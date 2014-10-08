@@ -42,7 +42,6 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.LegendDragAndDropC
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
 
 /**
  * Allows features to be moved onto the feature model diagram.
@@ -73,7 +72,7 @@ public class ModelLayoutEditPolicy extends LayoutEditPolicy {
 			}
 			return new FeatureMoveEditPolicy((FeatureEditPart) child, this);
 		} else if (child instanceof LegendEditPart) {
-			return new LegendMoveEditPolicy((LegendEditPart) child, this); 
+			return new LegendMoveEditPolicy(); 
 		} else {
 			return null;
 		}
@@ -108,7 +107,7 @@ public class ModelLayoutEditPolicy extends LayoutEditPolicy {
 				}
 			} else if (r.getEditParts().get(0) instanceof LegendEditPart) {
 				LegendEditPart editPart = (LegendEditPart) r.getEditParts().get(0);
-				cmd = new LegendDragAndDropCommand(featureModel, (LegendFigure) editPart.getFigure());
+				cmd = new LegendDragAndDropCommand(featureModel, editPart, r.getMoveDelta());
 			}
 		}
 		return cmd;

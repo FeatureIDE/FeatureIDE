@@ -55,7 +55,6 @@ public class Legend {
 	public void setPos(Point pos) {
 		this.pos = pos;
 		model.getLayout().setLegendPos(pos.x, pos.y);
-
 	}
 
 

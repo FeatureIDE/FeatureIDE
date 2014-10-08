@@ -31,29 +31,16 @@ import org.eclipse.draw2d.geometry.PrecisionRectangle;
 import org.eclipse.gef.editpolicies.NonResizableEditPolicy;
 import org.eclipse.gef.requests.ChangeBoundsRequest;
 
-import de.ovgu.featureide.fm.ui.editors.featuremodel.Legend;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.LegendDragAndDropCommand;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
-
 /**
  * Allows to move the legend.
  */
 public class LegendMoveEditPolicy extends NonResizableEditPolicy {
 
-	private LegendEditPart editPart;
-
-	private ModelLayoutEditPolicy superPolicy;
-
 	private RectangleFigure r;
 
 	private PolylineConnection c;
 
-	public LegendMoveEditPolicy(LegendEditPart child,
-			ModelLayoutEditPolicy superPolicy) {
-		this.editPart = child;
-		this.superPolicy = superPolicy;
-
+	public LegendMoveEditPolicy() {
 	}
 
 	@Override
@@ -88,17 +75,6 @@ public class LegendMoveEditPolicy extends NonResizableEditPolicy {
 		rect.translate(request.getMoveDelta());
 		rect.resize(request.getSizeDelta());
 
-		if (superPolicy.getConstraintCommand() instanceof LegendDragAndDropCommand) {
-			LegendDragAndDropCommand cmd = (LegendDragAndDropCommand) superPolicy
-					.getConstraintCommand();
-
-			if (cmd.canExecute()) {
-				((Legend) editPart.getModel()).getPos().x = rect.x;
-				((Legend) editPart.getModel()).getPos().y = rect.y;
-
-			}
-		}
-		((LegendFigure) editPart.getFigure()).newPos = rect.getLocation();
 	}
 
 	@Override

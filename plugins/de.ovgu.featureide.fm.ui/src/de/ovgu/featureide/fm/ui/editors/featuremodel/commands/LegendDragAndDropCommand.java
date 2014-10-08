@@ -31,6 +31,7 @@ import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.LegendMoveOperation;
 
@@ -42,34 +43,37 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.LegendMoveOperat
 public class LegendDragAndDropCommand extends Command {
 
 	private FeatureModel model;
-	private LegendFigure legendFigure;
+	private LegendEditPart legendEditPart;
+	private Point newLocation;
+	private Point moveDelta;
 
 	public LegendDragAndDropCommand(FeatureModel model,
-			LegendFigure legendFigure) {
-
-		this.legendFigure = legendFigure;
+			LegendEditPart legendEditPart, Point moveDelta) {
+		this.legendEditPart = legendEditPart;
 		this.model = model;
-
+		this.moveDelta = moveDelta;
+		determineNewLocation();
 	}
 
+	/**
+	 * @returns false if the Legend overlaps with a Feature or Constraint, true else.
+	 */
 	public boolean canExecute() {
 
-		// newRect is the rectangle containing the legend while dragging
-		Rectangle newRect = new Rectangle(legendFigure.newPos,
-				legendFigure.getSize());
-
-		legendFigure.translateToRelative(newRect);
+		Rectangle newBounds = new Rectangle(newLocation,
+				legendEditPart.getFigure().getSize());
+		
 		// check if legend intersects with a feature
 		for (Feature f : model.getFeatures()) {
 			Rectangle bounds = FeatureUIHelper.getBounds(f);
 
-			if (newRect.intersects(bounds)) {
+			if (newBounds.intersects(bounds)) {
 				return false;
 			}
 		}
 		// check if legend intersects with a constraint
 		for (Constraint c : model.getConstraints()) {
-			if (newRect.intersects(FeatureUIHelper.getBounds(c))) {
+			if (newBounds.intersects(FeatureUIHelper.getBounds(c))) {
 				return false;
 			}
 		}
@@ -78,12 +82,11 @@ public class LegendDragAndDropCommand extends Command {
 	}
 
 	public void execute() {
-		Point p = legendFigure.newPos.getCopy();
-//		model.getRoot().translateToAbsolute(p);
-		if (model.getLayout().getLegendPos().x == p.x && model.getLayout().getLegendPos().y == p.y) {
+		
+		if(((LegendFigure)legendEditPart.getFigure()).getLocation().equals(newLocation.x(), newLocation.y()))
 			return;
-		}
-		LegendMoveOperation op = new LegendMoveOperation(model, p, legendFigure);
+		
+		LegendMoveOperation op = new LegendMoveOperation(model, newLocation, (LegendFigure) legendEditPart.getFigure());
 		op.addContext((IUndoContext) model.getUndoContext());
 
 		try {
@@ -94,6 +97,11 @@ public class LegendDragAndDropCommand extends Command {
 
 		}
 
+	}
+	
+	private void determineNewLocation(){
+		final Rectangle bounds = legendEditPart.getFigure().getBounds().getCopy();
+		newLocation = bounds.getTranslated(moveDelta.getScaled(1 / FeatureUIHelper.getZoomFactor())).getLocation();
 	}
 
 }
