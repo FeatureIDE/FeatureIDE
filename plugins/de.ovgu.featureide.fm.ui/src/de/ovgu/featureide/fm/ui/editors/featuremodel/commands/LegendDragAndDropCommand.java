@@ -79,11 +79,11 @@ public class LegendDragAndDropCommand extends Command {
 
 	public void execute() {
 		Point p = legendFigure.newPos.getCopy();
-		legendFigure.translateToRelative(p);
+//		model.getRoot().translateToAbsolute(p);
 		if (model.getLayout().getLegendPos().x == p.x && model.getLayout().getLegendPos().y == p.y) {
 			return;
 		}
-		LegendMoveOperation op = new LegendMoveOperation(model, p,legendFigure.newPos, legendFigure);
+		LegendMoveOperation op = new LegendMoveOperation(model, p, legendFigure);
 		op.addContext((IUndoContext) model.getUndoContext());
 
 		try {

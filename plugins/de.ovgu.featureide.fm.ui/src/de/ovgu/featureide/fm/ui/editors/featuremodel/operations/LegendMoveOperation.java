@@ -44,7 +44,7 @@ public class LegendMoveOperation extends AbstractFeatureModelOperation {
 	private Point oldPos;
 	private boolean wasAutoLayout;
 
-	public LegendMoveOperation(FeatureModel featureModel, Point p, Point newPos, LegendFigure figure) {
+	public LegendMoveOperation(FeatureModel featureModel, Point p, LegendFigure figure) {
 		super(featureModel, LABEL);
 		this.pos = p;
 		final FMPoint legendPos = featureModel.getLayout().getLegendPos();
