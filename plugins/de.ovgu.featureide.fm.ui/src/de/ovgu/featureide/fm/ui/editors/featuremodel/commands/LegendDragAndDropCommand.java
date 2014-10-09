@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.commands;
 
+import java.util.List;
+
 import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
@@ -31,6 +33,7 @@ import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConnectionEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.LegendMoveOperation;
@@ -42,35 +45,42 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.LegendMoveOperat
  */
 public class LegendDragAndDropCommand extends Command {
 
-	private FeatureModel model;
-	private LegendEditPart legendEditPart;
+	private final FeatureModel model;
+	private final LegendEditPart legendEditPart;
 	private Point newLocation;
-	private Point moveDelta;
 
-	public LegendDragAndDropCommand(FeatureModel model,
-			LegendEditPart legendEditPart, Point moveDelta) {
+	public LegendDragAndDropCommand(FeatureModel model, LegendEditPart legendEditPart, Point moveDelta) {
 		this.legendEditPart = legendEditPart;
 		this.model = model;
-		this.moveDelta = moveDelta;
-		determineNewLocation();
+
+		final Rectangle bounds = legendEditPart.getFigure().getBounds().getCopy();
+		newLocation = bounds.getTranslated(moveDelta.getScaled(1 / FeatureUIHelper.getZoomFactor())).getLocation();
 	}
 
 	/**
-	 * @returns false if the Legend overlaps with a Feature or Constraint, true else.
+	 * Checks whether the movement is valid.
+	 * 
+	 * @returns
+	 * 	{@code false} if the legend overlaps with a feature or constraint,
+	 * 	{@code true} otherwise
 	 */
 	public boolean canExecute() {
+		Rectangle newBounds = new Rectangle(newLocation, legendEditPart.getFigure().getSize());
 
-		Rectangle newBounds = new Rectangle(newLocation,
-				legendEditPart.getFigure().getSize());
-		
 		// check if legend intersects with a feature
 		for (Feature f : model.getFeatures()) {
-			Rectangle bounds = FeatureUIHelper.getBounds(f);
-
-			if (newBounds.intersects(bounds)) {
+			if (newBounds.intersects(FeatureUIHelper.getBounds(f))) {
 				return false;
 			}
+			
+			final List<ConnectionEditPart> connectionList = FeatureUIHelper.getConnections(f, legendEditPart.getViewer());
+			for (ConnectionEditPart connectionEditPart : connectionList) {
+				if (connectionEditPart.getConnectionFigure().getPoints().intersects(newBounds)) {
+					return false;
+				}
+			}
 		}
+		
 		// check if legend intersects with a constraint
 		for (Constraint c : model.getConstraints()) {
 			if (newBounds.intersects(FeatureUIHelper.getBounds(c))) {
@@ -82,26 +92,19 @@ public class LegendDragAndDropCommand extends Command {
 	}
 
 	public void execute() {
-		
-		if(((LegendFigure)legendEditPart.getFigure()).getLocation().equals(newLocation.x(), newLocation.y()))
+		final LegendFigure legendFigure = (LegendFigure) legendEditPart.getFigure();
+
+		if (legendFigure.getLocation().equals(newLocation)) {
 			return;
-		
-		LegendMoveOperation op = new LegendMoveOperation(model, newLocation, (LegendFigure) legendEditPart.getFigure());
+		}
+
+		LegendMoveOperation op = new LegendMoveOperation(model, newLocation, legendFigure);
 		op.addContext((IUndoContext) model.getUndoContext());
 
 		try {
-			PlatformUI.getWorkbench().getOperationSupport()
-					.getOperationHistory().execute(op, null, null);
+			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (Exception e) {
 			FMUIPlugin.getDefault().logError(e);
-
 		}
-
 	}
-	
-	private void determineNewLocation(){
-		final Rectangle bounds = legendEditPart.getFigure().getBounds().getCopy();
-		newLocation = bounds.getTranslated(moveDelta.getScaled(1 / FeatureUIHelper.getZoomFactor())).getLocation();
-	}
-
 }

@@ -35,24 +35,16 @@ import org.eclipse.gef.requests.ChangeBoundsRequest;
  * Allows to move the legend.
  */
 public class LegendMoveEditPolicy extends NonResizableEditPolicy {
-
-	private RectangleFigure r;
-
-	private PolylineConnection c;
-
-	public LegendMoveEditPolicy() {
-	}
-
+	
 	@Override
 	protected IFigure createDragSourceFeedbackFigure() {
-
-		r = new RectangleFigure();
+		final RectangleFigure r = new RectangleFigure();
 		FigureUtilities.makeGhostShape(r);
 		r.setLineStyle(Graphics.LINE_DOT);
 		r.setForegroundColor(ColorConstants.white);
 		r.setBounds(getInitialFeedbackBounds());
 
-		c = new PolylineConnection();
+		final PolylineConnection c = new PolylineConnection();
 		c.setForegroundColor(ColorConstants.white);
 		c.setLineWidth(3);
 		FreeformLayer l = new FreeformLayer();
@@ -65,22 +57,13 @@ public class LegendMoveEditPolicy extends NonResizableEditPolicy {
 
 	@Override
 	protected void showChangeBoundsFeedback(ChangeBoundsRequest request) {
-
 		// call createDragSourceFeedbackFigure on start of the move
 		getDragSourceFeedbackFigure();
 
-		PrecisionRectangle rect = new PrecisionRectangle(
-				getInitialFeedbackBounds().getCopy());
+		PrecisionRectangle rect = new PrecisionRectangle(getInitialFeedbackBounds().getCopy());
 		getHostFigure().translateToAbsolute(rect);
 		rect.translate(request.getMoveDelta());
 		rect.resize(request.getSizeDelta());
 
 	}
-
-	@Override
-	protected void eraseChangeBoundsFeedback(ChangeBoundsRequest request) {
-		super.eraseChangeBoundsFeedback(request);
-
-	}
-
 }
