@@ -31,8 +31,8 @@ import de.ovgu.featureide.fm.core.FeatureModel;
  * @author Fabian Benduhn
  */
 public class Legend {
-	Point pos;
-	FeatureModel model;
+	private final FeatureModel model;
+	private Point pos;
 
 	public Legend(FeatureModel model) {
 		this.model = model;
@@ -40,11 +40,11 @@ public class Legend {
 		this.pos = new Point(legendPos.x, legendPos.y);
 	}
 
-	public FeatureModel getModel(){
+	public FeatureModel getModel() {
 		return model;
 	}
+
 	public void update() {
-//		model.redrawDiagram();
 		model.handleModelDataChanged();
 	}
 
@@ -55,8 +55,6 @@ public class Legend {
 	public void setPos(Point pos) {
 		this.pos = pos;
 		model.getLayout().setLegendPos(pos.x, pos.y);
-
 	}
-
 
 }

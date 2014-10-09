@@ -31,41 +31,20 @@ import org.eclipse.draw2d.geometry.PrecisionRectangle;
 import org.eclipse.gef.editpolicies.NonResizableEditPolicy;
 import org.eclipse.gef.requests.ChangeBoundsRequest;
 
-import de.ovgu.featureide.fm.ui.editors.featuremodel.Legend;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.LegendDragAndDropCommand;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
-
 /**
  * Allows to move the legend.
  */
 public class LegendMoveEditPolicy extends NonResizableEditPolicy {
-
-	private LegendEditPart editPart;
-
-	private ModelLayoutEditPolicy superPolicy;
-
-	private RectangleFigure r;
-
-	private PolylineConnection c;
-
-	public LegendMoveEditPolicy(LegendEditPart child,
-			ModelLayoutEditPolicy superPolicy) {
-		this.editPart = child;
-		this.superPolicy = superPolicy;
-
-	}
-
+	
 	@Override
 	protected IFigure createDragSourceFeedbackFigure() {
-
-		r = new RectangleFigure();
+		final RectangleFigure r = new RectangleFigure();
 		FigureUtilities.makeGhostShape(r);
 		r.setLineStyle(Graphics.LINE_DOT);
 		r.setForegroundColor(ColorConstants.white);
 		r.setBounds(getInitialFeedbackBounds());
 
-		c = new PolylineConnection();
+		final PolylineConnection c = new PolylineConnection();
 		c.setForegroundColor(ColorConstants.white);
 		c.setLineWidth(3);
 		FreeformLayer l = new FreeformLayer();
@@ -78,33 +57,13 @@ public class LegendMoveEditPolicy extends NonResizableEditPolicy {
 
 	@Override
 	protected void showChangeBoundsFeedback(ChangeBoundsRequest request) {
-
 		// call createDragSourceFeedbackFigure on start of the move
 		getDragSourceFeedbackFigure();
 
-		PrecisionRectangle rect = new PrecisionRectangle(
-				getInitialFeedbackBounds().getCopy());
+		PrecisionRectangle rect = new PrecisionRectangle(getInitialFeedbackBounds().getCopy());
 		getHostFigure().translateToAbsolute(rect);
 		rect.translate(request.getMoveDelta());
 		rect.resize(request.getSizeDelta());
 
-		if (superPolicy.getConstraintCommand() instanceof LegendDragAndDropCommand) {
-			LegendDragAndDropCommand cmd = (LegendDragAndDropCommand) superPolicy
-					.getConstraintCommand();
-
-			if (cmd.canExecute()) {
-				((Legend) editPart.getModel()).getPos().x = rect.x;
-				((Legend) editPart.getModel()).getPos().y = rect.y;
-
-			}
-		}
-		((LegendFigure) editPart.getFigure()).newPos = rect.getLocation();
 	}
-
-	@Override
-	protected void eraseChangeBoundsFeedback(ChangeBoundsRequest request) {
-		super.eraseChangeBoundsFeedback(request);
-
-	}
-
 }
