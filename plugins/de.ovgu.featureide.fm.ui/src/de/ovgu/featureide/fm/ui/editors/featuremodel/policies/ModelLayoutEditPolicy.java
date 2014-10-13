@@ -42,7 +42,6 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.LegendDragAndDropC
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
 
 /**
  * Allows features to be moved onto the feature model diagram.
@@ -73,7 +72,7 @@ public class ModelLayoutEditPolicy extends LayoutEditPolicy {
 			}
 			return new FeatureMoveEditPolicy((FeatureEditPart) child, this);
 		} else if (child instanceof LegendEditPart) {
-			return new LegendMoveEditPolicy((LegendEditPart) child, this); 
+			return new LegendMoveEditPolicy(); 
 		} else {
 			return null;
 		}
@@ -87,15 +86,15 @@ public class ModelLayoutEditPolicy extends LayoutEditPolicy {
 			if (r.getEditParts().size() != 1) {
 				return null;
 			}
-			if (r.getEditParts().get(0) instanceof FeatureEditPart) {
-				FeatureEditPart editPart = (FeatureEditPart) r.getEditParts().get(0);
-				Feature feature = editPart.getFeature();
+			Object editPart = r.getEditParts().get(0);
+			if (editPart instanceof FeatureEditPart) {
+				FeatureEditPart featureEditPart = (FeatureEditPart) editPart;
+				Feature feature = featureEditPart.getFeature();
 				Rectangle bounds = FeatureUIHelper.getBounds(feature);
 				bounds = bounds.getTranslated(r.getMoveDelta().getScaled(1 / FeatureUIHelper.getZoomFactor()));
-				cmd = new FeatureDragAndDropCommand(featureModel, feature, bounds.getLocation(), editPart);
-			} else if (r.getEditParts().get(0) instanceof ConstraintEditPart) {
-				ConstraintEditPart editPart = (ConstraintEditPart) r.getEditParts().get(0);
-				Constraint constraint = editPart.getConstraintModel();
+				cmd = new FeatureDragAndDropCommand(featureModel, feature, bounds.getLocation(), featureEditPart);
+			} else if (editPart instanceof ConstraintEditPart) {
+				Constraint constraint = ((ConstraintEditPart) editPart).getConstraintModel();
 
 				if (featureModel.getLayout().hasFeaturesAutoLayout()) {
 					Point point = r.getLocation().getCopy();
@@ -106,9 +105,8 @@ public class ModelLayoutEditPolicy extends LayoutEditPolicy {
 					bounds = bounds.getTranslated(r.getMoveDelta().getScaled(1 / FeatureUIHelper.getZoomFactor()));
 					cmd = new ConstraintDragAndDropCommand(featureModel, constraint, bounds.getLocation());
 				}
-			} else if (r.getEditParts().get(0) instanceof LegendEditPart) {
-				LegendEditPart editPart = (LegendEditPart) r.getEditParts().get(0);
-				cmd = new LegendDragAndDropCommand(featureModel, (LegendFigure) editPart.getFigure());
+			} else if (editPart instanceof LegendEditPart) {
+				cmd = new LegendDragAndDropCommand(featureModel, (LegendEditPart) editPart, r.getMoveDelta());
 			}
 		}
 		return cmd;
