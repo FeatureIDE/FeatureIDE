@@ -26,6 +26,12 @@ import java.util.List;
 import java.util.Vector;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -37,11 +43,24 @@ import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gef.EditDomain;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.GraphicalViewer;
+import org.eclipse.gef.KeyHandler;
 import org.eclipse.gef.LayerConstants;
 import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
 import org.eclipse.gef.ui.actions.PrintAction;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.gef.ui.parts.ScrollingGraphicalViewer;
+import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IPackageFragment;
+import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.search.IJavaSearchConstants;
+import org.eclipse.jdt.core.search.IJavaSearchScope;
+import org.eclipse.jdt.core.search.SearchDocument;
+import org.eclipse.jdt.core.search.SearchEngine;
+import org.eclipse.jdt.core.search.SearchMatch;
+import org.eclipse.jdt.core.search.SearchParticipant;
+import org.eclipse.jdt.core.search.SearchRequestor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -288,6 +307,52 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		createActions(part);
 		makeActions();
 		contributeToActionBars();
+		viewer.setKeyHandler(new KeyHandler() {
+			/*
+			 * (non-Javadoc)
+			 * 
+			 * @see
+			 * org.eclipse.gef.KeyHandler#keyReleased(org.eclipse.swt.events
+			 * .KeyEvent)
+			 */
+			@Override
+			public boolean keyReleased(KeyEvent event) {
+				org.eclipse.osgi.internal.debug.Debug.print(event.character);
+				if (event.keyCode == SWT.ESC) {
+					IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+					IProject project = root.getProjects()[0];
+					
+					org.eclipse.jdt.core.search.SearchPattern pattern = org.eclipse.jdt.core.search.SearchPattern
+							.createPattern("cut",
+									IJavaSearchConstants.METHOD,
+									IJavaSearchConstants.ALL_OCCURRENCES,
+									SearchPattern.RULE_PREFIX_MATCH);
+					IJavaSearchScope scope = SearchEngine.createJavaSearchScope(new IJavaElement[] {JavaCore.create(project) });
+					
+					SearchRequestor requestor = new SearchRequestor() {
+
+						@Override
+						public void acceptSearchMatch(SearchMatch match)
+								throws CoreException {
+							System.out.println(match.getElement());
+
+						}
+					};
+					SearchEngine engine = new SearchEngine();
+					try {
+						engine.search(pattern,
+								new SearchParticipant[] { SearchEngine
+										.getDefaultSearchParticipant() },
+								scope, requestor, null);
+					} catch (CoreException e) {
+						
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				return true;
+			}
+		});
 	}
 	
 	private void contributeToActionBars() {
