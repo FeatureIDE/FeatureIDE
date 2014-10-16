@@ -65,21 +65,11 @@ public class ClassEditPart extends AbstractGraphicalEditPart {
 		return (FSTClass) getModel();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.gef.editparts.AbstractGraphicalEditPart#createFigure()
-	 */
 	@Override
 	protected IFigure createFigure() {
 		return new ClassFigure(getClassModel(), 1);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.gef.editparts.AbstractEditPart#createEditPolicies()
-	 */
 	@Override
 	protected void createEditPolicies() {
 		installEditPolicy(EditPolicy.LAYOUT_ROLE, new ClassXYLayoutPolicy());
