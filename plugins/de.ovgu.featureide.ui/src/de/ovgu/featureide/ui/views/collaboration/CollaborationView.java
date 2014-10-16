@@ -331,7 +331,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults,
 		searchBoxShell.setText("Collaboration diagram search");
 		searchBoxShell.setBounds(120,120, 200, 50);
 		searchBoxShell.setLayout(new FillLayout());
-		final Text searchTextBox = new Text(searchBoxShell,SWT.SEARCH);
+		final Text searchTextBox = new Text(searchBoxShell,SWT.SEARCH | SWT.BORDER);
 		searchTextBox.addListener(SWT.Traverse,new Listener() {
 			
 			@Override
@@ -363,8 +363,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults,
 					SearchEngine engine = new SearchEngine();
 					try {
 						engine.search(pattern,
-								new SearchParticipant[] { SearchEngine
-										.getDefaultSearchParticipant() },
+								new SearchParticipant[] { SearchEngine.getDefaultSearchParticipant() },
 								scope, requestor, null);
 					} catch (CoreException ex) {
 						
