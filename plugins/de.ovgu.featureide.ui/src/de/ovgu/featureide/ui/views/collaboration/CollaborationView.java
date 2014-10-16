@@ -172,7 +172,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults,
 	private GraphicalViewerImpl viewer;
 	private CollaborationModelBuilder builder = new CollaborationModelBuilder();
 	private IWorkbenchPart currentEditor;
-
 	private AddRoleAction addRoleAction;
 	private DeleteAction delAction;
 	private Action toolbarAction;
@@ -182,7 +181,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults,
 	private ShowUnselectedAction showUnselectedAction;
 	private Point cursorPosition;
 	private Shell searchBoxShell = null;
-
 	private MenuManager colorSubMenu;
 	private AddColorSchemeAction addColorSchemeAction;
 	private RenameColorSchemeAction renameColorSchemeAction;
@@ -321,11 +319,10 @@ public class CollaborationView extends ViewPart implements GUIDefaults,
 		((ConnectionLayer) rootEditPart
 				.getLayer(LayerConstants.CONNECTION_LAYER))
 				.setAntialias(SWT.ON);
-
+		
 		viewer.setRootEditPart(rootEditPart);
 		viewer.setEditDomain(new EditDomain());
 		viewer.setEditPartFactory(new GraphicalEditPartFactory());
-
 		createContextMenu();
 		createActions(part);
 		makeActions();
