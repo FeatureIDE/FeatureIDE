@@ -72,12 +72,18 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartListener;
@@ -175,6 +181,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults,
 	private ExportAsAction exportAsAction;
 	private ShowUnselectedAction showUnselectedAction;
 	private Point cursorPosition;
+	private Shell searchBoxShell = null;
 
 	private MenuManager colorSubMenu;
 	private AddColorSchemeAction addColorSchemeAction;
@@ -323,35 +330,33 @@ public class CollaborationView extends ViewPart implements GUIDefaults,
 		createActions(part);
 		makeActions();
 		contributeToActionBars();
-		viewer.setKeyHandler(new KeyHandler() {
-			/*
-			 * (non-Javadoc)
-			 * 
-			 * @see
-			 * org.eclipse.gef.KeyHandler#keyReleased(org.eclipse.swt.events
-			 * .KeyEvent)
-			 */
+		searchBoxShell = new Shell(PlatformUI.getWorkbench().getDisplay());
+		searchBoxShell.setText("Collaboration diagram search");
+		searchBoxShell.setBounds(120,120, 200, 50);
+		searchBoxShell.setLayout(new FillLayout());
+		final Text searchTextBox = new Text(searchBoxShell,SWT.SEARCH);
+		searchTextBox.addListener(SWT.Traverse,new Listener() {
+			
 			@Override
-			public boolean keyReleased(KeyEvent event) {
-				org.eclipse.osgi.internal.debug.Debug.print(event.character);
-				if (event.keyCode == SWT.ESC) {
+			public void handleEvent(Event event) {
+				if(event.detail == SWT.TRAVERSE_RETURN){
 					IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 					IProject project = root.getProjects()[0];
 					
 					org.eclipse.jdt.core.search.SearchPattern pattern = org.eclipse.jdt.core.search.SearchPattern
-							.createPattern("cut",
+							.createPattern(searchTextBox.getText(),
 									IJavaSearchConstants.METHOD,
 									IJavaSearchConstants.ALL_OCCURRENCES,
 									SearchPattern.RULE_PREFIX_MATCH);
 					IJavaSearchScope scope = SearchEngine.createJavaSearchScope(new IJavaElement[] {JavaCore.create(project) });
 					
 					SearchRequestor requestor = new SearchRequestor() {
-
 						@Override
 						public void acceptSearchMatch(SearchMatch match)
 								throws CoreException {
-							System.out.println(match.getElement());
-
+							IJavaElement element = (IJavaElement)match.getElement();
+							String name = element.getElementName();
+							
 						}
 					};
 					SearchEngine engine = new SearchEngine();
@@ -360,12 +365,28 @@ public class CollaborationView extends ViewPart implements GUIDefaults,
 								new SearchParticipant[] { SearchEngine
 										.getDefaultSearchParticipant() },
 								scope, requestor, null);
-					} catch (CoreException e) {
+					} catch (CoreException ex) {
 						
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						ex.printStackTrace();
 					}
+					
 				}
+				else if(event.keyCode == SWT.ESC){
+					searchBoxShell.setVisible(false);
+					searchTextBox.setText("");
+				}
+				
+			}
+		});
+		
+		viewer.setKeyHandler(new KeyHandler() {
+		
+			@Override
+			public boolean keyReleased(KeyEvent event) {
+				if(!searchBoxShell.isVisible()){
+					searchBoxShell.setVisible(true);
+					searchTextBox.setFocus();
+				}				
 				return true;
 			}
 		});
