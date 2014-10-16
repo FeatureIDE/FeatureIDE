@@ -344,8 +344,15 @@ public class CollaborationView extends ViewPart implements GUIDefaults,
 			@Override
 			public void handleEvent(Event event) {
 				if(event.detail == SWT.TRAVERSE_RETURN){
+					ModelEditPart modelPart = (ModelEditPart)viewer.getContents();
+					List<Label> labels = gatherLabels(modelPart.getFigure());
+					List<Label> matchingLabels = new ArrayList<Label>();
+					String searchText = searchTextBox.getText();
 					
-							
+					for(Label label : labels){
+						String labelText = label.getText().toLowerCase();
+						if(labelText.contains(searchText) || labelText.startsWith(searchText) || labelText.endsWith(searchText)){
+							label.setBackgroundColor(ROLE_BACKGROUND_SELECTED);
 						}
 					}
 					
@@ -373,6 +380,28 @@ public class CollaborationView extends ViewPart implements GUIDefaults,
 		});
 
 	}
+	
+	private List<Label> gatherLabels(IFigure rootFigure)
+	{
+		List<Label> labels = new ArrayList<Label>();
+		gatherLabels(rootFigure,labels);
+		return labels;
+	}
+	
+	private void gatherLabels(IFigure rootFigure,List<Label> alreadyGatheredLabels){
+		
+		IFigure tempRootFigure = rootFigure;
+		for(Object objFigure : tempRootFigure.getChildren()){
+			IFigure figure = (IFigure)objFigure;
+			if(!(figure instanceof Label)){
+				gatherLabels(figure,alreadyGatheredLabels);
+			}
+			else{
+				alreadyGatheredLabels.add((Label)figure);
+			}
+		}
+	}
+	
 
 	private void contributeToActionBars() {
 		IActionBars bars = getViewSite().getActionBars();
