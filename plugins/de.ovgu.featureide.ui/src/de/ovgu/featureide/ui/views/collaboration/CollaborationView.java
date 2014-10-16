@@ -383,9 +383,11 @@ public class CollaborationView extends ViewPart implements GUIDefaults,
 		
 			@Override
 			public boolean keyReleased(KeyEvent event) {
-				if(!searchBoxShell.isVisible()){
+				if(!searchBoxShell.isVisible() && event.keyCode != SWT.ESC && 
+						   event.keyCode >= 48 && event.keyCode <= 125){
 					searchBoxShell.setVisible(true);
 					searchTextBox.setFocus();
+					
 				}				
 				return true;
 			}
