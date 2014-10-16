@@ -181,6 +181,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults,
 	private ShowUnselectedAction showUnselectedAction;
 	private Point cursorPosition;
 	private Shell searchBoxShell = null;
+	private List<Label> labels;
 	private MenuManager colorSubMenu;
 	private AddColorSchemeAction addColorSchemeAction;
 	private RenameColorSchemeAction renameColorSchemeAction;
@@ -221,6 +222,8 @@ public class CollaborationView extends ViewPart implements GUIDefaults,
 						part.refresh();
 					}
 					toolbarAction.setEnabled(true);
+					ModelEditPart modelPart = (ModelEditPart)viewer.getContents();
+					labels = gatherLabels(modelPart.getFigure());
 					return Status.OK_STATUS;
 				}
 			};
@@ -337,14 +340,11 @@ public class CollaborationView extends ViewPart implements GUIDefaults,
 			@Override
 			public void handleEvent(Event event) {
 				if(event.detail == SWT.TRAVERSE_RETURN){
-					ModelEditPart modelPart = (ModelEditPart)viewer.getContents();
-					List<Label> labels = gatherLabels(modelPart.getFigure());
-					List<Label> matchingLabels = new ArrayList<Label>();
-					String searchText = searchTextBox.getText();
 					
+					String searchText = searchTextBox.getText();					
 					for(Label label : labels){
 						String labelText = label.getText().toLowerCase();
-						if(labelText.contains(searchText) || labelText.startsWith(searchText) || labelText.endsWith(searchText)){
+						if(labelText.contains(searchText) ){
 							label.setBackgroundColor(ROLE_BACKGROUND_SELECTED);
 						}
 					}
@@ -731,6 +731,8 @@ public class CollaborationView extends ViewPart implements GUIDefaults,
 			public void run() {
 				viewer.setContents(model);
 				viewer.getContents().refresh();
+				ModelEditPart modelPart = (ModelEditPart)viewer.getContents();
+				labels = gatherLabels(modelPart.getFigure());
 			}
 		});
 	}
