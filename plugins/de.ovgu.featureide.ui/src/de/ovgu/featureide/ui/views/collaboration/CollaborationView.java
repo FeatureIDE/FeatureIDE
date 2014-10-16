@@ -345,14 +345,18 @@ public class CollaborationView extends ViewPart implements GUIDefaults,
 									IJavaSearchConstants.METHOD,
 									IJavaSearchConstants.ALL_OCCURRENCES,
 									SearchPattern.RULE_PREFIX_MATCH);
-					IJavaSearchScope scope = SearchEngine.createJavaSearchScope(new IJavaElement[] {JavaCore.create(project) });
+					IJavaSearchScope scope = SearchEngine.createJavaSearchScope(new IJavaElement[] {JavaCore.create(project) },IJavaSearchScope.SOURCES);
 					
 					SearchRequestor requestor = new SearchRequestor() {
 						@Override
 						public void acceptSearchMatch(SearchMatch match)
 								throws CoreException {
+							
 							IJavaElement element = (IJavaElement)match.getElement();
-							String name = element.getElementName();
+							
+							while(element != null && element.getElementType() != IJavaElement.COMPILATION_UNIT){
+								element = element.getParent();
+							}
 							
 						}
 					};
