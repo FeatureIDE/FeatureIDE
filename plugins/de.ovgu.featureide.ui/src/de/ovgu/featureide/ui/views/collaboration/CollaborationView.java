@@ -39,6 +39,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.draw2d.ConnectionLayer;
 import org.eclipse.draw2d.FigureCanvas;
+import org.eclipse.draw2d.IFigure;
+import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.Viewport;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gef.EditDomain;
@@ -70,9 +72,11 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
@@ -103,6 +107,7 @@ import Jakarta.util.Debug;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
+import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTConfiguration;
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
@@ -128,8 +133,10 @@ import de.ovgu.featureide.ui.views.collaboration.action.SetColorAction;
 import de.ovgu.featureide.ui.views.collaboration.action.SetColorSchemeAction;
 import de.ovgu.featureide.ui.views.collaboration.action.ShowFieldsMethodsAction;
 import de.ovgu.featureide.ui.views.collaboration.action.ShowUnselectedAction;
+import de.ovgu.featureide.ui.views.collaboration.editparts.ClassEditPart;
 import de.ovgu.featureide.ui.views.collaboration.editparts.CollaborationEditPart;
 import de.ovgu.featureide.ui.views.collaboration.editparts.GraphicalEditPartFactory;
+import de.ovgu.featureide.ui.views.collaboration.editparts.ModelEditPart;
 import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModelBuilder;
 
 /**
@@ -337,37 +344,9 @@ public class CollaborationView extends ViewPart implements GUIDefaults,
 			@Override
 			public void handleEvent(Event event) {
 				if(event.detail == SWT.TRAVERSE_RETURN){
-					IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-					IProject project = root.getProjects()[0];
 					
-					org.eclipse.jdt.core.search.SearchPattern pattern = org.eclipse.jdt.core.search.SearchPattern
-							.createPattern(searchTextBox.getText(),
-									IJavaSearchConstants.METHOD,
-									IJavaSearchConstants.ALL_OCCURRENCES,
-									SearchPattern.RULE_PREFIX_MATCH);
-					IJavaSearchScope scope = SearchEngine.createJavaSearchScope(new IJavaElement[] {JavaCore.create(project) },IJavaSearchScope.SOURCES);
-					
-					SearchRequestor requestor = new SearchRequestor() {
-						@Override
-						public void acceptSearchMatch(SearchMatch match)
-								throws CoreException {
-							
-							IJavaElement element = (IJavaElement)match.getElement();
-							
-							while(element != null && element.getElementType() != IJavaElement.COMPILATION_UNIT){
-								element = element.getParent();
-							}
 							
 						}
-					};
-					SearchEngine engine = new SearchEngine();
-					try {
-						engine.search(pattern,
-								new SearchParticipant[] { SearchEngine.getDefaultSearchParticipant() },
-								scope, requestor, null);
-					} catch (CoreException ex) {
-						
-						ex.printStackTrace();
 					}
 					
 				}
