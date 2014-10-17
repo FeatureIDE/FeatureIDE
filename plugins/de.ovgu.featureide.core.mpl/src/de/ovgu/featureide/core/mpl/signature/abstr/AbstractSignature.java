@@ -38,9 +38,11 @@ public abstract class AbstractSignature {
 	
 	public static final class FeatureData {
 		private final int id, lineNumber;
-		private boolean usesExternalMethods;
+		private boolean usesExternalMethods, usesOriginal;
+
 		private String comment;
 		private ArrayList<AbstractSignature> calledSignatures;
+		private ArrayList<String> usedNonPrimitveTypes;
 
 		public FeatureData(int id, int lineNumber, String comment) {
 			this.id = id;
@@ -48,6 +50,7 @@ public abstract class AbstractSignature {
 			this.comment = comment;
 			this.calledSignatures = null;
 			this.usesExternalMethods = false;
+			this.usesOriginal = false;
 		}
 		
 		public FeatureData(int id, int lineNumber) {
@@ -66,12 +69,24 @@ public abstract class AbstractSignature {
 			return usesExternalMethods;
 		}
 		
+		public boolean usesOriginal() {
+			return usesOriginal;
+		}
+		
 		public String getComment() {
 			return comment;
+		}
+
+		public List<String> getUsedNonPrimitveTypes() {
+			return usedNonPrimitveTypes != null ? Collections.unmodifiableList(usedNonPrimitveTypes) : new ArrayList<String>();
 		}
 		
 		public void setUsesExternMethods(boolean usesExternMethods) {
 			this.usesExternalMethods = usesExternMethods;
+		}
+		
+		public void setUsesOriginal(boolean usesOriginal) {
+			this.usesOriginal = usesOriginal;
 		}
 		
 		public List<AbstractSignature> getCalledSignatures() {
@@ -87,6 +102,15 @@ public abstract class AbstractSignature {
 				this.calledSignatures = new ArrayList<AbstractSignature>();
 			}
 			this.calledSignatures.add(signature);
+		}
+		
+		public void addUsedNonPrimitveType(String usedNonPrimitveType) {
+			if (this.usedNonPrimitveTypes == null) {
+				this.usedNonPrimitveTypes = new ArrayList<String>();
+			}
+			if (!this.usedNonPrimitveTypes.contains(usedNonPrimitveType)) {
+				this.usedNonPrimitveTypes.add(usedNonPrimitveType);
+			}
 		}
 	}
 	

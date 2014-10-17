@@ -38,6 +38,7 @@ public class FSTFeature {
 	private int color = -1;
 	private final FSTModel model;
 	private static final int hashCodePrime = 37;
+	private boolean hasMethodContracts = false;
 
 	public FSTFeature(String name, final FSTModel model) {
 		this.name = name;
@@ -73,6 +74,14 @@ public class FSTFeature {
 		return roles.get(className);
 	}
 	
+	public boolean hasMethodContracts() {
+		return hasMethodContracts;
+	}
+
+	public void setMethodContracts(boolean hasMethodContracts) {
+		this.hasMethodContracts = hasMethodContracts;
+	}
+	
 	@Override
 	public String toString() {
 		return name;
@@ -104,9 +113,12 @@ public class FSTFeature {
 	
 	@Override
 	public int hashCode() {
+		if (model != null) {
 		int hashCode = 1;
 		hashCode = hashCodePrime * hashCode + getName().hashCode();
 		return hashCodePrime * hashCode + model.getFeatureProject().getProjectName().hashCode();
+		} else {
+			return super.hashCode();
+		}
 	}
-
 }

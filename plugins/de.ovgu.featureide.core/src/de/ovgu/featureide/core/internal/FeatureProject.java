@@ -154,6 +154,14 @@ public class FeatureProject extends BuilderMarkerHandler implements
 	private final FeatureModelFile modelFile;
 
 	private IComposerExtension composerExtension = null;
+	
+	//TODO: Impelement possibility to change this path
+	private final String featureStubPath = "featurestub";
+
+	
+	public String getFeaturestubPath() {
+		return featureStubPath;
+	}
 
 	/**
 	 * If <code>true</code> there is something changed that is relevant for composition.<br>

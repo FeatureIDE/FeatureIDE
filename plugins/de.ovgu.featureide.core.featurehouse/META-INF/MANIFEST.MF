@@ -18,6 +18,9 @@ Bundle-ClassPath: lib/FeatureHouse.jar,
  lib/fuji.jar,
  .
 Bundle-Vendor: University of Magdeburg
-Import-Package: org.eclipse.core.expressions,
+Import-Package: de.uka.ilkd.key.gui,
+ de.uka.ilkd.key.gui.actions,
+ de.uka.ilkd.key.ui,
+ org.eclipse.core.expressions,
  org.eclipse.jdt.internal.core,
  org.eclipse.jdt.internal.ui.packageview

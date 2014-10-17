@@ -20,7 +20,9 @@
  */
 package de.ovgu.featureide.core.mpl.job;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -33,6 +35,7 @@ import AST.ASTNode;
 import AST.Access;
 import AST.BodyDecl;
 import AST.ClassDecl;
+import AST.ClassInstanceExpr;
 import AST.CompilationUnit;
 import AST.ConstructorAccess;
 import AST.ConstructorDecl;
@@ -46,7 +49,9 @@ import AST.MethodAccess;
 import AST.MethodDecl;
 import AST.ParameterDeclaration;
 import AST.Program;
+import AST.TypeAccess;
 import AST.TypeDecl;
+import AST.VarAccess;
 import beaver.Symbol;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTClassFragment;
@@ -61,6 +66,7 @@ import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.mpl.job.util.AJobArguments;
 import de.ovgu.featureide.core.mpl.signature.ProjectSignatures;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractClassSignature;
+import de.ovgu.featureide.core.mpl.signature.abstr.AbstractMethodSignature;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractSignature;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractSignature.FeatureData;
 import de.ovgu.featureide.core.mpl.signature.fuji.FujiClassSignature;
@@ -198,7 +204,9 @@ public class ExtendedFujiSignaturesJob extends AMonitorJob<ExtendedFujiSignature
 	private final HashMap<String, AbstractSignature> signatureTable = new HashMap<String, AbstractSignature>();
 
 	private final HashMap<BodyDecl, java.util.List<ExtendedSignature>> bodyMap = new HashMap<BodyDecl, java.util.List<ExtendedSignature>>();
-
+	private final ArrayList<ExtendedSignature> originalList = new ArrayList<ExtendedSignature>();
+	private final Hashtable<ExtendedSignature, ClassDecl> nonPrimitveTypesTable = new Hashtable<ExtendedSignature, ClassDecl>();
+	
 	public ProjectSignatures getProjectSignatures() {
 		return projectSignatures;
 	}
@@ -338,7 +346,7 @@ public class ExtendedFujiSignaturesJob extends AMonitorJob<ExtendedFujiSignature
 						parent = roleStack.pop();
 					}
 					featurename = getFeatureName(typeDecl);
-					final int featureID = interfaceProject.getFeatureID(featurename);
+					int featureID = interfaceProject.getFeatureID(featurename);
 					FujiClassSignature curClassSig = (FujiClassSignature) addFeatureID(new FujiClassSignature(parent, name, modifierString,
 							typeString, pckg, typeDecl, importList), featureID, Symbol.getLine(typeDecl.getStart()));
 					for (ImportDecl importDecl : importList) {
@@ -359,10 +367,11 @@ public class ExtendedFujiSignaturesJob extends AMonitorJob<ExtendedFujiSignature
 							List<Access> exceptionList = method.getExceptionList();
 
 							featurename = getFeatureName(bodyDecl);
-
+							featureID = interfaceProject.getFeatureID(featurename);
+							
 							AbstractSignature methAbs = addFeatureID(new FujiMethodSignature(curClassSig, name, modifierString, type,
 									false, parameterList, exceptionList), featureID, Symbol.getLine(method.getStart()));
-							findMethodAccesses(method.getBlock(), methAbs, featureID);
+							findMethodAccesses(method, methAbs, featureID);
 						} else if (bodyDecl instanceof FieldDeclaration) {
 							FieldDeclaration field = (FieldDeclaration) bodyDecl;
 
@@ -371,6 +380,8 @@ public class ExtendedFujiSignaturesJob extends AMonitorJob<ExtendedFujiSignature
 							TypeDecl type = field.type();
 
 							featurename = getFeatureName(bodyDecl);
+							featureID = interfaceProject.getFeatureID(featurename);
+							
 							addFeatureID(new FujiFieldSignature(curClassSig, name, modifierString, type), featureID,
 									Symbol.getLine(field.getStart()));
 
@@ -386,9 +397,11 @@ public class ExtendedFujiSignaturesJob extends AMonitorJob<ExtendedFujiSignature
 								List<Access> exceptionList = constructor.getExceptionList();
 
 								featurename = getFeatureName(bodyDecl);
+								featureID = interfaceProject.getFeatureID(featurename);
+								
 								AbstractSignature constrAbs = addFeatureID(new FujiMethodSignature(curClassSig, name, modifierString, type,
 										true, parameterList, exceptionList), featureID, Symbol.getLine(constructor.getStart()));
-								findMethodAccesses(constructor.getBlock(), constrAbs, featureID);
+								findMethodAccesses(constructor, constrAbs, featureID);
 							}
 
 						} else if (bodyDecl instanceof MemberClassDecl) {
@@ -447,35 +460,32 @@ public class ExtendedFujiSignaturesJob extends AMonitorJob<ExtendedFujiSignature
 							modifierString, typeString, pckg, typeDecl, importList)).sig;
 					
 					for (BodyDecl bodyDecl : typeDecl.getBodyDeclList()) {
-						typeDecl.getModifiers();
+						typeDecl.getModifiers();					
 						java.util.List<ExtendedSignature> accessingSignatures = bodyMap.remove(bodyDecl);
 						if (accessingSignatures != null) {
+							SignatureReference sigRef = null;
 							if (bodyDecl instanceof MethodDecl) {
 								MethodDecl method = (MethodDecl) bodyDecl;
-								if (accessingSignatures != null) {
-									modifierString = method.getModifiers().toString();
-									name = method.name();
-	
-									TypeDecl type = method.type();
-	
-									List<ParameterDeclaration> parameterList = method.getParameterList();
-									List<Access> exceptionList = method.getExceptionList();
-									SignatureReference sigRef = signatureSet.get(new FujiMethodSignature(curClassSig, name, modifierString,
-											type, false, parameterList, exceptionList));
-	
-									for (ExtendedSignature absSig : accessingSignatures) {
-										final FeatureData[] featureData = absSig.sig.getFeatureData();
-										for (int j = 0; j < featureData.length; j++) {
-											if (featureData[j].getId() == absSig.featureID) {
-												featureData[j].addCalledSignature(sigRef.sig);
-												break;
-											}
-										}
-									}
-								}
+								modifierString = method.getModifiers().toString();
+								name = method.name();
+
+								TypeDecl type = method.type();
+
+								List<ParameterDeclaration> parameterList = method.getParameterList();
+								List<Access> exceptionList = method.getExceptionList();
+								sigRef = signatureSet.get(new FujiMethodSignature(curClassSig, name, modifierString,
+										type, false, parameterList, exceptionList));
+							} else if (bodyDecl instanceof FieldDeclaration) {
+								FieldDeclaration field = (FieldDeclaration) bodyDecl;
+
+								modifierString = field.getModifiers().toString();
+								name = field.name();
+								TypeDecl type = field.type();
+								
+								sigRef = signatureSet.get(new FujiFieldSignature(curClassSig, name, modifierString, type));
 							} else if (bodyDecl instanceof ConstructorDecl) {
 								ConstructorDecl constructor = (ConstructorDecl) bodyDecl;
-								if (accessingSignatures != null && !constructor.isDefaultConstructor()) {
+								if (!constructor.isDefaultConstructor()) {
 									modifierString = constructor.getModifiers().toString();
 									name = constructor.name();
 									TypeDecl type = constructor.type();
@@ -483,15 +493,17 @@ public class ExtendedFujiSignaturesJob extends AMonitorJob<ExtendedFujiSignature
 									List<ParameterDeclaration> parameterList = constructor.getParameterList();
 									List<Access> exceptionList = constructor.getExceptionList();
 	
-									SignatureReference sigRef = signatureSet.get(new FujiMethodSignature(curClassSig, name, modifierString,
-											type, false, parameterList, exceptionList));
-									for (ExtendedSignature absSig : accessingSignatures) {
-										final FeatureData[] featureData = absSig.sig.getFeatureData();
-										for (int j = 0; j < featureData.length; j++) {
-											if (featureData[j].getId() == absSig.featureID) {
-												featureData[j].addCalledSignature(sigRef.sig);
-												break;
-											}
+									sigRef = signatureSet.get(new FujiMethodSignature(curClassSig, name, modifierString, type,
+											true, parameterList, exceptionList));
+								}
+							}
+							if (sigRef != null) {
+								for (ExtendedSignature absSig : accessingSignatures) {
+									final FeatureData[] featureData = absSig.sig.getFeatureData();
+									for (int j = 0; j < featureData.length; j++) {
+										if (featureData[j].getId() == absSig.featureID) {
+											featureData[j].addCalledSignature(sigRef.sig);
+											break;
 										}
 									}
 								}
@@ -505,12 +517,38 @@ public class ExtendedFujiSignaturesJob extends AMonitorJob<ExtendedFujiSignature
 			}
 			worked();
 		}
+		for (ExtendedSignature extSig : originalList) {
+			final FeatureData[] featureData = extSig.sig.getFeatureData();
+			for (int j = 0; j < featureData.length; j++) {
+				if (featureData[j].getId() == extSig.featureID) {
+					featureData[j].setUsesOriginal(true);
+					break;
+				}
+			}
+			 
+		}
+		for (ExtendedSignature extSig : nonPrimitveTypesTable.keySet()) {
+			final FeatureData[] featureData = extSig.sig.getFeatureData();
+			for (int j = 0; j < featureData.length; j++) {
+				if (featureData[j].getId() == extSig.featureID) {
+					featureData[j].addUsedNonPrimitveType(nonPrimitveTypesTable.get(extSig).name());
+					break;
+				}
+			}
+			 
+		}
 		for (java.util.List<ExtendedSignature> value  : bodyMap.values()) {
 			for (ExtendedSignature absSig : value) {
+				if (absSig.sig instanceof AbstractMethodSignature) {
+					AbstractMethodSignature methSig = (AbstractMethodSignature) absSig.sig;
+					if (methSig.isConstructor()) {
+						continue;
+					}
+				}
 				final FeatureData[] featureData = absSig.sig.getFeatureData();
 				for (int j = 0; j < featureData.length; j++) {
 					if (featureData[j].getId() == absSig.featureID) {
-						//featureData[j].setUsesExternMethods(true);
+						featureData[j].setUsesExternMethods(true);
 						break;
 					}
 				}
@@ -547,10 +585,49 @@ public class ExtendedFujiSignaturesJob extends AMonitorJob<ExtendedFujiSignature
 		if (stmt == null) {
 			return;
 		}
+		
+		if (stmt instanceof MethodDecl && ((MethodDecl) stmt).toString().contains("Main")) {
+			int i = 0;
+		}
+
 		if (stmt instanceof MethodAccess) {
-			putAccess(((MethodAccess) stmt).decl(), methAbs, featureID);
+			if ("original".equals(((MethodAccess) stmt).name())) {
+				originalList.add(new ExtendedSignature(methAbs, featureID));
+			} else {
+				putAccess(((MethodAccess) stmt).decl(), methAbs, featureID); 
+			}
+			for (int i = 0; i < stmt.getNumChildNoTransform(); i++) {
+				findMethodAccesses(stmt.getChildNoTransform(i), methAbs, featureID);
+			}
 		} else if (stmt instanceof ConstructorAccess) {
 			putAccess(((ConstructorAccess) stmt).decl(), methAbs, featureID);
+		} else if (stmt instanceof VarAccess) {			
+			Iterator<?> declIt = ((VarAccess) stmt).decls().iterator();
+			while (declIt.hasNext()) {
+				Object fieldDecl = declIt.next();
+				if (fieldDecl instanceof FieldDeclaration) {
+					putAccess((FieldDeclaration) fieldDecl, methAbs, featureID);
+					break;
+				}
+			}
+		} else if (stmt instanceof ClassInstanceExpr) {
+			Iterator<?> iterator = (((ClassInstanceExpr) stmt).decls().iterator());
+			while (iterator.hasNext()) {
+				Object cur = iterator.next();
+				if (cur instanceof ConstructorDecl) {
+					putAccess((ConstructorDecl) cur, methAbs, featureID);
+					break;
+				}
+			}
+		} else if (stmt instanceof TypeAccess){
+			Iterator<?> iterator = (((TypeAccess) stmt).decls().iterator());
+			while (iterator.hasNext()) {
+				Object cur = iterator.next();
+				if (cur instanceof ClassDecl) {
+					nonPrimitveTypesTable.put(new ExtendedSignature(methAbs, featureID), (ClassDecl) cur);
+					break;
+				}
+			}
 		} else {
 			for (int i = 0; i < stmt.getNumChildNoTransform(); i++) {
 				findMethodAccesses(stmt.getChildNoTransform(i), methAbs, featureID);
@@ -558,16 +635,13 @@ public class ExtendedFujiSignaturesJob extends AMonitorJob<ExtendedFujiSignature
 		}
 	}
 
-	private void putAccess(BodyDecl decl, AbstractSignature methAbs, int featureID) {
-		java.util.List<ExtendedSignature> signatureList = bodyMap.get(decl);
+	private void putAccess(BodyDecl typeDecl, AbstractSignature methAbs, int featureID) {
+		java.util.List<ExtendedSignature> signatureList = bodyMap.get(typeDecl);
 		if (signatureList == null) {
 			signatureList = new LinkedList<ExtendedSignature>();
-			bodyMap.put(decl, signatureList);
+			bodyMap.put(typeDecl, signatureList);
 		}
-		final ExtendedSignature extendedSignature = new ExtendedSignature(methAbs, featureID);
-		//if (!signatureList.contains(extendedSignature)) {
-			signatureList.add(extendedSignature);
-		//}
+		signatureList.add(new ExtendedSignature(methAbs, featureID));
 	}
 
 	private void copyComment(RoleElement element, int id, String fullName) {

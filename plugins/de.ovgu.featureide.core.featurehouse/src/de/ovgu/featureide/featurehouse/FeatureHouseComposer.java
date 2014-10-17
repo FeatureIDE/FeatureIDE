@@ -188,8 +188,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 					marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
 				} catch (CoreException e2) {
 					LOGGER.logError(e2);
-				}
-
+				} 
 			}
 
 			private IFile getFile(FSTTerminal terminal) {

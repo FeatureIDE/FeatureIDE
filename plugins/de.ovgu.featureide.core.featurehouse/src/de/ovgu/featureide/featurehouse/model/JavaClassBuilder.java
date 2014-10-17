@@ -173,15 +173,20 @@ public class JavaClassBuilder extends ClassBuilder {
 
 		String modifiers = (index == -1) ? "" : head.substring(0, index);
 		String contractBody = "", contractCompKey = "";
+		int startLine = -1;
 		for (FSTNode nonT1 : ((FSTNonTerminal) terminal.getParent()).getChildren()) {
 			if (nonT1.getType().equals("MethodSpecification")) {
 				for (FSTNode nonT2 : ((FSTNonTerminal) nonT1).getChildren()) {
 					if (nonT2.getType().equals("Specification")) {
 						for (FSTNode nonT3 : ((FSTNonTerminal) nonT2).getChildren()) {
-							if (nonT3.getType().equals("SpecCaseSeq"))
-								contractBody = ((FSTTerminal) nonT3).getBody();
-							if (nonT3.getType().equals("ContractCompKey"))
+							if (nonT3.getType().equals("SpecCaseSeq")) {
+								final FSTTerminal fstTerminal = (FSTTerminal) nonT3;
+								startLine = fstTerminal.beginLine;
+								contractBody = fstTerminal.getBody();
+							}
+							if (nonT3.getType().equals("ContractCompKey")) {
 								contractCompKey = ((FSTTerminal) nonT3).getContractCompKey();
+							}
 						}
 					}
 
@@ -191,7 +196,7 @@ public class JavaClassBuilder extends ClassBuilder {
 		}
 
 		// add method
-		RoleElement r = addMethod(name, getMethodParameter(terminal), returnType, modifiers, terminal.getBody(), terminal.beginLine, terminal.endLine, false, contractBody, contractCompKey);
+		RoleElement r = addMethod(name, getMethodParameter(terminal), returnType, modifiers, terminal.getBody(), terminal.beginLine, terminal.endLine, false, contractBody, contractCompKey, startLine);
 		r.setJavaDocCommtent(findJavaDocComments(terminal));
 	}
 
@@ -220,18 +225,19 @@ public class JavaClassBuilder extends ClassBuilder {
 		if (terminal.getBody().indexOf(name) > 0) {
 			modifiers = terminal.getBody().substring(0, terminal.getBody().indexOf(name) - 1);
 		}
-		if (name.contains("update")) {
-			int kons = 100;
-		}
 
 		String contractBody = "", contractCompKey = "";
+		int startLine = -1;
 		for (FSTNode nonT1 : ((FSTNonTerminal) terminal.getParent()).getChildren()) {
 			if (nonT1.getType().equals("MethodSpecification")) {
 				for (FSTNode nonT2 : ((FSTNonTerminal) nonT1).getChildren()) {
 					if (nonT2.getType().equals("Specification")) {
 						for (FSTNode nonT3 : ((FSTNonTerminal) nonT2).getChildren()) {
-							if (nonT3.getType().equals("SpecCaseSeq"))
-								contractBody = ((FSTTerminal) nonT3).getBody();
+							if (nonT3.getType().equals("SpecCaseSeq")) {
+								final FSTTerminal fstTerminal = (FSTTerminal) nonT3;
+								startLine = fstTerminal.beginLine;
+								contractBody = fstTerminal.getBody();
+							}
 							if (nonT3.getType().equals("ContractCompKey"))
 								contractCompKey = ((FSTTerminal) nonT3).getContractCompKey();
 
@@ -243,7 +249,7 @@ public class JavaClassBuilder extends ClassBuilder {
 		}
 
 		// add constructor
-		RoleElement r = addMethod(name, getMethodParameter(terminal), "void", modifiers, terminal.getBody(), terminal.beginLine, terminal.endLine, true, contractBody, contractCompKey);
+		RoleElement r = addMethod(name, getMethodParameter(terminal), "void", modifiers, terminal.getBody(), terminal.beginLine, terminal.endLine, true, contractBody, contractCompKey, startLine);
 		r.setJavaDocCommtent(findJavaDocComments(terminal));
 	}
 
