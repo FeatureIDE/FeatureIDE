@@ -18,9 +18,18 @@
             id="de.ovgu.featureide.featurehouse.meta.buildmetaproduct"
             objectClass="org.eclipse.core.resources.IProject">
          <action
-               class="de.ovgu.featureide.featurehouse.meta.BuildMetaProductAction"
+               class="de.ovgu.featureide.featurehouse.ui.actions.BuildMetaProductAction"
+               enablesFor="1"
                id="de.ovgu.featureide.featurehouse.meta.buildmetaproductaction"
                label="Build Metaproduct"
+               menubarPath="de.ovgu.featureide.fm.ui.menu/featurehouse"
+               style="toggle">
+         </action>
+         <action
+               class="de.ovgu.featureide.featurehouse.ui.actions.EnableFujiAction"
+               enablesFor="1"
+               id="de.ovgu.featureide.featurehouse.ui.enablefujiaction"
+               label="Enable Fuji Type Check"
                menubarPath="de.ovgu.featureide.fm.ui.menu/featurehouse"
                style="toggle">
          </action>

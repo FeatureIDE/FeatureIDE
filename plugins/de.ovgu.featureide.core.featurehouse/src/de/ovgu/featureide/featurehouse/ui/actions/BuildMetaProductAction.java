@@ -18,7 +18,7 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.featurehouse.meta;
+package de.ovgu.featureide.featurehouse.ui.actions;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
@@ -101,13 +101,10 @@ public class BuildMetaProductAction implements IActionDelegate {
 			if (featureProject != null) {
 				this.featureProject = featureProject;
 				if (FeatureHouseComposer.COMPOSER_ID.equals(featureProject.getComposerID())) {
-					action.setEnabled(true);
 					action.setChecked(getBuildMetaProduct());
-					return;
 				}
 			}
 		}
-		action.setEnabled(false); 
 	}
 
 }
