@@ -353,9 +353,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		 * Run fuji parallel to the build process.
 		 */
 		//TODO: save useFuji persistently and changed it via context menu
-		if (useFuji) {
-			fuji();
-		}
+		fuji();
 
 		createBuildFolder(config);
 		setJavaBuildPath(config.getName().split("[.]")[0]);
@@ -664,6 +662,9 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	 * Starts type checking with fuji in a background job.
 	 */
 	private void fuji() {
+		if (!useFuji) {
+			return;
+		}
 		if (fuji != null) {
 			fuji.cancel();
 			try {
@@ -1204,5 +1205,10 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 
 	public void setUseFuji(boolean useFuji) {
 		this.useFuji = useFuji;
+		fuji();
+	}
+	
+	public boolean usesFuji() {
+		return useFuji;
 	}
 }
