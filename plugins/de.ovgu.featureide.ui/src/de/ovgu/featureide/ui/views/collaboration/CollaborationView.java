@@ -330,8 +330,15 @@ public class CollaborationView extends ViewPart implements GUIDefaults,
 		createActions(part);
 		makeActions();
 		contributeToActionBars();
+		createSearchBox(viewer);
+		
+		
+
+	}
+	
+	private void createSearchBox(GraphicalViewerImpl parentToAttachKeyHandler){
 		searchBoxShell = new Shell(PlatformUI.getWorkbench().getDisplay());
-		searchBoxShell.setText("Collaboration diagram search");
+		searchBoxShell.setText("Search in: Collaboration Dagram");
 		searchBoxShell.setBounds(120,120, 200, 50);
 		searchBoxShell.setLayout(new FillLayout());
 		final Text searchTextBox = new Text(searchBoxShell,SWT.SEARCH | SWT.BORDER);
@@ -358,8 +365,8 @@ public class CollaborationView extends ViewPart implements GUIDefaults,
 			}
 		});
 		
-		viewer.setKeyHandler(new KeyHandler() {
-		
+		parentToAttachKeyHandler.setKeyHandler(new KeyHandler() {
+			
 			@Override
 			public boolean keyReleased(KeyEvent event) {
 				if(!searchBoxShell.isVisible() && event.keyCode != SWT.ESC && 
@@ -371,7 +378,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults,
 				return true;
 			}
 		});
-
+		
 	}
 	
 	private List<Label> gatherLabels(IFigure rootFigure)
