@@ -121,6 +121,7 @@ import de.ovgu.featureide.ui.views.collaboration.action.AddRoleAction;
 import de.ovgu.featureide.ui.views.collaboration.action.DeleteAction;
 import de.ovgu.featureide.ui.views.collaboration.action.DeleteColorSchemeAction;
 import de.ovgu.featureide.ui.views.collaboration.action.ExportAsAction;
+import de.ovgu.featureide.ui.views.collaboration.action.ExportAsImageImpl;
 import de.ovgu.featureide.ui.views.collaboration.action.FilterAction;
 import de.ovgu.featureide.ui.views.collaboration.action.RenameColorSchemeAction;
 import de.ovgu.featureide.ui.views.collaboration.action.SetColorAction;
@@ -564,7 +565,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults,
 		addRoleAction = new AddRoleAction(ADD_LABEL, viewer, this);
 		delAction = new DeleteAction(DELETE_LABEL, viewer);
 		filterAction = new FilterAction(FILTER_LABEL, viewer, this);
-		exportAsAction = new ExportAsAction(EXPORT_AS_LABEL, viewer);
+		exportAsAction = new ExportAsAction(EXPORT_AS_LABEL, viewer,new ExportAsImageImpl());
 		showUnselectedAction = new ShowUnselectedAction(UNSELECTED_LABEL, this);
 
 		for (int i = 0; i < FIELD_METHOD_LABEL_NAMES.length; i++) {
