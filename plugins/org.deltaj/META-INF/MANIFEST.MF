@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: org.deltaj
 Bundle-Vendor: Lorenzo Bettini
-Bundle-Version: 2.7.1.qualifier
+Bundle-Version: 2.7.2.qualifier
 Bundle-SymbolicName: org.deltaj;singleton:=true
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.apache.log4j,

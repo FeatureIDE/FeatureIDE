@@ -1,5 +1,6 @@
 package org.deltaj.generator;
 
+import com.google.common.base.Objects;
 import com.google.inject.Inject;
 import java.util.Arrays;
 import java.util.List;
@@ -22,8 +23,7 @@ import org.deltaj.util.DeltaJTypeUtils;
 import org.deltaj.util.DeltaJUtils;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.xtend2.lib.StringConcatenation;
-import org.eclipse.xtext.xbase.lib.IntegerExtensions;
-import org.eclipse.xtext.xbase.lib.ObjectExtensions;
+import org.eclipse.xtext.xbase.lib.Extension;
 
 @SuppressWarnings("all")
 public class DeltaJStatementConstraintGenerator {
@@ -36,14 +36,14 @@ public class DeltaJStatementConstraintGenerator {
   private DeltaJConstraintGeneratorHelper constraintGeneratorHelper;
   
   @Inject
+  @Extension
   private DeltaJGeneratorExtensions generatorExtensions;
   
   public CharSequence genConstraints(final DeltaJTypeSystem ts, final List<Statement> statements) {
     CharSequence _xblockexpression = null;
     {
       this.typeSystem = ts;
-      CharSequence _genConstraints = this.genConstraints(statements);
-      _xblockexpression = (_genConstraints);
+      _xblockexpression = this.genConstraints(statements);
     }
     return _xblockexpression;
   }
@@ -64,14 +64,12 @@ public class DeltaJStatementConstraintGenerator {
     CharSequence _xblockexpression = null;
     {
       this.typeSystem = ts;
-      CharSequence _genConstraintsCase = this.genConstraintsCase(statement);
-      CharSequence constraints = _genConstraintsCase;
-      CharSequence _genComment = this.constraintGeneratorHelper.genComment(statement);
-      CharSequence comment = _genComment;
+      CharSequence constraints = this.genConstraintsCase(statement);
+      CharSequence comment = this.constraintGeneratorHelper.genComment(statement);
       CharSequence _xifexpression = null;
       int _length = constraints.length();
-      boolean _operator_greaterThan = IntegerExtensions.operator_greaterThan(_length, 0);
-      if (_operator_greaterThan) {
+      boolean _greaterThan = (_length > 0);
+      if (_greaterThan) {
         StringConcatenation _builder = new StringConcatenation();
         _builder.append(comment, "");
         _builder.newLineIfNotEmpty();
@@ -80,7 +78,7 @@ public class DeltaJStatementConstraintGenerator {
       } else {
         _xifexpression = comment;
       }
-      _xblockexpression = (_xifexpression);
+      _xblockexpression = _xifexpression;
     }
     return _xblockexpression;
   }
@@ -101,22 +99,20 @@ public class DeltaJStatementConstraintGenerator {
   protected CharSequence _genConstraintsCase(final ReturnStatement statement) {
     CharSequence _xifexpression = null;
     Expression _expression = statement.getExpression();
-    boolean _operator_notEquals = ObjectExtensions.operator_notEquals(_expression, null);
-    if (_operator_notEquals) {
+    boolean _notEquals = (!Objects.equal(_expression, null));
+    if (_notEquals) {
       StringConcatenation _xblockexpression = null;
       {
-        StringConcatenation _stringConcatenation = new StringConcatenation();
-        StringConcatenation buffer = _stringConcatenation;
+        StringConcatenation buffer = new StringConcatenation();
         Expression _expression_1 = statement.getExpression();
-        Type _genConstraintAndGetType = this.expressionConstraintGenerator.genConstraintAndGetType(this.typeSystem, buffer, _expression_1);
-        final Type expType = _genConstraintAndGetType;
+        final Type expType = this.expressionConstraintGenerator.genConstraintAndGetType(this.typeSystem, buffer, _expression_1);
         this.generatorExtensions.addNewLineIfNotEmpty(buffer);
         Method _containingMethod = DeltaJUtils.getContainingMethod(statement);
         TypeForMethod _returntype = _containingMethod.getReturntype();
         Expression _expression_2 = statement.getExpression();
         CharSequence _genSubtypeConstraint = this.constraintGeneratorHelper.genSubtypeConstraint(expType, _returntype, _expression_2);
         buffer.append(_genSubtypeConstraint);
-        _xblockexpression = (buffer);
+        _xblockexpression = buffer;
       }
       _xifexpression = _xblockexpression;
     } else {
@@ -129,21 +125,18 @@ public class DeltaJStatementConstraintGenerator {
   protected CharSequence _genConstraintsCase(final Assignment assignment) {
     StringConcatenation _xblockexpression = null;
     {
-      StringConcatenation _stringConcatenation = new StringConcatenation();
-      StringConcatenation buffer = _stringConcatenation;
+      StringConcatenation buffer = new StringConcatenation();
       this.expressionConstraintGenerator.init(this.typeSystem, buffer);
       Expression _left = assignment.getLeft();
-      Type _genConstraintAndGetType = this.expressionConstraintGenerator.genConstraintAndGetType(_left);
-      Type leftType = _genConstraintAndGetType;
+      Type leftType = this.expressionConstraintGenerator.genConstraintAndGetType(_left);
       this.generatorExtensions.addNewLineIfNotEmpty(buffer);
       Expression _right = assignment.getRight();
-      Type _genConstraintAndGetType_1 = this.expressionConstraintGenerator.genConstraintAndGetType(_right);
-      Type rightType = _genConstraintAndGetType_1;
+      Type rightType = this.expressionConstraintGenerator.genConstraintAndGetType(_right);
       this.generatorExtensions.addNewLineIfNotEmpty(buffer);
       Expression _right_1 = assignment.getRight();
       CharSequence _genSubtypeConstraint = this.constraintGeneratorHelper.genSubtypeConstraint(rightType, leftType, _right_1);
       buffer.append(_genSubtypeConstraint);
-      _xblockexpression = (buffer);
+      _xblockexpression = buffer;
     }
     return _xblockexpression;
   }
@@ -151,13 +144,10 @@ public class DeltaJStatementConstraintGenerator {
   protected CharSequence _genConstraintsCase(final IfStatement statement) {
     StringConcatenation _xblockexpression = null;
     {
-      StringConcatenation _stringConcatenation = new StringConcatenation();
-      StringConcatenation buffer = _stringConcatenation;
+      StringConcatenation buffer = new StringConcatenation();
       Expression _expression = statement.getExpression();
-      Type _genConstraintAndGetType = this.expressionConstraintGenerator.genConstraintAndGetType(this.typeSystem, buffer, _expression);
-      Type expressionType = _genConstraintAndGetType;
-      BooleanType _createBooleanType = DeltaJTypeUtils.createBooleanType();
-      BooleanType booleanType = _createBooleanType;
+      Type expressionType = this.expressionConstraintGenerator.genConstraintAndGetType(this.typeSystem, buffer, _expression);
+      BooleanType booleanType = DeltaJTypeUtils.createBooleanType();
       this.generatorExtensions.addNewLineIfNotEmpty(buffer);
       Expression _expression_1 = statement.getExpression();
       CharSequence _genSubtypeConstraint = this.constraintGeneratorHelper.genSubtypeConstraint(expressionType, booleanType, _expression_1);
@@ -169,31 +159,28 @@ public class DeltaJStatementConstraintGenerator {
       this.generatorExtensions.addNewLineIfNotEmpty(buffer);
       StatementBlock _thenBlock = statement.getThenBlock();
       EList<Statement> _statements = _thenBlock.getStatements();
-      CharSequence _genConstraints = this.genConstraints(_statements);
+      Object _genConstraints = this.genConstraints(_statements);
       buffer.append(_genConstraints);
       StatementBlock _elseBlock = statement.getElseBlock();
-      boolean _operator_notEquals = ObjectExtensions.operator_notEquals(_elseBlock, null);
-      if (_operator_notEquals) {
-        {
-          buffer.newLineIfNotEmpty();
-          StringConcatenation _builder_1 = new StringConcatenation();
-          _builder_1.append("// else branch");
-          buffer.append(_builder_1);
-          this.generatorExtensions.addNewLineIfNotEmpty(buffer);
-          StatementBlock _elseBlock_1 = statement.getElseBlock();
-          EList<Statement> _statements_1 = _elseBlock_1.getStatements();
-          CharSequence _genConstraints_1 = this.genConstraints(_statements_1);
-          buffer.append(_genConstraints_1);
-        }
+      boolean _notEquals = (!Objects.equal(_elseBlock, null));
+      if (_notEquals) {
+        buffer.newLineIfNotEmpty();
+        StringConcatenation _builder_1 = new StringConcatenation();
+        _builder_1.append("// else branch");
+        buffer.append(_builder_1);
+        this.generatorExtensions.addNewLineIfNotEmpty(buffer);
+        StatementBlock _elseBlock_1 = statement.getElseBlock();
+        EList<Statement> _statements_1 = _elseBlock_1.getStatements();
+        Object _genConstraints_1 = this.genConstraints(_statements_1);
+        buffer.append(_genConstraints_1);
       }
-      _xblockexpression = (buffer);
+      _xblockexpression = buffer;
     }
     return _xblockexpression;
   }
   
   public StringConcatenation genConstraints(final Expression exp) {
-    StringConcatenation _genConstraints = this.expressionConstraintGenerator.genConstraints(this.typeSystem, exp);
-    return _genConstraints;
+    return this.expressionConstraintGenerator.genConstraints(this.typeSystem, exp);
   }
   
   public CharSequence genConstraintsCase(final Statement assignment) {

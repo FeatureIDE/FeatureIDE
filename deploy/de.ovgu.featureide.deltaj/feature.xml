@@ -2,7 +2,7 @@
 <feature
       id="de.ovgu.featureide.deltaj"
       label="FeatureIDE extension for DeltaJ (optional)"
-      version="2.7.1.qualifier"
+      version="2.7.2.qualifier"
       provider-name="University of Magdeburg">
 
    <description url="http://www.fosd.de/featureide/">
@@ -203,35 +203,35 @@ Library.
          id="org.deltaj"
          download-size="0"
          install-size="0"
-         version="2.7.1.qualifier"
+         version="2.7.2.qualifier"
          unpack="false"/>
 
    <plugin
          id="org.deltaj.transformations"
          download-size="0"
          install-size="0"
-         version="2.7.1.qualifier"
+         version="2.7.2.qualifier"
          unpack="false"/>
 
    <plugin
          id="org.deltaj.transformations.ui"
          download-size="0"
          install-size="0"
-         version="2.7.1.qualifier"
+         version="2.7.2.qualifier"
          unpack="false"/>
 
    <plugin
          id="org.deltaj.ui"
          download-size="0"
          install-size="0"
-         version="2.7.1.qualifier"
+         version="2.7.2.qualifier"
          unpack="false"/>
 
    <plugin
          id="de.ovgu.featureide.core.deltaj"
          download-size="0"
          install-size="0"
-         version="2.7.1.qualifier"
+         version="2.7.2.qualifier"
          unpack="false"/>
 
 </feature>
