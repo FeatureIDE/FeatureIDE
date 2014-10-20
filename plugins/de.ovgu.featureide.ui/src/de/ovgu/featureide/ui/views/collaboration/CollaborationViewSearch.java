@@ -171,6 +171,10 @@ public class CollaborationViewSearch {
 		});
 	}
 	
+	/***
+	 * This function refreshs the labels which are designated for searching.
+	 * It uses the given GraphicalViewerImpl and looks for labels.
+	 */
 	public void refreshSearchContent(){
 		ModelEditPart editPart = (ModelEditPart)attachedViewerParent.getContents();
 		gatherLabels(editPart.getFigure());
