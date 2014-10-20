@@ -115,6 +115,7 @@ import de.ovgu.featureide.fm.ui.GraphicsExporter;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.editors.annotation.ColorPalette;
 import de.ovgu.featureide.ui.statistics.ui.CheckBoxTreeViewDialog;
+import de.ovgu.featureide.ui.views.collaboration.CollaborationViewSearch.Builder;
 import de.ovgu.featureide.ui.views.collaboration.action.AddColorSchemeAction;
 import de.ovgu.featureide.ui.views.collaboration.action.AddRoleAction;
 import de.ovgu.featureide.ui.views.collaboration.action.DeleteAction;
@@ -181,7 +182,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults,
 	private ShowUnselectedAction showUnselectedAction;
 	private Point cursorPosition;
 	private Shell searchBoxShell = null;
-	private List<Label> labels;
+	private CollaborationViewSearch search;
 	private MenuManager colorSubMenu;
 	private AddColorSchemeAction addColorSchemeAction;
 	private RenameColorSchemeAction renameColorSchemeAction;
@@ -223,7 +224,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults,
 					}
 					toolbarAction.setEnabled(true);
 					ModelEditPart modelPart = (ModelEditPart)viewer.getContents();
-					labels = gatherLabels(modelPart.getFigure());
+					search.refreshSearchContent();
 					return Status.OK_STATUS;
 				}
 			};
@@ -330,78 +331,15 @@ public class CollaborationView extends ViewPart implements GUIDefaults,
 		createActions(part);
 		makeActions();
 		contributeToActionBars();
-		createSearchBox(viewer);
+		CollaborationViewSearch.Builder builder = new CollaborationViewSearch.Builder();
+		search = builder.setAttachedViewerParent(viewer)
+			   .setSearchBoxText("Search in Collaboration Diagram")
+			   .setFindResultsColor(ROLE_BACKGROUND_SELECTED)
+			   .create();
 		
 		
 
 	}
-	
-	private void createSearchBox(GraphicalViewerImpl parentToAttachKeyHandler){
-		searchBoxShell = new Shell(PlatformUI.getWorkbench().getDisplay());
-		searchBoxShell.setText("Search in: Collaboration Dagram");
-		searchBoxShell.setBounds(120,120, 200, 50);
-		searchBoxShell.setLayout(new FillLayout());
-		final Text searchTextBox = new Text(searchBoxShell,SWT.SEARCH | SWT.BORDER);
-		searchTextBox.addListener(SWT.Traverse,new Listener() {
-			
-			@Override
-			public void handleEvent(Event event) {
-				if(event.detail == SWT.TRAVERSE_RETURN){
-					
-					String searchText = searchTextBox.getText();					
-					for(Label label : labels){
-						String labelText = label.getText().toLowerCase();
-						if(labelText.contains(searchText) ){
-							label.setBackgroundColor(ROLE_BACKGROUND_SELECTED);
-						}
-					}
-					
-				}
-				else if(event.keyCode == SWT.ESC){
-					searchBoxShell.setVisible(false);
-					searchTextBox.setText("");
-				}
-				
-			}
-		});
-		
-		parentToAttachKeyHandler.setKeyHandler(new KeyHandler() {
-			
-			@Override
-			public boolean keyReleased(KeyEvent event) {
-				if(!searchBoxShell.isVisible() && event.keyCode != SWT.ESC && 
-						   event.keyCode >= 48 && event.keyCode <= 125){
-					searchBoxShell.setVisible(true);
-					searchTextBox.setFocus();
-					
-				}				
-				return true;
-			}
-		});
-		
-	}
-	
-	private List<Label> gatherLabels(IFigure rootFigure)
-	{
-		List<Label> labels = new ArrayList<Label>();
-		gatherLabels(rootFigure,labels);
-		return labels;
-	}
-	
-	private void gatherLabels(IFigure rootFigure,List<Label> alreadyGatheredLabels){
-		
-		IFigure tempRootFigure = rootFigure;
-		for(Object objFigure : tempRootFigure.getChildren()){
-			IFigure figure = (IFigure)objFigure;
-			if(!(figure instanceof Label)){
-				gatherLabels(figure,alreadyGatheredLabels);
-			}
-			else{
-				alreadyGatheredLabels.add((Label)figure);
-			}
-		}
-	}
-	
 
 	private void contributeToActionBars() {
 		IActionBars bars = getViewSite().getActionBars();
@@ -738,8 +676,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults,
 			public void run() {
 				viewer.setContents(model);
 				viewer.getContents().refresh();
-				ModelEditPart modelPart = (ModelEditPart)viewer.getContents();
-				labels = gatherLabels(modelPart.getFigure());
+				search.refreshSearchContent();
 			}
 		});
 	}
