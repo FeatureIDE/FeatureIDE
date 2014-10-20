@@ -335,6 +335,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults,
 		search = builder.setAttachedViewerParent(viewer)
 			   .setSearchBoxText("Search in Collaboration Diagram")
 			   .setFindResultsColor(ROLE_BACKGROUND_SELECTED)
+			   .setNoSearchResultsColor(ROLE_BACKGROUND_UNSELECTED)
 			   .create();
 		
 		

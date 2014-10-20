@@ -51,14 +51,26 @@ public class CollaborationViewSearch {
 	private GraphicalViewerImpl attachedViewerParent;
 	private String searchBoxText;
 	private Color findResultsColor;
-	private List<Label> searchedLabels;
+	private Color noSearchResultsColor;
+	private List<Label> extractedLabels;
+	private List<Label> matchedLabels;
 	
 	public static class Builder{
 		private GraphicalViewerImpl attachedViewerParent;
 		private String searchBoxText;
 		private Color findResultsColor;
+		private Color noSearchResultsColor;
 		
 		
+		public Color getNoSearchResultsColor() {
+			return noSearchResultsColor;
+		}
+
+		public Builder setNoSearchResultsColor(Color noSearchResultsColor) {
+			this.noSearchResultsColor = noSearchResultsColor;
+			return this;
+		}
+
 		public GraphicalViewerImpl getAttachedViewerParent() {
 			return attachedViewerParent;
 		}
@@ -87,16 +99,19 @@ public class CollaborationViewSearch {
 		}
 		
 		public CollaborationViewSearch create(){
-			return new CollaborationViewSearch(attachedViewerParent,searchBoxText,findResultsColor);
+			return new CollaborationViewSearch(attachedViewerParent,searchBoxText,findResultsColor,noSearchResultsColor);
 		}
 		
 	}
 	
-	private CollaborationViewSearch(GraphicalViewerImpl attachedViewerParent,String searchBoxText,Color findResultsColor) {
-		this.searchedLabels = new ArrayList<Label>();
+	private CollaborationViewSearch(GraphicalViewerImpl attachedViewerParent,String searchBoxText,Color findResultsColor,
+									Color noSearchResultColor) {
+		this.extractedLabels = new ArrayList<Label>();
+		this.matchedLabels = new ArrayList<Label>();
 		this.attachedViewerParent = attachedViewerParent;
 		this.searchBoxText = searchBoxText;
 		this.findResultsColor = findResultsColor;
+		this.noSearchResultsColor = noSearchResultColor;
 		createControls();
 	}
 	
@@ -111,13 +126,22 @@ public class CollaborationViewSearch {
 			
 			@Override
 			public void handleEvent(Event event) {
+				if(searchTextBox.getText().equalsIgnoreCase("")){
+					uncolorOldLabels();
+				}
 				if(event.detail == SWT.TRAVERSE_RETURN){
 					
-					String searchText = searchTextBox.getText();					
-					for(Label label : searchedLabels){
+					String searchText = searchTextBox.getText();
+					if(searchText.equalsIgnoreCase("")){
+						return;
+					}
+					uncolorOldLabels();
+					matchedLabels.clear();
+					for(Label label : extractedLabels){
 						String labelText = label.getText().toLowerCase();
 						if(labelText.contains(searchText) ){
 							label.setBackgroundColor(findResultsColor);
+							matchedLabels.add(label);
 						}
 					}
 					
@@ -125,6 +149,7 @@ public class CollaborationViewSearch {
 				else if(event.keyCode == SWT.ESC){
 					searchBoxShell.setVisible(false);
 					searchTextBox.setText("");
+					uncolorOldLabels();
 				}
 				
 			}
@@ -150,11 +175,19 @@ public class CollaborationViewSearch {
 		gatherLabels(editPart.getFigure());
 	}
 	
+	private void uncolorOldLabels(){
+		if(matchedLabels.size() != 0){
+			for(Label l : matchedLabels){
+				l.setBackgroundColor(noSearchResultsColor);
+			}
+		}
+	}
+	
 	private void gatherLabels(IFigure rootFigure)
 	{
 		List<Label> labels = new ArrayList<Label>();
 		gatherLabels(rootFigure,labels);
-		searchedLabels = new ArrayList<Label>(labels);
+		extractedLabels = new ArrayList<Label>(labels);
 	}
 	
 	private void gatherLabels(IFigure rootFigure,List<Label> alreadyGatheredLabels){
