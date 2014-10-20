@@ -23,6 +23,7 @@ package de.ovgu.featureide.ui.views.collaboration;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.draw2d.FigureCanvas;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Label;
 import org.eclipse.gef.EditPart;
@@ -100,26 +101,24 @@ public class CollaborationViewSearch {
 		}
 		
 		public CollaborationViewSearch create(){
-			return new CollaborationViewSearch(attachedViewerParent,searchBoxText,findResultsColor,noSearchResultsColor);
+			return new CollaborationViewSearch(this);
 		}
 		
 	}
 	
-	private CollaborationViewSearch(GraphicalViewerImpl attachedViewerParent,String searchBoxText,Color findResultsColor,
-									Color noSearchResultColor) {
+	private CollaborationViewSearch(Builder searchBuilder) {
 		this.extractedLabels = new ArrayList<Label>();
 		this.matchedLabels = new ArrayList<Label>();
-		this.attachedViewerParent = attachedViewerParent;
-		this.searchBoxText = searchBoxText;
-		this.findResultsColor = findResultsColor;
-		this.noSearchResultsColor = noSearchResultColor;
+		this.attachedViewerParent = searchBuilder.getAttachedViewerParent();
+		this.searchBoxText = searchBuilder.getSearchBoxText();
+		this.findResultsColor = searchBuilder.getFindResultsColor();
+		this.noSearchResultsColor = searchBuilder.getNoSearchResultsColor();
 		createControls();
 	}
 	
 	private void createControls(){
 		final Shell searchBoxShell = new Shell(PlatformUI.getWorkbench().getDisplay());
-		searchBoxShell.setText(searchBoxText);
-		
+		searchBoxShell.setText(searchBoxText);		
 		searchBoxShell.setBounds(120,120, 200, 50);
 		searchBoxShell.setLayout(new FillLayout());
 		final Text searchTextBox = new Text(searchBoxShell,SWT.SEARCH | SWT.BORDER);
