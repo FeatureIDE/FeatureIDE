@@ -20,34 +20,13 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.action;
 
-import java.util.HashSet;
-import java.util.Set;
- 
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
-import org.eclipse.jface.action.Action;
-
-import de.ovgu.featureide.fm.ui.GraphicsExporter;
-import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
-import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModelBuilder;
 
 /**
  * TODO description
  * 
- * @author G�nter Ulreich
+ * @author Christopher Kruczek
  */
-public class ExportAsAction extends Action {
-
-	private final GraphicalViewerImpl viewer;
-	private ExportAsImplemenation impl;
-	
-	public ExportAsAction(String text, GraphicalViewerImpl view) {
-		super(text);
-		viewer = view;
-		setEnabled(true);
-	}
-	
-	public void run() {
-		GraphicsExporter.exportAs(viewer);
-	}
-
+public interface ExportAsImplemenation {
+	public void export(GraphicalViewerImpl viewer);
 }
