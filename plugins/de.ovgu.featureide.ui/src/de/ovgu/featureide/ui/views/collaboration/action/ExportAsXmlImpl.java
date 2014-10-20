@@ -23,7 +23,7 @@ package de.ovgu.featureide.ui.views.collaboration.action;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 
 /**
- * TODO description
+ * This export implementation is responsible for xml exporting.
  * 
  * @author Christopher Kruczek
  */
