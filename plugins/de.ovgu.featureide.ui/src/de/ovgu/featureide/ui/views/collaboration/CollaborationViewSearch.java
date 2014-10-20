@@ -26,6 +26,7 @@ import java.util.List;
 import org.eclipse.draw2d.FigureCanvas;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Label;
+import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.KeyHandler;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
@@ -118,10 +119,10 @@ public class CollaborationViewSearch {
 	
 	private void createControls(){
 		final Shell searchBoxShell = new Shell(PlatformUI.getWorkbench().getDisplay());
-		searchBoxShell.setText(searchBoxText);		
-		searchBoxShell.setBounds(120,120, 200, 50);
+		searchBoxShell.setText(searchBoxText);
+		searchBoxShell.setBounds(500,500, 200, 50);
 		searchBoxShell.setLayout(new FillLayout());
-		final Text searchTextBox = new Text(searchBoxShell,SWT.SEARCH | SWT.BORDER);
+		final Text searchTextBox = new Text(searchBoxShell,SWT.SEARCH | SWT.SINGLE | SWT.ICON_SEARCH);
 		searchTextBox.addListener(SWT.Traverse,new Listener() {
 			
 			@Override
