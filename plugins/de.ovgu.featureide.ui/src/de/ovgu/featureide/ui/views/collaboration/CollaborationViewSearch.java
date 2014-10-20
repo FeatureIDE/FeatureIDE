@@ -54,7 +54,8 @@ public class CollaborationViewSearch {
 	private Color noSearchResultsColor;
 	private List<Label> extractedLabels;
 	private List<Label> matchedLabels;
-	
+	private final int BEGIN_OF_VALID_ASCII_CHARS = 48;
+	private final int END_OF_VALID_ASCII_CHARS = 125;
 	public static class Builder{
 		private GraphicalViewerImpl attachedViewerParent;
 		private String searchBoxText;
@@ -160,7 +161,7 @@ public class CollaborationViewSearch {
 			@Override
 			public boolean keyReleased(KeyEvent event) {
 				if(!searchBoxShell.isVisible() && event.keyCode != SWT.ESC && 
-						   event.keyCode >= 48 && event.keyCode <= 125){
+						   event.keyCode >= BEGIN_OF_VALID_ASCII_CHARS && event.keyCode <= END_OF_VALID_ASCII_CHARS){
 					searchBoxShell.setVisible(true);
 					searchTextBox.setFocus();
 					
