@@ -31,11 +31,14 @@ import java.util.Set;
 
 import javax.swing.JOptionPane;
 
+import org.apache.commons.cli.ParseException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+
+import AST.Program;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
@@ -52,11 +55,19 @@ import de.ovgu.featureide.core.mpl.signature.abstr.AbstractFieldSignature;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractMethodSignature;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractSignature;
 import de.ovgu.featureide.core.mpl.signature.filter.MethodFilter;
+import de.ovgu.featureide.featurehouse.FeatureHouseComposer;
 import de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin;
+import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.uka.ilkd.key.gui.GUIEvent;
 import de.uka.ilkd.key.gui.GUIListener;
 import de.uka.ilkd.key.gui.KeYMediator;
 import de.uka.ilkd.key.gui.Main;
+import fuji.CompilerWarningException;
+import fuji.Composition;
+import fuji.FeatureDirNotFoundException;
+import fuji.SemanticErrorException;
+import fuji.SyntacticErrorException;
 
 /**
  * Generates Feature Stubs
@@ -83,6 +94,29 @@ public class FeatureStubsGenerator {
 		}
 		final ExtendedFujiSignaturesJob fujiSignaturesJob = new ExtendedFujiSignaturesJob();
 
+		String fhc = FeatureHouseComposer.getClassPaths(featureProject);
+		String[] fujiOptions = new String[] { "-" + fuji.Main.OptionName.CLASSPATH, fhc, "-" + fuji.Main.OptionName.PROG_MODE, "-" + fuji.Main.OptionName.COMPOSTION_STRATEGY,
+				fuji.Main.OptionName.COMPOSTION_STRATEGY_ARG_FAMILY, "-typechecker", "-basedir", featureProject.getSourcePath() };
+		FeatureModel fm = featureProject.getFeatureModel();
+		fm.getAnalyser().setDependencies();
+
+		try {
+			fuji.Main fuji = new fuji.Main(fujiOptions, fm, featureProject.getFeatureModel().getConcreteFeatureNames());
+			Composition composition = fuji.getComposition(fuji);
+			Program ast = composition.composeAST();
+			// run type check
+			fuji.typecheckAST(ast);
+			
+			if (!fuji.getWarnings().isEmpty()) {
+				FeatureHouseCorePlugin.getDefault().logError("The SPL " + featureProject.getProjectName() + " contains type errors. Therefore, the verification is aborted.", null);
+			}
+		} catch (IllegalArgumentException | ParseException | IOException | FeatureDirNotFoundException | SyntacticErrorException
+				| SemanticErrorException | CompilerWarningException | UnsupportedModelException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		
 		final Object tmpObject = new Object();
 		final InterfaceProject intProject = MPLPlugin.getDefault().addProject(featureProject.getProject());
 		fujiSignaturesJob.setProject(intProject.getProjectReference());

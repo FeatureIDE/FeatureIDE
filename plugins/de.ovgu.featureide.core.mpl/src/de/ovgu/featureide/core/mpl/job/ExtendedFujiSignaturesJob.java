@@ -527,6 +527,7 @@ public class ExtendedFujiSignaturesJob extends AMonitorJob<ExtendedFujiSignature
 			}
 			 
 		}
+		 
 		for (ExtendedSignature extSig : nonPrimitveTypesTable.keySet()) {
 			final FeatureData[] featureData = extSig.sig.getFeatureData();
 			for (int j = 0; j < featureData.length; j++) {
@@ -584,10 +585,6 @@ public class ExtendedFujiSignaturesJob extends AMonitorJob<ExtendedFujiSignature
 	private void findMethodAccesses(ASTNode<?> stmt, AbstractSignature methAbs, int featureID) {
 		if (stmt == null) {
 			return;
-		}
-		
-		if (stmt instanceof MethodDecl && ((MethodDecl) stmt).toString().contains("Main")) {
-			int i = 0;
 		}
 
 		if (stmt instanceof MethodAccess) {

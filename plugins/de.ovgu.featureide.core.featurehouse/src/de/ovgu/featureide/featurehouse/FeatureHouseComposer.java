@@ -730,7 +730,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		}
 	}
 
-	private static String getClassPaths(IFeatureProject featureProject) {
+	public static String getClassPaths(IFeatureProject featureProject) {
 		String classpath = "";
 		String sep = System.getProperty("path.separator");
 		try {
