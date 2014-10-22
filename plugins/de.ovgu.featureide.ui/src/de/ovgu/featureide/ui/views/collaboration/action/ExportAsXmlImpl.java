@@ -55,13 +55,16 @@ public class ExportAsXmlImpl implements ExportAsImplemenation {
 	public void export(GraphicalViewerImpl viewer) {
 
 		String file = createXmlSaveDialog().open();
+		if(file == null)
+			return;
+		
 		ModelEditPart mep = (ModelEditPart) viewer.getContents();
 		XMLStreamWriter sw;
 		try {
 			sw = XMLOutputFactory.newInstance().createXMLStreamWriter(
 					new FileWriter(file));
 			sw.writeStartDocument("utf-8", "1.0");
-			sw.writeStartElement("config");
+			sw.writeStartElement("configuration");
 			for (Object child : mep.getChildren()) {
 				if (child instanceof CollaborationEditPart) {
 					CollaborationEditPart cep = (CollaborationEditPart) child;
