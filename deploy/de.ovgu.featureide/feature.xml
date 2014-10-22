@@ -2,7 +2,7 @@
 <feature
       id="de.ovgu.featureide"
       label="FeatureIDE"
-      version="2.7.1.qualifier"
+      version="2.7.2.qualifier"
       provider-name="University of Magdeburg">
    <install-handler library=""/>
 
@@ -231,21 +231,21 @@ Library.
          id="de.ovgu.featureide.core"
          download-size="0"
          install-size="0"
-         version="2.7.1.qualifier"
+         version="2.7.2.qualifier"
          unpack="false"/>
 
    <plugin
          id="de.ovgu.featureide.core.ahead"
          download-size="0"
          install-size="0"
-         version="2.7.1.qualifier"
+         version="2.7.2.qualifier"
          unpack="false"/>
 
    <plugin
          id="de.ovgu.featureide.ui"
          download-size="0"
          install-size="0"
-         version="2.7.1.qualifier"
+         version="2.7.2.qualifier"
          unpack="false"/>
 
 </feature>

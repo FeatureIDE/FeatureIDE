@@ -5,11 +5,15 @@ which can be found here:
 
 https://github.com/tthuem/FeatureIDE/issues/milestones
 
-and here:
-
-https://faracvs.cs.uni-magdeburg.de/projects/tthuem-FeatureIDE/report/6
-
 Here, is a list of high-level enhancements.
+
+Release 2.7.2 (October 2014)
+* Support for Android projects with preprocessor Munge
+* Family-based type checks with Fuji can be activated on demand (to overcome performance problems with large projects)
+* Feature-model import from S.P.L.O.T. improved (can deal with several group types)
+* Problems with preprocessor Antenna fixed
+* Manual layout of and search for features in feature diagram with keyboard
+* Graphical export of feature diagrams to SVG
 
 Release 2.7.1 (July 2014)
 * Example wizard improved by hierarchical structure and keyword search

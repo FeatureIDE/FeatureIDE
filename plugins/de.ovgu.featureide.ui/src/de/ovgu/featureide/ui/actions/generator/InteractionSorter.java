@@ -165,6 +165,10 @@ public class InteractionSorter extends AbstractConfigurationSorter {
 			if (size > longest) {
 				longest = size;
 				mostCovering = config;
+			} else if (size == longest) {
+				if (mostCovering.getName().compareTo(config.getName()) > 0) {
+					mostCovering = config;
+				}
 			}
 		}
 		return mostCovering;

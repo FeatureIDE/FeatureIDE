@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Feature Model UI Plug-in
 Bundle-SymbolicName: de.ovgu.featureide.fm.ui;singleton:=true
-Bundle-Version: 2.7.1.qualifier
+Bundle-Version: 2.7.2.qualifier
 Bundle-Activator: de.ovgu.featureide.fm.ui.FMUIPlugin
 Require-Bundle: 
  org.eclipse.ui,
