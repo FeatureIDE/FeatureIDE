@@ -22,28 +22,25 @@ package de.ovgu.featureide.ui.views.collaboration.action;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Collection;
 
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.eclipse.gef.editparts.AbstractEditPart;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 
-import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTClassFragment;
+import de.ovgu.featureide.core.fstmodel.FSTConfiguration;
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.ui.views.collaboration.editparts.CollaborationEditPart;
 import de.ovgu.featureide.ui.views.collaboration.editparts.ModelEditPart;
-import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModelBuilder;
 
 /**
  * This export implementation is responsible for XML exporting.
@@ -69,7 +66,13 @@ public class ExportAsXmlImpl implements ExportAsImplemenation {
 			for (Object child : mep.getChildren()) {
 				if (child instanceof CollaborationEditPart) {
 					CollaborationEditPart cep = (CollaborationEditPart) child;
-					writeElement(sw, cep.getCollaborationModel());
+					FSTFeature feature = cep.getCollaborationModel();
+					if (!(feature instanceof FSTConfiguration)) {
+						writeElement(sw, feature);
+					}
+					else{
+						sw.writeAttribute("name", feature.getName());
+					}
 				}
 			}
 			sw.writeEndElement();
@@ -142,7 +145,7 @@ public class ExportAsXmlImpl implements ExportAsImplemenation {
 			writer.writeStartElement("method");
 			writer.writeAttribute("type", method.getType());
 			writer.writeAttribute("visibility", method.getModifiers());
-			writer.writeCharacters(method.getName());			
+			writer.writeCharacters(method.getName());
 			writer.writeEndElement();
 		} catch (XMLStreamException e) {
 
