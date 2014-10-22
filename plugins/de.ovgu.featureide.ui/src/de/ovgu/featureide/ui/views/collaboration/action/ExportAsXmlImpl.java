@@ -140,7 +140,9 @@ public class ExportAsXmlImpl implements ExportAsImplemenation {
 	private void writeElement(XMLStreamWriter writer, FSTMethod method) {
 		try {
 			writer.writeStartElement("method");
-			writer.writeCharacters(method.getName());
+			writer.writeAttribute("type", method.getType());
+			writer.writeAttribute("visibility", method.getModifiers());
+			writer.writeCharacters(method.getName());			
 			writer.writeEndElement();
 		} catch (XMLStreamException e) {
 
@@ -152,6 +154,8 @@ public class ExportAsXmlImpl implements ExportAsImplemenation {
 	private void writeElement(XMLStreamWriter writer, FSTField field) {
 		try {
 			writer.writeStartElement("attribute");
+			writer.writeAttribute("type", field.getType());
+			writer.writeAttribute("visibility", field.getModifiers());
 			writer.writeCharacters(field.getName());
 			writer.writeEndElement();
 		} catch (XMLStreamException e) {
