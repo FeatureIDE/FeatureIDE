@@ -43,6 +43,7 @@ import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.ui.views.collaboration.editparts.CollaborationEditPart;
 import de.ovgu.featureide.ui.views.collaboration.editparts.ModelEditPart;
+import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModelBuilder;
 
 /**
  * This export implementation is responsible for XML exporting.
@@ -57,14 +58,14 @@ public class ExportAsXmlImpl implements ExportAsImplemenation {
 		String file = createXmlSaveDialog().open();
 		if (file == null)
 			return;
-		
-		ModelEditPart mep = (ModelEditPart) viewer.getContents();
+
 		XMLStreamWriter sw;
 		try {
 			sw = XMLOutputFactory.newInstance().createXMLStreamWriter(
 					new FileWriter(file));
 			sw.writeStartDocument("utf-8", "1.0");
 			sw.writeStartElement("configuration");
+			ModelEditPart mep = (ModelEditPart) viewer.getContents();
 			for (Object child : mep.getChildren()) {
 				if (child instanceof CollaborationEditPart) {
 					CollaborationEditPart cep = (CollaborationEditPart) child;
