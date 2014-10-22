@@ -20,23 +20,29 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.action;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Collection;
 
+import javax.xml.stream.FactoryConfigurationError;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.eclipse.gef.editparts.AbstractEditPart;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 
 import de.ovgu.featureide.core.fstmodel.FSTClass;
+import de.ovgu.featureide.core.fstmodel.FSTClassFragment;
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
-import de.ovgu.featureide.ui.views.collaboration.editparts.ClassEditPart;
+import de.ovgu.featureide.ui.views.collaboration.editparts.CollaborationEditPart;
 import de.ovgu.featureide.ui.views.collaboration.editparts.ModelEditPart;
-
 
 /**
  * This export implementation is responsible for XML exporting.
@@ -45,35 +51,110 @@ import de.ovgu.featureide.ui.views.collaboration.editparts.ModelEditPart;
  */
 public class ExportAsXmlImpl implements ExportAsImplemenation {
 
-	
 	@Override
 	public void export(GraphicalViewerImpl viewer) {
-		
+
 		String file = createXmlSaveDialog().open();
+		ModelEditPart mep = (ModelEditPart) viewer.getContents();
+		XMLStreamWriter sw;
+		try {
+			sw = XMLOutputFactory.newInstance().createXMLStreamWriter(
+					new FileWriter(file));
+			sw.writeStartDocument("utf-8", "1.0");
+			sw.writeStartElement("config");
+			for (Object child : mep.getChildren()) {
+				if (child instanceof CollaborationEditPart) {
+					CollaborationEditPart cep = (CollaborationEditPart) child;
+					writeElement(sw, cep.getCollaborationModel());
+				}
+			}
+			sw.writeEndElement();
+			sw.writeEndDocument();
+			sw.flush();
+			sw.close();
+		} catch (XMLStreamException e) {
+
+			e.printStackTrace();
+		} catch (FactoryConfigurationError e) {
+
+			e.printStackTrace();
+		} catch (IOException e) {
+
+			e.printStackTrace();
+		}
 
 	}
-	
-	private FileDialog createXmlSaveDialog(){
+
+	private FileDialog createXmlSaveDialog() {
 		FileDialog dlg = new FileDialog(new Shell(), SWT.SAVE);
-		dlg.setFilterExtensions(new String[]{"*.xml"});
+		dlg.setFilterExtensions(new String[] { "*.xml" });
+		dlg.setOverwrite(true);
 		return dlg;
 	}
-	
-	private void writeElement(XMLStreamWriter writer,FSTFeature feature){
+
+	private void writeElement(XMLStreamWriter writer, FSTFeature feature) {
+		try {
+			writer.writeStartElement("feature");
+			writer.writeAttribute("name", feature.getName());
+			for (FSTRole role : feature.getRoles()) {
+				writeElement(writer, role.getClassFragment());
+			}
+			writer.writeEndElement();
+
+		} catch (XMLStreamException e) {
+
+			e.printStackTrace();
+		}
+
 	}
-	
-	private void writeElement(XMLStreamWriter writer, FSTClass fstClass){
-		
+
+	private void writeElement(XMLStreamWriter writer, FSTClassFragment fstClass) {
+		try {
+			writer.writeStartElement("class");
+			writer.writeAttribute("name", fstClass.getName());
+
+			writer.writeStartElement("attributes");
+			for (FSTField field : fstClass.getFields()) {
+				writeElement(writer, field);
+			}
+			writer.writeEndElement();
+			writer.writeStartElement("methods");
+			for (FSTMethod method : fstClass.getMethods()) {
+				writeElement(writer, method);
+			}
+			writer.writeEndElement();
+
+			writer.writeEndElement();
+
+		} catch (XMLStreamException e) {
+
+			e.printStackTrace();
+		}
+
 	}
-	
-	private void writeElement(XMLStreamWriter writer, FSTMethod method){
-		
+
+	private void writeElement(XMLStreamWriter writer, FSTMethod method) {
+		try {
+			writer.writeStartElement("method");
+			writer.writeCharacters(method.getName());
+			writer.writeEndElement();
+		} catch (XMLStreamException e) {
+
+			e.printStackTrace();
+		}
+
 	}
-	
-	private void writeElement(XMLStreamWriter writer,FSTField field){
-		
+
+	private void writeElement(XMLStreamWriter writer, FSTField field) {
+		try {
+			writer.writeStartElement("attribute");
+			writer.writeCharacters(field.getName());
+			writer.writeEndElement();
+		} catch (XMLStreamException e) {
+
+			e.printStackTrace();
+		}
+
 	}
-	
-	
 
 }
