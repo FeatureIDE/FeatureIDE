@@ -20,10 +20,26 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.action;
 
+import java.util.Collection;
+
+import javax.xml.stream.XMLStreamWriter;
+
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Shell;
+
+import de.ovgu.featureide.core.fstmodel.FSTClass;
+import de.ovgu.featureide.core.fstmodel.FSTFeature;
+import de.ovgu.featureide.core.fstmodel.FSTField;
+import de.ovgu.featureide.core.fstmodel.FSTMethod;
+import de.ovgu.featureide.core.fstmodel.FSTRole;
+import de.ovgu.featureide.ui.views.collaboration.editparts.ClassEditPart;
+import de.ovgu.featureide.ui.views.collaboration.editparts.ModelEditPart;
+
 
 /**
- * This export implementation is responsible for xml exporting.
+ * This export implementation is responsible for XML exporting.
  * 
  * @author Christopher Kruczek
  */
@@ -32,8 +48,37 @@ public class ExportAsXmlImpl implements ExportAsImplemenation {
 	
 	@Override
 	public void export(GraphicalViewerImpl viewer) {
-	
+		
+		String file = createXmlSaveDialog().open();
+		ModelEditPart mep = (ModelEditPart)viewer.getContents();
+		ClassEditPart cep = (ClassEditPart)mep.getChildren().get(5);
+		FSTClass fstclass = cep.getClassModel();
+		Collection<FSTRole> roles = fstclass.getRoles();
+		int i = 0;
 
 	}
+	
+	private FileDialog createXmlSaveDialog(){
+		FileDialog dlg = new FileDialog(new Shell(), SWT.SAVE);
+		dlg.setFilterExtensions(new String[]{"*.xml"});
+		return dlg;
+	}
+	
+	private void writeElement(XMLStreamWriter writer,FSTFeature feature){
+	}
+	
+	private void writeElement(XMLStreamWriter writer, FSTClass fstClass){
+		
+	}
+	
+	private void writeElement(XMLStreamWriter writer, FSTMethod method){
+		
+	}
+	
+	private void writeElement(XMLStreamWriter writer,FSTField field){
+		
+	}
+	
+	
 
 }
