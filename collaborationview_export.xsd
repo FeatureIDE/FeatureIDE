@@ -6,20 +6,20 @@
         <xs:element name="feature" maxOccurs="unbounded">
           <xs:complexType>
             <xs:sequence>
-              <xs:element name="class" maxOccurs="unbounded">
+              <xs:element name="class" maxOccurs="unbounded" minOccurs="0">
                 <xs:complexType>
                   <xs:sequence>
                     <xs:element name="attributes">
                       <xs:complexType>
                         <xs:sequence>
-                          <xs:element name="attribute" type="xs:string" maxOccurs="unbounded"/>
+                          <xs:element name="attribute" type="xs:string" maxOccurs="unbounded" minOccurs="0"/>
                         </xs:sequence>
                       </xs:complexType>
                     </xs:element>
                     <xs:element name="methods">
                       <xs:complexType>
                         <xs:sequence>
-                          <xs:element name="method" type="xs:string" maxOccurs="unbounded" />
+                          <xs:element name="method" type="xs:string" maxOccurs="unbounded" minOccurs="0" />
                         </xs:sequence>
                       </xs:complexType>
                     </xs:element>
