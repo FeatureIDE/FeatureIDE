@@ -55,7 +55,7 @@ public class ExportAsXmlImpl implements ExportAsImplemenation {
 	public void export(GraphicalViewerImpl viewer) {
 
 		String file = createXmlSaveDialog().open();
-		if(file == null)
+		if (file == null)
 			return;
 		
 		ModelEditPart mep = (ModelEditPart) viewer.getContents();
