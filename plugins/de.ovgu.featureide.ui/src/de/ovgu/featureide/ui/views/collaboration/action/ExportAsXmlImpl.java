@@ -50,11 +50,6 @@ public class ExportAsXmlImpl implements ExportAsImplemenation {
 	public void export(GraphicalViewerImpl viewer) {
 		
 		String file = createXmlSaveDialog().open();
-		ModelEditPart mep = (ModelEditPart)viewer.getContents();
-		ClassEditPart cep = (ClassEditPart)mep.getChildren().get(5);
-		FSTClass fstclass = cep.getClassModel();
-		Collection<FSTRole> roles = fstclass.getRoles();
-		int i = 0;
 
 	}
 	
