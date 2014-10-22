@@ -44,7 +44,7 @@ import de.ovgu.featureide.ui.views.collaboration.editparts.ModelEditPart;
 
 /**
  * This class is designated for search functionalities inside of the collaborations diagramm
- * It takes care any tasks like: creating the searchbox, catching the key events, fireing the search and so on.
+ * It takes care of any tasks like: creating the searchbox, catching the key events, fireing the search and so on.
  * 
  * @author Christopher Kruczek
  */
