@@ -353,7 +353,13 @@ public class CreateFujiSignaturesJob extends AMonitorJob<CreateFujiSignaturesJob
 				
 				for (FSTRole fstRole : fstFeature.getRoles()) {
 					FSTClassFragment classFragment = fstRole.getClassFragment();
-					String fullName = (classFragment.getPackage() == null ? "" : classFragment.getPackage()) + "." + classFragment.getName();
+					String fullName;
+					if (classFragment.getPackage() == null) {
+						fullName = "." + classFragment.getName();
+					} else {
+						fullName = classFragment.getName();
+						fullName = fullName.replace('/', '.');
+					}
 					if (fullName.endsWith(".java")) {
 						fullName = fullName.substring(0, fullName.length() - ".java".length());
 					}

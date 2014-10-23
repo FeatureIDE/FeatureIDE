@@ -641,7 +641,7 @@ public class CorePlugin extends AbstractCorePlugin {
 					final AbstractMethodSignature methSig = (AbstractMethodSignature) curMember; 
 					final List<String> sig = methSig.getParameterTypes();
 					
-					//TODO Reimar: eigentlich ist eine Fallunterscheidung nach Typen notwendig!
+					//TODO differentiate between possible types
 					char[][] c = new char[][]{{}};
 					if(sig.size()>0){
 						c = new char[sig.size()][];
