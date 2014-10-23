@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:org.eclipse.ui.popup.none">
+         <menu
+               id="foo"
+               label="FeatureIDE MenuNEWANDBETTER">
+            <command
+                  commandId="de.ovgu.featureide.core.variantimport.VariantImportCommand"
+                  label="Create new FeatureIDE Project from Product Variants"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                     <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <or>
+                        <adapt
+                              type="org.eclipse.core.resources.IProject">
+                        </adapt>
+                        <instanceof
+                              value="org.eclipse.core.resources.IProject">
+                        </instanceof>
+                     </or>
+                  </iterate> 
+                  
+               </visibleWhen>
+            </command>
+         </menu>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="de.ovgu.featureide.core.variantimport.VariantImportCommandHandler"
+            id="de.ovgu.featureide.core.variantimport.VariantImportCommand"
+            name="Import..">
+      </command>
+   </extension>
+
+</plugin>
