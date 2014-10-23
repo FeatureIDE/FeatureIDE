@@ -396,12 +396,29 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 				return;
 			}
 			
-			if (!getContractParameter().equals(CONTRACT_COMPOSITION_METHOD_BASED)) {
+			final String contractParameter = getContractParameter();
+			if (!contractParameter.equals(CONTRACT_COMPOSITION_EXPLICIT_CONTRACTING)) {
+				for (FSTClass c : fstModel.getClasses()) {
+					for (FSTRole r : c.getRoles()) {
+						for (FSTMethod m : r.getClassFragment().getMethods()) {
+							if (m.hasContract() && m.getContract().contains("original")) {
+								if (m.getCompKey().isEmpty() && contractParameter.equals(CONTRACT_COMPOSITION_METHOD_BASED)) {
+									continue;
+								}
+									setContractErrorMarker(m, "Keyword original ignored. Contract composition set to " + contractParameter
+											+ ". Change to \"Explicit Contract Refinement\".");
+							}
+						}
+					}
+				}
+			}
+			
+			if (!contractParameter.equals(CONTRACT_COMPOSITION_METHOD_BASED)) {
 				for (FSTClass c : fstModel.getClasses()) {
 					for (FSTRole r : c.getRoles()) {
 						for (FSTMethod m : r.getClassFragment().getMethods()) {
 							if (m.getCompKey().length() > 0)
-								setContractErrorMarker(m, ": Keyword " + m.getCompKey() + " ignored. Contract composition set to " + getContractParameter()
+								setContractErrorMarker(m, ": Keyword " + m.getCompKey() + " ignored. Contract composition set to " + contractParameter
 										+ ". Change to \"method-based composition\".");
 						}
 					}
