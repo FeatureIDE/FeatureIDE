@@ -24,10 +24,12 @@ import org.eclipse.draw2d.ConnectionAnchor;
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.FreeformLayout;
 import org.eclipse.draw2d.GridLayout;
+import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
+import org.eclipse.gef.editparts.ZoomListener;
 
 import de.ovgu.featureide.fm.core.ExtendedFeature;
 import de.ovgu.featureide.fm.core.Feature;
@@ -76,6 +78,15 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		this.feature = feature;
 		this.featureModel = featureModel;
 		
+		FeatureUIHelper.getZoomManager().addZoomListener(new ZoomListener()
+		{
+			@Override
+			public void zoomChanged(double arg0)
+			{
+				enforceLabelSize();
+			}
+		});
+		
 		sourceAnchor = new SourceAnchor(this, feature);
 		targetAnchor = new TargetAnchor(this, feature);
 		
@@ -90,10 +101,10 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 
 		setProperties();
 		
-		
+		enforceLabelSize();
 		FeatureUIHelper.setSize(feature,getSize());
 		
-		add(label);
+		add(label, label.getBounds());
 		setOpaque(true);
 
 		if (FeatureUIHelper.getLocation(feature) != null)
@@ -104,6 +115,16 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		}
 	}
 	
+	/**
+	 *  After resizing this method ensures that label text will not be cut off(Issue #138)
+	 */
+	protected void enforceLabelSize()
+	{
+		if(getChildren().isEmpty())
+			return;
+		setConstraint((IFigure) getChildren().get(0), label.getBounds().getExpanded(5, 0));
+	}
+
 	boolean isHidden(Feature feature){
 		if(featureModel.getLayout().showHiddenFeatures()){
 			return false;
@@ -221,6 +242,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 	public void setName(String newName) {
 		label.setText(newName);
 		Dimension labelSize = label.getPreferredSize();
+		this.minSize = labelSize;
 		
 		if (labelSize.equals(label.getSize()))
 			return;

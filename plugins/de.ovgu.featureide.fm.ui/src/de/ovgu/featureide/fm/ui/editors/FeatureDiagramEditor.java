@@ -174,13 +174,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 
 		zoomManager = rootEditPart.getZoomManager();
 		zoomManager.setZoomLevels(new double[] { 0.05, 0.10, 0.25, 0.50, 0.75, 0.90, 1.00, 1.10, 1.25, 1.50, 2.00, 2.50, 3.00, 4.00 });
-		zoomManager.addZoomListener(new ZoomListener(){
-			@Override
-			public void zoomChanged(double newZoomFactor)
-			{
-				FeatureUIHelper.setZoomFactor(newZoomFactor);
-			}
-		});
+		FeatureUIHelper.setZoomManager(zoomManager);
 
 		setKeyHandler(new FeatureDiagramEditorKeyHandler(this, getFeatureModel()));
 	}
