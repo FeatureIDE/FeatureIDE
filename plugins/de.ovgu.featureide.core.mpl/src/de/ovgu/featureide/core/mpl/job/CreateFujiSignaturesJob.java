@@ -53,7 +53,7 @@ import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
-import de.ovgu.featureide.core.fstmodel.RoleElement;
+import de.ovgu.featureide.core.fstmodel.IRoleElement;
 import de.ovgu.featureide.core.mpl.InterfaceProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.mpl.job.util.AJobArguments;
@@ -372,7 +372,7 @@ public class CreateFujiSignaturesJob extends AMonitorJob<CreateFujiSignaturesJob
 		interfaceProject.setProjectSignatures(projectSignatures);
 	}
 	
-	private void copyComment(RoleElement element, int id, String fullName) {
+	private void copyComment(IRoleElement element, int id, String fullName) {
 		if (fullName == null) {
 			return;
 		}
@@ -383,7 +383,7 @@ public class CreateFujiSignaturesJob extends AMonitorJob<CreateFujiSignaturesJob
 			for (int j = 0; j < ids.length; j++) {
 				FeatureData featureData = ids[j];
 				if (featureData.getId() == id) {
-					featureData.setComment(element.getJavaDocCommtent());
+					featureData.setComment(element.getJavaDocComment());
 					break;
 				}
 			}

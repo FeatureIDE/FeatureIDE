@@ -18,20 +18,36 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.fm.core.job.util;
+package de.ovgu.featureide.core.fstmodel;
 
-import java.util.EventListener;
-
-import de.ovgu.featureide.fm.core.job.IJob;
 
 /**
- * Can be implemented by all classes that are waiting for the end of a job or a job sequence.
+ * TODO description
  * 
- * @author Sebastian Krieter
- * 
- * @see IJob
- * @see JobSequence
+ * @author "Andy Kenner"
  */
-public interface JobFinishListener extends EventListener {
-	void jobFinished(boolean success);
+public interface IRoleElement {
+
+	/**
+	 * @return the javaDocComment
+	 */
+	public abstract String getJavaDocComment();
+
+	/**
+	 * @param javaDocComment the javaDocComment to set
+	 */
+	public abstract void setJavaDocComment(String javaDocComment);
+
+	/**
+	 * @return
+	 */
+	public abstract FSTRole getRole();
+	
+	public abstract String getFullName();
+
+	/**
+	 * @param role
+	 */
+	public abstract void setRole(FSTRole role);
+
 }

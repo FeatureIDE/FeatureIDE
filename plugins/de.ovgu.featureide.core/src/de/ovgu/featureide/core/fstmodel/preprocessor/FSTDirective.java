@@ -34,7 +34,7 @@ import de.ovgu.featureide.core.fstmodel.RoleElement;
  * 
  * @author Jens Meinicke
  */
-public class FSTDirective extends RoleElement {
+public class FSTDirective extends RoleElement<FSTDirective> {
 
 	private String expression;
 	private List<String> featureNames = null;
@@ -230,18 +230,25 @@ public class FSTDirective extends RoleElement {
 		this.id = id;
 	}
 
-	@Override
 	public String getFullName() {
-		return Integer.toString(this.id);
+		return this.toDependencyString();
 	}
 	
+	/* 
+	 * special implementation for FSTDirective by proving linenumbers 
+	 **/
+	
 	@Override
-	public boolean comparesTo(RoleElement element) {
-		if (element instanceof FSTDirective) {
-			return toDependencyString().equals(((FSTDirective)element).toDependencyString());	
-		} else {
-			return false;
+	public int compareTo(FSTDirective element) {
+
+		if (this == element){
+			return 0;
 		}
-		
+		else
+		{
+			// TODO Is the linenumber check enough?
+			return this.getStartLine() > element.getStartLine() ? 1 : -1;
+		}
 	}
+	
 }

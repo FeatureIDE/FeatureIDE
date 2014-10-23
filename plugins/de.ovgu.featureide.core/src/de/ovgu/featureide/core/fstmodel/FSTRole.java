@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.core.fstmodel;
 
-import java.util.LinkedList;
+import java.util.TreeSet;
 
 import javax.annotation.Nonnull;
 
@@ -35,7 +35,7 @@ import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
  * @author Jens Meinicke
  */
 public class FSTRole {
-	private final LinkedList<FSTDirective> directives = new LinkedList<FSTDirective>();
+	private final TreeSet<FSTDirective> directives = new TreeSet<FSTDirective>();
 	private final FSTClassFragment classFragment;
 
 	private FSTFeature feature;
@@ -76,7 +76,7 @@ public class FSTRole {
 	}
 
 	@Nonnull
-	public LinkedList<FSTDirective> getDirectives() {
+	public TreeSet<FSTDirective> getDirectives() {
 		return directives;
 	}
 

@@ -281,7 +281,7 @@ public class FujiSignaturesCreator {
 			for (int j = 0; j < ids.length; j++) {
 				FeatureData featureData = ids[j];
 				if (featureData.getId() == id) {
-					featureData.setComment(element.getJavaDocCommtent());
+					featureData.setComment(element.getJavaDocComment());
 					break;
 				}
 			}
