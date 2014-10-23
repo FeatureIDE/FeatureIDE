@@ -18,29 +18,20 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.ui.views.collaboration.action;
+package de.ovgu.featureide.fm.core.job.util;
 
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
-import org.eclipse.jface.action.Action;
+import java.util.EventListener;
 
-import de.ovgu.featureide.fm.ui.GraphicsExporter;
+import de.ovgu.featureide.fm.core.job.IJob;
 
 /**
- * UI action for exporting from a graphical viewer.
+ * Can be implemented by all classes that are waiting for the end of a job or a job sequence.
  * 
- * @author Günter Ulreich
+ * @author Sebastian Krieter
+ * 
+ * @see IJob
+ * @see JobSequence
  */
-public class ExportAsAction extends Action {
-
-	private final GraphicalViewerImpl viewer;
-		
-	public ExportAsAction(String text, GraphicalViewerImpl view) {
-		super(text);
-		viewer = view;
-		setEnabled(true);
-	}
-	
-	public void run() {
-		GraphicsExporter.exportAs(viewer);
-	}
+public interface JobFinishListener extends EventListener {
+	void jobFinished(boolean success);
 }

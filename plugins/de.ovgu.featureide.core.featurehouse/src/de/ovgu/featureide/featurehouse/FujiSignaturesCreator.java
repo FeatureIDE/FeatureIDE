@@ -18,16 +18,11 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.core.mpl.job;
+package de.ovgu.featureide.featurehouse;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
-
-import org.eclipse.core.resources.IResource;
-import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.internal.core.JavaProject;
 
 import AST.ASTNode;
 import AST.Access;
@@ -54,34 +49,20 @@ import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.core.fstmodel.RoleElement;
-import de.ovgu.featureide.core.mpl.InterfaceProject;
-import de.ovgu.featureide.core.mpl.MPLPlugin;
-import de.ovgu.featureide.core.mpl.job.util.AJobArguments;
-import de.ovgu.featureide.core.mpl.signature.ProjectSignatures;
-import de.ovgu.featureide.core.mpl.signature.abstr.AbstractClassSignature;
-import de.ovgu.featureide.core.mpl.signature.abstr.AbstractSignature;
-import de.ovgu.featureide.core.mpl.signature.abstr.AbstractSignature.FeatureData;
-import de.ovgu.featureide.core.mpl.signature.fuji.FujiClassSignature;
-import de.ovgu.featureide.core.mpl.signature.fuji.FujiFieldSignature;
-import de.ovgu.featureide.core.mpl.signature.fuji.FujiMethodSignature;
-import de.ovgu.featureide.fm.core.FeatureModel;
-import fuji.Composition;
-import fuji.Main;
-import fuji.SPLStructure;
+import de.ovgu.featureide.core.signature.ProjectSignatures;
+import de.ovgu.featureide.core.signature.abstr.AbstractClassSignature;
+import de.ovgu.featureide.core.signature.abstr.AbstractSignature;
+import de.ovgu.featureide.core.signature.abstr.AbstractSignature.FeatureData;
+import de.ovgu.featureide.featurehouse.signature.fuji.FujiClassSignature;
+import de.ovgu.featureide.featurehouse.signature.fuji.FujiFieldSignature;
+import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
 
 /**
  * Loads the signatures from Fuji.
  * 
  * @author Sebastian Krieter
  */
-@SuppressWarnings("restriction")
-public class CreateFujiSignaturesJob extends AMonitorJob<CreateFujiSignaturesJob.Arguments> {
-	
-	public static class Arguments extends AJobArguments {		
-		public Arguments() {
-			super(Arguments.class);
-		}
-	}
+public class FujiSignaturesCreator {
 	
 	private final class SignatureReference {
 		private final HashMap<Integer, FeatureData> ids = new HashMap<Integer, FeatureData>();
@@ -111,120 +92,27 @@ public class CreateFujiSignaturesJob extends AMonitorJob<CreateFujiSignaturesJob
 		}
 	}
 
-	private final ProjectSignatures projectSignatures = new ProjectSignatures();
-
-	private final HashMap<AbstractSignature, SignatureReference> signatureSet = new HashMap<AbstractSignature, SignatureReference>();
-	private final HashMap<String, AbstractSignature> signatureTable = new HashMap<String, AbstractSignature>();
-
-	public CreateFujiSignaturesJob() {
-		this(null);
-	}
+	private java.util.List<String> featureModulePathnames = null;
 	
-	protected CreateFujiSignaturesJob(Arguments arguments) {
-		super("Loading Signatures", arguments);
-		setPriority(BUILD);
-	}
-	
-	private AbstractSignature addFeatureID(AbstractSignature sig, int featureID, int line) {
-		SignatureReference sigRef = signatureSet.get(sig);
-		if (sigRef == null) {
-			sigRef = new SignatureReference(sig);
-			signatureSet.put(sig, sigRef);
-			signatureTable.put(sig.getFullName(), sig);
-		}
-		sigRef.addID(new FeatureData(featureID, line));
-		return sigRef.getSig();
-	}
-
-	private static String getClassPaths(IFeatureProject featureProject) {
-		String classpath = "";
-		String sep = System.getProperty("path.separator");
-		try {
-			JavaProject proj = new JavaProject(featureProject.getProject(),
-					null);
-			IJavaElement[] elements = proj.getChildren();
-			for (IJavaElement e : elements) {
-				String path = e.getPath().toOSString();
-				if (path.contains(":")) {
-					classpath += sep + path;
-					continue;
-				}
-				IResource resource = e.getResource();
-				if (resource != null
-						&& "jar".equals(resource.getFileExtension())) {
-					classpath += sep + resource.getRawLocation().toOSString();
-				}
-			}
-		} catch (JavaModelException e) {
-
-		}
-		return classpath.length() > 0 ? classpath.substring(1) : classpath;
-	}
-
-	private static java.util.List<String> featureModulePathnames = null;
-
-	@SuppressWarnings("rawtypes")
-	private static String getFeatureName(ASTNode astNode) {
+	private String getFeatureName(ASTNode<?> astNode) {
 		int featureID = astNode.featureID();
 
 		String featurename = featureModulePathnames.get(featureID);
 		return featurename.substring(featurename.lastIndexOf('\\') + 1);
 	}
-	
-	@Override
-	protected boolean work() {
-		InterfaceProject interfaceProject = MPLPlugin.getDefault().getInterfaceProject(this.project);
-		if (interfaceProject == null) {
-			MPLPlugin.getDefault().logWarning(this.project.getName() + " is no Interface Project!");
-			return false;
-		}
-		IFeatureProject fp = interfaceProject.getFeatureProjectReference();
-		
-		FeatureModel fm = fp.getFeatureModel();
-		fm.getAnalyser().setDependencies();
 
-		String sourcePath = fp.getSourcePath();
-		String[] fujiOptions = new String[] { 
-				"-" + Main.OptionName.CLASSPATH, getClassPaths(fp)
-				,"-" + Main.OptionName.PROG_MODE
-				,"-" + Main.OptionName.COMPOSTION_STRATEGY, Main.OptionName.COMPOSTION_STRATEGY_ARG_FAMILY // "-typechecker",
-				,"-" + Main.OptionName.BASEDIR, sourcePath};
-		SPLStructure spl = null;
-		Program ast;
-		try {
-			Main fuji = new Main(fujiOptions, fm, fm.getConcreteFeatureNames());
-			Composition composition = fuji.getComposition(fuji);
-			ast = composition.composeAST();
-			fuji.typecheckAST(ast);
-			spl = fuji.getSPLStructure();
-			featureModulePathnames = spl.getFeatureModulePathnames();
-		} catch (Exception e) {
-			MPLPlugin.getDefault().logError(e);
-			return false;
-		}
-		
-		createSignatures(interfaceProject, fp, ast);
-		
-		MPLPlugin.getDefault().logInfo("Fuji signatures loaded.");
-		return true;
-	}
+	private final HashMap<AbstractSignature, SignatureReference> signatureSet = new HashMap<AbstractSignature, SignatureReference>();
+	private final HashMap<String, AbstractSignature> signatureTable = new HashMap<String, AbstractSignature>();
 	
-	@SuppressWarnings("unchecked")
-	private void createSignatures(InterfaceProject interfaceProject, IFeatureProject fp, Program ast) {
-		int count = 0;
-		Iterator<CompilationUnit> unitIter = ast.compilationUnitIterator();
-		while (unitIter.hasNext()) {
-			if (unitIter.next().featureID() >= 0) {
-				++count;
-			}
-		}
-		setMaxAbsoluteWork(count);
-
+	public ProjectSignatures createSignatures(IFeatureProject fp, Program ast) {
+		featureModulePathnames = ast.getSPLStructure().getFeatureModulePathnames();
+		
+		final ProjectSignatures projectSignatures = new ProjectSignatures(fp.getFeatureModel());
+		
 		LinkedList<TypeDecl> stack = new LinkedList<TypeDecl>();
 		LinkedList<AbstractClassSignature> roleStack = new LinkedList<AbstractClassSignature>();
 
-		unitIter = ast.compilationUnitIterator();
-		while (unitIter.hasNext()) {
+		for (@SuppressWarnings("unchecked") Iterator<CompilationUnit> unitIter = ast.compilationUnitIterator(); unitIter.hasNext();) {
 			CompilationUnit unit = unitIter.next();
 			if (unit.featureID() < 0) {
 				continue;
@@ -259,7 +147,7 @@ public class CreateFujiSignaturesJob extends AMonitorJob<CreateFujiSignaturesJob
 							new FujiClassSignature(parent, name,
 									modifierString, typeString, pckg, typeDecl,
 									importList),
-							interfaceProject.getFeatureID(featurename), Symbol.getLine(typeDecl.getStart()));
+									projectSignatures.getFeatureID(featurename), Symbol.getLine(typeDecl.getStart()));
 					for (ImportDecl importDecl : importList) {
 						curClassSig.addImport(importDecl.toString());
 					}
@@ -282,7 +170,7 @@ public class CreateFujiSignaturesJob extends AMonitorJob<CreateFujiSignaturesJob
 							addFeatureID(new FujiMethodSignature(curClassSig,
 									name, modifierString, type, false,
 									parameterList, exceptionList),
-									interfaceProject.getFeatureID(featurename), Symbol.getLine(method.getStart()));
+									projectSignatures.getFeatureID(featurename), Symbol.getLine(method.getStart()));
 
 						} else if (bodyDecl instanceof FieldDeclaration) {
 							FieldDeclaration field = (FieldDeclaration) bodyDecl;
@@ -294,7 +182,7 @@ public class CreateFujiSignaturesJob extends AMonitorJob<CreateFujiSignaturesJob
 							featurename = getFeatureName(bodyDecl);
 							addFeatureID(new FujiFieldSignature(curClassSig,
 									name, modifierString, type),
-									interfaceProject.getFeatureID(featurename), Symbol.getLine(field.getStart()));
+									projectSignatures.getFeatureID(featurename), Symbol.getLine(field.getStart()));
 
 						} else if (bodyDecl instanceof ConstructorDecl) {
 							ConstructorDecl constructor = (ConstructorDecl) bodyDecl;
@@ -314,7 +202,7 @@ public class CreateFujiSignaturesJob extends AMonitorJob<CreateFujiSignaturesJob
 										curClassSig, name, modifierString,
 										type, true, parameterList,
 										exceptionList),
-										interfaceProject.getFeatureID(featurename), Symbol.getLine(constructor.getStart()));
+										projectSignatures.getFeatureID(featurename), Symbol.getLine(constructor.getStart()));
 							}
 							
 						} else if (bodyDecl instanceof MemberClassDecl) {
@@ -330,7 +218,6 @@ public class CreateFujiSignaturesJob extends AMonitorJob<CreateFujiSignaturesJob
 					}
 				} while (!stack.isEmpty());
 			}
-			worked();
 		}
 
 		final AbstractSignature[] sigArray = new AbstractSignature[signatureSet.size()];
@@ -342,14 +229,28 @@ public class CreateFujiSignaturesJob extends AMonitorJob<CreateFujiSignaturesJob
 			sigArray[++i] = sig;
 		}
 		
-		fp.getComposer().buildFSTModel();
-		FSTModel fst = fp.getFSTModel();
+		projectSignatures.setSignatureArray(sigArray);
 		
+		return projectSignatures;
+	}
+	
+	private AbstractSignature addFeatureID(AbstractSignature sig, int featureID, int line) {
+		SignatureReference sigRef = signatureSet.get(sig);
+		if (sigRef == null) {
+			sigRef = new SignatureReference(sig);
+			signatureSet.put(sig, sigRef);
+			signatureTable.put(sig.getFullName(), sig);
+		}
+		sigRef.addID(new FeatureData(featureID, line));
+		return sigRef.getSig();
+	}
+
+	public void attachJavadocComments(ProjectSignatures projectSignatures, FSTModel fst) {
 		if (fst == null) {
-			MPLPlugin.getDefault().logInfo("No FSTModel!");
+			FeatureHouseCorePlugin.getDefault().logInfo("Kein FSTModel!");
 		} else {
 			for (FSTFeature fstFeature : fst.getFeatures()) {
-				final int id = interfaceProject.getFeatureID(fstFeature.getName());
+				final int id = projectSignatures.getFeatureID(fstFeature.getName());
 				
 				for (FSTRole fstRole : fstFeature.getRoles()) {
 					FSTClassFragment classFragment = fstRole.getClassFragment();
@@ -367,9 +268,6 @@ public class CreateFujiSignaturesJob extends AMonitorJob<CreateFujiSignaturesJob
 				}
 			}
 		}
-		
-		projectSignatures.setSignatureArray(sigArray);
-		interfaceProject.setProjectSignatures(projectSignatures);
 	}
 	
 	private void copyComment(RoleElement element, int id, String fullName) {

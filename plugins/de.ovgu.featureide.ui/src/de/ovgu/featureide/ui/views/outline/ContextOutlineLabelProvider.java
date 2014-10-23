@@ -18,7 +18,7 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.ui.mpl.views.outline;
+package de.ovgu.featureide.ui.views.outline;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -42,14 +42,15 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.ITextEditor;
 
+import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
-import de.ovgu.featureide.core.mpl.InterfaceProject;
-import de.ovgu.featureide.core.mpl.MPLPlugin;
-import de.ovgu.featureide.core.mpl.signature.abstr.AbstractClassFragment;
-import de.ovgu.featureide.core.mpl.signature.abstr.AbstractClassSignature;
-import de.ovgu.featureide.core.mpl.signature.abstr.AbstractFieldSignature;
-import de.ovgu.featureide.core.mpl.signature.abstr.AbstractMethodSignature;
-import de.ovgu.featureide.core.mpl.signature.abstr.AbstractSignature;
+import de.ovgu.featureide.core.signature.ProjectSignatures;
+import de.ovgu.featureide.core.signature.abstr.AbstractClassFragment;
+import de.ovgu.featureide.core.signature.abstr.AbstractClassSignature;
+import de.ovgu.featureide.core.signature.abstr.AbstractFieldSignature;
+import de.ovgu.featureide.core.signature.abstr.AbstractMethodSignature;
+import de.ovgu.featureide.core.signature.abstr.AbstractSignature;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
@@ -166,7 +167,7 @@ public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 	@Override
 	public boolean refreshContent(IFile oldFile, IFile currentFile) {
 		if (currentFile != null && oldFile != null) {
-			//TODO MPL: ... ?
+			// TODO MPL: ... ?
 			if (currentFile.getName().equals(oldFile.getName()) && viewer.getTree().getItems().length > 1) {
 				return true;
 			}
@@ -177,7 +178,7 @@ public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 	@Override
 	public void init() {
 		viewer.addSelectionChangedListener(sListner);
-//		viewer.setAutoExpandLevel(AbstractTreeViewer.ALL_LEVELS);
+		// viewer.setAutoExpandLevel(AbstractTreeViewer.ALL_LEVELS);
 	}
 
 	public static void scrollToLine(IEditorPart editorPart, int lineNumber) {
@@ -185,8 +186,7 @@ public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 			return;
 		}
 		ITextEditor editor = (ITextEditor) editorPart;
-		IDocument document = editor.getDocumentProvider().getDocument(
-				editor.getEditorInput());
+		IDocument document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
 		if (document != null) {
 			IRegion lineInfo = null;
 			try {
@@ -198,36 +198,42 @@ public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 			}
 		}
 	}
-	
-	private ISelectionChangedListener sListner = new ISelectionChangedListener() {	
+
+	private ISelectionChangedListener sListner = new ISelectionChangedListener() {
 		@Override
 		public void selectionChanged(SelectionChangedEvent event) {
 			if (viewer.getInput() != null) {
 				Object selection = ((IStructuredSelection) viewer.getSelection()).getFirstElement();
-				if (!(viewer.getInput() instanceof IResource)) return; 
-				InterfaceProject interfaceProject = MPLPlugin.getDefault().getInterfaceProject(((IResource) viewer.getInput()).getProject());
+				if (!(viewer.getInput() instanceof IResource)) {
+					return;
+				}
+				IFeatureProject featureProject = CorePlugin.getFeatureProject((IResource) viewer.getInput());
 				if (selection instanceof AbstractClassFragment) {
-					AbstractSignature sig = ((AbstractClassFragment) selection).getSignature();
-					openEditor(sig, interfaceProject, sig.getFeatureData()[0].getId());
+					final AbstractSignature sig = ((AbstractClassFragment) selection).getSignature();
+					openEditor(sig, featureProject, sig.getFeatureData()[0].getId());
 				} else if (selection instanceof AbstractSignature) {
-					AbstractSignature sig = (AbstractSignature) selection;
-					openEditor(sig, interfaceProject, sig.getFeatureData()[0].getId());
+					final AbstractSignature sig = (AbstractSignature) selection;
+					openEditor(sig, featureProject, sig.getFeatureData()[0].getId());
 				} else if (selection instanceof Feature) {
-					TreeItem decl = viewer.getTree().getSelection()[0].getParentItem();
-					openEditor((AbstractSignature) decl.getData(), interfaceProject, interfaceProject.getFeatureID(((Feature) selection).getName()));
+					final ProjectSignatures signatures = featureProject.getProjectSignatures();
+					if (signatures != null) {
+						final TreeItem decl = viewer.getTree().getSelection()[0].getParentItem();
+						openEditor((AbstractSignature) decl.getData(), featureProject, signatures.getFeatureID(((Feature) selection).getName()));
+					}
 				}
 			}
 		}
-		
-		private void openEditor(AbstractSignature sig, InterfaceProject interfaceProject, int featureID) {			
-			FSTModel model = interfaceProject.getFeatureProjectReference().getFSTModel();
-			if (model != null) {
+
+		private void openEditor(AbstractSignature sig, IFeatureProject featureProject, int featureID) {
+			final FSTModel model = featureProject.getFSTModel();
+			final ProjectSignatures signatures = featureProject.getProjectSignatures();
+			if (model != null && signatures != null) {
 				AbstractSignature parent = sig;
 				while (parent.getParent() != null) {
 					parent = parent.getParent();
-				}	
-				IFile iFile = model.getFeature(interfaceProject.getFeatureName(featureID)).getRole(parent.getName() + ".java").getFile();
-				
+				}
+				IFile iFile = model.getFeature(signatures.getFeatureName(featureID)).getRole(parent.getName() + ".java").getFile();
+
 				if (iFile.isAccessible()) {
 					IWorkbench workbench = PlatformUI.getWorkbench();
 					try {
@@ -237,10 +243,8 @@ public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 							contentType = description.getContentType();
 						}
 						IEditorDescriptor desc = workbench.getEditorRegistry().getDefaultEditor(iFile.getName(), contentType);
-						IEditorPart editorPart = workbench.getActiveWorkbenchWindow().getActivePage().openEditor(
-								new FileEditorInput(iFile), 
-								(desc != null) ? desc.getId() : "org.eclipse.ui.DefaultTextEditor");
-						
+						IEditorPart editorPart = workbench.getActiveWorkbenchWindow().getActivePage().openEditor(new FileEditorInput(iFile), (desc != null) ? desc.getId() : "org.eclipse.ui.DefaultTextEditor");
+
 						int linenumber = sig.getFeatureData()[sig.hasFeature(featureID)].getLineNumber();
 						scrollToLine(editorPart, linenumber);
 					} catch (CoreException e) {

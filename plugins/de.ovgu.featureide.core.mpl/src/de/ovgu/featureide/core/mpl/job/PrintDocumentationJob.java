@@ -32,7 +32,6 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.mpl.InterfaceProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.mpl.io.IOConstants;
-import de.ovgu.featureide.core.mpl.job.util.AJobArguments;
 import de.ovgu.featureide.core.mpl.signature.ProjectSignatures.SignatureIterator;
 import de.ovgu.featureide.core.mpl.signature.ProjectStructure;
 import de.ovgu.featureide.core.mpl.signature.abstr.AbstractClassFragment;
@@ -46,15 +45,17 @@ import de.ovgu.featureide.core.mpl.signature.javadoc.VariantMerger;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
+import de.ovgu.featureide.fm.core.job.AProjectJob;
+import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
 /**
  * Builds the JavaDoc-Documentation.
  * 
  * @author Sebastian Krieter
  */
-public class PrintDocumentationJob extends AMonitorJob<PrintDocumentationJob.Arguments> {
+public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arguments> {
 	
-	public static class Arguments extends AJobArguments {
+	public static class Arguments extends JobArguments {
 		private final String foldername, featurename;
 		private final int mode; 
 		private final String[] options;

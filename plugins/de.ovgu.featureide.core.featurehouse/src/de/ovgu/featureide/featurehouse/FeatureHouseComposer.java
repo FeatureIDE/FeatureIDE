@@ -86,10 +86,10 @@ import de.ovgu.featureide.featurehouse.model.FeatureHouseModelBuilder;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.StoppableJob;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import de.ovgu.featureide.fm.core.job.AStoppableJob;
 import fuji.CompilerWarningException;
 import fuji.Composition;
 import fuji.CompositionErrorException;
@@ -162,7 +162,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	}
 
 	private ICompositionErrorListener compositionErrorListener = createCompositionErrorListener();
-	private StoppableJob fuji;
+	private AStoppableJob fuji;
 
 	/**
 	 * @return
@@ -348,12 +348,14 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 
 		if (configPath == null || basePath == null || outputPath == null)
 			return;
+		
+		final SignatureSetter signatureSetter = new SignatureSetter();
 
-		/**
+		/*
 		 * Run fuji parallel to the build process.
 		 */
-		//TODO: save useFuji persistently and changed it via context menu
-		fuji();
+		//TODO: save useFuji persistently
+		fuji(signatureSetter);
 
 		createBuildFolder(config);
 		setJavaBuildPath(config.getName().split("[.]")[0]);
@@ -378,7 +380,8 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			}
 		}
 		buildFSTModel(configPath, basePath, outputPath);
-
+		signatureSetter.setFstModel(featureProject.getFSTModel());
+		
 		checkContractComposition();
 
 		callCompiler();
@@ -661,7 +664,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	/**
 	 * Starts type checking with fuji in a background job.
 	 */
-	private void fuji() {
+	private void fuji(final SignatureSetter signatureSetter) {
 		if (!useFuji) {
 			return;
 		}
@@ -673,17 +676,20 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 				FMCorePlugin.getDefault().logError(e);
 			}
 		}
-		fuji = new StoppableJob("Type checking " + featureProject.getProjectName() + " with fuji") {
+		fuji = new AStoppableJob("Type checking " + featureProject.getProjectName() + " with fuji") {
 			@Override
-			protected IStatus execute(IProgressMonitor monitor) {
+			protected boolean work() {
 				try {
-					runFuji(featureProject);
+					final Program ast = runFuji(featureProject);
+					signatureSetter.setFujiParameters(featureProject, ast);
+					return true;
 				} catch (CompositionException e) {
 					FMCorePlugin.getDefault().logError(e);
+					return false;
 				}
-				return Status.OK_STATUS;
 			}
 		};
+		fuji.addJobFinishedListener(signatureSetter);
 		fuji.schedule();
 	}
 
@@ -694,17 +700,18 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	 * @param featureProject
 	 *            The feature project of the caller.
 	 */
-	private synchronized static void runFuji(IFeatureProject featureProject) throws CompositionException {
+	private synchronized static Program runFuji(IFeatureProject featureProject) throws CompositionException {
 		String sourcePath = featureProject.getSourcePath();
 		String[] fujiOptions = new String[] { "-" + Main.OptionName.CLASSPATH, getClassPaths(featureProject), "-" + Main.OptionName.PROG_MODE, "-" + Main.OptionName.COMPOSTION_STRATEGY,
 				Main.OptionName.COMPOSTION_STRATEGY_ARG_FAMILY, "-typechecker", "-basedir", sourcePath };
+		Program ast = null;
 		try {
 			FeatureModel fm = featureProject.getFeatureModel();
 			fm.getAnalyser().setDependencies();
 
 			Main fuji = new Main(fujiOptions, fm, featureProject.getFeatureModel().getConcreteFeatureNames());
 			Composition composition = fuji.getComposition(fuji);
-			Program ast = composition.composeAST();
+			ast = composition.composeAST();
 
 			// run type check
 			fuji.typecheckAST(ast);
@@ -748,6 +755,8 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		} catch (UnsupportedModelException e) {
 			LOGGER.logError(e);
 		}
+		
+		return ast;
 	}
 
 	private static String getClassPaths(IFeatureProject featureProject) {
@@ -1205,7 +1214,13 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 
 	public void setUseFuji(boolean useFuji) {
 		this.useFuji = useFuji;
-		fuji();
+		
+		if (useFuji) {
+			final IFile currentConfiguration = featureProject.getCurrentConfiguration();
+			if (currentConfiguration != null) {
+				performFullBuild(currentConfiguration);
+			}
+		}
 	}
 	
 	public boolean usesFuji() {

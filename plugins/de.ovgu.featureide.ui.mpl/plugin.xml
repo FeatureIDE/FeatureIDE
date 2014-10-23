@@ -15,6 +15,23 @@
       </wizard>
    </extension> -->
    <extension
+         point="org.eclipse.ui.decorators">
+      <decorator
+            adaptable="true"
+            class="de.ovgu.featureide.ui.mpl.InterfaceProjectDecorator"
+            icon="icons/FeatureProjectDecorator.png"
+            id="de.ovgu.featureide.ui.mpl.InterfaceProjectDecorator"
+            label="Interface Project Decorator"
+            lightweight="true"
+            state="true">
+         <enablement>
+            <objectClass
+                  name="org.eclipse.core.resources.IProject">
+            </objectClass>
+         </enablement>
+      </decorator>
+   </extension>
+   <extension
          point="org.eclipse.ui.popupMenus">
       <objectContribution
             adaptable="true"
@@ -277,46 +294,4 @@
          </visibility>
       </objectContribution>
    </extension>
-   <extension
-         point="org.eclipse.ui.decorators">
-      <decorator
-            adaptable="true"
-            class="de.ovgu.featureide.ui.mpl.InterfaceProjectDecorator"
-            icon="icons/FeatureProjectDecorator.png"
-            id="de.ovgu.featureide.ui.mpl.InterfaceProjectDecorator"
-            label="Interface Project Decorator"
-            lightweight="true"
-            state="true">
-         <enablement>
-            <objectClass
-                  name="org.eclipse.core.resources.IProject">
-            </objectClass>
-         </enablement>
-      </decorator>
-   </extension>
-   
-   <extension
-	   		point="org.eclipse.jdt.ui.javaCompletionProposalComputer"
-			id="ContextViewCompletion"
-			name="ContextViewCompletion">
-		<javaCompletionProposalComputer
-			activate="false"
-			categoryID="org.eclipse.jpt.ui.ContextViewCompletion"
-			categoryId="de.ovgu.featureide.ui.mpl.ContextViewCompletion"
-			class="de.ovgu.featureide.ui.editors.Completion">
-			<partition type="__dftl_partition_content_type"/>
-			<partition type="__java_string"/>
-		</javaCompletionProposalComputer>
-		<proposalCategory
-			id="ContextViewCompletion"
-			name="tes"
-			icon="icons/featureide.gif"/>
-	</extension>     
-    <extension
-          point="de.ovgu.featureide.ui.views.outline">
-       <outline
-       		contentProvider="de.ovgu.featureide.ui.mpl.views.outline.ContextOutlineTreeContentProvider"
-            labelProvider="de.ovgu.featureide.ui.mpl.views.outline.ContextOutlineLabelProvider">
-       </outline>
-    </extension>
 </plugin>
