@@ -33,6 +33,8 @@ import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gef.EditPartViewer;
+import org.eclipse.gef.editparts.ZoomListener;
+import org.eclipse.gef.editparts.ZoomManager;
 
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.FMPoint;
@@ -65,6 +67,7 @@ public class FeatureUIHelper {
 	 * Necessary for correct manual drag-and-drop movement while zoomed.
 	 */
 	private static double zoomFactor = 1.0;
+	private static ZoomManager zoomManager = null;
 
 	public static Dimension getLegendSize(FeatureModel featureModel) {
 		return legendSize.get(featureModel);
@@ -97,16 +100,18 @@ public class FeatureUIHelper {
 	public static void setLocation(Feature feature, Point newLocation) {
 		Point oldLocation = getLocation(feature);
 		feature.setNewLocation(toFMPoint(newLocation));
-		if (newLocation == null)
+		if (newLocation == null) {
 			return;
+		}
 		featureLocation.put(feature, newLocation);
 		fireLocationChanged(feature, oldLocation, newLocation);
 	}
 
 	public static void setTemporaryLocation(Feature feature, Point newLocation) {
 		Point oldLocation = getLocation(feature);
-		if (newLocation == null || newLocation.equals(oldLocation))
+		if (newLocation == null || newLocation.equals(oldLocation)) {
 			return;
+		}
 		featureLocation.put(feature, newLocation);
 		fireLocationChanged(feature, oldLocation, newLocation);
 	}
@@ -165,8 +170,9 @@ public class FeatureUIHelper {
 		boolean parentFeatureHidden = false;
 		while (!parentFeature.isRoot()) {
 			parentFeature = parentFeature.getParent();
-			if (parentFeature.isHidden())
+			if (parentFeature.isHidden()) {
 				parentFeatureHidden = true;
+			}
 		}
 		if ((feature.isHidden() || parentFeatureHidden) && !showHiddenFeatures.contains(feature.getFeatureModel())) {
 			return getTargetLocation(feature.getParent());
@@ -269,5 +275,28 @@ public class FeatureUIHelper {
 	 */
 	public static void setZoomFactor(double zoomFactor) {
 		FeatureUIHelper.zoomFactor = zoomFactor;
+	}
+
+	/**
+	 * @param zoomManager
+	 */
+	public static void setZoomManager(ZoomManager zoomManager) {
+		FeatureUIHelper.zoomManager = zoomManager;
+		if (zoomManager == null) {
+			return;
+		}
+		zoomManager.addZoomListener(new ZoomListener() {
+			@Override
+			public void zoomChanged(double newZoomFactor) {
+				FeatureUIHelper.zoomFactor = newZoomFactor;
+			}
+		});
+	}
+
+	/**
+	 * @return the zoomManager
+	 */
+	public static ZoomManager getZoomManager() {
+		return zoomManager;
 	}
 }

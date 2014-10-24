@@ -40,7 +40,6 @@ import org.eclipse.gef.KeyStroke;
 import org.eclipse.gef.LayerConstants;
 import org.eclipse.gef.commands.CommandStack;
 import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
-import org.eclipse.gef.editparts.ZoomListener;
 import org.eclipse.gef.editparts.ZoomManager;
 import org.eclipse.gef.ui.actions.GEFActionConstants;
 import org.eclipse.gef.ui.actions.ZoomInAction;
@@ -145,7 +144,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 
 	private ZoomInAction zoomIn;
 	private ZoomOutAction zoomOut;
-	
+
 	ExportFeatureModelAction exportFeatureModelAction;
 	// legend action replaced with property page
 	private LegendAction legendAction;
@@ -174,13 +173,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 
 		zoomManager = rootEditPart.getZoomManager();
 		zoomManager.setZoomLevels(new double[] { 0.05, 0.10, 0.25, 0.50, 0.75, 0.90, 1.00, 1.10, 1.25, 1.50, 2.00, 2.50, 3.00, 4.00 });
-		zoomManager.addZoomListener(new ZoomListener(){
-			@Override
-			public void zoomChanged(double newZoomFactor)
-			{
-				FeatureUIHelper.setZoomFactor(newZoomFactor);
-			}
-		});
+		FeatureUIHelper.setZoomManager(zoomManager);
 
 		setKeyHandler(new FeatureDiagramEditorKeyHandler(this, getFeatureModel()));
 	}
@@ -406,7 +399,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 				extension.extendContextMenu(menu, this);
 			}
 		}
-		
+
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 		menu.add(this.exportFeatureModelAction);
 	}
@@ -672,7 +665,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			// additional actions can be refreshed here
 			// legendAction.refresh();
 			legendLayoutAction.refresh();
-		} else if (LEGEND_LAYOUT_CHANGED.equals(prop)){
+		} else if (LEGEND_LAYOUT_CHANGED.equals(prop)) {
 			legendLayoutAction.refresh();
 		}
 
@@ -715,12 +708,12 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	public IFeatureModelEditorPage getPage(Composite container) {
 		return new FeatureDiagramEditor(featureModelEditor, container);
 	}
-	
+
 	@Override
 	public void doSave(IProgressMonitor monitor) {
 
 	}
-	
+
 	@Override
 	public void pageChangeFrom(int newPage) {
 		if (newPage == getIndex()) {
