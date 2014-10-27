@@ -27,7 +27,7 @@ import de.ovgu.cide.fstgen.ast.FSTNonTerminal;
 import de.ovgu.cide.fstgen.ast.FSTTerminal;
 import de.ovgu.featureide.core.fstmodel.FSTInvariant;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
-import de.ovgu.featureide.core.fstmodel.RoleElement;
+import de.ovgu.featureide.core.fstmodel.IRoleElement;
 import de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin;
 
 /**
@@ -49,8 +49,8 @@ public class JavaClassBuilder extends ClassBuilder {
 		LinkedList<String> fields = getFields(terminal.getBody());
 		for (int i = 2; i < fields.size(); i++) {
 			// add field
-			RoleElement r = addField(fields.get(i), fields.get(1), fields.get(0), terminal.getBody(), terminal.beginLine, terminal.endLine);
-			r.setJavaDocCommtent(findJavaDocComments(terminal));
+			IRoleElement r = addField(fields.get(i), fields.get(1), fields.get(0), terminal.getBody(), terminal.beginLine, terminal.endLine);
+			r.setJavaDocComment(findJavaDocComments(terminal));
 		}
 	}
 	
@@ -192,8 +192,8 @@ public class JavaClassBuilder extends ClassBuilder {
 		}
 
 		// add method
-		RoleElement r = addMethod(name, getMethodParameter(terminal), returnType, modifiers, terminal.getBody(), terminal.beginLine, terminal.endLine, false, contractBody, contractCompKey);
-		r.setJavaDocCommtent(findJavaDocComments(terminal));
+		IRoleElement r = addMethod(name, getMethodParameter(terminal), returnType, modifiers, terminal.getBody(), terminal.beginLine, terminal.endLine, false, contractBody, contractCompKey);
+		r.setJavaDocComment(findJavaDocComments(terminal));
 	}
 
 	/**
@@ -221,6 +221,9 @@ public class JavaClassBuilder extends ClassBuilder {
 		if (terminal.getBody().indexOf(name) > 0) {
 			modifiers = terminal.getBody().substring(0, terminal.getBody().indexOf(name) - 1);
 		}
+		if (name.contains("update")) {
+			int kons = 100;
+		}
 
 		String contractBody = "", contractCompKey = "";
 		for (FSTNode nonT1 : ((FSTNonTerminal) terminal.getParent()).getChildren()) {
@@ -241,8 +244,8 @@ public class JavaClassBuilder extends ClassBuilder {
 		}
 
 		// add constructor
-		RoleElement r = addMethod(name, getMethodParameter(terminal), "void", modifiers, terminal.getBody(), terminal.beginLine, terminal.endLine, true, contractBody, contractCompKey);
-		r.setJavaDocCommtent(findJavaDocComments(terminal));
+		IRoleElement r = addMethod(name, getMethodParameter(terminal), "void", modifiers, terminal.getBody(), terminal.beginLine, terminal.endLine, true, contractBody, contractCompKey);
+		r.setJavaDocComment(findJavaDocComments(terminal));
 	}
 
 	private String getMethodName(FSTTerminal terminal) {

@@ -22,12 +22,14 @@ package de.ovgu.featureide.core.fstmodel;
 
 import org.eclipse.core.resources.IFile;
 
+import de.ovgu.featureide.core.signature.abstr.AbstractSignature;
+
 /**
  * Default implementation of {@link FSTMethod} and {@link FSTField}.
  * 
  * @author Jens Meinicke
  */
-public abstract class RoleElement {
+public abstract class RoleElement<T extends RoleElement<T>> implements Comparable<T>, IRoleElement{
 
 	private static final String STATIC = "static";
 	private static final String PUBLIC = "public";
@@ -39,12 +41,14 @@ public abstract class RoleElement {
 	protected String type;
 	protected String modifiers;
 	protected String body;
-	protected String javaDocCommtent = null;
+	protected String javaDocComment = null;
 	protected int beginLine;
 	protected int endLine;
 	protected int composedLine;
 
 	protected FSTRole role;
+	
+	protected AbstractSignature signature;
 
 	public RoleElement(String name, String type, String modifiers) {
 		this(name, type, modifiers, "", -1, -1);
@@ -59,120 +63,196 @@ public abstract class RoleElement {
 		this.endLine = endLine;
 	}
 
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.fstmodel.IRoleElement#getRole()
+	 */
 	public FSTRole getRole() {
 		return role;
 	}
 
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.fstmodel.IRoleElement#setRole(de.ovgu.featureide.core.fstmodel.FSTRole)
+	 */
 	public void setRole(FSTRole parent) {
 		this.role = parent;
 	}
 
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.fstmodel.IRoleElement#getFile()
+	 */
 	public IFile getFile() {
 		return role.getFile();
 	}
 
-	/**
-	 * 
-	 * @return The line of this method at the features file.
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.fstmodel.IRoleElement#getLine()
 	 */
 	public int getLine() {
 		return beginLine;
 	}
 
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.fstmodel.IRoleElement#setLine(int)
+	 */
 	public void setLine(int lineNumber) {
 		this.beginLine = lineNumber;
 	}
 
-	/**
-	 * 
-	 * @return The last line of this method at the features file.
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.fstmodel.IRoleElement#getEndLine()
 	 */
 	public int getEndLine() {
 		return endLine;
 	}
 
-	/**
-	 * 
-	 * @return The line of this method at the composed file.
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.fstmodel.IRoleElement#getComposedLine()
 	 */
 	public int getComposedLine() {
 		return composedLine;
 	}
 
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.fstmodel.IRoleElement#setComposedLine(int)
+	 */
 	public void setComposedLine(int line) {
 		composedLine = line;
 	}
 
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.fstmodel.IRoleElement#getBody()
+	 */
 	public String getBody() {
 		return body;
 	}
 
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.fstmodel.IRoleElement#isFinal()
+	 */
 	public boolean isFinal() {
 		return modifiers.contains(FINAL);
 	}
 
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.fstmodel.IRoleElement#isPrivate()
+	 */
 	public boolean isPrivate() {
 		return modifiers.contains(PRIVATE);
 	}
 
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.fstmodel.IRoleElement#isProtected()
+	 */
 	public boolean isProtected() {
 		return modifiers.contains(PROTECTED);
 	}
 
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.fstmodel.IRoleElement#isPublic()
+	 */
 	public boolean isPublic() {
 		return modifiers.contains(PUBLIC);
 	}
 
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.fstmodel.IRoleElement#isStatic()
+	 */
 	public boolean isStatic() {
 		return modifiers.contains(STATIC);
 	}
 
-	public abstract String getFullName();
-
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.fstmodel.IRoleElement#getType()
+	 */
 	public String getType() {
 		return type;
 	}
 
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.fstmodel.IRoleElement#getName()
+	 */
 	public String getName() {
 		return name;
 	}
 
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.fstmodel.IRoleElement#getModifiers()
+	 */
 	public String getModifiers() {
 		return modifiers;
 	}
 
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.fstmodel.IRoleElement#toString()
+	 */
 	@Override
 	public String toString() {
 		return getName();
 	}
 
+
 	/**
-	 * @return <code>true</code> if the given element is equivalent in it's
-	 *         structure and it has the same class as this element
+	 * @return
+	 * 		<code>true</code> if the given element is equivalent
+	 * 		in its structure and it has the same class as this element
 	 */
-	public boolean comparesTo(RoleElement element) {
-		return getFullName().equals(element.getFullName()) && getClass().equals(element.getClass());
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		return result;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof RoleElement) {
-			return comparesTo((RoleElement) obj);
-		}
-		return false;
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof IRoleElement))
+			return false;
+		IRoleElement other = (IRoleElement) obj;
+		if (!other.getClass().equals(this.getClass()))
+			return false;
+	
+		if (!other.getFullName().equals(this.getFullName()))
+			return false;
+		
+		
+		return true;
+	}
+	
+/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.fstmodel.IRoleElement#getJavaDocComment()
+	 */
+	public String getJavaDocComment() {
+		return javaDocComment;
+
 	}
 
-	/**
-	 * @return the javaDocCommtent
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.fstmodel.IRoleElement#setJavaDocComment(java.lang.String)
 	 */
-	public String getJavaDocCommtent() {
-		return javaDocCommtent;
+	public void setJavaDocComment(String javaDocComment) {
+		this.javaDocComment = javaDocComment;
 	}
+	
+	/*
+	 * default implementation
+	 * */
+	public int compareTo(T element) {
+	
+		if(this == element)
+			return 0;
+		
+		return this.getFullName().compareToIgnoreCase(element.getFullName());
+	}
+		
+		
+	
 
-	/**
-	 * @param javaDocCommtent the javaDocCommtent to set
-	 */
-	public void setJavaDocCommtent(String javaDocCommtent) {
-		this.javaDocCommtent = javaDocCommtent;
-	}
 }

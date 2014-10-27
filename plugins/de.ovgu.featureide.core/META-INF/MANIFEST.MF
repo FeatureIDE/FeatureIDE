@@ -21,6 +21,10 @@ Export-Package:
  de.ovgu.featureide.core.fstmodel,
  de.ovgu.featureide.core.fstmodel.preprocessor,
  de.ovgu.featureide.core.listeners,
+ de.ovgu.featureide.core.signature,
+ de.ovgu.featureide.core.signature.abstr,
+ de.ovgu.featureide.core.signature.comparator,
+ de.ovgu.featureide.core.signature.filter,
  de.ovgu.featureide.core.wizardextension
 Bundle-ClassPath: .
 Bundle-ActivationPolicy: lazy

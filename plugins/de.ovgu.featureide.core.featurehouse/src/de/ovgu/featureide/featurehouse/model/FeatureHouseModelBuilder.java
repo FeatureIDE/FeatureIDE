@@ -200,7 +200,7 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 						classBuilder.caseClassDeclarationType(terminal);
 					} else if (JAVA_NODE_MODIFIERS.equals(type)) {
 						classBuilder.caseModifiers(terminal);
-						classFragmentStack.peek().setJavaDocCommtent(JavaClassBuilder.findJavaDocComments(terminal));
+						classFragmentStack.peek().setJavaDocComment(JavaClassBuilder.findJavaDocComments(terminal));
 					} else if (JAVA_NODE_EXTENDSLIST.equals(type)) {
 						classBuilder.caseExtendsList(terminal);
 					} else if (JAVA_NODE_IMPLEMENTATIONLIST.equals(type)) {
@@ -252,7 +252,7 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 					caseClassDeclaration(child);
 				}
 			}
-
+			
 			if (!classFragmentStack.isEmpty()) {
 				classFragmentStack.pop();
 			}

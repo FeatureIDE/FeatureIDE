@@ -27,7 +27,7 @@ import java.util.LinkedList;
  * 
  * @author Jens Meinicke
  */
-public class FSTMethod extends RoleElement {
+public class FSTMethod extends RoleElement<FSTMethod> {
 
 	private LinkedList<String> parameterTypes;
 	private boolean isConstructor;
@@ -75,7 +75,6 @@ public class FSTMethod extends RoleElement {
 		this.compKey = compKey;
 	}
 
-	@Override
 	public String getFullName() {
 		StringBuilder fullname = new StringBuilder();
 		fullname.append(name);
@@ -148,4 +147,5 @@ public class FSTMethod extends RoleElement {
 		}
 		return false;
 	}
+
 }

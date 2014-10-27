@@ -18,34 +18,14 @@
 *
 * See http://www.fosd.de/featureide/ for further information.
 */
-package de.ovgu.featureide.core.mpl.util;
+package de.ovgu.featureide.core.signature.java;
 
-import java.util.HashSet;
+import de.ovgu.featureide.core.signature.abstr.AClassCreator;
+import de.ovgu.featureide.core.signature.abstr.AbstractClassSignature;
 
-public class FeatureList extends HashSet<String> {
-	private static final long serialVersionUID = 1L;
-	private static final int hashCodePrime = 31;
-	
-	private int hashCode = 0;
-
+public class JavaClassCreator extends AClassCreator {
 	@Override
-	public boolean add(String arg0) {
-		if (super.add(arg0)) {
-			hashCode *= hashCodePrime;
-			hashCode += arg0.hashCode();
-			
-			return true;
-		}
-		return false;
-	}
-
-//	@Override
-//	public boolean equals(Object o) {
-//		return super.equals(o);
-//	}
-
-	@Override
-	public int hashCode() {
-		return hashCode;
+	public JavaClass create(AbstractClassSignature sig) {
+		return new JavaClass(sig);
 	}
 }

@@ -65,7 +65,7 @@ abstract class AChainJob<T extends AJobArguments> extends Job implements IChainJ
 					AChainJob.this.status = status;
 				}
 				finalWork();
-			}
+;			}
 		}
 	}
 	

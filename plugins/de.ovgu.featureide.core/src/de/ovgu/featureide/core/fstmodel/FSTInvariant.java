@@ -26,7 +26,7 @@ package de.ovgu.featureide.core.fstmodel;
  * @author Stefan Krueger
  * @author Florian Proksch
  */
-public class FSTInvariant extends RoleElement {
+public class FSTInvariant extends RoleElement<FSTInvariant> {
 
 	public enum RoleTypes {
 		ROLE_TYPE_INVARIANT, MISC
@@ -57,7 +57,6 @@ public class FSTInvariant extends RoleElement {
 		return (body + beginLine).hashCode();
 	}
 
-	@Override
 	public String getFullName() {
 		String name = body.replaceAll("  ", "").replace((char) 10, ' ').replaceFirst("invariant\\W+", "").replaceFirst("invariant_redundantly\\W+", "");
 		return ((name.length() > 25 ? name.substring(0, 25) + "..." : name));

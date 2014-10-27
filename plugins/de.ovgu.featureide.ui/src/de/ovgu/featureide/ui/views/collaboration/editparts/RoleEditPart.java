@@ -22,6 +22,7 @@ package de.ovgu.featureide.ui.views.collaboration.editparts;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.TreeSet;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -164,7 +165,7 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 				int y = rect.y;
 				if (point.y >= y && point.y <= (y + rect.height)) {
 
-					LinkedList<FSTInvariant> invariants = this.getRoleModel().getClassFragment().getInvariants();
+					TreeSet<FSTInvariant> invariants = this.getRoleModel().getClassFragment().getInvariants();
 					for (FSTInvariant invariant : invariants) {
 						if (invariant.getFullName().equals(label.getElementName()))
 						{
@@ -177,7 +178,7 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 							
 					}
 					
-					LinkedList<FSTField> fields = this.getRoleModel().getClassFragment().getFields();
+					TreeSet<FSTField> fields = this.getRoleModel().getClassFragment().getFields();
 					for (FSTField fstField : fields) {
 						if (fstField.getFullName().equals(label.getElementName())) {
 							editor = openEditor(file);
@@ -188,7 +189,7 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 						}
 					}
 					
-					LinkedList<FSTMethod> methods = this.getRoleModel().getClassFragment().getMethods();
+					TreeSet<FSTMethod> methods = this.getRoleModel().getClassFragment().getMethods();
 					for (FSTMethod fstMethod : methods) {
 						if (fstMethod.getFullName().equals(label.getElementName())) {
 							editor = openEditor(file);
@@ -199,7 +200,7 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 						}
 					}
 
-					LinkedList<FSTDirective> directives = this.getRoleModel().getDirectives();
+					TreeSet<FSTDirective> directives = this.getRoleModel().getDirectives();
 					for (FSTDirective fstDirective : directives) {
 						if (fstDirective.toDependencyString().equals(label.getElementName())) {
 							editor = openEditor(file);

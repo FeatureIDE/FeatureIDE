@@ -24,15 +24,21 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
 import org.osgi.framework.BundleContext;
 
 import de.ovgu.featureide.fm.core.ExtendedFeatureModel.UsedModel;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.ModelIOFactory;
+import de.ovgu.featureide.fm.core.job.IJob;
+import de.ovgu.featureide.fm.core.job.IProjectJob;
+import de.ovgu.featureide.fm.core.job.util.JobArguments;
+import de.ovgu.featureide.fm.core.job.util.JobSequence;
 
 /**
  * The activator class controls the plug-in life cycle.
@@ -44,28 +50,17 @@ public class FMCorePlugin extends AbstractCorePlugin {
 	public static final String PLUGIN_ID = "de.ovgu.featureide.fm.core";
 	
 	private static FMCorePlugin plugin;
-
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.ui.plugin.AbstractUIPlugin#getID()
-	 */
+	
 	@Override
 	public String getID() {
 		return PLUGIN_ID;
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
-	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
-	 */
+	
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
 		super.stop(context);
@@ -73,6 +68,41 @@ public class FMCorePlugin extends AbstractCorePlugin {
 
 	public static FMCorePlugin getDefault() {
 		return plugin;
+	}
+	
+	/**
+	 * Creates a {@link IProjectJob} for every project with the given arguments.
+	 * 
+	 * @param projects the list of projects
+	 * @param arguments the arguments for the job
+	 * @param autostart if {@code true} the jobs is started automatically.
+	 * @return the created job or a {@link JobSequence} if more than one project is given.
+	 * 	Returns {@code null} if {@code projects} is empty.
+	 */
+	public IJob startJobs(List<IProject> projects, JobArguments arguments, boolean autostart) {
+		IJob ret;
+		switch (projects.size()) {
+		case 0: 
+			return null;
+		case 1:
+			IProjectJob newJob = arguments.createJob();
+			newJob.setProject(projects.get(0));
+			ret = newJob;
+			break;
+		default:
+			final JobSequence jobSequence = new JobSequence();
+			jobSequence.setIgnorePreviousJobFail(true);
+			for (IProject p : projects) {
+				IProjectJob newSequenceJob = arguments.createJob();
+				newSequenceJob.setProject(p);
+				jobSequence.addJob(newSequenceJob);
+			}
+			ret = jobSequence;
+		}
+		if (autostart) {
+			ret.schedule();
+		}
+		return ret;
 	}
 	
 	public void analyzeModel(IFile file) {

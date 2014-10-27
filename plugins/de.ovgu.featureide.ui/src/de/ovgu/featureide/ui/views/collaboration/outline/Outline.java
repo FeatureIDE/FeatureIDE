@@ -273,7 +273,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 			for (FSTRole r : field.getRole().getFSTClass().getRoles()) {
 				if (r.getFile().equals(iFile)) {
 					for (FSTField f : r.getClassFragment().getFields()) {
-						if (f.comparesTo(field)) {
+						if (f.compareTo(field)==0) {
 							return f.getLine();
 						}
 					}
@@ -286,7 +286,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 			for (FSTRole r : inv.getRole().getFSTClass().getRoles()) {
 				if (r.getFile().equals(iFile)) {
 					for (FSTInvariant i : r.getClassFragment().getInvariants()) {
-						if (i.comparesTo(inv)) {
+						if (i.compareTo(inv)==0) {
 							return i.getLine();
 						}
 					}
@@ -299,7 +299,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 			for (FSTRole r : meth.getRole().getFSTClass().getRoles()) {
 				if (r.getFile().equals(iFile)) {
 					for (FSTMethod m : r.getClassFragment().getMethods()) {
-						if (m.comparesTo(meth)) {
+						if (m.compareTo(meth)==0) {
 							return m.getLine();
 						}
 					}

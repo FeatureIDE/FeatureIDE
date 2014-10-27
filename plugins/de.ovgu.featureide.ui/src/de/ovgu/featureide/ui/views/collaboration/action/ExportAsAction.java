@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.action;
 
+
 import java.util.HashSet;
 import java.util.Set;
  
@@ -33,7 +34,8 @@ import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModelBuilder
 /**
  * TODO description
  * 
- * @author Günter Ulreich
+ * 
+ * @author Gï¿½nter Ulreich
  */
 public class ExportAsAction extends Action {
 
