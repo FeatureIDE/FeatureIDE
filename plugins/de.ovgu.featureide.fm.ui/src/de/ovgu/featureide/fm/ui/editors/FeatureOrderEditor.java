@@ -637,8 +637,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	}
 
 	@Override
-	public boolean pageChangeTo(int oldPage) {
+	public void pageChangeTo(int oldPage) {
 		updateOrderEditor();
-		return true;
 	}
 }

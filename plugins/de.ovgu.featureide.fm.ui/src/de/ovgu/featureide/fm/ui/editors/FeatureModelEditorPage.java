@@ -124,14 +124,19 @@ public abstract class FeatureModelEditorPage extends EditorPart implements IFeat
 	public void propertyChange(PropertyChangeEvent event) {
 
 	}
-
+	
 	@Override
-	public boolean pageChangeFrom(int newPage) {
+	public boolean allowPageChange(int newPage) {
 		return true;
+	}
+	
+	@Override
+	public void pageChangeFrom(int newPage) {
+		
 	}
 
 	@Override
-	public boolean pageChangeTo(int oldPage) {
-		return true;
+	public void pageChangeTo(int oldPage) {
+		
 	}
 }

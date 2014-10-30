@@ -88,18 +88,27 @@ public interface IFeatureModelEditorPage {
 	 * @param event
 	 */
 	void propertyChange(PropertyChangeEvent event);
+	
+	/**
+	 * Called if this page is about to change to another page.
+	 * 
+	 * @param newPage
+	 * 
+	 * @return {@code true} if the user is allowed to change the page
+	 */
+	boolean allowPageChange(int newPage);
 
 	/**
 	 * Called if the tab has been changed from this page.
 	 * 
 	 * @param newPage
 	 */
-	boolean pageChangeFrom(int newPage);
+	void pageChangeFrom(int newPage);
 
 	/**
 	 * Called if the tab has been changed to this page.
 	 * 
 	 * @param oldPage
 	 */
-	boolean pageChangeTo(int oldPage);
+	void pageChangeTo(int oldPage);
 }

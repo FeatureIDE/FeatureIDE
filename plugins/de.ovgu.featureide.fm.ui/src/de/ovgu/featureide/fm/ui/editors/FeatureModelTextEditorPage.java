@@ -72,10 +72,6 @@ public class FeatureModelTextEditorPage extends TextEditor implements IFeatureMo
 	 * Updates the text editor from diagram.
 	 */
 	private void updateTextEditor() {
-		// // prevent writing incorrectly read models due to errors in the model
-		// if (featureModelEditor.fmFile.hasModelMarkers()) {
-		// return;
-		// }
 		final String text = featureModelEditor.featureModelWriter.writeToString();
 		final IDocument document = getDocumentProvider().getDocument(getEditorInput());
 		if (!document.get().equals(text)) {
@@ -125,37 +121,33 @@ public class FeatureModelTextEditorPage extends TextEditor implements IFeatureMo
 	public void propertyChange(PropertyChangeEvent event) {
 
 	}
+	
+	@Override
+	public boolean allowPageChange(int newPage) {
+		final String newText = getDocumentProvider().getDocument(getEditorInput()).get();
+		return (newPage == getIndex()) || featureModelEditor.checkModel(newText);
+	}
 
 	@Override
-	public boolean pageChangeFrom(int newPage) {
+	public void pageChangeFrom(int newPage) {
 		if (newPage != getIndex()) {
 			final String newText = getDocumentProvider().getDocument(getEditorInput()).get();
 			if (!oldText.equals(newText)) {
 				final FeatureModel fm = featureModelEditor.featureModel;
-				if (featureModelEditor.checkModel(newText)) {
+				SourceChangeOperation op = new SourceChangeOperation(fm, featureModelEditor, newText, oldText);
 
-					SourceChangeOperation op = new SourceChangeOperation(fm, featureModelEditor, newText, oldText);
-
-					op.addContext((IUndoContext) fm.getUndoContext());
-					try {
-						PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-					} catch (ExecutionException e) {
-						FMUIPlugin.getDefault().logError(e);
-					}
-				} else {
-					return false;
+				op.addContext((IUndoContext) fm.getUndoContext());
+				try {
+					PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
+				} catch (ExecutionException e) {
+					FMUIPlugin.getDefault().logError(e);
 				}
 			}
 		}
-		return true;
 	}
 
 	@Override
-	public boolean pageChangeTo(int oldPage) {
-		// if
-		// (featureModelEditor.featureModel.getRenamingsManager().isRenamed()) {
-		// featureModelEditor.saveModelForConsistentRenamings();
-		// }
+	public void pageChangeTo(int oldPage) {
 		if (oldPage != getIndex()) {
 			if (featureModelEditor.isPageModified) {
 				updateTextEditor();
@@ -164,7 +156,6 @@ public class FeatureModelTextEditorPage extends TextEditor implements IFeatureMo
 			}
 			oldText = getDocumentProvider().getDocument(getEditorInput()).get();
 		}
-		return true;
 	}
 
 	@Override
