@@ -103,7 +103,8 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		updateOrderEditor();
 
 		if (hasFeatureOrder) {
-			writeToOrderFile(); // save the feature order also in .order if file exists
+			writeToOrderFile(); // save the feature order also in .order if file
+								// exists
 		}
 
 		if (featureModelEditor.featureModel.getFeatureOrderList().isEmpty())
@@ -189,7 +190,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 			createButtons();
 		}
 	}
-	
+
 	private void createButtons() {
 		createActivateButton();
 		createGridData();
@@ -197,7 +198,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		createDownButton();
 		createDeafaultButton();
 	}
-	
+
 	private void createActivateButton() {
 		activate = new Button(comp, SWT.CHECK);
 		activate.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
@@ -213,7 +214,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 
 		featurelist = new org.eclipse.swt.widgets.List(comp, SWT.NONE | SWT.BORDER | SWT.V_SCROLL | SWT.MULTI);
 	}
-	
+
 	private void createGridData() {
 		gridData = new GridData(GridData.FILL_BOTH);
 		gridData.horizontalSpan = 2;
@@ -226,7 +227,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		gridData = new GridData(GridData.HORIZONTAL_ALIGN_END);
 		gridData.widthHint = 70;
 	}
-	
+
 	private void createUpButton() {
 		up = new Button(comp, SWT.NONE);
 		up.setText("Up");
@@ -256,7 +257,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 			}
 		});
 	}
-	
+
 	private void createDownButton() {
 		down = new Button(comp, SWT.NONE);
 		down.setText("Down");
@@ -357,7 +358,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		boolean changed = false;
 		if (featureModelEditor.featureModel != null && featureModelEditor.featureModel.getRoot() != null) {
 			HashSet<String> featureSet = new HashSet<String>(featureModelEditor.featureModel.getConcreteFeatureNames());
-			
+
 			int itemcount = featurelist.getItemCount();
 			for (int i = 0; i < itemcount; i++) {
 				if (!featureSet.remove(featurelist.getItem(i))) {
@@ -410,7 +411,9 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 
 			Collection<String> list = featureModelEditor.featureModel.getFeatureOrderList();
 			if (list.isEmpty()) {
-				list = featureModelEditor.featureModel.getConcreteFeatureNames(); // set default values
+				list = featureModelEditor.featureModel.getConcreteFeatureNames(); // set
+																					// default
+																					// values
 			}
 
 			for (String featureName : list) {
@@ -538,13 +541,13 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		if (oldConfiguration.isEmpty()) {
 			return;
 		}
-		
+
 		final RenamingsManager renamingsManager = featureModelEditor.featureModel.getRenamingsManager();
 		for (ListIterator<String> it = oldConfiguration.listIterator(); it.hasNext();) {
 			final String oldName = it.next();
 			it.set(renamingsManager.getNewName(oldName));
 		}
-		
+
 		final List<String> layers;
 		if (!hasFeatureOrder || !activate.getSelection()) {
 			// Default order
@@ -559,7 +562,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 
 		// a copy of the old configuration
 		final LinkedList<String> configuration = new LinkedList<String>(oldConfiguration);
-		
+
 		final LinkedList<String> newConfiguration = new LinkedList<String>();
 		for (String layer : layers) {
 			if (oldConfiguration.contains(layer)) {
@@ -567,10 +570,10 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 				oldConfiguration.remove(layer);
 			}
 		}
-		
+
 		// Feature removed
 		newConfiguration.addAll(oldConfiguration);
-		
+
 		// check whether the new configuration is equal to the old one
 		boolean equal = true;
 		Iterator<String> newIt = newConfiguration.iterator();
@@ -587,7 +590,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		// Write Configuration
 		writeFeaturesToConfigurationFile(file, newConfiguration);
 	}
-	
+
 	private void enableUI(boolean selection) {
 		featurelist.setEnabled(selection);
 		up.setEnabled(selection);
@@ -622,28 +625,20 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		}
 		return null;
 	}
-	
+
 	@Override
 	public String getPageText() {
 		return PAGE_TEXT;
 	}
-	
+
 	@Override
 	public String getID() {
 		return ID;
 	}
-	
+
 	@Override
-	public void pageChangeTo(int oldPage) {
-		if (oldPage == featureModelEditor.textEditor.getIndex()) {
-			if (!featureModelEditor.textEditor.updateDiagram()) {
-				// there are errors in the file, stay at this editor page
-				featureModelEditor.isPageModified = false;
-				featureModelEditor.setActiveEditorPage(featureModelEditor.textEditor.getIndex());
-				featureModelEditor.currentPageIndex = featureModelEditor.textEditor.getIndex();
-				return;
-			}
-		}
+	public boolean pageChangeTo(int oldPage) {
 		updateOrderEditor();
+		return true;
 	}
 }

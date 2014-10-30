@@ -37,64 +37,69 @@ public interface IFeatureModelEditorPage {
 	 * 
 	 * @return Identifier of this page.
 	 */
-	public String getID();
-	
+	String getID();
+
 	/**
 	 * @return the index of this page.
 	 */
-	public int getIndex();
+	int getIndex();
 
 	/**
-	 * @param the index of this page.
+	 * @param the
+	 *            index of this page.
 	 */
-	public void setIndex(int index);
-	
+	void setIndex(int index);
+
 	/**
 	 * @return The Name of this page.
 	 */
-	public String getPageText();
-	
+	String getPageText();
+
 	/**
-	 * Called after adding the page to the editor. 
+	 * Called after adding the page to the editor.
 	 */
-	public void initEditor();
-	
+	void initEditor();
+
 	/**
-	 * @param the feature model editor containing the page.
+	 * @param the
+	 *            feature model editor containing the page.
 	 */
-	public void setFeatureModelEditor(FeatureModelEditor featureModelEditor);
-	
+	void setFeatureModelEditor(FeatureModelEditor featureModelEditor);
+
 	/**
 	 * @return This page. You can also call a constructor.
 	 */
-	public IFeatureModelEditorPage getPage(Composite container);
+	IFeatureModelEditorPage getPage(Composite container);
 
 	/**
 	 * 
 	 * @return The control of this page.
 	 */
-	public Control getControl();
+	Control getControl();
 
 	/**
 	 * @param monitor
 	 */
-	public void doSave(IProgressMonitor monitor);
+	void doSave(IProgressMonitor monitor);
 
 	/**
 	 * Called if the file has been changed.
+	 * 
 	 * @param event
 	 */
-	public void propertyChange(PropertyChangeEvent event);
+	void propertyChange(PropertyChangeEvent event);
 
 	/**
 	 * Called if the tab has been changed from this page.
+	 * 
 	 * @param newPage
 	 */
-	public void pageChangeFrom(int newPage);
+	boolean pageChangeFrom(int newPage);
 
 	/**
 	 * Called if the tab has been changed to this page.
+	 * 
 	 * @param oldPage
 	 */
-	public void pageChangeTo(int oldPage);
+	boolean pageChangeTo(int oldPage);
 }
