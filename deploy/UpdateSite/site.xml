@@ -613,37 +613,7 @@
    <feature url="features/de.ovgu.featureide.munge_2.7.1.201407301648.jar" id="de.ovgu.featureide.munge" version="2.7.1.201407301648">
       <category name="FeatureIDE 2.7"/>
    </feature>
-   <feature url="features/br.ufal.ic.colligens.feature_1.1.4.201410201709.jar" id="br.ufal.ic.colligens.feature" version="1.1.4.201410201709">
-      <category name="FeatureIDE 2.7"/>
-   </feature>
-   <feature url="features/de.ovgu.featureide_2.7.2.201410201709.jar" id="de.ovgu.featureide" version="2.7.2.201410201709">
-      <category name="FeatureIDE 2.7"/>
-   </feature>
-   <feature url="features/de.ovgu.featureide.antenna_2.7.2.201410201709.jar" id="de.ovgu.featureide.antenna" version="2.7.2.201410201709">
-      <category name="FeatureIDE 2.7"/>
-   </feature>
-   <feature url="features/de.ovgu.featureide.aspectj_2.7.2.201410201709.jar" id="de.ovgu.featureide.aspectj" version="2.7.2.201410201709">
-      <category name="FeatureIDE 2.7"/>
-   </feature>
-   <feature url="features/de.ovgu.featureide.deltaj_2.7.2.201410201709.jar" id="de.ovgu.featureide.deltaj" version="2.7.2.201410201709">
-      <category name="FeatureIDE 2.7"/>
-   </feature>
-   <feature url="features/de.ovgu.featureide.exampleprojects_2.7.2.201410201709.jar" id="de.ovgu.featureide.exampleprojects" version="2.7.2.201410201709">
-      <category name="FeatureIDE 2.7"/>
-   </feature>
-   <feature url="features/de.ovgu.featureide.featurecpp_2.7.2.201410201709.jar" id="de.ovgu.featureide.featurecpp" version="2.7.2.201410201709">
-      <category name="FeatureIDE 2.7"/>
-   </feature>
-   <feature url="features/de.ovgu.featureide.featurehouse_2.7.2.201410201709.jar" id="de.ovgu.featureide.featurehouse" version="2.7.2.201410201709">
-      <category name="FeatureIDE 2.7"/>
-   </feature>
-   <feature url="features/de.ovgu.featureide.featuremodeling_2.7.2.201410201709.jar" id="de.ovgu.featureide.featuremodeling" version="2.7.2.201410201709">
-      <category name="FeatureIDE 2.7"/>
-   </feature>
-   <feature url="features/de.ovgu.featureide.munge_2.7.2.201410201709.jar" id="de.ovgu.featureide.munge" version="2.7.2.201410201709">
-      <category name="FeatureIDE 2.7"/>
-   </feature>
-   <feature url="features/de.ovgu.featureide.munge.android_2.7.2.201410201709.jar" id="de.ovgu.featureide.munge.android" version="2.7.2.201410201709">
+   <feature url="features/de.ovgu.featureide.munge_android_2.7.1.qualifier.jar" id="de.ovgu.featureide.munge_android" version="2.7.1.qualifier">
       <category name="FeatureIDE 2.7"/>
    </feature>
    <archive path="Older Versions &lt;2.6" url="http://wwwiti.cs.uni-magdeburg.de/iti_db/research/featureide/deploy/2.5"/>

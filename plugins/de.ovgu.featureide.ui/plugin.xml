@@ -1094,30 +1094,7 @@
          markerType="de.ovgu.featureide.core.configurationProblemMarker"
          class="de.ovgu.featureide.ui.quickfix.ConfigurationQuickFixHandler"/>
     </extension>
+ 
+
     
-    <extension
-	   		point="org.eclipse.jdt.ui.javaCompletionProposalComputer"
-			id="ContextViewCompletion"
-			name="ContextViewCompletion">
-		<javaCompletionProposalComputer
-			activate="false"
-			categoryID="org.eclipse.jpt.ui.ContextViewCompletion"
-			categoryId="de.ovgu.featureide.ui.ContextViewCompletion"
-			class="de.ovgu.featureide.ui.editors.Completion">
-			<partition type="__dftl_partition_content_type"/>
-			<partition type="__java_string"/>
-		</javaCompletionProposalComputer>
-		<proposalCategory
-			id="ContextViewCompletion"
-			name="tes"
-			icon="icons/featureide.gif"/>
-	</extension>
-    
-    <extension
-          point="de.ovgu.featureide.ui.views.outline">
-       <outline
-       		contentProvider="de.ovgu.featureide.ui.views.outline.ContextOutlineTreeContentProvider"
-            labelProvider="de.ovgu.featureide.ui.views.outline.ContextOutlineLabelProvider">
-       </outline>
-    </extension>
-</plugin>
+    </plugin>
