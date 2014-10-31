@@ -25,6 +25,7 @@ import java.beans.PropertyChangeEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -103,6 +104,14 @@ public class FeatureModelTextEditorPage extends TextEditor implements IFeatureMo
 	}
 
 	@Override
+	public void doSave(IProgressMonitor progressMonitor) {
+		super.doSave(progressMonitor);
+		if (featureModelEditor.checkModel(getCurrentContent())) {
+			executeSaveOperation();
+		}
+	}
+
+	@Override
 	public void setFeatureModelEditor(FeatureModelEditor featureModelEditor) {
 		this.featureModelEditor = featureModelEditor;
 	}
@@ -124,25 +133,30 @@ public class FeatureModelTextEditorPage extends TextEditor implements IFeatureMo
 	
 	@Override
 	public boolean allowPageChange(int newPage) {
-		final String newText = getDocumentProvider().getDocument(getEditorInput()).get();
+		final String newText = getCurrentContent();
 		return (newPage == getIndex()) || featureModelEditor.checkModel(newText);
 	}
 
 	@Override
 	public void pageChangeFrom(int newPage) {
 		if (newPage != getIndex()) {
-			final String newText = getDocumentProvider().getDocument(getEditorInput()).get();
-			if (!oldText.equals(newText)) {
-				final FeatureModel fm = featureModelEditor.featureModel;
-				SourceChangeOperation op = new SourceChangeOperation(fm, featureModelEditor, newText, oldText);
+			executeSaveOperation();
+		}
+	}
 
-				op.addContext((IUndoContext) fm.getUndoContext());
-				try {
-					PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-				} catch (ExecutionException e) {
-					FMUIPlugin.getDefault().logError(e);
-				}
+	private void executeSaveOperation() {
+		final String newText = getCurrentContent();
+		if (!oldText.equals(newText)) {
+			final FeatureModel fm = featureModelEditor.featureModel;
+			SourceChangeOperation op = new SourceChangeOperation(fm, featureModelEditor, newText, oldText);
+
+			op.addContext((IUndoContext) fm.getUndoContext());
+			try {
+				PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
+			} catch (ExecutionException e) {
+				FMUIPlugin.getDefault().logError(e);
 			}
+			oldText = newText;
 		}
 	}
 
