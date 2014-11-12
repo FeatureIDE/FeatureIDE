@@ -20,12 +20,17 @@
  */
 package de.ovgu.featureide.fm.core.configuration;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.List;
+
 /**
- * TODO description
+ * Abstract class for reading and writing a configuration in a certain format.
  * 
  * @author Sebastian Krieter
  */
 public abstract class ConfigurationFormat {
+	protected static final String NEWLINE = System.getProperty("line.separator", "\n");
 	
 	public static ConfigurationFormat getFormatByExtension(String fileExtension) {
 		if (FeatureIDEFormat.EXTENSION.equals(fileExtension)) {
@@ -35,15 +40,6 @@ public abstract class ConfigurationFormat {
 		}
 	}
 	
-	protected Configuration configuration;
-	
-	public void prepareRead(Configuration configuration) {
-		this.configuration = configuration;
-	}
-	
-	public void finishRead() {
-	}
-	
-	public abstract String readLine(String line);
-	public abstract void write();
+	public abstract List<ConfigurationReader.Warning> read(BufferedReader reader, Configuration configuration) throws IOException;
+	public abstract String write(Configuration configuration);
 }

@@ -23,13 +23,9 @@ package de.ovgu.featureide.fm.core.configuration;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.util.List;
-import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
-
-import de.ovgu.featureide.fm.core.FeatureModel;
 
 /**
  * Writes a configuration into a file or String.
@@ -47,9 +43,7 @@ public class ConfigurationWriter {
 	}
 
 	public void saveToFile(IFile file) throws CoreException {
-		InputStream source = new ByteArrayInputStream(writeIntoString()
-				.getBytes(Charset.availableCharsets().get("UTF-8")));
-
+		InputStream source = new ByteArrayInputStream(writeIntoString().getBytes(Charset.availableCharsets().get("UTF-8")));
 		if (file.exists()) {
 			file.setContents(source, false, true, null);
 		} else {
@@ -58,37 +52,11 @@ public class ConfigurationWriter {
 	}
 
 	public String writeIntoString() {
-		StringBuilder buffer = new StringBuilder();
-		FeatureModel featureModel = configuration.getFeatureModel();
-		List<String> list = featureModel.getFeatureOrderList();
-		if (featureModel.isFeatureOrderUserDefined()) {
-			Set<String> featureSet = configuration.getSelectedFeatureNames();
-			for (String s : list) {
-				if (featureSet.contains(s)) {
-					if (s.contains(" ")) {
-						buffer.append("\"" + s + "\"\r\n");
-					} else {
-						buffer.append(s + "\r\n");
-					}
-				}
-			}
-			return buffer.toString();
-		}
-
-		writeSelectedFeatures(configuration.getRoot(), buffer);
-		return buffer.toString();
+		return writeIntoString(new DefaultFormat());
 	}
-
-	private void writeSelectedFeatures(SelectableFeature feature,
-			StringBuilder buffer) {
-		if (feature.getFeature().isConcrete()
-				&& feature.getSelection() == Selection.SELECTED)
-			if (feature.getName().contains(" "))
-				buffer.append("\"" + feature.getName() + "\"\r\n");
-				else
-					buffer.append(feature.getName() + "\r\n");
-		for (TreeElement child : feature.getChildren())
-			writeSelectedFeatures((SelectableFeature) child, buffer);
+	
+	public String writeIntoString(ConfigurationFormat format) {
+		return format.write(configuration);
 	}
 
 }

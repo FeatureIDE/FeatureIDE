@@ -20,71 +20,94 @@
  */
 package de.ovgu.featureide.fm.core.configuration;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
+
+
 /**
- * TODO description
+ * Extended configuration format for FeatureIDE projects.</br>
+ * Lists all features and indicates the manual and automatic selection.
  * 
  * @author Sebastian Krieter
  */
 public class FeatureIDEFormat extends ConfigurationFormat {
 	public static final String EXTENSION = "fideconf";
-	
-	private boolean orgPropagate = false;
 
-	public void prepareRead(Configuration configuration) {
-		super.prepareRead(configuration);
-		orgPropagate = configuration.isPropagate();
+	public List<ConfigurationReader.Warning> read(BufferedReader reader, Configuration configuration) throws IOException {
+		List<ConfigurationReader.Warning> warnings = new LinkedList<ConfigurationReader.Warning>();
+
+		boolean orgPropagate = configuration.isPropagate();
 		configuration.setPropagate(false);
 		configuration.resetValues();
+
+		String line = null;
+		int lineNumber = 1;
+		try {
+			while ((line  = reader.readLine()) != null) {				
+				if (line.startsWith("#")) {
+					return null;
+				}
+				line = line.trim();
+				if (!line.isEmpty()) {
+					Selection manual = Selection.UNDEFINED, automatic = Selection.UNDEFINED;
+					try {
+						switch (Integer.parseInt(line.substring(0, 1))) {
+							case 0: manual = Selection.UNSELECTED; break;
+							case 1: manual = Selection.SELECTED;
+						}
+						switch (Integer.parseInt(line.substring(1, 2))) {
+							case 0: automatic = Selection.UNSELECTED; break;
+							case 1: automatic = Selection.SELECTED;
+						}
+					} catch (NumberFormatException e) {
+						warnings.add(new ConfigurationReader.Warning("Wrong configuration format", lineNumber));
+					}
+					
+					final String name = line.substring(2);
+					
+					final SelectableFeature feature = configuration.getSelectablefeature(name);
+					if (feature == null) {
+						warnings.add(new ConfigurationReader.Warning("Feature " + name + " does not exist", lineNumber));
+					} else {
+						try {
+							configuration.setManual(feature, manual);
+							configuration.setAutomatic(feature, automatic);
+						} catch (SelectionNotPossibleException e) {
+							warnings.add(new ConfigurationReader.Warning("Selection not possible on feature " + name, lineNumber));
+						}
+					}
+				}
+				lineNumber++;
+			}
+		} finally {
+			configuration.setPropagate(orgPropagate);
+		}
+		return warnings;
 	}
 	
-	public void finishRead() {
-		configuration.setPropagate(orgPropagate);
-	}
-
-	public String readLine(String line) {
-		if (line.startsWith("#")) {
-			return null;
-		}
-		line = line.trim();
-		if (!line.isEmpty()) {
-			Selection manual = Selection.UNDEFINED, automatic = Selection.UNDEFINED;
-			try {
-				switch (Integer.parseInt(line.substring(0, 1))) {
-					case 0: manual = Selection.UNSELECTED; break;
-					case 1: manual = Selection.SELECTED;
-				}
-				switch (Integer.parseInt(line.substring(1, 2))) {
-					case 0: automatic = Selection.UNSELECTED; break;
-					case 1: automatic = Selection.SELECTED;
-				}
-			} catch (NumberFormatException e) {
-				return "Wrong configuration format";
-			}
-			
-			final String name = line.substring(2);
-			
-			final SelectableFeature feature = configuration.getSelectablefeature(name);
-			if (feature == null) {
-				return "Feature " + name + " does not exist";
-			} else {
-				try {
-					configuration.setManual(feature, manual);
-					configuration.setAutomatic(feature, automatic);
-				} catch (SelectionNotPossibleException e) {
-					return "Selection not possible on feature " + name;
-				}
-			}
-		}
-		return null;
-	}
-
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.configuration.ConfigurationFormat#write()
-	 */
 	@Override
-	public void write() {
-		// TODO Auto-generated method stub
+	public String write(Configuration configuration) {
+		final StringBuilder buffer = new StringBuilder();
 		
+		for (SelectableFeature feature : configuration.getFeatures()) {
+			buffer.append(Integer.toString(getSelectionCode(feature.getManual())));
+			buffer.append(Integer.toString(getSelectionCode(feature.getAutomatic())));
+			buffer.append(feature.getName());
+			buffer.append(NEWLINE);
+		}
+		
+		return buffer.toString();
 	}
-
+	
+	private int getSelectionCode(Selection selection) {
+		switch (selection) {
+			case SELECTED: return 1;
+			case UNDEFINED: return 2;
+			case UNSELECTED: return 0;
+			default: return 3;
+		}
+	}
+	
 }

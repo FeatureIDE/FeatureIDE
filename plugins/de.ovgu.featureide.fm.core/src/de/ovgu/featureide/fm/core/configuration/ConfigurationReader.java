@@ -40,11 +40,28 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
  * Reads a configuration from file or String.
  */
 public class ConfigurationReader {
+	
+	public static class Warning {
+		private final String message;
+		private final int position;
+		
+		public Warning(String message, int position) {
+			this.message = message;
+			this.position = position;
+		}
+
+		public String getMessage() {
+			return message;
+		}
+
+		public int getPosition() {
+			return position;
+		}
+	}
 
 	private final Configuration configuration;
-
-	private final LinkedList<String> warnings = new LinkedList<String>();
-	private final LinkedList<Integer> positions = new LinkedList<Integer>();
+	
+	private final LinkedList<Warning> warnings = new LinkedList<Warning>();
 
 	public ConfigurationReader(Configuration configuration) {
 		this.configuration = configuration;
@@ -88,37 +105,20 @@ public class ConfigurationReader {
 	}
 
 	private void read(InputStream inputStream, ConfigurationFormat format) throws IOException {
-		format.prepareRead(configuration);
 		warnings.clear();
-		positions.clear();
-
 		BufferedReader reader = null;
-		String line = null;
-		Integer lineNumber = 1;
 		try {
-			reader = new BufferedReader(new InputStreamReader(inputStream, Charset.availableCharsets().get("UTF-8")));
-			while ((line = reader.readLine()) != null) {
-				String warning = format.readLine(line);
-				if (warning != null) {
-					warnings.add(warning);
-					positions.add(lineNumber);
-				}
-				lineNumber++;
-			}
+			reader = new BufferedReader(new InputStreamReader(inputStream, Charset.availableCharsets().get("UTF-8")));			
+			warnings.addAll(format.read(reader, configuration));
 		} finally {
-			format.finishRead();
 			if (reader != null) {
 				reader.close();
 			}
 		}
 	}
 
-	public List<String> getWarnings() {
+	public List<Warning> getWarnings() {
 		return Collections.unmodifiableList(warnings);
-	}
-
-	public List<Integer> getPositions() {
-		return Collections.unmodifiableList(positions);
 	}
 
 }

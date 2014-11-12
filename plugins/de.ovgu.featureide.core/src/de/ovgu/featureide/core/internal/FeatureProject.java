@@ -925,10 +925,8 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 						}
 						// create warnings (e.g., for features that are not
 						// available anymore)
-						for (int i = 0; i < reader.getWarnings().size(); i++) {
-							String message = reader.getWarnings().get(i);
-							int line = reader.getPositions().get(i);
-							createConfigurationMarker(file, message, line, IMarker.SEVERITY_WARNING);
+						for (ConfigurationReader.Warning warning : reader.getWarnings()) {
+							createConfigurationMarker(file, warning.getMessage(), warning.getPosition(), IMarker.SEVERITY_WARNING);
 						}
 						monitor.worked(1);
 					}
