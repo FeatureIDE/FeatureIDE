@@ -134,6 +134,12 @@ public class Configuration {
 		this(configuration, configuration.featureModel, configuration.propagate);
 	}
 
+	/**
+	 * Copy constructor. Copies the status of a given configuration.
+	 * @param configuration
+	 * @param featureModel the underlying feature model. The model can be different from the old configuration, but must contain at least all features of the orignal model.
+	 * @param propagate
+	 */
 	public Configuration(Configuration configuration, FeatureModel featureModel, boolean propagate) {
 		this.featureModel = featureModel;
 		this.propagate = false;
@@ -152,7 +158,7 @@ public class Configuration {
 		}
 		this.propagate = propagate;
 	}
-
+	
 	public Configuration(FeatureModel featureModel) {
 		this(featureModel, true);
 	}
@@ -432,7 +438,11 @@ public class Configuration {
 		for (SelectableFeature feature : features) {
 			feature.setManual(Selection.UNDEFINED);
 		}
-		updateAutomaticValues();
+		if (propagate) {
+			updateAutomaticValues();
+		} else {
+			resetAutomaticValues();
+		}
 	}
 	
 	public void setAutomatic(SelectableFeature feature, Selection selection) {
@@ -461,6 +471,14 @@ public class Configuration {
 		setManual(feature, selection);
 	}
 	
+	public boolean isPropagate() {
+		return propagate;
+	}
+
+	public void setPropagate(boolean propagate) {
+		this.propagate = propagate;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -524,8 +542,9 @@ public class Configuration {
 	}
 	
 	private void updateAutomaticValues() {
-		if (!propagate)
+		if (!propagate) {
 			return;
+		}
 		resetAutomaticValues();
 		
 		Node[] nodeArray = createNodeArray(createNodeList(), rootNode);
