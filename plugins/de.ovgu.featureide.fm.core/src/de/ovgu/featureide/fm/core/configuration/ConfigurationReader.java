@@ -40,11 +40,11 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
  * Reads a configuration from file or String.
  */
 public class ConfigurationReader {
-	
+
 	public static class Warning {
 		private final String message;
 		private final int position;
-		
+
 		public Warning(String message, int position) {
 			this.message = message;
 			this.position = position;
@@ -60,7 +60,7 @@ public class ConfigurationReader {
 	}
 
 	private final Configuration configuration;
-	
+
 	private final LinkedList<Warning> warnings = new LinkedList<Warning>();
 
 	public ConfigurationReader(Configuration configuration) {
@@ -69,10 +69,10 @@ public class ConfigurationReader {
 
 	public boolean readFromFile(IFile file) throws CoreException, IOException {
 		final String fileName = file.getRawLocation().toOSString();
-		
+
 		final int extensionIndex = fileName.lastIndexOf(".");
 		final String extension = (extensionIndex > -1) ? fileName.substring(extensionIndex + 1) : null;
-		
+
 		return readFromInputStream(new FileInputStream(fileName), ConfigurationFormat.getFormatByExtension(extension));
 	}
 
@@ -80,7 +80,7 @@ public class ConfigurationReader {
 		InputStream inputStream = new ByteArrayInputStream(text.getBytes(Charset.availableCharsets().get("UTF-8")));
 		return readFromInputStream(inputStream, new DefaultFormat());
 	}
-	
+
 	public boolean readFromString(String text, ConfigurationFormat format) {
 		InputStream inputStream = new ByteArrayInputStream(text.getBytes(Charset.availableCharsets().get("UTF-8")));
 		return readFromInputStream(inputStream, format);
@@ -108,7 +108,7 @@ public class ConfigurationReader {
 		warnings.clear();
 		BufferedReader reader = null;
 		try {
-			reader = new BufferedReader(new InputStreamReader(inputStream, Charset.availableCharsets().get("UTF-8")));			
+			reader = new BufferedReader(new InputStreamReader(inputStream, Charset.availableCharsets().get("UTF-8")));
 			warnings.addAll(format.read(reader, configuration));
 		} finally {
 			if (reader != null) {

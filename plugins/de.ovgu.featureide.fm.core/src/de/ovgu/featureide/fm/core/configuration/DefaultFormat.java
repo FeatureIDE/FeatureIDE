@@ -32,19 +32,19 @@ import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
 /**
- * Simple configuration format.</br>
- * Lists all selected features in the user-defined order (if specified).
+ * Simple configuration format.</br> Lists all selected features in the
+ * user-defined order (if specified).
  * 
  * @author Sebastian Krieter
  */
 public class DefaultFormat extends ConfigurationFormat {
-	
+
 	public List<ConfigurationReader.Warning> read(BufferedReader reader, Configuration configuration) throws IOException {
 		List<ConfigurationReader.Warning> warnings = new LinkedList<ConfigurationReader.Warning>();
 		configuration.resetValues();
 		String line = null;
 		int lineNumber = 1;
-		while ((line  = reader.readLine()) != null) {
+		while ((line = reader.readLine()) != null) {
 			if (line.startsWith("#") || line.isEmpty() || line.equals(" ")) {
 				return null;
 			}
@@ -59,18 +59,22 @@ public class DefaultFormat extends ConfigurationFormat {
 						name = name.substring(1);
 						name += tokenizer.nextToken("\"");
 					} catch (NoSuchElementException e) {
-						warnings.add(new ConfigurationReader.Warning("Feature '" + name + "' is corrupt. No ending quotation marks found.", lineNumber));
+						warnings.add(new ConfigurationReader.Warning("Feature '" + name + "' is corrupt. No ending quotation marks found.",
+								lineNumber));
 					} catch (NullPointerException e) {
-						warnings.add(new ConfigurationReader.Warning("Feature '" + name + "' is corrupt. No ending quotation marks found.", lineNumber));
+						warnings.add(new ConfigurationReader.Warning("Feature '" + name + "' is corrupt. No ending quotation marks found.",
+								lineNumber));
 					}
 					// Check for ending quotation mark
 					try {
 						String endingDelimiter = tokenizer.nextToken(" ");
 						if (!endingDelimiter.startsWith("\"")) {
-							warnings.add(new ConfigurationReader.Warning("Feature '" + name + "' is corrupt. No ending quotation marks found.", lineNumber));
+							warnings.add(new ConfigurationReader.Warning("Feature '" + name
+									+ "' is corrupt. No ending quotation marks found.", lineNumber));
 						}
 					} catch (Exception e) {
-						warnings.add(new ConfigurationReader.Warning("Feature '" + name + "' is corrupt. No ending quotation marks found.", lineNumber));
+						warnings.add(new ConfigurationReader.Warning("Feature '" + name + "' is corrupt. No ending quotation marks found.",
+								lineNumber));
 					}
 				}
 
@@ -100,12 +104,12 @@ public class DefaultFormat extends ConfigurationFormat {
 		}
 		return warnings;
 	}
-	
+
 	public String readLine(String line) {
-		
+
 		return null;
 	}
-	
+
 	@Override
 	public String write(Configuration configuration) {
 		final StringBuilder buffer = new StringBuilder();

@@ -61,9 +61,6 @@ public class AdvancedConfigurationPage extends ConfigurationEditorPage {
 
 	private TreeViewer viewer;
 	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.ui.editors.IConfigurationEditorPage#getPageText()
-	 */
 	@Override
 	public String getPageText() {
 		return PAGE_TEXT;
@@ -78,8 +75,7 @@ public class AdvancedConfigurationPage extends ConfigurationEditorPage {
 	
 	private IDoubleClickListener listener = new IDoubleClickListener() {
 		public void doubleClick(DoubleClickEvent event) {
-			Object object = ((ITreeSelection) event.getSelection())
-					.getFirstElement();
+			Object object = ((ITreeSelection) event.getSelection()).getFirstElement();
 			if (object instanceof SelectableFeature) {
 				final SelectableFeature feature = (SelectableFeature) object;
 				changeSelection(feature);
@@ -218,7 +214,6 @@ public class AdvancedConfigurationPage extends ConfigurationEditorPage {
 			}
 			viewer.refresh();
 			removeHiddenFeatures();
-		
 		}
 		viewer.getTree().setRedraw(true);
 	}
@@ -228,8 +223,7 @@ public class AdvancedConfigurationPage extends ConfigurationEditorPage {
 		updateForeground(viewer.getTree().getItem(0));
 	}
 	
-	private void updateForeground(
-			TreeItem item) {	
+	private void updateForeground(TreeItem item) {	
 		// TODO #458 implement coloring
 //		for (TreeItem child : item.getItems()) {
 //			SelectableFeature feature = configurationEditor.configuration.getSelectablefeature(child.getText());
@@ -258,10 +252,7 @@ public class AdvancedConfigurationPage extends ConfigurationEditorPage {
 //			}
 //		}
 	}
-
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.ui.editors.IConfigurationEditorPage#getID()
-	 */
+	
 	@Override
 	public String getID() {
 		return ID;

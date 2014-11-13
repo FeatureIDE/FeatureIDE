@@ -38,12 +38,9 @@ public class ConfigurationWriter {
 		this.configuration = configuration;
 	}
 
-	public ConfigurationWriter() {
-
-	}
-
 	public void saveToFile(IFile file) throws CoreException {
-		InputStream source = new ByteArrayInputStream(writeIntoString().getBytes(Charset.availableCharsets().get("UTF-8")));
+		String configSource = writeIntoString(ConfigurationFormat.getFormatByExtension(file.getFileExtension()));
+		InputStream source = new ByteArrayInputStream(configSource.getBytes(Charset.availableCharsets().get("UTF-8")));
 		if (file.exists()) {
 			file.setContents(source, false, true, null);
 		} else {
@@ -54,7 +51,7 @@ public class ConfigurationWriter {
 	public String writeIntoString() {
 		return writeIntoString(new DefaultFormat());
 	}
-	
+
 	public String writeIntoString(ConfigurationFormat format) {
 		return format.write(configuration);
 	}

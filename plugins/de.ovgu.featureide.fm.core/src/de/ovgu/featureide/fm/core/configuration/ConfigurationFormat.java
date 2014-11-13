@@ -31,7 +31,7 @@ import java.util.List;
  */
 public abstract class ConfigurationFormat {
 	protected static final String NEWLINE = System.getProperty("line.separator", "\n");
-	
+
 	public static ConfigurationFormat getFormatByExtension(String fileExtension) {
 		if (FeatureIDEFormat.EXTENSION.equals(fileExtension)) {
 			return new FeatureIDEFormat();
@@ -39,7 +39,7 @@ public abstract class ConfigurationFormat {
 			return new DefaultFormat();
 		}
 	}
-	
+
 	public abstract List<ConfigurationReader.Warning> read(BufferedReader reader, Configuration configuration) throws IOException;
 	public abstract String write(Configuration configuration);
 }
