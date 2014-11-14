@@ -56,7 +56,6 @@ import de.ovgu.featureide.core.mpl.job.PrintFeatureInterfacesJob;
 import de.ovgu.featureide.core.mpl.job.PrintStatisticsJob;
 import de.ovgu.featureide.core.mpl.job.util.AJobArguments;
 import de.ovgu.featureide.core.mpl.job.util.IChainJob;
-import de.ovgu.featureide.core.mpl.util.ConfigurationChangeListener;
 import de.ovgu.featureide.core.mpl.util.EditorTracker;
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
@@ -89,7 +88,6 @@ public class MPLPlugin extends AbstractCorePlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
-		EditorTracker.init(new ConfigurationChangeListener());
 	}
 
 	@Override

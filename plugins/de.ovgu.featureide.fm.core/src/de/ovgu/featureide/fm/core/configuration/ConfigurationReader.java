@@ -68,12 +68,15 @@ public class ConfigurationReader {
 	}
 
 	public boolean readFromFile(IFile file) throws CoreException, IOException {
-		final String fileName = file.getRawLocation().toOSString();
+		if (file.isAccessible()) {
+			final String fileName = file.getRawLocation().toOSString();
 
-		final int extensionIndex = fileName.lastIndexOf(".");
-		final String extension = (extensionIndex > -1) ? fileName.substring(extensionIndex + 1) : null;
+			final int extensionIndex = fileName.lastIndexOf(".");
+			final String extension = (extensionIndex > -1) ? fileName.substring(extensionIndex + 1) : null;
 
-		return readFromInputStream(new FileInputStream(fileName), ConfigurationFormat.getFormatByExtension(extension));
+			return readFromInputStream(new FileInputStream(fileName), ConfigurationFormat.getFormatByExtension(extension));
+		}
+		return false;
 	}
 
 	public boolean readFromString(String text) {

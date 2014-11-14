@@ -43,6 +43,7 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.job.AStoppableJob;
 
 /**
  * Represents a configuration and provides operations for the configuration process.
@@ -82,17 +83,27 @@ public class Configuration {
 	public static final int 
 		COMPLETION_NONE = 0,
 		COMPLETION_ONE_CLICK = 1,
-		COMPLETION_OPEN_CLAUSES = 2;
+		COMPLETION_OPEN_CLAUSES = 2,
+		SCHEME_LONG = 0,
+		SCHEME_SHORT = 1;
 
 	public static int FEATURE_LIMIT_FOR_DEFAULT_COMPLETION = 150;
 	private static int defaultCompletion;
+	private static int defaultFeatureNameScheme;
 	static {
 		final IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode("de.ovgu.featureide.fm.core");
-		final String pref = preferences.get("configCompletion", Integer.toString(COMPLETION_ONE_CLICK));
+		String pref = preferences.get("configCompletion", Integer.toString(COMPLETION_ONE_CLICK));
 		try {
 			defaultCompletion = Integer.parseInt(pref);
 		} catch (Exception e) {
 			defaultCompletion = COMPLETION_ONE_CLICK;
+		}
+		
+		pref = preferences.get("configFeatureNameScheme", Integer.toString(SCHEME_LONG));
+		try {
+			defaultFeatureNameScheme = Integer.parseInt(pref);
+		} catch (Exception e) {
+			defaultFeatureNameScheme = SCHEME_LONG;
 		}
 	}
 
@@ -115,10 +126,25 @@ public class Configuration {
 		return defaultCompletion;
 	}
 	
+	public static int getDefaultFeatureNameScheme() {
+		return defaultFeatureNameScheme;
+	}
+	
 	public static void setDefaultCompletion(int defaultCompletion) {
 		Configuration.defaultCompletion = defaultCompletion;
 		final IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode("de.ovgu.featureide.fm.core");
 		preferences.put("configCompletion", Integer.toString(defaultCompletion));
+		try {
+			preferences.flush();
+		} catch (BackingStoreException e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+	}
+	
+	public static void setDefaultFeatureNameFormat(int defaultFeatureNameScheme) {
+		Configuration.defaultFeatureNameScheme = defaultFeatureNameScheme;
+		final IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode("de.ovgu.featureide.fm.core");
+		preferences.put("configFeatureNameScheme", Integer.toString(defaultFeatureNameScheme));
 		try {
 			preferences.flush();
 		} catch (BackingStoreException e) {
@@ -278,7 +304,7 @@ public class Configuration {
 		return false;
 	}
 	
-	public boolean[] leadToValidConfiguration(List<SelectableFeature> featureList) {
+	public ValidConfigJob leadToValidConfiguration(List<SelectableFeature> featureList) {
 		if (defaultCompletion == COMPLETION_NONE) {
 			return leadToValidConfiguration(featureList, defaultCompletion);
 		} else if (featureList.size() > FEATURE_LIMIT_FOR_DEFAULT_COMPLETION) {
@@ -287,132 +313,172 @@ public class Configuration {
 		return leadToValidConfiguration(featureList, defaultCompletion);
 	}
 	
-	public boolean[] leadToValidConfiguration(List<SelectableFeature> featureList, int mode) {
+	public ValidConfigJob leadToValidConfiguration(List<SelectableFeature> featureList, int mode) {
 		switch (mode) {
 			case COMPLETION_ONE_CLICK:
-				return leadsToValidConfiguration1(featureList);
+				return new ValidConfigJob1(featureList);
 			case COMPLETION_OPEN_CLAUSES:
-				return leadsToValidConfiguration3(featureList);
+				return new ValidConfigJob2(featureList);
 			case COMPLETION_NONE:
 			default:
-				return new boolean[featureList.size()];
+				return null;
 		}
 	}
 	
-	private boolean[] leadsToValidConfiguration1(List<SelectableFeature> featureList) {
-		final Map<String, Literal> featureMap = new HashMap<String, Literal>(features.size() << 1);
-		final Map<String, Integer> featureToIndexMap = new HashMap<String, Integer>(featureList.size() << 1);
+	
+	public abstract class ValidConfigJob extends AStoppableJob {
+		protected final boolean[] results;
+		protected final List<SelectableFeature> featureList;
 		
-		for (SelectableFeature selectableFeature : features) {
-			final Feature feature = selectableFeature.getFeature();
-			if ((ignoreAbstractFeatures || feature.isConcrete()) && !feature.hasHiddenParent()) {
-				final String featureName = feature.getName();
-				featureMap.put(featureName,
-					new Literal(featureName, selectableFeature.getSelection() == Selection.SELECTED));
-			}
-		}
-
-		final Literal[] literals = new Literal[featureList.size()];
-		
-		int i = 0;
-		for (SelectableFeature feature : featureList) {
-			final String featureName = feature.getFeature().getName();
-			featureToIndexMap.put(featureName, i);
-			literals[i++] = featureMap.remove(featureName);
+		public ValidConfigJob(List<SelectableFeature> featureList) {
+			super("Configuration coloring");
+			results = new boolean[featureList.size()];
+			this.featureList = featureList;
 		}
 		
-		final Node[] formula = new Node[featureMap.size() + 1];
-		formula[0] = rootNodeWithoutHidden.clone();
-		i = 1;
-		for (Literal literal : featureMap.values()) {
-			formula[i++] = literal;
+		public boolean[] getResults() {
+			return results;
 		}
-		
-		final SatSolver solver = new SatSolver(new And(formula), TIMEOUT);
-
-		final boolean[] results = new boolean[literals.length];
-		final boolean[] changedLiterals = new boolean[literals.length];
-		
-		for (int j = 0; j < literals.length; j++) {
-			final Literal l = literals[j].clone();
-			l.positive = !l.positive;
-			
-			final List<Literal> knownValues = solver.knownValues(l);
-			
-			for (Literal literal : knownValues) {
-				Integer index = featureToIndexMap.get(literal.var);
-				if (index != null) {
-					final Literal knownL = literals[index];
-					changedLiterals[index] = literal.positive != knownL.positive;
-					knownL.positive = literal.positive;
-				}
-			}
-			
-			try {
-				results[j] = solver.isSatisfiable(literals);
-			} catch (TimeoutException e) {
-				FMCorePlugin.getDefault().logError(e);
-				results[j] = false;
-			}
-			
-			for (int k = 0; k < literals.length; k++) {
-				final Literal knownL = literals[k];
-				knownL.positive = changedLiterals[k] ^ knownL.positive;
-				changedLiterals[k] = false;
-			}
-		}
-
-		return results;
 	}
 	
-	private boolean[] leadsToValidConfiguration3(List<SelectableFeature> featureList) {
-		final Map<String, Boolean> featureMap = new HashMap<String, Boolean>(features.size() << 1);
-		
-		for (SelectableFeature selectableFeature : features) {
-			final Feature feature = selectableFeature.getFeature();
-			if ((ignoreAbstractFeatures || feature.isConcrete()) && !feature.hasHiddenParent()) {
-				featureMap.put(feature.getName(), selectableFeature.getSelection() == Selection.SELECTED);
-			}
+	private class ValidConfigJob1 extends ValidConfigJob {
+		public ValidConfigJob1(List<SelectableFeature> featureList) {
+			super(featureList);
 		}
 		
-		final boolean[] results = new boolean[featureList.size()];
-		
-		final Node[] clauses = rootNodeWithoutHidden.getChildren();
-		final HashMap<Object, Literal> literalMap = new HashMap<Object, Literal>();
-		for (int i = 0; i < clauses.length; i++) {
-			final Node clause = clauses[i];
-			literalMap.clear();
-			if (clause instanceof Literal) {
-				final Literal literal = (Literal) clause;
-				literalMap.put(literal.var, literal);
-			} else {
-				final Node[] orLiterals = clause.getChildren();
-				for (int j = 0; j < orLiterals.length; j++) {
-					final Literal literal = (Literal) orLiterals[j];
-					literalMap.put(literal.var, literal);
+		@Override
+		protected boolean work() {
+			final Map<String, Literal> featureMap = new HashMap<String, Literal>(features.size() << 1);
+			final Map<String, Integer> featureToIndexMap = new HashMap<String, Integer>(featureList.size() << 1);
+			
+			for (SelectableFeature selectableFeature : features) {
+				final Feature feature = selectableFeature.getFeature();
+				if ((ignoreAbstractFeatures || feature.isConcrete()) && !feature.hasHiddenParent()) {
+					final String featureName = feature.getName();
+					featureMap.put(featureName,
+						new Literal(featureName, selectableFeature.getSelection() == Selection.SELECTED));
 				}
+			}
+			if (checkCancel()) {
+				return false;
+			}
+
+			final Literal[] literals = new Literal[featureList.size()];
+			
+			int i = 0;
+			for (SelectableFeature feature : featureList) {
+				final String featureName = feature.getFeature().getName();
+				featureToIndexMap.put(featureName, i);
+				literals[i++] = featureMap.remove(featureName);
 			}
 			
-			boolean satisfied = false;
-			for (Literal literal : literalMap.values()) {
-				Boolean selected = featureMap.get(literal.var);
-				if (selected != null && selected == literal.positive) {
-					satisfied = true;
-					break;
-				}
+			final Node[] formula = new Node[featureMap.size() + 1];
+			formula[0] = rootNodeWithoutHidden.clone();
+			i = 1;
+			for (Literal literal : featureMap.values()) {
+				formula[i++] = literal;
 			}
-			if (!satisfied) {
-				int c = 0;
-				for (SelectableFeature selectableFeature : featureList) {
-					if (literalMap.containsKey(selectableFeature.getFeature().getName())) {
-						results[c] = true;
+			
+			final SatSolver solver = new SatSolver(new And(formula), TIMEOUT);
+			
+			final boolean[] changedLiterals = new boolean[literals.length];
+			
+			for (int j = 0; j < literals.length; j++) {
+				if (checkCancel()) {
+					return false;
+				}
+				final Literal l = literals[j].clone();
+				l.positive = !l.positive;
+				
+				final List<Literal> knownValues = solver.knownValues(l);
+				
+				for (Literal literal : knownValues) {
+					Integer index = featureToIndexMap.get(literal.var);
+					if (index != null) {
+						final Literal knownL = literals[index];
+						changedLiterals[index] = literal.positive != knownL.positive;
+						knownL.positive = literal.positive;
 					}
-					c++;
+				}
+				
+				try {
+					results[j] = solver.isSatisfiable(literals);
+				} catch (TimeoutException e) {
+					FMCorePlugin.getDefault().logError(e);
+					results[j] = false;
+				}
+				
+				for (int k = 0; k < literals.length; k++) {
+					final Literal knownL = literals[k];
+					knownL.positive = changedLiterals[k] ^ knownL.positive;
+					changedLiterals[k] = false;
 				}
 			}
+
+			return true;
+		}
+	}
+	
+	
+	private class ValidConfigJob2 extends ValidConfigJob {
+		public ValidConfigJob2(List<SelectableFeature> featureList) {
+			super(featureList);
 		}
 		
-		return results;
+		@Override
+		protected boolean work() {
+			final Map<String, Boolean> featureMap = new HashMap<String, Boolean>(features.size() << 1);
+			
+			for (SelectableFeature selectableFeature : features) {
+				final Feature feature = selectableFeature.getFeature();
+				if ((ignoreAbstractFeatures || feature.isConcrete()) && !feature.hasHiddenParent()) {
+					featureMap.put(feature.getName(), selectableFeature.getSelection() == Selection.SELECTED);
+				}
+			}
+			if (checkCancel()) {
+				return false;
+			}
+			
+			final Node[] clauses = rootNodeWithoutHidden.getChildren();
+			final HashMap<Object, Literal> literalMap = new HashMap<Object, Literal>();
+			for (int i = 0; i < clauses.length; i++) {
+				if (checkCancel()) {
+					return false;
+				}
+				final Node clause = clauses[i];
+				literalMap.clear();
+				if (clause instanceof Literal) {
+					final Literal literal = (Literal) clause;
+					literalMap.put(literal.var, literal);
+				} else {
+					final Node[] orLiterals = clause.getChildren();
+					for (int j = 0; j < orLiterals.length; j++) {
+						final Literal literal = (Literal) orLiterals[j];
+						literalMap.put(literal.var, literal);
+					}
+				}
+				
+				boolean satisfied = false;
+				for (Literal literal : literalMap.values()) {
+					Boolean selected = featureMap.get(literal.var);
+					if (selected != null && selected == literal.positive) {
+						satisfied = true;
+						break;
+					}
+				}
+				if (!satisfied) {
+					int c = 0;
+					for (SelectableFeature selectableFeature : featureList) {
+						if (literalMap.containsKey(selectableFeature.getFeature().getName())) {
+							results[c] = true;
+						}
+						c++;
+					}
+				}
+			}
+			
+			return true;
+		}
 	}
 	
 	public long number() {

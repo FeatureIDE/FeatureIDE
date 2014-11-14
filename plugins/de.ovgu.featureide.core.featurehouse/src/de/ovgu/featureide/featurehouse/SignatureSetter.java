@@ -24,6 +24,7 @@ import AST.Program;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
+import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 
 /**
@@ -53,7 +54,7 @@ public class SignatureSetter implements JobFinishListener {
 	}
 
 	@Override
-	public void jobFinished(boolean success) {
+	public void jobFinished(IJob finishedJob, boolean success) {
 		if (success) {
 			this.signatures = sigCreator.createSignatures(fp, ast);
 			if (fstModel != null) {

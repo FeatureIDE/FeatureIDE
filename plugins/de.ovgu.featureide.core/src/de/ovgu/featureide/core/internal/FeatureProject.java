@@ -51,6 +51,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
@@ -75,6 +76,7 @@ import de.ovgu.featureide.fm.core.StoppableJob;
 import de.ovgu.featureide.fm.core.WaitingJob;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
+import de.ovgu.featureide.fm.core.configuration.FeatureIDEFormat;
 import de.ovgu.featureide.fm.core.configuration.FeatureOrderReader;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
@@ -1309,5 +1311,25 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		} catch (CoreException e) {
 			LOGGER.logError(e);
 		}
+	}
+	
+	@Override
+	public IFile getInternalConfigurationFile() {
+		return getInternalConfigurationFile(currentConfiguration);
+	}
+	
+	@Override
+	public IFile getInternalConfigurationFile(IFile configurationFile) {
+		String fileName = configurationFile.getName();
+		
+		final String extension = configurationFile.getFileExtension();
+		if (extension != null) {
+			fileName = "." + fileName.substring(0, fileName.length() - (extension.length())) + FeatureIDEFormat.EXTENSION;
+		} else {
+			fileName = "." + fileName + "." + FeatureIDEFormat.EXTENSION;
+		}
+		IFile internalFile = configurationFile.getParent().getFile(Path.fromOSString(fileName));
+		
+		return (internalFile.isAccessible()) ? internalFile : null;
 	}
 }

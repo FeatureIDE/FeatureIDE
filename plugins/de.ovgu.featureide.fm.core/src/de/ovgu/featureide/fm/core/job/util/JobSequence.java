@@ -54,7 +54,7 @@ public final class JobSequence implements IJob {
 			if (status == IJob.STATUS_NOTSTARTED || status == IJob.STATUS_RUNNING) {
 				newJob.addJobFinishedListener(new JobFinishListener() {
 					@Override
-					public void jobFinished(boolean success) {
+					public void jobFinished(IJob finishedJob, boolean success) {
 						JobSequence.this.startNextJob();
 					}
 				});
@@ -103,7 +103,7 @@ public final class JobSequence implements IJob {
 					for (IJob newJob : newJobs) {
 						newJob.addJobFinishedListener(new JobFinishListener() {
 							@Override
-							public void jobFinished(boolean success) {
+							public void jobFinished(IJob finishedJob, boolean success) {
 								JobSequence.this.startNextJob();
 							}
 						});
@@ -164,7 +164,7 @@ public final class JobSequence implements IJob {
 					if (jobFinishedListeners != null) {
 						for (final Iterator<JobFinishListener> it = jobFinishedListeners.iterator(); it.hasNext();) {
 						    try {
-						    	it.next().jobFinished(lastStatus == IJob.STATUS_OK);
+						    	it.next().jobFinished(this, lastStatus == IJob.STATUS_OK);
 						    }
 						    catch (RuntimeException e) {
 						    	FMCorePlugin.getDefault().logError(e);

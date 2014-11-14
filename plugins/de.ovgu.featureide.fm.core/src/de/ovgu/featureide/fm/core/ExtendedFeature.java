@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.core;
 
+import de.ovgu.featureide.fm.core.configuration.Configuration;
+
 /**
  * Feature for the {@link ExtendedFeatureModel}.
  * 
@@ -77,5 +79,18 @@ public class ExtendedFeature extends Feature {
 
 	public void setExternalModelName(String externalModelName) {
 		this.externalModelName = externalModelName;
+	}
+
+	@Override
+	public String getDisplayName() {
+		switch (Configuration.getDefaultFeatureNameScheme()) {
+			case Configuration.SCHEME_SHORT:
+				String name = getName();
+				int separatorIndex = name.lastIndexOf(".");
+				return name.substring(separatorIndex + 1);
+			case Configuration.SCHEME_LONG: 
+			default: 
+				return getName();
+		}
 	}
 }

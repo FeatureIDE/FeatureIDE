@@ -84,7 +84,7 @@ abstract class AbstractJob extends Job implements IJob {
 		// inform all registered listeners
 		for (final Iterator<JobFinishListener> it = jobFinishedListeners.iterator(); it.hasNext();) {
 		    try {
-		    	it.next().jobFinished(success);
+		    	it.next().jobFinished(this, success);
 		    } catch (RuntimeException e) {
 		    	FMCorePlugin.getDefault().logError(e);
 		    }

@@ -91,13 +91,11 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
  * @author Jens Meinicke
  * @author Hannes Smurawsky
  */
-public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefaults, PropertyConstants, PropertyChangeListener,
-		IResourceChangeListener, IConfigurationEditor {
+public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefaults, PropertyConstants, PropertyChangeListener, IResourceChangeListener, IConfigurationEditor {
 
 	public static final String ID = FMUIPlugin.PLUGIN_ID + ".editors.configuration.ConfigurationEditor";
 
-	private static final QualifiedName MODEL_PATH = new QualifiedName(ConfigurationEditor.class.getName() + "#MODEL_PATH",
-			ConfigurationEditor.class.getName() + "#MODEL_PATH");
+	private static final QualifiedName MODEL_PATH = new QualifiedName(ConfigurationEditor.class.getName() + "#MODEL_PATH", ConfigurationEditor.class.getName() + "#MODEL_PATH");
 
 	public ConfigurationPage configurationPage;
 	private boolean configurationPageUsed = true;
@@ -106,6 +104,8 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	private boolean advancedConfigurationPageUsed = false;
 
 	private TextEditorPage sourceEditor;
+
+	private final ValidConfigJobManager validConfigJobManager = new ValidConfigJobManager(this);
 
 	@Nonnull
 	public IFile file;
@@ -143,9 +143,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 
 		@Override
 		public void partClosed(IWorkbenchPart part) {
-			if (configurationPage != null) {
-				configurationPage.cancelColorJob();
-			}
+			validConfigJobManager.cancelCurrentJob();
 			if (featureModel != null)
 				featureModel.removeListener(ConfigurationEditor.this);
 		}
@@ -166,7 +164,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	@Override
 	protected void setInput(IEditorInput input) {
 		file = (IFile) input.getAdapter(IFile.class);
-
+		
 		String fileName = file.getName();
 		final String extension = file.getFileExtension();
 		if (extension != null) {
@@ -315,8 +313,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	 * Gets all extensions for this extension point.
 	 */
 	private void getExtensions() {
-		IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(
-				FMUIPlugin.PLUGIN_ID + ".ConfigurationEditor");
+		IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(FMUIPlugin.PLUGIN_ID + ".ConfigurationEditor");
 		try {
 			for (IConfigurationElement e : config) {
 				final Object o = e.createExecutableExtension("class");
@@ -717,5 +714,9 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	@Override
 	public File getModelFile() {
 		return modelFile;
+	}
+
+	public ValidConfigJobManager getValidConfigJobManager() {
+		return validConfigJobManager;
 	}
 }

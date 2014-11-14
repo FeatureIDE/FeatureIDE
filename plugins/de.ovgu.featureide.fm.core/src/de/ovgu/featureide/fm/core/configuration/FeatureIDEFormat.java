@@ -25,10 +25,9 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-
 /**
- * Extended configuration format for FeatureIDE projects.</br>
- * Lists all features and indicates the manual and automatic selection.
+ * Extended configuration format for FeatureIDE projects.</br> Lists all
+ * features and indicates the manual and automatic selection.
  * 
  * @author Sebastian Krieter
  */
@@ -45,28 +44,34 @@ public class FeatureIDEFormat extends ConfigurationFormat {
 		String line = null;
 		int lineNumber = 1;
 		try {
-			while ((line  = reader.readLine()) != null) {				
+			while ((line = reader.readLine()) != null) {
 				if (line.startsWith("#")) {
-					return null;
+					continue;
 				}
 				line = line.trim();
 				if (!line.isEmpty()) {
 					Selection manual = Selection.UNDEFINED, automatic = Selection.UNDEFINED;
 					try {
 						switch (Integer.parseInt(line.substring(0, 1))) {
-							case 0: manual = Selection.UNSELECTED; break;
-							case 1: manual = Selection.SELECTED;
+						case 0:
+							manual = Selection.UNSELECTED;
+							break;
+						case 1:
+							manual = Selection.SELECTED;
 						}
 						switch (Integer.parseInt(line.substring(1, 2))) {
-							case 0: automatic = Selection.UNSELECTED; break;
-							case 1: automatic = Selection.SELECTED;
+						case 0:
+							automatic = Selection.UNSELECTED;
+							break;
+						case 1:
+							automatic = Selection.SELECTED;
 						}
 					} catch (NumberFormatException e) {
 						warnings.add(new ConfigurationReader.Warning("Wrong configuration format", lineNumber));
 					}
-					
+
 					final String name = line.substring(2);
-					
+
 					final SelectableFeature feature = configuration.getSelectablefeature(name);
 					if (feature == null) {
 						warnings.add(new ConfigurationReader.Warning("Feature " + name + " does not exist", lineNumber));
@@ -86,28 +91,38 @@ public class FeatureIDEFormat extends ConfigurationFormat {
 		}
 		return warnings;
 	}
-	
+
 	@Override
 	public String write(Configuration configuration) {
 		final StringBuilder buffer = new StringBuilder();
-		
+		buffer.append("# Lists all features from the model with manual (first digit) and automatic (second digit) selection");
+		buffer.append(NEWLINE);
+		buffer.append("# 0 = deselected, 1 = selected, 2 = undefined");
+		buffer.append(NEWLINE);
+
 		for (SelectableFeature feature : configuration.getFeatures()) {
 			buffer.append(Integer.toString(getSelectionCode(feature.getManual())));
+			// buffer.append(',');
 			buffer.append(Integer.toString(getSelectionCode(feature.getAutomatic())));
+			// buffer.append(',');
 			buffer.append(feature.getName());
 			buffer.append(NEWLINE);
 		}
-		
+
 		return buffer.toString();
 	}
-	
+
 	private int getSelectionCode(Selection selection) {
 		switch (selection) {
-			case SELECTED: return 1;
-			case UNDEFINED: return 2;
-			case UNSELECTED: return 0;
-			default: return 3;
+		case SELECTED:
+			return 1;
+		case UNDEFINED:
+			return 2;
+		case UNSELECTED:
+			return 0;
+		default:
+			return 3;
 		}
 	}
-	
+
 }

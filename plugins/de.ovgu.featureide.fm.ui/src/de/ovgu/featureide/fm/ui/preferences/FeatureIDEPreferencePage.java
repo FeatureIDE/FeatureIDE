@@ -19,7 +19,7 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 public class FeatureIDEPreferencePage extends PreferencePage implements
 		IWorkbenchPreferencePage {
 	
-	private SelectionListener selectionListener = new SelectionListener() {
+	private static final SelectionListener completionSelectionListener = new SelectionListener() {
 		@Override
 		public void widgetSelected(SelectionEvent e) {
 			Configuration.setDefaultCompletion((Integer) ((Button) e.getSource()).getData());
@@ -29,6 +29,18 @@ public class FeatureIDEPreferencePage extends PreferencePage implements
 		public void widgetDefaultSelected(SelectionEvent e) {
 		}
 	};
+	
+	private static final SelectionListener schemeSelectionListener = new SelectionListener() {
+		@Override
+		public void widgetSelected(SelectionEvent e) {
+			Configuration.setDefaultFeatureNameFormat((Integer) ((Button) e.getSource()).getData());
+		}
+		
+		@Override
+		public void widgetDefaultSelected(SelectionEvent e) {
+		}
+	};
+	
 
 	public FeatureIDEPreferencePage() {
 	}
@@ -47,17 +59,16 @@ public class FeatureIDEPreferencePage extends PreferencePage implements
 
 	@Override
 	protected Control createContents(Composite parent) {
-		Composite container = new Composite(parent, SWT.NULL);		
-		final FillLayout fillLayout = new FillLayout();
-		container.setLayout(fillLayout);
+		Composite container = new Composite(parent, SWT.NULL);
+		container.setLayout(new FillLayout(SWT.VERTICAL));
 		
-		final Group configGroup = new Group(container, SWT.SHADOW_IN);
-	    configGroup.setText("Configuration Coloring");
-	    configGroup.setLayout(new RowLayout(SWT.VERTICAL));
-	    configGroup.setToolTipText("The configuration editor provides feature highlighting for invalid configurations in oder to find valid configurations.");
-	    final Button noneButton = new Button(configGroup, SWT.RADIO);
-	    final Button openClauseButton = new Button(configGroup, SWT.RADIO);
-	    final Button contradictionButton = new Button(configGroup, SWT.RADIO);
+		final Group completionGroup = new Group(container, SWT.SHADOW_IN);
+	    completionGroup.setText("Configuration Coloring");
+	    completionGroup.setLayout(new RowLayout(SWT.VERTICAL));
+	    completionGroup.setToolTipText("The configuration editor provides feature highlighting for invalid configurations in oder to find valid configurations.");
+	    final Button noneButton = new Button(completionGroup, SWT.RADIO);
+	    final Button openClauseButton = new Button(completionGroup, SWT.RADIO);
+	    final Button contradictionButton = new Button(completionGroup, SWT.RADIO);
 	    
 	    noneButton.setData(Configuration.COMPLETION_NONE);
 	    openClauseButton.setData(Configuration.COMPLETION_OPEN_CLAUSES);
@@ -67,7 +78,7 @@ public class FeatureIDEPreferencePage extends PreferencePage implements
 	    openClauseButton.setText("Check open clauses (Faster results)");
 	    contradictionButton.setText("Check contradiction (Better results)");
 
-	    noneButton.setToolTipText("Do not use this functionality (Yields best performance for large feature models).");
+	    noneButton.setToolTipText("Diseable the functionality (Yields best performance for large feature models).");
 	    openClauseButton.setToolTipText("Looks for open clauses in the CNF representation of the feature model and highlights the corresponding features.");
 	    contradictionButton.setToolTipText("Tries to find features which lead to a valid configuration by solving a satisfiability problem.");
 	    
@@ -82,10 +93,34 @@ public class FeatureIDEPreferencePage extends PreferencePage implements
     		contradictionButton.setSelection(true);
 	    	break;
 	    }
+		
+	    final Group schemeGroup = new Group(container, SWT.SHADOW_IN);
+	    schemeGroup.setText("Feature name scheme");
+	    schemeGroup.setLayout(new RowLayout(SWT.VERTICAL));
+	    final Button useShortFeatureNames = new Button(schemeGroup, SWT.RADIO);
+	    final Button useLongFeatureName = new Button(schemeGroup, SWT.RADIO);
 	    
-	    noneButton.addSelectionListener(selectionListener);
-	    openClauseButton.addSelectionListener(selectionListener);
-	    contradictionButton.addSelectionListener(selectionListener);
+	    useShortFeatureNames.setData(Configuration.SCHEME_SHORT);
+	    useLongFeatureName.setData(Configuration.SCHEME_LONG);
+	    
+	    useShortFeatureNames.setText("Use short feature names");
+	    useLongFeatureName.setText("Use long feature names");
+	    
+	    switch (Configuration.getDefaultFeatureNameScheme()) {
+    	case Configuration.SCHEME_SHORT:
+    		useShortFeatureNames.setSelection(true);
+	    	break;
+    	case Configuration.SCHEME_LONG:
+    		useLongFeatureName.setSelection(true);
+	    	break;
+	    }
+	    
+	    noneButton.addSelectionListener(completionSelectionListener);
+	    openClauseButton.addSelectionListener(completionSelectionListener);
+	    contradictionButton.addSelectionListener(completionSelectionListener);
+	    
+	    useShortFeatureNames.addSelectionListener(schemeSelectionListener);
+	    useLongFeatureName.addSelectionListener(schemeSelectionListener);
 	    
 		return container;
 	}

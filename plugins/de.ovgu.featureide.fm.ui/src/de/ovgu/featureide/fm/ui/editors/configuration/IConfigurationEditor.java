@@ -26,8 +26,8 @@ import org.eclipse.core.resources.IFile;
 
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 
-public interface IConfigurationEditor {
 
+public interface IConfigurationEditor {
 	public Configuration getConfiguration();
 
 	public IFile getFile();

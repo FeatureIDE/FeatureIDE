@@ -46,7 +46,7 @@ public class DefaultFormat extends ConfigurationFormat {
 		int lineNumber = 1;
 		while ((line = reader.readLine()) != null) {
 			if (line.startsWith("#") || line.isEmpty() || line.equals(" ")) {
-				return null;
+				continue;
 			}
 			// the string tokenizer is used to also support the expression
 			// format used by FeatureHouse

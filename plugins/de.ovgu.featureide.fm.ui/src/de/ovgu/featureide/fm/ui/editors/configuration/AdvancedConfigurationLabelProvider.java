@@ -50,7 +50,7 @@ public class AdvancedConfigurationLabelProvider extends ColumnLabelProvider
 			if (feature.getParent() == null) {
 				return getRootlabel(feature.getConfiguration());
 			}
-			return feature.getName();
+			return feature.getFeature().getDisplayName();
 		}
 		return o.toString();
 	}

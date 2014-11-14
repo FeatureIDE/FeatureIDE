@@ -270,7 +270,7 @@ public class FujiSignaturesCreator {
 		}
 	}
 	
-	private void copyComment(RoleElement element, int id, String fullName) {
+	private void copyComment(RoleElement<?> element, int id, String fullName) {
 		if (fullName == null) {
 			return;
 		}

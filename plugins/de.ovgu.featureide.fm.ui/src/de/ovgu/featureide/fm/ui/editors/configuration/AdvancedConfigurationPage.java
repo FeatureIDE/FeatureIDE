@@ -21,29 +21,37 @@
 package de.ovgu.featureide.fm.ui.editors.configuration;
 
 import java.beans.PropertyChangeEvent;
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.progress.UIJob;
 
 import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.configuration.Configuration.ValidConfigJob;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.configuration.TreeElement;
+import de.ovgu.featureide.fm.core.job.IJob;
+import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
@@ -56,11 +64,21 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
 public class AdvancedConfigurationPage extends ConfigurationEditorPage {
 	
 	private static final String PAGE_TEXT = "Advanced Configuration";
-
+	
 	private static final String ID = FMUIPlugin.PLUGIN_ID + "AdvancedConfigurationPage";
-
+	
 	private TreeViewer viewer;
 	
+	private ValidConfigJobManager validConfigJobManager = null;
+	
+	@Override
+	protected void setInput(IEditorInput input) {
+		super.setInput(input);
+		if (configurationEditor instanceof ConfigurationEditor) {
+			validConfigJobManager = ((ConfigurationEditor)configurationEditor).getValidConfigJobManager();
+		}
+	}
+
 	@Override
 	public String getPageText() {
 		return PAGE_TEXT;
@@ -72,21 +90,29 @@ public class AdvancedConfigurationPage extends ConfigurationEditorPage {
 			updateForeground(viewer.getTree().getItem(0));
 		removeHiddenFeatures();
 	}
-	
-	private IDoubleClickListener listener = new IDoubleClickListener() {
-		public void doubleClick(DoubleClickEvent event) {
-			Object object = ((ITreeSelection) event.getSelection()).getFirstElement();
-			if (object instanceof SelectableFeature) {
-				final SelectableFeature feature = (SelectableFeature) object;
-				changeSelection(feature);
-			}
-		}
-	};
 
 	@Override
 	public void createPartControl(Composite parent) {
 		viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
-		viewer.addDoubleClickListener(listener);
+		viewer.getTree().addMouseListener(new MouseListener() {
+			@Override
+			public void mouseUp(MouseEvent e) {
+				if (e.button == 1 || e.button == 3) {
+					TreeItem item = viewer.getTree().getItem(new Point(e.x, e.y));
+					if (item != null) {
+						Object data = item.getData();
+						if (data instanceof SelectableFeature) {
+							final SelectableFeature feature = (SelectableFeature) data;
+							changeSelection(feature, e.button == 1);
+						}
+					}
+				}
+			}
+			@Override
+			public void mouseDown(MouseEvent e) {}
+			@Override
+			public void mouseDoubleClick(MouseEvent e) {}
+		});
 		viewer.getTree().addKeyListener(new KeyListener() {
 
 			public void keyPressed(KeyEvent e) {
@@ -97,7 +123,7 @@ public class AdvancedConfigurationPage extends ConfigurationEditorPage {
 						Object object = tree.getFirstElement();
 						if (object instanceof SelectableFeature) {
 							final SelectableFeature feature = (SelectableFeature) object;
-							changeSelection(feature);
+							cycleSelection(feature);
 						}
 					}
 				}
@@ -198,17 +224,37 @@ public class AdvancedConfigurationPage extends ConfigurationEditorPage {
 		viewer.remove(element);
 	}
 	
-	protected void changeSelection(SelectableFeature feature) {
+	protected void cycleSelection(SelectableFeature feature) {
+		cycleSelection(feature, true);
+	}
+	
+	protected void cycleSelection(SelectableFeature feature, boolean up) {
 		viewer.getTree().setRedraw(false);
 		if (feature.getAutomatic() == Selection.UNDEFINED) {
-			// set to the next value
-			if (feature.getManual() == Selection.UNDEFINED)
-				set(feature, Selection.SELECTED);
-			else if (feature.getManual() == Selection.SELECTED)
-				set(feature, Selection.UNSELECTED);
-			else
-				// case: unselected
-				set(feature, Selection.UNDEFINED);
+			switch (feature.getManual()) {
+			case SELECTED: set(feature, (up) ? Selection.UNSELECTED : Selection.UNDEFINED);  break;
+			case UNSELECTED: set(feature, (up) ? Selection.UNDEFINED : Selection.SELECTED);  break;
+			case UNDEFINED: set(feature, (up) ? Selection.SELECTED : Selection.UNSELECTED); break;
+			default: set(feature, Selection.UNDEFINED);
+			}
+			if (!dirty) {
+				setDirty();
+			}
+			viewer.refresh();
+			removeHiddenFeatures();
+		}
+		viewer.getTree().setRedraw(true);
+	}
+	
+	protected void changeSelection(SelectableFeature feature, boolean select) {
+		viewer.getTree().setRedraw(false);
+		if (feature.getAutomatic() == Selection.UNDEFINED) {
+			switch (feature.getManual()) {
+			case SELECTED: set(feature, (select) ? Selection.UNDEFINED : Selection.UNSELECTED);  break;
+			case UNSELECTED: set(feature, (select) ? Selection.SELECTED : Selection.UNDEFINED);  break;
+			case UNDEFINED: set(feature, (select) ? Selection.SELECTED : Selection.UNSELECTED); break;
+			default: set(feature, Selection.UNDEFINED);
+			}
 			if (!dirty) {
 				setDirty();
 			}
@@ -223,34 +269,69 @@ public class AdvancedConfigurationPage extends ConfigurationEditorPage {
 		updateForeground(viewer.getTree().getItem(0));
 	}
 	
-	private void updateForeground(TreeItem item) {	
-		// TODO #458 implement coloring
-//		for (TreeItem child : item.getItems()) {
-//			SelectableFeature feature = configurationEditor.configuration.getSelectablefeature(child.getText());
-//			child.setForeground(null);
-//			child.setFont(treeItemStandardFont);
-//			if (feature != null) {
-//				if (!configurationEditor.configuration.valid())
-//					if (feature.getAutomatic() == Selection.UNDEFINED) {
-//						if (feature.getManual() == Selection.UNDEFINED) {
-//							if (configurationEditor.configuration.leadToValidConfiguration(feature, Selection.SELECTED, Selection.UNDEFINED)){
-//								child.setForeground(green);
-//								child.setFont(treeItemSpecialFont);	
-//							}
-//						} else if (feature.getManual() == Selection.SELECTED) {
-//							if (configurationEditor.configuration.leadToValidConfiguration(feature, Selection.UNSELECTED, Selection.SELECTED)){
-//								child.setForeground(blue);
-//								child.setFont(treeItemSpecialFont);
-//							}
-//							// case: unselected
-//						} else if (configurationEditor.configuration.leadToValidConfiguration(feature, Selection.SELECTED, Selection.UNSELECTED)){
-//								child.setForeground(green);
-//								child.setFont(treeItemSpecialFont);	
-//						}
-//					}
-//				updateForeground(child);
-//			}
-//		}
+	private void updateForegroundRec(TreeItem item, HashSet<String> featureSet) {
+		for (TreeItem child : item.getItems()) {
+			final Object data = child.getData();
+			if (data instanceof SelectableFeature) {
+				final SelectableFeature feature = (SelectableFeature) data;
+				if (featureSet.contains(feature.getName())) {
+					child.setForeground((feature.getManual() == Selection.SELECTED) ? ConfigurationPage.blue : ConfigurationPage.green);
+				} else {
+					child.setForeground(ConfigurationPage.black);
+				}
+			}
+			updateForegroundRec(child, featureSet);
+		}
+	}
+	
+	private void updateForegroundRec(TreeItem item) {
+		for (TreeItem child : item.getItems()) {
+			item.setForeground(ConfigurationPage.black);
+			updateForegroundRec(child);
+		}
+	}
+	
+	private void updateForeground(final TreeItem item) {
+		if (validConfigJobManager != null && !configurationEditor.getConfiguration().isValid()) {
+			final List<SelectableFeature> featureList = new LinkedList<SelectableFeature>();
+			final List<SelectableFeature> allFeatures = configurationEditor.getConfiguration().getFeatures();
+			for (SelectableFeature selectableFeature : allFeatures) {
+				if (selectableFeature.getAutomatic() == Selection.UNDEFINED) {
+					featureList.add(selectableFeature);
+				}
+			}
+			
+			final Display currentDisplay = Display.getCurrent();
+			
+			final JobFinishListener colorListener = new JobFinishListener() {
+				@Override
+				public void jobFinished(IJob finishedJob, boolean success) {
+					if (success) {
+						boolean[] validConf = ((ValidConfigJob)finishedJob).getResults();
+						final HashSet<String> featureSet = new HashSet<String>();
+						int i = 0;
+						for (SelectableFeature selectableFeature : featureList) {
+							if (validConf[i++]) {
+								featureSet.add(selectableFeature.getName());
+							}
+						}
+						
+						// needs to be executed on GUI Thread (otherwise there is an InvalidAccessException)
+						currentDisplay.asyncExec(new Runnable() {
+							@Override
+							public void run() {
+								updateForegroundRec(item, featureSet);								
+							}
+						});
+					}
+				}
+			};
+			
+			validConfigJobManager.startNewValidConfigJob(featureList, colorListener);
+		} else {
+			// reset color
+			updateForegroundRec(item);
+		}
 	}
 	
 	@Override
