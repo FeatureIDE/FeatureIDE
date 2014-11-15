@@ -134,6 +134,8 @@ public class FeatureCreateCompoundOperation extends AbstractFeatureModelOperatio
 			featureModel.setRoot(newCompound);
 		}
 
+//		newCompound = featureModel.getFeature(newCompound.getName());
+
 		FeatureDiagramLayoutHelper.initializeCompoundFeaturePosition(
 				featureModel, selectedFeatures, newCompound);
 	}
@@ -143,7 +145,7 @@ public class FeatureCreateCompoundOperation extends AbstractFeatureModelOperatio
 		if (parent == null) {
 			featureModel.replaceRoot(featureModel.getRoot().removeLastChild());
 		} else {
-			featureModel.deleteFeature(newCompound);
+			featureModel.deleteFeature(featureModel.getFeature(newCompound.getName()));
 		}
 	}
 

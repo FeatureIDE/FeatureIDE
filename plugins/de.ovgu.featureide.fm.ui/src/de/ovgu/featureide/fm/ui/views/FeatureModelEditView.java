@@ -79,15 +79,11 @@ import de.ovgu.featureide.fm.ui.views.featuremodeleditview.ViewLabelProvider;
  */
 public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 
-	public static final String ID = FMUIPlugin.PLUGIN_ID
-			+ ".views.FeatureModelEditView";
+	public static final String ID = FMUIPlugin.PLUGIN_ID + ".views.FeatureModelEditView";
 
-	public static final Image REFESH_TAB_IMAGE = FMUIPlugin
-			.getImage("refresh_tab.gif");
+	public static final Image REFESH_TAB_IMAGE = FMUIPlugin.getImage("refresh_tab.gif");
 
-	private static final QualifiedName ACTIVATOR_KEY = new QualifiedName(
-			FMUIPlugin.PLUGIN_ID + ".EditViewActivator", FMUIPlugin.PLUGIN_ID
-					+ ".EditViewActivator");
+	private static final QualifiedName ACTIVATOR_KEY = new QualifiedName(FMUIPlugin.PLUGIN_ID + ".EditViewActivator", FMUIPlugin.PLUGIN_ID + ".EditViewActivator");
 
 	private static final String ACTIVATOR_ACTION_TEXT = "Disable automatic calculations";
 	private static final String MANUAL_CALCULATION_TEXT = "Start calculation";
@@ -110,9 +106,7 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 					if (featureModelEditor == null)
 						contentProvider.defaultContent();
 					else {
-						contentProvider.calculateContent(
-								featureModelEditor.getOriginalFeatureModel(),
-								featureModelEditor.getFeatureModel(), monitor);
+						contentProvider.calculateContent(featureModelEditor.getOriginalFeatureModel(), featureModelEditor.getFeatureModel(), monitor);
 					}
 					return Status.OK_STATUS;
 				}
@@ -168,8 +162,8 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 
 	private PropertyChangeListener modelListener = new PropertyChangeListener() {
 		public void propertyChange(PropertyChangeEvent evt) {
-			if(!PropertyConstants.MODEL_LAYOUT_CHANGED.equals(evt.getPropertyName()))
-			refresh();
+			if (!PropertyConstants.MODEL_LAYOUT_CHANGED.equals(evt.getPropertyName()))
+				refresh();
 		}
 	};
 
@@ -195,14 +189,12 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 		manager.add(activatorAction);
 		activatorAction.setChecked(isActivatorChecked());
 		activatorAction.setToolTipText(ACTIVATOR_ACTION_TEXT);
-		activatorAction.setImageDescriptor(ImageDescriptor
-				.createFromImage(REFESH_TAB_IMAGE));
+		activatorAction.setImageDescriptor(ImageDescriptor.createFromImage(REFESH_TAB_IMAGE));
 
 		manager.add(manualAction);
 		manualAction.setEnabled(activatorAction.isEnabled() && activatorAction.isChecked());
 		manualAction.setToolTipText(MANUAL_CALCULATION_TEXT);
-		manualAction.setImageDescriptor(ImageDescriptor
-				.createFromImage(REFESH_TAB_IMAGE));
+		manualAction.setImageDescriptor(ImageDescriptor.createFromImage(REFESH_TAB_IMAGE));
 	}
 
 	/**
@@ -225,8 +217,7 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 	 */
 	private void setActivatorChecked(boolean checked) {
 		try {
-			workspaceRoot.setPersistentProperty(ACTIVATOR_KEY,
-					checked ? "true" : "false");
+			workspaceRoot.setPersistentProperty(ACTIVATOR_KEY, checked ? "true" : "false");
 		} catch (CoreException e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
@@ -241,8 +232,6 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 		}
 		getSite().getPage().removePartListener(editorListener);
 		if (featureModelEditor != null) {
-			featureModelEditor.getOriginalFeatureModel().removeListener(
-					modelListener);
 			featureModelEditor.getFeatureModel().removeListener(modelListener);
 			featureModelEditor = null;
 		}
@@ -263,27 +252,19 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 			return;
 
 		if (featureModelEditor != null) {
-			featureModelEditor.getOriginalFeatureModel().removeListener(
-					modelListener);
 			featureModelEditor.getFeatureModel().removeListener(modelListener);
 			featureModelEditor = null;
 		}
 
 		if (activeEditor instanceof FeatureModelEditor) {
 			featureModelEditor = (FeatureModelEditor) activeEditor;
-			featureModelEditor.getOriginalFeatureModel().addListener(
-					modelListener);
 			featureModelEditor.getFeatureModel().addListener(modelListener);
 
-			if (evaluation == null
-					&& featureModelEditor.getGrammarFile().getResource()
-							.getProject().getName()
-							.startsWith("EvaluationTest")) {
+			if (evaluation == null && featureModelEditor.getGrammarFile().getResource().getProject().getName().startsWith("EvaluationTest")) {
 				evaluation = new Job("Evaluation Test") {
 					@Override
 					protected IStatus run(IProgressMonitor monitor) {
-						Evaluation.evaluate(featureModelEditor.getGrammarFile()
-								.getResource().getProject());
+						Evaluation.evaluate(featureModelEditor.getGrammarFile().getResource().getProject());
 						return Status.OK_STATUS;
 					}
 				};
@@ -293,33 +274,25 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 					@Override
 					public IStatus runInUIThread(IProgressMonitor monitor) {
 						try {
-							convertModelToBitmapTest(featureModelEditor
-									.getGrammarFile().getResource()
-									.getProject().getFolder("models"));
+							convertModelToBitmapTest(featureModelEditor.getGrammarFile().getResource().getProject().getFolder("models"));
 						} catch (Exception e) {
 							FMUIPlugin.getDefault().logError(e);
 						}
 						return Status.OK_STATUS;
 					}
 
-					public void convertModelToBitmapTest(IFolder folder)
-							throws CoreException {
+					public void convertModelToBitmapTest(IFolder folder) throws CoreException {
 						for (IResource res : folder.members())
-							if (res instanceof IFile
-									&& res.getName().endsWith(".m")) {
+							if (res instanceof IFile && res.getName().endsWith(".m")) {
 								IFile fmFile = (IFile) res;
 								try {
 									FeatureModel fm = new FeatureModel();
-									
-									FeatureModelReaderIFileWrapper reader = 
-											new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(fm));
+
+									FeatureModelReaderIFileWrapper reader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(fm));
 									reader.readFromFile(fmFile);
 
-									String imageName = fmFile.getRawLocation()
-											.toOSString();
-									imageName = imageName.substring(0,
-											imageName.length() - ".m".length())
-											+ ".png";
+									String imageName = fmFile.getRawLocation().toOSString();
+									imageName = imageName.substring(0, imageName.length() - ".m".length()) + ".png";
 									createBitmap(fm, new File(imageName));
 								} catch (FileNotFoundException e) {
 									FMUIPlugin.getDefault().logError(e);
@@ -330,19 +303,13 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 						folder.refreshLocal(IResource.DEPTH_ONE, null);
 					}
 
-					private void createBitmap(FeatureModel featureModel,
-							File file) {
+					private void createBitmap(FeatureModel featureModel, File file) {
 						GraphicalViewerImpl graphicalViewer = new ScrollingGraphicalViewer();
-						graphicalViewer.createControl(viewer.getControl()
-								.getParent());
-						graphicalViewer.getControl().setBackground(
-								DIAGRAM_BACKGROUND);
-						graphicalViewer
-								.setEditPartFactory(new GraphicalEditPartFactory());
+						graphicalViewer.createControl(viewer.getControl().getParent());
+						graphicalViewer.getControl().setBackground(DIAGRAM_BACKGROUND);
+						graphicalViewer.setEditPartFactory(new GraphicalEditPartFactory());
 						ScalableFreeformRootEditPart rootEditPart = new ScalableFreeformRootEditPart();
-						((ConnectionLayer) rootEditPart
-								.getLayer(LayerConstants.CONNECTION_LAYER))
-								.setAntialias(SWT.ON);
+						((ConnectionLayer) rootEditPart.getLayer(LayerConstants.CONNECTION_LAYER)).setAntialias(SWT.ON);
 						graphicalViewer.setRootEditPart(rootEditPart);
 						graphicalViewer.setContents(featureModel);
 						FeatureDiagramLayoutManager layoutManager = new LevelOrderLayout();
@@ -361,9 +328,10 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 		if (contentProvider.isCanceled()) {
 			return;
 		}
-		
+
 		/*
-		 * This job waits for the calculation job to finish and starts immediately a new one
+		 * This job waits for the calculation job to finish and starts
+		 * immediately a new one
 		 */
 		Job waiter = new Job("Updating Feature Model Edits") {
 			@Override
@@ -393,9 +361,7 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 						} else if (isActivatorChecked()) {
 							contentProvider.defaultManualContent();
 						} else {
-							contentProvider.calculateContent(featureModelEditor
-									.getOriginalFeatureModel(),
-									featureModelEditor.getFeatureModel(), monitor);
+							contentProvider.calculateContent(featureModelEditor.getOriginalFeatureModel(), featureModelEditor.getFeatureModel(), monitor);
 						}
 						return Status.OK_STATUS;
 					}
