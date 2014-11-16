@@ -30,9 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.osgi.service.prefs.BackingStoreException;
 import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
@@ -42,6 +39,7 @@ import org.sat4j.specs.TimeoutException;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.Preferences;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.job.AStoppableJob;
 
@@ -80,32 +78,7 @@ public class Configuration {
 		}
 	}
 
-	public static final int 
-		COMPLETION_NONE = 0,
-		COMPLETION_ONE_CLICK = 1,
-		COMPLETION_OPEN_CLAUSES = 2,
-		SCHEME_LONG = 0,
-		SCHEME_SHORT = 1;
-
 	public static int FEATURE_LIMIT_FOR_DEFAULT_COMPLETION = 150;
-	private static int defaultCompletion;
-	private static int defaultFeatureNameScheme;
-	static {
-		final IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode("de.ovgu.featureide.fm.core");
-		String pref = preferences.get("configCompletion", Integer.toString(COMPLETION_ONE_CLICK));
-		try {
-			defaultCompletion = Integer.parseInt(pref);
-		} catch (Exception e) {
-			defaultCompletion = COMPLETION_ONE_CLICK;
-		}
-		
-		pref = preferences.get("configFeatureNameScheme", Integer.toString(SCHEME_LONG));
-		try {
-			defaultFeatureNameScheme = Integer.parseInt(pref);
-		} catch (Exception e) {
-			defaultFeatureNameScheme = SCHEME_LONG;
-		}
-	}
 
 	private static final int TIMEOUT = 1000;
 
@@ -121,36 +94,6 @@ public class Configuration {
 
 	private final boolean ignoreAbstractFeatures;
 	private boolean propagate;
-	
-	public static int getDefaultCompletion() {
-		return defaultCompletion;
-	}
-	
-	public static int getDefaultFeatureNameScheme() {
-		return defaultFeatureNameScheme;
-	}
-	
-	public static void setDefaultCompletion(int defaultCompletion) {
-		Configuration.defaultCompletion = defaultCompletion;
-		final IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode("de.ovgu.featureide.fm.core");
-		preferences.put("configCompletion", Integer.toString(defaultCompletion));
-		try {
-			preferences.flush();
-		} catch (BackingStoreException e) {
-			FMCorePlugin.getDefault().logError(e);
-		}
-	}
-	
-	public static void setDefaultFeatureNameFormat(int defaultFeatureNameScheme) {
-		Configuration.defaultFeatureNameScheme = defaultFeatureNameScheme;
-		final IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode("de.ovgu.featureide.fm.core");
-		preferences.put("configFeatureNameScheme", Integer.toString(defaultFeatureNameScheme));
-		try {
-			preferences.flush();
-		} catch (BackingStoreException e) {
-			FMCorePlugin.getDefault().logError(e);
-		}
-	}
 
 	/**
 	 * This method creates a clone of the given {@link Configuration}
@@ -234,7 +177,7 @@ public class Configuration {
 	public List<SelectableFeature> getFeatures() {
 		return Collections.unmodifiableList(features);
 	}
-
+	
 	public SelectableFeature getRoot() {
 		return root;
 	}
@@ -245,26 +188,32 @@ public class Configuration {
 	
 	public Set<String> getSelectedFeatureNames() {
 		final Set<String> result = new HashSet<String>();
-		
 		for (SelectableFeature feature : features) {
 			if (feature.getSelection() == Selection.SELECTED) {
 				result.add(feature.getFeature().getName());
 			}
 		}
-		
 		return result;
 	}
 
 	public List<Feature> getSelectedFeatures() {
 		final List<Feature> result = new ArrayList<Feature>();
-		
 		for (SelectableFeature feature : features) {
 			if (feature.getSelection() == Selection.SELECTED) {
 				result.add(feature.getFeature());
 			}
 		}
-		
 		return result;
+	}
+	
+	public List<SelectableFeature> getManualFeatures() {
+		final List<SelectableFeature> featureList = new LinkedList<SelectableFeature>();
+		for (SelectableFeature selectableFeature : features) {
+			if (selectableFeature.getAutomatic() == Selection.UNDEFINED && !selectableFeature.getFeature().hasHiddenParent()) {
+				featureList.add(selectableFeature);
+			}
+		}
+		return featureList;
 	}
 
 	public LinkedList<List<String>> getSolutions(int max) throws TimeoutException {
@@ -305,26 +254,23 @@ public class Configuration {
 	}
 	
 	public ValidConfigJob leadToValidConfiguration(List<SelectableFeature> featureList) {
-		if (defaultCompletion == COMPLETION_NONE) {
-			return leadToValidConfiguration(featureList, defaultCompletion);
-		} else if (featureList.size() > FEATURE_LIMIT_FOR_DEFAULT_COMPLETION) {
-			return leadToValidConfiguration(featureList, COMPLETION_OPEN_CLAUSES);
+		if (Preferences.defaultCompletion == Preferences.COMPLETION_ONE_CLICK && featureList.size() > FEATURE_LIMIT_FOR_DEFAULT_COMPLETION) {
+			return leadToValidConfiguration(featureList, Preferences.COMPLETION_OPEN_CLAUSES);
 		}
-		return leadToValidConfiguration(featureList, defaultCompletion);
+		return leadToValidConfiguration(featureList, Preferences.defaultCompletion);
 	}
 	
 	public ValidConfigJob leadToValidConfiguration(List<SelectableFeature> featureList, int mode) {
 		switch (mode) {
-			case COMPLETION_ONE_CLICK:
+			case Preferences.COMPLETION_ONE_CLICK:
 				return new ValidConfigJob1(featureList);
-			case COMPLETION_OPEN_CLAUSES:
+			case Preferences.COMPLETION_OPEN_CLAUSES:
 				return new ValidConfigJob2(featureList);
-			case COMPLETION_NONE:
+			case Preferences.COMPLETION_NONE:
 			default:
 				return null;
 		}
 	}
-	
 	
 	public abstract class ValidConfigJob extends AStoppableJob {
 		protected final boolean[] results;

@@ -541,7 +541,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 				advancedConfigurationPage.propertyChange(null);
 			}
 		} else if (oldPageIndex == configurationPage.getIndex()) {
-			configurationPage.resetColor();
+			validConfigJobManager.cancelCurrentJob();
 		} else {
 			for (IConfigurationEditorPage page : extensionPages) {
 				if (page.getIndex() == oldPageIndex) {
@@ -571,14 +571,14 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 					}
 				}
 				if (configurationPageUsed) {
-					configurationPage.updateTree();
+					configurationPage.refreshTree();
 				} else {
 					configurationPage.propertyChange(null);
 					configurationPageUsed = true;
 				}
 			} else if (newPageIndex == advancedConfigurationPage.getIndex()) {
 				if (advancedConfigurationPageUsed)
-					advancedConfigurationPage.updateTree();
+					advancedConfigurationPage.refreshTree();
 				else {
 					advancedConfigurationPage.propertyChange(null);
 					advancedConfigurationPageUsed = true;

@@ -25,6 +25,7 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.TreeElement;
 
 /**
@@ -45,29 +46,52 @@ public class ConfigurationContentProvider implements
 	}
 	
 	public Object[] getElements(Object parent) {
-		if (parent == null)
+		if (parent == null) {
 			return new String[] { "Loading..." };
-		if (parent == configuration)
+		}
+		if (parent == configuration) {
 			return new Object[] { configuration.getRoot() };
+		}
 		return getChildren(parent);
 	}
 
 	public Object getParent(Object child) {
-		if (child instanceof TreeElement)
+		if (child instanceof TreeElement) {
 			return ((TreeElement) child).getParent();
+		}
 		return null;
 	}
 
 	public Object[] getChildren(Object parent) {
-		if (parent instanceof TreeElement)
-			return ((TreeElement) parent).getChildren();
+		if (parent instanceof TreeElement) {
+			final TreeElement[] allChildren = ((TreeElement) parent).getChildren();
+			int removeCount = 0;
+			for (int i = 0; i < allChildren.length; i++) {
+				final TreeElement child = allChildren[i];
+				if ((child instanceof SelectableFeature) 
+						&& (((SelectableFeature) child).getFeature().isHidden())) {
+					allChildren[i] = null;
+					removeCount++;
+				}
+			}
+			final int newLength = allChildren.length - removeCount;
+			if (newLength > 0) {
+				final TreeElement[] nonHiddenChildren = new TreeElement[allChildren.length - removeCount];
+				int j = 0;
+				for (int i = 0; i < allChildren.length; i++) {
+					final TreeElement child = allChildren[i];
+					if (child != null) {
+						nonHiddenChildren[j++] = child;
+					}
+				}
+				return nonHiddenChildren;
+			}
+		}
 		return new Object[0];
 	}
 
 	public boolean hasChildren(Object parent) {
-		if (parent instanceof TreeElement)
-			return ((TreeElement) parent).hasChildren();
-		return false;
+		return (parent instanceof TreeElement) && ((TreeElement) parent).hasChildren();
 	}
 
 }

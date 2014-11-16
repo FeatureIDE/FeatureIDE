@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.core;
 
-import de.ovgu.featureide.fm.core.configuration.Configuration;
 
 /**
  * Feature for the {@link ExtendedFeatureModel}.
@@ -83,12 +82,12 @@ public class ExtendedFeature extends Feature {
 
 	@Override
 	public String getDisplayName() {
-		switch (Configuration.getDefaultFeatureNameScheme()) {
-			case Configuration.SCHEME_SHORT:
+		switch (Preferences.getDefaultFeatureNameScheme()) {
+			case Preferences.SCHEME_SHORT:
 				String name = getName();
 				int separatorIndex = name.lastIndexOf(".");
 				return name.substring(separatorIndex + 1);
-			case Configuration.SCHEME_LONG: 
+			case Preferences.SCHEME_LONG: 
 			default: 
 				return getName();
 		}

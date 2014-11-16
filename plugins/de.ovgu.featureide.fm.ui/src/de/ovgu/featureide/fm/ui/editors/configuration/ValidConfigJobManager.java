@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.jobs.Job;
 
+import de.ovgu.featureide.fm.core.Preferences;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
@@ -44,6 +45,10 @@ public class ValidConfigJobManager {
 
 	public Configuration.ValidConfigJob getValidConfigJob() {
 		return validConfigJob;
+	}
+	
+	public boolean isCompletionEnabled() {
+		return Preferences.getDefaultCompletion() != Preferences.COMPLETION_NONE;
 	}
 	
 	public void startNewValidConfigJob(List<SelectableFeature> featureList, JobFinishListener... listener) {

@@ -14,7 +14,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.Preferences;
 
 public class FeatureIDEPreferencePage extends PreferencePage implements
 		IWorkbenchPreferencePage {
@@ -22,7 +22,7 @@ public class FeatureIDEPreferencePage extends PreferencePage implements
 	private static final SelectionListener completionSelectionListener = new SelectionListener() {
 		@Override
 		public void widgetSelected(SelectionEvent e) {
-			Configuration.setDefaultCompletion((Integer) ((Button) e.getSource()).getData());
+			Preferences.setDefaultCompletion((Integer) ((Button) e.getSource()).getData());
 		}
 		
 		@Override
@@ -33,7 +33,7 @@ public class FeatureIDEPreferencePage extends PreferencePage implements
 	private static final SelectionListener schemeSelectionListener = new SelectionListener() {
 		@Override
 		public void widgetSelected(SelectionEvent e) {
-			Configuration.setDefaultFeatureNameFormat((Integer) ((Button) e.getSource()).getData());
+			Preferences.setDefaultFeatureNameFormat((Integer) ((Button) e.getSource()).getData());
 		}
 		
 		@Override
@@ -70,9 +70,9 @@ public class FeatureIDEPreferencePage extends PreferencePage implements
 	    final Button openClauseButton = new Button(completionGroup, SWT.RADIO);
 	    final Button contradictionButton = new Button(completionGroup, SWT.RADIO);
 	    
-	    noneButton.setData(Configuration.COMPLETION_NONE);
-	    openClauseButton.setData(Configuration.COMPLETION_OPEN_CLAUSES);
-	    contradictionButton.setData(Configuration.COMPLETION_ONE_CLICK);
+	    noneButton.setData(Preferences.COMPLETION_NONE);
+	    openClauseButton.setData(Preferences.COMPLETION_OPEN_CLAUSES);
+	    contradictionButton.setData(Preferences.COMPLETION_ONE_CLICK);
 	    
 	    noneButton.setText("None");
 	    openClauseButton.setText("Check open clauses (Faster results)");
@@ -82,14 +82,14 @@ public class FeatureIDEPreferencePage extends PreferencePage implements
 	    openClauseButton.setToolTipText("Looks for open clauses in the CNF representation of the feature model and highlights the corresponding features.");
 	    contradictionButton.setToolTipText("Tries to find features which lead to a valid configuration by solving a satisfiability problem.");
 	    
-	    switch (Configuration.getDefaultCompletion()) {
-    	case Configuration.COMPLETION_NONE:
+	    switch (Preferences.getDefaultCompletion()) {
+    	case Preferences.COMPLETION_NONE:
 	    	noneButton.setSelection(true);
 	    	break;
-    	case Configuration.COMPLETION_OPEN_CLAUSES:
+    	case Preferences.COMPLETION_OPEN_CLAUSES:
     		openClauseButton.setSelection(true);
 	    	break;
-    	case Configuration.COMPLETION_ONE_CLICK:
+    	case Preferences.COMPLETION_ONE_CLICK:
     		contradictionButton.setSelection(true);
 	    	break;
 	    }
@@ -100,17 +100,17 @@ public class FeatureIDEPreferencePage extends PreferencePage implements
 	    final Button useShortFeatureNames = new Button(schemeGroup, SWT.RADIO);
 	    final Button useLongFeatureName = new Button(schemeGroup, SWT.RADIO);
 	    
-	    useShortFeatureNames.setData(Configuration.SCHEME_SHORT);
-	    useLongFeatureName.setData(Configuration.SCHEME_LONG);
+	    useShortFeatureNames.setData(Preferences.SCHEME_SHORT);
+	    useLongFeatureName.setData(Preferences.SCHEME_LONG);
 	    
 	    useShortFeatureNames.setText("Use short feature names");
 	    useLongFeatureName.setText("Use long feature names");
 	    
-	    switch (Configuration.getDefaultFeatureNameScheme()) {
-    	case Configuration.SCHEME_SHORT:
+	    switch (Preferences.getDefaultFeatureNameScheme()) {
+    	case Preferences.SCHEME_SHORT:
     		useShortFeatureNames.setSelection(true);
 	    	break;
-    	case Configuration.SCHEME_LONG:
+    	case Preferences.SCHEME_LONG:
     		useLongFeatureName.setSelection(true);
 	    	break;
 	    }
