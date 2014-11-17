@@ -530,4 +530,13 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionBase#supportsMigration()
+	 */
+	@Override
+	public boolean supportsMigration()
+	{
+		return false;
+	}
+
 }

@@ -1098,7 +1098,10 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			if (errorPropagation == null) {
 				errorPropagation = ErrorPropagation.createErrorPropagation(file);
 			}
-			errorPropagation.addFile(file);
+			//FIXME 14.11.2014 KT: Nullpointer for files with extension != "c" || "h" || "java" 
+			// Error propagation necessary for other files?
+			if(errorPropagation!=null)
+				errorPropagation.addFile(file); 
 		} catch (CoreException e) {
 			LOGGER.logError(e);
 		}
@@ -1242,5 +1245,14 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	
 	public boolean usesFuji() {
 		return useFuji;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionBase#supportsMigration()
+	 */
+	@Override
+	public boolean supportsMigration()
+	{
+		return true;
 	}
 }

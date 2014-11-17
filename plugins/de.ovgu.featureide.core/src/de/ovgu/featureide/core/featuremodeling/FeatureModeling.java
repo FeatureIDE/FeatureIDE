@@ -87,4 +87,13 @@ public class FeatureModeling extends ComposerExtensionClass {
 			CorePlugin.getDefault().logError(e);
 		}
 	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionBase#supportsMigration()
+	 */
+	@Override
+	public boolean supportsMigration()
+	{
+		return false;
+	}
 }
