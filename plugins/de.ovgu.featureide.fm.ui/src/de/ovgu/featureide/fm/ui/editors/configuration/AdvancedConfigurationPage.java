@@ -76,9 +76,8 @@ public class AdvancedConfigurationPage extends ConfigurationEditorPage {
 	};
 	
 	private TreeViewer viewer;
-
-	@Override
-	public void createPartControl(Composite parent) {
+	
+	protected void createUITree(Composite parent) {	    
 		viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		viewer.getTree().addMouseListener(new MouseListener() {
 			@Override
@@ -137,17 +136,16 @@ public class AdvancedConfigurationPage extends ConfigurationEditorPage {
 		viewer.setLabelProvider(new AdvancedConfigurationLabelProvider());
 		viewer.setInput(configurationEditor.getConfiguration());
 		viewer.expandAll();
-		viewer.refresh();
 		if (errorMessage(viewer.getTree())) {
-			refreshItems();
+			refreshTree();
 		}
 		viewer.getTree().setRedraw(true);
 	}
 	
 	@Override
 	protected void refreshTree() {
+		super.refreshTree();
 		viewer.refresh();
-		refreshItems();
 	}
 	
 	@Override
@@ -160,16 +158,7 @@ public class AdvancedConfigurationPage extends ConfigurationEditorPage {
 		return treeWalker;
 	}
 	
-	@Override
-	protected boolean changeSelection(SelectableFeature feature, boolean select) {
-		viewer.getTree().setRedraw(false);
-		final boolean result = super.changeSelection(feature, select);
-		viewer.getTree().setRedraw(true);
-		return result;
-	}
-	
 	private void cycleSelection(SelectableFeature feature, boolean up) {
-		viewer.getTree().setRedraw(false);
 		if (feature.getAutomatic() == Selection.UNDEFINED) {
 			switch (feature.getManual()) {
 			case SELECTED: set(feature, (up) ? Selection.UNSELECTED : Selection.UNDEFINED);  break;
@@ -182,7 +171,6 @@ public class AdvancedConfigurationPage extends ConfigurationEditorPage {
 			}
 			refreshTree();
 		}
-		viewer.getTree().setRedraw(true);
 	}
 	
 	@Override

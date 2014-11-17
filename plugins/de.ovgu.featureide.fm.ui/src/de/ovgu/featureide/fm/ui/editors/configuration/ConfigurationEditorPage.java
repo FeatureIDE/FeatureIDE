@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.ui.editors.configuration;
 
 import java.beans.PropertyChangeEvent;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -32,8 +33,13 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IEditorInput;
@@ -44,6 +50,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.progress.UIJob;
 
+import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.Configuration.ValidConfigJob;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
@@ -64,6 +71,7 @@ public abstract class ConfigurationEditorPage extends EditorPart implements ICon
 	static final Color gray = new Color(null, 140, 140, 140);
 	static final Color green = new Color(null, 0, 140, 0);
 	static final Color blue = new Color(null, 0, 0, 200);
+	static final Color red = new Color(null, 240, 0, 0);
 	
 	static final Font treeItemStandardFont = new Font(null, "Arial", 8, SWT.NORMAL);
 	static final Font treeItemSpecialFont = new Font(null, "Arial", 8, SWT.BOLD);
@@ -76,6 +84,8 @@ public abstract class ConfigurationEditorPage extends EditorPart implements ICon
 	private int index;
 	protected boolean dirty = false;
 	protected boolean initialized = false;
+	
+	protected Label infoLabel;
 	
 	public void setDirty() {
 		dirty = true;
@@ -162,6 +172,83 @@ public abstract class ConfigurationEditorPage extends EditorPart implements ICon
 	
 	@Override
 	public void createPartControl(Composite parent) {
+		// parent composite
+		GridLayout gridLayout = new GridLayout(1, false);
+		gridLayout.verticalSpacing = 4;
+		gridLayout.marginHeight = 2;
+		gridLayout.marginWidth = 0;
+		parent.setLayout(gridLayout);
+		
+		// 1. sub composite
+		GridData gridData = new GridData();
+		gridData.horizontalAlignment = SWT.FILL;
+		gridData.grabExcessHorizontalSpace = true;
+		gridData.grabExcessVerticalSpace = false;
+		gridData.verticalAlignment = SWT.TOP;
+	    gridLayout = new GridLayout(3, false);
+		gridLayout.marginHeight = 0;
+		gridLayout.marginWidth = 0;
+		gridLayout.marginLeft = 4;
+		Composite compositeTop = new Composite(parent, SWT.NONE);
+	    compositeTop.setLayout(gridLayout);
+	    compositeTop.setLayoutData(gridData);
+	    
+	    // info label
+	    gridData = new GridData();
+		gridData.horizontalAlignment = SWT.FILL;
+		gridData.grabExcessHorizontalSpace = true;
+		gridData.verticalAlignment = SWT.CENTER;
+	    infoLabel = new Label(compositeTop, SWT.NONE);
+	    infoLabel.setLayoutData(gridData);
+	    setInfoLabel();
+		
+		// button 2
+		gridData = new GridData();
+		gridData.horizontalAlignment = SWT.RIGHT;
+		gridData.verticalAlignment = SWT.CENTER;
+		Button b2 = new Button(compositeTop, SWT.TOGGLE);
+		b2.setText("Autoselect Features");
+		b2.setLayoutData(gridData);
+		
+	    // button 1
+	    gridData = new GridData();
+		gridData.horizontalAlignment = SWT.RIGHT;
+		gridData.verticalAlignment = SWT.CENTER;
+		Button b1 = new Button(compositeTop, SWT.PUSH);
+		b1.setText("Compute Undifiend Features");
+		b1.setLayoutData(gridData);
+		
+		// 2. sub composite
+		gridData = new GridData();
+		gridData.horizontalAlignment = SWT.FILL;
+		gridData.verticalAlignment = SWT.FILL;
+		gridData.grabExcessHorizontalSpace = true;
+		gridData.grabExcessVerticalSpace = true;
+	    Composite compositeBottom = new Composite(parent, SWT.BORDER);
+	    compositeBottom.setLayout(new FillLayout());
+	    compositeBottom.setLayoutData(gridData);
+	    
+	    createUITree(compositeBottom);
+	}
+	
+	protected abstract void createUITree(Composite parent);
+	
+	private void setInfoLabel() {
+		Configuration configuration = configurationEditor.getConfiguration();
+		final boolean valid = configuration .isValid();
+		StringBuilder sb = new StringBuilder();
+		sb.append(valid ? "valid, " : "invalid, ");
+		long number = configuration.number();
+		if (number < 0) {
+			sb.append("more than ");
+			sb.append(-1 - number);
+		} else {
+			sb.append(number);
+		}
+		sb.append(" possible configurations");
+
+		infoLabel.setText(sb.toString());
+		infoLabel.setForeground(valid ? blue : red);
 	}
 	
 	@Override
@@ -221,18 +308,17 @@ public abstract class ConfigurationEditorPage extends EditorPart implements ICon
 		}
 		return false;
 	}
-	
-	protected abstract TreeItem getRoot();
 
+	protected abstract TreeItem getRoot();
 	protected abstract void updateTree();
-	protected abstract void refreshTree();
 	
 	protected ConfigurationTreeWalker getDefaultTreeWalker() {
 		return null;
 	}
 	
-	protected void refreshItems() {
+	protected void refreshTree() {
 		colorFeatureNames.clear();
+		setInfoLabel();
 		walkTree(getDefaultTreeWalker());
 		computeColoring();
 	}
@@ -288,19 +374,43 @@ public abstract class ConfigurationEditorPage extends EditorPart implements ICon
 	protected final void walkTree(ConfigurationTreeWalker walker) {
 		walkTree(getRoot(), walker);
 	}
-
+	
+	private static class StackItem {
+		public int counter = 0;
+		public final TreeItem[] treeItems;
+		
+		public StackItem(TreeItem[] treeItems) {
+			this.treeItems = treeItems;
+		}
+		
+		public TreeItem getNext() {
+			return treeItems[counter++];
+		}
+		
+		public boolean hasNext() {
+			return counter < treeItems.length;
+		}
+	}
+	
 	protected final void walkTree(TreeItem item, ConfigurationTreeWalker walker) {
 		if (walker == null) {
 			return;
 		}
-		for (TreeItem child : item.getItems()) {
-			final Object data = child.getData();
-			if (data instanceof SelectableFeature) {
+		final LinkedList<StackItem> stack = new LinkedList<StackItem>();
+		stack.push(new StackItem(item.getItems()));
+		while (!stack.isEmpty()) {
+			final StackItem stackItem = stack.peek();
+			if (stackItem.hasNext()) {
+				TreeItem child = stackItem.getNext();
+				final Object data = child.getData();
 				final SelectableFeature feature = (SelectableFeature) data;
-				if (walker.visitTreeItem(child, feature)) {
-					walkTree(child, walker);
+				walker.visitTreeItem(child, feature);
+				if (child.getItemCount() > 0) {
+					stack.push(new StackItem(child.getItems()));
 				}
+			} else {
+				stack.pop();
 			}
 		}
-	}	
+	}
 }

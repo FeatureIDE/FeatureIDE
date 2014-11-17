@@ -79,10 +79,9 @@ public class ConfigurationPage extends ConfigurationEditorPage {
 	private Tree tree;
 	
 	private boolean selectionCanChange = true;
-
-	@Override
-	public void createPartControl(Composite parent) {
-		tree = new Tree(parent, SWT.BORDER | SWT.CHECK);
+	
+	protected void createUITree(Composite parent) {
+		tree = new Tree(parent, SWT.CHECK);
 		tree.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
@@ -112,7 +111,8 @@ public class ConfigurationPage extends ConfigurationEditorPage {
 			final Configuration configuration = configurationEditor.getConfiguration();
 			tree.removeAll();
 			TreeItem root = new TreeItem(tree, 0);
-			root.setData(configuration.getRoot().getName());
+			root.setText(configuration.getRoot().getName());
+			root.setData(configuration.getRoot());
 			add(root, configuration.getRoot().getChildren());
 			root.setGrayed(true);
 			root.setExpanded(true);
@@ -136,14 +136,7 @@ public class ConfigurationPage extends ConfigurationEditorPage {
 			}
 		}
 	}
-	
-	@Override
-	protected void refreshTree() {
-		TreeItem root = tree.getItem(0);
-		root.setText(AdvancedConfigurationLabelProvider.getRootlabel(configurationEditor.getConfiguration()));
-		refreshItems();
-	}	
-	
+
 	@Override
 	protected TreeItem getRoot() {
 		return tree.getItem(0);

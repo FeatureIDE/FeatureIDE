@@ -28,7 +28,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 
 import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -38,8 +37,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
  * 
  * @author Thomas Thuem
  */
-public class AdvancedConfigurationLabelProvider extends ColumnLabelProvider
-		implements GUIDefaults {
+public class AdvancedConfigurationLabelProvider extends ColumnLabelProvider implements GUIDefaults {
 
 	private static HashMap<String, Image> combinedImages = new HashMap<String, Image>();
 
@@ -47,63 +45,40 @@ public class AdvancedConfigurationLabelProvider extends ColumnLabelProvider
 	public String getText(Object o) {
 		if (o instanceof SelectableFeature) {
 			SelectableFeature feature = (SelectableFeature) o;
-			if (feature.getParent() == null) {
-				return getRootlabel(feature.getConfiguration());
-			}
 			return feature.getFeature().getDisplayName();
 		}
 		return o.toString();
 	}
-
-	public static String getRootlabel(Configuration configuration) {
-		String s = configuration.isValid() ? "valid" : "invalid";
-		s += ", ";
-		long number = configuration.number();
-		if (number < 0)
-			s += "more than " + (-1 - number);
-		else
-			s += number;
-		s += " possible configurations";
-		return configuration.getRoot().getName() + " (" + s + ")";
-	}
-
+	
 	@Override
 	public Image getImage(Object o) {
-		if (!(o instanceof SelectableFeature))
+		if (!(o instanceof SelectableFeature)) {
 			return null;
-		Image image1, image2;
+		}
+		final SelectableFeature selFeature = (SelectableFeature) o;
+		final Feature feature = selFeature.getFeature();
+		
+		final Image image1 = getConnectionImage(feature);
+		final Image image2 = getSelectionImage(selFeature);
 
-		int distance = 5;
+		final ImageData imageData1 = image1.getImageData();
+		final ImageData imageData2 = image2.getImageData();
 
-		SelectableFeature selFeature = (SelectableFeature) o;
-		Feature feature = selFeature.getFeature();
+		final String imageString = image1.toString() + image2.toString();
 
-		image1 = getConnectionImage(feature);
-		image2 = getSelectionImage(selFeature);
+		final Image combinedImage = combinedImages.get(imageString);
+		if (combinedImage == null) {
+			final int distance = 5;
+			final Image mergeImage = new Image(image1.getDevice(), imageData2.width * 2 + distance, imageData1.height);
 
-		ImageData imageData1 = image1.getImageData();
-		ImageData imageData2 = image2.getImageData();
-
-		Image mergeImage = new Image(image1.getDevice(), imageData2.width * 2
-				+ distance, imageData1.height);
-
-		String image1ToString = image1.toString();
-		String image2ToString = image2.toString();
-
-		if (!combinedImages.containsKey(image1ToString + image2ToString)) {
-
-			GC gc = new GC(mergeImage);
+			final GC gc = new GC(mergeImage);
 
 			if (image1.equals(IMG_MANDATORY) || image1.equals(IMG_OPTIONAL)) {
-				gc.drawImage(image1, 0, 0, imageData1.width, imageData1.height,
-						3, 3, imageData1.width, imageData1.height);
+				gc.drawImage(image1, 0, 0, imageData1.width, imageData1.height, 3, 3, imageData1.width, imageData1.height);
 			} else {
-				gc.drawImage(image1, 0, 0, imageData1.width, imageData1.height,
-						0, 0, imageData1.width, imageData1.height);
+				gc.drawImage(image1, 0, 0, imageData1.width, imageData1.height, 0, 0, imageData1.width, imageData1.height);
 			}
-			gc.drawImage(image2, 0, 0, imageData2.width, imageData2.height,
-					imageData1.width + distance, 0, imageData2.width,
-					imageData2.height);
+			gc.drawImage(image2, 0, 0, imageData2.width, imageData2.height, imageData1.width + distance, 0, imageData2.width, imageData2.height);
 
 			gc.dispose();
 
@@ -111,10 +86,10 @@ public class AdvancedConfigurationLabelProvider extends ColumnLabelProvider
 				image1.dispose();
 			}
 
-			combinedImages.put(image1ToString + image2ToString, mergeImage);
+			combinedImages.put(imageString, mergeImage);
 			return mergeImage;
 		}
-		return combinedImages.get(image1ToString + image2ToString);
+		return combinedImage;
 	}
 
 	private Image getConnectionImage(Feature feature) {
@@ -123,7 +98,6 @@ public class AdvancedConfigurationLabelProvider extends ColumnLabelProvider
 				if (feature.getParent().isOr()) {
 					return IMG_OR;
 				}
-
 				if (feature.getParent().isAlternative()) {
 					return IMG_XOR;
 				}
@@ -133,19 +107,17 @@ public class AdvancedConfigurationLabelProvider extends ColumnLabelProvider
 			}
 			return IMG_OPTIONAL;
 		}
-		Image i = new Image(null, IMG_MANDATORY.getImageData().width,
-				IMG_MANDATORY.getImageData().height);
-		return i;
+		return new Image(null, IMG_MANDATORY.getImageData().width, IMG_MANDATORY.getImageData().height);
 	}
 
 	private Image getSelectionImage(SelectableFeature feat) {
-		if (feat.getAutomatic() != Selection.UNDEFINED)
-			return feat.getAutomatic() == Selection.SELECTED ? IMAGE_ASELECTED
-					: IMAGE_ADESELECTED;
-		if (feat.getManual() == Selection.UNDEFINED)
+		if (feat.getAutomatic() != Selection.UNDEFINED) {
+			return feat.getAutomatic() == Selection.SELECTED ? IMAGE_ASELECTED : IMAGE_ADESELECTED;
+		}
+		if (feat.getManual() == Selection.UNDEFINED) {
 			return IMAGE_UNDEFINED;
-		return feat.getManual() == Selection.SELECTED ? IMAGE_SELECTED
-				: IMAGE_DESELECTED;
+		}
+		return feat.getManual() == Selection.SELECTED ? IMAGE_SELECTED : IMAGE_DESELECTED;
 	}
 
 	@Override
@@ -162,8 +134,7 @@ public class AdvancedConfigurationLabelProvider extends ColumnLabelProvider
 			String describ = feature.getFeature().getDescription();
 
 			if (describ != null && !relConst.equals("")) {
-				return "Description:\n" + describ + "\n\nConstraints:\n"
-						+ relConst;
+				return "Description:\n" + describ + "\n\nConstraints:\n" + relConst;
 			}
 			if (describ != null && relConst.equals("")) {
 				return "Description:\n" + describ;
