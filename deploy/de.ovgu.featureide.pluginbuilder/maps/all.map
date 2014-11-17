@@ -30,5 +30,5 @@ fragment@de.ovgu.featureide.ui_test=COPY,/home/itidbrun/TeamCity/buildAgent/work
 feature@br.ufal.ic.colligens.feature=COPY,/home/itidbrun/TeamCity/buildAgent/work/featureide/deploy,br.ufal.ic.colligens.feature
 plugin@br.ufal.ic.colligens=COPY,/home/itidbrun/TeamCity/buildAgent/work/featureide/plugins,br.ufal.ic.colligens
 feature@de.ovgu.featureide.munge.android=COPY,/home/itidbrun/TeamCity/buildAgent/work/featureide/deploy,de.ovgu.featureide.munge.android
-plugin@de.ovgu.featureide.core.munge.android=COPY,/home/itidbrun/TeamCity/buildAgent/work/featureide/plugins,de.ovgu.featureide.core.munge.android
 plugin@de.ovgu.featureide.ui.android=COPY,/home/itidbrun/TeamCity/buildAgent/work/featureide/plugins,de.ovgu.featureide.ui.android
+plugin@de.ovgu.featureide.core.munge.android=COPY,/home/itidbrun/TeamCity/buildAgent/work/featureide/plugins,de.ovgu.featureide.core.munge.android
