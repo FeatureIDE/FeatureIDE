@@ -191,8 +191,8 @@ public class FeatureStubsGenerator {
 									if (curSig.getFeatureData()[i].getId() == featureID && curSig.getName().equals(meth.getName())
 											&& curSig.getFeatureData()[i].getLineNumber() == meth.getLine()) {
 										if (curSig.getFeatureData()[i].usesExternMethods()) {
-											JOptionPane.showMessageDialog(null, "The method\n"	+ curSig.getFullName() + "\nis not defined within the currently checked SPL. Therefore the process will be aborted.",
-															"Unknown method", JOptionPane.OK_OPTION);
+											FeatureHouseCorePlugin.getDefault().logError("The method\n"	+ curSig.getFullName() + "\nis not defined within the currently checked SPL. Therefore the process will be aborted."
+															, null);
 											return;
 										}
 										
