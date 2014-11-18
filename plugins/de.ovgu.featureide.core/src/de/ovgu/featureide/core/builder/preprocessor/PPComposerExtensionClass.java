@@ -428,11 +428,4 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 		}
 		return false;
 	}
-	
-	/**
-	 * False, until you implement it.
-	 */
-	public boolean supportsMigration() {
-		return false;
-	};
 }

@@ -387,4 +387,14 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 		this.featureProject.createBuilderMarker(featureProject
 				.getProject(), Warning, 0, IMarker.SEVERITY_WARNING);
 	}
+	
+	/**
+	 * Not supported until you implement it.
+	 */
+	@Override
+	public boolean supportsMigration()
+	{
+		return false;
+	}
+
 }
