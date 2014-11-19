@@ -49,7 +49,6 @@ import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.Selection;
-import de.ovgu.featureide.fm.core.configuration.SelectionNotPossibleException;
 
 /**
  * Builds different statistics from the {@link ProjectSignatures}.
@@ -198,11 +197,7 @@ public class PrintStatisticsJob extends AMonitorJob<PrintStatisticsJob.Arguments
 		
 		for (String featureName : allConcreteFeatures) {			
 			Configuration conf = new Configuration(defaultConf, fm, false);
-			try {
-				conf.setManual(featureName, Selection.SELECTED);
-			} catch(SelectionNotPossibleException e) {
-				conf.setAutomatic(featureName, Selection.SELECTED);
-			}
+			conf.setManual(featureName, Selection.SELECTED);
 			
 			curFeatureID = interfaceProject.getFeatureID(featureName);
 			contextFilter = new ContextFilter(IOConstants.buildNodeForFeature(featureName), interfaceProject);

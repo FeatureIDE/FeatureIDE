@@ -31,6 +31,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.FillLayout;
@@ -49,7 +51,10 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.progress.UIJob;
+import org.sat4j.specs.TimeoutException;
 
+import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.Configuration.ValidConfigJob;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
@@ -77,15 +82,17 @@ public abstract class ConfigurationEditorPage extends EditorPart implements ICon
 	static final Font treeItemSpecialFont = new Font(null, "Arial", 8, SWT.BOLD);
 	
 	protected final Set<String> colorFeatureNames = new HashSet<String>();
+	private final HashSet<SelectableFeature> invalidFeatures = new HashSet<SelectableFeature>();
 	
 	protected IConfigurationEditor configurationEditor = null;
 	protected ValidConfigJobManager validConfigJobManager = null;
 
-	private int index;
 	protected boolean dirty = false;
 	protected boolean initialized = false;
+
+	private int index;
 	
-	protected Label infoLabel;
+	private Label infoLabel;
 	
 	public void setDirty() {
 		dirty = true;
@@ -185,11 +192,11 @@ public abstract class ConfigurationEditorPage extends EditorPart implements ICon
 		gridData.grabExcessHorizontalSpace = true;
 		gridData.grabExcessVerticalSpace = false;
 		gridData.verticalAlignment = SWT.TOP;
-	    gridLayout = new GridLayout(3, false);
+	    gridLayout = new GridLayout(2, false);
 		gridLayout.marginHeight = 0;
 		gridLayout.marginWidth = 0;
 		gridLayout.marginLeft = 4;
-		Composite compositeTop = new Composite(parent, SWT.NONE);
+		final Composite compositeTop = new Composite(parent, SWT.NONE);
 	    compositeTop.setLayout(gridLayout);
 	    compositeTop.setLayoutData(gridData);
 	    
@@ -202,21 +209,38 @@ public abstract class ConfigurationEditorPage extends EditorPart implements ICon
 	    infoLabel.setLayoutData(gridData);
 	    setInfoLabel();
 		
-		// button 2
+		// autoselect button 
 		gridData = new GridData();
 		gridData.horizontalAlignment = SWT.RIGHT;
 		gridData.verticalAlignment = SWT.CENTER;
-		Button b2 = new Button(compositeTop, SWT.TOGGLE);
-		b2.setText("Autoselect Features");
-		b2.setLayoutData(gridData);
+		final Button autoSelectButton = new Button(compositeTop, SWT.TOGGLE);
+		autoSelectButton.setText("Autoselect Features");
+		autoSelectButton.setLayoutData(gridData);
+		autoSelectButton.setSelection(true);
 		
-	    // button 1
-	    gridData = new GridData();
-		gridData.horizontalAlignment = SWT.RIGHT;
-		gridData.verticalAlignment = SWT.CENTER;
-		Button b1 = new Button(compositeTop, SWT.PUSH);
-		b1.setText("Compute Undifiend Features");
-		b1.setLayoutData(gridData);
+		autoSelectButton.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				final Configuration config = configurationEditor.getConfiguration();
+				boolean oldPropagate = config.isPropagate();
+				if (oldPropagate) {
+					invalidFeatures.clear();
+					config.setPropagate(false);
+					config.makeManual(canDeselectFeatures());
+					refreshTree();
+				} else {
+					if (invalidFeatures.isEmpty()) {
+						config.setPropagate(true);
+						computeFeatures();
+					} else {
+						autoSelectButton.setSelection(false);
+					}
+				}
+			}
+			
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {}
+		});
 		
 		// 2. sub composite
 		gridData = new GridData();
@@ -224,11 +248,16 @@ public abstract class ConfigurationEditorPage extends EditorPart implements ICon
 		gridData.verticalAlignment = SWT.FILL;
 		gridData.grabExcessHorizontalSpace = true;
 		gridData.grabExcessVerticalSpace = true;
-	    Composite compositeBottom = new Composite(parent, SWT.BORDER);
+		final Composite compositeBottom = new Composite(parent, SWT.BORDER);
 	    compositeBottom.setLayout(new FillLayout());
 	    compositeBottom.setLayoutData(gridData);
 	    
 	    createUITree(compositeBottom);
+	}
+	
+	private void computeFeatures() {
+		configurationEditor.getConfiguration().updateAutomaticValues(true);
+		refreshTree();
 	}
 	
 	protected abstract void createUITree(Composite parent);
@@ -246,6 +275,9 @@ public abstract class ConfigurationEditorPage extends EditorPart implements ICon
 			sb.append(number);
 		}
 		sb.append(" possible configurations");
+		if (number == 0 && !configuration.isPropagate()) {
+			sb.append(" - Autoselect not possible!");
+		}
 
 		infoLabel.setText(sb.toString());
 		infoLabel.setForeground(valid ? blue : red);
@@ -261,31 +293,53 @@ public abstract class ConfigurationEditorPage extends EditorPart implements ICon
 	}
 	
 	protected boolean errorMessage(Tree tree) {
-		if (configurationEditor.getConfiguration() == null 
-				|| (!configurationEditor.getConfiguration().isValid() && configurationEditor.getConfiguration().number() == 0)) {
-			tree.removeAll();
-			TreeItem item = new TreeItem(tree, 1);
+		if (configurationEditor.getConfiguration() == null) {
 			if (configurationEditor.getModelFile() == null) {
-				item.setText("There is no feature model corresponding to this configuration, reopen the editor and select one.");
+				displayError(tree, "There is no feature model corresponding to this configuration, reopen the editor and select one.");
 			} else if (!configurationEditor.getModelFile().exists()) {
-				// This case should never happen
-				item.setText("The given feature model " + configurationEditor.getModelFile().getPath() + " does not exist.");
+				displayError(tree, "The given feature model " + configurationEditor.getModelFile().getPath() + " does not exist.");
 			} else {
-				item.setText("The feature model for this project is void, i.e., " + "there is no valid configuration. You need to correct the " + "feature model before you can create or edit configurations.");
+				displayError(tree, "An unknown error occurred.");
 			}
-			tree.getItem(0).setImage(0,FMUIPlugin.getDefault()
-					.getWorkbench().getSharedImages().getImage
-					(ISharedImages.IMG_OBJS_ERROR_TSK));
-			dirty = false;
-			item.setChecked(true);
-			item.setGrayed(true);
 			return false;
+		} else {
+			final Configuration configuration = configurationEditor.getConfiguration();
+			final FeatureModel configFeatureModel = configuration.getFeatureModel();
+			FeatureModelAnalyzer analyzer = configFeatureModel.getAnalyser();
+			try {
+				if (!analyzer.isValid()) {
+					displayError(tree, "The feature model for this project is void, i.e., there is no valid configuration. You need to correct the feature model before you can create or edit configurations.");
+					return false;
+				}
+			} catch (TimeoutException e) {
+				FMUIPlugin.getDefault().logError(e);
+			}
+
 		}
 		return true;
 	}
 	
+	private void displayError(Tree tree, String message) {
+		tree.removeAll();
+		TreeItem item = new TreeItem(tree, 1);
+		item.setText(message);
+		item.setImage(0, FMUIPlugin.getDefault().getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJS_ERROR_TSK));
+		item.setChecked(true);
+		item.setGrayed(true);
+		dirty = false;
+	}
+	
 	protected void set(SelectableFeature feature, Selection selection) {
-		configurationEditor.getConfiguration().setManual(feature, selection);
+		final Configuration config = configurationEditor.getConfiguration();
+		config.setManual(feature, selection);
+		
+		if (!config.isPropagate()) {
+			if (config.canBeValid()) {
+				invalidFeatures.clear();
+			} else {
+				invalidFeatures.add(feature);
+			}
+		}
 	}
 	
 	protected boolean changeSelection(SelectableFeature feature) {
@@ -316,11 +370,17 @@ public abstract class ConfigurationEditorPage extends EditorPart implements ICon
 		return null;
 	}
 	
+	protected boolean canDeselectFeatures() {
+		return false;
+	}
+	
 	protected void refreshTree() {
 		colorFeatureNames.clear();
 		setInfoLabel();
 		walkTree(getDefaultTreeWalker());
-		computeColoring();
+		if (configurationEditor.getConfiguration().isPropagate()) {
+			computeColoring();
+		}
 	}
 	
 	/**

@@ -158,6 +158,11 @@ public class AdvancedConfigurationPage extends ConfigurationEditorPage {
 		return treeWalker;
 	}
 	
+	@Override
+	protected boolean canDeselectFeatures() {
+		return true;
+	}
+	
 	private void cycleSelection(SelectableFeature feature, boolean up) {
 		if (feature.getAutomatic() == Selection.UNDEFINED) {
 			switch (feature.getManual()) {

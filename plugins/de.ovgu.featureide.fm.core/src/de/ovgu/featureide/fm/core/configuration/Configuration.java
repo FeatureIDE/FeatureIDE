@@ -253,6 +253,27 @@ public class Configuration {
 		return false;
 	}
 	
+	public boolean canBeValid() {
+		final List<Node> children = new ArrayList<Node>();
+		
+		for (SelectableFeature feature : features) {
+			if (feature.getSelection() != Selection.UNDEFINED) {
+				children.add(new Literal(feature.getFeature().getName(), feature.getSelection() == Selection.SELECTED));
+			}
+		}
+		
+		final Node[] allFeatures = new Node[children.size() + 1];
+		children.toArray(allFeatures);
+		allFeatures[children.size()] = rootNode.clone();
+		
+		try {
+			return new SatSolver(new And(allFeatures), TIMEOUT).isSatisfiable();
+		} catch (TimeoutException e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+		return false;
+	}
+	
 	public ValidConfigJob leadToValidConfiguration(List<SelectableFeature> featureList) {
 		if (Preferences.defaultCompletion == Preferences.COMPLETION_ONE_CLICK && featureList.size() > FEATURE_LIMIT_FOR_DEFAULT_COMPLETION) {
 			return leadToValidConfiguration(featureList, Preferences.COMPLETION_OPEN_CLAUSES);
@@ -427,10 +448,21 @@ public class Configuration {
 		}
 	}
 	
+	
+	/**
+	 * Convenience method.
+	 * @return the values of number(250)
+	 * @see #number(long)
+	 */
 	public long number() {
 		return number(250);
 	}
 	
+	/**
+	 * Counts the number of possible solutions.
+	 * @return a positive value equal to the number of solutions (if the method terminated in time)</br>
+	 * 	or a negative value (if a timeout occured) that indicates that there are more solutions than the absolute value
+	 */
 	public long number(long timeout) {
 		final List<Node> children = new ArrayList<Node>();
 		
@@ -449,20 +481,16 @@ public class Configuration {
 	public void resetValues() {
 		for (SelectableFeature feature : features) {
 			feature.setManual(Selection.UNDEFINED);
+			feature.setAutomatic(Selection.UNDEFINED);
 		}
-		if (propagate) {
-			updateAutomaticValues();
-		} else {
-			resetAutomaticValues();
-		}
-	}
-	
-	public void setAutomatic(SelectableFeature feature, Selection selection) {
-		feature.setAutomatic(selection);
 		updateAutomaticValues();
 	}
 	
-	public void setAutomatic(String name, Selection selection) {
+	void setAutomatic(SelectableFeature feature, Selection selection) {
+		feature.setAutomatic(selection);
+	}
+	
+	void setAutomatic(String name, Selection selection) {
 		SelectableFeature feature = table.get(name);
 		if (feature == null) {
 			throw new FeatureNotFoundException();
@@ -490,7 +518,7 @@ public class Configuration {
 	public void setPropagate(boolean propagate) {
 		this.propagate = propagate;
 	}
-
+	
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -553,45 +581,80 @@ public class Configuration {
 		}
 	}
 	
-	private void updateAutomaticValues() {
+	/**
+	 * Turns all automatic into manual values
+	 * @param discardDeselected if {@code true} all automatic deselected features get undefined instead of manual deselected
+	 */
+	public void makeManual(boolean discardDeselected) {
+		if (propagate) {
+			return;
+		}
+		for (SelectableFeature feature : features) {
+			final Selection autoSelection = feature.getAutomatic();
+			if (autoSelection != Selection.UNDEFINED && (!discardDeselected || autoSelection == Selection.SELECTED)) {
+				feature.setAutomatic(Selection.UNDEFINED);
+				feature.setManual(autoSelection);
+			} else {
+				feature.setAutomatic(Selection.UNDEFINED);
+			}
+		}
+	}
+	
+	public void updateAutomaticValues() {
+		updateAutomaticValues(false);
+	}
+	
+	public void updateAutomaticValues(boolean updateManual) {
 		if (!propagate) {
 			return;
 		}
 		resetAutomaticValues();
 		
-		Node[] nodeArray = createNodeArray(createNodeList(), rootNode);
-		final SatSolver solver = new SatSolver(new And(nodeArray), TIMEOUT);
-		for (Literal literal : solver.knownValues()) {
-			SelectableFeature feature = table.get(literal.var);
-			if (feature != null) {
-				if (feature.getManual() == Selection.UNDEFINED) {
-					feature.setAutomatic(literal.positive ? Selection.SELECTED : Selection.UNSELECTED);
+		Node[] nodeArray = createNodeArray(createNodeList(), rootNode);		
+		final SatSolver automaticSolver = new SatSolver(new And(nodeArray), TIMEOUT);
+		
+		for (SelectableFeature feature : features) {
+			if (feature.getManual() == Selection.UNDEFINED) {
+				Literal l = new Literal(feature.getFeature().getName(), true);
+				try {
+					if (!automaticSolver.isSatisfiable(l)) {
+						feature.setAutomatic(Selection.UNSELECTED);
+					} else {
+						l = new Literal(feature.getFeature().getName(), false);
+						if (!automaticSolver.isSatisfiable(l)) {
+							feature.setAutomatic(Selection.SELECTED);
+						} else {
+							feature.setAutomatic(Selection.UNDEFINED);
+						}
+					}
+				} catch (TimeoutException e) {
+					e.printStackTrace();
 				}
 			}
 		}
 		
-		final List<Node> children = new ArrayList<Node>();
-		boolean calculateHiddenFeatures = false;
-		
-		for (SelectableFeature feature : features) {
-			if (feature.getFeature().hasHiddenParent()) {
-				calculateHiddenFeatures = true;
-			} else {
-				children.add(new Literal(feature.getFeature().getName(), feature.getSelection() == Selection.SELECTED));
-			}
-		}
-		
-		if (calculateHiddenFeatures) {
-			nodeArray = createNodeArray(children, rootNode);
-			final SatSolver hiddenSolver = new SatSolver(new And(nodeArray), TIMEOUT);
-			for (Literal literal : hiddenSolver.knownValues()) {
-				SelectableFeature feature = table.get(literal.var);
-				if (feature != null) {
-					if (feature.getManual() == Selection.UNDEFINED && feature.getFeature().hasHiddenParent()) {
-						feature.setAutomatic(literal.positive ? Selection.SELECTED : Selection.UNSELECTED);
+		if (updateManual) {
+			Node[] manualSelectedArray = new Node[nodeArray.length - 1];
+			System.arraycopy(nodeArray, 0, manualSelectedArray, 0, manualSelectedArray.length);
+			final SatSolver manualSolver = new SatSolver(rootNode, TIMEOUT);
+			
+			for (int i = 0; i < manualSelectedArray.length; i++) {
+				Literal l = (Literal) manualSelectedArray[i];
+				try {
+					if (!manualSolver.isSatisfiable(manualSelectedArray)) {
+						table.get(l.var).setAutomatic(l.positive ? Selection.UNSELECTED : Selection.SELECTED);
+					} else {
+						l.positive = !l.positive;
+						if (!manualSolver.isSatisfiable(manualSelectedArray)) {
+							table.get(l.var).setAutomatic(l.positive ? Selection.UNSELECTED : Selection.SELECTED);
+						}
+						l.positive = !l.positive;
 					}
+				} catch (TimeoutException e) {
+					e.printStackTrace();
 				}
 			}
 		}
 	}
+	
 }
