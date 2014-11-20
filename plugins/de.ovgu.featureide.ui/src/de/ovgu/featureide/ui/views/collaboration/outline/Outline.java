@@ -88,6 +88,8 @@ import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePageContextMenu;
 import de.ovgu.featureide.fm.ui.views.outline.FmTreeContentProvider;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
+import de.ovgu.featureide.ui.views.outline.ContextOutlineLabelProvider;
+import de.ovgu.featureide.ui.views.outline.ContextOutlineTreeContentProvider;
 
 /**
  * Another outline view displaying the same information as the collaboration
@@ -438,6 +440,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 		addContentProv(new NotAvailableContentProv(), new NotAvailableLabelProv());
 		addContentProv(new CollaborationOutlineTreeContentProvider(), new CollaborationOutlineLabelProvider());
 		addContentProv(new FmTreeContentProvider(), new FMOutlineLabelProviderWrapper());
+		addContentProv(new ContextOutlineTreeContentProvider(), new ContextOutlineLabelProvider());
 
 		checkForExtensions();
 

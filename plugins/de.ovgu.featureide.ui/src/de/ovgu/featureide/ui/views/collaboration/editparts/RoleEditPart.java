@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.editparts;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeSet;
 
