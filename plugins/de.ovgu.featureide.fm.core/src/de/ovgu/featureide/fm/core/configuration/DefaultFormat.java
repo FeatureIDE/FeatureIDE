@@ -41,6 +41,9 @@ public class DefaultFormat extends ConfigurationFormat {
 
 	public List<ConfigurationReader.Warning> read(BufferedReader reader, Configuration configuration) throws IOException {
 		List<ConfigurationReader.Warning> warnings = new LinkedList<ConfigurationReader.Warning>();
+
+		boolean orgPropagate = configuration.isPropagate();
+		configuration.setPropagate(false);
 		configuration.resetValues();
 		String line = null;
 		int lineNumber = 1;
@@ -102,6 +105,8 @@ public class DefaultFormat extends ConfigurationFormat {
 			}
 			lineNumber++;
 		}
+		configuration.setPropagate(orgPropagate);
+		configuration.updateAutomaticValues();
 		return warnings;
 	}
 
