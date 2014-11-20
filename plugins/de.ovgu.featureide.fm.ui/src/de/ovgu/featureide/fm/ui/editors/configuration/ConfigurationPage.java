@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.configuration;
 
+import java.util.LinkedList;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -122,17 +124,50 @@ public class ConfigurationPage extends ConfigurationEditorPage {
 		}
 	}
 	
+	private static class StackItem {
+		public int counter = 0;
+		public final TreeItem curTreeItem;
+		public final TreeElement[] treeElements;
+		
+		public StackItem(TreeItem curTreeItem, TreeElement[] treeElements) {
+			this.curTreeItem = curTreeItem;
+			this.treeElements = treeElements;
+		}
+		
+		public TreeItem getCurTreeItem() {
+			return curTreeItem;
+		}
+
+		public TreeElement getNext() {
+			return treeElements[counter++];
+		}
+		
+		public boolean hasNext() {
+			return counter < treeElements.length;
+		}
+	}
+	
 	private void add(TreeItem parent, TreeElement[] children) {
-		for (TreeElement child : children) {
-			if (child instanceof SelectableFeature) {
-				final SelectableFeature currentFeature = (SelectableFeature) child;
-				if (!currentFeature.getFeature().isHidden()) {
-					TreeItem item = new TreeItem(parent, 0);
-					item.setText(currentFeature.getFeature().getDisplayName());
-					item.setData(currentFeature);
-					add(item, currentFeature.getChildren());
-					item.setExpanded(true);
+		final LinkedList<StackItem> stack = new LinkedList<StackItem>();
+		stack.push(new StackItem(parent, children));
+		while (!stack.isEmpty()) {
+			final StackItem stackItem = stack.peek();
+			if (stackItem.hasNext()) {
+				TreeElement child = stackItem.getNext();
+				if (child instanceof SelectableFeature) {
+					final SelectableFeature currentFeature = (SelectableFeature) child;
+					if (!currentFeature.getFeature().isHidden()) {
+						TreeItem item = new TreeItem(stackItem.getCurTreeItem(), 0);
+						item.setText(currentFeature.getFeature().getDisplayName());
+						item.setData(currentFeature);
+						if (child.hasChildren()) {
+							stack.push(new StackItem(item, currentFeature.getChildren()));
+						}
+					}
 				}
+			} else {
+				stackItem.getCurTreeItem().setExpanded(true);
+				stack.pop();
 			}
 		}
 	}
