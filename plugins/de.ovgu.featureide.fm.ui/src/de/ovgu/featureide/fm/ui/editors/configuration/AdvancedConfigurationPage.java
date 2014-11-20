@@ -87,8 +87,7 @@ public class AdvancedConfigurationPage extends ConfigurationEditorPage {
 					if (item != null) {
 						Object data = item.getData();
 						if (data instanceof SelectableFeature) {
-							final SelectableFeature feature = (SelectableFeature) data;
-							changeSelection(feature, e.button == 1);
+							changeSelection(item, e.button == 1);
 						}
 					}
 				}
@@ -146,6 +145,12 @@ public class AdvancedConfigurationPage extends ConfigurationEditorPage {
 	protected void refreshTree() {
 		super.refreshTree();
 		viewer.refresh();
+	}
+	
+	@Override
+	protected void refreshItem(TreeItem item, SelectableFeature feature) {
+		super.refreshItem(item, feature);
+		viewer.update(feature, null);
 	}
 	
 	@Override

@@ -94,7 +94,7 @@ public class ConfigurationPage extends ConfigurationEditorPage {
 						// case: grayed and unselected
 						item.setChecked(false);
 					} else if (selectionCanChange) {
-						changeSelection((SelectableFeature)item.getData());
+						changeSelection(item);
 					}
 				}
 			}
@@ -148,9 +148,9 @@ public class ConfigurationPage extends ConfigurationEditorPage {
 	}
 	
 	@Override
-	protected boolean changeSelection(SelectableFeature feature, boolean select) {
+	protected boolean changeSelection(TreeItem item, boolean select) {
 		selectionCanChange = false;
-		final boolean result = super.changeSelection(feature, select);
+		final boolean result = super.changeSelection(item, select);
 		selectionCanChange = true;
 		return result;
 	}

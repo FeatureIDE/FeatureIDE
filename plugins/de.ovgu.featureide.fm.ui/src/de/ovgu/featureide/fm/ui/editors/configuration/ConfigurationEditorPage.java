@@ -342,11 +342,12 @@ public abstract class ConfigurationEditorPage extends EditorPart implements ICon
 		}
 	}
 	
-	protected boolean changeSelection(SelectableFeature feature) {
-		return changeSelection(feature, true);
+	protected boolean changeSelection(TreeItem item) {
+		return changeSelection(item, true);
 	}
 	
-	protected boolean changeSelection(SelectableFeature feature, boolean select) {
+	protected boolean changeSelection(TreeItem item, boolean select) {
+		SelectableFeature feature = (SelectableFeature)item.getData();
 		if (feature.getAutomatic() == Selection.UNDEFINED) {
 			switch (feature.getManual()) {
 			case SELECTED: set(feature, (select) ? Selection.UNDEFINED : Selection.UNSELECTED);  break;
@@ -357,7 +358,11 @@ public abstract class ConfigurationEditorPage extends EditorPart implements ICon
 			if (!dirty) {
 				setDirty();
 			}
-			refreshTree();
+			if (configurationEditor.getConfiguration().isPropagate()) {
+				refreshTree();
+			} else {
+				refreshItem(item, feature);
+			}
 			return true;
 		}
 		return false;
@@ -381,6 +386,14 @@ public abstract class ConfigurationEditorPage extends EditorPart implements ICon
 		if (configurationEditor.getConfiguration().isPropagate()) {
 			computeColoring();
 		}
+	}
+	
+	protected void refreshItem(TreeItem item, SelectableFeature feature) {
+		ConfigurationTreeWalker walker = getDefaultTreeWalker();
+		if (walker != null) {
+			walker.visitTreeItem(item, feature);
+		}
+		setInfoLabel();
 	}
 	
 	/**
