@@ -181,7 +181,9 @@ public class FeatureStubsGenerator {
 							return;
 						}
 						StringBuilder fileTextSB = new StringBuilder(fileText.substring(0, lastIndexOf));
+						
 						for (FSTMethod meth : role.getClassFragment().getMethods()) {
+							boolean contractChanged = false;
 							final SignatureIterator sigIterator = signatures.createIterator();
 							sigIterator.addFilter(new MethodFilter());
 
@@ -191,8 +193,7 @@ public class FeatureStubsGenerator {
 									if (curSig.getFeatureData()[i].getId() == featureID && curSig.getName().equals(meth.getName())
 											&& curSig.getFeatureData()[i].getLineNumber() == meth.getLine()) {
 										if (curSig.getFeatureData()[i].usesExternMethods()) {
-											FeatureHouseCorePlugin.getDefault().logError("The method\n"	+ curSig.getFullName() + "\nis not defined within the currently checked SPL. Therefore the process will be aborted."
-															, null);
+											FeatureHouseCorePlugin.getDefault().logError("The method\n"	+ curSig.getFullName() + "\nis not defined within the currently checked SPL. Therefore the process will be aborted." , null);
 											return;
 										}
 										
@@ -201,6 +202,7 @@ public class FeatureStubsGenerator {
 										}
 
 										if (meth.hasContract() && meth.getContract().contains("\\original")) {
+											contractChanged = true;
 											fileTextSB = checkForOriginalInContract(fileTextSB, curSig);
 										}
 										
@@ -222,10 +224,14 @@ public class FeatureStubsGenerator {
 												}
 											}
 										}
+										if (!contractChanged && meth.hasContract()) {
+											fileTextSB =transformIntoAbstractContract(fileTextSB, curSig);
+										}
 									}
 								}
 							}
 						}
+						
 						fileTextSB.append(fileText.substring(lastIndexOf));
 						writeToFile(file, fileTextSB);
 					}
@@ -375,6 +381,61 @@ public class FeatureStubsGenerator {
 		return new StringBuilder(tmpFileText);
 	}
 
+	private StringBuilder transformIntoAbstractContract(StringBuilder fileTextSB, AbstractSignature curSig) { 
+		int indexOfBody = fileTextSB.toString().lastIndexOf(curSig.toString().trim());
+		if (indexOfBody < 1) {
+			indexOfBody = fileTextSB.toString().lastIndexOf(" " + curSig.getName()+"(");
+		}
+		String tmpText = fileTextSB.substring(0, indexOfBody);
+		int indexOfStartOfContract = tmpText.lastIndexOf("/*@");
+		String contractBody = "";
+		while (!(contractBody.contains("ensures") || contractBody.contains("requires") || contractBody.contains("assignable"))) {
+			if (!contractBody.isEmpty()) {
+				indexOfStartOfContract = fileTextSB.substring(0, fileTextSB.indexOf(contractBody) - 2).lastIndexOf("/*@");
+			}
+			if (indexOfStartOfContract < 0) {
+				return null;
+			}
+			contractBody = fileTextSB.substring(indexOfStartOfContract);
+		}
+		contractBody = contractBody.substring(0, contractBody.indexOf("*/"));
+		StringBuilder ensures = new StringBuilder(), requires = new StringBuilder(), assignable = new StringBuilder();
+		String [] contracts = contractBody.split("\n");
+		for (int i = 0; i < contracts.length; i++) {
+			String line = contracts[i].replace("@", "").trim();
+			if (line.startsWith("requires")) {
+				i = aggregateClauses(requires, contracts, i, line);
+			} else if (line.startsWith("ensures")) {
+				i = aggregateClauses(ensures, contracts, i, line);
+			} else if (line.startsWith("assignable")) {
+				assignable.append(line.replace("assignable", ""));
+			}
+		}
+		String tmpFileText = fileTextSB.substring(0, indexOfStartOfContract) + "/*@\n"
+				+ "\t@ requires_abs   " + curSig.getName() + "R;\n" + ((requires.length() != 0) ? "\t@ def " + curSig.getName() + "R = " + requires.toString().replace(";", "") + ";\n" : "") +
+				"\t@ ensures_abs " + curSig.getName() + "E;\n" + ((ensures.length() != 0) ? "\t@ def " + curSig.getName() + "E = " + ensures.toString().replace(";", "")  + ";\n" : "") + 
+				"\t@ assignable_abs " + curSig.getName() + "A;\n"+ ((assignable.length() != 0) ? "\t@ def " + curSig.getName() + "A = " + assignable.toString()  + "\n" : "") + 
+				"\t@" +
+				fileTextSB.substring(indexOfStartOfContract + contractBody.length());
+		return new StringBuilder(tmpFileText);
+	}
+
+	private int aggregateClauses(StringBuilder clause, String[] contracts, int i, String line) {
+		if (clause.length() > 0) {
+			clause.append(" && "); 
+		}
+		clause.append("(");
+		clause.append(line.substring(line.indexOf(" ")));
+		while (!line.endsWith(";")) {
+			line = contracts[++i].replace("@", "").trim();
+			clause.append(line);
+		} 
+		
+		clause.append(")");
+		return i;
+	}
+
+	
 	private StringBuilder checkForOriginal(StringBuilder fileTextSB, FSTMethod meth, AbstractSignature curSig,
 			final String featureName) {
 		final String absMethodName = curSig.toString();
