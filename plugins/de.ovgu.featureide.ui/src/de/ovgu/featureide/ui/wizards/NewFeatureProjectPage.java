@@ -38,6 +38,7 @@ import org.eclipse.swt.widgets.Text;
 
 import de.ovgu.featureide.core.builder.ComposerExtensionManager;
 import de.ovgu.featureide.core.builder.IComposerExtension;
+import de.ovgu.featureide.core.builder.IComposerExtensionBase;
 
 /**
  * A dialog page for creating FeatureIDE projects.
@@ -46,15 +47,16 @@ import de.ovgu.featureide.core.builder.IComposerExtension;
  */
 public class NewFeatureProjectPage extends WizardPage {
 
-	private IComposerExtension composerExtension = null;
-	private IComposerExtension[] extensions = null;
+	protected IComposerExtensionBase composerExtension = null;
+	protected IComposerExtensionBase[] extensions = null;
 	
-	private Text sourcePath, configsPath;
+	protected Text sourcePath;
+	protected Text configsPath;
 	protected Text buildPath;
 	
-	private Combo toolCB;
+	protected Combo toolCB;
 	protected GridData gd = new GridData(GridData.FILL_HORIZONTAL);
-	private GridLayout layout = new GridLayout();
+	protected GridLayout layout = new GridLayout();
 	protected Group pathGroup;
 	protected Label buildLabel;
 	private boolean canFlipToNextPage = true;
@@ -98,15 +100,15 @@ public class NewFeatureProjectPage extends WizardPage {
 	    StringBuilder descriptionStringBuilder = new StringBuilder();
 	    descriptionStringBuilder.append("Possible choices are:\n\n");
 	    List<IComposerExtension> composerExtensions = ComposerExtensionManager.getInstance().getComposers();
-	    extensions = new IComposerExtension[composerExtensions.size()]; 
+	    extensions = new IComposerExtensionBase[composerExtensions.size()]; 
 	    composerExtensions.toArray(extensions);
-	    Arrays.sort(extensions, new Comparator<IComposerExtension> () {
-			public int compare(IComposerExtension arg0, IComposerExtension arg1) {
+	    Arrays.sort(extensions, new Comparator<IComposerExtensionBase> () {
+			public int compare(IComposerExtensionBase arg0, IComposerExtensionBase arg1) {
 				return arg0.getName().compareTo(arg1.getName());
 			}
 	    });
 	    
-		for (IComposerExtension composerExtension : extensions) {
+		for (IComposerExtensionBase composerExtension : extensions) {
 			descriptionStringBuilder.append(composerExtension.getName());
 			descriptionStringBuilder.append(": ");
 			descriptionStringBuilder.append(composerExtension.getDescription());
@@ -166,7 +168,7 @@ public class NewFeatureProjectPage extends WizardPage {
 		addListeners();
 	}	
 	
-	public IComposerExtension getCompositionTool() {
+	public IComposerExtensionBase getCompositionTool() {
 		return composerExtension;
 	}
 	
@@ -174,7 +176,7 @@ public class NewFeatureProjectPage extends WizardPage {
 		return composerExtension != null;
 	}
 	
-	private void addListeners() {
+	protected void addListeners() {
 		toolCB.addModifyListener(new ModifyListener() {
 			
 			@Override
@@ -209,8 +211,7 @@ public class NewFeatureProjectPage extends WizardPage {
 	}
 	
 	protected void dialogChanged() {
-		IComposerExtension compositionTool = getCompositionTool();
-		compositionTool.loadComposerExtension();
+		IComposerExtensionBase compositionTool = getCompositionTool();
 		sourcePath.setEnabled(compositionTool.hasFeatureFolder());
 		buildPath.setEnabled(compositionTool.hasSourceFolder());
 		
@@ -237,10 +238,32 @@ public class NewFeatureProjectPage extends WizardPage {
 		if (isEnabled(buildPath) && isInvalidPath(getBuildPath(), "Build"))return;
 		if (isEnabled(configsPath) && isInvalidPath(getConfigPath(), "Equations"))return;
 		
+		if (compositionTool.supportsAndroid()) {
+			
+			canFlipToNextPage = false;
+			setErrorMessage(null);
+			setPageComplete(true);
+			
+			if (getSourcePath().equals("src") || getSourcePath().equals("res")) {
+				updateStatus("Source Path: \"src\" and \"res\" folders are reserved for Android.");
+				return;
+			}
+			if (getBuildPath().equals("src") || getBuildPath().equals("res")) {
+				updateStatus("Build Path: \"src\" and \"res\" folders are reserved for Android.");
+				return;
+			}
+			if (getConfigPath().equals("src") || getConfigPath().equals("res")) {
+				updateStatus("Config Path: \"src\" and \"res\" folders are reserved for Android.");
+				return;
+			}
+			
+			return;
+		}
+		
 		updateStatus(null);
 	}
 
-	private boolean isEnabled(Text text) {
+	protected boolean isEnabled(Text text) {
 		if (text.isEnabled() && text.isVisible()) {
 			return true;
 		}

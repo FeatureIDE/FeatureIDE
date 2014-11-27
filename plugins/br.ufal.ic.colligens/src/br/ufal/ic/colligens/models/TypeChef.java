@@ -30,10 +30,11 @@ import org.prop4j.Node;
 import org.prop4j.NodeWriter;
 
 import br.ufal.ic.colligens.activator.Colligens;
-import de.fosd.typechef.FrontendOptions;
-import de.fosd.typechef.FrontendOptionsWithConfigFiles;
 import de.fosd.typechef.TypeChefFrontend;
-import de.fosd.typechef.lexer.options.OptionException;
+import de.fosd.typechef.options.FrontendOptions;
+import de.fosd.typechef.options.FrontendOptionsWithConfigFiles;
+import de.fosd.typechef.options.OptionException;
+import de.fosd.typechef.options.Options;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
@@ -45,7 +46,6 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
 public class TypeChef {
 
 	private IProject project;
-	private FrontendOptions frontendOptions;
 	private boolean isFinish = false;
 	private List<FileProxy> fileProxies;
 
@@ -97,7 +97,7 @@ public class TypeChef {
 	 * @param fileProxy
 	 * @throws OptionException
 	 */
-	private void start(FileProxy fileProxy) throws OptionException {
+	private FrontendOptions getOptions(FileProxy fileProxy) throws OptionException {
 
 		ArrayList<String> paramters = new ArrayList<String>();
 
@@ -155,8 +155,11 @@ public class TypeChef {
 		}
 
 		paramters.add(fileProxy.getFileToAnalyse());
-
-		frontendOptions = new FrontendOptionsWithConfigFiles();
+		
+		//this static variable was changed, private to public, the jar typechef. 
+		Options.maxOptionId = 0;
+		
+		FrontendOptionsWithConfigFiles	frontendOptions = new FrontendOptionsWithConfigFiles();
 
 		String[] paramterArray = paramters
 				.toArray(new String[paramters.size()]);
@@ -164,6 +167,8 @@ public class TypeChef {
 		frontendOptions.parseOptions(paramterArray);
 
 		frontendOptions.setPrintToStdOutput(false);
+		
+		return frontendOptions;
 
 	}
 
@@ -210,14 +215,20 @@ public class TypeChef {
 
 				try {
 
-					this.start(fileProxy);
-
 					TypeChefFrontend typeChefFrontend = new TypeChefFrontend();
 
-					typeChefFrontend.processFile(frontendOptions, fileProxy);
+					typeChefFrontend.processFile(this.getOptions(fileProxy), fileProxy);
+					
+					this.isFinish = true;
+				} catch (OptionException e) {
+					e.printStackTrace();
+					// If the analysis is not performed correctly,
+					// and the analysis made ​​from the command line
+					this.startCommandLineMode(fileProxy);
 
 					this.isFinish = true;
-				} catch (Exception e) {
+				}
+				catch (Exception e) {
 					e.printStackTrace();
 					// If the analysis is not performed correctly,
 					// and the analysis made ​​from the command line

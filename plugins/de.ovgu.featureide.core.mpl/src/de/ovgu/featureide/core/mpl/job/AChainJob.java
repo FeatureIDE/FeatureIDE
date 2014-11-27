@@ -31,7 +31,7 @@ import de.ovgu.featureide.core.mpl.job.util.AJobArguments;
 import de.ovgu.featureide.core.mpl.job.util.IChainJob;
 
 /**
- * Abstract eclipse job which start another job when the work is finished.
+ * Abstract eclipse job which start another job when the work is done.
  * 
  * @author Sebastian Krieter
  */
@@ -65,7 +65,7 @@ abstract class AChainJob<T extends AJobArguments> extends Job implements IChainJ
 					AChainJob.this.status = status;
 				}
 				finalWork();
-			}
+;			}
 		}
 	}
 	
@@ -89,6 +89,9 @@ abstract class AChainJob<T extends AJobArguments> extends Job implements IChainJ
 		this.arguments = arguments;
 	}
 	
+	/**
+	 * dsad
+	 */
 	@SuppressWarnings("deprecation")
 	@Override
 	public IStatus run(IProgressMonitor monitor) {
@@ -118,6 +121,7 @@ abstract class AChainJob<T extends AJobArguments> extends Job implements IChainJ
 	
 	
 	private void finished() {
+		System.out.println();
 		synchronized (sequenceObject) {
 			if (sequenceObject != null) {
 				JobManager.startNextJob(sequenceObject);
@@ -126,11 +130,28 @@ abstract class AChainJob<T extends AJobArguments> extends Job implements IChainJ
 		}
 	}
 	
+	/**
+	 * Check whether the user has sent a cancel request for this job.
+	 * 
+	 * @return {@code true} if the job should be canceled
+	 */
 	protected final boolean checkCancel() {
 		return Thread.currentThread() == innerThread.thread;
 	}
-
+	
+	/**
+	 * In this method all the work of the job is done.
+	 * </br></br>
+	 * Implementing jobs should continuously call {@link #checkCancel()} and respond to a canceling request.
+	 * 
+	 * @return {@code true} if no error occurred during the process
+	 */
 	protected abstract boolean work();
+	
+	/**
+	 * This method is called after {@link #work()} is finished regardless whether it succeeded or not.
+	 * The default method is empty.
+	 */
 	protected void finalWork() {}
 	
 	@Override
@@ -196,11 +217,11 @@ abstract class AChainJob<T extends AJobArguments> extends Job implements IChainJ
 		setName(getName() + " - " + interfaceProject.getName());
 	}
 	
-	public void setSequenceObject(Object sequenceObject) {
+	void setSequenceObject(Object sequenceObject) {
 		this.sequenceObject = sequenceObject;
 	}	
 	
-	public Object getSequenceObject() {
+	Object getSequenceObject() {
 		return sequenceObject;
 	}
 }

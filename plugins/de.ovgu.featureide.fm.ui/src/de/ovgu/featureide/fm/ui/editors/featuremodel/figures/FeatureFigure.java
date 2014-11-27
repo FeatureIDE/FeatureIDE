@@ -24,10 +24,12 @@ import org.eclipse.draw2d.ConnectionAnchor;
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.FreeformLayout;
 import org.eclipse.draw2d.GridLayout;
+import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
+import org.eclipse.gef.editparts.ZoomListener;
 
 import de.ovgu.featureide.fm.core.ExtendedFeature;
 import de.ovgu.featureide.fm.core.Feature;
@@ -46,21 +48,21 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * @author Thomas Thuem
  */
 public class FeatureFigure extends Figure implements GUIDefaults {
-	
+
 	private final Label label = new Label();
-	
+
 	private static final FreeformLayout layout = new FreeformLayout();
 
 	private final ConnectionAnchor sourceAnchor;
-	
+
 	private final ConnectionAnchor targetAnchor;
 
 	private Feature feature;
 
 	private FeatureModel featureModel;
-	
+
 	private static GridLayout gl = new GridLayout();
-	
+
 	private static String CONCRETE = " Concrete";
 	private static String ABSTRACT = " Abstract";
 	private static String HIDDEN = " hidden";
@@ -75,43 +77,60 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		super();
 		this.feature = feature;
 		this.featureModel = featureModel;
-		
+
+		FeatureUIHelper.getZoomManager().addZoomListener(new ZoomListener() {
+			@Override
+			public void zoomChanged(double arg0) {
+				enforceLabelSize();
+			}
+		});
+
 		sourceAnchor = new SourceAnchor(this, feature);
 		targetAnchor = new TargetAnchor(this, feature);
-		
+
 		setLayoutManager(layout);
 
 		label.setForegroundColor(FMPropertyManager.getFeatureForgroundColor());
 		label.setFont(DEFAULT_FONT);
 
 		label.setLocation(new Point(FEATURE_INSETS.left, FEATURE_INSETS.top));
-		
+
 		setName(feature.getName());
 
 		setProperties();
-		
-		
-		FeatureUIHelper.setSize(feature,getSize());
-		
-		add(label);
+
+		enforceLabelSize();
+		FeatureUIHelper.setSize(feature, getSize());
+
+		add(label, label.getBounds());
 		setOpaque(true);
 
 		if (FeatureUIHelper.getLocation(feature) != null)
 			setLocation(FeatureUIHelper.getLocation(feature));
-		
-		if(isHidden(feature)){
-			setSize(new Dimension(0,0));
+
+		if (isHidden(feature)) {
+			setSize(new Dimension(0, 0));
 		}
 	}
-	
-	boolean isHidden(Feature feature){
-		if(featureModel.getLayout().showHiddenFeatures()){
+
+	/**
+	 * After resizing this method ensures that label text will not be cut
+	 * off(Issue #138)
+	 */
+	protected void enforceLabelSize() {
+		if (!getChildren().isEmpty()) {
+			setConstraint((IFigure) getChildren().get(0), label.getBounds().getExpanded(5, 0));
+		}
+	}
+
+	boolean isHidden(Feature feature) {
+		if (featureModel.getLayout().showHiddenFeatures()) {
 			return false;
 		} else {
-			if(feature.isHidden()){
+			if (feature.isHidden()) {
 				return true;
 			}
-			if(!feature.isRoot()){
+			if (!feature.isRoot()) {
 				return isHidden(feature.getParent());
 			} else {
 				return feature.isHidden();
@@ -121,53 +140,54 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 	}
 
 	public void setProperties() {
-	
 		String toolTip = "";
 		boolean modelIsValid = featureModel.getAnalyser().valid();
-		
+
 		label.setForegroundColor(FMPropertyManager.getFeatureForgroundColor());
 		setBackgroundColor(FMPropertyManager.getConcreteFeatureBackgroundColor());
-		setBorder(FMPropertyManager.getFeatureBorder());
-		
-		if (feature.isConcrete()) toolTip += CONCRETE;
-		
-		if (feature.isAbstract()){
+		setBorder(FMPropertyManager.getFeatureBorder(feature.isConstraintSelected()));
+
+		if (feature.isConcrete())
+			toolTip += CONCRETE;
+
+		if (feature.isAbstract()) {
 			setBackgroundColor(FMPropertyManager.getAbstractFeatureBackgroundColor());
-			setBorder(FMPropertyManager.getFeatureBorder());
-			if (feature.isRoot()){
+			if (feature.isRoot()) {
 				toolTip += ROOT;
 			} else {
 				toolTip += ABSTRACT;
 			}
 		}
-		
-		if (feature.hasHiddenParent()){
+
+		if (feature.hasHiddenParent()) {
 			setBorder(FMPropertyManager.getHiddenFeatureBorder(feature.isConstraintSelected()));
 			label.setForegroundColor(HIDDEN_FOREGROUND);
-			if (feature.isHidden()) toolTip += HIDDEN;
+			if (feature.isHidden())
+				toolTip += HIDDEN;
 		}
-		
-		if (!feature.isRoot()) toolTip += FEATURE;
-		
-		if ((feature.getFeatureStatus() == FeatureStatus.DEAD) && modelIsValid){
+
+		if (!feature.isRoot())
+			toolTip += FEATURE;
+
+		if ((feature.getFeatureStatus() == FeatureStatus.DEAD) && modelIsValid) {
 			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
 			setBorder(FMPropertyManager.getDeadFeatureBorder(feature.isConstraintSelected()));
-			toolTip += DEAD;			
+			toolTip += DEAD;
 		}
-		
-		if (feature.getFeatureStatus() == FeatureStatus.FALSE_OPTIONAL){
+
+		if (feature.getFeatureStatus() == FeatureStatus.FALSE_OPTIONAL) {
 			setBackgroundColor(FMPropertyManager.getWarningColor());
 			setBorder(FMPropertyManager.getConcreteFeatureBorder(feature.isConstraintSelected()));
 			toolTip += FALSE_OPTIONAL;
 		}
-		
-		if (feature.getFeatureStatus() == FeatureStatus.INDETERMINATE_HIDDEN){
+
+		if (feature.getFeatureStatus() == FeatureStatus.INDETERMINATE_HIDDEN) {
 			setBackgroundColor(FMPropertyManager.getWarningColor());
-			setBorder(FMPropertyManager.getConcreteFeatureBorder(feature.isConstraintSelected()));
+			setBorder(FMPropertyManager.getHiddenFeatureBorder(feature.isConstraintSelected()));
 			toolTip += INDETERMINATE_HIDDEN;
 		}
-		
-		if (feature.isRoot() && !modelIsValid){
+
+		if (feature.isRoot() && !modelIsValid) {
 			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
 			setBorder(FMPropertyManager.getDeadFeatureBorder(feature.isConstraintSelected()));
 			toolTip = VOID;
@@ -193,7 +213,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		if (description != null && !description.equals(" ")) {
 			toolTip += "\r\n\r\n" + "Description:\r\n" + description;
 		}
-		
+
 		String contraints = feature.getRelevantConstraintsString();
 		if (!contraints.isEmpty()) {
 			toolTip += "\n\nConstraints:\n" + contraints;
@@ -202,15 +222,15 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		toolTipContent.setLayoutManager(gl);
 		toolTipContent.setFont(DEFAULT_FONT);
 		toolTipContent.add(new Label(toolTip));
-		
+
 		// call of the FeatureDiagramExtensions
 		for (FeatureDiagramExtension extension : FeatureDiagramExtension.getExtensions()) {
 			toolTipContent = extension.extendFeatureFigureToolTip(toolTipContent, this);
 		}
-		
+
 		setToolTip(toolTipContent);
 	}
-	
+
 	public ConnectionAnchor getSourceAnchor() {
 		return sourceAnchor;
 	}
@@ -222,7 +242,8 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 	public void setName(String newName) {
 		label.setText(newName);
 		Dimension labelSize = label.getPreferredSize();
-		
+		this.minSize = labelSize;
+
 		if (labelSize.equals(label.getSize()))
 			return;
 		label.setSize(labelSize);
@@ -230,9 +251,8 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		Rectangle bounds = getBounds();
 		int w = FEATURE_INSETS.getWidth();
 		int h = FEATURE_INSETS.getHeight();
-		
+
 		bounds.setSize(labelSize.expand(w, h));
-			
 
 		Dimension oldSize = getSize();
 		if (!oldSize.equals(0, 0)) {
@@ -246,9 +266,9 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 	public Rectangle getLabelBounds() {
 		return label.getBounds();
 	}
-	
+
 	/**
-	 * @return The <code>Feature</code> represented by this <code>FeatureFigure</code>
+	 * @return The {@link Feature} represented by this {@link FeatureFigure}
 	 */
 	public Feature getFeature() {
 		return feature;

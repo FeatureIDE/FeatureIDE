@@ -20,11 +20,11 @@
  */
 package de.ovgu.featureide.core.mpl.builder;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -35,6 +35,7 @@ import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.mpl.job.JobManager;
 import de.ovgu.featureide.core.mpl.job.MPLBuildProjectJob;
 import de.ovgu.featureide.core.mpl.job.MPLRenameExternalJob;
+import de.ovgu.featureide.core.mpl.job.SequenceFinishedListener;
 import de.ovgu.featureide.core.mpl.job.util.IChainJob;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
@@ -54,31 +55,29 @@ public class MSPLBuilder extends IncrementalProjectBuilder {
 	}
 
 	protected void clean(IProgressMonitor monitor) throws CoreException {
-		IProject project = getProject();
-		if (project != null) {
-			if (buildThread != null) {
-				buildThread.interrupt();
-			}
-			cleanProject(CorePlugin.getFeatureProject(project), monitor);
-		} else {
-			MPLPlugin.getDefault().logWarning("no project got");
-		}
+		// TODO: prevent automatic build
+//		IProject project = getProject();
+//		if (project != null) {
+//			cleanProject(CorePlugin.getFeatureProject(project), monitor);
+//		} else {
+//			MPLPlugin.getDefault().logWarning("no project got");
+//		}
 	}
 	
-	private boolean cleanProject(IFeatureProject featureProject, IProgressMonitor monitor) {
-		final IFolder buildFolder = featureProject.getBuildFolder();
-		try {
-			for (IResource member : buildFolder.members()) {
-				member.delete(true, monitor);
-			}
-		} catch (CoreException e) {
-			MPLPlugin.getDefault().logError(e);
-			return false;
-		}
-		return true;
-	}
+//	private boolean cleanProject(IFeatureProject featureProject, IProgressMonitor monitor) {
+//		final IFolder buildFolder = featureProject.getBuildFolder();
+//		try {
+//			for (IResource member : buildFolder.members()) {
+//				member.delete(true, monitor);
+//			}
+//		} catch (CoreException e) {
+//			MPLPlugin.getDefault().logError(e);
+//			return false;
+//		}
+//		return true;
+//	}
 	
-	private Thread buildThread = null;
+	private final HashMap<String, Boolean> buildMap = new HashMap<String, Boolean>();
 
 	@SuppressWarnings("rawtypes")
 	@Override
@@ -86,53 +85,61 @@ public class MSPLBuilder extends IncrementalProjectBuilder {
 		final IProject project = getProject();
 		if (project != null) {
 			final IFeatureProject featureProject = CorePlugin.getFeatureProject(project);
-			final Configuration config = new Configuration(featureProject.getFeatureModel());
-			final ConfigurationReader reader = new ConfigurationReader(config);
+			if (featureProject == null || !featureProject.buildRelevantChanges()) {
+				return null;
+			}
+			
+			Boolean building;
+			synchronized (buildMap) {
+				building = buildMap.get(project.getName());
+				if (building == null) {
+					building = false;
+				}
+				if (building) {
+					return null;
+				} else {
+					buildMap.put(project.getName(), true);
+				}
+			}
+			
 			try {
-				reader.readFromFile(featureProject.getCurrentConfiguration());
+				final Configuration config = new Configuration(featureProject.getFeatureModel());
+				new ConfigurationReader(config).readFromFile(featureProject.getCurrentConfiguration());
+				
+				// build
+				final Object buildObject = new Object();
+				final IFolder buildFolder = featureProject.getBuildFolder();
+				final IChainJob job = new MPLBuildProjectJob.Arguments(featureProject, featureProject, buildFolder, config, null).createJob();
+				
+				String tempConfigName = featureProject.getCurrentConfiguration().getName();
+				final String configName;
+				final int splitIndex = tempConfigName.lastIndexOf('.');
+				if (splitIndex > -1) {
+					configName = tempConfigName.substring(0, splitIndex);
+				} else {
+					configName = tempConfigName;
+				}
+				
+				JobManager.addJob(buildObject, job, false);
+				JobManager.addSequenceFinishedListener(buildObject, new SequenceFinishedListener() {
+					@Override
+					public void sequenceFinished(Object idObject, boolean success) {
+						MPLRenameExternalJob.setJavaBuildPath(project, buildFolder.getFolder(configName).getFullPath());
+						synchronized (buildMap) {
+							buildMap.put(project.getName(), false);
+						}
+						featureProject.built();
+					}
+				});
+				JobManager.startSequence(buildObject);
 			} catch (Exception e) {
 				MPLPlugin.getDefault().logError(e);
-				return null;
-			}
-			
-			// TODO MPL: prevent parallel builds
-			if (buildThread != null) {
-				return null;
-			}
-
-			// build
-			final Object buildObject = new Object();
-			final IFolder buildFolder = featureProject.getBuildFolder(); //.getFolder("x");
-			final IChainJob job = new MPLBuildProjectJob.Arguments(featureProject, buildFolder, config, null).createJob();
-			
-			String tempConfigName = featureProject.getCurrentConfiguration().getName();
-			final String configName;
-			final int splitIndex = tempConfigName.lastIndexOf('.');
-			if (splitIndex > -1) {
-				configName = tempConfigName.substring(0, splitIndex);
-			} else {
-				configName = tempConfigName;
-			}
-			
-			JobManager.addJob(buildObject, job);
-			
-			buildThread = new Thread(new Runnable() {
-				@Override
-				public void run() {
-					// wait for jobs to be finished
-					synchronized (buildObject) {
-						try {
-							buildObject.wait();
-							MPLRenameExternalJob.setJavaBuildPath(project, buildFolder.getFolder(configName).getFullPath());
-						} catch (InterruptedException e) {
-							MPLPlugin.getDefault().logError(e);
-						}	
-					}
-					// set new java build path
-					buildThread = null;
+				synchronized (buildMap) {
+					buildMap.put(project.getName(), false);
 				}
-			});
-			buildThread.start();
+			}
+			
+			
 		} else {
 			MPLPlugin.getDefault().logWarning("no project got");
 		}

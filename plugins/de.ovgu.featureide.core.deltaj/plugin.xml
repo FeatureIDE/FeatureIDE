@@ -21,7 +21,7 @@
       </fmComposer>
    </extension>
    <extension
-         point="de.ovgu.featureide.ui.wizard">
+         point="de.ovgu.featureide.core.wizard">
       <newProjectWizard
             class="de.ovgu.featureide.deltaj.ui.wizard.DeltaJNewProjectWizardExtension"
             composerid="de.ovgu.featureide.composer.deltaj"

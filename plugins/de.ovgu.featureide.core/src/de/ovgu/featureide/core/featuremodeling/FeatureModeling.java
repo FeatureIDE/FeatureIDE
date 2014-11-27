@@ -54,11 +54,6 @@ public class FeatureModeling extends ComposerExtensionClass {
 	}
 	
 	@Override
-	public boolean hasFeatureFolders() {
-		return false;
-	}
-
-	@Override
 	public boolean hasSourceFolder() {
 		return false;
 	}
@@ -91,5 +86,14 @@ public class FeatureModeling extends ComposerExtensionClass {
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionBase#supportsMigration()
+	 */
+	@Override
+	public boolean supportsMigration()
+	{
+		return false;
 	}
 }

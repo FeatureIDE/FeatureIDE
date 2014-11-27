@@ -27,7 +27,8 @@ import de.ovgu.cide.fstgen.ast.FSTNonTerminal;
 import de.ovgu.cide.fstgen.ast.FSTTerminal;
 import de.ovgu.featureide.core.fstmodel.FSTInvariant;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
-import de.ovgu.featureide.core.fstmodel.RoleElement;
+import de.ovgu.featureide.core.fstmodel.IRoleElement;
+import de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin;
 
 /**
  * Builds Classes for the {@link FSTModel} for <code>FeatureHouse</code> Java
@@ -48,8 +49,8 @@ public class JavaClassBuilder extends ClassBuilder {
 		LinkedList<String> fields = getFields(terminal.getBody());
 		for (int i = 2; i < fields.size(); i++) {
 			// add field
-			RoleElement r = addField(fields.get(i), fields.get(1), fields.get(0), terminal.getBody(), terminal.beginLine, terminal.endLine);
-			r.setJavaDocCommtent(findJavaDocComments(terminal));
+			IRoleElement r = addField(fields.get(i), fields.get(1), fields.get(0), terminal.getBody(), terminal.beginLine, terminal.endLine);
+			r.setJavaDocComment(findJavaDocComments(terminal));
 		}
 	}
 	
@@ -194,10 +195,9 @@ public class JavaClassBuilder extends ClassBuilder {
 			}
 
 		}
-
 		// add method
-		RoleElement r = addMethod(name, getMethodParameter(terminal), returnType, modifiers, terminal.getBody(), terminal.beginLine, terminal.endLine, false, contractBody, contractCompKey, startLine);
-		r.setJavaDocCommtent(findJavaDocComments(terminal));
+		IRoleElement r = addMethod(name, getMethodParameter(terminal), returnType, modifiers, terminal.getBody(), terminal.beginLine, terminal.endLine, false, contractBody, contractCompKey, startLine);
+		r.setJavaDocComment(findJavaDocComments(terminal));
 	}
 
 	/**
@@ -249,8 +249,8 @@ public class JavaClassBuilder extends ClassBuilder {
 		}
 
 		// add constructor
-		RoleElement r = addMethod(name, getMethodParameter(terminal), "void", modifiers, terminal.getBody(), terminal.beginLine, terminal.endLine, true, contractBody, contractCompKey, startLine);
-		r.setJavaDocCommtent(findJavaDocComments(terminal));
+		IRoleElement r = addMethod(name, getMethodParameter(terminal), "void", modifiers, terminal.getBody(), terminal.beginLine, terminal.endLine, true, contractBody, contractCompKey, startLine);
+		r.setJavaDocComment(findJavaDocComments(terminal));
 	}
 
 	private String getMethodName(FSTTerminal terminal) {
@@ -318,14 +318,10 @@ public class JavaClassBuilder extends ClassBuilder {
 
 	@Override
 	public void caseJMLInvariant(FSTTerminal terminal) {
-		/*
-		 * FSTNonTerminal par =
-		 * (FSTNonTerminal)terminal.getParent().getParent().getParent(); if
-		 * (par.getType().equals(FHNodeTypes.JML_INVARIANT)) {
-		 */
 		FSTInvariant invariant = new FSTInvariant(terminal.getName(), terminal.getBody(), terminal.beginLine, terminal.endLine);
-		modelBuilder.getCurrentClassFragment().add(invariant);
-		// }
+		if (!modelBuilder.getCurrentClassFragment().add(invariant)) {
+			FeatureHouseCorePlugin.getDefault().logError("Invariant " + invariant.getBody() + "was not added to FSTModel.", null);
+		}
 	}
 
 	@Override

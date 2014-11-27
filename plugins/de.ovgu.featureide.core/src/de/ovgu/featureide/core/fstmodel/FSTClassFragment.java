@@ -21,7 +21,7 @@
 package de.ovgu.featureide.core.fstmodel;
 
 import java.util.HashSet;
-import java.util.LinkedList;
+import java.util.TreeSet;
 
 import javax.annotation.Nonnull;
 
@@ -30,13 +30,13 @@ import javax.annotation.Nonnull;
  * 
  * @author Sebastian Krieter
  */
-public class FSTClassFragment extends RoleElement {
-	protected final LinkedList<FSTMethod> methods = new LinkedList<FSTMethod>();
-	protected final LinkedList<FSTField> fields = new LinkedList<FSTField>();
-	protected final LinkedList<FSTClassFragment> innerClasses = new LinkedList<FSTClassFragment>();
-	protected final LinkedList<FSTInvariant> invariants = new LinkedList<FSTInvariant>();
 
-	
+public class FSTClassFragment extends RoleElement<FSTClassFragment> {
+	protected final TreeSet<FSTMethod> methods = new TreeSet<FSTMethod>();
+	protected final TreeSet<FSTField> fields = new TreeSet<FSTField>();
+	protected final TreeSet<FSTClassFragment> innerClasses = new TreeSet<FSTClassFragment>();
+	protected final TreeSet<FSTInvariant> invariants = new TreeSet<FSTInvariant>();
+
 	protected String pckg = null;
 
 	protected final HashSet<String> 
@@ -48,7 +48,6 @@ public class FSTClassFragment extends RoleElement {
 		super(name, null, null, "", -1, -1);
 	}
 
-	@Override
 	public String getFullName() {
 		StringBuilder fullname = new StringBuilder();
 		fullname.append(name);
@@ -76,28 +75,28 @@ public class FSTClassFragment extends RoleElement {
 	}
 
 	@Nonnull
-	public LinkedList<FSTField> getFields() {
+	public TreeSet<FSTField> getFields() {
 		return fields;
 	}
 
 	@Nonnull
-	public LinkedList<FSTInvariant> getInvariants() {
+	public TreeSet<FSTInvariant> getInvariants() {
 		return invariants;
 	}
 	
 	@Nonnull
-	public LinkedList<FSTMethod> getMethods() {
+	public TreeSet<FSTMethod> getMethods() {
 		return methods;
 	}
 	
 	@Nonnull
-	public LinkedList<FSTClassFragment> getInnerClasses() {
+	public TreeSet<FSTClassFragment> getInnerClasses() {
 		return innerClasses;
 	}
 	
 
 	
-	public boolean add(RoleElement element) {
+	public boolean add(IRoleElement element) {
 		if (element instanceof FSTMethod) {
 			if (methods.contains(element)) {
 				return false;
@@ -124,7 +123,7 @@ public class FSTClassFragment extends RoleElement {
 		element.setRole(role);
 		return true;
 	}
-
+	
 	public void addImport(String imp) {
 		importList.add(imp);
 	}

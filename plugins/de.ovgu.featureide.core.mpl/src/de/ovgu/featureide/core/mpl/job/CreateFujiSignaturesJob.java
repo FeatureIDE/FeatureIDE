@@ -34,7 +34,6 @@ import AST.Access;
 import AST.BodyDecl;
 import AST.ClassDecl;
 import AST.CompilationUnit;
-import AST.ConstructorAccess;
 import AST.ConstructorDecl;
 import AST.FieldDeclaration;
 import AST.ImportDecl;
@@ -42,11 +41,9 @@ import AST.InterfaceDecl;
 import AST.List;
 import AST.MemberClassDecl;
 import AST.MemberInterfaceDecl;
-import AST.MethodAccess;
 import AST.MethodDecl;
 import AST.ParameterDeclaration;
 import AST.Program;
-import AST.Stmt;
 import AST.TypeDecl;
 import beaver.Symbol;
 import de.ovgu.featureide.core.IFeatureProject;
@@ -56,7 +53,7 @@ import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
-import de.ovgu.featureide.core.fstmodel.RoleElement;
+import de.ovgu.featureide.core.fstmodel.IRoleElement;
 import de.ovgu.featureide.core.mpl.InterfaceProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.mpl.job.util.AJobArguments;
@@ -277,7 +274,6 @@ public class CreateFujiSignaturesJob extends AMonitorJob<CreateFujiSignaturesJob
 						typeDecl.getModifiers();
 						if (bodyDecl instanceof MethodDecl) {
 							MethodDecl method = (MethodDecl) bodyDecl;
-							findMethodAccesses(method.getBlock());
 
 							modifierString = method.getModifiers().toString();
 							name = method.name();
@@ -350,19 +346,24 @@ public class CreateFujiSignaturesJob extends AMonitorJob<CreateFujiSignaturesJob
 			sigArray[++i] = sig;
 		}
 		
-		fp.getComposer().initialize(fp);
 		fp.getComposer().buildFSTModel();
 		FSTModel fst = fp.getFSTModel();
 		
 		if (fst == null) {
-			MPLPlugin.getDefault().logInfo("Kein FSTModel!");
+			MPLPlugin.getDefault().logInfo("No FSTModel!");
 		} else {
 			for (FSTFeature fstFeature : fst.getFeatures()) {
 				final int id = interfaceProject.getFeatureID(fstFeature.getName());
 				
 				for (FSTRole fstRole : fstFeature.getRoles()) {
 					FSTClassFragment classFragment = fstRole.getClassFragment();
-					String fullName = (classFragment.getPackage() == null ? "" : classFragment.getPackage()) + "." + classFragment.getName();
+					String fullName;
+					if (classFragment.getPackage() == null) {
+						fullName = "." + classFragment.getName();
+					} else {
+						fullName = classFragment.getName();
+						fullName = fullName.replace('/', '.');
+					}
 					if (fullName.endsWith(".java")) {
 						fullName = fullName.substring(0, fullName.length() - ".java".length());
 					}
@@ -374,22 +375,8 @@ public class CreateFujiSignaturesJob extends AMonitorJob<CreateFujiSignaturesJob
 		projectSignatures.setSignatureArray(sigArray);
 		interfaceProject.setProjectSignatures(projectSignatures);
 	}
-	
-	private java.util.List<BodyDecl> calledMethods = new LinkedList<BodyDecl>();
-	
-	private void findMethodAccesses(ASTNode<?> stmt) {
-		for (ASTNode<?> astNode : stmt) {
-			if (astNode instanceof Stmt) {
-				findMethodAccesses(astNode); 
-			} else if (astNode instanceof MethodAccess) {
-				calledMethods.add(((MethodAccess)astNode).decl());
-			} else if (astNode instanceof ConstructorAccess) {
-				calledMethods.add(((ConstructorAccess) astNode).decl());
-			}
-		}
-	}
-	
-	private void copyComment(RoleElement element, int id, String fullName) {
+
+	private void copyComment(IRoleElement element, int id, String fullName) {
 		if (fullName == null) {
 			return;
 		}
@@ -400,7 +387,7 @@ public class CreateFujiSignaturesJob extends AMonitorJob<CreateFujiSignaturesJob
 			for (int j = 0; j < ids.length; j++) {
 				FeatureData featureData = ids[j];
 				if (featureData.getId() == id) {
-					featureData.setComment(element.getJavaDocCommtent());
+					featureData.setComment(element.getJavaDocComment());
 					break;
 				}
 			}

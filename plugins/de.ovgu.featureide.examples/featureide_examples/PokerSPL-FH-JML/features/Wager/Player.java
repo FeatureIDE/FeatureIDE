@@ -24,9 +24,7 @@ public /*nullable_by_default*/ class Player {
    * @param initAmount
    *          the init amount
    */
-  /*@ \original_spec
-      also
-      assignable bank;
+  /*@ assignable bank;
       ensures bank == initAmount;
    */
   private void initPlayer(final int newId, final double initAmount){

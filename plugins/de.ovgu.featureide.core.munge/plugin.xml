@@ -20,5 +20,14 @@
             name="MungFMComposer">
       </fmComposer>
    </extension>
+   <extension
+         point="de.ovgu.featureide.core.wizard">
+      <newProjectWizard
+            class="de.ovgu.featureide.core.wizardextension.DefaultNewFeatureProjectWizardExtension"
+            composerid="de.ovgu.featureide.preprocessor.munge"
+            id="de.ovgu.featureide.core.munge.newProjectWizard"
+            name="de.ovgu.featureide.preprocessor.munge">
+      </newProjectWizard>
+   </extension>
 
 </plugin>

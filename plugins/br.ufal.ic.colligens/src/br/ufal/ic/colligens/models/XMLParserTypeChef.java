@@ -74,7 +74,8 @@ public class XMLParserTypeChef {
 			if (file.contains(fileProxie.getFileToAnalyse())) {
 
 				Log log = new Log(fileProxie, Integer.parseInt(node
-						.getChild("position").getChildText("line").trim()),
+						.getChild("position").getChildText("line").trim()),Integer.parseInt(node
+								.getChild("position").getChildText("column").trim()),
 						node.getChildText("featurestr"),
 						node.getChildText("severity"), node.getChildText("msg"));
 

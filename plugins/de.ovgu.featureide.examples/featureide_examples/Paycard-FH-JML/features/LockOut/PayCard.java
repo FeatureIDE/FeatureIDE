@@ -6,9 +6,7 @@ public class PayCard {
     
     /*@ spec_public @*/ int unsuccessfulOperations = 0;
     
-    /*@ also
-      @
-      @ public normal_behavior
+    /*@ public normal_behavior
       @ requires amount>0;
       @ requires amount + balance >= limit || isValid() == false;
       @ ensures unsuccessfulOperations == \old(unsuccessfulOperations) + 1; 

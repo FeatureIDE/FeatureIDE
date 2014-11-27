@@ -81,8 +81,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 				new AntennaLineFilter());
 
 		String projectSourcePath = project.getProjectSourcePath();
-		if (projectSourcePath == null
-				|| "".equals(projectSourcePath)) {
+		if (projectSourcePath == null || projectSourcePath.isEmpty()) {
 			String buildPath = project.getBuildPath();
 			project.setPaths(buildPath, buildPath, project.getConfigPath());
 		}
@@ -120,6 +119,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 		// add source files
 		try {
 			// add activated features as definitions to preprocessor
+			preprocessor.clearDefines();
 			preprocessor.addDefines(featureList.toString());
 
 			// preprocess for all files in source folder
@@ -394,10 +394,11 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	}
 
 	@Override
-	public boolean hasFeatureFolders() {
+	public boolean createFolderForFeatures() {
 		return false;
 	}
 
+	
 	@Override
 	public boolean hasFeatureFolder() {
 		return false;
@@ -438,9 +439,6 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	    return IComposerExtensionClass.Mechanism.PREPROCESSOR;
 	}
 	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.ComposerExtensionClass#buildConfiguration(org.eclipse.core.resources.IFolder, de.ovgu.featureide.fm.core.configuration.Configuration, java.lang.String)
-	 */
 	@Override
 	public void buildConfiguration(IFolder folder, Configuration configuration,
 			String congurationName) {
@@ -530,6 +528,15 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 				}
 			}
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionBase#supportsMigration()
+	 */
+	@Override
+	public boolean supportsMigration()
+	{
+		return false;
 	}
 
 }

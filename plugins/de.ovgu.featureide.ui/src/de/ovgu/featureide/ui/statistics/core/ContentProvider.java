@@ -12,7 +12,6 @@ import org.eclipse.ui.progress.UIJob;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.builder.IComposerExtension;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -22,7 +21,7 @@ import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.Confi
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.DirectivesNode;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.StatisticsContractComplexity;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.StatisticsFeatureComplexity;
-import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.StatisticsProgrammSize;
+import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.StatisticsProgramSize;
 import de.ovgu.featureide.ui.statistics.ui.helper.JobDoneListener;
 
 /**
@@ -122,7 +121,7 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 	}
 	
 	private synchronized void addNodes() {
-		IComposerExtension composer = project.getComposer();
+		IComposerExtensionClass composer = project.getComposer();
 		FSTModel fstModel = getFSTModel(composer);
 		FeatureModel featModel = project.getFeatureModel();
 		JobDoneListener.getInstance().init(viewer);
@@ -140,7 +139,7 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 
 		
 		if (composer.getGenerationMechanism() == IComposerExtensionClass.Mechanism.FEATURE_ORIENTED_PROGRAMMING) {
-			godfather.addChild(new StatisticsProgrammSize(PRODUCT_LINE_IMPLEMENTATION, fstModel));
+			godfather.addChild(new StatisticsProgramSize(PRODUCT_LINE_IMPLEMENTATION, fstModel));
 			godfather.addChild(new StatisticsContractComplexity(CONTRACT_COMPLEXITY, fstModel, featModel, project.getContractComposition()));
 		}
 		if (composer.getGenerationMechanism() == IComposerExtensionClass.Mechanism.PREPROCESSOR) {
@@ -149,10 +148,9 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 		refresh();
 	}
 	
-	private FSTModel getFSTModel(IComposerExtension composer) {
+	private FSTModel getFSTModel(IComposerExtensionClass composer) {
 		FSTModel fstModel = project.getFSTModel();
 		if (fstModel == null || fstModel.getClasses().isEmpty() || fstModel.getFeatures().isEmpty()) {
-			composer.initialize(project);
 			composer.buildFSTModel();
 			fstModel = project.getFSTModel();
 		}

@@ -44,8 +44,8 @@ import de.ovgu.featureide.featurehouse.FeatureHouseComposer;
 import de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin;
 
 /**
- * This builder builds the {@link FSTModel} for FeatureHouse projects, 
- * by parsing the FeatureHouse internal FSTModel.
+ * This builder builds the {@link FSTModel} for FeatureHouse projects, by
+ * parsing the FeatureHouse internal FSTModel.
  * 
  * @author Jens Meinicke
  */
@@ -74,41 +74,45 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 		featureProject.setFSTModel(model);
 		this.featureProject = featureProject;
 	}
-	
+
 	public IFile getCurrentFile() {
 		return currentFile;
 	}
-	
+
 	public FSTRole getCurrentRole() {
 		return currentRole;
 	}
-	
+
 	public FSTClassFragment getCurrentClassFragment() {
-		FSTClassFragment currentClassFragment =  classFragmentStack.peek();
+		FSTClassFragment currentClassFragment = classFragmentStack.peek();
 		return (currentClassFragment == null) ? currentRole.getClassFragment() : classFragmentStack.peek();
 	}
-	
+
 	public boolean hasCurrentClassFragment() {
 		return currentRole != null || classFragmentStack.peek() != null;
 	}
 
 	/**
 	 * Builds the model out of the FSTNodes of the FeatureHouse composer
-	 * @param nodes The fstNodes
-	 * @param completeModel <code>true</code> for completions mode: old methods will not be overwritten
+	 * 
+	 * @param nodes
+	 *            The fstNodes
+	 * @param completeModel
+	 *            <code>true</code> for completions mode: old methods will not
+	 *            be overwritten
 	 */
 	@SuppressWarnings("unchecked")
 	public void buildModel(ArrayList<FSTNode> nodes, boolean completeModel) {
 		this.completeModel = completeModel;
 		if (!completeModel) {
 			model.reset();
-		}	
-		for (FSTNode node : (ArrayList<FSTNode>)nodes.clone()) {
+		}
+		for (FSTNode node : (ArrayList<FSTNode>) nodes.clone()) {
 			if (NODE_TYPE_FEATURE.equals(node.getType())) {
 				caseAddFeature(node);
 			} else if (NODE_TYPE_CLASS.equals(node.getType())) {
 				caseAddClass(node);
-			} else if(NODE_COMPILATIONUNIT.equals(node.getType())){
+			} else if (NODE_COMPILATIONUNIT.equals(node.getType())) {
 				caseCompileUnit(node);
 			} else if (JAVA_NODE_CLASS_DECLARATION.equals(node.getType())) {
 				caseClassDeclaration(node);
@@ -122,10 +126,10 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 				caseClassDeclaration(node);
 			}
 		}
-		
+
 		addArbitraryFiles();
 	}
-	
+
 	private void addArbitraryFiles() {
 		IFolder folder = featureProject.getSourceFolder();
 		for (String feature : featureProject.getFeatureModel().getConcreteFeatureNames()) {
@@ -138,7 +142,7 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 		try {
 			for (IResource res : featureFolder.members()) {
 				if (res instanceof IFolder) {
-					addArbitraryFiles((IFolder)res, feature);
+					addArbitraryFiles((IFolder) res, feature);
 				} else if (res instanceof IFile) {
 					if (!featureProject.getComposer().extensions().contains(res.getFileExtension())) {
 						model.addArbitraryFile(feature, (IFile) res);
@@ -151,58 +155,52 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 	}
 
 	private void caseCompileUnit(FSTNode node) {
-		node.accept(new FSTVisitor(){
-			 public boolean visit(FSTTerminal terminal){
-				 if (JAVA_NODE_IMPORTDECLARATION.equals(terminal.getType())) {
-					ClassBuilder.getClassBuilder(FeatureHouseModelBuilder.this.currentFile, FeatureHouseModelBuilder.this)
-						.caseAddImport(terminal);
-				 } else if(JAVA_NODE_PACKAGEDECLARATION.equals(terminal.getType())){
-					 ClassBuilder.getClassBuilder(FeatureHouseModelBuilder.this.currentFile, FeatureHouseModelBuilder.this)
-						.casePackage(terminal);
-				 }
+		node.accept(new FSTVisitor() {
+			public boolean visit(FSTTerminal terminal) {
+				if (JAVA_NODE_IMPORTDECLARATION.equals(terminal.getType())) {
+					ClassBuilder.getClassBuilder(FeatureHouseModelBuilder.this.currentFile, FeatureHouseModelBuilder.this).caseAddImport(
+							terminal);
+				} else if (JAVA_NODE_PACKAGEDECLARATION.equals(terminal.getType())) {
+					ClassBuilder.getClassBuilder(FeatureHouseModelBuilder.this.currentFile, FeatureHouseModelBuilder.this).casePackage(
+							terminal);
+				}
 				return true;
-			 }
-		});	
+			}
+		});
 	}
-	
+
 	private void caseAddFeature(FSTNode node) {
 		currentFeature = model.addFeature(node.getName());
 	}
-	
+
 	private void caseAddClass(FSTNode node) {
-		String name = node.getName();
-		String className = name.substring(
-				name.lastIndexOf(File.separator) + 1);
-		currentFile = getFile(name);
+		currentFile = getFile(node.getName());
 		if (!canCompose()) {
 			return;
 		}
-		currentRole = model.addRole(currentFeature.getName(), className, currentFile);
+		currentRole = model.addRole(currentFeature.getName(), model.getAbsoluteClassName(currentFile), currentFile);
 		classFragmentStack.clear();
 		classFragmentStack.push(currentRole.getClassFragment());
 	}
 
 	private boolean canCompose() {
-		return  FeatureHouseComposer.EXTENSIONS
-				.contains(currentFile.getFileExtension()) &&
-				currentFile.exists();
+		return FeatureHouseComposer.EXTENSIONS.contains(currentFile.getFileExtension()) && currentFile.exists();
 	}
 
 	private void caseClassDeclaration(FSTNode node) {
 		if (node instanceof FSTNonTerminal && canCompose()) {
 			List<FSTNode> children = ((FSTNonTerminal) node).getChildren();
 			for (FSTNode child : children) {
-				
+
 				String type = child.getType();
 				ClassBuilder classBuilder = ClassBuilder.getClassBuilder(currentFile, this);
 				if (child instanceof FSTTerminal) {
 					FSTTerminal terminal = (FSTTerminal) child;
-					if (JAVA_NODE_DECLARATION_TYPE1.equals(type)
-							|| JAVA_NODE_DECLARATION_TYPE2.equals(type)) {
+					if (JAVA_NODE_DECLARATION_TYPE1.equals(type) || JAVA_NODE_DECLARATION_TYPE2.equals(type)) {
 						classBuilder.caseClassDeclarationType(terminal);
 					} else if (JAVA_NODE_MODIFIERS.equals(type)) {
 						classBuilder.caseModifiers(terminal);
-						classFragmentStack.peek().setJavaDocCommtent(JavaClassBuilder.findJavaDocComments(terminal));
+						classFragmentStack.peek().setJavaDocComment(JavaClassBuilder.findJavaDocComments(terminal));
 					} else if (JAVA_NODE_EXTENDSLIST.equals(type)) {
 						classBuilder.caseExtendsList(terminal);
 					} else if (JAVA_NODE_IMPLEMENTATIONLIST.equals(type)) {
@@ -223,16 +221,12 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 						classBuilder.caseFieldDeclaration(terminal);
 					} else if (C_NODE_STMTL.equals(type)) {
 						classBuilder.caseFieldDeclaration(terminal);
-					} else if (CSHARP_NODE_CLAASS_MEMBER_DECLARATION_END
-							.equals(type)) {
-						if (CSHARP_NODE_COMPOSITON_METHOD.equals(terminal
-								.getCompositionMechanism())) {
+					} else if (CSHARP_NODE_CLAASS_MEMBER_DECLARATION_END.equals(type)) {
+						if (CSHARP_NODE_COMPOSITON_METHOD.equals(terminal.getCompositionMechanism())) {
 							classBuilder.caseMethodDeclaration(terminal);
-						} else if (CSHARP_NODE_COMPOSITION_FIELD
-								.equals(terminal.getCompositionMechanism())) {
+						} else if (CSHARP_NODE_COMPOSITION_FIELD.equals(terminal.getCompositionMechanism())) {
 							classBuilder.caseFieldDeclaration(terminal);
-						} else if (CSHARP_NODE_COMPOSITION_CONSTRUCTOR
-								.equals(terminal.getCompositionMechanism())) {
+						} else if (CSHARP_NODE_COMPOSITION_CONSTRUCTOR.equals(terminal.getCompositionMechanism())) {
 							classBuilder.caseConstructorDeclaration(terminal);
 						}
 					} else if (HASKELL_NODE_DECLARATION.equals(type)) {
@@ -243,14 +237,13 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 						classBuilder.caseJMLSpecCaseSeq(terminal);
 					} else if (JML_INVARIANT.equals(type)) {
 						classBuilder.caseJMLInvariant(terminal);
-					}					
+					}
 				} else if (child instanceof FSTNonTerminal) {
 					if (JAVA_NODE_INNER_CLASS_TYPE.equals(type)) {
 						String name = child.getName();
 						String className = name.substring(name.lastIndexOf(File.separator) + 1);
-						
+
 						FSTClassFragment newFragment = new FSTClassFragment(className);
-						
 						classFragmentStack.peek().add(newFragment);
 						classFragmentStack.push(newFragment);
 					} else {
@@ -258,23 +251,18 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 					}
 					caseClassDeclaration(child);
 				}
-				
 			}
 			
-			
 			if (!classFragmentStack.isEmpty()) {
-//				FSTClassFragment curClassFragment = 
-					classFragmentStack.pop();
-//				if (classFragmentStack.isEmpty() && curClassFragment.getPackage() == null) {
-//	//				curClassFragment.setPackage(currentFile.getParent().getName());
-//				}
+				classFragmentStack.pop();
 			}
 		}
 	}
 
 	private IFile getFile(String name) {
 		String projectName = featureProject.getProjectName();
-		name = name.substring(name.indexOf(projectName + System.getProperty("file.separator") + featureProject.getSourceFolder().getName()) + projectName.length() + 1);
+		name = name.substring(name.indexOf(projectName + System.getProperty("file.separator") + featureProject.getSourceFolder().getName())
+				+ projectName.length() + 1);
 		return featureProject.getProject().getFile(new Path(name));
 	}
 }

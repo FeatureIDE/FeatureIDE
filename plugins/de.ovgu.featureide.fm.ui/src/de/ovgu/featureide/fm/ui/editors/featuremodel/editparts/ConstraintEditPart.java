@@ -70,12 +70,7 @@ public class ConstraintEditPart extends AbstractGraphicalEditPart implements
 
 	}
 
-	public void performRequest(Request request) {
-		
-		for(Feature feature : getConstraintModel().getFeatureModel().getFeatures())	{
-			if (feature.isConstraintSelected()) feature.setConstraintSelected(false);
-		}
-		
+	public void performRequest(Request request) {		
 		if (request.getType() == RequestConstants.REQ_OPEN) {
 			new ConstraintDialog(getConstraintModel().getFeatureModel(),
 					getConstraintModel());					

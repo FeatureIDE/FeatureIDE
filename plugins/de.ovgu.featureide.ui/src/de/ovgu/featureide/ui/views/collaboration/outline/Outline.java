@@ -88,6 +88,8 @@ import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePageContextMenu;
 import de.ovgu.featureide.fm.ui.views.outline.FmTreeContentProvider;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
+import de.ovgu.featureide.ui.views.outline.ContextOutlineLabelProvider;
+import de.ovgu.featureide.ui.views.outline.ContextOutlineTreeContentProvider;
 
 /**
  * Another outline view displaying the same information as the collaboration
@@ -273,7 +275,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 			for (FSTRole r : field.getRole().getFSTClass().getRoles()) {
 				if (r.getFile().equals(iFile)) {
 					for (FSTField f : r.getClassFragment().getFields()) {
-						if (f.comparesTo(field)) {
+						if (f.compareTo(field)==0) {
 							return f.getLine();
 						}
 					}
@@ -286,7 +288,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 			for (FSTRole r : inv.getRole().getFSTClass().getRoles()) {
 				if (r.getFile().equals(iFile)) {
 					for (FSTInvariant i : r.getClassFragment().getInvariants()) {
-						if (i.comparesTo(inv)) {
+						if (i.compareTo(inv)==0) {
 							return i.getLine();
 						}
 					}
@@ -299,7 +301,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 			for (FSTRole r : meth.getRole().getFSTClass().getRoles()) {
 				if (r.getFile().equals(iFile)) {
 					for (FSTMethod m : r.getClassFragment().getMethods()) {
-						if (m.comparesTo(meth)) {
+						if (m.compareTo(meth)==0) {
 							return m.getLine();
 						}
 					}
@@ -438,6 +440,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 		addContentProv(new NotAvailableContentProv(), new NotAvailableLabelProv());
 		addContentProv(new CollaborationOutlineTreeContentProvider(), new CollaborationOutlineLabelProvider());
 		addContentProv(new FmTreeContentProvider(), new FMOutlineLabelProviderWrapper());
+		addContentProv(new ContextOutlineTreeContentProvider(), new ContextOutlineLabelProvider());
 
 		checkForExtensions();
 

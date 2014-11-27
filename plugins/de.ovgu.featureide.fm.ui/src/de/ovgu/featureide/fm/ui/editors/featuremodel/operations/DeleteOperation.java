@@ -21,8 +21,9 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Deque;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -63,7 +64,7 @@ public class DeleteOperation extends AbstractFeatureModelOperation implements GU
 
 	private static final String LABEL = "Delete";
 	private Object viewer;
-	private List<AbstractFeatureModelOperation > operations = new LinkedList<AbstractFeatureModelOperation >();
+	private Deque<AbstractFeatureModelOperation> operations = new LinkedList<AbstractFeatureModelOperation>();
 	
 	public DeleteOperation(Object viewer, FeatureModel featureModel) {
 		super(featureModel, LABEL);
@@ -235,33 +236,20 @@ public class DeleteOperation extends AbstractFeatureModelOperation implements GU
 
 	@Override
 	protected void redo() {
-		List<AbstractFeatureModelOperation > ops = new LinkedList<AbstractFeatureModelOperation >();
-		ops.addAll(operations);
-		Collections.reverse(operations);
-		while (!ops.isEmpty()) {
-			for (AbstractFeatureModelOperation  op : operations) {
-				try {
-					op.redo();
-					ops.remove(op);
-				} catch (Exception e) {
-					
-				}
-
+		for (Iterator<AbstractFeatureModelOperation> it = operations.iterator(); it.hasNext();) {
+			AbstractFeatureModelOperation operation = it.next();
+			if (operation.canRedo()) {
+				operation.redo();
 			}
 		}
-
 	}
 
 	@Override
 	protected void undo() {
-		List<AbstractFeatureModelOperation > ops = new ArrayList<AbstractFeatureModelOperation >(operations);
-		Collections.reverse(operations);
-		while (!ops.isEmpty()) {
-			for (AbstractFeatureModelOperation  op : operations) {
-				if (op.canUndo()) {
-					op.undo();
-					ops.remove(op);
-				}
+		for (Iterator<AbstractFeatureModelOperation> it = operations.descendingIterator(); it.hasNext();) {
+			AbstractFeatureModelOperation operation = it.next();
+			if (operation.canUndo()) {
+				operation.undo();
 			}
 		}
 	}

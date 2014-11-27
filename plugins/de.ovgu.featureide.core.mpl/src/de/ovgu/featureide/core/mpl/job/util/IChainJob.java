@@ -4,7 +4,7 @@ import org.eclipse.core.resources.IProject;
 
 /**
  * Interface for all jobs.
- * This should only be implementet by {@link AChainJob}.
+ * This should only be implemented by {@link AChainJob}.
  * 
  * @author Sebastian Krieter
  */

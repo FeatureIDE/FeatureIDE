@@ -50,9 +50,7 @@ public abstract class AbstractWizard extends Wizard implements IWorkbenchWizard 
 	}
 
 	public final Object getData(String key) {
-		for (AbstractWizardPage page : pages) {
-			page.saveData();
-		}
+		savePages();
 		return dataMap.get(key);
 	}
 
@@ -69,7 +67,14 @@ public abstract class AbstractWizard extends Wizard implements IWorkbenchWizard 
 
 	@Override
 	public boolean performFinish() {
+		savePages();
 		return true;
+	}
+
+	private void savePages() {
+		for (AbstractWizardPage page : pages) {
+			page.saveData();
+		}
 	}
 	
 	@Override

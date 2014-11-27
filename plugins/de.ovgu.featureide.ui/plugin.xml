@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.2"?>
 <plugin>
-   <extension-point id="wizard" name="Wizard" schema="schema/wizard.exsd"/>
-   <extension-point id="de.ovgu.featureide.ui.views.outline" name="Outline" schema="schema/de.ovgu.featureide.ui.views.outline.exsd"/>
+   <extension-point id="de.ovgu.featureide.ui.views.outline" name="Outline" schema="schema/de.ovgu.featureide.ui.views.outline.exsd"/>     
 
    <extension
          point="org.eclipse.ui.newWizards">
@@ -54,12 +53,18 @@
             id="de.ovgu.featureide.ui.actions.conversionaction"
             objectClass="org.eclipse.core.resources.IProject">
          <visibility>
-         	<not>
-         		<objectState
-         			name="nature"
-         			value="de.ovgu.featureide.core.featureProjectNature">
-         		</objectState>	
-         	</not>
+            <not>
+               <or>
+                  <objectState
+                        name="nature"
+                        value="de.ovgu.featureide.core.featureProjectNature">
+                  </objectState>
+                  <objectState
+                        name="nature"
+                        value="com.android.ide.eclipse.adt.AndroidNature">
+                  </objectState>
+               </or>
+            </not>
          </visibility>
          <action
                class="de.ovgu.featureide.ui.actions.ConversionAction"
@@ -1089,4 +1094,24 @@
          markerType="de.ovgu.featureide.core.configurationProblemMarker"
          class="de.ovgu.featureide.ui.quickfix.ConfigurationQuickFixHandler"/>
     </extension>
-</plugin>
+       <extension
+	   		point="org.eclipse.jdt.ui.javaCompletionProposalComputer"
+			id="ContextViewCompletion"
+			name="ContextViewCompletion">
+		<javaCompletionProposalComputer
+			activate="false"
+			categoryID="org.eclipse.jdt.ui.ContextViewCompletion"
+			categoryId="de.ovgu.featureide.ui.ContextViewCompletion"
+			class="de.ovgu.featureide.ui.editors.Completion">
+			<partition type="__dftl_partition_content_type"/>
+			<partition type="__java_string"/>
+		</javaCompletionProposalComputer>
+		<proposalCategory
+			id="ContextViewCompletion"
+			name="tes"
+			icon="icons/featureide.gif"/>
+	</extension>
+ 
+
+    
+    </plugin>

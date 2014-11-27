@@ -11,5 +11,14 @@
             nature="FeatureIDE_Core.featureCPPNature">
       </composer>
    </extension>
+   <extension
+         point="de.ovgu.featureide.core.wizard">
+      <newProjectWizard
+            class="de.ovgu.featureide.core.wizardextension.DefaultNewFeatureProjectWizardExtension"
+            composerid="de.ovgu.featureide.composer.featurecpp"
+            id="de.ovgu.featureide.core.featurecpp.newProjectWizard"
+            name="FeaturecppNewProjectWizard">
+      </newProjectWizard>
+   </extension>
 
 </plugin>

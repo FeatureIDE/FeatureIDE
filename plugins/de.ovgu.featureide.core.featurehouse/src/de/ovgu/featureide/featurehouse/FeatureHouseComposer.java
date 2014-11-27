@@ -69,6 +69,7 @@ import composer.FSTGenComposerExtension;
 import composer.ICompositionErrorListener;
 import composer.IParseErrorListener;
 import composer.rules.meta.FeatureModelInfo;
+
 import de.ovgu.cide.fstgen.ast.FSTNode;
 import de.ovgu.cide.fstgen.ast.FSTTerminal;
 import de.ovgu.featureide.core.IFeatureProject;
@@ -76,6 +77,7 @@ import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
+import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.featurehouse.errorpropagation.ErrorPropagation;
 import de.ovgu.featureide.featurehouse.meta.FeatureIDEModelInfo;
@@ -84,10 +86,10 @@ import de.ovgu.featureide.featurehouse.model.FeatureHouseModelBuilder;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.StoppableJob;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import de.ovgu.featureide.fm.core.job.AStoppableJob;
 import fuji.CompilerWarningException;
 import fuji.Composition;
 import fuji.CompositionErrorException;
@@ -138,12 +140,14 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	}
 
 	public static final String COMPOSER_ID = "de.ovgu.featureide.composer.featurehouse";
+	
+	private boolean useFuji = false;
 
 	private FSTGenComposer composer;
 
 	public FeatureHouseModelBuilder fhModelBuilder;
 
-	private ErrorPropagation errorPropagation = new ErrorPropagation();
+	private ErrorPropagation errorPropagation = null;
 
 	private IParseErrorListener listener = createParseErrorListener();
 
@@ -158,7 +162,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	}
 
 	private ICompositionErrorListener compositionErrorListener = createCompositionErrorListener();
-	private StoppableJob fuji;
+	private AStoppableJob fuji;
 
 	/**
 	 * @return
@@ -180,15 +184,20 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 				if (terminal != null) {
 					file = getFile(terminal);
 					lineFile = terminal.beginLine;
+
+					if (file != null) {
+						try {
+							IMarker marker = file.createMarker(FeatureHouseCorePlugin.BUILDER_PROBLEM_MARKER);
+							marker.setAttribute(IMarker.LINE_NUMBER, lineFile);
+							marker.setAttribute(IMarker.MESSAGE, e.getMessage());
+							marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
+						} catch (CoreException e2) {
+							LOGGER.logError(e2);
+						}
+					} else {
+						LOGGER.logError(new Exception("No file provided for: " + terminal.toString()));
+					}
 				}
-				try {
-					IMarker marker = file.createMarker(FeatureHouseCorePlugin.BUILDER_PROBLEM_MARKER);
-					marker.setAttribute(IMarker.LINE_NUMBER, lineFile);
-					marker.setAttribute(IMarker.MESSAGE, e.getMessage());
-					marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
-				} catch (CoreException e2) {
-					LOGGER.logError(e2);
-				} 
 			}
 
 			private IFile getFile(FSTTerminal terminal) {
@@ -199,8 +208,13 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 				while (fileNode != null && !fileNode.getName().endsWith(".java")) {
 					fileNode = fileNode.getParent();
 				}
-				FSTNode featureNode = fileNode.getParent();
-				return featureProject.getSourceFolder().getFolder(featureNode.getName()).getFile(fileNode.getName());
+				if (fileNode != null) {
+					FSTNode featureNode = fileNode.getParent();
+					return featureProject.getSourceFolder().getFolder(featureNode.getName()).getFile(fileNode.getName());
+				} else {
+					LOGGER.logError(new Exception("Java file could not be found for: "  + terminal.toString()));
+					return null;
+				}
 			}
 		};
 	}
@@ -210,11 +224,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		boolean supSuccess = super.initialize(project);
 		fhModelBuilder = new FeatureHouseModelBuilder(project);
 		createBuildStructure();
-		if (supSuccess == false || fhModelBuilder == null) {
-			return false;
-		} else {
-			return true;
-		}
+		return supSuccess && fhModelBuilder != null;
 	}
 
 	/**
@@ -337,11 +347,14 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 
 		if (configPath == null || basePath == null || outputPath == null)
 			return;
+		
+		final SignatureSetter signatureSetter = new SignatureSetter();
 
-		/**
+		/*
 		 * Run fuji parallel to the build process.
 		 */
-		fuji();
+		//TODO: save useFuji persistently
+		fuji(signatureSetter);
 
 		createBuildFolder(config);
 		setJavaBuildPath(config.getName().split("[.]")[0]);
@@ -366,7 +379,8 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			}
 		}
 		buildFSTModel(configPath, basePath, outputPath);
-
+		signatureSetter.setFstModel(featureProject.getFSTModel());
+		
 		checkContractComposition();
 
 		callCompiler();
@@ -375,13 +389,35 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	private void checkContractComposition() {
 		try {
 			deleteContractErrorMarkers();
-
-			if (!getContractParameter().equals(CONTRACT_COMPOSITION_METHOD_BASED)) {
-				for (FSTClass c : featureProject.getFSTModel().getClasses()) {
+			
+			final FSTModel fstModel = featureProject.getFSTModel();
+			if (fstModel == null) {
+				return;
+			}
+			
+			final String contractParameter = getContractParameter();
+			if (!contractParameter.equals(CONTRACT_COMPOSITION_EXPLICIT_CONTRACTING)) {
+				for (FSTClass c : fstModel.getClasses()) {
+					for (FSTRole r : c.getRoles()) {
+						for (FSTMethod m : r.getClassFragment().getMethods()) {
+							if (m.hasContract() && m.getContract().contains("original")) {
+								if (m.getCompKey().isEmpty() && contractParameter.equals(CONTRACT_COMPOSITION_METHOD_BASED)) {
+									continue;
+								}
+									setContractErrorMarker(m, "Keyword original ignored. Contract composition set to " + contractParameter
+											+ ". Change to \"Explicit Contract Refinement\".");
+							}
+						}
+					}
+				}
+			}
+			
+			if (!contractParameter.equals(CONTRACT_COMPOSITION_METHOD_BASED)) {
+				for (FSTClass c : fstModel.getClasses()) {
 					for (FSTRole r : c.getRoles()) {
 						for (FSTMethod m : r.getClassFragment().getMethods()) {
 							if (m.getCompKey().length() > 0)
-								setContractErrorMarker(m, ": Keyword " + m.getCompKey() + " ignored. Contract composition set to " + getContractParameter()
+								setContractErrorMarker(m, ": Keyword " + m.getCompKey() + " ignored. Contract composition set to " + contractParameter
 										+ ". Change to \"method-based composition\".");
 						}
 					}
@@ -389,7 +425,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 
 			} else {
 				final FeatureModel featureModel = featureProject.getFeatureModel();
-				for (FSTClass c : featureProject.getFSTModel().getClasses()) {
+				for (FSTClass c : fstModel.getClasses()) {
 					for (FSTRole r : c.getRoles()) {
 						Feature featureRole1 = featureModel.getFeature(r.getFeature().getName());
 						for (FSTMethod m : r.getClassFragment().getMethods()) {
@@ -644,7 +680,10 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	/**
 	 * Starts type checking with fuji in a background job.
 	 */
-	private void fuji() {
+	private void fuji(final SignatureSetter signatureSetter) {
+		if (!useFuji) {
+			return;
+		}
 		if (fuji != null) {
 			fuji.cancel();
 			try {
@@ -653,17 +692,20 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 				FMCorePlugin.getDefault().logError(e);
 			}
 		}
-		fuji = new StoppableJob("Type checking " + featureProject.getProjectName() + " with fuji") {
+		fuji = new AStoppableJob("Type checking " + featureProject.getProjectName() + " with fuji") {
 			@Override
-			protected IStatus execute(IProgressMonitor monitor) {
+			protected boolean work() {
 				try {
-					runFuji(featureProject);
+					final Program ast = runFuji(featureProject);
+					signatureSetter.setFujiParameters(featureProject, ast);
+					return true;
 				} catch (CompositionException e) {
 					FMCorePlugin.getDefault().logError(e);
+					return false;
 				}
-				return Status.OK_STATUS;
 			}
 		};
+		fuji.addJobFinishedListener(signatureSetter);
 		fuji.schedule();
 	}
 
@@ -674,17 +716,18 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	 * @param featureProject
 	 *            The feature project of the caller.
 	 */
-	private synchronized static void runFuji(IFeatureProject featureProject) throws CompositionException {
+	private synchronized static Program runFuji(IFeatureProject featureProject) throws CompositionException {
 		String sourcePath = featureProject.getSourcePath();
 		String[] fujiOptions = new String[] { "-" + Main.OptionName.CLASSPATH, getClassPaths(featureProject), "-" + Main.OptionName.PROG_MODE, "-" + Main.OptionName.COMPOSTION_STRATEGY,
 				Main.OptionName.COMPOSTION_STRATEGY_ARG_FAMILY, "-typechecker", "-basedir", sourcePath };
+		Program ast = null;
 		try {
 			FeatureModel fm = featureProject.getFeatureModel();
 			fm.getAnalyser().setDependencies();
 
 			Main fuji = new Main(fujiOptions, fm, featureProject.getFeatureModel().getConcreteFeatureNames());
 			Composition composition = fuji.getComposition(fuji);
-			Program ast = composition.composeAST();
+			ast = composition.composeAST();
 
 			// run type check
 			fuji.typecheckAST(ast);
@@ -728,6 +771,8 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		} catch (UnsupportedModelException e) {
 			LOGGER.logError(e);
 		}
+		
+		return ast;
 	}
 
 	public static String getClassPaths(IFeatureProject featureProject) {
@@ -776,7 +821,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	 * @param line
 	 *            The line number
 	 * @param message
-	 *            The message to disply
+	 *            The message to display
 	 * @param file
 	 *            The file
 	 * @param severity
@@ -784,7 +829,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	 */
 	private static void createFujiMarker(int line, String message, IResource file, int severity, IFeatureProject featureProject) {
 		// TODO NEWLine does not work
-		message = message.replaceAll("\n", NEWLINE);
+		message = message.replace("\n", NEWLINE);
 		try {
 			IMarker marker = file.createMarker(FeatureHouseCorePlugin.BUILDER_PROBLEM_MARKER);
 			marker.setAttribute(IMarker.LINE_NUMBER, line);
@@ -920,8 +965,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		} else if (CONTRACT_COMPOSITION_PLAIN_CONTRACTING
 				.equals(contractComposition)) {
 			return CONTRACT_COMPOSITION_PLAIN_CONTRACT;
-		} else if (CONTRACT_COMPOSITION_CONTRACT_OVERRIDING
-				.equals(contractComposition)) {
+		} else if (CONTRACT_COMPOSITION_CONTRACT_OVERRIDING.equals(contractComposition)) {
 			return CONTRACT_COMPOSITION_CONTRACT_OVERRIDING;
 		} else if (CONTRACT_COMPOSITION_EXPLICIT_CONTRACT_REFINEMENT.equals(contractComposition)) {
 			return CONTRACT_COMPOSITION_EXPLICIT_CONTRACTING;
@@ -1050,7 +1094,13 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			if (!file.getWorkspace().isTreeLocked()) {
 				file.refreshLocal(IResource.DEPTH_ZERO, null);
 			}
-			errorPropagation.addFile(file);
+			if (errorPropagation == null) {
+				errorPropagation = ErrorPropagation.createErrorPropagation(file);
+			}
+			//FIXME 14.11.2014 KT: Nullpointer for files with extension != "c" || "h" || "java" 
+			// Error propagation necessary for other files?
+			if(errorPropagation!=null)
+				errorPropagation.addFile(file); 
 		} catch (CoreException e) {
 			LOGGER.logError(e);
 		}
@@ -1112,7 +1162,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		composer.addParseErrorListener(createParseErrorListener());
 		composer.addCompositionErrorListener(createCompositionErrorListener());
 		composer.run(getArguments(configurationFile.getRawLocation().toOSString(), featureProject.getSourcePath(), folder.getParent().getLocation().toOSString(), getContractParameter()));
-		if (errorPropagation.job != null) {
+		if (errorPropagation != null && errorPropagation.job != null) {
 			/*
 			 * Waiting for the propagation job to finish, because the
 			 * corresponding FSTModel is necessary for propagation at FH This is
@@ -1168,13 +1218,12 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 
 	@Override
 	public void copyNotComposedFiles(Configuration config, IFolder destination) {
-		if (destination.getProject().equals(featureProject.getProject())) {
-			super.copyNotComposedFiles(config, destination.getFolder(featureProject.getCurrentConfiguration().getName().split("[.]")[0]));
+		if (destination == null) {
+			super.copyNotComposedFiles(config, featureProject.getBuildFolder().getFolder(featureProject.getCurrentConfiguration().getName().split("[.]")[0]));
 		} else {
 			// case: build into an external project
 			super.copyNotComposedFiles(config, destination);
 		}
-
 	}
 
 	@Override
@@ -1182,4 +1231,27 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		return IComposerExtensionClass.Mechanism.FEATURE_ORIENTED_PROGRAMMING;
 	}
 
+	public void setUseFuji(boolean useFuji) {
+		this.useFuji = useFuji;
+		
+		if (useFuji) {
+			final IFile currentConfiguration = featureProject.getCurrentConfiguration();
+			if (currentConfiguration != null) {
+				performFullBuild(currentConfiguration);
+			}
+		}
+	}
+	
+	public boolean usesFuji() {
+		return useFuji;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionBase#supportsMigration()
+	 */
+	@Override
+	public boolean supportsMigration()
+	{
+		return true;
+	}
 }

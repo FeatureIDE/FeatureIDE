@@ -26,7 +26,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
@@ -36,41 +35,41 @@ import org.eclipse.ui.part.EditorPart;
  * 
  * @author Jens Meinicke
  */
-public abstract class FeatureModelEditorPage extends EditorPart implements IFeatureModelEditorPage{
+public abstract class FeatureModelEditorPage extends EditorPart implements IFeatureModelEditorPage {
 
 	private int index;
-	
+
 	protected FeatureModelEditor featureModelEditor;
-	
+
 	protected boolean dirty = false;
-	
+
 	protected IEditorInput input;
 
 	protected IEditorSite site;
-	
+
 	/**
-	 * @param featureModelEditor the featureModelEditor to set
+	 * @param featureModelEditor
+	 *            the featureModelEditor to set
 	 */
 	public void setFeatureModelEditor(FeatureModelEditor featureModelEditor) {
 		this.featureModelEditor = featureModelEditor;
 	}
-	
+
 	@Override
 	public void doSave(IProgressMonitor monitor) {
 		dirty = false;
-		firePropertyChange(IEditorPart.PROP_DIRTY);
+		firePropertyChange(PROP_DIRTY);
 	}
 
 	@Override
 	public void doSaveAs() {
-		
+
 	}
 
 	@Override
-	public void init(IEditorSite site, IEditorInput input)
-			throws PartInitException {
+	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
 		this.input = input;
-		this.site = site; 
+		this.site = site;
 	}
 
 	@Override
@@ -85,12 +84,12 @@ public abstract class FeatureModelEditorPage extends EditorPart implements IFeat
 
 	@Override
 	public void createPartControl(Composite parent) {
-		
+
 	}
 
 	@Override
 	public void setFocus() {
-		
+
 	}
 
 	@Override
@@ -102,37 +101,42 @@ public abstract class FeatureModelEditorPage extends EditorPart implements IFeat
 	public void setIndex(int index) {
 		this.index = index;
 	}
-	
+
 	public IEditorSite getSite() {
 		return site;
 	}
-	
+
 	@Override
 	public void initEditor() {
 	}
-	
+
 	@Override
 	public IFeatureModelEditorPage getPage(Composite container) {
 		return this;
 	}
-	
+
 	@Override
 	public Control getControl() {
 		return null;
 	}
-	
+
 	@Override
 	public void propertyChange(PropertyChangeEvent event) {
-		
-	}
-	
-	@Override
-	public void pageChangeFrom(int newPage) {
 
 	}
 	
 	@Override
-	public void pageChangeTo(int oldPage) {
+	public boolean allowPageChange(int newPage) {
+		return true;
+	}
 	
+	@Override
+	public void pageChangeFrom(int newPage) {
+		
+	}
+
+	@Override
+	public void pageChangeTo(int oldPage) {
+		
 	}
 }

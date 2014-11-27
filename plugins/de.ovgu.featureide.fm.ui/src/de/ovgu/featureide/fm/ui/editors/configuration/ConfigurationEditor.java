@@ -180,6 +180,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements
 		}
 		else {
 			res = project.findMember("model.xml");
+			featureModel = new FeatureModel();
 		}
 		
 		if (res instanceof IFile) {
@@ -525,12 +526,10 @@ public class ConfigurationEditor extends MultiPageEditorPart implements
 			IDocument document = provider.getDocument(sourceEditor
 					.getEditorInput());
 			String text = document.get();
-			if (!new ConfigurationWriter(configuration).writeIntoString()
-					.equals(text)) {
+			if (!new ConfigurationWriter(configuration).writeIntoString().equals(text)) {
 				configuration = new Configuration(featureModel, true);
 				try {
-					new ConfigurationReader(configuration)
-							.readFromString(text);
+					new ConfigurationReader(configuration).readFromString(text);
 				} catch (Exception e) {
 					FMCorePlugin.getDefault().logError(e);
 				}

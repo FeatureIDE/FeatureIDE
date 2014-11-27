@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Android Plugin UI
+Bundle-SymbolicName: de.ovgu.featureide.ui.android;singleton:=true
+Bundle-Version: 2.7.2.qualifier
+Bundle-Activator: de.ovgu.featureide.ui.android.AndroidUIPlugin
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ de.ovgu.featureide.core,
+ de.ovgu.featureide.ui,
+ de.ovgu.featureide.fm.ui,
+ de.ovgu.featureide.fm.core,
+ de.ovgu.featureide.core.munge.android,
+ org.eclipse.ui.ide
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: de.ovgu.featureide.ui.android

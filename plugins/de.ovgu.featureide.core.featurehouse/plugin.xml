@@ -18,9 +18,18 @@
             id="de.ovgu.featureide.featurehouse.meta.buildmetaproduct"
             objectClass="org.eclipse.core.resources.IProject">
          <action
-               class="de.ovgu.featureide.featurehouse.meta.BuildMetaProductAction"
+               class="de.ovgu.featureide.featurehouse.ui.actions.BuildMetaProductAction"
+               enablesFor="1"
                id="de.ovgu.featureide.featurehouse.meta.buildmetaproductaction"
                label="Build Metaproduct"
+               menubarPath="de.ovgu.featureide.fm.ui.menu/featurehouse"
+               style="toggle">
+         </action>
+         <action
+               class="de.ovgu.featureide.featurehouse.ui.actions.EnableFujiAction"
+               enablesFor="1"
+               id="de.ovgu.featureide.featurehouse.ui.enablefujiaction"
+               label="Enable Fuji Type Check"
                menubarPath="de.ovgu.featureide.fm.ui.menu/featurehouse"
                style="toggle">
          </action>
@@ -30,25 +39,14 @@
                   value="de.ovgu.featureide.core.featureProjectNature">
             </objectState>
          </visibility>
-      </objectContribution>
-      <objectContribution
-            adaptable="true"
-            id="de.ovgu.featureide.core.featurehouse.FeatureBasedVerf"
-            objectClass="org.eclipse.core.resources.IProject">
          <action
-               class="de.ovgu.featureide.featurehouse.meta.GenerateFeatureStubsAction"
+               class="de.ovgu.featureide.featurehouse.ui.actions.GenerateFeatureStubsAction"
                id="de.ovgu.featureide.featurehouse.meta.FeatureBasedVeriAction"
                label="Perform Feature-Based Verification with KeY"
                menubarPath="de.ovgu.featureide.fm.ui.menu/featurehouse"
                style="push"
                tooltip="Generates Feature Stubs and Starts KeY for each Feature Stub&apos;s Verification">
          </action>
-         <visibility>
-            <objectState
-                  name="nature"
-                  value="de.ovgu.featureide.core.featureProjectNature">
-            </objectState>
-         </visibility>
       </objectContribution>
 	</extension>
  <extension
@@ -61,5 +59,14 @@
     <persistent
           value="true">
     </persistent>
+ </extension>
+ <extension
+       point="de.ovgu.featureide.core.wizard">
+    <newProjectWizard
+          class="de.ovgu.featureide.core.wizardextension.DefaultNewFeatureProjectWizardExtension"
+          composerid="de.ovgu.featureide.composer.featurehouse"
+          id="de.ovgu.featureide.core.featurehouse.newProjectWizard"
+          name="FeatureHouseNewProjectWizard">
+    </newProjectWizard>
  </extension>
 </plugin>

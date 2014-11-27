@@ -34,6 +34,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
+import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
@@ -46,16 +47,20 @@ public class JavaErrorPropagation extends ErrorPropagation {
 
 	private static final String REMOVED_LINES_2 = "2Lines";
 	private static final String REMOVED_LINES_4 = "4Lines";
-	
+
 	// Java 1.4 exclusions
 	private static final String RAW_TYPE = "raw type";
 	private static final String GENERIC_TYPE = "generic type";
 	private static final String TYPE_SAFETY = "Type safety";
-	//private static final String IMPORT = "The import";
-	
+	// private static final String IMPORT = "The import";
+
 	private static final String TASK = "org.eclipse.jdt.core.task";
 	private List<String> layerNames = null;
-	
+
+	protected JavaErrorPropagation(IFeatureProject featureProject) {
+		super(featureProject);
+	}
+
 	/**
 	 * 
 	 * Sets all composed lines to all methods and fields
@@ -149,7 +154,7 @@ public class JavaErrorPropagation extends ErrorPropagation {
 					} else if (line.startsWith(REMOVED_LINES_2)) {
 						lineCounter += 2;
 					}
-					
+
 					lineCounter++;
 				}
 				if (found) {
@@ -158,26 +163,23 @@ public class JavaErrorPropagation extends ErrorPropagation {
 			}
 		}
 	}
-	
-	@Override
-	protected boolean deleteMarker(String message) {
-		return (message.contains(RAW_TYPE) || 
-		message.contains(TYPE_SAFETY) || 
-		message.contains(GENERIC_TYPE)
-		//||message.contains(IMPORT)
-		); 
-	}
-	
 
 	@Override
-	boolean propagateMarker(IMarker m) {
+	protected boolean deleteMarker(String message) {
+		return (message.contains(RAW_TYPE) || message.contains(TYPE_SAFETY) || message.contains(GENERIC_TYPE)
+		// ||message.contains(IMPORT)
+		);
+	}
+
+	@Override
+	protected boolean propagateMarker(IMarker m) {
 		try {
 			return !(TASK.equals(m.getType()));
 		} catch (CoreException e) {
 		}
 		return super.propagateMarker(m);
 	}
-	
+
 	@Override
 	protected void propagateUnsupportedMarker(IMarker marker, IFile file) {
 		int markerLine = marker.getAttribute(IMarker.LINE_NUMBER, -1);
@@ -191,11 +193,14 @@ public class JavaErrorPropagation extends ErrorPropagation {
 			}
 		}
 	}
-	
+
 	/**
 	 * Checks if the given file contains a line with the given content.
-	 * @param lineContent the content to look for
-	 * @return The line of the content or <code>-1</code> if the does not contain the content. 
+	 * 
+	 * @param lineContent
+	 *            the content to look for
+	 * @return The line of the content or <code>-1</code> if the does not
+	 *         contain the content.
 	 */
 	private int getLine(IFile file, String lineContent) {
 		Scanner scanner = null;
@@ -221,7 +226,8 @@ public class JavaErrorPropagation extends ErrorPropagation {
 	}
 
 	/**
-	 * Corrects the given string to avoid changes by the <code>FeatureHouse</code> composer.
+	 * Corrects the given string to avoid changes by the
+	 * <code>FeatureHouse</code> composer.
 	 */
 	private String correctString(String string) {
 		while (string.contains("  ")) {
@@ -231,13 +237,14 @@ public class JavaErrorPropagation extends ErrorPropagation {
 			string = string.substring(0, string.indexOf('{'));
 		}
 		if (string.endsWith(" ")) {
-			string = string.substring(0,string.length()-1);
+			string = string.substring(0, string.length() - 1);
 		}
 		return string;
 	}
 
 	/**
-	 * @param file A composed file
+	 * @param file
+	 *            A composed file
 	 * @return A list containing all corresponding feature files
 	 */
 	private LinkedList<IFile> getFeatureFiles(IFile file) {
@@ -245,7 +252,7 @@ public class JavaErrorPropagation extends ErrorPropagation {
 		if (project == null) {
 			return null;
 		}
-		
+
 		if (layerNames == null) {
 			FeatureModel model = project.getFeatureModel();
 			if (model.isFeatureOrderUserDefined()) {
@@ -254,9 +261,10 @@ public class JavaErrorPropagation extends ErrorPropagation {
 				layerNames = model.getConcreteFeatureNames();
 			}
 		}
-		
+
 		LinkedList<IFile> featureFiles = new LinkedList<IFile>();
-		FSTClass c = project.getFSTModel().getClass(file.getName());
+		final FSTModel fstModel = project.getFSTModel();
+		FSTClass c = fstModel.getClass(fstModel.getAbsoluteClassName(file));
 		for (FSTRole role : c.getRoles()) {
 			featureFiles.add(role.getFile());
 		}
@@ -265,8 +273,9 @@ public class JavaErrorPropagation extends ErrorPropagation {
 
 	/**
 	 * 
-	 * @param line The line to lock for
-	 * @return the content at the given line of the file 
+	 * @param line
+	 *            The line to lock for
+	 * @return the content at the given line of the file
 	 */
 	private String getLineContent(IFile file, int line) {
 		Scanner scanner = null;
@@ -289,6 +298,5 @@ public class JavaErrorPropagation extends ErrorPropagation {
 		}
 		return "";
 	}
-	
-	
+
 }

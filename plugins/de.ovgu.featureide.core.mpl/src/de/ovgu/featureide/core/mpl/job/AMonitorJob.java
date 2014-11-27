@@ -22,6 +22,7 @@ package de.ovgu.featureide.core.mpl.job;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 
 import de.ovgu.featureide.core.mpl.job.util.AJobArguments;
@@ -44,16 +45,14 @@ abstract class AMonitorJob<T extends AJobArguments> extends AChainJob<T> {
 
 	@Override
 	public IStatus run(IProgressMonitor monitor) {
-		this.monitor = monitor;
+		this.monitor = (monitor != null) ? monitor : new NullProgressMonitor();
 		relativeWorkDone = 0;
 		absoluteWorkDone = 0;
 		maxAbsoluteWork = 1;
 		
-		if (monitor != null) {
-			monitor.beginTask(getName(), maxRelativeWork);
-		}
+		this.monitor.beginTask(getName(), maxRelativeWork);
 		
-		IStatus status = super.run(monitor);
+		IStatus status = super.run(this.monitor);
 		
 		if (monitor != null) {
 			monitor.done();

@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Munge (Android)
+Bundle-SymbolicName: de.ovgu.featureide.core.munge.android;singleton:=true
+Bundle-Version: 2.7.2.qualifier
+Bundle-Activator: de.ovgu.featureide.munge_android.MungeAndroidCorePlugin
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ de.ovgu.featureide.core,
+ de.ovgu.featureide.fm.core,
+ de.ovgu.featureide.core.munge
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: de.ovgu.featureide.munge_android

@@ -2,25 +2,20 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: FeatureHouse Plug-in
 Bundle-SymbolicName: de.ovgu.featureide.core.featurehouse;singleton:=true
-Bundle-Version: 2.7.0.qualifier
+Bundle-Version: 2.7.2.qualifier
 Bundle-Activator: de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.resources,
  de.ovgu.featureide.core,
  de.ovgu.featureide.fm.core,
- org.eclipse.jdt.core,
- de.ovgu.featureide.core.mpl;bundle-version="2.7.0",
- de.ovgu.featureide.ui.mpl;bundle-version="2.7.0"
+ org.eclipse.jdt.core
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: lib/FeatureHouse.jar,
  lib/fuji.jar,
  .
 Bundle-Vendor: University of Magdeburg
-Import-Package: de.uka.ilkd.key.gui,
- de.uka.ilkd.key.gui.actions,
- de.uka.ilkd.key.ui,
- org.eclipse.core.expressions,
+Import-Package: org.eclipse.core.expressions,
  org.eclipse.jdt.internal.core,
  org.eclipse.jdt.internal.ui.packageview

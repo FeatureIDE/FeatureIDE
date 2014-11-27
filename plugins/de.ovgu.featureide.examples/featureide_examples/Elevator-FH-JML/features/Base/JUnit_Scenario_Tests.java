@@ -26,7 +26,7 @@ public  class  JUnit_Scenario_Tests {
 	 * Hook for specifications with liveness properties. (indicator for
 	 * test-termination)
 	 */
-	/*@
+	/*@ \consecutive_contract
 	  @ ensures (\forall int i; 0 <= i && i < env.calledAt_Spec1.length; !env.calledAt_Spec1[i]);
 	  @ ensures (\forall int i; 0 <= i && i < env.calledAt_Spec2.length; !env.calledAt_Spec2[i]);
 	  @*/

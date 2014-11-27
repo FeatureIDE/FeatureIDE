@@ -26,12 +26,15 @@ import org.eclipse.core.runtime.IConfigurationElement;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.ExtensionPointManager;
+import de.ovgu.featureide.core.IFeatureProject;
 
 
 /**
  * Manages the FeatureIDE extensions to compose features.
  * 
  * @author Tom Brosch
+ * @author Stefan Krueger
+ * @author Sebastian Krieter
  */
 public class ComposerExtensionManager extends ExtensionPointManager<IComposerExtension> {
 
@@ -58,15 +61,16 @@ public class ComposerExtensionManager extends ExtensionPointManager<IComposerExt
 	}
 	
 	/**
-	 * Gets a composer by an I
+	 * Gets a composer by an ID
 	 * 
 	 * @param composerID The ID of the composer
 	 * @return The composer or null if no composer with the specified ID was found
 	 */
-	public IComposerExtension getComposerById(String composerID) {
+	public IComposerExtensionClass getComposerById(IFeatureProject featureProject, String composerID) {
 		for (IComposerExtension tool : getComposers()) {
-			if (tool.getId().equals(composerID))
-				return tool;
+			if (tool.getId().equals(composerID)) {
+				return tool.getComposerByProject(featureProject);	
+			}
 		}
 		return null;
 	}

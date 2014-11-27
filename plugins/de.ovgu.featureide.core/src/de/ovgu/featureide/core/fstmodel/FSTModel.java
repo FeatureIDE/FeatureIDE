@@ -29,27 +29,29 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.IPath;
 
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.signature.ProjectSignatures;
 
 /**
  * The FSTModel represents the projects structure.<br>
- * {@link FSTClass}es and {@link FSTFeature}s can have a shared {@link FSTRole}
- * s.<br>
+ * {@link FSTClass}es and {@link FSTFeature}s can have a shared {@link FSTRole}.<br>
  * For a visualization of the FSTModels structure see <i>lib/FSTModel.jpg<i>.
  * 
  * @author Jens Meinicke
  */
-
 public class FSTModel {
 
 	private final Map<String, FSTClass> classes = new HashMap<String, FSTClass>();
 	private final Map<String, FSTFeature> features = new HashMap<String, FSTFeature>();
-	private final IFeatureProject featurProject;
+	private final IFeatureProject featureProject;
 	private FSTConfiguration configuration;
+	
+	private ProjectSignatures projectSignatures = null;
 
 	public FSTModel(IFeatureProject featureProject) {
-		this.featurProject = featureProject;
+		this.featureProject = featureProject;
 	}
 
 	public void reset() {
@@ -87,7 +89,7 @@ public class FSTModel {
 	}
 	
 	public void addClass(final FSTClass c) {
-		if (!classes.containsValue(c)) {
+		if (!classes.containsKey(c.getName())) {
 			classes.put(c.getName(), c);
 		}
 	}
@@ -110,15 +112,12 @@ public class FSTModel {
 	}
 
 	public FSTRole getRole(String featureName, String className) {
-		FSTClass c = classes.get(className);
-		if (c != null) {
-			return c.getRole(featureName);
-		}
-		return null;
+		final FSTClass c = classes.get(className);
+		return (c == null) ? null : c.getRole(featureName);
 	}
 
-	public FSTClass getClass(String fileName) {
-		return classes.get(fileName);
+	public FSTClass getClass(String className) {
+		return classes.get(className);
 	}
 
 	public List<FSTClass> getClasses() {
@@ -126,7 +125,7 @@ public class FSTModel {
 	}
 
 	public IFeatureProject getFeatureProject() {
-		return featurProject;
+		return featureProject;
 	}
 	
 	/**
@@ -169,5 +168,33 @@ public class FSTModel {
 		c.addRole(featureName, arbitraryRole);
 		feature.addRole(className, arbitraryRole);
 		return role;
+	}
+	
+	public ProjectSignatures getProjectSignatures() {
+		return projectSignatures;
+	}
+	
+	public void setProjectSignatures(ProjectSignatures projectSignatures) {
+		this.projectSignatures = projectSignatures;
+	}
+	
+	public String getAbsoluteClassName(IFile file) {
+		IPath filePath = file.getProjectRelativePath();
+		final IPath featurePath = featureProject.getSourceFolder().getProjectRelativePath();
+		final IPath sourcePath = featureProject.getBuildFolder().getProjectRelativePath();
+		
+		int matchedSegments = filePath.matchingFirstSegments(featurePath) + 1;
+		if (matchedSegments != featurePath.segmentCount() + 1) {
+			// TODO: this depends on the used composer
+			// featureHouse adds an extra folder with the configuration name (therefore +1)
+			// however, ahead does not do this (hence, this is wrong)
+			matchedSegments = filePath.matchingFirstSegments(sourcePath) + 1;
+			if (matchedSegments != sourcePath.segmentCount() + 1) {
+				matchedSegments = 0;
+			}
+		}
+
+		filePath = filePath.removeFirstSegments(matchedSegments);
+		return filePath.toString();
 	}
 }

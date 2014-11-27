@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Hello World App</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world"><!--/*if[Hello]*/-->Hello<!--/*end[Hello]*/--><!--/*if[Beautiful]*/--> beautiful<!--/*end[Beautiful]*/--><!--/*if[Wonderful]*/--> wonderful<!--/*end[Wonderful]*/--><!--/*if[World]*/--> world<!--/*end[World]*/--></string>
+    <string name="button_say_hello">Say Hello</string>
+    <string name="custom_message_hint">Enter a message</string>
+    <string name="button_show_message">Show Message</string>
+
+</resources>

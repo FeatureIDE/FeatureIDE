@@ -46,10 +46,8 @@ public class Graph {
 	
 	/*@ \consecutive_contract
 	 @ requires nodes != null && nodes instanceof List<Node>;
-	 @ ensures \result ==> ((\forall int i; 0 <= i && i < nodes.size() -1;
-	 @ 	nodes.toArray()[i].compareTo(nodes.toArray()[i+1]) = -1 )
-	 @ || (\forall int i; 0 <= i && i < nodes.size() -1;
-	 @ 	nodes.toArray()[i].compareTo(nodes.toArray()[i+1]) = 0 ));
+	 @ ensures (\forall int i; 0 <= i && i < \result.size()-1;
+	 @ 	\result.toArray()[i].compareTo(\result.toArray()[i+1]) <= 0 );
 	 @*/
 	public Collection<Node> sortNodes(Collection<Node> nodes) {
 		List<Node> list = new ArrayList<Node>(nodes);
@@ -59,8 +57,8 @@ public class Graph {
 	
 	/*@ \consecutive_contract
 	 @ requires edges != null && edges instanceof List<Edge>;
-	 @ ensures \result == (\forall int i; 0 <= i && i < edges.size() -1;
-	 @ 	edges.toArray()[i].compareTo(edges.toArray()[i+1]) = -1 );
+	 @ ensures (\forall int i; 0 <= i && i < \result.size()-1;
+	 @ 	\result.toArray()[i].compareTo(\result.toArray()[i+1]) <= 0);
 	 @*/
 	public Collection<Edge> sortEdges(Collection<Edge> edges) {
 		List<Edge> list = new ArrayList<Edge>(edges);

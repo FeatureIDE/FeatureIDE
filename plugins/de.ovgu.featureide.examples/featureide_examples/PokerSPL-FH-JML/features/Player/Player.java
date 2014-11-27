@@ -41,7 +41,8 @@ public /*@nullable_by_default@*/ class Player {
    * @param initAmount
    *          the init amount
    */
-  /*@ requires newId > 0;
+  /*@ \conjunctive_contract
+      requires newId > 0;
       assignable id;
       ensures id == newId ;
    */

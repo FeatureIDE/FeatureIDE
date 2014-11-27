@@ -29,45 +29,27 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 
-import javax.swing.JOptionPane;
-
-import org.apache.commons.cli.ParseException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
-import AST.Program;
-
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
-import de.ovgu.featureide.core.mpl.InterfaceProject;
-import de.ovgu.featureide.core.mpl.MPLPlugin;
-import de.ovgu.featureide.core.mpl.job.ExtendedFujiSignaturesJob;
-import de.ovgu.featureide.core.mpl.job.JobManager;
-import de.ovgu.featureide.core.mpl.signature.ProjectSignatures;
-import de.ovgu.featureide.core.mpl.signature.ProjectSignatures.SignatureIterator;
-import de.ovgu.featureide.core.mpl.signature.abstr.AbstractFieldSignature;
-import de.ovgu.featureide.core.mpl.signature.abstr.AbstractMethodSignature;
-import de.ovgu.featureide.core.mpl.signature.abstr.AbstractSignature;
-import de.ovgu.featureide.core.mpl.signature.filter.MethodFilter;
-import de.ovgu.featureide.featurehouse.FeatureHouseComposer;
+import de.ovgu.featureide.core.signature.ProjectSignatures;
+import de.ovgu.featureide.core.signature.ProjectSignatures.SignatureIterator;
+import de.ovgu.featureide.core.signature.abstr.AbstractFieldSignature;
+import de.ovgu.featureide.core.signature.abstr.AbstractMethodSignature;
+import de.ovgu.featureide.core.signature.abstr.AbstractSignature;
+import de.ovgu.featureide.core.signature.filter.MethodFilter;
+import de.ovgu.featureide.featurehouse.ExtendedFujiSignaturesJob;
 import de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin;
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.uka.ilkd.key.gui.GUIEvent;
-import de.uka.ilkd.key.gui.GUIListener;
-import de.uka.ilkd.key.gui.KeYMediator;
-import de.uka.ilkd.key.gui.Main;
-import fuji.CompilerWarningException;
-import fuji.Composition;
-import fuji.FeatureDirNotFoundException;
-import fuji.SemanticErrorException;
-import fuji.SyntacticErrorException;
+import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 
 /**
  * Generates Feature Stubs
@@ -76,10 +58,11 @@ import fuji.SyntacticErrorException;
  */
 public class FeatureStubsGenerator {
 
-	private String PATH; // = "D" + Path.DEVICE_SEPARATOR + "\\FeatureIDETEST\\";
+	
+	private String PATH;
 	private IFeatureProject featureProject = null;
 
-	private GUIListener guiL = null;
+	KeYWrapper keyWrapper = null;
 	private IFolder featureStubFolder = null;
 	
 	public FeatureStubsGenerator(IFeatureProject fProject) {
@@ -89,84 +72,52 @@ public class FeatureStubsGenerator {
 	
 	public boolean generate() {
 		if (featureProject.getFSTModel() == null) {
-			featureProject.getComposer().initialize(featureProject);
 			featureProject.getComposer().buildFSTModel();
 		}
-		final ExtendedFujiSignaturesJob fujiSignaturesJob = new ExtendedFujiSignaturesJob();
 
-		String fhc = FeatureHouseComposer.getClassPaths(featureProject);
-		String[] fujiOptions = new String[] { "-" + fuji.Main.OptionName.CLASSPATH, fhc, "-" + fuji.Main.OptionName.PROG_MODE, "-" + fuji.Main.OptionName.COMPOSTION_STRATEGY,
-				fuji.Main.OptionName.COMPOSTION_STRATEGY_ARG_FAMILY, "-typechecker", "-basedir", featureProject.getSourcePath() };
+//		String fhc = FeatureHouseComposer.getClassPaths(featureProject);
+//		String[] fujiOptions = new String[] { "-" + fuji.Main.OptionName.CLASSPATH, fhc, "-" + fuji.Main.OptionName.PROG_MODE, "-" + fuji.Main.OptionName.COMPOSTION_STRATEGY,
+//				fuji.Main.OptionName.COMPOSTION_STRATEGY_ARG_FAMILY, "-typechecker", "-basedir", featureProject.getSourcePath() };
 		FeatureModel fm = featureProject.getFeatureModel();
 		fm.getAnalyser().setDependencies();
 
-		try {
-			fuji.Main fuji = new fuji.Main(fujiOptions, fm, featureProject.getFeatureModel().getConcreteFeatureNames());
-			Composition composition = fuji.getComposition(fuji);
-			Program ast = composition.composeAST();
-			// run type check
-			fuji.typecheckAST(ast);
+//		try {
+//			fuji.Main fuji = new fuji.Main(fujiOptions, fm, featureProject.getFeatureModel().getConcreteFeatureNames());
+//			Composition composition = fuji.getComposition(fuji);
+//			Program ast = composition.composeAST();
+//			// run type check
+//			fuji.typecheckAST(ast);
+//			
+//			if (!fuji.getWarnings().isEmpty()) {
+//				FeatureHouseCorePlugin.getDefault().logError("The SPL " + featureProject.getProjectName() + " contains type errors. Therefore, the verification is aborted.", null);
+//			}
+//		} catch (IllegalArgumentException | ParseException | IOException | FeatureDirNotFoundException | SyntacticErrorException
+//				| SemanticErrorException | CompilerWarningException | UnsupportedModelException e1) {
+//			FeatureHouseCorePlugin.getDefault().logError(e1);
+//		}
+		
+		ExtendedFujiSignaturesJob efsj = new ExtendedFujiSignaturesJob(featureProject);
+		efsj.addJobFinishedListener(new JobFinishListener() {
+
+			@Override
+			public void jobFinished(boolean success) {
+				getFeatures(featureProject.getFSTModel().getProjectSignatures());
+			}
 			
-			if (!fuji.getWarnings().isEmpty()) {
-				FeatureHouseCorePlugin.getDefault().logError("The SPL " + featureProject.getProjectName() + " contains type errors. Therefore, the verification is aborted.", null);
-			}
-		} catch (IllegalArgumentException | ParseException | IOException | FeatureDirNotFoundException | SyntacticErrorException
-				| SemanticErrorException | CompilerWarningException | UnsupportedModelException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		
-		
-		final Object tmpObject = new Object();
-		final InterfaceProject intProject = MPLPlugin.getDefault().addProject(featureProject.getProject());
-		fujiSignaturesJob.setProject(intProject.getProjectReference());
-		Thread buildThread;
-		buildThread = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				JobManager.addJob(tmpObject, fujiSignaturesJob);
-				// wait for jobs to be finished
-				synchronized (tmpObject) {
-					try {
-						tmpObject.wait();
-					} catch (InterruptedException e) {
-						CorePlugin.getDefault().logError(e);
-					} finally {
-					}
-				}
-			}
 		});
-		buildThread.start();
-		try {
-			buildThread.join();
-		} catch (InterruptedException e) {
-			CorePlugin.getDefault().logError(e);
-		}
-
-		final ProjectSignatures signatures = fujiSignaturesJob.getProjectSignatures();
-//		file = null;
-
-		Thread stubThread = new Thread() {
-
-			@Override
-			public void run() {
-				getFeatures(signatures, intProject);
-			}
-
-		};
-		stubThread.setPriority(Thread.MAX_PRIORITY);
-		stubThread.start();
+		efsj.schedule();
+		
 		
 		return true;
 	}
 
-	private void createFeatureStub(final FSTFeature feat, final ProjectSignatures signatures, final InterfaceProject intProject) {
+	private void createFeatureStub(final FSTFeature feat, final ProjectSignatures signatures) {
 		Thread keyThread = new Thread() {
 			public void run() {
 				try {
 					File file = null;
 					String fileText = "";
-					int featureID = intProject.getFeatureID(feat.getName());
+					int featureID = signatures.getFeatureID(feat.getName());
 					CorePlugin.createFolder(featureProject.getProject(), featureProject.getFeaturestubPath() + File.separator + feat.getName());
 					final HashSet<String> alreadyUsedSigs = new HashSet<String>();
 					copyRolesToFeatureStubsFolder(feat);
@@ -184,7 +135,7 @@ public class FeatureStubsGenerator {
 						
 						for (FSTMethod meth : role.getClassFragment().getMethods()) {
 							boolean contractChanged = false;
-							final SignatureIterator sigIterator = signatures.createIterator();
+							final SignatureIterator sigIterator = signatures.iterator();
 							sigIterator.addFilter(new MethodFilter());
 
 							while (sigIterator.hasNext()) {
@@ -198,12 +149,12 @@ public class FeatureStubsGenerator {
 										}
 										
 										if (curSig.getFeatureData()[i].usesOriginal()) {
-											fileTextSB = checkForOriginal(fileTextSB, meth, curSig, intProject.getFeatureName(curSig.getFeatureData()[i].getId()));
+											fileTextSB = checkForOriginal(fileTextSB, meth, curSig, signatures.getFeatureName(curSig.getFeatureData()[i].getId()));
 										}
 
 										if (meth.hasContract() && meth.getContract().contains("\\original")) {
 											contractChanged = true;
-											fileTextSB = checkForOriginalInContract(fileTextSB, curSig);
+											//fileTextSB = checkForOriginalInContract(fileTextSB, curSig);
 										}
 										
 										for (String typeName : curSig.getFeatureData()[i].getUsedNonPrimitveTypes()) {
@@ -235,12 +186,8 @@ public class FeatureStubsGenerator {
 						fileTextSB.append(fileText.substring(lastIndexOf));
 						writeToFile(file, fileTextSB);
 					}
-					Main key = new Main(new String[] { file.getCanonicalPath() });
-					if (key.getUi() != null) {
-						KeYMediator m = key.getUi().getMediator();
-						m.addGUIListener(guiL);
-					} else {
-						FeatureHouseCorePlugin.getDefault().logError("KeY could not be started.", null);
+					if (keyWrapper != null) {
+						keyWrapper.runKeY(file);
 					}
 				} catch (IOException e) {
 					FeatureHouseCorePlugin.getDefault().logError(e);
@@ -251,7 +198,7 @@ public class FeatureStubsGenerator {
 
 	}
 	
-	private void getFeatures(final ProjectSignatures signatures, final InterfaceProject intProject) {
+	private void getFeatures(final ProjectSignatures signatures) {
 		final LinkedList<FSTFeature> features = new LinkedList<FSTFeature>(this.featureProject.getFSTModel().getFeatures());
 		featureStubFolder = CorePlugin.createFolder(featureProject.getProject(), featureProject.getFeaturestubPath());
 		for (FSTFeature fstfeat : features) {
@@ -261,31 +208,23 @@ public class FeatureStubsGenerator {
 				FeatureHouseCorePlugin.getDefault().logError(e1);
 			}
 		}
-		
-		
-		guiL = new GUIListener() {
+		keyWrapper = KeYWrapper.createGUIListener(this, signatures, features);
 
-			@Override
-			public void modalDialogOpened(GUIEvent e) {
+		if (keyWrapper == null) {
+			FeatureHouseCorePlugin.getDefault().logInfo("Please install KeY for an auto-start of the theorem prover.");
+			while (!features.isEmpty()) {
+				nextElement(signatures, features);
 			}
-
-			@Override
-			public void modalDialogClosed(GUIEvent e) {
-			}
-
-			@Override
-			public void shutDown(GUIEvent e) {
-				nextElement(signatures, intProject, features);
-			}
-		};
-		nextElement(signatures, intProject, features);
+		} else {
+			nextElement(signatures, features);
+		}
 	}
 
-	private void nextElement(final ProjectSignatures signatures, final InterfaceProject intProject, final LinkedList<FSTFeature> features) {
+	void nextElement(final ProjectSignatures signatures, final LinkedList<FSTFeature> features) {
 		if (!features.isEmpty()) {
 			FSTFeature fstFeat;
 			while (!(fstFeat = features.removeFirst()).hasMethodContracts()) {};
-			createFeatureStub(fstFeat, signatures, intProject); 
+			createFeatureStub(fstFeat, signatures); 
 		} else {
 			FeatureHouseCorePlugin.getDefault().logInfo("Feature Stubs generated and proven.");
 		}

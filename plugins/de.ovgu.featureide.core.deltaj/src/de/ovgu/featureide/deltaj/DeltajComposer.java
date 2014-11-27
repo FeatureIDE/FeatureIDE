@@ -21,7 +21,6 @@
 package de.ovgu.featureide.deltaj;
 
 import java.io.BufferedReader;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,7 +31,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 
 import org.deltaj.DeltaJStandaloneSetup;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
@@ -295,10 +293,16 @@ public class DeltajComposer extends ComposerExtensionClass {
 	}
 	
 	@Override
-	public boolean hasFeatureFolders() {
+	public boolean hasFeatureFolder() {
 		return false;
 	}
 	
+
+	@Override
+	public boolean createFolderForFeatures() {
+		return false;
+	}
+
 	@Override
 	public boolean refines() {
 		return false;
@@ -320,5 +324,14 @@ public class DeltajComposer extends ComposerExtensionClass {
 	@Override
 	public Mechanism getGenerationMechanism() {
 	    return IComposerExtensionClass.Mechanism.DELTA_ORIENTED_PROGRAMMING;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionBase#supportsMigration()
+	 */
+	@Override
+	public boolean supportsMigration()
+	{
+		return false;
 	}
 }

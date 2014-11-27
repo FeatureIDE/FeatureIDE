@@ -329,6 +329,30 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		return concreteFeatureNames;
 	}
 	
+	public Collection<Feature> getFeaturesPreorder() {
+		List<Feature> preorderFeatures = new LinkedList<Feature>();
+		if (rootFeature != null) {
+			getFeaturesPreorder(rootFeature, preorderFeatures);
+		}
+		return Collections.unmodifiableCollection(preorderFeatures);
+	}
+
+	private void getFeaturesPreorder(Feature feature, List<Feature> preorderFeatures) {
+		
+		preorderFeatures.add(feature);
+		for (Feature child : feature.getChildren()) {
+			getFeaturesPreorder(child, preorderFeatures);
+		}
+	}
+	
+	public List<String> getFeatureNamesPreorder() {
+		List<String> preorderFeaturesNames = new LinkedList<String>();
+		for (Feature f : getFeaturesPreorder()) {
+			preorderFeaturesNames.add(f.getName());
+		}
+		return preorderFeaturesNames;
+	}
+	
 	/**
 	 * @return <code>true</code> if a feature with the given name exists and is concrete.
 	 * @deprecated Will be removed in a future release. Use {@link #getFeature(String)}.isConcrete() instead.
@@ -522,6 +546,10 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	
 	public void handleModelLayoutChanged() {
 		fireEvent(MODEL_LAYOUT_CHANGED);
+	}
+	
+	public void handleLegendLayoutChanged() {
+		fireEvent(LEGEND_LAYOUT_CHANGED);
 	}
 	
 	public void refreshContextMenu() {

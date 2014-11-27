@@ -31,7 +31,6 @@ import org.deltaj.typing.DeltaJTypeSystem;
 import org.deltaj.util.DeltaJTypeUtils;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.xtend2.lib.StringConcatenation;
-import org.eclipse.xtext.xbase.lib.IntegerExtensions;
 
 @SuppressWarnings("all")
 public class DeltaJExpressionConstraintGenerator {
@@ -43,8 +42,8 @@ public class DeltaJExpressionConstraintGenerator {
   private DeltaJConstraintGeneratorHelper constraintGeneratorHelper;
   
   public void init(final DeltaJTypeSystem ts, final StringConcatenation buf) {
-      this.typeSystem = ts;
-      this.buffer = buf;
+    this.typeSystem = ts;
+    this.buffer = buf;
   }
   
   public StringConcatenation genConstraints(final DeltaJTypeSystem ts, final Expression exp) {
@@ -53,7 +52,7 @@ public class DeltaJExpressionConstraintGenerator {
       StringConcatenation _stringConcatenation = new StringConcatenation();
       this.init(ts, _stringConcatenation);
       this.genConstraintAndGetType(exp);
-      _xblockexpression = (this.buffer);
+      _xblockexpression = this.buffer;
     }
     return _xblockexpression;
   }
@@ -62,38 +61,32 @@ public class DeltaJExpressionConstraintGenerator {
     Type _xblockexpression = null;
     {
       this.init(ts, buffer);
-      Type _genConstraintAndGetType = this.genConstraintAndGetType(exp);
-      _xblockexpression = (_genConstraintAndGetType);
+      _xblockexpression = this.genConstraintAndGetType(exp);
     }
     return _xblockexpression;
   }
   
   public Type genConstraintAndGetType(final Expression exp) {
-    Type _genConstraintAndGetTypeCase = this.genConstraintAndGetTypeCase(exp);
-    return _genConstraintAndGetTypeCase;
+    return this.genConstraintAndGetTypeCase(exp);
   }
   
   protected Type _genConstraintAndGetTypeCase(final Expression exp) {
-    Type _methodBodyExpressionType = this.typeSystem.getMethodBodyExpressionType(exp);
-    return _methodBodyExpressionType;
+    return this.typeSystem.getMethodBodyExpressionType(exp);
   }
   
   protected Type _genConstraintAndGetTypeCase(final Plus exp) {
     TypeVariable _xblockexpression = null;
     {
       Expression _left = exp.getLeft();
-      Type _genConstraintAndGetType = this.genConstraintAndGetType(_left);
-      Type leftType = _genConstraintAndGetType;
+      Type leftType = this.genConstraintAndGetType(_left);
       this.buffer.newLineIfNotEmpty();
       Expression _right = exp.getRight();
-      Type _genConstraintAndGetType_1 = this.genConstraintAndGetType(_right);
-      Type rightType = _genConstraintAndGetType_1;
+      Type rightType = this.genConstraintAndGetType(_right);
       this.buffer.newLineIfNotEmpty();
-      TypeVariable _createTypeVariable = this.typeSystem.createTypeVariable();
-      TypeVariable plusType = _createTypeVariable;
+      TypeVariable plusType = this.typeSystem.createTypeVariable();
       CharSequence _genPlusConstraint = this.constraintGeneratorHelper.genPlusConstraint(leftType, rightType, plusType, exp);
       this.buffer.append(_genPlusConstraint);
-      _xblockexpression = (plusType);
+      _xblockexpression = plusType;
     }
     return _xblockexpression;
   }
@@ -101,12 +94,11 @@ public class DeltaJExpressionConstraintGenerator {
   protected Type _genConstraintAndGetTypeCase(final Minus exp) {
     IntType _xblockexpression = null;
     {
-      IntType _createIntType = DeltaJTypeUtils.createIntType();
-      IntType intType = _createIntType;
+      IntType intType = DeltaJTypeUtils.createIntType();
       Expression _left = exp.getLeft();
       Expression _right = exp.getRight();
       this.genConstraintsForSubexpressions(exp, _left, _right, intType);
-      _xblockexpression = (intType);
+      _xblockexpression = intType;
     }
     return _xblockexpression;
   }
@@ -114,12 +106,11 @@ public class DeltaJExpressionConstraintGenerator {
   protected Type _genConstraintAndGetTypeCase(final MultiOrDiv exp) {
     IntType _xblockexpression = null;
     {
-      IntType _createIntType = DeltaJTypeUtils.createIntType();
-      IntType intType = _createIntType;
+      IntType intType = DeltaJTypeUtils.createIntType();
       Expression _left = exp.getLeft();
       Expression _right = exp.getRight();
       this.genConstraintsForSubexpressions(exp, _left, _right, intType);
-      _xblockexpression = (intType);
+      _xblockexpression = intType;
     }
     return _xblockexpression;
   }
@@ -127,12 +118,11 @@ public class DeltaJExpressionConstraintGenerator {
   protected Type _genConstraintAndGetTypeCase(final AndOrExpression exp) {
     BooleanType _xblockexpression = null;
     {
-      BooleanType _createBooleanType = DeltaJTypeUtils.createBooleanType();
-      BooleanType booleanType = _createBooleanType;
+      BooleanType booleanType = DeltaJTypeUtils.createBooleanType();
       Expression _left = exp.getLeft();
       Expression _right = exp.getRight();
       this.genConstraintsForSubexpressions(exp, _left, _right, booleanType);
-      _xblockexpression = (booleanType);
+      _xblockexpression = booleanType;
     }
     return _xblockexpression;
   }
@@ -140,42 +130,38 @@ public class DeltaJExpressionConstraintGenerator {
   protected Type _genConstraintAndGetTypeCase(final Comparison exp) {
     BooleanType _xblockexpression = null;
     {
-      BooleanType _createBooleanType = DeltaJTypeUtils.createBooleanType();
-      BooleanType booleanType = _createBooleanType;
+      BooleanType booleanType = DeltaJTypeUtils.createBooleanType();
       Expression _left = exp.getLeft();
       Expression _right = exp.getRight();
       IntType _createIntType = DeltaJTypeUtils.createIntType();
       this.genConstraintsForSubexpressions(exp, _left, _right, _createIntType);
-      _xblockexpression = (booleanType);
+      _xblockexpression = booleanType;
     }
     return _xblockexpression;
   }
   
   public void genConstraintsForSubexpressions(final Expression main, final Expression left, final Expression right, final Type expectedType) {
-      Type _genConstraintAndGetType = this.genConstraintAndGetType(left);
-      Type leftType = _genConstraintAndGetType;
-      this.buffer.newLineIfNotEmpty();
-      CharSequence _genSubtypeConstraint = this.constraintGeneratorHelper.genSubtypeConstraint(leftType, expectedType, left);
-      this.buffer.append(_genSubtypeConstraint);
-      this.buffer.newLineIfNotEmpty();
-      Type _genConstraintAndGetType_1 = this.genConstraintAndGetType(right);
-      Type rightType = _genConstraintAndGetType_1;
-      this.buffer.newLineIfNotEmpty();
-      CharSequence _genSubtypeConstraint_1 = this.constraintGeneratorHelper.genSubtypeConstraint(rightType, expectedType, right);
-      this.buffer.append(_genSubtypeConstraint_1);
-      this.buffer.newLineIfNotEmpty();
-      CharSequence _genComment = this.constraintGeneratorHelper.genComment(main);
-      this.buffer.append(_genComment);
+    Type leftType = this.genConstraintAndGetType(left);
+    this.buffer.newLineIfNotEmpty();
+    CharSequence _genSubtypeConstraint = this.constraintGeneratorHelper.genSubtypeConstraint(leftType, expectedType, left);
+    this.buffer.append(_genSubtypeConstraint);
+    this.buffer.newLineIfNotEmpty();
+    Type rightType = this.genConstraintAndGetType(right);
+    this.buffer.newLineIfNotEmpty();
+    CharSequence _genSubtypeConstraint_1 = this.constraintGeneratorHelper.genSubtypeConstraint(rightType, expectedType, right);
+    this.buffer.append(_genSubtypeConstraint_1);
+    this.buffer.newLineIfNotEmpty();
+    CharSequence _genComment = this.constraintGeneratorHelper.genComment(main);
+    this.buffer.append(_genComment);
   }
   
   protected Type _genConstraintAndGetTypeCase(final ArithmeticSigned exp) {
     IntType _xblockexpression = null;
     {
-      IntType _createIntType = DeltaJTypeUtils.createIntType();
-      IntType intType = _createIntType;
+      IntType intType = DeltaJTypeUtils.createIntType();
       Expression _expression = exp.getExpression();
       this.genConstraintsForSubexpressions(exp, _expression, intType);
-      _xblockexpression = (intType);
+      _xblockexpression = intType;
     }
     return _xblockexpression;
   }
@@ -183,24 +169,22 @@ public class DeltaJExpressionConstraintGenerator {
   protected Type _genConstraintAndGetTypeCase(final BooleanNegation exp) {
     BooleanType _xblockexpression = null;
     {
-      BooleanType _createBooleanType = DeltaJTypeUtils.createBooleanType();
-      BooleanType booleanType = _createBooleanType;
+      BooleanType booleanType = DeltaJTypeUtils.createBooleanType();
       Expression _expression = exp.getExpression();
       this.genConstraintsForSubexpressions(exp, _expression, booleanType);
-      _xblockexpression = (booleanType);
+      _xblockexpression = booleanType;
     }
     return _xblockexpression;
   }
   
   public void genConstraintsForSubexpressions(final Expression main, final Expression subExp, final Type expectedType) {
-      Type _genConstraintAndGetType = this.genConstraintAndGetType(subExp);
-      Type subExpType = _genConstraintAndGetType;
-      this.buffer.newLineIfNotEmpty();
-      CharSequence _genSubtypeConstraint = this.constraintGeneratorHelper.genSubtypeConstraint(subExpType, expectedType, subExp);
-      this.buffer.append(_genSubtypeConstraint);
-      this.buffer.newLineIfNotEmpty();
-      CharSequence _genComment = this.constraintGeneratorHelper.genComment(main);
-      this.buffer.append(_genComment);
+    Type subExpType = this.genConstraintAndGetType(subExp);
+    this.buffer.newLineIfNotEmpty();
+    CharSequence _genSubtypeConstraint = this.constraintGeneratorHelper.genSubtypeConstraint(subExpType, expectedType, subExp);
+    this.buffer.append(_genSubtypeConstraint);
+    this.buffer.newLineIfNotEmpty();
+    CharSequence _genComment = this.constraintGeneratorHelper.genComment(main);
+    this.buffer.append(_genComment);
   }
   
   protected Type _genConstraintAndGetTypeCase(final New exp) {
@@ -209,8 +193,7 @@ public class DeltaJExpressionConstraintGenerator {
       String _class_ = exp.getClass_();
       CharSequence _genClassConstraint = this.constraintGeneratorHelper.genClassConstraint(_class_, exp);
       this.buffer.append(_genClassConstraint);
-      Type _methodBodyExpressionType = this.typeSystem.getMethodBodyExpressionType(exp);
-      _xblockexpression = (_methodBodyExpressionType);
+      _xblockexpression = this.typeSystem.getMethodBodyExpressionType(exp);
     }
     return _xblockexpression;
   }
@@ -222,11 +205,10 @@ public class DeltaJExpressionConstraintGenerator {
       StringConcatenation _stringConcatenation = new StringConcatenation();
       this.buffer = _stringConcatenation;
       Expression _object = exp.getObject();
-      Type _genConstraintAndGetType = this.genConstraintAndGetType(_object);
-      Type objectType = _genConstraintAndGetType;
+      Type objectType = this.genConstraintAndGetType(_object);
       int _length = this.buffer.length();
-      boolean _operator_greaterThan = IntegerExtensions.operator_greaterThan(_length, 0);
-      if (_operator_greaterThan) {
+      boolean _greaterThan = (_length > 0);
+      if (_greaterThan) {
         this.buffer.newLine();
       }
       tempBuffer.append(this.buffer);
@@ -234,27 +216,23 @@ public class DeltaJExpressionConstraintGenerator {
       String _type = exp.getType();
       CharSequence _genCastConstraint = this.constraintGeneratorHelper.genCastConstraint(_type, objectType, exp);
       this.buffer.append(_genCastConstraint);
-      Type _methodBodyExpressionType = this.typeSystem.getMethodBodyExpressionType(exp);
-      _xblockexpression = (_methodBodyExpressionType);
+      _xblockexpression = this.typeSystem.getMethodBodyExpressionType(exp);
     }
     return _xblockexpression;
   }
   
   protected Type _genConstraintAndGetTypeCase(final Paren paren) {
     Expression _expression = paren.getExpression();
-    Type _genConstraintAndGetTypeCase = this.genConstraintAndGetTypeCase(_expression);
-    return _genConstraintAndGetTypeCase;
+    return this.genConstraintAndGetTypeCase(_expression);
   }
   
   protected Type _genConstraintAndGetTypeCase(final VariableAccess variableAccess) {
     TypedDeclaration _variable = variableAccess.getVariable();
-    Type _genConstraintAndGetTypeCase = this.genConstraintAndGetTypeCase(variableAccess, _variable);
-    return _genConstraintAndGetTypeCase;
+    return this.genConstraintAndGetTypeCase(variableAccess, _variable);
   }
   
   protected Type _genConstraintAndGetTypeCase(final VariableAccess variableAccess, final TypedDeclaration declaration) {
-    TypeForDeclaration _type = declaration.getType();
-    return _type;
+    return declaration.getType();
   }
   
   protected Type _genConstraintAndGetTypeCase(final VariableAccess variableAccess, final Field field) {
@@ -265,8 +243,7 @@ public class DeltaJExpressionConstraintGenerator {
       TypeForDeclaration _type = field.getType();
       CharSequence _genFieldConstraint = this.constraintGeneratorHelper.genFieldConstraint(_thisType, _name, _type, variableAccess);
       this.buffer.append(_genFieldConstraint);
-      TypeForDeclaration _type_1 = field.getType();
-      _xblockexpression = (_type_1);
+      _xblockexpression = field.getType();
     }
     return _xblockexpression;
   }
@@ -278,18 +255,16 @@ public class DeltaJExpressionConstraintGenerator {
       StringConcatenation _stringConcatenation = new StringConcatenation();
       this.buffer = _stringConcatenation;
       Expression _receiver = sel.getReceiver();
-      Type _genConstraintAndGetType = this.genConstraintAndGetType(_receiver);
-      Type receiverType = _genConstraintAndGetType;
+      Type receiverType = this.genConstraintAndGetType(_receiver);
       int _length = this.buffer.length();
-      boolean _operator_greaterThan = IntegerExtensions.operator_greaterThan(_length, 0);
-      if (_operator_greaterThan) {
+      boolean _greaterThan = (_length > 0);
+      if (_greaterThan) {
         this.buffer.newLine();
       }
       tempBuffer.append(this.buffer);
       this.buffer = tempBuffer;
       Message _message = sel.getMessage();
-      Type _genConstraintAndGetTypeCase = this.genConstraintAndGetTypeCase(receiverType, _message, sel);
-      _xblockexpression = (_genConstraintAndGetTypeCase);
+      _xblockexpression = this.genConstraintAndGetTypeCase(receiverType, _message, sel);
     }
     return _xblockexpression;
   }
@@ -301,12 +276,11 @@ public class DeltaJExpressionConstraintGenerator {
   protected Type _genConstraintAndGetTypeCase(final Type receiverType, final FieldSelection fieldSel, final Selection sel) {
     TypeVariable _xblockexpression = null;
     {
-      TypeVariable _createTypeVariable = this.typeSystem.createTypeVariable();
-      TypeVariable fieldType = _createTypeVariable;
+      TypeVariable fieldType = this.typeSystem.createTypeVariable();
       String _field = fieldSel.getField();
       CharSequence _genFieldConstraint = this.constraintGeneratorHelper.genFieldConstraint(receiverType, _field, fieldType, sel);
       this.buffer.append(_genFieldConstraint);
-      _xblockexpression = (fieldType);
+      _xblockexpression = fieldType;
     }
     return _xblockexpression;
   }
@@ -314,17 +288,13 @@ public class DeltaJExpressionConstraintGenerator {
   protected Type _genConstraintAndGetTypeCase(final Type receiverType, final MethodCall methodCall, final Selection sel) {
     TypeVariable _xblockexpression = null;
     {
-      TypeVariable _createTypeVariable = this.typeSystem.createTypeVariable();
-      TypeVariable methodReturnType = _createTypeVariable;
-      LinkedList<Type> _linkedList = new LinkedList<Type>();
-      LinkedList<Type> typesForParams = _linkedList;
+      TypeVariable methodReturnType = this.typeSystem.createTypeVariable();
+      LinkedList<Type> typesForParams = new LinkedList<Type>();
       EList<Expression> _args = methodCall.getArgs();
       for (final Expression arg : _args) {
         {
-          TypeVariable _createTypeVariable_1 = this.typeSystem.createTypeVariable();
-          TypeVariable typeForParam = _createTypeVariable_1;
-          Type _genConstraintAndGetType = this.genConstraintAndGetType(arg);
-          Type typeOfArg = _genConstraintAndGetType;
+          TypeVariable typeForParam = this.typeSystem.createTypeVariable();
+          Type typeOfArg = this.genConstraintAndGetType(arg);
           this.buffer.newLineIfNotEmpty();
           typesForParams.add(typeForParam);
           CharSequence _genSubtypeConstraint = this.constraintGeneratorHelper.genSubtypeConstraint(typeOfArg, typeForParam, arg);
@@ -335,7 +305,7 @@ public class DeltaJExpressionConstraintGenerator {
       String _method = methodCall.getMethod();
       CharSequence _genMethodConstraint = this.constraintGeneratorHelper.genMethodConstraint(receiverType, _method, methodReturnType, typesForParams, sel);
       this.buffer.append(_genMethodConstraint);
-      _xblockexpression = (methodReturnType);
+      _xblockexpression = methodReturnType;
     }
     return _xblockexpression;
   }

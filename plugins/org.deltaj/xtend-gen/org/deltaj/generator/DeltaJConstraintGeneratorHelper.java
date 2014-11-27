@@ -13,10 +13,10 @@ import org.deltaj.generator.DeltaJGeneratorExtensions;
 import org.deltaj.generator.DeltaJTypeGenerator;
 import org.deltaj.util.DeltaJNodeModelUtils;
 import org.eclipse.xtend2.lib.StringConcatenation;
+import org.eclipse.xtext.xbase.lib.Extension;
 import org.eclipse.xtext.xbase.lib.Functions.Function1;
 import org.eclipse.xtext.xbase.lib.IterableExtensions;
 import org.eclipse.xtext.xbase.lib.ListExtensions;
-import org.eclipse.xtext.xbase.lib.StringExtensions;
 
 @SuppressWarnings("all")
 public class DeltaJConstraintGeneratorHelper {
@@ -24,9 +24,11 @@ public class DeltaJConstraintGeneratorHelper {
   private DeltaJNodeModelUtils nodeModelUtils;
   
   @Inject
+  @Extension
   private DeltaJTypeGenerator typeGenerator;
   
   @Inject
+  @Extension
   private DeltaJGeneratorExtensions _deltaJGeneratorExtensions;
   
   protected CharSequence _genComment(final Statement statement) {
@@ -40,15 +42,13 @@ public class DeltaJConstraintGeneratorHelper {
   
   protected CharSequence _genComment(final JavaVerbatim javaVerbatim) {
     List<String> _javaVerbatimLines = this._deltaJGeneratorExtensions.javaVerbatimLines(javaVerbatim);
-    final Function1<String,String> _function = new Function1<String,String>() {
-        public String apply(final String line) {
-          String _operator_plus = StringExtensions.operator_plus("// ", line);
-          return _operator_plus;
-        }
-      };
+    final Function1<String, String> _function = new Function1<String, String>() {
+      public String apply(final String line) {
+        return ("// " + line);
+      }
+    };
     List<String> _map = ListExtensions.<String, String>map(_javaVerbatimLines, _function);
-    String _join = IterableExtensions.join(_map, "\n");
-    return _join;
+    return IterableExtensions.join(_map, "\n");
   }
   
   public CharSequence genComment(final Expression exp) {
@@ -137,12 +137,11 @@ public class DeltaJConstraintGeneratorHelper {
     _builder.append(", ");
     _builder.append(methodName, "");
     _builder.append(", (");
-    final Function1<Type,CharSequence> _function = new Function1<Type,CharSequence>() {
-        public CharSequence apply(final Type t) {
-          CharSequence _compileType = DeltaJConstraintGeneratorHelper.this.typeGenerator.compileType(t);
-          return _compileType;
-        }
-      };
+    final Function1<Type, CharSequence> _function = new Function1<Type, CharSequence>() {
+      public CharSequence apply(final Type t) {
+        return DeltaJConstraintGeneratorHelper.this.typeGenerator.compileType(t);
+      }
+    };
     List<CharSequence> _map = ListExtensions.<Type, CharSequence>map(typesForParams, _function);
     String _join = IterableExtensions.join(_map, ", ");
     _builder.append(_join, "");

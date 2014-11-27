@@ -4,8 +4,8 @@ import scala.Function1;
 import scala.Function3;
 import scala.Tuple3;
 import br.ufal.ic.colligens.util.Log;
+import de.fosd.typechef.error.Position;
 import de.fosd.typechef.featureexpr.FeatureExpr;
-import de.fosd.typechef.parser.Position;
 
 public class RenderParserError implements
 		Function3<FeatureExpr, String, Position, Object> {
@@ -22,9 +22,8 @@ public class RenderParserError implements
 	@Override
 	public Object apply(FeatureExpr featureExpr, String msg, Position position) {
 		if (position.getFile().contains(fileProxie.getFileToAnalyse())) {
-			Log log = new Log(fileProxie, position.getLine(),
+			Log log = new Log(fileProxie, position.getLine(),position.getColumn(),
 					featureExpr.toString(), "", msg);
-
 			fileProxie.getLogs().add(log);
 		}
 		// System.out.println("parser error " + fileProxie.getLogs().size());

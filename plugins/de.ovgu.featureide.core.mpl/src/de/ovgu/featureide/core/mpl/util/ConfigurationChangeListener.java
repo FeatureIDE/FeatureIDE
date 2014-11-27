@@ -26,6 +26,7 @@ import org.eclipse.ui.IPropertyListener;
 import de.ovgu.featureide.core.mpl.InterfaceProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.mpl.io.writer.ExtendedConfigurationWriter;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor;
 
 /**

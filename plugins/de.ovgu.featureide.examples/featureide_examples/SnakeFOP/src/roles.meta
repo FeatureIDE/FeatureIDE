@@ -1,0 +1,70 @@
+{
+	"features" : [
+		"SnakeFOP",
+		"Entities",
+		"Points",
+		"Level",
+		"Snake",
+		"Enemies",
+		"Manual",
+		"Centipede",
+		"Torus",
+		"L3",
+		"Highscore",
+		"SnakeFOP"
+	],
+	"roles": {
+		"newChatLine": {
+			"Chat": "newChatLine__wrappee__Chat",
+			"Console": "newChatLine"
+		},
+		"startGame": {
+			"Entities": "startGame__wrappee__Entities",
+			"Points": "startGame__wrappee__Points",
+			"Level": "startGame"
+		},
+		"killEntityPart": {
+			"Entities": "killEntityPart__wrappee__Entities",
+			"Points": "killEntityPart"
+		},
+		"getGameStatusString": {
+			"Entities": "getGameStatusString__wrappee__Entities",
+			"Points": "getGameStatusString"
+		},
+		"snakeTurn": {
+			"Manual": "snakeTurn"
+		},
+		"addEntityType": {
+			"Manual": "addEntityType__wrappee__Manual",
+			"Centipede": "addEntityType"
+		},
+		"newEntity": {
+			"Manual": "newEntity__wrappee__Manual",
+			"Centipede": "newEntity"
+		},
+		"paintEnemy": {
+			"Manual": "paintEnemy__wrappee__Manual",
+			"Centipede": "paintEnemy"
+		},
+		"getGraphics": {
+			"Manual": "getGraphics__wrappee__Manual",
+			"Centipede": "getGraphics"
+		},
+		"addLevelNames": {
+			"Torus": "addLevelNames__wrappee__Torus",
+			"L3": "addLevelNames"
+		},
+		"gameover": {
+			"Highscore": "gameover"
+		},
+		"addMenuElements": {
+			"L3": "addMenuElements__wrappee__L3",
+			"Highscore": "addMenuElements"
+		},
+		"testOtherMenuPoints": {
+			"L3": "testOtherMenuPoints__wrappee__L3",
+			"Highscore": "testOtherMenuPoints"
+		}
+	}
+
+}

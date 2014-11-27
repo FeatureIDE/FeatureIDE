@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            adaptable="true"
+            id="de.ovgu.featureide.ui.android.conversionAction"
+            objectClass="org.eclipse.core.resources.IProject">
+         <action
+               class="de.ovgu.featureide.ui.android.ConversionAction"
+               icon="icons/FeatureIconSmall.ico"
+               id="de.ovgu.featureide.ui.android.conversionAction1"
+               label="Add FeatureIDE Nature to Android Project"
+               menubarPath="de.ovgu.featureide.fm.ui.menu/ui"
+               style="push">
+         </action>
+         <visibility>
+            <and>
+               <not>
+                  <objectState
+                        name="nature"
+                        value="de.ovgu.featureide.core.featureProjectNature">
+                  </objectState></not>
+               <objectState
+                     name="nature"
+                     value="com.android.ide.eclipse.adt.AndroidNature">
+               </objectState>
+            </and>
+         </visibility>
+      </objectContribution>
+   </extension>
+   <extension
+         point="de.ovgu.featureide.core.wizard">
+      <newProjectWizard
+            class="de.ovgu.featureide.ui.android.wizards.MungeAndroidNewProjectWizardExtension"
+            composerid="de.ovgu.featureide.preprocessor.munge-android"
+            id="de.ovgu.featureide.ui.android.newProjectWizard"
+            name="MungeAndroidNewProjectWizard">
+      </newProjectWizard>
+   </extension>
+</plugin>

@@ -34,7 +34,7 @@ import org.eclipse.ui.PartInitException;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.builder.IComposerExtension;
+import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
@@ -52,7 +52,7 @@ public class JavaEditor extends CompilationUnitEditor {
 	public static final String ID = UIPlugin.PLUGIN_ID + ".editors.JavaEditor";
 	private static final Image TITLE_IMAGE = UIPlugin
 			.getImage("JakFileIcon.png");
-	private IComposerExtension composer;
+	private IComposerExtensionClass composer;
 
 	@Override
 	public void init(IEditorSite site, IEditorInput input)
@@ -69,7 +69,7 @@ public class JavaEditor extends CompilationUnitEditor {
 				String feature = featureProject.getFeatureName(file);
 				if (feature != null) {
 					// case: a source file
-					if (composer.hasFeatureFolders()) {
+					if (composer.hasFeatureFolder()) {
 						setPartName(file.getName() + "[" + feature + "]");
 					}
 				} else {

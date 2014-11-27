@@ -457,8 +457,10 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 		extFeatureModel.getLayout().showHiddenFeatures(true);
 		extFeatureModel.getLayout().verticalLayout(false);
 		
-		modelMarkerHandler = new ModelMarkerHandler(getProject().getFile(getFile().getName()));
-		modelMarkerHandler.deleteAllModelMarkers();
+		if (getProject() != null) {
+			modelMarkerHandler = new ModelMarkerHandler(getProject().getFile(getFile().getName()));
+			modelMarkerHandler.deleteAllModelMarkers();
+		}
 
 		extFeatureModelName = null;
 		cinterface = false;
@@ -843,8 +845,15 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 			}
 		}
 		
+		UsedModel usedModel = extFeatureModel.getExternalModel(sourceModelName);
+		if (usedModel != null) {
+			usedModel.setPrefix(targetParentFeature.getName() + "." + sourceModelName);
+		}
+		
 		final Feature instanceRoot = sourceModel.getRoot();
-		final String connectorName = (targetParentFeature.isRoot()) ? sourceModelName : targetParentFeature.getName() + "." + sourceModelName;
+		final String connectorName = (targetParentFeature.isRoot() && targetParentFeature.getName().equals(sourceModelName)) 
+				? sourceModelName 
+				: targetParentFeature.getName() + "." + sourceModelName;
 		final ExtendedFeature connector = addFeature(targetParentFeature, connectorName, true, true, instanceRoot.isHidden());
 		connector.setType(type);
 		connector.setExternalModelName(sourceModelName);
@@ -993,14 +1002,18 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 	}
 	
 	private void reportSyntaxError(Tree curNode) {
-		String message = "Illegal statement \""+ curNode.getText() + "\"";
-		modelMarkerHandler.createModelMarker(message, org.eclipse.core.resources.IMarker.SEVERITY_ERROR, curNode.getLine());
+		final String message = "Illegal statement \""+ curNode.getText() + "\"";
+		if (modelMarkerHandler != null) {
+			modelMarkerHandler.createModelMarker(message, org.eclipse.core.resources.IMarker.SEVERITY_ERROR, curNode.getLine());
+		}
 		FMCorePlugin.getDefault().logError(new UnsupportedModelException(
 			message + " at line " + curNode.getLine() + ((featureModelFile != null)?" in file " + featureModelFile.getName():""), curNode.getLine()));
 	}
 	
 	private void reportWarning(Tree curNode, String message) {
-		modelMarkerHandler.createModelMarker(message, org.eclipse.core.resources.IMarker.SEVERITY_WARNING, curNode.getLine());
+		if (modelMarkerHandler != null) {
+			modelMarkerHandler.createModelMarker(message, org.eclipse.core.resources.IMarker.SEVERITY_WARNING, curNode.getLine());
+		}
 		FMCorePlugin.getDefault().logWarning(message + " (at line "+ curNode.getLine() + ((featureModelFile != null)?" in file " + featureModelFile.getName():"") + ": \"" + curNode.getText() + "\")");		
 	}
 }

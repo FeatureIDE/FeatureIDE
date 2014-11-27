@@ -57,7 +57,8 @@ public /*nullable_by_default*/ class Pot {
    *
    * @param addedValue The added value to the pot.
    */
-  /*@ public normal_behavior
+  /*@ \conjunctive_contract
+      public normal_behavior
       requires addedValue >=0;
       requires getSize()+addedValue >= 0;
       assignable size;

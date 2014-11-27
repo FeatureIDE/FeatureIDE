@@ -5,9 +5,9 @@ class Account {
 	
 	int withdraw = 0;
 
-	/*@
-	 @ ensures \original 
-	 @   && (!\result ==> withdraw == \old(withdraw)) 
+	/*@ \consecutive_contract
+	 @
+	 @ ensures (!\result ==> withdraw == \old(withdraw)) 
 	 @   && (\result ==> withdraw <= \old(withdraw));
 	 @*/
 	boolean update(int x) {
@@ -23,9 +23,9 @@ class Account {
 		return true;
 	}
 	
-	/*@
-	 @ ensures \original 
-	 @   && (!\result ==> withdraw == \old(withdraw)) 
+	/*@ \consecutive_contract
+	 @
+	 @ ensures (!\result ==> withdraw == \old(withdraw)) 
 	 @   && (\result ==> withdraw >= \old(withdraw));
 	 @*/
 	boolean undoUpdate(int x) {

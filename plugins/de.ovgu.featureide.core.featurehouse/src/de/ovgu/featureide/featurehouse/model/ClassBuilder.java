@@ -28,7 +28,7 @@ import de.ovgu.cide.fstgen.ast.FSTTerminal;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
-import de.ovgu.featureide.core.fstmodel.RoleElement;
+import de.ovgu.featureide.core.fstmodel.IRoleElement;
 
 /**
  * Class builders are creating entries for the FSTModel of their special language.<br>
@@ -95,8 +95,7 @@ public class ClassBuilder {
 		return new ClassBuilder(builder);
 	}
 	
-	void addMethod(String name, LinkedList<String> parameterTypes, String returnType, String modifiers, String body, int beginLine, int endLine, boolean isConstructor)
-	{
+	void addMethod(String name, LinkedList<String> parameterTypes, String returnType, String modifiers, String body, int beginLine, int endLine, boolean isConstructor) {
 		addMethod(name, parameterTypes, returnType, modifiers, body, beginLine, endLine, isConstructor, "", "", -1);
 	}
 	
@@ -112,8 +111,7 @@ public class ClassBuilder {
 	 * @param isConstructor <code>true</code> if the method is a constructor 
 	 * @param contract contract string if existent
 	 */
-	RoleElement addMethod(String name, LinkedList<String> parameterTypes, String returnType, String modifiers, String body, int beginLine, int endLine, boolean isConstructor, String contract, String compKey, int contractLine) 
-	{
+	IRoleElement addMethod(String name, LinkedList<String> parameterTypes, String returnType, String modifiers, String body, int beginLine, int endLine, boolean isConstructor, String contract, String compKey, int contractLine) {
 		FSTMethod method = new FSTMethod(name, parameterTypes, returnType, modifiers, body, beginLine, endLine, contract, compKey, contractLine);								
 		method.setConstructor(isConstructor);
 		if (body.contains("original")) {
@@ -124,7 +122,7 @@ public class ClassBuilder {
 		return method;
 	}
 	
-	protected RoleElement addField(String fieldName, String typeName, String modifiers,
+	protected IRoleElement addField(String fieldName, String typeName, String modifiers,
 			String body, int beginLine, int endLine) {
 		FSTField field = new FSTField(fieldName, typeName, modifiers, body, beginLine, endLine);
 		modelBuilder.getCurrentClassFragment().add(field);

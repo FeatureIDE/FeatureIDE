@@ -432,11 +432,6 @@ public class AspectJComposer extends ComposerExtensionClass {
 		 return list;
 	}
 
-	@Override
-	public boolean hasFeatureFolders() {
-		return false;
-	}
-
 	private String rootName = "";
 	
 	@Override
@@ -528,6 +523,11 @@ public class AspectJComposer extends ComposerExtensionClass {
 	}
 
 	@Override
+	public boolean createFolderForFeatures() {
+		return false;
+	}
+
+	@Override
 	public boolean hasFeatureFolder() {
 		return false;
 	}
@@ -535,6 +535,15 @@ public class AspectJComposer extends ComposerExtensionClass {
 	@Override
 	public Mechanism getGenerationMechanism() {
 	    return IComposerExtensionClass.Mechanism.ASPECT_ORIENTED_PROGRAMMING;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionBase#supportsMigration()
+	 */
+	@Override
+	public boolean supportsMigration()
+	{
+		return false;
 	}
 
 }

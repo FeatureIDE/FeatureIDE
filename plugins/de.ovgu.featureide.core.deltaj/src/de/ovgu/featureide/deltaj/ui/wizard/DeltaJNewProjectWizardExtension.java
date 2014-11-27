@@ -33,20 +33,20 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.IWizardPage;
+import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 
 import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.core.wizardextension.DefaultNewFeatureProjectWizardExtension;
 import de.ovgu.featureide.deltaj.DeltajComposer;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.ui.wizards.INewFeatureProjectWizardExtension;
 
 /**
  * Extension of the NewFeatureProjectEditor. Adding pages to import a Feature Model, to select Deltas to be initially creadted and to select whether to create a single file for each Delta.
  * @author Sven Schuster
  */
-public class DeltaJNewProjectWizardExtension implements INewFeatureProjectWizardExtension {
+public class DeltaJNewProjectWizardExtension extends DefaultNewFeatureProjectWizardExtension {
 	public static final String ICON_FOLDER = "icons/";
 	
 	private FinishPage finishPage;
@@ -81,9 +81,6 @@ public class DeltaJNewProjectWizardExtension implements INewFeatureProjectWizard
 		finishPage = new FinishPage(this);
 	}
 	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.ui.wizards.INewFeatureProjectWizardExtension#setWizard(org.eclipse.jface.wizard.IWizard)
-	 */
 	@Override
 	public boolean isFinished() {
 		return this.finished;
@@ -100,27 +97,21 @@ public class DeltaJNewProjectWizardExtension implements INewFeatureProjectWizard
 		return featureModel;
 	}
 	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.ui.wizards.INewFeatureProjectWizardExtension#getNextPage(org.eclipse.jface.wizard.IWizardPage)
-	 */
+	
 	@Override
 	public IWizardPage getNextPage(IWizardPage page) {
-		if(page instanceof FeatureToDeltaPage) {
+		if (page instanceof FeatureToDeltaPage) {
 			return finishPage;
-		}
-		else if(page instanceof ImportModelPage) {
+		} else if (page instanceof ImportModelPage) {
 			return featureToDeltaPage;
-		}
-		else {
+		} else {
 			return importModelPage;
 		}
 	}
-	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.ui.wizards.INewFeatureProjectWizardExtension#setWizard(org.eclipse.jface.wizard.IWizard)
-	 */
+
 	@Override
-	public void setWizard(IWizard wizard) {
+	public void setWizard(BasicNewResourceWizard wizard) {
+		super.setWizard(wizard);
 		importModelPage.setWizard(wizard);
 		featureToDeltaPage.setWizard(wizard);
 		finishPage.setWizard(wizard);
@@ -191,11 +182,8 @@ public class DeltaJNewProjectWizardExtension implements INewFeatureProjectWizard
 		this.project.refreshLocal(IResource.DEPTH_INFINITE, null);
 	}
 	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.ui.wizards.INewFeatureProjectWizardExtension#setWizard(org.eclipse.jface.wizard.IWizard)
-	 */
 	@Override
-	public void enhanceProject(IProject project, String sourcePath, String configPath, String buildPath) {
+	public void extendedEnhanceProject(IProject project, String compID, String sourcePath, String configPath, String buildPath) {
 		this.project = project;
 		this.sourceFolder = project.getFolder(sourcePath);
 		EnhanceProjectJob epj = new EnhanceProjectJob("Enhance DeltaJ Project", this);

@@ -45,7 +45,6 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 
-import de.ovgu.featureide.core.builder.IComposerExtension;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.ui.UIPlugin;
 
@@ -98,19 +97,19 @@ public class NewFeatureIDEFileWizard extends Wizard implements INewWizard {
 		final String fileName = page.getFileName();
 		final String fileExtension = page.getExtension();
 		final String fileTemplate = page.getTemplate();
-		final IComposerExtension composer = page.getComposer();
+		final IComposerExtensionClass composer = page.getComposer();
 		final String featureName = page.getFeatureName();
 		final String className = page.getClassName();
 		final String packageName = page.getPackage();
 		IFolder sourceFolder = page.getSourceFolder();
-		if (composer.hasFeatureFolders()) {
+		if (composer.createFolderForFeatures()) {
 			sourceFolder = sourceFolder.getFolder(featureName);
 		}
 		createFolder(page.getPackage(), sourceFolder);
 		IRunnableWithProgress op = new IRunnableWithProgress() {
 			public void run(IProgressMonitor monitor) throws InvocationTargetException {
 				try {
-					doFinish(featureName,container, fileName,className, fileExtension, fileTemplate , composer, page.isRefinement (), packageName,monitor);
+					doFinish(featureName, container, fileName, className, fileExtension, fileTemplate, composer, page.isRefinement(), packageName, monitor);
 				} catch (CoreException e) {
 					throw new InvocationTargetException(e);
 				} finally {
@@ -153,14 +152,14 @@ public class NewFeatureIDEFileWizard extends Wizard implements INewWizard {
 	 * the editor on the newly created file.
 	 * @param packageName 
 	 */
-	private void doFinish(String featureName,IContainer container, String fileName,String classname, String extension, String template, 
-			IComposerExtension composer, boolean refines, String packageName, IProgressMonitor monitor) throws CoreException {
+	private void doFinish(String featureName, IContainer container, String fileName, String classname, String extension, String template, 
+			IComposerExtensionClass composer, boolean refines, String packageName, IProgressMonitor monitor) throws CoreException {
 		// create a sample file
 		monitor.beginTask("Creating " + fileName, 2);
 		final IFile file = container.getFile(new Path(fileName + "." + extension));
 	
 		try {
-			InputStream stream = openContentStream(featureName,container, classname, template, composer, refines, packageName);
+			InputStream stream = openContentStream(featureName, container, classname, template, composer, refines, packageName);
 			if (file.exists()) {
 				file.setContents(stream, true, true, monitor);
 			} else {
@@ -185,7 +184,7 @@ public class NewFeatureIDEFileWizard extends Wizard implements INewWizard {
 	}
 	
 	// TODO Rename, method name does not describe the functionality
-	private InputStream openContentStream(String featurename,IContainer container, String classname, String template, IComposerExtension composer, boolean refines, String packageName) {
+	private InputStream openContentStream(String featurename, IContainer container, String classname, String template, IComposerExtensionClass composer, boolean refines, String packageName) {
 		String contents = template;
 		contents = composer.replaceSourceContentMarker(contents, refines, packageName);
 		contents = contents.replaceAll(IComposerExtensionClass.CLASS_NAME_PATTERN, classname);

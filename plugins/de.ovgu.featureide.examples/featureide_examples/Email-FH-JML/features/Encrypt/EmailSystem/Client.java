@@ -38,7 +38,7 @@ public class Client {
 	 */
 	 /*@ model Set<Email> unEncryptedMails = new HashSet<Email>(2); @*/
 
-	/*@
+	/*@ \conjunctive_contract
 	  @ requires msg.isEncrypted() ==> !unEncryptedMails.contains(msg);
 	  @ requires !msg.isEncrypted() ==> !encryptedMails.contains(msg);
 	  @ requires encryptedMails.contains(msg) ==> msg.isEncrypted();

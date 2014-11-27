@@ -25,10 +25,7 @@ import java.io.FileNotFoundException;
 import java.util.AbstractCollection;
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.NoSuchElementException;
 import java.util.Scanner;
-
-import javax.annotation.CheckForNull;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -36,6 +33,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
@@ -51,82 +49,90 @@ import de.ovgu.featureide.fm.core.Feature;
 
 /**
  * Propagates error markers for composed files to sources files.
+ * 
  * @author Jens Meinicke
+ * @author Sebastian Krieter
  */
-public class ErrorPropagation {
-	
+public abstract class ErrorPropagation {
+
 	private static final String NO_ATTRIBUTE = "#NO_ATTRIBUTE#";
 
 	/**
-	 * A list containing composed files.
-	 * These files will be checked for propagation. 
+	 * A list containing composed files. These files will be checked for
+	 * propagation.
 	 */
-	/*
-	 * TODO Fix problem with java.util.NoSuchElementException maybe volatile fixed it
-	 * use a vector
-	 * This list needs to be static else there are some problems with getFirst or
-	 * get(0) because the element was not found. (This does not fixed the problem)
+	private final LinkedList<IFile> composedFiles = new LinkedList<IFile>();
+
+	/**
+	 * The main background job calling the corresponding error propagation class
+	 * for each file.
 	 */
-	private static volatile LinkedList<IFile> composedFiles = new LinkedList<IFile>();
-	
-	private synchronized IFile getComposedFile() {
-		if (!composedFiles.isEmpty()) {
-			IFile composedFile = composedFiles.getFirst();
-			composedFiles.remove();
-			return composedFile;
+	public final Job job;
+
+	/**
+	 * Propagates error markers for composed files to sources files.<br>
+	 * Call {@link #addFile(IFile)} to propagate the markers of the given source
+	 * file, to the corresponding file at the features folder.
+	 * 
+	 * @param sourceFile
+	 *            initial source file for determine project and language.
+	 *            </br>(must still be added by calling {@link #addFile(IFile)})
+	 */
+	public static ErrorPropagation createErrorPropagation(IFile sourceFile) {
+		final IFeatureProject featureProject = CorePlugin.getFeatureProject(sourceFile);
+		final String fileExtension = sourceFile.getFileExtension();
+		if ("java".equals(fileExtension)) {
+			return new JavaErrorPropagation(featureProject);
+		} else if ("c".equals(fileExtension) || "h".equals(fileExtension)) {
+			return new CErrorPropagation(featureProject);
 		}
 		return null;
 	}
-	
+
+	protected ErrorPropagation(IFeatureProject featureProject) {
+		job = new Job("Propagate problem markers for " + featureProject) {
+			@Override
+			public IStatus run(IProgressMonitor monitor) {
+				propagateMarkers(monitor);
+				return Status.OK_STATUS;
+			}
+		};
+		job.setPriority(Job.SHORT);
+	}
+
 	private void addComposedFile(IFile file) {
-		composedFiles.add(file);
+		synchronized (composedFiles) {
+			if (!composedFiles.contains(file)) {
+				composedFiles.add(file);
+			}
+		}
 	}
-	
-	/**
-	 * The main background job calling the corresponding error propagation class for each file. 
-	 */
-	public Job job = null;
 
-	private int composedFilesSize = 0;
-	
-	/**
-	 * Propagates error markers for composed files to sources files.<br>
-	 * Call <code>addFile(sourceFile)</code> to propagate the markers of the 
-	 * given source file, to the corresponding file at the features folder. 
-	 */
-	public ErrorPropagation() {
-		
+	private IFile removeComposedFile() {
+		synchronized (composedFiles) {
+			if (composedFiles.isEmpty()) {
+				return null;
+			}
+			return composedFiles.remove();
+		}
 	}
 
 	/**
-	 * Propagates the markers of the given source file, to the corresponding file
-	 * at the features folder. 
-	 * @param sourceFile The composed file
+	 * Propagates the markers of the given source file, to the corresponding
+	 * file at the features folder.
+	 * 
+	 * @param sourceFile
+	 *            The composed file
 	 */
 	public void addFile(IFile sourceFile) {
-		
-		String fileExtension = sourceFile.getFileExtension();
+
+		final String fileExtension = sourceFile.getFileExtension();
 		if (fileExtension == null) {
 			return;
 		}
-		if ("java".equals(fileExtension) || "c".equals(fileExtension) ||
-				"h".equals(fileExtension)) {
-			if (!composedFiles.contains(sourceFile)) {
-				addComposedFile(sourceFile);
-				composedFilesSize++;
-			}
-			if (job == null) {
-				job = new Job("Propagate problem markers for " + CorePlugin.getFeatureProject(sourceFile)) {
-					@Override
-					public IStatus run(IProgressMonitor monitor) {
-						propagateMarkers(monitor);
-						return Status.OK_STATUS;
-					}
-				};
-				job.setPriority(Job.SHORT);
-				job.schedule();
-			}
-			
+		if ("java".equals(fileExtension) || "c".equals(fileExtension) || "h".equals(fileExtension)) {
+			addComposedFile(sourceFile);
+
 			if (job.getState() == Job.NONE) {
 				job.schedule();
 			}
@@ -134,63 +140,37 @@ public class ErrorPropagation {
 	}
 
 	/**
-	 * Calls the corresponding propagation for all files at <code>composedFiles</code>.
+	 * Calls the corresponding propagation for all files at
+	 * <code>composedFiles</code>.
 	 */
 	protected void propagateMarkers(IProgressMonitor monitor) {
 		if (composedFiles.isEmpty()) {
 			return;
-		} 
-		int worked = 0;
-		int lastSize = composedFilesSize;
-		monitor.beginTask("Propagate markers for", composedFilesSize);
-		try {
-			while (!composedFiles.isEmpty()) {
-				if (monitor.isCanceled()) {
-					break;
-				}
-				
-				worked++;
-				if (composedFilesSize == lastSize) {
-					monitor.worked(1);
-				} else {
-					lastSize = composedFilesSize;
-					monitor.beginTask("Propagate markers for", composedFilesSize);
-					monitor.worked(worked);
-				}
-				
-				IFile file = getComposedFile();
-				monitor.subTask(file.getName());
-				
-				ErrorPropagation prop = getErrorPropagation(file);
-				if (prop != null) {
-					prop.propagateMarkers(file);
-				}
+		}
+
+		if (monitor == null) {
+			monitor = new NullProgressMonitor();
+		}
+		monitor.beginTask("Propagate markers for", IProgressMonitor.UNKNOWN);
+
+		IFile file = removeComposedFile();
+		while (file != null) {
+			if (monitor.isCanceled()) {
+				break;
 			}
-			composedFilesSize = 0;
-		} catch (NoSuchElementException e) {
-			FeatureHouseCorePlugin.getDefault().logError(e);
+			monitor.subTask(file.getName());
+
+			propagateMarkers(file);
+			monitor.worked(1);
+
+			file = removeComposedFile();
 		}
+		monitor.done();
 	}
 
 	/**
-	 * Returns the corresponding error propagation class of the given file.
-	 *
-	 * @return The corresponding <code>ErrorPropagation</code>
-	 */
-	@CheckForNull
-	private ErrorPropagation getErrorPropagation(IFile file) {
-		String fileExtension = file.getFileExtension();
-		if ("java".equals(fileExtension)) {
-			return new JavaErrorPropagation();
-		}
-		if ("c".equals(fileExtension) || "h".equals(fileExtension)) {
-			return new CErrorPropagation();
-		} 
-		return null;
-	}
-
-	/**
-	 * Removes the  not composed markers form the given source file and calls <code>propagateMarkers(marker, file)</code>
+	 * Removes the not composed markers form the given source file and calls
+	 * <code>propagateMarkers(marker, file)</code>
 	 */
 	protected void propagateMarkers(IFile file) {
 		if (!file.exists()) {
@@ -218,19 +198,22 @@ public class ErrorPropagation {
 	}
 
 	/**
-	 * Necessary if a marker should not be removed but also should not be propagated.
-	 * <br><code>Needs to be implemented by the Subclass.</code>
+	 * Necessary if a marker should not be removed but also should not be
+	 * propagated. <br>
+	 * <code>Needs to be implemented by the Subclass.</code>
+	 * 
 	 * @param marker
-	 * @return <code>false</code> if the marker should not be propagated. 
+	 * @return <code>false</code> if the marker should not be propagated.
 	 */
-	boolean propagateMarker(IMarker marker) {
+	protected boolean propagateMarker(IMarker marker) {
 		return true;
 	}
 
-
 	/**
-	 * Necessary if a marker should be removed and also should not be propagated.
-	 * <br><code>Needs to be implemented by the Subclass.</code>
+	 * Necessary if a marker should be removed and also should not be
+	 * propagated. <br>
+	 * <code>Needs to be implemented by the Subclass.</code>
+	 * 
 	 * @param message
 	 * @return <code>true</code> if the marker should not be removed.
 	 */
@@ -238,9 +221,9 @@ public class ErrorPropagation {
 		return false;
 	}
 
-
 	/**
 	 * Propagates all markers of the given file
+	 * 
 	 * @param markers
 	 * @param file
 	 */
@@ -260,14 +243,14 @@ public class ErrorPropagation {
 		if (model == null) {
 			return;
 		}
-		FSTClass fstClass = model.getClass(file.getName());
+		FSTClass fstClass = model.getClass(model.getAbsoluteClassName(file));
 		if (fstClass == null) {
 			return;
 		}
-		
+
 		LinkedList<String> selectedFeatures = getSelectedFeatures(CorePlugin.getFeatureProject(file));
 		for (FSTRole role : fstClass.getRoles()) {
-			if (!selectedFeatures.contains(role.getFeature())) {
+			if (!selectedFeatures.contains(role.getFeature().getName())) {
 				continue;
 			}
 			for (FSTField field : role.getClassFragment().getFields()) {
@@ -277,14 +260,14 @@ public class ErrorPropagation {
 				methods.add(method);
 			}
 		}
-		
+
 		setElementLines(content, fields, methods);
 
 		for (IMarker marker : markers) {
 			if (!marker.exists()) {
 				continue;
 			}
-			
+
 			if (marker.getAttribute(IMarker.MESSAGE, "").startsWith("The import")) {
 				propagateUnsupportedMarker(marker, file);
 				continue;
@@ -293,18 +276,15 @@ public class ErrorPropagation {
 			if (markerLine == -1) {
 				continue;
 			}
-			
+
 			boolean propagated = false;
 			for (FSTField f : fields) {
 				if (f.getEndLine() == -1) {
 					continue;
 				}
 				int composedLine = f.getComposedLine();
-				if (markerLine >= composedLine
-						&& markerLine <= composedLine
-								+ (f.getEndLine() - f.getLine())) {
-					propagateMarker(marker, f.getFile(), f.getLine()
-							+ markerLine - composedLine);
+				if (markerLine >= composedLine && markerLine <= composedLine + (f.getEndLine() - f.getLine())) {
+					propagateMarker(marker, f.getFile(), f.getLine() + markerLine - composedLine);
 					propagated = true;
 					break;
 				}
@@ -319,40 +299,41 @@ public class ErrorPropagation {
 					continue;
 				}
 				int composedLine = m.getComposedLine();
-				if (markerLine >= composedLine && 
-						markerLine <= composedLine + (m.getEndLine() - m.getLine())) {
+				if (markerLine >= composedLine && markerLine <= composedLine + (m.getEndLine() - m.getLine())) {
 					propagateMarker(marker, m.getFile(), m.getLine() + markerLine - m.getComposedLine());
 					propagated = true;
 					break;
 				}
 			}
-			
+
 			if (propagated) {
 				continue;
 			}
-			
+
 			propagateUnsupportedMarker(marker, file);
 		}
 	}
-	
+
 	// TODO refactor all occurrences of reading features of configurations
 	private LinkedList<String> getSelectedFeatures(IFeatureProject featureProject) {
-		if (featureProject == null)
+		if (featureProject == null) {
 			return null;
+		}
 
 		final IFile iFile;
 		LinkedList<String> list = new LinkedList<String>();
 		iFile = featureProject.getCurrentConfiguration();
-		
+
 		if (iFile == null || !iFile.exists()) {
 			return null;
 		}
-		
+
 		File file = iFile.getRawLocation().toFile();
 		LinkedList<String> configurationFeatures = readFeaturesfromConfigurationFile(file);
-		if (configurationFeatures == null)
+		if (configurationFeatures == null) {
 			return null;
-		
+		}
+
 		Collection<Feature> features = featureProject.getFeatureModel().getFeatures();
 		for (String confFeature : configurationFeatures) {
 			for (Feature feature : features) {
@@ -363,13 +344,13 @@ public class ErrorPropagation {
 		}
 		return list;
 	}
-	
+
 	private LinkedList<String> readFeaturesfromConfigurationFile(File file) {
 		LinkedList<String> list;
 		Scanner scanner = null;
 		if (!file.exists())
 			return null;
-		
+
 		try {
 			scanner = new Scanner(file, "UTF-8");
 		} catch (FileNotFoundException e) {
@@ -390,27 +371,31 @@ public class ErrorPropagation {
 	}
 
 	/**
-	 * Propagates markers outside of methods and fields. 
-	 * <br><code>Needs to be implemented by the Subclass.</code>
+	 * Propagates markers outside of methods and fields. <br>
+	 * <code>Needs to be implemented by the Subclass.</code>
 	 */
 	protected void propagateUnsupportedMarker(IMarker marker, IFile file) {
 		FeatureHouseCorePlugin.getDefault().logInfo("Marker not propagated: " + marker.getAttribute(IMarker.MESSAGE, ""));
 	}
 
 	/**
-	 * Sets the composed lines of the given fields and methods.
-	 * <br><code>Needs to be implemented by the Subclass.</code>
-	 * @param content The content of the composed file
+	 * Sets the composed lines of the given fields and methods. <br>
+	 * <code>Needs to be implemented by the Subclass.</code>
+	 * 
+	 * @param content
+	 *            The content of the composed file
 	 */
-	protected void setElementLines(String content,
-			LinkedList<FSTField> fields, LinkedList<FSTMethod> methods) {
-	}
+	protected abstract void setElementLines(String content, LinkedList<FSTField> fields, LinkedList<FSTMethod> methods);
 
 	/**
 	 * Propagates the given marker to the given source line
-	 * @param marker The marker to propagate
-	 * @param file The features file
-	 * @param line The marker line at the features file
+	 * 
+	 * @param marker
+	 *            The marker to propagate
+	 * @param file
+	 *            The features file
+	 * @param line
+	 *            The marker line at the features file
 	 */
 	protected void propagateMarker(IMarker marker, IFile file, int line) {
 		if (file != null && file.exists()) {
@@ -424,7 +409,7 @@ public class ErrorPropagation {
 			} catch (CoreException e) {
 				severity = IMarker.SEVERITY_ERROR;
 			}
-			if (!hasSameMarker(message,line,file)) {
+			if (!hasSameMarker(message, line, file)) {
 				try {
 					IMarker newMarker = file.createMarker(FeatureHouseCorePlugin.BUILDER_PROBLEM_MARKER);
 					newMarker.setAttribute(IMarker.LINE_NUMBER, line);

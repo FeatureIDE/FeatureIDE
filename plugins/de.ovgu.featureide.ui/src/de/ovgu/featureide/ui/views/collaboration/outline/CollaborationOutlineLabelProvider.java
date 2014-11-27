@@ -37,7 +37,7 @@ import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTInvariant;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
-import de.ovgu.featureide.core.fstmodel.RoleElement;
+import de.ovgu.featureide.core.fstmodel.IRoleElement;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
@@ -69,8 +69,8 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 
 	@Override
 	public Image getImage(Object element) {
-		if (element instanceof RoleElement) {
-			RoleElement fstModelElement = (RoleElement) element;
+		if (element instanceof IRoleElement) {
+			IRoleElement fstModelElement = (IRoleElement) element;
 			if (fstModelElement instanceof FSTField) {
 				FSTField field = (FSTField) fstModelElement;
 				if (field.isPrivate())
@@ -85,7 +85,8 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 				return IMAGE_AT_WITHOUT_WHITE_BACKGROUND;
 			} else if (fstModelElement instanceof FSTMethod) {
 				FSTMethod method = (FSTMethod) fstModelElement;
-				if (method.hasContract()) {
+				
+				if (method.hasContract() || method.contractsInRefinements()) {
 					if (method.isPrivate())
 						return IMAGE_METHODE_PRIVATE_CONTRACT;
 					else if (method.isProtected())
@@ -166,7 +167,7 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 
 	public void colorizeItems(TreeItem[] treeItems, IFile file) {
 		for (int i = 0; i < treeItems.length; i++) {
-			if (treeItems[i].getData() instanceof RoleElement) {
+			if (treeItems[i].getData() instanceof IRoleElement) {
 				setForeground(treeItems[i], file);
 			}
 			if (treeItems[i].getData() instanceof FSTRole) {
@@ -190,10 +191,10 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 	 */
 	private boolean hasSameClass(FSTClass Class, IFile oldFile, IFile currentFile) {
 		if (Class == null) {
-			UIPlugin.getDefault().logWarning("class war null");
+			UIPlugin.getDefault().logWarning("class is null");
 		}
 		if (currentFile == null) {
-			UIPlugin.getDefault().logWarning("file war null");
+			UIPlugin.getDefault().logWarning("file is null");
 		}
 		if (!currentFile.getProject().equals(oldFile.getProject())) {
 			return false;
@@ -239,7 +240,7 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 	}
 
 	public void setForeground(TreeItem item, IFile iFile) {
-		RoleElement element = (RoleElement) item.getData();
+		IRoleElement element = (IRoleElement) item.getData();
 
 		for (FSTRole role : element.getRole().getFSTClass().getRoles()) {
 			if (!role.getFile().equals(iFile)) {
@@ -247,7 +248,7 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 			}
 			if (element instanceof FSTMethod) {
 				for (FSTMethod method : role.getClassFragment().getMethods()) {
-					if (method.comparesTo(element)) {
+					if (method.equals(element)) {
 						item.setForeground(viewer.getControl().getDisplay().getSystemColor(SWT.DEFAULT));
 						return;
 					}
@@ -256,7 +257,7 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 			if (element instanceof FSTInvariant) {
 
 				for (FSTInvariant inv : role.getClassFragment().getInvariants()) {
-					if (inv.comparesTo(element)) {
+					if (inv.equals(element)) {
 						item.setForeground(viewer.getControl().getDisplay().getSystemColor(SWT.DEFAULT));
 						return;
 					}
@@ -265,7 +266,7 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 
 			if (element instanceof FSTField) {
 				for (FSTField field : role.getClassFragment().getFields()) {
-					if (field.comparesTo(element)) {
+					if (field.equals(element)) {
 						item.setForeground(viewer.getControl().getDisplay().getSystemColor(SWT.DEFAULT));
 						return;
 					}

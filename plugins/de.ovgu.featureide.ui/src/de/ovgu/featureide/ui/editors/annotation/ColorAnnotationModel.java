@@ -51,7 +51,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.builder.IComposerExtension;
+import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
@@ -83,7 +83,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 
 	private final IDocument document;
 	private final IFeatureProject project;
-	private final IComposerExtension composer;
+	private final IComposerExtensionClass composer;
 	private final IFile file;
 	
 	private int openConnections = 0;
@@ -112,7 +112,6 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 		this.project = project;
 		this.file = file;
 		composer = project.getComposer();
-		composer.initialize(project);
 		
 		docLines = document.getNumberOfLines();
 		docLength = document.getLength();

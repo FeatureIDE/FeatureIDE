@@ -25,7 +25,7 @@ package de.ovgu.featureide.core.fstmodel;
  * 
  * @author Jens Meinicke
  */
-public class FSTField extends RoleElement {
+public class FSTField extends RoleElement<FSTField> {
 
 	public FSTField(String name, String type, String modifiers) {
 		this(name, type, modifiers, "", -1, -1);
@@ -36,7 +36,6 @@ public class FSTField extends RoleElement {
 		super(fieldName, typeName, modifiers, body, beginLine, endLine);
 	}
 
-	@Override
 	public String getFullName() {
 		return name + " : " + type;
 	}
@@ -54,4 +53,5 @@ public class FSTField extends RoleElement {
 		}
 		return false;
 	}
+
 }

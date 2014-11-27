@@ -28,9 +28,11 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.osgi.service.prefs.BackingStoreException;
 import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
@@ -46,12 +48,54 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
  * Represents a configuration and provides operations for the configuration process.
  */
 public class Configuration {
+	
+	private static class BuildThread extends Thread {
+		private final FeatureModel featureModel;
+		private final Set<String> featureSet;
+		private final boolean ignoreAbstractFeatures;
+		private Node buildNode;
+		
+		public BuildThread(FeatureModel featureModel, Set<String> featureSet) {
+			super();
+			this.featureModel = featureModel;
+			this.featureSet = featureSet;
+			this.ignoreAbstractFeatures = false;
+		}
+		
+		public BuildThread(FeatureModel featureModel, boolean ignoreAbstractFeatures) {
+			super();
+			this.featureModel = featureModel;
+			this.featureSet = null;
+			this.ignoreAbstractFeatures = ignoreAbstractFeatures;
+		}
+		
+		@Override
+		public void run() {
+			if (featureSet != null) {
+				buildNode = NodeCreator.createNodes(featureModel, featureSet).toCNF();
+			} else {
+				buildNode = NodeCreator.createNodes(featureModel, ignoreAbstractFeatures).toCNF();
+			}
+		}
+	}
 
 	public static final int 
 		COMPLETION_NONE = 0,
 		COMPLETION_ONE_CLICK = 1,
-		COMPLETION_CHANGE = 2;
-	
+		COMPLETION_OPEN_CLAUSES = 2;
+
+	public static int FEATURE_LIMIT_FOR_DEFAULT_COMPLETION = 150;
+	private static int defaultCompletion;
+	static {
+		final IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode("de.ovgu.featureide.fm.core");
+		final String pref = preferences.get("configCompletion", Integer.toString(COMPLETION_ONE_CLICK));
+		try {
+			defaultCompletion = Integer.parseInt(pref);
+		} catch (Exception e) {
+			defaultCompletion = COMPLETION_ONE_CLICK;
+		}
+	}
+
 	private static final int TIMEOUT = 1000;
 
 	private final SelectableFeature root;
@@ -66,6 +110,21 @@ public class Configuration {
 
 	private final boolean ignoreAbstractFeatures;
 	private boolean propagate;
+	
+	public static int getDefaultCompletion() {
+		return defaultCompletion;
+	}
+	
+	public static void setDefaultCompletion(int defaultCompletion) {
+		Configuration.defaultCompletion = defaultCompletion;
+		final IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode("de.ovgu.featureide.fm.core");
+		preferences.put("configCompletion", Integer.toString(defaultCompletion));
+		try {
+			preferences.flush();
+		} catch (BackingStoreException e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+	}
 
 	/**
 	 * This method creates a clone of the given {@link Configuration}
@@ -102,7 +161,7 @@ public class Configuration {
 		this(featureModel, propagate, true);
 	}
 	
-	public Configuration(FeatureModel featureModel, boolean propagate, boolean ignoreAbstractFeatures) {
+	public Configuration(final FeatureModel featureModel, boolean propagate, final boolean ignoreAbstractFeatures) {
 		this.featureModel = featureModel;
 		this.propagate = propagate;
 		this.ignoreAbstractFeatures = ignoreAbstractFeatures;
@@ -110,11 +169,26 @@ public class Configuration {
 		Feature featureRoot = featureModel.getRoot();
 		root = new SelectableFeature(this, featureRoot);
 		initFeatures(root, featureRoot);
-
-		rootNode = NodeCreator.createNodes(featureModel, ignoreAbstractFeatures).toCNF();
+		
+		// Build both cnfs simultaneously for better performance
 		if (featureRoot != null) {
-			rootNodeWithoutHidden = NodeCreator.createNodes(featureModel, getRemoveFeatures(!ignoreAbstractFeatures, true)).toCNF();
+			BuildThread buildThread1 = new BuildThread(featureModel, getRemoveFeatures(!ignoreAbstractFeatures, true));
+			BuildThread buildThread2 = new BuildThread(featureModel, ignoreAbstractFeatures);
+			
+			buildThread1.start();
+			buildThread2.start();
+			
+			try {
+				buildThread2.join();
+				buildThread1.join();
+			} catch (InterruptedException e) {
+				FMCorePlugin.getDefault().logError(e);
+			}
+
+			rootNodeWithoutHidden = buildThread1.buildNode;
+			rootNode = buildThread2.buildNode;
 		} else {
+			rootNode = NodeCreator.createNodes(featureModel, ignoreAbstractFeatures).toCNF();
 			rootNodeWithoutHidden = rootNode.clone();
 		}
 		
@@ -199,15 +273,20 @@ public class Configuration {
 	}
 	
 	public boolean[] leadToValidConfiguration(List<SelectableFeature> featureList) {
-		return leadToValidConfiguration(featureList, COMPLETION_CHANGE);
+		if (defaultCompletion == COMPLETION_NONE) {
+			return leadToValidConfiguration(featureList, defaultCompletion);
+		} else if (featureList.size() > FEATURE_LIMIT_FOR_DEFAULT_COMPLETION) {
+			return leadToValidConfiguration(featureList, COMPLETION_OPEN_CLAUSES);
+		}
+		return leadToValidConfiguration(featureList, defaultCompletion);
 	}
 	
 	public boolean[] leadToValidConfiguration(List<SelectableFeature> featureList, int mode) {
 		switch (mode) {
 			case COMPLETION_ONE_CLICK:
 				return leadsToValidConfiguration1(featureList);
-			case COMPLETION_CHANGE:
-				return leadsToValidConfiguration2(featureList);
+			case COMPLETION_OPEN_CLAUSES:
+				return leadsToValidConfiguration3(featureList);
 			case COMPLETION_NONE:
 			default:
 				return new boolean[featureList.size()];
@@ -215,10 +294,73 @@ public class Configuration {
 	}
 	
 	private boolean[] leadsToValidConfiguration1(List<SelectableFeature> featureList) {
-		final Map<String, Boolean> featureMap = new HashMap<String, Boolean>(features.size() << 1);
+		final Map<String, Literal> featureMap = new HashMap<String, Literal>(features.size() << 1);
 		final Map<String, Integer> featureToIndexMap = new HashMap<String, Integer>(featureList.size() << 1);
-		final boolean[] results = new boolean[featureList.size()];
-		final Node[] literals = new Node[featureList.size()];
+		
+		for (SelectableFeature selectableFeature : features) {
+			final Feature feature = selectableFeature.getFeature();
+			if ((ignoreAbstractFeatures || feature.isConcrete()) && !feature.hasHiddenParent()) {
+				final String featureName = feature.getName();
+				featureMap.put(featureName,
+					new Literal(featureName, selectableFeature.getSelection() == Selection.SELECTED));
+			}
+		}
+
+		final Literal[] literals = new Literal[featureList.size()];
+		
+		int i = 0;
+		for (SelectableFeature feature : featureList) {
+			final String featureName = feature.getFeature().getName();
+			featureToIndexMap.put(featureName, i);
+			literals[i++] = featureMap.remove(featureName);
+		}
+		
+		final Node[] formula = new Node[featureMap.size() + 1];
+		formula[0] = rootNodeWithoutHidden.clone();
+		i = 1;
+		for (Literal literal : featureMap.values()) {
+			formula[i++] = literal;
+		}
+		
+		final SatSolver solver = new SatSolver(new And(formula), TIMEOUT);
+
+		final boolean[] results = new boolean[literals.length];
+		final boolean[] changedLiterals = new boolean[literals.length];
+		
+		for (int j = 0; j < literals.length; j++) {
+			final Literal l = literals[j].clone();
+			l.positive = !l.positive;
+			
+			final List<Literal> knownValues = solver.knownValues(l);
+			
+			for (Literal literal : knownValues) {
+				Integer index = featureToIndexMap.get(literal.var);
+				if (index != null) {
+					final Literal knownL = literals[index];
+					changedLiterals[index] = literal.positive != knownL.positive;
+					knownL.positive = literal.positive;
+				}
+			}
+			
+			try {
+				results[j] = solver.isSatisfiable(literals);
+			} catch (TimeoutException e) {
+				FMCorePlugin.getDefault().logError(e);
+				results[j] = false;
+			}
+			
+			for (int k = 0; k < literals.length; k++) {
+				final Literal knownL = literals[k];
+				knownL.positive = changedLiterals[k] ^ knownL.positive;
+				changedLiterals[k] = false;
+			}
+		}
+
+		return results;
+	}
+	
+	private boolean[] leadsToValidConfiguration3(List<SelectableFeature> featureList) {
+		final Map<String, Boolean> featureMap = new HashMap<String, Boolean>(features.size() << 1);
 		
 		for (SelectableFeature selectableFeature : features) {
 			final Feature feature = selectableFeature.getFeature();
@@ -227,167 +369,44 @@ public class Configuration {
 			}
 		}
 		
-		int i = 0;
-		for (SelectableFeature feature : featureList) {
-			final String featureName = feature.getFeature().getName();
-			featureMap.remove(featureName);
-			featureToIndexMap.put(featureName, i);
-			literals[i++] = new Literal(featureName, feature.getSelection() == Selection.SELECTED);
-		}
-		
-		final Node[] formula = new Node[featureMap.size() + 2];
-		formula[0] = rootNodeWithoutHidden.clone();
-		i = 2;
-		for (Entry<String, Boolean> feature : featureMap.entrySet()) {
-			formula[i++] = new Literal(feature.getKey(), feature.getValue());
-		}
-		
-		for (int j = 0; j < literals.length; j++) {
-			final Node[] newLiterals = new Node[featureList.size()];
-			for (int k = 0; k < newLiterals.length; k++) {
-				newLiterals[k] = literals[k].clone();
-			}
-			
-			final Literal l = (Literal) newLiterals[j];
-			l.positive = !l.positive;
-			formula[1] = l;
-			final SatSolver solver = new SatSolver(new And(formula), TIMEOUT);
-			
-			for (Literal literal : solver.knownValues()) {
-				Integer index = featureToIndexMap.get(literal.var);
-				if (index != null) {
-					newLiterals[index] = literal.clone();
-				}
-			}
-			
-			try {
-				results[j] = solver.isSatisfiable(newLiterals);
-			} catch (TimeoutException e) {
-				FMCorePlugin.getDefault().logError(e);
-				results[j] = false;
-			}
-		}
-
-		return results;
-	}
-	
-	private boolean[] leadsToValidConfiguration2(List<SelectableFeature> featureList) {
-		//all automatic features
-		final Map<String, SelectableFeature> featureMap = new HashMap<String, SelectableFeature>(features.size() << 1);
-		final Map<String, Integer> featureToIndexMap = new HashMap<String, Integer>(features.size() << 1);
 		final boolean[] results = new boolean[featureList.size()];
-		final ArrayList<Literal> allLiteralList = new ArrayList<Literal>(features.size());
 		
-		int c = 0;
-		for (SelectableFeature selectableFeature : features) {
-			final Feature feature = selectableFeature.getFeature();
-			if ((ignoreAbstractFeatures || feature.isConcrete()) && !feature.hasHiddenParent()) {
-				final String featureName = feature.getName();
-				final Selection selection = selectableFeature.getSelection();
-//				if (selection != Selection.UNDEFINED) {
-					featureMap.put(featureName, selectableFeature); // == Selection.SELECTED);
-//				}
-				featureToIndexMap.put(featureName, c);
-				allLiteralList.add(new Literal(featureName, selection == Selection.SELECTED));
-				c++;
-			}
-		}
-		
-
-		final Node[] allLiterals = allLiteralList.toArray(new Node[0]);
-
-		final Map<String, SelectableFeature> featureMap2 = new HashMap<String, SelectableFeature>(featureMap);
-		
-		// manual set features
-		final Node[] manuaLiterals = new Node[featureList.size()];
-		int i = 0;
-		for (SelectableFeature feature : featureList) {
-			final String featureName = feature.getFeature().getName();
-			featureMap.remove(featureName);
-			manuaLiterals[i++] = new Literal(featureName, feature.getSelection() == Selection.SELECTED);
-		}
-
-		// automatic set features
-		final Node[] formula = new Node[featureMap.size() + 2];
-		i = 0;
-		for (Entry<String, SelectableFeature> feature : featureMap.entrySet()) {
-			switch (feature.getValue().getSelection()) {
-			case SELECTED:
-				formula[i++] = new Literal(feature.getKey(), true);
-				break;
-			case UNSELECTED:
-			case UNDEFINED:
-				formula[i++] = new Literal(feature.getKey(), false);
-				break;
-			default:
-				break;
-			}
-		}
-		
-		formula[formula.length - 2] = rootNodeWithoutHidden.clone();
-		
-		for (int j = 0; j < manuaLiterals.length; j++) {
-			final Node[] allListeralsCloned = cloneArray(allLiterals);
-			final Literal curLiteral = (Literal) manuaLiterals[j];
-			final Feature curFeature = featureMap2.get(curLiteral.var).getFeature();
-			
-			curLiteral.positive = !curLiteral.positive;
-			formula[formula.length - 1] = curLiteral.clone();
-			final SatSolver solver = new SatSolver(new And(formula), TIMEOUT);
-			
-			try {
-				if (!solver.isSatisfiable()) {
-					results[j] = true;
-					continue;
+		final Node[] clauses = rootNodeWithoutHidden.getChildren();
+		final HashMap<Object, Literal> literalMap = new HashMap<Object, Literal>();
+		for (int i = 0; i < clauses.length; i++) {
+			final Node clause = clauses[i];
+			literalMap.clear();
+			if (clause instanceof Literal) {
+				final Literal literal = (Literal) clause;
+				literalMap.put(literal.var, literal);
+			} else {
+				final Node[] orLiterals = clause.getChildren();
+				for (int j = 0; j < orLiterals.length; j++) {
+					final Literal literal = (Literal) orLiterals[j];
+					literalMap.put(literal.var, literal);
 				}
-			} catch (TimeoutException e1) {
-				FMCorePlugin.getDefault().logError(e1);
 			}
-			boolean changed = false;
-			for (Literal knownLiteral : solver.knownValues()) {
-				Integer index1 = featureToIndexMap.get(knownLiteral.var);
-				if (index1 != null) {
-					final SelectableFeature s = featureMap2.get(knownLiteral.var);
-					final Literal l1 = (Literal) allListeralsCloned[index1];
-					if (changed || (
-						(!isParentOf(s.getFeature(), curFeature)) &&
-						(s.getSelection() == Selection.UNDEFINED || l1.positive != knownLiteral.positive)
-					)) {
-						changed = true;
+			
+			boolean satisfied = false;
+			for (Literal literal : literalMap.values()) {
+				Boolean selected = featureMap.get(literal.var);
+				if (selected != null && selected == literal.positive) {
+					satisfied = true;
+					break;
+				}
+			}
+			if (!satisfied) {
+				int c = 0;
+				for (SelectableFeature selectableFeature : featureList) {
+					if (literalMap.containsKey(selectableFeature.getFeature().getName())) {
+						results[c] = true;
 					}
-					l1.positive = knownLiteral.positive;
+					c++;
 				}
 			}
-			
-			try {
-				results[j] = (changed) || solver.isSatisfiable(allListeralsCloned);
-			} catch (TimeoutException e) {
-				FMCorePlugin.getDefault().logError(e);
-				results[j] = false;
-			} finally {
-				curLiteral.positive = !curLiteral.positive;
-			}
 		}
+		
 		return results;
-	}
-	
-	private boolean isParentOf(Feature possibleParent, Feature child) {
-		Feature parent = child;
-		while (parent != null) {
-			if (possibleParent.getName().equals(parent.getName())) {
-				return true;
-			}
-			parent = parent.getParent();
-		}
-		return false;
-	}
-	
-	private Node[] cloneArray(Node[] original) {
-		final Node[] cloned = new Node[original.length];
-		for (int i = 0; i < original.length; i++) {
-			cloned[i] = original[i].clone();
-		}
-		return cloned;
 	}
 	
 	public long number() {
@@ -543,21 +562,5 @@ public class Configuration {
 				}
 			}
 		}
-		
-//		for (SelectableFeature feature : features) {
-//			if (feature.getAutomatic() == Selection.UNDEFINED && feature.getFeature().hasHiddenParent()) {
-//				try {
-//					if (!solver2.isSatisfiable(new Literal(feature.getFeature().getName(), false))) {
-//						feature.setAutomatic(Selection.SELECTED);
-//					} else if (!solver2.isSatisfiable(new Literal(feature.getFeature().getName(), true))) {
-//						feature.setAutomatic(Selection.UNSELECTED);
-//					} else {
-//						feature.setAutomatic(Selection.UNDEFINED);
-//					}
-//				} catch (TimeoutException e) {
-//					FMCorePlugin.getDefault().logError(e);
-//				}
-//			}
-//		}
 	}
 }

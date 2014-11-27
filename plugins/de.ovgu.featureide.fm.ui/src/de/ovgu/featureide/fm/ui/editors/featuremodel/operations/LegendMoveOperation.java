@@ -26,7 +26,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.draw2d.geometry.Point;
 
-import de.ovgu.featureide.fm.core.FMPoint;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureModelLayout;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
@@ -40,15 +39,14 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
 public class LegendMoveOperation extends AbstractFeatureModelOperation {
 
 	private static final String LABEL = "Move Legend";
-	private Point pos;
-	private Point oldPos;
+	private Point newLocation;
+	private Point oldLocation;
 	private boolean wasAutoLayout;
 
-	public LegendMoveOperation(FeatureModel featureModel, Point p, Point newPos, LegendFigure figure) {
+	public LegendMoveOperation(FeatureModel featureModel, Point newLocation, LegendFigure legendFigure) {
 		super(featureModel, LABEL);
-		this.pos = p;
-		final FMPoint legendPos = featureModel.getLayout().getLegendPos();
-		this.oldPos = new Point(legendPos.x, legendPos.y);
+		this.newLocation = newLocation;
+		this.oldLocation = legendFigure.getLocation();
 	}
 	
 	@Override
@@ -60,18 +58,20 @@ public class LegendMoveOperation extends AbstractFeatureModelOperation {
 
 	@Override
 	protected void redo() {
-		FeatureUIHelper.getLegendFigure(featureModel).setLocation(pos);
+		FeatureUIHelper.getLegendFigure(featureModel).setLocation(newLocation);
 		final FeatureModelLayout layout = featureModel.getLayout();
-		layout.setLegendPos(pos.x, pos.y);
+		layout.setLegendPos(newLocation.x, newLocation.y);
 		layout.setLegendAutoLayout(false);
+		featureModel.handleLegendLayoutChanged(); 
 	}
 
 	@Override
 	protected void undo() {
-		FeatureUIHelper.getLegendFigure(featureModel).setLocation(oldPos);
+		FeatureUIHelper.getLegendFigure(featureModel).setLocation(oldLocation);
 		final FeatureModelLayout layout = featureModel.getLayout();
-		layout.setLegendPos(oldPos.x, oldPos.y);
+		layout.setLegendPos(oldLocation.x, oldLocation.y);
 		layout.setLegendAutoLayout(wasAutoLayout);
+		featureModel.handleLegendLayoutChanged(); 
 	}
 
 }

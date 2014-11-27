@@ -56,6 +56,13 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 	public static final String C_NATURE = "org.eclipse.cdt.core.cnature";
 	public static final String CC_NATURE = "org.eclipse.cdt.core.ccnature";
 
+	private static final String NEWLINE = System.getProperty("line.separator", "\n");
+	private static final ArrayList<String[]> TEMPLATES = new ArrayList<String[]>(1);
+	
+	static {
+		 TEMPLATES.add(new String[]{"C++", "h", NEWLINE + REFINES_PATTERN + " class " + CLASS_NAME_PATTERN + " {" + NEWLINE + NEWLINE + "};"});
+	}
+	
 	/**
 	 * This wrapper builds the current configuration into the build folder.
 	 */
@@ -81,9 +88,6 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 	
 
 	public boolean initialize(IFeatureProject project) {
-		if (project == null) {
-			return false;
-		}
 		super.initialize(project);
 		featureCpp.initialize(project.getSourceFolder(), project.getBuildFolder());
 		createTempFolder();
@@ -124,12 +128,13 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 		}
 	}
 
-
 	public void performFullBuild(IFile config) {
 		if(!isPluginInstalled(PLUGIN_ID)){
 			featureProject.createBuilderMarker(featureProject.getProject(), PLUGIN_WARNING, -1, IMarker.SEVERITY_ERROR);
 		}
-		initialize(CorePlugin.getFeatureProject(config));
+		if (!isInitialized()) {
+			initialize(CorePlugin.getFeatureProject(config));
+		}
 		featureCpp.compose(config);
 		buildFSTModel();
 	}
@@ -192,18 +197,6 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 		return TEMPLATES;
 	}
 	
-	private static final ArrayList<String[]> TEMPLATES = createTempltes();
-	private static final String NEWLINE = System.getProperty("line.separator", "\n");
-	
-	private static ArrayList<String[]> createTempltes() {
-		 ArrayList<String[]> list = new  ArrayList<String[]>(1);
-		 list.add(new String[]{"C++", "h", NEWLINE + REFINES_PATTERN + " class " + CLASS_NAME_PATTERN + " {" + NEWLINE + NEWLINE + "};"});
-		 return list;
-	}
-	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.ComposerExtensionClass#replaceMarker(java.lang.String, java.util.List)
-	 */
 	@Override
 	public String replaceSourceContentMarker(String text,  boolean refines, String packageName) {
 		if (refines)
@@ -284,11 +277,11 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 	}
 
 	@Override
-	public void buildConfiguration(IFolder folder, Configuration configuration, String congurationName) {
-		super.buildConfiguration(folder, configuration, congurationName);
+	public void buildConfiguration(IFolder folder, Configuration configuration, String configurationName) {
+		super.buildConfiguration(folder, configuration, configurationName);
 		featureCpp.initialize(null, folder);
 		try {
-			for (IResource res :folder.members()) {
+			for (IResource res : folder.members()) {
 				if (res instanceof IFile && getConfigurationExtension().equals(res.getFileExtension())) {
 					featureCpp.compose((IFile)res);
 				}
@@ -301,5 +294,15 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 	@Override
 	public Mechanism getGenerationMechanism() {
 	    return IComposerExtensionClass.Mechanism.FEATURE_ORIENTED_PROGRAMMING;
+	}
+
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionBase#supportsMigration()
+	 */
+	@Override
+	public boolean supportsMigration()
+	{
+		return false;
 	}
 }

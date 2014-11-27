@@ -167,7 +167,7 @@ public class MPLRenameExternalJob extends AMonitorJob<MPLRenameExternalJob.Argum
 
 	private boolean renameProject() {
 		final IPackageFragmentRoot packageFragmentRoot;
-
+		
 		List<IPackageFragment> packages = new LinkedList<IPackageFragment>();
 		try {
 			IPackageFragmentRoot[] packageFragmentRoots = javaProject.getPackageFragmentRoots();

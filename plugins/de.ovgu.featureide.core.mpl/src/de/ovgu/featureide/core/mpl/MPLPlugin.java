@@ -27,7 +27,6 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -37,9 +36,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.QualifiedName;
-import org.eclipse.jdt.core.CompletionProposal;
-import org.eclipse.jdt.core.Flags;
-import org.eclipse.jdt.core.Signature;
 import org.osgi.framework.BundleContext;
 
 import de.ovgu.featureide.core.CorePlugin;
@@ -60,17 +56,10 @@ import de.ovgu.featureide.core.mpl.job.PrintFeatureInterfacesJob;
 import de.ovgu.featureide.core.mpl.job.PrintStatisticsJob;
 import de.ovgu.featureide.core.mpl.job.util.AJobArguments;
 import de.ovgu.featureide.core.mpl.job.util.IChainJob;
-import de.ovgu.featureide.core.mpl.signature.ProjectSignatures;
-import de.ovgu.featureide.core.mpl.signature.ProjectSignatures.SignatureIterator;
-import de.ovgu.featureide.core.mpl.signature.ProjectStructure;
-import de.ovgu.featureide.core.mpl.signature.abstr.AbstractClassSignature;
-import de.ovgu.featureide.core.mpl.signature.abstr.AbstractFieldSignature;
-import de.ovgu.featureide.core.mpl.signature.abstr.AbstractMethodSignature;
-import de.ovgu.featureide.core.mpl.signature.abstr.AbstractSignature;
-import de.ovgu.featureide.core.mpl.signature.filter.ContextFilter;
 import de.ovgu.featureide.core.mpl.util.ConfigurationChangeListener;
 import de.ovgu.featureide.core.mpl.util.EditorTracker;
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.PropertyConstants;
 
 /** 
@@ -332,11 +321,13 @@ public class MPLPlugin extends AbstractCorePlugin {
 	}
 	
 	public void buildDocumentation(LinkedList<IProject> projects, String folder, String options, int mode) {
-		startJobs(projects, new PrintDocumentationJob.Arguments(folder, null, mode, options.split("\\s+")));
+		FMCorePlugin.getDefault().startJobs(projects, 
+				new PrintDocumentationJob.Arguments(folder, null, mode, options.split("\\s+")), true);
 	}
 	
 	public void buildDocumentation(LinkedList<IProject> projects, String folder, String options, int mode, String featurename) {
-		startJobs(projects, new PrintDocumentationJob.Arguments(folder, featurename, mode, options.split("\\s+")));
+		FMCorePlugin.getDefault().startJobs(projects, 
+				new PrintDocumentationJob.Arguments(folder, featurename, mode, options.split("\\s+")), true);
 	}
 	
 	public void buildDocumentationStatistics(LinkedList<IProject> projects, String folder) {
@@ -360,7 +351,6 @@ public class MPLPlugin extends AbstractCorePlugin {
 	}
 	
 	public void startJobs(LinkedList<IProject> projects, AJobArguments arguments) {
-//		final LinkedList<IChainJob> jobs = new LinkedList<IChainJob>();
 		final Object idObject = new Object();
 		for (IProject p : projects) {
 			InterfaceProject interfaceProject = getInterfaceProject(p);
@@ -368,117 +358,12 @@ public class MPLPlugin extends AbstractCorePlugin {
 				IChainJob job = new CreateFujiSignaturesJob();
 				job.setProject(p);
 				JobManager.addJob(idObject, job);
-//				jobs.add(job);
 			}
 			IChainJob job = arguments.createJob();
 			job.setProject(p);
-//			jobs.add(job);
 			JobManager.addJob(idObject, job);
 			
 		}
-//		new StartJob.Arguments(jobs).createJob().schedule();
-	}
-	
-	public List<CompletionProposal> extendedModules_getCompl(InterfaceProject interfaceProject, String featureName) {
-		final LinkedList<CompletionProposal> ret_List = new LinkedList<CompletionProposal>();
-		final ProjectSignatures signatures = interfaceProject.getProjectSignatures();
-		
-			if (signatures != null) {
-				SignatureIterator it = signatures.createIterator();
-				it.addFilter(new ContextFilter(featureName, interfaceProject));
-				
-				while (it.hasNext()) {
-					AbstractSignature curMember = it.next();
-					CompletionProposal pr = null;
-					
-					if (curMember instanceof AbstractMethodSignature) {
-						pr = CompletionProposal.create(CompletionProposal.METHOD_REF, 0);
-						
-						
-						AbstractMethodSignature methSig = (AbstractMethodSignature) curMember; 
-						
-						List<String> sig = methSig.getParameterTypes();
-						
-						
-						//TODO eigentlich ist eine Fallunterscheidung nach Typen notwendig!
-						char[][] c = new char[][]{{}};
-						if(sig.size()>0){
-							c = new char[sig.size()][];
-							int i = 0;
-							for (String parameterType : sig) {
-								String parameterTypeToChar = "L" + parameterType + ";";
-								c[i++] =  parameterTypeToChar.toCharArray() ;
-							}
-						}
-						
-						String returnType = "L" + methSig.getReturnType() + ";";
-						
-						
-						
-						pr.setSignature(Signature.createMethodSignature(c, returnType.toCharArray()));
-						
-						
-						String declType = "L" + methSig.getFullName().replaceAll("." + methSig.getName(),"") + ";";
-						pr.setDeclarationSignature(declType.toCharArray());
-//						((FeatureReadyCompletionProposal)pr).setFeature("feature");;
-//						pr.findParameterNames(new ProgressMonitor(arg0, arg1, arg2, arg3, arg4))
-					} else if (curMember instanceof AbstractFieldSignature) {
-						pr = CompletionProposal.create(CompletionProposal.FIELD_REF, 0);
-					} else if (curMember instanceof AbstractClassSignature) {
-						pr = CompletionProposal.create(CompletionProposal.TYPE_REF,0);
-						pr.setSignature(Signature.createTypeSignature(curMember.getFullName(), true).toCharArray());
-					}
-					
-					if (pr != null) {
-						pr.setFlags(getFlagOfSignature(curMember));
-						pr.setName(curMember.getName().toCharArray());
-						pr.setCompletion(curMember.getName().toCharArray());
-						
-						ret_List.add(pr);
-					}
-				}
-			} else {
-				interfaceProject.loadSignatures(false);
-			}
-		return ret_List;
-	}
-	
-	public int getFlagOfSignature(AbstractSignature element){
-		if (element instanceof AbstractMethodSignature) {
-			//TODO MPL: constructor icon
-			switch (((AbstractMethodSignature) element).getVisibilty()) {
-			case AbstractSignature.VISIBILITY_DEFAULT: return Flags.AccDefault;
-			case AbstractSignature.VISIBILITY_PRIVATE: return Flags.AccPrivate;
-			case AbstractSignature.VISIBILITY_PROTECTED: return Flags.AccProtected;
-			case AbstractSignature.VISIBILITY_PUBLIC: return Flags.AccPublic;
-			}
-		} else if (element instanceof AbstractFieldSignature) {
-			switch (((AbstractFieldSignature) element).getVisibilty()) {
-			case AbstractSignature.VISIBILITY_DEFAULT: return Flags.AccDefault;
-			case AbstractSignature.VISIBILITY_PRIVATE: return Flags.AccPrivate;
-			case AbstractSignature.VISIBILITY_PROTECTED: return Flags.AccProtected;
-			case AbstractSignature.VISIBILITY_PUBLIC: return Flags.AccPublic;
-			}
-		}
-		return 0;
-	}
-
-	public ProjectStructure extendedModules_getStruct(final IFeatureProject project, final String featureName) {
-		InterfaceProject interfaceProject = getInterfaceProject(project.getProject());
-		if (interfaceProject != null) {	
-			final ProjectSignatures signatures = interfaceProject.getProjectSignatures();
-			if (signatures != null) {
-				SignatureIterator it = signatures.createIterator();
-				//TODO check
-				if(featureName != null){
-					it.addFilter(new ContextFilter(featureName, interfaceProject));
-				}
-				return new ProjectStructure(it);
-			} else {
-				interfaceProject.loadSignatures(false);
-			}
-		}
-		return null;
 	}
 	
 	public void createInterface(IProject mplProject, IFeatureProject featureProject, Collection<String> featureNames) {

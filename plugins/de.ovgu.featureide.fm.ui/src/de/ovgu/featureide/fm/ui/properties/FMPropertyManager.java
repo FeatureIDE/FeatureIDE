@@ -467,7 +467,10 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 		return GUIBasics.createLineBorder(getConcreteBorderColor(), 1);
 	}
 	
-	public static Border getFeatureBorder() {
+	public static Border getFeatureBorder(boolean selected) {
+		if (selected) {
+			return GUIBasics.createLineBorder(getFeatureBorderColor(), 3);
+		}
 		return GUIBasics.createLineBorder(getFeatureBorderColor(), 1);
 	}
 
