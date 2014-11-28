@@ -26,6 +26,8 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
+import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationWriter;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
@@ -71,6 +73,10 @@ public class TextEditorPage extends TextEditor implements
 
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
+		refresh();
+	}
+
+	protected final void refresh() {
 		if (configurationEditor.getConfiguration() == null) {
 			return;
 		}
@@ -83,13 +89,22 @@ public class TextEditorPage extends TextEditor implements
 	}
 
 	@Override
-	public void pageChangeFrom(int index) {
-
+	public void pageChangeFrom(int newPageIndex) {
+		IDocumentProvider provider = getDocumentProvider();
+		IDocument document = provider.getDocument(getEditorInput());
+		String text = document.get();
+		if (!new ConfigurationWriter(configurationEditor.getConfiguration()).writeIntoString().equals(text)) {
+			try {
+				new ConfigurationReader(configurationEditor.getConfiguration()).readFromString(text);
+			} catch (Exception e) {
+				FMCorePlugin.getDefault().logError(e);
+			}
+		}
 	}
 
 	@Override
-	public void pageChangeTo(int index) {
-
+	public void pageChangeTo(int oldPageIndex) {
+		refresh();
 	}
 
 	@Override

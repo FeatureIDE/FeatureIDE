@@ -106,7 +106,7 @@ public class DefaultFormat extends ConfigurationFormat {
 			lineNumber++;
 		}
 		configuration.setPropagate(orgPropagate);
-		configuration.updateAutomaticValues();
+		configuration.update(true);
 		return warnings;
 	}
 

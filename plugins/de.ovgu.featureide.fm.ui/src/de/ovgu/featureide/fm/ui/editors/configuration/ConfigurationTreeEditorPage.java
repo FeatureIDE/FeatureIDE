@@ -68,7 +68,7 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  * 
  * @author Jens Meinicke
  */
-public abstract class ConfigurationEditorPage extends EditorPart implements IConfigurationEditorPage {
+public abstract class ConfigurationTreeEditorPage extends EditorPart implements IConfigurationEditorPage {
 	static interface ConfigurationTreeWalker {
 		boolean visitTreeItem(TreeItem item, SelectableFeature feature);
 	}
@@ -88,11 +88,11 @@ public abstract class ConfigurationEditorPage extends EditorPart implements ICon
 	protected ValidConfigJobManager validConfigJobManager = null;
 
 	protected boolean dirty = false;
-	protected boolean initialized = false;
 
 	private int index;
 	
 	private Label infoLabel;
+	private Button autoSelectButton;
 	
 	public void setDirty() {
 		dirty = true;
@@ -116,11 +116,12 @@ public abstract class ConfigurationEditorPage extends EditorPart implements ICon
 	
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
-		if (initialized) {
-			setDirty();
-		} else {
-			initialized = true;
-		}
+		refreshPage();
+		setDirty();
+	}
+
+	protected final void refreshPage() {
+		autoSelectButton.setSelection(configurationEditor.getConfiguration().isPropagate());
 		UIJob job = new UIJob("update tree") {
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
@@ -134,12 +135,12 @@ public abstract class ConfigurationEditorPage extends EditorPart implements ICon
 	
 	@Override
 	public void pageChangeFrom(int index) {
-	
+		
 	}
 	
 	@Override
 	public void pageChangeTo(int index) {
-
+		refreshPage();
 	}
 	
 	@Override
@@ -213,7 +214,7 @@ public abstract class ConfigurationEditorPage extends EditorPart implements ICon
 		gridData = new GridData();
 		gridData.horizontalAlignment = SWT.RIGHT;
 		gridData.verticalAlignment = SWT.CENTER;
-		final Button autoSelectButton = new Button(compositeTop, SWT.TOGGLE);
+		autoSelectButton = new Button(compositeTop, SWT.TOGGLE);
 		autoSelectButton.setText("Autoselect Features");
 		autoSelectButton.setLayoutData(gridData);
 		autoSelectButton.setSelection(true);
@@ -226,7 +227,7 @@ public abstract class ConfigurationEditorPage extends EditorPart implements ICon
 				if (oldPropagate) {
 					invalidFeatures.clear();
 					config.setPropagate(false);
-					config.makeManual(canDeselectFeatures());
+					config.makeManual(!canDeselectFeatures());
 					refreshTree();
 				} else {
 					if (invalidFeatures.isEmpty()) {
@@ -256,7 +257,7 @@ public abstract class ConfigurationEditorPage extends EditorPart implements ICon
 	}
 	
 	private void computeFeatures() {
-		configurationEditor.getConfiguration().updateAutomaticValues(true);
+		configurationEditor.getConfiguration().update(true, true);
 		refreshTree();
 	}
 	
@@ -350,8 +351,8 @@ public abstract class ConfigurationEditorPage extends EditorPart implements ICon
 		SelectableFeature feature = (SelectableFeature)item.getData();
 		if (feature.getAutomatic() == Selection.UNDEFINED) {
 			switch (feature.getManual()) {
-			case SELECTED: set(feature, (select) ? Selection.UNDEFINED : Selection.UNSELECTED);  break;
-			case UNSELECTED: set(feature, (select) ? Selection.SELECTED : Selection.UNDEFINED);  break;
+			case SELECTED: set(feature, (select) ? Selection.UNDEFINED : Selection.UNSELECTED); break;
+			case UNSELECTED: set(feature, (select) ? Selection.SELECTED : Selection.UNDEFINED); break;
 			case UNDEFINED: set(feature, (select) ? Selection.SELECTED : Selection.UNSELECTED); break;
 			default: set(feature, Selection.UNDEFINED);
 			}

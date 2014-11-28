@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.configuration;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 
 import org.eclipse.swt.SWT;
@@ -42,7 +43,7 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  * @author Jens Meinicke
  * @author Hannes Smurawsky
  */
-public class ConfigurationPage extends ConfigurationEditorPage {
+public class ConfigurationPage extends ConfigurationTreeEditorPage {
 	
 	private static final String PAGE_TEXT = "Configuration";
 	private static final String ID = FMUIPlugin.PLUGIN_ID + "ConfigurationPage";
@@ -188,6 +189,37 @@ public class ConfigurationPage extends ConfigurationEditorPage {
 		final boolean result = super.changeSelection(item, select);
 		selectionCanChange = true;
 		return result;
+	}
+
+	@Override
+	public void pageChangeTo(int index) {
+		final Configuration configuration = configurationEditor.getConfiguration();
+		final boolean oldPropagate = configuration.isPropagate();
+		configuration.setPropagate(false);
+		
+		final HashSet<SelectableFeature> selectedFeatures = new HashSet<SelectableFeature>();
+		for (SelectableFeature feature : configuration.getFeatures()) {
+			if (feature.getAutomatic() == Selection.SELECTED) {
+				selectedFeatures.add(feature);
+			} else if (feature.getAutomatic() == Selection.UNDEFINED && feature.getManual() == Selection.UNSELECTED) {
+				configuration.setManual(feature, Selection.UNDEFINED);
+			}
+		}
+		
+		configuration.setPropagate(oldPropagate);
+		configuration.update();
+		configuration.setPropagate(false);
+		
+		// reselect implied features
+		for (SelectableFeature feature : configuration.getFeatures()) {
+			if (feature.getAutomatic() == Selection.UNDEFINED && selectedFeatures.contains(feature)) {
+				configuration.setManual(feature, Selection.SELECTED);
+			}
+		}
+
+		configuration.setPropagate(oldPropagate);
+		configuration.update(true);
+		super.pageChangeTo(index);
 	}
 
 	@Override

@@ -100,17 +100,7 @@ public class Configuration {
 	 * @param configuration The configuration to clone
 	 */
 	public Configuration(Configuration configuration) {
-		this(configuration, configuration.featureModel, configuration.propagate);
-	}
-
-	/**
-	 * Copy constructor. Copies the status of a given configuration.
-	 * @param configuration
-	 * @param featureModel the underlying feature model. The model can be different from the old configuration, but must contain at least all features of the orignal model.
-	 * @param propagate
-	 */
-	public Configuration(Configuration configuration, FeatureModel featureModel, boolean propagate) {
-		this.featureModel = featureModel;
+		this.featureModel = configuration.featureModel;
 		this.propagate = false;
 		this.ignoreAbstractFeatures = configuration.ignoreAbstractFeatures;
 
@@ -125,7 +115,58 @@ public class Configuration {
 			setManual(f.getName(), f.getManual());
 			setAutomatic(f.getName(), f.getAutomatic());
 		}
-		this.propagate = propagate;
+		this.propagate = configuration.propagate;
+	}
+
+	/**
+	 * Copy constructor. Copies the status of a given configuration.
+	 * @param configuration
+	 * @param featureModel the underlying feature model. The model can be different from the old configuration.
+	 * @param propagate
+	 */
+	public Configuration(Configuration configuration, FeatureModel featureModel) {
+		this.featureModel = featureModel;
+		this.propagate = false;
+		this.ignoreAbstractFeatures = configuration.ignoreAbstractFeatures;
+		
+		Feature featureRoot = featureModel.getRoot();
+		root = new SelectableFeature(this, featureRoot);
+		
+		if (featureRoot != null) {
+			initFeatures(root, featureRoot);
+
+			// Build both cnfs simultaneously for better performance
+			BuildThread buildThread1 = new BuildThread(featureModel, getRemoveFeatures(!ignoreAbstractFeatures, true));
+			BuildThread buildThread2 = new BuildThread(featureModel, ignoreAbstractFeatures);
+			
+			buildThread1.start();
+			buildThread2.start();
+			
+			try {
+				buildThread2.join();
+				buildThread1.join();
+			} catch (InterruptedException e) {
+				FMCorePlugin.getDefault().logError(e);
+			}
+
+			rootNodeWithoutHidden = buildThread1.buildNode;
+			rootNode = buildThread2.buildNode;
+		} else {
+			features.add(root);
+			table.put(root.getName(), root);
+			rootNode = NodeCreator.createNodes(featureModel, ignoreAbstractFeatures).toCNF();
+			rootNodeWithoutHidden = rootNode.clone();
+		}
+		
+		for (SelectableFeature f : configuration.features) {
+			try {
+				setManual(f.getName(), (f.getManual()));
+			} catch (FeatureNotFoundException e) {
+			}
+		}
+		
+		this.propagate = configuration.propagate;
+		update(true);
 	}
 	
 	public Configuration(FeatureModel featureModel) {
@@ -143,10 +184,11 @@ public class Configuration {
 
 		Feature featureRoot = featureModel.getRoot();
 		root = new SelectableFeature(this, featureRoot);
-		initFeatures(root, featureRoot);
 		
-		// Build both cnfs simultaneously for better performance
 		if (featureRoot != null) {
+			initFeatures(root, featureRoot);
+
+			// Build both cnfs simultaneously for better performance
 			BuildThread buildThread1 = new BuildThread(featureModel, getRemoveFeatures(!ignoreAbstractFeatures, true));
 			BuildThread buildThread2 = new BuildThread(featureModel, ignoreAbstractFeatures);
 			
@@ -163,11 +205,13 @@ public class Configuration {
 			rootNodeWithoutHidden = buildThread1.buildNode;
 			rootNode = buildThread2.buildNode;
 		} else {
+			features.add(root);
+			table.put(root.getName(), root);
 			rootNode = NodeCreator.createNodes(featureModel, ignoreAbstractFeatures).toCNF();
 			rootNodeWithoutHidden = rootNode.clone();
 		}
 		
-		updateAutomaticValues();
+		update(true);
 	}
 
 	public FeatureModel getFeatureModel() {
@@ -483,7 +527,7 @@ public class Configuration {
 			feature.setManual(Selection.UNDEFINED);
 			feature.setAutomatic(Selection.UNDEFINED);
 		}
-		updateAutomaticValues();
+		update();
 	}
 	
 	void setAutomatic(SelectableFeature feature, Selection selection) {
@@ -500,7 +544,7 @@ public class Configuration {
 
 	public void setManual(SelectableFeature feature, Selection selection) {
 		feature.setManual(selection);
-		updateAutomaticValues();
+		update(true);
 	}
 
 	public void setManual(String name, Selection selection) {
@@ -591,26 +635,67 @@ public class Configuration {
 		}
 		for (SelectableFeature feature : features) {
 			final Selection autoSelection = feature.getAutomatic();
-			if (autoSelection != Selection.UNDEFINED && (!discardDeselected || autoSelection == Selection.SELECTED)) {
+			if (autoSelection != Selection.UNDEFINED) {
 				feature.setAutomatic(Selection.UNDEFINED);
-				feature.setManual(autoSelection);
-			} else {
-				feature.setAutomatic(Selection.UNDEFINED);
+				if (!discardDeselected || autoSelection == Selection.SELECTED) {
+					feature.setManual(autoSelection);
+				}
 			}
 		}
 	}
 	
-	public void updateAutomaticValues() {
-		updateAutomaticValues(false);
+	public void update() {
+		update(false, false);
 	}
 	
-	public void updateAutomaticValues(boolean updateManual) {
+	public void update(boolean manual) {
+		update(manual, false);
+	}
+	
+	public void update(boolean manual, boolean redundantManual) {
 		if (!propagate) {
 			return;
 		}
 		resetAutomaticValues();
 		
-		Node[] nodeArray = createNodeArray(createNodeList(), rootNode);		
+		final SatSolver manualSolver = (manual || redundantManual) ? new SatSolver(rootNode, TIMEOUT) : null;
+		
+		List<Node> manualSelected = new ArrayList<Node>();
+		for (SelectableFeature feature : features) {
+			switch (feature.getManual()) {
+				case SELECTED: manualSelected.add(new Literal(feature.getFeature().getName(), true)); break;
+				case UNSELECTED: manualSelected.add(new Literal(feature.getFeature().getName(), false)); break;
+				default:
+			}
+		}
+		
+		if (redundantManual) {
+			final Node[] manualSelectedArray = createNodeArray(manualSelected);
+			for (int i = 0; i < manualSelectedArray.length; i++) {
+				Literal l = (Literal) manualSelectedArray[i];
+				try {
+					l.positive = !l.positive;
+					if (!manualSolver.isSatisfiable(manualSelectedArray)) {
+						SelectableFeature feature = table.get(l.var);
+						feature.setManual(Selection.UNDEFINED);
+					}
+					l.positive = !l.positive;
+				} catch (TimeoutException e) {
+					e.printStackTrace();
+				}
+			}
+
+			manualSelected = new ArrayList<Node>();
+			for (SelectableFeature feature : features) {
+				switch (feature.getManual()) {
+					case SELECTED: manualSelected.add(new Literal(feature.getFeature().getName(), true)); break;
+					case UNSELECTED: manualSelected.add(new Literal(feature.getFeature().getName(), false)); break;
+					default:
+				}
+			}
+		}
+		
+		final Node[] nodeArray = createNodeArray(manualSelected, rootNode);
 		final SatSolver automaticSolver = new SatSolver(new And(nodeArray), TIMEOUT);
 		
 		for (SelectableFeature feature : features) {
@@ -633,23 +718,18 @@ public class Configuration {
 			}
 		}
 		
-		if (updateManual) {
-			Node[] manualSelectedArray = new Node[nodeArray.length - 1];
-			System.arraycopy(nodeArray, 0, manualSelectedArray, 0, manualSelectedArray.length);
-			final SatSolver manualSolver = new SatSolver(rootNode, TIMEOUT);
-			
+		
+		if (manual) {
+			final Node[] manualSelectedArray = createNodeArray(manualSelected);
 			for (int i = 0; i < manualSelectedArray.length; i++) {
 				Literal l = (Literal) manualSelectedArray[i];
 				try {
+					l.positive = !l.positive;
 					if (!manualSolver.isSatisfiable(manualSelectedArray)) {
-						table.get(l.var).setAutomatic(l.positive ? Selection.UNSELECTED : Selection.SELECTED);
-					} else {
-						l.positive = !l.positive;
-						if (!manualSolver.isSatisfiable(manualSelectedArray)) {
-							table.get(l.var).setAutomatic(l.positive ? Selection.UNSELECTED : Selection.SELECTED);
-						}
-						l.positive = !l.positive;
+						SelectableFeature feature = table.get(l.var);
+						feature.setManual(Selection.UNDEFINED);
 					}
+					l.positive = !l.positive;
 				} catch (TimeoutException e) {
 					e.printStackTrace();
 				}

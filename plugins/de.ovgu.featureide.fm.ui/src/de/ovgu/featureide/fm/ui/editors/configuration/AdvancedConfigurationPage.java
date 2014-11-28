@@ -42,7 +42,7 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  * @author Jens MeOinicke
  * @author Hannes Smurawsky
  */
-public class AdvancedConfigurationPage extends ConfigurationEditorPage {
+public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage {
 	
 	private static final String PAGE_TEXT = "Advanced Configuration";
 	private static final String ID = FMUIPlugin.PLUGIN_ID + "AdvancedConfigurationPage";
