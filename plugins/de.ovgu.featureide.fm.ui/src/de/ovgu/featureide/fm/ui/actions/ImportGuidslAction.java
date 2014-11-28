@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.actions;
 
+import org.eclipse.swt.widgets.FileDialog;
+
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslReader;
@@ -31,9 +33,14 @@ import de.ovgu.featureide.fm.core.io.guidsl.GuidslReader;
  * @author Maik Lampe
  */
 public class ImportGuidslAction extends AbstractImportAction {
-	
 	@Override
-	IFeatureModelReader setModelReader(FeatureModel fm) {
+	protected IFeatureModelReader setModelReader(FeatureModel fm) {
 		return new GuidslReader(fm);
+	}
+
+	@Override
+	protected void setFilter(FileDialog fileDialog) {
+		fileDialog.setFilterExtensions(new String[]{"*.m"});
+		fileDialog.setFilterNames(new String[]{"GUIDSL"});
 	}
 }

@@ -35,6 +35,7 @@ public class ExtendedFeature extends Feature {
 	
 	private int type = TYPE_INTERN;
 	private String externalModelName = null;
+	private boolean newDefined = false;
 
 	/**
 	 * @param featureModel
@@ -77,5 +78,13 @@ public class ExtendedFeature extends Feature {
 
 	public void setExternalModelName(String externalModelName) {
 		this.externalModelName = externalModelName;
+	}
+	
+	public boolean isNewDefined() {
+		return newDefined;
+	}
+	
+	public void setNewDefined(boolean newDefined) {
+		this.newDefined = newDefined;
 	}
 }

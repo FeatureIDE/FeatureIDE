@@ -93,6 +93,7 @@ public abstract class AbstractImportAction implements IObjectActionDelegate {
 							FileDialog fileDialog = new FileDialog(new Shell(),
 									SWT.OPEN);
 							fileDialog.setOverwrite(false);
+							setFilter(fileDialog);
 
 							String filepath = fileDialog.open();
 							if (filepath == null)
@@ -130,6 +131,11 @@ public abstract class AbstractImportAction implements IObjectActionDelegate {
 			}
 		}
 	}
+	
+	protected void setFilter(FileDialog fileDialog) {
+		fileDialog.setFilterExtensions(new String[]{"*.xml"});
+		fileDialog.setFilterNames(new String[]{"XML"});
+	}
 
 	protected FeatureModel createFeatureModel() {
 		return new FeatureModel();
@@ -166,5 +172,5 @@ public abstract class AbstractImportAction implements IObjectActionDelegate {
 	 * @param fm
 	 *            the feature model to initialize the IFeatureModelReader
 	 */
-	abstract IFeatureModelReader setModelReader(FeatureModel fm);
+	protected abstract IFeatureModelReader setModelReader(FeatureModel fm);
 }

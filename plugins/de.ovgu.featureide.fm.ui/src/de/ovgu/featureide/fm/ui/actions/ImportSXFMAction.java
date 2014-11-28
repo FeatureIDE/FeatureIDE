@@ -30,17 +30,8 @@ import de.ovgu.featureide.fm.core.io.sxfm.SXFMReader;
  * @author Fabian Wielgorz
  */
 public class ImportSXFMAction extends AbstractImportAction {
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.ovgu.featureide.fm.ui.actions.AbstractImportAction#initModelReader
-	 * (de.ovgu.featureide.fm.core.FeatureModel)
-	 */
 	@Override
-	IFeatureModelReader setModelReader(FeatureModel fm) {
+	protected IFeatureModelReader setModelReader(FeatureModel fm) {
 		return new SXFMReader(fm);
-
 	}
 }
