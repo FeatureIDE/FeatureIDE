@@ -21,8 +21,6 @@
 package de.ovgu.featureide.fm.ui.editors.configuration;
 
 import java.util.HashSet;
-import java.util.LinkedList;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -35,6 +33,8 @@ import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.configuration.TreeElement;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.configuration.xxx.AsyncTree;
+import de.ovgu.featureide.fm.ui.editors.configuration.xxx.FunctionalInterfaces;
 
 /**
  * Displays the tree for common configuration selection at the configuration
@@ -42,15 +42,17 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  * 
  * @author Jens Meinicke
  * @author Hannes Smurawsky
+ * @author Marcus Pinnecke
  */
 public class ConfigurationPage extends ConfigurationTreeEditorPage {
 	
-	private static final String PAGE_TEXT = "Configuration";
 	private static final String ID = FMUIPlugin.PLUGIN_ID + "ConfigurationPage";
 	
-	private final ConfigurationTreeWalker treeWalker = new ConfigurationTreeWalker() {
+	private static final String PAGE_TEXT = "Configuration";	
+	
+	private final FunctionalInterfaces.IBinaryFunction<TreeItem, SelectableFeature, Void> treeWalker = new FunctionalInterfaces.IBinaryFunction<TreeItem, SelectableFeature, Void>() {
 		@Override
-		public boolean visitTreeItem(TreeItem item, SelectableFeature feature) {
+		public Void invoke(TreeItem item, SelectableFeature feature) {
 			item.setBackground(null);
 			if (feature.getAutomatic() != Selection.UNDEFINED) {
 				item.setFont(treeItemStandardFont);
@@ -75,20 +77,42 @@ public class ConfigurationPage extends ConfigurationTreeEditorPage {
 					item.setFont(treeItemStandardFont);
 				}
 			}
-			return true;
+			return null;
 		}
 	};
 
+	private boolean selectionCanChange = true;
+	
 	private Tree tree;
 	
-	private boolean selectionCanChange = true;
+	public interface Methode {
+		public void invoke();
+	}
+	
+	private void buildTree(final TreeItem node, final TreeElement[] children, 
+						   final FunctionalInterfaces.IFunction<Void, Void> callbackIfDone) {
+		new AsyncTree(tree).build(node, children, callbackIfDone);
+	}
+	
+	@Override
+	protected boolean changeSelection(TreeItem item, boolean select) {
+		selectionCanChange = false;
+		final boolean result = super.changeSelection(item, select);
+		selectionCanChange = true;
+		return result;
+	}
 	
 	protected void createUITree(Composite parent) {
 		tree = new Tree(parent, SWT.CHECK);
 		tree.addSelectionListener(new SelectionListener() {
 			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+
+			@Override
 			public void widgetSelected(SelectionEvent event) {
-				if (event.detail == SWT.CHECK) {
+		
+				if (event.detail == SWT.CHECK) {	
 					final TreeItem item = (TreeItem) event.item;
 					if (item.getGrayed()) {
 						// case: grayed and selected
@@ -101,94 +125,27 @@ public class ConfigurationPage extends ConfigurationTreeEditorPage {
 					}
 				}
 			}
-
-			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
 		});
 	}
 
 	@Override
-	protected void updateTree() {
-		if (errorMessage(tree)) {
-			final Configuration configuration = configurationEditor.getConfiguration();
-			tree.removeAll();
-			TreeItem root = new TreeItem(tree, 0);
-			root.setText(configuration.getRoot().getName());
-			root.setData(configuration.getRoot());
-			add(root, configuration.getRoot().getChildren());
-			root.setGrayed(true);
-			root.setExpanded(true);
-			root.setChecked(true);
-			
-			refreshTree();
-		}
+	protected FunctionalInterfaces.IBinaryFunction<TreeItem, SelectableFeature, Void> getDefaultTreeWalker() {
+		return treeWalker;
 	}
 	
-	private static class StackItem {
-		public int counter = 0;
-		public final TreeItem curTreeItem;
-		public final TreeElement[] treeElements;
-		
-		public StackItem(TreeItem curTreeItem, TreeElement[] treeElements) {
-			this.curTreeItem = curTreeItem;
-			this.treeElements = treeElements;
-		}
-		
-		public TreeItem getCurTreeItem() {
-			return curTreeItem;
-		}
-
-		public TreeElement getNext() {
-			return treeElements[counter++];
-		}
-		
-		public boolean hasNext() {
-			return counter < treeElements.length;
-		}
+	@Override
+	public String getID() {
+		return ID;
 	}
 	
-	private void add(TreeItem parent, TreeElement[] children) {
-		final LinkedList<StackItem> stack = new LinkedList<StackItem>();
-		stack.push(new StackItem(parent, children));
-		while (!stack.isEmpty()) {
-			final StackItem stackItem = stack.peek();
-			if (stackItem.hasNext()) {
-				TreeElement child = stackItem.getNext();
-				if (child instanceof SelectableFeature) {
-					final SelectableFeature currentFeature = (SelectableFeature) child;
-					if (!currentFeature.getFeature().isHidden()) {
-						TreeItem item = new TreeItem(stackItem.getCurTreeItem(), 0);
-						item.setText(currentFeature.getFeature().getDisplayName());
-						item.setData(currentFeature);
-						if (child.hasChildren()) {
-							stack.push(new StackItem(item, currentFeature.getChildren()));
-						}
-					}
-				}
-			} else {
-				stackItem.getCurTreeItem().setExpanded(true);
-				stack.pop();
-			}
-		}
+	@Override
+	public String getPageText() {
+		return PAGE_TEXT;
 	}
 
 	@Override
 	protected TreeItem getRoot() {
 		return tree.getItem(0);
-	}
-	
-	@Override
-	protected ConfigurationTreeWalker getDefaultTreeWalker() {
-		return treeWalker;
-	}
-	
-	@Override
-	protected boolean changeSelection(TreeItem item, boolean select) {
-		selectionCanChange = false;
-		final boolean result = super.changeSelection(item, select);
-		selectionCanChange = true;
-		return result;
 	}
 
 	@Override
@@ -223,12 +180,39 @@ public class ConfigurationPage extends ConfigurationTreeEditorPage {
 	}
 
 	@Override
-	public String getPageText() {
-		return PAGE_TEXT;
+	protected void updateTree() {		
+		
+		if (errorMessage(tree)) {
+			final Configuration configuration = configurationEditor.getConfiguration();
+			tree.removeAll();
+			final TreeItem root = new TreeItem(tree, 0);
+			root.setText(configuration.getRoot().getName());
+			root.setData(configuration.getRoot());
+			
+			buildTree(root, configuration.getRoot().getChildren(), 
+					new FunctionalInterfaces.IFunction<Void, Void>() {
+
+						@Override
+						public Void invoke(Void t) {
+							root.setGrayed(true);
+							root.setExpanded(true);
+							root.setChecked(true);
+							root.setExpanded(true);
+							
+							final Configuration config = configurationEditor.getConfiguration();
+							boolean oldPropagationFlag = config.isPropagate();
+							config.setPropagate(true);
+							refreshTree();
+							config.setPropagate(oldPropagationFlag);
+							
+							return null;
+						}				
+			});
+		}
 	}
 
 	@Override
-	public String getID() {
-		return ID;
+	protected AsyncTree getTree() {
+		return new AsyncTree(tree);
 	}
 }

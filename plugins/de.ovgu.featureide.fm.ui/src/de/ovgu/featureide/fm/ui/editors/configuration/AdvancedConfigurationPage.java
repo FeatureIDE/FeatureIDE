@@ -35,21 +35,24 @@ import org.eclipse.swt.widgets.TreeItem;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.configuration.xxx.AsyncTree;
+import de.ovgu.featureide.fm.ui.editors.configuration.xxx.FunctionalInterfaces;
 
 /**
  * Displays the tree for advanced configuration selection at the configuration editor.
  * 
  * @author Jens MeOinicke
  * @author Hannes Smurawsky
+ * @author Marcus Pinnecke
  */
 public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage {
 	
 	private static final String PAGE_TEXT = "Advanced Configuration";
 	private static final String ID = FMUIPlugin.PLUGIN_ID + "AdvancedConfigurationPage";
 	
-	private final ConfigurationTreeWalker treeWalker = new ConfigurationTreeWalker() {
+	private final FunctionalInterfaces.IBinaryFunction<TreeItem, SelectableFeature, Void> treeWalker = new FunctionalInterfaces.IBinaryFunction<TreeItem, SelectableFeature, Void>() {
 		@Override
-		public boolean visitTreeItem(TreeItem item, SelectableFeature feature) {
+		public Void invoke(TreeItem item, SelectableFeature feature) {
 			item.setBackground(null);
 			if (feature.getAutomatic() != Selection.UNDEFINED) {
 				item.setFont(treeItemStandardFont);
@@ -71,7 +74,7 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage {
 					item.setFont(treeItemStandardFont);
 				}
 			}
-			return true;
+			return null;
 		}
 	};
 	
@@ -159,7 +162,7 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage {
 	}
 	
 	@Override
-	protected ConfigurationTreeWalker getDefaultTreeWalker() {
+	protected FunctionalInterfaces.IBinaryFunction<TreeItem, SelectableFeature, Void> getDefaultTreeWalker() {
 		return treeWalker;
 	}
 	
@@ -191,5 +194,10 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage {
 	@Override
 	public String getID() {
 		return ID;
+	}
+
+	@Override
+	protected AsyncTree getTree() {
+		return new AsyncTree(viewer.getTree());
 	}
 }

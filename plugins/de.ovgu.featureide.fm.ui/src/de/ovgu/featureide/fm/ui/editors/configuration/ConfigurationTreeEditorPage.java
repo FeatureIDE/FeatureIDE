@@ -25,6 +25,10 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+
+import javax.swing.JLabel;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -40,6 +44,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Tree;
@@ -62,17 +67,21 @@ import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.configuration.xxx.AsyncTree;
+import de.ovgu.featureide.fm.ui.editors.configuration.xxx.FunctionalInterfaces;
+import de.ovgu.featureide.fm.ui.editors.configuration.xxx.FunctionalInterfaces.IFunction;
 
 /**
  * Basic class with some default methods for configuration editor pages.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke
  */
 public abstract class ConfigurationTreeEditorPage extends EditorPart implements IConfigurationEditorPage {
 	static interface ConfigurationTreeWalker {
 		boolean visitTreeItem(TreeItem item, SelectableFeature feature);
-	}
-	
+	}	
+		
 	static final Color gray = new Color(null, 140, 140, 140);
 	static final Color green = new Color(null, 0, 140, 0);
 	static final Color blue = new Color(null, 0, 0, 200);
@@ -209,7 +218,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	    infoLabel = new Label(compositeTop, SWT.NONE);
 	    infoLabel.setLayoutData(gridData);
 	    setInfoLabel();
-		
+	    		
 		// autoselect button 
 		gridData = new GridData();
 		gridData.horizontalAlignment = SWT.RIGHT;
@@ -218,7 +227,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		autoSelectButton.setText("Autoselect Features");
 		autoSelectButton.setLayoutData(gridData);
 		autoSelectButton.setSelection(true);
-		
+				
 		autoSelectButton.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -372,7 +381,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	protected abstract TreeItem getRoot();
 	protected abstract void updateTree();
 	
-	protected ConfigurationTreeWalker getDefaultTreeWalker() {
+	protected FunctionalInterfaces.IBinaryFunction<TreeItem, SelectableFeature, Void> getDefaultTreeWalker() {
 		return null;
 	}
 	
@@ -383,16 +392,22 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	protected void refreshTree() {
 		colorFeatureNames.clear();
 		setInfoLabel();
-		walkTree(getDefaultTreeWalker());
-		if (configurationEditor.getConfiguration().isPropagate()) {
-			computeColoring();
-		}
+		walkTree(getDefaultTreeWalker(), new IFunction<Void, Void>() {
+			
+			@Override
+			public Void invoke(Void t) {
+				if (configurationEditor.getConfiguration().isPropagate()) {
+					computeColoring();
+				}
+				return null;
+			}
+		});
 	}
 	
 	protected void refreshItem(TreeItem item, SelectableFeature feature) {
-		ConfigurationTreeWalker walker = getDefaultTreeWalker();
+		FunctionalInterfaces.IBinaryFunction<TreeItem, SelectableFeature, Void> walker = getDefaultTreeWalker();
 		if (walker != null) {
-			walker.visitTreeItem(item, feature);
+			walker.invoke(item, feature);
 		}
 		setInfoLabel();
 	}
@@ -425,18 +440,30 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 						currentDisplay.asyncExec(new Runnable() {
 							@Override
 							public void run() {
-								walkTree(new ConfigurationTreeWalker() {
+								walkTree(new FunctionalInterfaces.IBinaryFunction<TreeItem, SelectableFeature, Void>() {
 									@Override
-									public boolean visitTreeItem(TreeItem item, SelectableFeature feature) {
+									public Void invoke(TreeItem item, SelectableFeature feature) {
 										if (colorFeatureNames.contains(feature.getName())) {
 											item.setForeground((feature.getManual() == Selection.SELECTED) ? blue : green);
 											item.setFont(treeItemSpecialFont);
 										}
-										return true;
+										return null;
 									}
-								});
+								}, FunctionalInterfaces.IFUNCTION_IDENITY);
 							}
 						});
+								
+						walkTree(new FunctionalInterfaces.IBinaryFunction<TreeItem, SelectableFeature, Void>() {
+							@Override
+							public Void invoke(TreeItem item,
+									SelectableFeature feature) {
+								if (colorFeatureNames.contains(feature.getName())) {
+									item.setForeground((feature.getManual() == Selection.SELECTED) ? blue : green);
+									item.setFont(treeItemSpecialFont);
+								}
+								return null;
+							}							
+						}, FunctionalInterfaces.IFUNCTION_IDENITY);
 					}
 				}
 			};
@@ -445,46 +472,12 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		}
 	}
 	
-	protected final void walkTree(ConfigurationTreeWalker walker) {
-		walkTree(getRoot(), walker);
+	protected final void walkTree( 
+			final FunctionalInterfaces.IBinaryFunction<TreeItem, SelectableFeature, Void> perNodeFunction,
+			final FunctionalInterfaces.IFunction<Void, Void> callbackIfDone) {
+		getTree().traverse(getRoot(), perNodeFunction, callbackIfDone);
 	}
-	
-	private static class StackItem {
-		public int counter = 0;
-		public final TreeItem[] treeItems;
-		
-		public StackItem(TreeItem[] treeItems) {
-			this.treeItems = treeItems;
-		}
-		
-		public TreeItem getNext() {
-			return treeItems[counter++];
-		}
-		
-		public boolean hasNext() {
-			return counter < treeItems.length;
-		}
-	}
-	
-	protected final void walkTree(TreeItem item, ConfigurationTreeWalker walker) {
-		if (walker == null) {
-			return;
-		}
-		final LinkedList<StackItem> stack = new LinkedList<StackItem>();
-		stack.push(new StackItem(item.getItems()));
-		while (!stack.isEmpty()) {
-			final StackItem stackItem = stack.peek();
-			if (stackItem.hasNext()) {
-				TreeItem child = stackItem.getNext();
-				final Object data = child.getData();
-				final SelectableFeature feature = (SelectableFeature) data;
-				walker.visitTreeItem(child, feature);
-				if (child.getItemCount() > 0) {
-					stack.push(new StackItem(child.getItems()));
-				}
-			} else {
-				stack.pop();
-			}
-		}
-	}
+
+	protected abstract AsyncTree getTree();
+
 }
