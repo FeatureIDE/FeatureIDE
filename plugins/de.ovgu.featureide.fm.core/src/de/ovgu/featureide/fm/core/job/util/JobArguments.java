@@ -22,39 +22,55 @@ package de.ovgu.featureide.fm.core.job.util;
 
 import java.lang.reflect.Constructor;
 
+import org.eclipse.core.runtime.jobs.Job;
+
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
 import de.ovgu.featureide.fm.core.job.IProjectJob;
 
 /**
- * TODO description
+ * This class is implemented by callers as an anonymous class to encapsulate
+ * parameters for the job constructor, so multiple {@code Job}s can be called
+ * with low effort. 
+ * 
+ * TODO KT: Add list of supporting Jobs.
  * 
  * @author Sebastian Krieter
  */
-public abstract class JobArguments {
-	
+public abstract class JobArguments
+{
+
 	private final Constructor<? extends AProjectJob<?>> constructor;
+
 	
 	@SuppressWarnings("unchecked")
-	protected JobArguments(Class<? extends JobArguments> cl) {
+	protected JobArguments(Class<? extends JobArguments> cl)
+	{
 		Constructor<? extends AProjectJob<?>> tempConstructor;
-		try {
-			tempConstructor = (Constructor<? extends AProjectJob<?>>) cl.getEnclosingClass().getDeclaredConstructor(cl);
+		try
+		{
+			tempConstructor = (Constructor<? extends AProjectJob<?>>) cl.getEnclosingClass()
+					.getDeclaredConstructor(cl);
 			tempConstructor.setAccessible(true);
-		} catch (Exception e) {
+		} catch (Exception e)
+		{
 			FMCorePlugin.getDefault().logError(e);
 			tempConstructor = null;
 		}
 		constructor = tempConstructor;
 	}
-	
-	public IProjectJob createJob() {
-		if (constructor == null) {
+
+	public IProjectJob createJob()
+	{
+		if (constructor == null)
+		{
 			return null;
 		}
-		try {
+		try
+		{
 			return constructor.newInstance(this);
-		} catch (Exception e) {
+		} catch (Exception e)
+		{
 			FMCorePlugin.getDefault().logError(e);
 			return null;
 		}

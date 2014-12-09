@@ -49,7 +49,8 @@ import de.ovgu.featureide.fm.core.job.AProjectJob;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
 /**
- * Builds the JavaDoc-Documentation.
+ * This job generates Javadoc from the feature-aware comments in a selected location.
+ * Subsequently it uses the Javadoc parser to generate the documentation.
  * 
  * @author Sebastian Krieter
  */

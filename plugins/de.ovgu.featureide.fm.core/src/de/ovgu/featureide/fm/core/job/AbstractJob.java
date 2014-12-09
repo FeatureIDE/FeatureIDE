@@ -29,6 +29,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.StoppableJob;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 
 /**
@@ -36,8 +37,13 @@ import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
  * 
  * @author Sebastian Krieter
  */
+/**
+ * TODO description
+ * 
+ * @author Asura
+ */
 abstract class AbstractJob extends Job implements IJob {
-	private int status = STATUS_NOTSTARTED;
+	private JobStatus status = JobStatus.NOT_STARTED;
 	private LinkedList<JobFinishListener> jobFinishedListeners = null;
 	
 	protected AbstractJob(String name, int priority) {
@@ -46,7 +52,7 @@ abstract class AbstractJob extends Job implements IJob {
 	}
 	
 	@Override
-	public final int getStatus() {
+	public final JobStatus getStatus() {
 		return status;
 	}
 	
@@ -67,7 +73,7 @@ abstract class AbstractJob extends Job implements IJob {
 	
 	@Override
 	public final IStatus run(IProgressMonitor monitor) {
-		status = STATUS_RUNNING;
+		status = JobStatus.RUNNING;
 		boolean success = false;
 		
 		// run job and catch possible runtime exceptions
@@ -79,7 +85,7 @@ abstract class AbstractJob extends Job implements IJob {
 			finalWork(success);
 		}
 		
-		status = success ? STATUS_OK : STATUS_FAILED;
+		status = success ? JobStatus.OK : JobStatus.FAILED;
 		
 		// inform all registered listeners
 		for (final Iterator<JobFinishListener> it = jobFinishedListeners.iterator(); it.hasNext();) {
@@ -108,5 +114,10 @@ abstract class AbstractJob extends Job implements IJob {
 	 */
 	protected abstract boolean work();
 
+	
+	/**
+	 * This method is used by {@link AStoppableJob} to handle the inner thread.
+	 * The job's task should be implemented in {@link #work()}.
+	 */
 	abstract boolean run2(IProgressMonitor monitor);
 }
