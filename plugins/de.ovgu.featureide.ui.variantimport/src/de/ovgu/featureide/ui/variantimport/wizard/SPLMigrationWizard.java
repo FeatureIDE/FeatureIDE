@@ -1,4 +1,4 @@
-package de.ovgu.featureide.ui.variantimport;
+package de.ovgu.featureide.ui.variantimport.wizard;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -6,6 +6,11 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
+
+import de.ovgu.featureide.ui.variantimport.migration.ISPLMigrator;
+import de.ovgu.featureide.ui.variantimport.migration.MigrationConfigurationData;
+import de.ovgu.featureide.ui.variantimport.plugin.SPLMigrationCommandHandler;
+import de.ovgu.featureide.ui.variantimport.plugin.SPLMigrationPlugin;
 
 /**
  * This class implements most of the {@link SPLMigrationPlugin}s functionality.

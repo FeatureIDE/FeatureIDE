@@ -1,13 +1,16 @@
 /**
  * 
  */
-package de.ovgu.featureide.ui.variantimport;
+package de.ovgu.featureide.ui.variantimport.plugin;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.handlers.HandlerUtil;
+
+import de.ovgu.featureide.ui.variantimport.migration.VariantsToFeatureHouseSPLMigrator;
+import de.ovgu.featureide.ui.variantimport.wizard.SPLMigrationWizard;
 
 /**
  * This class handles the {@code SPLMigrationCommand} which is triggered by the

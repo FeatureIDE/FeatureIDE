@@ -1,4 +1,4 @@
-package de.ovgu.featureide.ui.variantimport;
+package de.ovgu.featureide.ui.variantimport.migration;
 
 import java.io.UnsupportedEncodingException;
 
@@ -12,6 +12,7 @@ import org.eclipse.jface.wizard.WizardDialog;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.builder.IComposerExtensionBase;
+import de.ovgu.featureide.ui.variantimport.wizard.SPLMigrationWizard;
 
 /**
  * Handles the migration of products into a FeatureIDE project using the

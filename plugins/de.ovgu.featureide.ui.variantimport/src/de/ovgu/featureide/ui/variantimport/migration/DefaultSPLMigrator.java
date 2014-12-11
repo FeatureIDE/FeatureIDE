@@ -1,4 +1,4 @@
-package de.ovgu.featureide.ui.variantimport;
+package de.ovgu.featureide.ui.variantimport.migration;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
@@ -18,6 +18,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionBase;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.ui.variantimport.wizard.SPLMigrationDialogSettingsPage;
 
 public abstract class DefaultSPLMigrator implements ISPLMigrator
 {
