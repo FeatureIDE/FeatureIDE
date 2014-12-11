@@ -32,11 +32,11 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TreeItem;
 
+import de.ovgu.featureide.fm.core.FunctionalInterfaces;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.configuration.xxx.AsyncTree;
-import de.ovgu.featureide.fm.ui.editors.configuration.xxx.FunctionalInterfaces;
 
 /**
  * Displays the tree for advanced configuration selection at the configuration editor.

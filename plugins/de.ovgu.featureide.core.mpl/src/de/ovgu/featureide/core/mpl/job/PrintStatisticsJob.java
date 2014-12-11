@@ -196,7 +196,7 @@ public class PrintStatisticsJob extends AMonitorJob<PrintStatisticsJob.Arguments
 		Configuration defaultConf = new Configuration(fm, false);
 		
 		for (String featureName : allConcreteFeatures) {			
-			Configuration conf = new Configuration(defaultConf);
+			Configuration conf = defaultConf.clone();
 			conf.setManual(featureName, Selection.SELECTED);
 			
 			curFeatureID = interfaceProject.getFeatureID(featureName);

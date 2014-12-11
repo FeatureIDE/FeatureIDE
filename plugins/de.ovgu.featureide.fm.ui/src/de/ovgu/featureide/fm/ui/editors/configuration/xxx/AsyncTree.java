@@ -20,19 +20,15 @@
  */
 package de.ovgu.featureide.fm.ui.editors.configuration.xxx;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.progress.UIJob;
 
+import de.ovgu.featureide.fm.core.FunctionalInterfaces;
+import de.ovgu.featureide.fm.core.FunctionalInterfaces.IFunction;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.TreeElement;
-import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationPage.Methode;
 
 /**
  * TODO description
@@ -40,98 +36,115 @@ import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationPage.Methode;
  * @author Marcus Pinnecke
  */
 public class AsyncTree {
-
-	private static final String JOB_NAME_BUILDING_TREE = "Building tree...";
-	private static final String JOB_NAME_TRAVERSE_TREE = "Traversing tree...";
 	
+	private static class ThreadCounter {
+		private final FunctionalInterfaces.IFunction<Void, Void> callbackIfDone;
+		private Integer count = 0;
+		
+		public ThreadCounter(IFunction<Void, Void> callbackIfDone) {
+			this.callbackIfDone = callbackIfDone;
+		}
+
+		public void inc() {
+			synchronized (count) {
+				++count;
+			}
+		}
+
+		public void dec() {
+			boolean done;
+			synchronized (count) {
+				done = --count == 0;
+			}
+			if (done) {
+				callbackIfDone.invoke(null);
+			}
+		}
+	}
+
+//	private static final String JOB_NAME_BUILDING_TREE = "Building tree...";
+//	private static final String JOB_NAME_TRAVERSE_TREE = "Traversing tree...";
+
 	private Tree tree;
 
-	public AsyncTree(Tree tree) 
-	{
+	public AsyncTree(Tree tree) {
 		this.tree = tree;
 	}
-	
-	public Tree getTree()
-	{
+
+	public Tree getTree() {
 		return this.tree;
 	}
 
-	public UIJob build(final TreeItem node, final TreeElement[] children,
-					 final FunctionalInterfaces.IFunction<Void, Void> callbackIfDone) 
-	{
-		UIJob job = new UIJob(AsyncTree.JOB_NAME_BUILDING_TREE) {
-
-			@Override
-			public IStatus runInUIThread(IProgressMonitor monitor) {
-				doBuildingAsync(node, children);
-				callbackIfDone.invoke(null);
-				return Status.OK_STATUS;
-			}
-
-		};
-		job.schedule();
-		return job;
+	public UIJob build(final TreeItem node, final TreeElement[] children, final FunctionalInterfaces.IFunction<Void, Void> callbackIfDone) {
+		final Display currentDisplay = Display.getCurrent();
+		if (currentDisplay != null) {
+			doBuildingAsync(node, children, new ThreadCounter(callbackIfDone), currentDisplay);
+		}
+		return null;
 	}
 
-	public UIJob traverse(
-			final TreeItem node,
-			final FunctionalInterfaces.IBinaryFunction<TreeItem, SelectableFeature, Void> perNodeFunction,
-			final FunctionalInterfaces.IFunction<Void, Void> callbackIfDone) 
-	{
-		UIJob job = new UIJob(AsyncTree.JOB_NAME_TRAVERSE_TREE) {
-
-			@Override
-			public IStatus runInUIThread(IProgressMonitor monitor) {
-				traverseAsync(node, perNodeFunction);
-				callbackIfDone.invoke(null);
-				return Status.OK_STATUS;
-			}
-
-		};
-		job.schedule();
-		return job;
+	public UIJob traverse(final TreeItem node, final FunctionalInterfaces.IBinaryFunction<TreeItem, SelectableFeature, Void> perNodeFunction, final FunctionalInterfaces.IFunction<Void, Void> callbackIfDone) {
+		final Display currentDisplay = Display.getCurrent();
+		if (currentDisplay != null) {
+			traverseAsync(node, perNodeFunction, new ThreadCounter(callbackIfDone), currentDisplay);
+		}
+		return null;
 	}
-	
-	private void traverseAsync(TreeItem item, final FunctionalInterfaces.IBinaryFunction<TreeItem, SelectableFeature, Void> perNodeFunction)
-	{
+
+	private void traverseAsyncRec(TreeItem item, final FunctionalInterfaces.IBinaryFunction<TreeItem, SelectableFeature, Void> perNodeFunction,
+			ThreadCounter threadCounter, Display currentDisplay) {
 		final TreeItem[] children = item.getItems();
-		for (int i = 0; i < children.length; i++) {		
+		for (int i = 0; i < children.length; i++) {
 			final TreeItem childNode = children[i];
 			final Object data = childNode.getData();
 			final SelectableFeature feature = (SelectableFeature) data;
 			perNodeFunction.invoke(childNode, feature);
 			
-			Display.getCurrent().asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					if (childNode.getItemCount() > 0) {
-						traverseAsync(childNode, perNodeFunction);
-					}
-				}
-			});		
+			if (childNode.getItemCount() > 0) {
+				traverseAsync(childNode, perNodeFunction, threadCounter, currentDisplay);
+			}
 		}
+		threadCounter.dec();
 	}
+	
+	private void traverseAsync(final TreeItem item, final FunctionalInterfaces.IBinaryFunction<TreeItem, SelectableFeature, Void> perNodeFunction,
+			final ThreadCounter threadCounter, final Display currentDisplay) {
+		threadCounter.inc();
+		currentDisplay.asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				traverseAsyncRec(item, perNodeFunction, threadCounter, currentDisplay);
+			}
+		});
+	}	
 
-	private void doBuildingAsync(final TreeItem parent, final TreeElement[] children) 
-	{
+	private void doBuildingAsyncRec(final TreeItem parent, final TreeElement[] children, final ThreadCounter threadCounter, final Display currentDisplay) {
 		for (int i = 0; i < children.length; i++) {
-			if (children[i] instanceof SelectableFeature) {
-				final SelectableFeature currentFeature = (SelectableFeature) children[i];
+			final TreeElement child = children[i];
+			if (child instanceof SelectableFeature) {
+				final SelectableFeature currentFeature = (SelectableFeature) child;
 				if (!currentFeature.getFeature().isHidden()) {
 					final TreeItem childNode = new TreeItem(parent, 0);
-					final String displayText = currentFeature.getFeature().getDisplayName();
-					childNode.setText(displayText);
+					childNode.setText(currentFeature.getFeature().getDisplayName());
 					childNode.setData(currentFeature);
-					if (children[i].hasChildren()) {
-						Display.getCurrent().asyncExec(new Runnable() {
-							@Override
-							public void run() {
-								doBuildingAsync(childNode, currentFeature.getChildren());
-							}
-						});
+					if (currentFeature.hasChildren()) {
+						doBuildingAsync(childNode, currentFeature.getChildren(), threadCounter, currentDisplay);
 					}
 				}
 			}
 		}
+		parent.setExpanded(true);
+		threadCounter.dec();
 	}
+	
+	private void doBuildingAsync(final TreeItem parent, final TreeElement[] children, final ThreadCounter threadCounter, final Display currentDisplay) {
+		threadCounter.inc();
+		currentDisplay.asyncExec(new Runnable() {
+			@Override
+			public void run() {
+				doBuildingAsyncRec(parent, children, threadCounter, currentDisplay);
+			}
+		});
+	}
+	
 }

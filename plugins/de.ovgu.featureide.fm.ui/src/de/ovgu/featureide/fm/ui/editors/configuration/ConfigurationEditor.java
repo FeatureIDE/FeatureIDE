@@ -63,12 +63,15 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagatorJobWrapper.IConfigJob;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationWriter;
 import de.ovgu.featureide.fm.core.configuration.FeatureIDEFormat;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.ModelIOFactory;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import de.ovgu.featureide.fm.core.job.IJob;
+import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 
@@ -92,7 +95,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 
 	private TextEditorPage sourceEditorPage;
 
-	private final ValidConfigJobManager validConfigJobManager = new ValidConfigJobManager(this);
+	private final ConfigJobManager configJobManager = new ConfigJobManager();
 
 	@Nonnull
 	public IFile file;
@@ -128,7 +131,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 
 		@Override
 		public void partClosed(IWorkbenchPart part) {
-			validConfigJobManager.cancelCurrentJob();
+			configJobManager.cancelAllJobs();
 			if (featureModel != null) {
 				featureModel.removeListener(ConfigurationEditor.this);
 			}
@@ -164,7 +167,6 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		super.setInput(input);
 		getSite().getPage().addPartListener(iPartListener);
 		IProject project = file.getProject();
-		boolean mplConfig = false;
 
 		// if mpl.velvet exists then it is a multi product line
 		IResource res = project.findMember("mpl.velvet");
@@ -172,7 +174,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 			featureModel = new ExtendedFeatureModel();
 			IContainer parentFolder = file.getParent();
 			if (parentFolder != null && "InterfaceMapping".equals(parentFolder.getName())) {
-				mplConfig = true;
+				featureModel = ((ExtendedFeatureModel) featureModel).getMappingModel();
 			}
 		} else {
 			res = project.findMember("model.xml");
@@ -211,12 +213,8 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		}
 
 		readFeatureModel();
-
-		if (mplConfig) {
-			configuration = new Configuration(((ExtendedFeatureModel) featureModel).getMappingModel(), true);
-		} else {
-			configuration = new Configuration(featureModel, true);
-		}
+		
+		configuration = new Configuration(featureModel, Configuration.PARAM_IGNOREABSTRACT | Configuration.PARAM_LAZY | Configuration.PARAM_PROPAGATE);
 		try {
 			ConfigurationReader reader = new ConfigurationReader(configuration);
 			if (!internalFile.exists() || !reader.readFromFile(internalFile)) {
@@ -225,6 +223,15 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		} catch (Exception e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
+		
+		IConfigJob<?> configJob = configuration.getPropagator().getJobWrapper().load();
+		configJobManager.startJob(configJob, new JobFinishListener() {
+			@Override
+			public void jobFinished(IJob finishedJob, boolean success) {
+				// TODO ...
+			}
+		}, null);
+		
 		setPartName(file.getName());
 		featureModel.addListener(this);
 		firePropertyChange(IEditorPart.PROP_DIRTY);
@@ -282,7 +289,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	/**
 	 * Gets the models path at persistent properties of the project
 	 * 
-	 * @return The saved path or <i>null</i> if there is none.
+	 * @return The saved path or {@code null} if there is none.
 	 */
 	@CheckForNull
 	private String getPersitentModelFilePath() {
@@ -513,7 +520,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 				}
 			});
 		}
-	}
+	}	
 
 	@Override
 	public Configuration getConfiguration() {
@@ -530,7 +537,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		return modelFile;
 	}
 
-	public ValidConfigJobManager getValidConfigJobManager() {
-		return validConfigJobManager;
+	public ConfigJobManager getConfigJobManager() {
+		return configJobManager;
 	}
 }

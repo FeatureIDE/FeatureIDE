@@ -18,14 +18,24 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.fm.core.job;
+package de.ovgu.featureide.fm.core.configuration;
+
+import java.util.LinkedList;
+import java.util.List;
+
+import org.sat4j.specs.TimeoutException;
+
+import de.ovgu.featureide.fm.core.job.WorkMonitor;
 
 /**
- * Interface for a stoppable job.
- * 
- * @author Sebastian Krieter
+ * Provides long running operations for the configuration process.
  */
-public interface IStoppableJob extends IJob {
-	int getCancelingTimeout();
-	void setCancelingTimeout(int cancelingTimeout);
+public interface IConfiguration {	
+	boolean canBeValid();
+	LinkedList<List<String>> getSolutions(int max) throws TimeoutException;
+	boolean isValid();
+	boolean[] leadToValidConfiguration(List<SelectableFeature> featureList, WorkMonitor workMonitor);
+	boolean[] leadToValidConfiguration(List<SelectableFeature> featureList, int mode, WorkMonitor workMonitor);
+	long number(long timeout);
+	void update(boolean manual, boolean redundantManual);
 }

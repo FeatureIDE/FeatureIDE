@@ -68,6 +68,7 @@ import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureModelFile;
@@ -78,6 +79,7 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.configuration.FeatureIDEFormat;
 import de.ovgu.featureide.fm.core.configuration.FeatureOrderReader;
+import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
@@ -958,7 +960,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	}
 
 	public Collection<String> getFalseOptionalConfigurationFeatures(boolean[][] selections) {
-		return checkValidSelections(getSelectionMatrix(), false);
+		return checkValidSelections(selections, false);
 	}
 
 	public Collection<String> getUnusedConfigurationFeatures() {
@@ -966,7 +968,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	}
 
 	public Collection<String> getUnusedConfigurationFeatures(boolean[][] selections) {
-		return checkValidSelections(getSelectionMatrix(), true);
+		return checkValidSelections(selections, true);
 	}
 
 	private List<String> checkValidSelections(boolean[][] selections, boolean selectionState) {
@@ -976,16 +978,16 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		final List<String> concreteFeatures = getFalseOptionalFeatures();
 		final List<String> falseOptionalFeatures = new LinkedList<String>();
 		if (selections.length != 0) {
-			for (int collumn = 0; collumn < concreteFeatures.size(); collumn++) {
+			for (int column = 0; column < concreteFeatures.size(); column++) {
 				boolean invalid = true;
 				for (int conf = 0; conf < selections.length; conf++) {
-					if (selections[conf][collumn] == selectionState) {
+					if (selections[conf][column] == selectionState) {
 						invalid = false;
 						break;
 					}
 				}
 				if (invalid) {
-					falseOptionalFeatures.add(concreteFeatures.get(collumn));
+					falseOptionalFeatures.add(concreteFeatures.get(column));
 				}
 			}
 		}
@@ -994,23 +996,30 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 	private boolean[][] getSelectionMatrix() {
 		final List<IFile> configurations = getAllConfigurations();
-		final List<String> concreteFeatures = getOptionalConcreteFeatures();
+		final Collection<String> concreteFeatures = getOptionalConcreteFeatures();
 
-		boolean[][] selections = new boolean[configurations.size()][concreteFeatures.size()];
+		final boolean[][] selections = new boolean[configurations.size()][concreteFeatures.size()];
+		final Configuration configuration = new Configuration(featureModel, Configuration.PARAM_LAZY);
+		final ConfigurationReader reader = new ConfigurationReader(configuration);
+		
 		int row = 0;
 		for (IFile confFile : configurations) {
-			List<String> features = readFeaturesfromConfigurationFile(confFile.getRawLocation().makeAbsolute().toFile());
-			int collumn = 0;
-			for (String feature : concreteFeatures) {
-				selections[row][collumn] = features.contains(feature);
-				collumn++;
+			final boolean[] currentRow = selections[row++];
+			try {
+				reader.readFromFile(confFile);
+			} catch (Exception e) {
+				FMCorePlugin.getDefault().logError(e);
 			}
-			row++;
+			
+			int column = 0;
+			for (String feature : concreteFeatures) {
+				currentRow[column++] = configuration.getSelectablefeature(feature).getSelection() == Selection.SELECTED;
+			}
 		}
 		return selections;
 	}
 
-	private List<String> getOptionalConcreteFeatures() {
+	private Collection<String> getOptionalConcreteFeatures() {
 		final List<String> concreteFeatures = featureModel.getConcreteFeatureNames();
 		for (final Feature feature : featureModel.getAnalyser().getCoreFeatures()) {
 			concreteFeatures.remove(feature.getName());

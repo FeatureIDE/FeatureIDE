@@ -18,34 +18,35 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.fm.ui.editors.configuration.xxx;
+package de.ovgu.featureide.fm.core;
 
 /**
  * TODO description
  * 
- * @author Marcus Pinnecke (marcus.pinnecke@st.ovgu.de)
+ * @author Marcus Pinnecke
  */
-public class FunctionalInterfaces {
+public abstract class FunctionalInterfaces {
 	
 	public static interface IFunction<T,U> {
-		public U invoke(T t);
-	}
-	
-	public static interface IConsumer<T> {
-		public void consume(T t);
+		U invoke(T t);
 	}
 	
 	public static interface IBinaryFunction<T,U,R> {
-		public R invoke(T t, U u);
+		R invoke(T t, U u);
 	}
 	
-	public static IFunction<Void, Void> IFUNCTION_IDENITY = new IFunction<Void, Void>() {
-
+	public static class IdentityFunction<T> implements IFunction<T, T> {
 		@Override
-		public Void invoke(Void t) {
+		public T invoke(T t) {
+			return t;
+		}
+	};
+	
+	public static class NullFunction<T, U> implements IFunction<T, U> {
+		@Override
+		public U invoke(T t) {
 			return null;
 		}
-		
 	};
 
 }

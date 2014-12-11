@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.ui.editors.configuration;
 
 import java.util.HashSet;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -28,13 +29,13 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
+import de.ovgu.featureide.fm.core.FunctionalInterfaces;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.configuration.TreeElement;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.configuration.xxx.AsyncTree;
-import de.ovgu.featureide.fm.ui.editors.configuration.xxx.FunctionalInterfaces;
 
 /**
  * Displays the tree for common configuration selection at the configuration
@@ -45,11 +46,11 @@ import de.ovgu.featureide.fm.ui.editors.configuration.xxx.FunctionalInterfaces;
  * @author Marcus Pinnecke
  */
 public class ConfigurationPage extends ConfigurationTreeEditorPage {
-	
+
 	private static final String ID = FMUIPlugin.PLUGIN_ID + "ConfigurationPage";
-	
-	private static final String PAGE_TEXT = "Configuration";	
-	
+
+	private static final String PAGE_TEXT = "Configuration";
+
 	private final FunctionalInterfaces.IBinaryFunction<TreeItem, SelectableFeature, Void> treeWalker = new FunctionalInterfaces.IBinaryFunction<TreeItem, SelectableFeature, Void>() {
 		@Override
 		public Void invoke(TreeItem item, SelectableFeature feature) {
@@ -82,18 +83,17 @@ public class ConfigurationPage extends ConfigurationTreeEditorPage {
 	};
 
 	private boolean selectionCanChange = true;
-	
+
 	private Tree tree;
-	
+
 	public interface Methode {
 		public void invoke();
 	}
-	
-	private void buildTree(final TreeItem node, final TreeElement[] children, 
-						   final FunctionalInterfaces.IFunction<Void, Void> callbackIfDone) {
+
+	private void buildTree(final TreeItem node, final TreeElement[] children, final FunctionalInterfaces.IFunction<Void, Void> callbackIfDone) {
 		new AsyncTree(tree).build(node, children, callbackIfDone);
 	}
-	
+
 	@Override
 	protected boolean changeSelection(TreeItem item, boolean select) {
 		selectionCanChange = false;
@@ -101,7 +101,7 @@ public class ConfigurationPage extends ConfigurationTreeEditorPage {
 		selectionCanChange = true;
 		return result;
 	}
-	
+
 	protected void createUITree(Composite parent) {
 		tree = new Tree(parent, SWT.CHECK);
 		tree.addSelectionListener(new SelectionListener() {
@@ -111,8 +111,7 @@ public class ConfigurationPage extends ConfigurationTreeEditorPage {
 
 			@Override
 			public void widgetSelected(SelectionEvent event) {
-		
-				if (event.detail == SWT.CHECK) {	
+				if (event.detail == SWT.CHECK) {
 					final TreeItem item = (TreeItem) event.item;
 					if (item.getGrayed()) {
 						// case: grayed and selected
@@ -132,12 +131,12 @@ public class ConfigurationPage extends ConfigurationTreeEditorPage {
 	protected FunctionalInterfaces.IBinaryFunction<TreeItem, SelectableFeature, Void> getDefaultTreeWalker() {
 		return treeWalker;
 	}
-	
+
 	@Override
 	public String getID() {
 		return ID;
 	}
-	
+
 	@Override
 	public String getPageText() {
 		return PAGE_TEXT;
@@ -153,7 +152,7 @@ public class ConfigurationPage extends ConfigurationTreeEditorPage {
 		final Configuration configuration = configurationEditor.getConfiguration();
 		final boolean oldPropagate = configuration.isPropagate();
 		configuration.setPropagate(false);
-		
+
 		final HashSet<SelectableFeature> selectedFeatures = new HashSet<SelectableFeature>();
 		for (SelectableFeature feature : configuration.getFeatures()) {
 			if (feature.getAutomatic() == Selection.SELECTED) {
@@ -162,11 +161,11 @@ public class ConfigurationPage extends ConfigurationTreeEditorPage {
 				configuration.setManual(feature, Selection.UNDEFINED);
 			}
 		}
-		
+
 		configuration.setPropagate(oldPropagate);
 		configuration.update();
 		configuration.setPropagate(false);
-		
+
 		// reselect implied features
 		for (SelectableFeature feature : configuration.getFeatures()) {
 			if (feature.getAutomatic() == Selection.UNDEFINED && selectedFeatures.contains(feature)) {
@@ -180,33 +179,22 @@ public class ConfigurationPage extends ConfigurationTreeEditorPage {
 	}
 
 	@Override
-	protected void updateTree() {		
-		
+	protected void updateTree() {
 		if (errorMessage(tree)) {
 			final Configuration configuration = configurationEditor.getConfiguration();
 			tree.removeAll();
 			final TreeItem root = new TreeItem(tree, 0);
 			root.setText(configuration.getRoot().getName());
 			root.setData(configuration.getRoot());
-			
-			buildTree(root, configuration.getRoot().getChildren(), 
-					new FunctionalInterfaces.IFunction<Void, Void>() {
+			root.setChecked(true);
+			root.setGrayed(true);
 
-						@Override
-						public Void invoke(Void t) {
-							root.setGrayed(true);
-							root.setExpanded(true);
-							root.setChecked(true);
-							root.setExpanded(true);
-							
-							final Configuration config = configurationEditor.getConfiguration();
-							boolean oldPropagationFlag = config.isPropagate();
-							config.setPropagate(true);
-							refreshTree();
-							config.setPropagate(oldPropagationFlag);
-							
-							return null;
-						}				
+			buildTree(root, configuration.getRoot().getChildren(), new FunctionalInterfaces.IFunction<Void, Void>() {
+				@Override
+				public Void invoke(Void t) {
+					refreshTree();
+					return null;
+				}
 			});
 		}
 	}
