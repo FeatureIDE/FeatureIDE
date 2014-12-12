@@ -127,7 +127,7 @@ public class VelvetFeatureModelWriter extends AbstractFeatureModelWriter {
 
 		if (extFeatureModel != null) {
 			for (Feature child : root.getChildren()) {
-				writeUse(child, 1);
+				writeNewDefined(child, 1);
 			}
 			
 			for (Constraint constraint : featureModel.getConstraints()) {
@@ -192,12 +192,20 @@ public class VelvetFeatureModelWriter extends AbstractFeatureModelWriter {
 		}
 		sb.append("feature ");
 		sb.append(curFeature.getName());
+		final boolean hasDescription = curFeature.getDescription() != null && !curFeature.getDescription().isEmpty();
 
-		if (curFeature.getChildrenCount() == 0) {
+		if (curFeature.getChildrenCount() == 0 && !hasDescription) {
 			sb.append(";");
 		} else {
 			sb.append(" {");
 			sb.append(NEWLINE);
+			if (hasDescription) {
+				writeTab(depth + 1);
+				sb.append("description \"");
+				sb.append(curFeature.getDescription());
+				sb.append("\";");
+				sb.append(NEWLINE);
+			}
 			
 			writeFeatureGroup(curFeature, depth);
 			
@@ -207,12 +215,11 @@ public class VelvetFeatureModelWriter extends AbstractFeatureModelWriter {
 		sb.append(NEWLINE);
 	}
 	
-	private void writeUse(Feature curFeature, int depth) {
+	private void writeNewDefined(Feature curFeature, int depth) {
 		if (curFeature instanceof ExtendedFeature) {
-			ExtendedFeature extFeature = (ExtendedFeature) curFeature;
+			final ExtendedFeature extFeature = (ExtendedFeature) curFeature;
 			
-			if (extFeature.getType() == ExtendedFeature.TYPE_INSTANCE 
-					|| extFeature.getType() == ExtendedFeature.TYPE_INTERFACE) {
+			if (extFeature.getType() == ExtendedFeature.TYPE_INSTANCE || extFeature.getType() == ExtendedFeature.TYPE_INTERFACE) {
 				if (usedVariables.add(extFeature.getExternalModelName())) {
 					Feature parent = curFeature.getParent();
 					writeTab(depth);
@@ -236,7 +243,7 @@ public class VelvetFeatureModelWriter extends AbstractFeatureModelWriter {
 			}
 		}
 		for (Feature child : curFeature.getChildren()) {
-			writeUse(child, depth);
+			writeNewDefined(child, depth);
 		}
 	}
 

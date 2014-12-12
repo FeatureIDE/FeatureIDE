@@ -28,7 +28,7 @@ Export-Package:
  de.ovgu.featureide.core.wizardextension
 Bundle-ClassPath: .
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: University of Magdeburg
 Import-Package: org.eclipse.jdt.internal.core,
  org.eclipse.ui.wizards.newresource

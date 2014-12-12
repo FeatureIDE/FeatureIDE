@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.actions;
 
+import org.eclipse.swt.widgets.FileDialog;
+
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.ModelIOFactory;
@@ -30,14 +32,19 @@ import de.ovgu.featureide.fm.core.io.ModelIOFactory;
  * @author Sebastian Krieter
  */
 public class ImportVelvetAction extends AbstractImportAction {
-	
 	@Override
-	IFeatureModelReader setModelReader(FeatureModel fm) {
-		return ModelIOFactory.getModelReader(fm, ModelIOFactory.TYPE_VELVET);
+	protected IFeatureModelReader setModelReader(FeatureModel fm) {
+		return ModelIOFactory.getModelReader(fm, ModelIOFactory.TYPE_VELVET_IMPORT);
 	}
 	
 	@Override
 	protected FeatureModel createFeatureModel() {
-		return ModelIOFactory.getNewFeatureModel(ModelIOFactory.TYPE_VELVET);
+		return ModelIOFactory.getNewFeatureModel(ModelIOFactory.TYPE_VELVET_IMPORT);
+	}
+
+	@Override
+	protected void setFilter(FileDialog fileDialog) {
+		fileDialog.setFilterExtensions(new String[]{"*.velvet"});
+		fileDialog.setFilterNames(new String[]{"Velvet"});
 	}
 }

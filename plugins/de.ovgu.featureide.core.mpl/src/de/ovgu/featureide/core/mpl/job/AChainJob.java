@@ -29,9 +29,10 @@ import org.eclipse.core.runtime.jobs.Job;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.mpl.job.util.AJobArguments;
 import de.ovgu.featureide.core.mpl.job.util.IChainJob;
+import de.ovgu.featureide.fm.core.job.IJob.JobStatus;
 
 /**
- * Abstract eclipse job which start another job when the work is done.
+ * An abstract eclipse job, which starts another job when the work is done.
  * 
  * @author Sebastian Krieter
  */
@@ -55,9 +56,9 @@ abstract class AChainJob<T extends AJobArguments> extends Job implements IChainJ
 		
 		@Override
 		public void run() {
-			int status = JobManager.STATUS_FAILED;
+			JobStatus status = JobStatus.FAILED;
 			try {
-				status = AChainJob.this.work() ? JobManager.STATUS_OK : JobManager.STATUS_FAILED;
+				status = AChainJob.this.work() ? JobStatus.OK : JobStatus.FAILED;
 			} catch (Exception e) {
 				MPLPlugin.getDefault().logError(e);
 			} finally {
@@ -73,7 +74,7 @@ abstract class AChainJob<T extends AJobArguments> extends Job implements IChainJ
 	private int cancelingTimeout = 5000;
 
 	private InnerThread innerThread = null;
-	private Integer status = JobManager.STATUS_RUNNING;
+	private JobStatus status = JobStatus.FAILED;
 	private Object sequenceObject = null;
 	
 	protected IProject project = null;
@@ -89,15 +90,12 @@ abstract class AChainJob<T extends AJobArguments> extends Job implements IChainJ
 		this.arguments = arguments;
 	}
 	
-	/**
-	 * dsad
-	 */
 	@SuppressWarnings("deprecation")
 	@Override
 	public IStatus run(IProgressMonitor monitor) {
 		synchronized (status) {
-			// case job was start and canceled at the same time
-			if (status == JobManager.STATUS_FAILED) {
+			// in case job was started and cancelled at the same time
+			if (status == JobStatus.FAILED) {
 				finished();
 				return Status.CANCEL_STATUS;
 			}
@@ -112,7 +110,7 @@ abstract class AChainJob<T extends AJobArguments> extends Job implements IChainJ
 			MPLPlugin.getDefault().logError(e);
 			innerThread.stop();
 			synchronized (status) {
-				status =  JobManager.STATUS_FAILED;
+				status =  JobStatus.FAILED;
 			}
 			finished();
 			return Status.CANCEL_STATUS;
@@ -158,7 +156,7 @@ abstract class AChainJob<T extends AJobArguments> extends Job implements IChainJ
 	public void canceling() {
 		synchronized (status) {
 			if (innerThread == null) {
-				status = JobManager.STATUS_FAILED;
+				status = JobStatus.FAILED;
 				return;
 			}
 		}
@@ -192,7 +190,7 @@ abstract class AChainJob<T extends AJobArguments> extends Job implements IChainJ
 	}
 
 	@Override
-	public int getStatus() {
+	public JobStatus getStatus() {
 		return status;
 	}
 	

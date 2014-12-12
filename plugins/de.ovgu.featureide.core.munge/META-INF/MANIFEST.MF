@@ -10,6 +10,6 @@ Require-Bundle: org.eclipse.ui,
  de.ovgu.featureide.core,
  de.ovgu.featureide.fm.core
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: University of Magdeburg
 Export-Package: de.ovgu.featureide.munge

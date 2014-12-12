@@ -1,4 +1,4 @@
-package de.ovgu.featureide.ui.variantimport;
+package de.ovgu.featureide.ui.variantimport.migration;
 
 import de.ovgu.featureide.core.builder.IComposerExtensionBase;
 

@@ -36,7 +36,8 @@ public abstract class ModelIOFactory {
 	public static final int
 		TYPE_UNKNOWN = -1,
 		TYPE_XML = 0,
-		TYPE_VELVET = 1;
+		TYPE_VELVET = 1,
+		TYPE_VELVET_IMPORT = 2;
 	
 	public static AbstractFeatureModelReader getModelReader(int type) {
 		return getModelReader(getNewFeatureModel(type), type);
@@ -52,6 +53,8 @@ public abstract class ModelIOFactory {
 			return new XmlFeatureModelReader(featureModel);
 		case TYPE_VELVET:
 			return new VelvetFeatureModelReader(featureModel);
+		case TYPE_VELVET_IMPORT:
+			return new VelvetFeatureModelReader(featureModel, true);
 		default:
 			return null;
 		}
@@ -62,6 +65,8 @@ public abstract class ModelIOFactory {
 		case TYPE_XML:
 			return new XmlFeatureModelWriter(featureModel);
 		case TYPE_VELVET:
+			return new VelvetFeatureModelWriter(featureModel);
+		case TYPE_VELVET_IMPORT:
 			return new VelvetFeatureModelWriter(featureModel);
 		default:
 			return null;
@@ -82,6 +87,8 @@ public abstract class ModelIOFactory {
 		case TYPE_XML:
 			return new FeatureModel();
 		case TYPE_VELVET:
+			return new ExtendedFeatureModel();
+		case TYPE_VELVET_IMPORT:
 			return new ExtendedFeatureModel();
 		default:
 			return null;

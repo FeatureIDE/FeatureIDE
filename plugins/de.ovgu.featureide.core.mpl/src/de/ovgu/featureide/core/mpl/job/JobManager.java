@@ -11,6 +11,7 @@ import org.eclipse.core.resources.IProject;
 
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.mpl.job.util.IChainJob;
+import de.ovgu.featureide.fm.core.job.IJob.JobStatus;
 
 /**
  * Class for starting jobs.
@@ -27,11 +28,6 @@ public abstract class JobManager {
 		private final LinkedList<SequenceFinishedListener> listener = new LinkedList<SequenceFinishedListener>();
 		private boolean running = false;
 	}
-	
-	public static final int
-		STATUS_RUNNING = 0x01,
-		STATUS_OK = 0x02,
-		STATUS_FAILED = 0x04;
 	
 	private static final Map<Object, SequenceData> sequenceDataMap = new WeakHashMap<Object, SequenceData>();
 	
@@ -140,15 +136,15 @@ public abstract class JobManager {
 		synchronized (sequenceData) {
 			final IChainJob lastJob = sequenceData.jobs.poll();
 			if (lastJob != null) {
-				int lastStatus = lastJob.getStatus();
+				JobStatus lastStatus = lastJob.getStatus();
 				AChainJob<?> nextJob = null;
 
 				for (final Iterator<AChainJob<?>> it = sequenceData.jobs.iterator(); it.hasNext();) {
 					nextJob = it.next();
-					if (nextJob.getStatus() == STATUS_FAILED) {
-						lastStatus = STATUS_FAILED;
+					if (nextJob.getStatus() == JobStatus.FAILED) {
+						lastStatus = JobStatus.FAILED;
 						it.remove();
-					} else if (lastStatus == STATUS_FAILED && !nextJob.ignoresPreviousJobFail()) {
+					} else if (lastStatus == JobStatus.FAILED && !nextJob.ignoresPreviousJobFail()) {
 						it.remove();
 					} else {
 						break;
@@ -157,7 +153,7 @@ public abstract class JobManager {
 				if (sequenceData.jobs.isEmpty()) {
 					for (final Iterator<SequenceFinishedListener> it = sequenceData.listener.iterator(); it.hasNext();) {
 					    try {
-					    	it.next().sequenceFinished(idObject, lastStatus == JobManager.STATUS_OK);
+					    	it.next().sequenceFinished(idObject, lastStatus == JobStatus.OK);
 					    }
 					    catch (RuntimeException e) {
 					        MPLPlugin.getDefault().logError(e);

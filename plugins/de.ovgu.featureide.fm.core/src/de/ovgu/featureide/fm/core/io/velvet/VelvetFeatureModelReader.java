@@ -36,6 +36,7 @@ import java.util.Map.Entry;
 import org.antlr.runtime.ANTLRInputStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.tree.CommonErrorNode;
 import org.antlr.runtime.tree.Tree;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -104,6 +105,8 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 	private final LinkedList<ConstraintNode> constraintNodeList = new LinkedList<ConstraintNode>();
 	private final HashSet<String> usedVariables = new HashSet<String>();
 	
+	private final boolean velvetImport;
+	
 	private ModelMarkerHandler modelMarkerHandler;
 	private ExtendedFeatureModel extFeatureModel;
 	private String extFeatureModelName;
@@ -163,11 +166,16 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 		return true;
 	}
 
-	private static void copyChildnodes(final ExtendedFeatureModel targetModel,
+	private void copyChildnodes(final ExtendedFeatureModel targetModel,
 			final Feature targetParentNode, final Feature sourceParentNode,
 			final String parentModelName, final String parentNodeName, final int type) {
 		for (final Feature child : sourceParentNode.getChildren()) {
-			final ExtendedFeature feature = new ExtendedFeature(targetModel, parentNodeName + "." + child.getName());
+			final ExtendedFeature feature;
+			if (velvetImport) {
+				feature = new ExtendedFeature(targetModel, child.getName());
+			} else {
+				feature = new ExtendedFeature(targetModel, parentNodeName + "." + child.getName());
+			}
 			feature.setMandatory(child.isMandatory());
 			feature.setAbstract(child.isAbstract());
 			feature.setHidden(child.isHidden());
@@ -224,8 +232,13 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 	}
 
 	public VelvetFeatureModelReader(final FeatureModel featureModel) {
+		this(featureModel, false);
+	}
+	
+	public VelvetFeatureModelReader(final FeatureModel featureModel, boolean velvetImport) {
 		extFeatureModel = (ExtendedFeatureModel) featureModel;
 		setFeatureModel(extFeatureModel);
+		this.velvetImport = velvetImport;
 	}
 
 	@Override
@@ -235,25 +248,24 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 			antlrInputStream = new ANTLRInputStream(inputStream);
 		} catch (final IOException e) {
 			FMCorePlugin.getDefault().logError(e);
-		}
-		if (antlrInputStream == null) {
-			throw new UnsupportedModelException("Syntax error!", 0);
+			throw new UnsupportedModelException("Error while reading model!", 0);
 		}
 		final VelvetParser parser = new VelvetParser(new CommonTokenStream(new VelvetLexer(antlrInputStream)));
 		Tree root = null;
 		try {
 			root = (Tree) parser.velvetModel().getTree();
+			if (root == null) {
+				throw new UnsupportedModelException("Error while parsing model!", 0);
+			}
+			init();
+			
+			checkTree(root);
+			parseModel(root);
+			parseAttributeConstraints();
 		} catch (final RecognitionException e) {
+			FMCorePlugin.getDefault().logError(e);
 			throw new UnsupportedModelException(e.getMessage(), e.line);
 		}
-		if (root == null) {
-			throw new UnsupportedModelException("Error while reading model!", 0);
-		}
-		
-		init();
-
-		parseModel(root);
-		parseAttributeConstraints();
 		
 		// Update the FeatureModel in Editor
 		extFeatureModel.handleModelDataLoaded();
@@ -272,6 +284,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 		} else {
 			extFeatureModel.addFeature(newFeature);
 			parent.addChild(newFeature);
+			newFeature.setNewDefined(true);
 			return newFeature;
 		}
 	}
@@ -456,7 +469,6 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 		extFeatureModel.reset();
 		extFeatureModel.getLayout().showHiddenFeatures(true);
 		extFeatureModel.getLayout().verticalLayout(false);
-		
 		if (getProject() != null) {
 			modelMarkerHandler = new ModelMarkerHandler(getProject().getFile(getFile().getName()));
 			modelMarkerHandler.deleteAllModelMarkers();
@@ -471,10 +483,10 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 				&& featureModelFile.getParentFile().getName().equals("velvet");
 	}
 
-	private void parseAttribute(final Tree root, final Feature parent) {
+	private void parseAttribute(final Tree root, final Feature parent) throws RecognitionException {
 		final LinkedList<Tree> nodeList = getChildren(root);
 
-		final String name = nodeList.poll().getText();
+		final String name = checkTree(nodeList.poll()).getText();
 		final Tree valueNode = nodeList.poll();
 
 		switch (valueNode.getType()) {
@@ -489,15 +501,16 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 					Boolean.parseBoolean(valueNode.getText()));
 			break;
 		case VelvetParser.STRING:
+			final String valueNodeText = valueNode.getText();
 			this.extFeatureModel.addAttribute(parent.getName(), name,
-					valueNode.getText());
+					valueNodeText.substring(1, valueNodeText.length() - 1));
 			break;
 		default:
 			reportSyntaxError(valueNode);
 		}
 	}
 
-	private void parseAttributeConstraints() throws UnsupportedModelException {
+	private void parseAttributeConstraints() throws UnsupportedModelException, RecognitionException {
 		while (!this.atrributeConstraintNodes.isEmpty()) {
 			final LinkedList<Tree> nodeList = getChildren(this.atrributeConstraintNodes.poll());
 
@@ -574,7 +587,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 		}
 	}
 
-	private void parseConcept(final Tree root) {
+	private void parseConcept(final Tree root) throws RecognitionException {
 		final LinkedList<Tree> nodeList = getChildren(root);
 
 		while (!nodeList.isEmpty()) {
@@ -582,7 +595,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 
 			switch (curNode.getType()) {
 			case VelvetParser.ID:
-				extFeatureModelName = curNode.getText();
+				extFeatureModelName = checkTree(curNode).getText();
 
 				final ExtendedFeature rootFeature = new ExtendedFeature(extFeatureModel, extFeatureModelName);
 				rootFeature.setAbstract(true);
@@ -596,10 +609,10 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 			case VelvetParser.BASEEXT:
 				parseInheritance(curNode);
 				break;
-			case VelvetParser.INST:
+			case VelvetParser.IMPORTINSTANCE:
 				parseInstanceImport(curNode);
 				break;
-			case VelvetParser.INTF:
+			case VelvetParser.IMPORTINTERFACE:
 				parseInterfaceImport(curNode);
 				break;
 			case VelvetParser.DEF:
@@ -620,7 +633,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 		}
 	}
 
-	private void parseConstraint(final Tree root, final Feature parent) {
+	private void parseConstraint(final Tree root, final Feature parent) throws RecognitionException {
 		final LinkedList<Tree> nodeList = getChildren(root);
 
 		while (!nodeList.isEmpty()) {
@@ -644,7 +657,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 		}
 	}
 
-	private Node parseConstraint_rec(final Tree root) {
+	private Node parseConstraint_rec(final Tree root) throws RecognitionException {
 		final LinkedList<Tree> nodeList = getChildren(root);
 		final LinkedList<Node> nodes = new LinkedList<Node>();
 		final LinkedList<Integer> operators = new LinkedList<Integer>();
@@ -717,7 +730,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 		return nodes.getFirst();
 	}
 
-	private void parseDefinitions(final Tree root) {
+	private void parseDefinitions(final Tree root) throws RecognitionException {
 		final LinkedList<Tree> nodeList = getChildren(root);
 
 		final Feature parentFeature = parentStack.pop();
@@ -728,7 +741,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 
 			switch (curNode.getType()) {
 			// Feature
-			case VelvetParser.FEAT:
+			case VelvetParser.FEATURE:
 				parseFeature(curNode, parentFeature);
 				break;
 			// Feature-Group
@@ -740,12 +753,15 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 				parseConstraint(curNode, parentFeature);
 				break;
 			// Use
-			case VelvetParser.USES:
+			case VelvetParser.USE:
 				parseUse(curNode, parentFeature);
 				break;
 			// Attribute
 			case VelvetParser.ATTR:
 				parseAttribute(curNode, parentFeature);
+				break;
+			case VelvetParser.DESCRIPTION:
+				parseDescription(curNode, parentFeature);
 				break;
 			case VelvetParser.EMPTY:
 				break;
@@ -755,17 +771,31 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 		}
 
 	}
+	
+	private void parseDescription(Tree root, Feature parent) throws RecognitionException {
+		final LinkedList<Tree> nodeList = getChildren(root);
+		final Tree valueNode = nodeList.poll();
+		
+		switch (valueNode.getType()) {
+		case VelvetParser.STRING:
+			final String valueNodeText = valueNode.getText();
+			parent.setDescription(valueNodeText.substring(1, valueNodeText.length() - 1));
+			break;
+		default:
+			reportSyntaxError(valueNode);
+		}
+	}
 
-	private void parseFeature(final Tree root, Feature parent) {
+	private void parseFeature(final Tree root, Feature parent) throws RecognitionException {
 		final LinkedList<Tree> childList = getChildren(root);
 		final String featureName;
 		if (cinterface) {
-			featureName = childList.poll().getText();
+			featureName = checkTree(childList.poll()).getText();
 		} else {
-			if (parent.isRoot()) {
-				featureName = childList.poll().getText();
+			if (velvetImport || parent.isRoot()) {
+				featureName = checkTree(childList.poll()).getText();
 			} else {
-				featureName = parent.getName() + "." + childList.poll().getText();
+				featureName = parent.getName() + "." + checkTree(childList.poll()).getText();
 			}
 		}
 		boolean isMandatory = false, isAbstract = false, moreDefinitions = false;
@@ -796,7 +826,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 		}
 	}
 
-	private void parseFeatureGroup(final Tree root, final Feature parent) {
+	private void parseFeatureGroup(final Tree root, final Feature parent) throws RecognitionException {
 		final LinkedList<Tree> nodeList = getChildren(root);
 
 		while (!nodeList.isEmpty()) {
@@ -809,7 +839,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 			case VelvetParser.ONEOF:
 				parent.setAlternative();
 				break;
-			case VelvetParser.FEAT:
+			case VelvetParser.FEATURE:
 				parseFeature(curNode, parent);
 				break;
 			default:
@@ -818,12 +848,12 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 		}
 	}
 
-	private void parseInheritance(final Tree root) {
+	private void parseInheritance(final Tree root) throws RecognitionException {
 		final LinkedList<Tree> nodeList = getChildren(root);
 
 		while (!nodeList.isEmpty()) {
 			final Tree curNode = nodeList.poll();
-			final String parentModelName = curNode.getText();
+			final String parentModelName = checkTree(curNode).getText();
 
 			final FeatureModel fm = getExternalFeatureModel(curNode);
 			if (fm == null) {
@@ -875,13 +905,13 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 		}
 	}
 	
-	private void parseInterfaceImport(final Tree root) {
+	private void parseInterfaceImport(final Tree root) throws RecognitionException {
 		final LinkedList<Tree> nodeList = getChildren(root);
 
 		while (!nodeList.isEmpty()) {
-			final Tree idNode = nodeList.poll();
+			final Tree idNode = checkTree(nodeList.poll());
 			final String interfaceName = idNode.getText();
-			final Tree nameNode = nodeList.poll();
+			final Tree nameNode = checkTree(nodeList.poll());
 			final String varName = nameNode.getText();
 			
 			if (checkInterfaceModelFile(idNode)) {
@@ -892,13 +922,13 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 		}
 	}
 	
-	private void parseInstanceImport(final Tree root) {
+	private void parseInstanceImport(final Tree root) throws RecognitionException {
 		final LinkedList<Tree> nodeList = getChildren(root);
 
 		while (!nodeList.isEmpty()) {
-			final Tree idNode = nodeList.poll();
+			final Tree idNode = checkTree(nodeList.poll());
 			final String interfaceName = idNode.getText();
-			final Tree nameNode = nodeList.poll();
+			final Tree nameNode = checkTree(nodeList.poll());
 			final String varName = nameNode.getText();
 			
 			if (checkExternalModelFile(idNode)) {
@@ -909,7 +939,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 		}
 	}
 
-	private void parseModel(final Tree root) {
+	private void parseModel(final Tree root) throws RecognitionException {
 		final LinkedList<Tree> nodeList = getChildren(root);
 		while (!nodeList.isEmpty()) {
 			final Tree curNode = nodeList.poll();
@@ -922,8 +952,9 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 				parseConcept(curNode);
 				break;
 			case VelvetParser.EOF:
-				// TODO MPL: check if a model was created?
-				break;
+				if (curNode.getTokenStartIndex() > -1) {
+					break;
+				}
 			default:
 				reportSyntaxError(curNode);
 			}
@@ -965,9 +996,9 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 		
 	}
 
-	private void parseUse(Tree root, Feature parent) {
+	private void parseUse(Tree root, Feature parent) throws RecognitionException {
 		final LinkedList<Tree> childList = getChildren(root);
-		final Tree useNameNode = childList.poll();
+		final Tree useNameNode = checkTree(childList.poll());
 		final String varName = useNameNode.getText();
 		
 		if (!usedVariables.add(varName)) {
@@ -1001,19 +1032,33 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 		}
 	}
 	
-	private void reportSyntaxError(Tree curNode) {
-		final String message = "Illegal statement \""+ curNode.getText() + "\"";
-		if (modelMarkerHandler != null) {
-			modelMarkerHandler.createModelMarker(message, org.eclipse.core.resources.IMarker.SEVERITY_ERROR, curNode.getLine());
-		}
-		FMCorePlugin.getDefault().logError(new UnsupportedModelException(
-			message + " at line " + curNode.getLine() + ((featureModelFile != null)?" in file " + featureModelFile.getName():""), curNode.getLine()));
-	}
-	
 	private void reportWarning(Tree curNode, String message) {
 		if (modelMarkerHandler != null) {
 			modelMarkerHandler.createModelMarker(message, org.eclipse.core.resources.IMarker.SEVERITY_WARNING, curNode.getLine());
 		}
 		FMCorePlugin.getDefault().logWarning(message + " (at line "+ curNode.getLine() + ((featureModelFile != null)?" in file " + featureModelFile.getName():"") + ": \"" + curNode.getText() + "\")");		
+	}
+	
+	private Tree checkTree(Tree root) throws RecognitionException {
+		if (root instanceof CommonErrorNode) {
+			throwException(((CommonErrorNode)root).trappedException, root);
+		}
+		return root;
+	}	
+	
+	private void reportSyntaxError(Tree curNode) throws RecognitionException {
+		checkTree(curNode);
+		final RecognitionException ex = new RecognitionException();
+		ex.line = 1;
+		ex.charPositionInLine = 1;
+		throwException(ex, curNode);
+	}
+	
+	private void throwException(RecognitionException e, Tree curNode) throws RecognitionException {
+		if (modelMarkerHandler != null) {
+			final String message = "Illegal syntax in Line " + e.line + ":" + e.charPositionInLine + ". " + curNode.getText();
+			modelMarkerHandler.createModelMarker(message, org.eclipse.core.resources.IMarker.SEVERITY_ERROR, e.line);
+		}
+		throw e;
 	}
 }
