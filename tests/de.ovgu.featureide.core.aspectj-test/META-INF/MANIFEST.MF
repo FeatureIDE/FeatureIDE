@@ -4,6 +4,6 @@ Bundle-Name: AspectJ Test Fragment
 Bundle-SymbolicName: de.ovgu.featureide.core.aspectj_test;singleton:=true
 Bundle-Version: 2.2.4.qualifier
 Fragment-Host: de.ovgu.featureide.core.aspectj
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: University of Magdeburg
 Require-Bundle: org.junit

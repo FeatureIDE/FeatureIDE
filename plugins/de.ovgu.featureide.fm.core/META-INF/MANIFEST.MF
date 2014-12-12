@@ -50,7 +50,7 @@ Bundle-ClassPath: .,
  lib/guava-r09.jar,
  lib/org.sat4j.pb.jar,
  lib/antlr-3.4.jar
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Activator: de.ovgu.featureide.fm.core.FMCorePlugin
 Bundle-Vendor: University of Magdeburg
 

@@ -21,7 +21,7 @@ Require-Bundle: org.eclipse.ui,
  org.deltaj.transformations,
  org.deltaj.transformations.ui
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Import-Package: com.google.inject,
  de.ovgu.featureide.core,
  de.ovgu.featureide.core.builder,

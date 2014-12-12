@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Multi Product Lines UI
 Bundle-SymbolicName: de.ovgu.featureide.ui.mpl;singleton:=true
 Bundle-Version: 2.7.2.qualifier
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Require-Bundle: de.ovgu.featureide.core,
  de.ovgu.featureide.core.mpl,
  de.ovgu.featureide.fm.core,
