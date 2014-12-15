@@ -56,10 +56,10 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagatorJobWrapper.IConfigJob;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
+import de.ovgu.featureide.fm.core.configuration.TreeElement;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.configuration.xxx.AsyncTree;
 
 /**
  * Basic class with some default methods for configuration editor pages.
@@ -68,30 +68,26 @@ import de.ovgu.featureide.fm.ui.editors.configuration.xxx.AsyncTree;
  * @author Marcus Pinnecke
  */
 public abstract class ConfigurationTreeEditorPage extends EditorPart implements IConfigurationEditorPage {
-	static interface ConfigurationTreeWalker {
-		boolean visitTreeItem(TreeItem item, SelectableFeature feature);
-	}	
-		
-	static final Color gray = new Color(null, 140, 140, 140);
-	static final Color green = new Color(null, 0, 140, 0);
-	static final Color blue = new Color(null, 0, 0, 200);
-	static final Color red = new Color(null, 240, 0, 0);
+	protected static final Color gray = new Color(null, 140, 140, 140);
+	protected static final Color green = new Color(null, 0, 140, 0);
+	protected static final Color blue = new Color(null, 0, 0, 200);
+	protected static final Color red = new Color(null, 240, 0, 0);
 	
-	static final Font treeItemStandardFont = new Font(null, "Arial", 8, SWT.NORMAL);
-	static final Font treeItemSpecialFont = new Font(null, "Arial", 8, SWT.BOLD);
-	
+	protected static final Font treeItemStandardFont = new Font(null, "Arial", 8, SWT.NORMAL);
+	protected static final Font treeItemSpecialFont = new Font(null, "Arial", 8, SWT.BOLD);
+
 	private final HashSet<SelectableFeature> invalidFeatures = new HashSet<SelectableFeature>();
+	protected final HashSet<SelectableFeature> updateFeatures = new HashSet<SelectableFeature>();
 	
 	protected IConfigurationEditor configurationEditor = null;
 
 	protected boolean dirty = false;
 	
-	private boolean computeFeatures = false, computeColoring = false;
+	protected Tree tree;
 
 	private int index;
 
 	private Label infoLabel;
-	private Label activityLabel;
 	private Button autoSelectButton;
 	
 	public void setDirty() {
@@ -185,7 +181,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		gridData.grabExcessHorizontalSpace = true;
 		gridData.grabExcessVerticalSpace = false;
 		gridData.verticalAlignment = SWT.TOP;
-	    gridLayout = new GridLayout(3, false);
+	    gridLayout = new GridLayout(2, false);
 		gridLayout.marginHeight = 0;
 		gridLayout.marginWidth = 0;
 		gridLayout.marginLeft = 4;
@@ -201,15 +197,6 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	    infoLabel = new Label(compositeTop, SWT.NONE);
 	    infoLabel.setLayoutData(gridData);
 	    updateInfoLabel();
-
-	    // activity label
-	    gridData = new GridData();
-		gridData.horizontalAlignment = SWT.RIGHT;
-		gridData.grabExcessHorizontalSpace = false;
-		gridData.verticalAlignment = SWT.CENTER;
-	    activityLabel = new Label(compositeTop, SWT.NONE);
-	    activityLabel.setLayoutData(gridData);
-	    activityLabel.setText("    ");
 	    		
 		// autoselect button 
 		gridData = new GridData();
@@ -233,20 +220,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 					walkTree(new IBinaryFunction<TreeItem, SelectableFeature, Void>() {
 						@Override
 						public Void invoke(TreeItem item, SelectableFeature feature) {
-							if (feature.getAutomatic() == Selection.UNDEFINED) {
-								item.setFont(treeItemStandardFont);
-								item.setGrayed(false);
-								item.setForeground(null);
-								switch (feature.getManual()) {
-									case SELECTED:
-										item.setChecked(true);
-										break;
-									case UNSELECTED:
-									case UNDEFINED:
-										item.setChecked(false);
-										break;
-								}
-							}
+							refreshItem(item, feature);
 							return null;
 						}
 					}, new FunctionalInterfaces.NullFunction<Void, Void>());
@@ -384,6 +358,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			if (configurationEditor.isAutoSelectFeatures()) {
 				computeTree(false);
 			} else {
+				refreshItem(item, feature);
 				if (configurationEditor.getConfiguration().canBeValid()) {
 					invalidFeatures.clear();
 				} else {
@@ -393,12 +368,26 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			updateInfoLabel();
 		}
 	}
-
-	protected abstract TreeItem getRoot();
-	protected abstract void updateTree();
 	
-	protected FunctionalInterfaces.IBinaryFunction<TreeItem, SelectableFeature, Void> getDefaultTreeWalker() {
-		return null;
+	protected void updateTree() {
+		itemMap.clear();
+		if (errorMessage(tree)) {
+			final Configuration configuration = configurationEditor.getConfiguration();
+			tree.removeAll();
+			final TreeItem root = new TreeItem(tree, 0);
+			root.setText(configuration.getRoot().getName());
+			root.setData(configuration.getRoot());
+			itemMap.put(configuration.getRoot(), root);
+
+			buildTree(root, configuration.getRoot().getChildren(), new FunctionalInterfaces.IFunction<Void, Void>() {
+				@Override
+				public Void invoke(Void t) {
+					updateInfoLabel();
+					computeTree(false);
+					return null;
+				}
+			});
+		}
 	}
 	
 	protected boolean canDeselectFeatures() {
@@ -406,11 +395,25 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	}
 	
 	protected void refreshItem(TreeItem item, SelectableFeature feature) {
-		FunctionalInterfaces.IBinaryFunction<TreeItem, SelectableFeature, Void> walker = getDefaultTreeWalker();
-		if (walker != null) {
-			walker.invoke(item, feature);
+		item.setBackground(null);
+		item.setFont(treeItemStandardFont);
+		switch (feature.getAutomatic()) {
+		case SELECTED:
+			item.setGrayed(true);
+			item.setForeground(null);
+			item.setChecked(true);
+			break;
+		case UNSELECTED:
+			item.setGrayed(true);
+			item.setForeground(gray);
+			item.setChecked(false);
+			break;
+		case UNDEFINED:
+			item.setGrayed(false);
+			item.setForeground(null);
+			item.setChecked(feature.getManual() == Selection.SELECTED);
+			break;
 		}
-		updateInfoLabel();
 	}
 
 	/**
@@ -457,13 +460,6 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 				return null;
 			}
 		});
-		job.addJobFinishedListener(new JobFinishListener() {
-			@Override
-			public void jobFinished(IJob finishedJob, boolean success) {
-				computeColoring = false;
-				updateActivityLabel(currentDisplay);
-			}
-		});
 		return job;
 	}
 	
@@ -471,7 +467,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		if (!configurationEditor.isAutoSelectFeatures()) {	
 			return null;
 		}
-		final TreeItem topItem = getTree().getTopItem();
+		final TreeItem topItem = tree.getTopItem();
 		SelectableFeature feature = (SelectableFeature)(topItem.getData());
 		final IConfigJob<?> job = configurationEditor.getConfiguration().getPropagator().getJobWrapper().update(redundantManual, feature.getFeature().getName());
 		job.setIntermediateFunction(new IFunction<Object, Void>() {
@@ -486,37 +482,23 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 					currentDisplay.asyncExec(new Runnable() {
 						@Override
 						public void run() {
-							switch (feature.getAutomatic()) {
-							case SELECTED:
-								item.setGrayed(true);
-								item.setForeground(null);
-								item.setChecked(true);
-								break;
-							case UNSELECTED:
-								item.setGrayed(true);
-								item.setForeground(gray);
-								item.setChecked(false);
-								break;
-							case UNDEFINED:
-								item.setGrayed(false);
-								item.setChecked(feature.getManual() == Selection.SELECTED);
-								break;
-							}
+							updateFeatures.remove(feature);
+							refreshItem(item, feature);
 						}
 					});
 				}
 				return null;
 			}
 		});
-		job.addJobFinishedListener(new JobFinishListener() {
-			@Override
-			public void jobFinished(IJob finishedJob, boolean success) {
-				computeFeatures = false;
-				updateActivityLabel(currentDisplay);
-			}
-		});
 		return job;
-	}	
+	}
+	
+	protected void lockItem(TreeItem item) {
+		item.setGrayed(true);
+		item.setChecked(true);
+		item.setForeground(gray);
+		item.setFont(treeItemStandardFont);
+	}
 	
 	protected void computeTree(boolean redundantManual) {
 		final Display currentDisplay = Display.getCurrent();
@@ -534,35 +516,19 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			}
 		});
 		
+		updateFeatures.clear();
 		walkTree(new IBinaryFunction<TreeItem, SelectableFeature, Void>() {
 			@Override
 			public Void invoke(TreeItem item, SelectableFeature feature) {
-				item.setGrayed(true);
-				item.setChecked(true);
-				item.setForeground(null);
-				item.setFont(treeItemStandardFont);
+				lockItem(item);
+				updateFeatures.add(feature);
 				return null;
 			}
 		}, new IFunction<Void, Void>() {
 			@Override
 			public Void invoke(Void t) {
-				computeColoring = true;
-				computeFeatures = true;
-				updateActivityLabel(currentDisplay);
 				configurationEditor.getConfigJobManager().startJob(updateJob);
 				return null;	
-			}
-		});
-	}
-	
-	private synchronized void updateActivityLabel(Display currentDisplay) {
-		final StringBuilder sb = new StringBuilder();
-		sb.append(computeFeatures ? "F" : "  ");
-		sb.append(computeColoring ? "C" : "  ");
-		currentDisplay.asyncExec(new Runnable() {
-			@Override
-			public void run() {
-				activityLabel.setText(sb.toString());
 			}
 		});
 	}
@@ -570,11 +536,15 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	protected final void walkTree( 
 			final FunctionalInterfaces.IBinaryFunction<TreeItem, SelectableFeature, Void> perNodeFunction,
 			final FunctionalInterfaces.IFunction<Void, Void> callbackIfDone) {
-		getAsyncTree().traverse(getRoot(), perNodeFunction, callbackIfDone);
+		getAsyncTree().traverse(tree.getItem(0), perNodeFunction, callbackIfDone);
 	}
-
-	protected abstract AsyncTree getAsyncTree();
 	
-	protected abstract Tree getTree();
+	private void buildTree(final TreeItem node, final TreeElement[] children, final FunctionalInterfaces.IFunction<Void, Void> callbackIfDone) {
+		getAsyncTree().build(node, children, callbackIfDone);
+	}
+	
+	private AsyncTree getAsyncTree() {
+		return new AsyncTree(tree, itemMap);
+	}
 
 }

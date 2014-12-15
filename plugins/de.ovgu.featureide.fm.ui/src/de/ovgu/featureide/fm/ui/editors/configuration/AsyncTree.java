@@ -18,7 +18,7 @@
  *
  * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.fm.ui.editors.configuration.xxx;
+package de.ovgu.featureide.fm.ui.editors.configuration;
 
 import java.util.HashMap;
 
@@ -63,9 +63,6 @@ public class AsyncTree {
 			}
 		}
 	}
-
-//	private static final String JOB_NAME_BUILDING_TREE = "Building tree...";
-//	private static final String JOB_NAME_TRAVERSE_TREE = "Traversing tree...";
 
 	private Tree tree;
 	private final HashMap<SelectableFeature, TreeItem> itemMap;

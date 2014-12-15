@@ -235,7 +235,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 				currentDisplay.asyncExec(new Runnable() {
 					@Override
 					public void run() {
-						getPage(getActivePage()).propertyChange(new PropertyChangeEvent(ConfigurationEditor.this, "InitialLoad", null, null));
+						getPage(getActivePage()).propertyChange(null);
 					}
 				});
 			}
