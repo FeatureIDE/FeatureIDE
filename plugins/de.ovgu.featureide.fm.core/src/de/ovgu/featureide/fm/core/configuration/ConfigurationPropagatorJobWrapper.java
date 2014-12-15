@@ -52,8 +52,21 @@ public class ConfigurationPropagatorJobWrapper {
 		protected final int id;
 		
 		public ConfigJob(int id) {
-			super("Configuration Job");
+			super(getName(id));
 			this.id = id;
+		}
+		
+		private static String getName(int id) {
+			switch (id) {
+			case ID_LOAD: return "Loading CNF";
+			case ID_SOLUTIONS: return "Calculating Configuration Solutions";
+			case ID_ISVALID: return "Checking Configuration Validity";
+			case ID_CANBEVALID: return "Checking Configuration Validity";
+			case ID_VALIDCONFIG: return "Calculating Configuration Coloring";
+			case ID_NUMBER: return "Calculating Number of Valid Configurations";
+			case ID_UPDATE: return "Updating Configuration";
+			default: return "Configuration Job";
+			}
 		}
 
 		public T getResults() {
@@ -112,21 +125,21 @@ public class ConfigurationPropagatorJobWrapper {
 		};
 	}
 	
-	public IConfigJob<boolean[]> leadToValidConfiguration(final List<SelectableFeature> featureList) {
-		return new ConfigJob<boolean[]>(ConfigJob.ID_VALIDCONFIG) {
+	public IConfigJob<?> leadToValidConfiguration(final List<SelectableFeature> featureList) {
+		return new ConfigJob<Object>(ConfigJob.ID_VALIDCONFIG) {
 			@Override
 			protected boolean work() throws Exception {
-				result = propagator.leadToValidConfiguration(featureList, workMonitor);
+				propagator.leadToValidConfiguration(featureList, workMonitor);
 				return true;
 			}
 		};
 	}
 	
-	public IConfigJob<boolean[]> leadToValidConfiguration(final List<SelectableFeature> featureList, final int mode) {
-		return new ConfigJob<boolean[]>(ConfigJob.ID_VALIDCONFIG) {
+	public IConfigJob<?> leadToValidConfiguration(final List<SelectableFeature> featureList, final int mode) {
+		return new ConfigJob<Object>(ConfigJob.ID_VALIDCONFIG) {
 			@Override
 			protected boolean work() throws Exception {
-				result = propagator.leadToValidConfiguration(featureList, mode, workMonitor);
+				propagator.leadToValidConfiguration(featureList, mode, workMonitor);
 				return true;
 			}
 		};
@@ -142,11 +155,11 @@ public class ConfigurationPropagatorJobWrapper {
 		};
 	}
 	
-	public IConfigJob<?> update(final boolean manual, final boolean redundantManual, final String startFeature) {
+	public IConfigJob<?> update(final boolean redundantManual, final String startFeature) {
 		return new ConfigJob<Object>(ConfigJob.ID_UPDATE) {
 			@Override
 			protected boolean work() throws Exception {
-				propagator.update(manual, redundantManual, startFeature, workMonitor);
+				propagator.update(redundantManual, startFeature, workMonitor);
 				return true;
 			}
 		};

@@ -51,6 +51,7 @@ public class Configuration {
 	private final FeatureModel featureModel;
 	private final SelectableFeature root;
 	private final ConfigurationPropagator propagator;
+	private boolean propagate = true;
 
 	/**
 	 * This method creates a clone of the given {@link Configuration}
@@ -60,14 +61,14 @@ public class Configuration {
 		this.featureModel = configuration.featureModel;
 		this.ignoreAbstractFeatures = configuration.ignoreAbstractFeatures;
 		this.propagator = configuration.propagator.clone(this);
-		this.propagator.setPropagate(false);
+		propagate = false;
 		this.root = initRoot();
 		
 		for (SelectableFeature f : configuration.features) {
 			setManual(f.getName(), f.getManual());
 			setAutomatic(f.getName(), f.getAutomatic());
 		}
-		this.propagator.setPropagate(configuration.propagator.isPropagate());
+		this.propagate = configuration.propagate;
 	}
 
 	/**
@@ -80,6 +81,7 @@ public class Configuration {
 		this.featureModel = featureModel;
 		this.ignoreAbstractFeatures = configuration.ignoreAbstractFeatures;
 		this.propagator = new ConfigurationPropagator(this);
+		this.propagate = false;
 		this.root = initRoot();
 		
 		for (SelectableFeature f : configuration.features) {
@@ -89,7 +91,7 @@ public class Configuration {
 			}
 		}
 
-		loadPropagator(configuration.propagator.isPropagate());
+		loadPropagator(configuration.propagate);
 	}
 	
 	public Configuration(FeatureModel featureModel) {
@@ -119,7 +121,7 @@ public class Configuration {
 		this.root = initRoot();
 		
 		if ((options & PARAM_LAZY) != 0) {
-			this.propagator.setPropagate((options & PARAM_PROPAGATE) != 0);
+			this.propagate = (options & PARAM_PROPAGATE) != 0;
 		} else {
 			loadPropagator((options & PARAM_PROPAGATE) != 0);
 		}
@@ -153,8 +155,8 @@ public class Configuration {
 
 	private void loadPropagator(boolean propagate) {
 		this.propagator.load(new WorkMonitor());
-		this.propagator.setPropagate(propagate);
-		this.propagator.update(true, false, null, new WorkMonitor());
+		this.propagate = propagate;
+		update(false, null);
 	}
 	
 	public ConfigurationPropagator getPropagator() {
@@ -246,7 +248,7 @@ public class Configuration {
 	}
 	
 	public boolean isPropagate() {
-		return propagator.isPropagate();
+		return this.propagate;
 	}
 
 	/**
@@ -258,20 +260,12 @@ public class Configuration {
 		return propagator.isValid(new WorkMonitor());
 	}
 	
-//	public ValidConfigJob leadToValidConfiguration(List<SelectableFeature> featureList) {
-//		return propagator.leadToValidConfiguration(featureList);
-//	}
-//	
-//	public ValidConfigJob leadToValidConfiguration(List<SelectableFeature> featureList, int mode) {
-//		return propagator.leadToValidConfiguration(featureList, mode);
-//	}
-	
-	public boolean[] leadToValidConfiguration(List<SelectableFeature> featureList, WorkMonitor workMonitor) {
-		return propagator.leadToValidConfiguration(featureList, new WorkMonitor());
+	public void leadToValidConfiguration(List<SelectableFeature> featureList, WorkMonitor workMonitor) {
+		propagator.leadToValidConfiguration(featureList, new WorkMonitor());
 	}
 	
-	public boolean[] leadToValidConfiguration(List<SelectableFeature> featureList, int mode, WorkMonitor workMonitor) {
-		return propagator.leadToValidConfiguration(featureList, mode, new WorkMonitor());
+	public void leadToValidConfiguration(List<SelectableFeature> featureList, int mode, WorkMonitor workMonitor) {
+		propagator.leadToValidConfiguration(featureList, mode, new WorkMonitor());
 	}
 
 	/**
@@ -279,9 +273,6 @@ public class Configuration {
 	 * @param discardDeselected if {@code true} all automatic deselected features get undefined instead of manual deselected
 	 */
 	public void makeManual(boolean discardDeselected) {
-		if (propagator.isPropagate()) {
-			return;
-		}
 		for (SelectableFeature feature : features) {
 			final Selection autoSelection = feature.getAutomatic();
 			if (autoSelection != Selection.UNDEFINED) {
@@ -316,12 +307,12 @@ public class Configuration {
 			feature.setManual(Selection.UNDEFINED);
 			feature.setAutomatic(Selection.UNDEFINED);
 		}
-		propagator.update(false, false, null, new WorkMonitor());
+		update(false, null);
 	}
 	
 	public void setManual(SelectableFeature feature, Selection selection) {
 		feature.setManual(selection);
-		propagator.update(true, false, null, new WorkMonitor());
+		update(false, null);
 	}
 
 	public void setManual(String name, Selection selection) {
@@ -333,7 +324,7 @@ public class Configuration {
 	}
 	
 	public void setPropagate(boolean propagate) {
-		propagator.setPropagate(propagate);
+		this.propagate = propagate;
 	}
 	
 	@Override
@@ -349,19 +340,13 @@ public class Configuration {
 	}
 	
 	public void update() {
-		propagator.update(false, false, null, new WorkMonitor());
+		update(false, null);
 	}
 	
-	public void update(boolean manual) {
-		propagator.update(manual, false, null, new WorkMonitor());
-	}
-	
-	public void update(boolean manual, boolean redundantManual) {
-		propagator.update(manual, redundantManual, null, new WorkMonitor());
-	}
-	
-	public void update(boolean manual, boolean redundantManual, String startFeatureName) {
-		propagator.update(manual, redundantManual, startFeatureName, new WorkMonitor());
+	public void update(boolean redundantManual, String startFeatureName) {
+		if (propagate) {
+			propagator.update(redundantManual, startFeatureName, new WorkMonitor());
+		}
 	}
 
 	@Override

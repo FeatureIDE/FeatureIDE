@@ -30,6 +30,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
 import de.ovgu.featureide.fm.core.FunctionalInterfaces;
@@ -64,15 +65,7 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage {
 					item.setForeground(gray);
 				}
 			} else {
-				boolean selected = feature.getManual() == Selection.SELECTED;
 				item.setGrayed(false);
-				if (colorFeatureNames.contains(feature.getName())) {
-					item.setForeground(selected ? blue : green);
-					item.setFont(treeItemSpecialFont);
-				} else {
-					item.setForeground(null);
-					item.setFont(treeItemStandardFont);
-				}
 			}
 			return null;
 		}
@@ -88,7 +81,7 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage {
 				if (e.button == 1 || e.button == 3) {
 					TreeItem item = viewer.getTree().getItem(new Point(e.x, e.y));
 					if (item != null) {
-						Object data = item.getData();
+						final Object data = item.getData();
 						if (data instanceof SelectableFeature) {
 							changeSelection(item, e.button == 1);
 						}
@@ -139,16 +132,17 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage {
 		viewer.setInput(configurationEditor.getConfiguration());
 		viewer.expandAll();
 		if (errorMessage(viewer.getTree())) {
-			refreshTree();
+			updateInfoLabel();
+			viewer.refresh();
 		}
 		viewer.getTree().setRedraw(true);
 	}
 	
-	@Override
-	protected void refreshTree() {
-		super.refreshTree();
-		viewer.refresh();
-	}
+//	@Override
+//	protected void refreshTree() {
+//		super.refreshTree();
+//		viewer.refresh();
+//	}
 	
 	@Override
 	protected void refreshItem(TreeItem item, SelectableFeature feature) {
@@ -182,7 +176,6 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage {
 			if (!dirty) {
 				setDirty();
 			}
-			refreshTree();
 		}
 	}
 	
@@ -197,7 +190,12 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage {
 	}
 
 	@Override
-	protected AsyncTree getTree() {
-		return new AsyncTree(viewer.getTree());
+	protected AsyncTree getAsyncTree() {
+		return new AsyncTree(viewer.getTree(), itemMap);
+	}
+
+	@Override
+	protected Tree getTree() {
+		return viewer.getTree();
 	}
 }

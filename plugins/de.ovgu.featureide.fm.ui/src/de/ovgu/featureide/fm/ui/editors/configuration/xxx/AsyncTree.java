@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.configuration.xxx;
 
+import java.util.HashMap;
+
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
@@ -66,9 +68,11 @@ public class AsyncTree {
 //	private static final String JOB_NAME_TRAVERSE_TREE = "Traversing tree...";
 
 	private Tree tree;
+	private final HashMap<SelectableFeature, TreeItem> itemMap;
 
-	public AsyncTree(Tree tree) {
+	public AsyncTree(Tree tree, HashMap<SelectableFeature, TreeItem> itemMap) {
 		this.tree = tree;
+		this.itemMap = itemMap;
 	}
 
 	public Tree getTree() {
@@ -127,6 +131,7 @@ public class AsyncTree {
 					final TreeItem childNode = new TreeItem(parent, 0);
 					childNode.setText(currentFeature.getFeature().getDisplayName());
 					childNode.setData(currentFeature);
+					itemMap.put(currentFeature, childNode);
 					if (currentFeature.hasChildren()) {
 						doBuildingAsync(childNode, currentFeature.getChildren(), threadCounter, currentDisplay);
 					}

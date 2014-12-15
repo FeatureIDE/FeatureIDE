@@ -108,6 +108,8 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	private int currentPageIndex = -1;
 
 	private boolean closeEditor;
+	
+	private boolean autoSelectFeatures = false;
 
 	/**
 	 * The file of the corresponding feature model.
@@ -214,7 +216,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 
 		readFeatureModel();
 		
-		configuration = new Configuration(featureModel, Configuration.PARAM_IGNOREABSTRACT | Configuration.PARAM_LAZY | Configuration.PARAM_PROPAGATE);
+		configuration = new Configuration(featureModel, Configuration.PARAM_IGNOREABSTRACT | Configuration.PARAM_LAZY);
 		try {
 			ConfigurationReader reader = new ConfigurationReader(configuration);
 			if (!internalFile.exists() || !reader.readFromFile(internalFile)) {
@@ -224,13 +226,21 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 			FMCorePlugin.getDefault().logError(e);
 		}
 		
-		IConfigJob<?> configJob = configuration.getPropagator().getJobWrapper().load();
-		configJobManager.startJob(configJob, new JobFinishListener() {
+		final Display currentDisplay = Display.getCurrent();
+		final IConfigJob<?> configJob = configuration.getPropagator().getJobWrapper().load();
+		configJob.addJobFinishedListener(new JobFinishListener() {
 			@Override
 			public void jobFinished(IJob finishedJob, boolean success) {
-				// TODO ...
+				autoSelectFeatures = true;
+				currentDisplay.asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						getPage(getActivePage()).propertyChange(new PropertyChangeEvent(ConfigurationEditor.this, "InitialLoad", null, null));
+					}
+				});
 			}
-		}, null);
+		});
+		configJobManager.startJob(configJob);
 		
 		setPartName(file.getName());
 		featureModel.addListener(this);
@@ -539,5 +549,13 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 
 	public ConfigJobManager getConfigJobManager() {
 		return configJobManager;
+	}
+	
+	public boolean isAutoSelectFeatures() {
+		return autoSelectFeatures;
+	}
+	
+	public void setAutoSelectFeatures(boolean autoSelectFeatures) {
+		this.autoSelectFeatures = autoSelectFeatures;
 	}
 }

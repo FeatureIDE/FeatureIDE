@@ -86,7 +86,6 @@ public class ConfigurationPropagator {
 	
 	private Node rootNode = null, rootNodeWithoutHidden = null;
 	private final Configuration configuration;
-	private boolean propagate = true;
 
 	/**
 	 * This method creates a clone of the given {@link ConfigurationPropagator}
@@ -100,7 +99,6 @@ public class ConfigurationPropagator {
 		this.configuration = configuration;
 		this.rootNode = propagator.rootNode.clone();
 		this.rootNodeWithoutHidden = propagator.rootNodeWithoutHidden.clone();
-		this.propagate = propagator.propagate;
 	}
 	
 	ConfigurationPropagator(ConfigurationPropagator propagator) {
@@ -109,14 +107,6 @@ public class ConfigurationPropagator {
 	
 	public ConfigurationPropagatorJobWrapper getJobWrapper() {
 		return jobWrapper;
-	}
-	
-	public boolean isPropagate() {
-		return propagate;
-	}
-
-	public void setPropagate(boolean propagate) {
-		this.propagate = propagate;
 	}
 
 	public void load(WorkMonitor workMonitor) {
@@ -185,7 +175,8 @@ public class ConfigurationPropagator {
 		final List<Node> children = new ArrayList<Node>();
 		
 		for (SelectableFeature feature : configuration.features) {
-			if (feature.getSelection() != Selection.UNDEFINED) {
+			if (feature.getSelection() != Selection.UNDEFINED
+					&& (configuration.ignoreAbstractFeatures || feature.getFeature().isConcrete())) {
 				children.add(new Literal(feature.getFeature().getName(), feature.getSelection() == Selection.SELECTED));
 			}
 		}
@@ -202,64 +193,35 @@ public class ConfigurationPropagator {
 		return false;
 	}
 	
-//	public ValidConfigJob leadToValidConfiguration(List<SelectableFeature> featureList, WorkMonitor workMonitor) {
-//		if (Preferences.defaultCompletion == Preferences.COMPLETION_ONE_CLICK && featureList.size() > FEATURE_LIMIT_FOR_DEFAULT_COMPLETION) {
-//			return leadToValidConfiguration(featureList, Preferences.COMPLETION_OPEN_CLAUSES);
-//		}
-//		return leadToValidConfiguration(featureList, Preferences.defaultCompletion);
-//	}
-//	
-//	public ValidConfigJob leadToValidConfiguration(List<SelectableFeature> featureList, int mode, WorkMonitor workMonitor) {
-//		switch (mode) {
-//			case Preferences.COMPLETION_ONE_CLICK:
-//				return new ValidConfigJob1(featureList);
-//			case Preferences.COMPLETION_OPEN_CLAUSES:
-//				return new ValidConfigJob2(featureList);
-//			case Preferences.COMPLETION_NONE:
-//			default:
-//				return null;
-//		}
-//	}
-	
-	public boolean[] leadToValidConfiguration(List<SelectableFeature> featureList, WorkMonitor workMonitor) {
+	public void leadToValidConfiguration(List<SelectableFeature> featureList, WorkMonitor workMonitor) {
 		if (Preferences.defaultCompletion == Preferences.COMPLETION_ONE_CLICK && featureList.size() > FEATURE_LIMIT_FOR_DEFAULT_COMPLETION) {
-			return leadToValidConfiguration(featureList, Preferences.COMPLETION_OPEN_CLAUSES, workMonitor);
+			leadToValidConfiguration(featureList, Preferences.COMPLETION_OPEN_CLAUSES, workMonitor);
+		} else {
+			leadToValidConfiguration(featureList, Preferences.defaultCompletion, workMonitor);
 		}
-		return leadToValidConfiguration(featureList, Preferences.defaultCompletion, workMonitor);
 	}
 	
-	public boolean[] leadToValidConfiguration(List<SelectableFeature> featureList, int mode, WorkMonitor workMonitor) {
+	public void leadToValidConfiguration(List<SelectableFeature> featureList, int mode, WorkMonitor workMonitor) {
+		for (SelectableFeature feature : configuration.features) {
+			feature.setRecommended(Selection.UNDEFINED);
+		}
 		switch (mode) {
 			case Preferences.COMPLETION_ONE_CLICK:
-				return leadToValidConfig1(featureList, workMonitor);
+				leadToValidConfig1(featureList, workMonitor);
+				break;
 			case Preferences.COMPLETION_OPEN_CLAUSES:
-				return leadToValidConfig2(featureList, workMonitor);
+				leadToValidConfig2(featureList, workMonitor);
+				break;
 			case Preferences.COMPLETION_NONE:
 			default:
-				return null;
 		}
 	}
 	
-//	public abstract class ValidConfigJob extends AStoppableJob {
-//		protected final boolean[] results;
-//		protected final List<SelectableFeature> featureList;
-//		
-//		public ValidConfigJob(List<SelectableFeature> featureList) {
-//			super("Configuration coloring");
-//			results = new boolean[featureList.size()];
-//			this.featureList = featureList;
-//		}
-//		
-//		public boolean[] getResults() {
-//			return results;
-//		}
-//	}
-	
-	private boolean[] leadToValidConfig1(List<SelectableFeature> featureList, WorkMonitor workMonitor) {
-		final boolean[] results = new boolean[featureList.size()];
+	private void leadToValidConfig1(List<SelectableFeature> featureList, WorkMonitor workMonitor) {
 		if (rootNode == null) {
-			return results;
+			return;
 		}
+		workMonitor.setMaxAbsoluteWork(featureList.size() + 1);
 		final Map<String, Literal> featureMap = new HashMap<String, Literal>(configuration.features.size() << 1);
 		final Map<String, Integer> featureToIndexMap = new HashMap<String, Integer>(featureList.size() << 1);
 		
@@ -272,7 +234,7 @@ public class ConfigurationPropagator {
 			}
 		}
 		if (workMonitor.checkCancel()) {
-			return results;
+			return;
 		}
 
 		final Literal[] literals = new Literal[featureList.size()];
@@ -294,12 +256,13 @@ public class ConfigurationPropagator {
 		final SatSolver solver = new SatSolver(new And(formula), TIMEOUT);
 		
 		final boolean[] changedLiterals = new boolean[literals.length];
-		
-		for (int j = 0; j < literals.length; j++) {
+		int j = 0;
+		workMonitor.worked();
+		for (SelectableFeature feature : featureList) {
 			if (workMonitor.checkCancel()) {
-				return results;
+				return;
 			}
-			final Literal l = literals[j].clone();
+			final Literal l = literals[j++].clone();
 			l.positive = !l.positive;
 			
 			final List<Literal> knownValues = solver.knownValues(l);
@@ -312,12 +275,13 @@ public class ConfigurationPropagator {
 					knownL.positive = literal.positive;
 				}
 			}
-			
+
+			boolean result;
 			try {
-				results[j] = solver.isSatisfiable(literals);
+				result = solver.isSatisfiable(literals);
 			} catch (TimeoutException e) {
 				FMCorePlugin.getDefault().logError(e);
-				results[j] = false;
+				result = false;
 			}
 			
 			for (int k = 0; k < literals.length; k++) {
@@ -325,15 +289,28 @@ public class ConfigurationPropagator {
 				knownL.positive = changedLiterals[k] ^ knownL.positive;
 				changedLiterals[k] = false;
 			}
+			
+			if (result) {
+				switch (feature.getManual()) {
+				case SELECTED:
+					feature.setRecommended(Selection.UNSELECTED); break;
+				case UNSELECTED:
+				case UNDEFINED:
+					feature.setRecommended(Selection.SELECTED);
+				}
+			} else {
+				feature.setRecommended(Selection.UNDEFINED);
+			}
+			
+			workMonitor.invoke(feature);
+			workMonitor.worked();
 		}
-
-		return results;
 	}
 	
-	private boolean[] leadToValidConfig2(List<SelectableFeature> featureList, WorkMonitor workMonitor) {
+	private void leadToValidConfig2(List<SelectableFeature> featureList, WorkMonitor workMonitor) {
 		final boolean[] results = new boolean[featureList.size()];
 		if (rootNode == null) {
-			return results;
+			return;
 		}
 		final Map<String, Boolean> featureMap = new HashMap<String, Boolean>(configuration.features.size() << 1);
 		
@@ -343,15 +320,20 @@ public class ConfigurationPropagator {
 				featureMap.put(feature.getName(), selectableFeature.getSelection() == Selection.SELECTED);
 			}
 		}
+		for (SelectableFeature selectableFeature : featureList) {
+			selectableFeature.setRecommended(Selection.UNSELECTED);
+		}
+		
 		if (workMonitor.checkCancel()) {
-			return results;
+			return;
 		}
 		
 		final Node[] clauses = rootNodeWithoutHidden.getChildren();
 		final HashMap<Object, Literal> literalMap = new HashMap<Object, Literal>();
+		workMonitor.setMaxAbsoluteWork(clauses.length);
 		for (int i = 0; i < clauses.length; i++) {
 			if (workMonitor.checkCancel()) {
-				return results;
+				return;
 			}
 			final Node clause = clauses[i];
 			literalMap.clear();
@@ -377,31 +359,30 @@ public class ConfigurationPropagator {
 			if (!satisfied) {
 				int c = 0;
 				for (SelectableFeature selectableFeature : featureList) {
-					if (literalMap.containsKey(selectableFeature.getFeature().getName())) {
+					if (literalMap.containsKey(selectableFeature.getFeature().getName()) && !results[c]) {
 						results[c] = true;
+						
+						switch (selectableFeature.getManual()) {
+							case SELECTED:
+								selectableFeature.setRecommended(Selection.UNSELECTED); break;
+							case UNSELECTED:
+							case UNDEFINED:
+								selectableFeature.setRecommended(Selection.SELECTED);
+						}
+						
+						workMonitor.invoke(selectableFeature);
 					}
 					c++;
 				}
 			}
+			workMonitor.worked();
 		}
-		
-		return results;
 	}
-	
-	
-//	/**
-//	 * Convenience method.
-//	 * @return the values of number(250)
-//	 * @see #number(long)
-//	 */
-//	public long number() {
-//		return number(250);
-//	}
 	
 	/**
 	 * Counts the number of possible solutions.
 	 * @return a positive value equal to the number of solutions (if the method terminated in time)</br>
-	 * 	or a negative value (if a timeout occured) that indicates that there are more solutions than the absolute value
+	 * 	or a negative value (if a timeout occurred) that indicates that there are more solutions than the absolute value
 	 */
 	public long number(long timeout, WorkMonitor workMonitor) {
 		if (rootNode == null) {
@@ -453,17 +434,17 @@ public class ConfigurationPropagator {
 		return resultSet;
 	}
 	
-	public void update(boolean manual, boolean redundantManual, String startFeatureName, WorkMonitor workMonitor) {
-		if (!propagate || rootNode == null) {
+	public void update(boolean redundantManual, String startFeatureName, WorkMonitor workMonitor) {
+		if (rootNode == null) {
 			return;
 		}
 		workMonitor.setMaxAbsoluteWork(configuration.features.size() + 1);
 		
 		configuration.resetAutomaticValues();
 		
-		final SatSolver manualSolver = (manual || redundantManual) ? new SatSolver(rootNode, ConfigurationPropagator.TIMEOUT) : null;
+		final SatSolver manualSolver = new SatSolver(rootNode, ConfigurationPropagator.TIMEOUT);
 		
-		List<Node> manualSelected = new ArrayList<Node>();
+		final List<Node> manualSelected = (redundantManual) ? new LinkedList<Node>() : new ArrayList<Node>();
 		for (SelectableFeature feature : configuration.features) {
 			switch (feature.getManual()) {
 				case SELECTED: manualSelected.add(new Literal(feature.getFeature().getName(), true)); break;
@@ -474,15 +455,23 @@ public class ConfigurationPropagator {
 		
 		workMonitor.worked();
 		
+		final HashMap<SelectableFeature, Selection> possibleRedundantManual = new HashMap<SelectableFeature, Selection>();
+		
 		if (redundantManual) {
-			updateManualFeatures(manualSolver, manualSelected, workMonitor);
-
-			manualSelected = new ArrayList<Node>();
-			for (SelectableFeature feature : configuration.features) {
-				switch (feature.getManual()) {
-					case SELECTED: manualSelected.add(new Literal(feature.getFeature().getName(), true)); break;
-					case UNSELECTED: manualSelected.add(new Literal(feature.getFeature().getName(), false)); break;
-					default:
+			for (Iterator<Node> iterator = manualSelected.iterator(); iterator.hasNext();) {
+				final Literal l = (Literal) iterator.next();
+				try {
+					l.positive = !l.positive;
+					if (!manualSolver.isSatisfiable(manualSelected)) {
+						final SelectableFeature feature = configuration.table.get(l.var);
+						possibleRedundantManual.put(feature, feature.getManual());
+						feature.setManual(Selection.UNDEFINED);
+						iterator.remove();
+					}
+				} catch (TimeoutException e) {
+					FMCorePlugin.getDefault().logError(e);
+				} finally {
+					l.positive = !l.positive;
 				}
 			}
 		}
@@ -504,37 +493,17 @@ public class ConfigurationPropagator {
 			}
 		}
 		
-		if (index > -1) {
-			updateAllFeatures(automaticSolver, it, workMonitor);
-			updateAllFeatures(automaticSolver, configuration.features.subList(0, index).iterator(), workMonitor);
+		if (index > 0) {
+			updateAllFeatures(automaticSolver, it, workMonitor, manualSelected, manualSolver, possibleRedundantManual);
+			updateAllFeatures(automaticSolver, configuration.features.subList(0, index).iterator(), workMonitor, manualSelected, manualSolver, possibleRedundantManual);
 		} else {
-			updateAllFeatures(automaticSolver, configuration.features.iterator(), workMonitor);
-		}
-		
-		if (manual) {
-			updateManualFeatures(manualSolver, manualSelected, workMonitor);
+			updateAllFeatures(automaticSolver, configuration.features.iterator(), workMonitor, manualSelected, manualSolver, possibleRedundantManual);
 		}
 	}
 
-	private void updateManualFeatures(final SatSolver manualSolver, List<Node> manualSelected, WorkMonitor workMonitor) {
+	private void updateAllFeatures(final SatSolver automaticSolver, Iterator<SelectableFeature> it, WorkMonitor workMonitor, List<Node> manualSelected, SatSolver manualSolver, HashMap<SelectableFeature, Selection> possibleRedundantManual) {
 		final Node[] manualSelectedArray = createNodeArray(manualSelected);
-		for (int i = 0; i < manualSelectedArray.length; i++) {
-			Literal l = (Literal) manualSelectedArray[i];
-			try {
-				l.positive = !l.positive;
-				if (!manualSolver.isSatisfiable(manualSelectedArray)) {
-					SelectableFeature feature = configuration.table.get(l.var);
-					feature.setManual(Selection.UNDEFINED);
-				}
-				l.positive = !l.positive;
-			} catch (TimeoutException e) {
-				e.printStackTrace();
-			}
-			workMonitor.invoke(null);
-		}
-	}
-
-	private void updateAllFeatures(final SatSolver automaticSolver, Iterator<SelectableFeature> it, WorkMonitor workMonitor) {
+		int i = 0;
 		while (it.hasNext()) {
 			final SelectableFeature feature = it.next();
 			if (feature.getManual() == Selection.UNDEFINED) {
@@ -548,10 +517,29 @@ public class ConfigurationPropagator {
 							feature.setAutomatic(Selection.SELECTED);
 						} else {
 							feature.setAutomatic(Selection.UNDEFINED);
+							Selection manualSelection = possibleRedundantManual.get(feature);
+							if (manualSelection != null) {
+								feature.setManual(manualSelection);
+							}
 						}
 					}
 				} catch (TimeoutException e) {
-					e.printStackTrace();
+					FMCorePlugin.getDefault().logError(e);
+				}
+			} else {
+				Literal l = (Literal) manualSelectedArray[i++];
+				while (!feature.getFeature().getName().equals(l.var)) {
+					l = (Literal) manualSelectedArray[i++];
+				}
+				try {
+					l.positive = !l.positive;
+					if (!manualSolver.isSatisfiable(manualSelectedArray)) {
+						feature.setAutomatic(l.positive ? Selection.UNSELECTED : Selection.SELECTED);
+					}
+				} catch (TimeoutException e) {
+					FMCorePlugin.getDefault().logError(e);
+				} finally {
+					l.positive = !l.positive;
 				}
 			}
 			workMonitor.invoke(feature);

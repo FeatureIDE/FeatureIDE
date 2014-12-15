@@ -62,7 +62,7 @@ public class ConfigurationPage extends ConfigurationTreeEditorPage {
 					item.setForeground(null);
 					item.setChecked(true);
 				} else {
-					item.setGrayed(false);
+					item.setGrayed(true);
 					item.setForeground(gray);
 					item.setChecked(false);
 				}
@@ -70,19 +70,10 @@ public class ConfigurationPage extends ConfigurationTreeEditorPage {
 				boolean selected = feature.getManual() == Selection.SELECTED;
 				item.setGrayed(false);
 				item.setChecked(selected);
-				if (colorFeatureNames.contains(feature.getName())) {
-					item.setForeground(selected ? blue : green);
-					item.setFont(treeItemSpecialFont);
-				} else {
-					item.setForeground(null);
-					item.setFont(treeItemStandardFont);
-				}
 			}
 			return null;
 		}
 	};
-
-	private boolean selectionCanChange = true;
 
 	private Tree tree;
 
@@ -91,15 +82,7 @@ public class ConfigurationPage extends ConfigurationTreeEditorPage {
 	}
 
 	private void buildTree(final TreeItem node, final TreeElement[] children, final FunctionalInterfaces.IFunction<Void, Void> callbackIfDone) {
-		new AsyncTree(tree).build(node, children, callbackIfDone);
-	}
-
-	@Override
-	protected boolean changeSelection(TreeItem item, boolean select) {
-		selectionCanChange = false;
-		final boolean result = super.changeSelection(item, select);
-		selectionCanChange = true;
-		return result;
+		getAsyncTree().build(node, children, callbackIfDone);
 	}
 
 	protected void createUITree(Composite parent) {
@@ -113,14 +96,11 @@ public class ConfigurationPage extends ConfigurationTreeEditorPage {
 			public void widgetSelected(SelectionEvent event) {
 				if (event.detail == SWT.CHECK) {
 					final TreeItem item = (TreeItem) event.item;
-					if (item.getGrayed()) {
-						// case: grayed and selected
-						item.setChecked(true);
-					} else if (item.getForeground().equals(gray)) {
-						// case: grayed and unselected
-						item.setChecked(false);
-					} else if (selectionCanChange) {
-						changeSelection(item);
+					SelectableFeature feature = (SelectableFeature)item.getData();
+					switch (feature.getAutomatic()) {
+						case SELECTED: item.setChecked(true); break;
+						case UNSELECTED: item.setChecked(false); break;
+						case UNDEFINED: changeSelection(item, true); break;
 					}
 				}
 			}
@@ -174,12 +154,13 @@ public class ConfigurationPage extends ConfigurationTreeEditorPage {
 		}
 
 		configuration.setPropagate(oldPropagate);
-		configuration.update(true);
+		configuration.update();
 		super.pageChangeTo(index);
 	}
 
 	@Override
 	protected void updateTree() {
+		itemMap.clear();
 		if (errorMessage(tree)) {
 			final Configuration configuration = configurationEditor.getConfiguration();
 			tree.removeAll();
@@ -188,11 +169,13 @@ public class ConfigurationPage extends ConfigurationTreeEditorPage {
 			root.setData(configuration.getRoot());
 			root.setChecked(true);
 			root.setGrayed(true);
+			itemMap.put(configuration.getRoot(), root);
 
 			buildTree(root, configuration.getRoot().getChildren(), new FunctionalInterfaces.IFunction<Void, Void>() {
 				@Override
 				public Void invoke(Void t) {
-					refreshTree();
+					updateInfoLabel();
+					computeTree(false);
 					return null;
 				}
 			});
@@ -200,7 +183,12 @@ public class ConfigurationPage extends ConfigurationTreeEditorPage {
 	}
 
 	@Override
-	protected AsyncTree getTree() {
-		return new AsyncTree(tree);
+	protected AsyncTree getAsyncTree() {
+		return new AsyncTree(tree, itemMap);
+	}
+
+	@Override
+	protected Tree getTree() {
+		return tree;
 	}
 }

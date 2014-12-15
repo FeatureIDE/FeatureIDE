@@ -28,10 +28,16 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 
 
 public interface IConfigurationEditor {
-	public Configuration getConfiguration();
+	Configuration getConfiguration();
 
-	public IFile getFile();
+	IFile getFile();
 
-	public File getModelFile();
+	File getModelFile();
+	
+	ConfigJobManager getConfigJobManager();
+	
+	boolean isAutoSelectFeatures();
+	
+	void setAutoSelectFeatures(boolean autoSelectFeatures);
 
 }

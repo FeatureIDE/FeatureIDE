@@ -22,24 +22,13 @@ package de.ovgu.featureide.fm.ui.editors.configuration;
 
 import java.util.HashMap;
 
-import de.ovgu.featureide.fm.core.FunctionalInterfaces.IFunction;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagatorJobWrapper.IConfigJob;
-import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
  * Starts and cancels the job for configuration coloring.
  * 
  * @author Sebastian Krieter
- * 
- * Core
- * Min Variant
- * 
- * TEst
- * 
- * §. Pseudo Aufgabe
- * 
- * Eingührungs aufgabbe (Hello World)
  */
 public class ConfigJobManager {
 	private class JobEntry {
@@ -54,9 +43,10 @@ public class ConfigJobManager {
 	
 	private final HashMap<Integer, JobEntry> jobMap = new HashMap<Integer, JobEntry>();
 	
-	public synchronized void startJob(final IConfigJob<?> job, final JobFinishListener l, IFunction<Object, Void> intermediateFunction) {
-		job.addJobFinishedListener(l);
-		job.setIntermediateFunction(intermediateFunction);
+	public synchronized void startJob(final IConfigJob<?> job) {
+		if (job == null) {
+			return;
+		}
 		job.setCancelingTimeout(100);
 		final JobEntry currentEntry = jobMap.get(job.getID());
 		if (currentEntry != null) {
