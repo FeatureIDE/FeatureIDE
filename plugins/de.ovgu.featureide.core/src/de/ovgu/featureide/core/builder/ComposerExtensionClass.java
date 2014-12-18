@@ -63,11 +63,10 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	protected static final String JAVA_NATURE = "org.eclipse.jdt.core.javanature";
 	public static final IPath JRE_CONTAINER = new Path("org.eclipse.jdt.launching.JRE_CONTAINER");
 	protected IFeatureProject featureProject = null;
-	
+
 	public static final String NEWLINE = System.getProperty("line.separator", "\n");
-	private boolean initialized = false; 
+	private boolean initialized = false;
 	private IComposerExtension composerExtensionProxy;
-	
 
 	public String getName() {
 		return composerExtensionProxy.getName();
@@ -85,14 +84,12 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 		this.composerExtensionProxy = composerExtensionProxy;
 	}
 
-	protected final static String[] JAVA_TEMPLATE = new String[]{"Java", "java", PACKAGE_PATTERN + "/**" + NEWLINE 
-		+ " * TODO description" + NEWLINE 
-		+ " */" + NEWLINE 
-		+ "public class " + CLASS_NAME_PATTERN +" {" + NEWLINE + NEWLINE + "}"};
-	
+	protected final static String[] JAVA_TEMPLATE = new String[] { "Java", "java",
+			PACKAGE_PATTERN + "/**" + NEWLINE + " * TODO description" + NEWLINE + " */" + NEWLINE + "public class " + CLASS_NAME_PATTERN + " {" + NEWLINE + NEWLINE + "}" };
+
 	public boolean initialize(IFeatureProject project) {
 		assert (project != null) : "Invalid project given";
-		featureProject = project;		
+		featureProject = project;
 		return initialized = true;
 	}
 
@@ -115,7 +112,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 			if (destination == null) {
 				destination = featureProject.getBuildFolder();
 			}
-			
+
 			for (Feature feature : selectedFeatures) {
 				IFolder folder = featureProject.getSourceFolder().getFolder(feature.getName());
 				try {
@@ -129,19 +126,19 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 			}
 		}
 	}
-	
+
 	protected void copy(IFolder featureFolder, IFolder buildFolder) throws CoreException {
 		if (!featureFolder.exists()) {
 			return;
 		}
-		
+
 		for (IResource res : featureFolder.members()) {
 			if (res instanceof IFolder) {
 				IFolder folder = buildFolder.getFolder(res.getName());
 				if (!folder.exists()) {
 					folder.create(false, true, null);
 				}
-				copy((IFolder)res, folder);
+				copy((IFolder) res, folder);
 			} else if (res instanceof IFile) {
 				if (!extensions().contains(res.getFileExtension())) {
 					IFile file = buildFolder.getFile(res.getName());
@@ -151,7 +148,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 				}
 			}
 		}
-	}	
+	}
 
 	public LinkedHashSet<String> extensions() {
 		return new LinkedHashSet<String>(0);
@@ -161,12 +158,11 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 		return false;
 	}
 
-	public void addCompiler(IProject project, String sourcePath,
-			String configPath, String buildPath) {
+	public void addCompiler(IProject project, String sourcePath, String configPath, String buildPath) {
 		addNature(project);
 		addClasspathFile(project, buildPath);
 	}
-	
+
 	private void addClasspathFile(IProject project, String buildPath) {
 		try {
 			JavaProject javaProject = new JavaProject(project, null);
@@ -177,8 +173,10 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 			for (int i = 0; i < oldEntries.length; i++) {
 				if (!sourceAdded && oldEntries[i].getEntryKind() == IClasspathEntry.CPE_SOURCE) {
 					/** correct the source entry **/
-					// XXX the source entry should be equivalent to the build path, 
-					// but e.g. at FeatureHouse the real build path is src/config -> Builder problems
+					// XXX the source entry should be equivalent to the build
+					// path,
+					// but e.g. at FeatureHouse the real build path is
+					// src/config -> Builder problems
 					// -> is it necessary to correct the path?
 					if (oldEntries[i].getPath().toString().equals("/" + project.getName())) {
 						/** necessary after creating a new FeatureIDE project **/
@@ -198,11 +196,11 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 				javaProject.setRawClasspath(oldEntries, null);
 				return;
 			}
-			
+
 			/** add the new entries **/
 			IClasspathEntry[] entries = new IClasspathEntry[(sourceAdded ? 0 : 1) + (containerAdded ? 0 : 1) + oldEntries.length];
 			System.arraycopy(oldEntries, 0, entries, 0, oldEntries.length);
-			
+
 			if (!sourceAdded) {
 				entries[oldEntries.length] = getSourceEntry(buildPath);
 			}
@@ -210,43 +208,41 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 				int position = (sourceAdded ? 0 : 1) + oldEntries.length;
 				entries[position] = getContainerEntry();
 			}
-			
+
 			javaProject.setRawClasspath(entries, null);
 		} catch (JavaModelException e) {
 			CorePlugin.getDefault().logError(e);
-		}		
+		}
 	}
 
 	/**
 	 * Set the source path of the given <code>ClasspathEntry</code>
-	 * @param buildPath The new build path
-	 * @param e The entry to set
+	 * 
+	 * @param buildPath
+	 *            The new build path
+	 * @param e
+	 *            The entry to set
 	 * @return The entry with the new source path
 	 */
 	public IClasspathEntry setSourceEntry(String buildPath, IClasspathEntry e) {
-		return new ClasspathEntry(e.getContentKind(), e.getEntryKind(), 
-				new Path(buildPath), e.getInclusionPatterns(), e.getExclusionPatterns(), 
-				e.getSourceAttachmentPath(), e.getSourceAttachmentRootPath(), null, 
-				e.isExported(), e.getAccessRules(), e.combineAccessRules(), e.getExtraAttributes());
+		return new ClasspathEntry(e.getContentKind(), e.getEntryKind(), new Path(buildPath), e.getInclusionPatterns(), e.getExclusionPatterns(), e.getSourceAttachmentPath(), e.getSourceAttachmentRootPath(), null, e.isExported(),
+				e.getAccessRules(), e.combineAccessRules(), e.getExtraAttributes());
 	}
 
 	/**
 	 * @return A default JRE container entry
 	 */
 	public IClasspathEntry getContainerEntry() {
-		return new ClasspathEntry(IPackageFragmentRoot.K_SOURCE, 
-				IClasspathEntry.CPE_CONTAINER, JRE_CONTAINER, 
-				new IPath[0], new IPath[0], null, null, null, false, null, false, new IClasspathAttribute[0]);
+		return new ClasspathEntry(IPackageFragmentRoot.K_SOURCE, IClasspathEntry.CPE_CONTAINER, JRE_CONTAINER, new IPath[0], new IPath[0], null, null, null, false, null, false, new IClasspathAttribute[0]);
 	}
 
 	/**
-	 * @param path The source path
+	 * @param path
+	 *            The source path
 	 * @return A default source entry with the given path
 	 */
 	public IClasspathEntry getSourceEntry(String path) {
-		return new ClasspathEntry(IPackageFragmentRoot.K_SOURCE, 
-				IClasspathEntry.CPE_SOURCE, new Path(path), new IPath[0], new IPath[0], 
-				null, null, null, false, null, false, new IClasspathAttribute[0]);
+		return new ClasspathEntry(IPackageFragmentRoot.K_SOURCE, IClasspathEntry.CPE_SOURCE, new Path(path), new IPath[0], new IPath[0], null, null, null, false, null, false, new IClasspathAttribute[0]);
 	}
 
 	private void addNature(IProject project) {
@@ -261,21 +257,21 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 			newNatures[natures.length] = JAVA_NATURE;
 			description.setNatureIds(newNatures);
 			project.setDescription(description, null);
-			
+
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
 	}
 
 	public void buildFSTModel() {
-		
+
 	}
 
 	public ArrayList<String[]> getTemplates() {
 		return null;
 	}
 
-	public String replaceSourceContentMarker(String fileContent,  boolean refines, String packageName) {
+	public String replaceSourceContentMarker(String fileContent, boolean refines, String packageName) {
 		if (packageName.isEmpty()) {
 			return fileContent.replace(PACKAGE_PATTERN, "");
 		} else {
@@ -283,10 +279,9 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 		}
 	}
 
-	@SuppressWarnings("deprecation")
 	public void postCompile(IResourceDelta delta, IFile buildFile) {
 		try {
-			buildFile.setDerived(true);
+			buildFile.setDerived(true, null);
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
@@ -295,7 +290,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	public int getDefaultTemplateIndex() {
 		return 0;
 	}
-	
+
 	public boolean refines() {
 		return false;
 	}
@@ -303,7 +298,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	public void postModelChanged() {
 
 	}
-	
+
 	public boolean hasFeatureFolder() {
 		return true;
 	}
@@ -315,7 +310,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	public String getConfigurationExtension() {
 		return CorePlugin.getDefault().getConfigurationExtensions().getFirst();
 	}
-	
+
 	public void buildConfiguration(IFolder folder, Configuration configuration, String configurationName) {
 		try {
 			if (!folder.exists()) {
@@ -329,23 +324,23 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 			CorePlugin.getDefault().logError(e);
 		}
 	}
-	
+
 	public boolean preBuildConfiguration() {
 		return true;
 	}
-	
+
 	public boolean hasSourceFolder() {
 		return true;
 	}
 
 	public boolean canGeneratInParallelJobs() {
-		return true; 
+		return true;
 	}
-	
+
 	public boolean showContextFieldsAndMethods() {
 		return true;
 	}
-	
+
 	public LinkedList<FSTDirective> buildModelDirectivesForFile(Vector<String> lines) {
 		return null;
 	}
@@ -353,47 +348,45 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	public boolean needColor() {
 		return false;
 	}
-	
+
 	public boolean hasContractComposition() {
 		return false;
 	}
-	
+
 	public boolean hasMetaProductGeneration() {
 		return false;
 	}
-	
+
 	public boolean hasCompositionMechanisms() {
 		return false;
 	}
-	
+
 	public boolean createFolderForFeatures() {
 		return true;
 	}
-	
+
 	public boolean supportsAndroid() {
 		return false;
 	}
-	
+
 	protected boolean isPluginInstalled(String ID) {
-		for (Bundle b :InternalPlatform.getDefault().getBundleContext().getBundles()) {
+		for (Bundle b : InternalPlatform.getDefault().getBundleContext().getBundles()) {
 			if (b.getSymbolicName().startsWith(ID)) {
 				return true;
 			}
 		}
 		return false;
 	}
-	
+
 	protected void generateWarning(String Warning) {
-		this.featureProject.createBuilderMarker(featureProject
-				.getProject(), Warning, 0, IMarker.SEVERITY_WARNING);
+		this.featureProject.createBuilderMarker(featureProject.getProject(), Warning, 0, IMarker.SEVERITY_WARNING);
 	}
-	
+
 	/**
 	 * Not supported until you implement it.
 	 */
 	@Override
-	public boolean supportsMigration()
-	{
+	public boolean supportsMigration() {
 		return false;
 	}
 

@@ -23,6 +23,7 @@ package de.ovgu.featureide.core.featuremodeling;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.core.CorePlugin;
@@ -39,20 +40,19 @@ import de.ovgu.featureide.fm.core.configuration.ConfigurationWriter;
 public class FeatureModeling extends ComposerExtensionClass {
 
 	public void performFullBuild(IFile config) {
-		
+
 	}
 
 	@Override
-	public void addCompiler(IProject project, String sourcePath,
-			String configPath, String buildPath) {
+	public void addCompiler(IProject project, String sourcePath, String configPath, String buildPath) {
 
 	}
-	
+
 	@Override
 	public boolean hasFeatureFolder() {
 		return false;
 	}
-	
+
 	@Override
 	public boolean hasSourceFolder() {
 		return false;
@@ -65,11 +65,11 @@ public class FeatureModeling extends ComposerExtensionClass {
 
 	@Override
 	public void copyNotComposedFiles(Configuration config, IFolder destination) {
-	
+
 	}
 
 	public Mechanism getGenerationMechanism() {
-	    return null;
+		return null;
 	}
 
 	@Override
@@ -88,12 +88,18 @@ public class FeatureModeling extends ComposerExtensionClass {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionBase#supportsMigration()
-	 */
 	@Override
-	public boolean supportsMigration()
-	{
+	public boolean supportsMigration() {
 		return false;
+	}
+
+	@Override
+	public boolean createFolderForFeatures() {
+		return false;
+	}
+
+	@Override
+	public void postCompile(IResourceDelta delta, IFile buildFile) {
+
 	}
 }
