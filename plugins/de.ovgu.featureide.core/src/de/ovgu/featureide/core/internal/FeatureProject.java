@@ -63,6 +63,7 @@ import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.core.builder.ComposerExtensionManager;
 import de.ovgu.featureide.core.builder.ExtensibleFeatureProjectBuilder;
 import de.ovgu.featureide.core.builder.FeatureProjectNature;
+import de.ovgu.featureide.core.builder.IComposerExtension;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
@@ -153,6 +154,14 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	private final FeatureModelFile modelFile;
 
 	private IComposerExtensionClass composerExtension = null;
+	
+	//TODO: Impelement possibility to change this path
+	private final String featureStubPath = "featurestub";
+
+	
+	public String getFeaturestubPath() {
+		return featureStubPath;
+	}
 
 	/**
 	 * If <code>true</code> there is something changed that is relevant for

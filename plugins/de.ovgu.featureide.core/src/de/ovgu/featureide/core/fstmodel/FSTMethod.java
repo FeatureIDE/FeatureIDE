@@ -33,6 +33,12 @@ public class FSTMethod extends RoleElement<FSTMethod> {
 	private boolean isConstructor;
 	private boolean refines;
 	private String contract;
+	private String compKey;
+	private int startLineOfContract;
+
+	public int getStartLineOfContract() {
+		return startLineOfContract;
+	}
 
 	/**
 	 * @return the contract
@@ -40,11 +46,10 @@ public class FSTMethod extends RoleElement<FSTMethod> {
 	public String getContract() {
 		return contract;
 	}
-
-	private String compKey;
-
+	
+	
 	/**
-	 * @return the compKey
+	 * @return the contract composition technique
 	 */
 	public String getCompKey() {
 		return compKey;
@@ -67,12 +72,18 @@ public class FSTMethod extends RoleElement<FSTMethod> {
 		this(name, parameterTypes, type, modifiers, body, beginLine, endLine, contract, "");
 	}
 
-	public FSTMethod(String name, LinkedList<String> parameterTypes, String type, String modifiers, String body, int beginLine,
-			int endLine, String contract, String compKey) {
+	public FSTMethod(String name, LinkedList<String> parameterTypes, String type, String modifiers, String body, int beginLine, int endLine, String contract, String compKey) {
+		this(name, parameterTypes, type, modifiers, body, beginLine, endLine, contract, "", -1);
+	}
+	
+	public FSTMethod(String name, LinkedList<String> parameterTypes, String type, String modifiers, String body, int beginLine, int endLine, String contract, String compKey, int startLineOfContract) {
 		super(name, type, modifiers, body, beginLine, endLine);
 		this.parameterTypes = parameterTypes;
 		this.contract = contract;
 		this.compKey = compKey;
+		if (startLineOfContract > -1) {
+			this.startLineOfContract = startLineOfContract;
+		}
 	}
 
 	public String getFullName() {
@@ -111,7 +122,14 @@ public class FSTMethod extends RoleElement<FSTMethod> {
 	}
 
 	public boolean hasContract() {
-		return contract.length() > 0;
+		return !contract.isEmpty();
+	}
+
+	@Override
+	public void setRole(FSTRole parent) {
+		super.setRole(parent);
+		if (this.hasContract())
+		this.getRole().getFeature().setMethodContracts(true);
 	}
 
 	/**

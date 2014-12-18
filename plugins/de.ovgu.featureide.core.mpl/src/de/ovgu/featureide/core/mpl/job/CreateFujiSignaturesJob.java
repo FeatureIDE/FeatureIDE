@@ -116,6 +116,11 @@ public class CreateFujiSignaturesJob extends AMonitorJob<CreateFujiSignaturesJob
 	private final HashMap<AbstractSignature, SignatureReference> signatureSet = new HashMap<AbstractSignature, SignatureReference>();
 	private final HashMap<String, AbstractSignature> signatureTable = new HashMap<String, AbstractSignature>();
 
+
+	public ProjectSignatures getSignatureTable() {
+		return projectSignatures;
+	}
+
 	public CreateFujiSignaturesJob() {
 		this(null);
 	}
@@ -250,6 +255,7 @@ public class CreateFujiSignaturesJob extends AMonitorJob<CreateFujiSignaturesJob
 						typeString = "interface";
 					}
 
+
 					AbstractClassSignature parent = null;
 					if (!roleStack.isEmpty()) {
 						parent = roleStack.pop();
@@ -318,12 +324,10 @@ public class CreateFujiSignaturesJob extends AMonitorJob<CreateFujiSignaturesJob
 							}
 							
 						} else if (bodyDecl instanceof MemberClassDecl) {
-							stack.push(((MemberClassDecl) bodyDecl)
-									.getClassDecl());
+							stack.push(((MemberClassDecl) bodyDecl).getClassDecl());
 							roleStack.push(curClassSig);
 						} else if (bodyDecl instanceof MemberInterfaceDecl) {
-							stack.push(((MemberInterfaceDecl) bodyDecl)
-									.getInterfaceDecl());
+							stack.push(((MemberInterfaceDecl) bodyDecl).getInterfaceDecl());
 							roleStack.push(curClassSig);
 						}
 
@@ -371,7 +375,7 @@ public class CreateFujiSignaturesJob extends AMonitorJob<CreateFujiSignaturesJob
 		projectSignatures.setSignatureArray(sigArray);
 		interfaceProject.setProjectSignatures(projectSignatures);
 	}
-	
+
 	private void copyComment(IRoleElement element, int id, String fullName) {
 		if (fullName == null) {
 			return;

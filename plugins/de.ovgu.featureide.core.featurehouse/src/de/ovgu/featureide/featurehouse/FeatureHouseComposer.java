@@ -184,7 +184,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 				if (terminal != null) {
 					file = getFile(terminal);
 					lineFile = terminal.beginLine;
-				
+
 					if (file != null) {
 						try {
 							IMarker marker = file.createMarker(FeatureHouseCorePlugin.BUILDER_PROBLEM_MARKER);
@@ -198,7 +198,6 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 						LOGGER.logError(new Exception("No file provided for: " + terminal.toString()));
 					}
 				}
-
 			}
 
 			private IFile getFile(FSTTerminal terminal) {
@@ -776,7 +775,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		return ast;
 	}
 
-	private static String getClassPaths(IFeatureProject featureProject) {
+	public static String getClassPaths(IFeatureProject featureProject) {
 		String classpath = "";
 		String sep = System.getProperty("path.separator");
 		try {

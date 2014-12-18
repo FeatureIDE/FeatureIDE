@@ -237,15 +237,12 @@ public class FSTDirective extends RoleElement<FSTDirective> {
 	/* 
 	 * special implementation for FSTDirective by proving linenumbers 
 	 **/
-	
 	@Override
 	public int compareTo(FSTDirective element) {
 
-		if (this == element){
+		if (this == element) {
 			return 0;
-		}
-		else
-		{
+		} else {
 			// TODO Is the linenumber check enough?
 			return this.getStartLine() > element.getStartLine() ? 1 : -1;
 		}

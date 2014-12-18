@@ -24,30 +24,18 @@ package de.ovgu.featureide.core.fstmodel;
 /**
  * TODO description
  * 
- * @author "Andy Kenner"
+ * @author Andy Kenner
  */
 public interface IRoleElement {
 
-	/**
-	 * @return the javaDocComment
-	 */
-	public abstract String getJavaDocComment();
+	String getJavaDocComment();
 
-	/**
-	 * @param javaDocComment the javaDocComment to set
-	 */
-	public abstract void setJavaDocComment(String javaDocComment);
+	void setJavaDocComment(String javaDocComment);
 
-	/**
-	 * @return
-	 */
-	public abstract FSTRole getRole();
+	FSTRole getRole();
 	
-	public abstract String getFullName();
+	String getFullName();
 
-	/**
-	 * @param role
-	 */
-	public abstract void setRole(FSTRole role);
+	void setRole(FSTRole role);
 
 }

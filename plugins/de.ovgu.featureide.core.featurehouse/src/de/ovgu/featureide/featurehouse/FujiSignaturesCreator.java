@@ -48,7 +48,7 @@ import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
-import de.ovgu.featureide.core.fstmodel.RoleElement;
+import de.ovgu.featureide.core.fstmodel.IRoleElement;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.core.signature.abstr.AbstractClassSignature;
 import de.ovgu.featureide.core.signature.abstr.AbstractSignature;
@@ -270,7 +270,7 @@ public class FujiSignaturesCreator {
 		}
 	}
 	
-	private void copyComment(RoleElement element, int id, String fullName) {
+	private void copyComment(IRoleElement element, int id, String fullName) {
 		if (fullName == null) {
 			return;
 		}

@@ -1,4 +1,4 @@
-package de.ovgu.featureide.ui.variantimport;
+package de.ovgu.featureide.ui.variantimport.wizard;
 
 import org.eclipse.swt.widgets.Composite;
 

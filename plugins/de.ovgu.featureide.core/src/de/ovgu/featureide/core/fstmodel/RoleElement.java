@@ -241,6 +241,7 @@ public abstract class RoleElement<T extends RoleElement<T>> implements Comparabl
 		this.javaDocComment = javaDocComment;
 	}
 	
+	
 	/*
 	 * default implementation
 	 * */

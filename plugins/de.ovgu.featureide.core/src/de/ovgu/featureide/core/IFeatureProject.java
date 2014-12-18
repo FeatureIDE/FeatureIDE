@@ -108,6 +108,8 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 
 	String getSourcePath();
 	
+	String getFeaturestubPath();
+	
 	String[] getJavaClassPath();
 	
 	String getContractComposition();
@@ -132,7 +134,7 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	String getConfigName(IResource resource);
 
 	String getFolderName(IResource resource, IFolder folder);
-
+	
 	IProject getProject();
 	
 	ProjectSignatures getProjectSignatures();

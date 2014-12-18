@@ -20,9 +20,12 @@
  */
 package de.ovgu.featureide.core.mpl.signature.abstr;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 import de.ovgu.featureide.core.mpl.signature.ViewTag;
 
@@ -35,12 +38,19 @@ public abstract class AbstractSignature {
 	
 	public static final class FeatureData {
 		private final int id, lineNumber;
+		private boolean usesExternalMethods, usesOriginal;
+
 		private String comment;
-		
+		private ArrayList<AbstractSignature> calledSignatures;
+		private ArrayList<String> usedNonPrimitveTypes;
+
 		public FeatureData(int id, int lineNumber, String comment) {
 			this.id = id;
 			this.lineNumber = lineNumber;
 			this.comment = comment;
+			this.calledSignatures = null;
+			this.usesExternalMethods = false;
+			this.usesOriginal = false;
 		}
 		
 		public FeatureData(int id, int lineNumber) {
@@ -55,12 +65,52 @@ public abstract class AbstractSignature {
 			return lineNumber;
 		}
 		
+		public boolean usesExternMethods() {
+			return usesExternalMethods;
+		}
+		
+		public boolean usesOriginal() {
+			return usesOriginal;
+		}
+		
 		public String getComment() {
 			return comment;
 		}
+
+		public List<String> getUsedNonPrimitveTypes() {
+			return usedNonPrimitveTypes != null ? Collections.unmodifiableList(usedNonPrimitveTypes) : new ArrayList<String>();
+		}
 		
+		public void setUsesExternMethods(boolean usesExternMethods) {
+			this.usesExternalMethods = usesExternMethods;
+		}
+		
+		public void setUsesOriginal(boolean usesOriginal) {
+			this.usesOriginal = usesOriginal;
+		}
+		
+		public List<AbstractSignature> getCalledSignatures() {
+			return calledSignatures != null ? Collections.unmodifiableList(calledSignatures) : new ArrayList<AbstractSignature>();
+		}
+
 		public void setComment(String comment) {
 			this.comment = comment;
+		}
+		
+		public void addCalledSignature(AbstractSignature signature) {
+			if (this.calledSignatures == null) {
+				this.calledSignatures = new ArrayList<AbstractSignature>();
+			}
+			this.calledSignatures.add(signature);
+		}
+		
+		public void addUsedNonPrimitveType(String usedNonPrimitveType) {
+			if (this.usedNonPrimitveTypes == null) {
+				this.usedNonPrimitveTypes = new ArrayList<String>();
+			}
+			if (!this.usedNonPrimitveTypes.contains(usedNonPrimitveType)) {
+				this.usedNonPrimitveTypes.add(usedNonPrimitveType);
+			}
 		}
 	}
 	
@@ -126,8 +176,8 @@ public abstract class AbstractSignature {
 		}
 	}
 	
-	protected void setFullName(String perfixName) {
-		this.fullName = perfixName + '.' + name;
+	protected void setFullName(String prefixName) {
+		this.fullName = prefixName + '.' + name;
 	}
 
 	public AbstractClassSignature getParent() {

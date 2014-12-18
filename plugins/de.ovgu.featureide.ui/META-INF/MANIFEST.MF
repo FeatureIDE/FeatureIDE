@@ -19,7 +19,7 @@ Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: lib/SPLACAT.jar,
  lib/commons-math-2.2.jar,
  .
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: University of Magdeburg
 Export-Package: 
  de.ovgu.featureide.ui;uses:="org.eclipse.swt.graphics,de.ovgu.featureide.fm.ui,org.osgi.framework",
