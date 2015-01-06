@@ -44,6 +44,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
@@ -61,6 +62,7 @@ import de.ovgu.featureide.core.listeners.ICurrentBuildListener;
 import de.ovgu.featureide.core.listeners.ICurrentConfigurationListener;
 import de.ovgu.featureide.core.listeners.IFeatureFolderListener;
 import de.ovgu.featureide.core.listeners.IProjectListener;
+import de.ovgu.featureide.core.preferences.ContextOutlinePreference;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.core.signature.ProjectSignatures.SignatureIterator;
 import de.ovgu.featureide.core.signature.ProjectStructure;
@@ -69,7 +71,9 @@ import de.ovgu.featureide.core.signature.abstr.AbstractFieldSignature;
 import de.ovgu.featureide.core.signature.abstr.AbstractMethodSignature;
 import de.ovgu.featureide.core.signature.abstr.AbstractSignature;
 import de.ovgu.featureide.core.signature.filter.ContextFilter;
+import de.ovgu.featureide.core.signature.filter.FeatureFilter;
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
+import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
@@ -85,6 +89,9 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 public class CorePlugin extends AbstractCorePlugin {
 	
 	public static final String PLUGIN_ID = "de.ovgu.featureide.core";
+
+	public final QualifiedName QNAME_CONTEXTOUTLINEFILTER = new QualifiedName("de.ovgu.featureide.core", "contextOutlineFilter");
+	public String CONTEXTOUTLINEFILTER = "context";
 
 	private static final String COMPOSERS_ID = PLUGIN_ID + ".composers";
 
@@ -699,9 +706,25 @@ public class CorePlugin extends AbstractCorePlugin {
 		final ProjectSignatures signatures = project.getProjectSignatures();
 		if (signatures != null) {
 			SignatureIterator it = signatures.iterator();
-			//TODO check
+			
 			if (featureName != null) {
-				it.addFilter(new ContextFilter(featureName, signatures));
+				switch (ContextOutlinePreference.getInstance().getCurrentValue()) {
+		    	case ContextOutlinePreference.CONTEXTOUTLINE_NONE:
+					it.clearFilter();
+			    	break;
+		    	case ContextOutlinePreference.CONTEXTOUTLINE_CONTEXT:
+					it.addFilter(new ContextFilter(featureName, signatures));
+			    	break;
+		    	case ContextOutlinePreference.CONTEXTOUTLINE_CORE:
+					final Collection<Feature> coreFeature = project.getFeatureModel().getAnalyser().getCoreFeatures();
+					final int[] featureIDs = new int[coreFeature.size()];
+					int i = 0;
+					for (Feature feature : coreFeature) {
+						featureIDs[i++] = signatures.getFeatureID(feature.getName());
+					}
+					it.addFilter(new FeatureFilter(featureIDs));
+			    	break;
+			    }
 			}
 			return new ProjectStructure(it);
 		}

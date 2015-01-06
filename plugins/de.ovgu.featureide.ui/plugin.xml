@@ -1111,6 +1111,15 @@
 			name="tes"
 			icon="icons/featureide.gif"/>
 	</extension>
+       <extension
+             point="org.eclipse.ui.preferencePages">
+          <page
+                category="de.ovgu.featureide.fm.ui.FeatureIDEPreferencePage"
+                class="de.ovgu.featureide.ui.preferences.ContextOutlinePreferencePage"
+                id="de.ovgu.featureide.ui.preferences.contextoutline"
+                name="Context Outline">
+          </page>
+       </extension>
  
 
     

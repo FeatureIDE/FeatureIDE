@@ -21,6 +21,7 @@ Export-Package:
  de.ovgu.featureide.core.fstmodel,
  de.ovgu.featureide.core.fstmodel.preprocessor,
  de.ovgu.featureide.core.listeners,
+ de.ovgu.featureide.core.preferences,
  de.ovgu.featureide.core.signature,
  de.ovgu.featureide.core.signature.abstr,
  de.ovgu.featureide.core.signature.comparator,
