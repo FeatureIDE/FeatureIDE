@@ -248,6 +248,12 @@
             id="de.ovgu.featureide.fm.ui.FeatureIDEPreferencePage"
             name="FeatureIDE">
       </page>
+      <page
+            category="de.ovgu.featureide.fm.ui.FeatureIDEPreferencePage"
+            class="de.ovgu.featureide.fm.ui.preferences.ConfigurationPreferencePage"
+            id="de.ovgu.featureide.fm.ui.preferences.configuration"
+            name="Configuration">
+      </page>
    </extension>
    
 </plugin>

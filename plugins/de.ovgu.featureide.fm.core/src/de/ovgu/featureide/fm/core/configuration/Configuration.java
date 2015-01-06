@@ -30,9 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
-import org.osgi.service.prefs.BackingStoreException;
 import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
@@ -43,6 +40,7 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.preferences.ConfigurationPreference;
 
 /**
  * Represents a configuration and provides operations for the configuration process.
@@ -79,22 +77,7 @@ public class Configuration {
 		}
 	}
 
-	public static final int 
-		COMPLETION_NONE = 0,
-		COMPLETION_ONE_CLICK = 1,
-		COMPLETION_OPEN_CLAUSES = 2;
-
 	public static int FEATURE_LIMIT_FOR_DEFAULT_COMPLETION = 150;
-	private static int defaultCompletion;
-	static {
-		final IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode("de.ovgu.featureide.fm.core");
-		final String pref = preferences.get("configCompletion", Integer.toString(COMPLETION_ONE_CLICK));
-		try {
-			defaultCompletion = Integer.parseInt(pref);
-		} catch (Exception e) {
-			defaultCompletion = COMPLETION_ONE_CLICK;
-		}
-	}
 
 	private static final int TIMEOUT = 1000;
 
@@ -110,21 +93,6 @@ public class Configuration {
 
 	private final boolean ignoreAbstractFeatures;
 	private boolean propagate;
-	
-	public static int getDefaultCompletion() {
-		return defaultCompletion;
-	}
-	
-	public static void setDefaultCompletion(int defaultCompletion) {
-		Configuration.defaultCompletion = defaultCompletion;
-		final IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode("de.ovgu.featureide.fm.core");
-		preferences.put("configCompletion", Integer.toString(defaultCompletion));
-		try {
-			preferences.flush();
-		} catch (BackingStoreException e) {
-			FMCorePlugin.getDefault().logError(e);
-		}
-	}
 
 	/**
 	 * This method creates a clone of the given {@link Configuration}
@@ -273,21 +241,21 @@ public class Configuration {
 	}
 	
 	public boolean[] leadToValidConfiguration(List<SelectableFeature> featureList) {
-		if (defaultCompletion == COMPLETION_NONE) {
-			return leadToValidConfiguration(featureList, defaultCompletion);
+		if (ConfigurationPreference.getInstance().getCurrentValue() == ConfigurationPreference.COMPLETION_NONE) {
+			return leadToValidConfiguration(featureList, ConfigurationPreference.COMPLETION_NONE);
 		} else if (featureList.size() > FEATURE_LIMIT_FOR_DEFAULT_COMPLETION) {
-			return leadToValidConfiguration(featureList, COMPLETION_OPEN_CLAUSES);
+			return leadToValidConfiguration(featureList, ConfigurationPreference.COMPLETION_OPEN_CLAUSES);
 		}
-		return leadToValidConfiguration(featureList, defaultCompletion);
+		return leadToValidConfiguration(featureList, ConfigurationPreference.getInstance().getCurrentValue());
 	}
 	
 	public boolean[] leadToValidConfiguration(List<SelectableFeature> featureList, int mode) {
 		switch (mode) {
-			case COMPLETION_ONE_CLICK:
+			case ConfigurationPreference.COMPLETION_ONE_CLICK:
 				return leadsToValidConfiguration1(featureList);
-			case COMPLETION_OPEN_CLAUSES:
+			case ConfigurationPreference.COMPLETION_OPEN_CLAUSES:
 				return leadsToValidConfiguration3(featureList);
-			case COMPLETION_NONE:
+			case ConfigurationPreference.COMPLETION_NONE:
 			default:
 				return new boolean[featureList.size()];
 		}
