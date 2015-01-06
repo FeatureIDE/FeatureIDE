@@ -58,7 +58,7 @@ public abstract class AStoppableJob extends AbstractJob implements IStoppableJob
 		}
 	}
 	
-	private int cancelingTimeout = 5000;
+	private int cancelingTimeout = 1000;
 	
 	private InnerThread innerThread = null;
 	
@@ -78,17 +78,21 @@ public abstract class AStoppableJob extends AbstractJob implements IStoppableJob
 			}
 		}
 		
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					Thread.sleep(cancelingTimeout);
-				} catch (InterruptedException e) {
-					FMCorePlugin.getDefault().logError(e);
+		if (cancelingTimeout > 0) {
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						Thread.sleep(cancelingTimeout);
+					} catch (InterruptedException e) {
+						FMCorePlugin.getDefault().logError(e);
+					}
+					stopInnerThread();
 				}
-				stopInnerThread();
-			}
-		}).start();
+			}).start();
+		} else {
+			stopInnerThread();
+		}
 	}
 	
 	@Override

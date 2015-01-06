@@ -40,8 +40,8 @@ import de.ovgu.featureide.fm.core.job.IJob;
  */
 public final class JobSequence implements IJob {
 	private final LinkedList<IJob> jobs = new LinkedList<IJob>();
+	private final LinkedList<JobFinishListener> jobFinishedListeners = new LinkedList<JobFinishListener>();
 	
-	private LinkedList<JobFinishListener> jobFinishedListeners = null;
 	private boolean ignorePreviousJobFail = true;
 	private int status = IJob.STATUS_NOTSTARTED;
 		
@@ -68,9 +68,6 @@ public final class JobSequence implements IJob {
 	}
 	
 	public void addJobFinishedListener(JobFinishListener listener) {
-		if (jobFinishedListeners == null) {
-			jobFinishedListeners = new LinkedList<JobFinishListener>();
-		}
 		jobFinishedListeners.add(listener);
 	}
 	
@@ -117,9 +114,7 @@ public final class JobSequence implements IJob {
 	}
 	
 	public void removeJobFinishedListener(JobFinishListener listener) {
-		if (jobFinishedListeners != null) {
-			jobFinishedListeners.remove(listener);
-		}
+		jobFinishedListeners.remove(listener);
 	}
 	
 	@Override
@@ -162,15 +157,13 @@ public final class JobSequence implements IJob {
 					}
 				}
 				if (jobs.isEmpty()) {
-					if (jobFinishedListeners != null) {
-						for (final Iterator<JobFinishListener> it = jobFinishedListeners.iterator(); it.hasNext();) {
-						    try {
-						    	it.next().jobFinished(this, lastStatus == IJob.STATUS_OK);
-						    }
-						    catch (RuntimeException e) {
-						    	FMCorePlugin.getDefault().logError(e);
-						    }
-						}
+					for (final Iterator<JobFinishListener> it = jobFinishedListeners.iterator(); it.hasNext();) {
+					    try {
+					    	it.next().jobFinished(this, lastStatus == IJob.STATUS_OK);
+					    }
+					    catch (RuntimeException e) {
+					    	FMCorePlugin.getDefault().logError(e);
+					    }
 					}
 					status = IJob.STATUS_OK;
 				} else {
