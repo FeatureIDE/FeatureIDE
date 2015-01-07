@@ -1,16 +1,24 @@
 package de.ovgu.featureide.ui.variantimport.migration;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.internal.core.JavaProject;
 import org.eclipse.jface.viewers.IStructuredSelection;
 
 import de.ovgu.featureide.core.CorePlugin;
@@ -20,9 +28,12 @@ import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.ui.variantimport.wizard.SPLMigrationDialogSettingsPage;
 
+@SuppressWarnings("restriction")
 public abstract class DefaultSPLMigrator implements ISPLMigrator
 {
+	public static final String PROJECT_PROPERTIES_FILE_NAME = "project.properties";
 	public static final String DEFAULT_PROJECT_NAME = "migratedSPL";
+	public static final String ANDROID_NATURE = "com.android.ide.eclipse.adt.AndroidNature";
 
 	/**
 	 * The new project which contains the software product line, when the
@@ -58,7 +69,7 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator
 
 		createFeatureProject();
 
-		copyImportedProjectsCodeIntoFeatureFolders();
+		migrateProjects();
 
 		adjustFeatureModel();
 
@@ -74,16 +85,11 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator
 	 */
 	protected void createFeatureProject()
 	{
-		createNewProject(configurationData.projectName);
+		newProject = SPLMigrationUtils.createProject(configurationData.projectName);
 
 		openProjectHandleExceptions(newProject);
 
 		convertToFeatureProject(configurationData);
-	}
-
-	private void createNewProject(String projectName)
-	{
-		newProject = SPLMigrationUtils.createProject(projectName);
 	}
 
 	private void openProjectHandleExceptions(IProject project)
@@ -115,32 +121,159 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator
 	 * extending classes to accomodate {@link IComposerExtensionBase Composers}
 	 * needs.
 	 */
-	protected void copyImportedProjectsCodeIntoFeatureFolders()
+	protected void migrateProjects()
 	{
 		for (IProject project : projects)
 		{
 			IPath destinationPath = new Path(configurationData.sourcePath);
-			IPath sourcePath = new Path(project.getName());
 
 			assert newProject.getFolder(destinationPath).isAccessible() : "Destinationfolder not accessible or wrong path";
 			assert project.isOpen() : "Project " + project.getName() + " is not open.";
 
+			IPath featureFolderPath = SPLMigrationUtils.setupFolder(newProject.getFolder(destinationPath)
+					.getFolder(project.getName()));
+
 			try
 			{
-				IFolder sourceFolder = newProject.getFolder(destinationPath).getFolder(sourcePath);
-				if (sourceFolder.exists())
-				{
-					sourceFolder.delete(true, null);
-				}
-				sourceFolder.create(true, true, null);
-				SPLMigrationUtils.recursiveCopyFiles(project, sourceFolder);
-				newProject.refreshLocal(IProject.DEPTH_INFINITE, null);
+				migrateClassPathDependentContent(project, featureFolderPath);
+			} catch (JavaModelException e)
+			{
+				e.printStackTrace();
+			}
+			
+			try
+			{
+				if(project.hasNature(ANDROID_NATURE))
+					copyProjectProperties(project, featureFolderPath);
 			} catch (CoreException e)
 			{
-				CorePlugin.getDefault().logError(e);
 				e.printStackTrace();
 			}
 		}
+	}
+
+	private void copyProjectProperties(IProject project, IPath destinationPath)
+	{
+		final IFile source = project.getFile(PROJECT_PROPERTIES_FILE_NAME);
+		if(!source.exists())
+		{
+			assert false : "project.properties could not be copied, because it does not exist.";
+			return;
+		}
+		
+		final IFile destination = newProject.getFile(destinationPath.makeRelativeTo(newProject.getFullPath()).append(PROJECT_PROPERTIES_FILE_NAME));
+		if (!destination.exists())
+			try
+			{
+				System.out.println("source: " + source + " ; target: " + destination);
+				source.copy(destination.getFullPath(), true, null);
+			} catch (CoreException e)
+			{
+				e.printStackTrace();
+			}
+	}
+
+	/**
+	 * 
+	 * @param project
+	 * @param destinationPath
+	 * @throws JavaModelException
+	 */
+	private void migrateClassPathDependentContent(IProject project, IPath destinationPath)
+			throws JavaModelException
+	{
+		JavaProject javaProjectToMigrate = new JavaProject(project, null);
+		JavaProject newJavaProject = new JavaProject(newProject, null);
+
+		assert (javaProjectToMigrate != null && newJavaProject != null) : "Java Projects could not be created";
+
+		IClasspathEntry[] classpathToMigrate = javaProjectToMigrate.getRawClasspath();
+		List<IClasspathEntry> newClassPath = new ArrayList<IClasspathEntry>();
+
+		newClassPath.addAll(Arrays.asList(newJavaProject.getRawClasspath()));
+
+		assert classpathToMigrate != null : "classPath of project to migrate is null";
+
+		migrateLibraryAndContainerEntries(newJavaProject, classpathToMigrate, newClassPath);
+		migrateSourceFiles(project, destinationPath, classpathToMigrate);
+		migrateProjectNatures(project);
+	}
+
+	/**
+	 * @param project
+	 */
+	private void migrateProjectNatures(IProject project)
+	{
+		try
+		{
+			for(String natureId : project.getDescription().getNatureIds()){
+				List<String> natureIds = new ArrayList<String>();
+				natureIds.addAll(Arrays.asList(newProject.getDescription().getNatureIds()));
+				if(!natureIds.contains(natureId))
+					natureIds.add(natureId);
+				IProjectDescription description = newProject.getDescription();
+				description.setNatureIds(natureIds.toArray(new String[natureIds.size()]));
+				newProject.setDescription(description, null);
+			}
+		} catch (CoreException e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * @param project
+	 * @param destinationPath
+	 * @param classpathToMigrate
+	 */
+	private void migrateSourceFiles(IProject project, IPath destinationPath,
+			IClasspathEntry[] classpathToMigrate)
+	{
+		IPath relativeDestinationPath = ((IPath) destinationPath.clone()).makeRelativeTo(newProject.getFullPath());
+		System.out.println("migrate source destination: " + destinationPath + " relative: "+ relativeDestinationPath );
+		IFolder destination = newProject.getFolder(relativeDestinationPath);
+		
+		for (IClasspathEntry entry : classpathToMigrate)
+		{
+			if (entry.getEntryKind() == IClasspathEntry.CPE_SOURCE)
+			{
+				try
+				{
+					IPath relativeSourcePath = entry.getPath().makeRelativeTo(project.getFullPath());
+					IFolder source = project.getFolder(relativeSourcePath);
+					
+					SPLMigrationUtils.recursiveCopyFiles(source, destination);
+					
+					newProject.refreshLocal(IProject.DEPTH_INFINITE, null);
+					
+				} catch (CoreException e)
+				{
+					CorePlugin.getDefault().logError(e);
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	/**
+	 * @param newJavaProject
+	 * @param classpathToMigrate
+	 * @param newClassPath
+	 * @throws JavaModelException
+	 */
+	private void migrateLibraryAndContainerEntries(JavaProject newJavaProject,
+			IClasspathEntry[] classpathToMigrate, List<IClasspathEntry> newClassPath)
+			throws JavaModelException
+	{
+		for (IClasspathEntry entry : classpathToMigrate)
+		{
+			if (entry.getEntryKind() == IClasspathEntry.CPE_CONTAINER
+					|| entry.getEntryKind() == IClasspathEntry.CPE_LIBRARY)
+				if (!newClassPath.contains(entry))
+					newClassPath.add(entry);
+		}
+		newJavaProject.setRawClasspath(
+				newClassPath.toArray(new IClasspathEntry[newClassPath.size()]), null);
 	}
 
 	/**
@@ -228,9 +361,9 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator
 					project = (IProject) ((IAdaptable) selectedObject).getAdapter(IProject.class);
 
 			assert (!projects.contains(project)) : "Found two equal projects in selection";
-			
-			if(project!=null)
-			projects.add(project);
+
+			if (project != null)
+				projects.add(project);
 		}
 		registerProjectsForMigration(projects);
 	}

@@ -189,4 +189,29 @@ public class SPLMigrationUtils
 			e.printStackTrace();
 		}
 	}
+
+	/**
+	 * Creates the Folder empty. If it exists, it will be deleted and created
+	 * new.
+	 * 
+	 * @param folder
+	 *            the folder to be created.
+	 * @return the created {@link IFolder}s {@link IPath}, or null if creation
+	 *         was not successful
+	 */
+	public static IPath setupFolder(IFolder folder)
+	{
+		try
+		{
+			if (folder.exists())
+				folder.delete(true, null);
+
+			folder.create(true, true, null);
+		} catch (CoreException e)
+		{
+			e.printStackTrace();
+		}
+
+		return folder.exists() ? folder.getFullPath() : null;
+	}
 }

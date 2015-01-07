@@ -37,11 +37,6 @@ import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
  * 
  * @author Sebastian Krieter
  */
-/**
- * TODO description
- * 
- * @author Asura
- */
 abstract class AbstractJob extends Job implements IJob {
 	private JobStatus status = JobStatus.NOT_STARTED;
 	private LinkedList<JobFinishListener> jobFinishedListeners = null;

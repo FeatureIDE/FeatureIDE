@@ -1,17 +1,8 @@
 package de.ovgu.featureide.ui.variantimport.migration;
 
-import java.io.UnsupportedEncodingException;
-
-import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.WizardDialog;
 
-import de.ovgu.featureide.core.CorePlugin;
-import de.ovgu.featureide.core.builder.IComposerExtensionBase;
 import de.ovgu.featureide.ui.variantimport.wizard.SPLMigrationWizard;
 
 /**
