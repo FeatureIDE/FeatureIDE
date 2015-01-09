@@ -32,7 +32,8 @@ public class ContextOutlinePreference extends Preference<Integer> {
 	public static final int 
 		CONTEXTOUTLINE_NONE = 0,
 		CONTEXTOUTLINE_CONTEXT = 1,
-		CONTEXTOUTLINE_CORE = 2;
+		CONTEXTOUTLINE_CORE = 2,
+		CONTEXTOUTLINE_CONFIGURATION = 3;
 	
 	private static ContextOutlinePreference INSTANCE = null;
 	

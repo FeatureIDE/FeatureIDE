@@ -76,14 +76,17 @@ public class ContextOutlinePreferencePage extends PreferencePage implements IWor
 	    final Button noneButton = new Button(configGroup, SWT.RADIO);
 	    final Button contextButton = new Button(configGroup, SWT.RADIO);
 	    final Button coreButton = new Button(configGroup, SWT.RADIO);
+	    final Button configurationButton = new Button(configGroup, SWT.RADIO);
 	    
 	    noneButton.setData(ContextOutlinePreference.CONTEXTOUTLINE_NONE);
 	    contextButton.setData(ContextOutlinePreference.CONTEXTOUTLINE_CONTEXT);
 	    coreButton.setData(ContextOutlinePreference.CONTEXTOUTLINE_CORE);
+	    configurationButton.setData(ContextOutlinePreference.CONTEXTOUTLINE_CONFIGURATION);
 	    
 	    noneButton.setText("None");
 	    contextButton.setText("Current Context");
 	    coreButton.setText("Core Features");
+	    configurationButton.setText("Current Configuration");
 	    
 	    switch (ContextOutlinePreference.getInstance().getCurrentValue()) {
     	case ContextOutlinePreference.CONTEXTOUTLINE_NONE:
@@ -95,11 +98,15 @@ public class ContextOutlinePreferencePage extends PreferencePage implements IWor
     	case ContextOutlinePreference.CONTEXTOUTLINE_CORE:
     		coreButton.setSelection(true);
 	    	break;
+    	case ContextOutlinePreference.CONTEXTOUTLINE_CONFIGURATION:
+    		configurationButton.setSelection(true);
+	    	break;
 	    }
 	    
 	    noneButton.addSelectionListener(selectionListener);
 	    contextButton.addSelectionListener(selectionListener);
 	    coreButton.addSelectionListener(selectionListener);
+	    configurationButton.addSelectionListener(selectionListener);
 	    
 		return container;
 	}

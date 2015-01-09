@@ -75,6 +75,8 @@ import de.ovgu.featureide.core.signature.filter.FeatureFilter;
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 
@@ -716,19 +718,34 @@ public class CorePlugin extends AbstractCorePlugin {
 					it.addFilter(new ContextFilter(featureName, signatures));
 			    	break;
 		    	case ContextOutlinePreference.CONTEXTOUTLINE_CORE:
-					final Collection<Feature> coreFeature = project.getFeatureModel().getAnalyser().getCoreFeatures();
-					final int[] featureIDs = new int[coreFeature.size()];
-					int i = 0;
-					for (Feature feature : coreFeature) {
-						featureIDs[i++] = signatures.getFeatureID(feature.getName());
+						it.addFilter(new FeatureFilter(getFeatureIDs(signatures, project.getFeatureModel().getAnalyser().getCoreFeatures())));
+					break;
+		    	case ContextOutlinePreference.CONTEXTOUTLINE_CONFIGURATION:
+		    		final Configuration currentConfig = new Configuration(project.getFeatureModel(), false);
+		    		final ConfigurationReader reader = new ConfigurationReader(currentConfig);
+		    		try {
+						reader.readFromFile(project.getCurrentConfiguration());
+						if (currentConfig.isValid()) {
+							it.addFilter(new FeatureFilter(getFeatureIDs(signatures, currentConfig.getSelectedFeatures())));
+						}
+					} catch (CoreException | IOException e) {
+						logError(e);
 					}
-					it.addFilter(new FeatureFilter(featureIDs));
 			    	break;
 			    }
 			}
 			return new ProjectStructure(it);
 		}
 		return null;
+	}
+	
+	private int[] getFeatureIDs(ProjectSignatures signatures, Collection<Feature> features) {
+		final int[] featureIDs = new int[features.size()];
+		int i = 0;
+		for (Feature feature : features) {
+			featureIDs[i++] = signatures.getFeatureID(feature.getName());
+		}
+		return featureIDs;
 	}
 	
 }
