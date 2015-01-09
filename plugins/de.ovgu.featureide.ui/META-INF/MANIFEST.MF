@@ -66,6 +66,7 @@ Export-Package:
    de.ovgu.featureide.fm.core",
  org.apache.commons.math;uses:="org.apache.commons.math.exception.util,org.apache.commons.math.exception"
 Import-Package: org.eclipse.jdt.core,
+ org.eclipse.jdt.core.compiler.batch,
  org.eclipse.jdt.internal.core,
  org.eclipse.jdt.internal.ui.javaeditor,
  org.eclipse.jface.text,

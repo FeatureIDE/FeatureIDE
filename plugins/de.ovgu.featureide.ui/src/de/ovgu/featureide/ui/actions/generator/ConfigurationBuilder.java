@@ -479,12 +479,12 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			for (IJavaElement e : elements) {
 				String path = e.getPath().toOSString();
 				if (path.contains(":")) {
-					classpath += sep + path;
+					classpath += sep + "\"" + path + "\"";
 					continue;
 				}
 				IResource resource = e.getResource();
 				if (resource != null && "jar".equals(resource.getFileExtension())) {
-					classpath += sep + resource.getRawLocation().toOSString();
+					classpath += sep + "\"" + resource.getRawLocation().toOSString() + "\"";
 				}
 			}
 		} catch (JavaModelException e) {
