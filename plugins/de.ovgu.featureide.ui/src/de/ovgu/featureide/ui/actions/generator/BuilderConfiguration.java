@@ -59,19 +59,23 @@ public class BuilderConfiguration extends Configuration {
 	 * @return the name
 	 */
 	public String getName() {
-		final String zeros;
-		if (number < 10) {
-			zeros = "0000";
-		} else if (number < 100) {
-			zeros = "000";
-		} else if (number < 1000) {
-			zeros = "00";
-		} else if (number < 10000) {
-			zeros = "0";
-		} else {
-			zeros = "";
+		if (name == null) {
+			final String zeros;
+			if (number < 10) {
+				zeros = "0000";
+			} else if (number < 100) {
+				zeros = "000";
+			} else if (number < 1000) {
+				zeros = "00";
+			} else if (number < 10000) {
+				zeros = "0";
+			} else {
+				zeros = "";
+			}
+			return zeros + number;
 		}
-		return zeros + number;
+		return name;
+
 	}
 
 }
