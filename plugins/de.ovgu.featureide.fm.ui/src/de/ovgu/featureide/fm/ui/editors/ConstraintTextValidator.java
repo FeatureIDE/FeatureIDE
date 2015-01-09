@@ -22,7 +22,12 @@ package de.ovgu.featureide.fm.ui.editors;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -66,7 +71,7 @@ public final class ConstraintTextValidator {
 	 * @return List of all dead Features, empty if no feature is caused to be
 	 *         dead
 	 */
-	private List<Feature> getDeadFeatures(Constraint constraint, String input, FeatureModel model) {
+	private SortedSet<Feature> getDeadFeatures(Constraint constraint, String input, FeatureModel model) {
 		Collection<Feature> deadFeaturesBefore = null;
 		FeatureModel clonedModel = model.clone();
 
@@ -83,7 +88,14 @@ public final class ConstraintTextValidator {
 			clonedModel.handleModelDataChanged();
 		}
 
-		List<Feature> deadFeaturesAfter = new ArrayList<Feature>();
+		SortedSet<Feature> deadFeaturesAfter = new TreeSet<Feature>(new Comparator<Feature>() {
+
+			@Override
+			public int compare(Feature o1, Feature o2) {
+				return o1.getName().compareTo(o2.getName());
+			}
+		});
+		
 		for (Feature l : clonedModel.getAnalyser().getDeadFeatures()) {
 			if (!deadFeaturesBefore.contains(l)) {
 				deadFeaturesAfter.add(l);
@@ -100,7 +112,7 @@ public final class ConstraintTextValidator {
 	 * @param deadFeatures
 	 *            List of dead Features
 	 **/
-	private String getDeadFeatureString(List<Feature> deadFeatures) {
+	private String getDeadFeatureString(Set<Feature> deadFeatures) {
 		StringBuilder featureString = new StringBuilder();
 		featureString.append("Constraint causes the following features to be dead: ");
 		int count = 0;
@@ -120,10 +132,7 @@ public final class ConstraintTextValidator {
 				featureCount++;
 
 			}
-			if (deadFeatures.indexOf(l) == deadFeatures.size() - 1) {
-
-			}
-
+			
 		}
 		if (featureCount < deadFeatures.size()) {
 			featureString.append("...");
@@ -409,7 +418,7 @@ public final class ConstraintTextValidator {
 				}
 				// ---------------------------------------------------------
 				if (!canceled) {
-					final List<Feature> deadFeatuers = getDeadFeatures(constraint, con, featureModel);
+					final Set<Feature> deadFeatuers = getDeadFeatures(constraint, con, featureModel);
 	
 					new UIJob("Updating results for dead features...") {
 	
