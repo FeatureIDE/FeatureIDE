@@ -92,11 +92,11 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 		this.builder = builder;
 		
 		// TODO check why Compiler does not work
-//		if (!builder.createNewProjects) {
-//			compiler = new Compiler(nr , this);
-//			compiler.setPriority(Job.LONG);
-//			compiler.schedule();
-//		}
+		if (!builder.createNewProjects) {
+			compiler = new Compiler(nr , this);
+			compiler.setPriority(Job.LONG);
+			compiler.schedule();
+		}
 	}
 	
 	/**

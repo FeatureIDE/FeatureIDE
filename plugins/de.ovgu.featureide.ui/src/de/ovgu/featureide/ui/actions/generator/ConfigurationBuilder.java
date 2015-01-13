@@ -204,7 +204,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 * @see BuildAllCurrentConfigurationsAction
 	 * @see BuildAllValidConfigurationsAction
 	 */
-	ConfigurationBuilder(final IFeatureProject featureProject, final BuildType buildType,
+	public ConfigurationBuilder(final IFeatureProject featureProject, final BuildType buildType,
 		final boolean createNewProjects, final String algorithm, final int t, final BuildOrder buildOrder, final boolean bufferFirst) {
 		
 		if (!featureProject.getComposer().preBuildConfiguration()) {

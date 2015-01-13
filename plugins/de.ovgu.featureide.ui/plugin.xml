@@ -155,6 +155,19 @@
                path="additions">
          </menu>
       </viewerContribution>
+      <objectContribution
+            adaptable="true"
+            id="de.ovgu.featureide.ui.actions.contexttest"
+            objectClass="org.eclipse.core.resources.IProject">
+         <action
+               class="de.ovgu.featureide.ui.actions.TesterAction"
+               icon="icons/ConfigurationFileSmall.png"
+               id="de.ovgu.featureide.ui.actions.testconfigurations"
+               label="Tester"
+               menubarPath="de.ovgu.featureide.fm.ui.menu/ui"
+               style="push">
+         </action>
+      </objectContribution>
    </extension>
    <extension
          point="org.eclipse.ui.decorators">
