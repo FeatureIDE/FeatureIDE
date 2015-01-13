@@ -20,10 +20,9 @@
  */
 package de.ovgu.featureide.ui.actions.generator;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.AbstractList;
 import java.util.LinkedList;
 import java.util.Scanner;
@@ -39,6 +38,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jdt.core.compiler.batch.BatchCompiler;
 
 import de.ovgu.featureide.ui.UIPlugin;
 
@@ -146,17 +146,18 @@ public class Compiler extends Job implements IConfigurationBuilderBasics {
 	 */
 	void compile(String confName, IFolder tmpFolder) {	
 		LinkedList<IFile> files = getJavaFiles(generator.builder.folder.getFolder(confName));
-		LinkedList<String> options = new LinkedList<String>();
-		options.add("javac");
+		final LinkedList<String> options = new LinkedList<String>();
+		for (IFile file : files) {
+			options.add(file.getRawLocation().toOSString());
+		}
 		options.add("-g");
 		options.add("-Xlint");
+		options.add("-source");
+		options.add("1.7");
 		options.add("-d");
 		options.add(tmpFolder.getRawLocation().toOSString());
 		options.add("-classpath");
 		options.add(generator.builder.classpath);
-		for (IFile file : files) {
-			options.add(file.getRawLocation().toOSString());
-		}
 		
 		String output = process(options);
 		files = parseJavacOutput(output, files, confName);
@@ -166,55 +167,20 @@ public class Compiler extends Job implements IConfigurationBuilderBasics {
 	}
 	
 	private String process(AbstractList<String> command) {
-		ProcessBuilder processBuilder = new ProcessBuilder(command);
-		BufferedReader input = null;
-		BufferedReader error = null;
-		StringBuilder output = new StringBuilder();
-		try {
-			Process process = processBuilder.start();
-			input = new BufferedReader(new InputStreamReader(
-					process.getInputStream(), Charset.availableCharsets().get("UTF-8")));
-			error = new BufferedReader(new InputStreamReader(
-					process.getErrorStream(), Charset.availableCharsets().get("UTF-8")));
-			boolean x = true;
-			while (x) {
-				try {
-					String line;
-					while ((line = input.readLine()) != null) {
-						output.append(line);
-						output.append("\r\n");
-					}
-					while ((line = error.readLine()) != null) {
-						output.append(line);
-						output.append("\r\n");
-					}
-					try {
-						process.waitFor();
-					} catch (InterruptedException e) {
-						UIPlugin.getDefault().logError(e);
-					}
-					x = false;
-				} catch (IllegalThreadStateException e) {
-					UIPlugin.getDefault().logError(e);
-				}
-			}
-		} catch (IOException e) {
-//			UIPlugin.getDefault().logError(e);
-		} finally {
-			try {
-				if(input!=null)input.close();
-			} catch (IOException e) {
-				UIPlugin.getDefault().logError(e);
-			} finally {
-				if(error!=null)
-					try {
-						error.close();
-					} catch (IOException e) {
-						UIPlugin.getDefault().logError(e);
-					}
-			}
+		final StringBuilder sb = new StringBuilder();
+		for (String string : command) {
+			sb.append(string);
+			sb.append(' ');
 		}
-		return output.toString();
+		
+		String output = null;
+		try (StringWriter writer = new StringWriter()) {
+			BatchCompiler.compile(sb.toString(), new PrintWriter(System.out), new PrintWriter(writer), null);	
+			output = writer.toString();
+		} catch (IOException e) {
+			UIPlugin.getDefault().logError(e);
+		}
+		return output;
 	}
 
 	/**

@@ -82,7 +82,7 @@ import de.ovgu.featureide.fm.core.ColorschemeTable;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.StoppableJob;
-import de.ovgu.featureide.fm.core.WaitingJob;
+import de.ovgu.featureide.fm.core.AWaitingJob;
 import de.ovgu.featureide.fm.ui.GraphicsExporter;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.editors.annotation.ColorPalette;
@@ -160,7 +160,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults,
 	private ShowFieldsMethodsAction[] setFieldsMethodsActions = new ShowFieldsMethodsAction[FIELD_METHOD_LABEL_NAMES.length];
 
 	private final Vector<IFile> configurations = new Vector<IFile>();
-	private final Job updateGUIJob = new WaitingJob(UPDATE_COLLABORATION_VIEW) {
+	private final Job updateGUIJob = new AWaitingJob(UPDATE_COLLABORATION_VIEW) {
 
 		public IStatus execute(IProgressMonitor monitor) {
 			if (configurations.isEmpty()) {

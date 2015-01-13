@@ -61,11 +61,11 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.StoppableJob;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.job.AStoppableJob;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
@@ -241,15 +241,17 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 				configurationNumber = countConfigurations(this.featureProject.getConfigFolder());
 				break;
 			case ALL_VALID :
-				Job number = new StoppableJob(JOB_TITLE_COUNT_CONFIGURATIONS) {
-					public IStatus execute(IProgressMonitor monitor) {
+				Job number = new AStoppableJob(JOB_TITLE_COUNT_CONFIGURATIONS) {
+
+					@Override
+					protected boolean work() {
 						configurationNumber = new Configuration(featureModel, false, false).number(1000000);
-						if (configurationNumber < (0)) {
+						if (configurationNumber < 0) {
 							LOGGER.logWarning("Satsolver overflow");
 							configurationNumber = Integer.MAX_VALUE;
 						}
 						
-						return Status.OK_STATUS;
+						return true;
 					}
 				};
 				number.setPriority(Job.LONG);
@@ -367,6 +369,11 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 				}
 				LOGGER.logInfo(built + (configurationNumber != 0 ? " of " + configurationNumber : "") + 
 						" configurations built in " + t);
+				try {
+					folder.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+				} catch (CoreException e) {
+					LOGGER.logError(e);
+				}
 			}
 
 		};
@@ -472,12 +479,12 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			for (IJavaElement e : elements) {
 				String path = e.getPath().toOSString();
 				if (path.contains(":")) {
-					classpath += sep + path;
+					classpath += sep + "\"" + path + "\"";
 					continue;
 				}
 				IResource resource = e.getResource();
 				if (resource != null && "jar".equals(resource.getFileExtension())) {
-					classpath += sep + resource.getRawLocation().toOSString();
+					classpath += sep + "\"" + resource.getRawLocation().toOSString() + "\"";
 				}
 			}
 		} catch (JavaModelException e) {

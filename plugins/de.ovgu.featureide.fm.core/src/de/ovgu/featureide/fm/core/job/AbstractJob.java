@@ -37,14 +37,9 @@ import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
  * 
  * @author Sebastian Krieter
  */
-/**
- * TODO description
- * 
- * @author Asura
- */
 abstract class AbstractJob extends Job implements IJob {
 	private JobStatus status = JobStatus.NOT_STARTED;
-	private LinkedList<JobFinishListener> jobFinishedListeners = null;
+	private LinkedList<JobFinishListener> jobFinishedListeners = new LinkedList<JobFinishListener>();
 	
 	protected AbstractJob(String name, int priority) {
 		super(name);
@@ -58,17 +53,12 @@ abstract class AbstractJob extends Job implements IJob {
 	
 	@Override
 	public final void addJobFinishedListener(JobFinishListener listener) {
-		if (jobFinishedListeners == null) {
-			jobFinishedListeners = new LinkedList<JobFinishListener>();
-		}
 		jobFinishedListeners.add(listener);
 	}
 	
 	@Override
 	public final void removeJobFinishedListener(JobFinishListener listener) {
-		if (jobFinishedListeners != null) {
-			jobFinishedListeners.remove(listener);
-		}
+		jobFinishedListeners.remove(listener);
 	}
 	
 	@Override

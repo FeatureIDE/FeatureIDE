@@ -32,7 +32,7 @@ import org.eclipse.core.runtime.jobs.Job;
  * 
  * @author Jens Meinicke
  */
-public abstract class WaitingJob extends Job {
+public abstract class AWaitingJob extends Job {
 
 	private static final FMCorePlugin LOGGER = FMCorePlugin.getDefault();
 	private boolean waiting = false;
@@ -44,7 +44,7 @@ public abstract class WaitingJob extends Job {
 		}
 	};
 
-	public WaitingJob(String name) {
+	public AWaitingJob(String name) {
 		super(name);
 	}
 
