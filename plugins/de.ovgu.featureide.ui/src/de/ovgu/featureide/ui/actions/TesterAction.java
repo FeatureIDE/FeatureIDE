@@ -23,18 +23,14 @@ package de.ovgu.featureide.ui.actions;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.ui.actions.generator.ConfigurationBuilder;
-import de.ovgu.featureide.ui.actions.generator.Generator;
 import de.ovgu.featureide.ui.actions.generator.IConfigurationBuilderBasics.BuildOrder;
 import de.ovgu.featureide.ui.actions.generator.IConfigurationBuilderBasics.BuildType;
-import de.ovgu.featureide.ui.wizards.ConversionWizard;
 
 /**
  * Starts the conversion wizard for the selected project with the context menu

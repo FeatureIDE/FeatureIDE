@@ -725,9 +725,7 @@ public class CorePlugin extends AbstractCorePlugin {
 		    		final ConfigurationReader reader = new ConfigurationReader(currentConfig);
 		    		try {
 						reader.readFromFile(project.getCurrentConfiguration());
-						if (currentConfig.isValid()) {
-							it.addFilter(new FeatureFilter(getFeatureIDs(signatures, currentConfig.getSelectedFeatures())));
-						}
+						it.addFilter(new FeatureFilter(getFeatureIDs(signatures, currentConfig.getSelectedFeatures())));
 					} catch (CoreException | IOException e) {
 						logError(e);
 					}
