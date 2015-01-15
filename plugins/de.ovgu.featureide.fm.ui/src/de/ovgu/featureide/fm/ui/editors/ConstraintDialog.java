@@ -921,7 +921,6 @@ public class ConstraintDialog implements GUIDefaults {
 			if (message.validationResult != ValidationResult.OK) {
 				headerPanel.setDetails("Your constraint voids the model");
 				headerPanel.setColor(HeaderPanel.BubbleColor.RED);
-				updateDialogState(DialogState.SAVE_CHANGES_DISABLED);
 			}
 		}
 	};
@@ -935,7 +934,6 @@ public class ConstraintDialog implements GUIDefaults {
 			if (message.validationResult != ValidationResult.OK) {
 				headerPanel.setDetails("Your constraint leads to false optional features.\n\n" + message.details);
 				headerPanel.setColor(HeaderPanel.BubbleColor.RED);
-				updateDialogState(DialogState.SAVE_CHANGES_DISABLED);
 			}
 		}
 	};
@@ -949,7 +947,6 @@ public class ConstraintDialog implements GUIDefaults {
 			if (message.validationResult != ValidationResult.OK) {
 				headerPanel.setDetails("Your constraint leads to dead features.\n\n" + message.details);
 				headerPanel.setColor(HeaderPanel.BubbleColor.RED);
-				updateDialogState(DialogState.SAVE_CHANGES_DISABLED);
 			}
 		}
 	};
@@ -963,7 +960,6 @@ public class ConstraintDialog implements GUIDefaults {
 			if (message.validationResult != ValidationResult.OK) {
 				headerPanel.setDetails("Redundancy occurred inside your constraint.");
 				headerPanel.setColor(HeaderPanel.BubbleColor.RED);
-				updateDialogState(DialogState.SAVE_CHANGES_DISABLED);
 			}
 		}
 	};
@@ -989,7 +985,6 @@ public class ConstraintDialog implements GUIDefaults {
 			if (message.validationResult != ValidationResult.OK) {
 				headerPanel.setDetails("Your constraint is a tautology.");
 				headerPanel.setColor(HeaderPanel.BubbleColor.RED);
-				updateDialogState(DialogState.SAVE_CHANGES_DISABLED);
 			}
 		}
 	};
@@ -1003,7 +998,6 @@ public class ConstraintDialog implements GUIDefaults {
 			if (message.validationResult != ValidationResult.OK) {
 				headerPanel.setDetails("Your constraint is not satisfiable.");
 				headerPanel.setColor(HeaderPanel.BubbleColor.RED);
-				updateDialogState(DialogState.SAVE_CHANGES_DISABLED);
 			}
 		}
 	};
