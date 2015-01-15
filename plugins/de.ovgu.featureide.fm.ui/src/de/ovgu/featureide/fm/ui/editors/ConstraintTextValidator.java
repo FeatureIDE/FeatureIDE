@@ -40,12 +40,11 @@ import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureStatus;
+import de.ovgu.featureide.fm.core.FunctionalInterfaces.IConsumer;
 import de.ovgu.featureide.fm.core.StoppableJob;
 import de.ovgu.featureide.fm.core.editing.Comparison;
 import de.ovgu.featureide.fm.core.editing.ModelComparator;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.configuration.xxx.FunctionalInterfaces.IConsumer;
-import de.ovgu.featureide.fm.ui.editors.configuration.xxx.FunctionalInterfaces.IFunction;
 
 /**
  * Class which contains several tests for {@link ConstraintDialog} text field,
@@ -327,7 +326,7 @@ public final class ConstraintTextValidator {
 					@Override
 					public IStatus runInUIThread(IProgressMonitor monitor) {
 						if (!canceled) {
-							onCheckStarted.consume(new ValidationMessage());
+							onCheckStarted.invoke(new ValidationMessage());
 						}
 						return Status.OK_STATUS;
 					}
@@ -342,7 +341,7 @@ public final class ConstraintTextValidator {
 						@Override
 						public IStatus runInUIThread(IProgressMonitor monitor) {
 							if (!canceled) {
-							onIsTautology.consume(new ValidationMessage(!problemFoundTautology ? ValidationResult.OK : ValidationResult.IS_TAUTOLOGY));
+							onIsTautology.invoke(new ValidationMessage(!problemFoundTautology ? ValidationResult.OK : ValidationResult.IS_TAUTOLOGY));
 							}
 							return Status.OK_STATUS;
 						}
@@ -362,7 +361,7 @@ public final class ConstraintTextValidator {
 						@Override
 						public IStatus runInUIThread(IProgressMonitor monitor) {
 							if (!canceled) {
-								onIsNotSatisfiable.consume(new ValidationMessage(!problemFoundNotSatisfiable ? ValidationResult.OK : ValidationResult.IS_NOT_SATISFIABLE));
+								onIsNotSatisfiable.invoke(new ValidationMessage(!problemFoundNotSatisfiable ? ValidationResult.OK : ValidationResult.IS_NOT_SATISFIABLE));
 							}
 							return Status.OK_STATUS;
 						}
@@ -380,7 +379,7 @@ public final class ConstraintTextValidator {
 						@Override
 						public IStatus runInUIThread(IProgressMonitor monitor) {
 							if (!canceled) {
-								onVoidsModelCheckComplete.consume(new ValidationMessage(!problemFoundVoidsModel ? ValidationResult.OK : ValidationResult.VOIDS_MODEL));
+								onVoidsModelCheckComplete.invoke(new ValidationMessage(!problemFoundVoidsModel ? ValidationResult.OK : ValidationResult.VOIDS_MODEL));
 							}
 							return Status.OK_STATUS;
 						}
@@ -398,7 +397,7 @@ public final class ConstraintTextValidator {
 						@Override
 						public IStatus runInUIThread(IProgressMonitor monitor) {
 							if (!canceled) {
-								onFalseOptionalCheckComplete.consume(new ValidationMessage(falseOptionalFeatures.isEmpty() ? ValidationResult.OK : ValidationResult.FALSE_OPTIONAL_FEATURE, getFalseOptionalString(falseOptionalFeatures)));
+								onFalseOptionalCheckComplete.invoke(new ValidationMessage(falseOptionalFeatures.isEmpty() ? ValidationResult.OK : ValidationResult.FALSE_OPTIONAL_FEATURE, getFalseOptionalString(falseOptionalFeatures)));
 							}
 							return Status.OK_STATUS;
 						}
@@ -416,7 +415,7 @@ public final class ConstraintTextValidator {
 						@Override
 						public IStatus runInUIThread(IProgressMonitor monitor) {
 							if (!canceled) {
-								onDeadFeatureCheckComplete.consume(new ValidationMessage(deadFeatuers.isEmpty() ? ValidationResult.OK : ValidationResult.FALSE_OPTIONAL_FEATURE, getDeadFeatureString(deadFeatuers)));
+								onDeadFeatureCheckComplete.invoke(new ValidationMessage(deadFeatuers.isEmpty() ? ValidationResult.OK : ValidationResult.FALSE_OPTIONAL_FEATURE, getDeadFeatureString(deadFeatuers)));
 							}
 							return Status.OK_STATUS;
 						}
@@ -434,7 +433,7 @@ public final class ConstraintTextValidator {
 						@Override
 						public IStatus runInUIThread(IProgressMonitor monitor) {
 							if (!canceled) {
-								onIsRedundantCheckComplete.consume(new ValidationMessage(!problemFoundRedundant ? ValidationResult.OK : ValidationResult.FALSE_OPTIONAL_FEATURE, ""));
+								onIsRedundantCheckComplete.invoke(new ValidationMessage(!problemFoundRedundant ? ValidationResult.OK : ValidationResult.FALSE_OPTIONAL_FEATURE, ""));
 							}
 							return Status.OK_STATUS;
 						}
@@ -450,7 +449,7 @@ public final class ConstraintTextValidator {
 						@Override
 						public IStatus runInUIThread(IProgressMonitor monitor) {
 							if (!canceled) {
-								onCheckEnded.consume(new ValidationMessage());
+								onCheckEnded.invoke(new ValidationMessage());
 							}
 							return Status.OK_STATUS;
 						}

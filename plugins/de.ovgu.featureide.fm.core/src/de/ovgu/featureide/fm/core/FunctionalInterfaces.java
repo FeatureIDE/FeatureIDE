@@ -21,7 +21,7 @@
 package de.ovgu.featureide.fm.core;
 
 /**
- * TODO description
+ * Common interfaces for functional style.
  * 
  * @author Marcus Pinnecke
  */
@@ -41,6 +41,10 @@ public abstract class FunctionalInterfaces {
 			return t;
 		}
 	};
+	
+	public static interface IConsumer<T> {
+		void invoke(T t);
+	}
 	
 	public static class NullFunction<T, U> implements IFunction<T, U> {
 		@Override

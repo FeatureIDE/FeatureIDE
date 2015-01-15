@@ -80,11 +80,11 @@ import org.prop4j.NodeWriter;
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.FunctionalInterfaces.IConsumer;
 import de.ovgu.featureide.fm.core.Operator;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.ConstraintTextValidator.ValidationMessage;
 import de.ovgu.featureide.fm.ui.editors.ConstraintTextValidator.ValidationResult;
-import de.ovgu.featureide.fm.ui.editors.configuration.xxx.FunctionalInterfaces.IConsumer;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ConstraintCreateOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ConstraintEditOperation;
@@ -172,16 +172,16 @@ public class ConstraintDialog implements GUIDefaults {
 		public void setColor(BubbleColor color) {
 			switch (color) {
 			case RED:
-				bubble.setImage(CIRLCE_RED);
+				bubble.setImage(GUIDefaults.IMAGE_CIRCLE_RED);
 				break;
 			case GREEN:
-				bubble.setImage(CIRLCE_GREEN);
+				bubble.setImage(GUIDefaults.IMAGE_CIRCLE_GREEN);
 				break;
 			case YELLOW:
-				bubble.setImage(CIRLCE_YELLOW);
+				bubble.setImage(GUIDefaults.IMAGE_CIRCLE_YELLOW);
 				break;
 			default:
-				bubble.setImage(CIRLCE_GRAY);
+				bubble.setImage(GUIDefaults.IMAGE_CIRCLE_GRAY);
 				break;
 			}
 			bubble.redraw();
@@ -260,7 +260,7 @@ public class ConstraintDialog implements GUIDefaults {
 			headComposite.setLayout(headLayout);
 
 			bubble = new Label(headComposite, SWT.NONE | SWT.TOP);
-			bubble.setImage(CIRLCE_GRAY);
+			bubble.setImage(GUIDefaults.IMAGE_CIRCLE_GRAY);
 
 			headerLabel = new Label(headComposite, SWT.NONE);
 			FontData fontData = headerLabel.getFont().getFontData()[0];
@@ -903,7 +903,7 @@ public class ConstraintDialog implements GUIDefaults {
 	 */
 	private IConsumer<ValidationMessage> onCheckStarted = new IConsumer<ValidationMessage>() {
 		@Override
-		public void consume(ValidationMessage message) {
+		public void invoke(ValidationMessage message) {
 			updateDialogState(DialogState.SAVE_CHANGES_DONT_MIND);
 			headerPanel.setDetails("Performing additional checks. This may take a while. Although it is not recommended, you can " + (mode == Mode.UPDATE ? "update" : "save") + " your constraint by clicking \"" + okButton.getText() + "\" before this process has ended.");
 			headerPanel.setColor(HeaderPanel.BubbleColor.YELLOW);
@@ -915,7 +915,7 @@ public class ConstraintDialog implements GUIDefaults {
 	 */
 	private IConsumer<ValidationMessage> onVoidsModelCheckComplete = new IConsumer<ValidationMessage>() {
 		@Override
-		public void consume(ValidationMessage message) {
+		public void invoke(ValidationMessage message) {
 			if (message.validationResult != ValidationResult.OK) {
 				headerPanel.setDetails("Your constraint voids the model");
 				headerPanel.setColor(HeaderPanel.BubbleColor.RED);
@@ -929,7 +929,7 @@ public class ConstraintDialog implements GUIDefaults {
 	 */
 	private IConsumer<ValidationMessage> onFalseOptionalCheckComplete = new IConsumer<ValidationMessage>() {
 		@Override
-		public void consume(ValidationMessage message) {
+		public void invoke(ValidationMessage message) {
 			if (message.validationResult != ValidationResult.OK) {
 				headerPanel.setDetails("Your constraint leads to false optional features.\n\n" + message.details);
 				headerPanel.setColor(HeaderPanel.BubbleColor.RED);
@@ -943,7 +943,7 @@ public class ConstraintDialog implements GUIDefaults {
 	 */
 	private IConsumer<ValidationMessage> onDeadFeatureCheckComplete = new IConsumer<ValidationMessage>() {
 		@Override
-		public void consume(ValidationMessage message) {
+		public void invoke(ValidationMessage message) {
 			if (message.validationResult != ValidationResult.OK) {
 				headerPanel.setDetails("Your constraint leads to dead features.\n\n" + message.details);
 				headerPanel.setColor(HeaderPanel.BubbleColor.RED);
@@ -957,7 +957,7 @@ public class ConstraintDialog implements GUIDefaults {
 	 */
 	private IConsumer<ValidationMessage> onIsRedundantCheckComplete = new IConsumer<ValidationMessage>() {
 		@Override
-		public void consume(ValidationMessage message) {
+		public void invoke(ValidationMessage message) {
 			if (message.validationResult != ValidationResult.OK) {
 				headerPanel.setDetails("Redundancy occurred inside your constraint.");
 				headerPanel.setColor(HeaderPanel.BubbleColor.RED);
@@ -971,7 +971,7 @@ public class ConstraintDialog implements GUIDefaults {
 	 */
 	private IConsumer<ValidationMessage> onCheckEnded = new IConsumer<ValidationMessage>() {
 		@Override
-		public void consume(ValidationMessage message) {
+		public void invoke(ValidationMessage message) {
 			headerPanel.setDetails("Click \"" + (mode == Mode.UPDATE ? "Update" : "Create") + "\" to " + (mode == Mode.UPDATE ? "save your changes." : "add your new constraint."));
 			headerPanel.setColor(HeaderPanel.BubbleColor.GREEN);
 			updateDialogState(DialogState.SAVE_CHANGES_ENABLED);
@@ -983,7 +983,7 @@ public class ConstraintDialog implements GUIDefaults {
 	 */
 	private IConsumer<ValidationMessage> onIsTautology = new IConsumer<ValidationMessage>() {
 		@Override
-		public void consume(ValidationMessage message) {
+		public void invoke(ValidationMessage message) {
 			if (message.validationResult != ValidationResult.OK) {
 				headerPanel.setDetails("Your constraint is a tautology.");
 				headerPanel.setColor(HeaderPanel.BubbleColor.RED);
@@ -997,7 +997,7 @@ public class ConstraintDialog implements GUIDefaults {
 	 */
 	private IConsumer<ValidationMessage> onIsNotSatisfiable = new IConsumer<ValidationMessage>() {
 		@Override
-		public void consume(ValidationMessage message) {
+		public void invoke(ValidationMessage message) {
 			if (message.validationResult != ValidationResult.OK) {
 				headerPanel.setDetails("Your constraint is not satisfiable.");
 				headerPanel.setColor(HeaderPanel.BubbleColor.RED);
