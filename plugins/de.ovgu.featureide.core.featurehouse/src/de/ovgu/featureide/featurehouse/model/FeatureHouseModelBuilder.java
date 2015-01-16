@@ -200,7 +200,9 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 						classBuilder.caseClassDeclarationType(terminal);
 					} else if (JAVA_NODE_MODIFIERS.equals(type)) {
 						classBuilder.caseModifiers(terminal);
-						classFragmentStack.peek().setJavaDocComment(JavaClassBuilder.findJavaDocComments(terminal));
+						if (classFragmentStack.peek() != null) {
+							classFragmentStack.peek().setJavaDocComment(JavaClassBuilder.findJavaDocComments(terminal));
+						}
 					} else if (JAVA_NODE_EXTENDSLIST.equals(type)) {
 						classBuilder.caseExtendsList(terminal);
 					} else if (JAVA_NODE_IMPLEMENTATIONLIST.equals(type)) {

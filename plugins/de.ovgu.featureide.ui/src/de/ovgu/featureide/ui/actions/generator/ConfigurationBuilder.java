@@ -39,6 +39,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
@@ -238,7 +239,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		/** set number of configurations to build **/
 		switch (buildType) {
 			case ALL_CURRENT :
-				configurationNumber = countConfigurations(this.featureProject.getConfigFolder());
+				configurationNumber = countConfigurations(this.featureProject.getConfigFolder().getFolder(".test"));
 				break;
 			case ALL_VALID :
 				Job number = new AStoppableJob(JOB_TITLE_COUNT_CONFIGURATIONS) {
@@ -335,6 +336,11 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 					showStatistics(monitor);
 				} finally {
 					monitor.done();
+					try {
+						folder.getProject().build(IncrementalProjectBuilder.CLEAN_BUILD, null);
+					} catch (CoreException e) {
+						UIPlugin.getDefault().logError(e);
+					}
 				}
 				return Status.OK_STATUS;
 			}
@@ -575,7 +581,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	protected void buildCurrentConfigurations(IFeatureProject featureProject, IProgressMonitor monitor) {
 		monitor.beginTask("" , (int) configurationNumber);
 		try {
-			for (IResource configuration : featureProject.getConfigFolder().members()) {
+			for (IResource configuration : featureProject.getConfigFolder().getFolder(".test").members()) {
 				if (monitor.isCanceled()) {
 					finish();
 					return;
