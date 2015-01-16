@@ -400,6 +400,7 @@ public class Configuration {
 		for (SelectableFeature feature : features) {
 			feature.setManual(Selection.UNDEFINED);
 		}
+		resetAutomaticValues();
 		updateAutomaticValues();
 	}
 	

@@ -204,9 +204,7 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 		if (configurations.isEmpty()) {
 			return null;
 		}
-		BuilderConfiguration c = configurations.getFirst();
-		configurations.remove();
-		return c;
+		return configurations.remove();
 	}
 	
 	public void addConfiguration(BuilderConfiguration c) {
