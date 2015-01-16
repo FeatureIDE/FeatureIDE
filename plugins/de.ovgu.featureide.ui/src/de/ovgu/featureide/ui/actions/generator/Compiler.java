@@ -38,6 +38,11 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.debug.core.DebugPlugin;
+import org.eclipse.debug.core.ILaunch;
+import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.debug.core.ILaunchConfigurationType;
+import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.jdt.core.compiler.batch.BatchCompiler;
 
 import de.ovgu.featureide.ui.UIPlugin;
@@ -163,6 +168,34 @@ public class Compiler extends Job implements IConfigurationBuilderBasics {
 		files = parseJavacOutput(output, files, confName);
 		for (IFile file : files) {
 			generator.builder.featureProject.getComposer().postCompile(null, file);
+		}
+		launchJUnit();
+	}
+	
+	private void launchJUnit() {
+//		JUnitLaunchConfigurationDelegate del = new JUnitLaunchConfigurationDelegate();
+		ILaunchConfigurationType conf = DebugPlugin.getDefault().getLaunchManager().getLaunchConfigurationType("org.eclipse.jdt.junit.launchconfig");
+		ILaunchConfiguration[] confs = null;
+		
+		
+		try {
+			confs = DebugPlugin.getDefault().getLaunchManager().getLaunchConfigurations(conf);
+			for (ILaunchConfiguration iLaunchConfiguration : confs) {
+				if(iLaunchConfiguration.getName().compareTo("TestExp") == 0){
+					ILaunch launch = confs[0].launch(ILaunchManager.RUN_MODE, null);
+					while(!launch.isTerminated()){
+						try {
+							Thread.sleep(1000);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+//			launch.terminate();
+//			del.launch(confs[0], ILaunchManager.RUN_MODE, launch, null);
+		} catch (CoreException e) {
+			e.printStackTrace();
 		}
 	}
 	
