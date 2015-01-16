@@ -27,8 +27,10 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
 import de.ovgu.cide.fstgen.ast.FSTNode;
@@ -260,7 +262,14 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 	}
 
 	private IFile getFile(String name) {
-		String projectName = featureProject.getProjectName();
+		IProject project = featureProject.getProject();
+		IPath rl = project.getRawLocation();
+		final String projectName;
+		if (rl != null) {
+			projectName = rl.toOSString();
+		} else {
+			projectName = featureProject.getProjectName();
+		}
 		name = name.substring(name.indexOf(projectName + System.getProperty("file.separator") + featureProject.getSourceFolder().getName())
 				+ projectName.length() + 1);
 		return featureProject.getProject().getFile(new Path(name));
