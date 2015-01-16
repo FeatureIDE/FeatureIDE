@@ -232,7 +232,7 @@ public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 				while (parent.getParent() != null) {
 					parent = parent.getParent();
 				}
-				IFile iFile = model.getFeature(signatures.getFeatureName(featureID)).getRole(parent.getFullName().replace('.', '/') + ".java").getFile();
+				IFile iFile = model.getFeature(signatures.getFeatureName(featureID)).getRole(parent.getFullName().substring(1) + ".java").getFile();
 
 				if (iFile.isAccessible()) {
 					IWorkbench workbench = PlatformUI.getWorkbench();

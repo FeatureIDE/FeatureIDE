@@ -438,7 +438,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 		viewer.getControl().setEnabled(false);
 
 		addContentProv(new NotAvailableContentProv(), new NotAvailableLabelProv());
-		addContentProv(new CollaborationOutlineTreeContentProvider(), new CollaborationOutlineLabelProvider());
+//		addContentProv(new CollaborationOutlineTreeContentProvider(), new CollaborationOutlineLabelProvider());
 		addContentProv(new FmTreeContentProvider(), new FMOutlineLabelProviderWrapper());
 		addContentProv(new ContextOutlineTreeContentProvider(), new ContextOutlineLabelProvider());
 

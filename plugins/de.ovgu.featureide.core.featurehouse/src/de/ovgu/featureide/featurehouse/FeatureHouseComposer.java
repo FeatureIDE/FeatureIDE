@@ -141,7 +141,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 
 	public static final String COMPOSER_ID = "de.ovgu.featureide.composer.featurehouse";
 	
-	private boolean useFuji = false;
+	private boolean useFuji = true;
 
 	private FSTGenComposer composer;
 
