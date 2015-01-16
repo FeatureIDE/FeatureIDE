@@ -41,8 +41,6 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.events.KeyAdapter;
-import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.graphics.Color;
@@ -50,7 +48,6 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -362,6 +359,11 @@ public class ConstraintDialog implements GUIDefaults {
 		updateDialogState(DialogState.SAVE_CHANGES_DISABLED);
 	}
 
+	public void setInputText(String text) {
+		this.constraintText.setText(text);
+		this.constraintText.setSelection(text.length());
+	}
+
 	/**
 	 * initializes the shell
 	 */
@@ -571,16 +573,6 @@ public class ConstraintDialog implements GUIDefaults {
 		constraintText.setText(initialConstraint);
 		constraintText.setMargins(10, 5, 3, 5);
 		constraintText.setPossibleWords (featureModel.getFeatureNames());
-
-//		constraintText.addKeyListener(new KeyAdapter() {
-//			public void keyReleased(KeyEvent event) {
-//				if (event.keyCode == SWT.ESC) {
-//					if (!adapter.isProposalPopupOpen()) {
-//						cancelButtonPressEvent();
-//					}					
-//				}
-//			}
-//		});
 
 		constraintText.addModifyListener(new ModifyListener() {
 
