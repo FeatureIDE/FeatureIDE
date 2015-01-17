@@ -28,6 +28,7 @@ import java.util.LinkedList;
 import java.util.Scanner;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -47,7 +48,6 @@ import de.ovgu.featureide.ui.UIPlugin;
  * 
  * @author Jens Meinicke
  */
-// TODO use compiler of the given project directly
 public class Compiler extends Job implements IConfigurationBuilderBasics {
 
 	private Generator generator;
@@ -64,7 +64,7 @@ public class Compiler extends Job implements IConfigurationBuilderBasics {
 	 * @param name
 	 */
 	public Compiler(int nr, Generator generator) {
-		super(nr == 0 ? "Compiler" : "Compiler nr. " + nr);
+		super(nr == 0 ? "Compiler" : "Compiler" + nr);
 		this.generator = generator;
 		
 		tmp = generator.builder.tmp.getFolder(getName());
@@ -192,51 +192,74 @@ public class Compiler extends Job implements IConfigurationBuilderBasics {
 	 */
 	public LinkedList<IFile> parseJavacOutput(String output, LinkedList<IFile> files, String configurationName) {
 		LinkedList<IFile> errorFiles = new LinkedList<IFile>();
-		if (output.length() == 0)
+		if (output.isEmpty()) {
 			return errorFiles;
+		}
 		TreeMap<String, IFile> sourcePaths = new TreeMap<String, IFile>();
 		for (IFile file : files)
 			sourcePaths.put(file.getRawLocation().toOSString(), file);
 
-		Scanner scanner = new Scanner(output);
-		String currentLine;
-		while (scanner.hasNextLine()) {
-			currentLine = scanner.nextLine();
-
-			Matcher matcher = errorMessagePattern.matcher(currentLine);
-			if (!matcher.find() || !sourcePaths.containsKey(matcher.group(1)))
-				continue;
-			IFile currentFile = sourcePaths.get(matcher.group(1));
-			int line = Integer.parseInt(matcher.group(2));
-
-			String errorMessage = matcher.group(3).substring(1);
-
-			if (CANNOT_FIND_SYMBOL.equals(errorMessage)) {
-				errorMessage = parseCannotFindSymbolMessage(scanner);
-			}
-			if (errorMessage.contains(ERROR_IGNOR_RAW_TYPE) || errorMessage.contains(ERROR_IGNOR_CAST) 
-					|| errorMessage.contains(ERROR_IGNOR_SERIIZABLE) 
-					|| errorMessage.contains(ERROR_IGNOR_DEPRECATION)) {
-				continue;
-			}
-			if (!errorFiles.contains(currentFile)) {
-				errorFiles.add(currentFile);
-			}
-			IMarker newMarker;
-			try {
+		try (Scanner scanner = new Scanner(output)) {
+			String currentLine;
+			while (scanner.hasNextLine()) {
+				currentLine = scanner.nextLine();
+				Pattern pattern = Pattern.compile(
+				"\\S*\\s(\\w+)\\sin\\s(\\S:\\S*.java)\\s[(]at line (\\d+)[)]");
+				Matcher matcher = pattern.matcher(currentLine);
+				if (!matcher.find()) {
+					continue;
+				}
+				try {
+					boolean contains = sourcePaths.containsKey(matcher.group(2));
+					if (!contains) {
+						continue;
+					}
+				} catch (Exception e) {
+					UIPlugin.getDefault().logError(e);
+					continue;
+				}
+				final boolean warning = "WARNING".equals(matcher.group(1));
+				IFile currentFile = sourcePaths.get(matcher.group(2));
+				int line = Integer.parseInt(matcher.group(3));
+				// get error message in from the next lines
+				while (scanner.hasNextLine()) {
+					currentLine = scanner.nextLine();
+					Pattern messagePattern = Pattern.compile("\\w+[\\w\\W]*");
+					Matcher m = messagePattern.matcher(currentLine);
+					boolean found = m.matches();
+					if (found) {
+						break;
+					}
+				}
+				
+				String errorMessage = currentLine;
+	//			if (CANNOT_FIND_SYMBOL.equals(errorMessage)) {
+	//				errorMessage = parseCannotFindSymbolMessage(scanner);
+	//			}
+				if (errorMessage.contains(ERROR_IGNOR_RAW_TYPE) || errorMessage.contains(ERROR_IGNOR_CAST) 
+						|| errorMessage.contains(ERROR_IGNOR_SERIIZABLE) 
+						|| errorMessage.contains(ERROR_IGNOR_DEPRECATION)) {
+					continue;
+				}
+				if (!errorFiles.contains(currentFile)) {
+					errorFiles.add(currentFile);
+				}
+				IMarker newMarker;
 				newMarker = currentFile.createMarker(PROBLEM_MARKER);
 				if (newMarker.exists()) {
 					newMarker.setAttribute(IMarker.LINE_NUMBER, line);
 					newMarker.setAttribute(IMarker.MESSAGE, configurationName + " " + errorMessage);
-					newMarker.setAttribute(IMarker.SEVERITY, errorMessage.contains("warning") ? IMarker.SEVERITY_WARNING : IMarker.SEVERITY_ERROR);
+					newMarker.setAttribute(IMarker.SEVERITY, warning ? IMarker.SEVERITY_WARNING : IMarker.SEVERITY_ERROR);
 				}
-			} catch (CoreException e) {
-				UIPlugin.getDefault().logError(e);
 			}
+		} catch (CoreException e) {
+			UIPlugin.getDefault().logError(e);
 		}
+		
 		return errorFiles;
 	}
 
+	@SuppressWarnings("unused")
 	private String parseCannotFindSymbolMessage(Scanner scanner) {
 		while (scanner.hasNextLine()) {
 			String currentLine = scanner.nextLine();
