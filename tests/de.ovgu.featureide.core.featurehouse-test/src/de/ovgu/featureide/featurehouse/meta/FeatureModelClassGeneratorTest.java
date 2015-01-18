@@ -75,6 +75,18 @@ public class FeatureModelClassGeneratorTest {
 		System.out.println();
 	}
 	
+	@Test
+	public void testMetaVarexJ() {
+		System.out.println();
+		System.out.println("------------------------- Start Test VarexJ  ---------------------");
+		System.out.println();
+		FeatureModel model = init("model.xml");
+		new FeatureModelClassGenerator(model, IFeatureProject.META_VAREXJ);
+		System.out.println();
+		System.out.println("------------------------- End Test VarexJ  ---------------------");
+		System.out.println();
+	}
+	
 	protected static File MODEL_FILE_FOLDER = getFolder();
 	
 	private static final FileFilter filter = new FileFilter() {

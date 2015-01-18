@@ -364,6 +364,8 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 				buildDefaultMetaProduct(configPath, basePath, outputPath);
 			} else if (IFeatureProject.META_MODEL_CHECKING_BDD_JAVA.equals(featureProject.getMetaProductGeneration())) {
 				buildBDDMetaProduct(configPath, basePath, outputPath, "java");
+			} else if (IFeatureProject.META_VAREXJ.equals(featureProject.getMetaProductGeneration())) {
+				buildDefaultMetaProduct(configPath, basePath, outputPath);
 			} else if (IFeatureProject.META_MODEL_CHECKING_BDD_C.equals(featureProject.getMetaProductGeneration())) {
 				buildBDDMetaProduct(configPath, basePath, outputPath, "c");
 			} else {

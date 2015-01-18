@@ -53,9 +53,11 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	String DEFAULT_BUILD_PATH = "build";
 	String DEFAULT_CONTRACT_COMPOSITION= "None";
 	
+	// TODO revise with enum
 	String META_THEOREM_PROVING = "Theorem Proving";
 	String META_MODEL_CHECKING = "Model Checking (JPF-core)";
 	String META_MODEL_CHECKING_BDD_JAVA_JML = "Model Checking (JPF-BDD Java JML)";
+	String META_VAREXJ = "Variability-Aware Testing";
 	String META_MODEL_CHECKING_BDD_JAVA = "Model Checking (JPF-BDD Java)";
 	String META_MODEL_CHECKING_BDD_C = "Model Checking (JPF-BDD C)";
 	

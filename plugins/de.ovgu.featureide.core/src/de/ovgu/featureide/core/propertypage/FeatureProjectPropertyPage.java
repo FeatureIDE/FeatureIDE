@@ -266,6 +266,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 		metaCombo.add(IFeatureProject.META_MODEL_CHECKING);
 		metaCombo.add(IFeatureProject.META_MODEL_CHECKING_BDD_JAVA);
 		metaCombo.add(IFeatureProject.META_MODEL_CHECKING_BDD_JAVA_JML);
+		metaCombo.add(IFeatureProject.META_VAREXJ);
 		// TODO reactivate this line if c metaproduct is supported
 		// metaCombo.add(IFeatureProject.META_MODEL_CHECKING_BDD_C);
 		String selection = featureProject.getMetaProductGeneration();

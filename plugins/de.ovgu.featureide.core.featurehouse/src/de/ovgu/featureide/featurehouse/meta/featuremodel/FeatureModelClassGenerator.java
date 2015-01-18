@@ -61,6 +61,8 @@ public class FeatureModelClassGenerator {
 			featureModelClass = new FeatureModelKeY(featureModel);
 		} else if (method.equals(IFeatureProject.META_MODEL_CHECKING)) {
 			featureModelClass = new FeatureModelJPFCore(featureModel);
+		} else if (method.equals(IFeatureProject.META_VAREXJ)) {
+			featureModelClass = new FeatureModelVarexJ(featureModel);
 		} else {
 			return;
 		}
@@ -79,6 +81,8 @@ public class FeatureModelClassGenerator {
 			featureModelClass = new FeatureModelKeY(featureProject.getFeatureModel());
 		} else if (featureProject.getMetaProductGeneration().equals(IFeatureProject.META_MODEL_CHECKING)) {
 			featureModelClass = new FeatureModelJPFCore(featureProject.getFeatureModel());
+		} else if (featureProject.getMetaProductGeneration().equals(IFeatureProject.META_VAREXJ)) {
+			featureModelClass = new FeatureModelVarexJ(featureProject.getFeatureModel());
 		} else {
 			return;
 		}	
