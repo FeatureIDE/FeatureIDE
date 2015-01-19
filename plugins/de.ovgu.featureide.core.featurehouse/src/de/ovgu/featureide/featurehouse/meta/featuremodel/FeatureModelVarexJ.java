@@ -60,7 +60,7 @@ public class FeatureModelVarexJ implements IFeatureModelClass {
 	
 	@Override
 	public String getImports() {
-		return "import gov.nasa.jpf.annotation.Conditional\r\n\r\n";
+		return "import gov.nasa.jpf.annotation.Conditional;\r\n\r\n";
 	}
 		
 	@Override
@@ -108,7 +108,7 @@ public class FeatureModelVarexJ implements IFeatureModelClass {
 	@Override
 	public String getSelection() {
 		final StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append("\t/**\r\n\t * Select features to run a specific configuration.\r\n\t */\r\n\tpublic static String select(String[] selection) {\r\n\t\t");
+		stringBuilder.append("\t/**\r\n\t * Select features to run a specific configuration.\r\n\t */\r\n\tpublic static void select(String[] selection) {\r\n\t\t");
 		for (int i = 0;i < features.size();i++) {
 			if (i != 0) {
 				stringBuilder.append("\r\n\t\t");	

@@ -22,7 +22,6 @@ package de.ovgu.featureide.featurehouse;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -107,17 +106,8 @@ import fuji.SyntacticErrorException;
 @SuppressWarnings("restriction")
 public class FeatureHouseComposer extends ComposerExtensionClass {
 
-	/**
-	 * 
-	 */
 	private static final String FINAL_METHOD = "\\final_method";
-	/**
-	 * 
-	 */
 	private static final String ORIGINAL = "\\original";
-	/**
-	 * 
-	 */
 	private static final String FINAL_CONTRACT = "\\final_contract";
 	private static final FeatureHouseCorePlugin LOGGER = FeatureHouseCorePlugin.getDefault();
 	private static final String CONTRACT_COMPOSITION_CONSECUTIVE_CONTRACT_REFINEMENT = "consecutive contract refinement";
@@ -566,7 +556,8 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	private void buildDefaultMetaProduct(final String configPath, final String basePath, final String outputPath) {
 		new FeatureModelClassGenerator(featureProject);
 		FSTGenComposerExtension.key = IFeatureProject.META_THEOREM_PROVING.equals(featureProject.getMetaProductGeneration())
-				|| IFeatureProject.META_MODEL_CHECKING_BDD_JAVA_JML.equals(featureProject.getMetaProductGeneration());
+				|| IFeatureProject.META_MODEL_CHECKING_BDD_JAVA_JML.equals(featureProject.getMetaProductGeneration())
+				|| IFeatureProject.META_VAREXJ.equals(featureProject.getMetaProductGeneration());
 		composer = new FSTGenComposerExtension();
 		composer.addCompositionErrorListener(compositionErrorListener);
 		FeatureModel featureModel = featureProject.getFeatureModel();
@@ -587,23 +578,9 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 
 		try {
 			String[] args = getArguments(configPath, basePath, outputPath, getContractParameter());
-			long start = System.currentTimeMillis();
 			FeatureModelInfo modelInfo = new FeatureIDEModelInfo(featureModel, !IFeatureProject.META_THEOREM_PROVING.equals(featureProject.getMetaProductGeneration()));
 			((FSTGenComposerExtension) composer).setModelInfo(modelInfo);
 			((FSTGenComposerExtension) composer).buildMetaProduct(args, features);
-			long end = System.currentTimeMillis();
-			
-			long duration = end-start;
-			File file = new File("duration.txt");
-			try{
-				FileWriter writer = new FileWriter(file,true);
-				writer.write(String.valueOf(duration));
-				writer.write(System.getProperty("line.separator"));
-				writer.flush();
-				writer.close();
-			} catch (IOException ex){
-				
-			}
 		} catch (TokenMgrError e) {
 		} catch (Error e) {
 			LOGGER.logError(e);
