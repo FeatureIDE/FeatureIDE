@@ -23,6 +23,7 @@ package de.ovgu.featureide.featurehouse.meta.featuremodel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Locale;
 
 import org.prop4j.Node;
 import org.prop4j.NodeWriter;
@@ -78,7 +79,7 @@ public class FeatureModelVarexJ implements IFeatureModelClass {
 				fields.append(ANNOTATION);
 			}
 			fields.append(FIELD_MODIFIER);
-			fields.append(feature.getName());
+			fields.append(feature.getName().toLowerCase(Locale.ENGLISH));
 			if (isDeadFeature) {
 				fields.append(" = false;\r\n");
 			} else {
@@ -97,7 +98,7 @@ public class FeatureModelVarexJ implements IFeatureModelClass {
 		if (formula.contains(TRUE_FALSE)) {
 			formula = formula.substring(0, formula.indexOf(TRUE_FALSE));
 		}
-		return VALID + "return " + formula + ";\r\n\t}\r\n\r\n";
+		return VALID + "return " + formula.toLowerCase(Locale.ENGLISH) + ";\r\n\t}\r\n\r\n";
 	}
 
 	@Override
@@ -113,7 +114,7 @@ public class FeatureModelVarexJ implements IFeatureModelClass {
 			if (i != 0) {
 				stringBuilder.append("\r\n\t\t");	
 			}
-			stringBuilder.append(features.get(i).getName());
+			stringBuilder.append(features.get(i).getName().toLowerCase(Locale.ENGLISH));
 			stringBuilder.append(" = Boolean.valueOf(selection[");
 			stringBuilder.append(i);
 			stringBuilder.append("]);");
