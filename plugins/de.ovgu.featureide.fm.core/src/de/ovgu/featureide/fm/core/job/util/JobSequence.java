@@ -25,8 +25,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
-import org.eclipse.core.runtime.jobs.Job;
-
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.job.IJob;
 

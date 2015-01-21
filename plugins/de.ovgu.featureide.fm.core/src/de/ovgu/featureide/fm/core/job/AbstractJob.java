@@ -29,7 +29,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.StoppableJob;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 
 /**
