@@ -162,7 +162,6 @@ public class TNumberOfConfigurations extends AbstractConfigurationTest {
 		FeatureModel fm = loadXML(
 				"<and mandatory=\"true\" name=\"S\"><feature mandatory=\"false\" name=\"A\"/><feature hidden=\"true\" name=\"B\"/></and>");
 		Configuration c = new Configuration(fm);
-		System.out.println();
 		long x = c.number();
 		assertEquals(2, x);
 	}
