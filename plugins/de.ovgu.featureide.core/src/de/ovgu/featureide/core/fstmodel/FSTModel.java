@@ -179,22 +179,7 @@ public class FSTModel {
 	}
 	
 	public String getAbsoluteClassName(IFile file) {
-		IPath filePath = file.getProjectRelativePath();
-		final IPath featurePath = featureProject.getSourceFolder().getProjectRelativePath();
-		final IPath sourcePath = featureProject.getBuildFolder().getProjectRelativePath();
-		
-		int matchedSegments = filePath.matchingFirstSegments(featurePath) + 1;
-		if (matchedSegments != featurePath.segmentCount() + 1) {
-			// TODO: this depends on the used composer
-			// featureHouse adds an extra folder with the configuration name (therefore +1)
-			// however, ahead does not do this (hence, this is wrong)
-			matchedSegments = filePath.matchingFirstSegments(sourcePath) + 1;
-			if (matchedSegments != sourcePath.segmentCount() + 1) {
-				matchedSegments = 0;
-			}
-		}
-
-		filePath = filePath.removeFirstSegments(matchedSegments);
-		return filePath.toString();
+		IPath filePath = file.getProjectRelativePath();		
+		return filePath.removeFirstSegments(filePath.segmentCount() -1).toString();
 	}
 }
