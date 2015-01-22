@@ -1,22 +1,22 @@
-/* Prop4J - A Library for Propositional Formulas
- * Copyright (C) 2007-2013  Prop4J team, University of Magdeburg, Germany
+/* FeatureIDE - A Framework for Feature-Oriented Software Development
+ * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
  *
- * This file is part of Prop4J.
+ * This file is part of FeatureIDE.
  * 
- * Prop4J is free software: you can redistribute it and/or modify
+ * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  * 
- * Prop4J is distributed in the hope that it will be useful,
+ * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  * 
  * You should have received a copy of the GNU Lesser General Public License
- * along with Prop4J.  If not, see <http://www.gnu.org/licenses/>.
+ * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
- * See http://www.fosd.de/prop4j/ for further information.
+ * See http://featureide.cs.ovgu.de/ for further information.
  */
 package org.prop4j;
 
