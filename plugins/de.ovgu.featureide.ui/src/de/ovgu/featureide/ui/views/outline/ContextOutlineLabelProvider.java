@@ -226,13 +226,20 @@ public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 
 		private void openEditor(AbstractSignature sig, IFeatureProject featureProject, int featureID) {
 			final FSTModel model = featureProject.getFSTModel();
+			
 			final ProjectSignatures signatures = featureProject.getProjectSignatures();
 			if (model != null && signatures != null) {
 				AbstractSignature parent = sig;
 				while (parent.getParent() != null) {
 					parent = parent.getParent();
 				}
-				IFile iFile = model.getFeature(signatures.getFeatureName(featureID)).getRole(parent.getFullName().substring(1) + ".java").getFile();
+
+				IFile iFile = null;
+				if(!parent.getFullName().startsWith(".")){
+					iFile = model.getFeature(signatures.getFeatureName(featureID)).getRole(parent.getFullName().replace(".", "/") + ".java").getFile();
+				}else{
+					iFile = model.getFeature(signatures.getFeatureName(featureID)).getRole(parent.getFullName().substring(1) + ".java").getFile();
+				}
 
 				if (iFile.isAccessible()) {
 					IWorkbench workbench = PlatformUI.getWorkbench();
