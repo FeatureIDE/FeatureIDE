@@ -260,6 +260,14 @@ public class Configuration {
 		return propagator.isValid(new WorkMonitor());
 	}
 	
+	/**
+	 * Ignores hidden features.
+	 * Use this, when propgate is disabled (hidden features are not updated).
+	 */
+	public boolean isValidNoHidden() {
+		return propagator.isValidNoHidden(new WorkMonitor());
+	}
+	
 	public void leadToValidConfiguration(List<SelectableFeature> featureList, WorkMonitor workMonitor) {
 		propagator.leadToValidConfiguration(featureList, new WorkMonitor());
 	}

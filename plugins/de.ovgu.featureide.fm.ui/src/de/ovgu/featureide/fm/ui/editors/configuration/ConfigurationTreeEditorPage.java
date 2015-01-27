@@ -262,7 +262,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		if (display == null) {
 			return;
 		}
-		final boolean valid = configurationEditor.getConfiguration().isValid();
+		final boolean valid = configurationEditor.getConfiguration().isValidNoHidden();
 		
 		final IConfigJob<Long> job = configurationEditor.getConfiguration().getPropagator().getJobWrapper().number(250);
 		job.addJobFinishedListener(new JobFinishListener() {
@@ -357,6 +357,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			}
 			if (configurationEditor.isAutoSelectFeatures()) {
 				computeTree(false);
+				updateInfoLabel();
 			} else {
 				refreshItem(item, feature);
 				if (configurationEditor.getConfiguration().canBeValid()) {
@@ -364,8 +365,8 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 				} else {
 					invalidFeatures.add(feature);
 				}
+				updateInfoLabel();
 			}
-			updateInfoLabel();
 		}
 	}
 	
@@ -421,7 +422,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	 * configuration is invalid. deselect:blue, select:green
 	 */
 	protected IConfigJob<?> computeColoring(final Display currentDisplay) {
-		if (!configurationEditor.isAutoSelectFeatures() || configurationEditor.getConfiguration().isValid()) {
+		if (!configurationEditor.isAutoSelectFeatures() || configurationEditor.getConfiguration().isValidNoHidden()) {
 			return null;
 		}
 		final List<SelectableFeature> featureList = configurationEditor.getConfiguration().getManualFeatures();			

@@ -168,6 +168,35 @@ public class ConfigurationPropagator {
 		return false;
 	}
 	
+	/**
+	 * Ignores hidden features.
+	 * Use this, when propgate is disabled (hidden features are not updated).
+	 */
+	public boolean isValidNoHidden(WorkMonitor workMonitor) {
+		if (rootNode == null) {
+			return false;
+		}
+		final LinkedList<SelectableFeature> nonHiddenFeautres = new LinkedList<SelectableFeature>();
+
+		for (SelectableFeature feature : configuration.features) {
+			if (!feature.getFeature().hasHiddenParent()) {
+				nonHiddenFeautres.add(feature);
+			}
+		}
+		final Node[] allFeatures = new Node[nonHiddenFeautres.size() + 1];
+		allFeatures[0] = rootNodeWithoutHidden.clone();
+		int i = 1;
+		for (SelectableFeature feature : nonHiddenFeautres) {
+			allFeatures[i++] = new Literal(feature.getFeature().getName(), feature.getSelection() == Selection.SELECTED);
+		}
+		try {
+			return new SatSolver(new And(allFeatures), TIMEOUT).isSatisfiable();
+		} catch (TimeoutException e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+		return false;
+	}
+	
 	public boolean canBeValid(WorkMonitor workMonitor) {
 		if (rootNode == null) {
 			return false;
