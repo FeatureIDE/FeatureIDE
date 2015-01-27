@@ -22,11 +22,9 @@ package de.ovgu.featureide.fm.ui.editors;
 
 import org.eclipse.jface.fieldassist.IControlContentAdapter;
 import org.eclipse.jface.fieldassist.IControlContentAdapter2;
-import org.eclipse.jface.fieldassist.TextContentAdapter;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Text;
 
 /**
  * contentAdapter for content assist while typing constraints

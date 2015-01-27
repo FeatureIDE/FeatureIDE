@@ -85,8 +85,7 @@ public abstract class StoppableJob extends Job {
 		}
 		return Status.OK_STATUS; 
 	}
-
-	@SuppressWarnings("deprecation")
+	
 	@Override
 	protected void canceling() {
 		thread.stop();

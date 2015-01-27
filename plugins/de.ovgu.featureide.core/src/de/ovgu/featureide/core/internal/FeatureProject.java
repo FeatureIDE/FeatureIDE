@@ -64,18 +64,16 @@ import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.core.builder.ComposerExtensionManager;
 import de.ovgu.featureide.core.builder.ExtensibleFeatureProjectBuilder;
 import de.ovgu.featureide.core.builder.FeatureProjectNature;
-import de.ovgu.featureide.core.builder.IComposerExtension;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
+import de.ovgu.featureide.fm.core.AWaitingJob;
 import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureModelFile;
 import de.ovgu.featureide.fm.core.PropertyConstants;
-import de.ovgu.featureide.fm.core.StoppableJob;
-import de.ovgu.featureide.fm.core.AWaitingJob;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.configuration.FeatureIDEFormat;
@@ -88,6 +86,7 @@ import de.ovgu.featureide.fm.core.io.ModelIOFactory;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslReader;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
+import de.ovgu.featureide.fm.core.job.AStoppableJob;
 
 /**
  * Class that encapsulates any data and method related to FeatureIDE projects.
@@ -529,15 +528,16 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		// there are possibly no resource build yet or they are not up-to-date.
 		// Eclipse calls builders, if a resource as changed, but in this case
 		// actually no resource in the file system changes.
-		Job job = new StoppableJob("Performing full build") {
-			protected IStatus execute(IProgressMonitor monitor) {
+		Job job = new AStoppableJob("Performing full build") {
+			@Override
+			protected boolean work() throws Exception {
 				buildRelevantChanges = true;
 				try {
 					project.build(IncrementalProjectBuilder.FULL_BUILD, null);
 				} catch (CoreException e) {
 					LOGGER.logError(e);
 				}
-				return Status.OK_STATUS;
+				return true;
 			}
 		};
 		job.setPriority(Job.BUILD);

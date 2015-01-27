@@ -22,8 +22,6 @@ package de.ovgu.featureide.fm.core.job.util;
 
 import java.lang.reflect.Constructor;
 
-import org.eclipse.core.runtime.jobs.Job;
-
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
 import de.ovgu.featureide.fm.core.job.IProjectJob;

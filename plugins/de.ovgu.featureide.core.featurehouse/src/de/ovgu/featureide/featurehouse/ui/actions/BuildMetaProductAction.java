@@ -23,9 +23,6 @@ package de.ovgu.featureide.featurehouse.ui.actions;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
@@ -37,7 +34,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.featurehouse.FeatureHouseComposer;
 import de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.StoppableJob;
+import de.ovgu.featureide.fm.core.job.AStoppableJob;
 
 /**
  * Builds the meta product via FeatureHouse. 
@@ -77,15 +74,15 @@ public class BuildMetaProductAction implements IActionDelegate {
 			return;
 		}
 		buildMetaProduct(!getBuildMetaProduct(), featureProject.getProject());
-		Job job = new StoppableJob("Build meta product for project \"" + featureProject.getProjectName() + "\".") {
+		Job job = new AStoppableJob("Build meta product for project \"" + featureProject.getProjectName() + "\".") {
 			@Override
-			public IStatus execute(IProgressMonitor monitor) {
+			protected boolean work() throws Exception {
 				try {
 					featureProject.getProject().build(IncrementalProjectBuilder.FULL_BUILD, null);
 				} catch (CoreException e) {
 					FeatureHouseCorePlugin.getDefault().logError(e);
 				}
-				return Status.OK_STATUS;
+				return true;
 			}
 		};
 		job.setPriority(Job.LONG);

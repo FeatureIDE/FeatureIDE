@@ -21,7 +21,6 @@
 package de.ovgu.featureide.fm.ui.editors;
 
 import java.beans.PropertyChangeEvent;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;

@@ -77,12 +77,12 @@ import de.ovgu.featureide.core.fstmodel.FSTConfiguration;
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.listeners.ICurrentBuildListener;
+import de.ovgu.featureide.fm.core.AWaitingJob;
 import de.ovgu.featureide.fm.core.ColorList;
 import de.ovgu.featureide.fm.core.ColorschemeTable;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.PropertyConstants;
-import de.ovgu.featureide.fm.core.StoppableJob;
-import de.ovgu.featureide.fm.core.AWaitingJob;
+import de.ovgu.featureide.fm.core.job.AStoppableJob;
 import de.ovgu.featureide.fm.ui.GraphicsExporter;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.editors.annotation.ColorPalette;
@@ -566,20 +566,20 @@ public class CollaborationView extends ViewPart implements GUIDefaults,
 	private void makeActions() {
 		toolbarAction = new Action() {
 			public void run() {
-				Job job = new StoppableJob("Refresh Collaboration View") {
-					protected IStatus execute(IProgressMonitor monitor) {
+				Job job = new AStoppableJob("Refresh Collaboration View") {
+					@Override
+					protected boolean work() throws Exception {
 						if (!toolbarAction.isEnabled())
-							return Status.OK_STATUS;
+							return true;
 						toolbarAction.setEnabled(false);
 						if (featureProject != null) {
-							IComposerExtensionClass composer = featureProject
-									.getComposer();
+							IComposerExtensionClass composer = featureProject.getComposer();
 							if (composer != null) {
 								composer.buildFSTModel();
 								updateGuiAfterBuild(featureProject, null);
 							}
 						}
-						return Status.OK_STATUS;
+						return true;
 					}
 				};
 				job.setPriority(Job.SHORT);
