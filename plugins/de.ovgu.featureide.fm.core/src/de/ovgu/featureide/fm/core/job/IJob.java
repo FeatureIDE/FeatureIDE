@@ -29,39 +29,47 @@ import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
  * @author Sebastian Krieter
  */
 public interface IJob {
-	/**
-	 * Status value for jobs which are not already started.
-	 */
-	public static final int	STATUS_NOTSTARTED = 0x00;
 	
-	/**
-	 * Status value for jobs which are currently running.
-	 */
-	public static final int	STATUS_RUNNING = 0x01;
+	public enum JobStatus
+	{
+		/**
+		 * Job is not yet started.
+		 */
+		NOT_STARTED(0x00),
+		/**
+		 * Job is currently running.
+		 */
+		RUNNING(0x01),
+		/**
+		 * Job has finished successfully .
+		 */
+		OK(0x02),
+		/**
+		 * Job is finished, <b>without</b> success.
+		 * @see #OK
+		 */
+		FAILED(0x04);
+		
+		private int value;
+		
+		private JobStatus(int value){
+			this.value = value;
+		}
+		
+		public int getValue(){
+			return value;
+		}
+	}
 	
-	/**
-	 * Status value for finished jobs which successfully done their work.
-	 * @see #STATUS_FAILED
-	 */
-	public static final int	STATUS_OK = 0x02;
-	
-	/**
-	 * Status value for finished jobs which failed to do their work completely.
-	 * @see #STATUS_OK
-	 */
-	public static final int	STATUS_FAILED = 0x04;
 	
 	/**
 	 * Indicates the current status of the job.
 	 * 
 	 * @return one of 4 different possible statuses
 	 * 
-	 * @see #STATUS_NOTSTARTED
-	 * @see #STATUS_RUNNING
-	 * @see #STATUS_OK
-	 * @see #STATUS_FAILED
+	 * @see JobStatus
 	 */
-	int getStatus();
+	JobStatus getStatus();
 	
 	/**
 	 * Adds a {@link JobFinishListener} to this job.

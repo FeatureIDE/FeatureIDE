@@ -537,4 +537,13 @@ public class AspectJComposer extends ComposerExtensionClass {
 	    return IComposerExtensionClass.Mechanism.ASPECT_ORIENTED_PROGRAMMING;
 	}
 
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionBase#supportsMigration()
+	 */
+	@Override
+	public boolean supportsMigration()
+	{
+		return false;
+	}
+
 }

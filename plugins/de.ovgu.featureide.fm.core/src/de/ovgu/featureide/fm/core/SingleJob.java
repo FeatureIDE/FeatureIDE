@@ -26,7 +26,9 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
 /**
- * If the job is sheduled twice, the job is executed only once.
+ * This class implements a {@link Job}, that is executed only once, even if it 
+ * is scheduled twice.
+ * 
  * @author Jens Meinicke
  */
 public abstract class SingleJob extends Job {

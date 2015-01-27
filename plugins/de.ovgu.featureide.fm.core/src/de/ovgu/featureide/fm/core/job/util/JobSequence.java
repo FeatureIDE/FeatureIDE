@@ -31,10 +31,10 @@ import de.ovgu.featureide.fm.core.job.IJob;
 
 /**
  * Class for starting jobs.
- * It is possible to add jobs to a certain sequence, so they are executed consecutively.
- * Jobs in different sequences are executed in parallel.
+ * {@link IJob}s in a specific {@link JobSequence} are executed consecutively.
+ * {@link IJob}s in different {@link JobSequence}s are executed independent of each other.
  * </br>
- * It is also possible to wait for a sequence to finish.
+ * It is possible to wait for a sequence to finish.
  * 
  * @author Sebastian Krieter
  */
@@ -43,7 +43,7 @@ public final class JobSequence implements IJob {
 	private final LinkedList<JobFinishListener> jobFinishedListeners = new LinkedList<JobFinishListener>();
 	
 	private boolean ignorePreviousJobFail = true;
-	private int status = IJob.STATUS_NOTSTARTED;
+	private JobStatus status = JobStatus.NOT_STARTED;
 		
 	/**
 	 * Adds a new job to the sequence if it has not already finished
@@ -52,7 +52,7 @@ public final class JobSequence implements IJob {
 	 */
 	public boolean addJob(IJob newJob) {
 		synchronized (this) {
-			if (status == IJob.STATUS_NOTSTARTED || status == IJob.STATUS_RUNNING) {
+			if (status == JobStatus.NOT_STARTED || status == JobStatus.RUNNING) {
 				newJob.addJobFinishedListener(new JobFinishListener() {
 					@Override
 					public void jobFinished(IJob finishedJob, boolean success) {
@@ -73,7 +73,7 @@ public final class JobSequence implements IJob {
 	
 	public boolean cancel() {
 		synchronized (this) {
-			status = IJob.STATUS_FAILED;
+			status = JobStatus.FAILED;
 			if (jobs.isEmpty()) {
 				return true;
 			}
@@ -83,7 +83,7 @@ public final class JobSequence implements IJob {
 		}
 	}
 	
-	public int getStatus() {
+	public JobStatus getStatus() {
 		return status;
 	}
 	
@@ -122,8 +122,8 @@ public final class JobSequence implements IJob {
 		final IJob firstJob = jobs.peekFirst();
 		if (firstJob != null) {
 			synchronized (this) {
-				if (status == IJob.STATUS_NOTSTARTED) {
-					status = IJob.STATUS_RUNNING;
+				if (status == JobStatus.NOT_STARTED) {
+					status = JobStatus.RUNNING;
 					firstJob.schedule();
 				}
 			}
@@ -142,15 +142,15 @@ public final class JobSequence implements IJob {
 		synchronized (this) {
 			final IJob lastJob = jobs.poll();
 			if (lastJob != null) {
-				int lastStatus = lastJob.getStatus();
+				JobStatus lastStatus = lastJob.getStatus();
 				IJob nextJob = null;
 
 				for (final Iterator<IJob> it = jobs.iterator(); it.hasNext();) {
 					nextJob = it.next();
-					if (nextJob.getStatus() == IJob.STATUS_FAILED) {
-						lastStatus = IJob.STATUS_FAILED;
+					if (nextJob.getStatus() == JobStatus.FAILED) {
+						lastStatus = JobStatus.FAILED;
 						it.remove();
-					} else if (lastStatus == IJob.STATUS_FAILED && !ignoresPreviousJobFail()) {
+					} else if (lastStatus == JobStatus.FAILED && !ignoresPreviousJobFail()) {
 						it.remove();
 					} else {
 						break;
@@ -159,13 +159,13 @@ public final class JobSequence implements IJob {
 				if (jobs.isEmpty()) {
 					for (final Iterator<JobFinishListener> it = jobFinishedListeners.iterator(); it.hasNext();) {
 					    try {
-					    	it.next().jobFinished(this, lastStatus == IJob.STATUS_OK);
+					    	it.next().jobFinished(this, lastStatus == IJob.JobStatus.OK);
 					    }
 					    catch (RuntimeException e) {
 					    	FMCorePlugin.getDefault().logError(e);
 					    }
 					}
-					status = IJob.STATUS_OK;
+					status = JobStatus.OK;
 				} else {
 					nextJob.schedule();
 				}

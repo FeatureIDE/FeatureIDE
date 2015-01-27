@@ -865,5 +865,22 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		}
 		return x + " ] ";
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		return obj == this;// TODO equals should be implemented
+	}
+	
+	@Override
+	public int hashCode() {
+		int hash = 31;
+		for (String f : featureOrderList) {
+			hash = hash * 7 + f.hashCode();
+		}
+		for (Constraint c : constraints) {
+			hash = hash * 7 + c.toString().hashCode();
+		}
+		return hash;
+	}
 
 }

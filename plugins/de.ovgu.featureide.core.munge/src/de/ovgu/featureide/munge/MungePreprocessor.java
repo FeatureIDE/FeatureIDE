@@ -474,4 +474,13 @@ public class MungePreprocessor extends PPComposerExtensionClass {
 		return IComposerExtensionClass.Mechanism.PREPROCESSOR;
 	}
 
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionBase#supportsMigration()
+	 */
+	@Override
+	public boolean supportsMigration()
+	{
+		return false;
+	}
+
 }

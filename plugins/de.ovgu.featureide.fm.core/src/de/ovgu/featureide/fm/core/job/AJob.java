@@ -26,6 +26,8 @@ import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 
 /**
  * Abstract eclipse job with support for {@link JobFinishListener}.
+ * This class offers convenience constructors and hides the 
+ * {@link #run2(IProgressMonitor)}-method.
  * 
  * @author Sebastian Krieter
  */

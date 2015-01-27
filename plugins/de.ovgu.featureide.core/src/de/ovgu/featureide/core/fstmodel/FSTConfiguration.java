@@ -27,7 +27,7 @@ import org.eclipse.core.resources.IFile;
 
 
 /**
- * Describes the configuration for the FSTModel, to determine wether a feature is selected.
+ * Describes the configuration for the FSTModel, to determine whether a feature is selected.
  * 
  * @author Jens Meinicke
  */

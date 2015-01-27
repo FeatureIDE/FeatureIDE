@@ -39,6 +39,14 @@
                   value="de.ovgu.featureide.core.featureProjectNature">
             </objectState>
          </visibility>
+         <action
+               class="de.ovgu.featureide.featurehouse.ui.actions.GenerateFeatureStubsAction"
+               id="de.ovgu.featureide.featurehouse.meta.FeatureBasedVeriAction"
+               label="Perform Feature-Based Verification with KeY"
+               menubarPath="de.ovgu.featureide.fm.ui.menu/featurehouse"
+               style="push"
+               tooltip="Generates Feature Stubs and Starts KeY for each Feature Stub&apos;s Verification">
+         </action>
       </objectContribution>
 	</extension>
  <extension

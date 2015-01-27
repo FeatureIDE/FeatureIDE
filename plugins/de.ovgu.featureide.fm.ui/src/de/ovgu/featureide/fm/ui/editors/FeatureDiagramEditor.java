@@ -713,25 +713,20 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	public void doSave(IProgressMonitor monitor) {
 
 	}
-
+	
+	@Override
+	public boolean allowPageChange(int newPage) {
+		return true;
+	}
+	
 	@Override
 	public void pageChangeFrom(int newPage) {
-		if (newPage == getIndex()) {
-			featureModelEditor.textEditor.updateDiagram();
-		}
+		
 	}
 
 	@Override
 	public void pageChangeTo(int oldPage) {
-		if (oldPage == featureModelEditor.textEditor.getIndex()) {
-			if (!featureModelEditor.textEditor.updateDiagram()) {
-				// there are errors in the file, stay at this editor page
-				featureModelEditor.isPageModified = false;
-				featureModelEditor.setActiveEditorPage(featureModelEditor.textEditor.getIndex());
-				featureModelEditor.currentPageIndex = featureModelEditor.textEditor.getIndex();
-				return;
-			}
-		}
+		
 	}
 
 	@Override

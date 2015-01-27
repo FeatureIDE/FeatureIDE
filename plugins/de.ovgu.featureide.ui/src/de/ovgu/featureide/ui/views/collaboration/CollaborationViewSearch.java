@@ -23,11 +23,8 @@ package de.ovgu.featureide.ui.views.collaboration;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.draw2d.FigureCanvas;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Label;
-import org.eclipse.draw2d.geometry.Rectangle;
-import org.eclipse.gef.EditPart;
 import org.eclipse.gef.KeyHandler;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.swt.SWT;

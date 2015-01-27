@@ -58,7 +58,7 @@ public abstract class AStoppableJob extends AbstractJob implements IStoppableJob
 		}
 	}
 	
-	private int cancelingTimeout = 1000;
+	private int cancelingTimeout = 100;
 	
 	private InnerThread innerThread = null;
 	

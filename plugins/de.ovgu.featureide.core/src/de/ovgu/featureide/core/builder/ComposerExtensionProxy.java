@@ -116,4 +116,13 @@ public class ComposerExtensionProxy implements IComposerExtension {
 		return defaultComposerExtensionClass.supportsAndroid();
 	}
 
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionBase#supportsMigration()
+	 */
+	@Override
+	public boolean supportsMigration()
+	{
+		return defaultComposerExtensionClass.supportsMigration();
+	}
+
 }

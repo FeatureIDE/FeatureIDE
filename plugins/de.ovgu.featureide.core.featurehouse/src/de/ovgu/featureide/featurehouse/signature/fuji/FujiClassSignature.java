@@ -82,8 +82,8 @@ public class FujiClassSignature extends AbstractClassSignature {
 	public String toString() {		
 		StringBuilder sb = new StringBuilder();
 		
-		sb.append(super.toString());
-		sb.append(LINE_SEPARATOR);
+//		sb.append(super.toString());
+//		sb.append(LINE_SEPARATOR);
 		
 		if (mergedjavaDocComment != null) {
 			sb.append(mergedjavaDocComment);

@@ -325,4 +325,13 @@ public class DeltajComposer extends ComposerExtensionClass {
 	public Mechanism getGenerationMechanism() {
 	    return IComposerExtensionClass.Mechanism.DELTA_ORIENTED_PROGRAMMING;
 	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionBase#supportsMigration()
+	 */
+	@Override
+	public boolean supportsMigration()
+	{
+		return false;
+	}
 }

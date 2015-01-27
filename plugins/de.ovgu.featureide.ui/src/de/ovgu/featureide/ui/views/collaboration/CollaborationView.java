@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Vector;
 
 import org.eclipse.core.resources.IFile;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -58,7 +57,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartListener;
@@ -84,7 +82,7 @@ import de.ovgu.featureide.fm.core.ColorschemeTable;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.StoppableJob;
-import de.ovgu.featureide.fm.core.WaitingJob;
+import de.ovgu.featureide.fm.core.AWaitingJob;
 import de.ovgu.featureide.fm.ui.GraphicsExporter;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.editors.annotation.ColorPalette;
@@ -103,7 +101,6 @@ import de.ovgu.featureide.ui.views.collaboration.action.ShowFieldsMethodsAction;
 import de.ovgu.featureide.ui.views.collaboration.action.ShowUnselectedAction;
 import de.ovgu.featureide.ui.views.collaboration.editparts.CollaborationEditPart;
 import de.ovgu.featureide.ui.views.collaboration.editparts.GraphicalEditPartFactory;
-import de.ovgu.featureide.ui.views.collaboration.editparts.ModelEditPart;
 import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModelBuilder;
 
 /**
@@ -151,10 +148,8 @@ public class CollaborationView extends ViewPart implements GUIDefaults,
 	private Action toolbarAction;
 	private FilterAction filterAction;
 	private PrintAction printAction;
-	private ExportAsAction exportAsAction;
 	private ShowUnselectedAction showUnselectedAction;
 	private Point cursorPosition;
-	private Shell searchBoxShell = null;
 	private CollaborationViewSearch search;
 	private MenuManager colorSubMenu;
 	private AddColorSchemeAction addColorSchemeAction;
@@ -165,7 +160,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults,
 	private ShowFieldsMethodsAction[] setFieldsMethodsActions = new ShowFieldsMethodsAction[FIELD_METHOD_LABEL_NAMES.length];
 
 	private final Vector<IFile> configurations = new Vector<IFile>();
-	private final Job updateGUIJob = new WaitingJob(UPDATE_COLLABORATION_VIEW) {
+	private final Job updateGUIJob = new AWaitingJob(UPDATE_COLLABORATION_VIEW) {
 
 		public IStatus execute(IProgressMonitor monitor) {
 			if (configurations.isEmpty()) {
@@ -196,7 +191,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults,
 						part.refresh();
 					}
 					toolbarAction.setEnabled(true);
-					ModelEditPart modelPart = (ModelEditPart)viewer.getContents();
 					search.refreshSearchContent();
 					return Status.OK_STATUS;
 				}

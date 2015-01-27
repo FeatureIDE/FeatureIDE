@@ -64,6 +64,7 @@ import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.core.builder.ComposerExtensionManager;
 import de.ovgu.featureide.core.builder.ExtensibleFeatureProjectBuilder;
 import de.ovgu.featureide.core.builder.FeatureProjectNature;
+import de.ovgu.featureide.core.builder.IComposerExtension;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
@@ -74,7 +75,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureModelFile;
 import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.StoppableJob;
-import de.ovgu.featureide.fm.core.WaitingJob;
+import de.ovgu.featureide.fm.core.AWaitingJob;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.configuration.FeatureIDEFormat;
@@ -157,6 +158,14 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	private final FeatureModelFile modelFile;
 
 	private IComposerExtensionClass composerExtension = null;
+	
+	//TODO: Impelement possibility to change this path
+	private final String featureStubPath = "featurestub";
+
+	
+	public String getFeaturestubPath() {
+		return featureStubPath;
+	}
 
 	/**
 	 * If <code>true</code> there is something changed that is relevant for
@@ -168,7 +177,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 	private IFile currentConfiguration = null;
 
-	private final Job syncModulesJob = new WaitingJob("Synchronize feature model and feature modules") {
+	private final Job syncModulesJob = new AWaitingJob("Synchronize feature model and feature modules") {
 		protected IStatus execute(IProgressMonitor monitor) {
 			try {
 				final IFolder folder = sourceFolder;
@@ -200,7 +209,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		}
 	};
 
-	private final Job configurationChecker = new WaitingJob("Checking for unused features.") {
+	private final Job configurationChecker = new AWaitingJob("Checking for unused features.") {
 		protected IStatus execute(IProgressMonitor monitor) {
 			final IFolder folder = configFolder;
 			deleteConfigurationMarkers(folder, IResource.DEPTH_ZERO);

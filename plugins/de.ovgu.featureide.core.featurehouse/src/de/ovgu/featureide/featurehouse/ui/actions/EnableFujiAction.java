@@ -18,11 +18,14 @@ public class EnableFujiAction implements IObjectActionDelegate {
 	
 	@Override
 	public void run(IAction action) {
-		featureHouseComposer.setUseFuji(!featureHouseComposer.usesFuji());
+		if (featureHouseComposer != null) {
+			featureHouseComposer.setUseFuji(!featureHouseComposer.usesFuji());
+		}
 	}
 
 	@Override
 	public void selectionChanged(IAction action, ISelection selection) {
+		featureHouseComposer = null;
 		final Object first = ((IStructuredSelection) selection).getFirstElement();
 		if (first instanceof IProject) {
 			final IFeatureProject featureProject = CorePlugin.getFeatureProject((IProject) first);

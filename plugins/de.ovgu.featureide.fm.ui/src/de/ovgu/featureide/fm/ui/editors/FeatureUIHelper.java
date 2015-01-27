@@ -60,7 +60,7 @@ public class FeatureUIHelper {
 	private static final WeakHashMap<Constraint, Dimension> constraintSize = new WeakHashMap<Constraint, Dimension>();
 	private static WeakHashMap<FeatureModel, Dimension> legendSize = new WeakHashMap<FeatureModel, Dimension>();
 	private static WeakHashMap<FeatureModel, LegendFigure> legendFigure = new WeakHashMap<FeatureModel, LegendFigure>();
-	private static ArrayList<FeatureModel> hasVerticalLayout = new ArrayList<FeatureModel>();
+	private static Set<FeatureModel> hasVerticalLayout = new HashSet<FeatureModel>();
 	private static Set<FeatureModel> showHiddenFeatures = new HashSet<FeatureModel>();
 
 	/**

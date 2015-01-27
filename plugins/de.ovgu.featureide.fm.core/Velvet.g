@@ -17,6 +17,7 @@ tokens {
 	USE				='use';
 	IMPORTINSTANCE	='instance';
 	IMPORTINTERFACE	='interface';
+	DESCRIPTION		='description';
 
 	VAR_INT 	='int';
 	VAR_FLOAT 	='float';
@@ -53,14 +54,10 @@ tokens {
 	ACONSTR;
 	BASEEXT;
 	DEF;
-	FEAT;
 	GROUP;
 	ATTR;
 	UNARYOP;
 	OPERAND;
-	USES;
-	INST;
-	INTF;
 }
 
 @lexer::header {package de.ovgu.featureide.fm.core.io.velvet;}
@@ -86,7 +83,11 @@ concept
 		definitions?
 	-> ^(CONCEPT ID conceptBaseExt? instanceImports? interfaceImports? definitions?)
 	;
-
+	
+cinterface : CINTERFACE ID  (COLON conceptBaseExt)? definitions 
+	-> ^(CINTERFACE ID conceptBaseExt? definitions)
+	;
+	
 conceptBaseExt
 	: ID (COMMA ID)* 
 	-> ^(BASEEXT ID+)
@@ -94,21 +95,12 @@ conceptBaseExt
 	
 instanceImports
 	: IMPORTINSTANCE ID name (COMMA ID name)* 
-	-> ^(INST (ID name)+)
+	-> ^(IMPORTINSTANCE (ID name)+)
 	;
 	
 interfaceImports
 	: IMPORTINTERFACE ID name (COMMA ID name)* 
-	-> ^(INTF (ID name)+)
-	;
-
-cinterface : CINTERFACE ID  (COLON interfaceBaseExt)? definitions 
-	-> ^(CINTERFACE ID interfaceBaseExt? definitions)
-	;
-	
-interfaceBaseExt
-	: ID (COMMA ID)* 
-	-> ^(BASEEXT ID+)
+	-> ^(IMPORTINTERFACE (ID name)+)
 	;
 
 name: ID 
@@ -122,8 +114,7 @@ definitions
 
 definition 
 	: nonFeatureDefinition* (
-		(featureGroup nonFeatureDefinition*) |
-		(feature (feature | nonFeatureDefinition)*)
+		(featureGroup nonFeatureDefinition*) | (feature (feature | nonFeatureDefinition)*)
 	)?
 	;			
 	
@@ -131,16 +122,17 @@ nonFeatureDefinition
 	: constraint
 	| use
 	| attribute 
+	| description
 	;
 	
 use : USE name SEMI
-	-> ^(USES name)
+	-> ^(USE name)
 	;
 
 feature
 	: (MANDATORY ABSTRACT | ABSTRACT MANDATORY | MANDATORY | ABSTRACT)?
 	  FEATURE name (definitions | SEMI) 
-	-> ^(FEAT name MANDATORY? ABSTRACT? definitions?)
+	-> ^(FEATURE name MANDATORY? ABSTRACT? definitions?)
 	;
 
 featureGroup
@@ -152,7 +144,12 @@ groupType
 	: SOMEOF 
 	| ONEOF 
 	;
-
+	
+description
+	: DESCRIPTION STRING SEMI
+	-> ^(DESCRIPTION STRING)
+	;
+	
 constraint
 	: CONSTRAINT^ (ID EQ!)? (constraintDefinition | attributeConstraint) SEMI!
 	;
@@ -164,6 +161,11 @@ constraintDefinition
 	
 constraintOperand : unaryOp* (START_R constraintDefinition END_R | name )
 	-> constraintDefinition? ^(UNARYOP unaryOp)* ^(OPERAND name)? 
+	;
+	
+attribute
+	: (intAttribute | floatAttribute | stringAttribute | boolAttribute) SEMI
+	-> ^(ATTR intAttribute? floatAttribute? stringAttribute? boolAttribute?)
 	;
 	
 attributeConstraint
@@ -186,11 +188,6 @@ attribNumInstance
 	: INT 
 //	| FLOAT
 	| name
-	;
-
-attribute
-	: (intAttribute | floatAttribute | stringAttribute | boolAttribute) SEMI
-	-> ^(ATTR intAttribute? floatAttribute? stringAttribute? boolAttribute?)
 	;
 
 intAttribute:		VAR_INT!	name (EQ! INT)?;
@@ -222,7 +219,7 @@ attribRelation
 BOOLEAN	: 'true' 
 	| 'false'
 	;
-	
+		
 ID  :	('a'..'z'|'A'..'Z'|'_'|'-') ('a'..'z'|'A'..'Z'|'0'..'9'|'_'|'-')*
     ;
 	
@@ -267,7 +264,7 @@ UNICODE_ESC
     :   '\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
     ;
      
- WS  : ( ' '
+WS  : ( ' '
     | '\t'
     | '\r'
     | '\n'

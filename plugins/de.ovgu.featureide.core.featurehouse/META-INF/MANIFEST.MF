@@ -11,10 +11,11 @@ Require-Bundle: org.eclipse.ui,
  de.ovgu.featureide.fm.core,
  org.eclipse.jdt.core
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ClassPath: lib/FeatureHouse.jar,
  lib/fuji.jar,
  .
 Bundle-Vendor: University of Magdeburg
 Import-Package: org.eclipse.core.expressions,
- org.eclipse.jdt.internal.core
+ org.eclipse.jdt.internal.core,
+ org.eclipse.jdt.internal.ui.packageview
