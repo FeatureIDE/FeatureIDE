@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2013  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
- * See http://featureide.cs.ovgu.de/ for further information.
+ * See http://www.fosd.de/featureide/ for further information.
  */
 package de.ovgu.featureide.featurehouse.meta;
 
@@ -49,6 +49,7 @@ import de.ovgu.featureide.core.signature.filter.MethodFilter;
 import de.ovgu.featureide.featurehouse.ExtendedFujiSignaturesJob;
 import de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin;
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 
 /**
@@ -98,9 +99,8 @@ public class FeatureStubsGenerator {
 		
 		ExtendedFujiSignaturesJob efsj = new ExtendedFujiSignaturesJob(featureProject);
 		efsj.addJobFinishedListener(new JobFinishListener() {
-
 			@Override
-			public void jobFinished(boolean success) {
+			public void jobFinished(IJob finishedJob, boolean success) {
 				getFeatures(featureProject.getFSTModel().getProjectSignatures());
 			}
 			
@@ -308,17 +308,17 @@ public class FeatureStubsGenerator {
 		}
 	}
 
-	private StringBuilder checkForOriginalInContract(StringBuilder fileTextSB, AbstractSignature curSig) {
-		final int indexOfBody = fileTextSB.indexOf(curSig.toString().trim());
-		String tmpText = fileTextSB.substring(0, indexOfBody);
-		final int indexOfStartOfContract = tmpText.lastIndexOf("/*@");
-		final String contractBody = fileTextSB.substring(tmpText.length() - 1);
-		String tmpFileText = fileTextSB.substring(0, indexOfStartOfContract)
-				+ "\n\n\t/*@\n\t@ requires_abs   " + curSig.getName() + "R;\n\t@ ensures_abs    "
-				+ curSig.getName() + "E;\n\t@ assignable_abs " + curSig.getName() + "A;\n\t@*/\n"
-				+ contractBody;
-		return new StringBuilder(tmpFileText);
-	}
+//	private StringBuilder checkForOriginalInContract(StringBuilder fileTextSB, AbstractSignature curSig) {
+//		final int indexOfBody = fileTextSB.indexOf(curSig.toString().trim());
+//		String tmpText = fileTextSB.substring(0, indexOfBody);
+//		final int indexOfStartOfContract = tmpText.lastIndexOf("/*@");
+//		final String contractBody = fileTextSB.substring(tmpText.length() - 1);
+//		String tmpFileText = fileTextSB.substring(0, indexOfStartOfContract)
+//				+ "\n\n\t/*@\n\t@ requires_abs   " + curSig.getName() + "R;\n\t@ ensures_abs    "
+//				+ curSig.getName() + "E;\n\t@ assignable_abs " + curSig.getName() + "A;\n\t@*/\n"
+//				+ contractBody;
+//		return new StringBuilder(tmpFileText);
+//	}
 
 	private StringBuilder transformIntoAbstractContract(StringBuilder fileTextSB, AbstractSignature curSig) { 
 		int indexOfBody = fileTextSB.toString().lastIndexOf(curSig.toString().trim());

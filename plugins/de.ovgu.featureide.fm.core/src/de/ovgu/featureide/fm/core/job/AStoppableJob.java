@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.job;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
@@ -49,18 +47,20 @@ public abstract class AStoppableJob extends AbstractJob implements IStoppableJob
 			}
 		}
 		
-		// TODO test exceptions in work()
 		@Override
 		public void run() {
-			success = AStoppableJob.this.work();
+			try {
+				success = AStoppableJob.this.work();
+			} catch (Exception e) {
+				success = false;
+				e.printStackTrace();
+			}
 		}
 	}
-
-	private static final int maxRelativeWork = 100;
-	private int cancelingTimeout = 5000, relativeWorkDone = 0, absoluteWorkDone = 0, maxAbsoluteWork = 1;
+	
+	private int cancelingTimeout = 100;
 	
 	private InnerThread innerThread = null;
-	private IProgressMonitor monitor = null;
 	
 	protected AStoppableJob(String name, int priority) {
 		super(name, priority);
@@ -78,17 +78,21 @@ public abstract class AStoppableJob extends AbstractJob implements IStoppableJob
 			}
 		}
 		
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					Thread.sleep(cancelingTimeout);
-				} catch (InterruptedException e) {
-					FMCorePlugin.getDefault().logError(e);
+		if (cancelingTimeout > 0) {
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						Thread.sleep(cancelingTimeout);
+					} catch (InterruptedException e) {
+						FMCorePlugin.getDefault().logError(e);
+					}
+					stopInnerThread();
 				}
-				stopInnerThread();
-			}
-		}).start();
+			}).start();
+		} else {
+			stopInnerThread();
+		}
 	}
 	
 	@Override
@@ -97,14 +101,13 @@ public abstract class AStoppableJob extends AbstractJob implements IStoppableJob
 	}
 	
 	@Override
-	public final boolean run2(IProgressMonitor monitor) {
-		this.monitor = (monitor != null) ? monitor : new NullProgressMonitor();
-		this.monitor.beginTask(getName(), maxRelativeWork);		
+	public final boolean run2() {
+		workMonitor.begin(getName());
 		
 		synchronized (this) {
 			// in case job was started and canceled at the same time
-			if (monitor.isCanceled()) {
-				this.monitor.done();
+			if (workMonitor.checkCancel()) {
+				workMonitor.done();
 				return false;
 			}
 			innerThread = new InnerThread();
@@ -112,12 +115,12 @@ public abstract class AStoppableJob extends AbstractJob implements IStoppableJob
 		}
 		try {
 			innerThread.join();
-			this.monitor.done();
+			workMonitor.done();
 			return innerThread.success;
 		} catch (InterruptedException e) {
 			FMCorePlugin.getDefault().logError(e);
 			stopInnerThread();
-			this.monitor.done();
+			workMonitor.done();
 			return false;
 		}
 	}
@@ -131,32 +134,7 @@ public abstract class AStoppableJob extends AbstractJob implements IStoppableJob
 	 * {@inheritDoc}</br></br>
 	 * Implementing jobs should continuously call {@link #checkCancel()} and respond to a canceling request.
 	 */
-	protected abstract boolean work();
-	
-	/**
-	 * @return {@code true}, if the job received a canceling request.
-	 */
-	protected final boolean checkCancel() {
-		return monitor.isCanceled();
-	}
-
-	/**
-	 * Sets how many times {@link #worked()} has to be call within {@link #work()}.
-	 * 
-	 * @param maxAbsoluteWork the absolute amount of work this job has to do
-	 */
-	protected final void setMaxAbsoluteWork(int maxAbsoluteWork) {
-		this.maxAbsoluteWork = maxAbsoluteWork;
-	}
-	
-	/**
-	 * Increases the monitors progress.
-	 */
-	protected final void worked() {
-		final int nworked = (maxRelativeWork * ++absoluteWorkDone) / maxAbsoluteWork;
-		monitor.worked(nworked - relativeWorkDone);
-		relativeWorkDone = nworked;
-	}
+	protected abstract boolean work() throws Exception;
 
 	@SuppressWarnings("deprecation")
 	private void stopInnerThread() {

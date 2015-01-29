@@ -51,6 +51,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
@@ -68,14 +69,16 @@ import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.fm.core.AWaitingJob;
 import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureModelFile;
 import de.ovgu.featureide.fm.core.PropertyConstants;
-import de.ovgu.featureide.fm.core.StoppableJob;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
+import de.ovgu.featureide.fm.core.configuration.FeatureIDEFormat;
 import de.ovgu.featureide.fm.core.configuration.FeatureOrderReader;
+import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
@@ -83,6 +86,7 @@ import de.ovgu.featureide.fm.core.io.ModelIOFactory;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslReader;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
+import de.ovgu.featureide.fm.core.job.AStoppableJob;
 
 /**
  * Class that encapsulates any data and method related to FeatureIDE projects.
@@ -524,15 +528,16 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		// there are possibly no resource build yet or they are not up-to-date.
 		// Eclipse calls builders, if a resource as changed, but in this case
 		// actually no resource in the file system changes.
-		Job job = new StoppableJob("Performing full build") {
-			protected IStatus execute(IProgressMonitor monitor) {
+		Job job = new AStoppableJob("Performing full build") {
+			@Override
+			protected boolean work() throws Exception {
 				buildRelevantChanges = true;
 				try {
 					project.build(IncrementalProjectBuilder.FULL_BUILD, null);
 				} catch (CoreException e) {
 					LOGGER.logError(e);
 				}
-				return Status.OK_STATUS;
+				return true;
 			}
 		};
 		job.setPriority(Job.BUILD);
@@ -933,10 +938,8 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 						}
 						// create warnings (e.g., for features that are not
 						// available anymore)
-						for (int i = 0; i < reader.getWarnings().size(); i++) {
-							String message = reader.getWarnings().get(i);
-							int line = reader.getPositions().get(i);
-							createConfigurationMarker(file, message, line, IMarker.SEVERITY_WARNING);
+						for (ConfigurationReader.Warning warning : reader.getWarnings()) {
+							createConfigurationMarker(file, warning.getMessage(), warning.getPosition(), IMarker.SEVERITY_WARNING);
 						}
 						monitor.worked(1);
 					}
@@ -966,7 +969,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	}
 
 	public Collection<String> getFalseOptionalConfigurationFeatures(boolean[][] selections) {
-		return checkValidSelections(getSelectionMatrix(), false);
+		return checkValidSelections(selections, false);
 	}
 
 	public Collection<String> getUnusedConfigurationFeatures() {
@@ -974,7 +977,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	}
 
 	public Collection<String> getUnusedConfigurationFeatures(boolean[][] selections) {
-		return checkValidSelections(getSelectionMatrix(), true);
+		return checkValidSelections(selections, true);
 	}
 
 	private List<String> checkValidSelections(boolean[][] selections, boolean selectionState) {
@@ -984,16 +987,16 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		final List<String> concreteFeatures = getFalseOptionalFeatures();
 		final List<String> falseOptionalFeatures = new LinkedList<String>();
 		if (selections.length != 0) {
-			for (int collumn = 0; collumn < concreteFeatures.size(); collumn++) {
+			for (int column = 0; column < concreteFeatures.size(); column++) {
 				boolean invalid = true;
 				for (int conf = 0; conf < selections.length; conf++) {
-					if (selections[conf][collumn] == selectionState) {
+					if (selections[conf][column] == selectionState) {
 						invalid = false;
 						break;
 					}
 				}
 				if (invalid) {
-					falseOptionalFeatures.add(concreteFeatures.get(collumn));
+					falseOptionalFeatures.add(concreteFeatures.get(column));
 				}
 			}
 		}
@@ -1002,23 +1005,30 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 	private boolean[][] getSelectionMatrix() {
 		final List<IFile> configurations = getAllConfigurations();
-		final List<String> concreteFeatures = getOptionalConcreteFeatures();
+		final Collection<String> concreteFeatures = getOptionalConcreteFeatures();
 
-		boolean[][] selections = new boolean[configurations.size()][concreteFeatures.size()];
+		final boolean[][] selections = new boolean[configurations.size()][concreteFeatures.size()];
+		final Configuration configuration = new Configuration(featureModel, Configuration.PARAM_LAZY);
+		final ConfigurationReader reader = new ConfigurationReader(configuration);
+		
 		int row = 0;
 		for (IFile confFile : configurations) {
-			List<String> features = readFeaturesfromConfigurationFile(confFile.getRawLocation().makeAbsolute().toFile());
-			int collumn = 0;
-			for (String feature : concreteFeatures) {
-				selections[row][collumn] = features.contains(feature);
-				collumn++;
+			final boolean[] currentRow = selections[row++];
+			try {
+				reader.readFromFile(confFile);
+			} catch (Exception e) {
+				FMCorePlugin.getDefault().logError(e);
 			}
-			row++;
+			
+			int column = 0;
+			for (String feature : concreteFeatures) {
+				currentRow[column++] = configuration.getSelectablefeature(feature).getSelection() == Selection.SELECTED;
+			}
 		}
 		return selections;
 	}
 
-	private List<String> getOptionalConcreteFeatures() {
+	private Collection<String> getOptionalConcreteFeatures() {
 		final List<String> concreteFeatures = featureModel.getConcreteFeatureNames();
 		for (final Feature feature : featureModel.getAnalyser().getCoreFeatures()) {
 			concreteFeatures.remove(feature.getName());
@@ -1319,5 +1329,25 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		} catch (CoreException e) {
 			LOGGER.logError(e);
 		}
+	}
+	
+	@Override
+	public IFile getInternalConfigurationFile() {
+		return getInternalConfigurationFile(currentConfiguration);
+	}
+	
+	@Override
+	public IFile getInternalConfigurationFile(IFile configurationFile) {
+		String fileName = configurationFile.getName();
+		
+		final String extension = configurationFile.getFileExtension();
+		if (extension != null) {
+			fileName = "." + fileName.substring(0, fileName.length() - (extension.length())) + FeatureIDEFormat.EXTENSION;
+		} else {
+			fileName = "." + fileName + "." + FeatureIDEFormat.EXTENSION;
+		}
+		IFile internalFile = configurationFile.getParent().getFile(Path.fromOSString(fileName));
+		
+		return (internalFile.isAccessible()) ? internalFile : null;
 	}
 }

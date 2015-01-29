@@ -636,6 +636,10 @@ public class Feature implements PropertyConstants, PropertyChangeListener {
 	public String toString() {
 		return name;
 	}
+	
+	public String getDisplayName() {
+		return name;
+	}
 
 	@Override
 	public void propertyChange(PropertyChangeEvent event) {

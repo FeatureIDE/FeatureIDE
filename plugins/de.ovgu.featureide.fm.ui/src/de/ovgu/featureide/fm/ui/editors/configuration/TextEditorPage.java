@@ -26,6 +26,8 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
+import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationWriter;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
@@ -34,7 +36,8 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  * 
  * @author Jens Meinicke
  */
-public class TextEditorPage extends TextEditor implements IConfigurationEditorPage{
+public class TextEditorPage extends TextEditor implements
+		IConfigurationEditorPage {
 
 	private static final String ID = FMUIPlugin.PLUGIN_ID + "TextEditorPage";
 	private static final String PAGE_TEXT = "Source";
@@ -42,85 +45,71 @@ public class TextEditorPage extends TextEditor implements IConfigurationEditorPa
 	private int index;
 
 	private IConfigurationEditor configurationEditor;
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.ui.editors.IConfigurationEditorPage#getID()
-	 */
+
 	@Override
 	public String getID() {
 		return ID;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.ui.editors.IConfigurationEditorPage#getIndex()
-	 */
 	@Override
 	public int getIndex() {
 		return index;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.ui.editors.IConfigurationEditorPage#setIndex(int)
-	 */
 	@Override
 	public void setIndex(int index) {
 		this.index = index;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.ui.editors.IConfigurationEditorPage#setConfigurationEditor(de.ovgu.featureide.ui.editors.ConfigurationEditor)
-	 */
 	@Override
 	public void setConfigurationEditor(IConfigurationEditor configurationEditor) {
 		this.configurationEditor = configurationEditor;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.ui.editors.IConfigurationEditorPage#getPageText()
-	 */
 	@Override
 	public String getPageText() {
 		return PAGE_TEXT;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.ui.editors.IConfigurationEditorPage#propertyChange(java.beans.PropertyChangeEvent)
-	 */
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
-		if(configurationEditor.getConfiguration()==null){
-	
+		refresh();
+	}
+
+	protected final void refresh() {
+		if (configurationEditor.getConfiguration() == null) {
 			return;
 		}
-		String source = new ConfigurationWriter(configurationEditor.getConfiguration())
-				.writeIntoString();
+		String source = new ConfigurationWriter(configurationEditor.getConfiguration()).writeIntoString();
 		IDocumentProvider provider = getDocumentProvider();
 		IDocument document = provider.getDocument(getEditorInput());
-		if (!source.equals(document.get()))
+		if (!source.equals(document.get())) {
 			document.set(source);
+		}
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.ui.editors.IConfigurationEditorPage#pageChangeFrom(int)
-	 */
 	@Override
-	public void pageChangeFrom(int index) {
-	
+	public void pageChangeFrom(int newPageIndex) {
+		IDocumentProvider provider = getDocumentProvider();
+		IDocument document = provider.getDocument(getEditorInput());
+		String text = document.get();
+		if (!new ConfigurationWriter(configurationEditor.getConfiguration()).writeIntoString().equals(text)) {
+			try {
+				new ConfigurationReader(configurationEditor.getConfiguration()).readFromString(text);
+			} catch (Exception e) {
+				FMCorePlugin.getDefault().logError(e);
+			}
+		}
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.ui.editors.IConfigurationEditorPage#pageChangeTo(int)
-	 */
 	@Override
-	public void pageChangeTo(int index) {
-
+	public void pageChangeTo(int oldPageIndex) {
+		refresh();
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.ui.editors.IConfigurationEditorPage#getPage()
-	 */
 	@Override
 	public IConfigurationEditorPage getPage() {
 		return this;
 	}
-	
+
 }

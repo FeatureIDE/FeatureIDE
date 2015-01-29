@@ -202,7 +202,7 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 		final String docOutput = folderPath + "\\doc\\";
 		final String srcOutput = folderPath + "\\src\\";
 		
-		setMaxAbsoluteWork(structure.getClasses().size() + 2);
+		workMonitor.setMaxAbsoluteWork(structure.getClasses().size() + 2);
 		
 		for (AbstractClassFragment javaClass : structure.getClasses()) {
 			String packagename = javaClass.getSignature().getPackage();
@@ -219,7 +219,7 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 			IOConstants.writeToFile(
 					folder.getFile(javaClass.getSignature().getName() + IOConstants.EXTENSION_JAVA),
 					javaClass.toString());
-			worked();
+			workMonitor.worked();
 		}
 		folder = CorePlugin.createFolder(interfaceProject.getProjectReference(), arguments.foldername + "/doc/");
 		
@@ -266,14 +266,14 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 		}
 		
 		com.sun.tools.javadoc.Main.execute(javadocargs);
-		worked();
+		workMonitor.worked();
 		
 		try {
 			folder.refreshLocal(IFolder.DEPTH_INFINITE, null);
 		} catch (CoreException e) {
 			MPLPlugin.getDefault().logError(e);
 		}
-		worked();
+		workMonitor.worked();
 		
 		MPLPlugin.getDefault().logInfo("Built Documentation");
 		return true;

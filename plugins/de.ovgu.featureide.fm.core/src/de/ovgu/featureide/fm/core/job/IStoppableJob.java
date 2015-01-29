@@ -26,6 +26,6 @@ package de.ovgu.featureide.fm.core.job;
  * @author Sebastian Krieter
  */
 public interface IStoppableJob extends IJob {
-	int getCancelingTimeout();	
+	int getCancelingTimeout();
 	void setCancelingTimeout(int cancelingTimeout);
 }

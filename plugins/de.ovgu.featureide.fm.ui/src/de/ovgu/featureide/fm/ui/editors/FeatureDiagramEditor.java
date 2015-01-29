@@ -28,6 +28,7 @@ import java.util.LinkedList;
 import org.eclipse.core.commands.operations.ObjectUndoContext;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.draw2d.ConnectionLayer;
@@ -66,7 +67,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.FeatureStatus;
 import de.ovgu.featureide.fm.core.PropertyConstants;
-import de.ovgu.featureide.fm.core.StoppableJob;
+import de.ovgu.featureide.fm.core.job.AStoppableJob;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractAction;
@@ -524,12 +525,11 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 					}
 					waiting = false;
 				}
-				analyzeJob = new StoppableJob("Analyze feature model") {
-
+				analyzeJob = new AStoppableJob("Analyze feature model") {
 					@Override
-					protected IStatus execute(IProgressMonitor monitor) {
+					protected boolean work() throws Exception {
 						if (waiting) {
-							return Status.OK_STATUS;
+							return true;
 						}
 
 						if (!runAnalysis) {
@@ -550,19 +550,16 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 							};
 							refreshGraphics.setPriority(Job.SHORT);
 							refreshGraphics.schedule();
-							return Status.OK_STATUS;
+							return true;
 						}
 
 						analyzer = getFeatureModel().getAnalyser();
-
-						final HashMap<Object, Object> changedAttributes = analyzer.analyzeFeatureModel(monitor);
+						workMonitor.done();
+						final HashMap<Object, Object> changedAttributes = analyzer.analyzeFeatureModel(new NullProgressMonitor());
 
 						refreshGraphics(changedAttributes);
-
-						monitor.subTask(null);
-						monitor.done();
-						monitor.setCanceled(true);
-						return Status.OK_STATUS;
+						
+						return true;
 					}
 				};
 				analyzeJob.setPriority(Job.LONG);

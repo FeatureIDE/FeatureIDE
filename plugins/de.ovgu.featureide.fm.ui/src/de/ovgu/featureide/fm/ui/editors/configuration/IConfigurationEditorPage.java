@@ -67,13 +67,13 @@ public interface IConfigurationEditorPage extends IEditorPart {
 	 * Called if the tab has been changed from this page.
 	 * @param index of the new page 
 	 */
-	public void pageChangeFrom(int index);
+	public void pageChangeFrom(int newPageIndex);
 	
 	/**
 	 * Called if the tab has been changed to this page.
 	 * @param index of the old page 
 	 */
-	public void pageChangeTo(int index);
+	public void pageChangeTo(int oldPageIndex);
 	
 	/**
 	 * @return This page. You can also call a constructor.

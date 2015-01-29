@@ -202,7 +202,8 @@ public class InterfaceProject {
 	
 	public Configuration getConfiguration() {
 		if (configuration == null) {
-			configuration = FileLoader.loadConfiguration(this);
+			configuration = new Configuration(featureModel);
+			FileLoader.loadConfiguration(this);
 		}
 		return configuration;
 	}

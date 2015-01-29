@@ -20,13 +20,13 @@
  */
 package de.ovgu.featureide.core.mpl.io;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 
 import de.ovgu.featureide.core.mpl.InterfaceProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
-import de.ovgu.featureide.core.mpl.io.reader.ExtendedConfigurationReader;
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 
 /**
@@ -36,13 +36,15 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
  */
 public final class FileLoader {
 
-	public static Configuration loadConfiguration(InterfaceProject interfaceProject) {
+	public static void loadConfiguration(InterfaceProject interfaceProject) {
 		try {
-			ExtendedConfigurationReader exConfReader = new ExtendedConfigurationReader(interfaceProject);
-			return exConfReader.read();
+			ConfigurationReader configReader = new ConfigurationReader(interfaceProject.getConfiguration());
+			final IFile internalFile = interfaceProject.getFeatureProjectReference().getInternalConfigurationFile();
+			if (internalFile == null || !configReader.readFromFile(internalFile)) {
+				configReader.readFromFile(interfaceProject.getFeatureProjectReference().getCurrentConfiguration());
+			}
 		} catch (Exception e) {
 			MPLPlugin.getDefault().logError(e);
-			return null;
 		}
 	}
 

@@ -30,6 +30,8 @@ public class SelectableFeature extends TreeElement {
 	private Selection manual = Selection.UNDEFINED;
 
 	private Selection automatic = Selection.UNDEFINED;
+	
+	private Selection recommended = Selection.UNDEFINED;
 
 	private final Feature feature;
 
@@ -91,6 +93,14 @@ public class SelectableFeature extends TreeElement {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+	
+	public Selection getRecommended() {
+		return recommended;
+	}
+	
+	public void setRecommended(Selection recommended) {
+		this.recommended = recommended;
 	}
 
 }

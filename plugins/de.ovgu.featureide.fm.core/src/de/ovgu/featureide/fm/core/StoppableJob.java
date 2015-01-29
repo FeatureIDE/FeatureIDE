@@ -85,7 +85,7 @@ public abstract class StoppableJob extends Job {
 		}
 		return Status.OK_STATUS; 
 	}
-
+	
 	@Override
 	protected void canceling() {
 		thread.stop();

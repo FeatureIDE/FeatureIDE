@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.job;
 
+import de.ovgu.featureide.fm.core.FunctionalInterfaces.IFunction;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 
 /**
@@ -89,8 +90,12 @@ public interface IJob {
 	 */
 	boolean cancel();
 	
+	void join() throws InterruptedException;
+	
 	/**
 	 * {@link org.eclipse.core.runtime.jobs.Job#schedule()}
 	 */
 	void schedule();
+	
+	void setIntermediateFunction(IFunction<Object, Void> intermediateFunction);
 }

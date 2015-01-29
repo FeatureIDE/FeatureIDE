@@ -256,8 +256,6 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 
 	@Override
 	protected boolean work() {
-
-		
 		FeatureModel fm = featureProject.getFeatureModel();
 		fm.getAnalyser().setDependencies();
 
@@ -294,7 +292,7 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 				++count;
 			}
 		}
-		setMaxAbsoluteWork(2 * count);
+		workMonitor.setMaxAbsoluteWork(2 * count);
 
 		LinkedList<TypeDecl> stack = new LinkedList<TypeDecl>();
 		LinkedList<AbstractClassSignature> roleStack = new LinkedList<AbstractClassSignature>();
@@ -400,7 +398,7 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 					}
 				} while (!stack.isEmpty());
 			}
-			worked();
+			workMonitor.worked();
 		}
 		
 		final AbstractSignature[] sigArray = new AbstractSignature[signatureSet.size()];
@@ -501,7 +499,7 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 					}
 				} while (!stack.isEmpty());
 			}
-			worked();
+			workMonitor.worked();
 		}
 		for (ExtendedSignature extSig : originalList) {
 			final FeatureData[] featureData = extSig.sig.getFeatureData();

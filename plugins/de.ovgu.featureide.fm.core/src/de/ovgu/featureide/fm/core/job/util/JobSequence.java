@@ -26,6 +26,7 @@ import java.util.LinkedList;
 import java.util.ListIterator;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.FunctionalInterfaces.IFunction;
 import de.ovgu.featureide.fm.core.job.IJob;
 
 /**
@@ -39,8 +40,8 @@ import de.ovgu.featureide.fm.core.job.IJob;
  */
 public final class JobSequence implements IJob {
 	private final LinkedList<IJob> jobs = new LinkedList<IJob>();
+	private final LinkedList<JobFinishListener> jobFinishedListeners = new LinkedList<JobFinishListener>();
 	
-	private LinkedList<JobFinishListener> jobFinishedListeners = null;
 	private boolean ignorePreviousJobFail = true;
 	private JobStatus status = JobStatus.NOT_STARTED;
 		
@@ -54,7 +55,7 @@ public final class JobSequence implements IJob {
 			if (status == JobStatus.NOT_STARTED || status == JobStatus.RUNNING) {
 				newJob.addJobFinishedListener(new JobFinishListener() {
 					@Override
-					public void jobFinished(boolean success) {
+					public void jobFinished(IJob finishedJob, boolean success) {
 						JobSequence.this.startNextJob();
 					}
 				});
@@ -67,9 +68,6 @@ public final class JobSequence implements IJob {
 	}
 	
 	public void addJobFinishedListener(JobFinishListener listener) {
-		if (jobFinishedListeners == null) {
-			jobFinishedListeners = new LinkedList<JobFinishListener>();
-		}
 		jobFinishedListeners.add(listener);
 	}
 	
@@ -103,7 +101,7 @@ public final class JobSequence implements IJob {
 					for (IJob newJob : newJobs) {
 						newJob.addJobFinishedListener(new JobFinishListener() {
 							@Override
-							public void jobFinished(boolean success) {
+							public void jobFinished(IJob finishedJob, boolean success) {
 								JobSequence.this.startNextJob();
 							}
 						});
@@ -116,9 +114,7 @@ public final class JobSequence implements IJob {
 	}
 	
 	public void removeJobFinishedListener(JobFinishListener listener) {
-		if (jobFinishedListeners != null) {
-			jobFinishedListeners.remove(listener);
-		}
+		jobFinishedListeners.remove(listener);
 	}
 	
 	@Override
@@ -161,15 +157,13 @@ public final class JobSequence implements IJob {
 					}
 				}
 				if (jobs.isEmpty()) {
-					if (jobFinishedListeners != null) {
-						for (final Iterator<JobFinishListener> it = jobFinishedListeners.iterator(); it.hasNext();) {
-						    try {
-						    	it.next().jobFinished(lastStatus == JobStatus.OK);
-						    }
-						    catch (RuntimeException e) {
-						    	FMCorePlugin.getDefault().logError(e);
-						    }
-						}
+					for (final Iterator<JobFinishListener> it = jobFinishedListeners.iterator(); it.hasNext();) {
+					    try {
+					    	it.next().jobFinished(this, lastStatus == IJob.JobStatus.OK);
+					    }
+					    catch (RuntimeException e) {
+					    	FMCorePlugin.getDefault().logError(e);
+					    }
 					}
 					status = JobStatus.OK;
 				} else {
@@ -177,5 +171,13 @@ public final class JobSequence implements IJob {
 				}
 			}
 		}
+	}
+	
+	@Override
+	public void setIntermediateFunction(IFunction<Object, Void> intermediateFunction) {
+	}
+	
+	@Override
+	public void join() throws InterruptedException {
 	}
 }

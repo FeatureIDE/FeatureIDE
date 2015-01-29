@@ -29,6 +29,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.FunctionalInterfaces.IFunction;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 
 /**
@@ -37,6 +38,7 @@ import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
  * @author Sebastian Krieter
  */
 abstract class AbstractJob extends Job implements IJob {
+	protected final WorkMonitor workMonitor = new WorkMonitor();
 	private JobStatus status = JobStatus.NOT_STARTED;
 	private LinkedList<JobFinishListener> jobFinishedListeners = new LinkedList<JobFinishListener>();
 	
@@ -61,14 +63,20 @@ abstract class AbstractJob extends Job implements IJob {
 	}
 	
 	@Override
+	public final void setIntermediateFunction(IFunction<Object, Void> intermediateFunction) {
+		workMonitor.setIntermediateFunction(intermediateFunction);
+	}
+
+	@Override
 	public final IStatus run(IProgressMonitor monitor) {
 		status = JobStatus.RUNNING;
 		boolean success = false;
+		workMonitor.setMonitor(monitor);
 		
 		// run job and catch possible runtime exceptions
 		try {
-			success = run2(monitor);
-		} catch (RuntimeException e) {
+			success = run2();
+		} catch (Exception e) {
 			FMCorePlugin.getDefault().logError(e);
 		} finally {
 			finalWork(success);
@@ -79,7 +87,7 @@ abstract class AbstractJob extends Job implements IJob {
 		// inform all registered listeners
 		for (final Iterator<JobFinishListener> it = jobFinishedListeners.iterator(); it.hasNext();) {
 		    try {
-		    	it.next().jobFinished(success);
+		    	it.next().jobFinished(this, success);
 		    } catch (RuntimeException e) {
 		    	FMCorePlugin.getDefault().logError(e);
 		    }
@@ -97,16 +105,17 @@ abstract class AbstractJob extends Job implements IJob {
 	protected void finalWork(boolean success) {}
 	
 	/**
-	 * In this method all the work of the job is done.
+	 * In this method all the work of the job is done.</br>
+	 * Use the {@link #workMonitor} field for progress monitoring and calling intermediate functions.
 	 * 
 	 * @return {@code true} if no error occurred during the process
+	 * @throws Exception any exception (will be catched by the parent class)
 	 */
-	protected abstract boolean work();
-
+	protected abstract boolean work() throws Exception;
 	
 	/**
 	 * This method is used by {@link AStoppableJob} to handle the inner thread.
 	 * The job's task should be implemented in {@link #work()}.
 	 */
-	abstract boolean run2(IProgressMonitor monitor);
+	abstract boolean run2() throws Exception;
 }

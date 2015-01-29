@@ -144,8 +144,12 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 	FSTModel getFSTModel();
 
 	FeatureModel getFeatureModel();
-	
+
 	IFile getModelFile();
+	
+	IFile getInternalConfigurationFile();
+	
+	IFile getInternalConfigurationFile(IFile configurationFile);
 	
 	/**
 	 * Returns the ID of the assigned composer
