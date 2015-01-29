@@ -196,7 +196,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		gridData.verticalAlignment = SWT.CENTER;
 	    infoLabel = new Label(compositeTop, SWT.NONE);
 	    infoLabel.setLayoutData(gridData);
-	    updateInfoLabel();
+	    updateInfoLabel(Display.getCurrent());
 	    		
 		// autoselect button 
 		gridData = new GridData();
@@ -224,11 +224,11 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 							return null;
 						}
 					}, new FunctionalInterfaces.NullFunction<Void, Void>());
-					updateInfoLabel();
+					updateInfoLabel(Display.getCurrent());
 				} else {
 					if (invalidFeatures.isEmpty()) {
 						configurationEditor.setAutoSelectFeatures(true);
-						updateInfoLabel();
+//						updateInfoLabel();
 						computeTree(true);
 					} else {
 						autoSelectButton.setSelection(false);
@@ -257,9 +257,10 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	
 	protected abstract void createUITree(Composite parent);
 	
-	protected void updateInfoLabel() {
-		final Display display = Display.getCurrent();
+	protected void updateInfoLabel(final Display display) {
 		if (display == null) {
+			infoLabel.setText("Calculating ...");
+			infoLabel.setForeground(null);
 			return;
 		}
 		final boolean valid = configurationEditor.getConfiguration().isValidNoHidden();
@@ -357,7 +358,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			}
 			if (configurationEditor.isAutoSelectFeatures()) {
 				computeTree(false);
-				updateInfoLabel();
+//				updateInfoLabel();
 			} else {
 				refreshItem(item, feature);
 				if (configurationEditor.getConfiguration().canBeValid()) {
@@ -365,7 +366,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 				} else {
 					invalidFeatures.add(feature);
 				}
-				updateInfoLabel();
+//				updateInfoLabel();
 			}
 		}
 	}
@@ -383,7 +384,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			buildTree(root, configuration.getRoot().getChildren(), new FunctionalInterfaces.IFunction<Void, Void>() {
 				@Override
 				public Void invoke(Void t) {
-					updateInfoLabel();
+//					updateInfoLabel();
 					computeTree(false);
 					return null;
 				}
@@ -506,14 +507,15 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		if (currentDisplay == null) {
 			return;
 		}
+		updateInfoLabel(null);
 		
 		final IConfigJob<?> updateJob = computeFeatures(redundantManual, currentDisplay);
-		final IConfigJob<?> coloringJob = computeColoring(currentDisplay);
 		updateJob.addJobFinishedListener(new JobFinishListener() {
 			
 			@Override
 			public void jobFinished(IJob finishedJob, boolean success) {
-				configurationEditor.getConfigJobManager().startJob(coloringJob);
+				updateInfoLabel(currentDisplay);
+				configurationEditor.getConfigJobManager().startJob(computeColoring(currentDisplay));
 			}
 		});
 		
