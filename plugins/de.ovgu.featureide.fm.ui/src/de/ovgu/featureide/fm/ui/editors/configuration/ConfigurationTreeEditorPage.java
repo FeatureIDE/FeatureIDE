@@ -514,8 +514,10 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			
 			@Override
 			public void jobFinished(IJob finishedJob, boolean success) {
-				updateInfoLabel(currentDisplay);
-				configurationEditor.getConfigJobManager().startJob(computeColoring(currentDisplay));
+				if (success) {
+					updateInfoLabel(currentDisplay);
+					configurationEditor.getConfigJobManager().startJob(computeColoring(currentDisplay));	
+				}				
 			}
 		});
 		
