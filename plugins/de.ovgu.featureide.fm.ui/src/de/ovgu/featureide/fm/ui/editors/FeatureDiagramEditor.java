@@ -77,6 +77,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AutoLayoutConstrain
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ChangeFeatureDescriptionAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateCompoundAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintWithAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateLayerAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.DeleteAllAction;
@@ -153,6 +154,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 
 	private EditConstraintAction editConstraintAction;
 	private CreateConstraintAction createConstraintAction;
+	private CreateConstraintWithAction createConstraintWithAction;
 
 	private ReverseOrderAction reverseOrderAction;
 
@@ -265,6 +267,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		new SelectionAction(this, featureModel);
 
 		createConstraintAction = new CreateConstraintAction(this, featureModel);
+		createConstraintWithAction = new CreateConstraintWithAction(this, featureModel);
 		editConstraintAction = new EditConstraintAction(this, featureModel);
 		reverseOrderAction = new ReverseOrderAction(this, featureModel);
 
@@ -353,7 +356,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		else if ((createLayerAction.isEnabled() || createCompoundAction.isEnabled()) && !connectionSelected) {
 			menu.add(createCompoundAction);
 			menu.add(createLayerAction);
-			menu.add(createConstraintAction);
+			menu.add(createConstraintWithAction);
 			menu.add(renameAction);
 			menu.add(deleteAction);
 			menu.add(deleteAllAction);
