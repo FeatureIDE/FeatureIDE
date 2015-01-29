@@ -288,6 +288,11 @@ public class ConstraintDialog implements GUIDefaults {
 			detailsLabel.setText("You can create or edit constraints with this dialog.");
 		}
 	}
+	
+	public void setInputText(String text) {
+		this.constraintText.setText(text);
+		this.constraintText.setSelection(text.length());
+	}
 
 	private static final String FILTERTEXT = "type filter text";
 
