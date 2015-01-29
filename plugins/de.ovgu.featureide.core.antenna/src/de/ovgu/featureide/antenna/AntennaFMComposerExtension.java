@@ -47,6 +47,8 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
  * @author Marcus Kamieth
 */
 public class AntennaFMComposerExtension extends FMComposerExtension {
+	
+	private final static char[] ILLEGAL_FEAUTURE_NAME_CHARSET = new char[] {'(', ')', '"', 'ü', 'Ü', 'ä', 'Ä', 'ö', 'Ö', '$', '_'};
 
 	private static String ORDER_PAGE_MESSAGE = 
 			"FeatureIDE projects based on preprocessors such as Antenna do not\n" +
@@ -61,7 +63,7 @@ public class AntennaFMComposerExtension extends FMComposerExtension {
 	public boolean hasFeaureOrder() {
 		return false;
 	}
-
+	
 	@Override
 	public boolean performRenaming(String oldName, String newName, IProject project) {
 		IFeatureProject featureProject = CorePlugin.getFeatureProject(project);
@@ -88,6 +90,21 @@ public class AntennaFMComposerExtension extends FMComposerExtension {
 			}
 			
 		}
+	}
+	
+	@Override
+	public boolean isValidFeatureName(String s) {
+		return super.isValidFeatureName(s) && !containsIllegalChar(s.toCharArray());
+	}
+	
+	private final boolean containsIllegalChar(final char[] string) {
+		for (char a : string) {
+			for (char b : ILLEGAL_FEAUTURE_NAME_CHARSET) {
+				if (a == b)
+					return true;
+			}
+		}
+		return false;
 	}
 	
 	private void performRenamings(String oldName, String newName, IFile iFile) {
