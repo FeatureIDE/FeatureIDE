@@ -397,9 +397,9 @@ public class ConstraintDialog implements GUIDefaults {
 		shell.setLocation(x, y);
 		shell.addListener(SWT.Traverse, new Listener() {
 			public void handleEvent(Event event) {
-				if (event.detail == SWT.TRAVERSE_ESCAPE) {
+				if (event.detail == SWT.TRAVERSE_ESCAPE && !adapter.isProposalPopupOpen()) {
 
-					shell.close();
+					cancelButtonPressEvent();
 
 				}
 			}
@@ -589,16 +589,6 @@ public class ConstraintDialog implements GUIDefaults {
 		constraintText.setText(initialConstraint);
 		constraintText.setMargins(10, 5, 3, 5);
 		constraintText.setPossibleWords(featureModel.getFeatureNames());
-
-		constraintText.addKeyListener(new KeyAdapter() {
-			public void keyReleased(KeyEvent event) {
-				if (event.keyCode == SWT.ESC) {
-					if (!adapter.isProposalPopupOpen()) {
-						cancelButtonPressEvent();
-					}
-				}
-			}
-		});
 
 		constraintText.addModifyListener(new ModifyListener() {
 
