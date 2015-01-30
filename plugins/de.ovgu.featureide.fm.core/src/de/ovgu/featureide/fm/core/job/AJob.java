@@ -43,6 +43,10 @@ public abstract class AJob extends AbstractJob {
 	
 	@Override
 	final boolean run2() throws Exception {
-		return work();
+		try {
+			return work();
+		} finally {
+			workMonitor.done();
+		}
 	}
 }

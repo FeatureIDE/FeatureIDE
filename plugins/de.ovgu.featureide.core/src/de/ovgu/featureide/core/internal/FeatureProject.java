@@ -67,7 +67,6 @@ import de.ovgu.featureide.core.builder.FeatureProjectNature;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
-import de.ovgu.featureide.fm.core.AWaitingJob;
 import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
@@ -87,6 +86,7 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslReader;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 import de.ovgu.featureide.fm.core.job.AStoppableJob;
+import de.ovgu.featureide.fm.core.job.IJob;
 
 /**
  * Class that encapsulates any data and method related to FeatureIDE projects.
@@ -158,7 +158,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 	private IComposerExtensionClass composerExtension = null;
 	
-	//TODO: Impelement possibility to change this path
+	//TODO: Implement possibility to change this path
 	private final String featureStubPath = "featurestub";
 
 	
@@ -176,8 +176,8 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 	private IFile currentConfiguration = null;
 
-	private final Job syncModulesJob = new AWaitingJob("Synchronize feature model and feature modules") {
-		protected IStatus execute(IProgressMonitor monitor) {
+	private final IJob syncModulesJob = new AStoppableJob("Synchronize feature model and feature modules") {
+		protected boolean work() {
 			try {
 				final IFolder folder = sourceFolder;
 				final FeatureModel model = featureModel;
@@ -187,35 +187,37 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 				// modeling extension instead
 				if (allFeatureModulesEmpty(folder)) {
 					folder.deleteMarkers(FEATURE_MODULE_MARKER, true, IResource.DEPTH_ONE);
-					return Status.OK_STATUS;
+					return true;
 				}
 				// set marker for each folder
 				if (folder.exists()) {
-					monitor.beginTask("", folder.members().length);
+					workMonitor.setMaxAbsoluteWork(folder.members().length);
 					for (IResource res : folder.members()) {
 						if (res.exists() && res instanceof IFolder) {
 							setFeatureModuleMarker(model, (IFolder) res);
 						}
-						monitor.worked(1);
+						workMonitor.worked();
 					}
 				}
 			} catch (CoreException e) {
 				LOGGER.logError(e);
-			} finally {
-				monitor.done();
 			}
-			return Status.OK_STATUS;
+			return true;
 		}
 	};
-
-	private final Job configurationChecker = new AWaitingJob("Checking for unused features.") {
-		protected IStatus execute(IProgressMonitor monitor) {
+	
+	private final IJob configurationChecker = new AStoppableJob("Checking all configurations for unused features.") {
+		protected boolean work() {
 			final IFolder folder = configFolder;
 			deleteConfigurationMarkers(folder, IResource.DEPTH_ZERO);
+			workMonitor.setMaxAbsoluteWork(4);
 
 			final boolean[][] selectionMatrix = getSelectionMatrix();
+			workMonitor.worked();
 			final Collection<String> falseOptionalFeatures = getFalseOptionalConfigurationFeatures(selectionMatrix);
+			workMonitor.worked();
 			final Collection<String> deadFeatures = getUnusedConfigurationFeatures(selectionMatrix);
+			workMonitor.worked();
 
 			if (!deadFeatures.isEmpty()) {
 				createConfigurationMarker(folder, MARKER_UNUSED + "Following features are not used: " + deadFeatures, -1,
@@ -226,11 +228,12 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 						+ falseOptionalFeatures, -1, IMarker.SEVERITY_WARNING);
 			}
 			try {
-				folder.refreshLocal(IResource.DEPTH_ZERO, monitor);
+				folder.refreshLocal(IResource.DEPTH_ZERO, null);
 			} catch (CoreException e) {
 				LOGGER.logError(e);
 			}
-			return Status.OK_STATUS;
+			workMonitor.worked();
+			return true;
 		}
 	};
 
@@ -680,7 +683,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	 * unnecessarily multiple times.
 	 */
 	// TODO this should not be called if only markers are changed
-	private void setAllFeatureModuleMarkers() {
+	private synchronized void setAllFeatureModuleMarkers() {
 		syncModulesJob.schedule();
 	}
 
@@ -960,7 +963,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	 * Checks if any concrete feature is used in at least one configuration.
 	 */
 	// should also be called if a configuration file was removed
-	private void checkFeatureCoverage() {
+	private synchronized void checkFeatureCoverage() {
 		configurationChecker.schedule();
 	}
 

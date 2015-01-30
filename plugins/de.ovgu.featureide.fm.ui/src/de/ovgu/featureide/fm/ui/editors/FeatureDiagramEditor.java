@@ -557,7 +557,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 						}
 
 						analyzer = getFeatureModel().getAnalyser();
-						workMonitor.done();
 						final HashMap<Object, Object> changedAttributes = analyzer.analyzeFeatureModel(new NullProgressMonitor());
 
 						refreshGraphics(changedAttributes);

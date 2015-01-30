@@ -27,7 +27,8 @@ import de.ovgu.featureide.fm.core.FunctionalInterfaces;
 import de.ovgu.featureide.fm.core.FunctionalInterfaces.IFunction;
 
 /**
- * TODO description
+ * Control object for {@link IJob}s.
+ * Can be used to check for cancel request, display job progress, and calling intermediate functions.
  * 
  * @author Sebastian Krieter
  */
@@ -68,12 +69,16 @@ public final class WorkMonitor {
 		relativeWorkDone = nworked;
 	}
 	
-	public void begin(String taskName) {
+	void begin(String taskName) {
 		monitor.beginTask(taskName, maxRelativeWork);		
 	}
 	
-	public void done() {
+	void done() {
 		monitor.done();
+	}
+	
+	public void createSubTask(String name) {
+		this.monitor.subTask(name);
 	}
 	
 	public void setMonitor(IProgressMonitor monitor) {
