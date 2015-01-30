@@ -263,7 +263,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			infoLabel.setForeground(null);
 			return;
 		}
-		final boolean valid = configurationEditor.getConfiguration().isValidNoHidden();
+		final boolean valid = configurationEditor.getConfiguration().isValid();
 		
 		final IConfigJob<Long> job = configurationEditor.getConfiguration().getPropagator().getJobWrapper().number(250);
 		job.addJobFinishedListener(new JobFinishListener() {
@@ -423,7 +423,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	 * configuration is invalid. deselect:blue, select:green
 	 */
 	protected IConfigJob<?> computeColoring(final Display currentDisplay) {
-		if (!configurationEditor.isAutoSelectFeatures() || configurationEditor.getConfiguration().isValidNoHidden()) {
+		if (!configurationEditor.isAutoSelectFeatures() || configurationEditor.getConfiguration().isValid()) {
 			return null;
 		}
 		final List<SelectableFeature> featureList = configurationEditor.getConfiguration().getManualFeatures();			
