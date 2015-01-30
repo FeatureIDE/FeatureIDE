@@ -97,7 +97,7 @@ import de.ovgu.featureide.ui.views.outline.ContextOutlineTreeContentProvider;
  * 
  * @author Jan Wedding
  * @author Melanie Pflaume
- * @author Reimar Schröter
+ * @author Reimar Schrï¿½ter
  */
 /*
  * TODO #404 fix bug: do not close the tree if a corresponding file was opened
@@ -397,9 +397,10 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 						if (featureProject != null) {
 							Control control = viewer.getControl();
 							if (control != null && !control.isDisposed()) {
+								final String extension = file.getFileExtension();
 								if ("model.xml".equals(file.getName())) {
 									selectedOutlineType = OutlineLabelProvider.OUTLINE_FEATURE_MODEL;
-								} else if (file.getFileExtension().compareTo("java") == 0 || file.getFileExtension().compareTo("jak") == 0) {
+								} else if ("java".equals(extension) || "jak".equals(extension)) {
 									selectedOutlineType = OutlineLabelProvider.OUTLINE_CODE;
 								} else {
 									selectedOutlineType = OutlineLabelProvider.OUTLINE_NOT_AVAILABLE;
