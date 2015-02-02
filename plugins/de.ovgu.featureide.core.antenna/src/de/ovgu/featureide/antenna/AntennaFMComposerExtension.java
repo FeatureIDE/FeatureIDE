@@ -48,8 +48,8 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
 */
 public class AntennaFMComposerExtension extends FMComposerExtension {
 	
-	private final static char[] ILLEGAL_FEAUTURE_NAME_CHARSET = new char[] {'(', ')', '"', 'ü', 'Ü', 'ä', 'Ä', 'ö', 'Ö', '$', '_'};
-
+	private final static char[] ILLEGAL_FEATURE_NAME_CHARSET = new char[] {'(', ')', '"', '\u00fc', '\u00dc', '\u00e4', '\u00c4', '\u00f6', '\u00d6', '\u0024', '_'};
+	
 	private static String ORDER_PAGE_MESSAGE = 
 			"FeatureIDE projects based on preprocessors such as Antenna do not\n" +
 			"need an order, as the order is given directly at the source code.";
@@ -99,7 +99,7 @@ public class AntennaFMComposerExtension extends FMComposerExtension {
 	
 	private final boolean containsIllegalChar(final char[] string) {
 		for (char a : string) {
-			for (char b : ILLEGAL_FEAUTURE_NAME_CHARSET) {
+			for (char b : ILLEGAL_FEATURE_NAME_CHARSET) {
 				if (a == b)
 					return true;
 			}
