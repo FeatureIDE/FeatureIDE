@@ -40,6 +40,17 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
  * @author Jens Meinicke
  */
 public class BFeatureModelAnalyzer {
+	
+	/**
+	 * Warm up the analyzer to prevent unpredictable timeout exceptions.
+	 */
+	static {
+		for (int i = 0; i < 10; i++) {
+			analyze(10);
+			analyze(20);
+			analyze(21);
+		}
+	}
 
 	private static final FileFilter filter = new FileFilter() {
 		@Override
@@ -48,7 +59,7 @@ public class BFeatureModelAnalyzer {
 		}
 	};
 	
-	private final FeatureModel init(final String name) {
+	private final static FeatureModel init(final String name) {
 		FeatureModel fm = new FeatureModel();
 		File modelFileFolder = getFolder();
 		for (File f : modelFileFolder.listFiles(filter)) {
@@ -77,7 +88,7 @@ public class BFeatureModelAnalyzer {
 	/************************************************************
 	 * Analyzes the model completely.
 	 */
-	private void analyze(final int i) {
+	private static void analyze(final int i) {
 		getFM(i).getAnalyser().analyzeFeatureModel(null);
 	}
 
@@ -260,7 +271,7 @@ public class BFeatureModelAnalyzer {
 		BUpdateFeatures(1000);
 	}
 	
-	private FeatureModel getFM(final int i) {
+	private static FeatureModel getFM(final int i) {
 		switch (i) {
 		case 1:
 			return init("berkeley_db_model.xml");
