@@ -110,7 +110,6 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
 		refreshPage();
-		setDirty();
 	}
 
 	protected final void refreshPage() {

@@ -172,12 +172,11 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 
 		// if mpl.velvet exists then it is a multi product line
 		IResource res = project.findMember("mpl.velvet");
+		boolean mappingModel = false;
 		if (res != null && res instanceof IFile) {
 			featureModel = new ExtendedFeatureModel();
 			IContainer parentFolder = file.getParent();
-			if (parentFolder != null && "InterfaceMapping".equals(parentFolder.getName())) {
-				featureModel = ((ExtendedFeatureModel) featureModel).getMappingModel();
-			}
+			mappingModel = parentFolder != null && "InterfaceMapping".equals(parentFolder.getName());
 		} else {
 			res = project.findMember("model.xml");
 			featureModel = new FeatureModel();
@@ -215,6 +214,9 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		}
 
 		readFeatureModel();
+		if (mappingModel) {
+			featureModel = ((ExtendedFeatureModel) featureModel).getMappingModel();
+		}
 		
 		configuration = new Configuration(featureModel, Configuration.PARAM_IGNOREABSTRACT | Configuration.PARAM_LAZY);
 		try {
