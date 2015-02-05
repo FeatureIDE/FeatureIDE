@@ -45,6 +45,7 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
  *  
  * @author Christoph Giesel
  * @author Marcus Kamieth
+ * @author Marcus Pinnecke
 */
 public class AntennaFMComposerExtension extends FMComposerExtension {
 	

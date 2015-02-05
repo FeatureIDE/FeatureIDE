@@ -29,7 +29,7 @@ import org.eclipse.core.resources.IProject;
  */
 public interface IFMComposerExtension {
 	
-	static final String ERROR_MESSAGE_COMPOSER = "The name need to be a valid Java identifier.";
+	static final String ERROR_MESSAGE_COMPOSER = "Your feature name contains an illegal character or is empty.";
 	static final String ERROR_MESSAGE_NO_COMPOSER = "The following Characaters are not allowed \", (, )";
 
 	/*
