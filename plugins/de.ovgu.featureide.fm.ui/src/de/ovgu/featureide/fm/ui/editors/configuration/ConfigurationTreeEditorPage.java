@@ -27,14 +27,11 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
@@ -88,7 +85,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	private int index;
 
 	private Label infoLabel;
-	private Button autoSelectButton;
+//	private Button autoSelectButton;
 	
 	public void setDirty() {
 		dirty = true;
@@ -117,10 +114,10 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	}
 
 	protected final void refreshPage() {
-		if (configurationEditor.isAutoSelectFeatures()) {
-			autoSelectButton.setEnabled(true);
-		}
-		autoSelectButton.setSelection(configurationEditor.isAutoSelectFeatures());
+//		if (configurationEditor.isAutoSelectFeatures()) {
+//			autoSelectButton.setEnabled(true);
+//		}
+//		autoSelectButton.setSelection(configurationEditor.isAutoSelectFeatures());
 		updateTree();
 	}
 	
@@ -181,7 +178,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		gridData.grabExcessHorizontalSpace = true;
 		gridData.grabExcessVerticalSpace = false;
 		gridData.verticalAlignment = SWT.TOP;
-	    gridLayout = new GridLayout(2, false);
+	    gridLayout = new GridLayout(1, false);
 		gridLayout.marginHeight = 0;
 		gridLayout.marginWidth = 0;
 		gridLayout.marginLeft = 4;
@@ -199,46 +196,46 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	    updateInfoLabel(Display.getCurrent());
 	    		
 		// autoselect button 
-		gridData = new GridData();
-		gridData.horizontalAlignment = SWT.RIGHT;
-		gridData.verticalAlignment = SWT.CENTER;
-		autoSelectButton = new Button(compositeTop, SWT.TOGGLE);
-		autoSelectButton.setText("Autoselect Features");
-		autoSelectButton.setLayoutData(gridData);
-		autoSelectButton.setSelection(false);
-		autoSelectButton.setEnabled(false);
-				
-		autoSelectButton.addSelectionListener(new SelectionListener() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				final Configuration config = configurationEditor.getConfiguration();
-				if (configurationEditor.isAutoSelectFeatures()) {
-					invalidFeatures.clear();
-					configurationEditor.setAutoSelectFeatures(false);
-					configurationEditor.getConfigJobManager().cancelAllJobs();
-					config.makeManual(!canDeselectFeatures());
-					walkTree(new IBinaryFunction<TreeItem, SelectableFeature, Void>() {
-						@Override
-						public Void invoke(TreeItem item, SelectableFeature feature) {
-							refreshItem(item, feature);
-							return null;
-						}
-					}, new FunctionalInterfaces.NullFunction<Void, Void>());
-					updateInfoLabel(Display.getCurrent());
-				} else {
-					if (invalidFeatures.isEmpty()) {
-						configurationEditor.setAutoSelectFeatures(true);
-//						updateInfoLabel();
-						computeTree(true);
-					} else {
-						autoSelectButton.setSelection(false);
-					}
-				}
-			}
-			
-			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {}
-		});
+//		gridData = new GridData();
+//		gridData.horizontalAlignment = SWT.RIGHT;
+//		gridData.verticalAlignment = SWT.CENTER;
+//		autoSelectButton = new Button(compositeTop, SWT.TOGGLE);
+//		autoSelectButton.setText("Autoselect Features");
+//		autoSelectButton.setLayoutData(gridData);
+//		autoSelectButton.setSelection(false);
+//		autoSelectButton.setEnabled(false);
+//				
+//		autoSelectButton.addSelectionListener(new SelectionListener() {
+//			@Override
+//			public void widgetSelected(SelectionEvent e) {
+//				final Configuration config = configurationEditor.getConfiguration();
+//				if (configurationEditor.isAutoSelectFeatures()) {
+//					invalidFeatures.clear();
+//					configurationEditor.setAutoSelectFeatures(false);
+//					configurationEditor.getConfigJobManager().cancelAllJobs();
+//					config.makeManual(!canDeselectFeatures());
+//					walkTree(new IBinaryFunction<TreeItem, SelectableFeature, Void>() {
+//						@Override
+//						public Void invoke(TreeItem item, SelectableFeature feature) {
+//							refreshItem(item, feature);
+//							return null;
+//						}
+//					}, new FunctionalInterfaces.NullFunction<Void, Void>());
+//					updateInfoLabel(Display.getCurrent());
+//				} else {
+//					if (invalidFeatures.isEmpty()) {
+//						configurationEditor.setAutoSelectFeatures(true);
+////						updateInfoLabel();
+//						computeTree(true);
+//					} else {
+//						autoSelectButton.setSelection(false);
+//					}
+//				}
+//			}
+//			
+//			@Override
+//			public void widgetDefaultSelected(SelectionEvent e) {}
+//		});
 		
 		// 2. sub composite
 		gridData = new GridData();
