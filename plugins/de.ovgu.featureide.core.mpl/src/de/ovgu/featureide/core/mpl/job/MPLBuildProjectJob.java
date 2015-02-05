@@ -37,8 +37,6 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.mpl.builder.MSPLNature;
-import de.ovgu.featureide.core.mpl.job.util.AJobArguments;
-import de.ovgu.featureide.core.mpl.job.util.IChainJob;
 import de.ovgu.featureide.fm.core.ExtendedFeature;
 import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.ExtendedFeatureModel.UsedModel;
@@ -48,14 +46,18 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
+import de.ovgu.featureide.fm.core.job.AProjectJob;
+import de.ovgu.featureide.fm.core.job.IJob;
+import de.ovgu.featureide.fm.core.job.util.JobArguments;
+import de.ovgu.featureide.fm.core.job.util.JobSequence;
 
 /**
  * 
  * @author Sebastian Krieter
  */
-public class MPLBuildProjectJob extends AMonitorJob<MPLBuildProjectJob.Arguments> {
+public class MPLBuildProjectJob extends AProjectJob<MPLBuildProjectJob.Arguments> {
 
-	public static class Arguments extends AJobArguments {
+	public static class Arguments extends JobArguments {
 		private final IFeatureProject externalFeatureProject;
 		private final IFeatureProject rootFeatureProject;
 		private final Configuration configuration;
@@ -101,30 +103,33 @@ public class MPLBuildProjectJob extends AMonitorJob<MPLBuildProjectJob.Arguments
 	}
 	
 	private void buildExternalProject(String projectName, Configuration config, String configName) {
-		final IProject externalProject = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-		final IFeatureProject externalFeatureProject = CorePlugin.getFeatureProject(externalProject);
+		final JobSequence curJobSequence = JobSequence.getSequenceForJob(this);
+		if (curJobSequence != null) {
+			final IProject externalProject = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+			final IFeatureProject externalFeatureProject = CorePlugin.getFeatureProject(externalProject);
+			
+			final ArrayList<IJob> jobList = new ArrayList<IJob>(3);
+			
+			//build
+			jobList.add(createJob(new MPLBuildProjectJob.Arguments(arguments.rootFeatureProject,
+					externalFeatureProject, internTempBuildFolder, config, configName)));
+			
+			// rename
+			jobList.add(createJob(new MPLRenameExternalJob.Arguments(
+					arguments.externalFeatureProject.getProject(), configName, 
+					internTempBuildFolder.getFullPath())));
+			
+			// copy
+			jobList.add(createJob(new MPLCopyExternalJob.Arguments(
+					internTempBuildFolder, rootBuildFolder)));
+
+			curJobSequence.insertJobs(this, jobList);
+		}
 		
-		final ArrayList<IChainJob> jobList = new ArrayList<IChainJob>(3);
-		
-		//build
-		jobList.add(createJob(new MPLBuildProjectJob.Arguments(arguments.rootFeatureProject,
-				externalFeatureProject, internTempBuildFolder, config, configName)));
-		
-		// rename
-		jobList.add(createJob(new MPLRenameExternalJob.Arguments(
-				arguments.externalFeatureProject.getProject(), configName, 
-				internTempBuildFolder.getFullPath())));
-		
-		// copy
-		jobList.add(createJob(new MPLCopyExternalJob.Arguments(
-				internTempBuildFolder, rootBuildFolder)));
-		
-		JobManager.insertJobs(this, jobList);
 	}
 	
-	private IChainJob createJob(AJobArguments arg) {
-		IChainJob curJob = arg.createJob();
-		curJob.setIgnorePreviousJobFail(false);
+	private IJob createJob(JobArguments arg) {
+		IJob curJob = arg.createJob();
 		return curJob;
 	}
 	
@@ -149,7 +154,7 @@ public class MPLBuildProjectJob extends AMonitorJob<MPLBuildProjectJob.Arguments
 		
 		try {
 			if (!rootBuildFolder.exists()) {
-				rootBuildFolder.create(true, true, monitor);
+				rootBuildFolder.create(true, true, workMonitor.getMonitor());
 			}
 		} catch (CoreException e) {
 			MPLPlugin.getDefault().logError(e);
@@ -164,9 +169,9 @@ public class MPLBuildProjectJob extends AMonitorJob<MPLBuildProjectJob.Arguments
 				
 		try {
 			if (internTempBuildFolder.exists()) {
-				internTempBuildFolder.delete(true, monitor);
+				internTempBuildFolder.delete(true, workMonitor.getMonitor());
 			}
-			internTempBuildFolder.create(true, true, monitor);
+			internTempBuildFolder.create(true, true, workMonitor.getMonitor());
 		} catch (CoreException e) {
 			MPLPlugin.getDefault().logError(e);
 			return false;
@@ -233,7 +238,7 @@ public class MPLBuildProjectJob extends AMonitorJob<MPLBuildProjectJob.Arguments
 		try {
 			arguments.externalFeatureProject.getProject().refreshLocal(IResource.DEPTH_ONE, null);
 			for (IResource member : buildFolder.members()) {
-				member.delete(true, monitor);
+				member.delete(true, workMonitor.getMonitor());
 			}
 			buildFolder.refreshLocal(IResource.DEPTH_ZERO, null);
 		} catch (CoreException e) {

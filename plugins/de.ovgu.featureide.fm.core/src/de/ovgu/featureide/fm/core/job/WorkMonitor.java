@@ -81,6 +81,10 @@ public final class WorkMonitor {
 		this.monitor.subTask(name);
 	}
 	
+	public IProgressMonitor getMonitor() {
+		return monitor;
+	}
+
 	public void setMonitor(IProgressMonitor monitor) {
 		this.monitor = (monitor != null) ? monitor : new NullProgressMonitor();
 	}

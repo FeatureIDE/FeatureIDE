@@ -52,16 +52,17 @@ import org.eclipse.ltk.core.refactoring.RefactoringCore;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 
 import de.ovgu.featureide.core.mpl.MPLPlugin;
-import de.ovgu.featureide.core.mpl.job.util.AJobArguments;
+import de.ovgu.featureide.fm.core.job.AProjectJob;
+import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
 /**
  * 
  * @author Sebastian Krieter
  */
 @SuppressWarnings("restriction")
-public class MPLRenameExternalJob extends AMonitorJob<MPLRenameExternalJob.Arguments> {
+public class MPLRenameExternalJob extends AProjectJob<MPLRenameExternalJob.Arguments> {
 
-	public static class Arguments extends AJobArguments {
+	public static class Arguments extends JobArguments {
 		private final IProject externalProject;
 		private final String prefix;
 		private final IPath srcPath;
@@ -161,7 +162,7 @@ public class MPLRenameExternalJob extends AMonitorJob<MPLRenameExternalJob.Argum
 	}
 
 	@Override
-	protected void finalWork() {
+	protected void finalWork(boolean success) {
 		resetJavaBuildPath(javaProject, formerSourcePath, formerSourcePathIndex);
 	}
 
@@ -217,7 +218,7 @@ public class MPLRenameExternalJob extends AMonitorJob<MPLRenameExternalJob.Argum
 		}
 
 		try {
-			arguments.externalProject.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+			arguments.externalProject.refreshLocal(IResource.DEPTH_INFINITE, workMonitor.getMonitor());
 		} catch (CoreException e) {
 			MPLPlugin.getDefault().logError(e);
 		}

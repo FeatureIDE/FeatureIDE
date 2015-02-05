@@ -26,15 +26,16 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 
 import de.ovgu.featureide.core.mpl.MPLPlugin;
-import de.ovgu.featureide.core.mpl.job.util.AJobArguments;
+import de.ovgu.featureide.fm.core.job.AProjectJob;
+import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
 /**
  * 
  * @author Sebastian Krieter
  */
-public class MPLCopyExternalJob extends AMonitorJob<MPLCopyExternalJob.Arguments> {
+public class MPLCopyExternalJob extends AProjectJob<MPLCopyExternalJob.Arguments> {
 	
-	public static class Arguments extends AJobArguments {
+	public static class Arguments extends JobArguments {
 		private final IFolder srcFolder;
 		private final IFolder destFolder;
 		
@@ -60,7 +61,7 @@ public class MPLCopyExternalJob extends AMonitorJob<MPLCopyExternalJob.Arguments
 				IResource srcMember = srcMembers[i];
 				IPath px = destPath.append(srcMember.getName());
 				if (!px.toFile().exists()) {
-					srcMember.move(px, true, monitor);
+					srcMember.move(px, true, workMonitor.getMonitor());
 				}
 			}
 		} catch (CoreException e) {

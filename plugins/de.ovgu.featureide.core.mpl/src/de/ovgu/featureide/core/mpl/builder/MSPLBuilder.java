@@ -32,13 +32,13 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
-import de.ovgu.featureide.core.mpl.job.JobManager;
 import de.ovgu.featureide.core.mpl.job.MPLBuildProjectJob;
 import de.ovgu.featureide.core.mpl.job.MPLRenameExternalJob;
-import de.ovgu.featureide.core.mpl.job.SequenceFinishedListener;
-import de.ovgu.featureide.core.mpl.job.util.IChainJob;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
+import de.ovgu.featureide.fm.core.job.IJob;
+import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
+import de.ovgu.featureide.fm.core.job.util.JobSequence;
 
 /**
  * A simple multi product line builder.
@@ -107,9 +107,8 @@ public class MSPLBuilder extends IncrementalProjectBuilder {
 				new ConfigurationReader(config).readFromFile(featureProject.getCurrentConfiguration());
 				
 				// build
-				final Object buildObject = new Object();
 				final IFolder buildFolder = featureProject.getBuildFolder();
-				final IChainJob job = new MPLBuildProjectJob.Arguments(featureProject, featureProject, buildFolder, config, null).createJob();
+				final IJob job = new MPLBuildProjectJob.Arguments(featureProject, featureProject, buildFolder, config, null).createJob();
 				
 				String tempConfigName = featureProject.getCurrentConfiguration().getName();
 				final String configName;
@@ -120,10 +119,12 @@ public class MSPLBuilder extends IncrementalProjectBuilder {
 					configName = tempConfigName;
 				}
 				
-				JobManager.addJob(buildObject, job, false);
-				JobManager.addSequenceFinishedListener(buildObject, new SequenceFinishedListener() {
+				JobSequence buildSequence = new JobSequence();
+				buildSequence.setIgnorePreviousJobFail(false);
+				buildSequence.addJob(job);
+				buildSequence.addJobFinishedListener(new JobFinishListener() {
 					@Override
-					public void sequenceFinished(Object idObject, boolean success) {
+					public void jobFinished(IJob finishedJob, boolean success) {
 						MPLRenameExternalJob.setJavaBuildPath(project, buildFolder.getFolder(configName).getFullPath());
 						synchronized (buildMap) {
 							buildMap.put(project.getName(), false);
@@ -131,15 +132,13 @@ public class MSPLBuilder extends IncrementalProjectBuilder {
 						featureProject.built();
 					}
 				});
-				JobManager.startSequence(buildObject);
+				buildSequence.schedule();
 			} catch (Exception e) {
 				MPLPlugin.getDefault().logError(e);
 				synchronized (buildMap) {
 					buildMap.put(project.getName(), false);
 				}
 			}
-			
-			
 		} else {
 			MPLPlugin.getDefault().logWarning("no project got");
 		}

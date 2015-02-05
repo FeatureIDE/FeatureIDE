@@ -24,6 +24,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.ListIterator;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.FunctionalInterfaces.IFunction;
@@ -39,6 +41,12 @@ import de.ovgu.featureide.fm.core.job.IJob;
  * @author Sebastian Krieter
  */
 public final class JobSequence implements IJob {
+	private static final ConcurrentHashMap<IJob, JobSequence> sequenceMap = new ConcurrentHashMap<>();
+	
+	public static JobSequence getSequenceForJob(IJob currentJob) {
+		return sequenceMap.get(currentJob);
+	}
+	
 	private final LinkedList<IJob> jobs = new LinkedList<IJob>();
 	private final LinkedList<JobFinishListener> jobFinishedListeners = new LinkedList<JobFinishListener>();
 	
@@ -60,6 +68,7 @@ public final class JobSequence implements IJob {
 					}
 				});
 				jobs.add(newJob);
+				sequenceMap.put(newJob, this);
 				return true;
 			} else {
 				return false;
@@ -79,6 +88,12 @@ public final class JobSequence implements IJob {
 			}
 			final IJob curJob = jobs.getFirst();
 			jobs.clear();
+			for (Iterator<Entry<IJob, JobSequence>> it = sequenceMap.entrySet().iterator(); it.hasNext();) {
+				Entry<IJob, JobSequence> sequenceMapping = it.next();
+				if (sequenceMapping.getValue() == this) {
+					it.remove();
+				}
+			}
 			return curJob.cancel();
 		}
 	}
@@ -106,6 +121,7 @@ public final class JobSequence implements IJob {
 							}
 						});
 						it.add(newJob);
+						sequenceMap.put(newJob, this);
 					}
 					break;
 				}
@@ -144,14 +160,17 @@ public final class JobSequence implements IJob {
 			if (lastJob != null) {
 				JobStatus lastStatus = lastJob.getStatus();
 				IJob nextJob = null;
+				sequenceMap.remove(lastJob);
 
 				for (final Iterator<IJob> it = jobs.iterator(); it.hasNext();) {
 					nextJob = it.next();
 					if (nextJob.getStatus() == JobStatus.FAILED) {
 						lastStatus = JobStatus.FAILED;
 						it.remove();
+						sequenceMap.remove(nextJob);
 					} else if (lastStatus == JobStatus.FAILED && !ignoresPreviousJobFail()) {
 						it.remove();
+						sequenceMap.remove(nextJob);
 					} else {
 						break;
 					}
