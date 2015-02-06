@@ -62,8 +62,8 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	static final int SAT_CONTRADICTION = 1;
 	/** The expression is a tautology. */
 	static final int SAT_TAUTOLOGY = 2;
-	protected static final String MESSAGE_DEAD_CODE = ": This expression is dead code because it is always false.";
-	protected static final String MESSAGE_ALWAYS_TRUE = ": This expression is always true.";
+	protected static final String MESSAGE_DEAD_CODE = ": This expression is a contradiction and causes a dead code block.";
+	protected static final String MESSAGE_ALWAYS_TRUE = ": This expression is a tautology and causes a superfluous code block.";
 	protected static final String MESSAGE_ABSTRACT = " is defined as abstract in the feature model. Only concrete features should be referenced in preprocessor directives.";
 	protected static final String MESSAGE_NOT_DEFINED = " is not defined in the feature model and thus always assumed to be false";
 
