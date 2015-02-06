@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.variantimport.migration;
+package de.ovgu.featureide.migration.impl;
 
 import java.util.Set;
 

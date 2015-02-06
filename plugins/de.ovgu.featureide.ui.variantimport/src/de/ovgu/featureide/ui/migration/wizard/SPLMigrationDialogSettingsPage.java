@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.variantimport.wizard;
+package de.ovgu.featureide.ui.migration.wizard;
 
 import org.eclipse.swt.widgets.Composite;
 

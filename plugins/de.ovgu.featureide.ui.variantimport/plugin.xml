@@ -36,7 +36,7 @@
    <extension
          point="org.eclipse.ui.commands">
       <command
-            defaultHandler="de.ovgu.featureide.ui.variantimport.plugin.SPLMigrationCommandHandler"
+            defaultHandler="de.ovgu.featureide.ui.migration.plugin.SPLMigrationCommandHandler"
             id="de.ovgu.featureide.ui.variantimport.SPLMigrationCommand"
             name="Import..">
       </command>

@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.variantimport.wizard;
+package de.ovgu.featureide.ui.migration.wizard;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jface.wizard.WizardPage;
@@ -32,7 +32,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import de.ovgu.featureide.ui.variantimport.migration.DefaultSPLMigrator;
+import de.ovgu.featureide.migration.impl.DefaultSPLMigrator;
 
 public class SPLMigrationDialogNamePage extends WizardPage
 {	

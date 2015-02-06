@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.variantimport.migration;
+package de.ovgu.featureide.migration.impl;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -46,7 +46,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionBase;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.ui.variantimport.wizard.SPLMigrationDialogSettingsPage;
+import de.ovgu.featureide.ui.migration.wizard.SPLMigrationDialogSettingsPage;
 
 @SuppressWarnings("restriction")
 public abstract class DefaultSPLMigrator implements ISPLMigrator
@@ -93,7 +93,7 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator
 
 		adjustFeatureModel();
 
-		createConfigFiles();
+		createConfigurationFiles();
 	}
 
 	/**
@@ -226,15 +226,15 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator
 	{
 		try
 		{
+			List<String> natureIds = new ArrayList<String>();
+			natureIds.addAll(Arrays.asList(newProject.getDescription().getNatureIds()));
 			for(String natureId : project.getDescription().getNatureIds()){
-				List<String> natureIds = new ArrayList<String>();
-				natureIds.addAll(Arrays.asList(newProject.getDescription().getNatureIds()));
 				if(!natureIds.contains(natureId))
 					natureIds.add(natureId);
-				IProjectDescription description = newProject.getDescription();
-				description.setNatureIds(natureIds.toArray(new String[natureIds.size()]));
-				newProject.setDescription(description, null);
 			}
+			IProjectDescription description = newProject.getDescription();
+			description.setNatureIds(natureIds.toArray(new String[natureIds.size()]));
+			newProject.setDescription(description, null);
 		} catch (CoreException e)
 		{
 			e.printStackTrace();
@@ -338,7 +338,7 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator
 	 * 
 	 * @see SPLMigrationDialogSettingsPage#getConfigPath()
 	 */
-	protected void createConfigFiles()
+	protected void createConfigurationFiles()
 	{
 		for (IProject project : projects)
 			try

@@ -18,12 +18,12 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.variantimport.migration;
+package de.ovgu.featureide.migration.impl;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.WizardDialog;
 
-import de.ovgu.featureide.ui.variantimport.wizard.SPLMigrationWizard;
+import de.ovgu.featureide.ui.migration.wizard.SPLMigrationWizard;
 
 /**
  * Handles the migration of products into a FeatureIDE project using the
