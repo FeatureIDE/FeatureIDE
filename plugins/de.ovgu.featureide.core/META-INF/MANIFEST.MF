@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: FeatureIDE Core Plug-in
+Bundle-Name: FeatureIDE Core Plug-In
 Bundle-SymbolicName: de.ovgu.featureide.core;singleton:=true
 Bundle-Version: 2.7.2.qualifier
 Bundle-Activator: de.ovgu.featureide.core.CorePlugin
