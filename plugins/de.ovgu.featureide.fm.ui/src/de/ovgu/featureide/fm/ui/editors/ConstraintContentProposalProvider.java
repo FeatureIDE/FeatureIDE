@@ -191,7 +191,7 @@ public class ConstraintContentProposalProvider implements
 		Collections.sort(featureList, String.CASE_INSENSITIVE_ORDER);
 		
 		
-		if (") ".equals(wordBefore) || features.contains(wordBefore.trim()) || wordBefore.trim().endsWith("\"")) {
+		if (") ".equals(wordBefore) || features.contains(wordBefore.trim()) || wordBefore.trim().endsWith("\"") || wordBefore.trim().isEmpty()) {
 			proposals.add(new ContentProposal("and"));
 			proposals.add(new ContentProposal("iff"));
 			proposals.add(new ContentProposal("implies"));
