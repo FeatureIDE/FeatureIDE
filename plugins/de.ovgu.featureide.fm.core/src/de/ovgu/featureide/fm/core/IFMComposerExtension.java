@@ -26,11 +26,12 @@ import org.eclipse.core.resources.IProject;
  * Defines feature model specific extensions.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke
  */
 public interface IFMComposerExtension {
 	
-	static final String ERROR_MESSAGE_COMPOSER = "Your feature name contains an illegal character or is empty.";
-	static final String ERROR_MESSAGE_NO_COMPOSER = "The following Characaters are not allowed \", (, )";
+	static final String ERROR_MESSAGE_COMPOSER = "The feature name is illegal as the composer does only support $, _, 0-9, a-z, A-Z, whereas 0-9 are not allowed as the first character.";
+	static final String ERROR_MESSAGE_NO_COMPOSER = "The following Characaters are not allowed: \", (, )";
 
 	/*
 	 * This is necessary for feature models out of a feature project.
