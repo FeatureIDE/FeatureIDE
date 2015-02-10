@@ -47,7 +47,7 @@ public class FMComposerExtension implements IFMComposerExtension {
 		return false;
 	}
 	
-	public boolean isValidFeatureName(String s) {
+	public final boolean isValidFeatureName(String s) {
 		if (s == null) {
 			return false;
 		}
@@ -56,23 +56,42 @@ public class FMComposerExtension implements IFMComposerExtension {
 			return false;
 		}
 		
-		if (hasComposer) {
-			// Default behavior for feature projects
-			if (!Character.isJavaIdentifierStart(s.charAt(0)))
+		for (int i = 0; i < len; i++) {
+			if (s.charAt(i) == '"' || s.charAt(i) == '(' || s.charAt(i) == ')')
 				return false;
-			for (int i = 1; i < len; i++) {
-				if (!Character.isJavaIdentifierPart(s.charAt(i)))
-					return false;
-			}
-			return true;
-		} else {
-			// Default behavior for NON feature projects
-			for (int i = 0; i < len; i++) {
-				if (s.charAt(i) == '"' || s.charAt(i) == '(' || s.charAt(i) == ')')
-					return false;
-			}
-			return true;
+		}		
+		
+		if (hasComposer)
+			return isValidFeatureNameComposerSpecific(s);
+		else return true;
+	}
+
+	/**
+	 * This method could be overwritten by composers to check further conditions to a given feature name.
+	 * It's called within {@link #isValidFeatureName(String)} directly after the name is checked against
+	 * <code>null</code> or zero length and determines if a feature name is valid in the current (composer)
+	 * context. This is only done, if the feature name is non-null and non-empty. 
+	 * <br/><br/>
+	 * <b>Default behavior</b>: By default this method checks if the <code>featureName</code>
+	 * is a valid java identifier. <br/><br/>
+	 * If a subclass of <code>FMComposerExtension</code>...
+	 * <ul>
+	 * <li> ...restricts less than this or not completely this, it should overwrite this method entirely.</li> 
+	 * <li> ...restricts more than this, <code>super.isValidFeatureNameComposerSpecific(featureName)</code> should
+	 * be used, plus additional checks should be made.</li>  
+	 * </ul>
+	 * @param featureName
+	 * @return <b>True</b> if the name is valid in current context, otherwise <b>false</b>.
+	 */
+	protected boolean isValidFeatureNameComposerSpecific(String featureName) {
+		// Default behavior for feature projects
+		if (!Character.isJavaIdentifierStart(featureName.charAt(0)))
+			return false;
+		for (int i = 1; i < featureName.length(); i++) {
+			if (!Character.isJavaIdentifierPart('ü')) //featureName.charAt(i)))
+				return false;
 		}
+		return true;
 	}
 
 	@Override

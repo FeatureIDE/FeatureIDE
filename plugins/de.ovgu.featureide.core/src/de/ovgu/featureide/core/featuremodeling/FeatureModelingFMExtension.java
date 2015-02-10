@@ -47,20 +47,17 @@ public class FeatureModelingFMExtension extends FMComposerExtension {
 			IProject project) {
 		return true;
 	}
+	
+	protected boolean isValidFeatureNameComposerSpecific(String featureName) {
+		return !containsIllegalChar(featureName.toCharArray());
+	}
 
-	@Override
-	public boolean isValidFeatureName(String s) {
-		if (s == null)
-			return false;
-		final int len = s.length();
-
-		if (len == 0)
-			return false;
-		for (int i = 0; i < len; i++) {
-			if (s.charAt(i) == '"' || s.charAt(i) == '(' || s.charAt(i) == ')')
-				return false;
+	private boolean containsIllegalChar(char[] charArray) {
+		for (int i = 0; i < charArray.length; i++) {
+			if (charArray[i] == '"' || charArray[i] == '(' || charArray[i] == ')')
+				return true;
 		}
-		return true;
+		return false;
 	}
 
 	@Override

@@ -65,6 +65,14 @@ public class AntennaFMComposerExtension extends FMComposerExtension {
 		return false;
 	}
 	
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.FMComposerExtension#getErroMessage()
+	 */
+	@Override
+	public String getErroMessage() {
+		return super.getErroMessage() + "\n\nAdditionally in context of Antenna-composer, the following characters are illegal:  Ü, ü, Ä, ä, ö, Ö and $.";
+	}
+	
 	@Override
 	public boolean performRenaming(String oldName, String newName, IProject project) {
 		IFeatureProject featureProject = CorePlugin.getFeatureProject(project);
@@ -91,11 +99,6 @@ public class AntennaFMComposerExtension extends FMComposerExtension {
 			}
 			
 		}
-	}
-	
-	@Override
-	public boolean isValidFeatureName(String s) {
-		return super.isValidFeatureName(s) && !containsIllegalChar(s.toCharArray());
 	}
 	
 	private final boolean containsIllegalChar(final char[] string) {
@@ -145,6 +148,14 @@ public class AntennaFMComposerExtension extends FMComposerExtension {
 					AntennaCorePlugin.getDefault().logError(e);
 				}	
 		}
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.FMComposerExtension#compSpecTest(java.lang.String)
+	 */
+	@Override
+	protected boolean isValidFeatureNameComposerSpecific(String featureName) {
+		return super.isValidFeatureNameComposerSpecific(featureName) && !containsIllegalChar(featureName.toCharArray());
 	}
 	
 	private String replaceFeatureInText(String text, String oldName, String newName){
