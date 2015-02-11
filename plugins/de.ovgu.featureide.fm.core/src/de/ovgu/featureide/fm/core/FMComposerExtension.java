@@ -88,7 +88,7 @@ public class FMComposerExtension implements IFMComposerExtension {
 		if (!Character.isJavaIdentifierStart(featureName.charAt(0)))
 			return false;
 		for (int i = 1; i < featureName.length(); i++) {
-			if (!Character.isJavaIdentifierPart('ü')) //featureName.charAt(i)))
+			if (!Character.isJavaIdentifierPart(featureName.charAt(i)))
 				return false;
 		}
 		return true;
