@@ -41,7 +41,7 @@ public class ConstraintProposalLabelProvider extends LabelProvider implements GU
 		if(element instanceof ContentProposal){
 			String content = ((ContentProposal)element).getContent();
 			if("not".equals(content) || "or".equals(content) || "and".equals(content)
-				|| "iff".equals(content) || "implies".equals(content)){
+				|| "iff".equals(content) || "implies".equals(content) || "(".equals(content) || ")".equals(content)){
 				return OPERATOR_SYMBOL;
 			}	
 		}

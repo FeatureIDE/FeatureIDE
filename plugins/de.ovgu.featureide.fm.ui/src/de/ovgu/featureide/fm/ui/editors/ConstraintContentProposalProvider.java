@@ -190,24 +190,36 @@ public class ConstraintContentProposalProvider implements
 		ArrayList<String> featureList = new ArrayList<String>(features);
 		Collections.sort(featureList, String.CASE_INSENSITIVE_ORDER);
 		
-		
-		if (") ".equals(wordBefore) || features.contains(wordBefore.trim()) || wordBefore.trim().endsWith("\"")) {
-			proposals.add(new ContentProposal("and"));
-			proposals.add(new ContentProposal("iff"));
-			proposals.add(new ContentProposal("implies"));
-			proposals.add(new ContentProposal("or"));
-
+		if (wordBefore.trim().isEmpty())
+			proposeNotAndFeatuers(proposals, featureList);
+		else if (") ".equals(wordBefore) || features.contains(wordBefore.trim()) || wordBefore.trim().endsWith("\"") || wordBefore.trim().isEmpty()) {
+			proposeBinaryOperators(proposals);
 		} else if(!")".equals(wordBefore)){
-			proposals.add(new ContentProposal("not"));
-
-			for (String s : featureList) {
-				if (s.contains(" "))
-					proposals.add(new ContentProposal("\"" + s + "\""));
-				else 
-					proposals.add(new ContentProposal(s));
-			}
+			proposeNotAndFeatuers(proposals, featureList);
 		}
 		return proposals;
+	}
+
+	private static void proposeBinaryOperators(ArrayList<ContentProposal> proposals) {
+		proposals.add(new ContentProposal("and"));
+		proposals.add(new ContentProposal("iff"));
+		proposals.add(new ContentProposal("implies"));
+		proposals.add(new ContentProposal("or"));
+		proposals.add(new ContentProposal("("));
+		proposals.add(new ContentProposal(")"));
+	}
+
+	private static void proposeNotAndFeatuers(ArrayList<ContentProposal> proposals, ArrayList<String> featureList) {
+		proposals.add(new ContentProposal("not"));
+		proposals.add(new ContentProposal("("));
+		proposals.add(new ContentProposal(")"));
+
+		for (String s : featureList) {
+			if (s.contains(" "))
+				proposals.add(new ContentProposal("\"" + s + "\""));
+			else 
+				proposals.add(new ContentProposal(s));
+		}
 	}
 
 }

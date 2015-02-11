@@ -171,7 +171,7 @@ public interface GUIDefaults {
 	
 	public static final Image IMAGE_CIRCLE_GRAY = FMUIPlugin.getImage("fugue-icons/circle_gray.png");
 	public static final Image IMAGE_CIRCLE_GREEN = FMUIPlugin.getImage("fugue-icons/circle_green.png");
-	public static final Image IMAGE_CIRCLE_YELLOW = FMUIPlugin.getImage("fugue-icons/circle_red.png");
-	public static final Image IMAGE_CIRCLE_RED = FMUIPlugin.getImage("fugue-icons/circle_yellow.png");
+	public static final Image IMAGE_CIRCLE_YELLOW = FMUIPlugin.getImage("message_warning.gif");
+	public static final Image IMAGE_CIRCLE_RED = FMUIPlugin.getImage("icon_error.gif");
 
 }

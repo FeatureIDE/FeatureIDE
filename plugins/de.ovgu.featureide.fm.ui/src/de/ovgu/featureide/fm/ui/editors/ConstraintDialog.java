@@ -28,7 +28,11 @@ import java.util.Locale;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.AbstractOperation;
 import org.eclipse.core.commands.operations.IUndoContext;
+import org.eclipse.jface.bindings.keys.KeyStroke;
+import org.eclipse.jface.bindings.keys.ParseException;
 import org.eclipse.jface.fieldassist.ContentProposalAdapter;
+import org.eclipse.jface.fieldassist.IContentProposal;
+import org.eclipse.jface.fieldassist.IContentProposalListener;
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellLabelProvider;
@@ -41,8 +45,8 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.graphics.Color;
@@ -101,19 +105,25 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ConstraintEditOp
 public class ConstraintDialog implements GUIDefaults {
 
 	/**
-	 * Mode in which the dialog runs. Use "UPDATE" if an exiting constraint
-	 * should be edited and "CREATE" otherwise
+	 * The dialogs current state which correspond to the current validation
+	 * process. Because some validation tests will take a long time span to be
+	 * finished, the dialog has three states.
+	 * 
+	 * SAVE_CHANGES_ENABLED means the dialog can be closed as regular. In this
+	 * state everything is okay and the constraint is valid.
+	 * 
+	 * SAVE_CHANGES_DISABLED means the dialog can not be closed because there
+	 * are syntax errors for the constraint text or the validation process has
+	 * finshed with an error found.
+	 * 
+	 * SAVE_CHANGES_DONT_MIND mean the dialog can be closed which is not
+	 * recommended. However, some tests are running in this case.
 	 * 
 	 * @author Marcus Pinnecke
 	 */
-	public enum Mode {
-		UPDATE, CREATE
+	private enum DialogState {
+		SAVE_CHANGES_ENABLED, SAVE_CHANGES_DISABLED, SAVE_CHANGES_DONT_MIND
 	}
-
-	/**
-	 * Current constraint editing mode
-	 */
-	private Mode mode = Mode.CREATE;
 
 	/**
 	 * This is the panel on the top of the dialog. It contains the current
@@ -122,6 +132,16 @@ public class ConstraintDialog implements GUIDefaults {
 	 * @author Marcus Pinnecke
 	 */
 	public static class HeaderPanel {
+
+		/**
+		 * Color types for the bubble
+		 * {@link ConstraintDialog.HeaderPanel#bubble}
+		 * 
+		 * @author Marcus Pinnecke
+		 */
+		public enum BubbleColor {
+			RED, GREEN, GRAY, YELLOW
+		}
 
 		/**
 		 * The panels background color
@@ -147,88 +167,6 @@ public class ConstraintDialog implements GUIDefaults {
 		 * contains e.g. a list of dead features if any exists.
 		 */
 		private Text detailsLabel;
-
-		/**
-		 * Color types for the bubble
-		 * {@link ConstraintDialog.HeaderPanel#bubble}
-		 * 
-		 * @author Marcus Pinnecke
-		 */
-		public enum BubbleColor {
-			RED, GREEN, GRAY, YELLOW
-		}
-
-		/**
-		 * Set current color for the bubble label show the user everything is
-		 * okay (green), nothing happens until now (gray), everything is fine
-		 * (green) or some error happens (red);
-		 * 
-		 * {@link ConstraintDialog.HeaderPanel.BubbleColor}
-		 * {@link ConstraintDialog.HeaderPanel#bubble}
-		 * 
-		 * @param color
-		 *            The color to set
-		 */
-		public void setColor(BubbleColor color) {
-			switch (color) {
-			case RED:
-				bubble.setImage(GUIDefaults.IMAGE_CIRCLE_RED);
-				break;
-			case GREEN:
-				bubble.setImage(GUIDefaults.IMAGE_CIRCLE_GREEN);
-				break;
-			case YELLOW:
-				bubble.setImage(GUIDefaults.IMAGE_CIRCLE_YELLOW);
-				break;
-			default:
-				bubble.setImage(GUIDefaults.IMAGE_CIRCLE_GRAY);
-				break;
-			}
-			bubble.redraw();
-		}
-
-		/**
-		 * Sets the header text for this panel. This text should highlight the
-		 * current dialogs state, e.g. editing an existing constraint. More
-		 * information should be displayed in the details text are.
-		 * 
-		 * {@link ConstraintDialog.HeaderPanel#setDetails(String)}
-		 * 
-		 * @param text
-		 *            Text to display
-		 */
-		public void setHeader(String text) {
-			headerLabel.setText(text.trim());
-		}
-
-		/**
-		 * Set the details for this panel. This text should explain more in
-		 * details what is going on or should provide useful hints or an error
-		 * message. It can contain e.g. the list of dead features.
-		 * 
-		 * To set the header panels text, consider to use
-		 * {@link #setHeader(String)}
-		 * 
-		 * @param text
-		 *            Text to display
-		 */
-		public void setDetails(String text) {
-			detailsLabel.setText(text);
-		}
-
-		/**
-		 * @return Gets the current headers text
-		 */
-		public String getHeader() {
-			return headerLabel.getText();
-		}
-
-		/**
-		 * @return Gets the current details text
-		 */
-		public String getDetails() {
-			return detailsLabel.getText();
-		}
 
 		/**
 		 * The composite to be used for placing the GUI elements
@@ -267,7 +205,7 @@ public class ConstraintDialog implements GUIDefaults {
 			headComposite.setLayout(headLayout);
 
 			bubble = new Label(headComposite, SWT.NONE | SWT.TOP);
-			bubble.setImage(GUIDefaults.IMAGE_CIRCLE_GRAY);
+			bubble.setImage(null);
 
 			headerLabel = new Label(headComposite, SWT.NONE);
 			FontData fontData = headerLabel.getFont().getFontData()[0];
@@ -287,12 +225,94 @@ public class ConstraintDialog implements GUIDefaults {
 			detailsLabel.setBackground(panelBackgroundColor);
 			detailsLabel.setText("You can create or edit constraints with this dialog.");
 		}
+
+		/**
+		 * @return Gets the current details text
+		 */
+		public String getDetails() {
+			return detailsLabel.getText();
+		}
+
+		/**
+		 * @return Gets the current headers text
+		 */
+		public String getHeader() {
+			return headerLabel.getText();
+		}
+
+		/**
+		 * Set current color for the bubble label show the user everything is
+		 * okay (green), nothing happens until now (gray), everything is fine
+		 * (green) or some error happens (red);
+		 * 
+		 * {@link ConstraintDialog.HeaderPanel.BubbleColor}
+		 * {@link ConstraintDialog.HeaderPanel#bubble}
+		 * 
+		 * @param color
+		 *            The color to set
+		 */
+		public void setColor(BubbleColor color) {
+			switch (color) {
+			case RED:
+				bubble.setImage(GUIDefaults.IMAGE_CIRCLE_RED);
+				break;
+			case GREEN:
+				bubble.setImage(null);
+				break;
+			case YELLOW:
+				bubble.setImage(GUIDefaults.IMAGE_CIRCLE_YELLOW);
+				break;
+			default:
+				bubble.setImage(null);
+				break;
+			}
+			bubble.redraw();
+		}
+
+		/**
+		 * Set the details for this panel. This text should explain more in
+		 * details what is going on or should provide useful hints or an error
+		 * message. It can contain e.g. the list of dead features.
+		 * 
+		 * To set the header panels text, consider to use
+		 * {@link #setHeader(String)}
+		 * 
+		 * @param text
+		 *            Text to display
+		 */
+		public void setDetails(String text) {
+			detailsLabel.setText(text);
+		}
+
+		/**
+		 * Sets the header text for this panel. This text should highlight the
+		 * current dialogs state, e.g. editing an existing constraint. More
+		 * information should be displayed in the details text are.
+		 * 
+		 * {@link ConstraintDialog.HeaderPanel#setDetails(String)}
+		 * 
+		 * @param text
+		 *            Text to display
+		 */
+		public void setHeader(String text) {
+			headerLabel.setText(text.trim());
+		}
+	}
+
+	/**
+	 * Mode in which the dialog runs. Use "UPDATE" if an exiting constraint
+	 * should be edited and "CREATE" otherwise
+	 * 
+	 * @author Marcus Pinnecke
+	 */
+	public enum Mode {
+		UPDATE, CREATE
 	}
 	
-	public void setInputText(String text) {
-		this.constraintText.setText(text);
-		this.constraintText.setSelection(text.length());
-	}
+	/**
+	 * Current constraint editing mode
+	 */
+	private Mode mode = Mode.CREATE;
 
 	private static final String FILTERTEXT = "type filter text";
 
@@ -336,6 +356,117 @@ public class ConstraintDialog implements GUIDefaults {
 	private static final String DEFAULT_DIALOG_TITLE = "Constraint Dialog";
 
 	/**
+	 * Content proposal pop up.
+	 */
+	ContentProposalAdapter adapter;
+
+	private final static int PROPOSAL_AUTO_ACTIVATION_DELAY = 500;
+
+	public static final int VALIDATION_TIME_OUT = 1000;
+
+	/**
+	 * Called when a validation test is just started.
+	 */
+	private IConsumer<ValidationMessage> onCheckStarted = new IConsumer<ValidationMessage>() {
+		@Override
+		public void invoke(ValidationMessage message) {
+			updateDialogState(DialogState.SAVE_CHANGES_DONT_MIND);
+			headerPanel.setDetails("Performing additional checks. This may take a while. Although it is not recommended, you can " + (mode == Mode.UPDATE ? "update" : "save") + " your constraint by clicking \"" + okButton.getText()
+					+ "\" before this process has ended.");
+			headerPanel.setColor(HeaderPanel.BubbleColor.GRAY);
+		}
+	};
+
+	/**
+	 * Called when the validation test for "voids model" has completed
+	 */
+	private IConsumer<ValidationMessage> onVoidsModelCheckComplete = new IConsumer<ValidationMessage>() {
+		@Override
+		public void invoke(ValidationMessage message) {
+			if (message.validationResult != ValidationResult.OK) {
+				headerPanel.setDetails("Your constraint voids the model");
+				headerPanel.setColor(HeaderPanel.BubbleColor.YELLOW);
+			}
+		}
+	};
+
+	/**
+	 * Called when the validation test for "false optional" has completed
+	 */
+	private IConsumer<ValidationMessage> onFalseOptionalCheckComplete = new IConsumer<ValidationMessage>() {
+		@Override
+		public void invoke(ValidationMessage message) {
+			if (message.validationResult != ValidationResult.OK) {
+				headerPanel.setDetails("Your constraint leads to false optional features.\n\n" + message.details);
+				headerPanel.setColor(HeaderPanel.BubbleColor.YELLOW);
+			}
+		}
+	};
+
+	/**
+	 * Called when the validation test for "dead features" has completed
+	 */
+	private IConsumer<ValidationMessage> onDeadFeatureCheckComplete = new IConsumer<ValidationMessage>() {
+		@Override
+		public void invoke(ValidationMessage message) {
+			if (message.validationResult != ValidationResult.OK) {
+				headerPanel.setDetails("Your constraint leads to dead features.\n\n" + message.details);
+				headerPanel.setColor(HeaderPanel.BubbleColor.YELLOW);
+			}
+		}
+	};
+
+	/**
+	 * Called when the validation test for "redundant check" has completed
+	 */
+	private IConsumer<ValidationMessage> onIsRedundantCheckComplete = new IConsumer<ValidationMessage>() {
+		@Override
+		public void invoke(ValidationMessage message) {
+			if (message.validationResult != ValidationResult.OK) {
+				headerPanel.setDetails("Redundancy occurred inside your constraint.");
+				headerPanel.setColor(HeaderPanel.BubbleColor.YELLOW);
+			}
+		}
+	};
+
+	/**
+	 * Called when the validation test has finished
+	 */
+	private IConsumer<ValidationMessage> onCheckEnded = new IConsumer<ValidationMessage>() {
+		@Override
+		public void invoke(ValidationMessage message) {
+			headerPanel.setDetails("Click \"" + (mode == Mode.UPDATE ? "Update" : "Create") + "\" to " + (mode == Mode.UPDATE ? "save your changes." : "add your new constraint."));
+			headerPanel.setColor(HeaderPanel.BubbleColor.GREEN);
+			updateDialogState(DialogState.SAVE_CHANGES_ENABLED);
+		}
+	};
+
+	/**
+	 * Called when the validation test for "tautology" has completed
+	 */
+	private IConsumer<ValidationMessage> onIsTautology = new IConsumer<ValidationMessage>() {
+		@Override
+		public void invoke(ValidationMessage message) {
+			if (message.validationResult != ValidationResult.OK) {
+				headerPanel.setDetails("Your constraint is a tautology.");
+				headerPanel.setColor(HeaderPanel.BubbleColor.YELLOW);
+			}
+		}
+	};
+	
+	/**
+	 * Called when the validation test for "satisfiable test" has completed
+	 */
+	private IConsumer<ValidationMessage> onIsNotSatisfiable = new IConsumer<ValidationMessage>() {
+		@Override
+		public void invoke(ValidationMessage message) {
+			if (message.validationResult != ValidationResult.OK) {
+				headerPanel.setDetails("Your constraint is not satisfiable.");
+				headerPanel.setColor(HeaderPanel.BubbleColor.YELLOW);
+			}
+		}
+	};
+	/**
 	 * 
 	 * @param featuremodel
 	 * @param constraint
@@ -375,35 +506,109 @@ public class ConstraintDialog implements GUIDefaults {
 
 		updateDialogState(DialogState.SAVE_CHANGES_DISABLED);
 	}
+	/**
+	 * Depending on the current editing mode of this dialog the OK button text
+	 * will be altered.
+	 */
+	private void autoSetOkButtonText() {
+		okButton.setText((mode == Mode.UPDATE ? "Update" : "Create") + " Constraint");
+	}
 
 	/**
-	 * initializes the shell
+	 * Logic for pressing cancel-button. This method is called when pressing ESC
+	 * or hit the cancel button.
 	 */
-	private void initShell() {
-		shell = new Shell(Display.getCurrent());
-		shell.setText(DEFAULT_DIALOG_TITLE);
-		shell.setImage(FEATURE_SYMBOL);
-		shell.setSize(500, 585);
-		GridLayout shellLayout = new GridLayout();
-		shellLayout.marginWidth = 0;
-		shellLayout.marginHeight = 0;
-		shell.setLayout(shellLayout);
+	private void cancelButtonPressEvent() {
+		VALIDATOR.cancelValidation();
+		shell.dispose();
+	}
 
-		Monitor primary = shell.getDisplay().getPrimaryMonitor();
-		Rectangle bounds = primary.getBounds();
-		Rectangle rect = shell.getBounds();
-		int x = bounds.x + (bounds.width - rect.width) / 2;
-		int y = bounds.y + (bounds.height - rect.height) / 2;
-		shell.setLocation(x, y);
-		shell.addListener(SWT.Traverse, new Listener() {
-			public void handleEvent(Event event) {
-				if (event.detail == SWT.TRAVERSE_ESCAPE && !adapter.isProposalPopupOpen()) {
+	/**
+	 * closes the shell and adds new constraint to the feature model if possible
+	 * 
+	 * @param featureModel
+	 * @param constraint
+	 */
+	private void closeShell() {
+		NodeReader nodeReader = new NodeReader();
+		String input = constraintText.getText().trim();
 
-					cancelButtonPressEvent();
+		if (input.length() == 0) {
+			printHeaderError("constraint is empty");
+			return;
+		}
 
+		Node propNode = nodeReader.stringToNode(input, featureModel.getFeatureNames());
+
+		if (propNode == null) {
+			printHeaderError(nodeReader.getErrorMessage());
+			return;
+		}
+		if (!ConstraintTextValidator.isSatisfiable(input, VALIDATION_TIME_OUT)) {
+			printHeaderWarning("constraint is unsatisfiable");
+		}
+
+		AbstractOperation op = null;
+		if (constraint != null && featureModel.getConstraints().contains(constraint)) {
+			int index = 0;
+			for (Constraint c : featureModel.getConstraints()) {
+				if (c == constraint) {
+					op = new ConstraintEditOperation(propNode, featureModel, index);
+					break;
 				}
+				index++;
 			}
-		});
+		}
+		if (op == null) {
+			op = new ConstraintCreateOperation(propNode, featureModel);
+		}
+		op.addContext((IUndoContext) featureModel.getUndoContext());
+		try {
+			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
+		} catch (ExecutionException e) {
+			FMUIPlugin.getDefault().logError(e);
+		}
+
+		shell.dispose();
+
+	}
+
+	/**
+	 * returns a List of all features that are caused to be dead by the
+	 * constraint input
+	 * 
+	 * @param input
+	 *            constraint to be evaluated
+	 * @param model
+	 *            the feature model
+	 * @return List of all dead Features, empty if no feature is caused to be
+	 *         dead
+	 */
+	public List<Feature> getDeadFeatures(String input, FeatureModel model) {
+		Collection<Feature> deadFeaturesBefore = null;
+		FeatureModel clonedModel = model.clone();
+
+		NodeReader nodeReader = new NodeReader();
+
+		Node propNode = nodeReader.stringToNode(input, clonedModel.getFeatureNames());
+
+		if (propNode != null) {
+			if (constraint != null) {
+				clonedModel.removeConstraint(constraint);
+			}
+			deadFeaturesBefore = clonedModel.getAnalyser().getDeadFeatures();
+			clonedModel.addPropositionalNode(propNode);
+			clonedModel.handleModelDataChanged();
+		}
+
+		List<Feature> deadFeaturesAfter = new ArrayList<Feature>();
+		for (Feature l : clonedModel.getAnalyser().getDeadFeatures()) {
+			if (!deadFeaturesBefore.contains(l)) {
+				deadFeaturesAfter.add(l);
+
+			}
+		}
+		return deadFeaturesAfter;
 	}
 
 	/**
@@ -435,20 +640,23 @@ public class ConstraintDialog implements GUIDefaults {
 		formDataHelp.left = new FormAttachment(0, 5);
 		helpButtonBar.setLayoutData(formDataHelp);
 
-		okButton = new Button(lastComposite, SWT.NONE);
-		autoSetOkButtonText();
-		FormData formDataOk = new FormData();
-		formDataOk.width = 120;
-		formDataOk.right = new FormAttachment(100, -5);
-		formDataOk.bottom = new FormAttachment(100, -5);
-		okButton.setLayoutData(formDataOk);
+		
 
 		cancelButton = new Button(lastComposite, SWT.NONE);
 		cancelButton.setText("Cancel");
 		FormData formDataCancel = new FormData();
 		formDataCancel.width = 70;
-		formDataCancel.right = new FormAttachment(okButton, -5);
+		formDataCancel.right = new FormAttachment(100, -5);
 		formDataCancel.bottom = new FormAttachment(100, -5);
+		
+		okButton = new Button(lastComposite, SWT.NONE);
+		autoSetOkButtonText();
+		FormData formDataOk = new FormData();
+		formDataOk.width = 120;
+		formDataOk.right = new FormAttachment(cancelButton, -5);
+		formDataOk.bottom = new FormAttachment(100, -5);
+		okButton.setLayoutData(formDataOk);
+		
 		cancelButton.setLayoutData(formDataCancel);
 
 		shell.setTabList(new Control[] { featureGroup, buttonGroup, constraintTextComposite, lastComposite });
@@ -469,139 +677,6 @@ public class ConstraintDialog implements GUIDefaults {
 
 			}
 
-		});
-	}
-
-	/**
-	 * Logic for pressing okay-button. This is used because to be consistent to
-	 * the {@link #cancelButtonPressEvent()} method.
-	 */
-	private void okButtonPressEvent() {
-		if (okButton.isEnabled()) {
-			VALIDATOR.cancelValidation();
-			closeShell();
-		}
-	}
-
-	/**
-	 * Logic for pressing cancel-button. This method is called when pressing ESC
-	 * or hit the cancel button.
-	 */
-	private void cancelButtonPressEvent() {
-		VALIDATOR.cancelValidation();
-		shell.dispose();
-	}
-
-	/**
-	 * The dialogs current state which correspond to the current validation
-	 * process. Because some validation tests will take a long time span to be
-	 * finished, the dialog has three states.
-	 * 
-	 * SAVE_CHANGES_ENABLED means the dialog can be closed as regular. In this
-	 * state everything is okay and the constraint is valid.
-	 * 
-	 * SAVE_CHANGES_DISABLED means the dialog can not be closed because there
-	 * are syntax errors for the constraint text or the validation process has
-	 * finshed with an error found.
-	 * 
-	 * SAVE_CHANGES_DONT_MIND mean the dialog can be closed which is not
-	 * recommended. However, some tests are running in this case.
-	 * 
-	 * @author Marcus Pinnecke
-	 */
-	private enum DialogState {
-		SAVE_CHANGES_ENABLED, SAVE_CHANGES_DISABLED, SAVE_CHANGES_DONT_MIND
-	}
-
-	/**
-	 * Depending on the current editing mode of this dialog the OK button text
-	 * will be altered.
-	 */
-	private void autoSetOkButtonText() {
-		okButton.setText((mode == Mode.UPDATE ? "Update" : "Create") + " Constraint");
-	}
-
-	/**
-	 * Content proposal pop up.
-	 */
-	ContentProposalAdapter adapter;
-
-	/**
-	 * Updates the dialogs state, changing the default button and setting the
-	 * text for this button depending on the current
-	 * {@link ConstraintDialog.DialogState}
-	 * 
-	 * @param state
-	 *            The state to consider
-	 */
-	private void updateDialogState(DialogState state) {
-		switch (state) {
-		case SAVE_CHANGES_ENABLED:
-			okButton.setEnabled(true);
-			shell.setDefaultButton(okButton);
-			autoSetOkButtonText();
-			break;
-		case SAVE_CHANGES_DONT_MIND:
-			okButton.setEnabled(true);
-			shell.setDefaultButton(okButton);
-			okButton.setText("Save anyway");
-			break;
-		default:
-			okButton.setEnabled(false);
-			shell.setDefaultButton(cancelButton);
-			autoSetOkButtonText();
-			break;
-		}
-	}
-
-	/**
-	 * initializes the upper part of the dialog
-	 */
-	private void initHead() {
-		headerPanel = new HeaderPanel(shell);
-		headerPanel.setHeader(defaultHeaderText);
-		headerPanel.setDetails(defaultDetailsText);
-	}
-
-	/**
-	 * initializes the Text containing the constraint
-	 */
-	private void initConstraintText() {
-		constraintTextComposite = new Composite(shell, SWT.NONE);
-		GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
-
-		constraintTextComposite.setLayoutData(gridData);
-		FormLayout constraintTextLayout = new FormLayout();
-		constraintTextComposite.setLayout(constraintTextLayout);
-		constraintText = new SimpleSyntaxHighlightEditor(constraintTextComposite, SWT.WRAP | SWT.BORDER | SWT.V_SCROLL, Operator.NAMES);
-
-		adapter = new ContentProposalAdapter(constraintText, new SimpleSyntaxHighlighterConstraintContentAdapter(), new ConstraintContentProposalProvider(featureModel.getFeatureNames()), null, null);
-
-		adapter.setAutoActivationDelay(500);
-		adapter.setPopupSize(new Point(250, 85));
-
-		adapter.setLabelProvider(new ConstraintProposalLabelProvider());
-		FormData formDataConstraintText = new FormData();
-		formDataConstraintText.right = new FormAttachment(100, -5);
-		formDataConstraintText.left = new FormAttachment(0, 5);
-		formDataConstraintText.height = 50;
-		constraintText.setLayoutData(formDataConstraintText);
-		constraintText.setText(initialConstraint);
-		constraintText.setMargins(10, 5, 3, 5);
-		constraintText.setPossibleWords(featureModel.getFeatureNames());
-
-		constraintText.addModifyListener(new ModifyListener() {
-
-			@Override
-			public void modifyText(ModifyEvent e) {
-				if (constraintText.getText().trim().isEmpty()) {
-					headerPanel.setDetails("Please insert a constraint.");
-					headerPanel.setColor(HeaderPanel.BubbleColor.GRAY);
-					updateDialogState(DialogState.SAVE_CHANGES_DISABLED);
-				} else {
-					validate();
-				}
-			}
 		});
 	}
 
@@ -631,6 +706,45 @@ public class ConstraintDialog implements GUIDefaults {
 
 			});
 		}
+	}
+
+	/**
+	 * initializes the Text containing the constraint
+	 */
+	private void initConstraintText() {
+		constraintTextComposite = new Composite(shell, SWT.NONE);
+		GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
+
+		constraintTextComposite.setLayoutData(gridData);
+		FormLayout constraintTextLayout = new FormLayout();
+		constraintTextComposite.setLayout(constraintTextLayout);
+		constraintText = new SimpleSyntaxHighlightEditor(constraintTextComposite, SWT.SINGLE | SWT.H_SCROLL | SWT.BORDER, Operator.NAMES);
+
+		setupContentProposal();
+		
+		FormData formDataConstraintText = new FormData();
+		formDataConstraintText.right = new FormAttachment(100, -5);
+		formDataConstraintText.left = new FormAttachment(0, 5);
+		formDataConstraintText.height = 50;
+		constraintText.setLayoutData(formDataConstraintText);
+		constraintText.setText(initialConstraint);
+		constraintText.setMargins(10, 5, 3, 5);
+		constraintText.setPossibleWords(featureModel.getFeatureNames());
+
+		constraintText.addModifyListener(new ModifyListener() {
+
+			@Override
+			public void modifyText(ModifyEvent e) {
+				if (constraintText.getText().trim().isEmpty()) {
+					headerPanel.setDetails("Please insert a constraint.");
+					headerPanel.setColor(HeaderPanel.BubbleColor.GRAY);
+					updateDialogState(DialogState.SAVE_CHANGES_DISABLED);
+				} else {
+					validate();
+				}
+			}
+		});
+		
 	}
 
 	/**
@@ -743,51 +857,181 @@ public class ConstraintDialog implements GUIDefaults {
 			@Override
 			public void handleEvent(Event event) {
 				TableItem[] selectedItem = featureTable.getSelection();
-				constraintText.copyIn(selectedItem[0].getText());
+				final String featureName = selectedItem[0].getText().contains(" ")? "\"" + selectedItem[0].getText() + "\"" : selectedItem[0].getText();
+				constraintText.copyIn(featureName);
 			}
 		});
 
 	}
 
 	/**
-	 * returns a List of all features that are caused to be dead by the
-	 * constraint input
-	 * 
-	 * @param input
-	 *            constraint to be evaluated
-	 * @param model
-	 *            the feature model
-	 * @return List of all dead Features, empty if no feature is caused to be
-	 *         dead
+	 * initializes the upper part of the dialog
 	 */
-	public List<Feature> getDeadFeatures(String input, FeatureModel model) {
-		Collection<Feature> deadFeaturesBefore = null;
-		FeatureModel clonedModel = model.clone();
-
-		NodeReader nodeReader = new NodeReader();
-
-		Node propNode = nodeReader.stringToNode(input, clonedModel.getFeatureNames());
-
-		if (propNode != null) {
-			if (constraint != null) {
-				clonedModel.removeConstraint(constraint);
-			}
-			deadFeaturesBefore = clonedModel.getAnalyser().getDeadFeatures();
-			clonedModel.addPropositionalNode(propNode);
-			clonedModel.handleModelDataChanged();
-		}
-
-		List<Feature> deadFeaturesAfter = new ArrayList<Feature>();
-		for (Feature l : clonedModel.getAnalyser().getDeadFeatures()) {
-			if (!deadFeaturesBefore.contains(l)) {
-				deadFeaturesAfter.add(l);
-
-			}
-		}
-		return deadFeaturesAfter;
+	private void initHead() {
+		headerPanel = new HeaderPanel(shell);
+		headerPanel.setHeader(defaultHeaderText);
+		headerPanel.setDetails(defaultDetailsText);
 	}
 
-	public static final int VALIDATION_TIME_OUT = 1000;
+	/**
+	 * initializes the shell
+	 */
+	private void initShell() {
+		shell = new Shell(Display.getCurrent());
+		shell.setText(DEFAULT_DIALOG_TITLE);
+		shell.setImage(FEATURE_SYMBOL);
+		shell.setSize(500, 585);
+		GridLayout shellLayout = new GridLayout();
+		shellLayout.marginWidth = 0;
+		shellLayout.marginHeight = 0;
+		shell.setLayout(shellLayout);
+
+		Monitor primary = shell.getDisplay().getPrimaryMonitor();
+		Rectangle bounds = primary.getBounds();
+		Rectangle rect = shell.getBounds();
+		int x = bounds.x + (bounds.width - rect.width) / 2;
+		int y = bounds.y + (bounds.height - rect.height) / 2;
+		shell.setLocation(x, y);
+		shell.addListener(SWT.Traverse, new Listener() {
+			public void handleEvent(Event event) {
+				if (event.detail == SWT.TRAVERSE_ESCAPE && !adapter.isProposalPopupOpen()) {
+
+					cancelButtonPressEvent();
+
+				}
+			}
+		});
+	}
+
+	/**
+	 * Logic for pressing okay-button. This is used because to be consistent to
+	 * the {@link #cancelButtonPressEvent()} method.
+	 */
+	private void okButtonPressEvent() {
+		if (okButton.isEnabled()) {
+			VALIDATOR.cancelValidation();
+			closeShell();
+		}
+	}
+
+	/**
+	 * displays an error in the header
+	 * 
+	 * @param message
+	 *            message to be displayed
+	 */
+	private void printHeaderError(String message) {
+		okButton.setEnabled(false);
+		errorMarker.setImage(ERROR_IMAGE);
+		errorMarker.setVisible(true);
+		errorMessage.setText(message);
+	}
+
+	/**
+	 * displays a warning in the header
+	 * 
+	 * @param message
+	 *            message to be displayed
+	 */
+	private void printHeaderWarning(String message) {
+		okButton.setEnabled(true);
+		errorMarker.setImage(WARNING_IMAGE);
+		errorMarker.setVisible(true);
+		errorMessage.setText(message);
+		errorMessage.pack();
+	}
+
+	public void setInputText(String text) {
+		String constrainText = text.trim().contains(" ") ? "\"" + text.trim() + "\"" : text.trim();
+		constrainText += " ";
+		
+		this.constraintText.setText(constrainText);
+		this.constraintText.setSelection(constrainText.length());
+	}
+
+	private void setupContentProposal() {
+		try {
+			final KeyStroke keyStroke= KeyStroke.getInstance("Ctrl+Space");
+			
+			char[] autoActivationCharacters=new char[Character.MAX_VALUE];
+			for (char c = Character.MIN_VALUE; c < Character.MAX_VALUE; c++)
+				autoActivationCharacters[c] = c;
+		
+			adapter = new ContentProposalAdapter(constraintText, new SimpleSyntaxHighlighterConstraintContentAdapter(), new ConstraintContentProposalProvider(featureModel.getFeatureNames()), keyStroke, autoActivationCharacters);
+	
+			adapter.setAutoActivationDelay(PROPOSAL_AUTO_ACTIVATION_DELAY);
+			adapter.setPopupSize(new Point(250, 85));
+			adapter.setProposalAcceptanceStyle(ContentProposalAdapter.PROPOSAL_IGNORE);
+	
+			adapter.setLabelProvider(new ConstraintProposalLabelProvider());
+			
+			adapter.addContentProposalListener(new IContentProposalListener() {
+				
+				@Override
+				public void proposalAccepted(IContentProposal proposal) {
+					if (constraintText.getText().isEmpty()) {
+						constraintText.setText(proposal.getContent());
+						constraintText.setSelection(proposal.getContent().length());
+					} else {
+						final int lastSelection = constraintText.getSelection().x;
+						
+						if (constraintText.getSelection().x == constraintText.getSelection().y) {
+							// Insert text
+							int wordBeginIndex = 0;
+							for (int index = constraintText.getSelection().x - 1; index >= 0; index--) {
+								if (constraintText.getText().charAt(index) == ' ') {
+									wordBeginIndex = index;
+									break;
+								}
+							}
+							String subText = constraintText.getText().substring(wordBeginIndex, lastSelection);
+							final String completedText = proposal.getContent().substring(subText.length() - 1, proposal.getContent().length());
+							constraintText.setText(constraintText.getText() + completedText);
+							constraintText.setSelection(lastSelection + completedText.length());
+						} else {
+							// Replace text
+							final String replacement = proposal.getContent();
+							final String newConstraintText = constraintText.getText().substring(0, constraintText.getSelection().x) + replacement + constraintText.getText().substring(constraintText.getSelection().y, constraintText.getText().length());
+							constraintText.setText(newConstraintText);
+							constraintText.setSelection(lastSelection + replacement.length());
+						}
+					}
+					
+				}
+			});
+		
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Updates the dialogs state, changing the default button and setting the
+	 * text for this button depending on the current
+	 * {@link ConstraintDialog.DialogState}
+	 * 
+	 * @param state
+	 *            The state to consider
+	 */
+	private void updateDialogState(DialogState state) {
+		switch (state) {
+		case SAVE_CHANGES_ENABLED:
+			okButton.setEnabled(true);
+			shell.setDefaultButton(okButton);
+			autoSetOkButtonText();
+			break;
+		case SAVE_CHANGES_DONT_MIND:
+			okButton.setEnabled(true);
+			shell.setDefaultButton(okButton);
+			okButton.setText("Save anyway");
+			break;
+		default:
+			okButton.setEnabled(false);
+			shell.setDefaultButton(cancelButton);
+			autoSetOkButtonText();
+			break;
+		}
+	}
 
 	/**
 	 * validates the current constraint in constraintText
@@ -817,7 +1061,7 @@ public class ConstraintDialog implements GUIDefaults {
 							details = "Your input constains syntax error.";
 						} else {
 							int count = constraintText.getUnknownWords().size();
-							details = "Constains contains " + count + " unknown feature name" + (count > 1 ? "s" : "") + ".";
+							details = "Constraint contains " + count + " unknown feature name" + (count > 1 ? "s" : "") + ".";
 						}
 					} else
 						details = "";
@@ -830,184 +1074,4 @@ public class ConstraintDialog implements GUIDefaults {
 			}
 		});
 	}
-
-	/**
-	 * displays a warning in the header
-	 * 
-	 * @param message
-	 *            message to be displayed
-	 */
-	private void printHeaderWarning(String message) {
-		okButton.setEnabled(true);
-		errorMarker.setImage(WARNING_IMAGE);
-		errorMarker.setVisible(true);
-		errorMessage.setText(message);
-		errorMessage.pack();
-	}
-
-	/**
-	 * displays an error in the header
-	 * 
-	 * @param message
-	 *            message to be displayed
-	 */
-	private void printHeaderError(String message) {
-		okButton.setEnabled(false);
-		errorMarker.setImage(ERROR_IMAGE);
-		errorMarker.setVisible(true);
-		errorMessage.setText(message);
-	}
-
-	/**
-	 * closes the shell and adds new constraint to the feature model if possible
-	 * 
-	 * @param featureModel
-	 * @param constraint
-	 */
-	private void closeShell() {
-		NodeReader nodeReader = new NodeReader();
-		String input = constraintText.getText().trim();
-
-		if (input.length() == 0) {
-			printHeaderError("constraint is empty");
-			return;
-		}
-
-		Node propNode = nodeReader.stringToNode(input, featureModel.getFeatureNames());
-
-		if (propNode == null) {
-			printHeaderError(nodeReader.getErrorMessage());
-			return;
-		}
-		if (!ConstraintTextValidator.isSatisfiable(input, VALIDATION_TIME_OUT)) {
-			printHeaderWarning("constraint is unsatisfiable");
-		}
-
-		AbstractOperation op = null;
-		if (constraint != null && featureModel.getConstraints().contains(constraint)) {
-			int index = 0;
-			for (Constraint c : featureModel.getConstraints()) {
-				if (c == constraint) {
-					op = new ConstraintEditOperation(propNode, featureModel, index);
-					break;
-				}
-				index++;
-			}
-		}
-		if (op == null) {
-			op = new ConstraintCreateOperation(propNode, featureModel);
-		}
-		op.addContext((IUndoContext) featureModel.getUndoContext());
-		try {
-			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-		} catch (ExecutionException e) {
-			FMUIPlugin.getDefault().logError(e);
-		}
-
-		shell.dispose();
-
-	}
-
-	/**
-	 * Called when a validation test is just started.
-	 */
-	private IConsumer<ValidationMessage> onCheckStarted = new IConsumer<ValidationMessage>() {
-		@Override
-		public void invoke(ValidationMessage message) {
-			updateDialogState(DialogState.SAVE_CHANGES_DONT_MIND);
-			headerPanel.setDetails("Performing additional checks. This may take a while. Although it is not recommended, you can " + (mode == Mode.UPDATE ? "update" : "save") + " your constraint by clicking \"" + okButton.getText()
-					+ "\" before this process has ended.");
-			headerPanel.setColor(HeaderPanel.BubbleColor.YELLOW);
-		}
-	};
-
-	/**
-	 * Called when the validation test for "voids model" has completed
-	 */
-	private IConsumer<ValidationMessage> onVoidsModelCheckComplete = new IConsumer<ValidationMessage>() {
-		@Override
-		public void invoke(ValidationMessage message) {
-			if (message.validationResult != ValidationResult.OK) {
-				headerPanel.setDetails("Your constraint voids the model");
-				headerPanel.setColor(HeaderPanel.BubbleColor.RED);
-			}
-		}
-	};
-
-	/**
-	 * Called when the validation test for "false optional" has completed
-	 */
-	private IConsumer<ValidationMessage> onFalseOptionalCheckComplete = new IConsumer<ValidationMessage>() {
-		@Override
-		public void invoke(ValidationMessage message) {
-			if (message.validationResult != ValidationResult.OK) {
-				headerPanel.setDetails("Your constraint leads to false optional features.\n\n" + message.details);
-				headerPanel.setColor(HeaderPanel.BubbleColor.RED);
-			}
-		}
-	};
-
-	/**
-	 * Called when the validation test for "dead features" has completed
-	 */
-	private IConsumer<ValidationMessage> onDeadFeatureCheckComplete = new IConsumer<ValidationMessage>() {
-		@Override
-		public void invoke(ValidationMessage message) {
-			if (message.validationResult != ValidationResult.OK) {
-				headerPanel.setDetails("Your constraint leads to dead features.\n\n" + message.details);
-				headerPanel.setColor(HeaderPanel.BubbleColor.RED);
-			}
-		}
-	};
-
-	/**
-	 * Called when the validation test for "redundant check" has completed
-	 */
-	private IConsumer<ValidationMessage> onIsRedundantCheckComplete = new IConsumer<ValidationMessage>() {
-		@Override
-		public void invoke(ValidationMessage message) {
-			if (message.validationResult != ValidationResult.OK) {
-				headerPanel.setDetails("Redundancy occurred inside your constraint.");
-				headerPanel.setColor(HeaderPanel.BubbleColor.RED);
-			}
-		}
-	};
-
-	/**
-	 * Called when the validation test has finished
-	 */
-	private IConsumer<ValidationMessage> onCheckEnded = new IConsumer<ValidationMessage>() {
-		@Override
-		public void invoke(ValidationMessage message) {
-			headerPanel.setDetails("Click \"" + (mode == Mode.UPDATE ? "Update" : "Create") + "\" to " + (mode == Mode.UPDATE ? "save your changes." : "add your new constraint."));
-			headerPanel.setColor(HeaderPanel.BubbleColor.GREEN);
-			updateDialogState(DialogState.SAVE_CHANGES_ENABLED);
-		}
-	};
-
-	/**
-	 * Called when the validation test for "tautology" has completed
-	 */
-	private IConsumer<ValidationMessage> onIsTautology = new IConsumer<ValidationMessage>() {
-		@Override
-		public void invoke(ValidationMessage message) {
-			if (message.validationResult != ValidationResult.OK) {
-				headerPanel.setDetails("Your constraint is a tautology.");
-				headerPanel.setColor(HeaderPanel.BubbleColor.RED);
-			}
-		}
-	};
-
-	/**
-	 * Called when the validation test for "satisfiable test" has completed
-	 */
-	private IConsumer<ValidationMessage> onIsNotSatisfiable = new IConsumer<ValidationMessage>() {
-		@Override
-		public void invoke(ValidationMessage message) {
-			if (message.validationResult != ValidationResult.OK) {
-				headerPanel.setDetails("Your constraint is not satisfiable.");
-				headerPanel.setColor(HeaderPanel.BubbleColor.RED);
-			}
-		}
-	};
 }
