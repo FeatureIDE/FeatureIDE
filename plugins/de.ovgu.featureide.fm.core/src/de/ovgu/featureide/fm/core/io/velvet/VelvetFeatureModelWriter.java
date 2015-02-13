@@ -42,7 +42,7 @@ public class VelvetFeatureModelWriter extends AbstractFeatureModelWriter {
 	private static final String[] SYMBOLS = { "!", "&&", "||", "->", "<->",
 			", ", "choose", "atleast", "atmost" };
 	private static final String NEWLINE = System.getProperty("line.separator", "\n");
-	private StringBuilder sb = new StringBuilder();
+	private final StringBuilder sb = new StringBuilder();
 
 	/**
 	 * If true an interface will be created. Otherwise it is named "concept"
@@ -65,8 +65,10 @@ public class VelvetFeatureModelWriter extends AbstractFeatureModelWriter {
 	public String writeToString() {
 		if (featureModel instanceof ExtendedFeatureModel) {
 			extFeatureModel = (ExtendedFeatureModel) featureModel;
+			isInterface = isInterface || extFeatureModel.isInterface();
 		}
 		Feature root = featureModel.getRoot();
+		sb.delete(0, sb.length());
 
 		if (isInterface) {
 			sb.append("cinterface ");
@@ -125,7 +127,7 @@ public class VelvetFeatureModelWriter extends AbstractFeatureModelWriter {
 		sb.append(" {");
 		sb.append(NEWLINE);
 
-		if (extFeatureModel != null) {
+		if (extFeatureModel != null && !isInterface) {
 			for (Feature child : root.getChildren()) {
 				writeNewDefined(child, 1);
 			}

@@ -67,6 +67,7 @@ import de.ovgu.featureide.core.builder.FeatureProjectNature;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
+import de.ovgu.featureide.fm.core.ExtendedFeature;
 import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
@@ -424,9 +425,21 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	private void createAndDeleteFeatureFolders() throws CoreException {
 		sourceFolder.refreshLocal(IResource.DEPTH_ONE, null);
 		// create folders for all layers
-		for (Feature feature : featureModel.getFeatures())
-			if (feature.isConcrete())
-				createFeatureFolder(feature.getName());
+		if (featureModel instanceof ExtendedFeatureModel) {
+			for (Feature feature : featureModel.getFeatures()) {
+				if (feature.isConcrete() && 
+						feature instanceof ExtendedFeature && 
+						!((ExtendedFeature)feature).isFromExtern()) {
+					createFeatureFolder(feature.getName());
+				}
+			}
+		} else {
+			for (Feature feature : featureModel.getFeatures()) {
+				if (feature.isConcrete()) {
+					createFeatureFolder(feature.getName());
+				}
+			}
+		}
 		// delete all empty folders which do not anymore belong to layers
 		for (IResource res : sourceFolder.members())
 			if (res instanceof IFolder && res.exists()) {

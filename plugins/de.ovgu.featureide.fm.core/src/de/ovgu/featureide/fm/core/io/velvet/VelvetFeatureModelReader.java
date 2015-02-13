@@ -110,7 +110,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 	private ModelMarkerHandler modelMarkerHandler;
 	private ExtendedFeatureModel extFeatureModel;
 	private String extFeatureModelName;
-	private boolean cinterface, localSearch = false;
+	private boolean localSearch = false;
 	
 	/**
 	 * Reads external model with the right FeatureModelReader.
@@ -475,7 +475,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 		}
 
 		extFeatureModelName = null;
-		cinterface = false;
+		extFeatureModel.setInterface(false);
 		
 		// TODO MPL: Hack for local search
 		localSearch = featureModelFile != null
@@ -789,7 +789,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 	private void parseFeature(final Tree root, Feature parent) throws RecognitionException {
 		final LinkedList<Tree> childList = getChildren(root);
 		final String featureName;
-		if (cinterface) {
+		if (extFeatureModel.isInterface()) {
 			featureName = checkTree(childList.poll()).getText();
 		} else {
 			if (velvetImport || parent.isRoot()) {
@@ -948,7 +948,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 				parseConcept(curNode);
 				break;
 			case VelvetParser.CINTERFACE:
-				cinterface = true;
+				extFeatureModel.setInterface(true);
 				parseConcept(curNode);
 				break;
 			case VelvetParser.EOF:
