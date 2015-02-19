@@ -45,8 +45,6 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.graphics.Color;
@@ -114,7 +112,7 @@ public class ConstraintDialog implements GUIDefaults {
 	 * 
 	 * SAVE_CHANGES_DISABLED means the dialog can not be closed because there
 	 * are syntax errors for the constraint text or the validation process has
-	 * finshed with an error found.
+	 * finished with an error found.
 	 * 
 	 * SAVE_CHANGES_DONT_MIND mean the dialog can be closed which is not
 	 * recommended. However, some tests are running in this case.
@@ -134,13 +132,13 @@ public class ConstraintDialog implements GUIDefaults {
 	public static class HeaderPanel {
 
 		/**
-		 * Color types for the bubble
-		 * {@link ConstraintDialog.HeaderPanel#bubble}
+		 * Image types for description inside header panel
+		 * {@link ConstraintDialog.HeaderPanel#headerDescriptionImageLabel}
 		 * 
 		 * @author Marcus Pinnecke
 		 */
-		public enum BubbleColor {
-			RED, GREEN, GRAY, YELLOW
+		public enum HeaderDescriptionImage {
+			ERROR, WARNING, NONE
 		}
 
 		/**
@@ -149,12 +147,11 @@ public class ConstraintDialog implements GUIDefaults {
 		private final Color panelBackgroundColor;
 
 		/**
-		 * The bubble is a circle of red, green, yellow or gray depending on the
-		 * current dialog state.
+		 * The actual image of the headers description label
 		 * 
-		 * {@link ConstraintDialog.HeaderPanel.BubbleColor}
+		 * {@link ConstraintDialog.HeaderPanel.HeaderDescriptionImage}
 		 */
-		private Label bubble;
+		private Label headerDescriptionImageLabel;
 
 		/**
 		 * Brief text what's the current mode for the dialog. This is more or
@@ -176,9 +173,7 @@ public class ConstraintDialog implements GUIDefaults {
 		/**
 		 * Constructs a new header panel to the shell. This panel contains a
 		 * header text ({@link #setHeader(String)}), a details text (
-		 * {@link #setDetails(String)}) as well as a visualization of the
-		 * currents dialog state styled as a colored bubble (
-		 * {@link #setColor(BubbleColor)}).
+		 * {@link #setDetails(String)}).
 		 * 
 		 * By default a short info about possibilities with this dialog is
 		 * display as details and that a new constraint will be created now.
@@ -204,8 +199,7 @@ public class ConstraintDialog implements GUIDefaults {
 			headLayout.marginTop = 7;
 			headComposite.setLayout(headLayout);
 
-			bubble = new Label(headComposite, SWT.NONE | SWT.TOP);
-			bubble.setImage(null);
+			headerDescriptionImageLabel = new Label(headComposite, SWT.NONE | SWT.TOP);
 
 			headerLabel = new Label(headComposite, SWT.NONE);
 			FontData fontData = headerLabel.getFont().getFontData()[0];
@@ -241,32 +235,27 @@ public class ConstraintDialog implements GUIDefaults {
 		}
 
 		/**
-		 * Set current color for the bubble label show the user everything is
-		 * okay (green), nothing happens until now (gray), everything is fine
-		 * (green) or some error happens (red);
+		 * Set current image for the details text.
 		 * 
-		 * {@link ConstraintDialog.HeaderPanel.BubbleColor}
-		 * {@link ConstraintDialog.HeaderPanel#bubble}
+		 * {@link ConstraintDialog.HeaderPanel.HeaderDescriptionImage}
+		 * {@link ConstraintDialog.HeaderPanel#headerDescriptionImageLabel}
 		 * 
-		 * @param color
-		 *            The color to set
+		 * @param image
+		 *            The image to set
 		 */
-		public void setColor(BubbleColor color) {
-			switch (color) {
-			case RED:
-				bubble.setImage(GUIDefaults.IMAGE_CIRCLE_RED);
+		private void setImage(HeaderDescriptionImage image) {
+			switch (image) {
+			case ERROR:
+				headerDescriptionImageLabel.setImage(GUIDefaults.ERROR_IMAGE);
 				break;
-			case GREEN:
-				bubble.setImage(null);
-				break;
-			case YELLOW:
-				bubble.setImage(GUIDefaults.IMAGE_CIRCLE_YELLOW);
+			case WARNING:
+				headerDescriptionImageLabel.setImage(GUIDefaults.WARNING_IMAGE);
 				break;
 			default:
-				bubble.setImage(null);
+				headerDescriptionImageLabel.setImage(null);
 				break;
 			}
-			bubble.redraw();
+			headerDescriptionImageLabel.redraw();
 		}
 
 		/**
@@ -280,8 +269,9 @@ public class ConstraintDialog implements GUIDefaults {
 		 * @param text
 		 *            Text to display
 		 */
-		public void setDetails(String text) {
+		public void setDetails(String text, HeaderDescriptionImage image) {
 			detailsLabel.setText(text);
+			setImage(image);
 		}
 
 		/**
@@ -318,13 +308,13 @@ public class ConstraintDialog implements GUIDefaults {
 
 	/**
 	 * The panel on the top of this dialog showing useful information and
-	 * details as well as a colored bubble showing the current state.
+	 * details.
 	 */
 	private HeaderPanel headerPanel;
 
 	/**
 	 * An object which contains several validation functionalities used in this
-	 * dilog to check if a given constraint text is valid.
+	 * dialog to check if a given constraint text is valid.
 	 */
 	private static final ConstraintTextValidator VALIDATOR = new ConstraintTextValidator();
 
@@ -372,8 +362,7 @@ public class ConstraintDialog implements GUIDefaults {
 		public void invoke(ValidationMessage message) {
 			updateDialogState(DialogState.SAVE_CHANGES_DONT_MIND);
 			headerPanel.setDetails("Performing additional checks. This may take a while. Although it is not recommended, you can " + (mode == Mode.UPDATE ? "update" : "save") + " your constraint by clicking \"" + okButton.getText()
-					+ "\" before this process has ended.");
-			headerPanel.setColor(HeaderPanel.BubbleColor.GRAY);
+					+ "\" before this process has ended.", HeaderPanel.HeaderDescriptionImage.NONE);
 		}
 	};
 
@@ -384,8 +373,7 @@ public class ConstraintDialog implements GUIDefaults {
 		@Override
 		public void invoke(ValidationMessage message) {
 			if (message.validationResult != ValidationResult.OK) {
-				headerPanel.setDetails("Your constraint voids the model");
-				headerPanel.setColor(HeaderPanel.BubbleColor.YELLOW);
+				headerPanel.setDetails("Your constraint voids the model", HeaderPanel.HeaderDescriptionImage.WARNING);
 			}
 		}
 	};
@@ -397,8 +385,7 @@ public class ConstraintDialog implements GUIDefaults {
 		@Override
 		public void invoke(ValidationMessage message) {
 			if (message.validationResult != ValidationResult.OK) {
-				headerPanel.setDetails("Your constraint leads to false optional features.\n\n" + message.details);
-				headerPanel.setColor(HeaderPanel.BubbleColor.YELLOW);
+				headerPanel.setDetails("Your constraint leads to false optional features.\n\n" + message.details, HeaderPanel.HeaderDescriptionImage.WARNING);
 			}
 		}
 	};
@@ -410,8 +397,7 @@ public class ConstraintDialog implements GUIDefaults {
 		@Override
 		public void invoke(ValidationMessage message) {
 			if (message.validationResult != ValidationResult.OK) {
-				headerPanel.setDetails("Your constraint leads to dead features.\n\n" + message.details);
-				headerPanel.setColor(HeaderPanel.BubbleColor.YELLOW);
+				headerPanel.setDetails("Your constraint leads to dead features.\n\n" + message.details, HeaderPanel.HeaderDescriptionImage.WARNING);
 			}
 		}
 	};
@@ -423,8 +409,7 @@ public class ConstraintDialog implements GUIDefaults {
 		@Override
 		public void invoke(ValidationMessage message) {
 			if (message.validationResult != ValidationResult.OK) {
-				headerPanel.setDetails("Redundancy occurred inside your constraint.");
-				headerPanel.setColor(HeaderPanel.BubbleColor.YELLOW);
+				headerPanel.setDetails("Redundancy occurred inside your constraint.", HeaderPanel.HeaderDescriptionImage.WARNING);
 			}
 		}
 	};
@@ -435,8 +420,7 @@ public class ConstraintDialog implements GUIDefaults {
 	private IConsumer<ValidationMessage> onCheckEnded = new IConsumer<ValidationMessage>() {
 		@Override
 		public void invoke(ValidationMessage message) {
-			headerPanel.setDetails("Click \"" + (mode == Mode.UPDATE ? "Update" : "Create") + "\" to " + (mode == Mode.UPDATE ? "save your changes." : "add your new constraint."));
-			headerPanel.setColor(HeaderPanel.BubbleColor.GREEN);
+			headerPanel.setDetails("Click \"" + (mode == Mode.UPDATE ? "Update" : "Create") + "\" to " + (mode == Mode.UPDATE ? "save your changes." : "add your new constraint."), HeaderPanel.HeaderDescriptionImage.NONE);
 			updateDialogState(DialogState.SAVE_CHANGES_ENABLED);
 		}
 	};
@@ -448,8 +432,7 @@ public class ConstraintDialog implements GUIDefaults {
 		@Override
 		public void invoke(ValidationMessage message) {
 			if (message.validationResult != ValidationResult.OK) {
-				headerPanel.setDetails("Your constraint is a tautology.");
-				headerPanel.setColor(HeaderPanel.BubbleColor.YELLOW);
+				headerPanel.setDetails("Your constraint is a tautology.", HeaderPanel.HeaderDescriptionImage.WARNING);
 			}
 		}
 	};
@@ -461,8 +444,7 @@ public class ConstraintDialog implements GUIDefaults {
 		@Override
 		public void invoke(ValidationMessage message) {
 			if (message.validationResult != ValidationResult.OK) {
-				headerPanel.setDetails("Your constraint is not satisfiable.");
-				headerPanel.setColor(HeaderPanel.BubbleColor.YELLOW);
+				headerPanel.setDetails("Your constraint is not satisfiable.", HeaderPanel.HeaderDescriptionImage.WARNING);
 			}
 		}
 	};
@@ -736,8 +718,7 @@ public class ConstraintDialog implements GUIDefaults {
 			@Override
 			public void modifyText(ModifyEvent e) {
 				if (constraintText.getText().trim().isEmpty()) {
-					headerPanel.setDetails("Please insert a constraint.");
-					headerPanel.setColor(HeaderPanel.BubbleColor.GRAY);
+					headerPanel.setDetails("Please insert a constraint.", HeaderPanel.HeaderDescriptionImage.NONE);
 					updateDialogState(DialogState.SAVE_CHANGES_DISABLED);
 				} else {
 					validate();
@@ -870,7 +851,7 @@ public class ConstraintDialog implements GUIDefaults {
 	private void initHead() {
 		headerPanel = new HeaderPanel(shell);
 		headerPanel.setHeader(defaultHeaderText);
-		headerPanel.setDetails(defaultDetailsText);
+		headerPanel.setDetails(defaultDetailsText, HeaderPanel.HeaderDescriptionImage.NONE);
 	}
 
 	/**
@@ -1038,8 +1019,7 @@ public class ConstraintDialog implements GUIDefaults {
 	 * 
 	 */
 	private void validate() {
-		headerPanel.setDetails("Checking constraint...");
-		headerPanel.setColor(HeaderPanel.BubbleColor.GRAY);
+		headerPanel.setDetails("Checking constraint...", HeaderPanel.HeaderDescriptionImage.NONE);
 
 		Display.getDefault().asyncExec(new Runnable() {
 
@@ -1066,8 +1046,7 @@ public class ConstraintDialog implements GUIDefaults {
 					} else
 						details = "";
 
-					headerPanel.setDetails("Your constraint is invalid and can not be saved. " + details);
-					headerPanel.setColor(HeaderPanel.BubbleColor.RED);
+					headerPanel.setDetails("Your constraint is invalid and can not be saved. " + details, HeaderPanel.HeaderDescriptionImage.ERROR);
 
 					updateDialogState(DialogState.SAVE_CHANGES_DISABLED);
 				}
