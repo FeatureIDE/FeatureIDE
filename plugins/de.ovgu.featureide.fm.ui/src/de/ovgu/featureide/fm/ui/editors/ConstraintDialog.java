@@ -141,6 +141,10 @@ public class ConstraintDialog implements GUIDefaults {
 			ERROR, WARNING, NONE
 		}
 
+		private static final String STRING_HEADER_LABEL_DEFAULT = "Create new constraint";
+
+		private static final String STRING_HEADER_DETAILS_DEFAULT = "You can create or edit constraints with this dialog.";
+		
 		/**
 		 * The panels background color
 		 */
@@ -205,7 +209,7 @@ public class ConstraintDialog implements GUIDefaults {
 			FontData fontData = headerLabel.getFont().getFontData()[0];
 			Font fontActionLabel = new Font(shell.getDisplay(), new FontData(fontData.getName(), 12, SWT.BOLD));
 			headerLabel.setFont(fontActionLabel);
-			headerLabel.setText("Create new constraint");
+			headerLabel.setText(STRING_HEADER_LABEL_DEFAULT);
 
 			new Label(headComposite, SWT.NONE); // adds an invisible separator
 												// to align details text field
@@ -217,7 +221,7 @@ public class ConstraintDialog implements GUIDefaults {
 			detailsLabel.setLayoutData(gridData);
 			detailsLabel.setEditable(false);
 			detailsLabel.setBackground(panelBackgroundColor);
-			detailsLabel.setText("You can create or edit constraints with this dialog.");
+			detailsLabel.setText(STRING_HEADER_DETAILS_DEFAULT);
 		}
 
 		/**
@@ -232,30 +236,6 @@ public class ConstraintDialog implements GUIDefaults {
 		 */
 		public String getHeader() {
 			return headerLabel.getText();
-		}
-
-		/**
-		 * Set current image for the details text.
-		 * 
-		 * {@link ConstraintDialog.HeaderPanel.HeaderDescriptionImage}
-		 * {@link ConstraintDialog.HeaderPanel#headerDescriptionImageLabel}
-		 * 
-		 * @param image
-		 *            The image to set
-		 */
-		private void setImage(HeaderDescriptionImage image) {
-			switch (image) {
-			case ERROR:
-				headerDescriptionImageLabel.setImage(GUIDefaults.ERROR_IMAGE);
-				break;
-			case WARNING:
-				headerDescriptionImageLabel.setImage(GUIDefaults.WARNING_IMAGE);
-				break;
-			default:
-				headerDescriptionImageLabel.setImage(null);
-				break;
-			}
-			headerDescriptionImageLabel.redraw();
 		}
 
 		/**
@@ -287,6 +267,30 @@ public class ConstraintDialog implements GUIDefaults {
 		public void setHeader(String text) {
 			headerLabel.setText(text.trim());
 		}
+
+		/**
+		 * Set current image for the details text.
+		 * 
+		 * {@link ConstraintDialog.HeaderPanel.HeaderDescriptionImage}
+		 * {@link ConstraintDialog.HeaderPanel#headerDescriptionImageLabel}
+		 * 
+		 * @param image
+		 *            The image to set
+		 */
+		private void setImage(HeaderDescriptionImage image) {
+			switch (image) {
+			case ERROR:
+				headerDescriptionImageLabel.setImage(GUIDefaults.ERROR_IMAGE);
+				break;
+			case WARNING:
+				headerDescriptionImageLabel.setImage(GUIDefaults.WARNING_IMAGE);
+				break;
+			default:
+				headerDescriptionImageLabel.setImage(null);
+				break;
+			}
+			headerDescriptionImageLabel.redraw();
+		}
 	}
 
 	/**
@@ -299,6 +303,66 @@ public class ConstraintDialog implements GUIDefaults {
 		UPDATE, CREATE
 	}
 	
+	static class StringTable {
+
+		static final String CHECK_STARTED = "Performing additional checks. This may take a while. Although it is not recommended, you can %s your constraint by clicking %s before this process has ended.";
+
+		static final String CONSTRAINT_VOIDS_MODEL = "Your constraint voids the model";
+
+		static final String CONSTRAINT_FALSE_OPTIONAL = "Your constraint leads to false optional features.\n\n%s";
+
+		static final String CONSTRAINT_DEAD_FEATURES = "Your constraint leads to dead features.\n\n%s";
+
+		static final String CONSTRAINT_REDUNDANCE = "Redundancy occurred inside your constraint.";
+
+		static final String CONSTRAINT_CHECK_ENDED = "Click \"%s\" to %s .";
+
+		static final String CONSTRAINT_TAUTOLOGY = "Your constraint is a tautology.";
+
+		static final String CONSTRAINT_NOT_SATISFIABLE = "Your constraint is not satisfiable.";
+
+		static final String DEFAULT_DETAILS_NEW_CONSTRAINT = "Create Propositional Constraint";
+
+		static final String DEFAULT_HEADER_NEW_CONSTRAINT = "Create new Constraint";
+
+		static final String DEFAULT_DETAILS_EDIT_CONSTRAINT = "Edit Propositional Constraint";
+
+		static final String DEFAULT_HEADER_EDIT_CONSTRAINT = "Edit your Constraint";
+
+		static final String VERB_UPDATE = "Update";
+
+		static final String VERB_CREATE = "Create";
+
+		static final String OK_BUTTON_TEXT = "%s Constraint";
+
+		static final String SAVE_CHANGES = "save your changes";
+
+		static final String ADD_NEW_CONSTRAINT = "add your new constraint";
+
+		static final String VERB_SAVE = "save";
+
+		static final String CONSTRAINT_IS_EMPTY = "constraint is empty";
+
+		static final String CONSTRAINT_IS_NOT_SATISFIABLE = "constraint is unsatisfiable";
+
+		static final String HREF_HELP_LINK = "http://www.cs.utexas.edu/~schwartz/ATS/fopdocs/guidsl.html";
+
+		static final String PLEASE_INSERT_CONSTRAINT = "Please insert a constraint.";
+
+		static final String KEYSTROKE_SHORTCUT_FOR_PROPOSAL = "Ctrl+Space";
+
+		static final String CHECKING_CONSTRAINTS = "Checking constraint...";
+
+		static final String CONSTRAINT_CONTAINS_SYNTAX_ERRORS = "Your input constains syntax error.";
+
+		static final String CONSTRAINT_CONTAINS_UNKNOWN_FEATURE = "Constraint contains one unknown feature name.";
+
+		static final String CONSTRAINT_CONTAINS_UNKNOWN_FEATURES = "Constraint contains %s unknown feature names.";
+
+		static final String CONSTRAINT_CONNOT_BE_SAVED = "Your constraint is invalid and can not be saved: %s";
+
+	}
+
 	/**
 	 * Current constraint editing mode
 	 */
@@ -321,21 +385,21 @@ public class ConstraintDialog implements GUIDefaults {
 	private Shell shell;
 
 	private String initialConstraint;
-
 	private Label errorMarker;
 	private Text errorMessage;
 	private Group featureGroup;
 	private StyledText searchFeatureText;
-	private Table featureTable;
 
+	private Table featureTable;
 	private Group buttonGroup;
 	private Composite constraintTextComposite;
 	private SimpleSyntaxHighlightEditor constraintText;
 	private FeatureModel featureModel;
 	private Button okButton;
-	private Constraint constraint;
 
+	private Constraint constraint;
 	private String defaultDetailsText;
+
 	private String defaultHeaderText;
 
 	private Button cancelButton;
@@ -351,7 +415,7 @@ public class ConstraintDialog implements GUIDefaults {
 	ContentProposalAdapter adapter;
 
 	private final static int PROPOSAL_AUTO_ACTIVATION_DELAY = 500;
-
+	
 	public static final int VALIDATION_TIME_OUT = 1000;
 
 	/**
@@ -361,8 +425,7 @@ public class ConstraintDialog implements GUIDefaults {
 		@Override
 		public void invoke(ValidationMessage message) {
 			updateDialogState(DialogState.SAVE_CHANGES_DONT_MIND);
-			headerPanel.setDetails("Performing additional checks. This may take a while. Although it is not recommended, you can " + (mode == Mode.UPDATE ? "update" : "save") + " your constraint by clicking \"" + okButton.getText()
-					+ "\" before this process has ended.", HeaderPanel.HeaderDescriptionImage.NONE);
+			headerPanel.setDetails(String.format(StringTable.CHECK_STARTED, (mode == Mode.UPDATE ? StringTable.VERB_UPDATE.toLowerCase() : StringTable.VERB_SAVE), okButton.getText()), HeaderPanel.HeaderDescriptionImage.NONE);
 		}
 	};
 
@@ -373,7 +436,7 @@ public class ConstraintDialog implements GUIDefaults {
 		@Override
 		public void invoke(ValidationMessage message) {
 			if (message.validationResult != ValidationResult.OK) {
-				headerPanel.setDetails("Your constraint voids the model", HeaderPanel.HeaderDescriptionImage.WARNING);
+				headerPanel.setDetails(StringTable.CONSTRAINT_VOIDS_MODEL, HeaderPanel.HeaderDescriptionImage.WARNING);
 			}
 		}
 	};
@@ -385,7 +448,7 @@ public class ConstraintDialog implements GUIDefaults {
 		@Override
 		public void invoke(ValidationMessage message) {
 			if (message.validationResult != ValidationResult.OK) {
-				headerPanel.setDetails("Your constraint leads to false optional features.\n\n" + message.details, HeaderPanel.HeaderDescriptionImage.WARNING);
+				headerPanel.setDetails(String.format(StringTable.CONSTRAINT_FALSE_OPTIONAL, message.details), HeaderPanel.HeaderDescriptionImage.WARNING);
 			}
 		}
 	};
@@ -397,7 +460,7 @@ public class ConstraintDialog implements GUIDefaults {
 		@Override
 		public void invoke(ValidationMessage message) {
 			if (message.validationResult != ValidationResult.OK) {
-				headerPanel.setDetails("Your constraint leads to dead features.\n\n" + message.details, HeaderPanel.HeaderDescriptionImage.WARNING);
+				headerPanel.setDetails(String.format(StringTable.CONSTRAINT_DEAD_FEATURES, message.details), HeaderPanel.HeaderDescriptionImage.WARNING);
 			}
 		}
 	};
@@ -409,7 +472,7 @@ public class ConstraintDialog implements GUIDefaults {
 		@Override
 		public void invoke(ValidationMessage message) {
 			if (message.validationResult != ValidationResult.OK) {
-				headerPanel.setDetails("Redundancy occurred inside your constraint.", HeaderPanel.HeaderDescriptionImage.WARNING);
+				headerPanel.setDetails(StringTable.CONSTRAINT_REDUNDANCE, HeaderPanel.HeaderDescriptionImage.WARNING);
 			}
 		}
 	};
@@ -420,7 +483,7 @@ public class ConstraintDialog implements GUIDefaults {
 	private IConsumer<ValidationMessage> onCheckEnded = new IConsumer<ValidationMessage>() {
 		@Override
 		public void invoke(ValidationMessage message) {
-			headerPanel.setDetails("Click \"" + (mode == Mode.UPDATE ? "Update" : "Create") + "\" to " + (mode == Mode.UPDATE ? "save your changes." : "add your new constraint."), HeaderPanel.HeaderDescriptionImage.NONE);
+			headerPanel.setDetails(String.format(StringTable.CONSTRAINT_CHECK_ENDED, (mode == Mode.UPDATE ? StringTable.VERB_UPDATE : StringTable.VERB_CREATE), (mode == Mode.UPDATE ? StringTable.SAVE_CHANGES : StringTable.ADD_NEW_CONSTRAINT)), HeaderPanel.HeaderDescriptionImage.NONE);
 			updateDialogState(DialogState.SAVE_CHANGES_ENABLED);
 		}
 	};
@@ -432,7 +495,7 @@ public class ConstraintDialog implements GUIDefaults {
 		@Override
 		public void invoke(ValidationMessage message) {
 			if (message.validationResult != ValidationResult.OK) {
-				headerPanel.setDetails("Your constraint is a tautology.", HeaderPanel.HeaderDescriptionImage.WARNING);
+				headerPanel.setDetails(StringTable.CONSTRAINT_TAUTOLOGY, HeaderPanel.HeaderDescriptionImage.WARNING);
 			}
 		}
 	};
@@ -444,7 +507,7 @@ public class ConstraintDialog implements GUIDefaults {
 		@Override
 		public void invoke(ValidationMessage message) {
 			if (message.validationResult != ValidationResult.OK) {
-				headerPanel.setDetails("Your constraint is not satisfiable.", HeaderPanel.HeaderDescriptionImage.WARNING);
+				headerPanel.setDetails(StringTable.CONSTRAINT_NOT_SATISFIABLE, HeaderPanel.HeaderDescriptionImage.WARNING);
 			}
 		}
 	};
@@ -458,14 +521,14 @@ public class ConstraintDialog implements GUIDefaults {
 		this.featureModel = featuremodel;
 
 		if (constraint == null) {
-			defaultDetailsText = "Create Propositional Constraint";
-			defaultHeaderText = "Create new Constraint";
+			defaultDetailsText = StringTable.DEFAULT_DETAILS_NEW_CONSTRAINT;
+			defaultHeaderText = StringTable.DEFAULT_HEADER_NEW_CONSTRAINT;
 			initialConstraint = "";
 			mode = Mode.CREATE;
 
 		} else {
-			defaultDetailsText = "Edit Propositional Constraint";
-			defaultHeaderText = "Edit your Constraint";
+			defaultDetailsText = StringTable.DEFAULT_DETAILS_EDIT_CONSTRAINT;
+			defaultHeaderText = StringTable.DEFAULT_HEADER_EDIT_CONSTRAINT;
 
 			initialConstraint = constraint.getNode().toString(NodeWriter.textualSymbols);
 
@@ -493,7 +556,7 @@ public class ConstraintDialog implements GUIDefaults {
 	 * will be altered.
 	 */
 	private void autoSetOkButtonText() {
-		okButton.setText((mode == Mode.UPDATE ? "Update" : "Create") + " Constraint");
+		okButton.setText(String.format(StringTable.OK_BUTTON_TEXT, (mode == Mode.UPDATE ? StringTable.VERB_UPDATE : StringTable.VERB_CREATE)));
 	}
 
 	/**
@@ -516,7 +579,7 @@ public class ConstraintDialog implements GUIDefaults {
 		String input = constraintText.getText().trim();
 
 		if (input.length() == 0) {
-			printHeaderError("constraint is empty");
+			printHeaderError(StringTable.CONSTRAINT_IS_EMPTY);
 			return;
 		}
 
@@ -527,7 +590,7 @@ public class ConstraintDialog implements GUIDefaults {
 			return;
 		}
 		if (!ConstraintTextValidator.isSatisfiable(input, VALIDATION_TIME_OUT)) {
-			printHeaderWarning("constraint is unsatisfiable");
+			printHeaderWarning(StringTable.CONSTRAINT_IS_NOT_SATISFIABLE);
 		}
 
 		AbstractOperation op = null;
@@ -615,7 +678,7 @@ public class ConstraintDialog implements GUIDefaults {
 		helpButton.setImage(HELP_IMAGE);
 		helpButton.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
 			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
-				Program.launch("http://www.cs.utexas.edu/~schwartz/ATS/fopdocs/guidsl.html");
+				Program.launch(StringTable.HREF_HELP_LINK);
 			}
 		});
 		FormData formDataHelp = new FormData();
@@ -718,7 +781,7 @@ public class ConstraintDialog implements GUIDefaults {
 			@Override
 			public void modifyText(ModifyEvent e) {
 				if (constraintText.getText().trim().isEmpty()) {
-					headerPanel.setDetails("Please insert a constraint.", HeaderPanel.HeaderDescriptionImage.NONE);
+					headerPanel.setDetails(StringTable.PLEASE_INSERT_CONSTRAINT, HeaderPanel.HeaderDescriptionImage.NONE);
 					updateDialogState(DialogState.SAVE_CHANGES_DISABLED);
 				} else {
 					validate();
@@ -932,7 +995,7 @@ public class ConstraintDialog implements GUIDefaults {
 
 	private void setupContentProposal() {
 		try {
-			final KeyStroke keyStroke= KeyStroke.getInstance("Ctrl+Space");
+			final KeyStroke keyStroke= KeyStroke.getInstance(StringTable.KEYSTROKE_SHORTCUT_FOR_PROPOSAL);
 			
 			char[] autoActivationCharacters=new char[Character.MAX_VALUE];
 			for (char c = Character.MIN_VALUE; c < Character.MAX_VALUE; c++)
@@ -1019,7 +1082,7 @@ public class ConstraintDialog implements GUIDefaults {
 	 * 
 	 */
 	private void validate() {
-		headerPanel.setDetails("Checking constraint...", HeaderPanel.HeaderDescriptionImage.NONE);
+		headerPanel.setDetails(StringTable.CHECKING_CONSTRAINTS, HeaderPanel.HeaderDescriptionImage.NONE);
 
 		Display.getDefault().asyncExec(new Runnable() {
 
@@ -1038,15 +1101,15 @@ public class ConstraintDialog implements GUIDefaults {
 
 					if (result == ValidationResult.NOT_WELLFORMED) {
 						if (constraintText.getUnknownWords().isEmpty()) {
-							details = "Your input constains syntax error.";
+							details = StringTable.CONSTRAINT_CONTAINS_SYNTAX_ERRORS;
 						} else {
 							int count = constraintText.getUnknownWords().size();
-							details = "Constraint contains " + count + " unknown feature name" + (count > 1 ? "s" : "") + ".";
+							details = (count == 1 ? StringTable.CONSTRAINT_CONTAINS_UNKNOWN_FEATURE : String.format(StringTable.CONSTRAINT_CONTAINS_UNKNOWN_FEATURES, count));
 						}
 					} else
 						details = "";
 
-					headerPanel.setDetails("Your constraint is invalid and can not be saved. " + details, HeaderPanel.HeaderDescriptionImage.ERROR);
+					headerPanel.setDetails(String.format(StringTable.CONSTRAINT_CONNOT_BE_SAVED, details), HeaderPanel.HeaderDescriptionImage.ERROR);
 
 					updateDialogState(DialogState.SAVE_CHANGES_DISABLED);
 				}
