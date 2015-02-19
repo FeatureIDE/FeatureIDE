@@ -148,7 +148,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 	private Text descBox;
 
 	private Hashtable<String, List<ProjectRecord>> compTable;
-	private IProject[] wsProjects;
+	private static IProject[] wsProjects;
 	private String samplePath;
 
 	private static final String[] response = new String[] { YES, ALL, NO, NO_ALL, CANCEL };
@@ -675,10 +675,20 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 		for (int i = 0; i < contents.length; i++) {
 			File file = contents[i];
 			if (file.isFile() && file.getName().equals(dotProject)) {
-				files.add(new ProjectRecord(file));
-
-				// don't search sub-directories since we can't have nested
-				// projects
+				ProjectRecord newProject = new ProjectRecord(file);
+				files.add(newProject);
+				if(newProject.containsNatureID("de.ovgu.featureide.core.mpl.MSPLNature")){
+					if(contents[i].getParentFile().isDirectory()){
+						File[] subdir = contents[i].getParentFile().listFiles();
+						for (File file2 : subdir) {
+							if(file2.getName().compareTo(ProjectRecord.SUB_PROJECTS_FOLDER) == 0){
+								newProject.collectSubProjectFiles(file2, null, monitor);
+								break;
+							}
+						}
+						
+					}
+				}
 				return true;
 			}
 		}
@@ -707,7 +717,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 	 * 
 	 * @return IProject[] array of IProject in the current workspace
 	 */
-	private IProject[] getProjectsInWorkspace() {
+	private static IProject[] getProjectsInWorkspace() {
 		if (wsProjects == null) {
 			wsProjects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
 		}
@@ -733,6 +743,14 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 					for (int i = 0; i < selected.length; i++) {
 						if (selected[i] instanceof ProjectRecord) {
 							createExistingProject((ProjectRecord) selected[i], new SubProgressMonitor(monitor, 1));
+							if(((ProjectRecord) selected[i]).hasSubProjects()){
+								ProjectRecord[] subProj = ((ProjectRecord) selected[i]).getSubProjects();
+								for (ProjectRecord projectRecord : subProj) {
+									if(!projectRecord.hasWarnings())
+										createExistingProject(projectRecord, new SubProgressMonitor(monitor, 1));
+								}
+							}
+							
 						} else if (selected[i] instanceof String) {
 								//do nothing
 						}
@@ -832,7 +850,21 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 
 		// import operation to import project files if copy checkbox is selected
 		if (importSource != null) {
-			List<?> filesToImport = ExampleStructureProvider.INSTANCE.getChildren(importSource);
+			List<File> filesToImport = ExampleStructureProvider.INSTANCE.getChildren(importSource);
+			
+			if(record.hasSubProjects()){
+				File remove = null;
+				for (File currFile : filesToImport) {
+					
+					if(currFile.getName().compareTo(ProjectRecord.SUB_PROJECTS_FOLDER) == 0){
+						remove = currFile;
+					}
+				}
+				if(remove != null){
+					filesToImport.remove(remove);
+				}
+			}
+			
 			ImportOperation operation = new ImportOperation(project.getFullPath(), importSource, ExampleStructureProvider.INSTANCE, this,
 					filesToImport);
 			operation.setContext(getShell());
@@ -842,7 +874,6 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 			operation.setCreateContainerStructure(false);
 			operation.run(monitor);
 		}
-
 		return true;
 	}
 
@@ -951,11 +982,38 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 	 */
 
 	/**
+	 * Determine if the project with the given name is in the current
+	 * workspace.
+	 * 
+	 * @param projectName
+	 *            String the project name to check
+	 * @return boolean true if the project with the given name is in this
+	 *         workspace
+	 */
+	protected static boolean isProjectInWorkspace(String projectName) {
+		if (projectName == null) {
+			return false;
+		}
+		IProject[] workspaceProjects = getProjectsInWorkspace();
+		for (int i = 0; i < workspaceProjects.length; i++) {
+			if (projectName.equals(workspaceProjects[i].getName())) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
 	 * Class declared public only for test suite.
 	 * 
 	 */
 	public class ProjectRecord {
-		File projectSystemFile;
+		private File projectSystemFile;
+		
+		private Collection<ProjectRecord> files;
+		private ProjectRecord parentProject;
+		
+		public static final String SUB_PROJECTS_FOLDER = "projects"; 
 
 		Object projectArchiveFile;
 
@@ -1001,6 +1059,42 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 			performAlreadyExistsCheck();
 			performRequirementCheck();
 		}
+
+		/**
+		 * @param dir
+		 * @param object
+		 * @param monitor
+		 */
+		public void collectSubProjectFiles(File dir, Object object,
+				IProgressMonitor monitor) {
+			files = new ArrayList<ProjectRecord>();
+			collectProjectFilesFromDirectory(files, dir, null, monitor) ;
+			for (ProjectRecord curPro : files) {
+				curPro.parentProject = this;
+			}
+		}
+		
+		public boolean hasSubProjects() {
+			if(files == null || files.isEmpty())
+				return false; 
+			return true;
+		}
+		
+		public boolean hasParentProject() {
+			return parentProject != null;
+		}
+		
+		public ProjectRecord getParentProjectRecord(){
+			return parentProject;
+		}
+		
+		public ProjectRecord [] getSubProjects(){
+			if(files != null){
+				return files.toArray(new ProjectRecord[0]);
+			}
+			return new ProjectRecord[0];
+		}
+		
 
 		/**
 		 * Set the name of the project based on the projectFile.
@@ -1089,6 +1183,15 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 		public String getDescription() {
 			return comment == null ? "" : comment.getDescription();
 		}
+		
+		public boolean containsNatureID(String id){
+			for(String curID : description.getNatureIds()){
+				if(curID.compareTo(id) == 0){
+					return true;
+				}
+			}
+			return false;
+		}
 
 		private List<RequirementCategory> getRequirements() {
 			return comment == null ? null : comment.getRequirements();
@@ -1122,27 +1225,6 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 			}
 		}
 
-		/**
-		 * Determine if the project with the given name is in the current
-		 * workspace.
-		 * 
-		 * @param projectName
-		 *            String the project name to check
-		 * @return boolean true if the project with the given name is in this
-		 *         workspace
-		 */
-		private boolean isProjectInWorkspace(String projectName) {
-			if (projectName == null) {
-				return false;
-			}
-			IProject[] workspaceProjects = getProjectsInWorkspace();
-			for (int i = 0; i < workspaceProjects.length; i++) {
-				if (projectName.equals(workspaceProjects[i].getName())) {
-					return true;
-				}
-			}
-			return false;
-		}
 
 		private void performRequirementCheck() {
 			List<RequirementCategory> requirements = getRequirements();
