@@ -26,6 +26,8 @@ import java.util.LinkedList;
 
 import org.junit.Test;
 
+import de.ovgu.featureide.core.conversion.ahead_featurehouse.actions.FeatureHouseToAHEADConversion;
+
 /**
  * Test for conversion from <code>Ahead</code> to <code>FeatureHouse</code>.
  * 

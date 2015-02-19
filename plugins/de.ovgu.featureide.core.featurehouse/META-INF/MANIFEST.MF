@@ -8,6 +8,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.resources,
  de.ovgu.featureide.core,
+ de.ovgu.featureide.ui,
+ de.ovgu.featureide.fm.ui,
  de.ovgu.featureide.fm.core,
  org.eclipse.jdt.core
 Bundle-ActivationPolicy: lazy
@@ -19,3 +21,4 @@ Bundle-Vendor: University of Magdeburg
 Import-Package: org.eclipse.core.expressions,
  org.eclipse.jdt.internal.core,
  org.eclipse.jdt.internal.ui.packageview
+Export-Package: de.ovgu.featureide.featurehouse

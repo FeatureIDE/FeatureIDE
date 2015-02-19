@@ -1,253 +1,619 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.2"?>
 <plugin>
-   <extension-point id="de.ovgu.featureide.fm.ui.FeatureModelEditor" name="featuremodeleditor" schema="schema/de.ovgu.featureide.fm.ui.featuremodeleditor.exsd"/>
-   <extension-point id="de.ovgu.fm.ui.views.outline.FmTreeContentProvider" name="FeatureModelTreeContentProvider" schema="schema/de.ovgu.fm.ui.views.outline.FmTreeContentProvider.exsd"/>
-   <extension-point id="de.ovgu.fm.ui.outline.FmLabelProvider" name="FeatureModelLabelProvider" schema="schema/de.ovgu.fm.ui.outline.FmLabelProvider.exsd"/>
-   <extension-point id="de.ovgu.featureide.fm.ui.FeatureDiagram" name="featurediagram" schema="schema/de.ovgu.featureide.fm.ui.FeatureDiagram.exsd"/>
-   <extension-point id="de.ovgu.featureide.fm.ui.language" name="language" schema="schema/language.exsd"/>
-   <extension-point id="de.ovgu.featureide.fm.ui.ConfigurationEditor" name="ConfigurationEditorExtension" schema="schema/de.ovgu.featureide.fm.ui.ConfigurationPage.exsd"/>
-  
-  <extension point="org.eclipse.core.contenttype.contentTypes">
-	   <content-type base-type="org.eclipse.core.runtime.text"
-	                 file-extensions="config,equation,expression"
-	                 id="de.ovgu.featureide.contenttype.conf"
-	                 name="Configuration (for FeatureIDE projects)"
-	                 priority="high"/>
-    <content-type
-          base-type="org.eclipse.core.runtime.text"
-          file-extensions="config"
-          id="de.ovgu.featureide.contenttype.extConf"
-          name="Configuration (for non-FeatureIDE projects)"
-          priority="low">
-    </content-type>
-    <content-type
-          base-type="org.eclipse.core.runtime.text"
-          file-extensions="equation"
-          id="de.ovgu.featureide.contenttype.extConfE"
-          name="Equation (for non-FeatureIDE projects)"
-          priority="low">
-    </content-type>
-    <content-type
-          base-type="org.eclipse.core.runtime.text"
-          file-extensions="expression"
-          id="de.ovgu.featureide.contenttype.expression"
-          name="Expression (for non-FeatureIDE projects)"
-          priority="low">
-    </content-type>               
+	<extension-point id="de.ovgu.featureide.fm.ui.FeatureModelEditor" name="featuremodeleditor" schema="schema/de.ovgu.featureide.fm.ui.featuremodeleditor.exsd"/>
+	<extension-point id="de.ovgu.fm.ui.views.outline.FmTreeContentProvider" name="FeatureModelTreeContentProvider" schema="schema/de.ovgu.fm.ui.views.outline.FmTreeContentProvider.exsd"/>
+	<extension-point id="de.ovgu.fm.ui.outline.FmLabelProvider" name="FeatureModelLabelProvider" schema="schema/de.ovgu.fm.ui.outline.FmLabelProvider.exsd"/>
+	<extension-point id="de.ovgu.featureide.fm.ui.FeatureDiagram" name="featurediagram" schema="schema/de.ovgu.featureide.fm.ui.FeatureDiagram.exsd"/>
+	<extension-point id="de.ovgu.featureide.fm.ui.language" name="language" schema="schema/language.exsd"/>
+	<extension-point id="de.ovgu.featureide.fm.ui.ConfigurationEditor" name="ConfigurationEditorExtension" schema="schema/de.ovgu.featureide.fm.ui.ConfigurationPage.exsd"/>
+
+	<extension point="org.eclipse.core.contenttype.contentTypes">
+		<content-type base-type="org.eclipse.core.runtime.text"
+				file-extensions="config,equation,expression"
+				id="de.ovgu.featureide.contenttype.conf"
+				name="Configuration (for FeatureIDE projects)"
+				priority="high"/>
+		<content-type
+				base-type="org.eclipse.core.runtime.text"
+				file-extensions="config"
+				id="de.ovgu.featureide.contenttype.extConf"
+				name="Configuration (for non-FeatureIDE projects)"
+				priority="low">
+		</content-type>
+		<content-type
+				base-type="org.eclipse.core.runtime.text"
+				file-extensions="equation"
+				id="de.ovgu.featureide.contenttype.extConfE"
+				name="Equation (for non-FeatureIDE projects)"
+				priority="low">
+		</content-type>
+		<content-type
+				base-type="org.eclipse.core.runtime.text"
+				file-extensions="expression"
+				id="de.ovgu.featureide.contenttype.expression"
+				name="Expression (for non-FeatureIDE projects)"
+				priority="low">
+		</content-type>               
 	</extension>
-  
-   <extension
-         id="modelProblemMarker"
-         name="Model Problem Marker"
-         point="org.eclipse.core.resources.markers">
-      <super type="org.eclipse.core.resources.problemmarker"/>
-      <persistent value="true"/>
-   </extension>
-   <extension
-         point="de.ovgu.featureide.fm.ui.language">
-      <language
-            class="de.ovgu.featureide.fm.ui.properties.language.English"
-            id="english"
-            name="english">
-      </language>
-   </extension>
-   <extension
-         point="de.ovgu.featureide.fm.ui.language">
-      <language
-            class="de.ovgu.featureide.fm.ui.properties.language.German"
-            id="german"
-            name="german">
-      </language>
-   </extension>
- 
-   <extension
-         point="org.eclipse.ui.editors">
-      <editor
-            class="de.ovgu.featureide.fm.ui.editors.FeatureModelEditor"
-            contributorClass="de.ovgu.featureide.fm.ui.editors.featuremodel.FeatureModelEditorContributor"
-            default="true"
-            
-            icon="icons/featuretree.ico"
-            id="de.ovgu.featureide.fm.ui.editors.FeatureModelEditor"
-            name="Feature Model Editor">
-            <contentTypeBinding
-       		  contentTypeId="de.ovgu.featureide.fm.ui.featureModel">
-     		</contentTypeBinding>
-     		<contentTypeBinding
-       		  contentTypeId="de.ovgu.featureide.fm.ui.extendedfeatureModel">
-     		</contentTypeBinding>
-      </editor>
-      <editor
-            class="de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor"
-            default="true"
-            icon="icons/ConfigurationIcon.png"
-            id="de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor"
-            name="Configuration Editor">
-      <contentTypeBinding
-         contentTypeId="de.ovgu.featureide.contenttype.conf">
-      </contentTypeBinding>
-      </editor>
-   </extension>
- 
-   <extension point="org.eclipse.core.contenttype.contentTypes">
-   <content-type base-type="org.eclipse.core.runtime.xml"
-                 file-extensions="xml"
-                 id="de.ovgu.featureide.fm.ui.featureModel"
-                 name="Feature Model"
-                 priority="high">
-      <describer class="org.eclipse.core.runtime.content.XMLRootElementContentDescriber">
-         <parameter name="element"
-                    value="featureModel">
-         </parameter>
-      </describer>
-   </content-type>
-   <content-type file-extensions="velvet"
-                 id="de.ovgu.featureide.fm.ui.extendedfeatureModel"
-                 name="Extended Feature Model"
-                 priority="high">
-   </content-type>
-</extension>  
+
 	<extension
-         point="org.eclipse.ui.views">
-      <category
-            id="FeatureIDE"
-            name="FeatureIDE"/>
-      <view
-            category="FeatureIDE"
-            class="de.ovgu.featureide.fm.ui.views.FeatureModelEditView"
-            icon="icons/FeatureIconSmall.ico"
-            id="de.ovgu.featureide.fm.ui.views.FeatureModelEditView"
-            name="Feature Model Edits"/>
-   </extension>
-         
-   <extension
-         point="org.eclipse.ui.popupMenus">
-      <objectContribution
-            adaptable="true"
-            id="de.ovgu.featureide.fm.ui.menu"
-            objectClass="org.eclipse.core.resources.IResource">
-         <menu
-               icon="icons/FeatureIconSmall.ico"
-               id="de.ovgu.featureide.fm.ui.menu"
-               label="FeatureIDE"
-               path="group.open">
-         </menu>
-      </objectContribution> 
-      <objectContribution
-            adaptable="true"
-            id="de.ovgu.featureide.fm.ui.featureModelContribution"
-            nameFilter="*.xml"
-            objectClass="org.eclipse.core.resources.IFile">
-         <action
-               class="de.ovgu.featureide.fm.ui.actions.ExportGuidslAction"
-               icon="icons/export_wiz.gif"
-               id="de.ovgu.featureide.fm.ui.ExportGuidsl"
-               label="Export model to GUIDSL format"
-               menubarPath="de.ovgu.featureide.fm.ui.menu/guidsl">
-         </action>
-         <action
-               class="de.ovgu.featureide.fm.ui.actions.ImportGuidslAction"
-               icon="icons/import_wiz.gif"
-               id="de.ovgu.featureide.fm.ui.ImportGuidsl"
-               label="Import model from GUIDSL format"
-               menubarPath="de.ovgu.featureide.fm.ui.menu/guidsl">
-         </action>
-         <action
-               class="de.ovgu.featureide.fm.ui.actions.OpenWithGuidslAction"
-               icon="icons/guidsl.gif"
-               id="de.ovgu.featureide.fm.ui.openWithGuidsl"
-               label="Open with GUIDSL"
-               menubarPath="de.ovgu.featureide.fm.ui.menu/guidsl"
-               tooltip="GUIDSL is a configuration tool written by Don Batory">
-         </action>
-         <action
-               class="de.ovgu.featureide.fm.ui.actions.ExportSXFMAction"
-               icon="icons/export_wiz.gif"
-               id="de.ovgu.featureide.fm.ui.ExportSXFM"
-               label="Export model to SXFM (S.P.L.O.T.) format"
-               menubarPath="de.ovgu.featureide.fm.ui.menu/splot">
-         </action>
-         <action
-               class="de.ovgu.featureide.fm.ui.actions.ImportSXFMAction"
-               icon="icons/import_wiz.gif"
-               id="de.ovgu.featureide.fm.ui.ImportSXFM"
-               label="Import model from SXFM (S.P.L.O.T.) format"
-               menubarPath="de.ovgu.featureide.fm.ui.menu/splot">
-         </action>
-         <action
-               class="de.ovgu.featureide.fm.ui.actions.ExportConquererAction"
-               icon="icons/export_wiz.gif"
-               id="de.ovgu.featureide.fm.ui.ExportSPLConquerer"
-               label="Export model to SPL Conquerer format"
-               menubarPath="de.ovgu.featureide.fm.ui.menu/conquerer">
-         </action>
-         <action
-               class="de.ovgu.featureide.fm.ui.actions.FeatureDependenciesAction"
-               icon="icons/export_wiz.gif"
-               id="de.ovgu.featureide.fm.ui.FeatureDependencies"
-               label="Export feature dependency information"
-               menubarPath="de.ovgu.featureide.fm.ui.menu/dependency">
-         </action>
-         <action
-         	class="de.ovgu.featureide.fm.ui.actions.ExportCNFAction"
-            icon="icons/export_wiz.gif"
-            id="de.ovgu.featureide.fm.ui.ExportCNF"
-            label="Export CNF"
-         	menubarPath="de.ovgu.featureide.fm.ui.menu/dependency">
-         </action>
-         <action
-               class="de.ovgu.featureide.fm.ui.actions.ExportDIMACSAction"
-               icon="icons/export_wiz.gif"
-               id="de.ovgu.featureide.fm.ui.ExportCNF"
-               label="Export DIMACS"
-               menubarPath="de.ovgu.featureide.fm.ui.menu/dependency">
-         </action>
-         <action
-         	class="de.ovgu.featureide.fm.ui.actions.ImportVelvetAction"
-            icon="icons/import_wiz.gif"
-            id="de.ovgu.featureide.fm.ui.ImportVelvet"
-            label="Import model from Velvet format"
-            menubarPath="de.ovgu.featureide.fm.ui.menu/velvet">
-		</action>
-		<action
-			class="de.ovgu.featureide.fm.ui.actions.ExportVelvetAction"
-            icon="icons/export_wiz.gif"
-            id="de.ovgu.featureide.fm.ui.ExportVelvet"
-            label="Export model to Velvet format"
-            menubarPath="de.ovgu.featureide.fm.ui.menu/velvet">
-         </action>
-      </objectContribution>
-      <objectContribution
-            adaptable="true"
-            id="de.ovgu.featureide.fm.ui.velvetContribution"
-            nameFilter="*.velvet"
-            objectClass="org.eclipse.core.resources.IFile">
-         <action
-               class="de.ovgu.featureide.fm.ui.actions.AnalyzeVelvetAction"
-               icon="icons/FeatureIconSmall.ico"
-               id="de.ovgu.featureide.fm.ui.AnalyzeVelvet"
-               label="Analyze Velvet Model"
-               style="push">
-         </action>
-      </objectContribution>
-   </extension>
-   <extension
-         point="org.eclipse.ui.propertyPages">
-      <page
-            class="de.ovgu.featureide.fm.ui.properties.page.FMPropertyPage"
-            id="de.ovgu.featureide.fm.ui.propertypage"
-            name="Feature Model Editor"
-            nameFilter="*.xml">
-      </page>
-   </extension>
-   <extension
-         point="org.eclipse.ui.preferencePages">
-      <page
-            class="de.ovgu.featureide.fm.ui.preferences.FeatureIDEPreferencePage"
-            id="de.ovgu.featureide.fm.ui.FeatureIDEPreferencePage"
-            name="FeatureIDE">
-      </page>
-   </extension>
-   
+			id="modelProblemMarker"
+			name="Model Problem Marker"
+			point="org.eclipse.core.resources.markers">
+		<super type="org.eclipse.core.resources.problemmarker"/>
+		<persistent value="true"/>
+	</extension>
+	<extension
+			point="de.ovgu.featureide.fm.ui.language">
+		<language
+				class="de.ovgu.featureide.fm.ui.properties.language.English"
+				id="english"
+				name="english">
+		</language>
+	</extension>
+	<extension
+			point="de.ovgu.featureide.fm.ui.language">
+		<language
+				class="de.ovgu.featureide.fm.ui.properties.language.German"
+				id="german"
+				name="german">
+		</language>
+	</extension>
+
+	<extension
+			point="org.eclipse.ui.editors">
+		<editor
+				class="de.ovgu.featureide.fm.ui.editors.FeatureModelEditor"
+				contributorClass="de.ovgu.featureide.fm.ui.editors.featuremodel.FeatureModelEditorContributor"
+				default="true"
+
+				icon="icons/featuretree.ico"
+				id="de.ovgu.featureide.fm.ui.editors.FeatureModelEditor"
+				name="Feature Model Editor">
+			<contentTypeBinding
+					contentTypeId="de.ovgu.featureide.fm.ui.featureModel">
+			</contentTypeBinding>
+			<contentTypeBinding
+					contentTypeId="de.ovgu.featureide.fm.ui.extendedfeatureModel">
+			</contentTypeBinding>
+		</editor>
+		<editor
+				class="de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor"
+				default="true"
+				icon="icons/ConfigurationIcon.png"
+				id="de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor"
+				name="Configuration Editor">
+			<contentTypeBinding
+					contentTypeId="de.ovgu.featureide.contenttype.conf">
+			</contentTypeBinding>
+		</editor>
+	</extension>
+
+	<extension point="org.eclipse.core.contenttype.contentTypes">
+		<content-type base-type="org.eclipse.core.runtime.xml"
+				file-extensions="xml"
+				id="de.ovgu.featureide.fm.ui.featureModel"
+				name="Feature Model"
+				priority="high">
+			<describer class="org.eclipse.core.runtime.content.XMLRootElementContentDescriber">
+				<parameter name="element"
+						value="featureModel">
+				</parameter>
+			</describer>
+		</content-type>
+		<content-type file-extensions="velvet"
+				id="de.ovgu.featureide.fm.ui.extendedfeatureModel"
+				name="Extended Feature Model"
+				priority="high">
+		</content-type>
+	</extension>  
+	<extension
+			point="org.eclipse.ui.views">
+		<category
+				id="FeatureIDE"
+				name="FeatureIDE"/>
+		<view
+				category="FeatureIDE"
+				class="de.ovgu.featureide.fm.ui.views.FeatureModelEditView"
+				icon="icons/FeatureIconSmall.ico"
+				id="de.ovgu.featureide.fm.ui.views.FeatureModelEditView"
+				name="Feature Model Edits"/>
+	</extension>
+	<!--
+	<extension
+			point="org.eclipse.ui.popupMenus">
+		<objectContribution
+				adaptable="true"
+				id="de.ovgu.featureide.fm.ui.menu"
+				objectClass="org.eclipse.core.resources.IResource">
+			<menu
+					icon="icons/FeatureIconSmall.ico"
+					id="de.ovgu.featureide.fm.ui.menu"
+					label="FeatureIDE"
+					path="group.open">
+			</menu>
+		</objectContribution> 
+		<objectContribution
+				adaptable="true"
+				id="de.ovgu.featureide.fm.ui.featureModelContribution"
+				nameFilter="*.xml"
+				objectClass="org.eclipse.core.resources.IFile">
+			<action
+					class="de.ovgu.featureide.fm.ui.actions.ExportGuidslAction"
+					icon="icons/export_wiz.gif"
+					id="de.ovgu.featureide.fm.ui.ExportGuidsl"
+					label="Export model to GUIDSL format"
+					menubarPath="de.ovgu.featureide.fm.ui.menu/guidsl">
+			</action>
+			<action
+					class="de.ovgu.featureide.fm.ui.actions.ImportGuidslAction"
+					icon="icons/import_wiz.gif"
+					id="de.ovgu.featureide.fm.ui.ImportGuidsl"
+					label="Import model from GUIDSL format"
+					menubarPath="de.ovgu.featureide.fm.ui.menu/guidsl">
+			</action>
+			<action
+					class="de.ovgu.featureide.fm.ui.actions.OpenWithGuidslAction"
+					icon="icons/guidsl.gif"
+					id="de.ovgu.featureide.fm.ui.openWithGuidsl"
+					label="Open with GUIDSL"
+					menubarPath="de.ovgu.featureide.fm.ui.menu/guidsl"
+					tooltip="GUIDSL is a configuration tool written by Don Batory">
+			</action>
+			<action
+					class="de.ovgu.featureide.fm.ui.actions.ExportSXFMAction"
+					icon="icons/export_wiz.gif"
+					id="de.ovgu.featureide.fm.ui.ExportSXFM"
+					label="Export model to SXFM (S.P.L.O.T.) format"
+					menubarPath="de.ovgu.featureide.fm.ui.menu/splot">
+			</action>
+			<action
+					class="de.ovgu.featureide.fm.ui.actions.ImportSXFMAction"
+					icon="icons/import_wiz.gif"
+					id="de.ovgu.featureide.fm.ui.ImportSXFM"
+					label="Import model from SXFM (S.P.L.O.T.) format"
+					menubarPath="de.ovgu.featureide.fm.ui.menu/splot">
+			</action>
+			<action
+					class="de.ovgu.featureide.fm.ui.actions.ExportConquererAction"
+					icon="icons/export_wiz.gif"
+					id="de.ovgu.featureide.fm.ui.ExportSPLConquerer"
+					label="Export model to SPL Conquerer format"
+					menubarPath="de.ovgu.featureide.fm.ui.menu/conquerer">
+			</action>
+			<action
+					class="de.ovgu.featureide.fm.ui.actions.FeatureDependenciesAction"
+					icon="icons/export_wiz.gif"
+					id="de.ovgu.featureide.fm.ui.FeatureDependencies"
+					label="Export feature dependency information"
+					menubarPath="de.ovgu.featureide.fm.ui.menu/dependency">
+			</action>
+			<action
+					class="de.ovgu.featureide.fm.ui.actions.ExportCNFAction"
+					icon="icons/export_wiz.gif"
+					id="de.ovgu.featureide.fm.ui.ExportCNF"
+					label="Export CNF"
+					menubarPath="de.ovgu.featureide.fm.ui.menu/dependency">
+			</action>
+			<action
+					class="de.ovgu.featureide.fm.ui.actions.ExportDIMACSAction"
+					icon="icons/export_wiz.gif"
+					id="de.ovgu.featureide.fm.ui.ExportCNF"
+					label="Export DIMACS"
+					menubarPath="de.ovgu.featureide.fm.ui.menu/dependency">
+			</action>
+			<action
+					class="de.ovgu.featureide.fm.ui.actions.ImportVelvetAction"
+					icon="icons/import_wiz.gif"
+					id="de.ovgu.featureide.fm.ui.ImportVelvet"
+					label="Import model from Velvet format"
+					menubarPath="de.ovgu.featureide.fm.ui.menu/velvet">
+			</action>
+			<action
+					class="de.ovgu.featureide.fm.ui.actions.ExportVelvetAction"
+					icon="icons/export_wiz.gif"
+					id="de.ovgu.featureide.fm.ui.ExportVelvet"
+					label="Export model to Velvet format"
+					menubarPath="de.ovgu.featureide.fm.ui.menu/velvet">
+			</action>
+		</objectContribution>
+		<objectContribution
+				adaptable="true"
+				id="de.ovgu.featureide.fm.ui.velvetContribution"
+				nameFilter="*.velvet"
+				objectClass="org.eclipse.core.resources.IFile">
+			<action
+					class="de.ovgu.featureide.fm.ui.actions.AnalyzeVelvetAction"
+					icon="icons/FeatureIconSmall.ico"
+					id="de.ovgu.featureide.fm.ui.AnalyzeVelvet"
+					label="Analyze Velvet Model (OLD)"
+					style="push">
+			</action>
+		</objectContribution>
+	</extension>
+-->
+	<extension
+			point="org.eclipse.ui.propertyPages">
+		<page
+				class="de.ovgu.featureide.fm.ui.properties.page.FMPropertyPage"
+				id="de.ovgu.featureide.fm.ui.propertypage"
+				name="Feature Model Editor"
+				nameFilter="*.xml">
+		</page>
+	</extension>
+	<extension
+			point="org.eclipse.ui.preferencePages">
+		<page
+				class="de.ovgu.featureide.fm.ui.preferences.FeatureIDEPreferencePage"
+				id="de.ovgu.featureide.fm.ui.FeatureIDEPreferencePage"
+				name="FeatureIDE">
+		</page>
+	</extension>
+	<extension
+			point="org.eclipse.ui.menus">
+		<menuContribution
+				allPopups="false"
+				locationURI="popup:org.eclipse.ui.popup.any?before=additions">
+			<separator
+					name="de.ovgu.featureide.fm.ui.menus.beforeSeparator"
+					visible="true">
+			</separator>
+			<menu
+					icon="icons/FeatureIconSmall.ico"
+					id="de.ovgu.featureide.fm.ui.menus.popupMenu"
+					label="FeatureIDE">
+
+				<visibleWhen
+						checkEnabled="false">
+					<with
+							variable="activeMenuSelection">
+						<iterate
+								ifEmpty="false"
+								operator="or">
+							<test
+									args="de.ovgu.featureide.core.featureProjectNature"
+									property="de.ovgu.featureide.fm.ui.properties.nature"
+									value="true">
+							</test>
+						</iterate>
+					</with>
+				</visibleWhen>
+			</menu>
+		</menuContribution>
+		<menuContribution
+				allPopups="false"
+				locationURI="popup:de.ovgu.featureide.fm.ui.menus.popupMenu">
+			<command
+					commandId="de.ovgu.featureide.fm.ui.commands.ExportGuidsl"
+					icon="icons/export_wiz.gif"
+					id="de.ovgu.featureide.fm.ui.actions.ExportGuidsl"
+					label="Export model to GUIDSL format"
+					style="push">
+				<visibleWhen
+						checkEnabled="false">
+					<reference
+							definitionId="de.ovgu.featureide.fm.ui.expressions.containsXml">
+					</reference>
+				</visibleWhen>
+			</command>
+			<command
+					commandId="de.ovgu.featureide.fm.ui.commands.ImportGuidsl"
+					icon="icons/import_wiz.gif"
+					id="de.ovgu.featureide.fm.ui.actions.ImportGuidsl"
+					label="Import model from GUIDSL format"
+					style="push">
+				<visibleWhen
+						checkEnabled="false">
+					<reference
+							definitionId="de.ovgu.featureide.fm.ui.expressions.containsXml">
+					</reference>
+				</visibleWhen>
+			</command>
+			<command
+					commandId="de.ovgu.featureide.fm.ui.commands.openWithGuidsl"
+					icon="icons/guidsl.gif"
+					id="de.ovgu.featureide.fm.ui.actions.openWithGuidsl"
+					label="Open with GUIDSL"
+					style="push"
+					tooltip="GUIDSL is a configuration tool written by Don Batory">
+				<visibleWhen
+						checkEnabled="false">
+					<reference
+							definitionId="de.ovgu.featureide.fm.ui.expressions.containsXml">
+					</reference>
+				</visibleWhen>
+			</command>
+			<separator
+					name="de.ovgu.featureide.fm.ui.separator1"
+					visible="true">
+			</separator>
+			<command
+					commandId="de.ovgu.featureide.fm.ui.commands.ExportSXFM"
+					icon="icons/export_wiz.gif"
+					id="de.ovgu.featureide.fm.ui.actions.ExportSXFM"
+					label="Export model to SXFM (S.P.L.O.T.) format"
+					style="push">
+				<visibleWhen
+						checkEnabled="false">
+					<reference
+							definitionId="de.ovgu.featureide.fm.ui.expressions.containsXml">
+					</reference>
+				</visibleWhen>
+			</command>
+			<command
+					commandId="de.ovgu.featureide.fm.ui.commands.ExportSXFM"
+					icon="icons/import_wiz.gif"
+					id="de.ovgu.featureide.fm.ui.actions.ImportSXFM"
+					label="Import model from SXFM (S.P.L.O.T.) format"
+					style="push">
+				<visibleWhen
+						checkEnabled="false">
+					<reference
+							definitionId="de.ovgu.featureide.fm.ui.expressions.containsXml">
+					</reference>
+				</visibleWhen>
+			</command>
+			<separator
+					name="de.ovgu.featureide.fm.ui.separator3"
+					visible="true">
+			</separator>
+			<command
+					commandId="de.ovgu.featureide.fm.ui.commands.ExportVelvet"
+					icon="icons/export_wiz.gif"
+					id="de.ovgu.featureide.fm.ui.actions.ExportVelvet"
+					label="Export model to Velvet format"
+					style="push">
+				<visibleWhen
+						checkEnabled="false">
+					<reference
+							definitionId="de.ovgu.featureide.fm.ui.expressions.containsXml">
+					</reference>
+				</visibleWhen>
+			</command>
+			<command
+					commandId="de.ovgu.featureide.fm.ui.commands.ImportVelvet"
+					icon="icons/import_wiz.gif"
+					id="de.ovgu.featureide.fm.ui.actions.ImportVelvet"
+					label="Import model from Velvet format"
+					style="push">
+				<visibleWhen
+						checkEnabled="false">
+					<reference
+							definitionId="de.ovgu.featureide.fm.ui.expressions.containsXml">
+					</reference>
+				</visibleWhen>
+			</command>
+			<command
+					commandId="de.ovgu.featureide.fm.ui.commands.AnalyzeVelvet"
+					icon="icons/FeatureIconSmall.ico"
+					id="de.ovgu.featureide.fm.ui.actions.AnalyzeVelvet"
+					label="Analyze Velvet Model"
+					style="push">
+				<visibleWhen
+						checkEnabled="false">
+					<reference
+							definitionId="de.ovgu.featureide.fm.ui.expressions.containsVelvet">
+					</reference>
+				</visibleWhen>
+			</command>
+			<separator
+					name="de.ovgu.featureide.fm.ui.separator2"
+					visible="true">
+			</separator>
+			<command
+					commandId="de.ovgu.featureide.fm.ui.commands.ExportSPLConquerer"
+					icon="icons/export_wiz.gif"
+					id="de.ovgu.featureide.fm.ui.actions.ExportSPLConquerer"
+					label="Export model to SPL Conquerer format"
+					style="push">
+				<visibleWhen
+						checkEnabled="false">
+					<reference
+							definitionId="de.ovgu.featureide.fm.ui.expressions.containsXml">
+					</reference>
+				</visibleWhen>
+			</command>
+			<separator
+					name="de.ovgu.featureide.fm.ui.separator4"
+					visible="true">
+			</separator>
+			<command
+					commandId="de.ovgu.featureide.fm.ui.commands.FeatureDependencies"
+					icon="icons/export_wiz.gif"
+					id="de.ovgu.featureide.fm.ui.actions.FeatureDependencies"
+					label="Export feature dependency information"
+					style="push">
+				<visibleWhen
+						checkEnabled="false">
+					<reference
+							definitionId="de.ovgu.featureide.fm.ui.expressions.containsXml">
+					</reference>
+				</visibleWhen>
+			</command>
+			<command
+					commandId="de.ovgu.featureide.fm.ui.commands.ExportCNF"
+					icon="icons/export_wiz.gif"
+					id="de.ovgu.featureide.fm.ui.actions.ExportCNF"
+					label="Export CNF"
+					style="push">
+				<visibleWhen
+						checkEnabled="false">
+					<reference
+							definitionId="de.ovgu.featureide.fm.ui.expressions.containsXml">
+					</reference>
+				</visibleWhen>
+			</command>
+			<command
+					commandId="de.ovgu.featureide.fm.ui.commands.ExportDIMACS"
+					icon="icons/export_wiz.gif"
+					id="de.ovgu.featureide.fm.ui.actions.ExportDIMACS"
+					label="Export DIMACS"
+					style="push">
+				<visibleWhen
+						checkEnabled="false">
+					<reference
+							definitionId="de.ovgu.featureide.fm.ui.expressions.containsXml">
+					</reference>
+				</visibleWhen>
+			</command>
+		</menuContribution>
+	</extension>
+	<extension
+			point="org.eclipse.ui.commands">
+		<command
+				id="de.ovgu.featureide.fm.ui.commands.AnalyzeVelvet"
+				name="Analyze Velvet Model">
+		</command>
+		<command
+				id="de.ovgu.featureide.fm.ui.commands.ExportGuidsl"
+				name="Export model to GUIDSL format">
+		</command>
+		<command
+				id="de.ovgu.featureide.fm.ui.commands.ImportGuidsl"
+				name="Import model from GUIDSL format">
+		</command>
+		<command
+				id="de.ovgu.featureide.fm.ui.commands.ExportSXFM"
+				name="Export model to SXFM (S.P.L.O.T.) format">
+		</command>
+		<command
+				id="de.ovgu.featureide.fm.ui.commands.ImportSXFM"
+				name="Import model from SXFM (S.P.L.O.T.) format">
+		</command>
+		<command
+				id="de.ovgu.featureide.fm.ui.commands.ExportSPLConquerer"
+				name="Export model to SPL Conquerer format">
+		</command>
+		<command
+				id="de.ovgu.featureide.fm.ui.commands.FeatureDependencies"
+				name="Export feature dependency information">
+		</command>
+		<command
+				id="de.ovgu.featureide.fm.ui.commands.ExportCNF"
+				name="Export CNF">
+		</command>
+		<command
+				id="de.ovgu.featureide.fm.ui.commands.ExportDIMACS"
+				name="Export DIMACS">
+		</command>
+		<command
+				id="de.ovgu.featureide.fm.ui.commands.ExportVelvet"
+				name="Export model to Velvet format">
+		</command>
+		<command
+				id="de.ovgu.featureide.fm.ui.commands.ImportVelvet"
+				name="Import model from Velvet format">
+		</command>
+		<command
+				id="de.ovgu.featureide.fm.ui.commands.openWithGuidsl"
+				name="Open with GUIDSL">
+		</command>
+	</extension>
+	<extension
+			point="org.eclipse.ui.handlers">
+		<handler
+				class="de.ovgu.featureide.fm.ui.handlers.AnalyzeVelvetHandler"
+				commandId="de.ovgu.featureide.fm.ui.commands.AnalyzeVelvet">
+		</handler>
+		<handler
+				class="de.ovgu.featureide.fm.ui.handlers.ExportCNFHandler"
+				commandId="de.ovgu.featureide.fm.ui.commands.ExportCNF">
+		</handler>
+		<handler
+				class="de.ovgu.featureide.fm.ui.handlers.ExportConquererHandler"
+				commandId="de.ovgu.featureide.fm.ui.commands.ExportSPLConquerer">
+		</handler>
+		<handler
+				class="de.ovgu.featureide.fm.ui.handlers.ExportDIMACSHandler"
+				commandId="de.ovgu.featureide.fm.ui.commands.ExportDIMACS">
+		</handler>
+		<handler
+				class="de.ovgu.featureide.fm.ui.handlers.ExportGUIDSLHandler"
+				commandId="de.ovgu.featureide.fm.ui.commands.ExportGuidsl">
+		</handler>
+		<handler
+				class="de.ovgu.featureide.fm.ui.handlers.ExportSXFMHandler"
+				commandId="de.ovgu.featureide.fm.ui.commands.ExportSXFM">
+		</handler>
+		<handler
+				class="de.ovgu.featureide.fm.ui.handlers.ExportVelvetHandler"
+				commandId="de.ovgu.featureide.fm.ui.commands.ExportVelvet">
+		</handler>
+		<handler
+				class="de.ovgu.featureide.fm.ui.handlers.FeatureDependenciesHandler"
+				commandId="de.ovgu.featureide.fm.ui.commands.FeatureDependencies">
+		</handler>
+		<handler
+				class="de.ovgu.featureide.fm.ui.handlers.ImportGUIDSLHandler"
+				commandId="de.ovgu.featureide.fm.ui.commands.ImportGuidsl">
+		</handler>
+		<handler
+				class="de.ovgu.featureide.fm.ui.handlers.ImportSXFMHandler"
+				commandId="de.ovgu.featureide.fm.ui.commands.ImportSXFM">
+		</handler>
+		<handler
+				class="de.ovgu.featureide.fm.ui.handlers.ImportVelvetHandler"
+				commandId="de.ovgu.featureide.fm.ui.commands.ImportVelvet">
+		</handler>
+		<handler
+				class="de.ovgu.featureide.fm.ui.handlers.OpenWithGUIDSLHandler"
+				commandId="de.ovgu.featureide.fm.ui.commands.openWithGuidsl">
+		</handler>
+	</extension>
+	<extension
+			point="org.eclipse.core.expressions.definitions">
+		<definition
+				id="de.ovgu.featureide.fm.ui.expressions.containsXml">
+			<with
+					variable="activeMenuSelection">
+				<iterate
+						ifEmpty="false"
+						operator="or">
+					<test
+							args=".xml"
+							property="de.ovgu.featureide.fm.ui.properties.file">
+					</test>
+				</iterate>
+			</with>
+		</definition>
+		<definition
+				id="de.ovgu.featureide.fm.ui.expressions.containsVelvet">
+			<with
+					variable="activeMenuSelection">
+				<iterate
+						ifEmpty="false"
+						operator="or">
+					<test
+							args=".velvet"
+							property="de.ovgu.featureide.fm.ui.properties.file">
+					</test>
+				</iterate>
+			</with>
+		</definition>
+	</extension>
+	<extension
+			point="org.eclipse.core.expressions.propertyTesters">
+		<propertyTester
+				class="de.ovgu.featureide.fm.ui.properties.FileTester"
+				id="de.ovgu.featureide.fm.ui.propertytester.file"
+				namespace="de.ovgu.featureide.fm.ui.properties"
+				properties="file"
+				type="java.lang.Object">
+		</propertyTester>
+		<propertyTester
+				class="de.ovgu.featureide.fm.ui.properties.ClassTester"
+				id="de.ovgu.featureide.fm.ui.propertytester.class"
+				namespace="de.ovgu.featureide.fm.ui.properties"
+				properties="class"
+				type="java.lang.Object">
+		</propertyTester>
+		<propertyTester
+				class="de.ovgu.featureide.fm.ui.properties.NatureTester"
+				id="de.ovgu.featureide.fm.ui.propertytester.nature"
+				namespace="de.ovgu.featureide.fm.ui.properties"
+				properties="nature"
+				type="java.lang.Object">
+		</propertyTester>
+	</extension>
 </plugin>

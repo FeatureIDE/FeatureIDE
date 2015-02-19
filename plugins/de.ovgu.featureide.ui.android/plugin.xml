@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+	<!--
    <extension
          point="org.eclipse.ui.popupMenus">
       <objectContribution
@@ -30,13 +31,68 @@
          </visibility>
       </objectContribution>
    </extension>
-   <extension
-         point="de.ovgu.featureide.core.wizard">
-      <newProjectWizard
-            class="de.ovgu.featureide.ui.android.wizards.MungeAndroidNewProjectWizardExtension"
-            composerid="de.ovgu.featureide.preprocessor.munge-android"
-            id="de.ovgu.featureide.ui.android.newProjectWizard"
-            name="MungeAndroidNewProjectWizard">
-      </newProjectWizard>
-   </extension>
+-->
+	<extension
+			point="de.ovgu.featureide.core.wizard">
+		<newProjectWizard
+				class="de.ovgu.featureide.ui.android.wizards.MungeAndroidNewProjectWizardExtension"
+				composerid="de.ovgu.featureide.preprocessor.munge-android"
+				id="de.ovgu.featureide.ui.android.newProjectWizard"
+				name="MungeAndroidNewProjectWizard">
+		</newProjectWizard>
+	</extension>
+	<extension
+			point="org.eclipse.ui.menus">
+		<menuContribution
+				allPopups="false"
+				locationURI="popup:de.ovgu.featureide.fm.ui.menus.popupMenuNoFP">
+			<command
+					commandId="de.ovgu.featureide.ui.android.commands.conversion"
+					icon="icons/FeatureIconSmall.ico"
+					id="de.ovgu.featureide.ui.android.actions.conversion"
+					label="Add FeatureIDE Nature to Android Project"
+					style="push">
+				<visibleWhen
+						checkEnabled="false">
+					<with
+							variable="activeMenuSelection">
+						<iterate
+								ifEmpty="false"
+								operator="and">
+							<and>
+								<test
+										property="de.ovgu.featureide.fm.ui.properties.class"
+										value="org.eclipse.core.resources.IProject">
+								</test>
+								<test
+										args="de.ovgu.featureide.core.featureProjectNature"
+										property="de.ovgu.featureide.fm.ui.properties.nature"
+										value="false">
+								</test>
+								<test
+										args="com.android.ide.eclipse.adt.AndroidNature"
+										property="de.ovgu.featureide.fm.ui.properties.nature"
+										value="true">
+								</test>
+							</and>
+						</iterate>
+					</with>
+				</visibleWhen>
+			</command>
+		</menuContribution>
+	</extension>
+	<extension
+			point="org.eclipse.ui.commands">
+		<command
+				id="de.ovgu.featureide.ui.android.commands.conversion"
+				name="Add FeatureIDE Nature to Android Project">
+		</command>
+	</extension>
+	<extension
+			point="org.eclipse.ui.handlers">
+		<handler
+				class="de.ovgu.featureide.ui.android.handlers.ConversionHandler"
+				commandId="de.ovgu.featureide.ui.android.commands.conversion">
+		</handler>
+	</extension>
 </plugin>

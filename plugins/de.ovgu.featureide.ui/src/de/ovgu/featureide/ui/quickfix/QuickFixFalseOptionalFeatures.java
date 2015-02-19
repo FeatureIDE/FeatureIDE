@@ -26,16 +26,14 @@ import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.StoppableJob;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
+import de.ovgu.featureide.fm.core.job.AStoppableJob;
 
 
 /**
@@ -50,16 +48,15 @@ public class QuickFixFalseOptionalFeatures extends QuickFixMissingConfigurations
 	}
 
 	public void run(final IMarker marker) {
-		Job job = new StoppableJob(getLabel()) {
-			
+		Job job = new AStoppableJob(getLabel()) {
 			@Override
-			protected IStatus execute(final IProgressMonitor monitor) {
+			protected boolean work() throws Exception {
 				if (project != null) {
 					final Collection<String> falseOptionalFeatures = project.getFalseOptionalConfigurationFeatures();
-					final List<Configuration> confs = createConfigurations(falseOptionalFeatures, monitor);
+					final List<Configuration> confs = createConfigurations(falseOptionalFeatures, workMonitor.getMonitor());
 					writeConfigurations(confs);
 				}
-				return Status.OK_STATUS;
+				return true;
 			}
 		};
 		job.schedule();

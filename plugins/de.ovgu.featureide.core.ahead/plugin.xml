@@ -2,82 +2,46 @@
 <?eclipse version="3.4"?>
 <plugin>
 	<extension
-        point="org.eclipse.core.expressions.propertyTesters">
-     <propertyTester          
-        class="de.ovgu.featureide.ahead.actions.ComposerPropertyTester"
-           id="de.ovgu.featureide.ahead.actions.composerpropertytester"
-           namespace="PropertyTester"
-           properties="checkComposer"
-           type="org.eclipse.core.resources.IProject">
-     </propertyTester>
-     </extension>
-   <extension
-         point="de.ovgu.featureide.core.composers">
-      <composer
-            class="de.ovgu.featureide.ahead.AheadComposer"
-            description="Feature-oriented programming with Jak files (Java 1.4)."
-            id="de.ovgu.featureide.composer.ahead"
-            name="AHEAD"
-            nature="FeatureIDE_Core.jaknature">
-      </composer>
-   </extension>
-      <extension
-         point="org.eclipse.ui.menus">
-         <menuContribution locationURI="popup:org.eclipse.ui.popup.any?after=group.open">
-            <command
-                label="Change the composer to AHEAD"
-                commandId="de.ovgu.featureide.ahead.actions.changecomposeraction"
-                icon="icons/FeatureIconSmall.ico">
-               	<visibleWhen>
-   					<iterate ifEmpty="false">
-      					<adapt type="org.eclipse.core.resources.IProject">
-      						<test
-                  forcePluginActivation="true"
-                  property="PropertyTester.checkComposer"
-                  value="AHEAD"/>
-      					</adapt>
-   					</iterate>
-        		</visibleWhen>
-            </command>
-        </menuContribution>
-      </extension>
-      <extension
-         point="org.eclipse.ui.menus">
-         <menuContribution locationURI="popup:org.eclipse.ui.popup.any?after=group.open">
-            <command
-                label="Change the composer to FeatureHouse"
-                commandId="de.ovgu.featureide.ahead.actions.changecomposeraction"
-                icon="icons/FeatureIconSmall.ico">
-               <visibleWhen>
-				<iterate ifEmpty="false">
-      			<adapt type="org.eclipse.core.resources.IProject">
-      			<test
-               forcePluginActivation="true"
-               property="PropertyTester.checkComposer"
-               value="FeatureHouse"/>
-      			</adapt>
-   				</iterate>
-        </visibleWhen>
-            </command>
-        </menuContribution>
-      </extension>
-    <extension point="org.eclipse.ui.commands">
-    	<command 
-    		id="de.ovgu.featureide.ahead.actions.changecomposeraction" 
-    		name="changecomposeraction"/>
+			point="de.ovgu.featureide.core.composers">
+		<composer
+				class="de.ovgu.featureide.ahead.AheadComposer"
+				description="Feature-oriented programming with Jak files (Java 1.4)."
+				id="de.ovgu.featureide.composer.ahead"
+				name="AHEAD"
+				nature="FeatureIDE_Core.jaknature">
+		</composer>
 	</extension>
-   <extension point="org.eclipse.ui.handlers">
-    <handler
-        commandId="de.ovgu.featureide.ahead.actions.changecomposeraction"
-        class="de.ovgu.featureide.ahead.actions.ChangeComposerAction"/>
+	<extension
+			point="de.ovgu.featureide.core.wizard">
+		<newProjectWizard
+				class="de.ovgu.featureide.core.wizardextension.DefaultNewFeatureProjectWizardExtension"
+				composerid="de.ovgu.featureide.composer.ahead"
+				id="de.ovgu.featureide.core.ahead.newProjectWizard"
+				name="AHEADNewProjectWizard">
+		</newProjectWizard>
 	</extension>
-   <extension
-         point="de.ovgu.featureide.core.wizard">
-      <newProjectWizard
-            class="de.ovgu.featureide.core.wizardextension.DefaultNewFeatureProjectWizardExtension"
-            composerid="de.ovgu.featureide.composer.ahead"
-            id="de.ovgu.featureide.core.ahead.newProjectWizard"
-            name="AHEADNewProjectWizard">
-      </newProjectWizard>
-   </extension>
+	<extension
+			point="org.eclipse.ui.menus">
+		<menuContribution locationURI="popup:de.ovgu.featureide.fm.ui.menus.popupMenu">
+			<menu
+					icon="icons/FeatureIconSmall.ico"
+					id="de.ovgu.featureide.ahead.ui.submenu"
+					label="Ahead">
+				<visibleWhen
+						checkEnabled="false">
+					<with
+							variable="activeMenuSelection">
+						<iterate
+								ifEmpty="false"
+								operator="or">
+							<test
+									args="de.ovgu.featureide.composer.ahead"
+									property="de.ovgu.featureide.fm.ui.properties.composer">
+							</test>
+						</iterate>
+					</with>
+				</visibleWhen>
+			</menu>
+		</menuContribution>
+	</extension>
 </plugin>
