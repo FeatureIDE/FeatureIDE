@@ -168,5 +168,7 @@ public interface GUIDefaults {
 	
 	public static final Image DEFAULT_IMAGE = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_ELEMENT);
 	public static final Image ERROR_IMAGE_TSK = PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJS_ERROR_TSK);
+	
+	public static final Image IMAGE_EMPTY = FMUIPlugin.getImage("empty.png");
 
 }

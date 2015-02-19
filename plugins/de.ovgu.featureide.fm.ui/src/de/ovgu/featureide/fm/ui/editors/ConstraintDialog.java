@@ -204,6 +204,7 @@ public class ConstraintDialog implements GUIDefaults {
 			headComposite.setLayout(headLayout);
 
 			headerDescriptionImageLabel = new Label(headComposite, SWT.NONE | SWT.TOP);
+			headerDescriptionImageLabel.setImage(null);
 
 			headerLabel = new Label(headComposite, SWT.NONE);
 			FontData fontData = headerLabel.getFont().getFontData()[0];
@@ -221,7 +222,8 @@ public class ConstraintDialog implements GUIDefaults {
 			detailsLabel.setLayoutData(gridData);
 			detailsLabel.setEditable(false);
 			detailsLabel.setBackground(panelBackgroundColor);
-			detailsLabel.setText(STRING_HEADER_DETAILS_DEFAULT);
+
+			setDetails(STRING_HEADER_DETAILS_DEFAULT, HeaderDescriptionImage.NONE);
 		}
 
 		/**
@@ -286,10 +288,11 @@ public class ConstraintDialog implements GUIDefaults {
 				headerDescriptionImageLabel.setImage(GUIDefaults.WARNING_IMAGE);
 				break;
 			default:
-				headerDescriptionImageLabel.setImage(null);
+				headerDescriptionImageLabel.setImage(GUIDefaults.IMAGE_EMPTY);
 				break;
 			}
 			headerDescriptionImageLabel.redraw();
+			
 		}
 	}
 
@@ -305,7 +308,7 @@ public class ConstraintDialog implements GUIDefaults {
 	
 	static class StringTable {
 
-		static final String CHECK_STARTED = "Performing additional checks. This may take a while. Although it is not recommended, you can %s your constraint by clicking %s before this process has ended.";
+		static final String CHECK_STARTED = "Performing additional checks. This may take a while. Although it is not recommended, you can %s your constraint by clicking \"%s\" before this process has ended.";
 
 		static final String CONSTRAINT_VOIDS_MODEL = "Your constraint voids the model";
 
@@ -534,6 +537,7 @@ public class ConstraintDialog implements GUIDefaults {
 
 			mode = Mode.UPDATE;
 		}
+		
 
 		initShell();
 		initHead();
@@ -770,7 +774,7 @@ public class ConstraintDialog implements GUIDefaults {
 		FormData formDataConstraintText = new FormData();
 		formDataConstraintText.right = new FormAttachment(100, -5);
 		formDataConstraintText.left = new FormAttachment(0, 5);
-		formDataConstraintText.height = 50;
+		//formDataConstraintText.height = 50;
 		constraintText.setLayoutData(formDataConstraintText);
 		constraintText.setText(initialConstraint);
 		constraintText.setMargins(10, 5, 3, 5);
