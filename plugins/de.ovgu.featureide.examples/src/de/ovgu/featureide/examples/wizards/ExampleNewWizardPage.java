@@ -846,9 +846,9 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 			List<File> filesToImport = ExampleStructureProvider.INSTANCE.getChildren(importSource);
 
 			if (record.hasSubProjects()) {
-				for (File currFile : filesToImport) {
-					if (ProjectRecord.SUB_PROJECTS_FOLDER.equals(currFile.getName())) {
-						filesToImport.remove(currFile);
+				for (Iterator<File> it = filesToImport.iterator(); it.hasNext();) {
+					if (ProjectRecord.SUB_PROJECTS_FOLDER.equals(it.next().getName())) {
+						it.remove();
 						break;
 					}
 				}
