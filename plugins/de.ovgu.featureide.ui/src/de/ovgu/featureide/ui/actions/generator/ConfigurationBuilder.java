@@ -369,11 +369,6 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 				}
 				LOGGER.logInfo(built + (configurationNumber != 0 ? " of " + configurationNumber : "") + 
 						" configurations built in " + t);
-				try {
-					folder.refreshLocal(IResource.DEPTH_INFINITE, monitor);
-				} catch (CoreException e) {
-					LOGGER.logError(e);
-				}
 			}
 
 		};
