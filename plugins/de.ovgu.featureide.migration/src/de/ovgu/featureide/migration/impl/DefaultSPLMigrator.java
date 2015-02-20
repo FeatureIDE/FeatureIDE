@@ -82,7 +82,7 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator {
 	public void migrate(MigrationConfigurationData configurationData) {
 		this.configurationData = configurationData;
 
-		createFeatureProject();
+		createProject();
 
 		migrateProjects();
 
@@ -98,7 +98,7 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator {
 	 * Can be overwritten by extending classes to accomodate
 	 * {@link IComposerExtensionBase Composers} needs.
 	 */
-	protected void createFeatureProject() {
+	protected void createProject() {
 		newProject = SPLMigrationUtils.createProject(configurationData.projectName);
 
 		openProjectHandleExceptions(newProject);
@@ -143,16 +143,19 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator {
 			} catch (JavaModelException e) {
 				e.printStackTrace();
 			}
-
-			try {
-				if (project.hasNature(ANDROID_NATURE))
-					copyProjectProperties(project, featureFolderPath);
-			} catch (CoreException e) {
-				e.printStackTrace();
-			}
+			
+//			try
+//			{
+//				if(project.hasNature(ANDROID_NATURE))
+//					copyProjectProperties(project, featureFolderPath);
+//			} catch (CoreException e)
+//			{
+//				e.printStackTrace();
+//			}
 		}
 	}
-
+	
+	@SuppressWarnings("unused")
 	private void copyProjectProperties(IProject project, IPath destinationPath) {
 		final IFile source = project.getFile(PROJECT_PROPERTIES_FILE_NAME);
 		if (!source.exists()) {
