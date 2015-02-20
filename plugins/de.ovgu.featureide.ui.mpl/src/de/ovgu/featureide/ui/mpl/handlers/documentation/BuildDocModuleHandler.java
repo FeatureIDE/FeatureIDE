@@ -18,14 +18,11 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.mpl.actions.documentation;
-
-import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.swt.widgets.Display;
+package de.ovgu.featureide.ui.mpl.handlers.documentation;
 
 import de.ovgu.featureide.core.mpl.MPLPlugin;
-import de.ovgu.featureide.ui.mpl.actions.AProjectJobAction;
+import de.ovgu.featureide.ui.mpl.handlers.AProjectJobHandler;
+import de.ovgu.featureide.ui.mpl.wizards.AbstractWizard;
 import de.ovgu.featureide.ui.mpl.wizards.BuildDocWizard;
 import de.ovgu.featureide.ui.mpl.wizards.WizardConstants;
 
@@ -35,19 +32,20 @@ import de.ovgu.featureide.ui.mpl.wizards.WizardConstants;
  * @author Sebastian Krieter
  * @author Reimar Schroeter
  */
-public class BuildDocStatisticsAction extends AProjectJobAction {	
-	private BuildDocWizard wizard;
+public class BuildDocModuleHandler extends AProjectJobHandler {
 	
 	@Override
-	protected boolean startAction() {
-		wizard = new BuildDocWizard("Documentation Wizard", "DocumentationStatistics", false);
-		WizardDialog dialog = new WizardDialog(Display.getCurrent().getActiveShell(), wizard);
-		return (dialog.open() == Dialog.OK);
+	protected AbstractWizard instantiateWizard() {
+		return new BuildDocWizard("Documentation Wizard", "FeaturemoduleDocumentation", true);
 	}
 	
 	@Override
 	protected void endAction() {
-		MPLPlugin.getDefault().buildDocumentationStatistics(projects, 
-				(String) wizard.getData(WizardConstants.KEY_OUT_FOLDER));
+		MPLPlugin.getDefault().buildDocumentation(projects, 
+				(String) wizard.getData(WizardConstants.KEY_OUT_FOLDER), 
+				(String) wizard.getData(WizardConstants.KEY_OUT_DOCOPTIONS),
+				3, 
+				(String) wizard.getData(WizardConstants.KEY_OUT_FEATURE));
 	}
+	
 }

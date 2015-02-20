@@ -18,16 +18,30 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.mpl.actions.interfaces;
-
-import org.eclipse.core.resources.IProject;
+package de.ovgu.featureide.ui.mpl.handlers.interfaces;
 
 import de.ovgu.featureide.core.mpl.MPLPlugin;
-import de.ovgu.featureide.ui.mpl.actions.AProjectAction;
+import de.ovgu.featureide.ui.mpl.handlers.AProjectJobHandler;
+import de.ovgu.featureide.ui.mpl.wizards.AbstractWizard;
+import de.ovgu.featureide.ui.mpl.wizards.BuildExtendedModulesWizard;
+import de.ovgu.featureide.ui.mpl.wizards.WizardConstants;
 
-public class AddMSPLNatureAction extends AProjectAction {
+/**
+ * Action to build extended interfaces from the current configuration.
+ * 
+ * @author Reimar Schroeter
+ */
+public class BuildExtendedModulesHandler extends AProjectJobHandler {
+
 	@Override
-	protected void singleAction(IProject project) {
-		MPLPlugin.getDefault().addMSPLNature(project);
-	}	
+	protected AbstractWizard instantiateWizard() {
+		return new BuildExtendedModulesWizard("Folder of extended modules", "ExtendedModules");
+	}
+	
+	@Override
+	protected void endAction() {
+		MPLPlugin.getDefault().buildExtendedModules(projects, 
+				(String) wizard.getData(WizardConstants.KEY_OUT_FOLDER));
+	}
+	
 }

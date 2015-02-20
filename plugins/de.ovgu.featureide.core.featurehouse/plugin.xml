@@ -52,7 +52,7 @@
 	-->
 	<extension
 			point="org.eclipse.ui.menus">
-		<menuContribution locationURI="popup:de.ovgu.featureide.fm.ui.menus.popupMenu">
+		<menuContribution locationURI="popup:de.ovgu.featureide.fm.ui.menus.popupMenu?before=de.ovgu.featureide.fm.ui.menus.popupMenu.submenus">
 			<menu
 					icon="icons/FeatureIconSmall.ico"
 					id="de.ovgu.featureide.featurehouse.ui.submenu"
@@ -85,7 +85,7 @@
 										value="1">
 								</count>
 								<reference
-										definitionId="de.ovgu.featureide.ui.expressions.onlyProject">
+										definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
 								</reference>
 								<test
 										args="de.ovgu.featureide.core.featurehouse.ui.commands.metaproduct"
@@ -109,7 +109,7 @@
 										value="1">
 								</count>
 								<reference
-										definitionId="de.ovgu.featureide.ui.expressions.onlyProject">
+										definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
 								</reference>
 								<test
 										args="de.ovgu.featureide.core.featurehouse.ui.commands.fuji"
@@ -134,7 +134,7 @@
 										value="1">
 								</count>
 								<reference
-										definitionId="de.ovgu.featureide.ui.expressions.onlyProject">
+										definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
 								</reference>
 							</and>
 						</with>
@@ -169,6 +169,7 @@
 	<extension
 			point="org.eclipse.ui.handlers">
 		<handler
+				class="de.ovgu.featureide.featurehouse.ui.handlers.BuildMetaProductHandler"
 				commandId="de.ovgu.featureide.core.featurehouse.ui.commands.metaproduct">
 		</handler>
 		<handler

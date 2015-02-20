@@ -18,34 +18,50 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.mpl.actions.viewtags;
+package de.ovgu.featureide.ui.mpl.handlers;
+
+import java.util.LinkedList;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Display;
 
-import de.ovgu.featureide.core.mpl.MPLPlugin;
-import de.ovgu.featureide.ui.mpl.actions.AProjectAction;
-import de.ovgu.featureide.ui.mpl.wizards.ChangeViewTagWizard;
-import de.ovgu.featureide.ui.mpl.wizards.WizardConstants;
+import de.ovgu.featureide.fm.ui.handlers.base.ASelectionHandler;
+import de.ovgu.featureide.fm.ui.handlers.base.SelectionWrapper;
+import de.ovgu.featureide.ui.mpl.wizards.AbstractWizard;
 
-/**
- * Action to change the level of a view tag.
+/** 
  * 
  * @author Sebastian Krieter
  */
-public class ChangeViewTagAction extends AProjectAction {
+public abstract class AProjectJobHandler extends ASelectionHandler {	
 
+	protected final LinkedList<IProject> projects = new LinkedList<IProject>();
+	
+	protected AbstractWizard wizard;
+	
 	@Override
-	protected void singleAction(IProject project) {
-		ChangeViewTagWizard wizard = new ChangeViewTagWizard("Change a view tag");
-		WizardDialog dialog = new WizardDialog(Display.getCurrent().getActiveShell(), wizard);
-		if (dialog.open() == Dialog.OK) {
-			MPLPlugin.getDefault().scaleUpViewTag(project, 
-					(String) wizard.getData(WizardConstants.KEY_OUT_VIEWNAME), 
-					(Integer) wizard.getData(WizardConstants.KEY_OUT_VIEWLEVEL));
+	protected boolean startAction(IStructuredSelection selection) {
+		wizard = instantiateWizard();
+		if (Dialog.OK == new WizardDialog(Display.getCurrent().getActiveShell(), wizard).open()) {
+			final SelectionWrapper<IProject> selectionWrapper = SelectionWrapper.init(selection, IProject.class);
+			projects.clear();
+			for (IProject curProject; (curProject = selectionWrapper.getNext()) != null;) {
+				projects.add(curProject);
+			}
+			return true;
 		}
+		return false;
 	}
-
+	
+	@Override
+	protected void singleAction(Object element) {
+	}
+	
+	protected abstract AbstractWizard instantiateWizard();
+	
+	protected abstract void endAction();
+	
 }

@@ -36,13 +36,13 @@ import de.ovgu.featureide.ui.handlers.base.AFeatureProjectHandler;
  * @author Jens Meinicke
  * @author Sebastian Krieter
  */
-public class BuildMetaProductAction extends AFeatureProjectHandler {
+public class BuildMetaProductHandler extends AFeatureProjectHandler {
 	
 	@Override
 	protected void singleAction(final IFeatureProject featureProject) {
 		if (FeatureHouseComposer.COMPOSER_ID.equals(featureProject.getComposerID())) {
 			final FeatureHouseComposer featureHouseComposer = (FeatureHouseComposer) featureProject.getComposer();
-			featureHouseComposer.setBuildMetaProduct(featureHouseComposer.getBuildMetaProduct());
+			featureHouseComposer.setBuildMetaProduct(!featureHouseComposer.buildMetaProduct());
 			
 			final Job job = new AStoppableJob("Build meta product for project \"" + featureProject.getProjectName() + "\".") {
 				@Override

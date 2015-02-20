@@ -18,24 +18,33 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.mpl.actions.interfaces;
-
-import org.eclipse.core.resources.IProject;
+package de.ovgu.featureide.ui.mpl.handlers.interfaces;
 
 import de.ovgu.featureide.core.mpl.MPLPlugin;
-import de.ovgu.featureide.ui.mpl.actions.AProjectAction;
+import de.ovgu.featureide.ui.mpl.handlers.AProjectJobHandler;
+import de.ovgu.featureide.ui.mpl.wizards.AbstractWizard;
+import de.ovgu.featureide.ui.mpl.wizards.FeatureInterfaceWizard;
+import de.ovgu.featureide.ui.mpl.wizards.WizardConstants;
 
-public class RefreshAction extends AProjectAction {
-	private IProject project = null;
-	
+/**
+ * Action to compare all possible interface from the current configuration.
+ * 
+ * @author Sebastian Krieter
+ */
+public class CompareInterfacesHandler extends AProjectJobHandler {
+
 	@Override
-	protected void singleAction(IProject project) {
-		this.project = project;
+	protected AbstractWizard instantiateWizard() {
+		return new FeatureInterfaceWizard("Compare Configuration Interfaces");
 	}
-
+	
 	@Override
 	protected void endAction() {
-		MPLPlugin.getDefault().refresh(project);
+		MPLPlugin.getDefault().compareConfigurationInterfaces(
+				projects, 
+				(String) wizard.getData(WizardConstants.KEY_OUT_VIEWNAME), 
+				(Integer) wizard.getData(WizardConstants.KEY_OUT_VIEWLEVEL), 
+				(Integer) wizard.getData(WizardConstants.KEY_OUT_CONFIGLIMIT));
 	}
-	
+
 }

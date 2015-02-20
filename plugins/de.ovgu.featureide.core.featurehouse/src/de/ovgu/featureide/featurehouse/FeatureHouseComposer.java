@@ -1170,15 +1170,6 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		return false;
 	}
 
-	public final boolean buildMetaProduct() {
-		try {
-			return TRUE.equals(featureProject.getProject().getPersistentProperty(BUILD_META_PRODUCT));
-		} catch (CoreException e) {
-			FMCorePlugin.getDefault().logError(e);
-		}
-		return false;
-	}
-
 	@Override
 	public boolean hasContractComposition() {
 		return true;
@@ -1241,7 +1232,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		setProperty(BUILD_META_PRODUCT, value);
 	}
 	
-	public boolean getBuildMetaProduct() {
+	public final boolean buildMetaProduct() {
 		return getPropertyBoolean(BUILD_META_PRODUCT);
 	}
 	

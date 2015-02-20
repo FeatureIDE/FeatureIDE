@@ -18,39 +18,29 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.mpl.actions.documentation;
-
-import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.swt.widgets.Display;
+package de.ovgu.featureide.ui.mpl.handlers.statistics;
 
 import de.ovgu.featureide.core.mpl.MPLPlugin;
-import de.ovgu.featureide.ui.mpl.actions.AProjectJobAction;
-import de.ovgu.featureide.ui.mpl.wizards.BuildDocWizard;
+import de.ovgu.featureide.ui.mpl.handlers.AProjectJobHandler;
+import de.ovgu.featureide.ui.mpl.wizards.AbstractWizard;
+import de.ovgu.featureide.ui.mpl.wizards.BuildExtendedModulesWizard;
 import de.ovgu.featureide.ui.mpl.wizards.WizardConstants;
 
 /**
- * Action to build interfaces grouped by the feature name.
+ * Action to generate various statistics from the spl.
  * 
  * @author Sebastian Krieter
- * @author Reimar Schroeter
  */
-public class BuildDocContextAction extends AProjectJobAction {	
-	private BuildDocWizard wizard;
+public class PrintAllStatisticsHandler extends AProjectJobHandler {
 	
 	@Override
-	protected boolean startAction() {
-		wizard = new BuildDocWizard("Documentation Wizard", "ContextDocumentation", true);
-		WizardDialog dialog = new WizardDialog(Display.getCurrent().getActiveShell(), wizard);
-		return (dialog.open() == Dialog.OK);
+	protected AbstractWizard instantiateWizard() {
+		return new BuildExtendedModulesWizard("Folder of statistics", "Statistics");
 	}
-	
+
 	@Override
 	protected void endAction() {
-		MPLPlugin.getDefault().buildDocumentation(projects, 
-				(String) wizard.getData(WizardConstants.KEY_OUT_FOLDER), 
-				(String) wizard.getData(WizardConstants.KEY_OUT_DOCOPTIONS),
-				2, 
-				(String) wizard.getData(WizardConstants.KEY_OUT_FEATURE));
+		MPLPlugin.getDefault().printStatistics(projects, 
+				(String) wizard.getData(WizardConstants.KEY_OUT_FOLDER));
 	}
 }

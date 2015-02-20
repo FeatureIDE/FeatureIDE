@@ -52,8 +52,8 @@ public abstract class ASelectionHandler extends AbstractHandler {
 				for (Iterator<?> it = strSelection.iterator(); it.hasNext();) {
 					singleAction(it.next());
 				}
+				endAction();
 			}
-			endAction();
 		}
 		return null;
 	}

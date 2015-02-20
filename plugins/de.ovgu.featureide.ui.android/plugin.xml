@@ -42,19 +42,12 @@
 		</newProjectWizard>
 	</extension>
 	<extension
-			point="org.eclipse.ui.menus">
-		<menuContribution
-				allPopups="false"
-				locationURI="popup:de.ovgu.featureide.fm.ui.menus.popupMenuNoFP">
-			<command
-					commandId="de.ovgu.featureide.ui.android.commands.conversion"
-					icon="icons/FeatureIconSmall.ico"
-					id="de.ovgu.featureide.ui.android.actions.conversion"
-					label="Add FeatureIDE Nature to Android Project"
-					style="push">
-				<visibleWhen
-						checkEnabled="false">
-					<with
+			point="org.eclipse.ui.handlers">
+		<handler
+				class="de.ovgu.featureide.ui.android.handlers.ConversionHandler"
+				commandId="de.ovgu.featureide.ui.commands.Conversion">
+     <activeWhen>
+     					<with
 							variable="activeMenuSelection">
 						<iterate
 								ifEmpty="false"
@@ -77,22 +70,7 @@
 							</and>
 						</iterate>
 					</with>
-				</visibleWhen>
-			</command>
-		</menuContribution>
-	</extension>
-	<extension
-			point="org.eclipse.ui.commands">
-		<command
-				id="de.ovgu.featureide.ui.android.commands.conversion"
-				name="Add FeatureIDE Nature to Android Project">
-		</command>
-	</extension>
-	<extension
-			point="org.eclipse.ui.handlers">
-		<handler
-				class="de.ovgu.featureide.ui.android.handlers.ConversionHandler"
-				commandId="de.ovgu.featureide.ui.android.commands.conversion">
+     </activeWhen>
 		</handler>
 	</extension>
 </plugin>

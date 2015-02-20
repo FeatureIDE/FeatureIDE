@@ -1117,7 +1117,7 @@
 			point="org.eclipse.ui.menus">
 		<menuContribution
 				allPopups="false"
-				locationURI="popup:de.ovgu.featureide.fm.ui.menus.popupMenu">
+				locationURI="popup:de.ovgu.featureide.fm.ui.menus.popupMenu?after=de.ovgu.featureide.fm.ui.menus.popupMenu.submenus">
 			<command
 					commandId="de.ovgu.featureide.ui.commands.productGenerator"
 					icon="icons/FeatureIconSmall.ico"
@@ -1128,7 +1128,7 @@
 				<visibleWhen
 						checkEnabled="false">
 					<reference
-							definitionId="de.ovgu.featureide.ui.expressions.onlyProject">
+							definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
 					</reference>
 				</visibleWhen>
 			</command>
@@ -1178,7 +1178,7 @@
 					<visibleWhen
 							checkEnabled="false">
 						<reference
-								definitionId="de.ovgu.featureide.ui.expressions.onlyProject">
+								definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
 						</reference>
 					</visibleWhen>
 				</command>
@@ -1199,6 +1199,7 @@
 	<extension
 			point="org.eclipse.ui.commands">
 		<command
+				defaultHandler="de.ovgu.featureide.ui.handlers.ConversionHandler"
 				id="de.ovgu.featureide.ui.commands.Conversion"
 				name="Add FeatureIDE Nature">
 		</command>
@@ -1221,10 +1222,6 @@
 	</extension>
 	<extension
 			point="org.eclipse.ui.handlers">
-		<handler
-				class="de.ovgu.featureide.ui.handlers.ConversionHandler"
-				commandId="de.ovgu.featureide.ui.commands.Conversion">
-		</handler>
 		<handler
 				class="de.ovgu.featureide.ui.handlers.SetConfigurationHandler"
 				commandId="de.ovgu.featureide.ui.commands.setConfiguration">
@@ -1255,7 +1252,7 @@
 			</with>
 		</definition>
 		<definition
-				id="de.ovgu.featureide.ui.expressions.onlyProject">
+				id="de.ovgu.featureide.ui.expressions.onlyProjects">
 			<with
 					variable="activeMenuSelection">
 				<iterate

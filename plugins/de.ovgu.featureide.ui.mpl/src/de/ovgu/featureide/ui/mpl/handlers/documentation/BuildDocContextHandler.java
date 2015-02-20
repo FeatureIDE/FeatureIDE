@@ -18,16 +18,34 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.mpl.actions.interfaces;
-
-import org.eclipse.core.resources.IProject;
+package de.ovgu.featureide.ui.mpl.handlers.documentation;
 
 import de.ovgu.featureide.core.mpl.MPLPlugin;
-import de.ovgu.featureide.ui.mpl.actions.AProjectAction;
+import de.ovgu.featureide.ui.mpl.handlers.AProjectJobHandler;
+import de.ovgu.featureide.ui.mpl.wizards.AbstractWizard;
+import de.ovgu.featureide.ui.mpl.wizards.BuildDocWizard;
+import de.ovgu.featureide.ui.mpl.wizards.WizardConstants;
 
-public class RemoveInterfaceNatureAction extends AProjectAction {
+/**
+ * Action to build interfaces grouped by the feature name.
+ * 
+ * @author Sebastian Krieter
+ * @author Reimar Schroeter
+ */
+public class BuildDocContextHandler extends AProjectJobHandler {
+	
 	@Override
-	protected void singleAction(IProject project) {
-		MPLPlugin.getDefault().removeInterfaceNature(project);
+	protected AbstractWizard instantiateWizard() {
+		return new BuildDocWizard("Documentation Wizard", "ContextDocumentation", true);
 	}
+	
+	@Override
+	protected void endAction() {
+		MPLPlugin.getDefault().buildDocumentation(projects, 
+				(String) wizard.getData(WizardConstants.KEY_OUT_FOLDER), 
+				(String) wizard.getData(WizardConstants.KEY_OUT_DOCOPTIONS),
+				2, 
+				(String) wizard.getData(WizardConstants.KEY_OUT_FEATURE));
+	}
+
 }

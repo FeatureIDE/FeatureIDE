@@ -18,38 +18,42 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.mpl.actions.documentation;
+package de.ovgu.featureide.ui.mpl.handlers.interfaces;
 
-import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.swt.widgets.Display;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.core.mpl.MPLPlugin;
-import de.ovgu.featureide.ui.mpl.actions.AProjectJobAction;
-import de.ovgu.featureide.ui.mpl.wizards.BuildDocWizard;
-import de.ovgu.featureide.ui.mpl.wizards.WizardConstants;
+import de.ovgu.featureide.core.mpl.io.IOConstants;
+import de.ovgu.featureide.fm.ui.handlers.base.AFolderHandler;
+import de.ovgu.featureide.ui.mpl.MPLUIPlugin;
 
 /**
- * Action to build interfaces grouped by the feature name.
+ * Action to create a java project from a selected interface.
  * 
  * @author Sebastian Krieter
- * @author Reimar Schroeter
  */
-public class BuildDocSPLAction extends AProjectJobAction {	
-	private BuildDocWizard wizard;
-	
+public class BuildJavaProjectHandler extends AFolderHandler  {
+
 	@Override
-	protected boolean startAction() {
-		wizard = new BuildDocWizard("Documentation Wizard", "SPLDocumentation", false);
-		WizardDialog dialog = new WizardDialog(Display.getCurrent().getActiveShell(), wizard);
-		return (dialog.open() == Dialog.OK);
+	protected void singleAction(IFolder folder) {
+		IResource[] members = null;
+		try {
+			members = folder.members();
+		} catch (CoreException e) {
+			MPLUIPlugin.getDefault().logError(e);
+		}
+		
+		if (members != null) {
+			for (IResource resource : members) {
+				if (resource.getName().endsWith(IOConstants.EXTENSION_SOLUTION) && resource instanceof IFile) {
+					MPLPlugin.getDefault().buildJavaProject((IFile) resource, folder.getName());
+					break;
+				}
+			}
+		}		
 	}
 	
-	@Override
-	protected void endAction() {
-		MPLPlugin.getDefault().buildDocumentation(projects, 
-				(String) wizard.getData(WizardConstants.KEY_OUT_FOLDER),
-				(String) wizard.getData(WizardConstants.KEY_OUT_DOCOPTIONS),
-				0);
-	}
 }

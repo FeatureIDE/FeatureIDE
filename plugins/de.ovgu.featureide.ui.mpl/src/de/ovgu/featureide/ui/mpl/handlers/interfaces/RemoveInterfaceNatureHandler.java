@@ -18,32 +18,17 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.mpl.actions;
-
-import java.util.Collection;
-
-import org.eclipse.core.resources.IProject;
-import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.swt.widgets.Display;
+package de.ovgu.featureide.ui.mpl.handlers.interfaces;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
-import de.ovgu.featureide.ui.mpl.wizards.NewInterfaceWizard;
-import de.ovgu.featureide.ui.mpl.wizards.WizardConstants;
+import de.ovgu.featureide.ui.handlers.base.AFeatureProjectHandler;
 
-public class NewInterfaceAction  extends AProjectAction {
+public class RemoveInterfaceNatureHandler extends AFeatureProjectHandler {
 	
-	@SuppressWarnings("unchecked")
 	@Override
-	protected void singleAction(IProject project) {
-		NewInterfaceWizard wizard = new NewInterfaceWizard("New Interfaces");
-		WizardDialog dialog = new WizardDialog(Display.getCurrent().getActiveShell(), wizard);
-		if (dialog.open() == Dialog.OK) {
-			MPLPlugin.getDefault().createInterface(
-				project,
-				(IFeatureProject) wizard.getData(WizardConstants.KEY_OUT_PROJECT),
-				(Collection<String>) wizard.getData(WizardConstants.KEY_OUT_FEATURES));
-		}
+	protected void singleAction(IFeatureProject project) {
+		MPLPlugin.getDefault().removeInterfaceNature(project.getProject());
 	}
+	
 }

@@ -18,16 +18,24 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.mpl.actions.interfaces;
+package de.ovgu.featureide.ui.mpl.handlers;
 
-import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IFile;
 
 import de.ovgu.featureide.core.mpl.MPLPlugin;
-import de.ovgu.featureide.ui.mpl.actions.AProjectAction;
+import de.ovgu.featureide.fm.ui.handlers.base.AFileHandler;
 
-public class AddInterfaceNatureAction extends AProjectAction {
+/**
+ * 
+ * @author Sebastian Krieter
+ */
+public class SetMappingHandler extends AFileHandler {
+
 	@Override
-	protected void singleAction(IProject project) {
-		MPLPlugin.getDefault().addInterfaceNature(project);
-	}	
+	protected void singleAction(IFile file) {
+		if (file.getProject() != null) {
+			MPLPlugin.getDefault().setCurrentMapping(file.getProject(), file.getName());
+		}
+	}
+	
 }

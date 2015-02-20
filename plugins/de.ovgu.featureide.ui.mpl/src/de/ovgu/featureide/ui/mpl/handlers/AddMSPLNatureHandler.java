@@ -18,29 +18,17 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.mpl.actions;
+package de.ovgu.featureide.ui.mpl.handlers;
 
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.IAdaptable;
+import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.mpl.MPLPlugin;
+import de.ovgu.featureide.ui.handlers.base.AFeatureProjectHandler;
 
-/** 
- * Extends the {@link AAction} by a check whether the current selection contains a project folder.
- * 
- * @author Sebastian Krieter
- */
-public abstract class AProjectAction extends AAction {
-	protected abstract void singleAction(IProject project);
-	
+public class AddMSPLNatureHandler extends AFeatureProjectHandler {
+
 	@Override
-	protected void singleAction(Object element) {
-		IProject project = null;
-		if (element instanceof IProject) {
-			project = (IProject) element;
-		} else if (element instanceof IAdaptable) {
-			project = (IProject) ((IAdaptable) element).getAdapter(IProject.class);
-		}
-		if (project != null) {
-			singleAction(project);
-		}
+	protected void singleAction(IFeatureProject project) {
+		MPLPlugin.getDefault().addMSPLNature(project);
 	}
+	
 }

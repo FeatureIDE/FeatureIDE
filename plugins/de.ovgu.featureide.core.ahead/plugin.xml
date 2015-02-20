@@ -22,7 +22,7 @@
 	</extension>
 	<extension
 			point="org.eclipse.ui.menus">
-		<menuContribution locationURI="popup:de.ovgu.featureide.fm.ui.menus.popupMenu">
+		<menuContribution locationURI="popup:de.ovgu.featureide.fm.ui.menus.popupMenu?before=de.ovgu.featureide.fm.ui.menus.popupMenu.submenus">
 			<menu
 					icon="icons/FeatureIconSmall.ico"
 					id="de.ovgu.featureide.ahead.ui.submenu"

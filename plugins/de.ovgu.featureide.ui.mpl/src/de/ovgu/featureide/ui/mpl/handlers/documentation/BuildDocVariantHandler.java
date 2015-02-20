@@ -18,38 +18,33 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.mpl.actions.interfaces;
-
-import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.swt.widgets.Display;
+package de.ovgu.featureide.ui.mpl.handlers.documentation;
 
 import de.ovgu.featureide.core.mpl.MPLPlugin;
-import de.ovgu.featureide.ui.mpl.actions.AProjectJobAction;
-import de.ovgu.featureide.ui.mpl.wizards.FeatureInterfaceWizard;
+import de.ovgu.featureide.ui.mpl.handlers.AProjectJobHandler;
+import de.ovgu.featureide.ui.mpl.wizards.AbstractWizard;
+import de.ovgu.featureide.ui.mpl.wizards.BuildDocWizard;
 import de.ovgu.featureide.ui.mpl.wizards.WizardConstants;
 
-/** 
- * Action to build interfaces for the current configuration.
+/**
+ * Action to build interfaces grouped by the feature name.
  * 
  * @author Sebastian Krieter
+ * @author Reimar Schroeter
  */
-public class BuildConfigurationInterfacesAction extends AProjectJobAction {
-	private FeatureInterfaceWizard wizard;
-
+public class BuildDocVariantHandler extends AProjectJobHandler {
+	
 	@Override
-	protected boolean startAction() {
-		wizard = new FeatureInterfaceWizard("Build Configuration Interfaces");
-		WizardDialog dialog = new WizardDialog(Display.getCurrent().getActiveShell(), wizard);
-		return dialog.open() == Dialog.OK;
+	protected AbstractWizard instantiateWizard() {
+		return new BuildDocWizard("Documentation Wizard", "VariantDocumentation", false);
 	}
-
+	
 	@Override
 	protected void endAction() {
-		MPLPlugin.getDefault().buildConfigurationInterfaces(
-				projects, 
-				(String) wizard.getData(WizardConstants.KEY_OUT_VIEWNAME), 
-				(Integer) wizard.getData(WizardConstants.KEY_OUT_VIEWLEVEL), 
-				(Integer) wizard.getData(WizardConstants.KEY_OUT_CONFIGLIMIT));
+		MPLPlugin.getDefault().buildDocumentation(projects, 
+				(String) wizard.getData(WizardConstants.KEY_OUT_FOLDER), 
+				(String) wizard.getData(WizardConstants.KEY_OUT_DOCOPTIONS),
+				1);
 	}
+	
 }

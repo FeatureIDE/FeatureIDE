@@ -18,29 +18,33 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.mpl.actions;
-
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.IAdaptable;
+package de.ovgu.featureide.ui.mpl.handlers.documentation;
 
 import de.ovgu.featureide.core.mpl.MPLPlugin;
+import de.ovgu.featureide.ui.mpl.handlers.AProjectJobHandler;
+import de.ovgu.featureide.ui.mpl.wizards.AbstractWizard;
+import de.ovgu.featureide.ui.mpl.wizards.BuildDocWizard;
+import de.ovgu.featureide.ui.mpl.wizards.WizardConstants;
 
 /**
+ * Action to build interfaces grouped by the feature name.
  * 
  * @author Sebastian Krieter
+ * @author Reimar Schroeter
  */
-public class SetMappingAction extends AAction {
-
+public class BuildDocSPLHandler extends AProjectJobHandler {
+	
 	@Override
-	protected void singleAction(Object element) {
-		IFile file = null;
-		if (element instanceof IFile) {
-			file = (IFile) element;
-		} else if (element instanceof IAdaptable) {
-			file = (IFile) ((IAdaptable) element).getAdapter(IFile.class);
-		}
-		if (file != null && file.getProject() != null) {
-			MPLPlugin.getDefault().setCurrentMapping(file.getProject(), file.getName());
-		}
+	protected AbstractWizard instantiateWizard() {
+		return new BuildDocWizard("Documentation Wizard", "SPLDocumentation", false);
 	}
+	
+	@Override
+	protected void endAction() {
+		MPLPlugin.getDefault().buildDocumentation(projects, 
+				(String) wizard.getData(WizardConstants.KEY_OUT_FOLDER),
+				(String) wizard.getData(WizardConstants.KEY_OUT_DOCOPTIONS),
+				0);
+	}
+	
 }

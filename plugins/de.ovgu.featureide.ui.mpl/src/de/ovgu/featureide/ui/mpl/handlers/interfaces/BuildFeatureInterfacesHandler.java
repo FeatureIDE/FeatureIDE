@@ -18,35 +18,35 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.mpl.actions.interfaces;
-
-import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.swt.widgets.Display;
+package de.ovgu.featureide.ui.mpl.handlers.interfaces;
 
 import de.ovgu.featureide.core.mpl.MPLPlugin;
-import de.ovgu.featureide.ui.mpl.actions.AProjectJobAction;
-import de.ovgu.featureide.ui.mpl.wizards.BuildExtendedModulesWizard;
+import de.ovgu.featureide.ui.mpl.handlers.AProjectJobHandler;
+import de.ovgu.featureide.ui.mpl.wizards.AbstractWizard;
+import de.ovgu.featureide.ui.mpl.wizards.FeatureInterfaceWizard;
 import de.ovgu.featureide.ui.mpl.wizards.WizardConstants;
 
 /**
- * Action to build extended interfaces from the current configuration.
+ * Action to build interfaces grouped by the feature name.
  * 
+ * @author Sebastian Krieter
  * @author Reimar Schroeter
  */
-public class BuildExtendedModulesAction extends AProjectJobAction {
-	private BuildExtendedModulesWizard wizard;
-	
+public class BuildFeatureInterfacesHandler extends AProjectJobHandler {
+
 	@Override
-	protected boolean startAction() {
-		wizard = new BuildExtendedModulesWizard("Folder of extended modules", "ExtendedModules");
-		WizardDialog dialog = new WizardDialog(Display.getCurrent().getActiveShell(), wizard);
-		return (dialog.open() == Dialog.OK);
+	protected AbstractWizard instantiateWizard() {
+		return new FeatureInterfaceWizard("Build Feature Interfaces", "folder");
 	}
 	
 	@Override
 	protected void endAction() {
-		MPLPlugin.getDefault().buildExtendedModules(projects, 
-				(String) wizard.getData(WizardConstants.KEY_OUT_FOLDER));
+		MPLPlugin.getDefault().buildFeatureInterfaces(projects, 
+				(String) wizard.getData(WizardConstants.KEY_OUT_FOLDER), 
+				(String) wizard.getData(WizardConstants.KEY_OUT_VIEWNAME), 
+				(Integer) wizard.getData(WizardConstants.KEY_OUT_VIEWLEVEL), 
+				(Integer) wizard.getData(WizardConstants.KEY_OUT_CONFIGLIMIT));
+		
 	}
+	
 }
