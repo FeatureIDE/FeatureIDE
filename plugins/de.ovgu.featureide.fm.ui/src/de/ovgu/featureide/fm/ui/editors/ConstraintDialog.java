@@ -82,6 +82,7 @@ import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FunctionalInterfaces.IConsumer;
+import de.ovgu.featureide.fm.core.FunctionalInterfaces.IProvider;
 import de.ovgu.featureide.fm.core.Operator;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.ConstraintTextValidator.ValidationMessage;
@@ -996,7 +997,7 @@ public class ConstraintDialog implements GUIDefaults {
 		this.constraintText.setText(constrainText);
 		this.constraintText.setSelection(constrainText.length());
 	}
-
+	
 	private void setupContentProposal() {
 		try {
 			final KeyStroke keyStroke= KeyStroke.getInstance(StringTable.KEYSTROKE_SHORTCUT_FOR_PROPOSAL);
@@ -1009,44 +1010,8 @@ public class ConstraintDialog implements GUIDefaults {
 	
 			adapter.setAutoActivationDelay(PROPOSAL_AUTO_ACTIVATION_DELAY);
 			adapter.setPopupSize(new Point(250, 85));
-			adapter.setProposalAcceptanceStyle(ContentProposalAdapter.PROPOSAL_IGNORE);
 	
 			adapter.setLabelProvider(new ConstraintProposalLabelProvider());
-			
-			adapter.addContentProposalListener(new IContentProposalListener() {
-				
-				@Override
-				public void proposalAccepted(IContentProposal proposal) {
-					if (constraintText.getText().isEmpty()) {
-						constraintText.setText(proposal.getContent());
-						constraintText.setSelection(proposal.getContent().length());
-					} else {
-						final int lastSelection = constraintText.getSelection().x;
-						
-						if (constraintText.getSelection().x == constraintText.getSelection().y) {
-							// Insert text
-							int wordBeginIndex = 0;
-							for (int index = constraintText.getSelection().x - 1; index >= 0; index--) {
-								if (constraintText.getText().charAt(index) == ' ') {
-									wordBeginIndex = index;
-									break;
-								}
-							}
-							String subText = constraintText.getText().substring(wordBeginIndex, lastSelection);
-							final String completedText = proposal.getContent().substring(subText.length() - 1, proposal.getContent().length());
-							constraintText.setText(constraintText.getText() + completedText);
-							constraintText.setSelection(lastSelection + completedText.length());
-						} else {
-							// Replace text
-							final String replacement = proposal.getContent();
-							final String newConstraintText = constraintText.getText().substring(0, constraintText.getSelection().x) + replacement + constraintText.getText().substring(constraintText.getSelection().y, constraintText.getText().length());
-							constraintText.setText(newConstraintText);
-							constraintText.setSelection(lastSelection + replacement.length());
-						}
-					}
-					
-				}
-			});
 		
 		} catch (ParseException e) {
 			e.printStackTrace();
