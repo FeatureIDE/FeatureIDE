@@ -1,6 +1,0 @@
-concept HelloWorldMPL1 : HelloWorldMPL1 
-	interface IHelloWorldMPL2 hello2 {
-	feature HelloWorldMPL1.World {
-		use hello2;
-	}
-}
