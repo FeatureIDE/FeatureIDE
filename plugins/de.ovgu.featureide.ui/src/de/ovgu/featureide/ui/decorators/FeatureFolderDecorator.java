@@ -32,6 +32,7 @@ import org.eclipse.jface.viewers.LabelProviderChangedEvent;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.listeners.IFeatureFolderListener;
+import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
@@ -58,12 +59,15 @@ public class FeatureFolderDecorator implements ILightweightLabelDecorator, IFeat
 		//decorate only files in our projects
 		IFeatureProject featureProject = CorePlugin.getFeatureProject(folder);
 		if (featureProject == null || featureProject.getSourceFolder() == null || 
-				!featureProject.getSourceFolder().equals(folder.getParent()))
+				!featureProject.getSourceFolder().equals(folder.getParent())) {
 			return;
+		}
 		
 		//handle only not-in-use folders
-		if (featureProject.getFeatureModel().getFeature(folder.getName()).isConcrete())
+		final Feature feature = featureProject.getFeatureModel().getFeature(folder.getName());
+		if (feature == null || feature.isConcrete()) {
 			return;
+		}
 
 		//decorate non-empty not-in-use folders
 		decoration.addOverlay(OVERLAY, IDecoration.TOP_LEFT);
@@ -81,11 +85,7 @@ public class FeatureFolderDecorator implements ILightweightLabelDecorator, IFeat
 	public boolean isLabelProperty(Object element, String property) {
 		return false;
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see de.ovgu.featureide.core.listeners.IFeatureFolderListener#featureFolderChanged(org.eclipse.core.resources.IFolder)
-	 */
+	
 	public void featureFolderChanged(IFolder folder) {
 		LabelProviderChangedEvent event = new LabelProviderChangedEvent(this, folder);
 		for (ILabelProviderListener listener : listenerList) 
