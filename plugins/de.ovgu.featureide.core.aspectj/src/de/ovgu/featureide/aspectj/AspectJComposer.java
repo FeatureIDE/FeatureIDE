@@ -335,7 +335,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 			
 			/** add the new entries **/
 			IClasspathEntry[] entries = new IClasspathEntry[(sourceAdded ? 0 : 1) + 
-				(containerAdded ? 0 : 1) + (containerAdded ? 0 : 1) + oldEntries.length];
+				(containerAdded ? 0 : 1) + (ajContainerAdded ? 0 : 1) + oldEntries.length];
 			System.arraycopy(oldEntries, 0, entries, 0, oldEntries.length);
 			
 			if (!sourceAdded) {
