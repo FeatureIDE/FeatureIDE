@@ -42,8 +42,13 @@ public class ConfigurationWriter {
 		String configSource = writeIntoString(ConfigurationFormat.getFormatByExtension(file.getFileExtension()));
 		InputStream source = new ByteArrayInputStream(configSource.getBytes(Charset.availableCharsets().get("UTF-8")));
 		if (file.exists()) {
+			if (!"UTF-8".equals(file.getCharset())) {
+				file.setContents(new ByteArrayInputStream(new byte[0]), false, true, null);
+				file.setCharset("UTF-8", null);
+			}
 			file.setContents(source, false, true, null);
 		} else {
+			file.setCharset("UTF-8", null);
 			file.create(source, true, null);
 		}
 	}

@@ -22,6 +22,8 @@ package de.ovgu.featureide.fm.core.io.xml;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.Stack;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -34,6 +36,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.Attributes;
+import org.xml.sax.InputSource;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -103,7 +106,9 @@ public class PositionalXMLReader {
                 }
             }
         };
-        parser.parse(is, handler);
+        InputSource inputSource = new InputSource();
+        inputSource.setCharacterStream(new InputStreamReader(is, Charset.availableCharsets().get("UTF-8")));
+        parser.parse(inputSource, handler);
         return doc;
     }
 
