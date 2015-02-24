@@ -299,7 +299,7 @@ public abstract class ErrorPropagation {
 					continue;
 				}
 				int composedLine = m.getComposedLine();
-				if (markerLine >= composedLine && markerLine <= composedLine + (m.getEndLine() - m.getLine())) {
+				if (markerLine >= composedLine && markerLine <= composedLine + m.getMethodLength()) {
 					propagateMarker(marker, m.getFile(), m.getLine() + markerLine - m.getComposedLine());
 					propagated = true;
 					break;

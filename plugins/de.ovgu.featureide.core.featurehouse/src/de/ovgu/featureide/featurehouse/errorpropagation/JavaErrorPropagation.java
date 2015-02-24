@@ -114,54 +114,74 @@ public class JavaErrorPropagation extends ErrorPropagation {
 					method.setLine(line);
 				}
 			} else {
-				String body = method.getBody();
-				while (body.contains("  ")) {
-					body = body.replaceAll("  ", " ");
-				}
-				body = body.replaceAll("\t", "");
-				while (body.contains(" (")) {
-					body = body.replaceAll(" \\(", "(");
-				}
-				if (body.startsWith("public")) {
-					body = body.replaceFirst("public", "");
-				} else if (body.startsWith("protected")) {
-					body = body.replaceFirst("protected", "");
-				}
-				body = body.replaceAll("\r\n", "\n");
-				body = body.replaceAll("original\\(", method.getName() + "(");
-				body = body.replaceAll("original\\s*\\(", method.getName() + " (");
-				StringBuilder stringBuilder = new StringBuilder();
-				int lineCounter = 1;
-				int methodOverhead = 0;
-				boolean found = false;
-				for (String line : content.split("[\n]")) {
-					stringBuilder.append(line);
-					stringBuilder.append("\n");
-					String actualContent = stringBuilder.toString();
-					if (actualContent.replaceAll(REMOVED_LINES_4, "").replaceAll(REMOVED_LINES_2, "").contains(body)) {
-						found = true;
-						if (!actualContent.contains(body)) {
-							if (actualContent.replaceAll(REMOVED_LINES_4, "").contains(body)) {
-								methodOverhead = 4;
-							} else {
-								methodOverhead = 2;
-							}
-						}
-						break;
-					}
-					if (line.startsWith(REMOVED_LINES_4)) {
-						lineCounter += 4;
-					} else if (line.startsWith(REMOVED_LINES_2)) {
-						lineCounter += 2;
-					}
-
-					lineCounter++;
-				}
-				if (found) {
-					method.setLine(lineCounter - (method.getEndLine() - method.getLine() + methodOverhead));
+				boolean success = findComposedLine(method, content, true);
+				if (!success) {
+					findComposedLine(method, content, false);
 				}
 			}
 		}
+	}
+
+	/**
+	 * Sets the composed line for the given method.
+	 * 
+	 * @param method The method
+	 * @param content The composed file content. 
+	 * @param replaceOriginal Defines whether the original call should be replaced by the method call.
+	 * @return <code>true</code> if the composed line was found.
+	 */
+	private boolean findComposedLine(FSTMethod method, final String content, boolean replaceOriginal) {
+		String body = method.getBody();
+		while (body.contains("  ")) {
+			body = body.replaceAll("  ", " ");
+		}
+		body = body.replaceAll("\t", "");
+		while (body.contains(" (")) {
+			body = body.replaceAll(" \\(", "(");
+		}
+		if (body.startsWith("public")) {
+			body = body.replaceFirst("public", "");
+		} else if (body.startsWith("protected")) {
+			body = body.replaceFirst("protected", "");
+		}
+		body = body.replaceAll("\r\n", "\n");
+		if (replaceOriginal) {
+			body = body.replaceAll("original\\(", method.getName() + "(");
+			body = body.replaceAll("original\\s*\\(", method.getName() + " (");
+		}
+		StringBuilder stringBuilder = new StringBuilder();
+		int lineCounter = 1;
+		int methodOverhead = 0;
+		boolean found = false;
+		for (String line : content.split("[\n]")) {
+			stringBuilder.append(line);
+			stringBuilder.append("\n");
+			String actualContent = stringBuilder.toString();
+			if (actualContent.replaceAll(REMOVED_LINES_4, "").replaceAll(REMOVED_LINES_2, "").contains(body)) {
+				found = true;
+				if (!actualContent.contains(body)) {
+					if (actualContent.replaceAll(REMOVED_LINES_4, "").contains(body)) {
+						methodOverhead = 4;
+					} else {
+						methodOverhead = 2;
+					}
+				}
+				break;
+			}
+			if (line.startsWith(REMOVED_LINES_4)) {
+				lineCounter += 4;
+			} else if (line.startsWith(REMOVED_LINES_2)) {
+				lineCounter += 2;
+			}
+
+			lineCounter++;
+			
+		}
+		if (found) {
+			method.setComposedLine(lineCounter - (method.getEndLine() - method.getLine() + methodOverhead));
+		}
+		return found;
+
 	}
 
 	@Override
