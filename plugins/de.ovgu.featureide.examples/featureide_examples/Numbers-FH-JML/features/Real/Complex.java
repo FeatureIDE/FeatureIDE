@@ -107,9 +107,9 @@ public /*@ pure @*/ abstract class Complex {
       @          && this.realPart() == ((Complex)o).realPart()
       @          && this.magnitude() == ((Complex)o).magnitude();
       @*/
-	abstract boolean equals(/*@ nullable @*/ Object o);
+	public abstract boolean equals(/*@ nullable @*/ Object o);
 
     /** Return a hashCode for this number. */
     // specification inherited
-	abstract int hashCode();
+	public abstract int hashCode();
 }
