@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.ui.editors;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -28,6 +29,8 @@ import java.util.Set;
 import org.eclipse.jface.fieldassist.IContentProposal;
 import org.eclipse.jface.fieldassist.IContentProposalProvider;
 
+import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.Features;
 import de.ovgu.featureide.fm.core.Operator;
 
 /**
@@ -38,8 +41,7 @@ import de.ovgu.featureide.fm.core.Operator;
  * @author Florian Proksch
  * @author Stefan Krueger
  */
-public class ConstraintContentProposalProvider implements
-		IContentProposalProvider {
+public class ConstraintContentProposalProvider implements IContentProposalProvider {
 	static final int CURRENT = 0;
 	static final int LAST = 1;
 	private Set<String> features;
@@ -62,44 +64,31 @@ public class ConstraintContentProposalProvider implements
 	 */
 	public IContentProposal[] getProposals(String contents, int position) {
 
-		
 		String[] words = getWords(contents, position);
-		
+
 		List<ContentProposal> proposalList = getProposalList(words, contents);
 
-
-		return proposalList
-				.toArray(new IContentProposal[proposalList.size()]);
+		return proposalList.toArray(new IContentProposal[proposalList.size()]);
 
 	}
 
 	/**
-	 *  @return all possible feature names or junctors.
-	 *  @param words
-	 *  		current and previous word of edited string
-	 *  @param contents
-	 *  		complete string being edited
+	 * @return all possible feature names or junctors.
+	 * @param words
+	 *            current and previous word of edited string
+	 * @param contents
+	 *            complete string being edited
 	 * 
 	 */
 	private List<ContentProposal> getProposalList(String[] words, String contents) {
-		List<ContentProposal> proposalList = new ArrayList<ContentProposal>();	
-			
-		boolean caught = false;
-		for (String feature: features) {
-			if (Operator.isOperatorName(feature)||(feature.contains(" ") && feature.toLowerCase().startsWith(contents.substring(contents.lastIndexOf('"') + 1).toLowerCase()))) {
-				proposalList.add(new ContentProposal("\"" + feature + "\""));
-				caught = true;
-			}
-		}
-		if (!caught) {
-			if ("(".equals(words[CURRENT]) || " ".equals(words[CURRENT]) || "".equals(words[CURRENT])) {
-				proposalList = getProposalList(words[LAST], features);	
-			} else {
-				for (ContentProposal proposal : getProposalList(words[LAST], features)) {
-					if (proposal.getContent().length() > words[CURRENT].trim().length()
-							&& proposal.getContent().substring(0, words[CURRENT].trim().length()).equalsIgnoreCase(words[CURRENT].trim())) {
-						proposalList.add(proposal);
-					} 
+		List<ContentProposal> proposalList = new ArrayList<ContentProposal>();
+
+		if ("(".equals(words[CURRENT]) || " ".equals(words[CURRENT]) || "".equals(words[CURRENT])) {
+			proposalList = getProposalList(words[LAST], features);
+		} else {
+			for (ContentProposal proposal : getProposalList(words[LAST], features)) {
+				if (proposal.getContent().length() > words[CURRENT].trim().length() && proposal.getContent().substring(0, words[CURRENT].trim().length()).equalsIgnoreCase(words[CURRENT].trim())) {
+					proposalList.add(proposal);
 				}
 			}
 		}
@@ -149,20 +138,19 @@ public class ConstraintContentProposalProvider implements
 		}
 
 		if (words[LAST].trim().startsWith("(") && words[LAST].length() > 1) {
-			words[LAST] = words[LAST].substring(words[LAST].indexOf('(')+1);
+			words[LAST] = words[LAST].substring(words[LAST].indexOf('(') + 1);
 
 		}
 		if (words[CURRENT].trim().startsWith("(")) {
-			words[CURRENT]=words[CURRENT].trim();
+			words[CURRENT] = words[CURRENT].trim();
 			words[CURRENT] = words[CURRENT].substring(1);
 			words[LAST] = "(";
 		}
 		if (words[LAST].endsWith(")")) {
 			words[LAST] = ")";
-			if(contents.charAt(posMarker)==')'){
+			if (contents.charAt(posMarker) == ')') {
 				words[LAST] = ") ";
 			}
-
 
 		}
 		if (words[CURRENT].endsWith(")")) {
@@ -177,49 +165,33 @@ public class ConstraintContentProposalProvider implements
 	/**
 	 * 
 	 * @param wordBefore
-	 * 			
+	 * 
 	 * @param features
-	 * 			set of features
-	 * @return 
-	 * 		List of proposals, either operators or feature names
+	 *            set of features
+	 * @return List of proposals, either operators or feature names
 	 */
-	private static List<ContentProposal> getProposalList(String wordBefore,
-			Set<String> features) {
+	private static List<ContentProposal> getProposalList(String wordBefore, Set<String> features) {
 
 		ArrayList<ContentProposal> proposals = new ArrayList<ContentProposal>();
 		ArrayList<String> featureList = new ArrayList<String>(features);
 		Collections.sort(featureList, String.CASE_INSENSITIVE_ORDER);
 		
-		if (wordBefore.trim().isEmpty())
-			proposeNotAndFeatuers(proposals, featureList);
-		else if (") ".equals(wordBefore) || features.contains(wordBefore.trim()) || wordBefore.trim().endsWith("\"") || wordBefore.trim().isEmpty()) {
-			proposeBinaryOperators(proposals);
-		} else if(!")".equals(wordBefore)){
-			proposeNotAndFeatuers(proposals, featureList);
-		}
+		Collection<String> operatorNamesInFeatures = Features.extractOperatorNamesFromFeatuers(features);
+
+		// TODO: This is buggy!
+		//if (") ".equals(wordBefore) || features.contains(wordBefore.trim()) || wordBefore.trim().endsWith("\"") || wordBefore.trim().isEmpty()) {
+			proposals.add(new ContentProposal("and"));
+			proposals.add(new ContentProposal("iff"));
+			proposals.add(new ContentProposal("implies"));
+			proposals.add(new ContentProposal("or"));
+
+			//} else if (!")".equals(wordBefore)) { 
+			proposals.add(new ContentProposal("not"));
+
+			for (String s : featureList) {
+				proposals.add(new ContentProposal(s  + (operatorNamesInFeatures.contains(s.trim().toLowerCase()) ? " " + Features.FEATURE_SUFFIX : "")));
+			}
+			//}
 		return proposals;
 	}
-
-	private static void proposeBinaryOperators(ArrayList<ContentProposal> proposals) {
-		proposals.add(new ContentProposal("and"));
-		proposals.add(new ContentProposal("iff"));
-		proposals.add(new ContentProposal("implies"));
-		proposals.add(new ContentProposal("or"));
-		proposals.add(new ContentProposal("("));
-		proposals.add(new ContentProposal(")"));
-	}
-
-	private static void proposeNotAndFeatuers(ArrayList<ContentProposal> proposals, ArrayList<String> featureList) {
-		proposals.add(new ContentProposal("not"));
-		proposals.add(new ContentProposal("("));
-		proposals.add(new ContentProposal(")"));
-
-		for (String s : featureList) {
-			if (s.contains(" "))
-				proposals.add(new ContentProposal("\"" + s + "\""));
-			else 
-				proposals.add(new ContentProposal(s));
-		}
-	}
-
 }

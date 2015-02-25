@@ -79,6 +79,7 @@ import org.prop4j.NodeReader;
 import org.prop4j.NodeWriter;
 
 import de.ovgu.featureide.fm.core.Constraint;
+import de.ovgu.featureide.fm.core.Constraints;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FunctionalInterfaces.IConsumer;
@@ -534,7 +535,7 @@ public class ConstraintDialog implements GUIDefaults {
 			defaultDetailsText = StringTable.DEFAULT_DETAILS_EDIT_CONSTRAINT;
 			defaultHeaderText = StringTable.DEFAULT_HEADER_EDIT_CONSTRAINT;
 
-			initialConstraint = constraint.getNode().toString(NodeWriter.textualSymbols);
+			initialConstraint = Constraints.autoQuote(constraint);
 
 			mode = Mode.UPDATE;
 		}
@@ -991,7 +992,8 @@ public class ConstraintDialog implements GUIDefaults {
 	}
 
 	public void setInputText(String text) {
-		String constrainText = text.trim().contains(" ") ? "\"" + text.trim() + "\"" : text.trim();
+		final String input = text.trim();
+		String constrainText = Operator.isOperatorName(input) || input.contains(" ") ? "\"" + input + "\"" : input;
 		constrainText += " ";
 		
 		this.constraintText.setText(constrainText);
