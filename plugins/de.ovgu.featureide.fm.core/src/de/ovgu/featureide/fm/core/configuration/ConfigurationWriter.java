@@ -32,6 +32,7 @@ import org.eclipse.core.runtime.CoreException;
  */
 public class ConfigurationWriter {
 
+	private static final String DEFAULT_CHARSET = "UTF-8";
 	private Configuration configuration;
 
 	public ConfigurationWriter(Configuration configuration) {
@@ -40,16 +41,16 @@ public class ConfigurationWriter {
 
 	public void saveToFile(IFile file) throws CoreException {
 		String configSource = writeIntoString(ConfigurationFormat.getFormatByExtension(file.getFileExtension()));
-		InputStream source = new ByteArrayInputStream(configSource.getBytes(Charset.availableCharsets().get("UTF-8")));
+		InputStream source = new ByteArrayInputStream(configSource.getBytes(Charset.availableCharsets().get(DEFAULT_CHARSET)));
 		if (file.exists()) {
-			if (!"UTF-8".equals(file.getCharset())) {
+			if (!DEFAULT_CHARSET.equals(file.getCharset())) {
 				file.setContents(new ByteArrayInputStream(new byte[0]), false, true, null);
-				file.setCharset("UTF-8", null);
+				file.setCharset(DEFAULT_CHARSET, null);
 			}
 			file.setContents(source, false, true, null);
 		} else {
-			file.setCharset("UTF-8", null);
 			file.create(source, true, null);
+			file.setCharset(DEFAULT_CHARSET, null);
 		}
 	}
 
