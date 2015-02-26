@@ -25,6 +25,7 @@ import java.util.WeakHashMap;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IStatus;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
@@ -115,14 +116,15 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	public boolean supportsAndroid() {
 		return defaultComposerExtensionClass.supportsAndroid();
 	}
-
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionBase#supportsMigration()
-	 */
+	
 	@Override
-	public boolean supportsMigration()
-	{
+	public boolean supportsMigration() {
 		return defaultComposerExtensionClass.supportsMigration();
+	}
+	
+	@Override
+	public IStatus isComposable() {
+		return defaultComposerExtensionClass.isComposable();
 	}
 
 }

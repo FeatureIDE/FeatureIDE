@@ -1077,10 +1077,8 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 			final ComposerExtensionManager composerManagerInstance = ComposerExtensionManager.getInstance();
 			composerExtension = composerManagerInstance.getComposerById(this, compositionToolID);
-			if (composerExtension != null) {
+			if(composerExtension != null){
 				((ComposerExtensionClass) composerExtension).initialize(this);
-			} else {
-				CorePlugin.getDefault().logError(new Exception("No composer could be created for ID " + compositionToolID));
 			}
 		}
 		return composerExtension;

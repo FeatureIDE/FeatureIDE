@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 
-import org.eclipse.core.internal.runtime.InternalPlatform;
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -40,14 +39,15 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.core.ClasspathEntry;
 import org.eclipse.jdt.internal.core.JavaProject;
-import org.osgi.framework.Bundle;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
@@ -69,9 +69,9 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 @SuppressWarnings("restriction")
 public class AspectJComposer extends ComposerExtensionClass {
 	private static final String PLUGIN_ID = "org.eclipse.ajdt";
-	private static final String PLUGIN_WARNING = "The required bundle "+PLUGIN_ID+" is not installed.";
+	private static final String PLUGIN_WARNING = "The required bundle " + PLUGIN_ID + " is not installed.";
 	private static final String ASPECTJ_NATURE = "org.eclipse.ajdt.ui.ajnature";
-	
+
 	private static final String NEW_ASPECT = "\t// TODO Auto-generated aspect" + NEWLINE;
 
 	public static final IPath ASPECTJRT_CONTAINER = new Path("org.eclipse.ajdt.core.ASPECTJRT_CONTAINER");
@@ -83,15 +83,15 @@ public class AspectJComposer extends ComposerExtensionClass {
 	private LinkedList<String> unSelectedFeatures;
 	private FeatureModel featureModel;
 	private boolean hadAspectJNature;
-	
+
 	private static final LinkedHashSet<String> EXTENSIONS = createExtensions();
-	
+
 	private static LinkedHashSet<String> createExtensions() {
 		LinkedHashSet<String> extensions = new LinkedHashSet<String>();
 		extensions.add("java");
 		return extensions;
-	}  
-	
+	}
+
 	@Override
 	public LinkedHashSet<String> extensions() {
 		return EXTENSIONS;
@@ -102,20 +102,24 @@ public class AspectJComposer extends ComposerExtensionClass {
 		if (config == null) {
 			return;
 		}
-		assert(featureProject != null) : "Invalid project given";
-		if(!isPluginInstalled(PLUGIN_ID)){
-			featureProject.createBuilderMarker(featureProject.getProject(), PLUGIN_WARNING, -1, IMarker.SEVERITY_ERROR);
+		assert (featureProject != null) : "Invalid project given";
+		IStatus stat;
+		if ((stat = isComposable()) == Status.OK_STATUS) {
+			for (IStatus child : stat.getChildren()) {
+				featureProject.createBuilderMarker(featureProject.getProject(), child.getMessage(), -1, IMarker.SEVERITY_ERROR);
+			}
+			featureProject.createBuilderMarker(featureProject.getProject(), stat.getMessage(), -1, IMarker.SEVERITY_ERROR);
 		}
-		
-		final String configPath =  config.getRawLocation().toOSString();
+
+		final String configPath = config.getRawLocation().toOSString();
 		final String outputPath = featureProject.getBuildPath();
-		
+
 		if (configPath == null || outputPath == null)
 			return;
-		
+
 		Configuration configuration = new Configuration(featureProject.getFeatureModel());
 		ConfigurationReader reader = new ConfigurationReader(configuration);
-		
+
 		try {
 			reader.readFromFile(config);
 		} catch (CoreException e) {
@@ -133,30 +137,20 @@ public class AspectJComposer extends ComposerExtensionClass {
 				unSelectedFeatures.add(feature.getName());
 			}
 		}
-		
+
 		IProject project = config.getProject();
 		setBuildpaths(project);
 		try {
 			project.refreshLocal(IResource.DEPTH_INFINITE, null);
-			featureProject.getProject().build(IncrementalProjectBuilder.FULL_BUILD,	null);
+			featureProject.getProject().build(IncrementalProjectBuilder.FULL_BUILD, null);
 		} catch (CoreException e) {
 			AspectJCorePlugin.getDefault().logError(e);
 		}
 	}
 
-
-
-
-
-	public boolean isPluginInstalled(String ID) {
-		for(Bundle b :InternalPlatform.getDefault().getBundleContext().getBundles()){
-			if(b.getSymbolicName().startsWith(ID))return true;
-		}
-		return false;
-	}
-	
 	/**
 	 * Set the unselected aspects to be excluded from build
+	 * 
 	 * @param project
 	 */
 	private void setBuildpaths(IProject project) {
@@ -166,7 +160,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 		} else {
 			buildPath = featureProject.getBuildPath();
 		}
-		
+
 		try {
 			JavaProject javaProject = new JavaProject(project, null);
 			IClasspathEntry[] oldEntries = javaProject.getRawClasspath();
@@ -179,7 +173,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 					return;
 				}
 			}
-			
+
 			/** add the new entry **/
 			IClasspathEntry[] entries = new IClasspathEntry[oldEntries.length + 1];
 			System.arraycopy(oldEntries, 0, entries, 0, oldEntries.length);
@@ -189,22 +183,21 @@ public class AspectJComposer extends ComposerExtensionClass {
 			CorePlugin.getDefault().logError(e);
 		}
 	}
-	
+
 	/**
 	 * Set the unselected aspect files to be excluded
+	 * 
 	 * @param e The ClasspathEntry to set
 	 * @return The set entry
 	 */
 	private IClasspathEntry setSourceEntry(IClasspathEntry e) {
-		IPath[] excludedAspects = new IPath[unSelectedFeatures.size()];  
+		IPath[] excludedAspects = new IPath[unSelectedFeatures.size()];
 		int i = 0;
 		for (String f : unSelectedFeatures) {
 			excludedAspects[i++] = new Path(f.replaceAll("_", "/") + ".aj");
 		}
-		return new ClasspathEntry(e.getContentKind(), e.getEntryKind(), 
-				e.getPath(), e.getInclusionPatterns(), excludedAspects, 
-				e.getSourceAttachmentPath(), e.getSourceAttachmentRootPath(), null, 
-				e.isExported(), e.getAccessRules(), e.combineAccessRules(), e.getExtraAttributes());
+		return new ClasspathEntry(e.getContentKind(), e.getEntryKind(), e.getPath(), e.getInclusionPatterns(), excludedAspects, e.getSourceAttachmentPath(),
+				e.getSourceAttachmentRootPath(), null, e.isExported(), e.getAccessRules(), e.combineAccessRules(), e.getExtraAttributes());
 	}
 
 	@Override
@@ -214,15 +207,15 @@ public class AspectJComposer extends ComposerExtensionClass {
 
 	@Override
 	public void copyNotComposedFiles(Configuration config, IFolder destination) {
-		
+
 	}
-	
+
 	/**
 	 * Source files must not set derived.
 	 */
 	@Override
 	public void postCompile(IResourceDelta delta, IFile buildFile) {
-		
+
 	}
 
 	@Override
@@ -249,7 +242,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 		if (project.getFeatureModel() == null) {
 			return;
 		}
-		featureModel = project.getFeatureModel(); 
+		featureModel = project.getFeatureModel();
 		try {
 			if (addAspects(project.getBuildFolder(), "")) {
 				featureModel.getRoot().removeChild(featureModel.getFeature("Base"));
@@ -271,7 +264,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 		boolean hasAspects = false;
 		for (IResource res : folder.members()) {
 			if (res instanceof IFolder) {
-				hasAspects = addAspects((IFolder)res, folders + res.getName() + "_");
+				hasAspects = addAspects((IFolder) res, folders + res.getName() + "_");
 			} else if (res instanceof IFile) {
 				String name = res.getName();
 				if (name.endsWith(".aj")) {
@@ -289,8 +282,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 	}
 
 	@Override
-	public void addCompiler(IProject project, String sourcePath,
-			String configPath, String buildPath) {
+	public void addCompiler(IProject project, String sourcePath, String configPath, String buildPath) {
 		addNatures(project);
 		addClasspathFile(project, buildPath);
 	}
@@ -303,7 +295,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 				buildPath = featureProject.getBuildPath();
 			}
 		}
-		
+
 		try {
 			JavaProject javaProject = new JavaProject(project, null);
 			IClasspathEntry[] oldEntries = javaProject.getRawClasspath();
@@ -324,7 +316,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 					if (oldEntries[i].getPath().equals(ASPECTJRT_CONTAINER)) {
 						ajContainerAdded = true;
 					}
-					
+
 				}
 			}
 			/** case: no new entries **/
@@ -332,12 +324,11 @@ public class AspectJComposer extends ComposerExtensionClass {
 				javaProject.setRawClasspath(oldEntries, null);
 				return;
 			}
-			
+
 			/** add the new entries **/
-			IClasspathEntry[] entries = new IClasspathEntry[(sourceAdded ? 0 : 1) + 
-				(containerAdded ? 0 : 1) + (ajContainerAdded ? 0 : 1) + oldEntries.length];
+			IClasspathEntry[] entries = new IClasspathEntry[(sourceAdded ? 0 : 1) + (containerAdded ? 0 : 1) + (ajContainerAdded ? 0 : 1) + oldEntries.length];
 			System.arraycopy(oldEntries, 0, entries, 0, oldEntries.length);
-			
+
 			if (!sourceAdded) {
 				entries[oldEntries.length] = getSourceEntry(buildPath);
 			}
@@ -359,9 +350,8 @@ public class AspectJComposer extends ComposerExtensionClass {
 	 * @return The ClasspathEnttry for the AspectJ container
 	 */
 	private IClasspathEntry getAJContainerEntry() {
-		return new ClasspathEntry(IPackageFragmentRoot.K_SOURCE, 
-				IClasspathEntry.CPE_CONTAINER, ASPECTJRT_CONTAINER, 
-				new IPath[0], new IPath[0], null, null, null, false, null, false, new IClasspathAttribute[0]);
+		return new ClasspathEntry(IPackageFragmentRoot.K_SOURCE, IClasspathEntry.CPE_CONTAINER, ASPECTJRT_CONTAINER, new IPath[0], new IPath[0], null, null,
+				null, false, null, false, new IClasspathAttribute[0]);
 	}
 
 	private void addNatures(IProject project) {
@@ -369,7 +359,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 			if (!project.isAccessible()) {
 				return;
 			}
-			
+
 			int i = 2;
 			if (project.hasNature(JAVA_NATURE)) {
 				i--;
@@ -394,7 +384,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 				}
 			}
 			description.setNatureIds(newNatures);
-			
+
 			/** the java builder has to be replaced with the AspectJ builder **/
 			ICommand[] buildSpec = description.getBuildSpec();
 			if (buildSpec.length > 0) {
@@ -411,7 +401,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 				}
 				description.setBuildSpec(newBuildSpec);
 			}
-			
+
 			project.setDescription(description, null);
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
@@ -422,18 +412,18 @@ public class AspectJComposer extends ComposerExtensionClass {
 	public ArrayList<String[]> getTemplates() {
 		return TEMPLATES;
 	}
-	
+
 	private static final ArrayList<String[]> TEMPLATES = createTemplates();
 
 	// TODO add aspect template
 	private static ArrayList<String[]> createTemplates() {
-		 ArrayList<String[]> list = new  ArrayList<String[]>(1);
-		 list.add(JAVA_TEMPLATE);
-		 return list;
+		ArrayList<String[]> list = new ArrayList<String[]>(1);
+		list.add(JAVA_TEMPLATE);
+		return list;
 	}
 
 	private String rootName = "";
-	
+
 	@Override
 	public void postModelChanged() {
 		try {
@@ -468,7 +458,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 		String text = aspect.split("[_]")[0];
 		if (aspect.contains("_")) {
 			if (aspectPackage == null) {
-				aspectPackage = text; 
+				aspectPackage = text;
 			} else {
 				aspectPackage = aspectPackage + "." + text;
 			}
@@ -481,7 +471,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 		}
 		return folder.getFile(text + ".aj");
 	}
- 
+
 	private void createAspect(String aspect, IFolder folder, String aspectPackage) {
 		IFile aspectFile = getAspectFile(aspect, aspectPackage, folder);
 		if (aspectPackage == null && aspect.contains("_")) {
@@ -491,17 +481,9 @@ public class AspectJComposer extends ComposerExtensionClass {
 		if (!aspectFile.exists()) {
 			String fileText;
 			if (aspectPackage != null) {
-				fileText = NEWLINE +
-						   "package " + aspectPackage + ";" + NEWLINE +
-						   NEWLINE +
-						   "public aspect " + aspect + " {" + NEWLINE + 
-						   NEW_ASPECT +
-						   "}"; 
+				fileText = NEWLINE + "package " + aspectPackage + ";" + NEWLINE + NEWLINE + "public aspect " + aspect + " {" + NEWLINE + NEW_ASPECT + "}";
 			} else {
-				fileText = NEWLINE +
-						   "public aspect " + aspect + " {" + NEWLINE + 
-						   NEW_ASPECT +
-						   "}"; 
+				fileText = NEWLINE + "public aspect " + aspect + " {" + NEWLINE + NEW_ASPECT + "}";
 			}
 			InputStream source = new ByteArrayInputStream(fileText.getBytes(Charset.availableCharsets().get("UTF-8")));
 			try {
@@ -511,13 +493,13 @@ public class AspectJComposer extends ComposerExtensionClass {
 				// avoid resource already exists error
 				// has no negative effect
 			}
-			
+
 		}
 	}
 
 	public static void createFolder(IFolder folder) throws CoreException {
 		if (!folder.exists()) {
-			createFolder((IFolder)folder.getParent());
+			createFolder((IFolder) folder.getParent());
 			folder.create(true, true, null);
 		}
 	}
@@ -534,16 +516,20 @@ public class AspectJComposer extends ComposerExtensionClass {
 
 	@Override
 	public Mechanism getGenerationMechanism() {
-	    return IComposerExtensionClass.Mechanism.ASPECT_ORIENTED_PROGRAMMING;
+		return IComposerExtensionClass.Mechanism.ASPECT_ORIENTED_PROGRAMMING;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionBase#supportsMigration()
-	 */
 	@Override
-	public boolean supportsMigration()
-	{
+	public boolean supportsMigration() {
 		return false;
+	}
+
+	@Override
+	public IStatus isComposable() {
+		if (!isPluginInstalled(PLUGIN_ID)) {
+			return new Status(Status.ERROR, AspectJCorePlugin.PLUGIN_ID, Status.WARNING, PLUGIN_WARNING, null);
+		}
+		return super.isComposable();
 	}
 
 }

@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.core.builder;
 
+import org.eclipse.core.runtime.IStatus;
+
 import de.ovgu.featureide.core.IExtension;
 
 /**
@@ -78,4 +80,10 @@ public interface IComposerExtensionBase extends IExtension {
 	 * @see de.ovgu.featureide.ui.variantimport.SPLMigrationWizard
 	 */
 	boolean supportsMigration();
+	
+	
+	/**
+	 * @return whether all dependencies are fulfilled to use this composer
+	 */
+	IStatus isComposable();
 }

@@ -1,13 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 	<featureModel chosenLayoutAlgorithm="1">
 		<struct>
-			<and abstract="true" mandatory="true" name="HelloWorldMPL2">
-				<feature mandatory="true" name="Hello"/>
-				<alt abstract="true" name="Feature">
-					<feature mandatory="true" name="Wonderful"/>
-					<feature mandatory="true" name="Beautiful"/>
-				</alt>
-				<feature mandatory="true" name="World"/>
+			<and abstract="true" mandatory="true" name="HelloWorldMPL">
+				<feature name="Greetings"/>
 			</and>
 		</struct>
 		<constraints/>
