@@ -22,16 +22,11 @@ package de.ovgu.featureide.core.builder;
 
 import java.util.List;
 
-import org.eclipse.core.resources.ICommand;
-import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.ExtensionPointManager;
 import de.ovgu.featureide.core.IFeatureProject;
-
 
 /**
  * Manages the FeatureIDE extensions to compose features.
@@ -47,23 +42,22 @@ public class ComposerExtensionManager extends ExtensionPointManager<IComposerExt
 	ComposerExtensionManager() {
 		super(CorePlugin.PLUGIN_ID, IComposerExtension.extensionPointID);
 	}
-	
+
 	public static ComposerExtensionManager getInstance() {
 		return instance;
 	}
 
 	@Override
-	protected IComposerExtension parseExtension(
-			IConfigurationElement configurationElement) {
+	protected IComposerExtension parseExtension(IConfigurationElement configurationElement) {
 		if (!IComposerExtension.extensionID.equals(configurationElement.getName()))
 			return null;
 		return new ComposerExtensionProxy(configurationElement);
 	}
-	
+
 	public List<IComposerExtension> getComposers() {
 		return getProviders();
 	}
-	
+
 	/**
 	 * Gets a composer by an ID
 	 * 
@@ -73,24 +67,20 @@ public class ComposerExtensionManager extends ExtensionPointManager<IComposerExt
 	public IComposerExtensionClass getComposerById(IFeatureProject featureProject, String composerID) {
 		for (IComposerExtension tool : getComposers()) {
 			if (tool.getId().equals(composerID)) {
-				return tool.getComposerByProject(featureProject);	
+				return tool.getComposerByProject(featureProject);
 			}
 		}
 		return null;
 	}
-	
-	public IStatus isComposerInstalled(IProjectDescription desc){		
-		for (ICommand iCommand : desc.getBuildSpec()) {
-			if(iCommand.getBuilderName().compareTo("de.ovgu.featureide.core.extensibleFeatureProjectBuilder") == 0){
-				String composerName = iCommand.getArguments().get("composer");
-				for (IComposerExtension tool : getComposers()) {
-					if(tool.getId().equals(composerName)){
-						return tool.getComposerByProject(null).areDependentPluginsInstalled(desc);
-					}
-				}
-				return new Status(Status.ERROR, "unknown", Status.ERROR, "The required composer "+composerName+" is not supported.", null);
+
+	public IComposerExtension getComposerById(String composerID) {
+		for (IComposerExtension tool : getComposers()) {
+			if (tool.getId().equals(composerID)) {
+				return tool;
 			}
 		}
-		return new Status(Status.ERROR, "unknown", Status.ERROR, "The description does not contain a composer ID.", null);
-	}	
+		CorePlugin.getDefault().logWarning("The required composer " + composerID + " is not available.");
+		return null;
+	}
+	
 }

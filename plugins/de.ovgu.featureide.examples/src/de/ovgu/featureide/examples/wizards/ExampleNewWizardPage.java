@@ -26,7 +26,9 @@ import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -94,6 +96,7 @@ import org.eclipse.ui.actions.WorkspaceModifyOperation;
 import org.eclipse.ui.dialogs.IOverwriteQuery;
 import org.eclipse.ui.wizards.datatransfer.ImportOperation;
 
+import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.builder.ComposerExtensionManager;
 import de.ovgu.featureide.core.builder.IComposerExtension;
 import de.ovgu.featureide.core.builder.IComposerExtensionBase;
@@ -109,7 +112,7 @@ import de.ovgu.featureide.examples.utils.ZipStructureProvider;
  */
 public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery {
 
-	private class ItemAccessCheckboxTreeViewer extends CheckboxTreeViewer{
+	private class ItemAccessCheckboxTreeViewer extends CheckboxTreeViewer {
 
 		/**
 		 * @param parent
@@ -118,68 +121,55 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 		public ItemAccessCheckboxTreeViewer(Composite parent, int style) {
 			super(parent, style);
 		}
-		
-		public TreeItem findTreeItem(Object element){
-			 Widget widget = findItem(element);
-		     if (widget instanceof TreeItem) {
-		    	 return (TreeItem) widget;
-		     }
-		     return null;
+
+		public TreeItem findTreeItem(Object element) {
+			Widget widget = findItem(element);
+			if (widget instanceof TreeItem) {
+				return (TreeItem) widget;
+			}
+			return null;
 		}
-		
+
 		public void refresh() {
+			// Save selected and expanded elements;
+			final Set<Object> checkedElements = new HashSet<>(Arrays.asList(getCheckedElements()));
+			final Set<Object> expandedElements = new HashSet<>(Arrays.asList(getExpandedElements()));
 			
-//			if(!searchFeatureText.getText().equals(FILTERTEXT)){
-				//Save selected and expanded elements;
-				Object[] checkedElements = this.getCheckedElements();
-				Object[] expandedElement = this.getExpandedElements();
-				ArrayList<Object> listOfCheckedElement = new ArrayList<Object>();
-				ArrayList<Object> listOfExpandedElements = new ArrayList<Object>();
-				for (Object object : checkedElements) {
-					listOfCheckedElement.add(object);
-				}
-				for (Object object : expandedElement) {
-					listOfExpandedElements.add(object);
-				}
-				getTree().setRedraw(false);
-				
-				//update tree and load all elements regarding the filter
-				super.refresh();
-				expandAll();
-				collapseAll();
-				
-				//reset all selected and expanded elements
-				for (TreeItem parentItems : getTree().getItems()) {
-					if(parentItems.getData() instanceof String){		
-						if(listOfExpandedElements.contains(parentItems.getData())){
-							parentItems.setExpanded(true);
-						}
-						for(TreeItem currItem : parentItems.getItems()){
-							if(currItem.getData() instanceof ProjectRecord ){
-								ProjectRecord tmpRecord = (ProjectRecord) currItem.getData();
-								if(tmpRecord.hasErrors()){
-									currItem.setForeground(red);
-								} else if(tmpRecord.hasWarnings()){
-									currItem.setForeground(gray);
-								} else {
-									currItem.setForeground(black);
-								}
-								if(listOfCheckedElement.contains(tmpRecord)){
-									currItem.setChecked(true);
-								}
+			getTree().setRedraw(false);
+
+			//update tree and load all elements regarding the filter
+			super.refresh();
+			expandAll();
+			collapseAll();
+
+			//reset all selected and expanded elements
+			for (TreeItem parentItems : getTree().getItems()) {
+				if (parentItems.getData() instanceof String) {
+					if (expandedElements.contains(parentItems.getData())) {
+						parentItems.setExpanded(true);
+					}
+					for (TreeItem currItem : parentItems.getItems()) {
+						if (currItem.getData() instanceof ProjectRecord) {
+							ProjectRecord tmpRecord = (ProjectRecord) currItem.getData();
+							if (tmpRecord.hasErrors()) {
+								currItem.setForeground(red);
+							} else if (tmpRecord.hasWarnings()) {
+								currItem.setForeground(gray);
+							} else {
+								currItem.setForeground(black);
+							}
+							if (checkedElements.contains(tmpRecord)) {
+								currItem.setChecked(true);
 							}
 						}
 					}
 				}
-				getTree().setRedraw(true);
-//			} else {
-//				super.refresh();
-//			}
-//			
-		} 
-		
+			}
+			getTree().setRedraw(true);		
+		}
+
 	}
-	
+
 	private class ExampleProjectFilter extends ViewerFilter {
 
 		private String searchText = null;
@@ -203,10 +193,10 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 		}
 
 	}
-	
+
 	protected static final Color gray = new Color(null, 140, 140, 140);
 	protected static final Color red = new Color(null, 240, 0, 0);
-	protected static final Color black = new Color(null, 0,0,0);
+	protected static final Color black = new Color(null, 0, 0, 0);
 
 	/**
 	 * The name of the folder containing metadata information for the workspace.
@@ -234,7 +224,6 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 
 	private static final String CHILD_WARNING = "It was not possible to sellect all projects. "
 			+ "If a project only rely in a warning, it is possible to do a manually selection. ";
-	
 
 	private Thread updateProjects;
 
@@ -292,7 +281,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 			@Override
 			public void handleEvent(Event event) {
 				setMessage("");
-				
+
 				if (FILTERTEXT.equals(searchFeatureText.getText())) {
 					searchFeatureText.setText("");
 				}
@@ -414,30 +403,30 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 				if (event.getElement() instanceof String) {
 					for (ProjectRecord tmpRecord : compTable.get((String) event.getElement())) {
 						final boolean isChecked = projectsList.getChecked((String) event.getElement());
-						
-						if(isChecked == false){
+
+						if (isChecked == false) {
 							projectsList.setChecked(tmpRecord, isChecked);
 						} else {
 							if (tmpRecord.hasErrors() || tmpRecord.hasWarnings()) {
 								projectsList.setChecked(tmpRecord, false);
 								setMessage(CHILD_WARNING, INFORMATION);
-							} else{
+							} else {
 								projectsList.setChecked(tmpRecord, true);
 							}
 						}
 					}
-				} else if(event.getElement() instanceof ProjectRecord) {
+				} else if (event.getElement() instanceof ProjectRecord) {
 					ProjectRecord tmpRecord = (ProjectRecord) event.getElement();
 					if (tmpRecord.hasErrors()) {
 						projectsList.setChecked(tmpRecord, false);
-					} 
-					if(projectsList.getChecked(event.getElement())){
+					}
+					if (projectsList.getChecked(event.getElement())) {
 						projectsList.findTreeItem(event.getElement()).getParentItem().setChecked(true);
 					}
 				}
-				
+
 				projectsList.setSelection(new StructuredSelection(event.getElement()));
-				
+
 				determineAndSetPageComplete();
 			}
 		});
@@ -450,32 +439,32 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 						if (iss.getFirstElement() instanceof String) {
 							descBox.setText("");
 							setMessage("");
-							
+
 							TreeItem treeItem = projectsList.findTreeItem(iss.getFirstElement());
 							boolean allProjectsSelected = true;
 							for (TreeItem currItem : treeItem.getItems()) {
-								if(currItem.getData() instanceof ProjectRecord){
+								if (currItem.getData() instanceof ProjectRecord) {
 									ProjectRecord project = ((ProjectRecord) currItem.getData());
-									if(currItem.getChecked() && project.hasWarnings()){
+									if (currItem.getChecked() && project.hasWarnings()) {
 										setMessage("Projects with warnings are selected.", WARNING);
 										allProjectsSelected = true;
 										break;
 									}
-									if(!currItem.getChecked() && !project.hasErrors()){
+									if (!currItem.getChecked() && !project.hasErrors()) {
 										allProjectsSelected = false;
 									}
 								}
 							}
-							if(!allProjectsSelected && treeItem.getChecked()){
+							if (!allProjectsSelected && treeItem.getChecked()) {
 								setMessage("Not all project selected.", INFORMATION);
 							}
 						} else if (iss.getFirstElement() instanceof ProjectRecord) {
 							ProjectRecord tmpRecord = (ProjectRecord) iss.getFirstElement();
 							if (tmpRecord != null) {
 								descBox.setText(tmpRecord.getDescription());
-								if(tmpRecord.hasErrors()){
+								if (tmpRecord.hasErrors()) {
 									setMessage(tmpRecord.getErrorText(), ERROR);
-								}else if (tmpRecord.hasWarnings()) {
+								} else if (tmpRecord.hasWarnings()) {
 									setMessage(tmpRecord.getWarningText(), WARNING);
 								} else {
 									setMessage("");
@@ -515,7 +504,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 		descBox.setLayoutData(dbDG);
 
 	}
-	
+
 	private void determineAndSetPageComplete() {
 		for (Object obj : projectsList.getCheckedElements()) {
 			if (obj instanceof ProjectRecord) {
@@ -665,20 +654,20 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 
 	private void selectAllElementsWithoutWarningsOrErrors() {
 		boolean errorOrWarningExist = false;
-		
+
 		TreeItem[] parentItems = projectsList.getTree().getItems();
 		for (TreeItem currPItem : parentItems) {
-			if(currPItem.getData() instanceof String){
+			if (currPItem.getData() instanceof String) {
 				currPItem.setChecked(true);
 			}
 			for (TreeItem currItem : currPItem.getItems()) {
-				if(currItem.getData() instanceof ProjectRecord){
+				if (currItem.getData() instanceof ProjectRecord) {
 					ProjectRecord projectRecord = (ProjectRecord) currItem.getData();
 					if (projectRecord.hasErrors()) {
 						currItem.setGrayed(true);
 						errorOrWarningExist = true;
-					} else if(projectRecord.hasWarnings()) {
-						errorOrWarningExist = true ;
+					} else if (projectRecord.hasWarnings()) {
+						errorOrWarningExist = true;
 					} else {
 						currItem.setChecked(true);
 						projectsList.setChecked(projectRecord, true);
@@ -686,8 +675,8 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 				}
 			}
 		}
-		
-		if(errorOrWarningExist){
+
+		if (errorOrWarningExist) {
 			setMessage(CHILD_WARNING, INFORMATION);
 		}
 	}
@@ -831,7 +820,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 	public boolean createProjects() {
 		// saveWidgetValues();
 		final Object[] selected = projectsList.getCheckedElements();
-		WorkspaceModifyOperation op = new WorkspaceModifyOperation() {
+		final WorkspaceModifyOperation op = new WorkspaceModifyOperation() {
 			protected void execute(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 				try {
 					monitor.beginTask("", selected.length); //$NON-NLS-1$
@@ -843,7 +832,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 						if (selectedObject instanceof ProjectRecord) {
 							ProjectRecord projectRecord = (ProjectRecord) selectedObject;
 							if (projectRecord.hasSubProjects()) {
-								ProjectRecord[] subProj = projectRecord.getSubProjects();
+								Collection<ProjectRecord> subProj = projectRecord.getSubProjects();
 								for (ProjectRecord subPprojectRecord : subProj) {
 									if (!subPprojectRecord.hasWarnings())
 										createExistingProject(subPprojectRecord, new SubProgressMonitor(monitor, 1));
@@ -924,7 +913,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 		// location for this workspace
 		URI locationURI = record.projectDescription.getLocationURI();
 		// if location is null, project already exists in this location or
-		// some error condition occured.
+		// some error condition occurred.
 		if (locationURI != null) {
 			importSource = new File(locationURI);
 			IProjectDescription desc = workspace.newProjectDescription(projectName);
@@ -971,13 +960,11 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 	}
 
 	/**
-	 * The <code>WizardDataTransfer</code> implementation of this
-	 * <code>IOverwriteQuery</code> method asks the user whether the existing
+	 * The <code>WizardDataTransfer</code> implementation of this <code>IOverwriteQuery</code> method asks the user whether the existing
 	 * resource at the given path should be overwritten.
 	 * 
 	 * @param pathString
-	 * @return the user's reply: one of <code>"YES"</code>, <code>"NO"</code>,
-	 *         <code>"ALL"</code>, or <code>"CANCEL"</code>
+	 * @return the user's reply: one of <code>"YES"</code>, <code>"NO"</code>, <code>"ALL"</code>, or <code>"CANCEL"</code>
 	 */
 	public String queryOverwrite(String pathString) {
 		Path path = new Path(pathString);
@@ -991,8 +978,9 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 			messageString = "Overwrite " + path.lastSegment() + " in folder " + path.removeLastSegments(1).toOSString() + " ?";
 		}
 
-		final MessageDialog dialog = new MessageDialog(getContainer().getShell(), "Question", null, messageString, MessageDialog.QUESTION, new String[] { IDialogConstants.YES_LABEL, IDialogConstants.YES_TO_ALL_LABEL,
-				IDialogConstants.NO_LABEL, IDialogConstants.NO_TO_ALL_LABEL, IDialogConstants.CANCEL_LABEL }, 0);
+		final MessageDialog dialog = new MessageDialog(getContainer().getShell(), "Question", null, messageString, MessageDialog.QUESTION, new String[] {
+				IDialogConstants.YES_LABEL, IDialogConstants.YES_TO_ALL_LABEL, IDialogConstants.NO_LABEL, IDialogConstants.NO_TO_ALL_LABEL,
+				IDialogConstants.CANCEL_LABEL }, 0);
 
 		// run in syncExec because callback is from an operation,
 		// which is probably not running in the UI thread.
@@ -1098,35 +1086,34 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 	 * Class declared public only for test suite.
 	 * 
 	 */
-	public class ProjectRecord {
+	private class ProjectRecord {
+		public static final String SUB_PROJECTS_FOLDER = "projects";
+		
 		private File projectSystemFile;
 
 		private Collection<ProjectRecord> files;
-		private ProjectRecord parentProject;
 
-		public static final String SUB_PROJECTS_FOLDER = "projects";
+		private Object projectArchiveFile;
 
-		Object projectArchiveFile;
-
-		String projectName;
-		CommentParser comment;
+		private String projectName;
+		private CommentParser comment;
 		private String warning = "";
 		private String error = "";
 		private boolean hasWarnings = false;
 		private boolean hasErrors = false;
 
-		Object parent;
+		private Object parent;
 
-		int level;
+		private int level;
 
-		IProjectDescription projectDescription;
+		private IProjectDescription projectDescription;
 
 		/**
 		 * Create a record for a project based on the info in the file.
 		 * 
 		 * @param file
 		 */
-		ProjectRecord(File file) {
+		private ProjectRecord(File file) {
 			projectSystemFile = file;
 			setProjectName();
 			performAlreadyExistsCheck();
@@ -1141,7 +1128,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 		 * @param level
 		 *            The number of levels deep in the provider the file is
 		 */
-		ProjectRecord(Object file, Object parent, int level) {
+		private ProjectRecord(Object file, Object parent, int level) {
 			this.projectArchiveFile = file;
 			this.parent = parent;
 			this.level = level;
@@ -1156,32 +1143,17 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 		 * @param monitor
 		 */
 		public void collectSubProjectFiles(File dir, Object object, IProgressMonitor monitor) {
-			files = new ArrayList<ProjectRecord>();
+			files = new LinkedList<ProjectRecord>();
 			collectProjectFilesFromDirectory(files, dir, null, monitor);
-			for (ProjectRecord curPro : files) {
-				curPro.parentProject = this;
-			}
 		}
 
 		public boolean hasSubProjects() {
-			if (files == null || files.isEmpty())
-				return false;
-			return true;
+			return !(files == null || files.isEmpty());
 		}
 
-		public boolean hasParentProject() {
-			return parentProject != null;
-		}
-
-		public ProjectRecord getParentProjectRecord() {
-			return parentProject;
-		}
-
-		public ProjectRecord[] getSubProjects() {
-			if (files != null) {
-				return files.toArray(new ProjectRecord[0]);
-			}
-			return new ProjectRecord[0];
+		@SuppressWarnings("unchecked")
+		public Collection<ProjectRecord> getSubProjects() {
+			return (files != null) ? files : Collections.EMPTY_LIST;
 		}
 
 		/**
@@ -1198,11 +1170,6 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 							IPath path = new Path(((ZipEntry) projectArchiveFile).getName());
 							projectName = path.segment(path.segmentCount() - 2);
 						}
-						// else if (projectArchiveFile instanceof TarEntry) {
-						// IPath path = new Path(
-						// ((TarEntry) projectArchiveFile).getName());
-						// projectName = path.segment(path.segmentCount() - 2);
-						// }
 						comment = null;
 					} else {
 						projectDescription = ResourcesPlugin.getWorkspace().loadProjectDescription(stream);
@@ -1271,10 +1238,10 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 		public String getDescription() {
 			return comment == null ? "" : comment.getDescription();
 		}
-		
-		public boolean containsNatureID(String id){
-			for(String curID : projectDescription.getNatureIds()){
-				if(curID.compareTo(id) == 0){
+
+		public boolean containsNatureID(String id) {
+			for (String curID : projectDescription.getNatureIds()) {
+				if (curID.equals(id)) {
 					return true;
 				}
 			}
@@ -1288,7 +1255,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 		public String getWarningText() {
 			return warning;
 		}
-		
+
 		public boolean hasErrors() {
 			return hasErrors;
 		}
@@ -1305,18 +1272,22 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 		}
 
 		private void performRequirementCheck() {
-			IStatus stat = ComposerExtensionManager.getInstance().isComposerInstalled(projectDescription);
+			IStatus status = ResourcesPlugin.getWorkspace().validateNatureSet(projectDescription.getNatureIds());
 
-			if(stat.getCode() != IStatus.OK){
-				warning += stat.getMessage();
-				if(stat instanceof MultiStatus){
-					MultiStatus multi = (MultiStatus) stat;
-					if(multi.getChildren().length > 0){
+			if (status.isOK()) {
+				status = CorePlugin.getDefault().isComposable(projectDescription);
+			}
+
+			if (!status.isOK()) {
+				warning = status.getMessage();
+				if (status instanceof MultiStatus) {
+					MultiStatus multi = (MultiStatus) status;
+					if (multi.getChildren().length > 0) {
 						warning += " (";
-						for(int j = 0; j < multi.getChildren().length -1 ; j++){
+						for (int j = 0; j < multi.getChildren().length - 1; j++) {
 							warning += multi.getChildren()[j].getMessage() + " ;";
 						}
-						warning += multi.getChildren()[multi.getChildren().length-1].getMessage() + ")";
+						warning += multi.getChildren()[multi.getChildren().length - 1].getMessage() + ")";
 					}
 				}
 				hasWarnings = true;
@@ -1334,11 +1305,15 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 			return projectName;
 		}
 		
-		public boolean equals(Object arg){
-			if(arg instanceof ProjectRecord){
-				return ((ProjectRecord) arg).getProjectLabel().equals(this.getProjectLabel());
-			}
-			return false;
+		@Override
+		public int hashCode() {
+			return projectName.hashCode();
+		}
+
+		@Override
+		public boolean equals(Object arg) {
+			return (arg instanceof ProjectRecord) && ((ProjectRecord) arg).projectName.equals(this.projectName);
 		}
 	}
+
 }
