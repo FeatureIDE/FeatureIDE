@@ -537,15 +537,11 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	protected final void walkTree( 
 			final FunctionalInterfaces.IBinaryFunction<TreeItem, SelectableFeature, Void> perNodeFunction,
 			final FunctionalInterfaces.IFunction<Void, Void> callbackIfDone) {
-		getAsyncTree().traverse(tree.getItem(0), perNodeFunction, callbackIfDone);
+		AsyncTree.traverse(itemMap, tree.getItem(0), perNodeFunction, callbackIfDone);
 	}
 	
 	private void buildTree(final TreeItem node, final TreeElement[] children, final FunctionalInterfaces.IFunction<Void, Void> callbackIfDone) {
-		getAsyncTree().build(node, children, callbackIfDone);
-	}
-	
-	private AsyncTree getAsyncTree() {
-		return new AsyncTree(tree, itemMap);
+		AsyncTree.build(itemMap, node, children, callbackIfDone);
 	}
 
 }

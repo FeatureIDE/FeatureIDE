@@ -71,6 +71,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	
 	public AntennaPreprocessor() {
 		super("Antenna");
+		nodereader.setIgnoreMissingFeatures(true);
 	}
 
 	@Override
@@ -132,21 +133,11 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 			antennaModelBuilder.buildModel();
 		}
 	}
-
-	/*
-	 * buildFile is not set to derived
-	 * 
-	 * @see
-	 * de.ovgu.featureide.core.builder.ComposerExtensionClass#postCompile(org
-	 * .eclipse.core.resources.IResourceDelta, org.eclipse.core.resources.IFile)
-	 */
+	
 	@Override
 	public void postCompile(IResourceDelta delta, IFile buildFile) {
 	}
-
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.ComposerExtensionClass#postModelChanged()
-	 */
+	
 	@Override
 	public void postModelChanged() {
 			deleteAllPreprocessorAnotationMarkers();
@@ -271,8 +262,9 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 						ifelseCountStack.push(0);
 					}
 					
-					if (!ifelseCountStack.empty() && !line.contains("//#else"))
+					if (!ifelseCountStack.empty() && !line.contains("//#else")) {
 						ifelseCountStack.push(ifelseCountStack.pop() + 1);
+					}
 					
 					setMarkersContradictionalFeatures(line, res, j+1);
 					
@@ -369,8 +361,9 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 		String[] splitted = line.split(AntennaModelBuilder.OPERATORS, 0);
 		
 		for (int i = 0; i < splitted.length; ++i) {
-			if (!splitted[i].equals("") && !splitted[i].contains("//#")) {
-				setMarkersOnNotExistingOrAbstractFeature(splitted[i], lineNumber, res);
+			final String linePart = splitted[i];
+			if (!linePart.isEmpty() && !linePart.contains("//#")) {
+				setMarkersOnNotExistingOrAbstractFeature(linePart, lineNumber, res);
 			}
 		}
 	}
@@ -529,13 +522,9 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 			}
 		}
 	}
-
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionBase#supportsMigration()
-	 */
+	
 	@Override
-	public boolean supportsMigration()
-	{
+	public boolean supportsMigration() {
 		return false;
 	}
 

@@ -25,8 +25,10 @@ import jampack.Jampack;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -181,8 +183,7 @@ public class ComposerWrapper {
 		}
 		if (config != null) {
 			try {
-				reader = new BufferedReader(new FileReader(config
-						.getRawLocation().toFile()));
+				reader = new BufferedReader(new InputStreamReader(new FileInputStream(config.getRawLocation().toFile()), Charset.availableCharsets().get("UTF-8")));
 				String line = null;
 				while ((line = reader.readLine()) != null) {
 					if (line.startsWith("#"))

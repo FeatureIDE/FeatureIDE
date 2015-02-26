@@ -240,40 +240,22 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 	}
 
 	public void setForeground(TreeItem item, IFile iFile) {
-		IRoleElement element = (IRoleElement) item.getData();
+		if (item.getData() instanceof FSTDirective) {
+			item.setForeground(viewer.getControl().getDisplay().getSystemColor(SWT.DEFAULT));
+		} else {
+			final IRoleElement element = (IRoleElement) item.getData();
 
-		for (FSTRole role : element.getRole().getFSTClass().getRoles()) {
-			if (!role.getFile().equals(iFile)) {
-				continue;
-			}
-			if (element instanceof FSTMethod) {
-				for (FSTMethod method : role.getClassFragment().getMethods()) {
-					if (method.equals(element)) {
-						item.setForeground(viewer.getControl().getDisplay().getSystemColor(SWT.DEFAULT));
-						return;
-					}
+			for (FSTRole role : element.getRole().getFSTClass().getRoles()) {
+				if (role.getFile().equals(iFile) && (
+						(element instanceof FSTMethod && role.getClassFragment().getMethods().contains(element)) ||
+						(element instanceof FSTInvariant && role.getClassFragment().getInvariants().contains(element)) ||
+						(element instanceof FSTField && role.getClassFragment().getFields().contains(element)))) {
+					item.setForeground(viewer.getControl().getDisplay().getSystemColor(SWT.DEFAULT));
+					return;
 				}
 			}
-			if (element instanceof FSTInvariant) {
-
-				for (FSTInvariant inv : role.getClassFragment().getInvariants()) {
-					if (inv.equals(element)) {
-						item.setForeground(viewer.getControl().getDisplay().getSystemColor(SWT.DEFAULT));
-						return;
-					}
-				}
-			}
-
-			if (element instanceof FSTField) {
-				for (FSTField field : role.getClassFragment().getFields()) {
-					if (field.equals(element)) {
-						item.setForeground(viewer.getControl().getDisplay().getSystemColor(SWT.DEFAULT));
-						return;
-					}
-				}
-			}
+			item.setForeground(viewer.getControl().getDisplay().getSystemColor(SWT.COLOR_GRAY));
 		}
-		item.setForeground(viewer.getControl().getDisplay().getSystemColor(SWT.COLOR_GRAY));
 	}
 
 	public boolean refreshContent(IFile oldFile, IFile currentFile) {
