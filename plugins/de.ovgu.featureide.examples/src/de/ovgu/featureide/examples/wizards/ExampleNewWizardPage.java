@@ -441,7 +441,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 				determineAndSetPageComplete();
 			}
 		});
-		
+
 		projectsList.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(SelectionChangedEvent event) {
 				if (event.getSelection() instanceof IStructuredSelection) {
@@ -1303,7 +1303,6 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 				hasErrors = true;
 			}
 		}
-
 
 		private void performRequirementCheck() {
 			IStatus stat = ComposerExtensionManager.getInstance().isComposerInstalled(projectDescription);
