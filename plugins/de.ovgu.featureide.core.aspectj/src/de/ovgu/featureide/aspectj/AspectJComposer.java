@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 
-import org.eclipse.core.internal.runtime.InternalPlatform;
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -40,14 +39,16 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.core.ClasspathEntry;
 import org.eclipse.jdt.internal.core.JavaProject;
-import org.osgi.framework.Bundle;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
@@ -103,8 +104,16 @@ public class AspectJComposer extends ComposerExtensionClass {
 			return;
 		}
 		assert(featureProject != null) : "Invalid project given";
-		if(!isPluginInstalled(PLUGIN_ID)){
-			featureProject.createBuilderMarker(featureProject.getProject(), PLUGIN_WARNING, -1, IMarker.SEVERITY_ERROR);
+		IStatus stat;
+		try {
+			if((stat = areDependentPluginsInstalled(featureProject.getProject().getDescription())) == Status.OK_STATUS){
+				for (IStatus child : stat.getChildren()) {
+					featureProject.createBuilderMarker(featureProject.getProject(), child.getMessage(), -1, IMarker.SEVERITY_ERROR);
+				}
+				featureProject.createBuilderMarker(featureProject.getProject(), stat.getMessage(), -1, IMarker.SEVERITY_ERROR);
+			}
+		} catch (CoreException e1) {
+			e1.printStackTrace();
 		}
 		
 		final String configPath =  config.getRawLocation().toOSString();
@@ -142,17 +151,6 @@ public class AspectJComposer extends ComposerExtensionClass {
 		} catch (CoreException e) {
 			AspectJCorePlugin.getDefault().logError(e);
 		}
-	}
-
-
-
-
-
-	public boolean isPluginInstalled(String ID) {
-		for(Bundle b :InternalPlatform.getDefault().getBundleContext().getBundles()){
-			if(b.getSymbolicName().startsWith(ID))return true;
-		}
-		return false;
 	}
 	
 	/**
@@ -541,9 +539,18 @@ public class AspectJComposer extends ComposerExtensionClass {
 	 * @see de.ovgu.featureide.core.builder.IComposerExtensionBase#supportsMigration()
 	 */
 	@Override
-	public boolean supportsMigration()
-	{
+	public boolean supportsMigration(){
 		return false;
+	}
+	
+	@Override
+	public IStatus areDependentPluginsInstalled(IProjectDescription descr) {
+		IStatus stat = super.areDependentPluginsInstalled(descr); 
+		MultiStatus multi = (MultiStatus) stat;
+		if(!isPluginInstalled(PLUGIN_ID)){
+			multi.add(new Status(Status.ERROR, ASPECTJ_NATURE, Status.WARNING, PLUGIN_WARNING, null));
+		}
+		return multi;
 	}
 
 }

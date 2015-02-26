@@ -22,7 +22,11 @@ package de.ovgu.featureide.core.builder;
 
 import java.util.List;
 
+import org.eclipse.core.resources.ICommand;
+import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.ExtensionPointManager;
@@ -74,4 +78,19 @@ public class ComposerExtensionManager extends ExtensionPointManager<IComposerExt
 		}
 		return null;
 	}
+	
+	public IStatus isComposerInstalled(IProjectDescription desc){		
+		for (ICommand iCommand : desc.getBuildSpec()) {
+			if(iCommand.getBuilderName().compareTo("de.ovgu.featureide.core.extensibleFeatureProjectBuilder") == 0){
+				String composerName = iCommand.getArguments().get("composer");
+				for (IComposerExtension tool : getComposers()) {
+					if(tool.getId().equals(composerName)){
+						return tool.getComposerByProject(null).areDependentPluginsInstalled(desc);
+					}
+				}
+				return new Status(Status.ERROR, "unknown", Status.ERROR, "The required composer "+composerName+" is not supported.", null);
+			}
+		}
+		return new Status(Status.ERROR, "unknown", Status.ERROR, "The description does not contain a composer ID.", null);
+	}	
 }

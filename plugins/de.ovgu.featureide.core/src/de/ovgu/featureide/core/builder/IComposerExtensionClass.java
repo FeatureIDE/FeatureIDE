@@ -30,7 +30,9 @@ import javax.annotation.Nonnull;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.runtime.IStatus;
 
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
@@ -197,4 +199,6 @@ public interface IComposerExtensionClass extends IComposerExtensionBase {
 	 * @return The generation {@link Mechanism} of the generation tool, or null. 
 	 */
 	Mechanism getGenerationMechanism();
+	
+	IStatus areDependentPluginsInstalled(IProjectDescription descr);
 }

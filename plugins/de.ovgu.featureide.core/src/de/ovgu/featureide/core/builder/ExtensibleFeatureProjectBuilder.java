@@ -30,6 +30,8 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
@@ -69,11 +71,17 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 			return false;
 		}
 
-		if ((composerExtension = featureProject.getComposer()) == null) {
+		IStatus stat = null;
+		try {
+			stat = ComposerExtensionManager.getInstance().isComposerInstalled(featureProject.getProject().getDescription());
+		} catch (CoreException e) {
+			stat = Status.CANCEL_STATUS;
+			e.printStackTrace();
+		}
+		if (stat.getCode() != Status.OK){
 			CorePlugin.getDefault().logWarning("No composition tool found");
 			featureProject.createBuilderMarker(featureProject.getProject(),
-					"Could not load the assigned composition engine: "
-							+ featureProject.getComposerID(), 0,
+					stat.getMessage(), 0,
 					IMarker.SEVERITY_ERROR);
 			return false;
 		}

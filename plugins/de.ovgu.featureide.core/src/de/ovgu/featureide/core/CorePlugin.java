@@ -33,6 +33,7 @@ import javax.annotation.CheckForNull;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
@@ -52,6 +53,7 @@ import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.Signature;
 import org.osgi.framework.BundleContext;
 
+import de.ovgu.featureide.core.builder.ComposerExtensionManager;
 import de.ovgu.featureide.core.builder.FeatureProjectNature;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.internal.FeatureProject;
@@ -209,6 +211,19 @@ public class CorePlugin extends AbstractCorePlugin {
 
 		for (IProjectListener listener : projectListeners)
 			listener.projectAdded(data);
+		
+		try {
+			IStatus status = ComposerExtensionManager.getInstance().isComposerInstalled(project.getDescription());
+
+			if(status.getCode() != Status.OK){
+				for (IStatus child : status.getChildren()) {
+					data.createBuilderMarker(data.getProject(), child.getMessage(), -1, IMarker.SEVERITY_ERROR);
+				}
+				data.createBuilderMarker(data.getProject(), status.getMessage(), -1, IMarker.SEVERITY_ERROR);
+			}
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void removeProject(IProject project) {
