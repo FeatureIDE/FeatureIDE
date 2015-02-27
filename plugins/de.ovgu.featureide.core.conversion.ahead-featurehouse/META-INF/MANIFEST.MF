@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Ahead-FeatureHouse
+Bundle-Name: FeatureIDE Converter Plug-In from AHEAD to FeatureHouse
 Bundle-SymbolicName: de.ovgu.featureide.core.conversion.ahead_featurehouse;singleton:=true
 Bundle-Version: 2.7.2.qualifier
 Bundle-Activator: de.ovgu.featureide.core.conversion.ahead_featurehouse.ConversionPlugin
@@ -17,5 +17,7 @@ Require-Bundle: org.eclipse.ui,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: University of Magdeburg
-Export-Package: de.ovgu.featureide.core.conversion.ahead_featurehouse.actions;uses:="org.eclipse.jdt.core,de.ovgu.featureide.core,org.eclipse.core.resources"
+Export-Package: de.ovgu.featureide.core.conversion.ahead_featurehouse,
+ de.ovgu.featureide.core.conversion.ahead_featurehouse.actions;uses:="org.eclipse.jdt.core,de.ovgu.featureide.core,org.eclipse.core.resources",
+ de.ovgu.featureide.core.conversion.ahead_featurehouse.handlers
 Bundle-ClassPath: .
