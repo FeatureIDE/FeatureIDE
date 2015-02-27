@@ -178,20 +178,28 @@ public class ConstraintContentProposalProvider implements IContentProposalProvid
 		
 		Collection<String> operatorNamesInFeatures = Features.extractOperatorNamesFromFeatuers(features);
 
-		// TODO: This is buggy!
-		//if (") ".equals(wordBefore) || features.contains(wordBefore.trim()) || wordBefore.trim().endsWith("\"") || wordBefore.trim().isEmpty()) {
-			proposals.add(new ContentProposal("and"));
-			proposals.add(new ContentProposal("iff"));
-			proposals.add(new ContentProposal("implies"));
-			proposals.add(new ContentProposal("or"));
+		// TODO: Add binary operators only iff their appearance makes sense in content proposal
+		// Example:
+		//		Show "and" for "A |"
+		//		Hide "and" for "A and |"
+		proposals.add(new ContentProposal("and"));
+		proposals.add(new ContentProposal("iff"));
+		proposals.add(new ContentProposal("implies"));
+		proposals.add(new ContentProposal("or"));
 
-			//} else if (!")".equals(wordBefore)) { 
-			proposals.add(new ContentProposal("not"));
+		// TODO: Add binary operators only iff their appearance makes sense in content proposal
+		// Example:
+		//		Show "not" for "A implies |"
+		//		Hide "not" for "A |"
+		proposals.add(new ContentProposal("not"));
 
-			for (String s : featureList) {
-				proposals.add(new ContentProposal(s  + (operatorNamesInFeatures.contains(s.trim().toLowerCase()) ? " " + Features.FEATURE_SUFFIX : "")));
-			}
-			//}
+		// TODO: Add features only iff a feature name is valid in context
+		// Example: 
+		//		Show feature for "A implies |"
+		//		Hide features for "A |"
+		for (String s : featureList)
+			proposals.add(new ContentProposal(s  + (operatorNamesInFeatures.contains(s.trim().toLowerCase()) ? " " + Features.FEATURE_SUFFIX : "")));
+
 		return proposals;
 	}
 }
