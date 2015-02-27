@@ -30,17 +30,8 @@ import org.eclipse.core.resources.IProject;
  */
 public interface IFMComposerExtension {
 	
-	static final String ERROR_MESSAGE_COMPOSER = "The feature name is illegal in this context. "
-			+ "\n\nA character may start or is contained inside a feature name if and only if the following conditions are true:\n"
-			+ "\n-It is a letter"
-			+ "\n-It is a currency symbol (such as \"$\")"
-			+ "\n-It is a connecting punctuation character (such as \"_\")"
-			+ "\n-It is a numeric letter (such as XVI)"
-			+ "\n\n"
-			+ "Moreover a name can contain but not start with:"
-			+ "\n\n-A digit"
-			+ "\n-A combining mark"
-			+ "\n-A non-spacing mark\n\n\nNo feature name is allowed to contain  \", (, )";
+	static final String ERROR_MESSAGE_COMPOSER = "This feature name is not possible. The following regular expression descriptes all valid feature names: "
+			+ "TODO"; // TODO
 	static final String ERROR_MESSAGE_NO_COMPOSER = "The following Characaters are not allowed: \", (, )";
 
 	/*

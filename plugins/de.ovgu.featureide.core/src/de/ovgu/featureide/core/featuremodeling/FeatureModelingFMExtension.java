@@ -33,6 +33,8 @@ import de.ovgu.featureide.fm.core.FMComposerExtension;
  */
 public class FeatureModelingFMExtension extends FMComposerExtension {
 
+	private static final String FEATUREMODELLING_NAME_PATTERN = ".+";
+	
 	private static String ORDER_PAGE_MESSAGE = 
 			"FeatureIDE projects for modelling purpose only do not\n" +
 			"need an order, as there is no source code to compose.";
@@ -48,21 +50,14 @@ public class FeatureModelingFMExtension extends FMComposerExtension {
 		return true;
 	}
 	
-	protected boolean isValidFeatureNameComposerSpecific(String featureName) {
-		return !containsIllegalChar(featureName.toCharArray());
-	}
-
-	private boolean containsIllegalChar(char[] charArray) {
-		for (int i = 0; i < charArray.length; i++) {
-			if (charArray[i] == '"' || charArray[i] == '(' || charArray[i] == ')')
-				return true;
-		}
-		return false;
-	}
-
 	@Override
 	public boolean hasFeaureOrder() {
 		return false;
+	}
+	
+	@Override
+	protected boolean isValidFeatureNameComposerSpecific(String name) {
+		return name.matches(FEATUREMODELLING_NAME_PATTERN);
 	}
 	
 	/* (non-Javadoc)

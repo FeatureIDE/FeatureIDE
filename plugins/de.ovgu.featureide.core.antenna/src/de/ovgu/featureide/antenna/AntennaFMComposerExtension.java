@@ -49,8 +49,6 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
 */
 public class AntennaFMComposerExtension extends FMComposerExtension {
 	
-	private final static char[] ILLEGAL_FEATURE_NAME_CHARSET = new char[] {'(', ')', '"', '\u00fc', '\u00dc', '\u00e4', '\u00c4', '\u00f6', '\u00d6', '\u0024'};	//, '_'		Underscore could curse a issue when using antenna. However, I cannot reproduce this currently.
-	
 	private static String ORDER_PAGE_MESSAGE = 
 			"FeatureIDE projects based on preprocessors such as Antenna do not\n" +
 			"need an order, as the order is given directly at the source code.";
@@ -101,16 +99,6 @@ public class AntennaFMComposerExtension extends FMComposerExtension {
 		}
 	}
 	
-	private final boolean containsIllegalChar(final char[] string) {
-		for (char a : string) {
-			for (char b : ILLEGAL_FEATURE_NAME_CHARSET) {
-				if (a == b)
-					return true;
-			}
-		}
-		return false;
-	}
-	
 	private void performRenamings(String oldName, String newName, IFile iFile) {
 		Scanner scanner = null;
 		FileWriter fw = null;
@@ -148,14 +136,6 @@ public class AntennaFMComposerExtension extends FMComposerExtension {
 					AntennaCorePlugin.getDefault().logError(e);
 				}	
 		}
-	}
-	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.FMComposerExtension#compSpecTest(java.lang.String)
-	 */
-	@Override
-	protected boolean isValidFeatureNameComposerSpecific(String featureName) {
-		return super.isValidFeatureNameComposerSpecific(featureName) && !containsIllegalChar(featureName.toCharArray());
 	}
 	
 	private String replaceFeatureInText(String text, String oldName, String newName){
