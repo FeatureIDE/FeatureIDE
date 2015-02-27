@@ -870,17 +870,29 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		return true;
 	}
 
-	private void checkBuildFolder(IFolder folder, IResourceChangeEvent event) throws CoreException {
-		for (IResource res : folder.members()) {
-			if (res instanceof IFolder) {
-				checkBuildFolder((IFolder) res, event);
-			} else if (res instanceof IFile) {
-				IResourceDelta delta = event.getDelta().findMember(res.getFullPath());
-				if (delta != null) {
-					composerExtension.postCompile(delta, (IFile) res);
+	private void checkBuildFolder(final IFolder folder, final IResourceChangeEvent event) {
+		Job job = new Job("Postprocess generated files") {
+			@Override
+			public IStatus run(IProgressMonitor monitor) {
+				try {
+					for (IResource res : folder.members()) {
+						if (res instanceof IFolder) {
+							checkBuildFolder((IFolder) res, event);
+						} else if (res instanceof IFile) {
+							IResourceDelta delta = event.getDelta().findMember(res.getFullPath());
+							if (delta != null) {
+								composerExtension.postCompile(delta, (IFile) res);
+							}
+						}
+					}
+				} catch (CoreException e) {
+					LOGGER.logError(e);
 				}
+				return Status.OK_STATUS;
 			}
-		}
+		};
+		job.setPriority(Job.LONG);
+		job.schedule();
 	}
 
 	public List<IFile> getAllConfigurations() {
