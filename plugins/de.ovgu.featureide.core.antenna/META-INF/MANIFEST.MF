@@ -16,3 +16,5 @@ Bundle-ClassPath: .,
  lib/preprocessor-v3-bin-1.3.jar
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: University of Magdeburg
+Export-Package: de.ovgu.featureide.antenna,
+ de.ovgu.featureide.antenna.model

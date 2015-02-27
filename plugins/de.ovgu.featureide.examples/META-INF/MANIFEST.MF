@@ -14,3 +14,6 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: University of Magdeburg
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: de.ovgu.featureide.examples.ExamplePlugin
+Export-Package: de.ovgu.featureide.examples,
+ de.ovgu.featureide.examples.utils,
+ de.ovgu.featureide.examples.wizards
