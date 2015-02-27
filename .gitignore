@@ -1,5 +1,4 @@
 *.class
-*.project
 /plugins/de.ovgu.featureide.examples/featureide_examples/DiGraph-FH-JML/src
 /plugins/de.ovgu.featureide.examples/featureide_examples/Elevator-FH-JML/src
 /plugins/de.ovgu.featureide.examples/featureide_examples/Email-FH-JML/src
