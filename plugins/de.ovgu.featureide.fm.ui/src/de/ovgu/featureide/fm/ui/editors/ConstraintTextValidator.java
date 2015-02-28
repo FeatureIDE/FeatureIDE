@@ -147,12 +147,12 @@ public final class ConstraintTextValidator {
 
 		for (Feature feature : model.getFeatures()) {
 			if (input.contains(feature.getName())) {
-				if (feature.getFeatureStatus() != FeatureStatus.FALSE_OPTIONAL) {
+				//if (feature.getFeatureStatus() != FeatureStatus.FALSE_OPTIONAL) {
 					clonedModel.addPropositionalNode(propNode);
 					clonedModel.getAnalyser().analyzeFeatureModel(null);
 					if (clonedModel.getFeature(feature.getName()).getFeatureStatus() == FeatureStatus.FALSE_OPTIONAL && !list.contains(feature))
 						list.add(feature);
-				}
+				//}
 			}
 		}
 
