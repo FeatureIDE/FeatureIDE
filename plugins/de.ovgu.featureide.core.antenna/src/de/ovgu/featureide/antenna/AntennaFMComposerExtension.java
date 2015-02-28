@@ -70,14 +70,6 @@ public class AntennaFMComposerExtension extends FMComposerExtension {
 		return false;
 	}
 	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.FMComposerExtension#getErroMessage()
-	 */
-	@Override
-	public String getErroMessage() {
-		return super.getErroMessage() + "\n\nAdditionally in context of Antenna-composer, the following characters are illegal:  Ü, ü, Ä, ä, ö, Ö and $.";
-	}
-	
 	@Override
 	public boolean performRenaming(String oldName, String newName, IProject project) {
 		IFeatureProject featureProject = CorePlugin.getFeatureProject(project);

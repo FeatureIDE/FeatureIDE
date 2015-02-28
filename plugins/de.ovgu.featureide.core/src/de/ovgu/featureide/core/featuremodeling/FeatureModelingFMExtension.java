@@ -56,15 +56,12 @@ public class FeatureModelingFMExtension extends FMComposerExtension {
 	}
 	
 	@Override
-	public boolean hasFeaureOrder() {
-		return false;
-	}
-	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.FMComposerExtension#getErroMessage()
-	 */
-	@Override
 	public String getErroMessage() {
 		return ERROR_MESSAGE_NO_COMPOSER;
+	}
+	
+	@Override
+	public boolean hasFeaureOrder() {
+		return false;
 	}
 }
