@@ -20,6 +20,10 @@
  */
 package de.ovgu.featureide.fm.core;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import org.prop4j.NodeWriter;
 
 public final class Constraints {
@@ -35,19 +39,21 @@ public final class Constraints {
 	 * @param c The constraint
 	 * @return A string representation
 	 */
-	public static final String autoQuote(Constraint c) {
-		String[] contents = c.getNode().toString().split(" "); // returns "A => B v ..."
+	public static final String autoQuote(final Constraint constraint) {
+		
+		final String c = constraint.getNode().toString(NodeWriter.shortSymbols);
+		final String[] contents = split(c);
 		for (int i = 0; i < contents.length; i++) {
-			for (String op : Operator.NAMES) {
+			for (final String op : Operator.NAMES) {
 				if (contents[i].trim().toLowerCase().equals(op.toLowerCase()))
-					contents[i] = "\"" + contents[i] + "\"";
+					contents[i] = "\"" + contents[i].trim() + "\"";
 			}
 		}
-		StringBuilder print = new StringBuilder();
-		for (String content : contents) {
-			if (!content.trim().isEmpty()) {
-				print.append(content.trim());
-				print.append(" ");
+		
+		final StringBuilder print = new StringBuilder();
+		for (final String content : contents) {
+			if (!content.trim().isEmpty()) {	
+				print.append(content);
 			}
 		}
 		String printable = print.toString();
@@ -58,4 +64,22 @@ public final class Constraints {
 		return printable.toString().trim();
 	}
 
+	private static String[] split(final String string) {
+		final List<String> components = new ArrayList<>();
+		final String[] splitted = string.split(" ");
+		boolean quotes = false;
+		String word = "";
+		for (int i = 0; i < splitted.length; i++) {
+			if (splitted[i].startsWith("\"") || splitted[i].endsWith("\"")) {
+				quotes = !quotes;
+			}
+			word += splitted[i] + " ";
+			
+			if (!quotes) {
+				components.add(word);
+				word = "";
+			}
+		}		
+		return components.toArray(new String[components.size()]);
+	}
 }

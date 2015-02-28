@@ -992,8 +992,7 @@ public class ConstraintDialog implements GUIDefaults {
 	}
 
 	public void setInputText(String text) {
-		final String input = text.trim();
-		String constrainText = Operator.isOperatorName(input) || input.contains(" ") ? "\"" + input + "\"" : input;
+		String constrainText = Operator.isOperatorName(text) || text.contains(" ") ? "\"" + text + "\"" : text;
 		constrainText += " ";
 		
 		this.constraintText.setText(constrainText);
