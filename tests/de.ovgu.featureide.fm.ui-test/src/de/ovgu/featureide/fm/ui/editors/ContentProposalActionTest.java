@@ -132,7 +132,7 @@ public final class ContentProposalActionTest {
 
 	@Test
 	public void testCase23() {
-		testProposalInsertion("out|", "\"Output Signal\"", "\"Output Signal\"|");
+		testProposalInsertion("out|", "Output Signal", "\"Output Signal\"|");
 	}
 	
 	@Test
