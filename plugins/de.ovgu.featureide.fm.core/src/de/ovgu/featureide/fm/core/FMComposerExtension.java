@@ -53,9 +53,11 @@ public class FMComposerExtension implements IFMComposerExtension {
 		if (s == null || s.trim().isEmpty() || s.contains("\"") || s.contains("(") || s.contains(")"))
 			return false;
 		else {
-			boolean valid = isValidFeatureNameComposerSpecific(s);
-			return valid;
-		}	
+			if (hasComposer) {
+				boolean valid = isValidFeatureNameComposerSpecific(s);
+				return valid;
+			} else return true;
+		}
 	}
 
 	protected boolean isValidFeatureNameComposerSpecific(String s) {

@@ -191,7 +191,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 				throwError("Duplicate entry for feature: " + name, e);
 			}
 			if (!featureModel.getFMComposerExtension().isValidFeatureName(name)) {
-				throwError(name + "is no valid feature name", e);
+				throwError(name + " is no valid feature name", e);
 			}
 			Feature f = new Feature(featureModel, name);
 			f.setMandatory(true);

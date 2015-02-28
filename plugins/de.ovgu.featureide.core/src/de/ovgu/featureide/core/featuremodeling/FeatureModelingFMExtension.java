@@ -35,6 +35,11 @@ public class FeatureModelingFMExtension extends FMComposerExtension {
 
 	private static final String FEATUREMODELLING_NAME_PATTERN = ".+";
 	
+	@Override
+	protected boolean isValidFeatureNameComposerSpecific(String s) {
+		return s.matches(FEATUREMODELLING_NAME_PATTERN);
+	}
+	
 	private static String ORDER_PAGE_MESSAGE = 
 			"FeatureIDE projects for modelling purpose only do not\n" +
 			"need an order, as there is no source code to compose.";
@@ -53,11 +58,6 @@ public class FeatureModelingFMExtension extends FMComposerExtension {
 	@Override
 	public boolean hasFeaureOrder() {
 		return false;
-	}
-	
-	@Override
-	protected boolean isValidFeatureNameComposerSpecific(String name) {
-		return name.matches(FEATUREMODELLING_NAME_PATTERN);
 	}
 	
 	/* (non-Javadoc)

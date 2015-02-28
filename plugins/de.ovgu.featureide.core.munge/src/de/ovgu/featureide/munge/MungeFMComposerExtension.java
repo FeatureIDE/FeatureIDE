@@ -48,6 +48,13 @@ public class MungeFMComposerExtension extends FMComposerExtension {
 			"FeatureIDE projects based on preprocessors such as Munge do not\n" +
 			"need an order, as the order is given directly at the source code.";
 	
+	public static final String FEATURE_NAME_PATTERN = "^[a-zA-Z]+\\w*$";
+	
+	@Override
+	protected boolean isValidFeatureNameComposerSpecific(String s) {
+		return s.matches(FEATURE_NAME_PATTERN);
+	}
+	
 	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.fm.core.IFMComposerExtension#getComposer()
 	 */
