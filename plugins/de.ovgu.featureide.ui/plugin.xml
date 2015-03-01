@@ -48,6 +48,20 @@
    </extension>
    <extension
          point="org.eclipse.ui.popupMenus">
+         <objectContribution
+            adaptable="true"
+            id="de.ovgu.featureide.ui.featureModelContribution"
+            nameFilter="*.xml"
+            objectClass="org.eclipse.core.resources.IFile">
+         <action
+               class="de.ovgu.featureide.ui.actions.SplitModelAction"
+               icon="icons/FeatureIconSmall.ico"
+               id="de.ovgu.featureide.ui.splitModel"
+               label="Split Model"
+               menubarPath="de.ovgu.featureide.fm.ui.menu/split"
+               style="push">
+         </action>
+      </objectContribution>
       <objectContribution
             adaptable="true"
             id="de.ovgu.featureide.ui.actions.conversionaction"
