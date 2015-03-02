@@ -48,7 +48,7 @@ public class AspectJFMCompserExtension extends FMComposerExtension {
 			"a partial order can be defined in every aspect using the keywords\n" +
 			"'before' and 'after'.";
 	
-	public static final String FEATURE_NAME_PATTERN = "^[a-zA-Z]+\\w*$";
+	public static final String FEATURE_NAME_PATTERN = "^[a-zA-Z]\\w*$";
 	
 	@Override
 	protected boolean isValidFeatureNameComposerSpecific(String s) {

@@ -23,7 +23,6 @@ package de.ovgu.featureide.fm.ui.editors;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
@@ -147,12 +146,12 @@ public final class ConstraintTextValidator {
 
 		for (Feature feature : model.getFeatures()) {
 			if (input.contains(feature.getName())) {
-				if (feature.getFeatureStatus() != FeatureStatus.FALSE_OPTIONAL) {
+				//if (feature.getFeatureStatus() != FeatureStatus.FALSE_OPTIONAL) {
 					clonedModel.addPropositionalNode(propNode);
 					clonedModel.getAnalyser().analyzeFeatureModel(null);
 					if (clonedModel.getFeature(feature.getName()).getFeatureStatus() == FeatureStatus.FALSE_OPTIONAL && !list.contains(feature))
 						list.add(feature);
-				}
+				//}
 			}
 		}
 

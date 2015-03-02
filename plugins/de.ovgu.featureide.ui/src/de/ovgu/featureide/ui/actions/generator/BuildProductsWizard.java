@@ -69,7 +69,7 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
 	}
 	
-	boolean getToggleState() {
+	public boolean getToggleState() {
 		return toggleState;
 	}
 	

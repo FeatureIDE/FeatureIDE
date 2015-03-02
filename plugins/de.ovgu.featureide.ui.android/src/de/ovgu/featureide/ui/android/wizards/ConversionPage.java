@@ -25,7 +25,6 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -50,9 +49,9 @@ import de.ovgu.featureide.ui.wizards.NewFeatureProjectPage;
  */
 public class ConversionPage extends NewFeatureProjectPage {
 	
-	public ConversionPage(IProject p) {
+	public ConversionPage() {
 		super();
-		setDescription("Adds the FeatureIDE nature to Android project " + ((p != null) ? p.getName() : "") + ".");
+		setDescription("Add the FeatureIDE nature to Android projects.");
 	}
 	
 	@Override

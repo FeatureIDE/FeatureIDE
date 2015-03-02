@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: FeatureIDE Core Plug-in
+Bundle-Name: FeatureIDE Core Plug-In
 Bundle-SymbolicName: de.ovgu.featureide.core;singleton:=true
 Bundle-Version: 2.7.2.qualifier
 Bundle-Activator: de.ovgu.featureide.core.CorePlugin
@@ -18,13 +18,16 @@ Export-Package:
  de.ovgu.featureide.core,
  de.ovgu.featureide.core.builder,
  de.ovgu.featureide.core.builder.preprocessor,
+ de.ovgu.featureide.core.featuremodeling,
  de.ovgu.featureide.core.fstmodel,
  de.ovgu.featureide.core.fstmodel.preprocessor,
  de.ovgu.featureide.core.listeners,
+ de.ovgu.featureide.core.propertypage,
  de.ovgu.featureide.core.signature,
  de.ovgu.featureide.core.signature.abstr,
  de.ovgu.featureide.core.signature.comparator,
  de.ovgu.featureide.core.signature.filter,
+ de.ovgu.featureide.core.signature.java,
  de.ovgu.featureide.core.wizardextension
 Bundle-ClassPath: .
 Bundle-ActivationPolicy: lazy

@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Ahead Core Plug-in
+Bundle-Name: FeatureIDE Plug-In for AHEAD
 Bundle-SymbolicName: de.ovgu.featureide.core.ahead;singleton:=true
 Bundle-Version: 2.7.2.qualifier
 Bundle-Activator: de.ovgu.featureide.ahead.AheadCorePlugin
@@ -8,8 +8,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.resources,
  de.ovgu.featureide.core,
- de.ovgu.featureide.fm.core,
- org.eclipse.jdt.core
+ de.ovgu.featureide.fm.core
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: University of Magdeburg
@@ -18,6 +17,5 @@ Bundle-ClassPath: lib/jak2java.jar,
  lib/jampack.jar,
  .
 Export-Package: de.ovgu.featureide.ahead,
- de.ovgu.featureide.ahead.model
-Import-Package: org.eclipse.core.expressions,
- org.eclipse.jdt.internal.core
+ de.ovgu.featureide.ahead.model,
+ de.ovgu.featureide.ahead.wrapper

@@ -61,10 +61,7 @@ public class ExampleNewWizard extends Wizard implements INewWizard {
 		mainPage = new ExampleNewWizardPage(samplePath);
 		addPage(mainPage);
 	}
-
-	/*
-	 * (non-Javadoc) Method declared on IWorkbenchWizard.
-	 */
+	
 	public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
 		setWindowTitle("FeatureIDE Example Import");
 
@@ -87,18 +84,12 @@ public class ExampleNewWizard extends Wizard implements INewWizard {
 			ExamplePlugin.getDefault().logError(e);
 		}
 	}
-
-	/*
-	 * (non-Javadoc) Method declared on IWizard.
-	 */
+	
 	public boolean performCancel() {
 		mainPage.performCancel();
 		return true;
 	}
-
-	/*
-	 * (non-Javadoc) Method declared on IWizard.
-	 */
+	
 	public boolean performFinish() {
 		return mainPage.createProjects();
 	}

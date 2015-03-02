@@ -35,20 +35,17 @@ import de.ovgu.featureide.ui.UIPlugin;
  */
 @SuppressWarnings("restriction")
 public class ConversionPage extends NewFeatureProjectPage {
-	
-	private IProject p;
+
+	private IProject project;
 	private static final String JAVA_NATURE = "org.eclipse.jdt.core.javanature";
 	private static final String MESSAGE = "The build path is set to the java projects source path automatically";
 
-	public ConversionPage(String project, IProject p) {
+	public ConversionPage(IProject project) {
 		super();
-		setDescription("Adds the FeatureIDE nature to the project" + project + ".");
-		this.p = p;
+		setDescription("Adds the FeatureIDE nature to the project " + project.getName() + ".");
+		this.project = project;
 	}
 	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.ui.wizards.NewFeatureProjectPage#createControl(org.eclipse.swt.widgets.Composite)
-	 */
 	@Override
 	public void createControl(Composite parent) {
 		super.createControl(parent);
@@ -60,16 +57,18 @@ public class ConversionPage extends NewFeatureProjectPage {
 	 */
 	private void setBuildPath() {
 		try {
-			if (p.hasNature(JAVA_NATURE)) {
-				JavaProject javaProject = new JavaProject(p, null);
+			if (project.hasNature(JAVA_NATURE)) {
+				JavaProject javaProject = new JavaProject(project, null);
 				for (IClasspathEntry entry : javaProject.getRawClasspath()) {
 					if (entry.getEntryKind() == IClasspathEntry.CPE_SOURCE) {
 						String path = entry.getPath().toOSString();
 						String fileSeparator = System.getProperty("file.separator");
-						
-						if (path.contains(fileSeparator)) path = path.substring(path.indexOf(fileSeparator) + 1);
-						if (path.contains(fileSeparator)) path = path.substring(path.indexOf(fileSeparator) + 1);
-						
+
+						if (path.contains(fileSeparator))
+							path = path.substring(path.indexOf(fileSeparator) + 1);
+						if (path.contains(fileSeparator))
+							path = path.substring(path.indexOf(fileSeparator) + 1);
+
 						buildPath.setText(path);
 						buildPath.setEnabled(false);
 						buildLabel.setToolTipText(MESSAGE);

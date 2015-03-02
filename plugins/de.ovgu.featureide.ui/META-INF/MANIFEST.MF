@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: FeatureIDE UI Plug-in
+Bundle-Name: FeatureIDE UI Plug-In
 Bundle-SymbolicName: de.ovgu.featureide.ui;singleton:=true
 Bundle-Version: 2.7.2.qualifier
 Bundle-Activator: de.ovgu.featureide.ui.UIPlugin
@@ -13,8 +13,9 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.jdt.ui,
  org.eclipse.gef,
  de.ovgu.featureide.fm.core,
+ de.ovgu.featureide.fm.ui,
  de.ovgu.featureide.core,
- de.ovgu.featureide.fm.ui
+ org.eclipse.core.expressions
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: lib/SPLACAT.jar,
  lib/commons-math-2.2.jar,
@@ -23,6 +24,21 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: University of Magdeburg
 Export-Package: 
  de.ovgu.featureide.ui;uses:="org.eclipse.swt.graphics,de.ovgu.featureide.fm.ui,org.osgi.framework",
+ de.ovgu.featureide.ui.actions,
+ de.ovgu.featureide.ui.actions.generator,
+ de.ovgu.featureide.ui.decorators,
+ de.ovgu.featureide.ui.editors,
+ de.ovgu.featureide.ui.editors.annotation,
+ de.ovgu.featureide.ui.handlers.base,
+ de.ovgu.featureide.ui.perspective,
+ de.ovgu.featureide.ui.quickfix,
+ de.ovgu.featureide.ui.statistics.core,
+ de.ovgu.featureide.ui.statistics.core.composite,
+ de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations,
+ de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.genericdatatypes,
+ de.ovgu.featureide.ui.statistics.ui,
+ de.ovgu.featureide.ui.statistics.ui.helper,
+ de.ovgu.featureide.ui.statistics.ui.helper.jobs,
  de.ovgu.featureide.ui.views.collaboration;
   uses:="org.eclipse.core.runtime,
    de.ovgu.featureide.core,
@@ -40,6 +56,9 @@ Export-Package:
    de.ovgu.featureide.ui.views.collaboration,
    org.eclipse.gef.ui.parts,
    de.ovgu.featureide.fm.core",
+ de.ovgu.featureide.ui.views.collaboration.editparts,
+ de.ovgu.featureide.ui.views.collaboration.figures,
+ de.ovgu.featureide.ui.views.collaboration.model,
  de.ovgu.featureide.ui.views.collaboration.outline;
   uses:="org.eclipse.ui,
    de.ovgu.featureide.core.fstmodel,
@@ -53,6 +72,8 @@ Export-Package:
    de.ovgu.featureide.core.listeners,
    org.eclipse.jface.util,
    org.eclipse.swt.widgets",
+ de.ovgu.featureide.ui.views.collaboration.policy,
+ de.ovgu.featureide.ui.views.outline,
  de.ovgu.featureide.ui.wizards;
   uses:="org.eclipse.jface.wizard,
    de.ovgu.featureide.core,

@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Feature Model UI Plug-in
+Bundle-Name: Feature Model UI Plug-In
 Bundle-SymbolicName: de.ovgu.featureide.fm.ui;singleton:=true
 Bundle-Version: 2.7.2.qualifier
 Bundle-Activator: de.ovgu.featureide.fm.ui.FMUIPlugin
@@ -16,10 +16,10 @@ Require-Bundle:
  org.eclipse.jdt.debug.ui,
  org.eclipse.ui.views,
  org.eclipse.gef,
+ org.eclipse.core.expressions,
  de.ovgu.featureide.fm.core
 Bundle-ActivationPolicy: lazy
 Export-Package: de.ovgu.featureide.fm.ui,
- de.ovgu.featureide.fm.ui.actions,
  de.ovgu.featureide.fm.ui.editors;
   uses:="org.eclipse.jface.action,
    de.ovgu.featureide.fm.ui.editors.grammar,
@@ -34,13 +34,21 @@ Export-Package: de.ovgu.featureide.fm.ui,
  de.ovgu.featureide.fm.ui.editors.configuration,
  de.ovgu.featureide.fm.ui.editors.featuremodel,
  de.ovgu.featureide.fm.ui.editors.featuremodel.actions,
+ de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations,
  de.ovgu.featureide.fm.ui.editors.featuremodel.commands,
  de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming,
  de.ovgu.featureide.fm.ui.editors.featuremodel.editparts,
  de.ovgu.featureide.fm.ui.editors.featuremodel.figures,
  de.ovgu.featureide.fm.ui.editors.featuremodel.figures.anchors,
  de.ovgu.featureide.fm.ui.editors.featuremodel.layouts,
+ de.ovgu.featureide.fm.ui.editors.featuremodel.operations,
  de.ovgu.featureide.fm.ui.editors.featuremodel.policies,
+ de.ovgu.featureide.fm.ui.editors.keyhandler,
+ de.ovgu.featureide.fm.ui.handlers.base,
+ de.ovgu.featureide.fm.ui.preferences,
+ de.ovgu.featureide.fm.ui.properties,
+ de.ovgu.featureide.fm.ui.properties.language,
+ de.ovgu.featureide.fm.ui.properties.page,
  de.ovgu.featureide.fm.ui.views,
  de.ovgu.featureide.fm.ui.views.featuremodeleditview,
  de.ovgu.featureide.fm.ui.views.outline,

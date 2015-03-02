@@ -10,9 +10,6 @@
                class="de.ovgu.featureide.core.mpl.builder.InterfaceProjectNature">
          </run>
       </runtime>
-      <builder
-            id="de.ovgu.featureide.core.mpl.builder.interfaceProjectBuilder">
-      </builder>
    </extension>
    <extension id="MSPLNature" name="Multi Software Product Line Nature" point="org.eclipse.core.resources.natures">
       <runtime>

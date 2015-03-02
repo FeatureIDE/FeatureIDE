@@ -20,9 +20,6 @@
  */
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -63,38 +60,25 @@ public class ConfigParentNode extends LazyParent {
 		 *            for the job.
 		 */
 		public void calculate(final long timeout, final int priority) {
-			Job job = new StoppableTreeJob("Calculating "
-					+ this.description, this) {
-
+			Job job = new StoppableTreeJob("Calculating " + this.description, this) {
 				private String calculateConfigs() {
 					boolean ignoreAbstract = description.equals(DESC_CONFIGS);
-					if (!ignoreAbstract
-							&& innerModel.getAnalyser().countConcreteFeatures() == 0) {
-						// case: there is no concrete feature so there is only
-						// one program
-						// variant,
+					if (!ignoreAbstract && innerModel.getAnalyser().countConcreteFeatures() == 0) {
+						// case: there is no concrete feature so there is only one program variant,
 						// without this the calculation least much to long
 						return "1";
 					}
 
-					final long number = new Configuration(innerModel, false,
-							ignoreAbstract).number(timeout);
-
-					String s = "";
-					if (number < 0) {
-						s += "more than " + (-1 - number);
-					} else {
-						s += number;
-					}
-					return s;
+					final long number = new Configuration(innerModel, false, ignoreAbstract).number(timeout);
+					
+					return ((number < 0) ? "more than " + (-number - 1) : String.valueOf(number));
 				}
 
 				@Override
-				protected IStatus execute(IProgressMonitor monitor) {
+				protected boolean work() throws Exception {
 					setValue(calculateConfigs());
-					return Status.OK_STATUS;
+					return true;
 				}
-
 			};
 			job.setPriority(priority);
 			JobDoneListener listener = JobDoneListener.getInstance();

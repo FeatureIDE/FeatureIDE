@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+	<extension
+			point="org.eclipse.ui.menus">
+		<menuContribution locationURI="popup:de.ovgu.featureide.featurehouse.ui.submenu">
+			<command
+					commandId="de.ovgu.featureide.ahead.commands.changecomposeraction"
+					icon="icons/FeatureIconSmall.ico"
+					id="de.ovgu.featureide.ahead.actions.changeToAhead"
+					label="Change the composer to AHEAD"
+					style="push">
+				<visibleWhen
+						checkEnabled="false">
+					<with
+							variable="activeMenuSelection">
+						<iterate
+								ifEmpty="false"
+								operator="and">
+							<test
+									property="de.ovgu.featureide.fm.ui.properties.class"
+									value="org.eclipse.core.resources.IProject">
+							</test>
+						</iterate>
+					</with>
+				</visibleWhen>
+			</command>
+		</menuContribution>
+		<menuContribution locationURI="popup:de.ovgu.featureide.ahead.ui.submenu">
+			<command
+					commandId="de.ovgu.featureide.ahead.commands.changecomposeraction"
+					icon="icons/FeatureIconSmall.ico"
+					id="de.ovgu.featureide.ahead.actions.changeToFeatureHouse"
+					label="Change the composer to FeatureHouse"
+					style="push">
+				<visibleWhen
+						checkEnabled="false">
+					<with
+							variable="activeMenuSelection">
+						<iterate
+								ifEmpty="false"
+								operator="and">
+							<test
+									property="de.ovgu.featureide.fm.ui.properties.class"
+									value="org.eclipse.core.resources.IProject">
+							</test>
+						</iterate>
+					</with>
+				</visibleWhen>
+			</command>
+		</menuContribution>
+	</extension>
+	<extension point="org.eclipse.ui.commands">
+		<command
+				id="de.ovgu.featureide.ahead.commands.changecomposeraction"
+				name="changecomposeraction"/>
+	</extension>
+	<extension point="org.eclipse.ui.handlers">
+		<handler
+				commandId="de.ovgu.featureide.ahead.commands.changecomposeraction"
+				class="de.ovgu.featureide.core.conversion.ahead_featurehouse.handlers.ChangeComposerHandler"/>
+	</extension>
+</plugin>

@@ -95,66 +95,61 @@ public class MPLPlugin extends AbstractCorePlugin {
 		plugin = null;
 	}
 	
-	public void addMSPLNature(IProject project) {
-		IFeatureProject curFeatureProject = CorePlugin.getFeatureProject(project);
-		if (curFeatureProject != null) {
-			try {				
-				IProjectDescription description = project.getDescription();
-				String[] natures = description.getNatureIds();
-				String[] newNatures = new String[natures.length + 1];
-				System.arraycopy(natures, 0, newNatures, 0, natures.length);
-				newNatures[natures.length] = MSPLNature.NATURE_ID;
-				description.setNatureIds(newNatures);
-				project.setDescription(description, null);
+	public void addMSPLNature(IFeatureProject curFeatureProject) {
+		final IProject project = curFeatureProject.getProject();
+		try {				
+			IProjectDescription description = project.getDescription();
+			String[] natures = description.getNatureIds();
+			String[] newNatures = new String[natures.length + 1];
+			System.arraycopy(natures, 0, newNatures, 0, natures.length);
+			newNatures[natures.length] = MSPLNature.NATURE_ID;
+			description.setNatureIds(newNatures);
+			project.setDescription(description, null);
 
-				// create directories for MPL
-				IFolder mplFolder = project.getFolder("Interfaces");
-				if (!mplFolder.exists())
-					mplFolder.create(true, true, null);
-				
-				IFolder importFolder = project.getFolder("MPL");
-				if (!importFolder.exists())
-					importFolder.create(true, true, null);
-				
-				IFolder mappingFolder = project.getFolder("InterfaceMapping");
-				if (!mappingFolder.exists())
-					mappingFolder.create(true, true, null);
-				
-				IFile mappingFile = mappingFolder.getFile("default.config");
-				if (!mappingFile.exists()) {
-					mappingFile.create(new ByteArrayInputStream(new byte[0]), true, null);
-				}
-				project.setPersistentProperty(mappingConfigID, "default.config");
-				
-				// create interfaces mapping file
-				IFile mplVelvet = project.getFile("mpl.velvet");
-				if (!mplVelvet.exists()) {
-					// IFile.create() needs an source
-					byte[] bytes = ("concept " + project.getName() + " : "
-							+ project.getName()).getBytes();
-					InputStream source = new ByteArrayInputStream(bytes);
-					mplVelvet.create(source, true, null);
-				}
-			} catch (CoreException e) {
-				logError(e);
+			// create directories for MPL
+			IFolder mplFolder = project.getFolder("Interfaces");
+			if (!mplFolder.exists())
+				mplFolder.create(true, true, null);
+			
+			IFolder importFolder = project.getFolder("MPL");
+			if (!importFolder.exists())
+				importFolder.create(true, true, null);
+			
+			IFolder mappingFolder = project.getFolder("InterfaceMapping");
+			if (!mappingFolder.exists())
+				mappingFolder.create(true, true, null);
+			
+			IFile mappingFile = mappingFolder.getFile("default.config");
+			if (!mappingFile.exists()) {
+				mappingFile.create(new ByteArrayInputStream(new byte[0]), true, null);
 			}
+			project.setPersistentProperty(mappingConfigID, "default.config");
+			
+			// create interfaces mapping file
+			IFile mplVelvet = project.getFile("mpl.velvet");
+			if (!mplVelvet.exists()) {
+				// IFile.create() needs an source
+				byte[] bytes = ("concept " + project.getName() + " : "
+						+ project.getName()).getBytes();
+				InputStream source = new ByteArrayInputStream(bytes);
+				mplVelvet.create(source, true, null);
+			}
+		} catch (CoreException e) {
+			logError(e);
 		}
 	}
 	
-	public void addInterfaceNature(IProject project) {
-		IFeatureProject curFeatureProject = CorePlugin.getFeatureProject(project);
+	public void addInterfaceNature(IFeatureProject curFeatureProject) {
 		// TODO MPL: workaround: only for feature house projects
-		if (curFeatureProject != null
-				&& "de.ovgu.featureide.composer.featurehouse"
-						.equals(curFeatureProject.getComposerID())) {
+		if ("de.ovgu.featureide.composer.featurehouse".equals(curFeatureProject.getComposerID())) {
 			try {
-				IProjectDescription description = project.getDescription();
+				IProjectDescription description = curFeatureProject.getProject().getDescription();
 				String[] natures = description.getNatureIds();
 				String[] newNatures = new String[natures.length + 1];
 				System.arraycopy(natures, 0, newNatures, 0, natures.length);
 				newNatures[natures.length] = InterfaceProjectNature.NATURE_ID;
 				description.setNatureIds(newNatures);
-				project.setDescription(description, null);
+				curFeatureProject.getProject().setDescription(description, null);
 			} catch (CoreException e) {
 				logError(e);
 			}

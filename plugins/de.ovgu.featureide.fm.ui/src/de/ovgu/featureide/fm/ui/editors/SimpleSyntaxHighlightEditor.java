@@ -83,9 +83,16 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 	
 	public void setPossibleWords(Set<String> words) {
 		possibleWords.clear();
-		possibleWords.addAll(words);
-		for (int i = 0; i <keywords.length; i++)
-			possibleWords.add(keywords[i].toLowerCase());
+		
+		for (String word : words) {
+			possibleWords.add(word);
+			possibleWords.add("\"" + word + "\"");
+		}		
+		
+		for (int i = 0; i <keywords.length; i++) {
+			final String keyword = keywords[i].toLowerCase();
+			possibleWords.add(keyword);
+		}
 	}
 
 	private void updateHighlight() {
@@ -111,19 +118,31 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 		
 		unknownWords.clear();
 		
-		for (int i = 0; i < keywords.length; i++)
+		for (int i = 0; i < keywords.length; i++) {
 			possibleWords.add(keywords[i]);
+		}
 		
 		String safeCopy = new String(text);
 		safeCopy = safeCopy.replace("(", " ").replace(")", " ");
 		
-		System.out.println("---------------------\n" + safeCopy);
+		StringBuilder safeCopySb = new StringBuilder(safeCopy);
 		
-		String[] tokens = safeCopy.split(" ");
+		final char ILLEGAL_FEATURE_NAME_CHAR = '\u0000';
+		// avoid splitting feature names with containing spaces by replace spaces inside brackets with a char
+		// that could never be inside a feature name and recode this later
+		boolean insideFeatureNameWithWhitespace = false;
+		for (int i = 0; i < safeCopy.length(); i++) {
+			if (safeCopy.charAt(i) == '\"')
+				insideFeatureNameWithWhitespace = !insideFeatureNameWithWhitespace;
+			if (insideFeatureNameWithWhitespace && safeCopy.charAt(i) == ' ') {
+				safeCopySb.replace(i, i+1, String.valueOf(ILLEGAL_FEATURE_NAME_CHAR));
+			}
+		}
+		
+		String[] tokens = safeCopySb.toString().split(" ");
 		int start = 0;
 		for (int i = 0; i< tokens.length; i++) {
-			String token = tokens[i].trim();
-			System.out.println("token " + token);
+			String token = tokens[i].trim().replace(ILLEGAL_FEATURE_NAME_CHAR, ' ');
 			
 			if (!token.isEmpty() && !possibleWords.contains(token) && !possibleWords.contains(token.toLowerCase())) {
 				unknownWords.add(token);

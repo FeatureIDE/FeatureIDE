@@ -1,16 +1,19 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: FeatureIDE Examples Plug-in
+Bundle-Name: FeatureIDE Examples Plug-In
 Bundle-SymbolicName: de.ovgu.featureide.examples;singleton:=true
 Bundle-Version: 2.7.2.qualifier
 Require-Bundle: org.eclipse.core.resources,
  org.eclipse.ui,
  org.eclipse.ui.ide,
  org.eclipse.core.runtime,
- de.ovgu.featureide.fm.ui
+ de.ovgu.featureide.fm.ui,
+ de.ovgu.featureide.core,
+ de.ovgu.featureide.fm.core
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: University of Magdeburg
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: de.ovgu.featureide.examples.ExamplePlugin
-Import-Package: de.ovgu.featureide.core.builder,
- de.ovgu.featureide.fm.core.configuration
+Export-Package: de.ovgu.featureide.examples,
+ de.ovgu.featureide.examples.utils,
+ de.ovgu.featureide.examples.wizards

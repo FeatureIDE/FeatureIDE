@@ -21,13 +21,13 @@
 package de.ovgu.featureide.ui.mpl.wizards;
 
 import de.ovgu.featureide.ui.mpl.MPLUIPlugin;
-import de.ovgu.featureide.ui.mpl.actions.interfaces.BuildExtendedModulesAction;
+import de.ovgu.featureide.ui.mpl.handlers.interfaces.BuildExtendedModulesHandler;
 import de.ovgu.featureide.ui.mpl.wizards.page.ChooseFeaturePage;
 import de.ovgu.featureide.ui.mpl.wizards.page.ChooseFolderPage;
 import de.ovgu.featureide.ui.mpl.wizards.page.DocArgumentsPage;
 
 /**
- * Wizard for the {@link BuildExtendedModulesAction}.
+ * Wizard for the {@link BuildExtendedModulesHandler}.
  * 
  * @author Reimar Schroeter
  */

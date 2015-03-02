@@ -29,49 +29,32 @@ import org.eclipse.ui.IWorkbench;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
+import de.ovgu.featureide.fm.ui.handlers.base.SelectionWrapper;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
  * A Wizard to add the FeatureIDE Nature to a Project.
  * 
  * @author Jens Meinicke
+ * @author Sebastian Krieter
  */
 public class ConversionWizard extends Wizard implements INewWizard {
 
-	public static final String ID = UIPlugin.PLUGIN_ID
-			+ ".wizzard.ConversionWizzard";
+	public static final String ID = UIPlugin.PLUGIN_ID + ".wizzard.ConversionWizzard";
 
 	private ConversionPage page;
 
-	private IStructuredSelection selection;
+	private IProject project;
 
 	public boolean performFinish() {
-
-		Object obj = selection.getFirstElement();
-		if (obj instanceof IResource) {
-			if (page.hasCompositionTool()) {
-				IProject project = ((IResource) obj).getProject();
-				if (project.isOpen()) {
-					CorePlugin.setupProject(project, page
-							.getCompositionTool().getId(), page.getSourcePath(),
-							page.getConfigPath(), page.getBuildPath());
-					UIPlugin.getDefault().openEditor(FeatureModelEditor.ID,
-							project.getFile("model.xml"));
-				} else {
-					return false;
-				}
-			}
+		if (page.hasCompositionTool() && project.isOpen()) {
+			CorePlugin.setupProject(project, page.getCompositionTool().getId(), page.getSourcePath(), page.getConfigPath(), page.getBuildPath());
+			UIPlugin.getDefault().openEditor(FeatureModelEditor.ID, project.getFile("model.xml"));
 			return true;
 		}
-
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.wizard.Wizard#addPages()
-	 */
 	@Override
 	public void addPages() {
 		// addPage(new ConversionPage(selection));
@@ -80,25 +63,12 @@ public class ConversionWizard extends Wizard implements INewWizard {
 		super.addPages();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.ui.IWorkbenchWizard#init(org.eclipse.ui.IWorkbench,
-	 * org.eclipse.jface.viewers.IStructuredSelection)
-	 */
 	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
-		String project = "";
-
-		Object obj = selection.getFirstElement();
-		IProject p = null;
-		if (obj instanceof IResource) {
-			IResource res = (IResource) obj;
-			p = res.getProject();
-			project = p.getName();
+		final IResource res = SelectionWrapper.init(selection, IResource.class).getNext();
+		if (res != null) {
+			project = res.getProject();
+			page = new ConversionPage(project);
 		}
-
-		page = new ConversionPage(" " + project, p);
-		this.selection = selection;
 	}
 }

@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Aspectj Plug-in
+Bundle-Name: FeatureIDE Plug-In for AspectJ
 Bundle-SymbolicName: de.ovgu.featureide.core.aspectj;singleton:=true
 Bundle-Version: 2.7.2.qualifier
 Bundle-Activator: de.ovgu.featureide.aspectj.AspectJCorePlugin
@@ -13,3 +13,4 @@ Require-Bundle: org.eclipse.ui,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: University of Magdeburg
+Export-Package: de.ovgu.featureide.aspectj

@@ -1,0 +1,5 @@
+cinterface IHelloWorld-FH-Java {
+		mandatory feature Hello;
+		mandatory feature World;
+		feature Wonderful;
+}
