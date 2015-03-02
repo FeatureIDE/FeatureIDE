@@ -26,6 +26,8 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Control;
 
+import de.ovgu.featureide.fm.core.Features;
+
 /**
  * contentAdapter for content assist while typing constraints
  * 
@@ -33,26 +35,123 @@ import org.eclipse.swt.widgets.Control;
  * @author Fabian Benduhn
  */
 public class SimpleSyntaxHighlighterConstraintContentAdapter implements IControlContentAdapter, IControlContentAdapter2 {
-	
+
+	public enum TextChangeMode {
+		INSERT_TEXT, REPLACE_TEXT, UNKNOWN
+	}
+
+	public enum InsertionMode {
+		SUBSTRING_PRESENT, JUST_INSERT, UNKNOWN
+	}
+
+	public static class InsertionResult {
+		Point selection;
+		String text;
+
+		public InsertionResult(Point selection, String text) {
+			this.selection = selection;
+			this.text = text;
+		}
+
+		public Point getSelection() {
+			return selection;
+		}
+
+		public String getText() {
+			return text;
+		}
+
+	}
+
 	public void insertControlContents(Control control, String text, int cursorPosition) {
-		Point selection = ((SimpleSyntaxHighlightEditor) control).getSelection();
-		int posMarker = selection.y - 1;
-		if (cursorPosition != 0) {
-			String constraintText = ((SimpleSyntaxHighlightEditor) control).getText();
-			while (posMarker >= 0 && (constraintText.charAt(posMarker) != ' ' && constraintText.charAt(posMarker) != ')' && constraintText.charAt(posMarker) != '(')) {
-				posMarker--;
+
+		final SimpleSyntaxHighlightEditor editor = (SimpleSyntaxHighlightEditor) control;
+		final Point selection = editor.getSelection();
+		final String currentText = editor.getText();
+
+		InsertionResult result = performInsertion(currentText, selection, text);
+		
+		editor.setText(result.text);
+		editor.setSelection(result.selection);
+	}
+
+	/**
+	 * @param currentText
+	 * @param selection
+	 * @param text
+	 * @return
+	 */
+	public static InsertionResult performInsertion(final String currentText, final Point selection, final String textToInsert) {
+		String before = "", after = "";
+		String text = textToInsert;
+		
+		if (text.contains(Features.FEATURE_SUFFIX)) {
+			text = "\"" + text.replace(Features.FEATURE_SUFFIX, "").trim() + "\"";
+		} else if (text.contains(" ")) {
+			text = "\"" + text + "\"";
+		}
+		
+		switch (getMode(selection)) {
+		case INSERT_TEXT: {		
+
+			switch (getMode(currentText, selection.x)) {
+			case JUST_INSERT:
+				if (currentText.isEmpty()) {
+					return new InsertionResult(new Point(text.length(), text.length()), text);
+				} else {
+					before = currentText.substring(0, selection.x);
+					after = currentText.substring(selection.x, currentText.length());
+				}
+				break;
+			case SUBSTRING_PRESENT:
+				int substringStartIndex = getSubStringStartIndex(currentText, selection.x);
+				before = currentText.substring(0, substringStartIndex);
+				after = currentText.substring(selection.x, currentText.length());
+				break;
+			default:
+				throw new UnsupportedOperationException();
 			}
+		} break;
+		case REPLACE_TEXT:
+			before = currentText.substring(0, Math.min(selection.x, getSubStringStartIndex(currentText, selection.x)));
+			after = currentText.substring(selection.y, currentText.length());
+			break;
+		default:
+			throw new UnsupportedOperationException();
 		}
-		selection.x = posMarker + 1;
+		
+		if (!before.isEmpty() && !before.endsWith(" "))
+			before += " ";
+		
+		if (!after.isEmpty() && !after.startsWith(" "))
+			after = " " + after;
 
-		((SimpleSyntaxHighlightEditor) control).setSelection(selection);
-		((SimpleSyntaxHighlightEditor) control).insert(text);
+		final String newText = before + text + after;
+		final int pos = (before + text).length();
+		return new InsertionResult(new Point(pos, pos), newText);
+	}
 
-		// Insert will leave the cursor at the end of the inserted text. If this
-		// is not what we wanted, reset the selection.
-		if (cursorPosition < text.length()) {
-			((SimpleSyntaxHighlightEditor) control).setSelection(selection.x + cursorPosition, selection.x + cursorPosition);
+	private static int getSubStringStartIndex(final String currentText, final int x) {
+		int substringStartIndex = Math.max(0, x - 1);
+		for (; substringStartIndex > 0; substringStartIndex--) {
+			final char ch = currentText.charAt(substringStartIndex);
+			if (ch == ' ' || ch == '(' || ch == ')')
+				break;
 		}
+		return substringStartIndex;
+	}
+
+	private static InsertionMode getMode(final String text, final int selectionIndex) {
+		if (text.isEmpty() || selectionIndex - 1 < 0 || text.charAt(selectionIndex - 1) == ' ')
+			return InsertionMode.JUST_INSERT;
+		else if (!text.isEmpty() || selectionIndex - 1 >= 0 && text.charAt(selectionIndex - 1) != ' ')
+			return InsertionMode.SUBSTRING_PRESENT;
+		else
+			return InsertionMode.UNKNOWN;
+	}
+
+	private static TextChangeMode getMode(final Point selection) {
+		return selection.x == selection.y ? TextChangeMode.INSERT_TEXT : selection.x < selection.y ? TextChangeMode.REPLACE_TEXT : TextChangeMode.UNKNOWN;
 	}
 
 	/*
