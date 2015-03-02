@@ -47,11 +47,11 @@ public class ConfigurationWriter {
 				file.setContents(new ByteArrayInputStream(new byte[0]), false, true, null);
 				file.setCharset(DEFAULT_CHARSET, null);
 			}
-			file.setContents(source, false, true, null);
 		} else {
-			file.create(source, true, null);
+			file.create(new ByteArrayInputStream(new byte[0]), true, null);
 			file.setCharset(DEFAULT_CHARSET, null);
 		}
+		file.setContents(source, false, true, null);
 	}
 
 	public String writeIntoString() {
