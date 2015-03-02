@@ -1,10 +1,10 @@
 <project name="allElements delegation and assemble customTargets.xml">
-<!-- FILE WILL BE OVERWRITTEN WHEN GENERATED -->
-  	<target name="allElementsExceptSvnFetch" unless="is.svn.fetch">
-  		<antcall target="norcpbuild"/>
-  		<antcall target="rcpbuild"/>
-    </target>
-	
+	<!-- FILE WILL BE OVERWRITTEN WHEN GENERATED -->
+	<target name="allElementsExceptSvnFetch" unless="is.svn.fetch">
+		<antcall target="norcpbuild"/>
+		<antcall target="rcpbuild"/>
+	</target>
+
 	<target name="norcpbuild" unless="build.container.feature">
 		<ant antfile="${genericTargets}" target="${target}">
 			<property name="type" value="feature" />
@@ -17,6 +17,10 @@
 		<ant antfile="${genericTargets}" target="${target}">
 			<property name="type" value="feature" />
 			<property name="id" value="de.ovgu.featureide.featurecpp" />
+		</ant>
+		<ant antfile="${genericTargets}" target="${target}">
+			<property name="type" value="feature" />
+			<property name="id" value="de.ovgu.featureide.ahead" />
 		</ant>
 		<ant antfile="${genericTargets}" target="${target}">
 			<property name="type" value="feature" />
@@ -50,7 +54,7 @@
 			<property name="type" value="feature" />
 			<property name="id" value="de.ovgu.featureide.munge.android" />
 		</ant>
-		
+
 	</target>
 
 	<target name="rcpbuild" if="build.container.feature">
@@ -59,8 +63,8 @@
 			<property name="id" value="org.eclipse.pde.build.container.feature" />
 		</ant>
 	</target>
-	
-	<!-- generated assemble targets -->	     
+
+	<!-- generated assemble targets -->
 	<target name="assemble.de.ovgu.featureide.featuremodeling">
 		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
 			<property name="zipargs" value="" />
@@ -75,7 +79,8 @@
 		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
 			<property name="zipargs" value="" />
 		</ant>
-	</target>	<target name="assemble.de.ovgu.featureide">
+	</target>
+	<target name="assemble.de.ovgu.featureide">
 		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
 			<property name="zipargs" value="" />
 		</ant>
@@ -89,7 +94,8 @@
 		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
 			<property name="zipargs" value="" />
 		</ant>
-	</target>	<target name="assemble.de.ovgu.featureide.featurecpp">
+	</target>
+	<target name="assemble.de.ovgu.featureide.featurecpp">
 		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
 			<property name="zipargs" value="" />
 		</ant>
@@ -103,7 +109,8 @@
 		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
 			<property name="zipargs" value="" />
 		</ant>
-	</target>	<target name="assemble.de.ovgu.featureide.featurehouse">
+	</target>
+	<target name="assemble.de.ovgu.featureide.featurehouse">
 		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
 			<property name="zipargs" value="" />
 		</ant>
@@ -117,7 +124,23 @@
 		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
 			<property name="zipargs" value="" />
 		</ant>
-	</target>	<target name="assemble.de.ovgu.featureide.antenna">
+	</target>
+	<target name="assemble.de.ovgu.featureide.ahead">
+		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
+			<property name="zipargs" value="" />
+		</ant>
+	</target>
+	<target name="assemble.de.ovgu.featureide.ahead.p2">
+		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
+			<property name="zipargs" value="" />
+		</ant>
+	</target>
+	<target name="assemble.de.ovgu.featureide.ahead.group.group.group">
+		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
+			<property name="zipargs" value="" />
+		</ant>
+	</target>
+	<target name="assemble.de.ovgu.featureide.antenna">
 		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
 			<property name="zipargs" value="" />
 		</ant>
@@ -131,7 +154,8 @@
 		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
 			<property name="zipargs" value="" />
 		</ant>
-	</target>	<target name="assemble.de.ovgu.featureide.aspectj">
+	</target>
+	<target name="assemble.de.ovgu.featureide.aspectj">
 		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
 			<property name="zipargs" value="" />
 		</ant>
@@ -145,7 +169,8 @@
 		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
 			<property name="zipargs" value="" />
 		</ant>
-	</target>	<target name="assemble.de.ovgu.featureide.exampleprojects">
+	</target>
+	<target name="assemble.de.ovgu.featureide.exampleprojects">
 		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
 			<property name="zipargs" value="" />
 		</ant>
@@ -159,7 +184,8 @@
 		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
 			<property name="zipargs" value="" />
 		</ant>
-	</target>	<target name="assemble.de.ovgu.featureide.munge">
+	</target>
+	<target name="assemble.de.ovgu.featureide.munge">
 		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
 			<property name="zipargs" value="" />
 		</ant>
@@ -173,7 +199,8 @@
 		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
 			<property name="zipargs" value="" />
 		</ant>
-	</target>	<target name="assemble.de.ovgu.featureide.test">
+	</target>
+	<target name="assemble.de.ovgu.featureide.test">
 		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
 			<property name="zipargs" value="" />
 		</ant>
@@ -187,7 +214,8 @@
 		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
 			<property name="zipargs" value="" />
 		</ant>
-	</target>	<target name="assemble.br.ufal.ic.colligens.feature">
+	</target>
+	<target name="assemble.br.ufal.ic.colligens.feature">
 		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
 			<property name="zipargs" value="" />
 		</ant>
@@ -201,7 +229,8 @@
 		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
 			<property name="zipargs" value="" />
 		</ant>
-	</target>	<target name="assemble.de.ovgu.featureide.munge.android">
+	</target>
+	<target name="assemble.de.ovgu.featureide.munge.android">
 		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
 			<property name="zipargs" value="" />
 		</ant>
@@ -216,81 +245,81 @@
 			<property name="zipargs" value="" />
 		</ant>
 	</target>
-	
-	<!-- assmble targets for RCP build -->	
+
+	<!-- assmble targets for RCP build -->
 	<target name="assemble.org.eclipse.pde.build.container.feature.p2">
- 		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">			
- 			<property name="archiveName" value="${archiveNamePrefix}-win32.win32.x86.zip"/>
+		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
+			<property name="archiveName" value="${archiveNamePrefix}-win32.win32.x86.zip"/>
 		</ant>
 	</target>
 	<target name="assemble.org.eclipse.pde.build.container.feature.win32.win32.x86">
- 		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">			
- 			<property name="archiveName" value="${archiveNamePrefix}-win32.win32.x86.zip"/>
+		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
+			<property name="archiveName" value="${archiveNamePrefix}-win32.win32.x86.zip"/>
 		</ant>
 	</target>
 	<target name="assemble.org.eclipse.pde.build.container.feature.linux.gtk.x86">
- 		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">			
- 			<property name="archiveName" value="${archiveNamePrefix}-linux.gtk.x86.zip"/>
+		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
+			<property name="archiveName" value="${archiveNamePrefix}-linux.gtk.x86.zip"/>
 		</ant>
 	</target>
 	<target name="assemble.org.eclipse.pde.build.container.feature.linux.gtk.ppc">
- 		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">			
- 			<property name="archiveName" value="${archiveNamePrefix}-linux.gtk.ppc.zip"/>
+		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
+			<property name="archiveName" value="${archiveNamePrefix}-linux.gtk.ppc.zip"/>
 		</ant>
 	</target>
 	<target name="assemble.org.eclipse.pde.build.container.feature.linux.gtk.x86_64">
- 		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">			
- 			<property name="archiveName" value="${archiveNamePrefix}-linux.gtk.x86_64.zip"/>
+		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
+			<property name="archiveName" value="${archiveNamePrefix}-linux.gtk.x86_64.zip"/>
 		</ant>
 	</target>
 	<target name="assemble.org.eclipse.pde.build.container.feature.linux.motif.x86">
- 		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">			
- 			<property name="archiveName" value="${archiveNamePrefix}-linux.motif.x86.zip"/>
+		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
+			<property name="archiveName" value="${archiveNamePrefix}-linux.motif.x86.zip"/>
 		</ant>
 	</target>
 	<target name="assemble.org.eclipse.pde.build.container.feature.solaris.motif.sparc">
- 		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">			
- 			<property name="archiveName" value="${archiveNamePrefix}-solaris.motif.sparc.zip"/>
+		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
+			<property name="archiveName" value="${archiveNamePrefix}-solaris.motif.sparc.zip"/>
 		</ant>
 	</target>
 	<target name="assemble.org.eclipse.pde.build.container.feature.solaris.gtk.sparc">
- 		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">			
- 			<property name="archiveName" value="${archiveNamePrefix}-solaris.gtk.sparc.zip"/>
+		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
+			<property name="archiveName" value="${archiveNamePrefix}-solaris.gtk.sparc.zip"/>
 		</ant>
 	</target>
 	<target name="assemble.org.eclipse.pde.build.container.feature.aix.motif.ppc">
- 		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">			
- 			<property name="archiveName" value="${archiveNamePrefix}-aix.motif.ppc.zip"/>
+		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
+			<property name="archiveName" value="${archiveNamePrefix}-aix.motif.ppc.zip"/>
 		</ant>
 	</target>
 	<target name="assemble.org.eclipse.pde.build.container.feature.hpux.motif.PA_RISC">
- 		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">			
- 			<property name="archiveName" value="${archiveNamePrefix}-hpux.motif.PA_RISC.zip"/>
+		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
+			<property name="archiveName" value="${archiveNamePrefix}-hpux.motif.PA_RISC.zip"/>
 		</ant>
 	</target>
 	<target name="assemble.org.eclipse.pde.build.container.feature.macosx.carbon.ppc">
- 		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">			
- 			<property name="archiveName" value="${archiveNamePrefix}-macosx.carbon.ppc.zip"/>
+		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
+			<property name="archiveName" value="${archiveNamePrefix}-macosx.carbon.ppc.zip"/>
 		</ant>
 	</target>
 	<target name="assemble.org.eclipse.pde.build.container.feature.macosx.carbon.x86">
- 		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">			
- 			<property name="archiveName" value="${archiveNamePrefix}-macosx.carbon.x86.zip"/>
+		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
+			<property name="archiveName" value="${archiveNamePrefix}-macosx.carbon.x86.zip"/>
 		</ant>
 	</target>
 	<target name="assemble.org.eclipse.pde.build.container.feature.macosx.cocoa.ppc">
- 		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">			
- 			<property name="archiveName" value="${archiveNamePrefix}-macosx.cocoa.ppc.zip"/>
+		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
+			<property name="archiveName" value="${archiveNamePrefix}-macosx.cocoa.ppc.zip"/>
 		</ant>
-	</target>	
+	</target>
 	<target name="assemble.org.eclipse.pde.build.container.feature.macosx.cocoa.x86">
- 		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">			
- 			<property name="archiveName" value="${archiveNamePrefix}-macosx.cocoa.x86.zip"/>
+		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
+			<property name="archiveName" value="${archiveNamePrefix}-macosx.cocoa.x86.zip"/>
 		</ant>
-	</target>	
+	</target>
 	<target name="assemble.org.eclipse.pde.build.container.feature.macosx.cocoa.x86_64">
- 		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">			
- 			<property name="archiveName" value="${archiveNamePrefix}-macosx.cocoa.x86_64.zip"/>
+		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
+			<property name="archiveName" value="${archiveNamePrefix}-macosx.cocoa.x86_64.zip"/>
 		</ant>
-	</target>	
+	</target>
 </project>

@@ -2,12 +2,14 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: FeatureIDE Plug-In for FeatureHouse
 Bundle-SymbolicName: de.ovgu.featureide.core.featurehouse;singleton:=true
-Bundle-Version: 2.7.2.qualifier
+Bundle-Version: 2.7.3.qualifier
 Bundle-Activator: de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.resources,
  de.ovgu.featureide.core,
+ de.ovgu.featureide.ui,
+ de.ovgu.featureide.fm.ui,
  de.ovgu.featureide.fm.core,
  org.eclipse.jdt.core
 Bundle-ActivationPolicy: lazy
@@ -24,5 +26,4 @@ Export-Package: de.ovgu.featureide.featurehouse,
  de.ovgu.featureide.featurehouse.meta,
  de.ovgu.featureide.featurehouse.meta.featuremodel,
  de.ovgu.featureide.featurehouse.model,
- de.ovgu.featureide.featurehouse.signature.fuji,
- de.ovgu.featureide.featurehouse.ui.actions
+ de.ovgu.featureide.featurehouse.signature.fuji

@@ -26,11 +26,13 @@ import org.eclipse.core.resources.IProject;
  * Defines feature model specific extensions.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke
  */
 public interface IFMComposerExtension {
 	
-	static final String ERROR_MESSAGE_COMPOSER = "The name need to be a valid Java identifier.";
-	static final String ERROR_MESSAGE_NO_COMPOSER = "The following Characaters are not allowed \", (, )";
+	static final String ERROR_MESSAGE_NO_COMPOSER = "The characaters  \", (, ) are not allowed and the feature name has to be non-empty.";
+	static final String ERROR_MESSAGE_COMPOSER = "This feature name is not possible. The following regular expression descriptes all valid feature names: "
+			+ "\n   ^[a-zA-Z][a-zA-Z_0-9]*$\n\n" + ERROR_MESSAGE_NO_COMPOSER; 
 
 	/*
 	 * This is necessary for feature models out of a feature project.

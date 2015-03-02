@@ -32,17 +32,14 @@ import de.ovgu.featureide.ui.migration.wizard.SPLMigrationWizard;
  * @author Konstantin Tonscheidt
  * 
  */
-public class VariantsToFeatureHouseSPLMigrator extends DefaultSPLMigrator
-{
+public class VariantsToFeatureHouseSPLMigrator extends DefaultSPLMigrator {
 	private WizardDialog dialog;
 
-	public VariantsToFeatureHouseSPLMigrator(IStructuredSelection projectSelection)
-	{
+	public VariantsToFeatureHouseSPLMigrator(IStructuredSelection projectSelection) {
 		this(true, projectSelection);
 	}
 
-	public VariantsToFeatureHouseSPLMigrator(boolean withGui, IStructuredSelection projectSelection)
-	{
+	public VariantsToFeatureHouseSPLMigrator(boolean withGui, IStructuredSelection projectSelection) {
 		registerProjectsFromSelection(projectSelection);
 
 		if (withGui)
@@ -52,8 +49,7 @@ public class VariantsToFeatureHouseSPLMigrator extends DefaultSPLMigrator
 
 	}
 
-	private void initWizard(IStructuredSelection projectSelection)
-	{
+	private void initWizard(IStructuredSelection projectSelection) {
 		dialog = new WizardDialog(null, new SPLMigrationWizard(this));
 		dialog.open();
 	}

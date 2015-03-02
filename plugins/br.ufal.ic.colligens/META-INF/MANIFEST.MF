@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Colligens
 Bundle-SymbolicName: br.ufal.ic.colligens;singleton:=true
-Bundle-Version: 1.2.3.qualifier
+Bundle-Version: 1.1.4.qualifier
 Bundle-Activator: br.ufal.ic.colligens.activator.Colligens
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,

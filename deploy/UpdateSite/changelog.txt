@@ -7,6 +7,17 @@ https://github.com/tthuem/FeatureIDE/issues/milestones
 
 Here, is a list of high-level enhancements.
 
+Release 2.7.3 (March 2015)
+
+* Performance and appearance of constraint dialog for large feature models improved (automated analyses run asynchronously)
+* Performance of configuration editor for large feature models improved (automated analyses run asynchronously)
+* Improved support for multi product lines
+* Error propagation when generating multiple products (e.g., all products, all user-defined configurations, t-wise sampling)
+* Improved support for undo and redo in feature model editor
+* Added more restrictions to feature names in favor of stability (please report to us, if legacy FeatureIDE projects can no longer be built)
+* Deprecated action framework of Eclipse replaced
+* FeatureIDE requires Java 1.7 (was Java 1.6 before)
+
 Release 2.7.2 (October 2014)
 * Support for Android projects with preprocessor Munge
 * Family-based type checks with Fuji can be activated on demand (to overcome performance problems with large projects)

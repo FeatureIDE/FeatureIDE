@@ -23,14 +23,12 @@ package de.ovgu.featureide.ui.wizards;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.IDialogPage;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -57,29 +55,31 @@ import de.ovgu.featureide.ui.UIPlugin;
 public class NewConfigurationFilePage extends WizardPage {
 
 	private Combo featureComboProject;
-	
+
 	private Text fileText;
 
-	private ISelection selection;
-	
-	private IContainer container;
-	
-	IFeatureProject featureProject = null;
-	
+	private IFolder configFolder;
+
+	private IFeatureProject featureProject = null;
+
 	private Collection<IFeatureProject> featureProjects = CorePlugin.getFeatureProjects();
-	
+
 	private String text;
+
+	private LinkedList<String> configNames = new LinkedList<String>();
+	private boolean projectbool = false;
+	private boolean configbool = false;
+
 	/**
 	 * Constructor for SampleNewWizardPage.
 	 * 
 	 * @param pageName
 	 */
-	public NewConfigurationFilePage(ISelection selection) {
+	public NewConfigurationFilePage(IFolder configFolder) {
 		super("wizardPage");
 		setTitle("New Configuration");
-		setDescription("Enter the name of the configuration file. It will be placed in the configurations directory of the " +
-				"selected FeatureIDE project");
-		this.selection = selection;
+		setDescription("Enter the name of the configuration file. It will be placed in the configurations directory of the " + "selected FeatureIDE project");
+		this.configFolder = configFolder;
 	}
 
 	/**
@@ -92,18 +92,18 @@ public class NewConfigurationFilePage extends WizardPage {
 		layout.numColumns = 3;
 		layout.verticalSpacing = 9;
 		composite.setLayout(layout);
-		
+
 		Label label = new Label(composite, SWT.NULL);
-		label.setText("&Project:");		
+		label.setText("&Project:");
 		featureComboProject = new Combo(composite, SWT.BORDER | SWT.SINGLE);
 		featureComboProject.setLayoutData(gd);
-		new Label(composite,SWT.NULL);
+		new Label(composite, SWT.NULL);
 
 		label = new Label(composite, SWT.NULL);
 		label.setText("&File name:");
 		fileText = new Text(composite, SWT.BORDER | SWT.SINGLE);
 		fileText.setLayoutData(gd);
-		
+
 		initialize();
 		addListeners();
 		dialogChanged();
@@ -119,26 +119,26 @@ public class NewConfigurationFilePage extends WizardPage {
 			public void modifyText(ModifyEvent e) {
 				featureProject = null;
 				text = featureComboProject.getText();
-				for (IFeatureProject feature : featureProjects){
-					if(text.equalsIgnoreCase(feature.getProjectName())){
+				for (IFeatureProject feature : featureProjects) {
+					if (text.equalsIgnoreCase(feature.getProjectName())) {
 						featureProject = feature;
-					}	
+					}
 				}
-				if (featureProject != null){
+				if (featureProject != null) {
 					try {
 						for (IResource configFile : featureProject.getConfigFolder().members()) {
 							if (configFile instanceof IFile) {
-								configNames.add(configFile.getName());//.split("[.]")[0]);
+								configNames.add(configFile.getName());// .split("[.]")[0]);
 							}
 						}
 					} catch (CoreException e2) {
 						UIPlugin.getDefault().logError(e2);
 					}
-					IResource res = ResourcesPlugin.getWorkspace().getRoot().findMember(featureProject.getProjectName()); 
+					IResource res = ResourcesPlugin.getWorkspace().getRoot().findMember(featureProject.getProjectName());
 					IFeatureProject data = CorePlugin.getFeatureProject(res);
-					container = data.getConfigFolder();
-				}	
-				dialogChanged();	
+					configFolder = data.getConfigFolder();
+				}
+				dialogChanged();
 			}
 		});
 		fileText.addModifyListener(new ModifyListener() {
@@ -147,51 +147,35 @@ public class NewConfigurationFilePage extends WizardPage {
 			}
 		});
 	}
+
 	private void initialize() {
-		for (IFeatureProject feature : featureProjects)							
+		for (IFeatureProject feature : featureProjects) {
 			featureComboProject.add(feature.getProjectName());
-		if (selection != null && selection.isEmpty() == false
-				&& selection instanceof IStructuredSelection) {
-			IStructuredSelection ssel = (IStructuredSelection) selection;
-			if (ssel.size() > 1)
-				return;
-			Object obj = ssel.getFirstElement();
-			if (obj instanceof IResource) {
-				
-					IFeatureProject data = CorePlugin.getFeatureProject((IResource) obj);
-					if (data == null) container = null;
-					else {
-						container = data.getConfigFolder();
-					}
-				if (container != null) {
-					featureComboProject.setText(container.getProject().getName());
-				}
-			}
+		}
+		if (configFolder != null) {
+			featureComboProject.setText(configFolder.getProject().getName());
 		}
 	}
-	
-	private LinkedList<String> configNames = new LinkedList<String>();
-	private boolean projectbool = false;
-	private boolean configbool = false;
+
 	private void dialogChanged() {
 		String fileName = getFileName();
-		if (featureComboProject.getText().length() == 0 && !projectbool){
+		if (featureComboProject.getText().length() == 0 && !projectbool) {
 			setErrorMessage(null);
 			setPageComplete(false);
 			projectbool = true;
 			return;
 		}
-		
-		if (featureComboProject.getText().length() == 0){
+
+		if (featureComboProject.getText().length() == 0) {
 			updateStatus("No Project selected");
 			return;
 		}
-		
-		if (!isFeatureProject(featureComboProject.getText())){
+
+		if (!isFeatureProject(featureComboProject.getText())) {
 			updateStatus("Selected project is not a FeatureIDE Project");
 			return;
 		}
-		
+
 		if (fileName.length() != 0) {
 			configbool = true;
 			String fullFileName = fileName + "." + featureProject.getComposer().getConfigurationExtension();
@@ -199,25 +183,26 @@ public class NewConfigurationFilePage extends WizardPage {
 				updateStatus("File " + fullFileName + " already exists.");
 				return;
 			}
-		} else if(configbool) {
+		} else if (configbool) {
 			updateStatus("File name must be specified");
 			return;
-		}else{
+		} else {
 			setErrorMessage(null);
 			setPageComplete(false);
-			return;}
+			return;
+		}
 		if (fileName.replace('\\', '/').indexOf('/', 1) > 0) {
 			updateStatus("File name must be valid");
 			return;
 		}
-		
+
 		int dotLoc = fileName.lastIndexOf('.');
 		if (dotLoc != -1) {
 			updateStatus("Configuration name must not contain \".\"");
 			return;
 		}
 		updateStatus(null);
-		
+
 	}
 
 	private void updateStatus(String message) {
@@ -225,17 +210,18 @@ public class NewConfigurationFilePage extends WizardPage {
 		setPageComplete(message == null);
 	}
 
-	public IContainer getContainerObject() {
-		return container;
+	public IFolder getContainerObject() {
+		return configFolder;
 	}
 
 	public String getFileName() {
 		return fileText.getText();
 	}
-	public boolean isFeatureProject(String text){
+
+	public boolean isFeatureProject(String text) {
 		boolean isFP = false;
-		for (IFeatureProject feature : featureProjects){
-			if(text.equalsIgnoreCase(feature.getProjectName())){
+		for (IFeatureProject feature : featureProjects) {
+			if (text.equalsIgnoreCase(feature.getProjectName())) {
 				isFP = true;
 				featureProject = feature;
 				try {
@@ -251,5 +237,9 @@ public class NewConfigurationFilePage extends WizardPage {
 			}
 		}
 		return isFP;
+	}
+	
+	public IFeatureProject getFeatureProject() {
+		return featureProject;
 	}
 }

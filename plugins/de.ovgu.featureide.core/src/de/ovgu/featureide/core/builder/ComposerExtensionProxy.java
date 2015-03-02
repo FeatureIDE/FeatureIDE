@@ -30,14 +30,13 @@ import org.eclipse.core.runtime.IStatus;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 
-
 /**
  * Handles a composer extension.
  * 
  * @author Tom Brosch
  */
 public class ComposerExtensionProxy implements IComposerExtension {
-	
+
 	private final IConfigurationElement configElement;
 	private final String name;
 	private final String id;
@@ -58,22 +57,27 @@ public class ComposerExtensionProxy implements IComposerExtension {
 		}
 	}
 
+	@Override
 	public String getName() {
 		return name;
 	}
 
+	@Override
 	public String getId() {
 		return id;
 	}
 
+	@Override
 	public String toString() {
 		return "Name: " + name + "; ID: " + id;
 	}
-
+	
+	@Override
 	public String getDescription() {
 		return description;
 	}
 
+	@Override
 	public IComposerExtensionClass getComposerByProject(IFeatureProject featureProject) {
 		IComposerExtensionClass composer = projectComposerMap.get(featureProject);
 		if (composer == null) {
@@ -88,31 +92,38 @@ public class ComposerExtensionProxy implements IComposerExtension {
 		}
 		return composer;
 	}
-	
+
+	@Override
 	public boolean hasFeatureFolder() {
 		return defaultComposerExtensionClass.hasFeatureFolder();
 	}
 
+	@Override
 	public boolean hasSourceFolder() {
 		return defaultComposerExtensionClass.hasSourceFolder();
 	}
 
+	@Override
 	public boolean hasContractComposition() {
 		return defaultComposerExtensionClass.hasContractComposition();
 	}
 
+	@Override
 	public boolean hasMetaProductGeneration() {
 		return defaultComposerExtensionClass.hasMetaProductGeneration();
 	}
 
+	@Override
 	public boolean hasCompositionMechanisms() {
 		return defaultComposerExtensionClass.hasCompositionMechanisms();
 	}
 
+	@Override
 	public boolean createFolderForFeatures() {
 		return defaultComposerExtensionClass.createFolderForFeatures();
 	}
-	
+
+	@Override
 	public boolean supportsAndroid() {
 		return defaultComposerExtensionClass.supportsAndroid();
 	}

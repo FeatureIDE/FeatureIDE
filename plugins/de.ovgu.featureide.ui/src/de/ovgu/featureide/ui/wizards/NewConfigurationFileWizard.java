@@ -28,6 +28,8 @@ import java.nio.charset.Charset;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -35,7 +37,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
@@ -46,7 +47,10 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 
+import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
+import de.ovgu.featureide.fm.ui.handlers.base.SelectionWrapper;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
@@ -55,42 +59,40 @@ import de.ovgu.featureide.ui.UIPlugin;
  * @author Marcus Leich
  */
 public class NewConfigurationFileWizard extends Wizard implements INewWizard {
-	
+
 	public static final String ID = UIPlugin.PLUGIN_ID + ".wizards.NewConfigurationFileWizard";
-	
+
 	private NewConfigurationFilePage page;
-	
-	private ISelection selection;
+
+	private IFolder configFolder;
 
 	public NewConfigurationFileWizard() {
 		super();
 		setNeedsProgressMonitor(true);
-		
 	}
-	
+
 	/**
 	 * Adding the page to the wizard.
 	 */
 
 	public void addPages() {
-		page = new NewConfigurationFilePage(selection);
+		page = new NewConfigurationFilePage(configFolder);
 		addPage(page);
 		this.setWindowTitle("New Configuration");
 	}
 
 	/**
-	 * This method is called when 'Finish' button is pressed in
-	 * the wizard. We will create an operation and run it
-	 * using wizard as execution context.
+	 * This method is called when 'Finish' button is pressed in the wizard. We
+	 * will create an operation and run it using wizard as execution context.
 	 */
 	public boolean performFinish() {
-		final IContainer container = page.getContainerObject();
-		IComposerExtensionClass composer = page.featureProject.getComposer();
+		configFolder = page.getContainerObject();
+		final IComposerExtensionClass composer = page.getFeatureProject().getComposer();
 		final String fileName = page.getFileName() + "." + composer.getConfigurationExtension();
-		IRunnableWithProgress op = new IRunnableWithProgress() {
+		final IRunnableWithProgress op = new IRunnableWithProgress() {
 			public void run(IProgressMonitor monitor) throws InvocationTargetException {
 				try {
-					doFinish(container, fileName, monitor);
+					doFinish(configFolder, fileName, monitor);
 				} catch (CoreException e) {
 					throw new InvocationTargetException(e);
 				} finally {
@@ -109,24 +111,20 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 		}
 		return true;
 	}
-	
+
 	/**
-	 * The worker method. It will find the container, create the
-	 * file if missing or just replace its contents, and open
-	 * the editor on the newly created file.
+	 * The worker method. It will find the container, create the file if missing
+	 * or just replace its contents, and open the editor on the newly created
+	 * file.
 	 */
 
-	private void doFinish(
-		IContainer container,
-		String fileName,
-		IProgressMonitor monitor)
-		throws CoreException {
+	private void doFinish(IContainer container, String fileName, IProgressMonitor monitor) throws CoreException {
 		// create a sample file
 		monitor.beginTask("Creating " + fileName, 2);
 		if (!container.exists()) {
 			throwCoreException("Container does not exist.");
 		}
-		
+
 		final IFile file = container.getFile(new Path(fileName));
 		try {
 			InputStream stream = openContentStream();
@@ -140,8 +138,7 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 		monitor.setTaskName("Opening file for editing...");
 		getShell().getDisplay().asyncExec(new Runnable() {
 			public void run() {
-				IWorkbenchPage page =
-					PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 				try {
 					IDE.openEditor(page, file, true);
 				} catch (PartInitException e) {
@@ -150,7 +147,7 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 		});
 		monitor.worked(1);
 	}
-	
+
 	/**
 	 * We will initialize file contents with a sample text.
 	 */
@@ -160,17 +157,18 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 	}
 
 	private void throwCoreException(String message) throws CoreException {
-		IStatus status =
-			new Status(IStatus.ERROR, UIPlugin.PLUGIN_ID, IStatus.OK, message, null);
+		IStatus status = new Status(IStatus.ERROR, UIPlugin.PLUGIN_ID, IStatus.OK, message, null);
 		throw new CoreException(status);
 	}
-	
+
 	/**
-	 * We will accept the selection in the workbench to see if
-	 * we can initialize from it.
+	 * We will accept the selection in the workbench to see if we can initialize
+	 * from it.
+	 * 
 	 * @see IWorkbenchWizard#init(IWorkbench, IStructuredSelection)
 	 */
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
-		this.selection = selection;
+		final IFeatureProject data = CorePlugin.getFeatureProject(SelectionWrapper.init(selection, IResource.class).getNext());
+		configFolder = (data == null) ? null : data.getConfigFolder();
 	}
 }

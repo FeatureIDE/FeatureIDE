@@ -188,6 +188,7 @@ public abstract class Node {
 		return newList;
 	}
 
+	@SuppressWarnings("unchecked")
 	protected Node eliminate(Class<? extends Node> ...array) {
 		return eliminate(Arrays.asList(array));
 	}

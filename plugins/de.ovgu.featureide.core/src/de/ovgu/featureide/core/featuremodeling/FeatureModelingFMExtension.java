@@ -33,6 +33,13 @@ import de.ovgu.featureide.fm.core.FMComposerExtension;
  */
 public class FeatureModelingFMExtension extends FMComposerExtension {
 
+	private static final String FEATUREMODELLING_NAME_PATTERN = ".+";
+	
+	@Override
+	protected boolean isValidFeatureNameComposerSpecific(String s) {
+		return s.matches(FEATUREMODELLING_NAME_PATTERN);
+	}
+	
 	private static String ORDER_PAGE_MESSAGE = 
 			"FeatureIDE projects for modelling purpose only do not\n" +
 			"need an order, as there is no source code to compose.";
@@ -47,32 +54,14 @@ public class FeatureModelingFMExtension extends FMComposerExtension {
 			IProject project) {
 		return true;
 	}
-
-	@Override
-	public boolean isValidFeatureName(String s) {
-		if (s == null)
-			return false;
-		final int len = s.length();
-
-		if (len == 0)
-			return false;
-		for (int i = 0; i < len; i++) {
-			if (s.charAt(i) == '"' || s.charAt(i) == '(' || s.charAt(i) == ')')
-				return false;
-		}
-		return true;
-	}
-
-	@Override
-	public boolean hasFeaureOrder() {
-		return false;
-	}
 	
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.FMComposerExtension#getErroMessage()
-	 */
 	@Override
 	public String getErroMessage() {
 		return ERROR_MESSAGE_NO_COMPOSER;
+	}
+	
+	@Override
+	public boolean hasFeaureOrder() {
+		return false;
 	}
 }

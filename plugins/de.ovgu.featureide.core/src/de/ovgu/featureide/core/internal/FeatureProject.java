@@ -86,6 +86,7 @@ import de.ovgu.featureide.fm.core.io.ModelIOFactory;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslReader;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
+import de.ovgu.featureide.fm.core.job.AJob;
 import de.ovgu.featureide.fm.core.job.AStoppableJob;
 import de.ovgu.featureide.fm.core.job.IJob;
 
@@ -871,28 +872,28 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	}
 
 	private void checkBuildFolder(final IFolder folder, final IResourceChangeEvent event) {
-		Job job = new Job("Postprocess generated files") {
+		new AJob("Postprocess generated files", Job.LONG) {
 			@Override
-			public IStatus run(IProgressMonitor monitor) {
-				try {
+			protected boolean work() throws Exception {
+				checkBuildFolder(folder);
+				return true;
+			}
+			
+			private void checkBuildFolder(final IFolder folder) throws CoreException {
+				if (folder.isAccessible()) {
 					for (IResource res : folder.members()) {
 						if (res instanceof IFolder) {
-							checkBuildFolder((IFolder) res, event);
+							checkBuildFolder((IFolder) res);
 						} else if (res instanceof IFile) {
-							IResourceDelta delta = event.getDelta().findMember(res.getFullPath());
+							final IResourceDelta delta = event.getDelta().findMember(res.getFullPath());
 							if (delta != null) {
 								composerExtension.postCompile(delta, (IFile) res);
 							}
 						}
 					}
-				} catch (CoreException e) {
-					LOGGER.logError(e);
 				}
-				return Status.OK_STATUS;
 			}
-		};
-		job.setPriority(Job.LONG);
-		job.schedule();
+		}.schedule();
 	}
 
 	public List<IFile> getAllConfigurations() {

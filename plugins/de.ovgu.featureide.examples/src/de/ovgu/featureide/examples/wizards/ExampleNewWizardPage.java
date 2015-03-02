@@ -222,8 +222,8 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 	private StyledText searchFeatureText;
 	private final ExampleProjectFilter searchFilter = new ExampleProjectFilter();
 
-	private static final String CHILD_WARNING = "It was not possible to sellect all projects. "
-			+ "If a project only rely in a warning, it is possible to do a manually selection. ";
+	private static final String CHILD_WARNING = "Selected only fully compatible projects. "
+			+ "(Manual selection for projects with warnings is still possible).";
 
 	private Thread updateProjects;
 

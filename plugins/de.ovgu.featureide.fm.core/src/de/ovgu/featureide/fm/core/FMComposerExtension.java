@@ -30,6 +30,8 @@ import org.eclipse.core.resources.IProject;
 public class FMComposerExtension implements IFMComposerExtension {
 
 	private boolean hasComposer = false;
+	
+	public static final String FEATURE_NAME_PATTERN = "^[a-zA-Z]+\\w*$";
 
 	@Override
 	public String getOrderPageMessage() {
@@ -47,32 +49,19 @@ public class FMComposerExtension implements IFMComposerExtension {
 		return false;
 	}
 	
-	public boolean isValidFeatureName(String s) {
-		if (s == null) {
+	public final boolean isValidFeatureName(String s) {
+		if (s == null || s.trim().isEmpty() || s.contains("\"") || s.contains("(") || s.contains(")"))
 			return false;
+		else {
+			if (hasComposer) {
+				boolean valid = isValidFeatureNameComposerSpecific(s);
+				return valid;
+			} else return true;
 		}
-		final int len = s.length();
-		if (len == 0) {
-			return false;
-		}
-		
-		if (hasComposer) {
-			// Default behavior for feature projects
-			if (!Character.isJavaIdentifierStart(s.charAt(0)))
-				return false;
-			for (int i = 1; i < len; i++) {
-				if (!Character.isJavaIdentifierPart(s.charAt(i)))
-					return false;
-			}
-			return true;
-		} else {
-			// Default behavior for NON feature projects
-			for (int i = 0; i < len; i++) {
-				if (s.charAt(i) == '"' || s.charAt(i) == '(' || s.charAt(i) == ')')
-					return false;
-			}
-			return true;
-		}
+	}
+
+	protected boolean isValidFeatureNameComposerSpecific(String s) {
+		return s.matches(FEATURE_NAME_PATTERN);
 	}
 
 	@Override

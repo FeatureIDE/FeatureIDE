@@ -31,11 +31,11 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWizard;
 
-import de.ovgu.featureide.ui.mpl.actions.interfaces.BuildExtendedModulesAction;
+import de.ovgu.featureide.ui.mpl.handlers.interfaces.BuildExtendedModulesHandler;
 import de.ovgu.featureide.ui.mpl.wizards.page.AbstractWizardPage;
 
 /**
- * Wizard for the {@link BuildExtendedModulesAction}.
+ * Wizard for the {@link BuildExtendedModulesHandler}.
  * 
  * @author Reimar Schroeter
  */

@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: FeatureIDE UI Plug-In for Multi Product Lines
 Bundle-SymbolicName: de.ovgu.featureide.ui.mpl;singleton:=true
-Bundle-Version: 2.7.2.qualifier
+Bundle-Version: 2.7.3.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Require-Bundle: de.ovgu.featureide.core,
  de.ovgu.featureide.core.mpl,
@@ -22,10 +22,5 @@ Bundle-ActivationPolicy: lazy
 Bundle-Vendor: University of Magdeburg
 Bundle-Activator: de.ovgu.featureide.ui.mpl.MPLUIPlugin
 Export-Package: de.ovgu.featureide.ui.mpl,
- de.ovgu.featureide.ui.mpl.actions,
- de.ovgu.featureide.ui.mpl.actions.documentation,
- de.ovgu.featureide.ui.mpl.actions.interfaces,
- de.ovgu.featureide.ui.mpl.actions.statistics,
- de.ovgu.featureide.ui.mpl.actions.viewtags,
  de.ovgu.featureide.ui.mpl.wizards,
  de.ovgu.featureide.ui.mpl.wizards.page

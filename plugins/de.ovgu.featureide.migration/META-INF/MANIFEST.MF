@@ -2,12 +2,13 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: FeatureIDE UI Plug-In for Migration
 Bundle-SymbolicName: de.ovgu.featureide.migration;singleton:=true
-Bundle-Version: 1.0.0.qualifier
+Bundle-Version: 2.7.3.qualifier
 Bundle-Activator: de.ovgu.featureide.ui.migration.plugin.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.resources,
- org.eclipse.jdt.core
+ org.eclipse.jdt.core,
+ de.ovgu.featureide.fm.ui
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Import-Package: de.ovgu.featureide.core,

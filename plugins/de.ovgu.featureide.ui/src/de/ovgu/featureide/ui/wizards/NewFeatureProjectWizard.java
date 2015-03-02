@@ -41,7 +41,7 @@ import de.ovgu.featureide.ui.UIPlugin;
  * A creation wizard for FeatureIDE projects that adds the FeatureIDE nature after creation.
  * 
  * @author Marcus Leich
- * @author Thomas Thüm
+ * @author Thomas ThÃ¼m
  * @author Tom Brosch
  * @author Janet Feigenspan
  * @author Sven Schuster

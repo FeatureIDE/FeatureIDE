@@ -45,14 +45,20 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
  *  
  * @author Christoph Giesel
  * @author Marcus Kamieth
+ * @author Marcus Pinnecke
 */
 public class AntennaFMComposerExtension extends FMComposerExtension {
-	
-	private final static char[] ILLEGAL_FEATURE_NAME_CHARSET = new char[] {'(', ')', '"', '\u00fc', '\u00dc', '\u00e4', '\u00c4', '\u00f6', '\u00d6', '\u0024', '_'};
 	
 	private static String ORDER_PAGE_MESSAGE = 
 			"FeatureIDE projects based on preprocessors such as Antenna do not\n" +
 			"need an order, as the order is given directly at the source code.";
+	
+	public static final String FEATURE_NAME_PATTERN = "^[a-zA-Z]\\w*$";
+	
+	@Override
+	protected boolean isValidFeatureNameComposerSpecific(String s) {
+		return s.matches(FEATURE_NAME_PATTERN);
+	}
 	
 	@Override
 	public String getOrderPageMessage() {
@@ -90,21 +96,6 @@ public class AntennaFMComposerExtension extends FMComposerExtension {
 			}
 			
 		}
-	}
-	
-	@Override
-	public boolean isValidFeatureName(String s) {
-		return super.isValidFeatureName(s) && !containsIllegalChar(s.toCharArray());
-	}
-	
-	private final boolean containsIllegalChar(final char[] string) {
-		for (char a : string) {
-			for (char b : ILLEGAL_FEATURE_NAME_CHARSET) {
-				if (a == b)
-					return true;
-			}
-		}
-		return false;
 	}
 	
 	private void performRenamings(String oldName, String newName, IFile iFile) {

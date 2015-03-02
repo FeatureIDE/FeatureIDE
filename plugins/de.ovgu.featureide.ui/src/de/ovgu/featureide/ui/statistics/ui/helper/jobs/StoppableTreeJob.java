@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.ui.statistics.ui.helper.jobs;
 
-import de.ovgu.featureide.fm.core.StoppableJob;
+import de.ovgu.featureide.fm.core.job.AStoppableJob;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 
 /**
@@ -28,7 +28,7 @@ import de.ovgu.featureide.ui.statistics.core.composite.Parent;
  * 
  * @author Dominik Hamann
  */
-public abstract class StoppableTreeJob extends StoppableJob  implements ITreeJob {
+public abstract class StoppableTreeJob extends AStoppableJob  implements ITreeJob {
 
 	public StoppableTreeJob(String name, Parent calculated) {
 		super(name);

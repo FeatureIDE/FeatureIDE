@@ -5,40 +5,47 @@
          point="org.eclipse.ui.menus">
       <menuContribution
             allPopups="false"
-            locationURI="popup:org.eclipse.ui.popup.any">
-         <menu
-               id="foo"
-               label="FeatureIDE Migration">
-            <command
-                  commandId="de.ovgu.featureide.ui.variantimport.SPLMigrationCommand"
-                  label="Create new FeatureIDE Project from Product Variants"
-                  style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                     <iterate
+            locationURI="popup:de.ovgu.featureide.fm.ui.menus.popupMenuNoFP">
+         <command
+               commandId="de.ovgu.featureide.ui.variantimport.commands.SPLMigration"
+               id="de.ovgu.featureide.ui.variantimport.actions.SPLMigration"
+               label="Create new FeatureIDE Project from Product Variants"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeMenuSelection">
+                  <iterate
                         ifEmpty="false"
                         operator="and">
-                     <or>
-                        <adapt
-                              type="org.eclipse.core.resources.IProject">
-                        </adapt>
-                        <instanceof
+                     <and>
+                        <test
+                              property="de.ovgu.featureide.fm.ui.properties.class"
                               value="org.eclipse.core.resources.IProject">
-                        </instanceof>
-                     </or>
-                  </iterate> 
-                  
-               </visibleWhen>
-            </command>
-         </menu>
+                        </test>
+                        <test
+                              args="de.ovgu.featureide.core.featureProjectNature"
+                              property="de.ovgu.featureide.fm.ui.properties.nature"
+                              value="false">
+                        </test>
+                        <test
+                              args="org.eclipse.jdt.core.javanature"
+                              property="de.ovgu.featureide.fm.ui.properties.nature"
+                              value="true">
+                        </test>
+                     </and>
+                  </iterate>
+               </with>
+            </visibleWhen>
+         </command>
       </menuContribution>
    </extension>
    <extension
          point="org.eclipse.ui.commands">
       <command
             defaultHandler="de.ovgu.featureide.ui.migration.plugin.SPLMigrationCommandHandler"
-            id="de.ovgu.featureide.ui.variantimport.SPLMigrationCommand"
-            name="Import..">
+            id="de.ovgu.featureide.ui.variantimport.commands.SPLMigration"
+            name="Import...">
       </command>
    </extension>
 
