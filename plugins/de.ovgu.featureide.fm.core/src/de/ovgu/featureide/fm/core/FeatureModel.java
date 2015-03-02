@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.core;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -33,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -42,10 +44,12 @@ import org.prop4j.And;
 import org.prop4j.Implies;
 import org.prop4j.Literal;
 import org.prop4j.Node;
+import org.prop4j.Not;
 import org.prop4j.Or;
 
 import de.ovgu.featureide.fm.core.job.AStoppableJob;
 import de.ovgu.featureide.fm.core.job.IJob;
+import de.ovgu.featureide.fm.core.job.WorkMonitor;
 
 /**
  * The model representation of the feature tree that notifies listeners of
@@ -906,7 +910,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 				final Collection<Feature> features = new LinkedList<Feature>(getFeatures());
 				features.removeAll(coreFeatures);
 				
-				workMonitor.setMaxAbsoluteWork(2*features.size() + 2);
+				workMonitor.setMaxAbsoluteWork(features.size() + 2);
 				
 				featureGraph = new FeatureGraph(features);
 				
@@ -955,15 +959,13 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 				
 				workMonitor.worked();
 				
+				final ArrayList<String> featureNames = new ArrayList<>();
 				for (Feature feature : features) {
-					featureGraph.dfs(new byte[features.size()], featureGraph.featureMap.get(feature.getName()), true);
-					workMonitor.worked();
+					featureNames.add(feature.getName());
 				}
 				
-				for (Feature feature : features) {
-					featureGraph.dfs(new byte[features.size()], featureGraph.featureMap.get(feature.getName()), false);
-					workMonitor.worked();
-				}
+				final DFSThreadPool dfsThreadPool = new DFSThreadPool(featureGraph, featureNames, workMonitor);
+				dfsThreadPool.run();
 				
 				statistic();
 				
@@ -1064,65 +1066,190 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 				}
 			}
 			
-			private boolean connect(Node constraintNode) {
-				//TODO simplify nodes: convert to implies, remove not node
-//				constraintNode.simplify();
-				if (constraintNode instanceof Implies) {
-					final Node leftNode = constraintNode.getChildren()[0];
-					final Node rightNode = constraintNode.getChildren()[1];
-					if (leftNode instanceof Literal) {
-						final Literal implyNode = (Literal) leftNode;
-						if (rightNode instanceof Literal) {
-							imply(implyNode, (Literal) rightNode);
-							return true;
-						} else if (rightNode instanceof And) {
-							for (Node impliedNode : rightNode.getChildren()) {
-								if (impliedNode instanceof Literal) {
-									imply(implyNode, (Literal) impliedNode);
-								} else {
-									buildClique(implyNode, impliedNode);
-								}
-							}
-							return true;
+			private Collection<Node> simplify(Node node) {
+				final Collection<Node> nodeList = new LinkedList<>();
+				
+				node = deMorgan(node);
+				node = orToImply(node);
+				node = elimnateNot(node);
+				if (node instanceof And) {
+					final Node[] children = node.getChildren();
+					for (Node child : children) {
+						nodeList.add(child);
+					}
+				} else {
+					nodeList.add(node);
+				}
+				
+				return nodeList;
+			}
+			
+			private Node elimnateNot(Node node) {
+				if (node instanceof Not) {
+					Node child = node.getChildren()[0];
+					if (child instanceof Literal) {
+						((Literal) child).flip();
+						return child;
+					} else if (child instanceof Not) {
+						return child.getChildren()[0];
+					}
+				}
+				final Node[] children = node.getChildren();
+				if (children != null) {
+					for (int i = 0; i < children.length; i++) {
+						children[i] = elimnateNot(children[i]);
+					}
+				}
+				return node;
+			}
+			
+			private Node deMorgan(Node node) {
+				if (node instanceof Not) {
+					Node child = node.getChildren()[0];
+					if (child instanceof And) {
+						final Node[] children = child.getChildren();
+						final Node[] newChildren = new Node[children.length];
+						for (int i = 0; i < children.length; i++) {
+							newChildren[i] = new Not(children[i]);
 						}
-					} else if (leftNode instanceof Or) {
-						if (rightNode instanceof Literal) {
-							for (Node implyNode : leftNode.getChildren()) {
-								if (implyNode instanceof Literal) {
-									imply((Literal) implyNode, (Literal) rightNode);
-								} else {
-									buildClique(implyNode, rightNode);
-								}
-							}
-							return true;
-						} else if (rightNode instanceof And) {
-							for (Node implyNode : leftNode.getChildren()) {
-								if (implyNode instanceof Literal) {
-									for (Node impliedNode : rightNode.getChildren()) {
-										if (impliedNode instanceof Literal) {
-											imply((Literal) implyNode, (Literal) impliedNode);
-										} else {
-											buildClique(implyNode, impliedNode);
-										}
-									}
-								} else {
-									for (Node impliedNode : rightNode.getChildren()) {
+						node = new Or(newChildren);
+					}
+				}
+				final Node[] children = node.getChildren();
+				if (children != null) {
+					for (int i = 0; i < children.length; i++) {
+						children[i] = deMorgan(children[i]);
+					}
+				}
+				return node;
+			}
+			
+			private Node orToImply(Node node) {
+				if (node instanceof Or && node.getChildren().length == 2) {
+					final Node[] children = node.getChildren();
+					node = new Implies(new Not(children[0]), children[1]);
+				} else if (node instanceof And) {
+					for (Node child : node.getChildren()) {
+						orToImply(child);
+					}
+				}
+				return node;
+			}
+			
+			private void connect(Node constraintNode2) {
+				//TODO simplify nodes: convert to implies, remove not node
+				final Collection<Node> nodeList = simplify(constraintNode2);
+				for (Node constraintNode : nodeList) {
+					if (constraintNode instanceof Implies) {
+						final Node leftNode = constraintNode.getChildren()[0];
+						final Node rightNode = constraintNode.getChildren()[1];
+						if (leftNode instanceof Literal) {
+							final Literal implyNode = (Literal) leftNode;
+							if (rightNode instanceof Literal) {
+								imply(implyNode, (Literal) rightNode);
+							} else if (rightNode instanceof And) {
+								for (Node impliedNode : rightNode.getChildren()) {
+									if (impliedNode instanceof Literal) {
+										imply(implyNode, (Literal) impliedNode);
+									} else {
 										buildClique(implyNode, impliedNode);
 									}
 								}
 							}
-							return true;
+						} else if (leftNode instanceof Or) {
+							if (rightNode instanceof Literal) {
+								for (Node implyNode : leftNode.getChildren()) {
+									if (implyNode instanceof Literal) {
+										imply((Literal) implyNode, (Literal) rightNode);
+									} else {
+										buildClique(implyNode, rightNode);
+									}
+								}
+							} else if (rightNode instanceof And) {
+								for (Node implyNode : leftNode.getChildren()) {
+									if (implyNode instanceof Literal) {
+										for (Node impliedNode : rightNode.getChildren()) {
+											if (impliedNode instanceof Literal) {
+												imply((Literal) implyNode, (Literal) impliedNode);
+											} else {
+												buildClique(implyNode, impliedNode);
+											}
+										}
+									} else {
+										for (Node impliedNode : rightNode.getChildren()) {
+											buildClique(implyNode, impliedNode);
+										}
+									}
+								}
+							}
 						}
+					} else {
+						//TODO Implement other special cases
+						buildClique(constraintNode);
 					}
-				} else {
-					//TODO Implement other special cases
 				}
-				
-				buildClique(constraintNode);
-				return false;
 			}
 		};
 		splittJob.schedule();
+	}
+	
+	private static class DFSThreadPool {
+		
+		private static class DFSThread extends Thread {
+			private final DFSThreadPool threadPool;
+			
+			public DFSThread(DFSThreadPool threadPool) {
+				this.threadPool = threadPool;
+			}
+
+			@Override
+			public void run() {
+				final byte[] visited = new byte[threadPool.featureGraph.featureArray.length];
+				for (String featureName = threadPool.featureNames.poll(); 
+						featureName != null; featureName = threadPool.featureNames.poll()) {
+					final int featureIndex = threadPool.featureGraph.featureMap.get(featureName);
+					Arrays.fill(visited, (byte)0);
+					threadPool.featureGraph.dfs(visited, featureIndex, true);
+					Arrays.fill(visited, (byte)0);
+					threadPool.featureGraph.dfs(visited, featureIndex, false);
+					threadPool.worked();
+				}
+			}
+			
+		}
+		
+		private static final int NUMBER_OF_THREADS = 8;
+		
+		private final Thread[] threads = new Thread[NUMBER_OF_THREADS];
+		
+		private final ConcurrentLinkedQueue<String> featureNames;
+		private final FeatureGraph featureGraph;
+		private final WorkMonitor workMonitor;
+		
+		public DFSThreadPool(FeatureGraph featureGraph, Collection<String> featureNames, WorkMonitor workMonitor) {
+			this.featureGraph = featureGraph;
+			this.featureNames = new ConcurrentLinkedQueue<>(featureNames);
+			this.workMonitor = workMonitor;
+		}
+		
+		private synchronized void worked() {
+			workMonitor.worked();
+		}
+		
+		public void run() {
+			for (int i = 0; i < NUMBER_OF_THREADS; i++) {
+				final Thread thread = new DFSThread(this);
+				threads[i] = thread;
+				thread.start();
+			}
+			try {
+				for (int i = 0; i < NUMBER_OF_THREADS; i++) {
+					threads[i].join();
+				}
+			} catch (InterruptedException e) {
+				FMCorePlugin.getDefault().logError(e);
+			}
+		}
 	}
 	
 	private static class FeatureGraph {
@@ -1195,7 +1322,10 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		
 		public void setEdge(int from, int to, byte edgeType) {
 			final int index = (from * size) + to;
-			final byte oldValue = adjMatrix[index];
+			final byte oldValue;
+			synchronized (adjMatrix) {
+				oldValue = adjMatrix[index];
+			}
 			final int newValue;
 			switch (edgeType) {
 			case EDGE_NONE:
@@ -1246,15 +1376,18 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 			default:
 				newValue = EDGE_NONE;
 			}
-			adjMatrix[index] = (byte) newValue;
+			synchronized (adjMatrix) {
+				adjMatrix[index] = (byte) newValue;
+			}
 		}
 		
 //		public byte getEdge(String from, String to) {
 //			return getEdge(featureMap.get(from), featureMap.get(to));
 //		}
 		
-		public byte getEdge(int fromIndex, int toIndex) {			
-			return adjMatrix[(fromIndex * size) + toIndex];
+		public byte getEdge(int fromIndex, int toIndex) {
+			final int index = (fromIndex * size) + toIndex;
+			return adjMatrix[index];
 		}
 		
 		public void clearDiagonal() {
@@ -1328,13 +1461,13 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 								// don't select child
 								childSelected = 0;
 								visited[j] = 2;
-								System.out.println("\tq " + featureArray[j]);
+//								System.out.println("\tq " + featureArray[j]);
 								break;
 							case EDGE_11:
 								// select child
 								childSelected = 1;
 								visited[j] = 2;
-								System.out.println("\tq " + featureArray[j]);
+//								System.out.println("\tq " + featureArray[j]);
 								break;
 							case EDGE_1q:
 								// ?
@@ -1343,7 +1476,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 								}
 								visited[j] = 1;
 								childSelected = 2;
-								System.out.println("\tq " + featureArray[j]);
+//								System.out.println("\tq " + featureArray[j]);
 								break;
 							default:
 								continue;
@@ -1354,13 +1487,13 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 								// don't select child
 								childSelected = 0;
 								visited[j] = 2;
-								System.out.println("\t0 " + featureArray[j]);
+//								System.out.println("\t0 " + featureArray[j]);
 								break;
 							case EDGE_01:
 								// select child
 								childSelected = 1;
 								visited[j] = 2;
-								System.out.println("\t1 " + featureArray[j]);
+//								System.out.println("\t1 " + featureArray[j]);
 								break;
 							case EDGE_0q:
 								// ?
@@ -1369,7 +1502,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 								}
 								visited[j] = 1;
 								childSelected = 2;
-								System.out.println("\tq " + featureArray[j]);
+//								System.out.println("\tq " + featureArray[j]);
 								break;
 							default:
 								continue;
@@ -1392,21 +1525,21 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 								// visit = 0, not selected, implies not selected
 								case EDGE_00:
 									visited[j] = 2;
-									System.out.println("\t0 " + featureArray[j]);
+//									System.out.println("\t0 " + featureArray[j]);
 									setEdge(parentFeature, j, parentSelected ? EDGE_10 : EDGE_00);
 									dfs_rec(visited, j, parentFeature, (byte)0, parentSelected);
 									break;
 								// visit = 0, not selected, implies selected
 								case EDGE_01:
 									visited[j] = 2;
-									System.out.println("\t1 " + featureArray[j]);
+//									System.out.println("\t1 " + featureArray[j]);
 									setEdge(parentFeature, j, parentSelected ? EDGE_11 : EDGE_01);
 									dfs_rec(visited, j, parentFeature, (byte)1, parentSelected);
 									break;
 								// visit = 0, not selected, implies ?
 								case EDGE_0q:
 									visited[j] = 1;
-									System.out.println("\tq " + featureArray[j]);
+//									System.out.println("\tq " + featureArray[j]);
 									setEdge(parentFeature, j, parentSelected ? EDGE_1q : EDGE_0q);
 									dfs_rec(visited, j, parentFeature, (byte)2, parentSelected);
 									break;
@@ -1418,21 +1551,21 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 								// visit = 0, selected, implies not selected
 								case EDGE_10:
 									visited[j] = 2;
-									System.out.println("\t0 " + featureArray[j]);
+//									System.out.println("\t0 " + featureArray[j]);
 									setEdge(parentFeature, j, parentSelected ? EDGE_10 : EDGE_00);
 									dfs_rec(visited, j, parentFeature, (byte)0, parentSelected);
 									break;
 								// visit = 0, selected, implies selected
 								case EDGE_11:
 									visited[j] = 2;
-									System.out.println("\t1 " + featureArray[j]);
+//									System.out.println("\t1 " + featureArray[j]);
 									setEdge(parentFeature, j, parentSelected ? EDGE_11 : EDGE_01);
 									dfs_rec(visited, j, parentFeature, (byte)1, parentSelected);
 									break;
 								// visit = 0, selected, implies ?
 								case EDGE_1q:
 									visited[j] = 1;
-									System.out.println("\tq " + featureArray[j]);
+//									System.out.println("\tq " + featureArray[j]);
 									setEdge(parentFeature, j, parentSelected ? EDGE_1q : EDGE_0q);
 									dfs_rec(visited, j, parentFeature, (byte)2, parentSelected);
 									break;
@@ -1442,7 +1575,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 						case 2:
 							if (edge > 0) {
 								visited[j] = 1;
-								System.out.println("\tq " + featureArray[j]);
+//								System.out.println("\tq " + featureArray[j]);
 								setEdge(parentFeature, j, parentSelected ? EDGE_1q : EDGE_0q);
 								dfs_rec(visited, j, parentFeature, (byte)2, parentSelected);
 							}
@@ -1456,14 +1589,14 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 								// visit = 1, not selected, implies not selected
 								case EDGE_00:
 									visited[j] = 2;
-									System.out.println("\t0 " + featureArray[j]);
+//									System.out.println("\t0 " + featureArray[j]);
 									setEdge(parentFeature, j, parentSelected ? EDGE_10 : EDGE_00);
 									dfs_rec(visited, j, parentFeature, (byte)0, parentSelected);
 									break;
 								// visit = 1, not selected, implies selected
 								case EDGE_01:
 									visited[j] = 2;
-									System.out.println("\t1 " + featureArray[j]);
+//									System.out.println("\t1 " + featureArray[j]);
 									setEdge(parentFeature, j, parentSelected ? EDGE_11 : EDGE_01);
 									dfs_rec(visited, j, parentFeature, (byte)1, parentSelected);
 									break;
@@ -1475,12 +1608,14 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 								// visit = 1, selected, implies not selected
 								case EDGE_10:
 									visited[j] = 2;
+//									System.out.println("\t0 " + featureArray[j]);
 									setEdge(parentFeature, j, parentSelected ? EDGE_10 : EDGE_00);
 									dfs_rec(visited, j, parentFeature, (byte)0, parentSelected);
 									break;
 								// visit = 1, selected, implies selected
 								case EDGE_11:
 									visited[j] = 2;
+//									System.out.println("\t1 " + featureArray[j]);
 									setEdge(parentFeature, j, parentSelected ? EDGE_11 : EDGE_01);
 									dfs_rec(visited, j, parentFeature, (byte)1, parentSelected);
 									break;
