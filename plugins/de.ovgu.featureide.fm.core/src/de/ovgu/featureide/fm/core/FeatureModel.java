@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,9 +38,11 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 import org.eclipse.core.resources.IProject;
+import org.prop4j.And;
 import org.prop4j.Implies;
 import org.prop4j.Literal;
 import org.prop4j.Node;
+import org.prop4j.Or;
 
 import de.ovgu.featureide.fm.core.job.AStoppableJob;
 import de.ovgu.featureide.fm.core.job.IJob;
@@ -945,17 +948,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 				}
 				
 				for (Constraint constraint : constraints) {
-					final Collection<Feature> containedFeatures = constraint.getContainedFeatures();
-					containedFeatures.removeAll(coreFeatures);
-					final Node node = constraint.getNode();
-					if (!specialConnect(node)) {
-						for (Feature feature : containedFeatures) {
-							for (Feature feature2 : containedFeatures) {
-								featureGraph.setEdge(feature.getName(), feature2.getName(), FeatureGraph.EDGE_0q);
-								featureGraph.setEdge(feature.getName(), feature2.getName(), FeatureGraph.EDGE_1q);
-							}
-						}
-					}
+					connect(constraint.getNode());
 				}
 				
 				featureGraph.clearDiagonal();
@@ -972,71 +965,160 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 					workMonitor.worked();
 				}
 				
-				final int[] featureNeigbors = new int[features.size()];
-				int i = 0;
-				for (Feature feature : features) {
-					featureNeigbors[i++] = featureGraph.countNeighbors(feature.getName());
-				}
-				
-				final int[] featureNeigbors2 = new int[features.size()];
-				i = 0;
-				for (Feature feature : features) {
-					featureNeigbors2[i++] = featureGraph.countNeighbors2(feature.getName());
-				}
-
-				Arrays.sort(featureNeigbors);
-				for (int j = 0; j < featureNeigbors.length; j++) {
-					System.out.print(featureNeigbors[j] + ", ");
-				}
-				System.out.println();
-				
-				Arrays.sort(featureNeigbors2);
-				for (int j = 0; j < featureNeigbors2.length; j++) {
-					System.out.print(featureNeigbors2[j] + ", ");
-				}
-				System.out.println();
+				statistic();
 				
 				return true;
 			}
 			
-			private boolean specialConnect(Node constraintNode) { 
+			private void statistic() {
+				// ----- 1 ---------------------------
+					final int[] featureNeigbors = new int[featureGraph.featureArray.length];
+					int i = 0;
+					for (String feature : featureGraph.featureArray) {
+						featureNeigbors[i++] = featureGraph.countNeighbors(feature);
+					}
+					
+					Arrays.sort(featureNeigbors);
+					for (int j = 0; j < featureNeigbors.length; j++) {
+						System.out.print(featureNeigbors[j] + ", ");
+					}
+					System.out.println();
+
+				// ----- 2 ---------------------------
+					Arrays.fill(featureNeigbors, 0);
+					i = 0;
+					for (String feature : featureGraph.featureArray) {
+						featureNeigbors[i++] = featureGraph.countNeighbors2(feature);
+					}
+	
+					Arrays.sort(featureNeigbors);
+					for (int j = 0; j < featureNeigbors.length; j++) {
+						System.out.print(featureNeigbors[j] + ", ");
+					}
+					System.out.println();
+
+				// ----- 3 ---------------------------
+					Arrays.fill(featureNeigbors, 0);
+					i = 0;
+					for (String feature : featureGraph.featureArray) {
+						featureNeigbors[i++] = featureGraph.countRealNeighbors(feature);
+					}
+	
+					Arrays.sort(featureNeigbors);
+					for (int j = 0; j < featureNeigbors.length; j++) {
+						System.out.print(featureNeigbors[j] + ", ");
+					}
+					System.out.println();
+
+				// ----- 3 ---------------------------
+					Arrays.fill(featureNeigbors, 0);
+					i = 0;
+					for (String feature : featureGraph.featureArray) {
+						featureNeigbors[i++] = featureGraph.countRealNeighbors2(feature);
+					}
+	
+					Arrays.sort(featureNeigbors);
+					for (int j = 0; j < featureNeigbors.length; j++) {
+						System.out.print(featureNeigbors[j] + ", ");
+					}
+					System.out.println();
+			}
+			
+			private void collectContainedFeatures(Node node, Set<String> featureNames) {
+				if (node instanceof Literal) {
+					featureNames.add((String) ((Literal)node).var);
+				} else {
+					for (Node child : node.getChildren()) {
+						collectContainedFeatures(child, featureNames);
+					}
+				}
+			}
+			
+			private void buildClique(Node... nodes) {
+				final Set<String> featureNames = new HashSet<>();
+				for (Node node : nodes) {
+					collectContainedFeatures(node, featureNames);
+				}
+				for (Feature coreFeature : coreFeatures) {
+					featureNames.remove(coreFeature.getName());
+				}
+				for (String featureName1 : featureNames) {
+					for (String featureName2 : featureNames) {
+						featureGraph.setEdge(featureName1, featureName2, FeatureGraph.EDGE_0q);
+						featureGraph.setEdge(featureName1, featureName2, FeatureGraph.EDGE_1q);
+					}
+				}
+			}
+			
+			private void imply(Literal implyNode, Literal impliedNode) {
+				int negation = 0;
+				if (!impliedNode.positive) {
+					negation += 1;
+				}
+				if (!implyNode.positive) {
+					negation += 2;
+				}
+				final String impliedFeatureName = (String) impliedNode.var;
+				if (!coreFeatures.contains(getFeature(impliedFeatureName))) {
+					featureGraph.implies((String) implyNode.var, impliedFeatureName, negation);
+				}
+			}
+			
+			private boolean connect(Node constraintNode) {
+				//TODO simplify nodes: convert to implies, remove not node
+//				constraintNode.simplify();
 				if (constraintNode instanceof Implies) {
 					final Node leftNode = constraintNode.getChildren()[0];
 					final Node rightNode = constraintNode.getChildren()[1];
 					if (leftNode instanceof Literal) {
+						final Literal implyNode = (Literal) leftNode;
 						if (rightNode instanceof Literal) {
-							Feature impliedFeature = getFeature((String) ((Literal) rightNode).var);
-							if (!coreFeatures.contains(impliedFeature)) {
-								featureGraph.implies((String) ((Literal) leftNode).var, (String) ((Literal) rightNode).var);
+							imply(implyNode, (Literal) rightNode);
+							return true;
+						} else if (rightNode instanceof And) {
+							for (Node impliedNode : rightNode.getChildren()) {
+								if (impliedNode instanceof Literal) {
+									imply(implyNode, (Literal) impliedNode);
+								} else {
+									buildClique(implyNode, impliedNode);
+								}
 							}
 							return true;
 						}
-//						} else if (rightNode instanceof And) {
-//							for (Node impliedNode : rightNode.getChildren()) {
-//								
-//								Feature impliedFeature = getFeature(impliedNode);
-//								if (!coreFeatures.contains(impliedFeature)) {
-//									implies((String) ((Literal) leftNode).var, impliedNode);
-//								}
-//							}
-//							return true;
-//						}
-//					} else if (leftNode instanceof Or) {
-//						if (rightNode instanceof Literal) {
-//							for (Node implyNode : leftNode.getChildren()) {
-//								
-//							}
-//							return true;
-//						} else if (rightNode instanceof And) {
-//							for (Node implyNode : leftNode.getChildren()) {
-//								for (Node impliedNode : rightNode.getChildren()) {
-//									
-//								}
-//							}
-//							return true;
-//						}
+					} else if (leftNode instanceof Or) {
+						if (rightNode instanceof Literal) {
+							for (Node implyNode : leftNode.getChildren()) {
+								if (implyNode instanceof Literal) {
+									imply((Literal) implyNode, (Literal) rightNode);
+								} else {
+									buildClique(implyNode, rightNode);
+								}
+							}
+							return true;
+						} else if (rightNode instanceof And) {
+							for (Node implyNode : leftNode.getChildren()) {
+								if (implyNode instanceof Literal) {
+									for (Node impliedNode : rightNode.getChildren()) {
+										if (impliedNode instanceof Literal) {
+											imply((Literal) implyNode, (Literal) impliedNode);
+										} else {
+											buildClique(implyNode, impliedNode);
+										}
+									}
+								} else {
+									for (Node impliedNode : rightNode.getChildren()) {
+										buildClique(implyNode, impliedNode);
+									}
+								}
+							}
+							return true;
+						}
 					}
+				} else {
+					//TODO Implement other special cases
 				}
+				
+				buildClique(constraintNode);
 				return false;
 			}
 		};
@@ -1083,8 +1165,28 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		}
 		
 		private void implies(String implyFeature, String impliedFeature) {
-			setEdge(implyFeature, impliedFeature, FeatureGraph.EDGE_11);
-			setEdge(impliedFeature, implyFeature, FeatureGraph.EDGE_00);
+			implies(implyFeature, impliedFeature, 0);
+		}
+		
+		private void implies(String implyFeature, String impliedFeature, int negation) {
+			switch (negation) {
+				case 0:
+					setEdge(implyFeature, impliedFeature, FeatureGraph.EDGE_11);
+					setEdge(impliedFeature, implyFeature, FeatureGraph.EDGE_00);
+					break;
+				case 1:
+					setEdge(implyFeature, impliedFeature, FeatureGraph.EDGE_10);
+					setEdge(impliedFeature, implyFeature, FeatureGraph.EDGE_10);
+					break;
+				case 2:
+					setEdge(implyFeature, impliedFeature, FeatureGraph.EDGE_01);
+					setEdge(impliedFeature, implyFeature, FeatureGraph.EDGE_01);
+					break;
+				case 3:
+					setEdge(implyFeature, impliedFeature, FeatureGraph.EDGE_11);
+					setEdge(impliedFeature, implyFeature, FeatureGraph.EDGE_00);
+					break;
+			}
 		}
 
 		public void setEdge(String from, String to, byte edgeType) {
@@ -1167,6 +1269,34 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 			int count = 0;
 			for (int i = (fromIndex * size), end = i + size; i < end; i++) {
 				count += adjMatrix[i] % 2;
+			}
+			
+			return count;
+		}
+		
+		public int countRealNeighbors(String from) {
+			final int fromIndex = featureMap.get(from);
+			
+			int count = 0;
+			for (int i = (fromIndex * size), end = i + size; i < end; i++) {
+				int edge = (adjMatrix[i] & MASK_1_00001100);
+				if (edge == EDGE_10 || edge == EDGE_11) {
+					count++;
+				}
+			}
+			
+			return count;
+		}
+		
+		public int countRealNeighbors2(String from) {
+			final int fromIndex = featureMap.get(from);
+			
+			int count = 0;
+			for (int i = (fromIndex * size), end = i + size; i < end; i++) {
+				int edge = (adjMatrix[i] & MASK_0_00110000);
+				if (edge == EDGE_00 || edge == EDGE_01) {
+					count++;
+				}
 			}
 			
 			return count;
