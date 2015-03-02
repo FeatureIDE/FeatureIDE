@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: FeatureIDE Converter Plug-In from AHEAD to FeatureHouse
+Bundle-Name: FeatureIDE Converter Plug-In between AHEAD and FeatureHouse
 Bundle-SymbolicName: de.ovgu.featureide.core.conversion.ahead_featurehouse;singleton:=true
 Bundle-Version: 2.7.2.qualifier
 Bundle-Activator: de.ovgu.featureide.core.conversion.ahead_featurehouse.ConversionPlugin
