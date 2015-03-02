@@ -973,57 +973,25 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 			}
 			
 			private void statistic() {
-				// ----- 1 ---------------------------
-					final int[] featureNeigbors = new int[featureGraph.featureArray.length];
-					int i = 0;
-					for (String feature : featureGraph.featureArray) {
-						featureNeigbors[i++] = featureGraph.countNeighbors(feature);
-					}
-					
-					Arrays.sort(featureNeigbors);
-					for (int j = 0; j < featureNeigbors.length; j++) {
-						System.out.print(featureNeigbors[j] + ", ");
-					}
-					System.out.println();
+				final int[] featureNeigbors = new int[featureGraph.featureArray.length];
+				statisticPart(featureNeigbors, true, false);
+				statisticPart(featureNeigbors, false, false);
+				statisticPart(featureNeigbors, true, true);
+				statisticPart(featureNeigbors, false, true);
+			}
+			
+			private void statisticPart(final int[] featureNeigbors, boolean selected, boolean subtractReal) {
+				Arrays.fill(featureNeigbors, 0);
+				int i = 0;
+				for (String feature : featureGraph.featureArray) {
+					featureNeigbors[i++] = featureGraph.countNeighbors(feature, selected, subtractReal);
+				}
 
-				// ----- 2 ---------------------------
-					Arrays.fill(featureNeigbors, 0);
-					i = 0;
-					for (String feature : featureGraph.featureArray) {
-						featureNeigbors[i++] = featureGraph.countNeighbors2(feature);
-					}
-	
-					Arrays.sort(featureNeigbors);
-					for (int j = 0; j < featureNeigbors.length; j++) {
-						System.out.print(featureNeigbors[j] + ", ");
-					}
-					System.out.println();
-
-				// ----- 3 ---------------------------
-					Arrays.fill(featureNeigbors, 0);
-					i = 0;
-					for (String feature : featureGraph.featureArray) {
-						featureNeigbors[i++] = featureGraph.countRealNeighbors(feature);
-					}
-	
-					Arrays.sort(featureNeigbors);
-					for (int j = 0; j < featureNeigbors.length; j++) {
-						System.out.print(featureNeigbors[j] + ", ");
-					}
-					System.out.println();
-
-				// ----- 3 ---------------------------
-					Arrays.fill(featureNeigbors, 0);
-					i = 0;
-					for (String feature : featureGraph.featureArray) {
-						featureNeigbors[i++] = featureGraph.countRealNeighbors2(feature);
-					}
-	
-					Arrays.sort(featureNeigbors);
-					for (int j = 0; j < featureNeigbors.length; j++) {
-						System.out.print(featureNeigbors[j] + ", ");
-					}
-					System.out.println();
+				Arrays.sort(featureNeigbors);
+				for (int j = featureNeigbors.length - 1; j >= 0 ; --j) {
+					System.out.print(featureNeigbors[j] + ", ");
+				}
+				System.out.println();
 			}
 			
 			private void collectContainedFeatures(Node node, Set<String> featureNames) {
@@ -1396,51 +1364,16 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 			}
 		}
 		
-		public int countNeighbors(String from) {
+		public int countNeighbors(String from, boolean selected, boolean subtractReal) {
 			final int fromIndex = featureMap.get(from);
+			final byte mask = (selected) ? MASK_1_00001100 : MASK_0_00110000;
+			final byte unrealEdge = (selected) ? EDGE_1q : EDGE_0q;
+			
 			
 			int count = 0;
 			for (int i = (fromIndex * size), end = i + size; i < end; i++) {
-				count += adjMatrix[i] % 2;
-			}
-			
-			return count;
-		}
-		
-		public int countRealNeighbors(String from) {
-			final int fromIndex = featureMap.get(from);
-			
-			int count = 0;
-			for (int i = (fromIndex * size), end = i + size; i < end; i++) {
-				int edge = (adjMatrix[i] & MASK_1_00001100);
-				if (edge == EDGE_10 || edge == EDGE_11) {
-					count++;
-				}
-			}
-			
-			return count;
-		}
-		
-		public int countRealNeighbors2(String from) {
-			final int fromIndex = featureMap.get(from);
-			
-			int count = 0;
-			for (int i = (fromIndex * size), end = i + size; i < end; i++) {
-				int edge = (adjMatrix[i] & MASK_0_00110000);
-				if (edge == EDGE_00 || edge == EDGE_01) {
-					count++;
-				}
-			}
-			
-			return count;
-		}
-		
-		public int countNeighbors2(String from) {
-			final int fromIndex = featureMap.get(from);
-			
-			int count = 0;
-			for (int i = (fromIndex * size), end = i + size; i < end; i++) {
-				count += (adjMatrix[i] >>> 1) % 2;
+				final int edge = (adjMatrix[i] & mask);
+				count += (edge == 0 || (subtractReal && edge != unrealEdge)) ? 0 : 1;
 			}
 			
 			return count;
