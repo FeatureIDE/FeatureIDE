@@ -30,13 +30,13 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
-
 
 /**
  * A general builder used to build every <code>FeatureProject</code>. Using an
@@ -48,10 +48,9 @@ import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
  */
 public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 
-	public static final String BUILDER_ID = CorePlugin.PLUGIN_ID
-			+ ".extensibleFeatureProjectBuilder";
+	public static final String BUILDER_ID = CorePlugin.PLUGIN_ID + ".extensibleFeatureProjectBuilder";
 	public static final String COMPOSER_KEY = "composer";
-	
+
 	private IFeatureProject featureProject;
 	private IComposerExtensionClass composerExtension;
 
@@ -60,47 +59,43 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 			return true;
 
 		if (getProject() == null) {
-			CorePlugin.getDefault().logWarning("no project got");
+			CorePlugin.getDefault().logWarning("Unable to get project.");
 			return false;
 		}
 		featureProject = CorePlugin.getFeatureProject(getProject());
 		if (featureProject == null) {
-		//	CorePlugin.getDefault().logWarning("Unable to get feature project");
+			CorePlugin.getDefault().logWarning("Unable to make feature project.");
 			return false;
 		}
 
-		if ((composerExtension = featureProject.getComposer()) == null) {
-			CorePlugin.getDefault().logWarning("No composition tool found");
-			featureProject.createBuilderMarker(featureProject.getProject(),
-					"Could not load the assigned composition engine: "
-							+ featureProject.getComposerID(), 0,
-					IMarker.SEVERITY_ERROR);
+		final IStatus status = CorePlugin.getDefault().isComposable(getProject());
+		
+		if (!status.isOK() || (composerExtension = featureProject.getComposer()) == null) {
+			CorePlugin.getDefault().logWarning("No composition tool found.");
+			featureProject.createBuilderMarker(featureProject.getProject(), status.getMessage(), 0, IMarker.SEVERITY_ERROR);
 			return false;
 		}
 		return true;
 	}
-	
+
 	private boolean cleanBuild = false;
-	
+
 	private boolean cleaned = false;
-	
+
 	protected void clean(IProgressMonitor monitor) throws CoreException {
 		if (!featureProjectLoaded())
 			return;
-		
-		featureProject.deleteBuilderMarkers(featureProject.getSourceFolder(),
-				IResource.DEPTH_INFINITE);
+
+		featureProject.deleteBuilderMarkers(featureProject.getSourceFolder(), IResource.DEPTH_INFINITE);
 		IProject project = featureProject.getProject();
 		if (!composerExtension.clean()) {
 			cleaned = false;
-			
-			project.refreshLocal(IResource.DEPTH_INFINITE,
-					monitor);
+
+			project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 			return;
 		}
 		boolean hasOtherNature = true;
-		if (project.getDescription().getNatureIds().length == 1
-				&& project.hasNature(FeatureProjectNature.NATURE_ID)) {
+		if (project.getDescription().getNatureIds().length == 1 && project.hasNature(FeatureProjectNature.NATURE_ID)) {
 			hasOtherNature = false;
 		}
 
@@ -110,19 +105,17 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		}
 		IFolder binFolder = featureProject.getBinFolder();
 		if (!hasOtherNature) {
-			if (binFolder != null && 
-					binFolder.exists()) {
-				binFolder.refreshLocal(IResource.DEPTH_INFINITE,
-						monitor);
+			if (binFolder != null && binFolder.exists()) {
+				binFolder.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 			}
 		}
-		
+
 		if (cleanBuild) {
 			IFile configFile = featureProject.getCurrentConfiguration();
 			if (configFile == null) {
 				return;
 			}
-		}else{
+		} else {
 			cleaned = true;
 		}
 		if (!hasOtherNature) {
@@ -132,12 +125,10 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		for (IResource member : buildFolder.members()) {
 			member.delete(true, monitor);
 		}
-		
-		buildFolder.refreshLocal(IResource.DEPTH_INFINITE,
-				monitor);
+
+		buildFolder.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 		if (!hasOtherNature) {
-			binFolder.refreshLocal(IResource.DEPTH_INFINITE,
-				monitor);
+			binFolder.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 		}
 		cleanBuild = false;
 	}
@@ -153,9 +144,8 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 
 		cleaned = false;
 		IFile configFile = featureProject.getCurrentConfiguration();
-		featureProject.deleteBuilderMarkers(getProject(),
-				IResource.DEPTH_INFINITE);
-		
+		featureProject.deleteBuilderMarkers(getProject(), IResource.DEPTH_INFINITE);
+
 		try {
 			for (IResource res : featureProject.getConfigFolder().members())
 				res.refreshLocal(IResource.DEPTH_ZERO, null);
@@ -170,11 +160,11 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 			return null;
 		}
 		FeatureModel featureModel = featureProject.getFeatureModel();
-		if(featureModel==null||featureModel.getRoot()==null){
+		if (featureModel == null || featureModel.getRoot() == null) {
 			return null;
 		}
 		composerExtension.performFullBuild(configFile);
-		
+
 		featureProject.built();
 		try {
 			featureProject.getProject().refreshLocal(IResource.DEPTH_INFINITE, monitor);
@@ -188,7 +178,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 			reader.readFromFile(configFile);
 		} catch (Exception e) {
 			CorePlugin.getDefault().logError(e);
-		} 
+		}
 		composerExtension.copyNotComposedFiles(c, null);
 		try {
 			featureProject.getProject().refreshLocal(IResource.DEPTH_INFINITE, monitor);
@@ -196,7 +186,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 			CorePlugin.getDefault().logError(e);
 		}
 		return null;
-		
+
 	}
 
 }

@@ -35,9 +35,6 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.compiler.batch.BatchCompiler;
 
@@ -48,26 +45,24 @@ import de.ovgu.featureide.ui.UIPlugin;
  * 
  * @author Jens Meinicke
  */
-public class Compiler extends Job implements IConfigurationBuilderBasics {
+public class Compiler implements IConfigurationBuilderBasics {
 
-	private Generator generator;
-	private int compiled = 0;
+	private final Generator generator;
 
 	/**
 	 * The parent folder of the generated variants
 	 */
-	private IFolder tmp;
-
-	private boolean finish;
+	private final IFolder tmp;
 
 	/**
-	 * @param name
+	 * 
+	 * @param nr The number of the compiler
+	 * @param generator The generator holding this compiler
 	 */
 	public Compiler(int nr, Generator generator) {
-		super(nr == 0 ? "Compiler" : "Compiler" + nr);
 		this.generator = generator;
-		
-		tmp = generator.builder.tmp.getFolder(getName());
+
+		tmp = generator.builder.tmp.getFolder("Compiler" + nr);
 		if (!tmp.exists()) {
 			try {
 				tmp.create(true, true, null);
@@ -78,73 +73,34 @@ public class Compiler extends Job implements IConfigurationBuilderBasics {
 	}
 
 	/**
-	 * The main method of this {@link Job}. 
-	 * It compiles all configurations that are composed by the corresponding {@link Generator}.
-	 * 
+	 * Compiles the given configuration.
+	 * @param configuration The configuration to build
 	 */
-	@Override
-	protected IStatus run(IProgressMonitor monitor) {
-		while (true) {
-			synchronized (this) {
-				if (generator.builder.cancelGeneratorJobs || monitor.isCanceled()) {
-					return Status.OK_STATUS;
-				}
-				
-				if (generator.configurations.isEmpty() || generator.builder.cancelGeneratorJobs) {
-					monitor.setTaskName(compiled + " produrcts compiled. (Waiting)");
-					while (generator.configurations.isEmpty()) {
-						/** the job waits for a new configuration to build **/
-						try {
-							wait(100);
-							if ((finish && generator.configurations.isEmpty()) ||
-									generator.builder.cancelGeneratorJobs ||
-									monitor.isCanceled()) {
-								return Status.OK_STATUS;
-							}
-						} catch (InterruptedException e) {
-							UIPlugin.getDefault().logError(e);
-						}
-					}
-				}
+	protected void compile(BuilderConfiguration configuration) {
+		if (generator.builder.buildType == ConfigurationBuilder.BuildType.ALL_VALID) {
+			try {
+				generator.builder.folder.getFolder(CONFIGURATION_NAME + configuration.getName()).refreshLocal(IResource.DEPTH_INFINITE, null);
+			} catch (CoreException e) {
+				UIPlugin.getDefault().logError(e);
 			}
-			BuilderConfiguration c = generator.getConfiguration();
-			if (c == null) {
-				continue;
+			compile(CONFIGURATION_NAME + configuration.getName());
+		} else {
+			try {
+				generator.builder.folder.getFolder(configuration.getName()).refreshLocal(IResource.DEPTH_INFINITE, null);
+			} catch (CoreException e) {
+				UIPlugin.getDefault().logError(e);
 			}
-			monitor.setTaskName(compiled + " produrcts compiled. (Running)");
-			if (generator.builder.buildType == ConfigurationBuilder.BuildType.ALL_VALID) {
-				try {
-					generator.builder.folder.getFolder(CONFIGURATION_NAME + c.getName()).refreshLocal(IResource.DEPTH_INFINITE, null);
-				} catch (CoreException e) {
-					UIPlugin.getDefault().logError(e);
-				}
-				compile(CONFIGURATION_NAME + c.getName(), tmp);
-			} else {
-				try {
-					generator.builder.folder.getFolder(c.getName()).refreshLocal(IResource.DEPTH_INFINITE, null);
-				} catch (CoreException e) {
-					UIPlugin.getDefault().logError(e);
-				}
-				compile(c.getName(), tmp);
-			}
-			monitor.setTaskName(++compiled + " produrcts compiled. (Running)");
+			compile(configuration.getName());
 		}
-	}
-
-	/**
-	 * This method is called if the {@link Generator} is finished. 
-	 * Then the {@link Compiler} will end if all configurations are processed.
-	 */
-	void finish() {
-		finish = true;
 	}
 
 	/**
 	 * Compiles the built configuration to create error markers.
 	 * The binary files will be placed into an temporary folder.
+	 * 
 	 * @param confName
 	 */
-	void compile(String confName, IFolder tmpFolder) {	
+	private void compile(String confName) {
 		LinkedList<IFile> files = getJavaFiles(generator.builder.folder.getFolder(confName));
 		final LinkedList<String> options = new LinkedList<String>();
 		for (IFile file : files) {
@@ -155,27 +111,27 @@ public class Compiler extends Job implements IConfigurationBuilderBasics {
 		options.add("-source");
 		options.add("1.7");
 		options.add("-d");
-		options.add(tmpFolder.getRawLocation().toOSString());
+		options.add(tmp.getRawLocation().toOSString());
 		options.add("-classpath");
 		options.add(generator.builder.classpath);
-		
+
 		String output = process(options);
 		files = parseJavacOutput(output, files, confName);
 		for (IFile file : files) {
 			generator.builder.featureProject.getComposer().postCompile(null, file);
 		}
 	}
-	
+
 	private String process(AbstractList<String> command) {
 		final StringBuilder sb = new StringBuilder();
 		for (String string : command) {
 			sb.append(string);
 			sb.append(' ');
 		}
-		
+
 		String output = null;
 		try (StringWriter writer = new StringWriter()) {
-			BatchCompiler.compile(sb.toString(), new PrintWriter(System.out), new PrintWriter(writer), null);	
+			BatchCompiler.compile(sb.toString(), new PrintWriter(System.out), new PrintWriter(writer), null);
 			output = writer.toString();
 		} catch (IOException e) {
 			UIPlugin.getDefault().logError(e);
@@ -184,11 +140,12 @@ public class Compiler extends Job implements IConfigurationBuilderBasics {
 	}
 
 	/**
-	 * Generates the problem markers from the given compiler output. 
+	 * Generates the problem markers from the given compiler output.
+	 * 
 	 * @param output The output from the compiler
 	 * @param files The compiled files
 	 * @param configurationName Name of the actual configuration
-	 * @return 
+	 * @return
 	 */
 	public LinkedList<IFile> parseJavacOutput(String output, LinkedList<IFile> files, String configurationName) {
 		LinkedList<IFile> errorFiles = new LinkedList<IFile>();
@@ -203,8 +160,7 @@ public class Compiler extends Job implements IConfigurationBuilderBasics {
 			String currentLine;
 			while (scanner.hasNextLine()) {
 				currentLine = scanner.nextLine();
-				Pattern pattern = Pattern.compile(
-				"\\S*\\s(\\w+)\\sin\\s(\\S:\\S*.java)\\s[(]at line (\\d+)[)]");
+				Pattern pattern = Pattern.compile("\\S*\\s(\\w+)\\sin\\s(\\S:\\S*.java)\\s[(]at line (\\d+)[)]");
 				Matcher matcher = pattern.matcher(currentLine);
 				if (!matcher.find()) {
 					continue;
@@ -231,14 +187,13 @@ public class Compiler extends Job implements IConfigurationBuilderBasics {
 						break;
 					}
 				}
-				
+
 				String errorMessage = currentLine;
-	//			if (CANNOT_FIND_SYMBOL.equals(errorMessage)) {
-	//				errorMessage = parseCannotFindSymbolMessage(scanner);
-	//			}
-				if (errorMessage.contains(ERROR_IGNOR_RAW_TYPE) || errorMessage.contains(ERROR_IGNOR_CAST) 
-						|| errorMessage.contains(ERROR_IGNOR_SERIIZABLE) 
-						|| errorMessage.contains(ERROR_IGNOR_DEPRECATION)) {
+				//			if (CANNOT_FIND_SYMBOL.equals(errorMessage)) {
+				//				errorMessage = parseCannotFindSymbolMessage(scanner);
+				//			}
+				if (errorMessage.contains(ERROR_IGNOR_RAW_TYPE) || errorMessage.contains(ERROR_IGNOR_CAST) || errorMessage.contains(ERROR_IGNOR_SERIIZABLE)
+						|| errorMessage.contains(ERROR_IGNOR_UNUSED_IMPORT) || errorMessage.contains(ERROR_IGNOR_DEPRECATION)) {
 					continue;
 				}
 				if (!errorFiles.contains(currentFile)) {
@@ -255,7 +210,7 @@ public class Compiler extends Job implements IConfigurationBuilderBasics {
 		} catch (CoreException e) {
 			UIPlugin.getDefault().logError(e);
 		}
-		
+
 		return errorFiles;
 	}
 
@@ -266,7 +221,7 @@ public class Compiler extends Job implements IConfigurationBuilderBasics {
 			if (currentLine.startsWith("symbol")) {
 				String[] tokens = currentLine.split(": ");
 				if (tokens.length == 2)
-					return CANNOT_FIND_SYMBOL + ": "+ tokens[1];
+					return CANNOT_FIND_SYMBOL + ": " + tokens[1];
 				break;
 			}
 		}
@@ -275,6 +230,7 @@ public class Compiler extends Job implements IConfigurationBuilderBasics {
 
 	/**
 	 * Looks for all java files at the given folder.
+	 * 
 	 * @param folder The folder containing the java files
 	 * @return A list with all java files at the folder
 	 */
@@ -283,9 +239,9 @@ public class Compiler extends Job implements IConfigurationBuilderBasics {
 		try {
 			for (IResource res : folder.members()) {
 				if (res instanceof IFolder) {
-					files.addAll(getJavaFiles((IFolder)res));
+					files.addAll(getJavaFiles((IFolder) res));
 				} else if ("java".equals(res.getFileExtension())) {
-					files.add((IFile)res);
+					files.add((IFile) res);
 				}
 			}
 		} catch (CoreException e) {
@@ -293,5 +249,5 @@ public class Compiler extends Job implements IConfigurationBuilderBasics {
 		}
 		return files;
 	}
-	
+
 }

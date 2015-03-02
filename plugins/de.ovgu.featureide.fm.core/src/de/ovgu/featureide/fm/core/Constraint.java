@@ -23,7 +23,9 @@ package de.ovgu.featureide.fm.core;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.LinkedList;
+import java.util.TreeSet;
 
 import org.prop4j.Literal;
 import org.prop4j.Node;
@@ -73,21 +75,24 @@ public class Constraint implements PropertyConstants {
 	 * @return The dead features caused by this constraint
 	 */
 	public Collection<Feature> getDeadFeatures(SatSolver solver, FeatureModel fm, Collection<Feature> fmDeadFeatures) {
-		Collection<Feature> deadFeaturesBefore;		
+		Collection<Feature> deadFeatures;		
 		Node propNode = this.getNode();
-		if (propNode != null) {
-			deadFeaturesBefore = fm.getAnalyser().getDeadFeatures(solver, propNode);
-		} else {
-			deadFeaturesBefore = new LinkedList<Feature>();
-		}
-
-		Collection<Feature> deadFeaturesAfter = new LinkedList<Feature>();
-		for (Feature l : fmDeadFeatures) {
-			Feature feature = fm.getFeature(l.getName());
-			if (feature != null && deadFeaturesBefore.contains(feature)) {
-				deadFeaturesAfter.add(l);
+		Comparator<Feature> featComp = new Comparator<Feature>() {
+			@Override
+			 public int compare(Feature o1, Feature o2) {
+			 return o1.getName().compareTo(o2.getName());
 			}
+		};
+		if (propNode != null) {
+			deadFeatures = fm.getAnalyser().getDeadFeatures(solver, propNode);
+		} else {
+			deadFeatures = new TreeSet<Feature>(featComp);
 		}
+		
+		Collection<Feature> deadFeaturesAfter = new TreeSet<Feature>(featComp);
+		
+		deadFeaturesAfter.addAll(fmDeadFeatures);
+		deadFeaturesAfter.retainAll(deadFeatures);
 		fmDeadFeatures.removeAll(deadFeaturesAfter);
 		return deadFeaturesAfter;
 	}

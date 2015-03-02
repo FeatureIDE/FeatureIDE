@@ -18,6 +18,8 @@ Bundle-ClassPath: lib/jak2java.jar,
  lib/jampack.jar,
  .
 Export-Package: de.ovgu.featureide.ahead,
- de.ovgu.featureide.ahead.model
+ de.ovgu.featureide.ahead.actions,
+ de.ovgu.featureide.ahead.model,
+ de.ovgu.featureide.ahead.wrapper
 Import-Package: org.eclipse.core.expressions,
  org.eclipse.jdt.internal.core

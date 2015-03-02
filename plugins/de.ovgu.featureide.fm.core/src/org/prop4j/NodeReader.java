@@ -46,6 +46,8 @@ public class NodeReader {
 			"\u21D2", "\u2228", "\u2227", "\u00AC" };
 
 	private Collection<String> featureNames;
+	
+	private boolean ignoreMissingFeatures = false;
 
 	private String errorMessage = "";
 
@@ -117,7 +119,7 @@ public class NodeReader {
 			if ("  ".equals(string)) {
 				errorMessage = "No symbols found.";
 				error = true;
-				return new Literal("");
+				return getInvalidLiteral();
 			}
 			// traverse all symbols
 			for (int i = 0; i < symbols.length; i++) {
@@ -129,7 +131,7 @@ public class NodeReader {
 					if (index == -1) {
 						errorMessage = "No Operator found";
 						error = true;
-						return new Literal("");
+						return getInvalidLiteral();
 					}
 
 					// recursion for children nodes
@@ -144,20 +146,20 @@ public class NodeReader {
 						if (index == 0) {
 							errorMessage = "No left Symbol found";
 							error = true;
-							return new Literal("");
+							return getInvalidLiteral();
 						}
 
 						if (string.length() - (index + symbols[i].length()) == 0) {
 							errorMessage = "No right Symbol found";
 							error = true;
-							return new Literal("");
+							return getInvalidLiteral();
 						}
 
 					} else if (i == 4) {
 						if (string.length() - (index + symbols[i].length()) == 0) {
 							errorMessage = "No Symbol found";
 							error = true;
-							return new Literal("");
+							return getInvalidLiteral();
 						}
 					}
 
@@ -188,22 +190,18 @@ public class NodeReader {
 
 						if (featureNames.contains(list.get(Integer
 								.parseInt(string) - 100000))) {
-							return new Literal(list.get(Integer
-									.parseInt(string) - 100000));
+							return new Literal(list.get(Integer.parseInt(string) - 100000));
 						} else {
-							errorMessage = list
-									.get(Integer.parseInt(string) - 100000)
+							errorMessage = list.get(Integer.parseInt(string) - 100000)
 									+ " is no valid Feature Name";
 							error = true;
-							return new Literal("");
+							return getInvalidLiteral();
 						}
 					} else {
-						return new Literal(
-								list.get(Integer.parseInt(string) - 100000));
+						return new Literal(list.get(Integer.parseInt(string) - 100000));
 					}
 				} else {
-					return checkExpression(list.get(Integer.parseInt(string)),
-							list);
+					return checkExpression(list.get(Integer.parseInt(string)), list);
 				}
 			}
 
@@ -211,18 +209,27 @@ public class NodeReader {
 				if (!featureNames.contains(string)) {
 					errorMessage = string + " is no valid Feature Name";
 					error = true;
-					return new Literal("");
+					return getInvalidLiteral();
 				}
 			}
 			if (string.contains(" ")) {
 				errorMessage = string + " is no valid Feature Name";
 				error = true;
-				return new Literal("");
+				return getInvalidLiteral();
 			}
 
 			return new Literal(string);
 		}
-		return new Literal("");
+		return getInvalidLiteral();
+	}
+	
+	private Literal getInvalidLiteral() {
+		if (ignoreMissingFeatures) {
+			error = false;
+			return new Literal("FALSE");
+		} else {
+			return new Literal("");
+		}
 	}
 
 	/**
@@ -432,6 +439,14 @@ public class NodeReader {
 			return false;
 		}
 		return true;
+	}
+	
+	public boolean ignoresMissingFeatures() {
+		return ignoreMissingFeatures;
+	}
+	
+	public void setIgnoreMissingFeatures(boolean ignoreMissingFeatures) {
+		this.ignoreMissingFeatures = ignoreMissingFeatures;
 	}
 
 }

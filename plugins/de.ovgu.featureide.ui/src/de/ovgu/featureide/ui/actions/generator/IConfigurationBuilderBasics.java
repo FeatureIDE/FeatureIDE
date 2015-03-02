@@ -87,6 +87,7 @@ public interface IConfigurationBuilderBasics {
 	String ERROR_IGNOR_SERIIZABLE = "serializable class";
 	String ERROR_IGNOR_CAST = "redundant cast to";
 	String ERROR_IGNOR_DEPRECATION = "has been deprecated";
+	String ERROR_IGNOR_UNUSED_IMPORT = "The import";
 	
 	Pattern errorMessagePattern = Pattern.compile("(.+):(\\d+):(.+)");
 	

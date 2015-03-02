@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.ui.actions.generator;
 
-import java.util.LinkedList;
-
 import javax.annotation.CheckForNull;
 
 import org.eclipse.core.internal.resources.Workspace;
@@ -76,10 +74,8 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 
 	@CheckForNull
 	private Compiler compiler;
-	
-	LinkedList<BuilderConfiguration> configurations = new LinkedList<BuilderConfiguration>();
 
-	private BuilderConfiguration c;
+	private BuilderConfiguration configuration;
 
 	 /**
 	  * 
@@ -93,8 +89,6 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 		
 		if (!builder.createNewProjects) {
 			compiler = new Compiler(nr , this);
-			compiler.setPriority(Job.LONG);
-			compiler.schedule();
 		}
 	}
 	
@@ -105,17 +99,15 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
 		try {
+			monitor.setTaskName("Generate products");
 			while (true) {
 				synchronized (this) {
 					if (builder.cancelGeneratorJobs || monitor.isCanceled()) {
-						if (compiler != null) {
-							compiler.finish();
-						}
 						builder.generatorJobs.remove(this);
 						return Status.OK_STATUS;
 					}
 					if (builder.sorter.getBufferSize() == 0) {
-						monitor.setTaskName(generated + " produrcts generated. (Waiting)");
+						monitor.subTask("(Waiting)");
 						while (builder.sorter.getBufferSize() == 0) {
 							/** the job waits for a new configuration to build **/
 							try {
@@ -123,10 +115,6 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 								wait(1000);
 								if ((builder.sorter.getBufferSize() == 0 && builder.finish) || 
 										builder.cancelGeneratorJobs) {
-									if (compiler != null) {
-										compiler.finish();
-										compiler.join();
-									}
 									return Status.OK_STATUS;
 								}
 							} catch (InterruptedException e) {
@@ -135,81 +123,60 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 						}
 					}
 				}
-				c = builder.getConfiguration();
-				if (c == null) {
+				monitor.subTask("(Build)");
+				configuration = builder.getConfiguration();
+				if (configuration == null) {
 					continue;
 				}
-				monitor.setTaskName(generated + " produrcts generated. (Running)");
-				String name = c.getName();
+				
+				String name = configuration.getName();
 				switch (builder.buildType) {
 				case ALL_CURRENT:
 					if (builder.createNewProjects) {
-						buildConfiguration(builder.featureProject.getProjectName() + SEPARATOR_CONFIGURATION + name, c);
+						buildConfiguration(builder.featureProject.getProjectName() + SEPARATOR_CONFIGURATION + name, configuration);
 					} else {
 						builder.featureProject.getComposer().buildConfiguration(builder.folder.getFolder(name), 
-								c, name);
+								configuration, name);
 					}
 					break;
 				case ALL_VALID:
 					if (builder.createNewProjects) {
-						buildConfiguration(builder.featureProject.getProjectName() + SEPARATOR_VARIANT + name, c);
+						buildConfiguration(builder.featureProject.getProjectName() + SEPARATOR_VARIANT + name, configuration);
 					} else {
 						builder.featureProject.getComposer().buildConfiguration(builder.folder.getFolder(CONFIGURATION_NAME + name), 
-								c, CONFIGURATION_NAME + name);
+								configuration, CONFIGURATION_NAME + name);
 					}
 					break;
 				case T_WISE:
 					if (builder.createNewProjects) {
-						buildConfiguration(builder.featureProject.getProjectName() + SEPARATOR_T_WISE + name, c);
+						buildConfiguration(builder.featureProject.getProjectName() + SEPARATOR_T_WISE + name, configuration);
 					} else {
 						builder.featureProject.getComposer().buildConfiguration(builder.folder.getFolder(name), 
-								c, name);
+								configuration, name);
 					}
 					break;
 
 				}
-
-				addConfiguration(c);
+				if (compiler != null) {
+					monitor.subTask("(Compile)");
+					compiler.compile(configuration);
+				}
+				
 				builder.builtConfigurations++;
-
-				monitor.setTaskName(++generated + " produrcts generated. (Running)");
 			}
 		} catch (Exception e) {
-			UIPlugin.getDefault().logError("The Generator nr. " + nr + " will be restarted.", e);
+			UIPlugin.getDefault().logError("Error in configuration " + configuration, e);
 			/**
 			 * If there is any build error the configuration will be built again.
 			 * And because this job is terminated a new one will be created.
 			 */
-			if (compiler != null) {
-				compiler.finish();
-				try {
-					compiler.join();
-				} catch (InterruptedException e1) {
-					UIPlugin.getDefault().logError(e);
-				}
-			}
+			UIPlugin.getDefault().logWarning("The Generator nr. " + nr + " will be restarted.");
 			builder.createNewGenerator(nr);
-			if (c != null) {
-				builder.addConfiguration(c);
-			}
 		} finally {
 			builder.generatorJobs.remove(this);
+			monitor.done();
 		}
 		return Status.OK_STATUS;
-	}
-
-	@CheckForNull
-	public BuilderConfiguration getConfiguration() {
-		if (configurations.isEmpty()) {
-			return null;
-		}
-		BuilderConfiguration c = configurations.getFirst();
-		configurations.remove();
-		return c;
-	}
-	
-	public void addConfiguration(BuilderConfiguration c) {
-		configurations.add(c);
 	}
 
 	/**

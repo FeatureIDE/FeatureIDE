@@ -95,6 +95,8 @@ public class ExtendedFeatureModel extends FeatureModel {
 	protected final List<Constraint> ownConstraints = new LinkedList<Constraint>();
 	
 	protected FeatureModel mappingModel = null;
+	
+	private boolean isInterface = false;
 
 	@Override
 	protected FeatureModelAnalyzer createAnalyser() {
@@ -187,7 +189,7 @@ public class ExtendedFeatureModel extends FeatureModel {
 	 */
 	public boolean hasInstance() {
 		for (Feature feature : getFeatureTable().values()) {
-			if (((ExtendedFeature) feature).isInstance()) {
+			if (feature instanceof ExtendedFeature && ((ExtendedFeature) feature).isInstance()) {
 				return true;
 			}
 		}
@@ -201,7 +203,7 @@ public class ExtendedFeatureModel extends FeatureModel {
 	 */
 	public boolean hasInherited() {
 		for (Feature feature : getFeatureTable().values()) {
-			if (((ExtendedFeature) feature).isInherited()) {
+			if (feature instanceof ExtendedFeature && ((ExtendedFeature) feature).isInherited()) {
 				return true;
 			}
 		}
@@ -210,7 +212,7 @@ public class ExtendedFeatureModel extends FeatureModel {
 
 	public boolean hasInterface() {
 		for (Feature feature : getFeatureTable().values()) {
-			if (((ExtendedFeature) feature).isInterface()) {
+			if (feature instanceof ExtendedFeature && ((ExtendedFeature) feature).isInterface()) {
 				return true;
 			}
 		}
@@ -273,6 +275,14 @@ public class ExtendedFeatureModel extends FeatureModel {
 		return null;
 		// TODO MPL: Search for possible right feature
 //		return super.getFeature(parentModel + "." + name);
+	}
+	
+	public boolean isInterface() {
+		return isInterface;
+	}
+	
+	public void setInterface(boolean isInterface) {
+		this.isInterface = isInterface;
 	}
 	
 }

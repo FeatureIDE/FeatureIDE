@@ -67,6 +67,7 @@ import de.ovgu.featureide.core.builder.FeatureProjectNature;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
+import de.ovgu.featureide.fm.core.ExtendedFeature;
 import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
@@ -424,9 +425,21 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	private void createAndDeleteFeatureFolders() throws CoreException {
 		sourceFolder.refreshLocal(IResource.DEPTH_ONE, null);
 		// create folders for all layers
-		for (Feature feature : featureModel.getFeatures())
-			if (feature.isConcrete())
-				createFeatureFolder(feature.getName());
+		if (featureModel instanceof ExtendedFeatureModel) {
+			for (Feature feature : featureModel.getFeatures()) {
+				if (feature.isConcrete() && 
+						feature instanceof ExtendedFeature && 
+						!((ExtendedFeature)feature).isFromExtern()) {
+					createFeatureFolder(feature.getName());
+				}
+			}
+		} else {
+			for (Feature feature : featureModel.getFeatures()) {
+				if (feature.isConcrete()) {
+					createFeatureFolder(feature.getName());
+				}
+			}
+		}
 		// delete all empty folders which do not anymore belong to layers
 		for (IResource res : sourceFolder.members())
 			if (res instanceof IFolder && res.exists()) {
@@ -857,17 +870,29 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		return true;
 	}
 
-	private void checkBuildFolder(IFolder folder, IResourceChangeEvent event) throws CoreException {
-		for (IResource res : folder.members()) {
-			if (res instanceof IFolder) {
-				checkBuildFolder((IFolder) res, event);
-			} else if (res instanceof IFile) {
-				IResourceDelta delta = event.getDelta().findMember(res.getFullPath());
-				if (delta != null) {
-					composerExtension.postCompile(delta, (IFile) res);
+	private void checkBuildFolder(final IFolder folder, final IResourceChangeEvent event) {
+		Job job = new Job("Postprocess generated files") {
+			@Override
+			public IStatus run(IProgressMonitor monitor) {
+				try {
+					for (IResource res : folder.members()) {
+						if (res instanceof IFolder) {
+							checkBuildFolder((IFolder) res, event);
+						} else if (res instanceof IFile) {
+							IResourceDelta delta = event.getDelta().findMember(res.getFullPath());
+							if (delta != null) {
+								composerExtension.postCompile(delta, (IFile) res);
+							}
+						}
+					}
+				} catch (CoreException e) {
+					LOGGER.logError(e);
 				}
+				return Status.OK_STATUS;
 			}
-		}
+		};
+		job.setPriority(Job.LONG);
+		job.schedule();
 	}
 
 	public List<IFile> getAllConfigurations() {
@@ -1064,7 +1089,11 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 			final ComposerExtensionManager composerManagerInstance = ComposerExtensionManager.getInstance();
 			composerExtension = composerManagerInstance.getComposerById(this, compositionToolID);
-			((ComposerExtensionClass) composerExtension).initialize(this);
+			if (composerExtension != null) {
+				((ComposerExtensionClass) composerExtension).initialize(this);
+			} else {
+				CorePlugin.getDefault().logError(new Exception("No composer could be created for ID " + compositionToolID));
+			}
 		}
 		return composerExtension;
 	}

@@ -71,6 +71,7 @@ Export-Package: br.ufal.ic.colligens.activator;uses:="org.eclipse.jface.resource
    org.eclipse.ltk.core.refactoring,
    org.eclipse.swt.widgets,
    org.eclipse.ltk.ui.refactoring",
+ br.ufal.ic.colligens.controllers.semanticbugs,
  br.ufal.ic.colligens.handler;uses:="org.eclipse.ui.actions,org.eclipse.core.commands",
  br.ufal.ic.colligens.models;
   uses:="de.fosd.typechef.featureexpr,
@@ -80,6 +81,7 @@ Export-Package: br.ufal.ic.colligens.activator;uses:="org.eclipse.jface.resource
    de.fosd.typechef.parser,
    br.ufal.ic.colligens.controllers.core,
    scala",
+ br.ufal.ic.colligens.models.cppchecker,
  br.ufal.ic.colligens.preferences;uses:="org.eclipse.jface.preference,org.eclipse.ui,org.eclipse.core.runtime.preferences",
  br.ufal.ic.colligens.util;uses:="org.eclipse.jface.text,br.ufal.ic.colligens.models,org.eclipse.core.resources",
  br.ufal.ic.colligens.util.metrics;uses:="br.ufal.ic.colligens.controllers.core",
