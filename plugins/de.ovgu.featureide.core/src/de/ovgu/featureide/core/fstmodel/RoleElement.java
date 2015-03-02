@@ -104,6 +104,10 @@ public abstract class RoleElement<T extends RoleElement<T>> implements Comparabl
 	public int getEndLine() {
 		return endLine;
 	}
+	
+	public int getMethodLength() {
+		return endLine - beginLine;
+	}
 
 	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.core.fstmodel.IRoleElement#getComposedLine()

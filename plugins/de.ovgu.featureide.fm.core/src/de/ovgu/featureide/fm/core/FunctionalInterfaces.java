@@ -46,6 +46,10 @@ public abstract class FunctionalInterfaces {
 		void invoke(T t);
 	}
 	
+	public static interface IProvider<T> {
+		T invoke();
+	}
+	
 	public static class NullFunction<T, U> implements IFunction<T, U> {
 		@Override
 		public U invoke(T t) {

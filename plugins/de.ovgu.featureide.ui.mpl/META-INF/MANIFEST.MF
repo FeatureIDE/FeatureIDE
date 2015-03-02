@@ -21,3 +21,6 @@ Require-Bundle: de.ovgu.featureide.core,
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: University of Magdeburg
 Bundle-Activator: de.ovgu.featureide.ui.mpl.MPLUIPlugin
+Export-Package: de.ovgu.featureide.ui.mpl,
+ de.ovgu.featureide.ui.mpl.wizards,
+ de.ovgu.featureide.ui.mpl.wizards.page

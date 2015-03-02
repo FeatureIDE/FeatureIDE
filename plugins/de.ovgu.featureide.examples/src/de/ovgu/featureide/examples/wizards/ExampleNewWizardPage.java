@@ -26,14 +26,15 @@ import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
@@ -49,6 +50,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
@@ -78,6 +80,7 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -87,17 +90,19 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
 import org.eclipse.ui.dialogs.IOverwriteQuery;
 import org.eclipse.ui.wizards.datatransfer.ImportOperation;
 
+import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.builder.ComposerExtensionManager;
 import de.ovgu.featureide.core.builder.IComposerExtension;
 import de.ovgu.featureide.core.builder.IComposerExtensionBase;
 import de.ovgu.featureide.examples.ExamplePlugin;
 import de.ovgu.featureide.examples.utils.CommentParser;
 import de.ovgu.featureide.examples.utils.ExampleStructureProvider;
-import de.ovgu.featureide.examples.utils.RequirementCategory;
 import de.ovgu.featureide.examples.utils.ZipStructureProvider;
 
 /**
@@ -106,6 +111,64 @@ import de.ovgu.featureide.examples.utils.ZipStructureProvider;
  * @author Christian Becker
  */
 public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery {
+
+	private class ItemAccessCheckboxTreeViewer extends CheckboxTreeViewer {
+
+		/**
+		 * @param parent
+		 * @param style
+		 */
+		public ItemAccessCheckboxTreeViewer(Composite parent, int style) {
+			super(parent, style);
+		}
+
+		public TreeItem findTreeItem(Object element) {
+			Widget widget = findItem(element);
+			if (widget instanceof TreeItem) {
+				return (TreeItem) widget;
+			}
+			return null;
+		}
+
+		public void refresh() {
+			// Save selected and expanded elements;
+			final Set<Object> checkedElements = new HashSet<>(Arrays.asList(getCheckedElements()));
+			final Set<Object> expandedElements = new HashSet<>(Arrays.asList(getExpandedElements()));
+			
+			getTree().setRedraw(false);
+
+			//update tree and load all elements regarding the filter
+			super.refresh();
+			expandAll();
+			collapseAll();
+
+			//reset all selected and expanded elements
+			for (TreeItem parentItems : getTree().getItems()) {
+				if (parentItems.getData() instanceof String) {
+					if (expandedElements.contains(parentItems.getData())) {
+						parentItems.setExpanded(true);
+					}
+					for (TreeItem currItem : parentItems.getItems()) {
+						if (currItem.getData() instanceof ProjectRecord) {
+							ProjectRecord tmpRecord = (ProjectRecord) currItem.getData();
+							if (tmpRecord.hasErrors()) {
+								currItem.setForeground(red);
+							} else if (tmpRecord.hasWarnings()) {
+								currItem.setForeground(gray);
+							} else {
+								currItem.setForeground(black);
+							}
+							if (checkedElements.contains(tmpRecord)) {
+								currItem.setChecked(true);
+							}
+						}
+					}
+				}
+			}
+			getTree().setRedraw(true);		
+		}
+
+	}
 
 	private class ExampleProjectFilter extends ViewerFilter {
 
@@ -127,10 +190,13 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 			} else {
 				return false;
 			}
-
 		}
 
 	}
+
+	protected static final Color gray = new Color(null, 140, 140, 140);
+	protected static final Color red = new Color(null, 240, 0, 0);
+	protected static final Color black = new Color(null, 0, 0, 0);
 
 	/**
 	 * The name of the folder containing metadata information for the workspace.
@@ -144,11 +210,10 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 	 */
 	private ZipStructureProvider structureProvider;
 
-	private CheckboxTreeViewer projectsList;
+	private ItemAccessCheckboxTreeViewer projectsList;
 	private Text descBox;
 
 	private Hashtable<String, List<ProjectRecord>> compTable;
-	private IProject[] wsProjects;
 	private String samplePath;
 
 	private static final String[] response = new String[] { YES, ALL, NO, NO_ALL, CANCEL };
@@ -156,6 +221,9 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 
 	private StyledText searchFeatureText;
 	private final ExampleProjectFilter searchFilter = new ExampleProjectFilter();
+
+	private static final String CHILD_WARNING = "Selected only fully compatible projects. "
+			+ "(Manual selection for projects with warnings is still possible).";
 
 	private Thread updateProjects;
 
@@ -185,7 +253,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 
 		projectsList.addFilter(searchFilter);
 
-		searchFeatureText.setForeground(projectsList.getControl().getDisplay().getSystemColor(SWT.COLOR_GRAY));
+		searchFeatureText.setForeground(gray);
 		searchFeatureText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		searchFeatureText.addModifyListener(new ModifyListener() {
 
@@ -203,7 +271,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 			public void handleEvent(Event event) {
 				if (searchFeatureText.getText().isEmpty()) {
 					searchFeatureText.setText(FILTERTEXT);
-					searchFeatureText.setForeground(projectsList.getControl().getDisplay().getSystemColor(SWT.COLOR_GRAY));
+					searchFeatureText.setForeground(gray);
 				}
 
 			}
@@ -212,10 +280,12 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 
 			@Override
 			public void handleEvent(Event event) {
+				setMessage("");
+
 				if (FILTERTEXT.equals(searchFeatureText.getText())) {
 					searchFeatureText.setText("");
 				}
-				searchFeatureText.setForeground(projectsList.getControl().getDisplay().getSystemColor(SWT.COLOR_BLACK));
+				searchFeatureText.setForeground(black);
 			}
 
 		});
@@ -245,7 +315,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 
 		listComposite.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL | GridData.FILL_BOTH));
 
-		projectsList = new CheckboxTreeViewer(listComposite, SWT.BORDER);
+		projectsList = new ItemAccessCheckboxTreeViewer(listComposite, SWT.BORDER);
 		GridData listData = new GridData(GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL | GridData.FILL_BOTH);
 		listData.minimumHeight = 175;
 		projectsList.getControl().setLayoutData(listData);
@@ -306,7 +376,6 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 			public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 				exampleNewWizardPage = (ExampleNewWizardPage) newInput;
 			}
-
 		});
 
 		projectsList.setLabelProvider(new LabelProvider() {
@@ -315,7 +384,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 					List<IComposerExtension> composerExtensions = ComposerExtensionManager.getInstance().getComposers();
 					for (IComposerExtensionBase ic : composerExtensions) {
 						String composerExtension = ic.toString();
-						if (composerExtension.substring(composerExtension.lastIndexOf(".") +1).equals((String) element)) {
+						if (composerExtension.substring(composerExtension.lastIndexOf(".") + 1).equals((String) element)) {
 							return ic.getName();
 						}
 					}
@@ -330,74 +399,72 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 		});
 
 		projectsList.addCheckStateListener(new ICheckStateListener() {
-			public void checkStateChanged(CheckStateChangedEvent event) {				
-				projectsList.setSelection(new StructuredSelection(event.getElement()));
-
-				boolean keepWarning = false;
+			public void checkStateChanged(CheckStateChangedEvent event) {
 				if (event.getElement() instanceof String) {
 					for (ProjectRecord tmpRecord : compTable.get((String) event.getElement())) {
 						final boolean isChecked = projectsList.getChecked((String) event.getElement());
-						projectsList.setChecked(tmpRecord, isChecked);
-						if (tmpRecord.hasWarnings()) {
-							projectsList.setChecked(tmpRecord, false);
-							projectsList.setGrayed(tmpRecord, true);
-							if (isChecked) {
-								keepWarning = true;
-								setMessage(tmpRecord.getWarningText(), WARNING);
+
+						if (isChecked == false) {
+							projectsList.setChecked(tmpRecord, isChecked);
+						} else {
+							if (tmpRecord.hasErrors() || tmpRecord.hasWarnings()) {
+								projectsList.setChecked(tmpRecord, false);
+								setMessage(CHILD_WARNING, INFORMATION);
+							} else {
+								projectsList.setChecked(tmpRecord, true);
 							}
 						}
 					}
-				} else {
+				} else if (event.getElement() instanceof ProjectRecord) {
 					ProjectRecord tmpRecord = (ProjectRecord) event.getElement();
-					if (keepWarning = tmpRecord.hasWarnings()) {
+					if (tmpRecord.hasErrors()) {
 						projectsList.setChecked(tmpRecord, false);
-						setMessage(tmpRecord.getWarningText(), WARNING);
 					}
-					boolean allChecked = true;
-					String compID = tmpRecord.description.getBuildSpec()[0].getArguments().get("composer");
-					String curComposer = compID.substring(compID.lastIndexOf(".") + 1);
-					for (ProjectRecord pr : compTable.get(curComposer)) {
-						if (!projectsList.getChecked(pr) && !pr.hasWarnings) {
-							allChecked = false;
-							break;
-						}
+					if (projectsList.getChecked(event.getElement())) {
+						projectsList.findTreeItem(event.getElement()).getParentItem().setChecked(true);
 					}
-					projectsList.setChecked(curComposer, allChecked);
+				}
 
-				}
-				if (projectsList.getCheckedElements().length == 0) {
-					setPageComplete(false);
-					if (!keepWarning) {
-						setMessage("");
-					}
-				} else {
-					for (Object obj : projectsList.getCheckedElements()) {
-						if (obj instanceof ProjectRecord) {
-							setPageComplete(true);
-							break;
-						}
-						setPageComplete(false);
-					}
-				}
+				projectsList.setSelection(new StructuredSelection(event.getElement()));
+
+				determineAndSetPageComplete();
 			}
 		});
-		
 
-		
 		projectsList.addSelectionChangedListener(new ISelectionChangedListener() {
 			public void selectionChanged(SelectionChangedEvent event) {
-				
 				if (event.getSelection() instanceof IStructuredSelection) {
 					IStructuredSelection iss = (IStructuredSelection) event.getSelection();
-						if (iss != null) {
-							if (iss.getFirstElement() instanceof String) {
-								descBox.setText("");
-								setMessage("");
-							} else if (iss.getFirstElement() instanceof ProjectRecord) {
-								ProjectRecord tmpRecord = (ProjectRecord) iss.getFirstElement();
+					if (iss != null) {
+						if (iss.getFirstElement() instanceof String) {
+							descBox.setText("");
+							setMessage("");
+
+							TreeItem treeItem = projectsList.findTreeItem(iss.getFirstElement());
+							boolean allProjectsSelected = true;
+							for (TreeItem currItem : treeItem.getItems()) {
+								if (currItem.getData() instanceof ProjectRecord) {
+									ProjectRecord project = ((ProjectRecord) currItem.getData());
+									if (currItem.getChecked() && project.hasWarnings()) {
+										setMessage("Projects with warnings are selected.", WARNING);
+										allProjectsSelected = true;
+										break;
+									}
+									if (!currItem.getChecked() && !project.hasErrors()) {
+										allProjectsSelected = false;
+									}
+								}
+							}
+							if (!allProjectsSelected && treeItem.getChecked()) {
+								setMessage("Not all project selected.", INFORMATION);
+							}
+						} else if (iss.getFirstElement() instanceof ProjectRecord) {
+							ProjectRecord tmpRecord = (ProjectRecord) iss.getFirstElement();
 							if (tmpRecord != null) {
 								descBox.setText(tmpRecord.getDescription());
-								if (tmpRecord.hasWarnings()) {
+								if (tmpRecord.hasErrors()) {
+									setMessage(tmpRecord.getErrorText(), ERROR);
+								} else if (tmpRecord.hasWarnings()) {
 									setMessage(tmpRecord.getWarningText(), WARNING);
 								} else {
 									setMessage("");
@@ -414,9 +481,12 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 
 		createSelectionButtons(listComposite);
 
-		// Children in CheckboxTreeViewer are only requested when explicitly needed. When checking the composer checkbox
-		// (parent) before once having expanded it, projects (children) had actually not been checked when expanded
-		// later. Hence projectsList gets expanded and collapsed completely in the beginning to have all children/projects added.
+		// Children in CheckboxTreeViewer are only requested when explicitly
+		// needed. When checking the composer checkbox
+		// (parent) before once having expanded it, projects (children) had
+		// actually not been checked when expanded
+		// later. Hence projectsList gets expanded and collapsed completely in
+		// the beginning to have all children/projects added.
 		projectsList.expandAll();
 		projectsList.collapseAll();
 		setPageComplete(false);
@@ -433,6 +503,16 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 		dbDG.minimumHeight = 75;
 		descBox.setLayoutData(dbDG);
 
+	}
+
+	private void determineAndSetPageComplete() {
+		for (Object obj : projectsList.getCheckedElements()) {
+			if (obj instanceof ProjectRecord) {
+				setPageComplete(true);
+				break;
+			}
+			setPageComplete(false);
+		}
 	}
 
 	/**
@@ -454,7 +534,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 		selectAll.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 
-				selectAllElementsWithoutWarnings();
+				selectAllElementsWithoutWarningsOrErrors();
 				setPageComplete(projectsList.getCheckedElements().length > 0);
 			}
 		});
@@ -466,6 +546,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 		deselectAll.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				projectsList.setCheckedElements(new Object[0]);
+				setMessage("");
 				setPageComplete(false);
 			}
 		});
@@ -512,13 +593,14 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 					monitor.worked(50);
 					monitor.subTask("Processing results");
 					compTable = new Hashtable<String, List<ProjectRecord>>();
-					// FH, DeltaJ, AHEAD, Antenna, AspectJ, Colligens, FC++, Munge
-					
+					// FH, DeltaJ, AHEAD, Antenna, AspectJ, Colligens, FC++,
+					// Munge
+
 					while (filesIterator.hasNext()) {
 						ProjectRecord pr = filesIterator.next();
 						String compID = "", composer = "";
 
-						for (ICommand command : pr.description.getBuildSpec()) {
+						for (ICommand command : pr.projectDescription.getBuildSpec()) {
 							if (command.getArguments().containsKey("composer")) {
 								compID = command.getArguments().get("composer");
 								composer = compID.substring(compID.lastIndexOf(".") + 1);
@@ -529,10 +611,8 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 								break;
 							}
 						}
-
 					}
 				} else if (directory.isDirectory()) {
-
 					if (!collectProjectFilesFromDirectory(files, directory, null, monitor)) {
 						return;
 					}
@@ -540,13 +620,14 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 					monitor.worked(50);
 					monitor.subTask("Processing results");
 					compTable = new Hashtable<String, List<ProjectRecord>>();
-					// FH, DeltaJ, AHEAD, Antenna, AspectJ, Colligens, FC++, Munge
+					// FH, DeltaJ, AHEAD, Antenna, AspectJ, Colligens, FC++,
+					// Munge
 
 					while (filesIterator.hasNext()) {
 						ProjectRecord pr = filesIterator.next();
 						String compID = "", composer = "";
 
-						for (ICommand command : pr.description.getBuildSpec()) {
+						for (ICommand command : pr.projectDescription.getBuildSpec()) {
 							if (command.getArguments().containsKey("composer")) {
 								compID = command.getArguments().get("composer");
 								composer = compID.substring(compID.lastIndexOf(".") + 1);
@@ -557,7 +638,6 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 								break;
 							}
 						}
-
 					}
 				} else {
 					monitor.worked(60);
@@ -572,17 +652,32 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 		}
 	}
 
-	private void selectAllElementsWithoutWarnings() {
-		for (Entry<String, List<ProjectRecord>> composer : compTable.entrySet()) {
-			projectsList.setChecked(composer.getKey(), true);
-			for (ProjectRecord projectRecord : composer.getValue()) {
-				if (projectRecord.hasWarnings) {
-					projectsList.setGrayed(projectRecord, true);
-				} else {
-					projectsList.setChecked(projectRecord, true);
+	private void selectAllElementsWithoutWarningsOrErrors() {
+		boolean errorOrWarningExist = false;
+
+		TreeItem[] parentItems = projectsList.getTree().getItems();
+		for (TreeItem currPItem : parentItems) {
+			if (currPItem.getData() instanceof String) {
+				currPItem.setChecked(true);
+			}
+			for (TreeItem currItem : currPItem.getItems()) {
+				if (currItem.getData() instanceof ProjectRecord) {
+					ProjectRecord projectRecord = (ProjectRecord) currItem.getData();
+					if (projectRecord.hasErrors()) {
+						currItem.setGrayed(true);
+						errorOrWarningExist = true;
+					} else if (projectRecord.hasWarnings()) {
+						errorOrWarningExist = true;
+					} else {
+						currItem.setChecked(true);
+						projectsList.setChecked(projectRecord, true);
+					}
 				}
 			}
+		}
 
+		if (errorOrWarningExist) {
+			setMessage(CHILD_WARNING, INFORMATION);
 		}
 	}
 
@@ -650,8 +745,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 	 *            The monitor to report to
 	 * @return boolean <code>true</code> if the operation was completed.
 	 */
-	private boolean collectProjectFilesFromDirectory(Collection<ProjectRecord> files, File directory, Set<String> directoriesVisited,
-			IProgressMonitor monitor) {
+	private boolean collectProjectFilesFromDirectory(Collection<ProjectRecord> files, File directory, Set<String> directoriesVisited, IProgressMonitor monitor) {
 		if (monitor.isCanceled()) {
 			return false;
 		}
@@ -671,32 +765,38 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 		}
 
 		// first look for project description files
-		final String dotProject = IProjectDescription.DESCRIPTION_FILE_NAME;
 		for (int i = 0; i < contents.length; i++) {
-			File file = contents[i];
-			if (file.isFile() && file.getName().equals(dotProject)) {
-				files.add(new ProjectRecord(file));
-
-				// don't search sub-directories since we can't have nested
-				// projects
+			final File file = contents[i];
+			if (file.isFile() && IProjectDescription.DESCRIPTION_FILE_NAME.equals(file.getName())) {
+				final ProjectRecord newProject = new ProjectRecord(file);
+				files.add(newProject);
+				if (newProject.containsNatureID("de.ovgu.featureide.core.mpl.MSPLNature")) {
+					if (file.getParentFile().isDirectory()) {
+						final File[] subdir = file.getParentFile().listFiles();
+						for (File file2 : subdir) {
+							if (ProjectRecord.SUB_PROJECTS_FOLDER.equals(file2.getName())) {
+								newProject.collectSubProjectFiles(file2, null, monitor);
+								break;
+							}
+						}
+					}
+				}
 				return true;
 			}
 		}
 		// no project description found, so recurse into sub-directories
 		for (int i = 0; i < contents.length; i++) {
-			if (contents[i].isDirectory()) {
-				if (!contents[i].getName().equals(METADATA_FOLDER)) {
-					try {
-						String canonicalPath = contents[i].getCanonicalPath();
-						if (!directoriesVisited.add(canonicalPath)) {
-							// already been here --> do not recurse
-							continue;
-						}
-					} catch (IOException exception) {
-						exception.printStackTrace();
+			final File file = contents[i];
+			if (file.isDirectory() && !METADATA_FOLDER.equals(file.getName())) {
+				try {
+					if (!directoriesVisited.add(file.getCanonicalPath())) {
+						// already been here --> do not recurse
+						continue;
 					}
-					collectProjectFilesFromDirectory(files, contents[i], directoriesVisited, monitor);
+				} catch (IOException exception) {
+					exception.printStackTrace();
 				}
+				collectProjectFilesFromDirectory(files, contents[i], directoriesVisited, monitor);
 			}
 		}
 		return true;
@@ -707,11 +807,8 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 	 * 
 	 * @return IProject[] array of IProject in the current workspace
 	 */
-	private IProject[] getProjectsInWorkspace() {
-		if (wsProjects == null) {
-			wsProjects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-		}
-		return wsProjects;
+	private static IProject[] getProjectsInWorkspace() {
+		return ResourcesPlugin.getWorkspace().getRoot().getProjects();
 	}
 
 	/**
@@ -723,7 +820,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 	public boolean createProjects() {
 		// saveWidgetValues();
 		final Object[] selected = projectsList.getCheckedElements();
-		WorkspaceModifyOperation op = new WorkspaceModifyOperation() {
+		final WorkspaceModifyOperation op = new WorkspaceModifyOperation() {
 			protected void execute(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 				try {
 					monitor.beginTask("", selected.length); //$NON-NLS-1$
@@ -731,10 +828,20 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 						throw new OperationCanceledException();
 					}
 					for (int i = 0; i < selected.length; i++) {
-						if (selected[i] instanceof ProjectRecord) {
-							createExistingProject((ProjectRecord) selected[i], new SubProgressMonitor(monitor, 1));
-						} else if (selected[i] instanceof String) {
-								//do nothing
+						final Object selectedObject = selected[i];
+						if (selectedObject instanceof ProjectRecord) {
+							ProjectRecord projectRecord = (ProjectRecord) selectedObject;
+							if (projectRecord.hasSubProjects()) {
+								Collection<ProjectRecord> subProj = projectRecord.getSubProjects();
+								for (ProjectRecord subPprojectRecord : subProj) {
+									if (!subPprojectRecord.hasWarnings())
+										createExistingProject(subPprojectRecord, new SubProgressMonitor(monitor, 1));
+								}
+							}
+							createExistingProject(projectRecord, new SubProgressMonitor(monitor, 1));
+
+						} else if (selectedObject instanceof String) {
+							// do nothing
 						}
 					}
 				} finally {
@@ -772,31 +879,29 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 	 * @return boolean <code>true</code> if successful
 	 * @throws InterruptedException
 	 */
-	private boolean createExistingProject(final ProjectRecord record, IProgressMonitor monitor) throws InvocationTargetException,
-			InterruptedException {
+	private boolean createExistingProject(final ProjectRecord record, IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 		String projectName = record.getProjectName();
 		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		final IProject project = workspace.getRoot().getProject(projectName);
-		if (record.description == null) {
+		if (record.projectDescription == null) {
 			// error case
-			record.description = workspace.newProjectDescription(projectName);
+			record.projectDescription = workspace.newProjectDescription(projectName);
 			IPath locationPath = new Path(record.projectSystemFile.getAbsolutePath());
 
 			// If it is under the root use the default location
 			if (Platform.getLocation().isPrefixOf(locationPath)) {
-				record.description.setLocation(null);
+				record.projectDescription.setLocation(null);
 			} else {
-				record.description.setLocation(locationPath);
+				record.projectDescription.setLocation(locationPath);
 			}
 		} else {
-			record.description.setName(projectName);
+			record.projectDescription.setName(projectName);
 		}
 		if (record.projectArchiveFile != null) {
 			// import from archive
 			List<ZipEntry> fileSystemObjects = structureProvider.getChildren(record.parent);
 			structureProvider.setStrip(record.level);
-			ImportOperation operation = new ImportOperation(project.getFullPath(), structureProvider.getRoot(), structureProvider, this,
-					fileSystemObjects);
+			ImportOperation operation = new ImportOperation(project.getFullPath(), structureProvider.getRoot(), structureProvider, this, fileSystemObjects);
 			operation.setContext(getShell());
 			operation.run(monitor);
 			return true;
@@ -806,23 +911,23 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 		File importSource = null;
 		// import project from location copying files - use default project
 		// location for this workspace
-		URI locationURI = record.description.getLocationURI();
+		URI locationURI = record.projectDescription.getLocationURI();
 		// if location is null, project already exists in this location or
-		// some error condition occured.
+		// some error condition occurred.
 		if (locationURI != null) {
 			importSource = new File(locationURI);
 			IProjectDescription desc = workspace.newProjectDescription(projectName);
-			desc.setBuildSpec(record.description.getBuildSpec());
-			desc.setComment(record.description.getComment());
-			desc.setDynamicReferences(record.description.getDynamicReferences());
-			desc.setNatureIds(record.description.getNatureIds());
-			desc.setReferencedProjects(record.description.getReferencedProjects());
-			record.description = desc;
+			desc.setBuildSpec(record.projectDescription.getBuildSpec());
+			desc.setComment(record.projectDescription.getComment());
+			desc.setDynamicReferences(record.projectDescription.getDynamicReferences());
+			desc.setNatureIds(record.projectDescription.getNatureIds());
+			desc.setReferencedProjects(record.projectDescription.getReferencedProjects());
+			record.projectDescription = desc;
 		}
 
 		try {
 			monitor.beginTask("Creating Projects", 100);
-			project.create(record.description, new SubProgressMonitor(monitor, 30));
+			project.create(record.projectDescription, new SubProgressMonitor(monitor, 30));
 			project.open(IResource.BACKGROUND_REFRESH, new SubProgressMonitor(monitor, 70));
 		} catch (CoreException e) {
 			throw new InvocationTargetException(e);
@@ -832,9 +937,18 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 
 		// import operation to import project files if copy checkbox is selected
 		if (importSource != null) {
-			List<?> filesToImport = ExampleStructureProvider.INSTANCE.getChildren(importSource);
-			ImportOperation operation = new ImportOperation(project.getFullPath(), importSource, ExampleStructureProvider.INSTANCE, this,
-					filesToImport);
+			List<File> filesToImport = ExampleStructureProvider.INSTANCE.getChildren(importSource);
+
+			if (record.hasSubProjects()) {
+				for (Iterator<File> it = filesToImport.iterator(); it.hasNext();) {
+					if (ProjectRecord.SUB_PROJECTS_FOLDER.equals(it.next().getName())) {
+						it.remove();
+						break;
+					}
+				}
+			}
+
+			ImportOperation operation = new ImportOperation(project.getFullPath(), importSource, ExampleStructureProvider.INSTANCE, this, filesToImport);
 			operation.setContext(getShell());
 			operation.setOverwriteResources(true); // need to overwrite
 			// .project, .classpath
@@ -842,18 +956,15 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 			operation.setCreateContainerStructure(false);
 			operation.run(monitor);
 		}
-
 		return true;
 	}
 
 	/**
-	 * The <code>WizardDataTransfer</code> implementation of this
-	 * <code>IOverwriteQuery</code> method asks the user whether the existing
+	 * The <code>WizardDataTransfer</code> implementation of this <code>IOverwriteQuery</code> method asks the user whether the existing
 	 * resource at the given path should be overwritten.
 	 * 
 	 * @param pathString
-	 * @return the user's reply: one of <code>"YES"</code>, <code>"NO"</code>,
-	 *         <code>"ALL"</code>, or <code>"CANCEL"</code>
+	 * @return the user's reply: one of <code>"YES"</code>, <code>"NO"</code>, <code>"ALL"</code>, or <code>"CANCEL"</code>
 	 */
 	public String queryOverwrite(String pathString) {
 		Path path = new Path(pathString);
@@ -867,9 +978,9 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 			messageString = "Overwrite " + path.lastSegment() + " in folder " + path.removeLastSegments(1).toOSString() + " ?";
 		}
 
-		final MessageDialog dialog = new MessageDialog(getContainer().getShell(), "Question", null, messageString, MessageDialog.QUESTION,
-				new String[] { IDialogConstants.YES_LABEL, IDialogConstants.YES_TO_ALL_LABEL, IDialogConstants.NO_LABEL,
-						IDialogConstants.NO_TO_ALL_LABEL, IDialogConstants.CANCEL_LABEL }, 0);
+		final MessageDialog dialog = new MessageDialog(getContainer().getShell(), "Question", null, messageString, MessageDialog.QUESTION, new String[] {
+				IDialogConstants.YES_LABEL, IDialogConstants.YES_TO_ALL_LABEL, IDialogConstants.NO_LABEL, IDialogConstants.NO_TO_ALL_LABEL,
+				IDialogConstants.CANCEL_LABEL }, 0);
 
 		// run in syncExec because callback is from an operation,
 		// which is probably not running in the UI thread.
@@ -951,34 +1062,58 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 	 */
 
 	/**
+	 * Determine if the project with the given name is in the current workspace.
+	 * 
+	 * @param projectName
+	 *            String the project name to check
+	 * @return boolean true if the project with the given name is in this
+	 *         workspace
+	 */
+	protected static boolean isProjectInWorkspace(String projectName) {
+		if (projectName == null) {
+			return false;
+		}
+		IProject[] workspaceProjects = getProjectsInWorkspace();
+		for (int i = 0; i < workspaceProjects.length; i++) {
+			if (projectName.equals(workspaceProjects[i].getName())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
 	 * Class declared public only for test suite.
 	 * 
 	 */
-	public class ProjectRecord {
-		File projectSystemFile;
+	private class ProjectRecord {
+		public static final String SUB_PROJECTS_FOLDER = "projects";
+		
+		private File projectSystemFile;
 
-		Object projectArchiveFile;
+		private Collection<ProjectRecord> files;
 
-		String projectName;
-		CommentParser comment;
+		private Object projectArchiveFile;
+
+		private String projectName;
+		private CommentParser comment;
 		private String warning = "";
+		private String error = "";
 		private boolean hasWarnings = false;
+		private boolean hasErrors = false;
 
-		Object parent;
+		private Object parent;
 
-		int level;
+		private int level;
 
-		IProjectDescription description;
-
-		// private List<LanguageExtensionProxy> availLanguages;
-		// private FeatureModelProviderProxy activeFeatureManager;
+		private IProjectDescription projectDescription;
 
 		/**
 		 * Create a record for a project based on the info in the file.
 		 * 
 		 * @param file
 		 */
-		ProjectRecord(File file) {
+		private ProjectRecord(File file) {
 			projectSystemFile = file;
 			setProjectName();
 			performAlreadyExistsCheck();
@@ -993,13 +1128,32 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 		 * @param level
 		 *            The number of levels deep in the provider the file is
 		 */
-		ProjectRecord(Object file, Object parent, int level) {
+		private ProjectRecord(Object file, Object parent, int level) {
 			this.projectArchiveFile = file;
 			this.parent = parent;
 			this.level = level;
 			setProjectName();
 			performAlreadyExistsCheck();
 			performRequirementCheck();
+		}
+
+		/**
+		 * @param dir
+		 * @param object
+		 * @param monitor
+		 */
+		public void collectSubProjectFiles(File dir, Object object, IProgressMonitor monitor) {
+			files = new LinkedList<ProjectRecord>();
+			collectProjectFilesFromDirectory(files, dir, null, monitor);
+		}
+
+		public boolean hasSubProjects() {
+			return !(files == null || files.isEmpty());
+		}
+
+		@SuppressWarnings("unchecked")
+		public Collection<ProjectRecord> getSubProjects() {
+			return (files != null) ? files : Collections.EMPTY_LIST;
 		}
 
 		/**
@@ -1016,17 +1170,12 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 							IPath path = new Path(((ZipEntry) projectArchiveFile).getName());
 							projectName = path.segment(path.segmentCount() - 2);
 						}
-						// else if (projectArchiveFile instanceof TarEntry) {
-						// IPath path = new Path(
-						// ((TarEntry) projectArchiveFile).getName());
-						// projectName = path.segment(path.segmentCount() - 2);
-						// }
 						comment = null;
 					} else {
-						description = ResourcesPlugin.getWorkspace().loadProjectDescription(stream);
+						projectDescription = ResourcesPlugin.getWorkspace().loadProjectDescription(stream);
 						stream.close();
-						projectName = description.getName();
-						comment = new CommentParser(description.getComment());
+						projectName = projectDescription.getName();
+						comment = new CommentParser(projectDescription.getComment());
 					}
 
 				}
@@ -1038,12 +1187,12 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 					// name as the project name
 					if (isDefaultLocation(path)) {
 						projectName = path.segment(path.segmentCount() - 2);
-						description = ResourcesPlugin.getWorkspace().newProjectDescription(projectName);
-						comment = new CommentParser(description.getComment());
+						projectDescription = ResourcesPlugin.getWorkspace().newProjectDescription(projectName);
+						comment = new CommentParser(projectDescription.getComment());
 					} else {
-						description = ResourcesPlugin.getWorkspace().loadProjectDescription(path);
-						projectName = description.getName();
-						comment = new CommentParser(description.getComment());
+						projectDescription = ResourcesPlugin.getWorkspace().loadProjectDescription(path);
+						projectName = projectDescription.getName();
+						comment = new CommentParser(projectDescription.getComment());
 					}
 
 				}
@@ -1090,8 +1239,13 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 			return comment == null ? "" : comment.getDescription();
 		}
 
-		private List<RequirementCategory> getRequirements() {
-			return comment == null ? null : comment.getRequirements();
+		public boolean containsNatureID(String id) {
+			for (String curID : projectDescription.getNatureIds()) {
+				if (curID.equals(id)) {
+					return true;
+				}
+			}
+			return false;
 		}
 
 		public boolean hasWarnings() {
@@ -1102,73 +1256,41 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 			return warning;
 		}
 
-		/**
-		 * This method needs to be extended if you would like to check
-		 * availablity of further plugin categories. Currently only
-		 * "de.ovgu.cide.features" and "de.ovgu.cide.languages" are checked.
-		 * 
-		 * @param category
-		 * @param pluginID
-		 * @return
-		 */
-		private boolean isPluginAvailable(String category, String pluginID) {
-			return true;
+		public boolean hasErrors() {
+			return hasErrors;
+		}
+
+		public String getErrorText() {
+			return error;
 		}
 
 		private void performAlreadyExistsCheck() {
 			if (isProjectInWorkspace(getProjectName())) {
-				warning += "This example already exists in the workspace directory \n";
-				hasWarnings = true;
+				error += "This example already exists in the workspace directory.";
+				hasErrors = true;
 			}
-		}
-
-		/**
-		 * Determine if the project with the given name is in the current
-		 * workspace.
-		 * 
-		 * @param projectName
-		 *            String the project name to check
-		 * @return boolean true if the project with the given name is in this
-		 *         workspace
-		 */
-		private boolean isProjectInWorkspace(String projectName) {
-			if (projectName == null) {
-				return false;
-			}
-			IProject[] workspaceProjects = getProjectsInWorkspace();
-			for (int i = 0; i < workspaceProjects.length; i++) {
-				if (projectName.equals(workspaceProjects[i].getName())) {
-					return true;
-				}
-			}
-			return false;
 		}
 
 		private void performRequirementCheck() {
-			List<RequirementCategory> requirements = getRequirements();
+			IStatus status = ResourcesPlugin.getWorkspace().validateNatureSet(projectDescription.getNatureIds());
 
-			if (requirements == null)
-				return;
+			if (status.isOK()) {
+				status = CorePlugin.getDefault().isComposable(projectDescription);
+			}
 
-			Iterator<RequirementCategory> i = requirements.iterator();
-			String categoryName;
-
-			while (i.hasNext()) {
-				RequirementCategory cat = i.next();
-
-				// get the category name
-				categoryName = cat.getCategory();
-
-				// get all plugins which need to be checked
-				Set<String> plugins = cat.getPluginIds();
-				for (String plugin : plugins) {
-
-					if (!isPluginAvailable(categoryName, plugin)) {
-						warning += cat.getErrorMsg(plugin) + "\n";
-						hasWarnings = true;
+			if (!status.isOK()) {
+				warning = status.getMessage();
+				if (status instanceof MultiStatus) {
+					MultiStatus multi = (MultiStatus) status;
+					if (multi.getChildren().length > 0) {
+						warning += " (";
+						for (int j = 0; j < multi.getChildren().length - 1; j++) {
+							warning += multi.getChildren()[j].getMessage() + " ;";
+						}
+						warning += multi.getChildren()[multi.getChildren().length - 1].getMessage() + ")";
 					}
-
 				}
+				hasWarnings = true;
 			}
 		}
 
@@ -1182,5 +1304,16 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 		public String getProjectLabel() {
 			return projectName;
 		}
+		
+		@Override
+		public int hashCode() {
+			return projectName.hashCode();
+		}
+
+		@Override
+		public boolean equals(Object arg) {
+			return (arg instanceof ProjectRecord) && ((ProjectRecord) arg).projectName.equals(this.projectName);
+		}
 	}
+
 }

@@ -85,7 +85,7 @@ public class CreateConstraintWithAction extends CreateConstraintAction {
 	@Override
 	public void run() {
 		ConstraintDialog dialog = new ConstraintDialog(super.featuremodel, null);
-		dialog.setInputText(this.selectedFeature + " ");
+		dialog.setInputText(this.selectedFeature);
 	}
 
 }

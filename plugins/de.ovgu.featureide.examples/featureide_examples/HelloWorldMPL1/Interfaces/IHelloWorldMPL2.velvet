@@ -1,5 +1,0 @@
-cinterface IHelloWorldMPL2 {
-		mandatory feature Hello;
-		mandatory feature World;
-		feature Wonderful;
-}

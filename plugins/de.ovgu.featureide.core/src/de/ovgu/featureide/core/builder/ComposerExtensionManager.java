@@ -28,7 +28,6 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.ExtensionPointManager;
 import de.ovgu.featureide.core.IFeatureProject;
 
-
 /**
  * Manages the FeatureIDE extensions to compose features.
  * 
@@ -43,23 +42,22 @@ public class ComposerExtensionManager extends ExtensionPointManager<IComposerExt
 	ComposerExtensionManager() {
 		super(CorePlugin.PLUGIN_ID, IComposerExtension.extensionPointID);
 	}
-	
+
 	public static ComposerExtensionManager getInstance() {
 		return instance;
 	}
 
 	@Override
-	protected IComposerExtension parseExtension(
-			IConfigurationElement configurationElement) {
+	protected IComposerExtension parseExtension(IConfigurationElement configurationElement) {
 		if (!IComposerExtension.extensionID.equals(configurationElement.getName()))
 			return null;
 		return new ComposerExtensionProxy(configurationElement);
 	}
-	
+
 	public List<IComposerExtension> getComposers() {
 		return getProviders();
 	}
-	
+
 	/**
 	 * Gets a composer by an ID
 	 * 
@@ -69,9 +67,20 @@ public class ComposerExtensionManager extends ExtensionPointManager<IComposerExt
 	public IComposerExtensionClass getComposerById(IFeatureProject featureProject, String composerID) {
 		for (IComposerExtension tool : getComposers()) {
 			if (tool.getId().equals(composerID)) {
-				return tool.getComposerByProject(featureProject);	
+				return tool.getComposerByProject(featureProject);
 			}
 		}
 		return null;
 	}
+
+	public IComposerExtension getComposerById(String composerID) {
+		for (IComposerExtension tool : getComposers()) {
+			if (tool.getId().equals(composerID)) {
+				return tool;
+			}
+		}
+		CorePlugin.getDefault().logWarning("The required composer " + composerID + " is not available.");
+		return null;
+	}
+	
 }

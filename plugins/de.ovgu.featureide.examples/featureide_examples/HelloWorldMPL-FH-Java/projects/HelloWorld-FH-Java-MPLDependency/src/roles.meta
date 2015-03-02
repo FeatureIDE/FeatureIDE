@@ -1,0 +1,18 @@
+{
+	"features" : [
+		"Hello",
+		"Beautiful",
+		"World"
+	],
+	"roles": {
+		"print": {
+			"Hello": "print__wrappee__Hello",
+			"Beautiful": "print__wrappee__Beautiful",
+			"World": "print"
+		},
+		"main": {
+			"Hello": "main"
+		}
+	}
+
+}
