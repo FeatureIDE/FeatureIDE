@@ -29,9 +29,7 @@ import java.util.Set;
 import org.eclipse.jface.fieldassist.IContentProposal;
 import org.eclipse.jface.fieldassist.IContentProposalProvider;
 
-import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.Features;
-import de.ovgu.featureide.fm.core.Operator;
 
 /**
  * provides proposals for content assist while typing constraints

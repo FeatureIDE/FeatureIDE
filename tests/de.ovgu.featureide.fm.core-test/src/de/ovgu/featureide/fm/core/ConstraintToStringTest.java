@@ -20,16 +20,11 @@
  */
 package de.ovgu.featureide.fm.core;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.prop4j.Implies;
 import org.prop4j.Literal;
 import org.prop4j.NodeWriter;
-import org.prop4j.Not;
-import org.prop4j.Or;
 
 public class ConstraintToStringTest {
 	
