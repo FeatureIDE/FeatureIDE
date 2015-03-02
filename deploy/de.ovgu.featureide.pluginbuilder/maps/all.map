@@ -9,6 +9,7 @@ feature@de.ovgu.featureide.featurecpp=COPY,/home/itidbrun/TeamCity/buildAgent/wo
 plugin@de.ovgu.featureide.core.featurecpp=COPY,/home/itidbrun/TeamCity/buildAgent/work/featureide/plugins,de.ovgu.featureide.core.featurecpp
 feature@de.ovgu.featureide.featurehouse=COPY,/home/itidbrun/TeamCity/buildAgent/work/featureide/deploy,de.ovgu.featureide.featurehouse
 plugin@de.ovgu.featureide.core.featurehouse=COPY,/home/itidbrun/TeamCity/buildAgent/work/featureide/plugins,de.ovgu.featureide.core.featurehouse
+plugin@de.ovgu.featureide.core.conversion.ahead_featurehouse=COPY,/home/itidbrun/TeamCity/buildAgent/work/featureide/plugins,de.ovgu.featureide.core.conversion.ahead-featurehouse
 plugin@de.ovgu.featureide.core.mpl=COPY,/home/itidbrun/TeamCity/buildAgent/work/featureide/plugins,de.ovgu.featureide.core.mpl
 plugin@de.ovgu.featureide.ui.mpl=COPY,/home/itidbrun/TeamCity/buildAgent/work/featureide/plugins,de.ovgu.featureide.ui.mpl
 feature@de.ovgu.featureide.antenna=COPY,/home/itidbrun/TeamCity/buildAgent/work/featureide/deploy,de.ovgu.featureide.antenna

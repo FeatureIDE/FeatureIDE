@@ -214,4 +214,11 @@ Library.
          version="2.7.2.qualifier"
          unpack="false"/>
 
+   <plugin
+         id="de.ovgu.featureide.core.conversion.ahead_featurehouse"
+         download-size="0"
+         install-size="0"
+         version="2.7.2.qualifier"
+         unpack="false"/>
+
 </feature>
