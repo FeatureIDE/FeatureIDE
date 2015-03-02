@@ -356,6 +356,20 @@
 					icon="icons/FeatureIconSmall.ico"
 					id="de.ovgu.featureide.ui.mpl.javadoc.subMenu"
 					label="Documentation">
+				<visibleWhen
+						checkEnabled="false">
+					<with
+							variable="activeMenuSelection">
+						<iterate
+								ifEmpty="false"
+								operator="or">
+							<test
+									args="de.ovgu.featureide.composer.featurehouse"
+									property="de.ovgu.featureide.fm.ui.properties.composer">
+							</test>
+						</iterate>
+					</with>
+				</visibleWhen>
 				<command
 						commandId="de.ovgu.featureide.ui.mpl.commands.javadoc.product"
 						id="de.ovgu.featureide.ui.mpl.actions.javadoc.product"
