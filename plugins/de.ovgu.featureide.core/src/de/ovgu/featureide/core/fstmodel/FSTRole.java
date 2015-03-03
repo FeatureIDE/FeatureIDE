@@ -74,6 +74,26 @@ public class FSTRole {
 	public FSTClassFragment getClassFragment() {
 		return classFragment;
 	}
+	
+	@Nonnull
+	public TreeSet<FSTField> getFields() {
+		return classFragment.getFields();
+	}
+
+	@Nonnull
+	public TreeSet<FSTInvariant> getInvariants() {
+		return classFragment.getInvariants();
+	}
+	
+	@Nonnull
+	public TreeSet<FSTMethod> getMethods() {
+		return classFragment.getMethods();
+	}
+	
+	@Nonnull
+	public TreeSet<FSTClassFragment> getInnerClasses() {
+		return classFragment.getInnerClasses();
+	}
 
 	@Nonnull
 	public TreeSet<FSTDirective> getDirectives() {
