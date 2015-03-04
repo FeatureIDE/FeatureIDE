@@ -30,7 +30,6 @@ import javax.annotation.Nonnull;
  * 
  * @author Sebastian Krieter
  */
-
 public class FSTClassFragment extends RoleElement<FSTClassFragment> {
 	protected final TreeSet<FSTMethod> methods = new TreeSet<FSTMethod>();
 	protected final TreeSet<FSTField> fields = new TreeSet<FSTField>();
@@ -38,6 +37,8 @@ public class FSTClassFragment extends RoleElement<FSTClassFragment> {
 	protected final TreeSet<FSTInvariant> invariants = new TreeSet<FSTInvariant>();
 
 	protected String pckg = null;
+	
+	protected boolean innerClass = false;
 
 	protected final HashSet<String> 
 		importList = new HashSet<String>(),
@@ -146,5 +147,13 @@ public class FSTClassFragment extends RoleElement<FSTClassFragment> {
 	
 	public void setModifiers(String modifiers) {
 		this.modifiers = modifiers;
+	}
+	
+	public boolean isInnerClass() {
+		return innerClass;
+	}
+	
+	public void setInnerClass(boolean innerClass) {
+		this.innerClass = innerClass;
 	}
 }

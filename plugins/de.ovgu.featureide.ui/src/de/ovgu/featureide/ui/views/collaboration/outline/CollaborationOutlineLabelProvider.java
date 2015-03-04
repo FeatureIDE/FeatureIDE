@@ -46,7 +46,7 @@ import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
  * Provides labels and images for Collaboration outline
  * 
  * @author Jan Wedding
- * @author Melanie Pflaume
+ * @author Melanie Pflaume 
  */
 public class CollaborationOutlineLabelProvider extends OutlineLabelProvider implements GUIDefaults {
 
@@ -157,7 +157,7 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 	}
 
 	public String getLabelProvName() {
-		return "Collaboration Outline";
+		return "Default Outline";
 	}
 
 	@Override
