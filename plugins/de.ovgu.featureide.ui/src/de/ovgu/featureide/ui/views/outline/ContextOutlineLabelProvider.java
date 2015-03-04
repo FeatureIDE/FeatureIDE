@@ -232,21 +232,24 @@ public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 				while (parent.getParent() != null) {
 					parent = parent.getParent();
 				}
-				IFile iFile = model.getFeature(signatures.getFeatureName(featureID)).getRole(parent.getFullName().replace('.', '/') + ".java").getFile();
+				
+				final String fullName = parent.getFullName();
+				final String fileName = (fullName.startsWith("."))
+						? fullName.substring(1)
+						: fullName.replace('.', '/');
+						
+				final IFile iFile = model.getFeature(signatures.getFeatureName(featureID)).getRole(fileName + ".java").getFile();
 
 				if (iFile.isAccessible()) {
-					IWorkbench workbench = PlatformUI.getWorkbench();
+					final IWorkbench workbench = PlatformUI.getWorkbench();
 					try {
-						IContentType contentType = null;
-						IContentDescription description = iFile.getContentDescription();
-						if (description != null) {
-							contentType = description.getContentType();
-						}
-						IEditorDescriptor desc = workbench.getEditorRegistry().getDefaultEditor(iFile.getName(), contentType);
-						IEditorPart editorPart = workbench.getActiveWorkbenchWindow().getActivePage().openEditor(new FileEditorInput(iFile), (desc != null) ? desc.getId() : "org.eclipse.ui.DefaultTextEditor");
-
-						int linenumber = sig.getFeatureData()[sig.hasFeature(featureID)].getLineNumber();
-						scrollToLine(editorPart, linenumber);
+						final IContentDescription description = iFile.getContentDescription();
+						final IContentType contentType = (description != null) ? description.getContentType() : null;
+						final IEditorDescriptor desc = workbench.getEditorRegistry().getDefaultEditor(iFile.getName(), contentType);
+						final IEditorPart editorPart = workbench.getActiveWorkbenchWindow().getActivePage().openEditor(new FileEditorInput(iFile), (desc != null) ? desc.getId() : "org.eclipse.ui.DefaultTextEditor");
+						
+						final int dataIndex = sig.hasFeature(featureID);
+						scrollToLine(editorPart, (dataIndex > -1) ? sig.getFeatureData()[dataIndex].getLineNumber() : 1);
 					} catch (CoreException e) {
 						UIPlugin.getDefault().logError(e);
 					}
