@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import de.ovgu.featureide.core.fstmodel.FSTClass;
@@ -60,6 +61,9 @@ public class StatisticsProgramSize extends LazyParent {
 		HashMap<String, Integer> methodMap = new HashMap<String, Integer>();
 		HashMap<String, Integer> fieldMap = new HashMap<String, Integer>();
 		HashMap<String, Integer> classMap = new HashMap<String, Integer>();
+			
+		ArrayList<FSTClassFragment> allNestedList = new ArrayList<FSTClassFragment>();
+		int pointer = 0;
 
 		for (FSTClass class_ : fstModel.getClasses()) {
 			for (FSTRole role : class_.getRoles()) {
@@ -80,13 +84,28 @@ public class StatisticsProgramSize extends LazyParent {
 					addToMap(qualifier + method.getFullName(), methodMap);
 				for (FSTField field : classFragment.getFields())
 					addToMap(qualifier + field.getFullName(), fieldMap);
+				for(FSTClassFragment fragment : classFragment.getInnerClasses())
+					allNestedList.add(fragment);
+									
 				addToMap(qualifiedRoleName, classMap);
 			}
 		}
 		
+		while(pointer < allNestedList.size()) {
+			for(FSTClassFragment fragment : allNestedList.get(pointer).getInnerClasses())
+			{
+				allNestedList.add(fragment); 
+			}
+			pointer++;
+		}
+		
+		//HashMapNode nnn = new HashMapNode("",null,classMap);
+			
 		addChild(new HashMapNode(NUMBER_CLASS + SEPARATOR
-				+ classMap.keySet().size() + " | " + NUMBER_ROLE + SEPARATOR
+				+ (classMap.keySet().size()+ allNestedList.size()) + " (" + NUMBER_CLASS_NESTED + SEPARATOR + allNestedList.size() + ") " + " | " + NUMBER_ROLE + SEPARATOR
 				+ sum(classMap), null, classMap));
+		addChild(new HashMapNode(NUMBER_CLASS_NESTED + SEPARATOR + allNestedList.size(),null, classMap));
+		
 		addChild(new HashMapNode(NUMBER_FIELD_U + SEPARATOR
 				+ fieldMap.keySet().size() + " | " + NUMBER_FIELD + SEPARATOR
 				+ sum(fieldMap), null, fieldMap));

@@ -62,6 +62,7 @@ public interface StatisticsIds {
 	public static final String DESC_FEATURE_COMPLEXITY = "Feature - Details";
 	public static final String NUMBER_ROLE = "Number of roles";
 	public static final String NUMBER_CLASS = "Number of classes";
+	public static final String NUMBER_CLASS_NESTED = "Number of nested classes";
 	public static final String NUMBER_METHOD = "Number of methods";
 	public static final String NUMBER_FIELD = "Number of fields";
 	public static final String NUMBER_METHOD_U = "Number of unique methods";
