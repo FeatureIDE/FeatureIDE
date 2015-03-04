@@ -242,11 +242,11 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 					}
 				} else if (child instanceof FSTNonTerminal) {
 					if (JAVA_NODE_INNER_CLASS_TYPE.equals(type)) {
-						String name = child.getName();
-						String className = name.substring(name.lastIndexOf(File.separator) + 1);
+						final String name = child.getName();
+						final String className = name.substring(name.lastIndexOf(File.separator) + 1);
 
-						FSTClassFragment newFragment = new FSTClassFragment(className);
-						classFragmentStack.peek().add(newFragment);
+						final FSTClassFragment newFragment = new FSTClassFragment(className);
+						newFragment.setInnerClass(true);
 						classFragmentStack.push(newFragment);
 					} else {
 						classFragmentStack.push(classFragmentStack.peek());
@@ -256,7 +256,10 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 			}
 			
 			if (!classFragmentStack.isEmpty()) {
-				classFragmentStack.pop();
+				final FSTClassFragment lastElement = classFragmentStack.pop();
+				if (lastElement.isInnerClass()) {
+					classFragmentStack.peek().add(lastElement);
+				}
 			}
 		}
 	}
