@@ -194,7 +194,8 @@ public class VelvetFeatureModelWriter extends AbstractFeatureModelWriter {
 		}
 		sb.append("feature ");
 		sb.append(curFeature.getName());
-		final boolean hasDescription = curFeature.getDescription() != null && !curFeature.getDescription().isEmpty();
+		final String description = curFeature.getDescription();
+		final boolean hasDescription = description != null && !description.isEmpty();
 
 		if (curFeature.getChildrenCount() == 0 && !hasDescription) {
 			sb.append(";");
@@ -204,7 +205,7 @@ public class VelvetFeatureModelWriter extends AbstractFeatureModelWriter {
 			if (hasDescription) {
 				writeTab(depth + 1);
 				sb.append("description \"");
-				sb.append(curFeature.getDescription());
+				sb.append(description.replace("\"", "\\\""));
 				sb.append("\";");
 				sb.append(NEWLINE);
 			}
