@@ -222,7 +222,7 @@
 				class="de.ovgu.featureide.ui.views.collaboration.outline.Outline"
 				icon="icons/FeatureIconSmall.ico"
 				id="de.ovgu.featureide.ui.views.collaboration.outline.CollaborationOutline"
-				name="Collaboration Outline"
+				name="FeatureIDE Outline"
 				restorable="true">
 		</view>
 		<view
