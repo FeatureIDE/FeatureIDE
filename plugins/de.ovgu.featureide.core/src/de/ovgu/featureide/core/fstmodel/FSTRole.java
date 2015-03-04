@@ -41,7 +41,8 @@ public class FSTRole {
 	private FSTFeature feature;
 	private FSTClass fstClass;
 	private IFile file;
-
+	
+	
 	public FSTRole(IFile file, FSTFeature feature, FSTClass fstClass) {
 		this.feature = feature;
 		this.fstClass = fstClass;
@@ -73,6 +74,26 @@ public class FSTRole {
 
 	public FSTClassFragment getClassFragment() {
 		return classFragment;
+	}
+	
+	@Nonnull
+	public TreeSet<FSTField> getFields() {
+		return classFragment.getFields();
+	}
+
+	@Nonnull
+	public TreeSet<FSTInvariant> getInvariants() {
+		return classFragment.getInvariants();
+	}
+	
+	@Nonnull
+	public TreeSet<FSTMethod> getMethods() {
+		return classFragment.getMethods();
+	}
+	
+	@Nonnull
+	public TreeSet<FSTClassFragment> getInnerClasses() {
+		return classFragment.getInnerClasses();
 	}
 
 	@Nonnull

@@ -54,6 +54,7 @@ import org.eclipse.jface.viewers.Viewer;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
+import de.ovgu.featureide.core.fstmodel.FSTClassFragment;
 import de.ovgu.featureide.core.fstmodel.FSTContractedRole;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTInvariant;
@@ -116,26 +117,33 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 
 	@Override
 	public Object[] getChildren(Object parentElement) {
-		if (parentElement instanceof FSTClass) {
+		if (parentElement instanceof FSTClass || parentElement instanceof FSTClassFragment) {						// || parentElement instanceof FSTClassFragment ?
 			// get all fields, methods, directives and invariants
 			final TreeSet<FSTMethod> methods = new TreeSet<FSTMethod>();
 			final TreeSet<FSTField> fields = new TreeSet<FSTField>();
 			final TreeSet<FSTInvariant> invariants = new TreeSet<FSTInvariant>();
 			final TreeSet<FSTDirective> directives = new TreeSet<FSTDirective>();
+		//edit
+			final TreeSet<FSTClassFragment> innerClasses = new TreeSet<FSTClassFragment>();
+			
 			for (FSTRole role : ((FSTClass) parentElement).getRoles()) {
 				invariants.addAll(role.getClassFragment().getInvariants());
 				methods.addAll(role.getClassFragment().getMethods());
 				fields.addAll(role.getClassFragment().getFields());
 				directives.addAll(role.getDirectives());
+		//edit
+				innerClasses.addAll(role.getInnerClasses());
 			}
 
 			final IRoleElement[] obj = new IRoleElement[methods.size() + fields.size() + invariants.size()
-					+ directives.size()];
+					+ directives.size() + innerClasses.size()];
 			int pos = 0;
 			System.arraycopy(invariants.toArray(), 0, obj, pos, invariants.size());
 			System.arraycopy(fields.toArray(), 0, obj, pos += invariants.size(), fields.size());
 			System.arraycopy(methods.toArray(), 0, obj, pos += fields.size(), methods.size());
 			System.arraycopy(directives.toArray(), 0, obj, pos += methods.size(), directives.size());
+		//edit
+			System.arraycopy(innerClasses.toArray(), 0, obj, pos+=directives.size(), innerClasses.size());
 
 			return obj;
 		} else if (parentElement instanceof FSTMethod) {
@@ -218,7 +226,7 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 		if (element instanceof FSTClass) {
 			for (FSTRole role : ((FSTClass) element).getRoles()) {
 				if (!role.getClassFragment().getMethods().isEmpty() || !role.getClassFragment().getFields().isEmpty()
-						|| !role.getDirectives().isEmpty()) {
+						|| !role.getDirectives().isEmpty() || !role.getInnerClasses().isEmpty()) {
 					return true;
 				}
 			}
@@ -232,11 +240,21 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 			return true;
 
 		if (element instanceof FSTInvariant)
+			
 			return true;
 
 		if (element instanceof FSTDirective) {
 			return ((FSTDirective) element).getChildren().length != 0;
+			
+		}/*
+		if(element instanceof FSTClassFragment){
+			for (FSTRole role : ((FSTClassFragment) element).get) {
+				if (!role.getClassFragment().getMethods().isEmpty() || !role.getClassFragment().getFields().isEmpty()
+						|| !role.getDirectives().isEmpty() || !role.getInnerClasses().isEmpty()) {
+					return true;
+			
 		}
+		*/
 
 		return false;
 	}

@@ -31,6 +31,7 @@ import org.eclipse.swt.widgets.TreeItem;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
+import de.ovgu.featureide.core.fstmodel.FSTClassFragment;
 import de.ovgu.featureide.core.fstmodel.FSTContractedRole;
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTField;
@@ -152,8 +153,12 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 
 		if (element instanceof String)
 			return (String) element;
+		
+		if (element instanceof FSTClassFragment)
+			return ((FSTClassFragment) element).getName();
 
 		return "";
+		
 	}
 
 	public String getLabelProvName() {
