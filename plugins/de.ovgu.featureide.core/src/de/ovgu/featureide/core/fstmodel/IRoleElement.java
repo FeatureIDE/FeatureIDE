@@ -22,7 +22,7 @@ package de.ovgu.featureide.core.fstmodel;
 
 
 /**
- * TODO description
+ * Interface for the {@link RoleElement} class.
  * 
  * @author Andy Kenner
  */
