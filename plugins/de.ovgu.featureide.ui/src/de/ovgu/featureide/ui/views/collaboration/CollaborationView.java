@@ -132,11 +132,11 @@ public class CollaborationView extends ViewPart implements GUIDefaults,
 	private static final String TOOL_TIP_LABEL = "Build collaborationmodel";
 
 	private static final String[] FIELD_METHOD_LABEL_NAMES = { "Show Fields",
-			"Show Methods", "Show Method Contracts", "Show Class Invariants",
+			"Show Methods","Show Introductions", "Show Refinements", "Show Method Contracts", "Show Class Invariants",
 			"Hide Parameters/Types", "Public", "Protected", "Default",
 			"Private", "Select All", "Deselect All", };
 
-	private static final Image[] FIELD_METHOD_IMAGES = { null, null, IMAGE_AT,
+	private static final Image[] FIELD_METHOD_IMAGES = { null, null, null, null, IMAGE_AT,
 			IMAGE_AT, null, IMAGE_METHODE_PUBLIC, IMAGE_METHODE_PROTECTED,
 			IMAGE_METHODE_DEFAULT, IMAGE_METHODE_PRIVATE, null, null };
 

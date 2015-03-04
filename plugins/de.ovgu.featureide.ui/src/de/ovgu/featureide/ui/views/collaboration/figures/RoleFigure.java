@@ -43,6 +43,7 @@ import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Insets;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
+import org.eclipse.jdt.internal.ui.compare.CompareMessages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 
@@ -127,9 +128,9 @@ public class RoleFigure extends Figure implements GUIDefaults{
 	 * @return The persistent property
 	 */
 	public final static boolean[] getRoleSelections() {
-		boolean[] selections = new boolean[11];
+		boolean[] selections = new boolean[13];
 		
-		// Set everything but hide as enabled
+		// Set everything but hide as enabled (default setting)
 		Arrays.fill(selections, true);
 		selections[ShowFieldsMethodsAction.HIDE_PARAMETERS_AND_TYPES] = false;
 		selections[ShowFieldsMethodsAction.DESELECT_ALL] = false;
@@ -183,7 +184,6 @@ public class RoleFigure extends Figure implements GUIDefaults{
 
 	public RoleFigure(FSTRole role) {
 		super();
-		
 		this.role = role;
 		selected = role.getFeature().isSelected();
 		GridLayout gridLayout = new GridLayout(1, true);
@@ -241,16 +241,21 @@ public class RoleFigure extends Figure implements GUIDefaults{
 			int fieldCount = 0;
 			int methodCount = 0;
 			Object[] invariant = null;
+			if (showRefinements()) {
+				//methodCount = getCountForRefinementMethods(tooltipContent);
+			}
+			
 			if (showInvariants()) {
 				invariant = createInvariantContent(tooltipContent);
 			}
+			
 			if (showOnlyFields()) {
 				fieldCount = getCountForFieldContentCreate(tooltipContent);
 			}
 			
 			if (showOnlyMethods()) {
 				methodCount = getCountForMethodContentCreate(tooltipContent);
-			}else if (showContracts())
+			} else if (showContracts())
 			{
 				methodCount = getCountForMethodContentContractCreate(tooltipContent);
 			}	
@@ -278,7 +283,42 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		}
 		setToolTip(tooltipContent);
 	}
+	
+	private int getCountForRefinementMethods(Figure tooltipContent) {
+		
+		CompartmentFigure methodFigure = new CompartmentFigure();
+		Label label = new Label(role.getFeature() + " ", IMAGE_FEATURE);
+		
+		if (isFieldMethodFilterActive()) {
+			tooltipContent.add(label);
+		} else {
+			methodFigure.add(label);
+		}
+		
+		int methodCount = 0;
+		for (FSTMethod m : role.getClassFragment().getMethods()) {
+				Label methodLabel = createMethodLabel(m);
 
+				if (matchFilter(m) && m.hasContract() && m.inRefinementGroup()) {
+					methodFigure.add(methodLabel);
+					methodCount++;
+				
+					if (isFieldMethodFilterActive()) {
+						addLabel(methodLabel);
+					} else {
+						if (methodCount % 25 == 0) {
+							tooltipContent.add(methodFigure);
+							methodFigure = new CompartmentFigure();
+							methodFigure.add(new Label(""));
+						}
+				}
+			}
+			if (!isFieldMethodFilterActive()) {
+				addToToolTip(methodCount, methodFigure, tooltipContent);
+			}
+		}
+		return methodCount;
+	}
 
 	private int getCountForMethodContentCreate(Figure tooltipContent) {
 		
@@ -509,7 +549,12 @@ public class RoleFigure extends Figure implements GUIDefaults{
 			   (showOnlyFields() || showOnlyMethods() || showContracts() || showInvariants());
 	}
 	
-	
+	private boolean showIntroductions() {
+		return SELECTED_FIELDS_METHOD[ShowFieldsMethodsAction.SHOW_INTRODUCTIONS];
+	}
+	private boolean showRefinements() {
+		return SELECTED_FIELDS_METHOD[ShowFieldsMethodsAction.SHOW_REFINEMENTS];
+	}
 	private boolean isPublicFieldMethodFilterActive() {
 		return SELECTED_FIELDS_METHOD[ShowFieldsMethodsAction.PUBLIC_FIELDSMETHODS];
 	}
@@ -572,7 +617,6 @@ public class RoleFigure extends Figure implements GUIDefaults{
 			name = m.getFullName();
 		}
 		Label methodLabel = new RoleFigureLabel(name, m.getFullName());
-		
 		
 		if (m.inRefinementGroup()) {
 			methodLabel.setFont(FONT_BOLD);
