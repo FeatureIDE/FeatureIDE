@@ -899,58 +899,74 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	
 	public void splitModel() {
 		final IJob splittJob = new AStoppableJob("Spliting Feature Model") {
-			private Collection<Feature> coreFeatures = null;
+			private Collection<Feature> fixedFeatures = new HashSet<>();
 			private FeatureGraph featureGraph = null;
 			
 			@Override
 			protected boolean work() throws Exception {
 				System.out.println("Computing...");
-				coreFeatures = getAnalyser().getCoreFeatures();
+				fixedFeatures.addAll(getAnalyser().getCoreFeatures());
+				fixedFeatures.addAll(getAnalyser().getDeadFeatures());
 				final List<Constraint> constraints = getConstraints();
 				final Collection<Feature> features = new LinkedList<Feature>(getFeatures());
-				features.removeAll(coreFeatures);
+				features.removeAll(fixedFeatures);
 				
-				workMonitor.setMaxAbsoluteWork(features.size() + 2);
+				workMonitor.setMaxAbsoluteWork(3*features.size() + 2);
 				
 				featureGraph = new FeatureGraph(features);
 				
 				workMonitor.worked();
 				
 				for (Feature feature : features) {
-					if (!coreFeatures.contains(feature.getParent())) {
-						featureGraph.implies(feature.getName(), feature.getParent().getName());
-						if (feature.getParent().isAnd() && feature.isMandatory()) {
-							featureGraph.implies(feature.getParent().getName(), feature.getName());
-						} else if (feature.getParent().isAlternative() || feature.getParent().isOr()) {
-							featureGraph.setEdge(feature.getParent().getName(), feature.getName(), FeatureGraph.EDGE_1q);
-							featureGraph.setEdge(feature.getName(), feature.getParent().getName(), FeatureGraph.EDGE_0q);
-						} else if (feature.getParent().isAnd() && !feature.isMandatory()) {
-							featureGraph.setEdge(feature.getName(), feature.getParent().getName(), FeatureGraph.EDGE_0q);
-						}
-					}
-					if (feature.getParent().isAlternative()) {
-						for (Feature sibiling : feature.getParent().getChildren()) {
-							if (!coreFeatures.contains(sibiling)) {
-								featureGraph.setEdge(feature.getName(), sibiling.getName(), FeatureGraph.EDGE_10);
-								featureGraph.setEdge(feature.getName(), sibiling.getName(), FeatureGraph.EDGE_0q);
+					final Feature parent = feature.getParent();
+					final String featureName = feature.getName();
+					final String parentName = parent.getName();
+					if (!fixedFeatures.contains(parent)) {
+						featureGraph.implies(featureName, parentName);
+						if (parent.isAnd()) {
+							if (feature.isMandatory()) {
+								featureGraph.implies(parentName, featureName);
+							}
+						} else {
+							if (parent.getChildren().size() == 1) {
+								featureGraph.implies(parentName, featureName);
+							} else {
+								featureGraph.setEdge(parent.getName(), featureName, FeatureGraph.EDGE_1q);
+								featureGraph.setEdge(featureName, parentName, FeatureGraph.EDGE_0q);
 							}
 						}
-					} else if (feature.getParent().isOr()) {
+					}
+					if (parent.isAlternative()) {
+						if (fixedFeatures.contains(parent) && parent.getChildren().size() == 2) {
+							for (Feature sibiling : parent.getChildren()) {
+								if (!fixedFeatures.contains(sibiling)) {
+									featureGraph.setEdge(featureName, sibiling.getName(), FeatureGraph.EDGE_10);
+									featureGraph.setEdge(featureName, sibiling.getName(), FeatureGraph.EDGE_01);
+								}
+							}
+						} else {
+							for (Feature sibiling : parent.getChildren()) {
+								if (!fixedFeatures.contains(sibiling)) {
+									featureGraph.setEdge(featureName, sibiling.getName(), FeatureGraph.EDGE_10);
+									featureGraph.setEdge(featureName, sibiling.getName(), FeatureGraph.EDGE_0q);
+								}
+							}
+						}
+					} else if (parent.isOr()) {
 						boolean optionalFeature = false;
-						for (Feature sibiling : feature.getParent().getChildren()) {
-							if (coreFeatures.contains(sibiling)) {
+						for (Feature sibiling : parent.getChildren()) {
+							if (fixedFeatures.contains(sibiling)) {
 								optionalFeature = true;
 								break;
 							}
 						}
 						if (!optionalFeature) {
-							for (Feature sibiling : feature.getParent().getChildren()) {
-								featureGraph.setEdge(feature.getName(), sibiling.getName(), FeatureGraph.EDGE_0q);
+							for (Feature sibiling : parent.getChildren()) {
+								featureGraph.setEdge(featureName, sibiling.getName(), FeatureGraph.EDGE_0q);
 							}
 						}
 					}
 				}
-				
 				for (Constraint constraint : constraints) {
 					connect(constraint.getNode());
 				}
@@ -963,32 +979,38 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 				for (Feature feature : features) {
 					featureNames.add(feature.getName());
 				}
-				
-				final DFSThreadPool dfsThreadPool = new DFSThreadPool(featureGraph, featureNames, workMonitor);
-				dfsThreadPool.run();
-				
+
+				new DFSThreadPool(featureGraph, featureNames, workMonitor).run();
+				statistic();
+				new DFSThreadPool(featureGraph, featureNames, workMonitor).run();
+				statistic();
+				new DFSThreadPool(featureGraph, featureNames, workMonitor).run();
 				statistic();
 				
 				return true;
 			}
 			
 			private void statistic() {
-				final int[] featureNeigbors = new int[featureGraph.featureArray.length];
-				statisticPart(featureNeigbors, true, false);
-				statisticPart(featureNeigbors, false, false);
-				statisticPart(featureNeigbors, true, true);
-				statisticPart(featureNeigbors, false, true);
+				statisticPart(true, false);
+//				statisticPart(false, false);
+				statisticPart(true, true);
+//				statisticPart(false, true);
+				System.out.println();
 			}
 			
-			private void statisticPart(final int[] featureNeigbors, boolean selected, boolean subtractReal) {
-				Arrays.fill(featureNeigbors, 0);
+			private static final boolean ALL_FEATURE = true;
+			
+			private void statisticPart(boolean selected, boolean subtractReal) {
+				final int[] featureNeigbors = new int[featureGraph.featureArray.length];
 				int i = 0;
 				for (String feature : featureGraph.featureArray) {
-					featureNeigbors[i++] = featureGraph.countNeighbors(feature, selected, subtractReal);
+					if (ALL_FEATURE || getFeature(feature).getChildren().size() == 0) {
+						featureNeigbors[i++] = featureGraph.countNeighbors(feature, selected, subtractReal);
+					}
 				}
 
 				Arrays.sort(featureNeigbors);
-				for (int j = featureNeigbors.length - 1; j >= 0 ; --j) {
+				for (int j = featureNeigbors.length - 1, end = featureNeigbors.length - i; j >= end; --j) {
 					System.out.print(featureNeigbors[j] + ", ");
 				}
 				System.out.println();
@@ -1009,7 +1031,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 				for (Node node : nodes) {
 					collectContainedFeatures(node, featureNames);
 				}
-				for (Feature coreFeature : coreFeatures) {
+				for (Feature coreFeature : fixedFeatures) {
 					featureNames.remove(coreFeature.getName());
 				}
 				for (String featureName1 : featureNames) {
@@ -1028,9 +1050,10 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 				if (!implyNode.positive) {
 					negation += 2;
 				}
+				final String implyFeatureName = (String) implyNode.var;
 				final String impliedFeatureName = (String) impliedNode.var;
-				if (!coreFeatures.contains(getFeature(impliedFeatureName))) {
-					featureGraph.implies((String) implyNode.var, impliedFeatureName, negation);
+				if (!fixedFeatures.contains(getFeature(implyFeatureName)) && !fixedFeatures.contains(getFeature(impliedFeatureName))) {
+					featureGraph.implies(implyFeatureName, impliedFeatureName, negation);
 				}
 			}
 			
@@ -1056,10 +1079,10 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 				if (node instanceof Not) {
 					Node child = node.getChildren()[0];
 					if (child instanceof Literal) {
-						((Literal) child).flip();
-						return child;
+						Literal l = (Literal) child;
+						return new Literal(l.var, !l.positive);
 					} else if (child instanceof Not) {
-						return child.getChildren()[0];
+						return child.getChildren()[0].clone();
 					}
 				}
 				final Node[] children = node.getChildren();
@@ -1078,7 +1101,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 						final Node[] children = child.getChildren();
 						final Node[] newChildren = new Node[children.length];
 						for (int i = 0; i < children.length; i++) {
-							newChildren[i] = new Not(children[i]);
+							newChildren[i] = new Not(children[i].clone());
 						}
 						node = new Or(newChildren);
 					}
@@ -1095,10 +1118,11 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 			private Node orToImply(Node node) {
 				if (node instanceof Or && node.getChildren().length == 2) {
 					final Node[] children = node.getChildren();
-					node = new Implies(new Not(children[0]), children[1]);
+					return new Implies(new Not(children[0].clone()), children[1].clone());
 				} else if (node instanceof And) {
-					for (Node child : node.getChildren()) {
-						orToImply(child);
+					final Node[] children = node.getChildren();
+					for (int i = 0; i < children.length; i++) {
+						children[i] = orToImply(children[i]);
 					}
 				}
 				return node;
@@ -1186,7 +1210,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 			
 		}
 		
-		private static final int NUMBER_OF_THREADS = 8;
+		private static final int NUMBER_OF_THREADS = 6;
 		
 		private final Thread[] threads = new Thread[NUMBER_OF_THREADS];
 		
@@ -1278,8 +1302,8 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 					setEdge(impliedFeature, implyFeature, FeatureGraph.EDGE_01);
 					break;
 				case 3:
-					setEdge(implyFeature, impliedFeature, FeatureGraph.EDGE_11);
-					setEdge(impliedFeature, implyFeature, FeatureGraph.EDGE_00);
+					setEdge(impliedFeature, implyFeature, FeatureGraph.EDGE_11);
+					setEdge(implyFeature, impliedFeature, FeatureGraph.EDGE_00);
 					break;
 			}
 		}
@@ -1290,10 +1314,12 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		
 		public void setEdge(int from, int to, byte edgeType) {
 			final int index = (from * size) + to;
+			
 			final byte oldValue;
-			synchronized (adjMatrix) {
+			synchronized (featureArray[from]) {
 				oldValue = adjMatrix[index];
 			}
+			
 			final int newValue;
 			switch (edgeType) {
 			case EDGE_NONE:
@@ -1302,7 +1328,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 			case EDGE_0q:
 				switch (oldValue & MASK_0_00110000) {
 				case EDGE_NONE:
-					newValue = oldValue | edgeType | 2;
+					newValue = oldValue | EDGE_0q;
 					break;
 				default:
 					newValue = oldValue;
@@ -1311,19 +1337,20 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 			case EDGE_00: case EDGE_01: 
 				switch (oldValue & MASK_0_00110000) {
 					case EDGE_NONE:
-						newValue = oldValue | edgeType | 2;
+						newValue = oldValue | edgeType;
 						break;
 					case EDGE_0q:
 						newValue = (oldValue & MASK_0_11001111) | edgeType;
 						break;
 					default:
-						newValue = oldValue | EDGE_0q;
+						newValue = oldValue;
+						assert ((oldValue & MASK_0_00110000) == edgeType): (oldValue & MASK_0_00110000) + " != " + edgeType;
 				}
 				break;
 			case EDGE_1q:
 				switch (oldValue & MASK_1_00001100) {
 				case EDGE_NONE:
-					newValue = oldValue | edgeType | 1;
+					newValue = oldValue | EDGE_1q;
 					break;
 				default:
 					newValue = oldValue;
@@ -1332,19 +1359,23 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 			case EDGE_10: case EDGE_11: 
 				switch (oldValue & MASK_1_00001100) {
 					case EDGE_NONE:
-						newValue = oldValue | edgeType | 1;
+						newValue = oldValue | edgeType;
 						break;
 					case EDGE_1q:
 						newValue = (oldValue & MASK_1_11110011) | edgeType;
 						break;
 					default:
-						newValue = oldValue | EDGE_1q;
-				}
+						newValue = oldValue;
+						if ((oldValue & MASK_1_00001100) != edgeType) {
+							throw new RuntimeException();
+						}
+						assert ((oldValue & MASK_1_00001100) == edgeType): (oldValue & MASK_1_00001100) + " != " + edgeType; 
+					}
 				break;
 			default:
 				newValue = EDGE_NONE;
 			}
-			synchronized (adjMatrix) {
+			synchronized (featureArray[from]) {
 				adjMatrix[index] = (byte) newValue;
 			}
 		}
@@ -1355,7 +1386,9 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		
 		public byte getEdge(int fromIndex, int toIndex) {
 			final int index = (fromIndex * size) + toIndex;
-			return adjMatrix[index];
+//			synchronized (featureArray[fromIndex]) {
+				return adjMatrix[index];
+//			}
 		}
 		
 		public void clearDiagonal() {
@@ -1369,7 +1402,6 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 			final byte mask = (selected) ? MASK_1_00001100 : MASK_0_00110000;
 			final byte unrealEdge = (selected) ? EDGE_1q : EDGE_0q;
 			
-			
 			int count = 0;
 			for (int i = (fromIndex * size), end = i + size; i < end; i++) {
 				final int edge = (adjMatrix[i] & mask);
@@ -1381,7 +1413,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		
 		// visited: 0 not visited, 1 visited (unknown status), 2 visited (known status)
 		private void dfs(byte[] visited, int curFeature, boolean selected) {
-			System.out.println(featureArray[curFeature] + " " + selected);
+//			System.out.println(featureArray[curFeature] + " " + selected);
 			visited[curFeature] = 2;
 			
 			for (int j = 0; j < visited.length; j++) {
@@ -1433,8 +1465,8 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 								if (visit == 1) {
 									continue;
 								}
-								visited[j] = 1;
 								childSelected = 2;
+								visited[j] = 1;
 //								System.out.println("\tq " + featureArray[j]);
 								break;
 							default:
