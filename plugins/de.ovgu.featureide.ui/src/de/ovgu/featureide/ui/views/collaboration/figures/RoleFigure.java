@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.figures;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 
 import org.eclipse.core.resources.IFile;
@@ -125,7 +127,14 @@ public class RoleFigure extends Figure implements GUIDefaults{
 	 * @return The persistent property
 	 */
 	public final static boolean[] getRoleSelections() {
-		boolean[] selections = new boolean[10];
+		boolean[] selections = new boolean[11];
+		
+		// Set everything but hide as enabled
+		Arrays.fill(selections, true);
+		selections[ShowFieldsMethodsAction.HIDE_PARAMETERS_AND_TYPES] = false;
+		selections[ShowFieldsMethodsAction.DESELECT_ALL] = false;
+		selections[ShowFieldsMethodsAction.SELECT_ALL] = false;
+
 		try {
 			String property = ResourcesPlugin.getWorkspace().getRoot().getPersistentProperty(GET_ROLE_SELECTIONS_NAME());
 			if (property == null) {
