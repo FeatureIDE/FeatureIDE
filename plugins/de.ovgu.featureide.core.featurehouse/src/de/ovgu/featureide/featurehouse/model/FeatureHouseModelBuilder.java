@@ -246,6 +246,7 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 						final String className = name.substring(name.lastIndexOf(File.separator) + 1);
 
 						final FSTClassFragment newFragment = new FSTClassFragment(className);
+						newFragment.setRole(classFragmentStack.peek().getRole());
 						newFragment.setInnerClass(true);
 						classFragmentStack.push(newFragment);
 					} else {
