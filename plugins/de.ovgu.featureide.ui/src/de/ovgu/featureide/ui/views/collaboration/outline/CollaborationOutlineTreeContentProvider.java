@@ -129,7 +129,7 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 			List<FSTRole> roleList = new LinkedList<FSTRole>();
 
 			for (FSTRole role : ((FSTMethod) parentElement).getRole().getFSTClass().getRoles()) {
-				for (FSTMethod m : role.getClassFragment().getMethods()) {
+				for (FSTMethod m : role.getAllMethods()) {
 					if (// m.isOwn(role.file) &&
 						// ((FSTMethod)parentElement).isOwn(role.file) &&
 					m.getFullName().equals(((FSTMethod) parentElement).getFullName())) {
@@ -161,7 +161,7 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 			}
 			return obj;
 		} else if (parentElement instanceof FSTInvariant) {
-			// get all the roles that belong to an inavariant
+			// get all the roles that belong to an invariant
 			LinkedList<FSTRole> roleList = new LinkedList<FSTRole>();
 			for (FSTRole role : ((FSTInvariant) parentElement).getRole().getFSTClass().getRoles()) {
 				for (FSTInvariant i : role.getClassFragment().getInvariants()) {
@@ -177,7 +177,7 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 			// get all the roles that belong to a field
 			LinkedList<FSTRole> roleList = new LinkedList<FSTRole>();
 			for (FSTRole role : ((FSTField) parentElement).getRole().getFSTClass().getRoles()) {
-				for (FSTField f : role.getClassFragment().getFields()) {
+				for (FSTField f : role.getAllFields()) {
 					if (f.getFullName().equals(((FSTField) parentElement).getFullName())) {
 						roleList.add(role);
 						break;
