@@ -83,7 +83,7 @@ public abstract class RoleElement<T extends RoleElement<T>> implements Comparabl
 		IRoleElement oldParent = parent;
 		while (nextParent != null) {
 			sb.insert(0, '.');
-			sb.insert(0, nextParent.getFullName());
+			sb.insert(0, nextParent.getName());
 			oldParent = nextParent;
 			nextParent = nextParent.getParent();
 		}
@@ -92,7 +92,7 @@ public abstract class RoleElement<T extends RoleElement<T>> implements Comparabl
 		} else {
 			sb.insert(0, ((FSTClassFragment) oldParent).getPackage());
 		}
-		return sb.toString().replaceAll(".java", "").replaceAll(" : class", "");
+		return sb.toString().replaceAll(".java", "");
 	}
 
 	public void setParent(IRoleElement parent) {
