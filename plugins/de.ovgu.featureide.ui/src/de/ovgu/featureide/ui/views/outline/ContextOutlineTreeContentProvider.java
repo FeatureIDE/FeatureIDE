@@ -99,7 +99,7 @@ public class ContextOutlineTreeContentProvider implements ITreeContentProvider {
 		if (newInput != null && (newInput instanceof IFile)) {
 			IFeatureProject featureProject = CorePlugin.getFeatureProject((IFile) newInput);
 			if (featureProject != null) {
-				String featureName = featureProject.getFeatureName((IResource) newInput);
+				final String featureName = featureProject.getFeatureName((IResource) newInput);
 				projectStructure = CorePlugin.getDefault().extendedModules_getStruct(featureProject, featureName);
 			}
 		}
@@ -108,35 +108,33 @@ public class ContextOutlineTreeContentProvider implements ITreeContentProvider {
 	@Override
 	public Object[] getChildren(Object parentElement) {
 		if (parentElement instanceof AbstractClassFragment) {
-			AbstractClassFragment frag = (AbstractClassFragment) parentElement;
-			Object[] ret = new Object[frag.getMembers().size() + frag.getInnerClasses().size()];
-			int i = 0;
-			for (AbstractSignature curMember : frag.getMembers()) {
-				ret[i++] = curMember;
-			}
-			for (AbstractClassFragment curMember : frag.getInnerClasses().values()) {
-				ret[i++] = curMember;
-			}
+			final AbstractClassFragment frag = (AbstractClassFragment) parentElement;
+			final Object[] ret = new Object[frag.getMembers().size() + frag.getInnerClasses().size()];
+			
+			System.arraycopy(frag.getMembers().toArray(), 0, ret, 0, frag.getMembers().size());
+			System.arraycopy(frag.getInnerClasses().values().toArray(), 0, ret, frag.getMembers().size(), frag.getInnerClasses().values().size());
+			
 			Arrays.sort(ret, new SignatureComparator());
 
 			return ret;
 		} else if (parentElement instanceof AbstractSignature) {
-			AbstractSignature sig = (AbstractSignature) parentElement;
-			ProjectSignatures signatures = featureProject.getProjectSignatures();
+			final AbstractSignature sig = (AbstractSignature) parentElement;
+			final ProjectSignatures signatures = featureProject.getProjectSignatures();
 
 			if (signatures != null) {
-				HashMap<String, Feature> l2 = new HashMap<String, Feature>();
+				final HashMap<String, Feature> featureMap = new HashMap<String, Feature>();
 
 				for (FeatureData featureData : sig.getFeatureData()) {
-					Feature feature = featureProject.getFeatureModel().getFeature(signatures.getFeatureName(featureData.getId()));
-					if (!l2.containsKey(feature.getName())) {
-						l2.put(feature.getName(), feature);
+					final String featureName = signatures.getFeatureName(featureData.getId());
+					final Feature feature = featureProject.getFeatureModel().getFeature(featureName);
+					if (!featureMap.containsKey(featureName)) {
+						featureMap.put(featureName, feature);
 					}
 				}
-				return l2.values().toArray();
+				return featureMap.values().toArray();
 			}
 		}
-
+		
 		return new Object[] { "No Children" };
 	}
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="de.ovgu.featureide.munge.android"
-      label="Plugin for Android projects with Munge (optional)"
+      label="FeatureIDE extension for Android with Munge (optional)"
       version="2.7.3.qualifier"
       provider-name="University of Magdeburg">
 
