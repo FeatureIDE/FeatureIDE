@@ -63,6 +63,7 @@ public class StatisticsProgramSize extends LazyParent {
 		HashMap<String, Integer> classMap = new HashMap<String, Integer>();
 			
 		ArrayList<FSTClassFragment> allNestedList = new ArrayList<FSTClassFragment>();
+		ArrayList<String> name = new ArrayList<String>();
 		int pointer = 0;
 
 		for (FSTClass class_ : fstModel.getClasses()) {
@@ -85,9 +86,14 @@ public class StatisticsProgramSize extends LazyParent {
 				for (FSTField field : classFragment.getFields())
 					addToMap(qualifier + field.getFullName(), fieldMap);
 				for(FSTClassFragment fragment : classFragment.getInnerClasses())
+				{
 					allNestedList.add(fragment);
+					name.add(class_.getName().replaceFirst(".java", "") + CLASS_SEPARATOR + fragment.getFullName().replaceFirst(" : class", ""));
+					addToMap(class_.getName().replaceFirst(".java", "") + CLASS_SEPARATOR + fragment.getFullName(),classMap);
+					
+				}
 									
-				addToMap(qualifiedRoleName, classMap);
+				addToMap(/*CLASS_SEPARATOR + */qualifiedRoleName, classMap);
 			}
 		}
 		
@@ -95,16 +101,17 @@ public class StatisticsProgramSize extends LazyParent {
 			for(FSTClassFragment fragment : allNestedList.get(pointer).getInnerClasses())
 			{
 				allNestedList.add(fragment); 
+				
+				name.add(name.get(pointer) + CLASS_SEPARATOR + fragment.getFullName().replaceFirst(" : class", ""));
+				addToMap(name.get(pointer+1) + " : class", classMap);
 			}
 			pointer++;
 		}
 		
-		//HashMapNode nnn = new HashMapNode("",null,classMap);
-			
 		addChild(new HashMapNode(NUMBER_CLASS + SEPARATOR
 				+ (classMap.keySet().size()+ allNestedList.size()) + " (" + NUMBER_CLASS_NESTED + SEPARATOR + allNestedList.size() + ") " + " | " + NUMBER_ROLE + SEPARATOR
 				+ sum(classMap), null, classMap));
-		addChild(new HashMapNode(NUMBER_CLASS_NESTED + SEPARATOR + allNestedList.size(),null, classMap));
+		//addChild(new HashMapNode(NUMBER_CLASS_NESTED + SEPARATOR + allNestedList.size(),null, classMap));
 		
 		addChild(new HashMapNode(NUMBER_FIELD_U + SEPARATOR
 				+ fieldMap.keySet().size() + " | " + NUMBER_FIELD + SEPARATOR

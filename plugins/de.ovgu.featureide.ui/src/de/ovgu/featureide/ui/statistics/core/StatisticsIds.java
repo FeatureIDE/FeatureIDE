@@ -47,6 +47,7 @@ public interface StatisticsIds {
 	public static final String PROJECT_NAME = "Project Name";
 
 	public static final String SEPARATOR = ": ";
+	public static final String CLASS_SEPARATOR = "$";
 	public static final String NUMBER_FEATURES = "Number of features";
 	public static final String NUMBER_CONCRETE = "Number of concrete features";
 	public static final String NUMBER_ABSTRACT = "Number of abstract features";
