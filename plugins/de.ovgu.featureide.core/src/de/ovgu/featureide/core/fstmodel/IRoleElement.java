@@ -35,7 +35,15 @@ public interface IRoleElement {
 	FSTRole getRole();
 	
 	String getFullName();
+	
+	String getName();
+	
+	String getFullIdentifier();
 
 	void setRole(FSTRole role);
+	
+	IRoleElement getParent();
+	
+	void setParent(IRoleElement parent);
 
 }
