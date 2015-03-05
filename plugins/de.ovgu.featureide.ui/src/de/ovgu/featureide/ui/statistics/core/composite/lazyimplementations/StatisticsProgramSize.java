@@ -63,7 +63,6 @@ public class StatisticsProgramSize extends LazyParent {
 		HashMap<String, Integer> classMap = new HashMap<String, Integer>();
 
 		ArrayList<FSTClassFragment> allNestedList = new ArrayList<FSTClassFragment>();
-		ArrayList<String> name = new ArrayList<String>();
 		int pointer = 0;
 
 		for (FSTClass class_ : fstModel.getClasses()) {
@@ -77,17 +76,15 @@ public class StatisticsProgramSize extends LazyParent {
 				String qualifiedRoleName = qualifiedPackageName + "." + roleName;
 
 				String qualifier = qualifiedRoleName + ".";
-				
+
 				for (FSTMethod method : classFragment.getMethods())
 					addToMap(qualifier + method.getFullName(), methodMap);
 				for (FSTField field : classFragment.getFields())
 					addToMap(qualifier + field.getFullName(), fieldMap);
 				for (FSTClassFragment fragment : classFragment.getInnerClasses()) {
-					allNestedList.add(fragment);
-					name.add(class_.getName().replaceFirst(".java", "") + CLASS_SEPARATOR + fragment.getFullName().replaceFirst(" : class", ""));
-					addToMap(class_.getName().replaceFirst(".java", "") + CLASS_SEPARATOR + fragment.getFullName(), classMap);
+					addToMap(fragment.getFullIdentifier(), classMap);
 				}
-
+				allNestedList.add(classFragment);
 				addToMap(qualifiedRoleName, classMap);
 			}
 		}
@@ -95,27 +92,19 @@ public class StatisticsProgramSize extends LazyParent {
 		while (pointer < allNestedList.size()) {
 			for (FSTClassFragment fragment : allNestedList.get(pointer).getInnerClasses()) {
 				allNestedList.add(fragment);
-				name.add(name.get(pointer) + CLASS_SEPARATOR + fragment.getFullName().replaceFirst(" : class", ""));
-				addToMap(name.get(pointer + 1) + " : class", classMap);
-				
-				String packageName = fragment.getPackage();
-				String qualifiedPackageName = (packageName == null) ? "(default package)" : packageName;
-				String roleName = fragment.getName().endsWith(".java") ? fragment.getName().substring(0, fragment.getName().length() - 5)
-						: fragment.getName();
-				String qualifiedRoleName = qualifiedPackageName + "." + roleName;
-				String qualifier = qualifiedRoleName + ".";
+
+				addToMap(fragment.getFullIdentifier(), classMap);
+
 				for (FSTMethod method : fragment.getMethods())
-					addToMap(qualifier + method.getFullName(), methodMap);
+					addToMap(fragment.getFullIdentifier() + "." + method.getFullName(), methodMap);
+
+				for (FSTField field : fragment.getFields())
+					addToMap(fragment.getFullIdentifier() + "." + field.getFullName(), fieldMap);
 			}
 			pointer++;
 		}
-	
-		
-		
-		
-		
+
 		addChild(new HashMapNode(NUMBER_CLASS + SEPARATOR + (classMap.keySet().size()) + " | " + NUMBER_ROLE + SEPARATOR + sum(classMap), null, classMap));
-		
 		addChild(new HashMapNode(NUMBER_FIELD_U + SEPARATOR + fieldMap.keySet().size() + " | " + NUMBER_FIELD + SEPARATOR + sum(fieldMap), null, fieldMap));
 		addChild(new HashMapNode(NUMBER_METHOD_U + SEPARATOR + methodMap.keySet().size() + " | " + NUMBER_METHOD + SEPARATOR + sum(methodMap), null, methodMap));
 	}
