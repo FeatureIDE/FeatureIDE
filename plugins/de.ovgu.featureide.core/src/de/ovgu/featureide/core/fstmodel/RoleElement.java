@@ -47,6 +47,8 @@ public abstract class RoleElement<T extends RoleElement<T>> implements Comparabl
 	protected int composedLine;
 
 	protected FSTRole role;
+	
+	protected IRoleElement parent;
 
 	protected AbstractSignature signature;
 
@@ -71,6 +73,25 @@ public abstract class RoleElement<T extends RoleElement<T>> implements Comparabl
 		this.role = parent;
 	}
 	
+	public IRoleElement getParent() {
+		return parent;
+	}
+	
+	public String getFullIdentifier() {
+		final StringBuilder sb = new StringBuilder(name);
+		IRoleElement nextParent = parent;
+		while (nextParent != null) {
+			sb.append('.');
+			sb.append(nextParent.getFullName());
+			nextParent = nextParent.getParent();
+		}
+		return sb.toString();
+	}
+	
+	public void setParent(IRoleElement parent) {
+		this.parent = parent;
+	}
+
 	public IFile getFile() {
 		return role.getFile();
 	}
