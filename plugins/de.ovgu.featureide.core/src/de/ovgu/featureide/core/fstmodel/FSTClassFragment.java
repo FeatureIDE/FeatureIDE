@@ -117,6 +117,7 @@ public class FSTClassFragment extends RoleElement<FSTClassFragment> {
 			return false;
 		}
 		element.setRole(role);
+		element.setParent(this);
 		return true;
 	}
 
