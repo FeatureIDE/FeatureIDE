@@ -64,7 +64,10 @@ import de.ovgu.featureide.ui.views.collaboration.action.ShowFieldsMethodsAction;
  * 
  * @author Constanze Adler
  * @author Stephan Besecke
+ * @author Bastian Bartens
+ * @author Max Kammler
  */
+
 public class RoleFigure extends Figure implements GUIDefaults{
 
 	private static Font FONT_BOLD = new Font(null,"Arial", 8, SWT.BOLD);
@@ -241,9 +244,6 @@ public class RoleFigure extends Figure implements GUIDefaults{
 			int fieldCount = 0;
 			int methodCount = 0;
 			Object[] invariant = null;
-			if (showRefinements()) {
-				//methodCount = getCountForRefinementMethods(tooltipContent);
-			}
 			
 			if (showInvariants()) {
 				invariant = createInvariantContent(tooltipContent);
@@ -261,9 +261,14 @@ public class RoleFigure extends Figure implements GUIDefaults{
 			}	
 			
 			tooltipContent.add(new Label("Fields: " + fieldCount + " Methods: "	+ methodCount +" Invariants: " + ((invariant != null) ?((Integer)invariant[0]) : 0) + " "));
-
+			
 			if (showInvariants() && invariant != null && ((Integer)invariant[0]) > 0) {
 				addToToolTip(((Integer)invariant[0]), ((CompartmentFigure) invariant[1]), tooltipContent);
+			}
+			// if no methods, invariants or fields to show, show default label
+			if (fieldCount == 0 && methodCount == 0 && ((Integer)invariant[0] == 0))
+			{
+				addLabel(new Label("Fields: 0 Methods: 0 Invariants: 0 "));
 			}
 			
 			// draw separation line between fields and methods
@@ -283,42 +288,6 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		}
 		setToolTip(tooltipContent);
 	}
-	
-	private int getCountForRefinementMethods(Figure tooltipContent) {
-		
-		CompartmentFigure methodFigure = new CompartmentFigure();
-		Label label = new Label(role.getFeature() + " ", IMAGE_FEATURE);
-		
-		if (isFieldMethodFilterActive()) {
-			tooltipContent.add(label);
-		} else {
-			methodFigure.add(label);
-		}
-		
-		int methodCount = 0;
-		for (FSTMethod m : role.getClassFragment().getMethods()) {
-				Label methodLabel = createMethodLabel(m);
-
-				if (matchFilter(m) && m.hasContract() && m.inRefinementGroup()) {
-					methodFigure.add(methodLabel);
-					methodCount++;
-				
-					if (isFieldMethodFilterActive()) {
-						addLabel(methodLabel);
-					} else {
-						if (methodCount % 25 == 0) {
-							tooltipContent.add(methodFigure);
-							methodFigure = new CompartmentFigure();
-							methodFigure.add(new Label(""));
-						}
-				}
-			}
-			if (!isFieldMethodFilterActive()) {
-				addToToolTip(methodCount, methodFigure, tooltipContent);
-			}
-		}
-		return methodCount;
-	}
 
 	private int getCountForMethodContentCreate(Figure tooltipContent) {
 		
@@ -334,8 +303,8 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		int methodCount = 0;
 		for (FSTMethod m : role.getClassFragment().getMethods()) {
 			Label methodLabel = createMethodLabel(m);
-
-			if (matchFilter(m)) {
+			// check for selected context elements (Show methods and introductions & refinements and filter)
+			if ((matchFilter(m) && ((m.inRefinementGroup() && showRefinements()) || (!m.inRefinementGroup() && showIntroductions() )))) {
 				methodFigure.add(methodLabel);
 				methodCount++;
 				
@@ -371,8 +340,9 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		int methodCount = 0;
 		for (FSTMethod m : role.getClassFragment().getMethods()) {
 			Label methodLabel = createMethodLabel(m);
-
-			if (matchFilter(m) && m.hasContract()) {
+			// check for selected context elements (Show methods and introductions & refinements and filter)
+			if (matchFilter(m) && m.hasContract() &&  ((m.inRefinementGroup() && showRefinements()) || (!m.inRefinementGroup() && showIntroductions() ))) {
+	
 				methodFigure.add(methodLabel);
 				methodCount++;
 				
@@ -386,8 +356,7 @@ public class RoleFigure extends Figure implements GUIDefaults{
 					}
 				}
 			}
-		}
-		
+		}		
 		if (!isFieldMethodFilterActive()) {
 			addToToolTip(methodCount, methodFigure, tooltipContent);
 		}
@@ -439,7 +408,8 @@ public class RoleFigure extends Figure implements GUIDefaults{
 		
 		int fieldCount = 0;
 		for (FSTField f : role.getClassFragment().getFields()) {
-			if (matchFilter(f)) {
+			// check for selected context elements (Show fields and introductions & refinements and filter)
+			if (matchFilter(f) &&  ((f.inRefinementGroup() && showRefinements()) || (!f.inRefinementGroup() && showIntroductions() ))) {
 				Label fieldLabel = createFieldLabel(f);
 				fieldFigure.add(fieldLabel);
 				fieldCount++;
@@ -549,6 +519,10 @@ public class RoleFigure extends Figure implements GUIDefaults{
 			   (showOnlyFields() || showOnlyMethods() || showContracts() || showInvariants());
 	}
 	
+	
+	/*
+	 * Get current state of selected context entrys
+	 */
 	private boolean showIntroductions() {
 		return SELECTED_FIELDS_METHOD[ShowFieldsMethodsAction.SHOW_INTRODUCTIONS];
 	}
