@@ -61,7 +61,7 @@ public class StatisticsProgramSize extends LazyParent {
 		HashMap<String, Integer> methodMap = new HashMap<String, Integer>();
 		HashMap<String, Integer> fieldMap = new HashMap<String, Integer>();
 		HashMap<String, Integer> classMap = new HashMap<String, Integer>();
-			
+
 		ArrayList<FSTClassFragment> allNestedList = new ArrayList<FSTClassFragment>();
 		ArrayList<String> name = new ArrayList<String>();
 		int pointer = 0;
@@ -70,14 +70,11 @@ public class StatisticsProgramSize extends LazyParent {
 			for (FSTRole role : class_.getRoles()) {
 				FSTClassFragment classFragment = role.getClassFragment();
 				String packageName = classFragment.getPackage();
-				String qualifiedPackageName = (packageName == null) ? "(default package)"
-						: packageName;
+				String qualifiedPackageName = (packageName == null) ? "(default package)" : packageName;
 
-				String roleName = classFragment.getName().endsWith(".java") ? classFragment
-						.getName().substring(0, classFragment.getName().length() - 5)
+				String roleName = classFragment.getName().endsWith(".java") ? classFragment.getName().substring(0, classFragment.getName().length() - 5)
 						: classFragment.getName();
-				String qualifiedRoleName = qualifiedPackageName + "."
-						+ roleName;
+				String qualifiedRoleName = qualifiedPackageName + "." + roleName;
 
 				String qualifier = qualifiedRoleName + ".";
 
@@ -85,40 +82,31 @@ public class StatisticsProgramSize extends LazyParent {
 					addToMap(qualifier + method.getFullName(), methodMap);
 				for (FSTField field : classFragment.getFields())
 					addToMap(qualifier + field.getFullName(), fieldMap);
-				for(FSTClassFragment fragment : classFragment.getInnerClasses())
-				{
+				for (FSTClassFragment fragment : classFragment.getInnerClasses()) {
 					allNestedList.add(fragment);
 					name.add(class_.getName().replaceFirst(".java", "") + CLASS_SEPARATOR + fragment.getFullName().replaceFirst(" : class", ""));
-					addToMap(class_.getName().replaceFirst(".java", "") + CLASS_SEPARATOR + fragment.getFullName(),classMap);
-					
+					addToMap(class_.getName().replaceFirst(".java", "") + CLASS_SEPARATOR + fragment.getFullName(), classMap);
 				}
-									
-				addToMap(/*CLASS_SEPARATOR + */qualifiedRoleName, classMap);
+
+				addToMap(qualifiedRoleName, classMap);
 			}
 		}
-		
-		while(pointer < allNestedList.size()) {
-			for(FSTClassFragment fragment : allNestedList.get(pointer).getInnerClasses())
-			{
-				allNestedList.add(fragment); 
-				
+
+		while (pointer < allNestedList.size()) {
+			for (FSTClassFragment fragment : allNestedList.get(pointer).getInnerClasses()) {
+				allNestedList.add(fragment);
+
 				name.add(name.get(pointer) + CLASS_SEPARATOR + fragment.getFullName().replaceFirst(" : class", ""));
-				addToMap(name.get(pointer+1) + " : class", classMap);
+				addToMap(name.get(pointer + 1) + " : class", classMap);
 			}
 			pointer++;
 		}
+
+		addChild(new HashMapNode(NUMBER_CLASS + SEPARATOR + (classMap.keySet().size() + allNestedList.size()) + " (" + NUMBER_CLASS_NESTED + SEPARATOR
+		    	+ allNestedList.size() + ") " + " | " + NUMBER_ROLE + SEPARATOR + sum(classMap), null, classMap));
 		
-		addChild(new HashMapNode(NUMBER_CLASS + SEPARATOR
-				+ (classMap.keySet().size()+ allNestedList.size()) + " (" + NUMBER_CLASS_NESTED + SEPARATOR + allNestedList.size() + ") " + " | " + NUMBER_ROLE + SEPARATOR
-				+ sum(classMap), null, classMap));
-		//addChild(new HashMapNode(NUMBER_CLASS_NESTED + SEPARATOR + allNestedList.size(),null, classMap));
-		
-		addChild(new HashMapNode(NUMBER_FIELD_U + SEPARATOR
-				+ fieldMap.keySet().size() + " | " + NUMBER_FIELD + SEPARATOR
-				+ sum(fieldMap), null, fieldMap));
-		addChild(new HashMapNode(NUMBER_METHOD_U + SEPARATOR
-				+ methodMap.keySet().size() + " | " + NUMBER_METHOD + SEPARATOR
-				+ sum(methodMap), null, methodMap));
+		addChild(new HashMapNode(NUMBER_FIELD_U + SEPARATOR + fieldMap.keySet().size() + " | " + NUMBER_FIELD + SEPARATOR + sum(fieldMap), null, fieldMap));
+		addChild(new HashMapNode(NUMBER_METHOD_U + SEPARATOR + methodMap.keySet().size() + " | " + NUMBER_METHOD + SEPARATOR + sum(methodMap), null, methodMap));
 	}
 
 	private void addToMap(String name, HashMap<String, Integer> map) {
