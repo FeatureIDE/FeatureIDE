@@ -45,10 +45,13 @@ import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.jdt.internal.ui.compare.CompareMessages;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.fstmodel.FSTArbitraryRole;
+import de.ovgu.featureide.core.fstmodel.FSTClass;
+import de.ovgu.featureide.core.fstmodel.FSTClassFragment;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTInvariant;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
@@ -135,6 +138,7 @@ public class RoleFigure extends Figure implements GUIDefaults {
 
 		// Set everything but hide as enabled (default setting)
 		Arrays.fill(selections, true);
+		selections[ShowFieldsMethodsAction.ONLY_CONTRACTS] = false;
 		selections[ShowFieldsMethodsAction.HIDE_PARAMETERS_AND_TYPES] = false;
 		selections[ShowFieldsMethodsAction.DESELECT_ALL] = false;
 		selections[ShowFieldsMethodsAction.SELECT_ALL] = false;
@@ -223,6 +227,10 @@ public class RoleFigure extends Figure implements GUIDefaults {
 		if (!(role instanceof FSTArbitraryRole) && role.getDirectives().isEmpty()) {
 			int fieldCount = getCountForFieldContentCreate(tooltipContent);
 			int methodCount = getCountForMethodContentCreate(tooltipContent);
+		//	int innerMethodCount = getCountForInnerMethodContentCreate(tooltipContent);
+		//	int innerFieldCount = getCountForInnerFieldContentCreate(tooltipContent);
+			
+			
 			Object[] invariant = createInvariantContent(tooltipContent);
 			addLabel(new Label("Fields: " + fieldCount + " Methods: " + methodCount + " Invariants: " + ((Integer) invariant[0]) + " "));
 		} else if (role.getClassFragment().getName().startsWith("*.")) {
@@ -248,20 +256,31 @@ public class RoleFigure extends Figure implements GUIDefaults {
 			}
 
 			int fieldCount = getCountForFieldContentCreate(tooltipContent);
-
+			
 			int methodCount = 0;
+			int innerMethodCount = 0;
+			int innerFieldCount = 0;
+			
 			if (showContracts()) {
 				methodCount = getCountForMethodContentContractCreate(tooltipContent);
+				innerFieldCount = getCountForInnerFieldContentCreate(tooltipContent);
+				innerMethodCount = 0;
+				//#WARNING: Not implemented
+
 			} else if (!showContracts()) {
 				methodCount = getCountForMethodContentCreate(tooltipContent);
+				innerFieldCount = getCountForInnerFieldContentCreate(tooltipContent);
+				innerMethodCount = getCountForInnerMethodContentCreate(tooltipContent);
 			}
-
+			
 			tooltipContent.add(new Label("Fields: " + fieldCount + " Methods: " + methodCount + " Invariants: "
 					+ ((invariant != null) ? ((Integer) invariant[0]) : 0) + " "));
 
 			if (showInvariants() && invariant != null && ((Integer) invariant[0]) > 0) {
 				addToToolTip(((Integer) invariant[0]), ((CompartmentFigure) invariant[1]), tooltipContent);
-			}
+			}	
+
+
 			// if no methods, invariants or fields to show, show default label
 			int invariantsCount = ((invariant != null) ? ((Integer) invariant[0]) : 0);
 			if (fieldCount == 0 && methodCount == 0 && invariantsCount == 0) {
@@ -276,6 +295,18 @@ public class RoleFigure extends Figure implements GUIDefaults {
 				int xyValue = fieldCount * (ROLE_PREFERED_SIZE + GRIDLAYOUT_VERTICAL_SPACING) + GRIDLAYOUT_MARGIN_HEIGHT;
 				panel.setBorder(new RoleFigureBorder(xyValue, xyValue));
 			}
+			
+			// TODO: draw seperation line between class and nested class
+			/*
+			Panel panel2 = new Panel();
+			// draw seperation line between inner fields and inner methods
+			if (invariant != null && (innerFieldCount + ((Integer) invariant[0]) > 0) && (methodCount >0)) {
+				int xyValue = (fieldCount + methodCount + innerFieldCount + ((Integer) invariant[0])) * (ROLE_PREFERED_SIZE + GRIDLAYOUT_VERTICAL_SPACING) + GRIDLAYOUT_MARGIN_HEIGHT;
+				panel2.setBorder(new RoleFigureBorder(xyValue, xyValue));
+			} else if (innerFieldCount > 0 && (innerMethodCount > 0)) {
+				int xyValue = (innerFieldCount + methodCount + fieldCount) * (ROLE_PREFERED_SIZE + GRIDLAYOUT_VERTICAL_SPACING) + GRIDLAYOUT_MARGIN_HEIGHT;
+				panel2.setBorder(new RoleFigureBorder(xyValue, xyValue));
+			}*/
 
 		} else if (role.getClassFragment().getName().startsWith("*.")) {
 			setContentForFiles(tooltipContent, null);
@@ -284,6 +315,52 @@ public class RoleFigure extends Figure implements GUIDefaults {
 		}
 		setToolTip(tooltipContent);
 	}
+	
+	// Create content for innerclass methods
+	private int getCountForInnerMethodContentCreate(Figure tooltipContent) {
+		CompartmentFigure methodFigure = new CompartmentFigure();
+		Label label = new Label(role.getFeature() + " ", IMAGE_FEATURE);
+		
+		/*if (isFieldMethodFilterActive()) {
+			tooltipContent.add(label);
+		} else {*/
+			methodFigure.add(label);
+		//}
+		
+		int methodCount = 0;
+		
+		FSTClassFragment[] allInnerClasses = new FSTClassFragment[role.getInnerClasses().toArray().length];
+		role.getInnerClasses().toArray(allInnerClasses);	
+		
+		for (int i = 0; i < allInnerClasses.length; i++)
+		{
+			FSTClassFragment currentNestedClass = allInnerClasses[i];
+			for (FSTMethod innerMethod : currentNestedClass.getMethods())
+			{
+			//	System.out.println("refinementBug?");
+			//	System.out.println("innerClassMethod isInRefinementGroup: "+innerMethod.inRefinementGroup());
+				methodFigure.add(createMethodLabel(innerMethod));
+				methodCount++;
+				
+				if (isFieldMethodFilterActive()) {
+					addLabel(createMethodLabel(innerMethod));
+				}/* else {
+					if (methodCount % 25 == 0) {
+						tooltipContent.add(methodFigure);
+						methodFigure = new CompartmentFigure();
+						methodFigure.add(new Label(""));
+					}
+				}*/
+			}
+		}
+		
+		/*if (!isFieldMethodFilterActive()) {
+			addToToolTip(methodCount, methodFigure, tooltipContent);
+		}*/
+		
+		return methodCount;
+		
+		}
 
 	private int getCountForMethodContentCreate(Figure tooltipContent) {
 
@@ -297,8 +374,10 @@ public class RoleFigure extends Figure implements GUIDefaults {
 		}
 
 		int methodCount = 0;
+		
 		for (FSTMethod m : role.getClassFragment().getMethods()) {
 			Label methodLabel = createMethodLabel(m);
+			
 			// check for selected filters		
 			if (matchFilter(m) && ((methodsWithRefinements() && m.inRefinementGroup()) || (!m.inRefinementGroup() && methodsWithoutRefinements()))) {
 				methodFigure.add(methodLabel);
@@ -319,6 +398,7 @@ public class RoleFigure extends Figure implements GUIDefaults {
 		if (!isFieldMethodFilterActive()) {
 			addToToolTip(methodCount, methodFigure, tooltipContent);
 		}
+		
 		return methodCount;
 	}
 
@@ -389,6 +469,52 @@ public class RoleFigure extends Figure implements GUIDefaults {
 
 	private String getClassName() {
 		return role.getClassFragment().getName().split("[.]")[0];
+	}
+	
+	private int getCountForInnerFieldContentCreate(Figure tooltipContent) {
+		CompartmentFigure fieldFigure = new CompartmentFigure();
+		Label label = new Label(getClassName() + " ", IMAGE_CLASS);
+		
+		/*if (isFieldMethodFilterActive()) {
+			tooltipContent.add(label);
+		} else {*/
+			fieldFigure.add(label);
+		//}
+		
+		int innerFieldCount = 0;
+		
+		FSTClassFragment[] allInnerClasses = new FSTClassFragment[role.getInnerClasses().toArray().length];
+		role.getInnerClasses().toArray(allInnerClasses);
+		
+		for (int i = 0; i < allInnerClasses.length; i++)
+		{
+			FSTClassFragment currentNestedClass = allInnerClasses[i];
+			
+			// create label for nested class name
+			addLabel(createNestedClassLabel(currentNestedClass));
+			innerFieldCount++;
+						
+			for (FSTField innerField : currentNestedClass.getFields())
+			{
+				fieldFigure.add(createFieldLabel(innerField));
+				innerFieldCount++;
+				
+				if (isFieldMethodFilterActive()) {
+					addLabel(createFieldLabel(innerField));
+				}/* else {
+					if (innerFieldCount % 25 == 0) {
+					//	tooltipContent.add(fieldFigure);
+						fieldFigure = new CompartmentFigure();
+						fieldFigure.add(new Label(""));
+					}
+				}*/
+			}
+		}
+			/*
+		if (!isFieldMethodFilterActive()) {
+			addToToolTip(innerFieldCount, fieldFigure, tooltipContent);
+		}*/
+		return innerFieldCount;
 	}
 
 	private int getCountForFieldContentCreate(Figure tooltipContent) {
@@ -572,6 +698,7 @@ public class RoleFigure extends Figure implements GUIDefaults {
 				.hasContract() && showContracts()));
 	}
 
+	// create label for method
 	private Label createMethodLabel(FSTMethod m) {
 		String name;
 		if (showOnlyNames()) {
@@ -580,11 +707,11 @@ public class RoleFigure extends Figure implements GUIDefaults {
 			name = m.getFullName();
 		}
 		Label methodLabel = new RoleFigureLabel(name, m.getFullName());
-
-		if (m.inRefinementGroup()) {
-			methodLabel.setFont(FONT_BOLD);
-		}
-
+		
+	//	if (m.inRefinementGroup()) {
+	//	methodLabel.setFont(FONT_BOLD);
+	//	}
+		
 		if (m.hasContract() && showContracts()) {
 			if (m.isPrivate())
 				methodLabel.setIcon(IMAGE_METHODE_PRIVATE_CONTRACT);
@@ -602,7 +729,9 @@ public class RoleFigure extends Figure implements GUIDefaults {
 			else if (m.isPublic())
 				methodLabel.setIcon(IMAGE_METHODE_PUBLIC);
 			else
+			{
 				methodLabel.setIcon(IMAGE_METHODE_DEFAULT);
+			}
 		}
 
 		return methodLabel;
@@ -619,6 +748,7 @@ public class RoleFigure extends Figure implements GUIDefaults {
 		return invariantLabel;
 	}
 
+	// create label for field
 	private Label createFieldLabel(FSTField f) {
 		String name;
 		if (showOnlyNames()) {
@@ -627,9 +757,9 @@ public class RoleFigure extends Figure implements GUIDefaults {
 			name = f.getFullName();
 		}
 		Label fieldLabel = new RoleFigureLabel(name, f.getFullName());
-		if (f.inRefinementGroup()) {
-			fieldLabel.setFont(FONT_BOLD);
-		}
+	//	if (f.inRefinementGroup()) {
+	//		fieldLabel.setFont(FONT_BOLD);
+	//	}
 		if (!selected)
 			fieldLabel.setForegroundColor(ROLE_FOREGROUND_UNSELECTED);
 		if (f.isPrivate())
@@ -641,6 +771,23 @@ public class RoleFigure extends Figure implements GUIDefaults {
 		else
 			fieldLabel.setIcon(IMAGE_FIELD_DEFAULT);
 		return fieldLabel;
+	}
+	
+	// create label for nested class
+	private Label createNestedClassLabel(FSTClassFragment classFragment)
+	{
+		String name = "";
+		if (showOnlyNames()) {
+			name += classFragment.getName();
+		}
+		else {
+			name += classFragment.getFullName();
+		}
+		
+		Label classLabel = new RoleFigureLabel(name, classFragment.getFullName());
+		classLabel.setForegroundColor(ROLE_FOREGROUND_UNSELECTED);
+		
+		return classLabel;
 	}
 
 	private String getParentNames(IResource file) {
