@@ -95,8 +95,6 @@ public class FSTClassFragment extends RoleElement<FSTClassFragment> {
 		return innerClasses;
 	}
 	
-
-	
 	public boolean add(IRoleElement element) {
 		if (element instanceof FSTMethod) {
 			if (methods.contains(element)) {
@@ -122,6 +120,7 @@ public class FSTClassFragment extends RoleElement<FSTClassFragment> {
 			return false;
 		}
 		element.setRole(role);
+		element.setParent(this);
 		return true;
 	}
 	

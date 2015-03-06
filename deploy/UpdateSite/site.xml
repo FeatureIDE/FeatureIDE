@@ -646,6 +646,39 @@
    <feature url="features/de.ovgu.featureide.munge.android_2.7.3.201503021756.jar" id="de.ovgu.featureide.munge.android" version="2.7.3.201503021756">
       <category name="FeatureIDE 2.7"/>
    </feature>
+   <feature url="features/br.ufal.ic.colligens.feature_1.1.4.201503041644.jar" id="br.ufal.ic.colligens.feature" version="1.1.4.201503041644">
+      <category name="FeatureIDE 2.7"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide_2.7.3.201503041644.jar" id="de.ovgu.featureide" version="2.7.3.201503041644">
+      <category name="FeatureIDE 2.7"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.ahead_2.7.3.201503041644.jar" id="de.ovgu.featureide.ahead" version="2.7.3.201503041644">
+      <category name="FeatureIDE 2.7"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.antenna_2.7.3.201503041644.jar" id="de.ovgu.featureide.antenna" version="2.7.3.201503041644">
+      <category name="FeatureIDE 2.7"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.aspectj_2.7.3.201503041644.jar" id="de.ovgu.featureide.aspectj" version="2.7.3.201503041644">
+      <category name="FeatureIDE 2.7"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.exampleprojects_2.7.3.201503041644.jar" id="de.ovgu.featureide.exampleprojects" version="2.7.3.201503041644">
+      <category name="FeatureIDE 2.7"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featurecpp_2.7.3.201503041644.jar" id="de.ovgu.featureide.featurecpp" version="2.7.3.201503041644">
+      <category name="FeatureIDE 2.7"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featurehouse_2.7.3.201503041644.jar" id="de.ovgu.featureide.featurehouse" version="2.7.3.201503041644">
+      <category name="FeatureIDE 2.7"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.featuremodeling_2.7.3.201503041644.jar" id="de.ovgu.featureide.featuremodeling" version="2.7.3.201503041644">
+      <category name="FeatureIDE 2.7"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.munge_2.7.3.201503041644.jar" id="de.ovgu.featureide.munge" version="2.7.3.201503041644">
+      <category name="FeatureIDE 2.7"/>
+   </feature>
+   <feature url="features/de.ovgu.featureide.munge.android_2.7.3.201503041644.jar" id="de.ovgu.featureide.munge.android" version="2.7.3.201503041644">
+      <category name="FeatureIDE 2.7"/>
+   </feature>
    <archive path="Older Versions &lt;2.6" url="http://wwwiti.cs.uni-magdeburg.de/iti_db/research/featureide/deploy/2.5"/>
    <category-def name="FeatureIDE 2.6" label="FeatureIDE 2.6"/>
    <category-def name="FeatureIDE 2.7" label="FeatureIDE 2.7"/>
