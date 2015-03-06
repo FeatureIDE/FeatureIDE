@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.core.fstmodel;
 
+import java.util.LinkedList;
 import java.util.TreeSet;
 
 import javax.annotation.Nonnull;
@@ -33,6 +34,8 @@ import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
  * feature.
  * 
  * @author Jens Meinicke
+ * @author Dominic Labsch
+ * @author Daniel Püsche
  */
 public class FSTRole {
 	private final TreeSet<FSTDirective> directives = new TreeSet<FSTDirective>();
@@ -74,7 +77,7 @@ public class FSTRole {
 	public FSTClassFragment getClassFragment() {
 		return classFragment;
 	}
-	
+
 	@Nonnull
 	public TreeSet<FSTField> getFields() {
 		return classFragment.getFields();
@@ -84,12 +87,12 @@ public class FSTRole {
 	public TreeSet<FSTInvariant> getInvariants() {
 		return classFragment.getInvariants();
 	}
-	
+
 	@Nonnull
 	public TreeSet<FSTMethod> getMethods() {
 		return classFragment.getMethods();
 	}
-	
+
 	@Nonnull
 	public TreeSet<FSTClassFragment> getInnerClasses() {
 		return classFragment.getInnerClasses();
@@ -98,6 +101,60 @@ public class FSTRole {
 	@Nonnull
 	public TreeSet<FSTDirective> getDirectives() {
 		return directives;
+	}
+
+	// get all fields of all nested classes
+	public LinkedList<FSTField> getAllFields() {
+		LinkedList<FSTField> allFields = new LinkedList<FSTField>();
+		getAllFieldsRec(allFields, this.getClassFragment());
+		return allFields;
+
+	}
+
+	public void getAllFieldsRec(LinkedList<FSTField> fields, FSTClassFragment innerClass) {
+		fields.addAll(innerClass.getFields());
+		if (innerClass.getInnerClasses() != null) {
+			for (FSTClassFragment i : innerClass.getInnerClasses()) {
+				getAllFieldsRec(fields, i);
+			}
+		}
+
+	}
+
+	// get all methods of all nested classes
+	public LinkedList<FSTMethod> getAllMethods() {
+		LinkedList<FSTMethod> allMethods = new LinkedList<FSTMethod>();
+		getAllMethodsRec(allMethods, this.getClassFragment());
+		return allMethods;
+
+	}
+
+	public void getAllMethodsRec(LinkedList<FSTMethod> methods, FSTClassFragment innerClass) {
+		methods.addAll(innerClass.getMethods());
+		if (innerClass.getInnerClasses() != null) {
+			for (FSTClassFragment i : innerClass.getInnerClasses()) {
+				getAllMethodsRec(methods, i);
+			}
+		}
+
+	}
+
+	// get all nested classes of all nested classes
+	public LinkedList<FSTClassFragment> getAllInnerClasses() {
+		LinkedList<FSTClassFragment> allInnerClasses = new LinkedList<FSTClassFragment>();
+		getAllInnerClassesRec(allInnerClasses, this.getClassFragment());
+		return allInnerClasses;
+
+	}
+
+	public void getAllInnerClassesRec(LinkedList<FSTClassFragment> fragment, FSTClassFragment innerClass) {
+		fragment.addAll(innerClass.getInnerClasses());
+		if (innerClass.getInnerClasses() != null) {
+			for (FSTClassFragment i : innerClass.getInnerClasses()) {
+				getAllInnerClassesRec(fragment, i);
+			}
+		}
+
 	}
 
 	@Override

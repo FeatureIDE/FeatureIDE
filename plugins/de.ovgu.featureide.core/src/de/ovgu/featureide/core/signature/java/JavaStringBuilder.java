@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.core.signature.java;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import de.ovgu.featureide.core.signature.abstr.AbstractClassFragment;
 import de.ovgu.featureide.core.signature.abstr.AbstractFieldSignature;
 import de.ovgu.featureide.core.signature.abstr.AbstractMethodSignature;
@@ -145,7 +148,9 @@ public class JavaStringBuilder {
 		return "return " + getTypeDefaultValue(method);
 	}
 
-	private static String getTypeDefaultValue(AbstractSignature element) {
+	@Nonnull 
+	private static String getTypeDefaultValue(@Nullable AbstractSignature element) {
+		
 		String type = element.getType();
 		if (type.equals("void")) {
 			return ";";
