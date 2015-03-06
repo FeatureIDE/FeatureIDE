@@ -98,12 +98,11 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 			IWorkbenchPage page = getActivePage();
 			if (page != null) {
 				try {
-					
+
 					RoleFigure roleFigure = (RoleFigure) this.getFigure();
 					if (roleFigure.isFieldMethodFilterActive() || !CorePlugin.getFeatureProject(file).getComposer().showContextFieldsAndMethods()) {
 						openElement(roleFigure, file);
-					}
-					else 
+					} else
 						openEditor(file);
 				} catch (CoreException e) {
 					UIPlugin.getDefault().logError(e);
@@ -116,7 +115,7 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 	private IWorkbenchPage getActivePage() {
 		return UIPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow().getActivePage();
 	}
-	
+
 	private IEditorDescriptor getDescriptor(IFile file) throws CoreException {
 		IContentType contentType = null;
 		IContentDescription description = file.getContentDescription();
@@ -124,37 +123,35 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 			contentType = description.getContentType();
 		}
 		if (contentType != null) {
-			return PlatformUI.getWorkbench().getEditorRegistry()
-					.getDefaultEditor(file.getName(), contentType);
+			return PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(file.getName(), contentType);
 		} else {
-			return PlatformUI.getWorkbench().getEditorRegistry()
-					.getDefaultEditor(file.getName());
+			return PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(file.getName());
 		}
 	}
-	
+
 	private ITextEditor openEditor(IFile file) throws CoreException {
 		IWorkbenchPage page = getActivePage();
-		if (page == null) return null;
-		
+		if (page == null)
+			return null;
+
 		IEditorDescriptor desc = getDescriptor(file);
-		
+
 		if (desc != null) {
 			return (ITextEditor) page.openEditor(new FileEditorInput(file), desc.getId());
 		} else {
 			// case: there is no default editor for the file
-			return (ITextEditor) page.openEditor(new FileEditorInput(file),
-					"org.eclipse.ui.DefaultTextEditor");
+			return (ITextEditor) page.openEditor(new FileEditorInput(file), "org.eclipse.ui.DefaultTextEditor");
 		}
 	}
-	
+
 	/**
 	 * search clicked element of current cursor position and open element in editor
 	 */
 	private void openElement(RoleFigure roleFigure, IFile file) throws CoreException {
 		Point point = getCursorPosition();
 		List<?> panelList = roleFigure.getChildren();
-		ITextEditor editor; 
-		
+		ITextEditor editor;
+
 		for (Object o : panelList) {
 			Panel panel = (Panel) o;
 			List<?> labelList = panel.getChildren();
@@ -167,45 +164,33 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 
 					TreeSet<FSTInvariant> invariants = this.getRoleModel().getClassFragment().getInvariants();
 					for (FSTInvariant invariant : invariants) {
-						if (invariant.getFullName().equals(label.getElementName()))
-						{
+						if (invariant.getFullName().equals(label.getElementName())) {
 							editor = openEditor(file);
 							if (editor != null) {
-								Outline.scrollToLine(editor,invariant.getLine());
+								Outline.scrollToLine(editor, invariant.getLine());
 							}
 							return;
 						}
-							
+
 					}
-					
+
 					TreeSet<FSTField> fields = this.getRoleModel().getClassFragment().getFields();
 					for (FSTField fstField : fields) {
 						if (fstField.getFullName().equals(label.getElementName())) {
 							editor = openEditor(file);
 							if (editor != null) {
-								Outline.scrollToLine(editor,fstField.getLine());
+								Outline.scrollToLine(editor, fstField.getLine());
 							}
 							return;
 						}
 					}
-			//edit doesn't seem to have any impact...
-					/*TreeSet<FSTClassFragment> innerClasses = this.getRoleModel().getInnerClasses();
-					for (FSTClassFragment fstInnerClass : innerClasses) {
-						if (fstInnerClass.getFullName().equals(label.getElementName())) {
-							editor = openEditor(file);
-							if (editor != null) {
-								Outline.scrollToLine(editor,fstInnerClass.getLine());
-							}
-							return;
-						}
-					}*/
-					
+
 					TreeSet<FSTMethod> methods = this.getRoleModel().getClassFragment().getMethods();
 					for (FSTMethod fstMethod : methods) {
 						if (fstMethod.getFullName().equals(label.getElementName())) {
 							editor = openEditor(file);
-							if (editor != null)	{
-								Outline.scrollToLine(editor,fstMethod.getLine());
+							if (editor != null) {
+								Outline.scrollToLine(editor, fstMethod.getLine());
 							}
 							return;
 						}
@@ -215,8 +200,9 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 					for (FSTDirective fstDirective : directives) {
 						if (fstDirective.toDependencyString().equals(label.getElementName())) {
 							editor = openEditor(file);
-							if (editor != null)	{
-								Outline.scrollToLine(editor, fstDirective.getStartLine(), fstDirective.getEndLine(), fstDirective.getStartOffset(), fstDirective.getEndLength());
+							if (editor != null) {
+								Outline.scrollToLine(editor, fstDirective.getStartLine(), fstDirective.getEndLine(), fstDirective.getStartOffset(),
+										fstDirective.getEndLength());
 							}
 							return;
 						}
@@ -228,21 +214,23 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 		openEditor(file);
 		getViewer().getContents().refresh();
 	}
-	
+
 	private Point getCursorPosition() {
 		Display display = Display.getDefault();
-		FigureCanvas figureCanvas = (FigureCanvas)this.getViewer().getControl();
+		FigureCanvas figureCanvas = (FigureCanvas) this.getViewer().getControl();
 		Point point = figureCanvas.toControl(display.getCursorLocation());
-		
+
 		Viewport viewport = figureCanvas.getViewport();
 		org.eclipse.draw2d.geometry.Point location = viewport.getViewLocation();
-		
+
 		int x = point.x + location.x;
 		int y = point.y + location.y;
 		Rectangle bounds = viewport.getBounds();
-		if (point.x < 0) x += bounds.width;
-		if (point.y < 0) y += bounds.height;
-		
-		return new Point(x,y);
+		if (point.x < 0)
+			x += bounds.width;
+		if (point.y < 0)
+			y += bounds.height;
+
+		return new Point(x, y);
 	}
 }

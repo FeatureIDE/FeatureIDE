@@ -50,6 +50,8 @@ import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
  * @author Melanie Pflaume
  * @author Stefan Krüger
  * @author Florian Proksch
+ * @author Dominic Labsch
+ * @author Daniel Püsche
  */
 public class CollaborationOutlineTreeContentProvider implements ITreeContentProvider {
 
@@ -96,21 +98,19 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 
 	@Override
 	public Object[] getChildren(Object parentElement) {
-		if (parentElement instanceof FSTClass) { 
+		if (parentElement instanceof FSTClass) {
 			// get all fields, methods, directives and invariants
 			final TreeSet<FSTMethod> methods = new TreeSet<FSTMethod>();
 			final TreeSet<FSTField> fields = new TreeSet<FSTField>();
 			final TreeSet<FSTInvariant> invariants = new TreeSet<FSTInvariant>();
 			final TreeSet<FSTDirective> directives = new TreeSet<FSTDirective>();
-			//edit
 			final TreeSet<FSTClassFragment> innerClasses = new TreeSet<FSTClassFragment>();
 
 			for (FSTRole role : ((FSTClass) parentElement).getRoles()) {
 				invariants.addAll(role.getClassFragment().getInvariants());
-				methods.addAll(role.getClassFragment().getMethods());
-				fields.addAll(role.getClassFragment().getFields());
+				methods.addAll(role.getMethods());
+				fields.addAll(role.getFields());
 				directives.addAll(role.getDirectives());
-				//edit
 				innerClasses.addAll(role.getInnerClasses());
 			}
 
@@ -120,7 +120,6 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 			System.arraycopy(fields.toArray(), 0, obj, pos += invariants.size(), fields.size());
 			System.arraycopy(methods.toArray(), 0, obj, pos += fields.size(), methods.size());
 			System.arraycopy(directives.toArray(), 0, obj, pos += methods.size(), directives.size());
-			//edit
 			System.arraycopy(innerClasses.toArray(), 0, obj, pos += directives.size(), innerClasses.size());
 
 			return obj;
@@ -189,29 +188,28 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 			FSTDirective[] directiveArray = ((FSTDirective) parentElement).getChildren().clone();
 			Arrays.sort(directiveArray);
 			return directiveArray;
-		} else if (parentElement instanceof FSTClassFragment){
+		} else if (parentElement instanceof FSTClassFragment) {
 			final TreeSet<FSTMethod> methods = new TreeSet<FSTMethod>();
 			final TreeSet<FSTField> fields = new TreeSet<FSTField>();
 			final TreeSet<FSTClassFragment> innerClasses = new TreeSet<FSTClassFragment>();
 			final TreeSet<FSTInvariant> invariants = new TreeSet<FSTInvariant>();
-			
-			FSTClassFragment innerClassCast = (FSTClassFragment) parentElement; //working title...
-			
+
+			FSTClassFragment innerClassCast = (FSTClassFragment) parentElement;
+
 			invariants.addAll(innerClassCast.getInvariants());
 			methods.addAll(innerClassCast.getMethods());
 			fields.addAll(innerClassCast.getFields());
 			innerClasses.addAll(innerClassCast.getInnerClasses());
-			
+
 			final IRoleElement[] obj = new IRoleElement[methods.size() + fields.size() + invariants.size() + innerClasses.size()];
 			int pos = 0;
 			System.arraycopy(invariants.toArray(), 0, obj, pos, invariants.size());
 			System.arraycopy(fields.toArray(), 0, obj, pos += invariants.size(), fields.size());
-			System.arraycopy(methods.toArray(), 0, obj, pos += fields.size(), methods.size());			
+			System.arraycopy(methods.toArray(), 0, obj, pos += fields.size(), methods.size());
 			System.arraycopy(innerClasses.toArray(), 0, obj, pos += methods.size(), innerClasses.size());
 
 			return obj;
-			
-			
+
 		}
 		return new FSTRole[0];
 	}

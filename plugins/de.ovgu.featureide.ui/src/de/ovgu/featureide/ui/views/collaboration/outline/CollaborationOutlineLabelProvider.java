@@ -70,6 +70,9 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 
 	@Override
 	public Image getImage(Object element) {
+		if (element instanceof FSTClassFragment) {
+			return IMAGE_CLASS;
+		}
 		if (element instanceof IRoleElement) {
 			IRoleElement fstModelElement = (IRoleElement) element;
 			if (fstModelElement instanceof FSTField) {
@@ -112,7 +115,6 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 		} else if (element instanceof FSTContractedRole) {
 			return IMAGE_AT_WITHOUT_WHITE_BACKGROUND;
 		}
-
 		return null;
 	}
 
@@ -250,17 +252,20 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 		if (item.getData() instanceof FSTDirective) {
 			item.setForeground(viewer.getControl().getDisplay().getSystemColor(SWT.DEFAULT));
 		}
+		else if(item.getData() instanceof FSTClassFragment){
+			
+			item.setForeground(viewer.getControl().getDisplay().getSystemColor(SWT.DEFAULT));			
+		}
 
 		else {
 
 			final IRoleElement element = (IRoleElement) item.getData();
-		
 
 			for (FSTRole role : element.getRole().getFSTClass().getRoles()) {
 				if (role.getFile().equals(iFile)
-						&& ((element instanceof FSTMethod && role.getClassFragment().getMethods().contains(element))
+						&& ((element instanceof FSTMethod && role.getAllMethods().contains(element))
 								|| (element instanceof FSTInvariant && role.getClassFragment().getInvariants().contains(element)) || (element instanceof FSTField && role
-								.getClassFragment().getFields().contains(element)))) {
+								.getAllFields().contains(element)))) {
 					item.setForeground(viewer.getControl().getDisplay().getSystemColor(SWT.DEFAULT));
 					return;
 				}

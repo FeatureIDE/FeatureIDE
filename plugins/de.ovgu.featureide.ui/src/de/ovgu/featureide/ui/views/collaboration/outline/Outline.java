@@ -98,7 +98,9 @@ import de.ovgu.featureide.ui.views.outline.ContextOutlineTreeContentProvider;
  * 
  * @author Jan Wedding
  * @author Melanie Pflaume
- * @author Reimar Schrï¿½ter
+ * @author Reimar Schröter
+ * @author Dominic Labsch 
+ * @author Daniel Püsche
  */
 /*
  * TODO #404 fix bug: do not close the tree if a corresponding file was opened
@@ -191,68 +193,59 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 				if (selection instanceof FSTRole) {
 					r = (FSTRole) selection;
 					selection = viewer.getTree().getSelection()[0].getParentItem().getData();
-				} else if (selection instanceof FSTMethod) {			
-					FSTMethod meth = ((FSTMethod) selection); 
+				} else if (selection instanceof FSTMethod) {
+					FSTMethod meth = ((FSTMethod) selection);
 					fileAlreadyOpen = meth.getFile().getName().equals(iFile.getName()) && (getMethodLine(iFile, meth) > 0);
 					r = meth.getRole();
-				} else  if (selection instanceof FSTField) {
-					FSTField field = ((FSTField) selection); 
+				} else if (selection instanceof FSTField) {
+					FSTField field = ((FSTField) selection);
 					fileAlreadyOpen = field.getFile().getName().equals(iFile.getName()) && (getFieldLine(iFile, field) > 0);
 					r = field.getRole();
-				} else  if (selection instanceof FSTInvariant) {
-					FSTInvariant invariant = ((FSTInvariant) selection); 
+				} else if (selection instanceof FSTInvariant) {
+					FSTInvariant invariant = ((FSTInvariant) selection);
 					fileAlreadyOpen = invariant.getFile().getName().equals(iFile.getName()) && (getInvariantLine(iFile, invariant) > 0);
 					r = invariant.getRole();
-				} else  if (selection instanceof FSTDirective) {
+				} else if (selection instanceof FSTDirective) {
 					fileAlreadyOpen = true;
-		//edit			
-				} else  if (selection instanceof FSTClassFragment)
-				{
-					FSTClassFragment innerClass = ((FSTClassFragment)selection);
+
+				} else if (selection instanceof FSTClassFragment) {
+					FSTClassFragment innerClass = ((FSTClassFragment) selection);
 					fileAlreadyOpen = innerClass.getFile().getName().equals(iFile.getName()) && (getClassFragmentLine(iFile, innerClass) > 0);
-					r=innerClass.getRole();
+					r = innerClass.getRole();
 				}
-				
+
 				else {
 					return;
 				}
 				if (!fileAlreadyOpen && r.getFile().isAccessible()) {
-					IWorkbench workbench = PlatformUI
-							.getWorkbench();
+					IWorkbench workbench = PlatformUI.getWorkbench();
 					IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
 					IWorkbenchPage page = window.getActivePage();
 					IContentType contentType = null;
 					try {
 						iFile = r.getFile();
-						IContentDescription description = iFile
-								.getContentDescription();
+						IContentDescription description = iFile.getContentDescription();
 						if (description != null) {
 							contentType = description.getContentType();
 						}
 						IEditorDescriptor desc = null;
 						if (contentType != null) {
-							desc = workbench.getEditorRegistry()
-									.getDefaultEditor(iFile.getName(), contentType);
+							desc = workbench.getEditorRegistry().getDefaultEditor(iFile.getName(), contentType);
 						} else {
-							desc = workbench.getEditorRegistry()
-									.getDefaultEditor(iFile.getName());
+							desc = workbench.getEditorRegistry().getDefaultEditor(iFile.getName());
 						}
 						if (desc != null) {
-							page.openEditor(new FileEditorInput(iFile),
-									desc.getId());
+							page.openEditor(new FileEditorInput(iFile), desc.getId());
 						} else {
 							// case: there is no default editor for the file
-							page.openEditor(new FileEditorInput(iFile),
-									"org.eclipse.ui.DefaultTextEditor");
+							page.openEditor(new FileEditorInput(iFile), "org.eclipse.ui.DefaultTextEditor");
 						}
-						
-						
+
 					} catch (CoreException e) {
 						UIPlugin.getDefault().logError(e);
 					}
 				}
-								
-				
+
 				if (selection instanceof FSTMethod) {
 					FSTMethod meth = (FSTMethod) selection;
 					int line = getMethodLine(iFile, meth);
@@ -270,18 +263,17 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 					int line = getInvariantLine(iFile, inv);
 					if (line != -1)
 						scrollToLine(active_editor, line);
-   //edit					
-				}else if (selection instanceof FSTClassFragment){
+
+				} else if (selection instanceof FSTClassFragment) {
 					FSTClassFragment cf = (FSTClassFragment) selection;
 					int line = getClassFragmentLine(iFile, cf);
-					if(line != -1)
+					if (line != -1)
 						scrollToLine(active_editor, line);
 				}
-				
+
 				else if (selection instanceof FSTDirective) {
 					FSTDirective directive = (FSTDirective) selection;
-					scrollToLine(active_editor, directive.getStartLine(), directive.getEndLine(), 
-							directive.getStartOffset(), directive.getEndLength());
+					scrollToLine(active_editor, directive.getStartLine(), directive.getEndLine(), directive.getStartOffset(), directive.getEndLength());
 				}
 			}
 
@@ -292,7 +284,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 			for (FSTRole r : field.getRole().getFSTClass().getRoles()) {
 				if (r.getFile().equals(iFile)) {
 					for (FSTField f : r.getAllFields()) {
-						if (f.compareTo(field)==0) {
+						if (f.compareTo(field) == 0) {
 							return f.getLine();
 						}
 					}
@@ -305,7 +297,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 			for (FSTRole r : inv.getRole().getFSTClass().getRoles()) {
 				if (r.getFile().equals(iFile)) {
 					for (FSTInvariant i : r.getClassFragment().getInvariants()) {
-						if (i.compareTo(inv)==0) {
+						if (i.compareTo(inv) == 0) {
 							return i.getLine();
 						}
 					}
@@ -313,12 +305,12 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 			}
 			return -1;
 		}
- //edit
-		private int getClassFragmentLine(IFile iFile, FSTClassFragment cf){
-			for(FSTRole r: cf.getRole().getFSTClass().getRoles()){
-				if(r.getFile().equals(iFile)){
-					for(FSTClassFragment i: r.getAllInnerClasses()){
-						if(i.compareTo(cf)==0){
+
+		private int getClassFragmentLine(IFile iFile, FSTClassFragment cf) {
+			for (FSTRole r : cf.getRole().getFSTClass().getRoles()) {
+				if (r.getFile().equals(iFile)) {
+					for (FSTClassFragment i : r.getAllInnerClasses()) {
+						if (i.compareTo(cf) == 0) {
 							return i.getLine();
 						}
 					}
@@ -331,7 +323,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 			for (FSTRole r : meth.getRole().getFSTClass().getRoles()) {
 				if (r.getFile().equals(iFile)) {
 					for (FSTMethod m : r.getAllMethods()) {
-						if (m.compareTo(meth)==0) {
+						if (m.compareTo(meth) == 0) {
 							return m.getLine();
 						}
 					}
@@ -724,7 +716,8 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 		if (event.getSource() instanceof ProviderAction && ((ProviderAction) event.getSource()).isChecked()) {
 			for (IAction curAction : actionOfProv) {
 				if (curAction != event.getSource()) {
-					if (((ProviderAction) event.getSource()).getLabelProvider().getOutlineType() == ((ProviderAction) curAction).getLabelProvider().getOutlineType()) {
+					if (((ProviderAction) event.getSource()).getLabelProvider().getOutlineType() == ((ProviderAction) curAction).getLabelProvider()
+							.getOutlineType()) {
 						curAction.setChecked(false);
 					}
 				}
