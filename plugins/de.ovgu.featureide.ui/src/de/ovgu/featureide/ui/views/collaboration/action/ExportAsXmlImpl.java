@@ -20,8 +20,9 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.action;
 
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLOutputFactory;
@@ -39,6 +40,7 @@ import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
+import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.editparts.CollaborationEditPart;
 import de.ovgu.featureide.ui.views.collaboration.editparts.ModelEditPart;
 
@@ -47,19 +49,22 @@ import de.ovgu.featureide.ui.views.collaboration.editparts.ModelEditPart;
  * 
  * @author Christopher Kruczek
  */
-public class ExportAsXmlImpl implements ExportAsImplemenation {
+public class ExportAsXmlImpl extends AbstractExportAsAction {
+	
+	public ExportAsXmlImpl(String text, GraphicalViewerImpl view) {
+		super(text, view);
+	}
 
 	@Override
-	public void export(GraphicalViewerImpl viewer) {
-
-		String file = createXmlSaveDialog().open();
-		if (file == null)
+	public void run() {
+		final String file = createXmlSaveDialog().open();
+		if (file == null) {
 			return;
-
-		XMLStreamWriter sw;
+		}
+		
 		try {
-			sw = XMLOutputFactory.newInstance().createXMLStreamWriter(
-					new FileWriter(file));
+			XMLStreamWriter sw = XMLOutputFactory.newInstance().createXMLStreamWriter(
+					new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
 			sw.writeStartDocument("utf-8", "1.0");
 			sw.writeStartElement("configuration");
 			ModelEditPart mep = (ModelEditPart) viewer.getContents();
@@ -69,8 +74,7 @@ public class ExportAsXmlImpl implements ExportAsImplemenation {
 					FSTFeature feature = cep.getCollaborationModel();
 					if (!(feature instanceof FSTConfiguration)) {
 						writeElement(sw, feature);
-					}
-					else{
+					} else {
 						sw.writeAttribute("name", feature.getName());
 					}
 				}
@@ -79,17 +83,9 @@ public class ExportAsXmlImpl implements ExportAsImplemenation {
 			sw.writeEndDocument();
 			sw.flush();
 			sw.close();
-		} catch (XMLStreamException e) {
-
-			e.printStackTrace();
-		} catch (FactoryConfigurationError e) {
-
-			e.printStackTrace();
-		} catch (IOException e) {
-
-			e.printStackTrace();
+		} catch (XMLStreamException | FactoryConfigurationError | IOException e) {
+			UIPlugin.getDefault().logError(e);
 		}
-
 	}
 
 	private FileDialog createXmlSaveDialog() {
@@ -107,12 +103,9 @@ public class ExportAsXmlImpl implements ExportAsImplemenation {
 				writeElement(writer, role.getClassFragment());
 			}
 			writer.writeEndElement();
-
 		} catch (XMLStreamException e) {
-
-			e.printStackTrace();
+			UIPlugin.getDefault().logError(e);
 		}
-
 	}
 
 	private void writeElement(XMLStreamWriter writer, FSTClassFragment fstClass) {
@@ -130,14 +123,11 @@ public class ExportAsXmlImpl implements ExportAsImplemenation {
 				writeElement(writer, method);
 			}
 			writer.writeEndElement();
-
 			writer.writeEndElement();
 
 		} catch (XMLStreamException e) {
-
-			e.printStackTrace();
+			UIPlugin.getDefault().logError(e);
 		}
-
 	}
 
 	private void writeElement(XMLStreamWriter writer, FSTMethod method) {
@@ -148,10 +138,8 @@ public class ExportAsXmlImpl implements ExportAsImplemenation {
 			writer.writeCharacters(method.getName());
 			writer.writeEndElement();
 		} catch (XMLStreamException e) {
-
-			e.printStackTrace();
+			UIPlugin.getDefault().logError(e);
 		}
-
 	}
 
 	private void writeElement(XMLStreamWriter writer, FSTField field) {
@@ -162,10 +150,8 @@ public class ExportAsXmlImpl implements ExportAsImplemenation {
 			writer.writeCharacters(field.getName());
 			writer.writeEndElement();
 		} catch (XMLStreamException e) {
-
-			e.printStackTrace();
+			UIPlugin.getDefault().logError(e);
 		}
-
 	}
 
 }

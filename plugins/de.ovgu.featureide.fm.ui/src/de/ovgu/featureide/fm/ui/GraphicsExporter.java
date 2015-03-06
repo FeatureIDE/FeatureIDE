@@ -38,6 +38,7 @@ import org.osgi.framework.Bundle;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslWriter;
+import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelWriter;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GEFImageWriter;
@@ -55,9 +56,9 @@ public class GraphicsExporter {
 		boolean succ = false;
 		File file = null;
 		FileDialog fileDialog = new FileDialog(new Shell(), SWT.SAVE);
-		String[] extensions = { "*.png", "*.jpg", "*.bmp", "*.m", "*.xml", "*.svg" };
+		String[] extensions = { "*.png", "*.jpg", "*.bmp", "*.m", "*.xml", ".velvet", "*.svg" };
 		fileDialog.setFilterExtensions(extensions);
-		String[] filterNames = { "Portable Network Graphics *.png", "JPEG *.jpg", "Windows Bitmap *.bmp", "GUIDSL Grammar *.m", "XML Export *.xml", "Scalable Vector Graphics *.svg" };
+		String[] filterNames = { "Portable Network Graphics *.png", "JPEG *.jpg", "Windows Bitmap *.bmp", "GUIDSL Grammar *.m", "XML Export *.xml", "Velvet Export *.velvet", "Scalable Vector Graphics *.svg" };
 		fileDialog.setFilterNames(filterNames);
 		fileDialog.setOverwrite(true);
 		String filePath = fileDialog.open();
@@ -70,6 +71,9 @@ public class GraphicsExporter {
 			succ = true;
 		} else if (filePath.endsWith(".xml")) {
 			new XmlFeatureModelWriter(featureModel).writeToFile(file);
+			succ = true;
+		} else if (filePath.endsWith(".velvet")) {
+			new VelvetFeatureModelWriter(featureModel).writeToFile(file);
 			succ = true;
 		} else {
 			return GraphicsExporter.exportAs(diagramEditor, file);
