@@ -70,13 +70,10 @@ public class StatisticsProgramSize extends LazyParent {
 				FSTClassFragment classFragment = role.getClassFragment();
 				String packageName = classFragment.getPackage();
 				String qualifiedPackageName = (packageName == null) ? "(default package)" : packageName;
-
 				String roleName = classFragment.getName().endsWith(".java") ? classFragment.getName().substring(0, classFragment.getName().length() - 5)
 						: classFragment.getName();
 				String qualifiedRoleName = qualifiedPackageName + "." + roleName;
-
 				String qualifier = qualifiedRoleName + ".";
-
 				for (FSTMethod method : classFragment.getMethods())
 					addToMap(qualifier + method.getFullName(), methodMap);
 				for (FSTField field : classFragment.getFields())
