@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import de.ovgu.featureide.core.fstmodel.FSTClass;
@@ -61,18 +62,18 @@ public class StatisticsProgramSize extends LazyParent {
 		HashMap<String, Integer> fieldMap = new HashMap<String, Integer>();
 		HashMap<String, Integer> classMap = new HashMap<String, Integer>();
 
+		ArrayList<FSTClassFragment> allNestedList = new ArrayList<FSTClassFragment>();
+		int pointer = 0;
+
 		for (FSTClass class_ : fstModel.getClasses()) {
 			for (FSTRole role : class_.getRoles()) {
 				FSTClassFragment classFragment = role.getClassFragment();
 				String packageName = classFragment.getPackage();
-				String qualifiedPackageName = (packageName == null) ? "(default package)"
-						: packageName;
+				String qualifiedPackageName = (packageName == null) ? "(default package)" : packageName;
 
-				String roleName = classFragment.getName().endsWith(".java") ? classFragment
-						.getName().substring(0, classFragment.getName().length() - 5)
+				String roleName = classFragment.getName().endsWith(".java") ? classFragment.getName().substring(0, classFragment.getName().length() - 5)
 						: classFragment.getName();
-				String qualifiedRoleName = qualifiedPackageName + "."
-						+ roleName;
+				String qualifiedRoleName = qualifiedPackageName + "." + roleName;
 
 				String qualifier = qualifiedRoleName + ".";
 
@@ -80,19 +81,32 @@ public class StatisticsProgramSize extends LazyParent {
 					addToMap(qualifier + method.getFullName(), methodMap);
 				for (FSTField field : classFragment.getFields())
 					addToMap(qualifier + field.getFullName(), fieldMap);
+				for (FSTClassFragment fragment : classFragment.getInnerClasses()) {
+					addToMap(fragment.getFullIdentifier(), classMap);
+				}
+				allNestedList.add(classFragment);
 				addToMap(qualifiedRoleName, classMap);
 			}
 		}
-		
-		addChild(new HashMapNode(NUMBER_CLASS + SEPARATOR
-				+ classMap.keySet().size() + " | " + NUMBER_ROLE + SEPARATOR
-				+ sum(classMap), null, classMap));
-		addChild(new HashMapNode(NUMBER_FIELD_U + SEPARATOR
-				+ fieldMap.keySet().size() + " | " + NUMBER_FIELD + SEPARATOR
-				+ sum(fieldMap), null, fieldMap));
-		addChild(new HashMapNode(NUMBER_METHOD_U + SEPARATOR
-				+ methodMap.keySet().size() + " | " + NUMBER_METHOD + SEPARATOR
-				+ sum(methodMap), null, methodMap));
+
+		while (pointer < allNestedList.size()) {
+			for (FSTClassFragment fragment : allNestedList.get(pointer).getInnerClasses()) {
+				allNestedList.add(fragment);
+
+				addToMap(fragment.getFullIdentifier(), classMap);
+
+				for (FSTMethod method : fragment.getMethods())
+					addToMap(fragment.getFullIdentifier() + "." + method.getFullName(), methodMap);
+
+				for (FSTField field : fragment.getFields())
+					addToMap(fragment.getFullIdentifier() + "." + field.getFullName(), fieldMap);
+			}
+			pointer++;
+		}
+
+		addChild(new HashMapNode(NUMBER_CLASS + SEPARATOR + (classMap.keySet().size()) + " | " + NUMBER_ROLE + SEPARATOR + sum(classMap), null, classMap));
+		addChild(new HashMapNode(NUMBER_FIELD_U + SEPARATOR + fieldMap.keySet().size() + " | " + NUMBER_FIELD + SEPARATOR + sum(fieldMap), null, fieldMap));
+		addChild(new HashMapNode(NUMBER_METHOD_U + SEPARATOR + methodMap.keySet().size() + " | " + NUMBER_METHOD + SEPARATOR + sum(methodMap), null, methodMap));
 	}
 
 	private void addToMap(String name, HashMap<String, Integer> map) {
