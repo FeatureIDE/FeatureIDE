@@ -782,7 +782,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	 * @param line
 	 *            The line number
 	 * @param message
-	 *            The message to disply
+	 *            The message to display
 	 * @param file
 	 *            The file path
 	 * @param severity

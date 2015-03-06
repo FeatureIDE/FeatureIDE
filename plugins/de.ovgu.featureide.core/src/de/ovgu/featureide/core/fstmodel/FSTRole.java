@@ -111,7 +111,7 @@ public class FSTRole {
 
 	}
 
-	public void getAllFieldsRec(LinkedList<FSTField> fields, FSTClassFragment innerClass) {
+	private void getAllFieldsRec(LinkedList<FSTField> fields, FSTClassFragment innerClass) {
 		fields.addAll(innerClass.getFields());
 		if (innerClass.getInnerClasses() != null) {
 			for (FSTClassFragment i : innerClass.getInnerClasses()) {
@@ -129,7 +129,7 @@ public class FSTRole {
 
 	}
 
-	public void getAllMethodsRec(LinkedList<FSTMethod> methods, FSTClassFragment innerClass) {
+	private void getAllMethodsRec(LinkedList<FSTMethod> methods, FSTClassFragment innerClass) {
 		methods.addAll(innerClass.getMethods());
 		if (innerClass.getInnerClasses() != null) {
 			for (FSTClassFragment i : innerClass.getInnerClasses()) {
@@ -147,7 +147,7 @@ public class FSTRole {
 
 	}
 
-	public void getAllInnerClassesRec(LinkedList<FSTClassFragment> fragment, FSTClassFragment innerClass) {
+	private void getAllInnerClassesRec(LinkedList<FSTClassFragment> fragment, FSTClassFragment innerClass) {
 		fragment.addAll(innerClass.getInnerClasses());
 		if (innerClass.getInnerClasses() != null) {
 			for (FSTClassFragment i : innerClass.getInnerClasses()) {
@@ -155,6 +155,44 @@ public class FSTRole {
 			}
 		}
 
+	}
+	
+//	
+//	// get all nested classes of all nested classes
+//	public LinkedList<LinkedList<FSTClassFragment>> getAllInnerClassesNested() {
+//		LinkedList<LinkedList<FSTClassFragment>> allInnerClasses = new LinkedList<LinkedList<FSTClassFragment>>();
+//		getAllInnerClassesNestedRec(allInnerClasses, this.getClassFragment());
+//		return allInnerClasses;
+//
+//	}
+//
+//	private void getAllInnerClassesNestedRec(LinkedList<LinkedList<FSTClassFragment>> fragment, FSTClassFragment innerClass) {
+//		fragment.add(new LinkedList<FSTClassFragment>(innerClass.getInnerClasses()));
+//		
+//		
+//		if (innerClass.getInnerClasses() != null) {
+//			for (FSTClassFragment i : innerClass.getInnerClasses()) {
+//				getAllInnerClassesRec(fragment, i);
+//			}
+//		}
+//
+//	}
+	
+	public LinkedList<FSTClassFragment> getAllEqualFSTFragments(FSTClassFragment fragment){
+		LinkedList<FSTClassFragment> frag = new LinkedList<FSTClassFragment>();
+		frag.add(fragment);
+		
+		
+		for (FSTRole role : getFSTClass().getRoles()) {
+			for(FSTClassFragment currFrag : role.getAllInnerClasses()){
+				if(currFrag.equals(fragment)){
+					
+					frag.add(currFrag);
+				}
+			}
+		}
+		
+		return frag;
 	}
 
 	@Override

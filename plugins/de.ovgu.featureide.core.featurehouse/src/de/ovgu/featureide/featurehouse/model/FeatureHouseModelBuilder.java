@@ -258,7 +258,7 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 			
 			if (!classFragmentStack.isEmpty()) {
 				final FSTClassFragment lastElement = classFragmentStack.pop();
-				if (lastElement.isInnerClass()) {
+				if (lastElement.isInnerClass() && !lastElement.equals(classFragmentStack.peek())) {
 					classFragmentStack.peek().add(lastElement);
 				}
 			}

@@ -113,6 +113,9 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 				directives.addAll(role.getDirectives());
 				innerClasses.addAll(role.getInnerClasses());
 			}
+			
+			
+//			
 
 			final IRoleElement[] obj = new IRoleElement[methods.size() + fields.size() + invariants.size() + directives.size() + innerClasses.size()];
 			int pos = 0;
@@ -197,8 +200,11 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 			FSTClassFragment innerClassCast = (FSTClassFragment) parentElement;
 
 			invariants.addAll(innerClassCast.getInvariants());
-			methods.addAll(innerClassCast.getMethods());
-			fields.addAll(innerClassCast.getFields());
+			LinkedList<FSTClassFragment> allFragments = innerClassCast.getRole().getAllEqualFSTFragments(innerClassCast);
+			for (FSTClassFragment fstClassFragment : allFragments) {
+				methods.addAll(fstClassFragment.getMethods());
+				fields.addAll(fstClassFragment.getFields());
+			}
 			innerClasses.addAll(innerClassCast.getInnerClasses());
 
 			final IRoleElement[] obj = new IRoleElement[methods.size() + fields.size() + invariants.size() + innerClasses.size()];
