@@ -66,6 +66,7 @@ import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.FeatureStatus;
+import de.ovgu.featureide.fm.core.Preferences;
 import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.job.AStoppableJob;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -89,6 +90,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.LegendAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.LegendLayoutAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.MandatoryAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.MoveAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.NameTypeSelectionAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.OrAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.RenameAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ReverseOrderAction;
@@ -159,6 +161,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	private ReverseOrderAction reverseOrderAction;
 
 	private LinkedList<LayoutSelectionAction> setLayoutActions;
+	
+	private LinkedList<NameTypeSelectionAction> setNameType;
 
 	private AutoLayoutConstraintAction autoLayoutConstraintAction;
 
@@ -284,6 +288,11 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			setLayoutActions.add(new LayoutSelectionAction(this, featureModel, i, 0));
 		}
 		autoLayoutConstraintAction = new AutoLayoutConstraintAction(this, featureModel);
+		
+		setNameType = new LinkedList<NameTypeSelectionAction>();
+		setNameType.add(new NameTypeSelectionAction(this, featureModel, 0, 0));
+		setNameType.add(new NameTypeSelectionAction(this, featureModel, 1, 0));
+		
 	}
 
 	public void createContextMenu(MenuManager menu) {
@@ -338,7 +347,15 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			setLayoutActions.get(i).setChecked(isChosen);
 			setLayoutActions.get(i).setEnabled(!isChosen);
 		}
-
+		
+		IMenuManager subMenuNameType = new MenuManager("Set Name Type");
+		for (int i = 0; i < setNameType.size(); i++) {
+			subMenuNameType.add(setNameType.get(i));
+			setNameType.get(i).setChecked(i == Preferences.getDefaultFeatureNameScheme());
+			setNameType.get(i).setEnabled(!(i == Preferences.getDefaultFeatureNameScheme()));
+		}
+		
+		
 		autoLayoutConstraintAction.setEnabled(!getFeatureModel().getLayout().hasFeaturesAutoLayout());
 
 		boolean connectionSelected = alternativeAction.isConnectionSelected();
@@ -349,7 +366,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		}
 
 		if (mplModel) {
-			menu.add(createConstraintAction);
+			menu.add(subMenuLayout);
+			menu.add(subMenuNameType);
 		}
 		// don't show menu to change group type of a feature in case a
 		// connection line is selected
