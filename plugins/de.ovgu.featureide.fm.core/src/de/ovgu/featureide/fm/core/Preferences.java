@@ -41,10 +41,9 @@ public abstract class Preferences {
 	
 	public static String getNameTypeLabel(int layoutType){		
 		switch(layoutType){
-			case 0:
-				return "Long Names";
 			case 1: 
-				return "ShortNames";
+				return "Short Names";
+			case 0:
 			default:
 				return "Long Names";
 		}	

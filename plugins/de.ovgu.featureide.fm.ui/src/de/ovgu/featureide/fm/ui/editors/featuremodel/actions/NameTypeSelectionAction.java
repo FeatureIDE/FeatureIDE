@@ -21,43 +21,37 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.IUndoContext;
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.Preferences;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.NameTypeSelectionOperation;
 
 /**
  * Action to select the layout for the feature model.
  */
 public class NameTypeSelectionAction extends Action {
-	
-	private final FeatureModel featureModel;
-	private int newNameType;
-	private int oldNameType;
 
-	public NameTypeSelectionAction(GraphicalViewerImpl viewer,
-			FeatureModel featureModel, int newNameType, int oldNameType) {
+	private final FeatureDiagramEditor editor;
+	private final int newNameType;
+
+	public NameTypeSelectionAction(FeatureDiagramEditor editor, FeatureModel featureModel, int newNameType) {
 		super(Preferences.getNameTypeLabel(newNameType));
 		this.newNameType = newNameType;
-		this.oldNameType = oldNameType;
-		this.featureModel = featureModel;
+		this.editor = editor;
 	}
 
 	@Override
 	public void run() {
-		NameTypeSelectionOperation op = new NameTypeSelectionOperation(featureModel, newNameType, oldNameType);
-		op.addContext((IUndoContext) featureModel.getUndoContext());
+		final NameTypeSelectionOperation op = new NameTypeSelectionOperation(editor, newNameType);
 		try {
-			PlatformUI.getWorkbench().getOperationSupport()
-				.getOperationHistory().execute(op, null, null);
+			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
-	}	
-	
+	}
+
 }

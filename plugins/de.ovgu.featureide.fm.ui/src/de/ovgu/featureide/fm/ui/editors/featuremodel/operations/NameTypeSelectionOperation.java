@@ -20,32 +20,55 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.operations.AbstractOperation;
+import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+
 import de.ovgu.featureide.fm.core.Preferences;
+import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 
 /**
  * Operation to select the layout for the feature model editor.
  */
-public class NameTypeSelectionOperation extends AbstractFeatureModelOperation {
+public class NameTypeSelectionOperation extends AbstractOperation {
 
-	private int newNameType;
-	private int oldNameType;
-	
-	public NameTypeSelectionOperation(FeatureModel featureModel, 
-			int newNameType, int oldNameType) {
-		super(featureModel, "Set "+newNameType);
+	private final FeatureDiagramEditor editor;
+	private final int newNameType;
+
+	private int oldNameType = -1;
+
+	public NameTypeSelectionOperation(FeatureDiagramEditor editor, int newNameType) {
+		super("Set " + newNameType);
+		this.editor = editor;
 		this.newNameType = newNameType;
-		this.oldNameType = oldNameType;
 	}
 
 	@Override
-	protected void redo() {
+	public IStatus execute(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
+		return redo(monitor, info);
+	}
+
+	@Override
+	public IStatus redo(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
+		oldNameType = Preferences.getDefaultFeatureNameScheme();
 		Preferences.setDefaultFeatureNameFormat(newNameType);
+		editor.reload();
+		editor.refresh();
+		return Status.OK_STATUS;
 	}
 
 	@Override
-	protected void undo() {
-		Preferences.setDefaultFeatureNameFormat(oldNameType);
+	public IStatus undo(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
+		if (oldNameType > -1) {
+			Preferences.setDefaultFeatureNameFormat(oldNameType);
+			oldNameType = -1;
+		}
+		editor.reload();
+		editor.refresh();
+		return Status.OK_STATUS;
 	}
-	
+
 }
