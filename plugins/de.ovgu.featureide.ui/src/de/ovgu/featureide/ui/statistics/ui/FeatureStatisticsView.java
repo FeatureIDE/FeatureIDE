@@ -41,6 +41,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.ide.ResourceUtil;
 import org.eclipse.ui.part.ViewPart;
+import org.eclipse.ui.progress.UIJob;
 
 import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -63,6 +64,9 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 	private ContentProvider contentProvider;
 	private IWorkbenchPart currentEditor;
 	
+
+	
+	
 	public static final String ID = UIPlugin.PLUGIN_ID + ".statistics.ui.FeatureStatisticsView";
 	
 	public static final Image EXPORT_IMG = FMUIPlugin.getImage("export_wiz.gif");
@@ -71,6 +75,7 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 	@Override
 	public void createPartControl(Composite parent) {
 		
+
 		viewer = new TreeViewer(parent);
 		contentProvider = new ContentProvider(viewer);
 		viewer.setContentProvider(contentProvider);
@@ -91,6 +96,7 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 	 * 
 	 */
 	private void addButtons() {
+		
 		Action checkBoxer = new Action() {
 			public void run() {
 				CheckBoxTreeViewDialog dial = new CheckBoxTreeViewDialog(viewer.getControl().getShell(), contentProvider.godfather, viewer);
@@ -102,6 +108,18 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 		toolBarManager.add(checkBoxer);
 		checkBoxer.setImageDescriptor(ImageDescriptor.createFromImage(EXPORT_IMG));
 		checkBoxer.setToolTipText("Export to *.csv");
+		
+		//-----------------
+		Action refresher = new Action() {
+			public void run() {
+				FeatureStatisticsView.this.refresh();
+			}
+		};
+		
+		toolBarManager.add(refresher);
+		refresher.setImageDescriptor(ImageDescriptor.createFromImage(REFRESH_IMG));
+		refresher.setToolTipText("Refresh View");
+		//---------------
 	}
 	
 	private IPartListener editorListener = new IPartListener() {
@@ -151,7 +169,9 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 	 * Refresh the view.
 	 */
 	private void refresh() {
+		System.out.println("Ich werde aufgerufen!!!! :) ");
 		if (contentProvider.isCanceled()) {
+			System.out.println("contentProvider is canceled");
 			return;
 		}
 		
@@ -163,6 +183,7 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				try {
+					System.out.println("run getryed");
 					if (job != null) {
 						if (contentProvider.isCanceled()) {
 							return Status.OK_STATUS;
@@ -175,14 +196,18 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 					FMUIPlugin.getDefault().logError(e);
 				}
 				
+				
 				job = new Job("Updating FeatureStatisticsView") {
 					@Override
 					protected IStatus run(IProgressMonitor monitor) {
 						if (currentEditor == null) {
 							contentProvider.defaultContent();
+							System.out.println("contentProvider default");
 						} else {
 							IResource anyFile = ResourceUtil.getResource(((IEditorPart) currentEditor).getEditorInput());
-							contentProvider.calculateContent(anyFile);
+							//TODO is refresh really necessary? -> true?
+							contentProvider.calculateContent(anyFile, true);
+							System.out.println("contentProvider calculate");
 						}
 						return Status.OK_STATUS;
 					}
@@ -195,6 +220,7 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 		waiter.setPriority(Job.DECORATE);
 		waiter.schedule();
 		cancelJobs();
+		System.out.println("Ich bin fresh");
 	}
 	
 	private void cancelJobs() {

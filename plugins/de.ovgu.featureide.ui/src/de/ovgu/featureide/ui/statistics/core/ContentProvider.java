@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.ui.statistics.core;
 
+import javax.swing.text.View;
+
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -76,7 +78,8 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 	
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-
+//		godfather = new Parent("godfather", null);
+		
 	}
 	
 	public ContentProvider(TreeViewer viewer) {
@@ -129,8 +132,14 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 	 */
 	public void calculateContent(IResource res) {
 		IFeatureProject newProject = CorePlugin.getFeatureProject(res);
-		boolean isEntirelyNewProject = project == null && newProject != null;
 		boolean hasChanged = newProject != null && project != null && !newProject.equals(project);
+		calculateContent(res, hasChanged);
+	}
+	
+	public void calculateContent(IResource res, boolean hasChanged) {
+		IFeatureProject newProject = CorePlugin.getFeatureProject(res);
+		boolean isEntirelyNewProject = project == null && newProject != null;
+		
 		if (isEntirelyNewProject || hasChanged) {
 			this.project = newProject;
 			addNodes();
