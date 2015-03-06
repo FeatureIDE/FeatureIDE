@@ -132,12 +132,13 @@ public class CollaborationView extends ViewPart implements GUIDefaults,
 	private static final String TOOL_TIP_LABEL = "Build collaborationmodel";
 
 	private static final String[] FIELD_METHOD_LABEL_NAMES = { "Fields with Refinements",
-			"Fields without Refinements","Methods with Refinements", "Methods without Refinements", "Show Method Contracts", "Show Class Invariants",
+			"Fields without Refinements","Methods with Refinements", "Methods without Refinements",
+			"Show Method Contracts", "Show Class Invariants","Show Nested Classes",
 			"Hide Parameters/Types", "Public", "Protected", "Default",
 			"Private", "Select All", "Deselect All", };
 
 	private static final Image[] FIELD_METHOD_IMAGES = { null, null, null, null, IMAGE_AT,
-			IMAGE_AT, null, IMAGE_METHODE_PUBLIC, IMAGE_METHODE_PROTECTED,
+			IMAGE_AT, null, null, IMAGE_METHODE_PUBLIC, IMAGE_METHODE_PROTECTED,
 			IMAGE_METHODE_DEFAULT, IMAGE_METHODE_PRIVATE, null, null };
 
 	private GraphicalViewerImpl viewer;
@@ -459,7 +460,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults,
 				setFieldsMethodsActions[i].setChecked(false);
 
 				if ((i == ShowFieldsMethodsAction.ONLY_INVARIANTS)
-						|| (i == ShowFieldsMethodsAction.PRIVATE_FIELDSMETHODS)
+						|| (i == ShowFieldsMethodsAction.SHOW_NESTED_CLASSES)
 						|| (i == ShowFieldsMethodsAction.HIDE_PARAMETERS_AND_TYPES)) {
 					methodsFieldsSubMenu.add(new Separator());
 				}
