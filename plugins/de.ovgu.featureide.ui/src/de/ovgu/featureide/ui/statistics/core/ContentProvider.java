@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.ui.statistics.core;
 
+import javax.swing.text.View;
+
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -76,7 +78,8 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 	
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-
+//		godfather = new Parent("godfather", null);
+		
 	}
 	
 	public ContentProvider(TreeViewer viewer) {
