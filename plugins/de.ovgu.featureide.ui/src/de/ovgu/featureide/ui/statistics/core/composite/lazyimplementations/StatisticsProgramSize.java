@@ -62,7 +62,7 @@ public class StatisticsProgramSize extends LazyParent {
 		HashMap<String, Integer> fieldMap = new HashMap<String, Integer>();
 		HashMap<String, Integer> classMap = new HashMap<String, Integer>();
 
-		ArrayList<FSTClassFragment> allNestedList = new ArrayList<FSTClassFragment>();
+		ArrayList<FSTClassFragment> allClassesList = new ArrayList<FSTClassFragment>();
 		int pointer = 0;
 
 		for (FSTClass class_ : fstModel.getClasses()) {
@@ -78,17 +78,14 @@ public class StatisticsProgramSize extends LazyParent {
 					addToMap(qualifier + method.getFullName(), methodMap);
 				for (FSTField field : classFragment.getFields())
 					addToMap(qualifier + field.getFullName(), fieldMap);
-				for (FSTClassFragment fragment : classFragment.getInnerClasses()) {
-					addToMap(fragment.getFullIdentifier(), classMap);
-				}
-				allNestedList.add(classFragment);
+				allClassesList.add(classFragment);
 				addToMap(qualifiedRoleName, classMap);
 			}
 		}
 
-		while (pointer < allNestedList.size()) {
-			for (FSTClassFragment fragment : allNestedList.get(pointer).getInnerClasses()) {
-				allNestedList.add(fragment);
+		while (pointer < allClassesList.size()) {
+			for (FSTClassFragment fragment : allClassesList.get(pointer).getInnerClasses()) {
+				allClassesList.add(fragment);
 
 				addToMap(fragment.getFullIdentifier(), classMap);
 
