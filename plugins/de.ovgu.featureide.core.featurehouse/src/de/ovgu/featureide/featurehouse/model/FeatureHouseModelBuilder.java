@@ -136,7 +136,9 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 		IFolder folder = featureProject.getSourceFolder();
 		for (String feature : featureProject.getFeatureModel().getConcreteFeatureNames()) {
 			IFolder featureFolder = folder.getFolder(feature);
-			addArbitraryFiles(featureFolder, feature);
+			if (featureFolder.isAccessible()) {
+				addArbitraryFiles(featureFolder, feature);
+			}
 		}
 	}
 
