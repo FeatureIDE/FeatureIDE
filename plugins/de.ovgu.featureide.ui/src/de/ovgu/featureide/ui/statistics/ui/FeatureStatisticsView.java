@@ -91,6 +91,7 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 	 * 
 	 */
 	private void addButtons() {
+		
 		Action checkBoxer = new Action() {
 			public void run() {
 				CheckBoxTreeViewDialog dial = new CheckBoxTreeViewDialog(viewer.getControl().getShell(), contentProvider.godfather, viewer);
@@ -102,6 +103,18 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 		toolBarManager.add(checkBoxer);
 		checkBoxer.setImageDescriptor(ImageDescriptor.createFromImage(EXPORT_IMG));
 		checkBoxer.setToolTipText("Export to *.csv");
+		
+		//-----------------
+		Action refresher = new Action() {
+			public void run() {
+				refresh();
+			}
+		};
+		
+		toolBarManager.add(refresher);
+		refresher.setImageDescriptor(ImageDescriptor.createFromImage(REFRESH_IMG));
+		refresher.setToolTipText("Refresh View");
+		//---------------
 	}
 	
 	private IPartListener editorListener = new IPartListener() {
