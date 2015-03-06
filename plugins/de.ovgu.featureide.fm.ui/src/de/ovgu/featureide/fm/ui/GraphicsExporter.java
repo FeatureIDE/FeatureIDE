@@ -38,6 +38,7 @@ import org.osgi.framework.Bundle;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslWriter;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GEFImageWriter;
 
@@ -68,7 +69,7 @@ public class GraphicsExporter {
 			new GuidslWriter(featureModel).writeToFile(file);
 			succ = true;
 		} else if (filePath.endsWith(".xml")) {
-			featureModelWriter.writeToFile(file);
+			new XmlFeatureModelWriter(featureModel).writeToFile(file);
 			succ = true;
 		} else {
 			return GraphicsExporter.exportAs(diagramEditor, file);
