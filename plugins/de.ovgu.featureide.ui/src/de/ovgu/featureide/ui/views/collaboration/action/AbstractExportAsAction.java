@@ -25,24 +25,18 @@ import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 
 /**
- * TODO description
+ * Abstract action for exporting content of a view.
  * 
- * @author Gï¿½nter Ulreich
+ * @author Günter Ulreich
  */
-public class ExportAsAction extends Action {
+public abstract class AbstractExportAsAction extends Action {
 
-	private final GraphicalViewerImpl viewer;
-	private ExportAsImplemenation impl;
+	protected final GraphicalViewerImpl viewer;
 	
-	public ExportAsAction(String text, GraphicalViewerImpl view,ExportAsImplemenation impl) {
+	public AbstractExportAsAction(String text, GraphicalViewerImpl view) {
 		super(text);
 		viewer = view;
 		setEnabled(true);
-		this.impl = impl;
-	}
-	
-	public void run() {
-		impl.export(viewer);
 	}
 
 }

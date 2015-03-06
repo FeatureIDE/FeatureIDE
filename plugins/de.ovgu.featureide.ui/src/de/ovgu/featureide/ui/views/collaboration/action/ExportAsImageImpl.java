@@ -29,13 +29,15 @@ import de.ovgu.featureide.fm.ui.GraphicsExporter;
  * 
  * @author Christopher Kruczek
  */
-public class ExportAsImageImpl implements ExportAsImplemenation {
-
+public class ExportAsImageImpl extends AbstractExportAsAction {
 	
-	@Override
-	public void export(GraphicalViewerImpl viewer) {
-		GraphicsExporter.exportAs(viewer);
+	public ExportAsImageImpl(String text, GraphicalViewerImpl view) {
+		super(text, view);
+	}
 
+	@Override
+	public void run() {
+		GraphicsExporter.exportAs(viewer);
 	}
 
 }
