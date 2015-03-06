@@ -63,18 +63,14 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 	private TreeViewer viewer;
 	private ContentProvider contentProvider;
 	private IWorkbenchPart currentEditor;
-	
 
-	
-	
 	public static final String ID = UIPlugin.PLUGIN_ID + ".statistics.ui.FeatureStatisticsView";
-	
+
 	public static final Image EXPORT_IMG = FMUIPlugin.getImage("export_wiz.gif");
 	public static final Image REFRESH_IMG = FMUIPlugin.getImage("refresh_tab.gif");
 
 	@Override
 	public void createPartControl(Composite parent) {
-		
 
 		viewer = new TreeViewer(parent);
 		contentProvider = new ContentProvider(viewer);
@@ -83,12 +79,11 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 		viewer.setInput(viewer);
 		viewer.addDoubleClickListener(new TreeClickListener(viewer));
 		ColumnViewerToolTipSupport.enableFor(viewer);
-		
+
 		getSite().getPage().addPartListener(editorListener);
 		IWorkbenchPage page = getSite().getPage();
 		setEditor(page.getActiveEditor());
-		
-		
+
 		addButtons();
 	}
 
@@ -96,49 +91,50 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 	 * 
 	 */
 	private void addButtons() {
-		
+
+		IToolBarManager toolBarManager = getViewSite().getActionBars().getToolBarManager();
+
 		Action checkBoxer = new Action() {
 			public void run() {
 				CheckBoxTreeViewDialog dial = new CheckBoxTreeViewDialog(viewer.getControl().getShell(), contentProvider.godfather, viewer);
 				dial.open();
 			}
 		};
-		
-		IToolBarManager toolBarManager = getViewSite().getActionBars().getToolBarManager();
-		toolBarManager.add(checkBoxer);
-		checkBoxer.setImageDescriptor(ImageDescriptor.createFromImage(EXPORT_IMG));
-		checkBoxer.setToolTipText("Export to *.csv");
-		
-		//-----------------
+
 		Action refresher = new Action() {
 			public void run() {
 				FeatureStatisticsView.this.refresh();
 			}
 		};
-		
+
 		toolBarManager.add(refresher);
 		refresher.setImageDescriptor(ImageDescriptor.createFromImage(REFRESH_IMG));
 		refresher.setToolTipText("Refresh View");
-		//---------------
+
+		toolBarManager.add(checkBoxer);
+		checkBoxer.setImageDescriptor(ImageDescriptor.createFromImage(EXPORT_IMG));
+		checkBoxer.setToolTipText("Export to *.csv");
 	}
-	
+
 	private IPartListener editorListener = new IPartListener() {
-		
-		public void partOpened(IWorkbenchPart part) {}
-		
-		public void partDeactivated(IWorkbenchPart part) {}
-		
+
+		public void partOpened(IWorkbenchPart part) {
+		}
+
+		public void partDeactivated(IWorkbenchPart part) {
+		}
+
 		public void partClosed(IWorkbenchPart part) {
 			if (part == currentEditor) {
 				setEditor(null);
 			}
 		}
-		
+
 		public void partBroughtToTop(IWorkbenchPart part) {
 			if (part instanceof IEditorPart)
 				setEditor(part);
 		}
-		
+
 		public void partActivated(IWorkbenchPart part) {
 			if (part instanceof IEditorPart) {
 				ResourceUtil.getResource(((IEditorPart) part).getEditorInput());
@@ -146,12 +142,12 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 			}
 		}
 	};
-	
+
 	@Override
 	public void setFocus() {
 		viewer.getControl().setFocus();
 	}
-	
+
 	/**
 	 * Listener that refreshes the view every time the model has been edited.
 	 */
@@ -160,21 +156,19 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 			if (!PropertyConstants.MODEL_LAYOUT_CHANGED.equals(evt.getPropertyName()))
 				refresh();
 		}
-		
+
 	};
-	
+
 	private Job job = null;
-	
+
 	/**
 	 * Refresh the view.
 	 */
 	private void refresh() {
-		System.out.println("Ich werde aufgerufen!!!! :) ");
 		if (contentProvider.isCanceled()) {
-			System.out.println("contentProvider is canceled");
 			return;
 		}
-		
+
 		/*
 		 * This job waits for the calculation job to finish and starts
 		 * immediately a new one
@@ -183,7 +177,6 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				try {
-					System.out.println("run getryed");
 					if (job != null) {
 						if (contentProvider.isCanceled()) {
 							return Status.OK_STATUS;
@@ -195,19 +188,16 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 				} catch (InterruptedException e) {
 					FMUIPlugin.getDefault().logError(e);
 				}
-				
-				
+
 				job = new Job("Updating FeatureStatisticsView") {
 					@Override
 					protected IStatus run(IProgressMonitor monitor) {
 						if (currentEditor == null) {
 							contentProvider.defaultContent();
-							System.out.println("contentProvider default");
 						} else {
 							IResource anyFile = ResourceUtil.getResource(((IEditorPart) currentEditor).getEditorInput());
 							//TODO is refresh really necessary? -> true?
 							contentProvider.calculateContent(anyFile, true);
-							System.out.println("contentProvider calculate");
 						}
 						return Status.OK_STATUS;
 					}
@@ -220,20 +210,19 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 		waiter.setPriority(Job.DECORATE);
 		waiter.schedule();
 		cancelJobs();
-		System.out.println("Ich bin fresh");
 	}
-	
+
 	private void cancelJobs() {
 		JobDoneListener jobListener = JobDoneListener.getInstance();
 		if (jobListener != null) {
 			jobListener.cancelAllRunningTreeJobs();
 		}
 	}
-	
+
 	public TreeViewer getViewer() {
 		return viewer;
 	}
-	
+
 	/**
 	 * Watches changes in the feature model if the selected editor is an
 	 * instance of @{link FeatureModelEditor}
@@ -243,12 +232,12 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 			if (currentEditor == activeEditor) {
 				return;
 			}
-			
+
 			if (currentEditor instanceof FeatureModelEditor) {
 				((FeatureModelEditor) currentEditor).getFeatureModel().removeListener(modelListener);
 			}
 		}
-		
+
 		currentEditor = activeEditor;
 		if (activeEditor instanceof FeatureModelEditor) {
 			((FeatureModelEditor) currentEditor).getFeatureModel().addListener(modelListener);
