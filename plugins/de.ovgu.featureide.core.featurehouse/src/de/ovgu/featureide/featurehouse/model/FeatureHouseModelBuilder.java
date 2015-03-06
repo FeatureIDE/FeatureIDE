@@ -202,7 +202,9 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 						classBuilder.caseClassDeclarationType(terminal);
 					} else if (JAVA_NODE_MODIFIERS.equals(type)) {
 						classBuilder.caseModifiers(terminal);
-						classFragmentStack.peek().setJavaDocComment(JavaClassBuilder.findJavaDocComments(terminal));
+						if (classFragmentStack.peek() != null) {
+							classFragmentStack.peek().setJavaDocComment(JavaClassBuilder.findJavaDocComments(terminal));
+						}
 					} else if (JAVA_NODE_EXTENDSLIST.equals(type)) {
 						classBuilder.caseExtendsList(terminal);
 					} else if (JAVA_NODE_IMPLEMENTATIONLIST.equals(type)) {
@@ -246,8 +248,10 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 						final String className = name.substring(name.lastIndexOf(File.separator) + 1);
 
 						final FSTClassFragment newFragment = new FSTClassFragment(className);
-						newFragment.setRole(classFragmentStack.peek().getRole());
-						newFragment.setInnerClass(true);
+						if (classFragmentStack.peek() != null) {
+							newFragment.setRole(classFragmentStack.peek().getRole());
+							newFragment.setInnerClass(true);
+						}
 						classFragmentStack.push(newFragment);
 					} else {
 						classFragmentStack.push(classFragmentStack.peek());
@@ -258,8 +262,11 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 			
 			if (!classFragmentStack.isEmpty()) {
 				final FSTClassFragment lastElement = classFragmentStack.pop();
-				if (lastElement.isInnerClass()) {
-					classFragmentStack.peek().add(lastElement);
+				if (lastElement != null) {
+					final FSTClassFragment nextElement = classFragmentStack.peek();
+					if (lastElement.isInnerClass() && nextElement != null  && !lastElement.equals(nextElement)) {
+						classFragmentStack.peek().add(lastElement);
+					}
 				}
 			}
 		}
@@ -278,4 +285,5 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 				+ projectName.length() + 1);
 		return featureProject.getProject().getFile(new Path(name));
 	}
+	
 }
