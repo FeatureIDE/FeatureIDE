@@ -112,10 +112,7 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 		//-----------------
 		Action refresher = new Action() {
 			public void run() {
-				viewer.refresh();
-				
-			
-				
+				FeatureStatisticsView.this.refresh();
 			}
 		};
 		
@@ -124,21 +121,6 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 		refresher.setToolTipText("Refresh View");
 		//---------------
 	}
-	
-	//---------------
-//	private void refreshViewer() {
-//		UIJob job = new UIJob("Refresh export dialog") {
-//
-//			@Override
-//			public IStatus runInUIThread(IProgressMonitor monitor) {
-//				viewer.refresh();
-//				return Status.OK_STATUS;
-//			}
-//		};
-//		job.setPriority(Job.INTERACTIVE);
-//		job.schedule();
-//	}
-	//-----------------
 	
 	private IPartListener editorListener = new IPartListener() {
 		
@@ -223,7 +205,8 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 							System.out.println("contentProvider default");
 						} else {
 							IResource anyFile = ResourceUtil.getResource(((IEditorPart) currentEditor).getEditorInput());
-							contentProvider.calculateContent(anyFile);
+							//TODO is refresh really necessary? -> true?
+							contentProvider.calculateContent(anyFile, true);
 							System.out.println("contentProvider calculate");
 						}
 						return Status.OK_STATUS;
