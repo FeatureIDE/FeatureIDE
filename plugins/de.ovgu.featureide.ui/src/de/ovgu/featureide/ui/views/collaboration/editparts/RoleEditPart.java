@@ -43,6 +43,7 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.core.fstmodel.FSTClassFragment;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTInvariant;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
@@ -187,6 +188,17 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 							return;
 						}
 					}
+			//edit doesn't seem to have any impact...
+					/*TreeSet<FSTClassFragment> innerClasses = this.getRoleModel().getInnerClasses();
+					for (FSTClassFragment fstInnerClass : innerClasses) {
+						if (fstInnerClass.getFullName().equals(label.getElementName())) {
+							editor = openEditor(file);
+							if (editor != null) {
+								Outline.scrollToLine(editor,fstInnerClass.getLine());
+							}
+							return;
+						}
+					}*/
 					
 					TreeSet<FSTMethod> methods = this.getRoleModel().getClassFragment().getMethods();
 					for (FSTMethod fstMethod : methods) {

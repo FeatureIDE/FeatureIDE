@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.core.fstmodel;
 
+import java.util.LinkedList;
 import java.util.TreeSet;
 
 import javax.annotation.Nonnull;
@@ -74,7 +75,7 @@ public class FSTRole {
 	public FSTClassFragment getClassFragment() {
 		return classFragment;
 	}
-	
+
 	@Nonnull
 	public TreeSet<FSTField> getFields() {
 		return classFragment.getFields();
@@ -84,12 +85,12 @@ public class FSTRole {
 	public TreeSet<FSTInvariant> getInvariants() {
 		return classFragment.getInvariants();
 	}
-	
+
 	@Nonnull
 	public TreeSet<FSTMethod> getMethods() {
 		return classFragment.getMethods();
 	}
-	
+
 	@Nonnull
 	public TreeSet<FSTClassFragment> getInnerClasses() {
 		return classFragment.getInnerClasses();
@@ -99,6 +100,64 @@ public class FSTRole {
 	public TreeSet<FSTDirective> getDirectives() {
 		return directives;
 	}
+
+	//edit
+
+	public void getAllFieldsRec(LinkedList<FSTField> fields, FSTClassFragment innerClass) {
+		fields.addAll(innerClass.getFields());
+		if (innerClass.getInnerClasses() != null) {
+			for (FSTClassFragment i : innerClass.getInnerClasses()) {
+				//				fields.addAll(i.getFields());
+				getAllFieldsRec(fields, i);
+			}
+		}
+
+	}
+
+	public LinkedList<FSTField> getAllFields() { //working title
+		LinkedList<FSTField> allFields = new LinkedList<FSTField>();
+		getAllFieldsRec(allFields, this.getClassFragment());
+		return allFields;
+
+	}
+	
+	public LinkedList<FSTMethod> getAllMethods() { //working title
+		LinkedList<FSTMethod> allMethods = new LinkedList<FSTMethod>();
+		getAllMethodsRec(allMethods, this.getClassFragment());
+		return allMethods;
+
+	}
+	
+	public void getAllMethodsRec(LinkedList<FSTMethod> methods, FSTClassFragment innerClass) {
+		methods.addAll(innerClass.getMethods());
+		if (innerClass.getInnerClasses() != null) {
+			for (FSTClassFragment i : innerClass.getInnerClasses()) {
+				//				fields.addAll(i.getFields());
+				getAllMethodsRec(methods, i);
+			}
+		}
+
+	}
+	
+	public LinkedList<FSTClassFragment> getAllInnerClasses() { //working title
+		LinkedList<FSTClassFragment> allInnerClasses = new LinkedList<FSTClassFragment>();
+		getAllInnerClassesRec(allInnerClasses, this.getClassFragment());
+		return allInnerClasses;
+
+	}
+	
+	public void getAllInnerClassesRec(LinkedList<FSTClassFragment> fragment, FSTClassFragment innerClass) {
+		fragment.addAll(innerClass.getInnerClasses());
+		if (innerClass.getInnerClasses() != null) {
+			for (FSTClassFragment i : innerClass.getInnerClasses()) {
+				//				fields.addAll(i.getFields());
+				getAllInnerClassesRec(fragment, i);
+			}
+		}
+
+	}
+	
+	
 
 	@Override
 	public String toString() {

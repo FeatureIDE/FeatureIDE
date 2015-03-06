@@ -77,6 +77,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.fstmodel.FSTClassFragment;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTInvariant;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
@@ -204,7 +205,15 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 					r = invariant.getRole();
 				} else  if (selection instanceof FSTDirective) {
 					fileAlreadyOpen = true;
-				} else {
+		//edit			
+				} else  if (selection instanceof FSTClassFragment)
+				{
+					FSTClassFragment innerClass = ((FSTClassFragment)selection);
+					fileAlreadyOpen = innerClass.getFile().getName().equals(iFile.getName()) && (getClassFragmentLine(iFile, innerClass) > 0);
+					r=innerClass.getRole();
+				}
+				
+				else {
 					return;
 				}
 				if (!fileAlreadyOpen && r.getFile().isAccessible()) {
@@ -261,7 +270,15 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 					int line = getInvariantLine(iFile, inv);
 					if (line != -1)
 						scrollToLine(active_editor, line);
-				} else if (selection instanceof FSTDirective) {
+   //edit					
+				}else if (selection instanceof FSTClassFragment){
+					FSTClassFragment cf = (FSTClassFragment) selection;
+					int line = getClassFragmentLine(iFile, cf);
+					if(line != -1)
+						scrollToLine(active_editor, line);
+				}
+				
+				else if (selection instanceof FSTDirective) {
 					FSTDirective directive = (FSTDirective) selection;
 					scrollToLine(active_editor, directive.getStartLine(), directive.getEndLine(), 
 							directive.getStartOffset(), directive.getEndLength());
@@ -274,7 +291,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 		private int getFieldLine(IFile iFile, FSTField field) {
 			for (FSTRole r : field.getRole().getFSTClass().getRoles()) {
 				if (r.getFile().equals(iFile)) {
-					for (FSTField f : r.getClassFragment().getFields()) {
+					for (FSTField f : r.getAllFields()) {
 						if (f.compareTo(field)==0) {
 							return f.getLine();
 						}
@@ -296,11 +313,24 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 			}
 			return -1;
 		}
+ //edit
+		private int getClassFragmentLine(IFile iFile, FSTClassFragment cf){
+			for(FSTRole r: cf.getRole().getFSTClass().getRoles()){
+				if(r.getFile().equals(iFile)){
+					for(FSTClassFragment i: r.getAllInnerClasses()){
+						if(i.compareTo(cf)==0){
+							return i.getLine();
+						}
+					}
+				}
+			}
+			return -1;
+		}
 
 		private int getMethodLine(IFile iFile, FSTMethod meth) {
 			for (FSTRole r : meth.getRole().getFSTClass().getRoles()) {
 				if (r.getFile().equals(iFile)) {
-					for (FSTMethod m : r.getClassFragment().getMethods()) {
+					for (FSTMethod m : r.getAllMethods()) {
 						if (m.compareTo(meth)==0) {
 							return m.getLine();
 						}
