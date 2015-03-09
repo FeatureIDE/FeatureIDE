@@ -281,11 +281,11 @@ public class RoleFigure extends Figure implements GUIDefaults {
 
 			String nestedClassesTooltip = "";
 			if (shouldShowNestedClasses()) {
-				nestedClassesTooltip = getFieldForInnerClass();
+				getFieldForInnerClass(tooltipContent);
 			}
-			if (nestedClassesTooltip.length() > 0) {
-				tooltipContent.add(new Label(nestedClassesTooltip));
-			}
+//			if (nestedClassesTooltip.length() > 0) {
+//				tooltipContent.add(new Label(nestedClassesTooltip));
+//			}
 
 			// draw separation line between fields and methods
 			// TODO: Seperation line between inner classes, fields and methods
@@ -304,13 +304,10 @@ public class RoleFigure extends Figure implements GUIDefaults {
 		}
 		setToolTip(tooltipContent);
 	}
+	
+	// returns tooltip and creates content for nested classes
+	private void getFieldForInnerClass(Figure tooltipContent) {
 
-	// returns tooltip
-	private String getFieldForInnerClass() {
-		CompartmentFigure methodFigure = new CompartmentFigure();
-		Label label = new Label(role.getFeature() + " ", IMAGE_FEATURE);
-
-		methodFigure.add(label);
 		int innerFields = 0;
 		int innerMethods = 0;
 
@@ -318,14 +315,27 @@ public class RoleFigure extends Figure implements GUIDefaults {
 		role.getAllInnerClasses().toArray(allInnerClasses);
 
 		for (FSTClassFragment currentInnerClass : allInnerClasses) {
-			addLabel(createNestedClassLabel(currentInnerClass));
+
+			// create tooltip for class
+			CompartmentFigure methodFigure = new CompartmentFigure();
+			Label label = new Label(currentInnerClass.getFullName() + " ", IMAGE_CLASS);
+			tooltipContent.add(label);
+			
+			// create tooltip for feature
+		//	CompartmentFigure methodFigure = new CompartmentFigure();
+			label = new Label(currentInnerClass.getRole().getFeature() + " ", IMAGE_FEATURE);
+			tooltipContent.add(label);
+			methodFigure.add(label);
+			tooltipContent.add(methodFigure);
+			
+			addLabel(createNestedClassLabel(currentInnerClass));			
 			innerFields += getFieldsForInnerClass(currentInnerClass);
 			innerMethods += getMethodsForInnerClass(currentInnerClass);
 		}
-		if (allInnerClasses.length > 0) {
+		/*if (allInnerClasses.length > 0) {
 			return "Nested Classes: " + allInnerClasses.length + " Fields: " + innerFields + " Methods: " + innerMethods;
 		}
-		return "";
+		return "";*/
 	}
 
 	private int getFieldsForInnerClass(FSTClassFragment innerClassFragment) {
@@ -471,6 +481,21 @@ public class RoleFigure extends Figure implements GUIDefaults {
 
 	private String getClassName() {
 		return role.getClassFragment().getName().split("[.]")[0];
+	}
+	
+	// create label for nested class
+	private Label createNestedClassLabel(FSTClassFragment classFragment) {
+		String name = classFragment.getFullIdentifier();
+		if (showOnlyNames()) {
+			name += classFragment.getName();
+		} else {
+			name += classFragment.getFullName();
+		}
+
+		Label classLabel = new RoleFigureLabel(name, classFragment.getFullName());
+		classLabel.setForegroundColor(ROLE_FOREGROUND_UNSELECTED);
+
+		return classLabel;
 	}
 
 	private int getCountForFieldContentCreate(Figure tooltipContent) {
@@ -730,21 +755,6 @@ public class RoleFigure extends Figure implements GUIDefaults {
 		else
 			fieldLabel.setIcon(IMAGE_FIELD_DEFAULT);
 		return fieldLabel;
-	}
-
-	// create label for nested class
-	private Label createNestedClassLabel(FSTClassFragment classFragment) {
-		String name = classFragment.getFullIdentifier();
-		if (showOnlyNames()) {
-			name += classFragment.getName();
-		} else {
-			name += classFragment.getFullName();
-		}
-
-		Label classLabel = new RoleFigureLabel(name, classFragment.getFullName());
-		classLabel.setForegroundColor(ROLE_FOREGROUND_UNSELECTED);
-
-		return classLabel;
 	}
 
 	private String getParentNames(IResource file) {
