@@ -171,6 +171,7 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 						{
 							editor = openEditor(file);
 							if (editor != null) {
+								// TODO: Outline Support
 								Outline.scrollToLine(editor,invariant.getLine());
 							}
 							return;
