@@ -219,6 +219,8 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 		}
 	}
 
+
+	
 	public TreeViewer getViewer() {
 		return viewer;
 	}
