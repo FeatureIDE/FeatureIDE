@@ -156,28 +156,8 @@ public class FSTRole {
 		}
 
 	}
-	
-//	
-//	// get all nested classes of all nested classes
-//	public LinkedList<LinkedList<FSTClassFragment>> getAllInnerClassesNested() {
-//		LinkedList<LinkedList<FSTClassFragment>> allInnerClasses = new LinkedList<LinkedList<FSTClassFragment>>();
-//		getAllInnerClassesNestedRec(allInnerClasses, this.getClassFragment());
-//		return allInnerClasses;
-//
-//	}
-//
-//	private void getAllInnerClassesNestedRec(LinkedList<LinkedList<FSTClassFragment>> fragment, FSTClassFragment innerClass) {
-//		fragment.add(new LinkedList<FSTClassFragment>(innerClass.getInnerClasses()));
-//		
-//		
-//		if (innerClass.getInnerClasses() != null) {
-//			for (FSTClassFragment i : innerClass.getInnerClasses()) {
-//				getAllInnerClassesRec(fragment, i);
-//			}
-//		}
-//
-//	}
-	
+
+//get list of all nested classes shared by multiple features
 	public LinkedList<FSTClassFragment> getAllEqualFSTFragments(FSTClassFragment fragment){
 		LinkedList<FSTClassFragment> frag = new LinkedList<FSTClassFragment>();
 		frag.add(fragment);

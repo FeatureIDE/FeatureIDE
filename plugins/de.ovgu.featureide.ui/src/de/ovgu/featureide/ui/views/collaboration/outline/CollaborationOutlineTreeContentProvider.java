@@ -112,10 +112,7 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 				fields.addAll(role.getFields());
 				directives.addAll(role.getDirectives());
 				innerClasses.addAll(role.getInnerClasses());
-			}
-			
-			
-//			
+			}			
 
 			final IRoleElement[] obj = new IRoleElement[methods.size() + fields.size() + invariants.size() + directives.size() + innerClasses.size()];
 			int pos = 0;
