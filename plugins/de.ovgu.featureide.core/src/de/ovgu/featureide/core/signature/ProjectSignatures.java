@@ -32,7 +32,7 @@ import de.ovgu.featureide.core.signature.abstr.AbstractFieldSignature;
 import de.ovgu.featureide.core.signature.abstr.AbstractMethodSignature;
 import de.ovgu.featureide.core.signature.abstr.AbstractSignature;
 import de.ovgu.featureide.core.signature.abstr.AbstractSignature.FeatureData;
-import de.ovgu.featureide.core.signature.filter.ISignatureFilter;
+import de.ovgu.featureide.core.signature.filter.IFilter;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
@@ -43,18 +43,22 @@ import de.ovgu.featureide.fm.core.FeatureModel;
  */
 public class ProjectSignatures implements Iterable<AbstractSignature> {
 	
-	public final class SignatureIterator implements Iterator<AbstractSignature> {
-		private final LinkedList<ISignatureFilter> filter = new LinkedList<ISignatureFilter>();
+	public static final class SignatureIterator implements Iterator<AbstractSignature> {
+		private final AbstractSignature[] signatureArray;
+		
+		private final LinkedList<IFilter<AbstractSignature>> filter = new LinkedList<>();
 		private int count = 0;
 		private boolean nextAvailable = false;
 		
-		public SignatureIterator(ISignatureFilter... filter) {
-			for (int i = 0; i < filter.length; i++) {
-				addFilter(filter[i]);
-			}
+		public SignatureIterator() {
+			signatureArray = new AbstractSignature[0];
 		}
 		
-		public void addFilter(ISignatureFilter filter) {
+		private SignatureIterator(AbstractSignature[] signatureArray) {
+			this.signatureArray = signatureArray;
+		}
+		
+		public void addFilter(IFilter<AbstractSignature> filter) {
 			this.filter.add(filter);
 		}
 		
@@ -83,7 +87,7 @@ public class ProjectSignatures implements Iterable<AbstractSignature> {
 		}
 		
 		private boolean isValid(AbstractSignature sig) {
-			for (ISignatureFilter curFilter : filter) {
+			for (IFilter<AbstractSignature> curFilter : filter) {
 				if (!curFilter.isValid(sig)) {
 					return false;
 				}
@@ -134,11 +138,16 @@ public class ProjectSignatures implements Iterable<AbstractSignature> {
 	
 	@Override
 	public SignatureIterator iterator() {
-		return new SignatureIterator();
+		return new SignatureIterator(signatureArray);
 	}
 	
-	public SignatureIterator iterator(ISignatureFilter... filter) {
-		return new SignatureIterator(filter);
+	@SuppressWarnings("unchecked")
+	public SignatureIterator iterator(IFilter<AbstractSignature>... filter) {
+		final SignatureIterator it = new SignatureIterator(signatureArray);
+		for (IFilter<AbstractSignature> iFilter : filter) {
+			it.addFilter(iFilter);
+		}
+		return it;
 	}
 	
 	public int[] getFeatureIDs(Collection<String> featureNames) {

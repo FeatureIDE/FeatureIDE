@@ -18,32 +18,9 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.core.mpl.signature.documentation.base;
+package de.ovgu.featureide.core.signature.filter;
 
-import java.util.Collections;
-import java.util.List;
 
-import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.signature.filter.IFilter;
-
-/**
- * Abstract merger for modul-comment.
- * 
- * @author Sebastian Krieter
- */
-public abstract class ADocumentationCommentCollector<T> {
-	
-	protected final IFeatureProject featureProject;
-	protected int[] featureList;
-	
-	public ADocumentationCommentCollector(IFeatureProject featureProject) {
-		this.featureProject = featureProject;
-	}
-
-	public abstract List<SignatureCommentPair<T>> collect(List<IFilter<T>> filter);
-	
-	public List<SignatureCommentPair<T>> collect() {
-		return collect(Collections.<IFilter<T>>emptyList());
-	}
-	
+public interface IFilter<T> {
+	public boolean isValid(T signature);
 }

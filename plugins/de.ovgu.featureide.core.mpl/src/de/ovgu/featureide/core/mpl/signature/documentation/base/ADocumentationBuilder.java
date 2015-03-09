@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.core.mpl.signature.documentation.base;
 
-import java.util.Iterator;
 import java.util.List;
 
 import de.ovgu.featureide.core.IFeatureProject;
@@ -40,12 +39,11 @@ public abstract class ADocumentationBuilder<T> {
 	}
 	
 	public final void build(ADocumentationCommentMerger merger) {
-		final Iterator<SignatureCommentPair<T>> it = getCollector(featureProject).collect();
+		final List<SignatureCommentPair<T>> list = getCollector(featureProject).collect();
 
 		final ADocumentationCommentParser parser = getParser();
 		
-		while (it.hasNext()) {
-			SignatureCommentPair<T> pair = it.next();
+		for (SignatureCommentPair<T> pair : list) {
 			// parse
 			parser.parse(pair.getComment());
 			

@@ -22,6 +22,5 @@ package de.ovgu.featureide.core.signature.filter;
 
 import de.ovgu.featureide.core.signature.abstr.AbstractSignature;
 
-public interface ISignatureFilter {
-	public boolean isValid(AbstractSignature signature);
+public interface ISignatureFilter extends IFilter<AbstractSignature> {
 }
