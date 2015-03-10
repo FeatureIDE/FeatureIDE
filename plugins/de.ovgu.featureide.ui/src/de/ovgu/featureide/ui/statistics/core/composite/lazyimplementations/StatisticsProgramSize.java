@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import de.ovgu.featureide.core.fstmodel.FSTClass;
@@ -31,7 +30,6 @@ import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.genericdatatypes.HashMapNode;
-import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.genericdatatypes.MyHashNode;
 
 /**
  * TreeNode who stores the number of classes, roles, fields and methods of a
@@ -62,51 +60,39 @@ public class StatisticsProgramSize extends LazyParent {
 		HashMap<String, Integer> methodMap = new HashMap<String, Integer>();
 		HashMap<String, Integer> fieldMap = new HashMap<String, Integer>();
 		HashMap<String, Integer> classMap = new HashMap<String, Integer>();
-		
-		ArrayList<Object> listOfClasses = new ArrayList<Object>();
-		ArrayList<Object> listOfRoles = new ArrayList<Object>();
-		
-		
-		ArrayList<FSTClassFragment> ourAllClassesList = new ArrayList<FSTClassFragment>();
-		int pointer = 0;
 
 		for (FSTClass class_ : fstModel.getClasses()) {
 			for (FSTRole role : class_.getRoles()) {
-				listOfRoles.add(role);
 				FSTClassFragment classFragment = role.getClassFragment();
 				String packageName = classFragment.getPackage();
-				String qualifiedPackageName = (packageName == null) ? "(default package)" : packageName;
-				String roleName = classFragment.getName().endsWith(".java") ? classFragment.getName().substring(0, classFragment.getName().length() - 5)
+				String qualifiedPackageName = (packageName == null) ? "(default package)"
+						: packageName;
+
+				String roleName = classFragment.getName().endsWith(".java") ? classFragment
+						.getName().substring(0, classFragment.getName().length() - 5)
 						: classFragment.getName();
-				String qualifiedRoleName = qualifiedPackageName + "." + roleName.substring(roleName.lastIndexOf('/') + 1);
+				String qualifiedRoleName = qualifiedPackageName + "."
+						+ roleName;
+
+				String qualifier = qualifiedRoleName + ".";
+
 				for (FSTMethod method : classFragment.getMethods())
-					addToMap(method.getFullIdentifier(), methodMap);
+					addToMap(qualifier + method.getFullName(), methodMap);
 				for (FSTField field : classFragment.getFields())
-					addToMap(field.getFullIdentifier(), fieldMap);
-				ourAllClassesList.add(classFragment);
-				//addToMap(qualifiedRoleName, classMap);
+					addToMap(qualifier + field.getFullName(), fieldMap);
+				addToMap(qualifiedRoleName, classMap);
 			}
-			listOfClasses.add(class_);
 		}
-
-		while (pointer < ourAllClassesList.size()) {
-			for (FSTClassFragment fragment : ourAllClassesList.get(pointer).getInnerClasses()) {
-				ourAllClassesList.add(fragment);
-				listOfClasses.add(fragment);
-				//addToMap(fragment.getFullIdentifier(), classMap);
-
-				for (FSTMethod method : fragment.getMethods())
-					addToMap(fragment.getFullIdentifier() + "." + method.getFullName(), methodMap);
-
-				for (FSTField field : fragment.getFields())
-					addToMap(fragment.getFullIdentifier() + "." + field.getFullName(), fieldMap);
-			}
-			pointer++;
-		}																																	//	TODO:	FALSCH
-		addChild(new MyHashNode(NUMBER_CLASS + SEPARATOR + /*(classMap.keySet().size())*/ listOfClasses.size() + " | " + NUMBER_ROLE + SEPARATOR + listOfRoles.size(), listOfClasses));
-
-//		addChild(new HashMapNode(NUMBER_FIELD_U + SEPARATOR + fieldMap.keySet().size() + " | " + NUMBER_FIELD + SEPARATOR + sum(fieldMap), fieldMap));
-//		addChild(new HashMapNode(NUMBER_METHOD_U + SEPARATOR + methodMap.keySet().size() + " | " + NUMBER_METHOD + SEPARATOR + sum(methodMap), null, methodMap));
+		
+		addChild(new HashMapNode(NUMBER_CLASS + SEPARATOR
+				+ classMap.keySet().size() + " | " + NUMBER_ROLE + SEPARATOR
+				+ sum(classMap), null, classMap));
+		addChild(new HashMapNode(NUMBER_FIELD_U + SEPARATOR
+				+ fieldMap.keySet().size() + " | " + NUMBER_FIELD + SEPARATOR
+				+ sum(fieldMap), null, fieldMap));
+		addChild(new HashMapNode(NUMBER_METHOD_U + SEPARATOR
+				+ methodMap.keySet().size() + " | " + NUMBER_METHOD + SEPARATOR
+				+ sum(methodMap), null, methodMap));
 	}
 
 	private void addToMap(String name, HashMap<String, Integer> map) {

@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.core.fstmodel;
 
+import java.awt.List;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -70,6 +71,25 @@ public class FSTClass {
 	@Override
 	public String toString() {
 		return name;
+	}
+	
+	
+	public LinkedList<LinkedList<FSTClassFragment>> getAllFSTFragments(){
+		LinkedList<LinkedList<FSTClassFragment>> allFrags = new LinkedList<LinkedList<FSTClassFragment>>();
+		LinkedList<FSTClassFragment> helper = new LinkedList<FSTClassFragment>();
+		
+		for (FSTRole currRole : getRoles()) {
+			LinkedList<FSTClassFragment> allFragsOfRole = currRole.getAllInnerClasses();
+			for (FSTClassFragment fstClassFragment : allFragsOfRole) {
+				if(!helper.contains(fstClassFragment)){
+					LinkedList<FSTClassFragment> currList = currRole.getAllEqualFSTFragments(fstClassFragment);
+					allFrags.add(currList);
+					helper.addAll(currList);
+				}
+			}			
+		}
+		
+		return allFrags;
 	}
 	
 }

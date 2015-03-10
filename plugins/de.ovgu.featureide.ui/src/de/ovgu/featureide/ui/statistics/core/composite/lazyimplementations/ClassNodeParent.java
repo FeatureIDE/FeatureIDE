@@ -18,53 +18,41 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.genericdatatypes;
-
-import java.util.ArrayList;
-import java.util.LinkedList;
+package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
 import de.ovgu.featureide.core.fstmodel.FSTClass;
-import de.ovgu.featureide.core.fstmodel.FSTRole;
-import de.ovgu.featureide.ui.statistics.core.composite.Parent;
+import de.ovgu.featureide.core.fstmodel.FSTClassFragment;
+import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 
 /**
  * TODO description
  * 
  * @author Schleicher Miro
  */
-public class MyHashNode extends AbstractSortModeNode {
+public class ClassNodeParent extends LazyParent {
+
+	 FSTClass fstClass;
+	 FSTClassFragment fstClassFrag;
 	
-	private ArrayList<Object> list;
+	public ClassNodeParent(String descString, FSTClass fstClass){
+		super(descString, fstClass.getRoles().size());
+		this.fstClass = fstClass;
+	}
 	
-	/**
-	 * @param description
-	 * @param value
-	 * @param countMap
+	public ClassNodeParent(String descString, FSTClassFragment fstClass){
+		super(descString);
+		//bestimmen
+//		this.setValue(null);
+		this.fstClassFrag = fstClassFrag;
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.ui.statistics.core.composite.LazyParent#initChildren()
 	 */
-	public MyHashNode(String description,  ArrayList<Object> list) {
-		super(description, null);
-		this.list = list;
-		setSorted(true);
+	@Override
+	protected void initChildren() {
+		
+		
 	}
 
-	@Override
-	public void initChildren() {		
-		if (this.children.isEmpty())
-		{
-			for (Object name : list) 
-			{
-				if(name instanceof FSTClass ){
-					Parent p = new Parent(name.toString().replaceAll("/", "."), "");
-				
-					LinkedList<FSTRole> roles = ((FSTClass)name).getRoles();
-					for (FSTRole fstRole : roles) {
-						p.addChild(new Parent(fstRole.getFeature().getName().replaceAll("/", "."), fstRole));		
-					}
-					addChild(p);
-				}
-						
-			}
-		}
-	}
-	
 }

@@ -83,7 +83,6 @@ public class TreeClickListener implements IDoubleClickListener {
 	public TreeClickListener(TreeViewer view) {
 		super();
 		this.view = view;
-//		this.viewer = view;
 	}
 
 	/**
@@ -95,18 +94,15 @@ public class TreeClickListener implements IDoubleClickListener {
 	@Override
 	public void doubleClick(DoubleClickEvent event) {
 		Object[] selectedObjects = ((TreeSelection) event.getSelection()).toArray();
-		
-		if(selectedObjects.length == 1 && selectedObjects[0] instanceof Parent && ((Parent) selectedObjects[0]).getValue() instanceof FSTRole){
-			FSTRole role = (FSTRole)((Parent) selectedObjects[0]).getValue();
+
+		if (selectedObjects.length == 1 && selectedObjects[0] instanceof Parent && ((Parent) selectedObjects[0]).getValue() instanceof FSTRole) {
+			FSTRole role = (FSTRole) ((Parent) selectedObjects[0]).getValue();
 			IFile file = role.getFile();
-			System.out.println();
 		}
-		
-		
+
 		for (Object selected : selectedObjects) {
 			if (selected instanceof ConfigParentNode.ConfigNode) {
 				handleConfigNodes(event, selected);
-				System.out.println("ConfigParentNode geklickt");//löschen
 			} else if (selected instanceof AbstractSortModeNode && view.getExpandedState(selected)) {
 				final AbstractSortModeNode sortNode = ((AbstractSortModeNode) selected);
 				sortNode.setSortByValue(!sortNode.isSortByValue());
@@ -120,75 +116,8 @@ public class TreeClickListener implements IDoubleClickListener {
 				};
 				job.setPriority(Job.INTERACTIVE);
 				job.schedule();
-				System.out.println("AbstractSortModeNode und view.getExpandedState");//löschen
 			} else if (selected instanceof Parent && ((Parent) selected).hasChildren()) {
 				view.setExpandedState(selected, !view.getExpandedState(selected));
-				System.out.println("Parent und Parent hat Kinder");//löschen
-			} else if (selected instanceof Parent && !((Parent) selected).hasChildren() && ((Parent) selected).getParent().getParent() != null) {
-
-				//Unser Müll
-//
-//				final IFeatureProject featureProject = (IFeatureProject) CorePlugin.getFeatureProjects().toArray()[0];//getFeatureProject(IResource.);
-//				//aktuelles Featurepro???????????
-//				final IFeatureProject featureProject = CorePlugin.getFeatureProject((IResource) viewer.getInput());
-				
-//				final FSTModel model = featureProject.getFSTModel();
-//				final ProjectSignatures signatures = featureProject.getProjectSignatures();
-//				
-//				//hier wird der godfather gesucht
-//				if (model != null && signatures != null) {
-//					AbstractSignature parent = sig;
-//					while (parent.getParent() != null) {
-//						parent = parent.getParent();
-//					}
-//				
-//				final String fullName = parent.getFullName();
-//				final String fileName = (fullName.startsWith(".")) ? fullName.substring(1) : fullName.replace('.', '/');
-//	
-//				//merkt sich die datei
-//				final IFile iFile = model.getFeature(signatures.getFeatureName(featureID)).getRole(fileName + ".java").getFile();
-//	
-//				
-//				if (iFile.isAccessible()) {
-//					final IWorkbench workbench = PlatformUI.getWorkbench();
-//					try {
-//						final IContentDescription description = iFile.getContentDescription();
-//						final IEditorDescriptor desc = workbench.getEditorRegistry().getDefaultEditor(iFile.getName(),
-//								(description != null) ? description.getContentType() : null);
-//						final IWorkbenchPage activePage = workbench.getActiveWorkbenchWindow().getActivePage();
-//						IEditorPart editorPart = activePage.findEditor(new FileEditorInput(iFile));
-//						if (editorPart == null) {
-//							editorPart = activePage.openEditor(new FileEditorInput(iFile), (desc != null) ? desc.getId() : "org.eclipse.ui.DefaultTextEditor");
-//						}
-//						final int dataIndex = sig.hasFeature(featureID);
-//						scrollToLine(editorPart, (dataIndex > -1) ? sig.getFeatureData()[dataIndex].getLineNumber() : 1);
-//					} catch (CoreException e) {
-//						UIPlugin.getDefault().logError(e);
-//					}
-//				}
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				System.out.println(selected.getClass().getName() + " " + selected.toString() + " ");
-				System.out.println("Viewer initiieren");
-//				initViewer();
-				System.out.println("Viewer ok");
-				System.out.println("SelectionChangeListener zuweisen");//löschen
-				//viewer.addSelectionChangedListener(sListener);
-				//selected.höre auf unseren listener
-
 			}
 		}
 	}
@@ -207,109 +136,5 @@ public class TreeClickListener implements IDoubleClickListener {
 			}
 		}
 	}
-
-	//versuch
-//	protected TreeViewer viewer;//wer soll tun --> woher infos?
-//	
-//	public void initViewer() {
-//		
-//		viewer.addSelectionChangedListener(sListener);
-//	}
-	
-
-
-	//	public void initTreeViewer(TreeViewer viewer) {
-	//		this.viewer = viewer;
-	//		viewer.addSelectionChangedListener(sListener);
-	//	}
-
-//	private ISelectionChangedListener sListener = new ISelectionChangedListener() {
-//		@Override
-//		public void selectionChanged(SelectionChangedEvent event) {
-//			System.out.println("SelectionCangeListener wird aufgerufen");//löschen
-//			if (viewer.getInput() != null) {
-//				Object selection = ((IStructuredSelection) viewer.getSelection()).getFirstElement();
-////				if (!(viewer.getInput() instanceof IResource)) {
-////					System.out.println("raussprung");//löschen
-////					return;
-////				}
-//				System.out.println("vor featureproject angelegt");//löschen
-//				final IFeatureProject featureProject = CorePlugin.getFeatureProject((IResource) viewer.getInput());   //VERURSACHT NUR PROBLEME!!!!!!!!!!!!!!!!!!
-//				System.out.println("nach featureproject angelegt");//löschen
-//				if (selection instanceof AbstractClassFragment) {
-//					final AbstractSignature sig = ((AbstractClassFragment) selection).getSignature();
-//					openEditor(sig, featureProject, sig.getFeatureData()[0].getId());
-//				} else if (selection instanceof AbstractSignature) {
-//					final AbstractSignature sig = (AbstractSignature) selection;
-//					openEditor(sig, featureProject, sig.getFeatureData()[0].getId());
-//				} else if (selection instanceof Feature) {
-//					final ProjectSignatures signatures = featureProject.getProjectSignatures();
-//					if (signatures != null) {
-//						final TreeItem decl = viewer.getTree().getSelection()[0].getParentItem();
-//						openEditor((AbstractSignature) decl.getData(), featureProject, signatures.getFeatureID(((Feature) selection).getName()));
-//					}
-//				}
-//			}
-//		}
-//
-//	};
-//
-//	private void openEditor(AbstractSignature sig, IFeatureProject featureProject, int featureID) {
-//		System.out.println("OpenEditor wird aufgerufent");//löschen
-//		final FSTModel model = featureProject.getFSTModel();
-//		final ProjectSignatures signatures = featureProject.getProjectSignatures();
-//		
-//		//hier wird der godfather gesucht
-//		if (model != null && signatures != null) {
-//			AbstractSignature parent = sig;
-//			while (parent.getParent() != null) {
-//				parent = parent.getParent();
-//			}
-//
-//	//Verzeichnis benennen
-//			final String fullName = parent.getFullName();
-//			final String fileName = (fullName.startsWith(".")) ? fullName.substring(1) : fullName.replace('.', '/');
-//
-//			//merkt sich die datei
-//			final IFile iFile = model.getFeature(signatures.getFeatureName(featureID)).getRole(fileName + ".java").getFile();
-//
-//			
-//			if (iFile.isAccessible()) {
-//				final IWorkbench workbench = PlatformUI.getWorkbench();
-//				try {
-//					final IContentDescription description = iFile.getContentDescription();
-//					final IEditorDescriptor desc = workbench.getEditorRegistry().getDefaultEditor(iFile.getName(),
-//							(description != null) ? description.getContentType() : null);
-//					final IWorkbenchPage activePage = workbench.getActiveWorkbenchWindow().getActivePage();
-//					IEditorPart editorPart = activePage.findEditor(new FileEditorInput(iFile));
-//					if (editorPart == null) {
-//						editorPart = activePage.openEditor(new FileEditorInput(iFile), (desc != null) ? desc.getId() : "org.eclipse.ui.DefaultTextEditor");
-//					}
-//					final int dataIndex = sig.hasFeature(featureID);
-//					scrollToLine(editorPart, (dataIndex > -1) ? sig.getFeatureData()[dataIndex].getLineNumber() : 1);
-//				} catch (CoreException e) {
-//					UIPlugin.getDefault().logError(e);
-//				}
-//			}
-//		}
-//	}
-//
-//	public static void scrollToLine(IEditorPart editorPart, int lineNumber) {
-//		if (!(editorPart instanceof ITextEditor) || lineNumber <= 0) {
-//			return;
-//		}
-//		final ITextEditor editor = (ITextEditor) editorPart;
-//		final IDocument document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
-//		if (document != null) {
-//			IRegion lineInfo = null;
-//			try {
-//				lineInfo = document.getLineInformation(lineNumber - 1);
-//			} catch (BadLocationException e) {
-//			}
-//			if (lineInfo != null) {
-//				editor.selectAndReveal(lineInfo.getOffset(), lineInfo.getLength());
-//			}
-//		}
-//	}
 
 }

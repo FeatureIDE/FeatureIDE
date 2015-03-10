@@ -44,6 +44,7 @@ import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.Direc
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.StatisticsContractComplexity;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.StatisticsFeatureComplexity;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.StatisticsProgramSize;
+import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.StatisticsProgramSizeNew;
 import de.ovgu.featureide.ui.statistics.ui.helper.JobDoneListener;
 
 /**
@@ -169,6 +170,7 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 		
 		if (composer.getGenerationMechanism() == IComposerExtensionClass.Mechanism.FEATURE_ORIENTED_PROGRAMMING) {
 			godfather.addChild(new StatisticsProgramSize(PRODUCT_LINE_IMPLEMENTATION, fstModel));
+			godfather.addChild(new StatisticsProgramSizeNew(PRODUCT_LINE_IMPLEMENTATION, fstModel));
 			godfather.addChild(new StatisticsContractComplexity(CONTRACT_COMPLEXITY, fstModel, featModel, project.getContractComposition()));
 		}
 		if (composer.getGenerationMechanism() == IComposerExtensionClass.Mechanism.PREPROCESSOR) {
