@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
+import java.util.LinkedList;
+
 import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTClassFragment;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
@@ -36,7 +38,6 @@ public class SumImplementationArtifactsParent extends LazyParent {
 	private FSTModel fstModel;
 
 	private int type;
-
 
 	public static final int NUMBER_OF_CLASSES = 0;
 	public static final int NUMBER_OF_FIELDS = 1;
@@ -55,15 +56,11 @@ public class SumImplementationArtifactsParent extends LazyParent {
 	protected void initChildren() {
 		if (type == NUMBER_OF_CLASSES) {
 			for (FSTClass currClass : fstModel.getClasses()) {
-
-				addChild(new ClassNodeParent(currClass.getName().toString(), currClass));
-				
-				
+				for (LinkedList<FSTClassFragment> iterable_element : currClass.getAllFSTFragments()) {
+					addChild(new ClassNodeParent(iterable_element.get(0).getFullIdentifier() + ": " + iterable_element.size(), iterable_element.get(0)));
+				}
 			}
 		}
 	}
-	
-
-
 
 }

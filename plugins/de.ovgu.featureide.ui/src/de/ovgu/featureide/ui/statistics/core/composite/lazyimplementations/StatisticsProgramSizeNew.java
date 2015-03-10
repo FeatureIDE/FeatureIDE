@@ -21,10 +21,12 @@
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 
 import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTClassFragment;
+import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
@@ -37,7 +39,6 @@ import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 public class StatisticsProgramSizeNew extends LazyParent {
 
 	private FSTModel fstModel;
-	private int sumRoles;
 
 	public StatisticsProgramSizeNew(String description, FSTModel fstModel) {
 		super(description);
@@ -50,37 +51,35 @@ public class StatisticsProgramSizeNew extends LazyParent {
 	@Override
 	protected void initChildren() {
 
-		int pointer = 0;
-		
-//		ArrayList<FSTClassFragment> allClassesList = new ArrayList<FSTClassFragment>();
-		
 		int numberOfClasses = 0;
 		int numberOfRoles = 0;
 		int numberOfFields = 0;
 		int numberOfMethods = 0;
-		
-		numberOfClasses = fstModel.getClasses().size();
-		
-		for (FSTClass class_ : fstModel.getClasses()) {
-			//System.out.println();
-			numberOfRoles += class_.getRoles().size();
+		int numberOfUniMethods = 0;
 
+		for (FSTClass class_ : fstModel.getClasses()) {
 			LinkedList<LinkedList<FSTClassFragment>> allFrag = class_.getAllFSTFragments();
+			LinkedHashSet<FSTMethod> methHelper = new LinkedHashSet<FSTMethod>();
 			for (LinkedList<FSTClassFragment> linkedList : allFrag) {
 				numberOfRoles += linkedList.size();
+
 				for (FSTClassFragment fstClassFragment : linkedList) {
+					methHelper.addAll(fstClassFragment.getMethods());
+
 					numberOfMethods += fstClassFragment.getMethods().size();
 					numberOfFields += fstClassFragment.getFields().size();
 				}
 			}
+			numberOfUniMethods += methHelper.size();
 			numberOfClasses += allFrag.size();
 
 		}
 
-
-		addChild(new SumImplementationArtifactsParent("Number of classes: " + numberOfClasses + " Roles: " + numberOfRoles, fstModel, SumImplementationArtifactsParent.NUMBER_OF_CLASSES));
+		addChild(new SumImplementationArtifactsParent("Number of classes: " + numberOfClasses + " Roles: " + numberOfRoles, fstModel,
+				SumImplementationArtifactsParent.NUMBER_OF_CLASSES));
 		addChild(new SumImplementationArtifactsParent("Number of fields: " + numberOfFields, fstModel, SumImplementationArtifactsParent.NUMBER_OF_FIELDS));
-		addChild(new SumImplementationArtifactsParent("Number of methods: " + numberOfMethods, fstModel, SumImplementationArtifactsParent.NUMBER_OF_METHODS));
+		addChild(new SumImplementationArtifactsParent("Number of methods: " + numberOfMethods + " : " + numberOfUniMethods, fstModel,
+				SumImplementationArtifactsParent.NUMBER_OF_METHODS));
 	}
 
 }

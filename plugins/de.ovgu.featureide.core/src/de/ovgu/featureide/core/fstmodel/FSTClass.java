@@ -77,6 +77,7 @@ public class FSTClass {
 	public LinkedList<LinkedList<FSTClassFragment>> getAllFSTFragments(){
 		LinkedList<LinkedList<FSTClassFragment>> allFrags = new LinkedList<LinkedList<FSTClassFragment>>();
 		LinkedList<FSTClassFragment> helper = new LinkedList<FSTClassFragment>();
+		LinkedList<FSTClassFragment> fragmentsOfThisClass = new LinkedList<FSTClassFragment>();
 		
 		for (FSTRole currRole : getRoles()) {
 			LinkedList<FSTClassFragment> allFragsOfRole = currRole.getAllInnerClasses();
@@ -86,8 +87,11 @@ public class FSTClass {
 					allFrags.add(currList);
 					helper.addAll(currList);
 				}
-			}			
+			}
+			fragmentsOfThisClass.add(currRole.getClassFragment());
 		}
+		
+		allFrags.add(fragmentsOfThisClass);
 		
 		return allFrags;
 	}

@@ -80,15 +80,17 @@ public abstract class RoleElement<T extends RoleElement<T>> implements Comparabl
 	public String getFullIdentifier() {
 		final StringBuilder sb = new StringBuilder(name);
 		IRoleElement nextParent = parent;
-		IRoleElement oldParent = parent;
+		String package1 = (this instanceof FSTClassFragment) ? ((FSTClassFragment) this).getPackage() : null;
 		while (nextParent != null) {
 			sb.insert(0, '.');
 			sb.insert(0, nextParent.getName());
-			oldParent = nextParent;
+			if (nextParent.getParent() == null) {
+				package1 = ((FSTClassFragment) nextParent).getPackage();
+			}
 			nextParent = nextParent.getParent();
 		}
 		String className = sb.toString().substring(sb.toString().lastIndexOf('/') + 1).replace(".java", "");
-		String package1 = ((FSTClassFragment) oldParent).getPackage();
+		
 		return ((package1 == null) ? "(default package)." : package1 + ".") + className;
 	}
 
