@@ -22,8 +22,9 @@ package de.ovgu.featureide.fm.ui.editors;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.List;
 
 import org.eclipse.core.commands.operations.ObjectUndoContext;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -66,6 +67,7 @@ import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.FeatureStatus;
+import de.ovgu.featureide.fm.core.Preferences;
 import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.job.AStoppableJob;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -89,6 +91,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.LegendAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.LegendLayoutAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.MandatoryAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.MoveAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.NameTypeSelectionAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.OrAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.RenameAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ReverseOrderAction;
@@ -158,13 +161,19 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 
 	private ReverseOrderAction reverseOrderAction;
 
-	private LinkedList<LayoutSelectionAction> setLayoutActions;
+	private List<LayoutSelectionAction> setLayoutActions;
+	
+	private List<NameTypeSelectionAction> setNameType;
 
 	private AutoLayoutConstraintAction autoLayoutConstraintAction;
 
 	private int index;
 
 	private Job analyzeJob;
+	
+	private boolean waiting = false;
+
+	private FeatureModelAnalyzer analyzer;
 
 	public FeatureDiagramEditor(FeatureModelEditor featureModelEditor, Composite container) {
 		super();
@@ -181,7 +190,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		setKeyHandler(new FeatureDiagramEditorKeyHandler(this, getFeatureModel()));
 	}
 
-	void initializeGraphicalViewer() {
+	private void initializeGraphicalViewer() {
 		getControl().addControlListener(new ControlListener() {
 
 			@Override
@@ -279,11 +288,16 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		zoomIn = new ZoomInAction(zoomManager);
 		zoomOut = new ZoomOutAction(zoomManager);
 
-		setLayoutActions = new LinkedList<LayoutSelectionAction>();
+		setLayoutActions = new ArrayList<LayoutSelectionAction>(5);
 		for (int i = 0; i < 5; i++) {
 			setLayoutActions.add(new LayoutSelectionAction(this, featureModel, i, 0));
 		}
 		autoLayoutConstraintAction = new AutoLayoutConstraintAction(this, featureModel);
+		
+		setNameType = new ArrayList<NameTypeSelectionAction>(2);
+		setNameType.add(new NameTypeSelectionAction(this, featureModel, 0));
+		setNameType.add(new NameTypeSelectionAction(this, featureModel, 1));
+		
 	}
 
 	public void createContextMenu(MenuManager menu) {
@@ -327,7 +341,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 
 		showHiddenFeaturesAction.setChecked(getFeatureModel().getLayout().showHiddenFeatures());
 
-		IMenuManager subMenuLayout = new MenuManager("Set Layout");
+		final IMenuManager subMenuLayout = new MenuManager("Set Layout");
 		for (int i = 0; i < setLayoutActions.size(); i++) {
 			subMenuLayout.add(setLayoutActions.get(i));
 			if (i == 0) {
@@ -338,7 +352,18 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			setLayoutActions.get(i).setChecked(isChosen);
 			setLayoutActions.get(i).setEnabled(!isChosen);
 		}
+		
+		final IMenuManager subMenuNameType = new MenuManager("Set Name Type");
+		for (NameTypeSelectionAction nameType : setNameType) {
+			subMenuNameType.add(nameType);
+			nameType.setChecked(false);
+			nameType.setEnabled(true);
+		}
 
+		final NameTypeSelectionAction curNameType = setNameType.get(Preferences.getDefaultFeatureNameScheme());
+		curNameType.setChecked(true);
+		curNameType.setEnabled(false);
+		
 		autoLayoutConstraintAction.setEnabled(!getFeatureModel().getLayout().hasFeaturesAutoLayout());
 
 		boolean connectionSelected = alternativeAction.isConnectionSelected();
@@ -349,7 +374,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		}
 
 		if (mplModel) {
-			menu.add(createConstraintAction);
+			menu.add(subMenuLayout);
+			menu.add(subMenuNameType);
 		}
 		// don't show menu to change group type of a feature in case a
 		// connection line is selected
@@ -489,11 +515,11 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		if (!onlyLayout)
 			getContents().refresh();
 	}
-
-	boolean waiting = false;
-
-	private FeatureModelAnalyzer analyzer;
-
+	
+	public void reload() {
+		setContents(getFeatureModel());
+	}
+	
 	public void refresh() {
 		if (getFeatureModel() == null || getFeatureModel().getRoot() == null || getContents() == null) {
 			return;
@@ -649,7 +675,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	public void propertyChange(PropertyChangeEvent event) {
 		String prop = event.getPropertyName();
 		if (MODEL_DATA_CHANGED.equals(prop)) {
-			setContents(getFeatureModel());
+			reload();
 			refresh();
 			featureModelEditor.setPageModified(true);
 		} else if (MODEL_DATA_LOADED.equals(prop)) {
@@ -658,7 +684,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			featureModelEditor.setPageModified(true);
 		} else if (REDRAW_DIAGRAM.equals(prop)) {
 			getControl().setBackground(FMPropertyManager.getDiagramBackgroundColor());
-			setContents(getFeatureModel());
+			reload();
 			refreshGraphics(null);
 		} else if (REFRESH_ACTIONS.equals(prop)) {
 			// additional actions can be refreshed here
@@ -741,4 +767,5 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			analyzeJob.cancel();
 		}
 	}
+	
 }
