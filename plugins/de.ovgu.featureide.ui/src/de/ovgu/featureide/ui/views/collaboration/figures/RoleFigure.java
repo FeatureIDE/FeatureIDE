@@ -131,7 +131,7 @@ public class RoleFigure extends Figure implements GUIDefaults {
 	 * @return The persistent property
 	 */
 	public final static boolean[] getRoleSelections() {
-		boolean[] selections = new boolean[13];
+		boolean[] selections = new boolean[14];
 
 		// Set everything but hide as enabled (default setting)
 		Arrays.fill(selections, true);
@@ -144,6 +144,7 @@ public class RoleFigure extends Figure implements GUIDefaults {
 			if (property == null) {
 				return selections;
 			}
+			
 			int i = 0;
 			for (String entry : property.split("[|]")) {
 				selections[i++] = TRUE.equals(entry);

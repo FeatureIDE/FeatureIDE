@@ -93,7 +93,7 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 				}
 			}
 		}
-		return new String[] { "Collaboration Model not found" };
+		return new String[] { "Collaboration model not found" };
 	}
 
 	@Override
