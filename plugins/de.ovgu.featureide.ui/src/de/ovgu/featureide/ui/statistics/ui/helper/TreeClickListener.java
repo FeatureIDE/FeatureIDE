@@ -53,6 +53,8 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
+import de.ovgu.featureide.core.fstmodel.FSTField;
+import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
@@ -61,7 +63,10 @@ import de.ovgu.featureide.core.signature.abstr.AbstractSignature;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
+import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.ClassNodeParent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.ConfigParentNode;
+import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.FieldNodeParent;
+import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.MethodNodeParent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.genericdatatypes.AbstractSortModeNode;
 import de.ovgu.featureide.ui.statistics.ui.ConfigDialog;
 
@@ -118,7 +123,44 @@ public class TreeClickListener implements IDoubleClickListener {
 				job.schedule();
 			} else if (selected instanceof Parent && ((Parent) selected).hasChildren()) {
 				view.setExpandedState(selected, !view.getExpandedState(selected));
+			} else if (selected instanceof Parent
+					&& (((Parent) selected).getParent() instanceof FieldNodeParent || ((Parent) selected).getParent() instanceof ClassNodeParent || ((Parent) selected)
+							.getParent() instanceof MethodNodeParent)) {
+				IFile iFile;
+				if(((Parent)selected).getValue() instanceof FSTField) {
+					iFile = ((FSTField)((Parent)selected).getValue()).getRole().getFile();
+					openEditor(iFile);
+				}
+				else if(((Parent)selected).getValue() instanceof FSTMethod) {
+					iFile = ((FSTMethod)((Parent)selected).getValue()).getRole().getFile();
+					openEditor(iFile);
+				}
+				else {
+					iFile = ((FSTRole)((Parent)selected).getValue()).getFile();
+//					openEditor(iFile);
+
+
+					final IWorkbench workbench = PlatformUI.getWorkbench();
+					final IWorkbenchPage activePage = workbench.getActiveWorkbenchWindow().getActivePage();
+					IEditorPart editorPart = activePage.findEditor(new FileEditorInput(iFile));
+					IContentDescription description;
+					try {
+						description = iFile.getContentDescription();
+						final IEditorDescriptor desc = workbench.getEditorRegistry().getDefaultEditor(iFile.getName(),
+							(description != null) ? description.getContentType() : null);
+					if (editorPart == null) {
+						editorPart = activePage.openEditor(new FileEditorInput(iFile), (desc != null) ? desc.getId() : "org.eclipse.ui.DefaultTextEditor");
+					}
+					scrollToLine(editorPart, 5/* (dataIndex > -1) ? sig.getFeatureData()[dataIndex].getLineNumber() : 1*/);
+					} catch (CoreException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+					
+				}
 			}
+
 		}
 	}
 
@@ -136,5 +178,49 @@ public class TreeClickListener implements IDoubleClickListener {
 			}
 		}
 	}
+	
+	public static void scrollToLine(IEditorPart editorPart, int lineNumber) {
+		if (!(editorPart instanceof ITextEditor) || lineNumber <= 0) {
+			return;
+		}
+		final ITextEditor editor = (ITextEditor) editorPart;
+		final IDocument document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
+		if (document != null) {
+			IRegion lineInfo = null;
+			try {
+				lineInfo = document.getLineInformation(lineNumber - 1);
+			} catch (BadLocationException e) {
+			}
+			if (lineInfo != null) {
+				editor.selectAndReveal(lineInfo.getOffset(), lineInfo.getLength());
+			}
+		}
+	}
+
+	public void openEditor(IFile iFile) {
+		if (iFile.isAccessible()) {
+			final IWorkbench workbench = PlatformUI.getWorkbench();
+			try {
+				final IContentDescription description = iFile.getContentDescription();
+				final IEditorDescriptor desc = workbench.getEditorRegistry().getDefaultEditor(iFile.getName(),
+						(description != null) ? description.getContentType() : null);
+				final IWorkbenchPage activePage = workbench.getActiveWorkbenchWindow().getActivePage();
+				IEditorPart editorPart = activePage.findEditor(new FileEditorInput(iFile));
+				if (editorPart == null) {
+					editorPart = activePage.openEditor(new FileEditorInput(iFile), (desc != null) ? desc.getId() : "org.eclipse.ui.DefaultTextEditor");
+				}
+
+				//				final int dataIndex = sig.hasFeature(featureID);
+//								scrollToLine(editorPart, (dataIndex > -1) ? sig.getFeatureData()[dataIndex].getLineNumber() : 1);
+			} catch (CoreException e) {
+				UIPlugin.getDefault().logError(e);
+			}
+		}
+	}
+	
+	
+	
+	
+	
 
 }

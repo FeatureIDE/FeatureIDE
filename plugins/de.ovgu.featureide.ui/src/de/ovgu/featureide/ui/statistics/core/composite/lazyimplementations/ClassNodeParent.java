@@ -20,9 +20,14 @@
  */
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
+import java.util.LinkedList;
+
 import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTClassFragment;
+import de.ovgu.featureide.core.fstmodel.FSTModel;
+import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
+import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 
 /**
  * TODO description
@@ -31,28 +36,57 @@ import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
  */
 public class ClassNodeParent extends LazyParent {
 
-	 FSTClass fstClass;
-	 FSTClassFragment fstClassFrag;
-	
-	public ClassNodeParent(String descString, FSTClass fstClass){
+	FSTClass fstClass = null;
+	FSTClassFragment fstClassFrag = null;
+	FSTModel fstModel;
+
+	public ClassNodeParent(String descString, FSTClass fstClass, FSTModel fstMod) {
 		super(descString, fstClass.getRoles().size());
 		this.fstClass = fstClass;
+		this.fstModel = fstMod;
+
 	}
-	
-	public ClassNodeParent(String descString, FSTClassFragment fstClass){
+
+	public ClassNodeParent(String descString, FSTClassFragment fstClassFrag, FSTModel fstMod) {
 		super(descString);
-		//bestimmen
-//		this.setValue(null);
 		this.fstClassFrag = fstClassFrag;
+		this.fstModel = fstMod;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.ui.statistics.core.composite.LazyParent#initChildren()
 	 */
 	@Override
 	protected void initChildren() {
-		
-		
+
+		if (fstClass != null) {
+
+			for (FSTRole fstRole : fstClass.getRoles()) {
+				addChild(new Parent(fstRole.getFeature().getName(), fstRole));
+			}
+
+		} else if (fstClassFrag != null) {
+
+			//			LinkedList<FSTRole> fstRole = new LinkedList<FSTRole>();
+			//			for (FSTClass fstClass : fstModel.getClasses()) {
+			//				for (FSTRole fstRole2 : fstClass.getRoles()) {
+			//					
+			//				}
+
+			for (FSTClass currClass : fstModel.getClasses()) {
+				for (LinkedList<FSTClassFragment> iterable_element : currClass.getAllFSTFragments()) {
+					for (FSTClassFragment fstFrag : iterable_element) {
+						if (fstFrag.getFullIdentifier().equals(fstClassFrag.getFullIdentifier())) {
+							addChild(new Parent(fstFrag.getRole().getFeature().getName(), fstFrag.getRole()));
+						}
+					}
+				}
+			}
+
+		}
+
+		//fstModel.getClasses();
+
 	}
 
 }

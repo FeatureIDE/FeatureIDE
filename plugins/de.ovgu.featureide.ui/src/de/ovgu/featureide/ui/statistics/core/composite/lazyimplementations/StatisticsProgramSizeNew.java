@@ -26,6 +26,7 @@ import java.util.LinkedList;
 
 import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTClassFragment;
+import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
@@ -54,31 +55,38 @@ public class StatisticsProgramSizeNew extends LazyParent {
 		int numberOfClasses = 0;
 		int numberOfRoles = 0;
 		int numberOfFields = 0;
+		int numberOfUniFields = 0;
 		int numberOfMethods = 0;
 		int numberOfUniMethods = 0;
 
 		for (FSTClass class_ : fstModel.getClasses()) {
 			LinkedList<LinkedList<FSTClassFragment>> allFrag = class_.getAllFSTFragments();
 			LinkedHashSet<FSTMethod> methHelper = new LinkedHashSet<FSTMethod>();
+			LinkedHashSet<FSTField> fieldHelper = new LinkedHashSet<FSTField>();
+
 			for (LinkedList<FSTClassFragment> linkedList : allFrag) {
 				numberOfRoles += linkedList.size();
 
 				for (FSTClassFragment fstClassFragment : linkedList) {
 					methHelper.addAll(fstClassFragment.getMethods());
+					fieldHelper.addAll(fstClassFragment.getFields());
 
 					numberOfMethods += fstClassFragment.getMethods().size();
 					numberOfFields += fstClassFragment.getFields().size();
 				}
 			}
+
+			numberOfUniFields += fieldHelper.size();
 			numberOfUniMethods += methHelper.size();
 			numberOfClasses += allFrag.size();
 
 		}
 
-		addChild(new SumImplementationArtifactsParent("Number of classes: " + numberOfClasses + " Roles: " + numberOfRoles, fstModel,
+		addChild(new SumImplementationArtifactsParent(NUMBER_CLASS + SEPARATOR + numberOfClasses + " | " + NUMBER_ROLE + SEPARATOR + numberOfRoles, fstModel,
 				SumImplementationArtifactsParent.NUMBER_OF_CLASSES));
-		addChild(new SumImplementationArtifactsParent("Number of fields: " + numberOfFields, fstModel, SumImplementationArtifactsParent.NUMBER_OF_FIELDS));
-		addChild(new SumImplementationArtifactsParent("Number of methods: " + numberOfMethods + " : " + numberOfUniMethods, fstModel,
+		addChild(new SumImplementationArtifactsParent(NUMBER_FIELD_U + SEPARATOR + numberOfUniFields + " | " + NUMBER_FIELD + SEPARATOR + numberOfFields, fstModel,
+				SumImplementationArtifactsParent.NUMBER_OF_FIELDS));
+		addChild(new SumImplementationArtifactsParent(NUMBER_METHOD_U + SEPARATOR + numberOfUniMethods + " | " + NUMBER_METHOD + SEPARATOR + numberOfMethods, fstModel,
 				SumImplementationArtifactsParent.NUMBER_OF_METHODS));
 	}
 
