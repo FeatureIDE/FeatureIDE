@@ -22,6 +22,9 @@ package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
 import java.util.List;
 
+import org.eclipse.ui.internal.UIPlugin;
+
+import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
@@ -69,26 +72,28 @@ public class DirectivesNode extends LazyParent {
 		
 		Aggregator aggProject = new Aggregator();
 		for (FSTClass clazz : fstModel.getClasses()) {
-			String className;
-			
-			FSTRole role = clazz.getRoles().get(0);
-			
-			String packageName = role.getClassFragment().getPackage();
-			String qualifiedPackageName = (packageName == null) ? "(default package)" : packageName;
-			className = qualifiedPackageName + "." + role.getClassFragment().getName();
-			
-			Parent classNode = new Parent(className);
-			aggProject.process(clazz.getRoles(), classNode);
-			
-			Integer currentNesting = aggProject.getMaxNesting();
-			classNode.addChild(new Parent("Maximum nesting of directives", currentNesting));
-			if (currentNesting > maxNesting) {
-				maxNesting = currentNesting;
-				maxNestingClass = className;
-			}
-			aggProject.setMaxNesting(0);
-			
-			internClasses.addChild(classNode);
+			if (!clazz.getRoles().isEmpty()) {
+				String className;		
+				
+				FSTRole role = clazz.getRoles().get(0);
+				
+				String packageName = role.getClassFragment().getPackage();
+				String qualifiedPackageName = (packageName == null) ? "(default package)" : packageName;
+				className = qualifiedPackageName + "." + role.getClassFragment().getName();
+				
+				Parent classNode = new Parent(className);
+				aggProject.process(clazz.getRoles(), classNode);
+				
+				Integer currentNesting = aggProject.getMaxNesting();
+				classNode.addChild(new Parent("Maximum nesting of directives", currentNesting));
+				if (currentNesting > maxNesting) {
+					maxNesting = currentNesting;
+					maxNestingClass = className;
+				}
+				aggProject.setMaxNesting(0);
+				
+				internClasses.addChild(classNode);
+			} 
 		}
 		
 		Integer maximumSum = aggProject.getMaximumSum();
