@@ -22,12 +22,8 @@ package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
 import java.util.List;
 
-import org.eclipse.ui.internal.UIPlugin;
-
-import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
-import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.genericdatatypes.AbstractSortModeNode;
@@ -70,36 +66,31 @@ public class DirectivesNode extends LazyParent {
 			}
 		});
 		
-		Aggregator aggProject = new Aggregator();
+		final Aggregator aggProject = new Aggregator();
 		for (FSTClass clazz : fstModel.getClasses()) {
+			String className = clazz.getName();
+			final int pIndex = className.lastIndexOf('/');
+			className = ((pIndex > 0) ? className.substring(0, pIndex + 1).replace('/', '.') : "(default package).") + className.substring(pIndex + 1);
+			
+			final Parent classNode = new Parent(className);
+			aggProject.process(clazz.getRoles(), classNode);
+			internClasses.addChild(classNode);
+			
 			if (!clazz.getRoles().isEmpty()) {
-				String className;		
-				
-				FSTRole role = clazz.getRoles().get(0);
-				
-				String packageName = role.getClassFragment().getPackage();
-				String qualifiedPackageName = (packageName == null) ? "(default package)" : packageName;
-				className = qualifiedPackageName + "." + role.getClassFragment().getName();
-				
-				Parent classNode = new Parent(className);
-				aggProject.process(clazz.getRoles(), classNode);
-				
-				Integer currentNesting = aggProject.getMaxNesting();
+				final Integer currentNesting = aggProject.getMaxNesting();
 				classNode.addChild(new Parent("Maximum nesting of directives", currentNesting));
 				if (currentNesting > maxNesting) {
 					maxNesting = currentNesting;
 					maxNestingClass = className;
 				}
 				aggProject.setMaxNesting(0);
-				
-				internClasses.addChild(classNode);
-			} 
+			}
 		}
 		
-		Integer maximumSum = aggProject.getMaximumSum();
-		Integer minimumSum = aggProject.getMinimumSum();
+		final Integer maximumSum = aggProject.getMaximumSum();
+		final Integer minimumSum = aggProject.getMinimumSum();
 		
-		Parent directivesPerClass = new Parent("Directives per class");
+		final Parent directivesPerClass = new Parent("Directives per class");
 		directivesPerClass.addChild(new Parent("Maximum number of directives: " + maximumSum + " in class " + searchClass(internClasses.getChildren(), maximumSum)));
 		directivesPerClass.addChild(new Parent("Minimum number of directives: " + minimumSum + " in class " + searchClass(internClasses.getChildren(), minimumSum)));
 		directivesPerClass.addChild(new Parent("Average number of directives per class", getAverage(internClasses)));
