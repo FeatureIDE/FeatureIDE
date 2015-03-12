@@ -28,9 +28,9 @@ import org.eclipse.swt.widgets.Display;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
+import de.ovgu.featureide.fm.ui.wizards.WizardConstants;
 import de.ovgu.featureide.ui.handlers.base.AFeatureProjectHandler;
 import de.ovgu.featureide.ui.mpl.wizards.NewInterfaceWizard;
-import de.ovgu.featureide.ui.mpl.wizards.WizardConstants;
 
 public class NewInterfaceHandler extends AFeatureProjectHandler {
 

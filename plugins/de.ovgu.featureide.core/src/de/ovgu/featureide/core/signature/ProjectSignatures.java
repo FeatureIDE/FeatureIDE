@@ -22,16 +22,17 @@ package de.ovgu.featureide.core.signature;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map.Entry;
 
-import de.ovgu.featureide.core.signature.abstr.AbstractClassSignature;
-import de.ovgu.featureide.core.signature.abstr.AbstractFieldSignature;
-import de.ovgu.featureide.core.signature.abstr.AbstractMethodSignature;
-import de.ovgu.featureide.core.signature.abstr.AbstractSignature;
-import de.ovgu.featureide.core.signature.abstr.AbstractSignature.FeatureData;
+import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
+import de.ovgu.featureide.core.signature.base.AbstractFieldSignature;
+import de.ovgu.featureide.core.signature.base.AbstractMethodSignature;
+import de.ovgu.featureide.core.signature.base.AbstractSignature;
+import de.ovgu.featureide.core.signature.base.FOPFeatureData;
 import de.ovgu.featureide.core.signature.filter.IFilter;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -150,6 +151,10 @@ public class ProjectSignatures implements Iterable<AbstractSignature> {
 		return it;
 	}
 	
+	public void sort(Comparator<AbstractSignature> comparator) {
+		Arrays.sort(signatureArray, comparator);
+	}
+	
 	public int[] getFeatureIDs(Collection<String> featureNames) {
 		int[] ids = new int[featureNames.size()];
 		int i = -1;
@@ -174,6 +179,10 @@ public class ProjectSignatures implements Iterable<AbstractSignature> {
 	
 	public int getFeatureCount() {
 		return featureNames.length;
+	}
+	
+	public int getSize() {
+		return signatureArray.length;
 	}
 	
 	public FeatureModel getFeatureModel() {
@@ -237,7 +246,8 @@ public class ProjectSignatures implements Iterable<AbstractSignature> {
 	}
 	
 	private void count(AbstractSignature signature, int[] curCounter, HashMap<Integer, int[]> fs, int i) {
-		for (FeatureData feature : signature.getFeatureData()) {
+		final FOPFeatureData[] featureData = (FOPFeatureData[])signature.getFeatureData();
+		for (FOPFeatureData feature : featureData) {
 			int[] x = fs.get(feature.getId());
 			if (x == null) {
 				x = new int[]{0,0,0,0};

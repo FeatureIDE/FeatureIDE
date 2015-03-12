@@ -28,23 +28,24 @@ import org.eclipse.core.runtime.CoreException;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.mpl.InterfaceProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
-import de.ovgu.featureide.core.mpl.io.IOConstants;
-import de.ovgu.featureide.core.mpl.job.util.AJobArguments;
-import de.ovgu.featureide.core.mpl.signature.ProjectSignatures;
-import de.ovgu.featureide.core.mpl.signature.ProjectSignatures.SignatureIterator;
-import de.ovgu.featureide.core.mpl.signature.ProjectStructure;
-import de.ovgu.featureide.core.mpl.signature.abstr.AbstractClassFragment;
-import de.ovgu.featureide.core.mpl.signature.filter.FeatureFilter;
+import de.ovgu.featureide.core.signature.ProjectSignatures;
+import de.ovgu.featureide.core.signature.ProjectSignatures.SignatureIterator;
+import de.ovgu.featureide.core.signature.ProjectStructure;
+import de.ovgu.featureide.core.signature.base.AbstractClassFragment;
+import de.ovgu.featureide.core.signature.filter.FeatureFilter;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
+import de.ovgu.featureide.fm.core.io.IOConstants;
+import de.ovgu.featureide.fm.core.job.AProjectJob;
+import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
 /**
  * Builds interfaces for a single feature.
  * 
  * @author Sebastian Krieter
  */
-public class PrintFeatureInterfacesJob extends AMonitorJob<PrintFeatureInterfacesJob.Arguments> {
+public class PrintFeatureInterfacesJob extends AProjectJob<PrintFeatureInterfacesJob.Arguments> {
 	
-	public static class Arguments extends AJobArguments {
+	public static class Arguments extends JobArguments {
 		private final String foldername;
 		
 		public Arguments(String foldername) {
@@ -76,9 +77,9 @@ public class PrintFeatureInterfacesJob extends AMonitorJob<PrintFeatureInterface
 			return false;
 		}
 
-		setMaxAbsoluteWork(features.size());
+		workMonitor.setMaxAbsoluteWork(features.size());
 		int[] curFeature = new int[1];
-		SignatureIterator it = interfaceProject.getProjectSignatures().createIterator();
+		SignatureIterator it = interfaceProject.getProjectSignatures().iterator();
 		
 		for (SelectableFeature feature : features) {
 			curFeature[0] = interfaceProject.getFeatureID(feature.getName());
@@ -97,7 +98,7 @@ public class PrintFeatureInterfacesJob extends AMonitorJob<PrintFeatureInterface
 						folder.getFile(role.getSignature().getName() + IOConstants.EXTENSION_JAVA),
 						role.toShortString());
 			}
-			worked();
+			workMonitor.worked();
 		}
 		IOConstants.writeToFile(interfaceProject.getProjectReference().getFile("SPL_Statistic.txt"), 
 				projectSignatures.getStatisticsString());

@@ -22,7 +22,7 @@ package de.ovgu.featureide.core.signature.comparator;
 
 import java.util.Comparator;
 
-import de.ovgu.featureide.core.signature.abstr.AbstractSignature;
+import de.ovgu.featureide.core.signature.base.AbstractSignature;
 
 public class SignatureNameComparator implements Comparator<AbstractSignature> {
 

@@ -26,7 +26,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.core.mpl.MPLPlugin;
-import de.ovgu.featureide.core.mpl.io.IOConstants;
+import de.ovgu.featureide.fm.core.io.IOConstants;
 import de.ovgu.featureide.fm.ui.handlers.base.AFolderHandler;
 import de.ovgu.featureide.ui.mpl.MPLUIPlugin;
 

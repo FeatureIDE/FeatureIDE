@@ -20,8 +20,8 @@
  */
 package de.ovgu.featureide.core.signature.java;
 
-import de.ovgu.featureide.core.signature.abstr.AClassCreator;
-import de.ovgu.featureide.core.signature.abstr.AbstractClassSignature;
+import de.ovgu.featureide.core.signature.base.AClassCreator;
+import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 
 public class JavaClassCreator extends AClassCreator {
 	@Override

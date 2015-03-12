@@ -27,8 +27,8 @@ import AST.Access;
 import AST.List;
 import AST.ParameterDeclaration;
 import AST.TypeDecl;
-import de.ovgu.featureide.core.signature.abstr.AbstractClassSignature;
-import de.ovgu.featureide.core.signature.abstr.AbstractMethodSignature;
+import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
+import de.ovgu.featureide.core.signature.base.AbstractMethodSignature;
 
 /**
  * Holds the java signature of a method.

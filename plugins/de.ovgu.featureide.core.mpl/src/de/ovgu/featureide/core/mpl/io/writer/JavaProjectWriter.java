@@ -43,12 +43,12 @@ import org.eclipse.jdt.launching.LibraryLocation;
 import de.ovgu.featureide.core.mpl.InterfaceProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.mpl.io.reader.FeatureListReader;
-import de.ovgu.featureide.core.mpl.signature.ProjectSignatures;
-import de.ovgu.featureide.core.mpl.signature.ProjectSignatures.SignatureIterator;
-import de.ovgu.featureide.core.mpl.signature.ProjectStructure;
-import de.ovgu.featureide.core.mpl.signature.abstr.AbstractClassFragment;
-import de.ovgu.featureide.core.mpl.signature.filter.FeatureFilter;
 import de.ovgu.featureide.core.mpl.signature.filter.ViewTagFilter;
+import de.ovgu.featureide.core.signature.ProjectSignatures;
+import de.ovgu.featureide.core.signature.ProjectSignatures.SignatureIterator;
+import de.ovgu.featureide.core.signature.ProjectStructure;
+import de.ovgu.featureide.core.signature.base.AbstractClassFragment;
+import de.ovgu.featureide.core.signature.filter.FeatureFilter;
 
 /**
  * Creates a new java project with only interfaces for one configuration.
@@ -68,7 +68,7 @@ public class JavaProjectWriter extends AbstractWriter {
 			if (featureList != null) {
 				final ProjectSignatures projectSignatures = interfaceProject.getProjectSignatures();
 				
-				SignatureIterator it = projectSignatures.createIterator();
+				SignatureIterator it = projectSignatures.iterator();
 				it.addFilter(new FeatureFilter(featureList));
 				it.addFilter(new ViewTagFilter(interfaceProject.getFilterViewTag()));
 				ProjectStructure javaSig = new ProjectStructure(it);

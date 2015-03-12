@@ -22,24 +22,26 @@ package de.ovgu.featureide.core.mpl.job;
 
 import de.ovgu.featureide.core.mpl.InterfaceProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
-import de.ovgu.featureide.core.mpl.job.util.AJobArguments;
-import de.ovgu.featureide.core.mpl.signature.ProjectSignatures.SignatureIterator;
-import de.ovgu.featureide.core.mpl.signature.ProjectStructure;
-import de.ovgu.featureide.core.mpl.signature.filter.ISignatureFilter;
-import de.ovgu.featureide.core.mpl.signature.fuji.FujiClassCreator;
+import de.ovgu.featureide.core.signature.ProjectSignatures.SignatureIterator;
+import de.ovgu.featureide.core.signature.ProjectStructure;
+import de.ovgu.featureide.core.signature.base.AClassCreator;
+import de.ovgu.featureide.core.signature.base.AbstractSignature;
+import de.ovgu.featureide.core.signature.filter.IFilter;
+import de.ovgu.featureide.fm.core.job.AProjectJob;
+import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
 /**
  * Constructs a {@link ProjectStructure}.
  * 
  * @author Sebastian Krieter
  */
-public class CreateProjectStructureJob extends AChainJob<CreateProjectStructureJob.Arguments> {
+public abstract class CreateProjectStructureJob extends AProjectJob<CreateProjectStructureJob.Arguments> {
 	
-	public static class Arguments extends AJobArguments {
-		private final ISignatureFilter filter;
+	public static class Arguments extends JobArguments {
+		private final IFilter<AbstractSignature> filter;
 		private final ProjectStructure projectSig;
 		
-		public Arguments(ProjectStructure projectSig, ISignatureFilter filter) {
+		public Arguments(ProjectStructure projectSig, IFilter<AbstractSignature> filter) {
 			super(Arguments.class);
 			this.filter = filter;
 			this.projectSig = projectSig;
@@ -57,9 +59,11 @@ public class CreateProjectStructureJob extends AChainJob<CreateProjectStructureJ
 			MPLPlugin.getDefault().logWarning(this.project.getName() + " is no Interface Project!");
 			return false;
 		}
-		SignatureIterator it = interfaceProject.getProjectSignatures().createIterator();
+		SignatureIterator it = interfaceProject.getProjectSignatures().iterator();
 		it.addFilter(arguments.filter);
-		arguments.projectSig.construct(it, new FujiClassCreator());
+		arguments.projectSig.construct(it, getClassCreator());
 		return true;
 	}
+	
+	protected abstract AClassCreator getClassCreator();
 }

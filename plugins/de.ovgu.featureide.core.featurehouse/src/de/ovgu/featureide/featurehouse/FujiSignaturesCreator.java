@@ -50,9 +50,9 @@ import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.core.fstmodel.IRoleElement;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
-import de.ovgu.featureide.core.signature.abstr.AbstractClassSignature;
-import de.ovgu.featureide.core.signature.abstr.AbstractSignature;
-import de.ovgu.featureide.core.signature.abstr.AbstractSignature.FeatureData;
+import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
+import de.ovgu.featureide.core.signature.base.AbstractSignature;
+import de.ovgu.featureide.core.signature.base.FOPFeatureData;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiClassSignature;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiFieldSignature;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
@@ -65,23 +65,23 @@ import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
 public class FujiSignaturesCreator {
 	
 	private final class SignatureReference {
-		private final HashMap<Integer, FeatureData> ids = new HashMap<Integer, FeatureData>();
+		private final HashMap<Integer, FOPFeatureData> ids = new HashMap<>();
 		private final AbstractSignature sig;
 
 		public SignatureReference(AbstractSignature sig) {
 			this.sig = sig;
 		}
 		
-		public final FeatureData[] getFeatureData() {
-			FeatureData[] ret = new FeatureData[ids.size()];
+		public final FOPFeatureData[] getFeatureData() {
+			FOPFeatureData[] ret = new FOPFeatureData[ids.size()];
 			int i = -1;
-			for (FeatureData id : ids.values()) {
+			for (FOPFeatureData id : ids.values()) {
 				ret[++i] = id;
 			}
 			return ret;
 		}
 
-		public final void addID(FeatureData featureData) {
+		public final void addID(FOPFeatureData featureData) {
 			if (!ids.containsKey(featureData.getId())) {
 				ids.put(featureData.getId(), featureData);
 			}
@@ -241,7 +241,7 @@ public class FujiSignaturesCreator {
 			signatureSet.put(sig, sigRef);
 			signatureTable.put(sig.getFullName(), sig);
 		}
-		sigRef.addID(new FeatureData(featureID, line));
+		sigRef.addID(new FOPFeatureData(featureID, line));
 		return sigRef.getSig();
 	}
 
@@ -277,9 +277,9 @@ public class FujiSignaturesCreator {
 		AbstractSignature sig = signatureTable.get(fullName);
 		
 		if (sig != null) {
-			final FeatureData[] ids = sig.getFeatureData();
+			final FOPFeatureData[] ids = (FOPFeatureData[]) sig.getFeatureData();
 			for (int j = 0; j < ids.length; j++) {
-				FeatureData featureData = ids[j];
+				FOPFeatureData featureData = ids[j];
 				if (featureData.getId() == id) {
 					featureData.setComment(element.getJavaDocComment());
 					break;

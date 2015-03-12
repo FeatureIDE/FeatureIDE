@@ -22,7 +22,7 @@ package de.ovgu.featureide.core.fstmodel;
 
 import org.eclipse.core.resources.IFile;
 
-import de.ovgu.featureide.core.signature.abstr.AbstractSignature;
+import de.ovgu.featureide.core.signature.base.AbstractSignature;
 
 /**
  * Default implementation of {@link FSTMethod} and {@link FSTField}.

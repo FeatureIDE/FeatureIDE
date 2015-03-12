@@ -10,7 +10,10 @@ Require-Bundle: org.eclipse.ui,
  de.ovgu.featureide.core,
  de.ovgu.featureide.fm.core,
  org.eclipse.ui.editors,
- org.eclipse.jface.text
+ org.eclipse.jface.text,
+ org.eclipse.jdt.core,
+ de.ovgu.featureide.ui,
+ de.ovgu.featureide.fm.ui
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,
  lib/preprocessor-v3-bin-1.3.jar

@@ -1117,6 +1117,85 @@
 			point="org.eclipse.ui.menus">
 		<menuContribution
 				allPopups="false"
+				locationURI="popup:de.ovgu.featureide.fm.ui.menus.popupMenu?before=de.ovgu.featureide.fm.ui.menus.popupMenu.submenus">
+			<menu
+					icon="icons/FeatureIconSmall.ico"
+					id="de.ovgu.featureide.ui.mpl.javadoc.subMenu"
+					label="Documentation">
+				<command
+						commandId="de.ovgu.featureide.ui.mpl.commands.javadoc.product"
+						id="de.ovgu.featureide.ui.mpl.actions.javadoc.product"
+						label="Create Product Documentation (Javadoc)"
+						style="push">
+					<visibleWhen
+							checkEnabled="false">
+						<reference
+								definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
+						</reference>
+					</visibleWhen>
+				</command>
+				<command
+						commandId="de.ovgu.featureide.ui.mpl.commands.javadoc.feature"
+						id="de.ovgu.featureide.ui.mpl.actions.javadoc.feature"
+						label="Create Feature Documentation (Javadoc)"
+						style="push">
+					<visibleWhen
+							checkEnabled="false">
+						<reference
+								definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
+						</reference>
+					</visibleWhen>
+				</command>
+				<command
+						commandId="de.ovgu.featureide.ui.mpl.commands.javadoc.meta"
+						id="de.ovgu.featureide.ui.mpl.actions.javadoc.meta"
+						label="Create Meta Documentation (Javadoc)"
+						style="push">
+					<visibleWhen
+							checkEnabled="false">
+						<reference
+								definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
+						</reference>
+					</visibleWhen>
+				</command>
+				<command
+						commandId="de.ovgu.featureide.ui.mpl.commands.javadoc.context"
+						id="de.ovgu.featureide.ui.mpl.actions.javadoc.context"
+						label="Create Context Documentation (Javadoc)"
+						style="push">
+					<visibleWhen
+							checkEnabled="false">
+						<reference
+								definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
+						</reference>
+					</visibleWhen>
+				</command>
+				<command
+						commandId="de.ovgu.featureide.ui.mpl.commands.javadoc.statistic"
+						id="de.ovgu.featureide.ui.mpl.actions.javadoc.statistic"
+						label="Create Documentation Statistics"
+						style="push">
+					<visibleWhen
+							checkEnabled="false">
+						<and>
+							<reference
+									definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
+							</reference>
+							<test
+									args="de.ovgu.featureide.core.mpl.MPLExperimentalNature"
+									property="de.ovgu.featureide.fm.ui.properties.nature"
+									value="true">
+							</test>
+						</and>
+					</visibleWhen>
+				</command>
+    <visibleWhen
+          checkEnabled="true">
+    </visibleWhen>
+			</menu>
+		</menuContribution>
+		<menuContribution
+				allPopups="false"
 				locationURI="popup:de.ovgu.featureide.fm.ui.menus.popupMenu?after=de.ovgu.featureide.fm.ui.menus.popupMenu.submenus">
 			<command
 					commandId="de.ovgu.featureide.ui.commands.productGenerator"
@@ -1218,6 +1297,26 @@
 		<command
 				id="de.ovgu.featureide.ui.commands.productGenerator"
 				name="Product Generator">
+		</command>
+		<command
+				id="de.ovgu.featureide.ui.mpl.commands.javadoc.context"
+				name="Create context documentation (Javadoc)">
+		</command>
+		<command
+				id="de.ovgu.featureide.ui.mpl.commands.javadoc.feature"
+				name="Create feature documentation (Javadoc)">
+		</command>
+		<command
+				id="de.ovgu.featureide.ui.mpl.commands.javadoc.meta"
+				name="Create meta documentation (Javadoc)">
+		</command>
+		<command
+				id="de.ovgu.featureide.ui.mpl.commands.javadoc.product"
+				name="Create product documentation (Javadoc)">
+		</command>
+		<command
+				id="de.ovgu.featureide.ui.mpl.commands.javadoc.statistic"
+				name="Create documentation statistics">
 		</command>
 	</extension>
 	<extension

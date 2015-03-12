@@ -21,10 +21,10 @@
 package de.ovgu.featureide.ui.mpl.handlers.interfaces;
 
 import de.ovgu.featureide.core.mpl.MPLPlugin;
-import de.ovgu.featureide.ui.mpl.handlers.AProjectJobHandler;
-import de.ovgu.featureide.ui.mpl.wizards.AbstractWizard;
+import de.ovgu.featureide.fm.ui.handlers.base.AProjectJobHandler;
+import de.ovgu.featureide.fm.ui.wizards.AbstractWizard;
+import de.ovgu.featureide.fm.ui.wizards.WizardConstants;
 import de.ovgu.featureide.ui.mpl.wizards.FeatureInterfaceWizard;
-import de.ovgu.featureide.ui.mpl.wizards.WizardConstants;
 
 /**
  * Action to compare all possible interface from the current configuration.

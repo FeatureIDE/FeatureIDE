@@ -34,7 +34,8 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.mpl.builder.MSPLNature;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
-import de.ovgu.featureide.ui.mpl.wizards.WizardConstants;
+import de.ovgu.featureide.fm.ui.wizards.AbstractWizardPage;
+import de.ovgu.featureide.fm.ui.wizards.WizardConstants;
 
 /**
  * A wizard page to select the project the user wants to import from. Shows all

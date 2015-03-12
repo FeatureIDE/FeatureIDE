@@ -21,18 +21,20 @@
 package de.ovgu.featureide.core.mpl.signature.filter;
 
 import de.ovgu.featureide.core.mpl.signature.ViewTag;
-import de.ovgu.featureide.core.mpl.signature.abstr.AbstractSignature;
+import de.ovgu.featureide.core.signature.base.AbstractSignature;
+import de.ovgu.featureide.core.signature.filter.IFilter;
 
-public class ViewTagFilter implements ISignatureFilter {
-	private final ViewTag viewTag;
+public class ViewTagFilter implements IFilter<AbstractSignature> {
+//	private final ViewTag viewTag;
 
 	public ViewTagFilter(ViewTag viewTag) {
-		this.viewTag = viewTag;
+//		this.viewTag = viewTag;
 	}
 
 	@Override
 	public boolean isValid(AbstractSignature signature) {
-		return signature.hasViewTag(viewTag);
+//		return signature.hasViewTag(viewTag);
+		return true;
 	}
 
 }

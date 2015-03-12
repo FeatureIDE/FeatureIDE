@@ -32,6 +32,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
@@ -43,22 +44,16 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.FeatureProjectNature;
 import de.ovgu.featureide.core.mpl.builder.InterfaceProjectNature;
 import de.ovgu.featureide.core.mpl.builder.MSPLNature;
-import de.ovgu.featureide.core.mpl.io.IOConstants;
 import de.ovgu.featureide.core.mpl.io.writer.JavaProjectWriter;
-import de.ovgu.featureide.core.mpl.job.CreateFujiSignaturesJob;
 import de.ovgu.featureide.core.mpl.job.CreateInterfaceJob;
-import de.ovgu.featureide.core.mpl.job.JobManager;
-import de.ovgu.featureide.core.mpl.job.PrintComparedInterfacesJob;
-import de.ovgu.featureide.core.mpl.job.PrintDocumentationJob;
-import de.ovgu.featureide.core.mpl.job.PrintDocumentationStatisticsJob;
-import de.ovgu.featureide.core.mpl.job.PrintExtendedSignaturesJob;
 import de.ovgu.featureide.core.mpl.job.PrintFeatureInterfacesJob;
-import de.ovgu.featureide.core.mpl.job.PrintStatisticsJob;
-import de.ovgu.featureide.core.mpl.job.util.AJobArguments;
-import de.ovgu.featureide.core.mpl.job.util.IChainJob;
+import de.ovgu.featureide.core.mpl.job.statistics.PrintComparedInterfacesJob;
+import de.ovgu.featureide.core.mpl.job.statistics.PrintExtendedSignaturesJob;
+import de.ovgu.featureide.core.mpl.job.statistics.PrintStatisticsJob;
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.PropertyConstants;
+import de.ovgu.featureide.fm.core.io.IOConstants;
 
 /** 
  * Plug-in activator with miscellaneous function for an interface project.
@@ -303,63 +298,59 @@ public class MPLPlugin extends AbstractCorePlugin {
 	public void refresh(IProject project) {
 		InterfaceProject interfaceProject = getInterfaceProject(project);
 		if (interfaceProject != null) {
-			interfaceProject.loadSignatures(true);
-		}
-	}
-	
-	public void buildFeatureInterfaces(LinkedList<IProject> projects, String folder, String viewName, int viewLevel, int configLimit) {
-		startJobs(projects, new PrintFeatureInterfacesJob.Arguments(folder));
-	}
-	
-	public void buildDocumentation(LinkedList<IProject> projects, String folder, String options, int mode) {
-		FMCorePlugin.getDefault().startJobs(projects, 
-				new PrintDocumentationJob.Arguments(folder, null, mode, options.split("\\s+")), true);
-	}
-	
-	public void buildDocumentation(LinkedList<IProject> projects, String folder, String options, int mode, String featurename) {
-		FMCorePlugin.getDefault().startJobs(projects, 
-				new PrintDocumentationJob.Arguments(folder, featurename, mode, options.split("\\s+")), true);
-	}
-	
-	public void buildDocumentationStatistics(LinkedList<IProject> projects, String folder) {
-		startJobs(projects, new PrintDocumentationStatisticsJob.Arguments(folder));
-	}
-	
-	public void buildConfigurationInterfaces(LinkedList<IProject> projects, String viewName, int viewLevel, int configLimit) {
-		startJobs(projects, new PrintComparedInterfacesJob.Arguments());
-	}
-	
-	public void compareConfigurationInterfaces(LinkedList<IProject> projects, String viewName, int viewLevel, int configLimit) {
-		startJobs(projects, new PrintComparedInterfacesJob.Arguments());
-	}
-	
-	public void buildExtendedModules(LinkedList<IProject> projects, String folder) {
-		startJobs(projects, new PrintExtendedSignaturesJob.Arguments(folder));
-	}
-	
-	public void printStatistics(LinkedList<IProject> projects, String folder) {
-		startJobs(projects, new PrintStatisticsJob.Arguments(folder));
-	}
-	
-	public void startJobs(LinkedList<IProject> projects, AJobArguments arguments) {
-		final Object idObject = new Object();
-		for (IProject p : projects) {
-			InterfaceProject interfaceProject = getInterfaceProject(p);
-			if (interfaceProject != null && interfaceProject.getProjectSignatures() == null) {
-				IChainJob job = new CreateFujiSignaturesJob();
-				job.setProject(p);
-				JobManager.addJob(idObject, job);
+//			interfaceProject.loadSignatures(true);
+			try {
+				project.build(IncrementalProjectBuilder.FULL_BUILD, null);
+			} catch (CoreException e) {
+				logError(e);
 			}
-			IChainJob job = arguments.createJob();
-			job.setProject(p);
-			JobManager.addJob(idObject, job);
 			
 		}
 	}
 	
+	public void buildFeatureInterfaces(LinkedList<IProject> projects, String folder, String viewName, int viewLevel, int configLimit) {
+		FMCorePlugin.getDefault().startJobs(projects, new PrintFeatureInterfacesJob.Arguments(folder), true);
+	}
+	
+//	public void buildDocumentationStatistics(LinkedList<IProject> projects, String folder) {
+//		startJobs(projects, new PrintDocumentationStatisticsJob.Arguments(folder));
+//	}
+	
+	public void buildConfigurationInterfaces(LinkedList<IProject> projects, String viewName, int viewLevel, int configLimit) {
+		FMCorePlugin.getDefault().startJobs(projects, new PrintComparedInterfacesJob.Arguments(), true);
+	}
+	
+	public void compareConfigurationInterfaces(LinkedList<IProject> projects, String viewName, int viewLevel, int configLimit) {
+		FMCorePlugin.getDefault().startJobs(projects, new PrintComparedInterfacesJob.Arguments(), true);
+	}
+	
+	public void buildExtendedModules(LinkedList<IProject> projects, String folder) {
+		FMCorePlugin.getDefault().startJobs(projects, new PrintExtendedSignaturesJob.Arguments(folder), true);
+	}
+	
+	public void printStatistics(LinkedList<IProject> projects, String folder) {
+		FMCorePlugin.getDefault().startJobs(projects, new PrintStatisticsJob.Arguments(folder), true);
+	}
+	
+//	public void startJobs(LinkedList<IProject> projects, AJobArguments arguments) {
+//		final Object idObject = new Object();
+//		for (IProject p : projects) {
+//			InterfaceProject interfaceProject = getInterfaceProject(p);
+//			if (interfaceProject != null && interfaceProject.getProjectSignatures() == null) {
+//				IChainJob job = new CreateFujiSignaturesJob();
+//				job.setProject(p);
+//				JobManager.addJob(idObject, job);
+//			}
+//			IChainJob job = arguments.createJob();
+//			job.setProject(p);
+//			JobManager.addJob(idObject, job);
+//			
+//		}
+//	}
+	
 	public void createInterface(IProject mplProject, IFeatureProject featureProject, Collection<String> featureNames) {
 		LinkedList<IProject> projectList = new LinkedList<IProject>();
 		projectList.add(mplProject);
-		startJobs(projectList, new CreateInterfaceJob.Arguments(featureProject, featureNames));
+		FMCorePlugin.getDefault().startJobs(projectList, new CreateInterfaceJob.Arguments(featureProject, featureNames), true);
 	}
 }

@@ -30,7 +30,8 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-import de.ovgu.featureide.ui.mpl.wizards.WizardConstants;
+import de.ovgu.featureide.fm.ui.wizards.AbstractWizardPage;
+import de.ovgu.featureide.fm.ui.wizards.WizardConstants;
 
 /**
  * A dialog page to specify the new view tag name and level.

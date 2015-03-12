@@ -24,8 +24,10 @@ Export-Package:
  de.ovgu.featureide.core.listeners,
  de.ovgu.featureide.core.propertypage,
  de.ovgu.featureide.core.signature,
- de.ovgu.featureide.core.signature.abstr,
+ de.ovgu.featureide.core.signature.base,
  de.ovgu.featureide.core.signature.comparator,
+ de.ovgu.featureide.core.signature.documentation,
+ de.ovgu.featureide.core.signature.documentation.base,
  de.ovgu.featureide.core.signature.filter,
  de.ovgu.featureide.core.signature.java,
  de.ovgu.featureide.core.wizardextension

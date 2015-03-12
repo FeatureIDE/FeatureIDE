@@ -69,11 +69,11 @@ import de.ovgu.featureide.core.listeners.IProjectListener;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.core.signature.ProjectSignatures.SignatureIterator;
 import de.ovgu.featureide.core.signature.ProjectStructure;
-import de.ovgu.featureide.core.signature.abstr.AbstractClassSignature;
-import de.ovgu.featureide.core.signature.abstr.AbstractFieldSignature;
-import de.ovgu.featureide.core.signature.abstr.AbstractMethodSignature;
-import de.ovgu.featureide.core.signature.abstr.AbstractSignature;
-import de.ovgu.featureide.core.signature.filter.ContextFilter;
+import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
+import de.ovgu.featureide.core.signature.base.AbstractFieldSignature;
+import de.ovgu.featureide.core.signature.base.AbstractMethodSignature;
+import de.ovgu.featureide.core.signature.base.AbstractSignature;
+import de.ovgu.featureide.core.signature.filter.FOPContextFilter;
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
@@ -655,7 +655,7 @@ public class CorePlugin extends AbstractCorePlugin {
 
 		if (signatures != null) {
 			SignatureIterator it = signatures.iterator();
-			it.addFilter(new ContextFilter(featureName, signatures));
+			it.addFilter(new FOPContextFilter(featureName, signatures));
 
 			while (it.hasNext()) {
 				AbstractSignature curMember = it.next();
@@ -734,7 +734,7 @@ public class CorePlugin extends AbstractCorePlugin {
 			SignatureIterator it = signatures.iterator();
 			//TODO check
 			if (featureName != null) {
-				it.addFilter(new ContextFilter(featureName, signatures));
+				it.addFilter(new FOPContextFilter(featureName, signatures));
 			}
 			return new ProjectStructure(it);
 		}

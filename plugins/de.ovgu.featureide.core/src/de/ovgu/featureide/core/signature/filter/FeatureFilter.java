@@ -20,9 +20,9 @@
  */
 package de.ovgu.featureide.core.signature.filter;
 
-import de.ovgu.featureide.core.signature.abstr.AbstractSignature;
+import de.ovgu.featureide.core.signature.base.AbstractSignature;
 
-public class FeatureFilter implements ISignatureFilter {
+public class FeatureFilter implements IFilter<AbstractSignature> {
 	private final int[] featureList;
 	
 	public FeatureFilter(int... featureList) {

@@ -28,7 +28,7 @@ import AST.ImportDecl;
 import AST.InterfaceDecl;
 import AST.List;
 import AST.TypeDecl;
-import de.ovgu.featureide.core.signature.abstr.AbstractClassSignature;
+import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 
 /**
  * Holds the java signature of a class.

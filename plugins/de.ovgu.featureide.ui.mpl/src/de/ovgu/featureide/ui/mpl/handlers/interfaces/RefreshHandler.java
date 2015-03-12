@@ -29,7 +29,6 @@ public class RefreshHandler extends AFeatureProjectHandler {
 	@Override
 	protected void singleAction(IFeatureProject project) {
 		MPLPlugin.getDefault().refresh(project.getProject());
-		
 	}
 	
 }

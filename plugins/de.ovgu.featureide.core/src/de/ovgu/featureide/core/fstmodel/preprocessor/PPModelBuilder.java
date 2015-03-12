@@ -22,6 +22,7 @@ package de.ovgu.featureide.core.fstmodel.preprocessor;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
@@ -48,9 +49,10 @@ import de.ovgu.featureide.fm.core.Feature;
  */
 public class PPModelBuilder {
 
+	protected final IFeatureProject featureProject;
+
 	protected FSTModel model;
-	private IFeatureProject featureProject;
-	private List<String> featureNames = new LinkedList<String>();
+	protected List<String> featureNames = Collections.emptyList();
 	
 	public PPModelBuilder(IFeatureProject featureProject) {
 		model = new FSTModel(featureProject);
