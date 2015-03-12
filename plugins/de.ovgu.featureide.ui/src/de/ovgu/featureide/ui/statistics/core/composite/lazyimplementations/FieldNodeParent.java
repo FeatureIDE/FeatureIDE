@@ -9,34 +9,30 @@ import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 
 /**
- * TODO description
+ * Node to display the fields in the StatisticsProgrammSize
  * 
  * @author Schleicher Miro
  */
 public class FieldNodeParent extends LazyParent {
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.ui.statistics.core.composite.LazyParent#initChildren()
-	 */
+
 	FSTField fstField;
-	
-	
-	public FieldNodeParent(String descString, FSTField fstField, LinkedList<FSTField> allFields){
-		
+
+	public FieldNodeParent(String descString, FSTField fstField, LinkedList<FSTField> allFields) {
+
 		super(descString);
 		this.fstField = fstField;
 		int numberOfRoles = countFieldsWithSameName(allFields);
 		setValue(new Integer(numberOfRoles));
-		
+
 	}
-	
 
 	private int countFieldsWithSameName(LinkedList<FSTField> fields) {
 		int c = 0;
 		for (FSTField tempField : fields) {
-			if(tempField.getFullIdentifier().equals(fstField.getFullIdentifier())) {
+			if (tempField.getFullIdentifier().equals(fstField.getFullIdentifier())) {
 				c++;
-				
+
 				addChild(new Parent(tempField.getRole().getFeature().getName(), tempField));
 			}
 		}
@@ -45,7 +41,7 @@ public class FieldNodeParent extends LazyParent {
 
 	@Override
 	protected void initChildren() {
-		
+
 	}
 
 }

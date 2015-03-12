@@ -20,10 +20,7 @@
  */
 package de.ovgu.featureide.ui.statistics.ui.helper;
 
-import guidsl.Paren;
-
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -35,12 +32,8 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbench;
@@ -50,18 +43,10 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.texteditor.ITextEditor;
 
-import de.ovgu.featureide.core.CorePlugin;
-import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.fstmodel.FSTClass;
+import de.ovgu.featureide.core.fstmodel.FSTClassFragment;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
-import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
-import de.ovgu.featureide.core.signature.ProjectSignatures;
-import de.ovgu.featureide.core.signature.abstr.AbstractClassFragment;
-import de.ovgu.featureide.core.signature.abstr.AbstractSignature;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.ClassNodeParent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.ConfigParentNode;
@@ -69,11 +54,6 @@ import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.Field
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.MethodNodeParent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.genericdatatypes.AbstractSortModeNode;
 import de.ovgu.featureide.ui.statistics.ui.ConfigDialog;
-
-import org.eclipse.core.resources.IFile;
-import org.eclipse.jface.viewers.ILabelProvider;
-import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.swt.widgets.TreeItem;
 
 /**
  * Simple listener for the treeview.
@@ -127,37 +107,17 @@ public class TreeClickListener implements IDoubleClickListener {
 					&& (((Parent) selected).getParent() instanceof FieldNodeParent || ((Parent) selected).getParent() instanceof ClassNodeParent || ((Parent) selected)
 							.getParent() instanceof MethodNodeParent)) {
 				IFile iFile;
-				if(((Parent)selected).getValue() instanceof FSTField) {
-					iFile = ((FSTField)((Parent)selected).getValue()).getRole().getFile();
-					openEditor(iFile);
-				}
-				else if(((Parent)selected).getValue() instanceof FSTMethod) {
-					iFile = ((FSTMethod)((Parent)selected).getValue()).getRole().getFile();
-					openEditor(iFile);
-				}
-				else {
-					iFile = ((FSTRole)((Parent)selected).getValue()).getFile();
-//					openEditor(iFile);
-
-
-					final IWorkbench workbench = PlatformUI.getWorkbench();
-					final IWorkbenchPage activePage = workbench.getActiveWorkbenchWindow().getActivePage();
-					IEditorPart editorPart = activePage.findEditor(new FileEditorInput(iFile));
-					IContentDescription description;
-					try {
-						description = iFile.getContentDescription();
-						final IEditorDescriptor desc = workbench.getEditorRegistry().getDefaultEditor(iFile.getName(),
-							(description != null) ? description.getContentType() : null);
-					if (editorPart == null) {
-						editorPart = activePage.openEditor(new FileEditorInput(iFile), (desc != null) ? desc.getId() : "org.eclipse.ui.DefaultTextEditor");
-					}
-					scrollToLine(editorPart, 5/* (dataIndex > -1) ? sig.getFeatureData()[dataIndex].getLineNumber() : 1*/);
-					} catch (CoreException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					
-					
+				if (((Parent) selected).getValue() instanceof FSTField) {
+					iFile = ((FSTField) ((Parent) selected).getValue()).getRole().getFile();
+					int line = ((FSTField) ((Parent) selected).getValue()).getLine();
+					openEditor(iFile, line);
+				} else if (((Parent) selected).getValue() instanceof FSTMethod) {
+					iFile = ((FSTMethod) ((Parent) selected).getValue()).getRole().getFile();
+					int line = ((FSTMethod) ((Parent) selected).getValue()).getLine();
+					openEditor(iFile, line);
+				} else {
+					iFile = ((FSTRole) ((FSTClassFragment) ((Parent) selected).getValue()).getRole()).getFile();
+					openEditor(iFile, 1);
 				}
 			}
 
@@ -178,7 +138,7 @@ public class TreeClickListener implements IDoubleClickListener {
 			}
 		}
 	}
-	
+
 	public static void scrollToLine(IEditorPart editorPart, int lineNumber) {
 		if (!(editorPart instanceof ITextEditor) || lineNumber <= 0) {
 			return;
@@ -197,30 +157,20 @@ public class TreeClickListener implements IDoubleClickListener {
 		}
 	}
 
-	public void openEditor(IFile iFile) {
-		if (iFile.isAccessible()) {
-			final IWorkbench workbench = PlatformUI.getWorkbench();
-			try {
-				final IContentDescription description = iFile.getContentDescription();
-				final IEditorDescriptor desc = workbench.getEditorRegistry().getDefaultEditor(iFile.getName(),
-						(description != null) ? description.getContentType() : null);
-				final IWorkbenchPage activePage = workbench.getActiveWorkbenchWindow().getActivePage();
-				IEditorPart editorPart = activePage.findEditor(new FileEditorInput(iFile));
-				if (editorPart == null) {
-					editorPart = activePage.openEditor(new FileEditorInput(iFile), (desc != null) ? desc.getId() : "org.eclipse.ui.DefaultTextEditor");
-				}
-
-				//				final int dataIndex = sig.hasFeature(featureID);
-//								scrollToLine(editorPart, (dataIndex > -1) ? sig.getFeatureData()[dataIndex].getLineNumber() : 1);
-			} catch (CoreException e) {
-				UIPlugin.getDefault().logError(e);
-			}
+	public void openEditor(IFile iFile, int line) {
+		final IWorkbench workbench = PlatformUI.getWorkbench();
+		final IWorkbenchPage activePage = workbench.getActiveWorkbenchWindow().getActivePage();
+		IEditorPart editorPart = null;
+		IContentDescription description;
+		try {
+			description = iFile.getContentDescription();
+			final IEditorDescriptor desc = workbench.getEditorRegistry().getDefaultEditor(iFile.getName(),
+					(description != null) ? description.getContentType() : null);
+			editorPart = activePage.openEditor(new FileEditorInput(iFile), (desc != null) ? desc.getId() : "org.eclipse.ui.DefaultTextEditor");
+			scrollToLine(editorPart, line);
+		} catch (CoreException e) {
+			e.printStackTrace();
 		}
 	}
-	
-	
-	
-	
-	
 
 }

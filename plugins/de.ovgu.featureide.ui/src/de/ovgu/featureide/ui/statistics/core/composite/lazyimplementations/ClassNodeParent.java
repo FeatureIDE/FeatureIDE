@@ -30,7 +30,7 @@ import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 
 /**
- * TODO description
+ * Node to display the methods in the StatisticsProgrammSize
  * 
  * @author Schleicher Miro
  */
@@ -53,9 +53,7 @@ public class ClassNodeParent extends LazyParent {
 		this.fstModel = fstMod;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.ui.statistics.core.composite.LazyParent#initChildren()
-	 */
+
 	@Override
 	protected void initChildren() {
 
@@ -67,17 +65,11 @@ public class ClassNodeParent extends LazyParent {
 
 		} else if (fstClassFrag != null) {
 
-			//			LinkedList<FSTRole> fstRole = new LinkedList<FSTRole>();
-			//			for (FSTClass fstClass : fstModel.getClasses()) {
-			//				for (FSTRole fstRole2 : fstClass.getRoles()) {
-			//					
-			//				}
-
 			for (FSTClass currClass : fstModel.getClasses()) {
 				for (LinkedList<FSTClassFragment> iterable_element : currClass.getAllFSTFragments()) {
 					for (FSTClassFragment fstFrag : iterable_element) {
 						if (fstFrag.getFullIdentifier().equals(fstClassFrag.getFullIdentifier())) {
-							addChild(new Parent(fstFrag.getRole().getFeature().getName(), fstFrag.getRole()));
+							addChild(new Parent(fstFrag.getRole().getFeature().getName(), fstFrag/*.getRole()*/));
 						}
 					}
 				}
@@ -85,7 +77,6 @@ public class ClassNodeParent extends LazyParent {
 
 		}
 
-		//fstModel.getClasses();
 
 	}
 

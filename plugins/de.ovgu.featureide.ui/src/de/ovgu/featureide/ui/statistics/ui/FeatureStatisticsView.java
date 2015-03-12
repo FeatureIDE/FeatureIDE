@@ -197,7 +197,9 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 						} else {
 							IResource anyFile = ResourceUtil.getResource(((IEditorPart) currentEditor).getEditorInput());
 							//TODO is refresh really necessary? -> true?
-							contentProvider.calculateContent(anyFile, false);
+							
+							contentProvider.calculateContent(anyFile, true);
+							
 						}
 						return Status.OK_STATUS;
 					}

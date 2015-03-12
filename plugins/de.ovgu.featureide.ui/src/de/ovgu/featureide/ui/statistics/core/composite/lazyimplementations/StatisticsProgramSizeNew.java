@@ -33,7 +33,9 @@ import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 
 /**
- * TODO description
+ * TreeNode who stores the number of classes, roles, fields and methods of a
+ * given {@link FSTModel}.<br>
+ * This node should only be used for a feature oriented project.
  * 
  * @author Schleicher Miro
  */
@@ -46,9 +48,7 @@ public class StatisticsProgramSizeNew extends LazyParent {
 		this.fstModel = fstModel;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.ui.statistics.core.composite.LazyParent#initChildren()
-	 */
+
 	@Override
 	protected void initChildren() {
 
@@ -84,10 +84,10 @@ public class StatisticsProgramSizeNew extends LazyParent {
 
 		addChild(new SumImplementationArtifactsParent(NUMBER_CLASS + SEPARATOR + numberOfClasses + " | " + NUMBER_ROLE + SEPARATOR + numberOfRoles, fstModel,
 				SumImplementationArtifactsParent.NUMBER_OF_CLASSES));
-		addChild(new SumImplementationArtifactsParent(NUMBER_FIELD_U + SEPARATOR + numberOfUniFields + " | " + NUMBER_FIELD + SEPARATOR + numberOfFields, fstModel,
-				SumImplementationArtifactsParent.NUMBER_OF_FIELDS));
-		addChild(new SumImplementationArtifactsParent(NUMBER_METHOD_U + SEPARATOR + numberOfUniMethods + " | " + NUMBER_METHOD + SEPARATOR + numberOfMethods, fstModel,
-				SumImplementationArtifactsParent.NUMBER_OF_METHODS));
+		addChild(new SumImplementationArtifactsParent(NUMBER_FIELD_U + SEPARATOR + numberOfUniFields + " | " + NUMBER_FIELD + SEPARATOR + numberOfFields,
+				fstModel, SumImplementationArtifactsParent.NUMBER_OF_FIELDS));
+		addChild(new SumImplementationArtifactsParent(NUMBER_METHOD_U + SEPARATOR + numberOfUniMethods + " | " + NUMBER_METHOD + SEPARATOR + numberOfMethods,
+				fstModel, SumImplementationArtifactsParent.NUMBER_OF_METHODS));
 	}
 
 }

@@ -12,7 +12,7 @@ import de.ovgu.featureide.core.fstmodel.IRoleElement;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 
 /**
- * TODO description
+ * displays the sums of the different components in the statistics 
  * 
  * @author Schleicher Miro
  */
@@ -31,9 +31,7 @@ public class SumImplementationArtifactsParent extends LazyParent {
 		this.type = type;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.ui.statistics.core.composite.LazyParent#initChildren()
-	 */
+
 	@Override
 	protected void initChildren() {
 
