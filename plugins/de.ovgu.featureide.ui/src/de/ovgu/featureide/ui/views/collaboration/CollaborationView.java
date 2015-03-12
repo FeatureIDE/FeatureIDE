@@ -25,6 +25,9 @@ import java.beans.PropertyChangeListener;
 import java.util.List;
 import java.util.Vector;
 
+import javax.swing.JSeparator;
+import javax.swing.SwingConstants;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -42,6 +45,7 @@ import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
 import org.eclipse.gef.ui.actions.PrintAction;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.gef.ui.parts.ScrollingGraphicalViewer;
+import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -100,6 +104,7 @@ import de.ovgu.featureide.ui.views.collaboration.action.ShowFieldsMethodsAction;
 import de.ovgu.featureide.ui.views.collaboration.action.ShowUnselectedAction;
 import de.ovgu.featureide.ui.views.collaboration.editparts.CollaborationEditPart;
 import de.ovgu.featureide.ui.views.collaboration.editparts.GraphicalEditPartFactory;
+import de.ovgu.featureide.ui.views.collaboration.figures.RoleFigure;
 import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModelBuilder;
 
 /**
@@ -121,12 +126,12 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	private static final String OPEN_MESSAGE = "Open a file from a FeatureIDE project";
 
 	private static final String ADD_LABEL = "Add new Class / Role";
-	private static final String DELETE_LABEL = "Delete";
 	private static final String FILTER_LABEL = "Filter";
+	private static final String DELETE_LABEL = "Delete";
 	private static final String UNSELECTED_LABEL = "Show unselected features";
 	private static final String EXPORT_AS_LABEL = "Export As";
-
-	private static final String TOOL_TIP_LABEL = "Build collaborationmodel";
+	
+	private static final String REFRESH_TOOL_TIP_LABEL = "Build collaborationmodel";
 
 	private static final String[] FIELD_METHOD_LABEL_NAMES = { "Fields with Refinements",
 			"Fields without Refinements","Methods with Refinements", "Methods without Refinements",
@@ -134,8 +139,8 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 			"Hide Parameters/Types", "Public", "Protected", "Default",
 			"Private", "Select All", "Deselect All", };
 
-	private static final Image[] FIELD_METHOD_IMAGES = { null, null, null, null, IMAGE_AT,
-			IMAGE_AT, null, null, IMAGE_METHODE_PUBLIC, IMAGE_METHODE_PROTECTED,
+	private static final Image[] FIELD_METHOD_IMAGES = { IMAGE_FIELDS_REFINEMENTS, IMAGE_FIELDS_WITHOUT_REFINEMENTS, IMAGE_METHODS_REFINEMENTS, IMAGE_METHODS_WITHOUT_REFINEMENTS, IMAGE_AT,
+			IMAGE_AT, IMAGE_NESTED_CLASS, null, IMAGE_METHODE_PUBLIC, IMAGE_METHODE_PROTECTED,
 			IMAGE_METHODE_DEFAULT, IMAGE_METHODE_PRIVATE, null, null };
 
 	private GraphicalViewerImpl viewer;
@@ -144,6 +149,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	private AddRoleAction addRoleAction;
 	private DeleteAction delAction;
 	private Action toolbarAction;
+	private Action filterToolbarAction;
 	private FilterAction filterAction;
 	private PrintAction printAction;
 	private ShowUnselectedAction showUnselectedAction;
@@ -295,6 +301,13 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		search = builder.setAttachedViewerParent(viewer).setSearchBoxText("Search in Collaboration Diagram").setFindResultsColor(ROLE_BACKGROUND_SELECTED)
 				.setNoSearchResultsColor(ROLE_BACKGROUND_UNSELECTED).create();
 
+	}
+	
+	private void refreshActionBars()
+	{
+		IActionBars bars = getViewSite().getActionBars();
+		bars.getToolBarManager().update(true);
+//		bars.updateActionBars();
 	}
 
 	private void contributeToActionBars() {
@@ -501,7 +514,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		delAction = new DeleteAction(DELETE_LABEL, viewer);
 		filterAction = new FilterAction(FILTER_LABEL, viewer, this);
 		showUnselectedAction = new ShowUnselectedAction(UNSELECTED_LABEL, this);
-
+		
 		for (int i = 0; i < FIELD_METHOD_LABEL_NAMES.length; i++) {
 			setFieldsMethodsActions[i] = new ShowFieldsMethodsAction(FIELD_METHOD_LABEL_NAMES[i], FIELD_METHOD_IMAGES[i], this, i);
 		}
@@ -518,15 +531,37 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	}
 
 	private void fillLocalToolBar(IToolBarManager manager) {
+		Action showAccessModifiers = new Action("Access Modifiers", Action.AS_DROP_DOWN_MENU) {
+			public void run() {
+				
+			}
+		};
+		showAccessModifiers.setImageDescriptor(ImageDescriptor.createFromImage(IMAGE_METHODE_PROTECTED));
+		manager.add(showAccessModifiers);
+		
+		for (int i = 0; i <= ShowFieldsMethodsAction.SHOW_NESTED_CLASSES; i++)
+		{
+			if (i == ShowFieldsMethodsAction.SHOW_NESTED_CLASSES)
+			{
+				manager.add(new Separator());
+			}
+			ShowFieldsMethodsAction action = setFieldsMethodsActions[i];
+			manager.add(action);
+			action.setToolTipText("Display "+action.getText());
+			action.setChecked(false);
+			action.setChecked(RoleFigure.getRoleSelections()[i]);
+		}
+		manager.add(new Separator());
 		manager.add(toolbarAction);
-		toolbarAction.setToolTipText(TOOL_TIP_LABEL);
+		
+		toolbarAction.setToolTipText(REFRESH_TOOL_TIP_LABEL);
 		toolbarAction.setImageDescriptor(ImageDescriptor.createFromImage(REFESH_TAB_IMAGE));
 	}
 
 	private void makeActions() {
 		toolbarAction = new Action() {
 			public void run() {
-				Job job = new AStoppableJob("Refresh Collaboration View") {
+				Job refreshJob = new AStoppableJob("Refresh Collaboration View") {
 					@Override
 					protected boolean work() throws Exception {
 						if (!toolbarAction.isEnabled())
@@ -542,8 +577,31 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 						return true;
 					}
 				};
-				job.setPriority(Job.SHORT);
-				job.schedule();
+				refreshJob.setPriority(Job.SHORT);
+				refreshJob.schedule();				
+			}
+		};
+		
+		filterToolbarAction = new Action() {
+			public void run() {
+				Job refreshJob = new AStoppableJob("Refresh Collaboration View") {
+					@Override
+					protected boolean work() throws Exception {
+						if (!toolbarAction.isEnabled())
+							return true;
+						toolbarAction.setEnabled(false);
+						if (featureProject != null) {
+							IComposerExtensionClass composer = featureProject.getComposer();
+							if (composer != null) {
+								composer.buildFSTModel();
+								updateGuiAfterBuild(featureProject, null);
+							}
+						}
+						return true;
+					}
+				};
+				refreshJob.setPriority(Job.SHORT);
+				refreshJob.schedule();				
 			}
 		};
 	}
@@ -594,6 +652,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	}
 
 	public void refresh() {
+		refreshActionBars();
 		final FSTModel model = builder.buildCollaborationModel(featureProject);
 
 		if (model == null) {

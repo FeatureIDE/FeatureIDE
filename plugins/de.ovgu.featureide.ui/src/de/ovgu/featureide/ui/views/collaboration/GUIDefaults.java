@@ -124,6 +124,11 @@ public interface GUIDefaults {
 	Image REFESH_TAB_IMAGE = UIPlugin.getImage("refresh_tab.gif");
 
 	// Collaboration Diagram 
+	Image IMAGE_NESTED_CLASS = UIPlugin.getImage("nested_class_icon.png");
+	Image IMAGE_FIELDS_REFINEMENTS = UIPlugin.getImage("fields_with_refinements.png");
+	Image IMAGE_FIELDS_WITHOUT_REFINEMENTS = UIPlugin.getImage("fields_without_refinements.png");
+	Image IMAGE_METHODS_REFINEMENTS = UIPlugin.getImage("methods_with_refinements.png");
+	Image IMAGE_METHODS_WITHOUT_REFINEMENTS = UIPlugin.getImage("methods_without_refinements.png");
 	Image IMAGE_FIELD_PRIVATE = UIPlugin.getImage("field_private_obj.gif");
 	Image IMAGE_FIELD_PROTECTED = UIPlugin.getImage("field_protected_obj.gif");
 	Image IMAGE_FIELD_PUBLIC = UIPlugin.getImage("field_public_obj.gif");
@@ -136,7 +141,7 @@ public interface GUIDefaults {
 	Image IMAGE_METHODE_PUBLIC_CONTRACT = UIPlugin.getImage("public_co_contract.gif");
 	Image IMAGE_METHODE_PROTECTED_CONTRACT = UIPlugin.getImage("protected_co_contract.gif");
 	Image IMAGE_METHODE_PRIVATE_CONTRACT = UIPlugin.getImage("private_co_contract.gif");
-	Image IMAGE_AT = UIPlugin.getImage("aticon.gif");
+	Image IMAGE_AT = UIPlugin.getImage("aticon.png");
 	Image IMAGE_AT_WITHOUT_WHITE_BACKGROUND = UIPlugin.getImage("aticon_2.gif");
 	Image IMAGE_CLASS = UIPlugin.getImage("class_obj.gif");
 	Image IMAGE_FEATURE = UIPlugin.getImage("FeatureIconSmall.ico");

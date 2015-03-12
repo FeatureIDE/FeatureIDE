@@ -74,7 +74,6 @@ public class ShowFieldsMethodsAction extends Action {
 
 	public void run() {
 		boolean[] selected = RoleFigure.getSelectedFieldMethod();
-
 		switch (this.index) {
 		case SELECT_ALL:
 			setSelected(true, selected);
@@ -83,9 +82,11 @@ public class ShowFieldsMethodsAction extends Action {
 			setSelected(false, selected);
 			break;
 		default:
-			selected[this.index] = !selected[this.index];
+			selected[this.index] = !selected[this.index];			
+			super.setChecked(selected[this.index]);
 			break;
 		}
+		
 		RoleFigure.setSelectedFieldMethod(selected);
 		collaborationView.refresh();
 	}
@@ -93,7 +94,9 @@ public class ShowFieldsMethodsAction extends Action {
 	private void setSelected(boolean value, boolean[] selected) {
 		for (int i = FIELDS_WITH_REFINEMENTS; i < selected.length; i++) {
 			if (i != HIDE_PARAMETERS_AND_TYPES)
+			{
 				selected[i] = value;
+			}
 		}
 	}
 	

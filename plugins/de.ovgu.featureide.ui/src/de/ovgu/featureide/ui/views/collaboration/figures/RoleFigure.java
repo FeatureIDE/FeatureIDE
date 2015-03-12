@@ -232,8 +232,11 @@ public class RoleFigure extends Figure implements GUIDefaults {
 		if (!(role instanceof FSTArbitraryRole) && role.getDirectives().isEmpty()) {
 			int fieldCount = getCountForFieldContentCreate(tooltipContent);
 			int methodCount = getCountForMethodContentCreate(tooltipContent);
-
 			Object[] invariant = createInvariantContent(tooltipContent);
+			
+			fieldCount = getCountForFields();
+			methodCount = getCountForMethods();
+			
 			addLabel(new Label("Fields: " + fieldCount + " Methods: " + methodCount + " Invariants: " + ((Integer) invariant[0]) + " "));
 		} else if (role.getClassFragment().getName().startsWith("*.")) {
 			setContentForFiles(new CompartmentFigure(), tooltipContent);
@@ -363,6 +366,16 @@ public class RoleFigure extends Figure implements GUIDefaults {
 		}
 		return methodCount;
 	}
+	
+	private int getCountForMethods()
+	{
+		return role.getClassFragment().getMethods().size();
+	}
+	
+	private int getCountForFields()
+	{
+		return role.getClassFragment().getFields().size();
+	}
 
 	private int getCountForMethodContentCreate(Figure tooltipContent) {
 
@@ -484,7 +497,7 @@ public class RoleFigure extends Figure implements GUIDefaults {
 		classLabel.setForegroundColor(ROLE_FOREGROUND_UNSELECTED);
 		return classLabel;
 	}
-
+	
 	private int getCountForFieldContentCreate(Figure tooltipContent) {
 		CompartmentFigure fieldFigure = new CompartmentFigure();
 		Label label = new Label(getClassName() + " ", IMAGE_CLASS);
@@ -504,7 +517,7 @@ public class RoleFigure extends Figure implements GUIDefaults {
 				fieldCount++;
 
 				if (isFieldMethodFilterActive()) {
-					this.addLabel(fieldLabel);
+					addLabel(fieldLabel);
 				} else {
 					if (fieldCount % 25 == 0) {
 						tooltipContent.add(fieldFigure);
