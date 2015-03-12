@@ -52,6 +52,7 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.core.ClasspathEntry;
 import org.eclipse.jdt.internal.core.JavaProject;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.prop4j.Node;
 import org.prop4j.NodeWriter;
 import org.sat4j.specs.TimeoutException;
@@ -60,7 +61,6 @@ import AST.Problem;
 import AST.Program;
 import cide.gparser.ParseException;
 import cide.gparser.TokenMgrError;
-
 import composer.CmdLineInterpreter;
 import composer.CompositionException;
 import composer.FSTGenComposer;
@@ -68,7 +68,6 @@ import composer.FSTGenComposerExtension;
 import composer.ICompositionErrorListener;
 import composer.IParseErrorListener;
 import composer.rules.meta.FeatureModelInfo;
-
 import de.ovgu.cide.fstgen.ast.FSTNode;
 import de.ovgu.cide.fstgen.ast.FSTTerminal;
 import de.ovgu.featureide.core.IFeatureProject;
@@ -1214,6 +1213,17 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	}
 
 	public void setUseFuji(boolean useFuji) {
+		// This is actually a quick fix until Fuji works on JRE8
+		// Begin of Quick Fix
+		final boolean jre8 = System.getProperty("java.runtime.version").substring(0, 3).equals("1.8");
+		
+		if (jre8) {
+			MessageDialog.openInformation(null, "Information", "Fuji Typechecker is currently not supported for Java 1.8 runtime.");
+			setProperty(USE_FUJI, false);
+			return;
+		}
+		// End of Quick Fix	
+			
 		setProperty(USE_FUJI, useFuji);
 
 		if (useFuji) {
