@@ -23,14 +23,16 @@ package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.gene
 import java.util.Collections;
 import java.util.Comparator;
 
+import de.ovgu.featureide.core.fstmodel.FSTClassFragment;
+import de.ovgu.featureide.core.fstmodel.FSTField;
+import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.ui.statistics.core.composite.IToolTip;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 import de.ovgu.featureide.ui.statistics.ui.helper.TreeClickListener;
 
 /**
- * Implements a second sorting-order. If
- * {@link AbstractSortModeNode#sortByValue} is true, the imminent child nodes are
+ * Implements a second sorting-order. If {@link AbstractSortModeNode#sortByValue} is true, the imminent child nodes are
  * sorted by their value instead of being sorted alphabetically. In this
  * implementation the {@link TreeClickListener} is responsible for changing
  * this.
@@ -40,36 +42,53 @@ import de.ovgu.featureide.ui.statistics.ui.helper.TreeClickListener;
  */
 public abstract class AbstractSortModeNode extends LazyParent implements IToolTip {
 	protected boolean sortByValue = false;
-	
+
 	public AbstractSortModeNode(String description, Object value) {
 		super(description, value);
 		setSorted(true);
 	}
-	
+
 	public AbstractSortModeNode(String description) {
 		super(description);
 		setSorted(true);
 	}
-	
+
 	public boolean isSortByValue() {
 		return sortByValue;
 	}
-	
+
 	public void setSortByValue(boolean sortByValue) {
 		this.sortByValue = sortByValue;
 	}
-	
+
 	@Override
 	protected void sortChildren() {
 		if (sortByValue) {
+
 			Collections.sort(children, new Comparator<Parent>() {
 				@Override
 				public int compare(Parent o1, Parent o2) {
-					return ((Integer) o2.getValue()) - ((Integer) o1.getValue());
+
+					if (o1.getValue() == null) {
+						String o1Clean = o1.getDescription().substring(o1.getDescription().lastIndexOf(": "), (o1.getDescription().length()));
+						String o2Clean = o2.getDescription().substring(o2.getDescription().lastIndexOf(": "), (o2.getDescription().length()));
+						return -(o1Clean.compareTo(o2Clean));
+					} else {
+						return ((Integer) o2.getValue()) - ((Integer) o1.getValue());
+					}
+
 				}
 			});
+
 		} else {
-			super.sortChildren();
+
+			Collections.sort(children, new Comparator<Parent>() {
+				@Override
+				public int compare(Parent o1, Parent o2) {
+					return o1.getDescription().compareTo(o2.getDescription());
+				}
+			});
+
 		}
 	}
 
@@ -83,5 +102,5 @@ public abstract class AbstractSortModeNode extends LazyParent implements IToolTi
 		}
 		return null;
 	}
-	
+
 }

@@ -1,5 +1,7 @@
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 
 import de.ovgu.featureide.core.fstmodel.FSTClass;
@@ -9,14 +11,17 @@ import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.IRoleElement;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
+import de.ovgu.featureide.ui.statistics.core.composite.Parent;
+import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.genericdatatypes.AbstractSortModeNode;
 
 /**
- * displays the sums of the different components in the statistics 
+ * displays the sums of the different components in the statistics
  * 
  * @author Schleicher Miro
  */
-public class SumImplementationArtifactsParent extends LazyParent {
+public class SumImplementationArtifactsParent extends AbstractSortModeNode {
 	private FSTModel fstModel;
 
 	private int type;
@@ -30,7 +35,6 @@ public class SumImplementationArtifactsParent extends LazyParent {
 		this.fstModel = fstModel;
 		this.type = type;
 	}
-
 
 	@Override
 	protected void initChildren() {
@@ -88,4 +92,5 @@ public class SumImplementationArtifactsParent extends LazyParent {
 		}
 
 	}
+
 }

@@ -119,11 +119,12 @@ public class TreeClickListener implements IDoubleClickListener {
 					iFile = ((FSTRole) ((FSTClassFragment) ((Parent) selected).getValue()).getRole()).getFile();
 					openEditor(iFile, 1);
 				}
+				
 			}
-
 		}
 	}
 
+	
 	/**
 	 * Opens a dialog to start the calculation corresponding to the clicked
 	 * config-node - but only if their isn't already a calculation in progress.

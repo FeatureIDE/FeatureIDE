@@ -41,7 +41,6 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.ide.ResourceUtil;
 import org.eclipse.ui.part.ViewPart;
-import org.eclipse.ui.progress.UIJob;
 
 import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -63,6 +62,8 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 	private TreeViewer viewer;
 	private ContentProvider contentProvider;
 	private IWorkbenchPart currentEditor;
+	
+	private IResource currentInput;
 
 	public static final String ID = UIPlugin.PLUGIN_ID + ".statistics.ui.FeatureStatisticsView";
 
@@ -82,6 +83,7 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 
 		getSite().getPage().addPartListener(editorListener);
 		IWorkbenchPage page = getSite().getPage();
+		currentInput = ResourceUtil.getResource((page.getActiveEditor().getEditorInput()));
 		setEditor(page.getActiveEditor());
 
 		addButtons();
@@ -103,7 +105,7 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 
 		Action refresher = new Action() {
 			public void run() {
-				FeatureStatisticsView.this.refresh();
+				FeatureStatisticsView.this.refresh(true);
 			}
 		};
 
@@ -154,7 +156,7 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 	private PropertyChangeListener modelListener = new PropertyChangeListener() {
 		public void propertyChange(PropertyChangeEvent evt) {
 			if (!PropertyConstants.MODEL_LAYOUT_CHANGED.equals(evt.getPropertyName()))
-				refresh();
+				refresh(false);
 		}
 
 	};
@@ -164,7 +166,7 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 	/**
 	 * Refresh the view.
 	 */
-	private void refresh() {
+	private void refresh(final boolean button) {
 		if (contentProvider.isCanceled()) {
 			return;
 		}
@@ -198,7 +200,15 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 							IResource anyFile = ResourceUtil.getResource(((IEditorPart) currentEditor).getEditorInput());
 							//TODO is refresh really necessary? -> true?
 							
-							contentProvider.calculateContent(anyFile, true);
+							
+							if(!anyFile.getProject().equals(currentInput.getProject()) || button){
+								contentProvider.calculateContent(anyFile, true);
+								currentInput = anyFile;
+							}else{
+								contentProvider.calculateContent(anyFile, false);
+							}
+							
+							
 							
 						}
 						return Status.OK_STATUS;
@@ -246,6 +256,6 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 		if (activeEditor instanceof FeatureModelEditor) {
 			((FeatureModelEditor) currentEditor).getFeatureModel().addListener(modelListener);
 		}
-		refresh();
+		refresh(false);
 	}
 }
