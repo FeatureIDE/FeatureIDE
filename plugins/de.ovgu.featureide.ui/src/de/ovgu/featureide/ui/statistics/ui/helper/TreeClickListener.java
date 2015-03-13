@@ -49,9 +49,12 @@ import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.ClassNodeParent;
+import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.ClassSubNodeParent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.ConfigParentNode;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.FieldNodeParent;
+import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.FieldSubNodeParent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.MethodNodeParent;
+import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.MethodSubNodeParent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.genericdatatypes.AbstractSortModeNode;
 import de.ovgu.featureide.ui.statistics.ui.ConfigDialog;
 
@@ -90,7 +93,11 @@ public class TreeClickListener implements IDoubleClickListener {
 				handleConfigNodes(event, selected);
 			} else if (selected instanceof AbstractSortModeNode && view.getExpandedState(selected)) {
 				final AbstractSortModeNode sortNode = ((AbstractSortModeNode) selected);
-				sortNode.setSortByValue(!sortNode.isSortByValue());
+				if (selected instanceof ClassNodeParent || selected instanceof FieldNodeParent || selected instanceof MethodNodeParent)
+					sortNode.setSortByValue(false);
+
+				if (!(selected instanceof ClassNodeParent || selected instanceof FieldNodeParent || selected instanceof MethodNodeParent))
+					sortNode.setSortByValue(!sortNode.isSortByValue());
 
 				UIJob job = new UIJob("resort node") {
 					@Override
@@ -103,28 +110,22 @@ public class TreeClickListener implements IDoubleClickListener {
 				job.schedule();
 			} else if (selected instanceof Parent && ((Parent) selected).hasChildren()) {
 				view.setExpandedState(selected, !view.getExpandedState(selected));
-			} else if (selected instanceof Parent
-					&& (((Parent) selected).getParent() instanceof FieldNodeParent || ((Parent) selected).getParent() instanceof ClassNodeParent || ((Parent) selected)
-							.getParent() instanceof MethodNodeParent)) {
-				IFile iFile;
-				if (((Parent) selected).getValue() instanceof FSTField) {
-					iFile = ((FSTField) ((Parent) selected).getValue()).getRole().getFile();
-					int line = ((FSTField) ((Parent) selected).getValue()).getLine();
-					openEditor(iFile, line);
-				} else if (((Parent) selected).getValue() instanceof FSTMethod) {
-					iFile = ((FSTMethod) ((Parent) selected).getValue()).getRole().getFile();
-					int line = ((FSTMethod) ((Parent) selected).getValue()).getLine();
-					openEditor(iFile, line);
-				} else {
-					iFile = ((FSTRole) ((FSTClassFragment) ((Parent) selected).getValue()).getRole()).getFile();
-					openEditor(iFile, 1);
-				}
-				
+			} else if (selected instanceof FieldSubNodeParent) {
+				IFile iFile = ((FieldSubNodeParent) selected).getField().getRole().getFile();
+				int line = ((FieldSubNodeParent) selected).getField().getLine();
+				openEditor(iFile, line);
+			} else if (selected instanceof MethodSubNodeParent) {
+				IFile iFile = ((MethodSubNodeParent) selected).getMethod().getRole().getFile();
+				int line = ((MethodSubNodeParent) selected).getMethod().getLine();
+				openEditor(iFile, line);
+			} else {
+				IFile iFile = ((FSTRole) ((ClassSubNodeParent) selected).getFragment().getRole()).getFile();
+				openEditor(iFile, 1);
 			}
+
 		}
 	}
 
-	
 	/**
 	 * Opens a dialog to start the calculation corresponding to the clicked
 	 * config-node - but only if their isn't already a calculation in progress.

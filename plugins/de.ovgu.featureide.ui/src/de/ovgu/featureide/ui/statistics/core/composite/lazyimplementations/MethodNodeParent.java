@@ -5,13 +5,14 @@ import java.util.LinkedList;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
+import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.genericdatatypes.AbstractSortModeNode;
 
 /**
  * Node to display the methods in the StatisticsProgrammSize
  * 
  * @author Schleicher Miro
  */
-public class MethodNodeParent extends LazyParent {
+public class MethodNodeParent extends AbstractSortModeNode {
 
 
 	FSTMethod fstMethod;
@@ -31,7 +32,7 @@ public class MethodNodeParent extends LazyParent {
 			if (tempMethod.getFullIdentifier().equals(fstMethod.getFullIdentifier())) {
 				c++;
 
-				addChild(new Parent(tempMethod.getRole().getFeature().getName().split("@")[0], tempMethod));
+				addChild(new MethodSubNodeParent(tempMethod.getRole().getFeature().getName().split("@")[0], tempMethod));
 			}
 		}
 		return c;

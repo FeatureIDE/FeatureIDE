@@ -28,13 +28,14 @@ import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
+import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.genericdatatypes.AbstractSortModeNode;
 
 /**
  * Node to display the methods in the StatisticsProgrammSize
  * 
  * @author Schleicher Miro
  */
-public class ClassNodeParent extends LazyParent {
+public class ClassNodeParent extends AbstractSortModeNode {
 
 	FSTClass fstClass = null;
 	FSTClassFragment fstClassFrag = null;
@@ -69,7 +70,7 @@ public class ClassNodeParent extends LazyParent {
 				for (LinkedList<FSTClassFragment> iterable_element : currClass.getAllFSTFragments()) {
 					for (FSTClassFragment fstFrag : iterable_element) {
 						if (fstFrag.getFullIdentifier().equals(fstClassFrag.getFullIdentifier())) {
-							addChild(new Parent(fstFrag.getRole().getFeature().getName(), fstFrag/*.getRole()*/));
+							addChild(new ClassSubNodeParent(fstFrag.getRole().getFeature().getName(), fstFrag));
 						}
 					}
 				}

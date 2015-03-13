@@ -7,13 +7,14 @@ import de.ovgu.featureide.core.fstmodel.FSTClassFragment;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
+import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.genericdatatypes.AbstractSortModeNode;
 
 /**
  * Node to display the fields in the StatisticsProgrammSize
  * 
  * @author Schleicher Miro
  */
-public class FieldNodeParent extends LazyParent {
+public class FieldNodeParent extends AbstractSortModeNode {
 
 
 	FSTField fstField;
@@ -33,7 +34,7 @@ public class FieldNodeParent extends LazyParent {
 			if (tempField.getFullIdentifier().equals(fstField.getFullIdentifier())) {
 				c++;
 
-				addChild(new Parent(tempField.getRole().getFeature().getName(), tempField));
+				addChild(new FieldSubNodeParent(tempField.getRole().getFeature().getName(), tempField));
 			}
 		}
 		return c;
