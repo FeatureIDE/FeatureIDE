@@ -52,7 +52,7 @@ public class StatisticsProgramSizeNew extends LazyParent {
 	@Override
 	protected void initChildren() {
 
-		int numberOfClasses = 0;
+		int numberOfClasses = 0; 
 		int numberOfRoles = 0;
 		int numberOfFields = 0;
 		int numberOfUniFields = 0;
