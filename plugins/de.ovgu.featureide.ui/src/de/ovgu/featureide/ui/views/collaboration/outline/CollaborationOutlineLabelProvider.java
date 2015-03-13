@@ -76,9 +76,9 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 		if (element instanceof IRoleElement) {
 			IRoleElement fstModelElement = (IRoleElement) element;
 			if (fstModelElement instanceof FSTField) {
-				FSTField field = (FSTField) fstModelElement;
-				String fileExtension = field.getFile().getFileExtension();
-				if (fileExtension.equals("java") || fileExtension.equals("jak") || fileExtension.equals("cs")) {
+				final FSTField field = (FSTField) fstModelElement;
+				final String fileExtension = field.getFile().getFileExtension();
+				if ("java".equals(fileExtension) || "jak".equals(fileExtension) || "cs".equals(fileExtension)) {
 					if (field.isPrivate()) {
 						return IMAGE_FIELD_PRIVATE;
 					} else if (field.isProtected()) {
@@ -88,19 +88,19 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 					} else {
 						return IMAGE_FIELD_DEFAULT;
 					}
-				} else if (fileExtension.equals("hs")) {
+				} else if ("hs".equals(fileExtension)) {
 					return IMAGE_HASKELL_TYPE;
-				} else if (fileExtension.equals("h") || fileExtension.equals("c")) {
+				} else if ("h".equals(fileExtension) || "c".equals(fileExtension)) {
 					return IMAGE_FIELD_DEFAULT;
 				}
 
 			} else if (fstModelElement instanceof FSTInvariant) {
 				return IMAGE_AT_WITHOUT_WHITE_BACKGROUND;
 			} else if (fstModelElement instanceof FSTMethod) {
-				FSTMethod method = (FSTMethod) fstModelElement;
+				final FSTMethod method = (FSTMethod) fstModelElement;
 
-				String fileExtension = method.getFile().getFileExtension();
-				if (fileExtension.equals("java") || fileExtension.equals("jak") || fileExtension.equals("cs")) {
+				final String fileExtension = method.getFile().getFileExtension();
+				if ("java".equals(fileExtension) || "jak".equals(fileExtension) || "cs".equals(fileExtension)) {
 
 					if (method.hasContract() || method.contractsInRefinements()) {
 						if (method.isPrivate())
@@ -121,23 +121,25 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 						else
 							return IMAGE_METHODE_DEFAULT;
 					}
-				} else if (fileExtension.equals("hs")) {
+				} else if ("hs".equals(fileExtension)) {
 					return IMAGE_HASKELL_LAMBDA;
-				} else if (fileExtension.equals("h") || fileExtension.equals("c")) {
+				} else if ("h".equals(fileExtension) || "c".equals(fileExtension)) {
 					return IMAGE_METHODE_DEFAULT;
 				}
 			}
 		} else if (element instanceof FSTClass) {
 
 			FSTClass datClass = (FSTClass) element;
-			if (datClass.getName().contains(".hs")) {
-				return IMAGE_HASKELL_MODULE;
-
-			} else if (datClass.getName().contains(".java") || datClass.getName().contains(".jak") || datClass.getName().contains(".cs")
-					|| datClass.getName().contains(".h") || datClass.getName().contains(".c")) {
-				return IMAGE_CLASS;
+			final String className = datClass.getName();
+			final int extIndex = className.lastIndexOf('.');
+			if (extIndex > -1) {
+				final String fileExtension = className.substring(extIndex + 1);
+				if ("java".equals(fileExtension) || "jak".equals(fileExtension) || "cs".equals(fileExtension) || "h".equals(fileExtension) || "c".equals(fileExtension)) {
+					return IMAGE_CLASS;
+				} else if ("hs".equals(fileExtension)) {
+					return IMAGE_HASKELL_MODULE;
+				}
 			}
-
 		} else if (element instanceof FSTContractedRole) {
 			return IMAGE_AT_WITHOUT_WHITE_BACKGROUND;
 		}

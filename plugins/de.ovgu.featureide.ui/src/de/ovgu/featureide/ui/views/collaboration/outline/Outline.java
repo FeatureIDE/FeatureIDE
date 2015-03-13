@@ -22,7 +22,6 @@ package de.ovgu.featureide.ui.views.collaboration.outline;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
@@ -142,7 +141,6 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 		supportedTypes.add("h");
 		supportedTypes.add("c");
 		supportedTypes.add("cs");
-		
 	}
 
 
