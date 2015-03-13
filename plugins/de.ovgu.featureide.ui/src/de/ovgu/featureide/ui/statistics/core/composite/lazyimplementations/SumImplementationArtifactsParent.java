@@ -6,6 +6,8 @@ import java.util.LinkedList;
 
 import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTClassFragment;
+import de.ovgu.featureide.core.fstmodel.FSTFeature;
+import de.ovgu.featureide.core.fstmodel.FSTInvariant;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
@@ -29,6 +31,8 @@ public class SumImplementationArtifactsParent extends AbstractSortModeNode {
 	public static final int NUMBER_OF_CLASSES = 0;
 	public static final int NUMBER_OF_FIELDS = 1;
 	public static final int NUMBER_OF_METHODS = 2;
+	public static final int NUMBER_OF_INVARIANTS = 3;
+	public static final int NUMBER_OF_CONTRACTS = 4;
 
 	public SumImplementationArtifactsParent(String description, FSTModel fstModel, int type) {
 		super(description);
@@ -89,7 +93,66 @@ public class SumImplementationArtifactsParent extends AbstractSortModeNode {
 					pointer++;
 				}
 			}
-		}
+		} else if (type == NUMBER_OF_INVARIANTS) {
+			LinkedList<FSTInvariant> allInvariants = new LinkedList<FSTInvariant>();
+			
+			for (FSTClass currClass : fstModel.getClasses()) {
+				for (LinkedList<FSTClassFragment> iterable_element : currClass.getAllFSTFragments()) {
+					for (FSTClassFragment fstFrag : iterable_element) {
+						allInvariants.addAll(fstFrag.getInvariants());
+					}
+				}
+			}
+			while (allInvariants.size() > 0) {
+				addChild(new InvariantNodeParent(allInvariants.get(0).getRole().getClassFragment().getFullIdentifier(), allInvariants.get(0), allInvariants));
+				int pointer = 0;
+				String fullI = allInvariants.get(0).getRole().getClassFragment().getFullIdentifier();
+				while (pointer < allInvariants.size()) {
+					if (allInvariants.get(pointer).getRole().getClassFragment().getFullIdentifier().equals(fullI)) {
+						allInvariants.remove(pointer);
+						pointer--;
+					}
+					pointer++;
+				}
+			}
+
+		}else if(type == NUMBER_OF_CONTRACTS){
+			
+			LinkedList<FSTMethod> allMethodContracts = new LinkedList<FSTMethod>();
+			
+			//über alle klassen-->über alle rollen --> über alle methoden -->wenn es einen kontrakt hat zählen
+			
+			for (FSTClass currClass : fstModel.getClasses()) {
+				for (LinkedList<FSTClassFragment> iterable_element : currClass.getAllFSTFragments()) {
+					for (FSTClassFragment fstFrag : iterable_element) {
+						for (FSTMethod method : fstFrag.getMethods()) {
+							if (method.hasContract()){				}
+								allMethodContracts.add(method);
+							}
+						}
+						
+					}
+				}
+			}
+		//Liste mit allen Methoden in denen es Contracts gibt
+			
+		
+//		Zählen, wenn es sich um die gleiche Methode handelt
+		
+//			while (allMethodContracts.size() > 0) {
+//				addChild(new MethodContractNodeParent(allMethodContracts.get(0).getRole().getClassFragment().getFullIdentifier(), allMethodContracts.get(0), allMethodContracts));
+//				int pointer = 0;
+//				String fullI = allInvariants.get(0).getRole().getClassFragment().getFullIdentifier();
+//				while (pointer < allMethodContracts.size()) {
+//					if (allMethodContracts.get(pointer).getRole().getClassFragment().getFullIdentifier().equals(fullI)) {
+//						allMethodContracts.remove(pointer);
+//						pointer--;
+//					}
+//					pointer++;
+//				}
+//			
+			
+//		}//CONTRACTS
 
 	}
 

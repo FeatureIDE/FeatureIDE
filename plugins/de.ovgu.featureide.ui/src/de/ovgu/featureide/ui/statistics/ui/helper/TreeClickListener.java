@@ -45,6 +45,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 
 import de.ovgu.featureide.core.fstmodel.FSTClassFragment;
 import de.ovgu.featureide.core.fstmodel.FSTField;
+import de.ovgu.featureide.core.fstmodel.FSTInvariant;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
@@ -53,6 +54,7 @@ import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.Class
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.ConfigParentNode;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.FieldNodeParent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.FieldSubNodeParent;
+import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.InvariantNodeParent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.MethodNodeParent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.MethodSubNodeParent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.genericdatatypes.AbstractSortModeNode;
@@ -118,9 +120,13 @@ public class TreeClickListener implements IDoubleClickListener {
 				IFile iFile = ((MethodSubNodeParent) selected).getMethod().getRole().getFile();
 				int line = ((MethodSubNodeParent) selected).getMethod().getLine();
 				openEditor(iFile, line);
-			} else {
+			} else if(selected instanceof ClassSubNodeParent) {
 				IFile iFile = ((FSTRole) ((ClassSubNodeParent) selected).getFragment().getRole()).getFile();
 				openEditor(iFile, 1);
+			} else if(selected instanceof Parent && ((Parent)selected).getParent() instanceof InvariantNodeParent) {
+				IFile iFile = ((FSTInvariant)(((Parent) selected).getValue())).getFile();
+				int line = ((FSTInvariant)(((Parent) selected).getValue())).getLine();
+				openEditor(iFile,line);
 			}
 
 		}
