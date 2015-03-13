@@ -30,7 +30,9 @@ import de.ovgu.featureide.core.signature.abstr.AbstractSignature;
  * @author Jens Meinicke
  */
 public abstract class RoleElement<T extends RoleElement<T>> implements Comparable<T>, IRoleElement {
-
+	
+	public static final String DEFAULT_PACKAGE = "(default package).";
+	
 	private static final String STATIC = "static";
 	private static final String PUBLIC = "public";
 	private static final String PROTECTED = "protected";
@@ -76,22 +78,29 @@ public abstract class RoleElement<T extends RoleElement<T>> implements Comparabl
 	public IRoleElement getParent() {
 		return parent;
 	}
+	
+	private static String removeExtension(String name) {
+		final int extIndex = name.lastIndexOf('.');
+		return (extIndex > -1) ? name.substring(0, extIndex) : name;		
+	}
 
 	public String getFullIdentifier() {
-		final StringBuilder sb = new StringBuilder(name);
+		final StringBuilder sb = new StringBuilder(removeExtension(name));
+		String packageName = (this instanceof FSTClassFragment) ? ((FSTClassFragment) this).getPackage() : null;
 		IRoleElement nextParent = parent;
-		String package1 = (this instanceof FSTClassFragment) ? ((FSTClassFragment) this).getPackage() : null;
 		while (nextParent != null) {
 			sb.insert(0, '.');
-			sb.insert(0, nextParent.getName());
 			if (nextParent.getParent() == null) {
-				package1 = ((FSTClassFragment) nextParent).getPackage();
+				packageName = ((FSTClassFragment) nextParent).getPackage();
+				sb.insert(0, removeExtension(nextParent.getName()));
+			} else {
+				sb.insert(0, nextParent.getName());
 			}
 			nextParent = nextParent.getParent();
 		}
-		String className = sb.toString().substring(sb.toString().lastIndexOf('/') + 1).replace(".java", "");
-		
-		return ((package1 == null) ? "(default package)." : package1 + ".") + className;
+		final String className = sb.toString();
+		return ((packageName == null) ? DEFAULT_PACKAGE : packageName + ".") 
+				+ className.substring(className.lastIndexOf('/') + 1);
 	}
 
 	public void setParent(IRoleElement parent) {
