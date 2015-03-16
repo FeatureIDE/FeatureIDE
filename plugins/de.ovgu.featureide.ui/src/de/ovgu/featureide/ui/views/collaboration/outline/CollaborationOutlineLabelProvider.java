@@ -48,6 +48,8 @@ import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
  * 
  * @author Jan Wedding
  * @author Melanie Pflaume
+ * @author Dominic Labsch
+ * @author Daniel Püsche
  */
 public class CollaborationOutlineLabelProvider extends OutlineLabelProvider implements GUIDefaults {
 

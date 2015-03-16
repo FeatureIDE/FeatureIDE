@@ -101,7 +101,7 @@ import de.ovgu.featureide.ui.views.outline.ContextOutlineTreeContentProvider;
  * @author Jan Wedding
  * @author Melanie Pflaume
  * @author Reimar Schröter
- * @author Dominic Labsch 
+ * @author Dominic Labsch
  * @author Daniel Püsche
  */
 /*
@@ -127,12 +127,17 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 
 	private static final ImageDescriptor IMG_COLLAPSE = UIPlugin.getDefault().getImageDescriptor("icons/collapse.gif");
 	private static final ImageDescriptor IMG_EXPAND = UIPlugin.getDefault().getImageDescriptor("icons/expand.gif");
+	private static final ImageDescriptor IMG_SHOW_FIELDS = UIPlugin.getDefault().getImageDescriptor("icons/fields_co.gif");
+	private static final ImageDescriptor IMG_SHOW_METHODS = UIPlugin.getDefault().getImageDescriptor("icons/methods_co.gif");
+	private static final ImageDescriptor IMG_SORT_FEATURES = UIPlugin.getDefault().getImageDescriptor("icons/alphab_sort_co.gif");
 
 	public static final String ID = UIPlugin.PLUGIN_ID + ".views.collaboration.outline.CollaborationOutline";
 
 	private ArrayList<IAction> actionOfProv = new ArrayList<IAction>();
 	private boolean providerChanged = false;
-	
+
+	private final SortByOccurrenceInFeature filter = new SortByOccurrenceInFeature();
+
 	private static final Set<String> supportedTypes = new HashSet<>();
 	static {
 		supportedTypes.add("java");
@@ -143,6 +148,9 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 		supportedTypes.add("cs");
 	}
 
+	private boolean hideAllFieldsToggle = false;
+	private boolean hideAllMethodsToggle = false;
+	private boolean sortFeatureToggle = false;
 
 	private IPartListener editorListener = new IPartListener() {
 
@@ -407,13 +415,12 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 		CorePlugin.getDefault().addCurrentBuildListener(this);
 	}
 
-	
 	/**
 	 * handles all the editorActions
 	 * 
 	 */
 	private void setEditorActions(IWorkbenchPart activeEditor) {
-		
+
 		IEditorPart part = null;
 
 		if (activeEditor != null) {
@@ -435,7 +442,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 							Control control = viewer.getControl();
 							if (control != null && !control.isDisposed()) {
 								final String extension = file.getFileExtension();
-								
+
 								if ("model.xml".equals(file.getName())) {
 									selectedOutlineType = OutlineLabelProvider.OUTLINE_FEATURE_MODEL;
 								} else if (supportedTypes.contains(extension)) {
@@ -553,66 +560,69 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 		if (viewer != null) {
 			Control control = viewer.getControl();
 			if (control != null && !control.isDisposed()) {
-
-				if (!providerChanged && refreshContent(iFile, iFile2)) {
-					return;
-				} else {
-					providerChanged = false;
+				if (filter.isEnabled()) {
+					filter.setFile(iFile2);
 				}
+				if (providerChanged || !refreshContent(iFile, iFile2) || filter.isEnabled()) {
+					providerChanged = false;
 
-				iFile = iFile2;
+					iFile = iFile2;
 
-				if (uiJob == null || uiJob.getState() == Job.NONE) {
-					uiJob = new UIJob("Update Outline View") {
-						public IStatus runInUIThread(IProgressMonitor monitor) {
+					if (uiJob == null || uiJob.getState() == Job.NONE) {
+						uiJob = new UIJob("Update Outline View") {
+							public IStatus runInUIThread(IProgressMonitor monitor) {
 
-							if (viewer != null) {
-								if (viewer.getControl() != null && !viewer.getControl().isDisposed()) {
-									viewer.getControl().setRedraw(false);
+								if (viewer != null) {
+									if (viewer.getControl() != null && !viewer.getControl().isDisposed()) {
+										viewer.getControl().setRedraw(false);
 
-									viewer.setContentProvider(curContentProvider);
-									viewer.setLabelProvider(curClabel);
-									if (iFile != null) {
-										if ("model.xml".equals(iFile.getName()) && active_editor instanceof FeatureModelEditor) {
-											viewer.setInput(((FeatureModelEditor) active_editor).getFeatureModel());
+										viewer.setContentProvider(curContentProvider);
+										viewer.setLabelProvider(curClabel);
+										if (iFile != null) {
+											if ("model.xml".equals(iFile.getName()) && active_editor instanceof FeatureModelEditor) {
+												viewer.setInput(((FeatureModelEditor) active_editor).getFeatureModel());
 
-											// recreate the context menu in case
-											// we switched to another model
-											if (contextMenu == null || contextMenu.getFeatureModel() != ((FeatureModelEditor) active_editor).getFeatureModel()) {
-												if (contextMenu != null) {
-													// the listener isn't
-													// recreated, if it still
-													// exists
-													// but we need a new
-													// listener for the new
-													// model
-													viewer.removeDoubleClickListener(contextMenu.dblClickListener);
+												// recreate the context menu in case
+												// we switched to another model
+												if (contextMenu == null
+														|| contextMenu.getFeatureModel() != ((FeatureModelEditor) active_editor).getFeatureModel()) {
+													if (contextMenu != null) {
+														// the listener isn't
+														// recreated, if it still
+														// exists
+														// but we need a new
+														// listener for the new
+														// model
+														viewer.removeDoubleClickListener(contextMenu.dblClickListener);
+													}
+													contextMenu = new FmOutlinePageContextMenu(getSite(), (FeatureModelEditor) active_editor, viewer,
+															((FeatureModelEditor) active_editor).getFeatureModel());
 												}
-												contextMenu = new FmOutlinePageContextMenu(getSite(), (FeatureModelEditor) active_editor, viewer,
-														((FeatureModelEditor) active_editor).getFeatureModel());
+
+											} else {
+												viewer.setInput(iFile);
 											}
-
 										} else {
-											viewer.setInput(iFile);
+											viewer.setInput("");
 										}
-									} else {
-										viewer.setInput("");
-									}
 
-									if (viewer.getLabelProvider() instanceof OutlineLabelProvider && iFile != null) {
-										((OutlineLabelProvider) viewer.getLabelProvider()).colorizeItems(viewer.getTree().getItems(), iFile);
-									}
-									viewer.getControl().setRedraw(true);
-									viewer.getControl().setEnabled(true);
-									viewer.refresh();
+										if (viewer.getLabelProvider() instanceof OutlineLabelProvider && iFile != null) {
+											((OutlineLabelProvider) viewer.getLabelProvider()).colorizeItems(viewer.getTree().getItems(), iFile);
 
+											viewer.getContentProvider().inputChanged(viewer, null, iFile);
+										}
+										viewer.getControl().setRedraw(true);
+										viewer.getControl().setEnabled(true);
+										viewer.refresh();
+
+									}
 								}
+								return Status.OK_STATUS;
 							}
-							return Status.OK_STATUS;
-						}
-					};
-					uiJob.setPriority(Job.SHORT);
-					uiJob.schedule();
+						};
+						uiJob.setPriority(Job.SHORT);
+						uiJob.schedule();
+					}
 				}
 			}
 		}
@@ -630,6 +640,74 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 		}
 		return false;
 	}
+
+	// create Action to hide all fields
+	private final Action hideAllFields = new Action("", Action.AS_CHECK_BOX) {
+		private HideAllFields filter = new HideAllFields();
+
+		public void run() {
+			hideAllFieldsToggle = !hideAllFieldsToggle;
+
+			if (hideAllFieldsToggle) {
+				if (viewer.getContentProvider() instanceof CollaborationOutlineTreeContentProvider) {
+					((CollaborationOutlineTreeContentProvider) viewer.getContentProvider()).addFilter(filter);
+					viewer.refresh();
+				}
+			} else {
+				if (viewer.getContentProvider() instanceof CollaborationOutlineTreeContentProvider) {
+					((CollaborationOutlineTreeContentProvider) viewer.getContentProvider()).removeFilter(filter);
+					viewer.refresh();
+				}
+			}
+		}
+	};
+	// create Action to hide all methods
+	private final Action hideAllMethods = new Action("", Action.AS_CHECK_BOX) {
+		private HideAllMethods filter = new HideAllMethods();
+
+		public void run() {
+			hideAllMethodsToggle = !hideAllMethodsToggle;
+
+			if (hideAllMethodsToggle) {
+				if (viewer.getContentProvider() instanceof CollaborationOutlineTreeContentProvider) {
+					((CollaborationOutlineTreeContentProvider) viewer.getContentProvider()).addFilter(filter);
+					viewer.refresh();
+				}
+			} else {
+				if (viewer.getContentProvider() instanceof CollaborationOutlineTreeContentProvider) {
+					((CollaborationOutlineTreeContentProvider) viewer.getContentProvider()).removeFilter(filter);
+					viewer.refresh();
+				}
+			}
+		}
+	};
+
+	// create Action to display methods and fields in the current feature on top
+	private final Action sortMethods = new Action("", Action.AS_CHECK_BOX) {
+
+		public void run() {
+			sortFeatureToggle = !sortFeatureToggle;
+			if (sortFeatureToggle) {
+				if (viewer.getContentProvider() instanceof CollaborationOutlineTreeContentProvider) {
+					if (viewer.getInput() instanceof IFile) {
+						filter.setFile(iFile);
+						filter.setEnabled(true);
+						((CollaborationOutlineTreeContentProvider) viewer.getContentProvider()).addFilter(filter);
+						viewer.refresh();
+
+					}
+				}
+			} else {
+				if (viewer.getContentProvider() instanceof CollaborationOutlineTreeContentProvider) {
+					if (filter != null) {
+						filter.setEnabled(false);
+						((CollaborationOutlineTreeContentProvider) viewer.getContentProvider()).removeFilter(filter);
+						viewer.refresh();
+					}
+				}
+			}
+		}
+	};
 
 	/**
 	 * provides functionality to expand and collapse all items in viewer
@@ -659,11 +737,21 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 				}
 			}
 		};
+
 		expandAllAction.setToolTipText("Expand All");
 		expandAllAction.setImageDescriptor(IMG_EXPAND);
+		hideAllFields.setToolTipText("Hide Fields");
+		hideAllFields.setImageDescriptor(IMG_SHOW_FIELDS);
+		hideAllMethods.setToolTipText("Hide Methods");
+		hideAllMethods.setImageDescriptor(IMG_SHOW_METHODS);
+		sortMethods.setToolTipText("Sort By Feature");
+		sortMethods.setImageDescriptor(IMG_SORT_FEATURES);
 
 		iToolBarManager.add(collapseAllAction);
 		iToolBarManager.add(expandAllAction);
+		iToolBarManager.add(hideAllFields);
+		iToolBarManager.add(hideAllMethods);
+		iToolBarManager.add(sortMethods);
 	}
 
 	/**
