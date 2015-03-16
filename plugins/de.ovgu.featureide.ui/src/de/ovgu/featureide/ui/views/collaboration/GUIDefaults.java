@@ -141,4 +141,11 @@ public interface GUIDefaults {
 	Image IMAGE_CLASS = UIPlugin.getImage("class_obj.gif");
 	Image IMAGE_FEATURE = UIPlugin.getImage("FeatureIconSmall.ico");
 	Image IMAGE_HASH = UIPlugin.getImage("hash.png");
+	
+	// outline icons for haskell
+	
+	Image IMAGE_HASKELL_MODULE = UIPlugin.getImage("module.gif");
+	Image IMAGE_HASKELL_LAMBDA = UIPlugin.getImage("lambda.gif");
+	Image IMAGE_HASKELL_TYPE = UIPlugin.getImage("type.gif");
+	Image IMAGE_HASKELL_DATA = UIPlugin.getImage("haskellData.gif");
 }
