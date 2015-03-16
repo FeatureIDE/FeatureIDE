@@ -52,9 +52,11 @@ import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.ClassNodeParent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.ClassSubNodeParent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.ConfigParentNode;
+import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.ContractCountNodeParent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.FieldNodeParent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.FieldSubNodeParent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.InvariantNodeParent;
+import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.MethodContractNodeParent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.MethodNodeParent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.MethodSubNodeParent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.genericdatatypes.AbstractSortModeNode;
@@ -127,8 +129,12 @@ public class TreeClickListener implements IDoubleClickListener {
 				IFile iFile = ((FSTInvariant)(((Parent) selected).getValue())).getFile();
 				int line = ((FSTInvariant)(((Parent) selected).getValue())).getLine();
 				openEditor(iFile,line);
-			}
-
+			} else if (selected instanceof Parent && (((Parent)selected).getParent() instanceof MethodContractNodeParent || ((Parent)selected).getParent() instanceof ContractCountNodeParent)){
+				IFile iFile = ((FSTMethod)(((Parent) selected).getValue())).getFile();
+				int line = ((FSTMethod)(((Parent) selected).getValue())).getLine();
+				openEditor(iFile,line);
+			} 
+ 
 		}
 	}
 
