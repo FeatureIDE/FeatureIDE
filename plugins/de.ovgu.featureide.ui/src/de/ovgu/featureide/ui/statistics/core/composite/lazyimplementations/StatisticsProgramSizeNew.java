@@ -1,28 +1,18 @@
-/* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
- *
- * This file is part of FeatureIDE.
- * 
- * FeatureIDE is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * FeatureIDE is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public License
- * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
- *
- * See http://featureide.cs.ovgu.de/ for further information.
- */
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
+
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceVisitor;
+import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTClassFragment;
@@ -30,6 +20,7 @@ import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
+import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 
 /**
@@ -42,17 +33,17 @@ import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 public class StatisticsProgramSizeNew extends LazyParent {
 
 	private FSTModel fstModel;
+	int numberOfLines = 0;
 
 	public StatisticsProgramSizeNew(String description, FSTModel fstModel) {
 		super(description);
 		this.fstModel = fstModel;
 	}
 
-
 	@Override
 	protected void initChildren() {
 
-		int numberOfClasses = 0; 
+		int numberOfClasses = 0;
 		int numberOfRoles = 0;
 		int numberOfFields = 0;
 		int numberOfUniFields = 0;
@@ -82,12 +73,63 @@ public class StatisticsProgramSizeNew extends LazyParent {
 
 		}
 
+		if (fstModel.getFeatureProject().getComposer().hasFeatureFolder()) {
+			final LinkedHashSet<String> extList = fstModel.getFeatureProject().getComposer().extensions();
+			try {
+				fstModel.getFeatureProject().getSourceFolder().accept(new IResourceVisitor() {
+
+					@Override
+					public boolean visit(IResource resource) throws CoreException {
+						if (resource instanceof IFolder) {
+							return true;
+						} else if (resource instanceof IFile) {
+							final IFile file = (IFile) resource;
+							if (extList.contains(file.getFileExtension())) {
+
+								try {
+									FileReader fr = new FileReader(file.getLocation().toString());
+									BufferedReader br = new BufferedReader(fr);
+									String s;
+									boolean isInComment = false;
+									while ((s = br.readLine()) != null) {
+										if (s.trim().contains("*/"))
+											isInComment = false;
+
+										if (!s.trim().equals("") && !s.trim().startsWith("//") && !isInComment)
+											if (s.trim().startsWith("/*"))//TODO Kommentare sind auf java bezogen noch sprachunabhängig implementieren
+												isInComment = true;
+											else
+												numberOfLines++;
+
+										if (s.trim().contains("/*"))
+											isInComment = true;
+									}
+									br.close();
+
+								} catch (FileNotFoundException e) {
+									e.printStackTrace();
+								} catch (IOException e) {
+									e.printStackTrace();
+								}
+
+							}
+
+						}
+						return false;
+					}
+				});
+			} catch (CoreException e) {
+				UIPlugin.getDefault().logError(e);
+			}
+		}
+
 		addChild(new SumImplementationArtifactsParent(NUMBER_CLASS + SEPARATOR + numberOfClasses + " | " + NUMBER_ROLE + SEPARATOR + numberOfRoles, fstModel,
 				SumImplementationArtifactsParent.NUMBER_OF_CLASSES));
 		addChild(new SumImplementationArtifactsParent(NUMBER_FIELD_U + SEPARATOR + numberOfUniFields + " | " + NUMBER_FIELD + SEPARATOR + numberOfFields,
 				fstModel, SumImplementationArtifactsParent.NUMBER_OF_FIELDS));
 		addChild(new SumImplementationArtifactsParent(NUMBER_METHOD_U + SEPARATOR + numberOfUniMethods + " | " + NUMBER_METHOD + SEPARATOR + numberOfMethods,
 				fstModel, SumImplementationArtifactsParent.NUMBER_OF_METHODS));
+		addChild(new SumImplementationArtifactsParent(NUMBER_OF_CODELINES + SEPARATOR + numberOfLines, fstModel,
+				SumImplementationArtifactsParent.NUMBER_OF_LINES));
 	}
-
 }

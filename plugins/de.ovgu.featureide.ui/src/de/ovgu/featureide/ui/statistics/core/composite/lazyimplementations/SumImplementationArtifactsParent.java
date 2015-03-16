@@ -35,6 +35,7 @@ public class SumImplementationArtifactsParent extends AbstractSortModeNode {
 	public static final int NUMBER_OF_CONTRACTS = 4;
 	public static final int NUMBER_OF_CONTRACTS_METHODS = 5;
 	public static final int NUMBER_OF_FEATURE_CONTRACTS = 6;
+	public static final int NUMBER_OF_LINES = 7;
 
 	public SumImplementationArtifactsParent(String description, FSTModel fstModel, int type) {
 		super(description);
