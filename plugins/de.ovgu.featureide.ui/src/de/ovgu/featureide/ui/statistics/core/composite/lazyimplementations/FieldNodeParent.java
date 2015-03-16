@@ -2,11 +2,7 @@ package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
 import java.util.LinkedList;
 
-import de.ovgu.featureide.core.fstmodel.FSTClass;
-import de.ovgu.featureide.core.fstmodel.FSTClassFragment;
 import de.ovgu.featureide.core.fstmodel.FSTField;
-import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
-import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.genericdatatypes.AbstractSortModeNode;
 
 /**
@@ -16,16 +12,13 @@ import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.gener
  */
 public class FieldNodeParent extends AbstractSortModeNode {
 
-
-	FSTField fstField;
+	private final FSTField fstField;
 
 	public FieldNodeParent(String descString, FSTField fstField, LinkedList<FSTField> allFields) {
-
 		super(descString);
 		this.fstField = fstField;
 		int numberOfRoles = countFieldsWithSameName(allFields);
 		setValue(new Integer(numberOfRoles));
-
 	}
 
 	private int countFieldsWithSameName(LinkedList<FSTField> fields) {
@@ -42,7 +35,7 @@ public class FieldNodeParent extends AbstractSortModeNode {
 
 	@Override
 	protected void initChildren() {
-
+		
 	}
 
 }

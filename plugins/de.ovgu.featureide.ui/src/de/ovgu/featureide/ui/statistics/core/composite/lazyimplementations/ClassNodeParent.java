@@ -26,7 +26,6 @@ import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTClassFragment;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
-import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.genericdatatypes.AbstractSortModeNode;
 
@@ -37,9 +36,10 @@ import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.gener
  */
 public class ClassNodeParent extends AbstractSortModeNode {
 
-	FSTClass fstClass = null;
-	FSTClassFragment fstClassFrag = null;
-	FSTModel fstModel;
+	private final FSTModel fstModel;
+
+	private FSTClass fstClass;
+	private FSTClassFragment fstClassFrag;
 
 	public ClassNodeParent(String descString, FSTClass fstClass, FSTModel fstMod) {
 		super(descString, fstClass.getRoles().size());
@@ -54,31 +54,24 @@ public class ClassNodeParent extends AbstractSortModeNode {
 		this.fstModel = fstMod;
 	}
 
-
 	@Override
 	protected void initChildren() {
-
 		if (fstClass != null) {
-
 			for (FSTRole fstRole : fstClass.getRoles()) {
 				addChild(new Parent(fstRole.getFeature().getName(), fstRole));
 			}
-
 		} else if (fstClassFrag != null) {
 
 			for (FSTClass currClass : fstModel.getClasses()) {
-				for (LinkedList<FSTClassFragment> iterable_element : currClass.getAllFSTFragments()) {
-					for (FSTClassFragment fstFrag : iterable_element) {
+				for (LinkedList<FSTClassFragment> classFragmentList : currClass.getAllFSTFragments()) {
+					for (FSTClassFragment fstFrag : classFragmentList) {
 						if (fstFrag.getFullIdentifier().equals(fstClassFrag.getFullIdentifier())) {
 							addChild(new ClassSubNodeParent(fstFrag.getRole().getFeature().getName(), fstFrag));
 						}
 					}
 				}
 			}
-
 		}
-
-
 	}
 
 }

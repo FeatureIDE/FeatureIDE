@@ -111,7 +111,7 @@ public class FSTRole {
 
 	}
 
-	public void getAllFieldsRec(LinkedList<FSTField> fields, FSTClassFragment innerClass) {
+	private void getAllFieldsRec(LinkedList<FSTField> fields, FSTClassFragment innerClass) {
 		fields.addAll(innerClass.getFields());
 		if (innerClass.getInnerClasses() != null) {
 			for (FSTClassFragment i : innerClass.getInnerClasses()) {
@@ -129,7 +129,7 @@ public class FSTRole {
 
 	}
 
-	public void getAllMethodsRec(LinkedList<FSTMethod> methods, FSTClassFragment innerClass) {
+	private void getAllMethodsRec(LinkedList<FSTMethod> methods, FSTClassFragment innerClass) {
 		methods.addAll(innerClass.getMethods());
 		if (innerClass.getInnerClasses() != null) {
 			for (FSTClassFragment i : innerClass.getInnerClasses()) {
@@ -147,7 +147,7 @@ public class FSTRole {
 
 	}
 
-	public void getAllInnerClassesRec(LinkedList<FSTClassFragment> fragment, FSTClassFragment innerClass) {
+	private void getAllInnerClassesRec(LinkedList<FSTClassFragment> fragment, FSTClassFragment innerClass) {
 		fragment.addAll(innerClass.getInnerClasses());
 		if (innerClass.getInnerClasses() != null) {
 			for (FSTClassFragment i : innerClass.getInnerClasses()) {
@@ -156,25 +156,22 @@ public class FSTRole {
 		}
 
 	}
-	
 
 	//get list of all nested classes shared by multiple features
-		public LinkedList<FSTClassFragment> getAllEqualFSTFragments(FSTClassFragment fragment){
-			LinkedList<FSTClassFragment> frag = new LinkedList<FSTClassFragment>();
-//			frag.add(fragment);
-			
-			
-			for (FSTRole role : getFSTClass().getRoles()) {
-				for(FSTClassFragment currFrag : role.getAllInnerClasses()){
-					if(currFrag.equals(fragment)){
-						
-						frag.add(currFrag);
-					}
+	public LinkedList<FSTClassFragment> getAllEqualFSTFragments(FSTClassFragment fragment) {
+		final LinkedList<FSTClassFragment> frag = new LinkedList<FSTClassFragment>();
+
+		for (FSTRole role : fstClass.getRoles()) {
+			for (FSTClassFragment currFrag : role.getAllInnerClasses()) {
+				if (currFrag.equals(fragment)) {
+					frag.add(currFrag);
+					break;
 				}
 			}
-			
-			return frag;
 		}
+
+		return frag;
+	}
 
 	@Override
 	public String toString() {

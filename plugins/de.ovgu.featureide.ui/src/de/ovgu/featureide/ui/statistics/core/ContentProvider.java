@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.ui.statistics.core;
 
-import javax.swing.text.View;
-
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -43,7 +41,6 @@ import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.Confi
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.DirectivesNode;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.StatisticsContractComplexity;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.StatisticsFeatureComplexity;
-import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.StatisticsProgramSize;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.StatisticsProgramSizeNew;
 import de.ovgu.featureide.ui.statistics.ui.helper.JobDoneListener;
 
@@ -79,8 +76,6 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 	
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-//		godfather = new Parent("godfather", null);
-		
 	}
 	
 	public ContentProvider(TreeViewer viewer) {

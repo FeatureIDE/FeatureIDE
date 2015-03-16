@@ -88,10 +88,7 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 
 		addButtons();
 	}
-
-	/**
-	 * 
-	 */
+	
 	private void addButtons() {
 
 		IToolBarManager toolBarManager = getViewSite().getActionBars().getToolBarManager();
@@ -200,16 +197,12 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 							IResource anyFile = ResourceUtil.getResource(((IEditorPart) currentEditor).getEditorInput());
 							//TODO is refresh really necessary? -> true?
 							
-							
 							if(!anyFile.getProject().equals(currentInput.getProject()) || button){
 								contentProvider.calculateContent(anyFile, true);
 								currentInput = anyFile;
 							}else{
 								contentProvider.calculateContent(anyFile, false);
 							}
-							
-							
-							
 						}
 						return Status.OK_STATUS;
 					}

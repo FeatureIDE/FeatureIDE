@@ -10,7 +10,7 @@ import de.ovgu.featureide.ui.statistics.core.composite.Parent;
  */
 public class MethodSubNodeParent extends Parent {
 
-	FSTMethod method;
+	private final FSTMethod method;
 
 	public MethodSubNodeParent(String descString, FSTMethod method) {
 		super(descString.replace(":", ""));
