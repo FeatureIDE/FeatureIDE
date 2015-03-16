@@ -60,6 +60,7 @@ import de.ovgu.featureide.core.fstmodel.IRoleElement;
 import de.ovgu.featureide.core.fstmodel.RoleElement;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
 import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
 import de.ovgu.featureide.ui.views.collaboration.action.ShowFieldsMethodsAction;
 
@@ -209,7 +210,7 @@ public class RoleFigure extends Figure implements GUIDefaults {
 			setBorder(COLL_BORDER_UNSELECTED);
 		}
 		setOpaque(true);
-
+		
 		if (isFieldMethodFilterActive()) {
 			createContentForFieldMethodFilter();
 		} else {
@@ -240,6 +241,7 @@ public class RoleFigure extends Figure implements GUIDefaults {
 			addLabel(new Label("Fields: " + fieldCount + " Methods: " + methodCount + " Invariants: " + ((Integer) invariant[0]) + " "));
 		} else if (role.getClassFragment().getName().startsWith("*.")) {
 			setContentForFiles(new CompartmentFigure(), tooltipContent);
+		
 		} else {
 			setDirectivesContent(tooltipContent, getClassName());
 		}
@@ -271,7 +273,7 @@ public class RoleFigure extends Figure implements GUIDefaults {
 			if (showContracts()) {
 				methodCount = getCountForMethodContentContractCreate(tooltipContent);
 
-			} else if (!showContracts()) {
+			} else {
 				methodCount = getCountForMethodContentCreate(tooltipContent);
 			}
 
@@ -616,7 +618,7 @@ public class RoleFigure extends Figure implements GUIDefaults {
 	 */
 	public boolean isFieldMethodFilterActive() {
 		return (isPublicFieldMethodFilterActive() || isDefaultFieldMethodFilterActive() || isPrivateFieldMethodFilterActive() || isProtectedFieldMethodFilterActive())
-				&& (fieldsWithRefinements() || fieldsWithoutRefinements() || showContracts() || showInvariants());
+				&& (fieldsWithRefinements() || fieldsWithoutRefinements() || showContracts() || showInvariants() || methodsWithoutRefinements() || methodsWithRefinements());
 	}
 
 	/*

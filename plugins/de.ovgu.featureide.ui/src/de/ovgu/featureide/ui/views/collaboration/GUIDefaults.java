@@ -133,7 +133,7 @@ public interface GUIDefaults {
 	Image IMAGE_FIELD_PROTECTED = UIPlugin.getImage("field_protected_obj.gif");
 	Image IMAGE_FIELD_PUBLIC = UIPlugin.getImage("field_public_obj.gif");
 	Image IMAGE_FIELD_DEFAULT = UIPlugin.getImage("field_default_obj.gif");
-	Image IMAGE_METHODE_PRIVATE = UIPlugin.getImage("private_co.gif");
+	Image IMAGE_METHODE_PRIVATE = UIPlugin.getImage("private_co.png");
 	Image IMAGE_METHODE_PROTECTED = UIPlugin.getImage("protected_co.gif");
 	Image IMAGE_METHODE_PUBLIC = UIPlugin.getImage("public_co.gif");
 	Image IMAGE_METHODE_DEFAULT =  UIPlugin.getImage("default_co.gif");
@@ -141,9 +141,18 @@ public interface GUIDefaults {
 	Image IMAGE_METHODE_PUBLIC_CONTRACT = UIPlugin.getImage("public_co_contract.gif");
 	Image IMAGE_METHODE_PROTECTED_CONTRACT = UIPlugin.getImage("protected_co_contract.gif");
 	Image IMAGE_METHODE_PRIVATE_CONTRACT = UIPlugin.getImage("private_co_contract.gif");
-	Image IMAGE_AT = UIPlugin.getImage("aticon.png");
+	Image IMAGE_AT_CONTRACT = UIPlugin.getImage("aticon_contract.png");
+	Image IMAGE_AT_INVARIANT = UIPlugin.getImage("aticon_invariant.png");
 	Image IMAGE_AT_WITHOUT_WHITE_BACKGROUND = UIPlugin.getImage("aticon_2.gif");
 	Image IMAGE_CLASS = UIPlugin.getImage("class_obj.gif");
 	Image IMAGE_FEATURE = UIPlugin.getImage("FeatureIconSmall.ico");
 	Image IMAGE_HASH = UIPlugin.getImage("hash.png");
+	Image IMAGE_SELECT_ALL = UIPlugin.getImage("select_all_icon.png");
+	Image IMAGE_DESELECT_ALL = UIPlugin.getImage("deselect_all_icon.png");
+	Image IMAGE_NONE_ICON = UIPlugin.getImage("placeholder_icon.png");
+	Image IMAGE_MODIFIERS_NONE = UIPlugin.getImage("access_modifiers_none.png");
+	Image IMAGE_SELECT_ALL_MODIFIERS = UIPlugin.getImage("select_all_modifiers.png");
+	Image IMAGE_EXPORT_ICON = UIPlugin.getImage("export_icon.gif");
+	Image IMAGE_EXPORT_XML_ICON = UIPlugin.getImage("export_xml.png");
+	Image IMAGE_EXPORT_IMAGE_ICON = UIPlugin.getImage("export_image.png");
 }
