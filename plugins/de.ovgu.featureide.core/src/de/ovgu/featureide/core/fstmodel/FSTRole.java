@@ -157,21 +157,20 @@ public class FSTRole {
 
 	}
 
-//get list of all nested classes shared by multiple features
-	public LinkedList<FSTClassFragment> getAllEqualFSTFragments(FSTClassFragment fragment){
-		LinkedList<FSTClassFragment> frag = new LinkedList<FSTClassFragment>();
+	//get list of all nested classes shared by multiple features
+	public LinkedList<FSTClassFragment> getAllEqualFSTFragments(FSTClassFragment fragment) {
+		final LinkedList<FSTClassFragment> frag = new LinkedList<FSTClassFragment>();
 		frag.add(fragment);
-		
-		
-		for (FSTRole role : getFSTClass().getRoles()) {
-			for(FSTClassFragment currFrag : role.getAllInnerClasses()){
-				if(currFrag.equals(fragment)){
-					
+
+		for (FSTRole role : fstClass.getRoles()) {
+			for (FSTClassFragment currFrag : role.getAllInnerClasses()) {
+				if (currFrag.equals(fragment)) {
 					frag.add(currFrag);
+					break;
 				}
 			}
 		}
-		
+
 		return frag;
 	}
 
@@ -193,3 +192,4 @@ public class FSTRole {
 		return builder.toString();
 	}
 }
+

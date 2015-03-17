@@ -71,6 +71,28 @@ public class FSTClass {
 	public String toString() {
 		return name;
 	}
-	
+
+	public LinkedList<LinkedList<FSTClassFragment>> getAllFSTFragments() {
+		final LinkedList<LinkedList<FSTClassFragment>> allFrags = new LinkedList<LinkedList<FSTClassFragment>>();
+		final LinkedList<FSTClassFragment> helper = new LinkedList<FSTClassFragment>();
+		final LinkedList<FSTClassFragment> fragmentsOfThisClass = new LinkedList<FSTClassFragment>();
+
+		for (FSTRole currRole : getRoles()) {
+			final LinkedList<FSTClassFragment> allFragsOfRole = currRole.getAllInnerClasses();
+			for (FSTClassFragment fstClassFragment : allFragsOfRole) {
+				if (!helper.contains(fstClassFragment)) {
+					final LinkedList<FSTClassFragment> currList = currRole.getAllEqualFSTFragments(fstClassFragment);
+					allFrags.add(currList);
+					helper.addAll(currList);
+				}
+			}
+			fragmentsOfThisClass.add(currRole.getClassFragment());
+		}
+
+		allFrags.add(fragmentsOfThisClass);
+
+		return allFrags;
+	}
 	
 }
+

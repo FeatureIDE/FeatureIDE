@@ -57,7 +57,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 	private static final String TOOL_TIP_GENERATE = "Defines the produkt-based strategy.";
 	private static final String TOOL_TIP_T_WISE = "Defines the algorithm for t-wise sampling.";
 	private static final String TOOL_TIP_ORDER = "Defines how the generated produkts are ordered.";
-	private static final String TOOL_TIP_BUFFER = "If enabled, all produkts are buffered before odering and generation.";
+	private static final String TOOL_TIP_BUFFER = "If enabled, all products are buffered before odering and generation.";
 	private static final String TOOL_TIP_T = "Define the t for t-wise generation or interaction-based order.";
 	private static final String TOOL_TIP_PROJECT = "Defnies whether the produkts are generated into separate projects or into a folder in this project.";
 	

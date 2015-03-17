@@ -41,7 +41,7 @@ import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.Confi
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.DirectivesNode;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.StatisticsContractComplexity;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.StatisticsFeatureComplexity;
-import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.StatisticsProgramSize;
+import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.StatisticsProgramSizeNew;
 import de.ovgu.featureide.ui.statistics.ui.helper.JobDoneListener;
 
 /**
@@ -76,7 +76,6 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 	
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-
 	}
 	
 	public ContentProvider(TreeViewer viewer) {
@@ -129,8 +128,14 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 	 */
 	public void calculateContent(IResource res) {
 		IFeatureProject newProject = CorePlugin.getFeatureProject(res);
-		boolean isEntirelyNewProject = project == null && newProject != null;
 		boolean hasChanged = newProject != null && project != null && !newProject.equals(project);
+		calculateContent(res, hasChanged);
+	}
+	
+	public void calculateContent(IResource res, boolean hasChanged) {
+		IFeatureProject newProject = CorePlugin.getFeatureProject(res);
+		boolean isEntirelyNewProject = project == null && newProject != null;
+		
 		if (isEntirelyNewProject || hasChanged) {
 			this.project = newProject;
 			addNodes();
@@ -159,7 +164,7 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 
 		
 		if (composer.getGenerationMechanism() == IComposerExtensionClass.Mechanism.FEATURE_ORIENTED_PROGRAMMING) {
-			godfather.addChild(new StatisticsProgramSize(PRODUCT_LINE_IMPLEMENTATION, fstModel));
+			godfather.addChild(new StatisticsProgramSizeNew(PRODUCT_LINE_IMPLEMENTATION, fstModel));
 			godfather.addChild(new StatisticsContractComplexity(CONTRACT_COMPLEXITY, fstModel, featModel, project.getContractComposition()));
 		}
 		if (composer.getGenerationMechanism() == IComposerExtensionClass.Mechanism.PREPROCESSOR) {

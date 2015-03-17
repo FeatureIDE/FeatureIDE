@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.editparts;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.TreeSet;
 
@@ -173,8 +174,8 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 						}
 
 					}
-
-					TreeSet<FSTField> fields = this.getRoleModel().getClassFragment().getFields();
+					Collection<FSTField> fields = this.getRoleModel().getAllFields();
+					
 					for (FSTField fstField : fields) {
 						if (fstField.getFullName().equals(label.getElementName())) {
 							editor = openEditor(file);
@@ -185,7 +186,18 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 						}
 					}
 
-					TreeSet<FSTMethod> methods = this.getRoleModel().getClassFragment().getMethods();
+					Collection<FSTClassFragment> innerClasses = this.getRoleModel().getAllInnerClasses();
+					for (FSTClassFragment fstInnerClass : innerClasses) {
+						if (fstInnerClass.getFullName().equals(label.getElementName())) {
+							editor = openEditor(file);
+							if (editor != null) {
+								Outline.scrollToLine(editor,fstInnerClass.getLine());
+							}
+							return;
+						}
+					}
+					Collection<FSTMethod> methods = this.getRoleModel().getAllMethods();
+					
 					for (FSTMethod fstMethod : methods) {
 						if (fstMethod.getFullName().equals(label.getElementName())) {
 							editor = openEditor(file);
