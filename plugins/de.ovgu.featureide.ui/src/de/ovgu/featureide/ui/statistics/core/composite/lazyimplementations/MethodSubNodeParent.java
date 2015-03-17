@@ -19,7 +19,6 @@ public class MethodSubNodeParent extends Parent {
 
 	public FSTMethod getMethod() {
 		return method;
-	}
-	
+	}	
 
 }

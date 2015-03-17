@@ -21,7 +21,6 @@
 package de.ovgu.featureide.ui.views.collaboration.figures;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedList;
 
 import org.eclipse.core.resources.IFile;
@@ -43,16 +42,17 @@ import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Insets;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
-import org.eclipse.jdt.internal.ui.compare.CompareMessages;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.fstmodel.FSTArbitraryRole;
+import de.ovgu.featureide.core.fstmodel.FSTClassFragment;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTInvariant;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
+import de.ovgu.featureide.core.fstmodel.RoleElement;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
@@ -133,8 +133,9 @@ public class RoleFigure extends Figure implements GUIDefaults {
 	public final static boolean[] getRoleSelections() {
 		boolean[] selections = new boolean[14];
 
-		// Set everything but hide as enabled (default setting)
+		// Set everything but hide_all and show_contracts as enabled (default setting)
 		Arrays.fill(selections, true);
+		selections[ShowFieldsMethodsAction.ONLY_CONTRACTS] = false;
 		selections[ShowFieldsMethodsAction.HIDE_PARAMETERS_AND_TYPES] = false;
 		selections[ShowFieldsMethodsAction.DESELECT_ALL] = false;
 		selections[ShowFieldsMethodsAction.SELECT_ALL] = false;
@@ -194,6 +195,7 @@ public class RoleFigure extends Figure implements GUIDefaults {
 		gridLayout.verticalSpacing = GRIDLAYOUT_VERTICAL_SPACING;
 		gridLayout.marginHeight = GRIDLAYOUT_MARGIN_HEIGHT;
 		panel.setLayoutManager(gridLayout);
+
 		setLayoutManager(new FreeformLayout());
 		setBackgroundColor(ROLE_BACKGROUND);
 
@@ -213,7 +215,9 @@ public class RoleFigure extends Figure implements GUIDefaults {
 		Dimension size = getSize();
 		size.expand(0, gridLayout.marginHeight * 2);
 		setSize(size);
+
 		add(panel);
+
 	}
 
 	private void createContentForDefault() {
@@ -224,6 +228,7 @@ public class RoleFigure extends Figure implements GUIDefaults {
 		if (!(role instanceof FSTArbitraryRole) && role.getDirectives().isEmpty()) {
 			int fieldCount = getCountForFieldContentCreate(tooltipContent);
 			int methodCount = getCountForMethodContentCreate(tooltipContent);
+
 			Object[] invariant = createInvariantContent(tooltipContent);
 			addLabel(new Label("Fields: " + fieldCount + " Methods: " + methodCount + " Invariants: " + ((Integer) invariant[0]) + " "));
 		} else if (role.getClassFragment().getName().startsWith("*.")) {
@@ -236,6 +241,7 @@ public class RoleFigure extends Figure implements GUIDefaults {
 		setToolTip(tooltipContent);
 	}
 
+	// create content
 	private void createContentForFieldMethodFilter() {
 		Figure tooltipContent = new Figure();
 		GridLayout contentsLayout = new GridLayout(1, true);
@@ -244,15 +250,20 @@ public class RoleFigure extends Figure implements GUIDefaults {
 		if (role.getDirectives().isEmpty() && role.getFile() != null) {
 			Object[] invariant = null;
 
+			Label label = new RoleFigureLabel(getClassName() + " ", IMAGE_CLASS, role.getClassFragment().getFullName());
+			addLabel(label);
+			
 			if (showInvariants()) {
 				invariant = createInvariantContent(tooltipContent);
 			}
-
+			
 			int fieldCount = getCountForFieldContentCreate(tooltipContent);
 
 			int methodCount = 0;
+
 			if (showContracts()) {
 				methodCount = getCountForMethodContentContractCreate(tooltipContent);
+
 			} else if (!showContracts()) {
 				methodCount = getCountForMethodContentCreate(tooltipContent);
 			}
@@ -263,20 +274,25 @@ public class RoleFigure extends Figure implements GUIDefaults {
 			if (showInvariants() && invariant != null && ((Integer) invariant[0]) > 0) {
 				addToToolTip(((Integer) invariant[0]), ((CompartmentFigure) invariant[1]), tooltipContent);
 			}
+
 			// if no methods, invariants or fields to show, show default label
 			int invariantsCount = ((invariant != null) ? ((Integer) invariant[0]) : 0);
 			if (fieldCount == 0 && methodCount == 0 && invariantsCount == 0) {
 				addLabel(new Label("Fields: 0 Methods: 0 Invariants: 0 "));
 			}
 
-			// draw separation line between fields and methods
-			if (invariant != null && (fieldCount + ((Integer) invariant[0]) > 0) && (methodCount > 0)) {
+			if (shouldShowNestedClasses()) {
+				createContentForInnerClasses(tooltipContent);
+			}
+
+			// TODO: Seperation lines between inner classes, fields and methods
+			/*if (invariant != null && (fieldCount + ((Integer) invariant[0]) > 0) && (methodCount > 0)) {
 				int xyValue = (fieldCount + ((Integer) invariant[0])) * (ROLE_PREFERED_SIZE + GRIDLAYOUT_VERTICAL_SPACING) + GRIDLAYOUT_MARGIN_HEIGHT;
 				panel.setBorder(new RoleFigureBorder(xyValue, xyValue));
 			} else if (fieldCount > 0 && (methodCount > 0)) {
 				int xyValue = fieldCount * (ROLE_PREFERED_SIZE + GRIDLAYOUT_VERTICAL_SPACING) + GRIDLAYOUT_MARGIN_HEIGHT;
 				panel.setBorder(new RoleFigureBorder(xyValue, xyValue));
-			}
+			}*/
 
 		} else if (role.getClassFragment().getName().startsWith("*.")) {
 			setContentForFiles(tooltipContent, null);
@@ -284,6 +300,64 @@ public class RoleFigure extends Figure implements GUIDefaults {
 			setDirectivesContent(tooltipContent, getClassName());
 		}
 		setToolTip(tooltipContent);
+	}
+	
+	// creates tooltip and creates content for nested classes
+	private void createContentForInnerClasses(Figure tooltipContent) {
+
+		FSTClassFragment[] allInnerClasses = new FSTClassFragment[role.getAllInnerClasses().size()];
+		role.getAllInnerClasses().toArray(allInnerClasses);
+
+		for (FSTClassFragment currentInnerClass : allInnerClasses) {
+
+			// create empty label
+			Label label2 = new RoleFigureLabel("","");
+			addLabel(label2);
+			
+			// create tooltip for class
+			Label label = createNestedClassLabel(currentInnerClass);
+			tooltipContent.add(createNestedClassLabel(currentInnerClass));
+			
+			// create tooltip counts
+			int innerFields = 0;
+			int innerMethods = 0;
+			
+			addLabel(label);			
+			innerFields += getFieldsForInnerClass(currentInnerClass);
+			innerMethods += getMethodsForInnerClass(currentInnerClass);
+			
+			label = new Label("Fields: " + innerFields + " Methods: "+innerMethods);
+			tooltipContent.add(label);
+		}
+	}
+
+	private int getFieldsForInnerClass(FSTClassFragment innerClassFragment) {
+		int fieldCount = 0;
+		for (FSTField currentField : innerClassFragment.getFields()) {
+			if (matchFilter(currentField)
+					&& ((fieldsWithRefinements() && currentField.inRefinementGroup()) || (!currentField.inRefinementGroup() && fieldsWithoutRefinements()))) {
+				{
+					
+					fieldCount++;
+					addLabel(createFieldLabel(currentField));
+				}
+			}
+		}
+		return fieldCount;
+	}
+
+	private int getMethodsForInnerClass(FSTClassFragment innerClassFragment) {
+		int methodCount = 0;
+
+		for (FSTMethod currentMethod : innerClassFragment.getMethods()) {
+			if (matchFilter(currentMethod)
+					&& ((methodsWithRefinements() && currentMethod.inRefinementGroup()) || (!currentMethod.inRefinementGroup() && methodsWithoutRefinements()))) {
+				
+				methodCount++;
+				addLabel(createMethodLabel(currentMethod));
+			}
+		}
+		return methodCount;
 	}
 
 	private int getCountForMethodContentCreate(Figure tooltipContent) {
@@ -298,8 +372,10 @@ public class RoleFigure extends Figure implements GUIDefaults {
 		}
 
 		int methodCount = 0;
+
 		for (FSTMethod m : role.getClassFragment().getMethods()) {
 			Label methodLabel = createMethodLabel(m);
+
 			// check for selected filters		
 			if (matchFilter(m) && ((methodsWithRefinements() && m.inRefinementGroup()) || (!m.inRefinementGroup() && methodsWithoutRefinements()))) {
 				methodFigure.add(methodLabel);
@@ -320,6 +396,7 @@ public class RoleFigure extends Figure implements GUIDefaults {
 		if (!isFieldMethodFilterActive()) {
 			addToToolTip(methodCount, methodFigure, tooltipContent);
 		}
+
 		return methodCount;
 	}
 
@@ -390,6 +467,18 @@ public class RoleFigure extends Figure implements GUIDefaults {
 
 	private String getClassName() {
 		return role.getClassFragment().getName().split("[.]")[0];
+	}
+	
+	// create label for nested class
+	private Label createNestedClassLabel(FSTClassFragment classFragment) {
+		String name = classFragment.getFullIdentifier();
+		if (name.startsWith(RoleElement.DEFAULT_PACKAGE)) {
+			name = name.substring(RoleElement.DEFAULT_PACKAGE.length());
+		}
+		
+		RoleFigureLabel classLabel = new RoleFigureLabel(name, IMAGE_CLASS, classFragment.getFullName());
+		classLabel.setForegroundColor(ROLE_FOREGROUND_UNSELECTED);
+		return classLabel;
 	}
 
 	private int getCountForFieldContentCreate(Figure tooltipContent) {
@@ -520,6 +609,10 @@ public class RoleFigure extends Figure implements GUIDefaults {
 		return SELECTED_FIELDS_METHOD[ShowFieldsMethodsAction.METHODS_WITH_REFINEMENTS];
 	}
 
+	private boolean shouldShowNestedClasses() {
+		return SELECTED_FIELDS_METHOD[ShowFieldsMethodsAction.SHOW_NESTED_CLASSES];
+	}
+
 	private boolean methodsWithoutRefinements() {
 		return SELECTED_FIELDS_METHOD[ShowFieldsMethodsAction.METHODS_WITHOUT_REFINEMENTS];
 	}
@@ -573,6 +666,7 @@ public class RoleFigure extends Figure implements GUIDefaults {
 				.hasContract() && showContracts()));
 	}
 
+	// create label for method
 	private Label createMethodLabel(FSTMethod m) {
 		String name;
 		if (showOnlyNames()) {
@@ -602,8 +696,9 @@ public class RoleFigure extends Figure implements GUIDefaults {
 				methodLabel.setIcon(IMAGE_METHODE_PROTECTED);
 			else if (m.isPublic())
 				methodLabel.setIcon(IMAGE_METHODE_PUBLIC);
-			else
+			else {
 				methodLabel.setIcon(IMAGE_METHODE_DEFAULT);
+			}
 		}
 
 		return methodLabel;
@@ -620,6 +715,7 @@ public class RoleFigure extends Figure implements GUIDefaults {
 		return invariantLabel;
 	}
 
+	// create label for field
 	private Label createFieldLabel(FSTField f) {
 		String name;
 		if (showOnlyNames()) {

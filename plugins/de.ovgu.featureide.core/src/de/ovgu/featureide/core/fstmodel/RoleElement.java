@@ -31,8 +31,8 @@ import de.ovgu.featureide.core.signature.abstr.AbstractSignature;
  */
 public abstract class RoleElement<T extends RoleElement<T>> implements Comparable<T>, IRoleElement {
 	
-	public static final String DEFAULT_PACKAGE = "(default package).";
-	
+	public final static String DEFAULT_PACKAGE = "(default package).";
+
 	private static final String STATIC = "static";
 	private static final String PUBLIC = "public";
 	private static final String PROTECTED = "protected";
@@ -220,3 +220,4 @@ public abstract class RoleElement<T extends RoleElement<T>> implements Comparabl
 	}
 
 }
+
