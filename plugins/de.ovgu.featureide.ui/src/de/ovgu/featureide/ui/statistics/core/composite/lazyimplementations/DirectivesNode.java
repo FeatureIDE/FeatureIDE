@@ -20,10 +20,22 @@
  */
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.LinkedHashSet;
 import java.util.List;
+
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceVisitor;
+import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
+import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.genericdatatypes.AbstractSortModeNode;
@@ -38,6 +50,7 @@ import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.gener
  */
 public class DirectivesNode extends LazyParent {
 	private FSTModel fstModel;
+	int numberOfLines;
 
 	/**
 	 * Constructor for a {@code DirectivesNode}.
@@ -138,7 +151,7 @@ public class DirectivesNode extends LazyParent {
 		};
 		
 		addChild(classes);
-		
+		addChild(new Parent(NUMBER_OF_CODELINES + SEPARATOR + getLOC() ));
 	}
 	
 	private String searchClass(Parent[] data, Integer input) {
@@ -172,4 +185,54 @@ public class DirectivesNode extends LazyParent {
 		
 		return 0.0;
 	}
+	
+	
+	public int getLOC(){
+		final LinkedHashSet<String> extList = fstModel.getFeatureProject().getComposer().extensions();
+		
+		try {
+			fstModel.getFeatureProject().getSourceFolder().accept(new IResourceVisitor() {
+
+				@Override
+				public boolean visit(IResource resource) throws CoreException {
+					if (resource instanceof IFolder) {
+						return true;
+					} else if (resource instanceof IFile) {
+						final IFile file = (IFile) resource;
+						if (extList.contains(file.getFileExtension())) {
+
+							try {
+								FileReader fr = new FileReader(file.getLocation().toString());
+								BufferedReader br = new BufferedReader(fr);
+								String s;
+								while ((s = br.readLine()) != null) {
+									if (!s.trim().equals(""))
+											numberOfLines++;
+								}
+								br.close();
+
+							} catch (FileNotFoundException e) {
+								e.printStackTrace();
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+						}
+
+					}
+					return false;
+				}
+			});
+		} catch (CoreException e) {
+			UIPlugin.getDefault().logError(e);
+		}
+		
+		return numberOfLines;
+	}
+	
+	
+	
+	
+	
 }
+
+

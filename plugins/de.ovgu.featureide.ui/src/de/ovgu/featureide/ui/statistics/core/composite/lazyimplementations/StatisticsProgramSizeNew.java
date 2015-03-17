@@ -82,37 +82,78 @@ public class StatisticsProgramSizeNew extends LazyParent {
 							return true;
 						} else if (resource instanceof IFile) {
 							final IFile file = (IFile) resource;
-							if (extList.contains(file.getFileExtension())) {
-
-								try {
-									FileReader fr = new FileReader(file.getLocation().toString());
-									BufferedReader br = new BufferedReader(fr);
-									String s;
-									boolean isInComment = false;
-									while ((s = br.readLine()) != null) {
-										if (s.trim().contains("*/"))
-											isInComment = false;
-
-										if (!s.trim().equals("") && !s.trim().startsWith("//") && !isInComment)
-											if (s.trim().startsWith("/*"))//TODO Kommentare sind auf java bezogen noch sprachunabhängig implementieren
-												isInComment = true;
-											else
-												numberOfLines++;
-
-										if (s.trim().contains("/*"))
-											isInComment = true;
-									}
-									br.close();
-
-								} catch (FileNotFoundException e) {
-									e.printStackTrace();
-								} catch (IOException e) {
-									e.printStackTrace();
-								}
-
+							String oneLineComment = "", moreLineStart = "", moreLineEnd = "";
+							boolean nested = false;
+							int nestedCounter = 0;
+							switch (file.getFileExtension()) {
+							case "java" :
+							case "c" :	
+							case "h" :	
+									oneLineComment = "//";
+									moreLineStart = "/*";
+									moreLineEnd = "*/";
+									nested = false;
+									nestedCounter = 0;
+								break;
+							case "cs" : 
+									oneLineComment = "///";
+									moreLineStart = "/*";
+									moreLineEnd = "*/";
+									nested = false;
+									nestedCounter = 0;
+								break;
+							case "hs" :
+									oneLineComment = "--";
+									moreLineStart = "{-";
+									moreLineEnd = "-}";
+									nested = true;
+									nestedCounter = 0;
+								break;	
+							default:
+								oneLineComment ="#|#|#";
+								moreLineStart = "#|#|#";
+								moreLineEnd = "#|#|#";
+								nested = false;
+								nestedCounter = 0;
+								break;
 							}
+							
+							try {
+								FileReader fr = new FileReader(file.getLocation().toString());
+								BufferedReader br = new BufferedReader(fr);
+								String s;
+								boolean isInComment = false;
+								while ((s = br.readLine()) != null) {
+									if (s.trim().contains(moreLineEnd)) {
+										if(nested) {
+											nestedCounter--;
+											if(nestedCounter == 0)
+												isInComment = false;
+										} else {
+											isInComment = false;
+										}
+									}
+										
 
+									if (!s.trim().equals("") && !s.trim().startsWith(oneLineComment) && !isInComment) {
+										if (s.trim().startsWith(moreLineStart))//TODO Kommentare sind auf java bezogen noch sprachunabhängig implementieren
+											isInComment = true;
+										else
+											numberOfLines++;
+									}
+
+									if (s.trim().contains(moreLineStart))
+										isInComment = true;
+								}
+								br.close();
+
+							} catch (FileNotFoundException e) {
+								e.printStackTrace();
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
 						}
+
 						return false;
 					}
 				});
@@ -121,6 +162,12 @@ public class StatisticsProgramSizeNew extends LazyParent {
 			}
 		}
 
+		
+//		extensions.add("hs");
+//		extensions.add("jj");
+//		extensions.add("als");
+//		extensions.add("xmi");
+		
 		addChild(new SumImplementationArtifactsParent(NUMBER_CLASS + SEPARATOR + numberOfClasses + " | " + NUMBER_ROLE + SEPARATOR + numberOfRoles, fstModel,
 				SumImplementationArtifactsParent.NUMBER_OF_CLASSES));
 		addChild(new SumImplementationArtifactsParent(NUMBER_FIELD_U + SEPARATOR + numberOfUniFields + " | " + NUMBER_FIELD + SEPARATOR + numberOfFields,
