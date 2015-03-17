@@ -11,8 +11,8 @@ import de.ovgu.featureide.ui.statistics.core.composite.Parent;
  */
 public class ClassSubNodeParent extends Parent {
 
-	FSTClassFragment frag;
-	FSTClass fstClass;
+	private FSTClassFragment frag;
+	private FSTClass fstClass;
 	
 	public ClassSubNodeParent(String descString, FSTClassFragment fstClassFrag) {
 		super(descString.replace(":", ""));

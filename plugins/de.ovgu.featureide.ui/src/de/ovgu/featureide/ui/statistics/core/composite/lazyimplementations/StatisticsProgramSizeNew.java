@@ -20,8 +20,7 @@
  */
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.LinkedList;
 
 import de.ovgu.featureide.core.fstmodel.FSTClass;
@@ -29,7 +28,6 @@ import de.ovgu.featureide.core.fstmodel.FSTClassFragment;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
-import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 
 /**
@@ -41,28 +39,26 @@ import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
  */
 public class StatisticsProgramSizeNew extends LazyParent {
 
-	private FSTModel fstModel;
+	private final FSTModel fstModel;
 
 	public StatisticsProgramSizeNew(String description, FSTModel fstModel) {
 		super(description);
 		this.fstModel = fstModel;
 	}
 
-
 	@Override
 	protected void initChildren() {
-
-		int numberOfClasses = 0; 
+		int numberOfClasses = 0;
 		int numberOfRoles = 0;
 		int numberOfFields = 0;
 		int numberOfUniFields = 0;
 		int numberOfMethods = 0;
 		int numberOfUniMethods = 0;
 
-		for (FSTClass class_ : fstModel.getClasses()) {
-			LinkedList<LinkedList<FSTClassFragment>> allFrag = class_.getAllFSTFragments();
-			LinkedHashSet<FSTMethod> methHelper = new LinkedHashSet<FSTMethod>();
-			LinkedHashSet<FSTField> fieldHelper = new LinkedHashSet<FSTField>();
+		for (FSTClass fstClass : fstModel.getClasses()) {
+			final LinkedList<LinkedList<FSTClassFragment>> allFrag = fstClass.getAllFSTFragments();
+			final HashSet<FSTMethod> methHelper = new HashSet<FSTMethod>();
+			final HashSet<FSTField> fieldHelper = new HashSet<FSTField>();
 
 			for (LinkedList<FSTClassFragment> linkedList : allFrag) {
 				numberOfRoles += linkedList.size();
@@ -79,7 +75,6 @@ public class StatisticsProgramSizeNew extends LazyParent {
 			numberOfUniFields += fieldHelper.size();
 			numberOfUniMethods += methHelper.size();
 			numberOfClasses += allFrag.size();
-
 		}
 
 		addChild(new SumImplementationArtifactsParent(NUMBER_CLASS + SEPARATOR + numberOfClasses + " | " + NUMBER_ROLE + SEPARATOR + numberOfRoles, fstModel,

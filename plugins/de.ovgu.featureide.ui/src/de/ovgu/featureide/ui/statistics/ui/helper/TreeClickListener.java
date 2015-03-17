@@ -42,7 +42,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.texteditor.ITextEditor;
-
 import de.ovgu.featureide.core.fstmodel.FSTClassFragment;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTInvariant;
@@ -85,25 +84,17 @@ public class TreeClickListener implements IDoubleClickListener {
 	 */
 	@Override
 	public void doubleClick(DoubleClickEvent event) {
-		Object[] selectedObjects = ((TreeSelection) event.getSelection()).toArray();
-
-		if (selectedObjects.length == 1 && selectedObjects[0] instanceof Parent && ((Parent) selectedObjects[0]).getValue() instanceof FSTRole) {
-			FSTRole role = (FSTRole) ((Parent) selectedObjects[0]).getValue();
-			IFile file = role.getFile();
-		}
+		final Object[] selectedObjects = ((TreeSelection) event.getSelection()).toArray();
 
 		for (Object selected : selectedObjects) {
 			if (selected instanceof ConfigParentNode.ConfigNode) {
 				handleConfigNodes(event, selected);
 			} else if (selected instanceof AbstractSortModeNode && view.getExpandedState(selected)) {
 				final AbstractSortModeNode sortNode = ((AbstractSortModeNode) selected);
-				if (selected instanceof ClassNodeParent || selected instanceof FieldNodeParent || selected instanceof MethodNodeParent)
-					sortNode.setSortByValue(false);
+				sortNode.setSortByValue(!(selected instanceof ClassNodeParent || selected instanceof FieldNodeParent || selected instanceof MethodNodeParent || sortNode
+						.isSortByValue()));
 
-				if (!(selected instanceof ClassNodeParent || selected instanceof FieldNodeParent || selected instanceof MethodNodeParent))
-					sortNode.setSortByValue(!sortNode.isSortByValue());
-
-				UIJob job = new UIJob("resort node") {
+				final UIJob job = new UIJob("resort node") {
 					@Override
 					public IStatus runInUIThread(IProgressMonitor monitor) {
 						view.refresh(sortNode);
@@ -115,26 +106,29 @@ public class TreeClickListener implements IDoubleClickListener {
 			} else if (selected instanceof Parent && ((Parent) selected).hasChildren()) {
 				view.setExpandedState(selected, !view.getExpandedState(selected));
 			} else if (selected instanceof FieldSubNodeParent) {
-				IFile iFile = ((FieldSubNodeParent) selected).getField().getRole().getFile();
-				int line = ((FieldSubNodeParent) selected).getField().getLine();
+				final IFile iFile = ((FieldSubNodeParent) selected).getField().getRole().getFile();
+				final int line = ((FieldSubNodeParent) selected).getField().getLine();
 				openEditor(iFile, line);
 			} else if (selected instanceof MethodSubNodeParent) {
-				IFile iFile = ((MethodSubNodeParent) selected).getMethod().getRole().getFile();
-				int line = ((MethodSubNodeParent) selected).getMethod().getLine();
+				final IFile iFile = ((MethodSubNodeParent) selected).getMethod().getRole().getFile();
+				final int line = ((MethodSubNodeParent) selected).getMethod().getLine();
 				openEditor(iFile, line);
-			} else if(selected instanceof ClassSubNodeParent) {
-				IFile iFile = ((FSTRole) ((ClassSubNodeParent) selected).getFragment().getRole()).getFile();
-				openEditor(iFile, 1);
-			} else if(selected instanceof Parent && ((Parent)selected).getParent() instanceof InvariantNodeParent) {
-				IFile iFile = ((FSTInvariant)(((Parent) selected).getValue())).getFile();
-				int line = ((FSTInvariant)(((Parent) selected).getValue())).getLine();
-				openEditor(iFile,line);
-			} else if (selected instanceof Parent && (((Parent)selected).getParent() instanceof MethodContractNodeParent || ((Parent)selected).getParent() instanceof ContractCountNodeParent)){
-				IFile iFile = ((FSTMethod)(((Parent) selected).getValue())).getFile();
-				int line = ((FSTMethod)(((Parent) selected).getValue())).getLine();
-				openEditor(iFile,line);
-			} 
- 
+			} else if (selected instanceof ClassSubNodeParent) {
+				final IFile iFile = ((FSTRole) ((ClassSubNodeParent) selected).getFragment().getRole()).getFile();
+				if (iFile != null) {
+					openEditor(iFile, 1);
+				}
+			} else if (selected instanceof Parent && ((Parent) selected).getParent() instanceof InvariantNodeParent) {
+				IFile iFile = ((FSTInvariant) (((Parent) selected).getValue())).getFile();
+				int line = ((FSTInvariant) (((Parent) selected).getValue())).getLine();
+				openEditor(iFile, line);
+			} else if (selected instanceof Parent
+					&& (((Parent) selected).getParent() instanceof MethodContractNodeParent || ((Parent) selected).getParent() instanceof ContractCountNodeParent)) {
+				IFile iFile = ((FSTMethod) (((Parent) selected).getValue())).getFile();
+				int line = ((FSTMethod) (((Parent) selected).getValue())).getLine();
+				openEditor(iFile, line);
+			}
+
 		}
 	}
 
@@ -144,7 +138,7 @@ public class TreeClickListener implements IDoubleClickListener {
 	 * 
 	 */
 	private void handleConfigNodes(DoubleClickEvent event, Object selected) {
-		ConfigParentNode.ConfigNode clickedNode = (ConfigParentNode.ConfigNode) selected;
+		final ConfigParentNode.ConfigNode clickedNode = (ConfigParentNode.ConfigNode) selected;
 		if (!clickedNode.isCalculating()) {
 			ConfigDialog dial = new ConfigDialog(event.getViewer().getControl().getShell(), clickedNode.getDescription());
 			if (dial.open() == ConfigDialog.OK) {

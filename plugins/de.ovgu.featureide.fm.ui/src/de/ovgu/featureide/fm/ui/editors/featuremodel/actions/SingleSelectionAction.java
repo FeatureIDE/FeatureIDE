@@ -36,7 +36,6 @@ import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConnectionEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.views.outline.FmOutlineGroupStateStorage;
-import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
  * A default implementation for actions that only allow one feature to be
