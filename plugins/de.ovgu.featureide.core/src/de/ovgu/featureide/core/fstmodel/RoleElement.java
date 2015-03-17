@@ -30,8 +30,9 @@ import de.ovgu.featureide.core.signature.abstr.AbstractSignature;
  * @author Jens Meinicke
  */
 public abstract class RoleElement<T extends RoleElement<T>> implements Comparable<T>, IRoleElement {
-
+	
 	public final static String DEFAULT_PACKAGE = "(default package).";
+
 	private static final String STATIC = "static";
 	private static final String PUBLIC = "public";
 	private static final String PROTECTED = "protected";
@@ -77,23 +78,29 @@ public abstract class RoleElement<T extends RoleElement<T>> implements Comparabl
 	public IRoleElement getParent() {
 		return parent;
 	}
+	
+	private static String removeExtension(String name) {
+		final int extIndex = name.lastIndexOf('.');
+		return (extIndex > -1) ? name.substring(0, extIndex) : name;		
+	}
 
 	public String getFullIdentifier() {
-		final StringBuilder sb = new StringBuilder(name);
+		final StringBuilder sb = new StringBuilder(removeExtension(name));
+		String packageName = (this instanceof FSTClassFragment) ? ((FSTClassFragment) this).getPackage() : null;
 		IRoleElement nextParent = parent;
-		IRoleElement oldParent = parent;
 		while (nextParent != null) {
 			sb.insert(0, '.');
-			sb.insert(0, nextParent.getName());
-			oldParent = nextParent;
+			if (nextParent.getParent() == null) {
+				packageName = ((FSTClassFragment) nextParent).getPackage();
+				sb.insert(0, removeExtension(nextParent.getName()));
+			} else {
+				sb.insert(0, nextParent.getName());
+			}
 			nextParent = nextParent.getParent();
 		}
-		if (((FSTClassFragment) oldParent).getPackage() == null) {
-			sb.insert(0, DEFAULT_PACKAGE);
-		} else {
-			sb.insert(0, ((FSTClassFragment) oldParent).getPackage());
-		}
-		return sb.toString().replaceAll(".java", "");
+		final String className = sb.toString();
+		return ((packageName == null) ? DEFAULT_PACKAGE : packageName + ".") 
+				+ className.substring(className.lastIndexOf('/') + 1);
 	}
 
 	public void setParent(IRoleElement parent) {
@@ -178,7 +185,7 @@ public abstract class RoleElement<T extends RoleElement<T>> implements Comparabl
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((getFullName() == null) ? 0 : getFullName().hashCode());
 		return result;
 	}
 

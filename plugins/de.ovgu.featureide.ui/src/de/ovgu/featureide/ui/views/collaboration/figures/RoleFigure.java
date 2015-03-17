@@ -284,12 +284,6 @@ public class RoleFigure extends Figure implements GUIDefaults {
 				addToToolTip(((Integer) invariant[0]), ((CompartmentFigure) invariant[1]), tooltipContent);
 			}
 
-			// if no methods, invariants or fields to show, show default label
-			int invariantsCount = ((invariant != null) ? ((Integer) invariant[0]) : 0);
-			if (fieldCount == 0 && methodCount == 0 && invariantsCount == 0) {
-				addLabel(new Label("Fields: 0 Methods: 0 Invariants: 0 "));
-			}
-
 			if (shouldShowNestedClasses()) {
 				createContentForInnerClasses(tooltipContent);
 			}
