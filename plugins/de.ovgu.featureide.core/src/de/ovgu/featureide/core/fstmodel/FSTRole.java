@@ -160,7 +160,6 @@ public class FSTRole {
 	//get list of all nested classes shared by multiple features
 	public LinkedList<FSTClassFragment> getAllEqualFSTFragments(FSTClassFragment fragment) {
 		final LinkedList<FSTClassFragment> frag = new LinkedList<FSTClassFragment>();
-		frag.add(fragment);
 
 		for (FSTRole role : fstClass.getRoles()) {
 			for (FSTClassFragment currFrag : role.getAllInnerClasses()) {
