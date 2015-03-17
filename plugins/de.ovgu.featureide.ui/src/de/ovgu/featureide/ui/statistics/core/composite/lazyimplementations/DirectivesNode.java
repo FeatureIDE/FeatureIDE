@@ -24,6 +24,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 
@@ -39,6 +40,7 @@ import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.genericdatatypes.AbstractSortModeNode;
+import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.genericdatatypes.HashMapNode;
 
 /**
  * TreeNode who stores the number of used preprocessor directives, directives
@@ -51,6 +53,10 @@ import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.gener
 public class DirectivesNode extends LazyParent {
 	private FSTModel fstModel;
 	int numberOfLines;
+	/**
+	 * Mapping of lines of code to each feature.
+	 */
+	HashMap<String, Integer> featuresAndLines = new HashMap<String, Integer>();
 
 	/**
 	 * Constructor for a {@code DirectivesNode}.
@@ -64,31 +70,34 @@ public class DirectivesNode extends LazyParent {
 		super(description);
 		this.fstModel = fstModel;
 	}
-	
+	public DirectivesNode() {
+
+	}
+
 	@Override
 	protected void initChildren() {
 		final Parent internClasses = new Parent("Classes");
 		Parent project = new Parent("Project statistics");
 		Integer maxNesting = 0;
 		String maxNestingClass = null;
-		
+
 		project.addChild(new LazyParent("Number of directives") {
 			@Override
 			protected void initChildren() {
 				new Aggregator().processAll(fstModel, this);
 			}
 		});
-		
+
 		final Aggregator aggProject = new Aggregator();
 		for (FSTClass clazz : fstModel.getClasses()) {
 			String className = clazz.getName();
 			final int pIndex = className.lastIndexOf('/');
 			className = ((pIndex > 0) ? className.substring(0, pIndex + 1).replace('/', '.') : "(default package).") + className.substring(pIndex + 1);
-			
+
 			final Parent classNode = new Parent(className);
 			aggProject.process(clazz.getRoles(), classNode);
 			internClasses.addChild(classNode);
-			
+
 			if (!clazz.getRoles().isEmpty()) {
 				final Integer currentNesting = aggProject.getMaxNesting();
 				classNode.addChild(new Parent("Maximum nesting of directives", currentNesting));
@@ -99,25 +108,27 @@ public class DirectivesNode extends LazyParent {
 				aggProject.setMaxNesting(0);
 			}
 		}
-		
+
 		final Integer maximumSum = aggProject.getMaximumSum();
 		final Integer minimumSum = aggProject.getMinimumSum();
-		
+
 		final Parent directivesPerClass = new Parent("Directives per class");
-		directivesPerClass.addChild(new Parent("Maximum number of directives: " + maximumSum + " in class " + searchClass(internClasses.getChildren(), maximumSum)));
-		directivesPerClass.addChild(new Parent("Minimum number of directives: " + minimumSum + " in class " + searchClass(internClasses.getChildren(), minimumSum)));
+		directivesPerClass.addChild(new Parent("Maximum number of directives: " + maximumSum + " in class "
+				+ searchClass(internClasses.getChildren(), maximumSum)));
+		directivesPerClass.addChild(new Parent("Minimum number of directives: " + minimumSum + " in class "
+				+ searchClass(internClasses.getChildren(), minimumSum)));
 		directivesPerClass.addChild(new Parent("Average number of directives per class", getAverage(internClasses)));
 		project.addChild(directivesPerClass);
-		
+
 		project.addChild(new LazyParent("Features per directive") {
-			
+
 			@Override
 			protected void initChildren() {
-				
+
 				Aggregator aggregator = new Aggregator();
-				
+
 				aggregator.initializeDirectiveCount(fstModel);
-				
+
 				List<Integer> list = aggregator.getListOfNestings();
 				double average = 0.0;
 				for (Integer i : list) {
@@ -131,16 +142,16 @@ public class DirectivesNode extends LazyParent {
 				} else {
 					average = 0.0;
 				}
-				
+
 				addChild(new Parent("Maximum features per directive", aggregator.getMaxNesting()));
 				addChild(new Parent("Minimum features per directive", aggregator.getMinNesting()));
 				addChild(new Parent("Average features per directive", average));
 			}
 		});
 		project.addChild(new Parent("Maximum nesting of directives: " + maxNesting + " in class " + maxNestingClass));
-		
+
 		addChild(project);
-		
+
 		Parent classes = new AbstractSortModeNode("Class statistics") {
 			@Override
 			protected void initChildren() {
@@ -149,11 +160,11 @@ public class DirectivesNode extends LazyParent {
 				}
 			}
 		};
-		
+
 		addChild(classes);
-		addChild(new Parent(NUMBER_OF_CODELINES + SEPARATOR + getLOC() ));
+		addChild(new HashMapNode(NUMBER_OF_CODELINES + SEPARATOR + getLOC(), null, featuresAndLines));
 	}
-	
+
 	private String searchClass(Parent[] data, Integer input) {
 		for (Parent p : data) {
 			if (p.getValue().equals(input)) {
@@ -163,33 +174,32 @@ public class DirectivesNode extends LazyParent {
 		}
 		return null;
 	}
-	
+
 	private Double getAverage(Parent parent) {
 		if (parent.hasChildren()) {
 			Integer numberOfDirectives = 0;
 			for (Parent child : parent.getChildren()) {
 				numberOfDirectives += (Integer) child.getValue();
 			}
-			
+
 			Integer numberOfChildren = parent.getChildren().length;
-			
+
 			double average = numberOfDirectives;
-			
+
 			average /= (double) numberOfChildren;
 			average *= 10;
 			long rounded = Math.round(average);
 			average = ((double) rounded) / 10;
-			
+
 			return average;
 		}
-		
+
 		return 0.0;
 	}
-	
-	
-	public int getLOC(){
+
+	public int getLOC() {
 		final LinkedHashSet<String> extList = fstModel.getFeatureProject().getComposer().extensions();
-		
+
 		try {
 			fstModel.getFeatureProject().getSourceFolder().accept(new IResourceVisitor() {
 
@@ -199,18 +209,13 @@ public class DirectivesNode extends LazyParent {
 						return true;
 					} else if (resource instanceof IFile) {
 						final IFile file = (IFile) resource;
+						String currFeat = "";
 						if (extList.contains(file.getFileExtension())) {
 
-							try {
-								FileReader fr = new FileReader(file.getLocation().toString());
+							try (FileReader fr = new FileReader(file.getLocation().toString())) {
 								BufferedReader br = new BufferedReader(fr);
-								String s;
-								while ((s = br.readLine()) != null) {
-									if (!s.trim().equals(""))
-											numberOfLines++;
-								}
+								checkContent(currFeat, br);
 								br.close();
-
 							} catch (FileNotFoundException e) {
 								e.printStackTrace();
 							} catch (IOException e) {
@@ -221,12 +226,60 @@ public class DirectivesNode extends LazyParent {
 					}
 					return false;
 				}
+
 			});
 		} catch (CoreException e) {
 			UIPlugin.getDefault().logError(e);
 		}
-		
+
 		return numberOfLines;
 	}
 	
+	/**
+	 * @param currFeat
+	 * @param isFeat
+	 * @param isComment
+	 * @param br
+	 * @throws IOException
+	 */
+	public void checkContent(String currFeat, BufferedReader br) throws IOException {
+		boolean isFeat = false;
+		boolean isComment = false;
+		String s;
+		while ((s = br.readLine()) != null) {
+			s = s.trim();
+			if (!isComment) {
+				if (s.contains("/*")) {
+					isComment = true;
+				}
+					else if (s.startsWith("//#if")) {
+					isFeat = true;
+					currFeat = s.split("//#if")[1];
+					featuresAndLines.put(currFeat, 0);
+				} else if (s.startsWith("//#endif")) {
+					isFeat = false;
+				} else if (s.startsWith("//") && !s.startsWith("//@")) {
+
+				} 
+				} else if (isFeat) {
+					if (!s.equals("")) {
+						featuresAndLines.put(currFeat, featuresAndLines.get(currFeat) + 1);
+						numberOfLines++;
+					}
+				} else if (!s.equals("") && !isFeat) {
+					numberOfLines++;
+				} else {
+				if (s.contains("*/")) {
+					isComment = false;
+					if (s.split("*/")[1].length() > 0) {
+						numberOfLines++;
+						if (isFeat) {
+							featuresAndLines.put(currFeat, featuresAndLines.get(currFeat) + 1);
+						}
+					}
+				}
+			}
+		}
+	}
+
 }

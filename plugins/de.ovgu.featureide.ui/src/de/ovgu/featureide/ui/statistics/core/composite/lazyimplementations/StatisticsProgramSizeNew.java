@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -33,6 +34,8 @@ public class StatisticsProgramSizeNew extends LazyParent {
 
 	private final FSTModel fstModel;
 	int numberOfLines = 0;
+	HashMap<String, Integer> extensionLOCList = new HashMap<String, Integer>();
+	HashMap<String, Integer> featureLOCList = new HashMap<String, Integer>();
 
 	public StatisticsProgramSizeNew(String description, FSTModel fstModel) {
 		super(description);
@@ -78,6 +81,7 @@ public class StatisticsProgramSizeNew extends LazyParent {
 
 					@Override
 					public boolean visit(IResource resource) throws CoreException {
+						int numberOfLinesInThisFile = 0;
 						if (resource instanceof IFolder) {
 							return true;
 						} else if (resource instanceof IFile) {
@@ -86,60 +90,66 @@ public class StatisticsProgramSizeNew extends LazyParent {
 							boolean nested = false;
 							int nestedCounter = 0;
 							switch (file.getFileExtension()) {
-							case "java" :
-							case "c" :	
-							case "h" :	
-									oneLineComment = "//";
-									moreLineStart = "/*";
-									moreLineEnd = "*/";
-									nested = false;
-									nestedCounter = 0;
+							//TODO complete for all extensions 
+							case "java":
+							case "c":
+							case "h":
+								oneLineComment = "//";
+								moreLineStart = "/*";
+								moreLineEnd = "*/";
+								nested = false;
+								nestedCounter = 0;
 								break;
-							case "cs" : 
-									oneLineComment = "///";
-									moreLineStart = "/*";
-									moreLineEnd = "*/";
-									nested = false;
-									nestedCounter = 0;
+							case "cs":
+								oneLineComment = "///";
+								moreLineStart = "/*";
+								moreLineEnd = "*/";
+								nested = false;
+								nestedCounter = 0;
 								break;
-							case "hs" :
-									oneLineComment = "--";
-									moreLineStart = "{-";
-									moreLineEnd = "-}";
-									nested = true;
-									nestedCounter = 0;
-								break;	
+							case "hs":
+								oneLineComment = "--";
+								moreLineStart = "{-";
+								moreLineEnd = "-}";
+								nested = true;
+								nestedCounter = 0;
+								break;
 							default:
-								oneLineComment ="#|#|#";
+								oneLineComment = "#|#|#";
 								moreLineStart = "#|#|#";
 								moreLineEnd = "#|#|#";
 								nested = false;
 								nestedCounter = 0;
 								break;
 							}
-							
+
 							try {
 								FileReader fr = new FileReader(file.getLocation().toString());
 								BufferedReader br = new BufferedReader(fr);
 								String s;
 								boolean isInComment = false;
 								while ((s = br.readLine()) != null) {
+
+									if (!s.trim().equals("") && !s.trim().startsWith(oneLineComment) && !isInComment) {
+										if (s.trim().startsWith(moreLineStart)) {
+											isInComment = true;
+											if (nested)
+												nestedCounter += s.trim().split(moreLineStart).length - 1;
+										} else
+											numberOfLinesInThisFile++;
+									}
+
 									if (s.trim().contains(moreLineEnd)) {
-										if(nested) {
-											nestedCounter--;
-											if(nestedCounter == 0)
+										if (nested) {
+
+											nestedCounter -= s.trim().split(moreLineEnd).length - 1;
+											if (nestedCounter == 0)
 												isInComment = false;
 										} else {
 											isInComment = false;
+											if (!s.trim().endsWith(moreLineEnd))
+												numberOfLinesInThisFile++;
 										}
-									}
-										
-
-									if (!s.trim().equals("") && !s.trim().startsWith(oneLineComment) && !isInComment) {
-										if (s.trim().startsWith(moreLineStart))//TODO Kommentare sind auf java bezogen noch sprachunabhängig implementieren
-											isInComment = true;
-										else
-											numberOfLines++;
 									}
 
 									if (s.trim().contains(moreLineStart))
@@ -152,7 +162,20 @@ public class StatisticsProgramSizeNew extends LazyParent {
 							} catch (IOException e) {
 								e.printStackTrace();
 							}
+							if (!extensionLOCList.containsKey(file.getFileExtension()))
+								extensionLOCList.put(file.getFileExtension(), numberOfLinesInThisFile);
+							else
+								extensionLOCList.put(file.getFileExtension(), extensionLOCList.get(file.getFileExtension()) + numberOfLinesInThisFile);
+
+							String feat = (file.getFullPath().toString().substring(file.getFullPath().toString().indexOf("features") + 9, file.getFullPath()
+									.toString().length() - 1)).split("/")[0];
+							if (!featureLOCList.containsKey(feat))
+								featureLOCList.put(feat, numberOfLinesInThisFile);
+							else
+								featureLOCList.put(feat, featureLOCList.get(feat) + numberOfLinesInThisFile);
+
 						}
+						numberOfLines += numberOfLinesInThisFile;
 
 						return false;
 					}
@@ -162,19 +185,20 @@ public class StatisticsProgramSizeNew extends LazyParent {
 			}
 		}
 
-		
-//		extensions.add("hs");
-//		extensions.add("jj");
-//		extensions.add("als");
-//		extensions.add("xmi");
-		
+		//		extensions.add("hs");//out of order
+		//		extensions.add("jj");
+		//		extensions.add("als");
+		//		extensions.add("xmi");
+		//		extensions.add("jak");	//aNTENNA		
+
 		addChild(new SumImplementationArtifactsParent(NUMBER_CLASS + SEPARATOR + numberOfClasses + " | " + NUMBER_ROLE + SEPARATOR + numberOfRoles, fstModel,
 				SumImplementationArtifactsParent.NUMBER_OF_CLASSES));
 		addChild(new SumImplementationArtifactsParent(NUMBER_FIELD_U + SEPARATOR + numberOfUniFields + " | " + NUMBER_FIELD + SEPARATOR + numberOfFields,
 				fstModel, SumImplementationArtifactsParent.NUMBER_OF_FIELDS));
 		addChild(new SumImplementationArtifactsParent(NUMBER_METHOD_U + SEPARATOR + numberOfUniMethods + " | " + NUMBER_METHOD + SEPARATOR + numberOfMethods,
 				fstModel, SumImplementationArtifactsParent.NUMBER_OF_METHODS));
-		addChild(new SumImplementationArtifactsParent(NUMBER_OF_CODELINES + SEPARATOR + numberOfLines, fstModel,
-				SumImplementationArtifactsParent.NUMBER_OF_LINES));
+		//		addChild(new SumImplementationArtifactsParent(NUMBER_OF_CODELINES + SEPARATOR + numberOfLines, fstModel,
+		//				SumImplementationArtifactsParent.NUMBER_OF_LINES));
+		addChild(new LOCNode(NUMBER_OF_CODELINES + SEPARATOR + numberOfLines, extensionLOCList, featureLOCList));
 	}
 }

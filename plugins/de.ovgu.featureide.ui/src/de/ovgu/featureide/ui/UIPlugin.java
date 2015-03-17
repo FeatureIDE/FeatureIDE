@@ -70,7 +70,10 @@ public class UIPlugin extends AbstractUIPlugin {
 	}
 
 	public static Image getImage(String name) {
-		return getDefault().getImageDescriptor("icons/" + name).createImage();
+		if (getDefault() != null) {
+			return getDefault().getImageDescriptor("icons/" + name).createImage();
+		}
+		return null;
 	}
 
 }
