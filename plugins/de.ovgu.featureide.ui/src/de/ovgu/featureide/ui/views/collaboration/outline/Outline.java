@@ -21,6 +21,8 @@
 package de.ovgu.featureide.ui.views.collaboration.outline;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -130,6 +132,17 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 
 	private ArrayList<IAction> actionOfProv = new ArrayList<IAction>();
 	private boolean providerChanged = false;
+	
+	private static final Set<String> supportedTypes = new HashSet<>();
+	static {
+		supportedTypes.add("java");
+		supportedTypes.add("jak");
+		supportedTypes.add("hs");
+		supportedTypes.add("h");
+		supportedTypes.add("c");
+		supportedTypes.add("cs");
+	}
+
 
 	private IPartListener editorListener = new IPartListener() {
 
@@ -394,11 +407,13 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 		CorePlugin.getDefault().addCurrentBuildListener(this);
 	}
 
+	
 	/**
 	 * handles all the editorActions
 	 * 
 	 */
 	private void setEditorActions(IWorkbenchPart activeEditor) {
+		
 		IEditorPart part = null;
 
 		if (activeEditor != null) {
@@ -420,9 +435,10 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 							Control control = viewer.getControl();
 							if (control != null && !control.isDisposed()) {
 								final String extension = file.getFileExtension();
+								
 								if ("model.xml".equals(file.getName())) {
 									selectedOutlineType = OutlineLabelProvider.OUTLINE_FEATURE_MODEL;
-								} else if ("java".equals(extension) || "jak".equals(extension)) {
+								} else if (supportedTypes.contains(extension)) {
 									selectedOutlineType = OutlineLabelProvider.OUTLINE_CODE;
 								} else {
 									selectedOutlineType = OutlineLabelProvider.OUTLINE_NOT_AVAILABLE;

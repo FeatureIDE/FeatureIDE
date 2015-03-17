@@ -23,9 +23,6 @@ package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.gene
 import java.util.Collections;
 import java.util.Comparator;
 
-import de.ovgu.featureide.core.fstmodel.FSTClassFragment;
-import de.ovgu.featureide.core.fstmodel.FSTField;
-import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.ui.statistics.core.composite.IToolTip;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
@@ -64,31 +61,30 @@ public abstract class AbstractSortModeNode extends LazyParent implements IToolTi
 	@Override
 	protected void sortChildren() {
 		if (sortByValue) {
-
 			Collections.sort(children, new Comparator<Parent>() {
 				@Override
 				public int compare(Parent o1, Parent o2) {
-
 					if (o1.getValue() == null) {
-						String o1Clean = o1.getDescription().substring(o1.getDescription().lastIndexOf(": "), (o1.getDescription().length()));
-						String o2Clean = o2.getDescription().substring(o2.getDescription().lastIndexOf(": "), (o2.getDescription().length()));
-						return -(o1Clean.compareTo(o2Clean));
+						if (o1.getDescription() != null && o2.getDescription() != null) {
+							final int i1 = o1.getDescription().lastIndexOf(": ");
+							final int i2 = o2.getDescription().lastIndexOf(": ");
+							if (i1 > -1 && i2 > -1) {
+								return o2.getDescription().substring(i2).compareTo(o1.getDescription().substring(i1));
+							}
+						}
 					} else {
 						return ((Integer) o2.getValue()) - ((Integer) o1.getValue());
 					}
-
+					return 0;
 				}
 			});
-
 		} else {
-
 			Collections.sort(children, new Comparator<Parent>() {
 				@Override
 				public int compare(Parent o1, Parent o2) {
 					return o1.getDescription().compareTo(o2.getDescription());
 				}
 			});
-
 		}
 	}
 

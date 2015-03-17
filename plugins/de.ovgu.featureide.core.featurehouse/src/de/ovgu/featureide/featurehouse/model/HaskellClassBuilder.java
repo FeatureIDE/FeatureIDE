@@ -27,7 +27,7 @@ import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 
 /**
- * Builds Classes for the {@link FSTModel} for <code>FeatureHouse</code> Haskel files.
+ * Builds Classes for the {@link FSTModel} for <code>FeatureHouse</code> Haskell files.
  * 
  * @see ClassBuilder
  * @author Jens Meinicke

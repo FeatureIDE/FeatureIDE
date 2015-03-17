@@ -6,14 +6,13 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.LinkedList;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.runtime.CoreException;
-
 import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTClassFragment;
 import de.ovgu.featureide.core.fstmodel.FSTField;
@@ -32,7 +31,7 @@ import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
  */
 public class StatisticsProgramSizeNew extends LazyParent {
 
-	private FSTModel fstModel;
+	private final FSTModel fstModel;
 	int numberOfLines = 0;
 
 	public StatisticsProgramSizeNew(String description, FSTModel fstModel) {
@@ -50,10 +49,10 @@ public class StatisticsProgramSizeNew extends LazyParent {
 		int numberOfMethods = 0;
 		int numberOfUniMethods = 0;
 
-		for (FSTClass class_ : fstModel.getClasses()) {
-			LinkedList<LinkedList<FSTClassFragment>> allFrag = class_.getAllFSTFragments();
-			LinkedHashSet<FSTMethod> methHelper = new LinkedHashSet<FSTMethod>();
-			LinkedHashSet<FSTField> fieldHelper = new LinkedHashSet<FSTField>();
+		for (FSTClass fstClass : fstModel.getClasses()) {
+			final LinkedList<LinkedList<FSTClassFragment>> allFrag = fstClass.getAllFSTFragments();
+			final HashSet<FSTMethod> methHelper = new HashSet<FSTMethod>();
+			final HashSet<FSTField> fieldHelper = new HashSet<FSTField>();
 
 			for (LinkedList<FSTClassFragment> linkedList : allFrag) {
 				numberOfRoles += linkedList.size();
@@ -70,7 +69,6 @@ public class StatisticsProgramSizeNew extends LazyParent {
 			numberOfUniFields += fieldHelper.size();
 			numberOfUniMethods += methHelper.size();
 			numberOfClasses += allFrag.size();
-
 		}
 
 		if (fstModel.getFeatureProject().getComposer().hasFeatureFolder()) {
