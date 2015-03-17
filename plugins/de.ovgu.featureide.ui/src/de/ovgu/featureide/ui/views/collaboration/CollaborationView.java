@@ -729,6 +729,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	}
 	
 	private void fillLocalToolBar() {
+		toolbarManager.removeAll();
 		fieldsWithRefinementsButton = setFieldsMethodsActions[ShowFieldsMethodsAction.FIELDS_WITH_REFINEMENTS];
 		fieldsWithoutRefinementsButton = setFieldsMethodsActions[ShowFieldsMethodsAction.FIELDS_WITHOUT_REFINEMENTS];
 		methodsWithRefinementsButton = setFieldsMethodsActions[ShowFieldsMethodsAction.METHODS_WITH_REFINEMENTS];
