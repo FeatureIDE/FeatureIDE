@@ -89,91 +89,100 @@ public class StatisticsProgramSizeNew extends LazyParent {
 							String oneLineComment = "", moreLineStart = "", moreLineEnd = "";
 							boolean nested = false;
 							int nestedCounter = 0;
-							switch (file.getFileExtension()) {
-							//TODO complete for all extensions 
-							case "java":
-							case "c":
-							case "h":
-								oneLineComment = "//";
-								moreLineStart = "/*";
-								moreLineEnd = "*/";
-								nested = false;
-								nestedCounter = 0;
-								break;
-							case "cs":
-								oneLineComment = "///";
-								moreLineStart = "/*";
-								moreLineEnd = "*/";
-								nested = false;
-								nestedCounter = 0;
-								break;
-							case "hs":
-								oneLineComment = "--";
-								moreLineStart = "{-";
-								moreLineEnd = "-}";
-								nested = true;
-								nestedCounter = 0;
-								break;
-							default:
-								oneLineComment = "#|#|#";
-								moreLineStart = "#|#|#";
-								moreLineEnd = "#|#|#";
-								nested = false;
-								nestedCounter = 0;
-								break;
-							}
+							System.out.println(file.getFullPath().toString());
+							if (file.getFileExtension() != null && !"jpg jpeg tiff bmp jpe dib gif png".contains(file.getFileExtension())) {
+								switch (file.getFileExtension()) {
+								//TODO complete for all extensions 
+								case "java":
+								case "c":
+								case "h":
+								case "jj":
+								case "jak":
+									oneLineComment = "//";
+									moreLineStart = "/*";
+									moreLineEnd = "*/";
+									nested = false;
+									nestedCounter = 0;
+									break;
+								case "cs":
+									oneLineComment = "///";
+									moreLineStart = "/*";
+									moreLineEnd = "*/";
+									nested = false;
+									nestedCounter = 0;
+									break;
+								//							TODO Haskell comments
+								//								case "hs":
+								//								oneLineComment = "--";
+								//								moreLineStart = "{-";
+								//								moreLineEnd = "-}";
+								//								nested = true;
+								//								nestedCounter = 0;
+								//								break;
+								case "als":
+								case "xmi":
+									break;
+								default:
+									oneLineComment = "#|#|#";
+									moreLineStart = "#|#|#";
+									moreLineEnd = "#|#|#";
+									nested = false;
+									nestedCounter = 0;
+									break;
+								}
 
-							try {
-								FileReader fr = new FileReader(file.getLocation().toString());
-								BufferedReader br = new BufferedReader(fr);
-								String s;
-								boolean isInComment = false;
-								while ((s = br.readLine()) != null) {
-
-									if (!s.trim().equals("") && !s.trim().startsWith(oneLineComment) && !isInComment) {
-										if (s.trim().startsWith(moreLineStart)) {
-											isInComment = true;
-											if (nested)
-												nestedCounter += s.trim().split(moreLineStart).length - 1;
-										} else
-											numberOfLinesInThisFile++;
-									}
-
-									if (s.trim().contains(moreLineEnd)) {
-										if (nested) {
-
-											nestedCounter -= s.trim().split(moreLineEnd).length - 1;
-											if (nestedCounter == 0)
-												isInComment = false;
-										} else {
-											isInComment = false;
-											if (!s.trim().endsWith(moreLineEnd))
+								try {
+									FileReader fr = new FileReader(file.getLocation().toString());
+									BufferedReader br = new BufferedReader(fr);
+									String s;
+									boolean isInComment = false;
+									while ((s = br.readLine()) != null) {
+										s = s.trim();
+										if (!s.equals("") && !s.startsWith(oneLineComment) && !isInComment) {
+											if (s.startsWith(moreLineStart)) {
+												isInComment = true;
+												if (nested)
+													nestedCounter += s.split(moreLineStart).length - 1;
+											} else
 												numberOfLinesInThisFile++;
 										}
+
+										if (s.contains(moreLineEnd)) {
+											if (nested) {
+
+												nestedCounter -= s.split(moreLineEnd).length - 1;
+												if (nestedCounter == 0)
+													isInComment = false;
+											} else {
+												isInComment = false;
+												if (!s.endsWith(moreLineEnd))
+													numberOfLinesInThisFile++;
+											}
+										}
+
+										if (s.contains(moreLineStart))
+											isInComment = true;
 									}
+									br.close();
 
-									if (s.trim().contains(moreLineStart))
-										isInComment = true;
+								} catch (FileNotFoundException e) {
+									e.printStackTrace();
+								} catch (IOException e) {
+									e.printStackTrace();
 								}
-								br.close();
 
-							} catch (FileNotFoundException e) {
-								e.printStackTrace();
-							} catch (IOException e) {
-								e.printStackTrace();
+								if (!extensionLOCList.containsKey(file.getFileExtension()))
+									extensionLOCList.put(file.getFileExtension(), numberOfLinesInThisFile);
+								else
+									extensionLOCList.put(file.getFileExtension(), extensionLOCList.get(file.getFileExtension()) + numberOfLinesInThisFile);
+
+								String feat = (file.getFullPath().toString().substring(file.getFullPath().toString().indexOf("features") + 9, file
+										.getFullPath().toString().length() - 1)).split("/")[0];
+								if (!featureLOCList.containsKey(feat))
+									featureLOCList.put(feat, numberOfLinesInThisFile);
+								else
+									featureLOCList.put(feat, featureLOCList.get(feat) + numberOfLinesInThisFile);
 							}
-							if (!extensionLOCList.containsKey(file.getFileExtension()))
-								extensionLOCList.put(file.getFileExtension(), numberOfLinesInThisFile);
-							else
-								extensionLOCList.put(file.getFileExtension(), extensionLOCList.get(file.getFileExtension()) + numberOfLinesInThisFile);
-
-							String feat = (file.getFullPath().toString().substring(file.getFullPath().toString().indexOf("features") + 9, file.getFullPath()
-									.toString().length() - 1)).split("/")[0];
-							if (!featureLOCList.containsKey(feat))
-								featureLOCList.put(feat, numberOfLinesInThisFile);
-							else
-								featureLOCList.put(feat, featureLOCList.get(feat) + numberOfLinesInThisFile);
-
 						}
 						numberOfLines += numberOfLinesInThisFile;
 
@@ -185,11 +194,6 @@ public class StatisticsProgramSizeNew extends LazyParent {
 			}
 		}
 
-		//		extensions.add("hs");//out of order
-		//		extensions.add("jj");
-		//		extensions.add("als");
-		//		extensions.add("xmi");
-		//		extensions.add("jak");	//aNTENNA		
 
 		addChild(new SumImplementationArtifactsParent(NUMBER_CLASS + SEPARATOR + numberOfClasses + " | " + NUMBER_ROLE + SEPARATOR + numberOfRoles, fstModel,
 				SumImplementationArtifactsParent.NUMBER_OF_CLASSES));
@@ -197,8 +201,6 @@ public class StatisticsProgramSizeNew extends LazyParent {
 				fstModel, SumImplementationArtifactsParent.NUMBER_OF_FIELDS));
 		addChild(new SumImplementationArtifactsParent(NUMBER_METHOD_U + SEPARATOR + numberOfUniMethods + " | " + NUMBER_METHOD + SEPARATOR + numberOfMethods,
 				fstModel, SumImplementationArtifactsParent.NUMBER_OF_METHODS));
-		//		addChild(new SumImplementationArtifactsParent(NUMBER_OF_CODELINES + SEPARATOR + numberOfLines, fstModel,
-		//				SumImplementationArtifactsParent.NUMBER_OF_LINES));
 		addChild(new LOCNode(NUMBER_OF_CODELINES + SEPARATOR + numberOfLines, extensionLOCList, featureLOCList));
 	}
 }

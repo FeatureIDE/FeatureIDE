@@ -70,6 +70,7 @@ public class DirectivesNode extends LazyParent {
 		super(description);
 		this.fstModel = fstModel;
 	}
+
 	public DirectivesNode() {
 
 	}
@@ -234,7 +235,7 @@ public class DirectivesNode extends LazyParent {
 
 		return numberOfLines;
 	}
-	
+
 	/**
 	 * @param currFeat
 	 * @param isFeat
@@ -247,39 +248,42 @@ public class DirectivesNode extends LazyParent {
 		boolean isComment = false;
 		String s;
 		while ((s = br.readLine()) != null) {
-			s = s.trim();
+			s = s.trim().replaceAll("	", "").replaceAll(" ", "");
 			if (!isComment) {
-				if (s.contains("/*")) {
+				if (s.startsWith("/*")) {
 					isComment = true;
-				}
-					else if (s.startsWith("//#if")) {
-					isFeat = true;
+				} else if (s.startsWith("//#if")) {
 					currFeat = s.split("//#if")[1];
 					featuresAndLines.put(currFeat, 0);
+					isFeat = true;
 				} else if (s.startsWith("//#endif")) {
 					isFeat = false;
-				} else if (s.startsWith("//") && !s.startsWith("//@")) {
+				} else if (isFeat && !isComment && !s.equals("")) {
+					if (s.startsWith("//") && !s.startsWith("//@")) {
 
-				} 
-				} else if (isFeat) {
-					if (!s.equals("")) {
+					} else {
 						featuresAndLines.put(currFeat, featuresAndLines.get(currFeat) + 1);
 						numberOfLines++;
 					}
-				} else if (!s.equals("") && !isFeat) {
-					numberOfLines++;
-				} else {
-				if (s.contains("*/")) {
-					isComment = false;
-					if (s.split("*/")[1].length() > 0) {
+				} else if (!isFeat && !s.equals("")) {
+					if (!s.startsWith("//")) {
 						numberOfLines++;
-						if (isFeat) {
-							featuresAndLines.put(currFeat, featuresAndLines.get(currFeat) + 1);
-						}
 					}
 				}
+			} else {
+				if (s.endsWith("*/")) {
+					isComment = false;
+				} else if (s.contains("*/") && !s.endsWith("*/")) {
+					if (isFeat) {
+						featuresAndLines.put(currFeat, featuresAndLines.get(currFeat) + 1);
+						numberOfLines++;
+					} else {
+						numberOfLines++;
+					}
+					isComment = false;
+				}
 			}
+
 		}
 	}
-
 }
