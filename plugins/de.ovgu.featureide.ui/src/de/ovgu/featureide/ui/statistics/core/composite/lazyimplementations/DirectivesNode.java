@@ -52,7 +52,6 @@ import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.gener
  */
 public class DirectivesNode extends LazyParent {
 	private FSTModel fstModel;
-	int numberOfLines;
 	/**
 	 * Mapping of lines of code to each feature.
 	 */
@@ -71,9 +70,6 @@ public class DirectivesNode extends LazyParent {
 		this.fstModel = fstModel;
 	}
 
-	public DirectivesNode() {
-
-	}
 
 	@Override
 	protected void initChildren() {
@@ -163,7 +159,6 @@ public class DirectivesNode extends LazyParent {
 		};
 
 		addChild(classes);
-		addChild(new HashMapNode(NUMBER_OF_CODELINES + SEPARATOR + getLOC(), null, featuresAndLines));
 	}
 
 	private String searchClass(Parent[] data, Integer input) {
@@ -198,92 +193,4 @@ public class DirectivesNode extends LazyParent {
 		return 0.0;
 	}
 
-	public int getLOC() {
-		final LinkedHashSet<String> extList = fstModel.getFeatureProject().getComposer().extensions();
-
-		try {
-			fstModel.getFeatureProject().getSourceFolder().accept(new IResourceVisitor() {
-
-				@Override
-				public boolean visit(IResource resource) throws CoreException {
-					if (resource instanceof IFolder) {
-						return true;
-					} else if (resource instanceof IFile) {
-						final IFile file = (IFile) resource;
-						String currFeat = "";
-						if (extList.contains(file.getFileExtension())) {
-
-							try (FileReader fr = new FileReader(file.getLocation().toString())) {
-								BufferedReader br = new BufferedReader(fr);
-								checkContent(currFeat, br);
-								br.close();
-							} catch (FileNotFoundException e) {
-								e.printStackTrace();
-							} catch (IOException e) {
-								e.printStackTrace();
-							}
-						}
-
-					}
-					return false;
-				}
-
-			});
-		} catch (CoreException e) {
-			UIPlugin.getDefault().logError(e);
-		}
-
-		return numberOfLines;
-	}
-
-	/**
-	 * @param currFeat
-	 * @param isFeat
-	 * @param isComment
-	 * @param br
-	 * @throws IOException
-	 */
-	public void checkContent(String currFeat, BufferedReader br) throws IOException {
-		boolean isFeat = false;
-		boolean isComment = false;
-		String s;
-		while ((s = br.readLine()) != null) {
-			s = s.trim().replaceAll("	", "").replaceAll(" ", "");
-			if (!isComment) {
-				if (s.startsWith("/*")) {
-					isComment = true;
-				} else if (s.startsWith("//#if")) {
-					currFeat = s.split("//#if")[1];
-					featuresAndLines.put(currFeat, 0);
-					isFeat = true;
-				} else if (s.startsWith("//#endif")) {
-					isFeat = false;
-				} else if (isFeat && !isComment && !s.equals("")) {
-					if (s.startsWith("//") && !s.startsWith("//@")) {
-
-					} else {
-						featuresAndLines.put(currFeat, featuresAndLines.get(currFeat) + 1);
-						numberOfLines++;
-					}
-				} else if (!isFeat && !s.equals("")) {
-					if (!s.startsWith("//")) {
-						numberOfLines++;
-					}
-				}
-			} else {
-				if (s.endsWith("*/")) {
-					isComment = false;
-				} else if (s.contains("*/") && !s.endsWith("*/")) {
-					if (isFeat) {
-						featuresAndLines.put(currFeat, featuresAndLines.get(currFeat) + 1);
-						numberOfLines++;
-					} else {
-						numberOfLines++;
-					}
-					isComment = false;
-				}
-			}
-
-		}
-	}
 }

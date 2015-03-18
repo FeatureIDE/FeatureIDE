@@ -5,6 +5,7 @@ import java.util.HashMap;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.genericdatatypes.HashMapNode;
+import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.genericdatatypes.HashMapNodeTwoStrings;
 
 /**
  * TODO description
@@ -13,20 +14,20 @@ import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.gener
  */
 public class LOCNode extends LazyParent {
 	
-	HashMap<String, Integer> extensionLOCList = new HashMap<String, Integer>();
-	HashMap<String, Integer> featureLOCList = new HashMap<String, Integer>();
+	HashMap<String, Integer> featureExtensionLOCList = new HashMap<String, Integer>();
 	
-	LOCNode(String description, HashMap<String, Integer> extensionList, HashMap<String, Integer> featureList){
+	LOCNode(String description, HashMap<String, Integer> fExList){
 		super(description);
-		extensionLOCList = extensionList;
-		featureLOCList = featureList;
+		featureExtensionLOCList = fExList;
 	}
 	
 	@Override
 	protected void initChildren() {
 
-		addChild(new HashMapNode("LOC sorted by extensions", null, extensionLOCList));
-		addChild(new HashMapNode("LOC sorted by feature", null, featureLOCList));
+		
+		
+		addChild(new HashMapNodeTwoStrings("LOC by extension", 1, featureExtensionLOCList));
+		addChild(new HashMapNodeTwoStrings("LOC by feature", 2, featureExtensionLOCList));
 		
 	}
 
