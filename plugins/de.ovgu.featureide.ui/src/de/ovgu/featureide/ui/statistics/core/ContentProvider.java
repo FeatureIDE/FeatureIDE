@@ -70,6 +70,7 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 		this.canceled = canceled;
 	}
 	
+	
 	@Override
 	public void dispose() {
 		this.godfather = null;
