@@ -34,8 +34,6 @@ public class StatisticsProgramSizeNew extends LazyParent {
 
 	private final FSTModel fstModel;
 	int numberOfLines = 0;
-	HashMap<String, Integer> extensionLOCList = new HashMap<String, Integer>();
-	HashMap<String, Integer> featureLOCList = new HashMap<String, Integer>();
 	HashMap<String, Integer> featureExtensionLOCList = new HashMap<String, Integer>();
 
 	public StatisticsProgramSizeNew(String description, FSTModel fstModel) {
@@ -76,7 +74,6 @@ public class StatisticsProgramSizeNew extends LazyParent {
 		}
 
 		if (fstModel.getFeatureProject().getComposer().hasFeatureFolder()) {
-			final LinkedHashSet<String> extList = fstModel.getFeatureProject().getComposer().extensions();
 			try {
 				fstModel.getFeatureProject().getSourceFolder().accept(new IResourceVisitor() {
 
@@ -172,24 +169,14 @@ public class StatisticsProgramSizeNew extends LazyParent {
 									e.printStackTrace();
 								}
 
-								if (!extensionLOCList.containsKey(file.getFileExtension())) {
-									extensionLOCList.put(file.getFileExtension(), numberOfLinesInThisFile);
-								}
-								else {
-									extensionLOCList.put(file.getFileExtension(), extensionLOCList.get(file.getFileExtension()) + numberOfLinesInThisFile);
-								}
-								
 								String feat = (file.getFullPath().toString().substring(file.getFullPath().toString().indexOf("features") + 9, file
 										.getFullPath().toString().length() - 1)).split("/")[0];
-								if (!featureLOCList.containsKey(feat))
-									featureLOCList.put(feat, numberOfLinesInThisFile);
-								else
-									featureLOCList.put(feat, featureLOCList.get(feat) + numberOfLinesInThisFile);
-								
-								if(!featureExtensionLOCList.containsKey(file.getFileExtension() + "#" + feat)) {
+
+								if (!featureExtensionLOCList.containsKey(file.getFileExtension() + "#" + feat)) {
 									featureExtensionLOCList.put(file.getFileExtension() + "#" + feat, numberOfLinesInThisFile);
 								} else {
-									featureExtensionLOCList.put(file.getFileExtension() + "#" + feat, featureExtensionLOCList.get(file.getFileExtension() + "#" + feat) + numberOfLinesInThisFile);
+									featureExtensionLOCList.put(file.getFileExtension() + "#" + feat,
+											featureExtensionLOCList.get(file.getFileExtension() + "#" + feat) + numberOfLinesInThisFile);
 								}
 							}
 						}
@@ -203,14 +190,12 @@ public class StatisticsProgramSizeNew extends LazyParent {
 			}
 		}
 
-
 		addChild(new SumImplementationArtifactsParent(NUMBER_CLASS + SEPARATOR + numberOfClasses + " | " + NUMBER_ROLE + SEPARATOR + numberOfRoles, fstModel,
 				SumImplementationArtifactsParent.NUMBER_OF_CLASSES));
 		addChild(new SumImplementationArtifactsParent(NUMBER_FIELD_U + SEPARATOR + numberOfUniFields + " | " + NUMBER_FIELD + SEPARATOR + numberOfFields,
 				fstModel, SumImplementationArtifactsParent.NUMBER_OF_FIELDS));
 		addChild(new SumImplementationArtifactsParent(NUMBER_METHOD_U + SEPARATOR + numberOfUniMethods + " | " + NUMBER_METHOD + SEPARATOR + numberOfMethods,
 				fstModel, SumImplementationArtifactsParent.NUMBER_OF_METHODS));
-//		addChild(new LOCNode(NUMBER_OF_CODELINES + SEPARATOR + numberOfLines, extensionLOCList, featureLOCList));
 		addChild(new LOCNode(NUMBER_OF_CODELINES + SEPARATOR + numberOfLines, featureExtensionLOCList));
 	}
 }
