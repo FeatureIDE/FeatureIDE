@@ -57,8 +57,8 @@ public class SortByOccurrenceInFeature implements IFilter {
 			Arrays.sort(obj, new Comparator<Object>() {
 				@Override
 				public int compare(Object o1, Object o2) {
-					final boolean c1 = isNotInCurrentFeature((RoleElement) o1);
-					final boolean c2 = isNotInCurrentFeature((RoleElement) o2);
+					final boolean c1 = isNotInCurrentFeature((IRoleElement) o1);
+					final boolean c2 = isNotInCurrentFeature((IRoleElement) o2);
 					if (c1 != c2) {
 						return c1 ? 1 : -1;
 					}

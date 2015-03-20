@@ -634,6 +634,23 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 	 * @return
 	 */
 	private boolean refreshContent(IFile oldFile, IFile currentFile) {
+		if(CorePlugin.getFeatureProject(currentFile) ==null){
+			sortMethods.setEnabled(false);
+			hideAllFields.setEnabled(false);
+			hideAllMethods.setEnabled(false);
+			return false;
+		}
+		if(CorePlugin.getFeatureProject(currentFile).getComposer().showContextFieldsAndMethods()){
+			sortMethods.setEnabled(true);
+			hideAllFields.setEnabled(true);
+			hideAllMethods.setEnabled(true);			
+		}else{
+			sortMethods.setEnabled(false);
+			hideAllFields.setEnabled(false);
+			hideAllMethods.setEnabled(false);			
+		}
+		
+
 		if (viewer.getLabelProvider() instanceof OutlineLabelProvider) {
 			OutlineLabelProvider lp = (OutlineLabelProvider) viewer.getLabelProvider();
 			return lp.refreshContent(oldFile, currentFile);
@@ -647,20 +664,21 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 
 		public void run() {
 			hideAllFieldsToggle = !hideAllFieldsToggle;
-
-			if (hideAllFieldsToggle) {
-				if (viewer.getContentProvider() instanceof CollaborationOutlineTreeContentProvider) {
-					((CollaborationOutlineTreeContentProvider) viewer.getContentProvider()).addFilter(filter);
-					viewer.refresh();
+			
+			if (viewer.getContentProvider() instanceof CollaborationOutlineTreeContentProvider) {
+				CollaborationOutlineTreeContentProvider contentProvider = (CollaborationOutlineTreeContentProvider) viewer.getContentProvider();
+				CollaborationOutlineLabelProvider labelProvider = (CollaborationOutlineLabelProvider) viewer.getLabelProvider();
+				if (hideAllFieldsToggle) {
+					contentProvider.addFilter(filter);
+				} else {
+					contentProvider.removeFilter(filter);
 				}
-			} else {
-				if (viewer.getContentProvider() instanceof CollaborationOutlineTreeContentProvider) {
-					((CollaborationOutlineTreeContentProvider) viewer.getContentProvider()).removeFilter(filter);
-					viewer.refresh();
-				}
+				viewer.refresh();
+				labelProvider.refreshContent(iFile, (IFile) viewer.getInput());
 			}
 		}
 	};
+	
 	// create Action to hide all methods
 	private final Action hideAllMethods = new Action("", Action.AS_CHECK_BOX) {
 		private HideAllMethods filter = new HideAllMethods();
@@ -668,16 +686,16 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 		public void run() {
 			hideAllMethodsToggle = !hideAllMethodsToggle;
 
-			if (hideAllMethodsToggle) {
-				if (viewer.getContentProvider() instanceof CollaborationOutlineTreeContentProvider) {
-					((CollaborationOutlineTreeContentProvider) viewer.getContentProvider()).addFilter(filter);
-					viewer.refresh();
+			if (viewer.getContentProvider() instanceof CollaborationOutlineTreeContentProvider) {
+				CollaborationOutlineTreeContentProvider contentProvider = (CollaborationOutlineTreeContentProvider) viewer.getContentProvider();
+				CollaborationOutlineLabelProvider labelProvider = (CollaborationOutlineLabelProvider) viewer.getLabelProvider();
+				if (hideAllMethodsToggle) {
+					contentProvider.addFilter(filter);
+				} else {
+					contentProvider.removeFilter(filter);
 				}
-			} else {
-				if (viewer.getContentProvider() instanceof CollaborationOutlineTreeContentProvider) {
-					((CollaborationOutlineTreeContentProvider) viewer.getContentProvider()).removeFilter(filter);
-					viewer.refresh();
-				}
+				viewer.refresh();
+				labelProvider.refreshContent(iFile, (IFile) viewer.getInput());
 			}
 		}
 	};
@@ -685,29 +703,32 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 	// create Action to display methods and fields in the current feature on top
 	private final Action sortMethods = new Action("", Action.AS_CHECK_BOX) {
 
-		public void run() {
+		public void run() {			
 			sortFeatureToggle = !sortFeatureToggle;
-			if (sortFeatureToggle) {
-				if (viewer.getContentProvider() instanceof CollaborationOutlineTreeContentProvider) {
+			CollaborationOutlineTreeContentProvider contentProvider = (CollaborationOutlineTreeContentProvider) viewer.getContentProvider();
+			CollaborationOutlineLabelProvider labelProvider = (CollaborationOutlineLabelProvider) viewer.getLabelProvider();
+			if (viewer.getContentProvider() instanceof CollaborationOutlineTreeContentProvider) {
+				if (sortFeatureToggle) {
 					if (viewer.getInput() instanceof IFile) {
 						filter.setFile(iFile);
 						filter.setEnabled(true);
-						((CollaborationOutlineTreeContentProvider) viewer.getContentProvider()).addFilter(filter);
+						contentProvider.addFilter(filter);
 						viewer.refresh();
-
+						labelProvider.refreshContent(iFile, (IFile) viewer.getInput());
 					}
-				}
-			} else {
-				if (viewer.getContentProvider() instanceof CollaborationOutlineTreeContentProvider) {
+				} else {
 					if (filter != null) {
 						filter.setEnabled(false);
-						((CollaborationOutlineTreeContentProvider) viewer.getContentProvider()).removeFilter(filter);
+						contentProvider.removeFilter(filter);
 						viewer.refresh();
+						labelProvider.refreshContent(iFile, (IFile) viewer.getInput());
 					}
 				}
 			}
 		}
 	};
+	
+
 
 	/**
 	 * provides functionality to expand and collapse all items in viewer

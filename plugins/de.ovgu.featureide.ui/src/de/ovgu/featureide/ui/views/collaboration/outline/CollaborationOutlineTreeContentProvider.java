@@ -31,7 +31,6 @@ import java.util.TreeSet;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
@@ -280,4 +279,5 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 
 		return false;
 	}
+
 }
