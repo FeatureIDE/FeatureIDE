@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<struct>
+			<alt abstract="true" mandatory="true" name="Violet">
+				<and abstract="true" mandatory="true" name="VioletDef">
+					<or abstract="true" name="Additional">
+						<feature mandatory="true" name="CommandLine"/>
+						<feature mandatory="true" name="VersionChecker"/>
+						<feature mandatory="true" name="VioletFilter"/>
+						<feature mandatory="true" name="ImageFilter"/>
+						<feature mandatory="true" name="SetTitle"/>
+						<feature mandatory="true" name="Preferences"/>
+					</or>
+					<or abstract="true" name="Help">
+						<feature mandatory="true" name="About"/>
+						<feature mandatory="true" name="License"/>
+					</or>
+					<feature hidden="true" name="HelpMenu"/>
+					<or abstract="true" name="Window">
+						<feature mandatory="true" name="CloseWindow"/>
+						<feature mandatory="true" name="RestoreWindow"/>
+						<feature mandatory="true" name="MaximizeWindow"/>
+						<feature mandatory="true" name="PreviousWindow"/>
+						<feature mandatory="true" name="NextWindow"/>
+					</or>
+					<feature hidden="true" name="WindowMenu"/>
+					<or abstract="true" name="View">
+						<feature mandatory="true" name="LookAndFeel"/>
+						<feature mandatory="true" name="ZoomOut"/>
+						<feature mandatory="true" name="ZoomIn"/>
+						<feature mandatory="true" name="GrowDrawingArea"/>
+						<feature mandatory="true" name="ClipDrawingArea"/>
+						<feature mandatory="true" name="SmallerGrid"/>
+						<feature mandatory="true" name="LargerGrid"/>
+						<feature mandatory="true" name="HideGrid"/>
+					</or>
+					<feature hidden="true" name="ViewMenu"/>
+					<or abstract="true" name="Edit">
+						<feature mandatory="true" name="EditProperties"/>
+						<feature mandatory="true" name="DeleteItem"/>
+						<feature mandatory="true" name="SelectNext"/>
+						<feature mandatory="true" name="SelectPrevious"/>
+					</or>
+					<feature hidden="true" name="EditMenu"/>
+					<or abstract="true" name="ClassDiagram">
+						<feature mandatory="true" name="ClassNode"/>
+						<feature mandatory="true" name="InterfaceNode"/>
+						<feature mandatory="true" name="PackageNode"/>
+						<feature mandatory="true" name="ClassNoteNode"/>
+						<feature mandatory="true" name="ClassDependencyEdge"/>
+						<feature mandatory="true" name="ClassInheritanceEdge"/>
+						<feature mandatory="true" name="ClassAggregationEdge"/>
+						<feature mandatory="true" name="ClassAssociationEdge"/>
+						<feature mandatory="true" name="ClassCompositionEdge"/>
+						<feature mandatory="true" name="ClassInterfaceEdge"/>
+						<feature mandatory="true" name="ClassNoteEdge"/>
+					</or>
+					<feature hidden="true" name="ClassD"/>
+					<or abstract="true" name="SequenceDiagram">
+						<feature mandatory="true" name="SequenceParameterNode"/>
+						<feature mandatory="true" name="SequenceCallNode"/>
+						<feature mandatory="true" name="SequenceNoteNode"/>
+						<feature mandatory="true" name="SequenceCallEdge"/>
+						<feature mandatory="true" name="SequenceReturnEdge"/>
+						<feature mandatory="true" name="SequenceNoteEdge"/>
+					</or>
+					<feature hidden="true" name="SequenceD"/>
+					<or abstract="true" name="StateDiagram">
+						<feature mandatory="true" name="StateNode"/>
+						<feature mandatory="true" name="InitialStateNode"/>
+						<feature mandatory="true" name="FinalStateNode"/>
+						<feature mandatory="true" name="StateNoteNode"/>
+						<feature mandatory="true" name="StateTransitionEdge"/>
+						<feature mandatory="true" name="StateNoteEdge"/>
+					</or>
+					<feature hidden="true" name="StateD"/>
+					<or abstract="true" name="ObjectDiagram">
+						<feature mandatory="true" name="ObjectNode"/>
+						<feature mandatory="true" name="ObjectFieldNode"/>
+						<feature mandatory="true" name="ObjectNoteNode"/>
+						<feature mandatory="true" name="ObjectReferenceEdge"/>
+						<feature mandatory="true" name="ObjectAssociationEdge"/>
+						<feature mandatory="true" name="ObjectNoteEdge"/>
+					</or>
+					<feature hidden="true" name="ObjectD"/>
+					<or abstract="true" name="UseCaseDiagram">
+						<feature mandatory="true" name="Actor"/>
+						<feature mandatory="true" name="UseCaseNode"/>
+						<feature mandatory="true" name="UseCaseNoteNode"/>
+						<feature mandatory="true" name="UseCaseAssociationEdge"/>
+						<feature mandatory="true" name="ExtendRelationshipEdge"/>
+						<feature mandatory="true" name="IncludeRelationshipEdge"/>
+						<feature mandatory="true" name="UseCaseGeneralizationEdge"/>
+						<feature mandatory="true" name="UseCaseNoteEdge"/>
+					</or>
+					<feature hidden="true" name="UseCaseD"/>
+					<feature hidden="true" name="DiagramSupport"/>
+					<or abstract="true" name="File">
+						<feature mandatory="true" name="Exit"/>
+						<feature mandatory="true" name="Print"/>
+						<feature mandatory="true" name="ExportImage"/>
+						<feature mandatory="true" name="SaveFile"/>
+						<feature mandatory="true" name="SaveAs"/>
+						<feature mandatory="true" name="RecentFile"/>
+						<feature mandatory="true" name="OpenFile"/>
+					</or>
+					<feature hidden="true" name="NewFile"/>
+					<feature hidden="true" name="FileMenu"/>
+					<feature hidden="true" name="Read"/>
+					<feature hidden="true" name="InternalFrame"/>
+					<feature hidden="true" name="FileUtility"/>
+					<feature hidden="true" name="ExtensionFilter"/>
+					<feature hidden="true" name="GraphUtility"/>
+					<feature hidden="true" name="MenuResources"/>
+					<feature mandatory="true" name="base"/>
+				</and>
+			</alt>
+		</struct>
+		<constraints>
+			<rule>
+				<imp>
+					<disj>
+						<var>File</var>
+						<disj>
+							<var>NewFile</var>
+							<disj>
+								<var>Edit</var>
+								<disj>
+									<var>View</var>
+									<disj>
+										<var>Window</var>
+										<disj>
+											<var>Help</var>
+											<var>Additional</var>
+										</disj>
+									</disj>
+								</disj>
+							</disj>
+						</disj>
+					</disj>
+					<conj>
+						<var>MenuResources</var>
+						<conj>
+							<var>GraphUtility</var>
+							<conj>
+								<var>ExtensionFilter</var>
+								<conj>
+									<var>FileUtility</var>
+									<conj>
+										<var>InternalFrame</var>
+										<var>Read</var>
+									</conj>
+								</conj>
+							</conj>
+						</conj>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<disj>
+						<var>File</var>
+						<var>NewFile</var>
+					</disj>
+					<var>FileMenu</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>Edit</var>
+					<var>EditMenu</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>View</var>
+					<var>ViewMenu</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>Window</var>
+					<var>WindowMenu</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>Help</var>
+					<var>HelpMenu</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<disj>
+						<var>ClassDiagram</var>
+						<disj>
+							<var>SequenceDiagram</var>
+							<disj>
+								<var>StateDiagram</var>
+								<disj>
+									<var>ObjectDiagram</var>
+									<var>UseCaseDiagram</var>
+								</disj>
+							</disj>
+						</disj>
+					</disj>
+					<conj>
+						<var>DiagramSupport</var>
+						<var>NewFile</var>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>ClassDiagram</var>
+					<var>ClassD</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>SequenceDiagram</var>
+					<var>SequenceD</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>StateDiagram</var>
+					<var>StateD</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>ObjectDiagram</var>
+					<var>ObjectD</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>UseCaseDiagram</var>
+					<var>UseCaseD</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>RecentFile</var>
+					<var>OpenFile</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>SaveFile</var>
+					<var>SaveAs</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>ImageFilter</var>
+					<conj>
+						<var>ExtensionFilter</var>
+						<var>ExportImage</var>
+					</conj>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>VioletFilter</var>
+					<var>ExtensionFilter</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>CommandLine</var>
+					<var>OpenFile</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<disj>
+						<var>ClassDependencyEdge</var>
+						<disj>
+							<var>ClassInheritanceEdge</var>
+							<disj>
+								<var>ClassAggregationEdge</var>
+								<disj>
+									<var>ClassAssociationEdge</var>
+									<disj>
+										<var>ClassCompositionEdge</var>
+										<var>ClassInterfaceEdge</var>
+									</disj>
+								</disj>
+							</disj>
+						</disj>
+					</disj>
+					<var>ClassNode</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>ClassNoteEdge</var>
+					<var>ClassNoteNode</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<disj>
+						<var>SequenceCallEdge</var>
+						<var>SequenceReturnEdge</var>
+					</disj>
+					<var>SequenceCallNode</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>SequenceNoteEdge</var>
+					<var>SequenceNoteNode</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>StateTransitionEdge</var>
+					<var>StateNode</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>StateNoteEdge</var>
+					<var>StateNoteNode</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<disj>
+						<var>ObjectReferenceEdge</var>
+						<var>ObjectAssociationEdge</var>
+					</disj>
+					<var>ObjectNode</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>ObjectNoteEdge</var>
+					<var>ObjectNoteNode</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<disj>
+						<var>UseCaseAssociationEdge</var>
+						<disj>
+							<var>ExtendRelationshipEdge</var>
+							<disj>
+								<var>IncludeRelationshipEdge</var>
+								<var>UseCaseGeneralizationEdge</var>
+							</disj>
+						</disj>
+					</disj>
+					<var>Actor</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>UseCaseNoteEdge</var>
+					<var>UseCaseNoteNode</var>
+				</imp>
+			</rule>
+		</constraints>
+		<comments>
+			<c>* Violet Model File */</c>
+			<c> constraints</c>
+			<c> formatting</c>
+			<c>Exit {out="ExitV"}</c>
+			<c>ClassD {out="ClassDiagram"}</c>
+			<c>SequenceD {out="SequenceDiagram"}</c>
+			<c>StateD {out="StateDiagram"}</c>
+			<c>ObjectD {out="ObjectDiagram"}</c>
+			<c>UseCaseD {out="UseCaseDiagram"}</c>
+			<c>ImageFilter {out="ExportFilter"}</c>
+			<c>SequenceParameterNode {out="SequenceImplicitParameterNode"}</c>
+			<c>Actor {out="UseCaseActorNode"}</c>
+			<c>ExtendRelationshipEdge {out="UseCaseExtendRelationEdge"}</c>
+			<c>IncludeRelationshipEdge {out="UseCaseIncludeRelationEdge"}</c>
+		</comments>
+	</featureModel>
