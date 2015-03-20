@@ -20,8 +20,11 @@
  */
 package de.ovgu.featureide.core.fstmodel;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.annotation.Nonnull;
 
@@ -72,23 +75,19 @@ public class FSTClass {
 		return name;
 	}
 
-	public LinkedList<LinkedList<FSTClassFragment>> getAllFSTFragments() {
-		final LinkedList<LinkedList<FSTClassFragment>> allFrags = new LinkedList<LinkedList<FSTClassFragment>>();
-		final LinkedList<FSTClassFragment> helper = new LinkedList<FSTClassFragment>();
-		final LinkedList<FSTClassFragment> fragmentsOfThisClass = new LinkedList<FSTClassFragment>();
+	public List<List<FSTClassFragment>> getAllFSTFragments() {
+		final List<List<FSTClassFragment>> allFrags = new ArrayList<>();
+		final HashSet<FSTClassFragment> helper = new HashSet<>();
+		final List<FSTClassFragment> fragmentsOfThisClass = new LinkedList<>();
 
 		for (FSTRole currRole : getRoles()) {
-			final LinkedList<FSTClassFragment> allFragsOfRole = currRole.getAllInnerClasses();
-			for (FSTClassFragment fstClassFragment : allFragsOfRole) {
-				if (!helper.contains(fstClassFragment)) {
-					final LinkedList<FSTClassFragment> currList = currRole.getAllEqualFSTFragments(fstClassFragment);
-					allFrags.add(currList);
-					helper.addAll(currList);
+			fragmentsOfThisClass.add(currRole.getClassFragment());
+			for (FSTClassFragment fstClassFragment : currRole.getAllInnerClasses()) {
+				if (helper.add(fstClassFragment)) {
+					allFrags.add(currRole.getAllEqualFSTFragments(fstClassFragment));
 				}
 			}
-			fragmentsOfThisClass.add(currRole.getClassFragment());
 		}
-
 		allFrags.add(fragmentsOfThisClass);
 
 		return allFrags;

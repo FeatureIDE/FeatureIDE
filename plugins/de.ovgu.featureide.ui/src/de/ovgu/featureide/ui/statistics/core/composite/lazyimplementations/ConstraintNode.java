@@ -31,8 +31,9 @@ import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
  * @author Patrick Haese
  */
 public class ConstraintNode extends LazyParent {
-	protected Constraint constr;
-	
+
+	protected final Constraint constr;
+
 	public ConstraintNode(Constraint constr) {
 		super("Constraint", constr.toString());
 		this.constr = constr;
@@ -41,6 +42,5 @@ public class ConstraintNode extends LazyParent {
 
 	@Override
 	protected void initChildren() {
-		
 	}
 }

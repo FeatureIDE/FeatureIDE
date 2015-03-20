@@ -1,3 +1,23 @@
+/* FeatureIDE - A Framework for Feature-Oriented Software Development
+ * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ *
+ * This file is part of FeatureIDE.
+ * 
+ * FeatureIDE is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * FeatureIDE is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * See http://featureide.cs.ovgu.de/ for further information.
+ */
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
 import java.io.BufferedReader;
@@ -6,8 +26,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
+import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -32,11 +51,13 @@ import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
  */
 public class StatisticsProgramSizeNew extends LazyParent {
 
-	private final FSTModel fstModel;
-	int numberOfLines = 0;
-	HashMap<String, Integer> featureExtensionLOCList = new HashMap<String, Integer>();
 	private final static String[] ignoredExtensions = { "jpg", "jpeg", "raw", "hdr", "tiff", "bmp", "jpe", "dib", "gif", "pdf", "png", "zip", "wav", "mp3",
 			"avi", "flv", "midi" };
+
+	private final HashMap<String, Integer> featureExtensionLOCList = new HashMap<String, Integer>();
+	private final FSTModel fstModel;
+
+	private int numberOfLines = 0;
 
 	public StatisticsProgramSizeNew(String description, FSTModel fstModel) {
 		super(description);
@@ -54,11 +75,11 @@ public class StatisticsProgramSizeNew extends LazyParent {
 		int numberOfUniMethods = 0;
 
 		for (FSTClass fstClass : fstModel.getClasses()) {
-			final LinkedList<LinkedList<FSTClassFragment>> allFrag = fstClass.getAllFSTFragments();
+			final List<List<FSTClassFragment>> allFrag = fstClass.getAllFSTFragments();
 			final HashSet<FSTMethod> methHelper = new HashSet<FSTMethod>();
 			final HashSet<FSTField> fieldHelper = new HashSet<FSTField>();
 
-			for (LinkedList<FSTClassFragment> linkedList : allFrag) {
+			for (List<FSTClassFragment> linkedList : allFrag) {
 				numberOfRoles += linkedList.size();
 
 				for (FSTClassFragment fstClassFragment : linkedList) {
@@ -173,34 +194,14 @@ public class StatisticsProgramSizeNew extends LazyParent {
 
 		});
 	}
-
-	/**
-	 * @param numberOfLinesInThisFile : variable to save the number of lines
-	 * @param file : the opened file
-	 * @param oneLineComment : this variable contains the chars for comments in one line e.g. //
-	 * @param moreLineStart : this 
-	 * @param moreLineEnd
-	 * @return
-	 * @throws FileNotFoundException
-	 * @throws IOException
-	 */
+	
 	public static int countLOC(final IFile file, String oneLineComment, String moreLineStart, String moreLineEnd) throws FileNotFoundException, IOException {
 		FileReader fr = new FileReader(file.getLocation().toString());
 		BufferedReader br = new BufferedReader(fr);
 		return countLineNumber(oneLineComment, moreLineStart, moreLineEnd, br);
 	}
-
-	/**
-	 * @param oneLineComment
-	 * @param moreLineStart
-	 * @param moreLineEnd
-	 * @param numberOfLinesInThisFile
-	 * @param br
-	 * @return
-	 * @throws IOException
-	 */
-	public static int countLineNumber(String oneLineComment, String moreLineStart, String moreLineEnd,
-			BufferedReader br) throws IOException {
+	
+	public static int countLineNumber(String oneLineComment, String moreLineStart, String moreLineEnd, BufferedReader br) throws IOException {
 		int numberOfLinesInThisFile = 0;
 		String s;
 		boolean isInComment = false;

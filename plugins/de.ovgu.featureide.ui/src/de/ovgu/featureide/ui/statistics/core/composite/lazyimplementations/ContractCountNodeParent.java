@@ -26,13 +26,13 @@ import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 
 /**
- * TODO description
+ * Node for {@link FSTMethod}.
  * 
  * @author Schleicher Miro
  */
 public class ContractCountNodeParent extends Parent {
 
-	FSTMethod fstMethod;
+	private final FSTMethod fstMethod;
 	
 	public ContractCountNodeParent(String discription, FSTMethod nameMethod, LinkedList<FSTMethod> allMethodsList) {
 		super(discription);

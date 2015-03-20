@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
-import java.util.LinkedList;
+import java.util.List;
 
 import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTClassFragment;
@@ -63,7 +63,7 @@ public class ClassNodeParent extends AbstractSortModeNode {
 		} else if (fstClassFrag != null) {
 
 			for (FSTClass currClass : fstModel.getClasses()) {
-				for (LinkedList<FSTClassFragment> classFragmentList : currClass.getAllFSTFragments()) {
+				for (List<FSTClassFragment> classFragmentList : currClass.getAllFSTFragments()) {
 					for (FSTClassFragment fstFrag : classFragmentList) {
 						if (fstFrag.getFullIdentifier().equals(fstClassFrag.getFullIdentifier())) {
 							addChild(new ClassSubNodeParent(fstFrag.getRole().getFeature().getName(), fstFrag));

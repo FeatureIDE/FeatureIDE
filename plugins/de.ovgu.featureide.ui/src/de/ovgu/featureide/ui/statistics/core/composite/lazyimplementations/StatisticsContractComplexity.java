@@ -40,9 +40,10 @@ import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.gener
  * @author Florian Proksch
  */
 public class StatisticsContractComplexity extends LazyParent {
-	private FSTModel fstModel;
-	private FeatureModel featModel;
-	private String contractComposition;
+	
+	private final FSTModel fstModel;
+	private final FeatureModel featModel;
+	private final String contractComposition;
 
 	public StatisticsContractComplexity(String description, FSTModel fstmodel, FeatureModel featmodel, String contractComposition) {
 		super(description, null);

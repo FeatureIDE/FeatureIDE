@@ -19,6 +19,7 @@
  * See http://featureide.cs.ovgu.de/ for further information.
  */
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
+
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,10 +39,10 @@ import de.ovgu.featureide.ui.statistics.core.composite.Parent;
  * @author Patrick Haese
  */
 public final class StatisticsFeatureComplexity extends LazyParent {
-	private FeatureModelAnalyzer ana;
-	private FeatureModel model;
 
-	
+	private final FeatureModelAnalyzer ana;
+	private final FeatureModel model;
+
 	public StatisticsFeatureComplexity(String description, FeatureModel model) {
 		super(description, null);
 		this.model = model;
@@ -67,13 +68,11 @@ public final class StatisticsFeatureComplexity extends LazyParent {
 			 */
 			Collection<Feature> listOfFeatures = model.getFeatures();
 
-			addChild(new Parent(MODEL_VOID, isValid == null ? MODEL_TIMEOUT
-					: isValid));
+			addChild(new Parent(MODEL_VOID, isValid == null ? MODEL_TIMEOUT : isValid));
 
 			addChild(new FeatureListNode(NUMBER_FEATURES, listOfFeatures));
 
-			addChild(new FeatureListNode(NUMBER_CONCRETE,
-					model.getConcreteFeatures()));
+			addChild(new FeatureListNode(NUMBER_CONCRETE, model.getConcreteFeatures()));
 
 			List<Feature> listOfAbstractFeatures = new LinkedList<Feature>();
 			for (Feature f : listOfFeatures) {
@@ -81,8 +80,7 @@ public final class StatisticsFeatureComplexity extends LazyParent {
 					listOfAbstractFeatures.add(f);
 				}
 			}
-			addChild(new FeatureListNode(NUMBER_ABSTRACT,
-					listOfAbstractFeatures));
+			addChild(new FeatureListNode(NUMBER_ABSTRACT, listOfAbstractFeatures));
 
 			List<Feature> listOfCompoundFeatures = new LinkedList<Feature>();
 			for (Feature f : listOfFeatures) {
@@ -90,8 +88,7 @@ public final class StatisticsFeatureComplexity extends LazyParent {
 					listOfCompoundFeatures.add(f);
 				}
 			}
-			addChild(new FeatureListNode(NUMBER_COMPOUND,
-					listOfCompoundFeatures));
+			addChild(new FeatureListNode(NUMBER_COMPOUND, listOfCompoundFeatures));
 
 			List<Feature> listOfPrimitiveFeatures = new LinkedList<Feature>();
 			for (Feature f : listOfFeatures) {
@@ -99,11 +96,10 @@ public final class StatisticsFeatureComplexity extends LazyParent {
 					listOfPrimitiveFeatures.add(f);
 				}
 			}
-			addChild(new FeatureListNode(NUMBER_TERMINAL,
-					listOfPrimitiveFeatures));
+			addChild(new FeatureListNode(NUMBER_TERMINAL, listOfPrimitiveFeatures));
 
 			addChild(new FeatureListNode(NUMBER_HIDDEN, ana.getHiddenFeatures()));
-			
+
 			addChild(new Parent(NUMBER_CONSTRAINTS, constraints));
 
 		}

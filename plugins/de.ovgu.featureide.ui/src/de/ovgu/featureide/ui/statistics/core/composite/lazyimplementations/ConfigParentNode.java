@@ -33,12 +33,12 @@ import de.ovgu.featureide.ui.statistics.ui.helper.jobs.StoppableTreeJob;
 /**
  * Parent for the actual {@link ConfigNode}s.
  * 
- * 
  * @author Dominik Hamann
  * @author Patrick Haese
  */
 public class ConfigParentNode extends LazyParent {
-	private FeatureModel model;
+	
+	private final FeatureModel model;
 
 	public static class ConfigNode extends Parent {
 		private FeatureModel innerModel;

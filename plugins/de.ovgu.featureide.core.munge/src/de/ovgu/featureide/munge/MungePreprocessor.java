@@ -73,8 +73,7 @@ public class MungePreprocessor extends PPComposerExtensionClass {
 	public static final Pattern OP_COM_PATTERN = Pattern.compile("(" + OPERATORS + ")|/\\*|\\*/");
 
 	/**
-	 * is true if actual line is in comment section (between <code>&#47;*</code>
-	 * and <code>*&#47;</code>)
+	 * is true if actual line is in comment section (between <code>&#47;*</code> and <code>*&#47;</code>)
 	 */
 	private boolean commentSection;
 
@@ -120,7 +119,7 @@ public class MungePreprocessor extends PPComposerExtensionClass {
 		if (mungeModelBuilder != null)
 			mungeModelBuilder.buildModel();
 	}
-	
+
 	@Override
 	public void postModelChanged() {
 		prepareFullBuild(null);
@@ -247,8 +246,7 @@ public class MungePreprocessor extends PPComposerExtensionClass {
 	}
 
 	/**
-	 * Checks given line if it contains expressions which are always
-	 * <code>true</code> or <code>false</code>.<br />
+	 * Checks given line if it contains expressions which are always <code>true</code> or <code>false</code>.<br />
 	 * <br />
 	 * 
 	 * Check in three steps:
@@ -474,12 +472,8 @@ public class MungePreprocessor extends PPComposerExtensionClass {
 		return IComposerExtensionClass.Mechanism.PREPROCESSOR;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionBase#supportsMigration()
-	 */
 	@Override
-	public boolean supportsMigration()
-	{
+	public boolean supportsMigration() {
 		return false;
 	}
 

@@ -1,6 +1,27 @@
+/* FeatureIDE - A Framework for Feature-Oriented Software Development
+ * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ *
+ * This file is part of FeatureIDE.
+ * 
+ * FeatureIDE is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * FeatureIDE is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * See http://featureide.cs.ovgu.de/ for further information.
+ */
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import de.ovgu.featureide.core.fstmodel.FSTArbitraryRole;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
@@ -13,12 +34,12 @@ import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.genericdatatypes.AbstractSortModeNode;
 
 /**
- * displays the sums of the different components in the statistics
+ * Displays the sums of the different components in the statistics.
  * 
  * @author Schleicher Miro
  */
 public class SumImplementationArtifactsParent extends AbstractSortModeNode {
-	
+
 	public static final int NUMBER_OF_CLASSES = 0;
 	public static final int NUMBER_OF_FIELDS = 1;
 	public static final int NUMBER_OF_METHODS = 2;
@@ -43,7 +64,7 @@ public class SumImplementationArtifactsParent extends AbstractSortModeNode {
 
 		if (type == NUMBER_OF_CLASSES) {
 			for (FSTClass currClass : fstModel.getClasses()) {
-				for (LinkedList<FSTClassFragment> classFragmentList : currClass.getAllFSTFragments()) {
+				for (List<FSTClassFragment> classFragmentList : currClass.getAllFSTFragments()) {
 					if (!classFragmentList.isEmpty()) {
 						final FSTClassFragment firstClassFragment = classFragmentList.get(0);
 						final FSTRole fstRole = classFragmentList.get(0).getRole();
@@ -58,7 +79,7 @@ public class SumImplementationArtifactsParent extends AbstractSortModeNode {
 		} else if (type == NUMBER_OF_FIELDS) {
 			LinkedList<FSTField> allFields = new LinkedList<FSTField>();
 			for (FSTClass currClass : fstModel.getClasses()) {
-				for (LinkedList<FSTClassFragment> classFragmentList : currClass.getAllFSTFragments()) {
+				for (List<FSTClassFragment> classFragmentList : currClass.getAllFSTFragments()) {
 					for (FSTClassFragment fstFrag : classFragmentList) {
 						allFields.addAll(fstFrag.getFields());
 					}
@@ -80,7 +101,7 @@ public class SumImplementationArtifactsParent extends AbstractSortModeNode {
 		} else if (type == NUMBER_OF_METHODS) {
 			LinkedList<FSTMethod> allMethods = new LinkedList<FSTMethod>();
 			for (FSTClass currClass : fstModel.getClasses()) {
-				for (LinkedList<FSTClassFragment> classFragmentList : currClass.getAllFSTFragments()) {
+				for (List<FSTClassFragment> classFragmentList : currClass.getAllFSTFragments()) {
 					for (FSTClassFragment fstFrag : classFragmentList) {
 						allMethods.addAll(fstFrag.getMethods());
 					}
@@ -102,7 +123,7 @@ public class SumImplementationArtifactsParent extends AbstractSortModeNode {
 			LinkedList<FSTInvariant> allInvariants = new LinkedList<FSTInvariant>();
 
 			for (FSTClass currClass : fstModel.getClasses()) {
-				for (LinkedList<FSTClassFragment> iterable_element : currClass.getAllFSTFragments()) {
+				for (List<FSTClassFragment> iterable_element : currClass.getAllFSTFragments()) {
 					for (FSTClassFragment fstFrag : iterable_element) {
 						allInvariants.addAll(fstFrag.getInvariants());
 					}
@@ -162,14 +183,15 @@ public class SumImplementationArtifactsParent extends AbstractSortModeNode {
 
 			}
 
-		} else if(type == NUMBER_OF_FEATURE_CONTRACTS){
-			
+		} else if (type == NUMBER_OF_FEATURE_CONTRACTS) {
+
 			LinkedList<FSTMethod> allContractsFeature = new LinkedList<FSTMethod>();
 
 			allContractsFeature = getAllMethodsContractsList();
-			
+
 			while (allContractsFeature.size() > 0) {
-				addChild(new FeatureContractNodeParent(allContractsFeature.get(0).getRole().getFeature().getName(), allContractsFeature.get(0), allContractsFeature));
+				addChild(new FeatureContractNodeParent(allContractsFeature.get(0).getRole().getFeature().getName(), allContractsFeature.get(0),
+						allContractsFeature));
 				int pointer = 0;
 				String fullI = allContractsFeature.get(0).getRole().getFeature().getName();
 				while (pointer < allContractsFeature.size()) {
@@ -181,8 +203,7 @@ public class SumImplementationArtifactsParent extends AbstractSortModeNode {
 				}
 
 			}
-			
-			
+
 		}
 
 	}
@@ -191,7 +212,7 @@ public class SumImplementationArtifactsParent extends AbstractSortModeNode {
 		LinkedList<FSTMethod> allMethodContracts = new LinkedList<FSTMethod>();
 
 		for (FSTClass currClass : fstModel.getClasses()) {
-			for (LinkedList<FSTClassFragment> iterable_element : currClass.getAllFSTFragments()) {
+			for (List<FSTClassFragment> iterable_element : currClass.getAllFSTFragments()) {
 				for (FSTClassFragment fstFrag : iterable_element) {
 					for (FSTMethod method : fstFrag.getMethods()) {
 						if (method.hasContract()) {

@@ -177,7 +177,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	private ShowFieldsMethodsAction[] setFieldsMethodsActions = new ShowFieldsMethodsAction[FIELD_METHOD_LABEL_NAMES.length];
 
 	private ShowFieldsMethodsAction showAccessModifiers;
-	
+
 	private IToolBarManager toolbarManager;
 
 	private final Vector<IFile> configurations = new Vector<IFile>();
@@ -311,14 +311,12 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		viewer.setRootEditPart(rootEditPart);
 		viewer.setEditDomain(new EditDomain());
 		viewer.setEditPartFactory(new GraphicalEditPartFactory());
-		
-		
+
 		int select = ShowFieldsMethodsAction.SELECT_ALL_METHOD_ACCESS;
-		if (deselectAll())
-		{
+		if (deselectAll()) {
 			select = ShowFieldsMethodsAction.DESELECT_ALL_METHOD_ACCESS;
 		}
-		showAccessModifiers = new ShowFieldsMethodsAction("", null, this,select, Action.AS_DROP_DOWN_MENU);
+		showAccessModifiers = new ShowFieldsMethodsAction("", null, this, select, Action.AS_DROP_DOWN_MENU);
 		showAccessModifiers.setToolTipText("Change filter for access modifiers");
 		showAccessModifiers.setMenuCreator(new IMenuCreator() {
 
@@ -356,13 +354,12 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 			public void dispose() {
 			}
 		});
-		
-		
+
 		createContextMenu();
 		createActions(part);
 		makeActions();
 		contributeToActionBars();
-		
+
 		CollaborationViewSearch.Builder builder = new CollaborationViewSearch.Builder();
 		search = builder.setAttachedViewerParent(viewer).setSearchBoxText("Search in Collaboration Diagram").setFindResultsColor(ROLE_BACKGROUND_SELECTED)
 				.setNoSearchResultsColor(ROLE_BACKGROUND_UNSELECTED).create();
@@ -383,9 +380,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		fillLocalToolBar();
 	}
 
-	/*
-	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
-	 */
 	public void setFocus() {
 		FigureCanvas figureCanvas = (FigureCanvas) viewer.getControl();
 
@@ -470,7 +464,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	public void createContextMenu() {
 		MenuManager menuMgr = new MenuManager("#PopupMenu");
 		menuMgr.setRemoveAllWhenShown(true);
-		
+
 		menuMgr.addMenuListener(new IMenuListener() {
 			public void menuAboutToShow(IMenuManager m) {
 				fillContextMenu(m);
@@ -494,21 +488,21 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		filterAction.setEnabled(isNotEmpty);
 		delAction.setEnabled(isNotEmpty);
 		showUnselectedAction.setEnabled(isNotEmpty);
-	
+
 		saveCursorPosition();
-	
+
 		menuMgr.add(addRoleAction);
 		menuMgr.add(filterAction);
 		menuMgr.add(showUnselectedAction);
 		menuMgr.add(delAction);
-	
+
 		if (featureProject.getComposer().showContextFieldsAndMethods()) {
 			MenuManager methodsFieldsSubMenu = new MenuManager("Show Fields and Methods");
-	
+
 			for (int i = 0; i < setFieldsMethodsActions.length; i++) {
 				methodsFieldsSubMenu.add(setFieldsMethodsActions[i]);
 				setFieldsMethodsActions[i].setChecked(false);
-	
+
 				if ((i == ShowFieldsMethodsAction.SHOW_NESTED_CLASSES) || (i == ShowFieldsMethodsAction.HIDE_PARAMETERS_AND_TYPES)
 						|| (i == ShowFieldsMethodsAction.PRIVATE_FIELDSMETHODS)) {
 					methodsFieldsSubMenu.add(new Separator());
@@ -516,7 +510,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 			}
 			menuMgr.add(methodsFieldsSubMenu);
 		}
-	
+
 		Object selection = ((IStructuredSelection) viewer.getSelection()).getFirstElement();
 		if (selection instanceof CollaborationEditPart) {
 			FSTFeature coll = ((CollaborationEditPart) selection).getCollaborationModel();
@@ -524,16 +518,16 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 				FeatureModel fm = featureProject.getFeatureModel();
 				ColorschemeTable colorschemeTable = fm.getColorschemeTable();
 				List<String> csNames = colorschemeTable.getColorschemeNames();
-	
+
 				String curColorSchemeName = colorschemeTable.getSelectedColorschemeName();
 				MenuManager colorSchemeSubMenu = null;
-	
+
 				if (curColorSchemeName != null) {
 					colorSchemeSubMenu = new MenuManager(curColorSchemeName);
 				} else {
 					colorSchemeSubMenu = new MenuManager("No Colorscheme Selected");
 				}
-	
+
 				int count = 0;
 				for (String name : csNames) {
 					SetColorSchemeAction setCSAction = new SetColorSchemeAction(name, viewer, this, ++count);
@@ -542,7 +536,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 					}
 					colorSchemeSubMenu.add(setCSAction);
 				}
-	
+
 				colorSchemeSubMenu.add(new Separator());
 				colorSchemeSubMenu.add(addColorSchemeAction);
 				colorSchemeSubMenu.add(renameColorSchemeAction);
@@ -550,31 +544,29 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 				colorSubMenu.removeAll();
 				colorSubMenu.add(colorSchemeSubMenu);
 				colorSubMenu.add(new Separator());
-	
+
 				boolean enableColorActions = colorschemeTable.getSelectedColorscheme() > 0;
 				for (int i = 0; i < setColorActions.length; i++) {
 					setColorActions[i].setEnabled(enableColorActions);
 					setColorActions[i].setChecked(false);
 					colorSubMenu.add(setColorActions[i]);
 				}
-	
+
 				int color = fm.getFeature(coll.getName()).getColorList().getColor();
 				if (ColorList.isValidColor(color)) {
 					setColorActions[color].setChecked(true);
 				}
-	
+
 				menuMgr.add(colorSubMenu);
 			}
 		}
-	
+
 		menuMgr.add(new Separator());
 		MenuManager exportMenu = new MenuManager(EXPORT_AS_LABEL);
 		exportMenu.add(exportAsImage);
 		exportMenu.add(exportAsXML);
 		menuMgr.add(exportMenu);
 	}
-
-	
 
 	public void disableToolbarFilterItems() {
 		boolean value = false;
@@ -615,11 +607,11 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		renameColorSchemeAction = new RenameColorSchemeAction("&Rename Selected Colorscheme", viewer, this);
 		deleteColorSchemeAction = new DeleteColorSchemeAction("&Delete Selected Colorscheme", viewer, this);
 	}
-	
+
 	private boolean deselectAll() {
 		boolean[] selectedModifiers = RoleFigure.getRoleSelections();
-		if ((selectedModifiers[ShowFieldsMethodsAction.PUBLIC_FIELDSMETHODS]) && (selectedModifiers[ShowFieldsMethodsAction.PRIVATE_FIELDSMETHODS]) && (selectedModifiers[ShowFieldsMethodsAction.PROTECTED_FIELDSMETHODS]) && (selectedModifiers[ShowFieldsMethodsAction.DEFAULT_FIELDSMETHODS]))
-		{
+		if ((selectedModifiers[ShowFieldsMethodsAction.PUBLIC_FIELDSMETHODS]) && (selectedModifiers[ShowFieldsMethodsAction.PRIVATE_FIELDSMETHODS])
+				&& (selectedModifiers[ShowFieldsMethodsAction.PROTECTED_FIELDSMETHODS]) && (selectedModifiers[ShowFieldsMethodsAction.DEFAULT_FIELDSMETHODS])) {
 			return true;
 		}
 		return false;
@@ -655,11 +647,11 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		}
 	}
 
-	private Image combineImages(ArrayList<Image> images) {		
+	private Image combineImages(ArrayList<Image> images) {
 		if (images.size() == 0) {
 			return IMAGE_MODIFIERS_NONE;
 		}
-		
+
 		Collections.sort(images, new ImageComarator());
 
 		Image finalImage = new Image(images.get(0).getDevice(), images.get(0).getBounds());
@@ -693,21 +685,18 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		// build one image from max 4 images
 		boolean[] selectedAccessModifiers = RoleFigure.getRoleSelections();
 		showAccessModifiers.setImageDescriptor(getAccessModifiersImage(selectedAccessModifiers));
-		
-		if (deselectAll())
-		{
+
+		if (deselectAll()) {
 			showAccessModifiers.setActionIndex(ShowFieldsMethodsAction.DESELECT_ALL_METHOD_ACCESS);
-		}
-		else
-		{
+		} else {
 			showAccessModifiers.setActionIndex(ShowFieldsMethodsAction.SELECT_ALL_METHOD_ACCESS);
 		}
 	}
-	
+
 	public void selectAll() {
 		contributeToActionBars();
 	}
-	
+
 	private void fillLocalToolBar() {
 		toolbarManager.removeAll();
 		fieldsWithRefinementsButton = setFieldsMethodsActions[ShowFieldsMethodsAction.FIELDS_WITH_REFINEMENTS];
@@ -717,10 +706,9 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		showContracsButton = setFieldsMethodsActions[ShowFieldsMethodsAction.ONLY_CONTRACTS];
 		showInvariantsButton = setFieldsMethodsActions[ShowFieldsMethodsAction.ONLY_INVARIANTS];
 		showNestedClassesButton = setFieldsMethodsActions[ShowFieldsMethodsAction.SHOW_NESTED_CLASSES];
-		
+
 		boolean[] isChecked = RoleFigure.getRoleSelections();
-		for (int i = ShowFieldsMethodsAction.FIELDS_WITH_REFINEMENTS; i <= ShowFieldsMethodsAction.SHOW_NESTED_CLASSES; i++)
-		{
+		for (int i = ShowFieldsMethodsAction.FIELDS_WITH_REFINEMENTS; i <= ShowFieldsMethodsAction.SHOW_NESTED_CLASSES; i++) {
 			setFieldsMethodsActions[i].setChecked(isChecked[i]);
 		}
 
@@ -732,7 +720,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		toolbarManager.add(showContracsButton);
 		toolbarManager.add(showInvariantsButton);
 		toolbarManager.add(showNestedClassesButton);
-		
+
 		reloadImage();
 
 		toolbarManager.add(new Separator());
@@ -772,8 +760,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 
 			@Override
 			public void dispose() {
-				// TODO Auto-generated method stub
-
 			}
 
 		});
@@ -786,30 +772,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		refreshButton = new Action() {
 			public void run() {
 				disableToolbarFilterItems();
-				Job refreshJob = new AStoppableJob("Refresh Collaboration View") {
-					@Override
-					protected boolean work() throws Exception {
-						if (!refreshButton.isEnabled())
-							return true;
-						refreshButton.setEnabled(false);
-						if (featureProject != null) {
-							IComposerExtensionClass composer = featureProject.getComposer();
-							if (composer != null) {
-								composer.buildFSTModel();
-								updateGuiAfterBuild(featureProject, null);
-							}
-						}
-						return true;
-					}
-				};
-				refreshJob.setPriority(Job.SHORT);
-				refreshJob.schedule();
-			}
-		};
-
-		Action filterToolbarAction = new Action() {
-			public void run() {
-				
 				Job refreshJob = new AStoppableJob("Refresh Collaboration View") {
 					@Override
 					protected boolean work() throws Exception {

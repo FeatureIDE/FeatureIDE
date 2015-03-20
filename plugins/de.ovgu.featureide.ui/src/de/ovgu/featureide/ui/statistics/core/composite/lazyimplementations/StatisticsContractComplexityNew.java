@@ -14,15 +14,16 @@ import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.genericdatatypes.HashMapNode;
 
 /**
- * description
+ * Node for contract statistics.
  * 
  * @author Stefan Krueger
  * @author Florian Proksch
  */
 public class StatisticsContractComplexityNew extends LazyParent {
-	private FSTModel fstModel;
-	private FeatureModel featModel;
-	private String contractComposition;
+
+	private final FSTModel fstModel;
+	private final FeatureModel featModel;
+	private final String contractComposition;
 
 	public StatisticsContractComplexityNew(String description, FSTModel fstmodel, FeatureModel featmodel, String contractComposition) {
 		super(description, null);

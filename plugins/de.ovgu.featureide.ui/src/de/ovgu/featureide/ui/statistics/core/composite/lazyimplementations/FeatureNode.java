@@ -41,10 +41,13 @@ import de.ovgu.featureide.ui.statistics.core.composite.Parent;
  * @author Patrick Haese
  */
 public class FeatureNode extends LazyParent implements IToolTip {
+	
 	private static final String TOOLTIP_SEPARATOR = " | ";
-	protected String tooltip;
-	private boolean hasConstraints;
-	private Feature feat;
+	
+	protected final String tooltip;
+	
+	private final boolean hasConstraints;
+	private final Feature feat;
 
 	public FeatureNode(final Feature feat) {
 		super(feat.toString());

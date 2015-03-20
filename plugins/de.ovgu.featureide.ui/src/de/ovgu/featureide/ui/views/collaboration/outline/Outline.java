@@ -627,29 +627,23 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 			}
 		}
 	}
-
-	/**
-	 * @param oldFile
-	 * @param currentFile
-	 * @return
-	 */
+	
 	private boolean refreshContent(IFile oldFile, IFile currentFile) {
-		if(CorePlugin.getFeatureProject(currentFile) ==null){
+		if (CorePlugin.getFeatureProject(currentFile) == null) {
 			sortMethods.setEnabled(false);
 			hideAllFields.setEnabled(false);
 			hideAllMethods.setEnabled(false);
 			return false;
 		}
-		if(CorePlugin.getFeatureProject(currentFile).getComposer().showContextFieldsAndMethods()){
+		if (CorePlugin.getFeatureProject(currentFile).getComposer().showContextFieldsAndMethods()) {
 			sortMethods.setEnabled(true);
 			hideAllFields.setEnabled(true);
-			hideAllMethods.setEnabled(true);			
-		}else{
+			hideAllMethods.setEnabled(true);
+		} else {
 			sortMethods.setEnabled(false);
 			hideAllFields.setEnabled(false);
-			hideAllMethods.setEnabled(false);			
+			hideAllMethods.setEnabled(false);
 		}
-		
 
 		if (viewer.getLabelProvider() instanceof OutlineLabelProvider) {
 			OutlineLabelProvider lp = (OutlineLabelProvider) viewer.getLabelProvider();
@@ -664,7 +658,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 
 		public void run() {
 			hideAllFieldsToggle = !hideAllFieldsToggle;
-			
+
 			if (viewer.getContentProvider() instanceof CollaborationOutlineTreeContentProvider) {
 				CollaborationOutlineTreeContentProvider contentProvider = (CollaborationOutlineTreeContentProvider) viewer.getContentProvider();
 				CollaborationOutlineLabelProvider labelProvider = (CollaborationOutlineLabelProvider) viewer.getLabelProvider();
@@ -678,7 +672,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 			}
 		}
 	};
-	
+
 	// create Action to hide all methods
 	private final Action hideAllMethods = new Action("", Action.AS_CHECK_BOX) {
 		private HideAllMethods filter = new HideAllMethods();
@@ -703,7 +697,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 	// create Action to display methods and fields in the current feature on top
 	private final Action sortMethods = new Action("", Action.AS_CHECK_BOX) {
 
-		public void run() {			
+		public void run() {
 			sortFeatureToggle = !sortFeatureToggle;
 			CollaborationOutlineTreeContentProvider contentProvider = (CollaborationOutlineTreeContentProvider) viewer.getContentProvider();
 			CollaborationOutlineLabelProvider labelProvider = (CollaborationOutlineLabelProvider) viewer.getLabelProvider();
@@ -727,8 +721,6 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 			}
 		}
 	};
-	
-
 
 	/**
 	 * provides functionality to expand and collapse all items in viewer

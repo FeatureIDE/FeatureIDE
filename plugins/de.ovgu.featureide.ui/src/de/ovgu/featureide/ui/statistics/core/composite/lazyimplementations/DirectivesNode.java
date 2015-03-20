@@ -20,27 +20,13 @@
  */
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
-
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceVisitor;
-import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
-import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.genericdatatypes.AbstractSortModeNode;
-import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.genericdatatypes.HashMapNode;
 
 /**
  * TreeNode who stores the number of used preprocessor directives, directives
@@ -51,11 +37,8 @@ import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.gener
  * @author Patrick Haese
  */
 public class DirectivesNode extends LazyParent {
-	private FSTModel fstModel;
-	/**
-	 * Mapping of lines of code to each feature.
-	 */
-	HashMap<String, Integer> featuresAndLines = new HashMap<String, Integer>();
+	
+	private final FSTModel fstModel;
 
 	/**
 	 * Constructor for a {@code DirectivesNode}.
@@ -69,7 +52,6 @@ public class DirectivesNode extends LazyParent {
 		super(description);
 		this.fstModel = fstModel;
 	}
-
 
 	@Override
 	protected void initChildren() {

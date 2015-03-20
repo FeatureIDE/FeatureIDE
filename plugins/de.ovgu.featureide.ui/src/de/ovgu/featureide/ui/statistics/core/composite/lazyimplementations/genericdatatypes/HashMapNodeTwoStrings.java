@@ -29,9 +29,9 @@ import java.util.HashMap;
  */
 public class HashMapNodeTwoStrings extends AbstractSortModeNode {
 
-	HashMap<String, Integer> featureExtensionLOCList = new HashMap<String, Integer>();
-	HashMap<String, Integer> count = new HashMap<String, Integer>();
-	int side;
+	private HashMap<String, Integer> featureExtensionLOCList = new HashMap<String, Integer>();
+	private HashMap<String, Integer> count = new HashMap<String, Integer>();
+	private int side;
 	
 	public HashMapNodeTwoStrings(String description, int side, HashMap<String, Integer> extList) {
 		super(description);

@@ -21,7 +21,6 @@
 package de.ovgu.featureide.ui.views.collaboration.figures;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedList;
 
 import org.eclipse.core.resources.IFile;
@@ -43,24 +42,19 @@ import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Insets;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
-import org.eclipse.jdt.internal.ui.compare.CompareMessages;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.fstmodel.FSTArbitraryRole;
-import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTClassFragment;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTInvariant;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
-import de.ovgu.featureide.core.fstmodel.IRoleElement;
 import de.ovgu.featureide.core.fstmodel.RoleElement;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
 import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
 import de.ovgu.featureide.ui.views.collaboration.action.ShowFieldsMethodsAction;
 
@@ -151,9 +145,13 @@ public class RoleFigure extends Figure implements GUIDefaults {
 			if (property == null) {
 				return selections;
 			}
-			int i = 0;
-			for (String entry : property.split("[|]")) {
-				selections[i++] = TRUE.equals(entry);
+			final String[] properties = property.split("[|]");
+			if (properties.length != selections.length) {
+				return selections;
+			}
+			for (int i = 0; i < properties.length; i++) {
+				selections[i] = TRUE.equals(properties[i]);
+				
 			}
 		} catch (CoreException e) {
 			FMCorePlugin.getDefault().logError(e);

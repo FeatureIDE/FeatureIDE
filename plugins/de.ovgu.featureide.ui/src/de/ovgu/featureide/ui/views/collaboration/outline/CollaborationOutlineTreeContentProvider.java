@@ -89,7 +89,7 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 
 			if (model != null) {
 				FSTClass c = model.getClass(model.getAbsoluteClassName(file));
-
+				
 				if (c != null) {
 					return new Object[] { c };
 				}
