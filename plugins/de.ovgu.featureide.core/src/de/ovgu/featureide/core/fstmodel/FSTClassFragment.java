@@ -153,11 +153,5 @@ public class FSTClassFragment extends RoleElement<FSTClassFragment> {
 		this.innerClass = innerClass;
 	}
 	
-	// TODO
-//	@Override
-//	public String toString() {
-////		return name.replace(".java", "").replaceAll("/", ".");
-//		return "";
-//	}	
-	//
 }
+

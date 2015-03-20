@@ -220,3 +220,4 @@ public abstract class RoleElement<T extends RoleElement<T>> implements Comparabl
 	}
 
 }
+
