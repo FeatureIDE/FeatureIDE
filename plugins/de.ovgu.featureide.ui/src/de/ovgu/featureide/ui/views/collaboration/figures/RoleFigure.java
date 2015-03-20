@@ -21,6 +21,7 @@
 package de.ovgu.featureide.ui.views.collaboration.figures;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 
 import org.eclipse.core.resources.IFile;
@@ -42,19 +43,24 @@ import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Insets;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
+import org.eclipse.jdt.internal.ui.compare.CompareMessages;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.fstmodel.FSTArbitraryRole;
+import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTClassFragment;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTInvariant;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
+import de.ovgu.featureide.core.fstmodel.IRoleElement;
 import de.ovgu.featureide.core.fstmodel.RoleElement;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
 import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
 import de.ovgu.featureide.ui.views.collaboration.action.ShowFieldsMethodsAction;
 
@@ -145,7 +151,6 @@ public class RoleFigure extends Figure implements GUIDefaults {
 			if (property == null) {
 				return selections;
 			}
-			
 			int i = 0;
 			for (String entry : property.split("[|]")) {
 				selections[i++] = TRUE.equals(entry);
@@ -205,7 +210,7 @@ public class RoleFigure extends Figure implements GUIDefaults {
 			setBorder(COLL_BORDER_UNSELECTED);
 		}
 		setOpaque(true);
-
+		
 		if (isFieldMethodFilterActive()) {
 			createContentForFieldMethodFilter();
 		} else {
@@ -228,11 +233,15 @@ public class RoleFigure extends Figure implements GUIDefaults {
 		if (!(role instanceof FSTArbitraryRole) && role.getDirectives().isEmpty()) {
 			int fieldCount = getCountForFieldContentCreate(tooltipContent);
 			int methodCount = getCountForMethodContentCreate(tooltipContent);
-
 			Object[] invariant = createInvariantContent(tooltipContent);
+			
+			fieldCount = getCountForFields();
+			methodCount = getCountForMethods();
+			
 			addLabel(new Label("Fields: " + fieldCount + " Methods: " + methodCount + " Invariants: " + ((Integer) invariant[0]) + " "));
 		} else if (role.getClassFragment().getName().startsWith("*.")) {
 			setContentForFiles(new CompartmentFigure(), tooltipContent);
+		
 		} else {
 			setDirectivesContent(tooltipContent, getClassName());
 		}
@@ -264,7 +273,7 @@ public class RoleFigure extends Figure implements GUIDefaults {
 			if (showContracts()) {
 				methodCount = getCountForMethodContentContractCreate(tooltipContent);
 
-			} else if (!showContracts()) {
+			} else {
 				methodCount = getCountForMethodContentCreate(tooltipContent);
 			}
 
@@ -273,12 +282,6 @@ public class RoleFigure extends Figure implements GUIDefaults {
 
 			if (showInvariants() && invariant != null && ((Integer) invariant[0]) > 0) {
 				addToToolTip(((Integer) invariant[0]), ((CompartmentFigure) invariant[1]), tooltipContent);
-			}
-
-			// if no methods, invariants or fields to show, show default label
-			int invariantsCount = ((invariant != null) ? ((Integer) invariant[0]) : 0);
-			if (fieldCount == 0 && methodCount == 0 && invariantsCount == 0) {
-				addLabel(new Label("Fields: 0 Methods: 0 Invariants: 0 "));
 			}
 
 			if (shouldShowNestedClasses()) {
@@ -358,6 +361,16 @@ public class RoleFigure extends Figure implements GUIDefaults {
 			}
 		}
 		return methodCount;
+	}
+	
+	private int getCountForMethods()
+	{
+		return role.getClassFragment().getMethods().size();
+	}
+	
+	private int getCountForFields()
+	{
+		return role.getClassFragment().getFields().size();
 	}
 
 	private int getCountForMethodContentCreate(Figure tooltipContent) {
@@ -480,7 +493,7 @@ public class RoleFigure extends Figure implements GUIDefaults {
 		classLabel.setForegroundColor(ROLE_FOREGROUND_UNSELECTED);
 		return classLabel;
 	}
-
+	
 	private int getCountForFieldContentCreate(Figure tooltipContent) {
 		CompartmentFigure fieldFigure = new CompartmentFigure();
 		Label label = new Label(getClassName() + " ", IMAGE_CLASS);
@@ -500,7 +513,7 @@ public class RoleFigure extends Figure implements GUIDefaults {
 				fieldCount++;
 
 				if (isFieldMethodFilterActive()) {
-					this.addLabel(fieldLabel);
+					addLabel(fieldLabel);
 				} else {
 					if (fieldCount % 25 == 0) {
 						tooltipContent.add(fieldFigure);
@@ -599,7 +612,7 @@ public class RoleFigure extends Figure implements GUIDefaults {
 	 */
 	public boolean isFieldMethodFilterActive() {
 		return (isPublicFieldMethodFilterActive() || isDefaultFieldMethodFilterActive() || isPrivateFieldMethodFilterActive() || isProtectedFieldMethodFilterActive())
-				&& (fieldsWithRefinements() || fieldsWithoutRefinements() || showContracts() || showInvariants());
+				&& (fieldsWithRefinements() || fieldsWithoutRefinements() || showContracts() || showInvariants() || methodsWithoutRefinements() || methodsWithRefinements());
 	}
 
 	/*
