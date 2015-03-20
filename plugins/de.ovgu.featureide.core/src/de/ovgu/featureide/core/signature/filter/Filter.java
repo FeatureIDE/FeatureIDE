@@ -18,21 +18,33 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.antenna.ui.handlers;
+package de.ovgu.featureide.core.signature.filter;
 
-import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.ui.handlers.base.AFeatureProjectHandler;
+import java.util.Collection;
+import java.util.Iterator;
 
-/**
- * TODO description
- * 
- * @author Sebastian Krieter
- */
-public class DocumentationHandler extends AFeatureProjectHandler {
+public abstract class Filter {
 
-	@Override
-	protected void singleAction(IFeatureProject project) {
-		
+	public static <T> void filter(Collection<T> collection, IFilter<T> filter) {
+		if (collection != null && filter != null) {
+			for (Iterator<T> iterator = collection.iterator(); iterator.hasNext();) {
+				if (!filter.isValid(iterator.next())) {
+					iterator.remove();
+				}
+			}
+		}
 	}
 	
+	public static <T> void filter(Collection<T> collection, Collection<IFilter<T>> filterList) {
+		if (collection != null && filterList != null) {
+			for (IFilter<T> filter : filterList) {
+				for (Iterator<T> iterator = collection.iterator(); iterator.hasNext();) {
+					if (!filter.isValid(iterator.next())) {
+						iterator.remove();
+					}
+				}
+			}
+		}
+	}
+
 }

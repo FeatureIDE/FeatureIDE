@@ -22,54 +22,52 @@ package de.ovgu.featureide.core.signature.base;
 
 import java.util.Arrays;
 
-
 /**
  * TODO description
  * 
  * @author Sebastian Krieter
  */
 public abstract class AFeatureData {
-		protected final int lineNumber;
-		
-		protected int[] ids;
-		protected String comment;
-		
-		public AFeatureData(int id, int lineNumber) {
-			this.lineNumber = lineNumber;
-			this.ids = new int[]{id};
-		}
-		
-		public AFeatureData(int lineNumber) {
-			this.lineNumber = lineNumber;
-		}
-		
-		public AFeatureData(int[] ids, int lineNumber) {
-			this.lineNumber = lineNumber;
-			setIDs(ids);
-		}
-		
-		public int getLineNumber() {
-			return lineNumber;
-		}
-		
-		public String getComment() {
-			return comment;
-		}
+	protected final int lineNumber;
 
-		public void setComment(String comment) {
-			this.comment = comment;
-		}
-		
-		public void setIDs(int[] ids) {
-			this.ids = ids;
-			Arrays.sort(ids);
-		}
+	protected int[] ids;
+	protected String comment;
 
-		public int[] getIDs() {
-			return ids;
-		}
-		
-		public boolean hasID(int id) {
-			return Arrays.binarySearch(ids, id) > -1;
-		}
+	public AFeatureData(int id, int lineNumber) {
+		this(new int[] { id }, lineNumber);
+	}
+
+	public AFeatureData(int lineNumber) {
+		this(new int[] { -1 }, lineNumber);
+	}
+
+	public AFeatureData(int[] ids, int lineNumber) {
+		this.lineNumber = lineNumber;
+		setIDs(ids);
+	}
+
+	public int getLineNumber() {
+		return lineNumber;
+	}
+
+	public String getComment() {
+		return comment;
+	}
+
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
+
+	public void setIDs(int[] ids) {
+		this.ids = ids;
+		Arrays.sort(ids);
+	}
+
+	public int[] getIDs() {
+		return ids;
+	}
+
+	public boolean hasID(int id) {
+		return Arrays.binarySearch(ids, id) > -1;
+	}
 }

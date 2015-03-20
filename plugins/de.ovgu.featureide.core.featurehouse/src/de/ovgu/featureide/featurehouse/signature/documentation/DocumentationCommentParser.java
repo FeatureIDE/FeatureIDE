@@ -10,27 +10,27 @@ public class DocumentationCommentParser extends ADocumentationCommentParser {
 		
 		// Type
 		if (typeString.equals("general")) {
-			tagFeatureID = -1;
+			tagFeatureNode = null;
 		} else if (typeString.equals("feature")) {
-			tagFeatureID = curFeatureID;
+			tagFeatureNode = getCurFeatureNode();
 		} else if (typeString.equals("new")) {
-			tagFeatureID = curFeatureID;
+			tagFeatureNode = getCurFeatureNode();
 			featureTags.clear();
 		} else {
 			//warning?
-			tagFeatureID = -1;
+			tagFeatureNode = null;
 		}
 		
 		// Priority
 		if (parts.length == 2) {
 			try {
-				curPriority = Integer.parseInt(parts[1]);
+				tagPriority = Integer.parseInt(parts[1]);
 			} catch (NumberFormatException e) {
 				//warning?
-				curPriority = 0;
+				tagPriority = 0;
 			}
 		} else {
-			curPriority = 0;
+			tagPriority = 0;
 		}
 	}
 

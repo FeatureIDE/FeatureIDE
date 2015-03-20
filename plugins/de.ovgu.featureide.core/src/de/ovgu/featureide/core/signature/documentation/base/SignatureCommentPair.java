@@ -8,18 +8,15 @@ public class SignatureCommentPair {
 	
 	public static class Comment {
 		private final String comment;
-		private int featureID = -1;
+		private final int featureID;
 		
-		public Comment(String comment) {
+		public Comment(String comment, int featureID) {
 			this.comment = comment;
+			this.featureID = featureID;
 		}
 		
 		public int getFeatureID() {
 			return featureID;
-		}
-		
-		public void setFeatureID(int featureID) {
-			this.featureID = featureID;
 		}
 		
 		public String getComment() {

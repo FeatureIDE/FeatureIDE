@@ -20,12 +20,7 @@
  */
 package de.ovgu.featureide.core.signature.documentation;
 
-import java.util.List;
-import java.util.ListIterator;
-
 import de.ovgu.featureide.core.signature.documentation.base.ADocumentationCommentMerger;
-import de.ovgu.featureide.core.signature.documentation.base.BlockTag;
-
 
 /**
  * Modul-Comment merger for variants.
@@ -38,61 +33,4 @@ public class VariantMerger extends ADocumentationCommentMerger {
 		super(numberOfFeatures, validFeatureIDs);
 	}
 
-	@Override
-	protected int getRuleForCommentPart(BlockTag tag) {		
-		switch(tag.getTagtype()){
-		case BlockTag.TAG_UNKNOWN:
-			return RULE_OVERRIDE;
-		case BlockTag.TAG_DESCRIPTION:
-			return RULE_MERGE;
-		case BlockTag.TAG_AUTHOR:
-			return RULE_OVERRIDE;
-		case BlockTag.TAG_VERSION:
-			return RULE_OVERRIDE;
-		case BlockTag.TAG_PARAM:
-			return RULE_MERGE;
-		case BlockTag.TAG_RETURN:
-			return RULE_MERGE;
-		case BlockTag.TAG_THROWS:
-			return RULE_MERGE;
-		case BlockTag.TAG_SEE:
-			return RULE_OVERRIDE;
-		case BlockTag.TAG_SINCE:
-			return RULE_OVERRIDE;
-		case BlockTag.TAG_DEPRECATED:
-			return RULE_OVERRIDE;
-		default: 
-			return RULE_OVERRIDE;
-		}
-	}	
-	
-	@Override
-	protected void buildFinalComment(StringBuilder sb, List<BlockTag> generalTags, List<BlockTag> featureTags) {
-		ListIterator<BlockTag> itg = generalTags.listIterator();
-		ListIterator<BlockTag> itf = featureTags.listIterator();
-		while(itg.hasNext() || itf.hasNext()) {
-			sb.append(LINE_SEPARATOR);
-			
-			if (!itg.hasNext()) {
-				sb.append(itf.next());
-			} else if (!itf.hasNext()) {
-				sb.append(itg.next());
-			} else {
-				BlockTag g = itg.next();
-				BlockTag f = itf.next();
-				int comp = g.compareTo(f);
-				if (comp < 0) {
-					sb.append(g);
-					itf.previous();
-				} else if (comp == 0) {
-					sb.append(g);
-					sb.append("</br>");
-					sb.append(f.getDesc());
-				} else {
-					sb.append(f);
-					itg.previous();
-				}
-			}
-		}
-	}
 }

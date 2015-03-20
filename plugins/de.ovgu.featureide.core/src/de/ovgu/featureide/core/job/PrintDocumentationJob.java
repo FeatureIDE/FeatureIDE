@@ -24,7 +24,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
 
@@ -34,16 +33,11 @@ import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.core.signature.ProjectSignatures.SignatureIterator;
 import de.ovgu.featureide.core.signature.ProjectStructure;
 import de.ovgu.featureide.core.signature.base.AbstractClassFragment;
-import de.ovgu.featureide.core.signature.documentation.ContextMerger;
-import de.ovgu.featureide.core.signature.documentation.FeatureModuleMerger;
-import de.ovgu.featureide.core.signature.documentation.SPLMerger;
-import de.ovgu.featureide.core.signature.documentation.VariantMerger;
+import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.core.signature.documentation.base.ADocumentationCommentMerger;
-import de.ovgu.featureide.core.signature.filter.FOPContextFilter;
-import de.ovgu.featureide.core.signature.filter.FeatureFilter;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
+import de.ovgu.featureide.core.signature.documentation.base.ADocumentationCommentParser;
+import de.ovgu.featureide.core.signature.documentation.base.DocumentationBuilder;
+import de.ovgu.featureide.core.signature.filter.IFilter;
 import de.ovgu.featureide.fm.core.io.IOConstants;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
@@ -54,23 +48,28 @@ import de.ovgu.featureide.fm.core.job.util.JobArguments;
  * 
  * @author Sebastian Krieter
  */
-public abstract class APrintDocumentationJob extends AProjectJob<APrintDocumentationJob.Arguments> {
+public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arguments> {
 	
 	public static class Arguments extends JobArguments {
-		private final String foldername, featurename;
-		private final int mode; 
+		private final String foldername;
 		private final String[] options;
+
+		private final List<IFilter<AbstractSignature>> filters;
 		
-		public Arguments(String foldername, String featurename, int mode, String[] options) {
+		private final ADocumentationCommentParser parser;
+		private final ADocumentationCommentMerger merger;
+		
+		public Arguments(String foldername, String[] options, ADocumentationCommentParser parser, ADocumentationCommentMerger merger, List<IFilter<AbstractSignature>> filters) {
 			super(Arguments.class);
 			this.foldername = foldername;
-			this.featurename = featurename;
-			this.mode = mode;
 			this.options = options;
+			this.parser = parser;
+			this.merger = merger;
+			this.filters = filters;
 		}
 	}
 	
-	protected APrintDocumentationJob(Arguments arguments) {
+	protected PrintDocumentationJob(Arguments arguments) {
 		super("Build Documentation", arguments);
 	}
 
@@ -85,120 +84,121 @@ public abstract class APrintDocumentationJob extends AProjectJob<APrintDocumenta
 			return false;
 		}
 		
-		final ProjectSignatures projectSignatures = featureProject.getProjectSignatures();
-		if (projectSignatures == null) {
-			CorePlugin.getDefault().logWarning("No signatures available!");
-		}
+//		final ProjectSignatures projectSignatures = featureProject.getProjectSignatures();
+//		if (projectSignatures == null) {
+//			CorePlugin.getDefault().logWarning("No signatures available!");
+//		}
+//		
+//		final SignatureIterator it = projectSignatures.iterator();
+//		
+////		FeatureNames names = new FeatureNames(featureProject.getFeatureModel());		
+//		int[] featureIDs = new int[projectSignatures.getFeatureCount()];
+//		int i = 0;
+//		for (String string : projectSignatures.getFeatureModel().getFeatureOrderList()) {
+//			featureIDs[i++] = projectSignatures.getFeatureID(string);
+//		}
+//		final int index = (arguments.featurename == null) ? -1 : projectSignatures.getFeatureID(arguments.featurename);
 		
-		final SignatureIterator it = projectSignatures.iterator();
-		
-//		FeatureNames names = new FeatureNames(featureProject.getFeatureModel());		
-		int[] featureIDs = new int[projectSignatures.getFeatureCount()];
-		int i = 0;
-		for (String string : projectSignatures.getFeatureModel().getFeatureOrderList()) {
-			featureIDs[i++] = projectSignatures.getFeatureID(string);
-		}
-		int index = -1;
-		if (arguments.featurename != null) {
-			index = projectSignatures.getFeatureID(arguments.featurename);
-		}
-		
-		ADocumentationCommentMerger merger = null;
-		switch (arguments.mode) {
-		// ----------------------------------- SPL ---------------------------------------------
-		case 0: 
-			merger = new SPLMerger();
-			break;
-			
-		// -------------------------------- Variante ---------------------------------------------
-		case 1:
-			final Configuration conf = new Configuration(featureProject.getFeatureModel(),
-					Configuration.PARAM_LAZY | Configuration.PARAM_IGNOREABSTRACT);
-			try {
-				IFile file = featureProject.getCurrentConfiguration();
-				new ConfigurationReader(conf).readFromFile(file);
-			} catch (Exception e) {
-				CorePlugin.getDefault().logError(e);
-				return false;
-			}
-			final List<Feature> featureSet = conf.getSelectedFeatures();
-			
-			final int[] tempFeatureList = new int[featureSet.size()];
-			int count = 0;
-			for (Feature selctedFeature : featureSet) {
-				final int id = projectSignatures.getFeatureID(selctedFeature.getName());
-				if (id >= 0) {
-					tempFeatureList[count++] = id;
-				}
-			}
-			final int[] featureList = new int[count];
-			
-			// sort feature list
-			int c = 0;
-			for (int j = 0; j < featureIDs.length; j++) {
-				int curId = featureIDs[j];
-				for (int k = 0; k < count; k++) {
-					if (curId == tempFeatureList[k]) {
-						featureList[c++] = curId;
-						break;
-					}
-				}
-			}
-			
-			it.addFilter(new FeatureFilter(featureList));
-			System.out.println();
-			merger = new VariantMerger(featureIDs.length, featureList);
-			break;
+//		ADocumentationCommentMerger merger = null;
+//		switch (arguments.mode) {
+//		// ----------------------------------- SPL ---------------------------------------------
+//		case 0: 
+//			merger = new SPLMerger();
+//			break;
 //			
-//		// --------------------------------- Context ---------------------------------------------
-		case 2:
-			if (index > -1) {
-				it.addFilter(new FOPContextFilter(arguments.featurename, projectSignatures));
-				merger = new ContextMerger(featureIDs.length, featureIDs);
-			}
-			break;
+//		// -------------------------------- Variante ---------------------------------------------
+//		case 1:
+//			final Configuration conf = new Configuration(featureProject.getFeatureModel(),
+//					Configuration.PARAM_LAZY | Configuration.PARAM_IGNOREABSTRACT);
+//			try {
+//				IFile file = featureProject.getCurrentConfiguration();
+//				new ConfigurationReader(conf).readFromFile(file);
+//			} catch (Exception e) {
+//				CorePlugin.getDefault().logError(e);
+//				return false;
+//			}
+//			final List<Feature> featureSet = conf.getSelectedFeatures();
 //			
-//		// ------------------------------- Featuremodul ------------------------------------------
-		case 3:
-			if (index > -1) {
-//				int[] shortFeatureIDs = null;
-//				for (int j = 0; j < featureIDs.length; j++) {
-//					if (index == featureIDs[j]) {
-//						shortFeatureIDs = new int[j + 1];
-//						System.arraycopy(featureIDs, 0, shortFeatureIDs, 0, j + 1);
+//			final int[] tempFeatureList = new int[featureSet.size()];
+//			int count = 0;
+//			for (Feature selctedFeature : featureSet) {
+//				final int id = projectSignatures.getFeatureID(selctedFeature.getName());
+//				if (id >= 0) {
+//					tempFeatureList[count++] = id;
+//				}
+//			}
+//			final int[] featureList = new int[count];
+//			
+//			// sort feature list
+//			int c = 0;
+//			for (int j = 0; j < featureIDs.length; j++) {
+//				int curId = featureIDs[j];
+//				for (int k = 0; k < count; k++) {
+//					if (curId == tempFeatureList[k]) {
+//						featureList[c++] = curId;
 //						break;
 //					}
 //				}
-//				if (shortFeatureIDs == null) {
-//					//warning?
-//					return false;
-//				}
-				
-//				it.addFilter(new ContextFilter(arguments.featurename, interfaceProject));
-//				it.addFilter(new FeatureFilter(shortFeatureIDs));
-				it.addFilter(new FeatureFilter(new int[]{index}));
-				merger = new FeatureModuleMerger(featureIDs.length, index);
-			}
-			break;
-			
-		default:
-			return false;
-		}
-		
-		if (merger == null) {
-			return false;
-		}
-		
-//		while (it.hasNext()) {
-//			merger.setSig(it.next());
-//			merger.mergeComments();
+//			}
+//			
+//			it.addFilter(new FeatureFilter(featureList));
+//			
+//			merger = new VariantMerger(featureIDs.length, featureList);
+//			break;
+//			
+////		// --------------------------------- Context ---------------------------------------------
+//		case 2:
+//			if (index > -1) {
+//				it.addFilter(new FOPContextFilter(arguments.featurename, projectSignatures));
+//				merger = new ContextMerger(featureIDs.length, featureIDs);
+//			}
+//			break;
+//			
+////		// ------------------------------- Featuremodul ------------------------------------------
+//		case 3:
+//			if (index > -1) {
+////				int[] shortFeatureIDs = null;
+////				for (int j = 0; j < featureIDs.length; j++) {
+////					if (index == featureIDs[j]) {
+////						shortFeatureIDs = new int[j + 1];
+////						System.arraycopy(featureIDs, 0, shortFeatureIDs, 0, j + 1);
+////						break;
+////					}
+////				}
+////				if (shortFeatureIDs == null) {
+////					//warning?
+////					return false;
+////				}
+//				
+////				it.addFilter(new ContextFilter(arguments.featurename, interfaceProject));
+////				it.addFilter(new FeatureFilter(shortFeatureIDs));
+//				it.addFilter(new FeatureFilter(new int[]{index}));
+//				merger = new FeatureModuleMerger(featureIDs.length, index);
+//			}
+//			break;
+//			
+//		default:
+//			return false;
 //		}
-//		it.reset();
-
-		buildJavaDoc(it);
+//		
+//		if (merger == null) {
+//			return false;
+//		}
+		
+		final ProjectSignatures projectSignatures = featureProject.getProjectSignatures();
+		if (projectSignatures == null) {
+			CorePlugin.getDefault().logWarning("No signatures available!");
+			return false;
+		}
+		
+		DocumentationBuilder builder = new DocumentationBuilder(featureProject, arguments.parser);
+		builder.build(arguments.merger, arguments.filters);
+		
+		buildJavaDoc(projectSignatures.iterator(arguments.filters));
+		
 		return true;
 	}
-	
+
 	protected String folderPath = null;
 	
 	private boolean deleteOldFolder() {
@@ -288,7 +288,7 @@ public abstract class APrintDocumentationJob extends AProjectJob<APrintDocumenta
 			System.out.println(javadocargs[j]);
 		}
 		
-//		com.sun.tools.javadoc.Main.execute(javadocargs);
+		com.sun.tools.javadoc.Main.execute(javadocargs);
 		workMonitor.worked();
 		
 		try {

@@ -21,6 +21,7 @@ Export-Package:
  de.ovgu.featureide.core.featuremodeling,
  de.ovgu.featureide.core.fstmodel,
  de.ovgu.featureide.core.fstmodel.preprocessor,
+ de.ovgu.featureide.core.job,
  de.ovgu.featureide.core.listeners,
  de.ovgu.featureide.core.propertypage,
  de.ovgu.featureide.core.signature,
@@ -31,7 +32,8 @@ Export-Package:
  de.ovgu.featureide.core.signature.filter,
  de.ovgu.featureide.core.signature.java,
  de.ovgu.featureide.core.wizardextension
-Bundle-ClassPath: .
+Bundle-ClassPath: lib/tools.jar,
+ .
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: University of Magdeburg

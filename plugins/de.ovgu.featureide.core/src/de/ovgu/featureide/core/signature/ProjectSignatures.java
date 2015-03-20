@@ -142,11 +142,10 @@ public class ProjectSignatures implements Iterable<AbstractSignature> {
 		return new SignatureIterator(signatureArray);
 	}
 	
-	@SuppressWarnings("unchecked")
-	public SignatureIterator iterator(IFilter<AbstractSignature>... filter) {
+	public SignatureIterator iterator(Collection<IFilter<AbstractSignature>> filters) {
 		final SignatureIterator it = new SignatureIterator(signatureArray);
-		for (IFilter<AbstractSignature> iFilter : filter) {
-			it.addFilter(iFilter);
+		for (IFilter<AbstractSignature> filter : filters) {
+			it.addFilter(filter);
 		}
 		return it;
 	}
@@ -157,11 +156,20 @@ public class ProjectSignatures implements Iterable<AbstractSignature> {
 	
 	public int[] getFeatureIDs(Collection<String> featureNames) {
 		int[] ids = new int[featureNames.size()];
-		int i = -1;
+		int i = 0;
 		for (String featureName : featureNames) {
-			ids[++i] = getFeatureID(featureName);
+			ids[i++] = getFeatureID(featureName);
 		}
 		return ids;
+	}
+	
+	public int[] getFeatureIDs() {
+		int[] featureIDs = new int[featureNames.length];
+		int i = 0;
+		for (String string : featureModel.getFeatureOrderList()) {
+			featureIDs[i++] = getFeatureID(string);
+		}
+		return featureIDs;
 	}
 	
 	public int getFeatureID(String featureName) {

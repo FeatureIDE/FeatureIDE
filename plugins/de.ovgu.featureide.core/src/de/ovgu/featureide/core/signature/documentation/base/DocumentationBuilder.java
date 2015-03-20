@@ -23,6 +23,8 @@ package de.ovgu.featureide.core.signature.documentation.base;
 import java.util.List;
 
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.fstmodel.FSTModel;
+import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.core.signature.filter.IFilter;
 
@@ -31,34 +33,29 @@ import de.ovgu.featureide.core.signature.filter.IFilter;
  * 
  * @author Sebastian Krieter
  */
-public abstract class ADocumentationBuilder {
-	
-	private final IFeatureProject featureProject;
-	
-	public ADocumentationBuilder(IFeatureProject featureProject) {
-		this.featureProject = featureProject;
-	}
-	
-	public final void build(ADocumentationCommentMerger merger, List<IFilter<AbstractSignature>> filters) {
-		final List<SignatureCommentPair> list = getCollector(featureProject).collect(filters);
+public class DocumentationBuilder {
 
-		final ADocumentationCommentParser parser = getParser();
-		
-		for (SignatureCommentPair pair : list) {
-			// parse
-			parser.parse(pair.getComment());
-			
-			// merge
-			merger.sortFeatureList(parser.getFeatureTags());
-			final List<BlockTag> featureTags = merger.mergeList(parser.getFeatureTags());
-			final List<BlockTag> generalTags = merger.mergeList(parser.getGeneralTags());
-			
-			setComment(pair.getSignature(), merger.mergeLists(generalTags, featureTags));
+	private final ADocumentationCommentParser parser;
+	private final IFeatureProject featureProject;
+
+	public DocumentationBuilder(IFeatureProject featureProject, ADocumentationCommentParser parser) {
+		this.featureProject = featureProject;
+		this.parser = parser;
+	}
+
+	public final void build(ADocumentationCommentMerger merger, List<IFilter<AbstractSignature>> filters) {
+		final FSTModel fstModel = featureProject.getFSTModel();
+		if (fstModel != null) {
+			final ProjectSignatures projectSignatures = fstModel.getProjectSignatures();
+			if (projectSignatures != null) {
+				for (SignatureCommentPair pair : DocumentationCommentCollector.collect(projectSignatures, filters)) {
+					// parse
+					parser.parse(projectSignatures, pair.getComment());
+					// merge
+					pair.getSignature().setMergedjavaDocComment(merger.merge(parser.getGeneralTags(), parser.getFeatureTags()));
+				}
+			}
 		}
 	}
 
-	protected abstract ADocumentationCommentCollector getCollector(IFeatureProject featureProject);
-	protected abstract ADocumentationCommentParser getParser();
-	
-	protected abstract void setComment(AbstractSignature signature, String comment);
 }

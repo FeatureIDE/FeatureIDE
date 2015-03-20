@@ -26,6 +26,10 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.prop4j.Literal;
+import org.prop4j.Node;
+
+import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.core.signature.documentation.base.SignatureCommentPair.Comment;
 
 /**
@@ -34,92 +38,104 @@ import de.ovgu.featureide.core.signature.documentation.base.SignatureCommentPair
  * @author Sebastian Krieter
  */
 public abstract class ADocumentationCommentParser {
-	
+
 	static final String COMMENT_START = "/**", COMMENT_END = "*/";
-	private static final Pattern 
-		pBlockTag = Pattern.compile("[^{]\\s*@\\w+\\s"),
-		pCommentType = Pattern.compile("\\A\\s*[{]\\s*@[a-z]+\\s*\\d*\\s*[}]"),
-		pStar = Pattern.compile("\n\\s*[*]");
-	
-	protected int curFeatureID, tagFeatureID, curPriority;
-	
-	protected final List<BlockTag>
-		generalTags = new ArrayList<BlockTag>(),
-		featureTags = new LinkedList<BlockTag>();
-	
-	protected BlockTag handleCommentPart(BlockTag tag) {
-		return tag;
-	}
-	
-	public void parse(List<Comment> comments) {
+
+	private static final Pattern pBlockTag = Pattern.compile("[^{]\\s*@\\w+\\s"), pCommentType = Pattern.compile("\\A\\s*[{]\\s*@[a-z]+\\s*\\d*\\s*[}]"),
+			pStar = Pattern.compile("\n\\s*[*]");
+
+	protected final List<BlockTag> generalTags = new ArrayList<BlockTag>(), featureTags = new LinkedList<BlockTag>();
+
+	protected int curFeatureID, tagPriority;
+	protected Node tagFeatureNode;
+
+	private BlockTagConstructor tagConstructor;
+
+	public final void parse(ProjectSignatures projectSignatures, List<Comment> comments) {
+		tagConstructor = new BlockTagConstructor(projectSignatures);
+		generalTags.clear();
+		featureTags.clear();
+		
 		for (Comment comment : comments) {
 			final String commentString = comment.getComment();
 			curFeatureID = comment.getFeatureID();
-			
+
 			int startIndex = 0;
 			int endIndex = commentString.indexOf(COMMENT_END);
-			
+
 			while (endIndex > -1) {
 				parseTags(commentString.substring(startIndex + COMMENT_START.length(), endIndex));
 				startIndex = commentString.indexOf(COMMENT_START, endIndex + COMMENT_END.length());
 				endIndex = commentString.indexOf(COMMENT_END, endIndex + COMMENT_END.length());
 			}
-		}					
+		}
 	}
 	
-	protected abstract void parseHead(String[] parts);
+	protected final Node getCurFeatureNode() {
+		return new Literal(tagConstructor.getProjectSignatures().getFeatureName(curFeatureID));
+	}
 	
+	protected final Node getCurFeatureNode(int featureID) {
+		return new Literal(tagConstructor.getProjectSignatures().getFeatureName(featureID));
+	}
+
+	protected abstract void parseHead(String[] parts);
+
+	protected BlockTag handleCommentPart(BlockTag tag) {
+		return tag;
+	}
+
 	private void parseTags(String comment) {
 		Matcher mc = pCommentType.matcher(comment);
 		if (mc.find()) {
 			parseHead(comment.substring(comment.indexOf('@') + 1, mc.end() - 1).split("\\s+"));
 			comment = comment.substring(mc.end());
 		} else {
-			tagFeatureID = -1;
-			curPriority = 0;
+			tagFeatureNode = null;
+			tagPriority = 0;
 		}
 
 		addBlockTagToList(comment);
 	}
 
 	private void addBlockTagToList(String comment) {
-		final List<BlockTag> tagList = (tagFeatureID > -1) ? featureTags : generalTags;
-		
+		final List<BlockTag> tagList = (tagFeatureNode != null) ? featureTags : generalTags;
+
 		comment = pStar.matcher(comment).replaceAll("\n");
 		Matcher m = pBlockTag.matcher(comment);
-		
+
 		int x, y, z;
 		if (m.find()) {
 			x = m.start();
 			z = m.end();
-			
-			tagList.add(categorize("", comment.substring(1, x + 1).trim()));
-			
+
+			categorize(tagList, "", comment.substring(1, x + 1).trim());
+
 			while (m.find()) {
 				y = m.start();
-				tagList.add(categorize(comment.substring(x + 1, z - 1).trim(), comment.substring(z, y + 1).trim()));
+				categorize(tagList, comment.substring(x + 1, z - 1).trim(), comment.substring(z, y + 1).trim());
 				x = y;
 				z = m.end();
 			}
-			tagList.add(categorize(comment.substring(x + 1, z - 1).trim(), comment.substring(z).trim()));
+			categorize(tagList, comment.substring(x + 1, z - 1).trim(), comment.substring(z).trim());
 		} else {
-			tagList.add(categorize("", comment.trim()));
+			categorize(tagList, "", comment.trim());
 		}
 	}
-	
-	private BlockTag categorize(String head, String body) {
-		final BlockTag tag = BlockTag.construct(head, body);
-		tag.setPriority(curPriority);
-		tag.setFeatureID(tagFeatureID);
-		return tag;
+
+	private void categorize(List<BlockTag> tagList, String head, String body) {
+		final BlockTag tag = tagConstructor.construct(head, body, tagPriority, tagFeatureNode);
+		if (tag != null) {
+			tagList.add(tag);
+		}
 	}
-	
-	public List<BlockTag> getGeneralTags() {
+
+	public final List<BlockTag> getGeneralTags() {
 		return generalTags;
 	}
-	
-	public List<BlockTag> getFeatureTags() {
+
+	public final List<BlockTag> getFeatureTags() {
 		return featureTags;
 	}
-	
+
 }

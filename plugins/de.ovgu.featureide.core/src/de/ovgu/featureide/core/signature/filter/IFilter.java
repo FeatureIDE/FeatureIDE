@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.core.signature.filter;
 
-
 public interface IFilter<T> {
-	public boolean isValid(T signature);
+	boolean isValid(T object);
 }

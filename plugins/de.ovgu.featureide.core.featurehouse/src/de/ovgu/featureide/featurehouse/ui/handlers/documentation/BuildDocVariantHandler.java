@@ -41,10 +41,10 @@ public class BuildDocVariantHandler extends AProjectJobHandler {
 	
 	@Override
 	protected void endAction() {
-		FeatureHouseCorePlugin.getDefault().buildDocumentation(projects, 
-				(String) wizard.getData(WizardConstants.KEY_OUT_FOLDER), 
-				(String) wizard.getData(WizardConstants.KEY_OUT_DOCOPTIONS),
-				1);
+//		FeatureHouseCorePlugin.getDefault().buildDocumentation(projects, 
+//				(String) wizard.getData(WizardConstants.KEY_OUT_FOLDER), 
+//				(String) wizard.getData(WizardConstants.KEY_OUT_DOCOPTIONS),
+//				1);
 	}
 	
 }

@@ -35,26 +35,26 @@ import de.ovgu.featureide.core.signature.base.FOPFeatureData;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
 public class FOPContextFilter implements IFilter<AbstractSignature> {
-	
+
 	private final ProjectSignatures projectSignatures;
 	private final Node fmNode;
 	private final boolean[] selcetedFeatures;
 	private SatSolver solver;
-	
+
 	public FOPContextFilter(String featureName, ProjectSignatures projectSignatures) {
-		this(new Node[] {new Literal(featureName, true)}, projectSignatures);
+		this(new Node[] { new Literal(featureName, true) }, projectSignatures);
 	}
-	
+
 	public FOPContextFilter(Node[] constraints, ProjectSignatures projectSignatures) {
 		this.projectSignatures = projectSignatures;
 		fmNode = NodeCreator.createNodes(projectSignatures.getFeatureModel());
 		selcetedFeatures = new boolean[projectSignatures.getFeatureModel().getNumberOfFeatures()];
-		
+
 		init(constraints);
 	}
-	
+
 	public void init(String featureName) {
-		init(new Node[] {new Literal(featureName, true)});
+		init(new Node[] { new Literal(featureName, true) });
 	}
 
 	public void init(Node[] constraints) {
@@ -62,9 +62,9 @@ public class FOPContextFilter implements IFilter<AbstractSignature> {
 		fixClauses[0] = fmNode;
 		System.arraycopy(constraints, 0, fixClauses, 1, constraints.length);
 		Arrays.fill(selcetedFeatures, false);
-		
+
 		solver = new SatSolver(new And(fixClauses), 2000);
-		
+
 		for (Literal literal : solver.knownValues()) {
 			if (literal.positive) {
 				int id = projectSignatures.getFeatureID(literal.var.toString());
@@ -74,7 +74,7 @@ public class FOPContextFilter implements IFilter<AbstractSignature> {
 			}
 		}
 	}
-	
+
 	@Override
 	public boolean isValid(AbstractSignature signature) {
 		FOPFeatureData[] ids = (FOPFeatureData[]) signature.getFeatureData();
@@ -83,7 +83,7 @@ public class FOPContextFilter implements IFilter<AbstractSignature> {
 			int id = ids[i].getId();
 			if (selcetedFeatures[id]) {
 				return true;
-			} 
+			}
 			negativeLiterals[i] = new Literal(projectSignatures.getFeatureName(id), false);
 		}
 		try {

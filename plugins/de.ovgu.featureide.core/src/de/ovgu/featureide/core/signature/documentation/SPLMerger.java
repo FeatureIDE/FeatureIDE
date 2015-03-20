@@ -20,11 +20,9 @@
  */
 package de.ovgu.featureide.core.signature.documentation;
 
-import java.util.List;
-import java.util.ListIterator;
-
 import de.ovgu.featureide.core.signature.documentation.base.ADocumentationCommentMerger;
 import de.ovgu.featureide.core.signature.documentation.base.BlockTag;
+import de.ovgu.featureide.core.signature.filter.IFilter;
 
 /**
  * Modul-Comment merger for SPLs.
@@ -33,81 +31,22 @@ import de.ovgu.featureide.core.signature.documentation.base.BlockTag;
  */
 public class SPLMerger extends ADocumentationCommentMerger {
 
-	@Override
-	protected int getRuleForCommentPart(BlockTag tag) {
-		switch(tag.getTagtype()){
-		case BlockTag.TAG_UNKNOWN:
-			return RULE_OVERRIDE;
-		case BlockTag.TAG_DESCRIPTION:
-			return RULE_MERGE;
-		case BlockTag.TAG_AUTHOR:
-			return RULE_OVERRIDE;
-		case BlockTag.TAG_VERSION: 
-			return RULE_OVERRIDE;
-		case BlockTag.TAG_PARAM:
-			return RULE_MERGE;
-		case BlockTag.TAG_RETURN:
-			return RULE_MERGE;
-		case BlockTag.TAG_THROWS: 
-			return RULE_MERGE;
-		case BlockTag.TAG_SEE: 
-			return RULE_OVERRIDE;
-		case BlockTag.TAG_SINCE: 
-			return RULE_OVERRIDE;
-		case BlockTag.TAG_DEPRECATED: 
-			return RULE_OVERRIDE;
-		default:
-			return RULE_OVERRIDE;
-		}
-	}
-
-	@Override
-	protected void buildFinalComment(StringBuilder sb, List<BlockTag> generalTags, List<BlockTag> featureTags) {
-		ListIterator<BlockTag> itg = generalTags.listIterator();
-		ListIterator<BlockTag> itf = featureTags.listIterator();
-		while(itg.hasNext() || itf.hasNext()) {
-			sb.append(LINE_SEPARATOR);
-			
-			if (!itg.hasNext()) {
-				BlockTag f = itf.next();
-				if (f.getPriority() > 0) {
-					sb.append(f);
-				}
-			} else if (!itf.hasNext()) {
-				sb.append(itg.next());
-			} else {
-				BlockTag g = itg.next();
-				BlockTag f = itf.next();
-				if (f.getPriority() == 0) {
-					sb.append(g);
-				} else {
-					int comp = g.compareTo(f);
-					if (comp < 0) {
-						sb.append(g);
-						itf.previous();
-					} else if (comp == 0) {
-						sb.append(g);
-						sb.append("</br>");
-						sb.append(f.getDesc());
-					} else {
-						sb.append(f);
-						itg.previous();
-					}
-				}
+	public SPLMerger() {
+		super();
+		addFilter(new IFilter<BlockTag>() {
+			@Override
+			public boolean isValid(BlockTag blockTag) {
+				return blockTag.isFeatureIndependent(); // || blockTag.getPriority() > 0; // ???
 			}
-		}
+		});
 	}
 
 	@Override
 	protected BlockTag adaptBlockTag(BlockTag tag) {
-		if (tag.isFeatureIndependent()) {
-			return tag;
-		} else {
-			return null;
+		if (tag.isFeatureSpecific() && tag.getTagtype() != BlockTag.TAG_SEE) {
+			tag.setDesc("<b>[" + tag.getFeatureNode() + "]</b> " + tag.getDesc());
 		}
-//		if (tempInfoType == 1 && tag != null && tag.getTagtype() != BlockTag.TAG_SEE) {
-//			tag.setDesc("<b>[" + interfaceProject.getFeatureName(tempFeatureID) + "]</b> " + tag.getDesc());
-//		}
-//		return tag;
+		return tag;
 	}
+
 }

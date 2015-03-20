@@ -20,15 +20,10 @@
  */
 package de.ovgu.featureide.featurehouse;
 
-import java.util.LinkedList;
-
-import org.eclipse.core.resources.IProject;
 import org.osgi.framework.BundleContext;
 
 import de.ovgu.featureide.core.CorePlugin;
-import de.ovgu.featureide.featurehouse.job.PrintDocumentationJob;
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
-import de.ovgu.featureide.fm.core.FMCorePlugin;
 
 /**
  * The activator class controls the plug-in life cycle.
@@ -40,14 +35,12 @@ public class FeatureHouseCorePlugin extends AbstractCorePlugin {
 
 	public static final String PLUGIN_ID = "de.ovgu.featureide.core.featurehouse";
 
-	public static final String CONTRACT_MARKER = CorePlugin.PLUGIN_ID
-			+ ".contractMarker";
-	
-	public static final String BUILDER_PROBLEM_MARKER = CorePlugin.PLUGIN_ID
-			+ ".builderProblemMarker";
-	
+	public static final String CONTRACT_MARKER = CorePlugin.PLUGIN_ID + ".contractMarker";
+
+	public static final String BUILDER_PROBLEM_MARKER = CorePlugin.PLUGIN_ID + ".builderProblemMarker";
+
 	private static FeatureHouseCorePlugin plugin;
-	
+
 	@Override
 	public String getID() {
 		return PLUGIN_ID;
@@ -73,16 +66,6 @@ public class FeatureHouseCorePlugin extends AbstractCorePlugin {
 
 	public static FeatureHouseCorePlugin getDefault() {
 		return plugin;
-	}
-	
-	public void buildDocumentation(LinkedList<IProject> projects, String folder, String options, int mode) {
-		FMCorePlugin.getDefault().startJobs(projects, 
-				new PrintDocumentationJob.Arguments(folder, null, mode, options.split("\\s+")), true);
-	}
-	
-	public void buildDocumentation(LinkedList<IProject> projects, String folder, String options, int mode, String featurename) {
-		FMCorePlugin.getDefault().startJobs(projects, 
-				new PrintDocumentationJob.Arguments(folder, featurename, mode, options.split("\\s+")), true);
 	}
 
 }

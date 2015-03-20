@@ -25,7 +25,12 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
+
+import de.ovgu.featureide.core.signature.filter.Filter;
+import de.ovgu.featureide.core.signature.filter.IFilter;
 
 /**
  * Abstract merger for modul-comment.
@@ -33,14 +38,20 @@ import java.util.List;
  * @author Sebastian Krieter
  */
 public abstract class ADocumentationCommentMerger implements Comparator<BlockTag> {
-	protected final int[] featureIDRanks;
 
 	protected static final String LINE_SEPARATOR = System.getProperty("line.separator");
-	protected static final int 
+	protected static final int
 		RULE_MERGE = 0,
 		RULE_OVERRIDE = 1,
 		RULE_DISCARD = 2;
-	
+
+	protected final int[] featureIDRanks;
+	private final List<IFilter<BlockTag>> filterList = new LinkedList<>();
+
+	public ADocumentationCommentMerger() {
+		featureIDRanks = null;
+	}
+
 	public ADocumentationCommentMerger(int numberOfFeatures, int[] validFeatureIDs) {
 		featureIDRanks = new int[numberOfFeatures];
 		for (int i = 0; i < featureIDRanks.length; i++) {
@@ -53,17 +64,17 @@ public abstract class ADocumentationCommentMerger implements Comparator<BlockTag
 			}
 		}
 	}
-	
-	public ADocumentationCommentMerger() {
-		featureIDRanks = null;
-	}
 
-	protected abstract void buildFinalComment(StringBuilder sb, List<BlockTag> generalTags, List<BlockTag> featureTags);
+	public String merge(List<BlockTag> generalTags, List<BlockTag> featureTags) {
+		Filter.filter(generalTags, filterList);
+		Filter.filter(featureTags, filterList);
+		
+		sortFeatureList(featureTags);
+		
+		featureTags = mergeList(featureTags);
+		generalTags = mergeList(generalTags);
 
-	protected abstract int getRuleForCommentPart(BlockTag tag);
-	
-	protected BlockTag adaptBlockTag(BlockTag tag) {
-		return tag;
+		return mergeLists(generalTags, featureTags);
 	}
 
 	public String mergeLists(List<BlockTag> generalTags, List<BlockTag> featureTags) {
@@ -72,21 +83,47 @@ public abstract class ADocumentationCommentMerger implements Comparator<BlockTag
 		} else {
 			Collections.sort(generalTags);
 			Collections.sort(featureTags);
-			
+
 			final StringBuilder sb = new StringBuilder();
 			sb.append(ADocumentationCommentParser.COMMENT_START);
-			
-			buildFinalComment(sb, generalTags, featureTags);
+
+			final ListIterator<BlockTag> itg = generalTags.listIterator();
+			final ListIterator<BlockTag> itf = featureTags.listIterator();
+
+			while (itg.hasNext() || itf.hasNext()) {
+				sb.append(LINE_SEPARATOR);
+
+				if (!itg.hasNext()) {
+					sb.append(itf.next());
+				} else if (!itf.hasNext()) {
+					sb.append(itg.next());
+				} else {
+					final BlockTag g = itg.next();
+					final BlockTag f = itf.next();
+					final int comp = g.compareTo(f);
+					if (comp < 0) {
+						sb.append(g);
+						itf.previous();
+					} else if (comp == 0) {
+						sb.append(g);
+						sb.append("</br>");
+						sb.append(f.getDesc());
+					} else {
+						sb.append(f);
+						itg.previous();
+					}
+				}
+			}
 
 			sb.append(LINE_SEPARATOR);
 			sb.append(' ');
 			sb.append(ADocumentationCommentParser.COMMENT_END);
 			sb.append(LINE_SEPARATOR);
-			
+
 			return sb.toString();
 		}
 	}
-	
+
 	public void sortFeatureList(List<BlockTag> tagList) {
 		if (featureIDRanks != null) {
 			for (Iterator<BlockTag> it = tagList.iterator(); it.hasNext();) {
@@ -98,10 +135,10 @@ public abstract class ADocumentationCommentMerger implements Comparator<BlockTag
 			Collections.sort(tagList, this);
 		}
 	}
-	
+
 	public List<BlockTag> mergeList(List<BlockTag> tagList) {
 		final HashMap<BlockTag, BlockTag> tagSet = new HashMap<>();
-		
+
 		for (BlockTag newTag : tagList) {
 			newTag = adaptBlockTag(newTag);
 			if (newTag != null) {
@@ -121,7 +158,7 @@ public abstract class ADocumentationCommentMerger implements Comparator<BlockTag
 								oldTag.setDesc(newTag.getDesc());
 							}
 							break;
-						case RULE_OVERRIDE: 
+						case RULE_OVERRIDE:
 							tagSet.put(newTag, newTag);
 							break;
 						}
@@ -131,10 +168,45 @@ public abstract class ADocumentationCommentMerger implements Comparator<BlockTag
 		}
 		return new ArrayList<BlockTag>(tagSet.values());
 	}
-	
+
+	protected BlockTag adaptBlockTag(BlockTag tag) {
+		return tag;
+	}
+
+	protected int getRuleForCommentPart(BlockTag tag) {
+		switch (tag.getTagtype()) {
+		case BlockTag.TAG_UNKNOWN:
+			return RULE_OVERRIDE;
+		case BlockTag.TAG_DESCRIPTION:
+			return RULE_MERGE;
+		case BlockTag.TAG_AUTHOR:
+			return RULE_OVERRIDE;
+		case BlockTag.TAG_VERSION:
+			return RULE_OVERRIDE;
+		case BlockTag.TAG_PARAM:
+			return RULE_MERGE;
+		case BlockTag.TAG_RETURN:
+			return RULE_MERGE;
+		case BlockTag.TAG_THROWS:
+			return RULE_MERGE;
+		case BlockTag.TAG_SEE:
+			return RULE_OVERRIDE;
+		case BlockTag.TAG_SINCE:
+			return RULE_OVERRIDE;
+		case BlockTag.TAG_DEPRECATED:
+			return RULE_OVERRIDE;
+		default:
+			return RULE_OVERRIDE;
+		}
+	}
+
 	@Override
 	public int compare(BlockTag tag1, BlockTag tag2) {
 		return featureIDRanks[tag1.getFeatureID()] - featureIDRanks[tag2.getFeatureID()];
 	}
-	
+
+	public void addFilter(IFilter<BlockTag> filter) {
+		this.filterList.add(filter);
+	}
+
 }

@@ -29,4 +29,5 @@ public class FieldFilter implements IFilter<AbstractSignature> {
 	public boolean isValid(AbstractSignature signature) {
 		return signature instanceof AbstractFieldSignature;
 	}
+
 }

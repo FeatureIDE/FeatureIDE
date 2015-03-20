@@ -20,16 +20,89 @@
  */
 package de.ovgu.featureide.munge.ui.handlers;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+
+import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.munge.documentation.DocumentationBuilder;
+import de.ovgu.featureide.core.job.PrintDocumentationJob;
+import de.ovgu.featureide.core.signature.ProjectSignatures;
+import de.ovgu.featureide.core.signature.base.AbstractSignature;
+import de.ovgu.featureide.core.signature.documentation.VariantMerger;
+import de.ovgu.featureide.core.signature.documentation.base.ADocumentationCommentMerger;
+import de.ovgu.featureide.core.signature.documentation.base.ADocumentationCommentParser;
+import de.ovgu.featureide.core.signature.filter.FeatureFilter;
+import de.ovgu.featureide.core.signature.filter.IFilter;
+import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
+import de.ovgu.featureide.munge.MungeCorePlugin;
+import de.ovgu.featureide.munge.documentation.DocumentationCommentParser;
 import de.ovgu.featureide.ui.handlers.base.AFeatureProjectHandler;
 
 public class DocumentationHandler extends AFeatureProjectHandler {
 	
 	@Override
-	protected void singleAction(IFeatureProject project) {
-		DocumentationBuilder b = new DocumentationBuilder(project);
-		b.build(null, null);
+	protected void singleAction(IFeatureProject featureProject) {
+		final ADocumentationCommentParser parser = new DocumentationCommentParser();
+		final List<IFilter<AbstractSignature>> filters = new LinkedList<>();
+		
+		final ProjectSignatures projectSignatures = featureProject.getProjectSignatures();
+		if (projectSignatures == null) {
+			CorePlugin.getDefault().logWarning("No signatures available!");
+			return;
+		}
+			
+		int[] featureIDs = projectSignatures.getFeatureIDs();
+		
+		final Configuration conf = new Configuration(featureProject.getFeatureModel(),
+		Configuration.PARAM_LAZY | Configuration.PARAM_IGNOREABSTRACT);
+		try {
+			IFile file = featureProject.getCurrentConfiguration();
+			new ConfigurationReader(conf).readFromFile(file);
+		} catch (Exception e) {
+			MungeCorePlugin.getDefault().logError(e);
+			return;
+		}
+		final List<Feature> featureSet = conf.getSelectedFeatures();
+		
+		final int[] tempFeatureList = new int[featureSet.size()];
+		int count = 0;
+		for (Feature selctedFeature : featureSet) {
+			final int id = projectSignatures.getFeatureID(selctedFeature.getName());
+			if (id >= 0) {
+				tempFeatureList[count++] = id;
+			}
+		}
+		final int[] featureList = new int[count];
+		
+		// sort feature list
+		int c = 0;
+		for (int j = 0; j < featureIDs.length; j++) {
+			int curId = featureIDs[j];
+			for (int k = 0; k < count; k++) {
+				if (curId == tempFeatureList[k]) {
+					featureList[c++] = curId;
+					break;
+				}
+			}
+		}
+		
+		filters.add(new FeatureFilter(featureList));
+		
+		final ADocumentationCommentMerger merger = new VariantMerger(featureIDs.length, featureList);
+		
+		final PrintDocumentationJob.Arguments args =
+				new PrintDocumentationJob.Arguments("doc", new String[0], parser, merger, filters);
+		
+		List<IProject> pl = new LinkedList<>();
+		pl.add(featureProject.getProject());
+		
+		FMCorePlugin.getDefault().startJobs(pl, args, true);
 	}
 	
 }
