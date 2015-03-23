@@ -24,6 +24,8 @@ import static org.junit.Assert.assertSame;
 
 import org.junit.Test;
 
+import de.ovgu.jcorridore.annotations.Record;
+
 /**
  * Tests for the {@link FeatureModel}.
  * 
@@ -31,6 +33,7 @@ import org.junit.Test;
  */
 public class TFeatureModel {
 
+	@Record(samples = 10)
 	@Test
     public void testGetFeatureName(){
         FeatureModel fm = new FeatureModel();
