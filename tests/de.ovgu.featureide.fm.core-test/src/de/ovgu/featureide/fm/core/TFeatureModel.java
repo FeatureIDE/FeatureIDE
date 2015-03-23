@@ -60,8 +60,8 @@ public class TFeatureModel {
 	
 	@Test
     public void testGetFeatureName() {
-		List<String> failedMethods = new JCorridore(Commons.getFile("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/recordtest/", "recordtest").getAbsolutePath(),  
-				"stored_performances.db").run(TFeatureModel.class);
+		List<String> failedMethods = new JCorridore(Commons.getFile("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/benchmarkFeatureModels/", "benchmarkFeatureModels").getAbsolutePath(),  
+				"recordings.csv").run(TFeatureModel.class);
 		Assert.assertEquals(Commons.join("\n", failedMethods), 0, failedMethods.size());
 	}
 }
