@@ -24,9 +24,12 @@ import static org.junit.Assert.assertSame;
 
 import java.util.List;
 
+import org.junit.Assert;
 import org.junit.Test;
 
+import de.ovgu.featureide.common.Commons;
 import de.ovgu.jcorridore.JCorridore;
+import de.ovgu.jcorridore.annotations.Constraint;
 import de.ovgu.jcorridore.annotations.Record;
 
 /**
@@ -37,6 +40,7 @@ import de.ovgu.jcorridore.annotations.Record;
 public class TFeatureModel {
 
 	@Record(samples = 10)
+	@Constraint(samples = 10, allowedMedianDeviation = 10)
     public void recordGetFeatureName(){
         FeatureModel fm = new FeatureModel();
         Feature feature = new Feature(fm, "test_root");
@@ -44,7 +48,7 @@ public class TFeatureModel {
         fm.setRoot(feature);
         Feature root = fm.getFeature("test_root");
         assertSame(root, fm.getRoot());
-
+        
         FeatureModel clonedModel = fm.clone();
         Feature root2 = clonedModel.getFeature("test_root");
         
@@ -56,7 +60,8 @@ public class TFeatureModel {
 	
 	@Test
     public void testGetFeatureName() {
-		List<String> failedMethods = new JCorridore("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/recordtest/",  
+		List<String> failedMethods = new JCorridore(Commons.getFile("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/recordtest/", "recordtest").getAbsolutePath(),  
 				"stored_performances.db").run(TFeatureModel.class);
+		Assert.assertEquals(Commons.join("\n", failedMethods), 0, failedMethods.size());
 	}
 }
