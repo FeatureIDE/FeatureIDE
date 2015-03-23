@@ -22,7 +22,12 @@ package de.ovgu.featureide.fm.core;
 
 import static org.junit.Assert.assertSame;
 
+import java.util.List;
+
 import org.junit.Test;
+
+import de.ovgu.jcorridore.JCorridore;
+import de.ovgu.jcorridore.annotations.Record;
 
 /**
  * Tests for the {@link FeatureModel}.
@@ -31,8 +36,8 @@ import org.junit.Test;
  */
 public class TFeatureModel {
 
-	@Test
-    public void testGetFeatureName(){
+	@Record(samples = 10)
+    public void recordGetFeatureName(){
         FeatureModel fm = new FeatureModel();
         Feature feature = new Feature(fm, "test_root");
         fm.addFeature(feature);
@@ -47,5 +52,11 @@ public class TFeatureModel {
 //        assertEquals(root2, clonedModel.getRoot());
         
         assertSame(root2, clonedModel.getRoot());
+	}
+	
+	@Test
+    public void testGetFeatureName() {
+		List<String> failedMethods = new JCorridore("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/recordtest/",  
+				"stored_performances.db").run(TFeatureModel.class);
 	}
 }
