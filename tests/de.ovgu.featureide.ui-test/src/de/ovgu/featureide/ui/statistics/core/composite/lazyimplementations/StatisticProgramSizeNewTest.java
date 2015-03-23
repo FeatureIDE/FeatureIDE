@@ -1,9 +1,14 @@
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.StringReader;
+
+import org.junit.Test;
 
 public class StatisticProgramSizeNewTest {
 
@@ -35,17 +40,17 @@ public class StatisticProgramSizeNewTest {
 		return folder;
 	}
 
-//	@Test
-//	public void testGraph() throws Exception {
-//		BufferedReader br = new BufferedReader(new StringReader(getContent("Graph.jak")));
-//		assertEquals(37, StatisticsProgramSizeNew.countLineNumber("//", "/*", "*/", br));
-//	}
-//	
-//	@Test
-//	public void testDaily() throws Exception {
-//		BufferedReader br = new BufferedReader(new StringReader(getContent("Daily.jak")));
-//		assertEquals(34, StatisticsProgramSizeNew.countLineNumber("//", "/*", "*/", br));
-//	}
+	@Test
+	public void testGraph() throws Exception {
+		BufferedReader br = new BufferedReader(new StringReader(getContent("Graph.jak")));
+		assertEquals(37, StatisticsProgramSizeNew.countLineNumber("//", "/*", "*/", br));
+	}
+	
+	@Test
+	public void testDaily() throws Exception {
+		BufferedReader br = new BufferedReader(new StringReader(getContent("Daily.jak")));
+		assertEquals(34, StatisticsProgramSizeNew.countLineNumber("//", "/*", "*/", br));
+	}
 	
 
 }
