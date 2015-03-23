@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.featurehouse.ui.wizard;
+package de.ovgu.featureide.ui.wizards;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;

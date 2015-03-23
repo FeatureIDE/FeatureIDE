@@ -33,7 +33,7 @@ import de.ovgu.featureide.core.signature.ProjectSignatures.SignatureIterator;
 import de.ovgu.featureide.core.signature.ProjectStructure;
 import de.ovgu.featureide.core.signature.base.AbstractClassFragment;
 import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
-import de.ovgu.featureide.core.signature.filter.FOPContextFilter;
+import de.ovgu.featureide.core.signature.filter.ContextFilter;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.io.IOConstants;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
@@ -83,7 +83,7 @@ public class PrintExtendedSignaturesJob extends AProjectJob<PrintExtendedSignatu
 		ProjectSignatures p = interfaceProject.getProjectSignatures();
 		SignatureIterator it = p.iterator();
 		
-		FOPContextFilter filter = new FOPContextFilter(new Node[]{}, p);
+		ContextFilter filter = new ContextFilter(new Node[]{}, p);
 		it.addFilter(filter);
 		
 		ProjectStructure ps = new ProjectStructure(it);

@@ -43,10 +43,6 @@ public class FOPFeatureData extends AFeatureData {
 		this.usesOriginal = false;
 	}
 	
-	public int getId() {
-		return ids[0];
-	}
-	
 	public boolean usesExternMethods() {
 		return usesExternalMethods;
 	}

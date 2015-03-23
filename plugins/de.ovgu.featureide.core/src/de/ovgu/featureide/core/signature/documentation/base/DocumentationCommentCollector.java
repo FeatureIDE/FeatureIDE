@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.core.signature.documentation.base;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -43,7 +44,7 @@ class DocumentationCommentCollector {
 		this.projectSignatures = projectSignatures;
 	}
 
-	public static List<SignatureCommentPair> collect(ProjectSignatures projectSignatures, List<IFilter<AbstractSignature>> filters) {
+	public static List<SignatureCommentPair> collect(ProjectSignatures projectSignatures, Collection<IFilter<AbstractSignature>> filters) {
 		final SignatureIterator it = projectSignatures.iterator(filters);
 
 		final List<SignatureCommentPair> list = new LinkedList<>();
@@ -55,7 +56,9 @@ class DocumentationCommentCollector {
 
 			for (int j = 0; j < featureDataArray.length; j++) {
 				final AFeatureData featureData = featureDataArray[j];
-				commentList.add(new Comment(featureData.getComment(), featureData.getIDs()[0]));
+				if (featureData.getComment() != null) {
+					commentList.add(new Comment(featureData.getComment(), featureData.getID()));
+				}
 			}
 			list.add(new SignatureCommentPair(curSignature, commentList));
 		}

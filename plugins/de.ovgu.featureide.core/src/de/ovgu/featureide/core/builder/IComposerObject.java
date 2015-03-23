@@ -18,46 +18,13 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.core.signature.base;
-
+package de.ovgu.featureide.core.builder;
 
 /**
  * TODO description
  * 
  * @author Sebastian Krieter
  */
-public abstract class AFeatureData {
-	protected final int lineNumber;
-	protected final int id;
-	
-	protected String comment;
-	
-	protected AFeatureData(int lineNumber) {
-		this(-1, lineNumber);
-	}
+public interface IComposerObject {
 
-	protected AFeatureData(int id, int lineNumber) {
-		this.lineNumber = lineNumber;
-		this.id = id;
-	}
-
-	public int getLineNumber() {
-		return lineNumber;
-	}
-
-	public String getComment() {
-		return comment;
-	}
-
-	public void setComment(String comment) {
-		this.comment = comment;
-	}
-
-	public int getID() {
-		return id;
-	}
-
-	public boolean hasID(int id) {
-		return this.id == -1 || this.id == id;
-	}
 }

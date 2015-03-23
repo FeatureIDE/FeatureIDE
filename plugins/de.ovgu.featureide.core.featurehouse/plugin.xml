@@ -180,39 +180,6 @@
 				class="de.ovgu.featureide.featurehouse.ui.handlers.GenerateFeatureStubsHandler"
 				commandId="de.ovgu.featureide.core.featurehouse.ui.commands.key">
 		</handler>
-		<handler
-				class="de.ovgu.featureide.featurehouse.ui.handlers.documentation.BuildDocContextHandler"
-				commandId="de.ovgu.featureide.ui.mpl.commands.javadoc.context">
-		</handler>
-		<handler
-				class="de.ovgu.featureide.featurehouse.ui.handlers.documentation.BuildDocModuleHandler"
-				commandId="de.ovgu.featureide.ui.mpl.commands.javadoc.feature">
-		</handler>
-		<handler
-				class="de.ovgu.featureide.featurehouse.ui.handlers.documentation.BuildDocSPLHandler"
-				commandId="de.ovgu.featureide.ui.mpl.commands.javadoc.meta">
-		</handler>
-		<handler
-				class="de.ovgu.featureide.featurehouse.ui.handlers.documentation.BuildDocVariantHandler"
-				commandId="de.ovgu.featureide.ui.mpl.commands.javadoc.product">
-     <activeWhen>
-     <with
-							variable="activeMenuSelection">
-						<iterate
-								ifEmpty="false"
-								operator="and">
-							<test
-									args="de.ovgu.featureide.composer.featurehouse"
-									property="de.ovgu.featureide.fm.ui.properties.composer">
-							</test>
-						</iterate>
-					</with>
-		</activeWhen>
-		</handler>
-		<handler
-				class="de.ovgu.featureide.featurehouse.ui.handlers.documentation.BuildDocStatisticsHandler"
-				commandId="de.ovgu.featureide.ui.mpl.commands.javadoc.statistic">
-		</handler>
 	</extension>
 	<extension
 			id="de.ovgu.featureide.featurehouse.meta.verificationmarker"

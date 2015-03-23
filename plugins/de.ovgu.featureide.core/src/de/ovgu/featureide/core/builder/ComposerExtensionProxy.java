@@ -137,5 +137,10 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	public IStatus isComposable() {
 		return defaultComposerExtensionClass.isComposable();
 	}
+	
+	@Override
+	public <T extends IComposerObject> T getComposerObjectInstance(Class<T> c) {
+		return defaultComposerExtensionClass.getComposerObjectInstance(c);
+	}
 
 }

@@ -29,6 +29,7 @@ import java.util.regex.Pattern;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 
+import de.ovgu.featureide.core.builder.IComposerObject;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.core.signature.documentation.base.SignatureCommentPair.Comment;
 
@@ -37,7 +38,7 @@ import de.ovgu.featureide.core.signature.documentation.base.SignatureCommentPair
  * 
  * @author Sebastian Krieter
  */
-public abstract class ADocumentationCommentParser {
+public abstract class ADocumentationCommentParser implements IComposerObject {
 
 	static final String COMMENT_START = "/**", COMMENT_END = "*/";
 

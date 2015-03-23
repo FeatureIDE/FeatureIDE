@@ -1333,6 +1333,22 @@
 				class="de.ovgu.featureide.ui.handlers.BuildProductsHandler"
 				commandId="de.ovgu.featureide.ui.commands.productGenerator">
 		</handler>
+	  <handler
+	        class="de.ovgu.featureide.ui.handlers.VariantDocumentationHandler"
+	        commandId="de.ovgu.featureide.ui.mpl.commands.javadoc.product">
+	  </handler>
+	  <handler
+	        class="de.ovgu.featureide.ui.handlers.SPLDocumentationHandler"
+	        commandId="de.ovgu.featureide.ui.mpl.commands.javadoc.meta">
+	  </handler>
+	  <handler
+	        class="de.ovgu.featureide.ui.handlers.ContextDocumentationHandler"
+	        commandId="de.ovgu.featureide.ui.mpl.commands.javadoc.context">
+	  </handler>
+	  <handler
+	        class="de.ovgu.featureide.ui.handlers.FeatureDocumentationHandler"
+	        commandId="de.ovgu.featureide.ui.mpl.commands.javadoc.feature">
+	  </handler>
 	</extension>
 	<extension
 			point="org.eclipse.core.expressions.definitions">

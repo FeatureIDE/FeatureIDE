@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.core.signature.documentation.base;
 
-import java.util.List;
+import java.util.Collection;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
@@ -38,12 +38,12 @@ public class DocumentationBuilder {
 	private final ADocumentationCommentParser parser;
 	private final IFeatureProject featureProject;
 
-	public DocumentationBuilder(IFeatureProject featureProject, ADocumentationCommentParser parser) {
+	public DocumentationBuilder(IFeatureProject featureProject) {
 		this.featureProject = featureProject;
-		this.parser = parser;
+		this.parser = featureProject.getComposer().getComposerObjectInstance(ADocumentationCommentParser.class);
 	}
 
-	public final void build(ADocumentationCommentMerger merger, List<IFilter<AbstractSignature>> filters) {
+	public final void build(ADocumentationCommentMerger merger, Collection<IFilter<AbstractSignature>> filters) {
 		final FSTModel fstModel = featureProject.getFSTModel();
 		if (fstModel != null) {
 			final ProjectSignatures projectSignatures = fstModel.getProjectSignatures();

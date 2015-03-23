@@ -45,14 +45,11 @@ public abstract class ADocumentationCommentMerger implements Comparator<BlockTag
 		RULE_OVERRIDE = 1,
 		RULE_DISCARD = 2;
 
-	protected final int[] featureIDRanks;
 	private final List<IFilter<BlockTag>> filterList = new LinkedList<>();
 
-	public ADocumentationCommentMerger() {
-		featureIDRanks = null;
-	}
-
-	public ADocumentationCommentMerger(int numberOfFeatures, int[] validFeatureIDs) {
+	protected int[] featureIDRanks = null;
+	
+	public void setValidFeatureIDs(int numberOfFeatures, int[] validFeatureIDs) {
 		featureIDRanks = new int[numberOfFeatures];
 		for (int i = 0; i < featureIDRanks.length; i++) {
 			featureIDRanks[i] = -1;

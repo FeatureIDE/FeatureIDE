@@ -101,8 +101,8 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 		}
 
 		public final void addID(FOPFeatureData featureData) {
-			if (!ids.containsKey(featureData.getId())) {
-				ids.put(featureData.getId(), featureData);
+			if (!ids.containsKey(featureData.getID())) {
+				ids.put(featureData.getID(), featureData);
 			}
 		}
 
@@ -485,7 +485,7 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 								for (ExtendedSignature absSig : accessingSignatures) {
 									final FOPFeatureData[] featureData = (FOPFeatureData[]) absSig.sig.getFeatureData();
 									for (int j = 0; j < featureData.length; j++) {
-										if (featureData[j].getId() == absSig.featureID) {
+										if (featureData[j].getID() == absSig.featureID) {
 											featureData[j].addCalledSignature(sigRef.sig);
 											break;
 										}
@@ -504,7 +504,7 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 		for (ExtendedSignature extSig : originalList) {
 			final FOPFeatureData[] featureData = (FOPFeatureData[]) extSig.sig.getFeatureData();
 			for (int j = 0; j < featureData.length; j++) {
-				if (featureData[j].getId() == extSig.featureID) {
+				if (featureData[j].getID() == extSig.featureID) {
 					featureData[j].setUsesOriginal(true);
 					break;
 				}
@@ -515,7 +515,7 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 		for (ExtendedSignature extSig : nonPrimitveTypesTable.keySet()) {
 			final FOPFeatureData[] featureData = (FOPFeatureData[]) extSig.sig.getFeatureData();
 			for (int j = 0; j < featureData.length; j++) {
-				if (featureData[j].getId() == extSig.featureID) {
+				if (featureData[j].getID() == extSig.featureID) {
 					featureData[j].addUsedNonPrimitveType(nonPrimitveTypesTable.get(extSig).name());
 					break;
 				}
@@ -532,7 +532,7 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 				}
 				final FOPFeatureData[] featureData = (FOPFeatureData[]) absSig.sig.getFeatureData();
 				for (int j = 0; j < featureData.length; j++) {
-					if (featureData[j].getId() == absSig.featureID) {
+					if (featureData[j].getID() == absSig.featureID) {
 						featureData[j].setUsesExternMethods(true);
 						break;
 					}
@@ -634,7 +634,7 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 			final FOPFeatureData[] ids = (FOPFeatureData[]) sig.getFeatureData();
 			for (int j = 0; j < ids.length; j++) {
 				FOPFeatureData featureData = ids[j];
-				if (featureData.getId() == id) {
+				if (featureData.getID() == id) {
 					featureData.setComment(element.getJavaDocComment());
 					break;
 				}

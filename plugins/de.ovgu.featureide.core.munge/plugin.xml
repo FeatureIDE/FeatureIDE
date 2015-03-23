@@ -30,18 +30,6 @@
 		</newProjectWizard>
 	</extension>
 	<extension
-			point="org.eclipse.ui.handlers">
-		<handler
-				class="de.ovgu.featureide.munge.ui.handlers.DocumentationHandler"
-				commandId="de.ovgu.featureide.ui.mpl.commands.javadoc.product">
-			<activeWhen>
-      <reference
-            definitionId="de.ovgu.featureide.core.munge.expressions.hasComposer">
-      </reference>
-			</activeWhen>
-		</handler>
-	</extension>
-	<extension
 			point="org.eclipse.core.expressions.definitions">
 		<definition
 				id="de.ovgu.featureide.core.munge.expressions.hasComposer">

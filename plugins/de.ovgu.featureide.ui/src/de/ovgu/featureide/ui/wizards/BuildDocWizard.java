@@ -18,34 +18,39 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.featurehouse.ui.handlers.documentation;
+package de.ovgu.featureide.ui.wizards;
 
-import de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin;
-import de.ovgu.featureide.featurehouse.ui.wizard.BuildDocWizard;
-import de.ovgu.featureide.fm.ui.handlers.base.AProjectJobHandler;
 import de.ovgu.featureide.fm.ui.wizards.AbstractWizard;
-import de.ovgu.featureide.fm.ui.wizards.WizardConstants;
+import de.ovgu.featureide.fm.ui.wizards.ChooseFeaturePage;
+import de.ovgu.featureide.ui.UIPlugin;
 
 /**
- * Action to build interfaces grouped by the feature name.
+ * Wizard for the {@link BuildExtendedModulesHandler}.
  * 
- * @author Sebastian Krieter
  * @author Reimar Schroeter
  */
-public class BuildDocModuleHandler extends AProjectJobHandler {
+public class BuildDocWizard extends AbstractWizard {
+	public static final String ID = UIPlugin.PLUGIN_ID + ".wizards.BuildExtendedModulesWizard";
+
+	private final String defaultFolderString;
+	private final boolean featureSelection;
 	
+	public BuildDocWizard(String title, String defaultFolderString, boolean featureSelection) {
+		super(title);
+		this.defaultFolderString = (defaultFolderString != null) ? defaultFolderString : "";
+		this.featureSelection = featureSelection;
+	}
+
 	@Override
-	protected AbstractWizard instantiateWizard() {
-		return new BuildDocWizard("Documentation Wizard", "FeaturemoduleDocumentation", true);
+	public void addPages() {
+		if (featureSelection) {
+			addPage(new ChooseFeaturePage());
+		}
+//		addPage(new ChooseFolderPage(defaultFolderString));
+		addPage(new DocArgumentsPage());
 	}
 	
-	@Override
-	protected void endAction() {
-//		FeatureHouseCorePlugin.getDefault().buildDocumentation(projects, 
-//				(String) wizard.getData(WizardConstants.KEY_OUT_FOLDER), 
-//				(String) wizard.getData(WizardConstants.KEY_OUT_DOCOPTIONS),
-//				3, 
-//				(String) wizard.getData(WizardConstants.KEY_OUT_FEATURE));
+	public String getDefaultFolderString() {
+		return defaultFolderString;
 	}
-	
 }

@@ -40,7 +40,7 @@ import de.ovgu.featureide.core.signature.ProjectSignatures.SignatureIterator;
 import de.ovgu.featureide.core.signature.ProjectStructure;
 import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
-import de.ovgu.featureide.core.signature.filter.FOPContextFilter;
+import de.ovgu.featureide.core.signature.filter.ContextFilter;
 import de.ovgu.featureide.core.signature.filter.FeatureFilter;
 import de.ovgu.featureide.core.signature.filter.IFilter;
 import de.ovgu.featureide.fm.core.Feature;
@@ -143,7 +143,7 @@ public class PrintStatisticsJob extends AProjectJob<PrintStatisticsJob.Arguments
 		}
 	}
 	
-	private FOPContextFilter contextFilter;
+	private ContextFilter contextFilter;
 	private int curFeatureID = -1;
 	
 	protected PrintStatisticsJob(Arguments arguments) {
@@ -176,7 +176,7 @@ public class PrintStatisticsJob extends AProjectJob<PrintStatisticsJob.Arguments
 		
 		ProjectSignatures p = interfaceProject.getProjectSignatures();
 		SignatureIterator it = p.iterator();
-		it.addFilter(new FOPContextFilter(new Node[]{}, p));
+		it.addFilter(new ContextFilter(new Node[]{}, p));
 		
 		ProjectStructure ps = new ProjectStructure(it);
 //		sumStat.set(ps.getStatisticsNumbers(), SumStatistic.CONTEXT_ALWAYS);
@@ -192,7 +192,7 @@ public class PrintStatisticsJob extends AProjectJob<PrintStatisticsJob.Arguments
 			conf.setManual(featureName, Selection.SELECTED);
 			
 			curFeatureID = interfaceProject.getFeatureID(featureName);
-			contextFilter = new FOPContextFilter(IOConstants.buildNodeForFeature(featureName), p);
+			contextFilter = new ContextFilter(IOConstants.buildNodeForFeature(featureName), p);
 			
 			it.clearFilter();
 			it.addFilter(contextFilter);

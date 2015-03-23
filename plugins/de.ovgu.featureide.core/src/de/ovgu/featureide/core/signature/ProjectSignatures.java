@@ -28,11 +28,11 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map.Entry;
 
+import de.ovgu.featureide.core.signature.base.AFeatureData;
 import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 import de.ovgu.featureide.core.signature.base.AbstractFieldSignature;
 import de.ovgu.featureide.core.signature.base.AbstractMethodSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
-import de.ovgu.featureide.core.signature.base.FOPFeatureData;
 import de.ovgu.featureide.core.signature.filter.IFilter;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -254,12 +254,12 @@ public class ProjectSignatures implements Iterable<AbstractSignature> {
 	}
 	
 	private void count(AbstractSignature signature, int[] curCounter, HashMap<Integer, int[]> fs, int i) {
-		final FOPFeatureData[] featureData = (FOPFeatureData[])signature.getFeatureData();
-		for (FOPFeatureData feature : featureData) {
-			int[] x = fs.get(feature.getId());
+		final AFeatureData[] featureData = signature.getFeatureData();
+		for (AFeatureData feature : featureData) {
+			int[] x = fs.get(feature.getID());
 			if (x == null) {
 				x = new int[]{0,0,0,0};
-				fs.put(feature.getId(), x);
+				fs.put(feature.getID(), x);
 			}
 			x[i]++;
 		}

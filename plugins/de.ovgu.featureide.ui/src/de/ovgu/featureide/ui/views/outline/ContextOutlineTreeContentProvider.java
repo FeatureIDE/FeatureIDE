@@ -32,9 +32,9 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.core.signature.ProjectStructure;
+import de.ovgu.featureide.core.signature.base.AFeatureData;
 import de.ovgu.featureide.core.signature.base.AbstractClassFragment;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
-import de.ovgu.featureide.core.signature.base.FOPFeatureData;
 import de.ovgu.featureide.core.signature.comparator.ClassFragmentComparator;
 import de.ovgu.featureide.core.signature.comparator.SignatureComparator;
 import de.ovgu.featureide.fm.core.Feature;
@@ -124,9 +124,9 @@ public class ContextOutlineTreeContentProvider implements ITreeContentProvider {
 			if (signatures != null) {
 				final HashMap<String, Feature> featureMap = new HashMap<String, Feature>();
 
-				final FOPFeatureData[] featureDataArray = (FOPFeatureData[])sig.getFeatureData();
-				for (FOPFeatureData featureData : featureDataArray) {
-					final String featureName = signatures.getFeatureName(featureData.getId());
+				final AFeatureData[] featureDataArray = sig.getFeatureData();
+				for (AFeatureData featureData : featureDataArray) {
+					final String featureName = signatures.getFeatureName(featureData.getID());
 					final Feature feature = featureProject.getFeatureModel().getFeature(featureName);
 					if (!featureMap.containsKey(featureName)) {
 						featureMap.put(featureName, feature);

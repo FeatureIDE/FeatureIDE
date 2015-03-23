@@ -110,7 +110,7 @@ public abstract class MungeSignatureBuilder {
 					final StringBuilder sb = new StringBuilder();
 					while (it.hasNext()) {
 						final Javadoc comment = it.next();
-						if (comment.getStartPosition() < curDeclaration.getStartPosition()) {
+						if (comment.getStartPosition() <= curDeclaration.getStartPosition()) {
 							sb.append(comment);
 							sb.append("\n");
 						} else {
@@ -123,7 +123,7 @@ public abstract class MungeSignatureBuilder {
 					curfeatureData.setComment(lastComment);
 					lastCommentedMethod = (curDeclaration instanceof MethodDeclaration) ? (MethodDeclaration) curDeclaration : null;
 				}
-				return super.visit(node);
+				return false;
 			}
 			
 			private void attachFeatureData(AbstractSignature curSignature, BodyDeclaration curDeclaration) {
@@ -152,7 +152,7 @@ public abstract class MungeSignatureBuilder {
 				} else {
 					lastCommentedMethod = null;
 				}
-				return false;
+				return true;
 			}
 			
 			private AbstractClassSignature getParent(ASTNode astnode) {
@@ -186,7 +186,7 @@ public abstract class MungeSignatureBuilder {
 					attachFeatureData(fieldSignature, node);
 				}
 				
-				return false;
+				return true;
 			}
 			
 			@Override

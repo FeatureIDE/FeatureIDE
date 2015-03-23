@@ -30,22 +30,22 @@ import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
+import de.ovgu.featureide.core.signature.base.AFeatureData;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
-import de.ovgu.featureide.core.signature.base.FOPFeatureData;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
-public class FOPContextFilter implements IFilter<AbstractSignature> {
+public class ContextFilter implements IFilter<AbstractSignature> {
 
 	private final ProjectSignatures projectSignatures;
 	private final Node fmNode;
 	private final boolean[] selcetedFeatures;
 	private SatSolver solver;
 
-	public FOPContextFilter(String featureName, ProjectSignatures projectSignatures) {
+	public ContextFilter(String featureName, ProjectSignatures projectSignatures) {
 		this(new Node[] { new Literal(featureName, true) }, projectSignatures);
 	}
 
-	public FOPContextFilter(Node[] constraints, ProjectSignatures projectSignatures) {
+	public ContextFilter(Node[] constraints, ProjectSignatures projectSignatures) {
 		this.projectSignatures = projectSignatures;
 		fmNode = NodeCreator.createNodes(projectSignatures.getFeatureModel());
 		selcetedFeatures = new boolean[projectSignatures.getFeatureModel().getNumberOfFeatures()];
@@ -77,10 +77,10 @@ public class FOPContextFilter implements IFilter<AbstractSignature> {
 
 	@Override
 	public boolean isValid(AbstractSignature signature) {
-		FOPFeatureData[] ids = (FOPFeatureData[]) signature.getFeatureData();
+		AFeatureData[] ids = signature.getFeatureData();
 		Node[] negativeLiterals = new Node[ids.length];
 		for (int i = 0; i < ids.length; ++i) {
-			int id = ids[i].getId();
+			int id = ids[i].getID();
 			if (selcetedFeatures[id]) {
 				return true;
 			}

@@ -18,46 +18,26 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.core.signature.base;
+package de.ovgu.featureide.ui.handlers;
 
+import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.fm.ui.handlers.base.AProjectJobHandler;
+import de.ovgu.featureide.fm.ui.wizards.AbstractWizard;
+import de.ovgu.featureide.fm.ui.wizards.WizardConstants;
+import de.ovgu.featureide.ui.wizards.BuildDocWizard;
 
-/**
- * TODO description
- * 
- * @author Sebastian Krieter
- */
-public abstract class AFeatureData {
-	protected final int lineNumber;
-	protected final int id;
-	
-	protected String comment;
-	
-	protected AFeatureData(int lineNumber) {
-		this(-1, lineNumber);
+public class ContextDocumentationHandler extends AProjectJobHandler {
+
+	@Override
+	protected AbstractWizard instantiateWizard() {
+		return new BuildDocWizard("Documentation Wizard", "ContextDocumentation", true);
 	}
 
-	protected AFeatureData(int id, int lineNumber) {
-		this.lineNumber = lineNumber;
-		this.id = id;
+	@Override
+	protected void endAction() {
+		CorePlugin.getDefault().buildContextDocumentation(projects,
+				(String) wizard.getData(WizardConstants.KEY_OUT_DOCOPTIONS),
+				(String) wizard.getData(WizardConstants.KEY_OUT_FEATURE));
 	}
 
-	public int getLineNumber() {
-		return lineNumber;
-	}
-
-	public String getComment() {
-		return comment;
-	}
-
-	public void setComment(String comment) {
-		this.comment = comment;
-	}
-
-	public int getID() {
-		return id;
-	}
-
-	public boolean hasID(int id) {
-		return this.id == -1 || this.id == id;
-	}
 }

@@ -82,8 +82,8 @@ public class FujiSignaturesCreator {
 		}
 
 		public final void addID(FOPFeatureData featureData) {
-			if (!ids.containsKey(featureData.getId())) {
-				ids.put(featureData.getId(), featureData);
+			if (!ids.containsKey(featureData.getID())) {
+				ids.put(featureData.getID(), featureData);
 			}
 		}
 
@@ -280,7 +280,7 @@ public class FujiSignaturesCreator {
 			final FOPFeatureData[] ids = (FOPFeatureData[]) sig.getFeatureData();
 			for (int j = 0; j < ids.length; j++) {
 				FOPFeatureData featureData = ids[j];
-				if (featureData.getId() == id) {
+				if (featureData.getID() == id) {
 					featureData.setComment(element.getJavaDocComment());
 					break;
 				}

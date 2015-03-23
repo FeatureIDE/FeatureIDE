@@ -29,8 +29,4 @@ import de.ovgu.featureide.core.signature.documentation.base.ADocumentationCommen
  */
 public class VariantMerger extends ADocumentationCommentMerger {
 
-	public VariantMerger(int numberOfFeatures, int[] validFeatureIDs) {
-		super(numberOfFeatures, validFeatureIDs);
-	}
-
 }

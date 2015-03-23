@@ -31,8 +31,7 @@ import de.ovgu.featureide.core.signature.filter.IFilter;
  */
 public class ContextMerger extends ADocumentationCommentMerger {
 
-	public ContextMerger(int numberOfFeatures, int[] validFeatureIDs) {
-		super(numberOfFeatures, validFeatureIDs);
+	public ContextMerger() {
 		addFilter(new IFilter<BlockTag>() {
 			@Override
 			public boolean isValid(BlockTag blockTag) {

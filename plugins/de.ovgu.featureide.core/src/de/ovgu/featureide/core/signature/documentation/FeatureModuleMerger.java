@@ -28,9 +28,5 @@ import de.ovgu.featureide.core.signature.documentation.base.ADocumentationCommen
  * @author Sebastian Krieter
  */
 public class FeatureModuleMerger extends ADocumentationCommentMerger {
-
-	public FeatureModuleMerger(int numberOfFeatures, final int featureID) {
-		super(numberOfFeatures, new int[] { featureID });
-	}
-
+	
 }
