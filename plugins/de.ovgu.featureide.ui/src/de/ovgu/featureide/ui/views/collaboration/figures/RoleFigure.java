@@ -122,7 +122,7 @@ public class RoleFigure extends Figure implements GUIDefaults {
 	 * @return The selections status of the method an field filter.
 	 */
 	public static boolean[] getSelectedFieldMethod() {
-		return SELECTED_FIELDS_METHOD.clone();
+		return SELECTED_FIELDS_METHOD;
 	}
 
 	/**

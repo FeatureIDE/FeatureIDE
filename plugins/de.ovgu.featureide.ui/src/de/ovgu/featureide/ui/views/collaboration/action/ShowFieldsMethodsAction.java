@@ -50,21 +50,18 @@ public class ShowFieldsMethodsAction extends Action {
 	public static final int PRIVATE_FIELDSMETHODS = 11;
 	public static final int SELECT_ALL = 12;
 	public static final int DESELECT_ALL = 13;
-	
+
 	public static final int SELECT_ALL_METHOD_ACCESS = 20;
 	public static final int DESELECT_ALL_METHOD_ACCESS = 21;
 
-	private CollaborationView collaborationView;
+	private final CollaborationView collaborationView;
 	private int index;
 
 	// Custom action with checkbox
 	public ShowFieldsMethodsAction(String text, Image image, CollaborationView collaborationView, int index) {
-		super(text, Action.AS_CHECK_BOX);
-		this.setImageDescriptor(getImageDiscriptor(image));
-		this.collaborationView = collaborationView;
-		this.index = index;
+		this(text, image, collaborationView, index, Action.AS_CHECK_BOX);
 	}
-	
+
 	// Custom action with style
 	public ShowFieldsMethodsAction(String text, Image image, CollaborationView collaborationView, int index, int style) {
 		super(text, style);
@@ -72,16 +69,15 @@ public class ShowFieldsMethodsAction extends Action {
 		this.collaborationView = collaborationView;
 		this.index = index;
 	}
-	
-	public void setActionIndex(int index)
-	{
+
+	public void setActionIndex(int index) {
 		this.index = index;
 	}
 
 	@Override
 	public void setChecked(boolean checked) {
 		super.setChecked(isSelected());
-		
+
 	}
 
 	private static ImageDescriptor getImageDiscriptor(Image image) {
@@ -90,10 +86,9 @@ public class ShowFieldsMethodsAction extends Action {
 		}
 		return null;
 	}
-	
+
 	private boolean[] selectAllAccessModifiers(boolean[] selected, boolean value) {
-		for (int i = PUBLIC_FIELDSMETHODS; i <= PRIVATE_FIELDSMETHODS; i++)
-		{
+		for (int i = PUBLIC_FIELDSMETHODS; i <= PRIVATE_FIELDSMETHODS; i++) {
 			selected[i] = value;
 		}
 		return selected;
@@ -101,7 +96,7 @@ public class ShowFieldsMethodsAction extends Action {
 
 	public void run() {
 		boolean[] selected = RoleFigure.getSelectedFieldMethod();
-		switch (this.index) {
+		switch (index) {
 		case SELECT_ALL:
 			setSelected(true, selected);
 			break;
@@ -115,50 +110,51 @@ public class ShowFieldsMethodsAction extends Action {
 			selectAllAccessModifiers(selected, false);
 			break;
 		case PUBLIC_FIELDSMETHODS:
-			selected[this.index] = !selected[this.index];			
-			super.setChecked(selected[this.index]);
+			selected[index] = !selected[index];
+			super.setChecked(selected[index]);
 			break;
 		case PRIVATE_FIELDSMETHODS:
-			selected[this.index] = !selected[this.index];			
-			super.setChecked(selected[this.index]);
+			selected[index] = !selected[index];
+			super.setChecked(selected[index]);
 			break;
 		case DEFAULT_FIELDSMETHODS:
-			selected[this.index] = !selected[this.index];			
-			super.setChecked(selected[this.index]);
+			selected[index] = !selected[index];
+			super.setChecked(selected[index]);
 			break;
 		case PROTECTED_FIELDSMETHODS:
-			selected[this.index] = !selected[this.index];			
-			super.setChecked(selected[this.index]);
+			selected[index] = !selected[index];
+			super.setChecked(selected[index]);
 			break;
 		default:
-			selected[this.index] = !selected[this.index];			
-			super.setChecked(selected[this.index]);
+			selected[index] = !selected[index];
+			super.setChecked(selected[index]);
 			break;
 		}
 
 		RoleFigure.setSelectedFieldMethod(selected);
 		collaborationView.reloadImage();
 		collaborationView.refresh();
-		
-		if (this.index == SELECT_ALL || this.index == DESELECT_ALL)
+
+		if (index == SELECT_ALL || index == DESELECT_ALL)
 			collaborationView.selectAll();
 	}
 
 	private void setSelected(boolean value, boolean[] selected) {
 		for (int i = FIELDS_WITH_REFINEMENTS; i < selected.length; i++) {
-			if (i != HIDE_PARAMETERS_AND_TYPES	&& i != ONLY_CONTRACTS && i != ONLY_INVARIANTS) {
-						selected[i] = value;
+			if (i != HIDE_PARAMETERS_AND_TYPES && i != ONLY_CONTRACTS && i != ONLY_INVARIANTS) {
+				selected[i] = value;
 			}
 		}
 	}
 
 	private void setDeselected(boolean value, boolean[] selected) {
-	for (int i = FIELDS_WITH_REFINEMENTS; i < selected.length; i++) {
-		if (i != HIDE_PARAMETERS_AND_TYPES)
-					selected[i] = value;
+		for (int i = FIELDS_WITH_REFINEMENTS; i < selected.length; i++) {
+			if (i != HIDE_PARAMETERS_AND_TYPES) {
+				selected[i] = value;
+			}
 		}
 	}
-		
+
 	private boolean isSelected() {
 		switch (index) {
 		case SELECT_ALL:
@@ -173,4 +169,5 @@ public class ShowFieldsMethodsAction extends Action {
 			return RoleFigure.getSelectedFieldMethod()[index];
 		}
 	}
+
 }
