@@ -158,14 +158,14 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	
 	//@Test (timeout=8000) // 0.886s @ i5(3,3GHz)
 	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=1200)
+	@Constraint(samples=10, allowedMedianDeviation=2200)
 	public final void BAnalyzeFeatureModel200() {
 		analyze(200);
 	}
 	
 	//@Test (timeout=22000) // 5.519s @ i5(3,3GHz)
 	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=1000)
+	@Constraint(samples=10, allowedMedianDeviation=2000)
 	public final void BAnalyzeFeatureModel201() {
 		analyze(201);
 	}
