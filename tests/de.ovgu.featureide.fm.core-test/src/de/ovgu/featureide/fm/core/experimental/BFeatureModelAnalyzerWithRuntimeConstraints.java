@@ -109,49 +109,49 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 
 	//@Test (timeout=6000) // 0.749s @ i5(3,3GHz)
 	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=250)
+	@Constraint(samples=10, allowedMedianDeviation=500)
 	public final void BAnalyzeFeatureModel1() {
 		analyze(1);
 	}
 
 	//@Test (timeout=2500) // 0.385s @ i5(3,3GHz)
 	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=250)
+	@Constraint(samples=10, allowedMedianDeviation=500)
 	public final void BAnalyzeFeatureModel2() {
 		analyze(2);
 	}
 	
 	//@Test (timeout=100) // 0.007 @ i5(3,3GHz)
 	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=250)
+	@Constraint(samples=10, allowedMedianDeviation=500)
 	public final void BAnalyzeFeatureModel10() {
 		analyze(10);
 	}
 	
 	//@Test (timeout=100) // 0.006s @ i5(3,3GHz)
 	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=250)
+	@Constraint(samples=10, allowedMedianDeviation=500)
 	public final void BAnalyzeFeatureModel20() {
 		analyze(20);
 	}
 	
 	//@Test (timeout=250) // 0.020s @ i5(3,3GHz)
 	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=250)
+	@Constraint(samples=10, allowedMedianDeviation=500)
 	public final void BAnalyzeFeatureModel21() {
 		analyze(21);
 	}
 	
 	//@Test (timeout=1000) // 0.036 @ i5(3,3GHz)
 	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=250)
+	@Constraint(samples=10, allowedMedianDeviation=500)
 	public final void BAnalyzeFeatureModel50() {
 		analyze(50);
 	}
 	
 	//@Test (timeout=2500) // 0.142s @ i5(3,3GHz)
 	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=250)
+	@Constraint(samples=10, allowedMedianDeviation=500)
 	public final void BAnalyzeFeatureModel100() {
 		analyze(100);
 	}
@@ -191,7 +191,7 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	
 	//@Test (timeout=2500) // 0.509 @ i5(3,3GHz)
 	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=250)
+	@Constraint(samples=10, allowedMedianDeviation=500)
 	public final void BUpdateConstraints1() {
 		BUpdateConstraints(1);
 	}
@@ -206,35 +206,35 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	
 	//@Test (timeout=100) // 0.004s @ i5(3,3GHz)
 	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=10)
+	@Constraint(samples=10, allowedMedianDeviation=50)
 	public final void BUpdateConstraints10() {
 		BUpdateConstraints(10);
 	}
 	
 //	@Test (timeout=100) // 0.005s @ i5(3,3GHz)
 	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=10)
+	@Constraint(samples=10, allowedMedianDeviation=50)
 	public final void BUpdateConstraints20() {
 		BUpdateConstraints(20);
 	}
 	
 //	@Test (timeout=100) // 0.004s @ i5(3,3GHz)
 	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=10)
+	@Constraint(samples=10, allowedMedianDeviation=50)
 	public final void BUpdateConstraints21() {
 		BUpdateConstraints(21);
 	}
 	
 //	@Test (timeout=100) // 0.011s @ i5(3,3GHz)
 	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=10)
+	@Constraint(samples=10, allowedMedianDeviation=50)
 	public final void BUpdateConstraints50() {
 		BUpdateConstraints(50);
 	}
 	
 //	@Test (timeout=250) // 0.051s @ i5(3,3GHz)
 	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=25)
+	@Constraint(samples=10, allowedMedianDeviation=50)
 	public final void BUpdateConstraints100() {
 		BUpdateConstraints(100);
 	}
@@ -290,35 +290,35 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	
 //	@Test (timeout=100) // 0.005s @ i5(3,3GHz)
 	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=10)
+	@Constraint(samples=10, allowedMedianDeviation=50)
 	public final void BUpdateFeatures10() {
 		BUpdateFeatures(10);
 	}
 	
 //	@Test (timeout=100) // 0.005s @ i5(3,3GHz)
 	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=10)
+	@Constraint(samples=10, allowedMedianDeviation=50)
 	public final void BUpdateFeatures20() {
 		BUpdateFeatures(20);
 	}
 	
 //	@Test (timeout=200) // 0.020s @ i5(3,3GHz)
 	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=20)
+	@Constraint(samples=10, allowedMedianDeviation=40)
 	public final void BUpdateFeatures21() {
 		BUpdateFeatures(21);
 	}
 	
 //	@Test (timeout=250) // 0.012s @ i5(3,3GHz)
 	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=25)
+	@Constraint(samples=10, allowedMedianDeviation=50)
 	public final void BUpdateFeatures50() {
 		BUpdateFeatures(50);
 	}
 	
 //	@Test (timeout=200) // 0.027s @ i5(3,3GHz)
 	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=20)
+	@Constraint(samples=10, allowedMedianDeviation=40)
 	public final void BUpdateFeatures100() {
 		BUpdateFeatures(100);
 	}
@@ -339,7 +339,7 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	
 //	@Test (timeout=2500) // 0,465s @ i5(3,3GHz)
 	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=250)
+	@Constraint(samples=10, allowedMedianDeviation=500)
 	public final void BUpdateFeatures500() {
 		BUpdateFeatures(500);
 	}
