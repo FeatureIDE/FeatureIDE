@@ -18,21 +18,15 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.antenna.ui.handlers;
+package de.ovgu.featureide.core.signature.base;
 
-import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.ui.handlers.base.AFeatureProjectHandler;
+import org.prop4j.Node;
 
 /**
- * TODO description
+ * Interface for objects that are tied to a certain constraint.
  * 
  * @author Sebastian Krieter
  */
-public class DocumentationHandler extends AFeatureProjectHandler {
-
-	@Override
-	protected void singleAction(IFeatureProject project) {
-		
-	}
-	
+public interface IConstrainedObject {
+	Node getConstraint();
 }

@@ -255,7 +255,7 @@ public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 							editorPart = activePage.openEditor(new FileEditorInput(iFile), (desc != null) ? desc.getId() : "org.eclipse.ui.DefaultTextEditor");
 						}
 						final int dataIndex = sig.hasFeature(featureID);
-						scrollToLine(editorPart, (dataIndex > -1) ? sig.getFeatureData()[dataIndex].getLineNumber() : 1);
+						scrollToLine(editorPart, (dataIndex > -1) ? sig.getFeatureData()[dataIndex].getStartLineNumber() : 1);
 					} catch (CoreException e) {
 						UIPlugin.getDefault().logError(e);
 					}

@@ -20,7 +20,8 @@
  */
 package de.ovgu.featureide.core.signature.base;
 
-import org.prop4j.Node;
+import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * TODO description
@@ -28,19 +29,19 @@ import org.prop4j.Node;
  * @author Sebastian Krieter
  */
 public class PreprocessorFeatureData extends AFeatureData {
+
+	private final HashSet<Integer> involvedFeatures = new HashSet<>();
 	
-	private Node constraint;
-	
-	public PreprocessorFeatureData(int lineNumber) {
-		super(lineNumber);
+	PreprocessorFeatureData(int startLineNumber, int endLineNumber) {
+		super(-1, startLineNumber, endLineNumber);
 	}
 
-	public Node getConstraint() {
-		return constraint;
+	public Collection<Integer> getInvolvedFeature() {
+		return involvedFeatures;
 	}
-
-	public void setConstraint(Node constraint) {
-		this.constraint = constraint;
+	
+	public void addFeature(Integer featureID) {
+		involvedFeatures.add(featureID);
 	}
 	
 }

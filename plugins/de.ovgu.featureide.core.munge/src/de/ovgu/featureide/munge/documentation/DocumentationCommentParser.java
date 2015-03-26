@@ -11,18 +11,13 @@ public class DocumentationCommentParser extends ADocumentationCommentParser {
 	@Override
 	protected void parseHead(String[] parts) {
 		final String typeString = parts[0];
-		int prioIndex = 1;
 		
+		boolean featureHead = false;
 		// Type
 		if (typeString.equals("general")) {
 			tagFeatureNode = null;
 		} else if (typeString.equals("feature")) {
-			if (parts.length > prioIndex) {
-				tagFeatureNode = nodeReader.stringToNode(parts[prioIndex++]);
-			} else {
-				//warning?
-				tagFeatureNode = null;
-			}
+			featureHead = true;
 		} else {
 			//warning?
 			tagFeatureNode = null;
@@ -30,16 +25,42 @@ public class DocumentationCommentParser extends ADocumentationCommentParser {
 		}
 		
 		// Priority
-		if (parts.length > prioIndex) {
+		if (parts.length > 1) {
 			try {
-				tagPriority = Integer.parseInt(parts[prioIndex]);
+				tagPriority = Integer.parseInt(parts[parts.length -1]);
+				if (featureHead) {
+					if (parts.length > 2) {
+						final StringBuilder sb = new StringBuilder();
+						for (int i = 1; i < parts.length - 1; i++) {
+							sb.append(parts[i]);
+							sb.append(' ');
+						}
+						tagFeatureNode = nodeReader.stringToNode(sb.toString());
+					} else {
+						//warning?
+						tagFeatureNode = null;
+					}
+				}
 			} catch (NumberFormatException e) {
-				//warning?
 				tagPriority = 0;
+				
+				if (featureHead) {
+					final StringBuilder sb = new StringBuilder();
+					for (int i = 1; i < parts.length; i++) {
+						sb.append(parts[i]);
+						sb.append(' ');
+					}
+					tagFeatureNode = nodeReader.stringToNode(sb.toString());
+				}
 			}
 		} else {
 			tagPriority = 0;
 		}
+	}
+
+	@Override
+	public boolean addExtraFilters() {
+		return true;
 	}
 
 }

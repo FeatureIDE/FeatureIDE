@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.core.signature.documentation.base;
 
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -29,7 +28,6 @@ import de.ovgu.featureide.core.signature.ProjectSignatures.SignatureIterator;
 import de.ovgu.featureide.core.signature.base.AFeatureData;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.core.signature.documentation.base.SignatureCommentPair.Comment;
-import de.ovgu.featureide.core.signature.filter.IFilter;
 
 /**
  * Abstract merger for modul-comment.
@@ -44,8 +42,8 @@ class DocumentationCommentCollector {
 		this.projectSignatures = projectSignatures;
 	}
 
-	public static List<SignatureCommentPair> collect(ProjectSignatures projectSignatures, Collection<IFilter<AbstractSignature>> filters) {
-		final SignatureIterator it = projectSignatures.iterator(filters);
+	public static List<SignatureCommentPair> collect(ProjectSignatures projectSignatures) {
+		final SignatureIterator it = projectSignatures.iterator();
 
 		final List<SignatureCommentPair> list = new LinkedList<>();
 

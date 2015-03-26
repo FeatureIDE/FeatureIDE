@@ -27,6 +27,8 @@ import java.util.LinkedList;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
+import org.prop4j.Literal;
+import org.prop4j.Node;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
@@ -34,17 +36,18 @@ import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.core.signature.ProjectSignatures.SignatureIterator;
 import de.ovgu.featureide.core.signature.ProjectStructure;
 import de.ovgu.featureide.core.signature.base.AbstractClassFragment;
-import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.core.signature.documentation.ContextMerger;
 import de.ovgu.featureide.core.signature.documentation.FeatureModuleMerger;
 import de.ovgu.featureide.core.signature.documentation.VariantMerger;
 import de.ovgu.featureide.core.signature.documentation.base.ADocumentationCommentMerger;
 import de.ovgu.featureide.core.signature.documentation.base.DocumentationBuilder;
-import de.ovgu.featureide.core.signature.filter.ContextFilter;
-import de.ovgu.featureide.core.signature.filter.FeatureFilter;
+import de.ovgu.featureide.core.signature.filter.ConstraintFilter;
 import de.ovgu.featureide.core.signature.filter.IFilter;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
+import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
+import de.ovgu.featureide.fm.core.configuration.Selection;
+import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.io.IOConstants;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
@@ -93,7 +96,7 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 			return false;
 		}
 
-		final Collection<IFilter<AbstractSignature>> filters = new LinkedList<>();
+		final Collection<IFilter<?>> filters = new LinkedList<>();
 
 		final int[] featureIDs = projectSignatures.getFeatureIDs();
 		if (arguments.merger instanceof VariantMerger) {
@@ -129,14 +132,39 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 					}
 				}
 			}
+
+//			filters.add(new FeatureFilter(validFeatureIDs));
+			final Node[] nodes = new Node[conf.getFeatures().size() + 1];
+			nodes[0] = NodeCreator.createNodes(conf.getFeatureModel());
+			int i = 1;
+			for (SelectableFeature feature : conf.getFeatures()) {
+				Selection selection = feature.getSelection();
+				nodes[i++] = selection == Selection.UNDEFINED ? new Literal("true") : new Literal(feature.getFeature().getName(), feature.getSelection() == Selection.SELECTED);
+			}
+			filters.add(new ConstraintFilter(nodes));
+			
 			arguments.merger.setValidFeatureIDs(featureIDs.length, validFeatureIDs);
-			filters.add(new FeatureFilter(validFeatureIDs));
 		} else if (arguments.merger instanceof ContextMerger) {
-			filters.add(new ContextFilter(arguments.featureName, projectSignatures));
+			
+//			filters.add(new ContextFilter(arguments.featureName, projectSignatures));
+			final Node[] nodes = new Node[2];
+			nodes[0] = NodeCreator.createNodes(projectSignatures.getFeatureModel());
+			nodes[1] = new Literal(arguments.featureName, true);
+			filters.add(new ConstraintFilter(nodes));
+			
 			arguments.merger.setValidFeatureIDs(featureIDs.length, featureIDs);
 		} else if (arguments.merger instanceof FeatureModuleMerger) {
 			final int index = projectSignatures.getFeatureID(arguments.featureName);
 			arguments.merger.setValidFeatureIDs(featureIDs.length, new int[]{index});
+			
+//			filters.add(new FeatureFilter(index));
+			final Literal[] nodes = new Literal[projectSignatures.getFeatureCount()];
+			final String[] featureNames = projectSignatures.getFeatureNames();
+			for (int i = 0; i < featureNames.length; i++) {
+				nodes[i] = new Literal(featureNames[i], false);
+			}
+			nodes[index].flip();
+			filters.add(new ConstraintFilter(false, nodes));
 		}
 		
 		final DocumentationBuilder builder = new DocumentationBuilder(featureProject);

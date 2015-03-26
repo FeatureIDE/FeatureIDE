@@ -21,12 +21,16 @@
 package de.ovgu.featureide.core.signature.base;
 
 import java.util.Arrays;
+
+import org.prop4j.Node;
+import org.prop4j.Or;
+
 /** 
  * Abstract signature for a class member.
  * 
  * @author Sebastian Krieter
  */
-public abstract class AbstractSignature {
+public abstract class AbstractSignature implements IConstrainedObject {
 	
 	protected static final String LINE_SEPARATOR = System.getProperty("line.separator");
 	protected static final int hashCodePrime = 31;
@@ -229,5 +233,23 @@ public abstract class AbstractSignature {
 	@Override
 	public String toString() {
 		return fullName + " : " + type;
+	}
+
+	@Override
+	public Node getConstraint() {
+		if (featureData == null) {
+			return null;
+		}
+		
+		final Node[] constraints = new Node[featureData.length];
+		for (int i = 0; i < constraints.length; i++) {
+			final Node constraint = featureData[i].getConstraint();
+			if (constraint == null) {
+				return null;
+			}
+			constraints[i] = constraint.clone();
+		}		
+		
+		return new Or(constraints).toCNF();
 	}
 }

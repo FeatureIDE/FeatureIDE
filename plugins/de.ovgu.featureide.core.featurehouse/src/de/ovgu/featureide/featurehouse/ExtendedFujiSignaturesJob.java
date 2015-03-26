@@ -66,6 +66,7 @@ import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 import de.ovgu.featureide.core.signature.base.AbstractMethodSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.core.signature.base.FOPFeatureData;
+import de.ovgu.featureide.core.signature.base.FeatureDataConstructor;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiClassSignature;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiFieldSignature;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
@@ -192,6 +193,7 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 
 	private final IFeatureProject featureProject;
 	private final ProjectSignatures projectSignatures;
+	private final FeatureDataConstructor featureDataConstructor;
 
 	private final HashMap<AbstractSignature, SignatureReference> signatureSet = new HashMap<AbstractSignature, SignatureReference>();
 	private final HashMap<String, AbstractSignature> signatureTable = new HashMap<String, AbstractSignature>();
@@ -208,16 +210,17 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 		super("Loading Signatures for " + featureProject.getProjectName());
 		this.featureProject = featureProject;
 		this.projectSignatures = new ProjectSignatures(this.featureProject.getFeatureModel());
+		this.featureDataConstructor = new FeatureDataConstructor(projectSignatures, FeatureDataConstructor.TYPE_FOP);
 	}
 
-	private AbstractSignature addFeatureID(AbstractSignature sig, int featureID, int line) {
+	private AbstractSignature addFeatureID(AbstractSignature sig, int featureID, int startLine, int endLine) {
 		SignatureReference sigRef = signatureSet.get(sig);
 		if (sigRef == null) {
 			sigRef = new SignatureReference(sig);
 			signatureSet.put(sig, sigRef);
 			signatureTable.put(sig.getFullName(), sig);
 		}
-		sigRef.addID(new FOPFeatureData(featureID, line));
+		sigRef.addID((FOPFeatureData) featureDataConstructor.create(featureID, startLine, endLine));
 		return sigRef.getSig();
 	}
 
@@ -332,7 +335,7 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 					int featureID = projectSignatures.getFeatureID(featurename);
 					
 					FujiClassSignature curClassSig = (FujiClassSignature) addFeatureID(new FujiClassSignature(parent, name, modifierString,
-							typeString, pckg, typeDecl, importList), featureID, Symbol.getLine(typeDecl.getStart()));
+							typeString, pckg, typeDecl, importList), featureID, Symbol.getLine(typeDecl.getStart()), Symbol.getLine(typeDecl.getEnd()));
 					for (ImportDecl importDecl : importList) {
 						curClassSig.addImport(importDecl.toString());
 					}
@@ -354,7 +357,7 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 							featureID = projectSignatures.getFeatureID(featurename);
 							
 							AbstractSignature methAbs = addFeatureID(new FujiMethodSignature(curClassSig, name, modifierString, type,
-									false, parameterList, exceptionList), featureID, Symbol.getLine(method.getStart()));
+									false, parameterList, exceptionList), featureID, Symbol.getLine(method.getStart()), Symbol.getLine(method.getEnd()));
 							findMethodAccesses(method, methAbs, featureID);
 						} else if (bodyDecl instanceof FieldDeclaration) {
 							FieldDeclaration field = (FieldDeclaration) bodyDecl;
@@ -367,7 +370,7 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 							featureID = projectSignatures.getFeatureID(featurename);
 							
 							addFeatureID(new FujiFieldSignature(curClassSig, name, modifierString, type), featureID,
-									Symbol.getLine(field.getStart()));
+									Symbol.getLine(field.getStart()), Symbol.getLine(field.getEnd()));
 
 						} else if (bodyDecl instanceof ConstructorDecl) {
 							ConstructorDecl constructor = (ConstructorDecl) bodyDecl;
@@ -384,7 +387,7 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 								featureID = projectSignatures.getFeatureID(featurename);
 								
 								AbstractSignature constrAbs = addFeatureID(new FujiMethodSignature(curClassSig, name, modifierString, type,
-										true, parameterList, exceptionList), featureID, Symbol.getLine(constructor.getStart()));
+										true, parameterList, exceptionList), featureID, Symbol.getLine(constructor.getStart()), Symbol.getLine(constructor.getEnd()));
 								findMethodAccesses(constructor, constrAbs, featureID);
 							}
 

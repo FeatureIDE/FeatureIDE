@@ -25,7 +25,6 @@ import java.util.Collection;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
-import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.core.signature.filter.IFilter;
 
 /**
@@ -43,12 +42,17 @@ public class DocumentationBuilder {
 		this.parser = featureProject.getComposer().getComposerObjectInstance(ADocumentationCommentParser.class);
 	}
 
-	public final void build(ADocumentationCommentMerger merger, Collection<IFilter<AbstractSignature>> filters) {
+	public final void build(ADocumentationCommentMerger merger, Collection<IFilter<?>> filters) {
 		final FSTModel fstModel = featureProject.getFSTModel();
 		if (fstModel != null) {
 			final ProjectSignatures projectSignatures = fstModel.getProjectSignatures();
 			if (projectSignatures != null) {
-				for (SignatureCommentPair pair : DocumentationCommentCollector.collect(projectSignatures, filters)) {
+				if (parser.addExtraFilters()) {
+					for (IFilter<?> filter : filters) {
+						merger.addFilter(filter);
+					}
+				}
+				for (SignatureCommentPair pair : DocumentationCommentCollector.collect(projectSignatures)) {
 					// parse
 					parser.parse(projectSignatures, pair.getComment());
 					// merge

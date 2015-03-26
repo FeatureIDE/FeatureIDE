@@ -53,6 +53,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
+import de.ovgu.featureide.core.signature.base.FeatureDataConstructor;
 import de.ovgu.featureide.core.signature.base.PreprocessorFeatureData;
 
 /**
@@ -81,7 +82,7 @@ public abstract class MungeSignatureBuilder {
 		return contents.toString();
 	}
 	
-	private static Collection<AbstractSignature> parse(ASTNode root) {
+	private static Collection<AbstractSignature> parse(ProjectSignatures projectSignatures, ASTNode root) {
 		final HashMap<AbstractSignature, AbstractSignature> map = new HashMap<>();
 		
 		final CompilationUnit cu = (CompilationUnit) root;
@@ -97,6 +98,7 @@ public abstract class MungeSignatureBuilder {
 		}
 		
 		final ListIterator<Javadoc> it = cl.listIterator();
+		final FeatureDataConstructor featureDataConstructor = new FeatureDataConstructor(projectSignatures, FeatureDataConstructor.TYPE_PP);
 		
 		root.accept(new ASTVisitor() {
 			private BodyDeclaration curDeclaration = null;
@@ -130,17 +132,13 @@ public abstract class MungeSignatureBuilder {
 				this.curDeclaration = curDeclaration;
 				final Javadoc javadoc = curDeclaration.getJavadoc();
 				final int startPosition = (javadoc == null) ? curDeclaration.getStartPosition() : curDeclaration.getStartPosition() + javadoc.getLength();
-				curfeatureData = new PreprocessorFeatureData(cu.getLineNumber(startPosition));
+				curfeatureData = (PreprocessorFeatureData) featureDataConstructor.create(null, cu.getLineNumber(startPosition), cu.getLineNumber(curDeclaration.getStartPosition() + curDeclaration.getLength()));
 				curSignature.setFeatureData(curfeatureData);
 				map.put(curSignature, curSignature);
 			}
 			
 			@Override
 			public boolean visit(MethodDeclaration node) {
-				System.out.println("--- Method ---");
-				System.out.println(node.toString());
-				System.out.println();
-				
 				final MungeMethodSignature methodSignature = new MungeMethodSignature(getParent(node.getParent()), 
 						node.getName().getIdentifier(), node.getModifiers(), node.getReturnType2(), node.parameters(), 
 						node.isConstructor());
@@ -173,10 +171,6 @@ public abstract class MungeSignatureBuilder {
 			
 			@Override
 			public boolean visit(FieldDeclaration node) {
-				System.out.println("--- Field ---");
-				System.out.println(node.toString());
-				System.out.println();
-				
 				for (Iterator<?> it = node.fragments().iterator(); it.hasNext();) {
 					VariableDeclarationFragment fragment = (VariableDeclarationFragment) it.next();
 					
@@ -191,10 +185,6 @@ public abstract class MungeSignatureBuilder {
 			
 			@Override
 			public boolean visit(TypeDeclaration node) {
-				System.out.println("--- Type ---");
-				System.out.println(node.toString());
-				System.out.println();
-
 				final MungeClassSignature classSignature = new MungeClassSignature(getParent(node.getParent()),
 						node.getName().getIdentifier(), node.getModifiers(), node.isInterface() ? "interface" : "class", packageName);
 				
@@ -224,11 +214,7 @@ public abstract class MungeSignatureBuilder {
 						char[] content = readFile((IFile) resource).toCharArray();
 						if (content.length > 0) {
 							parser.setSource(content);
-							final Collection<AbstractSignature> map = parse(parser.createAST(null));
-							for (AbstractSignature abstractSignature : map) {
-								System.out.println(abstractSignature);
-							}
-							signatureList.addAll(map);
+							signatureList.addAll(parse(projectSignatures, parser.createAST(null)));
 						}
 					}
 

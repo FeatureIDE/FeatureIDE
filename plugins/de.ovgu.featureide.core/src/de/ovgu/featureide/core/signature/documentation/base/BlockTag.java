@@ -2,7 +2,9 @@ package de.ovgu.featureide.core.signature.documentation.base;
 
 import org.prop4j.Node;
 
-public class BlockTag implements Comparable<BlockTag> {
+import de.ovgu.featureide.core.signature.base.IConstrainedObject;
+
+public class BlockTag implements Comparable<BlockTag>, IConstrainedObject {
 	
 	public static final int TAG_UNKNOWN = Integer.MAX_VALUE, TAG_DESCRIPTION = 0, TAG_AUTHOR = 1, TAG_VERSION = 2, TAG_PARAM = 3, TAG_RETURN = 4,
 			TAG_THROWS = 5, TAG_SEE = 6, TAG_SINCE = 7, TAG_SERIAL = 8, TAG_SERIALFIELD = 9, TAG_DEPRECATED = 10;
@@ -82,7 +84,7 @@ public class BlockTag implements Comparable<BlockTag> {
 		return !isFeatureSpecific();
 	}
 
-	public Node getFeatureNode() {
+	public Node getConstraint() {
 		return featureNode;
 	}
 	

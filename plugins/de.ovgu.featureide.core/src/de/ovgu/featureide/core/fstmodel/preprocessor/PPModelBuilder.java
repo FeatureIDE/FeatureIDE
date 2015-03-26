@@ -77,32 +77,35 @@ public class PPModelBuilder {
 		}
 		featureProject.setFSTModel(model);
 	}
+	
+	protected IFile currentFile = null;
 
 	/**
 	 * @param folder
 	 * @param packageName 
 	 * @throws CoreException 
 	 */
-	private void buildModel(IFolder folder, String packageName) throws CoreException {
+	private void buildModel(IFolder folder, String packageName) throws CoreException {		
 		for (IResource res : folder.members()) {
 			if (res instanceof IFolder) {
 				buildModel((IFolder)res, packageName.isEmpty() ? res.getName() : packageName + "/" + res.getName());
 			} else if (res instanceof IFile) {
-				String text = getText((IFile)res);
+				currentFile = (IFile) res;
+				String text = getText(currentFile);
 				String className = packageName.isEmpty() ? res.getName() : packageName + "/" + res.getName();
 	
-				Vector<String> lines = PPComposerExtensionClass.loadStringsFromFile((IFile) res);
+				Vector<String> lines = PPComposerExtensionClass.loadStringsFromFile(currentFile);
 				boolean classAdded = false;
 				for (String feature : featureNames) {
 					if (containsFeature(text, feature)) {
 						System.err.println("buildModel2 :" + feature + " - " + className);
-						model.addRole(feature, className, (IFile) res);
+						model.addRole(feature, className, currentFile);
 						classAdded = true;
 					}
 				}
 				if (classAdded) {
 					LinkedList<FSTDirective> directives = buildModelDirectivesForFile(lines);
-					addDirectivesToModel(directives, (IFile)res, className);
+					addDirectivesToModel(directives, currentFile, className);
 				} else {
 					// add class without annotations
 					model.addClass(new FSTClass(className));

@@ -42,8 +42,11 @@ public abstract class ADocumentationCommentParser implements IComposerObject {
 
 	static final String COMMENT_START = "/**", COMMENT_END = "*/";
 
-	private static final Pattern pBlockTag = Pattern.compile("[^{]\\s*@\\w+\\s"), pCommentType = Pattern.compile("\\A\\s*[{]\\s*@[a-z]+\\s*\\d*\\s*[}]"),
-			pStar = Pattern.compile("\n\\s*[*]");
+	private static final Pattern
+		pStart 			= Pattern.compile("\\/\\*\\*[\\*\n\\s]*"),
+		pCommentType 	= Pattern.compile("\\A\\s*[{]\\s*@(feature|general|new)(\\s+(\\w)+)*\\s*[}]"),
+		pBlockTag 		= Pattern.compile("[^{]\\s*@\\w+\\s"),
+		pStar 			= Pattern.compile("\n\\s*[*]");
 
 	protected final List<BlockTag> generalTags = new ArrayList<BlockTag>(), featureTags = new LinkedList<BlockTag>();
 
@@ -61,13 +64,9 @@ public abstract class ADocumentationCommentParser implements IComposerObject {
 			final String commentString = comment.getComment();
 			curFeatureID = comment.getFeatureID();
 
-			int startIndex = 0;
-			int endIndex = commentString.indexOf(COMMENT_END);
-
-			while (endIndex > -1) {
-				parseTags(commentString.substring(startIndex + COMMENT_START.length(), endIndex));
-				startIndex = commentString.indexOf(COMMENT_START, endIndex + COMMENT_END.length());
-				endIndex = commentString.indexOf(COMMENT_END, endIndex + COMMENT_END.length());
+			final Matcher startMatcher = pStart.matcher(commentString);
+			while (startMatcher.find()) {
+				parseTags(commentString.substring(startMatcher.end(), commentString.indexOf(COMMENT_END, startMatcher.start())));
 			}
 		}
 	}
@@ -110,7 +109,7 @@ public abstract class ADocumentationCommentParser implements IComposerObject {
 			x = m.start();
 			z = m.end();
 
-			categorize(tagList, "", comment.substring(1, x + 1).trim());
+			categorize(tagList, "", comment.substring(0, x + 1).trim());
 
 			while (m.find()) {
 				y = m.start();
@@ -137,6 +136,10 @@ public abstract class ADocumentationCommentParser implements IComposerObject {
 
 	public final List<BlockTag> getFeatureTags() {
 		return featureTags;
+	}
+	
+	public boolean addExtraFilters() {
+		return false;
 	}
 
 }

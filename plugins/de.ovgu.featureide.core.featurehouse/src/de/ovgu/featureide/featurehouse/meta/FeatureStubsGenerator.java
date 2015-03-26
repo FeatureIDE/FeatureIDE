@@ -143,7 +143,7 @@ public class FeatureStubsGenerator {
 								AbstractSignature curSig = sigIterator.next();
 								for (int i = 0; i < curSig.getFeatureData().length; i++) {
 									if ((curSig.getFeatureData())[i].getID() == featureID && curSig.getName().equals(meth.getName())
-											&& curSig.getFeatureData()[i].getLineNumber() == meth.getLine()) {
+											&& curSig.getFeatureData()[i].getStartLineNumber() == meth.getLine()) {
 										if (((FOPFeatureData[])curSig.getFeatureData())[i].usesExternMethods()) {
 											FeatureHouseCorePlugin.getDefault().logError("The method\n"	+ curSig.getFullName() + "\nis not defined within the currently checked SPL. Therefore the process will be aborted." , null);
 											return;

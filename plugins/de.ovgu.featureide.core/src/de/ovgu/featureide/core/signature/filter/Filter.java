@@ -25,7 +25,7 @@ import java.util.Iterator;
 
 public abstract class Filter {
 
-	public static <T> void filter(Collection<T> collection, IFilter<T> filter) {
+	public static <U, T extends U> void filter(Collection<T> collection, IFilter<U> filter) {
 		if (collection != null && filter != null) {
 			for (Iterator<T> iterator = collection.iterator(); iterator.hasNext();) {
 				if (!filter.isValid(iterator.next())) {
@@ -34,10 +34,11 @@ public abstract class Filter {
 			}
 		}
 	}
-	
-	public static <T> void filter(Collection<T> collection, Collection<IFilter<T>> filterList) {
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static <T> void filter(Collection<T> collection, Collection<IFilter<?>> filterList) {
 		if (collection != null && filterList != null) {
-			for (IFilter<T> filter : filterList) {
+			for (IFilter filter : filterList) {
 				for (Iterator<T> iterator = collection.iterator(); iterator.hasNext();) {
 					if (!filter.isValid(iterator.next())) {
 						iterator.remove();

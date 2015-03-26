@@ -20,29 +20,41 @@
  */
 package de.ovgu.featureide.core.signature.base;
 
+import org.prop4j.Node;
 
 /**
  * TODO description
  * 
  * @author Sebastian Krieter
  */
-public abstract class AFeatureData {
-	protected final int lineNumber;
+public abstract class AFeatureData implements IConstrainedObject {
+	protected final int startLineNumber, endLineNumber;
 	protected final int id;
-	
-	protected String comment;
-	
-	protected AFeatureData(int lineNumber) {
-		this(-1, lineNumber);
-	}
 
-	protected AFeatureData(int id, int lineNumber) {
-		this.lineNumber = lineNumber;
+	protected Node constraint;
+
+	protected String comment;
+
+	protected AFeatureData(int id, int lineNumber, int endLineNumber) {
+		this.startLineNumber = lineNumber;
+		this.endLineNumber = endLineNumber;
 		this.id = id;
 	}
 
-	public int getLineNumber() {
-		return lineNumber;
+	public int getStartLineNumber() {
+		return startLineNumber;
+	}
+
+	public int getEndLineNumber() {
+		return endLineNumber;
+	}
+
+	public Node getConstraint() {
+		return constraint;
+	}
+
+	public void setConstraint(Node constraint) {
+		this.constraint = constraint;
 	}
 
 	public String getComment() {
@@ -60,4 +72,5 @@ public abstract class AFeatureData {
 	public boolean hasID(int id) {
 		return this.id == -1 || this.id == id;
 	}
+
 }

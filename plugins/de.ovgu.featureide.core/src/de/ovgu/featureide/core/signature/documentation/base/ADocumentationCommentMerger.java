@@ -44,8 +44,8 @@ public abstract class ADocumentationCommentMerger implements Comparator<BlockTag
 		RULE_MERGE = 0,
 		RULE_OVERRIDE = 1,
 		RULE_DISCARD = 2;
-
-	private final List<IFilter<BlockTag>> filterList = new LinkedList<>();
+	
+	private final List<IFilter<?>> filterList = new LinkedList<>();
 
 	protected int[] featureIDRanks = null;
 	
@@ -63,7 +63,7 @@ public abstract class ADocumentationCommentMerger implements Comparator<BlockTag
 	}
 
 	public String merge(List<BlockTag> generalTags, List<BlockTag> featureTags) {
-		Filter.filter(generalTags, filterList);
+//		Filter.filter(generalTags, filterList);
 		Filter.filter(featureTags, filterList);
 		
 		sortFeatureList(featureTags);
@@ -125,7 +125,7 @@ public abstract class ADocumentationCommentMerger implements Comparator<BlockTag
 		if (featureIDRanks != null) {
 			for (Iterator<BlockTag> it = tagList.iterator(); it.hasNext();) {
 				final BlockTag tag = it.next();
-				if (featureIDRanks[tag.getFeatureID()] == -1) {
+				if (tag.getFeatureID() > -1 && featureIDRanks[tag.getFeatureID()] == -1) {
 					it.remove();
 				}
 			}
@@ -150,7 +150,7 @@ public abstract class ADocumentationCommentMerger implements Comparator<BlockTag
 						switch (getRuleForCommentPart(newTag)) {
 						case RULE_MERGE:
 							if (!oldTag.getDesc().isEmpty()) {
-								oldTag.setDesc(newTag.getDesc() + ("</br>" + newTag.getDesc()));
+								oldTag.setDesc(oldTag.getDesc() + ("</br>" + newTag.getDesc()));
 							} else {
 								oldTag.setDesc(newTag.getDesc());
 							}
@@ -199,10 +199,13 @@ public abstract class ADocumentationCommentMerger implements Comparator<BlockTag
 
 	@Override
 	public int compare(BlockTag tag1, BlockTag tag2) {
+		if (tag1.getFeatureID() == -1 || tag2.getFeatureID() == -1) {
+			return 0;
+		}
 		return featureIDRanks[tag1.getFeatureID()] - featureIDRanks[tag2.getFeatureID()];
 	}
 
-	public void addFilter(IFilter<BlockTag> filter) {
+	public void addFilter(IFilter<?> filter) {
 		this.filterList.add(filter);
 	}
 

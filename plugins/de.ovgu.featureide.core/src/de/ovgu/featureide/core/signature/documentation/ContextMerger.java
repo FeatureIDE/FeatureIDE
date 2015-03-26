@@ -35,15 +35,15 @@ public class ContextMerger extends ADocumentationCommentMerger {
 		addFilter(new IFilter<BlockTag>() {
 			@Override
 			public boolean isValid(BlockTag blockTag) {
-				return blockTag.isFeatureIndependent() || blockTag.getPriority() > 0;
+				return blockTag.isFeatureIndependent() || blockTag.getPriority() >= 0;
 			}
 		});
 	}
 
 	@Override
 	protected BlockTag adaptBlockTag(BlockTag tag) {
-		if (tag.isFeatureIndependent() && tag.getTagtype() != BlockTag.TAG_SEE) {
-			tag.setDesc("<b>[" + tag.getFeatureNode() + "]</b> " + tag.getDesc());
+		if (tag.isFeatureSpecific() && tag.getTagtype() != BlockTag.TAG_SEE) {
+			tag.setDesc("<b>[" + tag.getConstraint() + "]</b> " + tag.getDesc());
 		}
 		return tag;
 	}

@@ -179,7 +179,7 @@ public class FSTModel {
 	
 	public String getAbsoluteClassName(IFile file) {
 		final int segments = featureProject.getSourceFolder().getFullPath().segmentCount()
-				+ ((featureProject.getComposer().hasFeatureFolder()) ? 1 : 0);
+				+ ((featureProject.getComposer().createFolderForFeatures()) ? 1 : 0);
 		return file.getFullPath().removeFirstSegments(segments).toString();
 	}
 }

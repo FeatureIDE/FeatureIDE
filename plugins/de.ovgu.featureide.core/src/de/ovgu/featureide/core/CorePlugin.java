@@ -74,8 +74,10 @@ import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 import de.ovgu.featureide.core.signature.base.AbstractFieldSignature;
 import de.ovgu.featureide.core.signature.base.AbstractMethodSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
+import de.ovgu.featureide.core.signature.documentation.ContextMerger;
 import de.ovgu.featureide.core.signature.documentation.FeatureModuleMerger;
 import de.ovgu.featureide.core.signature.documentation.SPLMerger;
+import de.ovgu.featureide.core.signature.documentation.VariantMerger;
 import de.ovgu.featureide.core.signature.filter.ContextFilter;
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
@@ -747,14 +749,14 @@ public class CorePlugin extends AbstractCorePlugin {
 
 	public void buildContextDocumentation(List<IProject> pl, String options, String featureName) {
 		final PrintDocumentationJob.Arguments args = new PrintDocumentationJob.Arguments(
-				"Docu_Context_" + featureName, options.split("\\s+"), new FeatureModuleMerger(), featureName);
+				"Docu_Context_" + featureName, options.split("\\s+"), new ContextMerger(), featureName);
 
 		FMCorePlugin.getDefault().startJobs(pl, args, true);
 	}
 
 	public void buildVariantDocumentation(List<IProject> pl, String options) {
 		final PrintDocumentationJob.Arguments args = new PrintDocumentationJob.Arguments(
-				"Docu_Variant", options.split("\\s+"), new FeatureModuleMerger(), null);
+				"Docu_Variant", options.split("\\s+"), new VariantMerger(), null);
 
 		FMCorePlugin.getDefault().startJobs(pl, args, true);
 	}

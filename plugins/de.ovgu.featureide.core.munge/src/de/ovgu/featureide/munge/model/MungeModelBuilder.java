@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.munge.model;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Deque;
 import java.util.Iterator;
@@ -27,6 +28,7 @@ import java.util.LinkedList;
 import java.util.Vector;
 import java.util.regex.Matcher;
 
+import org.prop4j.Node;
 import org.prop4j.NodeReader;
 
 import de.ovgu.featureide.core.IFeatureProject;
@@ -37,6 +39,7 @@ import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.core.signature.ProjectSignatures.SignatureIterator;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.core.signature.base.PreprocessorFeatureData;
+import de.ovgu.featureide.core.signature.filter.IFilter;
 import de.ovgu.featureide.munge.MungePreprocessor;
 import de.ovgu.featureide.munge.signatures.MungeSignatureBuilder;
 
@@ -47,9 +50,20 @@ import de.ovgu.featureide.munge.signatures.MungeSignatureBuilder;
  * @author Sebastian Krieter
  */
 public class MungeModelBuilder extends PPModelBuilder {
+	
+	private ProjectSignatures signatures = MungeSignatureBuilder.build(featureProject);
 
 	public MungeModelBuilder(IFeatureProject featureProject) {
 		super(featureProject);
+		
+		signatures = MungeSignatureBuilder.build(featureProject);
+		signatures.sort(new Comparator<AbstractSignature>() {
+			@Override
+			public int compare(AbstractSignature arg0, AbstractSignature arg1) {
+				return arg0.getFirstFeatureData().getStartLineNumber() - arg1.getFirstFeatureData().getStartLineNumber();
+			}
+		});
+		model.setProjectSignatures(signatures);
 	}
 
 	@Override
@@ -59,8 +73,8 @@ public class MungeModelBuilder extends PPModelBuilder {
 
 	private int curSignatureIndex = 0;
 	
-	private void updateSignatures(Deque<FSTDirective> directivesStack, int endline, SignatureIterator sigIt, int[] sigLineNumber) {
-		StringBuilder sb = new StringBuilder();
+	private void updateSignatures(Deque<FSTDirective> directivesStack, int endline, SignatureIterator sigIt, ArrayList<Integer> sigLineNumber) {
+		final StringBuilder sb = new StringBuilder();
 		int startLine = 0;
 		for (Iterator<FSTDirective> it = directivesStack.descendingIterator(); it.hasNext();) {
 			final FSTDirective fstDirective = it.next();
@@ -82,11 +96,11 @@ public class MungeModelBuilder extends PPModelBuilder {
 			}
 		}
 		if (sb.length() > 0) {
-			final NodeReader nodereader = new NodeReader();
-			for (; curSignatureIndex < sigLineNumber.length; curSignatureIndex++) {
-				if (sigLineNumber[curSignatureIndex] >= startLine) {
-					if (sigLineNumber[curSignatureIndex] <= endline) {
-						((PreprocessorFeatureData) sigIt.next().getFirstFeatureData()).setConstraint(nodereader.stringToNode(sb.toString(), featureNames));
+			final Node constraint = new NodeReader().stringToNode(sb.toString(), featureNames);
+			for (; curSignatureIndex < sigLineNumber.size(); curSignatureIndex++) {
+				if (sigLineNumber.get(curSignatureIndex) >= startLine) {
+					if (sigLineNumber.get(curSignatureIndex) <= endline) {
+						((PreprocessorFeatureData) sigIt.next().getFirstFeatureData()).setConstraint(constraint);
 					} else {
 						break;
 					}
@@ -104,20 +118,30 @@ public class MungeModelBuilder extends PPModelBuilder {
 		LinkedList<FSTDirective> directivesList = new LinkedList<FSTDirective>();
 		
 		boolean commentSection = false;
-
-		final ProjectSignatures signatures = MungeSignatureBuilder.build(featureProject);
-		signatures.sort(new Comparator<AbstractSignature>() {
-			@Override
-			public int compare(AbstractSignature arg0, AbstractSignature arg1) {
-				return arg0.getFirstFeatureData().getLineNumber() - arg1.getFirstFeatureData().getLineNumber();
-			}
-		});
-		model.setProjectSignatures(signatures);
 		
+		final String fileName;
+		String tempFileName = model.getAbsoluteClassName(currentFile);
+		final int extIndex = tempFileName.lastIndexOf('.');
+		if (extIndex > 0) {
+			fileName = tempFileName.substring(0, extIndex);
+		} else {
+			fileName = tempFileName;
+		}
 		final SignatureIterator sigIt = signatures.iterator();
-		int[] sigLineNumber = new int[signatures.getSize()];
-		for (int i = 0; sigIt.hasNext(); i++) {
-			sigLineNumber[i] = sigIt.next().getFirstFeatureData().getLineNumber();
+		sigIt.addFilter(new IFilter<AbstractSignature>() {
+			@Override
+			public boolean isValid(AbstractSignature object) {
+				String sigName = object.getFullName();
+				if (sigName.startsWith(".")) {
+					sigName = sigName.substring(1);
+				}
+				return sigName.replace('.', '/').startsWith(fileName);
+			}
+			
+		});
+		ArrayList<Integer> sigLineNumber = new ArrayList<>();
+		for (;sigIt.hasNext();) {
+			sigLineNumber.add(sigIt.next().getFirstFeatureData().getStartLineNumber());
 		}
 		sigIt.reset();
 		curSignatureIndex = 0;

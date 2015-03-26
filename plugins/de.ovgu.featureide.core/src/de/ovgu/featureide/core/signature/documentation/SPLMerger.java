@@ -32,7 +32,6 @@ import de.ovgu.featureide.core.signature.filter.IFilter;
 public class SPLMerger extends ADocumentationCommentMerger {
 
 	public SPLMerger() {
-		super();
 		addFilter(new IFilter<BlockTag>() {
 			@Override
 			public boolean isValid(BlockTag blockTag) {
@@ -44,7 +43,7 @@ public class SPLMerger extends ADocumentationCommentMerger {
 	@Override
 	protected BlockTag adaptBlockTag(BlockTag tag) {
 		if (tag.isFeatureSpecific() && tag.getTagtype() != BlockTag.TAG_SEE) {
-			tag.setDesc("<b>[" + tag.getFeatureNode() + "]</b> " + tag.getDesc());
+			tag.setDesc("<b>[" + tag.getConstraint() + "]</b> " + tag.getDesc());
 		}
 		return tag;
 	}

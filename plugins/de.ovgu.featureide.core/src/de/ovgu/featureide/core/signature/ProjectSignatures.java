@@ -47,7 +47,7 @@ public class ProjectSignatures implements Iterable<AbstractSignature> {
 	public static final class SignatureIterator implements Iterator<AbstractSignature> {
 		private final AbstractSignature[] signatureArray;
 		
-		private final LinkedList<IFilter<AbstractSignature>> filter = new LinkedList<>();
+		private final LinkedList<IFilter<?>> filter = new LinkedList<>();
 		private int count = 0;
 		private boolean nextAvailable = false;
 		
@@ -59,7 +59,7 @@ public class ProjectSignatures implements Iterable<AbstractSignature> {
 			this.signatureArray = signatureArray;
 		}
 		
-		public void addFilter(IFilter<AbstractSignature> filter) {
+		public void addFilter(IFilter<?> filter) {
 			this.filter.add(filter);
 		}
 		
@@ -87,8 +87,9 @@ public class ProjectSignatures implements Iterable<AbstractSignature> {
 			return false;
 		}
 		
+		@SuppressWarnings({ "unchecked", "rawtypes" })
 		private boolean isValid(AbstractSignature sig) {
-			for (IFilter<AbstractSignature> curFilter : filter) {
+			for (IFilter curFilter : filter) {
 				if (!curFilter.isValid(sig)) {
 					return false;
 				}
@@ -142,9 +143,9 @@ public class ProjectSignatures implements Iterable<AbstractSignature> {
 		return new SignatureIterator(signatureArray);
 	}
 	
-	public SignatureIterator iterator(Collection<IFilter<AbstractSignature>> filters) {
+	public SignatureIterator iterator(Collection<IFilter<?>> filters) {
 		final SignatureIterator it = new SignatureIterator(signatureArray);
-		for (IFilter<AbstractSignature> filter : filters) {
+		for (IFilter<?> filter : filters) {
 			it.addFilter(filter);
 		}
 		return it;
@@ -189,6 +190,10 @@ public class ProjectSignatures implements Iterable<AbstractSignature> {
 		return featureNames.length;
 	}
 	
+	public String[] getFeatureNames() {
+		return featureNames;
+	}
+
 	public int getSize() {
 		return signatureArray.length;
 	}
