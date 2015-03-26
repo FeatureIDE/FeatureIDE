@@ -11,45 +11,6 @@
 				nature="FeatureIDE_Core.featureHouseNature">
 		</composer>
 	</extension>
-	<!--	<extension
-         point="org.eclipse.ui.popupMenus">
-      <objectContribution
-            adaptable="true"
-            id="de.ovgu.featureide.featurehouse.meta.buildmetaproduct"
-            objectClass="org.eclipse.core.resources.IProject">
-         <action
-               class="de.ovgu.featureide.featurehouse.ui.actions.BuildMetaProductAction"
-               enablesFor="1"
-               id="de.ovgu.featureide.featurehouse.meta.buildmetaproductaction"
-               label="Build Metaproduct"
-               menubarPath="de.ovgu.featureide.fm.ui.menu/featurehouse"
-               style="toggle">
-         </action>
-         <action
-               class="de.ovgu.featureide.featurehouse.ui.actions.EnableFujiAction"
-               enablesFor="1"
-               id="de.ovgu.featureide.featurehouse.ui.enablefujiaction"
-               label="Enable Fuji Type Check"
-               menubarPath="de.ovgu.featureide.fm.ui.menu/featurehouse"
-               style="toggle">
-         </action>
-         <visibility>
-            <objectState
-                  name="nature"
-                  value="de.ovgu.featureide.core.featureProjectNature">
-            </objectState>
-         </visibility>
-         <action
-               class="de.ovgu.featureide.featurehouse.ui.actions.GenerateFeatureStubsAction"
-               id="de.ovgu.featureide.featurehouse.meta.FeatureBasedVeriAction"
-               label="Perform Feature-Based Verification with KeY"
-               menubarPath="de.ovgu.featureide.fm.ui.menu/featurehouse"
-               style="push"
-               tooltip="Generates Feature Stubs and Starts KeY for each Feature Stub&apos;s Verification">
-         </action>
-      </objectContribution>
-	</extension>
-	-->
 	<extension
 			point="org.eclipse.ui.menus">
 		<menuContribution locationURI="popup:de.ovgu.featureide.fm.ui.menus.popupMenu?before=de.ovgu.featureide.fm.ui.menus.popupMenu.submenus">

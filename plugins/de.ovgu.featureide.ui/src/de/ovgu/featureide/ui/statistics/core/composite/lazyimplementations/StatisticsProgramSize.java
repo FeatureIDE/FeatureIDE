@@ -40,7 +40,8 @@ import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.gener
  * @author Patrick Haese
  */
 public class StatisticsProgramSize extends LazyParent {
-	private FSTModel fstModel;
+
+	private final FSTModel fstModel;
 
 	/**
 	 * Constructor for a {@code ProgrammSizeNode}.
@@ -65,14 +66,11 @@ public class StatisticsProgramSize extends LazyParent {
 			for (FSTRole role : class_.getRoles()) {
 				FSTClassFragment classFragment = role.getClassFragment();
 				String packageName = classFragment.getPackage();
-				String qualifiedPackageName = (packageName == null) ? "(default package)"
-						: packageName;
+				String qualifiedPackageName = (packageName == null) ? "(default package)" : packageName;
 
-				String roleName = classFragment.getName().endsWith(".java") ? classFragment
-						.getName().substring(0, classFragment.getName().length() - 5)
+				String roleName = classFragment.getName().endsWith(".java") ? classFragment.getName().substring(0, classFragment.getName().length() - 5)
 						: classFragment.getName();
-				String qualifiedRoleName = qualifiedPackageName + "."
-						+ roleName;
+				String qualifiedRoleName = qualifiedPackageName + "." + roleName;
 
 				String qualifier = qualifiedRoleName + ".";
 
@@ -83,16 +81,10 @@ public class StatisticsProgramSize extends LazyParent {
 				addToMap(qualifiedRoleName, classMap);
 			}
 		}
-		
-		addChild(new HashMapNode(NUMBER_CLASS + SEPARATOR
-				+ classMap.keySet().size() + " | " + NUMBER_ROLE + SEPARATOR
-				+ sum(classMap), null, classMap));
-		addChild(new HashMapNode(NUMBER_FIELD_U + SEPARATOR
-				+ fieldMap.keySet().size() + " | " + NUMBER_FIELD + SEPARATOR
-				+ sum(fieldMap), null, fieldMap));
-		addChild(new HashMapNode(NUMBER_METHOD_U + SEPARATOR
-				+ methodMap.keySet().size() + " | " + NUMBER_METHOD + SEPARATOR
-				+ sum(methodMap), null, methodMap));
+
+		addChild(new HashMapNode(NUMBER_CLASS + SEPARATOR + classMap.keySet().size() + " | " + NUMBER_ROLE + SEPARATOR + sum(classMap), null, classMap));
+		addChild(new HashMapNode(NUMBER_FIELD_U + SEPARATOR + fieldMap.keySet().size() + " | " + NUMBER_FIELD + SEPARATOR + sum(fieldMap), null, fieldMap));
+		addChild(new HashMapNode(NUMBER_METHOD_U + SEPARATOR + methodMap.keySet().size() + " | " + NUMBER_METHOD + SEPARATOR + sum(methodMap), null, methodMap));
 	}
 
 	private void addToMap(String name, HashMap<String, Integer> map) {

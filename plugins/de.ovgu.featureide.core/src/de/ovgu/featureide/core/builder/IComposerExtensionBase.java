@@ -42,7 +42,7 @@ public interface IComposerExtensionBase extends IExtension {
 	String getDescription();
 	
 	/**
-	 * @return <code>true</code> if the composer has a folder for each features.
+	 * @return <code>true</code> if the composer has a folder for each feature.
 	 */
 	boolean hasFeatureFolder();
 

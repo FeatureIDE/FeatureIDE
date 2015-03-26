@@ -37,7 +37,8 @@ import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
  * @author Patrick Haese
  */
 public final class FeatureListNode extends LazyParent {
-	private Collection<Feature> list;
+	
+	private final Collection<Feature> list;
 	
 	public FeatureListNode(String description, Collection<Feature> collection) {
 		this(description, collection, collection.size());

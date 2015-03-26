@@ -29,111 +29,145 @@ import de.ovgu.featureide.ui.views.collaboration.figures.RoleFigure;
 
 /**
  * Collaboration diagram context menu option
- * Filter methods and fields of roles 
+ * Filter methods and fields of roles
  * 
- * @author Steffen Schulze 
- * @author Christian Lausberger 
+ * @author Steffen Schulze
+ * @author Christian Lausberger
  */
 public class ShowFieldsMethodsAction extends Action {
-	
-	public static final int ONLY_FIELDS = 0;
-	public static final int ONLY_METHODS = 1;
-	public static final int ONLY_CONTRACTS = 2;
-	public static final int ONLY_INVARIANTS = 3;
-	public static final int HIDE_PARAMETERS_AND_TYPES = 4;
-	public static final int PUBLIC_FIELDSMETHODS = 5;
-	public static final int PROTECTED_FIELDSMETHODS = 6;
-	public static final int DEFAULT_FIELDSMETHODS = 7;
-	public static final int PRIVATE_FIELDSMETHODS = 8;
-	public static final int SELECT_ALL = 9;
-	public static final int DESELECT_ALL = 10;
-	
-	private CollaborationView collaborationView;
+
+	public static final int FIELDS_WITH_REFINEMENTS = 0;
+	public static final int FIELDS_WITHOUT_REFINEMENTS = 1;
+	public static final int METHODS_WITH_REFINEMENTS = 2;
+	public static final int METHODS_WITHOUT_REFINEMENTS = 3;
+	public static final int ONLY_CONTRACTS = 4;
+	public static final int ONLY_INVARIANTS = 5;
+	public static final int SHOW_NESTED_CLASSES = 6;
+	public static final int HIDE_PARAMETERS_AND_TYPES = 7;
+	public static final int PUBLIC_FIELDSMETHODS = 8;
+	public static final int PROTECTED_FIELDSMETHODS = 9;
+	public static final int DEFAULT_FIELDSMETHODS = 10;
+	public static final int PRIVATE_FIELDSMETHODS = 11;
+	public static final int SELECT_ALL = 12;
+	public static final int DESELECT_ALL = 13;
+
+	public static final int SELECT_ALL_METHOD_ACCESS = 20;
+	public static final int DESELECT_ALL_METHOD_ACCESS = 21;
+
+	private final CollaborationView collaborationView;
 	private int index;
+
+	// Custom action with checkbox
 	public ShowFieldsMethodsAction(String text, Image image, CollaborationView collaborationView, int index) {
-		super(text, getImageDiscriptor(image));
+		this(text, image, collaborationView, index, Action.AS_CHECK_BOX);
+	}
+
+	// Custom action with style
+	public ShowFieldsMethodsAction(String text, Image image, CollaborationView collaborationView, int index, int style) {
+		super(text, style);
+		this.setImageDescriptor(getImageDiscriptor(image));
 		this.collaborationView = collaborationView;
 		this.index = index;
 	}
-	
+
+	public void setActionIndex(int index) {
+		this.index = index;
+	}
+
 	@Override
 	public void setChecked(boolean checked) {
 		super.setChecked(isSelected());
+
 	}
-	
+
 	private static ImageDescriptor getImageDiscriptor(Image image) {
-		if (image != null){
+		if (image != null) {
 			return ImageDescriptor.createFromImage(image);
 		}
 		return null;
 	}
-	
+
+	private boolean[] selectAllAccessModifiers(boolean[] selected, boolean value) {
+		for (int i = PUBLIC_FIELDSMETHODS; i <= PRIVATE_FIELDSMETHODS; i++) {
+			selected[i] = value;
+		}
+		return selected;
+	}
+
 	public void run() {
 		boolean[] selected = RoleFigure.getSelectedFieldMethod();
-		
-		switch (this.index) {
-			case SELECT_ALL:
-				setSelected(true, selected);
-				break;
-			case DESELECT_ALL:
-				setSelected(false, selected);
-				break;
-			case ONLY_CONTRACTS:
-			case ONLY_INVARIANTS:
-			case ONLY_FIELDS:
-			case ONLY_METHODS:
-				noDeclarationTypSelected(selected);
-				break;
-			case HIDE_PARAMETERS_AND_TYPES:
-				selected[index] = !selected[index];
-				break;
-			default:
-				noOnlyFieldOrMethodSelected(selected);
+		switch (index) {
+		case SELECT_ALL:
+			setSelected(true, selected);
+			break;
+		case DESELECT_ALL:
+			setDeselected(false, selected);
+			break;
+		case SELECT_ALL_METHOD_ACCESS:
+			selectAllAccessModifiers(selected, true);
+			break;
+		case DESELECT_ALL_METHOD_ACCESS:
+			selectAllAccessModifiers(selected, false);
+			break;
+		case PUBLIC_FIELDSMETHODS:
+			selected[index] = !selected[index];
+			super.setChecked(selected[index]);
+			break;
+		case PRIVATE_FIELDSMETHODS:
+			selected[index] = !selected[index];
+			super.setChecked(selected[index]);
+			break;
+		case DEFAULT_FIELDSMETHODS:
+			selected[index] = !selected[index];
+			super.setChecked(selected[index]);
+			break;
+		case PROTECTED_FIELDSMETHODS:
+			selected[index] = !selected[index];
+			super.setChecked(selected[index]);
+			break;
+		default:
+			selected[index] = !selected[index];
+			super.setChecked(selected[index]);
+			break;
 		}
+
 		RoleFigure.setSelectedFieldMethod(selected);
+		collaborationView.reloadImage();
 		collaborationView.refresh();
+
+		if (index == SELECT_ALL || index == DESELECT_ALL)
+			collaborationView.selectAll();
 	}
 
 	private void setSelected(boolean value, boolean[] selected) {
-		for (int i = ONLY_FIELDS; i < selected.length; i++) {
-			if (i != HIDE_PARAMETERS_AND_TYPES)
-			selected[i] = value;
+		for (int i = FIELDS_WITH_REFINEMENTS; i < selected.length; i++) {
+			if (i != HIDE_PARAMETERS_AND_TYPES && i != ONLY_CONTRACTS && i != ONLY_INVARIANTS) {
+				selected[i] = value;
+			}
 		}
-		
 	}
-	
-	private void noOnlyFieldOrMethodSelected(boolean[] selected) {
-		if(!selected[ONLY_FIELDS] && !selected[ONLY_METHODS] ) {
-			selected[ONLY_FIELDS] = true;
-			selected[ONLY_METHODS] = true;
+
+	private void setDeselected(boolean value, boolean[] selected) {
+		for (int i = FIELDS_WITH_REFINEMENTS; i < selected.length; i++) {
+			if (i != HIDE_PARAMETERS_AND_TYPES) {
+				selected[i] = value;
+			}
 		}
-		/*if(!selected[ONLY_FIELDS] && !selected[ONLY_METHODS]) {
-			selected[ONLY_FIELDS] = true;
-			selected[ONLY_METHODS] = true;
-		}*/
-		
-		selected[index] = !selected[index];
 	}
-	
-	private void noDeclarationTypSelected(boolean[] selected) {
-		if(!selected[PUBLIC_FIELDSMETHODS] && !selected[PROTECTED_FIELDSMETHODS] && 
-		   !selected[DEFAULT_FIELDSMETHODS] && !selected[PRIVATE_FIELDSMETHODS]) {
-			selected[PUBLIC_FIELDSMETHODS] = true;
-			selected[PROTECTED_FIELDSMETHODS] = true;
-			selected[DEFAULT_FIELDSMETHODS] = true;
-			selected[PRIVATE_FIELDSMETHODS] = true;
-		}
-		selected[index] = !selected[index];
-	}
-	
+
 	private boolean isSelected() {
 		switch (index) {
-			case SELECT_ALL:
-				return false;
-			case DESELECT_ALL:
-				return false;
-			default:
-				return RoleFigure.getSelectedFieldMethod()[index];
-		}	
+		case SELECT_ALL:
+			return false;
+		case DESELECT_ALL:
+			return false;
+		case SELECT_ALL_METHOD_ACCESS:
+			return true;
+		case DESELECT_ALL_METHOD_ACCESS:
+			return false;
+		default:
+			return RoleFigure.getSelectedFieldMethod()[index];
+		}
 	}
+
 }

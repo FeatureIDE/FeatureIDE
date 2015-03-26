@@ -22,7 +22,15 @@ package de.ovgu.featureide.fm.core;
 
 import static org.junit.Assert.assertSame;
 
+import java.util.List;
+
+import org.junit.Assert;
 import org.junit.Test;
+
+import de.ovgu.featureide.common.Commons;
+import de.ovgu.jcorridore.JCorridore;
+import de.ovgu.jcorridore.annotations.Constraint;
+import de.ovgu.jcorridore.annotations.Record;
 
 /**
  * Tests for the {@link FeatureModel}.
@@ -31,15 +39,16 @@ import org.junit.Test;
  */
 public class TFeatureModel {
 
-	@Test
-    public void testGetFeatureName(){
+	@Record(samples = 10)
+	@Constraint(samples = 10, allowedMedianDeviation = 10)
+    public void recordGetFeatureName(){
         FeatureModel fm = new FeatureModel();
         Feature feature = new Feature(fm, "test_root");
         fm.addFeature(feature);
         fm.setRoot(feature);
         Feature root = fm.getFeature("test_root");
         assertSame(root, fm.getRoot());
-
+        
         FeatureModel clonedModel = fm.clone();
         Feature root2 = clonedModel.getFeature("test_root");
         
@@ -47,5 +56,12 @@ public class TFeatureModel {
 //        assertEquals(root2, clonedModel.getRoot());
         
         assertSame(root2, clonedModel.getRoot());
+	}
+	
+	@Test
+    public void testGetFeatureName() {
+		List<String> failedMethods = new JCorridore(Commons.getFile("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/benchmarkFeatureModels/", "benchmarkFeatureModels").getAbsolutePath(),  
+				"recordings.csv").run(TFeatureModel.class);
+		Assert.assertEquals(Commons.join("\n", failedMethods), 0, failedMethods.size());
 	}
 }

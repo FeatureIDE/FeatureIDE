@@ -47,6 +47,7 @@ public interface StatisticsIds {
 	public static final String PROJECT_NAME = "Project Name";
 
 	public static final String SEPARATOR = ": ";
+	public static final String CLASS_SEPARATOR = "$";
 	public static final String NUMBER_FEATURES = "Number of features";
 	public static final String NUMBER_CONCRETE = "Number of concrete features";
 	public static final String NUMBER_ABSTRACT = "Number of abstract features";
@@ -62,10 +63,12 @@ public interface StatisticsIds {
 	public static final String DESC_FEATURE_COMPLEXITY = "Feature - Details";
 	public static final String NUMBER_ROLE = "Number of roles";
 	public static final String NUMBER_CLASS = "Number of classes";
+	public static final String NUMBER_CLASS_NESTED = "Number of nested classes";
 	public static final String NUMBER_METHOD = "Number of methods";
 	public static final String NUMBER_FIELD = "Number of fields";
 	public static final String NUMBER_METHOD_U = "Number of unique methods";
 	public static final String NUMBER_FIELD_U = "Number of unique fields";
+	public static final String NUMBER_OF_CODELINES = "Lines of code";
 	
 	public static final String NUMBER_PROJECT_METHOD_CONTRACT = "Number of method contracts in project";
 	public static final String NUMBER_PROJECT_INVARIANT = "Number of class invariants in project";

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<struct>
+			<alt abstract="true" mandatory="true" name="VncViewer">
+				<and abstract="true" mandatory="true" name="VncViewerMain">
+					<alt abstract="true" mandatory="true" name="Type">
+						<or abstract="true" mandatory="true" name="Opt">
+							<and abstract="true" mandatory="true" name="OptionsMenuFeatures">
+								<or abstract="true" name="MOpt">
+									<feature mandatory="true" name="OpEncodingFeat"/>
+									<feature mandatory="true" name="OpCompressionFeat"/>
+									<feature mandatory="true" name="OpJPEGqualityFeat"/>
+									<feature mandatory="true" name="OpCursorShapeFeat"/>
+									<feature mandatory="true" name="OpCopyRectFeat"/>
+									<feature mandatory="true" name="OpRestrictedColorsFeat"/>
+									<feature mandatory="true" name="OpMouse23Feat"/>
+									<feature mandatory="true" name="OpViewFeat"/>
+									<feature mandatory="true" name="OpShareFeat"/>
+								</or>
+								<feature mandatory="true" name="OptionsFeat"/>
+							</and>
+							<or abstract="true" mandatory="true" name="BOpt">
+								<feature mandatory="true" name="AboutButtonFeat"/>
+								<feature mandatory="true" name="AltTabButtonFeat"/>
+								<feature mandatory="true" name="RefreshButtonFeat"/>
+								<feature mandatory="true" name="CtrlAltDelButtonFeat"/>
+								<feature mandatory="true" name="RecordButtonFeat"/>
+								<feature mandatory="true" name="ClipboardButtonFeat"/>
+								<feature mandatory="true" name="OptionsButtonFeat"/>
+								<feature mandatory="true" name="DisconnectButtonFeat"/>
+							</or>
+							<feature mandatory="true" name="ClipboardFeat"/>
+							<feature mandatory="true" name="RecordingFeat"/>
+						</or>
+					</alt>
+					<feature mandatory="true" name="Base"/>
+				</and>
+			</alt>
+		</struct>
+		<constraints>
+			<rule>
+				<imp>
+					<var>RecordButtonFeat</var>
+					<var>RecordingFeat</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>OptionsButtonFeat</var>
+					<var>OptionsFeat</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>ClipboardButtonFeat</var>
+					<var>ClipboardFeat</var>
+				</imp>
+			</rule>
+		</constraints>
+		<comments>
+			<c> non-grammar constraints</c>
+			<c> annotations</c>
+			<c>Type { disp="TightVNC" }</c>
+			<c>Opt { disp="Options" }</c>
+			<c>MOpt { disp="Menu Option" }</c>
+			<c>BOpt { disp="Button Option" }</c>
+			<c>OpSubFeat { disp="Hidden" }</c>
+		</comments>
+	</featureModel>

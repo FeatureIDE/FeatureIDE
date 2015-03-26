@@ -30,6 +30,8 @@ import de.ovgu.featureide.core.signature.base.AbstractSignature;
  * @author Jens Meinicke
  */
 public abstract class RoleElement<T extends RoleElement<T>> implements Comparable<T>, IRoleElement {
+	
+	public final static String DEFAULT_PACKAGE = "(default package).";
 
 	private static final String STATIC = "static";
 	private static final String PUBLIC = "public";
@@ -47,7 +49,7 @@ public abstract class RoleElement<T extends RoleElement<T>> implements Comparabl
 	protected int composedLine;
 
 	protected FSTRole role;
-	
+
 	protected IRoleElement parent;
 
 	protected AbstractSignature signature;
@@ -64,30 +66,43 @@ public abstract class RoleElement<T extends RoleElement<T>> implements Comparabl
 		this.beginLine = beginLine;
 		this.endLine = endLine;
 	}
-	
+
 	public FSTRole getRole() {
 		return role;
 	}
-	
+
 	public void setRole(FSTRole parent) {
 		this.role = parent;
 	}
-	
+
 	public IRoleElement getParent() {
 		return parent;
 	}
 	
+	private static String removeExtension(String name) {
+		final int extIndex = name.lastIndexOf('.');
+		return (extIndex > -1) ? name.substring(0, extIndex) : name;		
+	}
+
 	public String getFullIdentifier() {
-		final StringBuilder sb = new StringBuilder(name);
+		final StringBuilder sb = new StringBuilder(removeExtension(name));
+		String packageName = (this instanceof FSTClassFragment) ? ((FSTClassFragment) this).getPackage() : null;
 		IRoleElement nextParent = parent;
 		while (nextParent != null) {
-			sb.append('.');
-			sb.append(nextParent.getFullName());
+			sb.insert(0, '.');
+			if (nextParent.getParent() == null) {
+				packageName = ((FSTClassFragment) nextParent).getPackage();
+				sb.insert(0, removeExtension(nextParent.getName()));
+			} else {
+				sb.insert(0, nextParent.getName());
+			}
 			nextParent = nextParent.getParent();
 		}
-		return sb.toString();
+		final String className = sb.toString();
+		return ((packageName == null) ? DEFAULT_PACKAGE : packageName + ".") 
+				+ className.substring(className.lastIndexOf('/') + 1);
 	}
-	
+
 	public void setParent(IRoleElement parent) {
 		this.parent = parent;
 	}
@@ -95,15 +110,15 @@ public abstract class RoleElement<T extends RoleElement<T>> implements Comparabl
 	public IFile getFile() {
 		return role.getFile();
 	}
-	
+
 	public int getLine() {
 		return beginLine;
 	}
-	
+
 	public void setLine(int lineNumber) {
 		this.beginLine = lineNumber;
 	}
-	
+
 	public int getEndLine() {
 		return endLine;
 	}
@@ -111,51 +126,51 @@ public abstract class RoleElement<T extends RoleElement<T>> implements Comparabl
 	public int getMethodLength() {
 		return endLine - beginLine;
 	}
-	
+
 	public int getComposedLine() {
 		return composedLine;
 	}
-	
+
 	public void setComposedLine(int line) {
 		composedLine = line;
 	}
-	
+
 	public String getBody() {
 		return body;
 	}
-	
+
 	public boolean isFinal() {
 		return modifiers.contains(FINAL);
 	}
-	
+
 	public boolean isPrivate() {
 		return modifiers.contains(PRIVATE);
 	}
-	
+
 	public boolean isProtected() {
 		return modifiers.contains(PROTECTED);
 	}
-	
+
 	public boolean isPublic() {
 		return modifiers.contains(PUBLIC);
 	}
-	
+
 	public boolean isStatic() {
 		return modifiers.contains(STATIC);
 	}
-	
+
 	public String getType() {
 		return type;
 	}
-	
+
 	public String getName() {
 		return name;
 	}
-	
+
 	public String getModifiers() {
 		return modifiers;
 	}
-	
+
 	@Override
 	public String toString() {
 		return getName();
@@ -170,10 +185,10 @@ public abstract class RoleElement<T extends RoleElement<T>> implements Comparabl
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((getFullName() == null) ? 0 : getFullName().hashCode());
 		return result;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -186,7 +201,7 @@ public abstract class RoleElement<T extends RoleElement<T>> implements Comparabl
 
 		return true;
 	}
-	
+
 	public String getJavaDocComment() {
 		return javaDocComment;
 	}
@@ -205,3 +220,4 @@ public abstract class RoleElement<T extends RoleElement<T>> implements Comparabl
 	}
 
 }
+

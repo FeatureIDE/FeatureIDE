@@ -40,6 +40,9 @@ import de.ovgu.featureide.ui.statistics.core.composite.Parent;
  * @author Patrick Haese
  */
 public class Aggregator {
+
+	private final DirectiveMap directiveCount = new DirectiveMap();
+
 	private Integer minimumSum;
 	private Integer maximumSum = 0;
 	private Integer nestingCount = 0;
@@ -47,9 +50,7 @@ public class Aggregator {
 	private Integer minNesting = null;
 	private List<Integer> listOfNestings = new LinkedList<Integer>();
 
-	private Integer blub = 0;
-
-	private DirectiveMap directiveCount = new DirectiveMap();
+	private int curNestingCount = 0;
 
 	/**
 	 * 
@@ -78,9 +79,9 @@ public class Aggregator {
 					this.add(child);
 				}
 			} else {
-				if (blub < nestingCount) {
-					int temp = blub;
-					blub = nestingCount;
+				if (curNestingCount < nestingCount) {
+					int temp = curNestingCount;
+					curNestingCount = nestingCount;
 					nestingCount -= temp;
 				}
 			}
@@ -150,8 +151,7 @@ public class Aggregator {
 	private void mapToChild(Parent parent, DirectiveMap count) {
 		for (FSTDirectiveCommand com : FSTDirectiveCommand.values()) {
 			if (count.containsKey(com)) {
-				parent.addChild(new Parent("Number of " + com.toString()
-						+ " directives", count.get(com)));
+				parent.addChild(new Parent("Number of " + com.toString() + " directives", count.get(com)));
 			}
 		}
 	}
