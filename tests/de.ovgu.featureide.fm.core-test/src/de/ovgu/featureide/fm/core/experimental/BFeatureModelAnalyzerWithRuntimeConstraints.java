@@ -102,26 +102,26 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 1)
-	@Constraint(samples = 1, allowedMedianDeviation = 500)
+	@Record(samples = 2)
+	@Constraint(samples = 2, allowedMedianDeviation = 500)
 	public final void BAnalyzeFeatureModel1() {
 		if (RuntimeConstraint.inject()) {
 			analyze(1);
 		}
 	}
 
-	@Test
-	@Record(samples = 1)
-	@Constraint(samples = 1, allowedMedianDeviation = 500)
-	public final void BAnalyzeFeatureModel1Ref() {
-		if (RuntimeConstraint.inject()) {
-			BAnalyzeFeatureModel18();
-		}
-	}
+//	@Test
+//	@Record(samples = 2)
+//	@Constraint(samples = 2, allowedMedianDeviation = 500)
+//	public final void BAnalyzeFeatureModel1Ref() {
+//		if (RuntimeConstraint.inject()) {
+//			BAnalyzeFeatureModel18();
+//		}
+//	}
 
 	@Test
-	@Record(samples = 1)
-	@Constraint(samples = 1, allowedMedianDeviation = 500)
+	@Record(samples = 2)
+	@Constraint(samples = 2, allowedMedianDeviation = 500)
 	public final void BAnalyzeFeatureModel2() {
 		if (RuntimeConstraint.inject()) {
 			analyze(2);
@@ -129,8 +129,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 1)
-	@Constraint(samples = 1, allowedMedianDeviation = 500)
+	@Record(samples = 2)
+	@Constraint(samples = 2, allowedMedianDeviation = 500)
 	public final void BAnalyzeFeatureModel10() {
 		if (RuntimeConstraint.inject()) {
 			analyze(10);
@@ -138,8 +138,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 1)
-	@Constraint(samples = 1, allowedMedianDeviation = 500)
+	@Record(samples = 2)
+	@Constraint(samples = 2, allowedMedianDeviation = 500)
 	public final void BAnalyzeFeatureModel20() {
 		if (RuntimeConstraint.inject()) {
 			analyze(20);
@@ -147,8 +147,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 1)
-	@Constraint(samples = 1, allowedMedianDeviation = 500)
+	@Record(samples = 2)
+	@Constraint(samples = 2, allowedMedianDeviation = 500)
 	public final void BAnalyzeFeatureModel21() {
 		if (RuntimeConstraint.inject()) {
 			analyze(21);
@@ -156,8 +156,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 1)
-	@Constraint(samples = 1, allowedMedianDeviation = 500)
+	@Record(samples = 2)
+	@Constraint(samples = 2, allowedMedianDeviation = 500)
 	public final void BAnalyzeFeatureModel50() {
 		if (RuntimeConstraint.inject()) {
 			analyze(50);
@@ -165,8 +165,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 1)
-	@Constraint(samples = 1, allowedMedianDeviation = 500)
+	@Record(samples = 2)
+	@Constraint(samples = 2, allowedMedianDeviation = 500)
 	public final void BAnalyzeFeatureModel100() {
 		if (RuntimeConstraint.inject()) {
 			analyze(100);
@@ -174,8 +174,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 1)
-	@Constraint(samples = 1, allowedMedianDeviation = 2200)
+	@Record(samples = 2)
+	@Constraint(samples = 2, allowedMedianDeviation = 2200)
 	public final void BAnalyzeFeatureModel200() {
 		if (RuntimeConstraint.inject()) {
 			analyze(200);
@@ -183,8 +183,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 1)
-	@Constraint(samples = 1, allowedMedianDeviation = 2000)
+	@Record(samples = 2)
+	@Constraint(samples = 2, allowedMedianDeviation = 2000)
 	public final void BAnalyzeFeatureModel201() {
 		if (RuntimeConstraint.inject()) {
 			analyze(201);
@@ -192,8 +192,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 1)
-	@Constraint(samples = 1, allowedMedianDeviation = 3000)
+	@Record(samples = 2)
+	@Constraint(samples = 2, allowedMedianDeviation = 3000)
 	public final void BAnalyzeFeatureModel500() {
 		if (RuntimeConstraint.inject()) {
 			analyze(500);
@@ -208,8 +208,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 1)
-	@Constraint(samples = 1, allowedMedianDeviation = 500)
+	@Record(samples = 2)
+	@Constraint(samples = 2, allowedMedianDeviation = 500)
 	public final void BUpdateConstraints1() {
 		if (RuntimeConstraint.inject()) {
 			BUpdateConstraints(1);
@@ -217,8 +217,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 1)
-	@Constraint(samples = 1, allowedMedianDeviation = 150)
+	@Record(samples = 2)
+	@Constraint(samples = 2, allowedMedianDeviation = 150)
 	public final void BUpdateConstraints2() {
 		if (RuntimeConstraint.inject()) {
 			BUpdateConstraints(2);
@@ -226,8 +226,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 1)
-	@Constraint(samples = 1, allowedMedianDeviation = 50)
+	@Record(samples = 2)
+	@Constraint(samples = 2, allowedMedianDeviation = 50)
 	public final void BUpdateConstraints10() {
 		if (RuntimeConstraint.inject()) {
 			BUpdateConstraints(10);
@@ -235,8 +235,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 1)
-	@Constraint(samples = 1, allowedMedianDeviation = 50)
+	@Record(samples = 2)
+	@Constraint(samples = 2, allowedMedianDeviation = 50)
 	public final void BUpdateConstraints20() {
 		if (RuntimeConstraint.inject()) {
 			BUpdateConstraints(20);
@@ -244,8 +244,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 1)
-	@Constraint(samples = 1, allowedMedianDeviation = 50)
+	@Record(samples = 2)
+	@Constraint(samples = 2, allowedMedianDeviation = 50)
 	public final void BUpdateConstraints21() {
 		if (RuntimeConstraint.inject()) {
 			BUpdateConstraints(21);
@@ -253,8 +253,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 1)
-	@Constraint(samples = 1, allowedMedianDeviation = 50)
+	@Record(samples = 2)
+	@Constraint(samples = 2, allowedMedianDeviation = 50)
 	public final void BUpdateConstraints50() {
 		if (RuntimeConstraint.inject()) {
 			BUpdateConstraints(50);
@@ -262,8 +262,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 1)
-	@Constraint(samples = 1, allowedMedianDeviation = 50)
+	@Record(samples = 2)
+	@Constraint(samples = 2, allowedMedianDeviation = 50)
 	public final void BUpdateConstraints100() {
 		if (RuntimeConstraint.inject()) {
 			BUpdateConstraints(100);
@@ -271,8 +271,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 1)
-	@Constraint(samples = 1, allowedMedianDeviation = 150)
+	@Record(samples = 2)
+	@Constraint(samples = 2, allowedMedianDeviation = 150)
 	public final void BUpdateConstraints200() {
 		if (RuntimeConstraint.inject()) {
 			BUpdateConstraints(201);
@@ -280,8 +280,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 1)
-	@Constraint(samples = 1, allowedMedianDeviation = 150)
+	@Record(samples = 2)
+	@Constraint(samples = 2, allowedMedianDeviation = 150)
 	public final void BUpdateConstraints201() {
 		if (RuntimeConstraint.inject()) {
 			BUpdateConstraints(201);
@@ -289,8 +289,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 1)
-	@Constraint(samples = 1, allowedMedianDeviation = 500)
+	@Record(samples = 2)
+	@Constraint(samples = 2, allowedMedianDeviation = 500)
 	public final void BUpdateConstraints500() {
 		if (RuntimeConstraint.inject()) {
 			BUpdateConstraints(500);
@@ -298,8 +298,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 1)
-	@Constraint(samples = 1, allowedMedianDeviation = 1400)
+	@Record(samples = 2)
+	@Constraint(samples = 2, allowedMedianDeviation = 1400)
 	public final void BUpdateConstraints1000() {
 		if (RuntimeConstraint.inject()) {
 			BUpdateConstraints(1000);
@@ -314,8 +314,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 1)
-	@Constraint(samples = 1, allowedMedianDeviation = 100)
+	@Record(samples = 2)
+	@Constraint(samples = 2, allowedMedianDeviation = 100)
 	public final void BUpdateFeatures1() {
 		if (RuntimeConstraint.inject()) {
 			BUpdateFeatures(1);
@@ -323,8 +323,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 1)
-	@Constraint(samples = 1, allowedMedianDeviation = 100)
+	@Record(samples = 2)
+	@Constraint(samples = 2, allowedMedianDeviation = 100)
 	public final void BUpdateFeatures2() {
 		if (RuntimeConstraint.inject()) {
 			BUpdateFeatures(2);
@@ -332,8 +332,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 1)
-	@Constraint(samples = 1, allowedMedianDeviation = 50)
+	@Record(samples = 2)
+	@Constraint(samples = 2, allowedMedianDeviation = 50)
 	public final void BUpdateFeatures10() {
 		if (RuntimeConstraint.inject()) {
 			BUpdateFeatures(10);
@@ -341,8 +341,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 1)
-	@Constraint(samples = 1, allowedMedianDeviation = 50)
+	@Record(samples = 2)
+	@Constraint(samples = 2, allowedMedianDeviation = 50)
 	public final void BUpdateFeatures20() {
 		if (RuntimeConstraint.inject()) {
 			BUpdateFeatures(20);
@@ -350,8 +350,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 1)
-	@Constraint(samples = 1, allowedMedianDeviation = 40)
+	@Record(samples = 2)
+	@Constraint(samples = 2, allowedMedianDeviation = 40)
 	public final void BUpdateFeatures21() {
 		if (RuntimeConstraint.inject()) {
 			BUpdateFeatures(21);
@@ -359,8 +359,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 1)
-	@Constraint(samples = 1, allowedMedianDeviation = 50)
+	@Record(samples = 2)
+	@Constraint(samples = 2, allowedMedianDeviation = 50)
 	public final void BUpdateFeatures50() {
 		if (RuntimeConstraint.inject()) {
 			BUpdateFeatures(50);
@@ -368,8 +368,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 1)
-	@Constraint(samples = 1, allowedMedianDeviation = 40)
+	@Record(samples = 2)
+	@Constraint(samples = 2, allowedMedianDeviation = 40)
 	public final void BUpdateFeatures100() {
 		if (RuntimeConstraint.inject()) {
 			BUpdateFeatures(100);
@@ -377,8 +377,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 1)
-	@Constraint(samples = 1, allowedMedianDeviation = 50)
+	@Record(samples = 2)
+	@Constraint(samples = 2, allowedMedianDeviation = 50)
 	public final void BUpdateFeatures200() {
 		if (RuntimeConstraint.inject()) {
 			BUpdateFeatures(200);
@@ -386,8 +386,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 1)
-	@Constraint(samples = 1, allowedMedianDeviation = 160)
+	@Record(samples = 2)
+	@Constraint(samples = 2, allowedMedianDeviation = 160)
 	public final void BUpdateFeatures201() {
 		if (RuntimeConstraint.inject()) {
 			BUpdateFeatures(201);
@@ -395,8 +395,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 1)
-	@Constraint(samples = 1, allowedMedianDeviation = 500)
+	@Record(samples = 2)
+	@Constraint(samples = 2, allowedMedianDeviation = 500)
 	public final void BUpdateFeatures500() {
 		if (RuntimeConstraint.inject()) {
 			BUpdateFeatures(500);
@@ -404,8 +404,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 1)
-	@Constraint(samples = 1, allowedMedianDeviation = 100)
+	@Record(samples = 2)
+	@Constraint(samples = 2, allowedMedianDeviation = 100)
 	public final void BUpdateFeatures1000() {
 		if (RuntimeConstraint.inject()) {
 			BUpdateFeatures(1000);
