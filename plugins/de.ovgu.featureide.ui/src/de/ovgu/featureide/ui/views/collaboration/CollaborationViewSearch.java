@@ -31,6 +31,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
@@ -41,13 +43,14 @@ import de.ovgu.featureide.ui.views.collaboration.editparts.ModelEditPart;
 
 /**
  * This class is designated for search functionalities inside of the collaborations diagramm
- * It takes care of any tasks like: creating the searchbox, catching the key events, fireing the search and so on.
+ * It takes care any tasks like: creating the searchbox, catching the key events, fireing the search and so on.
  * 
  * @author Christopher Kruczek
  */
 public class CollaborationViewSearch {
 	
 	private GraphicalViewerImpl attachedViewerParent;
+	private SearchDialog searchDialog;
 	private String searchBoxText;
 	private Color findResultsColor;
 	private Color noSearchResultsColor;
@@ -55,6 +58,55 @@ public class CollaborationViewSearch {
 	private List<Label> matchedLabels;
 	private final int BEGIN_OF_VALID_ASCII_CHARS = 48;
 	private final int END_OF_VALID_ASCII_CHARS = 125;
+
+	private class SearchDialog extends org.eclipse.jface.dialogs.Dialog {
+		private Text searchTextBox;
+		private String searchText;
+		private String title;
+
+		/**
+		 * @param parent
+		 */
+		public SearchDialog(Shell parent) {
+			this(parent, "");
+		}
+
+		public SearchDialog(Shell parent, String title) {
+			super(parent);
+			setShellStyle(SWT.CLOSE | SWT.TITLE | SWT.BORDER | SWT.DIALOG_TRIM
+					| SWT.APPLICATION_MODAL);
+			setBlockOnOpen(true);
+			this.title = title;
+		}
+
+		@Override
+		protected void configureShell(Shell newShell) {
+			super.configureShell(newShell);
+			newShell.setText(this.title);
+
+		}
+
+		@Override
+		protected Control createDialogArea(Composite parent) {
+			Composite container = (Composite) super.createDialogArea(parent);
+			container.setLayout(new FillLayout());
+			this.searchTextBox = new Text(container, SWT.SEARCH | SWT.SINGLE
+					| SWT.ICON_SEARCH);
+			this.searchTextBox.setBounds(500, 500, 200, 50);
+			return container;
+		}
+		
+		@Override
+		protected void buttonPressed(int buttonId) {
+			searchText = this.searchTextBox.getText();
+			super.buttonPressed(buttonId);
+		}
+		
+		public String getSearchText() {
+			return this.searchText;
+		}
+
+	}
 	public static class Builder{
 		private GraphicalViewerImpl attachedViewerParent;
 		private String searchBoxText;
@@ -113,56 +165,41 @@ public class CollaborationViewSearch {
 		this.noSearchResultsColor = searchBuilder.getNoSearchResultsColor();
 		createControls();
 	}
-	
-	private void createControls(){
-		final Shell searchBoxShell = new Shell(PlatformUI.getWorkbench().getDisplay());
-		searchBoxShell.setText(searchBoxText);
-		searchBoxShell.setBounds(500,500, 200, 50);
-		searchBoxShell.setLayout(new FillLayout());
-		final Text searchTextBox = new Text(searchBoxShell,SWT.SEARCH | SWT.SINGLE | SWT.ICON_SEARCH);
-		searchTextBox.addListener(SWT.Traverse,new Listener() {
-			
-			@Override
-			public void handleEvent(Event event) {
-				if(searchTextBox.getText().equalsIgnoreCase("")){
-					uncolorOldLabels();
-				}
-				if(event.detail == SWT.TRAVERSE_RETURN){
-					
-					String searchText = searchTextBox.getText();
-					if(searchText.equalsIgnoreCase("")){
-						return;
-					}
-					uncolorOldLabels();
-					matchedLabels.clear();
-					for(Label label : extractedLabels){
-						String labelText = label.getText().toLowerCase();
-						if(labelText.contains(searchText) ){
-							label.setBackgroundColor(findResultsColor);
-							matchedLabels.add(label);
-						}
-					}
-					
-				}
-				else if(event.keyCode == SWT.ESC){
-					searchBoxShell.setVisible(false);
-					searchTextBox.setText("");
-					uncolorOldLabels();
-				}
-				
-			}
-		});
-		
+
+	private void createControls() {
+
 		attachedViewerParent.setKeyHandler(new KeyHandler() {
-			
+
 			@Override
 			public boolean keyReleased(KeyEvent event) {
-				if(!searchBoxShell.isVisible() && event.keyCode != SWT.ESC && 
-						   event.keyCode >= BEGIN_OF_VALID_ASCII_CHARS && event.keyCode <= END_OF_VALID_ASCII_CHARS){
-					searchBoxShell.setVisible(true);
-					searchTextBox.setFocus();
+
+				if (searchDialog == null) {
+					searchDialog = new SearchDialog(PlatformUI.getWorkbench()
+							.getDisplay().getActiveShell(), searchBoxText);
+				}
+				if (event.keyCode != SWT.ESC
+						&& event.keyCode >= BEGIN_OF_VALID_ASCII_CHARS
+						&& event.keyCode <= END_OF_VALID_ASCII_CHARS) {
+
+					searchDialog.open();
+					String searchText = searchDialog.getSearchText();
+					if (!searchText.equals("")) {
+						uncolorOldLabels();
+						matchedLabels.clear();
+						for (Label label : extractedLabels) {
+							String labelText = label.getText().toLowerCase();
+							if (labelText.contains(searchText)) {
+								label.setBackgroundColor(findResultsColor);
+								matchedLabels.add(label);
+							}
+						}
+					} 
+
+				}
+				else if(event.keyCode == SWT.ESC){
+					uncolorOldLabels();
 					
-				}				
+				}
 				return true;
 			}
 		});
