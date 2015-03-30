@@ -24,17 +24,12 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
-import java.util.List;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-import de.ovgu.featureide.common.Commons;
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.TFeatureModel;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
-import de.ovgu.jcorridore.JCorridore;
 import de.ovgu.jcorridore.RuntimeConstraint;
 import de.ovgu.jcorridore.annotations.Constraint;
 import de.ovgu.jcorridore.annotations.Record;
@@ -110,14 +105,14 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 		}
 	}
 
-//	@Test
-//	@Record(samples = 2)
-//	@Constraint(samples = 2, allowedMedianDeviation = 500)
-//	public final void BAnalyzeFeatureModel1Ref() {
-//		if (RuntimeConstraint.inject(this.getClass())) {
-//			BAnalyzeFeatureModel18();
-//		}
-//	}
+	//	@Test
+	//	@Record(samples = 2)
+	//	@Constraint(samples = 2, allowedMedianDeviation = 500)
+	//	public final void BAnalyzeFeatureModel1Ref() {
+	//		if (RuntimeConstraint.inject(this.getClass())) {
+	//			BAnalyzeFeatureModel18();
+	//		}
+	//	}
 
 	@Test
 	@Record(samples = 2)
