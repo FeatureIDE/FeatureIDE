@@ -35,6 +35,7 @@ import de.ovgu.featureide.fm.core.TFeatureModel;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 import de.ovgu.jcorridore.JCorridore;
+import de.ovgu.jcorridore.RuntimeConstraint;
 import de.ovgu.jcorridore.annotations.Constraint;
 import de.ovgu.jcorridore.annotations.Record;
 
@@ -43,19 +44,12 @@ import de.ovgu.jcorridore.annotations.Record;
  * The test cases do not analyze the validity of the analyses.
  * 
  * All timeouts are set to around 4 times the measured times(with intel i5 @ 3,3 GHz)
- * to avoid that the tests fail for slower computers. 
- *  
+ * to avoid that the tests fail for slower computers.
+ * 
  * @author Jens Meinicke
  */
 public class BFeatureModelAnalyzerWithRuntimeConstraints {
-	
-	@Test
-	public void testAllWithRuntimeConstraints() {
-		List<String> failedMethods = new JCorridore(Commons.getFile("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/benchmarkFeatureModels/", "benchmarkFeatureModels").getAbsolutePath(),  
-				"recordings.csv").run(BFeatureModelAnalyzerWithRuntimeConstraints.class);
-		Assert.assertEquals(Commons.join("\n", failedMethods), 0, failedMethods.size());
-	}
-	
+
 	/**
 	 * Warm up the analyzer to prevent unpredictable timeout exceptions.
 	 */
@@ -73,7 +67,7 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 			return pathname.getName().endsWith(".xml");
 		}
 	};
-	
+
 	private final static FeatureModel init(final String name) {
 		FeatureModel fm = new FeatureModel();
 		File modelFileFolder = getFolder();
@@ -91,13 +85,13 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 		}
 		return fm;
 	}
-	
-	private static File getFolder() { 
-		File folder =  new File("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/benchmarkFeatureModels/"); 
-		if (!folder.canRead()) { 
-			folder = new File(ClassLoader.getSystemResource("benchmarkFeatureModels").getPath()); 
-		} 
-		return folder; 
+
+	private static File getFolder() {
+		File folder = new File("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/benchmarkFeatureModels/");
+		if (!folder.canRead()) {
+			folder = new File(ClassLoader.getSystemResource("benchmarkFeatureModels").getPath());
+		}
+		return folder;
 	}
 
 	/************************************************************
@@ -107,278 +101,345 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 		getFM(i).getAnalyser().analyzeFeatureModel(null);
 	}
 
-	//@Test (timeout=6000) // 0.749s @ i5(3,3GHz)
-	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=500)
+	@Test
+	@Record(samples = 1)
+	@Constraint(samples = 1, allowedMedianDeviation = 500)
 	public final void BAnalyzeFeatureModel1() {
-		analyze(1);
+		if (RuntimeConstraint.inject()) {
+			analyze(1);
+		}
 	}
 
-	//@Test (timeout=2500) // 0.385s @ i5(3,3GHz)
-	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=500)
+	@Test
+	@Record(samples = 1)
+	@Constraint(samples = 1, allowedMedianDeviation = 500)
+	public final void BAnalyzeFeatureModel1Ref() {
+		if (RuntimeConstraint.inject()) {
+			BAnalyzeFeatureModel18();
+		}
+	}
+
+	@Test
+	@Record(samples = 1)
+	@Constraint(samples = 1, allowedMedianDeviation = 500)
 	public final void BAnalyzeFeatureModel2() {
-		analyze(2);
+		if (RuntimeConstraint.inject()) {
+			analyze(2);
+		}
 	}
-	
-	//@Test (timeout=100) // 0.007 @ i5(3,3GHz)
-	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=500)
+
+	@Test
+	@Record(samples = 1)
+	@Constraint(samples = 1, allowedMedianDeviation = 500)
 	public final void BAnalyzeFeatureModel10() {
-		analyze(10);
+		if (RuntimeConstraint.inject()) {
+			analyze(10);
+		}
 	}
-	
-	//@Test (timeout=100) // 0.006s @ i5(3,3GHz)
-	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=500)
+
+	@Test
+	@Record(samples = 1)
+	@Constraint(samples = 1, allowedMedianDeviation = 500)
 	public final void BAnalyzeFeatureModel20() {
-		analyze(20);
+		if (RuntimeConstraint.inject()) {
+			analyze(20);
+		}
 	}
-	
-	//@Test (timeout=250) // 0.020s @ i5(3,3GHz)
-	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=500)
+
+	@Test
+	@Record(samples = 1)
+	@Constraint(samples = 1, allowedMedianDeviation = 500)
 	public final void BAnalyzeFeatureModel21() {
-		analyze(21);
+		if (RuntimeConstraint.inject()) {
+			analyze(21);
+		}
 	}
-	
-	//@Test (timeout=1000) // 0.036 @ i5(3,3GHz)
-	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=500)
+
+	@Test
+	@Record(samples = 1)
+	@Constraint(samples = 1, allowedMedianDeviation = 500)
 	public final void BAnalyzeFeatureModel50() {
-		analyze(50);
+		if (RuntimeConstraint.inject()) {
+			analyze(50);
+		}
 	}
-	
-	//@Test (timeout=2500) // 0.142s @ i5(3,3GHz)
-	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=500)
+
+	@Test
+	@Record(samples = 1)
+	@Constraint(samples = 1, allowedMedianDeviation = 500)
 	public final void BAnalyzeFeatureModel100() {
-		analyze(100);
+		if (RuntimeConstraint.inject()) {
+			analyze(100);
+		}
 	}
-	
-	//@Test (timeout=8000) // 0.886s @ i5(3,3GHz)
-	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=2200)
+
+	@Test
+	@Record(samples = 1)
+	@Constraint(samples = 1, allowedMedianDeviation = 2200)
 	public final void BAnalyzeFeatureModel200() {
-		analyze(200);
+		if (RuntimeConstraint.inject()) {
+			analyze(200);
+		}
 	}
-	
-	//@Test (timeout=22000) // 5.519s @ i5(3,3GHz)
-	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=2000)
+
+	@Test
+	@Record(samples = 1)
+	@Constraint(samples = 1, allowedMedianDeviation = 2000)
 	public final void BAnalyzeFeatureModel201() {
-		analyze(201);
+		if (RuntimeConstraint.inject()) {
+			analyze(201);
+		}
 	}
-	
-	//@Test (timeout=30000) // 6.147s @ i5(3,3GHz)
-	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=3000)
+
+	@Test
+	@Record(samples = 1)
+	@Constraint(samples = 1, allowedMedianDeviation = 3000)
 	public final void BAnalyzeFeatureModel500() {
-		analyze(500);
+		if (RuntimeConstraint.inject()) {
+			analyze(500);
+		}
 	}
-	
-//	@Test (timeout=300000) // 75.904s @ i5(3,3GHz)
-//	public void BAnalyzeFeatureModel1000() {
-//		analyze(1000);
-//	}
-	
+
 	/************************************************************
 	 * Analyzes constraints only
 	 */
 	private void BUpdateConstraints(final int i) {
 		getFM(i).getAnalyser().updateConstraints(new HashMap<Object, Object>(), new HashMap<Object, Object>());
 	}
-	
-	//@Test (timeout=2500) // 0.509 @ i5(3,3GHz)
-	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=500)
+
+	@Test
+	@Record(samples = 1)
+	@Constraint(samples = 1, allowedMedianDeviation = 500)
 	public final void BUpdateConstraints1() {
-		BUpdateConstraints(1);
+		if (RuntimeConstraint.inject()) {
+			BUpdateConstraints(1);
+		}
 	}
-	
-	
-	//@Test (timeout=1500) // 0.328 @ i5(3,3GHz)
-	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=150)
+
+	@Test
+	@Record(samples = 1)
+	@Constraint(samples = 1, allowedMedianDeviation = 150)
 	public final void BUpdateConstraints2() {
-		BUpdateConstraints(2);
+		if (RuntimeConstraint.inject()) {
+			BUpdateConstraints(2);
+		}
 	}
-	
-	//@Test (timeout=100) // 0.004s @ i5(3,3GHz)
-	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=50)
+
+	@Test
+	@Record(samples = 1)
+	@Constraint(samples = 1, allowedMedianDeviation = 50)
 	public final void BUpdateConstraints10() {
-		BUpdateConstraints(10);
+		if (RuntimeConstraint.inject()) {
+			BUpdateConstraints(10);
+		}
 	}
-	
-//	@Test (timeout=100) // 0.005s @ i5(3,3GHz)
-	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=50)
+
+	@Test
+	@Record(samples = 1)
+	@Constraint(samples = 1, allowedMedianDeviation = 50)
 	public final void BUpdateConstraints20() {
-		BUpdateConstraints(20);
+		if (RuntimeConstraint.inject()) {
+			BUpdateConstraints(20);
+		}
 	}
-	
-//	@Test (timeout=100) // 0.004s @ i5(3,3GHz)
-	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=50)
+
+	@Test
+	@Record(samples = 1)
+	@Constraint(samples = 1, allowedMedianDeviation = 50)
 	public final void BUpdateConstraints21() {
-		BUpdateConstraints(21);
+		if (RuntimeConstraint.inject()) {
+			BUpdateConstraints(21);
+		}
 	}
-	
-//	@Test (timeout=100) // 0.011s @ i5(3,3GHz)
-	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=50)
+
+	@Test
+	@Record(samples = 1)
+	@Constraint(samples = 1, allowedMedianDeviation = 50)
 	public final void BUpdateConstraints50() {
-		BUpdateConstraints(50);
+		if (RuntimeConstraint.inject()) {
+			BUpdateConstraints(50);
+		}
 	}
-	
-//	@Test (timeout=250) // 0.051s @ i5(3,3GHz)
-	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=50)
+
+	@Test
+	@Record(samples = 1)
+	@Constraint(samples = 1, allowedMedianDeviation = 50)
 	public final void BUpdateConstraints100() {
-		BUpdateConstraints(100);
+		if (RuntimeConstraint.inject()) {
+			BUpdateConstraints(100);
+		}
 	}
-	
-//	@Test (timeout=1500) // 0.233s @ i5(3,3GHz)
-	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=150)
+
+	@Test
+	@Record(samples = 1)
+	@Constraint(samples = 1, allowedMedianDeviation = 150)
 	public final void BUpdateConstraints200() {
-		BUpdateConstraints(201);
+		if (RuntimeConstraint.inject()) {
+			BUpdateConstraints(201);
+		}
 	}
-	
-//	@Test (timeout=1500) // 0.232s @ i5(3,3GHz)
-	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=150)
+
+	@Test
+	@Record(samples = 1)
+	@Constraint(samples = 1, allowedMedianDeviation = 150)
 	public final void BUpdateConstraints201() {
-		BUpdateConstraints(201);
+		if (RuntimeConstraint.inject()) {
+			BUpdateConstraints(201);
+		}
 	}
-	
-//	@Test (timeout=10000) // 1.809s @ i5(3,3GHz)
-	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=500)
+
+	@Test
+	@Record(samples = 1)
+	@Constraint(samples = 1, allowedMedianDeviation = 500)
 	public final void BUpdateConstraints500() {
-		BUpdateConstraints(500);
+		if (RuntimeConstraint.inject()) {
+			BUpdateConstraints(500);
+		}
 	}
-	
-//	@Test (timeout=140000) //  @ i5(3,3GHz)
-	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=1400)
+
+	@Test
+	@Record(samples = 1)
+	@Constraint(samples = 1, allowedMedianDeviation = 1400)
 	public final void BUpdateConstraints1000() {
-		BUpdateConstraints(1000);
+		if (RuntimeConstraint.inject()) {
+			BUpdateConstraints(1000);
+		}
 	}
-	
+
 	/************************************************************
 	 * Analyzes features only
 	 */
 	private void BUpdateFeatures(final int i) {
 		getFM(i).getAnalyser().updateFeatures(new HashMap<Object, Object>(), new HashMap<Object, Object>());
 	}
-	
-//	@Test (timeout=1000) // 0.053s @ i5(3,3GHz)
-	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=100)
+
+	@Test
+	@Record(samples = 1)
+	@Constraint(samples = 1, allowedMedianDeviation = 100)
 	public final void BUpdateFeatures1() {
-		BUpdateFeatures(1);
+		if (RuntimeConstraint.inject()) {
+			BUpdateFeatures(1);
+		}
 	}
-	
-//	@Test (timeout=1000) // 0.056s @ i5(3,3GHz)
-	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=100)
+
+	@Test
+	@Record(samples = 1)
+	@Constraint(samples = 1, allowedMedianDeviation = 100)
 	public final void BUpdateFeatures2() {
-		BUpdateFeatures(2);
+		if (RuntimeConstraint.inject()) {
+			BUpdateFeatures(2);
+		}
 	}
-	
-//	@Test (timeout=100) // 0.005s @ i5(3,3GHz)
-	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=50)
+
+	@Test
+	@Record(samples = 1)
+	@Constraint(samples = 1, allowedMedianDeviation = 50)
 	public final void BUpdateFeatures10() {
-		BUpdateFeatures(10);
+		if (RuntimeConstraint.inject()) {
+			BUpdateFeatures(10);
+		}
 	}
-	
-//	@Test (timeout=100) // 0.005s @ i5(3,3GHz)
-	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=50)
+
+	@Test
+	@Record(samples = 1)
+	@Constraint(samples = 1, allowedMedianDeviation = 50)
 	public final void BUpdateFeatures20() {
-		BUpdateFeatures(20);
+		if (RuntimeConstraint.inject()) {
+			BUpdateFeatures(20);
+		}
 	}
-	
-//	@Test (timeout=200) // 0.020s @ i5(3,3GHz)
-	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=40)
+
+	@Test
+	@Record(samples = 1)
+	@Constraint(samples = 1, allowedMedianDeviation = 40)
 	public final void BUpdateFeatures21() {
-		BUpdateFeatures(21);
+		if (RuntimeConstraint.inject()) {
+			BUpdateFeatures(21);
+		}
 	}
-	
-//	@Test (timeout=250) // 0.012s @ i5(3,3GHz)
-	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=50)
+
+	@Test
+	@Record(samples = 1)
+	@Constraint(samples = 1, allowedMedianDeviation = 50)
 	public final void BUpdateFeatures50() {
-		BUpdateFeatures(50);
+		if (RuntimeConstraint.inject()) {
+			BUpdateFeatures(50);
+		}
 	}
-	
-//	@Test (timeout=200) // 0.027s @ i5(3,3GHz)
-	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=40)
+
+	@Test
+	@Record(samples = 1)
+	@Constraint(samples = 1, allowedMedianDeviation = 40)
 	public final void BUpdateFeatures100() {
-		BUpdateFeatures(100);
+		if (RuntimeConstraint.inject()) {
+			BUpdateFeatures(100);
+		}
 	}
-	
-//	@Test (timeout=500) // 0.092s @ i5(3,3GHz)
-	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=50)
+
+	@Test
+	@Record(samples = 1)
+	@Constraint(samples = 1, allowedMedianDeviation = 50)
 	public final void BUpdateFeatures200() {
-		BUpdateFeatures(200);
+		if (RuntimeConstraint.inject()) {
+			BUpdateFeatures(200);
+		}
 	}
-	
-//	@Test (timeout=16000) // 5.446s @ i5(3,3GHz)
-	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=160)
+
+	@Test
+	@Record(samples = 1)
+	@Constraint(samples = 1, allowedMedianDeviation = 160)
 	public final void BUpdateFeatures201() {
-		BUpdateFeatures(201);
+		if (RuntimeConstraint.inject()) {
+			BUpdateFeatures(201);
+		}
 	}
-	
-//	@Test (timeout=2500) // 0,465s @ i5(3,3GHz)
-	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=500)
+
+	@Test
+	@Record(samples = 1)
+	@Constraint(samples = 1, allowedMedianDeviation = 500)
 	public final void BUpdateFeatures500() {
-		BUpdateFeatures(500);
+		if (RuntimeConstraint.inject()) {
+			BUpdateFeatures(500);
+		}
 	}
-	
-//	@Test (timeout=10000) // 2,925s @ i5(3,3GHz)
-	@Record(samples=10)
-	@Constraint(samples=10, allowedMedianDeviation=100)
+
+	@Test
+	@Record(samples = 1)
+	@Constraint(samples = 1, allowedMedianDeviation = 100)
 	public final void BUpdateFeatures1000() {
-		BUpdateFeatures(1000);
+		if (RuntimeConstraint.inject()) {
+			BUpdateFeatures(1000);
+		}
 	}
-	
+
 	private static FeatureModel getFM(final int i) {
 		switch (i) {
 		case 1:
 			return init("berkeley_db_model.xml");
-		case 2 :
+		case 2:
 			return init("berkeley_db_model2.xml");
-		case 1000 :
+		case 1000:
 			return init("1000-100.xml");
-		case 500 :
+		case 500:
 			return init("500-101.xml");
-		case 200 :
+		case 200:
 			return init("200-100.xml");
-		case 201 :
+		case 201:
 			return init("200-100-hidden.xml");
-		case 100 :
+		case 100:
 			return init("100-100.xml");
-		case 50 :
+		case 50:
 			return init("50-100.xml");
-		case 20 :
+		case 20:
 			return init("20-100.xml");
-		case 21 :
+		case 21:
 			return init("20-100-hidden.xml");
-		case 10 :
+		case 10:
 			return init("10-100.xml");
 		default:
 			System.err.println("NO FM");
 			return init("10-100.xml");
 		}
 	}
-	
+
 }
