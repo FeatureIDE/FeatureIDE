@@ -222,7 +222,7 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 
 	@Test
 	@Record(samples = 2)
-	@Constraint(samples = 2, allowedMedianDeviation = 50)
+	@Constraint(samples = 2, allowedMedianDeviation = 100)
 	public final void BUpdateConstraints10() {
 		if (RuntimeConstraint.inject(this.getClass())) {
 			BUpdateConstraints(10);
