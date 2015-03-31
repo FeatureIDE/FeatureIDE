@@ -22,15 +22,7 @@ package de.ovgu.featureide.fm.core;
 
 import static org.junit.Assert.assertSame;
 
-import java.util.List;
-
-import org.junit.Assert;
 import org.junit.Test;
-
-import de.ovgu.featureide.common.Commons;
-import de.ovgu.jcorridore.JCorridore;
-import de.ovgu.jcorridore.annotations.Constraint;
-import de.ovgu.jcorridore.annotations.Record;
 
 /**
  * Tests for the {@link FeatureModel}.

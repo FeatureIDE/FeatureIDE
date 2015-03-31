@@ -33,8 +33,6 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
@@ -42,13 +40,13 @@ import org.eclipse.ui.PlatformUI;
 import de.ovgu.featureide.ui.views.collaboration.editparts.ModelEditPart;
 
 /**
- * This class is designated for search functionalities inside of the collaborations diagramm
- * It takes care any tasks like: creating the searchbox, catching the key events, fireing the search and so on.
+ * This class is designated for search functionalities inside of the collaborations diagram
+ * It takes care of tasks like: creating the searchbox, catching the key events, firing the search and so on.
  * 
  * @author Christopher Kruczek
  */
 public class CollaborationViewSearch {
-	
+
 	private GraphicalViewerImpl attachedViewerParent;
 	private SearchDialog searchDialog;
 	private String searchBoxText;
@@ -64,17 +62,9 @@ public class CollaborationViewSearch {
 		private String searchText;
 		private String title;
 
-		/**
-		 * @param parent
-		 */
-		public SearchDialog(Shell parent) {
-			this(parent, "");
-		}
-
 		public SearchDialog(Shell parent, String title) {
 			super(parent);
-			setShellStyle(SWT.CLOSE | SWT.TITLE | SWT.BORDER | SWT.DIALOG_TRIM
-					| SWT.APPLICATION_MODAL);
+			setShellStyle(SWT.CLOSE | SWT.TITLE | SWT.BORDER | SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
 			setBlockOnOpen(true);
 			this.title = title;
 		}
@@ -90,30 +80,29 @@ public class CollaborationViewSearch {
 		protected Control createDialogArea(Composite parent) {
 			Composite container = (Composite) super.createDialogArea(parent);
 			container.setLayout(new FillLayout());
-			this.searchTextBox = new Text(container, SWT.SEARCH | SWT.SINGLE
-					| SWT.ICON_SEARCH);
+			this.searchTextBox = new Text(container, SWT.SEARCH | SWT.SINGLE | SWT.ICON_SEARCH);
 			this.searchTextBox.setBounds(500, 500, 200, 50);
 			return container;
 		}
-		
+
 		@Override
 		protected void buttonPressed(int buttonId) {
 			searchText = this.searchTextBox.getText();
 			super.buttonPressed(buttonId);
 		}
-		
+
 		public String getSearchText() {
 			return this.searchText;
 		}
 
 	}
-	public static class Builder{
+
+	public static class Builder {
 		private GraphicalViewerImpl attachedViewerParent;
 		private String searchBoxText;
 		private Color findResultsColor;
 		private Color noSearchResultsColor;
-		
-		
+
 		public Color getNoSearchResultsColor() {
 			return noSearchResultsColor;
 		}
@@ -126,36 +115,36 @@ public class CollaborationViewSearch {
 		public GraphicalViewerImpl getAttachedViewerParent() {
 			return attachedViewerParent;
 		}
-		
+
 		public Builder setAttachedViewerParent(GraphicalViewerImpl attachedViewerParent) {
 			this.attachedViewerParent = attachedViewerParent;
 			return this;
 		}
-		
+
 		public String getSearchBoxText() {
 			return searchBoxText;
 		}
-		
+
 		public Builder setSearchBoxText(String searchBoxText) {
 			this.searchBoxText = searchBoxText;
 			return this;
 		}
-		
+
 		public Color getFindResultsColor() {
 			return findResultsColor;
 		}
-		
+
 		public Builder setFindResultsColor(Color findResultsColor) {
 			this.findResultsColor = findResultsColor;
 			return this;
 		}
-		
-		public CollaborationViewSearch create(){
+
+		public CollaborationViewSearch create() {
 			return new CollaborationViewSearch(this);
 		}
-		
+
 	}
-	
+
 	private CollaborationViewSearch(Builder searchBuilder) {
 		this.extractedLabels = new ArrayList<Label>();
 		this.matchedLabels = new ArrayList<Label>();
@@ -174,12 +163,9 @@ public class CollaborationViewSearch {
 			public boolean keyReleased(KeyEvent event) {
 
 				if (searchDialog == null) {
-					searchDialog = new SearchDialog(PlatformUI.getWorkbench()
-							.getDisplay().getActiveShell(), searchBoxText);
+					searchDialog = new SearchDialog(PlatformUI.getWorkbench().getDisplay().getActiveShell(), searchBoxText);
 				}
-				if (event.keyCode != SWT.ESC
-						&& event.keyCode >= BEGIN_OF_VALID_ASCII_CHARS
-						&& event.keyCode <= END_OF_VALID_ASCII_CHARS) {
+				if (event.keyCode != SWT.ESC && event.keyCode >= BEGIN_OF_VALID_ASCII_CHARS && event.keyCode <= END_OF_VALID_ASCII_CHARS) {
 
 					searchDialog.open();
 					String searchText = searchDialog.getSearchText();
@@ -193,54 +179,51 @@ public class CollaborationViewSearch {
 								matchedLabels.add(label);
 							}
 						}
-					} 
+					}
 
-				}
-				else if(event.keyCode == SWT.ESC){
+				} else if (event.keyCode == SWT.ESC) {
 					uncolorOldLabels();
-					
+
 				}
 				return true;
 			}
 		});
 	}
-	
-	/***
-	 * This function refreshs the labels which are designated for searching.
+
+	/**
+	 * This function refreshes the labels which are designated for searching.
 	 * It uses the given GraphicalViewerImpl and looks for labels.
 	 */
-	public void refreshSearchContent(){
-		ModelEditPart editPart = (ModelEditPart)attachedViewerParent.getContents();
+	public void refreshSearchContent() {
+		ModelEditPart editPart = (ModelEditPart) attachedViewerParent.getContents();
 		gatherLabels(editPart.getFigure());
 	}
-	
-	private void uncolorOldLabels(){
-		if(matchedLabels.size() != 0){
-			for(Label l : matchedLabels){
+
+	private void uncolorOldLabels() {
+		if (matchedLabels.size() != 0) {
+			for (Label l : matchedLabels) {
 				l.setBackgroundColor(noSearchResultsColor);
 			}
 		}
 	}
-	
-	private void gatherLabels(IFigure rootFigure)
-	{
+
+	private void gatherLabels(IFigure rootFigure) {
 		List<Label> labels = new ArrayList<Label>();
-		gatherLabels(rootFigure,labels);
+		gatherLabels(rootFigure, labels);
 		extractedLabels = new ArrayList<Label>(labels);
 	}
-	
-	private void gatherLabels(IFigure rootFigure,List<Label> alreadyGatheredLabels){
-		
+
+	private void gatherLabels(IFigure rootFigure, List<Label> alreadyGatheredLabels) {
+
 		IFigure tempRootFigure = rootFigure;
-		for(Object objFigure : tempRootFigure.getChildren()){
-			IFigure figure = (IFigure)objFigure;
-			if(!(figure instanceof Label)){
-				gatherLabels(figure,alreadyGatheredLabels);
-			}
-			else{
-				alreadyGatheredLabels.add((Label)figure);
+		for (Object objFigure : tempRootFigure.getChildren()) {
+			IFigure figure = (IFigure) objFigure;
+			if (!(figure instanceof Label)) {
+				gatherLabels(figure, alreadyGatheredLabels);
+			} else {
+				alreadyGatheredLabels.add((Label) figure);
 			}
 		}
 	}
-	
+
 }
