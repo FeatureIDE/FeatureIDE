@@ -25,14 +25,11 @@ import java.util.LinkedList;
 import org.eclipse.core.resources.IFolder;
 import org.prop4j.Node;
 
-import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.mpl.InterfaceProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.core.signature.ProjectSignatures.SignatureIterator;
 import de.ovgu.featureide.core.signature.ProjectStructure;
-import de.ovgu.featureide.core.signature.base.AbstractClassFragment;
-import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 import de.ovgu.featureide.core.signature.filter.ContextFilter;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.io.IOConstants;
@@ -44,6 +41,7 @@ import de.ovgu.featureide.fm.core.job.util.JobArguments;
  * 
  * @author Sebastian Krieter
  */
+@SuppressWarnings("unused")
 public class PrintExtendedSignaturesJob extends AProjectJob<PrintExtendedSignaturesJob.Arguments> {
 	
 	public static class Arguments extends JobArguments {

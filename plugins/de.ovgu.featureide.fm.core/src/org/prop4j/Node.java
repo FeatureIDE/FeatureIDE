@@ -20,6 +20,7 @@
  */
 package org.prop4j;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -34,11 +35,11 @@ import de.ovgu.featureide.fm.core.Feature;
  * @author Thomas Thuem
  */
 public abstract class Node {
-	
+
 	protected Node[] children;
 
 	@SuppressWarnings("unchecked")
-	public void setChildren(Object ...newChildren) {
+	public void setChildren(Object... newChildren) {
 		//allow collections as parameters
 		if (newChildren.length == 1 && newChildren[0] instanceof Collection)
 			newChildren = ((Collection<Object>) newChildren[0]).toArray();
@@ -47,7 +48,7 @@ public abstract class Node {
 		for (int i = 0; i < children.length; i++)
 			children[i] = getNode(newChildren[i]);
 	}
-	
+
 	public void setChildren(Object leftChild, Object rightChild) {
 		children = new Node[] { getNode(leftChild), getNode(rightChild) };
 	}
@@ -55,11 +56,11 @@ public abstract class Node {
 	public void setChildren(Node[] newChildren) {
 		children = newChildren;
 	}
-	
+
 	public Node[] getChildren() {
 		return children;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public Node toCNF() {
 		Node node = this;
@@ -69,39 +70,39 @@ public abstract class Node {
 		node = node.eliminate(Not.class);
 		return node.clausify();
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public Node eliminateNotSupportedSymbols(final String[] symbols) {
 		Node node = this;
 		for (int i = 0; i < symbols.length; i++) {
 			if (symbols[i].equals(NodeWriter.noSymbol)) {
 				switch (i) {
-					case 0:
-						node = node.eliminate(Not.class);
-						break;
-					case 1:
-						node = node.eliminate(And.class);
-						break;
-					case 2:
-						node = node.eliminate(Or.class);
-						break;
-					case 3:
-						node = node.eliminate(Implies.class);
-						break;
-					case 4:
-						node = node.eliminate(Equals.class);
-						break;
-					case 6:
-						node = node.eliminate(Choose.class);
-						break;
-					case 7:
-						node = node.eliminate(AtLeast.class);
-						break;
-					case 8:
-						node = node.eliminate(AtMost.class);
-						break;
-					default:
-						break;
+				case 0:
+					node = node.eliminate(Not.class);
+					break;
+				case 1:
+					node = node.eliminate(And.class);
+					break;
+				case 2:
+					node = node.eliminate(Or.class);
+					break;
+				case 3:
+					node = node.eliminate(Implies.class);
+					break;
+				case 4:
+					node = node.eliminate(Equals.class);
+					break;
+				case 6:
+					node = node.eliminate(Choose.class);
+					break;
+				case 7:
+					node = node.eliminate(AtLeast.class);
+					break;
+				case 8:
+					node = node.eliminate(AtMost.class);
+					break;
+				default:
+					break;
 				}
 			}
 		}
@@ -125,7 +126,7 @@ public abstract class Node {
 		System.out.println();
 		return node;
 	}
-	
+
 	public void simplify() {
 		for (int i = 0; i < children.length; i++) {
 			children[i].simplify();
@@ -153,8 +154,7 @@ public abstract class Node {
 	}
 
 	@Override
-	public String toString() 
-	{
+	public String toString() {
 		return NodeWriter.nodeToString(this);
 	}
 
@@ -166,7 +166,7 @@ public abstract class Node {
 	 * @see org.prop4j.NodeWriter.logicalSymbols
 	 * @see org.prop4j.NodeWriter.textualSymbols
 	 * 
-	 * @param  symbols  the symbols for logical connectors
+	 * @param symbols the symbols for logical connectors
 	 * 
 	 * @return a string representing this node
 	 */
@@ -189,44 +189,38 @@ public abstract class Node {
 	}
 
 	@SuppressWarnings("unchecked")
-	protected Node eliminate(Class<? extends Node> ...array) {
+	protected Node eliminate(Class<? extends Node>... array) {
 		return eliminate(Arrays.asList(array));
 	}
-	
+
 	protected Node eliminate(List<Class<? extends Node>> list) {
 		for (int i = 0; i < children.length; i++)
 			children[i] = children[i].eliminate(list);
 		return this;
 	}
-	
+
 	protected Node clausify() {
 		throw new RuntimeException(getClass().getName() + " is not supporting this method");
 	}
 
-	public List<Node> replaceFeature(Feature feature, Feature replaceWithFeature)
-	{
-		return replaceFeature(feature, replaceWithFeature, new LinkedList<Node>());	
-	}	
-	
-	public List<Node> replaceFeature(Feature feature, Feature replaceWithFeature, List<Node> list)
-	{
-		if (this instanceof Literal)
-		{
-			if (((Literal)this).var.equals(feature.getName())) 
-			{
-				((Literal)this).var = replaceWithFeature.getName();
+	public List<Node> replaceFeature(Feature feature, Feature replaceWithFeature) {
+		return replaceFeature(feature, replaceWithFeature, new LinkedList<Node>());
+	}
+
+	public List<Node> replaceFeature(Feature feature, Feature replaceWithFeature, List<Node> list) {
+		if (this instanceof Literal) {
+			if (((Literal) this).var.equals(feature.getName())) {
+				((Literal) this).var = replaceWithFeature.getName();
 				list.add(this);
 			}
-		}else
-		{
-			for (Node child : this.children)
-			{
+		} else {
+			for (Node child : this.children) {
 				child.replaceFeature(feature, replaceWithFeature, list);
 			}
 		}
 		return list;
 	}
-	
+
 	protected void fuseWithSimilarChildren() {
 		int count = children.length;
 		for (Node child : children)
@@ -243,11 +237,11 @@ public abstract class Node {
 		}
 		children = newChildren;
 	}
-	
+
 	protected static Node getNode(Object object) {
 		return object instanceof Node ? (Node) object : new Literal(object);
 	}
-	
+
 	protected Node[] chooseKofN(Node[] elements, int k, boolean negated) {
 		int n = elements.length;
 
@@ -265,14 +259,14 @@ public abstract class Node {
 		//negate all elements
 		if (negated)
 			negateNodes(elements);
-		
+
 		Node[] clause = new Node[k];
 		int[] index = new int[k];
 
 		//the position that is currently filled in clause
-		int level = 0; 
+		int level = 0;
 		index[level] = -1;
-		
+
 		while (level >= 0) {
 			//fill this level with the next element
 			index[level]++;
@@ -280,8 +274,7 @@ public abstract class Node {
 			if (index[level] >= n - (k - 1 - level)) {
 				//go to previous level
 				level--;
-			}
-			else {
+			} else {
 				clause[level] = elements[index[level]];
 				if (level == k - 1)
 					newNodes[j++] = new Or(clone(clause));
@@ -307,11 +300,26 @@ public abstract class Node {
 			return 1;
 		return binom(n - 1, k - 1) * n / k;
 	}
-	
+
 	protected static void negateNodes(Node[] nodes) {
 		for (int i = 0; i < nodes.length; i++)
 			nodes[i] = new Not(nodes[i]);
 	}
-	
+
+	public List<String> getContainedFeatures() {
+		List<String> ret = new ArrayList<>();
+		getContainedFeatures(this, ret);
+		return ret;
+	}
+
+	private void getContainedFeatures(Node actNode, List<String> featureList) {
+		if (actNode instanceof Literal) {
+			featureList.add(((Literal) actNode).var.toString());
+		} else {
+			for (Node child : actNode.getChildren()) {
+				getContainedFeatures(child, featureList);
+			}
+		}
+	}
 
 }

@@ -44,6 +44,7 @@ import de.ovgu.featureide.fm.core.job.util.JobArguments;
  * 
  * @author Sebastian Krieter
  */
+@SuppressWarnings("unused")
 public class PrintComparedInterfacesJob extends AProjectJob<PrintComparedInterfacesJob.Arguments> {
 	
 	public static class Arguments extends JobArguments {

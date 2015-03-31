@@ -56,6 +56,7 @@ import de.ovgu.featureide.fm.core.job.util.JobArguments;
  * 
  * @author Sebastian Krieter
  */
+@SuppressWarnings("unused")
 public class PrintStatisticsJob extends AProjectJob<PrintStatisticsJob.Arguments> {
 	
 	public static class Arguments extends JobArguments {

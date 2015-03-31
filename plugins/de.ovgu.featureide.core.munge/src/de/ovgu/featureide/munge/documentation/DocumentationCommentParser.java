@@ -11,7 +11,7 @@ public class DocumentationCommentParser extends ADocumentationCommentParser {
 	@Override
 	protected void parseHead(String[] parts) {
 		final String typeString = parts[0];
-		
+
 		boolean featureHead = false;
 		// Type
 		if (typeString.equals("general")) {
@@ -23,11 +23,11 @@ public class DocumentationCommentParser extends ADocumentationCommentParser {
 			tagFeatureNode = null;
 			tagPriority = 0;
 		}
-		
+
 		// Priority
 		if (parts.length > 1) {
 			try {
-				tagPriority = Integer.parseInt(parts[parts.length -1]);
+				tagPriority = Integer.parseInt(parts[parts.length - 1]);
 				if (featureHead) {
 					if (parts.length > 2) {
 						final StringBuilder sb = new StringBuilder();
@@ -43,7 +43,7 @@ public class DocumentationCommentParser extends ADocumentationCommentParser {
 				}
 			} catch (NumberFormatException e) {
 				tagPriority = 0;
-				
+
 				if (featureHead) {
 					final StringBuilder sb = new StringBuilder();
 					for (int i = 1; i < parts.length; i++) {

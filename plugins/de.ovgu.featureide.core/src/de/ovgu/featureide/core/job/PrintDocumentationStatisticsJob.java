@@ -18,8 +18,15 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.featurehouse.job;
+package de.ovgu.featureide.core.job;
 
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.runtime.CoreException;
+
+import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.signature.ProjectSignatures;
+import de.ovgu.featureide.fm.core.io.IOConstants;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
@@ -43,33 +50,39 @@ public class PrintDocumentationStatisticsJob extends AProjectJob<PrintDocumentat
 
 	@Override
 	protected boolean work() {
-//		InterfaceProject interfaceProject = MPLPlugin.getDefault().getInterfaceProject(this.project);
-//		if (interfaceProject == null) {
-//			MPLPlugin.getDefault().logWarning(this.project.getName() + " is no Interface Project!");
-//			return false;
-//		}
-//		IFolder folder = CorePlugin.createFolder(this.project, arguments.foldername);
-//		try {
-//			folder.delete(true, null);
-//		} catch (CoreException e) {
-//			MPLPlugin.getDefault().logError(e);
-//			return false;
-//		}
-//		CorePlugin.createFolder(this.project, arguments.foldername);
-//		
-//		int[] featureIDs = new int[interfaceProject.getFeatureCount()];
-//		int i = 0;
-//		for (String string : interfaceProject.getFeatureModel().getFeatureOrderList()) {
-//			featureIDs[i++] = interfaceProject.getFeatureID(string);
-//		}
-//
-//		setMaxAbsoluteWork(2 * featureIDs.length + 5);
-//
-//		int[] statisticDataChars = new int[5];
-//		int[] statisticDataTags = new int[5];
-//		
-//		
-//		// ----------------------------------- SPL ---------------------------------------------
+		final IFeatureProject featureProject = CorePlugin.getFeatureProject(project);
+		if (featureProject == null) {
+			CorePlugin.getDefault().logWarning(this.project.getName() + " is no FeatureIDE Project!");
+		}
+		
+		IFolder folder = CorePlugin.createFolder(this.project, arguments.foldername);
+		try {
+			folder.delete(true, null);
+		} catch (CoreException e) {
+			CorePlugin.getDefault().logError(e);
+			return false;
+		}
+		CorePlugin.createFolder(this.project, arguments.foldername);
+		
+		final ProjectSignatures projectSignatures = featureProject.getProjectSignatures();
+		if (projectSignatures == null) {
+			CorePlugin.getDefault().logWarning("No signatures available!");
+			return false;
+		}
+		
+		int[] featureIDs = new int[projectSignatures.getFeatureCount()];
+		int i = 0;
+		for (String string : projectSignatures.getFeatureModel().getFeatureOrderList()) {
+			featureIDs[i++] = projectSignatures.getFeatureID(string);
+		}
+
+		workMonitor.setMaxAbsoluteWork(2 * featureIDs.length + 5);
+
+		int[] statisticDataChars = new int[5];
+		int[] statisticDataTags = new int[5];
+		
+		
+		// ----------------------------------- SPL ---------------------------------------------
 //		AJavaDocCommentMerger.reset();
 //		pseudoMerge(interfaceProject.getProjectSignatures().createIterator(),
 //			new SPLMerger(interfaceProject, featureIDs));
@@ -77,7 +90,7 @@ public class PrintDocumentationStatisticsJob extends AProjectJob<PrintDocumentat
 //		statisticDataChars[2] = AJavaDocCommentMerger.STAT_AFTER_CHARS;
 //		statisticDataTags[0] = AJavaDocCommentMerger.STAT_BEFORE_TAGS;
 //		statisticDataTags[2] = AJavaDocCommentMerger.STAT_AFTER_TAGS;
-//
+
 //		int[] statisticNumComments = new int[]{
 //			AJavaDocCommentMerger.STAT_NUM_FEATURE0,
 //			AJavaDocCommentMerger.STAT_NUM_FEATURE1,
@@ -89,10 +102,10 @@ public class PrintDocumentationStatisticsJob extends AProjectJob<PrintDocumentat
 //			AJavaDocCommentMerger.STAT_NUM_FEATURE0 + AJavaDocCommentMerger.STAT_NUM_FEATURE1 +
 //			AJavaDocCommentMerger.STAT_NUM_GENERAL0 + AJavaDocCommentMerger.STAT_NUM_GENERAL1,
 //		};
-//		worked();
-//			
-//		// ------------------------------- Featuremodule ------------------------------------------
-//
+		workMonitor.worked();
+			
+		// ------------------------------- Featuremodule ------------------------------------------
+
 //		AJavaDocCommentMerger.reset();
 //		for (int j = 0; j < featureIDs.length; j++) {
 //			int[] shortFeatureIDs = new int[j + 1];
@@ -101,12 +114,12 @@ public class PrintDocumentationStatisticsJob extends AProjectJob<PrintDocumentat
 //			SignatureIterator it = interfaceProject.getProjectSignatures().createIterator();
 //			it.addFilter(new FeatureFilter(new int[]{j}));
 //			pseudoMerge(it, new FeatureModuleMerger(interfaceProject, shortFeatureIDs, j));
-//			worked();
+//			workMonitor.worked();
 //		}
 //		statisticDataChars[4] = AJavaDocCommentMerger.STAT_AFTER_CHARS;
 //		statisticDataTags[4] = AJavaDocCommentMerger.STAT_AFTER_TAGS;
-//
-//		// --------------------------------- Context ---------------------------------------------
+
+		// --------------------------------- Context ---------------------------------------------
 //		AJavaDocCommentMerger.reset();
 //		SignatureIterator it = interfaceProject.getProjectSignatures().createIterator();
 //		it.addFilter(new ContextFilter(new Node[]{}, interfaceProject));
@@ -120,87 +133,87 @@ public class PrintDocumentationStatisticsJob extends AProjectJob<PrintDocumentat
 //
 //			AJavaDocCommentMerger.STAT_AFTER_CHARS -= statisticDataChars[3];
 //			AJavaDocCommentMerger.STAT_AFTER_TAGS -= statisticDataTags[3];
-//			worked();
+//			workMonitor.worked();
 //		}
 //		statisticDataChars[3] += AJavaDocCommentMerger.STAT_AFTER_CHARS;
 //		statisticDataTags[3] += AJavaDocCommentMerger.STAT_AFTER_TAGS;
-//		
-//		// -------------------------------- Variante ---------------------------------------------
-//
-//		statisticDataChars[1] = statisticDataChars[0];
-//		statisticDataTags[1] = statisticDataTags[0];
-//		worked();
-//		
-//		// ------------------------------------------------------------------------------------------------------------
-//		
-//		StringBuilder sb = new StringBuilder("MyMethod;Variant;SPL;Context;FeatureModule;Sum\n");
-//		
-//		int sum = -statisticDataChars[0];
-//		for (int j = 0; j < statisticDataChars.length; j++) {
-//			sb.append(statisticDataChars[j]);
-//			sb.append(';');
-//			sum += statisticDataChars[j];
-//		}
-//		sb.append(sum);
-//		sb.append('\n');
-//		
-//		int sum2 = -statisticDataTags[0];
-//		for (int j = 0; j < statisticDataTags.length; j++) {
-//			sb.append(statisticDataTags[j]);
-//			sb.append(';');
-//			sum2 += statisticDataTags[j];
-//		}
-//		sb.append(sum2);
-//		sb.append('\n');
-//		IOConstants.writeToFile(folder.getFile("statistics.csv"), sb.toString());
-//		worked();
-//		
-//		StringBuilder sb2 = new StringBuilder();
-//		
-//		String[] texString = new String[]{"Verfahren","Variante","SPL","Kontext","Featuremodul","Summe"};
-//		for (int j = 0; j < statisticDataTags.length; j++) {
-//			sb2.append(texString[j]);
-//			sb2.append(" & ");
-//			sb2.append(statisticDataChars[j]);
-//			sb2.append(" & ");
-//			sb2.append((int)(100 * ((double)statisticDataChars[j])/((double)statisticDataChars[0])));
-//			sb2.append("\\% & ");
-//			sb2.append(statisticDataTags[j]);
-//			sb2.append(" & ");
-//			sb2.append((int)(100 * ((double)statisticDataTags[j])/((double)statisticDataTags[0])));
-//			sb2.append("\\% \\\\\n");
-//		}
-//		sb2.append(texString[statisticDataTags.length]);
-//		sb2.append(" & ");
-//		sb2.append(sum);
-//		sb2.append(" & ");
-//		sb2.append((int)(100 * ((double)sum)/((double)statisticDataChars[0])));
-//		sb2.append("\\% & ");
-//		sb2.append(sum2);
-//		sb2.append(" & ");
-//		sb2.append((int)(100 * ((double)sum2)/((double)statisticDataTags[0])));
-//		sb2.append("\\% \\\\\n");
-//
-//		IOConstants.writeToFile(folder.getFile("latexTab.txt"), sb2.toString());
-//		worked();
-//		
-//		StringBuilder sb3 = new StringBuilder("Feature0;Feature1;New;SumFeature;General0;General1;SumGeneral;SumAll\n");
+		
+		// -------------------------------- Variante ---------------------------------------------
+
+		statisticDataChars[1] = statisticDataChars[0];
+		statisticDataTags[1] = statisticDataTags[0];
+		workMonitor.worked();
+		
+		// ------------------------------------------------------------------------------------------------------------
+		
+		StringBuilder sb = new StringBuilder("MyMethod;Variant;SPL;Context;FeatureModule;Sum\n");
+		
+		int sum = -statisticDataChars[0];
+		for (int j = 0; j < statisticDataChars.length; j++) {
+			sb.append(statisticDataChars[j]);
+			sb.append(';');
+			sum += statisticDataChars[j];
+		}
+		sb.append(sum);
+		sb.append('\n');
+		
+		int sum2 = -statisticDataTags[0];
+		for (int j = 0; j < statisticDataTags.length; j++) {
+			sb.append(statisticDataTags[j]);
+			sb.append(';');
+			sum2 += statisticDataTags[j];
+		}
+		sb.append(sum2);
+		sb.append('\n');
+		IOConstants.writeToFile(folder.getFile("statistics.csv"), sb.toString());
+		workMonitor.worked();
+		
+		StringBuilder sb2 = new StringBuilder();
+		
+		String[] texString = new String[]{"Verfahren","Variante","SPL","Kontext","Featuremodul","Summe"};
+		for (int j = 0; j < statisticDataTags.length; j++) {
+			sb2.append(texString[j]);
+			sb2.append(" & ");
+			sb2.append(statisticDataChars[j]);
+			sb2.append(" & ");
+			sb2.append((int)(100 * ((double)statisticDataChars[j])/((double)statisticDataChars[0])));
+			sb2.append("\\% & ");
+			sb2.append(statisticDataTags[j]);
+			sb2.append(" & ");
+			sb2.append((int)(100 * ((double)statisticDataTags[j])/((double)statisticDataTags[0])));
+			sb2.append("\\% \\\\\n");
+		}
+		sb2.append(texString[statisticDataTags.length]);
+		sb2.append(" & ");
+		sb2.append(sum);
+		sb2.append(" & ");
+		sb2.append((int)(100 * ((double)sum)/((double)statisticDataChars[0])));
+		sb2.append("\\% & ");
+		sb2.append(sum2);
+		sb2.append(" & ");
+		sb2.append((int)(100 * ((double)sum2)/((double)statisticDataTags[0])));
+		sb2.append("\\% \\\\\n");
+
+		IOConstants.writeToFile(folder.getFile("latexTab.txt"), sb2.toString());
+		workMonitor.worked();
+		
+		StringBuilder sb3 = new StringBuilder("Feature0;Feature1;New;SumFeature;General0;General1;SumGeneral;SumAll\n");
 //		for (int j = 0; j < statisticNumComments.length; j++) {
 //			sb3.append(statisticNumComments[j]);
 //			sb3.append(';');						
 //		}
-//		sb3.setCharAt(sb3.length() - 1, '\n');
-//		IOConstants.writeToFile(folder.getFile("numComments.txt"), sb3.toString());
-//		worked();
-//		
-//		MPLPlugin.getDefault().logInfo("Built Documentation Statistics");
+		sb3.setCharAt(sb3.length() - 1, '\n');
+		IOConstants.writeToFile(folder.getFile("numComments.txt"), sb3.toString());
+		workMonitor.worked();
+		
+		CorePlugin.getDefault().logInfo("Built Documentation Statistics");
 		return true;
 	}
 	
-//	private void pseudoMerge(SignatureIterator it, AJavaDocCommentMerger merger) {
+//	private void pseudoMerge(SignatureIterator it, ADocumentationCommentMerger merger) {
 //		while (it.hasNext()) {
 //			merger.setSig(it.next());
-//			merger.mergeComments();
+//			merger..mergeComments();
 //		}
 //	}
 }

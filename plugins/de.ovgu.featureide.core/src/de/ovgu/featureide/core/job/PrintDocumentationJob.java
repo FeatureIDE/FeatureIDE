@@ -32,6 +32,7 @@ import org.prop4j.Node;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.builder.IComposerExtensionClass.Mechanism;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.core.signature.ProjectSignatures.SignatureIterator;
 import de.ovgu.featureide.core.signature.ProjectStructure;
@@ -40,8 +41,10 @@ import de.ovgu.featureide.core.signature.documentation.ContextMerger;
 import de.ovgu.featureide.core.signature.documentation.FeatureModuleMerger;
 import de.ovgu.featureide.core.signature.documentation.VariantMerger;
 import de.ovgu.featureide.core.signature.documentation.base.ADocumentationCommentMerger;
+import de.ovgu.featureide.core.signature.documentation.base.BlockTag;
 import de.ovgu.featureide.core.signature.documentation.base.DocumentationBuilder;
 import de.ovgu.featureide.core.signature.filter.ConstraintFilter;
+import de.ovgu.featureide.core.signature.filter.FeatureFilter;
 import de.ovgu.featureide.core.signature.filter.IFilter;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
@@ -96,7 +99,8 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 			return false;
 		}
 
-		final Collection<IFilter<?>> filters = new LinkedList<>();
+		final Collection<IFilter<?>> commentFilters = new LinkedList<>();
+		final Collection<IFilter<?>> signatureFilters = new LinkedList<>();
 
 		final int[] featureIDs = projectSignatures.getFeatureIDs();
 		if (arguments.merger instanceof VariantMerger) {
@@ -141,7 +145,8 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 				Selection selection = feature.getSelection();
 				nodes[i++] = selection == Selection.UNDEFINED ? new Literal("true") : new Literal(feature.getFeature().getName(), feature.getSelection() == Selection.SELECTED);
 			}
-			filters.add(new ConstraintFilter(nodes));
+			signatureFilters.add(new ConstraintFilter(nodes));
+			commentFilters.add(new ConstraintFilter(nodes));
 			
 			arguments.merger.setValidFeatureIDs(featureIDs.length, validFeatureIDs);
 		} else if (arguments.merger instanceof ContextMerger) {
@@ -150,27 +155,42 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 			final Node[] nodes = new Node[2];
 			nodes[0] = NodeCreator.createNodes(projectSignatures.getFeatureModel());
 			nodes[1] = new Literal(arguments.featureName, true);
-			filters.add(new ConstraintFilter(nodes));
+			signatureFilters.add(new ConstraintFilter(nodes));
+			commentFilters.add(new ConstraintFilter(nodes));
 			
 			arguments.merger.setValidFeatureIDs(featureIDs.length, featureIDs);
 		} else if (arguments.merger instanceof FeatureModuleMerger) {
 			final int index = projectSignatures.getFeatureID(arguments.featureName);
 			arguments.merger.setValidFeatureIDs(featureIDs.length, new int[]{index});
 			
-//			filters.add(new FeatureFilter(index));
-			final Literal[] nodes = new Literal[projectSignatures.getFeatureCount()];
-			final String[] featureNames = projectSignatures.getFeatureNames();
-			for (int i = 0; i < featureNames.length; i++) {
-				nodes[i] = new Literal(featureNames[i], false);
+			if (featureProject.getComposer().getGenerationMechanism() == Mechanism.PREPROCESSOR) {
+				final Node[] nodes = new Node[2];
+				nodes[0] = NodeCreator.createNodes(projectSignatures.getFeatureModel());
+				nodes[1] = new Literal(arguments.featureName, true);
+				signatureFilters.add(new ConstraintFilter(nodes));
+				commentFilters.add(new ConstraintFilter(nodes));
+
+				commentFilters.add(new IFilter<BlockTag>() {
+					@Override
+					public boolean isValid(BlockTag object) {
+						for (String featureName : object.getConstraint().getContainedFeatures()) {
+							if (featureName.equals(arguments.featureName)) {
+								return true;
+							}
+						};
+						return false;
+					}
+				});
+			} else {
+				signatureFilters.add(new FeatureFilter(index));
+				commentFilters.add(new FeatureFilter(index));
 			}
-			nodes[index].flip();
-			filters.add(new ConstraintFilter(false, nodes));
 		}
 		
 		final DocumentationBuilder builder = new DocumentationBuilder(featureProject);
-		builder.build(arguments.merger, filters);
+		builder.build(arguments.merger, commentFilters);
 		
-		buildJavaDoc(projectSignatures.iterator(filters));
+		buildJavaDoc(projectSignatures.iterator(signatureFilters));
 		
 		return true;
 	}
