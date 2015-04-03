@@ -521,7 +521,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		walkTree(new IBinaryFunction<TreeItem, SelectableFeature, Void>() {
 			@Override
 			public Void invoke(TreeItem item, SelectableFeature feature) {
-				lockItem(item);
+//				lockItem(item);
 				updateFeatures.add(feature);
 				return null;
 			}
