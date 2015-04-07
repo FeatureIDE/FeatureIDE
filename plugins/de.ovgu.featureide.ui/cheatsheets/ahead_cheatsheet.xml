@@ -9,8 +9,9 @@ It is now time to implement the features. The implementation details depend on t
  <item
        title="Create new Jak files">
     <description>
-After you have saved your feature model, FeatureIDE will create directories for each feature. In these directories you can create Jak-Files.<br/><br/>
-Start with creating a new Jak-file in the directory Hello: Right click on the directory and use the context-item New-&gt;FeatureIDE File. Choose the identifier &quot;Main&quot; for the class name and press (Finish).<br/><br/>
+After you have <b>saved</b> your feature model, FeatureIDE will create directories for each feature. In these directories you can create Jak-Files.<br/><br/>
+Start with creating a new Jak-file in the directory &quot;Hello&quot;<br/>
+<b>Right click</b> on the <b>directory &quot;Hello&quot;</b> and use the command <b>New-&gt;FeatureIDE File</b> of the popup menu. Choose the <b>identifier &quot;Main&quot;</b> for the class name and press the <b>Finish</b> button.<br/><br/>
 FeatureIDE opens the file and you can write the following code:<br/><br/>
 public void print(){<br/>
   System.out.print(&quot;Hello&quot;);<br/>
@@ -19,14 +20,15 @@ public static void main(String[] args) {<br/>
   new Main().print();<br/>
 }
     </description>
-    <subitem
-          label="Now create more Jak files. Create one in each of the directories &quot;Beautiful&quot;, &quot;Wonderful&quot; and &quot;World&quot;. In these cases,  activate the option &quot;Refines&quot; in the Wizard. Furthermore, all the Jak files must have the same name Main.">
-    </subitem>
+      <subitem
+            label="Now create more Jak files, one in each of the directories &quot;Beautiful&quot;;, &quot;Wonderful&quot;; and &quot;World&quot;. In these cases,  activate the option &quot;Refines&quot;; in the Wizard. Furthermore, all the Jak files must have the same name Main.">
+      </subitem>
+
  </item>
  <item
        title="Source code for the Jak files">
     <description>
-       Now edit the remaining jak-Files. Every feature will refine the method print() in the class Main.<br/><br/> Now insert the following code in your world feature: <br/> <br/>
+       Now edit the remaining jak-Files. Every feature will <b>refine the method print()</b> in the <b>class Main</b>.<br/><br/> Now insert the following code in your world feature: <br/> <br/>
 	public void print() {<br/>
 		Super().print();<br/>
 		System.out.print(&quot; world!&quot;);<br/>
