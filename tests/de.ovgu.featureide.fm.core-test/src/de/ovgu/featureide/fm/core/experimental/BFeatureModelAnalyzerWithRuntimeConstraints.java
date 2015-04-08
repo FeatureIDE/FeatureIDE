@@ -97,8 +97,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 8)
-	@Constraint(samples = 8, allowedMedianDeviation = 500)
+	@Record(samples = 5)
+	@Constraint(samples = 5, allowedMedianDeviation = 1500)
 	public final void BAnalyzeFeatureModel1() {
 		if (RuntimeConstraint.inject(this.getClass())) {
 			analyze(1);
@@ -106,8 +106,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	//	@Test
-	//	@Record(samples = 8)
-	//	@Constraint(samples = 8, allowedMedianDeviation = 500)
+	//	@Record(samples = 5)
+	//	@Constraint(samples = 5, allowedMedianDeviation = 500)
 	//	public final void BAnalyzeFeatureModel1Ref() {
 	//		if (RuntimeConstraint.inject(this.getClass())) {
 	//			BAnalyzeFeatureModel18();
@@ -115,8 +115,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	//	}
 
 	@Test
-	@Record(samples = 8)
-	@Constraint(samples = 8, allowedMedianDeviation = 500)
+	@Record(samples = 5)
+	@Constraint(samples = 5, allowedMedianDeviation = 1500)
 	public final void BAnalyzeFeatureModel2() {
 		if (RuntimeConstraint.inject(this.getClass())) {
 			analyze(2);
@@ -124,8 +124,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 8)
-	@Constraint(samples = 8, allowedMedianDeviation = 500)
+	@Record(samples = 5)
+	@Constraint(samples = 5, allowedMedianDeviation = 1500)
 	public final void BAnalyzeFeatureModel10() {
 		if (RuntimeConstraint.inject(this.getClass())) {
 			analyze(10);
@@ -133,8 +133,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 8)
-	@Constraint(samples = 8, allowedMedianDeviation = 500)
+	@Record(samples = 5)
+	@Constraint(samples = 5, allowedMedianDeviation = 1500)
 	public final void BAnalyzeFeatureModel20() {
 		if (RuntimeConstraint.inject(this.getClass())) {
 			analyze(20);
@@ -142,8 +142,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 8)
-	@Constraint(samples = 8, allowedMedianDeviation = 500)
+	@Record(samples = 5)
+	@Constraint(samples = 5, allowedMedianDeviation = 1500)
 	public final void BAnalyzeFeatureModel21() {
 		if (RuntimeConstraint.inject(this.getClass())) {
 			analyze(21);
@@ -151,8 +151,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 8)
-	@Constraint(samples = 8, allowedMedianDeviation = 500)
+	@Record(samples = 5)
+	@Constraint(samples = 5, allowedMedianDeviation = 1500)
 	public final void BAnalyzeFeatureModel50() {
 		if (RuntimeConstraint.inject(this.getClass())) {
 			analyze(50);
@@ -160,8 +160,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 8)
-	@Constraint(samples = 8, allowedMedianDeviation = 500)
+	@Record(samples = 5)
+	@Constraint(samples = 5, allowedMedianDeviation = 1500)
 	public final void BAnalyzeFeatureModel100() {
 		if (RuntimeConstraint.inject(this.getClass())) {
 			analyze(100);
@@ -169,8 +169,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 8)
-	@Constraint(samples = 8, allowedMedianDeviation = 2200)
+	@Record(samples = 5)
+	@Constraint(samples = 5, allowedMedianDeviation = 3200)
 	public final void BAnalyzeFeatureModel200() {
 		if (RuntimeConstraint.inject(this.getClass())) {
 			analyze(200);
@@ -178,8 +178,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 8)
-	@Constraint(samples = 8, allowedMedianDeviation = 2500)
+	@Record(samples = 5)
+	@Constraint(samples = 5, allowedMedianDeviation = 3500)
 	public final void BAnalyzeFeatureModel201() {
 		if (RuntimeConstraint.inject(this.getClass())) {
 			analyze(201);
@@ -187,8 +187,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 8)
-	@Constraint(samples = 8, allowedMedianDeviation = 3000)
+	@Record(samples = 5)
+	@Constraint(samples = 5, allowedMedianDeviation = 4000)
 	public final void BAnalyzeFeatureModel500() {
 		if (RuntimeConstraint.inject(this.getClass())) {
 			analyze(500);
@@ -203,8 +203,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 8)
-	@Constraint(samples = 8, allowedMedianDeviation = 500)
+	@Record(samples = 5)
+	@Constraint(samples = 5, allowedMedianDeviation = 1500)
 	public final void BUpdateConstraints1() {
 		if (RuntimeConstraint.inject(this.getClass())) {
 			BUpdateConstraints(1);
@@ -212,8 +212,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 8)
-	@Constraint(samples = 8, allowedMedianDeviation = 350)
+	@Record(samples = 5)
+	@Constraint(samples = 5, allowedMedianDeviation = 1350)
 	public final void BUpdateConstraints2() {
 		if (RuntimeConstraint.inject(this.getClass())) {
 			BUpdateConstraints(2);
@@ -221,8 +221,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 8)
-	@Constraint(samples = 8, allowedMedianDeviation = 100)
+	@Record(samples = 5)
+	@Constraint(samples = 5, allowedMedianDeviation = 1100)
 	public final void BUpdateConstraints10() {
 		if (RuntimeConstraint.inject(this.getClass())) {
 			BUpdateConstraints(10);
@@ -230,8 +230,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 8)
-	@Constraint(samples = 8, allowedMedianDeviation = 50)
+	@Record(samples = 5)
+	@Constraint(samples = 5, allowedMedianDeviation = 1050)
 	public final void BUpdateConstraints20() {
 		if (RuntimeConstraint.inject(this.getClass())) {
 			BUpdateConstraints(20);
@@ -239,8 +239,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 8)
-	@Constraint(samples = 8, allowedMedianDeviation = 50)
+	@Record(samples = 5)
+	@Constraint(samples = 5, allowedMedianDeviation = 1050)
 	public final void BUpdateConstraints21() {
 		if (RuntimeConstraint.inject(this.getClass())) {
 			BUpdateConstraints(21);
@@ -248,8 +248,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 8)
-	@Constraint(samples = 8, allowedMedianDeviation = 50)
+	@Record(samples = 5)
+	@Constraint(samples = 5, allowedMedianDeviation = 1050)
 	public final void BUpdateConstraints50() {
 		if (RuntimeConstraint.inject(this.getClass())) {
 			BUpdateConstraints(50);
@@ -257,8 +257,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 8)
-	@Constraint(samples = 8, allowedMedianDeviation = 50)
+	@Record(samples = 5)
+	@Constraint(samples = 5, allowedMedianDeviation = 1050)
 	public final void BUpdateConstraints100() {
 		if (RuntimeConstraint.inject(this.getClass())) {
 			BUpdateConstraints(100);
@@ -266,8 +266,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 8)
-	@Constraint(samples = 8, allowedMedianDeviation = 150)
+	@Record(samples = 5)
+	@Constraint(samples = 5, allowedMedianDeviation = 1150)
 	public final void BUpdateConstraints200() {
 		if (RuntimeConstraint.inject(this.getClass())) {
 			BUpdateConstraints(201);
@@ -275,8 +275,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 8)
-	@Constraint(samples = 8, allowedMedianDeviation = 250)
+	@Record(samples = 5)
+	@Constraint(samples = 5, allowedMedianDeviation = 1250)
 	public final void BUpdateConstraints201() {
 		if (RuntimeConstraint.inject(this.getClass())) {
 			BUpdateConstraints(201);
@@ -284,8 +284,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 8)
-	@Constraint(samples = 8, allowedMedianDeviation = 1500)
+	@Record(samples = 5)
+	@Constraint(samples = 5, allowedMedianDeviation = 2500)
 	public final void BUpdateConstraints500() {
 		if (RuntimeConstraint.inject(this.getClass())) {
 			BUpdateConstraints(500);
@@ -293,8 +293,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 8)
-	@Constraint(samples = 8, allowedMedianDeviation = 3500)
+	@Record(samples = 5)
+	@Constraint(samples = 5, allowedMedianDeviation = 4500)
 	public final void BUpdateConstraints1000() {
 		if (RuntimeConstraint.inject(this.getClass())) {
 			BUpdateConstraints(1000);
@@ -309,8 +309,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 8)
-	@Constraint(samples = 8, allowedMedianDeviation = 100)
+	@Record(samples = 5)
+	@Constraint(samples = 5, allowedMedianDeviation = 1100)
 	public final void BUpdateFeatures1() {
 		if (RuntimeConstraint.inject(this.getClass())) {
 			BUpdateFeatures(1);
@@ -318,8 +318,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 8)
-	@Constraint(samples = 8, allowedMedianDeviation = 100)
+	@Record(samples = 5)
+	@Constraint(samples = 5, allowedMedianDeviation = 1100)
 	public final void BUpdateFeatures2() {
 		if (RuntimeConstraint.inject(this.getClass())) {
 			BUpdateFeatures(2);
@@ -327,8 +327,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 8)
-	@Constraint(samples = 8, allowedMedianDeviation = 50)
+	@Record(samples = 5)
+	@Constraint(samples = 5, allowedMedianDeviation = 1050)
 	public final void BUpdateFeatures10() {
 		if (RuntimeConstraint.inject(this.getClass())) {
 			BUpdateFeatures(10);
@@ -336,8 +336,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 8)
-	@Constraint(samples = 8, allowedMedianDeviation = 50)
+	@Record(samples = 5)
+	@Constraint(samples = 5, allowedMedianDeviation = 1050)
 	public final void BUpdateFeatures20() {
 		if (RuntimeConstraint.inject(this.getClass())) {
 			BUpdateFeatures(20);
@@ -345,8 +345,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 8)
-	@Constraint(samples = 8, allowedMedianDeviation = 100)
+	@Record(samples = 5)
+	@Constraint(samples = 5, allowedMedianDeviation = 1100)
 	public final void BUpdateFeatures21() {
 		if (RuntimeConstraint.inject(this.getClass())) {
 			BUpdateFeatures(21);
@@ -354,8 +354,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 8)
-	@Constraint(samples = 8, allowedMedianDeviation = 50)
+	@Record(samples = 5)
+	@Constraint(samples = 5, allowedMedianDeviation = 1050)
 	public final void BUpdateFeatures50() {
 		if (RuntimeConstraint.inject(this.getClass())) {
 			BUpdateFeatures(50);
@@ -363,8 +363,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 8)
-	@Constraint(samples = 8, allowedMedianDeviation = 100)
+	@Record(samples = 5)
+	@Constraint(samples = 5, allowedMedianDeviation = 1000)
 	public final void BUpdateFeatures100() {
 		if (RuntimeConstraint.inject(this.getClass())) {
 			BUpdateFeatures(100);
@@ -372,8 +372,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 8)
-	@Constraint(samples = 8, allowedMedianDeviation = 150)
+	@Record(samples = 5)
+	@Constraint(samples = 5, allowedMedianDeviation = 1150)
 	public final void BUpdateFeatures200() {
 		if (RuntimeConstraint.inject(this.getClass())) {
 			BUpdateFeatures(200);
@@ -381,8 +381,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 8)
-	@Constraint(samples = 8, allowedMedianDeviation = 2500)
+	@Record(samples = 5)
+	@Constraint(samples = 5, allowedMedianDeviation = 3500)
 	public final void BUpdateFeatures201() {
 		if (RuntimeConstraint.inject(this.getClass())) {
 			BUpdateFeatures(201);
@@ -390,8 +390,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 8)
-	@Constraint(samples = 8, allowedMedianDeviation = 500)
+	@Record(samples = 5)
+	@Constraint(samples = 5, allowedMedianDeviation = 1500)
 	public final void BUpdateFeatures500() {
 		if (RuntimeConstraint.inject(this.getClass())) {
 			BUpdateFeatures(500);
@@ -399,8 +399,8 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints {
 	}
 
 	@Test
-	@Record(samples = 8)
-	@Constraint(samples = 8, allowedMedianDeviation = 1500)
+	@Record(samples = 5)
+	@Constraint(samples = 5, allowedMedianDeviation = 2500)
 	public final void BUpdateFeatures1000() {
 		if (RuntimeConstraint.inject(this.getClass())) {
 			BUpdateFeatures(1000);
