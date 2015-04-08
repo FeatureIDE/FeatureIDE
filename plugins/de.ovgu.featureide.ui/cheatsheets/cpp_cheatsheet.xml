@@ -49,10 +49,9 @@ public:<br/>
 		printf(&quot; World!&quot;);<br/>
 		return 0;<br/>
 	}<br/>
-};<br/>
-
-	In the other files you can insert the same code and just change the print method.<br/>
-For example:<br/>
+};<br/><br/><br/>
+In the other files you can insert the same code and just change the print method.<br/>
+<br/><br/><b>Example:</b><br/>
 printf(&quot; wonderful&quot;); in feature &quot;Wonderful&quot;.<br/>printf(&quot; beautiful&quot;); in feature &quot;Beautiful&quot;.
     </description>
  </item>
