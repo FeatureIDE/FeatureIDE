@@ -24,8 +24,6 @@ It is now time to implement the features. The implementation details depend on t
 		//#if World<br/>
 		System.out.print(&quot; world!&quot;);<br/>
 		//#endif<br/>
-	<br/>t(&quot; world!&quot;);<br/>
-		//#endif<br/>
 	}<br/>
  
  	</description>
