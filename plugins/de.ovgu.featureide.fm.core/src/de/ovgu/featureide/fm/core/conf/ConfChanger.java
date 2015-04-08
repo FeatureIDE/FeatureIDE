@@ -1,0 +1,137 @@
+/* FeatureIDE - A Framework for Feature-Oriented Software Development
+ * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ *
+ * This file is part of FeatureIDE.
+ * 
+ * FeatureIDE is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * FeatureIDE is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * See http://featureide.cs.ovgu.de/ for further information.
+ */
+package de.ovgu.featureide.fm.core.conf;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.prop4j.Literal;
+import org.prop4j.Node;
+import org.prop4j.SatSolver;
+import org.sat4j.specs.TimeoutException;
+
+import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.conf.nodes.Variable;
+import de.ovgu.featureide.fm.core.conf.nodes.VariableConfiguration;
+import de.ovgu.featureide.fm.core.editing.NodeCreator;
+
+/**
+ * TODO description
+ * 
+ * @author Sebastian Krieter
+ */
+public class ConfChanger {
+	private final FeatureGraph featureGraph;
+	private final VariableConfiguration variableConfiguration;
+	private final SatSolver solver;
+
+	public ConfChanger(FeatureModel featureModel, FeatureGraph featureGraph, VariableConfiguration variableConfiguration) {
+		this.featureGraph = featureGraph;
+		this.variableConfiguration = variableConfiguration;
+		solver = new SatSolver(NodeCreator.createNodes(featureModel, false).toCNF(), 1000);
+	}
+
+	public void setFeature(Feature f, byte newValue) {
+		if (newValue == Variable.UNDEFINED) {
+			return;
+		}
+
+		final int index = featureGraph.getFeatureIndex(f.getName());
+		set(index, newValue == Variable.TRUE);
+
+		List<Integer> compList = new ArrayList<>();
+
+		if (newValue == Variable.TRUE) {
+			for (int i = 0; i < featureGraph.getSize(); i++) {
+				if (variableConfiguration.getVariable(i).getValue() != Variable.UNDEFINED) {
+					continue;
+				}
+				final byte edge = (byte) (featureGraph.getEdge(index, i) & FeatureGraph.MASK_1_00001100);
+				switch (edge) {
+				case FeatureGraph.EDGE_10:
+					set(i, false);
+					break;
+				case FeatureGraph.EDGE_11:
+					set(i, true);
+					break;
+				case FeatureGraph.EDGE_1q:
+					compList.add(i);
+					continue;
+				default:
+					continue;
+				}
+			}
+		} else {
+			for (int i = 0; i < featureGraph.getSize(); i++) {
+				if (variableConfiguration.getVariable(i).getValue() != Variable.UNDEFINED) {
+					continue;
+				}
+				final byte edge = (byte) (featureGraph.getEdge(index, i) & FeatureGraph.MASK_0_00110000);
+				switch (edge) {
+				case FeatureGraph.EDGE_00:
+					set(i, false);
+					break;
+				case FeatureGraph.EDGE_01:
+					set(i, true);
+					break;
+				case FeatureGraph.EDGE_0q:
+					compList.add(i);
+					continue;
+				default:
+					continue;
+				}
+			}
+		}
+
+		for (Integer i : compList) {
+			try {
+				ls.add(new Literal(featureGraph.featureArray[i], false));
+				if (!solver.isSatisfiable(ls)) {
+					variableConfiguration.setVariable(i, Variable.TRUE);
+					ls.set(ls.size() - 1, new Literal(featureGraph.featureArray[i], true));
+				} else {
+					ls.set(ls.size() - 1, new Literal(featureGraph.featureArray[i], true));
+					if (!solver.isSatisfiable(ls)) {
+						variableConfiguration.setVariable(i, Variable.FALSE);
+						ls.set(ls.size() - 1, new Literal(featureGraph.featureArray[i], false));
+					} else {
+						ls.remove(ls.size() - 1);
+					}
+				}
+			} catch (TimeoutException e) {
+				FMCorePlugin.getDefault().logError(e);
+				ls.remove(ls.size() - 1);
+			}
+		}
+	}
+
+	private final List<Node> ls = new ArrayList<>();
+
+	private void set(int index, boolean value) {
+		if (variableConfiguration.getVariable(index).getValue() == Variable.UNDEFINED) {
+			variableConfiguration.setVariable(index, value ? Variable.TRUE : Variable.FALSE);
+			ls.add(new Literal(featureGraph.featureArray[index], value));
+		}
+	}
+
+}

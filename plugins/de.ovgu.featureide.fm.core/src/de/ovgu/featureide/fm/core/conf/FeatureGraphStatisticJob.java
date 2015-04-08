@@ -23,6 +23,8 @@ package de.ovgu.featureide.fm.core.conf;
 import java.util.Arrays;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.conf.nodes.Variable;
+import de.ovgu.featureide.fm.core.conf.nodes.VariableConfiguration;
 import de.ovgu.featureide.fm.core.job.AStoppableJob;
 
 public class FeatureGraphStatisticJob extends AStoppableJob {
@@ -43,12 +45,18 @@ public class FeatureGraphStatisticJob extends AStoppableJob {
 		return true;
 	}
 
-	private void statistic() {
-		statisticPart(true, false);
-		//		statisticPart(false, false);
-		statisticPart(true, true);
-		//		statisticPart(false, true);
-		statisticPart2();
+	private void statistic() {		
+//		statisticPart(true, false);
+//		statisticPart(true, true);
+//		statisticPart2();
+
+		statisticPart3(0);
+		statisticPart3(1);
+		statisticPart3(10);
+		for (int i = 50; i <= 600; i+= 50) {
+			statisticPart3(i);
+		}
+		
 		System.out.println();
 	}
 
@@ -81,13 +89,35 @@ public class FeatureGraphStatisticJob extends AStoppableJob {
 				} else {
 					System.out.print("0");
 				}
-//				System.out.print(edge);
-//				System.out.print(" ");
 			}
 			System.out.print(": ");
 			System.out.println(feature);
 		}
 		System.out.println();
+	}
+	
+	private void statisticPart3(int blub) {
+		final VariableConfiguration variableConfiguration = new VariableConfiguration(featureGraph.getSize());
+		final ConfChanger c = new ConfChanger(featureModel, featureGraph, variableConfiguration);
+		int vIndex = 0;
+		for (int i = 0; i < blub; i++) {
+			while (vIndex < featureGraph.getSize() && variableConfiguration.getVariable(vIndex).getValue() != Variable.UNDEFINED) {
+				vIndex++;
+			}
+			if (vIndex < featureGraph.getSize()) {
+				c.setFeature(featureModel.getFeature(featureGraph.featureArray[vIndex]), Variable.TRUE);
+			}
+		}
+		
+		int x = 0;
+		for (int i = 0; i < featureGraph.getSize(); i++) {
+			if (variableConfiguration.getVariable(i).getValue() != Variable.UNDEFINED) {
+				x++;
+			}
+		}
+		
+		System.out.println();
+		System.out.println(x);
 	}
 
 }

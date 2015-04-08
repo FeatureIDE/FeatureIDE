@@ -20,8 +20,10 @@
  */
 package de.ovgu.featureide.fm.core.conf.nodes;
 
+import java.util.Iterator;
 
-public class VariableConfiguration {
+
+public class VariableConfiguration implements Iterable<Variable> {
 	
 	private final Variable[] conf;
 
@@ -38,5 +40,25 @@ public class VariableConfiguration {
 	
 	public Variable getVariable(int index) {
 		return conf[index];
+	}
+	
+	@Override
+	public Iterator<Variable> iterator() {
+		return new Iterator<Variable>() {
+			private int index = 0;
+			@Override
+			public boolean hasNext() {
+				return index < conf.length;
+			}
+
+			@Override
+			public Variable next() {
+				return conf[index++];
+			}
+
+			@Override
+			public void remove() {
+			}
+		};
 	}
 }

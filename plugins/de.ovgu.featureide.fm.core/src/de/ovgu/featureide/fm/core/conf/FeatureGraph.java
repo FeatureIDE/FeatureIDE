@@ -183,6 +183,10 @@ public class FeatureGraph {
 		return index != null ? index : -1;
 	}
 
+	public int getSize() {
+		return size;
+	}
+
 	public int countNeighbors(String from, boolean selected, boolean subtractReal) {
 		final int fromIndex = featureMap.get(from);
 		final byte mask = (selected) ? MASK_1_00001100 : MASK_0_00110000;
