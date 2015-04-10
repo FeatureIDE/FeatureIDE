@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.conf.nodes;
 
+import java.util.TreeSet;
+
 public class Variable {
 	public static final byte
 		TRUE = 1,
@@ -47,6 +49,10 @@ public class Variable {
 	}
 	
 	protected void reset() {
+	}
+	
+	protected void getVaraibles(TreeSet<Integer> list) {
+		list.add(id);
 	}
 
 }

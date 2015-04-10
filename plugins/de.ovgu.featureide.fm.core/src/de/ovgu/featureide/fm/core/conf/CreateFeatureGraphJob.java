@@ -37,10 +37,12 @@ import org.prop4j.Or;
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.conf.nodes.And2;
+import de.ovgu.featureide.fm.core.conf.nodes.Expression;
 import de.ovgu.featureide.fm.core.conf.nodes.Not2;
+import de.ovgu.featureide.fm.core.conf.nodes.Or2;
 import de.ovgu.featureide.fm.core.conf.nodes.Variable;
 import de.ovgu.featureide.fm.core.conf.nodes.VariableConfiguration;
+import de.ovgu.featureide.fm.core.conf.nodes.Xor;
 import de.ovgu.featureide.fm.core.job.AStoppableJob;
 
 public class CreateFeatureGraphJob extends AStoppableJob {
@@ -50,6 +52,8 @@ public class CreateFeatureGraphJob extends AStoppableJob {
 	private final Collection<Feature> coreFeatures = new HashSet<>();
 	private final Collection<Feature> deadFeatures = new HashSet<>();
 	private FeatureGraph featureGraph = null;
+
+	private final HashSet<Feature> processedParent = new HashSet<>();
 
 	public CreateFeatureGraphJob(FeatureModel featureModel) {
 		super("Spliting Feature Model");
@@ -67,12 +71,14 @@ public class CreateFeatureGraphJob extends AStoppableJob {
 		final Collection<Feature> features = new LinkedList<Feature>(featureModel.getFeatures());
 		features.removeAll(fixedFeatures);
 
+		processedParent.clear();
+
 		workMonitor.setMaxAbsoluteWork(1 * features.size() + 1);
 
 		featureGraph = new FeatureGraph(features);
 
 		workMonitor.worked();
-		
+
 		VariableConfiguration conf = new VariableConfiguration(features.size());
 
 		for (Feature feature : features) {
@@ -95,28 +101,35 @@ public class CreateFeatureGraphJob extends AStoppableJob {
 				}
 			}
 			if (parent.isAlternative()) {
-				if (fixedFeatures.contains(parent) && parent.getChildren().size() == 2) {
+				// XOR between two children
+				if (coreFeatures.contains(parent) && parent.getChildren().size() == 2) {
 					for (Feature sibiling : parent.getChildren()) {
-						if (!fixedFeatures.contains(sibiling)) {
-							featureGraph.setEdge(featureName, sibiling.getName(), FeatureGraph.EDGE_10);
-							featureGraph.setEdge(featureName, sibiling.getName(), FeatureGraph.EDGE_01);
-						}
+						//						if (!fixedFeatures.contains(sibiling)) {
+						featureGraph.setEdge(featureName, sibiling.getName(), FeatureGraph.EDGE_10);
+						featureGraph.setEdge(featureName, sibiling.getName(), FeatureGraph.EDGE_01);
+						//						}
 					}
 				} else {
 					for (Feature sibiling : parent.getChildren()) {
-						if (!fixedFeatures.contains(sibiling)) {
+						if (!deadFeatures.contains(sibiling)) {
 							featureGraph.setEdge(featureName, sibiling.getName(), FeatureGraph.EDGE_10);
 							featureGraph.setEdge(featureName, sibiling.getName(), FeatureGraph.EDGE_0q);
 						}
 					}
-					
-					final ArrayList<Variable> list = new ArrayList<>(parent.getChildren().size() - 1);
+
+					final ArrayList<Variable> list = new ArrayList<>(parent.getChildren().size());
 					for (Feature sibiling : parent.getChildren()) {
-						if (sibiling != feature && !fixedFeatures.contains(sibiling)) {
+						if (!deadFeatures.contains(sibiling)) {
 							list.add(conf.getVariable(featureGraph.getFeatureIndex(sibiling.getName())));
 						}
 					}
-					final And2 and = new And2(list.toArray(new Variable[0]));
+					//					final And2 and = new And2(list.toArray(new Variable[0]));
+					if (processedParent.add(parent) && !deadFeatures.contains(parent)) {
+						if (!coreFeatures.contains(parent)) {
+							list.add(new Not2(conf.getVariable(featureGraph.getFeatureIndex(parent.getName()))));
+						}
+						expList.add(new Xor(list.toArray(new Variable[0])));
+					}
 				}
 			} else if (parent.isOr()) {
 				boolean optionalFeature = false;
@@ -128,27 +141,53 @@ public class CreateFeatureGraphJob extends AStoppableJob {
 				}
 				if (!optionalFeature) {
 					for (Feature sibiling : parent.getChildren()) {
-						if (!fixedFeatures.contains(sibiling)) {
+						if (!deadFeatures.contains(sibiling)) {
 							featureGraph.setEdge(featureName, sibiling.getName(), FeatureGraph.EDGE_0q);
 						}
 					}
-					
-					final ArrayList<Variable> list = new ArrayList<>(parent.getChildren().size() - 1);
+
+					final ArrayList<Variable> list = new ArrayList<>(parent.getChildren().size());
 					for (Feature sibiling : parent.getChildren()) {
-						if (sibiling != feature && !fixedFeatures.contains(sibiling)) {
+						if (!deadFeatures.contains(sibiling)) {
 							list.add(conf.getVariable(featureGraph.getFeatureIndex(sibiling.getName())));
 						}
 					}
-					final Not2 not = new Not2(new And2(list.toArray(new Variable[0])));
+					if (processedParent.add(parent) && !deadFeatures.contains(parent)) {
+						if (coreFeatures.contains(parent)) {
+							expList.add(new Or2(list.toArray(new Variable[0])));
+						} else {
+							expList.add(new Xor(new Variable[] { new Or2(list.toArray(new Variable[0])),
+									new Not2(conf.getVariable(featureGraph.getFeatureIndex(parent.getName()))) }));
+						}
+					}
 				}
 			}
 		}
+
+		c1 = 0;
+		c2 = 0;
 		for (Constraint constraint : constraints) {
-			connect(constraint.getNode());
+			connect(constraint.getNode(), conf);
+		}
+
+		System.out.println(c1);
+		System.out.println(c2);
+		System.out.println();
+
+		final ArrayList<LinkedList<Expression>> expListAr = featureGraph.getExpListAr();
+		for (Expression exp : expList) {
+			for (Integer i : exp.getVaraibles()) {
+				LinkedList<Expression> varExpList = expListAr.get(i);
+				if (varExpList == null) {
+					varExpList = new LinkedList<Expression>();
+					expListAr.set(i, varExpList);
+				}
+				varExpList.add(exp);
+			}
 		}
 
 		featureGraph.clearDiagonal();
-		
+
 		final ArrayList<String> featureNames = new ArrayList<>();
 		for (Feature feature : features) {
 			featureNames.add(feature.getName());
@@ -156,7 +195,7 @@ public class CreateFeatureGraphJob extends AStoppableJob {
 
 		final DFSThreadPool dfsThread = new DFSThreadPool(featureGraph, featureNames, workMonitor);
 		dfsThread.run();
-		
+
 		featureModel.setFeatureGraph(featureGraph);
 
 		return true;
@@ -274,9 +313,10 @@ public class CreateFeatureGraphJob extends AStoppableJob {
 		return node;
 	}
 
-	private void connect(Node constraintNode2) {
+	private void connect(Node constraintNode2, VariableConfiguration conf) {
 		//TODO simplify nodes: convert to implies, remove not node
 		final Collection<Node> nodeList = simplify(constraintNode2);
+		boolean builtClique = false;
 		for (Node constraintNode : nodeList) {
 			if (constraintNode instanceof Implies) {
 				final Node leftNode = constraintNode.getChildren()[0];
@@ -291,6 +331,7 @@ public class CreateFeatureGraphJob extends AStoppableJob {
 								imply(implyNode, (Literal) impliedNode);
 							} else {
 								buildClique(implyNode, impliedNode);
+								builtClique = true;
 							}
 						}
 					}
@@ -301,6 +342,7 @@ public class CreateFeatureGraphJob extends AStoppableJob {
 								imply((Literal) implyNode, (Literal) rightNode);
 							} else {
 								buildClique(implyNode, rightNode);
+								builtClique = true;
 							}
 						}
 					} else if (rightNode instanceof And) {
@@ -311,11 +353,13 @@ public class CreateFeatureGraphJob extends AStoppableJob {
 										imply((Literal) implyNode, (Literal) impliedNode);
 									} else {
 										buildClique(implyNode, impliedNode);
+										builtClique = true;
 									}
 								}
 							} else {
 								for (Node impliedNode : rightNode.getChildren()) {
 									buildClique(implyNode, impliedNode);
+									builtClique = true;
 								}
 							}
 						}
@@ -324,8 +368,34 @@ public class CreateFeatureGraphJob extends AStoppableJob {
 			} else {
 				//TODO Implement other special cases
 				buildClique(constraintNode);
+				builtClique = true;
+			}
+			if (builtClique) {
+				final Node cnfNode = constraintNode.toCNF();
+				if (cnfNode instanceof And) {
+					for (Node andChild : cnfNode.getChildren()) {
+						convertNode(conf, andChild);
+					}
+				} else if (cnfNode instanceof Or) {
+					convertNode(conf, cnfNode);
+				}
+				c1++;
+			} else {
+				c2++;
 			}
 		}
+	}
+
+	private int c1, c2;
+
+	private final List<Expression> expList = new ArrayList<>();
+
+	private void convertNode(VariableConfiguration conf, Node andChild) {
+		final ArrayList<Variable> list = new ArrayList<>(andChild.getChildren().length);
+		for (Node orChild : andChild.getChildren()) {
+			list.add(conf.getVariable(featureGraph.getFeatureIndex(((Literal) orChild).var.toString())));
+		}
+		expList.add(new Or2(list.toArray(new Variable[0])));
 	}
 
 }

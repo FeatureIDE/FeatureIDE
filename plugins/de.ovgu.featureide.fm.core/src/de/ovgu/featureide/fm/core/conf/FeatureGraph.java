@@ -1,33 +1,33 @@
 package de.ovgu.featureide.fm.core.conf;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 
 import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.conf.nodes.Expression;
 
 public class FeatureGraph {
-	public static final byte
-			EDGE_NONE 	= 0b00000000,
-			EDGE_11 	= 0b00000100, //0x04,
-			EDGE_10 	= 0b00001000, //0x08,
-			EDGE_1q 	= 0b00001100, //0x0c,
-			EDGE_01 	= 0b00010000, //0x10,
-			EDGE_00 	= 0b00100000, //0x20,
-			EDGE_0q 	= 0b00110000; //0x30;
+	public static final byte EDGE_NONE = 0b00000000, EDGE_11 = 0b00000100, //0x04,
+			EDGE_10 = 0b00001000, //0x08,
+			EDGE_1q = 0b00001100, //0x0c,
+			EDGE_01 = 0b00010000, //0x10,
+			EDGE_00 = 0b00100000, //0x20,
+			EDGE_0q = 0b00110000; //0x30;
 
-	public static final byte 
-			MASK_1_11110011 = (byte) 0b11110011, //0xf3,
+	public static final byte MASK_1_11110011 = (byte) 0b11110011, //0xf3,
 			MASK_0_11001111 = (byte) 0b11001111, //0xcf,
-			MASK_1_00001100 = ~MASK_1_11110011,
-			MASK_0_00110000 = ~MASK_0_11001111;
+			MASK_1_00001100 = ~MASK_1_11110011, MASK_0_00110000 = ~MASK_0_11001111;
 
 	public final String[] featureArray;
 
 	private final byte[] adjMatrix;
 	private final int size;
 	private final HashMap<String, Integer> featureMap;
-	
+	private final ArrayList<LinkedList<Expression>> expListAr;
+
 	public static boolean isEdge(byte edge, byte q) {
 		switch (q) {
 		case EDGE_NONE:
@@ -49,6 +49,10 @@ public class FeatureGraph {
 		size = features.size();
 		featureMap = new HashMap<>(size << 1);
 		featureArray = new String[size];
+		expListAr = new ArrayList<>(size);
+		for (int i = 0; i < size; i++) {
+			expListAr.add(null);
+		}
 
 		int i = 0;
 		for (Feature feature : features) {
@@ -185,6 +189,10 @@ public class FeatureGraph {
 
 	public int getSize() {
 		return size;
+	}
+
+	public ArrayList<LinkedList<Expression>> getExpListAr() {
+		return expListAr;
 	}
 
 	public int countNeighbors(String from, boolean selected, boolean subtractReal) {
@@ -381,4 +389,5 @@ public class FeatureGraph {
 			}
 		}
 	}
+
 }

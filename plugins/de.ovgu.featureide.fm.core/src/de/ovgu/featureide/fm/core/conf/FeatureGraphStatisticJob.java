@@ -20,9 +20,13 @@
  */
 package de.ovgu.featureide.fm.core.conf;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.conf.nodes.Expression;
 import de.ovgu.featureide.fm.core.conf.nodes.Variable;
 import de.ovgu.featureide.fm.core.conf.nodes.VariableConfiguration;
 import de.ovgu.featureide.fm.core.job.AStoppableJob;
@@ -49,13 +53,17 @@ public class FeatureGraphStatisticJob extends AStoppableJob {
 //		statisticPart(true, false);
 //		statisticPart(true, true);
 //		statisticPart2();
-
-		statisticPart3(0);
-		statisticPart3(1);
-		statisticPart3(10);
-		for (int i = 50; i <= 600; i+= 50) {
-			statisticPart3(i);
-		}
+//		
+//		statisticPart4();
+//
+//		statisticPart3(0);
+//		statisticPart3(1);
+//		statisticPart3(10);
+//		for (int i = 50; i <= 600; i+= 50) {
+//			statisticPart3(i);
+//		}
+		
+		statisticPart5();
 		
 		System.out.println();
 	}
@@ -118,6 +126,54 @@ public class FeatureGraphStatisticJob extends AStoppableJob {
 		
 		System.out.println();
 		System.out.println(x);
+	}
+	
+	private void statisticPart4() {
+		int[] c = new int[featureGraph.getSize()];
+		int i = 0;
+		for (LinkedList<Expression> x : featureGraph.getExpListAr()) {
+			c[i++] = (x == null) ? 0 : x.size();
+		}
+		Arrays.sort(c);
+		for (int j = 0; j < c.length; j++) {
+			System.out.println(c[j]);
+		}
+	}
+	
+	private void statisticPart5() {
+		final ArrayList<Integer> indexArray = new ArrayList<>(featureGraph.getSize());
+		for (int i = 0; i < featureGraph.getSize(); i++) {
+			indexArray.add(i);
+		}
+		Collections.shuffle(indexArray);
+		
+		final long firstStart = System.nanoTime();
+		long start = firstStart;
+		
+		final VariableConfiguration variableConfiguration = new VariableConfiguration(featureGraph.getSize());
+		final ConfChanger c = new ConfChanger(featureModel, featureGraph, variableConfiguration);
+		System.out.print("Create: ");
+		start = split(start);
+		
+		for (int vIndex = 0; vIndex < featureGraph.getSize();) {
+			while (vIndex < featureGraph.getSize() && variableConfiguration.getVariable(indexArray.get(vIndex)).getValue() != Variable.UNDEFINED) {
+				vIndex++;
+			}
+			if (vIndex < featureGraph.getSize()) {
+				c.setFeature(featureModel.getFeature(featureGraph.featureArray[indexArray.get(vIndex)]), Variable.TRUE);
+				System.out.print(vIndex + ": ");
+				start = split(start);
+			}
+		}
+		
+		System.out.println();
+		start = split(firstStart);
+	}
+	
+	private long split(long start) {
+		final long end = System.nanoTime();
+		System.out.println(Math.round((double)((end - start)) / 1000000.0) / 1000.0);
+		return System.nanoTime();
 	}
 
 }

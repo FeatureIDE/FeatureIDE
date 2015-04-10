@@ -21,6 +21,8 @@
 package de.ovgu.featureide.fm.core.conf;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.prop4j.Literal;
@@ -31,6 +33,7 @@ import org.sat4j.specs.TimeoutException;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.conf.nodes.Expression;
 import de.ovgu.featureide.fm.core.conf.nodes.Variable;
 import de.ovgu.featureide.fm.core.conf.nodes.VariableConfiguration;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
@@ -99,6 +102,36 @@ public class ConfChanger {
 					continue;
 				default:
 					continue;
+				}
+			}
+		}
+
+		for (Iterator<Integer> it = compList.iterator(); it.hasNext();) {
+			final int i = it.next();
+			final LinkedList<Expression> varExpList = featureGraph.getExpListAr().get(i);
+			if (varExpList == null || varExpList.isEmpty()) {
+				it.remove();
+				continue;
+			}
+			for (Expression expression : varExpList) {
+				variableConfiguration.setVariable(i, Variable.TRUE);
+				expression.updateValue();
+				if (expression.getValue() == Variable.FALSE) {
+					variableConfiguration.setVariable(i, Variable.FALSE);
+					ls.add(new Literal(featureGraph.featureArray[i], false));
+					it.remove();
+					break;
+				} else {
+					variableConfiguration.setVariable(i, Variable.FALSE);
+					expression.updateValue();
+					if (expression.getValue() == Variable.FALSE) {
+						variableConfiguration.setVariable(i, Variable.TRUE);
+						ls.add(new Literal(featureGraph.featureArray[i], true));
+						it.remove();
+						break;
+					} else {
+						variableConfiguration.setVariable(i, Variable.UNDEFINED);
+					}
 				}
 			}
 		}

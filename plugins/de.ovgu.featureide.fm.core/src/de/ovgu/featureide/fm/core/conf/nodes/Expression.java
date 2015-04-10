@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.fm.core.conf.nodes;
 
+import java.util.Collection;
+import java.util.TreeSet;
+
 public abstract class Expression extends Variable {
 
 	protected final Variable[] children;
@@ -51,6 +54,19 @@ public abstract class Expression extends Variable {
 	public byte updateValue() {
 		reset();
 		return value = computeValue();
+	}
+	
+	public Collection<Integer> getVaraibles() {
+		final TreeSet<Integer> idSet = new TreeSet<>();
+		getVaraibles(idSet);
+		return idSet;
+		
+	}
+	
+	protected void getVaraibles(TreeSet<Integer> list) {
+		for (Variable variable : children) {
+			variable.getVaraibles(list);
+		}
 	}
 
 }

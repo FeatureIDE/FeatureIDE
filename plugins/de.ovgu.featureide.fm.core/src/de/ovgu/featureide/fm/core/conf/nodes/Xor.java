@@ -1,0 +1,33 @@
+package de.ovgu.featureide.fm.core.conf.nodes;
+
+public class Xor extends Expression {
+	
+	public Xor(Variable[] children) {
+		super(children);
+	}
+
+	@Override
+	protected byte computeValue() {
+		boolean containsTrue = false;
+		boolean undefined = false;
+		for (int i = 0; i < children.length; i++) {
+			final byte childValue = children[i].getValue();
+			switch (childValue) {
+			case TRUE:
+				if (containsTrue) {
+					return FALSE;
+				} else {
+					containsTrue = true;
+				}
+				break;
+			case UNDEFINED:
+				undefined = true;
+				break;
+			default:
+				continue;
+			}
+		}
+		return undefined ? UNDEFINED : containsTrue ? TRUE : FALSE;
+	}
+
+}
