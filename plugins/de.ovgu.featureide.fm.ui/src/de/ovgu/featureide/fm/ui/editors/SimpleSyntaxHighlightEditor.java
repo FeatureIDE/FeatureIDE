@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -161,38 +160,56 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 		}
 	}
 
-	/**
-	 * 
-	 */
-	private void hightlightKeywords(String text) {
-		final List<MatchResult> keywordPositions = new ArrayList<MatchResult>();
+	
+	private static class Match {
+		private int start, end;
 
-		for (int i = 0; i < keywords.length; i++) {
-			final String regex = keywords[i].equals("(") ? "\\(" : keywords[i].equals(")") ? "\\)" : " " + keywords[i].toLowerCase() + " "; 
-			keywordPositions.addAll(findMatchingPositions(Pattern.compile(regex), text));
+		public Match(int start, int end) {
+			this.start = start;
+			this.end = end;
 		}
+	}
+	
+	private static final Pattern nonOperators = Pattern.compile("\"[^\"]*\"");
+	
+	private void hightlightKeywords(String text) {
+		final List<Match> keywordPositions = new ArrayList<>();
+		
+		final StringBuilder sb = new StringBuilder("(");
+		for (String keyword : keywords) {
+			sb.append(Pattern.quote(keyword.toLowerCase()));
+			sb.append('|');
+		}
+		sb.setCharAt(sb.length() -1, ')');
+		
+		final Matcher operatorMatcher = Pattern.compile(sb.toString()).matcher(text);
+		final Matcher nonOperatorMatcher = nonOperators.matcher(text);
+		
+		Match nonOperatorMatch = null;
+		if (nonOperatorMatcher.find()) {
+			nonOperatorMatch = new Match(nonOperatorMatcher.start(), nonOperatorMatcher.end());
+		}
+		while (operatorMatcher.find()) {
+			int start = operatorMatcher.start();
+			int end = operatorMatcher.end();
 
-		// highlight keywords at the beginning
-		for (int j = 0; j < keywords.length; j++) {
-			if (this.getText().toLowerCase().startsWith(keywords[j].toLowerCase())) {
-				
-				StyleRange styleRange = new StyleRange();
-				styleRange.start = 0;
-				styleRange.length = keywords[j].length();
-				styleRange.fontStyle = SWT.BOLD;
-				styleRange.foreground = keywordColor;
-
-				setStyleRange(styleRange);				
-				break;
+			while (nonOperatorMatch != null && start > nonOperatorMatch.end) {
+				if (nonOperatorMatcher.find()) {
+					nonOperatorMatch = new Match(nonOperatorMatcher.start(), nonOperatorMatcher.end());
+				} else {
+					nonOperatorMatch = null;
+				}
+			}
+			if (nonOperatorMatch == null || !(start < nonOperatorMatch.end && end > nonOperatorMatch.start)) {
+				keywordPositions.add(new Match(start, end));
 			}
 		}
 		
 		// highlight keywords in text
-		for (int j = 0; j < keywordPositions.size(); j++) {
-
+		for (Match match : keywordPositions) {
 			StyleRange styleRange = new StyleRange();
-			styleRange.start = keywordPositions.get(j).start();
-			styleRange.length = keywordPositions.get(j).end() - keywordPositions.get(j).start();
+			styleRange.start = match.start;
+			styleRange.length = match.end - match.start;
 			styleRange.fontStyle = SWT.BOLD;
 			styleRange.foreground = keywordColor;
 
@@ -223,17 +240,6 @@ public class SimpleSyntaxHighlightEditor extends StyledText {
 		super.setSelection(selStart + prefix.length() + textToInsert.length() + suffix.length());
 	}
 
-	private List<MatchResult> findMatchingPositions(Pattern pattern, String text) {
-		final Matcher matcher = pattern.matcher(text);
-		List<MatchResult> retval = new ArrayList<MatchResult>();
-		while (matcher.find())
-			retval.add(matcher.toMatchResult());
-		return retval;
-	}
-
-	/**
-	 * 
-	 */
 	public void UnderlineEverything(boolean b) {
 		underlineEverything = b;
 		if (underlineEverything) {

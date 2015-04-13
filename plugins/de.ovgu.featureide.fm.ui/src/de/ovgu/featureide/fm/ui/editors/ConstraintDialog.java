@@ -904,13 +904,17 @@ public class ConstraintDialog implements GUIDefaults {
 			public void handleEvent(Event event) {
 				TableItem[] selectedItem = featureTable.getSelection();
 				String featureName = selectedItem[0].getText();
-				
-				for (String op : Operator.NAMES) {
-					if (featureName.contains(op.toLowerCase()) || featureName.contains(" ")) {
-						featureName = "\"" + featureName + "\"";
-						break;
+				if (featureName.matches(".*\\s.*")) {
+					featureName = "\"" + featureName + "\"";
+				} else {
+					for (String op : Operator.NAMES) {
+						if (featureName.equals(op.toLowerCase())) {
+							featureName = "\"" + featureName + "\"";
+							break;
+						}
 					}
 				}
+				
 				constraintText.copyIn(featureName);
 			}
 		});
