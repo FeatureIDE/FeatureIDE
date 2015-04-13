@@ -60,7 +60,12 @@ public final class Constraints {
 			printable = printable.replace(NodeWriter.shortSymbols[i].trim(), NodeWriter.textualSymbols[i].trim());
 		}
 		
-		return printable.toString().trim();
+		String result = printable.toString().trim();
+		// XXX Workaround for issue_237 to limit the error scope to node writer, see GitHub
+		for (String op : Operator.NAMES)
+			result = result.replace("\""+op.toLowerCase()+"\"", op.toLowerCase());	
+		
+		return result;
 	}
 
 	private static String[] split(final String string) {
