@@ -354,7 +354,7 @@ public class ConstraintDialog implements GUIDefaults {
 
 		static final String CHECKING_CONSTRAINTS = "Checking constraint...";
 
-		static final String CONSTRAINT_CONTAINS_SYNTAX_ERRORS = "Your input constains syntax error.";
+		static final String CONSTRAINT_CONTAINS_SYNTAX_ERRORS = "Your input constains syntax errors.";
 
 		static final String CONSTRAINT_CONTAINS_UNKNOWN_FEATURE = "Constraint contains one unknown feature name.";
 
