@@ -86,16 +86,6 @@
 		</decorator>
 	</extension>  
 	<extension
-			point="org.eclipse.ui.perspectiveExtensions">
-		<perspectiveExtension targetID="org.eclipse.ui.resourcePerspective">
-			<view
-					id="de.ovgu.featureide.fm.ui.views.FeatureModelEditView"
-					ratio="0.5"
-					relationship="right"
-					relative="org.eclipse.ui.views.TaskList"/>
-		</perspectiveExtension>
-	</extension>
-	<extension
 			point="org.eclipse.ui.views">
 		<view
 				category="FeatureIDE"
