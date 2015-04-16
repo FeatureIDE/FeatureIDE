@@ -146,6 +146,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 		supportedTypes.add("h");
 		supportedTypes.add("c");
 		supportedTypes.add("cs");
+		supportedTypes.add("asm");
 	}
 
 	private boolean hideAllFieldsToggle = false;
