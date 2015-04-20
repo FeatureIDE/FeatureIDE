@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel chosenLayoutAlgorithm="1">
+		<struct>
+			<or abstract="true" mandatory="true" name="LandingGear">
+				<alt mandatory="true" name="Base">
+					<and mandatory="true" name="Cylinders_Valves">
+						<and name="Sensors">
+							<and name="Landing_Sets">
+								<feature name="HealthMonitor"/>
+							</and>
+						</and>
+					</and>
+					<and mandatory="true" name="Cylinder_Valves_v2">
+						<feature name="Sensors_v2"/>
+					</and>
+				</alt>
+			</or>
+		</struct>
+		<constraints/>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true"/>
+		<comments/>
+		<featureOrder userDefined="false"/>
+	</featureModel>

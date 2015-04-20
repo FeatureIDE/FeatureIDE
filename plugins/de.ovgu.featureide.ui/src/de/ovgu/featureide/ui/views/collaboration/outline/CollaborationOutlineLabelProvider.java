@@ -30,6 +30,9 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.TreeItem;
 
 import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.core.fstmodel.FSTAsmetaLDomain;
+import de.ovgu.featureide.core.fstmodel.FSTAsmetaLInitialization;
+import de.ovgu.featureide.core.fstmodel.FSTAstemaLFunction;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTClassFragment;
 import de.ovgu.featureide.core.fstmodel.FSTContractedRole;
@@ -77,7 +80,17 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 		}
 		if (element instanceof IRoleElement) {
 			IRoleElement fstModelElement = (IRoleElement) element;
-			if (fstModelElement instanceof FSTField) {
+			if (fstModelElement instanceof FSTAsmetaLDomain)
+			{
+				return IMAGE_FIELD_PUBLIC;
+			} else if (fstModelElement instanceof FSTAstemaLFunction)
+			{
+				return IMAGE_FIELD_PRIVATE;
+			} else if (fstModelElement instanceof FSTAsmetaLInitialization)
+			{
+				return IMAGE_METHODE_PROTECTED;
+			} else if (fstModelElement instanceof FSTField) 
+			{
 				final FSTField field = (FSTField) fstModelElement;
 				final String fileExtension = field.getFile().getFileExtension();
 				if ("java".equals(fileExtension) || "jak".equals(fileExtension) || "cs".equals(fileExtension)) {

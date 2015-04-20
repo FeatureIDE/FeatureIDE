@@ -1026,6 +1026,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 
 	private static LinkedHashSet<String> createExtensions() {
 		LinkedHashSet<String> extensions = new LinkedHashSet<String>();
+		extensions.add("asm");
 		extensions.add("java");
 		extensions.add("cs");
 		extensions.add("c");
@@ -1051,6 +1052,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 
 	private static ArrayList<String[]> createTempltes() {
 		ArrayList<String[]> list = new ArrayList<String[]>(8);
+		list.add(new String[] { "AsmetaL", "asm", "asm " + CLASS_NAME_PATTERN + " \n \n signature: \n \n definitions: \n"});
 		list.add(new String[] { "Alloy", "als", "module " + CLASS_NAME_PATTERN });
 		list.add(new String[] { "C", "c", "" });
 		list.add(new String[] { "C#", "cs", "public class " + CLASS_NAME_PATTERN + " {\n\n}" });
