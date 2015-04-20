@@ -52,6 +52,17 @@ public interface FHNodeTypes {
 	static final String JML_SPEC_CASE_SEQ = "SpecCaseSeq";
 	static final String JML_INVARIANT = "Invariant";
 	
+	//AsmetaL specific node types
+	static final String ASMETAL_DOMAIN = "Domain";
+	static final String ASMETAL_MODULE_DECLARATION = "ModuleDeclaration";
+	static final String ASMETAL_RULE = "RuleDeclaration";
+	static final String ASMETAL_FUNCTION = "Function";
+	static final String ASMETAL_INVARIANT = "Invariant";
+	static final String ASMETAL_SIGNATURE = "Signature";
+	static final String ASMETAL_UNNAMED_INVARIANT = "UnnamedInvariant";
+	static final String ASMETAL_NAMED_INVARIANT = "NamedInvariant";
+	static final String ASMETAL_INITIALIZATION = "Initialization";
+
 	// C specific node types
 	static final String C_NODE_SEQUENCE_CODEUNIT_TOPLEVEL = "Sequence_CodeUnit_TopLevel";
 	static final String C_NODE_FUNC = "Func";

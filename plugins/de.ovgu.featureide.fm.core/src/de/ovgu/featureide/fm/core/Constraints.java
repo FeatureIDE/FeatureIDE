@@ -44,8 +44,8 @@ public final class Constraints {
 		final String[] contents = split(c);
 		for (int i = 0; i < contents.length; i++) {
 			for (final String op : Operator.NAMES) {
-				if (contents[i].trim().toLowerCase().equals(op.toLowerCase()))
-					contents[i] = "\"" + contents[i].trim() + "\"";
+				if (contents[i].trim().equals(op.toLowerCase()))
+					contents[i] = "\"" + contents[i].trim() + "\" ";
 			}
 		}
 		

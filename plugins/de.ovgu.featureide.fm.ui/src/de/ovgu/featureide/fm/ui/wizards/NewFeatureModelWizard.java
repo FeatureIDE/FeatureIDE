@@ -20,18 +20,15 @@
  */
 package de.ovgu.featureide.fm.ui.wizards;
 
-import java.io.File;
-
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.content.IContentType;
-import org.eclipse.jdt.internal.core.JavaElement;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.IEditorDescriptor;
@@ -46,6 +43,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.handlers.base.SelectionWrapper;
 
 /**
  * A Wizard to create a new Feature Model file.
@@ -53,66 +51,50 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  * @author Jens Meinicke
  */
 // TOOD add copy of an other model file
-@SuppressWarnings("restriction")
 public class NewFeatureModelWizard extends Wizard implements INewWizard {
 
 	public static final String ID = FMUIPlugin.PLUGIN_ID + ".wizard.NewFeatureModelWizard";
+
 	private NewFeatureModelWizardPage page;
+	private IProject project = null;
 
 	public boolean performFinish() {
-		FeatureModel featureModel = new FeatureModel();
-		featureModel.createDefaultValues("");
-		
-		Path fullFilePath = new Path(page.fileName.getText());
-		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-		IPath rootPath = root.getLocation();
-		if (rootPath.isPrefixOf(fullFilePath)) {
-			// case: is file in workspace
-			int matchingFirstSegments = rootPath.matchingFirstSegments(fullFilePath);
-			IPath localFilePath = fullFilePath.removeFirstSegments(matchingFirstSegments);
-			String[] segments = localFilePath.segments();
-			localFilePath = new Path("");
-			for (String segment : segments) {
-				localFilePath = localFilePath.append(segment);
+		final IPath fullFilePath = new Path(page.fileName.getText());
+
+		if (project == null || !createRelativeFile(fullFilePath, project)) {
+			boolean foundParent = false;
+			for (IProject otherProject : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
+				if (createRelativeFile(fullFilePath, otherProject)) {
+					foundParent = true;
+					break;
+				}
 			}
-			IFile file = root.getFile(localFilePath);
-			featureModel.initFMComposerExtension(file.getProject());
-			try {
-				new FeatureModelWriterIFileWrapper(new XmlFeatureModelWriter(featureModel)).writeToFile(file);
-				file.refreshLocal(IResource.DEPTH_INFINITE, null);
-			} catch (CoreException e) {
-				FMUIPlugin.getDefault().logError(e);
+			if (!foundParent) {
+				final FeatureModel featureModel = new FeatureModel();
+				featureModel.createDefaultValues("");
+				new XmlFeatureModelWriter(featureModel).writeToFile(fullFilePath.toFile());
 			}
-			open(file);
-		} else {
-			// case: is no file in workspace
-			File file = fullFilePath.toFile();
-			new XmlFeatureModelWriter(featureModel).writeToFile(file);
 		}
+		assert (fullFilePath.toFile().exists()) : "New file was not added to filesystem";
 		return true;
 	}
 
 	private void open(IFile file) {
-		IWorkbenchWindow dw = FMUIPlugin.getDefault().getWorkbench()
-				.getActiveWorkbenchWindow();
+		IWorkbenchWindow dw = FMUIPlugin.getDefault().getWorkbench().getActiveWorkbenchWindow();
 		IWorkbenchPage page = dw.getActivePage();
 		if (page != null) {
 			IContentType contentType = null;
 			try {
-				IContentDescription description = file
-						.getContentDescription();
+				IContentDescription description = file.getContentDescription();
 				if (description != null) {
 					contentType = description.getContentType();
 				}
 				IEditorDescriptor desc = null;
 				if (contentType != null) {
-					desc = PlatformUI.getWorkbench().getEditorRegistry()
-							.getDefaultEditor(file.getName(), contentType);
+					desc = PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(file.getName(), contentType);
 				} else {
-					desc = PlatformUI.getWorkbench().getEditorRegistry()
-							.getDefaultEditor(file.getName());
+					desc = PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(file.getName());
 				}
-
 				if (desc != null) {
 					page.openEditor(new FileEditorInput(file), desc.getId());
 				}
@@ -120,6 +102,25 @@ public class NewFeatureModelWizard extends Wizard implements INewWizard {
 				FMUIPlugin.getDefault().logError(e);
 			}
 		}
+	}
+
+	private boolean createRelativeFile(IPath fullFilePath, IProject parentProject) {
+		if (parentProject.getLocation().isPrefixOf(fullFilePath)) {
+			final IFile file = parentProject.getFile(fullFilePath.makeRelativeTo(parentProject.getLocation()));
+
+			final FeatureModel featureModel = new FeatureModel();
+			featureModel.createDefaultValues("");
+			featureModel.initFMComposerExtension(file.getProject());
+			try {
+				new FeatureModelWriterIFileWrapper(new XmlFeatureModelWriter(featureModel)).writeToFile(file);
+				file.refreshLocal(IResource.DEPTH_ZERO, null);
+			} catch (CoreException e) {
+				FMUIPlugin.getDefault().logError(e);
+			}
+			open(file);
+			return true;
+		}
+		return false;
 	}
 
 	@Override
@@ -130,12 +131,10 @@ public class NewFeatureModelWizard extends Wizard implements INewWizard {
 
 	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
-		Object obj = selection.getFirstElement();
-		if (obj instanceof IResource) {
-			page = new NewFeatureModelWizardPage("", ((IResource) obj).getProject());
-		} else if (obj instanceof JavaElement) {
-			JavaElement javaElement = (JavaElement)obj;
-			page = new NewFeatureModelWizardPage("", javaElement.getResource().getProject());
+		final IResource res = SelectionWrapper.init(selection, IResource.class).getNext();
+		if (res != null) {
+			project = res.getProject();
+			page = new NewFeatureModelWizardPage("", project);
 		} else {
 			page = new NewFeatureModelWizardPage("", null);
 		}

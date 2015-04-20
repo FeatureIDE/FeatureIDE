@@ -37,7 +37,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartListener;
-import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.ide.ResourceUtil;
 import org.eclipse.ui.part.ViewPart;
@@ -61,8 +60,7 @@ import de.ovgu.featureide.ui.statistics.ui.helper.TreeLabelProvider;
 public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 	private TreeViewer viewer;
 	private ContentProvider contentProvider;
-	private IWorkbenchPart currentEditor;
-	
+	private IEditorPart currentEditor;
 	private IResource currentInput;
 
 	public static final String ID = UIPlugin.PLUGIN_ID + ".statistics.ui.FeatureStatisticsView";
@@ -82,13 +80,12 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 		ColumnViewerToolTipSupport.enableFor(viewer);
 
 		getSite().getPage().addPartListener(editorListener);
-		IWorkbenchPage page = getSite().getPage();
-		currentInput = ResourceUtil.getResource((page.getActiveEditor().getEditorInput()));
-		setEditor(page.getActiveEditor());
-
+		setEditor(getSite().getPage().getActiveEditor());
+		currentInput = (currentEditor == null) ? null : ResourceUtil.getResource((currentEditor.getEditorInput()));
+		
 		addButtons();
 	}
-	
+
 	private void addButtons() {
 
 		IToolBarManager toolBarManager = getViewSite().getActionBars().getToolBarManager();
@@ -131,13 +128,13 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 
 		public void partBroughtToTop(IWorkbenchPart part) {
 			if (part instanceof IEditorPart)
-				setEditor(part);
+				setEditor((IEditorPart) part);
 		}
 
 		public void partActivated(IWorkbenchPart part) {
 			if (part instanceof IEditorPart) {
 				ResourceUtil.getResource(((IEditorPart) part).getEditorInput());
-				setEditor(part);
+				setEditor((IEditorPart) part);
 			}
 		}
 	};
@@ -196,11 +193,11 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 						} else {
 							IResource anyFile = ResourceUtil.getResource(((IEditorPart) currentEditor).getEditorInput());
 							//TODO is refresh really necessary? -> true?
-							
-							if(!anyFile.getProject().equals(currentInput.getProject()) || button){
+
+							if (button || currentInput == null || !anyFile.getProject().equals(currentInput.getProject())) {
 								contentProvider.calculateContent(anyFile, true);
 								currentInput = anyFile;
-							}else{
+							} else {
 								contentProvider.calculateContent(anyFile, false);
 							}
 						}
@@ -224,8 +221,6 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 		}
 	}
 
-
-	
 	public TreeViewer getViewer() {
 		return viewer;
 	}
@@ -234,7 +229,7 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 	 * Watches changes in the feature model if the selected editor is an
 	 * instance of @{link FeatureModelEditor}
 	 */
-	private void setEditor(IWorkbenchPart activeEditor) {
+	private void setEditor(IEditorPart activeEditor) {
 		if (currentEditor != null) {
 			if (currentEditor == activeEditor) {
 				return;

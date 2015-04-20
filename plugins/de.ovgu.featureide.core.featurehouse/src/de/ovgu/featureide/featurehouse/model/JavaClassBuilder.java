@@ -320,7 +320,7 @@ public class JavaClassBuilder extends ClassBuilder {
 	}
 
 	@Override
-	public void caseJMLInvariant(FSTTerminal terminal) {
+	public void caseInvariant(FSTTerminal terminal) {
 		FSTInvariant invariant = new FSTInvariant(terminal.getName(), terminal.getBody(), terminal.beginLine, terminal.endLine);
 		if (!modelBuilder.getCurrentClassFragment().add(invariant)) {
 			FeatureHouseCorePlugin.getDefault().logError("Invariant " + invariant.getBody() + "was not added to FSTModel.", null);

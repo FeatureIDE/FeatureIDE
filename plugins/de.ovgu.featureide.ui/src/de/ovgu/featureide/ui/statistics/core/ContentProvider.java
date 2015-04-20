@@ -133,15 +133,14 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 	}
 
 	public void calculateContent(IResource res, boolean hasChanged) {
-		IFeatureProject newProject = CorePlugin.getFeatureProject(res);
-		boolean isEntirelyNewProject = project == null && newProject != null;
-
-		if (isEntirelyNewProject || hasChanged) {
+		final IFeatureProject newProject = CorePlugin.getFeatureProject(res);
+		
+		if (newProject == null) {
+			this.project = newProject;
+			defaultContent();
+		} else if (hasChanged || project == null) {
 			this.project = newProject;
 			addNodes();
-		} else if (newProject == null) {
-			project = null;
-			defaultContent();
 		}
 	}
 

@@ -233,7 +233,7 @@
 				</visibleWhen>
 			</command>
 			<command
-					commandId="de.ovgu.featureide.fm.ui.commands.ExportSXFM"
+					commandId="de.ovgu.featureide.fm.ui.commands.ImportSXFM"
 					icon="icons/import_wiz.gif"
 					id="de.ovgu.featureide.fm.ui.actions.ImportSXFM"
 					label="Import model from SXFM (S.P.L.O.T.) format"
