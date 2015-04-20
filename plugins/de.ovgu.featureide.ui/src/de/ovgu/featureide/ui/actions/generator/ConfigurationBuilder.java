@@ -178,6 +178,10 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	AbstractConfigurationSorter sorter;
 	private boolean bufferConfigurationsFirst;
 	private boolean buffered = false;
+	
+	public final boolean runTests;
+	
+	final TestResults testResults;
 
 	/**
 	 * Gets the first entry of configurations or <code>null</code> if there is
@@ -216,11 +220,17 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 * @param createNewProjects
 	 *            <code>true</code> if the configurations should be built into
 	 *            separate projects
+	 * @param runTests 
 	 * @see BuildAllCurrentConfigurationsAction
 	 * @see BuildAllValidConfigurationsAction
 	 */
-	ConfigurationBuilder(final IFeatureProject featureProject, final BuildType buildType, final boolean createNewProjects, final String algorithm, final int t, final BuildOrder buildOrder, final boolean bufferFirst) {
-
+	ConfigurationBuilder(final IFeatureProject featureProject, final BuildType buildType, final boolean createNewProjects, final String algorithm, final int t, final BuildOrder buildOrder, final boolean bufferFirst, boolean runTests) {
+		this.runTests = runTests;
+		if (runTests) {
+			testResults = new TestResults(featureProject.getProjectName(), "FeatureIDE test: " + featureProject.getProjectName());
+		} else {
+			testResults = null;
+		}
 		if (!featureProject.getComposer().preBuildConfiguration()) {
 			return;
 		}

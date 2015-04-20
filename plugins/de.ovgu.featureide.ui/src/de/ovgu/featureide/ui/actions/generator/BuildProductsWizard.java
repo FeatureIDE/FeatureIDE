@@ -52,8 +52,9 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 		setGenerate(page.getBuildTypeText(page.getGeneration()));
 		setOrder(page.getSelectedOrder());
 		setBuffer(page.getBuffer());
+		setTest(page.getTest());
 		new ConfigurationBuilder(featureProject, page.getGeneration(),
-				toggleState, page.getAlgorithm(), page.getT(), page.getOrder(), page.getBuffer());
+				toggleState, page.getAlgorithm(), page.getT(), page.getOrder(), page.getBuffer(), page.getTest());
 		
 		return true;
 	}
@@ -61,7 +62,7 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 	@Override
 	public void addPages() {
 		setWindowTitle("Build Products");
-		page = new BuildProductsPage(featureProject.getProjectName(), featureProject, getGenerate(), toggleState, getAlgorithm(), getT(), getOrder(), getBuffer());
+		page = new BuildProductsPage(featureProject.getProjectName(), featureProject, getGenerate(), toggleState, getAlgorithm(), getT(), getOrder(), getBuffer(), getTest());
 		addPage(page);
 	}
 
@@ -180,6 +181,30 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 	private static void setBuffer(boolean buffer) {
 		try {
 			ResourcesPlugin.getWorkspace().getRoot().setPersistentProperty(BUFFER, buffer + "");
+		} catch (CoreException e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+	}
+	
+	private static boolean getTest() {
+		try {
+			final String buffer = ResourcesPlugin.getWorkspace().getRoot().getPersistentProperty(BUFFER);
+			if ("true".equals(buffer)) {
+				return true;
+			}
+			if ("false".equals(buffer)) {
+				return false;
+			}
+			return true;
+		} catch (CoreException e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+		return false;
+	}
+	
+	private static void setTest(boolean test) {
+		try {
+			ResourcesPlugin.getWorkspace().getRoot().setPersistentProperty(BUFFER, test + "");
 		} catch (CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}

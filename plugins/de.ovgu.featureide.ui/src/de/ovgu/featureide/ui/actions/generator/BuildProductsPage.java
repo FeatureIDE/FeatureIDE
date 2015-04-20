@@ -46,11 +46,12 @@ import de.ovgu.featureide.ui.UIPlugin;
  * @author Jens Meinicke
  */
 public class BuildProductsPage extends WizardPage implements IConfigurationBuilderBasics {
-		
+
 	private static final String LABEL_GENERATE = "&Strategy:";
 	private static final String LABEL_ALGORITHM = "&Algorithm:";
 	private static final String LABEL_ORDER = "&Order:";
 	private static final String LABEL_BUFFER = "&Buffer all configurations:";
+	private static final String LABEL_TEST = "&Run JUnit tests:";
 	private static final String LABEL_INTERACTIONS = "&Interactions: t=";
 	private static final String LABEL_CREATE_NEW_PROJECTS = "&Create new projects:";
 
@@ -58,9 +59,10 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 	private static final String TOOL_TIP_T_WISE = "Defines the algorithm for t-wise sampling.";
 	private static final String TOOL_TIP_ORDER = "Defines how the generated produkts are ordered.";
 	private static final String TOOL_TIP_BUFFER = "If enabled, all products are buffered before odering and generation.";
+	private static final String TOOL_TIP_TEST= "Searches for test cased in the generated products and executes them.";
 	private static final String TOOL_TIP_T = "Define the t for t-wise generation or interaction-based order.";
 	private static final String TOOL_TIP_PROJECT = "Defnies whether the produkts are generated into separate projects or into a folder in this project.";
-	
+
 	@CheckForNull
 	private IFeatureProject project;
 
@@ -82,11 +84,14 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 	private Combo comboGenerate;
 
 	private Button buttonBuffer;
+	private Button buttonTest;
 	private final String generate;
 	private final String order;
 	private boolean buffer;
+	private boolean test;
 
-	public BuildProductsPage(String project, IFeatureProject featureProject, String generate,  boolean toggleState, String algorithm, int t, String order, boolean buffer) {
+	public BuildProductsPage(String project, IFeatureProject featureProject, String generate, boolean toggleState, String algorithm, int t, String order,
+			boolean buffer, boolean test) {
 		super(project);
 		this.project = featureProject;
 		this.toggleState = toggleState;
@@ -95,6 +100,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		this.t = t;
 		this.order = order;
 		this.buffer = buffer;
+		this.test = test;
 		setDescription("Build products for project " + featureProject.getProjectName() + ".");
 	}
 
@@ -109,54 +115,56 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		final Label labelGenerate = new Label(composite, SWT.NULL);
 		labelGenerate.setText(LABEL_GENERATE);
 		labelGenerate.setToolTipText(TOOL_TIP_GENERATE);
-		comboGenerate = new Combo(composite, SWT.BORDER | SWT.SINGLE
-				| SWT.READ_ONLY);
+		comboGenerate = new Combo(composite, SWT.BORDER | SWT.SINGLE | SWT.READ_ONLY);
 		comboGenerate.setLayoutData(gd);
 		for (BuildType type : BuildType.values()) {
 			comboGenerate.add(getBuildTypeText(type));
 		}
 		comboGenerate.setText(generate);
-		
+
 		final Label labelAlgorithm = new Label(composite, SWT.NULL);
 		labelAlgorithm.setText(LABEL_ALGORITHM);
 		labelAlgorithm.setToolTipText(TOOL_TIP_T_WISE);
-		comboAlgorithm = new Combo(composite, SWT.BORDER | SWT.SINGLE
-				| SWT.READ_ONLY);
+		comboAlgorithm = new Combo(composite, SWT.BORDER | SWT.SINGLE | SWT.READ_ONLY);
 		comboAlgorithm.setLayoutData(gd);
 		for (TWise tWise : TWise.values()) {
 			comboAlgorithm.add(getTWiseText(tWise));
 		}
 		comboAlgorithm.setText(algorithm);
 		comboAlgorithm.setEnabled(comboGenerate.getText().equals(T_WISE_CONFIGURATIONS));
-		
-		
+
 		Label labelOrder = new Label(composite, SWT.NULL);
 		labelOrder.setText(LABEL_ORDER);
 		labelOrder.setToolTipText(TOOL_TIP_ORDER);
-		comboOrder = new Combo(composite, SWT.BORDER | SWT.SINGLE
-				| SWT.READ_ONLY);
+		comboOrder = new Combo(composite, SWT.BORDER | SWT.SINGLE | SWT.READ_ONLY);
 		comboOrder.setLayoutData(gd);
 		for (BuildOrder order : BuildOrder.values()) {
 			comboOrder.add(getOrderText(order));
 		}
 		comboOrder.setText(order);
-		
+
 		final Label labelBuffer = new Label(composite, SWT.NULL);
 		labelBuffer.setText(LABEL_BUFFER);
 		labelBuffer.setToolTipText(TOOL_TIP_BUFFER);
 		buttonBuffer = new Button(composite, SWT.CHECK);
 		buttonBuffer.setLayoutData(gd);
 		buttonBuffer.setSelection(buffer);
-	
+
+		final Label labelTest = new Label(composite, SWT.NULL);
+		labelTest.setText(LABEL_TEST);
+		labelTest.setToolTipText(TOOL_TIP_TEST);
+		buttonTest = new Button(composite, SWT.CHECK);
+		buttonTest.setLayoutData(gd);
+		buttonTest.setSelection(test);
+
 		labelT = new Label(composite, SWT.NULL);
 		labelT.setText(LABEL_INTERACTIONS + "10");
 		labelT.setToolTipText(TOOL_TIP_T);
-		scale = new Scale(composite,SWT.HORIZONTAL);
+		scale = new Scale(composite, SWT.HORIZONTAL);
 		scale.setIncrement(1);
 		scale.setPageIncrement(1);
 		scale.setSelection(t);
 		setScale();
-		
 
 		final Label labelProject = new Label(composite, SWT.NULL);
 		labelProject.setText(LABEL_CREATE_NEW_PROJECTS);
@@ -164,7 +172,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		buttonBuildProject = new Button(composite, SWT.CHECK);
 		buttonBuildProject.setLayoutData(gd);
 		buttonBuildProject.setSelection(toggleState);
-		
+
 		setPageComplete(false);
 		setControl(composite);
 		addListeners();
@@ -182,7 +190,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		default:
 			UIPlugin.getDefault().logWarning("Unimplemented switch statement for BuildOrder: " + order);
 			break;
-		
+
 		}
 		return "-Error-";
 	}
@@ -198,7 +206,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		default:
 			UIPlugin.getDefault().logWarning("Unimplemented switch statement for TWise: " + tWise);
 			break;
-		
+
 		}
 		return "-Error-";
 	}
@@ -223,14 +231,14 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		-t t_wise -a Chvatal -fm <feature_model> -s <strength, 1-4> (-startFrom <covering array>) (-limit <coverage limit>) (-sizelimit <rows>) (-onlyOnes) (-noAllZeros)
 		-t t_wise -a ICPL 	 -fm <feature_model> -s <strength, 1-3> (-startFrom <covering array>) (-onlyOnes) (-noAllZeros) [Inexact: (-sizelimit <rows>) (-limit <coverage limit>)] (for 3-wise, -eights <1-8>)
 		-t t_wise -a CASA 	 -fm <feature_model> -s <strength, 1-6>
-		**/
-		
+		 **/
+
 		if (comboOrder.getText().equals(INTERACTIONS) || comboGenerate.getText().equals(T_WISE_CONFIGURATIONS)) {
 			scale.setEnabled(true);
 		} else {
 			scale.setEnabled(false);
 		}
-		
+
 		String selection = comboAlgorithm.getText();
 		int lastSelection = scale.getSelection();
 		scale.setMinimum(1);
@@ -243,53 +251,53 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		} else if (selection.equals(CASA)) {
 			scale.setMaximum(CASA_MAX);
 		}
-		
+
 		if (lastSelection > scale.getMaximum()) {
-    		scale.setSelection(scale.getMaximum());
-    		labelT.setText(LABEL_INTERACTIONS + scale.getMaximum());
-    	}
+			scale.setSelection(scale.getMaximum());
+			labelT.setText(LABEL_INTERACTIONS + scale.getMaximum());
+		}
 	}
-	
+
 	private void dialogChanged() {
 		setPageComplete(false);
 		// check
 		int perspectiveValue = scale.getSelection();
-        labelT.setText(LABEL_INTERACTIONS + perspectiveValue +  "   ");
-        
+		labelT.setText(LABEL_INTERACTIONS + perspectiveValue + "   ");
+
 		setPageComplete(true);
 
 	}
+
 	private void addListeners() {
 		comboAlgorithm.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
 				setScale();
 			}
 		});
-		
+
 		scale.addListener(SWT.Selection, new Listener() {
-	        public void handleEvent(Event event) {
-	        	int selection = scale.getSelection();
-        		labelT.setText(LABEL_INTERACTIONS + selection);
-	        }
-	    });
-		
+			public void handleEvent(Event event) {
+				int selection = scale.getSelection();
+				labelT.setText(LABEL_INTERACTIONS + selection);
+			}
+		});
+
 		comboGenerate.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
 				comboAlgorithm.setEnabled(comboGenerate.getText().equals(T_WISE_CONFIGURATIONS));
 				setScale();
-				
+
 			}
 		});
-		
+
 		comboOrder.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
 				setScale();
 			}
 		});
-		
+
 	}
-	
-	
+
 	boolean getToggleState() {
 		return buttonBuildProject.getSelection();
 	}
@@ -297,15 +305,15 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 	String getAlgorithm() {
 		String text = comboAlgorithm.getText();
 		if (text.contains(" ")) {
-			return text.substring(0, text.indexOf(" "));			
+			return text.substring(0, text.indexOf(" "));
 		}
 		return text;
 	}
-	
+
 	int getT() {
 		return scale.getSelection();
 	}
-	
+
 	BuildType getGeneration() {
 		if (comboGenerate.getText().equals(ALL_CURRENT_CONFIGURATIONS)) {
 			return BuildType.ALL_CURRENT;
@@ -331,13 +339,15 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		}
 		return null;
 	}
-	
+
 	String getSelectedOrder() {
 		return comboOrder.getText();
 	}
 
 	public boolean getBuffer() {
 		return buttonBuffer.getSelection();
-		
+	}
+	public boolean getTest() {
+		return buttonTest.getSelection();
 	}
 }

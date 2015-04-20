@@ -188,6 +188,9 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 	}
 
 	private boolean canCompose() {
+		if (currentFile == null) {
+			return false;
+		}
 		return FeatureHouseComposer.EXTENSIONS.contains(currentFile.getFileExtension()) && currentFile.exists();
 	}
 

@@ -52,7 +52,8 @@ public class Compiler implements IConfigurationBuilderBasics {
 	/**
 	 * The parent folder of the generated variants
 	 */
-	private final IFolder tmp;
+	final IFolder tmp;
+	
 
 	/**
 	 * 
@@ -70,10 +71,12 @@ public class Compiler implements IConfigurationBuilderBasics {
 				UIPlugin.getDefault().logError(e);
 			}
 		}
+		
 	}
 
 	/**
 	 * Compiles the given configuration.
+	 * 
 	 * @param configuration The configuration to build
 	 */
 	protected void compile(BuilderConfiguration configuration) {
@@ -104,22 +107,48 @@ public class Compiler implements IConfigurationBuilderBasics {
 		LinkedList<IFile> files = getJavaFiles(generator.builder.folder.getFolder(confName));
 		final LinkedList<String> options = new LinkedList<String>();
 		for (IFile file : files) {
-			options.add(file.getRawLocation().toOSString());
+			options.add(setupPath(file));
 		}
 		options.add("-g");
 		options.add("-Xlint");
 		options.add("-source");
 		options.add("1.7");
 		options.add("-d");
-		options.add(tmp.getRawLocation().toOSString());
+		options.add(setupPath(tmp.getRawLocation().toOSString()));
 		options.add("-classpath");
 		options.add(generator.builder.classpath);
 
 		String output = process(options);
-		files = parseJavacOutput(output, files, confName);
-		for (IFile file : files) {
+		LinkedList<IFile> errorFiles = parseJavacOutput(output, files, confName);
+		for (IFile file : errorFiles) {
 			generator.builder.featureProject.getComposer().postCompile(null, file);
 		}
+	}
+
+	/**
+	 * Adds quotation marks to the path name if it contains white spaces.
+	 */
+	private String setupPath(IFile file) {
+		return setupPath(file.getRawLocation().toOSString());
+	}
+	
+	/**
+	 * Adds quotation marks to the path name if it contains white spaces.
+	 */
+	private String setupPath(String location) {
+		String[] split = location.split("[\\\\]");
+		StringBuilder path = new StringBuilder();
+		for (String loc : split) {
+			path.append("\\");
+			if (loc.contains(" ")) {
+				path.append("\"");
+				path.append(loc);
+				path.append("\"");
+			} else {
+				path.append(loc);
+			}
+		}
+		return path.substring(1);
 	}
 
 	private String process(AbstractList<String> command) {
@@ -160,7 +189,8 @@ public class Compiler implements IConfigurationBuilderBasics {
 			String currentLine;
 			while (scanner.hasNextLine()) {
 				currentLine = scanner.nextLine();
-				Pattern pattern = Pattern.compile("\\S*\\s(\\w+)\\sin\\s(\\S:\\S*.java)\\s[(]at line (\\d+)[)]");
+				// \S*\s(\w+)\sin\s(\w:[\w,\\,.,\s]*.java)\s[(]at line (\d+)[)]
+				Pattern pattern = Pattern.compile("\\S*\\s(\\w+)\\sin\\s(\\S:[\\s,\\S]*.java)\\s[(]at line (\\d+)[)]");
 				Matcher matcher = pattern.matcher(currentLine);
 				if (!matcher.find()) {
 					continue;

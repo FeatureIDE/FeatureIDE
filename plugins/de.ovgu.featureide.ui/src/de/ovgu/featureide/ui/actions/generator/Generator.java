@@ -75,6 +75,8 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 	@CheckForNull
 	private Compiler compiler;
 
+	private TestRunner testRunner;
+
 	private BuilderConfiguration configuration;
 
 	 /**
@@ -86,9 +88,9 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 		super(nr == 0 ? "Generator" : "Genarator nr. " + nr);
 		this.nr = nr;
 		this.builder = builder;
-		
 		if (!builder.createNewProjects) {
 			compiler = new Compiler(nr , this);
+			testRunner = new TestRunner(compiler.tmp, builder.testResults);
 		}
 	}
 	
@@ -160,6 +162,10 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 				if (compiler != null) {
 					monitor.subTask("(Compile)");
 					compiler.compile(configuration);
+					if (builder.runTests) {
+						monitor.subTask("(Test)");
+						testRunner.runTests(configuration);
+					}
 				}
 				
 				builder.builtConfigurations++;
