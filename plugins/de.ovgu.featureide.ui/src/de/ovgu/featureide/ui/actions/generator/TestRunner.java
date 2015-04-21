@@ -35,6 +35,17 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.content.IContentDescription;
+import org.eclipse.core.runtime.content.IContentType;
+import org.eclipse.ui.IEditorDescriptor;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.part.FileEditorInput;
+import org.eclipse.ui.progress.UIJob;
 import org.junit.runner.Description;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.notification.Failure;
@@ -63,7 +74,6 @@ public class TestRunner {
 	}
 
 	public void runTests(final BuilderConfiguration configuration) {
-		LOGGER.logInfo("run tests for " + configuration);
 		for (final String file : getFiles(tmp)) {
 			try {
 				URL url = tmp.getLocationURI().toURL();
@@ -85,9 +95,6 @@ public class TestRunner {
 						time = System.currentTimeMillis();
 					}
 
-					/* (non-Javadoc)
-					 * @see org.junit.runner.notification.RunListener#testFinished(org.junit.runner.Description)
-					 */
 					@Override
 					public void testFinished(Description description) throws Exception {
 						if (time == -1) {
@@ -97,9 +104,6 @@ public class TestRunner {
 						testResults.addTest(file, configuration.getName(), new Test(description.toString(), time, file));
 					}
 
-					/* (non-Javadoc)
-					 * @see org.junit.runner.notification.RunListener#testFailure(org.junit.runner.notification.Failure)
-					 */
 					@Override
 					public void testFailure(Failure failure) throws Exception {
 						if (failure.getDescription().toString().startsWith("initializationError") || "No runnable methods".equals(failure.getMessage())) {
@@ -111,9 +115,6 @@ public class TestRunner {
 						time = -1;
 					}
 
-					/* (non-Javadoc)
-					 * @see org.junit.runner.notification.RunListener#testIgnored(org.junit.runner.Description)
-					 */
 					@Override
 					public void testIgnored(Description description) throws Exception {
 						testResults.ignored++;
@@ -135,17 +136,11 @@ public class TestRunner {
 		}
 
 		IFile iResultsXML = CorePlugin.getFeatureProject(tmp).getProject().getFile("test.xml");
-		File resultsXML = new File(iResultsXML.getLocationURI());
-		try {
-			new TestXMLWriter(testResults).writeToFile(resultsXML);
-			iResultsXML.refreshLocal(IResource.DEPTH_INFINITE, null);
-		} catch (ParserConfigurationException | TransformerException | CoreException e) {
-			LOGGER.logError(e);
-		}
+		saveResults(iResultsXML, testResults);
 	}
-	
+
 	private static final NoExitSecurityManager NO_EXIT_MANAGER = new NoExitSecurityManager();
-	
+
 	private static class NoExitSecurityManager extends SecurityManager {
 		@Override
 		public void checkPermission(Permission perm) {
@@ -160,7 +155,14 @@ public class TestRunner {
 		@Override
 		public void checkExit(int status) {
 			super.checkExit(status);
-			throw new RuntimeException("System.exit " + status);
+			throw new SystemExitException(status);
+		}
+	}
+
+	@SuppressWarnings("serial")
+	private static class SystemExitException extends RuntimeException {
+		public SystemExitException(int status) {
+			super("Systen.exit: " + status);
 		}
 	}
 
@@ -190,5 +192,66 @@ public class TestRunner {
 			LOGGER.logError(e);
 		}
 		return files;
+	}
+	
+	private static synchronized void saveResults(IFile iResultsXML, TestResults testResults) {
+		File resultsXML = new File(iResultsXML.getLocationURI());
+		try {
+			new TestXMLWriter(testResults).writeToFile(resultsXML);
+			iResultsXML.refreshLocal(IResource.DEPTH_INFINITE, null);
+			openJunitView(iResultsXML);
+		} catch (ParserConfigurationException | TransformerException | CoreException e) {
+			LOGGER.logError(e);
+		}
+	}
+	
+	/**
+	 * Tries to open the given xml file on the JUnit view.
+	 * @param file The xml file to open.
+	 */
+	private static void openJunitView(final IFile file) {
+		if (!file.getFileExtension().equals("xml")) {
+			throw new RuntimeException(file + " is no xml file");
+		}
+		final UIJob job = new UIJob("open " + file) {
+
+			@Override
+			public IStatus runInUIThread(IProgressMonitor monitor) {
+				IWorkbenchWindow window = UIPlugin.getDefault().getWorkbench().getWorkbenchWindows()[0];
+				IWorkbenchPage page = window.getActivePage();
+				if (page == null)
+					return Status.OK_STATUS;
+
+				try {
+					IEditorDescriptor desc = getDescriptor(file);
+					if (desc != null) {
+						page.openEditor(new FileEditorInput(file), desc.getId());
+					}
+				} catch (CoreException e) {
+					LOGGER.logError(e);
+				}
+				return Status.OK_STATUS;
+			}
+		};
+		job.schedule();
+		try {
+			job.join();
+		} catch (InterruptedException e) {
+			LOGGER.logError(e);
+		}
+	}
+
+	
+	private static IEditorDescriptor getDescriptor(IFile file) throws CoreException {
+		IContentType contentType = null;
+		IContentDescription description = file.getContentDescription();
+		if (description != null) {
+			contentType = description.getContentType();
+		}
+		if (contentType != null) {
+			return PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(file.getName(), contentType);
+		} else {
+			return PlatformUI.getWorkbench().getEditorRegistry().getDefaultEditor(file.getName());
+		}
 	}
 }

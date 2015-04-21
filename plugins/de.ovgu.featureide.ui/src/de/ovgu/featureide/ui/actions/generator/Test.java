@@ -62,6 +62,15 @@ public class Test implements Comparable<Test> {
 	}
 	
 	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object other) {
+		Test otherTest = (Test)other;
+		return classname.equals(otherTest.classname) && name.equals(otherTest.name);
+	}
+	
+	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
