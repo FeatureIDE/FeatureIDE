@@ -1,7 +1,9 @@
 package de.ovgu.featureide.fm.core.conf.nodes;
 
 public class Xor extends Expression {
-	
+
+	private static final long serialVersionUID = -7576777102725610734L;
+
 	public Xor(Variable[] children) {
 		super(children);
 	}

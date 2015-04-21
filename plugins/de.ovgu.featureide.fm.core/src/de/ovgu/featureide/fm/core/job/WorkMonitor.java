@@ -69,6 +69,13 @@ public final class WorkMonitor {
 		relativeWorkDone = nworked;
 	}
 	
+	/**
+	 * Increases the monitor's progress.
+	 */
+	public synchronized void synchronizedWorked() {
+		worked();
+	}
+	
 	void begin(String taskName) {
 		monitor.beginTask(taskName, maxRelativeWork);		
 	}

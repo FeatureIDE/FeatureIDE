@@ -37,10 +37,7 @@ import javax.annotation.Nonnull;
 import org.eclipse.core.resources.IProject;
 import org.prop4j.Node;
 
-import de.ovgu.featureide.fm.core.conf.CreateFeatureGraphJob;
 import de.ovgu.featureide.fm.core.conf.FeatureGraph;
-import de.ovgu.featureide.fm.core.conf.FeatureGraphStatisticJob;
-import de.ovgu.featureide.fm.core.job.util.JobSequence;
 
 /**
  * The model representation of the feature tree that notifies listeners of
@@ -891,18 +888,11 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	}
 	
 	private FeatureGraph featureGraph = null;
-
-	public void splitModel() {
-		JobSequence j = new JobSequence();
-		j.addJob(new CreateFeatureGraphJob(this));
-		j.addJob(new FeatureGraphStatisticJob(this));
-		j.schedule();
-	}
 	
 	public FeatureGraph getFeatureGraph() {
 		return featureGraph;
 	}
-	
+
 	public void setFeatureGraph(FeatureGraph featureGraph) {
 		this.featureGraph = featureGraph;
 	}

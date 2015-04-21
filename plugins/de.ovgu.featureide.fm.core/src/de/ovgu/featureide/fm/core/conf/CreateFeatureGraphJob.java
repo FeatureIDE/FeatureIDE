@@ -20,6 +20,11 @@
  */
 package de.ovgu.featureide.fm.core.conf;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -27,6 +32,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
 import org.prop4j.And;
 import org.prop4j.Implies;
 import org.prop4j.Literal;
@@ -35,6 +42,7 @@ import org.prop4j.Not;
 import org.prop4j.Or;
 
 import de.ovgu.featureide.fm.core.Constraint;
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.conf.nodes.Expression;
@@ -43,11 +51,22 @@ import de.ovgu.featureide.fm.core.conf.nodes.Or2;
 import de.ovgu.featureide.fm.core.conf.nodes.Variable;
 import de.ovgu.featureide.fm.core.conf.nodes.VariableConfiguration;
 import de.ovgu.featureide.fm.core.conf.nodes.Xor;
-import de.ovgu.featureide.fm.core.job.AStoppableJob;
+import de.ovgu.featureide.fm.core.conf.worker.DFSThread;
+import de.ovgu.featureide.fm.core.conf.worker.base.ThreadPool;
+import de.ovgu.featureide.fm.core.job.AProjectJob;
+import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
-public class CreateFeatureGraphJob extends AStoppableJob {
+public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arguments> {
 
-	private final FeatureModel featureModel;
+	public static class Arguments extends JobArguments {
+		private final FeatureModel featureModel;
+
+		public Arguments(FeatureModel featureModel) {
+			super(Arguments.class);
+			this.featureModel = featureModel;
+		}
+	}
+
 	private final Collection<Feature> fixedFeatures = new HashSet<>();
 	private final Collection<Feature> coreFeatures = new HashSet<>();
 	private final Collection<Feature> deadFeatures = new HashSet<>();
@@ -55,148 +74,183 @@ public class CreateFeatureGraphJob extends AStoppableJob {
 
 	private final HashSet<Feature> processedParent = new HashSet<>();
 
-	public CreateFeatureGraphJob(FeatureModel featureModel) {
-		super("Spliting Feature Model");
-		this.featureModel = featureModel;
+	protected CreateFeatureGraphJob(Arguments arguments) {
+		super("Spliting Feature Model", arguments);
+	}
+
+	private boolean loadFeatureGraph() {
+		try (final ObjectInputStream in = new ObjectInputStream(new FileInputStream(project.getFile("model.fg").getLocation().toFile()))) {
+			this.featureGraph = (FeatureGraph) in.readObject();
+			return true;
+		} catch (IOException | ClassNotFoundException e) {
+			FMCorePlugin.getDefault().logError(e);
+			return false;
+		}
+	}
+
+	public void writeFeatureGraph() {
+		final IFile file = project.getFile("model.fg");
+		try (final ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file.getLocation().toFile()))) {
+			out.writeObject(featureGraph);
+			file.refreshLocal(IFile.DEPTH_ZERO, null);
+		} catch (IOException | CoreException e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
 	}
 
 	@Override
 	protected boolean work() throws Exception {
-		System.out.println("Computing...");
-		coreFeatures.addAll(featureModel.getAnalyser().getCoreFeatures());
-		deadFeatures.addAll(featureModel.getAnalyser().getDeadFeatures());
-		fixedFeatures.addAll(coreFeatures);
-		fixedFeatures.addAll(deadFeatures);
-		final List<Constraint> constraints = featureModel.getConstraints();
-		final Collection<Feature> features = new LinkedList<Feature>(featureModel.getFeatures());
-		features.removeAll(fixedFeatures);
+		if (!loadFeatureGraph()) {
+			System.out.println("Computing...");
+			
+//			final List<List<Feature>> unnormalFeatures = arguments.featureModel.getAnalyser().analyzeFeatures();
+//			coreFeatures.addAll(unnormalFeatures.get(0));
+//			deadFeatures.addAll(unnormalFeatures.get(1));
+//			fixedFeatures.addAll(coreFeatures);
+//			fixedFeatures.addAll(deadFeatures);
+//			final List<Constraint> constraints = arguments.featureModel.getConstraints();
+//			final Collection<Feature> features = new ArrayList<Feature>(arguments.featureModel.getFeatures());
+//			features.removeAll(fixedFeatures);
+			
+			coreFeatures.addAll(arguments.featureModel.getAnalyser().getCoreFeatures());
+			deadFeatures.addAll(arguments.featureModel.getAnalyser().getDeadFeatures());
+			fixedFeatures.addAll(coreFeatures);
+			fixedFeatures.addAll(deadFeatures);
+			final List<Constraint> constraints = arguments.featureModel.getConstraints();
+			final Collection<Feature> features = new LinkedList<Feature>(arguments.featureModel.getFeatures());
+			features.removeAll(fixedFeatures);
 
-		processedParent.clear();
 
-		workMonitor.setMaxAbsoluteWork(1 * features.size() + 1);
+			processedParent.clear();
 
-		featureGraph = new FeatureGraph(features);
+			workMonitor.setMaxAbsoluteWork(1 * features.size() + 1);
 
-		workMonitor.worked();
+			featureGraph = new FeatureGraph(features);
 
-		VariableConfiguration conf = new VariableConfiguration(features.size());
+			workMonitor.worked();
 
-		for (Feature feature : features) {
-			final Feature parent = feature.getParent();
-			final String featureName = feature.getName();
-			final String parentName = parent.getName();
-			if (!fixedFeatures.contains(parent)) {
-				featureGraph.implies(featureName, parentName);
-				if (parent.isAnd()) {
-					if (feature.isMandatory()) {
-						featureGraph.implies(parentName, featureName);
-					}
-				} else {
-					if (parent.getChildren().size() == 1) {
-						featureGraph.implies(parentName, featureName);
+			VariableConfiguration conf = new VariableConfiguration(features.size());
+
+			for (Feature feature : features) {
+				final Feature parent = feature.getParent();
+				final String featureName = feature.getName();
+				final String parentName = parent.getName();
+				if (!fixedFeatures.contains(parent)) {
+					featureGraph.implies(featureName, parentName);
+					if (parent.isAnd()) {
+						if (feature.isMandatory()) {
+							featureGraph.implies(parentName, featureName);
+						}
 					} else {
-						featureGraph.setEdge(parent.getName(), featureName, FeatureGraph.EDGE_1q);
-						featureGraph.setEdge(featureName, parentName, FeatureGraph.EDGE_0q);
-					}
-				}
-			}
-			if (parent.isAlternative()) {
-				// XOR between two children
-				if (coreFeatures.contains(parent) && parent.getChildren().size() == 2) {
-					for (Feature sibiling : parent.getChildren()) {
-						//						if (!fixedFeatures.contains(sibiling)) {
-						featureGraph.setEdge(featureName, sibiling.getName(), FeatureGraph.EDGE_10);
-						featureGraph.setEdge(featureName, sibiling.getName(), FeatureGraph.EDGE_01);
-						//						}
-					}
-				} else {
-					for (Feature sibiling : parent.getChildren()) {
-						if (!deadFeatures.contains(sibiling)) {
-							featureGraph.setEdge(featureName, sibiling.getName(), FeatureGraph.EDGE_10);
-							featureGraph.setEdge(featureName, sibiling.getName(), FeatureGraph.EDGE_0q);
-						}
-					}
-
-					final ArrayList<Variable> list = new ArrayList<>(parent.getChildren().size());
-					for (Feature sibiling : parent.getChildren()) {
-						if (!deadFeatures.contains(sibiling)) {
-							list.add(conf.getVariable(featureGraph.getFeatureIndex(sibiling.getName())));
-						}
-					}
-					//					final And2 and = new And2(list.toArray(new Variable[0]));
-					if (processedParent.add(parent) && !deadFeatures.contains(parent)) {
-						if (!coreFeatures.contains(parent)) {
-							list.add(new Not2(conf.getVariable(featureGraph.getFeatureIndex(parent.getName()))));
-						}
-						expList.add(new Xor(list.toArray(new Variable[0])));
-					}
-				}
-			} else if (parent.isOr()) {
-				boolean optionalFeature = false;
-				for (Feature sibiling : parent.getChildren()) {
-					if (coreFeatures.contains(sibiling)) {
-						optionalFeature = true;
-						break;
-					}
-				}
-				if (!optionalFeature) {
-					for (Feature sibiling : parent.getChildren()) {
-						if (!deadFeatures.contains(sibiling)) {
-							featureGraph.setEdge(featureName, sibiling.getName(), FeatureGraph.EDGE_0q);
-						}
-					}
-
-					final ArrayList<Variable> list = new ArrayList<>(parent.getChildren().size());
-					for (Feature sibiling : parent.getChildren()) {
-						if (!deadFeatures.contains(sibiling)) {
-							list.add(conf.getVariable(featureGraph.getFeatureIndex(sibiling.getName())));
-						}
-					}
-					if (processedParent.add(parent) && !deadFeatures.contains(parent)) {
-						if (coreFeatures.contains(parent)) {
-							expList.add(new Or2(list.toArray(new Variable[0])));
+						if (parent.getChildren().size() == 1) {
+							featureGraph.implies(parentName, featureName);
 						} else {
-							expList.add(new Xor(new Variable[] { new Or2(list.toArray(new Variable[0])),
-									new Not2(conf.getVariable(featureGraph.getFeatureIndex(parent.getName()))) }));
+//							featureGraph.setEdge(parent.getName(), featureName, FeatureGraph.EDGE_1q);
+							featureGraph.setEdge(featureName, parentName, FeatureGraph.EDGE_0q);
+						}
+					}
+				}
+				if (parent.isAlternative()) {
+					// XOR between two children
+					if (coreFeatures.contains(parent) && parent.getChildren().size() == 2) {
+						for (Feature sibiling : parent.getChildren()) {
+							//						if (!fixedFeatures.contains(sibiling)) {
+							featureGraph.setEdge(featureName, sibiling.getName(), FeatureGraph.EDGE_10);
+							featureGraph.setEdge(featureName, sibiling.getName(), FeatureGraph.EDGE_01);
+							//						}
+						}
+					} else {
+						for (Feature sibiling : parent.getChildren()) {
+							if (!deadFeatures.contains(sibiling)) {
+								featureGraph.setEdge(featureName, sibiling.getName(), FeatureGraph.EDGE_10);
+								featureGraph.setEdge(featureName, sibiling.getName(), FeatureGraph.EDGE_0q);
+							}
+						}
+
+						final ArrayList<Variable> list = new ArrayList<>(parent.getChildren().size());
+						for (Feature sibiling : parent.getChildren()) {
+							if (!deadFeatures.contains(sibiling)) {
+								list.add(conf.getVariable(featureGraph.getFeatureIndex(sibiling.getName())));
+							}
+						}
+						//					final And2 and = new And2(list.toArray(new Variable[0]));
+						if (processedParent.add(parent) && !deadFeatures.contains(parent)) {
+							if (!coreFeatures.contains(parent)) {
+								list.add(new Not2(conf.getVariable(featureGraph.getFeatureIndex(parent.getName()))));
+							}
+							expList.add(new Xor(list.toArray(new Variable[0])));
+						}
+					}
+				} else if (parent.isOr()) {
+					boolean optionalFeature = false;
+					for (Feature sibiling : parent.getChildren()) {
+						if (coreFeatures.contains(sibiling)) {
+							optionalFeature = true;
+							break;
+						}
+					}
+					if (!optionalFeature) {
+						for (Feature sibiling : parent.getChildren()) {
+							if (!deadFeatures.contains(sibiling)) {
+								featureGraph.setEdge(featureName, sibiling.getName(), FeatureGraph.EDGE_0q);
+							}
+						}
+
+						final ArrayList<Variable> list = new ArrayList<>(parent.getChildren().size());
+						for (Feature sibiling : parent.getChildren()) {
+							if (!deadFeatures.contains(sibiling)) {
+								list.add(conf.getVariable(featureGraph.getFeatureIndex(sibiling.getName())));
+							}
+						}
+						if (processedParent.add(parent) && !deadFeatures.contains(parent)) {
+							if (coreFeatures.contains(parent)) {
+								expList.add(new Or2(list.toArray(new Variable[0])));
+							} else {
+								expList.add(new Xor(new Variable[] { new Or2(list.toArray(new Variable[0])),
+										new Not2(conf.getVariable(featureGraph.getFeatureIndex(parent.getName()))) }));
+							}
 						}
 					}
 				}
 			}
-		}
 
-		c1 = 0;
-		c2 = 0;
-		for (Constraint constraint : constraints) {
-			connect(constraint.getNode(), conf);
-		}
-
-		System.out.println(c1);
-		System.out.println(c2);
-		System.out.println();
-
-		final ArrayList<LinkedList<Expression>> expListAr = featureGraph.getExpListAr();
-		for (Expression exp : expList) {
-			for (Integer i : exp.getVaraibles()) {
-				LinkedList<Expression> varExpList = expListAr.get(i);
-				if (varExpList == null) {
-					varExpList = new LinkedList<Expression>();
-					expListAr.set(i, varExpList);
-				}
-				varExpList.add(exp);
+			c1 = 0;
+			c2 = 0;
+			for (Constraint constraint : constraints) {
+				connect(constraint.getNode(), conf);
 			}
+
+			System.out.println(c1);
+			System.out.println(c2);
+			System.out.println();
+
+			final ArrayList<LinkedList<Expression>> expListAr = featureGraph.getExpListAr();
+			for (Expression exp : expList) {
+				for (Integer i : exp.getVaraibles()) {
+					LinkedList<Expression> varExpList = expListAr.get(i);
+					if (varExpList == null) {
+						varExpList = new LinkedList<Expression>();
+						expListAr.set(i, varExpList);
+					}
+					varExpList.add(exp);
+				}
+			}
+
+			featureGraph.clearDiagonal();
+
+			final ArrayList<String> featureNames = new ArrayList<>();
+			for (Feature feature : features) {
+				featureNames.add(feature.getName());
+			}
+
+			final ThreadPool<String> dfsThread = new ThreadPool<>(new DFSThread(featureGraph), workMonitor);
+			dfsThread.addObkects(featureNames);
+			dfsThread.run();
+
+			writeFeatureGraph();
 		}
 
-		featureGraph.clearDiagonal();
-
-		final ArrayList<String> featureNames = new ArrayList<>();
-		for (Feature feature : features) {
-			featureNames.add(feature.getName());
-		}
-
-		final DFSThreadPool dfsThread = new DFSThreadPool(featureGraph, featureNames, workMonitor);
-		dfsThread.run();
-
-		featureModel.setFeatureGraph(featureGraph);
+		arguments.featureModel.setFeatureGraph(featureGraph);
 
 		return true;
 	}
@@ -237,7 +291,8 @@ public class CreateFeatureGraphJob extends AStoppableJob {
 		}
 		final String implyFeatureName = (String) implyNode.var;
 		final String impliedFeatureName = (String) impliedNode.var;
-		if (!fixedFeatures.contains(featureModel.getFeature(implyFeatureName)) && !fixedFeatures.contains(featureModel.getFeature(impliedFeatureName))) {
+		if (!fixedFeatures.contains(arguments.featureModel.getFeature(implyFeatureName))
+				&& !fixedFeatures.contains(arguments.featureModel.getFeature(impliedFeatureName))) {
 			featureGraph.implies(implyFeatureName, impliedFeatureName, negation);
 		}
 	}

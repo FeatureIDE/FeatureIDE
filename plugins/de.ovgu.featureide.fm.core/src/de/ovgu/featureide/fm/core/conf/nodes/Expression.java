@@ -25,8 +25,10 @@ import java.util.TreeSet;
 
 public abstract class Expression extends Variable {
 
+	private static final long serialVersionUID = 3993773534104729866L;
+
 	protected final Variable[] children;
-	
+
 	public Expression(Variable[] children) {
 		super(-1);
 		this.children = children;
@@ -42,7 +44,7 @@ public abstract class Expression extends Variable {
 	@Override
 	public final void setValue(byte value) {
 	}
-	
+
 	@Override
 	public final void reset() {
 		value = UNDEFINED;
@@ -50,19 +52,19 @@ public abstract class Expression extends Variable {
 			children[i].reset();
 		}
 	}
-	
+
 	public byte updateValue() {
 		reset();
 		return value = computeValue();
 	}
-	
+
 	public Collection<Integer> getVaraibles() {
 		final TreeSet<Integer> idSet = new TreeSet<>();
 		getVaraibles(idSet);
 		return idSet;
-		
+
 	}
-	
+
 	protected void getVaraibles(TreeSet<Integer> list) {
 		for (Variable variable : children) {
 			variable.getVaraibles(list);

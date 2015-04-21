@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.core;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -230,7 +231,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener {
 	 * @return all constraints containing this feature.
 	 */
 	public String getRelevantConstraintsString() {
-		StringBuilder relevant = new StringBuilder();
+		final StringBuilder relevant = new StringBuilder();
 		for (Constraint constraint : featureModel.getConstraints()) {
 			for (Feature f : constraint.getContainedFeatures()) {
 				if (f.getName().equals(getName())) {
@@ -612,23 +613,12 @@ public class Feature implements PropertyConstants, PropertyChangeListener {
 		this.multiple = false;
 	}
 
-	public boolean hasHiddenParent() {
-
-		if (isHidden())
-			return true;
-		if (isRoot()) {
-
-			return false;
-		}
-		Feature p = getParent();
-
-		while (!p.isRoot()) {
-			if (p.isHidden())
+	public boolean hasHiddenParent() {		
+		for (Feature p = this; p != null; p = p.getParent()) {
+			if (p.isHidden()) {
 				return true;
-			p = p.getParent();
-
+			}
 		}
-
 		return false;
 	}
 
@@ -666,7 +656,15 @@ public class Feature implements PropertyConstants, PropertyChangeListener {
 	public int hashCode() {
 		return name.hashCode();
 	}
-	
+
+	public static List<String> getFeatureNames(Collection<Feature> features) {
+		final List<String> featureNames = new ArrayList<>(features.size());
+		for (Feature feature : features) {
+			featureNames.add(feature.getName());
+		}
+		return featureNames;
+	}
+
 	// TODO fix UI bug when hashCode function is used.
 	// (feature model editor acts strange, root feature is not placed correctly)
 	// problem seems to be the static implementation of FeatureUIHelper

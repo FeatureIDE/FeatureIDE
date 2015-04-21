@@ -1,5 +1,26 @@
+/* FeatureIDE - A Framework for Feature-Oriented Software Development
+ * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ *
+ * This file is part of FeatureIDE.
+ * 
+ * FeatureIDE is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * FeatureIDE is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * See http://featureide.cs.ovgu.de/ for further information.
+ */
 package de.ovgu.featureide.fm.core.conf;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -9,7 +30,10 @@ import java.util.LinkedList;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.conf.nodes.Expression;
 
-public class FeatureGraph {
+public class FeatureGraph implements Serializable {
+	
+	private static final long serialVersionUID = -4051783169730533477L;
+
 	public static final byte EDGE_NONE = 0b00000000, EDGE_11 = 0b00000100, //0x04,
 			EDGE_10 = 0b00001000, //0x08,
 			EDGE_1q = 0b00001100, //0x0c,
@@ -250,13 +274,11 @@ public class FeatureGraph {
 						// don't select child
 						childSelected = 0;
 						visited[j] = 2;
-						//						System.out.println("\t0 " + featureArray[j]);
 						break;
 					case EDGE_01:
 						// select child
 						childSelected = 1;
 						visited[j] = 2;
-						//						System.out.println("\t1 " + featureArray[j]);
 						break;
 					case EDGE_0q:
 						// ?
@@ -265,7 +287,6 @@ public class FeatureGraph {
 						}
 						childSelected = 2;
 						visited[j] = 1;
-						//						System.out.println("\tq " + featureArray[j]);
 						break;
 					default:
 						continue;
@@ -288,21 +309,18 @@ public class FeatureGraph {
 					// visit = 0, not selected, implies not selected
 					case EDGE_00:
 						visited[j] = 2;
-						//							System.out.println("\t0 " + featureArray[j]);
 						setEdge(parentFeature, j, parentSelected ? EDGE_10 : EDGE_00);
 						dfs_rec(visited, j, parentFeature, (byte) 0, parentSelected);
 						break;
 					// visit = 0, not selected, implies selected
 					case EDGE_01:
 						visited[j] = 2;
-						//							System.out.println("\t1 " + featureArray[j]);
 						setEdge(parentFeature, j, parentSelected ? EDGE_11 : EDGE_01);
 						dfs_rec(visited, j, parentFeature, (byte) 1, parentSelected);
 						break;
 					// visit = 0, not selected, implies ?
 					case EDGE_0q:
 						visited[j] = 1;
-						//							System.out.println("\tq " + featureArray[j]);
 						setEdge(parentFeature, j, parentSelected ? EDGE_1q : EDGE_0q);
 						dfs_rec(visited, j, parentFeature, (byte) 2, parentSelected);
 						break;
@@ -314,21 +332,18 @@ public class FeatureGraph {
 					// visit = 0, selected, implies not selected
 					case EDGE_10:
 						visited[j] = 2;
-						//							System.out.println("\t0 " + featureArray[j]);
 						setEdge(parentFeature, j, parentSelected ? EDGE_10 : EDGE_00);
 						dfs_rec(visited, j, parentFeature, (byte) 0, parentSelected);
 						break;
 					// visit = 0, selected, implies selected
 					case EDGE_11:
 						visited[j] = 2;
-						//							System.out.println("\t1 " + featureArray[j]);
 						setEdge(parentFeature, j, parentSelected ? EDGE_11 : EDGE_01);
 						dfs_rec(visited, j, parentFeature, (byte) 1, parentSelected);
 						break;
 					// visit = 0, selected, implies ?
 					case EDGE_1q:
 						visited[j] = 1;
-						//							System.out.println("\tq " + featureArray[j]);
 						setEdge(parentFeature, j, parentSelected ? EDGE_1q : EDGE_0q);
 						dfs_rec(visited, j, parentFeature, (byte) 2, parentSelected);
 						break;
@@ -338,7 +353,6 @@ public class FeatureGraph {
 				case 2:
 					if (edge > 0) {
 						visited[j] = 1;
-						//						System.out.println("\tq " + featureArray[j]);
 						setEdge(parentFeature, j, parentSelected ? EDGE_1q : EDGE_0q);
 						dfs_rec(visited, j, parentFeature, (byte) 2, parentSelected);
 					}
@@ -352,14 +366,12 @@ public class FeatureGraph {
 					// visit = 1, not selected, implies not selected
 					case EDGE_00:
 						visited[j] = 2;
-						//							System.out.println("\t0 " + featureArray[j]);
 						setEdge(parentFeature, j, parentSelected ? EDGE_10 : EDGE_00);
 						dfs_rec(visited, j, parentFeature, (byte) 0, parentSelected);
 						break;
 					// visit = 1, not selected, implies selected
 					case EDGE_01:
 						visited[j] = 2;
-						//							System.out.println("\t1 " + featureArray[j]);
 						setEdge(parentFeature, j, parentSelected ? EDGE_11 : EDGE_01);
 						dfs_rec(visited, j, parentFeature, (byte) 1, parentSelected);
 						break;
@@ -371,14 +383,12 @@ public class FeatureGraph {
 					// visit = 1, selected, implies not selected
 					case EDGE_10:
 						visited[j] = 2;
-						//							System.out.println("\t0 " + featureArray[j]);
 						setEdge(parentFeature, j, parentSelected ? EDGE_10 : EDGE_00);
 						dfs_rec(visited, j, parentFeature, (byte) 0, parentSelected);
 						break;
 					// visit = 1, selected, implies selected
 					case EDGE_11:
 						visited[j] = 2;
-						//							System.out.println("\t1 " + featureArray[j]);
 						setEdge(parentFeature, j, parentSelected ? EDGE_11 : EDGE_01);
 						dfs_rec(visited, j, parentFeature, (byte) 1, parentSelected);
 						break;

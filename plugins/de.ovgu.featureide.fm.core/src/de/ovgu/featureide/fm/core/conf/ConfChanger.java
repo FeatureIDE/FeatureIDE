@@ -27,15 +27,15 @@ import java.util.List;
 
 import org.prop4j.Literal;
 import org.prop4j.Node;
-import org.prop4j.SatSolver;
-import org.sat4j.specs.TimeoutException;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.conf.nodes.Expression;
 import de.ovgu.featureide.fm.core.conf.nodes.Variable;
 import de.ovgu.featureide.fm.core.conf.nodes.VariableConfiguration;
+import de.ovgu.featureide.fm.core.conf.worker.CalcThread;
+import de.ovgu.featureide.fm.core.conf.worker.base.AWorkerThread;
+import de.ovgu.featureide.fm.core.conf.worker.base.ThreadPool;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
 /**
@@ -46,12 +46,16 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
 public class ConfChanger {
 	private final FeatureGraph featureGraph;
 	private final VariableConfiguration variableConfiguration;
-	private final SatSolver solver;
+	private final ThreadPool<Integer> dfsThread;
+
+	private final List<Node> ls = new ArrayList<>();
+
 
 	public ConfChanger(FeatureModel featureModel, FeatureGraph featureGraph, VariableConfiguration variableConfiguration) {
 		this.featureGraph = featureGraph;
 		this.variableConfiguration = variableConfiguration;
-		solver = new SatSolver(NodeCreator.createNodes(featureModel, false).toCNF(), 1000);
+		this.dfsThread = new ThreadPool<>(new CalcThread(featureGraph, variableConfiguration, NodeCreator.createNodes(featureModel, false).toCNF()));
+		dfsThread.reset();
 	}
 
 	public void setFeature(Feature f, byte newValue) {
@@ -118,7 +122,7 @@ public class ConfChanger {
 				expression.updateValue();
 				if (expression.getValue() == Variable.FALSE) {
 					variableConfiguration.setVariable(i, Variable.FALSE);
-					ls.add(new Literal(featureGraph.featureArray[i], false));
+//					ls.add(new Literal(featureGraph.featureArray[i], false));
 					it.remove();
 					break;
 				} else {
@@ -126,7 +130,7 @@ public class ConfChanger {
 					expression.updateValue();
 					if (expression.getValue() == Variable.FALSE) {
 						variableConfiguration.setVariable(i, Variable.TRUE);
-						ls.add(new Literal(featureGraph.featureArray[i], true));
+//						ls.add(new Literal(featureGraph.featureArray[i], true));
 						it.remove();
 						break;
 					} else {
@@ -135,35 +139,59 @@ public class ConfChanger {
 				}
 			}
 		}
-
-		for (Integer i : compList) {
-			try {
+		
+		ls.clear();
+		
+		int i = 0;
+		for (Variable var : variableConfiguration) {
+			switch (var.getValue()) {
+			case Variable.TRUE:
+				ls.add(new Literal(featureGraph.featureArray[i], true));
+				break;	
+			case Variable.FALSE:
 				ls.add(new Literal(featureGraph.featureArray[i], false));
-				if (!solver.isSatisfiable(ls)) {
-					variableConfiguration.setVariable(i, Variable.TRUE);
-					ls.set(ls.size() - 1, new Literal(featureGraph.featureArray[i], true));
-				} else {
-					ls.set(ls.size() - 1, new Literal(featureGraph.featureArray[i], true));
-					if (!solver.isSatisfiable(ls)) {
-						variableConfiguration.setVariable(i, Variable.FALSE);
-						ls.set(ls.size() - 1, new Literal(featureGraph.featureArray[i], false));
-					} else {
-						ls.remove(ls.size() - 1);
-					}
-				}
-			} catch (TimeoutException e) {
-				FMCorePlugin.getDefault().logError(e);
-				ls.remove(ls.size() - 1);
+				break;	
+			default:
+				break;				
 			}
+			i++;
 		}
+		
+		//TODO vorher lösung suchen mit sat solver
+		dfsThread.reset();
+		for (AWorkerThread<Integer> thread : dfsThread.getThreads()) {
+			((CalcThread) thread).setLs(ls);
+		}
+		dfsThread.addObkects(compList);
+		dfsThread.run();
+
+		//		for (Integer i : compList) {
+		//			final int curIndex = ls.size();
+		//			try {
+		//				ls.add(new Literal(featureGraph.featureArray[i], false));
+		//				if (!solver.isSatisfiable(ls)) {
+		//					variableConfiguration.setVariable(i, Variable.TRUE);
+		//					ls.set(curIndex, new Literal(featureGraph.featureArray[i], true));
+		//				} else {
+		//					ls.set(curIndex, new Literal(featureGraph.featureArray[i], true));
+		//					if (!solver.isSatisfiable(ls)) {
+		//						variableConfiguration.setVariable(i, Variable.FALSE);
+		//						ls.set(curIndex, new Literal(featureGraph.featureArray[i], false));
+		//					} else {
+		//						ls.remove(curIndex);
+		//					}
+		//				}
+		//			} catch (TimeoutException e) {
+		//				FMCorePlugin.getDefault().logError(e);
+		//				ls.remove(curIndex);
+		//			}
+		//		}
 	}
-
-	private final List<Node> ls = new ArrayList<>();
-
+	
 	private void set(int index, boolean value) {
 		if (variableConfiguration.getVariable(index).getValue() == Variable.UNDEFINED) {
 			variableConfiguration.setVariable(index, value ? Variable.TRUE : Variable.FALSE);
-			ls.add(new Literal(featureGraph.featureArray[index], value));
+//			ls.add(new Literal(featureGraph.featureArray[index], value));
 		}
 	}
 

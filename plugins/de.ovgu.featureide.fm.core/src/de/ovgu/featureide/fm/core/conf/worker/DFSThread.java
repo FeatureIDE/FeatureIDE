@@ -18,42 +18,36 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.conf.nodes;
+package de.ovgu.featureide.fm.core.conf.worker;
 
-import java.io.Serializable;
-import java.util.TreeSet;
+import java.util.Arrays;
 
-public class Variable implements Serializable {
+import de.ovgu.featureide.fm.core.conf.FeatureGraph;
+import de.ovgu.featureide.fm.core.conf.worker.base.AWorkerThread;
 
-	private static final long serialVersionUID = 2253729345725413110L;
+public class DFSThread extends AWorkerThread<String> {
 
-	public static final byte TRUE = 1, FALSE = 0, UNDEFINED = -1;
+	private final FeatureGraph featureGraph;
+	private final byte[] visited;
 
-	protected final int id;
-
-	protected byte value = UNDEFINED;
-
-	public Variable(int id) {
-		this.id = id;
+	public DFSThread(FeatureGraph featureGraph) {
+		super();
+		this.featureGraph = featureGraph;
+		visited = new byte[featureGraph.featureArray.length];
 	}
 
-	public byte getValue() {
-		return value;
+	@Override
+	protected void work(String object) {
+		final int featureIndex = featureGraph.getFeatureIndex(object);
+		Arrays.fill(visited, (byte) 0);
+		featureGraph.dfs(visited, featureIndex, true);
+		Arrays.fill(visited, (byte) 0);
+		featureGraph.dfs(visited, featureIndex, false);
 	}
 
-	public int getId() {
-		return id;
-	}
-
-	public void setValue(byte value) {
-		this.value = value;
-	}
-
-	protected void reset() {
-	}
-
-	protected void getVaraibles(TreeSet<Integer> list) {
-		list.add(id);
+	@Override
+	public DFSThread newInstance() {
+		return new DFSThread(featureGraph);
 	}
 
 }

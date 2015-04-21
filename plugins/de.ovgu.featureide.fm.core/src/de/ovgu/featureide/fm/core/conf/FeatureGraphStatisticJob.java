@@ -22,7 +22,6 @@ package de.ovgu.featureide.fm.core.conf;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedList;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -145,7 +144,7 @@ public class FeatureGraphStatisticJob extends AStoppableJob {
 		for (int i = 0; i < featureGraph.getSize(); i++) {
 			indexArray.add(i);
 		}
-		Collections.shuffle(indexArray);
+//		Collections.shuffle(indexArray);
 		
 		final long firstStart = System.nanoTime();
 		long start = firstStart;

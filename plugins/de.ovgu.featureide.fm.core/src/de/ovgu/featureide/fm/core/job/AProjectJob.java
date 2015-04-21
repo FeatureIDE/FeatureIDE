@@ -37,7 +37,6 @@ public abstract class AProjectJob<T extends JobArguments> extends AStoppableJob 
 	protected IProject project = null;
 	protected final T arguments;
 	
-	
 	/**
 	 * Constructor.
 	 * 
