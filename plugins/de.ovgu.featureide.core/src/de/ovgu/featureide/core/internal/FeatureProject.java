@@ -1059,10 +1059,11 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 	private Collection<String> getOptionalConcreteFeatures() {
 		final List<String> concreteFeatures = featureModel.getConcreteFeatureNames();
-		for (final Feature feature : featureModel.getAnalyser().getCoreFeatures()) {
+		List<List<Feature>> deadCoreList = featureModel.getAnalyser().analyzeFeatures();
+		for (final Feature feature : deadCoreList.get(0)) {
 			concreteFeatures.remove(feature.getName());
 		}
-		for (final Feature feature : featureModel.getAnalyser().getDeadFeatures()) {
+		for (final Feature feature : deadCoreList.get(1)) {
 			concreteFeatures.remove(feature.getName());
 		}
 		return concreteFeatures;
@@ -1071,13 +1072,11 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	private List<String> getFalseOptionalFeatures() {
 		final List<String> concreteFeatureNames = new LinkedList<String>();
 		final Collection<Feature> coreFeatures = featureModel.getAnalyser().getCoreFeatures();
-
-		for (final Feature feature : featureModel.getConcreteFeatures()) {
-			if (!feature.isMandatory() && !feature.isAlternative() && coreFeatures.contains(feature))
+		
+		for (Feature feature : coreFeatures) {
+			if (feature.isConcrete() && !feature.isMandatory() && !feature.isAlternative()) {
 				concreteFeatureNames.add(feature.getName());
-		}
-		for (final Feature feature : featureModel.getAnalyser().getDeadFeatures()) {
-			concreteFeatureNames.remove(feature.getName());
+			}
 		}
 		return concreteFeatureNames;
 	}

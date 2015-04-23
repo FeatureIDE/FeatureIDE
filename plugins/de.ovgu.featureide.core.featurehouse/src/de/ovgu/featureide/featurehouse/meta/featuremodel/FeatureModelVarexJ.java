@@ -23,6 +23,7 @@ package de.ovgu.featureide.featurehouse.meta.featuremodel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Locale;
 
 import org.prop4j.Node;
@@ -72,9 +73,10 @@ public class FeatureModelVarexJ implements IFeatureModelClass {
 	@Override
 	public String getFeatureFields() {
 		StringBuilder fields = new StringBuilder();
+		final List<List<Feature>> deadCoreList = featureModel.getAnalyser().analyzeFeatures();
 		for (Feature feature : features) {
-			final boolean isCoreFeature = featureModel.getAnalyser().getCoreFeatures().contains(feature);
-			final boolean isDeadFeature = featureModel.getAnalyser().getDeadFeatures().contains(feature);
+			final boolean isCoreFeature = deadCoreList.get(0).contains(feature);
+			final boolean isDeadFeature = deadCoreList.get(1).contains(feature);
 			if (!isCoreFeature && !isDeadFeature) {
 				fields.append(ANNOTATION);
 			}

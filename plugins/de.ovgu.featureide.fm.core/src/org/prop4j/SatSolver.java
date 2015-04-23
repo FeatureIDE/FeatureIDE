@@ -21,6 +21,7 @@
 package org.prop4j;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,7 +36,6 @@ import org.sat4j.specs.IVecInt;
 import org.sat4j.specs.IteratorInt;
 import org.sat4j.specs.TimeoutException;
 import org.sat4j.tools.ModelIterator;
-import org.sat4j.tools.RemiUtils;
 import org.sat4j.tools.SolutionCounter;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
@@ -47,6 +47,17 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
  * @author Thomas Thuem
  */
 public class SatSolver {
+	
+	public static enum ValueType {
+		ALL(0), TRUE(1), FALSE(-1);
+		
+		private final int factor;
+
+		private ValueType(int factor) {
+			this.factor = factor;
+		}
+		
+	}
 
 	protected boolean contradiction = false;
 
@@ -150,77 +161,53 @@ public class SatSolver {
 		value *= ((Literal) node).positive ? 1 : -1;
 		return value;
 	}
-
-	public List<Literal> knownValues() {
-		IVecInt backbone = null;
+	
+	private boolean test() {
 		try {
-			backbone = RemiUtils.backbone(solver);
+			contradiction = contradiction || !solver.isSatisfiable();
 		} catch (TimeoutException e) {
 			FMCorePlugin.getDefault().logError(e);
+			return false;
 		}
-		if (backbone != null) {
-			addKnowValues(backbone);
+		return !contradiction;
+	}
+	
+	public List<Literal> knownValues(Literal... tempNodes) {
+		return knownValues(ValueType.ALL, tempNodes);
+	}
+	
+	public List<Literal> knownValues(ValueType vt, Literal... tempNodes) {
+		if (test()) {
+			
+			final IVecInt backbone = new VecInt();
+			for (int i = 0; i < tempNodes.length; i++) {
+				backbone.push(getIntOfLiteral(tempNodes[i]));
+			}
+			
+			final int[] model = solver.model();
+			for (int i = 0; i < model.length; i++) {
+				final int x = model[i];
+				if ((x * vt.factor) >= 0) {
+					backbone.push(-x);
+					try {
+						if (solver.isSatisfiable(backbone)) {
+							backbone.pop();
+						} else {
+							backbone.pop().push(x);
+						}
+					} catch (TimeoutException e) {
+						FMCorePlugin.getDefault().logError(e);
+						backbone.pop();
+					}
+				}
+			}
+			
+			for (int i = 0; i < tempNodes.length; i++) {
+				backbone.delete(i);
+			}
 			return convertToNodes(backbone);
-		} else {
-			return new ArrayList<Literal>(0);
 		}
-	}
-	
-	public List<Literal> knownValues(Literal tempNode) {
-		final IVecInt backbone = new VecInt();
-		backbone.push(getIntOfLiteral(tempNode));
-		
-		addKnowValues(backbone);
-		backbone.delete(0);
-		return convertToNodes(backbone);
-	}
-	
-	
-	public List<Literal> knownValues(Literal[] tempNodes) {
-		final IVecInt backbone = new VecInt();
-		for (int i = 0; i < tempNodes.length; i++) {
-			backbone.push(getIntOfLiteral(tempNodes[i]));
-		}
-		
-		addKnowValues(backbone);
-		for (int i = 0; i < tempNodes.length; i++) {
-			backbone.delete(i);
-		}
-		return convertToNodes(backbone);
-	}
-	
-	public List<Literal> knownValues(List<Literal> tempNodes) {
-		final IVecInt backbone = new VecInt();
-		for (Literal literal : tempNodes) {
-			backbone.push(getIntOfLiteral(literal));			
-		}
-		
-		addKnowValues(backbone);
-		for (int i = 0; i < tempNodes.size(); i++) {
-			backbone.delete(i);
-		}
-		return convertToNodes(backbone);
-	}
-	
-	private void addKnowValues(final IVecInt backbone) {
-		try {
-	        final int nvars = solver.nVars();
-	        for (int i = 1; i <= nvars; i++) {
-	            backbone.push(i);
-	            if (solver.isSatisfiable(backbone)) {
-	                backbone.pop().push(-i);
-	                if (solver.isSatisfiable(backbone)) {
-	                    backbone.pop();
-	                } else {
-	                    backbone.pop().push(i);
-	                }
-	            } else {
-	                backbone.pop().push(-i);
-	            }
-	        }			
-		} catch (TimeoutException e) {
-			FMCorePlugin.getDefault().logError(e);
-		}
+		return Collections.emptyList();
 	}
 	
 	private List<Literal> convertToNodes(final IVecInt backbone) {
