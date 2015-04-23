@@ -21,10 +21,12 @@
 package de.ovgu.featureide.ui.actions.generator;
 
 import java.io.File;
+import java.lang.annotation.Annotation;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.security.Permission;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -40,6 +42,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.content.IContentType;
+import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.internal.core.JavaProject;
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -61,7 +66,8 @@ import de.ovgu.featureide.ui.UIPlugin;
  */
 public class TestRunner {
 
-	final TestResults testResults;
+	private static final Object KEY = new Object();
+	private final TestResults testResults;
 	private static final UIPlugin LOGGER = UIPlugin.getDefault();
 	int compiled = 0;
 
@@ -73,14 +79,24 @@ public class TestRunner {
 
 	}
 
+
+	@SuppressWarnings("resource")
 	public void runTests(final BuilderConfiguration configuration) {
+		URL[] url = getURLs();
+		URLClassLoader classLoader = new URLClassLoader(url, Thread.currentThread().getContextClassLoader());
 		for (final String file : getFiles(tmp)) {
 			try {
-				URL url = tmp.getLocationURI().toURL();
-				url = new URL(url.toString() + "/");
-				@SuppressWarnings("resource")
-				URLClassLoader classLoader = new URLClassLoader(new URL[] { url }, Thread.currentThread().getContextClassLoader());
 				Class<?> clazz = classLoader.loadClass(file);
+
+				if (isModuleTest(clazz)) {
+					synchronized (KEY) {
+						if (testResults.modulTests.contains(clazz.getName())) {
+							continue;
+						} else {
+							testResults.modulTests.add(clazz.getName());
+						}
+					}
+				}
 
 				JUnitCore core = new JUnitCore();
 				core.addListener(new RunListener() {
@@ -128,8 +144,6 @@ public class TestRunner {
 				} finally {
 					System.setSecurityManager(originalManager);
 				}
-			} catch (MalformedURLException e) {
-				LOGGER.logError(e);
 			} catch (ClassNotFoundException e) {
 				LOGGER.logError(e);
 			}
@@ -137,6 +151,50 @@ public class TestRunner {
 
 		IFile iResultsXML = CorePlugin.getFeatureProject(tmp).getProject().getFile("test.xml");
 		saveResults(iResultsXML, testResults);
+
+	}
+
+	/**
+	 * @return
+	 */
+	@SuppressWarnings("restriction")
+	private URL[] getURLs() {
+		ArrayList<URL> urls = new ArrayList<>();
+		try {
+			URL url = tmp.getLocationURI().toURL();
+			url = new URL(url.toString() + "/");
+			urls.add(url);
+			
+			JavaProject proj = new JavaProject(tmp.getProject(), null);
+			IJavaElement[] elements = proj.getChildren();
+			for (IJavaElement e : elements) {
+				String path = e.getPath().toOSString();
+				if (path.contains(":")) {
+					continue;
+				}
+				IResource resource = e.getResource();
+				if (resource != null && "jar".equals(resource.getFileExtension())) {
+					urls.add(resource.getRawLocationURI().toURL());
+				}
+			}
+		} catch (MalformedURLException | JavaModelException e) {
+			UIPlugin.getDefault().logError(e);
+		}
+
+		return urls.toArray(new URL[urls.size()]);
+	}
+
+	/**
+	 * Checks whether the class is a module test.
+	 */
+	private boolean isModuleTest(Class<?> clazz) {
+		for (Annotation a : clazz.getAnnotations()) {
+			if ("@de.ovgu.featureide.ModuleTest()".equals(a.toString())) {
+				// somehow clazz.getAnnotation(ModulTest.class) does not work 
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private static final NoExitSecurityManager NO_EXIT_MANAGER = new NoExitSecurityManager();
@@ -193,7 +251,7 @@ public class TestRunner {
 		}
 		return files;
 	}
-	
+
 	private static synchronized void saveResults(IFile iResultsXML, TestResults testResults) {
 		File resultsXML = new File(iResultsXML.getLocationURI());
 		try {
@@ -204,9 +262,10 @@ public class TestRunner {
 			LOGGER.logError(e);
 		}
 	}
-	
+
 	/**
 	 * Tries to open the given xml file on the JUnit view.
+	 * 
 	 * @param file The xml file to open.
 	 */
 	private static void openJunitView(final IFile file) {
@@ -241,7 +300,6 @@ public class TestRunner {
 		}
 	}
 
-	
 	private static IEditorDescriptor getDescriptor(IFile file) throws CoreException {
 		IContentType contentType = null;
 		IContentDescription description = file.getContentDescription();

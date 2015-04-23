@@ -19,6 +19,7 @@ Require-Bundle: org.eclipse.ui,
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: lib/SPLACAT.jar,
  lib/commons-math-2.2.jar,
+ lib/FeatureIDEAnnotations.jar,
  .
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: University of Magdeburg

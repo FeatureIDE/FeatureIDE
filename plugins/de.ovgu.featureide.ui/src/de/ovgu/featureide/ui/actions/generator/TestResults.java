@@ -21,6 +21,7 @@
 package de.ovgu.featureide.ui.actions.generator;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -34,6 +35,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class TestResults {
 
+	final Set<String> modulTests = new HashSet<>();
+	
 	int ignored = 0;
 	int errors = 0;
 	int failures = 0;
