@@ -243,6 +243,9 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 
 		Composite workArea = new Composite(parent, SWT.NONE);
 		setControl(workArea);
+		
+		Label title = new Label(workArea, SWT.NONE);
+		title.setText("Choosable Examples:");
 
 		searchFeatureText = new StyledText(workArea, SWT.SINGLE | SWT.LEFT | SWT.BORDER);
 		searchFeatureText.setText(FILTERTEXT);
@@ -302,10 +305,6 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 	 * @param workArea
 	 */
 	private void createProjectsList(final Composite workArea) {
-		Label title = new Label(workArea, SWT.NONE);
-
-		title.setText("Choosable Examples");
-
 		Composite listComposite = new Composite(workArea, SWT.NONE);
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 2;
@@ -494,7 +493,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 
 	private void createDescriptionArea(Composite workArea) {
 		Label title = new Label(workArea, SWT.NONE);
-		title.setText("Description");
+		title.setText("Description:");
 
 		descBox = new Text(workArea, SWT.BORDER | SWT.MULTI | SWT.WRAP | SWT.READ_ONLY | SWT.V_SCROLL);
 		descBox.setText("");
@@ -631,6 +630,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 							if (command.getArguments().containsKey("composer")) {
 								compID = command.getArguments().get("composer");
 								composer = compID.substring(compID.lastIndexOf(".") + 1);
+								System.out.println("command.getArgu: "+command.getArguments()+" compID: "+compID+" pr.projectDescri: "+pr.projectName);
 								if (!compTable.containsKey(composer)) {
 									compTable.put(composer, new LinkedList<ProjectRecord>());
 								}

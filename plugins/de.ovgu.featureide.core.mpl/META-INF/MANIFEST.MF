@@ -26,14 +26,9 @@ Export-Package: de.ovgu.featureide.core.mpl,
  de.ovgu.featureide.core.mpl.io.reader,
  de.ovgu.featureide.core.mpl.io.writer,
  de.ovgu.featureide.core.mpl.job,
- de.ovgu.featureide.core.mpl.job.util,
  de.ovgu.featureide.core.mpl.signature,
- de.ovgu.featureide.core.mpl.signature.abstr,
  de.ovgu.featureide.core.mpl.signature.filter,
- de.ovgu.featureide.core.mpl.signature.fuji,
- de.ovgu.featureide.core.mpl.signature.javadoc,
  de.ovgu.featureide.core.mpl.util
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: lib/fuji.jar,
- lib/tools.jar,
  .

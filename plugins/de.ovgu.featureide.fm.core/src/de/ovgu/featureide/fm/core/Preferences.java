@@ -39,6 +39,16 @@ public abstract class Preferences {
 		SCHEME_LONG = 0,
 		SCHEME_SHORT = 1;
 	
+	public static String getNameTypeLabel(int layoutType){		
+		switch(layoutType){
+			case 1: 
+				return "Short Names";
+			case 0:
+			default:
+				return "Long Names";
+		}	
+	}
+	
 	private static final IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode("de.ovgu.featureide.fm.core");
 	
 	public static int defaultCompletion;

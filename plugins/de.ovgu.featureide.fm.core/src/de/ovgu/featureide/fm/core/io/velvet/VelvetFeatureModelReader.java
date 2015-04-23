@@ -779,7 +779,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 		switch (valueNode.getType()) {
 		case VelvetParser.STRING:
 			final String valueNodeText = valueNode.getText();
-			parent.setDescription(valueNodeText.substring(1, valueNodeText.length() - 1));
+			parent.setDescription(valueNodeText.substring(1, valueNodeText.length() - 1).replace("\\\"", "\""));
 			break;
 		default:
 			reportSyntaxError(valueNode);

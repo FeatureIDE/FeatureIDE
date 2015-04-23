@@ -85,6 +85,11 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements Proper
 		resetFeatureList();
 		featureModel.addListener(this);
 	}
+	
+	@Override
+	public boolean keyReleased(KeyEvent e){
+		return false;
+	}
 
 	/**
 	 * use {@link GraphicalViewerKeyHandler} first if auto-layout is active handles

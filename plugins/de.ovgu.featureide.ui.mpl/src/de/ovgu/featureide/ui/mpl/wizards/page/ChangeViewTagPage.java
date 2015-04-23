@@ -28,8 +28,9 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+import de.ovgu.featureide.fm.ui.wizards.AbstractWizardPage;
+import de.ovgu.featureide.fm.ui.wizards.WizardConstants;
 import de.ovgu.featureide.ui.mpl.wizards.ChangeViewTagWizard;
-import de.ovgu.featureide.ui.mpl.wizards.WizardConstants;
 
 /**
  * A dialog page for the {@link ChangeViewTagWizard}.

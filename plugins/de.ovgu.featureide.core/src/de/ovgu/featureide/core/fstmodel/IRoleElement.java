@@ -22,7 +22,7 @@ package de.ovgu.featureide.core.fstmodel;
 
 
 /**
- * TODO description
+ * Interface for the {@link RoleElement} class.
  * 
  * @author Andy Kenner
  */
@@ -35,7 +35,15 @@ public interface IRoleElement {
 	FSTRole getRole();
 	
 	String getFullName();
+	
+	String getName();
+	
+	String getFullIdentifier();
 
 	void setRole(FSTRole role);
+	
+	IRoleElement getParent();
+	
+	void setParent(IRoleElement parent);
 
 }

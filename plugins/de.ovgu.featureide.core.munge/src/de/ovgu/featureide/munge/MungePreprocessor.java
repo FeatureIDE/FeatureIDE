@@ -46,10 +46,13 @@ import org.sonatype.plugins.munge.Munge;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
+import de.ovgu.featureide.core.builder.IComposerObject;
 import de.ovgu.featureide.core.builder.preprocessor.PPComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
+import de.ovgu.featureide.core.signature.documentation.base.ADocumentationCommentParser;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.munge.documentation.DocumentationCommentParser;
 import de.ovgu.featureide.munge.model.MungeModelBuilder;
 
 /**
@@ -73,8 +76,7 @@ public class MungePreprocessor extends PPComposerExtensionClass {
 	public static final Pattern OP_COM_PATTERN = Pattern.compile("(" + OPERATORS + ")|/\\*|\\*/");
 
 	/**
-	 * is true if actual line is in comment section (between <code>&#47;*</code>
-	 * and <code>*&#47;</code>)
+	 * is true if actual line is in comment section (between <code>&#47;*</code> and <code>*&#47;</code>)
 	 */
 	private boolean commentSection;
 
@@ -120,7 +122,7 @@ public class MungePreprocessor extends PPComposerExtensionClass {
 		if (mungeModelBuilder != null)
 			mungeModelBuilder.buildModel();
 	}
-	
+
 	@Override
 	public void postModelChanged() {
 		prepareFullBuild(null);
@@ -247,8 +249,7 @@ public class MungePreprocessor extends PPComposerExtensionClass {
 	}
 
 	/**
-	 * Checks given line if it contains expressions which are always
-	 * <code>true</code> or <code>false</code>.<br />
+	 * Checks given line if it contains expressions which are always <code>true</code> or <code>false</code>.<br />
 	 * <br />
 	 * 
 	 * Check in three steps:
@@ -474,13 +475,17 @@ public class MungePreprocessor extends PPComposerExtensionClass {
 		return IComposerExtensionClass.Mechanism.PREPROCESSOR;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionBase#supportsMigration()
-	 */
 	@Override
-	public boolean supportsMigration()
-	{
+	public boolean supportsMigration() {
 		return false;
+	}
+
+	@Override
+	public <T extends IComposerObject> T getComposerObjectInstance(Class<T> c) {
+		if (c == ADocumentationCommentParser.class) {
+			return c.cast(new DocumentationCommentParser());
+		}
+		return super.getComposerObjectInstance(c);
 	}
 
 }

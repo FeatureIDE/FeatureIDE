@@ -39,6 +39,7 @@ import org.eclipse.swt.widgets.Widget;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.fm.ui.wizards.AbstractWizardPage;
 import de.ovgu.featureide.ui.mpl.wizards.NewMultiFeatureProjectWizard;
 
 /**

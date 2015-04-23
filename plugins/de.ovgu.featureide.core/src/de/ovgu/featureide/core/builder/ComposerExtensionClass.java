@@ -396,4 +396,9 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	public IStatus isComposable() {
 		return Status.OK_STATUS;
 	}
+	
+	@Override
+	public <T extends IComposerObject> T getComposerObjectInstance(Class<T> c)  {
+		return null;
+	}
 }

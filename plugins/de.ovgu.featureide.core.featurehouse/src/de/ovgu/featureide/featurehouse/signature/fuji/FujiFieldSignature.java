@@ -21,8 +21,8 @@
 package de.ovgu.featureide.featurehouse.signature.fuji;
 
 import AST.TypeDecl;
-import de.ovgu.featureide.core.signature.abstr.AbstractClassSignature;
-import de.ovgu.featureide.core.signature.abstr.AbstractFieldSignature;
+import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
+import de.ovgu.featureide.core.signature.base.AbstractFieldSignature;
 
 /**
  * Holds the java signature of a field.

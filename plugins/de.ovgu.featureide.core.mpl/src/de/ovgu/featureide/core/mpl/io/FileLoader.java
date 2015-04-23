@@ -27,6 +27,7 @@ import de.ovgu.featureide.core.mpl.InterfaceProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
+import de.ovgu.featureide.fm.core.io.IOConstants;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 
 /**

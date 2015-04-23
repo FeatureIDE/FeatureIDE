@@ -46,8 +46,7 @@ public class FSTMethod extends RoleElement<FSTMethod> {
 	public String getContract() {
 		return contract;
 	}
-	
-	
+
 	/**
 	 * @return the contract composition technique
 	 */
@@ -67,16 +66,17 @@ public class FSTMethod extends RoleElement<FSTMethod> {
 		this(name, parameterTypes, type, modifiers, body, beginLine, endLine, "", "");
 	}
 
-	public FSTMethod(String name, LinkedList<String> parameterTypes, String type, String modifiers, String body, int beginLine,
-			int endLine, String contract) {
+	public FSTMethod(String name, LinkedList<String> parameterTypes, String type, String modifiers, String body, int beginLine, int endLine, String contract) {
 		this(name, parameterTypes, type, modifiers, body, beginLine, endLine, contract, "");
 	}
 
-	public FSTMethod(String name, LinkedList<String> parameterTypes, String type, String modifiers, String body, int beginLine, int endLine, String contract, String compKey) {
+	public FSTMethod(String name, LinkedList<String> parameterTypes, String type, String modifiers, String body, int beginLine, int endLine, String contract,
+			String compKey) {
 		this(name, parameterTypes, type, modifiers, body, beginLine, endLine, contract, "", -1);
 	}
-	
-	public FSTMethod(String name, LinkedList<String> parameterTypes, String type, String modifiers, String body, int beginLine, int endLine, String contract, String compKey, int startLineOfContract) {
+
+	public FSTMethod(String name, LinkedList<String> parameterTypes, String type, String modifiers, String body, int beginLine, int endLine, String contract,
+			String compKey, int startLineOfContract) {
 		super(name, type, modifiers, body, beginLine, endLine);
 		this.parameterTypes = parameterTypes;
 		this.contract = contract;
@@ -129,7 +129,7 @@ public class FSTMethod extends RoleElement<FSTMethod> {
 	public void setRole(FSTRole parent) {
 		super.setRole(parent);
 		if (this.hasContract())
-		this.getRole().getFeature().setMethodContracts(true);
+			this.getRole().getFeature().setMethodContracts(true);
 	}
 
 	/**
@@ -157,8 +157,7 @@ public class FSTMethod extends RoleElement<FSTMethod> {
 				continue;
 			}
 			for (FSTMethod method : role.getClassFragment().getMethods()) {
-				if (method.getName().equals(getName()) && method.getParameter().equals(getParameter()) 
-						&& method.hasContract()) {
+				if (method.getName().equals(getName()) && method.getParameter().equals(getParameter()) && method.hasContract()) {
 					return true;
 				}
 			}
@@ -167,3 +166,4 @@ public class FSTMethod extends RoleElement<FSTMethod> {
 	}
 
 }
+

@@ -20,9 +20,10 @@
  */
 package de.ovgu.featureide.ui.mpl.wizards;
 
+import de.ovgu.featureide.fm.ui.wizards.AbstractWizard;
+import de.ovgu.featureide.fm.ui.wizards.ChooseFolderPage;
 import de.ovgu.featureide.ui.mpl.MPLUIPlugin;
 import de.ovgu.featureide.ui.mpl.handlers.interfaces.BuildExtendedModulesHandler;
-import de.ovgu.featureide.ui.mpl.wizards.page.ChooseFolderPage;
 
 /**
  * Wizard for the {@link BuildExtendedModulesHandler}.

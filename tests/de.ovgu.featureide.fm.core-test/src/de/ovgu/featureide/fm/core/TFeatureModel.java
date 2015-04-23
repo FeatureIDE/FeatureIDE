@@ -32,20 +32,18 @@ import org.junit.Test;
 public class TFeatureModel {
 
 	@Test
-    public void testGetFeatureName(){
+    public void recordGetFeatureName(){
         FeatureModel fm = new FeatureModel();
         Feature feature = new Feature(fm, "test_root");
         fm.addFeature(feature);
         fm.setRoot(feature);
         Feature root = fm.getFeature("test_root");
         assertSame(root, fm.getRoot());
-
+        
         FeatureModel clonedModel = fm.clone();
         Feature root2 = clonedModel.getFeature("test_root");
         
-//        assertNotSame(root2, root);
-//        assertEquals(root2, clonedModel.getRoot());
-        
         assertSame(root2, clonedModel.getRoot());
 	}
+	
 }

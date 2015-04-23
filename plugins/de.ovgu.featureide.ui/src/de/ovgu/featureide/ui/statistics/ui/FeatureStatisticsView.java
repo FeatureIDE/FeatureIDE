@@ -37,7 +37,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartListener;
-import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.ide.ResourceUtil;
 import org.eclipse.ui.part.ViewPart;
@@ -61,16 +60,17 @@ import de.ovgu.featureide.ui.statistics.ui.helper.TreeLabelProvider;
 public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 	private TreeViewer viewer;
 	private ContentProvider contentProvider;
-	private IWorkbenchPart currentEditor;
-	
+	private IEditorPart currentEditor;
+	private IResource currentInput;
+
 	public static final String ID = UIPlugin.PLUGIN_ID + ".statistics.ui.FeatureStatisticsView";
-	
+
 	public static final Image EXPORT_IMG = FMUIPlugin.getImage("export_wiz.gif");
 	public static final Image REFRESH_IMG = FMUIPlugin.getImage("refresh_tab.gif");
 
 	@Override
 	public void createPartControl(Composite parent) {
-		
+
 		viewer = new TreeViewer(parent);
 		contentProvider = new ContentProvider(viewer);
 		viewer.setContentProvider(contentProvider);
@@ -78,83 +78,93 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 		viewer.setInput(viewer);
 		viewer.addDoubleClickListener(new TreeClickListener(viewer));
 		ColumnViewerToolTipSupport.enableFor(viewer);
-		
+
 		getSite().getPage().addPartListener(editorListener);
-		IWorkbenchPage page = getSite().getPage();
-		setEditor(page.getActiveEditor());
-		
+		setEditor(getSite().getPage().getActiveEditor());
+		currentInput = (currentEditor == null) ? null : ResourceUtil.getResource((currentEditor.getEditorInput()));
 		
 		addButtons();
 	}
 
-	/**
-	 * 
-	 */
 	private void addButtons() {
+
+		IToolBarManager toolBarManager = getViewSite().getActionBars().getToolBarManager();
+
 		Action checkBoxer = new Action() {
 			public void run() {
 				CheckBoxTreeViewDialog dial = new CheckBoxTreeViewDialog(viewer.getControl().getShell(), contentProvider.godfather, viewer);
 				dial.open();
 			}
 		};
-		
-		IToolBarManager toolBarManager = getViewSite().getActionBars().getToolBarManager();
+
+		Action refresher = new Action() {
+			public void run() {
+				FeatureStatisticsView.this.refresh(true);
+			}
+		};
+
+		toolBarManager.add(refresher);
+		refresher.setImageDescriptor(ImageDescriptor.createFromImage(REFRESH_IMG));
+		refresher.setToolTipText("Refresh View");
+
 		toolBarManager.add(checkBoxer);
 		checkBoxer.setImageDescriptor(ImageDescriptor.createFromImage(EXPORT_IMG));
 		checkBoxer.setToolTipText("Export to *.csv");
 	}
-	
+
 	private IPartListener editorListener = new IPartListener() {
-		
-		public void partOpened(IWorkbenchPart part) {}
-		
-		public void partDeactivated(IWorkbenchPart part) {}
-		
+
+		public void partOpened(IWorkbenchPart part) {
+		}
+
+		public void partDeactivated(IWorkbenchPart part) {
+		}
+
 		public void partClosed(IWorkbenchPart part) {
 			if (part == currentEditor) {
 				setEditor(null);
 			}
 		}
-		
+
 		public void partBroughtToTop(IWorkbenchPart part) {
 			if (part instanceof IEditorPart)
-				setEditor(part);
+				setEditor((IEditorPart) part);
 		}
-		
+
 		public void partActivated(IWorkbenchPart part) {
 			if (part instanceof IEditorPart) {
 				ResourceUtil.getResource(((IEditorPart) part).getEditorInput());
-				setEditor(part);
+				setEditor((IEditorPart) part);
 			}
 		}
 	};
-	
+
 	@Override
 	public void setFocus() {
 		viewer.getControl().setFocus();
 	}
-	
+
 	/**
 	 * Listener that refreshes the view every time the model has been edited.
 	 */
 	private PropertyChangeListener modelListener = new PropertyChangeListener() {
 		public void propertyChange(PropertyChangeEvent evt) {
 			if (!PropertyConstants.MODEL_LAYOUT_CHANGED.equals(evt.getPropertyName()))
-				refresh();
+				refresh(false);
 		}
-		
+
 	};
-	
+
 	private Job job = null;
-	
+
 	/**
 	 * Refresh the view.
 	 */
-	private void refresh() {
+	private void refresh(final boolean button) {
 		if (contentProvider.isCanceled()) {
 			return;
 		}
-		
+
 		/*
 		 * This job waits for the calculation job to finish and starts
 		 * immediately a new one
@@ -174,7 +184,7 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 				} catch (InterruptedException e) {
 					FMUIPlugin.getDefault().logError(e);
 				}
-				
+
 				job = new Job("Updating FeatureStatisticsView") {
 					@Override
 					protected IStatus run(IProgressMonitor monitor) {
@@ -182,7 +192,14 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 							contentProvider.defaultContent();
 						} else {
 							IResource anyFile = ResourceUtil.getResource(((IEditorPart) currentEditor).getEditorInput());
-							contentProvider.calculateContent(anyFile);
+							//TODO is refresh really necessary? -> true?
+
+							if (button || currentInput == null || !anyFile.getProject().equals(currentInput.getProject())) {
+								contentProvider.calculateContent(anyFile, true);
+								currentInput = anyFile;
+							} else {
+								contentProvider.calculateContent(anyFile, false);
+							}
 						}
 						return Status.OK_STATUS;
 					}
@@ -196,37 +213,37 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 		waiter.schedule();
 		cancelJobs();
 	}
-	
+
 	private void cancelJobs() {
 		JobDoneListener jobListener = JobDoneListener.getInstance();
 		if (jobListener != null) {
 			jobListener.cancelAllRunningTreeJobs();
 		}
 	}
-	
+
 	public TreeViewer getViewer() {
 		return viewer;
 	}
-	
+
 	/**
 	 * Watches changes in the feature model if the selected editor is an
 	 * instance of @{link FeatureModelEditor}
 	 */
-	private void setEditor(IWorkbenchPart activeEditor) {
+	private void setEditor(IEditorPart activeEditor) {
 		if (currentEditor != null) {
 			if (currentEditor == activeEditor) {
 				return;
 			}
-			
+
 			if (currentEditor instanceof FeatureModelEditor) {
 				((FeatureModelEditor) currentEditor).getFeatureModel().removeListener(modelListener);
 			}
 		}
-		
+
 		currentEditor = activeEditor;
 		if (activeEditor instanceof FeatureModelEditor) {
 			((FeatureModelEditor) currentEditor).getFeatureModel().addListener(modelListener);
 		}
-		refresh();
+		refresh(false);
 	}
 }

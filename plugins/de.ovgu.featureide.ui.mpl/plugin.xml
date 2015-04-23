@@ -1,19 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-	<!--   <extension
-         point="org.eclipse.ui.newWizards">
-      <wizard
-            canFinishEarly="false"
-            category="de.ovgu.featureide.ui.category"
-            class="de.ovgu.featureide.ui.mpl.wizards.NewMultiFeatureProjectWizard"
-            hasPages="true"
-            icon="icons/NewFeatureProjectIcon.png"
-            id="de.ovgu.featureide.ui.mpl.wizards.MultiFeatureProjectWizard"
-            name="MultiFeatureIDE Project"
-            project="true">
-      </wizard>
-   </extension> -->
 	<extension
 			point="org.eclipse.ui.decorators">
 		<decorator
@@ -352,92 +339,6 @@
 					</visibleWhen>
 				</command>
 			</menu>
-			<menu
-					icon="icons/FeatureIconSmall.ico"
-					id="de.ovgu.featureide.ui.mpl.javadoc.subMenu"
-					label="Documentation">
-				<visibleWhen
-						checkEnabled="false">
-					<with
-							variable="activeMenuSelection">
-						<iterate
-								ifEmpty="false"
-								operator="or">
-							<test
-									args="de.ovgu.featureide.composer.featurehouse"
-									property="de.ovgu.featureide.fm.ui.properties.composer">
-							</test>
-						</iterate>
-					</with>
-				</visibleWhen>
-				<command
-						commandId="de.ovgu.featureide.ui.mpl.commands.javadoc.product"
-						id="de.ovgu.featureide.ui.mpl.actions.javadoc.product"
-						label="Create Product Documentation (Javadoc)"
-						style="push">
-					<visibleWhen
-							checkEnabled="false">
-						<reference
-								definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
-						</reference>
-					</visibleWhen>
-				</command>
-				<command
-						commandId="de.ovgu.featureide.ui.mpl.commands.javadoc.feature"
-						id="de.ovgu.featureide.ui.mpl.actions.javadoc.feature"
-						label="Create Feature Documentation (Javadoc)"
-						style="push">
-					<visibleWhen
-							checkEnabled="false">
-						<reference
-								definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
-						</reference>
-					</visibleWhen>
-				</command>
-				<command
-						commandId="de.ovgu.featureide.ui.mpl.commands.javadoc.meta"
-						id="de.ovgu.featureide.ui.mpl.actions.javadoc.meta"
-						label="Create Meta Documentation (Javadoc)"
-						style="push">
-					<visibleWhen
-							checkEnabled="false">
-						<reference
-								definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
-						</reference>
-					</visibleWhen>
-				</command>
-				<command
-						commandId="de.ovgu.featureide.ui.mpl.commands.javadoc.context"
-						id="de.ovgu.featureide.ui.mpl.actions.javadoc.context"
-						label="Create Context Documentation (Javadoc)"
-						style="push">
-					<visibleWhen
-							checkEnabled="false">
-						<reference
-								definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
-						</reference>
-					</visibleWhen>
-				</command>
-				<command
-						commandId="de.ovgu.featureide.ui.mpl.commands.javadoc.statistic"
-						id="de.ovgu.featureide.ui.mpl.actions.javadoc.statistic"
-						label="Create Documentation Statistics"
-						style="push">
-					<visibleWhen
-							checkEnabled="false">
-						<and>
-							<reference
-									definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
-							</reference>
-							<test
-									args="de.ovgu.featureide.core.mpl.MPLExperimentalNature"
-									property="de.ovgu.featureide.fm.ui.properties.nature"
-									value="true">
-							</test>
-						</and>
-					</visibleWhen>
-				</command>
-			</menu>
 		</menuContribution>
 		<menuContribution
 				allPopups="false"
@@ -510,26 +411,6 @@
 				name="Set current project mapping">
 		</command>
 		<command
-				id="de.ovgu.featureide.ui.mpl.commands.javadoc.context"
-				name="Create context documentation (Javadoc)">
-		</command>
-		<command
-				id="de.ovgu.featureide.ui.mpl.commands.javadoc.feature"
-				name="Create feature documentation (Javadoc)">
-		</command>
-		<command
-				id="de.ovgu.featureide.ui.mpl.commands.javadoc.meta"
-				name="Create meta documentation (Javadoc)">
-		</command>
-		<command
-				id="de.ovgu.featureide.ui.mpl.commands.javadoc.product"
-				name="Create product documentation (Javadoc)">
-		</command>
-		<command
-				id="de.ovgu.featureide.ui.mpl.commands.javadoc.statistic"
-				name="Create documentation statistics">
-		</command>
-		<command
 				id="de.ovgu.featureide.ui.mpl.commands.statistics"
 				name="Print MPL Statistics">
 		</command>
@@ -547,26 +428,6 @@
 		<handler
 				class="de.ovgu.featureide.ui.mpl.handlers.SetMappingHandler"
 				commandId="de.ovgu.featureide.ui.mpl.commands.mapping">
-		</handler>
-		<handler
-				class="de.ovgu.featureide.ui.mpl.handlers.documentation.BuildDocContextHandler"
-				commandId="de.ovgu.featureide.ui.mpl.commands.javadoc.context">
-		</handler>
-		<handler
-				class="de.ovgu.featureide.ui.mpl.handlers.documentation.BuildDocModuleHandler"
-				commandId="de.ovgu.featureide.ui.mpl.commands.javadoc.feature">
-		</handler>
-		<handler
-				class="de.ovgu.featureide.ui.mpl.handlers.documentation.BuildDocSPLHandler"
-				commandId="de.ovgu.featureide.ui.mpl.commands.javadoc.meta">
-		</handler>
-		<handler
-				class="de.ovgu.featureide.ui.mpl.handlers.documentation.BuildDocVariantHandler"
-				commandId="de.ovgu.featureide.ui.mpl.commands.javadoc.product">
-		</handler>
-		<handler
-				class="de.ovgu.featureide.ui.mpl.handlers.documentation.BuildDocStatisticsHandler"
-				commandId="de.ovgu.featureide.ui.mpl.commands.javadoc.statistic">
 		</handler>
 		<handler
 				class="de.ovgu.featureide.ui.mpl.handlers.statistics.PrintAllStatisticsHandler"

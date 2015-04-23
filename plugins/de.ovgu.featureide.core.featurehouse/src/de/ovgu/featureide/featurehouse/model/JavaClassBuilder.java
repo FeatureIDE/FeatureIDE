@@ -25,6 +25,7 @@ import java.util.LinkedList;
 import de.ovgu.cide.fstgen.ast.FSTNode;
 import de.ovgu.cide.fstgen.ast.FSTNonTerminal;
 import de.ovgu.cide.fstgen.ast.FSTTerminal;
+import de.ovgu.featureide.core.fstmodel.FSTClassFragment;
 import de.ovgu.featureide.core.fstmodel.FSTInvariant;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.IRoleElement;
@@ -275,8 +276,10 @@ public class JavaClassBuilder extends ClassBuilder {
 	@Override
 	public void caseClassDeclarationType(FSTTerminal terminal) {
 		if (modelBuilder.hasCurrentClassFragment()) {
-			String body = terminal.getBody().replaceAll("\\W", "");
-			modelBuilder.getCurrentClassFragment().setType(body);
+			final String body = terminal.getBody().replaceAll("\\W", "");
+			final FSTClassFragment currentClassFragment = modelBuilder.getCurrentClassFragment();
+			currentClassFragment.setType(body);
+			currentClassFragment.setLine(terminal.beginLine);
 		}
 	}
 
@@ -317,7 +320,7 @@ public class JavaClassBuilder extends ClassBuilder {
 	}
 
 	@Override
-	public void caseJMLInvariant(FSTTerminal terminal) {
+	public void caseInvariant(FSTTerminal terminal) {
 		FSTInvariant invariant = new FSTInvariant(terminal.getName(), terminal.getBody(), terminal.beginLine, terminal.endLine);
 		if (!modelBuilder.getCurrentClassFragment().add(invariant)) {
 			FeatureHouseCorePlugin.getDefault().logError("Invariant " + invariant.getBody() + "was not added to FSTModel.", null);

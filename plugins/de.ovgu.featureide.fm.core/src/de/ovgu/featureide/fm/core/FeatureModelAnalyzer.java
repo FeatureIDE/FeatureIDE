@@ -26,6 +26,7 @@ import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -55,12 +56,13 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
  * @author Stefan Krueger
  */
 public class FeatureModelAnalyzer {
-	
+
 	private static final String TRUE = "True";
 
 	private static final String FALSE = "False";
 
-	private final Collection<Feature> cachedDeadFeatures = new LinkedList<Feature>();
+	private final List<Feature> cachedDeadFeatures = new ArrayList<Feature>();
+	private final List<Feature> cachedCoreFeatures = new ArrayList<Feature>();
 	
 	private final Collection<Feature> chachedFalseOptionalFeatures = new LinkedList<Feature>();
 	
@@ -379,79 +381,90 @@ public class FeatureModelAnalyzer {
 	 *            a list of feature names for which
 	 * @return a list of features that is common to all variants
 	 */
-	public Collection<String> commonFeatures(long timeout,
-			Object... selectedFeatures) {
+	public Collection<String> commonFeatures(long timeout, Object... selectedFeatures) {
 		Node formula = NodeCreator.createNodes(fm);
-		if (selectedFeatures.length > 0)
+		if (selectedFeatures.length > 0) {
 			formula = new And(formula, new Or(selectedFeatures));
-		SatSolver solver = new SatSolver(formula, timeout);
-		Collection<String> common = new LinkedList<String>();
-		for (Literal literal : solver.knownValues())
-			if (literal.positive)
-				common.add(literal.var.toString());
+		}
+		final Collection<String> common = new ArrayList<>();
+		final SatSolver solver = new SatSolver(formula, timeout);
+		for (Literal literal : solver.knownValues(SatSolver.ValueType.TRUE)) {
+			common.add(literal.var.toString());
+		}
 		return common;
-	}
-
-	public Collection<Feature> getDeadFeatures() {
-		return getDeadFeatures(1000);	
 	}
 
 	/**
 	 * Adds the propNode to the solver to calculate dead features.
 	 */
-	public Collection<Feature> getDeadFeatures(SatSolver solver, Node propNode) {
+	public List<Feature> getDeadFeatures(SatSolver solver, Node propNode) {
 		solver.addClauses(propNode.clone().toCNF());
-		Collection<Feature> deadFeatures = new LinkedList<Feature>();
-		for (Literal e : solver.knownValues()) {
-			String var = e.var.toString();
-			if (!e.positive && !FALSE.equals(var) && !TRUE.equals(var)) {
-				Feature feature = fm.getFeature(var);
+		cachedDeadFeatures.clear();
+		
+		for (Literal e : solver.knownValues(SatSolver.ValueType.FALSE)) {
+			final String var = e.var.toString();
+			if (!FALSE.equals(var) && !TRUE.equals(var)) {
+				final Feature feature = fm.getFeature(var);
 				if (feature != null) {
-					deadFeatures.add(feature);
+					cachedDeadFeatures.add(feature);
 				}
 			}
 		}
-		cachedDeadFeatures.clear();
-		cachedDeadFeatures.addAll(deadFeatures);
-		return deadFeatures;
+		return cachedDeadFeatures;
 	}
 	
-	public Collection<Feature> getDeadFeatures(int timeout) {
-		// cloning the FM, because otherwise the resulting formula is wrong if
-		// renamed features are involved
-		// TODO: Check other calls of createNodes
-		Node root = NodeCreator.createNodes(fm.clone());
-		Collection<Feature> deadFeatures = new LinkedList<Feature>();
-		for (Literal e : new SatSolver(root, timeout).knownValues()) {
-			String var = e.var.toString();
-			if (!e.positive && !FALSE.equals(var) && !TRUE.equals(var)) {
-				Feature feature = fm.getFeature(var);
-				if (feature != null) {
-					deadFeatures.add(feature);
-				}
-			}
-		}
-		cachedDeadFeatures.clear();
-		cachedDeadFeatures.addAll(deadFeatures);
-		return deadFeatures;
+	public List<Feature> getCoreFeatures() {
+		return getCoreFeatures(1000);	
 	}
 	
-	public Collection<Feature> getCoreFeatures() {
-		// cloning the FM, because otherwise the resulting formula is wrong if
-		// renamed features are involved
-		// TODO: Check other calls of createNodes
-		Node root = NodeCreator.createNodes(fm.clone());
-		Collection<Feature> coreFeatures = new LinkedList<Feature>();
-		for (Literal e : new SatSolver(root, 1000).knownValues()) {
-			String var = e.var.toString();
-			if (e.positive && !FALSE.equals(var) && !TRUE.equals(var)) {
-				Feature feature = fm.getFeature(var);
+	public List<Feature> getDeadFeatures() {
+		return getDeadFeatures(1000);	
+	}
+
+	public List<List<Feature>> analyzeFeatures() {
+		return analyzeFeatures(1000);
+	}
+	
+	public List<Feature> getCoreFeatures(long timeout, Object... selectedFeatures) {
+		return analyzeFeatures(timeout, SatSolver.ValueType.TRUE, selectedFeatures).get(0);
+	}
+	
+	public List<Feature> getDeadFeatures(long timeout, Object... selectedFeatures) {
+		return analyzeFeatures(timeout, SatSolver.ValueType.FALSE, selectedFeatures).get(1);
+	}
+
+	public List<List<Feature>> analyzeFeatures(long timeout, Object... selectedFeatures) {
+		return analyzeFeatures(timeout, SatSolver.ValueType.ALL, selectedFeatures);
+	}
+	
+	private List<List<Feature>> analyzeFeatures(long timeout, SatSolver.ValueType vt, Object... selectedFeatures) {
+		final ArrayList<List<Feature>> result = new ArrayList<>(2);
+		result.add(cachedCoreFeatures);
+		result.add(cachedDeadFeatures);
+		
+		Node formula = NodeCreator.createNodes(fm);
+		if (selectedFeatures.length > 0) {
+			formula = new And(formula, new Or(selectedFeatures));
+		}
+		final SatSolver solver = new SatSolver(formula, timeout);
+
+		cachedCoreFeatures.clear();
+		cachedDeadFeatures.clear();
+		
+		for (Literal literal : solver.knownValues(vt)) {
+			final String var = literal.var.toString();
+			if (!FALSE.equals(var) && !TRUE.equals(var)) {
+				final Feature feature = fm.getFeature(var);
 				if (feature != null) {
-					coreFeatures.add(feature);
+					if (literal.positive) {
+						cachedCoreFeatures.add(feature);
+					} else {
+						cachedDeadFeatures.add(feature);
+					}
 				}
 			}
 		}
-		return coreFeatures;
+		return result;
 	}
 	
 	/**
@@ -694,7 +707,7 @@ public class FeatureModelAnalyzer {
 			cachedValidity = true;
 			FMCorePlugin.getDefault().logError(e);
 		}
-
+		
 		try {
 			if (canceled()) {
 				return;
@@ -703,13 +716,10 @@ public class FeatureModelAnalyzer {
 			 * here the saved dead features at the feature model are calculated and set
 			 */
 			setSubTask("Get Dead Features.");
-			cachedDeadFeatures.clear();
-			
 			for (Feature deadFeature : getDeadFeatures()) {
 				if (oldAttributes.get(deadFeature) != FeatureStatus.DEAD) {
 					changedAttributes.put(deadFeature, FeatureStatus.DEAD);
 				}
-				cachedDeadFeatures.add(deadFeature);
 				deadFeature.setFeatureStatus(FeatureStatus.DEAD, false);
 			}
 			worked(1);
@@ -914,4 +924,5 @@ public class FeatureModelAnalyzer {
 	public Collection<Feature> getCachedDeadFeatures() {
 		return cachedDeadFeatures;
 	}
+
 }

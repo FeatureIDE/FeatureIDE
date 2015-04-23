@@ -82,7 +82,7 @@ public class FMCorePlugin extends AbstractCorePlugin {
 	public IJob startJobs(List<IProject> projects, JobArguments arguments, boolean autostart) {
 		IJob ret;
 		switch (projects.size()) {
-		case 0: 
+		case 0:
 			return null;
 		case 1:
 			IProjectJob newJob = arguments.createJob();
@@ -104,33 +104,33 @@ public class FMCorePlugin extends AbstractCorePlugin {
 		}
 		return ret;
 	}
-	
+
 	public void analyzeModel(IFile file) {
 		logInfo("Reading Model File...");
 		final IContainer outputDir = file.getParent();
 		if (outputDir == null || !(outputDir instanceof IFolder)) {
 			return;
 		}
-		
+
 		final int modelType = ModelIOFactory.getTypeByFileName(file.getName());
 		if (modelType == ModelIOFactory.TYPE_UNKNOWN) {
 			return;
 		}
 		final FeatureModel fm = ModelIOFactory.getNewFeatureModel(modelType);
 		final AbstractFeatureModelReader reader = ModelIOFactory.getModelReader(fm, modelType);
-		
+
 		try {
 			reader.readFromFile(file.getLocation().toFile());
 			FeatureModelAnalyzer fma = new FeatureModelAnalyzer(fm);
 			fma.analyzeFeatureModel(null);
-			
+
 			final StringBuilder sb = new StringBuilder();
 			sb.append("Number Features: ");
 			sb.append(fm.getNumberOfFeatures());
 			sb.append(" (");
 			sb.append(fma.countConcreteFeatures());
 			sb.append(")\n");
-			
+
 			if (fm instanceof ExtendedFeatureModel) {
 				ExtendedFeatureModel extFeatureModel = (ExtendedFeatureModel) fm;
 				int countInherited = 0;
@@ -153,7 +153,9 @@ public class FMCorePlugin extends AbstractCorePlugin {
 				sb.append("\n");
 			}
 
-			Collection<Feature> analyzedFeatures = fma.getCoreFeatures();
+			final List<List<Feature>> unnomralFeature = fma.analyzeFeatures();
+
+			Collection<Feature> analyzedFeatures = unnomralFeature.get(0);
 			sb.append("Core Features (");
 			sb.append(analyzedFeatures.size());
 			sb.append("): ");
@@ -161,7 +163,7 @@ public class FMCorePlugin extends AbstractCorePlugin {
 				sb.append(coreFeature.getName());
 				sb.append(", ");
 			}
-			analyzedFeatures = fma.getDeadFeatures();
+			analyzedFeatures = unnomralFeature.get(1);
 			sb.append("\nDead Features (");
 			sb.append(analyzedFeatures.size());
 			sb.append("): ");
@@ -180,8 +182,7 @@ public class FMCorePlugin extends AbstractCorePlugin {
 			sb.append("\n");
 
 			final IFile outputFile = ((IFolder) outputDir).getFile(file.getName() + "_output.txt");
-			final InputStream inputStream = new ByteArrayInputStream(
-					sb.toString().getBytes(Charset.defaultCharset()));
+			final InputStream inputStream = new ByteArrayInputStream(sb.toString().getBytes(Charset.defaultCharset()));
 			if (outputFile.isAccessible()) {
 				outputFile.setContents(inputStream, false, true, null);
 			} else {

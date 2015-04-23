@@ -46,13 +46,12 @@ import org.eclipse.swt.widgets.Text;
 public class NewFeatureModelWizardPage extends WizardPage {
 	
 	@CheckForNull
-	private IProject project;
-
+	private final IProject project;
 	Text fileName;
 
-	public NewFeatureModelWizardPage(String project, IProject res) {
+	public NewFeatureModelWizardPage(String project, IProject projectRes) {
 		super(project);
-		this.project = res;
+		this.project = projectRes;
 		setDescription("Create a new feature model file.");
 	}
 
@@ -130,10 +129,12 @@ public class NewFeatureModelWizardPage extends WizardPage {
 	private String openFileDialog() {
 		FileDialog dialog = new FileDialog(getShell(), SWT.MULTI);
 		dialog.setText("New Feature Model");
-		dialog.setFileName("model.xml");
 		dialog.setFilterExtensions(new String [] {"*.xml"});
 		dialog.setFilterNames(new String[]{ "XML *.xml"});
-		dialog.setFilterPath(fileName.getText());
+		dialog.setFileName("model.xml");
+		if (project != null) {
+			dialog.setFilterPath(project.getLocation().toOSString());
+		}
 		
 		return dialog.open();
 	}

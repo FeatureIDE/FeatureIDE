@@ -71,6 +71,7 @@ import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.ModelIOFactory;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.job.IJob;
+import de.ovgu.featureide.fm.core.job.WorkMonitor;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -353,6 +354,10 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	private void setConfiguration() {
 		readFeatureModel();
 		configuration = new Configuration(configuration, featureModel);
+		configuration.getPropagator().update(false, null, new WorkMonitor());
+		if (!isDirty()) {
+			doSave(null);
+		}
 	}
 
 	/**

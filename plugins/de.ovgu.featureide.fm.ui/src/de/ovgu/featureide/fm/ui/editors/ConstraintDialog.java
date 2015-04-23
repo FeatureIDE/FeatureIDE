@@ -354,7 +354,7 @@ public class ConstraintDialog implements GUIDefaults {
 
 		static final String CHECKING_CONSTRAINTS = "Checking constraint...";
 
-		static final String CONSTRAINT_CONTAINS_SYNTAX_ERRORS = "Your input constains syntax error.";
+		static final String CONSTRAINT_CONTAINS_SYNTAX_ERRORS = "Your input constains syntax errors.";
 
 		static final String CONSTRAINT_CONTAINS_UNKNOWN_FEATURE = "Constraint contains one unknown feature name.";
 
@@ -903,7 +903,18 @@ public class ConstraintDialog implements GUIDefaults {
 			@Override
 			public void handleEvent(Event event) {
 				TableItem[] selectedItem = featureTable.getSelection();
-				final String featureName = selectedItem[0].getText().contains(" ")? "\"" + selectedItem[0].getText() + "\"" : selectedItem[0].getText();
+				String featureName = selectedItem[0].getText();
+				if (featureName.matches(".*\\s.*")) {
+					featureName = "\"" + featureName + "\"";
+				} else {
+					for (String op : Operator.NAMES) {
+						if (featureName.equals(op.toLowerCase())) {
+							featureName = "\"" + featureName + "\"";
+							break;
+						}
+					}
+				}
+				
 				constraintText.copyIn(featureName);
 			}
 		});

@@ -43,11 +43,14 @@ import org.prop4j.Not;
 
 import antenna.preprocessor.v3.PPException;
 import antenna.preprocessor.v3.Preprocessor;
+import de.ovgu.featureide.antenna.documentation.DocumentationCommentParser;
 import de.ovgu.featureide.antenna.model.AntennaModelBuilder;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
+import de.ovgu.featureide.core.builder.IComposerObject;
 import de.ovgu.featureide.core.builder.preprocessor.PPComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
+import de.ovgu.featureide.core.signature.documentation.base.ADocumentationCommentParser;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
@@ -65,10 +68,10 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	private Preprocessor preprocessor;
 
 	private AntennaModelBuilder antennaModelBuilder;
-	
+
 	/** pattern for replacing preprocessor commands like "//#if" */
 	static final Pattern replaceCommandPattern = Pattern.compile("//#(.+?)\\s");
-	
+
 	public AntennaPreprocessor() {
 		super("Antenna");
 		nodereader.setIgnoreMissingFeatures(true);
@@ -78,8 +81,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	public boolean initialize(IFeatureProject project) {
 		super.initialize(project);
 		antennaModelBuilder = new AntennaModelBuilder(project);
-		preprocessor = new Preprocessor(new AntennaLogger(),
-				new AntennaLineFilter());
+		preprocessor = new Preprocessor(new AntennaLogger(), new AntennaLineFilter());
 
 		String projectSourcePath = project.getProjectSourcePath();
 		if (projectSourcePath == null || projectSourcePath.isEmpty()) {
@@ -89,13 +91,13 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 		return true;
 	}
 
-	private static final LinkedHashSet<String> EXTENSIONS = createExtensions(); 
-	
+	private static final LinkedHashSet<String> EXTENSIONS = createExtensions();
+
 	private static LinkedHashSet<String> createExtensions() {
 		LinkedHashSet<String> extensions = new LinkedHashSet<String>();
 		extensions.add("java");
 		return extensions;
-	}  
+	}
 
 	@Override
 	public LinkedHashSet<String> extensions() {
@@ -113,8 +115,8 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 			featureList.append(feature + ",");
 		}
 		int length = featureList.length();
-		if(length>0) {
-			featureList.deleteCharAt(length-1);
+		if (length > 0) {
+			featureList.deleteCharAt(length - 1);
 		}
 
 		// add source files
@@ -133,18 +135,18 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 			antennaModelBuilder.buildModel();
 		}
 	}
-	
+
 	@Override
 	public void postCompile(IResourceDelta delta, IFile buildFile) {
 	}
-	
+
 	@Override
 	public void postModelChanged() {
-			deleteAllPreprocessorAnotationMarkers();
-			prepareFullBuild(null);
-			startPreprocessingSourceFiles(featureProject.getBuildFolder(), false);
+		deleteAllPreprocessorAnotationMarkers();
+		prepareFullBuild(null);
+		startPreprocessingSourceFiles(featureProject.getBuildFolder(), false);
 	}
-	
+
 	private void startPreprocessingSourceFiles(IFolder sourceFolder, boolean performFullBuild) {
 		try {
 			preprocessSourceFiles(sourceFolder, performFullBuild);
@@ -157,6 +159,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 			AntennaCorePlugin.getDefault().logError(e);
 		}
 	}
+
 	/**
 	 * preprocess all files in folder
 	 * 
@@ -165,8 +168,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
-	private void preprocessSourceFiles(IFolder sourceFolder, boolean performFullBuild) throws CoreException,
-			FileNotFoundException, IOException {
+	private void preprocessSourceFiles(IFolder sourceFolder, boolean performFullBuild) throws CoreException, FileNotFoundException, IOException {
 		for (final IResource res : sourceFolder.members()) {
 			if (res instanceof IFolder) {
 				// for folders do recursively 
@@ -176,13 +178,13 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 				if (performFullBuild) {
 					featureProject.deleteBuilderMarkers(res, 0);
 				}
-				
+
 				// get all lines from file
 				final Vector<String> lines = loadStringsFromFile((IFile) res);
-				
+
 				// do checking and some stuff
 				processLinesOfFile(lines, (IFile) res);
-				
+
 				if (!performFullBuild) {
 					continue;
 				}
@@ -191,14 +193,9 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 
 				try {
 					// run antenna preprocessor
-					changed = preprocessor.preprocess(lines,
-							((IFile) res).getCharset());
+					changed = preprocessor.preprocess(lines, ((IFile) res).getCharset());
 				} catch (PPException e) {
-					featureProject.createBuilderMarker(
-							res,
-							e.getMessage().replace(
-									"Line #" + e.getLineNumber() + " :",
-									"Antenna:"), e.getLineNumber() + 1,
+					featureProject.createBuilderMarker(res, e.getMessage().replace("Line #" + e.getLineNumber() + " :", "Antenna:"), e.getLineNumber() + 1,
 							IMarker.SEVERITY_ERROR);
 					AntennaCorePlugin.getDefault().logError(e);
 				}
@@ -207,10 +204,8 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 				if (changed) {
 					FileOutputStream ostr = null;
 					try {
-						ostr = new FileOutputStream(res
-								.getRawLocation().toOSString());
-						Preprocessor.saveStrings(lines, ostr,
-								((IFile) res).getCharset());
+						ostr = new FileOutputStream(res.getRawLocation().toOSString());
+						Preprocessor.saveStrings(lines, ostr, ((IFile) res).getCharset());
 					} finally {
 						if (ostr != null) {
 							ostr.close();
@@ -223,73 +218,67 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 			}
 		}
 	}
-	
+
 	/**
 	 * Do checking for all lines of file.
 	 * 
 	 * @param lines all lines of file
 	 * @param res file
 	 */
-	synchronized private void processLinesOfFile(Vector<String> lines, IFile res){
+	synchronized private void processLinesOfFile(Vector<String> lines, IFile res) {
 		expressionStack = new Stack<Node>();
-		
+
 		// count of if, ifelse and else to remove after processing of else from stack
 		ifelseCountStack = new Stack<Integer>();
-		
+
 		// go line for line
 		for (int j = 0; j < lines.size(); ++j) {
 			String line = lines.get(j);
-			
+
 			// if line is preprocessor directive
 			if (line.contains("//#")) {
-				if (line.contains("//#if ") ||
-					line.contains("//#elif ") ||
-					line.contains("//#condition ") ||
-					line.contains("//#ifdef ") ||
-					line.contains("//#ifndef ") ||
-					line.contains("//#elifdef ") ||
-					line.contains("//#elifndef ") ||
-					line.contains("//#else")) {
-					
+				if (line.contains("//#if ") || line.contains("//#elif ") || line.contains("//#condition ") || line.contains("//#ifdef ")
+						|| line.contains("//#ifndef ") || line.contains("//#elifdef ") || line.contains("//#elifndef ") || line.contains("//#else")) {
+
 					// if e1, elseif e2, ..., elseif en  ==  if -e1 && -e2 && ... && en
 					// if e1, elseif e2, ..., else  ==  if -e1 && -e2 && ...
 					if (line.contains("//#elif ") || line.contains("//#elifdef ") || line.contains("//#elifndef ") || line.contains("//#else")) {
-						if(!expressionStack.isEmpty()) {
+						if (!expressionStack.isEmpty()) {
 							Node lastElement = new Not(expressionStack.pop().clone());
 							expressionStack.push(lastElement);
 						}
 					} else if (line.contains("//#if ") || line.contains("//#ifdef ") || line.contains("//#ifndef ")) {
 						ifelseCountStack.push(0);
 					}
-					
+
 					if (!ifelseCountStack.empty() && !line.contains("//#else")) {
 						ifelseCountStack.push(ifelseCountStack.pop() + 1);
 					}
-					
-					setMarkersContradictionalFeatures(line, res, j+1);
-					
-					setMarkersNotConcreteFeatures(line, res, j+1);
+
+					setMarkersContradictionalFeatures(line, res, j + 1);
+
+					setMarkersNotConcreteFeatures(line, res, j + 1);
 				} else if (line.contains("//#endif")) {
 					while (!ifelseCountStack.empty()) {
 						if (ifelseCountStack.peek() == 0)
 							break;
-						
+
 						if (!expressionStack.isEmpty())
 							expressionStack.pop();
-						
+
 						ifelseCountStack.push(ifelseCountStack.pop() - 1);
 					}
-					
+
 					if (!ifelseCountStack.empty())
 						ifelseCountStack.pop();
 				}
 			}
 		}
 	}
-	
+
 	/**
-	 * Checks given line if it contains expressions which are always 
-	 * <code>true</code> or <code>false</code>.<br /><br />
+	 * Checks given line if it contains expressions which are always <code>true</code> or <code>false</code>.<br />
+	 * <br />
 	 * 
 	 * Check in three steps:
 	 * <ol>
@@ -302,26 +291,26 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	 * @param res file containing given line
 	 * @param lineNumber line number of given line
 	 */
-	private void setMarkersContradictionalFeatures(String line, IFile res, int lineNumber){
+	private void setMarkersContradictionalFeatures(String line, IFile res, int lineNumber) {
 		if (line.contains("//#else")) {
 			if (!expressionStack.isEmpty()) {
 				Node[] nestedExpressions = new Node[expressionStack.size()];
 				nestedExpressions = expressionStack.toArray(nestedExpressions);
-				
+
 				And nestedExpressionsAnd = new And(nestedExpressions);
-				
+
 				isContradictionOrTautology(nestedExpressionsAnd.clone(), true, lineNumber, res);
 			}
-			
+
 			return;
 		}
-		
+
 		boolean conditionIsSet = line.contains("//#condition ");
 		boolean negative = line.contains("//#ifndef ") || line.contains("//#elifndef ");
-		
+
 		// remove "//#if ", "//ifdef", ...
 		line = replaceCommandPattern.matcher(line).replaceAll("");
-		
+
 		// prepare expression for NodeReader()
 		line = line.trim();
 		line = line.replace("&&", "&");
@@ -330,26 +319,26 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 		line = line.replace("&", " and ");
 		line = line.replace("|", " or ");
 		line = line.replace("-", " not ");
-		
+
 		//get all features and generate Node expression for given line
 		Node ppExpression = nodereader.stringToNode(line, featureList);
-		
+
 		if (ppExpression != null) {
 			if (negative)
 				ppExpression = new Not(ppExpression.clone());
-			
+
 			if (!conditionIsSet)
 				expressionStack.push(ppExpression);
-			
+
 			doThreeStepExpressionCheck(ppExpression, lineNumber, res);
 		} else {
 			// if generating of expression failed, generate expression "true"
 			if (!conditionIsSet)
 				expressionStack.push(new Literal(NodeCreator.varTrue));
 		}
-		
+
 	}
-	
+
 	/**
 	 * Checks given line if it contains not existing or abstract features.
 	 * 
@@ -359,7 +348,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	 */
 	private void setMarkersNotConcreteFeatures(String line, IFile res, int lineNumber) {
 		String[] splitted = line.split(AntennaModelBuilder.OPERATORS, 0);
-		
+
 		for (int i = 0; i < splitted.length; ++i) {
 			final String linePart = splitted[i];
 			if (!linePart.isEmpty() && !linePart.contains("//#")) {
@@ -367,18 +356,18 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 			}
 		}
 	}
-	
+
 	@Override
 	public ArrayList<String[]> getTemplates() {
 		return TEMPLATES;
 	}
-	
+
 	private static final ArrayList<String[]> TEMPLATES = createTempltes();
-	
+
 	private static ArrayList<String[]> createTempltes() {
-		 ArrayList<String[]> list = new  ArrayList<String[]>(1);
-		 list.add(JAVA_TEMPLATE);
-		 return list;
+		ArrayList<String[]> list = new ArrayList<String[]>(1);
+		list.add(JAVA_TEMPLATE);
+		return list;
 	}
 
 	@Override
@@ -391,7 +380,6 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 		return false;
 	}
 
-	
 	@Override
 	public boolean hasFeatureFolder() {
 		return false;
@@ -399,14 +387,14 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 
 	@Override
 	public void copyNotComposedFiles(Configuration config, IFolder destination) {
-		
+
 	}
 
 	@Override
 	public void buildFSTModel() {
 		antennaModelBuilder.buildModel();
 	}
-	
+
 	@Override
 	public boolean postAddNature(IFolder source, IFolder destination) {
 		return true;
@@ -416,7 +404,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	public boolean showContextFieldsAndMethods() {
 		return false;
 	}
-	
+
 	@Override
 	public LinkedList<FSTDirective> buildModelDirectivesForFile(Vector<String> lines) {
 		return antennaModelBuilder.buildModelDirectivesForFile(lines);
@@ -429,12 +417,11 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 
 	@Override
 	public Mechanism getGenerationMechanism() {
-	    return IComposerExtensionClass.Mechanism.PREPROCESSOR;
+		return IComposerExtensionClass.Mechanism.PREPROCESSOR;
 	}
-	
+
 	@Override
-	public void buildConfiguration(IFolder folder, Configuration configuration,
-			String congurationName) {
+	public void buildConfiguration(IFolder folder, Configuration configuration, String congurationName) {
 		super.buildConfiguration(folder, configuration, congurationName);
 		try {
 			for (IResource res : featureProject.getBuildFolder().members()) {
@@ -443,7 +430,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 		} catch (CoreException e) {
 			AntennaCorePlugin.getDefault().logError(e);
 		}
-		
+
 		ArrayList<String> activatedFeatures = new ArrayList<String>();
 		for (Feature f : configuration.getSelectedFeatures()) {
 			activatedFeatures.add(f.getName());
@@ -454,14 +441,13 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 			featureList.append(feature + ",");
 		}
 		int length = featureList.length();
-		if(length>0) {
-			featureList.deleteCharAt(length-1);
+		if (length > 0) {
+			featureList.deleteCharAt(length - 1);
 		}
 		// add source files
 		try {
 			// add activated features as definitions to preprocessor
-			Preprocessor preprocessor = new Preprocessor(new AntennaLogger(),
-					new AntennaLineFilter());
+			Preprocessor preprocessor = new Preprocessor(new AntennaLogger(), new AntennaLineFilter());
 			preprocessor.addDefines(featureList.toString());
 			// preprocess for all files in source folder
 			preprocessSourceFiles(folder, preprocessor, congurationName);
@@ -469,47 +455,42 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 			AntennaCorePlugin.getDefault().logError(e);
 		}
 	}
-	
+
 	/**
 	 * Customized build for buildConfiguration().
 	 */
-	private void preprocessSourceFiles(IFolder sourceFolder, Preprocessor preprocessor, String congurationName) throws CoreException,
-		FileNotFoundException, IOException {
+	private void preprocessSourceFiles(IFolder sourceFolder, Preprocessor preprocessor, String congurationName) throws CoreException, FileNotFoundException,
+			IOException {
 		for (final IResource res : sourceFolder.members()) {
 			if (res instanceof IFolder) {
 				// for folders do recursively 
 				preprocessSourceFiles((IFolder) res, preprocessor, null);
 			} else if (res instanceof IFile) {
-				if(res.getName().equals(congurationName + getConfigurationExtension())) {
+				if (res.getName().equals(congurationName + getConfigurationExtension())) {
 					continue;
 				}
 				// get all lines from file
 				final Vector<String> lines = loadStringsFromFile((IFile) res);
-				
+
 				// do checking and some stuff
 				processLinesOfFile(lines, (IFile) res);
-				boolean changed = false;	
+				boolean changed = false;
 				try {
 					// run antenna preprocessor
 					changed = preprocessor.preprocess(lines, ((IFile) res).getCharset());
 
 				} catch (PPException e) {
-					featureProject.createBuilderMarker(
-							res,
-							e.getMessage().replace(
-									"Line #" + e.getLineNumber() + " :",
-									"Antenna:"), e.getLineNumber() + 1,
+					featureProject.createBuilderMarker(res, e.getMessage().replace("Line #" + e.getLineNumber() + " :", "Antenna:"), e.getLineNumber() + 1,
 							IMarker.SEVERITY_ERROR);
 					AntennaCorePlugin.getDefault().logError(e);
 				}
-		
+
 				// if preprocessor changed file: save & refresh
 				if (changed) {
 					FileOutputStream ostr = null;
 					try {
 						ostr = new FileOutputStream(res.getRawLocation().toOSString());
-						Preprocessor.saveStrings(lines, ostr,
-								((IFile) res).getCharset());
+						Preprocessor.saveStrings(lines, ostr, ((IFile) res).getCharset());
 					} finally {
 						if (ostr != null) {
 							ostr.close();
@@ -522,10 +503,18 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 			}
 		}
 	}
-	
+
 	@Override
 	public boolean supportsMigration() {
 		return false;
+	}
+
+	@Override
+	public <T extends IComposerObject> T getComposerObjectInstance(Class<T> c) {
+		if (c == ADocumentationCommentParser.class) {
+			return c.cast(new DocumentationCommentParser());
+		}
+		return super.getComposerObjectInstance(c);
 	}
 
 }

@@ -20,13 +20,14 @@
  */
 package de.ovgu.featureide.core.signature.filter;
 
-import de.ovgu.featureide.core.signature.abstr.AbstractMethodSignature;
-import de.ovgu.featureide.core.signature.abstr.AbstractSignature;
+import de.ovgu.featureide.core.signature.base.AbstractMethodSignature;
+import de.ovgu.featureide.core.signature.base.AbstractSignature;
 
-public class MethodFilter implements ISignatureFilter {
+public class MethodFilter implements IFilter<AbstractSignature> {
 
 	@Override
 	public boolean isValid(AbstractSignature signature) {
 		return signature instanceof AbstractMethodSignature;
 	}
+
 }

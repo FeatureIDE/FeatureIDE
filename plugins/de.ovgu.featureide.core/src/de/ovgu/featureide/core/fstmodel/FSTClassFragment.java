@@ -30,7 +30,6 @@ import javax.annotation.Nonnull;
  * 
  * @author Sebastian Krieter
  */
-
 public class FSTClassFragment extends RoleElement<FSTClassFragment> {
 	protected final TreeSet<FSTMethod> methods = new TreeSet<FSTMethod>();
 	protected final TreeSet<FSTField> fields = new TreeSet<FSTField>();
@@ -39,10 +38,9 @@ public class FSTClassFragment extends RoleElement<FSTClassFragment> {
 
 	protected String pckg = null;
 
-	protected final HashSet<String> 
-		importList = new HashSet<String>(),
-		extendList = new HashSet<String>(),
-		implementList = new HashSet<String>();
+	protected boolean innerClass = false;
+
+	protected final HashSet<String> importList = new HashSet<String>(), extendList = new HashSet<String>(), implementList = new HashSet<String>();
 
 	public FSTClassFragment(String name) {
 		super(name, null, null, "", -1, -1);
@@ -54,7 +52,7 @@ public class FSTClassFragment extends RoleElement<FSTClassFragment> {
 		fullname.append(" : " + type);
 		return fullname.toString();
 	}
-	
+
 	public String getPackage() {
 		return pckg;
 	}
@@ -83,19 +81,17 @@ public class FSTClassFragment extends RoleElement<FSTClassFragment> {
 	public TreeSet<FSTInvariant> getInvariants() {
 		return invariants;
 	}
-	
+
 	@Nonnull
 	public TreeSet<FSTMethod> getMethods() {
 		return methods;
 	}
-	
+
 	@Nonnull
 	public TreeSet<FSTClassFragment> getInnerClasses() {
 		return innerClasses;
 	}
-	
 
-	
 	public boolean add(IRoleElement element) {
 		if (element instanceof FSTMethod) {
 			if (methods.contains(element)) {
@@ -107,44 +103,55 @@ public class FSTClassFragment extends RoleElement<FSTClassFragment> {
 				return false;
 			}
 			fields.add((FSTField) element);
-		} else if(element instanceof FSTClassFragment) {
+		} else if (element instanceof FSTClassFragment) {
 			if (innerClasses.contains(element)) {
 				return false;
 			}
 			innerClasses.add((FSTClassFragment) element);
-		} else if(element instanceof FSTInvariant) {
+		} else if (element instanceof FSTInvariant) {
 			if (invariants.contains(element)) {
 				return false;
 			}
 			invariants.add((FSTInvariant) element);
-		}  else {
+		} else {
 			return false;
 		}
 		element.setRole(role);
+		element.setParent(this);
 		return true;
 	}
-	
+
 	public void addImport(String imp) {
 		importList.add(imp);
 	}
-	
+
 	public void addExtend(String extend) {
 		extendList.add(extend);
 	}
-	
+
 	public void addImplement(String implement) {
 		implementList.add(implement);
 	}
-	
+
 	public void setPackage(String pckg) {
 		this.pckg = pckg;
-	}	
-	
+	}
+
 	public void setType(String type) {
 		this.type = type;
 	}
-	
+
 	public void setModifiers(String modifiers) {
 		this.modifiers = modifiers;
 	}
+
+	public boolean isInnerClass() {
+		return innerClass;
+	}
+
+	public void setInnerClass(boolean innerClass) {
+		this.innerClass = innerClass;
+	}
+	
 }
+

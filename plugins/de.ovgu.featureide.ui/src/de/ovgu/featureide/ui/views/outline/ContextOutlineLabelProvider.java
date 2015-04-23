@@ -24,7 +24,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.content.IContentDescription;
-import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -38,6 +37,7 @@ import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.ITextEditor;
@@ -46,11 +46,12 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
-import de.ovgu.featureide.core.signature.abstr.AbstractClassFragment;
-import de.ovgu.featureide.core.signature.abstr.AbstractClassSignature;
-import de.ovgu.featureide.core.signature.abstr.AbstractFieldSignature;
-import de.ovgu.featureide.core.signature.abstr.AbstractMethodSignature;
-import de.ovgu.featureide.core.signature.abstr.AbstractSignature;
+import de.ovgu.featureide.core.signature.base.AFeatureData;
+import de.ovgu.featureide.core.signature.base.AbstractClassFragment;
+import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
+import de.ovgu.featureide.core.signature.base.AbstractFieldSignature;
+import de.ovgu.featureide.core.signature.base.AbstractMethodSignature;
+import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
@@ -117,30 +118,33 @@ public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 	public String getText(Object element) {
 		if (element instanceof AbstractClassFragment) {
 			return ((AbstractClassFragment) element).getSignature().getName();
-		} else if (element instanceof AbstractMethodSignature) {
-			AbstractMethodSignature method = (AbstractMethodSignature) element;
-			StringBuilder sb = new StringBuilder();
-			sb.append(method.getName());
-			sb.append('(');
-			for (String parameterType : method.getParameterTypes()) {
-				sb.append(parameterType);
-				sb.append(", ");
+		} else if (element instanceof AbstractSignature) {
+			if (element instanceof AbstractMethodSignature) {
+				final AbstractMethodSignature method = (AbstractMethodSignature) element;
+				final StringBuilder sb = new StringBuilder();
+				sb.append(method.getName());
+				sb.append('(');
+				for (String parameterType : method.getParameterTypes()) {
+					sb.append(parameterType);
+					sb.append(", ");
+				}
+				if (method.getParameterTypes().size() > 0) {
+					sb.delete(sb.length() - 2, sb.length());
+				}
+				sb.append(')');
+				if (!method.isConstructor()) {
+					sb.append(" : ");
+					sb.append(method.getType());
+				}
+				return sb.toString();
+			} else if (element instanceof AbstractFieldSignature) {
+				final AbstractFieldSignature field = (AbstractFieldSignature) element;
+				return field.getName() + " : " + field.getType();
+			} else if (element instanceof AbstractClassSignature) {
+				return ((AbstractClassSignature) element).getName();
 			}
-			if (method.getParameterTypes().size() > 0) {
-				sb.delete(sb.length() - 2, sb.length());
-			}
-			sb.append(')');
-			if (!method.isConstructor()) {
-				sb.append(" : ");
-				sb.append(method.getType());
-			}
-
-			return sb.toString();
-		} else if (element instanceof AbstractFieldSignature) {
-			AbstractFieldSignature field = (AbstractFieldSignature) element;
-			return field.getName() + " : " + field.getType();
-		} else if (element instanceof AbstractClassSignature) {
-			return ((AbstractClassSignature) element).getName();
+		} else if (element instanceof Feature) {
+			return ((Feature) element).getDisplayName();
 		}
 		return element.toString();
 	}
@@ -178,15 +182,14 @@ public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 	@Override
 	public void init() {
 		viewer.addSelectionChangedListener(sListner);
-		// viewer.setAutoExpandLevel(AbstractTreeViewer.ALL_LEVELS);
 	}
 
 	public static void scrollToLine(IEditorPart editorPart, int lineNumber) {
 		if (!(editorPart instanceof ITextEditor) || lineNumber <= 0) {
 			return;
 		}
-		ITextEditor editor = (ITextEditor) editorPart;
-		IDocument document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
+		final ITextEditor editor = (ITextEditor) editorPart;
+		final IDocument document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
 		if (document != null) {
 			IRegion lineInfo = null;
 			try {
@@ -207,13 +210,15 @@ public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 				if (!(viewer.getInput() instanceof IResource)) {
 					return;
 				}
-				IFeatureProject featureProject = CorePlugin.getFeatureProject((IResource) viewer.getInput());
+				final IFeatureProject featureProject = CorePlugin.getFeatureProject((IResource) viewer.getInput());
 				if (selection instanceof AbstractClassFragment) {
 					final AbstractSignature sig = ((AbstractClassFragment) selection).getSignature();
-					openEditor(sig, featureProject, sig.getFeatureData()[0].getId());
+					final AFeatureData[] featureDataArray = sig.getFeatureData();
+					openEditor(sig, featureProject, featureDataArray[0].getID());
 				} else if (selection instanceof AbstractSignature) {
 					final AbstractSignature sig = (AbstractSignature) selection;
-					openEditor(sig, featureProject, sig.getFeatureData()[0].getId());
+					final AFeatureData[] featureDataArray = sig.getFeatureData();
+					openEditor(sig, featureProject, featureDataArray[0].getID());
 				} else if (selection instanceof Feature) {
 					final ProjectSignatures signatures = featureProject.getProjectSignatures();
 					if (signatures != null) {
@@ -232,21 +237,25 @@ public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 				while (parent.getParent() != null) {
 					parent = parent.getParent();
 				}
-				IFile iFile = model.getFeature(signatures.getFeatureName(featureID)).getRole(parent.getFullName().replace('.', '/') + ".java").getFile();
+
+				final String fullName = parent.getFullName();
+				final String fileName = (fullName.startsWith(".")) ? fullName.substring(1) : fullName.replace('.', '/');
+
+				final IFile iFile = model.getFeature(signatures.getFeatureName(featureID)).getRole(fileName + ".java").getFile();
 
 				if (iFile.isAccessible()) {
-					IWorkbench workbench = PlatformUI.getWorkbench();
+					final IWorkbench workbench = PlatformUI.getWorkbench();
 					try {
-						IContentType contentType = null;
-						IContentDescription description = iFile.getContentDescription();
-						if (description != null) {
-							contentType = description.getContentType();
+						final IContentDescription description = iFile.getContentDescription();
+						final IEditorDescriptor desc = workbench.getEditorRegistry().getDefaultEditor(iFile.getName(),
+								(description != null) ? description.getContentType() : null);
+						final IWorkbenchPage activePage = workbench.getActiveWorkbenchWindow().getActivePage();
+						IEditorPart editorPart = activePage.findEditor(new FileEditorInput(iFile));
+						if (editorPart == null) {
+							editorPart = activePage.openEditor(new FileEditorInput(iFile), (desc != null) ? desc.getId() : "org.eclipse.ui.DefaultTextEditor");
 						}
-						IEditorDescriptor desc = workbench.getEditorRegistry().getDefaultEditor(iFile.getName(), contentType);
-						IEditorPart editorPart = workbench.getActiveWorkbenchWindow().getActivePage().openEditor(new FileEditorInput(iFile), (desc != null) ? desc.getId() : "org.eclipse.ui.DefaultTextEditor");
-
-						int linenumber = sig.getFeatureData()[sig.hasFeature(featureID)].getLineNumber();
-						scrollToLine(editorPart, linenumber);
+						final int dataIndex = sig.hasFeature(featureID);
+						scrollToLine(editorPart, (dataIndex > -1) ? sig.getFeatureData()[dataIndex].getStartLineNumber() : 1);
 					} catch (CoreException e) {
 						UIPlugin.getDefault().logError(e);
 					}

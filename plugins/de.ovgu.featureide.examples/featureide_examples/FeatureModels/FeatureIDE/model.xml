@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel chosenLayoutAlgorithm="1">
+		<struct>
+			<and mandatory="true" name="Eclipse">
+				<feature name="JDT"/>
+				<feature name="CDT"/>
+				<feature name="AJDT"/>
+				<and name="FeatureModeling">
+					<feature name="CIDE"/>
+					<feature name="FAMILIAR"/>
+					<or name="FeatureIDE">
+						<feature mandatory="true" name="AHEAD"/>
+						<feature mandatory="true" name="FeatureHouse"/>
+						<feature mandatory="true" name="FeatureCpp"/>
+						<feature mandatory="true" name="DeltaJ"/>
+						<feature mandatory="true" name="AspectJ"/>
+						<feature mandatory="true" name="Munge"/>
+						<feature mandatory="true" name="Antenna"/>
+						<feature mandatory="true" name="DeltaMontiArc"/>
+					</or>
+					<feature name="ExtendedFM"/>
+					<feature name="MoSoPoLiTe"/>
+				</and>
+				<feature name="DeltaJEclipsePlugin"/>
+			</and>
+		</struct>
+		<constraints>
+			<rule>
+				<imp>
+					<disj>
+						<var>AHEAD</var>
+						<disj>
+							<var>FeatureHouse</var>
+							<disj>
+								<var>Munge</var>
+								<var>Antenna</var>
+							</disj>
+						</disj>
+					</disj>
+					<var>JDT</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>FeatureCpp</var>
+					<var>CDT</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>AspectJ</var>
+					<var>AJDT</var>
+				</imp>
+			</rule>
+			<rule>
+				<imp>
+					<var>DeltaJ</var>
+					<var>DeltaJEclipsePlugin</var>
+				</imp>
+			</rule>
+		</constraints>
+		<comments/>
+		<featureOrder userDefined="false"/>
+	</featureModel>

@@ -26,5 +26,5 @@ package de.ovgu.featureide.core.fstmodel.preprocessor;
  * @author Jens Meinicke
  */
 public enum FSTDirectiveCommand {
-	IF, IF_NOT, IFDEF, IFNDEF, ELIF, ELIFDEF, ELIFNDEF, ELSE, CONDITION, DEFINE, UNDEFINE;
+	IF, IF_NOT, IFDEF, IFNDEF, ELIF, ELIFDEF, ELIFNDEF, ELSE, ELSE_NOT, CONDITION, DEFINE, UNDEFINE;
 }

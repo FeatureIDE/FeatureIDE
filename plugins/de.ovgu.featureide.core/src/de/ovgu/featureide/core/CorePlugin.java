@@ -61,6 +61,7 @@ import de.ovgu.featureide.core.builder.IComposerExtension;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.internal.FeatureProject;
 import de.ovgu.featureide.core.internal.ProjectChangeListener;
+import de.ovgu.featureide.core.job.PrintDocumentationJob;
 import de.ovgu.featureide.core.listeners.IConfigurationChangedListener;
 import de.ovgu.featureide.core.listeners.ICurrentBuildListener;
 import de.ovgu.featureide.core.listeners.ICurrentConfigurationListener;
@@ -69,12 +70,17 @@ import de.ovgu.featureide.core.listeners.IProjectListener;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.core.signature.ProjectSignatures.SignatureIterator;
 import de.ovgu.featureide.core.signature.ProjectStructure;
-import de.ovgu.featureide.core.signature.abstr.AbstractClassSignature;
-import de.ovgu.featureide.core.signature.abstr.AbstractFieldSignature;
-import de.ovgu.featureide.core.signature.abstr.AbstractMethodSignature;
-import de.ovgu.featureide.core.signature.abstr.AbstractSignature;
+import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
+import de.ovgu.featureide.core.signature.base.AbstractFieldSignature;
+import de.ovgu.featureide.core.signature.base.AbstractMethodSignature;
+import de.ovgu.featureide.core.signature.base.AbstractSignature;
+import de.ovgu.featureide.core.signature.documentation.ContextMerger;
+import de.ovgu.featureide.core.signature.documentation.FeatureModuleMerger;
+import de.ovgu.featureide.core.signature.documentation.SPLMerger;
+import de.ovgu.featureide.core.signature.documentation.VariantMerger;
 import de.ovgu.featureide.core.signature.filter.ContextFilter;
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
@@ -216,7 +222,7 @@ public class CorePlugin extends AbstractCorePlugin {
 		}
 		return isComposable(description);
 	}
-	
+
 	public IStatus isComposable(IProjectDescription description) {
 		if (description != null) {
 			final String composerID = getComposerID(description);
@@ -739,6 +745,34 @@ public class CorePlugin extends AbstractCorePlugin {
 			return new ProjectStructure(it);
 		}
 		return null;
+	}
+
+	public void buildContextDocumentation(List<IProject> pl, String options, String featureName) {
+		final PrintDocumentationJob.Arguments args = new PrintDocumentationJob.Arguments(
+				"Docu_Context_" + featureName, options.split("\\s+"), new ContextMerger(), featureName);
+
+		FMCorePlugin.getDefault().startJobs(pl, args, true);
+	}
+
+	public void buildVariantDocumentation(List<IProject> pl, String options) {
+		final PrintDocumentationJob.Arguments args = new PrintDocumentationJob.Arguments(
+				"Docu_Variant", options.split("\\s+"), new VariantMerger(), null);
+
+		FMCorePlugin.getDefault().startJobs(pl, args, true);
+	}
+
+	public void buildFeatureDocumentation(List<IProject> pl, String options, String featureName) {
+		final PrintDocumentationJob.Arguments args = new PrintDocumentationJob.Arguments(
+				"Docu_Feature_" + featureName, options.split("\\s+"), new FeatureModuleMerger(), featureName);
+
+		FMCorePlugin.getDefault().startJobs(pl, args, true);
+	}
+
+	public void buildSPLDocumentation(List<IProject> pl, String options) {
+		final PrintDocumentationJob.Arguments args = new PrintDocumentationJob.Arguments(
+				"Docu_SPL", options.split("\\s+"), new SPLMerger(), null);
+
+		FMCorePlugin.getDefault().startJobs(pl, args, true);
 	}
 
 }

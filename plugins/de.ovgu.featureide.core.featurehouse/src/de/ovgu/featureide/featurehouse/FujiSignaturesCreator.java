@@ -50,9 +50,10 @@ import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.core.fstmodel.IRoleElement;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
-import de.ovgu.featureide.core.signature.abstr.AbstractClassSignature;
-import de.ovgu.featureide.core.signature.abstr.AbstractSignature;
-import de.ovgu.featureide.core.signature.abstr.AbstractSignature.FeatureData;
+import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
+import de.ovgu.featureide.core.signature.base.AbstractSignature;
+import de.ovgu.featureide.core.signature.base.FOPFeatureData;
+import de.ovgu.featureide.core.signature.base.FeatureDataConstructor;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiClassSignature;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiFieldSignature;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
@@ -65,25 +66,25 @@ import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
 public class FujiSignaturesCreator {
 	
 	private final class SignatureReference {
-		private final HashMap<Integer, FeatureData> ids = new HashMap<Integer, FeatureData>();
+		private final HashMap<Integer, FOPFeatureData> ids = new HashMap<>();
 		private final AbstractSignature sig;
 
 		public SignatureReference(AbstractSignature sig) {
 			this.sig = sig;
 		}
 		
-		public final FeatureData[] getFeatureData() {
-			FeatureData[] ret = new FeatureData[ids.size()];
+		public final FOPFeatureData[] getFeatureData() {
+			FOPFeatureData[] ret = new FOPFeatureData[ids.size()];
 			int i = -1;
-			for (FeatureData id : ids.values()) {
+			for (FOPFeatureData id : ids.values()) {
 				ret[++i] = id;
 			}
 			return ret;
 		}
 
-		public final void addID(FeatureData featureData) {
-			if (!ids.containsKey(featureData.getId())) {
-				ids.put(featureData.getId(), featureData);
+		public final void addID(FOPFeatureData featureData) {
+			if (!ids.containsKey(featureData.getID())) {
+				ids.put(featureData.getID(), featureData);
 			}
 		}
 
@@ -103,11 +104,14 @@ public class FujiSignaturesCreator {
 
 	private final HashMap<AbstractSignature, SignatureReference> signatureSet = new HashMap<AbstractSignature, SignatureReference>();
 	private final HashMap<String, AbstractSignature> signatureTable = new HashMap<String, AbstractSignature>();
+
+	private FeatureDataConstructor featureDataConstructor = null;
 	
 	public ProjectSignatures createSignatures(IFeatureProject fp, Program ast) {
 		featureModulePathnames = ast.getSPLStructure().getFeatureModulePathnames();
 		
 		final ProjectSignatures projectSignatures = new ProjectSignatures(fp.getFeatureModel());
+		featureDataConstructor = new FeatureDataConstructor(projectSignatures, FeatureDataConstructor.TYPE_FOP);
 		
 		LinkedList<TypeDecl> stack = new LinkedList<TypeDecl>();
 		LinkedList<AbstractClassSignature> roleStack = new LinkedList<AbstractClassSignature>();
@@ -147,7 +151,7 @@ public class FujiSignaturesCreator {
 							new FujiClassSignature(parent, name,
 									modifierString, typeString, pckg, typeDecl,
 									importList),
-									projectSignatures.getFeatureID(featurename), Symbol.getLine(typeDecl.getStart()));
+									projectSignatures.getFeatureID(featurename), Symbol.getLine(typeDecl.getStart()), Symbol.getLine(typeDecl.getEnd()));
 					for (ImportDecl importDecl : importList) {
 						curClassSig.addImport(importDecl.toString());
 					}
@@ -170,7 +174,7 @@ public class FujiSignaturesCreator {
 							addFeatureID(new FujiMethodSignature(curClassSig,
 									name, modifierString, type, false,
 									parameterList, exceptionList),
-									projectSignatures.getFeatureID(featurename), Symbol.getLine(method.getStart()));
+									projectSignatures.getFeatureID(featurename), Symbol.getLine(method.getStart()), Symbol.getLine(method.getEnd()));
 
 						} else if (bodyDecl instanceof FieldDeclaration) {
 							FieldDeclaration field = (FieldDeclaration) bodyDecl;
@@ -182,7 +186,7 @@ public class FujiSignaturesCreator {
 							featurename = getFeatureName(bodyDecl);
 							addFeatureID(new FujiFieldSignature(curClassSig,
 									name, modifierString, type),
-									projectSignatures.getFeatureID(featurename), Symbol.getLine(field.getStart()));
+									projectSignatures.getFeatureID(featurename), Symbol.getLine(field.getStart()), Symbol.getLine(field.getEnd()));
 
 						} else if (bodyDecl instanceof ConstructorDecl) {
 							ConstructorDecl constructor = (ConstructorDecl) bodyDecl;
@@ -202,7 +206,7 @@ public class FujiSignaturesCreator {
 										curClassSig, name, modifierString,
 										type, true, parameterList,
 										exceptionList),
-										projectSignatures.getFeatureID(featurename), Symbol.getLine(constructor.getStart()));
+										projectSignatures.getFeatureID(featurename), Symbol.getLine(constructor.getStart()), Symbol.getLine(constructor.getEnd()));
 							}
 							
 						} else if (bodyDecl instanceof MemberClassDecl) {
@@ -234,14 +238,14 @@ public class FujiSignaturesCreator {
 		return projectSignatures;
 	}
 	
-	private AbstractSignature addFeatureID(AbstractSignature sig, int featureID, int line) {
+	private AbstractSignature addFeatureID(AbstractSignature sig, int featureID, int startLine, int endLine) {
 		SignatureReference sigRef = signatureSet.get(sig);
 		if (sigRef == null) {
 			sigRef = new SignatureReference(sig);
 			signatureSet.put(sig, sigRef);
 			signatureTable.put(sig.getFullName(), sig);
 		}
-		sigRef.addID(new FeatureData(featureID, line));
+		sigRef.addID((FOPFeatureData) featureDataConstructor.create(featureID, startLine, endLine));
 		return sigRef.getSig();
 	}
 
@@ -277,10 +281,10 @@ public class FujiSignaturesCreator {
 		AbstractSignature sig = signatureTable.get(fullName);
 		
 		if (sig != null) {
-			final FeatureData[] ids = sig.getFeatureData();
+			final FOPFeatureData[] ids = (FOPFeatureData[]) sig.getFeatureData();
 			for (int j = 0; j < ids.length; j++) {
-				FeatureData featureData = ids[j];
-				if (featureData.getId() == id) {
+				FOPFeatureData featureData = ids[j];
+				if (featureData.getID() == id) {
 					featureData.setComment(element.getJavaDocComment());
 					break;
 				}

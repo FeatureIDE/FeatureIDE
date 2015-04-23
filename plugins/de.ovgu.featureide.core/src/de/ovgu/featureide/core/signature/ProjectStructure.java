@@ -26,10 +26,10 @@ import java.util.LinkedList;
 import java.util.Map.Entry;
 
 import de.ovgu.featureide.core.signature.ProjectSignatures.SignatureIterator;
-import de.ovgu.featureide.core.signature.abstr.AClassCreator;
-import de.ovgu.featureide.core.signature.abstr.AbstractClassFragment;
-import de.ovgu.featureide.core.signature.abstr.AbstractClassSignature;
-import de.ovgu.featureide.core.signature.abstr.AbstractSignature;
+import de.ovgu.featureide.core.signature.base.AClassCreator;
+import de.ovgu.featureide.core.signature.base.AbstractClassFragment;
+import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
+import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.core.signature.java.JavaClassCreator;
 
 /** 

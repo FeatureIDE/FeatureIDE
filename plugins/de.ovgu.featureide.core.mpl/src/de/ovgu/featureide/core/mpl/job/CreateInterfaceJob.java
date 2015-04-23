@@ -38,21 +38,22 @@ import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
-import de.ovgu.featureide.core.mpl.job.util.AJobArguments;
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelWriter;
+import de.ovgu.featureide.fm.core.job.AProjectJob;
+import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
 /**
  * Create mpl interfaces.
  * 
  * @author Sebastian Krieter
  */
-public class CreateInterfaceJob extends AMonitorJob<CreateInterfaceJob.Arguments> {
+public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments> {
 	
-	public static class Arguments extends AJobArguments {
+	public static class Arguments extends JobArguments {
 		private final IFeatureProject featureProject;
 		private final Collection<String> featureNames;
 		
@@ -113,11 +114,11 @@ public class CreateInterfaceJob extends AMonitorJob<CreateInterfaceJob.Arguments
 		for (Feature feat : m.getFeatures()) {
 			feat.setAbstract(!selectedFeatureNames.contains(feat.getName()));
         }
-		setMaxAbsoluteWork(3);
+		workMonitor.setMaxAbsoluteWork(3);
 		Node nodes = NodeCreator.createNodes(m, false);
-		worked();
+		workMonitor.worked();
 		Node cnf = nodes.toCNF();
-		worked();
+		workMonitor.worked();
 		
 		// Calculate Model
 		m = orgFeatureModel.deepClone(false);
@@ -168,7 +169,7 @@ public class CreateInterfaceJob extends AMonitorJob<CreateInterfaceJob.Arguments
         
         if (cnf instanceof And) {
         	final Node[] children = cnf.getChildren();
-        	setMaxAbsoluteWork(children.length + 2);
+        	workMonitor.setMaxAbsoluteWork(children.length + 2);
 //    		final SatSolver modelSatSolver = new SatSolver(NodeCreator.createNodes(m), 500);
         	for (int i = 0; i < children.length; i++) {
         		final Node child = children[i];
@@ -181,7 +182,7 @@ public class CreateInterfaceJob extends AMonitorJob<CreateInterfaceJob.Arguments
 				} catch (TimeoutException e) {
 					MPLPlugin.getDefault().logError(e);
 				} finally {
-	        		worked();
+					workMonitor.worked();
 				}
 			}
         }

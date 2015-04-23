@@ -34,7 +34,8 @@ import org.eclipse.swt.widgets.TreeItem;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.ui.mpl.wizards.WizardConstants;
+import de.ovgu.featureide.fm.ui.wizards.AbstractWizardPage;
+import de.ovgu.featureide.fm.ui.wizards.WizardConstants;
 
 /**
  * A Wizard Page to select the features from the other project to create the

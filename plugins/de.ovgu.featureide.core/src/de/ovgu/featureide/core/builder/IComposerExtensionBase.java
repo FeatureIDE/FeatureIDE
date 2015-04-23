@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.core.builder;
 
+import javax.annotation.CheckForNull;
+
 import org.eclipse.core.runtime.IStatus;
 
 import de.ovgu.featureide.core.IExtension;
@@ -40,7 +42,7 @@ public interface IComposerExtensionBase extends IExtension {
 	String getDescription();
 	
 	/**
-	 * @return <code>true</code> if the composer has a folder for each features.
+	 * @return <code>true</code> if the composer has a folder for each feature.
 	 */
 	boolean hasFeatureFolder();
 
@@ -86,4 +88,7 @@ public interface IComposerExtensionBase extends IExtension {
 	 * @return whether all dependencies are fulfilled to use this composer
 	 */
 	IStatus isComposable();
+	
+	@CheckForNull
+	<T extends IComposerObject> T getComposerObjectInstance(Class<T> c);
 }

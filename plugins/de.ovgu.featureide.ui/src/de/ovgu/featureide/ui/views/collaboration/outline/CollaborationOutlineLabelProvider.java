@@ -30,7 +30,11 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.TreeItem;
 
 import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.core.fstmodel.FSTAsmetaLDomain;
+import de.ovgu.featureide.core.fstmodel.FSTAsmetaLInitialization;
+import de.ovgu.featureide.core.fstmodel.FSTAstemaLFunction;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
+import de.ovgu.featureide.core.fstmodel.FSTClassFragment;
 import de.ovgu.featureide.core.fstmodel.FSTContractedRole;
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTField;
@@ -47,6 +51,8 @@ import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
  * 
  * @author Jan Wedding
  * @author Melanie Pflaume
+ * @author Dominic Labsch
+ * @author Daniel Püsche
  */
 public class CollaborationOutlineLabelProvider extends OutlineLabelProvider implements GUIDefaults {
 
@@ -69,49 +75,89 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 
 	@Override
 	public Image getImage(Object element) {
+		if (element instanceof FSTClassFragment) {
+			return IMAGE_CLASS;
+		}
 		if (element instanceof IRoleElement) {
 			IRoleElement fstModelElement = (IRoleElement) element;
-			if (fstModelElement instanceof FSTField) {
-				FSTField field = (FSTField) fstModelElement;
-				if (field.isPrivate())
-					return IMAGE_FIELD_PRIVATE;
-				else if (field.isProtected())
-					return IMAGE_FIELD_PROTECTED;
-				else if (field.isPublic())
-					return IMAGE_FIELD_PUBLIC;
-				else
+			if (fstModelElement instanceof FSTAsmetaLDomain)
+			{
+				return IMAGE_FIELD_PUBLIC;
+			} else if (fstModelElement instanceof FSTAstemaLFunction)
+			{
+				return IMAGE_FIELD_PRIVATE;
+			} else if (fstModelElement instanceof FSTAsmetaLInitialization)
+			{
+				return IMAGE_METHODE_PROTECTED;
+			} else if (fstModelElement instanceof FSTField) 
+			{
+				final FSTField field = (FSTField) fstModelElement;
+				final String fileExtension = field.getFile().getFileExtension();
+				if ("java".equals(fileExtension) || "jak".equals(fileExtension) || "cs".equals(fileExtension)) {
+					if (field.isPrivate()) {
+						return IMAGE_FIELD_PRIVATE;
+					} else if (field.isProtected()) {
+						return IMAGE_FIELD_PROTECTED;
+					} else if (field.isPublic()) {
+						return IMAGE_FIELD_PUBLIC;
+					} else {
+						return IMAGE_FIELD_DEFAULT;
+					}
+				} else if ("hs".equals(fileExtension)) {
+					return IMAGE_HASKELL_TYPE;
+				} else if ("h".equals(fileExtension) || "c".equals(fileExtension)) {
 					return IMAGE_FIELD_DEFAULT;
+				}
+
 			} else if (fstModelElement instanceof FSTInvariant) {
 				return IMAGE_AT_WITHOUT_WHITE_BACKGROUND;
 			} else if (fstModelElement instanceof FSTMethod) {
-				FSTMethod method = (FSTMethod) fstModelElement;
-				
-				if (method.hasContract() || method.contractsInRefinements()) {
-					if (method.isPrivate())
-						return IMAGE_METHODE_PRIVATE_CONTRACT;
-					else if (method.isProtected())
-						return IMAGE_METHODE_PROTECTED_CONTRACT;
-					else if (method.isPublic())
-						return IMAGE_METHODE_PUBLIC_CONTRACT;
-					else
-						return IMAGE_METHODE_DEFAULT_CONTRACT;
-				} else {
-					if (method.isPrivate())
-						return IMAGE_METHODE_PRIVATE;
-					else if (method.isProtected())
-						return IMAGE_METHODE_PROTECTED;
-					else if (method.isPublic())
-						return IMAGE_METHODE_PUBLIC;
-					else
-						return IMAGE_METHODE_DEFAULT;
+				final FSTMethod method = (FSTMethod) fstModelElement;
+
+				final String fileExtension = method.getFile().getFileExtension();
+				if ("java".equals(fileExtension) || "jak".equals(fileExtension) || "cs".equals(fileExtension)) {
+
+					if (method.hasContract() || method.contractsInRefinements()) {
+						if (method.isPrivate())
+							return IMAGE_METHODE_PRIVATE_CONTRACT;
+						else if (method.isProtected())
+							return IMAGE_METHODE_PROTECTED_CONTRACT;
+						else if (method.isPublic())
+							return IMAGE_METHODE_PUBLIC_CONTRACT;
+						else
+							return IMAGE_METHODE_DEFAULT_CONTRACT;
+					} else {
+						if (method.isPrivate())
+							return IMAGE_METHODE_PRIVATE;
+						else if (method.isProtected())
+							return IMAGE_METHODE_PROTECTED;
+						else if (method.isPublic())
+							return IMAGE_METHODE_PUBLIC;
+						else
+							return IMAGE_METHODE_DEFAULT;
+					}
+				} else if ("hs".equals(fileExtension)) {
+					return IMAGE_HASKELL_LAMBDA;
+				} else if ("h".equals(fileExtension) || "c".equals(fileExtension)) {
+					return IMAGE_METHODE_DEFAULT;
 				}
 			}
 		} else if (element instanceof FSTClass) {
-			return IMAGE_CLASS;
+
+			FSTClass datClass = (FSTClass) element;
+			final String className = datClass.getName();
+			final int extIndex = className.lastIndexOf('.');
+			if (extIndex > -1) {
+				final String fileExtension = className.substring(extIndex + 1);
+				if ("java".equals(fileExtension) || "jak".equals(fileExtension) || "cs".equals(fileExtension) || "h".equals(fileExtension) || "c".equals(fileExtension)) {
+					return IMAGE_CLASS;
+				} else if ("hs".equals(fileExtension)) {
+					return IMAGE_HASKELL_MODULE;
+				}
+			}
 		} else if (element instanceof FSTContractedRole) {
 			return IMAGE_AT_WITHOUT_WHITE_BACKGROUND;
 		}
-
 		return null;
 	}
 
@@ -153,11 +199,15 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 		if (element instanceof String)
 			return (String) element;
 
+		if (element instanceof FSTClassFragment)
+			return ((FSTClassFragment) element).getName();
+
 		return "";
+
 	}
 
 	public String getLabelProvName() {
-		return "Collaboration Outline";
+		return "Default Outline";
 	}
 
 	@Override
@@ -173,10 +223,12 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 			if (treeItems[i].getData() instanceof FSTRole) {
 				if (((FSTRole) treeItems[i].getData()).getFile().equals(file)) {
 					// get old Font and simply make it bold
-					treeItems[i].setFont(new Font(treeItems[i].getDisplay(), treeItems[i].getFont().getFontData()[0].getName(), treeItems[i].getFont().getFontData()[0].getHeight(), SWT.BOLD));
+					treeItems[i].setFont(new Font(treeItems[i].getDisplay(), treeItems[i].getFont().getFontData()[0].getName(), treeItems[i].getFont()
+							.getFontData()[0].getHeight(), SWT.BOLD));
 
 				} else {
-					treeItems[i].setFont(new Font(treeItems[i].getDisplay(), treeItems[i].getFont().getFontData()[0].getName(), treeItems[i].getFont().getFontData()[0].getHeight(), SWT.NORMAL));
+					treeItems[i].setFont(new Font(treeItems[i].getDisplay(), treeItems[i].getFont().getFontData()[0].getName(), treeItems[i].getFont()
+							.getFontData()[0].getHeight(), SWT.NORMAL));
 				}
 			}
 			if (treeItems[i].getItems().length > 0) {
@@ -243,18 +295,21 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 		if (item.getData() instanceof FSTDirective) {
 			item.setForeground(viewer.getControl().getDisplay().getSystemColor(SWT.DEFAULT));
 		} else {
+
 			final IRoleElement element = (IRoleElement) item.getData();
 
 			for (FSTRole role : element.getRole().getFSTClass().getRoles()) {
-				if (role.getFile().equals(iFile) && (
-						(element instanceof FSTMethod && role.getClassFragment().getMethods().contains(element)) ||
-						(element instanceof FSTInvariant && role.getClassFragment().getInvariants().contains(element)) ||
-						(element instanceof FSTField && role.getClassFragment().getFields().contains(element)))) {
+				if (role.getFile().equals(iFile)
+						&& ((element instanceof FSTMethod && role.getAllMethods().contains(element))
+								|| (element instanceof FSTInvariant && role.getClassFragment().getInvariants().contains(element))
+								|| (element instanceof FSTField && role.getAllFields().contains(element)) || (element instanceof FSTClassFragment && role
+								.getAllInnerClasses().contains(element)))) {
 					item.setForeground(viewer.getControl().getDisplay().getSystemColor(SWT.DEFAULT));
 					return;
 				}
 			}
 			item.setForeground(viewer.getControl().getDisplay().getSystemColor(SWT.COLOR_GRAY));
+
 		}
 	}
 

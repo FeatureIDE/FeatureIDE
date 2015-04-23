@@ -28,11 +28,8 @@ import org.eclipse.core.resources.IProject;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.mpl.io.FileLoader;
-import de.ovgu.featureide.core.mpl.job.CreateFujiSignaturesJob;
-import de.ovgu.featureide.core.mpl.job.JobManager;
-import de.ovgu.featureide.core.mpl.job.util.IChainJob;
-import de.ovgu.featureide.core.mpl.signature.ProjectSignatures;
 import de.ovgu.featureide.core.mpl.signature.ViewTag;
+import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
@@ -60,8 +57,8 @@ public class InterfaceProject {
 	private final FeatureModel featureModel;
 	private String[] featureNames;
 	
-	private IChainJob loadJob = null;
-	private boolean loadAgain = false;
+//	private IChainJob loadJob = null;
+//	private boolean loadAgain = false;
 	
 	public InterfaceProject(IFeatureProject featureProject) {
 		this(null, featureProject);
@@ -170,15 +167,15 @@ public class InterfaceProject {
 		return featureNames.length;
 	}
 	
-	public void loadSignatures(boolean again) {
-		if (loadJob == null) {
-			loadJob = new CreateFujiSignaturesJob();
-			loadJob.setProject(projectReference);
-			JobManager.addJob(projectReference, loadJob);
-		} else if (again) {
-			loadAgain = true;
-		}
-	}
+//	public void loadSignatures(boolean again) {
+//		if (loadJob == null) {
+//			loadJob = new CreateFujiSignaturesJob();
+//			loadJob.setProject(projectReference);
+//			JobManager.addJob(projectReference, loadJob);
+//		} else if (again) {
+//			loadAgain = true;
+//		}
+//	}
 	
 	public ProjectSignatures getProjectSignatures() {
 		return projectSignatures;
@@ -226,11 +223,11 @@ public class InterfaceProject {
 
 	public void setProjectSignatures(ProjectSignatures projectSignatures) {
 		this.projectSignatures = projectSignatures;
-		loadJob = null;
-		if (loadAgain) {
-			loadSignatures(false);
-			loadAgain = false;
-		}
+//		loadJob = null;
+//		if (loadAgain) {
+//			loadSignatures(false);
+//			loadAgain = false;
+//		}
 	}
 
 	public void setConfigLimit(int configLimit) {

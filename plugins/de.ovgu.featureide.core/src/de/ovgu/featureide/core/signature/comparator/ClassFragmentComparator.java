@@ -22,8 +22,8 @@ package de.ovgu.featureide.core.signature.comparator;
 
 import java.util.Comparator;
 
-import de.ovgu.featureide.core.signature.abstr.AbstractClassFragment;
-import de.ovgu.featureide.core.signature.abstr.AbstractClassSignature;
+import de.ovgu.featureide.core.signature.base.AbstractClassFragment;
+import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 
 //TODO MPL: better implementation
 public class ClassFragmentComparator implements Comparator<AbstractClassFragment> {

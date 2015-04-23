@@ -11,18 +11,18 @@ It is now time to implement the features. The implementation details depend on t
 	<description>
  	<b>Antenna</b><br/><br/>
  	Antenna is a Java preprocessor. You can use Antenna-style Java comments to specify the mapping between parts of code and features.<br/><br/>
- 	Example:<br/>
+ 	<b>Example:</b><br/><br/>
  			//#if Hello<br/>
-		System.out.print("Hello");<br/>
+		System.out.print(&quot;Hello&quot;);<br/>
 		//#endif<br/>
 		//#if Beautiful<br/>
-		System.out.print(" beautiful");<br/>
+		System.out.print(&quot; beautiful&quot;);<br/>
 		//#endif<br/>
 		//#if Wonderful<br/>
-		System.out.print(" wonderful");	<br/>
+		System.out.print(&quot; wonderful&quot;);	<br/>
 		//#endif<br/>
 		//#if World<br/>
-		System.out.print(" world!");<br/>
+		System.out.print(&quot; world!&quot;);<br/>
 		//#endif<br/>
 	}<br/>
  

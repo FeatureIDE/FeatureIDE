@@ -20,17 +20,28 @@
  */
 package de.ovgu.featureide.munge.model;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Stack;
 import java.util.Vector;
 import java.util.regex.Matcher;
+
+import org.prop4j.Node;
+import org.prop4j.NodeReader;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirectiveCommand;
 import de.ovgu.featureide.core.fstmodel.preprocessor.PPModelBuilder;
+import de.ovgu.featureide.core.signature.ProjectSignatures;
+import de.ovgu.featureide.core.signature.ProjectSignatures.SignatureIterator;
+import de.ovgu.featureide.core.signature.base.AbstractSignature;
+import de.ovgu.featureide.core.signature.base.PreprocessorFeatureData;
+import de.ovgu.featureide.core.signature.filter.IFilter;
 import de.ovgu.featureide.munge.MungePreprocessor;
+import de.ovgu.featureide.munge.signatures.MungeSignatureBuilder;
 
 /**
  * Build the FSTModel for munge projects.
@@ -38,26 +49,104 @@ import de.ovgu.featureide.munge.MungePreprocessor;
  * @author Jens Meinicke
  * @author Sebastian Krieter
  */
-public class MungeModelBuilder extends PPModelBuilder{
+public class MungeModelBuilder extends PPModelBuilder {
+	
+	private ProjectSignatures signatures = MungeSignatureBuilder.build(featureProject);
 
 	public MungeModelBuilder(IFeatureProject featureProject) {
 		super(featureProject);
+		
+		signatures = MungeSignatureBuilder.build(featureProject);
+		signatures.sort(new Comparator<AbstractSignature>() {
+			@Override
+			public int compare(AbstractSignature arg0, AbstractSignature arg1) {
+				return arg0.getFirstFeatureData().getStartLineNumber() - arg1.getFirstFeatureData().getStartLineNumber();
+			}
+		});
+		model.setProjectSignatures(signatures);
 	}
 
 	@Override
 	protected boolean containsFeature(String text, String feature) {
 		return text.contains("end[" + feature + "]");
 	}
+
+	private int curSignatureIndex = 0;
+	
+	private void updateSignatures(Deque<FSTDirective> directivesStack, int endline, SignatureIterator sigIt, ArrayList<Integer> sigLineNumber) {
+		final StringBuilder sb = new StringBuilder();
+		int startLine = 0;
+		for (Iterator<FSTDirective> it = directivesStack.descendingIterator(); it.hasNext();) {
+			final FSTDirective fstDirective = it.next();
+			switch (fstDirective.getCommand()) {
+				case IF_NOT: case ELSE:
+					sb.append("not ");
+				case IF: case ELSE_NOT:
+					sb.append('(');
+					sb.append(fstDirective.getExpression());
+					sb.append(')');
+					break;
+				default:
+					return;
+			}
+			if (it.hasNext()) {
+				sb.append(" and ");
+			} else {
+				startLine = fstDirective.getStartLine();
+			}
+		}
+		if (sb.length() > 0) {
+			final Node constraint = new NodeReader().stringToNode(sb.toString(), featureNames);
+			for (; curSignatureIndex < sigLineNumber.size(); curSignatureIndex++) {
+				if (sigLineNumber.get(curSignatureIndex) >= startLine) {
+					if (sigLineNumber.get(curSignatureIndex) <= endline) {
+						((PreprocessorFeatureData) sigIt.next().getFirstFeatureData()).setConstraint(constraint);
+					} else {
+						break;
+					}
+				} else {
+					sigIt.next();
+				}
+			}
+		}
+	}
 	
 	@Override
 	public LinkedList<FSTDirective> buildModelDirectivesForFile(Vector<String> lines) {
 		//for preprocessor outline
-		Stack<FSTDirective> directivesStack = new Stack<FSTDirective>();
+		Deque<FSTDirective> directivesStack = new LinkedList<FSTDirective>();
 		LinkedList<FSTDirective> directivesList = new LinkedList<FSTDirective>();
 		
 		boolean commentSection = false;
 		
-		Iterator<String> linesIt = lines.iterator();
+		final String fileName;
+		String tempFileName = model.getAbsoluteClassName(currentFile);
+		final int extIndex = tempFileName.lastIndexOf('.');
+		if (extIndex > 0) {
+			fileName = tempFileName.substring(0, extIndex);
+		} else {
+			fileName = tempFileName;
+		}
+		final SignatureIterator sigIt = signatures.iterator();
+		sigIt.addFilter(new IFilter<AbstractSignature>() {
+			@Override
+			public boolean isValid(AbstractSignature object) {
+				String sigName = object.getFullName();
+				if (sigName.startsWith(".")) {
+					sigName = sigName.substring(1);
+				}
+				return sigName.replace('.', '/').startsWith(fileName);
+			}
+			
+		});
+		ArrayList<Integer> sigLineNumber = new ArrayList<>();
+		for (;sigIt.hasNext();) {
+			sigLineNumber.add(sigIt.next().getFirstFeatureData().getStartLineNumber());
+		}
+		sigIt.reset();
+		curSignatureIndex = 0;
+		final Iterator<String> linesIt = lines.iterator();
+		
 		int lineCount = 0, id = 0;
 		
 		while (linesIt.hasNext()) {
@@ -86,12 +175,17 @@ public class MungeModelBuilder extends PPModelBuilder{
 						
 						if (singleElement.equals("if")) {
 							command = FSTDirectiveCommand.IF;
+							
 						} else if (singleElement.equals("if_not")) {
-							command = FSTDirectiveCommand.IF;
+							command = FSTDirectiveCommand.IF_NOT;
 						} else if (singleElement.equals("else")) {
-							command = FSTDirectiveCommand.ELSE;
+							command = (directivesStack.peek().getCommand() == FSTDirectiveCommand.IF)
+									? FSTDirectiveCommand.ELSE
+									: FSTDirectiveCommand.ELSE_NOT;
+							updateSignatures(directivesStack, lineCount, sigIt, sigLineNumber);
 							directivesStack.pop();
 						} else if (singleElement.equals("end")) {
+							updateSignatures(directivesStack, lineCount, sigIt, sigLineNumber);
 							directivesStack.pop().setEndLine(lineCount, m.end(0)+MungePreprocessor.COMMENT_END.length());
 							continue;
 						} else {
@@ -109,6 +203,7 @@ public class MungeModelBuilder extends PPModelBuilder{
 						
 						directive.setStartLine(lineCount, m.start(0)-MungePreprocessor.COMMENT_START.length());
 						directive.setId(id++);
+						
 						
 						if(!directivesStack.isEmpty()){
 							FSTDirective top = directivesStack.peek();

@@ -20,8 +20,8 @@
  */
 package de.ovgu.featureide.featurehouse.signature.fuji;
 
-import de.ovgu.featureide.core.signature.abstr.AbstractClass;
-import de.ovgu.featureide.core.signature.abstr.AbstractClassSignature;
+import de.ovgu.featureide.core.signature.base.AbstractClass;
+import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 
 /**
  * Holds the java signature of a class.

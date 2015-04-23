@@ -120,119 +120,6 @@
 				id="de.ovgu.featureide.fm.ui.views.FeatureModelEditView"
 				name="Feature Model Edits"/>
 	</extension>
-	<!--
-	<extension
-			point="org.eclipse.ui.popupMenus">
-		<objectContribution
-				adaptable="true"
-				id="de.ovgu.featureide.fm.ui.menu"
-				objectClass="org.eclipse.core.resources.IResource">
-			<menu
-					icon="icons/FeatureIconSmall.ico"
-					id="de.ovgu.featureide.fm.ui.menu"
-					label="FeatureIDE"
-					path="group.open">
-			</menu>
-		</objectContribution> 
-		<objectContribution
-				adaptable="true"
-				id="de.ovgu.featureide.fm.ui.featureModelContribution"
-				nameFilter="*.xml"
-				objectClass="org.eclipse.core.resources.IFile">
-			<action
-					class="de.ovgu.featureide.fm.ui.actions.ExportGuidslAction"
-					icon="icons/export_wiz.gif"
-					id="de.ovgu.featureide.fm.ui.ExportGuidsl"
-					label="Export model to GUIDSL format"
-					menubarPath="de.ovgu.featureide.fm.ui.menu/guidsl">
-			</action>
-			<action
-					class="de.ovgu.featureide.fm.ui.actions.ImportGuidslAction"
-					icon="icons/import_wiz.gif"
-					id="de.ovgu.featureide.fm.ui.ImportGuidsl"
-					label="Import model from GUIDSL format"
-					menubarPath="de.ovgu.featureide.fm.ui.menu/guidsl">
-			</action>
-			<action
-					class="de.ovgu.featureide.fm.ui.actions.OpenWithGuidslAction"
-					icon="icons/guidsl.gif"
-					id="de.ovgu.featureide.fm.ui.openWithGuidsl"
-					label="Open with GUIDSL"
-					menubarPath="de.ovgu.featureide.fm.ui.menu/guidsl"
-					tooltip="GUIDSL is a configuration tool written by Don Batory">
-			</action>
-			<action
-					class="de.ovgu.featureide.fm.ui.actions.ExportSXFMAction"
-					icon="icons/export_wiz.gif"
-					id="de.ovgu.featureide.fm.ui.ExportSXFM"
-					label="Export model to SXFM (S.P.L.O.T.) format"
-					menubarPath="de.ovgu.featureide.fm.ui.menu/splot">
-			</action>
-			<action
-					class="de.ovgu.featureide.fm.ui.actions.ImportSXFMAction"
-					icon="icons/import_wiz.gif"
-					id="de.ovgu.featureide.fm.ui.ImportSXFM"
-					label="Import model from SXFM (S.P.L.O.T.) format"
-					menubarPath="de.ovgu.featureide.fm.ui.menu/splot">
-			</action>
-			<action
-					class="de.ovgu.featureide.fm.ui.actions.ExportConquererAction"
-					icon="icons/export_wiz.gif"
-					id="de.ovgu.featureide.fm.ui.ExportSPLConquerer"
-					label="Export model to SPL Conquerer format"
-					menubarPath="de.ovgu.featureide.fm.ui.menu/conquerer">
-			</action>
-			<action
-					class="de.ovgu.featureide.fm.ui.actions.FeatureDependenciesAction"
-					icon="icons/export_wiz.gif"
-					id="de.ovgu.featureide.fm.ui.FeatureDependencies"
-					label="Export feature dependency information"
-					menubarPath="de.ovgu.featureide.fm.ui.menu/dependency">
-			</action>
-			<action
-					class="de.ovgu.featureide.fm.ui.actions.ExportCNFAction"
-					icon="icons/export_wiz.gif"
-					id="de.ovgu.featureide.fm.ui.ExportCNF"
-					label="Export CNF"
-					menubarPath="de.ovgu.featureide.fm.ui.menu/dependency">
-			</action>
-			<action
-					class="de.ovgu.featureide.fm.ui.actions.ExportDIMACSAction"
-					icon="icons/export_wiz.gif"
-					id="de.ovgu.featureide.fm.ui.ExportCNF"
-					label="Export DIMACS"
-					menubarPath="de.ovgu.featureide.fm.ui.menu/dependency">
-			</action>
-			<action
-					class="de.ovgu.featureide.fm.ui.actions.ImportVelvetAction"
-					icon="icons/import_wiz.gif"
-					id="de.ovgu.featureide.fm.ui.ImportVelvet"
-					label="Import model from Velvet format"
-					menubarPath="de.ovgu.featureide.fm.ui.menu/velvet">
-			</action>
-			<action
-					class="de.ovgu.featureide.fm.ui.actions.ExportVelvetAction"
-					icon="icons/export_wiz.gif"
-					id="de.ovgu.featureide.fm.ui.ExportVelvet"
-					label="Export model to Velvet format"
-					menubarPath="de.ovgu.featureide.fm.ui.menu/velvet">
-			</action>
-		</objectContribution>
-		<objectContribution
-				adaptable="true"
-				id="de.ovgu.featureide.fm.ui.velvetContribution"
-				nameFilter="*.velvet"
-				objectClass="org.eclipse.core.resources.IFile">
-			<action
-					class="de.ovgu.featureide.fm.ui.actions.AnalyzeVelvetAction"
-					icon="icons/FeatureIconSmall.ico"
-					id="de.ovgu.featureide.fm.ui.AnalyzeVelvet"
-					label="Analyze Velvet Model (OLD)"
-					style="push">
-			</action>
-		</objectContribution>
-	</extension>
--->
 	<extension
 			point="org.eclipse.ui.propertyPages">
 		<page
@@ -346,7 +233,7 @@
 				</visibleWhen>
 			</command>
 			<command
-					commandId="de.ovgu.featureide.fm.ui.commands.ExportSXFM"
+					commandId="de.ovgu.featureide.fm.ui.commands.ImportSXFM"
 					icon="icons/import_wiz.gif"
 					id="de.ovgu.featureide.fm.ui.actions.ImportSXFM"
 					label="Import model from SXFM (S.P.L.O.T.) format"

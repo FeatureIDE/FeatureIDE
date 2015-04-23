@@ -23,6 +23,7 @@ package de.ovgu.featureide.featurehouse.meta.featuremodel;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 
 import org.prop4j.And;
@@ -78,10 +79,10 @@ public class FeatureModelJPFCore implements IFeatureModelClass {
 			fields.append("_;" + NEWLINE);
 		}
 
-		ArrayList<Feature> features = new ArrayList<Feature>(
-				featureModel.getFeatures());
-		deadFeatures = featureModel.getAnalyser().getDeadFeatures();
-		coreFeatures = featureModel.getAnalyser().getCoreFeatures();
+		final ArrayList<Feature> features = new ArrayList<Feature>(featureModel.getFeatures());
+		final List<List<Feature>> deadCoreList = featureModel.getAnalyser().analyzeFeatures();
+		coreFeatures = deadCoreList.get(0);
+		deadFeatures = deadCoreList.get(1);
 		fields.append(NEWLINE + "\t/**" + NEWLINE 
 				+ "\t * Core features are set 'selected' and dead features 'unselected'." + NEWLINE 
 				+ "\t * All other features have unknown selection states." + NEWLINE 

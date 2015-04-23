@@ -42,9 +42,10 @@ import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.core.signature.ProjectSignatures.SignatureIterator;
-import de.ovgu.featureide.core.signature.abstr.AbstractFieldSignature;
-import de.ovgu.featureide.core.signature.abstr.AbstractMethodSignature;
-import de.ovgu.featureide.core.signature.abstr.AbstractSignature;
+import de.ovgu.featureide.core.signature.base.AbstractFieldSignature;
+import de.ovgu.featureide.core.signature.base.AbstractMethodSignature;
+import de.ovgu.featureide.core.signature.base.AbstractSignature;
+import de.ovgu.featureide.core.signature.base.FOPFeatureData;
 import de.ovgu.featureide.core.signature.filter.MethodFilter;
 import de.ovgu.featureide.featurehouse.ExtendedFujiSignaturesJob;
 import de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin;
@@ -141,15 +142,15 @@ public class FeatureStubsGenerator {
 							while (sigIterator.hasNext()) {
 								AbstractSignature curSig = sigIterator.next();
 								for (int i = 0; i < curSig.getFeatureData().length; i++) {
-									if (curSig.getFeatureData()[i].getId() == featureID && curSig.getName().equals(meth.getName())
-											&& curSig.getFeatureData()[i].getLineNumber() == meth.getLine()) {
-										if (curSig.getFeatureData()[i].usesExternMethods()) {
+									if ((curSig.getFeatureData())[i].getID() == featureID && curSig.getName().equals(meth.getName())
+											&& curSig.getFeatureData()[i].getStartLineNumber() == meth.getLine()) {
+										if (((FOPFeatureData[])curSig.getFeatureData())[i].usesExternMethods()) {
 											FeatureHouseCorePlugin.getDefault().logError("The method\n"	+ curSig.getFullName() + "\nis not defined within the currently checked SPL. Therefore the process will be aborted." , null);
 											return;
 										}
 										
-										if (curSig.getFeatureData()[i].usesOriginal()) {
-											fileTextSB = checkForOriginal(fileTextSB, meth, curSig, signatures.getFeatureName(curSig.getFeatureData()[i].getId()));
+										if (((FOPFeatureData[])curSig.getFeatureData())[i].usesOriginal()) {
+											fileTextSB = checkForOriginal(fileTextSB, meth, curSig, signatures.getFeatureName(((FOPFeatureData[])curSig.getFeatureData())[i].getID()));
 										}
 
 										if (meth.hasContract() && meth.getContract().contains("\\original")) {
@@ -157,11 +158,11 @@ public class FeatureStubsGenerator {
 											//fileTextSB = checkForOriginalInContract(fileTextSB, curSig);
 										}
 										
-										for (String typeName : curSig.getFeatureData()[i].getUsedNonPrimitveTypes()) {
+										for (String typeName : ((FOPFeatureData[])curSig.getFeatureData())[i].getUsedNonPrimitveTypes()) {
 											checkForMissingTypes(feat, role, typeName);
 										}
 										
-										Set<AbstractSignature> calledSignatures = new HashSet<AbstractSignature>(curSig.getFeatureData()[i].getCalledSignatures());
+										Set<AbstractSignature> calledSignatures = new HashSet<AbstractSignature>(((FOPFeatureData[])curSig.getFeatureData())[i].getCalledSignatures());
 										for (AbstractSignature innerAbs : calledSignatures) {
 											if (!isInCurrentFeature(featureID, innerAbs) && alreadyUsedSigs.add(innerAbs.toString())) {
 												if (innerAbs.getParent().getName().equals(role.getClassFragment().getName().substring(0, role.getClassFragment().getName().indexOf(".")))) {
@@ -262,7 +263,7 @@ public class FeatureStubsGenerator {
 
 	private boolean isInCurrentFeature(int featureID, AbstractSignature innerAbs) {
 		for (int j = 0; j < innerAbs.getFeatureData().length; j++) {
-			if (innerAbs.getFeatureData()[j].getId() == featureID) {
+			if ((innerAbs.getFeatureData())[j].getID() == featureID) {
 				return true;
 			}
 		}

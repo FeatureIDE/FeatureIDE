@@ -52,6 +52,7 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.core.ClasspathEntry;
 import org.eclipse.jdt.internal.core.JavaProject;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.prop4j.Node;
 import org.prop4j.NodeWriter;
 import org.sat4j.specs.TimeoutException;
@@ -74,14 +75,17 @@ import de.ovgu.cide.fstgen.ast.FSTTerminal;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
+import de.ovgu.featureide.core.builder.IComposerObject;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
+import de.ovgu.featureide.core.signature.documentation.base.ADocumentationCommentParser;
 import de.ovgu.featureide.featurehouse.errorpropagation.ErrorPropagation;
 import de.ovgu.featureide.featurehouse.meta.FeatureIDEModelInfo;
 import de.ovgu.featureide.featurehouse.meta.featuremodel.FeatureModelClassGenerator;
 import de.ovgu.featureide.featurehouse.model.FeatureHouseModelBuilder;
+import de.ovgu.featureide.featurehouse.signature.documentation.DocumentationCommentParser;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -782,7 +786,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	 * @param line
 	 *            The line number
 	 * @param message
-	 *            The message to disply
+	 *            The message to display
 	 * @param file
 	 *            The file path
 	 * @param severity
@@ -1022,6 +1026,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 
 	private static LinkedHashSet<String> createExtensions() {
 		LinkedHashSet<String> extensions = new LinkedHashSet<String>();
+		extensions.add("asm");
 		extensions.add("java");
 		extensions.add("cs");
 		extensions.add("c");
@@ -1047,6 +1052,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 
 	private static ArrayList<String[]> createTempltes() {
 		ArrayList<String[]> list = new ArrayList<String[]>(8);
+		list.add(new String[] { "AsmetaL", "asm", "asm " + CLASS_NAME_PATTERN + " \n \n signature: \n \n definitions: \n"});
 		list.add(new String[] { "Alloy", "als", "module " + CLASS_NAME_PATTERN });
 		list.add(new String[] { "C", "c", "" });
 		list.add(new String[] { "C#", "cs", "public class " + CLASS_NAME_PATTERN + " {\n\n}" });
@@ -1214,6 +1220,17 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	}
 
 	public void setUseFuji(boolean useFuji) {
+		// This is actually a quick fix until Fuji works on JRE8
+		// Begin of Quick Fix
+		final boolean jre8 = System.getProperty("java.runtime.version").substring(0, 3).equals("1.8");
+		
+		if (jre8) {
+			MessageDialog.openInformation(null, "Information", "Fuji Typechecker is currently not supported for Java 1.8 runtime.");
+			setProperty(USE_FUJI, false);
+			return;
+		}
+		// End of Quick Fix	
+			
 		setProperty(USE_FUJI, useFuji);
 
 		if (useFuji) {
@@ -1239,5 +1256,13 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	@Override
 	public boolean supportsMigration() {
 		return true;
+	}
+	
+	@Override
+	public <T extends IComposerObject> T getComposerObjectInstance(Class<T> c)  {
+		if (c == ADocumentationCommentParser.class) {
+			return c.cast(new DocumentationCommentParser());
+		}
+		return super.getComposerObjectInstance(c);
 	}
 }

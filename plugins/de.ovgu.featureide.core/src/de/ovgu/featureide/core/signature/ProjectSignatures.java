@@ -22,17 +22,18 @@ package de.ovgu.featureide.core.signature;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map.Entry;
 
-import de.ovgu.featureide.core.signature.abstr.AbstractClassSignature;
-import de.ovgu.featureide.core.signature.abstr.AbstractFieldSignature;
-import de.ovgu.featureide.core.signature.abstr.AbstractMethodSignature;
-import de.ovgu.featureide.core.signature.abstr.AbstractSignature;
-import de.ovgu.featureide.core.signature.abstr.AbstractSignature.FeatureData;
-import de.ovgu.featureide.core.signature.filter.ISignatureFilter;
+import de.ovgu.featureide.core.signature.base.AFeatureData;
+import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
+import de.ovgu.featureide.core.signature.base.AbstractFieldSignature;
+import de.ovgu.featureide.core.signature.base.AbstractMethodSignature;
+import de.ovgu.featureide.core.signature.base.AbstractSignature;
+import de.ovgu.featureide.core.signature.filter.IFilter;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
@@ -43,18 +44,22 @@ import de.ovgu.featureide.fm.core.FeatureModel;
  */
 public class ProjectSignatures implements Iterable<AbstractSignature> {
 	
-	public final class SignatureIterator implements Iterator<AbstractSignature> {
-		private final LinkedList<ISignatureFilter> filter = new LinkedList<ISignatureFilter>();
+	public static final class SignatureIterator implements Iterator<AbstractSignature> {
+		private final AbstractSignature[] signatureArray;
+		
+		private final LinkedList<IFilter<?>> filter = new LinkedList<>();
 		private int count = 0;
 		private boolean nextAvailable = false;
 		
-		public SignatureIterator(ISignatureFilter... filter) {
-			for (int i = 0; i < filter.length; i++) {
-				addFilter(filter[i]);
-			}
+		public SignatureIterator() {
+			signatureArray = new AbstractSignature[0];
 		}
 		
-		public void addFilter(ISignatureFilter filter) {
+		private SignatureIterator(AbstractSignature[] signatureArray) {
+			this.signatureArray = signatureArray;
+		}
+		
+		public void addFilter(IFilter<?> filter) {
 			this.filter.add(filter);
 		}
 		
@@ -82,8 +87,9 @@ public class ProjectSignatures implements Iterable<AbstractSignature> {
 			return false;
 		}
 		
+		@SuppressWarnings({ "unchecked", "rawtypes" })
 		private boolean isValid(AbstractSignature sig) {
-			for (ISignatureFilter curFilter : filter) {
+			for (IFilter curFilter : filter) {
 				if (!curFilter.isValid(sig)) {
 					return false;
 				}
@@ -134,20 +140,37 @@ public class ProjectSignatures implements Iterable<AbstractSignature> {
 	
 	@Override
 	public SignatureIterator iterator() {
-		return new SignatureIterator();
+		return new SignatureIterator(signatureArray);
 	}
 	
-	public SignatureIterator iterator(ISignatureFilter... filter) {
-		return new SignatureIterator(filter);
+	public SignatureIterator iterator(Collection<IFilter<?>> filters) {
+		final SignatureIterator it = new SignatureIterator(signatureArray);
+		for (IFilter<?> filter : filters) {
+			it.addFilter(filter);
+		}
+		return it;
+	}
+	
+	public void sort(Comparator<AbstractSignature> comparator) {
+		Arrays.sort(signatureArray, comparator);
 	}
 	
 	public int[] getFeatureIDs(Collection<String> featureNames) {
 		int[] ids = new int[featureNames.size()];
-		int i = -1;
+		int i = 0;
 		for (String featureName : featureNames) {
-			ids[++i] = getFeatureID(featureName);
+			ids[i++] = getFeatureID(featureName);
 		}
 		return ids;
+	}
+	
+	public int[] getFeatureIDs() {
+		int[] featureIDs = new int[featureNames.length];
+		int i = 0;
+		for (String string : featureModel.getFeatureOrderList()) {
+			featureIDs[i++] = getFeatureID(string);
+		}
+		return featureIDs;
 	}
 	
 	public int getFeatureID(String featureName) {
@@ -165,6 +188,14 @@ public class ProjectSignatures implements Iterable<AbstractSignature> {
 	
 	public int getFeatureCount() {
 		return featureNames.length;
+	}
+	
+	public String[] getFeatureNames() {
+		return featureNames;
+	}
+
+	public int getSize() {
+		return signatureArray.length;
 	}
 	
 	public FeatureModel getFeatureModel() {
@@ -228,11 +259,12 @@ public class ProjectSignatures implements Iterable<AbstractSignature> {
 	}
 	
 	private void count(AbstractSignature signature, int[] curCounter, HashMap<Integer, int[]> fs, int i) {
-		for (FeatureData feature : signature.getFeatureData()) {
-			int[] x = fs.get(feature.getId());
+		final AFeatureData[] featureData = signature.getFeatureData();
+		for (AFeatureData feature : featureData) {
+			int[] x = fs.get(feature.getID());
 			if (x == null) {
 				x = new int[]{0,0,0,0};
-				fs.put(feature.getId(), x);
+				fs.put(feature.getID(), x);
 			}
 			x[i]++;
 		}

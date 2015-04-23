@@ -20,10 +20,10 @@
  */
 package de.ovgu.featureide.core.signature.java;
 
-import de.ovgu.featureide.core.signature.abstr.AbstractClassFragment;
-import de.ovgu.featureide.core.signature.abstr.AbstractFieldSignature;
-import de.ovgu.featureide.core.signature.abstr.AbstractMethodSignature;
-import de.ovgu.featureide.core.signature.abstr.AbstractSignature;
+import de.ovgu.featureide.core.signature.base.AbstractClassFragment;
+import de.ovgu.featureide.core.signature.base.AbstractFieldSignature;
+import de.ovgu.featureide.core.signature.base.AbstractMethodSignature;
+import de.ovgu.featureide.core.signature.base.AbstractSignature;
 
 public class JavaStringBuilder {
 	private static final String LINE_SEPARATOR = System.getProperty("line.separator");

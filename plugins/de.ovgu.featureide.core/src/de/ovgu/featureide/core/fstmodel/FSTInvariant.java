@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.core.fstmodel;
 
+import java.util.LinkedList;
+
 /**
  * description
  * 
@@ -32,14 +34,25 @@ public class FSTInvariant extends RoleElement<FSTInvariant> {
 		ROLE_TYPE_INVARIANT, MISC
 	}
 
+	private LinkedList<String> parameterTypes;
+	boolean hasProperIdentifier;
+	boolean isAsmetalInvariant;
 	RoleTypes parentRoleType;
-
+	public FSTInvariant(String name, String body, LinkedList<String> _parameterTypes, int beginLine, int endLine, boolean _hasProperIdentifier, boolean _isAsmetalInvaraint) 
+	{
+		super(name, "", "", body, beginLine, endLine);
+		hasProperIdentifier = _hasProperIdentifier;
+		isAsmetalInvariant = _isAsmetalInvaraint;
+		parameterTypes = _parameterTypes;
+		}
 	/**
 	 * @param name name of the invariant
 	 * @param body content of the invariant
 	 */
 	public FSTInvariant(String name, String body) {
 		super(name, "", "", body, -1, -1);
+		hasProperIdentifier = false;
+		isAsmetalInvariant = false;
 	}
 
 	/**
@@ -54,13 +67,31 @@ public class FSTInvariant extends RoleElement<FSTInvariant> {
 	}
 
 	public int getUniqueIdentifier() {
-		return (body + beginLine).hashCode();
+		return (body + beginLine + getFile()).hashCode();
 	}
 
-	public String getFullName() {
-		String name = body.replaceAll("  ", "").replace((char) 10, ' ').replaceFirst("invariant\\W+", "").replaceFirst("invariant_redundantly\\W+", "");
-		return ((name.length() > 25 ? name.substring(0, 25) + "..." : name));
-	}
+	public String getFullName() 
+	{
+	
+	if (isAsmetalInvariant)
+	{
+		StringBuilder fullname = new StringBuilder();
+		fullname.append(hasProperIdentifier ? name : "[line " + beginLine + "]");
+		fullname.append(" over ");
+			for (int i = 0; i < parameterTypes.size(); i++) {
+				if (i > 0)
+					fullname.append(", ");
+				fullname.append(parameterTypes.get(i));
+			}
+			return fullname.toString();
+			
+		}else
+		{
+			//JML Invariant
+			String name = body.replaceAll("  ", "").replace((char) 10, ' ').replaceFirst("invariant ", "");
+			return ((name.length() > 25 ? name.substring(0, 25) + "..." : name));
+		}
+	 	}
 
 	public boolean inRefinementGroup() {
 		for (FSTRole role : getRole().getFSTClass().getRoles()) {
