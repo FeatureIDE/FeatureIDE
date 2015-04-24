@@ -42,6 +42,7 @@ public interface StatisticsIds {
 	public static final String PRODUCT_LINE_IMPLEMENTATION = "Statistics of product-line implementation";
 	public static final String CONTRACT_COMPLEXITY = "Statistics of product-line specification";
 	public static final String VALID_CONFIGURATIONS = "Valid configurations of the feature model";
+	public static final String ATOMIC_SETS = "Atomic sets of the feature model";
 	public static final String NUMBER_OF_FEATURE = "Feature statistics";
 	public static final String STATISTICS_OF_THE_FEATURE_MODEL = "Statistics of the feature model";
 	public static final String PROJECT_NAME = "Project Name";
