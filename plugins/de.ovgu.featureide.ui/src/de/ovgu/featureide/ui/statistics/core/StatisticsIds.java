@@ -55,6 +55,8 @@ public interface StatisticsIds {
 	public static final String NUMBER_COMPOUND = "Number of compound features";
 	public static final String NUMBER_HIDDEN = "Number of hidden features";
 	public static final String NUMBER_CONSTRAINTS = "Number of constraints";
+	public static final String NUMBER_CONSTRAINT_FEATURES = "Number of features in constraints";
+	public static final String CONSTRAINT_RATIO = "Relative number of features in constraints";
 	public static final String MODEL_VOID = "Feature model is valid (not void)";
 	public static final String MODEL_TIMEOUT = MODEL_VOID + "timeout";
 	public static final String DESC_COMPOSER_NAME = "Generation Tool";
