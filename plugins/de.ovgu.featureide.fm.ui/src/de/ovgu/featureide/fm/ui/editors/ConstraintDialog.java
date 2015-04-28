@@ -934,10 +934,11 @@ public class ConstraintDialog implements GUIDefaults {
 	 * initializes the shell
 	 */
 	private void initShell() {
-		shell = new Shell(Display.getCurrent());
+		shell = new Shell(Display.getCurrent(), SWT.APPLICATION_MODAL | SWT.SHEET);
 		shell.setText(DEFAULT_DIALOG_TITLE);
 		shell.setImage(FEATURE_SYMBOL);
 		shell.setSize(500, 585);
+		
 		GridLayout shellLayout = new GridLayout();
 		shellLayout.marginWidth = 0;
 		shellLayout.marginHeight = 0;

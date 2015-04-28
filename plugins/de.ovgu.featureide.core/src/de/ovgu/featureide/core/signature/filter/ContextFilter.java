@@ -65,12 +65,10 @@ public class ContextFilter implements IFilter<AbstractSignature> {
 
 		solver = new SatSolver(new And(fixClauses), 2000);
 
-		for (Literal literal : solver.knownValues()) {
-			if (literal.positive) {
-				int id = projectSignatures.getFeatureID(literal.var.toString());
-				if (id > -1) {
-					selcetedFeatures[id] = true;
-				}
+		for (Literal literal : solver.knownValues(SatSolver.ValueType.TRUE)) {
+			int id = projectSignatures.getFeatureID(literal.var.toString());
+			if (id > -1) {
+				selcetedFeatures[id] = true;
 			}
 		}
 	}

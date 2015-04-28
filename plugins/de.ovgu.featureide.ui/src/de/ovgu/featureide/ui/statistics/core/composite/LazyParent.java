@@ -22,9 +22,6 @@ package de.ovgu.featureide.ui.statistics.core.composite;
 
 import java.util.LinkedList;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.TreeViewer;
 
@@ -49,19 +46,20 @@ public abstract class LazyParent extends Parent {
 	@Override
 	public Parent[] getChildren() {
 		if (lazy) {
-			Job job = new TreeJob("Calculate " + this.getClass().getName(), this) {
+			final TreeJob job = new TreeJob("Calculate " + this.getClass().getName(), this) {
 				@Override
-				public IStatus run(IProgressMonitor monitor) {
-					if (monitor.isCanceled()) {
-						return Status.CANCEL_STATUS;
-					}
+				public boolean work() {
 					initChildren();
+					return true;
+				}
+
+				@Override
+				protected void finalWork(boolean success) {
 					setCalculating(false);
-					return Status.OK_STATUS;
 				}
 			};
 			setPriority(job);
-			JobDoneListener listener = JobDoneListener.getInstance();
+			final JobDoneListener listener = JobDoneListener.getInstance();
 			if (listener != null) {
 				job.addJobChangeListener(listener);
 			}
