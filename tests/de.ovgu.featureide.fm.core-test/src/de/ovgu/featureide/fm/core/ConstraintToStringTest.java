@@ -22,11 +22,21 @@ package de.ovgu.featureide.fm.core;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.prop4j.Equals;
 import org.prop4j.Implies;
 import org.prop4j.Literal;
 import org.prop4j.NodeWriter;
 
 public class ConstraintToStringTest {
+	
+	@Test
+	public void testIffQuoteToString() {
+		FeatureModel fm = new FeatureModel();
+		Constraint c = new Constraint(fm, new Equals(new Literal("A"), new Literal("implies")));
+		final String s = Constraints.autoQuote(c);
+		
+		Assert.assertEquals("A iff \"implies\"", s);
+	}
 	
 	@Test
 	public void testStandardToString() {

@@ -520,7 +520,7 @@ public class ConstraintDialog implements GUIDefaults {
 	public ConstraintDialog(final FeatureModel featuremodel, final Constraint constraint) {
 		this.constraint = constraint;
 		this.featureModel = featuremodel;
-
+		
 		if (constraint == null) {
 			defaultDetailsText = StringTable.DEFAULT_DETAILS_NEW_CONSTRAINT;
 			defaultHeaderText = StringTable.DEFAULT_HEADER_NEW_CONSTRAINT;
