@@ -100,9 +100,9 @@ import de.ovgu.featureide.ui.views.outline.ContextOutlineTreeContentProvider;
  * 
  * @author Jan Wedding
  * @author Melanie Pflaume
- * @author Reimar Schröter
+ * @author Reimar Schroeter
  * @author Dominic Labsch
- * @author Daniel Püsche
+ * @author Daniel Psche
  */
 /*
  * TODO #404 fix bug: do not close the tree if a corresponding file was opened
@@ -444,7 +444,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 							if (control != null && !control.isDisposed()) {
 								final String extension = file.getFileExtension();
 
-								if ("model.xml".equals(file.getName())) {
+								if (extension.toLowerCase().equals("xml")) {
 									selectedOutlineType = OutlineLabelProvider.OUTLINE_FEATURE_MODEL;
 								} else if (supportedTypes.contains(extension)) {
 									selectedOutlineType = OutlineLabelProvider.OUTLINE_CODE;
@@ -580,7 +580,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 										viewer.setContentProvider(curContentProvider);
 										viewer.setLabelProvider(curClabel);
 										if (iFile != null) {
-											if ("model.xml".equals(iFile.getName()) && active_editor instanceof FeatureModelEditor) {
+											if ("xml".equals(iFile.getFileExtension().toLowerCase()) && active_editor instanceof FeatureModelEditor) {
 												viewer.setInput(((FeatureModelEditor) active_editor).getFeatureModel());
 
 												// recreate the context menu in case
