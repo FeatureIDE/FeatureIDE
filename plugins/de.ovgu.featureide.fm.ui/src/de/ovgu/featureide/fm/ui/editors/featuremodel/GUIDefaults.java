@@ -156,10 +156,15 @@ public interface GUIDefaults {
 	public static final Image OPERATOR_SYMBOL = FMUIPlugin.getImage("operator_symbol.gif");
 	public static final Image FEATURE_SYMBOL = FMUIPlugin.getImage("FeatureIconSmall.ico");
 	
-	public static final Image IMG_OPTIONAL = FMUIPlugin.getImage("optional.gif");
-	public static final Image IMG_MANDATORY = FMUIPlugin.getImage("mandatory.gif");
-	public static final Image IMG_OR = FMUIPlugin.getImage("or.gif");
-	public static final Image IMG_XOR = FMUIPlugin.getImage("exor.gif");
+	public static final Image IMG_UNKNOWN16x16 = FMUIPlugin.getImage("unknown16x16.png");
+	public static final Image IMG_FEATUREIDE = FMUIPlugin.getImage("featureide.png");
+	
+	public static final Image IMG_CONSTRAINTS = FMUIPlugin.getImage("constraints.png");
+	public static final Image IMG_CONSTRAINT = FMUIPlugin.getImage("constraint.png");
+	public static final Image IMG_OPTIONAL = FMUIPlugin.getImage("optional.png");
+	public static final Image IMG_MANDATORY = FMUIPlugin.getImage("mandatory.png");
+	public static final Image IMG_OR = FMUIPlugin.getImage("or.png");
+	public static final Image IMG_XOR = FMUIPlugin.getImage("xor.png");
 	
 	public static final Image PLUS_IMAGE = FMUIPlugin.getImage("plus.gif");
 	public static final Image MINUS_IMAGE = FMUIPlugin.getImage("minus.gif");

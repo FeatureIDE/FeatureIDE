@@ -92,11 +92,6 @@ public class FmTreeContentProvider implements ITreeContentProvider {
 		if (!((Feature) parentElement).hasChildren())
 			return null;
 
-		if (((Feature) parentElement).isOr())
-			return new Object[] { new FmOutlineGroupStateStorage((Feature) parentElement, true) };
-		if (((Feature) parentElement).isAlternative())
-			return new Object[] { new FmOutlineGroupStateStorage((Feature) parentElement, false) };
-
 		return featureListToArray(((Feature) parentElement).getChildren());
 	}
 
