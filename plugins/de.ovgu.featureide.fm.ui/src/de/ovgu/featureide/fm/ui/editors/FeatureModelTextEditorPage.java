@@ -130,7 +130,7 @@ public class FeatureModelTextEditorPage extends TextEditor implements IFeatureMo
 	public void propertyChange(PropertyChangeEvent event) {
 
 	}
-	
+
 	@Override
 	public boolean allowPageChange(int newPage) {
 		final String newText = getCurrentContent();

@@ -47,11 +47,11 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * @author Thomas Thuem
  */
 public class ConstraintFigure extends Figure implements GUIDefaults {
-	
+
 	private static String[] symbols = null;
 
 	private final Label label = new Label();
-	
+
 	private Constraint constraint;
 
 	public final static String VOID_MODEL = " Constraint makes the feature model void. ";
@@ -66,7 +66,7 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 	private static final IFigure UNSATISFIABLE_LABEL = new Label(UNSATISFIABLE);
 
 	private static final IFigure TAUTOLOGY_LABEL = new Label(TAUTOLOGY);
-	
+
 	public ConstraintFigure(Constraint constraint) {
 		super();
 		this.constraint = constraint;
@@ -76,30 +76,31 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 		label.setFont(DEFAULT_FONT);
 
 		label.setLocation(new Point(CONSTRAINT_INSETS.left, CONSTRAINT_INSETS.top));
-		
-		setText(getConstraintText(constraint));		
-		
-		FeatureUIHelper.setSize(constraint,getSize());
-		
+
+		setText(getConstraintText(constraint));
+
+		FeatureUIHelper.setSize(constraint, getSize());
+
 		add(label);
 		setOpaque(true);
 
 		if (FeatureUIHelper.getLocation(constraint) != null)
 			setLocation(FeatureUIHelper.getLocation(constraint));
-		
+
 		setConstraintProperties(true);
 	}
-	
+
 	/**
 	 * Sets the properties <i>color, border and tooltips</i> of the {@link ConstraintFigure}
+	 * 
 	 * @param init <code>true</code> if this method is called by the constructor else the
-	 * calculated properties will be set.
+	 *            calculated properties will be set.
 	 */
 	public void setConstraintProperties(boolean init) {
 		setBorder(FMPropertyManager.getConstraintBorder(constraint.isFeatureSelected()));
 		setBackgroundColor(FMPropertyManager.getConstraintBackgroundColor());
 
-		if(init) {
+		if (init) {
 			return;
 		}
 
@@ -112,20 +113,20 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 			setToolTip(VOID_LABEL);
 			return;
 		}
-		
+
 		if (constraintAttribute == ConstraintAttribute.UNSATISFIABLE) {
 			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
 			setToolTip(UNSATISFIABLE_LABEL);
 			return;
 		}
-		
+
 		if (constraintAttribute == ConstraintAttribute.TAUTOLOGY) {
 			setBackgroundColor(FMPropertyManager.getWarningColor());
-			setToolTip(TAUTOLOGY_LABEL);	
+			setToolTip(TAUTOLOGY_LABEL);
 			return;
 		}
-		
-		StringBuilder toolTip = new StringBuilder(); 
+
+		StringBuilder toolTip = new StringBuilder();
 		if (!constraint.getDeadFeatures().isEmpty()) {
 			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
 			toolTip.append(DEAD_FEATURE);
@@ -134,39 +135,39 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 				deadFeatures.add(dead.toString());
 			}
 			Collections.sort(deadFeatures, String.CASE_INSENSITIVE_ORDER);
-			
+
 			for (String dead : deadFeatures) {
 				toolTip.append("\n   ");
 				toolTip.append(dead);
 			}
 			setToolTip(new Label(toolTip.toString()));
 		}
-		
+
 		if (!constraint.getFalseOptional().isEmpty()) {
 			if (constraint.getDeadFeatures().isEmpty()) {
 				setBackgroundColor(FMPropertyManager.getWarningColor());
 			} else {
 				toolTip.append("\n\n");
 			}
-			
+
 			ArrayList<String> falseOptionalFeatures = new ArrayList<String>(constraint.getFalseOptional().size());
 			for (Feature feature : constraint.getFalseOptional()) {
 				falseOptionalFeatures.add(feature.toString());
 			}
 			Collections.sort(falseOptionalFeatures, String.CASE_INSENSITIVE_ORDER);
-			
+
 			toolTip.append(FALSE_OPTIONAL);
 			for (String feature : falseOptionalFeatures) {
 				toolTip.append("\n   ");
 				toolTip.append(feature);
 			}
-			setToolTip(new Label(toolTip.toString()));	
+			setToolTip(new Label(toolTip.toString()));
 			return;
 		}
-		
+
 		if (constraintAttribute == ConstraintAttribute.REDUNDANT) {
 			setBackgroundColor(FMPropertyManager.getWarningColor());
-			setToolTip(new Label(REDUNDANCE));	
+			setToolTip(new Label(REDUNDANCE));
 			return;
 		}
 
@@ -176,7 +177,7 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 	public void setBackgroundColor(Color bg) {
 		super.setBackgroundColor(bg);
 	}
-	
+
 	private String getConstraintText(Constraint constraint) {
 		if (symbols == null) {
 			symbols = NodeWriter.logicalSymbols;
@@ -192,7 +193,7 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 	private void setText(String newText) {
 		label.setText(newText);
 		Dimension labelSize = label.getPreferredSize();
-		
+
 		if (labelSize.equals(label.getSize()))
 			return;
 		label.setSize(labelSize);
@@ -214,5 +215,5 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 	public Rectangle getLabelBounds() {
 		return label.getBounds();
 	}
-	
+
 }

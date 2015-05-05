@@ -49,18 +49,18 @@ public class FeatureMoveEditPolicy extends NonResizableEditPolicy implements GUI
 	private FeatureEditPart editPart;
 
 	private ModelLayoutEditPolicy superPolicy;
-	
+
 	private FeatureDragAndDropCommand cmd;
 
 	public FeatureMoveEditPolicy(FeatureEditPart editPart, ModelLayoutEditPolicy superPolicy) {
 		this.editPart = editPart;
 		this.superPolicy = superPolicy;
 	}
-	
+
 	private Point s;
-	
+
 	private RectangleFigure r;
-	
+
 	private PolylineConnection c;
 
 	@Override
@@ -70,7 +70,7 @@ public class FeatureMoveEditPolicy extends NonResizableEditPolicy implements GUI
 		r.setLineStyle(Graphics.LINE_DOT);
 		r.setForegroundColor(ColorConstants.white);
 		r.setBounds(getInitialFeedbackBounds());
-		
+
 		s = FeatureUIHelper.getSourceLocation(editPart.getFeature());
 		Point s2 = s.getCopy();
 		getHostFigure().translateToAbsolute(s2);
@@ -79,47 +79,47 @@ public class FeatureMoveEditPolicy extends NonResizableEditPolicy implements GUI
 		c.setForegroundColor(NEW_CONNECTION_FOREGROUND);
 		c.setSourceAnchor(new XYAnchor(s2));
 		c.setTargetAnchor(new XYAnchor(s2));
-		
+
 		FreeformLayer l = new FreeformLayer();
 		l.add(r);
 		l.add(c);
-		
+
 		addFeedback(l);
 		return l;
 	}
-	
+
 	@Override
 	protected void showChangeBoundsFeedback(ChangeBoundsRequest request) {
 
 		//call createDragSourceFeedbackFigure on start of the move
 		getDragSourceFeedbackFigure();
-		
+
 		PrecisionRectangle rect = new PrecisionRectangle(getInitialFeedbackBounds().getCopy());
 		getHostFigure().translateToAbsolute(rect);
 		rect.translate(request.getMoveDelta());
 		rect.resize(request.getSizeDelta());
 		r.translateToRelative(rect);
 		r.setBounds(rect);
-		
+
 		Point s2 = s.getCopy();
 		getHostFigure().translateToAbsolute(s2);
 		s2.translate(request.getMoveDelta());
 		c.setSourceAnchor(new XYAnchor(s2));
 
-		if(superPolicy.getConstraintCommand() instanceof FeatureDragAndDropCommand){
-		cmd = (FeatureDragAndDropCommand)superPolicy.getConstraintCommand();
+		if (superPolicy.getConstraintCommand() instanceof FeatureDragAndDropCommand) {
+			cmd = (FeatureDragAndDropCommand) superPolicy.getConstraintCommand();
 			Point location;
 			if (cmd != null && cmd.getNewParent() != null) {
 				location = FeatureUIHelper.getTargetLocation(cmd.getNewParent());
 				getHostFigure().translateToAbsolute(location);
-				c.setForegroundColor(cmd.canExecute() ? NEW_CONNECTION_FOREGROUND : VOID_CONNECTION_FOREGROUND);			
-			}
-			else
+				c.setForegroundColor(cmd.canExecute() ? NEW_CONNECTION_FOREGROUND : VOID_CONNECTION_FOREGROUND);
+			} else
 				location = s2;
 			c.setTargetAnchor(new XYAnchor(location));
-		
+
+		}
 	}
-	}
+
 	@Override
 	protected void eraseChangeBoundsFeedback(ChangeBoundsRequest request) {
 		super.eraseChangeBoundsFeedback(request);

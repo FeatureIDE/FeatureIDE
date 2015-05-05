@@ -162,7 +162,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	private ReverseOrderAction reverseOrderAction;
 
 	private List<LayoutSelectionAction> setLayoutActions;
-	
+
 	private List<NameTypeSelectionAction> setNameType;
 
 	private AutoLayoutConstraintAction autoLayoutConstraintAction;
@@ -170,7 +170,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	private int index;
 
 	private Job analyzeJob;
-	
+
 	private boolean waiting = false;
 
 	private FeatureModelAnalyzer analyzer;
@@ -293,11 +293,11 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			setLayoutActions.add(new LayoutSelectionAction(this, featureModel, i, 0));
 		}
 		autoLayoutConstraintAction = new AutoLayoutConstraintAction(this, featureModel);
-		
+
 		setNameType = new ArrayList<NameTypeSelectionAction>(2);
 		setNameType.add(new NameTypeSelectionAction(this, featureModel, 0));
 		setNameType.add(new NameTypeSelectionAction(this, featureModel, 1));
-		
+
 	}
 
 	public void createContextMenu(MenuManager menu) {
@@ -352,7 +352,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			setLayoutActions.get(i).setChecked(isChosen);
 			setLayoutActions.get(i).setEnabled(!isChosen);
 		}
-		
+
 		final IMenuManager subMenuNameType = new MenuManager("Set Name Type");
 		for (NameTypeSelectionAction nameType : setNameType) {
 			subMenuNameType.add(nameType);
@@ -363,7 +363,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		final NameTypeSelectionAction curNameType = setNameType.get(Preferences.getDefaultFeatureNameScheme());
 		curNameType.setChecked(true);
 		curNameType.setEnabled(false);
-		
+
 		autoLayoutConstraintAction.setEnabled(!getFeatureModel().getLayout().hasFeaturesAutoLayout());
 
 		boolean connectionSelected = alternativeAction.isConnectionSelected();
@@ -515,11 +515,11 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		if (!onlyLayout)
 			getContents().refresh();
 	}
-	
+
 	public void reload() {
 		setContents(getFeatureModel());
 	}
-	
+
 	public void refresh() {
 		if (getFeatureModel() == null || getFeatureModel().getRoot() == null || getContents() == null) {
 			return;
@@ -530,7 +530,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			return;
 		}
 		waiting = true;
-		final boolean runAnalysis = featureModelEditor.getFeatureModel().getAnalyser().runCalculationAutomatically && featureModelEditor.getFeatureModel().getAnalyser().calculateFeatures;
+		final boolean runAnalysis = featureModelEditor.getFeatureModel().getAnalyser().runCalculationAutomatically
+				&& featureModelEditor.getFeatureModel().getAnalyser().calculateFeatures;
 		/**
 		 * This extra job is necessary, else the UI will stop.
 		 */
@@ -586,7 +587,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 						final HashMap<Object, Object> changedAttributes = analyzer.analyzeFeatureModel(new NullProgressMonitor());
 
 						refreshGraphics(changedAttributes);
-						
+
 						return true;
 					}
 				};
@@ -738,20 +739,20 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	public void doSave(IProgressMonitor monitor) {
 
 	}
-	
+
 	@Override
 	public boolean allowPageChange(int newPage) {
 		return true;
 	}
-	
+
 	@Override
 	public void pageChangeFrom(int newPage) {
-		
+
 	}
 
 	@Override
 	public void pageChangeTo(int oldPage) {
-		
+
 	}
 
 	@Override
@@ -767,5 +768,5 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			analyzeJob.cancel();
 		}
 	}
-	
+
 }

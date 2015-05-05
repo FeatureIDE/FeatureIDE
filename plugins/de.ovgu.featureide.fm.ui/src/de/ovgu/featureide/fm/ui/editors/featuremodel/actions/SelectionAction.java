@@ -46,38 +46,38 @@ public class SelectionAction extends Action {
 		public void selectionChanged(SelectionChangedEvent event) {
 			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
 
-			if (isSelectionValid(selection)){		
+			if (isSelectionValid(selection)) {
 				for (Feature feature : model.getFeatures()) {
 					if (feature.isConstraintSelected()) {
 						feature.setConstraintSelected(false);
 					}
 				}
-				
+
 				for (Constraint constraint : model.getConstraints()) {
 					if (constraint.isFeatureSelected()) {
 						constraint.setFeatureSelected(false);
 					}
 				}
-				
-				if (selection.getFirstElement() instanceof ConstraintEditPart) {					
+
+				if (selection.getFirstElement() instanceof ConstraintEditPart) {
 					((ConstraintEditPart) selection.getFirstElement()).performRequest(new Request(RequestConstants.REQ_SELECTION));
-				} else  if (selection.getFirstElement() instanceof FeatureEditPart){					
+				} else if (selection.getFirstElement() instanceof FeatureEditPart) {
 					((FeatureEditPart) selection.getFirstElement()).performRequest(new Request(RequestConstants.REQ_SELECTION));
 				}
-			} 
+			}
 		}
 	};
-	
+
 	private FeatureModel model;
-	
-	public SelectionAction (GraphicalViewerImpl viewer, FeatureModel featureModel){
+
+	public SelectionAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
 		super("Selection");
 		this.model = featureModel;
-		
+
 		viewer.addSelectionChangedListener(listener);
 	}
-	
-	public boolean isSelectionValid(IStructuredSelection selection){
+
+	public boolean isSelectionValid(IStructuredSelection selection) {
 		return selection.size() == 1;
 	}
 }

@@ -43,8 +43,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.ConstraintFigure;
  * 
  * @author Thomas Thuem
  */
-public class ConstraintEditPart extends AbstractGraphicalEditPart implements
-		PropertyConstants, PropertyChangeListener {
+public class ConstraintEditPart extends AbstractGraphicalEditPart implements PropertyConstants, PropertyChangeListener {
 
 	public ConstraintEditPart(Constraint constraint) {
 		super();
@@ -70,16 +69,15 @@ public class ConstraintEditPart extends AbstractGraphicalEditPart implements
 
 	}
 
-	public void performRequest(Request request) {		
+	public void performRequest(Request request) {
 		if (request.getType() == RequestConstants.REQ_OPEN) {
-			new ConstraintDialog(getConstraintModel().getFeatureModel(),
-					getConstraintModel());					
+			new ConstraintDialog(getConstraintModel().getFeatureModel(), getConstraintModel());
 		} else if (request.getType() == RequestConstants.REQ_SELECTION) {
 			try {
-				for (Feature containedFeature : getConstraintModel().getContainedFeatures()){
+				for (Feature containedFeature : getConstraintModel().getContainedFeatures()) {
 					containedFeature.setConstraintSelected(true);
 				}
-			} catch (NullPointerException e){
+			} catch (NullPointerException e) {
 				FMCorePlugin.getDefault().reportBug(320);
 			}
 		}

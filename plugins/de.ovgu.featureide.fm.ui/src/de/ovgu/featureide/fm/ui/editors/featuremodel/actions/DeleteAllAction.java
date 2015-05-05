@@ -40,9 +40,7 @@ public class DeleteAllAction extends SingleSelectionAction {
 
 	public static final String ID = "de.ovgu.featureide.deleteall";
 	private FeatureModel featureModel;
-	private static ImageDescriptor deleteImage = PlatformUI.getWorkbench()
-			.getSharedImages()
-			.getImageDescriptor(ISharedImages.IMG_TOOL_DELETE);
+	private static ImageDescriptor deleteImage = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_DELETE);
 
 	/**
 	 * 
@@ -63,8 +61,7 @@ public class DeleteAllAction extends SingleSelectionAction {
 		op.addContext((IUndoContext) featureModel.getUndoContext());
 
 		try {
-			PlatformUI.getWorkbench().getOperationSupport()
-					.getOperationHistory().execute(op, null, null);
+			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
 

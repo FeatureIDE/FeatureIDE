@@ -47,34 +47,34 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * @author Thomas Thuem
  */
 public class ModelEditPart extends AbstractGraphicalEditPart {
-	
+
 	public ModelEditPart(FeatureModel featureModel) {
 		super();
 		setModel(featureModel);
 	}
-	
+
 	public FeatureModel getFeatureModel() {
 		return (FeatureModel) getModel();
 	}
-	
+
 	protected IFigure createFigure() {
 		Figure fig = new FreeformLayer();
 		fig.setLayoutManager(new FreeformLayout());
 		fig.setBorder(new MarginBorder(5));
 		return fig;
 	}
-	
+
 	@Override
 	protected void createEditPolicies() {
 		installEditPolicy(EditPolicy.LAYOUT_ROLE, new ModelLayoutEditPolicy(getFeatureModel()));
 	}
-	
+
 	@Override
 	protected List<Object> getModelChildren() {
 		LinkedList<Object> list = new LinkedList<Object>();
 		addFeatures(getFeatureModel().getRoot(), list);
-		if(!FMPropertyManager.isLegendHidden()) {
-			list.add(new Legend((FeatureModel)getModel()));
+		if (!FMPropertyManager.isLegendHidden()) {
+			list.add(new Legend((FeatureModel) getModel()));
 		}
 		addConstraints(getFeatureModel().getConstraints(), list);
 		return list;
@@ -87,7 +87,7 @@ public class ModelEditPart extends AbstractGraphicalEditPart {
 		for (Feature child : feature.getChildren())
 			addFeatures(child, list);
 	}
-	
+
 	private void addConstraints(List<Constraint> constraints, List<Object> list) {
 		list.addAll(constraints);
 	}

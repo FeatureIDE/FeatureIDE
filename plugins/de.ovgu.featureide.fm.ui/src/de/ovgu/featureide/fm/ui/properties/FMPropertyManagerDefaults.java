@@ -66,9 +66,10 @@ public class FMPropertyManagerDefaults {
 	static final String FALSE = "false";
 
 	public static final IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
-	
+
 	/**
 	 * Creates a Qualified name.
+	 * 
 	 * @param name the identifier for the QualifiedName
 	 * @return The new QualifiedName
 	 */

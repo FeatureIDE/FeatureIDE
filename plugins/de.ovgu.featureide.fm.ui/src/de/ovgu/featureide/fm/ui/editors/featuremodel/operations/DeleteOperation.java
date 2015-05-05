@@ -55,8 +55,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePage;
 
 /**
- * Operation with functionality to delete multiple elements from the {@link FeatureModelEditor}
- * and the {@link FmOutlinePage}. Enables Undo/Redo.
+ * Operation with functionality to delete multiple elements from the {@link FeatureModelEditor} and the {@link FmOutlinePage}. Enables Undo/Redo.
  * 
  * @author Fabian Benduhn
  */
@@ -65,15 +64,14 @@ public class DeleteOperation extends AbstractFeatureModelOperation implements GU
 	private static final String LABEL = "Delete";
 	private Object viewer;
 	private Deque<AbstractFeatureModelOperation> operations = new LinkedList<AbstractFeatureModelOperation>();
-	
+
 	public DeleteOperation(Object viewer, FeatureModel featureModel) {
 		super(featureModel, LABEL);
 		this.viewer = viewer;
 	}
 
 	@Override
-	public IStatus execute(IProgressMonitor monitor, IAdaptable info)
-			throws ExecutionException {
+	public IStatus execute(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
 		doDelete();
 		return Status.OK_STATUS;
 	}
@@ -83,32 +81,33 @@ public class DeleteOperation extends AbstractFeatureModelOperation implements GU
 	 */
 	public void doDelete() {
 		/**
-		 * The key of the Map is the feature which could be replaced by their equivalents given at the 
-		 * corresponding List. 
+		 * The key of the Map is the feature which could be replaced by their equivalents given at the
+		 * corresponding List.
 		 */
 		Map<Feature, List<Feature>> removalMap = new HashMap<Feature, List<Feature>>();
 		List<Feature> alreadyDeleted = new LinkedList<Feature>();
-		
+
 		for (Object element : getSelection().toArray()) {
 			if (removeConstraint(element)) {
 				continue;
 			}
 			removeFeature(element, removalMap, alreadyDeleted);
 		}
-		
+
 		removeContainedFeatures(removalMap, alreadyDeleted);
 	}
 
 	private IStructuredSelection getSelection() {
 		if (viewer instanceof GraphicalViewerImpl) {
 			return (IStructuredSelection) ((GraphicalViewerImpl) viewer).getSelection();
-		} else { 
+		} else {
 			return (IStructuredSelection) ((TreeViewer) viewer).getSelection();
 		}
 	}
 
 	/**
 	 * If the given element is a {@link Constraint} it will be removed instantly.
+	 * 
 	 * @param element The constraint to remove.
 	 * @return <code>true</code> if the given element was a constraint.
 	 */
@@ -117,7 +116,7 @@ public class DeleteOperation extends AbstractFeatureModelOperation implements GU
 			Constraint constraint = ((ConstraintEditPart) element).getConstraintModel();
 			executeOperation(new ConstraintDeleteOperation(constraint, featureModel));
 			return true;
-		} else if (element instanceof Constraint){
+		} else if (element instanceof Constraint) {
 			Constraint constraint = ((Constraint) element);
 			executeOperation(new ConstraintDeleteOperation(constraint, featureModel));
 			return true;
@@ -126,20 +125,20 @@ public class DeleteOperation extends AbstractFeatureModelOperation implements GU
 	}
 
 	/**
-	 * Tries to remove the given {@link Feature} else there will be an dialog for exception handling. 
+	 * Tries to remove the given {@link Feature} else there will be an dialog for exception handling.
+	 * 
 	 * @param element The feature to remove.
 	 * @param removalMap A map with the features and their equivalents.
 	 * @param alreadyDeleted A List of features which are already deleted.
 	 */
-	private void removeFeature(Object element, Map<Feature, List<Feature>> removalMap, 
-			List<Feature> alreadyDeleted) {
+	private void removeFeature(Object element, Map<Feature, List<Feature>> removalMap, List<Feature> alreadyDeleted) {
 		Feature feature = null;
 		if (element instanceof Feature) {
 			feature = ((Feature) element);
 		} else if (element instanceof FeatureEditPart) {
 			feature = ((FeatureEditPart) element).getFeature();
 		}
-		if (feature != null) {	
+		if (feature != null) {
 			if (feature.getRelevantConstraints().isEmpty()) {
 				// feature can be removed because it has no relevant constraint
 				executeOperation(new FeatureDeleteOperation(featureModel, feature));
@@ -157,37 +156,36 @@ public class DeleteOperation extends AbstractFeatureModelOperation implements GU
 			}
 		}
 	}
-	
+
 	/**
 	 * @param operation the operation to execute.
 	 */
-	public void executeOperation(AbstractFeatureModelOperation  operation) {
+	public void executeOperation(AbstractFeatureModelOperation operation) {
 		operations.add(operation);
 		try {
-			PlatformUI.getWorkbench().getOperationSupport()
-					.getOperationHistory().execute(operation, null, null);
+			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(operation, null, null);
 		} catch (ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
 	}
-	
+
 	/**
 	 * Exception handling if the {@link Feature} to remove is contained in {@link Constraint}s.<br>
-	 * If the feature could be removed a {@link DeleteOperationAlternativeDialog} will be opened to 
-	 * select the features to replace with.<br> 
+	 * If the feature could be removed a {@link DeleteOperationAlternativeDialog} will be opened to
+	 * select the features to replace with.<br>
 	 * If the feature has no equivalent an error message will be displayed.
+	 * 
 	 * @param removalMap A map with the features and their equivalents.
 	 * @param alreadyDeleted A List of features which are already deleted.
 	 */
-	private void removeContainedFeatures(Map<Feature, List<Feature>> removalMap,
-			List<Feature> alreadyDeleted) {
+	private void removeContainedFeatures(Map<Feature, List<Feature>> removalMap, List<Feature> alreadyDeleted) {
 		if (!removalMap.isEmpty()) {
 			boolean hasDeletableFeature = false;
 			List<Feature> toBeDeleted = new ArrayList<Feature>(removalMap.keySet());
-			
+
 			List<Feature> notDeletable = new LinkedList<Feature>();
 			for (Entry<Feature, List<Feature>> entry : removalMap.entrySet()) {
-				List<Feature> featureList = entry.getValue();		
+				List<Feature> featureList = entry.getValue();
 				featureList.removeAll(toBeDeleted);
 				featureList.removeAll(alreadyDeleted);
 				if (featureList.isEmpty()) {
@@ -196,19 +194,20 @@ public class DeleteOperation extends AbstractFeatureModelOperation implements GU
 					hasDeletableFeature = true;
 				}
 			}
-			
+
 			if (hasDeletableFeature) {
 				// case: features can be replaced with an equivalent feature 
-				new DeleteOperationAlternativeDialog(featureModel, removalMap, this);	
+				new DeleteOperationAlternativeDialog(featureModel, removalMap, this);
 			} else {
 				// case: features can NOT be replaced with an equivalent feature
 				openErrorDialog(notDeletable);
 			}
 		}
 	}
-	
+
 	/**
 	 * Opens an error dialog displaying the {@link Feature}s which could not be replaced by alternatives.
+	 * 
 	 * @param notDeletable The not deletable features
 	 */
 	private void openErrorDialog(List<Feature> notDeletable) {
@@ -220,17 +219,14 @@ public class DeleteOperation extends AbstractFeatureModelOperation implements GU
 				notDeletedFeatures += ", \"" + f.getName() + "\"";
 			}
 		}
-		
-		MessageDialog dialog = new MessageDialog(new Shell(), 
-				" Delete Error ", FEATURE_SYMBOL, 
-				((notDeletable.size() != 1) 
-						? "The following features are contained in constraints:" 
-						: "The following feature is contained in constraints:") + "\n" +
-				notDeletedFeatures  + "\n" + 
-				((notDeletable.size() != 1) 
-						? "Select only one feature in order to replace it with an equivalent one." 
-						: "It can not be replaced with an equivalent one."),
-				MessageDialog.ERROR, new String[] { IDialogConstants.OK_LABEL }, 0);
+
+		MessageDialog dialog = new MessageDialog(new Shell(), " Delete Error ", FEATURE_SYMBOL,
+				((notDeletable.size() != 1) ? "The following features are contained in constraints:" : "The following feature is contained in constraints:")
+						+ "\n"
+						+ notDeletedFeatures
+						+ "\n"
+						+ ((notDeletable.size() != 1) ? "Select only one feature in order to replace it with an equivalent one."
+								: "It can not be replaced with an equivalent one."), MessageDialog.ERROR, new String[] { IDialogConstants.OK_LABEL }, 0);
 		dialog.open();
 	}
 

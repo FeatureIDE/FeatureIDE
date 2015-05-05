@@ -35,7 +35,7 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * @author Thomas Thuem
  */
 public class BreadthFirstLayout extends FeatureDiagramLayoutManager {
-	
+
 	/**
 	 * @param manager
 	 */
@@ -52,7 +52,7 @@ public class BreadthFirstLayout extends FeatureDiagramLayoutManager {
 		layout(root);
 		layout(yoffset, featureModel.getConstraints());
 	}
-	
+
 	private void layout(LayoutableFeature root) {
 		if (root == null)
 			return;
@@ -65,10 +65,9 @@ public class BreadthFirstLayout extends FeatureDiagramLayoutManager {
 			int width = 2 * FMPropertyManager.getLayoutMarginX() - FMPropertyManager.getFeatureSpaceX();
 			for (LayoutableFeature feature : list) {
 				width += FeatureUIHelper.getSize(feature.getFeature()).width + FMPropertyManager.getFeatureSpaceX();
-				
-				
+
 			}
-				
+
 			int xoffset = controlWidth / 2 - width / 2;
 
 			//set location of each feature at this level
@@ -76,7 +75,7 @@ public class BreadthFirstLayout extends FeatureDiagramLayoutManager {
 			for (int i = 0; i < levelSize; i++) {
 				LayoutableFeature feature = list.removeFirst();
 				Feature f = feature.getFeature();
-				FeatureUIHelper.setLocation(f,new Point(xoffset, yoffset));
+				FeatureUIHelper.setLocation(f, new Point(xoffset, yoffset));
 				xoffset += FeatureUIHelper.getSize(f).width + FMPropertyManager.getFeatureSpaceX();
 				//add the features children
 				for (LayoutableFeature child : feature.getChildren())
@@ -86,5 +85,5 @@ public class BreadthFirstLayout extends FeatureDiagramLayoutManager {
 		}
 		yoffset -= FMPropertyManager.getFeatureSpaceY();
 	}
-	
+
 }

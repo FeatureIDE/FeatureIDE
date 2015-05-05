@@ -58,7 +58,8 @@ public class GraphicsExporter {
 		FileDialog fileDialog = new FileDialog(new Shell(), SWT.SAVE);
 		String[] extensions = { "*.png", "*.jpg", "*.bmp", "*.m", "*.xml", ".velvet", "*.svg" };
 		fileDialog.setFilterExtensions(extensions);
-		String[] filterNames = { "Portable Network Graphics *.png", "JPEG *.jpg", "Windows Bitmap *.bmp", "GUIDSL Grammar *.m", "XML Export *.xml", "Velvet Export *.velvet", "Scalable Vector Graphics *.svg" };
+		String[] filterNames = { "Portable Network Graphics *.png", "JPEG *.jpg", "Windows Bitmap *.bmp", "GUIDSL Grammar *.m", "XML Export *.xml",
+				"Velvet Export *.velvet", "Scalable Vector Graphics *.svg" };
 		fileDialog.setFilterNames(filterNames);
 		fileDialog.setOverwrite(true);
 		String filePath = fileDialog.open();
@@ -116,7 +117,8 @@ public class GraphicsExporter {
 			// check if gef-imageexport is existing and activated!
 			if (bundleExportSVG != null) {
 				try {
-					org.osgi.framework.BundleActivator act = ((org.osgi.framework.BundleActivator) bundleExportSVG.loadClass("nl.utwente.ce.imagexport.export.svg.Activator").newInstance());
+					org.osgi.framework.BundleActivator act = ((org.osgi.framework.BundleActivator) bundleExportSVG.loadClass(
+							"nl.utwente.ce.imagexport.export.svg.Activator").newInstance());
 					act.start(InternalPlatform.getDefault().getBundleContext());
 
 					Class<?> cl = bundleExportSVG.loadClass("nl.utwente.ce.imagexport.export.svg.ExportSVG");
@@ -127,10 +129,12 @@ public class GraphicsExporter {
 					FMUIPlugin.getDefault().logError(e);
 				}
 			} else {
-				final String infoMessage = "Eclipse plugin for exporting diagram in SVG format is not existing." + "\nIf you want to use this, you have to install GEF Imageexport with SVG in Eclipse from "
+				final String infoMessage = "Eclipse plugin for exporting diagram in SVG format is not existing."
+						+ "\nIf you want to use this, you have to install GEF Imageexport with SVG in Eclipse from "
 						+ "\nhttp://veger.github.com/eclipse-gef-imageexport";
 
-				MessageDialog dialog = new MessageDialog(new Shell(), "SVG export failed", FMUIPlugin.getImage("FeatureIconSmall.ico"), infoMessage, MessageDialog.INFORMATION, new String[] { IDialogConstants.OK_LABEL }, 0);
+				MessageDialog dialog = new MessageDialog(new Shell(), "SVG export failed", FMUIPlugin.getImage("FeatureIconSmall.ico"), infoMessage,
+						MessageDialog.INFORMATION, new String[] { IDialogConstants.OK_LABEL }, 0);
 
 				dialog.open();
 				FMUIPlugin.getDefault().logInfo(infoMessage);

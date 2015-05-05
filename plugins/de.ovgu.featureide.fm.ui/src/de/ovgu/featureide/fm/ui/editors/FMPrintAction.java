@@ -54,16 +54,15 @@ public class FMPrintAction extends PrintAction {
 
 		if (!(this.getWorkbenchPart() instanceof FeatureModelEditor))
 			return;
-		FeatureModelEditor fmEditor = (FeatureModelEditor) this
-				.getWorkbenchPart();
+		FeatureModelEditor fmEditor = (FeatureModelEditor) this.getWorkbenchPart();
 		FeatureModel featureModel = fmEditor.getFeatureModel();
 		FeatureModelLayout layout = featureModel.getLayout();
 		int layoutOld = layout.getLayoutAlgorithm();
-		
+
 		Collection<Feature> features = featureModel.getFeatures();
 		Iterator<Feature> featureIter = features.iterator();
 		Point minP = FeatureUIHelper.getLocation(featureIter.next()).getCopy();
-		
+
 		move(featureModel, layout, features, featureIter, minP);
 		//print
 		super.run();
@@ -71,17 +70,15 @@ public class FMPrintAction extends PrintAction {
 		return;
 	}
 
-	private void move(FeatureModel featureModel, FeatureModelLayout layout,
-			Collection<Feature> features, Iterator<Feature> featureIter,
-			Point minP) {
+	private void move(FeatureModel featureModel, FeatureModelLayout layout, Collection<Feature> features, Iterator<Feature> featureIter, Point minP) {
 		layout.setLayout(0);
 		while (featureIter.hasNext()) {
 			Feature f = featureIter.next();
 			Point p = FeatureUIHelper.getLocation(f);
 			if (p.x < minP.x)
-				minP.x=p.x;
+				minP.x = p.x;
 			if (p.y < minP.y)
-				minP.y=p.y;
+				minP.y = p.y;
 		}
 
 		moveFeatures(features, minP);
@@ -89,8 +86,7 @@ public class FMPrintAction extends PrintAction {
 		moveLegend(featureModel, layout, minP);
 	}
 
-	private void moveBack(FeatureModel featureModel, FeatureModelLayout layout,
-			int layoutOld, Collection<Feature> features, Point minP) {
+	private void moveBack(FeatureModel featureModel, FeatureModelLayout layout, int layoutOld, Collection<Feature> features, Point minP) {
 		Point minPneg = new Point(-minP.x, -minP.y);
 		moveFeatures(features, minPneg);
 		moveConstraints(featureModel, minPneg);
@@ -98,29 +94,23 @@ public class FMPrintAction extends PrintAction {
 		layout.setLayout(layoutOld);
 	}
 
-	private void moveLegend(FeatureModel featureModel,
-			FeatureModelLayout layout, Point minP) {
+	private void moveLegend(FeatureModel featureModel, FeatureModelLayout layout, Point minP) {
 		FMPoint legendPos = layout.getLegendPos();
-		Point newLegendPos = new Point(legendPos.x - minP.x, legendPos.y
-				- minP.y);
+		Point newLegendPos = new Point(legendPos.x - minP.x, legendPos.y - minP.y);
 		FeatureUIHelper.getLegendFigure(featureModel).setLocation(newLegendPos);
 		layout.setLegendPos(newLegendPos.x, newLegendPos.y);
 	}
 
 	private void moveConstraints(FeatureModel featureModel, Point minP) {
 		for (Constraint c : featureModel.getConstraints()) {
-			Point newPoint = new Point(
-					FeatureUIHelper.getLocation(c).getCopy().x - minP.x,
-					FeatureUIHelper.getLocation(c).getCopy().y - minP.y);
+			Point newPoint = new Point(FeatureUIHelper.getLocation(c).getCopy().x - minP.x, FeatureUIHelper.getLocation(c).getCopy().y - minP.y);
 			FeatureUIHelper.setLocation(c, newPoint);
 		}
 	}
 
 	private void moveFeatures(Collection<Feature> features, Point minP) {
 		for (Feature f : features) {
-			Point newPoint = new Point(
-					FeatureUIHelper.getLocation(f).getCopy().x - minP.x,
-					FeatureUIHelper.getLocation(f).getCopy().y - minP.y);
+			Point newPoint = new Point(FeatureUIHelper.getLocation(f).getCopy().x - minP.x, FeatureUIHelper.getLocation(f).getCopy().y - minP.y);
 			FeatureUIHelper.setLocation(f, newPoint);
 		}
 	}

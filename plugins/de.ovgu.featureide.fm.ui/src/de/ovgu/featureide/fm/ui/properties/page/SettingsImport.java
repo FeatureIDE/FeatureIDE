@@ -77,26 +77,26 @@ public class SettingsImport {
 	 */
 	private String getContents(File settingsFile) {
 		StringBuilder buffer = new StringBuilder();
-    	BufferedReader reader = null;
-    	try {
-    		reader = new BufferedReader(new FileReader(settingsFile));
-    		String line = null;
-    		while ((line = reader.readLine()) != null) {
-    			buffer.append(line);
-    			buffer.append("\r\n");
-    		}
-	    } catch (IOException e) {
+		BufferedReader reader = null;
+		try {
+			reader = new BufferedReader(new FileReader(settingsFile));
+			String line = null;
+			while ((line = reader.readLine()) != null) {
+				buffer.append(line);
+				buffer.append("\r\n");
+			}
+		} catch (IOException e) {
 			FMUIPlugin.getDefault().logError(e);
 		} finally {
-    		try {
-    			if (reader != null) {
-    				reader.close();
-    			}
+			try {
+				if (reader != null) {
+					reader.close();
+				}
 			} catch (IOException e) {
 				FMUIPlugin.getDefault().logError(e);
 			}
-    	}
-    	return buffer.toString();
+		}
+		return buffer.toString();
 	}
 
 }

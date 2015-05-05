@@ -30,51 +30,53 @@ import org.eclipse.ui.IEditorPart;
  * @author Jens Meinicke
  */
 public interface IConfigurationEditorPage extends IEditorPart {
-	
+
 	/**
 	 * 
 	 * @return Identifier of this page.
 	 */
 	public String getID();
-	
+
 	/**
 	 * @return the index of this page.
 	 */
 	public int getIndex();
-	
+
 	/**
 	 * @param the index of this page.
 	 */
 	public void setIndex(int index);
-	
+
 	/**
 	 * @param the configuration editor containing the page.
 	 */
 	public void setConfigurationEditor(IConfigurationEditor configurationEditor);
-	
+
 	/**
 	 * @return The Name of this page.
 	 */
 	public String getPageText();
-	
+
 	/**
 	 * Called after this page has been added to the editor.
 	 * Called if the file has been changed.
 	 */
 	public void propertyChange(PropertyChangeEvent evt);
-	
+
 	/**
 	 * Called if the tab has been changed from this page.
-	 * @param index of the new page 
+	 * 
+	 * @param index of the new page
 	 */
 	public void pageChangeFrom(int newPageIndex);
-	
+
 	/**
 	 * Called if the tab has been changed to this page.
-	 * @param index of the old page 
+	 * 
+	 * @param index of the old page
 	 */
 	public void pageChangeTo(int oldPageIndex);
-	
+
 	/**
 	 * @return This page. You can also call a constructor.
 	 */

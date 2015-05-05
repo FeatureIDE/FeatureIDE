@@ -40,7 +40,7 @@ public abstract class AbstractWizard extends Wizard implements IWorkbenchWizard 
 
 	private final List<AbstractWizardPage> pages = new LinkedList<AbstractWizardPage>();
 	private final Map<String, Object> dataMap = new HashMap<String, Object>();
-	
+
 	public AbstractWizard(String title) {
 		super();
 		setWindowTitle(title);
@@ -54,7 +54,7 @@ public abstract class AbstractWizard extends Wizard implements IWorkbenchWizard 
 	public final void putData(String key, Object data) {
 		dataMap.put(key, data);
 	}
-	
+
 	@Override
 	public void addPage(IWizardPage page) {
 		page.setWizard(this);
@@ -73,7 +73,7 @@ public abstract class AbstractWizard extends Wizard implements IWorkbenchWizard 
 			page.saveData();
 		}
 	}
-	
+
 	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
 	}

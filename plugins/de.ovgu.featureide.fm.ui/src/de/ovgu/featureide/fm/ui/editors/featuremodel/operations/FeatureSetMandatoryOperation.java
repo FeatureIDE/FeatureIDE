@@ -37,8 +37,7 @@ public class FeatureSetMandatoryOperation extends AbstractFeatureModelOperation 
 
 	/**
 	 */
-	public FeatureSetMandatoryOperation(Feature feature,
-			FeatureModel featureModel) {
+	public FeatureSetMandatoryOperation(Feature feature, FeatureModel featureModel) {
 		super(featureModel, getLabel(feature));
 		this.feature = feature;
 	}

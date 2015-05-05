@@ -54,9 +54,7 @@ public class DeleteAction extends Action {
 
 	public static final String ID = ActionFactory.DELETE.getId();
 
-	private static ImageDescriptor deleteImage = PlatformUI.getWorkbench()
-			.getSharedImages()
-			.getImageDescriptor(ISharedImages.IMG_TOOL_DELETE);
+	private static ImageDescriptor deleteImage = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_DELETE);
 
 	private final Object viewer;
 
@@ -64,8 +62,7 @@ public class DeleteAction extends Action {
 
 	private ISelectionChangedListener listener = new ISelectionChangedListener() {
 		public void selectionChanged(SelectionChangedEvent event) {
-			IStructuredSelection selection = (IStructuredSelection) event
-					.getSelection();
+			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
 			setEnabled(isValidSelection(selection));
 		}
 	};
@@ -76,8 +73,7 @@ public class DeleteAction extends Action {
 		this.featureModel = featureModel;
 		setEnabled(false);
 		if (viewer instanceof GraphicalViewerImpl)
-			((GraphicalViewerImpl) viewer)
-					.addSelectionChangedListener(listener);
+			((GraphicalViewerImpl) viewer).addSelectionChangedListener(listener);
 		else
 			((TreeViewer) viewer).addSelectionChangedListener(listener);
 	}
@@ -88,8 +84,7 @@ public class DeleteAction extends Action {
 		op.addContext((IUndoContext) featureModel.getUndoContext());
 
 		try {
-			PlatformUI.getWorkbench().getOperationSupport()
-					.getOperationHistory().execute(op, null, null);
+			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
 
@@ -99,23 +94,19 @@ public class DeleteAction extends Action {
 
 	private boolean isValidSelection(IStructuredSelection selection) {
 		// check empty selection (i.e. ModelEditPart is selected)
-		if (selection.size() == 1
-				&& selection.getFirstElement() instanceof ModelEditPart)
+		if (selection.size() == 1 && selection.getFirstElement() instanceof ModelEditPart)
 			return false;
 
 		// check that a possibly new root can be determined unique
 		Feature root = featureModel.getRoot();
 		Feature newRoot = root;
-		LinkedList<Feature> features = new LinkedList<Feature>(
-				featureModel.getFeatures());
+		LinkedList<Feature> features = new LinkedList<Feature>(featureModel.getFeatures());
 		Iterator<?> iter = selection.iterator();
 		while (iter.hasNext()) {
 			Object editPart = iter.next();
-			if (!(editPart instanceof FeatureEditPart)
-					&& !(editPart instanceof Feature))
+			if (!(editPart instanceof FeatureEditPart) && !(editPart instanceof Feature))
 				continue;
-			Feature feature = editPart instanceof FeatureEditPart ? ((FeatureEditPart) editPart)
-					.getFeature() : (Feature) editPart;
+			Feature feature = editPart instanceof FeatureEditPart ? ((FeatureEditPart) editPart).getFeature() : (Feature) editPart;
 			if (feature == root) {
 				if (root.getChildrenCount() != 1)
 					return false;

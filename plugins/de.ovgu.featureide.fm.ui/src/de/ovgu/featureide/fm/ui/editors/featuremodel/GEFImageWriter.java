@@ -49,8 +49,7 @@ import org.eclipse.ui.progress.UIJob;
  */
 public class GEFImageWriter {
 
-	public static void writeToFile(final GraphicalViewerImpl graphicalViewer,
-			final File file) {
+	public static void writeToFile(final GraphicalViewerImpl graphicalViewer, final File file) {
 		UIJob job = new UIJob("Save image") {
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
@@ -60,9 +59,8 @@ public class GEFImageWriter {
 		};
 		job.schedule();
 	}
-	
-	private static void saveEditorContentsAsImage(GraphicalViewer viewer,
-			String saveFilePath) {
+
+	private static void saveEditorContentsAsImage(GraphicalViewer viewer, String saveFilePath) {
 		Image image = drawFigureOnImage(viewer);
 		Image croppedImage = cropImage(image);
 		image.dispose();
@@ -71,17 +69,17 @@ public class GEFImageWriter {
 	}
 
 	private static Image drawFigureOnImage(GraphicalViewer viewer) {
-		IFigure figure = getRootFigure(viewer); 
+		IFigure figure = getRootFigure(viewer);
 		Rectangle bounds = figure.getBounds();
-		
+
 		Image image = new Image(null, bounds.width, bounds.height);
 		GC imageGC = new GC(image);
 		Graphics imgGraphics = new SWTGraphics(imageGC);
-		
+
 		imgGraphics.translate(-bounds.x, -bounds.y);
 		figure.paint(imgGraphics);
 		imgGraphics.translate(bounds.x, bounds.y);
-		
+
 		imageGC.dispose();
 		return image;
 	}
@@ -89,11 +87,11 @@ public class GEFImageWriter {
 	private static Image cropImage(Image image) {
 		int border = 5;
 		Rectangle r = calculateUsedRectangle(image);
-		
+
 		Image img2 = new Image(null, r.width + 2 * border, r.height + 2 * border);
 		GC imageGC2 = new GC(img2);
 		Graphics imgGraphics2 = new SWTGraphics(imageGC2);
-		
+
 		imgGraphics2.drawImage(image, r, new Rectangle(border, border, r.width, r.height));
 		return img2;
 	}
@@ -110,10 +108,8 @@ public class GEFImageWriter {
 	}
 
 	private static IFigure getRootFigure(GraphicalViewer viewer) {
-		ScalableFreeformRootEditPart rootEditPart = (ScalableFreeformRootEditPart) viewer
-				.getEditPartRegistry().get(LayerManager.ID);
-		return ((LayerManager) rootEditPart)
-				.getLayer(LayerConstants.PRINTABLE_LAYERS);
+		ScalableFreeformRootEditPart rootEditPart = (ScalableFreeformRootEditPart) viewer.getEditPartRegistry().get(LayerManager.ID);
+		return ((LayerManager) rootEditPart).getLayer(LayerConstants.PRINTABLE_LAYERS);
 	}
 
 	private static Rectangle calculateUsedRectangle(Image image) {

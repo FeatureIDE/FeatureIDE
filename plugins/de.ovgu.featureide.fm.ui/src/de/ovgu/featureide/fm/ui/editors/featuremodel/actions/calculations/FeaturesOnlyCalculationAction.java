@@ -27,15 +27,16 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 
 /**
  * TODO description
+ * 
  * @author Jens Meinicke
  */
 public class FeaturesOnlyCalculationAction extends Action {
 
 	private final FeatureModel featureModel;
-	
+
 	public FeaturesOnlyCalculationAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
 		super("Calculate Features");
-		this.featureModel = featureModel;	
+		this.featureModel = featureModel;
 		setChecked(featureModel.getAnalyser().calculateFeatures);
 	}
 

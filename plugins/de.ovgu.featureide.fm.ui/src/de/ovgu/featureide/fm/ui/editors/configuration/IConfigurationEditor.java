@@ -26,18 +26,17 @@ import org.eclipse.core.resources.IFile;
 
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 
-
 public interface IConfigurationEditor {
 	Configuration getConfiguration();
 
 	IFile getFile();
 
 	File getModelFile();
-	
+
 	ConfigJobManager getConfigJobManager();
-	
+
 	boolean isAutoSelectFeatures();
-	
+
 	void setAutoSelectFeatures(boolean autoSelectFeatures);
 
 }

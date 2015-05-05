@@ -30,7 +30,7 @@ import de.ovgu.featureide.fm.ui.handlers.base.AFileHandler;
  * 
  * @author Sebastian Krieter
  */
-public class AnalyzeVelvetHandler extends AFileHandler {	
+public class AnalyzeVelvetHandler extends AFileHandler {
 	@Override
 	protected void singleAction(IFile inputFile) {
 		FMCorePlugin.getDefault().analyzeModel(inputFile);

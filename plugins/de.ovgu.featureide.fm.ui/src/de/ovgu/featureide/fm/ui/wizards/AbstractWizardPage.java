@@ -31,12 +31,12 @@ import org.eclipse.swt.events.KeyListener;
  * @author Sebastian Krieter
  */
 public abstract class AbstractWizardPage extends WizardPage {
-	
+
 	protected class KeyPressedListener implements KeyListener {
-		
+
 		public KeyPressedListener() {
 		}
-		
+
 		@Override
 		public void keyPressed(KeyEvent e) {
 		}
@@ -46,15 +46,15 @@ public abstract class AbstractWizardPage extends WizardPage {
 			updatePage();
 		}
 	}
-	
+
 	protected AbstractWizard abstractWizard;
 	private boolean dirty = true;
-	
+
 	protected AbstractWizardPage(String name) {
 		super(name);
 		super.setPageComplete(false);
 	}
-	
+
 	@Override
 	public void setWizard(IWizard newWizard) {
 		super.setWizard(newWizard);
@@ -75,7 +75,7 @@ public abstract class AbstractWizardPage extends WizardPage {
 			removeData();
 		}
 	}
-	
+
 	public final void saveData() {
 		if (dirty) {
 			if (abstractWizard != null) {
@@ -86,6 +86,11 @@ public abstract class AbstractWizardPage extends WizardPage {
 	}
 
 	protected abstract void putData();
-	protected void removeData(){}
-	protected String checkPage(){ return null; }
+
+	protected void removeData() {
+	}
+
+	protected String checkPage() {
+		return null;
+	}
 }

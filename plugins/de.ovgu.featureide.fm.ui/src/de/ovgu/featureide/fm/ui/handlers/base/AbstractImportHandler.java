@@ -64,7 +64,7 @@ public abstract class AbstractImportHandler extends AFileHandler {
 				setFilter(fileDialog);
 
 				File inputFile;
-				while (true)  {
+				while (true) {
 					final String filepath = fileDialog.open();
 					if (filepath == null) {
 						return;
@@ -79,7 +79,7 @@ public abstract class AbstractImportHandler extends AFileHandler {
 				final FeatureModel fm = createFeatureModel();
 				modelReader = setModelReader(fm);
 				modelReader.readFromFile(inputFile);
-				
+
 				final FeatureModelWriterIFileWrapper fmWriter = new FeatureModelWriterIFileWrapper(new XmlFeatureModelWriter(fm));
 				fmWriter.writeToFile(outputFile);
 				outputFile.refreshLocal(IResource.DEPTH_ZERO, null);

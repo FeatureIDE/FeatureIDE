@@ -47,7 +47,7 @@ public class LegendEditPart extends AbstractGraphicalEditPart {
 	 */
 	@Override
 	protected IFigure createFigure() {
-		return new LegendFigure(((Legend)this.getModel()).getModel(), ((Legend) getModel()).getPos());
+		return new LegendFigure(((Legend) this.getModel()).getModel(), ((Legend) getModel()).getPos());
 	}
 
 	/*
@@ -57,8 +57,7 @@ public class LegendEditPart extends AbstractGraphicalEditPart {
 	 */
 	@Override
 	protected void createEditPolicies() {
-		installEditPolicy(EditPolicy.DIRECT_EDIT_ROLE,
-				new NonResizableEditPolicy());
+		installEditPolicy(EditPolicy.DIRECT_EDIT_ROLE, new NonResizableEditPolicy());
 
 	}
 

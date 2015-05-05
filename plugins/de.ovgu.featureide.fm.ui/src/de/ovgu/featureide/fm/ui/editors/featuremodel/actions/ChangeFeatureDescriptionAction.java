@@ -30,8 +30,7 @@ import de.ovgu.featureide.fm.ui.editors.ChangeFeatureDescriptionDialog;
  */
 public class ChangeFeatureDescriptionAction extends SingleSelectionAction {
 
-	public ChangeFeatureDescriptionAction(Object viewer,
-			FeatureModel featureModel, Object graphicalViewer) {
+	public ChangeFeatureDescriptionAction(Object viewer, FeatureModel featureModel, Object graphicalViewer) {
 		super("Change Description", viewer);
 	}
 
@@ -42,10 +41,8 @@ public class ChangeFeatureDescriptionAction extends SingleSelectionAction {
 			description = feature.getDescription();
 			description = description.trim();
 		}
-		ChangeFeatureDescriptionDialog dialog = new ChangeFeatureDescriptionDialog(
-				null, "Feature Description",
-				"Please enter a description for feature '" + feature.getName()
-						+ "'", description);
+		ChangeFeatureDescriptionDialog dialog = new ChangeFeatureDescriptionDialog(null, "Feature Description", "Please enter a description for feature '"
+				+ feature.getName() + "'", description);
 		dialog.open();
 		String descriptemp = dialog.getValue();
 

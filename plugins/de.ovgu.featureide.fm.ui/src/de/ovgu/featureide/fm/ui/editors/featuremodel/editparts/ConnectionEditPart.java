@@ -61,11 +61,10 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * 
  * @author Thomas Thuem
  */
-public class ConnectionEditPart extends AbstractConnectionEditPart implements
-		GUIDefaults, PropertyConstants, PropertyChangeListener {
+public class ConnectionEditPart extends AbstractConnectionEditPart implements GUIDefaults, PropertyConstants, PropertyChangeListener {
 
 	private Figure toolTipContent = new Figure();
-	
+
 	public ConnectionEditPart(FeatureConnection connection) {
 		super();
 		setModel(connection);
@@ -79,15 +78,13 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements
 	protected IFigure createFigure() {
 		PolylineConnection figure = new PolylineConnection();
 		figure.setForegroundColor(FMPropertyManager.getConnectionForgroundColor());
-		
+
 		FeatureConnection featureConnection = getConnectionModel();
-		if (featureConnection.getSource() instanceof ExtendedFeature 
-				&& ((ExtendedFeature) featureConnection.getSource()).isFromExtern()
-				&& featureConnection.getTarget() instanceof ExtendedFeature
-				&& ((ExtendedFeature)featureConnection.getTarget()).isFromExtern()) {
+		if (featureConnection.getSource() instanceof ExtendedFeature && ((ExtendedFeature) featureConnection.getSource()).isFromExtern()
+				&& featureConnection.getTarget() instanceof ExtendedFeature && ((ExtendedFeature) featureConnection.getTarget()).isFromExtern()) {
 			figure.setLineStyle(SWT.LINE_DASH);
 		}
-		
+
 		return figure;
 	}
 
@@ -102,7 +99,8 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements
 
 	private static final class RoleDirectEditPolicy extends DirectEditPolicy {
 		@Override
-		protected void showCurrentEditValue(DirectEditRequest request) {}
+		protected void showCurrentEditValue(DirectEditRequest request) {
+		}
 
 		@Override
 		protected Command getDirectEditCommand(DirectEditRequest request) {
@@ -124,30 +122,26 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements
 
 		Feature feature = getConnectionModel().getTarget();
 		FeatureModel featureModel = feature.getFeatureModel();
-			
-	
-		int groupType;	
-		
+
+		int groupType;
+
 		if (feature.isAlternative()) {
-			groupType=FeatureChangeGroupTypeOperation.AND;
+			groupType = FeatureChangeGroupTypeOperation.AND;
 		} else if (feature.isAnd()) {
-			groupType=FeatureChangeGroupTypeOperation.OR;
+			groupType = FeatureChangeGroupTypeOperation.OR;
 		} else {
-			groupType=FeatureChangeGroupTypeOperation.ALTERNATIVE;
+			groupType = FeatureChangeGroupTypeOperation.ALTERNATIVE;
 		}
-		
-		FeatureChangeGroupTypeOperation op = new FeatureChangeGroupTypeOperation(groupType,
-				 feature,featureModel);
+
+		FeatureChangeGroupTypeOperation op = new FeatureChangeGroupTypeOperation(groupType, feature, featureModel);
 		op.addContext((IUndoContext) featureModel.getUndoContext());
-		
+
 		try {
-			PlatformUI.getWorkbench().getOperationSupport()
-					.getOperationHistory().execute(op, null, null);
+			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (ExecutionException e) {
-		FMUIPlugin.getDefault().logError(e);
+			FMUIPlugin.getDefault().logError(e);
 		}
-		
-		
+
 		featureModel.handleModelDataChanged();
 	}
 
@@ -169,8 +163,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements
 
 	public void refreshParent() {
 		Feature newModel = getConnectionModel().getTarget();
-		FeatureEditPart newEditPart = (FeatureEditPart) getViewer()
-				.getEditPartRegistry().get(newModel);
+		FeatureEditPart newEditPart = (FeatureEditPart) getViewer().getEditPartRegistry().get(newModel);
 		setTarget(newEditPart);
 	}
 
@@ -178,19 +171,19 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements
 		Feature source = ((FeatureConnection) getModel()).getSource();
 		Feature sourceParent = ((FeatureConnection) getModel()).getSource();
 		Feature target = ((FeatureConnection) getModel()).getTarget();
-		
+
 		boolean parentHidden = false;
-		
+
 		RotatableDecoration sourceDecoration = null;
-		while(!sourceParent.isRoot()){
+		while (!sourceParent.isRoot()) {
 			sourceParent = sourceParent.getParent();
-			if(sourceParent.isHidden())
+			if (sourceParent.isHidden())
 				parentHidden = true;
-			
+
 		}
-		if ((target.isAnd() || OR_CIRCLES) && !(source.isHidden() && !FeatureUIHelper.showHiddenFeatures(getFeatureModel())))	
-			if(!(parentHidden && !FeatureUIHelper.showHiddenFeatures(getFeatureModel())))
-					sourceDecoration = new CircleDecoration(source.isMandatory());
+		if ((target.isAnd() || OR_CIRCLES) && !(source.isHidden() && !FeatureUIHelper.showHiddenFeatures(getFeatureModel())))
+			if (!(parentHidden && !FeatureUIHelper.showHiddenFeatures(getFeatureModel())))
+				sourceDecoration = new CircleDecoration(source.isMandatory());
 
 		PolylineConnection connection = (PolylineConnection) getConnectionFigure();
 		connection.setSourceDecoration(sourceDecoration);
@@ -202,17 +195,15 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements
 		RotatableDecoration targetDecoration = null;
 		if (target.getChildrenCount() > 1 || HALF_ARC) {
 			Feature source = connectionModel.getSource();
-			if(FeatureUIHelper.hasVerticalLayout(getFeatureModel())){
-				if (!target.isAnd() && (target.getChildIndex(source) == (target.getChildrenCount()-1)))
-					targetDecoration = new RelationDecoration(target.isMultiple(),
-							target.getFirstChild(), target.getChildren());
+			if (FeatureUIHelper.hasVerticalLayout(getFeatureModel())) {
+				if (!target.isAnd() && (target.getChildIndex(source) == (target.getChildrenCount() - 1)))
+					targetDecoration = new RelationDecoration(target.isMultiple(), target.getFirstChild(), target.getChildren());
 			} else {
 				if (!target.isAnd() && target.isFirstChild(source))
-					targetDecoration = new RelationDecoration(target.isMultiple(),
-							target.getLastChild(), target.getChildren());
+					targetDecoration = new RelationDecoration(target.isMultiple(), target.getLastChild(), target.getChildren());
 			}
 		}
-		
+
 		PolylineConnection connection = (PolylineConnection) getConnectionFigure();
 		connection.setTargetDecoration(targetDecoration);
 	}
@@ -221,15 +212,13 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements
 		Feature target = ((FeatureConnection) getModel()).getTarget();
 		toolTipContent.removeAll();
 		toolTipContent.setLayoutManager(new GridLayout());
-		toolTipContent.add(new Label(" Connection type: \n"
-				+ (target.isAnd() ? " And" : (target.isMultiple() ? " Or"
-						: " Alternative"))));
-		
+		toolTipContent.add(new Label(" Connection type: \n" + (target.isAnd() ? " And" : (target.isMultiple() ? " Or" : " Alternative"))));
+
 		// call of the FeatureDiagramExtensions
 		for (FeatureDiagramExtension extension : FeatureDiagramExtension.getExtensions()) {
 			toolTipContent = extension.extendConnectionToolTip(toolTipContent, this);
 		}
-		
+
 		((PolylineConnection) getConnectionFigure()).setToolTip(toolTipContent);
 	}
 
@@ -268,12 +257,10 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements
 	 * 
 	 * @return true if both features are from an external feature model
 	 */
-	private boolean connectsExternFeatures() {		
+	private boolean connectsExternFeatures() {
 		FeatureConnection featureConnection = getConnectionModel();
-		return (featureConnection.getSource() instanceof ExtendedFeature 
-				&& ((ExtendedFeature) featureConnection.getSource()).isFromExtern()
-				&& featureConnection.getTarget() instanceof ExtendedFeature
-				&& ((ExtendedFeature)featureConnection.getTarget()).isFromExtern());
+		return (featureConnection.getSource() instanceof ExtendedFeature && ((ExtendedFeature) featureConnection.getSource()).isFromExtern()
+				&& featureConnection.getTarget() instanceof ExtendedFeature && ((ExtendedFeature) featureConnection.getTarget()).isFromExtern());
 	}
 
 }

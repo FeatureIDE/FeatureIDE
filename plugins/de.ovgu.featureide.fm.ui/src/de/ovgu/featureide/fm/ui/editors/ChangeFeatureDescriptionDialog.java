@@ -39,8 +39,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
  * A simple editor to change description of a particular feature diagram.
  * 
  */
-public class ChangeFeatureDescriptionDialog extends Dialog implements
-		GUIDefaults {
+public class ChangeFeatureDescriptionDialog extends Dialog implements GUIDefaults {
 
 	private String title;
 
@@ -56,8 +55,7 @@ public class ChangeFeatureDescriptionDialog extends Dialog implements
 
 	private String initmessage;
 
-	public ChangeFeatureDescriptionDialog(Shell parentShell,
-			String dialogTitle, String dialogMessage, String initialValue) {
+	public ChangeFeatureDescriptionDialog(Shell parentShell, String dialogTitle, String dialogMessage, String initialValue) {
 		super(parentShell);
 		this.title = dialogTitle;
 		message = dialogMessage;
@@ -109,8 +107,7 @@ public class ChangeFeatureDescriptionDialog extends Dialog implements
 	}
 
 	protected void createButtonsForButtonBar(Composite parent) {
-		okButton = createButton(parent, IDialogConstants.OK_ID,
-				IDialogConstants.OK_LABEL, true);
+		okButton = createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL, true);
 		text.setFocus();
 		if (value != null) {
 			text.setText(value);
@@ -123,9 +120,7 @@ public class ChangeFeatureDescriptionDialog extends Dialog implements
 		if (message != null) {
 			label = new CLabel(composite, SWT.WRAP);
 			label.setText(message);
-			GridData data = new GridData(GridData.GRAB_HORIZONTAL
-					| GridData.GRAB_VERTICAL | GridData.HORIZONTAL_ALIGN_FILL
-					| GridData.VERTICAL_ALIGN_CENTER);
+			GridData data = new GridData(GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL | GridData.HORIZONTAL_ALIGN_FILL | GridData.VERTICAL_ALIGN_CENTER);
 			data.widthHint = convertHorizontalDLUsToPixels(IDialogConstants.MINIMUM_MESSAGE_AREA_WIDTH);
 			label.setLayoutData(data);
 			label.setFont(parent.getFont());

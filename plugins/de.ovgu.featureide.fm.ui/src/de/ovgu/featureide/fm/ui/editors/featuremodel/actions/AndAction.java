@@ -46,13 +46,11 @@ public class AndAction extends SingleSelectionAction {
 
 	@Override
 	public void run() {
-		FeatureChangeGroupTypeOperation op = new FeatureChangeGroupTypeOperation(
-				FeatureChangeGroupTypeOperation.AND, feature, featureModel);
+		FeatureChangeGroupTypeOperation op = new FeatureChangeGroupTypeOperation(FeatureChangeGroupTypeOperation.AND, feature, featureModel);
 		op.addContext((IUndoContext) featureModel.getUndoContext());
 
 		try {
-			PlatformUI.getWorkbench().getOperationSupport()
-					.getOperationHistory().execute(op, null, null);
+			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
 
@@ -62,7 +60,7 @@ public class AndAction extends SingleSelectionAction {
 	@Override
 	protected void updateProperties() {
 		boolean and = feature.isAnd();
-		setEnabled(!and  && feature.hasChildren());
+		setEnabled(!and && feature.hasChildren());
 		setChecked(and);
 	}
 

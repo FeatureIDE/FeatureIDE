@@ -84,8 +84,7 @@ abstract public class AbstractUIPlugin extends org.eclipse.ui.plugin.AbstractUIP
 	 */
 	public void openEditor(String editorID, IFile file) {
 		IFileEditorInput editorInput = new FileEditorInput(file);
-		IWorkbenchWindow window = PlatformUI.getWorkbench()
-				.getActiveWorkbenchWindow();
+		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
 		IWorkbenchPage page = window.getActivePage();
 
 		try {
@@ -158,7 +157,7 @@ abstract public class AbstractUIPlugin extends org.eclipse.ui.plugin.AbstractUIP
 		if (isDebugging())
 			getLog().log(new Status(severity, getID(), message, exception));
 	}
-	
+
 	public void reportBug(int ticket) {
 		logWarning("This is a bug. Please report it. See Ticket #" + ticket + ".");
 	}

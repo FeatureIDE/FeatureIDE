@@ -94,7 +94,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		label.setFont(DEFAULT_FONT);
 
 		label.setLocation(new Point(FEATURE_INSETS.left, FEATURE_INSETS.top));
-		
+
 		setName(feature.getDisplayName());
 
 		setProperties();

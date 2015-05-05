@@ -34,7 +34,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
  * @author Sebastian Krieter
  */
 public class SelectionWrapper<T> {
-	
+
 	public static Object checkClass(Object element, Class<?> classType) {
 		if (element.getClass() == classType) {
 			return element;
@@ -50,7 +50,7 @@ public class SelectionWrapper<T> {
 
 	private final Class<T> type;
 	private Iterator<?> it;
-	
+
 	private SelectionWrapper(IStructuredSelection selection, Class<T> type) {
 		this.type = type;
 		this.it = ((IStructuredSelection) selection).iterator();
@@ -67,5 +67,5 @@ public class SelectionWrapper<T> {
 		}
 		return null;
 	}
-	
+
 }

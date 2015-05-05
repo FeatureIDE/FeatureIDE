@@ -37,7 +37,7 @@ public class ImportVelvetHandler extends AbstractImportHandler {
 	protected IFeatureModelReader setModelReader(FeatureModel fm) {
 		return ModelIOFactory.getModelReader(fm, ModelIOFactory.TYPE_VELVET_IMPORT);
 	}
-	
+
 	@Override
 	protected FeatureModel createFeatureModel() {
 		return ModelIOFactory.getNewFeatureModel(ModelIOFactory.TYPE_VELVET_IMPORT);
@@ -45,7 +45,7 @@ public class ImportVelvetHandler extends AbstractImportHandler {
 
 	@Override
 	protected void setFilter(FileDialog fileDialog) {
-		fileDialog.setFilterExtensions(new String[]{"*.velvet"});
-		fileDialog.setFilterNames(new String[]{"Velvet"});
+		fileDialog.setFilterExtensions(new String[] { "*.velvet" });
+		fileDialog.setFilterNames(new String[] { "Velvet" });
 	}
 }

@@ -138,7 +138,7 @@ public class FeatureUIHelper {
 		}
 		return new Rectangle(getLocation(constraint), getSize(constraint));
 	}
-	
+
 	public static List<ConnectionEditPart> getConnections(Feature feature, EditPartViewer viewer) {
 		final List<ConnectionEditPart> editPartList = new LinkedList<ConnectionEditPart>();
 		final Map<?, ?> registry = viewer.getEditPartRegistry();

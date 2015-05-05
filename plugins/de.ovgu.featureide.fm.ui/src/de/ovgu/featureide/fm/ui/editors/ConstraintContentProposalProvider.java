@@ -85,7 +85,8 @@ public class ConstraintContentProposalProvider implements IContentProposalProvid
 			proposalList = getProposalList(words[LAST], features);
 		} else {
 			for (ContentProposal proposal : getProposalList(words[LAST], features)) {
-				if (proposal.getContent().length() > words[CURRENT].trim().length() && proposal.getContent().substring(0, words[CURRENT].trim().length()).equalsIgnoreCase(words[CURRENT].trim())) {
+				if (proposal.getContent().length() > words[CURRENT].trim().length()
+						&& proposal.getContent().substring(0, words[CURRENT].trim().length()).equalsIgnoreCase(words[CURRENT].trim())) {
 					proposalList.add(proposal);
 				}
 			}
@@ -173,7 +174,7 @@ public class ConstraintContentProposalProvider implements IContentProposalProvid
 		ArrayList<ContentProposal> proposals = new ArrayList<ContentProposal>();
 		ArrayList<String> featureList = new ArrayList<String>(features);
 		Collections.sort(featureList, String.CASE_INSENSITIVE_ORDER);
-		
+
 		Collection<String> operatorNamesInFeatures = Features.extractOperatorNamesFromFeatuers(features);
 
 		// TODO: Add binary operators only iff their appearance makes sense in content proposal
@@ -196,7 +197,7 @@ public class ConstraintContentProposalProvider implements IContentProposalProvid
 		//		Show feature for "A implies |"
 		//		Hide features for "A |"
 		for (String s : featureList)
-			proposals.add(new ContentProposal(s  + (operatorNamesInFeatures.contains(s.trim()) ? " " + Features.FEATURE_SUFFIX : "")));
+			proposals.add(new ContentProposal(s + (operatorNamesInFeatures.contains(s.trim()) ? " " + Features.FEATURE_SUFFIX : "")));
 
 		return proposals;
 	}

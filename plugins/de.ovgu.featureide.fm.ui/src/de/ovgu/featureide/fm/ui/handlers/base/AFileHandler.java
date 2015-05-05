@@ -28,14 +28,14 @@ import org.eclipse.core.resources.IFile;
  * @author Sebastian Krieter
  */
 public abstract class AFileHandler extends ASelectionHandler {
-	
+
 	/**
 	 * This method is called for every file in the current selection.
 	 * 
 	 * @param file the current file handle.
 	 */
 	protected abstract void singleAction(IFile file);
-	
+
 	@Override
 	protected void singleAction(Object element) {
 		final IFile project = (IFile) SelectionWrapper.checkClass(element, IFile.class);

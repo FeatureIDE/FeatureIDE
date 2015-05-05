@@ -35,13 +35,12 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.LayoutSelectionO
  * Action to select the layout for the feature model.
  */
 public class LayoutSelectionAction extends Action {
-	
+
 	private final FeatureModel featureModel;
 	private int newSelectedLayoutAlgorithm;
 	private int oldSelectedLayoutAlgorithm;
 
-	public LayoutSelectionAction(GraphicalViewerImpl viewer,
-			FeatureModel featureModel, int newSelectedLayoutAlgorithm, int oldSelectedLayoutAlgorithm) {
+	public LayoutSelectionAction(GraphicalViewerImpl viewer, FeatureModel featureModel, int newSelectedLayoutAlgorithm, int oldSelectedLayoutAlgorithm) {
 		super(FeatureDiagramLayoutHelper.getLayoutLabel(newSelectedLayoutAlgorithm));
 		this.newSelectedLayoutAlgorithm = newSelectedLayoutAlgorithm;
 		this.oldSelectedLayoutAlgorithm = oldSelectedLayoutAlgorithm;
@@ -53,11 +52,10 @@ public class LayoutSelectionAction extends Action {
 		LayoutSelectionOperation op = new LayoutSelectionOperation(featureModel, newSelectedLayoutAlgorithm, oldSelectedLayoutAlgorithm);
 		op.addContext((IUndoContext) featureModel.getUndoContext());
 		try {
-			PlatformUI.getWorkbench().getOperationSupport()
-				.getOperationHistory().execute(op, null, null);
+			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
-	}	
-	
+	}
+
 }

@@ -43,32 +43,31 @@ public class FeatureLabelEditManager extends DirectEditManager implements GUIDef
 
 	private FeatureModel featureModel;
 
-	public FeatureLabelEditManager(FeatureEditPart editpart, Class<?> editorType, 
-			FeatureCellEditorLocator locator, FeatureModel featureModel) {
+	public FeatureLabelEditManager(FeatureEditPart editpart, Class<?> editorType, FeatureCellEditorLocator locator, FeatureModel featureModel) {
 		super(editpart, editorType, locator);
 		this.featureModel = featureModel;
 	}
-	
-	
+
 	@Override
 	protected void initCellEditor() {
 		final CellEditor cellEditor = getCellEditor();
 		final Control control = cellEditor.getControl();
 		final String oldValue = ((FeatureEditPart) getEditPart()).getFeature().getName();
-		
+
 		control.setFont(DEFAULT_FONT);
 		cellEditor.setValue(oldValue);
-		
+
 		cellEditor.addListener(new ICellEditorListener() {
 			private ToolTip tooltip;
-			
+
 			public void editorValueChanged(boolean oldValidState, boolean newValidState) {
 				closeTooltip();
 				String value = (String) cellEditor.getValue();
 				if (!value.equals(oldValue)) {
 					if (value.equalsIgnoreCase(oldValue)) {
-						createTooltip("It is not recommended to change upper and lower case. You currently try to rename " + oldValue + " to " + value + ".", SWT.ICON_WARNING);
-					// TODO #455 wrong usage of extension
+						createTooltip("It is not recommended to change upper and lower case. You currently try to rename " + oldValue + " to " + value + ".",
+								SWT.ICON_WARNING);
+						// TODO #455 wrong usage of extension
 					} else if ((!featureModel.getFMComposerExtension().isValidFeatureName(value))) {
 						createTooltip(featureModel.getFMComposerExtension().getErroMessage(), SWT.ICON_ERROR);
 					} else if (featureModel.getFeatureNames().contains(value)) {
@@ -76,22 +75,24 @@ public class FeatureLabelEditManager extends DirectEditManager implements GUIDef
 					}
 				}
 			}
-			
+
 			public void cancelEditor() {
 				closeTooltip();
 			}
-			
+
 			public void applyEditorValue() {
 				closeTooltip();
 			}
+
 			private void createTooltip(String message, int icon) {
 				tooltip = new ToolTip(control.getShell(), SWT.BALLOON | icon);
 				tooltip.setAutoHide(false);
-				tooltip.setLocation(control.toDisplay(control.getSize().x/2, control.getSize().y + 5));
+				tooltip.setLocation(control.toDisplay(control.getSize().x / 2, control.getSize().y + 5));
 				tooltip.setText("Invalid Name");
 				tooltip.setMessage(message);
 				tooltip.setVisible(true);
 			}
+
 			private void closeTooltip() {
 				if (tooltip != null) {
 					tooltip.setVisible(false);

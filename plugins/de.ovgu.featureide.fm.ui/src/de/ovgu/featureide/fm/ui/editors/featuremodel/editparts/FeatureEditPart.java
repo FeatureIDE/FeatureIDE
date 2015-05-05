@@ -167,7 +167,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 		super.deactivate();
 		getFeature().removeListener(this);
 	}
-	
+
 	public void propertyChange(PropertyChangeEvent event) {
 		String prop = event.getPropertyName();
 		if (LOCATION_CHANGED.equals(prop)) {
