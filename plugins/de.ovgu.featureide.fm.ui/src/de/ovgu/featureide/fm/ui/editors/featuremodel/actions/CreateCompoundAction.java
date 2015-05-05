@@ -56,27 +56,21 @@ public class CreateCompoundAction extends Action {
 	private Object viewer;
 
 	private Feature parent = null;
-	
+
 	private LinkedList<Feature> selectedFeatures = new LinkedList<Feature>();
-	
+
 	private Object diagramEditor;
 
-	private static ImageDescriptor createImage = PlatformUI.getWorkbench()
-			.getSharedImages()
-			.getImageDescriptor(ISharedImages.IMG_OBJ_ADD);
+	private static ImageDescriptor createImage = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ADD);
 
 	private ISelectionChangedListener listener = new ISelectionChangedListener() {
 		public void selectionChanged(SelectionChangedEvent event) {
-			IStructuredSelection selection = (IStructuredSelection) event
-					.getSelection();
+			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
 			setEnabled(isValidSelection(selection));
 		}
 	};
 
-	
-
-	public CreateCompoundAction(Object viewer,
-			FeatureModel featureModel, Object diagramEditor) {
+	public CreateCompoundAction(Object viewer, FeatureModel featureModel, Object diagramEditor) {
 		super("Create Feature Above", createImage);
 		this.viewer = viewer;
 		this.featureModel = featureModel;
@@ -92,13 +86,11 @@ public class CreateCompoundAction extends Action {
 
 	@Override
 	public void run() {
-		FeatureCreateCompoundOperation op = new FeatureCreateCompoundOperation(
-				viewer, parent, featureModel, selectedFeatures, diagramEditor);
+		FeatureCreateCompoundOperation op = new FeatureCreateCompoundOperation(viewer, parent, featureModel, selectedFeatures, diagramEditor);
 		op.addContext((IUndoContext) featureModel.getUndoContext());
 
 		try {
-			PlatformUI.getWorkbench().getOperationSupport()
-					.getOperationHistory().execute(op, null, null);
+			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
 
@@ -107,9 +99,7 @@ public class CreateCompoundAction extends Action {
 
 	private boolean isValidSelection(IStructuredSelection selection) {
 		// check empty selection (i.e. ModelEditPart is selected)
-		if (selection.size() == 1
-				&& (selection.getFirstElement() instanceof ModelEditPart 
-						))
+		if (selection.size() == 1 && (selection.getFirstElement() instanceof ModelEditPart))
 			return false;
 
 		// check that selected features have the same parent
@@ -120,12 +110,12 @@ public class CreateCompoundAction extends Action {
 			if (!(editPart instanceof FeatureEditPart) && !(editPart instanceof Feature))
 				continue;
 			Feature feature;
-			
+
 			if (editPart instanceof FeatureEditPart)
 				feature = ((FeatureEditPart) editPart).getFeature();
 			else
 				feature = (Feature) editPart;
-			
+
 			if (selectedFeatures.isEmpty())
 				parent = feature.getParent();
 			else if (parent != feature.getParent())

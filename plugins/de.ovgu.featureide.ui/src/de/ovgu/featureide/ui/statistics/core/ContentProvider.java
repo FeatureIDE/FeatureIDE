@@ -37,6 +37,7 @@ import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
+import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.AtomicParentNode;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.ConfigParentNode;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.DirectivesNode;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.StatisticsContractComplexityNew;
@@ -159,6 +160,7 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 		Parent featureModelStatistics = new Parent(STATISTICS_OF_THE_FEATURE_MODEL);
 		featureModelStatistics.addChild(new StatisticsFeatureComplexity(NUMBER_OF_FEATURE, featModel));
 		featureModelStatistics.addChild(new ConfigParentNode(VALID_CONFIGURATIONS, featModel));
+		featureModelStatistics.addChild(new AtomicParentNode(ATOMIC_SETS, featModel));
 		godfather.addChild(featureModelStatistics);
 
 		if (composer.getGenerationMechanism() == IComposerExtensionClass.Mechanism.FEATURE_ORIENTED_PROGRAMMING) {

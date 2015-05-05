@@ -35,14 +35,14 @@ import org.eclipse.ui.handlers.HandlerUtil;
  * @author Sebastian Krieter
  */
 public abstract class ASelectionHandler extends AbstractHandler {
-	
+
 	/**
 	 * This method is called for every object in the current selection.
 	 * 
 	 * @param element the current object.
 	 */
 	protected abstract void singleAction(Object element);
-	
+
 	@Override
 	public final Object execute(ExecutionEvent event) throws ExecutionException {
 		final ISelection selection = HandlerUtil.getCurrentSelection(event);
@@ -64,13 +64,12 @@ public abstract class ASelectionHandler extends AbstractHandler {
 	 * 
 	 * @param selection the current selection
 	 * 
-	 * @return {@code true} if the handler should iterate through the current selection,</br>
-	 * 	{@code false} if the handler should stop. 
+	 * @return {@code true} if the handler should iterate through the current selection,</br> {@code false} if the handler should stop.
 	 */
 	protected boolean startAction(IStructuredSelection selection) {
 		return true;
-	}	
-	
+	}
+
 	/**
 	 * This method is called after the last object in the selection was handled.</br>
 	 * Default implementation does nothing.
@@ -78,5 +77,5 @@ public abstract class ASelectionHandler extends AbstractHandler {
 	protected void endAction() {
 		// do nothing.
 	}
-	
+
 }

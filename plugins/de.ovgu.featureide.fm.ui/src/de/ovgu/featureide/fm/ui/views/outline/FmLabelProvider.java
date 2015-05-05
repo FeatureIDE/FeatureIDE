@@ -39,7 +39,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
  * @author Jan Wedding
  * @author Melanie Pflaume
  */
-public class FmLabelProvider implements ILabelProvider,IFontProvider, GUIDefaults {
+public class FmLabelProvider implements ILabelProvider, IFontProvider, GUIDefaults {
 
 	/*
 	 * (non-Javadoc)
@@ -94,28 +94,30 @@ public class FmLabelProvider implements ILabelProvider,IFontProvider, GUIDefault
 		if (element instanceof Feature) {
 			if ((((Feature) element).isRoot()))
 				return null;
-			if (((Feature) element).getParent().isAlternative() ||((Feature) element).getParent().isOr())
+			if (((Feature) element).getParent().isAlternative() || ((Feature) element).getParent().isOr())
 				return null;
 			if (((Feature) element).isMandatory()) {
-				
+
 				Image image = IMG_MANDATORY;
 				Image reDraw = new Image(image.getDevice(), image.getImageData().width, image.getImageData().height);
 				GC gc = new GC(reDraw);
-				gc.drawImage(image, 0, 0, image.getImageData().width, image.getImageData().height, 3, 3, image.getImageData().width, image.getImageData().height);
+				gc.drawImage(image, 0, 0, image.getImageData().width, image.getImageData().height, 3, 3, image.getImageData().width,
+						image.getImageData().height);
 				gc.dispose();
-				
+
 				return reDraw;
 			} else {
 				Image image = IMG_OPTIONAL;
 				Image reDraw = new Image(image.getDevice(), image.getImageData().width, image.getImageData().height);
 				GC gc = new GC(reDraw);
-				gc.drawImage(image, 0, 0, image.getImageData().width, image.getImageData().height, 3, 3, image.getImageData().width, image.getImageData().height);
+				gc.drawImage(image, 0, 0, image.getImageData().width, image.getImageData().height, 3, 3, image.getImageData().width,
+						image.getImageData().height);
 				gc.dispose();
-				
+
 				return reDraw;
 			}
 		} else if (element instanceof FmOutlineGroupStateStorage) {
-			if (((FmOutlineGroupStateStorage)element).isOrGroup()) {
+			if (((FmOutlineGroupStateStorage) element).isOrGroup()) {
 				return IMG_OR;
 			} else {
 				return IMG_XOR;
@@ -138,11 +140,9 @@ public class FmLabelProvider implements ILabelProvider,IFontProvider, GUIDefault
 			return ((Constraint) element).getNode().toString(NodeWriter.logicalSymbols);
 		else if (element instanceof FmOutlineGroupStateStorage)
 			return "";
-	
+
 		return element.toString();
 	}
-
-
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.IFontProvider#getFont(java.lang.Object)

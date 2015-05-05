@@ -209,7 +209,72 @@ public class SatSolver {
 		}
 		return Collections.emptyList();
 	}
-	
+
+	public List<List<Literal>> atomicSets() {
+		if (test()) {
+			final List<List<Literal>> result = new ArrayList<>();
+			result.add(new ArrayList<Literal>());
+			result.add(new ArrayList<Literal>());
+
+			final IVecInt backbone = new VecInt();
+			final int[] model = solver.model();
+			final byte[] done = new byte[model.length];
+
+			for (int i = 0; i < model.length; i++) {
+				final int x = model[i];
+				if (!sat(backbone, -x)) {
+					done[i] = 2;
+					result.get((x > 0) ? 0 : 1).add(new Literal(intToVar.get(Math.abs(x))));
+					backbone.push(x);
+				}
+			}
+
+			for (int j = 0; j < model.length; j++) {
+				final int y = model[j];
+				if (done[j] < 2) {
+					done[j] = 2;
+					final ArrayList<Literal> setList = new ArrayList<>();
+					setList.add(new Literal(intToVar.get(Math.abs(y))));
+					
+					backbone.push(y);
+					for (int i = 0; i < model.length; i++) {
+						if (done[i] < 2) {
+							final int x = model[i];
+							done[i] = (byte) ((x * y < 0) ? 0 : sat(backbone, -x) ? 0 : 1);
+						}
+					}
+
+					backbone.pop().push(-y);
+					for (int i = 0; i < model.length; i++) {
+						if (done[i] == 1) {
+							final int x = model[i];
+							if (!sat(backbone, x)) {
+								done[i] = 2;
+								setList.add(new Literal(intToVar.get(Math.abs(x))));
+							}
+						}
+					}
+					backbone.pop();
+					result.add(setList);
+				}
+			}
+			return result;
+		}
+		return Collections.emptyList();
+	}
+
+	private boolean sat(IVecInt backbone, int x) {
+		backbone.push(x);
+		try {
+			return (solver.isSatisfiable(backbone));
+		} catch (TimeoutException e) {
+			FMCorePlugin.getDefault().logError(e);
+			return false;
+		} finally {
+			backbone.pop();
+		}
+	}
+
 	private List<Literal> convertToNodes(final IVecInt backbone) {
 		final ArrayList<Literal> list = new ArrayList<Literal>(backbone.size());
 		

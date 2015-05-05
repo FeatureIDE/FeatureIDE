@@ -30,16 +30,16 @@ import org.eclipse.swt.widgets.Display;
 
 import de.ovgu.featureide.fm.ui.wizards.AbstractWizard;
 
-/** 
+/**
  * 
  * @author Sebastian Krieter
  */
-public abstract class AProjectJobHandler extends ASelectionHandler {	
+public abstract class AProjectJobHandler extends ASelectionHandler {
 
 	protected final LinkedList<IProject> projects = new LinkedList<IProject>();
-	
+
 	protected AbstractWizard wizard;
-	
+
 	@Override
 	protected boolean startAction(IStructuredSelection selection) {
 		wizard = instantiateWizard();
@@ -53,13 +53,13 @@ public abstract class AProjectJobHandler extends ASelectionHandler {
 		}
 		return false;
 	}
-	
+
 	@Override
 	protected void singleAction(Object element) {
 	}
-	
+
 	protected abstract AbstractWizard instantiateWizard();
-	
+
 	protected abstract void endAction();
-	
+
 }

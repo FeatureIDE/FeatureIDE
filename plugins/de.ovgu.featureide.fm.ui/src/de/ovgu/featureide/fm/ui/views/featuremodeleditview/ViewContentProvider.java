@@ -48,13 +48,12 @@ import de.ovgu.featureide.fm.ui.views.FeatureModelEditView;
  * 
  * @author Thomas Thuem
  */
-public class ViewContentProvider implements IStructuredContentProvider,
-		ITreeContentProvider, GUIDefaults {
+public class ViewContentProvider implements IStructuredContentProvider, ITreeContentProvider, GUIDefaults {
 
 	private static final String DEFAULT_MESSAGE = "Open a feature model.";
 	private static final String DEFAULT_MANUAL_MESSAGE = "Start manual or activate automatic calculation to show statistics.";
 	private static final String CALCULATING_MESSAGE = "Calculating...";
-	
+
 	private static final String HEAD_REFACTORING = "Refactoring: SPL unchanged";
 	private static final String HEAD_GENERALIZATION = "Generalization: Products added";
 	private static final String HEAD_SPECIALIZATION = "Specialization: Products removed";
@@ -72,10 +71,10 @@ public class ViewContentProvider implements IStructuredContentProvider,
 	protected static final String NUMBER_CONSTRAINTS = "Number of constraints: ";
 	protected static final String MODEL_VOID = "Feature model is valid (not void): ";
 	protected static final String MODEL_TIMEOUT = MODEL_VOID + "timeout";
-	
+
 	private static final String STATISTICS_BEFORE = "Statistics on before edit version";
-	private static final String STATISTICS_AFTER = "Statistics on after edit version";	
-	
+	private static final String STATISTICS_AFTER = "Statistics on after edit version";
+
 	/**
 	 * time in seconds after the calculation is aborted by the SAT solver
 	 */
@@ -87,7 +86,7 @@ public class ViewContentProvider implements IStructuredContentProvider,
 	private static final int INDEX_REMOVED = 3;
 	protected static final int INDEX_STATISTICS_BEFORE = 5;
 	protected static final int INDEX_STATISTICS_AFTER = 6;
-	
+
 	private static final int INDEX_VALID = 0;
 	private static final int INDEX_FEATURES = 1;
 	private static final int INDEX_CONCRETE = 2;
@@ -102,7 +101,7 @@ public class ViewContentProvider implements IStructuredContentProvider,
 	 * minimal number of available processors needed to activate parallelization
 	 */
 	private static final int PROCESSOR_LIMIT = 4;
-	
+
 	private final FeatureModelEditView view;
 
 	TreeParent invisibleRoot = new TreeParent("");
@@ -152,7 +151,7 @@ public class ViewContentProvider implements IStructuredContentProvider,
 			refresh();
 		}
 	}
-	
+
 	public void defaultContent() {
 		if (invisibleRoot != null) {
 			invisibleRoot.setChild(new TreeObject(DEFAULT_MESSAGE, DEFAULT_IMAGE));
@@ -163,13 +162,14 @@ public class ViewContentProvider implements IStructuredContentProvider,
 	private boolean cancel = false;
 
 	private static ModelComparator comparator = new ModelComparator(TIMEOUT);
-	
+
 	public void calculateContent(final FeatureModel oldModel, final FeatureModel newModel, IProgressMonitor monitor) {
 		if (oldModel.getRoot() == null || newModel.getRoot() == null)
 			return;
 
-		if (isCanceled()) return;
-				
+		if (isCanceled())
+			return;
+
 		if (invisibleRoot.getChildren().length <= 1) {
 			//case: init
 			// 		initializes the tree with default values
@@ -180,25 +180,27 @@ public class ViewContentProvider implements IStructuredContentProvider,
 			invisibleRoot.addChild(new TreeObject(CALCULATING_MESSAGE, DEFAULT_IMAGE));
 			invisibleRoot.addChild(new TreeObject(CALCULATING_MESSAGE, DEFAULT_IMAGE));
 			invisibleRoot.addChild("");
-			
+
 			addStatistics(invisibleRoot, STATISTICS_BEFORE, oldModel, INDEX_STATISTICS_BEFORE, true, null);
 			addStatistics(invisibleRoot, STATISTICS_AFTER, newModel, INDEX_STATISTICS_AFTER, true, null);
-			
+
 			refresh();
-			
+
 			// after initializing the statistics need to be calculated
 			calculateContent(oldModel, newModel, monitor);
 		} else {
 			// case: update
-			if (isCanceled()) return;
+			if (isCanceled())
+				return;
 
 			if (Runtime.getRuntime().availableProcessors() >= PROCESSOR_LIMIT) {
 				// case: running in parallel jobs
-		        // TODO it is unnecessary to refresh this every time while nothing has changed
+				// TODO it is unnecessary to refresh this every time while nothing has changed
 				Job oldCalculationJob = new Job("Calculate: \"" + STATISTICS_BEFORE + "\"") {
 					@Override
 					protected IStatus run(IProgressMonitor monitor) {
-						if (isCanceled()) return Status.OK_STATUS;
+						if (isCanceled())
+							return Status.OK_STATUS;
 						monitor.beginTask("", 2);
 						addStatistics(invisibleRoot, STATISTICS_BEFORE, oldModel, INDEX_STATISTICS_BEFORE, false, monitor);
 						return Status.OK_STATUS;
@@ -206,11 +208,12 @@ public class ViewContentProvider implements IStructuredContentProvider,
 				};
 				oldCalculationJob.setPriority(Job.DECORATE);
 				oldCalculationJob.schedule();
-				
+
 				Job newCalculationJob = new Job("Calculate: \"" + STATISTICS_AFTER + "\"") {
 					@Override
 					protected IStatus run(IProgressMonitor monitor) {
-						if (isCanceled()) return Status.OK_STATUS;
+						if (isCanceled())
+							return Status.OK_STATUS;
 						monitor.beginTask("", 2);
 						addStatistics(invisibleRoot, STATISTICS_AFTER, newModel, INDEX_STATISTICS_AFTER, false, monitor);
 						return Status.OK_STATUS;
@@ -218,13 +221,13 @@ public class ViewContentProvider implements IStructuredContentProvider,
 				};
 				newCalculationJob.setPriority(Job.DECORATE);
 				newCalculationJob.schedule();
-				
+
 				setHeadAndExamples(monitor, oldModel, newModel);
 				monitor.setTaskName("Waiting for subtasks to finish");
 				try {
 					oldCalculationJob.join();
 					newCalculationJob.join();
-					
+
 				} catch (InterruptedException e) {
 					FMUIPlugin.getDefault().logError(e);
 				}
@@ -232,30 +235,33 @@ public class ViewContentProvider implements IStructuredContentProvider,
 				// case: running in one jobs
 				monitor.beginTask("Calculate content", 5);
 				setHeadAndExamples(monitor, oldModel, newModel);
-				if (isCanceled()) return;
+				if (isCanceled())
+					return;
 				monitor.worked(1);
 
 				// TODO it is unnecessary to refresh this every time while nothing has changed
 				addStatistics(invisibleRoot, STATISTICS_BEFORE, oldModel, INDEX_STATISTICS_BEFORE, false, monitor);
-				if (isCanceled()) return;
+				if (isCanceled())
+					return;
 				addStatistics(invisibleRoot, STATISTICS_AFTER, newModel, INDEX_STATISTICS_AFTER, false, monitor);
-			}		
+			}
 		}
 	}
 
 	/**
 	 * Sets the comparing entry and calculates some examples
+	 * 
 	 * @param monitor
-	 * @param oldModel 
-	 * @param newModel 
+	 * @param oldModel
+	 * @param newModel
 	 */
 	private void setHeadAndExamples(IProgressMonitor monitor, FeatureModel oldModel, FeatureModel newModel) {
 		monitor.setTaskName("Compare models");
 		TreeObject head = calculateHead(oldModel, newModel, comparator);
 		TreeElement[] children = invisibleRoot.getChildren();
-		((TreeObject)children[INDEX_HEAD]).setContents(head.getName(), head.getImage());
-		((TreeObject)children[INDEX_ADDED]).set(new ExampleParent(true, comparator, 1, null));
-		((TreeObject)children[INDEX_REMOVED]).set(new ExampleParent(false, comparator, 1, null));
+		((TreeObject) children[INDEX_HEAD]).setContents(head.getName(), head.getImage());
+		((TreeObject) children[INDEX_ADDED]).set(new ExampleParent(true, comparator, 1, null));
+		((TreeObject) children[INDEX_REMOVED]).set(new ExampleParent(false, comparator, 1, null));
 		refresh();
 	}
 
@@ -263,8 +269,7 @@ public class ViewContentProvider implements IStructuredContentProvider,
 	 * Calculates the content of the first line
 	 * Compares the old with the new model
 	 */
-	private TreeObject calculateHead(FeatureModel oldModel, FeatureModel newModel,
-			ModelComparator comparator) {
+	private TreeObject calculateHead(FeatureModel oldModel, FeatureModel newModel, ModelComparator comparator) {
 		long start = System.currentTimeMillis();
 
 		Comparison comparison = comparator.compare(oldModel, newModel);
@@ -300,25 +305,25 @@ public class ViewContentProvider implements IStructuredContentProvider,
 
 	/**
 	 * Sets the statistics entries and counts the numbers of program variants and configurations
+	 * 
 	 * @param root The root of the tree
 	 * @param text The text of the statistics
-	 * @param model The corresponding model 
+	 * @param model The corresponding model
 	 * @param position The position of the statistics at the roots children
-	 * @param init A flag which indicates if the statistics only should be initialized or if they should be calculated 
+	 * @param init A flag which indicates if the statistics only should be initialized or if they should be calculated
 	 * @param monitor The monitor of the running job
 	 */
-	private void addStatistics(TreeParent root, final String text,
-			final FeatureModel model, int position, boolean init, IProgressMonitor monitor) {
+	private void addStatistics(TreeParent root, final String text, final FeatureModel model, int position, boolean init, IProgressMonitor monitor) {
 		if (monitor != null) {
 			monitor.setTaskName("Calculate: \"" + text + "\"");
 		}
-		
+
 		final int features = model.getNumberOfFeatures();
 		final int constraints = model.getConstraintCount();
 		final int concrete = model.getAnalyser().countConcreteFeatures();
 		final int terminal = model.getAnalyser().countTerminalFeatures();
-		final int hidden   = model.getAnalyser().countHiddenFeatures();
-		
+		final int hidden = model.getAnalyser().countHiddenFeatures();
+
 		if (init) {
 			// case: init
 			// does not count configurations and program variants
@@ -345,51 +350,50 @@ public class ViewContentProvider implements IStructuredContentProvider,
 		} else {
 			// case: update
 			// calculates the statistics
-			TreeObject statistics = (TreeObject)root.getChildren()[position];
+			TreeObject statistics = (TreeObject) root.getChildren()[position];
 			final TreeElement[] children = statistics.getChildren();
 			try {
 				if (children[INDEX_VALID] instanceof SelectableFeature) {
-					((SelectableFeature) children[INDEX_VALID]).setName(MODEL_VOID
-							+ model.getAnalyser().isValid());
+					((SelectableFeature) children[INDEX_VALID]).setName(MODEL_VOID + model.getAnalyser().isValid());
 				} else {
-					((TreeObject) children[INDEX_VALID]).setName(MODEL_VOID
-							+ model.getAnalyser().isValid());
+					((TreeObject) children[INDEX_VALID]).setName(MODEL_VOID + model.getAnalyser().isValid());
 				}
 			} catch (TimeoutException e) {
 				if (children[INDEX_VALID] instanceof SelectableFeature) {
 					((SelectableFeature) children[INDEX_VALID]).setName(MODEL_TIMEOUT);
 				} else {
-					((TreeObject)children[INDEX_VALID]).setName(MODEL_TIMEOUT);
+					((TreeObject) children[INDEX_VALID]).setName(MODEL_TIMEOUT);
 				}
 			} catch (ConcurrentModificationException e) {
-				
+
 			}
-			((TreeObject)children[INDEX_FEATURES]).setName(NUMBER_FEATURES + features);
-			((TreeObject)children[INDEX_CONCRETE]).setName(NUMBER_CONCRETE + concrete);
-			((TreeObject)children[INDEX_ABSTRACT]).setName(NUMBER_ABSTRACT + (features - concrete));
-			((TreeObject)children[INDEX_PRIMITIVE]).setName(NUMBER_PRIMITIVE + terminal);
-			((TreeObject)children[INDEX_COMPOUND]).setName(NUMBER_COMPOUND + (features - terminal));
-			((TreeObject)children[INDEX_HIDDEN]).setName(NUMBER_HIDDEN + hidden);
-			((TreeObject)children[INDEX_CONSTRAINTS]).setName(NUMBER_CONSTRAINTS + constraints);
-			
-			if (isCanceled()) return;
-			
+			((TreeObject) children[INDEX_FEATURES]).setName(NUMBER_FEATURES + features);
+			((TreeObject) children[INDEX_CONCRETE]).setName(NUMBER_CONCRETE + concrete);
+			((TreeObject) children[INDEX_ABSTRACT]).setName(NUMBER_ABSTRACT + (features - concrete));
+			((TreeObject) children[INDEX_PRIMITIVE]).setName(NUMBER_PRIMITIVE + terminal);
+			((TreeObject) children[INDEX_COMPOUND]).setName(NUMBER_COMPOUND + (features - terminal));
+			((TreeObject) children[INDEX_HIDDEN]).setName(NUMBER_HIDDEN + hidden);
+			((TreeObject) children[INDEX_CONSTRAINTS]).setName(NUMBER_CONSTRAINTS + constraints);
+
+			if (isCanceled())
+				return;
+
 			if (Runtime.getRuntime().availableProcessors() >= PROCESSOR_LIMIT) {
 				Job job = new Job("Calculate: \"" + text + "\"") {
 					@Override
 					protected IStatus run(IProgressMonitor monitor) {
 						monitor.setTaskName("Calculate number of configurations");
-						((TreeObject)children[INDEX_CONFIGS]).set(calculateNumberOfVariants(model, true));
+						((TreeObject) children[INDEX_CONFIGS]).set(calculateNumberOfVariants(model, true));
 						refresh();
 						return Status.OK_STATUS;
 					}
 				};
 				job.setPriority(Job.DECORATE);
 				job.schedule();
-				
+
 				monitor.setTaskName("Calculate number of program variants");
-				
-				((TreeObject)children[INDEX_VARIANTS]).set(calculateNumberOfVariants(model, false));
+
+				((TreeObject) children[INDEX_VARIANTS]).set(calculateNumberOfVariants(model, false));
 				refresh();
 				monitor.worked(1);
 				try {
@@ -401,35 +405,34 @@ public class ViewContentProvider implements IStructuredContentProvider,
 					FMUIPlugin.getDefault().logError(e);
 				}
 			} else {
-				((TreeObject)children[INDEX_CONFIGS]).set(calculateNumberOfVariants(model, true));
+				((TreeObject) children[INDEX_CONFIGS]).set(calculateNumberOfVariants(model, true));
 				refresh();
 				monitor.worked(1);
-				if (isCanceled()) return;
-				((TreeObject)children[INDEX_VARIANTS]).set(calculateNumberOfVariants(model, false));
+				if (isCanceled())
+					return;
+				((TreeObject) children[INDEX_VARIANTS]).set(calculateNumberOfVariants(model, false));
 				refresh();
 				monitor.worked(1);
 			}
 		}
 	}
 
-	private TreeParent calculateNumberOfVariants(FeatureModel model,
-			boolean ignoreAbstractFeatures) {
-		
-		String variants = ignoreAbstractFeatures ? "configurations"
-				: "program variants";
+	private TreeParent calculateNumberOfVariants(FeatureModel model, boolean ignoreAbstractFeatures) {
+
+		String variants = ignoreAbstractFeatures ? "configurations" : "program variants";
 		TreeParent p = new TreeParent("Number of " + variants, null, true) {
 			@Override
-			public void initChildren() {}
+			public void initChildren() {
+			}
 		};
-		
+
 		if (!ignoreAbstractFeatures && model.getAnalyser().countConcreteFeatures() == 0) {
 			// case: there is no concrete feature so there is only one program variant,
 			//       without this the calculation least much to long
 			p.addChild("1 " + variants);
 			return p;
 		}
-		final long number = new Configuration(model, false,
-					ignoreAbstractFeatures).number(TIMEOUT_CONFIGURATION);			
+		final long number = new Configuration(model, false, ignoreAbstractFeatures).number(TIMEOUT_CONFIGURATION);
 		String s = "";
 		if (number < 0)
 			s += "more than " + (-1 - number);
@@ -439,9 +442,9 @@ public class ViewContentProvider implements IStructuredContentProvider,
 		p.addChild(s);
 		return p;
 	}
-	
+
 	/**
-	 * Refreshes the tree in a fast running job with highest priority 
+	 * Refreshes the tree in a fast running job with highest priority
 	 */
 	protected void refresh() {
 		UIJob job_setColor = new UIJob("Refresh edit view") {
@@ -459,12 +462,13 @@ public class ViewContentProvider implements IStructuredContentProvider,
 
 	/**
 	 * Stops the calculation and the running job
+	 * 
 	 * @param value
 	 */
 	public void setCanceled(boolean value) {
-		cancel  = value;
+		cancel = value;
 	}
-	
+
 	/**
 	 * @return <code>true</code> if the calculation is canceled
 	 */

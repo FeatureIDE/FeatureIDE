@@ -18,36 +18,37 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.ui.editors.featuremodel.editparts;
+package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
-import org.eclipse.draw2d.IFigure;
-import org.eclipse.gef.EditPolicy;
-import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
-import org.eclipse.gef.editpolicies.NonResizableEditPolicy;
+import java.util.List;
 
-import de.ovgu.featureide.fm.ui.editors.featuremodel.Legend;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
+import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 
 /**
- * EditPart for feature model legend
+ * Displays all atomic sets of a feature model.
  * 
- * @author Fabian Benduhn
+ * @author Sebastian Krieter
  */
-public class LegendEditPart extends AbstractGraphicalEditPart {
+public class AtomicParentNode extends LazyParent {
+	private final FeatureModel model;
 
-	LegendEditPart(Object legend) {
-		super();
-		setModel(legend);
+	public AtomicParentNode(String description, FeatureModel model) {
+		super(description, null);
+		this.model = model;
 	}
 
 	@Override
-	protected IFigure createFigure() {
-		return new LegendFigure(((Legend) this.getModel()).getModel(), ((Legend) getModel()).getPos());
-	}
+	protected void initChildren() {
+		List<List<Feature>> atomicSets = model.getAnalyser().getAtomicSets();
 
-	@Override
-	protected void createEditPolicies() {
-		installEditPolicy(EditPolicy.DIRECT_EDIT_ROLE, new NonResizableEditPolicy());
+		int i = 0;
+		for (List<Feature> list : atomicSets) {
+			if (list.size() > 1) {
+				addChild(new FeatureListNode("Atomic Set #" + ++i, list, list.size(), false));
+			}
+		}
 	}
 
 }

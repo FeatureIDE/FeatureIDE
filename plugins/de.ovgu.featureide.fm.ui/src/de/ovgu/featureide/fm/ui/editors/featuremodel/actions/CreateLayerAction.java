@@ -40,15 +40,13 @@ public class CreateLayerAction extends SingleSelectionAction {
 
 	public static final String ID = "de.ovgu.featureide.createlayer";
 
-	private static ImageDescriptor createImage = PlatformUI.getWorkbench()
-			.getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ADD);
+	private static ImageDescriptor createImage = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ADD);
 
 	private final FeatureModel featureModel;
 
 	private Object diagramEditor;
 
-	public CreateLayerAction(Object viewer,
-			FeatureModel featureModel, Object diagramEditor) {
+	public CreateLayerAction(Object viewer, FeatureModel featureModel, Object diagramEditor) {
 		super("Create Feature Below (Ins)", viewer);
 		setImageDescriptor(createImage);
 		this.featureModel = featureModel;
@@ -57,13 +55,11 @@ public class CreateLayerAction extends SingleSelectionAction {
 
 	@Override
 	public void run() {
-		FeatureCreateLayerOperation op = new FeatureCreateLayerOperation(
-				feature, viewer, featureModel, diagramEditor);
+		FeatureCreateLayerOperation op = new FeatureCreateLayerOperation(feature, viewer, featureModel, diagramEditor);
 		op.addContext((IUndoContext) featureModel.getUndoContext());
 
 		try {
-			PlatformUI.getWorkbench().getOperationSupport()
-					.getOperationHistory().execute(op, null, null);
+			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
 		}

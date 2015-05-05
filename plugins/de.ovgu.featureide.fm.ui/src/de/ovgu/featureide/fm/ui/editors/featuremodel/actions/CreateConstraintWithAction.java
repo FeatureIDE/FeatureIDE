@@ -40,37 +40,34 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 public class CreateConstraintWithAction extends CreateConstraintAction {
 
 	protected String selectedFeature;
-	
+
 	/**
 	 * @param viewer
 	 * @param featuremodel
 	 */
 	public CreateConstraintWithAction(Object viewer, FeatureModel featuremodel) {
 		super(viewer, featuremodel);
-		
+
 		if (viewer instanceof GraphicalViewerImpl)
-			((GraphicalViewerImpl) viewer)
-					.addSelectionChangedListener(listener);
+			((GraphicalViewerImpl) viewer).addSelectionChangedListener(listener);
 	}
-	
+
 	private ISelectionChangedListener listener = new ISelectionChangedListener() {
 		public void selectionChanged(SelectionChangedEvent event) {
-			IStructuredSelection selection = (IStructuredSelection) event
-					.getSelection();
-			
+			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+
 			if (selection.size() == 1) {
 				Object editPart = selection.getFirstElement();
-				
-				Feature feature = editPart instanceof FeatureEditPart ? ((FeatureEditPart) editPart)
-						.getFeature() : null;
-						
+
+				Feature feature = editPart instanceof FeatureEditPart ? ((FeatureEditPart) editPart).getFeature() : null;
+
 				if (feature != null) {
 					updateConstraintActionText(feature.getName());
-				}			
-			} 
+				}
+			}
 		}
 	};
-	
+
 	/**
 	 * @param featureName
 	 */
@@ -78,7 +75,7 @@ public class CreateConstraintWithAction extends CreateConstraintAction {
 		this.selectedFeature = featureName;
 		this.setText("Create Constraint" + (featureName.isEmpty() ? "" : " starting with \"" + featureName + "\""));
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.fm.ui.editors.featuremodel.actions.CreateConstraintAction#run()
 	 */

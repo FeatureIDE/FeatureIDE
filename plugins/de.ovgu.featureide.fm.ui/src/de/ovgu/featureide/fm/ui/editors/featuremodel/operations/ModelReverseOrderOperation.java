@@ -47,37 +47,36 @@ public class ModelReverseOrderOperation extends AbstractFeatureModelOperation {
 	protected void redo() {
 		final Feature root = featureModel.getRoot();
 		reverse(root);
-		if(!featureModel.getLayout().hasFeaturesAutoLayout()){
+		if (!featureModel.getLayout().hasFeaturesAutoLayout()) {
 			Point mid = FeatureUIHelper.getLocation(root).getCopy();
-			mid.x += FeatureUIHelper.getSize(root).width/2;
-			mid.y += FeatureUIHelper.getSize(root).height/2;
-			mirrorFeaturePositions(root,mid,
-					FeatureUIHelper.hasVerticalLayout(featureModel));
+			mid.x += FeatureUIHelper.getSize(root).width / 2;
+			mid.y += FeatureUIHelper.getSize(root).height / 2;
+			mirrorFeaturePositions(root, mid, FeatureUIHelper.hasVerticalLayout(featureModel));
 		}
 	}
 
-	private void mirrorFeaturePositions(Feature feature, Point mid, boolean vertical) {	
-		if(!feature.isRoot()){
+	private void mirrorFeaturePositions(Feature feature, Point mid, boolean vertical) {
+		if (!feature.isRoot()) {
 			Point featureMid = FeatureUIHelper.getLocation(feature).getCopy();
 			Dimension size = FeatureUIHelper.getSize(feature).getCopy();
-			
-			if(vertical){
-				featureMid.y += size.height/2;
-				featureMid.y = 2*mid.y - featureMid.y;
-				featureMid.y -= size.height/2;
+
+			if (vertical) {
+				featureMid.y += size.height / 2;
+				featureMid.y = 2 * mid.y - featureMid.y;
+				featureMid.y -= size.height / 2;
 			} else {
-				featureMid.x += size.width/2;
-				featureMid.x = 2*mid.x - featureMid.x;
-				featureMid.x -= size.width/2;
+				featureMid.x += size.width / 2;
+				featureMid.x = 2 * mid.x - featureMid.x;
+				featureMid.x -= size.width / 2;
 			}
-			
+
 			FeatureUIHelper.setLocation(feature, featureMid);
 		}
-		if(feature.hasChildren()){
-			for(Feature child : feature.getChildren())
+		if (feature.hasChildren()) {
+			for (Feature child : feature.getChildren())
 				mirrorFeaturePositions(child, mid, vertical);
 		}
-	
+
 	}
 
 	private void reverse(Feature feature) {

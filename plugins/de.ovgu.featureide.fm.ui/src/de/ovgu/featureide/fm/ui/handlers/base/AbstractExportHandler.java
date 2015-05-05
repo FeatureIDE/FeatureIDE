@@ -43,11 +43,11 @@ public abstract class AbstractExportHandler extends AFileHandler {
 	protected final void singleAction(IFile modelFile) {
 		try {
 			final FeatureModel fm = new FeatureModel();
-			
+
 			// Read model
 			final FeatureModelReaderIFileWrapper reader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(fm));
 			reader.readFromFile(modelFile);
-			
+
 			// Get writer
 			final IFeatureModelWriter fmWriter = getFeatureModelWriter(fm);
 			if (fmWriter == null) {
@@ -70,7 +70,7 @@ public abstract class AbstractExportHandler extends AFileHandler {
 			FMUIPlugin.getDefault().logError(e);
 		}
 	}
-	
+
 	/**
 	 * @param fm
 	 * @return

@@ -47,25 +47,18 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.OrAction;
  */
 public class FeatureModelEditorContributor extends EditorActionBarContributor {
 
-	private static final String[] DIAGRAM_ACTION_IDS = { CreateLayerAction.ID,
-			CreateCompoundAction.ID, DeleteAction.ID, MandatoryAction.ID,
-			AndAction.ID, OrAction.ID, AlternativeAction.ID,
-			ActionFactory.UNDO.getId(), ActionFactory.REDO.getId(),
+	private static final String[] DIAGRAM_ACTION_IDS = { CreateLayerAction.ID, CreateCompoundAction.ID, DeleteAction.ID, MandatoryAction.ID, AndAction.ID,
+			OrAction.ID, AlternativeAction.ID, ActionFactory.UNDO.getId(), ActionFactory.REDO.getId(),
 			//ActionFactory.CUT.getId(), ActionFactory.COPY.getId(),
 			//ActionFactory.PASTE.getId(),
 			ActionFactory.SELECT_ALL.getId(),
 			//ActionFactory.FIND.getId(),
-			ActionFactory.PRINT.getId(),
-			GEFActionConstants.ZOOM_IN,
-			GEFActionConstants.ZOOM_OUT,
-			//IDEActionFactory.BOOKMARK.getId()
-			};
+			ActionFactory.PRINT.getId(), GEFActionConstants.ZOOM_IN, GEFActionConstants.ZOOM_OUT,
+	//IDEActionFactory.BOOKMARK.getId()
+	};
 
-	private static final String[] TEXTEDITOR_ACTION_IDS = {
-			ActionFactory.DELETE.getId(), ActionFactory.UNDO.getId(),
-			ActionFactory.REDO.getId(), ActionFactory.CUT.getId(),
-			ActionFactory.COPY.getId(), ActionFactory.PASTE.getId(),
-			ActionFactory.SELECT_ALL.getId(), ActionFactory.FIND.getId(),
+	private static final String[] TEXTEDITOR_ACTION_IDS = { ActionFactory.DELETE.getId(), ActionFactory.UNDO.getId(), ActionFactory.REDO.getId(),
+			ActionFactory.CUT.getId(), ActionFactory.COPY.getId(), ActionFactory.PASTE.getId(), ActionFactory.SELECT_ALL.getId(), ActionFactory.FIND.getId(),
 			ActionFactory.PRINT.getId(), IDEActionFactory.BOOKMARK.getId() };
 
 	@Override
@@ -89,20 +82,16 @@ public class FeatureModelEditorContributor extends EditorActionBarContributor {
 		}
 	}
 
-	private void hookGlobalDiagramActions(FeatureModelEditor editor,
-			IActionBars actionBars) {
+	private void hookGlobalDiagramActions(FeatureModelEditor editor, IActionBars actionBars) {
 		for (int i = 0; i < DIAGRAM_ACTION_IDS.length; i++) {
-			actionBars.setGlobalActionHandler(DIAGRAM_ACTION_IDS[i], editor
-					.getDiagramAction(DIAGRAM_ACTION_IDS[i]));
+			actionBars.setGlobalActionHandler(DIAGRAM_ACTION_IDS[i], editor.getDiagramAction(DIAGRAM_ACTION_IDS[i]));
 		}
 	}
 
-	private void hookGlobalTextActions(FeatureModelEditor editor,
-			IActionBars actionBars) {
+	private void hookGlobalTextActions(FeatureModelEditor editor, IActionBars actionBars) {
 		ITextEditor textEditor = editor.getSourceEditor();
 		for (int i = 0; i < TEXTEDITOR_ACTION_IDS.length; i++) {
-			actionBars.setGlobalActionHandler(TEXTEDITOR_ACTION_IDS[i],
-					textEditor.getAction(TEXTEDITOR_ACTION_IDS[i]));
+			actionBars.setGlobalActionHandler(TEXTEDITOR_ACTION_IDS[i], textEditor.getAction(TEXTEDITOR_ACTION_IDS[i]));
 		}
 	}
 

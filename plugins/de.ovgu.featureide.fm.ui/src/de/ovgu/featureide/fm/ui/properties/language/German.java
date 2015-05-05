@@ -21,8 +21,7 @@
 package de.ovgu.featureide.fm.ui.properties.language;
 
 /**
- * Class implementing the extension point 
- * <code>"de.ovgu.featureide.fm.core.language"</code> 
+ * Class implementing the extension point <code>"de.ovgu.featureide.fm.core.language"</code>
  * 
  * @author Jens Meinicke
  * @author Florian Proksch
@@ -31,7 +30,7 @@ package de.ovgu.featureide.fm.ui.properties.language;
 public class German implements ILanguage {
 
 	public static final String NAME = "German";
-	
+
 	private static final String LEGEND = "Legende:";
 	private static final String MANDATORY = "Obligatorisch";
 	private static final String ABSTRACT = "Abstrakt";
@@ -40,49 +39,47 @@ public class German implements ILanguage {
 	private static final String INTERFACED = "von Interface";
 	private static final String CONCRETE = "Konkret";
 	private static final String HIDDEN = "Versteckt";
-	private static final String DEAD = "Unwählbar";
-	private static final String FALSE_OPTIONAL ="Falsch-optionales Feature";
+	private static final String DEAD = "Unwï¿½hlbar";
+	private static final String FALSE_OPTIONAL = "Falsch-optionales Feature";
 	private static final String ALTERNATIVE = "Alternative";
 	private static final String OR = "Oder";
 	private static final String OPTIONAL = "Optional";
 	private static final String INDETHIDDEN = "Unbestimmbar verstecktes Feature";
 	private static final String REDUNDANT = "Redundantes Constraint";
-	private static final String UNSATISFIABLE_CONST = "Unerfüllbares Constraint";
+	private static final String UNSATISFIABLE_CONST = "Unerfï¿½llbares Constraint";
 	private static final String TAUTOLOGY_CONST = "Constraint ist Tautologie";
-	private static final String VOID_MODEL_CONST = "Constraint macht Produktlinie unerfüllbar";	
-	
+	private static final String VOID_MODEL_CONST = "Constraint macht Produktlinie unerfï¿½llbar";
+
 	@Override
 	public String getRedundantConst() {
 		return REDUNDANT;
 	}
-	
-	 
+
 	@Override
 	public String getUnsatisfiableConst() {
 		return UNSATISFIABLE_CONST;
-	}	
-	
+	}
+
 	@Override
 	public String getTautologyConst() {
 		return TAUTOLOGY_CONST;
 	}
-	 
+
 	@Override
 	public String getVoidModelConst() {
 		return VOID_MODEL_CONST;
 	}
-	 	
 
 	@Override
 	public String getIndetHidden() {
 		return INDETHIDDEN;
 	}
-	
+
 	@Override
 	public String getName() {
 		return NAME;
 	}
-	
+
 	@Override
 	public String getLagendTitle() {
 		return LEGEND;
@@ -127,12 +124,12 @@ public class German implements ILanguage {
 	public String getDead() {
 		return DEAD;
 	}
-	
+
 	@Override
 	public String getFalseOptional() {
 		return FALSE_OPTIONAL;
 	}
-	
+
 	@Override
 	public String getAlternative() {
 		return ALTERNATIVE;

@@ -20,15 +20,17 @@
  */
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
+import java.util.HashSet;
 import java.util.List;
 
 import org.sat4j.specs.TimeoutException;
 
+import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
+import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 
@@ -40,68 +42,72 @@ import de.ovgu.featureide.ui.statistics.core.composite.Parent;
  */
 public final class StatisticsFeatureComplexity extends LazyParent {
 
-	private final FeatureModelAnalyzer ana;
+	private static final double precision = 1000.0;
+	
 	private final FeatureModel model;
 
 	public StatisticsFeatureComplexity(String description, FeatureModel model) {
 		super(description, null);
 		this.model = model;
-		this.ana = model.getAnalyser();
 	}
 
 	@Override
 	protected void initChildren() {
 		if (model != null) {
-			/*
-			 * Calculates the actual statistics.
-			 */
+
 			final int constraints = model.getConstraintCount();
 
 			Boolean isValid = null;
 			try {
-				isValid = ana.isValid();
+				isValid = model.getAnalyser().isValid();
 			} catch (TimeoutException e) {
+				UIPlugin.getDefault().logError(e);
 			}
 
-			/*
-			 * Creates a dataset.
-			 */
-			Collection<Feature> listOfFeatures = model.getFeatures();
+			final Collection<Feature> listOfFeatures = model.getFeatures();
+
+			final List<Feature> listOfCompoundFeatures = new ArrayList<Feature>();
+			final List<Feature> listOfPrimitiveFeatures = new ArrayList<Feature>();
+			final List<Feature> listOfAbstractFeatures = new ArrayList<Feature>();
+			final List<Feature> listOfConcreteFeatures = new ArrayList<Feature>();
+
+			for (Feature f : listOfFeatures) {
+				if (f.getChildren().isEmpty()) {
+					listOfPrimitiveFeatures.add(f);
+				} else {
+					listOfCompoundFeatures.add(f);
+				}
+				if (f.isConcrete()) {
+					listOfConcreteFeatures.add(f);
+				} else {
+					listOfAbstractFeatures.add(f);
+				}
+			}
+
+			final HashSet<Feature> constraintFeatures = new HashSet<>(model.getNumberOfFeatures() << 1);
+			for (Constraint constraint : model.getConstraints()) {
+				constraintFeatures.addAll(constraint.getContainedFeatures());
+			}
 
 			addChild(new Parent(MODEL_VOID, isValid == null ? MODEL_TIMEOUT : isValid));
 
 			addChild(new FeatureListNode(NUMBER_FEATURES, listOfFeatures));
 
-			addChild(new FeatureListNode(NUMBER_CONCRETE, model.getConcreteFeatures()));
+			addChild(new FeatureListNode(NUMBER_CONCRETE, listOfConcreteFeatures));
 
-			List<Feature> listOfAbstractFeatures = new LinkedList<Feature>();
-			for (Feature f : listOfFeatures) {
-				if (f.isAbstract()) {
-					listOfAbstractFeatures.add(f);
-				}
-			}
 			addChild(new FeatureListNode(NUMBER_ABSTRACT, listOfAbstractFeatures));
 
-			List<Feature> listOfCompoundFeatures = new LinkedList<Feature>();
-			for (Feature f : listOfFeatures) {
-				if (!f.getChildren().isEmpty()) {
-					listOfCompoundFeatures.add(f);
-				}
-			}
 			addChild(new FeatureListNode(NUMBER_COMPOUND, listOfCompoundFeatures));
 
-			List<Feature> listOfPrimitiveFeatures = new LinkedList<Feature>();
-			for (Feature f : listOfFeatures) {
-				if (f.getChildren().isEmpty()) {
-					listOfPrimitiveFeatures.add(f);
-				}
-			}
 			addChild(new FeatureListNode(NUMBER_TERMINAL, listOfPrimitiveFeatures));
 
-			addChild(new FeatureListNode(NUMBER_HIDDEN, ana.getHiddenFeatures()));
+			addChild(new FeatureListNode(NUMBER_HIDDEN, model.getAnalyser().getHiddenFeatures()));
 
 			addChild(new Parent(NUMBER_CONSTRAINTS, constraints));
 
+			addChild(new Parent(NUMBER_CONSTRAINT_FEATURES, constraintFeatures.size()));
+
+			addChild(new Parent(CONSTRAINT_RATIO, Math.floor((precision * constraintFeatures.size()) / model.getNumberOfFeatures()) / precision));
 		}
 	}
 }

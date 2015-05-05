@@ -88,7 +88,7 @@ public interface IFeatureModelEditorPage {
 	 * @param event
 	 */
 	void propertyChange(PropertyChangeEvent event);
-	
+
 	/**
 	 * Called if this page is about to change to another page.
 	 * 

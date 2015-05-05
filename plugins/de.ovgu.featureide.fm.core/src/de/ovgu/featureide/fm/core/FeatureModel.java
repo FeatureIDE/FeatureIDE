@@ -48,8 +48,8 @@ import de.ovgu.featureide.fm.core.conf.FeatureGraph;
  * @author Stefan Krueger
  * 
  */
-public class FeatureModel extends DeprecatedFeatureModel implements PropertyConstants {
-
+public class FeatureModel extends DeprecatedFeatureModel implements PropertyConstants, IGraphicItem {
+	
 	private Feature rootFeature;
 
 	/**
@@ -895,6 +895,11 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 
 	public void setFeatureGraph(FeatureGraph featureGraph) {
 		this.featureGraph = featureGraph;
+	}
+
+	@Override
+	public GraphicItem getItemType() {
+		return GraphicItem.Model;
 	}
 
 }

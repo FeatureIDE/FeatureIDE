@@ -33,8 +33,7 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * 
  * @author Thomas Thuem
  */
-public class CircleDecoration extends RoundedRectangle implements
-		RotatableDecoration, GUIDefaults {
+public class CircleDecoration extends RoundedRectangle implements RotatableDecoration, GUIDefaults {
 
 	public CircleDecoration(boolean fill) {
 		super();
@@ -47,8 +46,7 @@ public class CircleDecoration extends RoundedRectangle implements
 
 	@Override
 	public void setLocation(Point p) {
-		super.setLocation(p.translate(-SOURCE_ANCHOR_DIAMETER / 2,
-				-SOURCE_ANCHOR_DIAMETER / 2));
+		super.setLocation(p.translate(-SOURCE_ANCHOR_DIAMETER / 2, -SOURCE_ANCHOR_DIAMETER / 2));
 	}
 
 	public void setReferencePoint(Point p) {

@@ -45,13 +45,11 @@ public class HiddenAction extends SingleSelectionAction {
 	@Override
 	public void run() {
 		setChecked(feature.isHidden());
-		FeatureSetHiddenOperation op = new FeatureSetHiddenOperation(feature,
-				featureModel);
+		FeatureSetHiddenOperation op = new FeatureSetHiddenOperation(feature, featureModel);
 		op.addContext((IUndoContext) featureModel.getUndoContext());
 
 		try {
-			PlatformUI.getWorkbench().getOperationSupport()
-					.getOperationHistory().execute(op, null, null);
+			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
 

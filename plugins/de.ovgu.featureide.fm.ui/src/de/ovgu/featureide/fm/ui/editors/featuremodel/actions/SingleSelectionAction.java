@@ -43,15 +43,12 @@ import de.ovgu.featureide.fm.ui.views.outline.FmOutlineGroupStateStorage;
  * 
  * @author Thomas Thuem
  */
-public abstract class SingleSelectionAction extends Action implements
-		PropertyChangeListener, PropertyConstants {
+public abstract class SingleSelectionAction extends Action implements PropertyChangeListener, PropertyConstants {
 
 	private ISelectionChangedListener listener = new ISelectionChangedListener() {
 		public void selectionChanged(SelectionChangedEvent event) {
-			IStructuredSelection selection = (IStructuredSelection) event
-					.getSelection();
-			SingleSelectionAction.this
-					.selectionChanged(isValidSelection(selection));
+			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+			SingleSelectionAction.this.selectionChanged(isValidSelection(selection));
 		}
 	};
 
@@ -73,26 +70,22 @@ public abstract class SingleSelectionAction extends Action implements
 
 	private boolean isOneFeatureSelected(IStructuredSelection selection) {
 		return selection.size() == 1
-				&& (selection.getFirstElement() instanceof FeatureEditPart || selection
-						.getFirstElement() instanceof ConnectionEditPart || selection
-						.getFirstElement() instanceof FmOutlineGroupStateStorage|| selection
-						.getFirstElement() instanceof Feature);
+				&& (selection.getFirstElement() instanceof FeatureEditPart || selection.getFirstElement() instanceof ConnectionEditPart
+						|| selection.getFirstElement() instanceof FmOutlineGroupStateStorage || selection.getFirstElement() instanceof Feature);
 	}
 
 	public FeatureEditPart getSelectedFeatureEditPart(Object diagramEditor) {
 		Object part;
 		if (diagramEditor == null) {
-			IStructuredSelection selection = (IStructuredSelection) ((AbstractEditPartViewer) viewer)
-					.getSelection();
-			part = selection.getFirstElement(); 
+			IStructuredSelection selection = (IStructuredSelection) ((AbstractEditPartViewer) viewer).getSelection();
+			part = selection.getFirstElement();
 		} else {
-			Feature selection = (Feature) ((IStructuredSelection) ((TreeViewer) viewer)
-					.getSelection()).getFirstElement();
+			Feature selection = (Feature) ((IStructuredSelection) ((TreeViewer) viewer).getSelection()).getFirstElement();
 			part = ((GraphicalViewerImpl) diagramEditor).getEditPartRegistry().get(selection);
 		}
-		
+
 		connectionSelected = part instanceof ConnectionEditPart;
-		
+
 		if (connectionSelected)
 			return (FeatureEditPart) ((ConnectionEditPart) part).getTarget();
 		else
@@ -108,10 +101,9 @@ public abstract class SingleSelectionAction extends Action implements
 			else
 				return (Feature) selection.getFirstElement();
 		} else {
-			selection = (IStructuredSelection) ((AbstractEditPartViewer) viewer)
-				.getSelection();
+			selection = (IStructuredSelection) ((AbstractEditPartViewer) viewer).getSelection();
 		}
-		
+
 		Object part = selection.getFirstElement();
 		connectionSelected = part instanceof ConnectionEditPart;
 		if (connectionSelected)
@@ -141,13 +133,12 @@ public abstract class SingleSelectionAction extends Action implements
 
 	public void propertyChange(PropertyChangeEvent event) {
 		String prop = event.getPropertyName();
-		if (CHILDREN_CHANGED.equals(prop) || MANDATORY_CHANGED.equals(prop)
-				|| PARENT_CHANGED.equals(prop) || HIDDEN_CHANGED.equals(prop) 
+		if (CHILDREN_CHANGED.equals(prop) || MANDATORY_CHANGED.equals(prop) || PARENT_CHANGED.equals(prop) || HIDDEN_CHANGED.equals(prop)
 				|| COLOR_CHANGED.equals(prop)) {
 			updateProperties();
 		}
 	}
-	
+
 	public boolean isConnectionSelected() {
 		return connectionSelected;
 	}

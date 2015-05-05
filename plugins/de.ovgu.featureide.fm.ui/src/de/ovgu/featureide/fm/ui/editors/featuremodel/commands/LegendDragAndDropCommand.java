@@ -61,8 +61,7 @@ public class LegendDragAndDropCommand extends Command {
 	 * Checks whether the movement is valid.
 	 * 
 	 * @returns
-	 * 	{@code false} if the legend overlaps with a feature or constraint,
-	 * 	{@code true} otherwise
+	 *          {@code false} if the legend overlaps with a feature or constraint, {@code true} otherwise
 	 */
 	public boolean canExecute() {
 		Rectangle newBounds = new Rectangle(newLocation, legendEditPart.getFigure().getSize());
@@ -72,7 +71,7 @@ public class LegendDragAndDropCommand extends Command {
 			if (newBounds.intersects(FeatureUIHelper.getBounds(f))) {
 				return false;
 			}
-			
+
 			final List<ConnectionEditPart> connectionList = FeatureUIHelper.getConnections(f, legendEditPart.getViewer());
 			for (ConnectionEditPart connectionEditPart : connectionList) {
 				if (connectionEditPart.getConnectionFigure().getPoints().intersects(newBounds)) {
@@ -80,7 +79,7 @@ public class LegendDragAndDropCommand extends Command {
 				}
 			}
 		}
-		
+
 		// check if legend intersects with a constraint
 		for (Constraint c : model.getConstraints()) {
 			if (newBounds.intersects(FeatureUIHelper.getBounds(c))) {

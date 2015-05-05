@@ -381,8 +381,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	/**
 	 * Update the order of features in the feature model
 	 * 
-	 * @deprecated is no longer supported, use {@link #updateFeatureOrderList()}
-	 *             instead
+	 * @deprecated is no longer supported, use {@link #updateFeatureOrderList()} instead
 	 */
 	@Deprecated
 	public void writeFeaturesToOrderFile() {
@@ -435,8 +434,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	}
 
 	/**
-	 * Update the order of features in the feature model if
-	 * {@link #hasFeatureOrder} is true
+	 * Update the order of features in the feature model if {@link #hasFeatureOrder} is true
 	 */
 	public void updateFeatureOrderList() {
 		if (hasFeatureOrder) {
@@ -456,8 +454,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	 * 
 	 * @return Return the FeatureOrder as an ArrayList. Return null if the
 	 *         "userdefined-order" is deactivate or if no order file exists.
-	 * @deprecated is no longer supported, use {@link #readFeatureOrderList()}
-	 *             instead
+	 * @deprecated is no longer supported, use {@link #readFeatureOrderList()} instead
 	 */
 	@Deprecated
 	public List<String> readFeaturesfromOrderFile() {
@@ -465,8 +462,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	}
 
 	/**
-	 * sets buttons and featurelist according to feature model if
-	 * {@link #hasFeatureOrder} is true
+	 * sets buttons and featurelist according to feature model if {@link #hasFeatureOrder} is true
 	 * 
 	 * @return returns the featureOrderList from feature model or an empty list
 	 *         if {@link #hasFeatureOrder} is false

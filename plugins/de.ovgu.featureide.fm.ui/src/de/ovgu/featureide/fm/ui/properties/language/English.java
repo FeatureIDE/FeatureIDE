@@ -21,8 +21,7 @@
 package de.ovgu.featureide.fm.ui.properties.language;
 
 /**
- * Class implementing the extension point
- * <code>"de.ovgu.featureide.fm.core.language"</code>
+ * Class implementing the extension point <code>"de.ovgu.featureide.fm.core.language"</code>
  * 
  * @author Jens Meinicke
  * @author Florian Proksch
@@ -50,7 +49,7 @@ public class English implements ILanguage {
 	private static final String UNSATISFIABLE_CONST = "Unsatisfiable constraint";
 	private static final String TAUTOLOGY_CONST = "Constraint is tautology";
 	private static final String VOID_MODEL_CONST = "Constraint makes the model void";
-	
+
 	@Override
 	public String getRedundantConst() {
 		return REDUNDANT;
@@ -145,6 +144,5 @@ public class English implements ILanguage {
 	public String getOptional() {
 		return OPTIONAL;
 	}
-
 
 }

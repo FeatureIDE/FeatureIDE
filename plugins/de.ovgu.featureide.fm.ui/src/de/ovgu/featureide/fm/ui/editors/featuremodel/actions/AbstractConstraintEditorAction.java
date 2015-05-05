@@ -43,27 +43,26 @@ public abstract class AbstractConstraintEditorAction extends Action {
 	protected Object viewer;
 
 	protected FeatureModel featuremodel;
-	
+
 	protected XmlFeatureModelWriter writer;
-	
+
 	protected String featuretext;
 
 	private ISelectionChangedListener listener = new ISelectionChangedListener() {
 		public void selectionChanged(SelectionChangedEvent event) {
-			IStructuredSelection selection = (IStructuredSelection) event
-					.getSelection();
+			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
 			setEnabled(isValidSelection(selection));
 		}
 	};
 
-	public AbstractConstraintEditorAction(Object viewer,
-			FeatureModel featuremodel, String menuname) {
+	public AbstractConstraintEditorAction(Object viewer, FeatureModel featuremodel, String menuname) {
 		super(menuname);
 		this.viewer = viewer;
 		this.featuremodel = featuremodel;
-		if (viewer instanceof TreeViewer)	
-			((TreeViewer)viewer).addSelectionChangedListener(listener);
-		else ((GraphicalViewerImpl)viewer).addSelectionChangedListener(listener);
+		if (viewer instanceof TreeViewer)
+			((TreeViewer) viewer).addSelectionChangedListener(listener);
+		else
+			((GraphicalViewerImpl) viewer).addSelectionChangedListener(listener);
 	}
 
 	public void run() {

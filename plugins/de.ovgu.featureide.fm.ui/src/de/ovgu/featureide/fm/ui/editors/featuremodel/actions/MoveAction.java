@@ -105,23 +105,23 @@ public class MoveAction extends Action {
 
 		if (!doStop) {
 			switch (dir) {
-			case DOWN: 
+			case DOWN:
 				deltaPos.setY(stepwidth);
 				break;
-			case UP: 
+			case UP:
 				deltaPos.setY(-stepwidth);
 				break;
-			case LEFT: 
+			case LEFT:
 				deltaPos.setX(-stepwidth);
 				break;
-			case RIGHT: 
+			case RIGHT:
 				deltaPos.setX(stepwidth);
 				break;
 			}
 		}
 		this.init();
 	}
-	
+
 	private void init() {
 		this.endPositions.clear();
 		this.isLegendMoving = false;
@@ -163,7 +163,7 @@ public class MoveAction extends Action {
 			}
 
 			FeatureUIHelper.setLocation(feature, newPos);
-		} else if ((element instanceof ConstraintEditPart) || (element instanceof Constraint)) {			
+		} else if ((element instanceof ConstraintEditPart) || (element instanceof Constraint)) {
 			Constraint constraint = element instanceof ConstraintEditPart ? ((ConstraintEditPart) element).getConstraintModel() : (Constraint) element;
 			final Point newPos = FeatureUIHelper.getLocation(constraint).translate(deltaPos);
 			FeatureUIHelper.setLocation(constraint, newPos);
@@ -173,16 +173,16 @@ public class MoveAction extends Action {
 			legendFigure.setLocation(newPos);
 			featureModel.getLayout().setLegendPos(newPos.x(), newPos.y());
 			featureModel.getLayout().setLegendAutoLayout(false);
-			featureModel.handleLegendLayoutChanged(); 
+			featureModel.handleLegendLayoutChanged();
 			this.isLegendMoving = true;
 		}
 	}
 
 	private void stop() {
 		this.doMove(true);
-		if(!isLegendMoving && featureModel.getLayout().hasLegendAutoLayout())
+		if (!isLegendMoving && featureModel.getLayout().hasLegendAutoLayout())
 			featureModel.handleModelDataChanged();
-		
+
 		this.init();
 	}
 

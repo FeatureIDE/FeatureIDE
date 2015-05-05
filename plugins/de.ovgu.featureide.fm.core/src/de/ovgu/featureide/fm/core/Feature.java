@@ -24,6 +24,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -38,7 +39,7 @@ import org.prop4j.NodeWriter;
  * @author Thomas Thuem
  * 
  */
-public class Feature implements PropertyConstants, PropertyChangeListener {
+public class Feature implements PropertyConstants, PropertyChangeListener, IGraphicItem {
 
 	private String name;
 
@@ -380,11 +381,11 @@ public class Feature implements PropertyConstants, PropertyChangeListener {
 
 	private FeatureConnection parentConnection = new FeatureConnection(this);
 
-	private LinkedList<FeatureConnection> sourceConnections = new LinkedList<FeatureConnection>();
+	private final LinkedList<FeatureConnection> sourceConnections = new LinkedList<FeatureConnection>();
 
-	private LinkedList<FeatureConnection> targetConnections = new LinkedList<FeatureConnection>();
+	private final LinkedList<FeatureConnection> targetConnections = new LinkedList<FeatureConnection>();
 
-	private static final LinkedList<FeatureConnection> EMPTY_LIST = new LinkedList<FeatureConnection>();
+	private static final List<FeatureConnection> EMPTY_LIST = Collections.<FeatureConnection>emptyList();
 
 	public List<FeatureConnection> getSourceConnections() {
 		return parent == null ? EMPTY_LIST : sourceConnections;
@@ -663,6 +664,11 @@ public class Feature implements PropertyConstants, PropertyChangeListener {
 			featureNames.add(feature.getName());
 		}
 		return featureNames;
+	}
+	
+	@Override
+	public GraphicItem getItemType() {
+		return GraphicItem.Feature;
 	}
 
 	// TODO fix UI bug when hashCode function is used.

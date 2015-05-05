@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
@@ -57,12 +58,22 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
  */
 public class FeatureModelAnalyzer {
 
+	public static enum Attribute {
+		Mandatory, Optional, Alternative, Or, Abstract, 
+		Concrete, Hidden, Dead, FalseOptional, 
+		IndetHidden, UnsatisfiableConst, TautologyConst, 
+		VoidModelConst, RedundantConst
+	}
+	
+
+	private final boolean[] attributeFlags = new boolean[Attribute.values().length];
+	
 	private static final String TRUE = "True";
 
 	private static final String FALSE = "False";
 
-	private final List<Feature> cachedDeadFeatures = new ArrayList<Feature>();
-	private final List<Feature> cachedCoreFeatures = new ArrayList<Feature>();
+	private final List<Feature> cachedDeadFeatures = new ArrayList<>();
+	private final List<Feature> cachedCoreFeatures = new ArrayList<>();
 	
 	private final Collection<Feature> chachedFalseOptionalFeatures = new LinkedList<Feature>();
 	
@@ -463,6 +474,28 @@ public class FeatureModelAnalyzer {
 					}
 				}
 			}
+		}
+		return result;
+	}
+	
+	public List<List<Feature>> getAtomicSets() {
+		final ArrayList<List<Feature>> result = new ArrayList<>();
+		
+		final SatSolver solver = new SatSolver(NodeCreator.createNodes(fm), 1000);
+		
+		for (List<Literal> literalList : solver.atomicSets()) {
+			final List<Feature> setList = new ArrayList<>();
+			result.add(setList);
+			for (Literal literal : literalList) {
+				final String var = literal.var.toString();
+				if (!FALSE.equals(var) && !TRUE.equals(var)) {
+					final Feature feature = fm.getFeature(var);
+					if (feature != null) {
+						setList.add(feature);
+					}
+				}
+			}
+			
 		}
 		return result;
 	}
@@ -924,5 +957,16 @@ public class FeatureModelAnalyzer {
 	public Collection<Feature> getCachedDeadFeatures() {
 		return cachedDeadFeatures;
 	}
-
+	
+	public boolean getAttributeFlag(Attribute attribute) {
+		return attributeFlags[attribute.ordinal()];
+	}
+	
+	public void setAttributeFlag(Attribute attribute, boolean flag) {
+		attributeFlags[attribute.ordinal()] = flag;
+	}
+	
+	public void resetAttributeFlags() {
+		Arrays.fill(attributeFlags, false);
+	}
 }

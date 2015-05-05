@@ -36,8 +36,7 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  * 
  * @author Jens Meinicke
  */
-public class TextEditorPage extends TextEditor implements
-		IConfigurationEditorPage {
+public class TextEditorPage extends TextEditor implements IConfigurationEditorPage {
 
 	private static final String ID = FMUIPlugin.PLUGIN_ID + "TextEditorPage";
 	private static final String PAGE_TEXT = "Source";

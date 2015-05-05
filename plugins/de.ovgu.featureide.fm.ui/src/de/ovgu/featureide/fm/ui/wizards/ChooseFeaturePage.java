@@ -68,7 +68,7 @@ public class ChooseFeaturePage extends AbstractWizardPage {
 		Label featureLabel = new Label(configGroup, 0);
 		featureLabel.setText("Name of Feature: ");
 		featureName = new Text(configGroup, SWT.BORDER | SWT.SINGLE);
-//		featureName.setText(featureNameString);
+		//		featureName.setText(featureNameString);
 		featureName.setLayoutData(gridData2);
 		featureName.addKeyListener(new KeyPressedListener());
 	}

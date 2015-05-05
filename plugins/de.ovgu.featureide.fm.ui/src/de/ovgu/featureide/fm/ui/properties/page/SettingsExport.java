@@ -73,7 +73,7 @@ public class SettingsExport {
 			}
 		}
 	}
-	
+
 	private String getSettings() {
 		StringBuilder settings = new StringBuilder();
 		for (QualifiedName qn : FMPropertyManager.getQualifiedNames()) {
@@ -86,7 +86,7 @@ public class SettingsExport {
 				FMUIPlugin.getDefault().logError(e);
 			}
 		}
-		
+
 		return settings.toString();
 	}
 }

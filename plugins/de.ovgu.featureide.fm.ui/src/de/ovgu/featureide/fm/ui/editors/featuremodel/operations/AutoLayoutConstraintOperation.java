@@ -38,61 +38,60 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * @author Patrick Sulkowski
  */
 public class AutoLayoutConstraintOperation extends AbstractFeatureModelOperation {
-	
+
 	private int counter;
-	private LinkedList <LinkedList<Point>> oldPos = new LinkedList <LinkedList<Point>>();
-	
+	private LinkedList<LinkedList<Point>> oldPos = new LinkedList<LinkedList<Point>>();
+
 	public AutoLayoutConstraintOperation(FeatureModel featureModel, LinkedList<LinkedList<Point>> oldPos, int counter) {
 		super(featureModel, "Auto Layout Constraints");
 		this.counter = counter;
-		if(!(oldPos == null) && !oldPos.isEmpty())
+		if (!(oldPos == null) && !oldPos.isEmpty())
 			this.oldPos.addAll(oldPos);
 	}
 
 	@Override
 	protected void redo() {
-		List <Constraint> constraintList = featureModel.getConstraints();
+		List<Constraint> constraintList = featureModel.getConstraints();
 		int minX = Integer.MAX_VALUE;
 		int maxX = 0;
-		if(!constraintList.isEmpty()){
-			Point newPos =new Point();
+		if (!constraintList.isEmpty()) {
+			Point newPos = new Point();
 			int y = 0;
-		
+
 			LinkedList<Feature> featureList = new LinkedList<Feature>();
 			featureList.addAll(featureModel.getFeatures());
-			
-			for(int i=0;i<featureList.size();i++){
-				if(y<FeatureUIHelper.getLocation(featureList.get(i)).y){
-					y=FeatureUIHelper.getLocation(featureList.get(i)).y;
+
+			for (int i = 0; i < featureList.size(); i++) {
+				if (y < FeatureUIHelper.getLocation(featureList.get(i)).y) {
+					y = FeatureUIHelper.getLocation(featureList.get(i)).y;
 				}
-				if(minX>FeatureUIHelper.getLocation(featureList.get(i)).x){
-					minX=FeatureUIHelper.getLocation(featureList.get(i)).x;
+				if (minX > FeatureUIHelper.getLocation(featureList.get(i)).x) {
+					minX = FeatureUIHelper.getLocation(featureList.get(i)).x;
 				}
-				if(maxX<FeatureUIHelper.getLocation(featureList.get(i)).x){
-					maxX=FeatureUIHelper.getLocation(featureList.get(i)).x +
-							FeatureUIHelper.getSize(featureList.get(i)).width;
+				if (maxX < FeatureUIHelper.getLocation(featureList.get(i)).x) {
+					maxX = FeatureUIHelper.getLocation(featureList.get(i)).x + FeatureUIHelper.getSize(featureList.get(i)).width;
 				}
 			}
 			final Constraint constraint = constraintList.get(0);
-			newPos.x=(minX+maxX)/2 - FeatureUIHelper.getSize(constraint).width/2;
-			newPos.y=y+ FMPropertyManager.getConstraintSpace();
+			newPos.x = (minX + maxX) / 2 - FeatureUIHelper.getSize(constraint).width / 2;
+			newPos.y = y + FMPropertyManager.getConstraintSpace();
 			FeatureUIHelper.setLocation(constraint, newPos);
 		}
-		for(int i=1;i<constraintList.size();i++){
-			Point newPos =new Point();
-			newPos.x=(minX+maxX)/2 - FeatureUIHelper.getSize(constraintList.get(i)).width/2;
-			newPos.y=FeatureUIHelper.getLocation(constraintList.get(i-1)).y+ FMPropertyManager.getConstraintSpace();
+		for (int i = 1; i < constraintList.size(); i++) {
+			Point newPos = new Point();
+			newPos.x = (minX + maxX) / 2 - FeatureUIHelper.getSize(constraintList.get(i)).width / 2;
+			newPos.y = FeatureUIHelper.getLocation(constraintList.get(i - 1)).y + FMPropertyManager.getConstraintSpace();
 			FeatureUIHelper.setLocation(constraintList.get(i), newPos);
 		}
 	}
 
 	@Override
 	protected void undo() {
-		List <Constraint> constraintList = featureModel.getConstraints();
-		if(!constraintList.isEmpty() && (!(oldPos == null) && !oldPos.isEmpty())){
+		List<Constraint> constraintList = featureModel.getConstraints();
+		if (!constraintList.isEmpty() && (!(oldPos == null) && !oldPos.isEmpty())) {
 			FeatureUIHelper.setLocation(constraintList.get(0), oldPos.get(counter).get(0));
 		}
-		for(int i=1;i<constraintList.size();i++){			
+		for (int i = 1; i < constraintList.size(); i++) {
 			FeatureUIHelper.setLocation(featureModel.getConstraints().get(i), oldPos.get(counter).get(i));
 		}
 	}

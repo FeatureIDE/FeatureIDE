@@ -38,10 +38,10 @@ import de.ovgu.featureide.fm.core.FeatureStatus;
 public class AutomatedCalculationsAction extends Action {
 
 	private final FeatureModel featureModel;
-	
+
 	public AutomatedCalculationsAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
 		super("Automated Calculations");
-		this.featureModel = featureModel;	
+		this.featureModel = featureModel;
 		setChecked(featureModel.getAnalyser().runCalculationAutomatically);
 	}
 

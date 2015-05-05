@@ -39,8 +39,7 @@ public class AbstractAction extends SingleSelectionAction {
 
 	private FeatureModel featureModel;
 
-	public AbstractAction(Object viewer,
-			FeatureModel featureModel, ObjectUndoContext undoContext) {
+	public AbstractAction(Object viewer, FeatureModel featureModel, ObjectUndoContext undoContext) {
 		super("Abstract", viewer);
 		this.undoContext = undoContext;
 		this.featureModel = featureModel;
@@ -50,13 +49,11 @@ public class AbstractAction extends SingleSelectionAction {
 	public void run() {
 
 		setChecked(feature.isAbstract());
-		FeatureSetAbstractOperation op = new FeatureSetAbstractOperation(
-				feature, featureModel);
+		FeatureSetAbstractOperation op = new FeatureSetAbstractOperation(feature, featureModel);
 		op.addContext(undoContext);
 
 		try {
-			PlatformUI.getWorkbench().getOperationSupport()
-					.getOperationHistory().execute(op, null, null);
+			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
 

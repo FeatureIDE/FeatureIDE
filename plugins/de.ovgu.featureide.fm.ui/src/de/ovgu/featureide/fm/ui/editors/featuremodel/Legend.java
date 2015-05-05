@@ -24,19 +24,20 @@ import org.eclipse.draw2d.geometry.Point;
 
 import de.ovgu.featureide.fm.core.FMPoint;
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.IGraphicItem;
 
 /**
  * Represents the legend in the FeatureModel
  * 
  * @author Fabian Benduhn
  */
-public class Legend {
+public class Legend implements IGraphicItem {
 	private final FeatureModel model;
 	private Point pos;
 
 	public Legend(FeatureModel model) {
 		this.model = model;
-		FMPoint legendPos = model.getLayout().getLegendPos();
+		final FMPoint legendPos = model.getLayout().getLegendPos();
 		this.pos = new Point(legendPos.x, legendPos.y);
 	}
 
@@ -55,6 +56,11 @@ public class Legend {
 	public void setPos(Point pos) {
 		this.pos = pos;
 		model.getLayout().setLegendPos(pos.x, pos.y);
+	}
+
+	@Override
+	public GraphicItem getItemType() {
+		return GraphicItem.Legend;
 	}
 
 }

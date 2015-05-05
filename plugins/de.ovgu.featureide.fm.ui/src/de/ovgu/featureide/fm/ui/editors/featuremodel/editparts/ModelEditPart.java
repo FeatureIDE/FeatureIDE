@@ -20,7 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.editparts;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.draw2d.Figure;
@@ -31,8 +32,6 @@ import org.eclipse.draw2d.MarginBorder;
 import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 
-import de.ovgu.featureide.fm.core.Constraint;
-import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.Legend;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.policies.ModelLayoutEditPolicy;
@@ -47,49 +46,45 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * @author Thomas Thuem
  */
 public class ModelEditPart extends AbstractGraphicalEditPart {
-	
-	public ModelEditPart(FeatureModel featureModel) {
+
+	ModelEditPart(Object featureModel) {
 		super();
 		setModel(featureModel);
 	}
-	
+
 	public FeatureModel getFeatureModel() {
 		return (FeatureModel) getModel();
 	}
-	
+
 	protected IFigure createFigure() {
 		Figure fig = new FreeformLayer();
 		fig.setLayoutManager(new FreeformLayout());
 		fig.setBorder(new MarginBorder(5));
 		return fig;
 	}
-	
+
 	@Override
 	protected void createEditPolicies() {
 		installEditPolicy(EditPolicy.LAYOUT_ROLE, new ModelLayoutEditPolicy(getFeatureModel()));
 	}
-	
+
 	@Override
 	protected List<Object> getModelChildren() {
-		LinkedList<Object> list = new LinkedList<Object>();
-		addFeatures(getFeatureModel().getRoot(), list);
-		if(!FMPropertyManager.isLegendHidden()) {
-			list.add(new Legend((FeatureModel)getModel()));
-		}
-		addConstraints(getFeatureModel().getConstraints(), list);
-		return list;
-	}
+		final FeatureModel fm = getFeatureModel();
 
-	private void addFeatures(Feature feature, List<Object> list) {
-		if (feature == null)
-			return;
-		list.add(feature);
-		for (Feature child : feature.getChildren())
-			addFeatures(child, list);
-	}
-	
-	private void addConstraints(List<Constraint> constraints, List<Object> list) {
+		final List<?> constraints = fm.getConstraints();
+		final Collection<?> features = fm.getFeatures();
+
+		final ArrayList<Object> list = new ArrayList<Object>(constraints.size() + features.size() + 1);
+
+		list.addAll(features);
 		list.addAll(constraints);
+
+		if (!FMPropertyManager.isLegendHidden()) {
+			list.add(new Legend(fm));
+		}
+
+		return list;
 	}
 
 }

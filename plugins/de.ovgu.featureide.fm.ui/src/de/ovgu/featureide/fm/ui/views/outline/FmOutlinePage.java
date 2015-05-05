@@ -51,8 +51,7 @@ public class FmOutlinePage extends ContentOutlinePage {
 
 	private Object[] expandedElements;
 
-	public FmOutlinePage(IDocumentProvider documentProvider,
-			FeatureModelEditor editor) {
+	public FmOutlinePage(IDocumentProvider documentProvider, FeatureModelEditor editor) {
 		super();
 
 		fDocumentProvider = documentProvider;
@@ -74,7 +73,8 @@ public class FmOutlinePage extends ContentOutlinePage {
 	 * Updates the outline page.
 	 */
 	public void update() {
-		if(fInput==null||fInput.getRoot()==null)return;
+		if (fInput == null || fInput.getRoot() == null)
+			return;
 		if (viewer != null) {
 			Control control = viewer.getControl();
 			if (control != null && !control.isDisposed()) {
@@ -95,12 +95,12 @@ public class FmOutlinePage extends ContentOutlinePage {
 			viewer.setLabelProvider(new FmLabelProvider());
 		}
 
-		if (fInput != null&&fInput.getRoot()!=null) {
+		if (fInput != null && fInput.getRoot() != null) {
 			viewer.setInput(fInput);
 		}
-		
+
 		viewer.expandToLevel(2);
-		FmOutlinePageContextMenu cm = new FmOutlinePageContextMenu(getSite(),fTextEditor,viewer,fInput);
+		FmOutlinePageContextMenu cm = new FmOutlinePageContextMenu(getSite(), fTextEditor, viewer, fInput);
 		cm.addToolbar(getSite().getActionBars().getToolBarManager());
 	}
 }

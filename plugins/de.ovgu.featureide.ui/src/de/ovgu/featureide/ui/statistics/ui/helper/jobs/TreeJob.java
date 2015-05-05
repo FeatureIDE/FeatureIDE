@@ -22,6 +22,7 @@ package de.ovgu.featureide.ui.statistics.ui.helper.jobs;
 
 import org.eclipse.core.runtime.jobs.Job;
 
+import de.ovgu.featureide.fm.core.job.AStoppableJob;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 
 /**
@@ -33,7 +34,7 @@ import de.ovgu.featureide.ui.statistics.core.composite.Parent;
  * @author Dominik Hamann
  * @author Patrick Haese
  */
-public abstract class TreeJob extends Job implements ITreeJob {
+public abstract class TreeJob extends AStoppableJob implements ITreeJob {
 	protected Parent calculated;
 
 	public TreeJob(String name, Parent calculated) {

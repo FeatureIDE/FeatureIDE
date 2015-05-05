@@ -27,15 +27,16 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 
 /**
  * TODO description
+ * 
  * @author Jens Meinicke
  */
 public class RunManualCalculationsAction extends Action {
 
 	private final FeatureModel featureModel;
-	
+
 	public RunManualCalculationsAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
 		super("Run Manual Calculations");
-		this.featureModel = featureModel;	
+		this.featureModel = featureModel;
 	}
 
 	@Override

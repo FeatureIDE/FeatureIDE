@@ -31,7 +31,7 @@ import java.util.LinkedList;
  * @author Thomas Thuem
  *
  */
-public class FeatureConnection implements PropertyConstants {
+public class FeatureConnection implements PropertyConstants, IGraphicItem {
 	
 	private Feature source;
 	
@@ -73,12 +73,14 @@ public class FeatureConnection implements PropertyConstants {
 			listener.propertyChange(event);
 	}
 	
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString() {
 		return source + " - " + target;
+	}
+	
+	@Override
+	public GraphicItem getItemType() {
+		return GraphicItem.Connection;
 	}
 
 }

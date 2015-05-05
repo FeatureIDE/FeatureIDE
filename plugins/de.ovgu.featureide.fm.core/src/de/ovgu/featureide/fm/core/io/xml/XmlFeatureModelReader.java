@@ -88,6 +88,9 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 			parseComments(e.getElementsByTagName(COMMENTS));
 			parseFeatureOrder(e.getElementsByTagName(FEATURE_ORDER));	
 		}
+		if (featureModel.getRoot() == null) {
+			throw new UnsupportedModelException("Wrong Syntax", 1);
+		}
 		featureModel.handleModelDataLoaded();
 	}
 

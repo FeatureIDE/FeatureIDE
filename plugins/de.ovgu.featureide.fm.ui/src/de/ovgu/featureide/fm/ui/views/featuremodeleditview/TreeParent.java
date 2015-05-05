@@ -30,7 +30,7 @@ import de.ovgu.featureide.fm.core.configuration.TreeElement;
  * @author Thomas Thuem
  */
 public class TreeParent extends TreeObject {
-	
+
 	boolean lazy = false;
 
 	public TreeParent(String name) {

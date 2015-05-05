@@ -40,13 +40,11 @@ public class ConstraintMoveOperation extends AbstractFeatureModelOperation {
 	private int index;
 
 	private int oldIndex;
-	
+
 	private Point newPos;
 	private Point oldPos;
-	
-	public ConstraintMoveOperation(Constraint constraint,
-			FeatureModel featureModel, int newIndex, int oldIndex,
-			boolean isLastPos, Point newPos, Point oldPos) {
+
+	public ConstraintMoveOperation(Constraint constraint, FeatureModel featureModel, int newIndex, int oldIndex, boolean isLastPos, Point newPos, Point oldPos) {
 
 		super(featureModel, LABEL);
 		this.constraint = constraint;
@@ -62,7 +60,7 @@ public class ConstraintMoveOperation extends AbstractFeatureModelOperation {
 		featureModel.addConstraint(constraint, index);
 		FeatureUIHelper.setLocation(featureModel.getConstraints().get(index), newPos);
 	}
-	
+
 	@Override
 	protected void undo() {
 		featureModel.removeConstraint(constraint);

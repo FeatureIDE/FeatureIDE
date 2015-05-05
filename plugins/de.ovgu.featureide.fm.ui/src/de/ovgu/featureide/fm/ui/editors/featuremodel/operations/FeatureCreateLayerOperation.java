@@ -51,8 +51,7 @@ public class FeatureCreateLayerOperation extends AbstractFeatureModelOperation {
 	private Feature newFeature;
 	private Object diagramEditor;
 
-	public FeatureCreateLayerOperation(Feature feature,
-			Object viewer, FeatureModel featureModel, Object diagramEditor) {
+	public FeatureCreateLayerOperation(Feature feature, Object viewer, FeatureModel featureModel, Object diagramEditor) {
 		super(featureModel, LABEL);
 		this.feature = feature;
 		this.viewer = viewer;
@@ -60,8 +59,7 @@ public class FeatureCreateLayerOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	public IStatus redo(IProgressMonitor monitor, IAdaptable info)
-			throws ExecutionException {
+	public IStatus redo(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
 		redo();
 		return Status.OK_STATUS;
 	}
@@ -70,36 +68,34 @@ public class FeatureCreateLayerOperation extends AbstractFeatureModelOperation {
 	protected void redo() {
 		int number = 0;
 
-		while (featureModel.getFeatureNames().contains("NewLayer" + ++number));
-		
+		while (featureModel.getFeatureNames().contains("NewLayer" + ++number))
+			;
+
 		newFeature = new Feature(featureModel, "NewLayer" + number);
 		featureModel.addFeature(newFeature);
 		feature = featureModel.getFeature(feature.getName());
 		feature.addChild(newFeature);
 		FeatureDiagramLayoutHelper.initializeLayerFeaturePosition(featureModel, newFeature, feature);
-		
+
 		/*
 		 * the model must be refreshed here else the new feature will not be found
 		 */
 		featureModel.handleModelDataChanged();
-		
+
 		// select the new feature
 		FeatureEditPart part;
 		if (viewer instanceof GraphicalViewerImpl) {
-			part = (FeatureEditPart) ((GraphicalViewerImpl) viewer).getEditPartRegistry()
-					.get(newFeature);
+			part = (FeatureEditPart) ((GraphicalViewerImpl) viewer).getEditPartRegistry().get(newFeature);
 			((GraphicalViewerImpl) viewer).setSelection(new StructuredSelection(part));
 		} else {
 			part = (FeatureEditPart) ((GraphicalViewerImpl) diagramEditor).getEditPartRegistry().get(newFeature);
 			((GraphicalViewerImpl) diagramEditor).setSelection(new StructuredSelection(part));
 		}
-		
+
 		part.getViewer().reveal(part);
 
 		// open the renaming command
-		DirectEditManager manager = new FeatureLabelEditManager(part,
-				TextCellEditor.class, new FeatureCellEditorLocator(
-						part.getFeatureFigure()), featureModel);
+		DirectEditManager manager = new FeatureLabelEditManager(part, TextCellEditor.class, new FeatureCellEditorLocator(part.getFeatureFigure()), featureModel);
 		manager.show();
 	}
 

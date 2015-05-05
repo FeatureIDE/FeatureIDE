@@ -34,15 +34,15 @@ public class ConfigJobManager {
 	private class JobEntry {
 		private IConfigJob<?> currentJob;
 		private Thread starterThread;
-		
+
 		public JobEntry(IConfigJob<?> currentJob, Thread starterThread) {
 			this.currentJob = currentJob;
 			this.starterThread = starterThread;
 		}
 	}
-	
+
 	private final HashMap<Integer, JobEntry> jobMap = new HashMap<Integer, JobEntry>();
-	
+
 	public synchronized void startJob(final IConfigJob<?> job) {
 		if (job == null) {
 			return;
@@ -73,23 +73,23 @@ public class ConfigJobManager {
 			job.schedule();
 		}
 	}
-	
+
 	public synchronized void cancelAllJobs() {
 		for (JobEntry entry : jobMap.values()) {
 			entry.currentJob.cancel();
 		}
 		jobMap.clear();
 	}
-	
-//	public synchronized void cancelCurrentJob(int id) {
-//		final JobEntry currentEntry = jobMap.get(id);
-//		if (currentEntry != null) {
-////			if (currentEntry.starterThread == null) {
-//				currentEntry.currentJob.cancel();
-////			} else {
-////				
-////			}
-//			jobMap.remove(id);
-//		}
-//	}
+
+	//	public synchronized void cancelCurrentJob(int id) {
+	//		final JobEntry currentEntry = jobMap.get(id);
+	//		if (currentEntry != null) {
+	////			if (currentEntry.starterThread == null) {
+	//				currentEntry.currentJob.cancel();
+	////			} else {
+	////				
+	////			}
+	//			jobMap.remove(id);
+	//		}
+	//	}
 }

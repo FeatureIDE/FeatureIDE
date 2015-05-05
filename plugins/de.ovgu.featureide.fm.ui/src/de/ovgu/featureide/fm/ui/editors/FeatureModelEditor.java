@@ -52,6 +52,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorActionBarContributor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPartSite;
@@ -102,25 +103,25 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 	public FeatureDiagramEditor diagramEditor;
 	public FeatureOrderEditor featureOrderEditor;
 	public FeatureModelTextEditorPage textEditor;
-	
+
 	public LinkedList<IFeatureModelEditorPage> extensionPages = new LinkedList<IFeatureModelEditorPage>();
 	public FeatureModel featureModel;
 
 	FeatureModelFile fmFile;
 	boolean isPageModified = false;
 	AbstractFeatureModelWriter featureModelWriter;
-	
+
 	private AbstractFeatureModelReader featureModelReader;
 	private IFile file;
-	
+
 	private boolean closeEditor;
-	
+
 	private int currentPageIndex;
 	private int ioType;
 	private int operationCounter;
-	
+
 	private FmOutlinePage outlinePage;
-	
+
 	private FMPrintAction printAction;
 	private SelectAllAction selectAllAction;
 	private UndoActionHandler undoAction;
@@ -642,7 +643,6 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 		return true;
 	}
 
-	@SuppressWarnings("deprecation")
 	private boolean saveEditors() {
 		if (featureModel.getRenamingsManager().isRenamed()) {
 			IProject project = file.getProject();
@@ -650,13 +650,16 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 			ArrayList<IEditorPart> dirtyEditors2 = new ArrayList<IEditorPart>();
 			for (IWorkbenchWindow window : getSite().getWorkbenchWindow().getWorkbench().getWorkbenchWindows()) {
 				for (IWorkbenchPage page : window.getPages()) {
-					for (IEditorPart editor : page.getEditors()) {
-						if (editor instanceof ConfigurationEditor && editor.isDirty()) {
-							IEditorInput editorInput = editor.getEditorInput();
-							IFile editorFile = (IFile) editorInput.getAdapter(IFile.class);
-							if (editorFile.getProject().equals(project)) {
-								dirtyEditors.add(editorFile.getName());
-								dirtyEditors2.add(editor);
+					for (IEditorReference editorRef : page.getEditorReferences()) {
+						if (ConfigurationEditor.ID.equals(editorRef.getId())) {
+							final IEditorPart editor = editorRef.getEditor(true);
+							if (editor.isDirty()) {
+								IEditorInput editorInput = editor.getEditorInput();
+								IFile editorFile = (IFile) editorInput.getAdapter(IFile.class);
+								if (editorFile.getProject().equals(project)) {
+									dirtyEditors.add(editorFile.getName());
+									dirtyEditors2.add(editor);
+								}
 							}
 						}
 					}
@@ -693,26 +696,29 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 	}
 
 	/**
-	 * Sets the actual FeatureModel at the corresponding
-	 * {@link ConfigurationEditor}s.
+	 * Sets the actual FeatureModel at the corresponding {@link ConfigurationEditor}s.
 	 * 
 	 * @see ConfigurationEditor#propertyChange(PropertyChangeEvent)
 	 */
-	@SuppressWarnings("deprecation")
 	private void updateConfigurationEditors() {
 		IProject project = file.getProject();
 		for (IWorkbenchWindow window : getSite().getWorkbenchWindow().getWorkbench().getWorkbenchWindows()) {
 			for (IWorkbenchPage page : window.getPages()) {
-				for (IEditorPart editor : page.getEditors()) {
-					if (editor instanceof ConfigurationEditor) {
-						IEditorInput editorInput = editor.getEditorInput();
-						IFile editorFile = (IFile) editorInput.getAdapter(IFile.class);
-						if (editorFile.getProject().equals(project)) {
-							((ConfigurationEditor) editor).propertyChange(new PropertyChangeEvent(file, PropertyConstants.MODEL_DATA_CHANGED, null, null));
+				for (IEditorReference editorRef : page.getEditorReferences()) {
+					if (ConfigurationEditor.ID.equals(editorRef.getId())) {
+						try {
+							final IFile editorFile = (IFile) editorRef.getEditorInput().getAdapter(IFile.class);
+							if (editorFile.getProject().equals(project)) {
+								((ConfigurationEditor) editorRef.getEditor(true)).propertyChange(new PropertyChangeEvent(file,
+										PropertyConstants.MODEL_DATA_CHANGED, null, null));
+							}
+						} catch (PartInitException e) {
+							FMCorePlugin.getDefault().logError(e);
 						}
 					}
 				}
 			}
 		}
 	}
+
 }

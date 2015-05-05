@@ -40,8 +40,7 @@ public class EditConstraintAction extends AbstractConstraintEditorAction {
 
 	private Constraint constraint;
 
-	public EditConstraintAction(Object viewer,
-			FeatureModel featuremodel) {
+	public EditConstraintAction(Object viewer, FeatureModel featuremodel) {
 		super(viewer, featuremodel, "Edit Constraint");
 		setEnabled(false);
 	}
@@ -54,19 +53,17 @@ public class EditConstraintAction extends AbstractConstraintEditorAction {
 
 	@Override
 	protected boolean isValidSelection(IStructuredSelection selection) {
-		if (selection.size() == 1
-				&& selection.getFirstElement() instanceof ModelEditPart)
+		if (selection.size() == 1 && selection.getFirstElement() instanceof ModelEditPart)
 			return false;
 
 		Iterator<?> iter = selection.iterator();
 		while (iter.hasNext()) {
 			Object editPart = iter.next();
 			if (editPart instanceof ConstraintEditPart) {
-				constraint = ((ConstraintEditPart) editPart)
-						.getConstraintModel();
+				constraint = ((ConstraintEditPart) editPart).getConstraintModel();
 				return true;
 			}
-			if (editPart instanceof Constraint){
+			if (editPart instanceof Constraint) {
 				constraint = (Constraint) editPart;
 				return true;
 			}

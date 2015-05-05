@@ -41,6 +41,26 @@ public final class Constraints {
 	public static final String autoQuote(final Constraint constraint) {
 		
 		final String c = constraint.getNode().toString(NodeWriter.shortSymbols);
+		
+		// Quote features that has the same name as an operator, e.g. Feature 
+		// implies will be "implies" afterwards
+		String printable = quoteOperatorNames(c);
+		
+		// ATTENTION: Backwards iteration is used here, to first replace "<=>" with "iff".
+		// That's because "=>" comes before "<=>" in "shortSymbols", such that "<=>" will
+		// be replaces by "<implies"" when not iterating backwards.
+		for (int i = NodeWriter.shortSymbols.length - 1; i > 0; i--) {
+			printable = printable.replace(NodeWriter.shortSymbols[i].trim(), NodeWriter.textualSymbols[i].trim());
+		}
+		
+		return printable.toString().trim();
+	}
+
+	/**
+	 * @param c
+	 * @return
+	 */
+	private static String quoteOperatorNames(final String c) {
 		final String[] contents = split(c);
 		for (int i = 0; i < contents.length; i++) {
 			for (final String op : Operator.NAMES) {
@@ -55,12 +75,7 @@ public final class Constraints {
 				print.append(content);
 			}
 		}
-		String printable = print.toString();
-		for (int i = 0; i < NodeWriter.shortSymbols.length; i++) {
-			printable = printable.replace(NodeWriter.shortSymbols[i].trim(), NodeWriter.textualSymbols[i].trim());
-		}
-		
-		return printable.toString().trim();
+		return print.toString();
 	}
 
 	private static String[] split(final String string) {

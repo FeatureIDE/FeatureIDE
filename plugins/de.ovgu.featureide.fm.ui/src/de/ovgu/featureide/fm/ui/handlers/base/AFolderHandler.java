@@ -28,14 +28,14 @@ import org.eclipse.core.resources.IFolder;
  * @author Sebastian Krieter
  */
 public abstract class AFolderHandler extends ASelectionHandler {
-	
+
 	/**
 	 * This method is called for every folder in the current selection.
 	 * 
 	 * @param folder the current folder handle.
 	 */
 	protected abstract void singleAction(IFolder folder);
-	
+
 	@Override
 	protected void singleAction(Object element) {
 		final IFolder project = (IFolder) SelectionWrapper.checkClass(element, IFolder.class);

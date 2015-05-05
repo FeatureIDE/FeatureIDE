@@ -32,10 +32,10 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 public class ConstrainsCalculationsAction extends Action {
 
 	private final FeatureModel featureModel;
-	
+
 	public ConstrainsCalculationsAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
 		super("Calculate Constraint Errors");
-		this.featureModel = featureModel;	
+		this.featureModel = featureModel;
 		setChecked(featureModel.getAnalyser().calculateConstraints);
 	}
 
@@ -45,11 +45,11 @@ public class ConstrainsCalculationsAction extends Action {
 			featureModel.getAnalyser().calculateConstraints = false;
 			featureModel.getAnalyser().calculateRedundantConstraints = false;
 			featureModel.getAnalyser().calculateTautologyConstraints = false;
-		} else {			
+		} else {
 			featureModel.getAnalyser().calculateConstraints = true;
 			featureModel.getAnalyser().calculateFeatures = true;
 		}
-		featureModel.handleModelDataChanged();		
+		featureModel.handleModelDataChanged();
 	}
 
 }

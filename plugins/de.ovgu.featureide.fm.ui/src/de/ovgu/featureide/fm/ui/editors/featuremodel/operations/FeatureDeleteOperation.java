@@ -46,7 +46,7 @@ public class FeatureDeleteOperation extends AbstractFeatureModelOperation {
 		this.feature = feature;
 		this.replacement = null;
 	}
-	
+
 	public FeatureDeleteOperation(FeatureModel featureModel, Feature feature, Feature replacement) {
 		super(featureModel, "Delete");
 		this.feature = feature;
@@ -74,7 +74,7 @@ public class FeatureDeleteOperation extends AbstractFeatureModelOperation {
 				oldChildrenCopy.add(oldChild);
 			}
 		}
-		
+
 		oldChildren = oldChildrenCopy;
 		if (feature == featureModel.getRoot()) {
 			featureModel.replaceRoot(featureModel.getRoot().removeLastChild());
@@ -82,14 +82,14 @@ public class FeatureDeleteOperation extends AbstractFeatureModelOperation {
 		} else {
 			deleted = featureModel.deleteFeature(feature);
 		}
-		
+
 		//Replace feature name in constraints
 		if (replacement != null) {
-			for (Constraint c : featureModel.getConstraints()) {	
+			for (Constraint c : featureModel.getConstraints()) {
 				if (c.getContainedFeatures().contains(feature)) {
-					 c.getNode().replaceFeature(feature, replacement);
+					c.getNode().replaceFeature(feature, replacement);
 				}
-			}			
+			}
 		}
 	}
 
@@ -99,7 +99,7 @@ public class FeatureDeleteOperation extends AbstractFeatureModelOperation {
 			if (!deleted) {
 				return;
 			}
-			
+
 			if (oldParent != null) {
 				oldParent = featureModel.getFeature(oldParent.getName());
 			}
@@ -114,7 +114,7 @@ public class FeatureDeleteOperation extends AbstractFeatureModelOperation {
 					oldChildrenCopy.add(child);
 				}
 			}
-			
+
 			oldChildren = oldChildrenCopy;
 
 			feature.setChildren(oldChildren);
@@ -124,12 +124,12 @@ public class FeatureDeleteOperation extends AbstractFeatureModelOperation {
 				featureModel.setRoot(feature);
 			}
 			featureModel.addFeature(feature);
-			
+
 			//Replace Featurename in Constraints
 			if (replacement != null) {
-				for (Constraint c : featureModel.getConstraints()) {				
+				for (Constraint c : featureModel.getConstraints()) {
 					if (c.getContainedFeatures().contains(replacement)) {
-						 c.getNode().replaceFeature(replacement, feature);
+						c.getNode().replaceFeature(replacement, feature);
 					}
 				}
 			}

@@ -52,15 +52,15 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
  * @author Hannes Smurawsky
  * @author Marcus Pinnecke
  */
-public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage implements GUIDefaults {	
+public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage implements GUIDefaults {
 	private static final String PAGE_TEXT = "Advanced Configuration";
 	private static final String ID = FMUIPlugin.PLUGIN_ID + "AdvancedConfigurationPage";
-	
+
 	private static HashMap<String, Image> combinedImages = new HashMap<String, Image>();
 
 	private static Image getImage(SelectableFeature selFeature, Selection selection) {
 		final Feature feature = selFeature.getFeature();
-		
+
 		final Image image1 = getConnectionImage(feature);
 		final Image image2 = getSelectionImage(selFeature, selection);
 
@@ -94,7 +94,7 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 		}
 		return combinedImage;
 	}
-	
+
 	private static Image getConnectionImage(Feature feature) {
 		if (!feature.isRoot()) {
 			if (feature.getParent() != null) {
@@ -116,18 +116,25 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 	private static Image getSelectionImage(SelectableFeature feat, Selection selection) {
 		if (selection != null) {
 			switch (selection) {
-				case SELECTED: return IMAGE_ASELECTED;
-				case UNSELECTED: return IMAGE_ADESELECTED;
-				case UNDEFINED: return IMAGE_UNDEFINED;
+			case SELECTED:
+				return IMAGE_ASELECTED;
+			case UNSELECTED:
+				return IMAGE_ADESELECTED;
+			case UNDEFINED:
+				return IMAGE_UNDEFINED;
 			}
 		}
 		if (feat.getAutomatic() != Selection.UNDEFINED) {
 			return feat.getAutomatic() == Selection.SELECTED ? IMAGE_ASELECTED : IMAGE_ADESELECTED;
 		}
 		switch (feat.getManual()) {
-			case SELECTED: return IMAGE_SELECTED;
-			case UNSELECTED: return IMAGE_DESELECTED;
-			case UNDEFINED: default: return IMAGE_UNDEFINED;
+		case SELECTED:
+			return IMAGE_SELECTED;
+		case UNSELECTED:
+			return IMAGE_DESELECTED;
+		case UNDEFINED:
+		default:
+			return IMAGE_UNDEFINED;
 		}
 	}
 
@@ -141,7 +148,7 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 					if (item != null) {
 						final Object data = item.getData();
 						if (data instanceof SelectableFeature) {
-							final SelectableFeature feature = (SelectableFeature)item.getData();
+							final SelectableFeature feature = (SelectableFeature) item.getData();
 							item.setImage(getImage(feature, null));
 							if (updateFeatures.contains(feature)) {
 								item.setImage(getImage(feature, Selection.SELECTED));
@@ -152,10 +159,14 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 					}
 				}
 			}
+
 			@Override
-			public void mouseDown(MouseEvent e) {}
+			public void mouseDown(MouseEvent e) {
+			}
+
 			@Override
-			public void mouseDoubleClick(MouseEvent e) {}
+			public void mouseDoubleClick(MouseEvent e) {
+			}
 		});
 		tree.addKeyListener(new KeyListener() {
 			public void keyPressed(KeyEvent e) {
@@ -165,7 +176,7 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 						final TreeItem item = selection[0];
 						final Object data = item.getData();
 						if (data instanceof SelectableFeature) {
-							final SelectableFeature feature = (SelectableFeature)item.getData();
+							final SelectableFeature feature = (SelectableFeature) item.getData();
 							item.setImage(getImage(feature, null));
 							if (updateFeatures.contains(feature)) {
 								item.setImage(getImage(feature, Selection.SELECTED));
@@ -176,7 +187,7 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 					}
 				}
 			}
-			
+
 			public void keyReleased(KeyEvent e) {
 			}
 		});
@@ -187,11 +198,11 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 				long currentTime = System.currentTimeMillis();
 				boolean changed = false;
 				if (item == null || item != tipItem) {
-//					time = currentTime;
+					//					time = currentTime;
 					tipItem = item;
 					changed = true;
 				}
-				
+
 				if (tip == null) {
 					if (item != null) {
 						createTooltip(item, e, currentTime);
@@ -207,29 +218,30 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 			}
 		});
 	}
-	
+
 	private TreeItem tipItem = null;
 	private Shell tip = null;
-//	private long time = 0;
-	
+
+	//	private long time = 0;
+
 	private void disposeTooltip() {
 		if (tip != null) {
 			tip.dispose();
 			tip = null;
 		}
 	}
-	
+
 	private void createTooltip(TreeItem item, MouseEvent e, long currentTime) {
-//		if (time + 500 > currentTime) {
-//			return;
-//		}
+		//		if (time + 500 > currentTime) {
+		//			return;
+		//		}
 		final Object data = item.getData();
 		if (data instanceof SelectableFeature) {
-			final SelectableFeature feature = (SelectableFeature)item.getData();
+			final SelectableFeature feature = (SelectableFeature) item.getData();
 			final String relConst = feature.getFeature().getRelevantConstraintsString();
 			final String describ = feature.getFeature().getDescription();
 			final StringBuilder sb = new StringBuilder();
-			
+
 			if (describ != null) {
 				sb.append("Description:\n");
 				sb.append(describ);
@@ -259,8 +271,8 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 			}
 		}
 	}
-	
-	protected void refreshItem(TreeItem item, SelectableFeature feature) {		
+
+	protected void refreshItem(TreeItem item, SelectableFeature feature) {
 		item.setBackground(null);
 		item.setForeground(null);
 		item.setFont(treeItemStandardFont);
@@ -269,7 +281,7 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 			item.setForeground(gray);
 		}
 	}
-	
+
 	@Override
 	protected void lockItem(TreeItem item) {
 		item.setImage(getImage((SelectableFeature) item.getData(), Selection.SELECTED));
@@ -286,19 +298,26 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 	public String getPageText() {
 		return PAGE_TEXT;
 	}
-	
+
 	@Override
 	protected boolean canDeselectFeatures() {
 		return true;
 	}
-	
+
 	private void cycleSelection(SelectableFeature feature, boolean up) {
 		if (feature.getAutomatic() == Selection.UNDEFINED) {
 			switch (feature.getManual()) {
-			case SELECTED: set(feature, (up) ? Selection.UNSELECTED : Selection.UNDEFINED);  break;
-			case UNSELECTED: set(feature, (up) ? Selection.UNDEFINED : Selection.SELECTED);  break;
-			case UNDEFINED: set(feature, (up) ? Selection.SELECTED : Selection.UNSELECTED); break;
-			default: set(feature, Selection.UNDEFINED);
+			case SELECTED:
+				set(feature, (up) ? Selection.UNSELECTED : Selection.UNDEFINED);
+				break;
+			case UNSELECTED:
+				set(feature, (up) ? Selection.UNDEFINED : Selection.SELECTED);
+				break;
+			case UNDEFINED:
+				set(feature, (up) ? Selection.SELECTED : Selection.UNSELECTED);
+				break;
+			default:
+				set(feature, Selection.UNDEFINED);
 			}
 			if (!dirty) {
 				setDirty();

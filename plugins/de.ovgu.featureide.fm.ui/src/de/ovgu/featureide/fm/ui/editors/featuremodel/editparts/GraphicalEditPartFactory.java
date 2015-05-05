@@ -23,11 +23,7 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.editparts;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPartFactory;
 
-import de.ovgu.featureide.fm.core.Constraint;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureConnection;
-import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.Legend;
+import de.ovgu.featureide.fm.core.IGraphicItem;
 
 /**
  * Creates edit parts for given models.
@@ -37,20 +33,20 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.Legend;
 public class GraphicalEditPartFactory implements EditPartFactory {
 
 	public EditPart createEditPart(EditPart context, Object model) {
-		if (model instanceof FeatureModel)
-			return new ModelEditPart((FeatureModel) model);
-
-		if (model instanceof Feature)
-			return new FeatureEditPart((Feature) model);
-
-		if (model instanceof FeatureConnection)
-			return new ConnectionEditPart((FeatureConnection) model);
-
-		if (model instanceof Constraint)
-			return new ConstraintEditPart((Constraint) model);
-		if (model instanceof Legend)
-			return new LegendEditPart((Legend) model);
-		return null;
+		switch (((IGraphicItem) model).getItemType()) {
+		case Connection:
+			return new ConnectionEditPart(model);
+		case Constraint:
+			return new ConstraintEditPart(model);
+		case Feature:
+			return new FeatureEditPart(model);
+		case Legend:
+			return new LegendEditPart(model);
+		case Model:
+			return new ModelEditPart(model);
+		default:
+			return null;
+		}
 	}
 
 }

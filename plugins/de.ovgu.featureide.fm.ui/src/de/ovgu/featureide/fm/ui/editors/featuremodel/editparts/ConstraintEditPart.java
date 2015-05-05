@@ -43,10 +43,11 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.ConstraintFigure;
  * 
  * @author Thomas Thuem
  */
-public class ConstraintEditPart extends AbstractGraphicalEditPart implements
-		PropertyConstants, PropertyChangeListener {
+public class ConstraintEditPart extends AbstractGraphicalEditPart implements PropertyConstants, PropertyChangeListener {
 
-	public ConstraintEditPart(Constraint constraint) {
+	private static final NonResizableEditPolicy NON_RESIZABLE_EDIT_POLICY = new NonResizableEditPolicy();
+
+	ConstraintEditPart(Object constraint) {
 		super();
 		setModel(constraint);
 	}
@@ -66,20 +67,18 @@ public class ConstraintEditPart extends AbstractGraphicalEditPart implements
 
 	@Override
 	protected void createEditPolicies() {
-		installEditPolicy(EditPolicy.SELECTION_FEEDBACK_ROLE, new NonResizableEditPolicy());
-
+		installEditPolicy(EditPolicy.SELECTION_FEEDBACK_ROLE, NON_RESIZABLE_EDIT_POLICY);
 	}
 
-	public void performRequest(Request request) {		
+	public void performRequest(Request request) {
 		if (request.getType() == RequestConstants.REQ_OPEN) {
-			new ConstraintDialog(getConstraintModel().getFeatureModel(),
-					getConstraintModel());					
+			new ConstraintDialog(getConstraintModel().getFeatureModel(), getConstraintModel());
 		} else if (request.getType() == RequestConstants.REQ_SELECTION) {
 			try {
-				for (Feature containedFeature : getConstraintModel().getContainedFeatures()){
+				for (Feature containedFeature : getConstraintModel().getContainedFeatures()) {
 					containedFeature.setConstraintSelected(true);
 				}
-			} catch (NullPointerException e){
+			} catch (NullPointerException e) {
 				FMCorePlugin.getDefault().reportBug(320);
 			}
 		}
@@ -97,18 +96,12 @@ public class ConstraintEditPart extends AbstractGraphicalEditPart implements
 		getConstraintModel().removeListener(this);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.
-	 * PropertyChangeEvent)
-	 */
 	public void propertyChange(PropertyChangeEvent event) {
 		String prop = event.getPropertyName();
 		if (LOCATION_CHANGED.equals(prop)) {
 			getConstraintFigure().setLocation((Point) event.getNewValue());
 		} else if (ATTRIBUTE_CHANGED.equals(prop) || CONSTRAINT_SELECTED.equals(prop)) {
-			getConstraintFigure().setConstraintProperties(false);
+			getConstraintFigure().setConstraintProperties();
 		}
 	}
 

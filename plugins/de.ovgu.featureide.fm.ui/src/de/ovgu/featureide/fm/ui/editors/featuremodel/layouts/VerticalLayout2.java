@@ -31,13 +31,13 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 /**
  * Ordering features by breadth first search (with a round order)
  * - can have intersections of features and connections
- * 		between features (due to differences in feature widths)
+ * between features (due to differences in feature widths)
  * 
  * @author David Halm
  * @author Patrick Sulkowski
  */
 public class VerticalLayout2 extends FeatureDiagramLayoutManager {
-	
+
 	/**
 	 * @param manager
 	 */
@@ -57,49 +57,47 @@ public class VerticalLayout2 extends FeatureDiagramLayoutManager {
 		centerLayoutX(featureModel);
 		layout(yoffset, featureModel.getConstraints());
 	}
-	
+
 	private void layout(LayoutableFeature feature) {
 		if (feature == null)
 			return;
 		LinkedList<LayoutableFeature> featureList = new LinkedList<LayoutableFeature>();
-			featureList.add(feature);
+		featureList.add(feature);
 
-		this.xoffset += FMPropertyManager.getLayoutMarginY()/4;
+		this.xoffset += FMPropertyManager.getLayoutMarginY() / 4;
 		while (!featureList.isEmpty()) {
 			int height = 2 * FMPropertyManager.getLayoutMarginX() - FMPropertyManager.getFeatureSpaceX();
-			for (LayoutableFeature feat : featureList){
+			for (LayoutableFeature feat : featureList) {
 				height += FeatureUIHelper.getSize(feat.getFeature()).height + FMPropertyManager.getFeatureSpaceX();
 			}
 			this.yoffset = controlHeight / 2 - height / 2;
-					
+
 			int maxFeatWidth = 0;
 
 			int levelSize = featureList.size();
 			for (int i = 0; i < levelSize; i++) {
 				LayoutableFeature feat = featureList.removeFirst();
-					if(FeatureUIHelper.getSize(feat.getFeature()).width > maxFeatWidth){
-						maxFeatWidth = FeatureUIHelper.getSize(feat.getFeature()).width;
-					}
-					FeatureUIHelper.setLocation(feat.getFeature(),new Point(this.xoffset, this.yoffset));
-					this.yoffset += FeatureUIHelper.getSize(feat.getFeature()).height + FMPropertyManager.getFeatureSpaceX();
-					if(i < (levelSize/2)){
-						this.xoffset +=  10;
-					} else if( i == (levelSize/2)){
-						this.yAcc = xoffset;
-					} else {
-						this.xoffset -= 10;
-					}
-				
-				for (LayoutableFeature child : feat.getChildren()){
+				if (FeatureUIHelper.getSize(feat.getFeature()).width > maxFeatWidth) {
+					maxFeatWidth = FeatureUIHelper.getSize(feat.getFeature()).width;
+				}
+				FeatureUIHelper.setLocation(feat.getFeature(), new Point(this.xoffset, this.yoffset));
+				this.yoffset += FeatureUIHelper.getSize(feat.getFeature()).height + FMPropertyManager.getFeatureSpaceX();
+				if (i < (levelSize / 2)) {
+					this.xoffset += 10;
+				} else if (i == (levelSize / 2)) {
+					this.yAcc = xoffset;
+				} else {
+					this.xoffset -= 10;
+				}
+
+				for (LayoutableFeature child : feat.getChildren()) {
 					featureList.add(child);
 				}
 			}
 			this.xoffset = this.yAcc;
-			this.xoffset += maxFeatWidth + FMPropertyManager.getFeatureSpaceY()/3;			
+			this.xoffset += maxFeatWidth + FMPropertyManager.getFeatureSpaceY() / 3;
 		}
 		this.xoffset -= FMPropertyManager.getFeatureSpaceY();
 	}
-	
-	
-	
+
 }

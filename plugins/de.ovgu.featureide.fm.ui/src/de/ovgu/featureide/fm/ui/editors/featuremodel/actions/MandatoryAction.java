@@ -47,13 +47,11 @@ public class MandatoryAction extends SingleSelectionAction {
 	@Override
 	public void run() {
 		setChecked(feature.isMandatory());
-		FeatureSetMandatoryOperation op = new FeatureSetMandatoryOperation(
-				feature, featureModel);
+		FeatureSetMandatoryOperation op = new FeatureSetMandatoryOperation(feature, featureModel);
 		op.addContext((IUndoContext) featureModel.getUndoContext());
 
 		try {
-			PlatformUI.getWorkbench().getOperationSupport()
-					.getOperationHistory().execute(op, null, null);
+			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
 

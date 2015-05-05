@@ -42,8 +42,7 @@ public class FeatureMoveOperation extends AbstractFeatureModelOperation {
 	private Point oldPos;
 	private Feature feature;
 
-	public FeatureMoveOperation(FeatureOperationData data,
-			FeatureModel featureModel, Point newPos, Point oldPos, Feature feature) {
+	public FeatureMoveOperation(FeatureOperationData data, FeatureModel featureModel, Point newPos, Point oldPos, Feature feature) {
 		super(featureModel, LABEL);
 		this.data = data;
 		this.newPos = newPos;
@@ -51,59 +50,56 @@ public class FeatureMoveOperation extends AbstractFeatureModelOperation {
 		this.feature = feature;
 	}
 
-	public void newInnerOrder (Point newPos){
-			FeatureUIHelper.setLocation(feature, newPos);	
-			if(!data.getFeature().isRoot()){
-				data.getOldParent().removeChild(data.getFeature());
-				LinkedList<Feature> featureList = new LinkedList<Feature>(data.getOldParent().getChildren());		
-				LinkedList<Feature> newFeatureList = new LinkedList<Feature>();	
-				int counter2=0;
-				int counter=0;
-			
-				while(data.getOldParent().hasChildren()){
-					if(counter==counter2){
-						if(FeatureUIHelper.hasVerticalLayout(featureModel)){
-							if(FeatureUIHelper.getLocation(featureList.get(counter)).y>newPos.y){
-								newFeatureList.add(data.getFeature());	
-								counter=Integer.MIN_VALUE;
-							}
+	public void newInnerOrder(Point newPos) {
+		FeatureUIHelper.setLocation(feature, newPos);
+		if (!data.getFeature().isRoot()) {
+			data.getOldParent().removeChild(data.getFeature());
+			LinkedList<Feature> featureList = new LinkedList<Feature>(data.getOldParent().getChildren());
+			LinkedList<Feature> newFeatureList = new LinkedList<Feature>();
+			int counter2 = 0;
+			int counter = 0;
+
+			while (data.getOldParent().hasChildren()) {
+				if (counter == counter2) {
+					if (FeatureUIHelper.hasVerticalLayout(featureModel)) {
+						if (FeatureUIHelper.getLocation(featureList.get(counter)).y > newPos.y) {
+							newFeatureList.add(data.getFeature());
+							counter = Integer.MIN_VALUE;
 						}
-						else{
-							if(FeatureUIHelper.getLocation(featureList.get(counter)).x>newPos.x){
-								newFeatureList.add(data.getFeature());	
-								counter=Integer.MIN_VALUE;
-							}
-						}													
+					} else {
+						if (FeatureUIHelper.getLocation(featureList.get(counter)).x > newPos.x) {
+							newFeatureList.add(data.getFeature());
+							counter = Integer.MIN_VALUE;
+						}
 					}
-					
-					data.getOldParent().removeChild(featureList.get(counter2));
-					newFeatureList.add(featureList.get(counter2));
-					counter2++;
-					counter++;
 				}
-			
-				if(!newFeatureList.contains(data.getFeature())){
-					newFeatureList.add(data.getFeature());	
-				}
-	
-				for(int i=0;i<counter2+1;i++){
-					data.getOldParent().addChildAtPosition(i,
-						newFeatureList.get(i));
-				}
+
+				data.getOldParent().removeChild(featureList.get(counter2));
+				newFeatureList.add(featureList.get(counter2));
+				counter2++;
+				counter++;
 			}
 
+			if (!newFeatureList.contains(data.getFeature())) {
+				newFeatureList.add(data.getFeature());
+			}
+
+			for (int i = 0; i < counter2 + 1; i++) {
+				data.getOldParent().addChildAtPosition(i, newFeatureList.get(i));
+			}
+		}
+
 	}
-	
+
 	@Override
-	protected void redo() {	
-		if(!featureModel.getLayout().hasFeaturesAutoLayout()){
+	protected void redo() {
+		if (!featureModel.getLayout().hasFeaturesAutoLayout()) {
 			newInnerOrder(newPos);
 		} else {
-			try{
+			try {
 				data.getOldParent().removeChild(data.getFeature());
-				data.getNewParent().addChildAtPosition(data.getNewIndex(),
-						data.getFeature());
-			} catch (Exception e){
+				data.getNewParent().addChildAtPosition(data.getNewIndex(), data.getFeature());
+			} catch (Exception e) {
 				FMUIPlugin.getDefault().logError(e);
 			}
 		}
@@ -111,16 +107,15 @@ public class FeatureMoveOperation extends AbstractFeatureModelOperation {
 
 	@Override
 	protected void undo() {
-		if(!featureModel.getLayout().hasFeaturesAutoLayout()){
+		if (!featureModel.getLayout().hasFeaturesAutoLayout()) {
 			newInnerOrder(oldPos);
 		} else {
-			try{
+			try {
 				data.getNewParent().removeChild(data.getFeature());
-				if(data.getOldParent()!=null) {
-					data.getOldParent().addChildAtPosition(data.getOldIndex(),
-							data.getFeature());
+				if (data.getOldParent() != null) {
+					data.getOldParent().addChildAtPosition(data.getOldIndex(), data.getFeature());
 				}
-			} catch (Exception e){
+			} catch (Exception e) {
 				FMUIPlugin.getDefault().logError(e);
 			}
 		}

@@ -34,16 +34,16 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.FeatureRenamingCom
  * @author Thomas Thuem
  */
 public class FeatureDirectEditPolicy extends DirectEditPolicy {
-	
+
 	private final FeatureModel featureModel;
 
 	private final Feature feature;
-	
+
 	public FeatureDirectEditPolicy(FeatureModel featureModel, Feature feature) {
 		this.featureModel = featureModel;
 		this.feature = feature;
 	}
-	
+
 	@Override
 	protected Command getDirectEditCommand(DirectEditRequest request) {
 		String newName = (String) request.getCellEditor().getValue();
@@ -53,5 +53,5 @@ public class FeatureDirectEditPolicy extends DirectEditPolicy {
 	@Override
 	protected void showCurrentEditValue(DirectEditRequest request) {
 	}
-	
+
 }
