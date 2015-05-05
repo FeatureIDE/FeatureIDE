@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.layouts;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -80,21 +81,18 @@ public class LayoutableFeature {
 		return feature;
 	}
 
-	public static LinkedList<Feature> convertFeatures(Collection<Feature> features, boolean showHidden) {
-
-		LinkedList<Feature> newFeatures = new LinkedList<Feature>();
-
-		for (Feature feature : features) {
-			if (showHidden) {
-				newFeatures.add(feature);
-			} else {
-				if (!isHidden(feature, showHidden)) {
+	public static Collection<Feature> convertFeatures(Collection<Feature> features, boolean showHidden) {
+		if (showHidden) {
+			return features;
+		} else {
+			final ArrayList<Feature> newFeatures = new ArrayList<Feature>();
+			for (Feature feature : features) {
+				if (feature.hasHiddenParent()) {
 					newFeatures.add(feature);
 				}
 			}
-
+			return newFeatures;
 		}
-		return newFeatures;
 	}
 
 	public static boolean isHidden(Feature feature, boolean showHidden) {

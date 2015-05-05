@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.layouts;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.draw2d.geometry.Dimension;
@@ -38,11 +39,9 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  */
 abstract public class FeatureDiagramLayoutManager {
 
-	int controlWidth = 10;
-
-	int controlHeight = 10;
-
-	boolean showHidden;
+	protected int controlWidth = 10;
+	protected int controlHeight = 10;
+	protected boolean showHidden;
 
 	public void layout(FeatureModel featureModel) {
 		showHidden = featureModel.getLayout().showHiddenFeatures();
@@ -109,13 +108,10 @@ abstract public class FeatureDiagramLayoutManager {
 
 	void layout(int yoffset, List<Constraint> constraints) {
 		int y = yoffset + FMPropertyManager.getConstraintSpace();
-		for (int i = 0; i < constraints.size(); i++) {
-			Constraint constraint = constraints.get(i);
+		boolean depthFirst = this instanceof DepthFirstLayout;
+		for (Constraint constraint : constraints) {
 			Dimension size = FeatureUIHelper.getSize(constraint);
-			int x = (controlWidth - size.width) / 2;
-			if (this instanceof DepthFirstLayout) {
-				x = 2 * FMPropertyManager.getFeatureSpaceX();
-			}
+			int x = depthFirst ? 2 * FMPropertyManager.getFeatureSpaceX() : (controlWidth - size.width) >> 1;
 			FeatureUIHelper.setLocation(constraint, new Point(x, y));
 			y += size.height;
 		}
@@ -125,14 +121,15 @@ abstract public class FeatureDiagramLayoutManager {
 	 * sets the position of the legend
 	 */
 	private static void layoutLegend(FeatureModel featureModel, boolean showHidden) {
-		Point min = new Point(Integer.MAX_VALUE, Integer.MAX_VALUE);
-		Point max = new Point(Integer.MIN_VALUE, Integer.MIN_VALUE);
+		final Point min = new Point(Integer.MAX_VALUE, Integer.MAX_VALUE);
+		final Point max = new Point(Integer.MIN_VALUE, Integer.MIN_VALUE);
 
 		/*
 		 * update lowest, highest, most left, most right coordinates
 		 * for features
 		 */
-		for (Feature feature : LayoutableFeature.convertFeatures(featureModel.getFeatures(), showHidden)) {
+		Collection<Feature> nonHidden = LayoutableFeature.convertFeatures(featureModel.getFeatures(), showHidden);
+		for (Feature feature : nonHidden) {
 			Point temp = FeatureUIHelper.getLocation(feature);
 			if (null == temp)
 				continue;
@@ -146,7 +143,6 @@ abstract public class FeatureDiagramLayoutManager {
 				max.x = temp.x + tempSize.width;
 			if (temp.y + tempSize.height > max.y)
 				max.y = temp.y + tempSize.height;
-
 		}
 
 		/*
@@ -177,24 +173,23 @@ abstract public class FeatureDiagramLayoutManager {
 		/*
 		 * check if features would intersect with the legend on the edges
 		 */
-		for (Feature feature : LayoutableFeature.convertFeatures(featureModel.getFeatures(), showHidden)) {
-			Point tempLocation = FeatureUIHelper.getLocation(feature);
-			if (null == tempLocation)
-				continue;
-			Dimension tempSize = FeatureUIHelper.getSize(feature);
-			if ((tempLocation.x + tempSize.width) > (max.x - legendSize.width - FMPropertyManager.getFeatureSpaceX())
-					&& (tempLocation.y) < (min.y + legendSize.height + FMPropertyManager.getFeatureSpaceY() / 2))
-				topRight = false;
-			if ((tempLocation.x) < (min.x + legendSize.width + FMPropertyManager.getFeatureSpaceX())
-					&& (tempLocation.y) < (min.y + legendSize.height + FMPropertyManager.getFeatureSpaceY() / 2))
-				topLeft = false;
-			if ((tempLocation.x) < (min.x + legendSize.width + FMPropertyManager.getFeatureSpaceX())
-					&& (tempLocation.y + tempSize.height) > (max.y - legendSize.height - FMPropertyManager.getFeatureSpaceY() / 2))
-				botLeft = false;
-			if ((tempLocation.x + tempSize.width) > (max.x - legendSize.width - FMPropertyManager.getFeatureSpaceX())
-					&& (tempLocation.y + tempSize.height) > (max.y - legendSize.height - FMPropertyManager.getFeatureSpaceY() / 2))
-				botRight = false;
-
+		for (Feature feature : nonHidden) {
+			final Point tempLocation = FeatureUIHelper.getLocation(feature);
+			if (null != tempLocation) {
+				final Dimension tempSize = FeatureUIHelper.getSize(feature);
+				if ((tempLocation.x + tempSize.width) > (max.x - legendSize.width - FMPropertyManager.getFeatureSpaceX())
+						&& (tempLocation.y) < (min.y + legendSize.height + FMPropertyManager.getFeatureSpaceY() / 2))
+					topRight = false;
+				if ((tempLocation.x) < (min.x + legendSize.width + FMPropertyManager.getFeatureSpaceX())
+						&& (tempLocation.y) < (min.y + legendSize.height + FMPropertyManager.getFeatureSpaceY() / 2))
+					topLeft = false;
+				if ((tempLocation.x) < (min.x + legendSize.width + FMPropertyManager.getFeatureSpaceX())
+						&& (tempLocation.y + tempSize.height) > (max.y - legendSize.height - FMPropertyManager.getFeatureSpaceY() / 2))
+					botLeft = false;
+				if ((tempLocation.x + tempSize.width) > (max.x - legendSize.width - FMPropertyManager.getFeatureSpaceX())
+						&& (tempLocation.y + tempSize.height) > (max.y - legendSize.height - FMPropertyManager.getFeatureSpaceY() / 2))
+					botRight = false;
+			}
 		}
 		/*
 		 * check if constraints would intersect with the legend on the edges
@@ -232,10 +227,6 @@ abstract public class FeatureDiagramLayoutManager {
 		} else if (botRight) {
 			featureModel.getLayout().setLegendPos(max.x - legendSize.width, max.y - legendSize.height);
 		} else {
-
-			/*
-			 * old layout method of the legend
-			 */
 			featureModel.getLayout().setLegendPos(max.x + FMPropertyManager.getFeatureSpaceX(), min.y);
 		}
 	}

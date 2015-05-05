@@ -33,6 +33,8 @@ import org.eclipse.swt.graphics.Color;
 
 import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
+import de.ovgu.featureide.fm.core.FeatureModelAnalyzer.Attribute;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
@@ -106,7 +108,8 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private static final int INHERITED = 9;
 	private static final int INTERFACED = 10;
 
-	private final XYLayout layout = new XYLayout();
+	private static final XYLayout layout = new XYLayout();
+
 	public Point newPos;
 	private int width;
 	private ILanguage language;
@@ -132,26 +135,27 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	@Override
 	public boolean useLocalCoordinates() {
 		return true;
-
 	}
 
 	public LegendFigure(FeatureModel featureModel, Point pos) {
+		final FeatureModelAnalyzer analyser = featureModel.getAnalyser();
+
 		mandatory = featureModel.hasMandatoryFeatures();
 		optional = featureModel.hasOptionalFeatures();
 		alternative = featureModel.hasAlternativeGroup();
 		or = featureModel.hasOrGroup();
-		_abstract = featureModel.hasAbstract();
-		concrete = featureModel.hasConcrete();
-		hidden = featureModel.hasHidden();
-		dead = !featureModel.getAnalyser().getDeadFeatures().isEmpty();
+		_abstract = analyser.getAttributeFlag(Attribute.Abstract);
+		concrete = analyser.getAttributeFlag(Attribute.Concrete);
+		hidden = analyser.getAttributeFlag(Attribute.Hidden);
+		dead = analyser.getAttributeFlag(Attribute.Dead);
 		showHidden = featureModel.getLayout().showHiddenFeatures();
-		falseoptional = featureModel.hasFalseOptionalFeatures();
-		indetHidden = featureModel.hasIndetHidden();
+		falseoptional = analyser.getAttributeFlag(Attribute.FalseOptional);
+		indetHidden = analyser.getAttributeFlag(Attribute.IndetHidden);
 
-		unsatisfiableConst = featureModel.hasUnsatisfiableConst() && featureModel.getAnalyser().calculateConstraints;
-		tautologyConst = featureModel.hasTautologyConst() && featureModel.getAnalyser().calculateTautologyConstraints;
-		voidModelConst = featureModel.hasVoidModelConst() && featureModel.getAnalyser().calculateConstraints;
-		redundantConst = featureModel.hasRedundantConst() && featureModel.getAnalyser().calculateRedundantConstraints;
+		unsatisfiableConst = analyser.calculateConstraints && featureModel.hasUnsatisfiableConst();
+		tautologyConst = analyser.calculateTautologyConstraints && featureModel.hasTautologyConst();
+		voidModelConst = analyser.calculateConstraints && featureModel.hasVoidModelConst();
+		redundantConst = analyser.calculateRedundantConstraints && featureModel.hasRedundantConst();
 
 		if (featureModel instanceof ExtendedFeatureModel) {
 			ExtendedFeatureModel extendedFeatureModel = (ExtendedFeatureModel) featureModel;

@@ -18,36 +18,16 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.ui.editors.featuremodel.editparts;
-
-import org.eclipse.draw2d.IFigure;
-import org.eclipse.gef.EditPolicy;
-import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
-import org.eclipse.gef.editpolicies.NonResizableEditPolicy;
-
-import de.ovgu.featureide.fm.ui.editors.featuremodel.Legend;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
+package de.ovgu.featureide.fm.core;
 
 /**
- * EditPart for feature model legend
  * 
- * @author Fabian Benduhn
+ * @author Sebastian Krieter
  */
-public class LegendEditPart extends AbstractGraphicalEditPart {
-
-	LegendEditPart(Object legend) {
-		super();
-		setModel(legend);
+public interface IGraphicItem {
+	public static enum GraphicItem {
+		Feature, Connection, Constraint, Legend, Model
 	}
-
-	@Override
-	protected IFigure createFigure() {
-		return new LegendFigure(((Legend) this.getModel()).getModel(), ((Legend) getModel()).getPos());
-	}
-
-	@Override
-	protected void createEditPolicies() {
-		installEditPolicy(EditPolicy.DIRECT_EDIT_ROLE, new NonResizableEditPolicy());
-	}
-
+	
+	GraphicItem getItemType();
 }

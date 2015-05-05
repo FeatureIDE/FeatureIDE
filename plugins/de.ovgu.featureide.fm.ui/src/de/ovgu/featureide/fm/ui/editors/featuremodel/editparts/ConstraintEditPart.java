@@ -45,7 +45,9 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.ConstraintFigure;
  */
 public class ConstraintEditPart extends AbstractGraphicalEditPart implements PropertyConstants, PropertyChangeListener {
 
-	public ConstraintEditPart(Constraint constraint) {
+	private static final NonResizableEditPolicy NON_RESIZABLE_EDIT_POLICY = new NonResizableEditPolicy();
+
+	ConstraintEditPart(Object constraint) {
 		super();
 		setModel(constraint);
 	}
@@ -65,8 +67,7 @@ public class ConstraintEditPart extends AbstractGraphicalEditPart implements Pro
 
 	@Override
 	protected void createEditPolicies() {
-		installEditPolicy(EditPolicy.SELECTION_FEEDBACK_ROLE, new NonResizableEditPolicy());
-
+		installEditPolicy(EditPolicy.SELECTION_FEEDBACK_ROLE, NON_RESIZABLE_EDIT_POLICY);
 	}
 
 	public void performRequest(Request request) {
@@ -95,18 +96,12 @@ public class ConstraintEditPart extends AbstractGraphicalEditPart implements Pro
 		getConstraintModel().removeListener(this);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.beans.PropertyChangeListener#propertyChange(java.beans.
-	 * PropertyChangeEvent)
-	 */
 	public void propertyChange(PropertyChangeEvent event) {
 		String prop = event.getPropertyName();
 		if (LOCATION_CHANGED.equals(prop)) {
 			getConstraintFigure().setLocation((Point) event.getNewValue());
 		} else if (ATTRIBUTE_CHANGED.equals(prop) || CONSTRAINT_SELECTED.equals(prop)) {
-			getConstraintFigure().setConstraintProperties(false);
+			getConstraintFigure().setConstraintProperties();
 		}
 	}
 

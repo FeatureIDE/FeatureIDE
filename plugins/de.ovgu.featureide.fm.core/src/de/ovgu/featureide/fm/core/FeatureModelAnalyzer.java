@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
@@ -57,6 +58,16 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
  */
 public class FeatureModelAnalyzer {
 
+	public static enum Attribute {
+		Mandatory, Optional, Alternative, Or, Abstract, 
+		Concrete, Hidden, Dead, FalseOptional, 
+		IndetHidden, UnsatisfiableConst, TautologyConst, 
+		VoidModelConst, RedundantConst
+	}
+	
+
+	private final boolean[] attributeFlags = new boolean[Attribute.values().length];
+	
 	private static final String TRUE = "True";
 
 	private static final String FALSE = "False";
@@ -946,5 +957,16 @@ public class FeatureModelAnalyzer {
 	public Collection<Feature> getCachedDeadFeatures() {
 		return cachedDeadFeatures;
 	}
-
+	
+	public boolean getAttributeFlag(Attribute attribute) {
+		return attributeFlags[attribute.ordinal()];
+	}
+	
+	public void setAttributeFlag(Attribute attribute, boolean flag) {
+		attributeFlags[attribute.ordinal()] = flag;
+	}
+	
+	public void resetAttributeFlags() {
+		Arrays.fill(attributeFlags, false);
+	}
 }

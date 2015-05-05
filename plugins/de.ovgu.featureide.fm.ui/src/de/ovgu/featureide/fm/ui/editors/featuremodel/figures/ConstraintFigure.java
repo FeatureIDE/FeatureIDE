@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 
 import org.eclipse.draw2d.Figure;
@@ -30,7 +31,6 @@ import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
-import org.eclipse.swt.graphics.Color;
 import org.prop4j.NodeWriter;
 
 import de.ovgu.featureide.fm.core.Constraint;
@@ -48,12 +48,6 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  */
 public class ConstraintFigure extends Figure implements GUIDefaults {
 
-	private static String[] symbols = null;
-
-	private final Label label = new Label();
-
-	private Constraint constraint;
-
 	public final static String VOID_MODEL = " Constraint makes the feature model void. ";
 	public final static String UNSATISFIABLE = " Constraint is unsatisfiable and makes the feature model void. ";
 	public final static String TAUTOLOGY = " Constraint is a tautology and should be removed. ";
@@ -62,10 +56,21 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 	public final static String REDUNDANCE = " Constraint is redundant and could be removed. ";
 
 	private static final IFigure VOID_LABEL = new Label(VOID_MODEL);
-
 	private static final IFigure UNSATISFIABLE_LABEL = new Label(UNSATISFIABLE);
-
 	private static final IFigure TAUTOLOGY_LABEL = new Label(TAUTOLOGY);
+
+	private static final String[] symbols;
+	static {
+		if (GUIBasics.unicodeStringTest(DEFAULT_FONT, Arrays.toString(NodeWriter.logicalSymbols))) {
+			symbols = NodeWriter.logicalSymbols;
+		} else {
+			symbols = NodeWriter.shortSymbols;
+		}
+	}
+
+	private final Label label = new Label();
+
+	private Constraint constraint;
 
 	public ConstraintFigure(Constraint constraint) {
 		super();
@@ -74,7 +79,6 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 
 		label.setForegroundColor(CONSTRAINT_FOREGROUND);
 		label.setFont(DEFAULT_FONT);
-
 		label.setLocation(new Point(CONSTRAINT_INSETS.left, CONSTRAINT_INSETS.top));
 
 		setText(getConstraintText(constraint));
@@ -87,22 +91,19 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 		if (FeatureUIHelper.getLocation(constraint) != null)
 			setLocation(FeatureUIHelper.getLocation(constraint));
 
-		setConstraintProperties(true);
+		init();
+	}
+
+	private void init() {
+		setBorder(FMPropertyManager.getConstraintBorder(constraint.isFeatureSelected()));
+		setBackgroundColor(FMPropertyManager.getConstraintBackgroundColor());
 	}
 
 	/**
-	 * Sets the properties <i>color, border and tooltips</i> of the {@link ConstraintFigure}
-	 * 
-	 * @param init <code>true</code> if this method is called by the constructor else the
-	 *            calculated properties will be set.
+	 * Sets the properties <i>color, border and tooltips</i> of the {@link ConstraintFigure}.
 	 */
-	public void setConstraintProperties(boolean init) {
-		setBorder(FMPropertyManager.getConstraintBorder(constraint.isFeatureSelected()));
-		setBackgroundColor(FMPropertyManager.getConstraintBackgroundColor());
-
-		if (init) {
-			return;
-		}
+	public void setConstraintProperties() {
+		init();
 
 		ConstraintAttribute constraintAttribute = constraint.getConstraintAttribute();
 		if (constraintAttribute == ConstraintAttribute.NORMAL) {
@@ -170,23 +171,9 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 			setToolTip(new Label(REDUNDANCE));
 			return;
 		}
-
-	}
-
-	@Override
-	public void setBackgroundColor(Color bg) {
-		super.setBackgroundColor(bg);
 	}
 
 	private String getConstraintText(Constraint constraint) {
-		if (symbols == null) {
-			symbols = NodeWriter.logicalSymbols;
-			StringBuilder s = new StringBuilder();
-			for (int i = 0; i < symbols.length; i++)
-				s.append(symbols[i]);
-			if (!GUIBasics.unicodeStringTest(label.getFont(), s.toString()))
-				symbols = NodeWriter.shortSymbols;
-		}
 		return constraint.getNode().toString(symbols);
 	}
 
