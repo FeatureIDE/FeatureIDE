@@ -52,7 +52,7 @@ import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
  * @author Jan Wedding
  * @author Melanie Pflaume
  * @author Dominic Labsch
- * @author Daniel Püsche
+ * @author Daniel Pï¿½sche
  */
 public class CollaborationOutlineLabelProvider extends OutlineLabelProvider implements GUIDefaults {
 
@@ -80,17 +80,13 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 		}
 		if (element instanceof IRoleElement) {
 			IRoleElement fstModelElement = (IRoleElement) element;
-			if (fstModelElement instanceof FSTAsmetaLDomain)
-			{
+			if (fstModelElement instanceof FSTAsmetaLDomain) {
 				return IMAGE_FIELD_PUBLIC;
-			} else if (fstModelElement instanceof FSTAstemaLFunction)
-			{
+			} else if (fstModelElement instanceof FSTAstemaLFunction) {
 				return IMAGE_FIELD_PRIVATE;
-			} else if (fstModelElement instanceof FSTAsmetaLInitialization)
-			{
+			} else if (fstModelElement instanceof FSTAsmetaLInitialization) {
 				return IMAGE_METHODE_PROTECTED;
-			} else if (fstModelElement instanceof FSTField) 
-			{
+			} else if (fstModelElement instanceof FSTField) {
 				final FSTField field = (FSTField) fstModelElement;
 				final String fileExtension = field.getFile().getFileExtension();
 				if ("java".equals(fileExtension) || "jak".equals(fileExtension) || "cs".equals(fileExtension)) {
@@ -149,7 +145,8 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 			final int extIndex = className.lastIndexOf('.');
 			if (extIndex > -1) {
 				final String fileExtension = className.substring(extIndex + 1);
-				if ("java".equals(fileExtension) || "jak".equals(fileExtension) || "cs".equals(fileExtension) || "h".equals(fileExtension) || "c".equals(fileExtension)) {
+				if ("java".equals(fileExtension) || "jak".equals(fileExtension) || "cs".equals(fileExtension) || "h".equals(fileExtension)
+						|| "c".equals(fileExtension)) {
 					return IMAGE_CLASS;
 				} else if ("hs".equals(fileExtension)) {
 					return IMAGE_HASKELL_MODULE;
@@ -244,9 +241,11 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 	private boolean hasSameClass(FSTClass Class, IFile oldFile, IFile currentFile) {
 		if (Class == null) {
 			UIPlugin.getDefault().logWarning("class is null");
+			return false;
 		}
 		if (currentFile == null) {
 			UIPlugin.getDefault().logWarning("file is null");
+			return false;
 		}
 		if (!currentFile.getProject().equals(oldFile.getProject())) {
 			return false;
