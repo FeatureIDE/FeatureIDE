@@ -98,7 +98,6 @@ import org.eclipse.ui.wizards.datatransfer.ImportOperation;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.builder.ComposerExtensionManager;
-import de.ovgu.featureide.core.builder.IComposerExtension;
 import de.ovgu.featureide.core.builder.IComposerExtensionBase;
 import de.ovgu.featureide.examples.ExamplePlugin;
 import de.ovgu.featureide.examples.utils.CommentParser;
@@ -112,7 +111,25 @@ import de.ovgu.featureide.examples.utils.ZipStructureProvider;
  */
 public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery {
 
-	private class ItemAccessCheckboxTreeViewer extends CheckboxTreeViewer {
+	private static final class ExampleLabelProvider extends LabelProvider {
+		public String getText(Object element) {
+			if (element instanceof String) {
+				for (IComposerExtensionBase ic : ComposerExtensionManager.getInstance().getComposers()) {
+					final String composerExtension = ic.toString();
+					if (composerExtension.substring(composerExtension.lastIndexOf(".") + 1).equals((String) element)) {
+						return ic.getName();
+					}
+				}
+				return (String) element;
+			} else if (element instanceof ProjectRecord) {
+				return ((ProjectRecord) element).getProjectLabel();
+			} else {
+				return "";
+			}
+		}
+	}
+
+	private static class ItemAccessCheckboxTreeViewer extends CheckboxTreeViewer {
 
 		/**
 		 * @param parent
@@ -377,25 +394,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 			}
 		});
 
-		projectsList.setLabelProvider(new LabelProvider() {
-			public String getText(Object element) {
-				if (element instanceof String) {
-					List<IComposerExtension> composerExtensions = ComposerExtensionManager.getInstance().getComposers();
-					for (IComposerExtensionBase ic : composerExtensions) {
-						String composerExtension = ic.toString();
-						if (composerExtension.substring(composerExtension.lastIndexOf(".") + 1).equals((String) element)) {
-							return ic.getName();
-						}
-					}
-					return (String) element;
-				} else if (element instanceof ProjectRecord) {
-					return ((ProjectRecord) element).getProjectLabel();
-				} else {
-					return "";
-				}
-
-			}
-		});
+		projectsList.setLabelProvider(new ExampleLabelProvider());
 
 		projectsList.addCheckStateListener(new ICheckStateListener() {
 			public void checkStateChanged(CheckStateChangedEvent event) {
@@ -773,12 +772,14 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 				if (newProject.containsNatureID("de.ovgu.featureide.core.mpl.MSPLNature")) {
 					if (file.getParentFile().isDirectory()) {
 						final File[] subdir = file.getParentFile().listFiles();
-						for (File file2 : subdir) {
-							if (ProjectRecord.SUB_PROJECTS_FOLDER.equals(file2.getName())) {
-								newProject.collectSubProjectFiles(file2, null, monitor);
-								break;
+						if (subdir != null) {
+							for (File file2 : subdir) {
+								if (ProjectRecord.SUB_PROJECTS_FOLDER.equals(file2.getName())) {
+									newProject.collectSubProjectFiles(file2, null, monitor);
+									break;
+								}
 							}
-						}
+						}						
 					}
 				}
 				return true;
