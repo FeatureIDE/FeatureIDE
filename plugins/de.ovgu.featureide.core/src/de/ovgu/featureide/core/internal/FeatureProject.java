@@ -1018,18 +1018,16 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		}
 		final List<String> concreteFeatures = getFalseOptionalFeatures();
 		final List<String> falseOptionalFeatures = new LinkedList<String>();
-		if (selections.length != 0) {
-			for (int column = 0; column < concreteFeatures.size(); column++) {
-				boolean invalid = true;
-				for (int conf = 0; conf < selections.length; conf++) {
-					if (selections[conf][column] == selectionState) {
-						invalid = false;
-						break;
-					}
+		for (int column = 0; column < concreteFeatures.size(); column++) {
+			boolean invalid = true;
+			for (int conf = 0; conf < selections.length; conf++) {
+				if (selections[conf][column] == selectionState) {
+					invalid = false;
+					break;
 				}
-				if (invalid) {
-					falseOptionalFeatures.add(concreteFeatures.get(column));
-				}
+			}
+			if (invalid) {
+				falseOptionalFeatures.add(concreteFeatures.get(column));
 			}
 		}
 		return falseOptionalFeatures;

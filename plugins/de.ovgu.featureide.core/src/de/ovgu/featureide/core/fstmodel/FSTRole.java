@@ -35,7 +35,7 @@ import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
  * 
  * @author Jens Meinicke
  * @author Dominic Labsch
- * @author Daniel Püsche
+ * @author Daniel Pï¿½sche
  */
 public class FSTRole {
 	private final TreeSet<FSTDirective> directives = new TreeSet<FSTDirective>();
@@ -113,12 +113,9 @@ public class FSTRole {
 
 	private void getAllFieldsRec(LinkedList<FSTField> fields, FSTClassFragment innerClass) {
 		fields.addAll(innerClass.getFields());
-		if (innerClass.getInnerClasses() != null) {
-			for (FSTClassFragment i : innerClass.getInnerClasses()) {
-				getAllFieldsRec(fields, i);
-			}
+		for (FSTClassFragment i : innerClass.getInnerClasses()) {
+			getAllFieldsRec(fields, i);
 		}
-
 	}
 
 	// get all methods of all nested classes
@@ -131,10 +128,8 @@ public class FSTRole {
 
 	private void getAllMethodsRec(LinkedList<FSTMethod> methods, FSTClassFragment innerClass) {
 		methods.addAll(innerClass.getMethods());
-		if (innerClass.getInnerClasses() != null) {
-			for (FSTClassFragment i : innerClass.getInnerClasses()) {
-				getAllMethodsRec(methods, i);
-			}
+		for (FSTClassFragment i : innerClass.getInnerClasses()) {
+			getAllMethodsRec(methods, i);
 		}
 
 	}
@@ -149,12 +144,9 @@ public class FSTRole {
 
 	private void getAllInnerClassesRec(LinkedList<FSTClassFragment> fragment, FSTClassFragment innerClass) {
 		fragment.addAll(innerClass.getInnerClasses());
-		if (innerClass.getInnerClasses() != null) {
-			for (FSTClassFragment i : innerClass.getInnerClasses()) {
-				getAllInnerClassesRec(fragment, i);
-			}
+		for (FSTClassFragment i : innerClass.getInnerClasses()) {
+			getAllInnerClassesRec(fragment, i);
 		}
-
 	}
 
 	//get list of all nested classes shared by multiple features

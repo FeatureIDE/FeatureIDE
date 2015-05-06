@@ -62,11 +62,18 @@ import de.ovgu.featureide.fm.core.configuration.ConfigurationWriter;
 @SuppressWarnings("restriction")
 public abstract class ComposerExtensionClass implements IComposerExtensionClass {
 
-	protected static final String JAVA_NATURE = "org.eclipse.jdt.core.javanature";
 	public static final IPath JRE_CONTAINER = new Path("org.eclipse.jdt.launching.JRE_CONTAINER");
+	public static final String NEWLINE = System.getProperty("line.separator", "\n");
+
+	protected static final String JAVA_NATURE = "org.eclipse.jdt.core.javanature";
+	protected final static String[] JAVA_TEMPLATE = new String[] {
+			"Java",
+			"java",
+			PACKAGE_PATTERN + "/**" + NEWLINE + " * TODO description" + NEWLINE + " */" + NEWLINE + "public class " + CLASS_NAME_PATTERN + " {" + NEWLINE
+					+ NEWLINE + "}" };
+
 	protected IFeatureProject featureProject = null;
 
-	public static final String NEWLINE = System.getProperty("line.separator", "\n");
 	private boolean initialized = false;
 	private IComposerExtension composerExtensionProxy;
 
@@ -85,10 +92,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	void setComposerExtension(IComposerExtension composerExtensionProxy) {
 		this.composerExtensionProxy = composerExtensionProxy;
 	}
-
-	protected final static String[] JAVA_TEMPLATE = new String[] { "Java", "java",
-			PACKAGE_PATTERN + "/**" + NEWLINE + " * TODO description" + NEWLINE + " */" + NEWLINE + "public class " + CLASS_NAME_PATTERN + " {" + NEWLINE + NEWLINE + "}" };
-
+	
 	public boolean initialize(IFeatureProject project) {
 		assert (project != null) : "Invalid project given";
 		featureProject = project;
