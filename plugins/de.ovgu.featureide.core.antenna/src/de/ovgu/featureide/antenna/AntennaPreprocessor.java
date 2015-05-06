@@ -451,7 +451,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 			preprocessor.addDefines(featureList.toString());
 			// preprocess for all files in source folder
 			preprocessSourceFiles(folder, preprocessor, congurationName);
-		} catch (Exception e) {
+		} catch (CoreException | IOException | PPException e) {
 			AntennaCorePlugin.getDefault().logError(e);
 		}
 	}
