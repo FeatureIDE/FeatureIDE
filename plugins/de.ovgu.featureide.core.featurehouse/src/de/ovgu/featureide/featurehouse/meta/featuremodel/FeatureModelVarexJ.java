@@ -22,7 +22,6 @@ package de.ovgu.featureide.featurehouse.meta.featuremodel;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -30,6 +29,7 @@ import org.prop4j.Node;
 import org.prop4j.NodeWriter;
 
 import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.FeatureComparator;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
@@ -39,25 +39,18 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
  * @author Jens Meinicke
  */
 public class FeatureModelVarexJ implements IFeatureModelClass {
-	
+
 	private final static String HEAD = "/**\r\n * Variability encoding of the feature model for VarexJ.\r\n * Auto-generated class.\r\n */\r\npublic class FeatureModel {\n\n";
 	private final static String FIELD_MODIFIER = "\tpublic static boolean ";
 	private final static String ANNOTATION = "\t@Conditional\r\n";
+
 	private final FeatureModel featureModel;
 	private final ArrayList<Feature> features;
 
 	public FeatureModelVarexJ(FeatureModel featureModel) {
 		this.featureModel = featureModel;
 		features = new ArrayList<Feature>(featureModel.getFeatures());
-		Collections.sort(features, new Comparator<Feature>() {
-
-			@Override
-			public int compare(Feature f1, Feature f2) {
-				return f1.getName().compareToIgnoreCase(f2.getName());
-			}
-
-		});
-		
+		Collections.sort(features, new FeatureComparator(true));
 	}
 	
 	@Override

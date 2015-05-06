@@ -172,7 +172,7 @@ public class FeatureStubsGenerator {
 													StringBuilder newClassFileTextSB = createClassForPrototype(innerAbs, newClassFile);
 													createPrototypes(newClassFileTextSB, innerAbs);
 													newClassFileTextSB.append("\n}");
-													writeToFile(newClassFile, newClassFileTextSB);
+													writeToFile(newClassFile, newClassFileTextSB.toString());
 												}
 											}
 										}
@@ -185,7 +185,7 @@ public class FeatureStubsGenerator {
 						}
 						
 						fileTextSB.append(fileText.substring(lastIndexOf));
-						writeToFile(file, fileTextSB);
+						writeToFile(file, fileTextSB.toString());
 					}
 					if (keyWrapper != null) {
 						keyWrapper.runKeY(file);
@@ -234,14 +234,13 @@ public class FeatureStubsGenerator {
 	private StringBuilder createClassForPrototype(AbstractSignature absStig, File classFile) {
 		StringBuilder newClassFileTextSB = null;
 		try {
-			classFile.createNewFile();
-			String newClassFileText = new String(Files.readAllBytes(classFile.toPath()));
-			final int lastIndexInNewClassFile = newClassFileText.lastIndexOf("}");
-			newClassFileTextSB = new StringBuilder(newClassFileText.substring(0,
-					lastIndexInNewClassFile > -1 ? lastIndexInNewClassFile : newClassFileText.length()));
-
-			if ((newClassFileTextSB.length() == 0)) {
-				newClassFileTextSB.append("public class " + absStig.getParent().getName() + "{\n");
+			if (classFile.createNewFile()) {
+				newClassFileTextSB = new StringBuilder("public class " + absStig.getParent().getName() + "{\n");
+			} else {
+				String newClassFileText = new String(Files.readAllBytes(classFile.toPath()));
+				final int lastIndexInNewClassFile = newClassFileText.lastIndexOf("}");
+				newClassFileTextSB = new StringBuilder(newClassFileText.substring(0,
+						lastIndexInNewClassFile > -1 ? lastIndexInNewClassFile : newClassFileText.length()));
 			}
 		} catch (IOException e1) {
 			FeatureHouseCorePlugin.getDefault().logError(e1);
@@ -274,28 +273,26 @@ public class FeatureStubsGenerator {
 		if (featureStubFolder.getFolder(role.getFeature().getName()).getFile(className + ".java").exists())
 			return;
 		File missingTypeFile = new File(PATH + feature.getName() + "\\" + className + ".java");
-		StringBuilder missingTypeFileTextSB = null;
 		try {
-			missingTypeFile.createNewFile();
-			String missingTypeFileText = new String(Files.readAllBytes(missingTypeFile.toPath()));
-			final int lastIndexInNewClassFile = missingTypeFileText.lastIndexOf("}");
-			missingTypeFileTextSB = new StringBuilder(missingTypeFileText.substring(0,
-					lastIndexInNewClassFile > -1 ? lastIndexInNewClassFile : missingTypeFileText.length()));
-
-			if ((missingTypeFileTextSB.length() == 0)) {
-				missingTypeFileTextSB.append("public class " + className + "{}");
-				writeToFile(missingTypeFile, missingTypeFileTextSB);
+			if (missingTypeFile.createNewFile()) {
+				writeToFile(missingTypeFile, "public class " + className + "{}");
+			} else {
+				String missingTypeFileText = new String(Files.readAllBytes(missingTypeFile.toPath()));
+				final int lastIndexInNewClassFile = missingTypeFileText.lastIndexOf("}");
+				StringBuilder missingTypeFileTextSB = new StringBuilder(missingTypeFileText.substring(0,
+						lastIndexInNewClassFile > -1 ? lastIndexInNewClassFile : missingTypeFileText.length()));
+				writeToFile(missingTypeFile, missingTypeFileTextSB.toString());
 			}
 		} catch (IOException e1) {
 			FeatureHouseCorePlugin.getDefault().logError(e1);
 		}
 	}
 
-	private void writeToFile(File File, StringBuilder Text) {
+	private void writeToFile(File file, String text) {
 		FileWriter newClassWriter = null;
 		try {
-			newClassWriter = new FileWriter(File);
-			newClassWriter.write(Text.toString());
+			newClassWriter = new FileWriter(file);
+			newClassWriter.write(text);
 		} catch (IOException e) {
 			FeatureHouseCorePlugin.getDefault().logError(e);
 		} finally {

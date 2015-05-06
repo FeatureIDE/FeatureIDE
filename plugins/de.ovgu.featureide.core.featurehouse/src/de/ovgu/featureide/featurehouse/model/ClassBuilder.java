@@ -23,7 +23,9 @@ package de.ovgu.featureide.featurehouse.model;
 import java.util.LinkedList;
 
 import org.eclipse.core.resources.IFile;
+
 import de.ovgu.cide.fstgen.ast.FSTNode;
+import de.ovgu.cide.fstgen.ast.FSTNonTerminal;
 import de.ovgu.cide.fstgen.ast.FSTTerminal;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
@@ -144,7 +146,8 @@ public class ClassBuilder {
 	public void caseModifiers(FSTTerminal terminal) {}
 
 	public void caseInvariant(FSTTerminal terminal) {}
-	
+
 	public void caseInitialization(FSTNode node) {}
-	public void caseSignatureDeclaration(FSTNode node) {}
+
+	public void caseSignatureDeclaration(FSTNonTerminal node) {}
 }

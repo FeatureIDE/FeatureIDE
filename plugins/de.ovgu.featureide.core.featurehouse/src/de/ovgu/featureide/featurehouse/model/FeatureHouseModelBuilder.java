@@ -259,7 +259,7 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 						}
 						classFragmentStack.push(newFragment);
 					} else if (ASMETAL_SIGNATURE.equals(type)) {
-						classBuilder.caseSignatureDeclaration(child);
+						classBuilder.caseSignatureDeclaration((FSTNonTerminal) child);
 					} else if (ASMETAL_INITIALIZATION.equals(type)) {
 						classBuilder.caseInitialization(child);
 					} else {

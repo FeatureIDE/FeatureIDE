@@ -85,8 +85,8 @@ public class AsmetaLClassBuilder extends ClassBuilder {
 	}
 
 	@Override
-	public void caseSignatureDeclaration(FSTNode node) {
-		List<FSTNode> children = ((FSTNonTerminal) node).getChildren();
+	public void caseSignatureDeclaration(FSTNonTerminal node) {
+		List<FSTNode> children = node.getChildren();
 		for (FSTNode child : children) {
 			FSTTerminal terminal = (FSTTerminal) child;
 			String type = child.getType();

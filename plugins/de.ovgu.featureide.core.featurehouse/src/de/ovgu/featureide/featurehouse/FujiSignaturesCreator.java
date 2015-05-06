@@ -65,7 +65,7 @@ import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
  */
 public class FujiSignaturesCreator {
 	
-	private final class SignatureReference {
+	private static final class SignatureReference {
 		private final HashMap<Integer, FOPFeatureData> ids = new HashMap<>();
 		private final AbstractSignature sig;
 
