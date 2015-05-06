@@ -63,25 +63,22 @@ import de.ovgu.featureide.core.IFeatureProject;
  */
 public class ComposerWrapper {
 
-	private LinkedList<AheadBuildErrorListener> errorListeners;
+	private final TreeMap<String, LinkedList<IFile>> absoluteJakFilenames;
 
-	private TreeMap<String, LinkedList<IFile>> absoluteJakFilenames;
+	private final LinkedList<IFolder> allFeatureFolders;
+	private final LinkedList<IFolder> featureFolders;
+	private final LinkedList<AheadBuildErrorListener> errorListeners;
+	private final LinkedList<IFile> composedFiles;
 
-	private LinkedList<IFolder> allFeatureFolders;
-	private LinkedList<IFolder> featureFolders;
+	private final Mixin mixin = new Mixin();
+	private final Jampack jampack = new Jampack();
 
-	private Mixin mixin = new Mixin();	
-	private Jampack jampack = new Jampack();
-	
-	private LinkedList<IFile> composedFiles;
+	private final IFeatureProject featureProject;
+
+	private final AbstractJakModelBuilder<?> jakModelBuilder;
 
 	private IFolder compositionFolder;
-
 	private IFile configFile;
-
-	private IFeatureProject featureProject;
-
-	private AbstractJakModelBuilder<?> jakModelBuilder;
 
 	/**
 	 * Creates a new instance of Composer
@@ -97,12 +94,10 @@ public class ComposerWrapper {
 		configFile = null;
 		errorListeners = new LinkedList<AheadBuildErrorListener>();
 		this.featureProject = featureProject;
-		if (jakModelBuilder == null) {
-			if ("Jampack".equals(featureProject.getCompositionMechanism())) {
-				jakModelBuilder = new JampackJakModelBuilder(featureProject);
-			} else {
-				jakModelBuilder = new MixinJakModelBuilder(featureProject);
-			}
+		if ("Jampack".equals(featureProject.getCompositionMechanism())) {
+			jakModelBuilder = new JampackJakModelBuilder(featureProject);
+		} else {
+			jakModelBuilder = new MixinJakModelBuilder(featureProject);
 		}
 	}
 	
