@@ -171,16 +171,16 @@ public class Munge {
     String source = null;
     String block = null;
 
-    final String[] commands = { "if", "if_not", "else", "end" };
-    final int IF = 0;
-    final int IF_NOT = 1;
-    final int ELSE = 2;
-    final int END = 3;
-    final int numCommands = 4;
+    static final String[] commands = { "if", "if_not", "else", "end" };
+    static final int IF = 0;
+    static final int IF_NOT = 1;
+    static final int ELSE = 2;
+    static final int END = 3;
+    static final int numCommands = 4;
 
-    final int EOF = 0;
-    final int COMMENT = 1;     // text surrounded by /* */ delimiters
-    final int CODE = 2;        // can just be whitespace
+    static final int EOF = 0;
+    static final int COMMENT = 1;     // text surrounded by /* */ delimiters
+    static final int CODE = 2;        // can just be whitespace
 
     private IFeatureProject featureProject;
 
@@ -309,15 +309,13 @@ public class Munge {
     }
 
     void cmd_if(String version) {
-        Boolean b = new Boolean(printing);
-        stack.push(b);
+        stack.push(Boolean.valueOf(printing));
         printing = (symbols.get(version) != null);
         checkNesting();
     }
 
     void cmd_if_not(String version) {
-        Boolean b = new Boolean(printing);
-        stack.push(b);
+        stack.push(Boolean.valueOf(printing));
         printing = (symbols.get(version) == null);
         checkNesting();
     }

@@ -50,19 +50,21 @@ import de.ovgu.featureide.munge.signatures.MungeSignatureBuilder;
  * @author Sebastian Krieter
  */
 public class MungeModelBuilder extends PPModelBuilder {
-	
+
+	private static final class SignatureComparator implements Comparator<AbstractSignature> {
+		@Override
+		public int compare(AbstractSignature arg0, AbstractSignature arg1) {
+			return arg0.getFirstFeatureData().getStartLineNumber() - arg1.getFirstFeatureData().getStartLineNumber();
+		}
+	}
+
 	private ProjectSignatures signatures = MungeSignatureBuilder.build(featureProject);
 
 	public MungeModelBuilder(IFeatureProject featureProject) {
 		super(featureProject);
 		
 		signatures = MungeSignatureBuilder.build(featureProject);
-		signatures.sort(new Comparator<AbstractSignature>() {
-			@Override
-			public int compare(AbstractSignature arg0, AbstractSignature arg1) {
-				return arg0.getFirstFeatureData().getStartLineNumber() - arg1.getFirstFeatureData().getStartLineNumber();
-			}
-		});
+		signatures.sort(new SignatureComparator());
 		model.setProjectSignatures(signatures);
 	}
 
