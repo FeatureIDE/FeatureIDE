@@ -75,25 +75,25 @@ public class FeatureCppWrapper {
 
 	private IFolder buildDirectory = null;
 	
-	private double version = 0.7;
+	private int version = 7;
 
 	public FeatureCppWrapper() {
 		String featureCppExecutable;
 		if ("Linux".equals(System.getProperty("os.name"))) {
 			if (System.getProperty("os.arch").contains("64")) {
 				featureCppExecutable = EXE_LINUX_64BIT;
-				version = 0.6;
+				version = 6;
 			} else {
 				featureCppExecutable = EXE_LINUX_32BIT;
 				// The current 32bit version does not support 0.7 commands
-				version = 0.8;
+				version = 8;
 			}
         } else if (System.getProperty("os.name").contains("Mac OS")) {
         	featureCppExecutable = EXE_MAC_OS_X;
-        	version = 0.8;
+        	version = 8;
         } else {
         	featureCppExecutable = EXE_WINDOWS;
-        	version = 0.7;
+        	version = 7;
         }
 		URL url = BundleUtility.find(FeatureCppCorePlugin.getDefault().getBundle(), "lib/" + featureCppExecutable);
 		try {
@@ -138,12 +138,12 @@ public class FeatureCppWrapper {
 		}
 		LinkedList<String> command = new LinkedList<String>();
 		command.add(featureCppExecutableName);
-		if (version == 0.7) {
+		if (version == 7) {
 			command.add("--classinfo");
 		}
 		command.add("-o=" + buildFolder);
 		command.add("-s=" + sourceFolder);
-		if (version == 0.7) {
+		if (version == 7) {
 			command.add("--gpp");
 		} else {
 			command.add("-gpp");
