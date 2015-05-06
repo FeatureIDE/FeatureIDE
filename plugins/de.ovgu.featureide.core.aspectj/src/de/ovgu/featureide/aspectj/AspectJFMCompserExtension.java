@@ -32,6 +32,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.FMComposerExtension;
 
 /**
@@ -68,8 +69,11 @@ public class AspectJFMCompserExtension extends FMComposerExtension {
 	@Override
 	public boolean performRenaming(String oldName, String newName,
 			IProject project) {
-		IFolder buildFolder = CorePlugin.getFeatureProject(project)
-				.getBuildFolder();
+		final IFeatureProject featureProject = CorePlugin.getFeatureProject(project);
+		if (featureProject == null) {
+			return false;
+		}
+		IFolder buildFolder = featureProject.getBuildFolder();
 		try {
 			aspectFile = AspectJComposer.getAspectFile(oldName, null,
 					buildFolder);
@@ -91,7 +95,7 @@ public class AspectJFMCompserExtension extends FMComposerExtension {
 		for (IResource res : folder.members()) {
 			if (res instanceof IFolder) {
 				renameAspect((IFolder) res, oldName, newName);
-			} else if (res instanceof IFile && res.getFileExtension().equals("aj")) {
+			} else if (res instanceof IFile && "aj".equals(res.getFileExtension())) {
 				renameAspect((IFile) res, oldName, newName);
 			}
 		}
