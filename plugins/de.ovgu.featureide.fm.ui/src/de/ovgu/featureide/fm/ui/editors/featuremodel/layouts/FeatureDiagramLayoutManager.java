@@ -164,7 +164,11 @@ abstract public class FeatureDiagramLayoutManager {
 				max.y = temp.y + tempSize.height;
 		}
 
-		Dimension legendSize = FeatureUIHelper.getLegendSize(featureModel);
+		final Dimension legendSize = FeatureUIHelper.getLegendSize(featureModel);
+		if (legendSize == null) {
+			return;
+		}
+		
 		boolean topRight = true;
 		boolean topLeft = true;
 		boolean botLeft = true;
@@ -177,18 +181,20 @@ abstract public class FeatureDiagramLayoutManager {
 			final Point tempLocation = FeatureUIHelper.getLocation(feature);
 			if (null != tempLocation) {
 				final Dimension tempSize = FeatureUIHelper.getSize(feature);
-				if ((tempLocation.x + tempSize.width) > (max.x - legendSize.width - FMPropertyManager.getFeatureSpaceX())
-						&& (tempLocation.y) < (min.y + legendSize.height + FMPropertyManager.getFeatureSpaceY() / 2))
-					topRight = false;
-				if ((tempLocation.x) < (min.x + legendSize.width + FMPropertyManager.getFeatureSpaceX())
-						&& (tempLocation.y) < (min.y + legendSize.height + FMPropertyManager.getFeatureSpaceY() / 2))
-					topLeft = false;
-				if ((tempLocation.x) < (min.x + legendSize.width + FMPropertyManager.getFeatureSpaceX())
-						&& (tempLocation.y + tempSize.height) > (max.y - legendSize.height - FMPropertyManager.getFeatureSpaceY() / 2))
-					botLeft = false;
-				if ((tempLocation.x + tempSize.width) > (max.x - legendSize.width - FMPropertyManager.getFeatureSpaceX())
-						&& (tempLocation.y + tempSize.height) > (max.y - legendSize.height - FMPropertyManager.getFeatureSpaceY() / 2))
-					botRight = false;
+				if (tempSize != null) {
+					if ((tempLocation.x + tempSize.width) > (max.x - legendSize.width - FMPropertyManager.getFeatureSpaceX())
+							&& (tempLocation.y) < (min.y + legendSize.height + FMPropertyManager.getFeatureSpaceY() / 2))
+						topRight = false;
+					if ((tempLocation.x) < (min.x + legendSize.width + FMPropertyManager.getFeatureSpaceX())
+							&& (tempLocation.y) < (min.y + legendSize.height + FMPropertyManager.getFeatureSpaceY() / 2))
+						topLeft = false;
+					if ((tempLocation.x) < (min.x + legendSize.width + FMPropertyManager.getFeatureSpaceX())
+							&& (tempLocation.y + tempSize.height) > (max.y - legendSize.height - FMPropertyManager.getFeatureSpaceY() / 2))
+						botLeft = false;
+					if ((tempLocation.x + tempSize.width) > (max.x - legendSize.width - FMPropertyManager.getFeatureSpaceX())
+							&& (tempLocation.y + tempSize.height) > (max.y - legendSize.height - FMPropertyManager.getFeatureSpaceY() / 2))
+						botRight = false;
+				}
 			}
 		}
 		/*

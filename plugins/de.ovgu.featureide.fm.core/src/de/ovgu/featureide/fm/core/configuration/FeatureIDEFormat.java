@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.ovgu.featureide.fm.core.RenamingsManager;
+
 /**
  * Extended configuration format for FeatureIDE projects.</br> Lists all
  * features and indicates the manual and automatic selection.
@@ -35,9 +37,10 @@ public class FeatureIDEFormat extends ConfigurationFormat {
 	public static final String EXTENSION = "fideconf";
 
 	public List<ConfigurationReader.Warning> read(BufferedReader reader, Configuration configuration) throws IOException {
-		List<ConfigurationReader.Warning> warnings = new LinkedList<ConfigurationReader.Warning>();
+		final RenamingsManager renamingsManager = configuration.getFeatureModel().getRenamingsManager();
+		final List<ConfigurationReader.Warning> warnings = new LinkedList<>();
 
-		boolean orgPropagate = configuration.isPropagate();
+		final boolean orgPropagate = configuration.isPropagate();
 		configuration.setPropagate(false);
 		configuration.resetValues();
 
@@ -58,6 +61,12 @@ public class FeatureIDEFormat extends ConfigurationFormat {
 							break;
 						case 1:
 							manual = Selection.SELECTED;
+							break;
+						case 2:
+							break;
+						default:
+							warnings.add(new ConfigurationReader.Warning("Wrong configuration format", lineNumber));
+							break;
 						}
 						switch (Integer.parseInt(line.substring(1, 2))) {
 						case 0:
@@ -65,12 +74,18 @@ public class FeatureIDEFormat extends ConfigurationFormat {
 							break;
 						case 1:
 							automatic = Selection.SELECTED;
+							break;
+						case 2:
+							break;
+						default:
+							warnings.add(new ConfigurationReader.Warning("Wrong configuration format", lineNumber));
+							break;
 						}
 					} catch (NumberFormatException e) {
 						warnings.add(new ConfigurationReader.Warning("Wrong configuration format", lineNumber));
 					}
 
-					final String name = line.substring(2);
+					final String name = renamingsManager.getNewName(line.substring(2));
 
 					final SelectableFeature feature = configuration.getSelectablefeature(name);
 					if (feature == null) {
