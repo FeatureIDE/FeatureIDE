@@ -1052,20 +1052,17 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		return TEMPLATES;
 	}
 
-	private static final ArrayList<String[]> TEMPLATES = createTempltes();
-
-	private static ArrayList<String[]> createTempltes() {
-		ArrayList<String[]> list = new ArrayList<String[]>(8);
-		list.add(new String[] { "AsmetaL", "asm", "asm " + CLASS_NAME_PATTERN + " \n \n signature: \n \n definitions: \n"});
-		list.add(new String[] { "Alloy", "als", "module " + CLASS_NAME_PATTERN });
-		list.add(new String[] { "C", "c", "" });
-		list.add(new String[] { "C#", "cs", "public class " + CLASS_NAME_PATTERN + " {\n\n}" });
-		list.add(new String[] { "Haskell", "hs", "module " + CLASS_NAME_PATTERN + " where \n{\n\n}" });
-		list.add(JAVA_TEMPLATE);
-		list.add(new String[] { "JavaCC", "jj", "PARSER_BEGIN(" + CLASS_NAME_PATTERN + ") \n \n PARSER_END(" + CLASS_NAME_PATTERN + ")" });
-		list.add(new String[] { "UML", "xmi", "<?xml version = '1.0' encoding = 'UTF-8' ?> \n	<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML'>\n\n</XMI>" });
-		list.add(new String[] { "Jak", "jak", "/**\r\n * TODO description\r\n */\r\npublic " + REFINES_PATTERN + " class " + CLASS_NAME_PATTERN + " {\r\n\r\n}" });
-		return list;
+	private static final ArrayList<String[]> TEMPLATES = new ArrayList<String[]>(9);
+	static {
+		TEMPLATES.add(new String[] { "AsmetaL", "asm", "asm " + CLASS_NAME_PATTERN + " \n \n signature: \n \n definitions: \n"});
+		TEMPLATES.add(new String[] { "Alloy", "als", "module " + CLASS_NAME_PATTERN });
+		TEMPLATES.add(new String[] { "C", "c", "" });
+		TEMPLATES.add(new String[] { "C#", "cs", "public class " + CLASS_NAME_PATTERN + " {\n\n}" });
+		TEMPLATES.add(new String[] { "Haskell", "hs", "module " + CLASS_NAME_PATTERN + " where \n{\n\n}" });
+		TEMPLATES.add(JAVA_TEMPLATE);
+		TEMPLATES.add(new String[] { "JavaCC", "jj", "PARSER_BEGIN(" + CLASS_NAME_PATTERN + ") \n \n PARSER_END(" + CLASS_NAME_PATTERN + ")" });
+		TEMPLATES.add(new String[] { "UML", "xmi", "<?xml version = '1.0' encoding = 'UTF-8' ?> \n	<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML'>\n\n</XMI>" });
+		TEMPLATES.add(new String[] { "Jak", "jak", "/**\r\n * TODO description\r\n */\r\npublic " + REFINES_PATTERN + " class " + CLASS_NAME_PATTERN + " {\r\n\r\n}" });
 	}
 
 	@Override
@@ -1083,11 +1080,9 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			if (errorPropagation == null) {
 				errorPropagation = ErrorPropagation.createErrorPropagation(file);
 			}
-			// FIXME 14.11.2014 KT: Nullpointer for files with extension != "c"
-			// || "h" || "java"
-			// Error propagation necessary for other files?
-			if (errorPropagation != null)
+			if (errorPropagation != null) {
 				errorPropagation.addFile(file);
+			}
 		} catch (CoreException e) {
 			LOGGER.logError(e);
 		}
@@ -1095,7 +1090,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 
 	@Override
 	public int getDefaultTemplateIndex() {
-		return 4;
+		return 5;
 	}
 
 	@Override
