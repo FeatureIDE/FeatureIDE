@@ -79,5 +79,19 @@ public class ConstraintToStringTest {
 		Assert.assertEquals("a implies b", Constraints.autoQuote(c));
 	}
 	
-
+	@Test
+	public void testSplit1() {
+		final String constraint = "- (A  =>  \" A\"  |  - - (\"A \"  &  and  =>  \" and\"  &  \" and\"  |  \" and \"  &  \" and\"  &  - \" and\"))";
+		final String exptected = "not ( A implies \" A\" or not not ( \"A \" and \"and\" implies \" and\" and \" and\" or \" and \" and \" and\" and not \" and\" ))";
+		Assert.assertEquals(exptected, Constraints.autoQuote(constraint));
+	}
+	
+	@Test
+	public void testSplit2() {
+		final String constraint = "- \"Permission Control\"  &  (\"Person Prio\"  |  Service)";
+		final String exptected = "not \"Permission Control\" and ( \"Person Prio\" or Service )";
+		Assert.assertEquals(exptected, Constraints.autoQuote(constraint));
+	}
+	
+	
 }
