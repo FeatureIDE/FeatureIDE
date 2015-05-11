@@ -22,7 +22,6 @@ package de.ovgu.featureide.fm.ui.editors;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
@@ -41,6 +40,7 @@ import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.FeatureComparator;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureStatus;
 import de.ovgu.featureide.fm.core.FunctionalInterfaces.IConsumer;
@@ -84,13 +84,7 @@ public final class ConstraintTextValidator {
 			clonedModel.handleModelDataChanged();
 		}
 
-		SortedSet<Feature> deadFeaturesAfter = new TreeSet<Feature>(new Comparator<Feature>() {
-
-			@Override
-			public int compare(Feature o1, Feature o2) {
-				return o1.getName().compareTo(o2.getName());
-			}
-		});
+		final SortedSet<Feature> deadFeaturesAfter = new TreeSet<Feature>(new FeatureComparator(true));
 
 		for (Feature l : clonedModel.getAnalyser().getDeadFeatures()) {
 			if (!deadFeaturesBefore.contains(l)) {
@@ -234,10 +228,11 @@ public final class ConstraintTextValidator {
 	 * @author Marcus Pinnecke
 	 */
 	public static class ValidationMessage {
-		ValidationResult validationResult = ValidationResult.OK;
-		String details = new String();
+		final ValidationResult validationResult;
+		final String details;
 
 		public ValidationMessage() {
+			this(ValidationResult.OK, "");
 		}
 
 		public ValidationMessage(ValidationResult result) {

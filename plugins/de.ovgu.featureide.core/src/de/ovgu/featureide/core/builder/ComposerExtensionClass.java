@@ -274,7 +274,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	}
 
 	public ArrayList<String[]> getTemplates() {
-		return null;
+		return new ArrayList<>(0);
 	}
 
 	public String replaceSourceContentMarker(String fileContent, boolean refines, String packageName) {
