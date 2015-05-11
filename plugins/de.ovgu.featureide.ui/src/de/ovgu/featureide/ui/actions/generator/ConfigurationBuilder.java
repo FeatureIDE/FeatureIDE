@@ -63,6 +63,7 @@ import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
+import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.job.AStoppableJob;
@@ -224,7 +225,15 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 * @see BuildAllCurrentConfigurationsAction
 	 * @see BuildAllValidConfigurationsAction
 	 */
-	ConfigurationBuilder(final IFeatureProject featureProject, final BuildType buildType, final boolean createNewProjects, final String algorithm, final int t, final BuildOrder buildOrder, final boolean bufferFirst, boolean runTests) {
+	public ConfigurationBuilder(final IFeatureProject featureProject, final BuildType buildType, final boolean createNewProjects, final String algorithm, final int t, final BuildOrder buildOrder, final boolean bufferFirst, boolean runTests) {
+		this(featureProject, buildType, createNewProjects, algorithm, t, buildOrder, bufferFirst, runTests, null);
+	}
+	
+	public ConfigurationBuilder(final IFeatureProject featureProject, final BuildType buildType, final String featureName) {
+		this(featureProject, BuildType.INTEGRATION, false, "", 0, BuildOrder.DEFAULT, false, true, featureName);
+	}
+		
+	public ConfigurationBuilder(final IFeatureProject featureProject, final BuildType buildType, final boolean createNewProjects, final String algorithm, final int t, final BuildOrder buildOrder, final boolean bufferFirst, boolean runTests, final String featureName) {
 		this.runTests = runTests;
 		if (runTests) {
 			testResults = new TestResults(featureProject.getProjectName(), "FeatureIDE test: " + featureProject.getProjectName());
@@ -283,6 +292,11 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			break;
 		case T_WISE:
 			break;
+		case INTEGRATION:
+			configurationNumber = 2;
+			break;
+		default:
+			break;
 		}
 
 		String jobName = "";
@@ -295,6 +309,10 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			break;
 		case T_WISE:
 			jobName = JOB_TITLE_T_WISE;
+			break;
+		case INTEGRATION:
+			break;
+		default:
 			break;
 		}
 		jobName += " for " + featureProject.getProjectName();
@@ -335,6 +353,11 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 					case T_WISE:
 						buildTWiseConfigurations(featureProject, monitor);
 						time = System.currentTimeMillis();
+						break;
+					case INTEGRATION:
+						buildModule(featureProject, monitor, featureName);
+						break;
+					default:
 						break;
 					}
 					if (bufferConfigurationsFirst) {
@@ -480,6 +503,14 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 								res.delete(true, null);
 							}
 							break;
+						case INTEGRATION:
+							if (projectName.startsWith(featureProject.getProjectName() + SEPARATOR_INTEGRATION)) {
+								monitor.setTaskName("Remove old products : " + projectName);
+								res.delete(true, null);
+							}
+							break;
+						default:
+							break;
 						}
 					}
 				}
@@ -515,6 +546,81 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		classpath = classpath.length() > 0 ? classpath.substring(1) : classpath;
 	}
 
+	/**
+	 * Creates a configuration containing the given feature.
+	 * @param featureProject The feature project
+	 * @param featureName The feature to build
+	 */
+	private void buildModule(IFeatureProject featureProject, IProgressMonitor monitor, String featureName) {
+		// create a configuration where the feature is selected
+		Configuration configuration = new Configuration(featureModel, true);
+		boolean success = createValidConfiguration(configuration, featureName, Selection.SELECTED);
+		if (success) {
+			addConfiguration(new BuilderConfiguration(configuration, featureName));
+		}
+		
+
+		for (Feature coreFeature : featureModel.getAnalyser().getCoreFeatures()) {
+			if (coreFeature.getName().equals(featureName)) {
+				configurationNumber = 1;
+				return;
+			}
+		}
+		// create a configuration without the feature
+		configuration = new Configuration(featureModel, true);
+		if (configuration.getSelectablefeature(featureName).getAutomatic() != Selection.UNDEFINED) {
+			return;
+		}
+		createValidConfiguration(configuration, featureName, Selection.UNSELECTED);
+		if (success) {
+			addConfiguration(new BuilderConfiguration(configuration, "not-" + featureName));
+		}
+	}
+	
+	/**
+	 * Selects features to create a valid configuration.
+	 * @param featureName 
+	 * @param selection 
+	 */
+	private boolean createValidConfiguration(Configuration configuration, String featureName, Selection selection) {
+		configuration.setManual(featureName, selection);
+		for (SelectableFeature feature : configuration.getFeatures()) {
+			if (feature.getName().equals(featureName)) {
+				continue;
+			}
+			if (configuration.isValid()) {
+				break;
+			}
+			SelectableFeature selectableFeature = configuration.getSelectablefeature(feature.getName());
+			if (selectableFeature.getSelection() == Selection.UNDEFINED) {
+				configuration.setManual(selectableFeature, Selection.SELECTED);
+			}
+		}
+		boolean canDeselect = true;
+		while (canDeselect) {
+			canDeselect = false;
+			for (Feature feature : configuration.getSelectedFeatures()) {
+				if (feature.getName().equals(featureName)) {
+					continue;
+				}
+				SelectableFeature selectableFeature = configuration.getSelectablefeature(feature.getName());
+				try {
+					if (selectableFeature.getAutomatic() == Selection.UNDEFINED && selectableFeature.getManual() == Selection.SELECTED) {
+						configuration.setManual(selectableFeature, Selection.UNDEFINED);
+						if (!configuration.isValid()) {
+							configuration.setManual(selectableFeature, Selection.SELECTED);
+						} else {
+							canDeselect = true;
+						}
+					}
+				} catch (Exception e) {
+					LOGGER.logError(e);
+				}
+			}
+		}
+		return configuration.isValid();
+	}
+	
 	/**
 	 * Builds all current configurations for the given feature project into the
 	 * folder for current configurations.
@@ -996,7 +1102,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 
 	/**
 	 * This is called if the main job is canceled and all {@link Builder} and
-	 * {@link Compiler} should finish.
+	 * {@link JavaCompiler} should finish.
 	 */
 	private void cancelGenerationJobs() {
 		cancelGeneratorJobs = true;

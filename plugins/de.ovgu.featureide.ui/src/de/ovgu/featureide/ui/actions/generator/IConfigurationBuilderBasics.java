@@ -37,7 +37,7 @@ import de.ovgu.featureide.core.CorePlugin;
  */
 public interface IConfigurationBuilderBasics {
 	
-	enum BuildType {ALL_VALID, ALL_CURRENT, T_WISE};
+	enum BuildType {ALL_VALID, ALL_CURRENT, T_WISE, INTEGRATION};
 	enum BuildOrder {DEFAULT, DIFFERENCE, INTERACTION};
 	enum TWise {ICPL, CHVATAL, CASA}
 	
@@ -75,6 +75,7 @@ public interface IConfigurationBuilderBasics {
 	String JOB_TITLE = "Build all valid configurations";
 	String JOB_TITLE_CURRENT = "Build all current configurations";
 	String JOB_TITLE_T_WISE = "Build t-wise configurations";
+	String JOB_TITLE_MODULE = "Build integration configurations";
 	
 	String JOB_TITLE_COUNT_CONFIGURATIONS = "Count configurations";
 	
@@ -96,6 +97,7 @@ public interface IConfigurationBuilderBasics {
 	String SEPARATOR_VARIANT = "_v.";
 	String SEPARATOR_CONFIGURATION = "_c.";
 	String SEPARATOR_T_WISE = "_t.";
+	String SEPARATOR_INTEGRATION = "_i.";
 	
 	String T_WISE_CONFIGURATIONS = "T-Wise configurations";
 	String ALL_CURRENT_CONFIGURATIONS = "All current configurations";

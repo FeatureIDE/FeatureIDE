@@ -45,7 +45,7 @@ import de.ovgu.featureide.ui.UIPlugin;
  * 
  * @author Jens Meinicke
  */
-public class Compiler implements IConfigurationBuilderBasics {
+public class JavaCompiler implements IConfigurationBuilderBasics {
 
 	private final Generator generator;
 
@@ -60,7 +60,7 @@ public class Compiler implements IConfigurationBuilderBasics {
 	 * @param nr The number of the compiler
 	 * @param generator The generator holding this compiler
 	 */
-	public Compiler(int nr, Generator generator) {
+	public JavaCompiler(int nr, Generator generator) {
 		this.generator = generator;
 
 		tmp = generator.builder.tmp.getFolder("Compiler" + nr);

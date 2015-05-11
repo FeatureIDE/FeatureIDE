@@ -118,6 +118,9 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		comboGenerate = new Combo(composite, SWT.BORDER | SWT.SINGLE | SWT.READ_ONLY);
 		comboGenerate.setLayoutData(gd);
 		for (BuildType type : BuildType.values()) {
+			if (type == BuildType.INTEGRATION) {
+				continue;
+			}
 			comboGenerate.add(getBuildTypeText(type));
 		}
 		comboGenerate.setText(generate);

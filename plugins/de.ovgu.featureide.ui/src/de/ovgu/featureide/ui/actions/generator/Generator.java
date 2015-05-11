@@ -73,7 +73,7 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 	private int nr;
 
 	@CheckForNull
-	private Compiler compiler;
+	private JavaCompiler compiler;
 
 	private TestRunner testRunner;
 
@@ -89,8 +89,14 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 		this.nr = nr;
 		this.builder = builder;
 		if (!builder.createNewProjects) {
-			compiler = new Compiler(nr , this);
-			testRunner = new TestRunner(compiler.tmp, builder.testResults);
+			try {
+				if (builder.featureProject.getProject().hasNature(JAVA_NATURE)) {
+					compiler = new JavaCompiler(nr , this);
+					testRunner = new TestRunner(compiler.tmp, builder.testResults);
+				}
+			} catch (CoreException e) {
+				UIPlugin.getDefault().logError(e);
+			}
 		}
 	}
 	
@@ -141,6 +147,14 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 								configuration, name);
 					}
 					break;
+				case INTEGRATION:
+					if (builder.createNewProjects) {
+						buildConfiguration(builder.featureProject.getProjectName() + SEPARATOR_INTEGRATION + name, configuration);
+					} else {
+						builder.featureProject.getComposer().buildConfiguration(builder.folder.getFolder(name), 
+								configuration, name);
+					}
+					break;
 				case ALL_VALID:
 					if (builder.createNewProjects) {
 						buildConfiguration(builder.featureProject.getProjectName() + SEPARATOR_VARIANT + name, configuration);
@@ -157,7 +171,6 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 								configuration, name);
 					}
 					break;
-
 				}
 				if (compiler != null) {
 					monitor.subTask("(Compile)");
