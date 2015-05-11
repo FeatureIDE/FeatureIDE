@@ -177,35 +177,55 @@ public class SatSolver {
 	}
 	
 	public List<Literal> knownValues(ValueType vt, Literal... tempNodes) {
-		if (test()) {
-			
+		if (!contradiction) {
 			final IVecInt backbone = new VecInt();
 			for (int i = 0; i < tempNodes.length; i++) {
 				backbone.push(getIntOfLiteral(tempNodes[i]));
 			}
-			
-			final int[] model = solver.model();
-			for (int i = 0; i < model.length; i++) {
-				final int x = model[i];
-				if ((x * vt.factor) >= 0) {
-					backbone.push(-x);
-					try {
-						if (solver.isSatisfiable(backbone)) {
+
+			boolean satisfiable = false;
+			try {
+				satisfiable = solver.isSatisfiable(backbone);
+			} catch (TimeoutException e) {
+				FMCorePlugin.getDefault().logError(e);
+			}
+			if (satisfiable) {
+				final byte[] b = new byte[solver.nVars()];
+				final int[] model = solver.model();
+				for (int i = 0; i < model.length; i++) {
+					b[i] = (byte) Math.signum(model[i]);
+				}
+				for (int i = 0; i < model.length; i++) {
+					if (b[i] == 0) {
+						continue;
+					}
+					final int x = model[i];
+					if ((x * vt.factor) >= 0) {
+						backbone.push(-x);
+						try {
+							if (solver.isSatisfiable(backbone)) {
+								backbone.pop();
+								final int[] tempModel = solver.model();
+								for (int j = i + 1; j < tempModel.length; j++) {
+									if (b[j] != (byte) Math.signum(tempModel[j])) {
+										b[j] = 0;
+									}
+								}
+							} else {
+								backbone.pop().push(x);
+							}
+						} catch (TimeoutException e) {
+							FMCorePlugin.getDefault().logError(e);
 							backbone.pop();
-						} else {
-							backbone.pop().push(x);
 						}
-					} catch (TimeoutException e) {
-						FMCorePlugin.getDefault().logError(e);
-						backbone.pop();
 					}
 				}
+				
+				for (int i = 0; i < tempNodes.length; i++) {
+					backbone.delete(i);
+				}
+				return convertToNodes(backbone);
 			}
-			
-			for (int i = 0; i < tempNodes.length; i++) {
-				backbone.delete(i);
-			}
-			return convertToNodes(backbone);
 		}
 		return Collections.emptyList();
 	}
