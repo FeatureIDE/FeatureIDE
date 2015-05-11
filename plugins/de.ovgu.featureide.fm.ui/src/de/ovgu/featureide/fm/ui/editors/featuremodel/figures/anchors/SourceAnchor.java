@@ -33,7 +33,7 @@ import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
  * @author Thomas Thuem
  */
 public class SourceAnchor extends AbstractConnectionAnchor {
-	
+
 	private Feature model;
 
 	public SourceAnchor(IFigure owner, Feature model) {
@@ -46,5 +46,5 @@ public class SourceAnchor extends AbstractConnectionAnchor {
 		getOwner().translateToAbsolute(ref);
 		return ref;
 	}
-	
+
 }

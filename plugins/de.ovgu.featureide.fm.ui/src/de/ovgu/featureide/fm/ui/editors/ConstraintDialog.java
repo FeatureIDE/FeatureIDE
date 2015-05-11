@@ -130,8 +130,7 @@ public class ConstraintDialog implements GUIDefaults {
 	public static class HeaderPanel {
 
 		/**
-		 * Image types for description inside header panel
-		 * {@link ConstraintDialog.HeaderPanel#headerDescriptionImageLabel}
+		 * Image types for description inside header panel {@link ConstraintDialog.HeaderPanel#headerDescriptionImageLabel}
 		 * 
 		 * @author Marcus Pinnecke
 		 */
@@ -142,7 +141,7 @@ public class ConstraintDialog implements GUIDefaults {
 		private static final String STRING_HEADER_LABEL_DEFAULT = "Create new constraint";
 
 		private static final String STRING_HEADER_DETAILS_DEFAULT = "You can create or edit constraints with this dialog.";
-		
+
 		/**
 		 * The panels background color
 		 */
@@ -174,8 +173,7 @@ public class ConstraintDialog implements GUIDefaults {
 
 		/**
 		 * Constructs a new header panel to the shell. This panel contains a
-		 * header text ({@link #setHeader(String)}), a details text (
-		 * {@link #setDetails(String)}).
+		 * header text ({@link #setHeader(String)}), a details text ( {@link #setDetails(String)}).
 		 * 
 		 * By default a short info about possibilities with this dialog is
 		 * display as details and that a new constraint will be created now.
@@ -243,8 +241,7 @@ public class ConstraintDialog implements GUIDefaults {
 		 * details what is going on or should provide useful hints or an error
 		 * message. It can contain e.g. the list of dead features.
 		 * 
-		 * To set the header panels text, consider to use
-		 * {@link #setHeader(String)}
+		 * To set the header panels text, consider to use {@link #setHeader(String)}
 		 * 
 		 * @param text
 		 *            Text to display
@@ -271,8 +268,7 @@ public class ConstraintDialog implements GUIDefaults {
 		/**
 		 * Set current image for the details text.
 		 * 
-		 * {@link ConstraintDialog.HeaderPanel.HeaderDescriptionImage}
-		 * {@link ConstraintDialog.HeaderPanel#headerDescriptionImageLabel}
+		 * {@link ConstraintDialog.HeaderPanel.HeaderDescriptionImage} {@link ConstraintDialog.HeaderPanel#headerDescriptionImageLabel}
 		 * 
 		 * @param image
 		 *            The image to set
@@ -290,7 +286,7 @@ public class ConstraintDialog implements GUIDefaults {
 				break;
 			}
 			headerDescriptionImageLabel.redraw();
-			
+
 		}
 	}
 
@@ -303,7 +299,7 @@ public class ConstraintDialog implements GUIDefaults {
 	public enum Mode {
 		UPDATE, CREATE
 	}
-	
+
 	static class StringTable {
 
 		static final String CHECK_STARTED = "Performing additional checks. This may take a while. Although it is not recommended, you can %s your constraint by clicking \"%s\" before this process has ended.";
@@ -416,7 +412,7 @@ public class ConstraintDialog implements GUIDefaults {
 	ContentProposalAdapter adapter;
 
 	private final static int PROPOSAL_AUTO_ACTIVATION_DELAY = 500;
-	
+
 	public static final int VALIDATION_TIME_OUT = 1000;
 
 	/**
@@ -426,7 +422,9 @@ public class ConstraintDialog implements GUIDefaults {
 		@Override
 		public void invoke(ValidationMessage message) {
 			updateDialogState(DialogState.SAVE_CHANGES_DONT_MIND);
-			headerPanel.setDetails(String.format(StringTable.CHECK_STARTED, (mode == Mode.UPDATE ? StringTable.VERB_UPDATE.toLowerCase() : StringTable.VERB_SAVE), okButton.getText()), HeaderPanel.HeaderDescriptionImage.NONE);
+			headerPanel.setDetails(
+					String.format(StringTable.CHECK_STARTED, (mode == Mode.UPDATE ? StringTable.VERB_UPDATE.toLowerCase() : StringTable.VERB_SAVE),
+							okButton.getText()), HeaderPanel.HeaderDescriptionImage.NONE);
 		}
 	};
 
@@ -484,7 +482,8 @@ public class ConstraintDialog implements GUIDefaults {
 	private IConsumer<ValidationMessage> onCheckEnded = new IConsumer<ValidationMessage>() {
 		@Override
 		public void invoke(ValidationMessage message) {
-			headerPanel.setDetails(String.format(StringTable.CONSTRAINT_CHECK_ENDED, (mode == Mode.UPDATE ? StringTable.VERB_UPDATE : StringTable.VERB_CREATE), (mode == Mode.UPDATE ? StringTable.SAVE_CHANGES : StringTable.ADD_NEW_CONSTRAINT)), HeaderPanel.HeaderDescriptionImage.NONE);
+			headerPanel.setDetails(String.format(StringTable.CONSTRAINT_CHECK_ENDED, (mode == Mode.UPDATE ? StringTable.VERB_UPDATE : StringTable.VERB_CREATE),
+					(mode == Mode.UPDATE ? StringTable.SAVE_CHANGES : StringTable.ADD_NEW_CONSTRAINT)), HeaderPanel.HeaderDescriptionImage.NONE);
 			updateDialogState(DialogState.SAVE_CHANGES_ENABLED);
 		}
 	};
@@ -500,7 +499,7 @@ public class ConstraintDialog implements GUIDefaults {
 			}
 		}
 	};
-	
+
 	/**
 	 * Called when the validation test for "satisfiable test" has completed
 	 */
@@ -512,6 +511,7 @@ public class ConstraintDialog implements GUIDefaults {
 			}
 		}
 	};
+
 	/**
 	 * 
 	 * @param featuremodel
@@ -535,7 +535,6 @@ public class ConstraintDialog implements GUIDefaults {
 
 			mode = Mode.UPDATE;
 		}
-		
 
 		initShell();
 		initHead();
@@ -553,6 +552,7 @@ public class ConstraintDialog implements GUIDefaults {
 
 		updateDialogState(DialogState.SAVE_CHANGES_DISABLED);
 	}
+
 	/**
 	 * Depending on the current editing mode of this dialog the OK button text
 	 * will be altered.
@@ -687,15 +687,13 @@ public class ConstraintDialog implements GUIDefaults {
 		formDataHelp.left = new FormAttachment(0, 5);
 		helpButtonBar.setLayoutData(formDataHelp);
 
-		
-
 		cancelButton = new Button(lastComposite, SWT.NONE);
 		cancelButton.setText("Cancel");
 		FormData formDataCancel = new FormData();
 		formDataCancel.width = 70;
 		formDataCancel.right = new FormAttachment(100, -5);
 		formDataCancel.bottom = new FormAttachment(100, -5);
-		
+
 		okButton = new Button(lastComposite, SWT.NONE);
 		autoSetOkButtonText();
 		FormData formDataOk = new FormData();
@@ -703,7 +701,7 @@ public class ConstraintDialog implements GUIDefaults {
 		formDataOk.right = new FormAttachment(cancelButton, -5);
 		formDataOk.bottom = new FormAttachment(100, -5);
 		okButton.setLayoutData(formDataOk);
-		
+
 		cancelButton.setLayoutData(formDataCancel);
 
 		shell.setTabList(new Control[] { featureGroup, buttonGroup, constraintTextComposite, lastComposite });
@@ -768,7 +766,7 @@ public class ConstraintDialog implements GUIDefaults {
 		constraintText = new SimpleSyntaxHighlightEditor(constraintTextComposite, SWT.SINGLE | SWT.H_SCROLL | SWT.BORDER, Operator.NAMES);
 
 		setupContentProposal();
-		
+
 		FormData formDataConstraintText = new FormData();
 		formDataConstraintText.right = new FormAttachment(100, -5);
 		formDataConstraintText.left = new FormAttachment(0, 5);
@@ -790,7 +788,7 @@ public class ConstraintDialog implements GUIDefaults {
 				}
 			}
 		});
-		
+
 	}
 
 	/**
@@ -914,7 +912,7 @@ public class ConstraintDialog implements GUIDefaults {
 						}
 					}
 				}
-				
+
 				constraintText.copyIn(featureName);
 			}
 		});
@@ -938,7 +936,7 @@ public class ConstraintDialog implements GUIDefaults {
 		shell.setText(DEFAULT_DIALOG_TITLE);
 		shell.setImage(FEATURE_SYMBOL);
 		shell.setSize(500, 585);
-		
+
 		GridLayout shellLayout = new GridLayout();
 		shellLayout.marginWidth = 0;
 		shellLayout.marginHeight = 0;
@@ -1002,26 +1000,27 @@ public class ConstraintDialog implements GUIDefaults {
 	public void setInputText(String text) {
 		String constrainText = Operator.isOperatorName(text) || text.contains(" ") ? "\"" + text + "\"" : text;
 		constrainText += " ";
-		
+
 		this.constraintText.setText(constrainText);
 		this.constraintText.setSelection(constrainText.length());
 	}
-	
+
 	private void setupContentProposal() {
 		try {
-			final KeyStroke keyStroke= KeyStroke.getInstance(StringTable.KEYSTROKE_SHORTCUT_FOR_PROPOSAL);
-			
-			char[] autoActivationCharacters=new char[Character.MAX_VALUE];
+			final KeyStroke keyStroke = KeyStroke.getInstance(StringTable.KEYSTROKE_SHORTCUT_FOR_PROPOSAL);
+
+			char[] autoActivationCharacters = new char[Character.MAX_VALUE];
 			for (char c = Character.MIN_VALUE; c < Character.MAX_VALUE; c++)
 				autoActivationCharacters[c] = c;
-		
-			adapter = new ContentProposalAdapter(constraintText, new SimpleSyntaxHighlighterConstraintContentAdapter(), new ConstraintContentProposalProvider(featureModel.getFeatureNames()), keyStroke, autoActivationCharacters);
-	
+
+			adapter = new ContentProposalAdapter(constraintText, new SimpleSyntaxHighlighterConstraintContentAdapter(), new ConstraintContentProposalProvider(
+					featureModel.getFeatureNames()), keyStroke, autoActivationCharacters);
+
 			adapter.setAutoActivationDelay(PROPOSAL_AUTO_ACTIVATION_DELAY);
 			adapter.setPopupSize(new Point(250, 85));
-	
+
 			adapter.setLabelProvider(new ConstraintProposalLabelProvider());
-		
+
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -1029,8 +1028,7 @@ public class ConstraintDialog implements GUIDefaults {
 
 	/**
 	 * Updates the dialogs state, changing the default button and setting the
-	 * text for this button depending on the current
-	 * {@link ConstraintDialog.DialogState}
+	 * text for this button depending on the current {@link ConstraintDialog.DialogState}
 	 * 
 	 * @param state
 	 *            The state to consider
@@ -1071,8 +1069,9 @@ public class ConstraintDialog implements GUIDefaults {
 				constraintText.UnderlineEverything(result != ValidationResult.OK && constraintText.getUnknownWords().isEmpty());
 
 				if (result == ValidationResult.OK) {
-					VALIDATOR.validateAsync(constraint, VALIDATION_TIME_OUT, featureModel, constraintText.getText(), onCheckStarted, onVoidsModelCheckComplete, onFalseOptionalCheckComplete, onDeadFeatureCheckComplete,
-							onIsRedundantCheckComplete, onCheckEnded, onIsTautology, onIsNotSatisfiable);
+					VALIDATOR.validateAsync(constraint, VALIDATION_TIME_OUT, featureModel, constraintText.getText(), onCheckStarted, onVoidsModelCheckComplete,
+							onFalseOptionalCheckComplete, onDeadFeatureCheckComplete, onIsRedundantCheckComplete, onCheckEnded, onIsTautology,
+							onIsNotSatisfiable);
 					updateDialogState(DialogState.SAVE_CHANGES_ENABLED);
 				} else {
 					String details = new String();
@@ -1082,7 +1081,8 @@ public class ConstraintDialog implements GUIDefaults {
 							details = StringTable.CONSTRAINT_CONTAINS_SYNTAX_ERRORS;
 						} else {
 							int count = constraintText.getUnknownWords().size();
-							details = (count == 1 ? StringTable.CONSTRAINT_CONTAINS_UNKNOWN_FEATURE : String.format(StringTable.CONSTRAINT_CONTAINS_UNKNOWN_FEATURES, count));
+							details = (count == 1 ? StringTable.CONSTRAINT_CONTAINS_UNKNOWN_FEATURE : String.format(
+									StringTable.CONSTRAINT_CONTAINS_UNKNOWN_FEATURES, count));
 						}
 					} else
 						details = "";

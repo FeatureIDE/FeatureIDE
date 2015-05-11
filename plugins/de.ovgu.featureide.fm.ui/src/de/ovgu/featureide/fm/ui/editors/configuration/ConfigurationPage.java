@@ -58,14 +58,20 @@ public class ConfigurationPage extends ConfigurationTreeEditorPage {
 					final TreeItem item = (TreeItem) event.item;
 					final Object data = item.getData();
 					if (data instanceof SelectableFeature) {
-						final SelectableFeature feature = (SelectableFeature)item.getData();
+						final SelectableFeature feature = (SelectableFeature) item.getData();
 						if (updateFeatures.contains(feature)) {
 							item.setChecked(true);
 						} else {
 							switch (feature.getAutomatic()) {
-								case SELECTED: item.setChecked(true); break;
-								case UNSELECTED: item.setChecked(false); break;
-								case UNDEFINED: changeSelection(item, true); break;
+							case SELECTED:
+								item.setChecked(true);
+								break;
+							case UNSELECTED:
+								item.setChecked(false);
+								break;
+							case UNDEFINED:
+								changeSelection(item, true);
+								break;
 							}
 						}
 					}

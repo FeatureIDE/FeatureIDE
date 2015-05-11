@@ -33,11 +33,10 @@ public class ConstraintDeleteOperation extends AbstractFeatureModelOperation {
 
 	private static final String LABEL = "Delete Constraint";
 	private Constraint constraint;
-	
+
 	private int index;
 
-	public ConstraintDeleteOperation(Constraint constraint,
-			FeatureModel featureModel) {
+	public ConstraintDeleteOperation(Constraint constraint, FeatureModel featureModel) {
 		super(featureModel, LABEL);
 		this.constraint = constraint;
 	}
@@ -52,9 +51,8 @@ public class ConstraintDeleteOperation extends AbstractFeatureModelOperation {
 	protected void undo() {
 		featureModel.addConstraint(constraint, index);
 		//initialize constraint position in manual layout
-		if(!featureModel.getLayout().hasFeaturesAutoLayout())
-			FeatureDiagramLayoutHelper.initializeConstraintPosition(featureModel,
-				featureModel.getConstraintCount()-1);
+		if (!featureModel.getLayout().hasFeaturesAutoLayout())
+			FeatureDiagramLayoutHelper.initializeConstraintPosition(featureModel, featureModel.getConstraintCount() - 1);
 	}
 
 }

@@ -223,7 +223,7 @@ public class JavaClassBuilder extends ClassBuilder {
 
 		// get modifiers
 		String modifiers = "";
-		if (terminal.getBody().indexOf(name) > 0) {
+		if (terminal.getBody().indexOf(name) >= 1) {
 			modifiers = terminal.getBody().substring(0, terminal.getBody().indexOf(name) - 1);
 		}
 

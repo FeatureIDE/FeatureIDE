@@ -55,9 +55,8 @@ public class ConstraintEditOperation extends AbstractFeatureModelOperation {
 	protected void undo() {
 		featureModel.replacePropNode(index, oldPropNode);
 		//initialize constraint position in manual layout
-		if(!featureModel.getLayout().hasFeaturesAutoLayout())
-			FeatureDiagramLayoutHelper.initializeConstraintPosition(featureModel,
-							index);
+		if (!featureModel.getLayout().hasFeaturesAutoLayout())
+			FeatureDiagramLayoutHelper.initializeConstraintPosition(featureModel, index);
 	}
 
 }

@@ -57,9 +57,7 @@ public class FeatureCreateCompoundOperation extends AbstractFeatureModelOperatio
 	/**
 	 * @param label
 	 */
-	public FeatureCreateCompoundOperation(Object viewer, Feature parent,
-			FeatureModel featureModel, LinkedList<Feature> selectedFeatures,
-			Object diagramEditor) {
+	public FeatureCreateCompoundOperation(Object viewer, Feature parent, FeatureModel featureModel, LinkedList<Feature> selectedFeatures, Object diagramEditor) {
 		super(featureModel, LABEL);
 		this.viewer = viewer;
 		this.parent = parent;
@@ -69,11 +67,9 @@ public class FeatureCreateCompoundOperation extends AbstractFeatureModelOperatio
 	}
 
 	@Override
-	public IStatus execute(IProgressMonitor monitor, IAdaptable info)
-			throws ExecutionException {
+	public IStatus execute(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
 		int number = 0;
-		while (featureModel.getFeatureNames()
-				.contains("NewCompound" + ++number))
+		while (featureModel.getFeatureNames().contains("NewCompound" + ++number))
 			;
 		newCompound = new Feature(featureModel, "NewCompound" + number);
 		if (parent != null) {
@@ -85,28 +81,23 @@ public class FeatureCreateCompoundOperation extends AbstractFeatureModelOperatio
 		// select the new feature
 		FeatureEditPart part;
 		if (viewer instanceof GraphicalViewerImpl) {
-			part = (FeatureEditPart) ((GraphicalViewerImpl) viewer)
-					.getEditPartRegistry().get(newCompound);
+			part = (FeatureEditPart) ((GraphicalViewerImpl) viewer).getEditPartRegistry().get(newCompound);
 		} else {
-			part = (FeatureEditPart) ((GraphicalViewerImpl) diagramEditor)
-					.getEditPartRegistry().get(newCompound);
+			part = (FeatureEditPart) ((GraphicalViewerImpl) diagramEditor).getEditPartRegistry().get(newCompound);
 		}
 
 		if (part != null) {
 			if (viewer instanceof GraphicalViewerImpl) {
-				((GraphicalViewerImpl) viewer)
-						.setSelection(new StructuredSelection(part));
+				((GraphicalViewerImpl) viewer).setSelection(new StructuredSelection(part));
 			} else {
-				((GraphicalViewerImpl) diagramEditor)
-						.setSelection(new StructuredSelection(part));
+				((GraphicalViewerImpl) diagramEditor).setSelection(new StructuredSelection(part));
 			}
 
 			part.getViewer().reveal(part);
 
 			// open the renaming command
-			DirectEditManager manager = new FeatureLabelEditManager(part,
-					TextCellEditor.class, new FeatureCellEditorLocator(
-							part.getFeatureFigure()), featureModel);
+			DirectEditManager manager = new FeatureLabelEditManager(part, TextCellEditor.class, new FeatureCellEditorLocator(part.getFeatureFigure()),
+					featureModel);
 			manager.show();
 		}
 		return Status.OK_STATUS;
@@ -134,10 +125,9 @@ public class FeatureCreateCompoundOperation extends AbstractFeatureModelOperatio
 			featureModel.setRoot(newCompound);
 		}
 
-//		newCompound = featureModel.getFeature(newCompound.getName());
+		//		newCompound = featureModel.getFeature(newCompound.getName());
 
-		FeatureDiagramLayoutHelper.initializeCompoundFeaturePosition(
-				featureModel, selectedFeatures, newCompound);
+		FeatureDiagramLayoutHelper.initializeCompoundFeaturePosition(featureModel, selectedFeatures, newCompound);
 	}
 
 	@Override

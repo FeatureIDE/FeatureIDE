@@ -35,7 +35,7 @@ import de.ovgu.featureide.fm.ui.handlers.base.AbstractExportHandler;
  * @author Sebastian Krieter
  */
 public class ExportConquererHandler extends AbstractExportHandler {
-	
+
 	@Override
 	protected IFeatureModelWriter getFeatureModelWriter(FeatureModel fm) {
 		return new ConquererFMWriter(fm);

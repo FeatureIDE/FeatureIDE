@@ -21,17 +21,13 @@
 package de.ovgu.featureide.fm.ui.editors;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.Scanner;
 
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFile;
@@ -51,7 +47,10 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 
-import de.ovgu.featureide.fm.core.RenamingsManager;
+import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
+import de.ovgu.featureide.fm.core.configuration.ConfigurationWriter;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
@@ -100,27 +99,30 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 
 	@Override
 	public void doSave(IProgressMonitor monitor) {
-		updateOrderEditor();
-
-		if (hasFeatureOrder) {
-			writeToOrderFile(); // save the feature order also in .order if file
-								// exists
-		}
-
-		if (featureModelEditor.featureModel.getFeatureOrderList().isEmpty())
-			defaultFeatureList();
-
-		try {
-			if (configFolder.exists()) {
-				for (IResource res : configFolder.members()) {
-					updateConfigurationOrder(res);
-				}
-				configFolder.refreshLocal(IResource.DEPTH_ONE, null);
+		if (dirty) {
+			updateOrderEditor();
+			
+			if (hasFeatureOrder) {
+				writeToOrderFile(); // save the feature order also in .order if file
+									// exists
 			}
-		} catch (CoreException e) {
-			FMUIPlugin.getDefault().logError(e);
+
+			if (featureModelEditor.featureModel.getFeatureOrderList().isEmpty()) {
+				defaultFeatureList();
+			}
+
+
+			if (hasFeatureOrder && configFolder.exists()) {
+				try {
+					for (IResource res : configFolder.members()) {
+						updateConfigurationOrder(res);
+					}
+				} catch (CoreException e) {
+					FMUIPlugin.getDefault().logError(e);
+				}
+			}
+			super.doSave(monitor);
 		}
-		super.doSave(monitor);
 	}
 
 	@Override
@@ -153,16 +155,14 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	 * @param feature
 	 */
 	public void updateOrderEditor() {
-		if (!hasFeatureOrder) {
-			return;
-		}
-
-		// This flag is true if a concrete feature was added or removed
-		boolean changed = updateFeatureList();
-		updateFeatureOrderList();
-
-		if (changed) {
-			setDirty();
+		if (hasFeatureOrder) {
+			// This flag is true if a concrete feature was added or removed
+			boolean changed = updateFeatureList();
+			updateFeatureOrderList();
+	
+			if (changed) {
+				setDirty();
+			}
 		}
 	}
 
@@ -381,8 +381,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	/**
 	 * Update the order of features in the feature model
 	 * 
-	 * @deprecated is no longer supported, use {@link #updateFeatureOrderList()}
-	 *             instead
+	 * @deprecated is no longer supported, use {@link #updateFeatureOrderList()} instead
 	 */
 	@Deprecated
 	public void writeFeaturesToOrderFile() {
@@ -435,8 +434,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	}
 
 	/**
-	 * Update the order of features in the feature model if
-	 * {@link #hasFeatureOrder} is true
+	 * Update the order of features in the feature model if {@link #hasFeatureOrder} is true
 	 */
 	public void updateFeatureOrderList() {
 		if (hasFeatureOrder) {
@@ -456,8 +454,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	 * 
 	 * @return Return the FeatureOrder as an ArrayList. Return null if the
 	 *         "userdefined-order" is deactivate or if no order file exists.
-	 * @deprecated is no longer supported, use {@link #readFeatureOrderList()}
-	 *             instead
+	 * @deprecated is no longer supported, use {@link #readFeatureOrderList()} instead
 	 */
 	@Deprecated
 	public List<String> readFeaturesfromOrderFile() {
@@ -465,8 +462,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	}
 
 	/**
-	 * sets buttons and featurelist according to feature model if
-	 * {@link #hasFeatureOrder} is true
+	 * sets buttons and featurelist according to feature model if {@link #hasFeatureOrder} is true
 	 * 
 	 * @return returns the featureOrderList from feature model or an empty list
 	 *         if {@link #hasFeatureOrder} is false
@@ -480,48 +476,6 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		return new LinkedList<String>();
 	}
 
-	// TODO #460 replace with a configuration reader
-	// the problem is that we need the old feature names
-	public LinkedList<String> readFeaturesfromConfigurationFile(File file) {
-		Scanner scanner = null;
-		LinkedList<String> list = new LinkedList<String>();
-		try {
-			scanner = new Scanner(file, "UTF-8");
-			while (scanner.hasNext()) {
-				list.add(featureModelEditor.featureModel.getRenamingsManager().getNewName(scanner.next()));
-			}
-		} catch (FileNotFoundException e) {
-			FMUIPlugin.getDefault().logError(e);
-		} finally {
-			if (scanner != null) {
-				scanner.close();
-			}
-		}
-		return list;
-	}
-
-	// TODO #460 replace with a configuration writer
-	public void writeFeaturesToConfigurationFile(File file, LinkedList<String> newConfiguration) {
-		FileWriter fw = null;
-		try {
-			fw = new FileWriter(file);
-			for (String layer : newConfiguration) {
-				fw.write(layer);
-				fw.append("\r\n");
-			}
-		} catch (IOException e) {
-			FMUIPlugin.getDefault().logError(e);
-		} finally {
-			if (fw != null) {
-				try {
-					fw.close();
-				} catch (IOException e) {
-					FMUIPlugin.getDefault().logError(e);
-				}
-			}
-		}
-	}
-
 	/**
 	 * Renames the features of the given configuration file and <br>
 	 * synchronizes the order with the feature model.
@@ -533,62 +487,15 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		if (!(resource instanceof IFile)) {
 			return;
 		}
-
-		// Read Configuration
 		final IFile res = (IFile) resource;
-		final File file = res.getRawLocation().toFile();
-		final LinkedList<String> oldConfiguration = readFeaturesfromConfigurationFile(file);
-		if (oldConfiguration.isEmpty()) {
-			return;
+		
+		final Configuration config = new Configuration(featureModelEditor.featureModel, Configuration.PARAM_LAZY);
+		try {
+			new ConfigurationReader(config).readFromFile(res);
+			new ConfigurationWriter(config).saveToFile(res);
+		} catch (CoreException | IOException e) {
+			FMCorePlugin.getDefault().logError(e);
 		}
-
-		final RenamingsManager renamingsManager = featureModelEditor.featureModel.getRenamingsManager();
-		for (ListIterator<String> it = oldConfiguration.listIterator(); it.hasNext();) {
-			final String oldName = it.next();
-			it.set(renamingsManager.getNewName(oldName));
-		}
-
-		final List<String> layers;
-		if (!hasFeatureOrder || !activate.getSelection()) {
-			// Default order
-			layers = featureModelEditor.featureModel.getConcreteFeatureNames();
-		} else {
-			// User specified order
-			layers = featureModelEditor.featureModel.getFeatureOrderList();
-		}
-		if (layers == null) {
-			return;
-		}
-
-		// a copy of the old configuration
-		final LinkedList<String> configuration = new LinkedList<String>(oldConfiguration);
-
-		final LinkedList<String> newConfiguration = new LinkedList<String>();
-		for (String layer : layers) {
-			if (oldConfiguration.contains(layer)) {
-				newConfiguration.add(layer);
-				oldConfiguration.remove(layer);
-			}
-		}
-
-		// Feature removed
-		newConfiguration.addAll(oldConfiguration);
-
-		// check whether the new configuration is equal to the old one
-		boolean equal = true;
-		Iterator<String> newIt = newConfiguration.iterator();
-		for (Iterator<String> curIt = configuration.iterator(); curIt.hasNext();) {
-			if (!renamingsManager.getOldName(newIt.next()).equals(curIt.next())) {
-				equal = false;
-				break;
-			}
-		}
-		if (equal) {
-			return;
-		}
-
-		// Write Configuration
-		writeFeaturesToConfigurationFile(file, newConfiguration);
 	}
 
 	private void enableUI(boolean selection) {

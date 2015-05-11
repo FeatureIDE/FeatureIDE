@@ -42,8 +42,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
  * The KeyHandler for the FeatureDiagramEditor.
  * </br>
  * At Manual-Layout: </br>
- * to ensure that actions registered in {@link #createKeyBindings()} 
- * will be handled first! default actions will be handled at last!
+ * to ensure that actions registered in {@link #createKeyBindings()} will be handled first! default actions will be handled at last!
  * 
  * Handles searching of features in the Tree.
  * </br>
@@ -59,9 +58,9 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements Proper
 	private final GraphicalViewerKeyHandler gvKeyHandler;
 	private final KeyHandler alternativeKeyHandler;
 	private final FeatureDiagramEditor viewer;
-	
+
 	private final ArrayList<String> featureList = new ArrayList<String>();
-	
+
 	private int curIndex;
 	private String curSearchString;
 	private long lastTime;
@@ -85,9 +84,9 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements Proper
 		resetFeatureList();
 		featureModel.addListener(this);
 	}
-	
+
 	@Override
-	public boolean keyReleased(KeyEvent e){
+	public boolean keyReleased(KeyEvent e) {
 		return false;
 	}
 
@@ -103,22 +102,22 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements Proper
 			} else {
 				return super.keyPressed(e);
 			}
-		} 
-		
+		}
+
 		final long currentTime = System.currentTimeMillis();
 		if (currentTime - lastTime > timeoutThreshold) {
 			curSearchString = "";
 		}
 		lastTime = currentTime;
-		
+
 		curIndex = updateIterator();
-		
+
 		if (curSearchString.length() == 1 && curSearchString.charAt(0) == Character.toLowerCase(e.character)) {
 			curSearchString = "";
 			curIndex = (curIndex + 1) % featureList.size();
 		}
 		curSearchString += Character.toLowerCase(e.character);
-		
+
 		final int foundIndex = search();
 		if (foundIndex >= 0) {
 			// select the new feature
@@ -130,7 +129,7 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements Proper
 				curIndex = foundIndex;
 			}
 		}
-		
+
 		return true;
 	}
 
@@ -138,17 +137,16 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements Proper
 	public void propertyChange(PropertyChangeEvent event) {
 		resetFeatureList();
 	}
-	
+
 	/**
-	 * To handle 2 key handlers (otherwise there would be an action loop)</br>
-	 * {@inheritDoc}
+	 * To handle 2 key handlers (otherwise there would be an action loop)</br> {@inheritDoc}
 	 */
 	@Override
 	public void put(KeyStroke keystroke, IAction action) {
 		this.alternativeKeyHandler.put(keystroke, action);
 		super.put(keystroke, action);
 	}
-	
+
 	private void resetFeatureList() {
 		featureList.clear();
 		featureList.addAll(featureModel.getFeatureNamesPreorder());
@@ -168,11 +166,11 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements Proper
 
 	private int updateIterator() {
 		final IStructuredSelection sel = (IStructuredSelection) viewer.getSelection();
-		
+
 		if (sel.size() == 1 && !(sel.getFirstElement() instanceof ModelEditPart)) {
 			final Object element = sel.getFirstElement();
 			final String featureName;
-			
+
 			if (element instanceof FeatureEditPart) {
 				featureName = ((FeatureEditPart) element).getFeature().getName();
 			} else if (element instanceof Feature) {
@@ -180,10 +178,8 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements Proper
 			} else {
 				return 0;
 			}
-			
-			return (!featureName.equalsIgnoreCase(featureList.get(curIndex)))
-				? featureList.indexOf(featureName)
-				: curIndex;
+
+			return (!featureName.equalsIgnoreCase(featureList.get(curIndex))) ? featureList.indexOf(featureName) : curIndex;
 		}
 		return 0;
 	}

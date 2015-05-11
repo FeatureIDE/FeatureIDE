@@ -53,6 +53,7 @@ public class PrintDocumentationStatisticsJob extends AProjectJob<PrintDocumentat
 		final IFeatureProject featureProject = CorePlugin.getFeatureProject(project);
 		if (featureProject == null) {
 			CorePlugin.getDefault().logWarning(this.project.getName() + " is no FeatureIDE Project!");
+			return false;
 		}
 		
 		IFolder folder = CorePlugin.createFolder(this.project, arguments.foldername);

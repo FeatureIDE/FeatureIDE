@@ -70,7 +70,7 @@ public class SimpleSyntaxHighlighterConstraintContentAdapter implements IControl
 		final String currentText = editor.getText();
 
 		InsertionResult result = performInsertion(currentText, selection, text);
-		
+
 		editor.setText(result.text);
 		editor.setSelection(result.selection);
 	}
@@ -84,15 +84,15 @@ public class SimpleSyntaxHighlighterConstraintContentAdapter implements IControl
 	public static InsertionResult performInsertion(final String currentText, final Point selection, final String textToInsert) {
 		String before = "", after = "";
 		String text = textToInsert;
-		
+
 		if (text.contains(Features.FEATURE_SUFFIX)) {
 			text = "\"" + text.replace(Features.FEATURE_SUFFIX, "").trim() + "\"";
 		} else if (text.contains(" ")) {
 			text = "\"" + text + "\"";
 		}
-		
+
 		switch (getMode(selection)) {
-		case INSERT_TEXT: {		
+		case INSERT_TEXT: {
 
 			switch (getMode(currentText, selection.x)) {
 			case JUST_INSERT:
@@ -111,7 +111,8 @@ public class SimpleSyntaxHighlighterConstraintContentAdapter implements IControl
 			default:
 				throw new UnsupportedOperationException();
 			}
-		} break;
+		}
+			break;
 		case REPLACE_TEXT:
 			before = currentText.substring(0, Math.min(selection.x, getSubStringStartIndex(currentText, selection.x)));
 			after = currentText.substring(selection.y, currentText.length());
@@ -119,10 +120,10 @@ public class SimpleSyntaxHighlighterConstraintContentAdapter implements IControl
 		default:
 			throw new UnsupportedOperationException();
 		}
-		
+
 		if (!before.isEmpty() && !before.endsWith(" "))
 			before += " ";
-		
+
 		if (!after.isEmpty() && !after.startsWith(" "))
 			after = " " + after;
 
@@ -223,8 +224,7 @@ public class SimpleSyntaxHighlighterConstraintContentAdapter implements IControl
 	}
 
 	/**
-	 * @see org.eclipse.jface.fieldassist.IControlContentAdapter2#setSelection(org.eclipse.swt.widgets.Control,
-	 *      org.eclipse.swt.graphics.Point)
+	 * @see org.eclipse.jface.fieldassist.IControlContentAdapter2#setSelection(org.eclipse.swt.widgets.Control, org.eclipse.swt.graphics.Point)
 	 * 
 	 * @since 3.4
 	 */

@@ -42,10 +42,11 @@ import de.ovgu.featureide.fm.ui.properties.page.FMPropertyPage;
 
 /**
  * Manages all persistent properties defined at the property page.<br>
- * These properties are defined for the whole workspace.<br><br>
+ * These properties are defined for the whole workspace.<br>
+ * <br>
  * 
- * Use this methods instead of {@link GUIDefaults}. 
- *  
+ * Use this methods instead of {@link GUIDefaults}.
+ * 
  * @see FMPropertyPage
  * @author Jens Meinicke
  */
@@ -82,7 +83,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 	private volatile static Integer CURRENT_FEATURE_SPACE_X = null;
 	private volatile static Integer CURRENT_LAYOUT_MARGIN_Y = null;
 	private volatile static Integer CURRENT_LAYOUT_MARGIN_X = null;
-		
+
 	public static void reset() {
 		CURRENT_HIDE_LEGEND = null;
 		CURRENT_LEGEND_FORGOUND = null;
@@ -108,25 +109,27 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 		CURRENT_HIDE_BORDER_COLOR = null;
 		CURRENT_FEATURE_BORDER = null;
 	}
-	
+
 	private static LinkedList<FeatureModel> featureModels = new LinkedList<FeatureModel>();
-	
+
 	/**
 	 * Register the model for property changes.
+	 * 
 	 * @param model
 	 */
 	public static void registerEditor(FeatureModel model) {
 		featureModels.add(model);
 	}
-	
+
 	/**
 	 * Removes the model from listener.
+	 * 
 	 * @param model
 	 */
 	public static void unregisterEditor(FeatureModel model) {
 		featureModels.remove(model);
 	}
-	
+
 	/**
 	 * Refreshes registered models.
 	 */
@@ -147,7 +150,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 		}
 		return CURRENT_HIDE_LEGEND;
 	}
-	
+
 	public static void setHideBorderColor(boolean value) {
 		CURRENT_HIDE_BORDER_COLOR = value;
 		setBoolean(QN_HIDE_BORDER_COLOR, value);
@@ -167,7 +170,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 
 	public static Color getLegendForgroundColor() {
 		if (CURRENT_LEGEND_FORGOUND == null) {
-			CURRENT_LEGEND_FORGOUND = getColor(QN_LEGEND_FORGOUND, LEGEND_FOREGROUND); 
+			CURRENT_LEGEND_FORGOUND = getColor(QN_LEGEND_FORGOUND, LEGEND_FOREGROUND);
 		}
 		return CURRENT_LEGEND_FORGOUND;
 	}
@@ -200,7 +203,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 		CURRENT_FEATURE_FOREGROUND = color;
 		setColor(QN_FEATURE_FORGROUND, color);
 	}
-	
+
 	public static Color getFeatureForgroundColor() {
 		if (CURRENT_FEATURE_FOREGROUND == null) {
 			CURRENT_FEATURE_FOREGROUND = getColor(QN_FEATURE_FORGROUND, FEATURE_FOREGROUND);
@@ -224,7 +227,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 		CURRENT_CONCRETE_BACKGROUND = color;
 		setColor(QN_FEATURE_CONCRETE, color);
 	}
-	
+
 	public static Color getConcreteFeatureBackgroundColor() {
 		if (CURRENT_CONCRETE_BACKGROUND == null) {
 			CURRENT_CONCRETE_BACKGROUND = getColor(QN_FEATURE_CONCRETE, CONCRETE_BACKGROUND);
@@ -248,7 +251,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 		if (CURRENT_HIDDEN_FOREGROUND == null) {
 			CURRENT_HIDDEN_FOREGROUND = getColor(QN_FEATURE_HIDEEN_FORGROUND, HIDDEN_FOREGROUND);
 		}
-		return CURRENT_HIDDEN_FOREGROUND ;
+		return CURRENT_HIDDEN_FOREGROUND;
 	}
 
 	public static void setHiddenFeatureForgroundColor(Color color) {
@@ -270,7 +273,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 
 	public static Color getDeadFeatureBackgroundColor() {
 		if (CURRENT_DEAD_BACKGROUND == null) {
-			CURRENT_DEAD_BACKGROUND  = getColor(QN_FEATURE_DEAD, DEAD_BACKGROUND);
+			CURRENT_DEAD_BACKGROUND = getColor(QN_FEATURE_DEAD, DEAD_BACKGROUND);
 		}
 		return CURRENT_DEAD_BACKGROUND;
 	}
@@ -280,19 +283,18 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 		setColor(QN_FEATURE_DEAD, color);
 	}
 
-
 	public static Color getFalseOptionalFeatureBackgroundColor() {
 		if (CURRENT_FEATURE_DEAD == null) {
 			CURRENT_FEATURE_DEAD = getColor(QN_FEATURE_DEAD, DEAD_BACKGROUND);
 		}
 		return CURRENT_FEATURE_DEAD;
 	}
-	
+
 	public static void setFalseOptionalFeatureBackgroundColor(Color color) {
 		CURRENT_FEATURE_DEAD = color;
 		setColor(QN_FEATURE_DEAD, color);
 	}
-	
+
 	public static Color getConstraintBackgroundColor() {
 		if (CURRENT_CONSTRAINT_BACKGROUND == null) {
 			CURRENT_CONSTRAINT_BACKGROUND = getColor(QN_CONSTRAINT, CONSTRAINT_BACKGROUND);
@@ -309,10 +311,10 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 		CURRENT_CONNECTION_FOREGROUND = color;
 		setColor(QN_CONNECTION, color);
 	}
-	
+
 	public static Color getConnectionForgroundColor() {
 		if (CURRENT_CONNECTION_FOREGROUND == null) {
-			CURRENT_CONNECTION_FOREGROUND  = getColor(QN_CONNECTION, CONNECTION_FOREGROUND);
+			CURRENT_CONNECTION_FOREGROUND = getColor(QN_CONNECTION, CONNECTION_FOREGROUND);
 		}
 		return CURRENT_CONNECTION_FOREGROUND;
 	}
@@ -328,7 +330,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 		CURRENT_WARNING_BACKGROUND = color;
 		setColor(QN_WARNING, color);
 	}
-	
+
 	public static Color getFeatureBorderColor() {
 		if (CURRENT_FEATURE_BORDER == null) {
 			CURRENT_FEATURE_BORDER = getColor(QN_FEATURE_BORDER, CONCRETE_BORDER_COLOR);
@@ -340,11 +342,11 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 		CURRENT_FEATURE_BORDER = color;
 		setColor(QN_FEATURE_BORDER, color);
 	}
-	
+
 	public static Color getFeatureBorderColorSave() {
 		return FEATURE_BORDER_SAVE;
 	}
-	
+
 	public static void setFeatureBorderColorSave(Color color) {
 		FEATURE_BORDER_SAVE = color;
 	}
@@ -404,7 +406,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 	}
 
 	public static void setFeatureSpaceY(int value) {
-		CURRENT_FEATURE_SPACE_Y =  value;
+		CURRENT_FEATURE_SPACE_Y = value;
 		setInt(QN_FEATURE_Y, value);
 	}
 
@@ -441,9 +443,9 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 		return GUIBasics.createLineBorder(HIDDEN_BORDER_COLOR, 1, Graphics.LINE_DASH);
 	}
 
-//	private static Color getHiddenBorderColor() {
-//		return GUIBasics.createBorderColor(getDeadFeatureBackgroundColor());
-//	}
+	//	private static Color getHiddenBorderColor() {
+	//		return GUIBasics.createBorderColor(getDeadFeatureBackgroundColor());
+	//	}
 
 	public static Border getDeadFeatureBorder(boolean selected) {
 		if (selected) {
@@ -466,7 +468,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 		}
 		return GUIBasics.createLineBorder(getConcreteBorderColor(), 1);
 	}
-	
+
 	public static Border getFeatureBorder(boolean selected) {
 		if (selected) {
 			return GUIBasics.createLineBorder(getFeatureBorderColor(), 3);
@@ -542,7 +544,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 	}
 
 	public static Color getDecoratorForgroundColor() {
-		if (CURRENT_DECORATOR_FORGROUND_COLOR  == null) {
+		if (CURRENT_DECORATOR_FORGROUND_COLOR == null) {
 			CURRENT_DECORATOR_FORGROUND_COLOR = getConnectionForgroundColor();
 		}
 		return CURRENT_DECORATOR_FORGROUND_COLOR;
@@ -554,7 +556,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 
 	/**
 	 * Gets the value(int) saved for the QualifiedName.<br>
-	 * If there is no value saved, the given default value is returned.   
+	 * If there is no value saved, the given default value is returned.
 	 * 
 	 * @param name The QualifiedName
 	 * @param defaultValue The default value from {@link GUIDefaults}
@@ -574,6 +576,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 
 	/**
 	 * Sets the value for the QualifiedName.
+	 * 
 	 * @param name The QualifiedName
 	 * @param value The value to set
 	 */
@@ -587,7 +590,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 
 	/**
 	 * Gets the value(boolean) saved for the QualifiedName.<br>
-	 * If there is no value saved, it returns: <code>false</code>   
+	 * If there is no value saved, it returns: <code>false</code>
 	 * 
 	 * @param name The QualifiedName
 	 * @return The value for the QualifiedName
@@ -603,6 +606,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 
 	/**
 	 * Sets the value for the QualifiedName.
+	 * 
 	 * @param name The QualifiedName
 	 * @param value The value to set
 	 */
@@ -616,7 +620,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 
 	/**
 	 * Gets the value(Color) saved for the QualifiedName.<br>
-	 * If there is no value saved, the given default value is returned.   
+	 * If there is no value saved, the given default value is returned.
 	 * 
 	 * @param name The QualifiedName
 	 * @param defaultColor The default value from {@link GUIDefaults}
@@ -628,8 +632,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 			if (property != null) {
 				String[] color = property.split("[|]");
 				if (color.length == 3) {
-					return new Color(null, Integer.parseInt(color[0]),
-							Integer.parseInt(color[1]), Integer.parseInt(color[2]));
+					return new Color(null, Integer.parseInt(color[0]), Integer.parseInt(color[1]), Integer.parseInt(color[2]));
 				}
 			}
 		} catch (CoreException e) {
@@ -640,12 +643,12 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 
 	/**
 	 * Sets the color for the QualifiedName.
+	 * 
 	 * @param name The QualifiedName
 	 * @param color The color to set
 	 */
 	private static void setColor(QualifiedName name, Color color) {
-		String c = color.getRed() + "|" + color.getGreen() + "|"
-				+ color.getBlue();
+		String c = color.getRed() + "|" + color.getGreen() + "|" + color.getBlue();
 		try {
 			workspaceRoot.setPersistentProperty(name, c);
 		} catch (CoreException e) {
@@ -655,7 +658,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 
 	/**
 	 * Gets the value(String) saved for the QualifiedName.<br>
-	 * If there is no value saved, it returns: "". 
+	 * If there is no value saved, it returns: "".
 	 * 
 	 * @param name The QualifiedName
 	 * @return The value for the QualifiedName
@@ -673,6 +676,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 
 	/**
 	 * Sets the value for the QualifiedName.
+	 * 
 	 * @param name The QualifiedName
 	 * @param value The value to set
 	 */
@@ -687,18 +691,18 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 	public static LinkedList<QualifiedName> getQualifiedNames() {
 		LinkedList<QualifiedName> names = new LinkedList<QualifiedName>();
 		names.add(QN_HIDE_LEGEND);
-//		names.add(QN_LEGEND_FORGOUND);
+		//		names.add(QN_LEGEND_FORGOUND);
 		names.add(QN_LEGEND_BACKGROUND);
 		names.add(QN_LEGEND_BORDER);
 		names.add(QN_LANGUAGE);
 		names.add(QN_DIAGRAM_BACKGROUND);
-//		names.add(QN_FEATURE_FORGROUND);
+		//		names.add(QN_FEATURE_FORGROUND);
 		names.add(QN_FEATURE_CONCRETE);
 		names.add(QN_FEATURE_ABSTRACT);
-//		names.add(QN_FEATURE_HIDEEN_FORGROUND);
+		//		names.add(QN_FEATURE_HIDEEN_FORGROUND);
 		names.add(QN_FEATURE_HIDEEN_BACKGROUND);
 		names.add(QN_FEATURE_DEAD);
-		names.add(QN_CONSTRAINT );
+		names.add(QN_CONSTRAINT);
 		names.add(QN_CONNECTION);
 		names.add(QN_WARNING);
 		names.add(QN_LAYOUT_MARGIN_X);

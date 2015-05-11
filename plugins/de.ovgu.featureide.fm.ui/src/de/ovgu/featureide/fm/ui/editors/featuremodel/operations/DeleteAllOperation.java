@@ -52,37 +52,34 @@ public class DeleteAllOperation extends AbstractFeatureModelOperation implements
 	private LinkedList<Feature> featureList;
 	private LinkedList<Feature> containedFeatureList;
 	private Deque<AbstractFeatureModelOperation> operations = new LinkedList<AbstractFeatureModelOperation>();
-	
+
 	public DeleteAllOperation(FeatureModel featureModel, Feature parent) {
 		super(featureModel, LABEL);
 		this.feature = parent;
 	}
 
 	@Override
-	public IStatus execute(IProgressMonitor monitor, IAdaptable info)
-			throws ExecutionException {
+	public IStatus execute(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
 
 		featureList = new LinkedList<Feature>();
 		containedFeatureList = new LinkedList<Feature>();
 		LinkedList<Feature> list = new LinkedList<Feature>();
-		list.add(feature);	
+		list.add(feature);
 		getFeaturesToDelete(list);
 
-		if (containedFeatureList.isEmpty()){
-			for (Feature feat : featureList){			
+		if (containedFeatureList.isEmpty()) {
+			for (Feature feat : featureList) {
 				AbstractFeatureModelOperation op = new FeatureDeleteOperation(featureModel, feat);
 				executeOperation(op);
 				operations.add(op);
 			}
 		} else {
 			final String containedFeatures = containedFeatureList.toString();
-			MessageDialog dialog = new MessageDialog(new Shell(), 
-					" Delete Error ", FEATURE_SYMBOL, 
-					"The following features are contained in constraints:" + '\n'
-					+ containedFeatures.substring(1, containedFeatures.length() - 1) + '\n' + '\n' +
-					"Unable to delete this features until all relevant constraints are removed.",
-					MessageDialog.ERROR, new String[] { IDialogConstants.OK_LABEL }, 0);
-			
+			MessageDialog dialog = new MessageDialog(new Shell(), " Delete Error ", FEATURE_SYMBOL, "The following features are contained in constraints:"
+					+ '\n' + containedFeatures.substring(1, containedFeatures.length() - 1) + '\n' + '\n'
+					+ "Unable to delete this features until all relevant constraints are removed.", MessageDialog.ERROR,
+					new String[] { IDialogConstants.OK_LABEL }, 0);
+
 			dialog.open();
 		}
 		return Status.OK_STATUS;
@@ -90,14 +87,13 @@ public class DeleteAllOperation extends AbstractFeatureModelOperation implements
 
 	private void executeOperation(AbstractFeatureModelOperation op) {
 		try {
-			PlatformUI.getWorkbench().getOperationSupport()
-					.getOperationHistory().execute(op, null, null);
+			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
 
 		}
 	}
-	
+
 	@Override
 	protected void redo() {
 		for (Iterator<AbstractFeatureModelOperation> it = operations.iterator(); it.hasNext();) {
@@ -124,7 +120,7 @@ public class DeleteAllOperation extends AbstractFeatureModelOperation implements
 	 * 
 	 * @param linkedList
 	 */
-	private void getFeaturesToDelete(LinkedList<Feature> linkedList) {		
+	private void getFeaturesToDelete(LinkedList<Feature> linkedList) {
 		for (Feature feat : linkedList) {
 			if (!feat.getRelevantConstraints().isEmpty()) {
 				containedFeatureList.add(feat);

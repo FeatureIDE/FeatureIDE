@@ -30,7 +30,7 @@ import de.ovgu.featureide.fm.core.configuration.TreeElement;
  * @author Thomas Thuem
  */
 public class TreeObject extends TreeElement {
-	
+
 	String name;
 
 	Image image;
@@ -47,11 +47,11 @@ public class TreeObject extends TreeElement {
 	public String getName() {
 		return name;
 	}
-	
+
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	public void setContents(String name, Image image) {
 		this.name = name;
 		this.image = image;
@@ -69,7 +69,7 @@ public class TreeObject extends TreeElement {
 			this.addChild(child);
 		}
 	}
-	
+
 	public String toString() {
 		return getName();
 	}

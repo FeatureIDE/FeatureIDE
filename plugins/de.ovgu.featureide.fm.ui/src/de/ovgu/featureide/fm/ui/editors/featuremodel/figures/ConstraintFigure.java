@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 
 import org.eclipse.draw2d.Figure;
@@ -30,7 +31,6 @@ import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
-import org.eclipse.swt.graphics.Color;
 import org.prop4j.NodeWriter;
 
 import de.ovgu.featureide.fm.core.Constraint;
@@ -47,12 +47,6 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * @author Thomas Thuem
  */
 public class ConstraintFigure extends Figure implements GUIDefaults {
-	
-	private static String[] symbols = null;
-
-	private final Label label = new Label();
-	
-	private Constraint constraint;
 
 	public final static String VOID_MODEL = " Constraint makes the feature model void. ";
 	public final static String UNSATISFIABLE = " Constraint is unsatisfiable and makes the feature model void. ";
@@ -62,11 +56,22 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 	public final static String REDUNDANCE = " Constraint is redundant and could be removed. ";
 
 	private static final IFigure VOID_LABEL = new Label(VOID_MODEL);
-
 	private static final IFigure UNSATISFIABLE_LABEL = new Label(UNSATISFIABLE);
-
 	private static final IFigure TAUTOLOGY_LABEL = new Label(TAUTOLOGY);
-	
+
+	private static final String[] symbols;
+	static {
+		if (GUIBasics.unicodeStringTest(DEFAULT_FONT, Arrays.toString(NodeWriter.logicalSymbols))) {
+			symbols = NodeWriter.logicalSymbols;
+		} else {
+			symbols = NodeWriter.shortSymbols;
+		}
+	}
+
+	private final Label label = new Label();
+
+	private Constraint constraint;
+
 	public ConstraintFigure(Constraint constraint) {
 		super();
 		this.constraint = constraint;
@@ -74,34 +79,31 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 
 		label.setForegroundColor(CONSTRAINT_FOREGROUND);
 		label.setFont(DEFAULT_FONT);
-
 		label.setLocation(new Point(CONSTRAINT_INSETS.left, CONSTRAINT_INSETS.top));
-		
-		setText(getConstraintText(constraint));		
-		
-		FeatureUIHelper.setSize(constraint,getSize());
-		
+
+		setText(getConstraintText(constraint));
+
+		FeatureUIHelper.setSize(constraint, getSize());
+
 		add(label);
 		setOpaque(true);
 
 		if (FeatureUIHelper.getLocation(constraint) != null)
 			setLocation(FeatureUIHelper.getLocation(constraint));
-		
-		setConstraintProperties(true);
+
+		init();
 	}
-	
-	/**
-	 * Sets the properties <i>color, border and tooltips</i> of the {@link ConstraintFigure}
-	 * @param init <code>true</code> if this method is called by the constructor else the
-	 * calculated properties will be set.
-	 */
-	public void setConstraintProperties(boolean init) {
+
+	private void init() {
 		setBorder(FMPropertyManager.getConstraintBorder(constraint.isFeatureSelected()));
 		setBackgroundColor(FMPropertyManager.getConstraintBackgroundColor());
+	}
 
-		if(init) {
-			return;
-		}
+	/**
+	 * Sets the properties <i>color, border and tooltips</i> of the {@link ConstraintFigure}.
+	 */
+	public void setConstraintProperties() {
+		init();
 
 		ConstraintAttribute constraintAttribute = constraint.getConstraintAttribute();
 		if (constraintAttribute == ConstraintAttribute.NORMAL) {
@@ -112,20 +114,20 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 			setToolTip(VOID_LABEL);
 			return;
 		}
-		
+
 		if (constraintAttribute == ConstraintAttribute.UNSATISFIABLE) {
 			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
 			setToolTip(UNSATISFIABLE_LABEL);
 			return;
 		}
-		
+
 		if (constraintAttribute == ConstraintAttribute.TAUTOLOGY) {
 			setBackgroundColor(FMPropertyManager.getWarningColor());
-			setToolTip(TAUTOLOGY_LABEL);	
+			setToolTip(TAUTOLOGY_LABEL);
 			return;
 		}
-		
-		StringBuilder toolTip = new StringBuilder(); 
+
+		StringBuilder toolTip = new StringBuilder();
 		if (!constraint.getDeadFeatures().isEmpty()) {
 			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
 			toolTip.append(DEAD_FEATURE);
@@ -134,65 +136,51 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 				deadFeatures.add(dead.toString());
 			}
 			Collections.sort(deadFeatures, String.CASE_INSENSITIVE_ORDER);
-			
+
 			for (String dead : deadFeatures) {
 				toolTip.append("\n   ");
 				toolTip.append(dead);
 			}
 			setToolTip(new Label(toolTip.toString()));
 		}
-		
+
 		if (!constraint.getFalseOptional().isEmpty()) {
 			if (constraint.getDeadFeatures().isEmpty()) {
 				setBackgroundColor(FMPropertyManager.getWarningColor());
 			} else {
 				toolTip.append("\n\n");
 			}
-			
+
 			ArrayList<String> falseOptionalFeatures = new ArrayList<String>(constraint.getFalseOptional().size());
 			for (Feature feature : constraint.getFalseOptional()) {
 				falseOptionalFeatures.add(feature.toString());
 			}
 			Collections.sort(falseOptionalFeatures, String.CASE_INSENSITIVE_ORDER);
-			
+
 			toolTip.append(FALSE_OPTIONAL);
 			for (String feature : falseOptionalFeatures) {
 				toolTip.append("\n   ");
 				toolTip.append(feature);
 			}
-			setToolTip(new Label(toolTip.toString()));	
+			setToolTip(new Label(toolTip.toString()));
 			return;
 		}
-		
+
 		if (constraintAttribute == ConstraintAttribute.REDUNDANT) {
 			setBackgroundColor(FMPropertyManager.getWarningColor());
-			setToolTip(new Label(REDUNDANCE));	
+			setToolTip(new Label(REDUNDANCE));
 			return;
 		}
-
 	}
 
-	@Override
-	public void setBackgroundColor(Color bg) {
-		super.setBackgroundColor(bg);
-	}
-	
 	private String getConstraintText(Constraint constraint) {
-		if (symbols == null) {
-			symbols = NodeWriter.logicalSymbols;
-			StringBuilder s = new StringBuilder();
-			for (int i = 0; i < symbols.length; i++)
-				s.append(symbols[i]);
-			if (!GUIBasics.unicodeStringTest(label.getFont(), s.toString()))
-				symbols = NodeWriter.shortSymbols;
-		}
 		return constraint.getNode().toString(symbols);
 	}
 
 	private void setText(String newText) {
 		label.setText(newText);
 		Dimension labelSize = label.getPreferredSize();
-		
+
 		if (labelSize.equals(label.getSize()))
 			return;
 		label.setSize(labelSize);
@@ -214,5 +202,5 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 	public Rectangle getLabelBounds() {
 		return label.getBounds();
 	}
-	
+
 }

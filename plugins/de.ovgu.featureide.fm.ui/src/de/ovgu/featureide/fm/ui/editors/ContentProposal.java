@@ -41,8 +41,7 @@ public class ContentProposal implements IContentProposal {
 	 * String. The cursor position will be located at the end of the content.
 	 * 
 	 * @param content
-	 *            the String representing the content. Should not be
-	 *            <code>null</code>.
+	 *            the String representing the content. Should not be <code>null</code>.
 	 */
 	public ContentProposal(String content) {
 		this(content, content, null);
@@ -54,11 +53,9 @@ public class ContentProposal implements IContentProposal {
 	 * content.
 	 * 
 	 * @param content
-	 *            the String representing the content. Should not be
-	 *            <code>null</code>. This string will also be used as the label.
+	 *            the String representing the content. Should not be <code>null</code>. This string will also be used as the label.
 	 * @param description
-	 *            the String representing the description, or <code>null</code>
-	 *            if there should be no description.
+	 *            the String representing the description, or <code>null</code> if there should be no description.
 	 */
 	public ContentProposal(String content, String description) {
 		this(content, content, description);
@@ -70,15 +67,12 @@ public class ContentProposal implements IContentProposal {
 	 * end of the content.
 	 * 
 	 * @param content
-	 *            the String representing the content. Should not be
-	 *            <code>null</code>.
+	 *            the String representing the content. Should not be <code>null</code>.
 	 * @param label
-	 *            the String representing the label. Should not be
-	 *            <code>null</code>.
+	 *            the String representing the label. Should not be <code>null</code>.
 	 * 
 	 * @param description
-	 *            the String representing the description, or <code>null</code>
-	 *            if there should be no description.
+	 *            the String representing the description, or <code>null</code> if there should be no description.
 	 */
 	public ContentProposal(String content, String label, String description) {
 		this(content, label, description, content.length());
@@ -89,15 +83,12 @@ public class ContentProposal implements IContentProposal {
 	 * position are as specified in the parameters.
 	 * 
 	 * @param content
-	 *            the String representing the content. Should not be
-	 *            <code>null</code>.
+	 *            the String representing the content. Should not be <code>null</code>.
 	 * @param label
-	 *            the String representing the label. Should not be
-	 *            <code>null</code>.
+	 *            the String representing the label. Should not be <code>null</code>.
 	 * 
 	 * @param description
-	 *            the String representing the description, or <code>null</code>
-	 *            if there should be no description.
+	 *            the String representing the description, or <code>null</code> if there should be no description.
 	 * 
 	 * @param cursorPosition
 	 *            the zero-based index position within the contents where the
@@ -109,12 +100,10 @@ public class ContentProposal implements IContentProposal {
 	 *                if the index is not between 0 and the number of characters
 	 *                in the content.
 	 */
-	public ContentProposal(String content, String label, String description,
-			int cursorPosition) {
+	public ContentProposal(String content, String label, String description, int cursorPosition) {
 		Assert.isNotNull(content);
 		Assert.isNotNull(label);
-		Assert.isLegal(cursorPosition >= 0
-				&& cursorPosition <= content.length());
+		Assert.isLegal(cursorPosition >= 0 && cursorPosition <= content.length());
 		this.content = content;
 		this.label = label;
 		this.description = description;

@@ -336,7 +336,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	 * Before loading, all error markers will be deleted and afterwards new ones
 	 * might be created if some errors occur.
 	 */
-	synchronized private void loadModel() {
+	synchronized private boolean loadModel() {
 		guidslToXML();
 
 		try {
@@ -347,6 +347,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 				setAllFeatureModuleMarkers();
 			}
 			readFeatureOrder();
+			return true;
 		} catch (FileNotFoundException e) {
 			modelFile.createModelMarker(e.getMessage(), IMarker.SEVERITY_ERROR, 0);
 		} catch (UnsupportedModelException e) {
@@ -354,6 +355,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		} catch (CoreException e) {
 			LOGGER.logError("Error while loading feature model from " + modelFile.getResource(), e);
 		}
+		return false;
 	}
 
 	/**
@@ -916,19 +918,19 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	private boolean checkModelChange(IResourceDelta delta) {
 		if (delta == null || (delta.getFlags() & IResourceDelta.CONTENT) == 0)
 			return false;
-
+		
 		Job job = new Job("Load Model") {
 			protected IStatus run(IProgressMonitor monitor) {
-				loadModel();
-				final IComposerExtensionClass composerExtension = getComposer();
-				if (composerExtension.isInitialized()) {
-					composerExtension.postModelChanged();
-					checkConfigurations(getAllConfigurations());
-					checkFeatureCoverage();
-					return Status.OK_STATUS;
-				} else {
-					return Status.CANCEL_STATUS;
+				if (loadModel()) {
+					final IComposerExtensionClass composerExtension = getComposer();
+					if (composerExtension.isInitialized()) {
+						composerExtension.postModelChanged();
+						checkConfigurations(getAllConfigurations());
+						checkFeatureCoverage();
+						return Status.OK_STATUS;
+					}
 				}
+				return Status.CANCEL_STATUS;
 			}
 		};
 		job.setPriority(Job.INTERACTIVE);
@@ -937,8 +939,9 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	}
 
 	private void checkConfigurations(final List<IFile> files) {
-		if (files == null || files.isEmpty())
+		if (files == null || files.isEmpty()) {
 			return;
+		}
 
 		Job job = new Job("Checking configurations") {
 			protected IStatus run(IProgressMonitor monitor) {
@@ -1015,18 +1018,16 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		}
 		final List<String> concreteFeatures = getFalseOptionalFeatures();
 		final List<String> falseOptionalFeatures = new LinkedList<String>();
-		if (selections.length != 0) {
-			for (int column = 0; column < concreteFeatures.size(); column++) {
-				boolean invalid = true;
-				for (int conf = 0; conf < selections.length; conf++) {
-					if (selections[conf][column] == selectionState) {
-						invalid = false;
-						break;
-					}
+		for (int column = 0; column < concreteFeatures.size(); column++) {
+			boolean invalid = true;
+			for (int conf = 0; conf < selections.length; conf++) {
+				if (selections[conf][column] == selectionState) {
+					invalid = false;
+					break;
 				}
-				if (invalid) {
-					falseOptionalFeatures.add(concreteFeatures.get(column));
-				}
+			}
+			if (invalid) {
+				falseOptionalFeatures.add(concreteFeatures.get(column));
 			}
 		}
 		return falseOptionalFeatures;

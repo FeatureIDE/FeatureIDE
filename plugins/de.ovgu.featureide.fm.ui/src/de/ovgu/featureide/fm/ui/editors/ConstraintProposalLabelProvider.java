@@ -27,7 +27,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 
 /**
  * provides the pictures of constraints or operators in the content assist window
- *  
+ * 
  * @author David Broneske
  * @author Fabian Benduhn
  */
@@ -38,23 +38,23 @@ public class ConstraintProposalLabelProvider extends LabelProvider implements GU
 	 */
 	@Override
 	public Image getImage(Object element) {
-		if(element instanceof ContentProposal){
-			String content = ((ContentProposal)element).getContent();
-			if("not".equals(content) || "or".equals(content) || "and".equals(content)
-				|| "iff".equals(content) || "implies".equals(content) || "(".equals(content) || ")".equals(content)){
+		if (element instanceof ContentProposal) {
+			String content = ((ContentProposal) element).getContent();
+			if ("not".equals(content) || "or".equals(content) || "and".equals(content) || "iff".equals(content) || "implies".equals(content)
+					|| "(".equals(content) || ")".equals(content)) {
 				return OPERATOR_SYMBOL;
-			}	
+			}
 		}
 		return FEATURE_SYMBOL;
 	}
-	
+
 	@Override
-	public String getText(Object element){
-	
-		if(element instanceof ContentProposal){
-			return ((ContentProposal)element).getContent();
+	public String getText(Object element) {
+
+		if (element instanceof ContentProposal) {
+			return ((ContentProposal) element).getContent();
 		}
 		return element.toString();
 	}
-	
+
 }

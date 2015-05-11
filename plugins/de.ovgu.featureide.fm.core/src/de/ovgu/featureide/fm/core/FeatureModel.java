@@ -46,7 +46,7 @@ import org.prop4j.Node;
  * @author Stefan Krueger
  * 
  */
-public class FeatureModel extends DeprecatedFeatureModel implements PropertyConstants {
+public class FeatureModel extends DeprecatedFeatureModel implements PropertyConstants, IGraphicItem {
 	
 	private Feature rootFeature;
 	
@@ -881,6 +881,11 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 			hash = hash * 7 + c.toString().hashCode();
 		}
 		return hash;
+	}
+
+	@Override
+	public GraphicItem getItemType() {
+		return GraphicItem.Model;
 	}
 
 }

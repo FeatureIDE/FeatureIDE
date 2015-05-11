@@ -32,7 +32,7 @@ public class SourceChangeOperation extends AbstractFeatureModelOperation {
 
 	private final FeatureModelEditor featureModelEditor;
 	private final String newText, oldText;
-	
+
 	/**
 	 * @param featureModel
 	 * @param label
@@ -51,10 +51,10 @@ public class SourceChangeOperation extends AbstractFeatureModelOperation {
 	protected void redo() {
 		featureModelEditor.readModel(newText);
 	}
-	
+
 	@Override
 	protected void undo() {
 		featureModelEditor.readModel(oldText);
 	}
-	
+
 }

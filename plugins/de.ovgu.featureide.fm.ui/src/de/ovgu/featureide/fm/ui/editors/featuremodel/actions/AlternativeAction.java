@@ -39,22 +39,18 @@ public class AlternativeAction extends SingleSelectionAction {
 
 	private final FeatureModel featureModel;
 
-	public AlternativeAction(Object viewer,
-			FeatureModel featureModel) {
+	public AlternativeAction(Object viewer, FeatureModel featureModel) {
 		super("Alternative", viewer);
 		this.featureModel = featureModel;
 	}
 
 	@Override
 	public void run() {
-		FeatureChangeGroupTypeOperation op = new FeatureChangeGroupTypeOperation(
-				FeatureChangeGroupTypeOperation.ALTERNATIVE, feature,
-				featureModel);
+		FeatureChangeGroupTypeOperation op = new FeatureChangeGroupTypeOperation(FeatureChangeGroupTypeOperation.ALTERNATIVE, feature, featureModel);
 		op.addContext((IUndoContext) featureModel.getUndoContext());
 
 		try {
-			PlatformUI.getWorkbench().getOperationSupport()
-					.getOperationHistory().execute(op, null, null);
+			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
 

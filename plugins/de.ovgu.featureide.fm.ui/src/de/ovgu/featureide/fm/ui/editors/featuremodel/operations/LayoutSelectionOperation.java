@@ -30,10 +30,9 @@ public class LayoutSelectionOperation extends AbstractFeatureModelOperation {
 
 	private int newSelectedLayoutAlgorithm;
 	private int oldSelectedLayoutAlgorithm;
-	
-	public LayoutSelectionOperation(FeatureModel featureModel, 
-			int newSelectedLayoutAlgorithm, int oldSelectedLayoutAlgorithm) {
-		super(featureModel, "Set "+FeatureDiagramLayoutHelper.getLayoutLabel(newSelectedLayoutAlgorithm));
+
+	public LayoutSelectionOperation(FeatureModel featureModel, int newSelectedLayoutAlgorithm, int oldSelectedLayoutAlgorithm) {
+		super(featureModel, "Set " + FeatureDiagramLayoutHelper.getLayoutLabel(newSelectedLayoutAlgorithm));
 		this.newSelectedLayoutAlgorithm = newSelectedLayoutAlgorithm;
 		this.oldSelectedLayoutAlgorithm = oldSelectedLayoutAlgorithm;
 	}
@@ -47,5 +46,5 @@ public class LayoutSelectionOperation extends AbstractFeatureModelOperation {
 	protected void undo() {
 		featureModel.getLayout().setLayout(oldSelectedLayoutAlgorithm);
 	}
-	
+
 }

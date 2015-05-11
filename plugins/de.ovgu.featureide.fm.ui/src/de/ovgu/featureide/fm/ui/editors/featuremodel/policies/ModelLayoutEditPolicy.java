@@ -67,14 +67,14 @@ public class ModelLayoutEditPolicy extends LayoutEditPolicy {
 			if (featureModel instanceof ExtendedFeatureModel) {
 				Feature feature = ((FeatureEditPart) child).getFeature();
 				if (feature instanceof ExtendedFeature && ((ExtendedFeature) feature).isFromExtern()) {
-					if(feature.getFeatureModel().getLayout().getLayoutAlgorithm() != 0){
+					if (feature.getFeatureModel().getLayout().getLayoutAlgorithm() != 0) {
 						return null;
 					}
 				}
 			}
 			return new FeatureMoveEditPolicy((FeatureEditPart) child, this);
 		} else if (child instanceof LegendEditPart) {
-			return new LegendMoveEditPolicy(); 
+			return new LegendMoveEditPolicy();
 		} else {
 			return null;
 		}

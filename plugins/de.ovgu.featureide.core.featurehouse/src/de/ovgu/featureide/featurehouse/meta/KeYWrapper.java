@@ -70,7 +70,10 @@ public class KeYWrapper {
 
 				isKeYLoadedtmp = mainClass != null && keYMediatorClass != null && guilClass != null && uiClass != null;
 			}
+		} catch (RuntimeException e) {
+			throw e;
 		} catch (Exception e) {
+			FeatureHouseCorePlugin.getDefault().logError(e);
 		} finally {
 			isKeYLoaded = isKeYLoadedtmp;
 		}

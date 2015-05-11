@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.layouts;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -31,37 +32,36 @@ import de.ovgu.featureide.fm.core.Feature;
  * @author Patrick Sulkowski
  */
 public class LayoutableFeature {
-	
+
 	private boolean showHidden;
 	private Feature feature;
-	
-	
+
 	public LayoutableFeature(Feature feature, boolean showHidden) {
 		this.feature = feature;
 		this.showHidden = showHidden;
 	}
-	
+
 	public LinkedList<LayoutableFeature> getChildren() {
-		
+
 		LinkedList<LayoutableFeature> children = new LinkedList<LayoutableFeature>();
-		
-		for(Feature child : feature.getChildren()){
-			if(showHidden) {
+
+		for (Feature child : feature.getChildren()) {
+			if (showHidden) {
 				children.add(new LayoutableFeature(child, showHidden));
 			} else {
-				if(!child.isHidden()) {
+				if (!child.isHidden()) {
 					children.add(new LayoutableFeature(child, showHidden));
 				}
 			}
-			
-				
+
 		}
 		return children;
-		
+
 	}
+
 	public LayoutableFeature getFirstChild() {
 		if (getChildren().isEmpty())
-			return null;		
+			return null;
 		return getChildren().get(0);
 	}
 
@@ -72,40 +72,36 @@ public class LayoutableFeature {
 		}
 		return null;
 	}
-	
+
 	public boolean hasChildren() {
 		return !getChildren().isEmpty();
 	}
-	
-	public Feature getFeature(){
+
+	public Feature getFeature() {
 		return feature;
 	}
-	
-	public static LinkedList<Feature> convertFeatures(
-			Collection<Feature> features, boolean showHidden){
-		
-		LinkedList<Feature> newFeatures = new LinkedList<Feature>();
-		
-		for(Feature feature : features){
-			if(showHidden) {
-				newFeatures.add(feature);
-			} else {
-				if(!isHidden(feature, showHidden)){
+
+	public static Collection<Feature> convertFeatures(Collection<Feature> features, boolean showHidden) {
+		if (showHidden) {
+			return features;
+		} else {
+			final ArrayList<Feature> newFeatures = new ArrayList<Feature>();
+			for (Feature feature : features) {
+				if (feature.hasHiddenParent()) {
 					newFeatures.add(feature);
 				}
 			}
-				
+			return newFeatures;
 		}
-		return newFeatures;
 	}
 
-	public static boolean isHidden(Feature feature, boolean showHidden){
-			if(showHidden)
-				return false;
-			if(!feature.isRoot())
-				return (feature.isHidden() || isHidden(feature.getParent(), showHidden));
-			 else 
-				return feature.isHidden();
-		}
-	
+	public static boolean isHidden(Feature feature, boolean showHidden) {
+		if (showHidden)
+			return false;
+		if (!feature.isRoot())
+			return (feature.isHidden() || isHidden(feature.getParent(), showHidden));
+		else
+			return feature.isHidden();
+	}
+
 }

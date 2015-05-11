@@ -66,18 +66,17 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 	Combo languageCombo;
 	Button buttonHideLegend;
 	LinkedList<ILanguage> languages = new LinkedList<ILanguage>();
-	
+
 	/* spaces group objects: */
 	Text textMarginX, textMarginY, textFeatureX, textFeatureY, textConstraint;
 
 	/* color group objects: */
-	ColorSelector selectorLegendBackground, selectorConcreteBackground, selectorAbstractBackground, 
-		selectorDeadBackground, selectorLegendBorder, selectorDiagramBackground, selectorConstraint, selectorConnection,
-		selectorWarning;
+	ColorSelector selectorLegendBackground, selectorConcreteBackground, selectorAbstractBackground, selectorDeadBackground, selectorLegendBorder,
+			selectorDiagramBackground, selectorConstraint, selectorConnection, selectorWarning;
 	//selectorHiddenBackground
 	static ColorSelector selectorFeatureBorder;
 	Button buttonHideBorderColor;
-	
+
 	public FMPropertyPage() {
 
 	}
@@ -89,11 +88,11 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 		layout.numColumns = 1;
 		layout.verticalSpacing = 9;
 		composite.setLayout(layout);
-		
+
 		addLegendGroup(composite);
 		addSpacesGroup(composite);
 		addColorGroup(composite);
-//		addExtensionsGroup(composite);
+		//		addExtensionsGroup(composite);
 		return composite;
 	}
 
@@ -103,7 +102,7 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 	private void addLegendGroup(Composite composite) {
 		Group group = createGroup(composite, LEGEND_GROUP_TEXT);
 		getLanguageExtensions();
-		
+
 		Label label = new Label(group, SWT.NULL);
 		label.setText(LEGEND_HIDE_LABEL);
 		buttonHideLegend = new Button(group, SWT.CHECK);
@@ -112,7 +111,7 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 		buttonHideLegend.setSelection(FMPropertyManager.isLegendHidden());
 
 		label = new Label(group, SWT.NULL);
-		label.setText(LEGEND_LANGUAGE_LABEL);		
+		label.setText(LEGEND_LANGUAGE_LABEL);
 		languageCombo = new Combo(group, SWT.READ_ONLY | SWT.DROP_DOWN);
 		languageCombo.setLayoutData(new GridData(GridData.FILL));
 
@@ -129,12 +128,14 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 			i++;
 		}
 
-		selectorLegendBackground = createSelectorEntry(group, LEGEND_BACKGROUND_LABEL, FMPropertyManager.getLegendBackgroundColor().getRGB(), LEGEND_BACKGROUND__TIP);
+		selectorLegendBackground = createSelectorEntry(group, LEGEND_BACKGROUND_LABEL, FMPropertyManager.getLegendBackgroundColor().getRGB(),
+				LEGEND_BACKGROUND__TIP);
 		selectorLegendBorder = createSelectorEntry(group, LEGEND_BORDER_LABEL, FMPropertyManager.getLegendBorderColor().getRGB(), LEGEND_BORDER_TIP);
 	}
 
 	/**
 	 * Creates the group to specify model specific spaces.
+	 * 
 	 * @param composite
 	 */
 	private void addSpacesGroup(Composite composite) {
@@ -149,15 +150,19 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 
 	/**
 	 * Creates the group to specify model specific colors.
+	 * 
 	 * @param composite
 	 */
 	private void addColorGroup(Composite composite) {
 		Group colorGroup = createGroup(composite, COLOR_GROUP_TEXT);
 
-		selectorDiagramBackground = createSelectorEntry(colorGroup, COLOR_DIAGRAM_LABEL,FMPropertyManager.getDiagramBackgroundColor().getRGB(), COLOR_BACKGROUND_TIP);
-		selectorConcreteBackground = createSelectorEntry(colorGroup, COLOR_CONCRETE_LABEL, FMPropertyManager.getConcreteFeatureBackgroundColor().getRGB(), COLOR_CONCRETE_TIP);
-		selectorAbstractBackground = createSelectorEntry(colorGroup, COLOR_ABSTRACT_LABEL, FMPropertyManager.getAbstractFeatureBackgroundColor().getRGB(), COLOR_ABSTRACT_TIP);
-		
+		selectorDiagramBackground = createSelectorEntry(colorGroup, COLOR_DIAGRAM_LABEL, FMPropertyManager.getDiagramBackgroundColor().getRGB(),
+				COLOR_BACKGROUND_TIP);
+		selectorConcreteBackground = createSelectorEntry(colorGroup, COLOR_CONCRETE_LABEL, FMPropertyManager.getConcreteFeatureBackgroundColor().getRGB(),
+				COLOR_CONCRETE_TIP);
+		selectorAbstractBackground = createSelectorEntry(colorGroup, COLOR_ABSTRACT_LABEL, FMPropertyManager.getAbstractFeatureBackgroundColor().getRGB(),
+				COLOR_ABSTRACT_TIP);
+
 		Label label = new Label(colorGroup, SWT.NULL);
 		label.setText(HIDE_BORDER_COLOR);
 		label.setToolTipText(COLOR_CHECKBOX_TIP);
@@ -165,20 +170,20 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 		GridData gd = new GridData(GridData.BEGINNING);
 		buttonHideBorderColor.setLayoutData(gd);
 		buttonHideBorderColor.setSelection(FMPropertyManager.isBorderColorHidden());
-		
+
 		selectorFeatureBorder = createSelectorEntry(colorGroup, COLOR_BORDER, FMPropertyManager.getFeatureBorderColor().getRGB(), COLOR_BORDER_TIP);
-//		selectorHiddenBackground = createSelectorEntry(colorGroup, COLOR_HIDDEN, PersistentPropertyManager.getHiddenFeatureBackgroundColor().getRGB(), COLOR_HIDDEN_TIP);
+		//		selectorHiddenBackground = createSelectorEntry(colorGroup, COLOR_HIDDEN, PersistentPropertyManager.getHiddenFeatureBackgroundColor().getRGB(), COLOR_HIDDEN_TIP);
 		selectorConnection = createSelectorEntry(colorGroup, COLOR_CONNECTION, FMPropertyManager.getConnectionForgroundColor().getRGB(), COLOR_CONNECTION_TIP);
 		selectorConstraint = createSelectorEntry(colorGroup, COLOR_CONSTRAINT, FMPropertyManager.getConstraintBackgroundColor().getRGB(), COLOR_CONSTRAINT_TIP);
 		selectorWarning = createSelectorEntry(colorGroup, COLOR_WARNING, FMPropertyManager.getWarningColor().getRGB(), COLOR_WARNING_TIP);
 		selectorDeadBackground = createSelectorEntry(colorGroup, COLOR_ERROR, FMPropertyManager.getDeadFeatureBackgroundColor().getRGB(), COLOR_DEAD_TIP);
-		
+
 		if (buttonHideBorderColor.getSelection()) {
 			selectorFeatureBorder.setEnabled(true);
 		} else {
 			selectorFeatureBorder.setEnabled(false);
 		}
-		
+
 		buttonHideBorderColor.addSelectionListener(new SelectionListener() {
 
 			@Override
@@ -187,7 +192,8 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 					selectorFeatureBorder.setColorValue(FMPropertyManager.getFeatureBorderColorSave().getRGB());
 					selectorFeatureBorder.setEnabled(true);
 				} else {
-					FMPropertyManager.setFeatureBorderColorSave(GUIBasics.createColor(selectorFeatureBorder.getColorValue().red, selectorFeatureBorder.getColorValue().green, selectorFeatureBorder.getColorValue().blue));
+					FMPropertyManager.setFeatureBorderColorSave(GUIBasics.createColor(selectorFeatureBorder.getColorValue().red,
+							selectorFeatureBorder.getColorValue().green, selectorFeatureBorder.getColorValue().blue));
 					selectorFeatureBorder.setEnabled(false);
 					selectorFeatureBorder.setColorValue(GUIDefaults.CONCRETE_BORDER_COLOR.getRGB());
 				}
@@ -195,30 +201,29 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
-				
+
 			}
-			
+
 		});
 	}
-	
+
 	/**
 	 * Add the export and import buttons to the button group on the bottom of the dialog.
 	 */
 	@Override
 	protected void contributeButtons(Composite buttonBar) {
 		GridLayout layout = new GridLayout();
-        layout.numColumns = 4;
-        layout.marginHeight = 0;
-        layout.marginWidth = 0;
-        layout.makeColumnsEqualWidth = false;
-        buttonBar.setLayout(layout);
-        
+		layout.numColumns = 4;
+		layout.marginHeight = 0;
+		layout.marginWidth = 0;
+		layout.makeColumnsEqualWidth = false;
+		buttonBar.setLayout(layout);
+
 		int widthHint = convertHorizontalDLUsToPixels(IDialogConstants.BUTTON_WIDTH);
 		Button importButton = new Button(buttonBar, SWT.PUSH);
 		importButton.setText("Import");
 		GridData data = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
-		Point minButtonSize = importButton.computeSize(SWT.DEFAULT,
-				SWT.DEFAULT, true);
+		Point minButtonSize = importButton.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
 		data.widthHint = Math.max(widthHint, minButtonSize.x);
 		importButton.setLayoutData(data);
 		importButton.addSelectionListener(new SelectionAdapter() {
@@ -227,11 +232,10 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 			}
 		});
 
-        Button exportButton = new Button(buttonBar, SWT.PUSH);
-        exportButton.setText("Export");
+		Button exportButton = new Button(buttonBar, SWT.PUSH);
+		exportButton.setText("Export");
 		data = new GridData(GridData.HORIZONTAL_ALIGN_FILL);
-		minButtonSize = exportButton.computeSize(SWT.DEFAULT, SWT.DEFAULT,
-				true);
+		minButtonSize = exportButton.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
 		data.widthHint = Math.max(widthHint, minButtonSize.x);
 		exportButton.setLayoutData(data);
 		exportButton.addSelectionListener(new SelectionAdapter() {
@@ -243,25 +247,26 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 	}
 
 	private void performImport() {
-		FileDialog importDialog = new FileDialog(new Shell(),SWT.OPEN);
+		FileDialog importDialog = new FileDialog(new Shell(), SWT.OPEN);
 		if (importDialog.open() != null) {
 			new SettingsImport(new File(importDialog.getFilterPath() + "\\" + importDialog.getFileName()));
 			update();
 		}
 	}
-	
+
 	private void performExport() {
 		applySettings();
-		FileDialog exportDialog = new FileDialog(new Shell(),SWT.SAVE);
+		FileDialog exportDialog = new FileDialog(new Shell(), SWT.SAVE);
 		exportDialog.setFilterPath(FMPropertyManager.workspaceRoot.getLocation().toOSString());
 		exportDialog.setFilterIndex(0);
 		if (exportDialog.open() != null) {
 			new SettingsExport(new File(exportDialog.getFilterPath() + "\\" + exportDialog.getFileName()));
 		}
 	}
-	
+
 	/**
 	 * Creates a new {@link Group}
+	 * 
 	 * @param composite The composite of the group
 	 * @param text The label of the group
 	 * @return The created group
@@ -275,17 +280,17 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 		group.setLayout(layout);
 		return group;
 	}
-	
+
 	/**
 	 * Creates a label and a {@link Text} with the given parameters.
+	 * 
 	 * @param group The group containing the text field
 	 * @param labelText The text of the label
 	 * @param value The numerical entry of the text filed
-	 * @param toolTipText 
+	 * @param toolTipText
 	 * @return The created text field
 	 */
-	private Text createTextEntry(Group group, String labelText,
-			int value, String toolTipText) {
+	private Text createTextEntry(Group group, String labelText, int value, String toolTipText) {
 		Label label = new Label(group, SWT.NULL);
 		label.setText(labelText);
 		label.setToolTipText(toolTipText);
@@ -294,16 +299,16 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 		text.setText(Integer.toString(value));
 		return text;
 	}
-	
+
 	/**
 	 * Creates a label and a {@link ColorSelector} with the given parameters.
+	 * 
 	 * @param group The group containing the ColorSelecotr
 	 * @param labelText The text of the label
 	 * @param rgb The value of the color selector
 	 * @return The created ColorSelector
 	 */
-	private ColorSelector createSelectorEntry(Group group,
-			String labelText, RGB rgb, String toolTipText) {
+	private ColorSelector createSelectorEntry(Group group, String labelText, RGB rgb, String toolTipText) {
 		Label label = new Label(group, SWT.NULL);
 		label.setText(labelText);
 		label.setToolTipText(toolTipText);
@@ -322,13 +327,13 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 		applySettings();
 		return super.performOk();
 	}
-	
+
 	@Override
 	protected void performApply() {
 		applySettings();
 		super.performApply();
 	}
-	
+
 	private void applySettings() {
 		FMPropertyManager.reset();
 		performLegendGroup();
@@ -357,7 +362,7 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 		FMPropertyManager.setFeatureSpaceY(Integer.parseInt(textFeatureY.getText()) + SPECES_FEATURE_X_ADJUST);
 		FMPropertyManager.setConstraintSpace(Integer.parseInt(textConstraint.getText()) + SPECES_CONSTRAIT_ADJUST);
 	}
-	
+
 	/**
 	 * Saves the selected values for: feature group
 	 */
@@ -365,7 +370,7 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 		FMPropertyManager.setDiagramBackgroundColor(new Color(null, selectorDiagramBackground.getColorValue()));
 		FMPropertyManager.setConcreteFeatureBackgroundColor(new Color(null, selectorConcreteBackground.getColorValue()));
 		FMPropertyManager.setAbstractFeatureBackgroundColor(new Color(null, selectorAbstractBackground.getColorValue()));
-//		PersistentPropertyManager.setHiddenFeatureBackgroundColor(new Color(null, selectorHiddenBackground.getColorValue()));
+		//		PersistentPropertyManager.setHiddenFeatureBackgroundColor(new Color(null, selectorHiddenBackground.getColorValue()));
 		FMPropertyManager.setDeadFeatureBackgroundColor(new Color(null, selectorDeadBackground.getColorValue()));
 		FMPropertyManager.setConstraintBackgroundColor(new Color(null, selectorConstraint.getColorValue()));
 		FMPropertyManager.setConnectionForgroundColor(new Color(null, selectorConnection.getColorValue()));
@@ -391,7 +396,7 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 		selectorLegendBorder.setColorValue(LEGEND_BORDER_COLOR.getRGB());
 		selectorLegendBackground.setColorValue(LEGEND_BACKGROUND.getRGB());
 	}
-	
+
 	/**
 	 * Sets the default values at: spaces group.
 	 */
@@ -402,7 +407,7 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 		textFeatureY.setText(Integer.toString(FEATURE_SPACE_Y - SPECES_FEATURE_X_ADJUST));
 		textConstraint.setText(Integer.toString(CONSTRAINT_SPACE_Y - SPECES_CONSTRAIT_ADJUST));
 	}
-	
+
 	/**
 	 * Sets the default values at: feature group.
 	 */
@@ -410,7 +415,7 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 		selectorDiagramBackground.setColorValue(DIAGRAM_BACKGROUND.getRGB());
 		selectorConcreteBackground.setColorValue(CONCRETE_BACKGROUND.getRGB());
 		selectorAbstractBackground.setColorValue(ABSTRACT_BACKGROUND.getRGB());
-//		selectorHiddenBackground.setColorValue(HIDDEN_BACKGROUND.getRGB());
+		//		selectorHiddenBackground.setColorValue(HIDDEN_BACKGROUND.getRGB());
 		selectorDeadBackground.setColorValue(DEAD_BACKGROUND.getRGB());
 		selectorConstraint.setColorValue(CONSTRAINT_BACKGROUND.getRGB());
 		selectorConnection.setColorValue(CONNECTION_FOREGROUND.getRGB());
@@ -419,14 +424,13 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 		selectorFeatureBorder.setEnabled(false);
 		buttonHideBorderColor.setSelection(false);
 	}
-	
+
 	/**
-	 * Fills the List "languages" with all defines languages at the extension point 
+	 * Fills the List "languages" with all defines languages at the extension point
 	 * "de.ovgu.featureide.fm.core.language".
 	 */
 	private void getLanguageExtensions() {
-		IConfigurationElement[] config = Platform.getExtensionRegistry()
-				.getConfigurationElementsFor(FMUIPlugin.PLUGIN_ID + ".language");
+		IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(FMUIPlugin.PLUGIN_ID + ".language");
 		try {
 			for (IConfigurationElement e : config) {
 				final Object o = e.createExecutableExtension("class");
@@ -438,7 +442,7 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 			FMCorePlugin.getDefault().logError(e);
 		}
 	}
-	
+
 	private void update() {
 		updateLegendGroup();
 		updateSpecesGroup();
@@ -462,7 +466,7 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 		selectorLegendBorder.setColorValue(FMPropertyManager.getLegendBorderColor().getRGB());
 		selectorLegendBackground.setColorValue(FMPropertyManager.getLegendBackgroundColor().getRGB());
 	}
-	
+
 	/**
 	 * Sets the default values at: spaces group.
 	 */
@@ -473,7 +477,7 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 		textFeatureY.setText(Integer.toString(FMPropertyManager.getFeatureSpaceY() - SPECES_FEATURE_X_ADJUST));
 		textConstraint.setText(Integer.toString(FMPropertyManager.getConstraintSpace() - SPECES_CONSTRAIT_ADJUST));
 	}
-	
+
 	/**
 	 * Sets the default values at: feature group.
 	 */
@@ -481,7 +485,7 @@ public class FMPropertyPage extends PropertyPage implements IFMPropertyPage, GUI
 		selectorDiagramBackground.setColorValue(FMPropertyManager.getDiagramBackgroundColor().getRGB());
 		selectorConcreteBackground.setColorValue(FMPropertyManager.getConcreteFeatureBackgroundColor().getRGB());
 		selectorAbstractBackground.setColorValue(FMPropertyManager.getAbstractFeatureBackgroundColor().getRGB());
-//		selectorHiddenBackground.setColorValue(PersistentPropertyManager.getHiddenFeatureBackgroundColor().getRGB());
+		//		selectorHiddenBackground.setColorValue(PersistentPropertyManager.getHiddenFeatureBackgroundColor().getRGB());
 		selectorDeadBackground.setColorValue(FMPropertyManager.getDeadFeatureBackgroundColor().getRGB());
 		selectorConstraint.setColorValue(FMPropertyManager.getConstraintBackgroundColor().getRGB());
 		selectorConnection.setColorValue(FMPropertyManager.getConnectionForgroundColor().getRGB());

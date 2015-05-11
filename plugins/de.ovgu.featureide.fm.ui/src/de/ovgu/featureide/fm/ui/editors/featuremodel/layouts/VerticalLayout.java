@@ -20,9 +20,11 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.layouts;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.ListIterator;
 
-import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 
 import de.ovgu.featureide.fm.core.Feature;
@@ -35,138 +37,73 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * 
  * @author David Halm
  * @author Patrick Sulkowski
+ * @author Sebastian Krieter
  */
 public class VerticalLayout extends FeatureDiagramLayoutManager {
-	
-	private LinkedList<LinkedList<LayoutableFeature>> levelList = new LinkedList<LinkedList<LayoutableFeature>>();
-	private int highestLevel = 0;
-	private int height = 0;
-	private int yOffset = 0;
-	private LinkedList<Integer> positionsX = new LinkedList<Integer>();
-	private LinkedList<Integer> positionsY = new LinkedList<Integer>();
-	private LinkedList<Integer> maxFeatureWidthOnLevel = new LinkedList<Integer>();
-	private int childlessNum = 0;
-	
-	/**
-	 * @param manager
-	 */
-	public VerticalLayout() {
-		super();
-	}
+
+	private static final int featureSpaceX = 32;
+	private static final int featureSpaceY = 8;
+
+	private final ArrayList<Integer> levelWidth = new ArrayList<>();
+
+	private int heightStep;
+	private int height;
 
 	public void layoutFeatureModel(FeatureModel featureModel) {
-		LayoutableFeature root = new LayoutableFeature(featureModel.getRoot(), showHidden);
-		
-		createLevelList(root, 0);
-		calculateLevelXPositions();	
-		getYcenterForChildlessFeatures();
-		centerChildren(root,0);
-		centerOther(highestLevel);
-		layout(yOffset, featureModel.getConstraints());
+		heightStep = FeatureUIHelper.getSize(featureModel.getRoot()).height + featureSpaceY;
+		height = FMPropertyManager.getLayoutMarginX() - heightStep;
+
+		calculateLevelWidth(featureModel.getRoot());
+		centerOther(featureModel.getRoot(), 0);
+		layout(height, featureModel.getConstraints());
 	}
-	
-	/**
-	 * calculates positions for each level (horizontal)
-	 * 
-	 */
-	private void calculateLevelXPositions(){	
-		int width = 0;
-		for(int i = 0; i <= highestLevel; i++){
-			width += maxFeatureWidthOnLevel.get(i)+FMPropertyManager.getFeatureSpaceY();
-		}
-		width -= FMPropertyManager.getFeatureSpaceY();
-		positionsX.add((controlWidth - width) /2);
-		for(int i = 1; i <= highestLevel; i++){
-			positionsX.add(positionsX.get(i-1)+maxFeatureWidthOnLevel.get(i-1)+FMPropertyManager.getFeatureSpaceY());
-		}
-	}
-	
-	/**
-	 * creates lists of features for every level
-	 */
-	private void createLevelList(LayoutableFeature feature, int level){
-		Feature f = feature.getFeature();
-		if (f == null) {
-			return;
-		}
-		Dimension size = FeatureUIHelper.getSize(f);
-		
-		if(level > highestLevel){
-			highestLevel = level;
-		}
-		if(levelList.size()-1 >= level){
-			levelList.get(level).add(feature);
-			if(maxFeatureWidthOnLevel.get(level) < size.width){
-				maxFeatureWidthOnLevel.set(level, size.width);
-			}
-		} else {
-			LinkedList<LayoutableFeature> subLevelList = new LinkedList<LayoutableFeature>();
-			subLevelList.add(feature);
-			levelList.add(subLevelList);
-			maxFeatureWidthOnLevel.add(size.width);
-		}
-		if(!feature.hasChildren()){
-			positionsY.add(height);
-			height += size.height+FMPropertyManager.getFeatureSpaceX();
-		}
-		for(LayoutableFeature next : feature.getChildren()){
-			createLevelList(next,level+1);
-		}
-	}
-	
-	/**
-	 * calculates positions for each child (vertical)
-	 * 
-	 */
-	private void getYcenterForChildlessFeatures(){
-		height -= FMPropertyManager.getFeatureSpaceX();
-		for(int i = 0; i < positionsY.size(); i++){
-			int newPos =  positionsY.get(i)+(controlHeight/2-height/2);
-			positionsY.set(i,newPos);
-		}
-	}
-	
-	/**
-	 * positions of features that have no more children are set
-	 * 
-	 */
-	private void centerChildren(LayoutableFeature feature, int level){
-			
-		if(feature.hasChildren()){
-			for(LayoutableFeature child : feature.getChildren()){
-				centerChildren(child, level+1);
-			}
-		} else {
-			Feature f = feature.getFeature();
-			FeatureUIHelper.setLocation(f, new Point (positionsX.get(level),
-					positionsY.get(childlessNum)));
-			childlessNum++;
-			yOffset = FeatureUIHelper.getLocation(f).y
-					+ FeatureUIHelper.getSize(f).height
-					+ FMPropertyManager.getFeatureSpaceX();
-		}
-		
-	}
-	
+
 	/**
 	 * positions of features that have children are now set from right to left (for each level)
 	 * (centered by their children's positions
-	 * 
-	 */	
-	private void centerOther(int level) {
-		for(int i = 0; i < levelList.get(level).size(); i++){
-			LayoutableFeature feature = levelList.get(level).get(i);
-			
-			if(feature.hasChildren()){				
-				int yPos = (FeatureUIHelper.getLocation(feature.getFirstChild().getFeature()).y
-						+ FeatureUIHelper.getLocation(feature.getLastChild().getFeature()).y) / 2;
-				FeatureUIHelper.setLocation(feature.getFeature(), new Point (positionsX.get(level),yPos));
+	 */
+	private int centerOther(Feature parent, int level) {
+		final LinkedList<Feature> children = parent.getChildren();
+		if (children.isEmpty()) {
+			height += heightStep;
+			FeatureUIHelper.setLocation(parent, new Point(levelWidth.get(level), height));
+			return height;
+		} else {
+			final Iterator<Feature> it = children.iterator();
+			final int min = centerOther(it.next(), level + 1);
+			int max = min;
+			while (it.hasNext()) {
+				max = centerOther(it.next(), level + 1);
 			}
-			
-		}
-		if(level != 0){
-			centerOther(level-1);
+
+			final int yPos = (min + max) >> 1;
+			FeatureUIHelper.setLocation(parent, new Point(levelWidth.get(level), yPos));
+			return yPos;
 		}
 	}
-		
+
+	private void calculateLevelWidth(Feature root) {
+		calculateLevelWidth(root, 0);
+		final ListIterator<Integer> it = levelWidth.listIterator();
+		int maxWidth = FMPropertyManager.getLayoutMarginX();
+		do {
+			final int curWidth = it.next();
+			it.set(maxWidth);
+			maxWidth += curWidth + featureSpaceX;
+		} while (it.hasNext());
+	}
+
+	private void calculateLevelWidth(Feature parent, int level) {
+		final int parentWidth = FeatureUIHelper.getSize(parent).width;
+		if (level >= levelWidth.size()) {
+			levelWidth.add(parentWidth);
+		} else if (levelWidth.get(level) < parentWidth) {
+			levelWidth.set(level, parentWidth);
+		}
+
+		for (Feature feature : parent.getChildren()) {
+			calculateLevelWidth(feature, level + 1);
+		}
+	}
+
 }

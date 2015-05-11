@@ -34,6 +34,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.FeatureFigure;
 
 /**
  * Extension point of the FeatureDiagram.
+ * 
  * @see de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor
  * @author Jens Meinicke
  */
@@ -41,16 +42,18 @@ public class FeatureDiagramExtension {
 
 	/**
 	 * Extends the context menu.
+	 * 
 	 * @param menu the context menu
 	 * @param featureDiagramEditor the feature diagram editor
 	 * @see de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor
 	 */
-	public void extendContextMenu(IMenuManager menu, FeatureDiagramEditor featureDiagramEditor){
-		
+	public void extendContextMenu(IMenuManager menu, FeatureDiagramEditor featureDiagramEditor) {
+
 	}
-	
+
 	/**
 	 * Extends the tool tip of the feature figure.
+	 * 
 	 * @param toolTipContent the original tool tip
 	 * @param figure the feature figure
 	 * @return the revised tool tip
@@ -62,6 +65,7 @@ public class FeatureDiagramExtension {
 
 	/**
 	 * Extends the tool tip of the connection part.
+	 * 
 	 * @param toolTipContent the original tool tip
 	 * @param connectionEditPart the connection edit part
 	 * @return the revised tool tip
@@ -70,17 +74,15 @@ public class FeatureDiagramExtension {
 	public Figure extendConnectionToolTip(Figure toolTipContent, ConnectionEditPart connectionEditPart) {
 		return toolTipContent;
 	}
-	
+
 	/**
-	 * @return all extensions of the feature diagram 
+	 * @return all extensions of the feature diagram
 	 * @see de.ovgu.featureide.fm.ui.FeatureDiagram
 	 */
 	public static LinkedList<FeatureDiagramExtension> getExtensions() {
 		LinkedList<FeatureDiagramExtension> extensions = new LinkedList<FeatureDiagramExtension>();
 
-		IConfigurationElement[] config = Platform.getExtensionRegistry()
-				.getConfigurationElementsFor(
-						FMUIPlugin.PLUGIN_ID + ".FeatureDiagram");
+		IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(FMUIPlugin.PLUGIN_ID + ".FeatureDiagram");
 		try {
 			for (IConfigurationElement e : config) {
 				final Object o = e.createExecutableExtension("class");

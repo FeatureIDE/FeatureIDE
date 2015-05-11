@@ -34,13 +34,13 @@ import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 public class ExportFeatureModelAction extends Action {
 
 	private final FeatureModelEditor featureModelEditor;
-		
+
 	public ExportFeatureModelAction(FeatureModelEditor featureModelEditor) {
 		super("Export As");
 		this.featureModelEditor = featureModelEditor;
 		setEnabled(true);
 	}
-	
+
 	public void run() {
 		this.featureModelEditor.doSaveAs();
 	}

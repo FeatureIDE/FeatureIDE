@@ -56,16 +56,14 @@ public class FeatureDragAndDropCommand extends Command {
 	private Feature newParent;
 
 	private int newIndex;
-	
+
 	private boolean hasAutoLayout;
-	
+
 	private boolean hasVerticalLayout;
-	
+
 	private FeatureEditPart editPart;
 
-
-	public FeatureDragAndDropCommand(FeatureModel featureModel,
-			Feature feature, Point newLocation,FeatureEditPart editPart) {
+	public FeatureDragAndDropCommand(FeatureModel featureModel, Feature feature, Point newLocation, FeatureEditPart editPart) {
 		super("Moving " + feature.getName());
 		this.featureModel = featureModel;
 		this.feature = feature;
@@ -79,13 +77,12 @@ public class FeatureDragAndDropCommand extends Command {
 
 	@Override
 	public boolean canExecute() {
-	
-		if(hasAutoLayout){
-			if(editPart.getSelected()!=2){
+
+		if (hasAutoLayout) {
+			if (editPart.getSelected() != 2) {
 				return false;
 			}
-			Point referencePoint = FeatureUIHelper.getSourceLocation(feature,
-					newLocation);
+			Point referencePoint = FeatureUIHelper.getSourceLocation(feature, newLocation);
 			Feature next = calculateNext(featureModel.getRoot(), referencePoint);
 
 			// calculate new parent (if exists)
@@ -108,36 +105,30 @@ public class FeatureDragAndDropCommand extends Command {
 
 	@Override
 	public void execute() {
-			FeatureOperationData data = new FeatureOperationData(feature,
-					oldParent, newParent, newIndex, oldIndex);
-			FeatureMoveOperation op = new FeatureMoveOperation(data, featureModel, newLocation, 
-					FeatureUIHelper.getLocation(feature).getCopy(), feature);
-			op.addContext((ObjectUndoContext) featureModel.getUndoContext());
+		FeatureOperationData data = new FeatureOperationData(feature, oldParent, newParent, newIndex, oldIndex);
+		FeatureMoveOperation op = new FeatureMoveOperation(data, featureModel, newLocation, FeatureUIHelper.getLocation(feature).getCopy(), feature);
+		op.addContext((ObjectUndoContext) featureModel.getUndoContext());
 
-			try {
-				PlatformUI.getWorkbench().getOperationSupport()
-						.getOperationHistory().execute(op, null, null);
-			} catch (ExecutionException e) {
-				FMUIPlugin.getDefault().logError(e);
+		try {
+			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
+		} catch (ExecutionException e) {
+			FMUIPlugin.getDefault().logError(e);
 
-			}
+		}
 	}
 
 	private boolean calculateNewParentAndIndex(Feature next) {
-		Point location = FeatureUIHelper
-				.getSourceLocation(feature, newLocation);
+		Point location = FeatureUIHelper.getSourceLocation(feature, newLocation);
 		Point nextLocation = FeatureUIHelper.getTargetLocation(next);
 		Dimension d = location.getDifference(nextLocation);
-		if(!hasVerticalLayout){
+		if (!hasVerticalLayout) {
 			if (d.height > 0) {
 				// insert below
 				newParent = next;
 				newIndex = 0;
 				for (Feature child : next.getChildren()) {
-					Dimension cd = FeatureUIHelper.getSourceLocation(child)
-							.getDifference(nextLocation);
-					if (d.width / (double) d.height <= cd.width
-							/ (double) cd.height)
+					Dimension cd = FeatureUIHelper.getSourceLocation(child).getDifference(nextLocation);
+					if (d.width / (double) d.height <= cd.width / (double) cd.height)
 						break;
 					else
 						newIndex++;
@@ -156,8 +147,7 @@ public class FeatureDragAndDropCommand extends Command {
 				}
 			}
 
-			if (newParent == oldParent
-					&& oldParent.getChildIndex(feature) < newIndex)
+			if (newParent == oldParent && oldParent.getChildIndex(feature) < newIndex)
 				newIndex--;
 
 			return true;
@@ -167,10 +157,8 @@ public class FeatureDragAndDropCommand extends Command {
 				newParent = next;
 				newIndex = 0;
 				for (Feature child : next.getChildren()) {
-					Dimension cd = FeatureUIHelper.getSourceLocation(child)
-							.getDifference(nextLocation);
-					if (d.height / (double) d.width <= cd.height
-							/ (double) cd.width)
+					Dimension cd = FeatureUIHelper.getSourceLocation(child).getDifference(nextLocation);
+					if (d.height / (double) d.width <= cd.height / (double) cd.width)
 						break;
 					else
 						newIndex++;
@@ -189,25 +177,22 @@ public class FeatureDragAndDropCommand extends Command {
 				}
 			}
 
-			if (newParent == oldParent
-					&& oldParent.getChildIndex(feature) < newIndex)
+			if (newParent == oldParent && oldParent.getChildIndex(feature) < newIndex)
 				newIndex--;
 
 			return true;
 		}
-		
+
 	}
 
 	public static Feature calculateNext(Feature feature, Point referencePoint) {
 		if (feature == null)
 			return null;
 		Feature next = feature;
-		double distance = FeatureUIHelper.getTargetLocation(next).getDistance(
-				referencePoint);
+		double distance = FeatureUIHelper.getTargetLocation(next).getDistance(referencePoint);
 		for (Feature child : feature.getChildren()) {
 			Feature childsNext = calculateNext(child, referencePoint);
-			double newDistance = FeatureUIHelper.getTargetLocation(childsNext)
-					.getDistance(referencePoint);
+			double newDistance = FeatureUIHelper.getTargetLocation(childsNext).getDistance(referencePoint);
 			if (newDistance > 0 && newDistance < distance) {
 				next = childsNext;
 				distance = newDistance;
@@ -221,7 +206,7 @@ public class FeatureDragAndDropCommand extends Command {
 	}
 
 	public Feature getNewParent() {
-	
+
 		return newParent;
 	}
 

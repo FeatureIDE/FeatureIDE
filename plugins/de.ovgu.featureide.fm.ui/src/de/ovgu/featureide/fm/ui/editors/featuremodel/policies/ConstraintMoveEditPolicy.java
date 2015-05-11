@@ -54,8 +54,7 @@ public class ConstraintMoveEditPolicy extends NonResizableEditPolicy {
 
 	private ModelLayoutEditPolicy superPolicy;
 
-	public ConstraintMoveEditPolicy(ConstraintEditPart child,
-			ModelLayoutEditPolicy superPolicy) {
+	public ConstraintMoveEditPolicy(ConstraintEditPart child, ModelLayoutEditPolicy superPolicy) {
 		this.editPart = child;
 		this.superPolicy = superPolicy;
 	}
@@ -73,8 +72,7 @@ public class ConstraintMoveEditPolicy extends NonResizableEditPolicy {
 		r.setForegroundColor(ColorConstants.white);
 		r.setBounds(getInitialFeedbackBounds());
 
-		Point s = FeatureUIHelper.getLocation(editPart.getConstraintModel())
-				.getCopy();
+		Point s = FeatureUIHelper.getLocation(editPart.getConstraintModel()).getCopy();
 		getHostFigure().translateToAbsolute(s);
 
 		c = new PolylineConnection();
@@ -94,8 +92,7 @@ public class ConstraintMoveEditPolicy extends NonResizableEditPolicy {
 		// call createDragSourceFeedbackFigure on start of the move
 		getDragSourceFeedbackFigure();
 
-		PrecisionRectangle rect = new PrecisionRectangle(
-				getInitialFeedbackBounds().getCopy());
+		PrecisionRectangle rect = new PrecisionRectangle(getInitialFeedbackBounds().getCopy());
 		getHostFigure().translateToAbsolute(rect);
 		rect.translate(request.getMoveDelta());
 		rect.resize(request.getSizeDelta());
@@ -103,8 +100,7 @@ public class ConstraintMoveEditPolicy extends NonResizableEditPolicy {
 		r.setBounds(rect);
 
 		if (superPolicy.getConstraintCommand() instanceof ConstraintDragAndDropCommand) {
-			ConstraintDragAndDropCommand cmd = (ConstraintDragAndDropCommand) superPolicy
-					.getConstraintCommand();
+			ConstraintDragAndDropCommand cmd = (ConstraintDragAndDropCommand) superPolicy.getConstraintCommand();
 
 			if (cmd.canExecute()) {
 				c.setForegroundColor(ColorConstants.black);

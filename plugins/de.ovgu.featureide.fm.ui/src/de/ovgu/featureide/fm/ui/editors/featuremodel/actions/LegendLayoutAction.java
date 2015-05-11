@@ -31,7 +31,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
 
 /**
  * Switches auto-layout function for the feature model legend.
- *   
+ * 
  * @author Fabian Benduhn
  */
 public class LegendLayoutAction extends Action {
@@ -39,14 +39,12 @@ public class LegendLayoutAction extends Action {
 	private FeatureModel featureModel;
 	private ISelectionChangedListener listener = new ISelectionChangedListener() {
 		public void selectionChanged(SelectionChangedEvent event) {
-			IStructuredSelection selection = (IStructuredSelection) event
-					.getSelection();
+			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
 			setEnabled(isValidSelection(selection));
 		}
 	};
 
-	public LegendLayoutAction(GraphicalViewerImpl viewer,
-			FeatureModel featuremodel) {
+	public LegendLayoutAction(GraphicalViewerImpl viewer, FeatureModel featuremodel) {
 		super("Auto-Layout Legend");
 		this.featureModel = featuremodel;
 		this.setEnabled(false);

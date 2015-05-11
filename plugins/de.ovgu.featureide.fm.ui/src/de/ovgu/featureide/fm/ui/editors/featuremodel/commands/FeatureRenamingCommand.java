@@ -35,11 +35,11 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureRenamingO
  * @author Thomas Thuem
  */
 public class FeatureRenamingCommand extends Command {
-	
+
 	private final FeatureModel featureModel;
 
 	private final String oldName;
-	
+
 	private final String newName;
 
 	public FeatureRenamingCommand(FeatureModel featureModel, String oldName, String newName) {
@@ -48,7 +48,7 @@ public class FeatureRenamingCommand extends Command {
 		this.oldName = oldName;
 		this.newName = newName;
 	}
-	
+
 	@Override
 	public boolean canExecute() {
 		if (newName == null)
@@ -57,19 +57,18 @@ public class FeatureRenamingCommand extends Command {
 			return false;
 		return featureModel.getFMComposerExtension().isValidFeatureName(newName);
 	}
-	
+
 	@Override
 	public void execute() {
 		FeatureRenamingOperation op = new FeatureRenamingOperation(featureModel, oldName, newName);
 		op.addContext((IUndoContext) featureModel.getUndoContext());
-		
+
 		try {
-			PlatformUI.getWorkbench().getOperationSupport()
-					.getOperationHistory().execute(op, null, null);
+			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (ExecutionException e) {
-		FMUIPlugin.getDefault().logError(e);
-			
+			FMUIPlugin.getDefault().logError(e);
+
 		}
 	}
-	
+
 }

@@ -44,8 +44,7 @@ public class FeatureChangeGroupTypeOperation extends AbstractFeatureModelOperati
 	 * Grouptype of feature will be set to groupType when this operation is
 	 * executed
 	 */
-	public FeatureChangeGroupTypeOperation(int groupType, Feature feature,
-			FeatureModel featureModel) {
+	public FeatureChangeGroupTypeOperation(int groupType, Feature feature, FeatureModel featureModel) {
 		super(featureModel, LABEL);
 		this.groupType = groupType;
 		this.oldGroupType = getGroupType(feature);

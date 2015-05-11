@@ -32,7 +32,7 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * @author Thomas Thuem
  */
 public class DepthFirstLayout extends FeatureDiagramLayoutManager {
-	
+
 	/**
 	 * @param manager
 	 */
@@ -41,23 +41,23 @@ public class DepthFirstLayout extends FeatureDiagramLayoutManager {
 	}
 
 	int yoffset;
-	
+
 	@Override
 	public void layoutFeatureModel(FeatureModel featureModel) {
 		yoffset = 0;
 		LayoutableFeature root = new LayoutableFeature(featureModel.getRoot(), showHidden);
 		depthFirstLayout(root, 0, FMPropertyManager.getLayoutMarginX());
-		yoffset=yoffset+FMPropertyManager.getFeatureSpaceX();
+		yoffset = yoffset + FMPropertyManager.getFeatureSpaceX();
 		layout(yoffset, featureModel.getConstraints());
 	}
 
 	private int depthFirstLayout(LayoutableFeature feature, int level, int x) {
-		FeatureUIHelper.setLocation(feature.getFeature(),new Point(x, FMPropertyManager.getLayoutMarginY() + level*FMPropertyManager.getFeatureSpaceY()));
+		FeatureUIHelper.setLocation(feature.getFeature(), new Point(x, FMPropertyManager.getLayoutMarginY() + level * FMPropertyManager.getFeatureSpaceY()));
 		int newX = x;
-		if(yoffset< FMPropertyManager.getLayoutMarginY() + level*FMPropertyManager.getFeatureSpaceY())
-			yoffset = FMPropertyManager.getLayoutMarginY() + level*FMPropertyManager.getFeatureSpaceY();
+		if (yoffset < FMPropertyManager.getLayoutMarginY() + level * FMPropertyManager.getFeatureSpaceY())
+			yoffset = FMPropertyManager.getLayoutMarginY() + level * FMPropertyManager.getFeatureSpaceY();
 		for (LayoutableFeature child : feature.getChildren()) {
-			newX = depthFirstLayout(child, level + 1, newX);			
+			newX = depthFirstLayout(child, level + 1, newX);
 		}
 		return Math.max(newX, x + FeatureUIHelper.getSize(feature.getFeature()).width + FMPropertyManager.getFeatureSpaceX());
 	}

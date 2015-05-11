@@ -31,13 +31,17 @@ import de.ovgu.featureide.core.signature.filter.IFilter;
  */
 public class ContextMerger extends ADocumentationCommentMerger {
 
+	private static final long serialVersionUID = 2811545559986504025L;
+	
+	private static final class BlockTagFilter implements IFilter<BlockTag> {
+		@Override
+		public boolean isValid(BlockTag blockTag) {
+			return blockTag.isFeatureIndependent() || blockTag.getPriority() >= 0;
+		}
+	}
+
 	public ContextMerger() {
-		addFilter(new IFilter<BlockTag>() {
-			@Override
-			public boolean isValid(BlockTag blockTag) {
-				return blockTag.isFeatureIndependent() || blockTag.getPriority() >= 0;
-			}
-		});
+		addFilter(new BlockTagFilter());
 	}
 
 	@Override

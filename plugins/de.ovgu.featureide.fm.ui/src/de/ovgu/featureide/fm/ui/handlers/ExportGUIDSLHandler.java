@@ -35,12 +35,13 @@ import de.ovgu.featureide.fm.ui.handlers.base.AbstractExportHandler;
  * @author Sebastian Krieter
  */
 public class ExportGUIDSLHandler extends AbstractExportHandler {
-	
+
 	@Override
 	protected IFeatureModelWriter getFeatureModelWriter(FeatureModel fm) {
 		final GuidslWriter fmWriter = new GuidslWriter(fm);
-		if (fmWriter.hasConcreteCompounds() && !MessageDialog.openQuestion(new Shell(), "Warning!", 
-				"The current feature model cannot be transformed due to concrete compounds! Proceed? (all compound features will be set as abstract)")) {
+		if (fmWriter.hasConcreteCompounds()
+				&& !MessageDialog.openQuestion(new Shell(), "Warning!",
+						"The current feature model cannot be transformed due to concrete compounds! Proceed? (all compound features will be set as abstract)")) {
 			return null;
 		}
 		return fmWriter;

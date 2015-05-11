@@ -31,12 +31,12 @@ import de.ovgu.featureide.fm.core.FeatureModel;
  * @author Stefan Krueger
  */
 public class TautologyContraintsCalculationsAction extends Action {
-	
+
 	private final FeatureModel featureModel;
-	
+
 	public TautologyContraintsCalculationsAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
 		super("Calculate Tautology Constraints");
-		this.featureModel = featureModel;	
+		this.featureModel = featureModel;
 		setChecked(featureModel.getAnalyser().calculateTautologyConstraints);
 	}
 

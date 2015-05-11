@@ -38,7 +38,7 @@ import org.prop4j.SatSolver;
  * @author Florian Proksch
  * @author Stefan Krueger
  */
-public class Constraint implements PropertyConstants {
+public class Constraint implements PropertyConstants, IGraphicItem {
 
 	private FeatureModel featureModel;
 	private Node propNode;
@@ -75,21 +75,15 @@ public class Constraint implements PropertyConstants {
 	 * @return The dead features caused by this constraint
 	 */
 	public Collection<Feature> getDeadFeatures(SatSolver solver, FeatureModel fm, Collection<Feature> fmDeadFeatures) {
-		Collection<Feature> deadFeatures;
-		Node propNode = this.getNode();
-		Comparator<Feature> featComp = new Comparator<Feature>() {
-			@Override
-			public int compare(Feature o1, Feature o2) {
-				return o1.getName().compareTo(o2.getName());
-			}
-		};
+		final Collection<Feature> deadFeatures;
+		final Node propNode = this.getNode();
+		final Comparator<Feature> featComp = new FeatureComparator(true);
 		if (propNode != null) {
 			deadFeatures = fm.getAnalyser().getDeadFeatures(solver, propNode);
 		} else {
 			deadFeatures = new TreeSet<Feature>(featComp);
 		}
-
-		Collection<Feature> deadFeaturesAfter = new TreeSet<Feature>(featComp);
+		final Collection<Feature> deadFeaturesAfter = new TreeSet<Feature>(featComp);
 
 		deadFeaturesAfter.addAll(fmDeadFeatures);
 		deadFeaturesAfter.retainAll(deadFeatures);
@@ -253,6 +247,11 @@ public class Constraint implements PropertyConstants {
 	 */
 	public Collection<Feature> getDeadFeatures() {
 		return deadFeatures;
+	}
+	
+	@Override
+	public GraphicItem getItemType() {
+		return GraphicItem.Constraint;
 	}
 
 }

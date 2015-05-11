@@ -36,33 +36,33 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AutoLayoutConstr
 
 /**
  * Action to switch auto-layout for contraints on/off.
+ * 
  * @author David Halm
  * @author Patrick Sulkowski
  */
 public class AutoLayoutConstraintAction extends Action {
 
 	private final FeatureModel featureModel;
-	private LinkedList <LinkedList<Point>> oldPos = new LinkedList <LinkedList<Point>> ();
-	
+	private LinkedList<LinkedList<Point>> oldPos = new LinkedList<LinkedList<Point>>();
+
 	public AutoLayoutConstraintAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
 		super("Auto Layout Constraints");
-		this.featureModel = featureModel;	
+		this.featureModel = featureModel;
 	}
 
 	@Override
 	public void run() {
-		LinkedList <Point> newList = new LinkedList<Point> ();
-		for(int i=0;i<featureModel.getConstraintCount();i++){			
+		LinkedList<Point> newList = new LinkedList<Point>();
+		for (int i = 0; i < featureModel.getConstraintCount(); i++) {
 			newList.add(FeatureUIHelper.getLocation(featureModel.getConstraints().get(i)).getCopy());
-		}		
+		}
 		int counter = oldPos.size();
 		oldPos.add(newList);
 		AutoLayoutConstraintOperation op = new AutoLayoutConstraintOperation(featureModel, oldPos, counter);
 		op.addContext((IUndoContext) featureModel.getUndoContext());
 
 		try {
-			PlatformUI.getWorkbench().getOperationSupport()
-					.getOperationHistory().execute(op, null, null);
+			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
 

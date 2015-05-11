@@ -35,7 +35,7 @@ import org.eclipse.gef.requests.ChangeBoundsRequest;
  * Allows to move the legend.
  */
 public class LegendMoveEditPolicy extends NonResizableEditPolicy {
-	
+
 	@Override
 	protected IFigure createDragSourceFeedbackFigure() {
 		final RectangleFigure r = new RectangleFigure();

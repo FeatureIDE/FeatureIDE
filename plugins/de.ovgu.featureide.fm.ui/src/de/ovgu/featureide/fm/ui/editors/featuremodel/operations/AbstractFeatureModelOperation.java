@@ -45,14 +45,12 @@ public abstract class AbstractFeatureModelOperation extends AbstractOperation {
 	}
 
 	@Override
-	public IStatus execute(IProgressMonitor monitor, IAdaptable info)
-			throws ExecutionException {
+	public IStatus execute(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
 		return redo(monitor, info);
 	}
 
 	@Override
-	public IStatus redo(IProgressMonitor monitor, IAdaptable info)
-			throws ExecutionException {
+	public IStatus redo(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
 		redo();
 		featureModel.handleModelDataChanged();
 		return Status.OK_STATUS;
@@ -61,13 +59,12 @@ public abstract class AbstractFeatureModelOperation extends AbstractOperation {
 	protected abstract void redo();
 
 	@Override
-	public IStatus undo(IProgressMonitor monitor, IAdaptable info)
-			throws ExecutionException {
+	public IStatus undo(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
 		undo();
 		featureModel.handleModelDataChanged();
 		return Status.OK_STATUS;
 	}
-	
+
 	protected abstract void undo();
 
 }

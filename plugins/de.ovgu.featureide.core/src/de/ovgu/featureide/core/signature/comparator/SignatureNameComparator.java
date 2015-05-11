@@ -20,11 +20,14 @@
  */
 package de.ovgu.featureide.core.signature.comparator;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 
-public class SignatureNameComparator implements Comparator<AbstractSignature> {
+public class SignatureNameComparator implements Comparator<AbstractSignature>, Serializable {
+	
+	private static final long serialVersionUID = -1196238795526480346L;
 
 	@Override
 	public int compare(AbstractSignature sig0, AbstractSignature sig1) {

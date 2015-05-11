@@ -24,12 +24,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.StringTokenizer;
 
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.RenamingsManager;
 
 /**
  * Simple configuration format.</br> Lists all selected features in the
@@ -40,11 +40,13 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 public class DefaultFormat extends ConfigurationFormat {
 
 	public List<ConfigurationReader.Warning> read(BufferedReader reader, Configuration configuration) throws IOException {
-		List<ConfigurationReader.Warning> warnings = new LinkedList<ConfigurationReader.Warning>();
+		final RenamingsManager renamingsManager = configuration.getFeatureModel().getRenamingsManager();
+		final List<ConfigurationReader.Warning> warnings = new LinkedList<>();
 
-		boolean orgPropagate = configuration.isPropagate();
+		final boolean orgPropagate = configuration.isPropagate();
 		configuration.setPropagate(false);
 		configuration.resetValues();
+		
 		String line = null;
 		int lineNumber = 1;
 		while ((line = reader.readLine()) != null) {
@@ -53,34 +55,22 @@ public class DefaultFormat extends ConfigurationFormat {
 			}
 			// the string tokenizer is used to also support the expression
 			// format used by FeatureHouse
-			StringTokenizer tokenizer = new StringTokenizer(line);
-			LinkedList<String> hiddenFeatures = new LinkedList<String>();
+			final StringTokenizer tokenizer = new StringTokenizer(line);
+			final LinkedList<String> hiddenFeatures = new LinkedList<>();
 			while (tokenizer.hasMoreTokens()) {
 				String name = tokenizer.nextToken(" ");
 				if (name.startsWith("\"")) {
 					try {
 						name = name.substring(1);
 						name += tokenizer.nextToken("\"");
-					} catch (NoSuchElementException e) {
-						warnings.add(new ConfigurationReader.Warning("Feature '" + name + "' is corrupt. No ending quotation marks found.",
-								lineNumber));
-					} catch (NullPointerException e) {
-						warnings.add(new ConfigurationReader.Warning("Feature '" + name + "' is corrupt. No ending quotation marks found.",
-								lineNumber));
-					}
-					// Check for ending quotation mark
-					try {
-						String endingDelimiter = tokenizer.nextToken(" ");
-						if (!endingDelimiter.startsWith("\"")) {
-							warnings.add(new ConfigurationReader.Warning("Feature '" + name
-									+ "' is corrupt. No ending quotation marks found.", lineNumber));
+						if (!tokenizer.nextToken(" ").startsWith("\"")) {
+							warnings.add(new ConfigurationReader.Warning("Feature '" + name + "' is corrupt. No ending quotation marks found.", lineNumber));
 						}
-					} catch (Exception e) {
-						warnings.add(new ConfigurationReader.Warning("Feature '" + name + "' is corrupt. No ending quotation marks found.",
-								lineNumber));
+					} catch (RuntimeException e) {
+						warnings.add(new ConfigurationReader.Warning("Feature '" + name + "' is corrupt. No ending quotation marks found.", lineNumber));
 					}
 				}
-
+				name = renamingsManager.getNewName(name);
 				Feature feature = configuration.getFeatureModel().getFeature(name);
 				if (feature != null && feature.hasHiddenParent()) {
 					hiddenFeatures.add(name);

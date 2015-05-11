@@ -92,7 +92,20 @@ public class FujiMethodSignature extends AbstractMethodSignature {
 			methodString.append(parameter.name());
 		}
 		methodString.append(')');
-
+		
+		if (exceptionList.getNumChild() > 0) {
+			notfirst = false;
+			methodString.append(" throws ");
+			for (Access exception : exceptionList) {
+				if (notfirst) {
+					methodString.append(", ");
+				} else {
+					notfirst = true;
+				}
+				methodString.append(exception.type().name());
+			}
+		}
+	
 		return methodString.toString();
 	}
 

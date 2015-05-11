@@ -40,8 +40,7 @@ public class ReverseOrderAction extends Action {
 
 	private final FeatureModel featureModel;
 
-	public ReverseOrderAction(Object viewer,
-			FeatureModel featureModel) {
+	public ReverseOrderAction(Object viewer, FeatureModel featureModel) {
 		super("Reverse Feature Order");
 		this.featureModel = featureModel;
 	}
@@ -49,13 +48,11 @@ public class ReverseOrderAction extends Action {
 	@Override
 	public void run() {
 
-		ModelReverseOrderOperation op = new ModelReverseOrderOperation(
-				featureModel);
+		ModelReverseOrderOperation op = new ModelReverseOrderOperation(featureModel);
 		op.addContext((IUndoContext) featureModel.getUndoContext());
 
 		try {
-			PlatformUI.getWorkbench().getOperationSupport()
-					.getOperationHistory().execute(op, null, null);
+			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (ExecutionException e) {
 			FMUIPlugin.getDefault().logError(e);
 

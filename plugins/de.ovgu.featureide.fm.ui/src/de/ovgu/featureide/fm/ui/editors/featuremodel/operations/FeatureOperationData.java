@@ -35,8 +35,7 @@ public class FeatureOperationData {
 	private int newIndex;
 	private int oldIndex;
 
-	public FeatureOperationData(Feature feature, Feature oldParent,
-			Feature newParent, int newIndex, int oldIndex) {
+	public FeatureOperationData(Feature feature, Feature oldParent, Feature newParent, int newIndex, int oldIndex) {
 		this.feature = feature;
 		this.newIndex = newIndex;
 		this.newParent = newParent;

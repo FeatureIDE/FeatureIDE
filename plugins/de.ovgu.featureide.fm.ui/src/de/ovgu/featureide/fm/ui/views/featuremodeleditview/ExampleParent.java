@@ -55,12 +55,10 @@ public class ExampleParent extends TreeParent implements GUIDefaults {
 		if (c.getResult() == Comparison.ERROR) {
 			image = IMAGE_UNDEFINED;
 		} else {
-			String imageName = added && !c.isImplied() ? "plus" : !added
-					&& !c.isImplies() ? "minus" : "zero";
+			String imageName = added && !c.isImplied() ? "plus" : !added && !c.isImplies() ? "minus" : "zero";
 			lazy = !"zero".equals(imageName);
 
-			image = "plus".equals(imageName) ? PLUS_IMAGE : "minus"
-					.equals(imageName) ? MINUS_IMAGE : ZERO_IMAGE;
+			image = "plus".equals(imageName) ? PLUS_IMAGE : "minus".equals(imageName) ? MINUS_IMAGE : ZERO_IMAGE;
 		}
 	}
 
@@ -72,12 +70,11 @@ public class ExampleParent extends TreeParent implements GUIDefaults {
 			}
 			if (example == null) {
 				addChild("none");
-			}
-			else {
+			} else {
 				SelectableFeature root = example.getRoot();
 				root.setName("Product " + number);
 				addChild(root);
-				
+
 				Configuration example = c.calculateExample(added);
 				if (example != null) {
 					addChild(new ExampleParent(added, c, number + 1, example));

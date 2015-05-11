@@ -110,13 +110,17 @@ public class ProjectStructure {
 	}
 
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
+		}
+		
+		if (!(obj instanceof ProjectStructure)) {
+			return false;
+		}
 		
 		ProjectStructure otherSig = (ProjectStructure) obj;
 		
-		if (otherSig == null 
-				|| classList.size() != otherSig.classList.size()) {
+		if (classList.size() != otherSig.classList.size()) {
 			return false;
 		}
 		for (Entry<String, AbstractClassFragment> entrySet : classList.entrySet()) {

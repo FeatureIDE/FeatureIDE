@@ -48,6 +48,9 @@ public class FeatureProjectNature implements IProjectNature {
 	private IProject project;
 	
 	public void configure() throws CoreException {
+		if (project == null) {
+			return;
+		}
 		IProjectDescription desc = project.getDescription();
 		ICommand[] commands = desc.getBuildSpec();
 
@@ -81,21 +84,11 @@ public class FeatureProjectNature implements IProjectNature {
 			}
 		}
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.resources.IProjectNature#getProject()
-	 */
+	
 	public IProject getProject() {
 		return project;
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.core.resources.IProjectNature#setProject(org.eclipse.core.resources.IProject)
-	 */
+	
 	public void setProject(IProject project) {
 		this.project = project;
 	}

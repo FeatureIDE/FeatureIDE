@@ -133,7 +133,11 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 			featureProject.createBuilderMarker(featureProject.getProject(), PLUGIN_WARNING, -1, IMarker.SEVERITY_ERROR);
 		}
 		if (!isInitialized()) {
-			initialize(CorePlugin.getFeatureProject(config));
+			final IFeatureProject configFeatureProject = CorePlugin.getFeatureProject(config);
+			if (configFeatureProject == null) {
+				return;
+			}
+			initialize(configFeatureProject);
 		}
 		featureCpp.compose(config);
 		buildFSTModel();

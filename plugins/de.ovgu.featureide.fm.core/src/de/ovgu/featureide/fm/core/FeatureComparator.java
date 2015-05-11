@@ -18,36 +18,31 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.ui.editors.featuremodel.editparts;
+package de.ovgu.featureide.fm.core;
 
-import org.eclipse.draw2d.IFigure;
-import org.eclipse.gef.EditPolicy;
-import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
-import org.eclipse.gef.editpolicies.NonResizableEditPolicy;
-
-import de.ovgu.featureide.fm.ui.editors.featuremodel.Legend;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
+import java.io.Serializable;
+import java.util.Comparator;
 
 /**
- * EditPart for feature model legend
+ * Compares two {@link Feature}s by their name.
  * 
- * @author Fabian Benduhn
+ * @author Sebastian Krieter
  */
-public class LegendEditPart extends AbstractGraphicalEditPart {
+public class FeatureComparator implements Comparator<Feature>, Serializable {
 
-	LegendEditPart(Object legend) {
-		super();
-		setModel(legend);
+	private static final long serialVersionUID = 3133122730880756050L;
+
+	private final boolean caseSensitive;
+
+	public FeatureComparator(boolean caseSensitive) {
+		this.caseSensitive = caseSensitive;
 	}
 
 	@Override
-	protected IFigure createFigure() {
-		return new LegendFigure(((Legend) this.getModel()).getModel(), ((Legend) getModel()).getPos());
-	}
-
-	@Override
-	protected void createEditPolicies() {
-		installEditPolicy(EditPolicy.DIRECT_EDIT_ROLE, new NonResizableEditPolicy());
+	public int compare(Feature feature1, Feature feature2) {
+		return caseSensitive 
+			? feature1.getName().compareTo(feature2.getName()) 
+			: feature1.getName().compareToIgnoreCase(feature2.getName());
 	}
 
 }

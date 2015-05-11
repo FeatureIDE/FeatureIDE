@@ -42,7 +42,7 @@ public class FMUIPlugin extends AbstractUIPlugin {
 	public String getID() {
 		return PLUGIN_ID;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
@@ -64,10 +64,9 @@ public class FMUIPlugin extends AbstractUIPlugin {
 	public static FMUIPlugin getDefault() {
 		return plugin;
 	}
-	
+
 	public static Image getImage(String name) {
-		return getDefault().getImageDescriptor(
-				"icons/" + name).createImage();
+		return getDefault().getImageDescriptor("icons/" + name).createImage();
 	}
 
 }

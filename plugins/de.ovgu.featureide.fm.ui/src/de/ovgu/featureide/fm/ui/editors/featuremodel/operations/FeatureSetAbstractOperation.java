@@ -47,7 +47,7 @@ public class FeatureSetAbstractOperation extends AbstractFeatureModelOperation {
 		super(featureModel, getLabel(feature));
 		this.feature = feature;
 	}
-	
+
 	/**
 	 * @param feature
 	 * @return String to be used in undo/redo menu

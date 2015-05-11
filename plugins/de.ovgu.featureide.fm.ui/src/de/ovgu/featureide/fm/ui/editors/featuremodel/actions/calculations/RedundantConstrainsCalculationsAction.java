@@ -27,15 +27,16 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 
 /**
  * TODO description
+ * 
  * @author Jens Meinicke
  */
 public class RedundantConstrainsCalculationsAction extends Action {
 
 	private final FeatureModel featureModel;
-	
+
 	public RedundantConstrainsCalculationsAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
 		super("Calculate Redundant Constraints");
-		this.featureModel = featureModel;	
+		this.featureModel = featureModel;
 		setChecked(featureModel.getAnalyser().calculateRedundantConstraints);
 	}
 
@@ -50,5 +51,5 @@ public class RedundantConstrainsCalculationsAction extends Action {
 		}
 		featureModel.handleModelDataChanged();
 	}
-		
+
 }

@@ -36,17 +36,15 @@ import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
  * @author Sebastian Krieter
  */
 public class FujiClassSignature extends AbstractClassSignature {
-	
-	protected final TypeDecl typeDecl;
+
 	protected final List<ImportDecl> importList;
 
 	protected final LinkedList<TypeDecl> superTypes;
 	protected final LinkedList<TypeDecl> implementTypes;
-	
+
 	public FujiClassSignature(AbstractClassSignature parent, String name, String modifiers, 
 			String type, String pckg, TypeDecl typeDecl, List<ImportDecl> importList) {
 		super(parent, name, modifiers, type, pckg);
-		this.typeDecl = typeDecl;
 		this.importList = importList;
 
 		superTypes = new LinkedList<TypeDecl>();
@@ -77,10 +75,17 @@ public class FujiClassSignature extends AbstractClassSignature {
 			}
 		}
 	}
-	
+
 	@Override
 	public String toString() {		
 		StringBuilder sb = new StringBuilder();
+		
+		for (ImportDecl importDecl : importList) {
+			sb.append("import ");
+			sb.append(importDecl.typeName());
+			sb.append(';');
+			sb.append(LINE_SEPARATOR);
+		}
 		
 //		sb.append(super.toString());
 //		sb.append(LINE_SEPARATOR);

@@ -26,19 +26,19 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * contentAdapter for content assist while typing constraints 
+ * contentAdapter for content assist while typing constraints
  * 
  * @author David Broneske
  * @author Fabian Benduhn
  */
 public class ConstraintContentAdapter extends TextContentAdapter {
-	public void insertControlContents(Control control, String text,
-			int cursorPosition) {
+	public void insertControlContents(Control control, String text, int cursorPosition) {
 		Point selection = ((Text) control).getSelection();
 		int posMarker = selection.y - 1;
 		if (cursorPosition != 0) {
 			String constraintText = ((Text) control).getText();
-			while (posMarker >= 0 && (constraintText.charAt(posMarker) != ' '&&constraintText.charAt(posMarker)!=')'&&constraintText.charAt(posMarker)!='(')) {
+			while (posMarker >= 0
+					&& (constraintText.charAt(posMarker) != ' ' && constraintText.charAt(posMarker) != ')' && constraintText.charAt(posMarker) != '(')) {
 				posMarker--;
 			}
 		}
@@ -50,8 +50,7 @@ public class ConstraintContentAdapter extends TextContentAdapter {
 		// Insert will leave the cursor at the end of the inserted text. If this
 		// is not what we wanted, reset the selection.
 		if (cursorPosition < text.length()) {
-			((Text) control).setSelection(selection.x + cursorPosition,
-					selection.x + cursorPosition);
+			((Text) control).setSelection(selection.x + cursorPosition, selection.x + cursorPosition);
 		}
 	}
 }

@@ -63,6 +63,10 @@ public class MungeFMComposerExtension extends FMComposerExtension {
 	@Override
 	public boolean performRenaming(String oldName, String newName, IProject project) {
 		IFeatureProject featureProject = CorePlugin.getFeatureProject(project);
+		if (featureProject == null) {
+			return false;
+		}
+		
 		IFolder sourceFolder = featureProject.getSourceFolder();
 		if (!sourceFolder.exists())
 			return true;
