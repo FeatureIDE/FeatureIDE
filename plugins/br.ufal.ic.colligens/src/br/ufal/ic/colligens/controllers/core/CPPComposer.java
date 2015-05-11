@@ -446,6 +446,7 @@ public class CPPComposer extends PPComposerExtensionClass {
 					+ System.getProperty("file.separator")
 					+ buildFolder.getName());
 			cpp.runCompiler(compilerArgs);
+			buildFolder.refreshLocal(IResource.DEPTH_INFINITE, null);
 		} catch (CoreException e) {
 			Colligens.getDefault().logError(e);
 		}
