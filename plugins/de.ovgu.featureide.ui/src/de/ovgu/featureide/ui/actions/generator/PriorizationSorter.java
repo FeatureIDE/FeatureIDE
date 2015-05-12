@@ -89,7 +89,6 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 		allconfigs.addAll(configs);
 		
 		configsDistancesResult=getconfigsDistanceMap(allconfigs);
-		
 		allyesconfig();
 		monitor.worked(1);
 			while (!allconfigs.isEmpty()) {
