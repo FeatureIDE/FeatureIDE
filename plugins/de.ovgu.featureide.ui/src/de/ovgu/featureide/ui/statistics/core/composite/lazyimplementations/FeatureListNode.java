@@ -22,11 +22,11 @@ package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
 import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.FeatureComparator;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 
 /**
@@ -52,12 +52,7 @@ public final class FeatureListNode extends LazyParent {
 		this.expand = expand;
 		
 		List<Feature> list = new LinkedList<Feature>(collection);
-		Collections.sort(list, new Comparator<Feature>() {
-			@Override
-			public int compare(Feature o1, Feature o2) {
-				return o1.getName().compareToIgnoreCase(o2.getName());
-			}
-		});
+		Collections.sort(list, new FeatureComparator(false));
 		
 		this.list = list;
 		lazy = (list.size() != 0);

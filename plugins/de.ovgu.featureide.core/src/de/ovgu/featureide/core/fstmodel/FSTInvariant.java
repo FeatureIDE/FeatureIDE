@@ -35,16 +35,17 @@ public class FSTInvariant extends RoleElement<FSTInvariant> {
 	}
 
 	private LinkedList<String> parameterTypes;
-	boolean hasProperIdentifier;
-	boolean isAsmetalInvariant;
-	RoleTypes parentRoleType;
-	public FSTInvariant(String name, String body, LinkedList<String> _parameterTypes, int beginLine, int endLine, boolean _hasProperIdentifier, boolean _isAsmetalInvaraint) 
-	{
+	private boolean hasProperIdentifier;
+	private boolean isAsmetalInvariant;
+
+	public FSTInvariant(String name, String body, LinkedList<String> _parameterTypes, int beginLine, int endLine, boolean _hasProperIdentifier,
+			boolean _isAsmetalInvaraint) {
 		super(name, "", "", body, beginLine, endLine);
 		hasProperIdentifier = _hasProperIdentifier;
 		isAsmetalInvariant = _isAsmetalInvaraint;
 		parameterTypes = _parameterTypes;
-		}
+	}
+
 	/**
 	 * @param name name of the invariant
 	 * @param body content of the invariant
@@ -70,28 +71,24 @@ public class FSTInvariant extends RoleElement<FSTInvariant> {
 		return (body + beginLine + getFile()).hashCode();
 	}
 
-	public String getFullName() 
-	{
-	
-	if (isAsmetalInvariant)
-	{
-		StringBuilder fullname = new StringBuilder();
-		fullname.append(hasProperIdentifier ? name : "[line " + beginLine + "]");
-		fullname.append(" over ");
+	public String getFullName() {
+		if (isAsmetalInvariant) {
+			StringBuilder fullname = new StringBuilder();
+			fullname.append(hasProperIdentifier ? name : "[line " + beginLine + "]");
+			fullname.append(" over ");
 			for (int i = 0; i < parameterTypes.size(); i++) {
 				if (i > 0)
 					fullname.append(", ");
 				fullname.append(parameterTypes.get(i));
 			}
 			return fullname.toString();
-			
-		}else
-		{
+
+		} else {
 			//JML Invariant
 			String name = body.replaceAll("  ", "").replace((char) 10, ' ').replaceFirst("invariant ", "");
 			return ((name.length() > 25 ? name.substring(0, 25) + "..." : name));
 		}
-	 	}
+	}
 
 	public boolean inRefinementGroup() {
 		for (FSTRole role : getRole().getFSTClass().getRoles()) {

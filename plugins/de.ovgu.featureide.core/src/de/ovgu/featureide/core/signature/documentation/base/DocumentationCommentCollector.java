@@ -36,12 +36,6 @@ import de.ovgu.featureide.core.signature.documentation.base.SignatureCommentPair
  */
 class DocumentationCommentCollector {
 
-	protected final ProjectSignatures projectSignatures;
-
-	public DocumentationCommentCollector(ProjectSignatures projectSignatures) {
-		this.projectSignatures = projectSignatures;
-	}
-
 	public static List<SignatureCommentPair> collect(ProjectSignatures projectSignatures) {
 		final SignatureIterator it = projectSignatures.iterator();
 

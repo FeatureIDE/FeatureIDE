@@ -18,17 +18,31 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.core.signature.documentation;
+package de.ovgu.featureide.fm.core;
 
-import de.ovgu.featureide.core.signature.documentation.base.ADocumentationCommentMerger;
+import java.io.Serializable;
+import java.util.Comparator;
 
 /**
- * Modul-Comment merger for feature modules.
+ * Compares two {@link Feature}s by their name.
  * 
  * @author Sebastian Krieter
  */
-public class FeatureModuleMerger extends ADocumentationCommentMerger {
+public class FeatureComparator implements Comparator<Feature>, Serializable {
 
-	private static final long serialVersionUID = 3765234776718850316L;
+	private static final long serialVersionUID = 3133122730880756050L;
+
+	private final boolean caseSensitive;
+
+	public FeatureComparator(boolean caseSensitive) {
+		this.caseSensitive = caseSensitive;
+	}
+
+	@Override
+	public int compare(Feature feature1, Feature feature2) {
+		return caseSensitive 
+			? feature1.getName().compareTo(feature2.getName()) 
+			: feature1.getName().compareToIgnoreCase(feature2.getName());
+	}
 
 }

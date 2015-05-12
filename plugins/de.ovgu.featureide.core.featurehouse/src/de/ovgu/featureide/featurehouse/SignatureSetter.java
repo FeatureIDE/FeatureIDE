@@ -42,9 +42,11 @@ public class SignatureSetter implements JobFinishListener {
 	private Program ast = null;
 	
 	public void setFstModel(FSTModel fstModel) {
-		this.fstModel = fstModel;
-		if (signatures != null) {
-			assignSignatures();
+		synchronized (this) {
+			this.fstModel = fstModel;
+			if (signatures != null) {
+				assignSignatures();
+			}
 		}
 	}
 	
@@ -56,14 +58,17 @@ public class SignatureSetter implements JobFinishListener {
 	@Override
 	public void jobFinished(IJob finishedJob, boolean success) {
 		if (success) {
-			this.signatures = sigCreator.createSignatures(fp, ast);
-			if (fstModel != null) {
-				assignSignatures();
+			ProjectSignatures sigs = sigCreator.createSignatures(fp, ast);
+			synchronized (this) {
+				this.signatures = sigs;
+				if (fstModel != null) {
+					assignSignatures();
+				}
 			}
 		}
 	}
 	
-	private synchronized void assignSignatures() {
+	private void assignSignatures() {
 		sigCreator.attachJavadocComments(signatures, fstModel);
 		fstModel.setProjectSignatures(signatures);
 	}

@@ -86,6 +86,9 @@ public class NewFeatureIDEFilePage extends WizardPage {
 	private static final String MESSAGE_LANGUAGE_SUPPORT = "Selected file format is not supported";
 
 	private static final String MESSAGE_MODULE_VALID = "Module name is invalid";
+	
+	private static int lastSelection = -1;
+	private static String lastComposerID = null;
 
 	private Combo comboProject, comboFeature, comboLanguage, comboPackage, comboClass;
 
@@ -242,6 +245,9 @@ public class NewFeatureIDEFilePage extends WizardPage {
 					initTextModulename();
 					initRefinesButton();
 					initComboClassName();
+					
+					NewFeatureIDEFilePage.lastComposerID = composer.getId();
+					NewFeatureIDEFilePage.lastSelection = comboLanguage.getSelectionIndex();
 				}
 
 				dialogChanged();
@@ -558,26 +564,32 @@ public class NewFeatureIDEFilePage extends WizardPage {
 		composer = featureProject.getComposer();
 		formats = composer.getTemplates();
 		comboLanguage.removeAll();
-		for (String[] format : formats)
-			comboLanguage.add(format[0]);
-		if (comboLanguage.getItemCount() == 1) {
-			comboLanguage.setEnabled(false);
-		} else {
-			comboLanguage.setEnabled(true);
-		}
-		Object element = selection.getFirstElement();
-		if (element instanceof IFile) {
-			String extension = ((IFile) element).getFileExtension();
-			int i = 0;
-			for (String[] template : composer.getTemplates()) {
-				if (template[1].equals(extension)) {
-					comboLanguage.select(i);
-					return;
+		if (!formats.isEmpty()) {
+			for (String[] format : formats)
+				comboLanguage.add(format[0]);
+			if (comboLanguage.getItemCount() == 1) {
+				comboLanguage.setEnabled(false);
+			} else {
+				comboLanguage.setEnabled(true);
+			}
+			Object element = selection.getFirstElement();
+			if (element instanceof IFile) {
+				String extension = ((IFile) element).getFileExtension();
+				int i = 0;
+				for (String[] template : composer.getTemplates()) {
+					if (template[1].equals(extension)) {
+						comboLanguage.select(i);
+						return;
+					}
+					i++;
 				}
-				i++;
+			}
+			if (composer.getId().equals(lastComposerID) && lastSelection < comboLanguage.getItemCount()) {
+				comboLanguage.select(lastSelection);
+			} else {
+				comboLanguage.select(composer.getDefaultTemplateIndex());
 			}
 		}
-		comboLanguage.select(composer.getDefaultTemplateIndex());
 	}
 
 	private void initRefinesButton() {
@@ -689,12 +701,16 @@ public class NewFeatureIDEFilePage extends WizardPage {
 	}
 
 	String getExtension() {
-		if (comboLanguage.getSelectionIndex() == -1)
+		if (comboLanguage.getSelectionIndex() == -1 || formats.isEmpty()) {
 			return null;
+		}
 		return formats.get(comboLanguage.getSelectionIndex())[1];
 	}
 
 	String getTemplate() {
+		if (formats.isEmpty()) {
+			return null;
+		}
 		return formats.get(comboLanguage.getSelectionIndex())[2];
 	}
 

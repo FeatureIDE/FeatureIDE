@@ -208,7 +208,7 @@ public class ProjectSignatures implements Iterable<AbstractSignature> {
 	
 	@Override
 	public boolean equals(Object obj) {
-		return Arrays.equals(signatureArray, ((ProjectSignatures) obj).signatureArray);
+		return (this == obj) || ((obj instanceof ProjectSignatures) && Arrays.equals(signatureArray, ((ProjectSignatures) obj).signatureArray));
 	}
 
 	@Override
@@ -305,6 +305,7 @@ public class ProjectSignatures implements Iterable<AbstractSignature> {
 			case 1: sb.append("#InnerClasses: "); break;
 			case 2: sb.append("#Fields: "); break;
 			case 3: sb.append("#Methods: "); break;
+			default: break;
 			}
 			sb.append(curCounter[0]);
 			sb.append("\n\t#Private: ");
@@ -327,6 +328,7 @@ public class ProjectSignatures implements Iterable<AbstractSignature> {
 				case 1: sb.append("\t\t#InnerClasses: "); break;
 				case 2: sb.append("\t\t#Fields: "); break;
 				case 3: sb.append("\t\t#Methods: "); break;
+				default: break;
 				}
 				sb.append(x[i]);
 				sb.append("\n");

@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.core.signature.documentation.base;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -37,8 +38,10 @@ import de.ovgu.featureide.core.signature.filter.IFilter;
  * 
  * @author Sebastian Krieter
  */
-public abstract class ADocumentationCommentMerger implements Comparator<BlockTag> {
-
+public abstract class ADocumentationCommentMerger implements Comparator<BlockTag>, Serializable {
+	
+	private static final long serialVersionUID = 1L;
+	
 	protected static final String LINE_SEPARATOR = System.getProperty("line.separator");
 	protected static final int
 		RULE_MERGE = 0,
@@ -157,6 +160,9 @@ public abstract class ADocumentationCommentMerger implements Comparator<BlockTag
 							break;
 						case RULE_OVERRIDE:
 							tagSet.put(newTag, newTag);
+							break;
+						case RULE_DISCARD:
+						default:
 							break;
 						}
 					}

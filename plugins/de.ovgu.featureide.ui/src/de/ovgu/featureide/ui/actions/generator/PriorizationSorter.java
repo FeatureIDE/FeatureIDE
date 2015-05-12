@@ -22,9 +22,11 @@ package de.ovgu.featureide.ui.actions.generator;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
@@ -40,6 +42,7 @@ import de.ovgu.featureide.fm.core.configuration.Selection;
 public class PriorizationSorter extends AbstractConfigurationSorter {
 	private final List<List<String>> allconfigs = new ArrayList<List<String>>();
 	private final List<List<String>> allsortedconfigs = new ArrayList<List<String>>();
+	HashMap<String,Double> configsDistancesResult = new HashMap<String,Double>();
 
 	//	private static final UIPlugin LOGGER = UIPlugin.getDefault();
 	private FeatureModel featureModel;
@@ -81,27 +84,18 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 //		LOGGER.logInfo("Start sorting configurations by difference");
 //		final long time = System.currentTimeMillis();
 		monitor.beginTask("Sort configurations" , configs.size());
-		// the main method.
+	
 		// bring the first product with maximum number of optional feature.\
-//		List<List<String>> configurations_ = new ArrayList<List<String>>();
-
-//		System.out.println(concreteFeatures);
 		allconfigs.addAll(configs);
 		
-		
+		configsDistancesResult=getconfigsDistanceMap(allconfigs);
 		allyesconfig();
 		monitor.worked(1);
-		// all the other elements from the original to the new list one by one
-		// based on the similarty
-//		int list_length = allconfigs.size();
-
-		while (!allconfigs.isEmpty()) {
-//			int sorted_list = allsortedconfigs.size();
-//			double max_distance = -1.0;
+			while (!allconfigs.isEmpty()) {
 			selectConfig();
 			monitor.worked(1);
 		}
-		// System.out.println("welcome test "+allsortedconfigs);
+		
 //		LOGGER.logInfo(System.currentTimeMillis() - time + "ms to sort all configs");
 		return allsortedconfigs;
 	}
@@ -137,6 +131,36 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 		return allconfigs.size() + configurations.size();
 	}
 
+	
+	private HashMap<String,Double> getconfigsDistanceMap(List<List<String>> allConfig)
+	{
+		configsDistancesResult = new HashMap<String,Double>();
+		String mapKey ;
+		for(int i =0; i< allConfig.size() ; i++)
+		{
+
+			for (int j = i+1 ; j < allConfig.size() ; j++ )
+			{
+
+				int xHashCode = allConfig.get(i).hashCode();
+				int yHashCode = allConfig.get(j).hashCode();
+				
+				mapKey = xHashCode + "_" + yHashCode;
+
+				if(configsDistancesResult.get(mapKey) == null) // not added before
+				{
+					configsDistancesResult.put(mapKey, clacDistance(allConfig.get(i),allConfig.get(j)));
+				}
+
+			}
+
+
+		}
+
+	
+		return configsDistancesResult;
+	}
+	
 	private List<String> allyesconfig() {
 		// here add the first element to the allsortedconfig list
 		// and Remove the element from the original list which is already added
@@ -161,27 +185,46 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 	private List<String> selectConfig() {
 		double distance = 1.0;
 		int index = 0;
-		double tempDistance = 0.0;
+		
+		int xHashCode = 0;
+		int yHashCode = 0;
+		
+		String mapKeyXY;
+		String mapKeyYX;
+		
 		for (List<String> x : allconfigs) {
-			for (List<String> y : allsortedconfigs) {
-				
-			
-				
-				double tempDistanceLocal = clacDistance(x, y);
-				// temp_distance= temp_distance+clac_distance2(x,y);
-//				if (tempDistance > tempDistanceLocal) {
-//					tempDistance = tempDistanceLocal;
-//				}
-				if(tempDistanceLocal>tempDistance){
-		            tempDistance=tempDistanceLocal;
-		        }
-			}
 
+			double tempDistance = 0.0;
+			for (List<String> y : allsortedconfigs) {
+				xHashCode = x.hashCode();
+				yHashCode = y.hashCode();
+				
+				mapKeyXY = xHashCode + "_" + yHashCode;
+				mapKeyYX = yHashCode + "_" + xHashCode;
+				double tempDistanceLocal = 0.0;
+				if(configsDistancesResult.get(mapKeyXY) != null)
+				{
+					tempDistanceLocal = configsDistancesResult.get(mapKeyXY);
+				}else if (configsDistancesResult.get(mapKeyYX) != null)
+				{
+					tempDistanceLocal = configsDistancesResult.get(mapKeyYX);
+					
+				}
+				else
+				{
+					System.out.println("we shouldn't get here,  here is wrong");
+				}
+				if(tempDistanceLocal>tempDistance){
+					tempDistance=tempDistanceLocal;
+
+				}
+			}
 			if (tempDistance < distance) {
 				distance = tempDistance;
 				index = allconfigs.indexOf(x);
 			}
 		}
+	
 //		LOGGER.logInfo("Distance: " + distance);
 		allsortedconfigs.add(allconfigs.get(index));
 		return allconfigs.remove(index);

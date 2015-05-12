@@ -30,6 +30,7 @@ import java.util.Set;
 
 import org.sat4j.specs.TimeoutException;
 
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.job.WorkMonitor;
@@ -37,7 +38,7 @@ import de.ovgu.featureide.fm.core.job.WorkMonitor;
 /**
  * Represents a configuration and provides operations for the configuration process.
  */
-public class Configuration {
+public class Configuration implements Cloneable {
 	public final static int PARAM_NONE = 0x00;
 	public final static int PARAM_IGNOREABSTRACT = 0x02;
 	public final static int PARAM_PROPAGATE = 0x04;
@@ -215,7 +216,7 @@ public class Configuration {
 		final Set<String> result = new HashSet<String>();
 		for (SelectableFeature feature : features) {
 			if (feature.getSelection() == Selection.SELECTED) {
-				result.add(feature.getFeature().getName());
+				result.add(feature.getName());
 			}
 		}
 		return result;
@@ -359,6 +360,13 @@ public class Configuration {
 
 	@Override
 	public Configuration clone() {
+		if (!this.getClass().equals(Configuration.class)) {
+			try {
+				return (Configuration) super.clone();
+			} catch (CloneNotSupportedException e) {
+				FMCorePlugin.getDefault().logError(e);
+			}
+		}
 		return new Configuration(this);
 	}
 	

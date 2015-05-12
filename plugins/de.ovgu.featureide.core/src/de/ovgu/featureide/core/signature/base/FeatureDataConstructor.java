@@ -48,7 +48,11 @@ public class FeatureDataConstructor {
 		final AFeatureData data;
 		switch (dataType) {
 		case TYPE_FOP:
-			data = new FOPFeatureData(sigs.getFeatureID(((Literal) constraint).var.toString()), startLineNumber, endLineNumber);
+			if (constraint instanceof Literal) {
+				data = new FOPFeatureData(sigs.getFeatureID(((Literal) constraint).var.toString()), startLineNumber, endLineNumber);
+			} else {
+				data = new FOPFeatureData(-1, startLineNumber, endLineNumber);
+			}
 			data.setConstraint(constraint);
 			break;
 		case TYPE_PP:

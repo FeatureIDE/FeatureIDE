@@ -292,8 +292,9 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 					methodFeature.put(methodName, featureList);
 				}
 				
-				if (!featureList.contains(featureName))
+				if (!featureList.contains(featureModel.getFeature(featureName))) {
 					addToFeatureList(featureModel.getFeature(featureName),featureList);
+				}
 			}
 		}
 	}

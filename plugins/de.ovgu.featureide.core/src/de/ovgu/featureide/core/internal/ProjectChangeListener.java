@@ -39,7 +39,7 @@ import de.ovgu.featureide.core.builder.FeatureProjectNature;
  * imported.
  * 
  * @author Markus Leich
- * @author Thomas Thüm
+ * @author Thomas Thï¿½m
  */
 public class ProjectChangeListener implements IResourceChangeListener {
 
@@ -54,11 +54,13 @@ public class ProjectChangeListener implements IResourceChangeListener {
 			final IProject project = (IProject) child.getResource();
 			if (hasNature(project)) {
 				//FeatureIDE project created
-				if ((child.getFlags() & IResourceDelta.DESCRIPTION) > 0)
+				if ((child.getFlags() & IResourceDelta.DESCRIPTION) != 0) {
 					addProject(project);
+				}
 				//FeatureIDE project opened or imported
-				else if((child.getFlags() & IResourceDelta.OPEN) > 0)
+				else if((child.getFlags() & IResourceDelta.OPEN) != 0) {
 					addProject(project);
+				}
 			} else {
 				//FeatureIDE project closed or deleted
 				if (!project.isOpen())

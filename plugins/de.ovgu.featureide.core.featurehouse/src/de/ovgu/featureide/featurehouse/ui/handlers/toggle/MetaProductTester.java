@@ -47,10 +47,12 @@ public class MetaProductTester extends PropertyTester {
 		IProject curProject = SelectionWrapper.init((IStructuredSelection) receiver, IProject.class).getNext();
 		if (curProject != null) {
 			final IFeatureProject featureProject = CorePlugin.getFeatureProject(curProject);
-			final IComposerExtensionClass composer = featureProject.getComposer();
-			if (FeatureHouseComposer.COMPOSER_ID.equals(composer.getId())) {
-				state.setValue(((FeatureHouseComposer) composer).buildMetaProduct());
-				return true;
+			if (featureProject != null) {
+				final IComposerExtensionClass composer = featureProject.getComposer();
+				if (FeatureHouseComposer.COMPOSER_ID.equals(composer.getId())) {
+					state.setValue(((FeatureHouseComposer) composer).buildMetaProduct());
+					return true;
+				}
 			}
 		}
 		state.setValue(false);

@@ -22,8 +22,6 @@ package de.ovgu.featureide.core.fstmodel;
 
 import org.eclipse.core.resources.IFile;
 
-import de.ovgu.featureide.core.signature.base.AbstractSignature;
-
 /**
  * Default implementation of {@link FSTMethod} and {@link FSTField}.
  * 
@@ -51,8 +49,6 @@ public abstract class RoleElement<T extends RoleElement<T>> implements Comparabl
 	protected FSTRole role;
 
 	protected IRoleElement parent;
-
-	protected AbstractSignature signature;
 
 	public RoleElement(String name, String type, String modifiers) {
 		this(name, type, modifiers, "", -1, -1);
@@ -193,7 +189,7 @@ public abstract class RoleElement<T extends RoleElement<T>> implements Comparabl
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (!obj.getClass().equals(this.getClass()))
+		if (obj == null || !obj.getClass().equals(this.getClass()))
 			return false;
 		final IRoleElement other = (IRoleElement) obj;
 		if (!other.getFullName().equals(this.getFullName()))
