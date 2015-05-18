@@ -20,51 +20,60 @@
  */
 package de.ovgu.featureide.fm.core.conf;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
+import java.util.List;
+
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.conf.nodes.Expression;
 import de.ovgu.featureide.fm.core.conf.nodes.Variable;
 import de.ovgu.featureide.fm.core.conf.nodes.VariableConfiguration;
-import de.ovgu.featureide.fm.core.job.AStoppableJob;
+import de.ovgu.featureide.fm.core.job.AProjectJob;
+import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
-public class FeatureGraphStatisticJob extends AStoppableJob {
+public class FeatureGraphStatisticJob extends AProjectJob<FeatureGraphStatisticJob.Arguments> {
 
-	private final FeatureModel featureModel;
-	private FeatureGraph featureGraph;
+	public static class Arguments extends JobArguments {
+		private final FeatureModel featureModel;
 
-	public FeatureGraphStatisticJob(FeatureModel featureModel) {
-		super("Spliting Feature Model");
-		this.featureModel = featureModel;
+		public Arguments(FeatureModel featureModel) {
+			super(Arguments.class);
+			this.featureModel = featureModel;
+		}
+	}
+
+	private final FeatureGraph featureGraph;
+	
+	private long curTime = 0;
+	private boolean wrongResult = false;
+
+	protected FeatureGraphStatisticJob(Arguments arguments) {
+		super("Computing Statistics on Feature Graph", arguments);
+		featureGraph = arguments.featureModel.getFeatureGraph();
 	}
 
 	@Override
 	protected boolean work() throws Exception {
-		featureGraph = featureModel.getFeatureGraph();
-		statistic();
+		//		statisticPart(true, false);
+		//		statisticPart(true, true);
+		//		statisticPart2();
 
-		return true;
-	}
+		try {
+			statisticPart7();
+			statisticPart8();
+		} catch (IOException | CoreException e) {
+			e.printStackTrace();
+		}
 
-	private void statistic() {		
-//		statisticPart(true, false);
-//		statisticPart(true, true);
-//		statisticPart2();
-//		
-//		statisticPart4();
-//
-//		statisticPart3(0);
-//		statisticPart3(1);
-//		statisticPart3(10);
-//		for (int i = 50; i <= 600; i+= 50) {
-//			statisticPart3(i);
-//		}
-		
-		statisticPart5();
-		
 		System.out.println();
+		return true;
 	}
 
 	private static final boolean ALL_FEATURE = true;
@@ -74,7 +83,7 @@ public class FeatureGraphStatisticJob extends AStoppableJob {
 		final int[] featureNeigbors = new int[featureGraph.featureArray.length];
 		int i = 0;
 		for (String feature : featureGraph.featureArray) {
-			if (ALL_FEATURE || featureModel.getFeature(feature).getChildren().size() == 0) {
+			if (ALL_FEATURE || arguments.featureModel.getFeature(feature).getChildren().size() == 0) {
 				featureNeigbors[i++] = featureGraph.countNeighbors(feature, selected, subtractReal);
 			}
 		}
@@ -85,7 +94,8 @@ public class FeatureGraphStatisticJob extends AStoppableJob {
 		}
 		System.out.println();
 	}
-	
+
+	@SuppressWarnings("unused")
 	private void statisticPart2() {
 		System.out.println();
 		for (String feature : featureGraph.featureArray) {
@@ -102,76 +112,161 @@ public class FeatureGraphStatisticJob extends AStoppableJob {
 		}
 		System.out.println();
 	}
-	
-	private void statisticPart3(int blub) {
-		final VariableConfiguration variableConfiguration = new VariableConfiguration(featureGraph.getSize());
-		final ConfChanger c = new ConfChanger(featureModel, featureGraph, variableConfiguration);
-		int vIndex = 0;
-		for (int i = 0; i < blub; i++) {
-			while (vIndex < featureGraph.getSize() && variableConfiguration.getVariable(vIndex).getValue() != Variable.UNDEFINED) {
-				vIndex++;
-			}
-			if (vIndex < featureGraph.getSize()) {
-				c.setFeature(featureModel.getFeature(featureGraph.featureArray[vIndex]), Variable.TRUE);
-			}
-		}
-		
-		int x = 0;
-		for (int i = 0; i < featureGraph.getSize(); i++) {
-			if (variableConfiguration.getVariable(i).getValue() != Variable.UNDEFINED) {
-				x++;
-			}
-		}
-		
-		System.out.println();
-		System.out.println(x);
+
+	private void statisticPart7() throws IOException, CoreException {
+		long startTime = System.nanoTime();
+		curTime = startTime;
+		statisticPart7_1(true, false);
+		startTime = split(startTime);
+		curTime = startTime;
+		statisticPart7_1(false, false);
+		startTime = split(startTime);
+		curTime = startTime;
+		statisticPart7_2(true, false);
+		startTime = split(startTime);
+		curTime = startTime;
+		statisticPart7_2(false, false);
+		split(startTime);
 	}
-	
-	private void statisticPart4() {
-		int[] c = new int[featureGraph.getSize()];
-		int i = 0;
-		for (LinkedList<Expression> x : featureGraph.getExpListAr()) {
-			c[i++] = (x == null) ? 0 : x.size();
+
+	private void statisticPart8() throws IOException, CoreException {
+		long startTime = System.nanoTime();
+		curTime = startTime;
+		statisticPart7_1(true, true);
+		startTime = split(startTime);
+		curTime = startTime;
+		statisticPart7_1(false, true);
+		startTime = split(startTime);
+		curTime = startTime;
+		statisticPart7_2(true, true);
+		startTime = split(startTime);
+		curTime = startTime;
+		statisticPart7_2(false, true);
+		split(startTime);
+	}
+
+	private void statisticPart7_1(boolean value, boolean compare) throws IOException, CoreException {
+		final String fileName = "sat_single_" + value + ".txt";
+		final IFile file = compare ? getFile(fileName) : createFile(fileName);
+		if (file == null) {
+			return;
 		}
-		Arrays.sort(c);
-		for (int j = 0; j < c.length; j++) {
-			System.out.println(c[j]);
+		final BufferedReader reader = compare ? new BufferedReader(new InputStreamReader(file.getContents(), Charset.availableCharsets().get("UTF-8"))) : null;
+		final StringBuilder sb = compare ? null : new StringBuilder();
+		final ArrayList<Integer> indexArray = createIndexArray();
+
+		final VariableConfiguration variableConfiguration = new VariableConfiguration(featureGraph.getSize());
+		final IConfigurationChanger c1 = compare ? new ConfChanger2(arguments.featureModel, featureGraph, variableConfiguration)
+				: new SatConfChanger(arguments.featureModel, featureGraph, variableConfiguration);
+
+		for (int vIndex = 0; vIndex < featureGraph.getSize(); vIndex++) {
+			if (compare) {
+				read(value, reader.readLine(), indexArray, c1, vIndex);
+			} else {
+				write(value, sb, indexArray, c1, vIndex);
+			}
+
+			variableConfiguration.reset();
+		}
+
+		if (compare) {
+			reader.close();
+		} else {
+			file.create(new ByteArrayInputStream(sb.toString().getBytes()), true, null);
 		}
 	}
-	
-	private void statisticPart5() {
-		final ArrayList<Integer> indexArray = new ArrayList<>(featureGraph.getSize());
-		for (int i = 0; i < featureGraph.getSize(); i++) {
-			indexArray.add(i);
+
+	private void statisticPart7_2(boolean value, boolean compare) throws IOException, CoreException {
+		final String fileName = "sat_stepwise_" + value + ".txt";
+		final IFile file = compare ? getFile(fileName) : createFile(fileName);
+		if (file == null) {
+			return;
 		}
-//		Collections.shuffle(indexArray);
-		
-		final long firstStart = System.nanoTime();
-		long start = firstStart;
-		
+		final BufferedReader reader = compare ? new BufferedReader(new InputStreamReader(file.getContents(), Charset.availableCharsets().get("UTF-8"))) : null;
+		final StringBuilder sb = compare ? null : new StringBuilder();
+		final ArrayList<Integer> indexArray = createIndexArray();
+
 		final VariableConfiguration variableConfiguration = new VariableConfiguration(featureGraph.getSize());
-		final ConfChanger c = new ConfChanger(featureModel, featureGraph, variableConfiguration);
-		System.out.print("Create: ");
-		start = split(start);
-		
+		final IConfigurationChanger c1 = compare ? new ConfChanger2(arguments.featureModel, featureGraph, variableConfiguration) : new SatConfChanger(
+				arguments.featureModel, featureGraph, variableConfiguration);
+
 		for (int vIndex = 0; vIndex < featureGraph.getSize();) {
 			while (vIndex < featureGraph.getSize() && variableConfiguration.getVariable(indexArray.get(vIndex)).getValue() != Variable.UNDEFINED) {
 				vIndex++;
 			}
 			if (vIndex < featureGraph.getSize()) {
-				c.setFeature(featureModel.getFeature(featureGraph.featureArray[indexArray.get(vIndex)]), Variable.TRUE);
-				System.out.print(vIndex + ": ");
-				start = split(start);
+				if (compare) {
+					read(value, reader.readLine(), indexArray, c1, vIndex);
+				} else {
+					write(value, sb, indexArray, c1, vIndex);
+				}
 			}
 		}
-		
-		System.out.println();
-		start = split(firstStart);
+
+		if (compare) {
+			reader.close();
+		} else {
+			file.create(new ByteArrayInputStream(sb.toString().getBytes()), true, null);
+		}
 	}
-	
+
+	private IFile getFile(final String fileName) {
+		System.out.println();
+		System.out.println("Comparing: " + fileName);
+		wrongResult = false;
+		return project.getFile(fileName);
+	}
+
+	private ArrayList<Integer> createIndexArray() {
+		final ArrayList<Integer> indexArray = new ArrayList<>(featureGraph.getSize());
+		workMonitor.setMaxAbsoluteWork(featureGraph.getSize());
+		for (int i = 0; i < featureGraph.getSize(); i++) {
+			indexArray.add(i);
+		}
+		return indexArray;
+	}
+
+	private IFile createFile(String fileName) throws CoreException {
+		System.out.println();
+		System.out.println("Writing: " + fileName);
+		final IFile file = project.getFile(fileName);
+		if (file.exists()) {
+			System.out.print("Already existing - ");
+			System.out.println("Skipping");
+			return null;
+		}
+		return file;
+	}
+
+	private void write(boolean value, StringBuilder sb, ArrayList<Integer> indexArray, IConfigurationChanger c1, int vIndex) throws CoreException {
+		final int index = indexArray.get(vIndex);
+		final List<String> x = c1.setFeature(arguments.featureModel.getFeature(featureGraph.featureArray[index]), value ? Variable.TRUE : Variable.FALSE);
+		final String result = x.toString() + "\n";
+		sb.append(result);
+		System.out.print(vIndex + " (" + index + ")");
+		curTime = split(curTime);
+	}
+
+	private void read(boolean value, String satResult, ArrayList<Integer> indexArray, IConfigurationChanger c1, int vIndex) throws CoreException {
+		if (vIndex < 0) {
+			return;
+		}
+		final int index = indexArray.get(vIndex);
+		final List<String> x = c1.setFeature(arguments.featureModel.getFeature(featureGraph.featureArray[index]), value ? Variable.TRUE : Variable.FALSE);
+		final String result = x.toString();
+		if (!result.equals(satResult)) {
+			System.out.print("false | ");
+			wrongResult = true;
+		} else if (!wrongResult) {
+			System.out.print("true | ");
+		}
+		System.out.print(vIndex + " (" + index + ")");
+		curTime = split(curTime);
+	}
+
 	private long split(long start) {
 		final long end = System.nanoTime();
-		System.out.println(Math.round((double)((end - start)) / 1000000.0) / 1000.0);
+		System.out.println(" -> " + Math.round((double) ((end - start)) / 1000000.0) / 1000.0 + "s");
 		return System.nanoTime();
 	}
 

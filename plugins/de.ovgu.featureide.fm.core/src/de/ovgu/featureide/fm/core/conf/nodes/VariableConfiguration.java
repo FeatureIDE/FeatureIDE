@@ -22,9 +22,8 @@ package de.ovgu.featureide.fm.core.conf.nodes;
 
 import java.util.Iterator;
 
-
 public class VariableConfiguration implements Iterable<Variable> {
-	
+
 	private final Variable[] conf;
 
 	public VariableConfiguration(int count) {
@@ -33,19 +32,20 @@ public class VariableConfiguration implements Iterable<Variable> {
 			conf[i] = new Variable(i);
 		}
 	}
-	
+
 	public void setVariable(int index, byte newValue) {
 		conf[index].setValue(newValue);
 	}
-	
+
 	public Variable getVariable(int index) {
 		return conf[index];
 	}
-	
+
 	@Override
 	public Iterator<Variable> iterator() {
 		return new Iterator<Variable>() {
 			private int index = 0;
+
 			@Override
 			public boolean hasNext() {
 				return index < conf.length;
@@ -61,4 +61,21 @@ public class VariableConfiguration implements Iterable<Variable> {
 			}
 		};
 	}
+
+	@Override
+	public String toString() {
+		final StringBuffer sb = new StringBuffer();
+		for (int i = 0; i < conf.length; i++) {
+			sb.append(conf[i]);
+			sb.append('\n');
+		}
+		return sb.toString();
+	}
+
+	public void reset() {
+		for (int i = 0; i < conf.length; i++) {
+			conf[i].setValue(Variable.UNDEFINED);
+		}
+	}
+
 }

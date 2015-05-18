@@ -31,10 +31,15 @@ public class Variable implements Serializable {
 
 	protected final int id;
 
-	protected byte value = UNDEFINED;
+	protected byte value;
 
 	public Variable(int id) {
+		this(id, UNDEFINED);
+	}
+
+	public Variable(int id, byte value) {
 		this.id = id;
+		this.value = value;
 	}
 
 	public byte getValue() {
@@ -54,6 +59,20 @@ public class Variable implements Serializable {
 
 	protected void getVaraibles(TreeSet<Integer> list) {
 		list.add(id);
+	}
+
+	@Override
+	public String toString() {
+		switch (value) {
+		case TRUE:
+			return id + " : true";
+		case FALSE:
+			return id + " : false";
+		case UNDEFINED:
+			return id + " : undefined";
+		default:
+			return "! " + id + " : invalid value!";
+		}
 	}
 
 }

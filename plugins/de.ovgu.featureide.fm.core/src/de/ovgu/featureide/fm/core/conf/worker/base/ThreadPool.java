@@ -30,30 +30,38 @@ import de.ovgu.featureide.fm.core.job.WorkMonitor;
 
 public class ThreadPool<T> {
 
-	private static final int NUMBER_OF_THREADS;
+	private static int NUMBER_OF_THREADS = 1;
 	static {
 		final int processors = Runtime.getRuntime().availableProcessors();
 		NUMBER_OF_THREADS = (processors == 1) ? processors : processors - 1;
 	}
 
-	private final ArrayList<AWorkerThread<T>> threads = new ArrayList<>(NUMBER_OF_THREADS);
 	final ConcurrentLinkedQueue<T> objects = new ConcurrentLinkedQueue<>();
 
+	private final ArrayList<AWorkerThread<T>> threads;
 	private final AWorkerThread<T> factory;
 	private final WorkMonitor workMonitor;
+
+	private final int numberOfThreads;
 
 	private boolean initialized = false;
 
 	public ThreadPool(AWorkerThread<T> factory) {
-		this(factory, new WorkMonitor());
+		this(factory, null);
 	}
 
 	public ThreadPool(AWorkerThread<T> factory, WorkMonitor workMonitor) {
-		this.factory = factory;
-		this.workMonitor = workMonitor;
+		this(factory, workMonitor, NUMBER_OF_THREADS);
 	}
 
-	public void addObkects(Collection<T> objects) {
+	public ThreadPool(AWorkerThread<T> factory, WorkMonitor workMonitor, int numberOfThreads) {
+		this.factory = factory;
+		this.workMonitor = (workMonitor != null) ? workMonitor : new WorkMonitor();
+		this.numberOfThreads = numberOfThreads;
+		this.threads = new ArrayList<>(numberOfThreads);
+	}
+
+	public void addObjects(Collection<T> objects) {
 		this.objects.addAll(objects);
 	}
 
@@ -65,7 +73,7 @@ public class ThreadPool<T> {
 		if (!initialized) {
 			reset();
 		}
-		
+
 		for (AWorkerThread<T> thread : threads) {
 			thread.start();
 		}
@@ -84,11 +92,11 @@ public class ThreadPool<T> {
 
 	public void reset() {
 		if (initialized) {
-			for (int i = 0; i < NUMBER_OF_THREADS; i++) {
+			for (int i = 0; i < numberOfThreads; i++) {
 				threads.set(i, threads.get(i).clone());
 			}
 		} else {
-			for (int i = 0; i < NUMBER_OF_THREADS; i++) {
+			for (int i = 0; i < numberOfThreads; i++) {
 				threads.add(factory.newInstance());
 			}
 			initialized = true;

@@ -54,7 +54,7 @@ public abstract class AWorkerThread<T> extends Thread {
 	public AWorkerThread<T> clone() {
 		return newInstance();
 	}
-	
+
 	public abstract AWorkerThread<T> newInstance();
 
 	protected boolean beforeWork() {
@@ -65,6 +65,5 @@ public abstract class AWorkerThread<T> extends Thread {
 	}
 
 	protected abstract void work(T object);
-
 
 }

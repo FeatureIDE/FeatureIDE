@@ -21,10 +21,12 @@
 package de.ovgu.featureide.fm.core.conf;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.prop4j.Literal;
 import org.prop4j.Node;
@@ -34,7 +36,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.conf.nodes.Expression;
 import de.ovgu.featureide.fm.core.conf.nodes.Variable;
 import de.ovgu.featureide.fm.core.conf.nodes.VariableConfiguration;
-import de.ovgu.featureide.fm.core.conf.worker.CalcThread2;
+import de.ovgu.featureide.fm.core.conf.worker.CalcThread3;
 import de.ovgu.featureide.fm.core.conf.worker.ISatThread;
 import de.ovgu.featureide.fm.core.conf.worker.base.AWorkerThread;
 import de.ovgu.featureide.fm.core.conf.worker.base.ThreadPool;
@@ -45,83 +47,131 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
  * 
  * @author Sebastian Krieter
  */
-public class ConfChanger implements IConfigurationChanger {
+public class ConfChanger2 implements IConfigurationChanger {
 	private final FeatureGraph featureGraph;
 	private final VariableConfiguration variableConfiguration;
 	private final ThreadPool<Integer> dfsThread;
 
-	private final List<Node> knownLiterals = new ArrayList<>();
+	private final ConcurrentLinkedQueue<Variable> q = new ConcurrentLinkedQueue<>();
 
-	public ConfChanger(FeatureModel featureModel, FeatureGraph featureGraph, VariableConfiguration variableConfiguration) {
+	private final HashSet<String> changedFeatures = new HashSet<>();
+	private final HashSet<Integer> compList = new HashSet<>();
+	private final byte[] known;
+	private final int[] count = new int[5];
+
+	public ConfChanger2(FeatureModel featureModel, FeatureGraph featureGraph, VariableConfiguration variableConfiguration) {
 		this.featureGraph = featureGraph;
+		this.known = new byte[featureGraph.getSize()];
 		this.variableConfiguration = variableConfiguration;
-		this.dfsThread = new ThreadPool<>(new CalcThread2(featureGraph, this, NodeCreator.createNodes(featureModel, true).toCNF()));
+		this.dfsThread = new ThreadPool<>(new CalcThread3(featureGraph, this, NodeCreator.createNodes(featureModel, true).toCNF()), null);
 		dfsThread.reset();
 	}
 
-	private int[] count = new int[4];
-
-	private final LinkedList<String> changedFeatures = new LinkedList<>();
-
 	public List<String> setFeature(Feature f, byte newValue) {
 		if (newValue == Variable.UNDEFINED) {
+			//TODO
 			return Collections.emptyList();
 		}
+
+		compList.clear();
+		q.clear();
 		changedFeatures.clear();
+		Arrays.fill(count, 0);
+		Arrays.fill(known, (byte) 0);
+
+		for (Variable var : variableConfiguration) {
+			if (var.getValue() != Variable.UNDEFINED) {
+				count[0]++;
+			}
+		}
 
 		final int index = featureGraph.getFeatureIndex(f.getName());
-		set(index, newValue == Variable.TRUE);
+		q.offer(new Variable(index, newValue));
+		while (!q.isEmpty()) {
+			Variable v = q.poll();
+			setFeature_rec(v.getId(), v.getValue() == Variable.TRUE);
+			count[2] += compList.size();
+			sat();
+		}
 
-		count = new int[4];
+		//		setFeature_rec(index, newValue == Variable.TRUE);
+		//		while (!compList.isEmpty()) {
+		//			count[2] += compList.size();
+		//			x(compList);
+		//		}
 
-		List<Integer> compList = new ArrayList<>();
+		//		count[3] = featureGraph.getSize() - (count[0] + count[1] + count[2] + count[4]);
+		//		System.out.println();
+		//		System.out.println("Known:      " + count[0]);
+		//		System.out.println("Unaffected: " + count[3]);
+		//		System.out.println("Graph:      " + count[1]);
+		//		System.out.println("Expression: " + count[4]);
+		//		System.out.println("Sat:        " + count[2]);
 
-		if (newValue == Variable.TRUE) {
+		final List<String> ret = new ArrayList<>(changedFeatures);
+		Collections.sort(ret);
+		return ret;
+	}
+
+	public void setFeature_rec(int index, boolean value) {
+		if (known[index] == 2 || variableConfiguration.getVariable(index).getValue() != Variable.UNDEFINED) {
+			return;
+		}
+		set(index, value);
+
+		if (value) {
 			for (int i = 0; i < featureGraph.getSize(); i++) {
-				if (variableConfiguration.getVariable(i).getValue() != Variable.UNDEFINED) {
-					count[0]++;
+				if (known[i] == 2 || variableConfiguration.getVariable(i).getValue() != Variable.UNDEFINED) {
+					known[i] = 2;
 					continue;
 				}
 				final byte edge = (byte) (featureGraph.getEdge(index, i) & FeatureGraph.MASK_1_00001100);
 				switch (edge) {
 				case FeatureGraph.EDGE_10:
 					set(i, false);
+					count[1]++;
 					break;
 				case FeatureGraph.EDGE_11:
 					set(i, true);
+					count[1]++;
 					break;
 				case FeatureGraph.EDGE_1q:
 					compList.add(i);
-					continue;
+//										known[i] = 1;
+					break;
 				default:
-					continue;
+					break;
 				}
 			}
 		} else {
 			for (int i = 0; i < featureGraph.getSize(); i++) {
-				if (variableConfiguration.getVariable(i).getValue() != Variable.UNDEFINED) {
+				if (known[i] == 2 || variableConfiguration.getVariable(i).getValue() != Variable.UNDEFINED) {
+					known[i] = 2;
 					continue;
 				}
 				final byte edge = (byte) (featureGraph.getEdge(index, i) & FeatureGraph.MASK_0_00110000);
 				switch (edge) {
 				case FeatureGraph.EDGE_00:
 					set(i, false);
+					count[1]++;
 					break;
 				case FeatureGraph.EDGE_01:
 					set(i, true);
+					count[1]++;
 					break;
 				case FeatureGraph.EDGE_0q:
 					compList.add(i);
-					continue;
+//										known[i] = 1;
+					break;
 				default:
-					continue;
+					break;
 				}
 			}
 		}
 
 		for (Iterator<Integer> it = compList.iterator(); it.hasNext();) {
 			final int i = it.next();
-			final LinkedList<Expression> varExpList = featureGraph.getExpListAr().get(i);
+			final List<Expression> varExpList = featureGraph.getExpListAr().get(i);
 			if (varExpList == null || varExpList.isEmpty()) {
 				continue;
 			}
@@ -130,16 +180,18 @@ public class ConfChanger implements IConfigurationChanger {
 				expression.updateValue();
 				if (expression.getValue() == Variable.FALSE) {
 					variableConfiguration.setVariable(i, Variable.UNDEFINED);
-					set(i, false);
 					it.remove();
+					q.offer(new Variable(i, Variable.TRUE));
+					count[4]++;
 					break;
 				} else {
 					variableConfiguration.setVariable(i, Variable.FALSE);
 					expression.updateValue();
 					if (expression.getValue() == Variable.FALSE) {
 						variableConfiguration.setVariable(i, Variable.UNDEFINED);
-						set(i, true);
 						it.remove();
+						q.offer(new Variable(i, Variable.TRUE));
+						count[4]++;
 						break;
 					} else {
 						variableConfiguration.setVariable(i, Variable.UNDEFINED);
@@ -147,30 +199,32 @@ public class ConfChanger implements IConfigurationChanger {
 				}
 			}
 		}
+	}
 
-		//		count[2] = compList.size();
-		//		count[3] = featureGraph.getSize() - (count[0] + count[1] + count[2]);
-		//		System.out.println();
-		//		System.out.println("Known:      " + count[0]);
-		//		System.out.println("Unaffected: " + count[3]);
-		//		System.out.println("Non Sat:    " + count[1]);
-		//		System.out.println("Sat:        " + count[2]);
+	public void x(int index, byte value) {
+		if (value == Variable.UNDEFINED) {
+			known[index] = 2;
+		} else {
+			q.offer(new Variable(index, value));
+		}
+	}
 
-		knownLiterals.clear();
-
-		int i = 0;
+	private void sat() {
+		if (compList.isEmpty()) {
+			return;
+		}
+		final List<Node> knownLiterals = new ArrayList<>();
 		for (Variable var : variableConfiguration) {
 			switch (var.getValue()) {
 			case Variable.TRUE:
-				knownLiterals.add(new Literal(featureGraph.featureArray[i], true));
+				knownLiterals.add(new Literal(featureGraph.featureArray[var.getId()], true));
 				break;
 			case Variable.FALSE:
-				knownLiterals.add(new Literal(featureGraph.featureArray[i], false));
+				knownLiterals.add(new Literal(featureGraph.featureArray[var.getId()], false));
 				break;
 			default:
 				break;
 			}
-			i++;
 		}
 
 		dfsThread.reset();
@@ -178,18 +232,15 @@ public class ConfChanger implements IConfigurationChanger {
 			((ISatThread) thread).setKnownLiterals(knownLiterals);
 		}
 		dfsThread.addObjects(compList);
+		compList.clear();
 		dfsThread.run();
-
-		Collections.sort(changedFeatures);
-		return changedFeatures;
 	}
 
-	public void set(int index, boolean value) {
-		if (variableConfiguration.getVariable(index).getValue() == Variable.UNDEFINED) {
-			variableConfiguration.setVariable(index, value ? Variable.TRUE : Variable.FALSE);
-			count[1]++;
-			changedFeatures.add(featureGraph.featureArray[index]);
-		}
+	private void set(int index, boolean value) {
+		variableConfiguration.setVariable(index, value ? Variable.TRUE : Variable.FALSE);
+		known[index] = 2;
+		compList.remove(index);
+		changedFeatures.add(featureGraph.featureArray[index] + ": " + value);
 	}
 
 }

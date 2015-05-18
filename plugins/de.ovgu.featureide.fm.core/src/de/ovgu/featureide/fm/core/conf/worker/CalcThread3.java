@@ -20,18 +20,15 @@
  */
 package de.ovgu.featureide.fm.core.conf.worker;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.prop4j.Literal;
 import org.prop4j.Node;
-import org.prop4j.SatSolver;
-import org.sat4j.specs.TimeoutException;
+import org.prop4j.SimpleSatSolver;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.conf.ConfChanger2;
 import de.ovgu.featureide.fm.core.conf.FeatureGraph;
 import de.ovgu.featureide.fm.core.conf.nodes.Variable;
-import de.ovgu.featureide.fm.core.conf.nodes.VariableConfiguration;
 import de.ovgu.featureide.fm.core.conf.worker.base.AWorkerThread;
 
 /**
@@ -39,64 +36,55 @@ import de.ovgu.featureide.fm.core.conf.worker.base.AWorkerThread;
  * 
  * @author Sebastian Krieter
  */
-public class CalcThread extends AWorkerThread<Integer> {
+public class CalcThread3 extends AWorkerThread<Integer> implements ISatThread {
 
 	private final FeatureGraph featureGraph;
-	private final VariableConfiguration variableConfiguration;
-	private final SatSolver solver;
+	private final ConfChanger2 variableConfiguration;
+	private final SimpleSatSolver solver;
 	private final Node fmNode;
 
-	private List<Node> ls = null;
-
-	public CalcThread(FeatureGraph featureGraph, VariableConfiguration variableConfiguration, Node fmNode) {
+	public CalcThread3(FeatureGraph featureGraph, ConfChanger2 variableConfiguration, Node fmNode) {
 		this.featureGraph = featureGraph;
 		this.variableConfiguration = variableConfiguration;
 		this.fmNode = fmNode;
-		this.solver = new SatSolver(fmNode, 1000);
+		this.solver = new SimpleSatSolver(fmNode, 1000);
 	}
 
-	private CalcThread(FeatureGraph featureGraph, VariableConfiguration variableConfiguration, SatSolver solver) {
+	private CalcThread3(FeatureGraph featureGraph, ConfChanger2 variableConfiguration, SimpleSatSolver solver) {
 		this.featureGraph = featureGraph;
 		this.variableConfiguration = variableConfiguration;
 		this.solver = solver;
 		this.fmNode = null;
 	}
 
-	public void setLs(List<Node> ls) {
-		this.ls = new ArrayList<>(ls);
+	public void setKnownLiterals(List<Node> knownLiterals) {
+		this.solver.seBackbone(knownLiterals);
 	}
 
 	@Override
 	protected void work(Integer i) {
-		final int curIndex = ls.size();
-		try {
-			ls.add(new Literal(featureGraph.featureArray[i], false));
-			if (!solver.isSatisfiable(ls)) {
-				variableConfiguration.setVariable(i, Variable.TRUE);
-				ls.set(curIndex, new Literal(featureGraph.featureArray[i], true));
-			} else {
-				ls.set(curIndex, new Literal(featureGraph.featureArray[i], true));
-				if (!solver.isSatisfiable(ls)) {
-					variableConfiguration.setVariable(i, Variable.FALSE);
-					ls.set(curIndex, new Literal(featureGraph.featureArray[i], false));
-				} else {
-					ls.remove(curIndex);
-				}
-			}
-		} catch (TimeoutException e) {
-			FMCorePlugin.getDefault().logError(e);
-			ls.remove(curIndex);
+		final byte value = solver.getValueOf(new Literal(featureGraph.featureArray[i]));
+		switch (value) {
+		case  1: 
+			variableConfiguration.x(i, Variable.TRUE);
+			break;
+		case -1: 
+			variableConfiguration.x(i, Variable.FALSE);
+			break;
+		default:
+			variableConfiguration.x(i, Variable.UNDEFINED);
+			break;
 		}
 	}
 
 	@Override
 	public AWorkerThread<Integer> newInstance() {
-		return new CalcThread(featureGraph, variableConfiguration, fmNode.clone());
+		return new CalcThread3(featureGraph, variableConfiguration, fmNode.clone());
 	}
 
 	@Override
-	public CalcThread clone() {
-		return new CalcThread(featureGraph, variableConfiguration, solver);
+	public CalcThread3 clone() {
+		return new CalcThread3(featureGraph, variableConfiguration, solver);
 	}
 
 }
