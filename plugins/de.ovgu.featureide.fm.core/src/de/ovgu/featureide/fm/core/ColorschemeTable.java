@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.core;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -45,8 +46,14 @@ public class ColorschemeTable {
 	
 	private final FeatureModel featureModel;
 	
-	private final ArrayList<String> colorschemeNames;
+	protected final List<String> colorschemeNames;
 	private int selectedColorscheme;
+	
+	protected ColorschemeTable() {
+		this.featureModel = null;
+		this.colorschemeNames = Collections.emptyList();
+		selectedColorscheme = -1;
+	}
 	
 	/**
 	 * @param featureModel
