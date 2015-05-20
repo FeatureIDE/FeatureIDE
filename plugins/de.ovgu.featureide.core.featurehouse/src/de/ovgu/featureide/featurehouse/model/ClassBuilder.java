@@ -94,6 +94,9 @@ public class ClassBuilder {
 		if ("hs".equals(fileExtension)) {
 			return new HaskellClassBuilder(builder);
 		}
+		if ("asm".equals(fileExtension)) {
+			 return new AsmetaLClassBuilder(builder);
+			}
 		return new ClassBuilder(builder);
 	}
 	
