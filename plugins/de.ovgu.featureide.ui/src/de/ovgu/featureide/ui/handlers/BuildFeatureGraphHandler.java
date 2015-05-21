@@ -37,7 +37,7 @@ public class BuildFeatureGraphHandler extends AFeatureProjectHandler {
 	protected void singleAction(IFeatureProject project) {
 		projectList.add(project);
 	}
-	
+
 	@Override
 	protected void endAction() {
 		final JobSequence global = new JobSequence();
@@ -49,8 +49,10 @@ public class BuildFeatureGraphHandler extends AFeatureProjectHandler {
 			newJob2.setProject(project.getProject());
 			j.addJob(newJob1);
 			j.addJob(newJob2);
+			j.setIgnorePreviousJobFail(false);
 			global.addJob(j);
 		}
+		projectList.clear();
 		global.schedule();
 	}
 
