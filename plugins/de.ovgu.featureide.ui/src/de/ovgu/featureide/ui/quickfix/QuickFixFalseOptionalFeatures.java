@@ -76,6 +76,10 @@ public class QuickFixFalseOptionalFeatures extends QuickFixMissingConfigurations
 		
 		final List<Configuration> confs = new LinkedList<Configuration>();
 		while (!falseOptionalFeatures.isEmpty()) {
+			monitor.subTask(createShortMessage(falseOptionalFeatures));
+			if (monitor.isCanceled()) {
+				break;
+			}
 			final Configuration configuration = new Configuration(featureModel, true);
 			List<String> deselected = new LinkedList<String>();
 			for (final String feature : falseOptionalFeatures) {
@@ -87,9 +91,14 @@ public class QuickFixFalseOptionalFeatures extends QuickFixMissingConfigurations
 					}
 				}
 			}
+			if (monitor.isCanceled()) {
+				break;
+			}
 			
 			for (final String feature : deselected) {
-				falseOptionalFeatures.remove(feature);
+				if (falseOptionalFeatures.remove(feature)) {
+					monitor.worked(1);	
+				}
 			}
 			
 			// select further features to get a valid configuration

@@ -92,7 +92,7 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 			try {
 				if (builder.featureProject.getProject().hasNature(JAVA_NATURE)) {
 					compiler = new JavaCompiler(nr , this);
-					testRunner = new TestRunner(compiler.tmp, builder.testResults);
+					testRunner = new TestRunner(compiler.tmp, builder.testResults, builder);
 				}
 			} catch (CoreException e) {
 				UIPlugin.getDefault().logError(e);
@@ -159,8 +159,8 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 					if (builder.createNewProjects) {
 						buildConfiguration(builder.featureProject.getProjectName() + SEPARATOR_VARIANT + name, configuration);
 					} else {
-						builder.featureProject.getComposer().buildConfiguration(builder.folder.getFolder(CONFIGURATION_NAME + name), 
-								configuration, CONFIGURATION_NAME + name);
+						builder.featureProject.getComposer().buildConfiguration(builder.folder.getFolder(name), 
+								configuration, name);
 					}
 					break;
 				case T_WISE:

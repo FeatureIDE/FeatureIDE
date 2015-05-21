@@ -103,4 +103,19 @@ public abstract class QuickFixMissingConfigurations implements IMarkerResolution
 		return PREFIX + number + "." + project.getComposer().getConfigurationExtension();
 	}
 	
+	protected String createShortMessage(Collection<String> features) {
+		StringBuilder message = new StringBuilder();
+		int addedFeatures = 0;
+		for (String feature : features) {
+			message.append(feature);
+			message.append(", ");
+			if (addedFeatures++ >= 25) {
+				message.append("...");
+				break;
+			}
+		}
+		
+		return message.toString();
+	}
+	
 }

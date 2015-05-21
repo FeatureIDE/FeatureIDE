@@ -41,7 +41,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
- * A wizard page for creating T-Wise configurations with SPLCATool.
+ * A wizard page sampling.
  * 
  * @author Jens Meinicke
  */
@@ -50,7 +50,6 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 	private static final String LABEL_GENERATE = "&Strategy:";
 	private static final String LABEL_ALGORITHM = "&Algorithm:";
 	private static final String LABEL_ORDER = "&Order:";
-	private static final String LABEL_BUFFER = "&Buffer all configurations:";
 	private static final String LABEL_TEST = "&Run JUnit tests:";
 	private static final String LABEL_INTERACTIONS = "&Interactions: t=";
 	private static final String LABEL_CREATE_NEW_PROJECTS = "&Create new projects:";
@@ -58,9 +57,8 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 	private static final String TOOL_TIP_GENERATE = "Defines the produkt-based strategy.";
 	private static final String TOOL_TIP_T_WISE = "Defines the algorithm for t-wise sampling.";
 	private static final String TOOL_TIP_ORDER = "Defines how the generated produkts are ordered.";
-	private static final String TOOL_TIP_BUFFER = "If enabled, all products are buffered before odering and generation.";
 	private static final String TOOL_TIP_TEST= "Searches for test cased in the generated products and executes them.";
-	private static final String TOOL_TIP_T = "Define the t for t-wise generation or interaction-based order.";
+	private static final String TOOL_TIP_T = "Define the t for t-wise sampling.";
 	private static final String TOOL_TIP_PROJECT = "Defnies whether the produkts are generated into separate projects or into a folder in this project.";
 
 	@CheckForNull
@@ -83,15 +81,12 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 
 	private Combo comboGenerate;
 
-	private Button buttonBuffer;
 	private Button buttonTest;
 	private final String generate;
 	private final String order;
-	private boolean buffer;
 	private boolean test;
 
-	public BuildProductsPage(String project, IFeatureProject featureProject, String generate, boolean toggleState, String algorithm, int t, String order,
-			boolean buffer, boolean test) {
+	public BuildProductsPage(String project, IFeatureProject featureProject, String generate, boolean toggleState, String algorithm, int t, String order, boolean test) {
 		super(project);
 		this.project = featureProject;
 		this.toggleState = toggleState;
@@ -99,7 +94,6 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		this.generate = generate;
 		this.t = t;
 		this.order = order;
-		this.buffer = buffer;
 		this.test = test;
 		setDescription("Build products for project " + featureProject.getProjectName() + ".");
 	}
@@ -110,7 +104,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		Composite composite = new Composite(parent, SWT.NULL);
 		GridLayout layout = new GridLayout();
 		layout.numColumns = 2;
-		layout.verticalSpacing = 9;
+		layout.verticalSpacing = 7;
 		composite.setLayout(layout);
 		final Label labelGenerate = new Label(composite, SWT.NULL);
 		labelGenerate.setText(LABEL_GENERATE);
@@ -145,20 +139,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 			comboOrder.add(getOrderText(order));
 		}
 		comboOrder.setText(order);
-
-		final Label labelBuffer = new Label(composite, SWT.NULL);
-		labelBuffer.setText(LABEL_BUFFER);
-		labelBuffer.setToolTipText(TOOL_TIP_BUFFER);
-		buttonBuffer = new Button(composite, SWT.CHECK);
-		buttonBuffer.setLayoutData(gd);
-		buttonBuffer.setSelection(buffer);
-
-		final Label labelTest = new Label(composite, SWT.NULL);
-		labelTest.setText(LABEL_TEST);
-		labelTest.setToolTipText(TOOL_TIP_TEST);
-		buttonTest = new Button(composite, SWT.CHECK);
-		buttonTest.setLayoutData(gd);
-		buttonTest.setSelection(test);
+		comboOrder.setEnabled(comboGenerate.getText().equals(T_WISE_CONFIGURATIONS));
 
 		labelT = new Label(composite, SWT.NULL);
 		labelT.setText(LABEL_INTERACTIONS + "10");
@@ -169,13 +150,19 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		scale.setSelection(t);
 		setScale();
 
+		final Label labelTest = new Label(composite, SWT.NULL);
+		labelTest.setText(LABEL_TEST);
+		labelTest.setToolTipText(TOOL_TIP_TEST);
+		buttonTest = new Button(composite, SWT.CHECK);
+		buttonTest.setLayoutData(gd);
+		buttonTest.setSelection(test);
+
 		final Label labelProject = new Label(composite, SWT.NULL);
 		labelProject.setText(LABEL_CREATE_NEW_PROJECTS);
 		labelProject.setToolTipText(TOOL_TIP_PROJECT);
 		buttonBuildProject = new Button(composite, SWT.CHECK);
 		buttonBuildProject.setLayoutData(gd);
 		buttonBuildProject.setSelection(toggleState);
-
 		setPageComplete(false);
 		setControl(composite);
 		addListeners();
@@ -236,7 +223,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		-t t_wise -a CASA 	 -fm <feature_model> -s <strength, 1-6>
 		 **/
 
-		if (comboOrder.getText().equals(INTERACTIONS) || comboGenerate.getText().equals(T_WISE_CONFIGURATIONS)) {
+		if (comboGenerate.getText().equals(T_WISE_CONFIGURATIONS)) {
 			scale.setEnabled(true);
 		} else {
 			scale.setEnabled(false);
@@ -287,7 +274,10 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 
 		comboGenerate.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
-				comboAlgorithm.setEnabled(comboGenerate.getText().equals(T_WISE_CONFIGURATIONS));
+				final boolean tWise = comboGenerate.getText().equals(T_WISE_CONFIGURATIONS); 
+				comboAlgorithm.setEnabled(tWise);
+				comboOrder.setEnabled(tWise);
+
 				setScale();
 
 			}
@@ -331,7 +321,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 	}
 
 	public BuildOrder getOrder() {
-		if (comboOrder.getText().equals(DEFAULT)) {
+		if (!comboGenerate.getText().equals(T_WISE_CONFIGURATIONS) || comboOrder.getText().equals(DEFAULT)) {
 			return BuildOrder.DEFAULT;
 		}
 		if (comboOrder.getText().equals(DIFFERENCE)) {
@@ -346,10 +336,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 	String getSelectedOrder() {
 		return comboOrder.getText();
 	}
-
-	public boolean getBuffer() {
-		return buttonBuffer.getSelection();
-	}
+	
 	public boolean getTest() {
 		return buttonTest.getSelection();
 	}

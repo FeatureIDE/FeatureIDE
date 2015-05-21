@@ -64,18 +64,27 @@ class QuickFixMissingFeatures extends QuickFixMissingConfigurations {
 	}
 	
 	private List<Configuration> createConfigurations(final Collection<String> unusedFeatures, final IProgressMonitor monitor) {
-		monitor.beginTask("Create configurations", unusedFeatures.size());
+		monitor.beginTask("Create configurations for", unusedFeatures.size());
 		final List<Configuration> confs = new LinkedList<Configuration>();
 		while (!unusedFeatures.isEmpty()) {
+			monitor.subTask(createShortMessage(unusedFeatures));
+			if (monitor.isCanceled()) {
+				break;
+			}
 			final Configuration configuration = new Configuration(featureModel, true);
 			for (final String feature : unusedFeatures) {
 				if (configuration.getSelectablefeature(feature).getSelection() == Selection.UNDEFINED) {
 					configuration.setManual(feature, Selection.SELECTED);
-					monitor.worked(1);
+					
 				}
 			}
+			if (monitor.isCanceled()) {
+				break;
+			}
 			for (final Feature feature : configuration.getSelectedFeatures()) {
-				unusedFeatures.remove(feature.getName());
+				if (unusedFeatures.remove(feature.getName())) {
+					monitor.worked(1);	
+				}
 			}
 			
 			// select further features to get a valid configuration

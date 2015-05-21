@@ -208,26 +208,49 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		}
 	};
 	
-	private final IJob configurationChecker = new AStoppableJob("Checking all configurations for unused features.") {
+	private final IJob configurationChecker = new AStoppableJob("Checking configurations for unused features") {
+		
 		protected boolean work() {
+			setCancelingTimeout(100);
 			final IFolder folder = configFolder;
 			deleteConfigurationMarkers(folder, IResource.DEPTH_ZERO);
-			workMonitor.setMaxAbsoluteWork(4);
-
-			final boolean[][] selectionMatrix = getSelectionMatrix();
-			workMonitor.worked();
-			final Collection<String> falseOptionalFeatures = getFalseOptionalConfigurationFeatures(selectionMatrix);
-			workMonitor.worked();
-			final Collection<String> deadFeatures = getUnusedConfigurationFeatures(selectionMatrix);
-			workMonitor.worked();
-
+			workMonitor.setMaxAbsoluteWork(7);
+			workMonitor.createSubTask("calculate core and dead features");
+			List<String> concreteFeatures = (List<String>) getOptionalConcreteFeatures();
+			next("get selection matrix");
+			if (workMonitor.checkCancel()) {
+				return true;
+			}
+			final boolean[][] selectionMatrix = getSelectionMatrix(concreteFeatures);
+			next("get false optional features");
+			if (workMonitor.checkCancel()) {
+				return true;
+			}
+			final Collection<String> falseOptionalFeatures = getFalseOptionalConfigurationFeatures(selectionMatrix, concreteFeatures);
+			next("get unused features");
+			if (workMonitor.checkCancel()) {
+				return true;
+			}
+			final Collection<String> deadFeatures = getUnusedConfigurationFeatures(selectionMatrix, concreteFeatures);
+			next("create marker: dead features");
+			if (workMonitor.checkCancel()) {
+				return true;
+			}
 			if (!deadFeatures.isEmpty()) {
-				createConfigurationMarker(folder, MARKER_UNUSED + "Following features are not used: " + deadFeatures, -1,
+				createConfigurationMarker(folder, MARKER_UNUSED + deadFeatures.size() + " features are not used: " + createShortMessage(deadFeatures), -1,
 						IMarker.SEVERITY_WARNING);
 			}
+			next("create marker: false optional features");
+			if (workMonitor.checkCancel()) {
+				return true;
+			}
 			if (!falseOptionalFeatures.isEmpty()) {
-				createConfigurationMarker(folder, MARKER_FALSE_OPTIONAL + "Following features are optional but used in all configurations:"
-						+ falseOptionalFeatures, -1, IMarker.SEVERITY_WARNING);
+				createConfigurationMarker(folder, MARKER_FALSE_OPTIONAL + falseOptionalFeatures.size() + " features are optional but used in all configurations: "
+						+ createShortMessage(falseOptionalFeatures), -1, IMarker.SEVERITY_WARNING);
+			}
+			next("refesh configuration foler");
+			if (workMonitor.checkCancel()) {
+				return true;
 			}
 			try {
 				folder.refreshLocal(IResource.DEPTH_ZERO, null);
@@ -236,6 +259,26 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			}
 			workMonitor.worked();
 			return true;
+		}
+		
+		private void next(String subTaskName) {
+			workMonitor.worked();
+			workMonitor.createSubTask(subTaskName);
+		}
+
+		private String createShortMessage(Collection<String> features) {
+			StringBuilder message = new StringBuilder();
+			int addedFeatures = 0;
+			for (String feature : features) {
+				message.append(feature);
+				message.append(", ");
+				if (addedFeatures++ >= 25) {
+					message.append("...");
+					break;
+				}
+			}
+			
+			return message.toString();
 		}
 	};
 
@@ -992,31 +1035,31 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	 * Checks if any concrete feature is used in at least one configuration.
 	 */
 	// should also be called if a configuration file was removed
-	private synchronized void checkFeatureCoverage() {
+	private void checkFeatureCoverage() {
+		configurationChecker.cancel();
 		configurationChecker.schedule();
 	}
 
 	public Collection<String> getFalseOptionalConfigurationFeatures() {
-		return getFalseOptionalConfigurationFeatures(getSelectionMatrix());
+		return getFalseOptionalConfigurationFeatures(getSelectionMatrix(), (List<String>) getOptionalConcreteFeatures());
 	}
 
-	public Collection<String> getFalseOptionalConfigurationFeatures(boolean[][] selections) {
-		return checkValidSelections(selections, false);
+	public Collection<String> getFalseOptionalConfigurationFeatures(boolean[][] selections,final List<String> concreteFeatures) {
+		return checkValidSelections(selections, false, concreteFeatures);
 	}
 
 	public Collection<String> getUnusedConfigurationFeatures() {
-		return getUnusedConfigurationFeatures(getSelectionMatrix());
+		return getUnusedConfigurationFeatures(getSelectionMatrix(), (List<String>) getOptionalConcreteFeatures());
 	}
 
-	public Collection<String> getUnusedConfigurationFeatures(boolean[][] selections) {
-		return checkValidSelections(selections, true);
+	public Collection<String> getUnusedConfigurationFeatures(boolean[][] selections, final List<String> concreteFeatures) {
+		return checkValidSelections(selections, true, concreteFeatures);
 	}
 
-	private List<String> checkValidSelections(boolean[][] selections, boolean selectionState) {
+	private List<String> checkValidSelections(boolean[][] selections, boolean selectionState, final List<String> concreteFeatures) {
 		if (selections.length == 0) {
 			return Collections.emptyList();
 		}
-		final List<String> concreteFeatures = getFalseOptionalFeatures();
 		final List<String> falseOptionalFeatures = new LinkedList<String>();
 		for (int column = 0; column < concreteFeatures.size(); column++) {
 			boolean invalid = true;
@@ -1034,11 +1077,15 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	}
 
 	private boolean[][] getSelectionMatrix() {
+		return getSelectionMatrix(getOptionalConcreteFeatures());
+	}
+	
+	private boolean[][] getSelectionMatrix(final Collection<String> concreteFeatures) {
 		final List<IFile> configurations = getAllConfigurations();
-		final Collection<String> concreteFeatures = getOptionalConcreteFeatures();
+		 
 
 		final boolean[][] selections = new boolean[configurations.size()][concreteFeatures.size()];
-		final Configuration configuration = new Configuration(featureModel, Configuration.PARAM_LAZY);
+		final Configuration configuration = new Configuration(featureModel, Configuration.PARAM_IGNOREABSTRACT);
 		final ConfigurationReader reader = new ConfigurationReader(configuration);
 		
 		int row = 0;
@@ -1059,7 +1106,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	}
 
 	private Collection<String> getOptionalConcreteFeatures() {
-		final List<String> concreteFeatures = featureModel.getConcreteFeatureNames();
+		final Collection<String> concreteFeatures = featureModel.getConcreteFeatureNames();
 		List<List<Feature>> deadCoreList = featureModel.getAnalyser().analyzeFeatures();
 		for (final Feature feature : deadCoreList.get(0)) {
 			concreteFeatures.remove(feature.getName());
@@ -1068,18 +1115,6 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			concreteFeatures.remove(feature.getName());
 		}
 		return concreteFeatures;
-	}
-
-	private List<String> getFalseOptionalFeatures() {
-		final List<String> concreteFeatureNames = new LinkedList<String>();
-		final Collection<Feature> coreFeatures = featureModel.getAnalyser().getCoreFeatures();
-		
-		for (Feature feature : coreFeatures) {
-			if (feature.isConcrete() && !feature.isMandatory() && !feature.isAlternative()) {
-				concreteFeatureNames.add(feature.getName());
-			}
-		}
-		return concreteFeatureNames;
 	}
 
 	public IComposerExtensionClass getComposer() {

@@ -177,8 +177,6 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	private LinkedList<Node> children;
 
 	AbstractConfigurationSorter sorter;
-	private boolean bufferConfigurationsFirst;
-	private boolean buffered = false;
 	
 	public final boolean runTests;
 	
@@ -192,10 +190,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 */
 	@CheckForNull
 	public synchronized BuilderConfiguration getConfiguration() {
-		if (bufferConfigurationsFirst && !buffered) {
-			return null;
-		}
-		return sorter.getConfiguration(!bufferConfigurationsFirst);
+		return sorter.getConfiguration();
 	}
 
 	/**
@@ -204,7 +199,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 * @param configuration
 	 */
 	public synchronized void addConfiguration(BuilderConfiguration configuration) {
-		sorter.addConfiguration(configuration, !bufferConfigurationsFirst);
+		sorter.addConfiguration(configuration);
 	}
 
 	/**
@@ -225,15 +220,15 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 * @see BuildAllCurrentConfigurationsAction
 	 * @see BuildAllValidConfigurationsAction
 	 */
-	public ConfigurationBuilder(final IFeatureProject featureProject, final BuildType buildType, final boolean createNewProjects, final String algorithm, final int t, final BuildOrder buildOrder, final boolean bufferFirst, boolean runTests) {
-		this(featureProject, buildType, createNewProjects, algorithm, t, buildOrder, bufferFirst, runTests, null);
+	public ConfigurationBuilder(final IFeatureProject featureProject, final BuildType buildType, final boolean createNewProjects, final String algorithm, final int t, final BuildOrder buildOrder, boolean runTests) {
+		this(featureProject, buildType, createNewProjects, algorithm, t, buildOrder, runTests, null);
 	}
 	
 	public ConfigurationBuilder(final IFeatureProject featureProject, final BuildType buildType, final String featureName) {
-		this(featureProject, BuildType.INTEGRATION, false, "", 0, BuildOrder.DEFAULT, false, true, featureName);
+		this(featureProject, BuildType.INTEGRATION, false, "", 0, BuildOrder.DEFAULT, true, featureName);
 	}
 		
-	public ConfigurationBuilder(final IFeatureProject featureProject, final BuildType buildType, final boolean createNewProjects, final String algorithm, final int t, final BuildOrder buildOrder, final boolean bufferFirst, boolean runTests, final String featureName) {
+	public ConfigurationBuilder(final IFeatureProject featureProject, final BuildType buildType, final boolean createNewProjects, final String algorithm, final int t, final BuildOrder buildOrder, boolean runTests, final String featureName) {
 		this.runTests = runTests;
 		if (runTests) {
 			testResults = new TestResults(featureProject.getProjectName(), "FeatureIDE test: " + featureProject.getProjectName());
@@ -243,7 +238,6 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		if (!featureProject.getComposer().preBuildConfiguration()) {
 			return;
 		}
-		this.bufferConfigurationsFirst = bufferFirst;
 		this.algorithm = algorithm;
 		this.t = t;
 		this.featureProject = featureProject;
@@ -360,16 +354,6 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 					default:
 						break;
 					}
-					if (bufferConfigurationsFirst) {
-						if (!monitor.isCanceled()) {
-							monitor.beginTask("Sort configurations", (int) configurationNumber);
-							configurationNumber = sorter.sort(monitor);
-							monitor.beginTask("", (int) configurationNumber);
-						}
-						time = System.currentTimeMillis();
-						buffered = true;
-					}
-
 					finish();
 
 					if (!createNewProjects) {
@@ -387,34 +371,45 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			}
 
 			private void showStatistics(IProgressMonitor monitor) {
-				synchronized (this) {
-					while (!generatorJobs.isEmpty()) {
-						try {
-							if (monitor.isCanceled()) {
-								cancelGenerationJobs();
+				try {
+					synchronized (this) {
+						while (!generatorJobs.isEmpty()) {
+							try {
+								if (monitor.isCanceled()) {
+									cancelGenerationJobs();
+									break;
+								}
+								Generator job = generatorJobs.get(0);
+								if (job.getState() != Job.RUNNING) {
+									job.schedule();
+								}
+								monitor.setTaskName(getTaskName() + " (waiting for Generators to finish)");
+								monitor.worked(builtConfigurations);
+								built += builtConfigurations;
+								builtConfigurations = 0;
+								wait(100);
+							} catch (InterruptedException e) {
+								LOGGER.logError(e);
+							} catch (IndexOutOfBoundsException e) {
+								// nothing here
 							}
-							monitor.setTaskName(getTaskName() + " (waiting for Generators to finish)");
-							monitor.worked(builtConfigurations);
-							built += builtConfigurations;
-							builtConfigurations = 0;
-							wait(100);
-						} catch (InterruptedException e) {
-							LOGGER.logError(e);
 						}
 					}
+	
+					long duration = System.currentTimeMillis() - time;
+	
+					long s = (duration / 1000) % 60;
+					long min = (duration / (60 * 1000)) % 60;
+					long h = duration / (60 * 60 * 1000);
+					String t = h + "h " + (min < 10 ? "0" + min : min) + "min " + (s < 10 ? "0" + s : s) + "s.";
+	
+					if (built > configurationNumber) {
+						built = (int) configurationNumber;
+					}
+					LOGGER.logInfo(built + (configurationNumber != 0 ? " of " + configurationNumber : "") + " configurations built in " + t);
+				} finally {
+					generatorJobs.clear();
 				}
-
-				long duration = System.currentTimeMillis() - time;
-
-				long s = (duration / 1000) % 60;
-				long min = (duration / (60 * 1000)) % 60;
-				long h = duration / (60 * 60 * 1000);
-				String t = h + "h " + (min < 10 ? "0" + min : min) + "min " + (s < 10 ? "0" + s : s) + "s.";
-
-				if (built > configurationNumber) {
-					built = (int) configurationNumber;
-				}
-				LOGGER.logInfo(built + (configurationNumber != 0 ? " of " + configurationNumber : "") + " configurations built in " + t);
 			}
 
 		};
@@ -634,6 +629,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		reader = new ConfigurationReader(configuration);
 		monitor.beginTask("Sampling", (int) configurationNumber);
 		runSPLCATool();
+		sorter.sortConfigurations(monitor);
 	}
 
 	private void runSPLCATool() {
@@ -857,10 +853,10 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 				monitor.setTaskName(getTaskName());
 				addConfiguration(new BuilderConfiguration(configuration, confs));
 
-				if (!bufferConfigurationsFirst && sorter.getBufferSize() >= maxSize) {
+				if (sorter.getBufferSize() >= maxSize) {
 					monitor.setTaskName(getTaskName() + " (waiting, buffer full)");
 					synchronized (this) {
-						while (!bufferConfigurationsFirst && sorter.getBufferSize() >= maxSize) {
+						while (sorter.getBufferSize() >= maxSize) {
 							if (monitor.isCanceled()) {
 								return;
 							}

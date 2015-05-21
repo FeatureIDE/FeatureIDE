@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
@@ -49,13 +48,14 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 
 	public PriorizationSorter(FeatureModel featureModel) {
 		super(featureModel);
+		super.sorted = false;
 		this.featureModel = featureModel;
 	}
 	
 	private int configurationCounter = 1;
 
 	@Override
-	public int sort(final IProgressMonitor monitor) {
+	protected int sort(final IProgressMonitor monitor) {
 		if (configurations.isEmpty()) {
 			return 0;
 		}
@@ -98,32 +98,6 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 		
 //		LOGGER.logInfo(System.currentTimeMillis() - time + "ms to sort all configs");
 		return allsortedconfigs;
-	}
-	
-	
-
-	@Override
-	public synchronized BuilderConfiguration getConfiguration(boolean sort) {
-		if (sort) {
-			if (allsortedconfigs.isEmpty()) {
-				return createConfiguration(allyesconfig(), configurationCounter++);
-			} else if (!allconfigs.isEmpty()){
-				return createConfiguration(selectConfig(), configurationCounter++);
-			} else {
-				return null;
-			}
-		} else {
-			return super.getConfiguration(sort);
-		}
-	}
-	
-	@Override
-	public synchronized void addConfiguration(BuilderConfiguration configuration, boolean sort) {
-		if (sort) {
-			allconfigs.add(new ArrayList<String>(configuration.getSelectedFeatureNames()));
-		} else {
-			super.addConfiguration(configuration, sort);
-		}
 	}
 	
 	@Override

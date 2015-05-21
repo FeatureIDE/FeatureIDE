@@ -80,21 +80,12 @@ public class JavaCompiler implements IConfigurationBuilderBasics {
 	 * @param configuration The configuration to build
 	 */
 	protected void compile(BuilderConfiguration configuration) {
-		if (generator.builder.buildType == ConfigurationBuilder.BuildType.ALL_VALID) {
-			try {
-				generator.builder.folder.getFolder(CONFIGURATION_NAME + configuration.getName()).refreshLocal(IResource.DEPTH_INFINITE, null);
-			} catch (CoreException e) {
-				UIPlugin.getDefault().logError(e);
-			}
-			compile(CONFIGURATION_NAME + configuration.getName());
-		} else {
-			try {
-				generator.builder.folder.getFolder(configuration.getName()).refreshLocal(IResource.DEPTH_INFINITE, null);
-			} catch (CoreException e) {
-				UIPlugin.getDefault().logError(e);
-			}
-			compile(configuration.getName());
+		try {
+			generator.builder.folder.getFolder(configuration.getName()).refreshLocal(IResource.DEPTH_INFINITE, null);
+		} catch (CoreException e) {
+			UIPlugin.getDefault().logError(e);
 		}
+		compile(configuration.getName());
 	}
 
 	/**

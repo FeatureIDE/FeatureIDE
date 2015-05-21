@@ -58,12 +58,14 @@ import org.junit.runner.notification.RunListener;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.ui.UIPlugin;
+import de.ovgu.featureide.ui.actions.generator.IConfigurationBuilderBasics.BuildType;
 
 /**
  * Runs test cases of the generated product.
  * 
  * @author Jens Meinicke
  */
+@SuppressWarnings("restriction")
 public class TestRunner {
 
 	private static final Object KEY = new Object();
@@ -72,10 +74,12 @@ public class TestRunner {
 	int compiled = 0;
 
 	private final IFolder tmp;
+	private final ConfigurationBuilder builder;
 
-	public TestRunner(IFolder tmp, TestResults testResults) {
+	public TestRunner(IFolder tmp, TestResults testResults, final ConfigurationBuilder builder) {
 		this.tmp = tmp;
 		this.testResults = testResults;
+		this.builder = builder;
 
 	}
 
@@ -117,7 +121,7 @@ public class TestRunner {
 							return;
 						}
 						time = System.currentTimeMillis() - time;
-						testResults.addTest(file, configuration.getName(), new Test(description.toString(), time, file));
+						testResults.addTest(file, (builder.buildType == BuildType.ALL_CURRENT ? "" : ConfigurationBuilder.FOLDER_NAME + "\\") + configuration.getName(), new Test(description.toString(), time, file));
 					}
 
 					@Override
@@ -127,7 +131,7 @@ public class TestRunner {
 							return;
 						}
 						time = System.currentTimeMillis() - time;
-						testResults.addTest(file, configuration.getName(), new Test(failure.getTestHeader(), time, file, failure));
+						testResults.addTest(file, (builder.buildType == BuildType.ALL_CURRENT ? "" : ConfigurationBuilder.FOLDER_NAME + "\\") + configuration.getName(), new Test(failure.getTestHeader(), time, file, failure));
 						time = -1;
 					}
 
@@ -154,10 +158,6 @@ public class TestRunner {
 
 	}
 
-	/**
-	 * @return
-	 */
-	@SuppressWarnings("restriction")
 	private URL[] getURLs() {
 		ArrayList<URL> urls = new ArrayList<>();
 		try {

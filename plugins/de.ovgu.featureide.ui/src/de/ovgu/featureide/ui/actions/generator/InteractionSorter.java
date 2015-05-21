@@ -50,10 +50,11 @@ public class InteractionSorter extends AbstractConfigurationSorter {
 
 	private final  boolean skippConfigurations;
 	
-	private final Set<Interaction> allCoveredInteractions = new HashSet<Interaction>();
+//	private final Set<Interaction> allCoveredInteractions = new HashSet<Interaction>();
 
 	public InteractionSorter(final int t, final FeatureModel featureModel, final boolean skippConfigurations) {
 		super(featureModel);
+		super.sorted = false;
 		this.t = t;
 		this.skippConfigurations = skippConfigurations;
 	}
@@ -64,8 +65,6 @@ public class InteractionSorter extends AbstractConfigurationSorter {
 	 */
 	@Override
 	public int sort(final IProgressMonitor monitor) {
-//		LOGGER.logInfo("Start sorting configurations by interactions");
-//		final long time = System.currentTimeMillis();
 		monitor.beginTask("Sort configurations" , configurations.size() * 2);
 		for (final BuilderConfiguration c : configurations) {
 			if (monitor.isCanceled()) {
@@ -77,7 +76,6 @@ public class InteractionSorter extends AbstractConfigurationSorter {
 			monitor.worked(1);
 		}
 		
-//		final StringBuilder sbAfter = new StringBuilder(interactions.size());
 		final LinkedList<BuilderConfiguration> sorted = new LinkedList<BuilderConfiguration>();
 		while (!interactions.isEmpty()) {
 			if (monitor.isCanceled()) {
@@ -98,54 +96,14 @@ public class InteractionSorter extends AbstractConfigurationSorter {
 				break;
 			}
 			sorted.add(mostCovering);
-//			sbAfter.append(coveredInteractions.size());
-//			sbAfter.append("  ");
 			interactions.remove(mostCovering);
 			for (final Set<Interaction> interaction : interactions.values()) {
 				interaction.removeAll(coveredInteractions);
 			}
 			monitor.worked(1);
 		}
-//		LOGGER.logInfo(System.currentTimeMillis() - time + "ms to sort all configs");
 		configurations = sorted;
 		return configurations.size();
-	}
-	
-	@Override
-	public void addConfiguration(BuilderConfiguration configuration, boolean sort) {
-		if (sort) {
-			interactions.put(configuration, new HashSet<Interaction>());
-			getInteractions(interactions.get(configuration), configuration.getSelectedFeatureNames(), new ArrayList<String>(0), new ArrayList<String>(0), 1, null);
-		} else {
-			super.addConfiguration(configuration, sort);
-		}
-	}
-	
-	private int configurationNumber = 1;
-	
-	@Override
-	public synchronized BuilderConfiguration getConfiguration(boolean sort) {
-		BuilderConfiguration config = null; 
-		if (sort && !interactions.isEmpty()) {
-			for (final Set<Interaction> interaction : interactions.values()) {
-				interaction.removeAll(allCoveredInteractions);
-			}
-			
-			final BuilderConfiguration mostCovering = getMostCoveringConfiguration(interactions);
-			final Set<Interaction> coveredInteractions = interactions.get(mostCovering);
-			allCoveredInteractions.addAll(coveredInteractions);
-			interactions.remove(mostCovering);
-			for (final Set<Interaction> interaction : interactions.values()) {
-				interaction.removeAll(coveredInteractions);
-			}
-			config =  mostCovering;
-		} else {
-			config =  super.getConfiguration(sort);
-		}
-		if (config != null) {
-			config.setNumber(configurationNumber++);
-		}
-		return config;
 	}
 
 	@Override

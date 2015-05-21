@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -65,7 +66,7 @@ public class QuickFixFalseOptionalFeaturesTest {
 
 	}
 
-	@Parameters
+	@Parameters(name = "{0}")
 	public static Collection<Object[]> getModels()
 			throws FileNotFoundException, UnsupportedModelException {
 		//first tries the location on build server, if this fails tries to use local location
@@ -74,10 +75,15 @@ public class QuickFixFalseOptionalFeaturesTest {
 			"models").getPath());
 		}
 		Collection<Object[]> params = new ArrayList<Object[]>();
-		for (File f : MODEL_FILE_FOLDER.listFiles(getFileFilter(".xml"))) {
+		for (final File f : MODEL_FILE_FOLDER.listFiles(getFileFilter(".xml"))) {
 			Object[] models = new Object[2];
 
-			FeatureModel fm = new FeatureModel();
+			FeatureModel fm = new FeatureModel() {
+				// display file name at JUnit view
+				public String toString() {
+					return f.getName();
+				};
+			};
 			XmlFeatureModelReader r = new XmlFeatureModelReader(fm);
 			r.readFromFile(f);
 			models[0] = fm;
@@ -112,7 +118,7 @@ public class QuickFixFalseOptionalFeaturesTest {
 		}
 		
 		final Collection<String> falseOptionalFeaturesTest = new ArrayList<String>(falseOptionalFeatures);
-		final Collection<Configuration> confs = quickFix.createConfigurations(falseOptionalFeatures, fm, null);
+		final Collection<Configuration> confs = quickFix.createConfigurations(falseOptionalFeatures, fm, new NullProgressMonitor());
 		for (final Configuration conf : confs) {
 			for (final Feature feature : conf.getUnSelectedFeatures()) {
 				falseOptionalFeaturesTest.remove(feature.getName());

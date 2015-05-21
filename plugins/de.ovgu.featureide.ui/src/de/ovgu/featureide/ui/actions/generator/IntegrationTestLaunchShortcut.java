@@ -22,7 +22,7 @@ public class IntegrationTestLaunchShortcut implements ILaunchShortcut {
 		TreeSelection treeSelection = (TreeSelection) selection;
 		IFolder selectedFolder = (IFolder) treeSelection.toArray()[0];
 		IFeatureProject featureProject = CorePlugin.getFeatureProject(selectedFolder);
-		new ConfigurationBuilder(featureProject, BuildType.INTEGRATION, false, "", 0, BuildOrder.DEFAULT, false, true, selectedFolder.getName());
+		new ConfigurationBuilder(featureProject, BuildType.INTEGRATION, false, "", 0, BuildOrder.DEFAULT, true, selectedFolder.getName());
 	}
 
 	
