@@ -38,23 +38,23 @@ public class ThreadPool<T> {
 
 	final ConcurrentLinkedQueue<T> objects = new ConcurrentLinkedQueue<>();
 
-	private final ArrayList<AWorkerThread<T>> threads;
-	private final AWorkerThread<T> factory;
+	private final ArrayList<IWorkerThread> threads;
+	private final IMasterThread<T> factory;
 	private final WorkMonitor workMonitor;
 
 	private final int numberOfThreads;
 
 	private boolean initialized = false;
 
-	public ThreadPool(AWorkerThread<T> factory) {
+	public ThreadPool(IMasterThread<T> factory) {
 		this(factory, null);
 	}
 
-	public ThreadPool(AWorkerThread<T> factory, WorkMonitor workMonitor) {
+	public ThreadPool(IMasterThread<T> factory, WorkMonitor workMonitor) {
 		this(factory, workMonitor, NUMBER_OF_THREADS);
 	}
 
-	public ThreadPool(AWorkerThread<T> factory, WorkMonitor workMonitor, int numberOfThreads) {
+	public ThreadPool(IMasterThread<T> factory, WorkMonitor workMonitor, int numberOfThreads) {
 		this.factory = factory;
 		this.workMonitor = (workMonitor != null) ? workMonitor : new WorkMonitor();
 		this.numberOfThreads = numberOfThreads;
@@ -65,24 +65,25 @@ public class ThreadPool<T> {
 		this.objects.addAll(objects);
 	}
 
-	public List<AWorkerThread<T>> getThreads() {
+	public List<IWorkerThread> getThreads() {
 		return threads;
 	}
 
-	public void run() {
+	public void start() {
 		if (!initialized) {
 			reset();
 		}
 
-		for (AWorkerThread<T> thread : threads) {
+		for (IWorkerThread thread : threads) {
 			thread.start();
 		}
 		try {
-			for (AWorkerThread<T> thread : threads) {
+			for (IWorkerThread thread : threads) {
 				thread.join();
 			}
 		} catch (InterruptedException e) {
 			FMCorePlugin.getDefault().logError(e);
+			stop();
 		}
 	}
 
@@ -93,17 +94,21 @@ public class ThreadPool<T> {
 	public void reset() {
 		if (initialized) {
 			for (int i = 0; i < numberOfThreads; i++) {
-				threads.set(i, threads.get(i).clone());
+				threads.set(i, threads.get(i).reset());
 			}
 		} else {
 			for (int i = 0; i < numberOfThreads; i++) {
-				threads.add(factory.newInstance());
+				final InternWorkerThread<T> newWorker = factory.newWorker();
+				threads.add(newWorker);
+				newWorker.setThreadPool(this);
 			}
 			initialized = true;
 		}
-		for (AWorkerThread<T> newThread : threads) {
-			newThread.setObjects(objects);
-			newThread.setWorkMonitor(workMonitor);
+	}
+
+	public void stop() {
+		for (int i = 0; i < numberOfThreads; i++) {
+			threads.get(i).stop();
 		}
 	}
 

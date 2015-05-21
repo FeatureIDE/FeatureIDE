@@ -20,29 +20,26 @@
  */
 package de.ovgu.featureide.fm.core.conf.worker.base;
 
-import java.util.concurrent.ConcurrentLinkedQueue;
+public abstract class AWorkerThread<T, M extends IMasterThread<T>> extends Thread implements InternWorkerThread<T> {
 
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+	protected final M masterThread;
+	private ThreadPool<T> pool;
 
-public abstract class AWorkerThread<T> extends Thread {
-
-	private ConcurrentLinkedQueue<T> objects;
-	private WorkMonitor workMonitor;
-
-	void setObjects(ConcurrentLinkedQueue<T> objects) {
-		this.objects = objects;
+	protected AWorkerThread(M masterThread) {
+		this.masterThread = masterThread;
 	}
 
-	void setWorkMonitor(WorkMonitor workMonitor) {
-		this.workMonitor = workMonitor;
+	@Override
+	public final void setThreadPool(ThreadPool<T> pool) {
+		this.pool = pool;
 	}
 
 	@Override
 	public final void run() {
 		if (beforeWork()) {
-			for (T object = objects.poll(); object != null; object = objects.poll()) {
+			for (T object = pool.objects.poll(); object != null; object = pool.objects.poll()) {
 				work(object);
-				workMonitor.synchronizedWorked();
+				pool.worked();
 			}
 			afterWork(true);
 		} else {
@@ -50,12 +47,15 @@ public abstract class AWorkerThread<T> extends Thread {
 		}
 	}
 
-	@Override
-	public AWorkerThread<T> clone() {
-		return newInstance();
+	protected InternWorkerThread<T> resetWorker() {
+		return masterThread.newWorker();
 	}
 
-	public abstract AWorkerThread<T> newInstance();
+	public final InternWorkerThread<T> reset() {
+		final InternWorkerThread<T> t = resetWorker();
+		t.setThreadPool(pool);
+		return t;
+	}
 
 	protected boolean beforeWork() {
 		return true;

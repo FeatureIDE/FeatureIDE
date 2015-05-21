@@ -23,11 +23,8 @@ package de.ovgu.featureide.fm.core.conf.worker;
 import java.util.List;
 
 import org.prop4j.Literal;
-import org.prop4j.Node;
 import org.prop4j.SimpleSatSolver;
 
-import de.ovgu.featureide.fm.core.conf.ConfChanger2;
-import de.ovgu.featureide.fm.core.conf.FeatureGraph;
 import de.ovgu.featureide.fm.core.conf.nodes.Variable;
 import de.ovgu.featureide.fm.core.conf.worker.base.AWorkerThread;
 
@@ -36,55 +33,43 @@ import de.ovgu.featureide.fm.core.conf.worker.base.AWorkerThread;
  * 
  * @author Sebastian Krieter
  */
-public class CalcThread3 extends AWorkerThread<Integer> implements ISatThread {
+class CalcThread3 extends AWorkerThread<Integer, CalcMasterThread2> implements ISatThread {
 
-	private final FeatureGraph featureGraph;
-	private final ConfChanger2 variableConfiguration;
-	private final SimpleSatSolver solver;
-	private final Node fmNode;
+	private SimpleSatSolver solver;
 
-	public CalcThread3(FeatureGraph featureGraph, ConfChanger2 variableConfiguration, Node fmNode) {
-		this.featureGraph = featureGraph;
-		this.variableConfiguration = variableConfiguration;
-		this.fmNode = fmNode;
-		this.solver = new SimpleSatSolver(fmNode, 1000);
+	protected CalcThread3(CalcMasterThread2 masterThread) {
+		super(masterThread);
+		this.solver = new SimpleSatSolver(masterThread.fmNode, 1000);
 	}
 
-	private CalcThread3(FeatureGraph featureGraph, ConfChanger2 variableConfiguration, SimpleSatSolver solver) {
-		this.featureGraph = featureGraph;
-		this.variableConfiguration = variableConfiguration;
+	private CalcThread3(CalcMasterThread2 masterThread, SimpleSatSolver solver) {
+		super(masterThread);
 		this.solver = solver;
-		this.fmNode = null;
 	}
 
-	public void setKnownLiterals(List<Node> knownLiterals) {
-		this.solver.seBackbone(knownLiterals);
+	public void setKnownLiterals(List<Literal> knownLiterals, Literal l) {
+		this.solver.seBackbone(knownLiterals, l);
 	}
 
 	@Override
 	protected void work(Integer i) {
-		final byte value = solver.getValueOf(new Literal(featureGraph.featureArray[i]));
+		final byte value = solver.getValueOf(new Literal(masterThread.featureGraph.featureArray[i]));
 		switch (value) {
-		case  1: 
-			variableConfiguration.x(i, Variable.TRUE);
+		case 1:
+			masterThread.variableConfiguration.setNewValue(i, Variable.TRUE);
 			break;
-		case -1: 
-			variableConfiguration.x(i, Variable.FALSE);
+		case -1:
+			masterThread.variableConfiguration.setNewValue(i, Variable.FALSE);
 			break;
 		default:
-			variableConfiguration.x(i, Variable.UNDEFINED);
+			masterThread.variableConfiguration.setNewValue(i, Variable.UNDEFINED);
 			break;
 		}
 	}
 
 	@Override
-	public AWorkerThread<Integer> newInstance() {
-		return new CalcThread3(featureGraph, variableConfiguration, fmNode.clone());
-	}
-
-	@Override
-	public CalcThread3 clone() {
-		return new CalcThread3(featureGraph, variableConfiguration, solver);
+	protected CalcThread3 resetWorker() {
+		return new CalcThread3(masterThread, solver);
 	}
 
 }

@@ -51,7 +51,7 @@ import de.ovgu.featureide.fm.core.conf.nodes.Or2;
 import de.ovgu.featureide.fm.core.conf.nodes.Variable;
 import de.ovgu.featureide.fm.core.conf.nodes.VariableConfiguration;
 import de.ovgu.featureide.fm.core.conf.nodes.Xor;
-import de.ovgu.featureide.fm.core.conf.worker.DFSThread;
+import de.ovgu.featureide.fm.core.conf.worker.DFSMasterThread;
 import de.ovgu.featureide.fm.core.conf.worker.base.ThreadPool;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
@@ -246,9 +246,12 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 				featureNames.add(feature.getName());
 			}
 
-			final ThreadPool<String> dfsThread = new ThreadPool<>(new DFSThread(featureGraph), workMonitor);
+			final long start = System.nanoTime();
+			final ThreadPool<String> dfsThread = new ThreadPool<>(new DFSMasterThread(featureGraph), workMonitor);
+			//			final ThreadPool<String> dfsThread = new ThreadPool<>(new IncDFSThread(featureGraph), workMonitor);
 			dfsThread.addObjects(featureNames);
-			dfsThread.run();
+			dfsThread.start();
+			System.out.println("DFS Time: " + Math.floor((System.nanoTime() - start) / 1000000.0) / 1000.0 + "s");
 
 			writeFeatureGraph();
 		}

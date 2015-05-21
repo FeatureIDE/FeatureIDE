@@ -27,16 +27,15 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.prop4j.Literal;
-import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.conf.nodes.Expression;
 import de.ovgu.featureide.fm.core.conf.nodes.Variable;
 import de.ovgu.featureide.fm.core.conf.nodes.VariableConfiguration;
-import de.ovgu.featureide.fm.core.conf.worker.CalcThread2;
+import de.ovgu.featureide.fm.core.conf.worker.CalcMasterThread2;
 import de.ovgu.featureide.fm.core.conf.worker.ISatThread;
-import de.ovgu.featureide.fm.core.conf.worker.base.AWorkerThread;
+import de.ovgu.featureide.fm.core.conf.worker.base.IWorkerThread;
 import de.ovgu.featureide.fm.core.conf.worker.base.ThreadPool;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
@@ -50,12 +49,12 @@ public class ConfChanger implements IConfigurationChanger {
 	private final VariableConfiguration variableConfiguration;
 	private final ThreadPool<Integer> dfsThread;
 
-	private final List<Node> knownLiterals = new ArrayList<>();
+	private final List<Literal> knownLiterals = new ArrayList<>();
 
 	public ConfChanger(FeatureModel featureModel, FeatureGraph featureGraph, VariableConfiguration variableConfiguration) {
 		this.featureGraph = featureGraph;
 		this.variableConfiguration = variableConfiguration;
-		this.dfsThread = new ThreadPool<>(new CalcThread2(featureGraph, this, NodeCreator.createNodes(featureModel, true).toCNF()));
+		this.dfsThread = new ThreadPool<>(new CalcMasterThread2(featureGraph, this, NodeCreator.createNodes(featureModel, true).toCNF(), 2));
 		dfsThread.reset();
 	}
 
@@ -70,7 +69,7 @@ public class ConfChanger implements IConfigurationChanger {
 		changedFeatures.clear();
 
 		final int index = featureGraph.getFeatureIndex(f.getName());
-		set(index, newValue == Variable.TRUE);
+		setNewValue(index, newValue);
 
 		count = new int[4];
 
@@ -85,10 +84,10 @@ public class ConfChanger implements IConfigurationChanger {
 				final byte edge = (byte) (featureGraph.getEdge(index, i) & FeatureGraph.MASK_1_00001100);
 				switch (edge) {
 				case FeatureGraph.EDGE_10:
-					set(i, false);
+					setNewValue(i, Variable.FALSE);
 					break;
 				case FeatureGraph.EDGE_11:
-					set(i, true);
+					setNewValue(i, Variable.TRUE);
 					break;
 				case FeatureGraph.EDGE_1q:
 					compList.add(i);
@@ -105,10 +104,10 @@ public class ConfChanger implements IConfigurationChanger {
 				final byte edge = (byte) (featureGraph.getEdge(index, i) & FeatureGraph.MASK_0_00110000);
 				switch (edge) {
 				case FeatureGraph.EDGE_00:
-					set(i, false);
+					setNewValue(i, Variable.FALSE);
 					break;
 				case FeatureGraph.EDGE_01:
-					set(i, true);
+					setNewValue(i, Variable.TRUE);
 					break;
 				case FeatureGraph.EDGE_0q:
 					compList.add(i);
@@ -130,7 +129,7 @@ public class ConfChanger implements IConfigurationChanger {
 				expression.updateValue();
 				if (expression.getValue() == Variable.FALSE) {
 					variableConfiguration.setVariable(i, Variable.UNDEFINED);
-					set(i, false);
+					setNewValue(i, Variable.FALSE);
 					it.remove();
 					break;
 				} else {
@@ -138,7 +137,7 @@ public class ConfChanger implements IConfigurationChanger {
 					expression.updateValue();
 					if (expression.getValue() == Variable.FALSE) {
 						variableConfiguration.setVariable(i, Variable.UNDEFINED);
-						set(i, true);
+						setNewValue(i, Variable.TRUE);
 						it.remove();
 						break;
 					} else {
@@ -158,6 +157,8 @@ public class ConfChanger implements IConfigurationChanger {
 
 		knownLiterals.clear();
 
+		variableConfiguration.setVariable(index, Variable.UNDEFINED);
+
 		int i = 0;
 		for (Variable var : variableConfiguration) {
 			switch (var.getValue()) {
@@ -172,21 +173,22 @@ public class ConfChanger implements IConfigurationChanger {
 			}
 			i++;
 		}
+		variableConfiguration.setVariable(index, newValue);
 
 		dfsThread.reset();
-		for (AWorkerThread<Integer> thread : dfsThread.getThreads()) {
-			((ISatThread) thread).setKnownLiterals(knownLiterals);
+		for (IWorkerThread thread : dfsThread.getThreads()) {
+			((ISatThread) thread).setKnownLiterals(knownLiterals, new Literal(featureGraph.featureArray[index], newValue == Variable.TRUE));
 		}
 		dfsThread.addObjects(compList);
-		dfsThread.run();
+		dfsThread.start();
 
 		Collections.sort(changedFeatures);
 		return changedFeatures;
 	}
 
-	public void set(int index, boolean value) {
+	public void setNewValue(int index, byte value) {
 		if (variableConfiguration.getVariable(index).getValue() == Variable.UNDEFINED) {
-			variableConfiguration.setVariable(index, value ? Variable.TRUE : Variable.FALSE);
+			variableConfiguration.setVariable(index, value);
 			count[1]++;
 			changedFeatures.add(featureGraph.featureArray[index]);
 		}

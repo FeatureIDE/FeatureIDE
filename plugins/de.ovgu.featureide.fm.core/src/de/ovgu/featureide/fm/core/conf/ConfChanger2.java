@@ -29,16 +29,15 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.prop4j.Literal;
-import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.conf.nodes.Expression;
 import de.ovgu.featureide.fm.core.conf.nodes.Variable;
 import de.ovgu.featureide.fm.core.conf.nodes.VariableConfiguration;
-import de.ovgu.featureide.fm.core.conf.worker.CalcThread3;
+import de.ovgu.featureide.fm.core.conf.worker.CalcMasterThread2;
 import de.ovgu.featureide.fm.core.conf.worker.ISatThread;
-import de.ovgu.featureide.fm.core.conf.worker.base.AWorkerThread;
+import de.ovgu.featureide.fm.core.conf.worker.base.IWorkerThread;
 import de.ovgu.featureide.fm.core.conf.worker.base.ThreadPool;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
@@ -63,7 +62,7 @@ public class ConfChanger2 implements IConfigurationChanger {
 		this.featureGraph = featureGraph;
 		this.known = new byte[featureGraph.getSize()];
 		this.variableConfiguration = variableConfiguration;
-		this.dfsThread = new ThreadPool<>(new CalcThread3(featureGraph, this, NodeCreator.createNodes(featureModel, true).toCNF()), null);
+		this.dfsThread = new ThreadPool<>(new CalcMasterThread2(featureGraph, this, NodeCreator.createNodes(featureModel, true).toCNF(), 3));
 		dfsThread.reset();
 	}
 
@@ -91,7 +90,7 @@ public class ConfChanger2 implements IConfigurationChanger {
 			Variable v = q.poll();
 			setFeature_rec(v.getId(), v.getValue() == Variable.TRUE);
 			count[2] += compList.size();
-			sat();
+			sat(v.getId(), v.getValue());
 		}
 
 		//		setFeature_rec(index, newValue == Variable.TRUE);
@@ -137,7 +136,7 @@ public class ConfChanger2 implements IConfigurationChanger {
 					break;
 				case FeatureGraph.EDGE_1q:
 					compList.add(i);
-//										known[i] = 1;
+					//										known[i] = 1;
 					break;
 				default:
 					break;
@@ -161,7 +160,7 @@ public class ConfChanger2 implements IConfigurationChanger {
 					break;
 				case FeatureGraph.EDGE_0q:
 					compList.add(i);
-//										known[i] = 1;
+					//										known[i] = 1;
 					break;
 				default:
 					break;
@@ -201,7 +200,7 @@ public class ConfChanger2 implements IConfigurationChanger {
 		}
 	}
 
-	public void x(int index, byte value) {
+	public void setNewValue(int index, byte value) {
 		if (value == Variable.UNDEFINED) {
 			known[index] = 2;
 		} else {
@@ -209,11 +208,14 @@ public class ConfChanger2 implements IConfigurationChanger {
 		}
 	}
 
-	private void sat() {
+	private void sat(int index, byte newValue) {
 		if (compList.isEmpty()) {
 			return;
 		}
-		final List<Node> knownLiterals = new ArrayList<>();
+
+		variableConfiguration.setVariable(index, Variable.UNDEFINED);
+
+		final List<Literal> knownLiterals = new ArrayList<>();
 		for (Variable var : variableConfiguration) {
 			switch (var.getValue()) {
 			case Variable.TRUE:
@@ -226,14 +228,15 @@ public class ConfChanger2 implements IConfigurationChanger {
 				break;
 			}
 		}
+		variableConfiguration.setVariable(index, newValue);
 
 		dfsThread.reset();
-		for (AWorkerThread<Integer> thread : dfsThread.getThreads()) {
-			((ISatThread) thread).setKnownLiterals(knownLiterals);
+		for (IWorkerThread thread : dfsThread.getThreads()) {
+			((ISatThread) thread).setKnownLiterals(knownLiterals, new Literal(featureGraph.featureArray[index], newValue == Variable.TRUE));
 		}
 		dfsThread.addObjects(compList);
 		compList.clear();
-		dfsThread.run();
+		dfsThread.start();
 	}
 
 	private void set(int index, boolean value) {

@@ -22,32 +22,24 @@ package de.ovgu.featureide.fm.core.conf.worker;
 
 import java.util.Arrays;
 
-import de.ovgu.featureide.fm.core.conf.FeatureGraph;
 import de.ovgu.featureide.fm.core.conf.worker.base.AWorkerThread;
 
-public class DFSThread extends AWorkerThread<String> {
+class DFSThread extends AWorkerThread<String, DFSMasterThread> {
 
-	private final FeatureGraph featureGraph;
 	private final byte[] visited;
 
-	public DFSThread(FeatureGraph featureGraph) {
-		super();
-		this.featureGraph = featureGraph;
-		visited = new byte[featureGraph.featureArray.length];
+	protected DFSThread(DFSMasterThread masterThread) {
+		super(masterThread);
+		visited = new byte[masterThread.featureGraph.featureArray.length];
 	}
 
 	@Override
 	protected void work(String object) {
-		final int featureIndex = featureGraph.getFeatureIndex(object);
+		final int featureIndex = masterThread.featureGraph.getFeatureIndex(object);
 		Arrays.fill(visited, (byte) 0);
-		featureGraph.dfs(visited, featureIndex, true);
+		masterThread.featureGraph.dfs(visited, featureIndex, true);
 		Arrays.fill(visited, (byte) 0);
-		featureGraph.dfs(visited, featureIndex, false);
-	}
-
-	@Override
-	public DFSThread newInstance() {
-		return new DFSThread(featureGraph);
+		masterThread.featureGraph.dfs(visited, featureIndex, false);
 	}
 
 }

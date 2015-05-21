@@ -22,8 +22,10 @@ package de.ovgu.featureide.fm.core.conf.worker;
 
 import java.util.List;
 
-import org.prop4j.Node;
+import org.prop4j.Literal;
 
 public interface ISatThread {
-	void setKnownLiterals(List<Node> knownLiterals);
+
+	void setKnownLiterals(List<Literal> knownLiterals, Literal l);
+
 }

@@ -47,11 +47,14 @@ public class SimpleSatSolver extends SatSolver {
 		b = new byte[solver.nVars()];
 	}
 
-	public void seBackbone(List<Node> knownLiterals) {
+	public void seBackbone(List<Literal> knownLiterals, Literal curLiteral) {
 		backbone = new VecInt(knownLiterals.size() << 1);
-		for (Node node : knownLiterals) {
+		for (Literal node : knownLiterals) {
 			backbone.push(getIntOfLiteral(node));
 		}
+		int x = getIntOfLiteral(curLiteral);
+
+		backbone.pop().push(x);
 		try {
 			satisfiable = solver.isSatisfiable(backbone);
 		} catch (TimeoutException e) {
@@ -62,16 +65,9 @@ public class SimpleSatSolver extends SatSolver {
 			for (int i = 0; i < model.length; i++) {
 				b[i] = (byte) Math.signum(model[i]);
 			}
-			if (model.length < b.length) {
-				System.out.println();
-				System.out.println("----- Short Model -------");
-				System.out.println();
-			}
+			assert model.length == b.length : "Short Model Length";
 		} else {
-			System.out.println();
-			System.out.println("----- Contradiction -------");
-			System.out.println(solver.unsatExplanation());
-			System.out.println();
+			throw new RuntimeException("Contradiction");
 		}
 	}
 

@@ -26,15 +26,14 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.prop4j.Literal;
-import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.conf.nodes.Variable;
 import de.ovgu.featureide.fm.core.conf.nodes.VariableConfiguration;
-import de.ovgu.featureide.fm.core.conf.worker.CalcThread4;
+import de.ovgu.featureide.fm.core.conf.worker.CalcMasterThread2;
 import de.ovgu.featureide.fm.core.conf.worker.ISatThread;
-import de.ovgu.featureide.fm.core.conf.worker.base.AWorkerThread;
+import de.ovgu.featureide.fm.core.conf.worker.base.IWorkerThread;
 import de.ovgu.featureide.fm.core.conf.worker.base.ThreadPool;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
@@ -51,7 +50,7 @@ public class SatConfChanger implements IConfigurationChanger {
 	public SatConfChanger(FeatureModel featureModel, FeatureGraph featureGraph, VariableConfiguration variableConfiguration) {
 		this.featureGraph = featureGraph;
 		this.variableConfiguration = variableConfiguration;
-		this.dfsThread = new ThreadPool<>(new CalcThread4(featureGraph, this, NodeCreator.createNodes(featureModel, true).toCNF()));
+		this.dfsThread = new ThreadPool<>(new CalcMasterThread2(featureGraph, this, NodeCreator.createNodes(featureModel, true).toCNF(), 4));
 		dfsThread.reset();
 	}
 
@@ -64,10 +63,12 @@ public class SatConfChanger implements IConfigurationChanger {
 		changedFeatures.clear();
 
 		final int index = featureGraph.getFeatureIndex(f.getName());
-		set(index, newValue == Variable.TRUE);
+		setNewValue(index, newValue);
 
 		final List<Integer> compList = new ArrayList<>();
-		final List<Node> knownLiterals = new ArrayList<>();
+		final List<Literal> knownLiterals = new ArrayList<>();
+
+		variableConfiguration.setVariable(index, Variable.UNDEFINED);
 
 		int i = 0;
 		for (Variable var : variableConfiguration) {
@@ -84,23 +85,24 @@ public class SatConfChanger implements IConfigurationChanger {
 			}
 			i++;
 		}
+		variableConfiguration.setVariable(index, newValue);
 
 		dfsThread.reset();
-		for (AWorkerThread<Integer> thread : dfsThread.getThreads()) {
-			((ISatThread) thread).setKnownLiterals(knownLiterals);
+		for (IWorkerThread thread : dfsThread.getThreads()) {
+			((ISatThread) thread).setKnownLiterals(knownLiterals, new Literal(featureGraph.featureArray[index], newValue == Variable.TRUE));
 		}
 		dfsThread.addObjects(compList);
-		dfsThread.run();
+		dfsThread.start();
 
 		final ArrayList<String> changedFeatures2 = new ArrayList<>(changedFeatures);
 		Collections.sort(changedFeatures2);
 		return changedFeatures2;
 	}
 
-	public void set(int index, boolean value) {
+	public void setNewValue(int index, byte value) {
 		if (variableConfiguration.getVariable(index).getValue() == Variable.UNDEFINED) {
-			variableConfiguration.setVariable(index, value ? Variable.TRUE : Variable.FALSE);
-			changedFeatures.add(featureGraph.featureArray[index] + ": " + value);
+			variableConfiguration.setVariable(index, value);
+			changedFeatures.add(featureGraph.featureArray[index] + ": " + (value == Variable.TRUE));
 		}
 	}
 

@@ -49,18 +49,19 @@ public class FeatureGraphStatisticJob extends AProjectJob<FeatureGraphStatisticJ
 		}
 	}
 
-	private final FeatureGraph featureGraph;
-	
+	private FeatureGraph featureGraph;
+
 	private long curTime = 0;
 	private boolean wrongResult = false;
 
 	protected FeatureGraphStatisticJob(Arguments arguments) {
 		super("Computing Statistics on Feature Graph", arguments);
-		featureGraph = arguments.featureModel.getFeatureGraph();
 	}
 
 	@Override
 	protected boolean work() throws Exception {
+		featureGraph = arguments.featureModel.getFeatureGraph();
+
 		//		statisticPart(true, false);
 		//		statisticPart(true, true);
 		//		statisticPart2();
@@ -156,8 +157,8 @@ public class FeatureGraphStatisticJob extends AProjectJob<FeatureGraphStatisticJ
 		final ArrayList<Integer> indexArray = createIndexArray();
 
 		final VariableConfiguration variableConfiguration = new VariableConfiguration(featureGraph.getSize());
-		final IConfigurationChanger c1 = compare ? new ConfChanger2(arguments.featureModel, featureGraph, variableConfiguration)
-				: new SatConfChanger(arguments.featureModel, featureGraph, variableConfiguration);
+		final IConfigurationChanger c1 = compare ? new ConfChanger2(arguments.featureModel, featureGraph, variableConfiguration) : new SatConfChanger(
+				arguments.featureModel, featureGraph, variableConfiguration);
 
 		for (int vIndex = 0; vIndex < featureGraph.getSize(); vIndex++) {
 			if (compare) {

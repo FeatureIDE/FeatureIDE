@@ -31,7 +31,7 @@ import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.conf.nodes.Expression;
 
 public class FeatureGraph implements Serializable {
-	
+
 	private static final long serialVersionUID = -4051783169730533477L;
 
 	public static final byte EDGE_NONE = 0b00000000, EDGE_11 = 0b00000100, //0x04,
@@ -119,9 +119,9 @@ public class FeatureGraph implements Serializable {
 		setEdge(featureMap.get(from), featureMap.get(to), edgeType);
 	}
 
-	public void setEdge(int from, int to, byte edgeType) {
+	public boolean setEdge(int from, int to, byte edgeType) {
 		if (from == to) {
-			return;
+			return false;
 		}
 		final int index = (from * size) + to;
 
@@ -190,6 +190,8 @@ public class FeatureGraph implements Serializable {
 		synchronized (featureArray[from]) {
 			adjMatrix[index] = (byte) newValue;
 		}
+
+		return oldValue != newValue;
 	}
 
 	//public byte getEdge(String from, String to) {
@@ -251,13 +253,11 @@ public class FeatureGraph implements Serializable {
 						// don't select child
 						childSelected = 0;
 						visited[j] = 2;
-						//						System.out.println("\tq " + featureArray[j]);
 						break;
 					case EDGE_11:
 						// select child
 						childSelected = 1;
 						visited[j] = 2;
-						//						System.out.println("\tq " + featureArray[j]);
 						break;
 					case EDGE_1q:
 						// ?
@@ -266,7 +266,6 @@ public class FeatureGraph implements Serializable {
 						}
 						visited[j] = 1;
 						childSelected = 2;
-						//						System.out.println("\tq " + featureArray[j]);
 						break;
 					default:
 						continue;
@@ -296,9 +295,7 @@ public class FeatureGraph implements Serializable {
 					}
 				}
 
-//				if (childSelected < 2) {
-					dfs_rec(visited, j, curFeature, childSelected, selected);
-//				}
+				dfs_rec(visited, j, curFeature, childSelected, selected);
 			}
 		}
 	}
@@ -326,9 +323,335 @@ public class FeatureGraph implements Serializable {
 					// visit = 0, not selected, implies ?
 					case EDGE_0q:
 						visited[j] = 1;
-						//XXX Lazy???
 						setEdge(parentFeature, j, parentSelected ? EDGE_1q : EDGE_0q);
 						dfs_rec(visited, j, parentFeature, (byte) 2, parentSelected);
+						break;
+					}
+					break;
+				case 1:
+					switch (edge & MASK_1_00001100) {
+					// visit = 0, selected, implies not selected
+					case EDGE_10:
+						visited[j] = 2;
+						setEdge(parentFeature, j, parentSelected ? EDGE_10 : EDGE_00);
+						dfs_rec(visited, j, parentFeature, (byte) 0, parentSelected);
+						break;
+					// visit = 0, selected, implies selected
+					case EDGE_11:
+						visited[j] = 2;
+						setEdge(parentFeature, j, parentSelected ? EDGE_11 : EDGE_01);
+						dfs_rec(visited, j, parentFeature, (byte) 1, parentSelected);
+						break;
+					// visit = 0, selected, implies ?
+					case EDGE_1q:
+						visited[j] = 1;
+						setEdge(parentFeature, j, parentSelected ? EDGE_1q : EDGE_0q);
+						dfs_rec(visited, j, parentFeature, (byte) 2, parentSelected);
+						break;
+					}
+					break;
+				case 2:
+					if (edge > 0) {
+						visited[j] = 1;
+						setEdge(parentFeature, j, parentSelected ? EDGE_1q : EDGE_0q);
+						dfs_rec(visited, j, parentFeature, (byte) 2, parentSelected);
+					}
+					break;
+				}
+			} else if (visit == 1) {
+				final byte edge = getEdge(curFeature, j);
+				switch (selected) {
+				case 0:
+					switch (edge & MASK_0_00110000) {
+					// visit = 1, not selected, implies not selected
+					case EDGE_00:
+						visited[j] = 2;
+						setEdge(parentFeature, j, parentSelected ? EDGE_10 : EDGE_00);
+						dfs_rec(visited, j, parentFeature, (byte) 0, parentSelected);
+						break;
+					// visit = 1, not selected, implies selected
+					case EDGE_01:
+						visited[j] = 2;
+						setEdge(parentFeature, j, parentSelected ? EDGE_11 : EDGE_01);
+						dfs_rec(visited, j, parentFeature, (byte) 1, parentSelected);
+						break;
+					}
+					break;
+				case 1:
+					switch (edge & MASK_1_00001100) {
+					// visit = 1, selected, implies not selected
+					case EDGE_10:
+						visited[j] = 2;
+						setEdge(parentFeature, j, parentSelected ? EDGE_10 : EDGE_00);
+						dfs_rec(visited, j, parentFeature, (byte) 0, parentSelected);
+						break;
+					// visit = 1, selected, implies selected
+					case EDGE_11:
+						visited[j] = 2;
+						setEdge(parentFeature, j, parentSelected ? EDGE_11 : EDGE_01);
+						dfs_rec(visited, j, parentFeature, (byte) 1, parentSelected);
+						break;
+					}
+					break;
+				}
+			}
+		}
+	}
+
+	public void dfs2(byte[] visited, boolean[] complete, int curFeature, boolean selected) {
+		//	System.out.println(featureArray[curFeature] + " " + selected);
+		visited[curFeature] = 2;
+
+		for (int j = 0; j < visited.length; j++) {
+			final byte visit = visited[j];
+			if (visit < 2) {
+				final byte childSelected;
+				if (selected) {
+					switch (getEdge(curFeature, j) & MASK_1_00001100) {
+					case EDGE_10:
+						// don't select child
+						childSelected = 0;
+						visited[j] = 2;
+						break;
+					case EDGE_11:
+						// select child
+						childSelected = 1;
+						visited[j] = 2;
+						break;
+					case EDGE_1q:
+						// ?
+						if (visit == 1) {
+							continue;
+						}
+						visited[j] = 1;
+						childSelected = 2;
+						break;
+					default:
+						continue;
+					}
+				} else {
+					switch (getEdge(curFeature, j) & MASK_0_00110000) {
+					case EDGE_00:
+						// don't select child
+						childSelected = 0;
+						visited[j] = 2;
+						break;
+					case EDGE_01:
+						// select child
+						childSelected = 1;
+						visited[j] = 2;
+						break;
+					case EDGE_0q:
+						// ?
+						if (visit == 1) {
+							continue;
+						}
+						childSelected = 2;
+						visited[j] = 1;
+						break;
+					default:
+						continue;
+					}
+				}
+
+				dfs2_rec(visited, complete, j, curFeature, childSelected, selected);
+			}
+		}
+	}
+
+	private void dfs2_rec(byte[] visited, boolean[] complete, int curFeature, int parentFeature, byte selected, boolean parentSelected) {
+		final boolean incomplete = !complete[curFeature];
+		for (int j = 0; j < visited.length; j++) {
+			final byte visit = visited[j];
+			byte childSelected = -1;
+			if (visit == 0) {
+				final byte edge = getEdge(curFeature, j);
+				switch (selected) {
+				case 0:
+					switch (edge & MASK_0_00110000) {
+					// visit = 0, not selected, implies not selected
+					case EDGE_00:
+						visited[j] = 2;
+						setEdge(parentFeature, j, parentSelected ? EDGE_10 : EDGE_00);
+						childSelected = 0;
+						break;
+					// visit = 0, not selected, implies selected
+					case EDGE_01:
+						visited[j] = 2;
+						setEdge(parentFeature, j, parentSelected ? EDGE_11 : EDGE_01);
+						childSelected = 1;
+						break;
+					// visit = 0, not selected, implies ?
+					case EDGE_0q:
+						visited[j] = 1;
+						setEdge(parentFeature, j, parentSelected ? EDGE_1q : EDGE_0q);
+						childSelected = 2;
+						break;
+					}
+					break;
+				case 1:
+					switch (edge & MASK_1_00001100) {
+					// visit = 0, selected, implies not selected
+					case EDGE_10:
+						visited[j] = 2;
+						setEdge(parentFeature, j, parentSelected ? EDGE_10 : EDGE_00);
+						childSelected = 0;
+						break;
+					// visit = 0, selected, implies selected
+					case EDGE_11:
+						visited[j] = 2;
+						setEdge(parentFeature, j, parentSelected ? EDGE_11 : EDGE_01);
+						childSelected = 1;
+						break;
+					// visit = 0, selected, implies ?
+					case EDGE_1q:
+						visited[j] = 1;
+						setEdge(parentFeature, j, parentSelected ? EDGE_1q : EDGE_0q);
+						childSelected = 2;
+						break;
+					}
+					break;
+				case 2:
+					if (edge > 0) {
+						visited[j] = 1;
+						setEdge(parentFeature, j, parentSelected ? EDGE_1q : EDGE_0q);
+						childSelected = 2;
+					}
+					break;
+				}
+			} else if (visit == 1) {
+				final byte edge = getEdge(curFeature, j);
+				switch (selected) {
+				case 0:
+					switch (edge & MASK_0_00110000) {
+					// visit = 1, not selected, implies not selected
+					case EDGE_00:
+						visited[j] = 2;
+						setEdge(parentFeature, j, parentSelected ? EDGE_10 : EDGE_00);
+						childSelected = 0;
+						break;
+					// visit = 1, not selected, implies selected
+					case EDGE_01:
+						visited[j] = 2;
+						setEdge(parentFeature, j, parentSelected ? EDGE_11 : EDGE_01);
+						childSelected = 1;
+						break;
+					}
+					break;
+				case 1:
+					switch (edge & MASK_1_00001100) {
+					// visit = 1, selected, implies not selected
+					case EDGE_10:
+						visited[j] = 2;
+						setEdge(parentFeature, j, parentSelected ? EDGE_10 : EDGE_00);
+						childSelected = 0;
+						break;
+					// visit = 1, selected, implies selected
+					case EDGE_11:
+						visited[j] = 2;
+						setEdge(parentFeature, j, parentSelected ? EDGE_11 : EDGE_01);
+						childSelected = 1;
+						break;
+					}
+					break;
+				}
+			}
+			if (incomplete && childSelected >= 0) {
+				dfs2_rec(visited, complete, j, parentFeature, childSelected, parentSelected);
+			}
+		}
+	}
+
+	// visited: 0 not visited, 1 visited (unknown status), 2 visited (known status)
+	public void dfs_incomplete(byte[] visited, int curFeature, boolean selected) {
+		//	System.out.println(featureArray[curFeature] + " " + selected);
+		visited[curFeature] = 2;
+
+		for (int j = 0; j < visited.length; j++) {
+			final byte visit = visited[j];
+			if (visit < 2) {
+				final byte childSelected;
+				if (selected) {
+					switch (getEdge(curFeature, j) & MASK_1_00001100) {
+					case EDGE_10:
+						// don't select child
+						childSelected = 0;
+						visited[j] = 2;
+						break;
+					case EDGE_11:
+						// select child
+						childSelected = 1;
+						visited[j] = 2;
+						break;
+					case EDGE_1q:
+						// ?
+						if (visit == 1) {
+							continue;
+						}
+						visited[j] = 1;
+						childSelected = 2;
+						break;
+					default:
+						continue;
+					}
+				} else {
+					switch (getEdge(curFeature, j) & MASK_0_00110000) {
+					case EDGE_00:
+						// don't select child
+						childSelected = 0;
+						visited[j] = 2;
+						break;
+					case EDGE_01:
+						// select child
+						childSelected = 1;
+						visited[j] = 2;
+						break;
+					case EDGE_0q:
+						// ?
+						if (visit == 1) {
+							continue;
+						}
+						childSelected = 2;
+						visited[j] = 1;
+						break;
+					default:
+						continue;
+					}
+				}
+
+				if (childSelected < 2) {
+					dfs_incomplete_rec(visited, j, curFeature, childSelected, selected);
+				}
+			}
+		}
+	}
+
+	private void dfs_incomplete_rec(byte[] visited, int curFeature, int parentFeature, byte selected, boolean parentSelected) {
+		for (int j = 0; j < visited.length; j++) {
+			final byte visit = visited[j];
+			if (visit == 0) {
+				final byte edge = getEdge(curFeature, j);
+				switch (selected) {
+				case 0:
+					switch (edge & MASK_0_00110000) {
+					// visit = 0, not selected, implies not selected
+					case EDGE_00:
+						visited[j] = 2;
+						setEdge(parentFeature, j, parentSelected ? EDGE_10 : EDGE_00);
+						dfs_rec(visited, j, parentFeature, (byte) 0, parentSelected);
+						break;
+					// visit = 0, not selected, implies selected
+					case EDGE_01:
+						visited[j] = 2;
+						setEdge(parentFeature, j, parentSelected ? EDGE_11 : EDGE_01);
+						dfs_rec(visited, j, parentFeature, (byte) 1, parentSelected);
+						break;
+					// visit = 0, not selected, implies ?
+					case EDGE_0q:
+						visited[j] = 1;
+						//XXX Lazy???
+						setEdge(parentFeature, j, parentSelected ? EDGE_1q : EDGE_0q);
+						//						dfs_rec(visited, j, parentFeature, (byte) 2, parentSelected);
 						break;
 					// default ???
 					}
@@ -352,20 +675,20 @@ public class FeatureGraph implements Serializable {
 						visited[j] = 1;
 						//XXX Lazy???
 						setEdge(parentFeature, j, parentSelected ? EDGE_1q : EDGE_0q);
-						dfs_rec(visited, j, parentFeature, (byte) 2, parentSelected);
+						//						dfs_rec(visited, j, parentFeature, (byte) 2, parentSelected);
 						break;
 					// default ???
 					}
 					break;
-				case 2:
-					if (edge > 0) {
-						visited[j] = 1;
-						//TODO Lazy???
-						setEdge(parentFeature, j, parentSelected ? EDGE_1q : EDGE_0q);
-						//TODO Lazy???
-						dfs_rec(visited, j, parentFeature, (byte) 2, parentSelected);
-					}
-					break;
+				//				case 2:
+				//					if (edge > 0) {
+				//						visited[j] = 1;
+				//						//TODO Lazy???
+				//						setEdge(parentFeature, j, parentSelected ? EDGE_1q : EDGE_0q);
+				//						//TODO Lazy???
+				//						dfs_rec(visited, j, parentFeature, (byte) 2, parentSelected);
+				//					}
+				//					break;
 				}
 			} else if (visit == 1) {
 				final byte edge = getEdge(curFeature, j);
@@ -408,5 +731,138 @@ public class FeatureGraph implements Serializable {
 			}
 		}
 	}
+
+	//	public void dfs_mm() {
+	//		for (int i = 0; i < size; i++) {
+	//			for (int k = 0; k < size; k++) {
+	//				for (int j = 0; j < size; j++) {
+	//					final byte x = (byte) (getEdge(j, k) & getEdge(i, j));
+	//					if ((x & MASK_1_00001100) == EDGE_1q) {
+	//						setEdge(i, k, EDGE_1q);
+	//					}
+	//					if ((x & MASK_0_00110000) == EDGE_0q) {
+	//						setEdge(i, k, EDGE_0q);
+	//					}
+	//				}
+	//			}
+	//		}
+	//	}
+
+	//	private class QE {
+	//		private final int index;
+	//		private final byte selected;
+	//
+	//		public QE(int index, byte selected) {
+	//			this.index = index;
+	//			this.selected = selected;
+	//		}
+	//	}
+	//
+	//	public void dfs2(int length, int curFeature, boolean selected) {
+	//		//	System.out.println(featureArray[curFeature] + " " + selected);
+	////		visited[curFeature] = 2;
+	//		System.out.println(curFeature);
+	//
+	//		LinkedList<Integer> q1 = new LinkedList<>();
+	//		LinkedList<QE> q2 = new LinkedList<>();
+	//		for (int i = 0; i < length; i++) {
+	//			q1.add(i);
+	//		}
+	//		boolean changed = true;
+	//		while (changed) {
+	//			changed = false;
+	//			for (Iterator<Integer> iterator = q1.iterator(); iterator.hasNext();) {
+	//				int j = iterator.next();
+	//				if (selected) {
+	//					switch (getEdge(curFeature, j) & MASK_1_00001100) {
+	//					case EDGE_10:
+	//						q2.offer(new QE(j, (byte) 0));
+	//						iterator.remove();
+	//						break;
+	//					case EDGE_11:
+	//						q2.offer(new QE(j, (byte) 1));
+	//						iterator.remove();
+	//						break;
+	//					case EDGE_1q:
+	//						q2.offer(new QE(j, (byte) 2));
+	//						break;
+	//					default:
+	//						continue;
+	//					}
+	//				} else {
+	//					switch (getEdge(curFeature, j) & MASK_0_00110000) {
+	//					case EDGE_00:
+	//						q2.offer(new QE(j, (byte) 0));
+	//						iterator.remove();
+	//						break;
+	//					case EDGE_01:
+	//						q2.offer(new QE(j, (byte) 1));
+	//						iterator.remove();
+	//						break;
+	//					case EDGE_0q:
+	//						q2.offer(new QE(j, (byte) 2));
+	//						break;
+	//					default:
+	//						continue;
+	//					}
+	//				}
+	//			}
+	//
+	//			while (!q2.isEmpty()) {
+	//				QE k = q2.poll();
+	//				for (Iterator<Integer> iterator = q1.iterator(); iterator.hasNext();) {
+	//					int j = iterator.next();
+	//					final byte edge = getEdge(k.index, j);
+	//					switch (k.selected) {
+	//					case 0:
+	//						switch (edge & MASK_0_00110000) {
+	//						case EDGE_00:
+	//							setEdge(curFeature, j, selected ? EDGE_10 : EDGE_00);
+	//							changed = true;
+	//							iterator.remove();
+	//							break;
+	//						case EDGE_01:
+	//							setEdge(curFeature, j, selected ? EDGE_11 : EDGE_01);
+	//							changed = true;
+	//							iterator.remove();
+	//							break;
+	//						case EDGE_0q:
+	//							//XXX Lazy???
+	//							if (setEdge(curFeature, j, selected ? EDGE_1q : EDGE_0q)) {
+	//								changed = true;
+	//							}
+	//							break;
+	//						}
+	//						break;
+	//					case 1:
+	//						switch (edge & MASK_1_00001100) {
+	//						case EDGE_10:
+	//							setEdge(curFeature, j, selected ? EDGE_10 : EDGE_00);
+	//							changed = true;
+	//							iterator.remove();
+	//							break;
+	//						case EDGE_11:
+	//							setEdge(curFeature, j, selected ? EDGE_11 : EDGE_01);
+	//							changed = true;
+	//							iterator.remove();
+	//							break;
+	//						case EDGE_1q:
+	//							//XXX Lazy???
+	//							if (setEdge(curFeature, j, selected ? EDGE_1q : EDGE_0q)) {
+	//								changed = true;
+	//							}
+	//							break;
+	//						}
+	//						break;
+	//					case 2:
+	//						if (edge > 0 && setEdge(curFeature, j, selected ? EDGE_1q : EDGE_0q)) {
+	//							changed = true;
+	//						}
+	//						break;
+	//					}
+	//				}
+	//			}
+	//		}
+	//	}
 
 }
