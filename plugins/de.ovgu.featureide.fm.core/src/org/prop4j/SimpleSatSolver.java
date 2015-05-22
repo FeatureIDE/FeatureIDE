@@ -48,13 +48,13 @@ public class SimpleSatSolver extends SatSolver {
 	}
 
 	public void seBackbone(List<Literal> knownLiterals, Literal curLiteral) {
-		backbone = new VecInt(knownLiterals.size() << 1);
+		backbone = new VecInt((knownLiterals.size() + 1) << 1);
 		for (Literal node : knownLiterals) {
 			backbone.push(getIntOfLiteral(node));
 		}
 		int x = getIntOfLiteral(curLiteral);
 
-		backbone.pop().push(x);
+		backbone.push(x);
 		try {
 			satisfiable = solver.isSatisfiable(backbone);
 		} catch (TimeoutException e) {
