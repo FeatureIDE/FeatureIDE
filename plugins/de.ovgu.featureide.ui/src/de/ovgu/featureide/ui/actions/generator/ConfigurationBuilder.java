@@ -627,9 +627,10 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	protected void buildTWiseConfigurations(IFeatureProject featureProject, IProgressMonitor monitor) {
 		configuration = new Configuration(featureModel, false);
 		reader = new ConfigurationReader(configuration);
-		monitor.beginTask("Sampling", (int) configurationNumber);
+		monitor.beginTask("Sampling", 1);
 		runSPLCATool();
-		sorter.sortConfigurations(monitor);
+		configurationNumber = sorter.sortConfigurations(monitor);
+		monitor.beginTask("Build configurations", (int)configurationNumber);		
 	}
 
 	private void runSPLCATool() {

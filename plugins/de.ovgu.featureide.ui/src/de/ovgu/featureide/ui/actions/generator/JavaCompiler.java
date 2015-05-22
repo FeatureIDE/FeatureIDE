@@ -78,12 +78,16 @@ public class JavaCompiler implements IConfigurationBuilderBasics {
 	 * Compiles the given configuration.
 	 * 
 	 * @param configuration The configuration to build
+	 * @throws CoreException 
 	 */
-	protected void compile(BuilderConfiguration configuration) {
+	protected void compile(BuilderConfiguration configuration) throws CoreException {
 		try {
 			generator.builder.folder.getFolder(configuration.getName()).refreshLocal(IResource.DEPTH_INFINITE, null);
 		} catch (CoreException e) {
 			UIPlugin.getDefault().logError(e);
+		}
+		for (IResource file : tmp.members()) {
+			file.delete(true, null);
 		}
 		compile(configuration.getName());
 	}
