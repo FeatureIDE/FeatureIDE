@@ -9,7 +9,7 @@ public class Not2 extends Expression {
 	}
 
 	@Override
-	protected byte computeValue() {
+	protected int computeValue() {
 		switch (children[0].getValue()) {
 		case TRUE:
 			return FALSE;

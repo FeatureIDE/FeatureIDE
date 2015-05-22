@@ -146,8 +146,8 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 						if (nonDeadSibilingCount == 1) {
 							featureGraph.implies(parentName, featureName);
 						} else {
-							featureGraph.setEdge(parentName, featureName, FeatureGraph.EDGE_1q);
-							featureGraph.setEdge(featureName, parentName, FeatureGraph.EDGE_0q);
+							featureGraph.setEdge(parentName, featureName, FeatureGraph.EDGE_1Q);
+							featureGraph.setEdge(featureName, parentName, FeatureGraph.EDGE_0Q);
 						}
 					}
 				}
@@ -167,7 +167,7 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 							for (Feature sibiling : parent.getChildren()) {
 								if (!deadFeatures.contains(sibiling)) {
 									featureGraph.setEdge(featureName, sibiling.getName(), FeatureGraph.EDGE_10);
-									featureGraph.setEdge(featureName, sibiling.getName(), FeatureGraph.EDGE_0q);
+									featureGraph.setEdge(featureName, sibiling.getName(), FeatureGraph.EDGE_0Q);
 								}
 							}
 
@@ -196,7 +196,7 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 						if (!optionalFeature) {
 							for (Feature sibiling : parent.getChildren()) {
 								if (!fixedFeatures.contains(sibiling)) {
-									featureGraph.setEdge(featureName, sibiling.getName(), FeatureGraph.EDGE_0q);
+									featureGraph.setEdge(featureName, sibiling.getName(), FeatureGraph.EDGE_0Q);
 								}
 							}
 
@@ -281,8 +281,8 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 		}
 		for (String featureName1 : featureNames) {
 			for (String featureName2 : featureNames) {
-				featureGraph.setEdge(featureName1, featureName2, FeatureGraph.EDGE_0q);
-				featureGraph.setEdge(featureName1, featureName2, FeatureGraph.EDGE_1q);
+				featureGraph.setEdge(featureName1, featureName2, FeatureGraph.EDGE_0Q);
+				featureGraph.setEdge(featureName1, featureName2, FeatureGraph.EDGE_1Q);
 			}
 		}
 	}

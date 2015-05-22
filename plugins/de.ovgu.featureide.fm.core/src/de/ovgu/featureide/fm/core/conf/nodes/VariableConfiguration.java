@@ -33,8 +33,8 @@ public class VariableConfiguration implements Iterable<Variable> {
 		}
 	}
 
-	public void setVariable(int index, byte newValue) {
-		conf[index].setValue(newValue);
+	public void setVariable(int index, int newValue, boolean manual) {
+		conf[index].setManualValue(newValue);
 	}
 
 	public Variable getVariable(int index) {
@@ -74,7 +74,9 @@ public class VariableConfiguration implements Iterable<Variable> {
 
 	public void reset() {
 		for (int i = 0; i < conf.length; i++) {
-			conf[i].setValue(Variable.UNDEFINED);
+			final Variable variable = conf[i];
+			variable.setManualValue(Variable.UNDEFINED);
+			variable.setAutomaticValue(Variable.UNDEFINED);
 		}
 	}
 

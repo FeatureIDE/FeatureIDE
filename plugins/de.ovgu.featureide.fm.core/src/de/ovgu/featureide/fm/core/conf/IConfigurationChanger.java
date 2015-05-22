@@ -31,8 +31,8 @@ import de.ovgu.featureide.fm.core.Feature;
  */
 public interface IConfigurationChanger {
 
-	List<String> setFeature(Feature f, byte newValue);
+	List<String> setFeature(Feature f, int newValue);
 
-	void setNewValue(int index, byte value);
+	void setNewValue(int index, int value);
 
 }

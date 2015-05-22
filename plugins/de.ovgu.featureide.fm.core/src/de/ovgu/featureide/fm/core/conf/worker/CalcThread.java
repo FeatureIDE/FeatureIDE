@@ -33,22 +33,22 @@ import de.ovgu.featureide.fm.core.conf.worker.base.AWorkerThread;
  * 
  * @author Sebastian Krieter
  */
-class CalcThread2 extends AWorkerThread<Integer, CalcMasterThread2> implements ISatThread {
+class CalcThread extends AWorkerThread<Integer, CalcMasterThread> implements ISatThread {
 
 	private SimpleSatSolver solver;
 
-	protected CalcThread2(CalcMasterThread2 masterThread) {
+	protected CalcThread(CalcMasterThread masterThread) {
 		super(masterThread);
 		this.solver = new SimpleSatSolver(masterThread.fmNode, 1000);
 	}
 
-	private CalcThread2(CalcMasterThread2 masterThread, SimpleSatSolver solver) {
+	private CalcThread(CalcMasterThread masterThread, SimpleSatSolver solver) {
 		super(masterThread);
 		this.solver = solver;
 	}
 
-	public void setKnownLiterals(List<Literal> ls, Literal l) {
-		solver.seBackbone(ls, l);
+	public void setKnownLiterals(List<Literal> knownLiterals, Literal l) {
+		this.solver.seBackbone(knownLiterals, l);
 	}
 
 	@Override
@@ -62,13 +62,14 @@ class CalcThread2 extends AWorkerThread<Integer, CalcMasterThread2> implements I
 			masterThread.variableConfiguration.setNewValue(i, Variable.FALSE);
 			break;
 		default:
+			masterThread.variableConfiguration.setNewValue(i, Variable.UNDEFINED);
 			break;
 		}
 	}
 
 	@Override
-	protected CalcThread2 resetWorker() {
-		return new CalcThread2(masterThread, solver);
+	protected CalcThread resetWorker() {
+		return new CalcThread(masterThread, solver);
 	}
 
 }

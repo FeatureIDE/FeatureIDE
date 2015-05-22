@@ -27,33 +27,21 @@ import de.ovgu.featureide.fm.core.conf.IConfigurationChanger;
 import de.ovgu.featureide.fm.core.conf.worker.base.IMasterThread;
 import de.ovgu.featureide.fm.core.conf.worker.base.InternWorkerThread;
 
-public class CalcMasterThread2 implements IMasterThread<Integer> {
+public class CalcMasterThread implements IMasterThread<Integer> {
 
 	final FeatureGraph featureGraph;
 	final IConfigurationChanger variableConfiguration;
 	final Node fmNode;
 
-	private final int mode;
-
-	public CalcMasterThread2(FeatureGraph featureGraph, IConfigurationChanger variableConfiguration, Node fmNode, int mode) {
+	public CalcMasterThread(FeatureGraph featureGraph, IConfigurationChanger variableConfiguration, Node fmNode) {
 		this.featureGraph = featureGraph;
 		this.variableConfiguration = variableConfiguration;
 		this.fmNode = fmNode;
-		this.mode = mode;
 	}
 
 	@Override
 	public InternWorkerThread<Integer> newWorker() {
-		switch (mode) {
-		case 2:
-			return new CalcThread2(this);
-		case 3:
-			return new CalcThread3(this);
-		case 4:
-			return new CalcThread4(this);
-		default:
-			return new CalcThread2(this);
-		}
+		return new CalcThread(this);
 	}
 
 }

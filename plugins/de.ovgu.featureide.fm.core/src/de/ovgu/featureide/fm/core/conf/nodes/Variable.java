@@ -27,31 +27,45 @@ public class Variable implements Serializable {
 
 	private static final long serialVersionUID = 2253729345725413110L;
 
-	public static final byte TRUE = 1, FALSE = 0, UNDEFINED = -1;
+	public static final int TRUE = 2, FALSE = 1, UNDEFINED = 0;
 
 	protected final int id;
 
-	protected byte value;
+	protected int value;
 
 	public Variable(int id) {
 		this(id, UNDEFINED);
 	}
 
-	public Variable(int id, byte value) {
+	public Variable(int id, int value) {
 		this.id = id;
-		this.value = value;
+		setManualValue(value);
 	}
 
-	public byte getValue() {
-		return value;
+	public int getValue() {
+		return getManualValue() | getAutomaticValue();
 	}
 
 	public int getId() {
 		return id;
 	}
 
-	public void setValue(byte value) {
-		this.value = value;
+	public int getManualValue() {
+		return value & 3;
+	}
+
+	public int getAutomaticValue() {
+		return value >> 2;
+	}
+
+	public void setManualValue(int value) {
+		this.value = (this.value & 0xfffffffc) | value;
+		assert getValue() <= TRUE && getValue() >= UNDEFINED : "Invalid Variable Configuration";
+	}
+
+	public void setAutomaticValue(int value) {
+		this.value = (this.value & 0xfffffff3) | value;
+		assert getValue() <= TRUE && getValue() >= UNDEFINED : "Invalid Variable Configuration";
 	}
 
 	protected void reset() {
@@ -63,7 +77,7 @@ public class Variable implements Serializable {
 
 	@Override
 	public String toString() {
-		switch (value) {
+		switch (getValue()) {
 		case TRUE:
 			return id + " : true";
 		case FALSE:

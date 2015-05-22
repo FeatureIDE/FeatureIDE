@@ -36,10 +36,14 @@ public class FeatureGraph implements Serializable {
 
 	public static final byte EDGE_NONE = 0b00000000, EDGE_11 = 0b00000100, //0x04,
 			EDGE_10 = 0b00001000, //0x08,
-			EDGE_1q = 0b00001100, //0x0c,
+			EDGE_1Q = 0b00001100, //0x0c,
 			EDGE_01 = 0b00010000, //0x10,
 			EDGE_00 = 0b00100000, //0x20,
-			EDGE_0q = 0b00110000; //0x30;
+			EDGE_0Q = 0b00110000, //0x30;
+			VALUE_NONE = 0b00000000, //0x02;
+			VALUE_1 = 0b00000001, //0x02;
+			VALUE_0 = 0b00000010, //0x01;
+			VALUE_Q = 0b00000011; //0x03;
 
 	public static final byte MASK_1_11110011 = (byte) 0b11110011, //0xf3,
 			MASK_0_11001111 = (byte) 0b11001111, //0xcf,
@@ -58,11 +62,11 @@ public class FeatureGraph implements Serializable {
 			return edge == 0;
 		case EDGE_11:
 		case EDGE_10:
-		case EDGE_1q:
+		case EDGE_1Q:
 			return (edge & MASK_1_00001100) == q;
 		case EDGE_01:
 		case EDGE_00:
-		case EDGE_0q:
+		case EDGE_0Q:
 			return (edge & MASK_0_00110000) == q;
 		default:
 			return false;
@@ -135,10 +139,10 @@ public class FeatureGraph implements Serializable {
 		case EDGE_NONE:
 			newValue = EDGE_NONE;
 			break;
-		case EDGE_0q:
+		case EDGE_0Q:
 			switch (oldValue & MASK_0_00110000) {
 			case EDGE_NONE:
-				newValue = oldValue | EDGE_0q;
+				newValue = oldValue | EDGE_0Q;
 				break;
 			default:
 				newValue = oldValue;
@@ -150,7 +154,7 @@ public class FeatureGraph implements Serializable {
 			case EDGE_NONE:
 				newValue = oldValue | edgeType;
 				break;
-			case EDGE_0q:
+			case EDGE_0Q:
 				newValue = (oldValue & MASK_0_11001111) | edgeType;
 				break;
 			default:
@@ -158,10 +162,10 @@ public class FeatureGraph implements Serializable {
 				assert ((oldValue & MASK_0_00110000) == edgeType) : (oldValue & MASK_0_00110000) + " != " + edgeType;
 			}
 			break;
-		case EDGE_1q:
+		case EDGE_1Q:
 			switch (oldValue & MASK_1_00001100) {
 			case EDGE_NONE:
-				newValue = oldValue | EDGE_1q;
+				newValue = oldValue | EDGE_1Q;
 				break;
 			default:
 				newValue = oldValue;
@@ -173,7 +177,7 @@ public class FeatureGraph implements Serializable {
 			case EDGE_NONE:
 				newValue = oldValue | edgeType;
 				break;
-			case EDGE_1q:
+			case EDGE_1Q:
 				newValue = (oldValue & MASK_1_11110011) | edgeType;
 				break;
 			default:
@@ -204,6 +208,13 @@ public class FeatureGraph implements Serializable {
 		return adjMatrix[index];
 		//	}
 	}
+	
+	public byte getValue(int fromIndex, int toIndex, boolean fromSelected) {
+		final int index = (fromIndex * size) + toIndex;
+		return (byte) (fromSelected 
+				? ((adjMatrix[index] & MASK_1_00001100) >> 2)
+				: ((adjMatrix[index] & MASK_0_00110000) >> 4));
+	}
 
 	public void clearDiagonal() {
 		for (int i = 0; i < adjMatrix.length; i += (size + 1)) {
@@ -227,7 +238,7 @@ public class FeatureGraph implements Serializable {
 	public int countNeighbors(String from, boolean selected, boolean subtractReal) {
 		final int fromIndex = featureMap.get(from);
 		final byte mask = (selected) ? MASK_1_00001100 : MASK_0_00110000;
-		final byte unrealEdge = (selected) ? EDGE_1q : EDGE_0q;
+		final byte unrealEdge = (selected) ? EDGE_1Q : EDGE_0Q;
 
 		int count = 0;
 		for (int i = (fromIndex * size), end = i + size; i < end; i++) {
@@ -259,7 +270,7 @@ public class FeatureGraph implements Serializable {
 						childSelected = 1;
 						visited[j] = 2;
 						break;
-					case EDGE_1q:
+					case EDGE_1Q:
 						// ?
 						if (visit == 1) {
 							continue;
@@ -282,7 +293,7 @@ public class FeatureGraph implements Serializable {
 						childSelected = 1;
 						visited[j] = 2;
 						break;
-					case EDGE_0q:
+					case EDGE_0Q:
 						// ?
 						if (visit == 1) {
 							continue;
@@ -321,9 +332,9 @@ public class FeatureGraph implements Serializable {
 						dfs_rec(visited, j, parentFeature, (byte) 1, parentSelected);
 						break;
 					// visit = 0, not selected, implies ?
-					case EDGE_0q:
+					case EDGE_0Q:
 						visited[j] = 1;
-						setEdge(parentFeature, j, parentSelected ? EDGE_1q : EDGE_0q);
+						setEdge(parentFeature, j, parentSelected ? EDGE_1Q : EDGE_0Q);
 						dfs_rec(visited, j, parentFeature, (byte) 2, parentSelected);
 						break;
 					}
@@ -343,9 +354,9 @@ public class FeatureGraph implements Serializable {
 						dfs_rec(visited, j, parentFeature, (byte) 1, parentSelected);
 						break;
 					// visit = 0, selected, implies ?
-					case EDGE_1q:
+					case EDGE_1Q:
 						visited[j] = 1;
-						setEdge(parentFeature, j, parentSelected ? EDGE_1q : EDGE_0q);
+						setEdge(parentFeature, j, parentSelected ? EDGE_1Q : EDGE_0Q);
 						dfs_rec(visited, j, parentFeature, (byte) 2, parentSelected);
 						break;
 					}
@@ -353,7 +364,7 @@ public class FeatureGraph implements Serializable {
 				case 2:
 					if (edge > 0) {
 						visited[j] = 1;
-						setEdge(parentFeature, j, parentSelected ? EDGE_1q : EDGE_0q);
+						setEdge(parentFeature, j, parentSelected ? EDGE_1Q : EDGE_0Q);
 						dfs_rec(visited, j, parentFeature, (byte) 2, parentSelected);
 					}
 					break;
@@ -418,7 +429,7 @@ public class FeatureGraph implements Serializable {
 						childSelected = 1;
 						visited[j] = 2;
 						break;
-					case EDGE_1q:
+					case EDGE_1Q:
 						// ?
 						if (visit == 1) {
 							continue;
@@ -441,7 +452,7 @@ public class FeatureGraph implements Serializable {
 						childSelected = 1;
 						visited[j] = 2;
 						break;
-					case EDGE_0q:
+					case EDGE_0Q:
 						// ?
 						if (visit == 1) {
 							continue;
@@ -482,9 +493,9 @@ public class FeatureGraph implements Serializable {
 						childSelected = 1;
 						break;
 					// visit = 0, not selected, implies ?
-					case EDGE_0q:
+					case EDGE_0Q:
 						visited[j] = 1;
-						setEdge(parentFeature, j, parentSelected ? EDGE_1q : EDGE_0q);
+						setEdge(parentFeature, j, parentSelected ? EDGE_1Q : EDGE_0Q);
 						childSelected = 2;
 						break;
 					}
@@ -504,9 +515,9 @@ public class FeatureGraph implements Serializable {
 						childSelected = 1;
 						break;
 					// visit = 0, selected, implies ?
-					case EDGE_1q:
+					case EDGE_1Q:
 						visited[j] = 1;
-						setEdge(parentFeature, j, parentSelected ? EDGE_1q : EDGE_0q);
+						setEdge(parentFeature, j, parentSelected ? EDGE_1Q : EDGE_0Q);
 						childSelected = 2;
 						break;
 					}
@@ -514,7 +525,7 @@ public class FeatureGraph implements Serializable {
 				case 2:
 					if (edge > 0) {
 						visited[j] = 1;
-						setEdge(parentFeature, j, parentSelected ? EDGE_1q : EDGE_0q);
+						setEdge(parentFeature, j, parentSelected ? EDGE_1Q : EDGE_0Q);
 						childSelected = 2;
 					}
 					break;
@@ -583,7 +594,7 @@ public class FeatureGraph implements Serializable {
 						childSelected = 1;
 						visited[j] = 2;
 						break;
-					case EDGE_1q:
+					case EDGE_1Q:
 						// ?
 						if (visit == 1) {
 							continue;
@@ -606,7 +617,7 @@ public class FeatureGraph implements Serializable {
 						childSelected = 1;
 						visited[j] = 2;
 						break;
-					case EDGE_0q:
+					case EDGE_0Q:
 						// ?
 						if (visit == 1) {
 							continue;
@@ -647,10 +658,10 @@ public class FeatureGraph implements Serializable {
 						dfs_rec(visited, j, parentFeature, (byte) 1, parentSelected);
 						break;
 					// visit = 0, not selected, implies ?
-					case EDGE_0q:
+					case EDGE_0Q:
 						visited[j] = 1;
 						//XXX Lazy???
-						setEdge(parentFeature, j, parentSelected ? EDGE_1q : EDGE_0q);
+						setEdge(parentFeature, j, parentSelected ? EDGE_1Q : EDGE_0Q);
 						//						dfs_rec(visited, j, parentFeature, (byte) 2, parentSelected);
 						break;
 					// default ???
@@ -671,10 +682,10 @@ public class FeatureGraph implements Serializable {
 						dfs_rec(visited, j, parentFeature, (byte) 1, parentSelected);
 						break;
 					// visit = 0, selected, implies ?
-					case EDGE_1q:
+					case EDGE_1Q:
 						visited[j] = 1;
 						//XXX Lazy???
-						setEdge(parentFeature, j, parentSelected ? EDGE_1q : EDGE_0q);
+						setEdge(parentFeature, j, parentSelected ? EDGE_1Q : EDGE_0Q);
 						//						dfs_rec(visited, j, parentFeature, (byte) 2, parentSelected);
 						break;
 					// default ???

@@ -34,15 +34,27 @@ public abstract class Expression extends Variable {
 		this.children = children;
 	}
 
-	protected abstract byte computeValue();
+	protected abstract int computeValue();
 
 	@Override
-	public final byte getValue() {
+	public final int getValue() {
 		return (value == UNDEFINED) ? value = computeValue() : value;
 	}
 
+	public int getManualValue() {
+		return getValue();
+	}
+
+	public int getAutomaticValue() {
+		return getValue();
+	}
+
 	@Override
-	public final void setValue(byte value) {
+	public final void setAutomaticValue(int value) {
+	}
+
+	@Override
+	public final void setManualValue(int value) {
 	}
 
 	@Override
@@ -53,7 +65,7 @@ public abstract class Expression extends Variable {
 		}
 	}
 
-	public byte updateValue() {
+	public int updateValue() {
 		reset();
 		return value = computeValue();
 	}

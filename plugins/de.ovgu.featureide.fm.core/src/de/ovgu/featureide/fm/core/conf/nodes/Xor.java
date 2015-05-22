@@ -9,11 +9,11 @@ public class Xor extends Expression {
 	}
 
 	@Override
-	protected byte computeValue() {
+	protected int computeValue() {
 		boolean containsTrue = false;
 		boolean undefined = false;
 		for (int i = 0; i < children.length; i++) {
-			final byte childValue = children[i].getValue();
+			final int childValue = children[i].getValue();
 			switch (childValue) {
 			case TRUE:
 				if (containsTrue) {

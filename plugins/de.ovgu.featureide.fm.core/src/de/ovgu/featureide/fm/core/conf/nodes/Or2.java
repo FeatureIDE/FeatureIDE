@@ -9,10 +9,10 @@ public class Or2 extends Expression {
 	}
 
 	@Override
-	protected byte computeValue() {
+	protected int computeValue() {
 		byte ret = FALSE;
 		for (int i = 0; i < children.length; i++) {
-			final byte childValue = children[i].getValue();
+			final int childValue = children[i].getValue();
 			switch (childValue) {
 			case TRUE:
 				return TRUE;
