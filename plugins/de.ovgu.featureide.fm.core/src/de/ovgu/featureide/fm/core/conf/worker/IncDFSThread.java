@@ -23,19 +23,24 @@ package de.ovgu.featureide.fm.core.conf.worker;
 import java.util.Arrays;
 
 import de.ovgu.featureide.fm.core.conf.FeatureGraph;
-import de.ovgu.featureide.fm.core.conf.worker.base.IMasterThread;
 import de.ovgu.featureide.fm.core.conf.worker.base.AWorkerThread;
-import de.ovgu.featureide.fm.core.conf.worker.base.InternWorkerThread;
+import de.ovgu.featureide.fm.core.job.WorkMonitor;
 
-public class IncDFSThread extends AWorkerThread<String, IncDFSThread> implements IMasterThread<String> {
+public class IncDFSThread extends AWorkerThread<String> {
 
 	private final FeatureGraph featureGraph;
 	private final byte[] visited;
 
-	public IncDFSThread(FeatureGraph featureGraph) {
-		super(null);
+	public IncDFSThread(WorkMonitor workMonitor, FeatureGraph featureGraph) {
+		super(workMonitor);
 		this.featureGraph = featureGraph;
 		visited = new byte[featureGraph.featureArray.length];
+	}
+
+	private IncDFSThread(IncDFSThread oldThread) {
+		super(oldThread);
+		this.featureGraph = oldThread.featureGraph;
+		visited = new byte[oldThread.featureGraph.featureArray.length];
 	}
 
 	@Override
@@ -48,13 +53,8 @@ public class IncDFSThread extends AWorkerThread<String, IncDFSThread> implements
 	}
 
 	@Override
-	public InternWorkerThread<String> newWorker() {
-		return new IncDFSThread(featureGraph);
-	}
-
-	@Override
-	protected InternWorkerThread<String> resetWorker() {
-		return new IncDFSThread(featureGraph);
+	protected IncDFSThread newThread() {
+		return new IncDFSThread(this);
 	}
 
 }

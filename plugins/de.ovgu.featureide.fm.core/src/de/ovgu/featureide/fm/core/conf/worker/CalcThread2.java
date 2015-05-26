@@ -23,8 +23,8 @@ package de.ovgu.featureide.fm.core.conf.worker;
 import java.util.List;
 
 import org.prop4j.Literal;
+import org.prop4j.MultiThreadSatSolver;
 import org.prop4j.Node;
-import org.prop4j.SimpleSatSolver;
 
 import de.ovgu.featureide.fm.core.conf.FeatureGraph;
 import de.ovgu.featureide.fm.core.conf.IConfigurationChanger;
@@ -37,36 +37,45 @@ import de.ovgu.featureide.fm.core.job.WorkMonitor;
  * 
  * @author Sebastian Krieter
  */
-public class CalcThread extends AWorkerThread<Integer> {
+public class CalcThread2 extends AWorkerThread<Integer> {
 
 	private static class SharedObjects {
+
+		private final MultiThreadSatSolver solver;
 		private final FeatureGraph featureGraph;
 		private final IConfigurationChanger variableConfiguration;
-		private final Node fmNode;
+		private final int numberOfSolvers;
 
+		private int lastSolverID = 0;
 		private List<Literal> knownLiterals = null;
 		private Literal l = null;
 
-		public SharedObjects(FeatureGraph featureGraph, IConfigurationChanger variableConfiguration, Node fmNode) {
+		public SharedObjects(Node fmNode, int numberOfSolvers, FeatureGraph featureGraph, IConfigurationChanger variableConfiguration) {
+			this.numberOfSolvers = numberOfSolvers;
+			this.solver = new MultiThreadSatSolver(fmNode, 1000, numberOfSolvers);
 			this.featureGraph = featureGraph;
 			this.variableConfiguration = variableConfiguration;
-			this.fmNode = fmNode;
 		}
+
 	}
 
-	private final SimpleSatSolver solver;
+	private final int id;
 	private final SharedObjects sharedObjects;
 
-	public CalcThread(FeatureGraph featureGraph, IConfigurationChanger variableConfiguration, Node fmNode) {
-		super(new WorkMonitor());
-		this.sharedObjects = new SharedObjects(featureGraph, variableConfiguration, fmNode);
-		this.solver = new SimpleSatSolver(fmNode, 1000);
+	public CalcThread2(FeatureGraph featureGraph, IConfigurationChanger variableConfiguration, Node fmNode) {
+		this(featureGraph, variableConfiguration, fmNode, NUMBER_OF_THREADS);
 	}
 
-	private CalcThread(CalcThread oldThread) {
+	public CalcThread2(FeatureGraph featureGraph, IConfigurationChanger variableConfiguration, Node fmNode, int numberOfSolvers) {
+		super(new WorkMonitor());
+		sharedObjects = new SharedObjects(fmNode, numberOfSolvers, featureGraph, variableConfiguration);
+		this.id = sharedObjects.lastSolverID;
+	}
+
+	private CalcThread2(CalcThread2 oldThread) {
 		super(oldThread);
 		this.sharedObjects = oldThread.sharedObjects;
-		this.solver = new SimpleSatSolver(oldThread.sharedObjects.fmNode, 1000);
+		this.id = ++oldThread.sharedObjects.lastSolverID;
 	}
 
 	public void setKnownLiterals(List<Literal> knownLiterals, Literal l) {
@@ -75,14 +84,23 @@ public class CalcThread extends AWorkerThread<Integer> {
 	}
 
 	@Override
-	protected boolean beforeWork() {
-		this.solver.setBackbone(sharedObjects.knownLiterals, sharedObjects.l);
-		return super.beforeWork();
+	public void start() {
+		startWork();
+	}
+
+	@Override
+	public void start(int numberOfThreads) {
+		startWork();
+	}
+
+	private void startWork() {
+		sharedObjects.solver.setBackbone(sharedObjects.knownLiterals, sharedObjects.l);
+		super.start(sharedObjects.numberOfSolvers);
 	}
 
 	@Override
 	protected void work(Integer i) {
-		final byte value = solver.getValueOf(new Literal(sharedObjects.featureGraph.featureArray[i]));
+		final byte value = sharedObjects.solver.getValueOf(new Literal(sharedObjects.featureGraph.featureArray[i]), id);
 		switch (value) {
 		case 1:
 			sharedObjects.variableConfiguration.setNewValue(i, Variable.TRUE);
@@ -97,8 +115,8 @@ public class CalcThread extends AWorkerThread<Integer> {
 	}
 
 	@Override
-	protected AWorkerThread<Integer> newThread() {
-		return new CalcThread(this);
+	protected CalcThread2 newThread() {
+		return new CalcThread2(this);
 	}
 
 }

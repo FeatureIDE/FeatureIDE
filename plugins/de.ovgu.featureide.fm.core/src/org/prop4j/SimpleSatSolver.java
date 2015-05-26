@@ -47,7 +47,7 @@ public class SimpleSatSolver extends SatSolver {
 		b = new byte[solver.nVars()];
 	}
 
-	public void seBackbone(List<Literal> knownLiterals, Literal curLiteral) {
+	public void setBackbone(List<Literal> knownLiterals, Literal curLiteral) {
 		backbone = new VecInt((knownLiterals.size() + 1) << 1);
 		for (Literal node : knownLiterals) {
 			backbone.push(getIntOfLiteral(node));

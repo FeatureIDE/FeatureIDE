@@ -20,41 +20,51 @@
  */
 package de.ovgu.featureide.fm.core.conf.worker.base;
 
-public abstract class AWorkerThread<T, M extends IMasterThread<T>> extends Thread implements InternWorkerThread<T> {
+import java.util.Collection;
 
-	protected final M masterThread;
-	private ThreadPool<T> pool;
+import de.ovgu.featureide.fm.core.job.WorkMonitor;
 
-	protected AWorkerThread(M masterThread) {
-		this.masterThread = masterThread;
+public abstract class AWorkerThread<T> implements Runnable {
+
+	protected static int NUMBER_OF_THREADS = 1;
+	static {
+		final int processors = Runtime.getRuntime().availableProcessors();
+		NUMBER_OF_THREADS = (processors == 1) ? processors : processors - 1;
 	}
 
-	@Override
-	public final void setThreadPool(ThreadPool<T> pool) {
-		this.pool = pool;
+	private final MasterThread<T> masterThread;
+
+	public AWorkerThread(AWorkerThread<T> oldWorker) {
+		this.masterThread = oldWorker.masterThread;
+	}
+
+	public AWorkerThread(WorkMonitor workMonitor) {
+		this.masterThread = new MasterThread<T>(this, workMonitor);
+	}
+
+	public void start() {
+		masterThread.start();
+	}
+
+	public void start(int numberOfThreads) {
+		masterThread.start(numberOfThreads);
+	}
+
+	public void addObjects(Collection<T> objects) {
+		masterThread.objects.addAll(objects);
 	}
 
 	@Override
 	public final void run() {
 		if (beforeWork()) {
-			for (T object = pool.objects.poll(); object != null; object = pool.objects.poll()) {
+			for (T object = masterThread.objects.poll(); object != null; object = masterThread.objects.poll()) {
 				work(object);
-				pool.worked();
+				masterThread.workMonitor.synchronizedWorked();
 			}
 			afterWork(true);
 		} else {
 			afterWork(false);
 		}
-	}
-
-	protected InternWorkerThread<T> resetWorker() {
-		return masterThread.newWorker();
-	}
-
-	public final InternWorkerThread<T> reset() {
-		final InternWorkerThread<T> t = resetWorker();
-		t.setThreadPool(pool);
-		return t;
 	}
 
 	protected boolean beforeWork() {
@@ -65,5 +75,7 @@ public abstract class AWorkerThread<T, M extends IMasterThread<T>> extends Threa
 	}
 
 	protected abstract void work(T object);
+
+	protected abstract AWorkerThread<T> newThread();
 
 }

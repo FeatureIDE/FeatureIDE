@@ -157,7 +157,7 @@ public class FeatureGraphStatisticJob extends AProjectJob<FeatureGraphStatisticJ
 		final ArrayList<Integer> indexArray = createIndexArray();
 
 		final VariableConfiguration variableConfiguration = new VariableConfiguration(featureGraph.getSize());
-		final IConfigurationChanger c1 = compare ? new ConfChanger2(arguments.featureModel, featureGraph, variableConfiguration) : new SatConfChanger(
+		final IConfigurationChanger c1 = compare ? new ConfChanger(arguments.featureModel, featureGraph, variableConfiguration) : new SatConfChanger(
 				arguments.featureModel, featureGraph, variableConfiguration);
 
 		for (int vIndex = 0; vIndex < featureGraph.getSize(); vIndex++) {
@@ -188,7 +188,7 @@ public class FeatureGraphStatisticJob extends AProjectJob<FeatureGraphStatisticJ
 		final ArrayList<Integer> indexArray = createIndexArray();
 
 		final VariableConfiguration variableConfiguration = new VariableConfiguration(featureGraph.getSize());
-		final IConfigurationChanger c1 = compare ? new ConfChanger2(arguments.featureModel, featureGraph, variableConfiguration) : new SatConfChanger(
+		final IConfigurationChanger c1 = compare ? new ConfChanger(arguments.featureModel, featureGraph, variableConfiguration) : new SatConfChanger(
 				arguments.featureModel, featureGraph, variableConfiguration);
 
 		for (int vIndex = 0; vIndex < featureGraph.getSize();) {

@@ -22,24 +22,47 @@ package de.ovgu.featureide.fm.core.conf.worker;
 
 import java.util.Arrays;
 
+import de.ovgu.featureide.fm.core.conf.FeatureGraph;
 import de.ovgu.featureide.fm.core.conf.worker.base.AWorkerThread;
+import de.ovgu.featureide.fm.core.job.WorkMonitor;
 
-class DFSThread extends AWorkerThread<String, DFSMasterThread> {
+public class DFSThread extends AWorkerThread<String> {
+
+	private static class SharedObjects {
+		private final FeatureGraph featureGraph;
+
+		public SharedObjects(FeatureGraph featureGraph) {
+			this.featureGraph = featureGraph;
+		}
+	}
 
 	private final byte[] visited;
+	private final SharedObjects sharedObjects;
 
-	protected DFSThread(DFSMasterThread masterThread) {
-		super(masterThread);
-		visited = new byte[masterThread.featureGraph.featureArray.length];
+	public DFSThread(FeatureGraph featureGraph, WorkMonitor workMonitor) {
+		super(workMonitor);
+		sharedObjects = new SharedObjects(featureGraph);
+		visited = new byte[featureGraph.featureArray.length];
+	}
+
+	private DFSThread(DFSThread oldThread) {
+		super(oldThread);
+		this.sharedObjects = oldThread.sharedObjects;
+		visited = new byte[oldThread.sharedObjects.featureGraph.featureArray.length];
 	}
 
 	@Override
 	protected void work(String object) {
-		final int featureIndex = masterThread.featureGraph.getFeatureIndex(object);
+		final int featureIndex = sharedObjects.featureGraph.getFeatureIndex(object);
 		Arrays.fill(visited, (byte) 0);
-		masterThread.featureGraph.dfs(visited, featureIndex, true);
+		sharedObjects.featureGraph.dfs(visited, featureIndex, true);
 		Arrays.fill(visited, (byte) 0);
-		masterThread.featureGraph.dfs(visited, featureIndex, false);
+		sharedObjects.featureGraph.dfs(visited, featureIndex, false);
+	}
+
+	@Override
+	protected DFSThread newThread() {
+		return new DFSThread(this);
 	}
 
 }

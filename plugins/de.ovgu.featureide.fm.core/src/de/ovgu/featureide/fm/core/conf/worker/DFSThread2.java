@@ -22,25 +22,50 @@ package de.ovgu.featureide.fm.core.conf.worker;
 
 import java.util.Arrays;
 
+import de.ovgu.featureide.fm.core.conf.FeatureGraph;
 import de.ovgu.featureide.fm.core.conf.worker.base.AWorkerThread;
+import de.ovgu.featureide.fm.core.job.WorkMonitor;
 
-class DFSThread2 extends AWorkerThread<String, DFSMasterThread> {
+public class DFSThread2 extends AWorkerThread<String> {
+
+	private static class SharedObjects {
+		private final FeatureGraph featureGraph;
+		private final boolean[] complete;
+
+		public SharedObjects(FeatureGraph featureGraph) {
+			this.featureGraph = featureGraph;
+			this.complete = new boolean[featureGraph.featureArray.length];
+		}
+	}
 
 	private final byte[] visited;
+	private final SharedObjects sharedObjects;
 
-	protected DFSThread2(DFSMasterThread masterThread) {
-		super(masterThread);
-		visited = new byte[masterThread.featureGraph.featureArray.length];
+	public DFSThread2(FeatureGraph featureGraph, WorkMonitor workMonitor) {
+		super(workMonitor);
+		sharedObjects = new SharedObjects(featureGraph);
+		visited = new byte[featureGraph.featureArray.length];
+	}
+
+	private DFSThread2(DFSThread2 oldThread) {
+		super(oldThread);
+		this.sharedObjects = oldThread.sharedObjects;
+		visited = new byte[oldThread.sharedObjects.featureGraph.featureArray.length];
 	}
 
 	@Override
 	protected void work(String object) {
-		final int featureIndex = masterThread.featureGraph.getFeatureIndex(object);
+		final int featureIndex = sharedObjects.featureGraph.getFeatureIndex(object);
 		Arrays.fill(visited, (byte) 0);
-		masterThread.featureGraph.dfs2(visited, masterThread.complete, featureIndex, true);
+		sharedObjects.featureGraph.dfs2(visited, sharedObjects.complete, featureIndex, true);
 		Arrays.fill(visited, (byte) 0);
-		masterThread.featureGraph.dfs2(visited, masterThread.complete, featureIndex, false);
-		masterThread.complete[featureIndex] = true;
+		sharedObjects.featureGraph.dfs2(visited, sharedObjects.complete, featureIndex, false);
+		sharedObjects.complete[featureIndex] = true;
+	}
+
+	@Override
+	protected DFSThread2 newThread() {
+		return new DFSThread2(this);
 	}
 
 }

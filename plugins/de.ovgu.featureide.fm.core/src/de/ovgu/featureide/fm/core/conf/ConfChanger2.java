@@ -35,10 +35,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.conf.nodes.Expression;
 import de.ovgu.featureide.fm.core.conf.nodes.Variable;
 import de.ovgu.featureide.fm.core.conf.nodes.VariableConfiguration;
-import de.ovgu.featureide.fm.core.conf.worker.CalcMasterThread;
-import de.ovgu.featureide.fm.core.conf.worker.ISatThread;
-import de.ovgu.featureide.fm.core.conf.worker.base.IWorkerThread;
-import de.ovgu.featureide.fm.core.conf.worker.base.ThreadPool;
+import de.ovgu.featureide.fm.core.conf.worker.CalcThread;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
 /**
@@ -49,7 +46,7 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
 public class ConfChanger2 implements IConfigurationChanger {
 	private final FeatureGraph featureGraph;
 	private final VariableConfiguration variableConfiguration;
-	private final ThreadPool<Integer> dfsThread;
+	private final CalcThread calcThread;
 
 	private final ConcurrentLinkedQueue<Variable> q = new ConcurrentLinkedQueue<>();
 
@@ -62,8 +59,7 @@ public class ConfChanger2 implements IConfigurationChanger {
 		this.featureGraph = featureGraph;
 		this.known = new byte[featureGraph.getSize()];
 		this.variableConfiguration = variableConfiguration;
-		this.dfsThread = new ThreadPool<>(new CalcMasterThread(featureGraph, this, NodeCreator.createNodes(featureModel, true).toCNF()));
-		dfsThread.reset();
+		this.calcThread = new CalcThread(featureGraph, this, NodeCreator.createNodes(featureModel, true).toCNF());
 	}
 
 	public List<String> setFeature(Feature f, int newValue) {
@@ -231,13 +227,10 @@ public class ConfChanger2 implements IConfigurationChanger {
 		}
 		variableConfiguration.setVariable(index, newValue, true);
 
-		dfsThread.reset();
-		for (IWorkerThread thread : dfsThread.getThreads()) {
-			((ISatThread) thread).setKnownLiterals(knownLiterals, new Literal(featureGraph.featureArray[index], newValue == Variable.TRUE));
-		}
-		dfsThread.addObjects(compList);
+		calcThread.setKnownLiterals(knownLiterals, new Literal(featureGraph.featureArray[index], newValue == Variable.TRUE));
+		calcThread.addObjects(compList);
 		compList.clear();
-		dfsThread.start();
+		calcThread.start();
 	}
 
 	private void set(int index, boolean value) {

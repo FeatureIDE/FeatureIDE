@@ -33,10 +33,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.conf.nodes.Expression;
 import de.ovgu.featureide.fm.core.conf.nodes.Variable;
 import de.ovgu.featureide.fm.core.conf.nodes.VariableConfiguration;
-import de.ovgu.featureide.fm.core.conf.worker.CalcMasterThread;
-import de.ovgu.featureide.fm.core.conf.worker.ISatThread;
-import de.ovgu.featureide.fm.core.conf.worker.base.IWorkerThread;
-import de.ovgu.featureide.fm.core.conf.worker.base.ThreadPool;
+import de.ovgu.featureide.fm.core.conf.worker.CalcThread2;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
 /**
@@ -48,15 +45,14 @@ public class ConfChanger implements IConfigurationChanger {
 
 	private final FeatureGraph featureGraph;
 	private final VariableConfiguration variableConfiguration;
-	private final ThreadPool<Integer> dfsThread;
+	private final CalcThread2 calcThread;
 
 	private final List<String> changedFeatures = new ArrayList<>();
 
 	public ConfChanger(FeatureModel featureModel, FeatureGraph featureGraph, VariableConfiguration variableConfiguration) {
 		this.featureGraph = featureGraph;
 		this.variableConfiguration = variableConfiguration;
-		this.dfsThread = new ThreadPool<>(new CalcMasterThread(featureGraph, this, NodeCreator.createNodes(featureModel, true).toCNF()));
-		dfsThread.reset();
+		this.calcThread = new CalcThread2(featureGraph, this, NodeCreator.createNodes(featureModel, true).toCNF());
 	}
 
 	//	private int[] count = new int[4];
@@ -77,35 +73,35 @@ public class ConfChanger implements IConfigurationChanger {
 		final List<Integer> compList = new ArrayList<>();
 
 		for (int i = 0; i < featureGraph.getSize(); i++) {
-			if (i == index)
-				continue;
-			final int curValue = variableConfiguration.getVariable(i).getAutomaticValue();
-			if (newValue != Variable.UNDEFINED) {
-				if (curValue == Variable.UNDEFINED) {
-					final byte edgeValue = featureGraph.getValue(index, i, newValue == Variable.TRUE);
-					switch (edgeValue) {
-					case FeatureGraph.VALUE_0:
-						setNewValue(i, Variable.FALSE);
-						break;
-					case FeatureGraph.VALUE_1:
-						setNewValue(i, Variable.TRUE);
-						break;
-					case FeatureGraph.VALUE_Q:
-						compList.add(i);
-						break;
-					case FeatureGraph.VALUE_NONE:
-						if (oldValue != Variable.UNDEFINED && featureGraph.getValue(index, i, oldValue == Variable.TRUE) != FeatureGraph.VALUE_NONE) {
+			if (i != index) {
+				final int curValue = variableConfiguration.getVariable(i).getAutomaticValue();
+				if (newValue != Variable.UNDEFINED) {
+					if (curValue == Variable.UNDEFINED) {
+						final byte edgeValue = featureGraph.getValue(index, i, newValue == Variable.TRUE);
+						switch (edgeValue) {
+						case FeatureGraph.VALUE_0:
+							setNewValue(i, Variable.FALSE);
+							break;
+						case FeatureGraph.VALUE_1:
+							setNewValue(i, Variable.TRUE);
+							break;
+						case FeatureGraph.VALUE_Q:
+							compList.add(i);
+							break;
+						case FeatureGraph.VALUE_NONE:
+							if (oldValue != Variable.UNDEFINED && featureGraph.getValue(index, i, oldValue == Variable.TRUE) != FeatureGraph.VALUE_NONE) {
+								compList.add(i);
+							}
+							break;
+						default:
+							continue;
+						}
+					}
+				} else {
+					if (curValue != Variable.UNDEFINED) {
+						if (featureGraph.getValue(index, i, oldValue == Variable.TRUE) != FeatureGraph.VALUE_NONE) {
 							compList.add(i);
 						}
-						break;
-					default:
-						continue;
-					}
-				}
-			} else {
-				if (curValue != Variable.UNDEFINED) {
-					if (featureGraph.getValue(index, i, oldValue == Variable.TRUE) != FeatureGraph.VALUE_NONE) {
-						compList.add(i);
 					}
 				}
 			}
@@ -149,32 +145,31 @@ public class ConfChanger implements IConfigurationChanger {
 		//		System.out.println("Non Sat:    " + count[1]);
 		//		System.out.println("Sat:        " + count[2]);
 
-		final List<Literal> knownLiterals = new ArrayList<>();
+		if (!compList.isEmpty()) {
+			final List<Literal> knownLiterals = new ArrayList<>();
 
-		variableConfiguration.setVariable(index, Variable.UNDEFINED, true);
+			variableConfiguration.setVariable(index, Variable.UNDEFINED, true);
 
-		int i = 0;
-		for (Variable var : variableConfiguration) {
-			switch (var.getValue()) {
-			case Variable.TRUE:
-				knownLiterals.add(new Literal(featureGraph.featureArray[i], true));
-				break;
-			case Variable.FALSE:
-				knownLiterals.add(new Literal(featureGraph.featureArray[i], false));
-				break;
-			default:
-				break;
+			int i = 0;
+			for (Variable var : variableConfiguration) {
+				switch (var.getValue()) {
+				case Variable.TRUE:
+					knownLiterals.add(new Literal(featureGraph.featureArray[i], true));
+					break;
+				case Variable.FALSE:
+					knownLiterals.add(new Literal(featureGraph.featureArray[i], false));
+					break;
+				default:
+					break;
+				}
+				i++;
 			}
-			i++;
-		}
-		variableConfiguration.setVariable(index, newValue, true);
+			variableConfiguration.setVariable(index, newValue, true);
 
-		dfsThread.reset();
-		for (IWorkerThread thread : dfsThread.getThreads()) {
-			((ISatThread) thread).setKnownLiterals(knownLiterals, new Literal(featureGraph.featureArray[index], newValue == Variable.TRUE));
+			calcThread.setKnownLiterals(knownLiterals, new Literal(featureGraph.featureArray[index], newValue == Variable.TRUE));
+			calcThread.addObjects(compList);
+			calcThread.start();
 		}
-		dfsThread.addObjects(compList);
-		dfsThread.start();
 
 		Collections.sort(changedFeatures);
 		return getChangedFeatures();
