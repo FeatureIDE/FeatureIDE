@@ -37,12 +37,17 @@ import java.util.Stack;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
@@ -52,6 +57,7 @@ import antenna.preprocessor.v3.PPException;
 import antenna.preprocessor.v3.Preprocessor;
 import de.ovgu.featureide.antenna.documentation.DocumentationCommentParser;
 import de.ovgu.featureide.antenna.model.AntennaModelBuilder;
+import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.builder.IComposerObject;
@@ -142,8 +148,85 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 		}
 	}
 
+	// TODO revide code clone from Munge
 	@Override
-	public void postCompile(IResourceDelta delta, IFile buildFile) {
+	public void postCompile(IResourceDelta delta, final IFile file) {
+		if (isSourceFile(file.getParent())) {
+			return;
+		}
+		super.postCompile(delta, file);
+		Job job = new Job("Propagate problem markers for " + CorePlugin.getFeatureProject(file)) {
+			@Override
+			public IStatus run(IProgressMonitor monitor) {
+				try {
+					IMarker[] marker = file.findMarkers(null, false, IResource.DEPTH_ZERO);
+					if (marker.length != 0) {
+						for (IMarker m : marker) {
+							IFile sourceFile = findSourceFile(file, featureProject.getSourceFolder());
+							if (!hasMarker(m, sourceFile)) {
+								IMarker newMarker = sourceFile.createMarker(CorePlugin.PLUGIN_ID + ".builderProblemMarker");
+								newMarker.setAttribute(IMarker.LINE_NUMBER, m.getAttribute(IMarker.LINE_NUMBER));
+								newMarker.setAttribute(IMarker.MESSAGE, m.getAttribute(IMarker.MESSAGE));
+								newMarker.setAttribute(IMarker.SEVERITY, m.getAttribute(IMarker.SEVERITY));
+							}
+						}
+					}
+				} catch (CoreException e) {
+					AntennaCorePlugin.getDefault().logError(e);
+				}
+				return Status.OK_STATUS;
+			}
+
+			private boolean hasMarker(IMarker buildMarker, IFile sourceFile) {
+				try {
+					IMarker[] marker = sourceFile.findMarkers(null, true, IResource.DEPTH_ZERO);
+					int LineNumber = buildMarker.getAttribute(IMarker.LINE_NUMBER, -1);
+					String Message = buildMarker.getAttribute(IMarker.MESSAGE, null);
+					if (marker.length > 0) {
+						for (IMarker m : marker) {
+							if (LineNumber == m.getAttribute(IMarker.LINE_NUMBER, -1)) {
+								if (Message.equals(m.getAttribute(IMarker.MESSAGE, null))) {
+									return true;
+								}
+							}
+						}
+					}
+				} catch (CoreException e) {
+					AntennaCorePlugin.getDefault().logError(e);
+				}
+				return false;
+			}
+			
+			private IFile findSourceFile(IFile file, IFolder folder) throws CoreException {
+				for (IResource res : folder.members()) {
+					if (res instanceof IFolder) {
+						IFile sourceFile = findSourceFile(file, (IFolder) res);
+						if (sourceFile != null) {
+							return sourceFile;
+						}
+					} else if (res instanceof IFile) {
+						if (res.getName().equals(file.getName()))
+							return (IFile) res;
+					}
+				}
+				return null;
+			}
+		};
+		job.setPriority(Job.DECORATE);
+		job.schedule();
+	}
+
+	/**
+	 * Checks whether the file is contained in the source folder.
+	 */
+	private boolean isSourceFile(IContainer parent) {
+		if (parent.equals(featureProject.getSourceFolder())) {
+			return true;
+		}
+		if (parent instanceof IFolder) {
+			return isSourceFile(parent.getParent());
+		}
+		return false;
 	}
 
 	@Override
