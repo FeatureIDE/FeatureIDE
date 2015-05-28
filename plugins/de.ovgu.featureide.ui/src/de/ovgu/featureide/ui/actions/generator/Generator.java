@@ -44,6 +44,8 @@ import org.eclipse.jdt.internal.core.JavaProject;
 
 import de.ovgu.featureide.core.builder.ExtensibleFeatureProjectBuilder;
 import de.ovgu.featureide.core.builder.FeatureProjectNature;
+import de.ovgu.featureide.core.builder.IComposerExtensionClass;
+import de.ovgu.featureide.core.builder.preprocessor.PPComposerExtensionClass;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.ui.UIPlugin;
 
@@ -203,7 +205,13 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 			UIPlugin.getDefault().logError(e);
 		}
 			
-		builder.featureProject.getComposer().buildConfiguration(project.getFolder("src"), configuration, name);
+		final IComposerExtensionClass composer = builder.featureProject.getComposer();
+		final IFolder sourceFolder = project.getFolder("src");
+		composer.buildConfiguration(sourceFolder, configuration, name);
+		if (composer instanceof PPComposerExtensionClass) {
+			((PPComposerExtensionClass)composer).postProcess(sourceFolder);
+		}
+			
 		try {
 			IFile modelFile = builder.featureProject.getModelFile();
 			modelFile.copy(project.getFile(modelFile.getName()).getFullPath(), true, null);

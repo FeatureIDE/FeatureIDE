@@ -20,9 +20,16 @@
  */
 package de.ovgu.featureide.antenna;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -61,7 +68,6 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
  * @author Christoph Giesel
  * @author Marcus Kamieth
  */
-// TODO #413 implement buildConfiguration
 public class AntennaPreprocessor extends PPComposerExtensionClass {
 
 	/** antenna preprocessor used from external library */
@@ -515,6 +521,73 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 			return c.cast(new DocumentationCommentParser());
 		}
 		return super.getComposerObjectInstance(c);
+	}
+
+	/**
+	 * Removes annotated lines of preprocessed files.
+	 */
+	@Override
+	public void postProcess(IFolder folder) {
+		try {
+			for (final IResource res : folder.members()) {
+				if (res instanceof IFolder) { 
+					postProcess((IFolder) res);
+				} else if (res instanceof IFile) {
+					if (res.getFileExtension().equals(getConfigurationExtension())) {
+						continue;
+					}
+					try (final FileInputStream inputStream = new FileInputStream(new File(res.getLocationURI()));
+						final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, Charset.availableCharsets().get("UTF-8")))) {
+						String line = null;
+						final StringBuilder content = new StringBuilder();
+						boolean hasAnnotations = false;
+						while ((line = reader.readLine()) != null) {
+							if (!isAnnotation(line)) {
+								content.append(line);
+								content.append("\r\n");
+							} else {
+								hasAnnotations = true;
+							}
+						}
+						if (hasAnnotations) {
+							setFileContent((IFile)res, content);
+						}
+					} catch (IOException e) {
+						AntennaCorePlugin.getDefault().logError(e);
+					}
+				}
+			}
+		} catch (CoreException e) {
+			AntennaCorePlugin.getDefault().logError(e);
+		}
+	}
+
+	/**
+	 * Sets the files new content.
+	 * @param file The file
+	 * @param content The new content to set
+	 */
+	private void setFileContent(IFile file, StringBuilder content) {
+		InputStream source = new ByteArrayInputStream(content.toString().getBytes(Charset.availableCharsets().get("UTF-8")));
+		try {
+			file.setContents(source, false, true, null);
+		} catch (CoreException e) {
+			AntennaCorePlugin.getDefault().logError(e);
+		}
+	}
+
+	/**
+	 * 
+	 */
+	// TODO use regex
+	private boolean isAnnotation(String line) {
+		if (line.trim().startsWith("//#")) {
+			return true;
+		}
+		if (line.trim().startsWith("//@")) {
+			return true;
+		}
+		return false;
 	}
 
 }
