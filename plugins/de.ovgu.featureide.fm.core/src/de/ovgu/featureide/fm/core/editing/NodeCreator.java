@@ -482,12 +482,10 @@ public class NodeCreator {
 	 */
 	private static void updateMap(HashMap<Object, Node> map, Object var,
 			Node replacing) {
-		for (Object key : map.keySet()) {
-			Node value = map.get(key);
+		for (Entry<Object, Node> entry : map.entrySet()) {
 			HashMap<Object, Node> tempMap = new HashMap<Object, Node>();
 			tempMap.put(var, replacing);
-			value = NodeCreator.replaceAbstractVariables(value, tempMap, true);
-			map.put(key, value);
+			entry.setValue(NodeCreator.replaceAbstractVariables(entry.getValue(), tempMap, true));
 		}
 		map.put(var, replacing);
 	}
@@ -531,7 +529,7 @@ public class NodeCreator {
 			Feature feature, Set<String> featureNames) {
 		if (!feature.hasChildren()) {
 			Feature parent = feature.getParent();
-			if (parent == null || featureNames.contains(parent))
+			if (parent == null || featureNames.contains(parent.getName()))
 				return null;
 			if ((parent.isAnd() && feature.isMandatorySet())
 					|| (!parent.isAnd() && parent.getChildrenCount() == 1))
@@ -540,7 +538,7 @@ public class NodeCreator {
 		}
 		if (feature.isAnd()) {
 			for (Feature child : feature.getChildren())
-				if (child.isMandatorySet() && !featureNames.contains(child))
+				if (child.isMandatorySet() && !featureNames.contains(child.getName()))
 					return new Literal(featureModel.getRenamingsManager().getOldName(child.getName()));
 			for (Feature child : feature.getChildren())
 				if (child.isMandatorySet())
