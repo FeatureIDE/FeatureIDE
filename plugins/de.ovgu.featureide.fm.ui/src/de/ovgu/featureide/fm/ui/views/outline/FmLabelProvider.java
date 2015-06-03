@@ -94,7 +94,7 @@ public class FmLabelProvider implements ILabelProvider,IFontProvider, GUIDefault
 	public Image getImage(Object element) {
 		if (element instanceof Feature) {
 			if ((((Feature) element).isRoot()))
-				return IMG_FEATUREIDE;
+				return null; // TODO: Add here icon for feature model
 			if (((Feature) element).getParent().isAlternative()) {
 				return IMG_XOR;
 			}
@@ -107,10 +107,10 @@ public class FmLabelProvider implements ILabelProvider,IFontProvider, GUIDefault
 				return IMG_OPTIONAL;
 			}
 		} else if (element instanceof String) {
-			return IMG_CONSTRAINTS;
+			return null; // TODO: Add here icon for "constraint" node
 		} else if (element instanceof Constraint) {
-			return IMG_CONSTRAINT;
-		} else return IMG_UNKNOWN16x16;
+			return null; // TODO: Add here icon for "constraint element" node
+		} else return null;
 	}
 	
 
