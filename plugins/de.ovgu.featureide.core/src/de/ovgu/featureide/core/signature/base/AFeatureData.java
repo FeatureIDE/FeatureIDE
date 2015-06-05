@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.core.signature.base;
 
+import org.eclipse.core.resources.IFile;
 import org.prop4j.Node;
 
 /**
@@ -34,6 +35,8 @@ public abstract class AFeatureData implements IConstrainedObject {
 	protected Node constraint;
 
 	protected String comment;
+	
+	protected IFile file;
 
 	protected AFeatureData(int id, int lineNumber, int endLineNumber) {
 		this.startLineNumber = lineNumber;
@@ -71,6 +74,13 @@ public abstract class AFeatureData implements IConstrainedObject {
 
 	public boolean hasID(int id) {
 		return this.id == -1 || this.id == id;
+	}
+	public IFile getFile() {
+		return file;
+	}
+
+	public void setFile(IFile file) {
+		this.file = file;
 	}
 
 }

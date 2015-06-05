@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.featurehouse;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -27,6 +28,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map.Entry;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.JavaModelException;
@@ -63,6 +65,7 @@ import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.core.fstmodel.IRoleElement;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
+import de.ovgu.featureide.core.signature.base.AFeatureData;
 import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 import de.ovgu.featureide.core.signature.base.AbstractMethodSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
@@ -262,7 +265,7 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 		int featureID = astNode.featureID();
 
 		String featurename = featureModulePathnames.get(featureID);
-		return featurename.substring(featurename.lastIndexOf('\\') + 1);
+		return featurename.substring(featurename.lastIndexOf(File.separator) + 1);
 	}
 
 	@Override
@@ -564,18 +567,54 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 
 				for (FSTRole fstRole : fstFeature.getRoles()) {
 					FSTClassFragment classFragment = fstRole.getClassFragment();
-					String fullName = (classFragment.getPackage() == null ? "" : classFragment.getPackage()) + "."
-							+ classFragment.getName();
+					String fullName = (classFragment.getPackage() == null ? "" : classFragment.getPackage()) + "." + classFragment.getName();
 					if (fullName.endsWith(".java")) {
 						fullName = fullName.substring(0, fullName.length() - ".java".length());
 					}
 					copyComment_rec(classFragment, id, fullName);
 				}
 			}
+
+			setFileForFOPFeatures(fst, sigArray, true);
 		}
 
 		projectSignatures.setSignatureArray(sigArray);
 		featureProject.getFSTModel().setProjectSignatures(projectSignatures);
+	}
+
+	private IFile getFileForFeatureData(final AFeatureData featureData, final FSTModel fst, final String fileName) {
+		final int featureId = featureData.getID();
+		if (featureId < 0)
+			return null;
+		final String featureName = projectSignatures.getFeatureName(featureId);
+
+		return fst.getFeature(featureName).getRole(fileName + ".java").getFile();
+	}
+
+	private void setFileForFOPFeatures(final FSTModel fst, AbstractSignature[] sigArray, final boolean checkCalledSignatures) {
+		for (AbstractSignature signature : sigArray) {
+			
+			String fullName = signature.getFullName();
+			AbstractSignature parentSignature = signature.getParent();
+			while (parentSignature != null) {
+				fullName = parentSignature.getFullName();
+				parentSignature = parentSignature.getParent();
+			}
+			
+			final String fileName = (fullName.startsWith(".")) ? fullName.substring(1) : fullName.replace('.', '/');
+
+			final FOPFeatureData[] featureData = (FOPFeatureData[]) signature.getFeatureData();
+			for (int j = 0; j < featureData.length; j++) {
+				FOPFeatureData fopFeature = featureData[j];
+				fopFeature.setFile(getFileForFeatureData(fopFeature, fst, fileName));
+				System.out.println(fopFeature.getFile().getName());
+
+				if (checkCalledSignatures && !fopFeature.getCalledSignatures().isEmpty())
+					setFileForFOPFeatures(fst,
+							(AbstractSignature[]) fopFeature.getCalledSignatures().toArray(new AbstractSignature[fopFeature.getCalledSignatures().size()]),
+							false);
+			}
+		}
 	}
 
 	private void findMethodAccesses(ASTNode<?> stmt, AbstractSignature methAbs, int featureID) {

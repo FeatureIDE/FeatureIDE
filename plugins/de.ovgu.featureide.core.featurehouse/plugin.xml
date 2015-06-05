@@ -15,9 +15,9 @@
 			point="org.eclipse.ui.menus">
 		<menuContribution locationURI="popup:de.ovgu.featureide.fm.ui.menus.popupMenu?before=de.ovgu.featureide.fm.ui.menus.popupMenu.submenus">
 			<menu
-					icon="icons/FeatureIconSmall.ico"
-					id="de.ovgu.featureide.featurehouse.ui.submenu"
-					label="FeatureHouse">
+         icon="icons/FeatureIconSmall.ico"
+         id="de.ovgu.featureide.featurehouse.ui.submenu"
+         label="FeatureHouse">
 				<visibleWhen
 						checkEnabled="false">
 					<with
@@ -103,6 +103,42 @@
 				</command>
 			</menu>
 		</menuContribution>
+  <menuContribution
+        allPopups="false"
+        locationURI="popup:org.eclipse.ui.popup.any?after=additions">
+    <!--
+     <menu
+           label="Refactoring">
+           -->
+        <command
+              commandId="de.ovgu.featureide.core.featurehouse.ui.commands.refactoring.rename"
+              id="de.ovgu.featureide.core.featurehouse.ui.action.refactoring.rename"
+              label="Rename..."
+              style="push">
+              <!--
+           <visibleWhen
+                 checkEnabled="false">
+                 
+              <with
+                    variable="activeMenuSelection">
+                 <iterate
+                       ifEmpty="false"
+                       operator="or">
+                    <adapt
+                          type="org.eclipse.core.resources.IFile">
+                       <test
+                             property="org.eclipse.core.resources.name"
+                             value="*.java">
+                       </test>
+                    </adapt>
+                 </iterate>
+              </with>
+              
+           </visibleWhen>
+           -->
+        </command>
+     <!--</menu>-->
+  </menuContribution>
 	</extension>
 	<extension
 			point="org.eclipse.ui.commands">
@@ -126,6 +162,10 @@
 				id="de.ovgu.featureide.core.featurehouse.ui.commands.key"
 				name="Perform Feature-Based Verification with KeY">
 		</command>
+  <command
+        id="de.ovgu.featureide.core.featurehouse.ui.commands.refactoring.rename"
+        name="Rename...">
+  </command>
 	</extension>
 	<extension
 			point="org.eclipse.ui.handlers">
@@ -141,6 +181,10 @@
 				class="de.ovgu.featureide.featurehouse.ui.handlers.GenerateFeatureStubsHandler"
 				commandId="de.ovgu.featureide.core.featurehouse.ui.commands.key">
 		</handler>
+  <handler
+        class="de.ovgu.featureide.featurehouse.ui.handlers.RenameHandler"
+        commandId="de.ovgu.featureide.core.featurehouse.ui.commands.refactoring.rename">
+  </handler>
 	</extension>
 	<extension
 			id="de.ovgu.featureide.featurehouse.meta.verificationmarker"
@@ -179,4 +223,17 @@
 				type="org.eclipse.jface.viewers.IStructuredSelection">
 		</propertyTester>
 	</extension>
+ <extension
+       point="org.eclipse.ltk.core.refactoring.renameParticipants">
+    <renameParticipant
+          class="de.ovgu.featureide.featurehouse.refactoring.RenameParticipant1"
+          id="de.ovgu.featureide.core.featurehouse.renameParticipant1"
+          name="name">
+          <enablement>
+      <with variable="element">
+        <instanceof value="org.eclipse.jdt.core.IMethod"/>
+      </with>
+    </enablement>
+    </renameParticipant>
+ </extension>
 </plugin>
