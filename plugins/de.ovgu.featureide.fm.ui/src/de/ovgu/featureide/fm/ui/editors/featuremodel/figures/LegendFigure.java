@@ -138,24 +138,25 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	}
 
 	public LegendFigure(FeatureModel featureModel, Point pos) {
-		final FeatureModelAnalyzer analyser = featureModel.getAnalyser();
 
 		mandatory = featureModel.hasMandatoryFeatures();
 		optional = featureModel.hasOptionalFeatures();
 		alternative = featureModel.hasAlternativeGroup();
 		or = featureModel.hasOrGroup();
-		_abstract = analyser.getAttributeFlag(Attribute.Abstract);
-		concrete = analyser.getAttributeFlag(Attribute.Concrete);
-		hidden = analyser.getAttributeFlag(Attribute.Hidden);
-		dead = analyser.getAttributeFlag(Attribute.Dead);
+		_abstract = featureModel.hasAbstract();
+		concrete = featureModel.hasConcrete();
+		hidden = featureModel.hasHidden();
+		dead = !featureModel.getAnalyser().getDeadFeatures().isEmpty();
+		
 		showHidden = featureModel.getLayout().showHiddenFeatures();
-		falseoptional = analyser.getAttributeFlag(Attribute.FalseOptional);
-		indetHidden = analyser.getAttributeFlag(Attribute.IndetHidden);
+		falseoptional = featureModel.hasFalseOptionalFeatures();
+		indetHidden = featureModel.hasIndetHidden();
+		
+		unsatisfiableConst = featureModel.hasUnsatisfiableConst() && featureModel.getAnalyser().calculateConstraints;
+		tautologyConst = featureModel.hasTautologyConst() && featureModel.getAnalyser().calculateTautologyConstraints;
+		voidModelConst = featureModel.hasVoidModelConst() && featureModel.getAnalyser().calculateConstraints;
+		redundantConst = featureModel.hasRedundantConst() && featureModel.getAnalyser().calculateRedundantConstraints;
 
-		unsatisfiableConst = analyser.calculateConstraints && featureModel.hasUnsatisfiableConst();
-		tautologyConst = analyser.calculateTautologyConstraints && featureModel.hasTautologyConst();
-		voidModelConst = analyser.calculateConstraints && featureModel.hasVoidModelConst();
-		redundantConst = analyser.calculateRedundantConstraints && featureModel.hasRedundantConst();
 
 		if (featureModel instanceof ExtendedFeatureModel) {
 			ExtendedFeatureModel extendedFeatureModel = (ExtendedFeatureModel) featureModel;
