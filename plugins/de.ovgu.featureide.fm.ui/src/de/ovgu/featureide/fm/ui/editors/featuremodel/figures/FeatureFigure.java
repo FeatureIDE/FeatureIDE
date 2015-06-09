@@ -118,7 +118,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		final Label featureLabel = new Label("Feature: ");
 		final Label featureName = new Label(feature.getName());
 		featureLabel.setFont(DEFAULT_FONT_TINY);
-		featureLabel.setFont(DEFAULT_FONT_REGULAR);
+		featureName.setFont(DEFAULT_FONT_REGULAR);
 		tip.setLayoutManager(new GridLayout());
 		tip.add(featureLabel);
 		tip.add(featureName);
