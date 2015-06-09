@@ -102,7 +102,6 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 
 		add(label, label.getBounds());
 		setOpaque(true);
-		setupTooltip();
 
 		if (FeatureUIHelper.getLocation(feature) != null) {
 			setLocation(FeatureUIHelper.getLocation(feature));
@@ -111,18 +110,6 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		if (isHidden(feature)) {
 			setSize(new Dimension(0, 0));
 		}
-	}
-
-	private void setupTooltip() {
-		final Figure tip = new Figure();
-		final Label featureLabel = new Label("Feature: ");
-		final Label featureName = new Label(feature.getName());
-		featureLabel.setFont(DEFAULT_FONT_TINY);
-		featureName.setFont(DEFAULT_FONT_REGULAR);
-		tip.setLayoutManager(new GridLayout());
-		tip.add(featureLabel);
-		tip.add(featureName);
-		label.setToolTip(tip);
 	}
 
 	/**
@@ -223,11 +210,14 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 			toolTip.append("\n\nConstraints:\n");
 			toolTip.append(contraints);
 		}
+		
+		toolTip.append("\n Feature: " + feature.getName());
+		
 		Figure toolTipContent = new Figure();
 		toolTipContent.setLayoutManager(gl);
 		toolTipContent.setFont(DEFAULT_FONT);
 		toolTipContent.add(new Label(toolTip.toString()));
-
+		
 		// call of the FeatureDiagramExtensions
 		for (FeatureDiagramExtension extension : FeatureDiagramExtension.getExtensions()) {
 			toolTipContent = extension.extendFeatureFigureToolTip(toolTipContent, this);
