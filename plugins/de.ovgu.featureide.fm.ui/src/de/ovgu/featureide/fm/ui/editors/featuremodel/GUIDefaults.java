@@ -55,6 +55,8 @@ public interface GUIDefaults {
 	 * an Unicode font to be able to display constraints at the feature diagram correctly
 	 */
 	public static final Font DEFAULT_FONT = new Font(null, new FontData("Arial Unicode MS", 8, SWT.NORMAL));
+	public static final Font DEFAULT_FONT_TINY = new Font(null, new FontData("Arial Unicode MS", 8, SWT.NORMAL));
+	public static final Font DEFAULT_FONT_REGULAR = new Font(null, new FontData("Arial Unicode MS", 12, SWT.NORMAL));
 
 	public static final Color DIAGRAM_BACKGROUND = ColorConstants.white;
 

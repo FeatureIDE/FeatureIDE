@@ -102,6 +102,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 
 		add(label, label.getBounds());
 		setOpaque(true);
+		setupTooltip();
 
 		if (FeatureUIHelper.getLocation(feature) != null) {
 			setLocation(FeatureUIHelper.getLocation(feature));
@@ -110,6 +111,18 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		if (isHidden(feature)) {
 			setSize(new Dimension(0, 0));
 		}
+	}
+
+	private void setupTooltip() {
+		final Figure tip = new Figure();
+		final Label featureLabel = new Label("Feature: ");
+		final Label featureName = new Label(feature.getName());
+		featureLabel.setFont(DEFAULT_FONT_TINY);
+		featureLabel.setFont(DEFAULT_FONT_REGULAR);
+		tip.setLayoutManager(new GridLayout());
+		tip.add(featureLabel);
+		tip.add(featureName);
+		label.setToolTip(tip);
 	}
 
 	/**
