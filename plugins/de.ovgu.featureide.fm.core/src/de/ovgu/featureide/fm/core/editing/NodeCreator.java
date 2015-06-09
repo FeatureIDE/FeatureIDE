@@ -271,7 +271,7 @@ public class NodeCreator {
 				return new Literal(varFalse);
 			return lit;
 		}
-		Node[] children = node.getChildren();
+		final Node[] children = node.getChildren();
 		int removeChildren = 0;
 		for (int i = 0; i < children.length; i++) {
 			Node child = simplify(children[i]);
@@ -345,20 +345,41 @@ public class NodeCreator {
 			}
 			children[i] = child;
 		}
-		if (removeChildren == 0)
-			return node;
-		if (children.length - removeChildren == 0) {
-			if (node instanceof And)
+		final int newSize = children.length - removeChildren;
+		switch (newSize) {
+		case 0:
+			if (node instanceof And) {
 				return new Literal(varTrue);
-			if (node instanceof Or)
+			}
+			if (node instanceof Or) {
 				return new Literal(varFalse);
+			}
+			break;
+		case 1:
+			if (node instanceof And || node instanceof Or) {
+				for (Node child : children) {
+					if (child != null) {
+						return child;
+					}
+				}
+			}
+			break;
+		default:
+			break;
 		}
-		Node[] newChildren = new Node[children.length - removeChildren];
+		if (removeChildren == 0) {
+			return node;
+		}
+		
+		final Node[] newChildren = new Node[newSize];
 		int i = 0;
-		for (Node child : children)
-			if (child != null)
+		for (Node child : children) {
+			if (child != null) {
 				newChildren[i++] = child;
+			}
+		}
 		node.setChildren(newChildren);
+		
 		return node;
 	}
 
@@ -461,12 +482,10 @@ public class NodeCreator {
 	 */
 	private static void updateMap(HashMap<Object, Node> map, Object var,
 			Node replacing) {
-		for (Object key : map.keySet()) {
-			Node value = map.get(key);
+		for (Entry<Object, Node> entry : map.entrySet()) {
 			HashMap<Object, Node> tempMap = new HashMap<Object, Node>();
 			tempMap.put(var, replacing);
-			value = NodeCreator.replaceAbstractVariables(value, tempMap, true);
-			map.put(key, value);
+			entry.setValue(NodeCreator.replaceAbstractVariables(entry.getValue(), tempMap, true));
 		}
 		map.put(var, replacing);
 	}
@@ -510,7 +529,7 @@ public class NodeCreator {
 			Feature feature, Set<String> featureNames) {
 		if (!feature.hasChildren()) {
 			Feature parent = feature.getParent();
-			if (parent == null || featureNames.contains(parent))
+			if (parent == null || featureNames.contains(parent.getName()))
 				return null;
 			if ((parent.isAnd() && feature.isMandatorySet())
 					|| (!parent.isAnd() && parent.getChildrenCount() == 1))
@@ -519,7 +538,7 @@ public class NodeCreator {
 		}
 		if (feature.isAnd()) {
 			for (Feature child : feature.getChildren())
-				if (child.isMandatorySet() && !featureNames.contains(child))
+				if (child.isMandatorySet() && !featureNames.contains(child.getName()))
 					return new Literal(featureModel.getRenamingsManager().getOldName(child.getName()));
 			for (Feature child : feature.getChildren())
 				if (child.isMandatorySet())

@@ -986,23 +986,27 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			return;
 		}
 
-		Job job = new Job("Checking configurations") {
-			protected IStatus run(IProgressMonitor monitor) {
-				monitor.beginTask("", files.size());
-				Configuration config = new Configuration(featureModel, false, false);
-				// Configuration autoConfig = new Configuration(featureModel,
-				// true);
-				ConfigurationReader reader = new ConfigurationReader(config);
-				// ConfigurationReader autoReader = new ConfigurationReader(
-				// autoConfig);
+		Job job = new AStoppableJob("Checking configurations", Job.LONG) {	
+			@Override
+			protected boolean work() throws Exception {
+				workMonitor.setMaxAbsoluteWork(2 * files.size());
+				final Configuration config = new Configuration(featureModel, false, false);
+				final ConfigurationReader reader = new ConfigurationReader(config);
 				try {
-					monitor.subTask("Delete Configuration Markers");
+					workMonitor.getMonitor().subTask("Delete Configuration Markers");
 					for (IFile file : files) {
+						if (workMonitor.checkCancel()) {
+							return false;
+						}
 						deleteConfigurationMarkers(file, IResource.DEPTH_ZERO);
+						workMonitor.worked();
 					}
 					// check validity
 					for (IFile file : files) {
-						monitor.subTask("Check validity of " + file.getName());
+						if (workMonitor.checkCancel()) {
+							return false;
+						}
+						workMonitor.getMonitor().subTask("Check validity of " + file.getName());
 						reader.readFromFile(file);
 						if (!config.isValid()) {
 							String name = file.getName();
@@ -1011,23 +1015,19 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 							createConfigurationMarker(file, message, 0, IMarker.SEVERITY_ERROR);
 
 						}
-						// create warnings (e.g., for features that are not
-						// available anymore)
+						// create warnings (e.g., for features that are not available anymore)
 						for (ConfigurationReader.Warning warning : reader.getWarnings()) {
 							createConfigurationMarker(file, warning.getMessage(), warning.getPosition(), IMarker.SEVERITY_WARNING);
 						}
-						monitor.worked(1);
+						workMonitor.worked();
 					}
 				} catch (OutOfMemoryError e) {
 					LOGGER.logError(e);
-				} catch (Exception e) {
-					LOGGER.logError(e);
+					return false;
 				}
-				monitor.done();
-				return Status.OK_STATUS;
+				return true;
 			}
 		};
-		job.setPriority(Job.DECORATE);
 		job.schedule();
 	}
 

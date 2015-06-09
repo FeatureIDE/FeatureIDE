@@ -20,9 +20,16 @@
  */
 package de.ovgu.featureide.antenna;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -30,12 +37,17 @@ import java.util.Stack;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
@@ -45,6 +57,7 @@ import antenna.preprocessor.v3.PPException;
 import antenna.preprocessor.v3.Preprocessor;
 import de.ovgu.featureide.antenna.documentation.DocumentationCommentParser;
 import de.ovgu.featureide.antenna.model.AntennaModelBuilder;
+import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.builder.IComposerObject;
@@ -61,7 +74,6 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
  * @author Christoph Giesel
  * @author Marcus Kamieth
  */
-// TODO #413 implement buildConfiguration
 public class AntennaPreprocessor extends PPComposerExtensionClass {
 
 	/** antenna preprocessor used from external library */
@@ -136,8 +148,85 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 		}
 	}
 
+	// TODO revide code clone from Munge
 	@Override
-	public void postCompile(IResourceDelta delta, IFile buildFile) {
+	public void postCompile(IResourceDelta delta, final IFile file) {
+		if (isSourceFile(file.getParent())) {
+			return;
+		}
+		super.postCompile(delta, file);
+		Job job = new Job("Propagate problem markers for " + CorePlugin.getFeatureProject(file)) {
+			@Override
+			public IStatus run(IProgressMonitor monitor) {
+				try {
+					IMarker[] marker = file.findMarkers(null, false, IResource.DEPTH_ZERO);
+					if (marker.length != 0) {
+						for (IMarker m : marker) {
+							IFile sourceFile = findSourceFile(file, featureProject.getSourceFolder());
+							if (!hasMarker(m, sourceFile)) {
+								IMarker newMarker = sourceFile.createMarker(CorePlugin.PLUGIN_ID + ".builderProblemMarker");
+								newMarker.setAttribute(IMarker.LINE_NUMBER, m.getAttribute(IMarker.LINE_NUMBER));
+								newMarker.setAttribute(IMarker.MESSAGE, m.getAttribute(IMarker.MESSAGE));
+								newMarker.setAttribute(IMarker.SEVERITY, m.getAttribute(IMarker.SEVERITY));
+							}
+						}
+					}
+				} catch (CoreException e) {
+					AntennaCorePlugin.getDefault().logError(e);
+				}
+				return Status.OK_STATUS;
+			}
+
+			private boolean hasMarker(IMarker buildMarker, IFile sourceFile) {
+				try {
+					IMarker[] marker = sourceFile.findMarkers(null, true, IResource.DEPTH_ZERO);
+					int LineNumber = buildMarker.getAttribute(IMarker.LINE_NUMBER, -1);
+					String Message = buildMarker.getAttribute(IMarker.MESSAGE, null);
+					if (marker.length > 0) {
+						for (IMarker m : marker) {
+							if (LineNumber == m.getAttribute(IMarker.LINE_NUMBER, -1)) {
+								if (Message.equals(m.getAttribute(IMarker.MESSAGE, null))) {
+									return true;
+								}
+							}
+						}
+					}
+				} catch (CoreException e) {
+					AntennaCorePlugin.getDefault().logError(e);
+				}
+				return false;
+			}
+			
+			private IFile findSourceFile(IFile file, IFolder folder) throws CoreException {
+				for (IResource res : folder.members()) {
+					if (res instanceof IFolder) {
+						IFile sourceFile = findSourceFile(file, (IFolder) res);
+						if (sourceFile != null) {
+							return sourceFile;
+						}
+					} else if (res instanceof IFile) {
+						if (res.getName().equals(file.getName()))
+							return (IFile) res;
+					}
+				}
+				return null;
+			}
+		};
+		job.setPriority(Job.DECORATE);
+		job.schedule();
+	}
+
+	/**
+	 * Checks whether the file is contained in the source folder.
+	 */
+	private boolean isSourceFile(IContainer parent) {
+		if (parent.equals(featureProject.getSourceFolder())) {
+			return true;
+		}
+		if (parent instanceof IFolder) {
+			return isSourceFile(parent.getParent());
+		}
+		return false;
 	}
 
 	@Override
@@ -515,6 +604,73 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 			return c.cast(new DocumentationCommentParser());
 		}
 		return super.getComposerObjectInstance(c);
+	}
+
+	/**
+	 * Removes annotated lines of preprocessed files.
+	 */
+	@Override
+	public void postProcess(IFolder folder) {
+		try {
+			for (final IResource res : folder.members()) {
+				if (res instanceof IFolder) { 
+					postProcess((IFolder) res);
+				} else if (res instanceof IFile) {
+					if (res.getFileExtension().equals(getConfigurationExtension())) {
+						continue;
+					}
+					try (final FileInputStream inputStream = new FileInputStream(new File(res.getLocationURI()));
+						final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, Charset.availableCharsets().get("UTF-8")))) {
+						String line = null;
+						final StringBuilder content = new StringBuilder();
+						boolean hasAnnotations = false;
+						while ((line = reader.readLine()) != null) {
+							if (!isAnnotation(line)) {
+								content.append(line);
+								content.append("\r\n");
+							} else {
+								hasAnnotations = true;
+							}
+						}
+						if (hasAnnotations) {
+							setFileContent((IFile)res, content);
+						}
+					} catch (IOException e) {
+						AntennaCorePlugin.getDefault().logError(e);
+					}
+				}
+			}
+		} catch (CoreException e) {
+			AntennaCorePlugin.getDefault().logError(e);
+		}
+	}
+
+	/**
+	 * Sets the files new content.
+	 * @param file The file
+	 * @param content The new content to set
+	 */
+	private void setFileContent(IFile file, StringBuilder content) {
+		InputStream source = new ByteArrayInputStream(content.toString().getBytes(Charset.availableCharsets().get("UTF-8")));
+		try {
+			file.setContents(source, false, true, null);
+		} catch (CoreException e) {
+			AntennaCorePlugin.getDefault().logError(e);
+		}
+	}
+
+	/**
+	 * 
+	 */
+	// TODO use regex
+	private boolean isAnnotation(String line) {
+		if (line.trim().startsWith("//#")) {
+			return true;
+		}
+		if (line.trim().startsWith("//@")) {
+			return true;
+		}
+		return false;
 	}
 
 }

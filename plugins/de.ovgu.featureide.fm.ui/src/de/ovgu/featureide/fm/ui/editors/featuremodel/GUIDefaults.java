@@ -154,11 +154,11 @@ public interface GUIDefaults {
 
 	public static final Image OPERATOR_SYMBOL = FMUIPlugin.getImage("operator_symbol.gif");
 	public static final Image FEATURE_SYMBOL = FMUIPlugin.getImage("FeatureIconSmall.ico");
-
+		
 	public static final Image IMG_OPTIONAL = FMUIPlugin.getImage("optional.gif");
 	public static final Image IMG_MANDATORY = FMUIPlugin.getImage("mandatory.gif");
 	public static final Image IMG_OR = FMUIPlugin.getImage("or.gif");
-	public static final Image IMG_XOR = FMUIPlugin.getImage("exor.gif");
+	public static final Image IMG_XOR = FMUIPlugin.getImage("xor.gif");
 
 	public static final Image PLUS_IMAGE = FMUIPlugin.getImage("plus.gif");
 	public static final Image MINUS_IMAGE = FMUIPlugin.getImage("minus.gif");
