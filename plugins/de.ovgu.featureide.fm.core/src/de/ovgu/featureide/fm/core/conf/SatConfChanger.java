@@ -33,6 +33,8 @@ import de.ovgu.featureide.fm.core.conf.nodes.Variable;
 import de.ovgu.featureide.fm.core.conf.nodes.VariableConfiguration;
 import de.ovgu.featureide.fm.core.conf.worker.CalcThread;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.job.LongRunningMethod;
+import de.ovgu.featureide.fm.core.job.WorkMonitor;
 
 /**
  * For evaluation purposes.
@@ -43,8 +45,10 @@ public class SatConfChanger implements IConfigurationChanger {
 	private final FeatureGraph featureGraph;
 	private final VariableConfiguration variableConfiguration;
 	private final CalcThread calcThread;
+	private final FeatureModel featureModel;
 
 	public SatConfChanger(FeatureModel featureModel, FeatureGraph featureGraph, VariableConfiguration variableConfiguration) {
+		this.featureModel = featureModel;
 		this.featureGraph = featureGraph;
 		this.variableConfiguration = variableConfiguration;
 		this.calcThread = new CalcThread(featureGraph, this, NodeCreator.createNodes(featureModel, true).toCNF());
@@ -52,52 +56,68 @@ public class SatConfChanger implements IConfigurationChanger {
 
 	private final ConcurrentLinkedQueue<String> changedFeatures = new ConcurrentLinkedQueue<>();
 
-	public List<String> setFeature(Feature f, int newValue) {
-		if (newValue == Variable.UNDEFINED) {
-			return Collections.emptyList();
-		}
-		changedFeatures.clear();
+	private Feature f = null;
+	private int newValue = 0;
 
-		final int index = featureGraph.getFeatureIndex(f.getName());
-		variableConfiguration.setVariable(index, newValue, true);
-		changedFeatures.add(featureGraph.featureArray[index] + ": " + (newValue == Variable.TRUE));
-
-		final List<Integer> compList = new ArrayList<>();
-		final List<Literal> knownLiterals = new ArrayList<>();
-
-		variableConfiguration.setVariable(index, Variable.UNDEFINED, true);
-
-		int i = 0;
-		for (Variable var : variableConfiguration) {
-			switch (var.getValue()) {
-			case Variable.TRUE:
-				knownLiterals.add(new Literal(featureGraph.featureArray[i], true));
-				break;
-			case Variable.FALSE:
-				knownLiterals.add(new Literal(featureGraph.featureArray[i], false));
-				break;
-			default:
-				compList.add(i);
-				break;
+	public class UpdateMethod implements LongRunningMethod<List<String>> {
+		@Override
+		public List<String> run(WorkMonitor monitor) {
+			if (newValue == Variable.UNDEFINED) {
+				return Collections.emptyList();
 			}
-			i++;
+			changedFeatures.clear();
+
+			final int index = featureGraph.getFeatureIndex(f.getName());
+			variableConfiguration.setVariable(index, newValue, true);
+			changedFeatures.add(featureGraph.featureArray[index] + ": " + (newValue == Variable.TRUE));
+
+			final List<Integer> compList = new ArrayList<>();
+			final List<Literal> knownLiterals = new ArrayList<>();
+
+			variableConfiguration.setVariable(index, Variable.UNDEFINED, true);
+
+			int i = 0;
+			for (Variable var : variableConfiguration) {
+				switch (var.getValue()) {
+				case Variable.TRUE:
+					knownLiterals.add(new Literal(featureGraph.featureArray[i], true));
+					break;
+				case Variable.FALSE:
+					knownLiterals.add(new Literal(featureGraph.featureArray[i], false));
+					break;
+				default:
+					compList.add(i);
+					break;
+				}
+				i++;
+			}
+			variableConfiguration.setVariable(index, newValue, true);
+
+			calcThread.setKnownLiterals(knownLiterals, new Literal(featureGraph.featureArray[index], newValue == Variable.TRUE));
+			calcThread.addObjects(compList);
+			calcThread.start();
+
+			final ArrayList<String> changedFeatures2 = new ArrayList<>(changedFeatures);
+			Collections.sort(changedFeatures2);
+			return changedFeatures2;
 		}
-		variableConfiguration.setVariable(index, newValue, true);
-
-		calcThread.setKnownLiterals(knownLiterals, new Literal(featureGraph.featureArray[index], newValue == Variable.TRUE));
-		calcThread.addObjects(compList);
-		calcThread.start();
-
-		final ArrayList<String> changedFeatures2 = new ArrayList<>(changedFeatures);
-		Collections.sort(changedFeatures2);
-		return changedFeatures2;
 	}
 
-	public void setNewValue(int index, int value) {
-		if (value != Variable.UNDEFINED && variableConfiguration.getVariable(index).getValue() == Variable.UNDEFINED) {
-			variableConfiguration.setVariable(index, value, false);
-			changedFeatures.add(featureGraph.featureArray[index] + ": " + (value == Variable.TRUE));
+	public void setNewValue(int index, int value, boolean manual) {
+		if (manual) {
+			f = featureModel.getFeature(featureGraph.featureArray[index]);
+			newValue = value;
+		} else {
+			if (value != Variable.UNDEFINED && variableConfiguration.getVariable(index).getValue() == Variable.UNDEFINED) {
+				variableConfiguration.setVariable(index, value, false);
+				changedFeatures.add(featureGraph.featureArray[index] + ": " + (value == Variable.TRUE));
+			}
 		}
+	}
+
+	@Override
+	public UpdateMethod update(boolean redundantManual, String startFeatureName) {
+		return new UpdateMethod();
 	}
 
 }

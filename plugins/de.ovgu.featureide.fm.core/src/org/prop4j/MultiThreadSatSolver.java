@@ -58,19 +58,28 @@ public class MultiThreadSatSolver {
 	private final Solver[] solvers;
 
 	protected final Map<Object, Integer> varToInt = new HashMap<>();
-//	protected final ArrayList<Object> intToVar = new ArrayList<>();
 
 	private int[] model = null;
-	private boolean satisfiable = false;
+	private boolean satisfiable = true;
 
-	public MultiThreadSatSolver(Node node, long timeout, int numberOfSolvers) {
+	private final long timeout;
+
+	private final Node node;
+
+	private int[] literals;
+
+	public MultiThreadSatSolver(Node node, long timeout, int numberOfSolvers, boolean createCNF) {
 		readVars(node);
 
+		this.timeout = timeout;
+		this.node = createCNF ? node.toCNF() : node;
+
 		solvers = new Solver[numberOfSolvers];
-		for (int i = 0; i < numberOfSolvers; i++) {
-			solvers[i] = new Solver(varToInt.size(), timeout);
-		}
-		addClauses(node.toCNF());
+	}
+
+	public void initSolver(int id) {
+		solvers[id] = new Solver(varToInt.size(), timeout);
+		addClauses(node.clone(), id);
 	}
 
 	private void readVars(Node node) {
@@ -79,7 +88,6 @@ public class MultiThreadSatSolver {
 			if (!varToInt.containsKey(var)) {
 				final int index = varToInt.size() + 1;
 				varToInt.put(var, index);
-//				intToVar.add(var);
 			}
 		} else {
 			for (Node child : node.getChildren()) {
@@ -88,48 +96,43 @@ public class MultiThreadSatSolver {
 		}
 	}
 
-	private void addClauses(Node root) {
+	private void addClauses(Node root, int id) {
 		try {
 			if (root instanceof And) {
 				for (Node node : root.getChildren()) {
-					addClause(node);
+					addClause(node, id);
 				}
 			} else {
-				addClause(root);
+				addClause(root, id);
 			}
 		} catch (ContradictionException e) {
 			satisfiable = false;
 		}
 	}
 
-	private void addClause(Node node) throws ContradictionException {
+	private void addClause(Node node, int id) throws ContradictionException {
 		if (node instanceof Or) {
 			final int[] clause = new int[node.children.length];
 			int i = 0;
 			for (Node child : node.getChildren()) {
 				clause[i++] = getIntOfLiteral(child);
 			}
-			addClause(clause);
+			addClause(clause, id);
 		} else {
-			addClause(new int[] { getIntOfLiteral(node) });
+			addClause(new int[] { getIntOfLiteral(node) }, id);
 		}
 	}
 
-	private void addClause(int[] literals) throws ContradictionException {
-		for (int j = 0; j < solvers.length - 1; j++) {
-			solvers[j].solver.addClause(newCopiedVecInt(literals));
-		}
-		solvers[solvers.length - 1].solver.addClause(new VecInt(literals));
-	}
-
-	private VecInt newCopiedVecInt(int[] literals) {
-		return newCopiedVecInt(literals, 0);
+	private void addClause(int[] literals, int id) throws ContradictionException {
+		solvers[id].solver.addClause(new VecInt(literals));
 	}
 
 	private VecInt newCopiedVecInt(int[] literals, int additionalSpace) {
 		int[] copiedLiterals = new int[literals.length + additionalSpace];
 		System.arraycopy(literals, 0, copiedLiterals, 0, literals.length);
-		return new VecInt(copiedLiterals);
+		final VecInt vecInt = new VecInt(copiedLiterals);
+		vecInt.shrinkTo(literals.length);
+		return vecInt;
 	}
 
 	private int getIntOfLiteral(Node node) {
@@ -140,166 +143,38 @@ public class MultiThreadSatSolver {
 		return node.positive ? varToInt.get(node.var) : -varToInt.get(node.var);
 	}
 
-	//	public List<Literal> knownValues(Literal... tempNodes) {
-	//		return knownValues(ValueType.ALL, tempNodes);
-	//	}
-	//
-	//	public List<Literal> knownValues(ValueType vt, Literal... tempNodes) {
-	//		if (!contradiction) {
-	//			final IVecInt backbone = new VecInt();
-	//			for (int i = 0; i < tempNodes.length; i++) {
-	//				backbone.push(getIntOfLiteral(tempNodes[i]));
-	//			}
-	//
-	//			boolean satisfiable = false;
-	//			try {
-	//				satisfiable = solver.isSatisfiable(backbone);
-	//			} catch (TimeoutException e) {
-	//				FMCorePlugin.getDefault().logError(e);
-	//			}
-	//			if (satisfiable) {
-	//				final byte[] b = new byte[solver.nVars()];
-	//				final int[] model = solver.model();
-	//				for (int i = 0; i < model.length; i++) {
-	//					b[i] = (byte) Math.signum(model[i]);
-	//				}
-	//				for (int i = 0; i < model.length; i++) {
-	//					if (b[i] == 0) {
-	//						continue;
-	//					}
-	//					final int x = model[i];
-	//					if ((x * vt.factor) >= 0) {
-	//						backbone.push(-x);
-	//						try {
-	//							if (solver.isSatisfiable(backbone)) {
-	//								backbone.pop();
-	//								final int[] tempModel = solver.model();
-	//								for (int j = i + 1; j < tempModel.length; j++) {
-	//									if (b[j] != (byte) Math.signum(tempModel[j])) {
-	//										b[j] = 0;
-	//									}
-	//								}
-	//							} else {
-	//								backbone.pop().push(x);
-	//							}
-	//						} catch (TimeoutException e) {
-	//							FMCorePlugin.getDefault().logError(e);
-	//							backbone.pop();
-	//						}
-	//					}
-	//				}
-	//
-	//				for (int i = 0; i < tempNodes.length; i++) {
-	//					backbone.delete(i);
-	//				}
-	//				return convertToNodes(backbone);
-	//			}
-	//		}
-	//		return Collections.emptyList();
-	//	}
-
-	//TODO AtomicSets
-	//	public List<List<Literal>> atomicSets() {
-	//		if (satisfiable) {
-	//			final List<List<Literal>> result = new ArrayList<>();
-	//			result.add(new ArrayList<Literal>());
-	//			result.add(new ArrayList<Literal>());
-	//
-	//			final IVecInt backbone = new VecInt();
-	//			final int[] model = solver.model();
-	//			final byte[] done = new byte[model.length];
-	//
-	//			for (int i = 0; i < model.length; i++) {
-	//				final int x = model[i];
-	//				if (!sat(backbone, -x)) {
-	//					done[i] = 2;
-	//					result.get((x > 0) ? 0 : 1).add(new Literal(intToVar.get(Math.abs(x))));
-	//					backbone.push(x);
-	//				}
-	//			}
-	//
-	//			for (int j = 0; j < model.length; j++) {
-	//				final int y = model[j];
-	//				if (done[j] < 2) {
-	//					done[j] = 2;
-	//					final ArrayList<Literal> setList = new ArrayList<>();
-	//					setList.add(new Literal(intToVar.get(Math.abs(y))));
-	//
-	//					backbone.push(y);
-	//					for (int i = 0; i < model.length; i++) {
-	//						if (done[i] < 2) {
-	//							final int x = model[i];
-	//							done[i] = (byte) ((x * y < 0) ? 0 : sat(backbone, -x) ? 0 : 1);
-	//						}
-	//					}
-	//
-	//					backbone.pop().push(-y);
-	//					for (int i = 0; i < model.length; i++) {
-	//						if (done[i] == 1) {
-	//							final int x = model[i];
-	//							if (!sat(backbone, x)) {
-	//								done[i] = 2;
-	//								setList.add(new Literal(intToVar.get(Math.abs(x))));
-	//							}
-	//						}
-	//					}
-	//					backbone.pop();
-	//					result.add(setList);
-	//				}
-	//			}
-	//			return result;
-	//		}
-	//		return Collections.emptyList();
-	//	}
-	//
-	//	private boolean sat(IVecInt backbone, int x) {
-	//		backbone.push(x);
-	//		try {
-	//			return (solver.isSatisfiable(backbone));
-	//		} catch (TimeoutException e) {
-	//			FMCorePlugin.getDefault().logError(e);
-	//			return false;
-	//		} finally {
-	//			backbone.pop();
-	//		}
-	//	}
-
-	//	private List<Literal> convertToNodes(final IVecInt backbone) {
-	//		final ArrayList<Literal> list = new ArrayList<Literal>(backbone.size());
-	//
-	//		final IteratorInt iter = backbone.iterator();
-	//		while (iter.hasNext()) {
-	//			final int value = iter.next();
-	//			list.add(new Literal(intToVar.get(Math.abs(value)), value > 0));
-	//		}
-	//		return list;
-	//	}
-
-	public void setBackbone(List<Literal> knownLiterals) {
-		for (int i = 0; i < solvers.length; i++) {
-			final Solver solver = solvers[i];
-			solver.backbone = new VecInt((knownLiterals.size()) << 1);
-			for (Literal node : knownLiterals) {
-				solver.backbone.push(getIntOfLiteral(node));
-			}
-		}
-		isSatisfiable();
-	}
-
-	public void setBackbone(List<Literal> knownLiterals, Literal curLiteral) {
-		final int[] literals = new int[knownLiterals.size() + 1];
+	public void setLiterals(List<Literal> knownLiterals) {
+		literals = new int[knownLiterals.size()];
 		int i = 0;
 		for (Literal node : knownLiterals) {
 			literals[i++] = getIntOfLiteral(node);
 		}
-		literals[i] = getIntOfLiteral(curLiteral);
-		for (Solver solver : solvers) {
-			solver.backbone = newCopiedVecInt(literals, 0);
+	}
+
+	public void setBackbone(int id) {
+		solvers[id].backbone = newCopiedVecInt(literals, 10);
+		if (id == 0) {
+			synchronized (this) {
+				isSatisfiable();
+				this.notifyAll();
+			}
+		} else {
+			synchronized (this) {
+				if (satisfiable && model == null) {
+					try {
+						this.wait();
+					} catch (InterruptedException e) {
+						FMCorePlugin.getDefault().logError(e);
+					}
+				}
+			}
 		}
-		isSatisfiable();
 	}
 
 	public boolean isSatisfiable() {
+		if (!satisfiable) {
+			return false;
+		}
 		try {
 			satisfiable = solvers[0].isSatisfiable();
 		} catch (TimeoutException e) {
@@ -307,10 +182,6 @@ public class MultiThreadSatSolver {
 		}
 		if (satisfiable) {
 			model = solvers[0].solver.model();
-			//			for (int i = 0; i < model.length; i++) {
-			//				b[i] = (byte) Math.signum(model[i]);
-			//			}
-			//			assert model.length == b.length : "Short Model Length";
 		} else {
 			throw new RuntimeException("Contradiction");
 		}

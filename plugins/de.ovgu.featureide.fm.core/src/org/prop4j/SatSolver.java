@@ -68,11 +68,15 @@ public class SatSolver {
 	protected ISolver solver;
 
 	public SatSolver(Node node, long timeout) {
+		this(node, timeout, true);
+	}
+	
+	public SatSolver(Node node, long timeout, boolean createCNF) {
 		varToInt = new HashMap<Object, Integer>();
 		intToVar = new HashMap<Integer, Object>();
 		readVars(node);
 
-		initSolver(node, timeout);
+		initSolver(node, timeout, createCNF);
 	}
 
 	protected void readVars(Node node) {
@@ -88,12 +92,11 @@ public class SatSolver {
 				readVars(child);
 	}
 
-	protected void initSolver(Node node, long timeout) {
+	protected void initSolver(Node node, long timeout, boolean createCNF) {
 		solver = SolverFactory.newDefault();
 		solver.setTimeoutMs(timeout);
-		node = node.toCNF();
 		solver.newVar(varToInt.size());
-		addClauses(node);
+		addClauses(createCNF ? node.toCNF() : node.clone());
 	}
 	
 	public void setTimeout(long timeout) {
@@ -422,10 +425,28 @@ public class SatSolver {
 			return 0;
 		long number = 0;
 		SolutionCounter counter = new SolutionCounter(solver);
+		
 		try {
 			number = counter.countSolutions();
 		} catch (TimeoutException e) {
 			number = -1 - counter.lowerBound();
+		}
+		return number;
+	}
+	
+	public long countSolutions(Literal[] literals) {
+		long number = 0;
+		if (!contradiction) {
+			ReusableModelIterator it = new ReusableModelIterator(solver);
+			solver.expireTimeout();
+			if (literals != null && literals.length > 0) {
+				final int[] unitClauses = new int[literals.length];
+				for (int i = 0; i < literals.length; i++) {
+					unitClauses[i] = getIntOfLiteral(literals[i]);
+				}
+				it.setAssumptions(new VecInt(unitClauses));	
+			}
+			number = it.count();
 		}
 		return number;
 	}
@@ -464,6 +485,33 @@ public class SatSolver {
 			out.append("true: " + pos + "    false: " + neg + "\n");
 		}
 		return out.toString();
+	}
+	
+	public LinkedList<List<String>> getSolutionFeatures(Literal[] literals, int number)	throws TimeoutException {
+		final LinkedList<List<String>> solutionList = new LinkedList<List<String>>();
+		
+		if (!contradiction) {
+			int[] unitClauses = new int[literals.length];
+			for (int i = 0; i < literals.length; i++) {
+				unitClauses[i] = getIntOfLiteral(literals[i]);
+			}
+			final VecInt assumps = new VecInt(unitClauses);
+			
+			final ModelIterator modelIterator = new ModelIterator(solver, number);
+			while (modelIterator.isSatisfiable(assumps)) {
+				final int[] model = modelIterator.model();
+
+				final List<String> featureList = new LinkedList<>();
+				for (int var : model) {
+					if (var > 0) {
+						featureList.add(intToVar.get(Math.abs(var)).toString());
+					}
+				}
+				solutionList.add(featureList);
+			}
+		}
+
+		return solutionList;
 	}
 
 	public LinkedList<List<String>> getSolutionFeatures(int number)

@@ -42,12 +42,16 @@ public class Variable implements Serializable {
 		setManualValue(value);
 	}
 
-	public int getValue() {
-		return getManualValue() | getAutomaticValue();
-	}
-
 	public int getId() {
 		return id;
+	}
+	
+	public boolean hasValue() {
+		return value > UNDEFINED;
+	}
+
+	public int getValue() {
+		return getManualValue() | getAutomaticValue();
 	}
 
 	public int getManualValue() {
@@ -58,20 +62,20 @@ public class Variable implements Serializable {
 		return value >> 2;
 	}
 
-	public void setManualValue(int value) {
+	void setManualValue(int value) {
 		this.value = (this.value & 0xfffffffc) | value;
 		assert getValue() <= TRUE && getValue() >= UNDEFINED : "Invalid Variable Configuration";
 	}
 
-	public void setAutomaticValue(int value) {
-		this.value = (this.value & 0xfffffff3) | value;
+	void setAutomaticValue(int value) {
+		this.value = (this.value & 0xfffffff3) | value << 2;
 		assert getValue() <= TRUE && getValue() >= UNDEFINED : "Invalid Variable Configuration";
 	}
 
 	protected void reset() {
 	}
 
-	protected void getVaraibles(TreeSet<Integer> list) {
+	protected void getVariables(TreeSet<Integer> list) {
 		list.add(id);
 	}
 

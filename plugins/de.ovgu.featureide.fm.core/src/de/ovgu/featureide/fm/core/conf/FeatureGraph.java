@@ -50,6 +50,8 @@ public class FeatureGraph implements Serializable {
 			MASK_1_00001100 = ~MASK_1_11110011, MASK_0_00110000 = ~MASK_0_11001111;
 
 	public final String[] featureArray;
+	public final String[] coreFeatures;
+	public final String[] deadFeatures;
 
 	private final byte[] adjMatrix;
 	private final int size;
@@ -73,20 +75,36 @@ public class FeatureGraph implements Serializable {
 		}
 	}
 
-	public FeatureGraph(Collection<Feature> features) {
-		size = features.size();
+	public FeatureGraph(Collection<Feature> variantfeatures, Collection<Feature> coreFeatures, Collection<Feature> deadFeatures) {
+		size = variantfeatures.size();
 		featureMap = new HashMap<>(size << 1);
 		featureArray = new String[size];
+		this.coreFeatures = new String[coreFeatures.size()];
+		this.deadFeatures = new String[deadFeatures.size()];
+
 		expListAr = new ArrayList<>(size);
 		for (int i = 0; i < size; i++) {
 			expListAr.add(null);
 		}
 
 		int i = 0;
-		for (Feature feature : features) {
+		for (Feature feature : coreFeatures) {
+			this.coreFeatures[i++] = feature.getName();
+		}
+
+		i = 0;
+		for (Feature feature : deadFeatures) {
+			this.deadFeatures[i++] = feature.getName();
+		}
+
+		i = 0;
+		for (Feature feature : variantfeatures) {
 			featureArray[i++] = feature.getName();
 		}
+
 		Arrays.sort(featureArray);
+		Arrays.sort(this.coreFeatures);
+		Arrays.sort(this.deadFeatures);
 		for (int j = 0; j < featureArray.length; j++) {
 			featureMap.put(featureArray[j], j);
 		}
@@ -208,18 +226,10 @@ public class FeatureGraph implements Serializable {
 		return adjMatrix[index];
 		//	}
 	}
-	
+
 	public byte getValue(int fromIndex, int toIndex, boolean fromSelected) {
 		final int index = (fromIndex * size) + toIndex;
-		return (byte) (fromSelected 
-				? ((adjMatrix[index] & MASK_1_00001100) >> 2)
-				: ((adjMatrix[index] & MASK_0_00110000) >> 4));
-	}
-
-	public void clearDiagonal() {
-		for (int i = 0; i < adjMatrix.length; i += (size + 1)) {
-			adjMatrix[i] = EDGE_NONE;
-		}
+		return (byte) (fromSelected ? ((adjMatrix[index] & MASK_1_00001100) >> 2) : ((adjMatrix[index] & MASK_0_00110000) >> 4));
 	}
 
 	public int getFeatureIndex(String featureName) {

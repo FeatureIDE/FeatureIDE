@@ -39,7 +39,7 @@ import de.ovgu.featureide.fm.core.RenamingsManager;
  */
 public class DefaultFormat extends ConfigurationFormat {
 
-	public List<ConfigurationReader.Warning> read(BufferedReader reader, Configuration configuration) throws IOException {
+	public List<ConfigurationReader.Warning> read(BufferedReader reader, IConfiguration configuration) throws IOException {
 		final RenamingsManager renamingsManager = configuration.getFeatureModel().getRenamingsManager();
 		final List<ConfigurationReader.Warning> warnings = new LinkedList<>();
 
@@ -106,7 +106,7 @@ public class DefaultFormat extends ConfigurationFormat {
 	}
 
 	@Override
-	public String write(Configuration configuration) {
+	public String write(IConfiguration configuration) {
 		final StringBuilder buffer = new StringBuilder();
 		final FeatureModel featureModel = configuration.getFeatureModel();
 		if (featureModel.isFeatureOrderUserDefined()) {

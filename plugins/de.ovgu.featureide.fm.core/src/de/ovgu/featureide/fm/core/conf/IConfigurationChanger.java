@@ -22,7 +22,7 @@ package de.ovgu.featureide.fm.core.conf;
 
 import java.util.List;
 
-import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 
 /**
  * TODO description
@@ -31,8 +31,8 @@ import de.ovgu.featureide.fm.core.Feature;
  */
 public interface IConfigurationChanger {
 
-	List<String> setFeature(Feature f, int newValue);
+	LongRunningMethod<List<String>> update(boolean redundantManual, String startFeatureName);
 
-	void setNewValue(int index, int value);
+	void setNewValue(int index, int value, boolean manual);
 
 }

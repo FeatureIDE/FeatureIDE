@@ -25,6 +25,7 @@ import java.util.Iterator;
 public class VariableConfiguration implements Iterable<Variable> {
 
 	private final Variable[] conf;
+	private int valueCount = 0;
 
 	public VariableConfiguration(int count) {
 		conf = new Variable[count];
@@ -34,7 +35,24 @@ public class VariableConfiguration implements Iterable<Variable> {
 	}
 
 	public void setVariable(int index, int newValue, boolean manual) {
-		conf[index].setManualValue(newValue);
+		final Variable variable = conf[index];
+		final boolean hasValue = variable.hasValue();
+		if (manual) {
+			variable.setManualValue(newValue);
+		} else {
+			variable.setAutomaticValue(newValue);
+		}
+		if (hasValue != variable.hasValue()) {
+			valueCount += hasValue ? -1 : 1;
+		}
+	}
+
+	public int size() {
+		return size(false);
+	}
+
+	public int size(boolean definedVariablesOnly) {
+		return definedVariablesOnly ? valueCount : conf.length;
 	}
 
 	public Variable getVariable(int index) {

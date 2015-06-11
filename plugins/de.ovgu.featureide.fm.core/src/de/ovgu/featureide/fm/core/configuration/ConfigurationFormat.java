@@ -40,6 +40,6 @@ public abstract class ConfigurationFormat {
 		}
 	}
 
-	public abstract List<ConfigurationReader.Warning> read(BufferedReader reader, Configuration configuration) throws IOException;
-	public abstract String write(Configuration configuration);
+	public abstract List<ConfigurationReader.Warning> read(BufferedReader reader, IConfiguration configuration) throws IOException;
+	public abstract String write(IConfiguration configuration);
 }

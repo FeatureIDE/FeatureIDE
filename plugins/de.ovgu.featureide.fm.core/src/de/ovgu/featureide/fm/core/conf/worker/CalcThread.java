@@ -85,13 +85,13 @@ public class CalcThread extends AWorkerThread<Integer> {
 		final byte value = solver.getValueOf(new Literal(sharedObjects.featureGraph.featureArray[i]));
 		switch (value) {
 		case 1:
-			sharedObjects.variableConfiguration.setNewValue(i, Variable.TRUE);
+			sharedObjects.variableConfiguration.setNewValue(i, Variable.TRUE, false);
 			break;
 		case -1:
-			sharedObjects.variableConfiguration.setNewValue(i, Variable.FALSE);
+			sharedObjects.variableConfiguration.setNewValue(i, Variable.FALSE, false);
 			break;
 		default:
-			sharedObjects.variableConfiguration.setNewValue(i, Variable.UNDEFINED);
+			sharedObjects.variableConfiguration.setNewValue(i, Variable.UNDEFINED, false);
 			break;
 		}
 	}

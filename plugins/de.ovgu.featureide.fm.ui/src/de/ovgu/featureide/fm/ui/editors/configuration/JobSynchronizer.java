@@ -22,40 +22,51 @@ package de.ovgu.featureide.fm.ui.editors.configuration;
 
 import java.util.HashMap;
 
-import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagatorJobWrapper.IConfigJob;
+import de.ovgu.featureide.fm.core.job.IStoppableJob;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
- * Starts and cancels the job for configuration coloring.
+ * Starts and cancels stoppable jobs.
  * 
  * @author Sebastian Krieter
  */
-public class ConfigJobManager {
+public class JobSynchronizer {
 	private class JobEntry {
-		private IConfigJob<?> currentJob;
+		private final IStoppableJob currentJob;
 		private Thread starterThread;
 
-		public JobEntry(IConfigJob<?> currentJob, Thread starterThread) {
+		public JobEntry(IStoppableJob currentJob, Thread starterThread) {
 			this.currentJob = currentJob;
 			this.starterThread = starterThread;
 		}
+
+		@Override
+		public boolean equals(Object obj) {
+			return (obj instanceof JobEntry) && ((JobEntry) obj).currentJob.getClass().equals(this.currentJob.getClass());
+		}
+
+		@Override
+		public int hashCode() {
+			return this.currentJob.getClass().hashCode();
+		}
 	}
 
-	private final HashMap<Integer, JobEntry> jobMap = new HashMap<Integer, JobEntry>();
+	private final HashMap<JobEntry, JobEntry> jobMap = new HashMap<>();
 
-	public synchronized void startJob(final IConfigJob<?> job) {
+	public synchronized void startJob(final IStoppableJob job, final boolean cancelPreviousJob) {
 		if (job == null) {
 			return;
 		}
-		job.setCancelingTimeout(100);
-		final JobEntry currentEntry = jobMap.get(job.getID());
+		final JobEntry newEntry = new JobEntry(job, null);
+		final JobEntry currentEntry = jobMap.get(newEntry);
 		if (currentEntry != null) {
 			if (currentEntry.starterThread == null) {
-				final JobEntry newEntry = new JobEntry(job, null);
 				newEntry.starterThread = new Thread(new Runnable() {
 					@Override
 					public void run() {
-						currentEntry.currentJob.cancel();
+						if (cancelPreviousJob) {
+							currentEntry.currentJob.cancel();
+						}
 						try {
 							currentEntry.currentJob.join();
 						} catch (InterruptedException e) {
@@ -65,11 +76,11 @@ public class ConfigJobManager {
 						newEntry.starterThread = null;
 					}
 				});
-				jobMap.put(job.getID(), newEntry);
+				jobMap.put(newEntry, newEntry);
 				newEntry.starterThread.start();
 			}
 		} else {
-			jobMap.put(job.getID(), new JobEntry(job, null));
+			jobMap.put(newEntry, newEntry);
 			job.schedule();
 		}
 	}
@@ -81,15 +92,4 @@ public class ConfigJobManager {
 		jobMap.clear();
 	}
 
-	//	public synchronized void cancelCurrentJob(int id) {
-	//		final JobEntry currentEntry = jobMap.get(id);
-	//		if (currentEntry != null) {
-	////			if (currentEntry.starterThread == null) {
-	//				currentEntry.currentJob.cancel();
-	////			} else {
-	////				
-	////			}
-	//			jobMap.remove(id);
-	//		}
-	//	}
 }

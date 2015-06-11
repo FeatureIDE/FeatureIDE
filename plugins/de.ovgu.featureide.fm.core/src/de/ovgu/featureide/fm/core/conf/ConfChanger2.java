@@ -37,6 +37,8 @@ import de.ovgu.featureide.fm.core.conf.nodes.Variable;
 import de.ovgu.featureide.fm.core.conf.nodes.VariableConfiguration;
 import de.ovgu.featureide.fm.core.conf.worker.CalcThread;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.job.LongRunningMethod;
+import de.ovgu.featureide.fm.core.job.WorkMonitor;
 
 /**
  * TODO description
@@ -47,6 +49,7 @@ public class ConfChanger2 implements IConfigurationChanger {
 	private final FeatureGraph featureGraph;
 	private final VariableConfiguration variableConfiguration;
 	private final CalcThread calcThread;
+	private final FeatureModel featureModel;
 
 	private final ConcurrentLinkedQueue<Variable> q = new ConcurrentLinkedQueue<>();
 
@@ -56,56 +59,49 @@ public class ConfChanger2 implements IConfigurationChanger {
 	private final int[] count = new int[5];
 
 	public ConfChanger2(FeatureModel featureModel, FeatureGraph featureGraph, VariableConfiguration variableConfiguration) {
+		this.featureModel = featureModel;
 		this.featureGraph = featureGraph;
 		this.known = new byte[featureGraph.getSize()];
 		this.variableConfiguration = variableConfiguration;
 		this.calcThread = new CalcThread(featureGraph, this, NodeCreator.createNodes(featureModel, true).toCNF());
 	}
 
-	public List<String> setFeature(Feature f, int newValue) {
-		if (newValue == Variable.UNDEFINED) {
-			//TODO
-			return Collections.emptyList();
-		}
+	private Feature f = null;
+	private int newValue = 0;
 
-		compList.clear();
-		q.clear();
-		changedFeatures.clear();
-		Arrays.fill(count, 0);
-		Arrays.fill(known, (byte) 0);
-
-		for (Variable var : variableConfiguration) {
-			if (var.getValue() != Variable.UNDEFINED) {
-				count[0]++;
+	public class UpdateMethod implements LongRunningMethod<List<String>> {
+		@Override
+		public List<String> run(WorkMonitor monitor) {
+			if (newValue == Variable.UNDEFINED) {
+				//TODO
+				return Collections.emptyList();
 			}
+
+			compList.clear();
+			q.clear();
+			changedFeatures.clear();
+			Arrays.fill(count, 0);
+			Arrays.fill(known, (byte) 0);
+
+			for (Variable var : variableConfiguration) {
+				if (var.getValue() != Variable.UNDEFINED) {
+					count[0]++;
+				}
+			}
+
+			final int index = featureGraph.getFeatureIndex(f.getName());
+			q.offer(new Variable(index, newValue));
+			while (!q.isEmpty()) {
+				Variable v = q.poll();
+				setFeature_rec(v.getId(), v.getValue() == Variable.TRUE);
+				count[2] += compList.size();
+				sat(v.getId(), v.getValue());
+			}
+
+			final List<String> ret = new ArrayList<>(changedFeatures);
+			Collections.sort(ret);
+			return ret;
 		}
-
-		final int index = featureGraph.getFeatureIndex(f.getName());
-		q.offer(new Variable(index, newValue));
-		while (!q.isEmpty()) {
-			Variable v = q.poll();
-			setFeature_rec(v.getId(), v.getValue() == Variable.TRUE);
-			count[2] += compList.size();
-			sat(v.getId(), v.getValue());
-		}
-
-		//		setFeature_rec(index, newValue == Variable.TRUE);
-		//		while (!compList.isEmpty()) {
-		//			count[2] += compList.size();
-		//			x(compList);
-		//		}
-
-		//		count[3] = featureGraph.getSize() - (count[0] + count[1] + count[2] + count[4]);
-		//		System.out.println();
-		//		System.out.println("Known:      " + count[0]);
-		//		System.out.println("Unaffected: " + count[3]);
-		//		System.out.println("Graph:      " + count[1]);
-		//		System.out.println("Expression: " + count[4]);
-		//		System.out.println("Sat:        " + count[2]);
-
-		final List<String> ret = new ArrayList<>(changedFeatures);
-		Collections.sort(ret);
-		return ret;
 	}
 
 	public void setFeature_rec(int index, boolean value) {
@@ -133,7 +129,6 @@ public class ConfChanger2 implements IConfigurationChanger {
 					break;
 				case FeatureGraph.EDGE_1Q:
 					compList.add(i);
-					//										known[i] = 1;
 					break;
 				default:
 					break;
@@ -157,7 +152,6 @@ public class ConfChanger2 implements IConfigurationChanger {
 					break;
 				case FeatureGraph.EDGE_0Q:
 					compList.add(i);
-					//										known[i] = 1;
 					break;
 				default:
 					break;
@@ -197,14 +191,6 @@ public class ConfChanger2 implements IConfigurationChanger {
 		}
 	}
 
-	public void setNewValue(int index, int value) {
-		if (value == Variable.UNDEFINED) {
-			known[index] = 2;
-		} else {
-			q.offer(new Variable(index, value));
-		}
-	}
-
 	private void sat(int index, int newValue) {
 		if (compList.isEmpty()) {
 			return;
@@ -238,6 +224,25 @@ public class ConfChanger2 implements IConfigurationChanger {
 		known[index] = 2;
 		compList.remove(index);
 		changedFeatures.add(featureGraph.featureArray[index] + ": " + value);
+	}
+
+	@Override
+	public void setNewValue(int index, int value, boolean manual) {
+		if (manual) {
+			f = featureModel.getFeature(featureGraph.featureArray[index]);
+			newValue = value;
+		} else {
+			if (value == Variable.UNDEFINED) {
+				known[index] = 2;
+			} else {
+				q.offer(new Variable(index, value));
+			}
+		}
+	}
+
+	@Override
+	public UpdateMethod update(boolean redundantManual, String startFeatureName) {
+		return new UpdateMethod();
 	}
 
 }

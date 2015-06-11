@@ -23,7 +23,10 @@ package de.ovgu.featureide.fm.ui.editors.configuration;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -62,8 +65,10 @@ import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.PropertyConstants;
+import de.ovgu.featureide.fm.core.conf.ConfigurationFG;
+import de.ovgu.featureide.fm.core.conf.FeatureGraph;
+import de.ovgu.featureide.fm.core.configuration.IConfiguration;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagatorJobWrapper.IConfigJob;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationWriter;
 import de.ovgu.featureide.fm.core.configuration.FeatureIDEFormat;
@@ -71,7 +76,8 @@ import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.ModelIOFactory;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.job.IJob;
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.job.IStoppableJob;
+import de.ovgu.featureide.fm.core.job.LongRunningJob;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -98,7 +104,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 
 	private TextEditorPage sourceEditorPage;
 
-	private final ConfigJobManager configJobManager = new ConfigJobManager();
+	private final JobSynchronizer configJobManager = new JobSynchronizer();
 
 	@Nonnull
 	public IFile file;
@@ -106,7 +112,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 
 	public FeatureModel featureModel = new FeatureModel();
 
-	public Configuration configuration;
+	private IConfiguration configuration = null;
 
 	private int currentPageIndex = -1;
 
@@ -221,7 +227,14 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 			featureModel = ((ExtendedFeatureModel) featureModel).getMappingModel();
 		}
 
-		configuration = new Configuration(featureModel, Configuration.PARAM_IGNOREABSTRACT | Configuration.PARAM_LAZY);
+		final FeatureGraph fg = loadFeatureGraph(res);
+		if (fg == null) {
+			configuration = new Configuration(featureModel, Configuration.PARAM_IGNOREABSTRACT | Configuration.PARAM_LAZY);
+		} else {
+			featureModel.setFeatureGraph(fg);
+			configuration = new ConfigurationFG(featureModel, ConfigurationFG.PARAM_IGNOREABSTRACT | ConfigurationFG.PARAM_LAZY);
+		}
+
 		try {
 			ConfigurationReader reader = new ConfigurationReader(configuration);
 			if (!internalFile.exists() || !reader.readFromFile(internalFile)) {
@@ -232,7 +245,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		}
 
 		final Display currentDisplay = Display.getCurrent();
-		final IConfigJob<?> configJob = configuration.getPropagator().getJobWrapper().load();
+		final IStoppableJob configJob = LongRunningJob.createJob("Load Configuation", configuration.getPropagator().load());
 		configJob.addJobFinishedListener(new JobFinishListener() {
 			@Override
 			public void jobFinished(IJob finishedJob, boolean success) {
@@ -245,12 +258,21 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 				});
 			}
 		});
-		configJobManager.startJob(configJob);
+		configJobManager.startJob(configJob, true);
 
 		setPartName(file.getName());
 		featureModel.addListener(this);
 		firePropertyChange(IEditorPart.PROP_DIRTY);
 		getExtensions();
+	}
+
+	private FeatureGraph loadFeatureGraph(IResource file) {
+		try (final ObjectInputStream in = new ObjectInputStream(new FileInputStream(file.getProject().getFile("model.fg").getLocation().toFile()))) {
+			return (FeatureGraph) in.readObject();
+		} catch (IOException | ClassNotFoundException e) {
+			FMCorePlugin.getDefault().logError(e);
+			return null;
+		}
 	}
 
 	/**
@@ -355,8 +377,11 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 
 	private void setConfiguration() {
 		readFeatureModel();
-		configuration = new Configuration(configuration, featureModel);
-		configuration.getPropagator().update(false, null, new WorkMonitor());
+		if (configuration instanceof Configuration) {
+			configuration = new Configuration((Configuration) configuration, featureModel);
+		}
+		//		configuration.getPropagator().update(false, null, new WorkMonitor());
+		configuration.update(false, null);
 		if (!isDirty()) {
 			doSave(null);
 		}
@@ -542,7 +567,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	}
 
 	@Override
-	public Configuration getConfiguration() {
+	public IConfiguration getConfiguration() {
 		return configuration;
 	}
 
@@ -556,7 +581,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		return modelFile;
 	}
 
-	public ConfigJobManager getConfigJobManager() {
+	public JobSynchronizer getConfigJobManager() {
 		return configJobManager;
 	}
 

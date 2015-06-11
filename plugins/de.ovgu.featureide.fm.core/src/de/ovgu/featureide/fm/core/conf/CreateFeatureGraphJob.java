@@ -30,7 +30,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -51,7 +50,9 @@ import de.ovgu.featureide.fm.core.conf.nodes.Or2;
 import de.ovgu.featureide.fm.core.conf.nodes.Variable;
 import de.ovgu.featureide.fm.core.conf.nodes.VariableConfiguration;
 import de.ovgu.featureide.fm.core.conf.nodes.Xor;
+import de.ovgu.featureide.fm.core.conf.worker.CalcFixedThread;
 import de.ovgu.featureide.fm.core.conf.worker.DFSThread2;
+import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
@@ -102,9 +103,19 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 		if (!loadFeatureGraph()) {
 			System.out.println("Computing...");
 
-			final List<List<Feature>> unnormalFeatures = arguments.featureModel.getAnalyser().analyzeFeatures();
-			coreFeatures.addAll(unnormalFeatures.get(0)); //1548
-			deadFeatures.addAll(unnormalFeatures.get(1)); //10
+			final CalcFixedThread calcThread = new CalcFixedThread(NodeCreator.createNodes(arguments.featureModel, true).toCNF());
+			calcThread.addObjects(arguments.featureModel.getFeatureNames());
+			calcThread.start();
+
+			for (Literal literal : calcThread.getFixedLiterals()) {
+				final Feature feature = arguments.featureModel.getFeature((String) literal.var);
+				if (literal.positive) {
+					coreFeatures.add(feature);
+				} else {
+					deadFeatures.add(feature);
+				}
+			}
+
 			fixedFeatures.addAll(coreFeatures);
 			fixedFeatures.addAll(deadFeatures);
 			final List<Constraint> constraints = arguments.featureModel.getConstraints();
@@ -115,7 +126,7 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 
 			workMonitor.setMaxAbsoluteWork(1 * features.size() + 1);
 
-			featureGraph = new FeatureGraph(features);
+			featureGraph = new FeatureGraph(features, coreFeatures, deadFeatures);
 
 			workMonitor.worked();
 
@@ -194,7 +205,7 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 						}
 						if (!optionalFeature) {
 							for (Feature sibiling : parent.getChildren()) {
-								if (!fixedFeatures.contains(sibiling)) {
+								if (!deadFeatures.contains(sibiling)) {
 									featureGraph.setEdge(featureName, sibiling.getName(), FeatureGraph.EDGE_0Q);
 								}
 							}
@@ -202,7 +213,7 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 							if (processedParents.add(parent)) {
 								final ArrayList<Variable> list = new ArrayList<>(nonDeadSibilingCount);
 								for (Feature sibiling : parent.getChildren()) {
-									if (!fixedFeatures.contains(sibiling)) {
+									if (!deadFeatures.contains(sibiling)) {
 										list.add(conf.getVariable(featureGraph.getFeatureIndex(sibiling.getName())));
 									}
 								}
@@ -230,7 +241,7 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 
 			final ArrayList<LinkedList<Expression>> expListAr = featureGraph.getExpListAr();
 			for (Expression exp : expList) {
-				for (Integer i : exp.getVaraibles()) {
+				for (Integer i : exp.getVariables()) {
 					LinkedList<Expression> varExpList = expListAr.get(i);
 					if (varExpList == null) {
 						varExpList = new LinkedList<Expression>();
@@ -259,28 +270,51 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 		return true;
 	}
 
-	private void collectContainedFeatures(Node node, Set<String> featureNames) {
-		if (node instanceof Literal) {
-			featureNames.add((String) ((Literal) node).var);
-		} else {
-			for (Node child : node.getChildren()) {
-				collectContainedFeatures(child, featureNames);
+	//	private void collectContainedFeatures(Node node, Set<String> featureNames) {
+	//		if (node instanceof Literal) {
+	//			featureNames.add((String) ((Literal) node).var);
+	//		} else {
+	//			for (Node child : node.getChildren()) {
+	//				collectContainedFeatures(child, featureNames);
+	//			}
+	//		}
+	//	}
+
+	private void buildClique(Node... nodes) {
+		final Node cnfNode = new And(nodes).toCNF();
+
+		if (cnfNode instanceof And) {
+			for (Node andChild : cnfNode.getChildren()) {
+				buildOrNode(andChild);
 			}
+		} else {
+			buildOrNode(cnfNode);
 		}
 	}
 
-	private void buildClique(Node... nodes) {
-		final Set<String> featureNames = new HashSet<>();
-		for (Node node : nodes) {
-			collectContainedFeatures(node, featureNames);
-		}
-		for (Feature coreFeature : fixedFeatures) {
-			featureNames.remove(coreFeature.getName());
-		}
-		for (String featureName1 : featureNames) {
-			for (String featureName2 : featureNames) {
-				featureGraph.setEdge(featureName1, featureName2, FeatureGraph.EDGE_0Q);
-				featureGraph.setEdge(featureName1, featureName2, FeatureGraph.EDGE_1Q);
+	private void buildOrNode(Node andChild) {
+		if (andChild instanceof Or) {
+			boolean optionalFeature = false;
+			for (Node orChild : andChild.getChildren()) {
+				if (coreFeatures.contains((arguments.featureModel.getFeature((String) ((Literal) orChild).var)))) {
+					optionalFeature = true;
+					break;
+				}
+			}
+
+			if (!optionalFeature) {
+				for (Node orChild1 : andChild.getChildren()) {
+					final Literal literal1 = (Literal) orChild1;
+					final String featureName1 = (String) literal1.var;
+					if (!deadFeatures.contains(arguments.featureModel.getFeature(featureName1))) {
+						for (Node orChild2 : andChild.getChildren()) {
+							final String featureName2 = (String) ((Literal) orChild2).var;
+							if (!deadFeatures.contains(arguments.featureModel.getFeature(featureName2))) {
+								featureGraph.setEdge(featureName1, featureName2, literal1.positive ? FeatureGraph.EDGE_0Q : FeatureGraph.EDGE_1Q);
+							}
+						}
+					}
+				}
 			}
 		}
 	}
@@ -305,7 +339,7 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 		final Collection<Node> nodeList = new LinkedList<>();
 		node = node.clone().toCNF();
 
-//		node = deMorgan(node);
+		//		node = deMorgan(node);
 		node = orToImply(node);
 		node = elimnateNot(node);
 		if (node instanceof And) {
@@ -339,26 +373,26 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 		return node;
 	}
 
-//	private Node deMorgan(Node node) {
-//		if (node instanceof Not) {
-//			Node child = node.getChildren()[0];
-//			if (child instanceof And) {
-//				final Node[] children = child.getChildren();
-//				final Node[] newChildren = new Node[children.length];
-//				for (int i = 0; i < children.length; i++) {
-//					newChildren[i] = new Not(children[i].clone());
-//				}
-//				node = new Or(newChildren);
-//			}
-//		}
-//		final Node[] children = node.getChildren();
-//		if (children != null) {
-//			for (int i = 0; i < children.length; i++) {
-//				children[i] = deMorgan(children[i]);
-//			}
-//		}
-//		return node;
-//	}
+	//	private Node deMorgan(Node node) {
+	//		if (node instanceof Not) {
+	//			Node child = node.getChildren()[0];
+	//			if (child instanceof And) {
+	//				final Node[] children = child.getChildren();
+	//				final Node[] newChildren = new Node[children.length];
+	//				for (int i = 0; i < children.length; i++) {
+	//					newChildren[i] = new Not(children[i].clone());
+	//				}
+	//				node = new Or(newChildren);
+	//			}
+	//		}
+	//		final Node[] children = node.getChildren();
+	//		if (children != null) {
+	//			for (int i = 0; i < children.length; i++) {
+	//				children[i] = deMorgan(children[i]);
+	//			}
+	//		}
+	//		return node;
+	//	}
 
 	private Node orToImply(Node node) {
 		if (node instanceof Or && node.getChildren().length == 2) {

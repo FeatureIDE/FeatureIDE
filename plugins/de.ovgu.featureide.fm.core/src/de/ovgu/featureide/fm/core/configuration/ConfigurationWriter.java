@@ -33,9 +33,9 @@ import org.eclipse.core.runtime.CoreException;
 public class ConfigurationWriter {
 
 	private static final String DEFAULT_CHARSET = "UTF-8";
-	private Configuration configuration;
+	private IConfiguration configuration;
 
-	public ConfigurationWriter(Configuration configuration) {
+	public ConfigurationWriter(IConfiguration configuration) {
 		this.configuration = configuration;
 	}
 

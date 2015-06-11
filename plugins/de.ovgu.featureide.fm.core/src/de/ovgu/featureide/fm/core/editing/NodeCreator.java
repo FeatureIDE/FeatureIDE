@@ -27,7 +27,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.prop4j.And;
 import org.prop4j.AtMost;
@@ -61,7 +60,7 @@ public class NodeCreator {
 			: calculateReplacingMap(featureModel));
 	}
 	
-	public static Node createNodes(FeatureModel featureModel, Set<String> removeFeatures) {
+	public static Node createNodes(FeatureModel featureModel, Collection<String> removeFeatures) {
 		return createNodes(featureModel, calculateReplacingMap(featureModel, removeFeatures), removeFeatures);
 	}
 
@@ -84,7 +83,7 @@ public class NodeCreator {
 	}
 	
 	public static Node createNodes(FeatureModel featureModel,
-			Map<Object, Node> replacingMap, Set<String> removeFeatures) {
+			Map<Object, Node> replacingMap, Collection<String> removeFeatures) {
 		Feature root = featureModel.getRoot();
 		LinkedList<Node> nodes = new LinkedList<Node>();
 		if (root != null) {
@@ -201,7 +200,7 @@ public class NodeCreator {
 	}
 	
 	public static And eliminateAbstractVariables(And and,
-			Map<Object, Node> map, FeatureModel featureModel, Set<String> removeFeatures) {
+			Map<Object, Node> map, FeatureModel featureModel, Collection<String> removeFeatures) {
 		for (Entry<Object, Node> entry : map.entrySet())
 			if (entry.getValue() == null) {
 				String name = entry.getKey().toString();
@@ -444,7 +443,7 @@ public class NodeCreator {
 		return map;
 	}
 	
-	public static HashMap<Object, Node> calculateReplacingMap(FeatureModel featureModel, Set<String> featureNames) {
+	public static HashMap<Object, Node> calculateReplacingMap(FeatureModel featureModel, Collection<String> featureNames) {
 		HashMap<Object, Node> map = new HashMap<Object, Node>();
 		for (String featureName : featureNames) {
 			String var = getVariable(featureName, featureModel);
@@ -507,10 +506,10 @@ public class NodeCreator {
 	}
 	
 	private static Node calculateReplacing(FeatureModel featureModel,
-			Feature feature, Set<String> featureNames) {
+			Feature feature, Collection<String> featureNames) {
 		if (!feature.hasChildren()) {
 			Feature parent = feature.getParent();
-			if (parent == null || featureNames.contains(parent))
+			if (parent == null || featureNames.contains(parent.getName()))
 				return null;
 			if ((parent.isAnd() && feature.isMandatorySet())
 					|| (!parent.isAnd() && parent.getChildrenCount() == 1))
@@ -519,7 +518,7 @@ public class NodeCreator {
 		}
 		if (feature.isAnd()) {
 			for (Feature child : feature.getChildren())
-				if (child.isMandatorySet() && !featureNames.contains(child))
+				if (child.isMandatorySet() && !featureNames.contains(child.getName()))
 					return new Literal(featureModel.getRenamingsManager().getOldName(child.getName()));
 			for (Feature child : feature.getChildren())
 				if (child.isMandatorySet())

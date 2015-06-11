@@ -70,16 +70,15 @@ public abstract class Expression extends Variable {
 		return value = computeValue();
 	}
 
-	public Collection<Integer> getVaraibles() {
+	public Collection<Integer> getVariables() {
 		final TreeSet<Integer> idSet = new TreeSet<>();
-		getVaraibles(idSet);
+		getVariables(idSet);
 		return idSet;
-
 	}
 
-	protected void getVaraibles(TreeSet<Integer> list) {
+	protected void getVariables(TreeSet<Integer> list) {
 		for (Variable variable : children) {
-			variable.getVaraibles(list);
+			variable.getVariables(list);
 		}
 	}
 

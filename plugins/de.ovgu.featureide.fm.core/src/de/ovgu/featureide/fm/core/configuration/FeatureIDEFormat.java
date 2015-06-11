@@ -36,7 +36,7 @@ import de.ovgu.featureide.fm.core.RenamingsManager;
 public class FeatureIDEFormat extends ConfigurationFormat {
 	public static final String EXTENSION = "fideconf";
 
-	public List<ConfigurationReader.Warning> read(BufferedReader reader, Configuration configuration) throws IOException {
+	public List<ConfigurationReader.Warning> read(BufferedReader reader, IConfiguration configuration) throws IOException {
 		final RenamingsManager renamingsManager = configuration.getFeatureModel().getRenamingsManager();
 		final List<ConfigurationReader.Warning> warnings = new LinkedList<>();
 
@@ -108,7 +108,7 @@ public class FeatureIDEFormat extends ConfigurationFormat {
 	}
 
 	@Override
-	public String write(Configuration configuration) {
+	public String write(IConfiguration configuration) {
 		final StringBuilder buffer = new StringBuilder();
 		buffer.append("# Lists all features from the model with manual (first digit) and automatic (second digit) selection");
 		buffer.append(NEWLINE);

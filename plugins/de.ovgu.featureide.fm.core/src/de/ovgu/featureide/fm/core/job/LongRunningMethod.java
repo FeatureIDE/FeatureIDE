@@ -18,27 +18,15 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.configuration;
-
-import de.ovgu.featureide.fm.core.conf.nodes.Variable;
+package de.ovgu.featureide.fm.core.job;
 
 /**
- * Defines Selection types Selected, Unselected, Undefined. These are needed for the configuration process.
+ * TODO description
  * 
  * @author Sebastian Krieter
  */
-public enum Selection {
+public interface LongRunningMethod<T> {
 
-	SELECTED(Variable.TRUE), UNSELECTED(Variable.FALSE), UNDEFINED(Variable.UNDEFINED);
-
-	private final int value;
-
-	private Selection(int value) {
-		this.value = value;
-	}
-
-	public int getValue() {
-		return value;
-	}
+	T run(WorkMonitor monitor) throws Exception;
 
 }

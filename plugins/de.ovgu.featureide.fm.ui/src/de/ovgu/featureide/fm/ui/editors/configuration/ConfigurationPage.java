@@ -27,7 +27,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
-import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.IConfiguration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -92,7 +92,7 @@ public class ConfigurationPage extends ConfigurationTreeEditorPage {
 
 	@Override
 	public void pageChangeTo(int index) {
-		final Configuration configuration = configurationEditor.getConfiguration();
+		final IConfiguration configuration = configurationEditor.getConfiguration();
 		for (SelectableFeature feature : configuration.getFeatures()) {
 			if (feature.getAutomatic() == Selection.UNDEFINED && feature.getManual() == Selection.UNSELECTED) {
 				configuration.setManual(feature, Selection.UNDEFINED);
@@ -100,4 +100,5 @@ public class ConfigurationPage extends ConfigurationTreeEditorPage {
 		}
 		super.pageChangeTo(index);
 	}
+
 }

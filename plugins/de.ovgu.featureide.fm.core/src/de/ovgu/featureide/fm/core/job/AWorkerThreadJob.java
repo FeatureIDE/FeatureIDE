@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.core.job;
 
 import org.eclipse.core.runtime.jobs.Job;
 
+import de.ovgu.featureide.fm.core.conf.worker.base.AWorkerThread;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 
 /**
@@ -30,14 +31,23 @@ import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
  * 
  * @author Sebastian Krieter
  */
-public abstract class AJob extends AbstractJob {
+public class AWorkerThreadJob extends AbstractJob {
 
-	public AJob(String name) {
-		super(name, Job.SHORT);
+	private final AWorkerThread<?> worker;
+	private final int numberOfThreads;
+
+	public static void startJob(String name, AWorkerThread<?> worker, int numberOfThreads) {
+		new AWorkerThreadJob(name, worker, numberOfThreads).schedule();
 	}
 
-	public AJob(String name, int priority) {
-		super(name, priority);
+	public static void startJob(String name, AWorkerThread<?> worker) {
+		new AWorkerThreadJob(name, worker, 0).schedule();
+	}
+
+	public AWorkerThreadJob(String name, AWorkerThread<?> worker, int numberOfThreads) {
+		super(name, Job.LONG);
+		this.worker = worker;
+		this.numberOfThreads = numberOfThreads;
 	}
 
 	@Override
@@ -48,6 +58,16 @@ public abstract class AJob extends AbstractJob {
 		} finally {
 			workMonitor.done();
 		}
+	}
+
+	@Override
+	protected boolean work() throws Exception {
+		if (numberOfThreads > 0) {
+			worker.start(numberOfThreads);
+		} else {
+			worker.start();
+		}
+		return true;
 	}
 
 }

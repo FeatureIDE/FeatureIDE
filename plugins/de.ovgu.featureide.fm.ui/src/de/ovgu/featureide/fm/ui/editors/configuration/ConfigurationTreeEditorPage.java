@@ -49,12 +49,13 @@ import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.FunctionalInterfaces;
 import de.ovgu.featureide.fm.core.FunctionalInterfaces.IBinaryFunction;
 import de.ovgu.featureide.fm.core.FunctionalInterfaces.IFunction;
-import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagatorJobWrapper.IConfigJob;
+import de.ovgu.featureide.fm.core.configuration.IConfiguration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.configuration.TreeElement;
 import de.ovgu.featureide.fm.core.job.IJob;
+import de.ovgu.featureide.fm.core.job.IStoppableJob;
+import de.ovgu.featureide.fm.core.job.LongRunningJob;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
@@ -73,7 +74,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	protected static final Font treeItemStandardFont = new Font(null, "Arial", 8, SWT.NORMAL);
 	protected static final Font treeItemSpecialFont = new Font(null, "Arial", 8, SWT.BOLD);
 
-	private final HashSet<SelectableFeature> invalidFeatures = new HashSet<SelectableFeature>();
+//	private final HashSet<SelectableFeature> invalidFeatures = new HashSet<SelectableFeature>();
 	protected final HashSet<SelectableFeature> updateFeatures = new HashSet<SelectableFeature>();
 
 	protected IConfigurationEditor configurationEditor = null;
@@ -261,8 +262,10 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			return;
 		}
 		final boolean valid = configurationEditor.getConfiguration().isValid();
-
-		final IConfigJob<Long> job = configurationEditor.getConfiguration().getPropagator().getJobWrapper().number(250);
+		if (configurationEditor.getConfiguration().getPropagator() == null) {
+			return;
+		}
+		final LongRunningJob<Long> job = LongRunningJob.createJob("", configurationEditor.getConfiguration().getPropagator().number(250));
 		job.addJobFinishedListener(new JobFinishListener() {
 			@Override
 			public void jobFinished(IJob finishedJob, boolean success) {
@@ -270,14 +273,16 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 				sb.append(valid ? "valid, " : "invalid, ");
 
 				@SuppressWarnings("unchecked")
-				final long number = ((IConfigJob<Long>) finishedJob).getResults();
-				if (number < 0) {
-					sb.append("more than ");
-					sb.append(-1 - number);
-				} else {
-					sb.append(number);
+				final Long number = ((LongRunningJob<Long>) finishedJob).getResults();
+				if (number != null) {
+					if (number < 0) {
+						sb.append("more than ");
+						sb.append(-1 - number);
+					} else {
+						sb.append(number);
+					}
+					sb.append(" possible configurations");
 				}
-				sb.append(" possible configurations");
 				if (number == 0 && !configurationEditor.isAutoSelectFeatures()) {
 					sb.append(" - Autoselect not possible!");
 				}
@@ -291,7 +296,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 				});
 			}
 		});
-		configurationEditor.getConfigJobManager().startJob(job);
+		configurationEditor.getConfigJobManager().startJob(job, true);
 	}
 
 	@Override
@@ -367,11 +372,11 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 				//				updateInfoLabel();
 			} else {
 				refreshItem(item, feature);
-				if (configurationEditor.getConfiguration().canBeValid()) {
-					invalidFeatures.clear();
-				} else {
-					invalidFeatures.add(feature);
-				}
+				//				if (configurationEditor.getConfiguration().canBeValid()) {
+				//					invalidFeatures.clear();
+				//				} else {
+				//					invalidFeatures.add(feature);
+				//				}
 				//				updateInfoLabel();
 			}
 		}
@@ -380,7 +385,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	protected void updateTree() {
 		itemMap.clear();
 		if (errorMessage(tree)) {
-			final Configuration configuration = configurationEditor.getConfiguration();
+			final IConfiguration configuration = configurationEditor.getConfiguration();
 			tree.removeAll();
 			final TreeItem root = new TreeItem(tree, 0);
 			root.setText(configuration.getRoot().getName());
@@ -428,12 +433,14 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	 * Colors all features if they lead to a valid configuration if current
 	 * configuration is invalid. deselect:blue, select:green
 	 */
-	protected IConfigJob<?> computeColoring(final Display currentDisplay) {
+	protected LongRunningJob<Void> computeColoring(final Display currentDisplay) {
 		if (!configurationEditor.isAutoSelectFeatures() || configurationEditor.getConfiguration().isValid()) {
 			return null;
 		}
 		final List<SelectableFeature> featureList = configurationEditor.getConfiguration().getManualFeatures();
-		final IConfigJob<?> job = configurationEditor.getConfiguration().getPropagator().getJobWrapper().leadToValidConfiguration(featureList);
+		final LongRunningJob<Void> job = LongRunningJob.createJob("",
+				configurationEditor.getConfiguration().getPropagator().leadToValidConfiguration(featureList));
+
 		job.setIntermediateFunction(new IFunction<Object, Void>() {
 			@Override
 			public Void invoke(Object t) {
@@ -471,14 +478,14 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		return job;
 	}
 
-	protected IConfigJob<?> computeFeatures(final boolean redundantManual, final Display currentDisplay) {
+	protected LongRunningJob<List<String>> computeFeatures(final boolean redundantManual, final Display currentDisplay) {
 		if (!configurationEditor.isAutoSelectFeatures()) {
 			return null;
 		}
 		final TreeItem topItem = tree.getTopItem();
 		SelectableFeature feature = (SelectableFeature) (topItem.getData());
-		final IConfigJob<?> job = configurationEditor.getConfiguration().getPropagator().getJobWrapper()
-				.update(redundantManual, feature.getFeature().getName());
+		final LongRunningJob<List<String>> job = LongRunningJob.createJob("",
+				configurationEditor.getConfiguration().getPropagator().update(redundantManual, feature.getFeature().getName()));
 		job.setIntermediateFunction(new IFunction<Object, Void>() {
 			@Override
 			public Void invoke(Object t) {
@@ -516,14 +523,15 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		}
 		updateInfoLabel(null);
 
-		final IConfigJob<?> updateJob = computeFeatures(redundantManual, currentDisplay);
+		final IStoppableJob updateJob = computeFeatures(redundantManual, currentDisplay);
+
 		updateJob.addJobFinishedListener(new JobFinishListener() {
 
 			@Override
 			public void jobFinished(IJob finishedJob, boolean success) {
 				if (success) {
 					updateInfoLabel(currentDisplay);
-					configurationEditor.getConfigJobManager().startJob(computeColoring(currentDisplay));
+					configurationEditor.getConfigJobManager().startJob(computeColoring(currentDisplay), true);
 				}
 			}
 		});
@@ -539,7 +547,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		}, new IFunction<Void, Void>() {
 			@Override
 			public Void invoke(Void t) {
-				configurationEditor.getConfigJobManager().startJob(updateJob);
+				configurationEditor.getConfigJobManager().startJob(updateJob, true);
 				return null;
 			}
 		});

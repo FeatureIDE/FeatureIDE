@@ -59,11 +59,11 @@ public class ConfigurationReader {
 		}
 	}
 
-	private final Configuration configuration;
+	private final IConfiguration configuration;
 
 	private final LinkedList<Warning> warnings = new LinkedList<Warning>();
 
-	public ConfigurationReader(Configuration configuration) {
+	public ConfigurationReader(IConfiguration configuration) {
 		this.configuration = configuration;
 	}
 
@@ -73,8 +73,8 @@ public class ConfigurationReader {
 
 			final int extensionIndex = fileName.lastIndexOf(".");
 			final String extension = (extensionIndex > -1) ? fileName.substring(extensionIndex + 1) : null;
-
-			return readFromInputStream(new FileInputStream(fileName), ConfigurationFormat.getFormatByExtension(extension));
+			final boolean result = readFromInputStream(new FileInputStream(fileName), ConfigurationFormat.getFormatByExtension(extension));
+			return result;
 		}
 		return false;
 	}

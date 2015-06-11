@@ -20,14 +20,13 @@
  */
 package de.ovgu.featureide.fm.core.conf.worker;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.prop4j.Literal;
 import org.prop4j.MultiThreadSatSolver;
 import org.prop4j.Node;
 
-import de.ovgu.featureide.fm.core.conf.IConfigurationChanger;
-import de.ovgu.featureide.fm.core.conf.nodes.Variable;
 import de.ovgu.featureide.fm.core.conf.worker.base.AWorkerThread;
 import de.ovgu.featureide.fm.core.job.WorkMonitor;
 
@@ -36,21 +35,17 @@ import de.ovgu.featureide.fm.core.job.WorkMonitor;
  * 
  * @author Sebastian Krieter
  */
-public class CalcThread2 extends AWorkerThread<Integer> {
+public class CalcFixedThread extends AWorkerThread<String> {
 
 	private static class SharedObjects {
 
 		private final MultiThreadSatSolver solver;
-		private final String[] featureArray;
-		private final IConfigurationChanger variableConfiguration;
+		private final ArrayList<Literal> fixedLiteralsList = new ArrayList<>();
 		private final int numberOfSolvers;
 
 		private int lastSolverID = 0;
-		private List<Literal> knownLiterals = null;
 
-		public SharedObjects(String[] featureArray, IConfigurationChanger variableConfiguration, Node fmNode, int numberOfSolvers) {
-			this.featureArray = featureArray;
-			this.variableConfiguration = variableConfiguration;
+		public SharedObjects(Node fmNode, int numberOfSolvers) {
 			this.numberOfSolvers = numberOfSolvers;
 			this.solver = new MultiThreadSatSolver(fmNode, 1000, numberOfSolvers, false);
 		}
@@ -60,28 +55,20 @@ public class CalcThread2 extends AWorkerThread<Integer> {
 	private final int id;
 	private final SharedObjects sharedObjects;
 
-	public CalcThread2(String[] featureArray, IConfigurationChanger variableConfiguration, Node fmNode) {
-		this(featureArray, variableConfiguration, fmNode, NUMBER_OF_THREADS);
+	public CalcFixedThread(Node fmNode) {
+		this(fmNode, NUMBER_OF_THREADS);
 	}
 
-	public CalcThread2(String[] featureArray, IConfigurationChanger variableConfiguration, Node fmNode, int numberOfSolvers) {
+	public CalcFixedThread(Node fmNode, int numberOfSolvers) {
 		super(new WorkMonitor());
-		sharedObjects = new SharedObjects(featureArray, variableConfiguration, fmNode, numberOfSolvers);
+		sharedObjects = new SharedObjects(fmNode, numberOfSolvers);
 		this.id = sharedObjects.lastSolverID;
 	}
 
-	private CalcThread2(CalcThread2 oldThread) {
+	private CalcFixedThread(CalcFixedThread oldThread) {
 		super(oldThread);
 		this.sharedObjects = oldThread.sharedObjects;
 		this.id = ++oldThread.sharedObjects.lastSolverID;
-	}
-
-	public void setKnownLiterals(List<Literal> knownLiterals, Literal l) {
-		sharedObjects.knownLiterals = knownLiterals;
-	}
-
-	public void setKnownLiterals(List<Literal> knownLiterals) {
-		setKnownLiterals(knownLiterals, null);
 	}
 
 	@Override
@@ -95,36 +82,38 @@ public class CalcThread2 extends AWorkerThread<Integer> {
 	}
 
 	private void startWork() {
-		sharedObjects.solver.setLiterals(sharedObjects.knownLiterals);
+		sharedObjects.solver.isSatisfiable();
 		super.start(sharedObjects.numberOfSolvers);
 	}
 
 	@Override
-	protected boolean beforeWork() {
-		sharedObjects.solver.initSolver(id);
-		sharedObjects.solver.setBackbone(id);
-		return super.beforeWork();
-	}
-
-	@Override
-	protected void work(Integer i) {
-		final byte value = sharedObjects.solver.getValueOf(new Literal(sharedObjects.featureArray[i]), id);
+	protected void work(String featureName) {
+		final Literal curLiteral = new Literal(featureName);
+		final byte value = sharedObjects.solver.getValueOf(curLiteral, id);
 		switch (value) {
 		case 1:
-			sharedObjects.variableConfiguration.setNewValue(i, Variable.TRUE, false);
+			addLiteral(curLiteral);
 			break;
 		case -1:
-			sharedObjects.variableConfiguration.setNewValue(i, Variable.FALSE, false);
+			curLiteral.positive = false;
+			addLiteral(curLiteral);
 			break;
 		default:
-			sharedObjects.variableConfiguration.setNewValue(i, Variable.UNDEFINED, false);
 			break;
 		}
 	}
 
+	private synchronized void addLiteral(Literal literal) {
+		sharedObjects.fixedLiteralsList.add(literal);
+	}
+
+	public List<Literal> getFixedLiterals() {
+		return sharedObjects.fixedLiteralsList;
+	}
+
 	@Override
-	protected CalcThread2 newThread() {
-		return new CalcThread2(this);
+	protected CalcFixedThread newThread() {
+		return new CalcFixedThread(this);
 	}
 
 }
