@@ -18,10 +18,9 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.mpl.wizards.page;
+package de.ovgu.featureide.ui.wizards;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -32,7 +31,6 @@ import org.eclipse.swt.widgets.TreeItem;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.mpl.builder.MSPLNature;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.wizards.AbstractWizardPage;
 import de.ovgu.featureide.fm.ui.wizards.WizardConstants;
@@ -48,7 +46,7 @@ public class SelectProjectWizardPage extends AbstractWizardPage implements Selec
 
 	private Composite container;
 	private Tree projectTree;
-	
+
 	private IFeatureProject selectedProject = null;
 
 	public SelectProjectWizardPage() {
@@ -64,25 +62,25 @@ public class SelectProjectWizardPage extends AbstractWizardPage implements Selec
 		FillLayout layout = new FillLayout();
 		container.setLayout(layout);
 		setControl(container);
-		
+
 		projectTree = new Tree(container, SWT.NORMAL);
 		projectTree.addSelectionListener(this);
 
 		for (IFeatureProject project : CorePlugin.getFeatureProjects()) {
-			try {
-				IProject projectHandle = project.getProject();
-				if (projectHandle != null && projectHandle.isAccessible() && !projectHandle.isNatureEnabled(MSPLNature.NATURE_ID)) {
-					TreeItem item = new TreeItem(projectTree, SWT.NORMAL);
-					item.setImage(GUIDefaults.FEATURE_SYMBOL);
-					item.setText(project.getProjectName());
-					item.setData(project);
-				}
-			} catch (CoreException e) {
-				CorePlugin.getDefault().logError(e);
+			//			try {
+			IProject projectHandle = project.getProject();
+			if (projectHandle != null && projectHandle.isAccessible()) { //&& !projectHandle.isNatureEnabled(MSPLNature.NATURE_ID)
+				TreeItem item = new TreeItem(projectTree, SWT.NORMAL);
+				item.setImage(GUIDefaults.FEATURE_SYMBOL);
+				item.setText(project.getProjectName());
+				item.setData(project);
 			}
+			//			} catch (CoreException e) {
+			//				CorePlugin.getDefault().logError(e);
+			//			}
 		}
 	}
-	
+
 	@Override
 	public void widgetSelected(SelectionEvent e) {
 		final TreeItem[] items = projectTree.getSelection();
@@ -94,12 +92,12 @@ public class SelectProjectWizardPage extends AbstractWizardPage implements Selec
 	public void widgetDefaultSelected(SelectionEvent e) {
 		updatePage();
 	}
-	
+
 	@Override
 	protected void putData() {
 		abstractWizard.putData(WizardConstants.KEY_OUT_PROJECT, selectedProject);
 	}
-	
+
 	@Override
 	protected String checkPage() {
 		if (selectedProject == null) {

@@ -344,8 +344,9 @@
 				allPopups="false"
 				locationURI="popup:de.ovgu.featureide.ui.mpl.subMenu">
 			<command
-					commandId="de.ovgu.featureide.ui.mpl.commands.newInterface"
+					commandId="de.ovgu.featureide.ui.commands.newInterface"
 					icon="icons/featuretree.ico"
+					id="de.ovgu.featureide.ui.mpl.actions.newInterface"
 					label="Create New Interface Model"
 					style="push">
 				<visibleWhen
@@ -403,10 +404,6 @@
 				name="Convert to MPL Project">
 		</command>
 		<command
-				id="de.ovgu.featureide.ui.mpl.commands.newInterface"
-				name="Create new interface model">
-		</command>
-		<command
 				id="de.ovgu.featureide.ui.mpl.commands.mapping"
 				name="Set current project mapping">
 		</command>
@@ -423,7 +420,14 @@
 		</handler>
 		<handler
 				class="de.ovgu.featureide.ui.mpl.handlers.NewInterfaceHandler"
-				commandId="de.ovgu.featureide.ui.mpl.commands.newInterface">
+				commandId="de.ovgu.featureide.ui.commands.newInterface">
+     <activeWhen>
+        <test
+              args="de.ovgu.featureide.core.mpl.builder.MSPLNature"
+              property="de.ovgu.featureide.fm.ui.properties.nature"
+              value="true">
+        </test>
+     </activeWhen>
 		</handler>
 		<handler
 				class="de.ovgu.featureide.ui.mpl.handlers.SetMappingHandler"
