@@ -25,6 +25,7 @@ import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -43,6 +44,7 @@ import de.ovgu.jcorridore.annotations.Record;
  * 
  * @author Jens Meinicke
  */
+@Ignore
 public class BFeatureModelAnalyzerWithRuntimeConstraints {
 
 	/**

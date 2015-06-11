@@ -26,6 +26,8 @@ import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -71,7 +73,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 	private Scale scale;
 	private Label labelT;
 
-	private boolean toggleState;
+	private boolean buildProjects;
 
 	private int t;
 
@@ -86,10 +88,10 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 	private final String order;
 	private boolean test;
 
-	public BuildProductsPage(String project, IFeatureProject featureProject, String generate, boolean toggleState, String algorithm, int t, String order, boolean test) {
+	public BuildProductsPage(String project, IFeatureProject featureProject, String generate, boolean buildProjects, String algorithm, int t, String order, boolean test) {
 		super(project);
 		this.project = featureProject;
-		this.toggleState = toggleState;
+		this.buildProjects = buildProjects;
 		this.algorithm = algorithm;
 		this.generate = generate;
 		this.t = t;
@@ -162,11 +164,13 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		labelProject.setToolTipText(TOOL_TIP_PROJECT);
 		buttonBuildProject = new Button(composite, SWT.CHECK);
 		buttonBuildProject.setLayoutData(gd);
-		buttonBuildProject.setSelection(toggleState);
+		buttonBuildProject.setSelection(buildProjects);
 		setPageComplete(false);
 		setControl(composite);
 		addListeners();
 		dialogChanged();
+		
+		buttonTest.setEnabled(!buttonBuildProject.getSelection());
 	}
 
 	private String getOrderText(BuildOrder order) {
@@ -288,6 +292,20 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 				setScale();
 			}
 		});
+		
+		buttonBuildProject.addSelectionListener(new SelectionListener() {
+			
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				buttonTest.setEnabled(!buttonBuildProject.getSelection());
+			}
+			
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+				// nothing here
+			}
+		});
+		
 
 	}
 

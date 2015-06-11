@@ -60,8 +60,6 @@ public interface IConfigurationBuilderBasics {
 			IConfigurationBuilderBasics.class.getName() + "#Generate");
 	QualifiedName ORDER = new QualifiedName(IConfigurationBuilderBasics.class.getName() + "#Order", 
 			IConfigurationBuilderBasics.class.getName() + "#Order");
-	QualifiedName BUFFER = new QualifiedName(IConfigurationBuilderBasics.class.getName() + "#Buffer", 
-			IConfigurationBuilderBasics.class.getName() + "#Buffer");
 	QualifiedName TEST = new QualifiedName(IConfigurationBuilderBasics.class.getName() + "#Test", 
 			IConfigurationBuilderBasics.class.getName() + "#Test");
 	String TRUE = "true";

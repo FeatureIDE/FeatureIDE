@@ -163,11 +163,11 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 	
 	private static boolean getTest() {
 		try {
-			final String buffer = ResourcesPlugin.getWorkspace().getRoot().getPersistentProperty(BUFFER);
-			if ("true".equals(buffer)) {
+			final String test = ResourcesPlugin.getWorkspace().getRoot().getPersistentProperty(TEST);
+			if ("true".equals(test)) {
 				return true;
 			}
-			if ("false".equals(buffer)) {
+			if ("false".equals(test)) {
 				return false;
 			}
 			return true;
@@ -179,7 +179,7 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 	
 	private static void setTest(boolean test) {
 		try {
-			ResourcesPlugin.getWorkspace().getRoot().setPersistentProperty(BUFFER, test + "");
+			ResourcesPlugin.getWorkspace().getRoot().setPersistentProperty(TEST, test + "");
 		} catch (CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}

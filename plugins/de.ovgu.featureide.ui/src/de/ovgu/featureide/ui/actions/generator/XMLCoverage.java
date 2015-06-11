@@ -1,5 +1,11 @@
 package de.ovgu.featureide.ui.actions.generator;
 
+/**
+ * 
+ * Defines entries for Junit xml files.
+ * 
+ * @author Jens Meinicke
+ */
 public interface XMLCoverage {
 
 	String BASE = "base";
