@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -787,84 +788,104 @@ public class CorePlugin extends AbstractCorePlugin {
 		try {
 			System.out.println("Creating Node1...");
 			final Node fmNode1 = removeFeatures(data.getFeatureModel(), features);
-//			System.out.println("Creating Node2...");
-//			final Node fmNode2 = NodeCreator.createNodes(data.getFeatureModel(), features).toCNF();
-//			SatSolver solver = new SatSolver(new Not(new Equals(fmNode1, fmNode2)), 2000);
-//			System.out.println(!solver.isSatisfiable());
-//			System.out.println("Done.");
+			System.out.println("Creating Node2...");
+			final Node fmNode2 = NodeCreator.createNodes(data.getFeatureModel(), features).toCNF();
+			SatSolver solver = new SatSolver(new Not(new Equals(fmNode1.clone(), fmNode2.clone())), 2000);
+			System.out.println(!solver.isSatisfiable());
+			System.out.println("Done.");
 		} catch (TimeoutException e) {
 			CorePlugin.getDefault().logError(e);
 		}
 	}
 
 	public Node removeFeatures(FeatureModel fm, Collection<String> features) throws TimeoutException {
-		final Node fmNode = NodeCreator.createNodes(fm).toCNF();
+		final Node fmNode = NodeCreator.createNodes(fm).clone().toCNF();
 		if (fmNode instanceof And) {
 			final SatSolver solver = new SatSolver(fmNode.clone(), 1000);
-			final ArrayList<Node> literalList = new ArrayList<>();
 			final Node[] andChildren = fmNode.getChildren();
-			int nullCount = 0;
+			int lastIndex = -1;
 
 			for (int i = 0; i < andChildren.length; i++) {
 				final Node andChild = andChildren[i];
 				if (andChild instanceof Or) {
-					boolean hasFeature = false;
-					literalList.clear();
-					final Node[] orChildren = andChild.getChildren();
-					for (int j = 0; j < orChildren.length; j++) {
-						final Node orChild = orChildren[j];
-						Literal literal = (Literal) orChild;
-						final String featureName = (String) literal.var;
-						if (features.contains(featureName)) {
-							hasFeature = true;
-							break;
-						} else {
-							literal = literal.clone();
-							literal.flip();
-							literalList.add(literal);
-						}
-					}
-					if (hasFeature) {
-						if (literalList.isEmpty()) {
-							andChildren[i] = null;
-							nullCount++;
-						} else {
-							if (solver.isSatisfiable(literalList)) {
-								andChildren[i] = null;
-								nullCount++;
-							} else {
-								for (Node node : literalList) {
-									((Literal) node).flip();
-								}
-								andChildren[i] = new Or(literalList.toArray(new Node[0]));
-							}
-						}
+					final Node result = checkOr(andChild, features, solver);
+					if (result == null) {
+						andChildren[i] = new Literal(NodeCreator.varTrue);
+						lastIndex = i;
+					} else {
+						andChildren[i] = result;
 					}
 				} else {
-					final String featureName = (String) ((Literal) andChild).var;
-					if (features.contains(featureName)) {
-						andChildren[i] = null;
-						nullCount++;
+					if (features.contains(((Literal) andChild).var)) {
+						andChildren[i] = new Literal(NodeCreator.varTrue);
+						lastIndex = i;
 					}
 				}
 			}
-			final Node[] newChildren = new Node[andChildren.length - nullCount];
-			int j = 0;
-			for (int i = 0; i < andChildren.length; i++) {
-				final Node node = andChildren[i];
-				if (node != null) {
-					newChildren[j++] = node;
+			
+			if (lastIndex > -1) {
+				final Collection<String> retainedFeatures = new HashSet<>(fm.getFeatureNames());
+				retainedFeatures.removeAll(features);
+				final Node[] literals = new Node[retainedFeatures.size() + 1];
+				int i = 0;
+				for (String node : retainedFeatures) {
+					literals[i++] = new Literal(node);
 				}
+				literals[i] = new Literal(NodeCreator.varTrue);
+				andChildren[lastIndex] = new Or(literals);
 			}
-			fmNode.setChildren(newChildren);
+			
 			return fmNode;
 		} else if (fmNode instanceof Or) {
-			System.out.println("Not Supported!");
-			return null;
+			return checkOr(fmNode, features);
 		} else {
-			System.out.println("Not Supported!");
-			return null;
+			return (features.contains(((Literal) fmNode).var)) ? new Literal(NodeCreator.varTrue) : fmNode;
 		}
+	}
+
+	private Node checkOr(final Node andChild, Collection<String> features, final SatSolver solver) throws TimeoutException {
+		Node result = andChild;
+		final Node[] orChildren = andChild.getChildren();
+		final ArrayList<Node> literalList = new ArrayList<>(orChildren.length);
+		for (int j = 0; j < orChildren.length; j++) {
+			Literal literal = (Literal) orChildren[j];
+			if (!features.contains(literal.var)) {
+				literal = literal.clone();
+				literal.flip();
+				literalList.add(literal);
+			}
+		}
+		if (literalList.size() < orChildren.length) {
+			if (literalList.isEmpty() || solver.isSatisfiable(literalList)) {
+				result = null;
+			} else {
+				for (Node node : literalList) {
+					((Literal) node).flip();
+				}
+				result = new Or(literalList.toArray(new Node[0]));
+			}
+		}
+		return result;
+	}
+	
+	private Node checkOr(final Node andChild, Collection<String> features) throws TimeoutException {
+		Node result = andChild;
+		final Node[] orChildren = andChild.getChildren();
+		final ArrayList<Node> literalList = new ArrayList<>(orChildren.length);
+		for (int j = 0; j < orChildren.length; j++) {
+			final Literal literal = (Literal) orChildren[j];
+			if (!features.contains(literal.var)) {
+				literalList.add(literal);
+			}
+		}
+		if (literalList.size() < orChildren.length) {
+			if (literalList.isEmpty()) {
+				result = new Literal(NodeCreator.varTrue);
+			} else {
+				result = new Or(literalList.toArray(new Node[0]));
+			}
+		}
+		return result;
 	}
 
 }
