@@ -144,13 +144,14 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		optional = featureModel.hasOptionalFeatures();
 		alternative = featureModel.hasAlternativeGroup();
 		or = featureModel.hasOrGroup();
-		_abstract = analyser.getAttributeFlag(Attribute.Abstract);
-		concrete = analyser.getAttributeFlag(Attribute.Concrete);
-		hidden = analyser.getAttributeFlag(Attribute.Hidden);
+		_abstract = featureModel.hasAbstract();
+		concrete = featureModel.hasConcrete();
+		hidden = featureModel.hasHidden();
 		dead = analyser.getAttributeFlag(Attribute.Dead);
+		
 		showHidden = featureModel.getLayout().showHiddenFeatures();
-		falseoptional = analyser.getAttributeFlag(Attribute.FalseOptional);
-		indetHidden = analyser.getAttributeFlag(Attribute.IndetHidden);
+		falseoptional = featureModel.hasFalseOptionalFeatures();
+		indetHidden = featureModel.hasIndetHidden();
 
 		unsatisfiableConst = analyser.calculateConstraints && featureModel.hasUnsatisfiableConst();
 		tautologyConst = analyser.calculateTautologyConstraints && featureModel.hasTautologyConst();
