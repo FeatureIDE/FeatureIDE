@@ -1,15 +1,25 @@
 package de.ovgu.featureide.featurehouse.ui.handlers;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.internal.ui.javaeditor.JavaEditor;
+import org.eclipse.jdt.ui.JavaUI;
+import org.eclipse.jface.text.ITextSelection;
+import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ltk.ui.refactoring.RefactoringWizardOpenOperation;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.ResourceUtil;
+import org.eclipse.ui.texteditor.ITextEditor;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
@@ -24,6 +34,22 @@ public class RenameHandler extends ASelectionHandler {
 	@Override
 	protected void singleAction(Object element) 
 	{
+//		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+//		ITextEditor editor = (ITextEditor) page.getActiveEditor();
+//		IJavaElement elem = JavaUI.getEditorInputJavaElement(editor.getEditorInput());
+//		if (elem instanceof ICompilationUnit) {
+//		    ITextSelection sel = (ITextSelection) editor.getSelectionProvider().getSelection();
+//		    IJavaElement selected;
+//			try {
+//				selected = ((ICompilationUnit) elem).getElementAt(sel.getOffset());
+//				if (selected != null && selected.getElementType() == IJavaElement.METHOD) {
+//			    	element = (IMethod) selected;
+//			    }
+//			} catch (JavaModelException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
 		if (!(element instanceof IMethod)) return;
 		IMethod method = (IMethod) element;
 		

@@ -14,7 +14,10 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.jdt.core,
  org.eclipse.ltk.core.refactoring;bundle-version="3.6.100",
  org.eclipse.ltk.ui.refactoring,
- org.eclipse.ui.ide;bundle-version="3.9.2"
+ org.eclipse.ui.ide;bundle-version="3.9.2",
+ org.eclipse.text,
+ org.eclipse.jdt.ui,
+ org.eclipse.core.filebuffers
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ClassPath: lib/FeatureHouse.jar,
@@ -23,6 +26,7 @@ Bundle-ClassPath: lib/FeatureHouse.jar,
 Bundle-Vendor: University of Magdeburg
 Import-Package: org.eclipse.core.expressions,
  org.eclipse.jdt.internal.core,
+ org.eclipse.jdt.internal.debug.core.refactoring,
  org.eclipse.jdt.internal.ui.packageview,
  org.eclipse.jface.text,
  org.eclipse.ui.texteditor

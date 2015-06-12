@@ -499,13 +499,17 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 							}
 							if (sigRef != null) {
 								for (ExtendedSignature absSig : accessingSignatures) {
-									final FOPFeatureData[] featureData = (FOPFeatureData[]) absSig.sig.getFeatureData();
+									FOPFeatureData[] featureData = (FOPFeatureData[]) absSig.sig.getFeatureData();
 									for (int j = 0; j < featureData.length; j++) {
 										if (featureData[j].getID() == absSig.featureID) {
 											featureData[j].addCalledSignature(sigRef.sig);
 											break;
 										}
 									}
+
+									FOPFeatureData fopFeatureData = (FOPFeatureData) sigRef.sig.getFirstFeatureData();
+									if (fopFeatureData != null)
+											fopFeatureData.addInvokedSignature(absSig.sig);
 								}
 							}
 						} else if (bodyDecl instanceof MemberClassDecl) {
@@ -591,7 +595,7 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 		return fst.getFeature(featureName).getRole(fileName + ".java").getFile();
 	}
 
-	private void setFileForFOPFeatures(final FSTModel fst, AbstractSignature[] sigArray, final boolean checkCalledSignatures) {
+	private void setFileForFOPFeatures(final FSTModel fst, final AbstractSignature[] sigArray, final boolean checkCalledSignatures, IFile file) {
 		for (AbstractSignature signature : sigArray) {
 			
 			String fullName = signature.getFullName();
@@ -606,15 +610,19 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 			final FOPFeatureData[] featureData = (FOPFeatureData[]) signature.getFeatureData();
 			for (int j = 0; j < featureData.length; j++) {
 				FOPFeatureData fopFeature = featureData[j];
-				fopFeature.setFile(getFileForFeatureData(fopFeature, fst, fileName));
-				System.out.println(fopFeature.getFile().getName());
+				if (checkCalledSignatures) file = getFileForFeatureData(fopFeature, fst, fileName);
+				fopFeature.setFile(file);
 
 				if (checkCalledSignatures && !fopFeature.getCalledSignatures().isEmpty())
 					setFileForFOPFeatures(fst,
 							(AbstractSignature[]) fopFeature.getCalledSignatures().toArray(new AbstractSignature[fopFeature.getCalledSignatures().size()]),
-							false);
+							false, file);
 			}
 		}
+	}
+	
+	private void setFileForFOPFeatures(final FSTModel fst, final AbstractSignature[] sigArray, final boolean checkCalledSignatures) {
+		setFileForFOPFeatures(fst, sigArray, checkCalledSignatures, null);
 	}
 
 	private void findMethodAccesses(ASTNode<?> stmt, AbstractSignature methAbs, int featureID) {
