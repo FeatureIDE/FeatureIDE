@@ -138,6 +138,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	}
 
 	public LegendFigure(FeatureModel featureModel, Point pos) {
+		final FeatureModelAnalyzer analyser = featureModel.getAnalyser();
 
 		mandatory = featureModel.hasMandatoryFeatures();
 		optional = featureModel.hasOptionalFeatures();
@@ -146,17 +147,16 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		_abstract = featureModel.hasAbstract();
 		concrete = featureModel.hasConcrete();
 		hidden = featureModel.hasHidden();
-		dead = !featureModel.getAnalyser().getDeadFeatures().isEmpty();
+		dead = analyser.getAttributeFlag(Attribute.Dead);
 		
 		showHidden = featureModel.getLayout().showHiddenFeatures();
 		falseoptional = featureModel.hasFalseOptionalFeatures();
 		indetHidden = featureModel.hasIndetHidden();
-		
-		unsatisfiableConst = featureModel.hasUnsatisfiableConst() && featureModel.getAnalyser().calculateConstraints;
-		tautologyConst = featureModel.hasTautologyConst() && featureModel.getAnalyser().calculateTautologyConstraints;
-		voidModelConst = featureModel.hasVoidModelConst() && featureModel.getAnalyser().calculateConstraints;
-		redundantConst = featureModel.hasRedundantConst() && featureModel.getAnalyser().calculateRedundantConstraints;
 
+		unsatisfiableConst = analyser.calculateConstraints && featureModel.hasUnsatisfiableConst();
+		tautologyConst = analyser.calculateTautologyConstraints && featureModel.hasTautologyConst();
+		voidModelConst = analyser.calculateConstraints && featureModel.hasVoidModelConst();
+		redundantConst = analyser.calculateRedundantConstraints && featureModel.hasRedundantConst();
 
 		if (featureModel instanceof ExtendedFeatureModel) {
 			ExtendedFeatureModel extendedFeatureModel = (ExtendedFeatureModel) featureModel;
