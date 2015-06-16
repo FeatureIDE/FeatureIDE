@@ -48,17 +48,20 @@ public class ColorAnnotation extends Annotation {
 	}
 
 	private Position position;
-	private final String id;
+	private final int id;
 	private final int type;
 	
 	public ColorAnnotation(int id, Position posistion, int annotationtype) {
 		super(getTypeString(id, annotationtype), false, "Color Annotation");
 		this.position = posistion;
-		this.id = Integer.toString(id);
+		this.id = id;
 		this.type = annotationtype;
 	}
 	
 	private static String getTypeString(int id, int type) {
+		if (id == -1) {
+			return "de.ovgu.featureide.ui.editors.annotations.image";
+		}
 		switch (type) {
 			case TYPE_IMAGE:
 				return ANNOTATIONTYPE_ID[0];
@@ -84,16 +87,12 @@ public class ColorAnnotation extends Annotation {
 	public void updateLength(int deltaLength) {
 		position.length += deltaLength;
 	}
-
-	public String getText() {
-		return "";
-	}
 	
 	public String getId() {
-		return id;
+		return Integer.toString(id);
 	}
-	
+		
 	public boolean isImageAnnotation() {
-		return type == TYPE_IMAGE;
+		return type == TYPE_IMAGE && id != -1;
 	}
 }
