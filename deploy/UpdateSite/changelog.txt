@@ -7,8 +7,12 @@ https://github.com/tthuem/FeatureIDE/issues/milestones
 
 Here, is a list of high-level enhancements.
 
-Release 2.7.3 (March 2015)
+Release 2.7.4 (June 2015)
+* Performance of automated analyses in the feature model editor improved (e.g., new calculation of dead and core features)
+* Update problem with feature-model legend and constraints fixed (e.g., wrong highlighting of redundant constraints)
+* Feature model outline revised
 
+Release 2.7.3 (March 2015)
 * Performance and appearance of constraint dialog for large feature models improved (automated analyses run asynchronously)
 * Performance of configuration editor for large feature models improved (automated analyses run asynchronously)
 * Improved support for multi product lines
