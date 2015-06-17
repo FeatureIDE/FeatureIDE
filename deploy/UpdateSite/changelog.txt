@@ -8,6 +8,9 @@ https://github.com/tthuem/FeatureIDE/issues/milestones
 Here, is a list of high-level enhancements.
 
 Release 2.7.4 (June 2015)
+* Improved outline with support for further langauges (Haskell, C#), nested classes, and with new filters
+* Improved collaboration diagram with support for nested classes, new filters, and toolbar buttons
+* Improved statistics view with LOC, support for nested classes, and jump-to-file actions
 * Performance of automated analyses in the feature model editor improved (e.g., new calculation of dead and core features)
 * Update problem with feature-model legend and constraints fixed (e.g., wrong highlighting of redundant constraints)
 * Feature model outline revised
