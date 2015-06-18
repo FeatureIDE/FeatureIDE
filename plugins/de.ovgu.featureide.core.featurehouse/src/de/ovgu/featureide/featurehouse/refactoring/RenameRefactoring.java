@@ -21,42 +21,31 @@
 package de.ovgu.featureide.featurehouse.refactoring;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
-import org.eclipse.core.filebuffers.FileBuffers;
-import org.eclipse.core.filebuffers.ITextFileBuffer;
-import org.eclipse.core.filebuffers.LocationKind;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.JavaConventions;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
-import org.eclipse.jdt.core.dom.MethodInvocation;
-import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.CompositeChange;
 import org.eclipse.ltk.core.refactoring.Refactoring;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.core.refactoring.TextFileChange;
 import org.eclipse.text.edits.MultiTextEdit;
-import org.eclipse.text.edits.TextEdit;
+import org.eclipse.text.edits.ReplaceEdit;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
@@ -66,21 +55,21 @@ import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.core.signature.base.FOPFeatureData;
 import de.ovgu.featureide.featurehouse.ExtendedFujiSignaturesJob;
-import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
 
 /**
  * TODO description
  * 
  * @author Steffen Schulze
  */
-public abstract class RenameRefactoring<T extends IMember> extends Refactoring {
+public abstract class RenameRefactoring<T extends IMember, Q extends AbstractSignature> extends Refactoring {
 
 	protected final IFeatureProject featureProject;
 	protected final T renamingElement;
 	protected ProjectSignatures signatures;
 	protected String newName;
 	private Map<ICompilationUnit, TextFileChange> changes = new LinkedHashMap<ICompilationUnit, TextFileChange>();
-	private Map<ICompilationUnit, List<ASTRewrite>> rewrites = new LinkedHashMap<ICompilationUnit, List<ASTRewrite>>();
+	private Map<String, AbstractClassSignature> classes = new HashMap<>();
+	private Map<ICompilationUnit, List<SearchMatch>> nodes = new HashMap<>();
 
 	public RenameRefactoring(T selection, IFeatureProject featureProject) {
 		this.renamingElement = selection;
@@ -98,9 +87,8 @@ public abstract class RenameRefactoring<T extends IMember> extends Refactoring {
 
 	protected abstract boolean checkSignature(AbstractSignature signature);
 
-	protected abstract IASTVisitor getASTVisitor(AbstractSignature signature);
+	protected abstract IASTVisitor getASTVisitor(final ICompilationUnit unit, final RefactoringSignature refactoringSignature);
 
-	//	protected abstract IASTVisitor getASTVisitor2(AbstractSignature signature);
 	protected abstract boolean checkPreConditions(RefactoringStatus refactoringStatus);
 
 	@Override
@@ -128,6 +116,23 @@ public abstract class RenameRefactoring<T extends IMember> extends Refactoring {
 				return refactoringStatus;
 
 			IStatus status = JavaConventions.validateMethodName(newName, JavaCore.VERSION_1_7, JavaCore.VERSION_1_7);
+
+			//			public final RefactoringStatus checkNewElementName(String newName) {
+			//				Assert.isNotNull(newName, "new name"); //$NON-NLS-1$
+			//
+			//				RefactoringStatus status= Checks.checkName(newName, JavaConventionsUtil.validateMethodName(newName, fMethod));
+			//				if (status.isOK() && !Checks.startsWithLowerCase(newName))
+			//					status= RefactoringStatus.createWarningStatus(fIsComposite
+			//							? Messages.format(RefactoringCoreMessages.Checks_method_names_lowercase2, new String[] { BasicElementLabels.getJavaElementName(newName), getDeclaringTypeLabel()})
+			//							: RefactoringCoreMessages.Checks_method_names_lowercase);
+			//
+			//				if (Checks.isAlreadyNamed(fMethod, newName))
+			//					status.addFatalError(fIsComposite
+			//							? Messages.format(RefactoringCoreMessages.RenameMethodRefactoring_same_name2, new String[] { BasicElementLabels.getJavaElementName(newName), getDeclaringTypeLabel() } )
+			//							: RefactoringCoreMessages.RenameMethodRefactoring_same_name,
+			//							JavaStatusContext.create(fMethod));
+			//				return status;
+			//			}
 
 			if (!status.isOK()) {
 				switch (status.getSeverity()) {
@@ -173,16 +178,29 @@ public abstract class RenameRefactoring<T extends IMember> extends Refactoring {
 			if (!checkPreConditions(refactoringStatus))
 				return refactoringStatus;
 
-			final SignatureIterator iter = signatures.iterator();
-			while (iter.hasNext()) {
-				final AbstractSignature signature = iter.next();
-				//				if (!(signature instanceof FujiMethodSignature)) continue;
-				//				FujiMethodSignature methodSignature = (FujiMethodSignature) signature;
-				////				System.out.println(Flags.toString(renamingElement.getFlags()));
-				doMagic(signature);
+			classes = getClasses();
+			Set<AbstractSignature> matchedSignatures = getMatchedSignatures();
+
+			AbstractSignature selectedSignature = null;
+			if (matchedSignatures.size() == 1) {
+				selectedSignature = matchedSignatures.iterator().next();
+			} else {
+				for (AbstractSignature matchedSignature : matchedSignatures) {
+					if (hasSameClass(matchedSignature))
+						selectedSignature = matchedSignature;
+				}
 			}
-			for (Entry<ICompilationUnit, List<ASTRewrite>> entry : rewrites.entrySet()) {
-				rewriteAST(entry.getKey(), entry.getValue());
+
+			if (selectedSignature != null) {
+				Set<RefactoringSignature> involvedSignatures = getInvolvedSignatures(selectedSignature, matchedSignatures);
+
+				for (RefactoringSignature refactoringSignature : involvedSignatures) {
+					search(refactoringSignature);
+				}
+
+				for (Entry<ICompilationUnit, List<SearchMatch>> searchMatches : nodes.entrySet()) {
+					rewriteAST(searchMatches.getKey(), searchMatches.getValue());
+				}
 			}
 
 		} catch (InterruptedException e) {
@@ -193,58 +211,209 @@ public abstract class RenameRefactoring<T extends IMember> extends Refactoring {
 		return refactoringStatus;
 	}
 
-	private void doMagic(final AbstractSignature signature) throws JavaModelException {
+	private Set<RefactoringSignature> getInvolvedSignatures(AbstractSignature selectedSignature, Set<AbstractSignature> matchedSignatures) {
+		Set<AbstractClassSignature> involvedClasses2 = new HashSet<>();
 
-		final FOPFeatureData[] featureData = (FOPFeatureData[]) signature.getFeatureData();
+		addSubAndSuperClasses(involvedClasses2, selectedSignature.getParent());
+
+		Set<RefactoringSignature> involvedClasses = createRefactoringSignatures(involvedClasses2, matchedSignatures);
+
+		handleInvokedSignatureOfMatchedSignature(involvedClasses, selectedSignature);
+		final FOPFeatureData[] featureData = (FOPFeatureData[]) selectedSignature.getFeatureData();
 		for (int j = 0; j < featureData.length; j++) {
 			final FOPFeatureData fopFeature = featureData[j];
-			final IFile file = fopFeature.getFile();
 
-			if (checkSignature(signature)) {
-
-				rewriteAST(signature, file, getInvokedSignaturesList(fopFeature.getInvokedSignatures()));
-			}
+			addToRefactoringSignatures(involvedClasses, selectedSignature, fopFeature.getFile());
 		}
-		
+
+		System.out.println(involvedClasses);
+
+		return involvedClasses;
 	}
 
-	private Map<AbstractSignature, IFile> getInvokedSignaturesList(List<AbstractSignature> invokedSignatures) throws JavaModelException {
-		Map<AbstractSignature, IFile> result = new HashMap<>();
-		for (AbstractSignature signature : invokedSignatures) {
-			final FOPFeatureData featureData = (FOPFeatureData) signature.getFirstFeatureData();
-			if (featureData == null)
-				continue;
+	private Set<RefactoringSignature> createRefactoringSignatures(final Set<AbstractClassSignature> involvedClasses2,
+			final Set<AbstractSignature> matchedSignatures) {
+		Set<RefactoringSignature> result = new HashSet<>();
 
-			result.put(signature, featureData.getFile());
+		for (AbstractClassSignature involvedClass : involvedClasses2) {
+
+			AbstractSignature matchedSignature = checkSignature(involvedClass, matchedSignatures);
+			if (matchedSignature != null) {
+
+				handleInvokedSignatureOfMatchedSignature(result, matchedSignature);
+
+				final FOPFeatureData[] featureData = (FOPFeatureData[]) involvedClass.getFeatureData();
+				for (int j = 0; j < featureData.length; j++) {
+					final FOPFeatureData fopFeature = featureData[j];
+
+					addToRefactoringSignatures(result, matchedSignature, fopFeature.getFile());
+				}
+			}
 		}
+
 		return result;
 	}
 
-	private void rewriteAST(final AbstractSignature signature, final IFile file, final Map<AbstractSignature, IFile> invokedSignatures)
-			throws JavaModelException {
+	private void addToRefactoringSignatures(Set<RefactoringSignature> result, AbstractSignature matchedSignature, final IFile file) {
+		RefactoringSignature signature = getRefactoringSignature(result, file);
+		if (signature == null) {
 
-		MethodVisitor visitor = new MethodVisitor((FujiMethodSignature) signature, file, invokedSignatures);
-		visitor.startVisit();
+			signature = new RefactoringSignature(file, matchedSignature);
+			result.add(signature);
+		} else if (signature.getDeclaration() == null) {
+			signature.setDeclaration(matchedSignature);
+		}
+		signature.setRenameDeclaration(true);
+	}
 
-		Map<ICompilationUnit, List<ASTNode>> changingUnits = visitor.getChangingNodes();
+	private void handleInvokedSignatureOfMatchedSignature(Set<RefactoringSignature> result, AbstractSignature matchedSignature) {
 
-		for (Entry<ICompilationUnit, List<ASTNode>> changingUnit : changingUnits.entrySet()) {
+		for (FOPFeatureData featureData : (FOPFeatureData[]) matchedSignature.getFeatureData()) {
 
-			final ICompilationUnit unit = changingUnit.getKey();
-			List<ASTRewrite> listAstRewrite;
-			if (rewrites.containsKey(unit)) {
-				listAstRewrite = rewrites.get(unit);
-			} else {
-				listAstRewrite = new ArrayList<>();
-				rewrites.put(unit, listAstRewrite);
-			}
+			for (AbstractSignature invokedSignature : featureData.getInvokedSignatures()) {
+				final FOPFeatureData[] invokedFeatureData = (FOPFeatureData[]) invokedSignature.getFeatureData();
+				for (int i = 0; i < invokedFeatureData.length; i++) {
+					final FOPFeatureData fopFeature = invokedFeatureData[i];
+					final IFile file = fopFeature.getFile();
 
-			for (ASTNode astNode : changingUnit.getValue()) {
-				ASTRewrite astRewrite = ASTRewrite.create(astNode.getRoot().getAST());
-				listAstRewrite.add(astRewrite);
-				rewriteMethodDeclaration(astRewrite, astNode);
+					RefactoringSignature signature = getRefactoringSignature(result, file);
+					if (signature == null) {
+
+						signature = new RefactoringSignature(file, matchedSignature);
+						result.add(signature);
+					}
+
+					signature.addInvocation(invokedSignature);
+				}
 			}
 		}
+	}
+
+	private Set<AbstractSignature> getSignaturesForFile(final Map<IFile, Set<AbstractSignature>> qwer, final IFile file) {
+		final Set<AbstractSignature> signatures;
+		if (qwer.containsKey(file)) {
+			signatures = qwer.get(file);
+		} else {
+			signatures = new HashSet<>();
+			qwer.put(file, signatures);
+		}
+
+		return signatures;
+	}
+
+	private Set<AbstractSignature> getMatchedSignatures() {
+		Set<AbstractSignature> matched = new HashSet<>();
+		final SignatureIterator iter = signatures.iterator();
+		while (iter.hasNext()) {
+			final AbstractSignature signature = iter.next();
+			if (checkSignature(signature)) {
+				matched.add(signature);
+			}
+		}
+
+		return matched;
+	}
+
+	private void addSubAndSuperClasses(final Map<IFile, Set<AbstractSignature>> map, final AbstractClassSignature classSignature) {
+		if (classSignature == null)
+			return;
+
+		addAbstractClassesForNames(map, classSignature.getImplementList());
+		addAbstractClassesForNames(map, classSignature.getExtendList());
+		addAbstractClassesForNames(map, classSignature.getSubClassesList());
+	}
+
+	private void addAbstractClassesForNames(final Map<IFile, Set<AbstractSignature>> map, final Set<String> names) {
+		for (String className : names) {
+			if (!classes.containsKey(className))
+				continue;
+
+			final AbstractClassSignature classSignature = classes.get(className);
+			if (classSignature == null)
+				return;
+
+			final FOPFeatureData[] featureData = (FOPFeatureData[]) classSignature.getFeatureData();
+			for (int j = 0; j < featureData.length; j++) {
+				final FOPFeatureData fopFeature = featureData[j];
+
+				final Set<AbstractSignature> signatures = getSignaturesForFile(map, fopFeature.getFile());
+				if (!signatures.contains(classSignature)) {
+					signatures.add(classSignature);
+					addSubAndSuperClasses(map, classSignature);
+				}
+			}
+		}
+	}
+
+	private void addSubAndSuperClasses(final Set<AbstractClassSignature> result, final AbstractClassSignature classSignature) {
+		if (classSignature == null)
+			return;
+
+		addAbstractClassesForNames(result, classSignature.getImplementList());
+		addAbstractClassesForNames(result, classSignature.getExtendList());
+		addAbstractClassesForNames(result, classSignature.getSubClassesList());
+	}
+
+	private void addAbstractClassesForNames(final Set<AbstractClassSignature> result, final Set<String> names) {
+		for (String className : names) {
+			if (!classes.containsKey(className))
+				continue;
+
+			final AbstractClassSignature classSignature = classes.get(className);
+			if (classSignature == null)
+				return;
+
+			if (!result.contains(classSignature)) {
+				result.add(classSignature);
+				addSubAndSuperClasses(result, classSignature);
+			}
+		}
+	}
+
+	private RefactoringSignature getRefactoringSignature(final Set<RefactoringSignature> result, final IFile file) {
+		for (RefactoringSignature refactoringSignature : result) {
+			if (refactoringSignature.getFile().equals(file))
+				return refactoringSignature;
+		}
+		return null;
+	}
+
+	private AbstractSignature checkSignature(final AbstractClassSignature signature, Set<AbstractSignature> matchedSignatures) {
+		for (AbstractSignature match : matchedSignatures) {
+			if (match.getParent().equals(signature)) {
+				return match;
+			}
+		}
+		return null;
+	}
+
+	private Map<String, AbstractClassSignature> getClasses() {
+		final Map<String, AbstractClassSignature> classes = new HashMap<>();
+
+		final SignatureIterator iter = signatures.iterator();
+		while (iter.hasNext()) {
+			final AbstractSignature signature = iter.next();
+			if (signature instanceof AbstractClassSignature)
+				classes.put(signature.getName(), (AbstractClassSignature) signature);
+		}
+
+		return classes;
+	}
+
+	private void search(final RefactoringSignature refactoringSignatures) {
+
+		final IFile file = refactoringSignatures.getFile();
+		if ((file == null) || ((file != null) && !file.isAccessible()))
+			return;
+
+		ICompilationUnit unit = JavaCore.createCompilationUnitFrom(file);
+		if (unit == null)
+			return;
+
+		IASTVisitor visitor = getASTVisitor(unit, refactoringSignatures);
+		visitor.startVisit();
+
+		nodes.put(unit, visitor.getMatches());
 	}
 
 	@Override
@@ -258,21 +427,6 @@ public abstract class RenameRefactoring<T extends IMember> extends Refactoring {
 		} finally {
 			pm.done();
 		}
-	}
-
-	private void rewriteMethodDeclaration(ASTRewrite astRewrite, ASTNode oldNode) throws JavaModelException {
-		AST ast = oldNode.getAST();
-
-		ASTNode newNode = null;
-		if (oldNode instanceof MethodDeclaration) {
-			newNode = (MethodDeclaration) ASTNode.copySubtree(ast, oldNode);
-			((MethodDeclaration) newNode).setName(ast.newSimpleName(newName));
-		} else if (oldNode instanceof MethodInvocation) {
-			newNode = (MethodInvocation) ASTNode.copySubtree(ast, oldNode);
-			((MethodInvocation) newNode).setName(ast.newSimpleName(newName));
-		}
-		if (newNode != null)
-			astRewrite.replace(oldNode, newNode, null);
 	}
 
 	protected boolean hasSameName(final String signatureName, final String otherName) {
@@ -291,41 +445,21 @@ public abstract class RenameRefactoring<T extends IMember> extends Refactoring {
 		return signature.getName();
 	}
 
-	protected void rewriteAST(ICompilationUnit unit, List<ASTRewrite> astRewrite) {
-		try {
-			ITextFileBuffer buffer = acquire(unit);
-			if (buffer == null)
-				return;
+	private void rewriteAST(ICompilationUnit unit, List<SearchMatch> matches) {
 
-			MultiTextEdit multiEdit = new MultiTextEdit();
-			TextFileChange change = null;
-			for (ASTRewrite astRewrite2 : astRewrite) {
-
-				TextEdit edit = astRewrite2.rewriteAST(buffer.getDocument(), null);
-				multiEdit.addChild(edit);
-			}
-
-			if (!multiEdit.hasChildren())
-				return;
-
-			change = new TextFileChange(unit.getElementName(), (IFile) unit.getResource());
-			change.setTextType("java");
-			change.setEdit(multiEdit);
-
-			changes.put(unit, change);
-		} catch (CoreException exception) {
-			exception.printStackTrace();
+		MultiTextEdit multiEdit = new MultiTextEdit();
+		for (SearchMatch match : matches) {
+			multiEdit.addChild(new ReplaceEdit(match.getOffset(), match.getLength(), newName));
 		}
-	}
 
-	private ITextFileBuffer acquire(final ICompilationUnit unit) throws CoreException {
-		final IResource resource = unit.getResource();
-		if (resource != null && resource.getType() == IResource.FILE) {
-			final IPath path = resource.getFullPath();
-			FileBuffers.getTextFileBufferManager().connect(path, LocationKind.IFILE, new NullProgressMonitor());
-			return FileBuffers.getTextFileBufferManager().getTextFileBuffer(path, LocationKind.IFILE);
-		}
-		return null;
+		if (!multiEdit.hasChildren())
+			return;
+
+		TextFileChange change = new TextFileChange(unit.getElementName(), (IFile) unit.getResource());
+		change.setTextType("java");
+		change.setEdit(multiEdit);
+
+		changes.put(unit, change);
 	}
 
 }

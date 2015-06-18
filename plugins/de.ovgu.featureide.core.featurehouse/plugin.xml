@@ -223,17 +223,4 @@
 				type="org.eclipse.jface.viewers.IStructuredSelection">
 		</propertyTester>
 	</extension>
- <extension
-       point="org.eclipse.ltk.core.refactoring.renameParticipants">
-    <renameParticipant
-          class="de.ovgu.featureide.featurehouse.refactoring.RenameParticipant1"
-          id="de.ovgu.featureide.core.featurehouse.renameParticipant1"
-          name="name">
-          <enablement>
-      <with variable="element">
-        <instanceof value="org.eclipse.jdt.core.IMethod"/>
-      </with>
-    </enablement>
-    </renameParticipant>
- </extension>
 </plugin>

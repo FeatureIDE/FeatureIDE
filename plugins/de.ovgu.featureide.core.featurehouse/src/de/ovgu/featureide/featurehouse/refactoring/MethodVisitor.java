@@ -20,72 +20,105 @@
  */
 package de.ovgu.featureide.featurehouse.refactoring;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.IMethodBinding;
+import org.eclipse.jdt.core.dom.ITypeBinding;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
+import org.eclipse.jdt.core.dom.VariableDeclaration;
 
+import de.ovgu.featureide.core.signature.base.AbstractMethodSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
-import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
+
 
 /**
  * TODO description
  * 
  * @author steffen
  */
-public class MethodVisitor {
+public class MethodVisitor extends AbstractASTVisitor<AbstractMethodSignature> {
 
-	protected final FujiMethodSignature signature;
-	private final IFile file;
-	private final Map<ICompilationUnit, List<ASTNode>> changingNodes = new HashMap<>();
-	private final Map<AbstractSignature, IFile> invokedSignatures;
-	
-	public MethodVisitor(final FujiMethodSignature signature, final IFile file, final Map<AbstractSignature, IFile> invokedSignatures) {
-		this.signature = signature;
-		this.file = file;
-		this.invokedSignatures = invokedSignatures;
+	private boolean checkChildren = false;
+
+	public MethodVisitor(final ICompilationUnit unit, final RefactoringSignature refactoringSignature) {
+		super(unit, refactoringSignature);
 	}
-	
-	public Map<ICompilationUnit, List<ASTNode>> getChangingNodes(){
-		return changingNodes;
-	}
-	
-	public void startVisit()
-	{
-		if ((file == null) || ((file != null) && !file.isAccessible()))  return;
-		
-		ICompilationUnit unit = JavaCore.createCompilationUnitFrom(file);
-		if (unit == null) return;
-		
-		ASTNode root = RefactoringUtil.parseUnit(unit);
-		if (root == null) return;
-		
-		final AbstractASTVisitor<FujiMethodSignature> visitor = new MethodDeclarationVisitor(signature);
-		root.accept(visitor);
-		
-		changingNodes.put(unit, visitor.getSearchedNodes());
-		
-		for (Entry<AbstractSignature, IFile> invokedSignature : invokedSignatures.entrySet()) {
-			final IFile file = invokedSignature.getValue();
-			if ((file == null) || ((file != null) && !file.isAccessible()))  return;
-			
-			unit = JavaCore.createCompilationUnitFrom(file);
-			if (unit == null) return;
-			
-			root = RefactoringUtil.parseUnit(unit);
-			if (root == null) return;
-			
-			final MethodInvocationVisitor expVisitor = new MethodInvocationVisitor(signature);
-			root.accept(expVisitor);
-			
-			changingNodes.put(unit, expVisitor.getSearchedNodes());
+
+	@Override
+	public boolean visit(MethodDeclaration node) {
+
+		if (refactoringSignature.isRenameDeclaration() && isSameSignature((AbstractMethodSignature) refactoringSignature.getDeclaration(), node)) {
+			addSearchMatch(node.getName());
+			checkChildren = false;
+		} else {
+			boolean foundInvokedSignature = false;
+			for (AbstractSignature aSignature : refactoringSignature.getInvocations()) {
+				if (!(aSignature instanceof AbstractMethodSignature))
+					continue;
+
+				if (isSameSignature((AbstractMethodSignature) aSignature, node)) {
+					foundInvokedSignature = true;
+					break;
+				}
+			}
+			checkChildren = foundInvokedSignature;
 		}
+
+		return checkChildren;
 	}
 
-	
+	@Override
+	public boolean visit(MethodInvocation node) {
+
+		if (isSameSignature((AbstractMethodSignature) refactoringSignature.getDeclaration(), node)) {
+			addSearchMatch(node.getName());
+		}
+		return false;
+	}
+
+	@Override
+	protected <Q extends ASTNode> boolean isSameSignature(AbstractMethodSignature sig1, Q sig2) {
+
+		if (sig2 instanceof MethodDeclaration) {
+			MethodDeclaration node = (MethodDeclaration) sig2;
+			return (hasSameName(node.getName().getFullyQualifiedName(), sig1.getName()) && hasSameParameters(getNodeParameters(node), sig1.getParameterTypes()));
+		} else if (sig2 instanceof MethodInvocation) {
+			MethodInvocation node = (MethodInvocation) sig2;
+			return (hasSameName(node.getName().getFullyQualifiedName(), sig1.getName()) && hasSameParameters(getNodeParameters(node), sig1.getParameterTypes()));
+		}
+		return false;
+	}
+
+	private boolean hasSameParameters(List<String> parameters, List<String> parameters2) {
+		return parameters.equals(parameters2);
+	}
+
+	private List<String> getNodeParameters(MethodInvocation node) {
+		List<String> parameters = new ArrayList<String>();
+		IMethodBinding methodBinding = node.resolveMethodBinding();
+		for (ITypeBinding type : methodBinding.getParameterTypes()) {
+
+			parameters.add(type.getErasure().getName());
+		}
+		return parameters;
+	}
+
+	private List<String> getNodeParameters(MethodDeclaration node) {
+		List<String> parameters = new ArrayList<String>();
+		for (Object parameter : node.parameters()) {
+			VariableDeclaration variableDeclaration = (VariableDeclaration) parameter;
+			String type = variableDeclaration.getStructuralProperty(SingleVariableDeclaration.TYPE_PROPERTY).toString();
+			for (int i = 0; i < variableDeclaration.getExtraDimensions(); i++) {
+				type += "[]";
+			}
+			parameters.add(type);
+		}
+		return parameters;
+	}
+
 }

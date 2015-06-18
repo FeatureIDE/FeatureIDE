@@ -23,13 +23,16 @@ package de.ovgu.featureide.featurehouse.refactoring;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.signature.ProjectSignatures.SignatureIterator;
 import de.ovgu.featureide.core.signature.base.AFeatureData;
+import de.ovgu.featureide.core.signature.base.AbstractMethodSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
 
@@ -38,7 +41,7 @@ import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
  * 
  * @author Steffen Schulze
  */
-public class RenameMethodRefactoring extends RenameRefactoring<IMethod> {
+public class RenameMethodRefactoring extends RenameRefactoring<IMethod, AbstractMethodSignature> {
 	
 	
 	public RenameMethodRefactoring(IMethod selection, IFeatureProject featureProject) {
@@ -62,23 +65,27 @@ public class RenameMethodRefactoring extends RenameRefactoring<IMethod> {
 
 		return Arrays.equals(simpleNames, parameterTypes.toArray(new String[parameterTypes.size()]));
 	}
+	
+	private boolean hasSameReturnType(final FujiMethodSignature signature) {
+		try {
+			return signature.getReturnType().equals(Signature.toString(renamingElement.getReturnType()));
+		} catch (JavaModelException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
 
 	@Override
 	protected boolean checkSignature(AbstractSignature signature) {
-		return (signature instanceof FujiMethodSignature) && hasSameClass(signature) && hasSameName(signature.getName(), renamingElement.getElementName())
-				&& hasSameParameters((FujiMethodSignature) signature);
+		return (signature instanceof FujiMethodSignature) && /*hasSameClass(signature) &&*/ hasSameName(signature.getName(), renamingElement.getElementName())
+				&& hasSameParameters((FujiMethodSignature) signature) && hasSameReturnType((FujiMethodSignature) signature);
 	}
 
 	@Override
-	protected IASTVisitor getASTVisitor(AbstractSignature signature) {
-		return new MethodDeclarationVisitor((FujiMethodSignature) signature);
+	protected IASTVisitor getASTVisitor(final ICompilationUnit unit, final RefactoringSignature refactoringSignature) {
+		return new MethodVisitor(unit, refactoringSignature);
 	}
 	
-//	@Override
-//	protected IASTVisitor getASTVisitor2(AbstractSignature signature) {
-//		return new MethodInvocationVisitor((FujiMethodSignature) signature);
-//	}
-
 	@Override
 	protected boolean checkPreConditions(RefactoringStatus refactoringStatus) {
 		
@@ -105,4 +112,6 @@ public class RenameMethodRefactoring extends RenameRefactoring<IMethod> {
 		}
 		return true;
 	}
+
+	
 }

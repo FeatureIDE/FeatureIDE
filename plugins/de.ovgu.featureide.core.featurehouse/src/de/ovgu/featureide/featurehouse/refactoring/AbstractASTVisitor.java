@@ -23,8 +23,10 @@ package de.ovgu.featureide.featurehouse.refactoring;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.SimpleName;
 
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 
@@ -33,22 +35,41 @@ import de.ovgu.featureide.core.signature.base.AbstractSignature;
  * 
  * @author steffen
  */
-public abstract class AbstractASTVisitor<T extends AbstractSignature> extends ASTVisitor implements IASTVisitor{
-	protected final T signature;
-	protected List<ASTNode> visitedNodes = new ArrayList<>();
-	
-	public AbstractASTVisitor(final T signature) {
-		this.signature = signature;
+public abstract class AbstractASTVisitor<T extends AbstractSignature> extends ASTVisitor implements IASTVisitor {
+	protected final RefactoringSignature refactoringSignature;
+	private List<SearchMatch> matches = new ArrayList<>();
+	private final ICompilationUnit unit;
+
+	public AbstractASTVisitor(final ICompilationUnit unit, final RefactoringSignature refactoringSignature) {
+		this.unit = unit;
+		this.refactoringSignature = refactoringSignature;
 	}
-	
+
 	@Override
-	public List<ASTNode> getSearchedNodes() {
-		return visitedNodes;
+	public List<SearchMatch> getMatches() {
+		return matches;
 	}
-	
-	  protected boolean hasSameName(String name)
-	  {
-		  return name.equals(signature.getName());
-		 //return node.getName().getFullyQualifiedName().equals(signature.getName());
-	  }
+
+	//	  protected boolean hasSameAsSignatur(String name)
+	//	  {
+	//		  return hasSameName(name, signature.getName());
+	//	  }
+	//	  
+	protected boolean hasSameName(String name, String otherName) {
+		return name.equals(otherName);
+	}
+
+	public void startVisit() {
+		ASTNode root = RefactoringUtil.parseUnit(unit);
+		if (root == null)
+			return;
+
+		root.accept(this);
+	}
+
+	protected void addSearchMatch(SimpleName simpleName) {
+		matches.add(new SearchMatch(unit, simpleName.getStartPosition(), simpleName.getLength()));
+	}
+
+	abstract protected <Q extends ASTNode> boolean isSameSignature(T sig1, Q sig2);
 }
