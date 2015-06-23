@@ -26,8 +26,12 @@ import java.util.List;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.Name;
+import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.SimpleName;
 
+import de.ovgu.featureide.core.signature.base.AbstractMethodSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 
 /**
@@ -35,10 +39,11 @@ import de.ovgu.featureide.core.signature.base.AbstractSignature;
  * 
  * @author steffen
  */
-public abstract class AbstractASTVisitor<T extends AbstractSignature> extends ASTVisitor implements IASTVisitor {
+public abstract class AbstractASTVisitor extends ASTVisitor implements IASTVisitor {
 	protected final RefactoringSignature refactoringSignature;
 	private List<SearchMatch> matches = new ArrayList<>();
 	private final ICompilationUnit unit;
+	protected boolean checkChildren = false;
 
 	public AbstractASTVisitor(final ICompilationUnit unit, final RefactoringSignature refactoringSignature) {
 		this.unit = unit;
@@ -50,13 +55,32 @@ public abstract class AbstractASTVisitor<T extends AbstractSignature> extends AS
 		return matches;
 	}
 
-	//	  protected boolean hasSameAsSignatur(String name)
-	//	  {
-	//		  return hasSameName(name, signature.getName());
-	//	  }
-	//	  
 	protected boolean hasSameName(String name, String otherName) {
 		return name.equals(otherName);
+	}
+	
+	protected boolean hasSameName(final AbstractSignature signature, final Name name){
+		if (name instanceof QualifiedName)
+			return hasSameName(signature, (QualifiedName) name);
+		
+		return hasSameName(signature, (SimpleName) name);
+	}
+	
+	protected SimpleName getSimpleName(Name nodeName) {
+		SimpleName simpleName;
+		if (nodeName instanceof QualifiedName)
+			simpleName = (SimpleName) ((QualifiedName) nodeName).getName();
+		else
+			simpleName = (SimpleName) nodeName;
+		return simpleName;
+	}
+
+	protected boolean hasSameName(final AbstractSignature signature, final QualifiedName name){
+			return hasSameName(signature.getFullName(), name.getFullyQualifiedName());
+	}
+	
+	protected boolean hasSameName(final AbstractSignature signature, final SimpleName name){
+		return hasSameName(signature.getName(), name.getFullyQualifiedName());
 	}
 
 	public void startVisit() {
@@ -70,6 +94,18 @@ public abstract class AbstractASTVisitor<T extends AbstractSignature> extends AS
 	protected void addSearchMatch(SimpleName simpleName) {
 		matches.add(new SearchMatch(unit, simpleName.getStartPosition(), simpleName.getLength()));
 	}
+	
+	protected boolean checkMethodBody(MethodDeclaration node) {
+		for (AbstractSignature aSignature : refactoringSignature.getInvocations()) {
+			if (!(aSignature instanceof AbstractMethodSignature))
+				continue;
 
-	abstract protected <Q extends ASTNode> boolean isSameSignature(T sig1, Q sig2);
+			if (isSameSignature(aSignature, node)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	abstract protected boolean isSameSignature(AbstractSignature sig1, ASTNode sig2);
 }

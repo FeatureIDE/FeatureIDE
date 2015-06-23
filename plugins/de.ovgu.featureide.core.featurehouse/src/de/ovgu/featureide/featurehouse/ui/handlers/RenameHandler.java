@@ -5,6 +5,7 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.ui.javaeditor.JavaEditor;
 import org.eclipse.jdt.ui.JavaUI;
@@ -23,7 +24,9 @@ import org.eclipse.ui.texteditor.ITextEditor;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.featurehouse.refactoring.RenameTypeRefactoring;
 import de.ovgu.featureide.featurehouse.refactoring.RenameMethodRefactoring;
+import de.ovgu.featureide.featurehouse.refactoring.RenameRefactoring;
 import de.ovgu.featureide.featurehouse.refactoring.RenameRefactoringWizard;
 import de.ovgu.featureide.fm.ui.handlers.base.ASelectionHandler;
 import de.ovgu.featureide.fm.ui.handlers.base.SelectionWrapper;
@@ -34,36 +37,30 @@ public class RenameHandler extends ASelectionHandler {
 	@Override
 	protected void singleAction(Object element) 
 	{
-//		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-//		ITextEditor editor = (ITextEditor) page.getActiveEditor();
-//		IJavaElement elem = JavaUI.getEditorInputJavaElement(editor.getEditorInput());
-//		if (elem instanceof ICompilationUnit) {
-//		    ITextSelection sel = (ITextSelection) editor.getSelectionProvider().getSelection();
-//		    IJavaElement selected;
-//			try {
-//				selected = ((ICompilationUnit) elem).getElementAt(sel.getOffset());
-//				if (selected != null && selected.getElementType() == IJavaElement.METHOD) {
-//			    	element = (IMethod) selected;
-//			    }
-//			} catch (JavaModelException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//		}
-		if (!(element instanceof IMethod)) return;
-		IMethod method = (IMethod) element;
-		
-		IFeatureProject featureProject = getFeatureProject();
-		if (featureProject == null) return;
-
-		RenameMethodRefactoring refactoring = new RenameMethodRefactoring(method, featureProject);
-
-		RenameRefactoringWizard refactoringWizard = new RenameRefactoringWizard(refactoring);
-		RefactoringWizardOpenOperation op = new RefactoringWizardOpenOperation(refactoringWizard);
 		try {
+			IFeatureProject featureProject = getFeatureProject();
+			if (featureProject == null)
+				return;
+
+			RenameRefactoring refactoring;
+			if (element instanceof IMethod) {
+				IMethod method = (IMethod) element;
+
+				if (method.isConstructor())
+					refactoring = new RenameTypeRefactoring(method.getDeclaringType(), featureProject);
+				else
+					refactoring = new RenameMethodRefactoring(method, featureProject);
+
+			} else if (element instanceof IType)
+				refactoring = new RenameTypeRefactoring((IType) element, featureProject);
+			else
+				return;
+
+			RenameRefactoringWizard refactoringWizard = new RenameRefactoringWizard(refactoring);
+			RefactoringWizardOpenOperation op = new RefactoringWizardOpenOperation(refactoringWizard);
 			op.run(getShell(), "Rename-Refactoring");
-		}
-		catch (InterruptedException e) {
+		} catch (JavaModelException e) {
+		} catch (InterruptedException e) {
 		}
 	}
 

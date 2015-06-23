@@ -82,6 +82,10 @@ public abstract class ASelectionHandler extends AbstractHandler {
 				ITypeRoot root = (ITypeRoot) JavaUI.getEditorInputJavaElement(editor.getEditorInput());
 				IJavaElement[] elt;
 				try {
+//					 IJavaElement selected =  ((ICompilationUnit) elem).getElementAt(sel.getOffset());
+//					 if (selected != null && selected.getElementType() == IJavaElement.METHOD) {
+//						 singleAction((IMethod) selected);
+//				    }
 					elt = root.codeSelect(sel.getOffset(), sel.getLength());
 					if (elt.length > 0) singleAction(elt[0]);
 				} catch (JavaModelException e) {

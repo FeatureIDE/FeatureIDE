@@ -25,6 +25,8 @@ Bundle-ClassPath: lib/FeatureHouse.jar,
  .
 Bundle-Vendor: University of Magdeburg
 Import-Package: org.eclipse.core.expressions,
+ org.eclipse.jdt.core.refactoring,
+ org.eclipse.jdt.core.refactoring.descriptors,
  org.eclipse.jdt.internal.core,
  org.eclipse.jdt.internal.debug.core.refactoring,
  org.eclipse.jdt.internal.ui.packageview,

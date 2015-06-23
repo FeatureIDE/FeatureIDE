@@ -20,30 +20,43 @@
  */
 package de.ovgu.featureide.featurehouse.refactoring;
 
-import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IMember;
-import org.eclipse.jdt.core.JavaConventions;
+import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.IPackageDeclaration;
+import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.internal.corext.refactoring.Checks;
+import org.eclipse.jdt.internal.corext.refactoring.RefactoringCoreMessages;
+import org.eclipse.jdt.internal.corext.refactoring.changes.RenameCompilationUnitChange;
+import org.eclipse.jdt.internal.corext.refactoring.rename.RenameTypeProcessor;
+import org.eclipse.jdt.internal.corext.util.JavaModelUtil;
+import org.eclipse.jdt.ui.refactoring.RenameSupport;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.CompositeChange;
 import org.eclipse.ltk.core.refactoring.Refactoring;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.core.refactoring.TextFileChange;
+import org.eclipse.ltk.core.refactoring.resource.RenameResourceChange;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 
@@ -55,6 +68,10 @@ import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.core.signature.base.FOPFeatureData;
 import de.ovgu.featureide.featurehouse.ExtendedFujiSignaturesJob;
+import de.ovgu.featureide.featurehouse.refactoring.matcher.MethodSignatureMatcher;
+import de.ovgu.featureide.featurehouse.refactoring.matcher.SignatureMatcher;
+import de.ovgu.featureide.featurehouse.refactoring.matcher.TypeSignatureMatcher;
+import de.ovgu.featureide.featurehouse.signature.fuji.FujiClassSignature;
 
 /**
  * TODO description
@@ -67,8 +84,8 @@ public abstract class RenameRefactoring<T extends IMember, Q extends AbstractSig
 	protected final T renamingElement;
 	protected ProjectSignatures signatures;
 	protected String newName;
-	private Map<ICompilationUnit, TextFileChange> changes = new LinkedHashMap<ICompilationUnit, TextFileChange>();
-	private Map<String, AbstractClassSignature> classes = new HashMap<>();
+	private List<Change> changes = new ArrayList<Change>();
+	protected Map<String, AbstractClassSignature> classes = new HashMap<>();
 	private Map<ICompilationUnit, List<SearchMatch>> nodes = new HashMap<>();
 
 	public RenameRefactoring(T selection, IFeatureProject featureProject) {
@@ -85,75 +102,11 @@ public abstract class RenameRefactoring<T extends IMember, Q extends AbstractSig
 		return this.newName;
 	}
 
-	protected abstract boolean checkSignature(AbstractSignature signature);
-
 	protected abstract IASTVisitor getASTVisitor(final ICompilationUnit unit, final RefactoringSignature refactoringSignature);
 
-	protected abstract boolean checkPreConditions(RefactoringStatus refactoringStatus);
-
-	@Override
-	public RefactoringStatus checkInitialConditions(final IProgressMonitor pm) throws CoreException, OperationCanceledException {
-		RefactoringStatus refactoringStatus = new RefactoringStatus();
-
-		try {
-			pm.beginTask("Checking preconditions...", 1);
-
-			// die Methode existiert
-			if (!renamingElement.exists())
-				refactoringStatus.merge(RefactoringStatus.createFatalErrorStatus(MessageFormat.format("Element ''{0}'' does not exist.",
-						new Object[] { renamingElement.getElementName() })));
-			// ob die Methode nicht aus einer binaeren Klasse (.class File) stammt und die Klassendatei keine Compile-Fehler aufweist
-			else {
-				if (!renamingElement.isBinary() && !renamingElement.getCompilationUnit().isStructureKnown())
-					refactoringStatus.merge(RefactoringStatus.createFatalErrorStatus(MessageFormat.format("Compilation unit ''{0}'' contains compile errors.",
-							new Object[] { renamingElement.getCompilationUnit().getElementName() })));
-			}
-
-			if ("".equals(newName))
-				return RefactoringStatus.createFatalErrorStatus("Hier neuen Methodennamen eingeben");
-
-			if (renamingElement.getElementName().equals(newName))
-				return refactoringStatus;
-
-			IStatus status = JavaConventions.validateMethodName(newName, JavaCore.VERSION_1_7, JavaCore.VERSION_1_7);
-
-			//			public final RefactoringStatus checkNewElementName(String newName) {
-			//				Assert.isNotNull(newName, "new name"); //$NON-NLS-1$
-			//
-			//				RefactoringStatus status= Checks.checkName(newName, JavaConventionsUtil.validateMethodName(newName, fMethod));
-			//				if (status.isOK() && !Checks.startsWithLowerCase(newName))
-			//					status= RefactoringStatus.createWarningStatus(fIsComposite
-			//							? Messages.format(RefactoringCoreMessages.Checks_method_names_lowercase2, new String[] { BasicElementLabels.getJavaElementName(newName), getDeclaringTypeLabel()})
-			//							: RefactoringCoreMessages.Checks_method_names_lowercase);
-			//
-			//				if (Checks.isAlreadyNamed(fMethod, newName))
-			//					status.addFatalError(fIsComposite
-			//							? Messages.format(RefactoringCoreMessages.RenameMethodRefactoring_same_name2, new String[] { BasicElementLabels.getJavaElementName(newName), getDeclaringTypeLabel() } )
-			//							: RefactoringCoreMessages.RenameMethodRefactoring_same_name,
-			//							JavaStatusContext.create(fMethod));
-			//				return status;
-			//			}
-
-			if (!status.isOK()) {
-				switch (status.getSeverity()) {
-				case IStatus.ERROR:
-					refactoringStatus.merge(RefactoringStatus.createFatalErrorStatus(status.getMessage()));
-					break;
-				case IStatus.WARNING:
-					refactoringStatus.merge(RefactoringStatus.createWarningStatus(status.getMessage()));
-					break;
-				case IStatus.INFO:
-					refactoringStatus.merge(RefactoringStatus.createInfoStatus(status.getMessage()));
-
-				}
-			}
-
-		} finally {
-			pm.done();
-		}
-
-		return refactoringStatus;
-	}
+	protected abstract void checkPreConditions(final Set<AbstractSignature> newMatchedSignatures, final Set<AbstractSignature> oldMatchedSignatures, final AbstractSignature selectedSignature, final RefactoringStatus status) throws JavaModelException, CoreException;
+	
+	protected abstract RefactoringStatus checkNewElementName(String newName);
 
 	@Override
 	public final RefactoringStatus checkFinalConditions(final IProgressMonitor pm) throws CoreException, OperationCanceledException {
@@ -171,30 +124,28 @@ public abstract class RenameRefactoring<T extends IMember, Q extends AbstractSig
 			if (signatures == null)
 				return refactoringStatus;
 
-			final FSTModel model = featureProject.getFSTModel();
-			if (model == null)
+			pm.setTaskName(RefactoringCoreMessages.RenameMethodRefactoring_taskName_checkingPreconditions);
+//			if (!)
+//				return refactoringStatus;
+			
+			SignatureMatcher matcher = null;
+			if (renamingElement instanceof IMethod)
+				matcher = new MethodSignatureMatcher(signatures, renamingElement, newName);
+			else if (renamingElement instanceof IType)
+				matcher = new TypeSignatureMatcher(signatures, renamingElement, newName);
+			
+			if (matcher == null)
 				return refactoringStatus;
-
-			if (!checkPreConditions(refactoringStatus))
+			
+			matcher.findMatchedSignatures();
+			
+			//checkPreConditions(getNamedMatchedSignatures(newName), matchedSignatures, selectedSignature, refactoringStatus);
+			if (refactoringStatus.hasFatalError()) 
 				return refactoringStatus;
+			
+			if (matcher.getSelectedSignature() != null) {
 
-			classes = getClasses();
-			Set<AbstractSignature> matchedSignatures = getMatchedSignatures();
-
-			AbstractSignature selectedSignature = null;
-			if (matchedSignatures.size() == 1) {
-				selectedSignature = matchedSignatures.iterator().next();
-			} else {
-				for (AbstractSignature matchedSignature : matchedSignatures) {
-					if (hasSameClass(matchedSignature))
-						selectedSignature = matchedSignature;
-				}
-			}
-
-			if (selectedSignature != null) {
-				Set<RefactoringSignature> involvedSignatures = getInvolvedSignatures(selectedSignature, matchedSignatures);
-
-				for (RefactoringSignature refactoringSignature : involvedSignatures) {
+				for (RefactoringSignature refactoringSignature : createRefactoringSignatures(matcher)) {
 					search(refactoringSignature);
 				}
 
@@ -211,43 +162,35 @@ public abstract class RenameRefactoring<T extends IMember, Q extends AbstractSig
 		return refactoringStatus;
 	}
 
-	private Set<RefactoringSignature> getInvolvedSignatures(AbstractSignature selectedSignature, Set<AbstractSignature> matchedSignatures) {
-		Set<AbstractClassSignature> involvedClasses2 = new HashSet<>();
+//	private Set<RefactoringSignature> getInvolvedSignatures(final AbstractSignature selectedSignature, final Set<AbstractSignature> matchedSignatures) {
+//		
+////		filterMatchedSignatures(selectedSignature, matchedSignatures);
+//		
+//		Set<RefactoringSignature> refactoringSignatures = createRefactoringSignatures(matchedSignatures);
+//
+//		handleInvokedSignatureOfMatchedSignature(refactoringSignatures, selectedSignature);
+//		final FOPFeatureData[] featureData = (FOPFeatureData[]) selectedSignature.getFeatureData();
+//		for (int j = 0; j < featureData.length; j++) {
+//			final FOPFeatureData fopFeature = featureData[j];
+//
+//			addToRefactoringSignatures(refactoringSignatures, selectedSignature, fopFeature.getFile());
+//		}
+//
+//		return refactoringSignatures;
+//	}
 
-		addSubAndSuperClasses(involvedClasses2, selectedSignature.getParent());
-
-		Set<RefactoringSignature> involvedClasses = createRefactoringSignatures(involvedClasses2, matchedSignatures);
-
-		handleInvokedSignatureOfMatchedSignature(involvedClasses, selectedSignature);
-		final FOPFeatureData[] featureData = (FOPFeatureData[]) selectedSignature.getFeatureData();
-		for (int j = 0; j < featureData.length; j++) {
-			final FOPFeatureData fopFeature = featureData[j];
-
-			addToRefactoringSignatures(involvedClasses, selectedSignature, fopFeature.getFile());
-		}
-
-		System.out.println(involvedClasses);
-
-		return involvedClasses;
-	}
-
-	private Set<RefactoringSignature> createRefactoringSignatures(final Set<AbstractClassSignature> involvedClasses2,
-			final Set<AbstractSignature> matchedSignatures) {
+	private Set<RefactoringSignature> createRefactoringSignatures(final SignatureMatcher matcher) {
 		Set<RefactoringSignature> result = new HashSet<>();
 
-		for (AbstractClassSignature involvedClass : involvedClasses2) {
+		for (AbstractSignature matchedSignature : matcher.getMatchedSignatures()) {
 
-			AbstractSignature matchedSignature = checkSignature(involvedClass, matchedSignatures);
-			if (matchedSignature != null) {
+			handleInvokedSignatureOfMatchedSignature(result, matchedSignature);
 
-				handleInvokedSignatureOfMatchedSignature(result, matchedSignature);
+			final FOPFeatureData[] featureData = (FOPFeatureData[]) matchedSignature.getFeatureData();
+			for (int j = 0; j < featureData.length; j++) {
+				final FOPFeatureData fopFeature = featureData[j];
 
-				final FOPFeatureData[] featureData = (FOPFeatureData[]) involvedClass.getFeatureData();
-				for (int j = 0; j < featureData.length; j++) {
-					final FOPFeatureData fopFeature = featureData[j];
-
-					addToRefactoringSignatures(result, matchedSignature, fopFeature.getFile());
-				}
+				addToRefactoringSignatures(result, matcher.getSelectedSignature(), fopFeature.getFile());
 			}
 		}
 
@@ -257,7 +200,6 @@ public abstract class RenameRefactoring<T extends IMember, Q extends AbstractSig
 	private void addToRefactoringSignatures(Set<RefactoringSignature> result, AbstractSignature matchedSignature, final IFile file) {
 		RefactoringSignature signature = getRefactoringSignature(result, file);
 		if (signature == null) {
-
 			signature = new RefactoringSignature(file, matchedSignature);
 			result.add(signature);
 		} else if (signature.getDeclaration() == null) {
@@ -289,87 +231,6 @@ public abstract class RenameRefactoring<T extends IMember, Q extends AbstractSig
 		}
 	}
 
-	private Set<AbstractSignature> getSignaturesForFile(final Map<IFile, Set<AbstractSignature>> qwer, final IFile file) {
-		final Set<AbstractSignature> signatures;
-		if (qwer.containsKey(file)) {
-			signatures = qwer.get(file);
-		} else {
-			signatures = new HashSet<>();
-			qwer.put(file, signatures);
-		}
-
-		return signatures;
-	}
-
-	private Set<AbstractSignature> getMatchedSignatures() {
-		Set<AbstractSignature> matched = new HashSet<>();
-		final SignatureIterator iter = signatures.iterator();
-		while (iter.hasNext()) {
-			final AbstractSignature signature = iter.next();
-			if (checkSignature(signature)) {
-				matched.add(signature);
-			}
-		}
-
-		return matched;
-	}
-
-	private void addSubAndSuperClasses(final Map<IFile, Set<AbstractSignature>> map, final AbstractClassSignature classSignature) {
-		if (classSignature == null)
-			return;
-
-		addAbstractClassesForNames(map, classSignature.getImplementList());
-		addAbstractClassesForNames(map, classSignature.getExtendList());
-		addAbstractClassesForNames(map, classSignature.getSubClassesList());
-	}
-
-	private void addAbstractClassesForNames(final Map<IFile, Set<AbstractSignature>> map, final Set<String> names) {
-		for (String className : names) {
-			if (!classes.containsKey(className))
-				continue;
-
-			final AbstractClassSignature classSignature = classes.get(className);
-			if (classSignature == null)
-				return;
-
-			final FOPFeatureData[] featureData = (FOPFeatureData[]) classSignature.getFeatureData();
-			for (int j = 0; j < featureData.length; j++) {
-				final FOPFeatureData fopFeature = featureData[j];
-
-				final Set<AbstractSignature> signatures = getSignaturesForFile(map, fopFeature.getFile());
-				if (!signatures.contains(classSignature)) {
-					signatures.add(classSignature);
-					addSubAndSuperClasses(map, classSignature);
-				}
-			}
-		}
-	}
-
-	private void addSubAndSuperClasses(final Set<AbstractClassSignature> result, final AbstractClassSignature classSignature) {
-		if (classSignature == null)
-			return;
-
-		addAbstractClassesForNames(result, classSignature.getImplementList());
-		addAbstractClassesForNames(result, classSignature.getExtendList());
-		addAbstractClassesForNames(result, classSignature.getSubClassesList());
-	}
-
-	private void addAbstractClassesForNames(final Set<AbstractClassSignature> result, final Set<String> names) {
-		for (String className : names) {
-			if (!classes.containsKey(className))
-				continue;
-
-			final AbstractClassSignature classSignature = classes.get(className);
-			if (classSignature == null)
-				return;
-
-			if (!result.contains(classSignature)) {
-				result.add(classSignature);
-				addSubAndSuperClasses(result, classSignature);
-			}
-		}
-	}
-
 	private RefactoringSignature getRefactoringSignature(final Set<RefactoringSignature> result, final IFile file) {
 		for (RefactoringSignature refactoringSignature : result) {
 			if (refactoringSignature.getFile().equals(file))
@@ -378,35 +239,9 @@ public abstract class RenameRefactoring<T extends IMember, Q extends AbstractSig
 		return null;
 	}
 
-	private AbstractSignature checkSignature(final AbstractClassSignature signature, Set<AbstractSignature> matchedSignatures) {
-		for (AbstractSignature match : matchedSignatures) {
-			if (match.getParent().equals(signature)) {
-				return match;
-			}
-		}
-		return null;
-	}
-
-	private Map<String, AbstractClassSignature> getClasses() {
-		final Map<String, AbstractClassSignature> classes = new HashMap<>();
-
-		final SignatureIterator iter = signatures.iterator();
-		while (iter.hasNext()) {
-			final AbstractSignature signature = iter.next();
-			if (signature instanceof AbstractClassSignature)
-				classes.put(signature.getName(), (AbstractClassSignature) signature);
-		}
-
-		return classes;
-	}
-
 	private void search(final RefactoringSignature refactoringSignatures) {
 
-		final IFile file = refactoringSignatures.getFile();
-		if ((file == null) || ((file != null) && !file.isAccessible()))
-			return;
-
-		ICompilationUnit unit = JavaCore.createCompilationUnitFrom(file);
+		final ICompilationUnit unit = getCompilationUnit(refactoringSignatures.getFile());
 		if (unit == null)
 			return;
 
@@ -415,6 +250,14 @@ public abstract class RenameRefactoring<T extends IMember, Q extends AbstractSig
 
 		nodes.put(unit, visitor.getMatches());
 	}
+	
+	protected ICompilationUnit getCompilationUnit(final IFile file)
+	{
+		if ((file == null) || ((file != null) && !file.isAccessible()))
+			return null;
+
+		return JavaCore.createCompilationUnitFrom(file);
+	}
 
 	@Override
 	public final Change createChange(IProgressMonitor pm) throws CoreException, OperationCanceledException {
@@ -422,27 +265,10 @@ public abstract class RenameRefactoring<T extends IMember, Q extends AbstractSig
 		try {
 			pm.beginTask("Creating change...", 1);
 
-			final Collection<TextFileChange> textFileChanges = changes.values();
-			return new CompositeChange(getName(), textFileChanges.toArray(new Change[textFileChanges.size()]));
+			return new CompositeChange(getName(), changes.toArray(new Change[changes.size()]));
 		} finally {
 			pm.done();
 		}
-	}
-
-	protected boolean hasSameName(final String signatureName, final String otherName) {
-		return signatureName.equals(otherName);
-	}
-
-	protected boolean hasSameClass(final AbstractSignature signature) {
-		return getClassforSiganture(signature).equals(renamingElement.getDeclaringType().getFullyQualifiedName());
-	}
-
-	private String getClassforSiganture(final AbstractSignature signature) {
-		AbstractClassSignature parent = signature.getParent();
-		if (parent != null)
-			return parent.getName();
-
-		return signature.getName();
 	}
 
 	private void rewriteAST(ICompilationUnit unit, List<SearchMatch> matches) {
@@ -454,12 +280,45 @@ public abstract class RenameRefactoring<T extends IMember, Q extends AbstractSig
 
 		if (!multiEdit.hasChildren())
 			return;
-
+		
 		TextFileChange change = new TextFileChange(unit.getElementName(), (IFile) unit.getResource());
 		change.setTextType("java");
 		change.setEdit(multiEdit);
-
-		changes.put(unit, change);
+		changes.add(change);
+		
+		if (willRenameCU(unit)) 
+			changes.add(new RenameResourceChange(unit.getPath(), newName + ".java"));
+	}
+	
+	private boolean willRenameCU(final ICompilationUnit unit) {
+		if (!(renamingElement instanceof IType)) 
+			return false;
+		String name = JavaCore.removeJavaLikeExtension(unit.getElementName());
+		if (! (Checks.isTopLevel((IType)renamingElement) && name.equals(renamingElement.getElementName())))
+			return false;
+		if (! checkNewPathValidity().isOK())
+			return false;
+		if (! Checks.checkCompilationUnitNewName(unit, newName).isOK())
+			return false;
+		return true;
 	}
 
+	private RefactoringStatus checkNewPathValidity() {
+		IContainer c = renamingElement.getCompilationUnit().getResource().getParent();
+
+		String notRename= RefactoringCoreMessages.RenameTypeRefactoring_will_not_rename;
+		IStatus status= c.getWorkspace().validateName(newName, IResource.FILE);
+		if (status.getSeverity() == IStatus.ERROR)
+			return RefactoringStatus.createWarningStatus(status.getMessage() + ". " + notRename); //$NON-NLS-1$
+
+		status= c.getWorkspace().validatePath(createNewPath(newName), IResource.FILE);
+		if (status.getSeverity() == IStatus.ERROR)
+			return RefactoringStatus.createWarningStatus(status.getMessage() + ". " + notRename); //$NON-NLS-1$
+
+		return new RefactoringStatus();
+	}
+	
+	private String createNewPath(String newName) {
+		return renamingElement.getCompilationUnit().getResource().getFullPath().removeLastSegments(1).append(newName).toString();
+	}
 }

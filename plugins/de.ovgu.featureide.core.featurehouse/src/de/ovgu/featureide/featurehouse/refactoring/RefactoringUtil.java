@@ -21,9 +21,17 @@
 package de.ovgu.featureide.featurehouse.refactoring;
 
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IMember;
+import org.eclipse.jdt.core.IPackageDeclaration;
+import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+
+import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
+import de.ovgu.featureide.core.signature.base.AbstractSignature;
+import de.ovgu.featureide.featurehouse.signature.fuji.FujiClassSignature;
 
 /**
  * TODO description
@@ -41,4 +49,52 @@ public class RefactoringUtil {
 	    parser.setBindingsRecovery(true);
 	    return (CompilationUnit) parser.createAST(null); 
 	  }
+	
+	public static boolean hasSameClass(final AbstractSignature signature, final IMember member) {
+		final IType declaringType = member.getDeclaringType();
+		String className;
+		if (declaringType != null)
+			className = member.getDeclaringType().getElementName();
+		else
+			className = member.getElementName();
+		
+		return signature.getName().equals(className) && hasSamePackage(signature, member);
+	}
+	
+	private static boolean hasSamePackage(AbstractSignature signature, final IMember member) {
+		
+		String sigPackage;
+		if (signature instanceof FujiClassSignature)
+			sigPackage = ((FujiClassSignature) signature).getPackage();
+		else
+			sigPackage = signature.getParent().getPackage();
+			
+		String package0 = getPackageDeclaration(member.getCompilationUnit());
+		
+		return sigPackage.equals(package0);
+	}
+
+	public static String getPackageDeclaration(final ICompilationUnit unit) {
+		IPackageDeclaration[] packageDeclarations = null;
+		try {
+			packageDeclarations = unit.getPackageDeclarations();
+		} catch (JavaModelException e) {
+			//TODO: 
+			e.printStackTrace();
+		}
+		
+		String package0 = "";
+		if ((packageDeclarations != null) && (packageDeclarations.length > 0))
+			package0 = packageDeclarations[0].getElementName();
+		return package0;
+	}
+	
+	public static boolean hasSameName(final AbstractSignature signature, final IMember member) {
+		return hasSameName(signature, member.getElementName());
+	}
+	
+	public static boolean hasSameName(final AbstractSignature signature, final String name) {
+		return signature.getName().equals(name);
+	}
+
 }

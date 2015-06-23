@@ -20,12 +20,12 @@ import org.eclipse.swt.widgets.Text;
 public class RenameRefactoringWizardPage extends UserInputWizardPage {
 	
 	private static final String PAGE_NAME = "RefactoringInputPage";	
-	private final RenameMethodRefactoring refactoring;
+	private final RenameRefactoring refactoring;
 	private Text newNameField;
 	
 	public RenameRefactoringWizardPage(RenameRefactoringWizard wizard) {
 		super(PAGE_NAME);
-		refactoring = (RenameMethodRefactoring) wizard.getRefactoring();
+		refactoring = (RenameRefactoring) wizard.getRefactoring();
 	}
 	
 	@Override
@@ -56,14 +56,10 @@ public class RenameRefactoringWizardPage extends UserInputWizardPage {
 	}
 	
 	protected final void validatePage() {
-		refactoring.setNewName(newNameField.getText());
 		RefactoringStatus status;
-		try {
-			status = refactoring.checkInitialConditions(new NullProgressMonitor());
-			setPageComplete(status);
-		} catch (OperationCanceledException | CoreException e) {
-			e.printStackTrace();
-		}
+		status = refactoring.checkNewElementName(newNameField.getText());
+		refactoring.setNewName(newNameField.getText());
+		setPageComplete(status);
 	}
 	
 }

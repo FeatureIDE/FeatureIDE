@@ -21,19 +21,32 @@
 package de.ovgu.featureide.featurehouse.refactoring;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.ISourceRange;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.ClassInstanceCreation;
+import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.ConstructorInvocation;
+import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.QualifiedName;
+import org.eclipse.jdt.core.dom.SimpleName;
+import org.eclipse.jdt.core.dom.SimpleType;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
+import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclaration;
+import org.eclipse.jdt.ui.refactoring.RenameSupport;
 
 import de.ovgu.featureide.core.signature.base.AbstractMethodSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
+import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
 
 
 /**
@@ -41,9 +54,7 @@ import de.ovgu.featureide.core.signature.base.AbstractSignature;
  * 
  * @author steffen
  */
-public class MethodVisitor extends AbstractASTVisitor<AbstractMethodSignature> {
-
-	private boolean checkChildren = false;
+public class MethodVisitor extends AbstractASTVisitor {
 
 	public MethodVisitor(final ICompilationUnit unit, final RefactoringSignature refactoringSignature) {
 		super(unit, refactoringSignature);
@@ -53,20 +64,10 @@ public class MethodVisitor extends AbstractASTVisitor<AbstractMethodSignature> {
 	public boolean visit(MethodDeclaration node) {
 
 		if (refactoringSignature.isRenameDeclaration() && isSameSignature((AbstractMethodSignature) refactoringSignature.getDeclaration(), node)) {
-			addSearchMatch(node.getName());
+			addSearchMatch(getSimpleName(node.getName()));
 			checkChildren = false;
 		} else {
-			boolean foundInvokedSignature = false;
-			for (AbstractSignature aSignature : refactoringSignature.getInvocations()) {
-				if (!(aSignature instanceof AbstractMethodSignature))
-					continue;
-
-				if (isSameSignature((AbstractMethodSignature) aSignature, node)) {
-					foundInvokedSignature = true;
-					break;
-				}
-			}
-			checkChildren = foundInvokedSignature;
+			checkChildren = checkMethodBody(node);
 		}
 
 		return checkChildren;
@@ -76,20 +77,23 @@ public class MethodVisitor extends AbstractASTVisitor<AbstractMethodSignature> {
 	public boolean visit(MethodInvocation node) {
 
 		if (isSameSignature((AbstractMethodSignature) refactoringSignature.getDeclaration(), node)) {
-			addSearchMatch(node.getName());
+			addSearchMatch(getSimpleName(node.getName()));
 		}
 		return false;
 	}
 
 	@Override
-	protected <Q extends ASTNode> boolean isSameSignature(AbstractMethodSignature sig1, Q sig2) {
+	protected boolean isSameSignature(AbstractSignature sig1, ASTNode sig2) {
 
+		if (!(sig1 instanceof FujiMethodSignature)) return false;
+		final FujiMethodSignature method = (FujiMethodSignature) sig1;
+		
 		if (sig2 instanceof MethodDeclaration) {
-			MethodDeclaration node = (MethodDeclaration) sig2;
-			return (hasSameName(node.getName().getFullyQualifiedName(), sig1.getName()) && hasSameParameters(getNodeParameters(node), sig1.getParameterTypes()));
+			final MethodDeclaration node = (MethodDeclaration) sig2;
+			return (hasSameName(sig1, node.getName()) && hasSameParameters(getNodeParameters(node), method.getParameterTypes()));
 		} else if (sig2 instanceof MethodInvocation) {
-			MethodInvocation node = (MethodInvocation) sig2;
-			return (hasSameName(node.getName().getFullyQualifiedName(), sig1.getName()) && hasSameParameters(getNodeParameters(node), sig1.getParameterTypes()));
+			final MethodInvocation node = (MethodInvocation) sig2;
+			return (hasSameName(sig1, node.getName()) && hasSameParameters(getNodeParameters(node), method.getParameterTypes()));
 		}
 		return false;
 	}
@@ -101,9 +105,17 @@ public class MethodVisitor extends AbstractASTVisitor<AbstractMethodSignature> {
 	private List<String> getNodeParameters(MethodInvocation node) {
 		List<String> parameters = new ArrayList<String>();
 		IMethodBinding methodBinding = node.resolveMethodBinding();
-		for (ITypeBinding type : methodBinding.getParameterTypes()) {
+		if (methodBinding == null) {
+			for (Iterator it = node.arguments().iterator(); it.hasNext();) {
+				Expression e = (Expression) it.next();
+				parameters.add(e.resolveTypeBinding().getErasure().getName());
+			}
+		} else {
 
-			parameters.add(type.getErasure().getName());
+			for (ITypeBinding type : methodBinding.getParameterTypes()) {
+
+				parameters.add(type.getErasure().getName());
+			}
 		}
 		return parameters;
 	}
