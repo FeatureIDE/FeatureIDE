@@ -359,9 +359,10 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 	private void createAnnotations() {
 		AnnotationModelEvent event = new AnnotationModelEvent(this);
 		
-		Iterator<FSTDirective> it = validDirectiveList.iterator();
-		while (it.hasNext()) {
-			FSTDirective directive = it.next();
+		for (FSTDirective directive : validDirectiveList) {
+			if (directive == null) {
+				continue;
+			}
 			try {
 				int startline = directive.getStartLine();
 				int endline = getLastChildLine(directive, directive.getEndLine());
@@ -383,14 +384,14 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 						
 						if (hasChildAtLine(directive, line)) {
 							length = 1;
-							
-							if (overViewStartOffset != -1) {
-								Position overViewPos = new Position(overViewStartOffset, overViewLength);
-								createOverViewRuler(event, directive, color, overViewPos);
-								overViewStartOffset = -1;
-								overViewLength = 0;
-							}
-						} else {
+						}	
+						
+						if (overViewStartOffset != -1 && hasChildAtLineWithColor(directive, line)) {
+							Position overViewPos = new Position(overViewStartOffset, overViewLength);
+							createOverViewRuler(event, directive, color, overViewPos);
+							overViewStartOffset = -1;
+							overViewLength = 0;
+						} else if (!hasChildAtLineWithColor(directive, line)){
 							if (overViewStartOffset == -1) {
 								overViewStartOffset = document.getLineOffset(line);
 							}
@@ -461,20 +462,34 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 	}
 
 	/**
+	 * Returns whether the given annotation has a child <b>with a color</b> at the given line. 
+	 * @param directive The directive
+	 * @param line The line
+	 * @return <code>true</code> if there is a child at the line
+	 */
+	private boolean hasChildAtLineWithColor(FSTDirective directive, int line) {
+		return hasChildAtLine(directive, line, true);
+	}
+	
+	/**
 	 * Returns whether the given annotation has a child at the given line. 
 	 * @param directive The directive
 	 * @param line The line
 	 * @return <code>true</code> if there is a child at the line
 	 */
 	private boolean hasChildAtLine(FSTDirective directive, int line) {
+		return hasChildAtLine(directive, line, false);
+	}
+		
+	private boolean hasChildAtLine(FSTDirective directive, int line, boolean hasValidColor) {
 		for (FSTDirective child : directive.getChildren()) {
 			int start = child.getStartLine();
 			int end = child.getEndLine();
 			
-			if (line >= start && line <= end) {
+			if (line >= start && line <= end && (!hasValidColor || ColorList.isValidColor(child.getColor()))) {
 				return true;
 			}
-			if (hasChildAtLine(child, line)) {
+			if (hasChildAtLine(child, line, hasValidColor)) {
 				return true;
 			}
 			
