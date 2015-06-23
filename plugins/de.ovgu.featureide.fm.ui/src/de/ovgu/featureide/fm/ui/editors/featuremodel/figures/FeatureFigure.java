@@ -210,11 +210,17 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 			toolTip.append("\n\nConstraints:\n");
 			toolTip.append(contraints);
 		}
+		
+		
 		Figure toolTipContent = new Figure();
 		toolTipContent.setLayoutManager(gl);
-		toolTipContent.setFont(DEFAULT_FONT);
-		toolTipContent.add(new Label(toolTip.toString()));
-
+		Label featureName = new Label(feature.getName());
+		featureName.setFont(DEFAULT_FONT_BOLD);
+		Label furtherInfos = new Label(toolTip.toString());
+		furtherInfos.setFont(DEFAULT_FONT);
+		toolTipContent.add(featureName);
+		toolTipContent.add(furtherInfos);
+		
 		// call of the FeatureDiagramExtensions
 		for (FeatureDiagramExtension extension : FeatureDiagramExtension.getExtensions()) {
 			toolTipContent = extension.extendFeatureFigureToolTip(toolTipContent, this);

@@ -577,23 +577,9 @@ public class ConstraintDialog implements GUIDefaults {
 	 * @param constraint
 	 */
 	private void closeShell() {
-		NodeReader nodeReader = new NodeReader();
-		String input = constraintText.getText().trim();
-
-		if (input.length() == 0) {
-			printHeaderError(StringTable.CONSTRAINT_IS_EMPTY);
-			return;
-		}
-
-		Node propNode = nodeReader.stringToNode(input, featureModel.getFeatureNames());
-
-		if (propNode == null) {
-			printHeaderError(nodeReader.getErrorMessage());
-			return;
-		}
-		if (!ConstraintTextValidator.isSatisfiable(input, VALIDATION_TIME_OUT)) {
-			printHeaderWarning(StringTable.CONSTRAINT_IS_NOT_SATISFIABLE);
-		}
+		final NodeReader nodeReader = new NodeReader();
+		final String input = constraintText.getText().trim();
+		final Node propNode = nodeReader.stringToNode(input, featureModel.getFeatureNames());
 
 		AbstractOperation op = null;
 		if (constraint != null && featureModel.getConstraints().contains(constraint)) {

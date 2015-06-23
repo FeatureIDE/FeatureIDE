@@ -299,9 +299,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 		
 		for (int i = 0; i < index; i++) {
 			FSTDirective dir = directiveMap.get(i);
-			if (dir != null && ColorList.isValidColor(dir.getColor())) {
-				validDirectiveList.add(dir);
-			}
+			validDirectiveList.add(dir);
 		}
 	}
 	
@@ -361,76 +359,86 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 	private void createAnnotations() {
 		AnnotationModelEvent event = new AnnotationModelEvent(this);
 		
-		Iterator<FSTDirective> it = validDirectiveList.descendingIterator();
-		while (it.hasNext()) {
-			FSTDirective dir = it.next();
+		for (FSTDirective directive : validDirectiveList) {
+			if (directive == null) {
+				continue;
+			}
 			try {
-				int startline = dir.getStartLine();
-				int endline = dir.getEndLine();
-				for (int i = startline; i <= endline; i++) {
-					if (i < endline || dir.getEndLength() > 0) {
-						int lineLength = document.getLineLength(i);
-						int lineOffset = document.getLineOffset(i);
+				int startline = directive.getStartLine();
+				int endline = getLastChildLine(directive, directive.getEndLine());
+				final int color = directive.getColor();
+				int overViewStartOffset = document.getLineOffset(startline);
+				int overViewLength = 0;
+				for (int line = startline; line <= endline; line++) {
+					if (line < endline || directive.getEndLength() > 0) {
+						int length = document.getLineLength(line);
+						int lineOffset = document.getLineOffset(line);
 						
-						if (i == endline) {
-							lineLength = dir.getEndLength();
+						if (line == directive.getEndLine()) {
+							length = directive.getEndLength();
 						}
-						if (i == startline) {
-							lineOffset += dir.getStartOffset();
-							lineLength -= dir.getStartOffset();
+						if (line == startline) {
+							lineOffset += directive.getStartOffset();
+							length -= directive.getStartOffset();
 						}
 						
-						Position newPos = new Position(lineOffset, lineLength);
+						if (hasChildAtLine(directive, line)) {
+							length = 1;
+						}	
 						
-						if (!annotatedPositions.containsKey(i)) {
-							if(!ColorList.isValidColor(dir.getColor()))break;
-							ColorAnnotation ca = new ColorAnnotation(dir.getColor(), 
-									new Position(lineOffset, lineLength), ColorAnnotation.TYPE_IMAGE);
+						if (overViewStartOffset != -1 && hasChildAtLineWithColor(directive, line)) {
+							Position overViewPos = new Position(overViewStartOffset, overViewLength);
+							createOverViewRuler(event, directive, color, overViewPos);
+							overViewStartOffset = -1;
+							overViewLength = 0;
+						} else if (!hasChildAtLineWithColor(directive, line)){
+							if (overViewStartOffset == -1) {
+								overViewStartOffset = document.getLineOffset(line);
+							}
+							overViewLength += document.getLineLength(line);
+						}
+							
+						FSTDirective parent = directive.getParent();
+						while (parent != null) {
+							lineOffset++;
+							if (length > 1) {
+								length--;
+							}
+							parent = parent.getParent();
+						}
+						Position newPos = new Position(lineOffset, length);
+						
+						
+						if (!hasChildAtLine(directive, line)) {
+							// bar at the left of the editor
+							ColorAnnotation ca = new ColorAnnotation(color, 
+									newPos, ColorAnnotation.TYPE_IMAGE);
+							ca.setText(directive.toString());
 							annotations.add(ca);
 							event.annotationAdded(ca);
+						}
+						if(!ColorList.isValidColor(color)) {
+							continue;
+						}
+						if (!hasChildAtLine(directive, line)) {
+							// bar at the right of the editor
 							
-							if (highlighting) {
-								ca = new ColorAnnotation(dir.getColor(), newPos, 
-										i == startline ? ColorAnnotation.TYPE_HIGHLIGHT_OVERVIEW : ColorAnnotation.TYPE_HIGHLIGHT);
-								annotations.add(ca);
-								event.annotationAdded(ca);
-							} else if (i == startline) {
-								ca = new ColorAnnotation(dir.getColor(), newPos, ColorAnnotation.TYPE_OVERVIEW);
-								annotations.add(ca);
-								event.annotationAdded(ca);
-							}
-							
-							annotatedPositions.put(i, newPos);
-						} else if (highlighting) {
-							Position oldPos = annotatedPositions.get(i);
-							int oldOffset = oldPos.getOffset();
-							int oldLength = oldPos.getLength();
-							int wholeOffset = oldOffset;
-							int wholeLength = oldLength;
-							
-							if (oldOffset > lineOffset) {
-								ColorAnnotation ca = new ColorAnnotation(dir.getColor(), 
-										new Position(lineOffset, oldOffset-lineOffset), ColorAnnotation.TYPE_HIGHLIGHT);
-								annotations.add(ca);
-								event.annotationAdded(ca);
-								wholeOffset = lineOffset; 
-								wholeLength += oldOffset-lineOffset;
-							}
-							int newOffset = oldOffset + oldLength;
-							int newLength = lineLength - (newOffset - lineOffset);
-							if (newLength > 0) {
-								newPos.setOffset(newOffset);
-								newPos.setLength(newLength);
-								
-								ColorAnnotation ca = new ColorAnnotation(dir.getColor(), newPos, ColorAnnotation.TYPE_HIGHLIGHT);
-								annotations.add(ca);
-								event.annotationAdded(ca);
-								
-								wholeLength += newLength;
-							}
-							annotatedPositions.put(i, new Position(wholeOffset, wholeLength));
+						}
+						if (highlighting) {
+							// background colors
+							ColorAnnotation ca = new ColorAnnotation(color, newPos, ColorAnnotation.TYPE_HIGHLIGHT);
+							ca.setText(directive.toDependencyString());
+							annotations.add(ca);
+							event.annotationAdded(ca);
 						}
 					}
+					
+				}
+				if (overViewStartOffset != -1) {
+					Position overViewPos = new Position(overViewStartOffset, overViewLength);
+					createOverViewRuler(event, directive, color, overViewPos);
+					overViewStartOffset = -1;
+					overViewLength = 0;
 				}
 			} catch (BadLocationException e) {
 				UIPlugin.getDefault().logError(e);
@@ -439,7 +447,70 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 		
 		fireModelChanged(event);
 	}
+
+	/**
+	 * Creates a new overview ruler annotation.
+	 * 
+	 */
+	private void createOverViewRuler(AnnotationModelEvent event, FSTDirective directive, final int color, Position newPos) {
+		if (ColorList.isValidColor(color)) {
+			ColorAnnotation ca = new ColorAnnotation(color, newPos, ColorAnnotation.TYPE_OVERVIEW);
+			ca.setText(directive.toString());
+			annotations.add(ca);
+			event.annotationAdded(ca);
+		}
+	}
+
+	/**
+	 * Returns whether the given annotation has a child <b>with a color</b> at the given line. 
+	 * @param directive The directive
+	 * @param line The line
+	 * @return <code>true</code> if there is a child at the line
+	 */
+	private boolean hasChildAtLineWithColor(FSTDirective directive, int line) {
+		return hasChildAtLine(directive, line, true);
+	}
 	
+	/**
+	 * Returns whether the given annotation has a child at the given line. 
+	 * @param directive The directive
+	 * @param line The line
+	 * @return <code>true</code> if there is a child at the line
+	 */
+	private boolean hasChildAtLine(FSTDirective directive, int line) {
+		return hasChildAtLine(directive, line, false);
+	}
+		
+	private boolean hasChildAtLine(FSTDirective directive, int line, boolean hasValidColor) {
+		for (FSTDirective child : directive.getChildren()) {
+			int start = child.getStartLine();
+			int end = child.getEndLine();
+			
+			if (line >= start && line <= end && (!hasValidColor || ColorList.isValidColor(child.getColor()))) {
+				return true;
+			}
+			if (hasChildAtLine(child, line, hasValidColor)) {
+				return true;
+			}
+			
+		}
+		return false;
+	}
+
+	private int getLastChildLine(FSTDirective directive, int lastLine) {
+		for (FSTDirective child : directive.getChildren()) {
+			int childEnd = child.getEndLine();
+			if (child.getEndLength() > 0) {
+				childEnd++;
+			}
+			if (childEnd > lastLine) {
+				lastLine = childEnd;
+			}
+			lastLine = getLastChildLine(child, lastLine);
+		}
+		return lastLine;
+	}
+
 	private void fireModelChanged(AnnotationModelEvent event) {
 		event.markSealed();
 		if (!event.isEmpty()) {

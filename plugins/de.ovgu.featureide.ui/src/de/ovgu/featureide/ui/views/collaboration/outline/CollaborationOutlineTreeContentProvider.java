@@ -113,7 +113,12 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 				invariants.addAll(role.getClassFragment().getInvariants());
 				methods.addAll(role.getMethods());
 				fields.addAll(role.getFields());
-				directives.addAll(role.getDirectives());
+				TreeSet<FSTDirective> roleDirectives = role.getDirectives();
+				for (FSTDirective directive : roleDirectives) {
+					if (directive.getParent() == null) {
+						directives.add(directive);
+					}
+				}
 				innerClasses.addAll(role.getInnerClasses());
 			}
 
@@ -188,7 +193,6 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 			return filter(roleList.toArray());
 		} else if (parentElement instanceof FSTDirective) {
 			FSTDirective[] directiveArray = ((FSTDirective) parentElement).getChildren().clone();
-			Arrays.sort(directiveArray);
 			return filter(directiveArray);
 		} else if (parentElement instanceof FSTClassFragment) {
 			final TreeSet<FSTMethod> methods = new TreeSet<FSTMethod>();

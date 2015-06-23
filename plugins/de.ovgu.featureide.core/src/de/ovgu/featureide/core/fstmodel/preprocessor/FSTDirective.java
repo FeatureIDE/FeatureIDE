@@ -139,7 +139,11 @@ public class FSTDirective extends RoleElement<FSTDirective> {
 		if (children.size() > 0) {
 			for(FSTDirective child : children) {
 				ret.append("\n");
-				ret.append(child.toString(i + 1));
+				if (child.toString().startsWith("el")) {
+					ret.append(child.toString(i));
+				} else {
+					ret.append(child.toString(i + 1));
+				}
 			}
 		}
 		return ret.toString();
