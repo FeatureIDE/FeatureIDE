@@ -66,7 +66,7 @@ public class QuickFixFalseOptionalFeaturesTest {
 
 	}
 
-	@Parameters(name = "{0}")
+	@Parameters
 	public static Collection<Object[]> getModels()
 			throws FileNotFoundException, UnsupportedModelException {
 		//first tries the location on build server, if this fails tries to use local location
