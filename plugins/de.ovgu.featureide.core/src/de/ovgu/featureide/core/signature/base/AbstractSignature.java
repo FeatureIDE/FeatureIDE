@@ -57,6 +57,8 @@ public abstract class AbstractSignature implements IConstrainedObject {
 	protected AFeatureData[] featureData = null;
 	protected String mergedjavaDocComment = null;
 	
+	protected final boolean staticSignature;
+	
 	protected AbstractSignature(AbstractClassSignature parent, String name, String modifierString, String type) {
 		this.parent = parent;
 		this.name = name;
@@ -82,7 +84,10 @@ public abstract class AbstractSignature implements IConstrainedObject {
 			this.visibility = VISIBILITY_DEFAULT;
 		}
 		
+		this.staticSignature = (Arrays.binarySearch(this.modifiers, "static") >= 0);
+		
 		this.finalSignature = Arrays.binarySearch(this.modifiers, "final") >= 0;
+		
 		if (type == null) {
 			this.type = "void";
 		} else {
@@ -148,6 +153,13 @@ public abstract class AbstractSignature implements IConstrainedObject {
 	
 	public boolean isFinal() {
 		return finalSignature;
+	}
+
+	/**
+	 * @return the isStatic
+	 */
+	public boolean isStatic() {
+		return staticSignature;
 	}
 
 	public void setMergedjavaDocComment(String mergedjavaDocComment) {

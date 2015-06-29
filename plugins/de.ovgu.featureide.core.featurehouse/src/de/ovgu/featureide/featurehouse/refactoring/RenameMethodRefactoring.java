@@ -20,24 +20,16 @@
  */
 package de.ovgu.featureide.featurehouse.refactoring;
 
-import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.core.runtime.SubProgressMonitor;
-import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.jdt.internal.corext.refactoring.Checks;
@@ -45,22 +37,16 @@ import org.eclipse.jdt.internal.corext.refactoring.RefactoringCoreMessages;
 import org.eclipse.jdt.internal.corext.refactoring.base.JavaStatusContext;
 import org.eclipse.jdt.internal.corext.refactoring.rename.MethodChecks;
 import org.eclipse.jdt.internal.corext.util.JavaConventionsUtil;
-import org.eclipse.jdt.internal.corext.util.JdtFlags;
 import org.eclipse.jdt.internal.corext.util.Messages;
 import org.eclipse.jdt.internal.ui.viewsupport.BasicElementLabels;
 import org.eclipse.jdt.ui.JavaElementLabels;
-import org.eclipse.jdt.ui.refactoring.RenameSupport;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
-import org.eclipse.ltk.core.refactoring.RefactoringStatusContext;
-import org.eclipse.ltk.core.refactoring.participants.RenameProcessor;
 
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.signature.ProjectSignatures.SignatureIterator;
-import de.ovgu.featureide.core.signature.base.AFeatureData;
 import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
-import de.ovgu.featureide.core.signature.base.AbstractMethodSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
-import de.ovgu.featureide.core.signature.base.FOPFeatureData;
+import de.ovgu.featureide.featurehouse.refactoring.matcher.MethodSignatureMatcher;
+import de.ovgu.featureide.featurehouse.refactoring.matcher.SignatureMatcher;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
 
 /**
@@ -69,7 +55,7 @@ import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
  * @author Steffen Schulze
  */
 @SuppressWarnings("restriction")
-public class RenameMethodRefactoring extends RenameRefactoring<IMethod, AbstractMethodSignature> {
+public class RenameMethodRefactoring extends RenameRefactoring<IMethod> {
 
 	public RenameMethodRefactoring(IMethod selection, IFeatureProject featureProject) {
 		super(selection, featureProject);
@@ -88,149 +74,90 @@ public class RenameMethodRefactoring extends RenameRefactoring<IMethod, Abstract
 	}
 
 	@Override
-	protected void checkPreConditions(final Set<AbstractSignature> newMatchedSignatures, final Set<AbstractSignature> oldMatchedSignatures, final AbstractSignature selectedSignature, final RefactoringStatus refactoringStatus) throws JavaModelException,
+	protected void checkPreConditions(final SignatureMatcher matcher, final RefactoringStatus refactoringStatus) throws JavaModelException,
 			CoreException {
-//
-//		final IFile file = (IFile) renamingElement.getCompilationUnit().getResource();
-//		final IType declaring = renamingElement.getDeclaringType();
-//		final String className = renamingElement.getCompilationUnit().getElementName().replaceAll(".java", "");
-//
-//		final boolean isPrivate = Flags.isPrivate(renamingElement.getFlags());
-//		
-//		
-////		filterMatchedSignatures(selectedSignature, matchedSignatures);
-//
-//		if (declaring.isInterface() && isSpecialCase()) {
-//			refactoringStatus.addError(RefactoringCoreMessages.RenameMethodInInterfaceRefactoring_special_case);
-//		} 
-//		
-//
-//		
-//		Set<AbstractClassSignature> subClasses = new HashSet<>();
-//		addSubClasses2(subClasses, selectedSignature.getParent());
-////		filterMatchedSignatures(subClasses, newMatchedSignatures);
-//		
-//			
-////			for (AbstractSignature newMatchedSignature : newMatchedSignatures) {
-////				if (!hasSameType(newMatchedSignature)) continue;
-////				
-////				final FujiMethodSignature methodSignature = (FujiMethodSignature) newMatchedSignature;
-////				
-////				final FOPFeatureData[] invokedFeatureData = (FOPFeatureData[]) methodSignature.getFeatureData();
-////				for (int i = 0; i < invokedFeatureData.length; i++) {
-////					final FOPFeatureData fopFeature = invokedFeatureData[i];
-////
-////					String fileName = fopFeature.getFile().getFullPath().toString();
-////					if (fileName.startsWith("/"))
-////						fileName = fileName.substring(1);
-////					
-////					///RefactoringStatusContext context= JavaStatusContext.create(getCompilationUnit(fopFeature.getFile(),);
-////					if (hasSameParameters(methodSignature)) {
-////						if (fopFeature.getFile().equals(file)) {
-////							String message = Messages.format(RefactoringCoreMessages.RenameMethodRefactoring_same_name2, new String[] {
-////									BasicElementLabels.getJavaElementName(newName), fileName});
-////							refactoringStatus.addError(message);
-////
-////						} else if (hasSameName(className, methodSignature.getParent().getName())) {
-////							String message = Messages.format(RefactoringCoreMessages.RenamePrivateMethodRefactoring_hierarchy_defines, new String[] { fileName,
-////									BasicElementLabels.getJavaElementName(newName) });
-////							refactoringStatus.addWarning(message);
-////						}
-////					} 
-//////						else if (hasSameName(className, methodSignature.getParent().getName())) {
-//////						String message = Messages.format(RefactoringCoreMessages.RenamePrivateMethodRefactoring_hierarchy_defines2, new String[] {
-//////								BasicElementLabels.getJavaElementName(declaring.getFullyQualifiedName('.')), BasicElementLabels.getJavaElementName(newName) });
-//////						refactoringStatus.addWarning(message);
-//////					}
-////			}
-////
-////			
-////		}
-//
-//		
-//		
-////		for (AbstractSignature oldMatchedSignature : oldMatchedSignatures) {
-//			if (!hasSameType(selectedSignature)) return;
-//			
-//			final FujiMethodSignature methodSignature = (FujiMethodSignature) selectedSignature;
-//			
-////			final FOPFeatureData[] invokedFeatureData = (FOPFeatureData[]) methodSignature.getFeatureData();
-////			for (int i = 0; i < invokedFeatureData.length; i++) {
-////				final FOPFeatureData fopFeature = invokedFeatureData[i];
-////
-////				String fileName = fopFeature.getFile().getFullPath().toString();
-////				if (fileName.startsWith("/"))
-////					fileName = fileName.substring(1);
-//				
-//				
-//				for (AbstractSignature newMatchedSignature : newMatchedSignatures) {
-//					if (!hasSameType(newMatchedSignature)) continue;
-//					
-//					final FujiMethodSignature newMethodSignature = (FujiMethodSignature) newMatchedSignature;
-//					
-//					if (!hasSameClass(newMethodSignature)) continue;
-//					
-//					final FOPFeatureData[] newInvokedFeatureData = (FOPFeatureData[]) newMethodSignature.getFeatureData();
-//					for (int j = 0; j < newInvokedFeatureData.length; j++) {
-//						final FOPFeatureData newFopFeature = newInvokedFeatureData[j];
-//
-//						String newFileName = newFopFeature.getFile().getFullPath().toString();
-//						if (newFileName.startsWith("/"))
-//							newFileName = newFileName.substring(1);
-//						
-//						if (hasSameParameters(newMethodSignature)) {
-//							if (file.equals(newFopFeature.getFile())) {
-//								String message = Messages.format(RefactoringCoreMessages.RenameMethodRefactoring_same_name2, new String[] {
-//										BasicElementLabels.getJavaElementName(newName), newFileName});
-//								refactoringStatus.addError(message);
-//
-//							} else {
-//								String message = Messages.format(RefactoringCoreMessages.RenamePrivateMethodRefactoring_hierarchy_defines, new String[] { newFileName,
-//										BasicElementLabels.getJavaElementName(newName) });
-//								refactoringStatus.addWarning(message);
-//							}
-//						}
-////							else {
-////							String message = Messages.format(RefactoringCoreMessages.RenamePrivateMethodRefactoring_hierarchy_defines2, new String[] {
-////									BasicElementLabels.getJavaElementName(declaring.getFullyQualifiedName('.')), BasicElementLabels.getJavaElementName(newName) });
-////							refactoringStatus.addWarning(message);
-////						}
-//						
-//				}
-//
-//				///RefactoringStatusContext context= JavaStatusContext.create(getCompilationUnit(fopFeature.getFile(),);
-//				
-////			}
-//		}
-//				
-//				if (!MethodChecks.isVirtual(renamingElement))
-//				{	
-//				for (AbstractClassSignature subClass : subClasses) {
-//					for (AbstractSignature newMatchedSignature : newMatchedSignatures) {
-//						if (!hasSameType(newMatchedSignature)) continue;
-//						
-//						final FujiMethodSignature newMethodSignature = (FujiMethodSignature) newMatchedSignature;
-////						if (!newMethodSignature.getParent().equals(subClass)) continue;
-//						
-//						final FOPFeatureData[] newInvokedFeatureData = (FOPFeatureData[]) newMethodSignature.getFeatureData();
-//						for (int j = 0; j < newInvokedFeatureData.length; j++) {
-//							final FOPFeatureData newFopFeature = newInvokedFeatureData[j];
-//							
-//							String newFileName = newFopFeature.getFile().getFullPath().toString();
-//							if (newFileName.startsWith("/"))
-//								newFileName = newFileName.substring(1);
-//							
-//							if (hasSameParameters(newMethodSignature) && reduceVisibility(selectedSignature, methodSignature)) {
-//								String message = Messages.format(RefactoringCoreMessages.RenamePrivateMethodRefactoring_hierarchy_defines, new String[] { newFileName,
-//										BasicElementLabels.getJavaElementName(newName) });
-//								refactoringStatus.addError(message);
-//							}
-//						}
-//						
-//					}
-//				}
-//				}
-//		}
+		
+		if (!Checks.isAvailable(renamingElement)) {
+			refactoringStatus.addFatalError(RefactoringCoreMessages.RenameMethodProcessor_is_binary, JavaStatusContext.create(renamingElement));
+			return;
+		}
+		refactoringStatus.merge(Checks.checkIfCuBroken(renamingElement));
+		if (refactoringStatus.hasFatalError())
+			return;
+//		pm.setTaskName(RefactoringCoreMessages.RenameMethodRefactoring_taskName_checkingPreconditions);
+		refactoringStatus.merge(checkNewElementName(newName));
+		if (refactoringStatus.hasFatalError())
+			return;
+
+		final IType declaring = renamingElement.getDeclaringType();
+
+		if (declaring.isInterface() && isSpecialCase()) {
+			refactoringStatus.addError(RefactoringCoreMessages.RenameMethodInInterfaceRefactoring_special_case);
+		} 
+
+//		AbstractMethodSignature topmost = matcher.findDeclaringMethod((FujiMethodSignature)matcher.getSelectedSignature());
+		
+		Set<FujiMethodSignature> result = new HashSet<>();
+		for (AbstractSignature matchedSignature : matcher.getMatchedSignatures()) {
+			
+			if (!(matchedSignature instanceof FujiMethodSignature))
+				continue;
+
+			final FujiMethodSignature methodSignature = (FujiMethodSignature) matchedSignature;
+			
+			Set<AbstractClassSignature> superclasses = new HashSet<>();
+			Set<AbstractClassSignature> subclasses = new HashSet<>();
+			((MethodSignatureMatcher) matcher).addSubClasses(subclasses, matchedSignature.getParent());
+			((MethodSignatureMatcher) matcher).addSuperClasses(superclasses, matchedSignature.getParent());
+			
+			Set<AbstractClassSignature> allClasses = new HashSet<>();
+			allClasses.addAll(subclasses);
+			allClasses.add(matchedSignature.getParent());
+			allClasses.addAll(superclasses);
+			
+			for (AbstractSignature newMatchedSignature : matcher.getMatchedSignaturesForNewName()) {
+				if (!(newMatchedSignature instanceof FujiMethodSignature))
+					continue;
+
+				final FujiMethodSignature newMethodSignature = (FujiMethodSignature) newMatchedSignature;
+				
+				final AbstractClassSignature clazz = newMethodSignature.getParent();
+				boolean found = allClasses.contains(clazz);
+				if (!found)
+					continue;
+				
+				final boolean isSubclass = subclasses.contains(clazz);
+				
+				if (isSubclass || matchedSignature.getParent().equals(clazz))
+					result.add(newMethodSignature);
+				else if (reduceVisibility(newMethodSignature, methodSignature))
+					result.add(newMethodSignature);
+			}
+		}
+		
+		for (FujiMethodSignature methodSignature : result) {
+			if (RefactoringUtil.hasSameParameters(methodSignature, renamingElement)) {
+				String message;
+				if (MethodChecks.isVirtual(renamingElement)) {
+					message = Messages.format(RefactoringCoreMessages.RenameVirtualMethodRefactoring_hierarchy_declares1,
+							new String[] { BasicElementLabels.getJavaElementName(methodSignature.getName()) });
+				} else {
+					message = Messages.format(RefactoringCoreMessages.RenamePrivateMethodRefactoring_hierarchy_defines, 
+							new String[] { methodSignature.getParent().getFullName(), BasicElementLabels.getJavaElementName(newName) });
+				}
+				refactoringStatus.addError(message);
+			} else {
+				String message;
+				if (MethodChecks.isVirtual(renamingElement)) {
+					message = Messages.format(RefactoringCoreMessages.RenameVirtualMethodRefactoring_hierarchy_declares2,
+							new String[] { BasicElementLabels.getJavaElementName(methodSignature.getName()) });
+				} else {
+					message = Messages.format(RefactoringCoreMessages.RenamePrivateMethodRefactoring_hierarchy_defines2, 
+							new String[] { methodSignature.getParent().getFullName(), BasicElementLabels.getJavaElementName(newName) });
+				}
+				refactoringStatus.addWarning(message);
+			}
+		}
 	}
 	
 	private boolean isSpecialCase() throws CoreException {
@@ -291,7 +218,7 @@ public class RenameMethodRefactoring extends RenameRefactoring<IMethod, Abstract
 		return JavaElementLabels.getElementLabel(renamingElement.getDeclaringType(), JavaElementLabels.ALL_DEFAULT);
 	}
 	
-	private boolean reduceVisibility(final AbstractSignature selectedSignature, final FujiMethodSignature methodSignature) {
+	private boolean reduceVisibility(final FujiMethodSignature selectedSignature, final FujiMethodSignature methodSignature) {
 		if (selectedSignature.isDefault() && (methodSignature.isPrivate()))
 			return true;
 		if (selectedSignature.isProtected() && (methodSignature.isPrivate() || methodSignature.isDefault()))
@@ -300,28 +227,4 @@ public class RenameMethodRefactoring extends RenameRefactoring<IMethod, Abstract
 			return true;
 		return false;
 	}
-
-	protected void addSubClasses2(final Set<AbstractClassSignature> result, final AbstractClassSignature classSignature) {
-		if (classSignature == null)
-			return;
-
-		addSubClassesForNames2(result, classSignature.getSubClassesList());
-	}
-
-	protected void addSubClassesForNames2(final Set<AbstractClassSignature> result, final Set<String> names) {
-		for (String className : names) {
-			if (!classes.containsKey(className))
-				continue;
-
-			final AbstractClassSignature classSignature = classes.get(className);
-			if (classSignature == null)
-				return;
-
-			if (!result.contains(classSignature)) {
-				result.add(classSignature);
-				addSubClasses2(result, classSignature);
-			}
-		}
-	}
-
 }

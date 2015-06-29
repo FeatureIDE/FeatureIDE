@@ -31,9 +31,7 @@ import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.core.signature.ProjectSignatures.SignatureIterator;
 import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
-import de.ovgu.featureide.featurehouse.refactoring.RefactoringSignature;
 import de.ovgu.featureide.featurehouse.refactoring.RefactoringUtil;
-import de.ovgu.featureide.featurehouse.signature.fuji.FujiClassSignature;
 
 
 /**
@@ -48,8 +46,8 @@ public abstract class SignatureMatcher {
 	protected final IMember selectedElement;
 	protected AbstractSignature selectedSignature;
 	private final String newName;
-	private Set<AbstractSignature> newMatchedSignatures;
-	protected Set<AbstractSignature> oldMatchedSignatures;
+	private Set<AbstractSignature> newNameMatchedSignatures;
+	private Set<AbstractSignature> matchedSignatures;
 	protected Map<String, AbstractClassSignature> classes = new HashMap<>();
 	
 	protected Set<AbstractSignature> subClasses = new HashSet<>();
@@ -65,29 +63,19 @@ public abstract class SignatureMatcher {
 	
 	public void findMatchedSignatures(){
 		classes = getClasses();
-		oldMatchedSignatures = getNamedMatchedSignatures(selectedElement.getElementName());
-		newMatchedSignatures = getNamedMatchedSignatures(newName); 
+		matchedSignatures = getNamedMatchedSignatures(selectedElement.getElementName());
+		newNameMatchedSignatures = getNamedMatchedSignatures(newName); 
 		selectedSignature = selectSignature();
-		
-		final Set<AbstractClassSignature> involvedClasses = new HashSet<>();
-		
-		if (selectedSignature instanceof FujiClassSignature) {
-			involvedClasses.add((FujiClassSignature) selectedSignature);
-		}
-		else {
-			involvedClasses.add(selectedSignature.getParent());
-		}
-		
-		addInvolvedClasses(involvedClasses);
+		matchedSignatures = determineMatchedSignatures();
 	}
 	
-	protected abstract void addInvolvedClasses(final Set<AbstractClassSignature> involvedClasses);
+	protected abstract Set<AbstractSignature> determineMatchedSignatures();
 	
 	private AbstractSignature selectSignature() {
-		if (oldMatchedSignatures.size() == 1) {
-			return oldMatchedSignatures.iterator().next();
+		if (matchedSignatures.size() == 1) {
+			return matchedSignatures.iterator().next();
 		} else {
-			for (AbstractSignature matchedSignature : oldMatchedSignatures) {
+			for (AbstractSignature matchedSignature : matchedSignatures) {
 				if (checkSignature(matchedSignature) && RefactoringUtil.hasSameClass(matchedSignature, selectedElement))
 					return matchedSignature;
 			}
@@ -95,9 +83,7 @@ public abstract class SignatureMatcher {
 		return null;
 	}
 	
-	
-	
-	private Map<String, AbstractClassSignature> getClasses() {
+	public Map<String, AbstractClassSignature> getClasses() {
 		final Map<String, AbstractClassSignature> classes = new HashMap<>();
 
 		final SignatureIterator iter = signatures.iterator();
@@ -110,8 +96,7 @@ public abstract class SignatureMatcher {
 		return classes;
 	}
 	
-	
-	private Set<AbstractSignature> getNamedMatchedSignatures(final String name) {
+	protected Set<AbstractSignature> getNamedMatchedSignatures(final String name) {
 		Set<AbstractSignature> matched = new HashSet<>();
 		final SignatureIterator iter = signatures.iterator();
 		while (iter.hasNext()) {
@@ -124,15 +109,212 @@ public abstract class SignatureMatcher {
 		return matched;
 	}
 	
-	
 	protected abstract boolean hasSameType(AbstractSignature signature);
 	protected abstract boolean checkSignature(AbstractSignature signature);
 	
-	public abstract Set<AbstractSignature> getMatchedSignatures();
+	public Set<AbstractSignature> getMatchedSignatures() {
+		return matchedSignatures;
+	}
 	
 	public AbstractSignature getSelectedSignature()
 	{
 		return selectedSignature;
 	}
-
+	
+	public Set<AbstractSignature> getMatchedSignaturesForNewName()
+	{
+		return newNameMatchedSignatures;
+	}
+	
+//	public AbstractMethodSignature findDeclaringMethod(AbstractMethodSignature overriding) throws JavaModelException {
+//		AbstractMethodSignature result= null;
+//		AbstractMethodSignature overridden= findOverriddenMethod(overriding);
+//		while (overridden != null) {
+//			result= overridden;
+//			overridden= findOverriddenMethod(result);
+//		}
+//		return result;
+//	}
+//	
+//	/**
+//	 * Finds the method that is overridden by the given method.
+//	 * First the super class is examined and then the implemented interfaces.
+//	 * @param overriding the overriding method
+//	 * @return a method that is directly overridden by the given method, or <code>null</code>
+//	 */
+//	public AbstractMethodSignature findOverriddenMethod(AbstractMethodSignature overriding) {
+//		if (overriding.isPrivate() || overriding.isStatic() || overriding.isConstructor()) {
+//			return null;
+//		}
+//
+//		AbstractClassSignature type = overriding.getParent();
+//		AbstractClassSignature superClass = getSuperclass(type);
+//		if (superClass != null) {
+//			AbstractMethodSignature res= findOverriddenMethodInHierarchy(superClass, overriding);
+//			if (res != null) {
+//				if (isVisibleInHierarchy(res, type.getPackage())) {
+//					return res;
+//				}
+//			}
+//		}
+//		Set<AbstractClassSignature> interfaces = getSuperInterfaces(type);
+//		for (AbstractClassSignature classInterface : interfaces) {
+//			AbstractMethodSignature res= findOverriddenMethodInHierarchy(classInterface, overriding);
+//			if (res != null) {
+//				return res; // methods from interfaces are always public and therefore visible
+//			}
+//		}
+//		return null;
+//	}
+//
+//	private boolean isVisibleInHierarchy(final AbstractMethodSignature res, final String pack) {
+//
+//		final AbstractClassSignature parent = res.getParent();
+//		if (parent == null) return false;
+//
+//		if (parent.isPublic() || parent.isProtected() || parent.getType().equals(ExtendedFujiSignaturesJob.TYPE_INTERFACE)) {
+//			return true;
+//		} else if (parent.isPrivate()) {
+//			return false;
+//		}
+//
+//		return (pack != null && pack.equals(parent.getPackage()));
+//	}
+//
+//	private Set<AbstractClassSignature> getSuperInterfaces(AbstractClassSignature type) {
+//		final Set<AbstractClassSignature> result = new HashSet<>();
+//		final Set<String> implementList = type.getImplementList();
+//		for (String implement : implementList) {
+//			if (classes.containsKey(implement)) {
+//				result.add(classes.get(implement));
+//			}
+//		}
+//		return result;
+//	}
+//
+//	private AbstractClassSignature getSuperclass(final AbstractClassSignature type) {
+//		final HashSet<String> extendList = type.getExtendList();
+//		if (extendList.size() == 1)
+//			return classes.get(extendList.iterator().next());
+//		
+//		return null;
+//	}
+//
+//	/**
+//	 * Finds the directly overridden method in a type and its super types. First the super class is examined and then the implemented interfaces.
+//	 * With generics it is possible that 2 methods in the same type are overidden at the same time. In that case, the first overridden method found is returned.
+//	 * 	@param superClass The type to find methods in
+//	 * @param overriding The overriding method
+//	 * @return The first overridden method or <code>null</code> if no method is overridden
+//	 * @throws JavaModelException if a problem occurs
+//	 */
+//	public AbstractMethodSignature findOverriddenMethodInHierarchy(AbstractClassSignature classSig, AbstractMethodSignature overriding) {
+//		AbstractMethodSignature method= findOverriddenMethodInType(classSig, overriding);
+//		if (method != null) {
+//			return method;
+//		}
+//		AbstractClassSignature superClass= getSuperclass(classSig);
+//		if (superClass != null) {
+//			AbstractMethodSignature res=  findOverriddenMethodInHierarchy(superClass, overriding);
+//			if (res != null) {
+//				return res;
+//			}
+//		}
+//		Set<AbstractClassSignature> superInterfaces = getSuperInterfaces(classSig);
+//		for (AbstractClassSignature classInterface : superInterfaces) {
+//			AbstractMethodSignature res= findOverriddenMethodInHierarchy(classInterface, overriding);
+//			if (res != null) {
+//				return res;
+//			}
+//		}
+//		return method;
+//	}
+//
+//	/**
+//	 * Finds an overridden method in a type. With generics it is possible that 2 methods in the same type are overridden at the same time.
+//	 * In that case the first overridden method found is returned.
+//	 * @param superClass The type to find methods in
+//	 * @param overriding The overriding method
+//	 * @return The first overridden method or <code>null</code> if no method is overridden
+//	 * @throws JavaModelException if a problem occurs
+//	 */
+//	public AbstractMethodSignature findOverriddenMethodInType(AbstractClassSignature superClass, AbstractMethodSignature overriding) {
+//		if (overriding.isPrivate() || overriding.isStatic() || overriding.isConstructor())
+//			return null;
+//		
+//		final Set<AbstractMethodSignature> overriddenMethods= superClass.getMethods();
+//		for (AbstractMethodSignature overridden : overriddenMethods) {
+//			if (overridden.isPrivate() || overridden.isStatic() || overridden.isConstructor())
+//				continue;
+//			if (RefactoringUtil.hasSameName(overriding, overridden) && overridden.getParameterTypes().equals(overriding.getParameterTypes())) {
+//				return overridden;
+//			}
+//		}
+//		return null;
+//	}
+//	
+//	/**
+//	 * Locates the topmost method of an override ripple and returns it. If none
+//	 * is found, null is returned.
+//	 *
+//	 * @param method the IMethod which may be part of a ripple
+//	 * @param typeHierarchy a ITypeHierarchy of the declaring type of the method. May be null
+//	 * @param monitor an IProgressMonitor
+//	 * @return the topmost method of the ripple, or null if none
+//	 * @throws JavaModelException
+//	 */
+//	public AbstractMethodSignature getTopmostMethod(final AbstractMethodSignature method) throws JavaModelException {
+//
+//		Assert.isNotNull(method);
+//
+////		ITypeHierarchy hierarchy= typeHierarchy;
+//		AbstractMethodSignature topmostMethod= null;
+////		final AbstractClassSignature declaringType= method.getParent();
+////		if (!declaringType.getType().equals(ExtendedFujiSignaturesJob.TYPE_INTERFACE)) {
+////
+////			AbstractMethodSignature inInterface= isDeclaredInInterface(method, hierarchy, monitor);
+////			if (inInterface != null && !inInterface.equals(method))
+////				topmostMethod= inInterface;
+////		}
+////		
+//		if (topmostMethod == null) {
+//			AbstractMethodSignature overrides= overridesAnotherMethod(method);
+//			if (overrides != null && !overrides.equals(method))
+//				topmostMethod= overrides;
+//		}
+//		return topmostMethod;
+//	}
+//	
+//	public AbstractMethodSignature overridesAnotherMethod(final AbstractMethodSignature method) throws JavaModelException {
+//		AbstractMethodSignature found = findDeclaringMethod(method);
+//		boolean overrides= (found != null && !found.equals(method) && (!found.isStatic()) && (!found.isPrivate()));
+//		if (overrides)
+//			return found;
+//		else
+//			return null;
+//	}
+//
+////	public AbstractMethodSignature isDeclaredInInterface(AbstractMethodSignature method) throws JavaModelException {
+////		//Assert.isTrue(isVirtual(method));
+////		for (AbstractSignature matchedSignature : matchedSignatures) {
+////			
+////		} 
+////			for (int i= 0; i < classes.length; i++) {
+////				final IType clazz= classes[i];
+////				IType[] superinterfaces= null;
+////				if (clazz.equals(hierarchy.getType()))
+////					superinterfaces= hierarchy.getAllSuperInterfaces(clazz);
+////				else
+////					superinterfaces= clazz.newSupertypeHierarchy(new SubProgressMonitor(subMonitor, 1)).getAllSuperInterfaces(clazz);
+////				for (int j= 0; j < superinterfaces.length; j++) {
+////					IMethod found= Checks.findSimilarMethod(method, superinterfaces[j]);
+////					if (found != null && !found.equals(method))
+////						return found;
+////				}
+////			}
+////			return null;
+////		} finally {
+////		}
+////	}
+	
 }

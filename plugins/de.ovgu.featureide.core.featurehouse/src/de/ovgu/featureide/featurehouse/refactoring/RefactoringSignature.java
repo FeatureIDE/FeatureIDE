@@ -23,8 +23,6 @@ package de.ovgu.featureide.featurehouse.refactoring;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.core.resources.IFile;
-
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 
 /**
@@ -37,17 +35,17 @@ public class RefactoringSignature {
 	
 	private Set<AbstractSignature> invocations = new HashSet<>();
 	
-	private final IFile file;
+	private final String relativePathToFile;
 	
 	private boolean renameDeclaration = false;
 	
-	public RefactoringSignature(final IFile file, final AbstractSignature declaration) {
-		this.file = file;
+	public RefactoringSignature(final String relativePathToFile, final AbstractSignature declaration) {
+		this.relativePathToFile = relativePathToFile;
 		this.declaration = declaration;
 	}
 	
-	public IFile getFile() {
-		return file;
+	public String getRelativePathToFile() {
+		return relativePathToFile;
 	}
 	
 	public AbstractSignature getDeclaration() {
@@ -69,7 +67,7 @@ public class RefactoringSignature {
 	@Override
 	public String toString() {
 		
-		return "File: " + file + "; declaration: " + declaration + "; invocations: " + invocations;
+		return "File: " + relativePathToFile + "; declaration: " + declaration + "; invocations: " + invocations;
 	}
 
 	public boolean isRenameDeclaration() {

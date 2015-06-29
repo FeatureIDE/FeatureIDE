@@ -91,6 +91,13 @@ public class FujiSignaturesCreator {
 		public final AbstractSignature getSig() {
 			return sig;
 		}
+		
+		public void setAbsoluteFilePath(int featureID, String absoluteFilePath) {
+			if (ids.containsKey(featureID)) {
+				ids.get(featureID).setAbsoluteFilePath(absoluteFilePath);
+			}
+		}
+
 	}
 
 	private java.util.List<String> featureModulePathnames = null;
@@ -122,6 +129,8 @@ public class FujiSignaturesCreator {
 				continue;
 			}
 			String featurename = getFeatureName(unit);
+			
+			String absoluteFilePath = unit.relativeName();
 
 			List<TypeDecl> typeDeclList = unit.getTypeDeclList();
 			String pckg = unit.getPackageDecl();
@@ -151,7 +160,7 @@ public class FujiSignaturesCreator {
 							new FujiClassSignature(parent, name,
 									modifierString, typeString, pckg, typeDecl,
 									importList),
-									projectSignatures.getFeatureID(featurename), Symbol.getLine(typeDecl.getStart()), Symbol.getLine(typeDecl.getEnd()));
+									projectSignatures.getFeatureID(featurename), Symbol.getLine(typeDecl.getStart()), Symbol.getLine(typeDecl.getEnd()), absoluteFilePath);
 					for (ImportDecl importDecl : importList) {
 						curClassSig.addImport(importDecl.toString());
 					}
@@ -174,7 +183,7 @@ public class FujiSignaturesCreator {
 							addFeatureID(new FujiMethodSignature(curClassSig,
 									name, modifierString, type, false,
 									parameterList, exceptionList),
-									projectSignatures.getFeatureID(featurename), Symbol.getLine(method.getStart()), Symbol.getLine(method.getEnd()));
+									projectSignatures.getFeatureID(featurename), Symbol.getLine(method.getStart()), Symbol.getLine(method.getEnd()), absoluteFilePath);
 
 						} else if (bodyDecl instanceof FieldDeclaration) {
 							FieldDeclaration field = (FieldDeclaration) bodyDecl;
@@ -186,7 +195,7 @@ public class FujiSignaturesCreator {
 							featurename = getFeatureName(bodyDecl);
 							addFeatureID(new FujiFieldSignature(curClassSig,
 									name, modifierString, type),
-									projectSignatures.getFeatureID(featurename), Symbol.getLine(field.getStart()), Symbol.getLine(field.getEnd()));
+									projectSignatures.getFeatureID(featurename), Symbol.getLine(field.getStart()), Symbol.getLine(field.getEnd()), absoluteFilePath);
 
 						} else if (bodyDecl instanceof ConstructorDecl) {
 							ConstructorDecl constructor = (ConstructorDecl) bodyDecl;
@@ -206,7 +215,7 @@ public class FujiSignaturesCreator {
 										curClassSig, name, modifierString,
 										type, true, parameterList,
 										exceptionList),
-										projectSignatures.getFeatureID(featurename), Symbol.getLine(constructor.getStart()), Symbol.getLine(constructor.getEnd()));
+										projectSignatures.getFeatureID(featurename), Symbol.getLine(constructor.getStart()), Symbol.getLine(constructor.getEnd()), absoluteFilePath);
 							}
 							
 						} else if (bodyDecl instanceof MemberClassDecl) {
@@ -238,7 +247,7 @@ public class FujiSignaturesCreator {
 		return projectSignatures;
 	}
 	
-	private AbstractSignature addFeatureID(AbstractSignature sig, int featureID, int startLine, int endLine) {
+	private AbstractSignature addFeatureID(AbstractSignature sig, int featureID, int startLine, int endLine, String absoluteFilePath) {
 		SignatureReference sigRef = signatureSet.get(sig);
 		if (sigRef == null) {
 			sigRef = new SignatureReference(sig);
@@ -246,6 +255,7 @@ public class FujiSignaturesCreator {
 			signatureTable.put(sig.getFullName(), sig);
 		}
 		sigRef.addID((FOPFeatureData) featureDataConstructor.create(featureID, startLine, endLine));
+		sigRef.setAbsoluteFilePath(featureID, absoluteFilePath);
 		return sigRef.getSig();
 	}
 

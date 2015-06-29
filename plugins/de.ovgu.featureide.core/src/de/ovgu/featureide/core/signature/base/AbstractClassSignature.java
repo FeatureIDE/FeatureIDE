@@ -21,6 +21,7 @@
 package de.ovgu.featureide.core.signature.base;
 
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Abstract signature for one class.
@@ -34,6 +35,10 @@ public abstract class AbstractClassSignature extends AbstractSignature {
 	protected final HashSet<String> 
 		importList, extendList, implementList, subClassesList;
 	
+	protected final Set<AbstractMethodSignature> methods;
+	protected final Set<AbstractFieldSignature> fields;
+	protected final Set<AbstractClassSignature> memberClasses;
+	
 	protected AbstractClassSignature(AbstractClassSignature parent, String name, String modifiers, String type, String pckg) {
 		super(parent, name, modifiers, type);
 		this.pckg = pckg == null ? "" : pckg;
@@ -44,6 +49,9 @@ public abstract class AbstractClassSignature extends AbstractSignature {
 		extendList = new HashSet<String>();
 		implementList = new HashSet<String>();
 		subClassesList = new HashSet<String>();
+		methods = new HashSet<>();
+		fields = new HashSet<>();
+		memberClasses = new HashSet<>();
 	}
 
 	public String getPackage() {
@@ -83,6 +91,33 @@ public abstract class AbstractClassSignature extends AbstractSignature {
 	public void addSubClass(String subClass) {
 		subClassesList.add(subClass);
 		hasHashCode = false;
+	}
+	
+	public void addMethod(AbstractMethodSignature method) {
+		methods.add(method);
+		hasHashCode = false;
+	}
+	
+	public Set<AbstractMethodSignature> getMethods() {
+		return methods;
+	}
+	
+	public void addField(AbstractFieldSignature field) {
+		fields.add(field);
+		hasHashCode = false;
+	}
+	
+	public Set<AbstractFieldSignature> getFields() {
+		return fields;
+	}
+	
+	public void addMemberClass(AbstractClassSignature memberClass) {
+		memberClasses.add(memberClass);
+		hasHashCode = false;
+	}
+	
+	public Set<AbstractClassSignature> getMemberClasses() {
+		return memberClasses;
 	}
 
 //	@Override

@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.featurehouse.refactoring.matcher;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -53,26 +54,24 @@ public class TypeSignatureMatcher extends SignatureMatcher {
 	}
 	
 	@Override
-	protected void addInvolvedClasses(final Set<AbstractClassSignature> involvedClasses) {
+	protected Set<AbstractSignature> determineMatchedSignatures() {
+		
+		if (selectedSignature instanceof FujiClassSignature) return Collections.emptySet();
+
+		final Set<AbstractSignature> result = new HashSet<>();
+		
 		for (String className : ((FujiClassSignature) selectedSignature).getSubClassesList()) {
 			if (!classes.containsKey(className))
 				continue;
 
 			final AbstractClassSignature classSignature = classes.get(className);
-			if (classSignature == null)
-				return;
 
-			if (!involvedClasses.contains(classSignature)) {
-				involvedClasses.add(classSignature);
+			if (!result.contains(classSignature)) {
+				result.add(classSignature);
 			}
 		}
 		
-		oldMatchedSignatures = new HashSet<>();
-		oldMatchedSignatures.addAll(involvedClasses);
+		return result;
 	}
 
-	@Override
-	public Set<AbstractSignature> getMatchedSignatures() {
-		return oldMatchedSignatures;
-	}
 }

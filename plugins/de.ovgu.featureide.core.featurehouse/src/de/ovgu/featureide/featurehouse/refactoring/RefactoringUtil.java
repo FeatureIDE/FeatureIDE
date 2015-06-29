@@ -20,18 +20,23 @@
  */
 package de.ovgu.featureide.featurehouse.refactoring;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IMember;
+import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IPackageDeclaration;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.Signature;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 
-import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiClassSignature;
+import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
 
 /**
  * TODO description
@@ -58,20 +63,34 @@ public class RefactoringUtil {
 		else
 			className = member.getElementName();
 		
-		return signature.getName().equals(className) && hasSamePackage(signature, member);
+		String sigClassName = signature.getName();
+		if (!(signature instanceof FujiClassSignature)) 
+			sigClassName = signature.getParent().getName();
+		
+		return sigClassName.equals(className) && hasSamePackage(signature, member);
 	}
 	
-	private static boolean hasSamePackage(AbstractSignature signature, final IMember member) {
+	private static boolean hasSamePackage(final AbstractSignature signature, final IMember member) {
 		
-		String sigPackage;
-		if (signature instanceof FujiClassSignature)
-			sigPackage = ((FujiClassSignature) signature).getPackage();
-		else
-			sigPackage = signature.getParent().getPackage();
-			
-		String package0 = getPackageDeclaration(member.getCompilationUnit());
+		final String sigPackage = getPackage(signature);
+		final String package0 = getPackageDeclaration(member.getCompilationUnit());
 		
 		return sigPackage.equals(package0);
+	}
+	
+	public static boolean hasSamePackage(final AbstractSignature signature1, final AbstractSignature signature2) {
+		
+		final String sigPackage1 = getPackage(signature1);
+		final String sigPackage2 = getPackage(signature2);
+		
+		return sigPackage1.equals(sigPackage2);
+	}
+	
+	public static String getPackage(final AbstractSignature signature){
+		if (signature instanceof FujiClassSignature)
+			return ((FujiClassSignature) signature).getPackage();
+		else
+			return signature.getParent().getPackage();
 	}
 
 	public static String getPackageDeclaration(final ICompilationUnit unit) {
@@ -93,8 +112,29 @@ public class RefactoringUtil {
 		return hasSameName(signature, member.getElementName());
 	}
 	
+	public static boolean hasSameName(final AbstractSignature signature1, final AbstractSignature signature2) {
+		return hasSameName(signature1.getName(), signature2.getName());
+	}
+	
 	public static boolean hasSameName(final AbstractSignature signature, final String name) {
 		return signature.getName().equals(name);
+	}
+	
+	private static boolean hasSameName(final String name1, final String name2) {
+		return name1.equals(name2);
+	}
+	
+	public static boolean hasSameParameters(final FujiMethodSignature signature, final IMethod method) {
+		List<String> parameterTypes = signature.getParameterTypes();
+
+		final int myParamsLength = method.getParameterTypes().length;
+		final String[] simpleNames = new String[myParamsLength];
+		for (int i = 0; i < myParamsLength; i++) {
+			String erasure = Signature.getTypeErasure(method.getParameterTypes()[i]);
+			simpleNames[i] = Signature.getSimpleName(Signature.toString(erasure));
+		}
+
+		return Arrays.equals(simpleNames, parameterTypes.toArray(new String[parameterTypes.size()]));
 	}
 
 }
