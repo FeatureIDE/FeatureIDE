@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -803,7 +802,6 @@ public class CorePlugin extends AbstractCorePlugin {
 		if (fmNode instanceof And) {
 			final SatSolver solver = new SatSolver(fmNode.clone(), 1000);
 			final Node[] andChildren = fmNode.getChildren();
-			int lastIndex = -1;
 
 			for (int i = 0; i < andChildren.length; i++) {
 				final Node andChild = andChildren[i];
@@ -811,28 +809,14 @@ public class CorePlugin extends AbstractCorePlugin {
 					final Node result = checkOr(andChild, features, solver);
 					if (result == null) {
 						andChildren[i] = new Literal(NodeCreator.varTrue);
-						lastIndex = i;
 					} else {
 						andChildren[i] = result;
 					}
 				} else {
 					if (features.contains(((Literal) andChild).var)) {
 						andChildren[i] = new Literal(NodeCreator.varTrue);
-						lastIndex = i;
 					}
 				}
-			}
-			
-			if (lastIndex > -1) {
-				final Collection<String> retainedFeatures = new HashSet<>(fm.getFeatureNames());
-				retainedFeatures.removeAll(features);
-				final Node[] literals = new Node[retainedFeatures.size() + 1];
-				int i = 0;
-				for (String node : retainedFeatures) {
-					literals[i++] = new Literal(node);
-				}
-				literals[i] = new Literal(NodeCreator.varTrue);
-				andChildren[lastIndex] = new Or(literals);
 			}
 			
 			return fmNode;
@@ -845,29 +829,50 @@ public class CorePlugin extends AbstractCorePlugin {
 
 	private Node checkOr(final Node andChild, Collection<String> features, final SatSolver solver) throws TimeoutException {
 		Node result = andChild;
-		final Node[] orChildren = andChild.getChildren();
-		final ArrayList<Node> literalList = new ArrayList<>(orChildren.length);
-		for (int j = 0; j < orChildren.length; j++) {
-			Literal literal = (Literal) orChildren[j];
-			if (!features.contains(literal.var)) {
-				literal = literal.clone();
-				literal.flip();
-				literalList.add(literal);
-			}
-		}
-		if (literalList.size() < orChildren.length) {
-			if (literalList.isEmpty() || solver.isSatisfiable(literalList)) {
-				result = null;
-			} else {
-				for (Node node : literalList) {
-					((Literal) node).flip();
+
+		if (!isOrTrue(andChild)) {
+			final Node[] orChildren = andChild.getChildren();
+			final Literal[] literalList = new Literal[orChildren.length];
+			int removeIndex = orChildren.length;
+			int retainIndex = -1;
+			for (int j = 0; j < orChildren.length; j++) {
+				final Literal literal = (Literal) orChildren[j].clone();
+				if (!features.contains(literal.var)) {
+					literal.flip();
+					literalList[++retainIndex] = literal;
+				} else {
+					literalList[--removeIndex] = literal;
 				}
-				result = new Or(literalList.toArray(new Node[0]));
+			}
+			if (removeIndex < orChildren.length) {
+				if (retainIndex == -1) {
+					result = null;
+				} else {					
+					Literal[] retainLiterals = new Literal[retainIndex + 1];
+					System.arraycopy(literalList, 0, retainLiterals, 0, retainLiterals.length);
+					Literal[] removeLiterals = new Literal[orChildren.length - removeIndex];
+					System.arraycopy(literalList, retainLiterals.length, removeLiterals, 0, removeLiterals.length);
+
+					for (Literal node : retainLiterals) {
+						node.flip();
+					}
+					result = new Or(retainLiterals);
+				}
 			}
 		}
 		return result;
 	}
-	
+
+	private boolean isOrTrue(Node or) {
+		for (Node orChild : or.getChildren()) {
+			final Literal literal = (Literal) orChild;
+			if ((literal.positive && literal.var.equals(NodeCreator.varTrue)) || (!literal.positive && literal.var.equals(NodeCreator.varFalse))) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	private Node checkOr(final Node andChild, Collection<String> features) throws TimeoutException {
 		Node result = andChild;
 		final Node[] orChildren = andChild.getChildren();
