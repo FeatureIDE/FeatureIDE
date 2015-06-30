@@ -444,7 +444,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 							if (control != null && !control.isDisposed()) {
 								final String extension = file.getFileExtension();
 
-								if (extension.toLowerCase().equals("xml")) {
+								if ("xml".equalsIgnoreCase(extension)) {
 									selectedOutlineType = OutlineLabelProvider.OUTLINE_FEATURE_MODEL;
 								} else if (supportedTypes.contains(extension)) {
 									selectedOutlineType = OutlineLabelProvider.OUTLINE_CODE;
@@ -580,7 +580,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 										viewer.setContentProvider(curContentProvider);
 										viewer.setLabelProvider(curClabel);
 										if (iFile != null) {
-											if ("xml".equals(iFile.getFileExtension().toLowerCase()) && active_editor instanceof FeatureModelEditor) {
+											if ("xml".equalsIgnoreCase(iFile.getFileExtension()) && active_editor instanceof FeatureModelEditor) {
 												viewer.setInput(((FeatureModelEditor) active_editor).getFeatureModel());
 
 												// recreate the context menu in case
@@ -700,9 +700,9 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 
 		public void run() {
 			sortFeatureToggle = !sortFeatureToggle;
-			CollaborationOutlineTreeContentProvider contentProvider = (CollaborationOutlineTreeContentProvider) viewer.getContentProvider();
-			CollaborationOutlineLabelProvider labelProvider = (CollaborationOutlineLabelProvider) viewer.getLabelProvider();
 			if (viewer.getContentProvider() instanceof CollaborationOutlineTreeContentProvider) {
+				CollaborationOutlineTreeContentProvider contentProvider = (CollaborationOutlineTreeContentProvider) viewer.getContentProvider();
+				CollaborationOutlineLabelProvider labelProvider = (CollaborationOutlineLabelProvider) viewer.getLabelProvider();
 				if (sortFeatureToggle) {
 					if (viewer.getInput() instanceof IFile) {
 						filter.setFile(iFile);
