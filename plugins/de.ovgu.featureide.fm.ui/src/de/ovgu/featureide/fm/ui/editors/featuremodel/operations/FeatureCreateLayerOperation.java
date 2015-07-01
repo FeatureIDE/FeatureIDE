@@ -46,6 +46,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayou
 public class FeatureCreateLayerOperation extends AbstractFeatureModelOperation {
 
 	private static final String LABEL = "Create Layer";
+	private static final String DEFAULT_FEATURE_LAYER_CAPTION = "NewFeature";
 	private Feature feature;
 	private Object viewer;
 	private Feature newFeature;
@@ -68,10 +69,10 @@ public class FeatureCreateLayerOperation extends AbstractFeatureModelOperation {
 	protected void redo() {
 		int number = 0;
 
-		while (featureModel.getFeatureNames().contains("NewLayer" + ++number))
+		while (featureModel.getFeatureNames().contains(DEFAULT_FEATURE_LAYER_CAPTION + ++number))
 			;
 
-		newFeature = new Feature(featureModel, "NewLayer" + number);
+		newFeature = new Feature(featureModel, DEFAULT_FEATURE_LAYER_CAPTION + number);
 		featureModel.addFeature(newFeature);
 		feature = featureModel.getFeature(feature.getName());
 		feature.addChild(newFeature);
