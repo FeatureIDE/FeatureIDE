@@ -803,94 +803,194 @@ public class CorePlugin extends AbstractCorePlugin {
 			final SatSolver solver = new SatSolver(fmNode.clone(), 1000);
 			final Node[] andChildren = fmNode.getChildren();
 
+			// all clauses that have both kinds of literals (remove AND retain)
+			final List<Node> relevantClauseList = new ArrayList<>(andChildren.length);
+
+			// all clauses that contain no literals to remove
+			final List<Node> otherClauseList = new ArrayList<>(andChildren.length);
+
+			// list for all new construct clauses
+			final List<Node> newClauseList = new ArrayList<>(andChildren.length);
+
+			// fill first two lists
 			for (int i = 0; i < andChildren.length; i++) {
 				final Node andChild = andChildren[i];
 				if (andChild instanceof Or) {
-					final Node result = checkOr(andChild, features, solver);
-					if (result == null) {
-						andChildren[i] = new Literal(NodeCreator.varTrue);
-					} else {
-						andChildren[i] = result;
+
+					int relevance = 0;
+					for (Node orChild : andChild.getChildren()) {
+						final Literal literal = (Literal) orChild;
+
+						// sort out obvious tautologies
+						if ((literal.positive && literal.var.equals(NodeCreator.varTrue)) || (!literal.positive && literal.var.equals(NodeCreator.varFalse))) {
+							relevance = -1;
+							break;
+						}
+
+						relevance += features.contains(literal.var) ? 1 : 0;
+					}
+
+					if (relevance > 0) {
+						if (relevance < andChild.getChildren().length) {
+							relevantClauseList.add(andChild);
+						}
+					} else if (relevance == 0) {
+						otherClauseList.add(andChild);
 					}
 				} else {
-					if (features.contains(((Literal) andChild).var)) {
-						andChildren[i] = new Literal(NodeCreator.varTrue);
+					if (!features.contains(((Literal) andChild).var)) {
+						otherClauseList.add(andChild);
 					}
 				}
 			}
-			
+
+			// for each feature that should be removed ...
+			for (String curFeature : features) {
+
+				// ... create list of clauses that contain this feature
+				final byte[] clauseStates = new byte[relevantClauseList.size()];
+				for (int i = 0; i < relevantClauseList.size(); i++) {
+					final Node clause = relevantClauseList.get(i);
+
+					Literal curLiteral = null;
+					for (Node clauseChildren : clause.getChildren()) {
+						final Literal literal = (Literal) clauseChildren;
+						if (literal.var.equals(curFeature)) {
+							if (curLiteral == null) {
+								curLiteral = literal;
+								clauseStates[i] = (byte) (curLiteral.positive ? 1 : 2);
+							} else if (literal.positive != curLiteral.positive) {
+								clauseStates[i] = -1;
+								break;
+							}
+						}
+					}
+				}
+
+				final ArrayList<Node> newRelevantClauseList = new ArrayList<>();
+
+				// ... combine relevant clauses if possible
+				for (int i = clauseStates.length - 1; i >= 0; i--) {
+					final boolean positive;
+					switch (clauseStates[i]) {
+					case 1:
+						positive = true;
+						break;
+					case 2:
+						positive = false;
+						break;
+					case -1:
+						relevantClauseList.remove(i);
+					case 0:
+					default:
+						continue;
+					}
+
+					final Node clause = relevantClauseList.get(i);
+
+					final Node[] orChildren = clause.getChildren();
+					final Literal[] literalList = new Literal[orChildren.length];
+					int removeIndex = orChildren.length;
+					int retainIndex = -1;
+
+					for (int j = 0; j < orChildren.length; j++) {
+						final Literal literal = (Literal) orChildren[j].clone();
+						if (literal.var.equals(curFeature)) {
+							literalList[--removeIndex] = literal;
+						} else {
+							literal.flip();
+							literalList[++retainIndex] = literal;
+						}
+					}
+
+					// test for generalizability
+					if (!solver.isSatisfiable(literalList)) {
+						Literal[] retainLiterals = new Literal[retainIndex + 1];
+						System.arraycopy(literalList, 0, retainLiterals, 0, retainLiterals.length);
+						for (Literal retainedLiteral : retainLiterals) {
+							retainedLiteral.flip();
+						}
+						final Or newClause = new Or(retainLiterals);
+						newClauseList.add(newClause);
+
+						for (Node orChild : newClause.getChildren()) {
+							final Literal literal = (Literal) orChild;
+							if (features.contains(literal.var)) {
+								newRelevantClauseList.add(newClause);
+								break;
+							}
+						}
+						// try to combine with other clauses
+					} else {
+						final Node[] children1 = relevantClauseList.get(i).getChildren();
+						for (int j = i - 1; j >= 0; j--) {
+							if ((positive && clauseStates[j] == 2) || (!positive && clauseStates[j] == 1)) {
+								final Node[] children2 = relevantClauseList.get(j).getChildren();
+								final ArrayList<Node> newChildren = new ArrayList<>(children1.length + children2.length - 2);
+
+								for (int k = 0; k < children1.length; k++) {
+									final Literal child = (Literal) children1[k];
+									if (!curFeature.equals(child.var)) {
+										newChildren.add(child);
+									}
+								}
+
+								for (int k = 0; k < children2.length; k++) {
+									final Literal child = (Literal) children2[k];
+									if (!curFeature.equals(child.var)) {
+										newChildren.add(child);
+									}
+								}
+
+								final Or newClause = new Or(newChildren.toArray(new Node[0]));
+								newClauseList.add(newClause);
+
+								for (Node orChild : newClause.getChildren()) {
+									final Literal literal = (Literal) orChild;
+									if (features.contains(literal.var)) {
+										newRelevantClauseList.add(newClause);
+										break;
+									}
+								}
+							}
+						}
+					}
+				}
+				relevantClauseList.addAll(newRelevantClauseList);
+			}
+
+			// create clause that contains all retained features
+			final Node[] allLiterals = new Node[fm.getNumberOfFeatures() - features.size() + 1];
+			int i = 0;
+			for (String featureName : fm.getFeatureNames()) {
+				if (!features.contains(featureName)) {
+					allLiterals[i++] = new Literal(featureName);
+				}
+			}
+			allLiterals[i] = new Literal(NodeCreator.varTrue);
+
+			// create new clauses list
+			final int lastIndex = otherClauseList.size() + newClauseList.size();
+			final Node[] newClauses = new Node[lastIndex + 1];
+
+			System.arraycopy(otherClauseList.toArray(new Node[0]), 0, newClauses, 0, otherClauseList.size());
+			System.arraycopy(newClauseList.toArray(new Node[0]), 0, newClauses, otherClauseList.size(), newClauseList.size());
+			newClauses[lastIndex] = new Or(allLiterals);
+
+			fmNode.setChildren(newClauses);
+
 			return fmNode;
 		} else if (fmNode instanceof Or) {
-			return checkOr(fmNode, features);
+			for (Node clauseChildren : fmNode.getChildren()) {
+				final Literal literal = (Literal) clauseChildren;
+				if (features.contains(literal.var)) {
+					return new Literal(NodeCreator.varTrue);
+				}
+			}
+			return fmNode;
 		} else {
 			return (features.contains(((Literal) fmNode).var)) ? new Literal(NodeCreator.varTrue) : fmNode;
 		}
-	}
-
-	private Node checkOr(final Node andChild, Collection<String> features, final SatSolver solver) throws TimeoutException {
-		Node result = andChild;
-
-		if (!isOrTrue(andChild)) {
-			final Node[] orChildren = andChild.getChildren();
-			final Literal[] literalList = new Literal[orChildren.length];
-			int removeIndex = orChildren.length;
-			int retainIndex = -1;
-			for (int j = 0; j < orChildren.length; j++) {
-				final Literal literal = (Literal) orChildren[j].clone();
-				if (!features.contains(literal.var)) {
-					literal.flip();
-					literalList[++retainIndex] = literal;
-				} else {
-					literalList[--removeIndex] = literal;
-				}
-			}
-			if (removeIndex < orChildren.length) {
-				if (retainIndex == -1) {
-					result = null;
-				} else {					
-					Literal[] retainLiterals = new Literal[retainIndex + 1];
-					System.arraycopy(literalList, 0, retainLiterals, 0, retainLiterals.length);
-					Literal[] removeLiterals = new Literal[orChildren.length - removeIndex];
-					System.arraycopy(literalList, retainLiterals.length, removeLiterals, 0, removeLiterals.length);
-
-					for (Literal node : retainLiterals) {
-						node.flip();
-					}
-					result = new Or(retainLiterals);
-				}
-			}
-		}
-		return result;
-	}
-
-	private boolean isOrTrue(Node or) {
-		for (Node orChild : or.getChildren()) {
-			final Literal literal = (Literal) orChild;
-			if ((literal.positive && literal.var.equals(NodeCreator.varTrue)) || (!literal.positive && literal.var.equals(NodeCreator.varFalse))) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private Node checkOr(final Node andChild, Collection<String> features) throws TimeoutException {
-		Node result = andChild;
-		final Node[] orChildren = andChild.getChildren();
-		final ArrayList<Node> literalList = new ArrayList<>(orChildren.length);
-		for (int j = 0; j < orChildren.length; j++) {
-			final Literal literal = (Literal) orChildren[j];
-			if (!features.contains(literal.var)) {
-				literalList.add(literal);
-			}
-		}
-		if (literalList.size() < orChildren.length) {
-			if (literalList.isEmpty()) {
-				result = new Literal(NodeCreator.varTrue);
-			} else {
-				result = new Or(literalList.toArray(new Node[0]));
-			}
-		}
-		return result;
 	}
 
 }
