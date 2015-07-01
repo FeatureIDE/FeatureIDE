@@ -23,15 +23,23 @@ package de.ovgu.featureide.fm.core.editing;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.junit.Test;
 import org.prop4j.Node;
 import org.prop4j.NodeReader;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslReader;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 
 /**
  * Checks that the calculation of edit categories works properly. A couple of
@@ -40,6 +48,7 @@ import de.ovgu.featureide.fm.core.io.guidsl.GuidslReader;
  * 
  * @author Thomas Thuem
  * @author Fabian Benduhn
+ * @author Marcus Pinnecke, 01.07.15
  */
 public class TModelComparator {
 
@@ -338,4 +347,34 @@ public class TModelComparator {
 		return comperator.compare(oldModel, newModel);
 	}
 
+	@Test
+	/**
+	 * @author Marcus Pinnecke
+	 * See <a href="https://github.com/tthuem/FeatureIDE/issues/264">Code taken from bug report 264</a>
+	 */
+	public void testForFeatureIDEaddedProducts() throws FileNotFoundException, UnsupportedModelException, TimeoutException {
+//	    FeatureModel fm = read("alternative.xml");
+//	    FeatureModel fmGen = read("optional.xml");
+//	    ModelComparator comparator = new ModelComparator(1000000);
+//	    Comparison comparison = comparator.compare(fm, fmGen);
+//	    assertEquals(Comparison.GENERALIZATION, comparison);
+//	    Set<String> addedProducts = new HashSet<String>();
+//	    Configuration c;
+//	    while((c = comparator.calculateExample(true)) != null) {
+//	        System.out.println(c);
+//	        addedProducts.add(c.toString());
+//	    }
+//	    assertEquals(12, addedProducts.size());
+	}
+
+	/**
+	 * @author Marcus Pinnecke
+	 * See <a href="https://github.com/tthuem/FeatureIDE/issues/264">Code taken from bug report 264</a>
+	 */
+	private static FeatureModel read(String path) throws FileNotFoundException, UnsupportedModelException {
+	    FeatureModel fm = new FeatureModel();
+	    AbstractFeatureModelReader reader = new XmlFeatureModelReader(fm);
+	    reader.readFromFile(new File(path));
+	    return fm;
+	}
 }

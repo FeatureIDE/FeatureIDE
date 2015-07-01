@@ -25,6 +25,7 @@ import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 
+import de.ovgu.featureide.common.Commons;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
@@ -47,6 +48,9 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints extends RuntimeTest {
 	static {
 		disableThisTest = false;	// set this flag to true, if this test class should be skipped
 	}
+	
+	private static final String REMOTE_PATH = "/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/benchmarkFeatureModels/";
+	private static final String LOCAL_CLASS_PATH = "benchmarkFeatureModels";
 
 	/**
 	 * Warm up the analyzer to prevent unpredictable timeout exceptions.
@@ -58,39 +62,6 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints extends RuntimeTest {
 			analyze(20);
 			analyze(21);
 		}
-	}
-
-	private static final FileFilter filter = new FileFilter() {
-		@Override
-		public boolean accept(final File pathname) {
-			return pathname.getName().endsWith(".xml");
-		}
-	};
-
-	private final static FeatureModel init(final String name) {
-		FeatureModel fm = new FeatureModel();
-		File modelFileFolder = getFolder();
-		for (File f : modelFileFolder.listFiles(filter)) {
-			if (f.getName().equals(name)) {
-				try {
-					new XmlFeatureModelReader(fm).readFromFile(f);
-					break;
-				} catch (FileNotFoundException e) {
-					e.printStackTrace();
-				} catch (UnsupportedModelException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return fm;
-	}
-
-	private static File getFolder() {
-		File folder = new File("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/benchmarkFeatureModels/");
-		if (!folder.canRead()) {
-			folder = new File(ClassLoader.getSystemResource("benchmarkFeatureModels").getPath());
-		}
-		return folder;
 	}
 
 	/************************************************************
@@ -277,30 +248,30 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints extends RuntimeTest {
 	private static FeatureModel getFM(final int i) {
 		switch (i) {
 		case 1:
-			return init("berkeley_db_model.xml");
+			return Commons.loadFeatureModelFromFile("berkeley_db_model.xml", REMOTE_PATH, LOCAL_CLASS_PATH);
 		case 2:
-			return init("berkeley_db_model2.xml");
+			return Commons.loadFeatureModelFromFile("berkeley_db_model2.xml", REMOTE_PATH, LOCAL_CLASS_PATH);
 		case 1000:
-			return init("1000-100.xml");
+			return Commons.loadFeatureModelFromFile("1000-100.xml", REMOTE_PATH, LOCAL_CLASS_PATH);
 		case 500:
-			return init("500-101.xml");
+			return Commons.loadFeatureModelFromFile("500-101.xml", REMOTE_PATH, LOCAL_CLASS_PATH);
 		case 200:
-			return init("200-100.xml");
+			return Commons.loadFeatureModelFromFile("200-100.xml", REMOTE_PATH, LOCAL_CLASS_PATH);
 		case 201:
-			return init("200-100-hidden.xml");
+			return Commons.loadFeatureModelFromFile("200-100-hidden.xml", REMOTE_PATH, LOCAL_CLASS_PATH);
 		case 100:
-			return init("100-100.xml");
+			return Commons.loadFeatureModelFromFile("100-100.xml", REMOTE_PATH, LOCAL_CLASS_PATH);
 		case 50:
-			return init("50-100.xml");
+			return Commons.loadFeatureModelFromFile("50-100.xml", REMOTE_PATH, LOCAL_CLASS_PATH);
 		case 20:
-			return init("20-100.xml");
+			return Commons.loadFeatureModelFromFile("20-100.xml", REMOTE_PATH, LOCAL_CLASS_PATH);
 		case 21:
-			return init("20-100-hidden.xml");
+			return Commons.loadFeatureModelFromFile("20-100-hidden.xml", REMOTE_PATH, LOCAL_CLASS_PATH);
 		case 10:
-			return init("10-100.xml");
+			return Commons.loadFeatureModelFromFile("10-100.xml", REMOTE_PATH, LOCAL_CLASS_PATH);
 		default:
 			System.err.println("NO FM");
-			return init("10-100.xml");
+			return Commons.loadFeatureModelFromFile("10-100.xml", REMOTE_PATH, LOCAL_CLASS_PATH);
 		}
 	}
 

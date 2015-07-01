@@ -1,7 +1,13 @@
 package de.ovgu.featureide.common;
 
 import java.io.File;
+import java.io.FileFilter;
+import java.io.FileNotFoundException;
 import java.util.List;
+
+import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 
 
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
@@ -30,6 +36,23 @@ import java.util.List;
  */
 public class Commons {
 
+	
+	public static class FileFilterByExtension implements FileFilter {
+		
+		final String fileExtension;
+		
+		public FileFilterByExtension(final String fileExtension) {
+			assert (fileExtension != null && !fileExtension.isEmpty());
+			
+			this.fileExtension = fileExtension;
+		}
+		
+		@Override
+		public boolean accept(final File pathname) {
+			return pathname.getName().endsWith("." + fileExtension);
+		}
+	};
+	
 	/**
 	 * Returns a file reference to <code>remotePath</code> via a absolute path on TeamCity build server or
 	 * the file reference to <code>localClassPath</code> which should be inside the class path. The return
@@ -42,6 +65,39 @@ public class Commons {
 	public static final File getFile(final String remotePath, final String localClassPath) {
 		final File folder = new File(remotePath);
 		return folder.canRead() ? folder : new File(ClassLoader.getSystemResource(localClassPath).getPath());
+	}
+	
+	public final static FeatureModel loadFeatureModelFromFile(final String featureModelXmlFilename, final String remotePath, final String localClassPath) {
+		return loadFeatureModelFromFile(featureModelXmlFilename, new FileFilterByExtension(extractFileExtension(featureModelXmlFilename)), remotePath, localClassPath);
+	}
+	
+	/**
+	 * @param featureModelXmlFilename
+	 * @return
+	 */
+	public static String extractFileExtension(String filename) {
+		final int position = filename.lastIndexOf('.');
+		if (position > 0) {
+		    return filename.substring(position+1);
+		} else return "";
+	}
+
+	public final static FeatureModel loadFeatureModelFromFile(final String featureModelXmlFilename, final FileFilter filter, final String remotePath, final String localClassPath) {
+		FeatureModel fm = new FeatureModel();
+		File modelFileFolder = getFile(remotePath, localClassPath);
+		for (File f : modelFileFolder.listFiles(filter)) {
+			if (f.getName().equals(featureModelXmlFilename)) {
+				try {
+					new XmlFeatureModelReader(fm).readFromFile(f);
+					break;
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				} catch (UnsupportedModelException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return fm;
 	}
 
 	public final static <T> String join(T delimiter, List<T> list) {
