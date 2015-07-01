@@ -48,6 +48,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayou
 public class FeatureCreateCompoundOperation extends AbstractFeatureModelOperation {
 
 	private static final String LABEL = "Create Compound";
+	private static final String DEFAULT_FEATURE_LAYER_CAPTION = "NewFeature";
 	Feature newCompound;
 	private Feature parent;
 	private Object viewer;
@@ -69,9 +70,9 @@ public class FeatureCreateCompoundOperation extends AbstractFeatureModelOperatio
 	@Override
 	public IStatus execute(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
 		int number = 0;
-		while (featureModel.getFeatureNames().contains("NewCompound" + ++number))
+		while (featureModel.getFeatureNames().contains(DEFAULT_FEATURE_LAYER_CAPTION + ++number))
 			;
-		newCompound = new Feature(featureModel, "NewCompound" + number);
+		newCompound = new Feature(featureModel, DEFAULT_FEATURE_LAYER_CAPTION + number);
 		if (parent != null) {
 			newCompound.setAND(true);
 			newCompound.setMultiple(parent.isMultiple());
