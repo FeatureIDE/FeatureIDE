@@ -33,6 +33,7 @@ import org.prop4j.Node;
 import org.prop4j.NodeReader;
 import org.sat4j.specs.TimeoutException;
 
+import de.ovgu.featureide.common.Commons;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
@@ -349,32 +350,25 @@ public class TModelComparator {
 
 	@Test
 	/**
+	 * Based on https://github.com/tthuem/FeatureIDE/issues/264
 	 * @author Marcus Pinnecke
-	 * See <a href="https://github.com/tthuem/FeatureIDE/issues/264">Code taken from bug report 264</a>
+	 * 
 	 */
 	public void testForFeatureIDEaddedProducts() throws FileNotFoundException, UnsupportedModelException, TimeoutException {
-//	    FeatureModel fm = read("alternative.xml");
-//	    FeatureModel fmGen = read("optional.xml");
-//	    ModelComparator comparator = new ModelComparator(1000000);
-//	    Comparison comparison = comparator.compare(fm, fmGen);
-//	    assertEquals(Comparison.GENERALIZATION, comparison);
-//	    Set<String> addedProducts = new HashSet<String>();
-//	    Configuration c;
-//	    while((c = comparator.calculateExample(true)) != null) {
-//	        System.out.println(c);
-//	        addedProducts.add(c.toString());
-//	    }
-//	    assertEquals(12, addedProducts.size());
-	}
-
-	/**
-	 * @author Marcus Pinnecke
-	 * See <a href="https://github.com/tthuem/FeatureIDE/issues/264">Code taken from bug report 264</a>
-	 */
-	private static FeatureModel read(String path) throws FileNotFoundException, UnsupportedModelException {
-	    FeatureModel fm = new FeatureModel();
-	    AbstractFeatureModelReader reader = new XmlFeatureModelReader(fm);
-	    reader.readFromFile(new File(path));
-	    return fm;
+	    final FeatureModel fm = Commons.loadFeatureModelFromFile("issue_264_model_optional.xml", Commons.FEATURE_MODEL_BENCHMARK_PATH_REMOTE, Commons.FEATURE_MODEL_BENCHMARK_PATH_LOCAL_CLASS_PATH);
+	    final FeatureModel fmGen = Commons.loadFeatureModelFromFile("issue_264_model_alternative.xml", Commons.FEATURE_MODEL_BENCHMARK_PATH_REMOTE, Commons.FEATURE_MODEL_BENCHMARK_PATH_LOCAL_CLASS_PATH);
+	    final ModelComparator comparator = new ModelComparator(1000000);
+	    final Comparison comparison = comparator.compare(fm, fmGen);
+	    
+	    assertEquals(Comparison.GENERALIZATION, comparison);
+	    
+	    final Set<String> addedProducts = new HashSet<String>();
+	    
+	    Configuration c;
+	    while((c = comparator.calculateExample(true)) != null) {
+	        System.out.println(c);
+	        addedProducts.add(c.toString());
+	    }
+	    assertEquals(12, addedProducts.size());
 	}
 }
