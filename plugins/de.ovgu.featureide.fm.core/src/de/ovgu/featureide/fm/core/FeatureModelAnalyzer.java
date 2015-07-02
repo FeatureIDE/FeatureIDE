@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.core;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -72,8 +73,8 @@ public class FeatureModelAnalyzer {
 
 	private static final String FALSE = "False";
 
-	private final List<Feature> cachedDeadFeatures = new ArrayList<>();
-	private final List<Feature> cachedCoreFeatures = new ArrayList<>();
+	private List<Feature> cachedDeadFeatures = Collections.emptyList();
+	private List<Feature> cachedCoreFeatures = Collections.emptyList();
 	
 	private final Collection<Feature> chachedFalseOptionalFeatures = new LinkedList<Feature>();
 	
@@ -410,17 +411,20 @@ public class FeatureModelAnalyzer {
 	 */
 	public List<Feature> getDeadFeatures(SatSolver solver, Node propNode) {
 		solver.addClauses(propNode.clone().toCNF());
-		cachedDeadFeatures.clear();
+		final ArrayList<Feature> deadFeatures = new ArrayList<>();
+		deadFeatures.clear();
 		
 		for (Literal e : solver.knownValues(SatSolver.ValueType.FALSE)) {
 			final String var = e.var.toString();
 			if (!FALSE.equals(var) && !TRUE.equals(var)) {
 				final Feature feature = fm.getFeature(var);
 				if (feature != null) {
-					cachedDeadFeatures.add(feature);
+					deadFeatures.add(feature);
 				}
 			}
 		}
+		
+		cachedDeadFeatures = deadFeatures;
 		return cachedDeadFeatures;
 	}
 	
@@ -450,8 +454,11 @@ public class FeatureModelAnalyzer {
 	
 	private List<List<Feature>> analyzeFeatures(long timeout, SatSolver.ValueType vt, Object... selectedFeatures) {
 		final ArrayList<List<Feature>> result = new ArrayList<>(2);
-		result.add(cachedCoreFeatures);
-		result.add(cachedDeadFeatures);
+		final ArrayList<Feature> coreFeatures = new ArrayList<>();
+		final ArrayList<Feature> deadFeatures = new ArrayList<>();
+		
+		result.add(coreFeatures);
+		result.add(deadFeatures);
 		
 		Node formula = NodeCreator.createNodes(fm);
 		if (selectedFeatures.length > 0) {
@@ -459,22 +466,22 @@ public class FeatureModelAnalyzer {
 		}
 		final SatSolver solver = new SatSolver(formula, timeout);
 
-		cachedCoreFeatures.clear();
-		cachedDeadFeatures.clear();
-		
 		for (Literal literal : solver.knownValues(vt)) {
 			final String var = literal.var.toString();
 			if (!FALSE.equals(var) && !TRUE.equals(var)) {
 				final Feature feature = fm.getFeature(var);
 				if (feature != null) {
 					if (literal.positive) {
-						cachedCoreFeatures.add(feature);
+						coreFeatures.add(feature);
 					} else {
-						cachedDeadFeatures.add(feature);
+						deadFeatures.add(feature);
 					}
 				}
 			}
 		}
+
+		cachedCoreFeatures = coreFeatures;
+		cachedDeadFeatures = deadFeatures;
 		return result;
 	}
 	
@@ -957,7 +964,11 @@ public class FeatureModelAnalyzer {
 	public Collection<Feature> getCachedDeadFeatures() {
 		return cachedDeadFeatures;
 	}
-	
+
+	public List<Feature> getCachedCoreFeatures() {
+		return cachedCoreFeatures;
+	}
+
 	public boolean getAttributeFlag(Attribute attribute) {
 		return attributeFlags[attribute.ordinal()];
 	}
@@ -969,4 +980,5 @@ public class FeatureModelAnalyzer {
 	public void resetAttributeFlags() {
 		Arrays.fill(attributeFlags, false);
 	}
+
 }
