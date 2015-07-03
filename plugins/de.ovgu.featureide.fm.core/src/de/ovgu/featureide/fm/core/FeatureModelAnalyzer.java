@@ -425,7 +425,7 @@ public class FeatureModelAnalyzer {
 		}
 		
 		cachedDeadFeatures = deadFeatures;
-		return cachedDeadFeatures;
+		return getCachedDeadFeatures();
 	}
 	
 	public List<Feature> getCoreFeatures() {
@@ -453,12 +453,8 @@ public class FeatureModelAnalyzer {
 	}
 	
 	private List<List<Feature>> analyzeFeatures(long timeout, SatSolver.ValueType vt, Object... selectedFeatures) {
-		final ArrayList<List<Feature>> result = new ArrayList<>(2);
 		final ArrayList<Feature> coreFeatures = new ArrayList<>();
 		final ArrayList<Feature> deadFeatures = new ArrayList<>();
-		
-		result.add(coreFeatures);
-		result.add(deadFeatures);
 		
 		Node formula = NodeCreator.createNodes(fm);
 		if (selectedFeatures.length > 0) {
@@ -482,6 +478,11 @@ public class FeatureModelAnalyzer {
 
 		cachedCoreFeatures = coreFeatures;
 		cachedDeadFeatures = deadFeatures;
+
+		final ArrayList<List<Feature>> result = new ArrayList<>(2);
+		result.add(getCachedCoreFeatures());
+		result.add(getCachedDeadFeatures());
+		
 		return result;
 	}
 	
@@ -555,7 +556,7 @@ public class FeatureModelAnalyzer {
 		clone.constraints.clear();
 		SatSolver solver = new SatSolver(NodeCreator.createNodes(clone), 1000);
 	
-		Collection<Feature> fmDeadFeatures = getCachedDeadFeatures();
+		Collection<Feature> fmDeadFeatures = new ArrayList<>(getCachedDeadFeatures());
 		Collection<Feature> fmFalseOptionals = getCachedFalseOptionalFeatures();
 		try {
 			if (!cachedValidity) { 
@@ -681,6 +682,7 @@ public class FeatureModelAnalyzer {
 				if (!fmDeadFeatures.isEmpty()) {
 					Collection<Feature> deadFeatures = constraint.getDeadFeatures(solver, clone, fmDeadFeatures);
 					if (!deadFeatures.isEmpty()) {
+						fmDeadFeatures.removeAll(deadFeatures);
 						constraint.setDeadFeatures(deadFeatures);
 						constraint.setConstraintAttribute(ConstraintAttribute.DEAD, false);
 						changedAttributes.put(constraint, ConstraintAttribute.DEAD);
@@ -961,12 +963,12 @@ public class FeatureModelAnalyzer {
 		cancel = value;
 	}
 
-	public Collection<Feature> getCachedDeadFeatures() {
-		return cachedDeadFeatures;
+	public List<Feature> getCachedDeadFeatures() {
+		return Collections.unmodifiableList(cachedDeadFeatures);
 	}
 
 	public List<Feature> getCachedCoreFeatures() {
-		return cachedCoreFeatures;
+		return Collections.unmodifiableList(cachedCoreFeatures);
 	}
 
 	public boolean getAttributeFlag(Attribute attribute) {
