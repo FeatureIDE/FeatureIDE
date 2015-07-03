@@ -24,16 +24,15 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.JavaConventions;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.corext.refactoring.Checks;
 import org.eclipse.jdt.internal.corext.refactoring.RefactoringCoreMessages;
 import org.eclipse.jdt.internal.corext.util.Messages;
 import org.eclipse.jdt.internal.ui.viewsupport.BasicElementLabels;
-import org.eclipse.jdt.ui.JavaElementLabels;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 
 import de.ovgu.featureide.core.IFeatureProject;
@@ -42,6 +41,8 @@ import de.ovgu.featureide.core.signature.base.AbstractMethodSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.core.signature.base.FOPFeatureData;
 import de.ovgu.featureide.featurehouse.refactoring.matcher.SignatureMatcher;
+import de.ovgu.featureide.featurehouse.refactoring.visitors.IASTVisitor;
+import de.ovgu.featureide.featurehouse.refactoring.visitors.TypeVisitor;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiClassSignature;
 
 /**
@@ -50,9 +51,9 @@ import de.ovgu.featureide.featurehouse.signature.fuji.FujiClassSignature;
  * @author Steffen Schulze
  */
 @SuppressWarnings("restriction")
-public class RenameTypeRefactoring extends RenameRefactoring<IType> {
+public class RenameTypeRefactoring extends RenameRefactoring<FujiClassSignature> {
 
-	public RenameTypeRefactoring(IType selection, IFeatureProject featureProject) {
+	public RenameTypeRefactoring(FujiClassSignature selection, IFeatureProject featureProject) {
 		super(selection, featureProject);
 	}
 
@@ -68,13 +69,8 @@ public class RenameTypeRefactoring extends RenameRefactoring<IType> {
 
 	@Override
 	protected void checkPreConditions(final SignatureMatcher matcher, final RefactoringStatus refactoringStatus) throws JavaModelException, CoreException {
-
-		refactoringStatus.merge(checkNewElementName(newName));
-		if (refactoringStatus.hasFatalError())
-			return;
-		refactoringStatus.merge(Checks.checkIfCuBroken(renamingElement));
-		if (refactoringStatus.hasFatalError())
-			return;
+		super.checkPreConditions(matcher, refactoringStatus);
+		if (refactoringStatus.hasFatalError()) return;
 		
 		refactoringStatus.merge(checkTypesInCompilationUnit(matcher));
 	}
@@ -140,7 +136,7 @@ public class RenameTypeRefactoring extends RenameRefactoring<IType> {
 				result.addError(Messages.format(
 						RefactoringCoreMessages.RenameTypeRefactoring_imported,
 						new Object[] { BasicElementLabels.getJavaElementName(newName),
-								BasicElementLabels.getPathLabel(renamingElement.getCompilationUnit().getResource().getFullPath(), false) }));
+								BasicElementLabels.getPathLabel(getFile(renamingElement.getFirstFeatureData().getAbsoluteFilePath()).getFullPath(), false) }));
 			}
 		}
 		
@@ -173,25 +169,43 @@ public class RenameTypeRefactoring extends RenameRefactoring<IType> {
 		return false;
 	}
 
-	@Override
-	public RefactoringStatus checkInitialConditions(IProgressMonitor pm) throws CoreException, OperationCanceledException {
-
-		IType primary= (IType) renamingElement.getPrimaryElement();
-		if (primary == null || !primary.exists()) {
-			String qualifiedTypeName= JavaElementLabels.getElementLabel(renamingElement, JavaElementLabels.F_FULLY_QUALIFIED);
-			String message= Messages.format(RefactoringCoreMessages.RenameTypeRefactoring_does_not_exist, new String[] { BasicElementLabels.getJavaElementName(qualifiedTypeName), BasicElementLabels.getFileName(renamingElement.getCompilationUnit())});
-			return RefactoringStatus.createFatalErrorStatus(message);
-		}
-		return Checks.checkIfCuBroken(renamingElement);
-	}
 
 	@Override
 	public RefactoringStatus checkNewElementName(String newName) {
 		Assert.isNotNull(newName, "new name"); //$NON-NLS-1$
-		RefactoringStatus result= Checks.checkTypeName(newName, renamingElement);
-		if (Checks.isAlreadyNamed(renamingElement, newName))
+		RefactoringStatus result = checkTypeName(newName);
+		if (renamingElement.getName().equals(newName))
 			result.addFatalError(RefactoringCoreMessages.RenameTypeRefactoring_choose_another_name);
 		return result;
 	}
+	
+	/**
+	 * Checks if the given name is a valid Java type name.
+	 *
+	 * @param name the java method name.
+	 * @param context an {@link IJavaElement} or <code>null</code>
+	 * @return a refactoring status containing the error message if the
+	 *  name is not a valid java type name.
+	 */
+	private RefactoringStatus checkTypeName(String name) {
+		if (name.indexOf(".") != -1) //$NON-NLS-1$
+			return RefactoringStatus.createFatalErrorStatus(RefactoringCoreMessages.Checks_no_dot);
+		else
+			return Checks.checkName(name, validateJavaTypeName(name));
+	}
+	
+	/**
+	 * @param name the name to validate
+	 * @param context an {@link IJavaElement} or <code>null</code>
+	 * @return validation status in <code>context</code>'s project or in the workspace
+	 *
+	 * @see JavaConventions#validateJavaTypeName(String, String, String)
+	 */
+	private IStatus validateJavaTypeName(String name) {
+		String[] sourceComplianceLevels = getSourceComplianceLevels();
+		return JavaConventions.validateJavaTypeName(name, sourceComplianceLevels[0], sourceComplianceLevels[1]);
+	}
+
+	
 
 }

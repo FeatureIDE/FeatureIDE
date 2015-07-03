@@ -1,5 +1,6 @@
 package de.ovgu.featureide.featurehouse.refactoring;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.internal.ui.refactoring.RefactoringUIMessages;
 import org.eclipse.ltk.ui.refactoring.UserInputWizardPage;
@@ -12,17 +13,20 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
+import de.ovgu.featureide.core.signature.base.AbstractSignature;
+
 
 @SuppressWarnings("restriction")
 public class RenameRefactoringWizardPage extends UserInputWizardPage {
 	
 	private static final String PAGE_NAME = "RefactoringInputPage";	
-	private final RenameRefactoring refactoring;
+	private final RenameRefactoring<AbstractSignature> refactoring;
 	private Text newNameField;
 	
+	@SuppressWarnings("unchecked")
 	public RenameRefactoringWizardPage(RenameRefactoringWizard wizard) {
 		super(PAGE_NAME);
-		refactoring = (RenameRefactoring) wizard.getRefactoring();
+		refactoring = (RenameRefactoring<AbstractSignature>) wizard.getRefactoring();
 	}
 	
 	@Override
@@ -53,10 +57,14 @@ public class RenameRefactoringWizardPage extends UserInputWizardPage {
 	}
 	
 	protected final void validatePage() {
-		RefactoringStatus status;
-		status = refactoring.checkNewElementName(newNameField.getText());
-		refactoring.setNewName(newNameField.getText());
-		setPageComplete(status);
+		try {
+			RefactoringStatus status;
+			status = refactoring.checkNewElementName(newNameField.getText());
+			refactoring.setNewName(newNameField.getText());
+			setPageComplete(status);
+		} catch (CoreException ce) {
+
+		}
 	}
 	
 }

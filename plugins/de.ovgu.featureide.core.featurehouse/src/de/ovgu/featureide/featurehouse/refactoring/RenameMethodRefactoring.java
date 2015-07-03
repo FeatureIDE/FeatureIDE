@@ -26,20 +26,17 @@ import java.util.Set;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.IMethod;
-import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.JavaConventions;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.jdt.internal.corext.refactoring.Checks;
 import org.eclipse.jdt.internal.corext.refactoring.RefactoringCoreMessages;
-import org.eclipse.jdt.internal.corext.refactoring.base.JavaStatusContext;
-import org.eclipse.jdt.internal.corext.refactoring.rename.MethodChecks;
-import org.eclipse.jdt.internal.corext.util.JavaConventionsUtil;
 import org.eclipse.jdt.internal.corext.util.Messages;
 import org.eclipse.jdt.internal.ui.viewsupport.BasicElementLabels;
-import org.eclipse.jdt.ui.JavaElementLabels;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 
 import de.ovgu.featureide.core.IFeatureProject;
@@ -47,6 +44,8 @@ import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.featurehouse.refactoring.matcher.MethodSignatureMatcher;
 import de.ovgu.featureide.featurehouse.refactoring.matcher.SignatureMatcher;
+import de.ovgu.featureide.featurehouse.refactoring.visitors.IASTVisitor;
+import de.ovgu.featureide.featurehouse.refactoring.visitors.MethodVisitor;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
 
 /**
@@ -55,10 +54,10 @@ import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
  * @author Steffen Schulze
  */
 @SuppressWarnings("restriction")
-public class RenameMethodRefactoring extends RenameRefactoring<IMethod> {
+public class RenameMethodRefactoring extends RenameRefactoring<FujiMethodSignature> {
 
-	public RenameMethodRefactoring(IMethod selection, IFeatureProject featureProject) {
-		super(selection, featureProject);
+	public RenameMethodRefactoring(FujiMethodSignature method, IFeatureProject featureProject) {
+		super(method, featureProject);
 	}
 
 	@Override
@@ -77,23 +76,18 @@ public class RenameMethodRefactoring extends RenameRefactoring<IMethod> {
 	protected void checkPreConditions(final SignatureMatcher matcher, final RefactoringStatus refactoringStatus) throws JavaModelException,
 			CoreException {
 		
-		if (!Checks.isAvailable(renamingElement)) {
-			refactoringStatus.addFatalError(RefactoringCoreMessages.RenameMethodProcessor_is_binary, JavaStatusContext.create(renamingElement));
-			return;
-		}
-		refactoringStatus.merge(Checks.checkIfCuBroken(renamingElement));
-		if (refactoringStatus.hasFatalError())
-			return;
+		super.checkPreConditions(matcher, refactoringStatus);
+		if (refactoringStatus.hasFatalError()) return;
+		
 //		pm.setTaskName(RefactoringCoreMessages.RenameMethodRefactoring_taskName_checkingPreconditions);
-		refactoringStatus.merge(checkNewElementName(newName));
-		if (refactoringStatus.hasFatalError())
-			return;
+	
 
-		final IType declaring = renamingElement.getDeclaringType();
+//		final AbstractClassSignature declaring = renamingElement.getParent();
 
-		if (declaring.isInterface() && isSpecialCase()) {
-			refactoringStatus.addError(RefactoringCoreMessages.RenameMethodInInterfaceRefactoring_special_case);
-		} 
+//		boolean isInterface =  declaring.getType().equals(ExtendedFujiSignaturesJob.TYPE_INTERFACE);
+//		if (isInterface && isSpecialCase()) {
+//			refactoringStatus.addError(RefactoringCoreMessages.RenameMethodInInterfaceRefactoring_special_case);
+//		} 
 
 //		AbstractMethodSignature topmost = matcher.findDeclaringMethod((FujiMethodSignature)matcher.getSelectedSignature());
 		
@@ -138,7 +132,7 @@ public class RenameMethodRefactoring extends RenameRefactoring<IMethod> {
 		for (FujiMethodSignature methodSignature : result) {
 			if (RefactoringUtil.hasSameParameters(methodSignature, renamingElement)) {
 				String message;
-				if (MethodChecks.isVirtual(renamingElement)) {
+				if (RefactoringUtil.isVirtual(renamingElement)) {
 					message = Messages.format(RefactoringCoreMessages.RenameVirtualMethodRefactoring_hierarchy_declares1,
 							new String[] { BasicElementLabels.getJavaElementName(methodSignature.getName()) });
 				} else {
@@ -148,7 +142,7 @@ public class RenameMethodRefactoring extends RenameRefactoring<IMethod> {
 				refactoringStatus.addError(message);
 			} else {
 				String message;
-				if (MethodChecks.isVirtual(renamingElement)) {
+				if (RefactoringUtil.isVirtual(renamingElement)) {
 					message = Messages.format(RefactoringCoreMessages.RenameVirtualMethodRefactoring_hierarchy_declares2,
 							new String[] { BasicElementLabels.getJavaElementName(methodSignature.getName()) });
 				} else {
@@ -160,63 +154,92 @@ public class RenameMethodRefactoring extends RenameRefactoring<IMethod> {
 		}
 	}
 	
-	private boolean isSpecialCase() throws CoreException {
-		String[] noParams= new String[0];
-		String[] specialNames= new String[]{"toString", "toString", "toString", "toString", "equals", //$NON-NLS-5$ //$NON-NLS-4$ //$NON-NLS-3$ //$NON-NLS-2$ //$NON-NLS-1$
-											"equals", "getClass", "getClass", "hashCode", "notify", //$NON-NLS-5$ //$NON-NLS-4$ //$NON-NLS-3$ //$NON-NLS-2$ //$NON-NLS-1$
-											"notifyAll", "wait", "wait", "wait"}; //$NON-NLS-4$ //$NON-NLS-3$ //$NON-NLS-2$ //$NON-NLS-1$
-		String[][] specialParamTypes= new String[][]{noParams, noParams, noParams, noParams,
-													 {"QObject;"}, {"Qjava.lang.Object;"}, noParams, noParams, //$NON-NLS-2$ //$NON-NLS-1$
-													 noParams, noParams, noParams, {Signature.SIG_LONG, Signature.SIG_INT},
-													 {Signature.SIG_LONG}, noParams};
-		String[] specialReturnTypes= new String[]{"QString;", "QString;", "Qjava.lang.String;", "Qjava.lang.String;", //$NON-NLS-4$ //$NON-NLS-3$ //$NON-NLS-2$ //$NON-NLS-1$
-												   Signature.SIG_BOOLEAN, Signature.SIG_BOOLEAN, "QClass;", "Qjava.lang.Class;", //$NON-NLS-2$ //$NON-NLS-1$
-												   Signature.SIG_INT, Signature.SIG_VOID, Signature.SIG_VOID, Signature.SIG_VOID,
-												   Signature.SIG_VOID, Signature.SIG_VOID};
-		Assert.isTrue((specialNames.length == specialParamTypes.length) && (specialParamTypes.length == specialReturnTypes.length));
-		for (int i= 0; i < specialNames.length; i++){
-			if (specialNames[i].equals(newName)
-				&& Checks.compareParamTypes(renamingElement.getParameterTypes(), specialParamTypes[i])
-				&& !specialReturnTypes[i].equals(renamingElement.getReturnType())){
-					return true;
-			}
-		}
-		return false;
-	}
+//	private boolean isSpecialCase() throws CoreException {
+//		String[] noParams= new String[0];
+//		String[] specialNames= new String[]{"toString", "toString", "toString", "toString", "equals", //$NON-NLS-5$ //$NON-NLS-4$ //$NON-NLS-3$ //$NON-NLS-2$ //$NON-NLS-1$
+//											"equals", "getClass", "getClass", "hashCode", "notify", //$NON-NLS-5$ //$NON-NLS-4$ //$NON-NLS-3$ //$NON-NLS-2$ //$NON-NLS-1$
+//											"notifyAll", "wait", "wait", "wait"}; //$NON-NLS-4$ //$NON-NLS-3$ //$NON-NLS-2$ //$NON-NLS-1$
+//		String[][] specialParamTypes= new String[][]{noParams, noParams, noParams, noParams,
+//													 {"QObject;"}, {"Qjava.lang.Object;"}, noParams, noParams, //$NON-NLS-2$ //$NON-NLS-1$
+//													 noParams, noParams, noParams, {Signature.SIG_LONG, Signature.SIG_INT},
+//													 {Signature.SIG_LONG}, noParams};
+//		String[] specialReturnTypes= new String[]{"QString;", "QString;", "Qjava.lang.String;", "Qjava.lang.String;", //$NON-NLS-4$ //$NON-NLS-3$ //$NON-NLS-2$ //$NON-NLS-1$
+//												   Signature.SIG_BOOLEAN, Signature.SIG_BOOLEAN, "QClass;", "Qjava.lang.Class;", //$NON-NLS-2$ //$NON-NLS-1$
+//												   Signature.SIG_INT, Signature.SIG_VOID, Signature.SIG_VOID, Signature.SIG_VOID,
+//												   Signature.SIG_VOID, Signature.SIG_VOID};
+//		Assert.isTrue((specialNames.length == specialParamTypes.length) && (specialParamTypes.length == specialReturnTypes.length));
+//		for (int i= 0; i < specialNames.length; i++){
+//			if (specialNames[i].equals(newName)
+//				&& Checks.compareParamTypes(renamingElement.getParameterTypes(), specialParamTypes[i])
+//				&& !specialReturnTypes[i].equals(renamingElement.getReturnType())){
+//					return true;
+//			}
+//		}
+//		return false;
+//	}
+//	
+//	public static boolean compareParamTypes(String[] paramTypes1, String[] paramTypes2) {
+//		if (paramTypes1.length == paramTypes2.length) {
+//			int i= 0;
+//			while (i < paramTypes1.length) {
+//				String t1= Signature.getSimpleName(Signature.toString(paramTypes1[i]));
+//				String t2= Signature.getSimpleName(Signature.toString(paramTypes2[i]));
+//				if (!t1.equals(t2)) {
+//					return false;
+//				}
+//				i++;
+//			}
+//			return true;
+//		}
+//		return false;
+//	}
+
 
 	@Override
 	public RefactoringStatus checkInitialConditions(IProgressMonitor pm) throws CoreException, OperationCanceledException {
-		if (!renamingElement.exists()) {
+		if (renamingElement == null) {
 			String message = Messages.format(RefactoringCoreMessages.RenameMethodRefactoring_deleted,
-					BasicElementLabels.getFileName(renamingElement.getCompilationUnit()));
+					getFullFilePathForRenamingElement());
 			return RefactoringStatus.createFatalErrorStatus(message);
 		}
-
-		RefactoringStatus result = Checks.checkAvailability(renamingElement);
-		if (result.hasFatalError())
-			return result;
-		result.merge(Checks.checkIfCuBroken(renamingElement));
-		return result;
+		return super.checkInitialConditions(pm);
 	}
+
+
 
 	//RenameMethodProcessor
 	@Override
 	public RefactoringStatus checkNewElementName(String newName) {
 		Assert.isNotNull(newName, "new name"); 
 
-		RefactoringStatus status = Checks.checkName(newName, JavaConventionsUtil.validateMethodName(newName, renamingElement));
+		RefactoringStatus status = Checks.checkName(newName, validateMethodName(newName));
 		if (status.isOK() && !Checks.startsWithLowerCase(newName))
 			status = RefactoringStatus.createWarningStatus(Messages.format(RefactoringCoreMessages.Checks_method_names_lowercase2, new String[] {
-					BasicElementLabels.getJavaElementName(newName), getDeclaringTypeLabel() }));
+					BasicElementLabels.getJavaElementName(newName), ""/*getDeclaringTypeLabel()*/ }));
 
-		if (Checks.isAlreadyNamed(renamingElement, newName))
-			status.addFatalError(RefactoringCoreMessages.RenameMethodRefactoring_same_name, JavaStatusContext.create(renamingElement));
+		if (renamingElement.getName().equals(newName))
+			status.addFatalError(RefactoringCoreMessages.RenameMethodRefactoring_same_name);
 		return status;
 	}
-
-	private String getDeclaringTypeLabel() {
-		return JavaElementLabels.getElementLabel(renamingElement.getDeclaringType(), JavaElementLabels.ALL_DEFAULT);
+	
+	/**
+	 * @param name the name to validate
+	 * @param context an {@link IJavaElement} or <code>null</code>
+	 * @return validation status in <code>context</code>'s project or in the workspace
+	 *
+	 * @see JavaConventions#validateMethodName(String, String, String)
+	 */
+	public IStatus validateMethodName(String name) {
+		String[] sourceComplianceLevels= new String[] {
+				JavaCore.getOption(JavaCore.COMPILER_SOURCE),
+				JavaCore.getOption(JavaCore.COMPILER_COMPLIANCE)
+		};
+		return JavaConventions.validateMethodName(name, sourceComplianceLevels[0], sourceComplianceLevels[1]);
 	}
+
+//	private String getDeclaringTypeLabel() {
+//		return JavaElementLabels.getElementLabel(renamingElement.getDeclaringType(), JavaElementLabels.ALL_DEFAULT);
+//	}
 	
 	private boolean reduceVisibility(final FujiMethodSignature selectedSignature, final FujiMethodSignature methodSignature) {
 		if (selectedSignature.isDefault() && (methodSignature.isPrivate()))

@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
@@ -46,31 +45,36 @@ public class MethodSignatureMatcher extends SignatureMatcher {
 
 	Map<AbstractClassSignature, List<AbstractClassSignature>> typeHierarchy = new HashMap<>();
 	
-	public MethodSignatureMatcher(ProjectSignatures signatures, IMember selectedElement, String newName) {
+	public MethodSignatureMatcher(final ProjectSignatures signatures, final AbstractSignature selectedElement, final String newName) {
 		super(signatures, selectedElement, newName);
 	}
 	
 	@Override
 	protected Set<AbstractSignature> determineMatchedSignatures() {
-		
-		final Set<AbstractSignature> allMatchedSignatures = getNamedMatchedSignatures(selectedElement.getElementName());
-		
-		Set<AbstractClassSignature> involvedSuperClasses = new HashSet<>();
-		
-		Set<AbstractClassSignature> involvedClasses = new HashSet<>();
-		involvedClasses.add(selectedSignature.getParent());
-		
-		if (allMatchedSignatures.size() > 1) {
-			addSuperClasses(involvedSuperClasses, selectedSignature.getParent());
-			filterSuperClasses(involvedSuperClasses, allMatchedSignatures);
-			involvedClasses.addAll(involvedSuperClasses); 
-			if (!selectedSignature.isPrivate()) {
-				addSubClasses(involvedClasses, new HashSet<>(involvedClasses));
+
+		final Set<AbstractSignature> matched = new HashSet<>();
+		if (RefactoringUtil.isVirtual((FujiMethodSignature) selectedSignature)) {
+
+			matched.addAll(getMatchedSignatures());
+
+			final Set<AbstractClassSignature> involvedSuperClasses = new HashSet<>();
+			final Set<AbstractClassSignature> involvedClasses = new HashSet<>();
+			involvedClasses.add(selectedSignature.getParent());
+
+			if (matched.size() > 1) {
+				addSuperClasses(involvedSuperClasses, selectedSignature.getParent());
+				filterSuperClasses(involvedSuperClasses, matched);
+				involvedClasses.addAll(involvedSuperClasses);
+				if (!selectedSignature.isPrivate()) {
+					addSubClasses(involvedClasses, new HashSet<>(involvedClasses));
+				}
 			}
+
+			filterMatchedSignatures(involvedClasses, matched);
+		} else {
+			matched.add(selectedSignature);
 		}
-		
-		filterMatchedSignatures(involvedClasses, allMatchedSignatures);
-		return allMatchedSignatures;
+		return matched;
 	}
 	
 

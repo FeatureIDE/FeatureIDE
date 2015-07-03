@@ -34,6 +34,8 @@ import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 
+import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
+import de.ovgu.featureide.core.signature.base.AbstractMethodSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiClassSignature;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
@@ -64,8 +66,10 @@ public class RefactoringUtil {
 			className = member.getElementName();
 		
 		String sigClassName = signature.getName();
-		if (!(signature instanceof FujiClassSignature)) 
-			sigClassName = signature.getParent().getName();
+		AbstractClassSignature classSig = signature.getParent();
+		if (classSig != null) {
+			sigClassName = classSig.getName();
+		}
 		
 		return sigClassName.equals(className) && hasSamePackage(signature, member);
 	}
@@ -135,6 +139,30 @@ public class RefactoringUtil {
 		}
 
 		return Arrays.equals(simpleNames, parameterTypes.toArray(new String[parameterTypes.size()]));
+	}
+	
+	public static boolean hasSameParameters(final FujiMethodSignature signature1, final FujiMethodSignature signature2) {
+		List<String> parameterTypes1 = signature1.getParameterTypes();
+		List<String> parameterTypes2 = signature1.getParameterTypes();
+		
+		return parameterTypes1.equals(parameterTypes2);
+	}
+	
+	/**
+	 * Returns <code>true</code> iff the method could be a virtual method,
+	 * i.e. if it is not a constructor, is private, or is static.
+	 *
+	 * @param method a method
+	 * @return <code>true</code> iff the method could a virtual method
+	 */
+	public static boolean isVirtual(AbstractMethodSignature method) {
+		if (method.isConstructor())
+			return false;
+		if (method.isPrivate())
+			return false;
+		if (method.isStatic())
+			return false;
+		return true;
 	}
 
 }

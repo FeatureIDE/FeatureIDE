@@ -20,30 +20,28 @@
  */
 package de.ovgu.featureide.featurehouse.refactoring.matcher;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 import de.ovgu.featureide.core.signature.ProjectSignatures;
-import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.featurehouse.refactoring.RefactoringUtil;
-import de.ovgu.featureide.featurehouse.signature.fuji.FujiClassSignature;
+import de.ovgu.featureide.featurehouse.signature.fuji.FujiFieldSignature;
 
 /**
  * TODO description
  * 
  * @author steffen
  */
-public class TypeSignatureMatcher extends SignatureMatcher {
+public class FieldSignatureMatcher extends SignatureMatcher {
 
-	public TypeSignatureMatcher(ProjectSignatures signatures, AbstractSignature selectedElement, String newName) {
+	public FieldSignatureMatcher(ProjectSignatures signatures, AbstractSignature selectedElement, String newName) {
 		super(signatures, selectedElement, newName);
 	}
 
 	@Override
 	protected boolean hasSameType(AbstractSignature signature) {
-		return (signature instanceof FujiClassSignature);
+		return (signature instanceof FujiFieldSignature);
 	}
 	
 	@Override
@@ -53,22 +51,9 @@ public class TypeSignatureMatcher extends SignatureMatcher {
 	
 	@Override
 	protected Set<AbstractSignature> determineMatchedSignatures() {
-		
-		if (!hasSameType(selectedSignature)) return Collections.emptySet();
 
 		final Set<AbstractSignature> result = new HashSet<>();
 		result.add(selectedSignature);
-		
-		for (String className : ((FujiClassSignature) selectedSignature).getSubClassesList()) {
-			if (!classes.containsKey(className))
-				continue;
-
-			final AbstractClassSignature classSignature = classes.get(className);
-
-			if (!result.contains(classSignature)) {
-				result.add(classSignature);
-			}
-		}
 		
 		return result;
 	}

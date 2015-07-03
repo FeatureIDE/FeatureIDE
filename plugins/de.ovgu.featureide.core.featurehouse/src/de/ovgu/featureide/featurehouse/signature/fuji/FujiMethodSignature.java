@@ -135,8 +135,8 @@ public class FujiMethodSignature extends AbstractMethodSignature {
 		if (isConstructor != otherSig.isConstructor) {
 			return false;
 		}
-		
-		if (returnType != otherSig.returnType) {
+
+		if (!returnType.name().equals(otherSig.returnType.name())) {
 			return false;
 		}
 		

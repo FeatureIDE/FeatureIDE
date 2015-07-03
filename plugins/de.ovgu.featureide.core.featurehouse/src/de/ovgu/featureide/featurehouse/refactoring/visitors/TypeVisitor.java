@@ -18,18 +18,21 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.featurehouse.refactoring;
+package de.ovgu.featureide.featurehouse.refactoring.visitors;
 
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
+import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.SimpleType;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
+import org.eclipse.jdt.core.dom.TypeLiteral;
 
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
+import de.ovgu.featureide.featurehouse.refactoring.RefactoringSignature;
 
 
 /**
@@ -60,17 +63,17 @@ public class TypeVisitor extends AbstractASTVisitor {
 		return false;
 	}
 	
-	@Override
-	public boolean visit(ClassInstanceCreation node) {
-		Type type = node.getType();
-		if (type instanceof SimpleType) {
-			SimpleType simpleType = (SimpleType) type;
-			if (hasSameName(refactoringSignature.getDeclaration(), simpleType.getName())) {
-				addSearchMatch(getSimpleName(simpleType.getName()));
-			}
-		}
-		return false;
-	}
+//	@Override
+//	public boolean visit(ClassInstanceCreation node) {
+//		Type type = node.getType();
+//		if (type instanceof SimpleType) {
+//			SimpleType simpleType = (SimpleType) type;
+//			if (hasSameName(refactoringSignature.getDeclaration(), simpleType.getName())) {
+//				addSearchMatch(getSimpleName(simpleType.getName()));
+//			}
+//		}
+//		return false;
+//	}
 
 	@Override
 	public boolean visit(MethodDeclaration node) {
@@ -83,7 +86,7 @@ public class TypeVisitor extends AbstractASTVisitor {
 
 		return checkChildren;
 	}
-	
+
 	@Override
 	public boolean visit(ImportDeclaration node) {
 		

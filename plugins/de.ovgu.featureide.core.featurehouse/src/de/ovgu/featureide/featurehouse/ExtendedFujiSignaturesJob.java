@@ -21,6 +21,7 @@
 package de.ovgu.featureide.featurehouse;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -209,9 +210,6 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 		}
 	}
 	
-	public static final String TYPE_INTERFACE = "interface";
-	public static final String TYPE_CLASS = "class";
-	
 	private final IFeatureProject featureProject;
 	private final ProjectSignatures projectSignatures;
 	private final FeatureDataConstructor featureDataConstructor;
@@ -354,9 +352,9 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 					String typeString = null;
 
 					if (typeDecl instanceof ClassDecl) {
-						typeString = TYPE_CLASS;
+						typeString = AbstractClassSignature.TYPE_CLASS;
 					} else if (typeDecl instanceof InterfaceDecl) {
-						typeString = TYPE_INTERFACE;
+						typeString = AbstractClassSignature.TYPE_INTERFACE;
 					}
 					
 					AbstractClassSignature parent = null;
@@ -475,9 +473,9 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 					String typeString = null;
 
 					if (typeDecl instanceof ClassDecl) {
-						typeString = TYPE_CLASS;
+						typeString = AbstractClassSignature.TYPE_CLASS;
 					} else if (typeDecl instanceof InterfaceDecl) {
-						typeString = TYPE_INTERFACE;
+						typeString = AbstractClassSignature.TYPE_INTERFACE;
 					}
 
 					AbstractClassSignature parent = null;
@@ -610,7 +608,7 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 			for (String implement : classSignature.getImplementList()) {
 				if (classes.containsKey(implement)) {
 					AbstractClassSignature implementClass = classes.get(implement);
-					if (implementClass.getType().equals(TYPE_INTERFACE))		
+					if (implementClass.getType().equals(AbstractClassSignature.TYPE_INTERFACE))		
 						implementClass.addSubClass(signature.getName());
 				}
 			}

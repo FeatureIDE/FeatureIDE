@@ -25,8 +25,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.jdt.core.IMember;
-
 import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.core.signature.ProjectSignatures.SignatureIterator;
 import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
@@ -43,19 +41,18 @@ import de.ovgu.featureide.featurehouse.refactoring.RefactoringUtil;
 public abstract class SignatureMatcher {
 
 	private final ProjectSignatures signatures;
-	protected final IMember selectedElement;
+	protected final AbstractSignature selectedElement;
 	protected AbstractSignature selectedSignature;
-	private final String newName;
-	private Set<AbstractSignature> newNameMatchedSignatures;
+	protected final String newName;
+	protected Set<AbstractSignature> newNameMatchedSignatures;
 	private Set<AbstractSignature> matchedSignatures;
 	protected Map<String, AbstractClassSignature> classes = new HashMap<>();
 	
-	protected Set<AbstractSignature> subClasses = new HashSet<>();
-	protected Set<AbstractSignature> superClasses = new HashSet<>();
-	protected Set<AbstractSignature> interfaces = new HashSet<>();
+//	protected Set<AbstractSignature> subClasses = new HashSet<>();
+//	protected Set<AbstractSignature> superClasses = new HashSet<>();
+//	protected Set<AbstractSignature> interfaces = new HashSet<>();
 
-
-	public SignatureMatcher(final ProjectSignatures signatures, final IMember selectedElement, final String newName) {
+	public SignatureMatcher(final ProjectSignatures signatures, final AbstractSignature selectedElement, final String newName) {
 		this.signatures = signatures;
 		this.selectedElement = selectedElement;
 		this.newName = newName;
@@ -63,7 +60,7 @@ public abstract class SignatureMatcher {
 	
 	public void findMatchedSignatures(){
 		classes = getClasses();
-		matchedSignatures = getNamedMatchedSignatures(selectedElement.getElementName());
+		matchedSignatures = getNamedMatchedSignatures(selectedElement.getName());
 		newNameMatchedSignatures = getNamedMatchedSignatures(newName); 
 		selectedSignature = selectSignature();
 		matchedSignatures = determineMatchedSignatures();
@@ -76,7 +73,7 @@ public abstract class SignatureMatcher {
 			return matchedSignatures.iterator().next();
 		} else {
 			for (AbstractSignature matchedSignature : matchedSignatures) {
-				if (checkSignature(matchedSignature) && RefactoringUtil.hasSameClass(matchedSignature, selectedElement))
+				if (matchedSignature.equals(selectedElement))
 					return matchedSignature;
 			}
 		}

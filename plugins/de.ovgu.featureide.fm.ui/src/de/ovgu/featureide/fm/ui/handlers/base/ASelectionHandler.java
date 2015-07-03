@@ -20,30 +20,14 @@
  */
 package de.ovgu.featureide.fm.ui.handlers.base;
 
-import java.util.Arrays;
 import java.util.Iterator;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.IMethod;
-import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.ITypeRoot;
-import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.internal.ui.javaeditor.EditorUtility;
-import org.eclipse.jdt.internal.ui.javaeditor.JavaEditor;
-import org.eclipse.jdt.ui.JavaUI;
-import org.eclipse.jface.text.ITextSelection;
-import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
-import org.eclipse.ui.texteditor.ITextEditor;
 
 /**
  * Abstract class for handlers that work on selections.
@@ -60,7 +44,7 @@ public abstract class ASelectionHandler extends AbstractHandler {
 	protected abstract void singleAction(Object element);
 
 	@Override
-	public final Object execute(ExecutionEvent event) throws ExecutionException {
+	public Object execute(ExecutionEvent event) throws ExecutionException {
 		final ISelection selection = HandlerUtil.getCurrentSelection(event);
 		if (selection instanceof IStructuredSelection) {
 			IStructuredSelection strSelection = (IStructuredSelection) selection;
@@ -70,30 +54,6 @@ public abstract class ASelectionHandler extends AbstractHandler {
 				}
 				endAction();
 			}
-		}
-		else if (selection instanceof ITextSelection)
-		{
-			IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-			ITextEditor editor = (ITextEditor) page.getActiveEditor();
-			IJavaElement elem = JavaUI.getEditorInputJavaElement(editor.getEditorInput());
-			if (elem instanceof ICompilationUnit) {
-			    ITextSelection sel = (ITextSelection) editor.getSelectionProvider().getSelection();
-				
-				ITypeRoot root = (ITypeRoot) JavaUI.getEditorInputJavaElement(editor.getEditorInput());
-				IJavaElement[] elt;
-				try {
-//					 IJavaElement selected =  ((ICompilationUnit) elem).getElementAt(sel.getOffset());
-//					 if (selected != null && selected.getElementType() == IJavaElement.METHOD) {
-//						 singleAction((IMethod) selected);
-//				    }
-					elt = root.codeSelect(sel.getOffset(), sel.getLength());
-					if (elt.length > 0) singleAction(elt[0]);
-				} catch (JavaModelException e) {
-					e.printStackTrace();
-				}
-			}
-			
-			
 		}
 		
 		return null;
@@ -118,5 +78,5 @@ public abstract class ASelectionHandler extends AbstractHandler {
 	protected void endAction() {
 		// do nothing.
 	}
-
+	
 }

@@ -30,6 +30,9 @@ import java.util.Set;
  */
 public abstract class AbstractClassSignature extends AbstractSignature {
 
+	public static final String TYPE_INTERFACE = "interface";
+	public static final String TYPE_CLASS = "class";
+	
 	protected final String pckg;
 
 	protected final HashSet<String> 
@@ -118,6 +121,10 @@ public abstract class AbstractClassSignature extends AbstractSignature {
 	
 	public Set<AbstractClassSignature> getMemberClasses() {
 		return memberClasses;
+	}
+	
+	public boolean isInterface(){
+		return this.type.equals(TYPE_INTERFACE);
 	}
 
 //	@Override
