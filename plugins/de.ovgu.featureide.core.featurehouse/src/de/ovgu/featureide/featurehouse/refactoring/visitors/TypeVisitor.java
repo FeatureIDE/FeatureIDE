@@ -22,14 +22,10 @@ package de.ovgu.featureide.featurehouse.refactoring.visitors;
 
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ClassInstanceCreation;
-import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.SimpleType;
-import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
-import org.eclipse.jdt.core.dom.TypeLiteral;
 
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.featurehouse.refactoring.RefactoringSignature;
@@ -42,8 +38,8 @@ import de.ovgu.featureide.featurehouse.refactoring.RefactoringSignature;
  */
 public class TypeVisitor extends AbstractASTVisitor {
 
-	public TypeVisitor(final ICompilationUnit unit, final RefactoringSignature refactoringSignature) {
-		super(unit, refactoringSignature);
+	public TypeVisitor(final ICompilationUnit unit, final RefactoringSignature refactoringSignature, final String newName) {
+		super(unit, refactoringSignature, newName);
 	}
 
 	@Override

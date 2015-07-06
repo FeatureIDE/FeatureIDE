@@ -59,12 +59,14 @@ import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.core.signature.base.FOPFeatureData;
 import de.ovgu.featureide.featurehouse.ExtendedFujiSignaturesJob;
 import de.ovgu.featureide.featurehouse.refactoring.matcher.FieldSignatureMatcher;
+import de.ovgu.featureide.featurehouse.refactoring.matcher.LocalVariableSignatureMatcher;
 import de.ovgu.featureide.featurehouse.refactoring.matcher.MethodSignatureMatcher;
 import de.ovgu.featureide.featurehouse.refactoring.matcher.SignatureMatcher;
 import de.ovgu.featureide.featurehouse.refactoring.matcher.TypeSignatureMatcher;
 import de.ovgu.featureide.featurehouse.refactoring.visitors.IASTVisitor;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiClassSignature;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiFieldSignature;
+import de.ovgu.featureide.featurehouse.signature.fuji.FujiLocalVariableSignature;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
 
 /**
@@ -97,7 +99,7 @@ public abstract class RenameRefactoring<T extends AbstractSignature> extends Ref
 		return this.newName;
 	}
 
-	protected abstract IASTVisitor getASTVisitor(final ICompilationUnit unit, final RefactoringSignature refactoringSignature);
+	protected abstract IASTVisitor getASTVisitor(final ICompilationUnit unit, final RefactoringSignature refactoringSignature, final String newName);
 
 	protected abstract RefactoringStatus checkNewElementName(String newName) throws CoreException;
 	
@@ -143,6 +145,8 @@ public abstract class RenameRefactoring<T extends AbstractSignature> extends Ref
 				matcher = new TypeSignatureMatcher(signatures, renamingElement, newName);
 			else if (renamingElement instanceof FujiFieldSignature)
 				matcher = new FieldSignatureMatcher(signatures, renamingElement, newName);
+			else if (renamingElement instanceof FujiLocalVariableSignature)
+				matcher = new LocalVariableSignatureMatcher(signatures, renamingElement, newName);
 			
 			if (matcher == null)
 				return refactoringStatus;
@@ -157,7 +161,7 @@ public abstract class RenameRefactoring<T extends AbstractSignature> extends Ref
 				return refactoringStatus;
 			
 			for (RefactoringSignature refactoringSignature : createRefactoringSignatures(matcher)) {
-				search(refactoringSignature);
+				refactoringStatus.merge(search(refactoringSignature));
 			}
 
 			for (Entry<ICompilationUnit, List<SearchMatch>> searchMatches : nodes.entrySet()) {
@@ -195,7 +199,7 @@ public abstract class RenameRefactoring<T extends AbstractSignature> extends Ref
 		for (AbstractSignature matchedSignature : matcher.getMatchedSignatures()) {
 
 			handleInvokedSignatureOfMatchedSignature(result, matcher.getSelectedSignature(), (FOPFeatureData[]) matchedSignature.getFeatureData());
-
+			
 			final FOPFeatureData[] featureData = (FOPFeatureData[]) matchedSignature.getFeatureData();
 			for (int j = 0; j < featureData.length; j++) {
 				final FOPFeatureData fopFeature = featureData[j];
@@ -248,16 +252,22 @@ public abstract class RenameRefactoring<T extends AbstractSignature> extends Ref
 		return null;
 	}
 
-	private void search(final RefactoringSignature refactoringSignatures) {
+	private RefactoringStatus search(final RefactoringSignature refactoringSignatures) {
 
+		final RefactoringStatus status = new RefactoringStatus();
 		final ICompilationUnit unit = getCompilationUnit(refactoringSignatures.getRelativePathToFile());
 		if (unit == null)
-			return;
+			return status;
 
-		IASTVisitor visitor = getASTVisitor(unit, refactoringSignatures);
+		IASTVisitor visitor = getASTVisitor(unit, refactoringSignatures, newName);
 		visitor.startVisit();
 
 		nodes.put(unit, visitor.getMatches());
+		
+		for (String errorMsg : visitor.getErrors()) {
+			status.addError(errorMsg);
+		}
+		return status;
 	}
 
 	protected IFile getFile(final String relativePath) {

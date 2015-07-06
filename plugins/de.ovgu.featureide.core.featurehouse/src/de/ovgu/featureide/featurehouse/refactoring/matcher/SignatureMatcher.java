@@ -30,6 +30,7 @@ import de.ovgu.featureide.core.signature.ProjectSignatures.SignatureIterator;
 import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.featurehouse.refactoring.RefactoringUtil;
+import de.ovgu.featureide.featurehouse.signature.fuji.FujiLocalVariableSignature;
 
 
 /**
@@ -69,6 +70,9 @@ public abstract class SignatureMatcher {
 	protected abstract Set<AbstractSignature> determineMatchedSignatures();
 	
 	private AbstractSignature selectSignature() {
+		if (selectedElement instanceof FujiLocalVariableSignature)
+			return selectedElement;
+		
 		if (matchedSignatures.size() == 1) {
 			return matchedSignatures.iterator().next();
 		} else {

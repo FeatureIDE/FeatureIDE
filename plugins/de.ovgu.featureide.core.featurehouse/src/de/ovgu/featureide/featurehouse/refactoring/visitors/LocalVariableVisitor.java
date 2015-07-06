@@ -30,15 +30,14 @@ import de.ovgu.featureide.featurehouse.refactoring.RefactoringSignature;
  * 
  * @author steffen
  */
-public class FieldVisitor extends VariableVisitor {
+public class LocalVariableVisitor extends VariableVisitor {
 
-	public FieldVisitor(final ICompilationUnit unit, final RefactoringSignature refactoringSignature, final String newName) {
+	public LocalVariableVisitor(final ICompilationUnit unit, final RefactoringSignature refactoringSignature, final String newName) {
 		super(unit, refactoringSignature, newName);
 	}
 
 	@Override
 	protected boolean isField() {
-		return true;
+		return false;
 	}
-	
 }

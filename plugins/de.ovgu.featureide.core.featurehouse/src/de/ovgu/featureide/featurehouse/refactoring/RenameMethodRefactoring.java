@@ -68,8 +68,8 @@ public class RenameMethodRefactoring extends RenameRefactoring<FujiMethodSignatu
 
 
 	@Override
-	protected IASTVisitor getASTVisitor(final ICompilationUnit unit, final RefactoringSignature refactoringSignature) {
-		return new MethodVisitor(unit, refactoringSignature);
+	protected IASTVisitor getASTVisitor(final ICompilationUnit unit, final RefactoringSignature refactoringSignature, final String newName) {
+		return new MethodVisitor(unit, refactoringSignature, newName);
 	}
 
 	@Override

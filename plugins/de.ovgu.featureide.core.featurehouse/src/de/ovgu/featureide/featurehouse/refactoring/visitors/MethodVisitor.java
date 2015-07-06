@@ -48,8 +48,8 @@ import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
  */
 public class MethodVisitor extends AbstractASTVisitor {
 
-	public MethodVisitor(final ICompilationUnit unit, final RefactoringSignature refactoringSignature) {
-		super(unit, refactoringSignature);
+	public MethodVisitor(final ICompilationUnit unit, final RefactoringSignature refactoringSignature, final String newName) {
+		super(unit, refactoringSignature, newName);
 	}
 
 	@Override

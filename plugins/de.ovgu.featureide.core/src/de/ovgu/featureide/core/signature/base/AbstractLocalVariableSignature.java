@@ -18,27 +18,12 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.featurehouse.refactoring.visitors;
+package de.ovgu.featureide.core.signature.base;
 
-import org.eclipse.jdt.core.ICompilationUnit;
+public abstract class AbstractLocalVariableSignature extends AbstractSignature {
 
-import de.ovgu.featureide.featurehouse.refactoring.RefactoringSignature;
-
-
-/**
- * TODO description
- * 
- * @author steffen
- */
-public class FieldVisitor extends VariableVisitor {
-
-	public FieldVisitor(final ICompilationUnit unit, final RefactoringSignature refactoringSignature, final String newName) {
-		super(unit, refactoringSignature, newName);
-	}
-
-	@Override
-	protected boolean isField() {
-		return true;
+	protected AbstractLocalVariableSignature(AbstractClassSignature parent, String name, String modifiers, String type) {
+		super(parent, name, modifiers, type);
 	}
 	
 }

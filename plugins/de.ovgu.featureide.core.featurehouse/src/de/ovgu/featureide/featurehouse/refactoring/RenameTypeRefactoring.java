@@ -63,8 +63,8 @@ public class RenameTypeRefactoring extends RenameRefactoring<FujiClassSignature>
 	}
 
 	@Override
-	protected IASTVisitor getASTVisitor(final ICompilationUnit unit, final RefactoringSignature refactoringSignature) {
-		return new TypeVisitor(unit, refactoringSignature);
+	protected IASTVisitor getASTVisitor(final ICompilationUnit unit, final RefactoringSignature refactoringSignature, final String newName) {
+		return new TypeVisitor(unit, refactoringSignature, newName);
 	}
 
 	@Override

@@ -21,7 +21,9 @@
 package de.ovgu.featureide.featurehouse.refactoring.visitors;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -44,13 +46,16 @@ import de.ovgu.featureide.featurehouse.refactoring.SearchMatch;
  */
 public abstract class AbstractASTVisitor extends ASTVisitor implements IASTVisitor {
 	protected final RefactoringSignature refactoringSignature;
-	private List<SearchMatch> matches = new ArrayList<>();
-	private final ICompilationUnit unit;
+	private final List<SearchMatch> matches = new ArrayList<>();
+	protected final ICompilationUnit unit;
 	protected boolean checkChildren = false;
+	private final Set<String> errors = new HashSet<>();
+	protected final String newName;
 
-	public AbstractASTVisitor(final ICompilationUnit unit, final RefactoringSignature refactoringSignature) {
+	public AbstractASTVisitor(final ICompilationUnit unit, final RefactoringSignature refactoringSignature, final String newName) {
 		this.unit = unit;
 		this.refactoringSignature = refactoringSignature;
+		this.newName = newName;
 	}
 
 	@Override
@@ -155,6 +160,10 @@ public abstract class AbstractASTVisitor extends ASTVisitor implements IASTVisit
 		matches.add(new SearchMatch(unit, simpleName.getStartPosition(), simpleName.getLength()));
 	}
 	
+	protected void addError(String errorMsg) {
+		errors.add(errorMsg);
+	}
+	
 	protected boolean checkMethodBody(MethodDeclaration node) {
 		for (AbstractSignature aSignature : refactoringSignature.getInvocations()) {
 			if (!(aSignature instanceof AbstractMethodSignature))
@@ -167,5 +176,10 @@ public abstract class AbstractASTVisitor extends ASTVisitor implements IASTVisit
 		return false;
 	}
 
+
 	abstract protected boolean isSameSignature(AbstractSignature sig1, ASTNode sig2);
+
+	public Set<String> getErrors() {
+		return errors;
+	}
 }

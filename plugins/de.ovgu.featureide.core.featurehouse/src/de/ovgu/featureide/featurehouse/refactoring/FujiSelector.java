@@ -29,6 +29,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.core.JavaProject;
 
 import AST.ASTNode;
+import AST.ArrayTypeAccess;
 import AST.ClassDecl;
 import AST.CompilationUnit;
 import AST.ConstructorDecl;
@@ -37,6 +38,7 @@ import AST.InterfaceDecl;
 import AST.MethodAccess;
 import AST.MethodDecl;
 import AST.Opt;
+import AST.ParameterDeclaration;
 import AST.Program;
 import AST.TypeAccess;
 import AST.TypeDecl;
@@ -46,13 +48,14 @@ import AST.VariableDeclaration;
 import beaver.Symbol;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
-import de.ovgu.featureide.core.signature.base.AFeatureData;
 import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
+import de.ovgu.featureide.core.signature.base.FOPFeatureData;
 import de.ovgu.featureide.core.signature.base.FeatureDataConstructor;
 import de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiClassSignature;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiFieldSignature;
+import de.ovgu.featureide.featurehouse.signature.fuji.FujiLocalVariableSignature;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import fuji.Composition;
@@ -140,38 +143,66 @@ public class FujiSelector {
 		
 		AbstractSignature selectedSignature = null;
 		if (result instanceof MethodDecl){
-			selectedSignature = getFujiMethodSignature((MethodDecl) result);
-			selectedSignature.setFeatureData(getFeatureData(result, ast));
+			selectedSignature = getFujiMethodSignature((MethodDecl) result, ast);
 		}
 		else if (result instanceof ConstructorDecl){
-			selectedSignature = getFujiMethodSignature((ConstructorDecl) result);
-			selectedSignature.setFeatureData(getFeatureData(result, ast));
+			selectedSignature = getFujiMethodSignature((ConstructorDecl) result, ast);
 		}	
 		else if (result instanceof TypeDecl){
-			selectedSignature = getFujiClassSignature((TypeDecl)result);
-			selectedSignature.setFeatureData(getFeatureData(result, ast));
+			selectedSignature = getFujiClassSignature((TypeDecl)result, ast);
 		}
 		else if (result instanceof FieldDeclaration){
-			selectedSignature = getFujiFieldSignature((FieldDeclaration)result);
-			selectedSignature.setFeatureData(getFeatureData(result, ast));
+			selectedSignature = getFujiFieldSignature((FieldDeclaration)result, ast);
+		}
+		else if (result instanceof VariableDeclaration){
+			selectedSignature = getFujiLocalVariableSignature((VariableDeclaration)result, ast);
+			FOPFeatureData firstFeatureData = (FOPFeatureData) selectedSignature.getFirstFeatureData();
+			firstFeatureData.addInvokedSignature(getEnclosedMethod((VariableDeclaration)result, ast));
+		}
+		else if (result instanceof ParameterDeclaration){
+			selectedSignature = getFujiLocalVariableSignature((ParameterDeclaration)result, ast);
+			FOPFeatureData firstFeatureData = (FOPFeatureData) selectedSignature.getFirstFeatureData();
+			firstFeatureData.addInvokedSignature(getEnclosedMethod((ParameterDeclaration)result, ast));
 		}
 		
 		return selectedSignature;
 	}
 	
-	private FujiFieldSignature getFujiFieldSignature(final FieldDeclaration fieldDecl) {
-		return new FujiFieldSignature(getDeclaringClass(fieldDecl), fieldDecl.name(), fieldDecl.getModifiers().toString(), fieldDecl.type());
+	private FujiLocalVariableSignature getFujiLocalVariableSignature(final VariableDeclaration varDecl, final Program ast) {
+		final FujiLocalVariableSignature sig = new FujiLocalVariableSignature(getDeclaringClass(varDecl, ast), varDecl.name(), varDecl.getModifiers().toString(), varDecl.type());
+		createAndSetFeatureData(varDecl, ast, sig);
+		return sig;
 	}
 	
-	private FujiMethodSignature getFujiMethodSignature(final MethodDecl methodDecl) {
-		return new FujiMethodSignature(getDeclaringClass(methodDecl), methodDecl.name(), methodDecl.getModifiers().toString(), methodDecl.type(), false, methodDecl.getParameterList(),  methodDecl.getExceptionList());
-	}
-	
-	private FujiMethodSignature getFujiMethodSignature(final ConstructorDecl methodDecl) {
-		return new FujiMethodSignature(getDeclaringClass(methodDecl), methodDecl.name(), methodDecl.getModifiers().toString(), methodDecl.type(), true, methodDecl.getParameterList(),  methodDecl.getExceptionList());
+	private FujiLocalVariableSignature getFujiLocalVariableSignature(final ParameterDeclaration varDecl, final Program ast) {
+		final FujiLocalVariableSignature sig = new FujiLocalVariableSignature(getDeclaringClass(varDecl, ast), varDecl.name(), varDecl.getModifiers().toString(), varDecl.type());
+		createAndSetFeatureData(varDecl, ast, sig);
+		return sig;
 	}
 
-	private FujiClassSignature getFujiClassSignature(final TypeDecl typeDecl) {
+	protected void createAndSetFeatureData(final ASTNode<?> node, final Program ast, final AbstractSignature sig) {
+		sig.setFeatureData(new FOPFeatureData[] {getFeatureData(node, ast)});
+	}
+
+	private FujiFieldSignature getFujiFieldSignature(final FieldDeclaration fieldDecl, final Program ast) {
+		final FujiFieldSignature sig = new FujiFieldSignature(getDeclaringClass(fieldDecl, ast), fieldDecl.name(), fieldDecl.getModifiers().toString(), fieldDecl.type());
+		createAndSetFeatureData(fieldDecl, ast, sig);
+		return sig;
+	}
+	
+	private FujiMethodSignature getFujiMethodSignature(final MethodDecl methodDecl, final Program ast) {
+		final FujiMethodSignature sig = new FujiMethodSignature(getDeclaringClass(methodDecl, ast), methodDecl.name(), methodDecl.getModifiers().toString(), methodDecl.type(), false, methodDecl.getParameterList(),  methodDecl.getExceptionList());
+		createAndSetFeatureData(methodDecl, ast, sig);
+		return sig;
+	}
+	
+	private FujiMethodSignature getFujiMethodSignature(final ConstructorDecl methodDecl, final Program ast) {
+		final FujiMethodSignature sig = new FujiMethodSignature(getDeclaringClass(methodDecl, ast), methodDecl.name(), methodDecl.getModifiers().toString(), methodDecl.type(), true, methodDecl.getParameterList(),  methodDecl.getExceptionList());
+		createAndSetFeatureData(methodDecl, ast, sig);
+		return sig;
+	}
+
+	private FujiClassSignature getFujiClassSignature(final TypeDecl typeDecl, final Program ast) {
 		
 		final String pckg = getPackage(typeDecl);
 		String typeString = null;
@@ -181,25 +212,46 @@ public class FujiSelector {
 			typeString = AbstractClassSignature.TYPE_INTERFACE;
 		}
 		
-		return new FujiClassSignature(getDeclaringClass(typeDecl), typeDecl.name(), typeDecl.getModifiers().toString(), typeString, pckg, typeDecl, null);
+		final FujiClassSignature sig = new FujiClassSignature(getDeclaringClass(typeDecl, ast), typeDecl.name(), typeDecl.getModifiers().toString(), typeString, pckg, typeDecl, null);
+		createAndSetFeatureData(typeDecl, ast, sig);
+		return sig;
 	}
 	
-	private AFeatureData getFeatureData(final ASTNode<?> node, final Program ast) {
+	private FOPFeatureData getFeatureData(final ASTNode<?> node, final Program ast) {
 		final String featurename = getFeatureName(node, ast);
-		final AFeatureData featureData = featureDataConstructor.create(projectSignatures.getFeatureID(featurename), Symbol.getLine(node.getStart()), Symbol.getLine(node.getEnd()));
+		final FOPFeatureData featureData = (FOPFeatureData) featureDataConstructor.create(projectSignatures.getFeatureID(featurename), Symbol.getLine(node.getStart()), Symbol.getLine(node.getEnd()));
 		featureData.setAbsoluteFilePath(file);
 		
 		return featureData;
 	}
 
-	private FujiClassSignature getDeclaringClass(final ASTNode<?> node){
+	private FujiClassSignature getDeclaringClass(final ASTNode<?> node, final Program ast){
 		
 		ASTNode<?> parent = node.getParent();
 		
 		while(parent != null){
 			if (parent instanceof TypeDecl){
-				return getFujiClassSignature((TypeDecl) parent);
+				FujiClassSignature classSignature = getFujiClassSignature((TypeDecl) parent, ast);
+				final FOPFeatureData featureData = (FOPFeatureData) getFeatureData(node, ast);
+				final FOPFeatureData[] featureDatas = {featureData};
+				classSignature.setFeatureData(featureDatas);
+				return classSignature;
 			}
+			parent = parent.getParent();
+		}
+		return null;
+	}
+	
+	
+	private FujiMethodSignature getEnclosedMethod(final ASTNode<?> varDecl, final Program ast){
+		
+		ASTNode<?> parent = varDecl.getParent();
+		
+		while(parent != null){
+			if (parent instanceof MethodDecl) 
+				return getFujiMethodSignature((MethodDecl) parent, ast);
+			else if (parent instanceof ConstructorDecl)
+				return getFujiMethodSignature((ConstructorDecl) parent, ast);
 			parent = parent.getParent();
 		}
 		return null;
@@ -277,10 +329,12 @@ public class FujiSelector {
 						return (VariableDeclaration) varDecl;
 				} else if (stmt instanceof MethodAccess) {
 					return ((MethodAccess) stmt).decl();
+				} else if (stmt instanceof ArrayTypeAccess) {
+					// hier passiert nichts. Check children
 				} else if (stmt instanceof TypeAccess) {
 					return ((TypeAccess) stmt).type();
 				} else if ((stmt instanceof TypeDecl) || (stmt instanceof MethodDecl) || (stmt instanceof ConstructorDecl)
-						|| (stmt instanceof FieldDeclaration) || (stmt instanceof VariableDeclaration)) {
+						|| (stmt instanceof FieldDeclaration) || (stmt instanceof VariableDeclaration) || (stmt instanceof ParameterDeclaration)) {
 					return stmt;
 				}
 			}

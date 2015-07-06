@@ -60,8 +60,8 @@ public class RenameFieldRefactoring extends RenameRefactoring<FujiFieldSignature
 	}
 
 	@Override
-	protected IASTVisitor getASTVisitor(final ICompilationUnit unit, final RefactoringSignature refactoringSignature) {
-		return new FieldVisitor(unit, refactoringSignature);
+	protected IASTVisitor getASTVisitor(final ICompilationUnit unit, final RefactoringSignature refactoringSignature, final String newName) {
+		return new FieldVisitor(unit, refactoringSignature, newName);
 	}
 
 	@Override
