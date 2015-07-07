@@ -27,8 +27,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.CheckForNull;
 
@@ -55,10 +57,8 @@ import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.Signature;
 import org.osgi.framework.BundleContext;
 import org.prop4j.And;
-import org.prop4j.Equals;
 import org.prop4j.Literal;
 import org.prop4j.Node;
-import org.prop4j.Not;
 import org.prop4j.Or;
 import org.prop4j.SatSolver;
 import org.sat4j.specs.TimeoutException;
@@ -785,32 +785,23 @@ public class CorePlugin extends AbstractCorePlugin {
 
 	public void removeFeatures(IProject project, IFeatureProject data, Collection<String> features) {
 		try {
-			System.out.println("Creating Node1...");
-			final Node fmNode1 = removeFeatures(data.getFeatureModel(), features);
-			System.out.println("Creating Node2...");
-			final Node fmNode2 = NodeCreator.createNodes(data.getFeatureModel(), features).toCNF();
-			SatSolver solver = new SatSolver(new Not(new Equals(fmNode1.clone(), fmNode2.clone())), 2000);
-			System.out.println(!solver.isSatisfiable());
-			System.out.println("Done.");
+			removeFeatures(data.getFeatureModel(), features);
 		} catch (TimeoutException e) {
 			CorePlugin.getDefault().logError(e);
 		}
 	}
 
-	public Node removeFeatures(FeatureModel fm, Collection<String> features) throws TimeoutException {
-		final Node fmNode = NodeCreator.createNodes(fm).clone().toCNF();
+	public static Node removeFeatures(FeatureModel fm, Collection<String> features) throws TimeoutException {
+		Node fmNode = NodeCreator.createNodes(fm).clone().toCNF();
 		if (fmNode instanceof And) {
 			final SatSolver solver = new SatSolver(fmNode.clone(), 1000);
 			final Node[] andChildren = fmNode.getChildren();
 
 			// all clauses that have both kinds of literals (remove AND retain)
-			final List<Node> relevantClauseList = new ArrayList<>(andChildren.length);
-
-			// all clauses that contain no literals to remove
-			final List<Node> otherClauseList = new ArrayList<>(andChildren.length);
+			final List<Or> relevantClauseList = new ArrayList<>(andChildren.length);
 
 			// list for all new construct clauses
-			final List<Node> newClauseList = new ArrayList<>(andChildren.length);
+			final Set<Or> newClauseList = new HashSet<>(andChildren.length);
 
 			// fill first two lists
 			for (int i = 0; i < andChildren.length; i++) {
@@ -831,15 +822,13 @@ public class CorePlugin extends AbstractCorePlugin {
 					}
 
 					if (relevance > 0) {
-						if (relevance < andChild.getChildren().length) {
-							relevantClauseList.add(andChild);
-						}
+						relevantClauseList.add((Or) andChild);
 					} else if (relevance == 0) {
-						otherClauseList.add(andChild);
+						newClauseList.add((Or) andChild);
 					}
 				} else {
 					if (!features.contains(((Literal) andChild).var)) {
-						otherClauseList.add(andChild);
+						newClauseList.add(new Or(andChild));
 					}
 				}
 			}
@@ -848,6 +837,7 @@ public class CorePlugin extends AbstractCorePlugin {
 			for (String curFeature : features) {
 
 				// ... create list of clauses that contain this feature
+				int relevantIndex = 0;
 				final byte[] clauseStates = new byte[relevantClauseList.size()];
 				for (int i = 0; i < relevantClauseList.size(); i++) {
 					final Node clause = relevantClauseList.get(i);
@@ -858,16 +848,17 @@ public class CorePlugin extends AbstractCorePlugin {
 						if (literal.var.equals(curFeature)) {
 							if (curLiteral == null) {
 								curLiteral = literal;
-								clauseStates[i] = (byte) (curLiteral.positive ? 1 : 2);
+								clauseStates[relevantIndex] = (byte) (curLiteral.positive ? 1 : 2);
+								Collections.swap(relevantClauseList, i, relevantIndex++);
 							} else if (literal.positive != curLiteral.positive) {
-								clauseStates[i] = -1;
+								clauseStates[relevantIndex - 1] = -1;
 								break;
 							}
 						}
 					}
 				}
 
-				final ArrayList<Node> newRelevantClauseList = new ArrayList<>();
+				final ArrayList<Or> newRelevantClauseList = new ArrayList<>();
 
 				// ... combine relevant clauses if possible
 				for (int i = clauseStates.length - 1; i >= 0; i--) {
@@ -880,7 +871,6 @@ public class CorePlugin extends AbstractCorePlugin {
 						positive = false;
 						break;
 					case -1:
-						relevantClauseList.remove(i);
 					case 0:
 					default:
 						continue;
@@ -910,23 +900,22 @@ public class CorePlugin extends AbstractCorePlugin {
 						for (Literal retainedLiteral : retainLiterals) {
 							retainedLiteral.flip();
 						}
-						final Or newClause = new Or(retainLiterals);
-						newClauseList.add(newClause);
 
-						for (Node orChild : newClause.getChildren()) {
-							final Literal literal = (Literal) orChild;
-							if (features.contains(literal.var)) {
-								newRelevantClauseList.add(newClause);
-								break;
-							}
+						final Or newClause = new Or(retainLiterals);
+
+						if (checkRelevance(features, newClause)) {
+							newRelevantClauseList.add(newClause);
+						} else {
+							newClauseList.add(newClause);
 						}
+
 						// try to combine with other clauses
 					} else {
-						final Node[] children1 = relevantClauseList.get(i).getChildren();
+						final Node[] children1 = clause.getChildren();
 						for (int j = i - 1; j >= 0; j--) {
 							if ((positive && clauseStates[j] == 2) || (!positive && clauseStates[j] == 1)) {
 								final Node[] children2 = relevantClauseList.get(j).getChildren();
-								final ArrayList<Node> newChildren = new ArrayList<>(children1.length + children2.length - 2);
+								final ArrayList<Literal> newChildren = new ArrayList<>(children1.length + children2.length - 2);
 
 								for (int k = 0; k < children1.length; k++) {
 									final Literal child = (Literal) children1[k];
@@ -942,20 +931,20 @@ public class CorePlugin extends AbstractCorePlugin {
 									}
 								}
 
-								final Or newClause = new Or(newChildren.toArray(new Node[0]));
-								newClauseList.add(newClause);
+								final Literal[] newLiterals = newChildren.toArray(new Literal[0]);
+								final Or newClause = new Or(newLiterals);
 
-								for (Node orChild : newClause.getChildren()) {
-									final Literal literal = (Literal) orChild;
-									if (features.contains(literal.var)) {
-										newRelevantClauseList.add(newClause);
-										break;
-									}
+								if (checkRelevance(features, newClause)) {
+									newRelevantClauseList.add(newClause);
+								} else {
+									newClauseList.add(newClause);
 								}
 							}
 						}
 					}
 				}
+				relevantClauseList.subList(0, relevantIndex).clear();
+				newRelevantClauseList.removeAll(relevantClauseList);
 				relevantClauseList.addAll(newRelevantClauseList);
 			}
 
@@ -970,11 +959,10 @@ public class CorePlugin extends AbstractCorePlugin {
 			allLiterals[i] = new Literal(NodeCreator.varTrue);
 
 			// create new clauses list
-			final int lastIndex = otherClauseList.size() + newClauseList.size();
+			final int lastIndex = newClauseList.size();
 			final Node[] newClauses = new Node[lastIndex + 1];
 
-			System.arraycopy(otherClauseList.toArray(new Node[0]), 0, newClauses, 0, otherClauseList.size());
-			System.arraycopy(newClauseList.toArray(new Node[0]), 0, newClauses, otherClauseList.size(), newClauseList.size());
+			System.arraycopy(newClauseList.toArray(new Node[0]), 0, newClauses, 0, newClauseList.size());
 			newClauses[lastIndex] = new Or(allLiterals);
 
 			fmNode.setChildren(newClauses);
@@ -991,6 +979,16 @@ public class CorePlugin extends AbstractCorePlugin {
 		} else {
 			return (features.contains(((Literal) fmNode).var)) ? new Literal(NodeCreator.varTrue) : fmNode;
 		}
+	}
+
+	private static boolean checkRelevance(Collection<String> features, final Or newClause) {
+		for (Node orChild : newClause.getChildren()) {
+			final Literal literal = (Literal) orChild;
+			if (features.contains(literal.var)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

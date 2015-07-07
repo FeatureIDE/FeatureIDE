@@ -1196,9 +1196,6 @@
 		<command
 				id="de.ovgu.featureide.ui.commands.newInterface"
 				name="Create new interface model">
-     <defaultHandler
-           class="de.ovgu.featureide.ui.handlers.NewInterfaceHandler">
-     </defaultHandler>
 		</command>
 		<command
 				id="de.ovgu.featureide.ui.commands.setConfiguration"
@@ -1275,6 +1272,10 @@
 	        class="de.ovgu.featureide.ui.handlers.FeatureDocumentationHandler"
 	        commandId="de.ovgu.featureide.ui.mpl.commands.javadoc.feature">
 	  </handler>
+   <handler
+         class="de.ovgu.featureide.ui.handlers.NewInterfaceHandler"
+         commandId="de.ovgu.featureide.ui.commands.newInterface">
+   </handler>
 	</extension>
 	<extension
 			point="org.eclipse.core.expressions.definitions">
