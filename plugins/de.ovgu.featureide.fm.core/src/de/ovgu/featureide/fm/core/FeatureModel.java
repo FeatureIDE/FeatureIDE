@@ -121,10 +121,10 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 			this.colorschemeTable = oldFeatureModel.colorschemeTable.clone(this);
 			this.layout = oldFeatureModel.layout.clone();
 		} else {
-			this.annotations = null;
-			this.comments = null;
+			this.annotations = Collections.emptyList();
+			this.comments = Collections.emptyList();
 			this.colorschemeTable = new EmptyColorschemeTable();
-			this.layout = null;
+			this.layout = new FeatureModelLayout();
 		}
 
 		if (oldFeatureModel.rootFeature != null) {
