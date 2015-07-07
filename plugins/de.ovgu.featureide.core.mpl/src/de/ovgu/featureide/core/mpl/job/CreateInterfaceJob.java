@@ -222,6 +222,11 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
         
 		if (curFeature.getName().equals(MARK1)) {
 			if (parentGroup == curFeatureGroup) {
+				if (parentGroup == GROUP_AND && !curFeature.isMandatory()) {
+					for (Feature feature : curFeature.getChildren()) {
+						feature.setMandatory(false);
+					}
+				}
 				deleteFeature(curFeature);
 			} else {
 				switch (parentGroup) {
