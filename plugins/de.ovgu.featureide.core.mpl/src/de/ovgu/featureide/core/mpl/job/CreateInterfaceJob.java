@@ -22,6 +22,7 @@ package de.ovgu.featureide.core.mpl.job;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -36,13 +37,15 @@ import org.prop4j.Not;
 import org.prop4j.SatSolver;
 import org.sat4j.specs.TimeoutException;
 
+import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
-import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelWriter;
+import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
@@ -70,22 +73,22 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 
 	@Override
 	protected boolean work() {
-		FeatureModel newFeatureModel = createInterface(arguments.featureProject.getFeatureModel(), arguments.featureNames);
-
-		String projectName = arguments.featureProject.getProjectName();
-		String interfaceName = "I" + projectName;
-		newFeatureModel.getRoot().setName(interfaceName);
-
-		VelvetFeatureModelWriter modelWriter = new VelvetFeatureModelWriter(newFeatureModel, true);
-		String interfaceContent = modelWriter.writeToString();
-
 		try {
+			FeatureModel newFeatureModel = createInterface(arguments.featureProject.getFeatureModel(), arguments.featureNames);
+
+			String projectName = arguments.featureProject.getProjectName();
+			String interfaceName = "I" + projectName;
+			newFeatureModel.getRoot().setName(interfaceName);
+
+			AbstractFeatureModelWriter modelWriter = new XmlFeatureModelWriter(newFeatureModel);
+			String interfaceContent = modelWriter.writeToString();
+			
 			// create interface
 			IFolder mplFolder = project.getFolder("Interfaces");
 			if (!mplFolder.exists())
 				mplFolder.create(true, true, null);
 
-			IFile interfaceFile = mplFolder.getFile(interfaceName + ".velvet");
+			IFile interfaceFile = mplFolder.getFile(interfaceName + ".xml");
 
 			// TODO: warning for existing interface file
 			if (!interfaceFile.exists()) {
@@ -99,25 +102,24 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 				interfaceFile.setContents(interfaceContentStream, true, false, null);
 				interfaceContentStream.close();
 			}
-		} catch (CoreException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (CoreException | IOException | TimeoutException e) {
+			MPLPlugin.getDefault().logError(e);
 		}
 		MPLPlugin.getDefault().logInfo("Created Interface.");
 		return true;
 	}
 	
-	private FeatureModel createInterface(FeatureModel orgFeatureModel, Collection<String> selectedFeatureNames) {
+	private FeatureModel createInterface(FeatureModel orgFeatureModel, Collection<String> selectedFeatureNames) throws TimeoutException {
 		// Calculate Constraints
 		FeatureModel m = orgFeatureModel.deepClone(false);		
 		for (Feature feat : m.getFeatures()) {
 			feat.setAbstract(!selectedFeatureNames.contains(feat.getName()));
         }
-		workMonitor.setMaxAbsoluteWork(3);
-		Node nodes = NodeCreator.createNodes(m, false);
-		workMonitor.worked();
-		Node cnf = nodes.toCNF();
+		
+		workMonitor.setMaxAbsoluteWork(2);
+		ArrayList<String> removeFeatures = new ArrayList<>(m.getFeatureNames());
+		removeFeatures.removeAll(selectedFeatureNames);
+		Node cnf = CorePlugin.removeFeatures(m, removeFeatures);
 		workMonitor.worked();
 		
 		// Calculate Model
@@ -159,7 +161,7 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 				featureStack.push(feature);
 			}
         	if (curFeature.getName().startsWith(MARK1)) {
-        		curFeature.setName("_Abstract_" + count++);
+        		curFeature.setName("Abstract_" + count++);
         		curFeature.setAbstract(true);
         	}
         	featureTable.put(curFeature.getName(), curFeature);
