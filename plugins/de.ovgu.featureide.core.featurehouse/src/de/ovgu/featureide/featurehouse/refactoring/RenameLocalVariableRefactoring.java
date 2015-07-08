@@ -23,19 +23,14 @@ package de.ovgu.featureide.featurehouse.refactoring;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.JavaConventions;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.corext.refactoring.Checks;
 import org.eclipse.jdt.internal.corext.refactoring.RefactoringCoreMessages;
-import org.eclipse.jdt.internal.corext.util.Messages;
-import org.eclipse.jdt.internal.ui.viewsupport.BasicElementLabels;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.signature.base.AbstractSignature;
-import de.ovgu.featureide.core.signature.base.FOPFeatureData;
 import de.ovgu.featureide.featurehouse.refactoring.matcher.SignatureMatcher;
 import de.ovgu.featureide.featurehouse.refactoring.visitors.IASTVisitor;
 import de.ovgu.featureide.featurehouse.refactoring.visitors.LocalVariableVisitor;
@@ -59,8 +54,8 @@ public class RenameLocalVariableRefactoring extends RenameRefactoring<FujiLocalV
 	}
 
 	@Override
-	protected IASTVisitor getASTVisitor(final ICompilationUnit unit, final RefactoringSignature refactoringSignature, final String newName) {
-		return new LocalVariableVisitor(unit, refactoringSignature, newName);
+	protected IASTVisitor getASTVisitor(final RefactoringSignature refactoringSignature, final String newName) {
+		return new LocalVariableVisitor(refactoringSignature, newName);
 	}
 
 //	RenameLocalVariableProcessor

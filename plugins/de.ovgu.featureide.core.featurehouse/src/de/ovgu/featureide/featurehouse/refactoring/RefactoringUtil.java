@@ -20,6 +20,11 @@
  */
 package de.ovgu.featureide.featurehouse.refactoring;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
@@ -28,6 +33,7 @@ import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IPackageDeclaration;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.jdt.core.dom.AST;
@@ -48,14 +54,32 @@ import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
 public class RefactoringUtil {
 
 	
-	public static CompilationUnit parseUnit(ICompilationUnit unit) {
-	    ASTParser parser = ASTParser.newParser(AST.JLS4);
-	    parser.setKind(ASTParser.K_COMPILATION_UNIT);
-	    parser.setSource(unit);
-	    parser.setResolveBindings(true);
-	    parser.setBindingsRecovery(true);
-	    return (CompilationUnit) parser.createAST(null); 
-	  }
+	public static CompilationUnit parseUnit(final String absoluteFilePath) {
+
+		try {
+			final ASTParser parser = ASTParser.newParser(AST.JLS4);
+			parser.setKind(ASTParser.K_COMPILATION_UNIT);
+			byte[] encoded = Files.readAllBytes(Paths.get(absoluteFilePath));
+			final String content = new String(encoded, StandardCharsets.UTF_8);
+			parser.setCompilerOptions(JavaCore.getOptions());
+
+			final String[] classpath = java.lang.System.getProperty("java.class.path").split(";");
+			final int index = absoluteFilePath.lastIndexOf(File.separator);
+			final String path = absoluteFilePath.substring(0, index);
+			parser.setUnitName(absoluteFilePath.substring(index + 1));
+
+			parser.setEnvironment(classpath, new String[] { path }, new String[] { StandardCharsets.UTF_8.name() }, true);
+			parser.setSource(content.toCharArray());
+			parser.setResolveBindings(true);
+			parser.setBindingsRecovery(true);
+
+			return (CompilationUnit) parser.createAST(null);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+		
 	
 	public static boolean hasSameClass(final AbstractSignature signature, final IMember member) {
 		final IType declaringType = member.getDeclaringType();

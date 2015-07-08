@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.IMethodBinding;
@@ -48,13 +47,12 @@ import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
  */
 public class MethodVisitor extends AbstractASTVisitor {
 
-	public MethodVisitor(final ICompilationUnit unit, final RefactoringSignature refactoringSignature, final String newName) {
-		super(unit, refactoringSignature, newName);
+	public MethodVisitor(final RefactoringSignature refactoringSignature, final String newName) {
+		super(refactoringSignature, newName);
 	}
 
 	@Override
 	public boolean visit(MethodDeclaration node) {
-
 		if (refactoringSignature.isRenameDeclaration() && isSameSignature((AbstractMethodSignature) refactoringSignature.getDeclaration(), node)) {
 			addSearchMatch(getSimpleName(node.getName()));
 		}
@@ -64,7 +62,6 @@ public class MethodVisitor extends AbstractASTVisitor {
 
 	@Override
 	public boolean visit(MethodInvocation node) {
-
 		if (isSameSignature((AbstractMethodSignature) refactoringSignature.getDeclaration(), node)) {
 			addSearchMatch(getSimpleName(node.getName()));
 		}
@@ -112,9 +109,7 @@ public class MethodVisitor extends AbstractASTVisitor {
 				parameters.add(e.resolveTypeBinding().getErasure().getName());
 			}
 		} else {
-
 			for (ITypeBinding type : methodBinding.getParameterTypes()) {
-
 				parameters.add(type.getErasure().getName());
 			}
 		}

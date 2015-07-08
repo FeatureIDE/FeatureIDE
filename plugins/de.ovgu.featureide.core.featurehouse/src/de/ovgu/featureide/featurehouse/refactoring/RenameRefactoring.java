@@ -83,7 +83,7 @@ public abstract class RenameRefactoring<T extends AbstractSignature> extends Ref
 	protected String newName;
 	private List<Change> changes;
 	protected Map<String, AbstractClassSignature> classes = new HashMap<>();
-	private Map<ICompilationUnit, List<SearchMatch>> nodes = new HashMap<>();
+	private Map<String, List<SearchMatch>> nodes = new HashMap<>();
 
 	public RenameRefactoring(T selection, IFeatureProject featureProject) {
 		this.renamingElement = selection;
@@ -99,7 +99,7 @@ public abstract class RenameRefactoring<T extends AbstractSignature> extends Ref
 		return this.newName;
 	}
 
-	protected abstract IASTVisitor getASTVisitor(final ICompilationUnit unit, final RefactoringSignature refactoringSignature, final String newName);
+	protected abstract IASTVisitor getASTVisitor(final RefactoringSignature refactoringSignature, final String newName);
 
 	protected abstract RefactoringStatus checkNewElementName(String newName) throws CoreException;
 	
@@ -164,7 +164,7 @@ public abstract class RenameRefactoring<T extends AbstractSignature> extends Ref
 				refactoringStatus.merge(search(refactoringSignature));
 			}
 
-			for (Entry<ICompilationUnit, List<SearchMatch>> searchMatches : nodes.entrySet()) {
+			for (Entry<String, List<SearchMatch>> searchMatches : nodes.entrySet()) {
 				rewriteAST(searchMatches.getKey(), searchMatches.getValue());
 			}
 
@@ -176,28 +176,11 @@ public abstract class RenameRefactoring<T extends AbstractSignature> extends Ref
 		return refactoringStatus;
 	}
 
-//	private Set<RefactoringSignature> getInvolvedSignatures(final AbstractSignature selectedSignature, final Set<AbstractSignature> matchedSignatures) {
-//		
-////		filterMatchedSignatures(selectedSignature, matchedSignatures);
-//		
-//		Set<RefactoringSignature> refactoringSignatures = createRefactoringSignatures(matchedSignatures);
-//
-//		handleInvokedSignatureOfMatchedSignature(refactoringSignatures, selectedSignature);
-//		final FOPFeatureData[] featureData = (FOPFeatureData[]) selectedSignature.getFeatureData();
-//		for (int j = 0; j < featureData.length; j++) {
-//			final FOPFeatureData fopFeature = featureData[j];
-//
-//			addToRefactoringSignatures(refactoringSignatures, selectedSignature, fopFeature.getFile());
-//		}
-//
-//		return refactoringSignatures;
-//	}
-
 	private Set<RefactoringSignature> createRefactoringSignatures(final SignatureMatcher matcher) {
 		Set<RefactoringSignature> result = new HashSet<>();
 
 		for (AbstractSignature matchedSignature : matcher.getMatchedSignatures()) {
-
+			
 			handleInvokedSignatureOfMatchedSignature(result, matcher.getSelectedSignature(), (FOPFeatureData[]) matchedSignature.getFeatureData());
 			
 			final FOPFeatureData[] featureData = (FOPFeatureData[]) matchedSignature.getFeatureData();
@@ -231,10 +214,10 @@ public abstract class RenameRefactoring<T extends AbstractSignature> extends Ref
 				for (int i = 0; i < invokedFeatureData.length; i++) {
 					final FOPFeatureData fopFeature = invokedFeatureData[i];
 
-					final String relativePath = fopFeature.getAbsoluteFilePath();
-					RefactoringSignature signature = getRefactoringSignature(result, relativePath);
+					final String absolutePath = fopFeature.getAbsoluteFilePath();
+					RefactoringSignature signature = getRefactoringSignature(result, absolutePath);
 					if (signature == null) {
-						signature = new RefactoringSignature(relativePath, matchedSignature);
+						signature = new RefactoringSignature(absolutePath, matchedSignature);
 						result.add(signature);
 					}
 
@@ -255,14 +238,11 @@ public abstract class RenameRefactoring<T extends AbstractSignature> extends Ref
 	private RefactoringStatus search(final RefactoringSignature refactoringSignatures) {
 
 		final RefactoringStatus status = new RefactoringStatus();
-		final ICompilationUnit unit = getCompilationUnit(refactoringSignatures.getRelativePathToFile());
-		if (unit == null)
-			return status;
 
-		IASTVisitor visitor = getASTVisitor(unit, refactoringSignatures, newName);
+		IASTVisitor visitor = getASTVisitor(refactoringSignatures, newName);
 		visitor.startVisit();
 
-		nodes.put(unit, visitor.getMatches());
+		nodes.put(refactoringSignatures.getRelativePathToFile(), visitor.getMatches());
 		
 		for (String errorMsg : visitor.getErrors()) {
 			status.addError(errorMsg);
@@ -309,8 +289,11 @@ public abstract class RenameRefactoring<T extends AbstractSignature> extends Ref
 		}
 	}
 
-	private void rewriteAST(ICompilationUnit unit, List<SearchMatch> matches) {
+	private void rewriteAST(String file, List<SearchMatch> matches) {
 
+		final ICompilationUnit unit = getCompilationUnit(file);
+		if (unit == null) return;
+		
 		MultiTextEdit multiEdit = new MultiTextEdit();
 		for (SearchMatch match : matches) {
 			multiEdit.addChild(new ReplaceEdit(match.getOffset(), match.getLength(), newName));

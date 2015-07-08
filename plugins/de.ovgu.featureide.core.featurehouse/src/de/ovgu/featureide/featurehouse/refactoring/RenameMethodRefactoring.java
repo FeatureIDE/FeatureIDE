@@ -28,7 +28,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.JavaConventions;
 import org.eclipse.jdt.core.JavaCore;
@@ -66,10 +65,9 @@ public class RenameMethodRefactoring extends RenameRefactoring<FujiMethodSignatu
 	}
 
 
-
 	@Override
-	protected IASTVisitor getASTVisitor(final ICompilationUnit unit, final RefactoringSignature refactoringSignature, final String newName) {
-		return new MethodVisitor(unit, refactoringSignature, newName);
+	protected IASTVisitor getASTVisitor(final RefactoringSignature refactoringSignature, final String newName) {
+		return new MethodVisitor(refactoringSignature, newName);
 	}
 
 	@Override

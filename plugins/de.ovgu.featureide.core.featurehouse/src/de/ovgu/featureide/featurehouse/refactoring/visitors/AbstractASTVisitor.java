@@ -25,9 +25,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.IBinding;
+import org.eclipse.jdt.core.dom.IMethodBinding;
+import org.eclipse.jdt.core.dom.ITypeBinding;
+import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.QualifiedName;
@@ -47,13 +50,11 @@ import de.ovgu.featureide.featurehouse.refactoring.SearchMatch;
 public abstract class AbstractASTVisitor extends ASTVisitor implements IASTVisitor {
 	protected final RefactoringSignature refactoringSignature;
 	private final List<SearchMatch> matches = new ArrayList<>();
-	protected final ICompilationUnit unit;
 	protected boolean checkChildren = false;
 	private final Set<String> errors = new HashSet<>();
 	protected final String newName;
 
-	public AbstractASTVisitor(final ICompilationUnit unit, final RefactoringSignature refactoringSignature, final String newName) {
-		this.unit = unit;
+	public AbstractASTVisitor(final RefactoringSignature refactoringSignature, final String newName) {
 		this.refactoringSignature = refactoringSignature;
 		this.newName = newName;
 	}
@@ -84,80 +85,53 @@ public abstract class AbstractASTVisitor extends ASTVisitor implements IASTVisit
 	}
 
 	protected boolean hasSameName(final AbstractSignature signature, final QualifiedName name){
-			return hasSameName(signature.getFullName(), name.getFullyQualifiedName());
+			return hasSameName(signature.getFullName(), getFullQualifiedName(name));
 	}
 	
 	protected boolean hasSameName(final AbstractSignature signature, final SimpleName name){
-		return hasSameName(signature.getName(), name.getFullyQualifiedName());
+		return hasSameName(signature.getFullName(), getFullQualifiedName(name));
 	}
 	
-//	private String getFullQualifiedName(final Name name) {
-//		IBinding binding = name.resolveBinding();
-//		if (binding instanceof IVariableBinding){
-//			final IVariableBinding varBinding = (IVariableBinding) binding;
-//			final ITypeBinding typeBinding = varBinding.getDeclaringClass();
-//			return packageName + typeBinding.getQualifiedName() + "." +getSimpleName(name);
-//		}
-//		else if (binding instanceof IMethodBinding){
-//			final IMethodBinding methodBinding = (IMethodBinding) binding;
-//			final ITypeBinding typeBinding = methodBinding.getDeclaringClass();
-//			String qualifiedName = packageName + typeBinding.getQualifiedName();
-//			if (!methodBinding.isConstructor()){
-//				qualifiedName += "." +getSimpleName(name);
-//			}
-//			return qualifiedName;
-//		}
-//		else if (binding instanceof ITypeBinding){
-//			final ITypeBinding typeBinding = (ITypeBinding) binding;
-//			
-////			 IImportDeclaration import1 = unit.getImport(binding.getName());
-////			 if (!import1.exists()){
-////				 
-////				 try {
-////					for (IImportDeclaration importDeclaration : unit.getImports()) {
-////						if (importDeclaration.isOnDemand()){
-////							
-////						}
-////					}
-////				} catch (JavaModelException e) {
-////					// TODO Auto-generated catch block
-////					e.printStackTrace();
-////				}
-////			 }
-////				 
-//			
-//			IJavaElement javaElement = typeBinding.getJavaElement();
-//			String packageQ = packageName;
-////			while(javaElement != null){
-////				if (javaElement instanceof ICompilationUnit) {
-////					packageQ = RefactoringUtil.getPackageDeclaration((ICompilationUnit) javaElement);
-////					break;
-////				}
-////				javaElement = javaElement.getParent();
-////			}
-//			return packageQ + typeBinding.getQualifiedName();
-//		}
-//		else 
-//			return name.getFullyQualifiedName();
-//		
-//	}
+	protected String getFullQualifiedName(final Name name) {
+		final IBinding binding = name.resolveBinding();
+		if (binding instanceof IVariableBinding){
+			final IVariableBinding varBinding = (IVariableBinding) binding;
+			final ITypeBinding typeBinding = varBinding.getDeclaringClass();
+			return getFullQualifiedName(typeBinding) + "." + getSimpleName(name);
+		}
+		else if (binding instanceof IMethodBinding){
+			final IMethodBinding methodBinding = (IMethodBinding) binding;
+			final ITypeBinding typeBinding = methodBinding.getDeclaringClass();
+			String qualifiedName = getFullQualifiedName(typeBinding);
+			if (!methodBinding.isConstructor()){
+				qualifiedName += "." + getSimpleName(name);
+			}
+			return qualifiedName;
+		}
+		else if (binding instanceof ITypeBinding){
+			final ITypeBinding typeBinding = (ITypeBinding) binding;
+			return getFullQualifiedName(typeBinding);
+		}
+		else 
+			return name.getFullyQualifiedName();
+	}
 
-//	private String getPackage(final ITypeBinding typeBinding) {
-//		String packageName = typeBinding.getPackage().getName();
-//		if (packageName.isEmpty()) packageName = ".";
-//		return packageName;
-//	}
+	private String getFullQualifiedName(final ITypeBinding typeBinding) {
+		String qualifiedName = typeBinding.getQualifiedName();
+		if (typeBinding.getPackage().getName().isEmpty()) qualifiedName = "." + qualifiedName;
+		return qualifiedName;
+	}
 
 	public void startVisit() {
-		ASTNode root = RefactoringUtil.parseUnit(unit);
+		ASTNode root = RefactoringUtil.parseUnit(refactoringSignature.getRelativePathToFile());
 		if (root == null)
 			return;
-
+		
 		root.accept(this);
 	}
 
 	protected void addSearchMatch(SimpleName simpleName) {
-		matches.add(new SearchMatch(unit, simpleName.getStartPosition(), simpleName.getLength()));
+		matches.add(new SearchMatch(refactoringSignature.getRelativePathToFile(), simpleName.getStartPosition(), simpleName.getLength()));
 	}
 	
 	protected void addError(String errorMsg) {

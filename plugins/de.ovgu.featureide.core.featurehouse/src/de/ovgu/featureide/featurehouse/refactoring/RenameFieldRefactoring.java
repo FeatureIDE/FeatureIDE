@@ -23,7 +23,6 @@ package de.ovgu.featureide.featurehouse.refactoring;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.JavaConventions;
 import org.eclipse.jdt.core.JavaModelException;
@@ -60,8 +59,8 @@ public class RenameFieldRefactoring extends RenameRefactoring<FujiFieldSignature
 	}
 
 	@Override
-	protected IASTVisitor getASTVisitor(final ICompilationUnit unit, final RefactoringSignature refactoringSignature, final String newName) {
-		return new FieldVisitor(unit, refactoringSignature, newName);
+	protected IASTVisitor getASTVisitor(final RefactoringSignature refactoringSignature, final String newName) {
+		return new FieldVisitor(refactoringSignature, newName);
 	}
 
 	@Override

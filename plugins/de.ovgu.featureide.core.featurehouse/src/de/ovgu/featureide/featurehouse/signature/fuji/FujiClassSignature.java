@@ -136,7 +136,7 @@ public class FujiClassSignature extends AbstractClassSignature {
 		for (TypeDecl thisSuperType : superTypes) {
 			boolean contains = false;
 			for (TypeDecl otherSuperType : otherSig.superTypes) {
-				if (thisSuperType == otherSuperType) {
+				if (thisSuperType.fullName().equals(otherSuperType.fullName())) {
 					contains = true;
 					break;
 				}

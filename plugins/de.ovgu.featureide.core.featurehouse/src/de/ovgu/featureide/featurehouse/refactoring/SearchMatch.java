@@ -20,22 +20,20 @@
  */
 package de.ovgu.featureide.featurehouse.refactoring;
 
-import org.eclipse.jdt.core.ICompilationUnit;
-
 public class SearchMatch {
 	
 	private final int length;
 	private final int offset;
-	private final ICompilationUnit unit;
+	private final String file;
 	
-	public SearchMatch(final ICompilationUnit unit, final int offset, final int length) {
-		this.unit = unit;
+	public SearchMatch(final String file, final int offset, final int length) {
+		this.file = file;
 		this.length = length;
 		this.offset = offset;
 	}
 
-	public ICompilationUnit getUnit() {
-		return unit;
+	public String getFile() {
+		return file;
 	}
 	
 	public int getLength() {

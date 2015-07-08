@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.featurehouse.refactoring.visitors;
 
-import org.eclipse.jdt.core.ICompilationUnit;
-
 import de.ovgu.featureide.featurehouse.refactoring.RefactoringSignature;
 
 
@@ -32,8 +30,8 @@ import de.ovgu.featureide.featurehouse.refactoring.RefactoringSignature;
  */
 public class LocalVariableVisitor extends VariableVisitor {
 
-	public LocalVariableVisitor(final ICompilationUnit unit, final RefactoringSignature refactoringSignature, final String newName) {
-		super(unit, refactoringSignature, newName);
+	public LocalVariableVisitor(final RefactoringSignature refactoringSignature, final String newName) {
+		super(refactoringSignature, newName);
 	}
 
 	@Override

@@ -138,8 +138,10 @@ public class FujiSelector {
 		
 		CompilationUnit unit = getCompilationUnit(ast, file);
 		if (unit == null) return null;
-			
+		
 		ASTNode<?> result = findSelectedNode(unit, line, column);
+		
+		if (result.featureID() < 0) return null;
 		
 		AbstractSignature selectedSignature = null;
 		if (result instanceof MethodDecl){
@@ -221,7 +223,6 @@ public class FujiSelector {
 		final String featurename = getFeatureName(node, ast);
 		final FOPFeatureData featureData = (FOPFeatureData) featureDataConstructor.create(projectSignatures.getFeatureID(featurename), Symbol.getLine(node.getStart()), Symbol.getLine(node.getEnd()));
 		featureData.setAbsoluteFilePath(file);
-		
 		return featureData;
 	}
 

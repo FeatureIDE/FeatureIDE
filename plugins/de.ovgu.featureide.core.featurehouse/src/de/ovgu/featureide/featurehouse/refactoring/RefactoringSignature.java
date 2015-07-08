@@ -35,17 +35,17 @@ public class RefactoringSignature {
 	
 	private Set<AbstractSignature> invocations = new HashSet<>();
 	
-	private final String relativePathToFile;
+	private final String absolutePath;
 	
 	private boolean renameDeclaration = false;
 	
-	public RefactoringSignature(final String relativePathToFile, final AbstractSignature declaration) {
-		this.relativePathToFile = relativePathToFile;
+	public RefactoringSignature(final String absolutePath, final AbstractSignature declaration) {
+		this.absolutePath = absolutePath;
 		this.declaration = declaration;
 	}
 	
 	public String getRelativePathToFile() {
-		return relativePathToFile;
+		return absolutePath;
 	}
 	
 	public AbstractSignature getDeclaration() {
@@ -67,7 +67,7 @@ public class RefactoringSignature {
 	@Override
 	public String toString() {
 		
-		return "File: " + relativePathToFile + "; declaration: " + declaration + "; invocations: " + invocations;
+		return "File: " + absolutePath + "; declaration: " + declaration + "; invocations: " + invocations;
 	}
 
 	public boolean isRenameDeclaration() {

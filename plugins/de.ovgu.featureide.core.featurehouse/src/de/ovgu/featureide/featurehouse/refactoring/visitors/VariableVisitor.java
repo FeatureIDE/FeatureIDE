@@ -22,7 +22,6 @@ package de.ovgu.featureide.featurehouse.refactoring.visitors;
 
 import java.util.List;
 
-import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ArrayAccess;
 import org.eclipse.jdt.core.dom.Assignment;
@@ -52,8 +51,8 @@ import de.ovgu.featureide.featurehouse.refactoring.RefactoringSignature;
 @SuppressWarnings("restriction")
 public abstract class VariableVisitor extends AbstractASTVisitor {
 
-	public VariableVisitor(final ICompilationUnit unit, final RefactoringSignature refactoringSignature, final String newName) {
-		super(unit, refactoringSignature, newName);
+	public VariableVisitor(final RefactoringSignature refactoringSignature, final String newName) {
+		super(refactoringSignature, newName);
 	}
 
 	protected abstract boolean isField();
@@ -137,7 +136,7 @@ public abstract class VariableVisitor extends AbstractASTVisitor {
 			if (varBinding.isField())
 				addError(Messages.format(RefactoringCoreMessages.RefactoringAnalyzeUtil_name_collision, BasicElementLabels.getJavaElementName(newName)));
 			else
-				addError(Messages.format(RefactoringCoreMessages.RenameAnalyzeUtil_shadows, BasicElementLabels.getFileName(unit)));
+				addError(Messages.format(RefactoringCoreMessages.RenameAnalyzeUtil_shadows, refactoringSignature.getRelativePathToFile()));
 		}
 		
 		return false;
