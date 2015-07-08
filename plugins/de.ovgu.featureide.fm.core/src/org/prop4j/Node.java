@@ -136,6 +136,15 @@ public abstract class Node {
 	abstract public Node clone();
 
 	@Override
+	public int hashCode() {
+		int hashCode = children.length * 37;
+		for (int i = 0; i < children.length; i++) {
+			hashCode += children[i].hashCode();
+		}
+		return hashCode;
+	}
+
+	@Override
 	public boolean equals(Object object) {
 		if (!getClass().isInstance(object))
 			return false;
