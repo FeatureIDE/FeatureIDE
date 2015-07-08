@@ -181,13 +181,13 @@ public abstract class RenameRefactoring<T extends AbstractSignature> extends Ref
 
 		for (AbstractSignature matchedSignature : matcher.getMatchedSignatures()) {
 			
-			handleInvokedSignatureOfMatchedSignature(result, matcher.getSelectedSignature(), (FOPFeatureData[]) matchedSignature.getFeatureData());
+			handleInvokedSignatureOfMatchedSignature(result, matchedSignature, (FOPFeatureData[]) matchedSignature.getFeatureData());
 			
 			final FOPFeatureData[] featureData = (FOPFeatureData[]) matchedSignature.getFeatureData();
 			for (int j = 0; j < featureData.length; j++) {
 				final FOPFeatureData fopFeature = featureData[j];
 
-				addToRefactoringSignatures(result, matcher.getSelectedSignature(), fopFeature.getAbsoluteFilePath());
+				addToRefactoringSignatures(result, matchedSignature, fopFeature.getAbsoluteFilePath());
 			}
 		}
 

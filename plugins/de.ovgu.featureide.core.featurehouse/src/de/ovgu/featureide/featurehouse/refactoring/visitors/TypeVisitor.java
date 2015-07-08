@@ -58,18 +58,6 @@ public class TypeVisitor extends AbstractASTVisitor {
 		return false;
 	}
 	
-//	@Override
-//	public boolean visit(ClassInstanceCreation node) {
-//		Type type = node.getType();
-//		if (type instanceof SimpleType) {
-//			SimpleType simpleType = (SimpleType) type;
-//			if (hasSameName(refactoringSignature.getDeclaration(), simpleType.getName())) {
-//				addSearchMatch(getSimpleName(simpleType.getName()));
-//			}
-//		}
-//		return false;
-//	}
-
 	@Override
 	public boolean visit(MethodDeclaration node) {
 		if (hasSameName(refactoringSignature.getDeclaration(), node.getName()) && node.isConstructor()) {

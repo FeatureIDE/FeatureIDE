@@ -26,10 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.jdt.core.IMethod;
-import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
-
 import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
@@ -149,11 +145,9 @@ public class MethodSignatureMatcher extends SignatureMatcher {
 	@Override
 	protected boolean checkSignature(AbstractSignature signature) {
 		return hasSameType(signature) && RefactoringUtil.hasSameName(signature, selectedElement)
-				&& RefactoringUtil.hasSameParameters((FujiMethodSignature) signature, (IMethod) selectedElement) && hasSameReturnType((FujiMethodSignature) signature);
+				&& RefactoringUtil.hasSameParameters((FujiMethodSignature) signature, (FujiMethodSignature) selectedElement) && hasSameReturnType((FujiMethodSignature) signature);
 	}
 	
-	
-
 	private void filterSuperClasses(final Set<AbstractClassSignature> involvedClasses, final Set<AbstractSignature> matchedSignatures) {
 		for (AbstractClassSignature involvedClass : new HashSet<>(involvedClasses)) {
 			AbstractSignature matchedSignature = getMatchedSignature(involvedClass, matchedSignatures);
@@ -173,12 +167,7 @@ public class MethodSignatureMatcher extends SignatureMatcher {
 	}
 	
 	private boolean hasSameReturnType(final FujiMethodSignature signature) {
-		try {
-			return signature.getReturnType().equals(Signature.toString(((IMethod) selectedElement).getReturnType()));
-		} catch (JavaModelException e) {
-			e.printStackTrace();
-		}
-		return false;
+		return signature.getReturnType().equals(((FujiMethodSignature) selectedElement).getReturnType());
 	}
 	
 }

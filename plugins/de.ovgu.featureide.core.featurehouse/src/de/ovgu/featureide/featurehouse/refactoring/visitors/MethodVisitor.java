@@ -53,7 +53,7 @@ public class MethodVisitor extends AbstractASTVisitor {
 
 	@Override
 	public boolean visit(MethodDeclaration node) {
-		if (refactoringSignature.isRenameDeclaration() && isSameSignature((AbstractMethodSignature) refactoringSignature.getDeclaration(), node)) {
+		if (refactoringSignature.isRenameDeclaration() && isSameSignature(refactoringSignature.getDeclaration(), node)) {
 			addSearchMatch(getSimpleName(node.getName()));
 		}
 
@@ -62,7 +62,7 @@ public class MethodVisitor extends AbstractASTVisitor {
 
 	@Override
 	public boolean visit(MethodInvocation node) {
-		if (isSameSignature((AbstractMethodSignature) refactoringSignature.getDeclaration(), node)) {
+		if (isSameSignature(refactoringSignature.getDeclaration(), node)) {
 			addSearchMatch(getSimpleName(node.getName()));
 		}
 		return false;
@@ -71,7 +71,7 @@ public class MethodVisitor extends AbstractASTVisitor {
 	@Override
 	public boolean visit(SuperMethodInvocation node) {
 
-		if (isSameSignature((AbstractMethodSignature) refactoringSignature.getDeclaration(), node)) {
+		if (isSameSignature(refactoringSignature.getDeclaration(), node)) {
 			addSearchMatch(getSimpleName(node.getName()));
 		}
 		return false;

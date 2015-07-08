@@ -25,22 +25,13 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.List;
 
-import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.IMember;
-import org.eclipse.jdt.core.IMethod;
-import org.eclipse.jdt.core.IPackageDeclaration;
-import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 
-import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 import de.ovgu.featureide.core.signature.base.AbstractMethodSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiClassSignature;
@@ -80,32 +71,6 @@ public class RefactoringUtil {
 		return null;
 	}
 		
-	
-	public static boolean hasSameClass(final AbstractSignature signature, final IMember member) {
-		final IType declaringType = member.getDeclaringType();
-		String className;
-		if (declaringType != null)
-			className = member.getDeclaringType().getElementName();
-		else
-			className = member.getElementName();
-		
-		String sigClassName = signature.getName();
-		AbstractClassSignature classSig = signature.getParent();
-		if (classSig != null) {
-			sigClassName = classSig.getName();
-		}
-		
-		return sigClassName.equals(className) && hasSamePackage(signature, member);
-	}
-	
-	private static boolean hasSamePackage(final AbstractSignature signature, final IMember member) {
-		
-		final String sigPackage = getPackage(signature);
-		final String package0 = getPackageDeclaration(member.getCompilationUnit());
-		
-		return sigPackage.equals(package0);
-	}
-	
 	public static boolean hasSamePackage(final AbstractSignature signature1, final AbstractSignature signature2) {
 		
 		final String sigPackage1 = getPackage(signature1);
@@ -121,25 +86,6 @@ public class RefactoringUtil {
 			return signature.getParent().getPackage();
 	}
 
-	public static String getPackageDeclaration(final ICompilationUnit unit) {
-		IPackageDeclaration[] packageDeclarations = null;
-		try {
-			packageDeclarations = unit.getPackageDeclarations();
-		} catch (JavaModelException e) {
-			//TODO: 
-			e.printStackTrace();
-		}
-		
-		String package0 = "";
-		if ((packageDeclarations != null) && (packageDeclarations.length > 0))
-			package0 = packageDeclarations[0].getElementName();
-		return package0;
-	}
-	
-	public static boolean hasSameName(final AbstractSignature signature, final IMember member) {
-		return hasSameName(signature, member.getElementName());
-	}
-	
 	public static boolean hasSameName(final AbstractSignature signature1, final AbstractSignature signature2) {
 		return hasSameName(signature1.getName(), signature2.getName());
 	}
@@ -152,19 +98,6 @@ public class RefactoringUtil {
 		return name1.equals(name2);
 	}
 	
-	public static boolean hasSameParameters(final FujiMethodSignature signature, final IMethod method) {
-		List<String> parameterTypes = signature.getParameterTypes();
-
-		final int myParamsLength = method.getParameterTypes().length;
-		final String[] simpleNames = new String[myParamsLength];
-		for (int i = 0; i < myParamsLength; i++) {
-			String erasure = Signature.getTypeErasure(method.getParameterTypes()[i]);
-			simpleNames[i] = Signature.getSimpleName(Signature.toString(erasure));
-		}
-
-		return Arrays.equals(simpleNames, parameterTypes.toArray(new String[parameterTypes.size()]));
-	}
-	
 	public static boolean hasSameParameters(final FujiMethodSignature signature1, final FujiMethodSignature signature2) {
 		List<String> parameterTypes1 = signature1.getParameterTypes();
 		List<String> parameterTypes2 = signature1.getParameterTypes();
@@ -173,11 +106,11 @@ public class RefactoringUtil {
 	}
 	
 	/**
-	 * Returns <code>true</code> iff the method could be a virtual method,
+	 * Returns <code>true</code> if the method could be a virtual method,
 	 * i.e. if it is not a constructor, is private, or is static.
 	 *
 	 * @param method a method
-	 * @return <code>true</code> iff the method could a virtual method
+	 * @return <code>true</code> if the method could a virtual method
 	 */
 	public static boolean isVirtual(AbstractMethodSignature method) {
 		if (method.isConstructor())
