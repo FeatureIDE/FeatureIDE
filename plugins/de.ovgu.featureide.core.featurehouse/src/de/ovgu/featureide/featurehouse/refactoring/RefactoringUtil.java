@@ -100,7 +100,7 @@ public class RefactoringUtil {
 	
 	public static boolean hasSameParameters(final FujiMethodSignature signature1, final FujiMethodSignature signature2) {
 		List<String> parameterTypes1 = signature1.getParameterTypes();
-		List<String> parameterTypes2 = signature1.getParameterTypes();
+		List<String> parameterTypes2 = signature2.getParameterTypes();
 		
 		return parameterTypes1.equals(parameterTypes2);
 	}

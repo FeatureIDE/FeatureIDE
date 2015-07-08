@@ -62,17 +62,12 @@ public class TypeVisitor extends AbstractASTVisitor {
 	public boolean visit(MethodDeclaration node) {
 		if (hasSameName(refactoringSignature.getDeclaration(), node.getName()) && node.isConstructor()) {
 			addSearchMatch(getSimpleName(node.getName()));
-			checkChildren = false;
-		} else {
-			checkChildren = checkMethodBody(node);
 		}
-
-		return checkChildren;
+		return checkMethodBody(node);
 	}
 
 	@Override
 	public boolean visit(ImportDeclaration node) {
-		
 		if (hasSameName(refactoringSignature.getDeclaration(), node.getName())) {
 			addSearchMatch(getSimpleName(node.getName()));
 		}

@@ -25,7 +25,6 @@ import java.util.Set;
 
 import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
-import de.ovgu.featureide.featurehouse.refactoring.RefactoringUtil;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiFieldSignature;
 
 /**
@@ -42,11 +41,6 @@ public class LocalVariableSignatureMatcher extends SignatureMatcher {
 	@Override
 	protected boolean hasSameType(AbstractSignature signature) {
 		return (signature instanceof FujiFieldSignature);
-	}
-	
-	@Override
-	protected boolean checkSignature(AbstractSignature signature) {
-		return RefactoringUtil.hasSameName(signature, selectedElement);
 	}
 	
 	@Override

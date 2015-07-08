@@ -102,7 +102,7 @@ public abstract class SignatureMatcher {
 		final SignatureIterator iter = signatures.iterator();
 		while (iter.hasNext()) {
 			final AbstractSignature signature = iter.next();
-			if (RefactoringUtil.hasSameName(signature, name) && hasSameType(signature)) {
+			if (checkSignature(signature, name) ) {
 				matched.add(signature);
 			}
 		}
@@ -110,8 +110,11 @@ public abstract class SignatureMatcher {
 		return matched;
 	}
 	
-	protected abstract boolean hasSameType(AbstractSignature signature);
-	protected abstract boolean checkSignature(AbstractSignature signature);
+	protected abstract boolean hasSameType(final AbstractSignature signature);
+	
+	protected boolean checkSignature(final AbstractSignature signature, final String sigName) {
+		return RefactoringUtil.hasSameName(signature, sigName) && hasSameType(signature);
+	}
 	
 	public Set<AbstractSignature> getMatchedSignatures() {
 		return matchedSignatures;

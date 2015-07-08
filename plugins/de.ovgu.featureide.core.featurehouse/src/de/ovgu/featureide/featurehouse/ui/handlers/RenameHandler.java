@@ -9,6 +9,7 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.ltk.ui.refactoring.RefactoringWizardOpenOperation;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
@@ -77,36 +78,31 @@ public class RenameHandler extends ASelectionHandler {
 		return window.getShell();
 	}
 	
-	
 	@Override
 	public final Object execute(ExecutionEvent event) throws ExecutionException {
-		ISelection selection = HandlerUtil.getCurrentSelection(event);
-		if (selection instanceof ITextSelection)
-		{
-			 IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-			 ITextEditor editor = (ITextEditor) page.getActiveEditor();
-			
-			IJavaElement elem = JavaUI.getEditorInputJavaElement(editor.getEditorInput());
-			if (elem instanceof ICompilationUnit) {
-			    ITextSelection sel = (ITextSelection) editor.getSelectionProvider().getSelection();
-				
-				IDocument document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
-				
-				int lineOffset = 0;
-				try {
-					lineOffset = document.getLineOffset(sel.getStartLine());
-				} catch (BadLocationException e1) {
-					e1.printStackTrace();
-				}
-				int column = sel.getOffset() - lineOffset;
-				
-				final String file = ((ICompilationUnit) elem).getResource().getRawLocation().toOSString();
-				
-				FujiSelector selector = new FujiSelector(getFeatureProject(), file);
-				AbstractSignature signature = selector.getSelectedSignature(sel.getStartLine()+1, column);
-				if (signature != null) 					
-					singleAction(signature);
+		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+		ITextEditor editor = (ITextEditor) page.getActiveEditor();
+
+		IJavaElement elem = JavaUI.getEditorInputJavaElement(editor.getEditorInput());
+		if (elem instanceof ICompilationUnit) {
+			ITextSelection sel = (ITextSelection) editor.getSelectionProvider().getSelection();
+
+			IDocument document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
+
+			int lineOffset = 0;
+			try {
+				lineOffset = document.getLineOffset(sel.getStartLine());
+			} catch (BadLocationException e1) {
+				e1.printStackTrace();
 			}
+			int column = sel.getOffset() - lineOffset;
+
+			final String file = ((ICompilationUnit) elem).getResource().getRawLocation().toOSString();
+
+			FujiSelector selector = new FujiSelector(getFeatureProject(), file);
+			AbstractSignature signature = selector.getSelectedSignature(sel.getStartLine() + 1, column);
+			if (signature != null)
+				singleAction(signature);
 		}
 		
 		return null;

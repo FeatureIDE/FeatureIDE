@@ -140,7 +140,7 @@ public class FujiSelector {
 		if (unit == null) return null;
 		
 		ASTNode<?> result = findSelectedNode(unit, line, column);
-		
+		if (result == null) return null;
 		if (result.featureID() < 0) return null;
 		
 		AbstractSignature selectedSignature = null;
@@ -320,7 +320,7 @@ public class FujiSelector {
 		}
 		
 		if ((positions.getStartRow() <= line) && (positions.getEndRow() >= line)) {
-			if ((positions.getStartRow() == line) && (positions.getStartColumn() <= column) && (positions.getEndColumn() >= column)) {
+			if ((positions.getStartRow() == line) && (((positions.getStartColumn() <= column) && (positions.getEndColumn() >= column)) || (column == 0))) {
 
 				if (stmt instanceof VarAccess) {
 					Variable varDecl = ((VarAccess) stmt).varDecl();

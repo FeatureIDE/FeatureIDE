@@ -43,6 +43,8 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.corext.refactoring.Checks;
 import org.eclipse.jdt.internal.corext.refactoring.RefactoringCoreMessages;
+import org.eclipse.jdt.internal.corext.util.Messages;
+import org.eclipse.jdt.internal.ui.viewsupport.BasicElementLabels;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.CompositeChange;
 import org.eclipse.ltk.core.refactoring.Refactoring;
@@ -54,6 +56,7 @@ import org.eclipse.text.edits.ReplaceEdit;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
+import de.ovgu.featureide.core.signature.base.AFeatureData;
 import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.core.signature.base.FOPFeatureData;
@@ -77,13 +80,10 @@ import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
 @SuppressWarnings("restriction")
 public abstract class RenameRefactoring<T extends AbstractSignature> extends Refactoring {
 
-	protected final IFeatureProject featureProject;
+	private final IFeatureProject featureProject;
 	protected final T renamingElement;
-	protected ProjectSignatures signatures;
 	protected String newName;
 	private List<Change> changes;
-	protected Map<String, AbstractClassSignature> classes = new HashMap<>();
-	private Map<String, List<SearchMatch>> nodes = new HashMap<>();
 
 	public RenameRefactoring(T selection, IFeatureProject featureProject) {
 		this.renamingElement = selection;
@@ -125,13 +125,13 @@ public abstract class RenameRefactoring<T extends AbstractSignature> extends Ref
 		try {
 			pm.beginTask("Checking preconditions...", 2);
 
+			changes = new ArrayList<Change>();
+			
 			ExtendedFujiSignaturesJob efsj = new ExtendedFujiSignaturesJob(featureProject);
 			efsj.schedule();
 			efsj.join();
 
-			changes = new ArrayList<Change>();
-
-			signatures = featureProject.getFSTModel().getProjectSignatures();
+			ProjectSignatures signatures = featureProject.getFSTModel().getProjectSignatures();
 			//TODO: Fehlermeldung
 			if (signatures == null)
 				return refactoringStatus;
@@ -160,12 +160,13 @@ public abstract class RenameRefactoring<T extends AbstractSignature> extends Ref
 			if (refactoringStatus.hasFatalError()) 
 				return refactoringStatus;
 			
+			final Map<RefactoringSignature, List<SearchMatch>> changingNodes = new HashMap<>();
 			for (RefactoringSignature refactoringSignature : createRefactoringSignatures(matcher)) {
-				refactoringStatus.merge(search(refactoringSignature));
+				refactoringStatus.merge(search(refactoringSignature, changingNodes));
 			}
 
-			for (Entry<String, List<SearchMatch>> searchMatches : nodes.entrySet()) {
-				rewriteAST(searchMatches.getKey(), searchMatches.getValue());
+			for (Entry<RefactoringSignature, List<SearchMatch>> searchMatches : changingNodes.entrySet()) {
+				refactoringStatus.merge(createChanges(searchMatches.getKey(), searchMatches.getValue(), matcher.getSelectedSignature()));
 			}
 
 		} catch (InterruptedException e) {
@@ -199,10 +200,7 @@ public abstract class RenameRefactoring<T extends AbstractSignature> extends Ref
 		if (signature == null) {
 			signature = new RefactoringSignature(relativePath, matchedSignature);
 			result.add(signature);
-		} else if (signature.getDeclaration() == null) {
-			signature.setDeclaration(matchedSignature);
-		}
-		signature.setRenameDeclaration(true);
+		} 
 	}
 
 	private void handleInvokedSignatureOfMatchedSignature(final Set<RefactoringSignature> result, final AbstractSignature matchedSignature, final FOPFeatureData[] fopFeatureData)  {
@@ -229,20 +227,20 @@ public abstract class RenameRefactoring<T extends AbstractSignature> extends Ref
 
 	private RefactoringSignature getRefactoringSignature(final Set<RefactoringSignature> result, final String relativePath) {
 		for (RefactoringSignature refactoringSignature : result) {
-			if (refactoringSignature.getRelativePathToFile().equals(relativePath))
+			if (refactoringSignature.getAbsolutePathToFile().equals(relativePath))
 				return refactoringSignature;
 		}
 		return null;
 	}
 
-	private RefactoringStatus search(final RefactoringSignature refactoringSignatures) {
+	private RefactoringStatus search(final RefactoringSignature refactoringSignatures, final Map<RefactoringSignature, List<SearchMatch>> changingNodes) {
 
 		final RefactoringStatus status = new RefactoringStatus();
 
 		IASTVisitor visitor = getASTVisitor(refactoringSignatures, newName);
 		visitor.startVisit();
 
-		nodes.put(refactoringSignatures.getRelativePathToFile(), visitor.getMatches());
+		changingNodes.put(refactoringSignatures, visitor.getMatches());
 		
 		for (String errorMsg : visitor.getErrors()) {
 			status.addError(errorMsg);
@@ -251,13 +249,14 @@ public abstract class RenameRefactoring<T extends AbstractSignature> extends Ref
 	}
 
 	protected IFile getFile(final String relativePath) {
-		final IPath projectPath = ResourcesPlugin.getWorkspace().getRoot().getProject(featureProject.getProjectName()).getFullPath();
-		
-		int index = relativePath.lastIndexOf(projectPath.toString());
-		String path = relativePath.substring(index);
-		
-		final IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(path));
-		return file;
+//		final IPath projectPath = ResourcesPlugin.getWorkspace().getRoot().getProject(featureProject.getProjectName()).getFullPath();
+//		
+//		int index = relativePath.lastIndexOf(projectPath.toString());
+//		String path = relativePath.substring(index);
+//		
+//		final IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(path));
+//		return file;
+		return ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(Path.fromOSString(relativePath));
 	}
 	
 	protected String getFullFilePath(final String relativePath) {
@@ -289,42 +288,61 @@ public abstract class RenameRefactoring<T extends AbstractSignature> extends Ref
 		}
 	}
 
-	private void rewriteAST(String file, List<SearchMatch> matches) {
+	private RefactoringStatus createChanges(final RefactoringSignature refactoringSig, final List<SearchMatch> matches, 
+			final AbstractSignature selectedSignature) {
 
-		final ICompilationUnit unit = getCompilationUnit(file);
-		if (unit == null) return;
-		
+		RefactoringStatus status = new RefactoringStatus();
 		MultiTextEdit multiEdit = new MultiTextEdit();
 		for (SearchMatch match : matches) {
 			multiEdit.addChild(new ReplaceEdit(match.getOffset(), match.getLength(), newName));
 		}
 
 		if (!multiEdit.hasChildren())
-			return;
+			return status;
 		
-		
-//		TextChangeCompatibility.addTextEdit(changes, TEXT_EDIT_LABEL, multiEdit, TEXTUAL_MATCHES);
-		
-		TextFileChange change = new TextFileChange(unit.getElementName(), (IFile) unit.getResource());
+		IFile ifile = getFile(refactoringSig.getAbsolutePathToFile());
+		TextFileChange change = new TextFileChange(JavaCore.removeJavaLikeExtension(ifile.getName()), ifile);
 		change.setTextType("java");
 		change.setEdit(multiEdit);
 		changes.add(change);
 		
-		if (willRenameCU(unit)) 
-			changes.add(new RenameResourceChange(unit.getPath(), newName + ".java"));
+		if (willRenameCU(refactoringSig, selectedSignature, status)) 
+			changes.add(new RenameResourceChange(ifile.getProjectRelativePath(), newName + ".java"));
+		
+		return status;
 	}
 	
-	private boolean willRenameCU(final ICompilationUnit unit) {
-		if (!(renamingElement instanceof AbstractClassSignature)) 
+	private boolean willRenameCU(final RefactoringSignature refactoringSig, final AbstractSignature selectedSignature, final RefactoringStatus status) {
+		final AbstractSignature signature = refactoringSig.getDeclaration();
+		if (!(signature instanceof AbstractClassSignature)) 
 			return false;
-		String name = JavaCore.removeJavaLikeExtension(unit.getElementName());
-		if (!((renamingElement.getParent() == null) && name.equals(renamingElement.getName())))
+		if (!checkIfRenamingType(signature, refactoringSig.getAbsolutePathToFile()))
 			return false;
-		if (!checkNewPathValidity().isOK())
+		String name = JavaCore.removeJavaLikeExtension(signature.getName());
+		if (!((signature.getParent() == null) && name.equals(signature.getName())))
 			return false;
-		if (!Checks.checkCompilationUnitNewName(unit, newName).isOK())
+		status.merge(checkNewPathValidity(refactoringSig.getAbsolutePathToFile()));
+		if (status.hasError())
+			return false;
+		status.merge(existCompilationUnitNewName(refactoringSig.getAbsolutePathToFile()));
+		if (status.hasError())
 			return false;
 		return true;
+	}
+	
+	private RefactoringStatus existCompilationUnitNewName(final String file){
+		IPath renamedResourcePath= getFile(file).getParent().getFullPath();
+		if (Checks.resourceExists(renamedResourcePath.append(newName + ".java")))
+			return RefactoringStatus.createFatalErrorStatus(Messages.format(RefactoringCoreMessages.Checks_cu_name_used, BasicElementLabels.getResourceName(newName)));
+		else
+			return new RefactoringStatus();
+	}
+	
+	private boolean checkIfRenamingType(final AbstractSignature selectedSignature, final String file){
+		for (AFeatureData featureData : selectedSignature.getFeatureData()) {
+			if (featureData.getAbsoluteFilePath().equals(file)) return true;
+		}
+		return false;
 	}
 	
 	protected RefactoringStatus checkIfCuBroken() throws JavaModelException{
@@ -348,8 +366,8 @@ public abstract class RenameRefactoring<T extends AbstractSignature> extends Ref
 		return sourceComplianceLevels;
 	}
 
-	private RefactoringStatus checkNewPathValidity() {
-		ICompilationUnit unit = getCompilationUnit(renamingElement.getFirstFeatureData().getAbsoluteFilePath());
+	private RefactoringStatus checkNewPathValidity(final String file) {
+		ICompilationUnit unit = getCompilationUnit(file);
 		IContainer c = unit.getResource().getParent();
 
 		String notRename= RefactoringCoreMessages.RenameTypeRefactoring_will_not_rename;

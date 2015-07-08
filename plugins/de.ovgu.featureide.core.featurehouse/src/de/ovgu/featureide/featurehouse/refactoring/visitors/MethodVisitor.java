@@ -34,7 +34,6 @@ import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.SuperMethodInvocation;
 import org.eclipse.jdt.core.dom.VariableDeclaration;
 
-import de.ovgu.featureide.core.signature.base.AbstractMethodSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.featurehouse.refactoring.RefactoringSignature;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
@@ -53,7 +52,7 @@ public class MethodVisitor extends AbstractASTVisitor {
 
 	@Override
 	public boolean visit(MethodDeclaration node) {
-		if (refactoringSignature.isRenameDeclaration() && isSameSignature(refactoringSignature.getDeclaration(), node)) {
+		if (isSameSignature(refactoringSignature.getDeclaration(), node)) {
 			addSearchMatch(getSimpleName(node.getName()));
 		}
 
@@ -101,33 +100,22 @@ public class MethodVisitor extends AbstractASTVisitor {
 	}
 
 	private List<String> getNodeParameters(MethodInvocation node) {
-		List<String> parameters = new ArrayList<String>();
-		IMethodBinding methodBinding = node.resolveMethodBinding();
-		if (methodBinding == null) {
-			for (Iterator it = node.arguments().iterator(); it.hasNext();) {
-				Expression e = (Expression) it.next();
-				parameters.add(e.resolveTypeBinding().getErasure().getName());
-			}
-		} else {
-			for (ITypeBinding type : methodBinding.getParameterTypes()) {
-				parameters.add(type.getErasure().getName());
-			}
-		}
-		return parameters;
+		return getNodeParameters(node.arguments(), node.resolveMethodBinding());
 	}
 	
 	private List<String> getNodeParameters(SuperMethodInvocation node) {
-		List<String> parameters = new ArrayList<String>();
-		IMethodBinding methodBinding = node.resolveMethodBinding();
+		return getNodeParameters(node.arguments(), node.resolveMethodBinding());
+	}
+
+	private List<String> getNodeParameters(List arguments, IMethodBinding methodBinding) {
+		final List<String> parameters = new ArrayList<>();
 		if (methodBinding == null) {
-			for (Iterator it = node.arguments().iterator(); it.hasNext();) {
+			for (Iterator it = arguments.iterator(); it.hasNext();) {
 				Expression e = (Expression) it.next();
 				parameters.add(e.resolveTypeBinding().getErasure().getName());
 			}
 		} else {
-
 			for (ITypeBinding type : methodBinding.getParameterTypes()) {
-
 				parameters.add(type.getErasure().getName());
 			}
 		}

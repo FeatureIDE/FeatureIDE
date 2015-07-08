@@ -141,11 +141,9 @@ public class MethodSignatureMatcher extends SignatureMatcher {
 		return (signature instanceof FujiMethodSignature);
 	}
 
-
 	@Override
-	protected boolean checkSignature(AbstractSignature signature) {
-		return hasSameType(signature) && RefactoringUtil.hasSameName(signature, selectedElement)
-				&& RefactoringUtil.hasSameParameters((FujiMethodSignature) signature, (FujiMethodSignature) selectedElement) && hasSameReturnType((FujiMethodSignature) signature);
+	protected boolean checkSignature(final AbstractSignature signature, final String sigName) {
+		return super.checkSignature(signature, sigName) && RefactoringUtil.hasSameParameters((FujiMethodSignature) signature, (FujiMethodSignature) selectedElement) && hasSameReturnType((FujiMethodSignature) signature);
 	}
 	
 	private void filterSuperClasses(final Set<AbstractClassSignature> involvedClasses, final Set<AbstractSignature> matchedSignatures) {
@@ -159,7 +157,7 @@ public class MethodSignatureMatcher extends SignatureMatcher {
 	
 	private AbstractSignature getMatchedSignature(final AbstractClassSignature signature, final Set<AbstractSignature> matchedSignatures) {
 		for (AbstractSignature match : matchedSignatures) {
-			if (checkSignature(match) && match.getParent().equals(signature)) {
+			if (checkSignature(match, match.getName()) && match.getParent().equals(signature)) {
 				return match;
 			}
 		}

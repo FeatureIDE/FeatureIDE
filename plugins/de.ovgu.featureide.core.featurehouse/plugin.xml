@@ -105,7 +105,7 @@
 		</menuContribution>
   <menuContribution
         allPopups="false"
-        locationURI="popup:org.eclipse.ui.popup.any?after=additions">
+        locationURI="popup:#CompilationUnitEditorContext?after=additions">
     <!--
      <menu
            label="Refactoring">
@@ -115,6 +115,17 @@
               id="de.ovgu.featureide.core.featurehouse.ui.action.refactoring.rename"
               label="Rename..."
               style="push">
+              
+           <visibleWhen
+                 checkEnabled="false">
+            
+         <test
+               property="de.ovgu.featureide.core.featurehouse.properties.rename">
+         </test>
+					
+				
+           </visibleWhen>
+           
               <!--
            <visibleWhen
                  checkEnabled="false">
@@ -138,6 +149,22 @@
            -->
         </command>
      <!--</menu>-->
+  </menuContribution>
+  <menuContribution
+        allPopups="false"
+        locationURI="popup:de.ovgu.featureide.ui.views.collaboration.outline.CollaborationOutline">
+     <command
+           commandId="de.ovgu.featureide.core.featurehouse.ui.commands.refactoring.rename"
+           id="de.ovgu.featureide.core.featurehouse.ui.action.refactoring.rename"
+           label="Rename..."
+           style="push">
+        <visibleWhen
+              checkEnabled="false">
+           <test
+                 property="de.ovgu.featureide.core.featurehouse.properties.rename">
+           </test>
+        </visibleWhen>
+     </command>
   </menuContribution>
 	</extension>
 	<extension
@@ -164,7 +191,7 @@
 		</command>
   <command
         id="de.ovgu.featureide.core.featurehouse.ui.commands.refactoring.rename"
-        name="Rename...">
+        name="Rename">
   </command>
 	</extension>
 	<extension
@@ -222,5 +249,12 @@
 				properties="metaproduct"
 				type="org.eclipse.jface.viewers.IStructuredSelection">
 		</propertyTester>
+  <propertyTester
+        class="de.ovgu.featureide.featurehouse.ui.properties.RenameTester"
+        id="de.ovgu.featureide.core.featurehouse.renamepropertyTester"
+        namespace="de.ovgu.featureide.core.featurehouse.properties"
+        properties="rename"
+        type="java.lang.Object">
+  </propertyTester>
 	</extension>
 </plugin>

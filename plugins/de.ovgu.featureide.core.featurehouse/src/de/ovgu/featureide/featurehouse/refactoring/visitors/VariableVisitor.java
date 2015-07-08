@@ -136,7 +136,7 @@ public abstract class VariableVisitor extends AbstractASTVisitor {
 			if (varBinding.isField())
 				addError(Messages.format(RefactoringCoreMessages.RefactoringAnalyzeUtil_name_collision, BasicElementLabels.getJavaElementName(newName)));
 			else
-				addError(Messages.format(RefactoringCoreMessages.RenameAnalyzeUtil_shadows, refactoringSignature.getRelativePathToFile()));
+				addError(Messages.format(RefactoringCoreMessages.RenameAnalyzeUtil_shadows, refactoringSignature.getAbsolutePathToFile()));
 		}
 		
 		return false;

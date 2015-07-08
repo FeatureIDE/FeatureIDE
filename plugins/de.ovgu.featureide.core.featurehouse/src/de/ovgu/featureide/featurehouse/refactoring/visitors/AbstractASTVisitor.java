@@ -123,7 +123,7 @@ public abstract class AbstractASTVisitor extends ASTVisitor implements IASTVisit
 	}
 
 	public void startVisit() {
-		ASTNode root = RefactoringUtil.parseUnit(refactoringSignature.getRelativePathToFile());
+		ASTNode root = RefactoringUtil.parseUnit(refactoringSignature.getAbsolutePathToFile());
 		if (root == null)
 			return;
 		
@@ -131,7 +131,7 @@ public abstract class AbstractASTVisitor extends ASTVisitor implements IASTVisit
 	}
 
 	protected void addSearchMatch(SimpleName simpleName) {
-		matches.add(new SearchMatch(refactoringSignature.getRelativePathToFile(), simpleName.getStartPosition(), simpleName.getLength()));
+		matches.add(new SearchMatch(refactoringSignature.getAbsolutePathToFile(), simpleName.getStartPosition(), simpleName.getLength()));
 	}
 	
 	protected void addError(String errorMsg) {
