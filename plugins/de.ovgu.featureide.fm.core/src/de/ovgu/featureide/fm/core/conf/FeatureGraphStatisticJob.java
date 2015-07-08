@@ -50,7 +50,7 @@ public class FeatureGraphStatisticJob extends AProjectJob<FeatureGraphStatisticJ
 		}
 	}
 
-	private FeatureGraph featureGraph;
+	private IFeatureGraph featureGraph;
 
 	private long curTime = 0;
 	private boolean wrongResult = false;
@@ -82,9 +82,9 @@ public class FeatureGraphStatisticJob extends AProjectJob<FeatureGraphStatisticJ
 
 	@SuppressWarnings("unused")
 	private void statisticPart(boolean selected, boolean subtractReal) {
-		final int[] featureNeigbors = new int[featureGraph.featureArray.length];
+		final int[] featureNeigbors = new int[featureGraph.getFeatureArray().length];
 		int i = 0;
-		for (String feature : featureGraph.featureArray) {
+		for (String feature : featureGraph.getFeatureArray()) {
 			if (ALL_FEATURE || arguments.featureModel.getFeature(feature).getChildren().size() == 0) {
 				featureNeigbors[i++] = featureGraph.countNeighbors(feature, selected, subtractReal);
 			}
@@ -100,10 +100,10 @@ public class FeatureGraphStatisticJob extends AProjectJob<FeatureGraphStatisticJ
 	@SuppressWarnings("unused")
 	private void statisticPart2() {
 		System.out.println();
-		for (String feature : featureGraph.featureArray) {
-			for (String feature2 : featureGraph.featureArray) {
+		for (String feature : featureGraph.getFeatureArray()) {
+			for (String feature2 : featureGraph.getFeatureArray()) {
 				final byte edge = featureGraph.getEdge(featureGraph.getFeatureIndex(feature), featureGraph.getFeatureIndex(feature2));
-				if (FeatureGraph.isEdge(edge, FeatureGraph.EDGE_10) || FeatureGraph.isEdge(edge, FeatureGraph.EDGE_11)) {
+				if (AFeatureGraph.isEdge(edge, IFeatureGraph.EDGE_10) || AFeatureGraph.isEdge(edge, IFeatureGraph.EDGE_11)) {
 					System.out.print("1");
 				} else {
 					System.out.print("0");

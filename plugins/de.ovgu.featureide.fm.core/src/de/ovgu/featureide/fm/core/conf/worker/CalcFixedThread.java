@@ -82,8 +82,14 @@ public class CalcFixedThread extends AWorkerThread<String> {
 	}
 
 	private void startWork() {
-		sharedObjects.solver.isSatisfiable();
 		super.start(sharedObjects.numberOfSolvers);
+	}
+
+	@Override
+	protected boolean beforeWork() {
+		sharedObjects.solver.initSolver(id);
+		sharedObjects.solver.setBackbone(id);
+		return super.beforeWork();
 	}
 
 	@Override

@@ -26,8 +26,8 @@ import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.SimpleSatSolver;
 
-import de.ovgu.featureide.fm.core.conf.FeatureGraph;
 import de.ovgu.featureide.fm.core.conf.IConfigurationChanger;
+import de.ovgu.featureide.fm.core.conf.IFeatureGraph;
 import de.ovgu.featureide.fm.core.conf.nodes.Variable;
 import de.ovgu.featureide.fm.core.conf.worker.base.AWorkerThread;
 import de.ovgu.featureide.fm.core.job.WorkMonitor;
@@ -37,17 +37,17 @@ import de.ovgu.featureide.fm.core.job.WorkMonitor;
  * 
  * @author Sebastian Krieter
  */
-public class CalcThread extends AWorkerThread<Integer> {
+public class SatCalcThread extends AWorkerThread<Integer> {
 
 	private static class SharedObjects {
-		private final FeatureGraph featureGraph;
+		private final IFeatureGraph featureGraph;
 		private final IConfigurationChanger variableConfiguration;
 		private final Node fmNode;
 
 		private List<Literal> knownLiterals = null;
 		private Literal l = null;
 
-		public SharedObjects(FeatureGraph featureGraph, IConfigurationChanger variableConfiguration, Node fmNode) {
+		public SharedObjects(IFeatureGraph featureGraph, IConfigurationChanger variableConfiguration, Node fmNode) {
 			this.featureGraph = featureGraph;
 			this.variableConfiguration = variableConfiguration;
 			this.fmNode = fmNode;
@@ -57,13 +57,13 @@ public class CalcThread extends AWorkerThread<Integer> {
 	private final SimpleSatSolver solver;
 	private final SharedObjects sharedObjects;
 
-	public CalcThread(FeatureGraph featureGraph, IConfigurationChanger variableConfiguration, Node fmNode) {
+	public SatCalcThread(IFeatureGraph featureGraph, IConfigurationChanger variableConfiguration, Node fmNode) {
 		super(new WorkMonitor());
 		this.sharedObjects = new SharedObjects(featureGraph, variableConfiguration, fmNode);
 		this.solver = new SimpleSatSolver(fmNode, 1000);
 	}
 
-	private CalcThread(CalcThread oldThread) {
+	private SatCalcThread(SatCalcThread oldThread) {
 		super(oldThread);
 		this.sharedObjects = oldThread.sharedObjects;
 		this.solver = new SimpleSatSolver(oldThread.sharedObjects.fmNode, 1000);
@@ -82,7 +82,7 @@ public class CalcThread extends AWorkerThread<Integer> {
 
 	@Override
 	protected void work(Integer i) {
-		final byte value = solver.getValueOf(new Literal(sharedObjects.featureGraph.featureArray[i]));
+		final byte value = solver.getValueOf(new Literal(sharedObjects.featureGraph.getFeatureArray()[i]));
 		switch (value) {
 		case 1:
 			sharedObjects.variableConfiguration.setNewValue(i, Variable.TRUE, false);
@@ -98,7 +98,7 @@ public class CalcThread extends AWorkerThread<Integer> {
 
 	@Override
 	protected AWorkerThread<Integer> newThread() {
-		return new CalcThread(this);
+		return new SatCalcThread(this);
 	}
 
 }

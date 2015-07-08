@@ -152,7 +152,9 @@ public class MultiThreadSatSolver {
 	}
 
 	public void setBackbone(int id) {
-		solvers[id].backbone = newCopiedVecInt(literals, 10);
+		if (literals != null) {
+			solvers[id].backbone = newCopiedVecInt(literals, 10);
+		}
 		if (id == 0) {
 			synchronized (this) {
 				isSatisfiable();

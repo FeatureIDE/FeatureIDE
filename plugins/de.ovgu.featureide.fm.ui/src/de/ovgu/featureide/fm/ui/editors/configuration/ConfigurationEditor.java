@@ -66,12 +66,12 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.conf.ConfigurationFG;
-import de.ovgu.featureide.fm.core.conf.FeatureGraph;
-import de.ovgu.featureide.fm.core.configuration.IConfiguration;
+import de.ovgu.featureide.fm.core.conf.IFeatureGraph;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationWriter;
 import de.ovgu.featureide.fm.core.configuration.FeatureIDEFormat;
+import de.ovgu.featureide.fm.core.configuration.IConfiguration;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.ModelIOFactory;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
@@ -227,7 +227,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 			featureModel = ((ExtendedFeatureModel) featureModel).getMappingModel();
 		}
 
-		final FeatureGraph fg = loadFeatureGraph(res);
+		final IFeatureGraph fg = loadFeatureGraph(res);
 		if (fg == null) {
 			configuration = new Configuration(featureModel, Configuration.PARAM_IGNOREABSTRACT | Configuration.PARAM_LAZY);
 		} else {
@@ -266,9 +266,9 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		getExtensions();
 	}
 
-	private FeatureGraph loadFeatureGraph(IResource file) {
+	private IFeatureGraph loadFeatureGraph(IResource file) {
 		try (final ObjectInputStream in = new ObjectInputStream(new FileInputStream(file.getProject().getFile("model.fg").getLocation().toFile()))) {
-			return (FeatureGraph) in.readObject();
+			return (IFeatureGraph) in.readObject();
 		} catch (IOException | ClassNotFoundException e) {
 			FMCorePlugin.getDefault().logError(e);
 			return null;

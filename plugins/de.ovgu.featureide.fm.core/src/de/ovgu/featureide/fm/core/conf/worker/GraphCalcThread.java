@@ -36,7 +36,7 @@ import de.ovgu.featureide.fm.core.job.WorkMonitor;
  * 
  * @author Sebastian Krieter
  */
-public class CalcThread2 extends AWorkerThread<Integer> {
+public class GraphCalcThread extends AWorkerThread<Integer> {
 
 	private static class SharedObjects {
 
@@ -60,17 +60,17 @@ public class CalcThread2 extends AWorkerThread<Integer> {
 	private final int id;
 	private final SharedObjects sharedObjects;
 
-	public CalcThread2(String[] featureArray, IConfigurationChanger variableConfiguration, Node fmNode) {
+	public GraphCalcThread(String[] featureArray, IConfigurationChanger variableConfiguration, Node fmNode) {
 		this(featureArray, variableConfiguration, fmNode, NUMBER_OF_THREADS);
 	}
 
-	public CalcThread2(String[] featureArray, IConfigurationChanger variableConfiguration, Node fmNode, int numberOfSolvers) {
+	public GraphCalcThread(String[] featureArray, IConfigurationChanger variableConfiguration, Node fmNode, int numberOfSolvers) {
 		super(new WorkMonitor());
 		sharedObjects = new SharedObjects(featureArray, variableConfiguration, fmNode, numberOfSolvers);
 		this.id = sharedObjects.lastSolverID;
 	}
 
-	private CalcThread2(CalcThread2 oldThread) {
+	private GraphCalcThread(GraphCalcThread oldThread) {
 		super(oldThread);
 		this.sharedObjects = oldThread.sharedObjects;
 		this.id = ++oldThread.sharedObjects.lastSolverID;
@@ -123,8 +123,8 @@ public class CalcThread2 extends AWorkerThread<Integer> {
 	}
 
 	@Override
-	protected CalcThread2 newThread() {
-		return new CalcThread2(this);
+	protected GraphCalcThread newThread() {
+		return new GraphCalcThread(this);
 	}
 
 }

@@ -37,7 +37,7 @@ import javax.annotation.Nonnull;
 import org.eclipse.core.resources.IProject;
 import org.prop4j.Node;
 
-import de.ovgu.featureide.fm.core.conf.FeatureGraph;
+import de.ovgu.featureide.fm.core.conf.IFeatureGraph;
 
 /**
  * The model representation of the feature tree that notifies listeners of
@@ -121,10 +121,10 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 			this.colorschemeTable = oldFeatureModel.colorschemeTable.clone(this);
 			this.layout = oldFeatureModel.layout.clone();
 		} else {
-			this.annotations = null;
-			this.comments = null;
+			this.annotations = Collections.emptyList();
+			this.comments = Collections.emptyList();
 			this.colorschemeTable = new EmptyColorschemeTable();
-			this.layout = null;
+			this.layout = new FeatureModelLayout();
 		}
 
 		if (oldFeatureModel.rootFeature != null) {
@@ -885,13 +885,13 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		return hash;
 	}
 	
-	private FeatureGraph featureGraph = null;
+	private IFeatureGraph featureGraph = null;
 	
-	public FeatureGraph getFeatureGraph() {
+	public IFeatureGraph getFeatureGraph() {
 		return featureGraph;
 	}
 
-	public void setFeatureGraph(FeatureGraph featureGraph) {
+	public void setFeatureGraph(IFeatureGraph featureGraph) {
 		this.featureGraph = featureGraph;
 	}
 

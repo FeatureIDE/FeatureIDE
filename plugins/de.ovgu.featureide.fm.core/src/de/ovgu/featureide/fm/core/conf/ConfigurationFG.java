@@ -59,7 +59,7 @@ public class ConfigurationFG implements IConfiguration {
 	private final SelectableFeature root;
 	private boolean propagate = true;
 
-	private FeatureGraph featureGraph;
+	private IFeatureGraph featureGraph;
 	private VariableConfiguration variableConfiguration;
 	private ConfigurationChanger propagator;
 
@@ -182,17 +182,17 @@ public class ConfigurationFG implements IConfiguration {
 	}
 
 	private Feature getFeature(int id) {
-		return featureModel.getFeature(featureGraph.featureArray[id]);
+		return featureModel.getFeature(featureGraph.getFeatureArray()[id]);
 	}
 
 	public List<Feature> getSelectedFeatures() {
-		final List<Feature> featureList = new ArrayList<>(variableConfiguration.size(true) + featureGraph.coreFeatures.length);
+		final List<Feature> featureList = new ArrayList<>(variableConfiguration.size(true) + featureGraph.getCoreFeatures().length);
 		for (Variable var : variableConfiguration) {
 			if (var.getValue() == Variable.TRUE) {
 				featureList.add(getFeature(var.getId()));
 			}
 		}
-		for (String featureName : featureGraph.coreFeatures) {
+		for (String featureName : featureGraph.getCoreFeatures()) {
 			featureList.add(featureModel.getFeature(featureName));
 		}
 		return featureList;
@@ -203,13 +203,13 @@ public class ConfigurationFG implements IConfiguration {
 	}
 
 	public List<Feature> getUnSelectedFeatures() {
-		final List<Feature> featureList = new ArrayList<>(variableConfiguration.size(true) + featureGraph.deadFeatures.length);
+		final List<Feature> featureList = new ArrayList<>(variableConfiguration.size(true) + featureGraph.getDeadFeatures().length);
 		for (Variable var : variableConfiguration) {
 			if (var.getValue() == Variable.FALSE) {
 				featureList.add(getFeature(var.getId()));
 			}
 		}
-		for (String featureName : featureGraph.deadFeatures) {
+		for (String featureName : featureGraph.getDeadFeatures()) {
 			featureList.add(featureModel.getFeature(featureName));
 		}
 		return featureList;

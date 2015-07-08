@@ -51,7 +51,7 @@ import de.ovgu.featureide.fm.core.conf.nodes.Variable;
 import de.ovgu.featureide.fm.core.conf.nodes.VariableConfiguration;
 import de.ovgu.featureide.fm.core.conf.nodes.Xor;
 import de.ovgu.featureide.fm.core.conf.worker.CalcFixedThread;
-import de.ovgu.featureide.fm.core.conf.worker.DFSThread2;
+import de.ovgu.featureide.fm.core.conf.worker.DFSThread;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
@@ -70,7 +70,7 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 	private final Collection<Feature> fixedFeatures = new HashSet<>();
 	private final Collection<Feature> coreFeatures = new HashSet<>();
 	private final Collection<Feature> deadFeatures = new HashSet<>();
-	private FeatureGraph featureGraph = null;
+	private IFeatureGraph featureGraph = null;
 
 	private final HashSet<Feature> processedParents = new HashSet<>();
 
@@ -80,7 +80,7 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 
 	private boolean loadFeatureGraph() {
 		try (final ObjectInputStream in = new ObjectInputStream(new FileInputStream(project.getFile("model.fg").getLocation().toFile()))) {
-			this.featureGraph = (FeatureGraph) in.readObject();
+			this.featureGraph = (IFeatureGraph) in.readObject();
 			return true;
 		} catch (IOException | ClassNotFoundException e) {
 			FMCorePlugin.getDefault().logError(e);
@@ -126,7 +126,7 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 
 			workMonitor.setMaxAbsoluteWork(1 * features.size() + 1);
 
-			featureGraph = new FeatureGraph(features, coreFeatures, deadFeatures);
+			featureGraph = new MatrixFeatureGraph(features, coreFeatures, deadFeatures);
 
 			workMonitor.worked();
 
@@ -156,8 +156,8 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 						if (nonDeadSibilingCount == 1) {
 							featureGraph.implies(parentName, featureName);
 						} else {
-							featureGraph.setEdge(parentName, featureName, FeatureGraph.EDGE_1Q);
-							featureGraph.setEdge(featureName, parentName, FeatureGraph.EDGE_0Q);
+							featureGraph.setEdge(parentName, featureName, MatrixFeatureGraph.EDGE_1Q);
+							featureGraph.setEdge(featureName, parentName, MatrixFeatureGraph.EDGE_0Q);
 						}
 					}
 				}
@@ -169,15 +169,15 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 						if (coreFeatures.contains(parent) && nonDeadSibilingCount == 2) {
 							for (Feature sibiling : parent.getChildren()) {
 								if (!deadFeatures.contains(sibiling)) {
-									featureGraph.setEdge(featureName, sibiling.getName(), FeatureGraph.EDGE_10);
-									featureGraph.setEdge(featureName, sibiling.getName(), FeatureGraph.EDGE_01);
+									featureGraph.setEdge(featureName, sibiling.getName(), MatrixFeatureGraph.EDGE_10);
+									featureGraph.setEdge(featureName, sibiling.getName(), MatrixFeatureGraph.EDGE_01);
 								}
 							}
 						} else {
 							for (Feature sibiling : parent.getChildren()) {
 								if (!deadFeatures.contains(sibiling)) {
-									featureGraph.setEdge(featureName, sibiling.getName(), FeatureGraph.EDGE_10);
-									featureGraph.setEdge(featureName, sibiling.getName(), FeatureGraph.EDGE_0Q);
+									featureGraph.setEdge(featureName, sibiling.getName(), MatrixFeatureGraph.EDGE_10);
+									featureGraph.setEdge(featureName, sibiling.getName(), MatrixFeatureGraph.EDGE_0Q);
 								}
 							}
 
@@ -206,7 +206,7 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 						if (!optionalFeature) {
 							for (Feature sibiling : parent.getChildren()) {
 								if (!deadFeatures.contains(sibiling)) {
-									featureGraph.setEdge(featureName, sibiling.getName(), FeatureGraph.EDGE_0Q);
+									featureGraph.setEdge(featureName, sibiling.getName(), MatrixFeatureGraph.EDGE_0Q);
 								}
 							}
 
@@ -256,12 +256,15 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 				featureNames.add(feature.getName());
 			}
 
-			final long start = System.nanoTime();
-			final DFSThread2 dfsThread = new DFSThread2(featureGraph, workMonitor);
-			dfsThread.addObjects(featureNames);
-			dfsThread.start();
-			System.out.println("DFS Time: " + Math.floor((System.nanoTime() - start) / 1000000.0) / 1000.0 + "s");
-
+			
+			if (featureGraph instanceof MatrixFeatureGraph) {
+				final long start = System.nanoTime();
+				final DFSThread dfsThread = new DFSThread((MatrixFeatureGraph) featureGraph, workMonitor);
+				dfsThread.addObjects(featureNames);
+				dfsThread.start();
+				System.out.println("DFS Time: " + Math.floor((System.nanoTime() - start) / 1000000.0) / 1000.0 + "s");
+			}
+			
 			writeFeatureGraph();
 		}
 
@@ -310,7 +313,7 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 						for (Node orChild2 : andChild.getChildren()) {
 							final String featureName2 = (String) ((Literal) orChild2).var;
 							if (!deadFeatures.contains(arguments.featureModel.getFeature(featureName2))) {
-								featureGraph.setEdge(featureName1, featureName2, literal1.positive ? FeatureGraph.EDGE_0Q : FeatureGraph.EDGE_1Q);
+								featureGraph.setEdge(featureName1, featureName2, literal1.positive ? IFeatureGraph.EDGE_0Q : IFeatureGraph.EDGE_1Q);
 							}
 						}
 					}

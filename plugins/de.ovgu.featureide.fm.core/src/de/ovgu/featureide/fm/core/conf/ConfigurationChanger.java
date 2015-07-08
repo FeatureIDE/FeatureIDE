@@ -36,7 +36,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.conf.nodes.Expression;
 import de.ovgu.featureide.fm.core.conf.nodes.Variable;
 import de.ovgu.featureide.fm.core.conf.nodes.VariableConfiguration;
-import de.ovgu.featureide.fm.core.conf.worker.CalcThread2;
+import de.ovgu.featureide.fm.core.conf.worker.GraphCalcThread;
 import de.ovgu.featureide.fm.core.configuration.IConfigurationPropagator;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
@@ -53,7 +53,7 @@ import de.ovgu.featureide.fm.core.job.WorkMonitor;
 public class ConfigurationChanger implements IConfigurationChanger, IConfigurationPropagator {
 
 	private final FeatureModel featureModel;
-	private final FeatureGraph featureGraph;
+	private final IFeatureGraph featureGraph;
 	private final VariableConfiguration variableConfiguration;
 	private final ConfigurationFG c;
 	private Node node;
@@ -61,7 +61,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 	private byte[] lastComputedValues;
 	private final List<String> changedFeatures = new ArrayList<>();
 
-	private CalcThread2 calcThread;
+	private GraphCalcThread calcThread;
 	private SatSolver satSolver1 = null;
 	private SatSolver satSolver2 = null;
 
@@ -82,7 +82,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 				lastComputedValues = new byte[variableConfiguration.size()];
 				Arrays.fill(lastComputedValues, (byte) Variable.UNDEFINED);
 				node = NodeCreator.createNodes(featureModel, true).toCNF();
-				calcThread = new CalcThread2(featureGraph.featureArray, ConfigurationChanger.this, node);
+				calcThread = new GraphCalcThread(featureGraph.getFeatureArray(), ConfigurationChanger.this, node);
 				initialized = true;
 			}
 			return null;
@@ -152,20 +152,20 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 								if (curValue == Variable.UNDEFINED) {
 									final byte edgeValue = featureGraph.getValue(index, i, newValue == Variable.TRUE);
 									switch (edgeValue) {
-									case FeatureGraph.VALUE_0:
+									case IFeatureGraph.VALUE_0:
 										setNewValue(i, Variable.FALSE, false);
 										featureToCompute[i] = false;
 										break;
-									case FeatureGraph.VALUE_1:
+									case IFeatureGraph.VALUE_1:
 										setNewValue(i, Variable.TRUE, false);
 										featureToCompute[i] = false;
 										break;
-									case FeatureGraph.VALUE_Q:
+									case IFeatureGraph.VALUE_Q:
 										featureToCompute[i] = true;
 										break;
-									case FeatureGraph.VALUE_NONE:
+									case IFeatureGraph.VALUE_NONE:
 										if (oldValue != Variable.UNDEFINED
-												&& featureGraph.getValue(index, i, oldValue == Variable.TRUE) != FeatureGraph.VALUE_NONE) {
+												&& featureGraph.getValue(index, i, oldValue == Variable.TRUE) != IFeatureGraph.VALUE_NONE) {
 											featureToCompute[i] = true;
 										}
 										break;
@@ -175,7 +175,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 								}
 							} else {
 								if (curValue != Variable.UNDEFINED) {
-									if (featureGraph.getValue(index, i, oldValue == Variable.TRUE) != FeatureGraph.VALUE_NONE) {
+									if (featureGraph.getValue(index, i, oldValue == Variable.TRUE) != IFeatureGraph.VALUE_NONE) {
 										featureToCompute[i] = true;
 									}
 								}
@@ -227,10 +227,10 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 					// TODO only if undefined
 					switch (var.getManualValue()) {
 					case Variable.TRUE:
-						knownLiterals.add(new Literal(featureGraph.featureArray[i], true));
+						knownLiterals.add(new Literal(featureGraph.getFeatureArray()[i], true));
 						break;
 					case Variable.FALSE:
-						knownLiterals.add(new Literal(featureGraph.featureArray[i], false));
+						knownLiterals.add(new Literal(featureGraph.getFeatureArray()[i], false));
 						break;
 					default:
 						break;
@@ -253,12 +253,12 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 						f.setManual(manu == Variable.UNDEFINED ? Selection.UNDEFINED : manu == Variable.TRUE ? Selection.SELECTED : Selection.UNSELECTED);
 						monitor.invoke(f);
 					} else {
-						if (Arrays.binarySearch(featureGraph.coreFeatures, f.getName()) >= 0) {
+						if (Arrays.binarySearch(featureGraph.getCoreFeatures(), f.getName()) >= 0) {
 							f.setAutomatic(Selection.SELECTED);
 							f.setManual(Selection.UNDEFINED);
 							monitor.invoke(f);
 						} else {
-							if (Arrays.binarySearch(featureGraph.deadFeatures, f.getName()) >= 0) {
+							if (Arrays.binarySearch(featureGraph.getDeadFeatures(), f.getName()) >= 0) {
 								f.setAutomatic(Selection.UNSELECTED);
 								f.setManual(Selection.UNDEFINED);
 								monitor.invoke(f);
@@ -309,7 +309,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 		int i = 0;
 		for (Variable var : variableConfiguration) {
 			if (!definedVariablesOnly || var.getValue() != Variable.UNDEFINED) {
-				literals[i++] = new Literal(featureGraph.featureArray[var.getId()], var.getValue() == Variable.TRUE);
+				literals[i++] = new Literal(featureGraph.getFeatureArray()[var.getId()], var.getValue() == Variable.TRUE);
 			}
 		}
 		return literals;
@@ -340,7 +340,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 
 		//		addChangedFeature(featureGraph.featureArray[index] + ": " + (value == Variable.UNDEFINED ? "UNDEFINED" : (value == Variable.TRUE)));		
 		if (value != Variable.UNDEFINED && variableConfiguration.getVariable(index).getValue() == Variable.UNDEFINED) {
-			addChangedFeature(featureGraph.featureArray[index] + ": " + (value == Variable.TRUE));
+			addChangedFeature(featureGraph.getFeatureArray()[index] + ": " + (value == Variable.TRUE));
 		}
 
 		variableConfiguration.setVariable(index, value, manual);
@@ -350,7 +350,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 		changedFeatures.add(featureString);
 	}
 
-	public FeatureGraph getFeatureGraph() {
+	public IFeatureGraph getFeatureGraph() {
 		return featureGraph;
 	}
 
