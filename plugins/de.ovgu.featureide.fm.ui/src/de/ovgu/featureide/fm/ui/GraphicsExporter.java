@@ -20,7 +20,9 @@
  */
 package de.ovgu.featureide.fm.ui;
 
+import java.awt.Composite;
 import java.io.File;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import org.eclipse.core.internal.runtime.InternalPlatform;
@@ -30,7 +32,9 @@ import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.osgi.framework.Bundle;
@@ -106,24 +110,45 @@ public class GraphicsExporter {
 		if (file.getAbsolutePath().endsWith(".svg")) {
 			ScalableFreeformRootEditPart part = (ScalableFreeformRootEditPart) viewer.getEditPartRegistry().get(LayerManager.ID);
 			IFigure rootFigure = part.getFigure();
+
+			Bundle bundleExport = null;
 			Bundle bundleExportSVG = null;
 			for (Bundle b : InternalPlatform.getDefault().getBundleContext().getBundles()) {
+				if (b.getSymbolicName().equals("nl.utwente.ce.imageexport")) {
+					bundleExport = b;
+				}
 				if (b.getSymbolicName().equals("nl.utwente.ce.imageexport.svg")) {
 					bundleExportSVG = b;
+				}
+				if (bundleExport != null && bundleExportSVG != null) {
 					break;
 				}
 			}
 
 			// check if gef-imageexport is existing and activated!
-			if (bundleExportSVG != null) {
+			if (bundleExport != null && bundleExportSVG != null) {
 				try {
-					org.osgi.framework.BundleActivator act = ((org.osgi.framework.BundleActivator) bundleExportSVG.loadClass(
-							"nl.utwente.ce.imagexport.export.svg.Activator").newInstance());
+					org.osgi.framework.BundleActivator act = ((org.osgi.framework.BundleActivator) bundleExport.loadClass(
+							"nl.utwente.ce.imageexport.core.ImageExportPlugin").newInstance());
 					act.start(InternalPlatform.getDefault().getBundleContext());
 
 					Class<?> cl = bundleExportSVG.loadClass("nl.utwente.ce.imagexport.export.svg.ExportSVG");
-					Method m = cl.getMethod("exportImage", String.class, String.class, IFigure.class);
-					m.invoke(cl.newInstance(), "SVG", file.getAbsolutePath(), rootFigure);
+					Object exportSVGObject = cl.newInstance();
+
+					Method provideSettings = cl.getMethod("provideSettings", String.class, org.eclipse.swt.widgets.Composite.class, IPreferenceStore.class);
+					provideSettings.invoke(exportSVGObject, "SVG", viewer.getControl(), FMUIPlugin.getDefault().getPreferenceStore());
+
+					Method exportImage = cl.getMethod("exportImage", String.class, String.class, IFigure.class);
+					exportImage.invoke(exportSVGObject, "SVG", file.getAbsolutePath(), rootFigure);
+
+					Field disableClippingButton = cl.getDeclaredField("disableClippingButton");
+					disableClippingButton.setAccessible(true);
+
+					Object disableClippingButtonObj = disableClippingButton.get(exportSVGObject);
+					if (disableClippingButtonObj instanceof Button) {
+						((Button) disableClippingButtonObj).dispose();
+					}
+
 					succ = true;
 				} catch (Exception e) {
 					FMUIPlugin.getDefault().logError(e);
