@@ -24,10 +24,12 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -791,6 +793,26 @@ public class CorePlugin extends AbstractCorePlugin {
 		}
 	}
 
+	private static class DeprecatedFeature implements Comparable<DeprecatedFeature> {
+		private final String feature;
+
+		private int clauseCount = 0;
+
+		public DeprecatedFeature(String feature, int clauseCount) {
+			this.feature = feature;
+			this.clauseCount = clauseCount;
+		}
+
+		public String getFeature() {
+			return feature;
+		}
+
+		@Override
+		public int compareTo(DeprecatedFeature arg0) {
+			return arg0.clauseCount - clauseCount;
+		}
+	}
+
 	public static Node removeFeatures(FeatureModel fm, Collection<String> features) throws TimeoutException {
 		Node fmNode = NodeCreator.createNodes(fm).clone().toCNF();
 		if (fmNode instanceof And) {
@@ -833,8 +855,50 @@ public class CorePlugin extends AbstractCorePlugin {
 				}
 			}
 
-			// for each feature that should be removed ...
+			final DeprecatedFeature[] deprecatedFeatures = new DeprecatedFeature[features.size()];
+			int featureIndex = 0;
 			for (String curFeature : features) {
+				int positiveCount = 0;
+				int negativeCount = 0;
+
+				for (Iterator<Or> iterator = relevantClauseList.iterator(); iterator.hasNext();) {
+					final Or clause = iterator.next();
+
+					int count = 0;
+					Literal curLiteral = null;
+					for (Node clauseChildren : clause.getChildren()) {
+						final Literal literal = (Literal) clauseChildren;
+						if (literal.var.equals(curFeature)) {
+							if (curLiteral == null) {
+								curLiteral = literal;
+								count = (curLiteral.positive ? 1 : 2);
+							} else if (literal.positive != curLiteral.positive) {
+								count = -1;
+								iterator.remove();
+								break;
+							}
+						}
+					}
+					switch (count) {
+					case 1:
+						positiveCount++;
+						break;
+					case 2:
+						negativeCount++;
+						break;
+					default:
+					}
+				}
+
+				deprecatedFeatures[featureIndex++] = new DeprecatedFeature(curFeature, negativeCount * positiveCount);
+			}
+
+			Arrays.sort(deprecatedFeatures);
+			final Set<Or> relevantClauseSet = new HashSet<>(relevantClauseList);
+
+			// for each feature that should be removed ...
+			for (int l = deprecatedFeatures.length - 1; l >= 0; l--) {
+				final String curFeature = deprecatedFeatures[l].getFeature();
 
 				// ... create list of clauses that contain this feature
 				int relevantIndex = 0;
@@ -857,8 +921,6 @@ public class CorePlugin extends AbstractCorePlugin {
 						}
 					}
 				}
-
-				final ArrayList<Or> newRelevantClauseList = new ArrayList<>();
 
 				// ... combine relevant clauses if possible
 				for (int i = clauseStates.length - 1; i >= 0; i--) {
@@ -904,7 +966,10 @@ public class CorePlugin extends AbstractCorePlugin {
 						final Or newClause = new Or(retainLiterals);
 
 						if (checkRelevance(features, newClause)) {
-							newRelevantClauseList.add(newClause);
+							if (!relevantClauseSet.contains(newClause)) {
+								relevantClauseList.add(newClause);
+								relevantClauseSet.add(newClause);
+							}
 						} else {
 							newClauseList.add(newClause);
 						}
@@ -935,7 +1000,10 @@ public class CorePlugin extends AbstractCorePlugin {
 								final Or newClause = new Or(newLiterals);
 
 								if (checkRelevance(features, newClause)) {
-									newRelevantClauseList.add(newClause);
+									if (!relevantClauseSet.contains(newClause)) {
+										relevantClauseList.add(newClause);
+										relevantClauseSet.add(newClause);
+									}
 								} else {
 									newClauseList.add(newClause);
 								}
@@ -944,8 +1012,6 @@ public class CorePlugin extends AbstractCorePlugin {
 					}
 				}
 				relevantClauseList.subList(0, relevantIndex).clear();
-				newRelevantClauseList.removeAll(relevantClauseList);
-				relevantClauseList.addAll(newRelevantClauseList);
 			}
 
 			// create clause that contains all retained features
