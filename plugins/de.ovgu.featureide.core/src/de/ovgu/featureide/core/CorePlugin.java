@@ -1011,7 +1011,9 @@ public class CorePlugin extends AbstractCorePlugin {
 						}
 					}
 				}
-				relevantClauseList.subList(0, relevantIndex).clear();
+				final List<Or> subList = relevantClauseList.subList(0, relevantIndex);
+				relevantClauseSet.removeAll(subList);
+				subList.clear();
 			}
 
 			// create clause that contains all retained features
