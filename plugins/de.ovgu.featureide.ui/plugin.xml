@@ -1321,15 +1321,6 @@
 			  </contextualLaunch>
 	    </shortcut>
 	</extension>
-	<extension point = "org.eclipse.debug.ui.launchGroups">
-	<launchGroup
-		id = "de.ovgu.launchGroup.run"
-		mode = "run"
-		label = "Run"
-		image = "icons/FeatureIcon.png"
-		bannerImage = "icons/FeatureIcon.png">
-	</launchGroup> 
-	</extension>
 	<extension point="org.eclipse.core.expressions.propertyTesters">
 		<propertyTester
 				class="de.ovgu.featureide.ui.properties.IntegrationTester"
