@@ -252,9 +252,11 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			break;
 		case DIFFERENCE:
 			sorter = new PriorizationSorter(featureModel);
+			maxSize = Integer.MAX_VALUE;
 			break;
 		case INTERACTION:
 			sorter = new InteractionSorter(t, featureModel, buildType == BuildType.T_WISE);
+			maxSize = Integer.MAX_VALUE;
 			break;
 		default:
 			LOGGER.logWarning("Case statement missing for: " + buildOrder);
@@ -714,6 +716,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 					build(configuration, monitor);
 				}
 			}
+			sorter.sort(monitor);
 		} catch (CoreException e) {
 			LOGGER.logError(e);
 		}
@@ -786,6 +789,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		rootNode = NodeCreator.createNodes(featureModel, false).toCNF();
 		children = new LinkedList<Node>();
 		build(root, "", selectedFeatures2, monitor);
+		sorter.sortConfigurations(monitor);
 	}
 
 	private void build(Feature currentFeature, String selected, LinkedList<Feature> selectedFeatures2, IProgressMonitor monitor) {

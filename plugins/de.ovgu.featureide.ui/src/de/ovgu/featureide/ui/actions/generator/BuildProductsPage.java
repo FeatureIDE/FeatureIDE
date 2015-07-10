@@ -141,7 +141,8 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 			comboOrder.add(getOrderText(order));
 		}
 		comboOrder.setText(order);
-		comboOrder.setEnabled(comboGenerate.getText().equals(T_WISE_CONFIGURATIONS));
+//		comboOrder.setEnabled(comboGenerate.getText().equals(T_WISE_CONFIGURATIONS) || 
+//				comboGenerate.getText().equals(ALL_CURRENT_CONFIGURATIONS));
 
 		labelT = new Label(composite, SWT.NULL);
 		labelT.setText(LABEL_INTERACTIONS + "10");
@@ -227,7 +228,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		-t t_wise -a CASA 	 -fm <feature_model> -s <strength, 1-6>
 		 **/
 
-		if (comboGenerate.getText().equals(T_WISE_CONFIGURATIONS)) {
+		if (comboGenerate.getText().equals(T_WISE_CONFIGURATIONS) || comboOrder.getText().equals(INTERACTIONS)) {
 			scale.setEnabled(true);
 		} else {
 			scale.setEnabled(false);
@@ -237,7 +238,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		int lastSelection = scale.getSelection();
 		scale.setMinimum(1);
 		if (!comboAlgorithm.isEnabled()) {
-			scale.setMaximum(10);
+			scale.setMaximum(3);
 		} else if (selection.equals(CHVATAL)) {
 			scale.setMaximum(CHVATAL_MAX);
 		} else if (selection.equals(ICPL)) {
@@ -278,9 +279,11 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 
 		comboGenerate.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent e) {
-				final boolean tWise = comboGenerate.getText().equals(T_WISE_CONFIGURATIONS); 
+				final String text = comboGenerate.getText();
+				final boolean tWise = text.equals(T_WISE_CONFIGURATIONS);
+//				final boolean allCurrent = text.equals(ALL_CURRENT_CONFIGURATIONS); 
 				comboAlgorithm.setEnabled(tWise);
-				comboOrder.setEnabled(tWise);
+//				comboOrder.setEnabled(tWise || allCurrent);
 
 				setScale();
 
@@ -339,16 +342,13 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 	}
 
 	public BuildOrder getOrder() {
-		if (!comboGenerate.getText().equals(T_WISE_CONFIGURATIONS) || comboOrder.getText().equals(DEFAULT)) {
-			return BuildOrder.DEFAULT;
-		}
 		if (comboOrder.getText().equals(DIFFERENCE)) {
 			return BuildOrder.DIFFERENCE;
 		}
 		if (comboOrder.getText().equals(INTERACTIONS)) {
 			return BuildOrder.INTERACTION;
 		}
-		return null;
+		return BuildOrder.DEFAULT;
 	}
 
 	String getSelectedOrder() {
