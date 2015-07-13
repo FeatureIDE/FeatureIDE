@@ -32,8 +32,9 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
 import org.prop4j.And;
+import org.prop4j.Literal;
 import org.prop4j.Node;
-import org.prop4j.Not;
+import org.prop4j.Or;
 import org.prop4j.SatSolver;
 import org.sat4j.specs.TimeoutException;
 
@@ -172,13 +173,12 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
         if (cnf instanceof And) {
         	final Node[] children = cnf.getChildren();
         	workMonitor.setMaxAbsoluteWork(children.length + 2);
-//    		final SatSolver modelSatSolver = new SatSolver(NodeCreator.createNodes(m), 500);
+        	final SatSolver modelSatSolver = new SatSolver(new And(NodeCreator.createNodes(m), cnf), 1000);
+			workMonitor.worked();
         	for (int i = 0; i < children.length; i++) {
         		final Node child = children[i];
-        		final Node notChild = new Not(child.clone());
-        		SatSolver modelSatSolver = new SatSolver(new And(NodeCreator.createNodes(m), notChild), 1000);
         		try {
-					if (modelSatSolver.isSatisfiable()) {
+					if (checkOr(modelSatSolver, child)) {
 						m.addConstraint(new Constraint(m, child));
 					}
 				} catch (TimeoutException e) {
@@ -190,6 +190,33 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
         }
         return m;
     }
+	
+	private boolean checkOr(final SatSolver solver, Node clause) throws TimeoutException {
+		if (clause instanceof Or) {
+			Node[] clauseChildren = clause.getChildren();
+			Literal[] literals = new Literal[clauseChildren.length];
+			for (int k = 0; k < literals.length; k++) {
+				final Literal literal = (Literal) clauseChildren[k].clone();
+				literal.flip();
+				literals[k] = literal;
+			}
+			if (solver.isSatisfiable(literals)) {
+				return true;
+			}
+		} else {
+			return checkLiteral(solver, clause);
+		}
+		return false;
+	}
+
+	private boolean checkLiteral(final SatSolver solver, Node clause) throws TimeoutException {
+		final Literal literal = (Literal) clause.clone();
+		literal.flip();
+		if (solver.isSatisfiable(new Literal[] { literal })) {
+			return true;
+		}
+		return false;
+	}
 
 	private static final String MARK1 = "?", MARK2 = "??";
 	
