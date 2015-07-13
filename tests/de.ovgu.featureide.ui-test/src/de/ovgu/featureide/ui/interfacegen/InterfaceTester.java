@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.ui.interfacegen;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -31,10 +31,12 @@ import java.util.List;
 import java.util.Random;
 
 import org.junit.Test;
-import org.prop4j.Equals;
+import org.prop4j.And;
+import org.prop4j.Literal;
 import org.prop4j.Node;
-import org.prop4j.Not;
+import org.prop4j.Or;
 import org.prop4j.SatSolver;
+import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -85,7 +87,7 @@ public class InterfaceTester {
 		try {
 			final String[] modelNames = { "email", "gol", "gpl", "snake" };
 			final boolean verbose = false;
-			final int rounds = 10;
+			final int rounds = 100;
 			final double removeFactor = 0.6;
 
 			long currentTimeMillis = System.currentTimeMillis();
@@ -104,7 +106,7 @@ public class InterfaceTester {
 					System.out.println("Random Seed: " + nextSeed);
 
 					if (verbose)
-						System.out.println("Removing the following features:");
+						System.out.println("\tRemoving the following features:");
 
 					final List<String> features = new LinkedList<>(orgFeatures);
 					for (Iterator<String> iterator = features.iterator(); iterator.hasNext();) {
@@ -113,31 +115,70 @@ public class InterfaceTester {
 							iterator.remove();
 						} else {
 							if (verbose)
-								System.out.println("\t" + name);
+								System.out.println("\t\t" + name);
 						}
 					}
 
 					if (verbose)
-						System.out.println("Creating Node1...");
+						System.out.println("\tCreating Node1...");
 					Node fmNode1 = CorePlugin.removeFeatures(fm, features);
 					if (verbose)
-						System.out.println("Creating Node2...");
+						System.out.println("\tCreating Node2...");
 					final Node fmNode2 = NodeCreator.createNodes(fm, features).toCNF();
 
-					SatSolver solver;
 					if (verbose)
-						System.out.println("Compare 1 & 2...");
-					solver = new SatSolver(new Not(new Equals(fmNode1.clone(), fmNode2.clone())), 2000);
+						System.out.println("\tCompare 1 with 2...");
+					compare(fmNode2, fmNode1);
 					if (verbose)
-						System.out.println("\tSolver created.");
-					assertTrue(!solver.isSatisfiable());
+						System.out.println("\tCompare 2 with 1...");
+					compare(fmNode1, fmNode2);
+
 					if (verbose)
-						System.out.println("\tTrue");
+						System.out.println("\tTrue!");
 				}
 			}
 			System.out.println("\nDone!.");
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+	}
+
+	private void compare(Node fmNode1, final Node fmNode2) throws TimeoutException {
+		final SatSolver solver = new SatSolver(fmNode1, 1000);
+		if (fmNode2 instanceof And) {
+			for (Node clause : fmNode2.getChildren()) {
+				checkOr(solver, clause);
+			}
+		} else {
+			checkOr(solver, fmNode2);
+		}
+	}
+
+	private void checkOr(final SatSolver solver, Node clause) throws TimeoutException {
+		if (clause instanceof Or) {
+			Node[] clauseChildren = clause.getChildren();
+			Literal[] literals = new Literal[clauseChildren.length];
+			for (int k = 0; k < literals.length; k++) {
+				final Literal literal = (Literal) clauseChildren[k].clone();
+				literal.flip();
+				literals[k] = literal;
+			}
+			if (solver.isSatisfiable(literals)) {
+				System.out.println("\nFail!.");
+				fail();
+			}
+		} else {
+			checkLiteral(solver, clause);
+		}
+
+	}
+
+	private void checkLiteral(final SatSolver solver, Node clause) throws TimeoutException {
+		final Literal literal = (Literal) clause.clone();
+		literal.flip();
+		if (solver.isSatisfiable(new Literal[] { literal })) {
+			System.out.println("\nFail!.");
+			fail();
 		}
 	}
 
