@@ -971,7 +971,9 @@ public class CorePlugin extends AbstractCorePlugin {
 								relevantClauseSet.add(newClause);
 							}
 						} else {
-							newClauseList.add(newClause);
+							if (checkValidity(newClause)) {
+								newClauseList.add(newClause);
+							}
 						}
 
 						// try to combine with other clauses
@@ -1005,7 +1007,9 @@ public class CorePlugin extends AbstractCorePlugin {
 										relevantClauseSet.add(newClause);
 									}
 								} else {
-									newClauseList.add(newClause);
+									if (checkValidity(newClause)) {
+										newClauseList.add(newClause);
+									}
 								}
 							}
 						}
@@ -1057,6 +1061,28 @@ public class CorePlugin extends AbstractCorePlugin {
 			}
 		}
 		return false;
+	}
+	
+	private static boolean checkValidity(Node newClause) {
+		final Node[] children = newClause.getChildren();
+		final HashSet<Literal> literalSet = new HashSet<>(children.length << 1);
+		for (Node orChild : children) {
+			final Literal literal = (Literal) orChild;
+
+			// sort out obvious tautologies
+			if ((literal.positive && literal.var.equals(NodeCreator.varTrue)) || (!literal.positive && literal.var.equals(NodeCreator.varFalse))) {
+				return false;
+			}
+			
+			if (literalSet.contains(literal)) {
+				return false;
+			} else {
+				final Literal negativliteral = literal.clone();
+				negativliteral.flip();
+				literalSet.add(negativliteral);
+			}
+		}
+		return true;
 	}
 
 }
