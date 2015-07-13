@@ -335,6 +335,6 @@ public class MPLPlugin extends AbstractCorePlugin {
 	public void createInterface(IProject mplProject, IFeatureProject featureProject, Collection<String> featureNames) {
 		final LinkedList<IProject> projectList = new LinkedList<>();
 		projectList.add(mplProject);
-		FMCorePlugin.getDefault().startJobs(projectList, new CreateInterfaceJob.Arguments(featureProject, featureNames), true);
+		FMCorePlugin.getDefault().startJobs(projectList, new CreateInterfaceJob.Arguments(featureProject.getProjectName(), featureProject.getFeatureModel(), featureNames), true);
 	}
 }
