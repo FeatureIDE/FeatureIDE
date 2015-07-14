@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.core.internal;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE_CORE_AND_DEAD_FEATURES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CHECKING_CONFIGURATIONS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CHECKING_CONFIGURATIONS_FOR_UNUSED_FEATURES;
@@ -1030,7 +1031,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 						if (!config.isValid()) {
 							String name = file.getName();
 							name = name.substring(0, name.lastIndexOf('.'));
-							String message = CONFIGURATION_ + name + "' is invalid";
+							String message = CONFIGURATION_ + name + IS_INVALID;
 							createConfigurationMarker(file, message, 0, IMarker.SEVERITY_ERROR);
 
 						}

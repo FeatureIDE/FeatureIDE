@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.core;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.VALID;
 import static de.ovgu.featureide.fm.core.localization.StringTable.VELVET_FEATUREMODEL_IMPORTED;
 
@@ -251,7 +252,7 @@ public class ExtendedFeatureModel extends FeatureModel {
 		FMCorePlugin.getDefault().logInfo(VELVET_FEATUREMODEL_IMPORTED);
 
 		try {
-			FMCorePlugin.getDefault().logInfo(analyzer.isValid() ? VALID : "invalid");
+			FMCorePlugin.getDefault().logInfo(analyzer.isValid() ? VALID : INVALID);
 			StringBuilder sb = new StringBuilder("Dead Features: ");
 			for (Feature deadFeature : analyzer.getDeadFeatures()) {
 				sb.append(deadFeature.getName() + ", ");

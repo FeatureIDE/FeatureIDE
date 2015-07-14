@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.ui.mpl.handlers.statistics;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FOLDER_OF_STATISTICS;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.fm.ui.handlers.base.AProjectJobHandler;
@@ -36,7 +37,7 @@ public class PrintAllStatisticsHandler extends AProjectJobHandler {
 	
 	@Override
 	protected AbstractWizard instantiateWizard() {
-		return new BuildExtendedModulesWizard(FOLDER_OF_STATISTICS, "Statistics");
+		return new BuildExtendedModulesWizard(FOLDER_OF_STATISTICS, STATISTICS);
 	}
 
 	@Override

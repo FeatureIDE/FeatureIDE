@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NUMBER_OF;
 
 import java.util.HashMap;
@@ -153,7 +154,7 @@ public class Aggregator {
 	private void mapToChild(Parent parent, DirectiveMap count) {
 		for (FSTDirectiveCommand com : FSTDirectiveCommand.values()) {
 			if (count.containsKey(com)) {
-				parent.addChild(new Parent(NUMBER_OF + com.toString() + " directives", count.get(com)));
+				parent.addChild(new Parent(NUMBER_OF + com.toString() + DIRECTIVES, count.get(com)));
 			}
 		}
 	}

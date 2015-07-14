@@ -21,6 +21,7 @@
 // $ANTLR 3.4 Velvet.g 2014-11-23 20:46:36
 package de.ovgu.featureide.fm.core.io.velvet;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ALL;
 
 import org.antlr.runtime.BaseRecognizer;
@@ -33,7 +34,7 @@ import org.antlr.runtime.NoViableAltException;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.RecognizerSharedState;
 
-@SuppressWarnings({ALL, "warnings", "unchecked"})
+@SuppressWarnings({ALL, WARNINGS, "unchecked"})
 public class VelvetLexer extends Lexer {
     public static final int EOF=-1;
     public static final int ABSTRACT=4;

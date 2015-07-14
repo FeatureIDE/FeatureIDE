@@ -1,5 +1,6 @@
 package br.ufal.ic.colligens.models;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.POSITION;
 
 import java.io.File;
@@ -77,7 +78,7 @@ public class XMLParserTypeChef {
 
 				Log log = new Log(fileProxie, Integer.parseInt(node
 						.getChild(POSITION).getChildText("line").trim()),Integer.parseInt(node
-								.getChild(POSITION).getChildText("column").trim()),
+								.getChild(POSITION).getChildText(COLUMN).trim()),
 						node.getChildText("featurestr"),
 						node.getChildText("severity"), node.getChildText("msg"));
 

@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.views.featuremodeleditview;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE_CONTENT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE_NUMBER_OF_CONFIGURATIONS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE_NUMBER_OF_PROGRAM_VARIANTS;
@@ -436,7 +437,7 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 
 	private TreeParent calculateNumberOfVariants(FeatureModel model, boolean ignoreAbstractFeatures) {
 
-		String variants = ignoreAbstractFeatures ? CONFIGURATIONS : "program variants";
+		String variants = ignoreAbstractFeatures ? CONFIGURATIONS : PROGRAM_VARIANTS;
 		TreeParent p = new TreeParent(NUMBER_OF + variants, null, true) {
 			@Override
 			public void initChildren() {

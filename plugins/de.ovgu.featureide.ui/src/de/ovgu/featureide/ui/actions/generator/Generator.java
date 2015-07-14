@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.ui.actions.generator;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ERROR_IN_CONFIGURATION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.GENERATE_PRODUCTS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.GENERATOR;
@@ -93,7 +95,7 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 	  * @param builder The {@link ConfigurationBuilder} containing the {@link Generator}
 	  */
 	public Generator(int nr, ConfigurationBuilder builder) {
-		super(nr == 0 ? GENERATOR : "Genarator nr. " + nr);
+		super(nr == 0 ? GENERATOR : GENARATOR_NR_ + nr);
 		this.nr = nr;
 		this.builder = builder;
 		if (!builder.createNewProjects) {
@@ -197,7 +199,7 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 			 * If there is any build error the configuration will be built again.
 			 * And because this job is terminated a new one will be created.
 			 */
-			UIPlugin.getDefault().logWarning(THE_GENERATOR_NR_ + nr + " will be restarted.");
+			UIPlugin.getDefault().logWarning(THE_GENERATOR_NR_ + nr + WILL_BE_RESTARTED_);
 			builder.createNewGenerator(nr);
 		} finally {
 			builder.generatorJobs.remove(this);

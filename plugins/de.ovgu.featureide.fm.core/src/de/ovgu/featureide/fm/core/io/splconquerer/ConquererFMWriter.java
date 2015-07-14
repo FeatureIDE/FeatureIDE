@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.fm.core.io.splconquerer;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CHILD;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CLASSES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CLAUSE;
@@ -202,7 +205,7 @@ public class ConquererFMWriter extends AbstractFeatureModelWriter {
 
     	Element commulative = doc.createElement("constraint");
     	constraints.appendChild(commulative);
-    	commulative.setAttribute(TYPE, "commulative");
+    	commulative.setAttribute(TYPE, COMMULATIVE);
     	if (!feature.isRoot() && feature.getParent().isOr()) {
         	for (Feature childFeature : feature.getParent().getChildren())
         		if (childFeature != feature) {
@@ -219,7 +222,7 @@ public class ConquererFMWriter extends AbstractFeatureModelWriter {
 
     	Element requires = doc.createElement("constraint");
     	constraints.appendChild(requires);
-    	requires.setAttribute(TYPE, "requires");
+    	requires.setAttribute(TYPE, REQUIRES);
     	Set<String> requireFeature = require.get(feature.getName());
     	if (requireFeature != null)
 	    	for (String childFeature : requireFeature) {
@@ -235,7 +238,7 @@ public class ConquererFMWriter extends AbstractFeatureModelWriter {
 
     	Element excludes = doc.createElement("constraint");
     	constraints.appendChild(excludes);
-    	excludes.setAttribute(TYPE, "excludes");
+    	excludes.setAttribute(TYPE, EXCLUDES);
     	Set<String> excludeFeature = exclude.get(feature.getName());
     	if (excludeFeature != null)
 	    	for (String childFeature : excludeFeature) {

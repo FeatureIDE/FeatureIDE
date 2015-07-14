@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.configuration;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTION_NOT_POSSIBLE_ON_FEATURE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.WRONG_CONFIGURATION_FORMAT;
@@ -93,7 +94,7 @@ public class FeatureIDEFormat extends ConfigurationFormat {
 
 					final SelectableFeature feature = configuration.getSelectablefeature(name);
 					if (feature == null) {
-						warnings.add(new ConfigurationReader.Warning(FEATURE + name + " does not exist", lineNumber));
+						warnings.add(new ConfigurationReader.Warning(FEATURE + name + DOES_NOT_EXIST, lineNumber));
 					} else {
 						try {
 							configuration.setManual(feature, manual);

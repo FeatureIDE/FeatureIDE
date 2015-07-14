@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.outline;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -77,7 +79,7 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 	@Override
 	public Object[] getElements(Object inputElement) {
 		if (inputElement == null || !(inputElement instanceof IFile)) {
-			return new String[] { "no file found" };
+			return new String[] { NO_FILE_FOUND };
 		}
 
 		final IFile file = (IFile) inputElement;
@@ -94,7 +96,7 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 				}
 			}
 		}
-		return new String[] { "Collaboration model not found" };
+		return new String[] { COLLABORATION_MODEL_NOT_FOUND };
 	}
 
 	@Override

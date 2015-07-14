@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.fm.core.io.velvet;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ILLEGAL_SYNTAX_IN_LINE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.IN_FILE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NO_SUCH_ATTRIBUTE_DEFINED_;
@@ -866,7 +869,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 			}
 			
 			if (!extFeatureModel.addInheritance(parentModelName, parentModelName)) {
-				reportWarning(curNode, THE_PARENT_MODEL + parentModelName + " is already used.");
+				reportWarning(curNode, THE_PARENT_MODEL + parentModelName + IS_ALREADY_USED_);
 				return;
 			}
 			addExternalFeatures(fm, parentModelName, extFeatureModel.getRoot(), ExtendedFeature.TYPE_INHERITED);
@@ -921,7 +924,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 			
 			if (checkInterfaceModelFile(idNode)) {
 				if (!extFeatureModel.addInterface(interfaceName, varName)) {
-					reportWarning(idNode, THE_VARIABLE_NAME + varName + " is already in use.");
+					reportWarning(idNode, THE_VARIABLE_NAME + varName + IS_ALREADY_IN_USE_);
 				}
 			}
 		}
@@ -938,7 +941,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 			
 			if (checkExternalModelFile(idNode)) {
 				if (!extFeatureModel.addInstance(interfaceName, varName)) {
-					reportWarning(idNode, THE_VARIABLE_NAME + varName + " is already in use.");
+					reportWarning(idNode, THE_VARIABLE_NAME + varName + IS_ALREADY_IN_USE_);
 				}
 			}
 		}

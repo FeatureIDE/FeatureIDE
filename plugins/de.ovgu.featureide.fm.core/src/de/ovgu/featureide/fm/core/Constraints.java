@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.core;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,7 +50,7 @@ public final class Constraints {
 		String printable = quoteOperatorNames(constraint);
 
 		// ATTENTION: Backwards iteration is used here, to first replace "<=>WITHiff".
-		// That's because "=>COMES_BEFORE<=>" in "shortSymbols", such that "<=>" will
+		// That's because "=>COMES_BEFORE<=>INshortSymbols", such that "<=>" will
 		// be replaces by "<implies"" when not iterating backwards.
 		for (int i = NodeWriter.shortSymbols.length - 1; i >= 0; i--)
 			printable = printable.replace(NodeWriter.shortSymbols[i].trim(), NodeWriter.textualSymbols[i].trim());

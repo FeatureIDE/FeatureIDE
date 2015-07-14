@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.aspectj;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.EMPTY___;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_REQUIRED_BUNDLE;
@@ -73,7 +74,7 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 @SuppressWarnings(RESTRICTION)
 public class AspectJComposer extends ComposerExtensionClass {
 	private static final String PLUGIN_ID = "org.eclipse.ajdt";
-	private static final String PLUGIN_WARNING = THE_REQUIRED_BUNDLE + PLUGIN_ID + " is not installed.";
+	private static final String PLUGIN_WARNING = THE_REQUIRED_BUNDLE + PLUGIN_ID + IS_NOT_INSTALLED_;
 	private static final String ASPECTJ_NATURE = "org.eclipse.ajdt.ui.ajnature";
 
 	private static final String NEW_ASPECT = "\t// TODO Auto-generated aspect" + NEWLINE;

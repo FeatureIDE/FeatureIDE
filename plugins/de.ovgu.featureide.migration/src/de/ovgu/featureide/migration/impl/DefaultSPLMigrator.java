@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.migration.impl;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CLASSPATH_OF_PROJECT_TO_MIGRATE_IS_NULL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DESTINATIONFOLDER_NOT_ACCESSIBLE_OR_WRONG_PATH;
 import static de.ovgu.featureide.fm.core.localization.StringTable.JAVA_PROJECTS_COULD_NOT_BE_CREATED;
@@ -143,7 +144,7 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator {
 			IPath destinationPath = new Path(configurationData.sourcePath);
 
 			assert newProject.getFolder(destinationPath).isAccessible() : DESTINATIONFOLDER_NOT_ACCESSIBLE_OR_WRONG_PATH;
-			assert project.isOpen() : PROJECT + project.getName() + " is not open.";
+			assert project.isOpen() : PROJECT + project.getName() + IS_NOT_OPEN_;
 
 			IPath featureFolderPath = SPLMigrationUtils.setupFolder(newProject.getFolder(destinationPath).getFolder(project.getName()));
 

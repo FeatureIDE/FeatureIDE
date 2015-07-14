@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.ui.wizards;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ENTER_THE_NAME_OF_THE_CONFIGURATION_FILE__IT_WILL_BE_PLACED_IN_THE_CONFIGURATIONS_DIRECTORY_OF_THE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FILE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FILE_NAME_MUST_BE_SPECIFIED;
@@ -86,7 +88,7 @@ public class NewConfigurationFilePage extends WizardPage {
 	public NewConfigurationFilePage(IFolder configFolder) {
 		super("wizardPage");
 		setTitle(NEW_CONFIGURATION);
-		setDescription(ENTER_THE_NAME_OF_THE_CONFIGURATION_FILE__IT_WILL_BE_PLACED_IN_THE_CONFIGURATIONS_DIRECTORY_OF_THE + "selected FeatureIDE project");
+		setDescription(ENTER_THE_NAME_OF_THE_CONFIGURATION_FILE__IT_WILL_BE_PLACED_IN_THE_CONFIGURATIONS_DIRECTORY_OF_THE + SELECTED_FEATUREIDE_PROJECT);
 		this.configFolder = configFolder;
 	}
 
@@ -188,7 +190,7 @@ public class NewConfigurationFilePage extends WizardPage {
 			configbool = true;
 			String fullFileName = fileName + "." + featureProject.getComposer().getConfigurationExtension();
 			if (featureProject.getConfigFolder().getFile(fullFileName).exists()) {
-				updateStatus(FILE + fullFileName + " already exists.");
+				updateStatus(FILE + fullFileName + ALREADY_EXISTS_);
 				return;
 			}
 		} else if (configbool) {

@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.ui.statistics.core;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CHOOSE_WISELY;
 import static de.ovgu.featureide.fm.core.localization.StringTable.EXPORT_STATISTICS_INTO_CSV;
 import static de.ovgu.featureide.fm.core.localization.StringTable.OK;
@@ -184,21 +187,21 @@ public class CsvExporter {
 			 * 
 			 */
 			private void giveUserFeedback(final boolean error) {
-				UIJob errorJob = new UIJob(error ? SHOW_ERRORDIALOG : "show dialog") {
+				UIJob errorJob = new UIJob(error ? SHOW_ERRORDIALOG : SHOW_DIALOG) {
 					
 					@Override
 					public IStatus runInUIThread(IProgressMonitor monitor) {
 						Shell shell = Display.getDefault().getActiveShell();
 						if (error) {
 							MessageDialog dial = new MessageDialog(shell, "Error", GUIDefaults.FEATURE_SYMBOL, "The file cannot be accessed!\nTry again?",
-									MessageDialog.ERROR, new String[] { OK, "Cancel" }, 0);
+									MessageDialog.ERROR, new String[] { OK, CANCEL }, 0);
 							if (dial.open() == 0) {
 								actualWriting();
 							}
 						} else {
 							// MessageDialog.openInformation(shell, ,
 							// DATA_WAS_SUCCESSFULLY_EXPORTED_);
-							new MessageDialog(shell, SUCCESS, GUIDefaults.FEATURE_SYMBOL, "Data was successfully exported", MessageDialog.INFORMATION,
+							new MessageDialog(shell, SUCCESS, GUIDefaults.FEATURE_SYMBOL, DATA_WAS_SUCCESSFULLY_EXPORTED, MessageDialog.INFORMATION,
 									new String[] { OK }, 0).open();
 						}
 						

@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.ui.views.collaboration;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD_COLLABORATIONMODEL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CHANGE_FILTER_FOR_ACCESS_MODIFIERS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE;
@@ -159,9 +162,9 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 
 	private static final String REFRESH_TOOL_TIP_LABEL = BUILD_COLLABORATIONMODEL;
 
-	private static final String[] FIELD_METHOD_LABEL_NAMES = { FIELDS_WITH_REFINEMENTS, "Fields without Refinements", "Methods with Refinements",
-			METHODS_WITHOUT_REFINEMENTS, "Show Method Contracts", "Show Class Invariants", "Show Nested Classes", "Hide Parameters/Types", "Public",
-			PROTECTED, "Default", "Private", "Select All", "Deselect All", };
+	private static final String[] FIELD_METHOD_LABEL_NAMES = { FIELDS_WITH_REFINEMENTS, FIELDS_WITHOUT_REFINEMENTS, "Methods with Refinements",
+			METHODS_WITHOUT_REFINEMENTS, SHOW_METHOD_CONTRACTS, "Show Class Invariants", "Show Nested Classes", "Hide Parameters/Types", "Public",
+			PROTECTED, DEFAULT, "Private", "Select All", "Deselect All", };
 
 	private static final Image[] FIELD_METHOD_IMAGES = { IMAGE_FIELDS_REFINEMENTS, IMAGE_FIELDS_WITHOUT_REFINEMENTS, IMAGE_METHODS_REFINEMENTS,
 			IMAGE_METHODS_WITHOUT_REFINEMENTS, IMAGE_AT_CONTRACT, IMAGE_AT_INVARIANT, IMAGE_NESTED_CLASS, null, IMAGE_METHODE_PUBLIC, IMAGE_METHODE_PROTECTED,

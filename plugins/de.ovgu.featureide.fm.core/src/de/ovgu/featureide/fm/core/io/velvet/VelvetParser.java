@@ -22,6 +22,7 @@
 
 package de.ovgu.featureide.fm.core.io.velvet;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ALL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RULE_ATTRIBCONSTRAINT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RULE_BINARYOP;
@@ -70,7 +71,7 @@ import org.antlr.runtime.tree.TreeAdaptor;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 
 
-@SuppressWarnings({ALL, "warnings", "unchecked"})
+@SuppressWarnings({ALL, WARNINGS, "unchecked"})
 public class VelvetParser extends Parser {
     public static final String[] tokenNames = new String[] {
         "<invalid>", "<EOR>", "<DOWN>", "<UP>", "ABSTRACT", "ACONSTR", "ATTR", "ATTR_OP_EQUALS", "ATTR_OP_GREATER", "ATTR_OP_GREATER_EQ", "ATTR_OP_LESS", "ATTR_OP_LESS_EQ", "ATTR_OP_NOT_EQUALS", "BASEEXT", "BOOLEAN", "CINTERFACE", "COLON", "COMMA", "CONCEPT", "CONSTR", "CONSTRAINT", "DEF", "DESCRIPTION", "EMPTY", "END_C", "END_R", "EQ", "ESC_SEQ", "EXPONENT", "FEATURE", "FLOAT", "GROUP", "HEX_DIGIT", "ID", "IDPath", "IMPORTINSTANCE", "IMPORTINTERFACE", "INT", "MANDATORY", "MINUS", "ML_COMMENT", "OCTAL_ESC", "ONEOF", "OPERAND", "OP_AND", "OP_EQUIVALENT", "OP_IMPLIES", "OP_NOT", "OP_OR", "OP_XOR", "PLUS", "SEMI", "SL_COMMENT", "SOMEOF", "START_C", "START_R", "STRING", "UNARYOP", "UNICODE_ESC", "USE", "VAR_BOOL", "VAR_FLOAT", "VAR_INT", "VAR_STRING", "WS"

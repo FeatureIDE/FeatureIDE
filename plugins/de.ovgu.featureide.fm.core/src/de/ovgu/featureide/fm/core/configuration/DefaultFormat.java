@@ -20,6 +20,12 @@
  */
 package de.ovgu.featureide.fm.core.configuration;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE_;
 
@@ -67,10 +73,10 @@ public class DefaultFormat extends ConfigurationFormat {
 						name = name.substring(1);
 						name += tokenizer.nextToken("\"");
 						if (!tokenizer.nextToken(" ").startsWith("\"")) {
-							warnings.add(new ConfigurationReader.Warning(FEATURE_ + name + "' is corrupt. No ending quotation marks found.", lineNumber));
+							warnings.add(new ConfigurationReader.Warning(FEATURE_ + name + IS_CORRUPT__NO_ENDING_QUOTATION_MARKS_FOUND_, lineNumber));
 						}
 					} catch (RuntimeException e) {
-						warnings.add(new ConfigurationReader.Warning(FEATURE_ + name + "' is corrupt. No ending quotation marks found.", lineNumber));
+						warnings.add(new ConfigurationReader.Warning(FEATURE_ + name + IS_CORRUPT__NO_ENDING_QUOTATION_MARKS_FOUND_, lineNumber));
 					}
 				}
 				name = renamingsManager.getNewName(name);
@@ -81,9 +87,9 @@ public class DefaultFormat extends ConfigurationFormat {
 					try {
 						configuration.setManual(name, Selection.SELECTED);
 					} catch (FeatureNotFoundException e) {
-						warnings.add(new ConfigurationReader.Warning(FEATURE + name + " does not exist", lineNumber));
+						warnings.add(new ConfigurationReader.Warning(FEATURE + name + DOES_NOT_EXIST, lineNumber));
 					} catch (SelectionNotPossibleException e) {
-						warnings.add(new ConfigurationReader.Warning(FEATURE + name + " cannot be selected", lineNumber));
+						warnings.add(new ConfigurationReader.Warning(FEATURE + name + CANNOT_BE_SELECTED, lineNumber));
 					}
 				}
 			}
@@ -91,9 +97,9 @@ public class DefaultFormat extends ConfigurationFormat {
 				try {
 					configuration.setAutomatic(name, Selection.SELECTED);
 				} catch (FeatureNotFoundException e) {
-					warnings.add(new ConfigurationReader.Warning(FEATURE + name + " does not exist", lineNumber));
+					warnings.add(new ConfigurationReader.Warning(FEATURE + name + DOES_NOT_EXIST, lineNumber));
 				} catch (SelectionNotPossibleException e) {
-					warnings.add(new ConfigurationReader.Warning(FEATURE + name + " cannot be selected", lineNumber));
+					warnings.add(new ConfigurationReader.Warning(FEATURE + name + CANNOT_BE_SELECTED, lineNumber));
 				}
 			}
 			lineNumber++;

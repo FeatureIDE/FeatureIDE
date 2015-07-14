@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.ui.editors.annotation;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.COLOR_ANNOTATION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RED;
 
@@ -41,7 +42,7 @@ public class ColorAnnotation extends Annotation {
 	private static final String[] ANNOTATIONTYPE_ID = new String[31];
 	static {
 		String PREFIX = "de.ovgu.featureide.ui.editors.annotations.";
-		String[] COLORS = {	RED, "orange", "yellow", "darkgreen",	"lightgreen", 
+		String[] COLORS = {	RED, ORANGE, "yellow", "darkgreen",	"lightgreen", 
 							"cyan", "lightgrey", "blue", "margenta", "pink"};
 		ANNOTATIONTYPE_ID[0] = PREFIX + "image";
 		

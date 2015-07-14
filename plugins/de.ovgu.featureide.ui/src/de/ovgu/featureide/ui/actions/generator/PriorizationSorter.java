@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.ui.actions.generator;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_CONFIGS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.EMPTY___;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SORT_CONFIGURATIONS;
@@ -71,7 +72,7 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 		configurations.clear();
 		final List<List<String>> sortedConfigs = sortConfigs(configs, monitor);
 		for (final List<String> solution : sortedConfigs) {
-			System.out.println(CREATE_CONFIGS + configurationCounter + " of " + sortedConfigs.size());
+			System.out.println(CREATE_CONFIGS + configurationCounter + OF + sortedConfigs.size());
 			configurations.add(createConfiguration(solution, configurationCounter++));
 		}
 		return configurations.size();

@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.fm.ui.views.featuremodeleditview;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ADDED_PRODUCTS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NEXT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NONE;
@@ -59,14 +62,14 @@ public class ExampleParent extends TreeParent implements GUIDefaults {
 		this.example = example;
 
 		if (number == 1)
-			name = added ? ADDED_PRODUCTS : "Removed products";
+			name = added ? ADDED_PRODUCTS : REMOVED_PRODUCTS;
 		if (c.getResult() == Comparison.ERROR) {
 			image = IMAGE_UNDEFINED;
 		} else {
-			String imageName = added && !c.isImplied() ? PLUS : !added && !c.isImplies() ? "minus" : ZERO;
+			String imageName = added && !c.isImplied() ? PLUS : !added && !c.isImplies() ? MINUS : ZERO;
 			lazy = !ZERO.equals(imageName);
 
-			image = PLUS.equals(imageName) ? PLUS_IMAGE : "minus".equals(imageName) ? MINUS_IMAGE : ZERO_IMAGE;
+			image = PLUS.equals(imageName) ? PLUS_IMAGE : MINUS.equals(imageName) ? MINUS_IMAGE : ZERO_IMAGE;
 		}
 	}
 

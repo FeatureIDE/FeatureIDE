@@ -20,6 +20,23 @@
  */
 package de.ovgu.featureide.examples.wizards;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -234,12 +251,12 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 	private String samplePath;
 
 	private static final String[] response = new String[] { YES, ALL, NO, NO_ALL, CANCEL };
-	private static final String FILTERTEXT = "type filter text";
+	private static final String FILTERTEXT = TYPE_FILTER_TEXT;
 
 	private StyledText searchFeatureText;
 	private final ExampleProjectFilter searchFilter = new ExampleProjectFilter();
 
-	private static final String CHILD_WARNING = "Selected only fully compatible projects. "
+	private static final String CHILD_WARNING = SELECTED_ONLY_FULLY_COMPATIBLE_PROJECTS_
 			+ "(Manual selection for projects with warnings is still possible).";
 
 	private Thread updateProjects;
@@ -346,7 +363,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 				} else if (parentElement instanceof String) {
 					return compTable.get((String) parentElement).toArray();
 				} else {
-					return new Object[] { "Children could not be loaded." };
+					return new Object[] { CHILDREN_COULD_NOT_BE_LOADED_ };
 				}
 			}
 
@@ -363,7 +380,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 						}
 						return compTable.keySet().toArray();
 					} else {
-						return new Object[] { "Examples could not be loaded." };
+						return new Object[] { EXAMPLES_COULD_NOT_BE_LOADED_ };
 					}
 				} else {
 					return getChildren(exampleNewWizardPage);
@@ -444,7 +461,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 								if (currItem.getData() instanceof ProjectRecord) {
 									ProjectRecord project = ((ProjectRecord) currItem.getData());
 									if (currItem.getChecked() && project.hasWarnings()) {
-										setMessage("Projects with warnings are selected.", WARNING);
+										setMessage(PROJECTS_WITH_WARNINGS_ARE_SELECTED_, WARNING);
 										allProjectsSelected = true;
 										break;
 									}
@@ -454,7 +471,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 								}
 							}
 							if (!allProjectsSelected && treeItem.getChecked()) {
-								setMessage("Not all project selected.", INFORMATION);
+								setMessage(NOT_ALL_PROJECT_SELECTED_, INFORMATION);
 							}
 						} else if (iss.getFirstElement() instanceof ProjectRecord) {
 							ProjectRecord tmpRecord = (ProjectRecord) iss.getFirstElement();
@@ -560,7 +577,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 	 */
 	public void updateProjectsList(final String path) {
 		if (path == null || path.length() == 0) {
-			setMessage("Select a directory to search for existing Eclipse projects.");
+			setMessage(SELECT_A_DIRECTORY_TO_SEARCH_FOR_EXISTING_ECLIPSE_PROJECTS_);
 			projectsList.refresh(true);
 			setPageComplete(projectsList.getCheckedElements().length > 0);
 			return;
@@ -572,7 +589,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 			public void run() {
 
 				NullProgressMonitor monitor = new NullProgressMonitor();
-				monitor.beginTask("Searching for projects", 100);
+				monitor.beginTask(SEARCHING_FOR_PROJECTS, 100);
 				Collection<ProjectRecord> files = new ArrayList<ProjectRecord>();
 				monitor.worked(10);
 
@@ -589,7 +606,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 					}
 					Iterator<ProjectRecord> filesIterator = files.iterator();
 					monitor.worked(50);
-					monitor.subTask("Processing results");
+					monitor.subTask(PROCESSING_RESULTS);
 					compTable = new Hashtable<String, List<ProjectRecord>>();
 					// FH, DeltaJ, AHEAD, Antenna, AspectJ, Colligens, FC++,
 					// Munge
@@ -616,7 +633,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 					}
 					Iterator<ProjectRecord> filesIterator = files.iterator();
 					monitor.worked(50);
-					monitor.subTask("Processing results");
+					monitor.subTask(PROCESSING_RESULTS);
 					compTable = new Hashtable<String, List<ProjectRecord>>();
 					// FH, DeltaJ, AHEAD, Antenna, AspectJ, Colligens, FC++,
 					// Munge
@@ -692,10 +709,10 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 		try {
 			return new ZipFile(fileName);
 		} catch (ZipException e) {
-			ExamplePlugin.getDefault().logError("Source file is not a valid Zip file.", e);
+			ExamplePlugin.getDefault().logError(SOURCE_FILE_IS_NOT_A_VALID_ZIP_FILE_, e);
 
 		} catch (IOException e) {
-			ExamplePlugin.getDefault().logError("Source file could not be read.", e);
+			ExamplePlugin.getDefault().logError(SOURCE_FILE_COULD_NOT_BE_READ_, e);
 		}
 
 		return null;
@@ -858,7 +875,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 		} catch (InvocationTargetException e) {
 			// one of the steps resulted in a core exception
 			Throwable t = e.getTargetException();
-			String message = "Creation Problems";
+			String message = CREATION_PROBLEMS;
 			IStatus status;
 			if (t instanceof CoreException) {
 				status = ((CoreException) t).getStatus();
@@ -927,7 +944,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 		}
 
 		try {
-			monitor.beginTask("Creating Projects", 100);
+			monitor.beginTask(CREATING_PROJECTS, 100);
 			project.create(record.projectDescription, new SubProgressMonitor(monitor, 30));
 			project.open(IResource.BACKGROUND_REFRESH, new SubProgressMonitor(monitor, 70));
 		} catch (CoreException e) {
@@ -976,10 +993,10 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 		if (path.getFileExtension() == null || path.segmentCount() < 2) {
 			messageString = pathString + " already exists. Would you like to overwrite it?";
 		} else {
-			messageString = "Overwrite " + path.lastSegment() + " in folder " + path.removeLastSegments(1).toOSString() + " ?";
+			messageString = OVERWRITE + path.lastSegment() + " in folder " + path.removeLastSegments(1).toOSString() + " ?";
 		}
 
-		final MessageDialog dialog = new MessageDialog(getContainer().getShell(), "Question", null, messageString, MessageDialog.QUESTION, new String[] {
+		final MessageDialog dialog = new MessageDialog(getContainer().getShell(), QUESTION, null, messageString, MessageDialog.QUESTION, new String[] {
 				IDialogConstants.YES_LABEL, IDialogConstants.YES_TO_ALL_LABEL, IDialogConstants.NO_LABEL, IDialogConstants.NO_TO_ALL_LABEL,
 				IDialogConstants.CANCEL_LABEL }, 0);
 
@@ -1267,7 +1284,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 
 		private void performAlreadyExistsCheck() {
 			if (isProjectInWorkspace(getProjectName())) {
-				error += "This example already exists in the workspace directory.";
+				error += THIS_EXAMPLE_ALREADY_EXISTS_IN_THE_WORKSPACE_DIRECTORY_;
 				hasErrors = true;
 			}
 		}

@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.featurehouse.meta;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ASSIGNABLE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CLASS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ENSURES;
@@ -137,7 +138,7 @@ public class FeatureStubsGenerator {
 
 						final int lastIndexOf = fileText.lastIndexOf("}");
 						if (lastIndexOf < 0) {
-							FeatureHouseCorePlugin.getDefault().logError(CLASS + file.getAbsolutePath() + " is not complete.", null);
+							FeatureHouseCorePlugin.getDefault().logError(CLASS + file.getAbsolutePath() + IS_NOT_COMPLETE_, null);
 							return;
 						}
 						StringBuilder fileTextSB = new StringBuilder(fileText.substring(0, lastIndexOf));

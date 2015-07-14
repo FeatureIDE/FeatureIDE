@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.core.job;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD_DOCUMENTATION_STATISTICS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.BUILT_DOCUMENTATION_STATISTICS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.VERFAHREN;
@@ -175,7 +176,7 @@ public class PrintDocumentationStatisticsJob extends AProjectJob<PrintDocumentat
 		
 		StringBuilder sb2 = new StringBuilder();
 		
-		String[] texString = new String[]{VERFAHREN,"Variante","SPL","Kontext","Featuremodul","Summe"};
+		String[] texString = new String[]{VERFAHREN,VARIANTE,"SPL","Kontext","Featuremodul","Summe"};
 		for (int j = 0; j < statisticDataTags.length; j++) {
 			sb2.append(texString[j]);
 			sb2.append(" & ");

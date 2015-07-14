@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.core.mpl.job.statistics;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE_SOLUTIONS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.COMPARED;
 import static de.ovgu.featureide.fm.core.localization.StringTable.COMPARE_CONFIGURATION_INTERFACES;
@@ -146,7 +147,7 @@ public class PrintComparedInterfacesJob extends AProjectJob<PrintComparedInterfa
 			similarityQString.append(IOConstants.LINE_SEPARATOR);
 		}
 		IOConstants.writeToFile(interfaceProject.getProjectReference().getFile(IOConstants.FILENAME_COMPARE_MATRIX), similarityQString.toString());
-		MPLPlugin.getDefault().logInfo(COMPARED + numberSignatures + " different Interfaces");
+		MPLPlugin.getDefault().logInfo(COMPARED + numberSignatures + DIFFERENT_INTERFACES);
 		return true;
 	}
 

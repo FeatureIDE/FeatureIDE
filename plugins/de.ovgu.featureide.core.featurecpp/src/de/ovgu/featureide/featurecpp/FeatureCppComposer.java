@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.featurecpp;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.EQUATION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_REQUIRED_BUNDLE;
 
@@ -54,7 +55,7 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
  */
 public class FeatureCppComposer extends ComposerExtensionClass {
 	private static final String PLUGIN_ID = "org.eclipse.cdt";
-	private static final String PLUGIN_WARNING = THE_REQUIRED_BUNDLE+PLUGIN_ID+" is not installed.";
+	private static final String PLUGIN_WARNING = THE_REQUIRED_BUNDLE+PLUGIN_ID+IS_NOT_INSTALLED_;
 	public static final String COMPOSER_ID = "de.ovgu.featureide.composer.featurecpp";
 	public static final String C_NATURE = "org.eclipse.cdt.core.cnature";
 	public static final String CC_NATURE = "org.eclipse.cdt.core.ccnature";

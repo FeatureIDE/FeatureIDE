@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.io.xml;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.AUTO;
 import static de.ovgu.featureide.fm.core.localization.StringTable.REDUNDANT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.TAUTOLOGY;
@@ -51,7 +52,7 @@ public interface XMLFeatureModelTags {
 	static final String CALCULATE_FEATURES = "Features";
 	static final String CALCULATE_REDUNDANT = REDUNDANT;
 	static final String CALCULATE_TAUTOLOGY = TAUTOLOGY;
-	static final String CALCULATE_CONSTRAINTS = "Constraints";
+	static final String CALCULATE_CONSTRAINTS = de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINTS;
 	static final String CALCULATE_AUTO = AUTO;
 	static final String NAME = "name";
 	static final String FALSE = "false";

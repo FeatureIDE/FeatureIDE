@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.configuration;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.AN_UNKNOWN_ERROR_OCCURRED_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ARIAL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATING____;
@@ -277,7 +279,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			@Override
 			public void jobFinished(IJob finishedJob, boolean success) {
 				final StringBuilder sb = new StringBuilder();
-				sb.append(valid ? VALID_COMMA_ : "invalid, ");
+				sb.append(valid ? VALID_COMMA_ : INVALID_COMMA_);
 
 				@SuppressWarnings("unchecked")
 				final long number = ((IConfigJob<Long>) finishedJob).getResults();
@@ -318,7 +320,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			if (configurationEditor.getModelFile() == null) {
 				displayError(tree, THERE_IS_NO_FEATURE_MODEL_CORRESPONDING_TO_THIS_CONFIGURATION_COMMA__REOPEN_THE_EDITOR_AND_SELECT_ONE_);
 			} else if (!configurationEditor.getModelFile().exists()) {
-				displayError(tree, THE_GIVEN_FEATURE_MODEL + configurationEditor.getModelFile().getPath() + " does not exist.");
+				displayError(tree, THE_GIVEN_FEATURE_MODEL + configurationEditor.getModelFile().getPath() + DOES_NOT_EXIST_);
 			} else {
 				displayError(tree, AN_UNKNOWN_ERROR_OCCURRED_);
 			}

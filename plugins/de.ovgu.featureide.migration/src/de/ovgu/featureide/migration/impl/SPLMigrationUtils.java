@@ -20,6 +20,10 @@
  */
 package de.ovgu.featureide.migration.impl;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.BECAUSE_IT_ALREADY_EXISTS_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CANNOT_CREATE_PROJECT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CREATING_FOLDER_AT;
@@ -108,14 +112,14 @@ public class SPLMigrationUtils
 		if (newFolder.exists())
 		{
 			assert false : "Trying to create an already existing folder: " + path;
-			System.out.println(FOLDER + path + " already exists");
+			System.out.println(FOLDER + path + ALREADY_EXISTS);
 			return;
 		}
 		try
 		{
 			newFolder.create(true, true, null);
 			project.refreshLocal(IProject.DEPTH_INFINITE, null);
-			System.out.println(CREATION_OF_FOLDER + path + " successful");
+			System.out.println(CREATION_OF_FOLDER + path + SUCCESSFUL);
 		} catch (CoreException e)
 		{
 			System.out.println(CREATION_OF_FOLDER + path + " lead to CoreException:"
@@ -123,7 +127,7 @@ public class SPLMigrationUtils
 			e.printStackTrace();
 		}
 		if (!newFolder.exists())
-			System.out.println(FOLDER + path + " does not exist after creation");
+			System.out.println(FOLDER + path + DOES_NOT_EXIST_AFTER_CREATION);
 
 	}
 
@@ -141,7 +145,7 @@ public class SPLMigrationUtils
 	public static void createFolderInProject(IProject project, String path)
 	{
 		IPath newPath = new Path(path);
-		System.out.println(CREATING_FOLDER_AT + path + " in project " + project.getName());
+		System.out.println(CREATING_FOLDER_AT + path + IN_PROJECT + project.getName());
 		createFolderInProject(project, newPath);
 	}
 

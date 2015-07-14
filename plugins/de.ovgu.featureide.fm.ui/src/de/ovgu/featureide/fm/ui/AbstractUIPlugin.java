@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.STARTING_FEATUREIDE_PLUG_IN_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.STOPPING_FEATUREIDE_PLUG_IN_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UNABLE_TO_OPEN_FILE;
@@ -94,7 +95,7 @@ abstract public class AbstractUIPlugin extends org.eclipse.ui.plugin.AbstractUIP
 		try {
 			page.openEditor(editorInput, editorID);
 		} catch (PartInitException e) {
-			logError(UNABLE_TO_OPEN_FILE + file + " in editor " + editorID, e);
+			logError(UNABLE_TO_OPEN_FILE + file + IN_EDITOR + editorID, e);
 		}
 	}
 

@@ -1,5 +1,6 @@
 package br.ufal.ic.colligens.controllers.invalidproducts;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.VARIANT_NAME;
 
 import java.awt.event.MouseEvent;
@@ -95,7 +96,7 @@ public class InvalidProductsViewController extends ViewController {
 	}
 
 	public void createColumns(Tree tree) {
-		String[] titles = { VARIANT_NAME, "Path" };
+		String[] titles = { VARIANT_NAME, PATH };
 		int[] bounds = { 400, 400 };
 
 		for (int i = 0; i < bounds.length; i++) {

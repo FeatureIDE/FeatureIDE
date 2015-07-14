@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.examples.utils;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -41,7 +42,7 @@ public class CommentParser {
 	public static final String DESCRIPTION_TAG = "description";
 	public static final String REQUIREMENT_CATEGORYS_TAG = "requirementcategory";
 	public static final String REQUIREMENT_CATEGORY_NAME_TAG = "categoryname";
-	public static final String REQUIREMENT_TAG = "requirement";
+	public static final String REQUIREMENT_TAG = REQUIREMENT;
 	public static final String PLUGIN_ID_TAG = "pluginid";
 	public static final String PLUGIN_MISSING_MSG_TAG = "errormsg";
 

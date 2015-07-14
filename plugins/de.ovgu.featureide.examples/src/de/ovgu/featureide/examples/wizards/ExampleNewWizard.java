@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.examples.wizards;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import java.io.IOException;
 import java.net.URL;
 
@@ -63,7 +64,7 @@ public class ExampleNewWizard extends Wizard implements INewWizard {
 	}
 	
 	public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
-		setWindowTitle("FeatureIDE Example Import");
+		setWindowTitle(FEATUREIDE_EXAMPLE_IMPORT);
 
 		// get the path for the examples - it can be a jar-file or folder
 		// structure
