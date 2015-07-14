@@ -20,9 +20,9 @@
  */
 package de.ovgu.featureide.fm.ui.handlers.base;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FILE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NOT_FOUND;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SPECIFIED_FILE_WASNT_FOUND;
 import static de.ovgu.featureide.fm.core.localization.StringTable.XML;
 
 import java.io.File;

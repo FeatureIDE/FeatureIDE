@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.core.internal;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE_CORE_AND_DEAD_FEATURES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CHECKING_CONFIGURATIONS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CHECKING_CONFIGURATIONS_FOR_UNUSED_FEATURES;
@@ -31,6 +30,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.ERROR_WHILE_LO
 import static de.ovgu.featureide.fm.core.localization.StringTable.GET_FALSE_OPTIONAL_FEATURES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.GET_SELECTION_MATRIX;
 import static de.ovgu.featureide.fm.core.localization.StringTable.GET_UNUSED_FEATURES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IS_INVALID;
 import static de.ovgu.featureide.fm.core.localization.StringTable.LOAD_MODEL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NO_COMPOSER_COULD_BE_CREATED_FOR_ID;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PERFORMING_FULL_BUILD;

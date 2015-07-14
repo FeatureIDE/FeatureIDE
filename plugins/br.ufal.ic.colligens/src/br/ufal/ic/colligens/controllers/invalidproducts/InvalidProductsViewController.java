@@ -1,6 +1,6 @@
 package br.ufal.ic.colligens.controllers.invalidproducts;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.PATH;
 import static de.ovgu.featureide.fm.core.localization.StringTable.VARIANT_NAME;
 
 import java.awt.event.MouseEvent;

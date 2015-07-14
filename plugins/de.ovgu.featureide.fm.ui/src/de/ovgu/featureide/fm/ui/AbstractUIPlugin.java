@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IN_EDITOR;
 import static de.ovgu.featureide.fm.core.localization.StringTable.STARTING_FEATUREIDE_PLUG_IN_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.STOPPING_FEATUREIDE_PLUG_IN_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UNABLE_TO_OPEN_FILE;

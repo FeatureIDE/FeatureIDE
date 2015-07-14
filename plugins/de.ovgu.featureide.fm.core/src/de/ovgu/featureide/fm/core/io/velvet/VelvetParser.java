@@ -22,7 +22,6 @@
 
 package de.ovgu.featureide.fm.core.io.velvet;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ALL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RULE_ATTRIBCONSTRAINT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RULE_BINARYOP;
@@ -48,6 +47,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.TOKEN_MANDATOR
 import static de.ovgu.featureide.fm.core.localization.StringTable.TOKEN_SEMI;
 import static de.ovgu.featureide.fm.core.localization.StringTable.TOKEN_STRING;
 import static de.ovgu.featureide.fm.core.localization.StringTable.TOKEN_USE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.WARNINGS;
 
 import org.antlr.runtime.BaseRecognizer;
 import org.antlr.runtime.BitSet;

@@ -20,12 +20,12 @@
  */
 package de.ovgu.featureide.featurehouse.meta;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ASSIGNABLE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CLASS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ENSURES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE_STUBS_GENERATED_AND_PROVEN_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE_STUB_GENERATOR_FOR;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IS_NOT_COMPLETE_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PLEASE_INSTALL_KEY_FOR_AN_AUTO_START_OF_THE_THEOREM_PROVER_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.REQUIRES;
 

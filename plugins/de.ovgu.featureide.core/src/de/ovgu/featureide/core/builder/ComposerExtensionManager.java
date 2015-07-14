@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.core.builder;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IS_NOT_AVAILABLE_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_REQUIRED_COMPOSER;
 
 import java.util.List;

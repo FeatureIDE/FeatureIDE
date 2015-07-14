@@ -20,32 +20,35 @@
  */
 package de.ovgu.featureide.ui.views.collaboration;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ADD_NEW_CLASS_ROLE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD_COLLABORATIONMODEL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CHANGE_FILTER_FOR_ACCESS_MODIFIERS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DEFAULT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DESELECT_ALL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.EXPORT_AS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.EXPORT_AS_IMAGE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.EXPORT_AS_XML;
 import static de.ovgu.featureide.fm.core.localization.StringTable.EXPORT_AS___;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FIELDS_WITHOUT_REFINEMENTS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FIELDS_WITH_REFINEMENTS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FILTER;
+import static de.ovgu.featureide.fm.core.localization.StringTable.HIDE_PARAMETER_TYPES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.METHODS_WITHOUT_REFINEMENTS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.METHODS_WITH_REFINEMENTS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.MODEL_LOADING_ERROR;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NO_COLORSCHEME_SELECTED;
 import static de.ovgu.featureide.fm.core.localization.StringTable.OPEN_A_FILE_FROM_A_FEATUREIDE_PROJECT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.PRIVATE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PROTECTED;
+import static de.ovgu.featureide.fm.core.localization.StringTable.PUBLIC;
 import static de.ovgu.featureide.fm.core.localization.StringTable.REFRESH_COLLABORATION_VIEW;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SEARCH_IN_COLLABORATION_DIAGRAM;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SELECT_ALL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SHOW_CLASS_INVARIANTS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SHOW_FIELDS_AND_METHODS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SHOW_METHOD_CONTRACTS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SHOW_NESTED_CLASSES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SHOW_UNSELECTED_FEATURES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATE_COLLABORATION_VIEW;
 
@@ -158,7 +161,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 
 	private static final String OPEN_MESSAGE = OPEN_A_FILE_FROM_A_FEATUREIDE_PROJECT;
 
-	private static final String ADD_LABEL = "Add new Class / Role";
+	private static final String ADD_LABEL = ADD_NEW_CLASS_ROLE;
 	private static final String FILTER_LABEL = FILTER;
 	private static final String DELETE_LABEL = DELETE;
 	private static final String UNSELECTED_LABEL = SHOW_UNSELECTED_FEATURES;
@@ -167,8 +170,8 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	private static final String REFRESH_TOOL_TIP_LABEL = BUILD_COLLABORATIONMODEL;
 
 	private static final String[] FIELD_METHOD_LABEL_NAMES = { FIELDS_WITH_REFINEMENTS, FIELDS_WITHOUT_REFINEMENTS, METHODS_WITH_REFINEMENTS,
-			METHODS_WITHOUT_REFINEMENTS, SHOW_METHOD_CONTRACTS, SHOW_CLASS_INVARIANTS, SHOW_NESTED_CLASSES, "Hide Parameters/Types", "Public",
-			PROTECTED, DEFAULT, PRIVATE, "Select All", "Deselect All", };
+			METHODS_WITHOUT_REFINEMENTS, SHOW_METHOD_CONTRACTS, SHOW_CLASS_INVARIANTS, SHOW_NESTED_CLASSES, HIDE_PARAMETER_TYPES, PUBLIC,
+			PROTECTED, DEFAULT, PRIVATE, SELECT_ALL, DESELECT_ALL };
 
 	private static final Image[] FIELD_METHOD_IMAGES = { IMAGE_FIELDS_REFINEMENTS, IMAGE_FIELDS_WITHOUT_REFINEMENTS, IMAGE_METHODS_REFINEMENTS,
 			IMAGE_METHODS_WITHOUT_REFINEMENTS, IMAGE_AT_CONTRACT, IMAGE_AT_INVARIANT, IMAGE_NESTED_CLASS, null, IMAGE_METHODE_PUBLIC, IMAGE_METHODE_PROTECTED,

@@ -20,11 +20,10 @@
  */
 package de.ovgu.featureide.fm.core.io.velvet;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ILLEGAL_SYNTAX_IN_LINE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.IN_FILE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IS_ALREADY_IN_USE_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IS_ALREADY_USED_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NO_SUCH_ATTRIBUTE_DEFINED_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_PARENT_MODEL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_VARIABLE_NAME;

@@ -1,6 +1,6 @@
 package br.ufal.ic.colligens.models;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.COLUMN;
 import static de.ovgu.featureide.fm.core.localization.StringTable.POSITION;
 
 import java.io.File;

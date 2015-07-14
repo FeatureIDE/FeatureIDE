@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.core;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import java.util.ArrayList;
 import java.util.List;
 

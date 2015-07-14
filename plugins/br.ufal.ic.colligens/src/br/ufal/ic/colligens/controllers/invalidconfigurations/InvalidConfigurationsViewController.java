@@ -1,8 +1,8 @@
 package br.ufal.ic.colligens.controllers.invalidconfigurations;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DESCRIPTION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE_CONFIGURATION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SEVERITY;
 
 import java.awt.event.MouseEvent;
 import java.io.IOException;

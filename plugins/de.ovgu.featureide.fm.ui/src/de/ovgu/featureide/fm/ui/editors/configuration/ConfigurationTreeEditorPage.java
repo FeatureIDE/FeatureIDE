@@ -20,11 +20,11 @@
  */
 package de.ovgu.featureide.fm.ui.editors.configuration;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.AN_UNKNOWN_ERROR_OCCURRED_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ARIAL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATING____;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DOES_NOT_EXIST_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.INVALID_COMMA_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.MORE_THAN;
 import static de.ovgu.featureide.fm.core.localization.StringTable.POSSIBLE_CONFIGURATIONS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.THERE_IS_NO_FEATURE_MODEL_CORRESPONDING_TO_THIS_CONFIGURATION_COMMA__REOPEN_THE_EDITOR_AND_SELECT_ONE_;

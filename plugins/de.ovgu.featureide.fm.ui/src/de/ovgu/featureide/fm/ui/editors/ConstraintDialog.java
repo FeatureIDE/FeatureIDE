@@ -404,8 +404,6 @@ public class ConstraintDialog implements GUIDefaults {
 	private Shell shell;
 
 	private String initialConstraint;
-	private Label errorMarker;
-	private Text errorMessage;
 	private Group featureGroup;
 	private StyledText searchFeatureText;
 
@@ -976,33 +974,6 @@ public class ConstraintDialog implements GUIDefaults {
 			VALIDATOR.cancelValidation();
 			closeShell();
 		}
-	}
-
-	/**
-	 * displays an error in the header
-	 * 
-	 * @param message
-	 *            message to be displayed
-	 */
-	private void printHeaderError(String message) {
-		okButton.setEnabled(false);
-		errorMarker.setImage(ERROR_IMAGE);
-		errorMarker.setVisible(true);
-		errorMessage.setText(message);
-	}
-
-	/**
-	 * displays a warning in the header
-	 * 
-	 * @param message
-	 *            message to be displayed
-	 */
-	private void printHeaderWarning(String message) {
-		okButton.setEnabled(true);
-		errorMarker.setImage(WARNING_IMAGE);
-		errorMarker.setVisible(true);
-		errorMessage.setText(message);
-		errorMessage.pack();
 	}
 
 	public void setInputText(String text) {

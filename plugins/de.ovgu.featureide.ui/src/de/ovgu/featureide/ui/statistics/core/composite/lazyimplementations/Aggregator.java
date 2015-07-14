@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DIRECTIVES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NUMBER_OF;
 
 import java.util.HashMap;

@@ -20,14 +20,11 @@
  */
 package de.ovgu.featureide.fm.core.configuration;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CANNOT_BE_SELECTED;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DOES_NOT_EXIST;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IS_CORRUPT__NO_ENDING_QUOTATION_MARKS_FOUND_;
 
 import java.io.BufferedReader;
 import java.io.IOException;

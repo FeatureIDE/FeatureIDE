@@ -20,9 +20,9 @@
  */
 package de.ovgu.featureide.migration.impl;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CLASSPATH_OF_PROJECT_TO_MIGRATE_IS_NULL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DESTINATIONFOLDER_NOT_ACCESSIBLE_OR_WRONG_PATH;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IS_NOT_OPEN_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.JAVA_PROJECTS_COULD_NOT_BE_CREATED;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NO_PROJECTS_WERE_SELECTED_FOR_MIGRATION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PROJECT;

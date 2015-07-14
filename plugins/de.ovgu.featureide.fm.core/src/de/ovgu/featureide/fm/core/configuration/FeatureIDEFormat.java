@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.configuration;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DOES_NOT_EXIST;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTION_NOT_POSSIBLE_ON_FEATURE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.WRONG_CONFIGURATION_FORMAT;

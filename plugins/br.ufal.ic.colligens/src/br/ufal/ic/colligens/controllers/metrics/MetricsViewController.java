@@ -1,7 +1,7 @@
 package br.ufal.ic.colligens.controllers.metrics;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.METRICS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.VALUE;
 
 import java.util.List;
 

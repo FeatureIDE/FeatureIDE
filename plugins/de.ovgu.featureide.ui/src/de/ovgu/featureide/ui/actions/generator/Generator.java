@@ -20,13 +20,13 @@
  */
 package de.ovgu.featureide.ui.actions.generator;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ERROR_IN_CONFIGURATION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.GENARATOR_NR_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.GENERATE_PRODUCTS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.GENERATOR;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_GENERATOR_NR_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.WILL_BE_RESTARTED_;
 
 import javax.annotation.CheckForNull;
 

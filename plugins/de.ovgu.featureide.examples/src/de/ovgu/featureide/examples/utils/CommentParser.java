@@ -20,7 +20,8 @@
  */
 package de.ovgu.featureide.examples.utils;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.REQUIREMENT;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;

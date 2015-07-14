@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui.views.featuremodeleditview;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE_CONTENT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE_NUMBER_OF_CONFIGURATIONS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE_NUMBER_OF_PROGRAM_VARIANTS;
@@ -30,6 +29,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.CONFIGURATIONS
 import static de.ovgu.featureide.fm.core.localization.StringTable.MORE_THAN;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NUMBER_OF;
 import static de.ovgu.featureide.fm.core.localization.StringTable.OPEN_A_FEATURE_MODEL_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.PROGRAM_VARIANTS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.REFRESH_EDIT_VIEW;
 import static de.ovgu.featureide.fm.core.localization.StringTable.START_MANUAL_OR_ACTIVATE_AUTOMATIC_CALCULATION_TO_SHOW_STATISTICS_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.STATISTICS_ON_AFTER_EDIT_VERSION;

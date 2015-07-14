@@ -788,6 +788,9 @@ public class StringTable {
     public static final String FIELDS_WITH_REFINEMENTS = "Fields with Refinements";
     public static final String METHODS_WITHOUT_REFINEMENTS = "Methods without Refinements";
     public static final String PROTECTED = "Protected";
+    public static final String PUBLIC = "Public";
+    public static final String HIDE_PARAMETER_TYPES = "Hide Parameters/Types";
+    public static final String ADD_NEW_CLASS_ROLE = "Add new Class / Role";
     public static final String CHANGE_FILTER_FOR_ACCESS_MODIFIERS = "Change filter for access modifiers";
     public static final String SELECT_ALL = "Select all";
     public static final String DESELECT_ALL = "Deselect all";
@@ -970,4 +973,9 @@ public class StringTable {
     public static final String FUJI_TYPECHECKER_IS_CURRENTLY_NOT_SUPPORTED_FOR_JAVA_1_8_RUNTIME_ = "Fuji Typechecker is currently not supported for Java 1.8 runtime.";
     public static final String LIGHTGREEN = "lightgreen";
     public static final String SUMME = "Summe";
+    public static final String CYAN = "cyan"; 
+    public static final String LIGHTGREY = "lightgrey"; 
+    public static final String BLUE = "blue";
+    public static final String MARGENTA = "margenta";
+    public static final String PINK = "pink";
 }

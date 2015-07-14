@@ -20,14 +20,14 @@
  */
 package de.ovgu.featureide.ui.wizards;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ALREADY_EXISTS_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ENTER_THE_NAME_OF_THE_CONFIGURATION_FILE__IT_WILL_BE_PLACED_IN_THE_CONFIGURATIONS_DIRECTORY_OF_THE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FILE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FILE_NAME_MUST_BE_SPECIFIED;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FILE_NAME_MUST_BE_VALID;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NEW_CONFIGURATION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NO_PROJECT_SELECTED;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTED_FEATUREIDE_PROJECT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTED_PROJECT_IS_NOT_A_FEATUREIDE_PROJECT;
 
 import java.util.Collection;

@@ -20,11 +20,11 @@
  */
 package de.ovgu.featureide.core.mpl.job.statistics;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE_SOLUTIONS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.COMPARED;
 import static de.ovgu.featureide.fm.core.localization.StringTable.COMPARE_CONFIGURATION_INTERFACES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.COMPARE_SIGNATURES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DIFFERENT_INTERFACES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.GENERATE_SIGNATURES;
 
 import java.util.HashSet;

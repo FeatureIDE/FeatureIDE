@@ -20,9 +20,9 @@
  */
 package de.ovgu.featureide.ui.actions.generator;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_CONFIGS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.EMPTY___;
+import static de.ovgu.featureide.fm.core.localization.StringTable.OF;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SORT_CONFIGURATIONS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.WE_SHOULDNT_GET_HERE_COMMA___HERE_IS_WRONG;
 

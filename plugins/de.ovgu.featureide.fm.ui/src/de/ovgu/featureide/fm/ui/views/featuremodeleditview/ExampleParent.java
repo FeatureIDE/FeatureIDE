@@ -20,14 +20,13 @@
  */
 package de.ovgu.featureide.fm.ui.views.featuremodeleditview;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ADDED_PRODUCTS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.MINUS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NEXT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NONE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PLUS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PRODUCT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.REMOVED_PRODUCTS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.TIMEOUT_STRING;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ZERO;
 

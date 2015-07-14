@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.io.xml;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.AUTO;
 import static de.ovgu.featureide.fm.core.localization.StringTable.REDUNDANT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.TAUTOLOGY;

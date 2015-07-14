@@ -20,24 +20,24 @@
  */
 package de.ovgu.featureide.examples.wizards;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CHILDREN_COULD_NOT_BE_LOADED_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CREATING_PROJECTS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CREATION_PROBLEMS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.EXAMPLES_COULD_NOT_BE_LOADED_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IN_FOLDER;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NOT_ALL_PROJECT_SELECTED_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.OVERWRITE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.PROCESSING_RESULTS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.PROJECTS_WITH_WARNINGS_ARE_SELECTED_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.QUESTION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SEARCHING_FOR_PROJECTS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTED_ONLY_FULLY_COMPATIBLE_PROJECTS_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SELECT_A_DIRECTORY_TO_SEARCH_FOR_EXISTING_ECLIPSE_PROJECTS_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SOURCE_FILE_COULD_NOT_BE_READ_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SOURCE_FILE_IS_NOT_A_VALID_ZIP_FILE_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.THIS_EXAMPLE_ALREADY_EXISTS_IN_THE_WORKSPACE_DIRECTORY_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.TYPE_FILTER_TEXT;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;

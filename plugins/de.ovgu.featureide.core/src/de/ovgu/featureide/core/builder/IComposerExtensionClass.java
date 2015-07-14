@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.core.builder;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;

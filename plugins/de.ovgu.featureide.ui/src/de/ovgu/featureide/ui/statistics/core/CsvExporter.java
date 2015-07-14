@@ -20,12 +20,12 @@
  */
 package de.ovgu.featureide.ui.statistics.core;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CANCEL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CHOOSE_WISELY;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DATA_WAS_SUCCESSFULLY_EXPORTED;
 import static de.ovgu.featureide.fm.core.localization.StringTable.EXPORT_STATISTICS_INTO_CSV;
 import static de.ovgu.featureide.fm.core.localization.StringTable.OK;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SHOW_DIALOG;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SHOW_ERRORDIALOG;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SUCCESS;
 

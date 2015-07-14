@@ -20,8 +20,8 @@
  */
 package de.ovgu.featureide.featurecpp;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.EQUATION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IS_NOT_INSTALLED_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_REQUIRED_BUNDLE;
 
 import java.io.ByteArrayInputStream;

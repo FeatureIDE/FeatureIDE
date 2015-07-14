@@ -20,11 +20,11 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.action;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ALL_FILES_OF_CLASS_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ALL_FILES_OF_FEATURE_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ARE_YOU_SURE_YOU_WANT_TO_REMOVE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.AT_FEATURE_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CANCEL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE_RESOURCES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.OK;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ROLE;

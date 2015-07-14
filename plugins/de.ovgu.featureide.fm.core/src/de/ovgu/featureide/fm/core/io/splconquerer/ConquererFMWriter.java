@@ -20,16 +20,16 @@
  */
 package de.ovgu.featureide.fm.core.io.splconquerer;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CHILD;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CLASSES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CLAUSE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.COMMULATIVE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DYNAMIC;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ELEMENT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.EXCLUDES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.OPTIONAL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ORDER;
+import static de.ovgu.featureide.fm.core.localization.StringTable.REQUIRES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.TYPE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.YES;
 

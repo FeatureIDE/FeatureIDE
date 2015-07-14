@@ -20,8 +20,9 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.outline;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.COLLABORATION_MODEL_NOT_FOUND;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NO_FILE_FOUND;
+
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;

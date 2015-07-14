@@ -20,17 +20,17 @@
  */
 package de.ovgu.featureide.migration.impl;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ALREADY_EXISTS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.BECAUSE_IT_ALREADY_EXISTS_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CANNOT_CREATE_PROJECT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CREATING_FOLDER_AT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CREATION_OF_FOLDER;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DOES_NOT_EXIST_AFTER_CREATION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FOLDER;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IN_PROJECT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.MODEL_XML_DOES_NOT_EXIST;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ONLY_EXPECTED__FILES_AND_CONTAINERS_TO_COPY;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SUCCESSFUL;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;

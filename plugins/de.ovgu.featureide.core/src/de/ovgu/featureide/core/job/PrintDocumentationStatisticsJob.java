@@ -20,13 +20,13 @@
  */
 package de.ovgu.featureide.core.job;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD_DOCUMENTATION_STATISTICS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.BUILT_DOCUMENTATION_STATISTICS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FEATUREMODUL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.KONTEXT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SPL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SUMME;
+import static de.ovgu.featureide.fm.core.localization.StringTable.VARIANTE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.VERFAHREN;
 
 import org.eclipse.core.resources.IFolder;

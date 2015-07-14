@@ -20,8 +20,8 @@
  */
 package de.ovgu.featureide.aspectj;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.EMPTY___;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IS_NOT_INSTALLED_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_REQUIRED_BUNDLE;
 

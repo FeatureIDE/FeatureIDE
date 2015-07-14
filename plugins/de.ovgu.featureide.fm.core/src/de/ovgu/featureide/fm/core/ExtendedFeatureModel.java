@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.core;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.INVALID;
 import static de.ovgu.featureide.fm.core.localization.StringTable.VALID;
 import static de.ovgu.featureide.fm.core.localization.StringTable.VELVET_FEATUREMODEL_IMPORTED;
 

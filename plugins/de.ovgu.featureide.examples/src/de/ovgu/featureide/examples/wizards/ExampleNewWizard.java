@@ -20,7 +20,8 @@
  */
 package de.ovgu.featureide.examples.wizards;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FEATUREIDE_EXAMPLE_IMPORT;
+
 import java.io.IOException;
 import java.net.URL;
 

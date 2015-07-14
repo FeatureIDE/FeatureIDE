@@ -21,8 +21,8 @@
 // $ANTLR 3.4 Velvet.g 2014-11-23 20:46:36
 package de.ovgu.featureide.fm.core.io.velvet;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ALL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.WARNINGS;
 
 import org.antlr.runtime.BaseRecognizer;
 import org.antlr.runtime.CharStream;
