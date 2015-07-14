@@ -20,6 +20,22 @@
  */
 package de.ovgu.featureide.featurehouse;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -106,8 +122,8 @@ import fuji.SyntacticErrorException;
  * 
  * @author Tom Brosch
  */
-// TODO set "Composition errors" like *.png could not be composed with *.png
-@SuppressWarnings("restriction")
+// TODO set COMPOSITION_ERRORS like *.png could not be composed with *.png
+@SuppressWarnings(RESTRICTION)
 public class FeatureHouseComposer extends ComposerExtensionClass {
 	private static final QualifiedName BUILD_META_PRODUCT = new QualifiedName(FeatureHouseComposer.class.getName() + "#BuildMetaProduct", FeatureHouseComposer.class.getName() + "#BuildMetaProduct");
 	private static final QualifiedName USE_FUJI = new QualifiedName(FeatureHouseComposer.class.getName() + "#Fuji", FeatureHouseComposer.class.getName() + "#Fuji");
@@ -131,7 +147,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	private static final String CONTRACT_COMPOSITION_CONJUNCTIVE_CONTRACTING = "conjunctive_contracting";
 	private static final String CONTRACT_COMPOSITION_METHOD_BASED_COMPOSITION = "method-based composition";
 	private static final String CONTRACT_COMPOSITION_METHOD_BASED = "method_based";
-	private static final String CONTRACT_COMPOSITION_NONE = "none";
+	private static final String CONTRACT_COMPOSITION_NONE = NONE;
 
 	private enum CompKeys {
 		conjunctive_contract, consecutive_contract, cumulative_contract, final_contract, final_method
@@ -405,7 +421,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 								if (m.getCompKey().isEmpty() && contractParameter.equals(CONTRACT_COMPOSITION_METHOD_BASED)) {
 									continue;
 								}
-								setContractErrorMarker(m, "Keyword original ignored. Contract composition set to " + contractParameter + ". Change to \"Explicit Contract Refinement\".");
+								setContractErrorMarker(m, KEYWORD_ORIGINAL_IGNORED__CONTRACT_COMPOSITION_SET_TO + contractParameter + ". Change to \"Explicit Contract Refinement\".");
 							}
 						}
 					}
@@ -417,7 +433,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 					for (FSTRole r : c.getRoles()) {
 						for (FSTMethod m : r.getClassFragment().getMethods()) {
 							if (m.getCompKey().length() > 0)
-								setContractErrorMarker(m, ": Keyword " + m.getCompKey() + " ignored. Contract composition set to " + contractParameter + ". Change to \"method-based composition\".");
+								setContractErrorMarker(m, ": Keyword " + m.getCompKey() + IGNORED__CONTRACT_COMPOSITION_SET_TO + contractParameter + ". Change to \"method-based composition\".");
 						}
 					}
 				}
@@ -452,27 +468,27 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 										List<Feature> finalMethodList = new LinkedList<Feature>();
 										finalMethodList.add(featureRole2);
 										if (!featureModel.getAnalyser().checkIfFeatureCombinationNotPossible(featureRole1, finalMethodList))
-											setContractErrorMarker(m, "keyword \"\\final_method\" found but possibly later refinement.");
+											setContractErrorMarker(m, "keyword \"\\final_method\FOUND_BUT_POSSIBLY_LATER_REFINEMENT_);
 									}
 
 									if (checkForIllegitimateContract(m, mm)) {
 										List<Feature> finalContractList = new LinkedList<Feature>();
 										finalContractList.add(featureRole2);
 										if (mm.getCompKey().contains(FINAL_CONTRACT) && !featureModel.getAnalyser().checkIfFeatureCombinationNotPossible(new Feature(featureModel, r.getFeature().getName()), finalContractList))
-											setContractErrorMarker(m, "keyword \"\\final_contract\" found but possibly later contract refinement.");
+											setContractErrorMarker(m, "keyword \"\\final_contract\FOUND_BUT_POSSIBLY_LATER_CONTRACT_REFINEMENT_);
 									}
 
 									if (checkForIllegitimaterefinement(m, mm)) {
 										LinkedList<Feature> treeDependencyList = new LinkedList<Feature>();
 										treeDependencyList.add(featureRole2);
 										if (!featureModel.getAnalyser().checkIfFeatureCombinationNotPossible(featureRole1, treeDependencyList))
-											setContractErrorMarker(m, "Contract with composition keyword " + mm.getCompKey() + " possibily illegitimately redefined with keyword " + m.getCompKey() + ".");
+											setContractErrorMarker(m, CONTRACT_WITH_COMPOSITION_KEYWORD + mm.getCompKey() + POSSIBILY_ILLEGITIMATELY_REDEFINED_WITH_KEYWORD + m.getCompKey() + ".");
 									}
 
 								}
 							}
 							if (m.getContract().contains(ORIGINAL) && !(!originalList.isEmpty() ? featureModel.getAnalyser().checkImplies(currentFeatureList, originalList) : false))
-								setContractErrorMarker(m, "keyword \"\\original\" found but no mandatory previous introduction.");
+								setContractErrorMarker(m, "keyword \"\\original\FOUND_BUT_NO_MANDATORY_PREVIOUS_INTRODUCTION_);
 						}
 					}
 				}
@@ -601,7 +617,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	 * @param outputPath
 	 * @param language
 	 */
-	@SuppressWarnings("deprecation")
+	@SuppressWarnings(DEPRECATION)
 	private void buildBDDMetaProduct(final String configPath, final String basePath, final String outputPath, String language) {
 		composer = new FSTGenComposerExtension();
 		composer.addCompositionErrorListener(compositionErrorListener);
@@ -675,7 +691,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 				FMCorePlugin.getDefault().logError(e);
 			}
 		}
-		fuji = new AStoppableJob("Type checking " + featureProject.getProjectName() + " with fuji") {
+		fuji = new AStoppableJob(TYPE_CHECKING + featureProject.getProjectName() + WITH_FUJI) {
 			@Override
 			protected boolean work() {
 				try {
@@ -971,7 +987,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	 * This is necessary after calling <code>setAsCurrentConfiguration</code>.
 	 */
 	private void callCompiler() {
-		Job job = new Job("Call compiler") {
+		Job job = new Job(CALL_COMPILER) {
 			protected IStatus run(IProgressMonitor monitor) {
 				IFile iClasspathFile = featureProject.getProject().getFile(".classpath");
 				if (iClasspathFile.exists()) {
@@ -1225,7 +1241,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		final boolean jre8 = System.getProperty("java.runtime.version").substring(0, 3).equals("1.8");
 		
 		if (jre8) {
-			MessageDialog.openInformation(null, "Information", "Fuji Typechecker is currently not supported for Java 1.8 runtime.");
+			MessageDialog.openInformation(null, INFORMATION, FUJI_TYPECHECKER_IS_CURRENTLY_NOT_SUPPORTED_FOR_JAVA_1_8_RUNTIME_);
 			setProperty(USE_FUJI, false);
 			return;
 		}
