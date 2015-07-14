@@ -442,7 +442,7 @@ public class StringTable {
     public static final String INHERITED_HIDDEN = " inherited hidden";
     public static final String IS_DEAD = "is dead ";
     public static final String IS_FALSE_OPTIONAL = "is false optional ";
-    public static final String IS_HIDDEN_AND_INDETERMINATE = "is hidden and indeterminate";
+    public static final String IS_HIDDEN_AND_INDETERMINATE = "is indeterminate"; // "hidden" was removed, see #228
     public static final String FEATURE_MODEL_IS_VOID = " Feature Model is void ";
     public static final String ROOT = " Root ";
     public static final String CONSTRAINT_MAKES_THE_MODEL_VOID_ = "Constraint makes the model void.";
