@@ -796,11 +796,20 @@ public class CorePlugin extends AbstractCorePlugin {
 	private static class DeprecatedFeature implements Comparable<DeprecatedFeature> {
 		private final String feature;
 
-		private int clauseCount = 0;
+		private int positiveCount;
+		private int negativeCount;
+		private int countMarker;
 
-		public DeprecatedFeature(String feature, int clauseCount) {
+		public DeprecatedFeature(String feature) {
 			this.feature = feature;
-			this.clauseCount = clauseCount;
+			reset();
+		}
+
+		public DeprecatedFeature(String feature, int positiveCount, int negativeCount) {
+			this.feature = feature;
+			reset();
+			this.positiveCount = positiveCount;
+			this.negativeCount = negativeCount;
 		}
 
 		public String getFeature() {
@@ -809,7 +818,54 @@ public class CorePlugin extends AbstractCorePlugin {
 
 		@Override
 		public int compareTo(DeprecatedFeature arg0) {
-			return arg0.clauseCount - clauseCount;
+			return arg0.getClauseCount() - getClauseCount();
+		}
+
+		public int getClauseCount() {
+			return positiveCount * negativeCount;
+		}
+
+		public int getCountMarker() {
+			return countMarker;
+		}
+
+		public void setCountMarker(int countMarker) {
+			this.countMarker = countMarker;
+		}
+
+		public void incCount() {
+			switch (countMarker) {
+			case 1:
+				positiveCount++;
+				break;
+			case 2:
+				negativeCount++;
+				break;
+			default:
+				break;
+			}
+			countMarker = 0;
+		}
+
+		public void reset() {
+			positiveCount = 0;
+			negativeCount = 0;
+			countMarker = 0;
+		}
+
+		@Override
+		public boolean equals(Object arg0) {
+			return (arg0 instanceof DeprecatedFeature) && feature.equals(((DeprecatedFeature) arg0).feature);
+		}
+
+		@Override
+		public int hashCode() {
+			return feature.hashCode();
+		}
+
+		@Override
+		public String toString() {
+			return feature + ": " + getClauseCount();
 		}
 	}
 
@@ -890,15 +946,22 @@ public class CorePlugin extends AbstractCorePlugin {
 					}
 				}
 
-				deprecatedFeatures[featureIndex++] = new DeprecatedFeature(curFeature, negativeCount * positiveCount);
+				deprecatedFeatures[featureIndex++] = new DeprecatedFeature(curFeature, negativeCount, positiveCount);
 			}
 
 			Arrays.sort(deprecatedFeatures);
 			final Set<Or> relevantClauseSet = new HashSet<>(relevantClauseList);
 
+			//			final HashMap<String, DeprecatedFeature> map = new HashMap<>(features.size() << 1);
+			//			for (String curFeature : features) {
+			//				map.put(curFeature, new DeprecatedFeature(curFeature));
+			//			}
+
 			// for each feature that should be removed ...
 			for (int l = deprecatedFeatures.length - 1; l >= 0; l--) {
 				final String curFeature = deprecatedFeatures[l].getFeature();
+				//			while (!map.isEmpty()) {
+				//				final String curFeature = next(map, relevantClauseList).getFeature();
 
 				// ... create list of clauses that contain this feature
 				int relevantIndex = 0;
@@ -1062,7 +1125,7 @@ public class CorePlugin extends AbstractCorePlugin {
 		}
 		return false;
 	}
-	
+
 	private static boolean checkValidity(Node newClause) {
 		final Node[] children = newClause.getChildren();
 		final HashSet<Literal> literalSet = new HashSet<>(children.length << 1);
@@ -1073,7 +1136,7 @@ public class CorePlugin extends AbstractCorePlugin {
 			if ((literal.positive && literal.var.equals(NodeCreator.varTrue)) || (!literal.positive && literal.var.equals(NodeCreator.varFalse))) {
 				return false;
 			}
-			
+
 			if (literalSet.contains(literal)) {
 				return false;
 			} else {
@@ -1083,6 +1146,73 @@ public class CorePlugin extends AbstractCorePlugin {
 			}
 		}
 		return true;
+	}
+
+	private static DeprecatedFeature next(HashMap<String, DeprecatedFeature> map, List<Or> relevantClauseList) {
+		for (DeprecatedFeature df : map.values()) {
+			df.reset();
+		}
+
+		for (Iterator<Or> iterator = relevantClauseList.iterator(); iterator.hasNext();) {
+			final Or clause = iterator.next();
+			boolean invalidClause = false;
+
+			for (Node clauseChildren : clause.getChildren()) {
+				final Literal literal = (Literal) clauseChildren;
+				final DeprecatedFeature df = map.get(literal.var);
+				if (df != null) {
+					switch (df.getCountMarker()) {
+					case 0:
+						df.setCountMarker(literal.positive ? 1 : 2);
+						break;
+					case 1:
+						if (!literal.positive) {
+							invalidClause = true;
+							iterator.remove();
+						}
+						break;
+					case 2:
+						if (literal.positive) {
+							invalidClause = true;
+							iterator.remove();
+						}
+						break;
+					default:
+						break;
+					}
+				}
+				if (invalidClause) {
+					break;
+				}
+			}
+
+			if (invalidClause) {
+				for (DeprecatedFeature df : map.values()) {
+					df.setCountMarker(0);
+				}
+				break;
+			} else {
+				for (DeprecatedFeature df : map.values()) {
+					df.incCount();
+				}
+			}
+		}
+
+		final Collection<DeprecatedFeature> values = map.values();
+		DeprecatedFeature smallestFeature = null;
+		if (!values.isEmpty()) {
+			final Iterator<DeprecatedFeature> it = values.iterator();
+			smallestFeature = it.next();
+			while (it.hasNext()) {
+				final DeprecatedFeature next = it.next();
+				if (next.compareTo(smallestFeature) > 0) {
+					smallestFeature = next;
+				}
+			}
+			map.remove(smallestFeature.getFeature());
+		}
+
+		return smallestFeature;
 	}
 
 }
