@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.ui.handlers.base;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FILE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.XML;
 
@@ -77,7 +78,7 @@ public abstract class AbstractImportHandler extends AFileHandler {
 					if (inputFile.exists()) {
 						break;
 					}
-					MessageDialog.openInformation(new Shell(), FILE + NOT_FOUND, "Specified file wasn't found");
+					MessageDialog.openInformation(new Shell(), FILE + NOT_FOUND, SPECIFIED_FILE_WASNT_FOUND);
 				}
 
 				final FeatureModel fm = createFeatureModel();

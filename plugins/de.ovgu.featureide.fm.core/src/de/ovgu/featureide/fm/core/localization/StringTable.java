@@ -951,4 +951,14 @@ public class StringTable {
 	public static final String SELECTED_FEATUREIDE_PROJECT = "selected FeatureIDE project";
 	public static final String ALREADY_EXISTS_ = " already exists.";
 	public static final String STATISTICS = "Statistics";
+	public static final String TEMPLATE = "template";
+	public static final String IN_PROJECT_ = "' in project '";
+	public static final String SPL = "SPL";
+	public static final String IN_FOLDER = " in folder ";
+	public static final String COMMA__SUCH_THAT = ", such that ";
+	public static final String SPECIFIED_FILE_WASNT_FOUND = "Specified file wasn't found";
+	public static final String YELLOW = "yellow";
+	public static final String METHODS_WITH_REFINEMENTS = "Methods with Refinements";
+	public static final String SHOW_CLASS_INVARIANTS = "Show Class Invariants";
+	public static final String PRIVATE = "Private";
 }

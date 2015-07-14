@@ -37,6 +37,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import static de.ovgu.featureide.fm.core.localization.StringTable.*;
+import static de.ovgu.featureide.fm.core.localization.StringTable.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -993,7 +994,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 		if (path.getFileExtension() == null || path.segmentCount() < 2) {
 			messageString = pathString + " already exists. Would you like to overwrite it?";
 		} else {
-			messageString = OVERWRITE + path.lastSegment() + " in folder " + path.removeLastSegments(1).toOSString() + " ?";
+			messageString = OVERWRITE + path.lastSegment() + IN_FOLDER + path.removeLastSegments(1).toOSString() + " ?";
 		}
 
 		final MessageDialog dialog = new MessageDialog(getContainer().getShell(), QUESTION, null, messageString, MessageDialog.QUESTION, new String[] {
