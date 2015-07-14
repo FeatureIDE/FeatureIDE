@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.ui.statistics.ui;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.REFRESH_VIEW;
+import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATING_FEATURESTATISTICSVIEW;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
@@ -105,7 +108,7 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 
 		toolBarManager.add(refresher);
 		refresher.setImageDescriptor(ImageDescriptor.createFromImage(REFRESH_IMG));
-		refresher.setToolTipText("Refresh View");
+		refresher.setToolTipText(REFRESH_VIEW);
 
 		toolBarManager.add(checkBoxer);
 		checkBoxer.setImageDescriptor(ImageDescriptor.createFromImage(EXPORT_IMG));
@@ -169,7 +172,7 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 		 * This job waits for the calculation job to finish and starts
 		 * immediately a new one
 		 */
-		Job waiter = new Job("Updating FeatureStatisticsView") {
+		Job waiter = new Job(UPDATING_FEATURESTATISTICSVIEW) {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				try {
@@ -185,7 +188,7 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 					FMUIPlugin.getDefault().logError(e);
 				}
 
-				job = new Job("Updating FeatureStatisticsView") {
+				job = new Job(UPDATING_FEATURESTATISTICSVIEW) {
 					@Override
 					protected IStatus run(IProgressMonitor monitor) {
 						if (currentEditor == null) {

@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.ui.handlers;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.DOCUMENTATION_WIZARD;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.fm.ui.handlers.base.AProjectJobHandler;
 import de.ovgu.featureide.fm.ui.wizards.AbstractWizard;
@@ -30,7 +31,7 @@ public class FeatureDocumentationHandler extends AProjectJobHandler {
 
 	@Override
 	protected AbstractWizard instantiateWizard() {
-		return new BuildDocWizard("Documentation Wizard", "FeatureDocumentation", true);
+		return new BuildDocWizard(DOCUMENTATION_WIZARD, "FeatureDocumentation", true);
 	}
 
 	@Override

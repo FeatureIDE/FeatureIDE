@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.ui.actions.generator;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
+
 import org.eclipse.core.internal.resources.Project;
 import org.eclipse.core.internal.resources.Workspace;
 import org.eclipse.core.runtime.IPath;
@@ -28,7 +30,7 @@ import org.eclipse.core.runtime.IPath;
  * This is a workaround to create a new project
  * @author Jens Meinicke
  */
-@SuppressWarnings("restriction")
+@SuppressWarnings(RESTRICTION)
 public class ConfigurationProject extends Project {
 
 	/**

@@ -20,6 +20,12 @@
  */
 package de.ovgu.featureide.core.mpl.job.statistics;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE_SOLUTIONS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.COMPARED;
+import static de.ovgu.featureide.fm.core.localization.StringTable.COMPARE_CONFIGURATION_INTERFACES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.COMPARE_SIGNATURES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.GENERATE_SIGNATURES;
+
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -54,7 +60,7 @@ public class PrintComparedInterfacesJob extends AProjectJob<PrintComparedInterfa
 	}
 	
 	protected PrintComparedInterfacesJob(Arguments arguments) {
-		super("Compare Configuration Interfaces", arguments);
+		super(COMPARE_CONFIGURATION_INTERFACES, arguments);
 	}
 
 	@Override
@@ -65,7 +71,7 @@ public class PrintComparedInterfacesJob extends AProjectJob<PrintComparedInterfa
 			return false;
 		}
 		
-		workMonitor.createSubTask("Calculate Solutions");
+		workMonitor.createSubTask(CALCULATE_SOLUTIONS);
 		
 		final int configLimit = interfaceProject.getConfigLimit();
 		
@@ -77,7 +83,7 @@ public class PrintComparedInterfacesJob extends AProjectJob<PrintComparedInterfa
 			return false;
 		}
 		
-		workMonitor.createSubTask("Generate Signatures");
+		workMonitor.createSubTask(GENERATE_SIGNATURES);
 		
 		final HashSet<ProjectStructure> signatures = new HashSet<ProjectStructure>();
 		
@@ -103,7 +109,7 @@ public class PrintComparedInterfacesJob extends AProjectJob<PrintComparedInterfa
 			numberSignatures = signatures.size(),
 			numberCompares = (numberSignatures*(numberSignatures - 1)) >> 1;
 		
-		workMonitor.createSubTask("Compare Signatures");
+		workMonitor.createSubTask(COMPARE_SIGNATURES);
 		workMonitor.setMaxAbsoluteWork(numberCompares);
 		
 		final double[] compareValues = new double[numberCompares];
@@ -140,7 +146,7 @@ public class PrintComparedInterfacesJob extends AProjectJob<PrintComparedInterfa
 			similarityQString.append(IOConstants.LINE_SEPARATOR);
 		}
 		IOConstants.writeToFile(interfaceProject.getProjectReference().getFile(IOConstants.FILENAME_COMPARE_MATRIX), similarityQString.toString());
-		MPLPlugin.getDefault().logInfo("Compared " + numberSignatures + " different Interfaces");
+		MPLPlugin.getDefault().logInfo(COMPARED + numberSignatures + " different Interfaces");
 		return true;
 	}
 

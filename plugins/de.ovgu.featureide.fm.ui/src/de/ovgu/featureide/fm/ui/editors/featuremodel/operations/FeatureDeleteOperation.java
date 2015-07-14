@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE;
+
 import java.util.LinkedList;
 
 import de.ovgu.featureide.fm.core.Constraint;
@@ -42,13 +44,13 @@ public class FeatureDeleteOperation extends AbstractFeatureModelOperation {
 	private Feature replacement;
 
 	public FeatureDeleteOperation(FeatureModel featureModel, Feature feature) {
-		super(featureModel, "Delete");
+		super(featureModel, DELETE);
 		this.feature = feature;
 		this.replacement = null;
 	}
 
 	public FeatureDeleteOperation(FeatureModel featureModel, Feature feature, Feature replacement) {
-		super(featureModel, "Delete");
+		super(featureModel, DELETE);
 		this.feature = feature;
 		this.replacement = replacement;
 	}

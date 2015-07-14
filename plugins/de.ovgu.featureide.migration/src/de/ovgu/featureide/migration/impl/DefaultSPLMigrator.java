@@ -20,6 +20,15 @@
  */
 package de.ovgu.featureide.migration.impl;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CLASSPATH_OF_PROJECT_TO_MIGRATE_IS_NULL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DESTINATIONFOLDER_NOT_ACCESSIBLE_OR_WRONG_PATH;
+import static de.ovgu.featureide.fm.core.localization.StringTable.JAVA_PROJECTS_COULD_NOT_BE_CREATED;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NO_PROJECTS_WERE_SELECTED_FOR_MIGRATION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.PROJECT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.PROJECT_PROPERTIES_COULD_NOT_BE_COPIED_COMMA__BECAUSE_IT_DOES_NOT_EXIST_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.TRIED_TO_OPEN_NULL_PROJECT_;
+
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,7 +56,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.handlers.base.SelectionWrapper;
 import de.ovgu.featureide.ui.migration.wizard.SPLMigrationDialogSettingsPage;
 
-@SuppressWarnings("restriction")
+@SuppressWarnings(RESTRICTION)
 public abstract class DefaultSPLMigrator implements ISPLMigrator {
 	public static final String PROJECT_PROPERTIES_FILE_NAME = "project.properties";
 	public static final String DEFAULT_PROJECT_NAME = "migratedSPL";
@@ -73,7 +82,7 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator {
 	@Override
 	public void registerProjectsForMigration(Set<IProject> projects) {
 		if (projects == null || projects.isEmpty())
-			throw new IllegalArgumentException("No projects were selected for Migration");
+			throw new IllegalArgumentException(NO_PROJECTS_WERE_SELECTED_FOR_MIGRATION);
 
 		this.projects = projects;
 	}
@@ -107,7 +116,7 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator {
 	}
 
 	private void openProjectHandleExceptions(IProject project) {
-		assert (project != null) : "Tried to open null project.";
+		assert (project != null) : TRIED_TO_OPEN_NULL_PROJECT_;
 		try {
 			project.open(null);
 		} catch (CoreException e) {
@@ -133,8 +142,8 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator {
 		for (IProject project : projects) {
 			IPath destinationPath = new Path(configurationData.sourcePath);
 
-			assert newProject.getFolder(destinationPath).isAccessible() : "Destinationfolder not accessible or wrong path";
-			assert project.isOpen() : "Project " + project.getName() + " is not open.";
+			assert newProject.getFolder(destinationPath).isAccessible() : DESTINATIONFOLDER_NOT_ACCESSIBLE_OR_WRONG_PATH;
+			assert project.isOpen() : PROJECT + project.getName() + " is not open.";
 
 			IPath featureFolderPath = SPLMigrationUtils.setupFolder(newProject.getFolder(destinationPath).getFolder(project.getName()));
 
@@ -159,7 +168,7 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator {
 	private void copyProjectProperties(IProject project, IPath destinationPath) {
 		final IFile source = project.getFile(PROJECT_PROPERTIES_FILE_NAME);
 		if (!source.exists()) {
-			assert false : "project.properties could not be copied, because it does not exist.";
+			assert false : PROJECT_PROPERTIES_COULD_NOT_BE_COPIED_COMMA__BECAUSE_IT_DOES_NOT_EXIST_;
 			return;
 		}
 
@@ -183,14 +192,14 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator {
 		JavaProject javaProjectToMigrate = new JavaProject(project, null);
 		JavaProject newJavaProject = new JavaProject(newProject, null);
 
-		assert (javaProjectToMigrate != null && newJavaProject != null) : "Java Projects could not be created";
+		assert (javaProjectToMigrate != null && newJavaProject != null) : JAVA_PROJECTS_COULD_NOT_BE_CREATED;
 
 		IClasspathEntry[] classpathToMigrate = javaProjectToMigrate.getRawClasspath();
 		List<IClasspathEntry> newClassPath = new ArrayList<IClasspathEntry>();
 
 		newClassPath.addAll(Arrays.asList(newJavaProject.getRawClasspath()));
 
-		assert classpathToMigrate != null : "classPath of project to migrate is null";
+		assert classpathToMigrate != null : CLASSPATH_OF_PROJECT_TO_MIGRATE_IS_NULL;
 
 		migrateLibraryAndContainerEntries(newJavaProject, classpathToMigrate, newClassPath);
 		migrateSourceFiles(project, destinationPath, classpathToMigrate);

@@ -20,6 +20,25 @@
  */
 package de.ovgu.featureide.core.internal;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE_CORE_AND_DEAD_FEATURES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CHECKING_CONFIGURATIONS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CHECKING_CONFIGURATIONS_FOR_UNUSED_FEATURES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CHECK_VALIDITY_OF;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CONFIGURATION_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE_CONFIGURATION_MARKERS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ERROR_WHILE_LOADING_FEATURE_MODEL_FROM;
+import static de.ovgu.featureide.fm.core.localization.StringTable.GET_FALSE_OPTIONAL_FEATURES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.GET_SELECTION_MATRIX;
+import static de.ovgu.featureide.fm.core.localization.StringTable.GET_UNUSED_FEATURES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.LOAD_MODEL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NO_COMPOSER_COULD_BE_CREATED_FOR_ID;
+import static de.ovgu.featureide.fm.core.localization.StringTable.PERFORMING_FULL_BUILD;
+import static de.ovgu.featureide.fm.core.localization.StringTable.POSTPROCESS_GENERATED_FILES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.REFESH_CONFIGURATION_FOLER;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SYNCHRONIZE_FEATURE_MODEL_AND_FEATURE_MODULES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.THE_FEATURE_MODULE_IS_EMPTY__YOU_EITHER_SHOULD_IMPLEMENT_IT_COMMA__MARK_THE_FEATURE_AS_ABSTRACT_COMMA__OR_REMOVE_THE_FEATURE_FROM_THE_FEATURE_MODEL_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.THIS_ANNOTATION_IS_NOT_SUPPORTED_YET___MOVED_TO_THE_COMMENT_SECTION_;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -178,7 +197,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 	private IFile currentConfiguration = null;
 
-	private final IJob syncModulesJob = new AStoppableJob("Synchronize feature model and feature modules") {
+	private final IJob syncModulesJob = new AStoppableJob(SYNCHRONIZE_FEATURE_MODEL_AND_FEATURE_MODULES) {
 		protected boolean work() {
 			try {
 				final IFolder folder = sourceFolder;
@@ -208,26 +227,26 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		}
 	};
 	
-	private final IJob configurationChecker = new AStoppableJob("Checking configurations for unused features") {
+	private final IJob configurationChecker = new AStoppableJob(CHECKING_CONFIGURATIONS_FOR_UNUSED_FEATURES) {
 		
 		protected boolean work() {
 			setCancelingTimeout(100);
 			final IFolder folder = configFolder;
 			deleteConfigurationMarkers(folder, IResource.DEPTH_ZERO);
 			workMonitor.setMaxAbsoluteWork(7);
-			workMonitor.createSubTask("calculate core and dead features");
+			workMonitor.createSubTask(CALCULATE_CORE_AND_DEAD_FEATURES);
 			List<String> concreteFeatures = (List<String>) getOptionalConcreteFeatures();
-			next("get selection matrix");
+			next(GET_SELECTION_MATRIX);
 			if (workMonitor.checkCancel()) {
 				return true;
 			}
 			final boolean[][] selectionMatrix = getSelectionMatrix(concreteFeatures);
-			next("get false optional features");
+			next(GET_FALSE_OPTIONAL_FEATURES);
 			if (workMonitor.checkCancel()) {
 				return true;
 			}
 			final Collection<String> falseOptionalFeatures = getFalseOptionalConfigurationFeatures(selectionMatrix, concreteFeatures);
-			next("get unused features");
+			next(GET_UNUSED_FEATURES);
 			if (workMonitor.checkCancel()) {
 				return true;
 			}
@@ -248,7 +267,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 				createConfigurationMarker(folder, MARKER_FALSE_OPTIONAL + falseOptionalFeatures.size() + " features are optional but used in all configurations: "
 						+ createShortMessage(falseOptionalFeatures), -1, IMarker.SEVERITY_WARNING);
 			}
-			next("refesh configuration foler");
+			next(REFESH_CONFIGURATION_FOLER);
 			if (workMonitor.checkCancel()) {
 				return true;
 			}
@@ -396,7 +415,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		} catch (UnsupportedModelException e) {
 			modelFile.createModelMarker(e.getMessage(), IMarker.SEVERITY_ERROR, e.lineNumber);
 		} catch (CoreException e) {
-			LOGGER.logError("Error while loading feature model from " + modelFile.getResource(), e);
+			LOGGER.logError(ERROR_WHILE_LOADING_FEATURE_MODEL_FROM + modelFile.getResource(), e);
 		}
 		return false;
 	}
@@ -454,7 +473,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 				if (!guidslReader.getAnnLine().isEmpty()) {
 					FeatureModelFile modelFile = new FeatureModelFile(project.getFile("model.m"));
 					for (int i = 0; i < guidslReader.getAnnLine().size(); i++)
-						modelFile.createModelMarker("This annotation is not supported yet - moved to the comment section.",
+						modelFile.createModelMarker(THIS_ANNOTATION_IS_NOT_SUPPORTED_YET___MOVED_TO_THE_COMMENT_SECTION_,
 								IMarker.SEVERITY_WARNING, guidslReader.getAnnLine().get(i));
 				}
 
@@ -590,7 +609,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		// there are possibly no resource build yet or they are not up-to-date.
 		// Eclipse calls builders, if a resource as changed, but in this case
 		// actually no resource in the file system changes.
-		Job job = new AStoppableJob("Performing full build") {
+		Job job = new AStoppableJob(PERFORMING_FULL_BUILD) {
 			@Override
 			protected boolean work() throws Exception {
 				buildRelevantChanges = true;
@@ -773,7 +792,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			try {
 				final int memberCount = folder.members().length;
 				if (feature.isConcrete() && memberCount == 0) {
-					message = "The feature module is empty. You either should implement it, mark the feature as abstract, or remove the feature from the feature model.";
+					message = THE_FEATURE_MODULE_IS_EMPTY__YOU_EITHER_SHOULD_IMPLEMENT_IT_COMMA__MARK_THE_FEATURE_AS_ABSTRACT_COMMA__OR_REMOVE_THE_FEATURE_FROM_THE_FEATURE_MODEL_;
 				} else if (feature.isAbstract() && memberCount > 0) {
 					message = "This feature module is ignored as \"" + feature.getName() + "\" is marked as abstract.";
 				}
@@ -917,7 +936,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	}
 
 	private void checkBuildFolder(final IFolder folder, final IResourceChangeEvent event) {
-		new AJob("Postprocess generated files", Job.LONG) {
+		new AJob(POSTPROCESS_GENERATED_FILES, Job.LONG) {
 			@Override
 			protected boolean work() throws Exception {
 				checkBuildFolder(folder);
@@ -962,7 +981,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		if (delta == null || (delta.getFlags() & IResourceDelta.CONTENT) == 0)
 			return false;
 		
-		Job job = new Job("Load Model") {
+		Job job = new Job(LOAD_MODEL) {
 			protected IStatus run(IProgressMonitor monitor) {
 				if (loadModel()) {
 					final IComposerExtensionClass composerExtension = getComposer();
@@ -986,14 +1005,14 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			return;
 		}
 
-		Job job = new AStoppableJob("Checking configurations", Job.LONG) {	
+		Job job = new AStoppableJob(CHECKING_CONFIGURATIONS, Job.LONG) {	
 			@Override
 			protected boolean work() throws Exception {
 				workMonitor.setMaxAbsoluteWork(2 * files.size());
 				final Configuration config = new Configuration(featureModel, false, false);
 				final ConfigurationReader reader = new ConfigurationReader(config);
 				try {
-					workMonitor.getMonitor().subTask("Delete Configuration Markers");
+					workMonitor.getMonitor().subTask(DELETE_CONFIGURATION_MARKERS);
 					for (IFile file : files) {
 						if (workMonitor.checkCancel()) {
 							return false;
@@ -1006,12 +1025,12 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 						if (workMonitor.checkCancel()) {
 							return false;
 						}
-						workMonitor.getMonitor().subTask("Check validity of " + file.getName());
+						workMonitor.getMonitor().subTask(CHECK_VALIDITY_OF + file.getName());
 						reader.readFromFile(file);
 						if (!config.isValid()) {
 							String name = file.getName();
 							name = name.substring(0, name.lastIndexOf('.'));
-							String message = "Configuration '" + name + "' is invalid";
+							String message = CONFIGURATION_ + name + "' is invalid";
 							createConfigurationMarker(file, message, 0, IMarker.SEVERITY_ERROR);
 
 						}
@@ -1128,7 +1147,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			if (composerExtension != null) {
 				((ComposerExtensionClass) composerExtension).initialize(this);
 			} else {
-				CorePlugin.getDefault().logError(new Exception("No composer could be created for ID " + compositionToolID));
+				CorePlugin.getDefault().logError(new Exception(NO_COMPOSER_COULD_BE_CREATED_FOR_ID + compositionToolID));
 			}
 		}
 		return composerExtension;

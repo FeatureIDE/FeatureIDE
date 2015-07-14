@@ -1,5 +1,7 @@
 package br.ufal.ic.colligens.controllers.metrics;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.METRICS;
+
 import java.util.List;
 
 import org.eclipse.jface.viewers.TableViewer;
@@ -78,7 +80,7 @@ public class MetricsViewController extends ViewController {
 	}
 
 	public void createColumns(Composite parent) {
-		String[] titles = { "Metrics", "Value" };
+		String[] titles = { METRICS, "Value" };
 		int[] bounds = { 300, 400 };
 
 		for (int i = 0; i < bounds.length; i++) {

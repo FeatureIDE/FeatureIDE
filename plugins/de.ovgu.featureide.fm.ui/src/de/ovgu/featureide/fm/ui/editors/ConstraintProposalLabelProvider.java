@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.NOT;
+
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 
@@ -40,7 +42,7 @@ public class ConstraintProposalLabelProvider extends LabelProvider implements GU
 	public Image getImage(Object element) {
 		if (element instanceof ContentProposal) {
 			String content = ((ContentProposal) element).getContent();
-			if ("not".equals(content) || "or".equals(content) || "and".equals(content) || "iff".equals(content) || "implies".equals(content)
+			if (NOT.equals(content) || "or".equals(content) || "and".equals(content) || "iff".equals(content) || "implies".equals(content)
 					|| "(".equals(content) || ")".equals(content)) {
 				return OPERATOR_SYMBOL;
 			}

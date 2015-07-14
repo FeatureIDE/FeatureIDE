@@ -1,5 +1,7 @@
 package br.ufal.ic.colligens.handler;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
+
 import java.util.Iterator;
 
 import org.eclipse.cdt.core.model.ITranslationUnit;
@@ -21,7 +23,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.FileEditorInput;
 
-@SuppressWarnings("restriction")
+@SuppressWarnings(RESTRICTION)
 public abstract class ColligensAbstractHandler extends AbstractHandler {
 	private static ISelection selection = null;
 	private static boolean enabled = false;

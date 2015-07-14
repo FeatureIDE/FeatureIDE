@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.configuration;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CONFIGURATION;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -43,7 +45,7 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
 public class ConfigurationPage extends ConfigurationTreeEditorPage {
 
 	private static final String ID = FMUIPlugin.PLUGIN_ID + "ConfigurationPage";
-	private static final String PAGE_TEXT = "Configuration";
+	private static final String PAGE_TEXT = CONFIGURATION;
 
 	protected void createUITree(Composite parent) {
 		tree = new Tree(parent, SWT.CHECK);

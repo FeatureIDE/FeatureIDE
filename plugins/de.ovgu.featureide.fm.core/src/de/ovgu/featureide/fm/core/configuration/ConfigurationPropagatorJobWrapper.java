@@ -20,6 +20,14 @@
  */
 package de.ovgu.featureide.fm.core.configuration;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATING_CONFIGURATION_COLORING;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATING_CONFIGURATION_SOLUTIONS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATING_NUMBER_OF_VALID_CONFIGURATIONS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CHECKING_CONFIGURATION_VALIDITY;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CONFIGURATION_JOB;
+import static de.ovgu.featureide.fm.core.localization.StringTable.LOADING_CNF;
+import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATING_CONFIGURATION;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -58,14 +66,14 @@ public class ConfigurationPropagatorJobWrapper {
 		
 		private static String getName(int id) {
 			switch (id) {
-			case ID_LOAD: return "Loading CNF";
-			case ID_SOLUTIONS: return "Calculating Configuration Solutions";
-			case ID_ISVALID: return "Checking Configuration Validity";
-			case ID_CANBEVALID: return "Checking Configuration Validity";
-			case ID_VALIDCONFIG: return "Calculating Configuration Coloring";
-			case ID_NUMBER: return "Calculating Number of Valid Configurations";
-			case ID_UPDATE: return "Updating Configuration";
-			default: return "Configuration Job";
+			case ID_LOAD: return LOADING_CNF;
+			case ID_SOLUTIONS: return CALCULATING_CONFIGURATION_SOLUTIONS;
+			case ID_ISVALID: return CHECKING_CONFIGURATION_VALIDITY;
+			case ID_CANBEVALID: return CHECKING_CONFIGURATION_VALIDITY;
+			case ID_VALIDCONFIG: return CALCULATING_CONFIGURATION_COLORING;
+			case ID_NUMBER: return CALCULATING_NUMBER_OF_VALID_CONFIGURATIONS;
+			case ID_UPDATE: return UPDATING_CONFIGURATION;
+			default: return CONFIGURATION_JOB;
 			}
 		}
 

@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.ui.quickfix;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_CONFIGURATIONS_FOR;
+
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -64,7 +66,7 @@ class QuickFixMissingFeatures extends QuickFixMissingConfigurations {
 	}
 	
 	private List<Configuration> createConfigurations(final Collection<String> unusedFeatures, final IProgressMonitor monitor) {
-		monitor.beginTask("Create configurations for", unusedFeatures.size());
+		monitor.beginTask(CREATE_CONFIGURATIONS_FOR, unusedFeatures.size());
 		final List<Configuration> confs = new LinkedList<Configuration>();
 		while (!unusedFeatures.isEmpty()) {
 			monitor.subTask(createShortMessage(unusedFeatures));

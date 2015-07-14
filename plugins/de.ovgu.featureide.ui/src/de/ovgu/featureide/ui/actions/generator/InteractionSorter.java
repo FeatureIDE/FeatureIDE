@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.ui.actions.generator;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.SORT_CONFIGURATIONS;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -65,7 +67,7 @@ public class InteractionSorter extends AbstractConfigurationSorter {
 	 */
 	@Override
 	public int sort(final IProgressMonitor monitor) {
-		monitor.beginTask("Sort configurations" , configurations.size() * 2);
+		monitor.beginTask(SORT_CONFIGURATIONS , configurations.size() * 2);
 		for (final BuilderConfiguration c : configurations) {
 			if (monitor.isCanceled()) {
 				configurations.clear();

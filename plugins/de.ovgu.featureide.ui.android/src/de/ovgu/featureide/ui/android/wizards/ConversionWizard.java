@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.ui.android.wizards;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.ADD_FEATUREIDE_NATURE_TO_ANDROID_PROJECT;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
@@ -44,7 +46,7 @@ public class ConversionWizard extends Wizard implements INewWizard {
 
 	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
-		setWindowTitle("Add FeatureIDE Nature to Android Project");
+		setWindowTitle(ADD_FEATUREIDE_NATURE_TO_ANDROID_PROJECT);
 		page = new ConversionPage();
 		this.selection = selection;
 	}

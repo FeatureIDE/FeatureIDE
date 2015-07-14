@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.featurehouse.signature.fuji;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.EXTENDS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IMPLEMENTS;
 import de.ovgu.featureide.core.signature.base.AbstractClassFragment;
 import de.ovgu.featureide.core.signature.base.AbstractFieldSignature;
 import de.ovgu.featureide.core.signature.base.AbstractMethodSignature;
@@ -55,7 +57,7 @@ public class FujiStringBuilder {
 				sb.append(LINE_SEPARATOR);
 				sb.append("\t\textends ");
 			} else {
-				sb.append(" extends ");				
+				sb.append(EXTENDS);				
 			}
 			for (String ext : cls.getSignature().getExtendList()) {
 				sb.append(ext);	
@@ -69,7 +71,7 @@ public class FujiStringBuilder {
 				sb.append(LINE_SEPARATOR);
 				sb.append("\t\timplements ");
 			} else {
-				sb.append(" implements ");				
+				sb.append(IMPLEMENTS);				
 			}
 			for (String impl : cls.getSignature().getImplementList()) {
 				sb.append(impl);	

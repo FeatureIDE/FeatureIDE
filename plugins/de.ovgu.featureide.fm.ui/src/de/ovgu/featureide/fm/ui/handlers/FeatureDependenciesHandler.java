@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.handlers;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATING_FEATURE_DEPENDENCIES;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -54,7 +56,7 @@ public class FeatureDependenciesHandler extends AFileHandler {
 	@Override
 	protected void singleAction(final IFile inputFile) {
 		final FeatureModel mod = readModel(inputFile);
-		Job job = new Job("Calculating Feature Dependencies") {
+		Job job = new Job(CALCULATING_FEATURE_DEPENDENCIES) {
 			protected IStatus run(IProgressMonitor monitor) {
 				final String text = new FeatureDependencies(mod).toStringWithLegend();
 				// UI access

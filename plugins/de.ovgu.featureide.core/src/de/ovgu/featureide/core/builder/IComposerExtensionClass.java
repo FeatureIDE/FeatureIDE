@@ -118,7 +118,7 @@ public interface IComposerExtensionClass extends IComposerExtensionBase {
 
 	/**
 	 * Returns the list of templates for the current composer. <br>
-	 * Format: {"File format name", "extension", "template"}
+	 * Format: {FILE_FORMAT_NAME, "extension", "template"}
 	 * 
 	 * @return list of templates for the current composer
 	 */

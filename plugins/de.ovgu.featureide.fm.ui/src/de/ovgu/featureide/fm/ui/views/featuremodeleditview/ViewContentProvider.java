@@ -20,6 +20,23 @@
  */
 package de.ovgu.featureide.fm.ui.views.featuremodeleditview;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE_CONTENT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE_NUMBER_OF_CONFIGURATIONS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE_NUMBER_OF_PROGRAM_VARIANTS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATING___;
+import static de.ovgu.featureide.fm.core.localization.StringTable.COMPARE_MODELS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CONFIGURATIONS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.MORE_THAN;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NUMBER_OF;
+import static de.ovgu.featureide.fm.core.localization.StringTable.OPEN_A_FEATURE_MODEL_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.REFRESH_EDIT_VIEW;
+import static de.ovgu.featureide.fm.core.localization.StringTable.START_MANUAL_OR_ACTIVATE_AUTOMATIC_CALCULATION_TO_SHOW_STATISTICS_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.STATISTICS_ON_AFTER_EDIT_VERSION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.STATISTICS_ON_BEFORE_EDIT_VERSION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.TIMEOUT_STRING;
+import static de.ovgu.featureide.fm.core.localization.StringTable.WAITING_FOR_SUBTASKS_TO_FINISH;
+import static de.ovgu.featureide.fm.core.localization.StringTable.WAITING_FOR_SUBTASK_TO_FINISH;
+
 import java.util.ConcurrentModificationException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -50,9 +67,9 @@ import de.ovgu.featureide.fm.ui.views.FeatureModelEditView;
  */
 public class ViewContentProvider implements IStructuredContentProvider, ITreeContentProvider, GUIDefaults {
 
-	private static final String DEFAULT_MESSAGE = "Open a feature model.";
-	private static final String DEFAULT_MANUAL_MESSAGE = "Start manual or activate automatic calculation to show statistics.";
-	private static final String CALCULATING_MESSAGE = "Calculating...";
+	private static final String DEFAULT_MESSAGE = OPEN_A_FEATURE_MODEL_;
+	private static final String DEFAULT_MANUAL_MESSAGE = START_MANUAL_OR_ACTIVATE_AUTOMATIC_CALCULATION_TO_SHOW_STATISTICS_;
+	private static final String CALCULATING_MESSAGE = CALCULATING___;
 
 	private static final String HEAD_REFACTORING = "Refactoring: SPL unchanged";
 	private static final String HEAD_GENERALIZATION = "Generalization: Products added";
@@ -70,10 +87,10 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 	protected static final String NUMBER_HIDDEN = "Number of hidden features: ";
 	protected static final String NUMBER_CONSTRAINTS = "Number of constraints: ";
 	protected static final String MODEL_VOID = "Feature model is valid (not void): ";
-	protected static final String MODEL_TIMEOUT = MODEL_VOID + "timeout";
+	protected static final String MODEL_TIMEOUT = MODEL_VOID + TIMEOUT_STRING;
 
-	private static final String STATISTICS_BEFORE = "Statistics on before edit version";
-	private static final String STATISTICS_AFTER = "Statistics on after edit version";
+	private static final String STATISTICS_BEFORE = STATISTICS_ON_BEFORE_EDIT_VERSION;
+	private static final String STATISTICS_AFTER = STATISTICS_ON_AFTER_EDIT_VERSION;
 
 	/**
 	 * time in seconds after the calculation is aborted by the SAT solver
@@ -223,7 +240,7 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 				newCalculationJob.schedule();
 
 				setHeadAndExamples(monitor, oldModel, newModel);
-				monitor.setTaskName("Waiting for subtasks to finish");
+				monitor.setTaskName(WAITING_FOR_SUBTASKS_TO_FINISH);
 				try {
 					oldCalculationJob.join();
 					newCalculationJob.join();
@@ -233,7 +250,7 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 				}
 			} else {
 				// case: running in one jobs
-				monitor.beginTask("Calculate content", 5);
+				monitor.beginTask(CALCULATE_CONTENT, 5);
 				setHeadAndExamples(monitor, oldModel, newModel);
 				if (isCanceled())
 					return;
@@ -256,7 +273,7 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 	 * @param newModel
 	 */
 	private void setHeadAndExamples(IProgressMonitor monitor, FeatureModel oldModel, FeatureModel newModel) {
-		monitor.setTaskName("Compare models");
+		monitor.setTaskName(COMPARE_MODELS);
 		TreeObject head = calculateHead(oldModel, newModel, comparator);
 		TreeElement[] children = invisibleRoot.getChildren();
 		((TreeObject) children[INDEX_HEAD]).setContents(head.getName(), head.getImage());
@@ -382,7 +399,7 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 				Job job = new Job("Calculate: \"" + text + "\"") {
 					@Override
 					protected IStatus run(IProgressMonitor monitor) {
-						monitor.setTaskName("Calculate number of configurations");
+						monitor.setTaskName(CALCULATE_NUMBER_OF_CONFIGURATIONS);
 						((TreeObject) children[INDEX_CONFIGS]).set(calculateNumberOfVariants(model, true));
 						refresh();
 						return Status.OK_STATUS;
@@ -391,13 +408,13 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 				job.setPriority(Job.DECORATE);
 				job.schedule();
 
-				monitor.setTaskName("Calculate number of program variants");
+				monitor.setTaskName(CALCULATE_NUMBER_OF_PROGRAM_VARIANTS);
 
 				((TreeObject) children[INDEX_VARIANTS]).set(calculateNumberOfVariants(model, false));
 				refresh();
 				monitor.worked(1);
 				try {
-					monitor.setTaskName("Waiting for subtask to finish");
+					monitor.setTaskName(WAITING_FOR_SUBTASK_TO_FINISH);
 					job.join();
 					monitor.worked(1);
 					monitor.done();
@@ -419,8 +436,8 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 
 	private TreeParent calculateNumberOfVariants(FeatureModel model, boolean ignoreAbstractFeatures) {
 
-		String variants = ignoreAbstractFeatures ? "configurations" : "program variants";
-		TreeParent p = new TreeParent("Number of " + variants, null, true) {
+		String variants = ignoreAbstractFeatures ? CONFIGURATIONS : "program variants";
+		TreeParent p = new TreeParent(NUMBER_OF + variants, null, true) {
 			@Override
 			public void initChildren() {
 			}
@@ -435,7 +452,7 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 		final long number = new Configuration(model, false, ignoreAbstractFeatures).number(TIMEOUT_CONFIGURATION);
 		String s = "";
 		if (number < 0)
-			s += "more than " + (-1 - number);
+			s += MORE_THAN + (-1 - number);
 		else
 			s += number;
 		s += " " + variants;
@@ -447,7 +464,7 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 	 * Refreshes the tree in a fast running job with highest priority
 	 */
 	protected void refresh() {
-		UIJob job_setColor = new UIJob("Refresh edit view") {
+		UIJob job_setColor = new UIJob(REFRESH_EDIT_VIEW) {
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				if (!view.getViewer().getControl().isDisposed()) {

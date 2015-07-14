@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.core;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.DEFAULT_COLORSCHEME;
+
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,7 +43,7 @@ import de.ovgu.featureide.fm.core.io.xml.XmlColorModelWriter;
  * @author Sebastian Krieter
  */
 public class ColorschemeTable {
-	private static final String DEFAULT_COLORSCHEMENAME = "Default Colorscheme";
+	private static final String DEFAULT_COLORSCHEMENAME = DEFAULT_COLORSCHEME;
 	private static final String COLOR_FILE_NAME = ".color.xml";
 	
 	private final FeatureModel featureModel;

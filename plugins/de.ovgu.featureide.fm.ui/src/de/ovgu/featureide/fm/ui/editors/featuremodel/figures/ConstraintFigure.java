@@ -20,6 +20,11 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT_IS_A_TAUTOLOGY_AND_SHOULD_BE_REMOVED_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT_IS_REDUNDANT_AND_COULD_BE_REMOVED_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT_IS_UNSATISFIABLE_AND_MAKES_THE_FEATURE_MODEL_VOID_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT_MAKES_THE_FEATURE_MODEL_VOID_;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -48,12 +53,12 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  */
 public class ConstraintFigure extends Figure implements GUIDefaults {
 
-	public final static String VOID_MODEL = " Constraint makes the feature model void. ";
-	public final static String UNSATISFIABLE = " Constraint is unsatisfiable and makes the feature model void. ";
-	public final static String TAUTOLOGY = " Constraint is a tautology and should be removed. ";
+	public final static String VOID_MODEL = CONSTRAINT_MAKES_THE_FEATURE_MODEL_VOID_;
+	public final static String UNSATISFIABLE = CONSTRAINT_IS_UNSATISFIABLE_AND_MAKES_THE_FEATURE_MODEL_VOID_;
+	public final static String TAUTOLOGY = CONSTRAINT_IS_A_TAUTOLOGY_AND_SHOULD_BE_REMOVED_;
 	public final static String DEAD_FEATURE = " Constraint makes following features dead: ";
 	public final static String FALSE_OPTIONAL = " Constraint makes following features false optional: ";
-	public final static String REDUNDANCE = " Constraint is redundant and could be removed. ";
+	public final static String REDUNDANCE = CONSTRAINT_IS_REDUNDANT_AND_COULD_BE_REMOVED_;
 
 	private static final IFigure VOID_LABEL = new Label(VOID_MODEL);
 	private static final IFigure UNSATISFIABLE_LABEL = new Label(UNSATISFIABLE);

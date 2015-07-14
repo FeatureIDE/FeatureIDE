@@ -20,6 +20,11 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE_ERROR;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IT_CAN_NOT_BE_REPLACED_WITH_AN_EQUIVALENT_ONE_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SELECT_ONLY_ONE_FEATURE_IN_ORDER_TO_REPLACE_IT_WITH_AN_EQUIVALENT_ONE_;
+
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.HashMap;
@@ -61,7 +66,7 @@ import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePage;
  */
 public class DeleteOperation extends AbstractFeatureModelOperation implements GUIDefaults {
 
-	private static final String LABEL = "Delete";
+	private static final String LABEL = DELETE;
 	private Object viewer;
 	private Deque<AbstractFeatureModelOperation> operations = new LinkedList<AbstractFeatureModelOperation>();
 
@@ -220,13 +225,13 @@ public class DeleteOperation extends AbstractFeatureModelOperation implements GU
 			}
 		}
 
-		MessageDialog dialog = new MessageDialog(new Shell(), " Delete Error ", FEATURE_SYMBOL,
+		MessageDialog dialog = new MessageDialog(new Shell(), DELETE_ERROR, FEATURE_SYMBOL,
 				((notDeletable.size() != 1) ? "The following features are contained in constraints:" : "The following feature is contained in constraints:")
 						+ "\n"
 						+ notDeletedFeatures
 						+ "\n"
-						+ ((notDeletable.size() != 1) ? "Select only one feature in order to replace it with an equivalent one."
-								: "It can not be replaced with an equivalent one."), MessageDialog.ERROR, new String[] { IDialogConstants.OK_LABEL }, 0);
+						+ ((notDeletable.size() != 1) ? SELECT_ONLY_ONE_FEATURE_IN_ORDER_TO_REPLACE_IT_WITH_AN_EQUIVALENT_ONE_
+								: IT_CAN_NOT_BE_REPLACED_WITH_AN_EQUIVALENT_ONE_), MessageDialog.ERROR, new String[] { IDialogConstants.OK_LABEL }, 0);
 		dialog.open();
 	}
 

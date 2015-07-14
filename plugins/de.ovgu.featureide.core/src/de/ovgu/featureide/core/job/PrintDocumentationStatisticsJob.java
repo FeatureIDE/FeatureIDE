@@ -20,6 +20,10 @@
  */
 package de.ovgu.featureide.core.job;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD_DOCUMENTATION_STATISTICS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.BUILT_DOCUMENTATION_STATISTICS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.VERFAHREN;
+
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
 
@@ -45,7 +49,7 @@ public class PrintDocumentationStatisticsJob extends AProjectJob<PrintDocumentat
 	}
 	
 	protected PrintDocumentationStatisticsJob(Arguments arguments) {
-		super("Build Documentation Statistics", arguments);
+		super(BUILD_DOCUMENTATION_STATISTICS, arguments);
 	}
 
 	@Override
@@ -171,7 +175,7 @@ public class PrintDocumentationStatisticsJob extends AProjectJob<PrintDocumentat
 		
 		StringBuilder sb2 = new StringBuilder();
 		
-		String[] texString = new String[]{"Verfahren","Variante","SPL","Kontext","Featuremodul","Summe"};
+		String[] texString = new String[]{VERFAHREN,"Variante","SPL","Kontext","Featuremodul","Summe"};
 		for (int j = 0; j < statisticDataTags.length; j++) {
 			sb2.append(texString[j]);
 			sb2.append(" & ");
@@ -207,7 +211,7 @@ public class PrintDocumentationStatisticsJob extends AProjectJob<PrintDocumentat
 		IOConstants.writeToFile(folder.getFile("numComments.txt"), sb3.toString());
 		workMonitor.worked();
 		
-		CorePlugin.getDefault().logInfo("Built Documentation Statistics");
+		CorePlugin.getDefault().logInfo(BUILT_DOCUMENTATION_STATISTICS);
 		return true;
 	}
 	

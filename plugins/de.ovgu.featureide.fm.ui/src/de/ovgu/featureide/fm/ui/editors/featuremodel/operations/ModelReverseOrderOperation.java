@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.REVERSE_LAYOUT_ORDER;
+
 import java.util.LinkedList;
 
 import org.eclipse.draw2d.geometry.Dimension;
@@ -37,7 +39,7 @@ import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
  */
 public class ModelReverseOrderOperation extends AbstractFeatureModelOperation {
 
-	private static final String LABEL = "Reverse Layout Order";
+	private static final String LABEL = REVERSE_LAYOUT_ORDER;
 
 	public ModelReverseOrderOperation(FeatureModel featureModel) {
 		super(featureModel, LABEL);

@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.SAVE_IMAGE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.UNKNOWN_IMAGE_FILE_FORMAT;
+
 import java.io.File;
 import java.util.Locale;
 
@@ -50,7 +53,7 @@ import org.eclipse.ui.progress.UIJob;
 public class GEFImageWriter {
 
 	public static void writeToFile(final GraphicalViewerImpl graphicalViewer, final File file) {
-		UIJob job = new UIJob("Save image") {
+		UIJob job = new UIJob(SAVE_IMAGE) {
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				saveEditorContentsAsImage(graphicalViewer, file.toString());
@@ -163,7 +166,7 @@ public class GEFImageWriter {
 			return SWT.IMAGE_PNG;
 		if (file.endsWith(".tif"))
 			return SWT.IMAGE_TIFF;
-		throw new RuntimeException("Unknown image file format " + saveFilePath);
+		throw new RuntimeException(UNKNOWN_IMAGE_FILE_FORMAT + saveFilePath);
 	}
 
 }

@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.job;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;

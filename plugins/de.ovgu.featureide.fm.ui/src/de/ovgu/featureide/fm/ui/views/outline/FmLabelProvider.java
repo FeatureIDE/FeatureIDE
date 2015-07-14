@@ -23,9 +23,7 @@ package de.ovgu.featureide.fm.ui.views.outline;
 import org.eclipse.jface.viewers.IFontProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.prop4j.NodeWriter;
 
@@ -109,7 +107,7 @@ public class FmLabelProvider implements ILabelProvider,IFontProvider, GUIDefault
 		} else if (element instanceof String) {
 			return null; // TODO: Add here icon for "constraint" node
 		} else if (element instanceof Constraint) {
-			return null; // TODO: Add here icon for "constraint element" node
+			return null; // TODO: Add here icon for CONSTRAINT_ELEMENT node
 		} else return null;
 	}
 	

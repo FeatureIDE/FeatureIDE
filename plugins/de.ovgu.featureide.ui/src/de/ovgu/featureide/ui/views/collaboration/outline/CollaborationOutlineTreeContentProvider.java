@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.outline;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -50,10 +49,10 @@ import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
  * 
  * @author Jan Wedding
  * @author Melanie Pflaume
- * @author Stefan Krüger
+ * @author Stefan Krï¿½ger
  * @author Florian Proksch
  * @author Dominic Labsch
- * @author Daniel Püsche
+ * @author Daniel Pï¿½sche
  */
 public class CollaborationOutlineTreeContentProvider implements ITreeContentProvider {
 

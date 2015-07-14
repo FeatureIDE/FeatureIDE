@@ -20,6 +20,16 @@
  */
 package de.ovgu.featureide.fm.ui.editors;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CHECKING_COMPLETE_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RUNNING_ADDITIONAL_CHECKS___;
+import static de.ovgu.featureide.fm.core.localization.StringTable.STARTING_UP___;
+import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATING_RESULTS_FOR_DEAD_FEATURES___;
+import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATING_RESULTS_FOR_FALSE_OPTIONAL_FEATURES___;
+import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATING_RESULTS_FOR_REDUNDANCY___;
+import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATING_RESULTS_FOR_SATISFIABLE_CHECK___;
+import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATING_RESULTS_FOR_VOIDS_MODEL___;
+import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATING_RESULTS_TAUTOLOGY_CHECK___;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -303,12 +313,12 @@ public final class ConstraintTextValidator {
 	 * @param featureModel FeatureModel
 	 * @param constraintText Test to text
 	 * @param onCheckStarted Observer, before the first test runs.
-	 * @param onVoidsModelCheckComplete Observer, when there is a result for "voids model" test
-	 * @param onFalseOptionalCheckComplete Observer, when there is a result for "false optional" test
-	 * @param onDeadFeatureCheckComplete Observer, when there is a result for "dead feature" test
-	 * @param onIsRedundantCheckComplete Observer, when there is a result for "redundant check" test
+	 * @param onVoidsModelCheckComplete Observer, when there is a result for VOIDS_MODEL test
+	 * @param onFalseOptionalCheckComplete Observer, when there is a result for FALSE_OPTIONAL test
+	 * @param onDeadFeatureCheckComplete Observer, when there is a result for DEAD_FEATURE test
+	 * @param onIsRedundantCheckComplete Observer, when there is a result for REDUNDANT_CHECK test
 	 * @param onIsTautology Observer, when there is a result for "tautology" test
-	 * @param onIsNotSatisfiable Observer, when there is a result for "is satisfiable" test
+	 * @param onIsNotSatisfiable Observer, when there is a result for IS_SATISFIABLE test
 	 * @param onCheckEnded Observer, when the entire series has passed and ended
 	 */
 	public void validateAsync(final Constraint constraint, final int timeOut, final FeatureModel featureModel, final String constraintText,
@@ -321,11 +331,11 @@ public final class ConstraintTextValidator {
 
 		this.cancelValidation();
 
-		asyncCheckJob = new ValidationJob("Running additional checks...") {
+		asyncCheckJob = new ValidationJob(RUNNING_ADDITIONAL_CHECKS___) {
 
 			protected IStatus run(IProgressMonitor monitor) {
 
-				new UIJob("Starting up...") {
+				new UIJob(STARTING_UP___) {
 
 					@Override
 					public IStatus runInUIThread(IProgressMonitor monitor) {
@@ -340,7 +350,7 @@ public final class ConstraintTextValidator {
 				if (!canceled) {
 					final boolean problemFoundTautology = isTautology(con, timeOut);
 
-					new UIJob("Updating results tautology check...") {
+					new UIJob(UPDATING_RESULTS_TAUTOLOGY_CHECK___) {
 
 						@Override
 						public IStatus runInUIThread(IProgressMonitor monitor) {
@@ -360,7 +370,7 @@ public final class ConstraintTextValidator {
 				if (!canceled) {
 					final boolean problemFoundNotSatisfiable = !isSatisfiable(con, timeOut);
 
-					new UIJob("Updating results for satisfiable check...") {
+					new UIJob(UPDATING_RESULTS_FOR_SATISFIABLE_CHECK___) {
 
 						@Override
 						public IStatus runInUIThread(IProgressMonitor monitor) {
@@ -379,7 +389,7 @@ public final class ConstraintTextValidator {
 				if (!canceled) {
 					final boolean problemFoundVoidsModel = isVoidsModel(featureModel, con, constraint);
 
-					new UIJob("Updating results for voids model...") {
+					new UIJob(UPDATING_RESULTS_FOR_VOIDS_MODEL___) {
 
 						@Override
 						public IStatus runInUIThread(IProgressMonitor monitor) {
@@ -398,7 +408,7 @@ public final class ConstraintTextValidator {
 				if (!canceled) {
 					final List<Feature> falseOptionalFeatures = getFalseOptional(con, featureModel);
 
-					new UIJob("Updating results for false optional features...") {
+					new UIJob(UPDATING_RESULTS_FOR_FALSE_OPTIONAL_FEATURES___) {
 
 						@Override
 						public IStatus runInUIThread(IProgressMonitor monitor) {
@@ -417,7 +427,7 @@ public final class ConstraintTextValidator {
 				if (!canceled) {
 					final Set<Feature> deadFeatuers = getDeadFeatures(constraint, con, featureModel);
 
-					new UIJob("Updating results for dead features...") {
+					new UIJob(UPDATING_RESULTS_FOR_DEAD_FEATURES___) {
 
 						@Override
 						public IStatus runInUIThread(IProgressMonitor monitor) {
@@ -436,7 +446,7 @@ public final class ConstraintTextValidator {
 				if (!canceled) {
 					final boolean problemFoundRedundant = isRedundant(featureModel, con);
 
-					new UIJob("Updating results for redundancy...") {
+					new UIJob(UPDATING_RESULTS_FOR_REDUNDANCY___) {
 
 						@Override
 						public IStatus runInUIThread(IProgressMonitor monitor) {
@@ -453,7 +463,7 @@ public final class ConstraintTextValidator {
 				}
 				// ---------------------------------------------------------
 				if (!canceled) {
-					new UIJob("Checking complete.") {
+					new UIJob(CHECKING_COMPLETE_) {
 
 						@Override
 						public IStatus runInUIThread(IProgressMonitor monitor) {

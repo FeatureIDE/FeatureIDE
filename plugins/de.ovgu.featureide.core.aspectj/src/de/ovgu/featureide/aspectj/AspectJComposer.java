@@ -20,6 +20,10 @@
  */
 package de.ovgu.featureide.aspectj;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.EMPTY___;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.THE_REQUIRED_BUNDLE;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -66,10 +70,10 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
  * @author Jens Meinicke
  */
 // implement buildconfiguration
-@SuppressWarnings("restriction")
+@SuppressWarnings(RESTRICTION)
 public class AspectJComposer extends ComposerExtensionClass {
 	private static final String PLUGIN_ID = "org.eclipse.ajdt";
-	private static final String PLUGIN_WARNING = "The required bundle " + PLUGIN_ID + " is not installed.";
+	private static final String PLUGIN_WARNING = THE_REQUIRED_BUNDLE + PLUGIN_ID + " is not installed.";
 	private static final String ASPECTJ_NATURE = "org.eclipse.ajdt.ui.ajnature";
 
 	private static final String NEW_ASPECT = "\t// TODO Auto-generated aspect" + NEWLINE;
@@ -194,7 +198,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 		IPath[] excludedAspects = new IPath[unSelectedFeatures.size()];
 		int i = 0;
 		for (String f : unSelectedFeatures) {
-			excludedAspects[i++] = new Path(f.replaceAll("_", "/") + ".aj");
+			excludedAspects[i++] = new Path(f.replaceAll(EMPTY___, "/") + ".aj");
 		}
 		return new ClasspathEntry(e.getContentKind(), e.getEntryKind(), e.getPath(), e.getInclusionPatterns(), excludedAspects, e.getSourceAttachmentPath(),
 				e.getSourceAttachmentRootPath(), null, e.isExported(), e.getAccessRules(), e.combineAccessRules(), e.getExtraAttributes());
@@ -264,7 +268,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 		boolean hasAspects = false;
 		for (IResource res : folder.members()) {
 			if (res instanceof IFolder) {
-				hasAspects = addAspects((IFolder) res, folders + res.getName() + "_");
+				hasAspects = addAspects((IFolder) res, folders + res.getName() + EMPTY___);
 			} else if (res instanceof IFile) {
 				String name = res.getName();
 				if (name.endsWith(".aj")) {
@@ -456,7 +460,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 
 	public static IFile getAspectFile(String aspect, String aspectPackage, IFolder folder) {
 		String text = aspect.split("[_]")[0];
-		if (aspect.contains("_")) {
+		if (aspect.contains(EMPTY___)) {
 			if (aspectPackage == null) {
 				aspectPackage = text;
 			} else {
@@ -474,8 +478,8 @@ public class AspectJComposer extends ComposerExtensionClass {
 
 	private void createAspect(String aspect, IFolder folder, String aspectPackage) {
 		IFile aspectFile = getAspectFile(aspect, aspectPackage, folder);
-		if (aspectPackage == null && aspect.contains("_")) {
-			aspectPackage = aspect.substring(0, aspect.lastIndexOf('_')).replaceAll("_", ".");
+		if (aspectPackage == null && aspect.contains(EMPTY___)) {
+			aspectPackage = aspect.substring(0, aspect.lastIndexOf('_')).replaceAll(EMPTY___, ".");
 			aspect = aspect.substring(aspect.lastIndexOf('_') + 1);
 		}
 		if (!aspectFile.exists()) {

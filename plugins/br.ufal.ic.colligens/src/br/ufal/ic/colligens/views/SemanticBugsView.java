@@ -1,5 +1,7 @@
 package br.ufal.ic.colligens.views;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.SEMANTIC_BUGS___COLLIGENS;
+
 import java.util.List;
 
 import org.eclipse.swt.widgets.Composite;
@@ -19,7 +21,7 @@ public class SemanticBugsView extends ViewPart {
 	public SemanticBugsView() {
 		viewController = SemanticBugsViewController.getInstance();
 		viewController.setView(this);
-		this.setTitleToolTip("Semantic Bugs - Colligens");
+		this.setTitleToolTip(SEMANTIC_BUGS___COLLIGENS);
 	}
 
 	@Override

@@ -124,7 +124,7 @@ public class PresenceConditionController {
 						.trim();
 				if (codeNode.contains(code.trim())) {
 					// System.out.println("Presence Condition: "
-					// + node.getPresenceCondition() + ", from line "
+					// + node.getPresenceCondition() + COMMA__FROM_LINE
 					// + line + "." + node.getPositionFrom().getLine());
 					node.accept(new VisitorPrinter(false));
 					// System.out.println("\n\n");

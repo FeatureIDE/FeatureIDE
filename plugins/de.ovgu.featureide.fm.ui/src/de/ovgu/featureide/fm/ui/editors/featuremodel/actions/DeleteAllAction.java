@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE_INCLUDING_SUBFEATURES;
+
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -48,7 +50,7 @@ public class DeleteAllAction extends SingleSelectionAction {
 	 * @param featureModel
 	 */
 	public DeleteAllAction(Object viewer, FeatureModel featureModel) {
-		super("Delete including subfeatures", viewer);
+		super(DELETE_INCLUDING_SUBFEATURES, viewer);
 		this.featureModel = featureModel;
 		this.viewer = viewer;
 		setImageDescriptor(deleteImage);

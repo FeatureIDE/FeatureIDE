@@ -20,6 +20,10 @@
  */
 package de.ovgu.featureide.aspectj;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.AJ;
+import static de.ovgu.featureide.fm.core.localization.StringTable.BEFORE_AND_AFTER_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.EMPTY___;
+
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -47,7 +51,7 @@ public class AspectJFMCompserExtension extends FMComposerExtension {
 	private static String ORDER_PAGE_MESSAGE = 
 			"FeatureIDE projects based on AspectJ do not need a total order as\n" +
 			"a partial order can be defined in every aspect using the keywords\n" +
-			"'before' and 'after'.";
+			BEFORE_AND_AFTER_;
 	
 	public static final String FEATURE_NAME_PATTERN = "^[a-zA-Z]\\w*$";
 	
@@ -95,22 +99,22 @@ public class AspectJFMCompserExtension extends FMComposerExtension {
 		for (IResource res : folder.members()) {
 			if (res instanceof IFolder) {
 				renameAspect((IFolder) res, oldName, newName);
-			} else if (res instanceof IFile && "aj".equals(res.getFileExtension())) {
+			} else if (res instanceof IFile && AJ.equals(res.getFileExtension())) {
 				renameAspect((IFile) res, oldName, newName);
 			}
 		}
 	}
 
 	private String getPackege(String aspectName) {
-		if (aspectName.contains("_")) {
-			return aspectName.replaceAll("_", ".").substring(0,
+		if (aspectName.contains(EMPTY___)) {
+			return aspectName.replaceAll(EMPTY___, ".").substring(0,
 					aspectName.lastIndexOf('_'));
 		}
 		return null;
 	}
 
 	private String getAspect(String aspectName) {
-		if (aspectName.contains("_")) {
+		if (aspectName.contains(EMPTY___)) {
 			return aspectName.substring(aspectName.lastIndexOf('_') + 1,
 					aspectName.length());
 		}

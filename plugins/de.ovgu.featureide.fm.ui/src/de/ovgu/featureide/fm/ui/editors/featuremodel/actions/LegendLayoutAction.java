@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.AUTO_LAYOUT_LEGEND;
+
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -45,7 +47,7 @@ public class LegendLayoutAction extends Action {
 	};
 
 	public LegendLayoutAction(GraphicalViewerImpl viewer, FeatureModel featuremodel) {
-		super("Auto-Layout Legend");
+		super(AUTO_LAYOUT_LEGEND);
 		this.featureModel = featuremodel;
 		this.setEnabled(false);
 		this.setChecked(true);

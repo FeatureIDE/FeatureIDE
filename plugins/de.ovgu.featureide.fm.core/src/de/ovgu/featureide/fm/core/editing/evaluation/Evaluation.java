@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.editing.evaluation;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURES_EDITS_KIND_OUTPUT_FMID_EDITID_STRAT0_STRAT1_STRAT2_STRAT3;
+
 import java.io.File;
 import java.io.PrintWriter;
 import java.util.Date;
@@ -75,7 +77,7 @@ public class Evaluation {
 
 //			calculationTime(project, out);
 
-//			out.println("features	fmid	valid");
+//			out.println(FEATURES_FMID_VALID);
 //			for (int i = 1; i <= 5; i++)
 //				checkModels(project, out, i*100, i*100+39);
 			
@@ -88,7 +90,7 @@ public class Evaluation {
 	}
 
 	static void calculationTime(IProject project, PrintWriter out) {
-		out.println("features	edits	kind	output	fmid	editid	strat0	strat1	strat2	strat3");
+		out.println(FEATURES_EDITS_KIND_OUTPUT_FMID_EDITID_STRAT0_STRAT1_STRAT2_STRAT3);
 		ModelComparator[] comparator = new ModelComparator[4];
 		for (int i = 0; i < comparator.length; i++)
 			comparator[i] = new ModelComparator(60000, i);

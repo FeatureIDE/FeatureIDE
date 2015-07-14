@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.ui.wizards;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.RENAME_COLORSCHEME;
+
 import org.eclipse.jface.wizard.Wizard;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -45,7 +47,7 @@ public class RenameColorSchemeWizard extends Wizard {
 	public RenameColorSchemeWizard(FeatureModel featureModel) {
 		super();
 		this.featureModel = featureModel;
-		setWindowTitle("Rename Colorscheme");
+		setWindowTitle(RENAME_COLORSCHEME);
 	}
 
 	/**

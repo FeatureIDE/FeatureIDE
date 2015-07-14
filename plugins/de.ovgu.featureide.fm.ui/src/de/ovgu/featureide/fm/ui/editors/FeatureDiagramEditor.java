@@ -20,6 +20,16 @@
  */
 package de.ovgu.featureide.fm.ui.editors;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.ALTERNATIVE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ANALYZE_FEATURE_MODEL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.AND;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE_DIAGRAM;
+import static de.ovgu.featureide.fm.core.localization.StringTable.OR;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SET_CALCULATIONS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SET_LAYOUT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SET_NAME_TYPE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATING_FEATURE_MODEL_ATTRIBUTES;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -118,7 +128,7 @@ import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePage;
  */
 public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GUIDefaults, PropertyConstants, PropertyChangeListener, IFeatureModelEditorPage {
 
-	private static final String PAGE_TEXT = "Feature Diagram";
+	private static final String PAGE_TEXT = FEATURE_DIAGRAM;
 	private static final String ID = FMUIPlugin.PLUGIN_ID + ".editors.FeatureDiagramEditor";
 
 	private FeatureModelEditor featureModelEditor;
@@ -330,7 +340,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	}
 
 	private void fillContextMenu(IMenuManager menu) {
-		IMenuManager subMenuCalculations = new MenuManager("Set Calculations");
+		IMenuManager subMenuCalculations = new MenuManager(SET_CALCULATIONS);
 		subMenuCalculations.add(new AutomatedCalculationsAction(this, getFeatureModel()));
 		subMenuCalculations.add(new RunManualCalculationsAction(this, getFeatureModel()));
 		subMenuCalculations.add(new Separator());
@@ -341,7 +351,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 
 		showHiddenFeaturesAction.setChecked(getFeatureModel().getLayout().showHiddenFeatures());
 
-		final IMenuManager subMenuLayout = new MenuManager("Set Layout");
+		final IMenuManager subMenuLayout = new MenuManager(SET_LAYOUT);
 		for (int i = 0; i < setLayoutActions.size(); i++) {
 			subMenuLayout.add(setLayoutActions.get(i));
 			if (i == 0) {
@@ -353,7 +363,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			setLayoutActions.get(i).setEnabled(!isChosen);
 		}
 
-		final IMenuManager subMenuNameType = new MenuManager("Set Name Type");
+		final IMenuManager subMenuNameType = new MenuManager(SET_NAME_TYPE);
 		for (NameTypeSelectionAction nameType : setNameType) {
 			subMenuNameType.add(nameType);
 			nameType.setChecked(false);
@@ -438,26 +448,26 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		if (andAction.isEnabled() || orAction.isEnabled() || alternativeAction.isEnabled()) {
 			boolean connectionSelected = alternativeAction.isConnectionSelected();
 			if (andAction.isChecked()) {
-				andAction.setText("And");
+				andAction.setText(AND);
 				if (connectionSelected)
 					orAction.setText("Or (Double Click)");
 				else
-					orAction.setText("Or");
-				alternativeAction.setText("Alternative");
+					orAction.setText(OR);
+				alternativeAction.setText(ALTERNATIVE);
 			} else if (orAction.isChecked()) {
-				andAction.setText("And");
-				orAction.setText("Or");
+				andAction.setText(AND);
+				orAction.setText(OR);
 				if (connectionSelected)
 					alternativeAction.setText("Alternative (Double Click)");
 				else
-					alternativeAction.setText("Alternative");
+					alternativeAction.setText(ALTERNATIVE);
 			} else if (alternativeAction.isChecked()) {
 				if (connectionSelected)
 					andAction.setText("And (Double Click)");
 				else
-					andAction.setText("And");
-				orAction.setText("Or");
-				alternativeAction.setText("Alternative");
+					andAction.setText(AND);
+				orAction.setText(OR);
+				alternativeAction.setText(ALTERNATIVE);
 			}
 			menu.add(andAction);
 			menu.add(orAction);
@@ -555,7 +565,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 					}
 					waiting = false;
 				}
-				analyzeJob = new AStoppableJob("Analyze feature model") {
+				analyzeJob = new AStoppableJob(ANALYZE_FEATURE_MODEL) {
 					@Override
 					protected boolean work() throws Exception {
 						if (waiting) {
@@ -563,7 +573,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 						}
 
 						if (!runAnalysis) {
-							UIJob refreshGraphics = new UIJob("Updating feature model attributes") {
+							UIJob refreshGraphics = new UIJob(UPDATING_FEATURE_MODEL_ATTRIBUTES) {
 
 								@Override
 								public IStatus runInUIThread(IProgressMonitor monitor) {
@@ -608,7 +618,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	 *            all features should be refreshed.
 	 */
 	private void refreshGraphics(final HashMap<Object, Object> changedAttributes) {
-		UIJob refreshGraphics = new UIJob("Updating feature model attributes") {
+		UIJob refreshGraphics = new UIJob(UPDATING_FEATURE_MODEL_ATTRIBUTES) {
 
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {

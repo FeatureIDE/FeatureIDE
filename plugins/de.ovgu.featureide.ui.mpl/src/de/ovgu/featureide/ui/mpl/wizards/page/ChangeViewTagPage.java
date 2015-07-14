@@ -20,6 +20,12 @@
  */
 package de.ovgu.featureide.ui.mpl.wizards.page;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CREATES_A_MULTI_FEATUREIDE_PROJECT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ENTER_A_NUMBER;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ENTER_A_VIEW_NAME;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SCALE_UP_VIEW_TAG;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SELECT_A_COMPOSER;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -44,8 +50,8 @@ public class ChangeViewTagPage extends AbstractWizardPage {
 	
 	public ChangeViewTagPage() {
 		super("");
-		setTitle("Select a composer");
-		setDescription("Creates a Multi-FeatureIDE project");
+		setTitle(SELECT_A_COMPOSER);
+		setDescription(CREATES_A_MULTI_FEATUREIDE_PROJECT);
 	}
 
 	public void createControl(Composite parent) {
@@ -59,7 +65,7 @@ public class ChangeViewTagPage extends AbstractWizardPage {
 		projGridLayout.numColumns = 2;
 		
 		Group configGroup = new Group(container, SWT.NONE);
-		configGroup.setText("Scale Up View Tag");
+		configGroup.setText(SCALE_UP_VIEW_TAG);
 		GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
 		gridData.horizontalSpan = 2;
 		gridData.verticalSpan = 2;
@@ -98,12 +104,12 @@ public class ChangeViewTagPage extends AbstractWizardPage {
 	@Override
 	protected String checkPage() {
 		if (viewNameText.getText().isEmpty()) {
-			return "Enter a view name";
+			return ENTER_A_VIEW_NAME;
 		}
 		try {
 			Integer.valueOf(viewLevelText.getText());
 		} catch (NumberFormatException e) {
-			return "Enter a number";
+			return ENTER_A_NUMBER;
 		}
 		return null;
 	}	

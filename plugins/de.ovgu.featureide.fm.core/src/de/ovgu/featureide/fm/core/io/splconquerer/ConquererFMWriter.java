@@ -20,6 +20,16 @@
  */
 package de.ovgu.featureide.fm.core.io.splconquerer;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CHILD;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CLASSES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CLAUSE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DYNAMIC;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ELEMENT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.OPTIONAL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ORDER;
+import static de.ovgu.featureide.fm.core.localization.StringTable.TYPE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.YES;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
@@ -136,7 +146,7 @@ public class ConquererFMWriter extends AbstractFeatureModelWriter {
     	Element furtherConstraints = doc.createElement("furtherConstraints");
     	plm.appendChild(furtherConstraints);
     	for (Node child : furtherNodes) {
-			Element clause = doc.createElement("clause");
+			Element clause = doc.createElement(CLAUSE);
 			furtherConstraints.appendChild(clause);
 			clause.appendChild(doc.createTextNode(child.toString()));
 		}
@@ -151,13 +161,13 @@ public class ConquererFMWriter extends AbstractFeatureModelWriter {
     }
   
 	private void generateElement(Document doc, Element node, Feature feature) {
-    	Element element = doc.createElement("element");
+    	Element element = doc.createElement(ELEMENT);
     	node.appendChild(element);
 		element.setAttribute("id", getID(feature.getName()));
 		element.setAttribute("name", feature.getName());
-		element.setAttribute("type", "feature");
-		element.setAttribute("optional", feature.isMandatory() ? "false" : "true");
-		element.setAttribute("dynamic", "false");
+		element.setAttribute(TYPE, "feature");
+		element.setAttribute(OPTIONAL, feature.isMandatory() ? "false" : "true");
+		element.setAttribute(DYNAMIC, "false");
     	
     	element.appendChild(doc.createElement("path_absolut"));
     	element.appendChild(doc.createElement("path_relativ"));
@@ -175,7 +185,7 @@ public class ConquererFMWriter extends AbstractFeatureModelWriter {
     	
     	Element alternative = doc.createElement("constraint");
     	constraints.appendChild(alternative);
-		alternative.setAttribute("type", "alternative");
+		alternative.setAttribute(TYPE, "alternative");
     	if (!feature.isRoot() && feature.getParent().isAlternative()) {
         	for (Feature childFeature : feature.getParent().getChildren())
         		if (childFeature != feature) {
@@ -192,7 +202,7 @@ public class ConquererFMWriter extends AbstractFeatureModelWriter {
 
     	Element commulative = doc.createElement("constraint");
     	constraints.appendChild(commulative);
-    	commulative.setAttribute("type", "commulative");
+    	commulative.setAttribute(TYPE, "commulative");
     	if (!feature.isRoot() && feature.getParent().isOr()) {
         	for (Feature childFeature : feature.getParent().getChildren())
         		if (childFeature != feature) {
@@ -209,7 +219,7 @@ public class ConquererFMWriter extends AbstractFeatureModelWriter {
 
     	Element requires = doc.createElement("constraint");
     	constraints.appendChild(requires);
-    	requires.setAttribute("type", "requires");
+    	requires.setAttribute(TYPE, "requires");
     	Set<String> requireFeature = require.get(feature.getName());
     	if (requireFeature != null)
 	    	for (String childFeature : requireFeature) {
@@ -225,7 +235,7 @@ public class ConquererFMWriter extends AbstractFeatureModelWriter {
 
     	Element excludes = doc.createElement("constraint");
     	constraints.appendChild(excludes);
-    	excludes.setAttribute("type", "excludes");
+    	excludes.setAttribute(TYPE, "excludes");
     	Set<String> excludeFeature = exclude.get(feature.getName());
     	if (excludeFeature != null)
 	    	for (String childFeature : excludeFeature) {
@@ -242,16 +252,16 @@ public class ConquererFMWriter extends AbstractFeatureModelWriter {
     	Element childElements = doc.createElement("childElements");
     	element.appendChild(childElements);
     	for (Feature childFeature : feature.getChildren()) {
-        	Element child = doc.createElement("child");
+        	Element child = doc.createElement(CHILD);
         	childElements.appendChild(child);
-    		child.setAttribute("optional", childFeature.isMandatory() ? "false" : "true");
+    		child.setAttribute(OPTIONAL, childFeature.isMandatory() ? "false" : "true");
         	Element id = doc.createElement("id");
         	child.appendChild(id);
         	id.appendChild(doc.createTextNode(getID(childFeature.getName())));
 		}
     	
-    	element.appendChild(doc.createElement("order"));
-    	element.appendChild(doc.createElement("classes"));
+    	element.appendChild(doc.createElement(ORDER));
+    	element.appendChild(doc.createElement(CLASSES));
 	}
 
 	/**
@@ -328,7 +338,7 @@ public class ConquererFMWriter extends AbstractFeatureModelWriter {
 		}
 		
 		transfo.setOutputProperty(OutputKeys.METHOD, "xml");
-		transfo.setOutputProperty(OutputKeys.INDENT, "yes");
+		transfo.setOutputProperty(OutputKeys.INDENT, YES);
 		StreamResult result = new StreamResult(new StringWriter());
 		DOMSource source = new DOMSource(doc);
 		try {

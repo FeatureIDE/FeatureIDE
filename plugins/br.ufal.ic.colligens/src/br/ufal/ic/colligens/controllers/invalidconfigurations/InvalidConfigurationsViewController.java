@@ -1,5 +1,8 @@
 package br.ufal.ic.colligens.controllers.invalidconfigurations;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.DESCRIPTION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE_CONFIGURATION;
+
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.List;
@@ -200,8 +203,8 @@ public class InvalidConfigurationsViewController extends ViewController {
 	}
 
 	public void createColumns(Tree tree) {
-		String[] titles = { "Description", "Resource", "Path",
-				"Feature configuration", "Severity" };
+		String[] titles = { DESCRIPTION, "Resource", "Path",
+				FEATURE_CONFIGURATION, "Severity" };
 		int[] bounds = { 300, 100, 100, 300, 100 };
 
 		for (int i = 0; i < bounds.length; i++) {

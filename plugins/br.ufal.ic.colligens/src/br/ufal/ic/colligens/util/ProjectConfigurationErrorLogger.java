@@ -1,5 +1,7 @@
 package br.ufal.ic.colligens.util;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CLEAR_LOG_LIST;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -12,7 +14,7 @@ public class ProjectConfigurationErrorLogger {
 	}
 	
 	public void clearLogList(){
-		System.out.println("Clear log List");
+		System.out.println(CLEAR_LOG_LIST);
 		projectsName.clear();
 	}
 	

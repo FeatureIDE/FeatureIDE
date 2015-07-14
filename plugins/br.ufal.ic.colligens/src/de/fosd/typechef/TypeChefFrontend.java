@@ -1,5 +1,7 @@
 package de.fosd.typechef;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.FILE_HAS_CONTRADICTORY_PRESENCE_CONDITION__EXISTING_;
+
 import java.io.File;
 
 import scala.Function3;
@@ -133,7 +135,7 @@ public final class TypeChefFrontend {
 	// .get("dataFlow"))).toString());
 	// } else {
 	// System.out
-	// .println("file has contradictory presence condition. existing.");
+	// .println(FILE_HAS_CONTRADICTORY_PRESENCE_CONDITION__EXISTING_);
 	// }
 	// }
 
@@ -154,7 +156,7 @@ public final class TypeChefFrontend {
 								// feature model with file presence conditions
 		if (!opt.getFilePresenceCondition().isSatisfiable(fm)) {
 			System.out
-					.println("file has contradictory presence condition. existing."); // otherwise
+					.println(FILE_HAS_CONTRADICTORY_PRESENCE_CONDITION__EXISTING_); // otherwise
 																						// this
 																						// can
 																						// lead

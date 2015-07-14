@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.AUTOMATED_CALCULATIONS;
+
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 
@@ -40,7 +42,7 @@ public class AutomatedCalculationsAction extends Action {
 	private final FeatureModel featureModel;
 
 	public AutomatedCalculationsAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
-		super("Automated Calculations");
+		super(AUTOMATED_CALCULATIONS);
 		this.featureModel = featureModel;
 		setChecked(featureModel.getAnalyser().runCalculationAutomatically);
 	}

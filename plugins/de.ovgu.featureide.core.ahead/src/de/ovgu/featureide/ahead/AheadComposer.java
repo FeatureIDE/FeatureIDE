@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.ahead;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.AHEAD_INSTANCE_NOT_INITIALIZED;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -85,7 +87,7 @@ public class AheadComposer extends ComposerExtensionClass {
 	}
 
 	public void performFullBuild(IFile config) {
-		assert (ahead != null) : "Ahead instance not initialized";
+		assert (ahead != null) : AHEAD_INSTANCE_NOT_INITIALIZED;
 		try {
 			correctSourceFiles(featureProject.getSourceFolder());
 			ahead.setConfiguration(config);

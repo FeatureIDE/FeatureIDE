@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.fm.core;
  
+import static de.ovgu.featureide.fm.core.localization.StringTable.STARTING_FEATUREIDE_PLUG_IN_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.STOPPING_FEATUREIDE_PLUG_IN_;
+
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
@@ -45,7 +48,7 @@ abstract public class AbstractCorePlugin extends Plugin {
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
-		logInfo("Starting FeatureIDE plug-in '" + getID() + "'");
+		logInfo(STARTING_FEATUREIDE_PLUG_IN_ + getID() + "'");
 	}
 
 	/*
@@ -53,7 +56,7 @@ abstract public class AbstractCorePlugin extends Plugin {
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception {
-		logInfo("Stopping FeatureIDE plug-in '" + getID() + "'");
+		logInfo(STOPPING_FEATUREIDE_PLUG_IN_ + getID() + "'");
 		super.stop(context);
 	}
 	

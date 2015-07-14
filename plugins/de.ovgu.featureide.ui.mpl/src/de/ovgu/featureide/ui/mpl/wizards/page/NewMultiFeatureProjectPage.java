@@ -20,6 +20,12 @@
  */
 package de.ovgu.featureide.ui.mpl.wizards.page;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CREATES_A_MULTI_FEATUREIDE_PROJECT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.PLEASE_SELECT_TWO_OR_MORE_PROJECTS_FROM_BELOW_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.PROJECTS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SELECT_AT_LEAST_ONE_PROJECT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SELECT_A_COMPOSER;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -55,8 +61,8 @@ public class NewMultiFeatureProjectPage extends AbstractWizardPage {
 	
 	public NewMultiFeatureProjectPage() {
 		super("");
-		setTitle("Select a composer");
-		setDescription("Creates a Multi-FeatureIDE project");
+		setTitle(SELECT_A_COMPOSER);
+		setDescription(CREATES_A_MULTI_FEATUREIDE_PROJECT);
 	}
 
 	public void createControl(Composite parent) {
@@ -77,7 +83,7 @@ public class NewMultiFeatureProjectPage extends AbstractWizardPage {
 		GridData gridData = new GridData(GridData.FILL_BOTH);
 		gridData.horizontalSpan = 2;
 		helloLabel.setLayoutData(gridData);
-		helloLabel.setText("Please select two or more projects from below.");
+		helloLabel.setText(PLEASE_SELECT_TWO_OR_MORE_PROJECTS_FROM_BELOW_);
 
 		projectTable = new Table(toolGroup, SWT.CHECK | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
 		projectTable.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -85,7 +91,7 @@ public class NewMultiFeatureProjectPage extends AbstractWizardPage {
 		projectTable.setHeaderVisible(true);
 		projectTable.setLinesVisible(true);
 		TableColumn column = new TableColumn(projectTable, SWT.NONE);
-		column.setText("Projects");
+		column.setText(PROJECTS);
 		column.setResizable(true);
 		column.setMoveable(false);
 
@@ -128,7 +134,7 @@ public class NewMultiFeatureProjectPage extends AbstractWizardPage {
 
 	protected void dialogChanged() {
 		if (sel.size() == 0) {
-			updateStatus("Select at least one project");
+			updateStatus(SELECT_AT_LEAST_ONE_PROJECT);
 		} else {
 			updateStatus(null);
 		}

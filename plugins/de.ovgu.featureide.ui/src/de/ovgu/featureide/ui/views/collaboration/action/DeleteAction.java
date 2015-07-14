@@ -20,6 +20,13 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.action;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.ALL_FILES_OF_CLASS_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ALL_FILES_OF_FEATURE_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE_RESOURCES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.OK;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ROLE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.THE_ROLE_OF_CLASS_;
+
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
@@ -63,7 +70,7 @@ public class DeleteAction extends Action {
 			super.setEnabled(false);
 		} else {
 			if (part instanceof RoleEditPart)
-				super.setText(text + " Role");
+				super.setText(text + ROLE);
 			if (part instanceof ClassEditPart)
 				super.setText(text + " Class");
 			if (part instanceof CollaborationEditPart)
@@ -76,8 +83,8 @@ public class DeleteAction extends Action {
 	}
 
 	public void run() {
-		MessageDialog messageDialog = new MessageDialog(null, "Delete Resources", null, "Are you sure you want to remove "
-				+ getDialogText(), MessageDialog.INFORMATION, new String[] { "OK", "Cancel" }, 0);
+		MessageDialog messageDialog = new MessageDialog(null, DELETE_RESOURCES, null, "Are you sure you want to remove "
+				+ getDialogText(), MessageDialog.INFORMATION, new String[] { OK, "Cancel" }, 0);
 		if (messageDialog.open() != 0) {
 			return;
 		}
@@ -118,13 +125,13 @@ public class DeleteAction extends Action {
 	private String getDialogText() {
 		if (part instanceof RoleEditPart) {
 			FSTRole role = ((RoleEditPart) part).getRoleModel();
-			return "the role of class '" + role.getClassFragment().getName() + "' at feature '" + role.getFeature().getName() + "'";
+			return THE_ROLE_OF_CLASS_ + role.getClassFragment().getName() + "' at feature '" + role.getFeature().getName() + "'";
 		} else if (part instanceof ClassEditPart) {
 			FSTClass c = ((ClassEditPart) part).getClassModel();
-			return "all files of class '" + c.getName() + "'?";
+			return ALL_FILES_OF_CLASS_ + c.getName() + "'?";
 		} else if (part instanceof CollaborationEditPart) {
 			FSTFeature coll = ((CollaborationEditPart) part).getCollaborationModel();
-			return " all files of feature '" + coll.getName() + "'?";
+			return ALL_FILES_OF_FEATURE_ + coll.getName() + "'?";
 		}
 		return null;
 	}

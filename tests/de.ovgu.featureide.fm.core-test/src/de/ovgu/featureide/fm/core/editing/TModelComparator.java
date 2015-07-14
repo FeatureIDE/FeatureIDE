@@ -23,7 +23,6 @@ package de.ovgu.featureide.fm.core.editing;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashSet;
 import java.util.Set;
@@ -36,11 +35,9 @@ import org.sat4j.specs.TimeoutException;
 import de.ovgu.featureide.common.Commons;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslReader;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 
 /**
  * Checks that the calculation of edit categories works properly. A couple of

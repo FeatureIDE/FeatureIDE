@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.ui.wizards;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.NEW_COLORSCHEME;
+
 import org.eclipse.jface.wizard.Wizard;
 
 import de.ovgu.featureide.fm.core.ColorschemeTable;
@@ -42,7 +44,7 @@ public class NewColorSchemeWizard extends Wizard {
 
 	public NewColorSchemeWizard(FeatureModel featureModel) {
 		super();
-		setWindowTitle("New Colorscheme");
+		setWindowTitle(NEW_COLORSCHEME);
 		this.featureModel = featureModel;
 	}
 

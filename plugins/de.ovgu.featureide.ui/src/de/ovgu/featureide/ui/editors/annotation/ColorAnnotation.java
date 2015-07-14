@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.ui.editors.annotation;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.COLOR_ANNOTATION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RED;
+
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
 
@@ -38,7 +41,7 @@ public class ColorAnnotation extends Annotation {
 	private static final String[] ANNOTATIONTYPE_ID = new String[31];
 	static {
 		String PREFIX = "de.ovgu.featureide.ui.editors.annotations.";
-		String[] COLORS = {	"red", "orange", "yellow", "darkgreen",	"lightgreen", 
+		String[] COLORS = {	RED, "orange", "yellow", "darkgreen",	"lightgreen", 
 							"cyan", "lightgrey", "blue", "margenta", "pink"};
 		ANNOTATIONTYPE_ID[0] = PREFIX + "image";
 		
@@ -52,7 +55,7 @@ public class ColorAnnotation extends Annotation {
 	private final int type;
 	
 	public ColorAnnotation(int id, Position posistion, int annotationtype) {
-		super(getTypeString(id, annotationtype), false, "Color Annotation");
+		super(getTypeString(id, annotationtype), false, COLOR_ANNOTATION);
 		this.position = posistion;
 		this.id = id;
 		this.type = annotationtype;

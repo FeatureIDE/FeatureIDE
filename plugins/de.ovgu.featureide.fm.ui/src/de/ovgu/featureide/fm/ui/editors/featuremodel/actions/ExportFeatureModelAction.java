@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.EXPORT_AS;
+
 import org.eclipse.jface.action.Action;
 
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
@@ -36,7 +38,7 @@ public class ExportFeatureModelAction extends Action {
 	private final FeatureModelEditor featureModelEditor;
 
 	public ExportFeatureModelAction(FeatureModelEditor featureModelEditor) {
-		super("Export As");
+		super(EXPORT_AS);
 		this.featureModelEditor = featureModelEditor;
 		setEnabled(true);
 	}

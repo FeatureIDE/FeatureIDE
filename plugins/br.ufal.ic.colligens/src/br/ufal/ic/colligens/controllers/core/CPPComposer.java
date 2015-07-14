@@ -1,5 +1,11 @@
 package br.ufal.ic.colligens.controllers.core;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.C_HEADER_FILE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DISPLAY_IS_NULL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IS_NOT_INSTALLED_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.PREPROCESSOR_ANNOTATION_CHECKING;
+import static de.ovgu.featureide.fm.core.localization.StringTable.THE_REQUIRED_BUNDLE;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -64,8 +70,8 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 public class CPPComposer extends PPComposerExtensionClass {
 
 	private static final String PLUGIN_CDT_ID = "org.eclipse.cdt";
-	private static final String PLUGIN_WARNING = "The required bundle "
-			+ PLUGIN_CDT_ID + " is not installed.";
+	private static final String PLUGIN_WARNING = THE_REQUIRED_BUNDLE
+			+ PLUGIN_CDT_ID + IS_NOT_INSTALLED_;
 	public static final String COMPOSER_ID = Colligens.PLUGIN_ID
 			+ ".cppcomposer";
 	public static final String C_NATURE = "org.eclipse.cdt.core.cnature";
@@ -204,7 +210,7 @@ public class CPPComposer extends PPComposerExtensionClass {
 
 	private void annotationChecking() {
 		deleteAllPreprocessorAnotationMarkers();
-		Job job = new Job("preprocessor annotation checking") {
+		Job job = new Job(PREPROCESSOR_ANNOTATION_CHECKING) {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				annotationChecking(featureProject.getSourceFolder());
@@ -477,7 +483,7 @@ public class CPPComposer extends PPComposerExtensionClass {
 
 			final Display display = Display.getDefault();
 			if (display == null) {
-				throw new NullPointerException("Display is null");
+				throw new NullPointerException(DISPLAY_IS_NULL);
 			}
 
 			display.syncExec(new Runnable() {
@@ -582,7 +588,7 @@ public class CPPComposer extends PPComposerExtensionClass {
 		list.add(new String[] { "C Source File", "c",
 				"\r\n" + "int main(int argc, char **argv)" + " {\r\n\r\n}" });
 		list.add(new String[] {
-				"C Header File",
+				C_HEADER_FILE,
 				"h",
 				"#ifndef " + CLASS_NAME_PATTERN + "_H_\n" + "#define "
 						+ CLASS_NAME_PATTERN + "_H_\n\n\n" + "#endif /* "
@@ -644,7 +650,7 @@ public class CPPComposer extends PPComposerExtensionClass {
 		if (threadInExecId.isEmpty()) {
 			final Display display = Display.getDefault();
 			if (display == null) {
-				throw new NullPointerException("Display is null");
+				throw new NullPointerException(DISPLAY_IS_NULL);
 			}
 			display.syncExec(new Runnable() {
 				@Override

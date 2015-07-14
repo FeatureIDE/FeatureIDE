@@ -22,17 +22,55 @@
 
 package de.ovgu.featureide.fm.core.io.velvet;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.ALL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RULE_ATTRIBCONSTRAINT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RULE_BINARYOP;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RULE_BOOLATTRIBUTE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RULE_CONCEPTBASEEXT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RULE_CONSTRAINTDEFINITION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RULE_CONSTRAINTOPERAND;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RULE_DEFINITION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RULE_DEFINITIONS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RULE_FEATURE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RULE_FLOATATTRIBUTE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RULE_GROUPTYPE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RULE_INSTANCEIMPORTS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RULE_INTATTRIBUTE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RULE_INTERFACEIMPORTS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RULE_NAME;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RULE_RETVAL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RULE_STRINGATTRIBUTE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.TOKEN_ABSTRACT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.TOKEN_DESCRIPTION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.TOKEN_FEATURE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.TOKEN_MANDATORY;
+import static de.ovgu.featureide.fm.core.localization.StringTable.TOKEN_SEMI;
+import static de.ovgu.featureide.fm.core.localization.StringTable.TOKEN_STRING;
+import static de.ovgu.featureide.fm.core.localization.StringTable.TOKEN_USE;
+
+import org.antlr.runtime.BaseRecognizer;
+import org.antlr.runtime.BitSet;
+import org.antlr.runtime.DFA;
+import org.antlr.runtime.EarlyExitException;
+import org.antlr.runtime.MismatchedSetException;
+import org.antlr.runtime.NoViableAltException;
+import org.antlr.runtime.Parser;
+import org.antlr.runtime.ParserRuleReturnScope;
+import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.RecognizerSharedState;
+import org.antlr.runtime.Token;
+import org.antlr.runtime.TokenStream;
+import org.antlr.runtime.tree.CommonTreeAdaptor;
+import org.antlr.runtime.tree.RewriteEarlyExitException;
+import org.antlr.runtime.tree.RewriteRuleSubtreeStream;
+import org.antlr.runtime.tree.RewriteRuleTokenStream;
+import org.antlr.runtime.tree.Tree;
+import org.antlr.runtime.tree.TreeAdaptor;
+
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 
-import org.antlr.runtime.*;
-import java.util.Stack;
-import java.util.List;
-import java.util.ArrayList;
 
-import org.antlr.runtime.tree.*;
-
-
-@SuppressWarnings({"all", "warnings", "unchecked"})
+@SuppressWarnings({ALL, "warnings", "unchecked"})
 public class VelvetParser extends Parser {
     public static final String[] tokenNames = new String[] {
         "<invalid>", "<EOR>", "<DOWN>", "<UP>", "ABSTRACT", "ACONSTR", "ATTR", "ATTR_OP_EQUALS", "ATTR_OP_GREATER", "ATTR_OP_GREATER_EQ", "ATTR_OP_LESS", "ATTR_OP_LESS_EQ", "ATTR_OP_NOT_EQUALS", "BASEEXT", "BOOLEAN", "CINTERFACE", "COLON", "COMMA", "CONCEPT", "CONSTR", "CONSTRAINT", "DEF", "DESCRIPTION", "EMPTY", "END_C", "END_R", "EQ", "ESC_SEQ", "EXPONENT", "FEATURE", "FLOAT", "GROUP", "HEX_DIGIT", "ID", "IDPath", "IMPORTINSTANCE", "IMPORTINTERFACE", "INT", "MANDATORY", "MINUS", "ML_COMMENT", "OCTAL_ESC", "ONEOF", "OPERAND", "OP_AND", "OP_EQUIVALENT", "OP_IMPLIES", "OP_NOT", "OP_OR", "OP_XOR", "PLUS", "SEMI", "SL_COMMENT", "SOMEOF", "START_C", "START_R", "STRING", "UNARYOP", "UNICODE_ESC", "USE", "VAR_BOOL", "VAR_FLOAT", "VAR_INT", "VAR_STRING", "WS"
@@ -247,7 +285,7 @@ public TreeAdaptor getTreeAdaptor() {
     };
 
 
-    // $ANTLR start "concept"
+    // $ANTLR start CONCEPT
     // Velvet.g:80:1: concept : CONCEPT ID ( COLON conceptBaseExt )? ( instanceImports interfaceImports | interfaceImports instanceImports | interfaceImports | instanceImports )? ( definitions )? -> ^( CONCEPT ID ( conceptBaseExt )? ( instanceImports )? ( interfaceImports )? ( definitions )? ) ;
     public final VelvetParser.concept_return concept() throws RecognitionException {
         VelvetParser.concept_return retval = new VelvetParser.concept_return();
@@ -282,10 +320,10 @@ public TreeAdaptor getTreeAdaptor() {
         RewriteRuleTokenStream stream_COLON=new RewriteRuleTokenStream(adaptor,"token COLON");
         RewriteRuleTokenStream stream_ID=new RewriteRuleTokenStream(adaptor,"token ID");
         RewriteRuleTokenStream stream_CONCEPT=new RewriteRuleTokenStream(adaptor,"token CONCEPT");
-        RewriteRuleSubtreeStream stream_conceptBaseExt=new RewriteRuleSubtreeStream(adaptor,"rule conceptBaseExt");
-        RewriteRuleSubtreeStream stream_instanceImports=new RewriteRuleSubtreeStream(adaptor,"rule instanceImports");
-        RewriteRuleSubtreeStream stream_interfaceImports=new RewriteRuleSubtreeStream(adaptor,"rule interfaceImports");
-        RewriteRuleSubtreeStream stream_definitions=new RewriteRuleSubtreeStream(adaptor,"rule definitions");
+        RewriteRuleSubtreeStream stream_conceptBaseExt=new RewriteRuleSubtreeStream(adaptor,RULE_CONCEPTBASEEXT);
+        RewriteRuleSubtreeStream stream_instanceImports=new RewriteRuleSubtreeStream(adaptor,RULE_INSTANCEIMPORTS);
+        RewriteRuleSubtreeStream stream_interfaceImports=new RewriteRuleSubtreeStream(adaptor,RULE_INTERFACEIMPORTS);
+        RewriteRuleSubtreeStream stream_definitions=new RewriteRuleSubtreeStream(adaptor,RULE_DEFINITIONS);
         try {
             // Velvet.g:81:2: ( CONCEPT ID ( COLON conceptBaseExt )? ( instanceImports interfaceImports | interfaceImports instanceImports | interfaceImports | instanceImports )? ( definitions )? -> ^( CONCEPT ID ( conceptBaseExt )? ( instanceImports )? ( interfaceImports )? ( definitions )? ) )
             // Velvet.g:81:4: CONCEPT ID ( COLON conceptBaseExt )? ( instanceImports interfaceImports | interfaceImports instanceImports | interfaceImports | instanceImports )? ( definitions )?
@@ -428,7 +466,7 @@ public TreeAdaptor getTreeAdaptor() {
             // rule list labels: 
             // wildcard labels: 
             retval.tree = root_0;
-            RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
+            RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,RULE_RETVAL,retval!=null?retval.tree:null);
 
             root_0 = (Tree)adaptor.nil();
             // 84:2: -> ^( CONCEPT ID ( conceptBaseExt )? ( instanceImports )? ( interfaceImports )? ( definitions )? )
@@ -501,7 +539,7 @@ public TreeAdaptor getTreeAdaptor() {
         }
         return retval;
     }
-    // $ANTLR end "concept"
+    // $ANTLR end CONCEPT
 
 
     public static class cinterface_return extends ParserRuleReturnScope {
@@ -533,8 +571,8 @@ public TreeAdaptor getTreeAdaptor() {
         RewriteRuleTokenStream stream_COLON=new RewriteRuleTokenStream(adaptor,"token COLON");
         RewriteRuleTokenStream stream_ID=new RewriteRuleTokenStream(adaptor,"token ID");
         RewriteRuleTokenStream stream_CINTERFACE=new RewriteRuleTokenStream(adaptor,"token CINTERFACE");
-        RewriteRuleSubtreeStream stream_conceptBaseExt=new RewriteRuleSubtreeStream(adaptor,"rule conceptBaseExt");
-        RewriteRuleSubtreeStream stream_definitions=new RewriteRuleSubtreeStream(adaptor,"rule definitions");
+        RewriteRuleSubtreeStream stream_conceptBaseExt=new RewriteRuleSubtreeStream(adaptor,RULE_CONCEPTBASEEXT);
+        RewriteRuleSubtreeStream stream_definitions=new RewriteRuleSubtreeStream(adaptor,RULE_DEFINITIONS);
         try {
             // Velvet.g:87:12: ( CINTERFACE ID ( COLON conceptBaseExt )? definitions -> ^( CINTERFACE ID ( conceptBaseExt )? definitions ) )
             // Velvet.g:87:14: CINTERFACE ID ( COLON conceptBaseExt )? definitions
@@ -590,7 +628,7 @@ public TreeAdaptor getTreeAdaptor() {
             // rule list labels: 
             // wildcard labels: 
             retval.tree = root_0;
-            RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
+            RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,RULE_RETVAL,retval!=null?retval.tree:null);
 
             root_0 = (Tree)adaptor.nil();
             // 88:2: -> ^( CINTERFACE ID ( conceptBaseExt )? definitions )
@@ -720,7 +758,7 @@ public TreeAdaptor getTreeAdaptor() {
             // rule list labels: 
             // wildcard labels: 
             retval.tree = root_0;
-            RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
+            RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,RULE_RETVAL,retval!=null?retval.tree:null);
 
             root_0 = (Tree)adaptor.nil();
             // 93:2: -> ^( BASEEXT ( ID )+ )
@@ -806,7 +844,7 @@ public TreeAdaptor getTreeAdaptor() {
         RewriteRuleTokenStream stream_ID=new RewriteRuleTokenStream(adaptor,"token ID");
         RewriteRuleTokenStream stream_COMMA=new RewriteRuleTokenStream(adaptor,"token COMMA");
         RewriteRuleTokenStream stream_IMPORTINSTANCE=new RewriteRuleTokenStream(adaptor,"token IMPORTINSTANCE");
-        RewriteRuleSubtreeStream stream_name=new RewriteRuleSubtreeStream(adaptor,"rule name");
+        RewriteRuleSubtreeStream stream_name=new RewriteRuleSubtreeStream(adaptor,RULE_NAME);
         try {
             // Velvet.g:97:2: ( IMPORTINSTANCE ID name ( COMMA ID name )* -> ^( IMPORTINSTANCE ( ID name )+ ) )
             // Velvet.g:97:4: IMPORTINSTANCE ID name ( COMMA ID name )*
@@ -873,7 +911,7 @@ public TreeAdaptor getTreeAdaptor() {
             // rule list labels: 
             // wildcard labels: 
             retval.tree = root_0;
-            RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
+            RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,RULE_RETVAL,retval!=null?retval.tree:null);
 
             root_0 = (Tree)adaptor.nil();
             // 98:2: -> ^( IMPORTINSTANCE ( ID name )+ )
@@ -962,7 +1000,7 @@ public TreeAdaptor getTreeAdaptor() {
         RewriteRuleTokenStream stream_ID=new RewriteRuleTokenStream(adaptor,"token ID");
         RewriteRuleTokenStream stream_COMMA=new RewriteRuleTokenStream(adaptor,"token COMMA");
         RewriteRuleTokenStream stream_IMPORTINTERFACE=new RewriteRuleTokenStream(adaptor,"token IMPORTINTERFACE");
-        RewriteRuleSubtreeStream stream_name=new RewriteRuleSubtreeStream(adaptor,"rule name");
+        RewriteRuleSubtreeStream stream_name=new RewriteRuleSubtreeStream(adaptor,RULE_NAME);
         try {
             // Velvet.g:102:2: ( IMPORTINTERFACE ID name ( COMMA ID name )* -> ^( IMPORTINTERFACE ( ID name )+ ) )
             // Velvet.g:102:4: IMPORTINTERFACE ID name ( COMMA ID name )*
@@ -1029,7 +1067,7 @@ public TreeAdaptor getTreeAdaptor() {
             // rule list labels: 
             // wildcard labels: 
             retval.tree = root_0;
-            RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
+            RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,RULE_RETVAL,retval!=null?retval.tree:null);
 
             root_0 = (Tree)adaptor.nil();
             // 103:2: -> ^( IMPORTINTERFACE ( ID name )+ )
@@ -1176,7 +1214,7 @@ public TreeAdaptor getTreeAdaptor() {
         Tree END_C38_tree=null;
         RewriteRuleTokenStream stream_END_C=new RewriteRuleTokenStream(adaptor,"token END_C");
         RewriteRuleTokenStream stream_START_C=new RewriteRuleTokenStream(adaptor,"token START_C");
-        RewriteRuleSubtreeStream stream_definition=new RewriteRuleSubtreeStream(adaptor,"rule definition");
+        RewriteRuleSubtreeStream stream_definition=new RewriteRuleSubtreeStream(adaptor,RULE_DEFINITION);
         try {
             // Velvet.g:111:2: ( START_C definition END_C -> ^( DEF ( definition )? EMPTY ) )
             // Velvet.g:111:4: START_C definition END_C
@@ -1204,7 +1242,7 @@ public TreeAdaptor getTreeAdaptor() {
             // rule list labels: 
             // wildcard labels: 
             retval.tree = root_0;
-            RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
+            RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,RULE_RETVAL,retval!=null?retval.tree:null);
 
             root_0 = (Tree)adaptor.nil();
             // 112:2: -> ^( DEF ( definition )? EMPTY )
@@ -1265,7 +1303,7 @@ public TreeAdaptor getTreeAdaptor() {
     };
 
 
-    // $ANTLR start "definition"
+    // $ANTLR start DEFINITION
     // Velvet.g:115:1: definition : ( nonFeatureDefinition )* ( ( featureGroup ( nonFeatureDefinition )* ) | ( feature ( feature | nonFeatureDefinition )* ) )? ;
     public final VelvetParser.definition_return definition() throws RecognitionException {
         VelvetParser.definition_return retval = new VelvetParser.definition_return();
@@ -1475,7 +1513,7 @@ public TreeAdaptor getTreeAdaptor() {
         }
         return retval;
     }
-    // $ANTLR end "definition"
+    // $ANTLR end DEFINITION
 
 
     public static class nonFeatureDefinition_return extends ParserRuleReturnScope {
@@ -1645,9 +1683,9 @@ public TreeAdaptor getTreeAdaptor() {
 
         Tree USE49_tree=null;
         Tree SEMI51_tree=null;
-        RewriteRuleTokenStream stream_USE=new RewriteRuleTokenStream(adaptor,"token USE");
-        RewriteRuleTokenStream stream_SEMI=new RewriteRuleTokenStream(adaptor,"token SEMI");
-        RewriteRuleSubtreeStream stream_name=new RewriteRuleSubtreeStream(adaptor,"rule name");
+        RewriteRuleTokenStream stream_USE=new RewriteRuleTokenStream(adaptor,TOKEN_USE);
+        RewriteRuleTokenStream stream_SEMI=new RewriteRuleTokenStream(adaptor,TOKEN_SEMI);
+        RewriteRuleSubtreeStream stream_name=new RewriteRuleSubtreeStream(adaptor,RULE_NAME);
         try {
             // Velvet.g:128:5: ( USE name SEMI -> ^( USE name ) )
             // Velvet.g:128:7: USE name SEMI
@@ -1675,7 +1713,7 @@ public TreeAdaptor getTreeAdaptor() {
             // rule list labels: 
             // wildcard labels: 
             retval.tree = root_0;
-            RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
+            RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,RULE_RETVAL,retval!=null?retval.tree:null);
 
             root_0 = (Tree)adaptor.nil();
             // 129:2: -> ^( USE name )
@@ -1757,12 +1795,12 @@ public TreeAdaptor getTreeAdaptor() {
         Tree ABSTRACT57_tree=null;
         Tree FEATURE58_tree=null;
         Tree SEMI61_tree=null;
-        RewriteRuleTokenStream stream_ABSTRACT=new RewriteRuleTokenStream(adaptor,"token ABSTRACT");
-        RewriteRuleTokenStream stream_MANDATORY=new RewriteRuleTokenStream(adaptor,"token MANDATORY");
-        RewriteRuleTokenStream stream_SEMI=new RewriteRuleTokenStream(adaptor,"token SEMI");
-        RewriteRuleTokenStream stream_FEATURE=new RewriteRuleTokenStream(adaptor,"token FEATURE");
-        RewriteRuleSubtreeStream stream_name=new RewriteRuleSubtreeStream(adaptor,"rule name");
-        RewriteRuleSubtreeStream stream_definitions=new RewriteRuleSubtreeStream(adaptor,"rule definitions");
+        RewriteRuleTokenStream stream_ABSTRACT=new RewriteRuleTokenStream(adaptor,TOKEN_ABSTRACT);
+        RewriteRuleTokenStream stream_MANDATORY=new RewriteRuleTokenStream(adaptor,TOKEN_MANDATORY);
+        RewriteRuleTokenStream stream_SEMI=new RewriteRuleTokenStream(adaptor,TOKEN_SEMI);
+        RewriteRuleTokenStream stream_FEATURE=new RewriteRuleTokenStream(adaptor,TOKEN_FEATURE);
+        RewriteRuleSubtreeStream stream_name=new RewriteRuleSubtreeStream(adaptor,RULE_NAME);
+        RewriteRuleSubtreeStream stream_definitions=new RewriteRuleSubtreeStream(adaptor,RULE_DEFINITIONS);
         try {
             // Velvet.g:133:2: ( ( MANDATORY ABSTRACT | ABSTRACT MANDATORY | MANDATORY | ABSTRACT )? FEATURE name ( definitions | SEMI ) -> ^( FEATURE name ( MANDATORY )? ( ABSTRACT )? ( definitions )? ) )
             // Velvet.g:133:4: ( MANDATORY ABSTRACT | ABSTRACT MANDATORY | MANDATORY | ABSTRACT )? FEATURE name ( definitions | SEMI )
@@ -1902,7 +1940,7 @@ public TreeAdaptor getTreeAdaptor() {
             // rule list labels: 
             // wildcard labels: 
             retval.tree = root_0;
-            RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
+            RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,RULE_RETVAL,retval!=null?retval.tree:null);
 
             root_0 = (Tree)adaptor.nil();
             // 135:2: -> ^( FEATURE name ( MANDATORY )? ( ABSTRACT )? ( definitions )? )
@@ -1999,8 +2037,8 @@ public TreeAdaptor getTreeAdaptor() {
         Tree END_C65_tree=null;
         RewriteRuleTokenStream stream_END_C=new RewriteRuleTokenStream(adaptor,"token END_C");
         RewriteRuleTokenStream stream_START_C=new RewriteRuleTokenStream(adaptor,"token START_C");
-        RewriteRuleSubtreeStream stream_groupType=new RewriteRuleSubtreeStream(adaptor,"rule groupType");
-        RewriteRuleSubtreeStream stream_feature=new RewriteRuleSubtreeStream(adaptor,"rule feature");
+        RewriteRuleSubtreeStream stream_groupType=new RewriteRuleSubtreeStream(adaptor,RULE_GROUPTYPE);
+        RewriteRuleSubtreeStream stream_feature=new RewriteRuleSubtreeStream(adaptor,RULE_FEATURE);
         try {
             // Velvet.g:139:2: ( groupType START_C ( feature )+ END_C -> ^( GROUP groupType ( feature )+ ) )
             // Velvet.g:139:4: groupType START_C ( feature )+ END_C
@@ -2064,7 +2102,7 @@ public TreeAdaptor getTreeAdaptor() {
             // rule list labels: 
             // wildcard labels: 
             retval.tree = root_0;
-            RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
+            RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,RULE_RETVAL,retval!=null?retval.tree:null);
 
             root_0 = (Tree)adaptor.nil();
             // 140:2: -> ^( GROUP groupType ( feature )+ )
@@ -2206,9 +2244,9 @@ public TreeAdaptor getTreeAdaptor() {
         Tree DESCRIPTION67_tree=null;
         Tree STRING68_tree=null;
         Tree SEMI69_tree=null;
-        RewriteRuleTokenStream stream_DESCRIPTION=new RewriteRuleTokenStream(adaptor,"token DESCRIPTION");
-        RewriteRuleTokenStream stream_SEMI=new RewriteRuleTokenStream(adaptor,"token SEMI");
-        RewriteRuleTokenStream stream_STRING=new RewriteRuleTokenStream(adaptor,"token STRING");
+        RewriteRuleTokenStream stream_DESCRIPTION=new RewriteRuleTokenStream(adaptor,TOKEN_DESCRIPTION);
+        RewriteRuleTokenStream stream_SEMI=new RewriteRuleTokenStream(adaptor,TOKEN_SEMI);
+        RewriteRuleTokenStream stream_STRING=new RewriteRuleTokenStream(adaptor,TOKEN_STRING);
 
         try {
             // Velvet.g:149:2: ( DESCRIPTION STRING SEMI -> ^( DESCRIPTION STRING ) )
@@ -2234,7 +2272,7 @@ public TreeAdaptor getTreeAdaptor() {
             // rule list labels: 
             // wildcard labels: 
             retval.tree = root_0;
-            RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
+            RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,RULE_RETVAL,retval!=null?retval.tree:null);
 
             root_0 = (Tree)adaptor.nil();
             // 150:2: -> ^( DESCRIPTION STRING )
@@ -2474,8 +2512,8 @@ public TreeAdaptor getTreeAdaptor() {
         VelvetParser.constraintOperand_return constraintOperand78 =null;
 
 
-        RewriteRuleSubtreeStream stream_constraintOperand=new RewriteRuleSubtreeStream(adaptor,"rule constraintOperand");
-        RewriteRuleSubtreeStream stream_binaryOp=new RewriteRuleSubtreeStream(adaptor,"rule binaryOp");
+        RewriteRuleSubtreeStream stream_constraintOperand=new RewriteRuleSubtreeStream(adaptor,RULE_CONSTRAINTOPERAND);
+        RewriteRuleSubtreeStream stream_binaryOp=new RewriteRuleSubtreeStream(adaptor,RULE_BINARYOP);
         try {
             // Velvet.g:158:2: ( constraintOperand ( binaryOp constraintOperand )* -> ^( CONSTR ( constraintOperand )+ ( binaryOp )* ) )
             // Velvet.g:158:4: constraintOperand ( binaryOp constraintOperand )*
@@ -2533,7 +2571,7 @@ public TreeAdaptor getTreeAdaptor() {
             // rule list labels: 
             // wildcard labels: 
             retval.tree = root_0;
-            RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
+            RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,RULE_RETVAL,retval!=null?retval.tree:null);
 
             root_0 = (Tree)adaptor.nil();
             // 159:2: -> ^( CONSTR ( constraintOperand )+ ( binaryOp )* )
@@ -2621,9 +2659,9 @@ public TreeAdaptor getTreeAdaptor() {
         Tree END_R82_tree=null;
         RewriteRuleTokenStream stream_END_R=new RewriteRuleTokenStream(adaptor,"token END_R");
         RewriteRuleTokenStream stream_START_R=new RewriteRuleTokenStream(adaptor,"token START_R");
-        RewriteRuleSubtreeStream stream_name=new RewriteRuleSubtreeStream(adaptor,"rule name");
+        RewriteRuleSubtreeStream stream_name=new RewriteRuleSubtreeStream(adaptor,RULE_NAME);
         RewriteRuleSubtreeStream stream_unaryOp=new RewriteRuleSubtreeStream(adaptor,"rule unaryOp");
-        RewriteRuleSubtreeStream stream_constraintDefinition=new RewriteRuleSubtreeStream(adaptor,"rule constraintDefinition");
+        RewriteRuleSubtreeStream stream_constraintDefinition=new RewriteRuleSubtreeStream(adaptor,RULE_CONSTRAINTDEFINITION);
         try {
             // Velvet.g:162:19: ( ( unaryOp )* ( START_R constraintDefinition END_R | name ) -> ( constraintDefinition )? ( ^( UNARYOP unaryOp ) )* ( ^( OPERAND name ) )? )
             // Velvet.g:162:21: ( unaryOp )* ( START_R constraintDefinition END_R | name )
@@ -2721,7 +2759,7 @@ public TreeAdaptor getTreeAdaptor() {
             // rule list labels: 
             // wildcard labels: 
             retval.tree = root_0;
-            RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
+            RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,RULE_RETVAL,retval!=null?retval.tree:null);
 
             root_0 = (Tree)adaptor.nil();
             // 163:2: -> ( constraintDefinition )? ( ^( UNARYOP unaryOp ) )* ( ^( OPERAND name ) )?
@@ -2822,11 +2860,11 @@ public TreeAdaptor getTreeAdaptor() {
 
 
         Tree SEMI88_tree=null;
-        RewriteRuleTokenStream stream_SEMI=new RewriteRuleTokenStream(adaptor,"token SEMI");
-        RewriteRuleSubtreeStream stream_intAttribute=new RewriteRuleSubtreeStream(adaptor,"rule intAttribute");
-        RewriteRuleSubtreeStream stream_stringAttribute=new RewriteRuleSubtreeStream(adaptor,"rule stringAttribute");
-        RewriteRuleSubtreeStream stream_floatAttribute=new RewriteRuleSubtreeStream(adaptor,"rule floatAttribute");
-        RewriteRuleSubtreeStream stream_boolAttribute=new RewriteRuleSubtreeStream(adaptor,"rule boolAttribute");
+        RewriteRuleTokenStream stream_SEMI=new RewriteRuleTokenStream(adaptor,TOKEN_SEMI);
+        RewriteRuleSubtreeStream stream_intAttribute=new RewriteRuleSubtreeStream(adaptor,RULE_INTATTRIBUTE);
+        RewriteRuleSubtreeStream stream_stringAttribute=new RewriteRuleSubtreeStream(adaptor,RULE_STRINGATTRIBUTE);
+        RewriteRuleSubtreeStream stream_floatAttribute=new RewriteRuleSubtreeStream(adaptor,RULE_FLOATATTRIBUTE);
+        RewriteRuleSubtreeStream stream_boolAttribute=new RewriteRuleSubtreeStream(adaptor,RULE_BOOLATTRIBUTE);
         try {
             // Velvet.g:167:2: ( ( intAttribute | floatAttribute | stringAttribute | boolAttribute ) SEMI -> ^( ATTR ( intAttribute )? ( floatAttribute )? ( stringAttribute )? ( boolAttribute )? ) )
             // Velvet.g:167:4: ( intAttribute | floatAttribute | stringAttribute | boolAttribute ) SEMI
@@ -2927,7 +2965,7 @@ public TreeAdaptor getTreeAdaptor() {
             // rule list labels: 
             // wildcard labels: 
             retval.tree = root_0;
-            RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
+            RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,RULE_RETVAL,retval!=null?retval.tree:null);
 
             root_0 = (Tree)adaptor.nil();
             // 168:2: -> ^( ATTR ( intAttribute )? ( floatAttribute )? ( stringAttribute )? ( boolAttribute )? )
@@ -3017,7 +3055,7 @@ public TreeAdaptor getTreeAdaptor() {
         VelvetParser.attribConstraint_return attribConstraint89 =null;
 
 
-        RewriteRuleSubtreeStream stream_attribConstraint=new RewriteRuleSubtreeStream(adaptor,"rule attribConstraint");
+        RewriteRuleSubtreeStream stream_attribConstraint=new RewriteRuleSubtreeStream(adaptor,RULE_ATTRIBCONSTRAINT);
         try {
             // Velvet.g:172:2: ( attribConstraint -> ^( ACONSTR attribConstraint ) )
             // Velvet.g:172:4: attribConstraint
@@ -3037,7 +3075,7 @@ public TreeAdaptor getTreeAdaptor() {
             // rule list labels: 
             // wildcard labels: 
             retval.tree = root_0;
-            RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.tree:null);
+            RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,RULE_RETVAL,retval!=null?retval.tree:null);
 
             root_0 = (Tree)adaptor.nil();
             // 173:2: -> ^( ACONSTR attribConstraint )

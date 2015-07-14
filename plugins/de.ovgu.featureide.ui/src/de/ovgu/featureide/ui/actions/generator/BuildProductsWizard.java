@@ -20,6 +20,12 @@
  */
 package de.ovgu.featureide.ui.actions.generator;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.ALL_VALID_CONFIGURATIONS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD_PRODUCTS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CASA;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CHVATAL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DEFAULT;
+
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -60,7 +66,7 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 
 	@Override
 	public void addPages() {
-		setWindowTitle("Build Products");
+		setWindowTitle(BUILD_PRODUCTS);
 		page = new BuildProductsPage(featureProject.getProjectName(), featureProject, getGenerate(), toggleState, getAlgorithm(), getT(), getOrder(), getTest());
 		addPage(page);
 	}

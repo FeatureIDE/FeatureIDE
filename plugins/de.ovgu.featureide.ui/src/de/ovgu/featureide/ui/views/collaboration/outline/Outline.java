@@ -20,6 +20,16 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.outline;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.AN_OUTLINE_IS_NOT_AVAILABLE_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.COLLAPSE_ALL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.EMPTY_OUTLINE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.EXPAND_ALL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.HIDE_FIELDS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.HIDE_METHODS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.OUTLINE_SELECTION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SORT_BY_FEATURE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATE_OUTLINE_VIEW;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -405,7 +415,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 		actionOfProv.add(provAct);
 	}
 
-	private Action dropDownAction = new Action("Outline Selection", Action.AS_DROP_DOWN_MENU) {
+	private Action dropDownAction = new Action(OUTLINE_SELECTION, Action.AS_DROP_DOWN_MENU) {
 		{
 			setImageDescriptor(ImageDescriptor.createFromImage(GUIDefaults.REFESH_TAB_IMAGE));
 		}
@@ -570,7 +580,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 					iFile = iFile2;
 
 					if (uiJob == null || uiJob.getState() == Job.NONE) {
-						uiJob = new UIJob("Update Outline View") {
+						uiJob = new UIJob(UPDATE_OUTLINE_VIEW) {
 							public IStatus runInUIThread(IProgressMonitor monitor) {
 
 								if (viewer != null) {
@@ -738,7 +748,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 				}
 			}
 		};
-		collapseAllAction.setToolTipText("Collapse All");
+		collapseAllAction.setToolTipText(COLLAPSE_ALL);
 		collapseAllAction.setImageDescriptor(IMG_COLLAPSE);
 
 		Action expandAllAction = new Action() {
@@ -752,13 +762,13 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 			}
 		};
 
-		expandAllAction.setToolTipText("Expand All");
+		expandAllAction.setToolTipText(EXPAND_ALL);
 		expandAllAction.setImageDescriptor(IMG_EXPAND);
-		hideAllFields.setToolTipText("Hide Fields");
+		hideAllFields.setToolTipText(HIDE_FIELDS);
 		hideAllFields.setImageDescriptor(IMG_SHOW_FIELDS);
-		hideAllMethods.setToolTipText("Hide Methods");
+		hideAllMethods.setToolTipText(HIDE_METHODS);
 		hideAllMethods.setImageDescriptor(IMG_SHOW_METHODS);
-		sortMethods.setToolTipText("Sort By Feature");
+		sortMethods.setToolTipText(SORT_BY_FEATURE);
 		sortMethods.setImageDescriptor(IMG_SORT_FEATURES);
 
 		iToolBarManager.add(collapseAllAction);
@@ -905,7 +915,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 
 		@Override
 		public String getLabelProvName() {
-			return "Empty Outline";
+			return EMPTY_OUTLINE;
 		}
 
 		@Override
@@ -950,7 +960,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 		// TODO
 		public Object[] getElements(Object inputElement) {
 			// if (inputElement == null || !(inputElement instanceof IFile))
-			// return new String[] { "no file found" };
+			// return new String[] { NO_FILE_FOUND };
 
 			// IFeatureProject featureProject = CorePlugin
 			// .getFeatureProject((IFile) inputElement);
@@ -960,19 +970,19 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 			// if (c != null) {
 			// return new Object[] { c };
 			// } else {
-			return new String[] { "An outline is not available." };
+			return new String[] { AN_OUTLINE_IS_NOT_AVAILABLE_ };
 			// }
 			// } else {
 			// return new String[] { "Collaboration Model not found" };
 			// }
 			// } else {
-			// return new String[] { "This is no feature project" };
+			// return new String[] { THIS_IS_NO_FEATURE_PROJECT };
 			// }
 		}
 
 		// @Override
 		// public Object[] getElements(Object inputElement) {
-		// return new String[] { "An outline is not available." };
+		// return new String[] { AN_OUTLINE_IS_NOT_AVAILABLE_ };
 		// }
 
 		@Override

@@ -20,6 +20,10 @@
  */
 package de.ovgu.featureide.ui.mpl.wizards.page;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.HERE_YOU_SELECT_THE_PROJECT_YOU_WANT_TO_IMPORT_FROM_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SELECT_A_PROJECT_FROM_THE_LIST_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SELECT_PROJECT;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.swt.SWT;
@@ -52,9 +56,9 @@ public class SelectProjectWizardPage extends AbstractWizardPage implements Selec
 	private IFeatureProject selectedProject = null;
 
 	public SelectProjectWizardPage() {
-		super("Select Project");
-		setTitle("Select Project");
-		setDescription("Here you select the project you want to import from.");
+		super(SELECT_PROJECT);
+		setTitle(SELECT_PROJECT);
+		setDescription(HERE_YOU_SELECT_THE_PROJECT_YOU_WANT_TO_IMPORT_FROM_);
 	}
 
 	@Override
@@ -103,7 +107,7 @@ public class SelectProjectWizardPage extends AbstractWizardPage implements Selec
 	@Override
 	protected String checkPage() {
 		if (selectedProject == null) {
-			return "Select a project from the list.";
+			return SELECT_A_PROJECT_FROM_THE_LIST_;
 		}
 		return null;
 	}

@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.RENAME_FEATURE;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
 /**
@@ -30,7 +31,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
  */
 public class FeatureRenamingOperation extends AbstractFeatureModelOperation {
 
-	private static final String LABEL = "Rename Feature";
+	private static final String LABEL = RENAME_FEATURE;
 	private String oldName;
 	private String newName;
 

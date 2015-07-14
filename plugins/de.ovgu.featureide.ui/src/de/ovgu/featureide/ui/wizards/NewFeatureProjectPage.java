@@ -20,6 +20,26 @@
  */
 package de.ovgu.featureide.ui.wizards;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD;
+import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD_PATH_EQUALS_CONFIGURATIONS_PATH_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD_PATH_RESTRICTION_ANDROID;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CONFIG_PATH_RESTRICTION_ANDROID;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CREATES_A_FEATUREIDE_PROJECT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.EQUATIONS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NO_COMPOSITION_ENGINES_INSTALLED_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.PATH_MUST_BE_SPECIFIED_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.PATH_MUST_BE_VALID;
+import static de.ovgu.featureide.fm.core.localization.StringTable.PLEASE_SELECT_A_COMPOSER_FROM_THE_SELECTION_BELOW_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SELECT_A_COMPOSER;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SETS_THE_PATH_OF_COMPOSED_FILES_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SETS_THE_PATH_OF_CONFIGURATIONFILES_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SETS_THE_PATH_OF_FEATUREFOLDERS_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SOURCE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SOURCE_PATH_EQUALS_BUILD_PATH_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SOURCE_PATH_EQUALS_CONFIGURATIONS_PATH_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SOURCE_PATH_RESTRICTION_ANDROID;
+
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -63,8 +83,8 @@ public class NewFeatureProjectPage extends WizardPage {
 	
 	protected NewFeatureProjectPage() {
 		super("");
-		setTitle("Select a composer");
-		setDescription("Creates a FeatureIDE project");
+		setTitle(SELECT_A_COMPOSER);
+		setDescription(CREATES_A_FEATUREIDE_PROJECT);
 	}
 	
 	public void createControl(Composite parent) {
@@ -85,7 +105,7 @@ public class NewFeatureProjectPage extends WizardPage {
 		GridData gridData = new GridData(GridData.FILL_BOTH);
 		gridData.horizontalSpan = 2;
 		helloLabel.setLayoutData(gridData);
-		helloLabel.setText("Please select a composer from the selection below.");
+		helloLabel.setText(PLEASE_SELECT_A_COMPOSER_FROM_THE_SELECTION_BELOW_);
 		
 	    Label label = new Label(toolGroup, SWT.NONE);
 	    label.setText("Composers:");
@@ -118,7 +138,7 @@ public class NewFeatureProjectPage extends WizardPage {
 		
 		String descriptionString = descriptionStringBuilder.toString();
 		if (composerExtensions.isEmpty()) {
-			descriptionString = "No composition engines installed.";
+			descriptionString = NO_COMPOSITION_ENGINES_INSTALLED_;
 			setDescription(descriptionString);
 			toolCB.setEnabled(false);
 		}
@@ -138,7 +158,7 @@ public class NewFeatureProjectPage extends WizardPage {
 		pathGroup.setLayoutData(gd);
 		pathGroup.setLayout(layout);
 		
-		String tooltip = "Sets the path of composed files.";
+		String tooltip = SETS_THE_PATH_OF_COMPOSED_FILES_;
 		buildLabel = new Label(pathGroup, SWT.NULL);
 		buildLabel.setText("&Source Path:");
 		buildLabel.setToolTipText(tooltip);
@@ -147,16 +167,16 @@ public class NewFeatureProjectPage extends WizardPage {
 		buildPath.setText("src");
 		buildPath.setToolTipText(tooltip);
 		
-		tooltip = "Sets the path of featurefolders.";
+		tooltip = SETS_THE_PATH_OF_FEATUREFOLDERS_;
 		label = new Label(pathGroup, SWT.NULL);
 		label.setText("&Feature Path:");
 		label.setToolTipText(tooltip);
 		sourcePath = new Text(pathGroup, SWT.BORDER | SWT.SINGLE);
 		sourcePath.setLayoutData(gd);
-		sourcePath.setText("features");
+		sourcePath.setText(FEATURES);
 		sourcePath.setToolTipText(tooltip);
 		
-		tooltip = "Sets the path of configurationfiles.";
+		tooltip = SETS_THE_PATH_OF_CONFIGURATIONFILES_;
 		label = new Label(pathGroup, SWT.NULL);
 		label.setText("&Configurations Path:");
 		label.setToolTipText(tooltip);
@@ -217,26 +237,26 @@ public class NewFeatureProjectPage extends WizardPage {
 		
 		if (isEnabled(sourcePath) && isEnabled(configsPath) &&
 				getSourcePath().equals(getConfigPath())) {
-			updateStatus("Source path equals configurations path.");
+			updateStatus(SOURCE_PATH_EQUALS_CONFIGURATIONS_PATH_);
 			return;
 		}
 		if (isEnabled(sourcePath) && isEnabled(buildPath) &&
 				getSourcePath().equals(getBuildPath())) {
-			updateStatus("Source path equals build path.");
+			updateStatus(SOURCE_PATH_EQUALS_BUILD_PATH_);
 			return;
 		}
 		if (isEnabled(buildPath) && isEnabled(configsPath) && 
 				getBuildPath().equals(getConfigPath())) {
-			updateStatus("Build path equals configurations path.");
+			updateStatus(BUILD_PATH_EQUALS_CONFIGURATIONS_PATH_);
 			return;
 		}
-		if (isEnabled(sourcePath) && isPathEmpty(getSourcePath(), "Source"))return;
-		if (isEnabled(buildPath) && isPathEmpty(getBuildPath(), "Build"))return;
-		if (isEnabled(configsPath) && isPathEmpty(getConfigPath(), "Equations"))return;
+		if (isEnabled(sourcePath) && isPathEmpty(getSourcePath(), SOURCE))return;
+		if (isEnabled(buildPath) && isPathEmpty(getBuildPath(), BUILD))return;
+		if (isEnabled(configsPath) && isPathEmpty(getConfigPath(), EQUATIONS))return;
 		
-		if (isEnabled(sourcePath) && isInvalidPath(getSourcePath(), "Source"))return;
-		if (isEnabled(buildPath) && isInvalidPath(getBuildPath(), "Build"))return;
-		if (isEnabled(configsPath) && isInvalidPath(getConfigPath(), "Equations"))return;
+		if (isEnabled(sourcePath) && isInvalidPath(getSourcePath(), SOURCE))return;
+		if (isEnabled(buildPath) && isInvalidPath(getBuildPath(), BUILD))return;
+		if (isEnabled(configsPath) && isInvalidPath(getConfigPath(), EQUATIONS))return;
 		
 		if (compositionTool.supportsAndroid()) {
 			
@@ -245,15 +265,15 @@ public class NewFeatureProjectPage extends WizardPage {
 			setPageComplete(true);
 			
 			if (getSourcePath().equals("src") || getSourcePath().equals("res")) {
-				updateStatus("Source Path: \"src\" and \"res\" folders are reserved for Android.");
+				updateStatus(SOURCE_PATH_RESTRICTION_ANDROID);
 				return;
 			}
 			if (getBuildPath().equals("src") || getBuildPath().equals("res")) {
-				updateStatus("Build Path: \"src\" and \"res\" folders are reserved for Android.");
+				updateStatus(BUILD_PATH_RESTRICTION_ANDROID);
 				return;
 			}
 			if (getConfigPath().equals("src") || getConfigPath().equals("res")) {
-				updateStatus("Config Path: \"src\" and \"res\" folders are reserved for Android.");
+				updateStatus(CONFIG_PATH_RESTRICTION_ANDROID);
 				return;
 			}
 			
@@ -272,7 +292,7 @@ public class NewFeatureProjectPage extends WizardPage {
 
 	protected boolean isPathEmpty(String path, String name) {
 		if (path.length() == 0) {
-			updateStatus(name + " Path must be specified.");
+			updateStatus(name + PATH_MUST_BE_SPECIFIED_);
 			canFlipToNextPage  = false;
 			return true;
 		}
@@ -293,7 +313,7 @@ public class NewFeatureProjectPage extends WizardPage {
 				|| path.contains(">")
 				|| path.contains("|")
 				|| path.contains(""+'"')) {
-			updateStatus(name + " Path must be valid");
+			updateStatus(name + PATH_MUST_BE_VALID);
 			return true;
 		}
 		return false;

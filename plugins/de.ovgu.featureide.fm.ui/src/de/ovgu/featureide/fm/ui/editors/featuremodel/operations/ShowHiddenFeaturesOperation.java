@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.SHOW_HIDDEN_FEATURES;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 
@@ -34,7 +35,7 @@ public class ShowHiddenFeaturesOperation extends AbstractFeatureModelOperation {
 	private FeatureModel featureModel;
 
 	public ShowHiddenFeaturesOperation(FeatureModel featureModel) {
-		super(featureModel, "Show Hidden Features");
+		super(featureModel, SHOW_HIDDEN_FEATURES);
 		this.featureModel = featureModel;
 	}
 

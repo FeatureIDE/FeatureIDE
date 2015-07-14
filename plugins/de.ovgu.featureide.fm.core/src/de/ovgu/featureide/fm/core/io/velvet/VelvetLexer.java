@@ -21,12 +21,19 @@
 // $ANTLR 3.4 Velvet.g 2014-11-23 20:46:36
 package de.ovgu.featureide.fm.core.io.velvet;
 
-import org.antlr.runtime.*;
-import java.util.Stack;
-import java.util.List;
-import java.util.ArrayList;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ALL;
 
-@SuppressWarnings({"all", "warnings", "unchecked"})
+import org.antlr.runtime.BaseRecognizer;
+import org.antlr.runtime.CharStream;
+import org.antlr.runtime.DFA;
+import org.antlr.runtime.EarlyExitException;
+import org.antlr.runtime.Lexer;
+import org.antlr.runtime.MismatchedSetException;
+import org.antlr.runtime.NoViableAltException;
+import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.RecognizerSharedState;
+
+@SuppressWarnings({ALL, "warnings", "unchecked"})
 public class VelvetLexer extends Lexer {
     public static final int EOF=-1;
     public static final int ABSTRACT=4;
@@ -114,7 +121,7 @@ public class VelvetLexer extends Lexer {
             // Velvet.g:4:10: ( 'abstract' )
             // Velvet.g:4:12: 'abstract'
             {
-            match("abstract"); 
+            match(ABSTRACT); 
 
 
 
@@ -336,7 +343,7 @@ public class VelvetLexer extends Lexer {
             // Velvet.g:14:9: ( 'concept' )
             // Velvet.g:14:11: 'concept'
             {
-            match("concept"); 
+            match(CONCEPT); 
 
 
 
@@ -537,7 +544,7 @@ public class VelvetLexer extends Lexer {
             // Velvet.g:23:11: ( 'mandatory' )
             // Velvet.g:23:13: 'mandatory'
             {
-            match("mandatory"); 
+            match(MANDATORY); 
 
 
 

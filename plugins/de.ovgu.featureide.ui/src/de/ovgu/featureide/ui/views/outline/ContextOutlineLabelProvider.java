@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.ui.views.outline;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE_CONTEXT_OUTLINE;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -160,7 +162,7 @@ public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 
 	@Override
 	public String getLabelProvName() {
-		return "Feature Context Outline";
+		return FEATURE_CONTEXT_OUTLINE;
 	}
 
 	@Override

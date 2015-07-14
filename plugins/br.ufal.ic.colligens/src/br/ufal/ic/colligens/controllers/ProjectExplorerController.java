@@ -1,5 +1,8 @@
 package br.ufal.ic.colligens.controllers;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SELECT_A_VALID_FILE_OR_DIRECTORY_;
+
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,7 +31,7 @@ import br.ufal.ic.colligens.activator.Colligens;
 /**
  * @author Thiago Emmanuel
  */
-@SuppressWarnings("restriction")
+@SuppressWarnings(RESTRICTION)
 public class ProjectExplorerController {
 	private ISelection iSelection;
 	private Set<IResource> iResources;
@@ -94,7 +97,7 @@ public class ProjectExplorerController {
 
 		if (iResources.isEmpty()) {
 			throw new ProjectExplorerException(
-					"Select a valid file or directory.");
+					SELECT_A_VALID_FILE_OR_DIRECTORY_);
 		}
 		
 		return iResources;

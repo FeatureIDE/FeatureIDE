@@ -1,5 +1,10 @@
 package br.ufal.ic.colligens.models;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.FATAL_ERROR;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NOT_A_VALID_FILE_C_IN;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.WAS_NOT_POSSIBLE_TO_GENERATE_THE_STUBS;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.DataInputStream;
@@ -42,7 +47,7 @@ import core.GeneralFrontend;
 import core.presence.condition.PresenceConditionVisitor;
 import de.fosd.typechef.options.OptionException;
 
-@SuppressWarnings("restriction")
+@SuppressWarnings(RESTRICTION)
 public class StubsHeader extends AbstractHeader {
 	// It keeps the C types.
 	private final HashSet<String> types = new HashSet<String>();
@@ -128,7 +133,7 @@ public class StubsHeader extends AbstractHeader {
 		// + System.getProperty("file.separator")
 		// + super.getProject().getProject().getName()));
 
-		// monitorbeginTask("Generating stubs", includes.size());
+		// monitorbeginTask(GENERATING_STUBS, includes.size());
 		//
 		// for (Iterator<String> iterator = includes.iterator(); iterator
 		// .hasNext();) {
@@ -254,7 +259,7 @@ public class StubsHeader extends AbstractHeader {
 			System.out.println(type.getSource());
 		}
 		System.err.println(typesAll.size());
-		throw new PlatformException("Not a valid file C in ");
+		throw new PlatformException(NOT_A_VALID_FILE_C_IN);
 
 	}
 
@@ -278,13 +283,13 @@ public class StubsHeader extends AbstractHeader {
 		} catch (CoreException e1) {
 
 			throw new PlatformException(
-					"Was not possible to generate the stubs");
+					WAS_NOT_POSSIBLE_TO_GENERATE_THE_STUBS);
 			// } catch (IOException e) {
 			// TODO Auto-generated catch block
 			// e.printStackTrace();
 			//
 			// throw new PlatformException(
-			// "Was not possible to generate the stubs");
+			// WAS_NOT_POSSIBLE_TO_GENERATE_THE_STUBS);
 		}
 	}
 
@@ -465,7 +470,7 @@ public class StubsHeader extends AbstractHeader {
 						}
 						errorLine = "";
 						while ((line = error.readLine()) != null) {
-							if (line.contains("fatal error")) {
+							if (line.contains(FATAL_ERROR)) {
 								errorLine = line;
 								break;
 							}

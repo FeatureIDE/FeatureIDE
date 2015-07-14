@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.ui.quickfix;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_CONFIGURATIONS;
+
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -68,7 +70,7 @@ public class QuickFixFalseOptionalFeatures extends QuickFixMissingConfigurations
 		
 	List<Configuration> createConfigurations(final Collection<String> falseOptionalFeatures, FeatureModel featureModel, final IProgressMonitor monitor) {
 		if (monitor != null) {
-			monitor.beginTask("Create configurations", falseOptionalFeatures.size());
+			monitor.beginTask(CREATE_CONFIGURATIONS, falseOptionalFeatures.size());
 		}
 		for (Feature dead : featureModel.getAnalyser().getDeadFeatures()) {
 			falseOptionalFeatures.remove(dead.getName());

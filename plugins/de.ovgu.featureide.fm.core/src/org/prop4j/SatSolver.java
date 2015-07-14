@@ -20,6 +20,9 @@
  */
 package org.prop4j;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.EXPRESSION_IS_NOT_IN_CNF;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ONLY;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -137,7 +140,7 @@ public class SatSolver {
 				solver.addClause(new VecInt(new int[] { literal }));
 			}
 		} catch (ClassCastException e) {
-			throw new RuntimeException("expression is not in cnf", e);
+			throw new RuntimeException(EXPRESSION_IS_NOT_IN_CNF, e);
 		}
 	}
 
@@ -439,7 +442,7 @@ public class SatSolver {
 		int[] lastModel = null;
 		for (int i = 0; i < number; i++) {
 			if (!problem.isSatisfiable(i > 0)) {
-				out.append("only " + i + " solutions\n");
+				out.append(ONLY + i + " solutions\n");
 				break;
 			}
 			int[] model = problem.model();
@@ -449,7 +452,7 @@ public class SatSolver {
 					if (model[j] != lastModel[j])
 						same = false;
 				if (same) {
-					out.append("only " + i + " solutions\n");
+					out.append(ONLY + i + " solutions\n");
 					break;
 				}
 			}

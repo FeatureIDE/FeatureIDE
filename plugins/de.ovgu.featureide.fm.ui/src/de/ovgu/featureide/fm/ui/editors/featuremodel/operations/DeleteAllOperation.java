@@ -20,6 +20,10 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE_ERROR;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE_INCLUDING_SUBFEATURES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.UNABLE_TO_DELETE_THIS_FEATURES_UNTIL_ALL_RELEVANT_CONSTRAINTS_ARE_REMOVED_;
+
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -47,7 +51,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
  */
 public class DeleteAllOperation extends AbstractFeatureModelOperation implements GUIDefaults {
 
-	private static final String LABEL = "Delete including subfeatures";
+	private static final String LABEL = DELETE_INCLUDING_SUBFEATURES;
 	private Feature feature;
 	private LinkedList<Feature> featureList;
 	private LinkedList<Feature> containedFeatureList;
@@ -75,9 +79,9 @@ public class DeleteAllOperation extends AbstractFeatureModelOperation implements
 			}
 		} else {
 			final String containedFeatures = containedFeatureList.toString();
-			MessageDialog dialog = new MessageDialog(new Shell(), " Delete Error ", FEATURE_SYMBOL, "The following features are contained in constraints:"
+			MessageDialog dialog = new MessageDialog(new Shell(), DELETE_ERROR, FEATURE_SYMBOL, "The following features are contained in constraints:"
 					+ '\n' + containedFeatures.substring(1, containedFeatures.length() - 1) + '\n' + '\n'
-					+ "Unable to delete this features until all relevant constraints are removed.", MessageDialog.ERROR,
+					+ UNABLE_TO_DELETE_THIS_FEATURES_UNTIL_ALL_RELEVANT_CONSTRAINTS_ARE_REMOVED_, MessageDialog.ERROR,
 					new String[] { IDialogConstants.OK_LABEL }, 0);
 
 			dialog.open();

@@ -20,6 +20,10 @@
  */
 package de.ovgu.featureide.ui.statistics.core;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.PROJECT_NAME;
+import static de.ovgu.featureide.fm.core.localization.StringTable.REFRESH_STATISTICS_VIEW;
+import static de.ovgu.featureide.fm.core.localization.StringTable.STATISTICS_OF_THE_FEATURE_MODEL;
+
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -197,7 +201,7 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 	 * priority.
 	 */
 	protected void refresh() {
-		UIJob job_setColor = new UIJob("Refresh statistics view") {
+		UIJob job_setColor = new UIJob(REFRESH_STATISTICS_VIEW) {
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				if (!viewer.getControl().isDisposed()) {

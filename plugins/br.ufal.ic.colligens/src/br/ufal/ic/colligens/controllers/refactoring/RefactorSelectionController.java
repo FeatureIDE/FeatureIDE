@@ -1,5 +1,14 @@
 package br.ufal.ic.colligens.controllers.refactoring;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CHECKING_CHECKFINALCONDITIONS___;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CHECKING_PRECONDITIONS___;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CREATING_CHANGE___;
+import static de.ovgu.featureide.fm.core.localization.StringTable.REFACTORING;
+import static de.ovgu.featureide.fm.core.localization.StringTable.THE_SELECTED_PART_CONTAINS_ERRORS_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.WAS_NOT_POSSIBLE_TO_REFACTOR_THE_SELECTED_PART_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.WAS_NOT_POSSIBLE_TO_REFACTOR_THE_SELECTED_PART__TRY_AGAIN_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.WAS_NOT_POSSIBLE_TO_REFACTOR__TRY_AGAIN_;
+
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,7 +40,7 @@ public class RefactorSelectionController extends Refactoring {
 
 	@Override
 	public String getName() {
-		return "Refactoring " + refactoringType.getLabel();
+		return REFACTORING + refactoringType.getLabel();
 	}
 
 	@Override
@@ -39,26 +48,26 @@ public class RefactorSelectionController extends Refactoring {
 			throws CoreException, OperationCanceledException {
 		RefactoringStatus status = new RefactoringStatus();
 		
-		monitor.beginTask("Checking preconditions...", 2);
+		monitor.beginTask(CHECKING_PRECONDITIONS___, 2);
 
 		try {
 
 			processor.selectToFile(file, textSelection, refactoringType);
 
 		} catch (LexerException e) {
-			status.addFatalError("Was not possible to refactor the selected part.");
+			status.addFatalError(WAS_NOT_POSSIBLE_TO_REFACTOR_THE_SELECTED_PART_);
 
 		} catch (OptionException e) {
-			status.addFatalError("Was not possible to refactor. Try again.");
+			status.addFatalError(WAS_NOT_POSSIBLE_TO_REFACTOR__TRY_AGAIN_);
 
 		} catch (IOException e) {
-			status.addFatalError("Was not possible to refactor the selected part. Try again.");
+			status.addFatalError(WAS_NOT_POSSIBLE_TO_REFACTOR_THE_SELECTED_PART__TRY_AGAIN_);
 
 		} catch (NullPointerException e) {
-			status.addFatalError("Was not possible to refactor the selected part.");
+			status.addFatalError(WAS_NOT_POSSIBLE_TO_REFACTOR_THE_SELECTED_PART_);
 
 		} catch (RefactorException e) {
-			status.addFatalError("The selected part contains errors.");
+			status.addFatalError(THE_SELECTED_PART_CONTAINS_ERRORS_);
 		} finally {
 			monitor.done();
 		}
@@ -70,7 +79,7 @@ public class RefactorSelectionController extends Refactoring {
 			throws CoreException, OperationCanceledException {
 		RefactoringStatus status = new RefactoringStatus();
 
-		monitor.beginTask("Checking checkFinalConditions...", 2);
+		monitor.beginTask(CHECKING_CHECKFINALCONDITIONS___, 2);
 
 		try {
 			changes = processor.process(monitor);
@@ -87,7 +96,7 @@ public class RefactorSelectionController extends Refactoring {
 	public Change createChange(IProgressMonitor pm) throws CoreException,
 			OperationCanceledException {
 		try {
-			pm.beginTask("Creating change...", 1);
+			pm.beginTask(CREATING_CHANGE___, 1);
 			//
 			return new CompositeChange(getName(),
 					changes.toArray(new Change[] {}));

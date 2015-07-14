@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.commands;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.RENAMING_FEATURE;
+
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.gef.commands.Command;
@@ -43,7 +45,7 @@ public class FeatureRenamingCommand extends Command {
 	private final String newName;
 
 	public FeatureRenamingCommand(FeatureModel featureModel, String oldName, String newName) {
-		super("Renaming feature " + oldName);
+		super(RENAMING_FEATURE + oldName);
 		this.featureModel = featureModel;
 		this.oldName = oldName;
 		this.newName = newName;

@@ -20,6 +20,10 @@
  */
 package de.ovgu.featureide.ui.wizards;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.ADDS_THE_FEATUREIDE_NATURE_TO_THE_PROJECT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.THE_BUILD_PATH_IS_SET_TO_THE_JAVA_PROJECTS_SOURCE_PATH_AUTOMATICALLY;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IClasspathEntry;
@@ -33,16 +37,16 @@ import de.ovgu.featureide.ui.UIPlugin;
  * 
  * @author Jens Meinicke
  */
-@SuppressWarnings("restriction")
+@SuppressWarnings(RESTRICTION)
 public class ConversionPage extends NewFeatureProjectPage {
 
 	private IProject project;
 	private static final String JAVA_NATURE = "org.eclipse.jdt.core.javanature";
-	private static final String MESSAGE = "The build path is set to the java projects source path automatically";
+	private static final String MESSAGE = THE_BUILD_PATH_IS_SET_TO_THE_JAVA_PROJECTS_SOURCE_PATH_AUTOMATICALLY;
 
 	public ConversionPage(IProject project) {
 		super();
-		setDescription("Adds the FeatureIDE nature to the project " + project.getName() + ".");
+		setDescription(ADDS_THE_FEATUREIDE_NATURE_TO_THE_PROJECT + project.getName() + ".");
 		this.project = project;
 	}
 	

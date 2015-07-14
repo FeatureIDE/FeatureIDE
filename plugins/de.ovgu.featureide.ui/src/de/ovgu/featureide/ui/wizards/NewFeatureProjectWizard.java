@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.ui.wizards;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CREATING_ANDROID_PROJECT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NEW_FEATUREIDE_PROJECT;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -57,7 +60,7 @@ public class NewFeatureProjectWizard extends BasicNewProjectResourceWizard {
 	
 	@Override
 	public void addPages() {
-		setWindowTitle("New FeatureIDE Project");
+		setWindowTitle(NEW_FEATUREIDE_PROJECT);
 		page = new NewFeatureProjectPage();
 		addPage(page);
 		super.addPages();
@@ -130,7 +133,7 @@ public class NewFeatureProjectWizard extends BasicNewProjectResourceWizard {
 		} 
 		
 		if (wizardExtension.performOwnFinish()) {
-			UIJob job = new UIJob("Creating Android project") {
+			UIJob job = new UIJob(CREATING_ANDROID_PROJECT) {
 				@Override
 				public IStatus runInUIThread(IProgressMonitor monitor) {
 					if (wizardExtension.performBeforeFinish(page)) {

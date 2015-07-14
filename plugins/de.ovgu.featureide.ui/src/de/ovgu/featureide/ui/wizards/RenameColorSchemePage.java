@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.ui.wizards;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.ENTER_THE_NAME_OF_THE_COLORSCHEME_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RENAME_COLORSCHEME;
+
 import org.eclipse.jface.dialogs.IDialogPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -40,8 +43,8 @@ public class RenameColorSchemePage extends WizardPage {
 
 	public RenameColorSchemePage() {
 		super("wizardPage");
-		setTitle("Rename Colorscheme");
-		setDescription("Enter the name of the Colorscheme.");
+		setTitle(RENAME_COLORSCHEME);
+		setDescription(ENTER_THE_NAME_OF_THE_COLORSCHEME_);
 	}
 
 	/**

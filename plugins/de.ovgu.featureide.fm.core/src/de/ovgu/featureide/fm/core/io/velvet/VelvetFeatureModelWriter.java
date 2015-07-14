@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.io.velvet;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.USE;
+
 import java.util.HashSet;
 import java.util.LinkedList;
 
@@ -45,7 +47,7 @@ public class VelvetFeatureModelWriter extends AbstractFeatureModelWriter {
 	private final StringBuilder sb = new StringBuilder();
 
 	/**
-	 * If true an interface will be created. Otherwise it is named "concept"
+	 * If true an interface will be created. Otherwise it is named CONCEPT
 	 */
 	private boolean isInterface = false;
 	private ExtendedFeatureModel extFeatureModel = null;
@@ -233,7 +235,7 @@ public class VelvetFeatureModelWriter extends AbstractFeatureModelWriter {
 						sb.append(NEWLINE);
 						writeTab(depth + 1);
 					}
-					sb.append("use ");
+					sb.append(USE);
 					sb.append(extFeature.getExternalModelName());
 					sb.append(";");
 					sb.append(NEWLINE);

@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.munge;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.PREPROCESSOR_ANNOTATION_CHECKING;
+import static de.ovgu.featureide.fm.core.localization.StringTable.PROPAGATE_PROBLEM_MARKERS_FOR;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -139,7 +142,7 @@ public class MungePreprocessor extends PPComposerExtensionClass {
 
 	protected void annotationChecking() {
 		deleteAllPreprocessorAnotationMarkers();
-		Job job = new Job("preprocessor annotation checking") {
+		Job job = new Job(PREPROCESSOR_ANNOTATION_CHECKING) {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				annotationChecking(featureProject.getSourceFolder());
@@ -368,7 +371,7 @@ public class MungePreprocessor extends PPComposerExtensionClass {
 	@Override
 	public void postCompile(IResourceDelta delta, final IFile file) {
 		super.postCompile(delta, file);
-		Job job = new Job("Propagate problem markers for " + CorePlugin.getFeatureProject(file)) {
+		Job job = new Job(PROPAGATE_PROBLEM_MARKERS_FOR + CorePlugin.getFeatureProject(file)) {
 			@Override
 			public IStatus run(IProgressMonitor monitor) {
 				try {

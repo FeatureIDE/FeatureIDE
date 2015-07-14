@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.core.internal;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.REMOVE_PROJECT;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
@@ -84,7 +86,7 @@ public class ProjectChangeListener implements IResourceChangeListener {
 	}
 
 	private void removeProject(final IProject project) {
-		Job job = new Job("Remove project") {
+		Job job = new Job(REMOVE_PROJECT) {
 			protected IStatus run(IProgressMonitor monitor) {
 				CorePlugin.getDefault().removeProject(project);
 				return Status.OK_STATUS;

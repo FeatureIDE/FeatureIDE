@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_HIDDEN;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_NOT_HIDDEN;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
@@ -31,8 +33,8 @@ import de.ovgu.featureide.fm.core.FeatureModel;
  */
 public class FeatureSetHiddenOperation extends AbstractFeatureModelOperation {
 
-	private static final String LABEL_NOT_HIDDEN = "Set Feature Not-Hidden";
-	private static final String LABEL_HIDDEN = "Set Feature Hidden";
+	private static final String LABEL_NOT_HIDDEN = SET_FEATURE_NOT_HIDDEN;
+	private static final String LABEL_HIDDEN = SET_FEATURE_HIDDEN;
 	private Feature feature;
 
 	public FeatureSetHiddenOperation(Feature feature, FeatureModel featureModel) {

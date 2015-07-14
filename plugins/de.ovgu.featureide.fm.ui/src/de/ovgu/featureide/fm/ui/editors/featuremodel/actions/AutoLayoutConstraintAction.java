@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.AUTO_LAYOUT_CONSTRAINTS;
+
 import java.util.LinkedList;
 
 import org.eclipse.core.commands.ExecutionException;
@@ -46,7 +48,7 @@ public class AutoLayoutConstraintAction extends Action {
 	private LinkedList<LinkedList<Point>> oldPos = new LinkedList<LinkedList<Point>>();
 
 	public AutoLayoutConstraintAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
-		super("Auto Layout Constraints");
+		super(AUTO_LAYOUT_CONSTRAINTS);
 		this.featureModel = featureModel;
 	}
 

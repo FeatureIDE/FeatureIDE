@@ -1,4 +1,4 @@
-package de.ovgu.featureide.core.localization;
+package de.ovgu.featureide.fm.core.localization;
 
 public class StringTable {
 	public static final String THE_REQUIRED_BUNDLE = "The required bundle ";
@@ -354,7 +354,7 @@ public class StringTable {
 	public static final String CREATE_NEW_CONSTRAINT = "Create new constraint";
 	public static final String YOU_CAN_CREATE_OR_EDIT_CONSTRAINTS_WITH_THIS_DIALOG_ = "You can create or edit constraints with this dialog.";
 	public static final String EDITING = "editing";
-	public static final String BEFORE_THIS_PROCESS_HAS_ENDED_ = " before this process has ended.";
+	public static final String BEFORE_THIS_PROCESS_HAS_ENDED = "Performing additional checks. This may take a while. Although it is not recommended, you can %s your constraint by clicking \"%s\" before the process has ended.";
 	public static final String YOUR_CONSTRAINT_VOIDS_THE_MODEL = "Your constraint voids the model";
 	public static final String REDUNDANCY_OCCURRED_INSIDE_YOUR_CONSTRAINT_ = "Redundancy occurred inside your constraint.";
 	public static final String YOUR_CONSTRAINT_IS_A_TAUTOLOGY_ = "Your constraint is a tautology.";
@@ -548,7 +548,10 @@ public class StringTable {
 	public static final String PLUS = "plus";
 	public static final String ZERO = "zero";
 	public static final String PRODUCT = "Product ";
-	public static final String TIMEOUT = "timeout";
+	public static final String TIMEOUT_STRING = "timeout";
+	public static final String SOURCE_PATH_RESTRICTION_ANDROID = "Source Path: \"src\" and \"res\" folders are reserved for Android.";
+	public static final String BUILD_PATH_RESTRICTION_ANDROID = "Build Path: \"src\" and \"res\" folders are reserved for Android.";
+	public static final String CONFIG_PATH_RESTRICTION_ANDROID = "Config Path: \"src\" and \"res\" folders are reserved for Android.";
 	public static final String OPEN_A_FEATURE_MODEL_ = "Open a feature model.";
 	public static final String START_MANUAL_OR_ACTIVATE_AUTOMATIC_CALCULATION_TO_SHOW_STATISTICS_ = "Start manual or activate automatic calculation to show statistics.";
 	public static final String CALCULATING___ = "Calculating...";

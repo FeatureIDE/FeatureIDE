@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTION;
+
 import org.eclipse.gef.Request;
 import org.eclipse.gef.RequestConstants;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
@@ -71,7 +73,7 @@ public class SelectionAction extends Action {
 	private FeatureModel model;
 
 	public SelectionAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
-		super("Selection");
+		super(SELECTION);
 		this.model = featureModel;
 
 		viewer.addSelectionChangedListener(listener);
