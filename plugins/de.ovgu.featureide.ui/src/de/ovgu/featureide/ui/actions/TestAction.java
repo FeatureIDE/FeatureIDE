@@ -23,9 +23,10 @@ public class TestAction implements IWorkbenchWindowActionDelegate {
 	
 	@Override
 	public void run(IAction action) {
+		IProject tempProject = null;
 		if (selection instanceof StructuredSelection) {
 			final Object first = ((StructuredSelection) selection).getFirstElement();
-			IProject tempProject = null;
+			
 			if (first instanceof IAdaptable) {
 				Object adapter = ((IAdaptable) first).getAdapter(IProject.class);
 				if (adapter != null) {
@@ -34,38 +35,42 @@ public class TestAction implements IWorkbenchWindowActionDelegate {
 			} else if (first instanceof IProject) {
 				tempProject = (IProject) first;
 			}
-			if (tempProject != null) {
-				final IProject project = tempProject;
-				
-				final Thread testThread = new Thread() {
-					@Override
-					public void run() {
-						try {	
-							project.build(IncrementalProjectBuilder.FULL_BUILD, new NullProgressMonitor() {
-								private int countTasks = 0;
-								
-								@Override
-								public void beginTask(String name, int totalWork) {
-									++countTasks;
-								}
-
-								@Override
-								public void done() {
-									if (--countTasks == 0) {
-										new ConfigurationBuilder(CorePlugin.getFeatureProject(project), BuildType.ALL_CURRENT, false, "ICPL", 2, BuildOrder.DEFAULT, false);
-									}
-								}
-							});
-						} catch (CoreException e) {
-							UIPlugin.getDefault().logError(e);
-						}
-					}
-				};
-				testThread.start();
-				return;
-			}
 		}
-		System.out.println("No valid selection!");
+		if(tempProject == null && CorePlugin.getFeatureProjects() != null && CorePlugin.getFeatureProjects().size() > 0){
+			Object o = CorePlugin.getFeatureProjects().iterator().next().getProject();
+			tempProject = (IProject) o;
+			System.out.println("No valid selection! -> First project of the workspace is used");
+		}
+		if (tempProject != null) {
+			final IProject project = tempProject;
+			
+			final Thread testThread = new Thread() {
+				@Override
+				public void run() {
+					try {
+						project.build(IncrementalProjectBuilder.FULL_BUILD, new NullProgressMonitor() {
+							private int countTasks = 0;
+							
+							@Override
+							public void beginTask(String name, int totalWork) {
+								++countTasks;
+							}
+
+							@Override
+							public void done() {
+								if (--countTasks == 0) {
+									new ConfigurationBuilder(CorePlugin.getFeatureProject(project), BuildType.ALL_CURRENT, false, "ICPL", 2, BuildOrder.DEFAULT, false);
+								}
+							}
+						});
+					} catch (CoreException e) {
+						UIPlugin.getDefault().logError(e);
+					}
+				}
+			};
+			testThread.start();
+			return;
+		}
 	}
 
 	@Override
