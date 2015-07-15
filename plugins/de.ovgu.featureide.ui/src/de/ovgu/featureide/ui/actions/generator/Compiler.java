@@ -168,6 +168,23 @@ public class Compiler extends Job implements IConfigurationBuilderBasics {
 		for (IFile file : files) {
 			generator.builder.featureProject.getComposer().postCompile(null, file);
 		}
+		
+		try {
+			for (IResource res : generator.builder.folder.getFolder(confName).members()) {
+				if (res instanceof IFolder) {
+				} else if (!"java".equals(res.getFileExtension())) {
+					IResource f = tmpFolder.getFile(res.getName());
+					f.refreshLocal(IResource.DEPTH_ZERO, null);
+					if(f != null && f.exists()){
+						f.delete(true, null);
+					}
+					((IFile)res).copy(f.getFullPath(), true, null);
+				}
+			}
+		} catch (CoreException e) {
+			UIPlugin.getDefault().logError(e);
+		}
+		
 		runJUnit();
 	}
 	
