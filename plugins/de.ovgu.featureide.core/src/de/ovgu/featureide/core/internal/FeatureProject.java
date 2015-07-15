@@ -785,9 +785,9 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 					List<String> selectedFeatures = readFeaturesfromConfigurationFile(currentConfig.getRawLocation().toFile());
 					for (IResource res : sourceFolder.members()) {
 						if (res instanceof IFolder) {
-							if (selectedFeatures.contains(res.getName())) {
+//							if (selectedFeatures.contains(res.getName())) {
 								checkSourceFolder((IFolder) res, event);
-							}
+//							}
 						}
 					}
 				} else {
