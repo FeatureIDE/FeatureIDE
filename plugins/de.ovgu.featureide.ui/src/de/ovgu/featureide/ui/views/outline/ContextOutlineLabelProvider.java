@@ -168,9 +168,9 @@ public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 	public boolean refreshContent(IFile oldFile, IFile currentFile) {
 		if (currentFile != null && oldFile != null) {
 			// TODO MPL: ... ?
-			if (currentFile.getName().equals(oldFile.getName()) && viewer.getTree().getItems().length > 1) {
-				return true;
-			}
+//			if (currentFile.equals(oldFile) && viewer.getTree().getItems().length > 1) {
+//				return true;
+//			}
 		}
 		return false;
 	}
