@@ -47,7 +47,7 @@ public class CalcFixedThread extends AWorkerThread<String> {
 
 		public SharedObjects(Node fmNode, int numberOfSolvers) {
 			this.numberOfSolvers = numberOfSolvers;
-			this.solver = new MultiThreadSatSolver(fmNode, 1000, numberOfSolvers, false);
+			this.solver = new MultiThreadSatSolver(fmNode, 2000, numberOfSolvers, false);
 		}
 
 	}
@@ -55,12 +55,12 @@ public class CalcFixedThread extends AWorkerThread<String> {
 	private final int id;
 	private final SharedObjects sharedObjects;
 
-	public CalcFixedThread(Node fmNode) {
-		this(fmNode, NUMBER_OF_THREADS);
+	public CalcFixedThread(Node fmNode, WorkMonitor monitor) {
+		this(fmNode, NUMBER_OF_THREADS, monitor);
 	}
 
-	public CalcFixedThread(Node fmNode, int numberOfSolvers) {
-		super(new WorkMonitor());
+	public CalcFixedThread(Node fmNode, int numberOfSolvers, WorkMonitor monitor) {
+		super(monitor);
 		sharedObjects = new SharedObjects(fmNode, numberOfSolvers);
 		this.id = sharedObjects.lastSolverID;
 	}
