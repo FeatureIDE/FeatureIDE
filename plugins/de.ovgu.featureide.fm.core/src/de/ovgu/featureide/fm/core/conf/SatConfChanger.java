@@ -120,4 +120,8 @@ public class SatConfChanger implements IConfigurationChanger {
 		return new UpdateMethod();
 	}
 
+	@Override
+	public void reset() {
+	}
+
 }

@@ -29,6 +29,7 @@ import java.util.List;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.SatSolver;
+import org.prop4j.SatSolver.ValueType;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
@@ -37,6 +38,7 @@ import de.ovgu.featureide.fm.core.conf.nodes.Expression;
 import de.ovgu.featureide.fm.core.conf.nodes.Variable;
 import de.ovgu.featureide.fm.core.conf.nodes.VariableConfiguration;
 import de.ovgu.featureide.fm.core.conf.worker.GraphCalcThread;
+import de.ovgu.featureide.fm.core.conf.worker.GraphCalcThread.CalcObject;
 import de.ovgu.featureide.fm.core.configuration.IConfigurationPropagator;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
@@ -137,8 +139,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 	public class UpdateMethod implements LongRunningMethod<List<String>> {
 		@Override
 		public List<String> run(WorkMonitor monitor) {
-			final boolean[] featureToCompute = new boolean[variableConfiguration.size()];
-			changedFeatures.clear();
+			final byte[] featureToCompute = new byte[variableConfiguration.size()];
 			for (int index = 0; index < lastComputedValues.length; index++) {
 				final int oldValue = lastComputedValues[index];
 				final int newValue = variableConfiguration.getVariable(index).getValue();
@@ -152,21 +153,27 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 								if (curValue == Variable.UNDEFINED) {
 									final byte edgeValue = featureGraph.getValue(index, i, newValue == Variable.TRUE);
 									switch (edgeValue) {
-									case IFeatureGraph.VALUE_0:
+									case AFeatureGraph.VALUE_0:
 										setNewValue(i, Variable.FALSE, false);
-										featureToCompute[i] = false;
+										featureToCompute[i] = 0;
 										break;
-									case IFeatureGraph.VALUE_1:
+									case AFeatureGraph.VALUE_1:
 										setNewValue(i, Variable.TRUE, false);
-										featureToCompute[i] = false;
+										featureToCompute[i] = 0;
 										break;
-									case IFeatureGraph.VALUE_Q:
-										featureToCompute[i] = true;
+									case AFeatureGraph.VALUE_0Q:
+										featureToCompute[i] = 1;
 										break;
-									case IFeatureGraph.VALUE_NONE:
+									case AFeatureGraph.VALUE_1Q:
+										featureToCompute[i] = 2;
+										break;
+									case AFeatureGraph.VALUE_10Q:
+										featureToCompute[i] = 3;
+										break;
+									case AFeatureGraph.VALUE_NONE:
 										if (oldValue != Variable.UNDEFINED
-												&& featureGraph.getValue(index, i, oldValue == Variable.TRUE) != IFeatureGraph.VALUE_NONE) {
-											featureToCompute[i] = true;
+												&& featureGraph.getValue(index, i, oldValue == Variable.TRUE) != AFeatureGraph.VALUE_NONE) {
+											featureToCompute[i] = 3;
 										}
 										break;
 									default:
@@ -175,8 +182,8 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 								}
 							} else {
 								if (curValue != Variable.UNDEFINED) {
-									if (featureGraph.getValue(index, i, oldValue == Variable.TRUE) != IFeatureGraph.VALUE_NONE) {
-										featureToCompute[i] = true;
+									if (featureGraph.getValue(index, i, oldValue == Variable.TRUE) != AFeatureGraph.VALUE_NONE) {
+										featureToCompute[i] = 3;
 									}
 								}
 							}
@@ -184,14 +191,27 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 					}
 				}
 			}
-			final List<Integer> compList = new ArrayList<>();
+			final List<CalcObject> compList = new ArrayList<>();
 
 			// TODO Recursion for found values
 			for (int i = 0; i < featureToCompute.length; i++) {
-				if (featureToCompute[i]) {
+				final byte computeFeature = featureToCompute[i];
+				if (computeFeature > 0) {
+					final ValueType valueType;
+					switch (computeFeature) {
+					case 1:
+						valueType = ValueType.FALSE;
+						break;
+					case 2:
+						valueType = ValueType.TRUE;
+						break;
+					default:
+						valueType = ValueType.ALL;
+						break;
+					}
 					final LinkedList<Expression> varExpList = featureGraph.getExpListAr().get(i);
 					if (varExpList == null || varExpList.isEmpty()) {
-						compList.add(i);
+						compList.add(new CalcObject(i, valueType));
 						continue;
 					}
 
@@ -212,9 +232,9 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 					variableConfiguration.setVariable(i, oldManualValue, true);
 					if (newAutomaticValue != Variable.UNDEFINED) {
 						setNewValue(i, newAutomaticValue, false);
-						featureToCompute[i] = false;
+						featureToCompute[i] = 0;
 					} else {
-						compList.add(i);
+						compList.add(new CalcObject(i, valueType));
 					}
 				}
 			}
@@ -269,7 +289,9 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 			}
 
 			Collections.sort(changedFeatures);
-			return getChangedFeatures();
+			final ArrayList<String> ret = new ArrayList<>(changedFeatures);
+			changedFeatures.clear();
+			return ret;
 		}
 
 	}
@@ -375,6 +397,11 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 	@Override
 	public LoadMethod load() {
 		return new LoadMethod();
+	}
+
+	@Override
+	public void reset() {
+		Arrays.fill(lastComputedValues, (byte) Variable.UNDEFINED);
 	}
 
 }

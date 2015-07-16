@@ -103,7 +103,7 @@ public class FeatureGraphStatisticJob extends AProjectJob<FeatureGraphStatisticJ
 		for (String feature : featureGraph.getFeatureArray()) {
 			for (String feature2 : featureGraph.getFeatureArray()) {
 				final byte edge = featureGraph.getEdge(featureGraph.getFeatureIndex(feature), featureGraph.getFeatureIndex(feature2));
-				if (AFeatureGraph.isEdge(edge, IFeatureGraph.EDGE_10) || AFeatureGraph.isEdge(edge, IFeatureGraph.EDGE_11)) {
+				if (AFeatureGraph.isEdge(edge, (byte) (AFeatureGraph.EDGE_10 | AFeatureGraph.EDGE_11))) {
 					System.out.print("1");
 				} else {
 					System.out.print("0");
@@ -169,6 +169,7 @@ public class FeatureGraphStatisticJob extends AProjectJob<FeatureGraphStatisticJ
 			}
 
 			variableConfiguration.reset();
+			c1.reset();
 		}
 
 		if (compare) {

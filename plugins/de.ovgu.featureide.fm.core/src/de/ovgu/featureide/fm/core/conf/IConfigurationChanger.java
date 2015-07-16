@@ -35,4 +35,6 @@ public interface IConfigurationChanger {
 
 	void setNewValue(int index, int value, boolean manual);
 
+	void reset();
+
 }

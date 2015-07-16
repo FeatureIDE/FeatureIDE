@@ -28,7 +28,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.job.WorkMonitor;
 
-class MasterThread<T> {
+final class MasterThread<T> {
 
 	final ConcurrentLinkedQueue<T> objects = new ConcurrentLinkedQueue<>();
 	final WorkMonitor workMonitor;
@@ -44,7 +44,7 @@ class MasterThread<T> {
 		this.workMonitor = (workMonitor != null) ? workMonitor : new WorkMonitor();
 	}
 
-	void init(int numberOfThreads) {
+	private void init(int numberOfThreads) {
 		if (numberOfThreads < 1) {
 			throw new IndexOutOfBoundsException("Number of threads must be greater than 0 (was " + numberOfThreads + ").");
 		} else if (initialized == numberOfThreads) {

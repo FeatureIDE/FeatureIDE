@@ -29,7 +29,7 @@ public abstract class AWorkerThread<T> implements Runnable {
 	protected static int NUMBER_OF_THREADS = 1;
 	static {
 		final int processors = Runtime.getRuntime().availableProcessors();
-		NUMBER_OF_THREADS = (processors == 1) ? processors : processors - 1;
+		NUMBER_OF_THREADS = (processors == 1) ? processors : processors >> 1;
 	}
 
 	private final MasterThread<T> masterThread;
@@ -66,16 +66,35 @@ public abstract class AWorkerThread<T> implements Runnable {
 			afterWork(false);
 		}
 	}
-
+	
+	/**
+	 * Is called once before the worker start to process its objects.</br>
+	 * </br>
+	 * Default implementation returns {@code true}.
+	 * 
+	 * @return {@code true} if the worker should start working, {@code false} otherwise
+	 */
 	protected boolean beforeWork() {
 		return true;
 	}
-
+	
+	/**
+	 * Is called once after the worker processed all of its objects.</br>
+	 * </br>
+	 * Default implementation does nothing.
+	 * 
+	 * @param success result of {@link #beforeWork()}
+	 */
 	protected void afterWork(boolean success) {
 	}
 
 	protected abstract void work(T object);
 
+	/**
+	 * Creates a new instance of the worker.
+	 * 
+	 * @return new instance of {@link AWorkerThread}
+	 */
 	protected abstract AWorkerThread<T> newThread();
 
 }

@@ -25,6 +25,7 @@ import java.util.List;
 import org.prop4j.Literal;
 import org.prop4j.MultiThreadSatSolver;
 import org.prop4j.Node;
+import org.prop4j.SatSolver.ValueType;
 
 import de.ovgu.featureide.fm.core.conf.IConfigurationChanger;
 import de.ovgu.featureide.fm.core.conf.nodes.Variable;
@@ -36,7 +37,25 @@ import de.ovgu.featureide.fm.core.job.WorkMonitor;
  * 
  * @author Sebastian Krieter
  */
-public class GraphCalcThread extends AWorkerThread<Integer> {
+public class GraphCalcThread extends AWorkerThread<GraphCalcThread.CalcObject> {
+
+	public static class CalcObject {
+		private final int id;
+		private final ValueType valueTye;
+
+		public int getId() {
+			return id;
+		}
+
+		public ValueType getValueType() {
+			return valueTye;
+		}
+
+		public CalcObject(int id, ValueType valueTye) {
+			this.id = id;
+			this.valueTye = valueTye;
+		}
+	}
 
 	private static class SharedObjects {
 
@@ -107,17 +126,33 @@ public class GraphCalcThread extends AWorkerThread<Integer> {
 	}
 
 	@Override
-	protected void work(Integer i) {
-		final byte value = sharedObjects.solver.getValueOf(new Literal(sharedObjects.featureArray[i]), id);
-		switch (value) {
-		case 1:
-			sharedObjects.variableConfiguration.setNewValue(i, Variable.TRUE, false);
+	protected void work(CalcObject calcOject) {
+		final int featureID = calcOject.getId();
+
+		final int value;
+		switch (calcOject.getValueType()) {
+		case ALL:
+			value = sharedObjects.solver.getValueOf(new Literal(sharedObjects.featureArray[featureID]), id);
 			break;
-		case -1:
-			sharedObjects.variableConfiguration.setNewValue(i, Variable.FALSE, false);
+		case FALSE:
+			value = sharedObjects.solver.isFalse(new Literal(sharedObjects.featureArray[featureID]), id) ? -1 : 0;
+			break;
+		case TRUE:
+			value = sharedObjects.solver.isTrue(new Literal(sharedObjects.featureArray[featureID]), id) ? 1 : 0;
 			break;
 		default:
-			sharedObjects.variableConfiguration.setNewValue(i, Variable.UNDEFINED, false);
+			return;
+		}
+
+		switch (value) {
+		case 1:
+			sharedObjects.variableConfiguration.setNewValue(featureID, Variable.TRUE, false);
+			break;
+		case -1:
+			sharedObjects.variableConfiguration.setNewValue(featureID, Variable.FALSE, false);
+			break;
+		default:
+			sharedObjects.variableConfiguration.setNewValue(featureID, Variable.UNDEFINED, false);
 			break;
 		}
 	}

@@ -144,6 +144,7 @@ public class MultiThreadSatSolver {
 	}
 
 	public void setLiterals(List<Literal> knownLiterals) {
+		model = null;
 		literals = new int[knownLiterals.size()];
 		int i = 0;
 		for (Literal node : knownLiterals) {
@@ -183,7 +184,9 @@ public class MultiThreadSatSolver {
 			FMCorePlugin.getDefault().logError(e);
 		}
 		if (satisfiable) {
-			model = solvers[0].solver.model();
+			final int[] solverModel = solvers[0].solver.model();
+			model = new int[solverModel.length];
+			System.arraycopy(solverModel, 0, model, 0, solverModel.length);
 		} else {
 			throw new RuntimeException("Contradiction");
 		}
@@ -208,19 +211,21 @@ public class MultiThreadSatSolver {
 	private byte getValueOf(int varIndex, int solverIndex) {
 		if (satisfiable) {
 			final int x = model[varIndex];
-			final Solver solver = solvers[solverIndex];
-			solver.backbone.push(-x);
-			try {
-				if (solver.isSatisfiable()) {
+			if (x != 0) {
+				final Solver solver = solvers[solverIndex];
+				solver.backbone.push(-x);
+				try {
+					if (solver.isSatisfiable()) {
+						solver.backbone.pop();
+						updateModel(solver.solver.model(), 0);
+					} else {
+						solver.backbone.pop().push(x);
+						return (byte) Math.signum(x);
+					}
+				} catch (TimeoutException e) {
+					FMCorePlugin.getDefault().logError(e);
 					solver.backbone.pop();
-					updateModel(solver.solver.model(), 0);
-				} else {
-					solver.backbone.pop().push(x);
-					return (byte) Math.signum(x);
 				}
-			} catch (TimeoutException e) {
-				FMCorePlugin.getDefault().logError(e);
-				solver.backbone.pop();
 			}
 		}
 		return 0;

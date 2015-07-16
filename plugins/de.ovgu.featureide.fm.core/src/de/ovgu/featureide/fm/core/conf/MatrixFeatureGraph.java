@@ -26,7 +26,7 @@ import de.ovgu.featureide.fm.core.Feature;
 
 public class MatrixFeatureGraph extends AFeatureGraph {
 
-	private static final long serialVersionUID = -4051783169730533477L;
+	private static final long serialVersionUID = 3919685766908834399L;
 
 	private final byte[] adjMatrix;
 
@@ -42,70 +42,66 @@ public class MatrixFeatureGraph extends AFeatureGraph {
 		}
 		final int index = (from * size) + to;
 
+		final int newValue;
 		final byte oldValue;
 		synchronized (featureArray[from]) {
 			oldValue = adjMatrix[index];
-		}
 
-		final int newValue;
-		switch (edgeType) {
-		case EDGE_NONE:
-			newValue = EDGE_NONE;
-			break;
-		case EDGE_0Q:
-			switch (oldValue & MASK_0_00110000) {
+			switch (edgeType) {
 			case EDGE_NONE:
-				newValue = oldValue | EDGE_0Q;
+				newValue = EDGE_NONE;
 				break;
-			default:
-				newValue = oldValue;
-			}
-			break;
-		case EDGE_00:
-		case EDGE_01:
-			switch (oldValue & MASK_0_00110000) {
-			case EDGE_NONE:
-				newValue = oldValue | edgeType;
-				break;
-			case EDGE_0Q:
-				newValue = (oldValue & MASK_0_11001111) | edgeType;
-				break;
-			default:
-				newValue = oldValue;
-				assert ((oldValue & MASK_0_00110000) == edgeType) : (oldValue & MASK_0_00110000) + " != " + edgeType;
-			}
-			break;
-		case EDGE_1Q:
-			switch (oldValue & MASK_1_00001100) {
-			case EDGE_NONE:
-				newValue = oldValue | EDGE_1Q;
-				break;
-			default:
-				newValue = oldValue;
-			}
-			break;
-		case EDGE_10:
-		case EDGE_11:
-			switch (oldValue & MASK_1_00001100) {
-			case EDGE_NONE:
-				newValue = oldValue | edgeType;
-				break;
-			case EDGE_1Q:
-				newValue = (oldValue & MASK_1_11110011) | edgeType;
-				break;
-			default:
-				newValue = oldValue;
-				if ((oldValue & MASK_1_00001100) != edgeType) {
-					throw new RuntimeException();
+			case EDGE_00Q:
+				if (!isEdge(oldValue, (byte) (EDGE_00 | EDGE_01))) {
+					newValue = oldValue | EDGE_00Q;
+				} else {
+					newValue = oldValue;
 				}
-				assert ((oldValue & MASK_1_00001100) == edgeType) : (oldValue & MASK_1_00001100) + " != " + edgeType;
+				break;
+			case EDGE_00:
+				assert !isEdge(oldValue, EDGE_01);
+				newValue = (oldValue & MASK_0_CLEAR) | EDGE_00;
+				break;
+			case EDGE_01Q:
+				if (!isEdge(oldValue, (byte) (EDGE_00 | EDGE_01))) {
+					newValue = oldValue | EDGE_01Q;
+				} else {
+					newValue = oldValue;
+				}
+				break;
+			case EDGE_01:
+				assert !isEdge(oldValue, EDGE_00);
+				newValue = (oldValue & MASK_0_CLEAR) | EDGE_01;
+				break;
+
+			case EDGE_10Q:
+				if (!isEdge(oldValue, (byte) (EDGE_10 | EDGE_11))) {
+					newValue = oldValue | EDGE_10Q;
+				} else {
+					newValue = oldValue;
+				}
+				break;
+			case EDGE_10:
+				assert !isEdge(oldValue, EDGE_11);
+				newValue = (oldValue & MASK_1_CLEAR) | EDGE_10;
+				break;
+			case EDGE_11Q:
+				if (!isEdge(oldValue, (byte) (EDGE_10 | EDGE_11))) {
+					newValue = oldValue | EDGE_11Q;
+				} else {
+					newValue = oldValue;
+				}
+				break;
+			case EDGE_11:
+				assert !isEdge(oldValue, EDGE_10);
+				newValue = (oldValue & MASK_1_CLEAR) | EDGE_11;
+				break;
+			default:
+				newValue = oldValue;
+				break;
 			}
-			break;
-		default:
-			newValue = EDGE_NONE;
-		}
-		synchronized (featureArray[from]) {
-			adjMatrix[index] = (byte) newValue;
+
+			adjMatrix[index] = (byte) (0x000000ff & newValue);
 		}
 
 		return oldValue != newValue;
@@ -120,19 +116,20 @@ public class MatrixFeatureGraph extends AFeatureGraph {
 	@Override
 	public byte getValue(int fromIndex, int toIndex, boolean fromSelected) {
 		final int index = (fromIndex * size) + toIndex;
-		return (byte) (fromSelected ? ((adjMatrix[index] & MASK_1_00001100) >> 2) : ((adjMatrix[index] & MASK_0_00110000) >> 4));
+		return (byte) (((fromSelected ? (adjMatrix[index] >>> 4) : adjMatrix[index])) & 0x0000000f);
 	}
 
 	@Override
 	public int countNeighbors(String from, boolean selected, boolean subtractReal) {
 		final int fromIndex = featureMap.get(from);
-		final byte mask = (selected) ? MASK_1_00001100 : MASK_0_00110000;
-		final byte unrealEdge = (selected) ? EDGE_1Q : EDGE_0Q;
+
+		final byte countEdge = selected ? (subtractReal ? (EDGE_10 | EDGE_11) : MASK_0_CLEAR) : (subtractReal ? (EDGE_00 | EDGE_01) : MASK_1_CLEAR);
 
 		int count = 0;
 		for (int i = (fromIndex * size), end = i + size; i < end; i++) {
-			final int edge = (adjMatrix[i] & mask);
-			count += (edge == 0 || (subtractReal && edge != unrealEdge)) ? 0 : 1;
+			if (isEdge(adjMatrix[i], countEdge)) {
+				count++;
+			}
 		}
 
 		return count;

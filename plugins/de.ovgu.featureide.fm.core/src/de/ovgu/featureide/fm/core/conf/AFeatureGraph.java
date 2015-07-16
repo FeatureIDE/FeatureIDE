@@ -33,20 +33,20 @@ public abstract class AFeatureGraph implements IFeatureGraph {
 
 	private static final long serialVersionUID = 1L;
 
-	public static final byte EDGE_NONE = 0b00000000, EDGE_11 = 0b00000100, //0x04,
-			EDGE_10 = 0b00001000, //0x08,
-			EDGE_1Q = 0b00001100, //0x0c,
-			EDGE_01 = 0b00010000, //0x10,
-			EDGE_00 = 0b00100000, //0x20,
-			EDGE_0Q = 0b00110000, //0x30;
-			VALUE_NONE = 0b00000000, //0x02;
-			VALUE_1 = 0b00000001, //0x02;
-			VALUE_0 = 0b00000010, //0x01;
-			VALUE_Q = 0b00000011; //0x03;
+	public static final byte EDGE_NONE = 0b00000000, //0x00;
+			EDGE_00 = 0b00000010, //0x02,
+			EDGE_00Q = 0b00000001, //0x01,
+			EDGE_01 = 0b00001000, //0x08,
+			EDGE_01Q = 0b00000100, //0x04,
+			EDGE_10 = 0b00100000, //0x20,
+			EDGE_10Q = 0b00010000, //0x10,
+			EDGE_11 = (byte) 0b10000000, //0x80,
+			EDGE_11Q = 0b01000000, //0x40,
 
-	public static final byte MASK_1_11110011 = (byte) 0b11110011, //0xf3,
-			MASK_0_11001111 = (byte) 0b11001111, //0xcf,
-			MASK_1_00001100 = ~MASK_1_11110011, MASK_0_00110000 = ~MASK_0_11001111;
+			VALUE_NONE = EDGE_NONE, VALUE_0Q = EDGE_00Q, VALUE_0 = EDGE_00, VALUE_1Q = EDGE_01Q, VALUE_1 = EDGE_01, VALUE_10Q = EDGE_00Q | EDGE_01Q;
+
+	public static final byte MASK_0_CLEAR = (byte) 0b11110000, //0xf3,
+			MASK_1_CLEAR = (byte) 0b00001111; //0xf3,
 
 	protected final String[] featureArray;
 	protected final String[] coreFeatures;
@@ -57,20 +57,7 @@ public abstract class AFeatureGraph implements IFeatureGraph {
 	protected final ArrayList<LinkedList<Expression>> expListAr;
 
 	public static boolean isEdge(byte edge, byte q) {
-		switch (q) {
-		case EDGE_NONE:
-			return edge == EDGE_NONE;
-		case EDGE_11:
-		case EDGE_10:
-		case EDGE_1Q:
-			return (edge & MASK_1_00001100) == q;
-		case EDGE_01:
-		case EDGE_00:
-		case EDGE_0Q:
-			return (edge & MASK_0_00110000) == q;
-		default:
-			return false;
-		}
+		return (edge & q) != EDGE_NONE;
 	}
 
 	public AFeatureGraph(Collection<Feature> variantfeatures, Collection<Feature> coreFeatures, Collection<Feature> deadFeatures) {
