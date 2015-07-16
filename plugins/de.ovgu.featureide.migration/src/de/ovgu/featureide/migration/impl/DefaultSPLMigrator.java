@@ -28,7 +28,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.NO_PROJECTS_WE
 import static de.ovgu.featureide.fm.core.localization.StringTable.PROJECT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PROJECT_PROPERTIES_COULD_NOT_BE_COPIED_COMMA__BECAUSE_IT_DOES_NOT_EXIST_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
-import static de.ovgu.featureide.fm.core.localization.StringTable.TRIED_TO_OPEN_NULL_PROJECT_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.INTERNAL_ASSERT_MESSAGE_PROJECT_IS_NULL;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -117,7 +117,7 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator {
 	}
 
 	private void openProjectHandleExceptions(IProject project) {
-		assert (project != null) : TRIED_TO_OPEN_NULL_PROJECT_;
+		assert (project != null) : INTERNAL_ASSERT_MESSAGE_PROJECT_IS_NULL;
 		try {
 			project.open(null);
 		} catch (CoreException e) {

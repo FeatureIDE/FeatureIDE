@@ -28,7 +28,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.NOT_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.OF;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SAMPLING;
-import static de.ovgu.featureide.fm.core.localization.StringTable.SATSOLVER_OVERFLOW;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SATSOLVER_COMPUTATION_TIMEOUT;
 
 import java.io.IOException;
 import java.net.URL;
@@ -286,7 +286,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 				protected boolean work() {
 					configurationNumber = new Configuration(featureModel, false, false).number(1000000);
 					if (configurationNumber < 0) {
-						LOGGER.logWarning(SATSOLVER_OVERFLOW);
+						LOGGER.logWarning(SATSOLVER_COMPUTATION_TIMEOUT);
 						configurationNumber = Integer.MAX_VALUE;
 					}
 

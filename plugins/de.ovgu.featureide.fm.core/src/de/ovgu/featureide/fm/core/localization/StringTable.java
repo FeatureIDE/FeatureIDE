@@ -549,9 +549,13 @@ public class StringTable {
     public static final String ZERO = "zero";
     public static final String PRODUCT = "Product ";
     public static final String TIMEOUT_STRING = "timeout";
-    public static final String SOURCE_PATH_RESTRICTION_ANDROID = "Source Path: \"src\" and \"res\" folders are reserved for Android.";//TODO simplify strings
-    public static final String BUILD_PATH_RESTRICTION_ANDROID = "Build Path: \"src\" and \"res\" folders are reserved for Android.";
-    public static final String CONFIG_PATH_RESTRICTION_ANDROID = "Config Path: \"src\" and \"res\" folders are reserved for Android.";
+    public static final String SOURCE_PATH = "Source Path";
+    public static final String BUILD_PATH = "Build Path";
+    public static final String CONFIG_PATH = "Config Path";
+    public static final String PATH_RESTRICTION_ANDROID = "The folders \"src\" and \"res\" are reserved for Android and can not be used as \"";
+    public static final String SOURCE_PATH_RESTRICTION_ANDROID = PATH_RESTRICTION_ANDROID + SOURCE_PATH + "\".";
+    public static final String BUILD_PATH_RESTRICTION_ANDROID = PATH_RESTRICTION_ANDROID + BUILD_PATH + "\".";
+    public static final String CONFIG_PATH_RESTRICTION_ANDROID = PATH_RESTRICTION_ANDROID + CONFIG_PATH + "\".";
     public static final String OPEN_A_FEATURE_MODEL_ = "Open a feature model.";
     public static final String START_MANUAL_OR_ACTIVATE_AUTOMATIC_CALCULATION_TO_SHOW_STATISTICS_ = "Start manual calculation or activate automatic calculation to show statistics.";
     public static final String CALCULATING___ = "Calculating...";
@@ -590,7 +594,7 @@ public class StringTable {
     public static final String NEW_MODEL_FILE_MUST_HAVE_XML_AS_FILE_EXTENSION_ = "New model file must have xml as file extension.";
     public static final String SELECTED_FILE_ALREADY_EXISTS_ = "Selected file already exists.";
     public static final String NO_PROJECTS_WERE_SELECTED_FOR_MIGRATION = "No projects were selected for migration";
-    public static final String TRIED_TO_OPEN_NULL_PROJECT_ = "Tried to open null project.";//TODO revise
+    public static final String INTERNAL_ASSERT_MESSAGE_PROJECT_IS_NULL = "Assertion failed: Project referrence is null.";
     public static final String DESTINATIONFOLDER_NOT_ACCESSIBLE_OR_WRONG_PATH = "Destination folder not accessible or wrong path";
     public static final String PROJECT = "Project ";
     public static final String PROJECT_PROPERTIES_COULD_NOT_BE_COPIED_COMMA__BECAUSE_IT_DOES_NOT_EXIST_ = "project.properties could not be copied, because it does not exist.";
@@ -619,7 +623,7 @@ public class StringTable {
     public static final String BUILD_PRODUCTS_FOR_PROJECT = "Build products for project ";
     public static final String ERROR_ = "-Error-";
     public static final String BUILD_PRODUCTS = "Build Products";
-    public static final String SATSOLVER_OVERFLOW = "SAT solver overflow";//TODO clarify
+    public static final String SATSOLVER_COMPUTATION_TIMEOUT = "A timeout occurred during computation of satisfiability. Formula is too complex and cannot be solved. Try again or increase the timeout.";
     public static final String FOR = " for ";
     public static final String OF = " of ";
     public static final String NOT_ = "not-";
@@ -632,10 +636,6 @@ public class StringTable {
     public static final String THE_GENERATOR_NR_ = "The generator number ";
     public static final String BUILD_ALL_VALID_CONFIGURATIONS = "Build all valid configurations";
     public static final String BUILD_ALL_CURRENT_CONFIGURATIONS = "Build all current configurations";
-    public static final String BUILD_T_WISE_CONFIGURATIONS = "Build T-wise configurations";
-    public static final String BUILDS_ALL_CURRENT_CONFIGURATIONS = "Builds all current configurations";//TODO necessary? sounds wrong
-    public static final String BUILD_ALL_VALID_PROGRAM_VARIANTS_ = "Build all valid program variants.";//TODO necessary? see above
-    public static final String CREATE_A_NEW_PROJECT_FOR_EACH_VARIANT = "Create a new project for each variant";//TODO replace all occurrences of variant / program variant by product
     public static final String BUILD_INTEGRATION_CONFIGURATIONS = "Build integration configurations";
     public static final String COUNT_CONFIGURATIONS = "Count configurations";
     public static final String VARIANT = "Variant";

@@ -20,14 +20,10 @@
  */
 package de.ovgu.featureide.ui.actions.generator;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.BUILDS_ALL_CURRENT_CONFIGURATIONS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD_ALL_CURRENT_CONFIGURATIONS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD_ALL_VALID_CONFIGURATIONS;
-import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD_ALL_VALID_PROGRAM_VARIANTS_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD_INTEGRATION_CONFIGURATIONS;
-import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD_T_WISE_CONFIGURATIONS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.COUNT_CONFIGURATIONS;
-import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_A_NEW_PROJECT_FOR_EACH_VARIANT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.HAS_BEEN_DEPRECATED;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PRODUCTS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.REDUNDANT_CAST_TO;
@@ -55,16 +51,6 @@ public interface IConfigurationBuilderBasics {
 	enum BuildType {ALL_VALID, ALL_CURRENT, T_WISE, INTEGRATION};
 	enum BuildOrder {DEFAULT, DIFFERENCE, INTERACTION};
 	enum TWise {ICPL, CHVATAL, CASA}
-	
-	/**
-	 * Basics for the dialogs.
-	 */
-	String MESSAGE_TITLE_VALID = BUILD_ALL_VALID_CONFIGURATIONS;
-	String MESSAGE_TITLE_CURRENT = BUILD_ALL_CURRENT_CONFIGURATIONS;
-	String MESSAGE_TITLE_T = BUILD_T_WISE_CONFIGURATIONS;
-	String MESSAGE_CURRENT = BUILDS_ALL_CURRENT_CONFIGURATIONS;
-	String MESSAGE_START = BUILD_ALL_VALID_PROGRAM_VARIANTS_;
-	String TOGGLE_MESSAGE = CREATE_A_NEW_PROJECT_FOR_EACH_VARIANT;
 	
 	/** Saves the toggle state whether new projects should be generated for each configuration. **/
 	QualifiedName TOGGLE_STATE = new QualifiedName(IConfigurationBuilderBasics.class.getName() + "#CreateNewProject", 
