@@ -57,10 +57,6 @@ public class DFSThread extends AWorkerThread<String> {
 	@Override
 	protected void work(String object) {
 		final int featureIndex = sharedObjects.featureGraph.getFeatureIndex(object);
-//		if (featureIndex == 952) {
-//			System.out.println();
-//		}
-			
 		Arrays.fill(visited, (byte) 0);
 		dfs(visited, sharedObjects.complete, featureIndex, true);
 		Arrays.fill(visited, (byte) 0);
@@ -75,16 +71,12 @@ public class DFSThread extends AWorkerThread<String> {
 
 	// visited: 0 not visited, 1 visited (unknown status), 2 visited (known status)
 	private void dfs(byte[] visited, boolean[] complete, int curFeature, boolean selected) {
-		//	System.out.println(featureArray[curFeature] + " " + selected);
 		visited[curFeature] = 5;
 
 		for (int j = 0; j < visited.length; j++) {
 			final byte visit = visited[j];
 			if (visit < 5) {
 				final byte childSelected;
-//				if (sharedObjects.featureGraph.getValue(curFeature, j, selected) > 0) {
-//					System.out.println();
-//				}
 				switch (sharedObjects.featureGraph.getValue(curFeature, j, selected)) {
 				case AFeatureGraph.VALUE_0Q:
 					if (visit == 2) {
@@ -92,14 +84,11 @@ public class DFSThread extends AWorkerThread<String> {
 					}
 					if (visit == 3) {
 						visited[j] = 4;
-						childSelected = 2; // correct ???
-//						childSelected = 4; // correct ???
+						childSelected = 2;
 					} else {
 						visited[j] = 2;
 						childSelected = 2;
 					}
-//					visited[j] = 4;
-//					childSelected = 4;
 					break;
 				case AFeatureGraph.VALUE_1Q:
 					if (visit == 3) {
@@ -107,29 +96,25 @@ public class DFSThread extends AWorkerThread<String> {
 					}
 					if (visit == 2) {
 						visited[j] = 4;
-						childSelected = 3; // correct ???
-//						childSelected = 4; // correct ???
+						childSelected = 3;
 					} else {
 						visited[j] = 3;
 						childSelected = 3;
 					}
-//					visited[j] = 4;
-//					childSelected = 4;
 					break;
 				case AFeatureGraph.VALUE_10Q:
 					if (visit == 4) {
 						continue;
 					}
 					visited[j] = 4;
-					
+
 					if (visit == 2) {
-						childSelected = 3; // correct ???
+						childSelected = 3;
 					} else if (visit == 3) {
-						childSelected = 2; // correct ???
-					} else  {
+						childSelected = 2;
+					} else {
 						childSelected = 4;
 					}
-//					childSelected = 4;
 					break;
 				case AFeatureGraph.VALUE_0:
 					// don't select child
@@ -156,10 +141,7 @@ public class DFSThread extends AWorkerThread<String> {
 		for (int j = 0; j < visited.length; j++) {
 			final byte visit = visited[j];
 			byte childSelected = -1;
-//			final byte edge = sharedObjects.featureGraph.getEdge(curFeature, j);
-//			if (sharedObjects.featureGraph.getEdge(curFeature, j) > 0) {
-//				System.out.println();
-//			}
+
 			if (visit == 0) {
 				switch (selected) {
 				case 0:
@@ -374,8 +356,6 @@ public class DFSThread extends AWorkerThread<String> {
 						visited[j] = 4;
 						childSelected = 4;
 						sharedObjects.featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
-//						//TODO added
-//						sharedObjects.featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
 						break;
 					case AFeatureGraph.VALUE_0:
 						// don't select child
@@ -400,8 +380,6 @@ public class DFSThread extends AWorkerThread<String> {
 						visited[j] = 4;
 						childSelected = 4;
 						sharedObjects.featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
-//						//TODO added
-//						sharedObjects.featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
 						break;
 					case AFeatureGraph.VALUE_0:
 						// don't select child
@@ -427,8 +405,6 @@ public class DFSThread extends AWorkerThread<String> {
 						visited[j] = 4;
 						childSelected = 4;
 						sharedObjects.featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
-//						//TODO added
-//						sharedObjects.featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
 						break;
 					default:
 						continue;
@@ -442,8 +418,6 @@ public class DFSThread extends AWorkerThread<String> {
 						visited[j] = 4;
 						childSelected = 4;
 						sharedObjects.featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
-//						//TODO added
-//						sharedObjects.featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
 						break;
 					default:
 						continue;
@@ -457,8 +431,6 @@ public class DFSThread extends AWorkerThread<String> {
 						visited[j] = 4;
 						childSelected = 4;
 						sharedObjects.featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
-//						//TODO added
-//						sharedObjects.featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
 						break;
 					default:
 						break;
@@ -470,8 +442,6 @@ public class DFSThread extends AWorkerThread<String> {
 						visited[j] = 4;
 						childSelected = 4;
 						sharedObjects.featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
-//						//TODO added
-//						sharedObjects.featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
 						break;
 					default:
 						break;
@@ -487,8 +457,6 @@ public class DFSThread extends AWorkerThread<String> {
 						visited[j] = 4;
 						childSelected = 4;
 						sharedObjects.featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
-//						//TODO added
-//						sharedObjects.featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
 						break;
 					case AFeatureGraph.VALUE_0:
 						// don't select child
@@ -513,8 +481,6 @@ public class DFSThread extends AWorkerThread<String> {
 						visited[j] = 4;
 						childSelected = 4;
 						sharedObjects.featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
-//						//TODO added
-//						sharedObjects.featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
 						break;
 					case AFeatureGraph.VALUE_0:
 						// don't select child
@@ -540,8 +506,6 @@ public class DFSThread extends AWorkerThread<String> {
 						visited[j] = 4;
 						childSelected = 4;
 						sharedObjects.featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
-//						//TODO added
-//						sharedObjects.featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
 						break;
 					default:
 						continue;
@@ -555,8 +519,6 @@ public class DFSThread extends AWorkerThread<String> {
 						visited[j] = 4;
 						childSelected = 4;
 						sharedObjects.featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
-//						//TODO added
-//						sharedObjects.featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
 						break;
 					default:
 						continue;
@@ -570,8 +532,6 @@ public class DFSThread extends AWorkerThread<String> {
 						visited[j] = 4;
 						childSelected = 4;
 						sharedObjects.featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
-//						//TODO added
-//						sharedObjects.featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
 						break;
 					default:
 						break;
@@ -583,8 +543,6 @@ public class DFSThread extends AWorkerThread<String> {
 						visited[j] = 4;
 						childSelected = 4;
 						sharedObjects.featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_10Q : AFeatureGraph.EDGE_00Q);
-//						//TODO added
-//						sharedObjects.featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_11Q : AFeatureGraph.EDGE_01Q);
 						break;
 					default:
 						break;
@@ -633,115 +591,10 @@ public class DFSThread extends AWorkerThread<String> {
 					break;
 				}
 			}
-					
 
-			if (incomplete) {
-				if (childSelected == 4) {
-					dfs_rec(visited, complete, j, parentFeature, childSelected, parentSelected);
-//					dfs_rec(visited, complete, j, parentFeature, childSelected, parentSelected);
-				} else if (childSelected >= 0) {
-					dfs_rec(visited, complete, j, parentFeature, childSelected, parentSelected);
-				}
+			if (incomplete && childSelected >= 0) {
+				dfs_rec(visited, complete, j, parentFeature, childSelected, parentSelected);
 			}
-//			if (incomplete && childSelected >= 0) {
-//				dfs_rec(visited, complete, j, parentFeature, childSelected, parentSelected);
-//			}
-//					
-//					
-//					
-//					
-//					
-//					
-//					
-//					
-//					switch (edge & AFeatureGraph.MASK_0_00110000) {
-//					// visit = 0, not selected, implies not selected
-//					case AFeatureGraph.EDGE_00:
-//						visited[j] = 2;
-//						sharedObjects.featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_10 : AFeatureGraph.EDGE_00);
-//						childSelected = 0;
-//						break;
-//					// visit = 0, not selected, implies selected
-//					case AFeatureGraph.EDGE_01:
-//						visited[j] = 2;
-//						sharedObjects.featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_11 : AFeatureGraph.EDGE_01);
-//						childSelected = 1;
-//						break;
-//					// visit = 0, not selected, implies ?
-//					case AFeatureGraph.EDGE_0Q:
-//						visited[j] = 1;
-//						sharedObjects.featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_1Q : AFeatureGraph.EDGE_0Q);
-//						childSelected = 2;
-//						break;
-//					}
-//					break;
-//				case 1:
-//					switch (edge & AFeatureGraph.MASK_1_00001100) {
-//					// visit = 0, selected, implies not selected
-//					case AFeatureGraph.EDGE_10:
-//						visited[j] = 2;
-//						sharedObjects.featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_10 : AFeatureGraph.EDGE_00);
-//						childSelected = 0;
-//						break;
-//					// visit = 0, selected, implies selected
-//					case AFeatureGraph.EDGE_11:
-//						visited[j] = 2;
-//						sharedObjects.featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_11 : AFeatureGraph.EDGE_01);
-//						childSelected = 1;
-//						break;
-//					// visit = 0, selected, implies ?
-//					case AFeatureGraph.EDGE_1Q:
-//						visited[j] = 1;
-//						sharedObjects.featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_1Q : AFeatureGraph.EDGE_0Q);
-//						childSelected = 2;
-//						break;
-//					}
-//					break;
-//				case 2:
-//					if (edge > 0) {
-//						visited[j] = 1;
-//						sharedObjects.featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_1Q : AFeatureGraph.EDGE_0Q);
-//						childSelected = 2;
-//					}
-//					break;
-//				}
-//			} else if (visit == 1) {
-//				final byte edge = sharedObjects.featureGraph.getEdge(curFeature, j);
-//				switch (selected) {
-//				case 0:
-//					switch (edge & AFeatureGraph.MASK_0_00110000) {
-//					// visit = 1, not selected, implies not selected
-//					case AFeatureGraph.EDGE_00:
-//						visited[j] = 2;
-//						sharedObjects.featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_10 : AFeatureGraph.EDGE_00);
-//						childSelected = 0;
-//						break;
-//					// visit = 1, not selected, implies selected
-//					case AFeatureGraph.EDGE_01:
-//						visited[j] = 2;
-//						sharedObjects.featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_11 : AFeatureGraph.EDGE_01);
-//						childSelected = 1;
-//						break;
-//					}
-//					break;
-//				case 1:
-//					switch (edge & AFeatureGraph.MASK_1_00001100) {
-//					// visit = 1, selected, implies not selected
-//					case AFeatureGraph.EDGE_10:
-//						visited[j] = 2;
-//						sharedObjects.featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_10 : AFeatureGraph.EDGE_00);
-//						childSelected = 0;
-//						break;
-//					// visit = 1, selected, implies selected
-//					case AFeatureGraph.EDGE_11:
-//						visited[j] = 2;
-//						sharedObjects.featureGraph.setEdge(parentFeature, j, parentSelected ? AFeatureGraph.EDGE_11 : AFeatureGraph.EDGE_01);
-//						childSelected = 1;
-//						break;
-//					}
-//					break;
-//				}
-//			}
 		}
 	}
 
