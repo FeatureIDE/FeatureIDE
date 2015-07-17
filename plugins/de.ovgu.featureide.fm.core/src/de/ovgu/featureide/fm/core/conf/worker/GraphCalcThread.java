@@ -71,7 +71,7 @@ public class GraphCalcThread extends AWorkerThread<GraphCalcThread.CalcObject> {
 			this.featureArray = featureArray;
 			this.variableConfiguration = variableConfiguration;
 			this.numberOfSolvers = numberOfSolvers;
-			this.solver = new MultiThreadSatSolver(fmNode, 2000, numberOfSolvers, false);
+			this.solver = new MultiThreadSatSolver(fmNode, 1000, numberOfSolvers, false);
 		}
 
 	}
@@ -120,9 +120,7 @@ public class GraphCalcThread extends AWorkerThread<GraphCalcThread.CalcObject> {
 
 	@Override
 	protected boolean beforeWork() {
-		sharedObjects.solver.initSolver(id);
-		sharedObjects.solver.setBackbone(id);
-		return super.beforeWork();
+		return sharedObjects.solver.initSolver(id);
 	}
 
 	@Override

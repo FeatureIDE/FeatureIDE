@@ -102,9 +102,9 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 	protected boolean work() throws Exception {
 		if (!loadFeatureGraph()) {
 			System.out.println("Computing...");
-			
-			workMonitor.setMaxAbsoluteWork(2 * arguments.featureModel.getFeatureNames().size() + 1);
-			
+
+			workMonitor.setMaxAbsoluteWork((2 * arguments.featureModel.getFeatureNames().size()) + 1);
+
 			final CalcFixedThread calcThread = new CalcFixedThread(NodeCreator.createNodes(arguments.featureModel, true).toCNF(), workMonitor);
 			calcThread.addObjects(arguments.featureModel.getFeatureNames());
 			calcThread.start();
@@ -126,7 +126,7 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 
 			processedParents.clear();
 
-//			workMonitor.setMaxAbsoluteWork(1 * features.size() + 1);
+			workMonitor.setMaxAbsoluteWork(arguments.featureModel.getFeatureNames().size() + features.size() + 1);
 
 			featureGraph = new MatrixFeatureGraph(features, coreFeatures, deadFeatures);
 

@@ -77,9 +77,43 @@ public class MultiThreadSatSolver {
 		solvers = new Solver[numberOfSolvers];
 	}
 
-	public void initSolver(int id) {
+	public boolean initSolver(int id) {
 		solvers[id] = new Solver(varToInt.size(), timeout);
 		addClauses(node.clone(), id);
+
+		if (literals != null) {
+			solvers[id].backbone = newCopiedVecInt(literals, 10);
+		}
+
+		if (id == 0) {
+			try {
+				satisfiable = solvers[0].isSatisfiable();
+			} catch (TimeoutException e) {
+				satisfiable = false;
+				FMCorePlugin.getDefault().logError(e);
+			}
+
+			synchronized (this) {
+				if (satisfiable) {
+					final int[] solverModel = solvers[0].solver.model();
+					model = new int[solvers[0].solver.nVars()];
+					System.arraycopy(solverModel, 0, model, 0, solverModel.length);
+				}
+				this.notifyAll();
+			}
+		} else {
+			synchronized (this) {
+				if (satisfiable && model == null) {
+					try {
+						this.wait();
+					} catch (InterruptedException e) {
+						FMCorePlugin.getDefault().logError(e);
+					}
+				}
+			}
+		}
+
+		return satisfiable;
 	}
 
 	private void readVars(Node node) {
@@ -152,47 +186,6 @@ public class MultiThreadSatSolver {
 		}
 	}
 
-	public void setBackbone(int id) {
-		if (literals != null) {
-			solvers[id].backbone = newCopiedVecInt(literals, 10);
-		}
-		if (id == 0) {
-			synchronized (this) {
-				isSatisfiable();
-				this.notifyAll();
-			}
-		} else {
-			synchronized (this) {
-				if (satisfiable && model == null) {
-					try {
-						this.wait();
-					} catch (InterruptedException e) {
-						FMCorePlugin.getDefault().logError(e);
-					}
-				}
-			}
-		}
-	}
-
-	public boolean isSatisfiable() {
-		if (!satisfiable) {
-			return false;
-		}
-		try {
-			satisfiable = solvers[0].isSatisfiable();
-		} catch (TimeoutException e) {
-			FMCorePlugin.getDefault().logError(e);
-		}
-		if (satisfiable) {
-			final int[] solverModel = solvers[0].solver.model();
-			model = new int[solverModel.length];
-			System.arraycopy(solverModel, 0, model, 0, solverModel.length);
-		} else {
-			throw new RuntimeException("Contradiction");
-		}
-		return satisfiable;
-	}
-
 	public byte getValueOf(Literal literal, int solverIndex) {
 		final int i = getIntOfLiteral(literal) - 1;
 		return (model[i] != 0) ? getValueOf(i, solverIndex) : 0;
@@ -217,7 +210,7 @@ public class MultiThreadSatSolver {
 				try {
 					if (solver.isSatisfiable()) {
 						solver.backbone.pop();
-						updateModel(solver.solver.model(), 0);
+						updateModel(solver.solver.model(), varIndex);
 					} else {
 						solver.backbone.pop().push(x);
 						return (byte) Math.signum(x);

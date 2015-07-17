@@ -47,13 +47,17 @@ public class CalcFixedThread extends AWorkerThread<String> {
 
 		public SharedObjects(Node fmNode, int numberOfSolvers) {
 			this.numberOfSolvers = numberOfSolvers;
-			this.solver = new MultiThreadSatSolver(fmNode, 2000, numberOfSolvers, false);
+			this.solver = new MultiThreadSatSolver(fmNode, 1000, numberOfSolvers, false);
 		}
 
 	}
 
 	private final int id;
 	private final SharedObjects sharedObjects;
+
+	public CalcFixedThread(Node fmNode) {
+		this(fmNode, NUMBER_OF_THREADS, new WorkMonitor());
+	}
 
 	public CalcFixedThread(Node fmNode, WorkMonitor monitor) {
 		this(fmNode, NUMBER_OF_THREADS, monitor);
@@ -87,9 +91,7 @@ public class CalcFixedThread extends AWorkerThread<String> {
 
 	@Override
 	protected boolean beforeWork() {
-		sharedObjects.solver.initSolver(id);
-		sharedObjects.solver.setBackbone(id);
-		return super.beforeWork();
+		return sharedObjects.solver.initSolver(id);
 	}
 
 	@Override
