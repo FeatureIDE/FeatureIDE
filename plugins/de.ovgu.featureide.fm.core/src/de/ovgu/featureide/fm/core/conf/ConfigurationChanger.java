@@ -321,6 +321,10 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 		return new UpdateMethod();
 	}
 
+	public UpdateMethod2 updateNext() {
+		return new UpdateMethod2();
+	}
+
 	@Override
 	public IsValidMethod isValidNoHidden() {
 		return new IsValidMethod();
@@ -402,6 +406,126 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 	@Override
 	public void reset() {
 		Arrays.fill(lastComputedValues, (byte) Variable.UNDEFINED);
+	}
+
+	public class UpdateMethod2 implements LongRunningMethod<Void> {
+		@Override
+		public Void run(WorkMonitor monitor) {
+			for (int index = 0; index < lastComputedValues.length; index++) {
+				final int oldValue = lastComputedValues[index];
+				final int newValue = variableConfiguration.getVariable(index).getValue();
+				if (newValue != oldValue) {
+					lastComputedValues[index] = (byte) newValue;
+
+					for (int i = index + 1; i != index; i = (i + 1) % featureGraph.getSize()) {
+						final int curValue = variableConfiguration.getVariable(i).getAutomaticValue();
+						if (curValue == Variable.UNDEFINED) {
+							final byte edgeValue = featureGraph.getValue(index, i, newValue == Variable.TRUE);
+							switch (edgeValue) {
+							case AFeatureGraph.VALUE_0:
+								setNewValue(i, Variable.FALSE, false);
+								break;
+							case AFeatureGraph.VALUE_1:
+								setNewValue(i, Variable.TRUE, false);
+								break;
+							case AFeatureGraph.VALUE_0Q:
+								calcNegative(i);
+								break;
+							case AFeatureGraph.VALUE_1Q:
+								calcPositive(i);
+								break;
+							case AFeatureGraph.VALUE_10Q:
+								calc(i);
+								break;
+							case AFeatureGraph.VALUE_NONE:
+							default:
+								return null;
+							}
+						}
+					}
+				}
+			}
+			return null;
+		}
+
+		private Literal[] knownLiterals = null;
+		private SatSolver solver = null;
+
+		private void init() {
+			if (solver == null) {
+				final List<Literal> knownLiteralList = new ArrayList<>();
+
+				int i = 0;
+				for (Variable var : variableConfiguration) {
+					// TODO only if undefined
+					switch (var.getManualValue()) {
+					case Variable.TRUE:
+						knownLiteralList.add(new Literal(featureGraph.getFeatureArray()[i], true));
+						break;
+					case Variable.FALSE:
+						knownLiteralList.add(new Literal(featureGraph.getFeatureArray()[i], false));
+						break;
+					default:
+						break;
+					}
+					i++;
+				}
+
+				knownLiterals = knownLiteralList.toArray(new Literal[knownLiteralList.size() + 1]);
+				solver = new SatSolver(node, 1000);
+			}
+		}
+
+		private boolean calc(int featureID) {
+			init();
+			final Literal curLiteral = new Literal(featureGraph.getFeatureArray()[featureID], true);
+			knownLiterals[knownLiterals.length - 1] = curLiteral;
+			try {
+				if (!solver.isSatisfiable(knownLiterals)) {
+					ConfigurationChanger.this.setNewValue(featureID, Variable.TRUE, false);
+				} else {
+					curLiteral.flip();
+					if (!solver.isSatisfiable(knownLiterals)) {
+						ConfigurationChanger.this.setNewValue(featureID, Variable.FALSE, false);
+					}
+				}
+			} catch (TimeoutException e) {
+				FMCorePlugin.getDefault().logError(e);
+			}
+
+			return variableConfiguration.getVariable(featureID).getValue() == Variable.UNDEFINED;
+		}
+
+		private boolean calcPositive(int featureID) {
+			init();
+			final Literal curLiteral = new Literal(featureGraph.getFeatureArray()[featureID], true);
+			knownLiterals[knownLiterals.length - 1] = curLiteral;
+			try {
+				if (!solver.isSatisfiable(knownLiterals)) {
+					ConfigurationChanger.this.setNewValue(featureID, Variable.TRUE, false);
+				}
+			} catch (TimeoutException e) {
+				FMCorePlugin.getDefault().logError(e);
+			}
+
+			return variableConfiguration.getVariable(featureID).getValue() == Variable.UNDEFINED;
+		}
+
+		private boolean calcNegative(int featureID) {
+			init();
+			final Literal curLiteral = new Literal(featureGraph.getFeatureArray()[featureID], false);
+			knownLiterals[knownLiterals.length - 1] = curLiteral;
+			try {
+				if (!solver.isSatisfiable(knownLiterals)) {
+					ConfigurationChanger.this.setNewValue(featureID, Variable.FALSE, false);
+				}
+			} catch (TimeoutException e) {
+				FMCorePlugin.getDefault().logError(e);
+			}
+
+			return variableConfiguration.getVariable(featureID).getValue() == Variable.UNDEFINED;
+		}
+
 	}
 
 }

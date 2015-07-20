@@ -282,11 +282,12 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 						sb.append(number);
 					}
 					sb.append(" possible configurations");
+					
+//					if (number == 0 && !configurationEditor.isAutoSelectFeatures()) {
+//						sb.append(" - Autoselect not possible!");
+//					}
 				}
-				if (number == 0 && !configurationEditor.isAutoSelectFeatures()) {
-					sb.append(" - Autoselect not possible!");
-				}
-
+				
 				display.asyncExec(new Runnable() {
 					@Override
 					public void run() {
