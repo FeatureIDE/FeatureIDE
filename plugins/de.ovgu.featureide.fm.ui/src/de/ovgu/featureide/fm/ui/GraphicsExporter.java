@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui;
 
-import java.awt.Composite;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -114,14 +113,17 @@ public class GraphicsExporter {
 			Bundle bundleExport = null;
 			Bundle bundleExportSVG = null;
 			for (Bundle b : InternalPlatform.getDefault().getBundleContext().getBundles()) {
-				if (b.getSymbolicName().equals("nl.utwente.ce.imageexport")) {
+				if ("nl.utwente.ce.imageexport".equals(b.getSymbolicName())) {
 					bundleExport = b;
+					if (bundleExportSVG != null) {
+						break;
+					}
 				}
-				if (b.getSymbolicName().equals("nl.utwente.ce.imageexport.svg")) {
+				if ("nl.utwente.ce.imageexport.svg".equals(b.getSymbolicName())) {
 					bundleExportSVG = b;
-				}
-				if (bundleExport != null && bundleExportSVG != null) {
-					break;
+					if (bundleExport != null) {
+						break;
+					}
 				}
 			}
 
@@ -152,17 +154,11 @@ public class GraphicsExporter {
 					succ = true;
 				} catch (Exception e) {
 					FMUIPlugin.getDefault().logError(e);
+					displayError();
+					return false;
 				}
 			} else {
-				final String infoMessage = "Eclipse plugin for exporting diagram in SVG format is not existing."
-						+ "\nIf you want to use this, you have to install GEF Imageexport with SVG in Eclipse from "
-						+ "\nhttp://veger.github.com/eclipse-gef-imageexport";
-
-				MessageDialog dialog = new MessageDialog(new Shell(), "SVG export failed", FMUIPlugin.getImage("FeatureIconSmall.ico"), infoMessage,
-						MessageDialog.INFORMATION, new String[] { IDialogConstants.OK_LABEL }, 0);
-
-				dialog.open();
-				FMUIPlugin.getDefault().logInfo(infoMessage);
+				displayError();
 				return false;
 			}
 		} else {
@@ -173,6 +169,18 @@ public class GraphicsExporter {
 		GraphicsExporter.printExportMessage(file, succ);
 
 		return succ;
+	}
+
+	private static void displayError() {
+		final String infoMessage = "Eclipse plug-in for exporting SVG format was not found."
+				+ "\nIf you want to use SVG export, please install the newest version of\n\"GEF Image Export Plug-In\" from"
+				+ "\nhttps://veger.github.com/eclipse-gef-imageexport";
+
+		MessageDialog dialog = new MessageDialog(new Shell(), "SVG export failed", FMUIPlugin.getImage("FeatureIconSmall.ico"), infoMessage,
+				MessageDialog.WARNING, new String[] { IDialogConstants.OK_LABEL }, 0);
+
+		dialog.open();
+		FMUIPlugin.getDefault().logInfo(infoMessage);
 	}
 
 	public static void printExportMessage(File file, boolean successful) {
