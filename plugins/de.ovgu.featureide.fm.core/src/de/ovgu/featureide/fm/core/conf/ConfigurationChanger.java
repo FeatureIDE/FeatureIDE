@@ -94,14 +94,24 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 	public class CanBeValidMethod implements LongRunningMethod<Boolean> {
 		@Override
 		public Boolean run(WorkMonitor monitor) {
-			return sat(getCurrentLiterals(true));
+			try {
+				return sat(getCurrentLiterals(true));
+			} catch (Exception e) {
+				FMCorePlugin.getDefault().logError(e);
+				return false;
+			}
 		}
 	}
 
 	public class IsValidMethod implements LongRunningMethod<Boolean> {
 		@Override
 		public Boolean run(WorkMonitor monitor) {
-			return sat(getCurrentLiterals(false));
+			try {
+				return sat(getCurrentLiterals(false));
+			} catch (Exception e) {
+				FMCorePlugin.getDefault().logError(e);
+				return false;
+			}
 		}
 	}
 
@@ -341,16 +351,11 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 		return literals;
 	}
 
-	private boolean sat(final Literal[] literals) {
+	private boolean sat(final Literal[] literals) throws TimeoutException {
 		if (satSolver1 == null) {
 			satSolver1 = new SatSolver(node, 1000, false);
 		}
-		try {
-			return satSolver1.isSatisfiable(literals);
-		} catch (Exception e) {
-			FMCorePlugin.getDefault().logError(e);
-			return false;
-		}
+		return satSolver1.isSatisfiable(literals);
 	}
 
 	private boolean testExpression(Expression expression, int index, int value) {
@@ -449,15 +454,13 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 		}
 
 		private Literal[] knownLiterals = null;
-		private SatSolver solver = null;
 
 		private void init() {
-			if (solver == null) {
+			if (knownLiterals == null) {
 				final List<Literal> knownLiteralList = new ArrayList<>();
 
 				int i = 0;
 				for (Variable var : variableConfiguration) {
-					// TODO only if undefined
 					switch (var.getManualValue()) {
 					case Variable.TRUE:
 						knownLiteralList.add(new Literal(featureGraph.getFeatureArray()[i], true));
@@ -472,7 +475,6 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 				}
 
 				knownLiterals = knownLiteralList.toArray(new Literal[knownLiteralList.size() + 1]);
-				solver = new SatSolver(node, 1000);
 			}
 		}
 
@@ -481,12 +483,12 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 			final Literal curLiteral = new Literal(featureGraph.getFeatureArray()[featureID], true);
 			knownLiterals[knownLiterals.length - 1] = curLiteral;
 			try {
-				if (!solver.isSatisfiable(knownLiterals)) {
-					ConfigurationChanger.this.setNewValue(featureID, Variable.TRUE, false);
+				if (!sat(knownLiterals)) {
+					setNewValue(featureID, Variable.TRUE, false);
 				} else {
 					curLiteral.flip();
-					if (!solver.isSatisfiable(knownLiterals)) {
-						ConfigurationChanger.this.setNewValue(featureID, Variable.FALSE, false);
+					if (!sat(knownLiterals)) {
+						setNewValue(featureID, Variable.FALSE, false);
 					}
 				}
 			} catch (TimeoutException e) {
@@ -501,8 +503,8 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 			final Literal curLiteral = new Literal(featureGraph.getFeatureArray()[featureID], true);
 			knownLiterals[knownLiterals.length - 1] = curLiteral;
 			try {
-				if (!solver.isSatisfiable(knownLiterals)) {
-					ConfigurationChanger.this.setNewValue(featureID, Variable.TRUE, false);
+				if (!sat(knownLiterals)) {
+					setNewValue(featureID, Variable.TRUE, false);
 				}
 			} catch (TimeoutException e) {
 				FMCorePlugin.getDefault().logError(e);
@@ -516,8 +518,8 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 			final Literal curLiteral = new Literal(featureGraph.getFeatureArray()[featureID], false);
 			knownLiterals[knownLiterals.length - 1] = curLiteral;
 			try {
-				if (!solver.isSatisfiable(knownLiterals)) {
-					ConfigurationChanger.this.setNewValue(featureID, Variable.FALSE, false);
+				if (!sat(knownLiterals)) {
+					setNewValue(featureID, Variable.FALSE, false);
 				}
 			} catch (TimeoutException e) {
 				FMCorePlugin.getDefault().logError(e);
