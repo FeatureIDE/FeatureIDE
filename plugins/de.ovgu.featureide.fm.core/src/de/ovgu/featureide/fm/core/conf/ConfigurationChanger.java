@@ -331,8 +331,12 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 		return new UpdateMethod();
 	}
 
-	public UpdateMethod2 updateNext() {
-		return new UpdateMethod2();
+	public UpdateNextMethod updateNext() {
+		return new UpdateNextMethod();
+	}
+
+	public AutoCompletionMethod autoCompletion(int type) {
+		return new AutoCompletionMethod(type);
 	}
 
 	@Override
@@ -413,74 +417,76 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 		Arrays.fill(lastComputedValues, (byte) Variable.UNDEFINED);
 	}
 
-	public class UpdateMethod2 implements LongRunningMethod<Void> {
-		@Override
-		public Void run(WorkMonitor monitor) {
-			for (int index = 0; index < lastComputedValues.length; index++) {
-				final int oldValue = lastComputedValues[index];
-				final int newValue = variableConfiguration.getVariable(index).getValue();
-				if (newValue != oldValue) {
-					lastComputedValues[index] = (byte) newValue;
-
-					for (int i = index + 1; i != index; i = (i + 1) % featureGraph.getSize()) {
-						final int curValue = variableConfiguration.getVariable(i).getAutomaticValue();
-						if (curValue == Variable.UNDEFINED) {
-							final byte edgeValue = featureGraph.getValue(index, i, newValue == Variable.TRUE);
-							switch (edgeValue) {
-							case AFeatureGraph.VALUE_0:
-								setNewValue(i, Variable.FALSE, false);
-								break;
-							case AFeatureGraph.VALUE_1:
-								setNewValue(i, Variable.TRUE, false);
-								break;
-							case AFeatureGraph.VALUE_0Q:
-								calcNegative(i);
-								break;
-							case AFeatureGraph.VALUE_1Q:
-								calcPositive(i);
-								break;
-							case AFeatureGraph.VALUE_10Q:
-								calc(i);
-								break;
-							case AFeatureGraph.VALUE_NONE:
-							default:
-								return null;
-							}
-						}
-					}
-				}
-			}
-			return null;
-		}
+	private class UpdateHelper {
 
 		private Literal[] knownLiterals = null;
 
-		private void init() {
-			if (knownLiterals == null) {
-				final List<Literal> knownLiteralList = new ArrayList<>();
+		private boolean undefined = false;
 
-				int i = 0;
-				for (Variable var : variableConfiguration) {
-					switch (var.getManualValue()) {
-					case Variable.TRUE:
-						knownLiteralList.add(new Literal(featureGraph.getFeatureArray()[i], true));
-						break;
-					case Variable.FALSE:
-						knownLiteralList.add(new Literal(featureGraph.getFeatureArray()[i], false));
-						break;
-					default:
-						break;
-					}
-					i++;
+		private boolean variableValue = false;
+
+		private int variableIndex = 0;
+
+		public void init(int variableIndex, boolean variableValue) {
+			this.variableIndex = variableIndex;
+			this.variableValue = variableValue;
+
+			final List<Literal> knownLiteralList = new ArrayList<>();
+
+			int i = 0;
+			for (Variable var : variableConfiguration) {
+				switch (var.getManualValue()) {
+				case Variable.TRUE:
+					knownLiteralList.add(new Literal(featureGraph.getFeatureArray()[i], true));
+					break;
+				case Variable.FALSE:
+					knownLiteralList.add(new Literal(featureGraph.getFeatureArray()[i], false));
+					break;
+				default:
+					break;
 				}
+				i++;
+			}
 
-				knownLiterals = knownLiteralList.toArray(new Literal[knownLiteralList.size() + 1]);
+			knownLiterals = knownLiteralList.toArray(new Literal[knownLiteralList.size() + 1]);
+			undefined = false;
+		}
+
+		private void updateVariable(int index) {
+			if (variableConfiguration.getVariable(index).getValue() == Variable.UNDEFINED) {
+				final byte edgeValue = featureGraph.getValue(variableIndex, index, variableValue);
+				switch (edgeValue) {
+				case AFeatureGraph.VALUE_0:
+					setNewValue(index, Variable.FALSE, false);
+					break;
+				case AFeatureGraph.VALUE_1:
+					setNewValue(index, Variable.TRUE, false);
+					break;
+				case AFeatureGraph.VALUE_0Q:
+					if (!undefined) {
+						undefined = calcNegative(index);
+					}
+					break;
+				case AFeatureGraph.VALUE_1Q:
+					if (!undefined) {
+						undefined = calcPositive(index);
+					}
+					break;
+				case AFeatureGraph.VALUE_10Q:
+					if (!undefined) {
+						undefined = calc(index);
+					}
+					break;
+				case AFeatureGraph.VALUE_NONE:
+				default:
+					undefined = true;
+					break;
+				}
 			}
 		}
 
 		private boolean calc(int featureID) {
-			init();
-			final Literal curLiteral = new Literal(featureGraph.getFeatureArray()[featureID], true);
+			final Literal curLiteral = new Literal(featureGraph.getFeatureArray()[featureID], false);
 			knownLiterals[knownLiterals.length - 1] = curLiteral;
 			try {
 				if (!sat(knownLiterals)) {
@@ -499,8 +505,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 		}
 
 		private boolean calcPositive(int featureID) {
-			init();
-			final Literal curLiteral = new Literal(featureGraph.getFeatureArray()[featureID], true);
+			final Literal curLiteral = new Literal(featureGraph.getFeatureArray()[featureID], false);
 			knownLiterals[knownLiterals.length - 1] = curLiteral;
 			try {
 				if (!sat(knownLiterals)) {
@@ -514,8 +519,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 		}
 
 		private boolean calcNegative(int featureID) {
-			init();
-			final Literal curLiteral = new Literal(featureGraph.getFeatureArray()[featureID], false);
+			final Literal curLiteral = new Literal(featureGraph.getFeatureArray()[featureID], true);
 			knownLiterals[knownLiterals.length - 1] = curLiteral;
 			try {
 				if (!sat(knownLiterals)) {
@@ -527,7 +531,67 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 
 			return variableConfiguration.getVariable(featureID).getValue() == Variable.UNDEFINED;
 		}
+	}
 
+	public class UpdateNextMethod implements LongRunningMethod<Void> {
+		@Override
+		public Void run(WorkMonitor monitor) {
+			final UpdateHelper updateHelper = new UpdateHelper();
+			for (int index = 0; index < lastComputedValues.length; index++) {
+				final int newValue = variableConfiguration.getVariable(index).getValue();
+				if (newValue != lastComputedValues[index]) {
+					lastComputedValues[index] = (byte) newValue;
+
+					updateHelper.init(index, newValue == Variable.TRUE);
+
+					for (int i = index + 1; i != index; i = (i + 1) % featureGraph.getSize()) {
+						updateHelper.updateVariable(i);
+					}
+				}
+			}
+			return null;
+		}
+	}
+
+	public class AutoCompletionMethod implements LongRunningMethod<Void> {
+
+		private final int type;
+
+		public AutoCompletionMethod(int type) {
+			this.type = type;
+		}
+
+		@Override
+		public Void run(WorkMonitor monitor) {
+			final UpdateHelper updateHelper = new UpdateHelper();
+			for (int index = 0; index < featureGraph.getSize(); index++) {
+				if (variableConfiguration.getVariable(index).getValue() != Variable.UNDEFINED) {
+					continue;
+				}
+
+				final int newValue;
+				switch (type) {
+				case 0:
+					newValue = Variable.FALSE;
+					break;
+				case 2:
+					newValue = Math.random() < 0.5 ? Variable.FALSE : Variable.TRUE;
+					break;
+				case 1:
+				default:
+					newValue = Variable.TRUE;
+					break;
+				}
+				setNewValue(index, newValue, true);
+
+				updateHelper.init(index, newValue == Variable.TRUE);
+
+				for (int i = index + 1; i < featureGraph.getSize(); i++) {
+					updateHelper.updateVariable(i);
+				}
+			}
+			return null;
+		}
 	}
 
 }

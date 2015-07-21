@@ -70,7 +70,8 @@ public class FeatureGraphStatisticJob extends AProjectJob<FeatureGraphStatisticJ
 		try {
 //			statisticPart7();
 //			statisticPart8();
-			statisticPart9(1);
+			statisticPart10(0);
+			statisticPart9(0);
 		} catch (IOException | CoreException e) {
 			e.printStackTrace();
 		}
@@ -278,12 +279,13 @@ public class FeatureGraphStatisticJob extends AProjectJob<FeatureGraphStatisticJ
 	
 	private void statisticPart9(int type) throws IOException, CoreException {
 		final ArrayList<Integer> indexArray = createIndexArray();
+		
+		long startTime = System.nanoTime();
+		curTime = startTime;
 
 		final VariableConfiguration variableConfiguration = new VariableConfiguration(featureGraph.getSize());
 		final ConfigurationChanger c1 = new ConfigurationChanger(arguments.featureModel, variableConfiguration, null);
 		
-		long startTime = System.nanoTime();
-		curTime = startTime;
 		
 		for (int vIndex = 0; vIndex < featureGraph.getSize();) {
 			while (vIndex < featureGraph.getSize() && variableConfiguration.getVariable(indexArray.get(vIndex)).getValue() != Variable.UNDEFINED) {
@@ -307,6 +309,16 @@ public class FeatureGraphStatisticJob extends AProjectJob<FeatureGraphStatisticJ
 		default:
 			return Variable.TRUE;
 		}
+	}
+	
+	private void statisticPart10(int type) throws IOException, CoreException {
+		long startTime = System.nanoTime();
+		curTime = startTime;
+		final VariableConfiguration variableConfiguration = new VariableConfiguration(featureGraph.getSize());
+		final ConfigurationChanger c1 = new ConfigurationChanger(arguments.featureModel, variableConfiguration, null);
+		
+		LongRunningJob.runMethod(c1.autoCompletion(type));
+		curTime = split(curTime);
 	}
 	
 }
