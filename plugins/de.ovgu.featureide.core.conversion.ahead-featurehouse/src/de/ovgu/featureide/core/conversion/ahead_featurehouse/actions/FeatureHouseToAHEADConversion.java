@@ -20,6 +20,12 @@
  */
 package de.ovgu.featureide.core.conversion.ahead_featurehouse.actions;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CHANGE_COMPOSER_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CHANGE_THE_COMPOSER_OF_PROJECT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FROM_FEATUREHOUSE_TO_AHEAD_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.REPLACE_KEYWORDS_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
+
 import java.util.AbstractList;
 import java.util.LinkedList;
 
@@ -51,7 +57,7 @@ import de.ovgu.featureide.core.fstmodel.FSTRole;
  * 
  * @author Jens Meinicke
  */
-@SuppressWarnings("restriction")
+@SuppressWarnings(RESTRICTION)
 public class FeatureHouseToAHEADConversion extends ComposerConversion {
 	private FSTModel model;
 
@@ -64,19 +70,19 @@ public class FeatureHouseToAHEADConversion extends ComposerConversion {
 			return;
 		}
 		this.featureProject = featureProject; 
-		ConversionPlugin.getDefault().logInfo("Change the composer of project " 
+		ConversionPlugin.getDefault().logInfo(CHANGE_THE_COMPOSER_OF_PROJECT 
 				+ featureProject.getProjectName() + 
-				" from FeatureHouse to AHEAD.");
-		Job job = new Job("Change composer.") {
+				FROM_FEATUREHOUSE_TO_AHEAD_);
+		Job job = new Job(CHANGE_COMPOSER_) {
 			protected IStatus run(IProgressMonitor monitor) {
 				try {
 					setJavaBuildPath(featureProject);
-					monitor.beginTask("Change composer.", 2);
+					monitor.beginTask(CHANGE_COMPOSER_, 2);
 					monitor.subTask("Build full FSTModel.");
 					buildFullFSTModel();
 					model = featureProject.getFSTModel();
 					monitor.worked(1);
-					monitor.subTask("Replace keywords.");
+					monitor.subTask(REPLACE_KEYWORDS_);
 					startProjectConversion(featureProject);
 					monitor.worked(1);
 				} finally {

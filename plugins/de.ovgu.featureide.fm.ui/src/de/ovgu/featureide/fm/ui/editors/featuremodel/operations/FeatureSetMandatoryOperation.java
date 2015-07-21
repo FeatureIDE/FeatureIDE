@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_MANDATORY;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_OPTIONAL;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
@@ -31,8 +33,8 @@ import de.ovgu.featureide.fm.core.FeatureModel;
  */
 public class FeatureSetMandatoryOperation extends AbstractFeatureModelOperation {
 
-	private static final String LABEL_MANDATORY = "Set Feature Mandatory";
-	private static final String LABEL_OPTIONAL = "Set Feature Optional";
+	private static final String LABEL_MANDATORY = SET_FEATURE_MANDATORY;
+	private static final String LABEL_OPTIONAL = SET_FEATURE_OPTIONAL;
 	private Feature feature;
 
 	/**

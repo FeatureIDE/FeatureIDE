@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CHANGE_GROUP_TYPE;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
@@ -31,7 +32,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
  */
 public class FeatureChangeGroupTypeOperation extends AbstractFeatureModelOperation {
 
-	private static final String LABEL = "Change Group Type";
+	private static final String LABEL = CHANGE_GROUP_TYPE;
 	public static final int ALTERNATIVE = 0;
 	public static final int AND = 1;
 	public static final int OR = 2;

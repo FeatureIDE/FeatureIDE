@@ -20,6 +20,14 @@
  */
 package de.ovgu.featureide.fm.core;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.ANALYZE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ANALYZE_FEATURES_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE_INDETRMINATE_HIDDEN_FEATURES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE_INDETRMINATE_HIDDEN_FEATURES_FOR;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FIND_REDUNDANT_CONSTRAINTS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.GET_DEAD_FEATURES_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.GET_FALSE_OPTIONAL_FEATURES_;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -234,7 +242,7 @@ public class FeatureModelAnalyzer {
 	 * featureSets are present)) is a tautology.
 	 * 
 	 * Here is an example for a truth table of
-	 * "at most one the featureSets are present" for three feature sets A, B and
+	 * AT_MOST_ONE_THE_FEATURESETS_ARE_PRESENT for three feature sets A, B and
 	 * C:
 	 * 
 	 * A B C result ------------------------ T T T F T T F F T F T F T F F T F T
@@ -546,7 +554,7 @@ public class FeatureModelAnalyzer {
 
 	private void beginTask(int totalWork) {
 		if (monitor != null) {
-			monitor.beginTask("Analyze", totalWork);
+			monitor.beginTask(ANALYZE, totalWork);
 		}
 	}
 
@@ -610,7 +618,7 @@ public class FeatureModelAnalyzer {
 			 * Add the NEW introduces errors/warnings to the constraint;
 			 */
 			if (calculateRedundantConstraints || calculateTautologyConstraints) {
-				setSubTask("Find redundant constraints");
+				setSubTask(FIND_REDUNDANT_CONSTRAINTS);
 				/** Remove redundant constraints for further analysis **/
 				for (Constraint constraint : fm.getConstraints()) {
 					if (canceled()) {
@@ -732,7 +740,7 @@ public class FeatureModelAnalyzer {
 
 	public void updateFeatures(Map<Object, Object> oldAttributes,
 			Map<Object, Object> changedAttributes) {
-		setSubTask("Analyze features.");
+		setSubTask(ANALYZE_FEATURES_);
 		for (Feature bone : fm.getFeatures()) {
 			oldAttributes.put(bone, bone.getFeatureStatus());
 			
@@ -757,7 +765,7 @@ public class FeatureModelAnalyzer {
 			/**
 			 * here the saved dead features at the feature model are calculated and set
 			 */
-			setSubTask("Get Dead Features.");
+			setSubTask(GET_DEAD_FEATURES_);
 			for (Feature deadFeature : getDeadFeatures()) {
 				if (oldAttributes.get(deadFeature) != FeatureStatus.DEAD) {
 					changedAttributes.put(deadFeature, FeatureStatus.DEAD);
@@ -775,7 +783,7 @@ public class FeatureModelAnalyzer {
 
 		try {
 			if (cachedValidity) {
-				setSubTask("Get False Optional Features.");
+				setSubTask(GET_FALSE_OPTIONAL_FEATURES_);
 				getFalseOptionalFeature(oldAttributes, changedAttributes);
 				worked(1);
 			}
@@ -793,10 +801,10 @@ public class FeatureModelAnalyzer {
 		if (!fm.hasHidden()) {
 			return;
 		}			
-		setSubTask("calculate indetrminate hidden features");
+		setSubTask(CALCULATE_INDETRMINATE_HIDDEN_FEATURES);
 		/**
 		 * First every relevant constraint of every hidden feature is checked if its form equals 
-		 * "hidden feature" <=> A
+		 * HIDDEN_FEATURE <=> A
 		 * where A is an expression containing only non hidden features
 		 * If there is a constraint of that kind for a hidden feature it is added to a list. 
 		 */
@@ -842,7 +850,7 @@ public class FeatureModelAnalyzer {
 			if (canceled()) {
 				return;
 			}
-			setSubTask("calculate indetrminate hidden features for " + feature.getName());
+			setSubTask(CALCULATE_INDETRMINATE_HIDDEN_FEATURES_FOR + feature.getName());
 			if (!list.contains(feature)) {
 				Collection<Feature> set = featureDependencies.getImpliedFeatures(feature);
 				boolean noHidden = false;

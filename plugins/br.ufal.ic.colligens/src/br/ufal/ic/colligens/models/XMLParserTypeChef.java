@@ -1,5 +1,8 @@
 package br.ufal.ic.colligens.models;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.COLUMN;
+import static de.ovgu.featureide.fm.core.localization.StringTable.POSITION;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -68,14 +71,14 @@ public class XMLParserTypeChef {
 		for (int i = 0; i < list.size(); i++) {
 			Element node = list.get(i);
 
-			String file = node.getChild("position").getChildText("file").trim();
+			String file = node.getChild(POSITION).getChildText("file").trim();
 
 			// compare with the log file that was analyzed
 			if (file.contains(fileProxie.getFileToAnalyse())) {
 
 				Log log = new Log(fileProxie, Integer.parseInt(node
-						.getChild("position").getChildText("line").trim()),Integer.parseInt(node
-								.getChild("position").getChildText("column").trim()),
+						.getChild(POSITION).getChildText("line").trim()),Integer.parseInt(node
+								.getChild(POSITION).getChildText(COLUMN).trim()),
 						node.getChildText("featurestr"),
 						node.getChildText("severity"), node.getChildText("msg"));
 

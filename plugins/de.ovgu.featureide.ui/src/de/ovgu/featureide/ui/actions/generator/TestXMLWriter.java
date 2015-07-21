@@ -1,5 +1,17 @@
 package de.ovgu.featureide.ui.actions.generator;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CLASSNAME;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ERRORS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FAILURE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IGNORED;
+import static de.ovgu.featureide.fm.core.localization.StringTable.STARTED;
+import static de.ovgu.featureide.fm.core.localization.StringTable.TESTCASE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.TESTRUN;
+import static de.ovgu.featureide.fm.core.localization.StringTable.TESTS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.TESTSUITE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.TIME;
+import static de.ovgu.featureide.fm.core.localization.StringTable.YES;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -46,31 +58,31 @@ public class TestXMLWriter implements XMLCoverage {
 	}
 
 	private String createXMLDocument(Document doc) throws TransformerException {
-		Element root = doc.createElement("testrun");
-		root.setAttribute("ignored", Integer.valueOf(testResults.ignored).toString());
-		root.setAttribute("errors", Integer.valueOf(testResults.errors).toString());
-		root.setAttribute("started", Integer.valueOf(testResults.started).toString());
-		root.setAttribute("tests", Integer.valueOf(testResults.tests).toString());
+		Element root = doc.createElement(TESTRUN);
+		root.setAttribute(IGNORED, Integer.valueOf(testResults.ignored).toString());
+		root.setAttribute(ERRORS, Integer.valueOf(testResults.errors).toString());
+		root.setAttribute(STARTED, Integer.valueOf(testResults.started).toString());
+		root.setAttribute(TESTS, Integer.valueOf(testResults.tests).toString());
 		root.setAttribute("project", testResults.project);
 		root.setAttribute("name", testResults.name);
 
 		for (Entry<String, Map<String, Set<Test>>> result : testResults.testResults.entrySet()) {
-			Element suite = doc.createElement("testsuite");
+			Element suite = doc.createElement(TESTSUITE);
 			suite.setAttribute("name", result.getKey());
 			float suiteTime = 0;
 			for (Entry<String, Set<Test>> configTest : result.getValue().entrySet()) {
-				Element config1 = doc.createElement("testsuite");
+				Element config1 = doc.createElement(TESTSUITE);
 				config1.setAttribute("name", configTest.getKey());
 				float configTime = 0;
 				for (Test test : configTest.getValue()) {
-					Element testCase = doc.createElement("testcase");
+					Element testCase = doc.createElement(TESTCASE);
 					testCase.setAttribute("name", test.name);
-					testCase.setAttribute("classname", test.classname);
-					testCase.setAttribute("time", test.time + "");
+					testCase.setAttribute(CLASSNAME, test.classname);
+					testCase.setAttribute(TIME, test.time + "");
 					if (test.failure != null) {
 						Element failure;
 						if (test.failure.getException() instanceof AssertionError) {
-							failure = doc.createElement("failure");
+							failure = doc.createElement(FAILURE);
 						} else {
 							failure = doc.createElement("error");
 						}
@@ -81,10 +93,10 @@ public class TestXMLWriter implements XMLCoverage {
 					configTime += test.time;
 				}
 				suiteTime += configTime;
-				config1.setAttribute("time", Double.valueOf(configTime).toString());
+				config1.setAttribute(TIME, Double.valueOf(configTime).toString());
 				suite.appendChild(config1);
 			}
-			suite.setAttribute("time", Double.valueOf(suiteTime).toString());
+			suite.setAttribute(TIME, Double.valueOf(suiteTime).toString());
 			root.appendChild(suite);
 		}
 		doc.appendChild(root);
@@ -92,7 +104,7 @@ public class TestXMLWriter implements XMLCoverage {
 		// Transform the Xml Representation into a String
 		Transformer transfo = TransformerFactory.newInstance().newTransformer();
 		transfo.setOutputProperty(OutputKeys.METHOD, "xml");
-		transfo.setOutputProperty(OutputKeys.INDENT, "yes");
+		transfo.setOutputProperty(OutputKeys.INDENT, YES);
 		StreamResult result = new StreamResult(new StringWriter());
 		DOMSource source = new DOMSource(doc);
 		transfo.transform(source, result);

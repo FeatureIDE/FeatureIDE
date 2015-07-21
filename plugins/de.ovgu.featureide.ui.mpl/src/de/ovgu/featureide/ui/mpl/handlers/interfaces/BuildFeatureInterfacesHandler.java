@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.ui.mpl.handlers.interfaces;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD_FEATURE_INTERFACES;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.fm.ui.handlers.base.AProjectJobHandler;
 import de.ovgu.featureide.fm.ui.wizards.AbstractWizard;
@@ -36,7 +37,7 @@ public class BuildFeatureInterfacesHandler extends AProjectJobHandler {
 
 	@Override
 	protected AbstractWizard instantiateWizard() {
-		return new FeatureInterfaceWizard("Build Feature Interfaces", "folder");
+		return new FeatureInterfaceWizard(BUILD_FEATURE_INTERFACES, "folder");
 	}
 	
 	@Override

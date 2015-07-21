@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.io.guidsl;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.EMPTY___;
+
 import java.util.LinkedList;
 
 import org.prop4j.Node;
@@ -155,7 +157,7 @@ public class GuidslWriter extends AbstractFeatureModelWriter {
 				out.append(getRightGrammarToken(feature));
 				if (!mainFeature.isAnd() && (!feature.isMandatory() || feature.isMultiple())) {
 					out.append(" :: ");
-					out.append(feature.getName() + "_");
+					out.append(feature.getName() + EMPTY___);
 				}
 			}
 		}

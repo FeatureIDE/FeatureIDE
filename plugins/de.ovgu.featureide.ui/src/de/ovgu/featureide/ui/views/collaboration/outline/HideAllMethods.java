@@ -21,12 +21,13 @@
 package de.ovgu.featureide.ui.views.collaboration.outline;
 
 import java.util.LinkedList;
+
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.RoleElement;
 
 /**
   * @author Dominic Labsch
-  * @author Daniel Püsche
+  * @author Daniel Pï¿½sche
  */
 public class HideAllMethods implements IFilter {
 

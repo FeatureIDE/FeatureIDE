@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.core.mpl.job.statistics;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD_EXTENDED_MODULES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.BUILT_EXTENDED_MODULES;
+
 import java.util.LinkedList;
 
 import org.eclipse.core.resources.IFolder;
@@ -54,7 +57,7 @@ public class PrintExtendedSignaturesJob extends AProjectJob<PrintExtendedSignatu
 	}
 	
 	protected PrintExtendedSignaturesJob(Arguments arguments) {
-		super("Build Extended Modules", arguments);
+		super(BUILD_EXTENDED_MODULES, arguments);
 	}
 
 	@Override
@@ -101,7 +104,7 @@ public class PrintExtendedSignaturesJob extends AProjectJob<PrintExtendedSignatu
 		
 		IOConstants.writeToFile(folder.getFile("all_statistics.txt"), sb.toString());
 		
-		MPLPlugin.getDefault().logInfo("Built Extended Modules");
+		MPLPlugin.getDefault().logInfo(BUILT_EXTENDED_MODULES);
 		return true;
 	}
 	

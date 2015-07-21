@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.ui.editors.annotation;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CANT_CONNECT_TO_DIFFERENT_DOCUMENT_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CANT_DISCONNECT_FROM_DIFFERENT_DOCUMENT_;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -205,7 +208,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 	 * but the number of lines stays the same.
 	 * 
 	 * It updates the offset and length of annotations, 
-	 * with an offset greater than the "change offset".
+	 * with an offset greater than the CHANGE_OFFSET.
 	 *  
 	 *  @param offset the change offset
 	 *  @param newLength the length of the changed document
@@ -540,7 +543,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 	@Override
 	public void connect(IDocument document) {
 		if (this.document != document)
-			throw new RuntimeException("Can't connect to different document.");
+			throw new RuntimeException(CANT_CONNECT_TO_DIFFERENT_DOCUMENT_);
 		for (final ColorAnnotation ca : annotations) {
 			try {
 				document.addPosition(ca.getPosition());
@@ -555,7 +558,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 	@Override
 	public void disconnect(IDocument document) {
 		if (this.document != document)
-			throw new RuntimeException("Can't disconnect from different document.");
+			throw new RuntimeException(CANT_DISCONNECT_FROM_DIFFERENT_DOCUMENT_);
 		for (final ColorAnnotation ca : annotations) {
 			document.removePosition(ca.getPosition());
 		}

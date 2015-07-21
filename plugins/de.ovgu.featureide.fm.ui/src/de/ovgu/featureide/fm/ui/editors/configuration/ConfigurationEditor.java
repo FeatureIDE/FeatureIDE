@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.configuration;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.SELECT_THE_CORRESPONDING_FEATUREMODEL_;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -277,7 +279,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	// TODO add all model extensions
 	private String openFileDialog() {
 		FileDialog dialog = new FileDialog(getSite().getWorkbenchWindow().getShell(), SWT.MULTI);
-		dialog.setText("Select the corresponding Featuremodel.");
+		dialog.setText(SELECT_THE_CORRESPONDING_FEATUREMODEL_);
 		dialog.setFileName("model.xml");
 		dialog.setFilterExtensions(new String[] { "*.xml", "*.velvet" });
 		dialog.setFilterNames(new String[] { "XML *.xml", "VELVET *.velvet" });

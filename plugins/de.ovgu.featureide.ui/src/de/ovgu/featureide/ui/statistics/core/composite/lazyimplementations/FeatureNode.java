@@ -20,6 +20,16 @@
  */
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.ABSTRACT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.HAS_CHILD_FEATURES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.HIDDEN;
+import static de.ovgu.featureide.fm.core.localization.StringTable.HIDDEN_BY_ANCESTOR;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IS_AFFECTED_BY_CONSTRAINTS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IS_TERMINAL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.MANDATORY;
+import static de.ovgu.featureide.fm.core.localization.StringTable.OPTIONAL;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -97,15 +107,15 @@ public class FeatureNode extends LazyParent implements IToolTip {
 		}
 		
 		if (feat.isAbstract()) {
-			attribute.add("abstract");
+			attribute.add(ABSTRACT);
 		} else {
 			attribute.add("concrete");
 		}
 		
 		if (feat.isMandatory()) {
-			attribute.add("mandatory");
+			attribute.add(MANDATORY);
 		} else {
-			attribute.add("optional");
+			attribute.add(OPTIONAL);
 		}
 		
 		String connectionType = null;
@@ -119,19 +129,19 @@ public class FeatureNode extends LazyParent implements IToolTip {
 		attribute.add(connectionType + " - connection");
 		
 		if (status == FeatureStatus.INDETERMINATE_HIDDEN) {
-			attribute.add("hidden by ancestor");
+			attribute.add(HIDDEN_BY_ANCESTOR);
 		} else if (feat.isHidden()) {
-			attribute.add("hidden");
+			attribute.add(HIDDEN);
 		}
 		
 		if (feat.hasChildren()) {
-			attribute.add("has child-features");
+			attribute.add(HAS_CHILD_FEATURES);
 		} else {
-			attribute.add("is terminal");
+			attribute.add(IS_TERMINAL);
 		}
 		
 		if (hasConstraints) {
-			attribute.add("is affected by constraints");
+			attribute.add(IS_AFFECTED_BY_CONSTRAINTS);
 		}
 		
 		StringBuilder buffer = new StringBuilder();
@@ -161,7 +171,7 @@ public class FeatureNode extends LazyParent implements IToolTip {
 	private Parent findConstraints(Parent constraints) {
 		if (hasConstraints) {
 			for (Constraint constr : feat.getRelevantConstraints()) {
-				constraints.addChild(new Parent("Constraint", constr.toString()));
+				constraints.addChild(new Parent(CONSTRAINT, constr.toString()));
 			}
 		}
 		return constraints;

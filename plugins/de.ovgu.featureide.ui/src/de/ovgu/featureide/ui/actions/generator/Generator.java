@@ -20,6 +20,14 @@
  */
 package de.ovgu.featureide.ui.actions.generator;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.ERROR_IN_CONFIGURATION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.GENARATOR_NR_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.GENERATE_PRODUCTS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.GENERATOR;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.THE_GENERATOR_NR_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.WILL_BE_RESTARTED_;
+
 import javax.annotation.CheckForNull;
 
 import org.eclipse.core.internal.resources.Workspace;
@@ -54,7 +62,7 @@ import de.ovgu.featureide.ui.UIPlugin;
  * 
  * @author Jens Meinicke
  */
-@SuppressWarnings("restriction")
+@SuppressWarnings(RESTRICTION)
 public class Generator extends Job implements IConfigurationBuilderBasics {
 	
 	protected static final String JAVA_NATURE = "org.eclipse.jdt.core.javanature";
@@ -87,7 +95,7 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 	  * @param builder The {@link ConfigurationBuilder} containing the {@link Generator}
 	  */
 	public Generator(int nr, ConfigurationBuilder builder) {
-		super(nr == 0 ? "Generator" : "Genarator nr. " + nr);
+		super(nr == 0 ? GENERATOR : GENARATOR_NR_ + nr);
 		this.nr = nr;
 		this.builder = builder;
 		if (!builder.createNewProjects) {
@@ -109,7 +117,7 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
 		try {
-			monitor.setTaskName("Generate products");
+			monitor.setTaskName(GENERATE_PRODUCTS);
 			while (true) {
 				synchronized (this) {
 					if (builder.cancelGeneratorJobs || monitor.isCanceled()) {
@@ -186,12 +194,12 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 				builder.builtConfigurations++;
 			}
 		} catch (Exception e) {
-			UIPlugin.getDefault().logError("Error in configuration " + configuration, e);
+			UIPlugin.getDefault().logError(ERROR_IN_CONFIGURATION + configuration, e);
 			/**
 			 * If there is any build error the configuration will be built again.
 			 * And because this job is terminated a new one will be created.
 			 */
-			UIPlugin.getDefault().logWarning("The Generator nr. " + nr + " will be restarted.");
+			UIPlugin.getDefault().logWarning(THE_GENERATOR_NR_ + nr + WILL_BE_RESTARTED_);
 			builder.createNewGenerator(nr);
 		} finally {
 			builder.generatorJobs.remove(this);

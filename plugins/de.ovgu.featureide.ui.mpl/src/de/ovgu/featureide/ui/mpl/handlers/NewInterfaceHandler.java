@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.ui.mpl.handlers;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.NEW_INTERFACES;
+
 import java.util.Collection;
 
 import org.eclipse.jface.dialogs.Dialog;
@@ -37,7 +39,7 @@ public class NewInterfaceHandler extends AFeatureProjectHandler {
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void singleAction(IFeatureProject project) {
-		NewInterfaceWizard wizard = new NewInterfaceWizard("New Interfaces");
+		NewInterfaceWizard wizard = new NewInterfaceWizard(NEW_INTERFACES);
 		WizardDialog dialog = new WizardDialog(Display.getCurrent().getActiveShell(), wizard);
 		if (dialog.open() == Dialog.OK) {
 			MPLPlugin.getDefault().createInterface(

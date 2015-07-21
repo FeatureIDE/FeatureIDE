@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.featurehouse.errorpropagation;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.PROPAGATE_MARKERS_FOR;
+import static de.ovgu.featureide.fm.core.localization.StringTable.PROPAGATE_PROBLEM_MARKERS_FOR;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.AbstractCollection;
@@ -90,7 +93,7 @@ public abstract class ErrorPropagation {
 	}
 
 	protected ErrorPropagation(IFeatureProject featureProject) {
-		job = new Job("Propagate problem markers for " + featureProject) {
+		job = new Job(PROPAGATE_PROBLEM_MARKERS_FOR + featureProject) {
 			@Override
 			public IStatus run(IProgressMonitor monitor) {
 				propagateMarkers(monitor);
@@ -151,7 +154,7 @@ public abstract class ErrorPropagation {
 		if (monitor == null) {
 			monitor = new NullProgressMonitor();
 		}
-		monitor.beginTask("Propagate markers for", IProgressMonitor.UNKNOWN);
+		monitor.beginTask(PROPAGATE_MARKERS_FOR, IProgressMonitor.UNKNOWN);
 
 		IFile file = removeComposedFile();
 		while (file != null) {

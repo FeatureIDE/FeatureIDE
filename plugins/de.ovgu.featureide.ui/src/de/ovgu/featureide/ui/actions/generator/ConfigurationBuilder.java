@@ -20,6 +20,16 @@
  */
 package de.ovgu.featureide.ui.actions.generator;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD_CONFIGURATIONS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CASA;
+import static de.ovgu.featureide.fm.core.localization.StringTable.COUNTING___;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FOR;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NOT_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.OF;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SAMPLING;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SATSOLVER_COMPUTATION_TIMEOUT;
+
 import java.io.IOException;
 import java.net.URL;
 import java.security.KeyStore.Builder;
@@ -74,7 +84,7 @@ import de.ovgu.featureide.ui.UIPlugin;
  * 
  * @author Jens Meinicke
  */
-@SuppressWarnings("restriction")
+@SuppressWarnings(RESTRICTION)
 public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 
 	private static final UIPlugin LOGGER = UIPlugin.getDefault();
@@ -276,7 +286,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 				protected boolean work() {
 					configurationNumber = new Configuration(featureModel, false, false).number(1000000);
 					if (configurationNumber < 0) {
-						LOGGER.logWarning("Satsolver overflow");
+						LOGGER.logWarning(SATSOLVER_COMPUTATION_TIMEOUT);
 						configurationNumber = Integer.MAX_VALUE;
 					}
 
@@ -311,7 +321,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		default:
 			break;
 		}
-		jobName += " for " + featureProject.getProjectName();
+		jobName += FOR + featureProject.getProjectName();
 		Job job = new Job(jobName) {
 			public IStatus run(IProgressMonitor monitor) {
 				try {
@@ -408,7 +418,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 					if (built > configurationNumber) {
 						built = (int) configurationNumber;
 					}
-					LOGGER.logInfo(built + (configurationNumber != 0 ? " of " + configurationNumber : "") + " configurations built in " + t);
+					LOGGER.logInfo(built + (configurationNumber != 0 ? OF + configurationNumber : "") + " configurations built in " + t);
 				} finally {
 					generatorJobs.clear();
 				}
@@ -570,7 +580,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		}
 		createValidConfiguration(configuration, featureName, Selection.UNSELECTED);
 		if (success) {
-			addConfiguration(new BuilderConfiguration(configuration, "not-" + featureName));
+			addConfiguration(new BuilderConfiguration(configuration, NOT_ + featureName));
 		}
 	}
 	
@@ -629,10 +639,10 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	protected void buildTWiseConfigurations(IFeatureProject featureProject, IProgressMonitor monitor) {
 		configuration = new Configuration(featureModel, false);
 		reader = new ConfigurationReader(configuration);
-		monitor.beginTask("Sampling", 1);
+		monitor.beginTask(SAMPLING, 1);
 		runSPLCATool();
 		configurationNumber = sorter.sortConfigurations(monitor);
-		monitor.beginTask("Build configurations", (int)configurationNumber);		
+		monitor.beginTask(BUILD_CONFIGURATIONS, (int)configurationNumber);		
 	}
 
 	private void runSPLCATool() {
@@ -916,7 +926,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			t = " " + h + "h " + (min < 10 ? "0" + min : min) + "min " + (s < 10 ? "0" + s : s) + "s.";
 		}
 		long buffer = buildType == BuildType.ALL_VALID ? sorter.getBufferSize() : configurationNumber - built;
-		return "Built configurations: " + built + "/" + (configurationNumber == 0 ? "counting..." : configurationNumber) + "(" + buffer + " buffered)" + " Expected time: " + t;
+		return "Built configurations: " + built + "/" + (configurationNumber == 0 ? COUNTING___ : configurationNumber) + "(" + buffer + " buffered)" + " Expected time: " + t;
 	}
 
 	private void buildAlternative(String selected, LinkedList<Feature> selectedFeatures2, IProgressMonitor monitor) {

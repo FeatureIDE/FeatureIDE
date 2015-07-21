@@ -3,6 +3,8 @@
  */
 package br.ufal.ic.colligens.handler;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.REFACTORING___COLLIGENS;
+
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
@@ -28,7 +30,7 @@ import core.RefactoringType;
 public class RefactorSelectionHandler extends ColligensAbstractHandler {
 	public static String PARM_ID = "br.ufal.ic.colligens.RefactorParameter";
 	public static String COMMAND_ID = "br.ufal.ic.colligens.commands.RefactorCommand";
-	private final String WIZARD_NAME = "Refactoring - Colligens";
+	private final String WIZARD_NAME = REFACTORING___COLLIGENS;
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {

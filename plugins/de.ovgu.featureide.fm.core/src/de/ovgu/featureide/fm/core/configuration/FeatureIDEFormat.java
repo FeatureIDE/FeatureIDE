@@ -20,6 +20,11 @@
  */
 package de.ovgu.featureide.fm.core.configuration;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.DOES_NOT_EXIST;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTION_NOT_POSSIBLE_ON_FEATURE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.WRONG_CONFIGURATION_FORMAT;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.LinkedList;
@@ -65,7 +70,7 @@ public class FeatureIDEFormat extends ConfigurationFormat {
 						case 2:
 							break;
 						default:
-							warnings.add(new ConfigurationReader.Warning("Wrong configuration format", lineNumber));
+							warnings.add(new ConfigurationReader.Warning(WRONG_CONFIGURATION_FORMAT, lineNumber));
 							break;
 						}
 						switch (Integer.parseInt(line.substring(1, 2))) {
@@ -78,24 +83,24 @@ public class FeatureIDEFormat extends ConfigurationFormat {
 						case 2:
 							break;
 						default:
-							warnings.add(new ConfigurationReader.Warning("Wrong configuration format", lineNumber));
+							warnings.add(new ConfigurationReader.Warning(WRONG_CONFIGURATION_FORMAT, lineNumber));
 							break;
 						}
 					} catch (NumberFormatException e) {
-						warnings.add(new ConfigurationReader.Warning("Wrong configuration format", lineNumber));
+						warnings.add(new ConfigurationReader.Warning(WRONG_CONFIGURATION_FORMAT, lineNumber));
 					}
 
 					final String name = renamingsManager.getNewName(line.substring(2));
 
 					final SelectableFeature feature = configuration.getSelectablefeature(name);
 					if (feature == null) {
-						warnings.add(new ConfigurationReader.Warning("Feature " + name + " does not exist", lineNumber));
+						warnings.add(new ConfigurationReader.Warning(FEATURE + name + DOES_NOT_EXIST, lineNumber));
 					} else {
 						try {
 							configuration.setManual(feature, manual);
 							configuration.setAutomatic(feature, automatic);
 						} catch (SelectionNotPossibleException e) {
-							warnings.add(new ConfigurationReader.Warning("Selection not possible on feature " + name, lineNumber));
+							warnings.add(new ConfigurationReader.Warning(SELECTION_NOT_POSSIBLE_ON_FEATURE + name, lineNumber));
 						}
 					}
 				}

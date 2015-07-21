@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.ui.statistics.core.composite;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE;
+
 import java.util.LinkedList;
 
 import org.eclipse.core.runtime.jobs.Job;
@@ -46,7 +48,7 @@ public abstract class LazyParent extends Parent {
 	@Override
 	public Parent[] getChildren() {
 		if (lazy) {
-			final TreeJob job = new TreeJob("Calculate " + this.getClass().getName(), this) {
+			final TreeJob job = new TreeJob(CALCULATE + this.getClass().getName(), this) {
 				@Override
 				public boolean work() {
 					initChildren();

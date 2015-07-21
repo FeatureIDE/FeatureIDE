@@ -20,6 +20,10 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.outline;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CLASS_IS_NULL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DEFAULT_OUTLINE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FILE_IS_NULL;
+
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -204,7 +208,7 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 	}
 
 	public String getLabelProvName() {
-		return "Default Outline";
+		return DEFAULT_OUTLINE;
 	}
 
 	@Override
@@ -240,11 +244,11 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 	 */
 	private boolean hasSameClass(FSTClass Class, IFile oldFile, IFile currentFile) {
 		if (Class == null) {
-			UIPlugin.getDefault().logWarning("class is null");
+			UIPlugin.getDefault().logWarning(CLASS_IS_NULL);
 			return false;
 		}
 		if (currentFile == null) {
-			UIPlugin.getDefault().logWarning("file is null");
+			UIPlugin.getDefault().logWarning(FILE_IS_NULL);
 			return false;
 		}
 		if (!currentFile.getProject().equals(oldFile.getProject())) {

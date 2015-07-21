@@ -20,6 +20,18 @@
  */
 package de.ovgu.featureide.fm.ui.editors.configuration;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.AN_UNKNOWN_ERROR_OCCURRED_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ARIAL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATING____;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DOES_NOT_EXIST_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.INVALID_COMMA_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.MORE_THAN;
+import static de.ovgu.featureide.fm.core.localization.StringTable.POSSIBLE_CONFIGURATIONS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.THERE_IS_NO_FEATURE_MODEL_CORRESPONDING_TO_THIS_CONFIGURATION_COMMA__REOPEN_THE_EDITOR_AND_SELECT_ONE_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.THE_FEATURE_MODEL_FOR_THIS_PROJECT_IS_VOID_COMMA__I_E__COMMA__THERE_IS_NO_VALID_CONFIGURATION__YOU_NEED_TO_CORRECT_THE_FEATURE_MODEL_BEFORE_YOU_CAN_CREATE_OR_EDIT_CONFIGURATIONS_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.THE_GIVEN_FEATURE_MODEL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.VALID_COMMA_;
+
 import java.beans.PropertyChangeEvent;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -70,8 +82,8 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	protected static final Color blue = new Color(null, 0, 0, 200);
 	protected static final Color red = new Color(null, 240, 0, 0);
 
-	protected static final Font treeItemStandardFont = new Font(null, "Arial", 8, SWT.NORMAL);
-	protected static final Font treeItemSpecialFont = new Font(null, "Arial", 8, SWT.BOLD);
+	protected static final Font treeItemStandardFont = new Font(null, ARIAL, 8, SWT.NORMAL);
+	protected static final Font treeItemSpecialFont = new Font(null, ARIAL, 8, SWT.BOLD);
 
 	private final HashSet<SelectableFeature> invalidFeatures = new HashSet<SelectableFeature>();
 	protected final HashSet<SelectableFeature> updateFeatures = new HashSet<SelectableFeature>();
@@ -200,7 +212,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		//		gridData.horizontalAlignment = SWT.RIGHT;
 		//		gridData.verticalAlignment = SWT.CENTER;
 		//		autoSelectButton = new Button(compositeTop, SWT.TOGGLE);
-		//		autoSelectButton.setText("Autoselect Features");
+		//		autoSelectButton.setText(AUTOSELECT_FEATURES);
 		//		autoSelectButton.setLayoutData(gridData);
 		//		autoSelectButton.setSelection(false);
 		//		autoSelectButton.setEnabled(false);
@@ -256,7 +268,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 	protected void updateInfoLabel(final Display display) {
 		if (display == null) {
-			infoLabel.setText("Calculating ...");
+			infoLabel.setText(CALCULATING____);
 			infoLabel.setForeground(null);
 			return;
 		}
@@ -267,17 +279,17 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			@Override
 			public void jobFinished(IJob finishedJob, boolean success) {
 				final StringBuilder sb = new StringBuilder();
-				sb.append(valid ? "valid, " : "invalid, ");
+				sb.append(valid ? VALID_COMMA_ : INVALID_COMMA_);
 
 				@SuppressWarnings("unchecked")
 				final long number = ((IConfigJob<Long>) finishedJob).getResults();
 				if (number < 0) {
-					sb.append("more than ");
+					sb.append(MORE_THAN);
 					sb.append(-1 - number);
 				} else {
 					sb.append(number);
 				}
-				sb.append(" possible configurations");
+				sb.append(POSSIBLE_CONFIGURATIONS);
 				if (number == 0 && !configurationEditor.isAutoSelectFeatures()) {
 					sb.append(" - Autoselect not possible!");
 				}
@@ -306,11 +318,11 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	protected boolean errorMessage(Tree tree) {
 		if (configurationEditor.getConfiguration() == null) {
 			if (configurationEditor.getModelFile() == null) {
-				displayError(tree, "There is no feature model corresponding to this configuration, reopen the editor and select one.");
+				displayError(tree, THERE_IS_NO_FEATURE_MODEL_CORRESPONDING_TO_THIS_CONFIGURATION_COMMA__REOPEN_THE_EDITOR_AND_SELECT_ONE_);
 			} else if (!configurationEditor.getModelFile().exists()) {
-				displayError(tree, "The given feature model " + configurationEditor.getModelFile().getPath() + " does not exist.");
+				displayError(tree, THE_GIVEN_FEATURE_MODEL + configurationEditor.getModelFile().getPath() + DOES_NOT_EXIST_);
 			} else {
-				displayError(tree, "An unknown error occurred.");
+				displayError(tree, AN_UNKNOWN_ERROR_OCCURRED_);
 			}
 			return false;
 		} else {
@@ -319,7 +331,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 				if (!analyzer.isValid()) {
 					displayError(
 							tree,
-							"The feature model for this project is void, i.e., there is no valid configuration. You need to correct the feature model before you can create or edit configurations.");
+							THE_FEATURE_MODEL_FOR_THIS_PROJECT_IS_VOID_COMMA__I_E__COMMA__THERE_IS_NO_VALID_CONFIGURATION__YOU_NEED_TO_CORRECT_THE_FEATURE_MODEL_BEFORE_YOU_CAN_CREATE_OR_EDIT_CONFIGURATIONS_);
 					return false;
 				}
 			} catch (TimeoutException e) {

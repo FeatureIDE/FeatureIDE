@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.MOVE_LEGEND;
+
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -38,7 +40,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
  */
 public class LegendMoveOperation extends AbstractFeatureModelOperation {
 
-	private static final String LABEL = "Move Legend";
+	private static final String LABEL = MOVE_LEGEND;
 	private Point newLocation;
 	private Point oldLocation;
 	private boolean wasAutoLayout;

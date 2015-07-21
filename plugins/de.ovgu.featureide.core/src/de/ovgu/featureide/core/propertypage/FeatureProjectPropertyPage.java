@@ -20,6 +20,24 @@
  */
 package de.ovgu.featureide.core.propertypage;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.COMPOSITION_MECHANISM;
+import static de.ovgu.featureide.fm.core.localization.StringTable.COMPOSITION_TOOL_SETTINGS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CONFIGURATIONS_AND_FEATURES_PATH_SHOULD_DIFFER_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CONFIGURATIONS_AND_SOURCE_PATH_SHOULD_DIFFER_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CONJUNCTIVE_CONTRACT_REFINEMENT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CONSECUTIVE_CONTRACT_REFINEMENT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CONTRACT_OVERRIDING;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CUMULATIVE_CONTRACT_REFINEMENT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DEFINE_A_CONFIGURATIONS_PATH_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DEFINE_A_FEATURES_PATH_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DEFINE_A_SOURCE_PATH_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.EXPLICIT_CONTRACT_REFINEMENT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.METHOD_BASED_COMPOSITION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NO_RESOURCE_SELECTED_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.PLAIN_CONTRACTING;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SOURCE_AND_FEATURES_PATH_SHOULD_DIFFER_;
+
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -60,7 +78,7 @@ import de.ovgu.featureide.core.builder.IComposerExtensionBase;
  */
 // TODO distinction between rename and move of folders
 // TODO change from FeatureModelling -> Antenna : Sourcepath is not written
-@SuppressWarnings("restriction")
+@SuppressWarnings(RESTRICTION)
 public class FeatureProjectPropertyPage extends PropertyPage {
 
 	private static final class ExtensionComparator implements Comparator<IComposerExtensionBase>, Serializable {
@@ -72,7 +90,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 	}
 
 	private static final String DESCRIPTION = null;
-	private static final String COMPOSER_GROUP_TEXT = "Composition tool settings";
+	private static final String COMPOSER_GROUP_TEXT = COMPOSITION_TOOL_SETTINGS;
 	private static final String COMPOSER_SELECTION_TEXT = "&Composition tool:";
 	private static final String CONTRACT_SELECTION_TEXT = "&Contract composition:";
 	private static final String COMPOSER_CONFIG_PATH = "&configurations path:";
@@ -121,7 +139,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 
 		if (!getProject()) {
 			Label label = new Label(composite, SWT.NONE);
-			label.setText("No resource selected.");
+			label.setText(NO_RESOURCE_SELECTED_);
 			return composite;
 		}
 
@@ -228,13 +246,13 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 		contractCombo = new Combo(group, SWT.READ_ONLY | SWT.DROP_DOWN);
 		contractCombo.setLayoutData(gd);
 		contractCombo.add(IFeatureProject.DEFAULT_CONTRACT_COMPOSITION);
-		contractCombo.add("Method-Based Composition");
-		contractCombo.add("Explicit Contract Refinement");
-		contractCombo.add("Contract Overriding");
-		contractCombo.add("Conjunctive Contract Refinement");
-		contractCombo.add("Consecutive Contract Refinement");
-		contractCombo.add("Cumulative Contract Refinement");
-		contractCombo.add("Plain Contracting");
+		contractCombo.add(METHOD_BASED_COMPOSITION);
+		contractCombo.add(EXPLICIT_CONTRACT_REFINEMENT);
+		contractCombo.add(CONTRACT_OVERRIDING);
+		contractCombo.add(CONJUNCTIVE_CONTRACT_REFINEMENT);
+		contractCombo.add(CONSECUTIVE_CONTRACT_REFINEMENT);
+		contractCombo.add(CUMULATIVE_CONTRACT_REFINEMENT);
+		contractCombo.add(PLAIN_CONTRACTING);
 
 		String composer = featureProject.getContractComposition();
 		refreshContractCombo(composer);
@@ -292,7 +310,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 
 	private void addCompositionMechanismMember(Group group) {
 		Label label = new Label(group, SWT.NULL);
-		label.setText("Composition mechanism");
+		label.setText(COMPOSITION_MECHANISM);
 		mechanismCombo = new Combo(group, SWT.READ_ONLY | SWT.DROP_DOWN);
 		mechanismCombo.setLayoutData(gd);
 		mechanismCombo.add(IFeatureProject.DEFAULT_COMPOSITION_MECHANISM);
@@ -568,11 +586,11 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 				if (c.hasFeatureFolder()) {
 					featurePath.setEnabled(true);
 					if (featurePath.getText().equals("")) {
-						updateStatus("Define a features path.");
+						updateStatus(DEFINE_A_FEATURES_PATH_);
 						return;
 					}
 					if (featurePath.getText().equals(configPath.getText())) {
-						updateStatus("Configurations and features path should differ.");
+						updateStatus(CONFIGURATIONS_AND_FEATURES_PATH_SHOULD_DIFFER_);
 						return;
 					}
 				} else {
@@ -581,11 +599,11 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 				if (c.hasSourceFolder()) {
 					sourcePath.setEnabled(true);
 					if (sourcePath.getText().equals("")) {
-						updateStatus("Define a source path.");
+						updateStatus(DEFINE_A_SOURCE_PATH_);
 						return;
 					}
 					if (sourcePath.getText().equals(configPath.getText())) {
-						updateStatus("Configurations and source path should differ.");
+						updateStatus(CONFIGURATIONS_AND_SOURCE_PATH_SHOULD_DIFFER_);
 						return;
 					}
 				} else {
@@ -593,13 +611,13 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 				}
 				if (c.hasFeatureFolder() && c.hasSourceFolder()) {
 					if (featurePath.getText().equals(sourcePath.getText())) {
-						updateStatus("Source and features path should differ.");
+						updateStatus(SOURCE_AND_FEATURES_PATH_SHOULD_DIFFER_);
 						return;
 					}
 				}
 
 				if (configPath.getText().equals("")) {
-					updateStatus("Define a configurations path.");
+					updateStatus(DEFINE_A_CONFIGURATIONS_PATH_);
 					return;
 				}
 				if (!c.hasMetaProductGeneration()) {

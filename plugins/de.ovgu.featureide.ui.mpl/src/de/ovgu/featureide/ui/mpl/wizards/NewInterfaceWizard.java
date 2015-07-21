@@ -61,7 +61,7 @@ public class NewInterfaceWizard extends AbstractWizard {
 //		try {
 //			// create interface
 //			
-//			IFolder mplFolder = project.getFolder("Interfaces");
+//			IFolder mplFolder = project.getFolder(INTERFACES);
 //			if (!mplFolder.exists())
 //				mplFolder.create(true, true, null);
 //

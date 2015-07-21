@@ -20,6 +20,10 @@
  */
 package de.ovgu.featureide.ui.actions.generator;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CANNOT_FIND_SYMBOL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.COMPILER;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SYMBOL;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -63,7 +67,7 @@ public class JavaCompiler implements IConfigurationBuilderBasics {
 	public JavaCompiler(int nr, Generator generator) {
 		this.generator = generator;
 
-		tmp = generator.builder.tmp.getFolder("Compiler" + nr);
+		tmp = generator.builder.tmp.getFolder(COMPILER + nr);
 		if (!tmp.exists()) {
 			try {
 				tmp.create(true, true, null);
@@ -243,7 +247,7 @@ public class JavaCompiler implements IConfigurationBuilderBasics {
 	private String parseCannotFindSymbolMessage(Scanner scanner) {
 		while (scanner.hasNextLine()) {
 			String currentLine = scanner.nextLine();
-			if (currentLine.startsWith("symbol")) {
+			if (currentLine.startsWith(SYMBOL)) {
 				String[] tokens = currentLine.split(": ");
 				if (tokens.length == 2)
 					return CANNOT_FIND_SYMBOL + ": " + tokens[1];

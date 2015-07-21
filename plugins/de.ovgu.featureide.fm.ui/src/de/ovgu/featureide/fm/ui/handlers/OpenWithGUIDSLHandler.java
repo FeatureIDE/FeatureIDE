@@ -20,6 +20,10 @@
  */
 package de.ovgu.featureide.fm.ui.handlers;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.LINUX;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.UNABLE_TO_START_GUIDSL;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -47,7 +51,7 @@ import de.ovgu.featureide.fm.ui.handlers.base.AFileHandler;
  * 
  * @author Thomas Thuem
  */
-@SuppressWarnings("restriction")
+@SuppressWarnings(RESTRICTION)
 public class OpenWithGUIDSLHandler extends AFileHandler {
 
 	@Override
@@ -79,7 +83,7 @@ public class OpenWithGUIDSLHandler extends AFileHandler {
 			execProcess(command, new File(dirpath));
 
 		} catch (Exception e) {
-			FMUIPlugin.getDefault().logError("Unable to start GUIDSL", e);
+			FMUIPlugin.getDefault().logError(UNABLE_TO_START_GUIDSL, e);
 		}
 	}
 
@@ -106,7 +110,7 @@ public class OpenWithGUIDSLHandler extends AFileHandler {
 		String sys = System.getProperty("os.name");
 		// #58 ,OS dependent Code for excuting commands, Linux does not execute
 		// without a shell
-		if ("Linux".equals(sys)) {
+		if (LINUX.equals(sys)) {
 			String[] cmd = new String[3];
 			cmd[0] = "/bin/bash";
 			cmd[1] = "-c";

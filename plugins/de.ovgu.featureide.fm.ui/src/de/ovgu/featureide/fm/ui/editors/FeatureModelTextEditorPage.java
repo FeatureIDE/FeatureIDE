@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.SOURCE;
+
 import java.beans.PropertyChangeEvent;
 
 import org.eclipse.core.commands.ExecutionException;
@@ -46,7 +48,7 @@ public class FeatureModelTextEditorPage extends TextEditor implements IFeatureMo
 
 	private int index;
 
-	private static final String PAGE_TEXT = "Source";
+	private static final String PAGE_TEXT = SOURCE;
 
 	private static final String ID = FMUIPlugin.PLUGIN_ID + ".editors.FeatureModelTextEditorPage";
 

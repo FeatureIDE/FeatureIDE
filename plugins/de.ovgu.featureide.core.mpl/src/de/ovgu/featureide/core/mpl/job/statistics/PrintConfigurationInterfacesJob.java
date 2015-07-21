@@ -20,6 +20,12 @@
  */
 package de.ovgu.featureide.core.mpl.job.statistics;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD_CONFIGURATION_INTERFACES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE_SOLUTIONS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.GENERATE_SIGNATURES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.GROUPS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IN_GROUP;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -56,7 +62,7 @@ public class PrintConfigurationInterfacesJob extends AProjectJob<PrintConfigurat
 	}
 	
 	protected PrintConfigurationInterfacesJob(Arguments arguments) {
-		super("Build Configuration Interfaces", arguments);
+		super(BUILD_CONFIGURATION_INTERFACES, arguments);
 	}
 
 	@Override
@@ -66,7 +72,7 @@ public class PrintConfigurationInterfacesJob extends AProjectJob<PrintConfigurat
 			MPLPlugin.getDefault().logWarning(this.project.getName() + " is no Interface Project!");
 			return false;
 		}
-		workMonitor.createSubTask("Calculate Solutions");
+		workMonitor.createSubTask(CALCULATE_SOLUTIONS);
 		
 		final LinkedList<List<String>> solutionList;
 		try {
@@ -77,10 +83,10 @@ public class PrintConfigurationInterfacesJob extends AProjectJob<PrintConfigurat
 		}
 		final int numberSolutions = solutionList.size();
 		
-		workMonitor.createSubTask("Generate Signatures");
+		workMonitor.createSubTask(GENERATE_SIGNATURES);
 		
 		IFolder interfaceFolder = interfaceProject.getProjectReference().getFolder("configuration_interfaces");
-		IFolder groupListFolder = interfaceFolder.getFolder("groups");
+		IFolder groupListFolder = interfaceFolder.getFolder(GROUPS);
 		try {
 			if (interfaceFolder.exists()) {
 				interfaceFolder.delete(true, null);
@@ -162,7 +168,7 @@ public class PrintConfigurationInterfacesJob extends AProjectJob<PrintConfigurat
 		sb2.append(minNumbers[0][0]);
 		sb2.append(" (Solution ");
 		sb2.append(converter.convert(solutionIds[0][0]));
-		sb2.append(" in Group ");
+		sb2.append(IN_GROUP);
 		sb2.append(converter.convert(groupIds[0][0]));
 		sb2.append(")\n");
 
@@ -170,7 +176,7 @@ public class PrintConfigurationInterfacesJob extends AProjectJob<PrintConfigurat
 		sb2.append(minNumbers[0][1]);
 		sb2.append(" (Solution ");
 		sb2.append(converter.convert(solutionIds[0][1]));
-		sb2.append(" in Group ");
+		sb2.append(IN_GROUP);
 		sb2.append(converter.convert(groupIds[0][1]));
 		sb2.append(")\n");
 
@@ -178,7 +184,7 @@ public class PrintConfigurationInterfacesJob extends AProjectJob<PrintConfigurat
 		sb2.append(minNumbers[0][2]);
 		sb2.append(" (Solution ");
 		sb2.append(converter.convert(solutionIds[0][2]));
-		sb2.append(" in Group ");
+		sb2.append(IN_GROUP);
 		sb2.append(converter.convert(groupIds[0][2]));
 		sb2.append(")\n");
 		

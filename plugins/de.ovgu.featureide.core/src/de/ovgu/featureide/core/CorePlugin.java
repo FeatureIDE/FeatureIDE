@@ -20,6 +20,19 @@
  */
 package de.ovgu.featureide.core;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.ADD_PROJECT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.AND_COMPOSER_TO_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CHANGE_OLD_NATURE_TO_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.COULD_NOT_SET_PERSISTANT_PROPERTY;
+import static de.ovgu.featureide.fm.core.localization.StringTable.EQUATION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ERROR_WHILE_CREATING_FEATURE_MODEL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.EXPRESSION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IN_PROJECT_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NO_COMPOSER_FOUND_IN_DESCRIPTION_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NO_PROJECT_DESCRIPTION_FOUND_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NO_RESOURCE_GIVEN_WHILE_GETTING_THE_PROJECT_DATA;
+import static de.ovgu.featureide.fm.core.localization.StringTable.REMOVED;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -169,7 +182,7 @@ public class CorePlugin extends AbstractCorePlugin {
 	 */
 	private static void changeOldNature(IProject project, String composerID) throws CoreException {
 		CorePlugin.getDefault().logInfo(
-				"Change old nature to '" + FeatureProjectNature.NATURE_ID + "' and composer to '" + composerID + "' in project '" + project.getName() + "'");
+				CHANGE_OLD_NATURE_TO_ + FeatureProjectNature.NATURE_ID + AND_COMPOSER_TO_ + composerID + IN_PROJECT_ + project.getName() + "'");
 		IProjectDescription description = project.getDescription();
 		String[] natures = description.getNatureIds();
 		for (int i = 0; i < natures.length; i++)
@@ -234,10 +247,10 @@ public class CorePlugin extends AbstractCorePlugin {
 					return new Status(Status.ERROR, PLUGIN_ID, "No Composer Found for ID " + composerID);
 				}
 			} else {
-				return new Status(Status.ERROR, PLUGIN_ID, "No Composer Found in Description.");
+				return new Status(Status.ERROR, PLUGIN_ID, NO_COMPOSER_FOUND_IN_DESCRIPTION_);
 			}
 		} else {
-			return new Status(Status.ERROR, PLUGIN_ID, "No Project Description Found.");
+			return new Status(Status.ERROR, PLUGIN_ID, NO_PROJECT_DESCRIPTION_FOUND_);
 		}
 	}
 
@@ -258,7 +271,7 @@ public class CorePlugin extends AbstractCorePlugin {
 			return;
 
 		IFeatureProject featureProject = featureProjectMap.remove(project);
-		logInfo(project.getName() + " removed");
+		logInfo(project.getName() + REMOVED);
 
 		for (IProjectListener listener : projectListeners)
 			listener.projectRemoved(featureProject);
@@ -463,7 +476,7 @@ public class CorePlugin extends AbstractCorePlugin {
 			project.setPersistentProperty(IFeatureProject.configFolderConfigID, configPath);
 			project.setPersistentProperty(IFeatureProject.sourceFolderConfigID, sourcePath);
 		} catch (CoreException e) {
-			CorePlugin.getDefault().logError("Could not set persistant property", e);
+			CorePlugin.getDefault().logError(COULD_NOT_SET_PERSISTANT_PROPERTY, e);
 		}
 		addFeatureNatureToProject(project);
 	}
@@ -542,7 +555,7 @@ public class CorePlugin extends AbstractCorePlugin {
 		try {
 			new FeatureModelWriterIFileWrapper(new XmlFeatureModelWriter(featureModel)).writeToFile(project.getFile("model.xml"));
 		} catch (CoreException e) {
-			CorePlugin.getDefault().logError("Error while creating feature model", e);
+			CorePlugin.getDefault().logError(ERROR_WHILE_CREATING_FEATURE_MODEL, e);
 		}
 
 	}
@@ -577,7 +590,7 @@ public class CorePlugin extends AbstractCorePlugin {
 	@CheckForNull
 	public static IFeatureProject getFeatureProject(IResource res) {
 		if (res == null) {
-			getDefault().logWarning("No resource given while getting the project data");
+			getDefault().logWarning(NO_RESOURCE_GIVEN_WHILE_GETTING_THE_PROJECT_DATA);
 			return null;
 		}
 		IProject prj = res.getProject();
@@ -597,8 +610,8 @@ public class CorePlugin extends AbstractCorePlugin {
 	public LinkedList<String> getConfigurationExtensions() {
 		LinkedList<String> extensions = new LinkedList<String>();
 		extensions.add("config");
-		extensions.add("equation");
-		extensions.add("expression");
+		extensions.add(EQUATION);
+		extensions.add(EXPRESSION);
 		return extensions;
 	}
 
@@ -617,7 +630,7 @@ public class CorePlugin extends AbstractCorePlugin {
 
 		projectsToAdd.add(project);
 		if (job == null) {
-			job = new Job("Add Project") {
+			job = new Job(ADD_PROJECT) {
 				@Override
 				public IStatus run(IProgressMonitor monitor) {
 					addProjects(monitor);

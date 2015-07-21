@@ -1,5 +1,8 @@
 package br.ufal.ic.colligens.preferences;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.ANALYZING_IFDEF_VARIABILITY_IN_C_CODE_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.GENERAL_PROCESSING_TYPECHEF_OPTIONS;
+
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.RadioGroupFieldEditor;
@@ -31,7 +34,7 @@ public class PreferencePage extends FieldEditorPreferencePage implements
 				getFieldEditorParent()));
 
 		addField(new RadioGroupFieldEditor("TypeChefPreference",
-				"General processing TypeChef options", 1, new String[][] {
+				GENERAL_PROCESSING_TYPECHEF_OPTIONS, 1, new String[][] {
 						{ "&Typecheck", "--typecheck" },
 						{ "P&arse", "--parse" } }, getFieldEditorParent()));
 
@@ -40,7 +43,7 @@ public class PreferencePage extends FieldEditorPreferencePage implements
 	@Override
 	public void init(IWorkbench workbench) {
 		setPreferenceStore(Colligens.getDefault().getPreferenceStore());
-		setDescription("Analyzing ifdef variability in C code.");
+		setDescription(ANALYZING_IFDEF_VARIABILITY_IN_C_CODE_);
 	}
 
 }

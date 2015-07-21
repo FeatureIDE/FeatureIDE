@@ -1,5 +1,7 @@
 package br.ufal.ic.colligens.util;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.INVALID_PRODUCT_VARIANT;
+
 import java.io.File;
 import java.util.regex.Pattern;
 
@@ -30,7 +32,7 @@ public class InvalidProductViewLog {
 
 		try {
 			IMarker marker = getFolder().createMarker(MARKER_TYPE);
-			marker.setAttribute(IMarker.MESSAGE, "Invalid product variant");
+			marker.setAttribute(IMarker.MESSAGE, INVALID_PRODUCT_VARIANT);
 			marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
 			marker.setAttribute(IMarker.LOCATION, this.relativePath);
 		} catch (CoreException e) {

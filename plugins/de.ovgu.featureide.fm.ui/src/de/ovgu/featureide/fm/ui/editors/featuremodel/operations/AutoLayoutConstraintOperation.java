@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.AUTO_LAYOUT_CONSTRAINTS;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -43,7 +45,7 @@ public class AutoLayoutConstraintOperation extends AbstractFeatureModelOperation
 	private LinkedList<LinkedList<Point>> oldPos = new LinkedList<LinkedList<Point>>();
 
 	public AutoLayoutConstraintOperation(FeatureModel featureModel, LinkedList<LinkedList<Point>> oldPos, int counter) {
-		super(featureModel, "Auto Layout Constraints");
+		super(featureModel, AUTO_LAYOUT_CONSTRAINTS);
 		this.counter = counter;
 		if (!(oldPos == null) && !oldPos.isEmpty())
 			this.oldPos.addAll(oldPos);

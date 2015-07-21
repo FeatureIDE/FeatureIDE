@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_CONSTRAINT;
+
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.ISharedImages;
@@ -38,7 +40,7 @@ public class CreateConstraintAction extends AbstractConstraintEditorAction {
 	private static ImageDescriptor createImage = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ADD);
 
 	public CreateConstraintAction(Object viewer, FeatureModel featuremodel) {
-		super(viewer, featuremodel, "Create Constraint");
+		super(viewer, featuremodel, CREATE_CONSTRAINT);
 		setImageDescriptor(createImage);
 	}
 

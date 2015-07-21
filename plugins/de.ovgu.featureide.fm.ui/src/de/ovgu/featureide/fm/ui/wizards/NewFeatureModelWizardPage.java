@@ -20,6 +20,13 @@
  */
 package de.ovgu.featureide.fm.ui.wizards;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.BROWSE___;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_A_NEW_FEATURE_MODEL_FILE_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FILE_NAME_MUST_BE_SPECIFIED_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NEW_FEATURE_MODEL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NEW_MODEL_FILE_MUST_HAVE_XML_AS_FILE_EXTENSION_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTED_FILE_ALREADY_EXISTS_;
+
 import javax.annotation.CheckForNull;
 
 import org.eclipse.core.resources.IProject;
@@ -52,7 +59,7 @@ public class NewFeatureModelWizardPage extends WizardPage {
 	public NewFeatureModelWizardPage(String project, IProject projectRes) {
 		super(project);
 		this.project = projectRes;
-		setDescription("Create a new feature model file.");
+		setDescription(CREATE_A_NEW_FEATURE_MODEL_FILE_);
 	}
 
 	@Override
@@ -74,7 +81,7 @@ public class NewFeatureModelWizardPage extends WizardPage {
 		}
 
 		Button browseButton = new Button(composite, SWT.NONE);
-		browseButton.setText("     Browse...     ");
+		browseButton.setText(BROWSE___);
 		browseButton.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
 			public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
 				String selectedPath = openFileDialog();
@@ -102,7 +109,7 @@ public class NewFeatureModelWizardPage extends WizardPage {
 		String text = fileName.getText();
 		IPath path = new Path(text);
 		if (path.isEmpty()) {
-			updateStatus("File name must be specified.");
+			updateStatus(FILE_NAME_MUST_BE_SPECIFIED_);
 			return;
 		}
 		if (!path.isValidPath(text)) {
@@ -111,11 +118,11 @@ public class NewFeatureModelWizardPage extends WizardPage {
 		}
 		String fileExtension = path.getFileExtension();
 		if (fileExtension == null || !fileExtension.equals("xml")) {
-			updateStatus("New model file must have xml as file extension.");
+			updateStatus(NEW_MODEL_FILE_MUST_HAVE_XML_AS_FILE_EXTENSION_);
 			return;
 		}
 		if (path.toFile().exists()) {
-			updateStatus("Selected file already exists.");
+			updateStatus(SELECTED_FILE_ALREADY_EXISTS_);
 			return;
 		}
 		updateStatus(null);
@@ -128,7 +135,7 @@ public class NewFeatureModelWizardPage extends WizardPage {
 
 	private String openFileDialog() {
 		FileDialog dialog = new FileDialog(getShell(), SWT.MULTI);
-		dialog.setText("New Feature Model");
+		dialog.setText(NEW_FEATURE_MODEL);
 		dialog.setFilterExtensions(new String[] { "*.xml" });
 		dialog.setFilterNames(new String[] { "XML *.xml" });
 		dialog.setFileName("model.xml");

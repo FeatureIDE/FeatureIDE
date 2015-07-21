@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.featurehouse.meta.featuremodel;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.DEPRECATION;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -100,7 +102,7 @@ public class FeatureModelClassGenerator {
 	 * Saves the content of the {@link StringBuilder} to the given file.
 	 * @param file
 	 */
-	@SuppressWarnings("deprecation")
+	@SuppressWarnings(DEPRECATION)
 	public void saveToFile(IFile file) {
 		InputStream source = new ByteArrayInputStream(stringBuilder.toString()
 				.getBytes(Charset.availableCharsets().get("UTF-8")));

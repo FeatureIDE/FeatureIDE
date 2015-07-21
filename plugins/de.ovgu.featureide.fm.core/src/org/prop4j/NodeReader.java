@@ -20,6 +20,17 @@
  */
 package org.prop4j;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.IFF;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IMPLIES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.INVALID_NUMBER_OF_QUOTATION_MARKS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.INVALID_POSITIONING_OF_PARENTHESES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NO_LEFT_SYMBOL_FOUND;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NO_OPERATOR_FOUND;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NO_RIGHT_SYMBOL_FOUND;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NO_SYMBOLS_FOUND_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NO_SYMBOL_FOUND;
+import static de.ovgu.featureide.fm.core.localization.StringTable.WHITESPACE_BEFORE_AND_AFTER_QUOTED_FEATURENAME_REQUIRED;
+
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -36,8 +47,8 @@ import java.util.List;
  */
 public class NodeReader {
 
-	public final static String[] textualSymbols = new String[] { "iff",
-			"implies", "or", "and", "not" };
+	public final static String[] textualSymbols = new String[] { IFF,
+			IMPLIES, "or", "and", "not" };
 
 	public final static String[] shortSymbols = new String[] { "<=>", "=>",
 			"|", "&", "-" };
@@ -117,7 +128,7 @@ public class NodeReader {
 			errorMessage = " ";
 			string = " " + string.trim() + " ";
 			if ("  ".equals(string)) {
-				errorMessage = "No symbols found.";
+				errorMessage = NO_SYMBOLS_FOUND_;
 				error = true;
 				return getInvalidLiteral();
 			}
@@ -129,7 +140,7 @@ public class NodeReader {
 																			// occurrence
 
 					if (index == -1) {
-						errorMessage = "No Operator found";
+						errorMessage = NO_OPERATOR_FOUND;
 						error = true;
 						return getInvalidLiteral();
 					}
@@ -144,20 +155,20 @@ public class NodeReader {
 
 					if (i < 4) {
 						if (index == 0) {
-							errorMessage = "No left Symbol found";
+							errorMessage = NO_LEFT_SYMBOL_FOUND;
 							error = true;
 							return getInvalidLiteral();
 						}
 
 						if (string.length() - (index + symbols[i].length()) == 0) {
-							errorMessage = "No right Symbol found";
+							errorMessage = NO_RIGHT_SYMBOL_FOUND;
 							error = true;
 							return getInvalidLiteral();
 						}
 
 					} else if (i == 4) {
 						if (string.length() - (index + symbols[i].length()) == 0) {
-							errorMessage = "No Symbol found";
+							errorMessage = NO_SYMBOL_FOUND;
 							error = true;
 							return getInvalidLiteral();
 						}
@@ -251,7 +262,7 @@ public class NodeReader {
 				if (constraint.charAt(i) == '(') {
 					bracketCounter++;
 				} else if (constraint.charAt(i) == ')' && bracketCounter == 0) {
-					errorMessage = "invalid positioning of parentheses";
+					errorMessage = INVALID_POSITIONING_OF_PARENTHESES;
 					return false;
 				} else if (constraint.charAt(i) == ')') {
 					bracketCounter--;
@@ -279,7 +290,7 @@ public class NodeReader {
 				int indEnd = constraint.indexOf("\"", indStart + 1);
 
 				if (indEnd == -1) {
-					errorMessage = "Invalid number of quotation marks";
+					errorMessage = INVALID_NUMBER_OF_QUOTATION_MARKS;
 					return false;
 				}
 				if (indStart - 1 > 0 && constraint.charAt(indStart - 1) != ' '
@@ -287,7 +298,7 @@ public class NodeReader {
 						|| indEnd + 1 < constraint.length()
 						&& constraint.charAt(indEnd + 1) != ' '
 						&& constraint.charAt(indEnd + 1) != ')') {
-					errorMessage = "Whitespace before and after quoted Featurename required";
+					errorMessage = WHITESPACE_BEFORE_AND_AFTER_QUOTED_FEATURENAME_REQUIRED;
 					return false;
 				}
 
@@ -311,7 +322,7 @@ public class NodeReader {
 						|| indEnd + 1 < constraint.length()
 						&& constraint.charAt(indEnd + 1) != ' '
 						&& constraint.charAt(indEnd + 1) != ')') {
-					errorMessage = "Whitespace before and after quoted Featurename required";
+					errorMessage = WHITESPACE_BEFORE_AND_AFTER_QUOTED_FEATURENAME_REQUIRED;
 					return false;
 				}
 

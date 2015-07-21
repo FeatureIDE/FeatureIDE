@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.ui.mpl.wizards;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.NEW_MULTI_FEATURE_PROJECT;
+
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.IWorkbench;
@@ -43,7 +45,7 @@ public class NewMultiFeatureProjectWizard extends Wizard implements IWorkbenchWi
 	
 	@Override
 	public void addPages() {
-		setWindowTitle("New Multi-Feature Project");
+		setWindowTitle(NEW_MULTI_FEATURE_PROJECT);
 		multiPage = new NewMultiFeatureProjectPage();
 		addPage(multiPage);
 		super.addPages();

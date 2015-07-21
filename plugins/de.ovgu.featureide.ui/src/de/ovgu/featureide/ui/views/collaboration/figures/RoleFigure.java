@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.figures;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.ARIAL;
+
 import java.util.Arrays;
 import java.util.LinkedList;
 
@@ -70,7 +72,7 @@ import de.ovgu.featureide.ui.views.collaboration.action.ShowFieldsMethodsAction;
 
 public class RoleFigure extends Figure implements GUIDefaults {
 
-	private static Font FONT_BOLD = new Font(null, "Arial", 8, SWT.BOLD);
+	private static Font FONT_BOLD = new Font(null, ARIAL, 8, SWT.BOLD);
 
 	private final Panel panel = new Panel();
 	private boolean selected = false;

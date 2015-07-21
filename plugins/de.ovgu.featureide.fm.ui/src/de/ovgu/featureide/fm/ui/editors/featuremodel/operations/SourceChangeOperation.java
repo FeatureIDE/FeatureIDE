@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.SOURCE_CHANGE;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 
@@ -41,7 +42,7 @@ public class SourceChangeOperation extends AbstractFeatureModelOperation {
 	 * @param oldText
 	 */
 	public SourceChangeOperation(FeatureModel featureModel, FeatureModelEditor featureModelEditor, String newText, String oldText) {
-		super(featureModel, "Source Change");
+		super(featureModel, SOURCE_CHANGE);
 		this.featureModelEditor = featureModelEditor;
 		this.newText = newText;
 		this.oldText = oldText;

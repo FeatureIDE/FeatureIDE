@@ -21,6 +21,11 @@
 package de.ovgu.featureide.ahead.wrapper;
 
 import static de.ovgu.featureide.ahead.wrapper.AheadBuildErrorType.COMPOSER_ERROR;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DOES_NOT_EXIST;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FILE_SKIPPED_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NO_FEATURE_FOLDER_FOUND_IN_THE_JAK_FILE_PATH_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SOURCE_PATH_NOT_CONTAINED_IN_THE_JAK_FILE_PATH_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.UNEXPECTED_ERROR_WHILE_PARSING;
 import jampack.Jampack;
 
 import java.io.BufferedReader;
@@ -147,7 +152,7 @@ public class ComposerWrapper {
 						.contains(featureFolder.getName()))
 					featureProject.createBuilderMarker(featureProject
 							.getProject(), "Feature folder "
-							+ featureFolder.getName() + " does not exist", 0,
+							+ featureFolder.getName() + DOES_NOT_EXIST, 0,
 							IMarker.SEVERITY_WARNING);
 			} catch (CoreException e) {
 				AheadCorePlugin.getDefault().logError(e);
@@ -257,8 +262,8 @@ public class ComposerWrapper {
 		String jakFilePath = newJakFile.getRawLocation().toOSString();
 
 		if (!jakFilePath.startsWith(srcFolderPath)) {
-			AheadCorePlugin.getDefault().logWarning("Source path not contained in the Jak file path '"
-							+ jakFilePath + "'. File skipped.");
+			AheadCorePlugin.getDefault().logWarning(SOURCE_PATH_NOT_CONTAINED_IN_THE_JAK_FILE_PATH_
+							+ jakFilePath + FILE_SKIPPED_);
 			return;
 		}
 
@@ -269,8 +274,8 @@ public class ComposerWrapper {
 		int pos = jakFilePath.indexOf(java.io.File.separator);
 
 		if (pos < 0) {
-			AheadCorePlugin.getDefault().logWarning("No feature folder found in the Jak file path '"
-					+ jakFilePath + "'. File skipped.");
+			AheadCorePlugin.getDefault().logWarning(NO_FEATURE_FOLDER_FOUND_IN_THE_JAK_FILE_PATH_
+					+ jakFilePath + FILE_SKIPPED_);
 			return;
 		}
 		jakFilePath = jakFilePath.substring(pos + 1).replace("\\", "/");
@@ -354,7 +359,7 @@ public class ComposerWrapper {
 			} catch (Exception e) {
 				AheadCorePlugin.getDefault().logError(e);
 				handleErrorMessage(featureProject.getSourceFolder(),
-						"Unexpected error while parsing "
+						UNEXPECTED_ERROR_WHILE_PARSING
 								+ newJakIFile.getName(), 0);
 			}
 		}
@@ -400,7 +405,7 @@ public class ComposerWrapper {
 			} catch (Exception e) {
 				AheadCorePlugin.getDefault().logError(e);
 				handleErrorMessage(featureProject.getSourceFolder(),
-						"Unexpected error while parsing "
+						UNEXPECTED_ERROR_WHILE_PARSING
 								+ newJakIFile.getName(), 0);
 			}
 		}

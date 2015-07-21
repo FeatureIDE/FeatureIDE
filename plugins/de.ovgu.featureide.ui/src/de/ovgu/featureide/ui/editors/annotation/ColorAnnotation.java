@@ -20,6 +20,18 @@
  */
 package de.ovgu.featureide.ui.editors.annotation;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.BLUE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.COLOR_ANNOTATION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CYAN;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DARKGREEN;
+import static de.ovgu.featureide.fm.core.localization.StringTable.LIGHTGREEN;
+import static de.ovgu.featureide.fm.core.localization.StringTable.LIGHTGREY;
+import static de.ovgu.featureide.fm.core.localization.StringTable.MARGENTA;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ORANGE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.PINK;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RED;
+import static de.ovgu.featureide.fm.core.localization.StringTable.YELLOW;
+
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
 
@@ -38,8 +50,8 @@ public class ColorAnnotation extends Annotation {
 	private static final String[] ANNOTATIONTYPE_ID = new String[31];
 	static {
 		String PREFIX = "de.ovgu.featureide.ui.editors.annotations.";
-		String[] COLORS = {	"red", "orange", "yellow", "darkgreen",	"lightgreen", 
-							"cyan", "lightgrey", "blue", "margenta", "pink"};
+		String[] COLORS = {	RED, ORANGE, YELLOW, DARKGREEN,	LIGHTGREEN, 
+							CYAN, LIGHTGREY, BLUE, MARGENTA, PINK};
 		ANNOTATIONTYPE_ID[0] = PREFIX + "image";
 		
 		for (int i = 0; i < ANNOTATIONTYPE_ID.length - 1; i++) {
@@ -52,7 +64,7 @@ public class ColorAnnotation extends Annotation {
 	private final int type;
 	
 	public ColorAnnotation(int id, Position posistion, int annotationtype) {
-		super(getTypeString(id, annotationtype), false, "Color Annotation");
+		super(getTypeString(id, annotationtype), false, COLOR_ANNOTATION);
 		this.position = posistion;
 		this.id = id;
 		this.type = annotationtype;

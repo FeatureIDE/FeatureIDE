@@ -20,6 +20,11 @@
  */
 package de.ovgu.featureide.ui.mpl.wizards.page;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CREATES_A_MULTI_FEATUREIDE_PROJECT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ENTER_A_NUMBER;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ENTER_A_VIEW_NAME;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SELECT_A_COMPOSER;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -42,8 +47,8 @@ public class InterfacePage extends AbstractWizardPage {
 	private int viewLevel = 1, configLimit = 1000;
 	
 	public InterfacePage() {
-		super("Select a composer");
-		setDescription("Creates a Multi-FeatureIDE project");
+		super(SELECT_A_COMPOSER);
+		setDescription(CREATES_A_MULTI_FEATUREIDE_PROJECT);
 	}
 
 	public void createControl(Composite parent) {
@@ -97,13 +102,13 @@ public class InterfacePage extends AbstractWizardPage {
 	@Override
 	protected String checkPage() {
 		if (viewNameText.getText().isEmpty()) {
-			return "Enter a view name";
+			return ENTER_A_VIEW_NAME;
 		}
 		try {
 			viewLevel = Integer.valueOf(viewLevelText.getText());
 			configLimit = Integer.valueOf(configLimitText.getText());
 		} catch (NumberFormatException e) {
-			return "Enter a number";
+			return ENTER_A_NUMBER;
 		}
 		return null;
 	}

@@ -20,6 +20,12 @@
  */
 package de.ovgu.featureide.fm.core.io.xml;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.COLOR;
+import static de.ovgu.featureide.fm.core.localization.StringTable.COLORSCHEME;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.INDEX;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SCHEME;
+
 import java.util.List;
 
 import org.w3c.dom.Document;
@@ -49,17 +55,17 @@ public class XmlColorModelWriter extends XmlFeatureModelWriter {
 	protected void createXmlDoc(Document doc) {
     	Element root = doc.createElement("root");
     	Element colorSchemesRoot = doc.createElement("colorSchemes");
-    	Element featuresRoot = doc.createElement("features");
+    	Element featuresRoot = doc.createElement(FEATURES);
 
     	ColorschemeTable colorschemeTable = featureModel.getColorschemeTable();
     	List<String> csNames = colorschemeTable.getColorschemeNames();
     	for (String name : csNames) {
-    		Element colorSchemesElement = doc.createElement("colorscheme");
+    		Element colorSchemesElement = doc.createElement(COLORSCHEME);
     		colorSchemesElement.setAttribute("name", name);
     		colorSchemesRoot.appendChild(colorSchemesElement);
 		}
     	Element curSchemeElement = doc.createElement("curColorscheme");
-    	curSchemeElement.setAttribute("index", Integer.toString(colorschemeTable.getSelectedColorscheme()));
+    	curSchemeElement.setAttribute(INDEX, Integer.toString(colorschemeTable.getSelectedColorscheme()));
 		colorSchemesRoot.appendChild(curSchemeElement);
     	
     	root.appendChild(colorSchemesRoot);
@@ -77,9 +83,9 @@ public class XmlColorModelWriter extends XmlFeatureModelWriter {
 						featuresElement.setAttribute("name", feat.getName());
 						noColor = false;
 					}
-					Element colorElement = doc.createElement("color");
-					colorElement.setAttribute( "index",	Integer.toString(colors.getColor(i)));
-					colorElement.setAttribute("scheme", Integer.toString(i));
+					Element colorElement = doc.createElement(COLOR);
+					colorElement.setAttribute( INDEX,	Integer.toString(colors.getColor(i)));
+					colorElement.setAttribute(SCHEME, Integer.toString(i));
 					featuresElement.appendChild(colorElement);
 				}
 			}

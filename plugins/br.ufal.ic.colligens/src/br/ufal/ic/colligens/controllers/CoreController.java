@@ -1,5 +1,7 @@
 package br.ufal.ic.colligens.controllers;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.ANALYZING_FILES;
+
 import java.util.List;
 
 import org.eclipse.core.resources.IResource;
@@ -47,7 +49,7 @@ public class CoreController {
 
 		typeChef = new TypeChef();
 
-		Job job = new Job("Analyzing files") {
+		Job job = new Job(ANALYZING_FILES) {
 			/*
 			 * (non-Javadoc)
 			 * 

@@ -20,6 +20,15 @@
  */
 package de.ovgu.featureide.featurecpp.wrapper;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CONFIGURATION_FILE_DOES_NOT_EXIST;
+import static de.ovgu.featureide.fm.core.localization.StringTable.GPP;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IS_NOT_AN_ABSOLUTE_PATH_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IS_NO_VALID_PATH_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.LINUX;
+import static de.ovgu.featureide.fm.core.localization.StringTable.PROPAGATE_PROBLEM_MARKERS_FOR;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SEE;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -56,7 +65,7 @@ import de.ovgu.featureide.fm.core.ModelMarkerHandler;
  * @author Tom Brosch
  * @author Jens Meinicke
  */
-@SuppressWarnings("restriction")
+@SuppressWarnings(RESTRICTION)
 public class FeatureCppWrapper {
 	private final static String EXE_LINUX_64BIT = "fc++v0.6Linux64bit";
 	private final static String EXE_LINUX_32BIT = "fc++v0.8Linux32bit";
@@ -79,7 +88,7 @@ public class FeatureCppWrapper {
 
 	public FeatureCppWrapper() {
 		String featureCppExecutable;
-		if ("Linux".equals(System.getProperty("os.name"))) {
+		if (LINUX.equals(System.getProperty("os.name"))) {
 			if (System.getProperty("os.arch").contains("64")) {
 				featureCppExecutable = EXE_LINUX_64BIT;
 				version = 6;
@@ -104,11 +113,11 @@ public class FeatureCppWrapper {
 		Path path = new Path(url.getFile());
 		String pathName = path.toOSString();
 		if (!path.isAbsolute()) {
-			FeatureCppCorePlugin.getDefault().logWarning(pathName + " is not an absolute path. " +
+			FeatureCppCorePlugin.getDefault().logWarning(pathName + IS_NOT_AN_ABSOLUTE_PATH_ +
 					"fc++ can not be found.");
 		}
 		if (!path.isValidPath(pathName)) {
-			FeatureCppCorePlugin.getDefault().logWarning(pathName + " is no valid path. " +
+			FeatureCppCorePlugin.getDefault().logWarning(pathName + IS_NO_VALID_PATH_ +
 					"fc++ can not be found.");
 		}
 		featureCppExecutableName = pathName;
@@ -129,7 +138,7 @@ public class FeatureCppWrapper {
 	}
 
 	public void compose(IFile config) {
-		assert (config != null && config.exists()) : "Configuration file does not exist";
+		assert (config != null && config.exists()) : CONFIGURATION_FILE_DOES_NOT_EXIST;
 		try {
 			if (!buildDirectory.exists())
 				buildDirectory.create(false, true, null);
@@ -146,7 +155,7 @@ public class FeatureCppWrapper {
 		if (version == 7) {
 			command.add("--gpp");
 		} else {
-			command.add("-gpp");
+			command.add(GPP);
 		}
 		command.add(config.getRawLocation().toOSString());
 		process(command);
@@ -227,7 +236,7 @@ public class FeatureCppWrapper {
 				public IStatus runInUIThread(IProgressMonitor monitor) {
 					MessageBox d = new MessageBox(new Shell(), SWT.ICON_ERROR);
 					d.setMessage("FeatureC++ can not be executed. Allow the file to be executed.\n" +
-							"See " + ("Linux".equals(System.getProperty("os.name")) ? "Properties/Permissions of " : "") + "file:\n" +
+							SEE + (LINUX.equals(System.getProperty("os.name")) ? "Properties/Permissions of " : "") + "file:\n" +
 							"\t" + featureCppExecutableName);
 					d.setText("FeatureC++ can not be executed.");
 					d.open();
@@ -276,7 +285,7 @@ public class FeatureCppWrapper {
 	}
 
 	private void addMarker(final IFile file, final String message, final int line) {
-		Job job = new Job("Propagate problem markers for " + CorePlugin.getFeatureProject(file)) {
+		Job job = new Job(PROPAGATE_PROBLEM_MARKERS_FOR + CorePlugin.getFeatureProject(file)) {
 			@Override
 			public IStatus run(IProgressMonitor monitor) {
 				try {

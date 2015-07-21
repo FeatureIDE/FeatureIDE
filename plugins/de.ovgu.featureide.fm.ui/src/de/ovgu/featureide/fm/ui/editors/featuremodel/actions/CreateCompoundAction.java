@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_FEATURE_ABOVE;
+
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -71,7 +73,7 @@ public class CreateCompoundAction extends Action {
 	};
 
 	public CreateCompoundAction(Object viewer, FeatureModel featureModel, Object diagramEditor) {
-		super("Create Feature Above", createImage);
+		super(CREATE_FEATURE_ABOVE, createImage);
 		this.viewer = viewer;
 		this.featureModel = featureModel;
 		this.diagramEditor = diagramEditor;

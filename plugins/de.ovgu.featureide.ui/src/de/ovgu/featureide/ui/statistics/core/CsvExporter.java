@@ -20,6 +20,15 @@
  */
 package de.ovgu.featureide.ui.statistics.core;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CANCEL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CHOOSE_WISELY;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DATA_WAS_SUCCESSFULLY_EXPORTED;
+import static de.ovgu.featureide.fm.core.localization.StringTable.EXPORT_STATISTICS_INTO_CSV;
+import static de.ovgu.featureide.fm.core.localization.StringTable.OK;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SHOW_DIALOG;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SHOW_ERRORDIALOG;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SUCCESS;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -75,7 +84,7 @@ public class CsvExporter {
 				visibleExpandedElements = export;				
 				FileDialog dialog = new FileDialog(shell);
 				dialog.setFilterExtensions(new String[] { "*.csv" });
-				dialog.setText("choose wisely");
+				dialog.setText(CHOOSE_WISELY);
 				returnVal = dialog.open();
 				if (returnVal == null) {
 					return Status.CANCEL_STATUS;
@@ -119,7 +128,7 @@ public class CsvExporter {
 	 * 
 	 */
 	private void actualExport() {
-		Job job = new Job("Export statistics into csv") {
+		Job job = new Job(EXPORT_STATISTICS_INTO_CSV) {
 			
 			private StringBuilder firstBuffer;
 			private StringBuilder secondBuffer;
@@ -178,22 +187,22 @@ public class CsvExporter {
 			 * 
 			 */
 			private void giveUserFeedback(final boolean error) {
-				UIJob errorJob = new UIJob(error ? "show errordialog" : "show dialog") {
+				UIJob errorJob = new UIJob(error ? SHOW_ERRORDIALOG : SHOW_DIALOG) {
 					
 					@Override
 					public IStatus runInUIThread(IProgressMonitor monitor) {
 						Shell shell = Display.getDefault().getActiveShell();
 						if (error) {
 							MessageDialog dial = new MessageDialog(shell, "Error", GUIDefaults.FEATURE_SYMBOL, "The file cannot be accessed!\nTry again?",
-									MessageDialog.ERROR, new String[] { "OK", "Cancel" }, 0);
+									MessageDialog.ERROR, new String[] { OK, CANCEL }, 0);
 							if (dial.open() == 0) {
 								actualWriting();
 							}
 						} else {
 							// MessageDialog.openInformation(shell, ,
-							// "Data was successfully exported.");
-							new MessageDialog(shell, "Success", GUIDefaults.FEATURE_SYMBOL, "Data was successfully exported", MessageDialog.INFORMATION,
-									new String[] { "OK" }, 0).open();
+							// DATA_WAS_SUCCESSFULLY_EXPORTED_);
+							new MessageDialog(shell, SUCCESS, GUIDefaults.FEATURE_SYMBOL, DATA_WAS_SUCCESSFULLY_EXPORTED, MessageDialog.INFORMATION,
+									new String[] { OK }, 0).open();
 						}
 						
 						return Status.OK_STATUS;

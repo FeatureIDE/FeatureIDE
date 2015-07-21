@@ -20,6 +20,12 @@
  */
 package de.ovgu.featureide.ui.actions.generator;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.IS_NO_XML_FILE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.OPEN;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RESOURCE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SERIAL;
+
 import java.io.File;
 import java.lang.annotation.Annotation;
 import java.net.MalformedURLException;
@@ -65,7 +71,7 @@ import de.ovgu.featureide.ui.actions.generator.IConfigurationBuilderBasics.Build
  * 
  * @author Jens Meinicke
  */
-@SuppressWarnings("restriction")
+@SuppressWarnings(RESTRICTION)
 public class TestRunner {
 
 	private static final Object KEY = new Object();
@@ -84,7 +90,7 @@ public class TestRunner {
 	}
 
 
-	@SuppressWarnings("resource")
+	@SuppressWarnings(RESOURCE)
 	public void runTests(final BuilderConfiguration configuration) {
 		URL[] url = getURLs();
 		URLClassLoader classLoader = new URLClassLoader(url, Thread.currentThread().getContextClassLoader());
@@ -217,7 +223,7 @@ public class TestRunner {
 		}
 	}
 
-	@SuppressWarnings("serial")
+	@SuppressWarnings(SERIAL)
 	private static class SystemExitException extends RuntimeException {
 		public SystemExitException(int status) {
 			super("Systen.exit: " + status);
@@ -270,9 +276,9 @@ public class TestRunner {
 	 */
 	private static void openJunitView(final IFile file) {
 		if (!file.getFileExtension().equals("xml")) {
-			throw new RuntimeException(file + " is no xml file");
+			throw new RuntimeException(file + IS_NO_XML_FILE);
 		}
-		final UIJob job = new UIJob("open " + file) {
+		final UIJob job = new UIJob(OPEN + file) {
 
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {

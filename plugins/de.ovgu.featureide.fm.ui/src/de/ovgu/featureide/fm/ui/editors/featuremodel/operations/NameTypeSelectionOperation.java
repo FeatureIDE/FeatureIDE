@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.SET;
+
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.AbstractOperation;
 import org.eclipse.core.runtime.IAdaptable;
@@ -41,7 +43,7 @@ public class NameTypeSelectionOperation extends AbstractOperation {
 	private int oldNameType = -1;
 
 	public NameTypeSelectionOperation(FeatureDiagramEditor editor, int newNameType) {
-		super("Set " + newNameType);
+		super(SET + newNameType);
 		this.editor = editor;
 		this.newNameType = newNameType;
 	}

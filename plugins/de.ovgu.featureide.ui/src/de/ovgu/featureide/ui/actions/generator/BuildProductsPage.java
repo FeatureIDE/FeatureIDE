@@ -20,6 +20,23 @@
  */
 package de.ovgu.featureide.ui.actions.generator;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.ALL_CURRENT_CONFIGURATIONS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ALL_VALID_CONFIGURATIONS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD_PRODUCTS_FOR_PROJECT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CASA;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CHVATAL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DEFAULT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DEFINES_HOW_THE_GENERATED_PRODUKTS_ARE_ORDERED_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DEFINES_THE_ALGORITHM_FOR_T_WISE_SAMPLING_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DEFINES_THE_PRODUKT_BASED_STRATEGY_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DEFINE_THE_T_FOR_T_WISE_SAMPLING_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DEFNIES_WHETHER_THE_PRODUKTS_ARE_GENERATED_INTO_SEPARATE_PROJECTS_OR_INTO_A_FOLDER_IN_THIS_PROJECT_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DIFFERENCE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ERROR_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.INTERACTIONS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SEARCHES_FOR_TEST_CASED_IN_THE_GENERATED_PRODUCTS_AND_EXECUTES_THEM_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.T_WISE_CONFIGURATIONS;
+
 import javax.annotation.CheckForNull;
 
 import org.eclipse.jface.wizard.WizardPage;
@@ -56,12 +73,12 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 	private static final String LABEL_INTERACTIONS = "&Interactions: t=";
 	private static final String LABEL_CREATE_NEW_PROJECTS = "&Create new projects:";
 
-	private static final String TOOL_TIP_GENERATE = "Defines the produkt-based strategy.";
-	private static final String TOOL_TIP_T_WISE = "Defines the algorithm for t-wise sampling.";
-	private static final String TOOL_TIP_ORDER = "Defines how the generated produkts are ordered.";
-	private static final String TOOL_TIP_TEST= "Searches for test cased in the generated products and executes them.";
-	private static final String TOOL_TIP_T = "Define the t for t-wise sampling.";
-	private static final String TOOL_TIP_PROJECT = "Defnies whether the produkts are generated into separate projects or into a folder in this project.";
+	private static final String TOOL_TIP_GENERATE = DEFINES_THE_PRODUKT_BASED_STRATEGY_;
+	private static final String TOOL_TIP_T_WISE = DEFINES_THE_ALGORITHM_FOR_T_WISE_SAMPLING_;
+	private static final String TOOL_TIP_ORDER = DEFINES_HOW_THE_GENERATED_PRODUKTS_ARE_ORDERED_;
+	private static final String TOOL_TIP_TEST= SEARCHES_FOR_TEST_CASED_IN_THE_GENERATED_PRODUCTS_AND_EXECUTES_THEM_;
+	private static final String TOOL_TIP_T = DEFINE_THE_T_FOR_T_WISE_SAMPLING_;
+	private static final String TOOL_TIP_PROJECT = DEFNIES_WHETHER_THE_PRODUKTS_ARE_GENERATED_INTO_SEPARATE_PROJECTS_OR_INTO_A_FOLDER_IN_THIS_PROJECT_;
 
 	@CheckForNull
 	private IFeatureProject project;
@@ -97,7 +114,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		this.t = t;
 		this.order = order;
 		this.test = test;
-		setDescription("Build products for project " + featureProject.getProjectName() + ".");
+		setDescription(BUILD_PRODUCTS_FOR_PROJECT + featureProject.getProjectName() + ".");
 	}
 
 	@Override
@@ -187,7 +204,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 			break;
 
 		}
-		return "-Error-";
+		return ERROR_;
 	}
 
 	private String getTWiseText(TWise tWise) {
@@ -203,7 +220,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 			break;
 
 		}
-		return "-Error-";
+		return ERROR_;
 	}
 
 	String getBuildTypeText(BuildType type) {
@@ -218,7 +235,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 			UIPlugin.getDefault().logWarning("Unimplemented switch statement for BuildType: " + type);
 			break;
 		}
-		return "-Error-";
+		return ERROR_;
 	}
 
 	private void setScale() {

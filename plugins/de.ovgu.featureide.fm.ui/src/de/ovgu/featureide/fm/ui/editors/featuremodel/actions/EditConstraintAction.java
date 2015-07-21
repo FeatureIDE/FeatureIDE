@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.EDIT_CONSTRAINT;
+
 import java.util.Iterator;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -41,7 +43,7 @@ public class EditConstraintAction extends AbstractConstraintEditorAction {
 	private Constraint constraint;
 
 	public EditConstraintAction(Object viewer, FeatureModel featuremodel) {
-		super(viewer, featuremodel, "Edit Constraint");
+		super(viewer, featuremodel, EDIT_CONSTRAINT);
 		setEnabled(false);
 	}
 

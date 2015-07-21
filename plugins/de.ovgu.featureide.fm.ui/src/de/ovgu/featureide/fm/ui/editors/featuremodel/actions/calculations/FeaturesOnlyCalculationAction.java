@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE_FEATURES;
+
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 
@@ -35,7 +37,7 @@ public class FeaturesOnlyCalculationAction extends Action {
 	private final FeatureModel featureModel;
 
 	public FeaturesOnlyCalculationAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
-		super("Calculate Features");
+		super(CALCULATE_FEATURES);
 		this.featureModel = featureModel;
 		setChecked(featureModel.getAnalyser().calculateFeatures);
 	}

@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CHANGE_DESCRIPTION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE_DESCRIPTION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.PLEASE_ENTER_A_DESCRIPTION_FOR_FEATURE_;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.ChangeFeatureDescriptionDialog;
 
@@ -31,7 +34,7 @@ import de.ovgu.featureide.fm.ui.editors.ChangeFeatureDescriptionDialog;
 public class ChangeFeatureDescriptionAction extends SingleSelectionAction {
 
 	public ChangeFeatureDescriptionAction(Object viewer, FeatureModel featureModel, Object graphicalViewer) {
-		super("Change Description", viewer);
+		super(CHANGE_DESCRIPTION, viewer);
 	}
 
 	@Override
@@ -41,7 +44,7 @@ public class ChangeFeatureDescriptionAction extends SingleSelectionAction {
 			description = feature.getDescription();
 			description = description.trim();
 		}
-		ChangeFeatureDescriptionDialog dialog = new ChangeFeatureDescriptionDialog(null, "Feature Description", "Please enter a description for feature '"
+		ChangeFeatureDescriptionDialog dialog = new ChangeFeatureDescriptionDialog(null, FEATURE_DESCRIPTION, PLEASE_ENTER_A_DESCRIPTION_FOR_FEATURE_
 				+ feature.getName() + "'", description);
 		dialog.open();
 		String descriptemp = dialog.getValue();

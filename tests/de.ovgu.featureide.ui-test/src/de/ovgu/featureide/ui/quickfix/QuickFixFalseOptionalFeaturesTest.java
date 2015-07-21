@@ -105,7 +105,7 @@ public class QuickFixFalseOptionalFeaturesTest {
 		return filter;
 	}
 	
-	@Test(timeout = 10000)
+	@Test(timeout = 20000)
 	public void createConfigurationsTest() {
 		final Collection<Feature> concrete = fm.getConcreteFeatures();
 		final Collection<Feature> core = fm.getAnalyser().getCoreFeatures();

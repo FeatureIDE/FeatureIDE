@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.antenna;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.NEED_AN_ORDER_COMMA__AS_THE_ORDER_IS_GIVEN_DIRECTLY_AT_THE_SOURCE_CODE_;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -51,7 +53,7 @@ public class AntennaFMComposerExtension extends FMComposerExtension {
 	
 	private static String ORDER_PAGE_MESSAGE = 
 			"FeatureIDE projects based on preprocessors such as Antenna do not\n" +
-			"need an order, as the order is given directly at the source code.";
+			NEED_AN_ORDER_COMMA__AS_THE_ORDER_IS_GIVEN_DIRECTLY_AT_THE_SOURCE_CODE_;
 	
 	public static final String FEATURE_NAME_PATTERN = "^[a-zA-Z]\\w*$";
 	

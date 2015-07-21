@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.fm.ui.views.outline;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINTS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NO_DATA_TO_DISPLAY_AVAILABLE_;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -59,11 +62,11 @@ public class FmTreeContentProvider implements ITreeContentProvider {
 		if (fModel != null && fModel.getRoot() != null) {
 			elements = new Object[2];
 			elements[0] = fModel.getRoot();
-			elements[1] = "Constraints";
+			elements[1] = CONSTRAINTS;
 			return elements;
 		}
 
-		return new String[] { "No data to display available." };
+		return new String[] { NO_DATA_TO_DISPLAY_AVAILABLE_ };
 	}
 
 	@Override
@@ -72,7 +75,7 @@ public class FmTreeContentProvider implements ITreeContentProvider {
 			return null;
 
 		// we have a String as parent of constraints
-		if (parentElement instanceof String && "Constraints".equals(parentElement)) {
+		if (parentElement instanceof String && CONSTRAINTS.equals(parentElement)) {
 			Object[] elements = new Object[fModel.getConstraintCount()];
 			List<Constraint> cList = fModel.getConstraints();
 			for (int i = 0; i < fModel.getConstraintCount(); i++) {
@@ -115,7 +118,7 @@ public class FmTreeContentProvider implements ITreeContentProvider {
 		if (element instanceof Feature)
 			return ((Feature) element).getParent();
 		else if (element instanceof Constraint)
-			return "Constraints";
+			return CONSTRAINTS;
 		else if (element instanceof FmOutlineGroupStateStorage)
 			return ((FmOutlineGroupStateStorage) element).getFeature();
 
@@ -129,7 +132,7 @@ public class FmTreeContentProvider implements ITreeContentProvider {
 		else if (element instanceof FmOutlineGroupStateStorage)
 			return true;
 		else if (element instanceof String)
-			if ("Constraints".equals(element))
+			if (CONSTRAINTS.equals(element))
 				return fModel.getConstraintCount() > 0;
 
 		return false;

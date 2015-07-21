@@ -20,6 +20,11 @@
  */
 package de.ovgu.featureide.core.mpl.job;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD_EXTERNAL_PROJECT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.BUILT_MPL_PROJECT_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.EMPTY___;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NO_MAPPING_FILE_SPECIFIED_;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -75,7 +80,7 @@ public class MPLBuildProjectJob extends AProjectJob<MPLBuildProjectJob.Arguments
 	}
 
 	protected MPLBuildProjectJob(Arguments arguments) {
-		super("Build External Project", arguments);
+		super(BUILD_EXTERNAL_PROJECT, arguments);
 		setPriority(BUILD);
 	}
 	
@@ -98,7 +103,7 @@ public class MPLBuildProjectJob extends AProjectJob<MPLBuildProjectJob.Arguments
 			MPLPlugin.getDefault().logError(e);
 			return false;
 		}
-		MPLPlugin.getDefault().logInfo("Built MPL Project.");
+		MPLPlugin.getDefault().logInfo(BUILT_MPL_PROJECT_);
 		return true;
 	}
 	
@@ -146,7 +151,7 @@ public class MPLBuildProjectJob extends AProjectJob<MPLBuildProjectJob.Arguments
 				varName = varName.substring(0, splitIndex);
 			}
 			rootBuildFolder = arguments.buildF.getFolder(varName);
-			internTempBuildFolder = arguments.buildF.getFolder("_" + varName);
+			internTempBuildFolder = arguments.buildF.getFolder(EMPTY___ + varName);
 		} else {
 			rootBuildFolder = arguments.buildF;
 			internTempBuildFolder = arguments.externalFeatureProject.getBuildFolder();
@@ -189,7 +194,7 @@ public class MPLBuildProjectJob extends AProjectJob<MPLBuildProjectJob.Arguments
 			}
 			IFile mappingFile = arguments.externalFeatureProject.getProject().getFile("InterfaceMapping/" + mappingFileName);
 			if (mappingFile == null) {
-				MPLPlugin.getDefault().logInfo("No mapping file specified.");
+				MPLPlugin.getDefault().logInfo(NO_MAPPING_FILE_SPECIFIED_);
 				return false;
 			}
 			new ConfigurationReader(mappedProjects).readFromFile(arguments.externalFeatureProject.getProject().getFile("InterfaceMapping/" + mappingFileName));

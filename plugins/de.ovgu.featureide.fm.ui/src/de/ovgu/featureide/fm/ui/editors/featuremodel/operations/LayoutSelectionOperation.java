@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.SET;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
 
@@ -32,7 +33,7 @@ public class LayoutSelectionOperation extends AbstractFeatureModelOperation {
 	private int oldSelectedLayoutAlgorithm;
 
 	public LayoutSelectionOperation(FeatureModel featureModel, int newSelectedLayoutAlgorithm, int oldSelectedLayoutAlgorithm) {
-		super(featureModel, "Set " + FeatureDiagramLayoutHelper.getLayoutLabel(newSelectedLayoutAlgorithm));
+		super(featureModel, SET + FeatureDiagramLayoutHelper.getLayoutLabel(newSelectedLayoutAlgorithm));
 		this.newSelectedLayoutAlgorithm = newSelectedLayoutAlgorithm;
 		this.oldSelectedLayoutAlgorithm = oldSelectedLayoutAlgorithm;
 	}

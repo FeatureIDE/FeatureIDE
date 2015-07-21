@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.ui.statistics.ui.helper;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.RESORT_NODE;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -93,7 +95,7 @@ public class TreeClickListener implements IDoubleClickListener {
 				sortNode.setSortByValue(!(selected instanceof ClassNodeParent || selected instanceof FieldNodeParent || selected instanceof MethodNodeParent || sortNode
 						.isSortByValue()));
 
-				final UIJob job = new UIJob("resort node") {
+				final UIJob job = new UIJob(RESORT_NODE) {
 					@Override
 					public IStatus runInUIThread(IProgressMonitor monitor) {
 						view.refresh(sortNode);

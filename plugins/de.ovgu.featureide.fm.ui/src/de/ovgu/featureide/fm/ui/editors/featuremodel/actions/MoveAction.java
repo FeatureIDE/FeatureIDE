@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.MOVING;
+
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -90,7 +92,7 @@ public class MoveAction extends Action {
 	 * @param direction
 	 */
 	public MoveAction(Object viewer, FeatureModel featureModel, Object graphicalViewer, int direction) {
-		super("Moving");
+		super(MOVING);
 		this.setId(ID);
 		if (viewer instanceof GraphicalViewerImpl) {
 			this.viewer = (GraphicalViewerImpl) viewer;

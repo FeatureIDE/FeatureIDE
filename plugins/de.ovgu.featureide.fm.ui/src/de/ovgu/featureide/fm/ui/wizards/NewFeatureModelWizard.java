@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.fm.ui.wizards;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.NEW_FEATURE_MODEL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NEW_FILE_WAS_NOT_ADDED_TO_FILESYSTEM;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -75,7 +78,7 @@ public class NewFeatureModelWizard extends Wizard implements INewWizard {
 				new XmlFeatureModelWriter(featureModel).writeToFile(fullFilePath.toFile());
 			}
 		}
-		assert (fullFilePath.toFile().exists()) : "New file was not added to filesystem";
+		assert (fullFilePath.toFile().exists()) : NEW_FILE_WAS_NOT_ADDED_TO_FILESYSTEM;
 		return true;
 	}
 
@@ -125,7 +128,7 @@ public class NewFeatureModelWizard extends Wizard implements INewWizard {
 
 	@Override
 	public void addPages() {
-		setWindowTitle("New Feature Model");
+		setWindowTitle(NEW_FEATURE_MODEL);
 		addPage(page);
 	}
 

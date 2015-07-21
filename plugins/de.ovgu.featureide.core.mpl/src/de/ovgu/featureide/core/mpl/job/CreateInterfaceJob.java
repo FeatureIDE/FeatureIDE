@@ -20,6 +20,10 @@
  */
 package de.ovgu.featureide.core.mpl.job;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CREATED_INTERFACE_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_INTERFACE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.INTERFACES;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Collection;
@@ -65,7 +69,7 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 	}
 	
 	protected CreateInterfaceJob(Arguments arguments) {
-		super("Create Interface", arguments);
+		super(CREATE_INTERFACE, arguments);
 	}
 
 	@Override
@@ -81,7 +85,7 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 
 		try {
 			// create interface
-			IFolder mplFolder = project.getFolder("Interfaces");
+			IFolder mplFolder = project.getFolder(INTERFACES);
 			if (!mplFolder.exists())
 				mplFolder.create(true, true, null);
 
@@ -104,7 +108,7 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		MPLPlugin.getDefault().logInfo("Created Interface.");
+		MPLPlugin.getDefault().logInfo(CREATED_INTERFACE_);
 		return true;
 	}
 	

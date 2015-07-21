@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.antenna;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.ANTENNA;
+import static de.ovgu.featureide.fm.core.localization.StringTable.PROPAGATE_PROBLEM_MARKERS_FOR;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -85,7 +88,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	static final Pattern replaceCommandPattern = Pattern.compile("//#(.+?)\\s");
 
 	public AntennaPreprocessor() {
-		super("Antenna");
+		super(ANTENNA);
 		nodereader.setIgnoreMissingFeatures(true);
 	}
 
@@ -155,7 +158,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 			return;
 		}
 		super.postCompile(delta, file);
-		Job job = new Job("Propagate problem markers for " + CorePlugin.getFeatureProject(file)) {
+		Job job = new Job(PROPAGATE_PROBLEM_MARKERS_FOR + CorePlugin.getFeatureProject(file)) {
 			@Override
 			public IStatus run(IProgressMonitor monitor) {
 				try {

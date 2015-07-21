@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.ui.statistics.ui;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.REFRESH_EXPORT_DIALOG;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -111,7 +113,7 @@ public class CheckBoxListener implements ICheckStateListener {
 	}
 
 	private void refreshViewer() {
-		UIJob job = new UIJob("Refresh export dialog") {
+		UIJob job = new UIJob(REFRESH_EXPORT_DIALOG) {
 
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {

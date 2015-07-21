@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.featurehouse.ui.handlers;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE_STUBS_GENERATION_STARTED_;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin;
 import de.ovgu.featureide.featurehouse.meta.FeatureStubsGenerator;
@@ -36,7 +37,7 @@ public class GenerateFeatureStubsHandler extends AFeatureProjectHandler {
 	protected void singleAction(IFeatureProject featureProject) {
 		FeatureStubsGenerator fsg = new FeatureStubsGenerator(featureProject);
 		if (fsg.generate()) {
-			FeatureHouseCorePlugin.getDefault().logInfo("Feature Stubs Generation started.");
+			FeatureHouseCorePlugin.getDefault().logInfo(FEATURE_STUBS_GENERATION_STARTED_);
 		}
 	}
 	

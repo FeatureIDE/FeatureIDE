@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.migration.impl;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.FUNCTIONALITY_NOT_YET_IMPLEMENTED;
+
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.WizardDialog;
 
@@ -45,7 +47,7 @@ public class VariantsToFeatureHouseSPLMigrator extends DefaultSPLMigrator {
 		if (withGui)
 			initWizard(projectSelection);
 		else
-			throw new IllegalArgumentException("Functionality not yet implemented");
+			throw new IllegalArgumentException(FUNCTIONALITY_NOT_YET_IMPLEMENTED);
 
 	}
 

@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.handlers;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.EXPORT_TO_DIMACS;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -61,7 +63,7 @@ public class ExportDIMACSHandler extends AFileHandler {
 	@Override
 	protected void singleAction(final IFile inputFile) {
 		final FeatureModel model = readModel(inputFile);
-		Job job = new Job("Export to DIMACS") {
+		Job job = new Job(EXPORT_TO_DIMACS) {
 			protected IStatus run(IProgressMonitor monitor) {
 				final String text = getCNF(model);
 				// UI access
