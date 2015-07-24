@@ -24,7 +24,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -796,6 +795,7 @@ public class CorePlugin extends AbstractCorePlugin {
 	private static class DeprecatedFeature implements Comparable<DeprecatedFeature> {
 		private final String feature;
 
+		private int mixedClauseCount;
 		private int positiveCount;
 		private int negativeCount;
 		private int countMarker;
@@ -805,24 +805,17 @@ public class CorePlugin extends AbstractCorePlugin {
 			reset();
 		}
 
-		public DeprecatedFeature(String feature, int positiveCount, int negativeCount) {
-			this.feature = feature;
-			reset();
-			this.positiveCount = positiveCount;
-			this.negativeCount = negativeCount;
-		}
-
 		public String getFeature() {
 			return feature;
 		}
 
 		@Override
 		public int compareTo(DeprecatedFeature arg0) {
-			return arg0.getClauseCount() - getClauseCount();
+			return (int) Math.signum(arg0.getClauseCount() - getClauseCount());
 		}
 
-		public int getClauseCount() {
-			return positiveCount * negativeCount;
+		public double getClauseCount() {
+			return Math.pow((positiveCount * negativeCount), 2) / (mixedClauseCount + 1);
 		}
 
 		public int getCountMarker() {
@@ -833,7 +826,10 @@ public class CorePlugin extends AbstractCorePlugin {
 			this.countMarker = countMarker;
 		}
 
-		public void incCount() {
+		public void incCount(boolean mixed) {
+			if (mixed && countMarker > 0) {
+				mixedClauseCount++;
+			}
 			switch (countMarker) {
 			case 1:
 				positiveCount++;
@@ -848,6 +844,7 @@ public class CorePlugin extends AbstractCorePlugin {
 		}
 
 		public void reset() {
+			mixedClauseCount = 0;
 			positiveCount = 0;
 			negativeCount = 0;
 			countMarker = 0;
@@ -911,58 +908,20 @@ public class CorePlugin extends AbstractCorePlugin {
 				}
 			}
 
-			final DeprecatedFeature[] deprecatedFeatures = new DeprecatedFeature[features.size()];
-			int featureIndex = 0;
-			for (String curFeature : features) {
-				int positiveCount = 0;
-				int negativeCount = 0;
-
-				for (Iterator<Or> iterator = relevantClauseList.iterator(); iterator.hasNext();) {
-					final Or clause = iterator.next();
-
-					int count = 0;
-					Literal curLiteral = null;
-					for (Node clauseChildren : clause.getChildren()) {
-						final Literal literal = (Literal) clauseChildren;
-						if (literal.var.equals(curFeature)) {
-							if (curLiteral == null) {
-								curLiteral = literal;
-								count = (curLiteral.positive ? 1 : 2);
-							} else if (literal.positive != curLiteral.positive) {
-								count = -1;
-								iterator.remove();
-								break;
-							}
-						}
-					}
-					switch (count) {
-					case 1:
-						positiveCount++;
-						break;
-					case 2:
-						negativeCount++;
-						break;
-					default:
-					}
-				}
-
-				deprecatedFeatures[featureIndex++] = new DeprecatedFeature(curFeature, negativeCount, positiveCount);
-			}
-
-			Arrays.sort(deprecatedFeatures);
 			final Set<Or> relevantClauseSet = new HashSet<>(relevantClauseList);
 
-			//			final HashMap<String, DeprecatedFeature> map = new HashMap<>(features.size() << 1);
-			//			for (String curFeature : features) {
-			//				map.put(curFeature, new DeprecatedFeature(curFeature));
-			//			}
+			final HashMap<String, DeprecatedFeature> map = new HashMap<>(features.size() << 1);
+			for (String curFeature : features) {
+				map.put(curFeature, new DeprecatedFeature(curFeature));
+			}
 
-			// for each feature that should be removed ...
-			for (int l = deprecatedFeatures.length - 1; l >= 0; l--) {
-				final String curFeature = deprecatedFeatures[l].getFeature();
-				//			while (!map.isEmpty()) {
-				//				final String curFeature = next(map, relevantClauseList).getFeature();
-
+			while (!map.isEmpty()) {
+				final String curFeature = next(map, relevantClauseList).getFeature();
+				if (curFeature == null) {
+					relevantClauseList.clear();
+					relevantClauseSet.clear();
+					break;
+				}
 				// ... create list of clauses that contain this feature
 				int relevantIndex = 0;
 				final byte[] clauseStates = new byte[relevantClauseList.size()];
@@ -1153,9 +1112,11 @@ public class CorePlugin extends AbstractCorePlugin {
 			df.reset();
 		}
 
+		boolean globalMixedClause = false;
 		for (Iterator<Or> iterator = relevantClauseList.iterator(); iterator.hasNext();) {
 			final Or clause = iterator.next();
 			boolean invalidClause = false;
+			boolean mixedClause = false;
 
 			for (Node clauseChildren : clause.getChildren()) {
 				final Literal literal = (Literal) clauseChildren;
@@ -1180,6 +1141,8 @@ public class CorePlugin extends AbstractCorePlugin {
 					default:
 						break;
 					}
+				} else if (literal.var instanceof String) {
+					mixedClause = true;
 				}
 				if (invalidClause) {
 					break;
@@ -1190,12 +1153,18 @@ public class CorePlugin extends AbstractCorePlugin {
 				for (DeprecatedFeature df : map.values()) {
 					df.setCountMarker(0);
 				}
-				break;
 			} else {
 				for (DeprecatedFeature df : map.values()) {
-					df.incCount();
+					df.incCount(mixedClause);
+				}
+				if (mixedClause) {
+					globalMixedClause = true;
 				}
 			}
+		}
+
+		if (!globalMixedClause) {
+			return new DeprecatedFeature(null);
 		}
 
 		final Collection<DeprecatedFeature> values = map.values();
