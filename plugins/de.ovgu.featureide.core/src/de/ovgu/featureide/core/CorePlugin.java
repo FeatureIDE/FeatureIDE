@@ -815,7 +815,7 @@ public class CorePlugin extends AbstractCorePlugin {
 		}
 
 		public double getClauseCount() {
-			return Math.pow((positiveCount * negativeCount), 2) / (mixedClauseCount + 1);
+			return ((double) (positiveCount * negativeCount)) / (mixedClauseCount + 1);
 		}
 
 		public int getCountMarker() {
@@ -828,7 +828,7 @@ public class CorePlugin extends AbstractCorePlugin {
 
 		public void incCount(boolean mixed) {
 			if (mixed && countMarker > 0) {
-				mixedClauseCount++;
+				mixedClauseCount = 1;
 			}
 			switch (countMarker) {
 			case 1:
@@ -915,8 +915,14 @@ public class CorePlugin extends AbstractCorePlugin {
 				map.put(curFeature, new DeprecatedFeature(curFeature));
 			}
 
+			final boolean alwaysUpdate = false;
+			final int threshold = 1;
+
+			int count = 0;
 			while (!map.isEmpty()) {
-				final String curFeature = next(map, relevantClauseList).getFeature();
+				final String curFeature = (count++ < threshold || alwaysUpdate) 
+						? next(map, update(map, relevantClauseList)).getFeature() 
+						: next(map).getFeature();
 				if (curFeature == null) {
 					relevantClauseList.clear();
 					relevantClauseSet.clear();
@@ -1107,7 +1113,7 @@ public class CorePlugin extends AbstractCorePlugin {
 		return true;
 	}
 
-	private static DeprecatedFeature next(HashMap<String, DeprecatedFeature> map, List<Or> relevantClauseList) {
+	private static boolean update(HashMap<String, DeprecatedFeature> map, List<Or> relevantClauseList) {
 		for (DeprecatedFeature df : map.values()) {
 			df.reset();
 		}
@@ -1163,25 +1169,32 @@ public class CorePlugin extends AbstractCorePlugin {
 			}
 		}
 
-		if (!globalMixedClause) {
-			return new DeprecatedFeature(null);
-		}
+		return globalMixedClause;
+	}
 
-		final Collection<DeprecatedFeature> values = map.values();
-		DeprecatedFeature smallestFeature = null;
-		if (!values.isEmpty()) {
-			final Iterator<DeprecatedFeature> it = values.iterator();
-			smallestFeature = it.next();
-			while (it.hasNext()) {
-				final DeprecatedFeature next = it.next();
-				if (next.compareTo(smallestFeature) > 0) {
-					smallestFeature = next;
+	private static DeprecatedFeature next(HashMap<String, DeprecatedFeature> map) {
+		return next(map, true);
+	}
+
+	private static DeprecatedFeature next(HashMap<String, DeprecatedFeature> map, boolean globalMixedClause) {
+		if (globalMixedClause) {
+
+			final Collection<DeprecatedFeature> values = map.values();
+
+			DeprecatedFeature smallestFeature = null;
+			if (!values.isEmpty()) {
+				final Iterator<DeprecatedFeature> it = values.iterator();
+				smallestFeature = it.next();
+				while (it.hasNext()) {
+					final DeprecatedFeature next = it.next();
+					if (next.compareTo(smallestFeature) > 0) {
+						smallestFeature = next;
+					}
 				}
+				return map.remove(smallestFeature.getFeature());
 			}
-			map.remove(smallestFeature.getFeature());
 		}
-
-		return smallestFeature;
+		return new DeprecatedFeature(null);
 	}
 
 }
