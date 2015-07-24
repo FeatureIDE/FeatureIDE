@@ -135,6 +135,44 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 			}
 		}
 	}
+	
+	public FeatureModel(FeatureModel oldFeatureModel, Feature newRoot, Set<Feature> featuresToInclude, Set<Constraint> includeConstraints, boolean complete) {
+		super();
+		
+		this.featureOrderList = new LinkedList<String>();
+		for (String featureName : oldFeatureModel.featureOrderList) {
+			Feature f = this.getFeature(featureName);
+			if(f == null){
+				System.err.println("Feature nicht gefunden");
+			}
+			if(featuresToInclude.contains(f)){
+				this.featureOrderList.add(f.getName()); 
+			}
+		}
+		
+		this.featureOrderUserDefined = oldFeatureModel.featureOrderUserDefined;
+		this.featureOrderInXML = oldFeatureModel.featureOrderInXML;
+		
+		if (complete) {
+			this.annotations = new LinkedList<String>(oldFeatureModel.annotations);
+			this.comments = new LinkedList<String>(oldFeatureModel.comments);
+			this.colorschemeTable = oldFeatureModel.colorschemeTable.clone(this);
+			this.layout = oldFeatureModel.layout.clone();
+		} else {
+			this.annotations = null;
+			this.comments = null;
+			this.colorschemeTable = new EmptyColorschemeTable();
+			this.layout = null;
+		}
+		
+		if (newRoot != null) {
+			this.rootFeature = newRoot.clone(this, complete);
+			
+			for (final Constraint constraint : includeConstraints) {
+				this.addConstraint(new Constraint(this, constraint.getNode().clone()));
+			}
+		}		
+	}
 
 	protected FeatureModelAnalyzer createAnalyser() {
 		return new FeatureModelAnalyzer(this);
