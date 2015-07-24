@@ -68,10 +68,7 @@ public class FeatureGraphStatisticJob extends AProjectJob<FeatureGraphStatisticJ
 		//		statisticPart2();
 
 		try {
-//			statisticPart7();
-//			statisticPart8();
-			statisticPart10(0);
-			statisticPart9(0);
+			statisticPart12();
 		} catch (IOException | CoreException e) {
 			e.printStackTrace();
 		}
@@ -276,17 +273,17 @@ public class FeatureGraphStatisticJob extends AProjectJob<FeatureGraphStatisticJ
 		System.out.println(" -> " + Math.round((double) ((end - start)) / 1000000.0) / 1000.0 + "s");
 		return System.nanoTime();
 	}
-	
+
 	private void statisticPart9(int type) throws IOException, CoreException {
 		final ArrayList<Integer> indexArray = createIndexArray();
-		
+
 		long startTime = System.nanoTime();
 		curTime = startTime;
 
 		final VariableConfiguration variableConfiguration = new VariableConfiguration(featureGraph.getSize());
 		final ConfigurationChanger c1 = new ConfigurationChanger(arguments.featureModel, variableConfiguration, null);
-		
-		
+
+		curTime = split(curTime);
 		for (int vIndex = 0; vIndex < featureGraph.getSize();) {
 			while (vIndex < featureGraph.getSize() && variableConfiguration.getVariable(indexArray.get(vIndex)).getValue() != Variable.UNDEFINED) {
 				vIndex++;
@@ -297,8 +294,10 @@ public class FeatureGraphStatisticJob extends AProjectJob<FeatureGraphStatisticJ
 			}
 		}
 		curTime = split(curTime);
+		count(variableConfiguration);
+		System.out.println(LongRunningJob.runMethod(c1.isValid()));
 	}
-	
+
 	private int getValue(int type) {
 		switch (type) {
 		case 0:
@@ -310,15 +309,63 @@ public class FeatureGraphStatisticJob extends AProjectJob<FeatureGraphStatisticJ
 			return Variable.TRUE;
 		}
 	}
-	
+
 	private void statisticPart10(int type) throws IOException, CoreException {
 		long startTime = System.nanoTime();
 		curTime = startTime;
 		final VariableConfiguration variableConfiguration = new VariableConfiguration(featureGraph.getSize());
 		final ConfigurationChanger c1 = new ConfigurationChanger(arguments.featureModel, variableConfiguration, null);
-		
+
+		curTime = split(curTime);
 		LongRunningJob.runMethod(c1.autoCompletion(type));
+
+		curTime = split(curTime);
+		count(variableConfiguration);
+		System.out.println(LongRunningJob.runMethod(c1.isValid()));
+	}
+
+	private void statisticPart11(boolean positive) throws IOException, CoreException {
+		long startTime = System.nanoTime();
+		curTime = startTime;
+		final VariableConfiguration variableConfiguration = new VariableConfiguration(featureGraph.getSize());
+		final ConfigurationChanger c1 = new ConfigurationChanger(arguments.featureModel, variableConfiguration, null);
+
+		curTime = split(curTime);
+		LongRunningJob.runMethod(c1.simpleAutoCompletion(positive));
+
+		curTime = split(curTime);
+		count(variableConfiguration);
+		System.out.println(LongRunningJob.runMethod(c1.isValid()));
+	}
+
+	private void statisticPart12() throws IOException, CoreException {
+		System.out.println();
+		System.out.println("Core/Dead Features");
+		long startTime = System.nanoTime();
+		curTime = startTime;
+
+		arguments.featureModel.getAnalyser().analyzeFeatures();
 		curTime = split(curTime);
 	}
-	
+
+	private void count(final VariableConfiguration variableConfiguration) {
+		int countTrue = 0;
+		int countFalse = 0;
+		int countUndefined = 0;
+		for (Variable variable : variableConfiguration) {
+			switch (variable.getValue()) {
+			case Variable.TRUE:
+				countTrue++;
+				break;
+			case Variable.FALSE:
+				countFalse++;
+				break;
+			default:
+				countUndefined++;
+				break;
+			}
+		}
+		System.out.println("True: " + countTrue + " | False: " + countFalse + " | Undefined: " + countUndefined);
+	}
+
 }

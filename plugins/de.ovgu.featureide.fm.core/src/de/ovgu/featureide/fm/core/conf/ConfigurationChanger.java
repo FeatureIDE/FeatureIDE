@@ -339,6 +339,10 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 		return new AutoCompletionMethod(type);
 	}
 
+	public SimpleAutoCompletionMethod simpleAutoCompletion(boolean positive) {
+		return new SimpleAutoCompletionMethod(positive);
+	}
+
 	@Override
 	public IsValidMethod isValidNoHidden() {
 		return new IsValidMethod();
@@ -431,25 +435,23 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 			this.variableIndex = variableIndex;
 			this.variableValue = variableValue;
 
-			final List<Literal> knownLiteralList = new ArrayList<>();
+			undefined = false;
+
+			knownLiterals = new Literal[variableConfiguration.size(true) + 1];
 
 			int i = 0;
 			for (Variable var : variableConfiguration) {
-				switch (var.getManualValue()) {
+				switch (var.getValue()) {
 				case Variable.TRUE:
-					knownLiteralList.add(new Literal(featureGraph.getFeatureArray()[i], true));
+					knownLiterals[i++] = new Literal(featureGraph.getFeatureArray()[var.getId()], true);
 					break;
 				case Variable.FALSE:
-					knownLiteralList.add(new Literal(featureGraph.getFeatureArray()[i], false));
+					knownLiterals[i++] = new Literal(featureGraph.getFeatureArray()[var.getId()], false);
 					break;
 				default:
 					break;
 				}
-				i++;
 			}
-
-			knownLiterals = knownLiteralList.toArray(new Literal[knownLiteralList.size() + 1]);
-			undefined = false;
 		}
 
 		private void updateVariable(int index) {
@@ -473,13 +475,11 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 					}
 					break;
 				case AFeatureGraph.VALUE_10Q:
+				case AFeatureGraph.VALUE_NONE:
+				default:
 					if (!undefined) {
 						undefined = calc(index);
 					}
-					break;
-				case AFeatureGraph.VALUE_NONE:
-				default:
-					undefined = true;
 					break;
 				}
 			}
@@ -544,7 +544,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 
 					updateHelper.init(index, newValue == Variable.TRUE);
 
-					for (int i = index + 1; i != index; i = (i + 1) % featureGraph.getSize()) {
+					for (int i = (index + 1) % featureGraph.getSize(); i != index; i = (i + 1) % featureGraph.getSize()) {
 						updateHelper.updateVariable(i);
 					}
 				}
@@ -590,6 +590,37 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 					updateHelper.updateVariable(i);
 				}
 			}
+			return null;
+		}
+	}
+
+	public class SimpleAutoCompletionMethod implements LongRunningMethod<Void> {
+
+		private final boolean positive;
+
+		public SimpleAutoCompletionMethod(boolean positive) {
+			this.positive = positive;
+		}
+
+		@Override
+		public Void run(WorkMonitor monitor) {
+			if (satSolver1 == null) {
+				satSolver1 = new SatSolver(node, 1000, false);
+			}
+			List<String> featureNames = satSolver1.getSolution(positive);
+			for (String featureName : featureNames) {
+				int index = featureGraph.getFeatureIndex(featureName);
+				if (index >= 0) {
+					setNewValue(featureGraph.getFeatureIndex(featureName), Variable.TRUE, false);
+				}
+			}
+
+			for (int index = 0; index < featureGraph.getSize(); index++) {
+				if (variableConfiguration.getVariable(index).getValue() == Variable.UNDEFINED) {
+					setNewValue(index, Variable.FALSE, false);
+				}
+			}
+
 			return null;
 		}
 	}
