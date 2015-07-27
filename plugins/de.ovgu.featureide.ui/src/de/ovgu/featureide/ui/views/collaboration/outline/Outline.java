@@ -41,6 +41,7 @@ import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
@@ -509,8 +510,19 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 		viewer.addSelectionChangedListener(selectionChangedListener);
 
 		fillLocalToolBar(getViewSite().getActionBars().getToolBarManager());
+		
+		createContextMenu();
 	}
-
+	
+	private void createContextMenu() {
+		MenuManager menuMgr = new MenuManager("#PopupMenu");
+		menuMgr.setRemoveAllWhenShown(true);
+		Control control = viewer.getControl();
+		Menu menu = menuMgr.createContextMenu(control);
+		control.setMenu(menu);
+		getSite().registerContextMenu(menuMgr, viewer);
+	}
+	
 	/**
 	 * @param toolBarManager
 	 */
