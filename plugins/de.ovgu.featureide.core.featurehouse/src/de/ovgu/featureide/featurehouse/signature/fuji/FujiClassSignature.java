@@ -54,7 +54,6 @@ public class FujiClassSignature extends AbstractClassSignature {
 			superTypes.add(classDecl.superclass());
 			ClassDecl superClass = classDecl.superclass();
 			if (!superClass.fullName().equals("java.lang.Object")) {
-				System.out.println(superClass.fullName());
 				addExtend(superClass.fullName());
 			}
 			@SuppressWarnings("unchecked")

@@ -95,11 +95,6 @@ public abstract class RenameRefactoringTest {
 		importOperation.run(new NullProgressMonitor());
 		
 		project.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
-			 
-		IResource res = ResourcesPlugin.getWorkspace().getRoot().findMember("/HelloWorld-FH-Java-Test/features/Wonderful/Main.java");
-		if (res == null){
-			System.out.println("we");
-		}
 		
 		ExtendedFujiSignaturesJob efsj = new ExtendedFujiSignaturesJob(featureProject);
 		efsj.schedule();
@@ -153,7 +148,6 @@ public abstract class RenameRefactoringTest {
 		final InputStream contents = file.getContents();
 		byte[] contentsArray = new byte[contents.available()];
 		contents.read(contentsArray);
-		System.out.println(new String(contentsArray));
 		return new String(contentsArray).hashCode();
 	}
 	
