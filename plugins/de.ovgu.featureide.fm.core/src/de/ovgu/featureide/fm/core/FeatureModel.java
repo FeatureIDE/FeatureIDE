@@ -24,6 +24,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
@@ -102,16 +103,50 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		this.featureOrderUserDefined = false;
 		this.featureOrderInXML = false;
 
-		this.comments = new LinkedList<String>();
-		this.annotations = new LinkedList<String>();
+		this.comments = new LinkedList<>();
+		this.annotations = new LinkedList<>();
 		this.colorschemeTable = new ColorschemeTable(this);
 		this.layout = new FeatureModelLayout();
 	}
 
 	protected FeatureModel(FeatureModel oldFeatureModel, boolean complete) {
+		this(oldFeatureModel, null, complete);
+	}
+
+	public FeatureModel(FeatureModel oldFeatureModel, Feature newRoot, boolean complete) {
 		super();
 
-		this.featureOrderList = new LinkedList<String>(oldFeatureModel.featureOrderList);
+		if (newRoot == null) {
+			this.featureOrderList = new LinkedList<String>(oldFeatureModel.featureOrderList);
+
+			if (oldFeatureModel.rootFeature != null) {
+				this.rootFeature = oldFeatureModel.rootFeature.clone(this, complete);
+
+				for (final Constraint constraint : oldFeatureModel.constraints) {
+					this.addConstraint(new Constraint(this, constraint.getNode().clone()));
+				}
+			}
+		} else {
+			final HashSet<Feature> featuresToInclude = new HashSet<>();
+			Features.getAllFeatures(featuresToInclude, newRoot);
+
+			this.featureOrderList = new LinkedList<>();
+			for (String featureName : oldFeatureModel.featureOrderList) {
+				final Feature feature = this.getFeature(featureName);
+				if (feature != null && featuresToInclude.contains(feature)) {
+					this.featureOrderList.add(feature.getName());
+				}
+			}
+
+			this.rootFeature = newRoot.clone(this, complete);
+
+			for (final Constraint constraint : oldFeatureModel.constraints) {
+				if (featuresToInclude.containsAll(constraint.getContainedFeatures())) {
+					this.addConstraint(new Constraint(this, constraint.getNode().clone()));
+				}
+			}
+		}
+
 		this.featureOrderUserDefined = oldFeatureModel.featureOrderUserDefined;
 		this.featureOrderInXML = oldFeatureModel.featureOrderInXML;
 
@@ -121,57 +156,11 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 			this.colorschemeTable = oldFeatureModel.colorschemeTable.clone(this);
 			this.layout = oldFeatureModel.layout.clone();
 		} else {
-			this.annotations = Collections.emptyList();
 			this.comments = Collections.emptyList();
+			this.annotations = Collections.emptyList();
 			this.colorschemeTable = new EmptyColorschemeTable();
 			this.layout = new FeatureModelLayout();
 		}
-
-		if (oldFeatureModel.rootFeature != null) {
-			this.rootFeature = oldFeatureModel.rootFeature.clone(this, complete);
-
-			for (final Constraint constraint : oldFeatureModel.constraints) {
-				this.addConstraint(new Constraint(this, constraint.getNode().clone()));
-			}
-		}
-	}
-	
-	public FeatureModel(FeatureModel oldFeatureModel, Feature newRoot, Set<Feature> featuresToInclude, Set<Constraint> includeConstraints, boolean complete) {
-		super();
-		
-		this.featureOrderList = new LinkedList<String>();
-		for (String featureName : oldFeatureModel.featureOrderList) {
-			Feature f = this.getFeature(featureName);
-			if(f == null){
-				System.err.println("Feature nicht gefunden");
-			}
-			if(featuresToInclude.contains(f)){
-				this.featureOrderList.add(f.getName()); 
-			}
-		}
-		
-		this.featureOrderUserDefined = oldFeatureModel.featureOrderUserDefined;
-		this.featureOrderInXML = oldFeatureModel.featureOrderInXML;
-		
-		if (complete) {
-			this.annotations = new LinkedList<String>(oldFeatureModel.annotations);
-			this.comments = new LinkedList<String>(oldFeatureModel.comments);
-			this.colorschemeTable = oldFeatureModel.colorschemeTable.clone(this);
-			this.layout = oldFeatureModel.layout.clone();
-		} else {
-			this.annotations = null;
-			this.comments = null;
-			this.colorschemeTable = new EmptyColorschemeTable();
-			this.layout = null;
-		}
-		
-		if (newRoot != null) {
-			this.rootFeature = newRoot.clone(this, complete);
-			
-			for (final Constraint constraint : includeConstraints) {
-				this.addConstraint(new Constraint(this, constraint.getNode().clone()));
-			}
-		}		
 	}
 
 	protected FeatureModelAnalyzer createAnalyser() {

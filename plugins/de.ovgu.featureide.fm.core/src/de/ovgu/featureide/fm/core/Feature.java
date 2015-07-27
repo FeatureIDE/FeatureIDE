@@ -107,7 +107,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 		colorList = new ColorList(this);
 	}
 	
-	public Feature(Feature feature, FeatureModel featureModel, boolean complete) {
+	protected Feature(Feature feature, FeatureModel featureModel, boolean complete) {
 		this.featureModel = featureModel;
 		
 		this.name = feature.name;

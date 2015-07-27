@@ -129,12 +129,7 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 		workMonitor.setMaxAbsoluteWork(2);
 		ArrayList<String> removeFeatures = new ArrayList<>(m.getFeatureNames());
 		removeFeatures.removeAll(selectedFeatureNames);
-		Node cnf;
-		if (selectedFeatureNames.size() > 1) {
-			cnf = CorePlugin.removeFeatures(m, removeFeatures);
-		} else {
-			cnf = new Literal(m.getRoot().getName());
-		}
+		Node cnf = (selectedFeatureNames.size() > 1) ? CorePlugin.removeFeatures(m, removeFeatures) : new Literal(m.getRoot().getName());
 		workMonitor.worked();
 
 		// Calculate Model
@@ -176,7 +171,7 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 				featureStack.push(feature);
 			}
 			if (curFeature.getName().startsWith(MARK1)) {
-				String name = "Abstract_" + (int)(Math.random()*100);
+				curFeature.setName(root.getName() + "_Abstract_" + count++);
 				curFeature.setAbstract(true);
 			}
 			featureTable.put(curFeature.getName(), curFeature);
