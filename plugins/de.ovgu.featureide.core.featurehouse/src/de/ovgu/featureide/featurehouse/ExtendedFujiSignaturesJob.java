@@ -21,7 +21,6 @@
 package de.ovgu.featureide.featurehouse;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -37,16 +36,13 @@ import org.eclipse.jdt.internal.core.JavaProject;
 
 import AST.ASTNode;
 import AST.Access;
-import AST.AnnotationMethodDecl;
 import AST.BodyDecl;
-import AST.BridgeMethodDecl;
 import AST.ClassDecl;
 import AST.ClassInstanceExpr;
 import AST.CompilationUnit;
 import AST.ConstructorAccess;
 import AST.ConstructorDecl;
 import AST.FieldDeclaration;
-import AST.GenericMethodDecl;
 import AST.ImportDecl;
 import AST.InterfaceDecl;
 import AST.List;
@@ -54,8 +50,6 @@ import AST.MemberClassDecl;
 import AST.MemberInterfaceDecl;
 import AST.MethodAccess;
 import AST.MethodDecl;
-import AST.MethodDeclSubstituted;
-import AST.ParMethodDecl;
 import AST.ParameterDeclaration;
 import AST.Program;
 import AST.TypeAccess;
@@ -370,7 +364,7 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 						curClassSig.addImport(importDecl.toString());
 					}
 					
-					classes.put(name, curClassSig);
+					classes.put(typeDecl.fullName(), curClassSig);
 					
 					if (parent != null)	{
 						parent.addMemberClass(curClassSig);
@@ -542,7 +536,7 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 
 									featureData = (FOPFeatureData[]) sigRef.sig.getFeatureData();
 									for (int j = 0; j < featureData.length; j++) {
-											featureData[j].addInvokedSignature(absSig.sig);
+										featureData[j].addInvokedSignature(absSig.sig);
 									}
 											
 								}
@@ -599,9 +593,12 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 			if (!(signature instanceof AbstractClassSignature)) continue;
 			
 			AbstractClassSignature classSignature = (AbstractClassSignature) signature;
+			
+			String fullName = signature.getFullName();
+			if (fullName.startsWith(".")) fullName = fullName.substring(1);
 			for (String extend : classSignature.getExtendList()) {
 				if (classes.containsKey(extend)) {
-					classes.get(extend).addSubClass(signature.getName());
+					classes.get(extend).addSubClass(fullName);
 				}
 			} 
 			
@@ -609,7 +606,7 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 				if (classes.containsKey(implement)) {
 					AbstractClassSignature implementClass = classes.get(implement);
 					if (implementClass.getType().equals(AbstractClassSignature.TYPE_INTERFACE))		
-						implementClass.addSubClass(signature.getName());
+						implementClass.addSubClass(fullName);
 				}
 			}
 		}

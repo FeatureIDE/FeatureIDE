@@ -203,8 +203,6 @@ public class RenameMethodRefactoring extends RenameRefactoring<FujiMethodSignatu
 		return super.checkInitialConditions(pm);
 	}
 
-
-
 	//RenameMethodProcessor
 	@Override
 	public RefactoringStatus checkNewElementName(String newName) {

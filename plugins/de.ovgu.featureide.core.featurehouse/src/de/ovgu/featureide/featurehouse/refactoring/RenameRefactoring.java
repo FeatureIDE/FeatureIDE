@@ -180,15 +180,20 @@ public abstract class RenameRefactoring<T extends AbstractSignature> extends Ref
 	private Set<RefactoringSignature> createRefactoringSignatures(final SignatureMatcher matcher) {
 		Set<RefactoringSignature> result = new HashSet<>();
 
+		AbstractSignature selectedSignature = matcher.getSelectedSignature();
 		for (AbstractSignature matchedSignature : matcher.getMatchedSignatures()) {
-			
-			handleInvokedSignatureOfMatchedSignature(result, matchedSignature, (FOPFeatureData[]) matchedSignature.getFeatureData());
+
+			if ((selectedSignature instanceof FujiClassSignature && selectedSignature.equals(matchedSignature))|| !(selectedSignature instanceof FujiClassSignature)) 
+				handleInvokedSignatureOfMatchedSignature(result, matchedSignature);
 			
 			final FOPFeatureData[] featureData = (FOPFeatureData[]) matchedSignature.getFeatureData();
 			for (int j = 0; j < featureData.length; j++) {
 				final FOPFeatureData fopFeature = featureData[j];
 
-				addToRefactoringSignatures(result, matchedSignature, fopFeature.getAbsoluteFilePath());
+				if (selectedSignature instanceof FujiClassSignature)
+					addToRefactoringSignatures(result, selectedSignature, fopFeature.getAbsoluteFilePath());
+				else
+					addToRefactoringSignatures(result, matchedSignature, fopFeature.getAbsoluteFilePath());
 			}
 		}
 
@@ -203,9 +208,9 @@ public abstract class RenameRefactoring<T extends AbstractSignature> extends Ref
 		} 
 	}
 
-	private void handleInvokedSignatureOfMatchedSignature(final Set<RefactoringSignature> result, final AbstractSignature matchedSignature, final FOPFeatureData[] fopFeatureData)  {
+	private void handleInvokedSignatureOfMatchedSignature(final Set<RefactoringSignature> result, final AbstractSignature matchedSignature)  {
 
-		for (FOPFeatureData featureData : fopFeatureData) {
+		for (FOPFeatureData featureData : (FOPFeatureData[]) matchedSignature.getFeatureData()) {
 
 			for (AbstractSignature invokedSignature : featureData.getInvokedSignatures()) {
 				final FOPFeatureData[] invokedFeatureData = (FOPFeatureData[]) invokedSignature.getFeatureData();
@@ -219,7 +224,7 @@ public abstract class RenameRefactoring<T extends AbstractSignature> extends Ref
 						result.add(signature);
 					}
 
-					signature.addInvocation(invokedSignature);
+					signature.addInvocation(invokedSignature, matchedSignature);
 				}
 			}
 		}
@@ -301,14 +306,19 @@ public abstract class RenameRefactoring<T extends AbstractSignature> extends Ref
 			return status;
 		
 		IFile ifile = getFile(refactoringSig.getAbsolutePathToFile());
+		
 		TextFileChange change = new TextFileChange(JavaCore.removeJavaLikeExtension(ifile.getName()), ifile);
+		change.initializeValidationData(null);
 		change.setTextType("java");
 		change.setEdit(multiEdit);
 		changes.add(change);
 		
-		if (willRenameCU(refactoringSig, selectedSignature, status)) 
-			changes.add(new RenameResourceChange(ifile.getProjectRelativePath(), newName + ".java"));
-		
+		if (willRenameCU(refactoringSig, selectedSignature, status)) {
+			String filePath = "/" + ifile.getProject().getName() + "/" + ifile.getProjectRelativePath();
+			RenameResourceChange resourceChange = new RenameResourceChange(new Path(filePath), newName + ".java");
+			resourceChange.initializeValidationData(null);
+			changes.add(resourceChange);
+		}
 		return status;
 	}
 	
@@ -346,11 +356,11 @@ public abstract class RenameRefactoring<T extends AbstractSignature> extends Ref
 	}
 	
 	protected RefactoringStatus checkIfCuBroken() throws JavaModelException{
-		ICompilationUnit cu = getCompilationUnit(renamingElement.getFirstFeatureData().getAbsoluteFilePath());
-		if (cu == null)
-			return RefactoringStatus.createFatalErrorStatus(RefactoringCoreMessages.Checks_cu_not_created);
-		else if (! cu.isStructureKnown())
-			return RefactoringStatus.createFatalErrorStatus(RefactoringCoreMessages.Checks_cu_not_parsed);
+//		ICompilationUnit cu = getCompilationUnit(renamingElement.getFirstFeatureData().getAbsoluteFilePath());
+//		if (cu == null)
+//			return RefactoringStatus.createFatalErrorStatus(RefactoringCoreMessages.Checks_cu_not_created);
+//		else if (! cu.isStructureKnown())
+//			return RefactoringStatus.createFatalErrorStatus(RefactoringCoreMessages.Checks_cu_not_parsed);
 		return new RefactoringStatus();
 	}
 	

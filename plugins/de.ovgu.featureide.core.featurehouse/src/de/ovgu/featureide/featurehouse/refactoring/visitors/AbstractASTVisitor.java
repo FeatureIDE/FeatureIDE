@@ -50,7 +50,7 @@ import de.ovgu.featureide.featurehouse.refactoring.SearchMatch;
 public abstract class AbstractASTVisitor extends ASTVisitor implements IASTVisitor {
 	protected final RefactoringSignature refactoringSignature;
 	private final List<SearchMatch> matches = new ArrayList<>();
-	protected boolean checkChildren = false;
+	protected AbstractSignature methodDeclaration = null;
 	private final Set<String> errors = new HashSet<>();
 	protected final String newName;
 
@@ -85,7 +85,7 @@ public abstract class AbstractASTVisitor extends ASTVisitor implements IASTVisit
 	}
 
 	protected boolean hasSameName(final AbstractSignature signature, final QualifiedName name){
-			return hasSameName(signature.getFullName(), getFullQualifiedName(name));
+		return hasSameName(signature.getFullName(), getFullQualifiedName(name));
 	}
 	
 	protected boolean hasSameName(final AbstractSignature signature, final SimpleName name){
@@ -96,13 +96,18 @@ public abstract class AbstractASTVisitor extends ASTVisitor implements IASTVisit
 		final IBinding binding = name.resolveBinding();
 		if (binding instanceof IVariableBinding){
 			final IVariableBinding varBinding = (IVariableBinding) binding;
-			final ITypeBinding typeBinding = varBinding.getDeclaringClass();
-			return getFullQualifiedName(typeBinding) + "." + getSimpleName(name);
+			if (varBinding.isField()){
+				final ITypeBinding typeBinding = varBinding.getDeclaringClass();
+				return getFullQualifiedTypeName(typeBinding) + "." + getSimpleName(name);
+			}else{
+				final IMethodBinding methodBinding = varBinding.getDeclaringMethod();
+				return getFullQualifiedTypeName(methodBinding.getDeclaringClass()) + "." +methodBinding.getName() + "." + getSimpleName(name);
+			}
 		}
 		else if (binding instanceof IMethodBinding){
 			final IMethodBinding methodBinding = (IMethodBinding) binding;
 			final ITypeBinding typeBinding = methodBinding.getDeclaringClass();
-			String qualifiedName = getFullQualifiedName(typeBinding);
+			String qualifiedName = getFullQualifiedTypeName(typeBinding);
 			if (!methodBinding.isConstructor()){
 				qualifiedName += "." + getSimpleName(name);
 			}
@@ -110,13 +115,15 @@ public abstract class AbstractASTVisitor extends ASTVisitor implements IASTVisit
 		}
 		else if (binding instanceof ITypeBinding){
 			final ITypeBinding typeBinding = (ITypeBinding) binding;
-			return getFullQualifiedName(typeBinding);
+			return getFullQualifiedTypeName(typeBinding);
 		}
 		else 
-			return name.getFullyQualifiedName();
+			return getSimpleName(name).toString();
+		
 	}
 
-	private String getFullQualifiedName(final ITypeBinding typeBinding) {
+	private String getFullQualifiedTypeName(final ITypeBinding typeBinding) {
+		if (typeBinding == null) return "";
 		String qualifiedName = typeBinding.getQualifiedName();
 		if (typeBinding.getPackage().getName().isEmpty()) qualifiedName = "." + qualifiedName;
 		return qualifiedName;
@@ -139,11 +146,12 @@ public abstract class AbstractASTVisitor extends ASTVisitor implements IASTVisit
 	}
 	
 	protected boolean checkMethodBody(MethodDeclaration node) {
-		for (AbstractSignature aSignature : refactoringSignature.getInvocations()) {
+		for (AbstractSignature aSignature : refactoringSignature.getInvocations().keySet()) {
 			if (!(aSignature instanceof AbstractMethodSignature))
 				continue;
 
 			if (isSameSignature(aSignature, node)) {
+				methodDeclaration = aSignature;
 				return true;
 			}
 		}

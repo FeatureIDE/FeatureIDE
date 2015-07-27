@@ -23,6 +23,7 @@ package de.ovgu.featureide.featurehouse.signature.fuji;
 import AST.TypeDecl;
 import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 import de.ovgu.featureide.core.signature.base.AbstractLocalVariableSignature;
+import de.ovgu.featureide.core.signature.base.AbstractMethodSignature;
 
 /**
  * Holds the java signature of a local variable.
@@ -31,11 +32,14 @@ import de.ovgu.featureide.core.signature.base.AbstractLocalVariableSignature;
  */
 public class FujiLocalVariableSignature extends AbstractLocalVariableSignature {
 
-	protected TypeDecl returnType;
+	protected final TypeDecl returnType;
+	protected final AbstractMethodSignature declaringMethod;
 
-	public FujiLocalVariableSignature(AbstractClassSignature parent, String name, String modifiers, TypeDecl returnType) {
+	public FujiLocalVariableSignature(AbstractClassSignature parent, AbstractMethodSignature declaringMethod, String name, String modifiers, TypeDecl returnType) {
 		super(parent, name, modifiers, returnType.name());
 		this.returnType = returnType;
+		this.declaringMethod = declaringMethod;
+		this.fullName = declaringMethod.getFullName() + "." + name;
 	}
 
 	@Override
@@ -83,5 +87,9 @@ public class FujiLocalVariableSignature extends AbstractLocalVariableSignature {
 			return false;
 		}
 		return true;
+	}
+
+	public AbstractMethodSignature getDeclaringMethod() {
+		return declaringMethod;
 	}
 }

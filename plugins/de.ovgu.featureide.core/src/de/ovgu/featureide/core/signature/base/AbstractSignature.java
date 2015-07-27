@@ -167,15 +167,11 @@ public abstract class AbstractSignature implements IConstrainedObject {
 	}
 	
 	public void setFeatureData(AFeatureData[] featureData) {
-		if (this.featureData == null) {
-			this.featureData = featureData;
-		}
+		this.featureData = featureData;
 	}
 	
 	public void setFeatureData(AFeatureData featureData) {
-		if (this.featureData == null) {
-			this.featureData = new AFeatureData[]{featureData};
-		}
+		this.featureData = new AFeatureData[]{featureData};
 	}
 
 	public int hasFeature(int id) {

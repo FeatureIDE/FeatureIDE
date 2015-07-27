@@ -41,7 +41,7 @@ import de.ovgu.featureide.featurehouse.signature.fuji.FujiLocalVariableSignature
  */
 public abstract class SignatureMatcher {
 
-	private final ProjectSignatures signatures;
+	protected final ProjectSignatures signatures;
 	protected final AbstractSignature selectedElement;
 	protected AbstractSignature selectedSignature;
 	protected final String newName;
@@ -90,8 +90,12 @@ public abstract class SignatureMatcher {
 		final SignatureIterator iter = signatures.iterator();
 		while (iter.hasNext()) {
 			final AbstractSignature signature = iter.next();
-			if (signature instanceof AbstractClassSignature)
-				classes.put(signature.getName(), (AbstractClassSignature) signature);
+			if (signature instanceof AbstractClassSignature) {
+				String fullName = signature.getFullName();
+				if (fullName.startsWith("."))
+					fullName = fullName.substring(1);
+				classes.put(fullName, (AbstractClassSignature) signature);
+			}
 		}
 
 		return classes;

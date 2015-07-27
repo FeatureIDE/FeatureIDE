@@ -157,27 +157,29 @@ public class FujiSelector {
 			selectedSignature = getFujiFieldSignature((FieldDeclaration)result, ast);
 		}
 		else if (result instanceof VariableDeclaration){
-			selectedSignature = getFujiLocalVariableSignature((VariableDeclaration)result, ast);
-			FOPFeatureData firstFeatureData = (FOPFeatureData) selectedSignature.getFirstFeatureData();
-			firstFeatureData.addInvokedSignature(getEnclosedMethod((VariableDeclaration)result, ast));
+			final FujiMethodSignature enclosedMethod = getEnclosedMethod((VariableDeclaration)result, ast);
+			selectedSignature = getFujiLocalVariableSignature((VariableDeclaration)result, enclosedMethod, ast);
+			final FOPFeatureData firstFeatureData = (FOPFeatureData) selectedSignature.getFirstFeatureData();
+			firstFeatureData.addInvokedSignature(enclosedMethod);
 		}
 		else if (result instanceof ParameterDeclaration){
-			selectedSignature = getFujiLocalVariableSignature((ParameterDeclaration)result, ast);
-			FOPFeatureData firstFeatureData = (FOPFeatureData) selectedSignature.getFirstFeatureData();
-			firstFeatureData.addInvokedSignature(getEnclosedMethod((ParameterDeclaration)result, ast));
+			final FujiMethodSignature enclosedMethod = getEnclosedMethod((ParameterDeclaration)result, ast);
+			selectedSignature = getFujiLocalVariableSignature((ParameterDeclaration)result, enclosedMethod, ast);
+			final FOPFeatureData firstFeatureData = (FOPFeatureData) selectedSignature.getFirstFeatureData();
+			firstFeatureData.addInvokedSignature(enclosedMethod);
 		}
 		
 		return selectedSignature;
 	}
 	
-	private FujiLocalVariableSignature getFujiLocalVariableSignature(final VariableDeclaration varDecl, final Program ast) {
-		final FujiLocalVariableSignature sig = new FujiLocalVariableSignature(getDeclaringClass(varDecl, ast), varDecl.name(), varDecl.getModifiers().toString(), varDecl.type());
+	private FujiLocalVariableSignature getFujiLocalVariableSignature(final VariableDeclaration varDecl, final FujiMethodSignature enclosedMethod, final Program ast) {
+		final FujiLocalVariableSignature sig = new FujiLocalVariableSignature(getDeclaringClass(varDecl, ast), enclosedMethod, varDecl.name(), varDecl.getModifiers().toString(), varDecl.type());
 		createAndSetFeatureData(varDecl, ast, sig);
 		return sig;
 	}
 	
-	private FujiLocalVariableSignature getFujiLocalVariableSignature(final ParameterDeclaration varDecl, final Program ast) {
-		final FujiLocalVariableSignature sig = new FujiLocalVariableSignature(getDeclaringClass(varDecl, ast), varDecl.name(), varDecl.getModifiers().toString(), varDecl.type());
+	private FujiLocalVariableSignature getFujiLocalVariableSignature(final ParameterDeclaration varDecl, final FujiMethodSignature enclosedMethod, final Program ast) {
+		final FujiLocalVariableSignature sig = new FujiLocalVariableSignature(getDeclaringClass(varDecl, ast), enclosedMethod, varDecl.name(), varDecl.getModifiers().toString(), varDecl.type());
 		createAndSetFeatureData(varDecl, ast, sig);
 		return sig;
 	}
@@ -328,6 +330,8 @@ public class FujiSelector {
 						return (FieldDeclaration) varDecl;
 					else if (varDecl instanceof VariableDeclaration)
 						return (VariableDeclaration) varDecl;
+					else if (varDecl instanceof ParameterDeclaration)
+						return (ParameterDeclaration) varDecl;
 				} else if (stmt instanceof MethodAccess) {
 					return ((MethodAccess) stmt).decl();
 				} else if (stmt instanceof ArrayTypeAccess) {

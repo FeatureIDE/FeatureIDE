@@ -52,16 +52,17 @@ public class FujiClassSignature extends AbstractClassSignature {
 		if (typeDecl instanceof ClassDecl) {
 			ClassDecl classDecl = (ClassDecl)typeDecl;
 			superTypes.add(classDecl.superclass());
-			addExtend(classDecl.superclass().name());
-			if (!classDecl.name().equals("Object")) {
-				addExtend(classDecl.superclass().name());
+			ClassDecl superClass = classDecl.superclass();
+			if (!superClass.fullName().equals("java.lang.Object")) {
+				System.out.println(superClass.fullName());
+				addExtend(superClass.fullName());
 			}
 			@SuppressWarnings("unchecked")
 			Iterator<TypeDecl> implementInterfaceIt = classDecl.interfacesIterator();
 			while (implementInterfaceIt.hasNext()) {
 				TypeDecl implementType = implementInterfaceIt.next();
 				implementTypes.add(implementType);
-				addImplement(implementType.name());
+				addImplement(implementType.fullName());
 			}
 		} else if (typeDecl instanceof InterfaceDecl) {
 			@SuppressWarnings("unchecked")
@@ -69,8 +70,8 @@ public class FujiClassSignature extends AbstractClassSignature {
 			while (superInterfaceIt.hasNext()) {
 				TypeDecl superInterface = superInterfaceIt.next();
 				superTypes.add(superInterface);
-				if (!superInterface.name().equals("Object")) {
-					addExtend(superInterface.name());
+				if (!superInterface.fullName().equals("java.lang.Object")) {
+					addExtend(superInterface.fullName());
 				}
 			}
 		}

@@ -23,6 +23,7 @@ package de.ovgu.featureide.featurehouse.refactoring.visitors;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Expression;
@@ -61,17 +62,25 @@ public class MethodVisitor extends AbstractASTVisitor {
 
 	@Override
 	public boolean visit(MethodInvocation node) {
-		if (isSameSignature(refactoringSignature.getDeclaration(), node)) {
-			addSearchMatch(getSimpleName(node.getName()));
+		Set<AbstractSignature> invokedSignatures = refactoringSignature.getInvocations().get(methodDeclaration);
+		for (AbstractSignature invokedSignature : invokedSignatures) {
+			if (isSameSignature(invokedSignature, node)) {
+				addSearchMatch(getSimpleName(node.getName()));
+				return false;
+			}
 		}
+		
 		return false;
 	}
 	
 	@Override
 	public boolean visit(SuperMethodInvocation node) {
-
-		if (isSameSignature(refactoringSignature.getDeclaration(), node)) {
-			addSearchMatch(getSimpleName(node.getName()));
+		Set<AbstractSignature> invokedSignatures = refactoringSignature.getInvocations().get(methodDeclaration);
+		for (AbstractSignature invokedSignature : invokedSignatures) {
+			if (isSameSignature(invokedSignature, node)) {
+				addSearchMatch(getSimpleName(node.getName()));
+				return false;
+			}
 		}
 		return false;
 	}

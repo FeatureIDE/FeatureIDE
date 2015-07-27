@@ -130,7 +130,7 @@ public class MethodSignatureMatcher extends SignatureMatcher {
 	public void addSuperClasses(final Set<AbstractClassSignature> result, final AbstractClassSignature classSignature) {
 		if (classSignature == null)
 			return;
-
+		
 		addSuperClassesForNames(result, classSignature.getImplementList());
 		addSuperClassesForNames(result, classSignature.getExtendList());
 	}

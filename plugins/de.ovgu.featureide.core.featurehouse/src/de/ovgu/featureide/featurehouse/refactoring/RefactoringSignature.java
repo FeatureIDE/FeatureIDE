@@ -20,10 +20,12 @@
  */
 package de.ovgu.featureide.featurehouse.refactoring;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
-
-import org.eclipse.jdt.internal.ui.packageview.PackageExplorerPart;
 
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 
@@ -35,7 +37,9 @@ import de.ovgu.featureide.core.signature.base.AbstractSignature;
 public class RefactoringSignature {
 	private AbstractSignature declaration;
 	
-	private Set<AbstractSignature> invocations = new HashSet<>();
+	private AbstractSignature invocationDeclaration;
+	
+	private Map<AbstractSignature, Set<AbstractSignature>> invocations = new HashMap<>();
 	
 	private final String absolutePath;
 	
@@ -56,12 +60,22 @@ public class RefactoringSignature {
 		this.declaration = declaration;
 	}
 
-	public Set<AbstractSignature> getInvocations() {
+	public Map<AbstractSignature, Set<AbstractSignature>> getInvocations() {
 		return invocations;
 	}
 
-	public void addInvocation(AbstractSignature invocation) {
-		this.invocations.add(invocation);
+	public void addInvocation(final AbstractSignature invocation, final AbstractSignature invokedSignature) {
+		
+		Set<AbstractSignature> invokedSignatures;
+		if (this.invocations.containsKey(invocation)) {
+			invokedSignatures = invocations.get(invocation);
+		}
+		else {
+			invokedSignatures = new HashSet<>();
+			this.invocations.put(invocation, invokedSignatures);
+		}
+		
+		invokedSignatures.add(invokedSignature);
 	}
 	
 	@Override
