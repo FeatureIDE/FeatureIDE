@@ -77,7 +77,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 
 	public class LoadMethod implements LongRunningMethod<Void> {
 		@Override
-		public Void run(WorkMonitor monitor) {
+		public Void execute(WorkMonitor monitor) {
 			if (!initialized) {
 				lastComputedValues = new byte[variableConfiguration.size()];
 				Arrays.fill(lastComputedValues, (byte) Variable.UNDEFINED);
@@ -91,14 +91,14 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 
 	public class CanBeValidMethod implements LongRunningMethod<Boolean> {
 		@Override
-		public Boolean run(WorkMonitor monitor) {
+		public Boolean execute(WorkMonitor monitor) {
 			return sat(getCurrentLiterals(true));
 		}
 	}
 
 	public class IsValidMethod implements LongRunningMethod<Boolean> {
 		@Override
-		public Boolean run(WorkMonitor monitor) {
+		public Boolean execute(WorkMonitor monitor) {
 			return sat(getCurrentLiterals(false));
 		}
 	}
@@ -111,7 +111,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 		}
 
 		@Override
-		public LinkedList<List<String>> run(WorkMonitor monitor) throws TimeoutException {
+		public LinkedList<List<String>> execute(WorkMonitor monitor) throws TimeoutException {
 			SatSolver satSolver3 = new SatSolver(node, 1000, false);
 			return satSolver3.getSolutionFeatures(getCurrentLiterals(true), max);
 		}
@@ -119,7 +119,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 
 	public class CountSolutionsMethod implements LongRunningMethod<Long> {
 		@Override
-		public Long run(WorkMonitor monitor) {
+		public Long execute(WorkMonitor monitor) {
 			if (satSolver2 == null) {
 				satSolver2 = new SatSolver(node, 1000, false);
 			}
@@ -129,14 +129,14 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 
 	public class LeadToValidConfiguration implements LongRunningMethod<Void> {
 		@Override
-		public Void run(WorkMonitor monitor) {
+		public Void execute(WorkMonitor monitor) {
 			return null;
 		}
 	}
 
 	public class UpdateMethod implements LongRunningMethod<List<String>> {
 		@Override
-		public List<String> run(WorkMonitor monitor) {
+		public List<String> execute(WorkMonitor monitor) {
 			final boolean[] featureToCompute = new boolean[variableConfiguration.size()];
 			changedFeatures.clear();
 			for (int index = 0; index < lastComputedValues.length; index++) {

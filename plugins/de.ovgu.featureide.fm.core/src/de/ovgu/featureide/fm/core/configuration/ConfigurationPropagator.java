@@ -113,7 +113,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 
 	public class LoadMethod implements LongRunningMethod<Void> {
 		@Override
-		public Void run(WorkMonitor monitor) {
+		public Void execute(WorkMonitor monitor) {
 			if (rootNode != null) {
 				return null;
 			}
@@ -151,7 +151,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 		}
 
 		@Override
-		public LinkedList<List<String>> run(WorkMonitor monitor) throws TimeoutException {
+		public LinkedList<List<String>> execute(WorkMonitor monitor) throws TimeoutException {
 			if (rootNode == null) {
 				return null;
 			}
@@ -162,7 +162,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 
 	public class IsValidMethod implements LongRunningMethod<Boolean> {
 		@Override
-		public Boolean run(WorkMonitor monitor) {
+		public Boolean execute(WorkMonitor monitor) {
 			if (rootNode == null) {
 				return false;
 			}
@@ -183,7 +183,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 
 	public class IsValidNoHiddenMethod implements LongRunningMethod<Boolean> {
 		@Override
-		public Boolean run(WorkMonitor monitor) {
+		public Boolean execute(WorkMonitor monitor) {
 			if (rootNode == null) {
 				return false;
 			}
@@ -211,7 +211,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 
 	public class CanBeValidMethod implements LongRunningMethod<Boolean> {
 		@Override
-		public Boolean run(WorkMonitor monitor) {
+		public Boolean execute(WorkMonitor monitor) {
 			if (rootNode == null) {
 				return false;
 			}
@@ -252,7 +252,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 		}
 
 		@Override
-		public Void run(WorkMonitor monitor) throws Exception {
+		public Void execute(WorkMonitor monitor) throws Exception {
 			if (mode == DEFAULT_MODE) {
 				if (Preferences.defaultCompletion == Preferences.COMPLETION_ONE_CLICK && featureList.size() > FEATURE_LIMIT_FOR_DEFAULT_COMPLETION) {
 					leadToValidConfiguration(featureList, Preferences.COMPLETION_OPEN_CLAUSES, monitor);
@@ -454,7 +454,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 		}
 
 		@Override
-		public Long run(WorkMonitor monitor) {
+		public Long execute(WorkMonitor monitor) {
 			if (rootNode == null) {
 				return 0L;
 			}
@@ -518,7 +518,7 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 		}
 
 		@Override
-		public List<String> run(WorkMonitor workMonitor) {
+		public List<String> execute(WorkMonitor workMonitor) {
 			if (rootNode == null) {
 				return null;
 			}
