@@ -826,6 +826,14 @@ public class CorePlugin extends AbstractCorePlugin {
 			this.countMarker = countMarker;
 		}
 
+		public void incPositive() {
+			positiveCount++;
+		}
+
+		public void incNegative() {
+			negativeCount++;
+		}
+
 		public void incCount(boolean mixed) {
 			if (mixed && countMarker > 0) {
 				mixedClauseCount = 1;
@@ -867,9 +875,8 @@ public class CorePlugin extends AbstractCorePlugin {
 	}
 
 	public static Node removeFeatures(FeatureModel fm, Collection<String> features) throws TimeoutException {
-		Node fmNode = NodeCreator.createNodes(fm).clone().toCNF();
+		Node fmNode = NodeCreator.createNodes(fm).toCNF();
 		if (fmNode instanceof And) {
-			final SatSolver solver = new SatSolver(fmNode.clone(), 1000);
 			final Node[] andChildren = fmNode.getChildren();
 
 			// all clauses that have both kinds of literals (remove AND retain)
@@ -877,33 +884,81 @@ public class CorePlugin extends AbstractCorePlugin {
 
 			// list for all new construct clauses
 			final Set<Or> newClauseList = new HashSet<>(andChildren.length);
+			
+			// TODO globalMixedClauseCount
+			//			int globalMixedClauseCount = 0;
 
 			// fill first two lists
 			for (int i = 0; i < andChildren.length; i++) {
-				final Node andChild = andChildren[i];
+				Node andChild = andChildren[i];
 				if (andChild instanceof Or) {
-
+					int absoluteValueCount = 0;
 					int relevance = 0;
-					for (Node orChild : andChild.getChildren()) {
-						final Literal literal = (Literal) orChild;
+
+					final Node[] children = andChild.getChildren();
+					for (int j = 0; j < children.length; j++) {
+						final Literal literal = (Literal) children[j];
 
 						// sort out obvious tautologies
-						if ((literal.positive && literal.var.equals(NodeCreator.varTrue)) || (!literal.positive && literal.var.equals(NodeCreator.varFalse))) {
-							relevance = -1;
-							break;
+						if (literal.var.equals(NodeCreator.varTrue)) {
+							if (literal.positive) {
+								relevance = -1;
+							} else {
+								absoluteValueCount++;
+								children[j] = null;
+							}
+						} else if (literal.var.equals(NodeCreator.varFalse)) {
+							if (literal.positive) {
+								absoluteValueCount++;
+								children[j] = null;
+							} else {
+								relevance = -1;
+							}
+						} else {
+							relevance += features.contains(literal.var) ? 1 : 0;
 						}
+					}
 
-						relevance += features.contains(literal.var) ? 1 : 0;
+					if (absoluteValueCount > 0) {
+						if (children.length == absoluteValueCount) {
+							throw new RuntimeException("Model is void!");
+						}
+						Node[] newChildren = new Node[children.length - absoluteValueCount];
+						int k = 0;
+						for (int j = 0; j < children.length; j++) {
+							final Node literal = children[j];
+							if (literal != null) {
+								newChildren[k++] = literal;
+							}
+						}
+						andChild = new Or(newChildren);
 					}
 
 					if (relevance > 0) {
 						relevantClauseList.add((Or) andChild);
+						// TODO globalMixedClauseCount
+						//						if (relevance < andChild.getChildren().length) {
+						//							globalMixedClauseCount++;
+						//						}
 					} else if (relevance == 0) {
 						newClauseList.add((Or) andChild);
 					}
 				} else {
-					if (!features.contains(((Literal) andChild).var)) {
-						newClauseList.add(new Or(andChild));
+					final Literal literal = (Literal) andChild;
+					if (!features.contains(literal.var)) {
+						if (literal.var.equals(NodeCreator.varTrue)) {
+							if (!literal.positive) {
+								throw new RuntimeException("Model is void!");
+							}
+						} else if (literal.var.equals(NodeCreator.varFalse)) {
+							if (literal.positive) {
+								throw new RuntimeException("Model is void!");
+							}
+						} else {
+							newClauseList.add(new Or(andChild));
+						}
+					} else {
+						relevantClauseList.add(new Or(andChild));
 					}
 				}
 			}
@@ -918,16 +973,18 @@ public class CorePlugin extends AbstractCorePlugin {
 			final boolean alwaysUpdate = false;
 			final int threshold = 1;
 
+			final int max = map.size();
 			int count = 0;
 			while (!map.isEmpty()) {
-				final String curFeature = (count++ < threshold || alwaysUpdate) 
-						? next(map, update(map, relevantClauseList)).getFeature() 
-						: next(map).getFeature();
+				final String curFeature = (count++ < threshold || alwaysUpdate) ? next(map, update(map, relevantClauseList)).getFeature() : next(map)
+						.getFeature();
 				if (curFeature == null) {
 					relevantClauseList.clear();
 					relevantClauseSet.clear();
 					break;
 				}
+				System.out.println(max - count);
+
 				// ... create list of clauses that contain this feature
 				int relevantIndex = 0;
 				final byte[] clauseStates = new byte[relevantClauseList.size()];
@@ -950,8 +1007,10 @@ public class CorePlugin extends AbstractCorePlugin {
 					}
 				}
 
+				final SatSolver solver = new SatSolver(new And(relevantClauseList.subList(0, relevantIndex).toArray(new Or[0])).clone(), 1000);
+
 				// ... combine relevant clauses if possible
-				for (int i = clauseStates.length - 1; i >= 0; i--) {
+				for (int i = relevantIndex - 1; i >= 0; i--) {
 					final boolean positive;
 					switch (clauseStates[i]) {
 					case 1:
@@ -966,9 +1025,12 @@ public class CorePlugin extends AbstractCorePlugin {
 						continue;
 					}
 
-					final Node clause = relevantClauseList.get(i);
+					final Node[] orChildren = relevantClauseList.get(i).getChildren();
 
-					final Node[] orChildren = clause.getChildren();
+					if (orChildren.length < 2) {
+						continue;
+					}
+
 					final Literal[] literalList = new Literal[orChildren.length];
 					int removeIndex = orChildren.length;
 					int retainIndex = -1;
@@ -991,61 +1053,54 @@ public class CorePlugin extends AbstractCorePlugin {
 							retainedLiteral.flip();
 						}
 
-						final Or newClause = new Or(retainLiterals);
-
-						if (checkRelevance(features, newClause)) {
-							if (!relevantClauseSet.contains(newClause)) {
-								relevantClauseList.add(newClause);
-								relevantClauseSet.add(newClause);
-							}
-						} else {
-							if (checkValidity(newClause)) {
+						final Or newClause = checkValidity(retainLiterals);
+						if (newClause != null) {
+							int relevance = checkRelevance(features, newClause, map);
+							if (relevance == 0) {
 								newClauseList.add(newClause);
+								// TODO globalMixedClauseCount
+								//								globalMixedClauseCount--;
+							} else if (relevantClauseSet.add(newClause)) {
+								relevantClauseList.add(newClause);
 							}
 						}
-
 						// try to combine with other clauses
 					} else {
-						final Node[] children1 = clause.getChildren();
 						for (int j = i - 1; j >= 0; j--) {
 							if ((positive && clauseStates[j] == 2) || (!positive && clauseStates[j] == 1)) {
 								final Node[] children2 = relevantClauseList.get(j).getChildren();
-								final ArrayList<Literal> newChildren = new ArrayList<>(children1.length + children2.length - 2);
+								final Literal[] newChildren = new Literal[orChildren.length + children2.length];
 
-								for (int k = 0; k < children1.length; k++) {
-									final Literal child = (Literal) children1[k];
-									if (!curFeature.equals(child.var)) {
-										newChildren.add(child);
-									}
-								}
+								System.arraycopy(orChildren, 0, newChildren, 0, orChildren.length);
+								System.arraycopy(children2, 0, newChildren, orChildren.length, children2.length);
 
-								for (int k = 0; k < children2.length; k++) {
-									final Literal child = (Literal) children2[k];
-									if (!curFeature.equals(child.var)) {
-										newChildren.add(child);
-									}
-								}
-
-								final Literal[] newLiterals = newChildren.toArray(new Literal[0]);
-								final Or newClause = new Or(newLiterals);
-
-								if (checkRelevance(features, newClause)) {
-									if (!relevantClauseSet.contains(newClause)) {
-										relevantClauseList.add(newClause);
-										relevantClauseSet.add(newClause);
-									}
-								} else {
-									if (checkValidity(newClause)) {
+								final Or newClause = checkValidity(newChildren, curFeature);
+								if (newClause != null) {
+									int relevance = checkRelevance(features, newClause, map);
+									if (relevance == 0) {
 										newClauseList.add(newClause);
+										// TODO globalMixedClauseCount
+										//										globalMixedClauseCount--;
+									} else if (relevantClauseSet.add(newClause)) {
+										relevantClauseList.add(newClause);
+										// TODO globalMixedClauseCount
+										//										if (relevance < newClause.getChildren().length) {
+										//											globalMixedClauseCount++;
+										//										}
 									}
 								}
 							}
 						}
 					}
 				}
+				solver.reset();
 				final List<Or> subList = relevantClauseList.subList(0, relevantIndex);
 				relevantClauseSet.removeAll(subList);
 				subList.clear();
+				// TODO globalMixedClauseCount
+				//				if (globalMixedClauseCount == 0) {
+				//					break;
+				//				}
 			}
 
 			// create clause that contains all retained features
@@ -1059,11 +1114,13 @@ public class CorePlugin extends AbstractCorePlugin {
 			allLiterals[i] = new Literal(NodeCreator.varTrue);
 
 			// create new clauses list
-			final int lastIndex = newClauseList.size();
-			final Node[] newClauses = new Node[lastIndex + 1];
+			final int newClauseSize = newClauseList.size();
+			final Node[] newClauses = new Node[newClauseSize + 3];
 
 			System.arraycopy(newClauseList.toArray(new Node[0]), 0, newClauses, 0, newClauseList.size());
-			newClauses[lastIndex] = new Or(allLiterals);
+			newClauses[newClauseSize] = new Or(allLiterals);
+			newClauses[newClauseSize + 1] = new Literal(NodeCreator.varTrue);
+			newClauses[newClauseSize + 2] = new Literal(NodeCreator.varFalse, false);
 
 			fmNode.setChildren(newClauses);
 
@@ -1081,36 +1138,53 @@ public class CorePlugin extends AbstractCorePlugin {
 		}
 	}
 
-	private static boolean checkRelevance(Collection<String> features, final Or newClause) {
+	private static int checkRelevance(Collection<String> features, final Or newClause, HashMap<String, DeprecatedFeature> map) {
+		int relevance = 0;
 		for (Node orChild : newClause.getChildren()) {
 			final Literal literal = (Literal) orChild;
-			if (features.contains(literal.var)) {
-				return true;
+			final DeprecatedFeature df = map.get(literal.var);
+			if (df != null) {
+				relevance++;
+				if (literal.positive) {
+					df.incPositive();
+				} else {
+					df.incNegative();
+				}
 			}
 		}
-		return false;
+		return relevance;
 	}
 
-	private static boolean checkValidity(Node newClause) {
-		final Node[] children = newClause.getChildren();
-		final HashSet<Literal> literalSet = new HashSet<>(children.length << 1);
-		for (Node orChild : children) {
-			final Literal literal = (Literal) orChild;
+	private static Or checkValidity(Literal[] newLiterals) {
+		final HashSet<Literal> literalSet = new HashSet<>(newLiterals.length << 1);
+		for (Literal literal : newLiterals) {
+			final Literal negativliteral = literal.clone();
+			negativliteral.flip();
 
-			// sort out obvious tautologies
-			if ((literal.positive && literal.var.equals(NodeCreator.varTrue)) || (!literal.positive && literal.var.equals(NodeCreator.varFalse))) {
-				return false;
-			}
-
-			if (literalSet.contains(literal)) {
-				return false;
+			if (literalSet.contains(negativliteral)) {
+				return null;
 			} else {
-				final Literal negativliteral = literal.clone();
-				negativliteral.flip();
-				literalSet.add(negativliteral);
+				literalSet.add(literal);
 			}
 		}
-		return true;
+		return new Or(literalSet.toArray(new Literal[0]));
+	}
+
+	private static Or checkValidity(Literal[] newLiterals, String curFeature) {
+		final HashSet<Literal> literalSet = new HashSet<>(newLiterals.length << 1);
+		for (Literal literal : newLiterals) {
+			if (!curFeature.equals(literal.var)) {
+				final Literal negativliteral = literal.clone();
+				negativliteral.flip();
+
+				if (literalSet.contains(negativliteral)) {
+					return null;
+				} else {
+					literalSet.add(literal);
+				}
+			}
+		}
+		return new Or(literalSet.toArray(new Literal[0]));
 	}
 
 	private static boolean update(HashMap<String, DeprecatedFeature> map, List<Or> relevantClauseList) {
@@ -1147,7 +1221,7 @@ public class CorePlugin extends AbstractCorePlugin {
 					default:
 						break;
 					}
-				} else if (literal.var instanceof String) {
+				} else {
 					mixedClause = true;
 				}
 				if (invalidClause) {

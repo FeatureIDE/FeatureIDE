@@ -570,4 +570,9 @@ public class SatSolver {
 		}
 		return out.toString();
 	}
+
+	public void reset() {
+		solver.reset();		
+	}
+
 }
