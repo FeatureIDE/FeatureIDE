@@ -916,7 +916,7 @@ public class CorePlugin extends AbstractCorePlugin {
 				} else if (arg0.positive) {
 					return -1;
 				} else {
-					return -1;
+					return 1;
 				}
 			}
 		}
@@ -1271,7 +1271,6 @@ public class CorePlugin extends AbstractCorePlugin {
 					clause.delete(map);
 				}
 				subList.clear();
-				// TODO globalMixedClauseCount
 				if (map.getGlobalMixedClauseCount() == 0) {
 					break;
 				}
