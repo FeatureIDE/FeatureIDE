@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.ui.interfacegen;
 
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -57,10 +59,10 @@ public class InterfaceCompositionTester {
 
 	private static final List<String> ROOT_FEATURES_LIST = new ArrayList<String>();
 
-	private static final String SUB_MODEL_DIR = "subModels\\";
-	private static final String FEATURE_LIST = "";
-	private static final String MODEL_PATH = "";
-	private static final String OUTPUT_PATH = "";
+	private static String SUB_MODEL_DIR = "subModels\\";
+	private static String FEATURE_LIST = "";
+	private static String MODEL_PATH = "";
+	private static String OUTPUT_PATH = "";
 
 	private static InterfaceCompositionTester singelton = null;
 
@@ -96,8 +98,38 @@ public class InterfaceCompositionTester {
 	}
 
 	public static void main(final String[] args) throws FileNotFoundException, UnsupportedModelException {
+		SUB_MODEL_DIR = args[0];
+		FEATURE_LIST = args[1];
+		MODEL_PATH = args[2];
+		OUTPUT_PATH = args[3];
+		boolean recompute = new Boolean(args[4]).booleanValue();
+
 		final InterfaceCompositionTester tester = InterfaceCompositionTester.getInstance();
-		tester.test();
+
+		if (recompute) {
+			tester.test();
+		} else {
+
+			FeatureModel newCompleteModel = new FeatureModel();
+			FeatureModel newCompleteModel2 = new FeatureModel();
+
+			new XmlFeatureModelReader(newCompleteModel).readFromFile(new File(OUTPUT_PATH + "//newmodel.xml"));
+
+			new XmlFeatureModelReader(newCompleteModel2).readFromFile(new File(OUTPUT_PATH + "//newmodel33.xml"));
+
+			tester.compareFeatureSetsOfModels(newCompleteModel, newCompleteModel2);
+			tester.compareFeatureSetsOfModels(newCompleteModel2, newCompleteModel);
+
+			tester.compareModels(newCompleteModel, newCompleteModel2);
+		}
+	}
+
+	private void compareFeatureSetsOfModels(FeatureModel newCompleteModel, FeatureModel newCompleteModel2) {
+		for (String featureName : newCompleteModel.getFeatureNames()) {
+			if (newCompleteModel2.getFeature(featureName) == null) {
+				fail(featureName);
+			}
+		}
 	}
 
 	private static void output(final String path, FeatureModel newSubModel, Collection<String> includedFeatures, int crossModelConstraintSize, String name) {
@@ -210,7 +242,10 @@ public class InterfaceCompositionTester {
 
 			System.out.print(i-- + ": " + subModel.getRoot().getName() + " (" + featureSet.size() + "/" + subModel.getFeatures().size() + ")");
 
-			interfaces.add(createInterface(subModel, featureSet));
+			FeatureModel model  = createInterface(subModel, featureSet);
+			interfaces.add(model);
+			
+			new XmlFeatureModelWriter(model).writeToFile(new File(OUTPUT_PATH + SUB_MODEL_DIR + "interface_"+subModel.getRoot().getName()+".xml"));
 
 			allFeatures.addAll(featureSet);
 
@@ -229,13 +264,17 @@ public class InterfaceCompositionTester {
 		System.out.println(" > Done!");
 
 		System.out.print("Creating complete model 2 ...");
-		final FeatureModel newCompleteModel2 = createInterface(completeModel, allFeatures);
+		final FeatureModel newCompleteModel2 = createInterface(completeModel, newCompleteModel.getFeatureNames());
 		System.out.println(" > Done!");
 
 		System.out.print("Writing complete model 2 ...");
 		new XmlFeatureModelWriter(newCompleteModel2).writeToFile(new File(OUTPUT_PATH + "newmodel2.xml"));
 		System.out.println(" > Done!");
 
+		compareModels(newCompleteModel, newCompleteModel2);
+	}
+
+	private void compareModels(final FeatureModel newCompleteModel, final FeatureModel newCompleteModel2) {
 		System.out.print("Creating node for model 1 ...");
 		Node cnf1 = NodeCreator.createNodes(newCompleteModel).toCNF();
 		System.out.println(" > Done!");

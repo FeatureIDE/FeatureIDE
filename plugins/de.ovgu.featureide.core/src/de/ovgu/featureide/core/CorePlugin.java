@@ -889,6 +889,10 @@ public class CorePlugin extends AbstractCorePlugin {
 			return map.isEmpty();
 		}
 
+		public int getSize() {
+			return map.size();
+		}
+		
 		public DeprecatedFeature get(Object var) {
 			return map.get(var);
 		}
@@ -1141,8 +1145,15 @@ public class CorePlugin extends AbstractCorePlugin {
 					}
 				}
 			}
-
+			
+			int ii = map.getSize();
+			
 			while (!map.isEmpty()) {
+				ii = map.getSize();
+				if(ii % 100 == 0){
+					
+					System.out.println(ii);
+				}
 				final String curFeature = map.next().getFeature();
 				if (curFeature == null) {
 					relevantClauseList.clear();
