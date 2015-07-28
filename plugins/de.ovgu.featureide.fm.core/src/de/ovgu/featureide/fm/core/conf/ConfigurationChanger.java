@@ -79,7 +79,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 
 	public class LoadMethod implements LongRunningMethod<Void> {
 		@Override
-		public Void run(WorkMonitor monitor) {
+		public Void execute(WorkMonitor monitor) {
 			if (!initialized) {
 				lastComputedValues = new byte[variableConfiguration.size()];
 				Arrays.fill(lastComputedValues, (byte) Variable.UNDEFINED);
@@ -93,7 +93,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 
 	public class CanBeValidMethod implements LongRunningMethod<Boolean> {
 		@Override
-		public Boolean run(WorkMonitor monitor) {
+		public Boolean execute(WorkMonitor monitor) {
 			try {
 				return sat(getCurrentLiterals(true));
 			} catch (Exception e) {
@@ -105,7 +105,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 
 	public class IsValidMethod implements LongRunningMethod<Boolean> {
 		@Override
-		public Boolean run(WorkMonitor monitor) {
+		public Boolean execute(WorkMonitor monitor) {
 			try {
 				return sat(getCurrentLiterals(false));
 			} catch (Exception e) {
@@ -123,7 +123,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 		}
 
 		@Override
-		public LinkedList<List<String>> run(WorkMonitor monitor) throws TimeoutException {
+		public LinkedList<List<String>> execute(WorkMonitor monitor) throws TimeoutException {
 			SatSolver satSolver3 = new SatSolver(node, 1000, false);
 			return satSolver3.getSolutionFeatures(getCurrentLiterals(true), max);
 		}
@@ -131,7 +131,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 
 	public class CountSolutionsMethod implements LongRunningMethod<Long> {
 		@Override
-		public Long run(WorkMonitor monitor) {
+		public Long execute(WorkMonitor monitor) {
 			if (satSolver2 == null) {
 				satSolver2 = new SatSolver(node, 1000, false);
 			}
@@ -141,14 +141,14 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 
 	public class LeadToValidConfiguration implements LongRunningMethod<Void> {
 		@Override
-		public Void run(WorkMonitor monitor) {
+		public Void execute(WorkMonitor monitor) {
 			return null;
 		}
 	}
 
 	public class UpdateMethod implements LongRunningMethod<List<String>> {
 		@Override
-		public List<String> run(WorkMonitor monitor) {
+		public List<String> execute(WorkMonitor monitor) {
 			final byte[] featureToCompute = new byte[variableConfiguration.size()];
 			for (int index = 0; index < lastComputedValues.length; index++) {
 				final int oldValue = lastComputedValues[index];
@@ -535,7 +535,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 
 	public class UpdateNextMethod implements LongRunningMethod<Void> {
 		@Override
-		public Void run(WorkMonitor monitor) {
+		public Void execute(WorkMonitor monitor) {
 			final UpdateHelper updateHelper = new UpdateHelper();
 			for (int index = 0; index < lastComputedValues.length; index++) {
 				final int newValue = variableConfiguration.getVariable(index).getValue();
@@ -562,7 +562,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 		}
 
 		@Override
-		public Void run(WorkMonitor monitor) {
+		public Void execute(WorkMonitor monitor) {
 			final UpdateHelper updateHelper = new UpdateHelper();
 			for (int index = 0; index < featureGraph.getSize(); index++) {
 				if (variableConfiguration.getVariable(index).getValue() != Variable.UNDEFINED) {
@@ -603,7 +603,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 		}
 
 		@Override
-		public Void run(WorkMonitor monitor) {
+		public Void execute(WorkMonitor monitor) {
 			if (satSolver1 == null) {
 				satSolver1 = new SatSolver(node, 1000, false);
 			}

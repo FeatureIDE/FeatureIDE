@@ -46,7 +46,7 @@ public class LongRunningJob<T> extends AStoppableJob implements IStoppableJob {
 
 	public static <T> T runMethod(LongRunningMethod<T> method) {
 		try {
-			return method.run(new WorkMonitor());
+			return method.execute(new WorkMonitor());
 		} catch (Exception e) {
 			FMCorePlugin.getDefault().logError(e);
 			return null;
@@ -55,7 +55,7 @@ public class LongRunningJob<T> extends AStoppableJob implements IStoppableJob {
 
 	public static <T> T runMethod(LongRunningMethod<T> method, WorkMonitor monitor) {
 		try {
-			return method.run(monitor != null ? monitor : new WorkMonitor());
+			return method.execute(monitor != null ? monitor : new WorkMonitor());
 		} catch (Exception e) {
 			FMCorePlugin.getDefault().logError(e);
 			return null;
@@ -68,7 +68,7 @@ public class LongRunningJob<T> extends AStoppableJob implements IStoppableJob {
 	}
 
 	protected boolean work() throws Exception {
-		methodResult = method.run(workMonitor);
+		methodResult = method.execute(workMonitor);
 		return true;
 	}
 

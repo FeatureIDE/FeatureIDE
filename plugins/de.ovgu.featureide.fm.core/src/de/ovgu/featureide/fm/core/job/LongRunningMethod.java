@@ -27,6 +27,6 @@ package de.ovgu.featureide.fm.core.job;
  */
 public interface LongRunningMethod<T> {
 
-	T run(WorkMonitor monitor) throws Exception;
+	T execute(WorkMonitor monitor) throws Exception;
 
 }
