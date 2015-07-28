@@ -24,8 +24,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -61,7 +63,10 @@ import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Or;
-import org.prop4j.SatSolver;
+import org.sat4j.core.VecInt;
+import org.sat4j.minisat.SolverFactory;
+import org.sat4j.specs.ContradictionException;
+import org.sat4j.specs.ISolver;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.core.builder.ComposerExtensionManager;
@@ -795,14 +800,13 @@ public class CorePlugin extends AbstractCorePlugin {
 	private static class DeprecatedFeature implements Comparable<DeprecatedFeature> {
 		private final String feature;
 
-		private int mixedClauseCount;
 		private int positiveCount;
 		private int negativeCount;
-		private int countMarker;
 
 		public DeprecatedFeature(String feature) {
 			this.feature = feature;
-			reset();
+			positiveCount = 0;
+			negativeCount = 0;
 		}
 
 		public String getFeature() {
@@ -814,16 +818,8 @@ public class CorePlugin extends AbstractCorePlugin {
 			return (int) Math.signum(arg0.getClauseCount() - getClauseCount());
 		}
 
-		public double getClauseCount() {
-			return ((double) (positiveCount * negativeCount)) / (mixedClauseCount + 1);
-		}
-
-		public int getCountMarker() {
-			return countMarker;
-		}
-
-		public void setCountMarker(int countMarker) {
-			this.countMarker = countMarker;
+		public int getClauseCount() {
+			return positiveCount * negativeCount;
 		}
 
 		public void incPositive() {
@@ -834,28 +830,12 @@ public class CorePlugin extends AbstractCorePlugin {
 			negativeCount++;
 		}
 
-		public void incCount(boolean mixed) {
-			if (mixed && countMarker > 0) {
-				mixedClauseCount = 1;
-			}
-			switch (countMarker) {
-			case 1:
-				positiveCount++;
-				break;
-			case 2:
-				negativeCount++;
-				break;
-			default:
-				break;
-			}
-			countMarker = 0;
+		public void decPositive() {
+			positiveCount--;
 		}
 
-		public void reset() {
-			mixedClauseCount = 0;
-			positiveCount = 0;
-			negativeCount = 0;
-			countMarker = 0;
+		public void decNegative() {
+			negativeCount--;
 		}
 
 		@Override
@@ -874,35 +854,228 @@ public class CorePlugin extends AbstractCorePlugin {
 		}
 	}
 
+	private static class DeprecatedFeatureMap {
+
+		private final HashMap<String, DeprecatedFeature> map;
+
+		private int globalMixedClauseCount = 0;
+
+		public DeprecatedFeatureMap(Collection<String> features) {
+			map = new HashMap<>(features.size() << 1);
+			for (String curFeature : features) {
+				map.put(curFeature, new DeprecatedFeature(curFeature));
+			}
+		}
+
+		public DeprecatedFeature next() {
+			final Collection<DeprecatedFeature> values = map.values();
+
+			DeprecatedFeature smallestFeature = null;
+			if (!values.isEmpty()) {
+				final Iterator<DeprecatedFeature> it = values.iterator();
+				smallestFeature = it.next();
+				while (it.hasNext()) {
+					final DeprecatedFeature next = it.next();
+					if (next.compareTo(smallestFeature) > 0) {
+						smallestFeature = next;
+					}
+				}
+				return map.remove(smallestFeature.getFeature());
+			}
+			return new DeprecatedFeature(null);
+		}
+
+		public boolean isEmpty() {
+			return map.isEmpty();
+		}
+
+		public DeprecatedFeature get(Object var) {
+			return map.get(var);
+		}
+
+		public int getGlobalMixedClauseCount() {
+			return globalMixedClauseCount;
+		}
+
+		public void incGlobalMixedClauseCount() {
+			globalMixedClauseCount++;
+		}
+
+		public void decGlobalMixedClauseCount() {
+			globalMixedClauseCount--;
+		}
+	}
+
+	private static class Clause {
+
+		private static final class LiteralComparator implements Comparator<Literal> {
+			@Override
+			public int compare(Literal arg0, Literal arg1) {
+				if (arg0.positive == arg1.positive) {
+					return ((String) arg0.var).compareTo((String) arg1.var);
+				} else if (arg0.positive) {
+					return -1;
+				} else {
+					return -1;
+				}
+			}
+		}
+
+		private static final LiteralComparator literalComparator = new LiteralComparator();
+
+		private Literal[] literals;
+		private int relevance;
+
+		public static Clause createClause(DeprecatedFeatureMap map, Literal[] newLiterals, String curFeature) {
+			final HashSet<Literal> literalSet = new HashSet<>(newLiterals.length << 1);
+			for (Literal literal : newLiterals) {
+				if (!curFeature.equals(literal.var)) {
+					final Literal negativeliteral = literal.clone();
+					negativeliteral.flip();
+
+					if (literalSet.contains(negativeliteral)) {
+						return null;
+					} else {
+						literalSet.add(literal);
+					}
+				}
+			}
+
+			final Clause clause = new Clause(literalSet.toArray(new Literal[0]));
+			clause.computeRelevance(map);
+			return clause;
+		}
+
+		public static Clause createClause(DeprecatedFeatureMap map, Literal[] newLiterals) {
+			final HashSet<Literal> literalSet = new HashSet<>(newLiterals.length << 1);
+			for (Literal literal : newLiterals) {
+				final Literal negativeliteral = literal.clone();
+				negativeliteral.flip();
+
+				if (literalSet.contains(negativeliteral)) {
+					return null;
+				} else {
+					literalSet.add(literal);
+				}
+			}
+
+			final Clause clause = new Clause(literalSet.toArray(new Literal[0]));
+			clause.computeRelevance(map);
+			return clause;
+		}
+
+		public static Clause createClause(DeprecatedFeatureMap map, Literal newLiteral) {
+			final Clause clause = new Clause(new Literal[] { newLiteral });
+			final DeprecatedFeature df = map.get(newLiteral.var);
+			if (df != null) {
+				clause.relevance++;
+			}
+			return clause;
+		}
+
+		private Clause(Literal[] literals) {
+			this.literals = literals;
+			Arrays.sort(this.literals, literalComparator);
+			this.relevance = 0;
+		}
+
+		public Literal[] getLiterals() {
+			return literals;
+		}
+
+		private void computeRelevance(DeprecatedFeatureMap map) {
+			for (Literal literal : literals) {
+				final DeprecatedFeature df = map.get(literal.var);
+				if (df != null) {
+					relevance++;
+					if (literal.positive) {
+						df.incPositive();
+					} else {
+						df.incNegative();
+					}
+				}
+			}
+			if (relevance > 0 && relevance < literals.length) {
+				map.incGlobalMixedClauseCount();
+			}
+		}
+
+		public void delete(DeprecatedFeatureMap map) {
+			if (literals != null && literals.length > 1) {
+				for (Literal literal : literals) {
+					final DeprecatedFeature df = map.get(literal.var);
+					if (df != null) {
+						if (literal.positive) {
+							df.decPositive();
+						} else {
+							df.decNegative();
+						}
+					}
+				}
+				if (relevance > 0 && relevance < literals.length) {
+					map.decGlobalMixedClauseCount();
+				}
+				literals = null;
+			}
+		}
+
+		@Override
+		public int hashCode() {
+			return Arrays.hashCode(literals);
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null || getClass() != obj.getClass())
+				return false;
+			return Arrays.equals(literals, ((Clause) obj).literals);
+		}
+
+		@Override
+		public String toString() {
+			return "Clause [literals=" + Arrays.toString(literals) + "]";
+		}
+
+		public int getRelevance() {
+			return relevance;
+		}
+
+	}
+
 	public static Node removeFeatures(FeatureModel fm, Collection<String> features) throws TimeoutException {
 		Node fmNode = NodeCreator.createNodes(fm).toCNF();
 		if (fmNode instanceof And) {
 			final Node[] andChildren = fmNode.getChildren();
 
 			// all clauses that have both kinds of literals (remove AND retain)
-			final List<Or> relevantClauseList = new ArrayList<>(andChildren.length);
+			final List<Clause> relevantClauseList = new ArrayList<>(andChildren.length);
 
 			// list for all new construct clauses
-			final Set<Or> newClauseList = new HashSet<>(andChildren.length);
-			
-			// TODO globalMixedClauseCount
-			//			int globalMixedClauseCount = 0;
+			final Set<Clause> newClauseSet = new HashSet<>(andChildren.length);
+			final Set<Clause> relevantClauseSet = new HashSet<>(relevantClauseList);
+
+			final DeprecatedFeatureMap map = new DeprecatedFeatureMap(features);
 
 			// fill first two lists
 			for (int i = 0; i < andChildren.length; i++) {
 				Node andChild = andChildren[i];
+
+				final Clause curClause;
+
 				if (andChild instanceof Or) {
 					int absoluteValueCount = 0;
-					int relevance = 0;
+					boolean valid = true;
 
-					final Node[] children = andChild.getChildren();
+					final Literal[] children = Arrays.copyOf(andChild.getChildren(), andChild.getChildren().length, Literal[].class);
 					for (int j = 0; j < children.length; j++) {
-						final Literal literal = (Literal) children[j];
+						final Literal literal = children[j];
 
 						// sort out obvious tautologies
 						if (literal.var.equals(NodeCreator.varTrue)) {
 							if (literal.positive) {
-								relevance = -1;
+								valid = false;
 							} else {
 								absoluteValueCount++;
 								children[j] = null;
@@ -912,87 +1085,80 @@ public class CorePlugin extends AbstractCorePlugin {
 								absoluteValueCount++;
 								children[j] = null;
 							} else {
-								relevance = -1;
+								valid = false;
 							}
+						}
+					}
+
+					if (valid) {
+						if (absoluteValueCount > 0) {
+							if (children.length == absoluteValueCount) {
+								throw new RuntimeException("Model is void!");
+							}
+							Literal[] newChildren = new Literal[children.length - absoluteValueCount];
+							int k = 0;
+							for (int j = 0; j < children.length; j++) {
+								final Literal literal = children[j];
+								if (literal != null) {
+									newChildren[k++] = literal;
+								}
+							}
+							curClause = Clause.createClause(map, newChildren);
 						} else {
-							relevance += features.contains(literal.var) ? 1 : 0;
+							curClause = Clause.createClause(map, children);
 						}
-					}
-
-					if (absoluteValueCount > 0) {
-						if (children.length == absoluteValueCount) {
-							throw new RuntimeException("Model is void!");
-						}
-						Node[] newChildren = new Node[children.length - absoluteValueCount];
-						int k = 0;
-						for (int j = 0; j < children.length; j++) {
-							final Node literal = children[j];
-							if (literal != null) {
-								newChildren[k++] = literal;
-							}
-						}
-						andChild = new Or(newChildren);
-					}
-
-					if (relevance > 0) {
-						relevantClauseList.add((Or) andChild);
-						// TODO globalMixedClauseCount
-						//						if (relevance < andChild.getChildren().length) {
-						//							globalMixedClauseCount++;
-						//						}
-					} else if (relevance == 0) {
-						newClauseList.add((Or) andChild);
+					} else {
+						curClause = null;
 					}
 				} else {
 					final Literal literal = (Literal) andChild;
-					if (!features.contains(literal.var)) {
-						if (literal.var.equals(NodeCreator.varTrue)) {
-							if (!literal.positive) {
-								throw new RuntimeException("Model is void!");
-							}
-						} else if (literal.var.equals(NodeCreator.varFalse)) {
-							if (literal.positive) {
-								throw new RuntimeException("Model is void!");
-							}
-						} else {
-							newClauseList.add(new Or(andChild));
+					if (literal.var.equals(NodeCreator.varTrue)) {
+						if (!literal.positive) {
+							throw new RuntimeException("Model is void!");
+						}
+						curClause = null;
+					} else if (literal.var.equals(NodeCreator.varFalse)) {
+						if (literal.positive) {
+							throw new RuntimeException("Model is void!");
+						}
+						curClause = null;
+					} else {
+						curClause = Clause.createClause(map, literal);
+					}
+				}
+
+				if (curClause != null) {
+					if (curClause.getRelevance() == 0) {
+						if (!newClauseSet.add(curClause)) {
+							curClause.delete(map);
 						}
 					} else {
-						relevantClauseList.add(new Or(andChild));
+						if (relevantClauseSet.add(curClause)) {
+							relevantClauseList.add(curClause);
+						} else {
+							curClause.delete(map);
+						}
 					}
 				}
 			}
 
-			final Set<Or> relevantClauseSet = new HashSet<>(relevantClauseList);
-
-			final HashMap<String, DeprecatedFeature> map = new HashMap<>(features.size() << 1);
-			for (String curFeature : features) {
-				map.put(curFeature, new DeprecatedFeature(curFeature));
-			}
-
-			final boolean alwaysUpdate = false;
-			final int threshold = 1;
-
-			final int max = map.size();
-			int count = 0;
 			while (!map.isEmpty()) {
-				final String curFeature = (count++ < threshold || alwaysUpdate) ? next(map, update(map, relevantClauseList)).getFeature() : next(map)
-						.getFeature();
+				final String curFeature = map.next().getFeature();
 				if (curFeature == null) {
 					relevantClauseList.clear();
 					relevantClauseSet.clear();
 					break;
 				}
-				System.out.println(max - count);
+				//	System.out.println(map.size());
 
 				// ... create list of clauses that contain this feature
 				int relevantIndex = 0;
 				final byte[] clauseStates = new byte[relevantClauseList.size()];
 				for (int i = 0; i < relevantClauseList.size(); i++) {
-					final Node clause = relevantClauseList.get(i);
+					final Clause clause = relevantClauseList.get(i);
 
 					Literal curLiteral = null;
-					for (Node clauseChildren : clause.getChildren()) {
+					for (Node clauseChildren : clause.getLiterals()) {
 						final Literal literal = (Literal) clauseChildren;
 						if (literal.var.equals(curFeature)) {
 							if (curLiteral == null) {
@@ -1007,7 +1173,7 @@ public class CorePlugin extends AbstractCorePlugin {
 					}
 				}
 
-				final SatSolver solver = new SatSolver(new And(relevantClauseList.subList(0, relevantIndex).toArray(new Or[0])).clone(), 1000);
+				final CNFSolver solver = new CNFSolver(relevantClauseList.subList(0, relevantIndex));
 
 				// ... combine relevant clauses if possible
 				for (int i = relevantIndex - 1; i >= 0; i--) {
@@ -1025,7 +1191,7 @@ public class CorePlugin extends AbstractCorePlugin {
 						continue;
 					}
 
-					final Node[] orChildren = relevantClauseList.get(i).getChildren();
+					final Literal[] orChildren = relevantClauseList.get(i).getLiterals();
 
 					if (orChildren.length < 2) {
 						continue;
@@ -1036,7 +1202,7 @@ public class CorePlugin extends AbstractCorePlugin {
 					int retainIndex = -1;
 
 					for (int j = 0; j < orChildren.length; j++) {
-						final Literal literal = (Literal) orChildren[j].clone();
+						final Literal literal = orChildren[j].clone();
 						if (literal.var.equals(curFeature)) {
 							literalList[--removeIndex] = literal;
 						} else {
@@ -1053,40 +1219,45 @@ public class CorePlugin extends AbstractCorePlugin {
 							retainedLiteral.flip();
 						}
 
-						final Or newClause = checkValidity(retainLiterals);
+						final Clause newClause = Clause.createClause(map, retainLiterals);
+
 						if (newClause != null) {
-							int relevance = checkRelevance(features, newClause, map);
-							if (relevance == 0) {
-								newClauseList.add(newClause);
-								// TODO globalMixedClauseCount
-								//								globalMixedClauseCount--;
-							} else if (relevantClauseSet.add(newClause)) {
-								relevantClauseList.add(newClause);
+							if (newClause.getRelevance() == 0) {
+								if (!newClauseSet.add(newClause)) {
+									newClause.delete(map);
+								}
+							} else {
+								if (relevantClauseSet.add(newClause)) {
+									relevantClauseList.add(newClause);
+								} else {
+									newClause.delete(map);
+								}
 							}
 						}
+
 						// try to combine with other clauses
 					} else {
 						for (int j = i - 1; j >= 0; j--) {
 							if ((positive && clauseStates[j] == 2) || (!positive && clauseStates[j] == 1)) {
-								final Node[] children2 = relevantClauseList.get(j).getChildren();
+								final Node[] children2 = relevantClauseList.get(j).getLiterals();
 								final Literal[] newChildren = new Literal[orChildren.length + children2.length];
 
 								System.arraycopy(orChildren, 0, newChildren, 0, orChildren.length);
 								System.arraycopy(children2, 0, newChildren, orChildren.length, children2.length);
 
-								final Or newClause = checkValidity(newChildren, curFeature);
+								final Clause newClause = Clause.createClause(map, newChildren, curFeature);
+
 								if (newClause != null) {
-									int relevance = checkRelevance(features, newClause, map);
-									if (relevance == 0) {
-										newClauseList.add(newClause);
-										// TODO globalMixedClauseCount
-										//										globalMixedClauseCount--;
-									} else if (relevantClauseSet.add(newClause)) {
-										relevantClauseList.add(newClause);
-										// TODO globalMixedClauseCount
-										//										if (relevance < newClause.getChildren().length) {
-										//											globalMixedClauseCount++;
-										//										}
+									if (newClause.getRelevance() == 0) {
+										if (!newClauseSet.add(newClause)) {
+											newClause.delete(map);
+										}
+									} else {
+										if (relevantClauseSet.add(newClause)) {
+											relevantClauseList.add(newClause);
+										} else {
+											newClause.delete(map);
+										}
 									}
 								}
 							}
@@ -1094,13 +1265,16 @@ public class CorePlugin extends AbstractCorePlugin {
 					}
 				}
 				solver.reset();
-				final List<Or> subList = relevantClauseList.subList(0, relevantIndex);
+				final List<Clause> subList = relevantClauseList.subList(0, relevantIndex);
 				relevantClauseSet.removeAll(subList);
+				for (Clause clause : subList) {
+					clause.delete(map);
+				}
 				subList.clear();
 				// TODO globalMixedClauseCount
-				//				if (globalMixedClauseCount == 0) {
-				//					break;
-				//				}
+				if (map.getGlobalMixedClauseCount() == 0) {
+					break;
+				}
 			}
 
 			// create clause that contains all retained features
@@ -1114,10 +1288,14 @@ public class CorePlugin extends AbstractCorePlugin {
 			allLiterals[i] = new Literal(NodeCreator.varTrue);
 
 			// create new clauses list
-			final int newClauseSize = newClauseList.size();
+			final int newClauseSize = newClauseSet.size();
 			final Node[] newClauses = new Node[newClauseSize + 3];
 
-			System.arraycopy(newClauseList.toArray(new Node[0]), 0, newClauses, 0, newClauseList.size());
+			int j = 0;
+			for (Clause newClause : newClauseSet) {
+				newClauses[j++] = new Or(newClause.getLiterals());
+			}
+
 			newClauses[newClauseSize] = new Or(allLiterals);
 			newClauses[newClauseSize + 1] = new Literal(NodeCreator.varTrue);
 			newClauses[newClauseSize + 2] = new Literal(NodeCreator.varFalse, false);
@@ -1138,137 +1316,60 @@ public class CorePlugin extends AbstractCorePlugin {
 		}
 	}
 
-	private static int checkRelevance(Collection<String> features, final Or newClause, HashMap<String, DeprecatedFeature> map) {
-		int relevance = 0;
-		for (Node orChild : newClause.getChildren()) {
-			final Literal literal = (Literal) orChild;
-			final DeprecatedFeature df = map.get(literal.var);
-			if (df != null) {
-				relevance++;
-				if (literal.positive) {
-					df.incPositive();
-				} else {
-					df.incNegative();
-				}
-			}
-		}
-		return relevance;
-	}
+	private static class CNFSolver {
 
-	private static Or checkValidity(Literal[] newLiterals) {
-		final HashSet<Literal> literalSet = new HashSet<>(newLiterals.length << 1);
-		for (Literal literal : newLiterals) {
-			final Literal negativliteral = literal.clone();
-			negativliteral.flip();
+		private final HashMap<Object, Integer> varToInt;
+		private final ISolver solver;
 
-			if (literalSet.contains(negativliteral)) {
-				return null;
-			} else {
-				literalSet.add(literal);
-			}
-		}
-		return new Or(literalSet.toArray(new Literal[0]));
-	}
-
-	private static Or checkValidity(Literal[] newLiterals, String curFeature) {
-		final HashSet<Literal> literalSet = new HashSet<>(newLiterals.length << 1);
-		for (Literal literal : newLiterals) {
-			if (!curFeature.equals(literal.var)) {
-				final Literal negativliteral = literal.clone();
-				negativliteral.flip();
-
-				if (literalSet.contains(negativliteral)) {
-					return null;
-				} else {
-					literalSet.add(literal);
-				}
-			}
-		}
-		return new Or(literalSet.toArray(new Literal[0]));
-	}
-
-	private static boolean update(HashMap<String, DeprecatedFeature> map, List<Or> relevantClauseList) {
-		for (DeprecatedFeature df : map.values()) {
-			df.reset();
-		}
-
-		boolean globalMixedClause = false;
-		for (Iterator<Or> iterator = relevantClauseList.iterator(); iterator.hasNext();) {
-			final Or clause = iterator.next();
-			boolean invalidClause = false;
-			boolean mixedClause = false;
-
-			for (Node clauseChildren : clause.getChildren()) {
-				final Literal literal = (Literal) clauseChildren;
-				final DeprecatedFeature df = map.get(literal.var);
-				if (df != null) {
-					switch (df.getCountMarker()) {
-					case 0:
-						df.setCountMarker(literal.positive ? 1 : 2);
-						break;
-					case 1:
-						if (!literal.positive) {
-							invalidClause = true;
-							iterator.remove();
-						}
-						break;
-					case 2:
-						if (literal.positive) {
-							invalidClause = true;
-							iterator.remove();
-						}
-						break;
-					default:
-						break;
-					}
-				} else {
-					mixedClause = true;
-				}
-				if (invalidClause) {
-					break;
-				}
-			}
-
-			if (invalidClause) {
-				for (DeprecatedFeature df : map.values()) {
-					df.setCountMarker(0);
-				}
-			} else {
-				for (DeprecatedFeature df : map.values()) {
-					df.incCount(mixedClause);
-				}
-				if (mixedClause) {
-					globalMixedClause = true;
-				}
-			}
-		}
-
-		return globalMixedClause;
-	}
-
-	private static DeprecatedFeature next(HashMap<String, DeprecatedFeature> map) {
-		return next(map, true);
-	}
-
-	private static DeprecatedFeature next(HashMap<String, DeprecatedFeature> map, boolean globalMixedClause) {
-		if (globalMixedClause) {
-
-			final Collection<DeprecatedFeature> values = map.values();
-
-			DeprecatedFeature smallestFeature = null;
-			if (!values.isEmpty()) {
-				final Iterator<DeprecatedFeature> it = values.iterator();
-				smallestFeature = it.next();
-				while (it.hasNext()) {
-					final DeprecatedFeature next = it.next();
-					if (next.compareTo(smallestFeature) > 0) {
-						smallestFeature = next;
+		public CNFSolver(Collection<Clause> clauses) {
+			varToInt = new HashMap<Object, Integer>();
+			for (Clause clause : clauses) {
+				for (Literal literal : clause.getLiterals()) {
+					final Object var = literal.var;
+					if (!varToInt.containsKey(var)) {
+						int index = varToInt.size() + 1;
+						varToInt.put(var, index);
 					}
 				}
-				return map.remove(smallestFeature.getFeature());
+			}
+
+			solver = SolverFactory.newDefault();
+			solver.setTimeoutMs(1000);
+			solver.newVar(varToInt.size());
+
+			try {
+				for (Clause node : clauses) {
+					final Literal[] literals = node.getLiterals();
+					int[] clause = new int[literals.length];
+					int i = 0;
+					for (Literal child : literals) {
+						clause[i++] = getIntOfLiteral(child);
+					}
+					solver.addClause(new VecInt(clause));
+				}
+			} catch (ContradictionException e) {
+				throw new RuntimeException(e);
 			}
 		}
-		return new DeprecatedFeature(null);
+
+		private int getIntOfLiteral(Literal node) {
+			final int value = varToInt.get(node.var);
+			return node.positive ? value : -value;
+		}
+
+		public boolean isSatisfiable(Literal[] literals) throws TimeoutException {
+			final int[] unitClauses = new int[literals.length];
+			int i = 0;
+			for (Literal literal : literals) {
+				unitClauses[i++] = getIntOfLiteral(literal);
+			}
+			return solver.isSatisfiable(new VecInt(unitClauses));
+		}
+
+		public void reset() {
+			solver.reset();
+		}
+
 	}
 
 }

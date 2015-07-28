@@ -76,9 +76,14 @@ public class Literal extends Node {
 
 	@Override
 	public boolean equals(Object node) {
-		if (!(node instanceof Literal))
+		if (this == node) {
+			return true;
+		}
+		if (!(node instanceof Literal)) {
 			return false;
-		return (var.equals(((Literal) node).var)) && (positive == ((Literal) node).positive);
+		}
+		final Literal other = (Literal) node;
+		return (positive == other.positive) && (var.equals(other.var));
 	}
 
 }
