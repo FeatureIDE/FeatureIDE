@@ -71,7 +71,7 @@ public class ConfChanger2 implements IConfigurationChanger {
 
 	public class UpdateMethod implements LongRunningMethod<List<String>> {
 		@Override
-		public List<String> run(WorkMonitor monitor) {
+		public List<String> execute(WorkMonitor monitor) {
 			if (newValue == Variable.UNDEFINED) {
 				//TODO
 				return Collections.emptyList();

@@ -21,12 +21,13 @@
 package de.ovgu.featureide.fm.core.job;
 
 /**
- * TODO description
+ * Interface for methods that take a long time to finish.</br>
+ * Can be executed as Eclipse job with the wrapper {@link LongRunningJob}.
  * 
  * @author Sebastian Krieter
  */
 public interface LongRunningMethod<T> {
 
-	T run(WorkMonitor monitor) throws Exception;
+	T execute(WorkMonitor monitor) throws Exception;
 
 }
