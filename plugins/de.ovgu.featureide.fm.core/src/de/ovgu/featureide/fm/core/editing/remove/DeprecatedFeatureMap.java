@@ -87,7 +87,7 @@ public class DeprecatedFeatureMap {
 			return feature + ": " + getClauseCount();
 		}
 	}
-	
+
 	private final HashMap<String, DeprecatedFeature> map;
 
 	private int globalMixedClauseCount = 0;
@@ -136,4 +136,9 @@ public class DeprecatedFeatureMap {
 	public void decGlobalMixedClauseCount() {
 		globalMixedClauseCount--;
 	}
+
+	public int size() {
+		return map.size();
+	}
+
 }

@@ -25,6 +25,8 @@ import java.util.Comparator;
 
 import org.prop4j.Literal;
 
+import de.ovgu.featureide.fm.core.editing.NodeCreator;
+
 /**
  * Clause of a CNF.
  * 
@@ -36,7 +38,15 @@ public class Clause {
 		@Override
 		public int compare(Literal arg0, Literal arg1) {
 			if (arg0.positive == arg1.positive) {
-				return ((String) arg0.var).compareTo((String) arg1.var);
+				if (arg0.var == arg1.var) {
+					return 0;
+				} else if (arg0.var == NodeCreator.varTrue || arg0.var == NodeCreator.varFalse) {
+					return (arg0.var == NodeCreator.varTrue || arg1.var != NodeCreator.varTrue) ? -1 : 1;
+				} else if (arg1.var == NodeCreator.varTrue || arg1.var == NodeCreator.varFalse) {
+					return 1;
+				} else {
+					return ((String) arg0.var).compareTo((String) arg1.var);
+				}
 			} else if (arg0.positive) {
 				return -1;
 			} else {
@@ -49,7 +59,7 @@ public class Clause {
 
 	protected Literal[] literals;
 
-	public Clause(Literal[] literals) {
+	public Clause(Literal... literals) {
 		this.literals = literals;
 		Arrays.sort(this.literals, literalComparator);
 	}

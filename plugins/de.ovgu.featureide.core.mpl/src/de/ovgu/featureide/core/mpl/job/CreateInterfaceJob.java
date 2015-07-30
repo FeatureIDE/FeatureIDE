@@ -43,7 +43,7 @@ import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.editing.CNFNodeCreator;
 import de.ovgu.featureide.fm.core.editing.cnf.UnkownLiteralException;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
@@ -183,7 +183,7 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 		if (cnf instanceof And) {
 			final Node[] children = cnf.getChildren();
 			workMonitor.setMaxAbsoluteWork(children.length + 2);
-			final SatSolver modelSatSolver = new SatSolver(NodeCreator.createNodes(m), 1000);
+			final SatSolver modelSatSolver = new SatSolver(new CNFNodeCreator().createNodes(m), 1000);
 			workMonitor.worked();
 			for (int i = 0; i < children.length; i++) {
 				final Node child = children[i];

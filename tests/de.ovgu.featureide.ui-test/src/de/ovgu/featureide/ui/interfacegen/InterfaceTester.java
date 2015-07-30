@@ -87,7 +87,6 @@ public class InterfaceTester {
 			final double[] removeFactors = { 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9 };
 
 			long currentTimeMillis = System.currentTimeMillis();
-			//			currentTimeMillis = 1438037342537L;
 			final Random rand = new Random(currentTimeMillis);
 			System.out.println("First Random Seed: " + currentTimeMillis);
 

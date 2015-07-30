@@ -35,6 +35,7 @@ import org.prop4j.Or;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.editing.CNFNodeCreator;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.editing.cnf.CNFSolver;
 import de.ovgu.featureide.fm.core.editing.cnf.Clause;
@@ -48,7 +49,7 @@ import de.ovgu.featureide.fm.core.job.WorkMonitor;
  * @author Sebastian Krieter
  */
 public class FeatureRemover implements LongRunningMethod<Node> {
-	
+
 	private final FeatureModel fm;
 
 	private final Collection<String> features;
@@ -69,7 +70,7 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 
 	public Node execute(WorkMonitor workMonitor) throws TimeoutException, UnkownLiteralException {
 		workMonitor.setMaxAbsoluteWork(features.size() + 3);
-		Node fmNode = NodeCreator.createNodes(fm).toCNF();
+		final Node fmNode = new CNFNodeCreator().createNodes(fm);
 		workMonitor.worked();
 		if (fmNode instanceof And) {
 			final Node[] andChildren = fmNode.getChildren();
@@ -288,7 +289,7 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 			newClauses[newClauseSize + 2] = new Literal(NodeCreator.varFalse, false);
 
 			fmNode.setChildren(newClauses);
-			
+
 			workMonitor.worked();
 
 			return fmNode;
