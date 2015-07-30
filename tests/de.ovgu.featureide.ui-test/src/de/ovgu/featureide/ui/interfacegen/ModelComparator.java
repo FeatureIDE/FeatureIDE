@@ -40,7 +40,7 @@ public abstract class ModelComparator {
 			}
 			if (solver.isSatisfiable(literals)) {
 				System.out.println("\nFail!.");
-				fail();
+//				fail();
 				return false;
 			}
 		} else {

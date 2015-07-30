@@ -20,19 +20,19 @@
  */
 package de.ovgu.featureide.ui.interfacegen;
 
-import static org.junit.Assert.fail;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Scanner;
 import java.util.Set;
 
 import org.junit.Test;
@@ -52,21 +52,132 @@ import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 
 /**
- * @author Reimar SchrÃ¶ter
+ * @author Reimar Schröter
  * @author Sebastian Krieter
  */
 public class InterfaceCompositionTester {
 
-	private static final List<String> ROOT_FEATURES_LIST = new ArrayList<String>();
+	//Input
+	private String subModelDir = "";
+	private List<String> rootFeatures = null;
+	private String modelPath = "";
+	private String outputPath = "";
+	private static boolean FORCE_RECOMPUTATION = false;
 
-	private static String SUB_MODEL_DIR = "subModels\\";
-	private static String FEATURE_LIST = "";
-	private static String MODEL_PATH = "";
-	private static String OUTPUT_PATH = "";
+	//Intermediate result
+	private FeatureModel completeModel;
 
-	private static InterfaceCompositionTester singelton = null;
+	//Result
+	private List<FeatureModel> subModels;
+	private List<FeatureModel> interfacesOfSubModels;
+	private FeatureModel newCompleteModel_usingSubModels;
+	private FeatureModel newCompleteModel_directInterface;
 
-	private static FeatureModel createInterface(final FeatureModel subModel, final Collection<String> includeFeatures) {
+	public static void main(final String[] args) throws FileNotFoundException, UnsupportedModelException {
+		FORCE_RECOMPUTATION = new Boolean(args[2]).booleanValue();
+		
+		List<InterfaceCompositionTester> allVersions = new ArrayList<InterfaceCompositionTester>();
+		String[] paths = args[1].split(";");
+		for (String path : paths) {
+			List<String> features = null;
+			try {
+				features = Files.readAllLines(new File(path + "roots.txt").toPath(), Charset.defaultCharset());
+				if (features.get(0).startsWith("#")) {
+					features.remove(0);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			final InterfaceCompositionTester tester = new InterfaceCompositionTester(args[0], features, path + "model.xml", path);
+
+			allVersions.add(tester);
+
+		}
+
+		Iterator<InterfaceCompositionTester> it = allVersions.iterator();
+
+		HashMap<String, String[]> root_intefaceS = new HashMap<>();
+		HashMap<String, String[]> root_org = new HashMap<>();
+
+		int round = 0;
+		if (it.hasNext()) {
+			InterfaceCompositionTester compareVersion = it.next();
+			while (it.hasNext()) {
+				InterfaceCompositionTester newVersion = it.next();
+
+				//compare
+				for (String root : compareVersion.rootFeatures) {
+
+					if (!root_intefaceS.containsKey(root)) {
+						root_intefaceS.put(root, new String[allVersions.size()]);
+						root_intefaceS.get(root)[allVersions.size() - 1] = "Interface: " + root;
+
+						root_org.put(root, new String[allVersions.size()]);
+						root_org.get(root)[allVersions.size() - 1] = "Org:" + root;
+					}
+
+					int id = compareVersion.rootFeatures.indexOf(root);
+					FeatureModel compareInterfaceModel = compareVersion.interfacesOfSubModels.get(id);
+					FeatureModel compareOrgModel = compareVersion.subModels.get(id);
+
+					if (newVersion.rootFeatures.contains(root)) {
+						FeatureModel newInterface = newVersion.interfacesOfSubModels.get(newVersion.rootFeatures.indexOf(root));
+						FeatureModel newOrg = newVersion.subModels.get(newVersion.rootFeatures.indexOf(root));
+
+						boolean resOrg = compareModels(compareOrgModel, newOrg);
+						boolean res = compareModels(compareInterfaceModel, newInterface);
+
+						root_intefaceS.get(root)[round] = new Boolean(res).toString() + " (" + newInterface.getFeatureNames().size() + ")";
+						root_org.get(root)[round] = new Boolean(resOrg).toString() + " (" + newOrg.getFeatureNames().size() + ")";
+
+					} else {
+						root_intefaceS.get(root)[round] = "nicht drin";
+					}
+				}
+				round++;
+
+				compareVersion = newVersion;
+			}
+
+			for (String root : root_intefaceS.keySet()) {
+				System.out.println(Arrays.toString(root_intefaceS.get(root)));
+				System.out.println(Arrays.toString(root_org.get(root)));
+			}
+		}
+	}
+
+	public InterfaceCompositionTester(String subModelDir, List<String> features, String modelPath, String outputPath) {
+		this.subModelDir = subModelDir;
+		this.rootFeatures = features;
+		this.modelPath = modelPath;
+		this.outputPath = outputPath;
+
+		try {
+			createNewModelUsingSubModels();
+		} catch (FileNotFoundException | UnsupportedModelException e) {
+			e.printStackTrace();
+		}
+		createOrGet_InterfaceOfCompleteModel(completeModel);
+	}
+
+	private FeatureModel createOrLoadInterface(final FeatureModel subModel, final Collection<String> includeFeatures) {
+
+		FeatureModel interfaceModel;
+
+		if (!FORCE_RECOMPUTATION && new File(outputPath + subModelDir + "interface_" + subModel.getRoot().getName() + ".xml").exists()) {
+			interfaceModel = new FeatureModel();
+			try {
+				new XmlFeatureModelReader(interfaceModel)
+						.readFromFile(new File(outputPath + subModelDir + "interface_" + subModel.getRoot().getName() + ".xml"));
+				return interfaceModel;
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (UnsupportedModelException e) {
+				e.printStackTrace();
+			}
+		}
+
 		final CreateInterfaceJob job = (CreateInterfaceJob) new CreateInterfaceJob.Arguments(null, subModel, includeFeatures).createJob();
 
 		job.addJobFinishedListener(new JobFinishListener() {
@@ -90,49 +201,23 @@ public class InterfaceCompositionTester {
 		return job.getInterfaceModel();
 	}
 
-	private synchronized static InterfaceCompositionTester getInstance() {
-		if (singelton == null) {
-			singelton = new InterfaceCompositionTester();
+	public void compareResultingModels() {
+		FeatureModel newCompleteModel = new FeatureModel();
+		FeatureModel newCompleteModel2 = new FeatureModel();
+
+		try {
+			new XmlFeatureModelReader(newCompleteModel).readFromFile(new File(outputPath + "//newmodel.xml"));
+			new XmlFeatureModelReader(newCompleteModel2).readFromFile(new File(outputPath + "//newmodel2.xml"));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (UnsupportedModelException e) {
+			e.printStackTrace();
 		}
-		return singelton;
+
+		compareModels(newCompleteModel, newCompleteModel2);
 	}
 
-	public static void main(final String[] args) throws FileNotFoundException, UnsupportedModelException {
-		SUB_MODEL_DIR = args[0];
-		FEATURE_LIST = args[1];
-		MODEL_PATH = args[2];
-		OUTPUT_PATH = args[3];
-		boolean recompute = new Boolean(args[4]).booleanValue();
-
-		final InterfaceCompositionTester tester = InterfaceCompositionTester.getInstance();
-
-		if (recompute) {
-			tester.test();
-		} else {
-
-			FeatureModel newCompleteModel = new FeatureModel();
-			FeatureModel newCompleteModel2 = new FeatureModel();
-
-			new XmlFeatureModelReader(newCompleteModel).readFromFile(new File(OUTPUT_PATH + "//newmodel.xml"));
-
-			new XmlFeatureModelReader(newCompleteModel2).readFromFile(new File(OUTPUT_PATH + "//newmodel33.xml"));
-
-			tester.compareFeatureSetsOfModels(newCompleteModel, newCompleteModel2);
-			tester.compareFeatureSetsOfModels(newCompleteModel2, newCompleteModel);
-
-			tester.compareModels(newCompleteModel, newCompleteModel2);
-		}
-	}
-
-	private void compareFeatureSetsOfModels(FeatureModel newCompleteModel, FeatureModel newCompleteModel2) {
-		for (String featureName : newCompleteModel.getFeatureNames()) {
-			if (newCompleteModel2.getFeature(featureName) == null) {
-				fail(featureName);
-			}
-		}
-	}
-
-	private static void output(final String path, FeatureModel newSubModel, Collection<String> includedFeatures, int crossModelConstraintSize, String name) {
+	private static void writeModel(final String path, FeatureModel newSubModel, Collection<String> includedFeatures, int crossModelConstraintSize, String name) {
 		final File newFolder = new File(path);
 		if (!newFolder.exists()) {
 			newFolder.mkdir();
@@ -173,7 +258,7 @@ public class InterfaceCompositionTester {
 
 	private final Set<Constraint> internConstraintsOfAllModels = new HashSet<Constraint>();
 
-	private Feature cloneRec(Feature old, FeatureModel newModel, List<FeatureModel> interfaces, List<String> rootFeatures) {
+	private Feature cloneFeatureModelRec(Feature old, FeatureModel newModel, List<FeatureModel> interfaces, List<String> rootFeatures) {
 		final Feature newRoot = new Feature(old, newModel);
 		newModel.addFeature(newRoot);
 
@@ -183,14 +268,14 @@ public class InterfaceCompositionTester {
 			if (!rootFeatures.contains(child.getName())) {
 				thisChild = newRoot.getFeatureModel().getFeature(child.getName());
 				if (thisChild == null) {
-					thisChild = cloneRec(old.getFeatureModel().getFeature(child.getName()), newModel, interfaces, rootFeatures);
+					thisChild = cloneFeatureModelRec(old.getFeatureModel().getFeature(child.getName()), newModel, interfaces, rootFeatures);
 					newRoot.getFeatureModel().addFeature(thisChild);
 				}
 			} else {
 				thisChild = newRoot.getFeatureModel().getFeature(child.getName());
 				if (thisChild == null) {
 					FeatureModel model = interfaces.get(rootFeatures.indexOf(child.getName()));
-					thisChild = cloneRec(model.getFeature(child.getName()), newModel, interfaces, rootFeatures);
+					thisChild = cloneFeatureModelRec(model.getFeature(child.getName()), newModel, interfaces, rootFeatures);
 					newRoot.getFeatureModel().addFeature(thisChild);
 				}
 			}
@@ -205,7 +290,7 @@ public class InterfaceCompositionTester {
 		final FeatureModel newModel = new FeatureModel();
 
 		if (completeModel.getRoot() != null) {
-			final Feature newRoot = cloneRec(completeModel.getRoot(), newModel, interfaces, rootFeatures);
+			final Feature newRoot = cloneFeatureModelRec(completeModel.getRoot(), newModel, interfaces, rootFeatures);
 			newModel.setRoot(newRoot);
 
 			for (final Constraint constraint : completeModel.getConstraints()) {
@@ -219,62 +304,94 @@ public class InterfaceCompositionTester {
 	}
 
 	@Test
-	public void test() throws FileNotFoundException, UnsupportedModelException {
-		final FeatureModel completeModel = new FeatureModel();
-		new XmlFeatureModelReader(completeModel).readFromFile(new File(MODEL_PATH));
+	public void createNewModelUsingSubModels() throws FileNotFoundException, UnsupportedModelException {
+		if (FORCE_RECOMPUTATION) {
+			completeModel = new FeatureModel();
+			new XmlFeatureModelReader(completeModel).readFromFile(new File(modelPath));
 
-		final List<FeatureModel> subModels = new ArrayList<>();
-		final List<Set<String>> selectedFeatures = new ArrayList<>();
-		writeModelTest(subModels, selectedFeatures, completeModel, FEATURE_LIST, ROOT_FEATURES_LIST);
+			subModels = new ArrayList<FeatureModel>();
+			final List<Set<String>> selectedFeatures = new ArrayList<Set<String>>();
+			createOrLoadSubModels(subModels, selectedFeatures, completeModel, rootFeatures);
 
-		final List<FeatureModel> interfaces = new ArrayList<>(subModels.size());
+			interfacesOfSubModels = new ArrayList<>(subModels.size());
 
-		long startTime = System.nanoTime();
-		long curTime = startTime;
+			long startTime = System.nanoTime();
+			long curTime = startTime;
 
-		int i = selectedFeatures.size();
-		final Iterator<FeatureModel> modelIterator = subModels.iterator();
-		final Iterator<Set<String>> featureSetIterator = selectedFeatures.iterator();
-		final Set<String> allFeatures = new HashSet<String>();
-		while (modelIterator.hasNext()) {
-			final FeatureModel subModel = modelIterator.next();
-			final Set<String> featureSet = featureSetIterator.next();
+			int i = selectedFeatures.size();
+			final Iterator<FeatureModel> modelIterator = subModels.iterator();
+			final Iterator<Set<String>> featureSetIterator = selectedFeatures.iterator();
+			//			final Set<String> allFeatures = new HashSet<String>();
+			while (modelIterator.hasNext()) {
+				final FeatureModel subModel = modelIterator.next();
+				final Set<String> featureSet = featureSetIterator.next();
 
-			System.out.print(i-- + ": " + subModel.getRoot().getName() + " (" + featureSet.size() + "/" + subModel.getFeatures().size() + ")");
+				System.out.print(i-- + ": " + subModel.getRoot().getName() + " (" + featureSet.size() + "/" + subModel.getFeatures().size() + ")");
 
-			FeatureModel model  = createInterface(subModel, featureSet);
-			interfaces.add(model);
-			
-			new XmlFeatureModelWriter(model).writeToFile(new File(OUTPUT_PATH + SUB_MODEL_DIR + "interface_"+subModel.getRoot().getName()+".xml"));
+				FeatureModel model = createOrLoadInterface(subModel, featureSet);
+				interfacesOfSubModels.add(model);
 
-			allFeatures.addAll(featureSet);
+				new XmlFeatureModelWriter(model).writeToFile(new File(outputPath + subModelDir + "interface_" + subModel.getRoot().getName() + ".xml"));
 
-			curTime = split(curTime);
+				//				allFeatures.addAll(featureSet);
+
+				curTime = split(curTime);
+			}
+			System.out.println();
+			System.out.println("Global Time:");
+			split(startTime);
+
+			System.out.print("DeepCopy...");
+			newCompleteModel_usingSubModels = createDeepCopyUsingInterfaces(completeModel, interfacesOfSubModels, rootFeatures);
+			System.out.println(" > Old model: " + completeModel.getFeatures().size() + " new model has " + newCompleteModel_usingSubModels.getFeatures().size()
+					+ " features.");
+
+			System.out.print("Writing complete model...");
+			new XmlFeatureModelWriter(newCompleteModel_usingSubModels).writeToFile(new File(outputPath + "newmodel.xml"));
+			System.out.println(" > Done!");
+		} else {
+			completeModel = new FeatureModel();
+			new XmlFeatureModelReader(completeModel).readFromFile(new File(modelPath));
+
+			subModels = new ArrayList<FeatureModel>();
+			createOrLoadSubModels(subModels, null, completeModel, rootFeatures);
+
+			interfacesOfSubModels = new ArrayList<>(subModels.size());
+
+			final Iterator<FeatureModel> modelIterator = subModels.iterator();
+			while (modelIterator.hasNext()) {
+				final FeatureModel subModel = modelIterator.next();
+				FeatureModel model = createOrLoadInterface(subModel, null);
+				interfacesOfSubModels.add(model);
+			}
+
+			newCompleteModel_usingSubModels = new FeatureModel();
+			new XmlFeatureModelReader(newCompleteModel_usingSubModels).readFromFile(new File(outputPath + "newmodel.xml"));
 		}
-		System.out.println();
-		System.out.println("Global Time:");
-		split(startTime);
+	}
 
-		System.out.print("DeepCopy...");
-		final FeatureModel newCompleteModel = createDeepCopyUsingInterfaces(completeModel, interfaces, ROOT_FEATURES_LIST);
-		System.out.println(" > Old model: " + completeModel.getFeatures().size() + " new model has " + newCompleteModel.getFeatures().size() + " features.");
+	private void createOrGet_InterfaceOfCompleteModel(final FeatureModel completeModel) {
+		if (!FORCE_RECOMPUTATION) {
+			newCompleteModel_directInterface = new FeatureModel();
 
-		System.out.print("Writing complete model...");
-		new XmlFeatureModelWriter(newCompleteModel).writeToFile(new File(OUTPUT_PATH + "newmodel.xml"));
-		System.out.println(" > Done!");
+			try {
+				new XmlFeatureModelReader(newCompleteModel_directInterface).readFromFile(new File(outputPath + "newmodel2.xml"));
+				return;
+			} catch (FileNotFoundException | UnsupportedModelException e) {
+				e.printStackTrace();
+			}
+		}
 
 		System.out.print("Creating complete model 2 ...");
-		final FeatureModel newCompleteModel2 = createInterface(completeModel, newCompleteModel.getFeatureNames());
+		newCompleteModel_directInterface = createOrLoadInterface(completeModel, newCompleteModel_usingSubModels.getFeatureNames());
 		System.out.println(" > Done!");
 
 		System.out.print("Writing complete model 2 ...");
-		new XmlFeatureModelWriter(newCompleteModel2).writeToFile(new File(OUTPUT_PATH + "newmodel2.xml"));
+		new XmlFeatureModelWriter(newCompleteModel_directInterface).writeToFile(new File(outputPath + "newmodel2.xml"));
 		System.out.println(" > Done!");
-
-		compareModels(newCompleteModel, newCompleteModel2);
 	}
 
-	private void compareModels(final FeatureModel newCompleteModel, final FeatureModel newCompleteModel2) {
+	private static boolean compareModels(final FeatureModel newCompleteModel, final FeatureModel newCompleteModel2) {
 		System.out.print("Creating node for model 1 ...");
 		Node cnf1 = NodeCreator.createNodes(newCompleteModel).toCNF();
 		System.out.println(" > Done!");
@@ -286,89 +403,71 @@ public class InterfaceCompositionTester {
 		System.out.print("Comparing both model ...");
 		try {
 			if (ModelComparator.eq(cnf1, cnf2)) {
+
 				System.out.println(" > True!");
+				return true;
 			} else {
 				System.out.println(" > False!");
+				return false;
 			}
 		} catch (TimeoutException e) {
 			System.out.println(" > Timeout!");
 		}
+		return false;
 	}
 
-	@Test
-	public void testCreateInterfacesSub() {
-		for (final String rootFeature : FEATURE_LIST.split(";")) {
-			final File modelFile = new File(OUTPUT_PATH + SUB_MODEL_DIR + rootFeature + ".xml");
-			final FeatureModel complete = new FeatureModel();
-			try {
-				new XmlFeatureModelReader(complete).readFromFile(modelFile);
-
-				try (Scanner sc = new Scanner(new File(OUTPUT_PATH + SUB_MODEL_DIR + rootFeature + "_include.txt"))) {
-					if (sc.hasNext()) {
-						final String[] ar = sc.nextLine().split(";");
-
-						final List<String> nfeatures = Arrays.asList(ar);
-
-						final List<String> features = new ArrayList<String>(complete.getFeatureNames());
-						for (final String string : nfeatures) {
-							features.remove(string);
-						}
-
-						if (nfeatures.size() > 1) {
-							FeatureModel newfm = createInterface(complete, nfeatures);
-
-							new XmlFeatureModelWriter(newfm).writeToFile(new File(OUTPUT_PATH + SUB_MODEL_DIR + rootFeature + "_interface.xml"));
-
-							System.out.println(newfm);
-						}
-					}
-				}
-			} catch (final Exception e) {
-				e.printStackTrace();
-			}
-		}
-		System.out.println("\nDone!.");
-	}
-
-	private void writeModelTest(List<FeatureModel> subModels, List<Set<String>> selectedFeatures, FeatureModel model, String rootFeatureNames,
-			List<String> rootFeatures) {
+	private void createOrLoadSubModels(List<FeatureModel> subModels, List<Set<String>> selectedFeatures, FeatureModel model, List<String> rootFeatureNames) {
 		internConstraintsOfAllModels.clear();
 
-		for (final String rootFeature : rootFeatureNames.split(";")) {
+		List<String> names = new ArrayList<>(rootFeatureNames);
+		for (final String rootFeature : names) {
 			Feature root = model.getFeature(rootFeature);
 
 			if (root == null) {
 				for (final Feature feature : model.getFeatures()) {
 					if (feature.getName().endsWith(rootFeature)) {
 						root = feature;
-
+						rootFeatureNames.set(rootFeatureNames.indexOf(rootFeature), root.getName());
 						System.out.println("otherRoot");
 					}
 				}
 			}
 
 			if (root != null) {
-				rootFeatures.add(root.getName());
-				final FeatureModel newSubModel = new FeatureModel(model, root, false);
 
-				final Set<String> includeFeatures = new HashSet<>();
-				includeFeatures.add(root.getName());
+				FeatureModel newSubModel;
 
-				final HashSet<Constraint> crossModelConstraints = new HashSet<>(model.getConstraints());
-				crossModelConstraints.removeAll(newSubModel.getConstraints());
-				for (final Constraint constr : crossModelConstraints) {
-					for (Feature feature : constr.getContainedFeatures()) {
-						includeFeatures.add(feature.getName());
+				if (!FORCE_RECOMPUTATION && new File(outputPath + subModelDir + rootFeature + ".xml").exists()) {
+					newSubModel = new FeatureModel();
+					try {
+						new XmlFeatureModelReader(newSubModel).readFromFile(new File(outputPath + subModelDir + rootFeature + ".xml"));
+					} catch (FileNotFoundException e) {
+						e.printStackTrace();
+					} catch (UnsupportedModelException e) {
+						e.printStackTrace();
 					}
+				} else {
+
+					newSubModel = new FeatureModel(model, root, false);
+					final Set<String> includeFeatures = new HashSet<>();
+					includeFeatures.add(root.getName());
+
+					final HashSet<Constraint> crossModelConstraints = new HashSet<>(model.getConstraints());
+					crossModelConstraints.removeAll(newSubModel.getConstraints());
+					for (final Constraint constr : crossModelConstraints) {
+						for (Feature feature : constr.getContainedFeatures()) {
+							includeFeatures.add(feature.getName());
+						}
+					}
+					includeFeatures.retainAll(newSubModel.getFeatureNames());
+
+					internConstraintsOfAllModels.addAll(newSubModel.getConstraints());
+
+					writeModel(outputPath + subModelDir, newSubModel, includeFeatures, crossModelConstraints.size(), rootFeature);
+
+					selectedFeatures.add(includeFeatures);
 				}
-				includeFeatures.retainAll(newSubModel.getFeatureNames());
-
-				internConstraintsOfAllModels.addAll(newSubModel.getConstraints());
-
-				output(OUTPUT_PATH + SUB_MODEL_DIR, newSubModel, includeFeatures, crossModelConstraints.size(), rootFeature);
-
 				subModels.add(newSubModel);
-				selectedFeatures.add(includeFeatures);
 			}
 		}
 	}
