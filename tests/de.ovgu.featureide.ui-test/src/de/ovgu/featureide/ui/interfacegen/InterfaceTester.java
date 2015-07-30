@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.ui.interfacegen;
 
+import static org.junit.Assert.fail;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
@@ -34,6 +36,7 @@ import org.prop4j.Node;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.editing.cnf.ModelComparator;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 
@@ -126,10 +129,16 @@ public class InterfaceTester {
 
 						if (verbose)
 							System.out.println("\tCompare 1 with 2...");
-						ModelComparator.compare(fmNode2, fmNode1);
+						if (!ModelComparator.compare(fmNode2, fmNode1)) {
+							System.out.println("\tFalse!");
+							fail();
+						}
 						if (verbose)
 							System.out.println("\tCompare 2 with 1...");
-						ModelComparator.compare(fmNode1, fmNode2);
+						if (!ModelComparator.compare(fmNode1, fmNode2)) {
+							System.out.println("\tFalse!");
+							fail();
+						}
 
 						if (verbose)
 							System.out.println("\tTrue!");

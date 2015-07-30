@@ -44,6 +44,7 @@ import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.editing.cnf.UnkownLiteralException;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
@@ -112,14 +113,14 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 				interfaceFile.setContents(interfaceContentStream, true, false, null);
 				interfaceContentStream.close();
 			}
-		} catch (CoreException | IOException | TimeoutException e) {
+		} catch (CoreException | IOException | TimeoutException | UnkownLiteralException e) {
 			MPLPlugin.getDefault().logError(e);
 		}
 		MPLPlugin.getDefault().logInfo("Created Interface.");
 		return true;
 	}
 
-	private FeatureModel createInterface(FeatureModel orgFeatureModel, Collection<String> selectedFeatureNames) throws TimeoutException {
+	private FeatureModel createInterface(FeatureModel orgFeatureModel, Collection<String> selectedFeatureNames) throws TimeoutException, UnkownLiteralException {
 		// Calculate Constraints
 		FeatureModel m = orgFeatureModel.deepClone(false);
 		for (Feature feat : m.getFeatures()) {
@@ -182,7 +183,7 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 		if (cnf instanceof And) {
 			final Node[] children = cnf.getChildren();
 			workMonitor.setMaxAbsoluteWork(children.length + 2);
-			final SatSolver modelSatSolver = new SatSolver(new And(NodeCreator.createNodes(m)), 1000);
+			final SatSolver modelSatSolver = new SatSolver(NodeCreator.createNodes(m), 1000);
 			workMonitor.worked();
 			for (int i = 0; i < children.length; i++) {
 				final Node child = children[i];

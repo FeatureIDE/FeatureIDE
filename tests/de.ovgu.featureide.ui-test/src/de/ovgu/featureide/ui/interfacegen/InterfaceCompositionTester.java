@@ -45,6 +45,7 @@ import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.editing.cnf.ModelComparator;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
@@ -75,7 +76,7 @@ public class InterfaceCompositionTester {
 
 	public static void main(final String[] args) throws FileNotFoundException, UnsupportedModelException {
 		FORCE_RECOMPUTATION = new Boolean(args[2]).booleanValue();
-		
+
 		List<InterfaceCompositionTester> allVersions = new ArrayList<InterfaceCompositionTester>();
 		String[] paths = args[1].split(";");
 		for (String path : paths) {
@@ -321,7 +322,7 @@ public class InterfaceCompositionTester {
 			int i = selectedFeatures.size();
 			final Iterator<FeatureModel> modelIterator = subModels.iterator();
 			final Iterator<Set<String>> featureSetIterator = selectedFeatures.iterator();
-			//			final Set<String> allFeatures = new HashSet<String>();
+
 			while (modelIterator.hasNext()) {
 				final FeatureModel subModel = modelIterator.next();
 				final Set<String> featureSet = featureSetIterator.next();
@@ -332,8 +333,6 @@ public class InterfaceCompositionTester {
 				interfacesOfSubModels.add(model);
 
 				new XmlFeatureModelWriter(model).writeToFile(new File(outputPath + subModelDir + "interface_" + subModel.getRoot().getName() + ".xml"));
-
-				//				allFeatures.addAll(featureSet);
 
 				curTime = split(curTime);
 			}
@@ -403,7 +402,6 @@ public class InterfaceCompositionTester {
 		System.out.print("Comparing both model ...");
 		try {
 			if (ModelComparator.eq(cnf1, cnf2)) {
-
 				System.out.println(" > True!");
 				return true;
 			} else {

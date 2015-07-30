@@ -18,16 +18,13 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.editing;
+package de.ovgu.featureide.fm.core.editing.remove;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -35,13 +32,13 @@ import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Or;
-import org.sat4j.core.VecInt;
-import org.sat4j.minisat.SolverFactory;
-import org.sat4j.specs.ContradictionException;
-import org.sat4j.specs.ISolver;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.editing.cnf.CNFSolver;
+import de.ovgu.featureide.fm.core.editing.cnf.Clause;
+import de.ovgu.featureide.fm.core.editing.cnf.UnkownLiteralException;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.WorkMonitor;
 
@@ -51,320 +48,17 @@ import de.ovgu.featureide.fm.core.job.WorkMonitor;
  * @author Sebastian Krieter
  */
 public class FeatureRemover implements LongRunningMethod<Node> {
-
-	private static class DeprecatedFeature implements Comparable<DeprecatedFeature> {
-		private final String feature;
-
-		private int positiveCount;
-		private int negativeCount;
-
-		public DeprecatedFeature(String feature) {
-			this.feature = feature;
-			positiveCount = 0;
-			negativeCount = 0;
-		}
-
-		public String getFeature() {
-			return feature;
-		}
-
-		@Override
-		public int compareTo(DeprecatedFeature arg0) {
-			return (int) Math.signum(arg0.getClauseCount() - getClauseCount());
-		}
-
-		public int getClauseCount() {
-			return positiveCount * negativeCount;
-		}
-
-		public void incPositive() {
-			positiveCount++;
-		}
-
-		public void incNegative() {
-			negativeCount++;
-		}
-
-		public void decPositive() {
-			positiveCount--;
-		}
-
-		public void decNegative() {
-			negativeCount--;
-		}
-
-		@Override
-		public boolean equals(Object arg0) {
-			return (arg0 instanceof DeprecatedFeature) && feature.equals(((DeprecatedFeature) arg0).feature);
-		}
-
-		@Override
-		public int hashCode() {
-			return feature.hashCode();
-		}
-
-		@Override
-		public String toString() {
-			return feature + ": " + getClauseCount();
-		}
-	}
-
-	private static class DeprecatedFeatureMap {
-
-		private final HashMap<String, DeprecatedFeature> map;
-
-		private int globalMixedClauseCount = 0;
-
-		public DeprecatedFeatureMap(Collection<String> features) {
-			map = new HashMap<>(features.size() << 1);
-			for (String curFeature : features) {
-				map.put(curFeature, new DeprecatedFeature(curFeature));
-			}
-		}
-
-		public DeprecatedFeature next() {
-			final Collection<DeprecatedFeature> values = map.values();
-
-			DeprecatedFeature smallestFeature = null;
-			if (!values.isEmpty()) {
-				final Iterator<DeprecatedFeature> it = values.iterator();
-				smallestFeature = it.next();
-				while (it.hasNext()) {
-					final DeprecatedFeature next = it.next();
-					if (next.compareTo(smallestFeature) > 0) {
-						smallestFeature = next;
-					}
-				}
-				return map.remove(smallestFeature.getFeature());
-			}
-			return new DeprecatedFeature(null);
-		}
-
-		public boolean isEmpty() {
-			return map.isEmpty();
-		}
-
-		public DeprecatedFeature get(Object var) {
-			return map.get(var);
-		}
-
-		public int getGlobalMixedClauseCount() {
-			return globalMixedClauseCount;
-		}
-
-		public void incGlobalMixedClauseCount() {
-			globalMixedClauseCount++;
-		}
-
-		public void decGlobalMixedClauseCount() {
-			globalMixedClauseCount--;
-		}
-	}
-
-	private static class Clause {
-
-		private static final class LiteralComparator implements Comparator<Literal> {
-			@Override
-			public int compare(Literal arg0, Literal arg1) {
-				if (arg0.positive == arg1.positive) {
-					return ((String) arg0.var).compareTo((String) arg1.var);
-				} else if (arg0.positive) {
-					return -1;
-				} else {
-					return 1;
-				}
-			}
-		}
-
-		private static final LiteralComparator literalComparator = new LiteralComparator();
-
-		private Literal[] literals;
-		private int relevance;
-
-		public static Clause createClause(DeprecatedFeatureMap map, Literal[] newLiterals, String curFeature) {
-			final HashSet<Literal> literalSet = new HashSet<>(newLiterals.length << 1);
-			for (Literal literal : newLiterals) {
-				if (!curFeature.equals(literal.var)) {
-					final Literal negativeliteral = literal.clone();
-					negativeliteral.flip();
-
-					if (literalSet.contains(negativeliteral)) {
-						return null;
-					} else {
-						literalSet.add(literal);
-					}
-				}
-			}
-
-			final Clause clause = new Clause(literalSet.toArray(new Literal[0]));
-			clause.computeRelevance(map);
-			return clause;
-		}
-
-		public static Clause createClause(DeprecatedFeatureMap map, Literal[] newLiterals) {
-			final HashSet<Literal> literalSet = new HashSet<>(newLiterals.length << 1);
-			for (Literal literal : newLiterals) {
-				final Literal negativeliteral = literal.clone();
-				negativeliteral.flip();
-
-				if (literalSet.contains(negativeliteral)) {
-					return null;
-				} else {
-					literalSet.add(literal);
-				}
-			}
-
-			final Clause clause = new Clause(literalSet.toArray(new Literal[0]));
-			clause.computeRelevance(map);
-			return clause;
-		}
-
-		public static Clause createClause(DeprecatedFeatureMap map, Literal newLiteral) {
-			final Clause clause = new Clause(new Literal[] { newLiteral });
-			final DeprecatedFeature df = map.get(newLiteral.var);
-			if (df != null) {
-				clause.relevance++;
-			}
-			return clause;
-		}
-
-		private Clause(Literal[] literals) {
-			this.literals = literals;
-			Arrays.sort(this.literals, literalComparator);
-			this.relevance = 0;
-		}
-
-		public Literal[] getLiterals() {
-			return literals;
-		}
-
-		private void computeRelevance(DeprecatedFeatureMap map) {
-			for (Literal literal : literals) {
-				final DeprecatedFeature df = map.get(literal.var);
-				if (df != null) {
-					relevance++;
-					if (literal.positive) {
-						df.incPositive();
-					} else {
-						df.incNegative();
-					}
-				}
-			}
-			if (relevance > 0 && relevance < literals.length) {
-				map.incGlobalMixedClauseCount();
-			}
-		}
-
-		public void delete(DeprecatedFeatureMap map) {
-			if (literals != null && literals.length > 1) {
-				for (Literal literal : literals) {
-					final DeprecatedFeature df = map.get(literal.var);
-					if (df != null) {
-						if (literal.positive) {
-							df.decPositive();
-						} else {
-							df.decNegative();
-						}
-					}
-				}
-				if (relevance > 0 && relevance < literals.length) {
-					map.decGlobalMixedClauseCount();
-				}
-				literals = null;
-			}
-		}
-
-		@Override
-		public int hashCode() {
-			return Arrays.hashCode(literals);
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null || getClass() != obj.getClass())
-				return false;
-			return Arrays.equals(literals, ((Clause) obj).literals);
-		}
-
-		@Override
-		public String toString() {
-			return "Clause [literals=" + Arrays.toString(literals) + "]";
-		}
-
-		public int getRelevance() {
-			return relevance;
-		}
-
-	}
-
-	private static class CNFSolver {
-
-		private final HashMap<Object, Integer> varToInt;
-		private final ISolver solver;
-
-		public CNFSolver(Collection<Clause> clauses) {
-			varToInt = new HashMap<Object, Integer>();
-			for (Clause clause : clauses) {
-				for (Literal literal : clause.getLiterals()) {
-					final Object var = literal.var;
-					if (!varToInt.containsKey(var)) {
-						int index = varToInt.size() + 1;
-						varToInt.put(var, index);
-					}
-				}
-			}
-
-			solver = SolverFactory.newDefault();
-			solver.setTimeoutMs(1000);
-			solver.newVar(varToInt.size());
-
-			try {
-				for (Clause node : clauses) {
-					final Literal[] literals = node.getLiterals();
-					int[] clause = new int[literals.length];
-					int i = 0;
-					for (Literal child : literals) {
-						clause[i++] = getIntOfLiteral(child);
-					}
-					solver.addClause(new VecInt(clause));
-				}
-			} catch (ContradictionException e) {
-				throw new RuntimeException(e);
-			}
-		}
-
-		private int getIntOfLiteral(Literal node) {
-			final int value = varToInt.get(node.var);
-			return node.positive ? value : -value;
-		}
-
-		public boolean isSatisfiable(Literal[] literals) throws TimeoutException {
-			final int[] unitClauses = new int[literals.length];
-			int i = 0;
-			for (Literal literal : literals) {
-				unitClauses[i++] = getIntOfLiteral(literal);
-			}
-			return solver.isSatisfiable(new VecInt(unitClauses));
-		}
-
-		public void reset() {
-			solver.reset();
-		}
-
-	}
-
+	
 	private final FeatureModel fm;
 
 	private final Collection<String> features;
 
 	// all clauses that have both kinds of literals (remove AND retain)
-	private List<Clause> relevantClauseList;
-	private Set<Clause> relevantClauseSet;
+	private List<DeprecatedClause> relevantClauseList;
+	private Set<DeprecatedClause> relevantClauseSet;
 
 	// list for all new construct clauses
-	private Set<Clause> newClauseSet;
+	private Set<DeprecatedClause> newClauseSet;
 
 	private DeprecatedFeatureMap map;
 
@@ -373,7 +67,7 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 		this.features = features;
 	}
 
-	public Node execute(WorkMonitor workMonitor) throws TimeoutException {
+	public Node execute(WorkMonitor workMonitor) throws TimeoutException, UnkownLiteralException {
 		workMonitor.setMaxAbsoluteWork(features.size() + 3);
 		Node fmNode = NodeCreator.createNodes(fm).toCNF();
 		workMonitor.worked();
@@ -391,7 +85,7 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 			for (int i = 0; i < andChildren.length; i++) {
 				Node andChild = andChildren[i];
 
-				final Clause curClause;
+				final DeprecatedClause curClause;
 
 				if (andChild instanceof Or) {
 					int absoluteValueCount = 0;
@@ -432,9 +126,9 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 									newChildren[k++] = literal;
 								}
 							}
-							curClause = Clause.createClause(map, newChildren);
+							curClause = DeprecatedClause.createClause(map, newChildren);
 						} else {
-							curClause = Clause.createClause(map, children);
+							curClause = DeprecatedClause.createClause(map, children);
 						}
 					} else {
 						curClause = null;
@@ -452,7 +146,7 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 						}
 						curClause = null;
 					} else {
-						curClause = Clause.createClause(map, literal);
+						curClause = DeprecatedClause.createClause(map, literal);
 					}
 				}
 
@@ -541,7 +235,7 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 							retainedLiteral.flip();
 						}
 
-						addNewClause(Clause.createClause(map, retainLiterals));
+						addNewClause(DeprecatedClause.createClause(map, retainLiterals));
 
 						// try to combine with other clauses
 					} else {
@@ -553,15 +247,15 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 								System.arraycopy(orChildren, 0, newChildren, 0, orChildren.length);
 								System.arraycopy(children2, 0, newChildren, orChildren.length, children2.length);
 
-								addNewClause(Clause.createClause(map, newChildren, curFeature));
+								addNewClause(DeprecatedClause.createClause(map, newChildren, curFeature));
 							}
 						}
 					}
 				}
 				solver.reset();
-				final List<Clause> subList = relevantClauseList.subList(0, relevantIndex);
+				final List<DeprecatedClause> subList = relevantClauseList.subList(0, relevantIndex);
 				relevantClauseSet.removeAll(subList);
-				for (Clause clause : subList) {
+				for (DeprecatedClause clause : subList) {
 					clause.delete(map);
 				}
 				subList.clear();
@@ -613,7 +307,7 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 		}
 	}
 
-	private void addNewClause(final Clause curClause) {
+	private void addNewClause(final DeprecatedClause curClause) {
 		if (curClause != null) {
 			if (curClause.getRelevance() == 0) {
 				if (!newClauseSet.add(curClause)) {

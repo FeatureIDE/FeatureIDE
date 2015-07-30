@@ -1,12 +1,9 @@
-package de.ovgu.featureide.ui.interfacegen;
-
-import static org.junit.Assert.fail;
+package de.ovgu.featureide.fm.core.editing.cnf;
 
 import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Or;
-import org.prop4j.SatSolver;
 import org.sat4j.specs.TimeoutException;
 
 public abstract class ModelComparator {
@@ -16,20 +13,24 @@ public abstract class ModelComparator {
 	}
 
 	public static boolean compare(Node fmNode1, final Node fmNode2) throws TimeoutException {
-		final SatSolver solver = new SatSolver(fmNode1, 1000);
-		if (fmNode2 instanceof And) {
-			for (Node clause : fmNode2.getChildren()) {
-				if (!checkOr(solver, clause)) {
-					return false;
+		final CNFSolver solver = new CNFSolver(fmNode1);
+		try {
+			if (fmNode2 instanceof And) {
+				for (Node clause : fmNode2.getChildren()) {
+					if (!checkOr(solver, clause)) {
+						return false;
+					}
 				}
+			} else {
+				return checkOr(solver, fmNode2);
 			}
-		} else {
-			return checkOr(solver, fmNode2);
+		} catch (UnkownLiteralException e) {
+			return false;
 		}
 		return true;
 	}
 
-	private static boolean checkOr(final SatSolver solver, Node clause) throws TimeoutException {
+	private static boolean checkOr(final CNFSolver solver, Node clause) throws TimeoutException, UnkownLiteralException {
 		if (clause instanceof Or) {
 			Node[] clauseChildren = clause.getChildren();
 			Literal[] literals = new Literal[clauseChildren.length];
@@ -39,8 +40,6 @@ public abstract class ModelComparator {
 				literals[k] = literal;
 			}
 			if (solver.isSatisfiable(literals)) {
-				System.out.println("\nFail!.");
-//				fail();
 				return false;
 			}
 		} else {
@@ -49,12 +48,10 @@ public abstract class ModelComparator {
 		return true;
 	}
 
-	private static boolean checkLiteral(final SatSolver solver, Node clause) throws TimeoutException {
+	private static boolean checkLiteral(final CNFSolver solver, Node clause) throws TimeoutException, UnkownLiteralException {
 		final Literal literal = (Literal) clause.clone();
 		literal.flip();
 		if (solver.isSatisfiable(new Literal[] { literal })) {
-			System.out.println("\nFail!.");
-			fail();
 			return false;
 		}
 		return true;

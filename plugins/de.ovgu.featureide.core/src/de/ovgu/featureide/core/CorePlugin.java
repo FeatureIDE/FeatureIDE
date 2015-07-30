@@ -84,7 +84,8 @@ import de.ovgu.featureide.core.signature.filter.ContextFilter;
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.editing.FeatureRemover;
+import de.ovgu.featureide.fm.core.editing.cnf.UnkownLiteralException;
+import de.ovgu.featureide.fm.core.editing.remove.FeatureRemover;
 import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 import de.ovgu.featureide.fm.core.job.WorkMonitor;
@@ -780,15 +781,13 @@ public class CorePlugin extends AbstractCorePlugin {
 	public void removeFeatures(IProject project, IFeatureProject data, Collection<String> features) {
 		try {
 			removeFeatures(data.getFeatureModel(), features);
-		} catch (TimeoutException e) {
+		} catch (TimeoutException | UnkownLiteralException e) {
 			CorePlugin.getDefault().logError(e);
 		}
 	}
 
-
-	public static Node removeFeatures(FeatureModel featureModel, Collection<String> removeFeatures) throws TimeoutException {
+	public static Node removeFeatures(FeatureModel featureModel, Collection<String> removeFeatures) throws TimeoutException, UnkownLiteralException {
 		return new FeatureRemover(featureModel, removeFeatures).execute(new WorkMonitor());
-
 	}
 
 }
