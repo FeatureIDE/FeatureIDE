@@ -42,6 +42,7 @@ import de.ovgu.featureide.fm.core.conf.worker.GraphCalcThread.CalcObject;
 import de.ovgu.featureide.fm.core.configuration.IConfigurationPropagator;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
+import de.ovgu.featureide.fm.core.editing.CNFNodeCreator;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.job.LongRunningJob;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
@@ -83,7 +84,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 			if (!initialized) {
 				lastComputedValues = new byte[variableConfiguration.size()];
 				Arrays.fill(lastComputedValues, (byte) Variable.UNDEFINED);
-				node = NodeCreator.createNodes(featureModel, true).toCNF();
+				node = new CNFNodeCreator().createNodes(featureModel);
 				calcThread = new GraphCalcThread(featureGraph.getFeatureArray(), ConfigurationChanger.this, node);
 				initialized = true;
 			}

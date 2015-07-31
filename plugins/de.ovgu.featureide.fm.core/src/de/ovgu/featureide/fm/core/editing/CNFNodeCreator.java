@@ -21,7 +21,6 @@
 package de.ovgu.featureide.fm.core.editing;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.prop4j.And;
@@ -48,15 +47,13 @@ public class CNFNodeCreator extends NewNodeCreator {
 			if (cnfNode instanceof And) {
 				for (Node andChild : cnfNode.getChildren()) {
 					if (andChild instanceof Or) {
-						final Node[] orChildren = andChild.getChildren();
-						clauses.add(new Or(Arrays.copyOf(orChildren, orChildren.length, Literal[].class)));
+						clauses.add(new Or(andChild.getChildren()));
 					} else {
 						clauses.add(new Or((Literal) andChild));
 					}
 				}
 			} else if (cnfNode instanceof Or) {
-				final Node[] orChildren = cnfNode.getChildren();
-				clauses.add(new Or(Arrays.copyOf(orChildren, orChildren.length, Literal[].class)));
+				clauses.add(new Or(cnfNode.getChildren()));
 			} else {
 				clauses.add(new Or((Literal) cnfNode));
 			}

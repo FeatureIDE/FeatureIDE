@@ -44,7 +44,7 @@ import de.ovgu.featureide.core.mpl.job.CreateInterfaceJob;
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.editing.CNFNodeCreator;
 import de.ovgu.featureide.fm.core.editing.cnf.ModelComparator;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
@@ -53,7 +53,7 @@ import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 
 /**
- * @author Reimar Schröter
+ * @author Reimar Schrï¿½ter
  * @author Sebastian Krieter
  */
 public class InterfaceCompositionTester {
@@ -392,11 +392,11 @@ public class InterfaceCompositionTester {
 
 	private static boolean compareModels(final FeatureModel newCompleteModel, final FeatureModel newCompleteModel2) {
 		System.out.print("Creating node for model 1 ...");
-		Node cnf1 = NodeCreator.createNodes(newCompleteModel).toCNF();
+		Node cnf1 = new CNFNodeCreator().createNodes(newCompleteModel);
 		System.out.println(" > Done!");
 
 		System.out.print("Creating node for model 2 ...");
-		Node cnf2 = NodeCreator.createNodes(newCompleteModel2).toCNF();
+		Node cnf2 = new CNFNodeCreator().createNodes(newCompleteModel2);
 		System.out.println(" > Done!");
 
 		System.out.print("Comparing both model ...");
