@@ -70,10 +70,20 @@ public class Literal extends Node {
 	}
 
 	@Override
-	public boolean equals(Object node) {
-		if (!(node instanceof Literal))
-			return false;
-		return (var.equals(((Literal) node).var)) && (positive == ((Literal) node).positive);
+	public int hashCode() {
+		return var.hashCode() * (positive ? 31 : 37);
 	}
-	
+
+	@Override
+	public boolean equals(Object node) {
+		if (this == node) {
+			return true;
+		}
+		if (!(node instanceof Literal)) {
+			return false;
+		}
+		final Literal other = (Literal) node;
+		return (positive == other.positive) && (var.equals(other.var));
+	}
+
 }

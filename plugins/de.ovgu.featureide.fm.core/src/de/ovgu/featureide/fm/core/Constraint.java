@@ -202,6 +202,11 @@ public class Constraint implements PropertyConstants, IGraphicItem {
 	}
 
 	@Override
+	public int hashCode() {
+		return propNode.hashCode();
+	}
+
+	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;

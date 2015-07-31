@@ -106,10 +106,14 @@ public class NodeCreator {
 	 * @return
 	 */
 	private static Node replaceNames(Node node, FeatureModel featureModel) {
-		if(node==null)return null;
+		if (node == null) {
+			return null;
+		}
 		if (node instanceof Literal) {
 			Literal literal = (Literal) node;
-			literal.var=featureModel.getRenamingsManager().getOldName(literal.var.toString());
+			if (literal.var instanceof String) {
+				literal.var=featureModel.getRenamingsManager().getOldName((String) literal.var);
+			}
 		} else {
 			Node[] children = node.getChildren();
 			for (int i = 0; i < children.length; i++) {

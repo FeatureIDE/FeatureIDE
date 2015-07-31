@@ -53,6 +53,8 @@ import org.eclipse.jdt.core.CompletionProposal;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.Signature;
 import org.osgi.framework.BundleContext;
+import org.prop4j.Node;
+import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.core.builder.ComposerExtensionManager;
 import de.ovgu.featureide.core.builder.ExtensibleFeatureProjectBuilder;
@@ -82,8 +84,11 @@ import de.ovgu.featureide.core.signature.filter.ContextFilter;
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.editing.cnf.UnkownLiteralException;
+import de.ovgu.featureide.fm.core.editing.remove.FeatureRemover;
 import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
+import de.ovgu.featureide.fm.core.job.WorkMonitor;
 
 /**
  * The activator class controls the plug-in life cycle.
@@ -748,31 +753,41 @@ public class CorePlugin extends AbstractCorePlugin {
 	}
 
 	public void buildContextDocumentation(List<IProject> pl, String options, String featureName) {
-		final PrintDocumentationJob.Arguments args = new PrintDocumentationJob.Arguments(
-				"Docu_Context_" + featureName, options.split("\\s+"), new ContextMerger(), featureName);
+		final PrintDocumentationJob.Arguments args = new PrintDocumentationJob.Arguments("Docu_Context_" + featureName, options.split("\\s+"),
+				new ContextMerger(), featureName);
 
 		FMCorePlugin.getDefault().startJobs(pl, args, true);
 	}
 
 	public void buildVariantDocumentation(List<IProject> pl, String options) {
-		final PrintDocumentationJob.Arguments args = new PrintDocumentationJob.Arguments(
-				"Docu_Variant", options.split("\\s+"), new VariantMerger(), null);
+		final PrintDocumentationJob.Arguments args = new PrintDocumentationJob.Arguments("Docu_Variant", options.split("\\s+"), new VariantMerger(), null);
 
 		FMCorePlugin.getDefault().startJobs(pl, args, true);
 	}
 
 	public void buildFeatureDocumentation(List<IProject> pl, String options, String featureName) {
-		final PrintDocumentationJob.Arguments args = new PrintDocumentationJob.Arguments(
-				"Docu_Feature_" + featureName, options.split("\\s+"), new FeatureModuleMerger(), featureName);
+		final PrintDocumentationJob.Arguments args = new PrintDocumentationJob.Arguments("Docu_Feature_" + featureName, options.split("\\s+"),
+				new FeatureModuleMerger(), featureName);
 
 		FMCorePlugin.getDefault().startJobs(pl, args, true);
 	}
 
 	public void buildSPLDocumentation(List<IProject> pl, String options) {
-		final PrintDocumentationJob.Arguments args = new PrintDocumentationJob.Arguments(
-				"Docu_SPL", options.split("\\s+"), new SPLMerger(), null);
+		final PrintDocumentationJob.Arguments args = new PrintDocumentationJob.Arguments("Docu_SPL", options.split("\\s+"), new SPLMerger(), null);
 
 		FMCorePlugin.getDefault().startJobs(pl, args, true);
+	}
+
+	public void removeFeatures(IProject project, IFeatureProject data, Collection<String> features) {
+		try {
+			removeFeatures(data.getFeatureModel(), features);
+		} catch (TimeoutException | UnkownLiteralException e) {
+			CorePlugin.getDefault().logError(e);
+		}
+	}
+
+	public static Node removeFeatures(FeatureModel featureModel, Collection<String> removeFeatures) throws TimeoutException, UnkownLiteralException {
+		return new FeatureRemover(featureModel, removeFeatures).execute(new WorkMonitor());
 	}
 
 }

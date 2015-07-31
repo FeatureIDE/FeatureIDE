@@ -25,7 +25,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 
 /**
- * Abstract eclipse job which can be stopped.
+ * Job that wraps the functionality of a {@link LongRunningMethod}.
  * 
  * @author Sebastian Krieter
  */

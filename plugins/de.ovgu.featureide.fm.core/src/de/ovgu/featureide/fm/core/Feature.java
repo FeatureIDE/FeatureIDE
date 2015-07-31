@@ -142,6 +142,23 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 			this.parent = this.featureModel.getFeature(feature.parent.getName());
 		}
 	}
+	
+	public Feature(Feature feature, FeatureModel featureModel) {
+		this.featureModel = featureModel;
+		
+		this.name = feature.name;
+		this.mandatory = feature.mandatory;
+		this.concret = feature.concret;
+		this.and = feature.and;
+		this.multiple = feature.multiple;
+		this.hidden = feature.hidden;
+		this.constraintSelected = feature.constraintSelected;
+		this.status = feature.status;
+		this.description = feature.description;
+		
+		this.featureModel.addFeature(this);
+		
+	}
 
 	public void setNewLocation(FMPoint newLocation) {
 		location = newLocation;

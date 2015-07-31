@@ -624,4 +624,9 @@ public class SatSolver {
 		}
 		return Collections.emptyList();
 	}
+
+	public void reset() {
+		solver.reset();		
+	}
+
 }

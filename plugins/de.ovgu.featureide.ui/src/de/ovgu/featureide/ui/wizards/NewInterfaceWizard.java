@@ -18,16 +18,31 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.job;
+package de.ovgu.featureide.ui.wizards;
 
-/**
- * Interface for methods that take a long time to finish.</br>
- * Can be executed as Eclipse job with the wrapper {@link LongRunningJob}.
- * 
- * @author Sebastian Krieter
- */
-public interface LongRunningMethod<T> {
+import de.ovgu.featureide.fm.ui.wizards.AbstractWizard;
+import de.ovgu.featureide.ui.UIPlugin;
 
-	T execute(WorkMonitor monitor) throws Exception;
+public class NewInterfaceWizard extends AbstractWizard {
+
+	public static final String ID = UIPlugin.PLUGIN_ID + ".wizards.InterfaceWizard";
+
+	public NewInterfaceWizard(String title) {
+		super(title);
+	}
+
+	@Override
+	public void addPages() {
+		addPage(new SelectProjectWizardPage());
+		addPage(new SelectFeaturesWizardPage());
+	}
+
+	protected SelectProjectWizardPage selectProject;
+	protected SelectFeaturesWizardPage selectFeatures;
+
+	@Override
+	public boolean performFinish() {
+		return true;
+	}
 
 }
