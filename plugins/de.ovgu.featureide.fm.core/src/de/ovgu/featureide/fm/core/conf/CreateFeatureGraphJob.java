@@ -52,8 +52,7 @@ import de.ovgu.featureide.fm.core.conf.nodes.VariableConfiguration;
 import de.ovgu.featureide.fm.core.conf.nodes.Xor;
 import de.ovgu.featureide.fm.core.conf.worker.CalcFixedThread;
 import de.ovgu.featureide.fm.core.conf.worker.DFSThread;
-import de.ovgu.featureide.fm.core.editing.CNFNodeCreator;
-import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
@@ -106,7 +105,7 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 
 			workMonitor.setMaxAbsoluteWork((2 * arguments.featureModel.getFeatureNames().size()) + 1);
 
-			final CalcFixedThread calcThread = new CalcFixedThread(new CNFNodeCreator().createNodes(arguments.featureModel), workMonitor);
+			final CalcFixedThread calcThread = new CalcFixedThread(AdvancedNodeCreator.createNodes(arguments.featureModel), workMonitor);
 			calcThread.addObjects(arguments.featureModel.getFeatureNames());
 			calcThread.start();
 

@@ -32,8 +32,8 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.core.signature.base.AFeatureData;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
-import de.ovgu.featureide.fm.core.editing.CNFNodeCreator;
-import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
+import de.ovgu.featureide.fm.core.filter.base.IFilter;
 
 public class ContextFilter implements IFilter<AbstractSignature> {
 
@@ -48,7 +48,7 @@ public class ContextFilter implements IFilter<AbstractSignature> {
 
 	public ContextFilter(Node[] constraints, ProjectSignatures projectSignatures) {
 		this.projectSignatures = projectSignatures;
-		fmNode = new CNFNodeCreator().createNodes(projectSignatures.getFeatureModel());
+		fmNode = AdvancedNodeCreator.createNodes(projectSignatures.getFeatureModel());
 		selcetedFeatures = new boolean[projectSignatures.getFeatureModel().getNumberOfFeatures()];
 
 		init(constraints);

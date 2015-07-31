@@ -32,7 +32,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.conf.nodes.Variable;
 import de.ovgu.featureide.fm.core.conf.nodes.VariableConfiguration;
 import de.ovgu.featureide.fm.core.conf.worker.SatCalcThread;
-import de.ovgu.featureide.fm.core.editing.CNFNodeCreator;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.WorkMonitor;
 
@@ -51,7 +51,7 @@ public class SatConfChanger implements IConfigurationChanger {
 		this.featureModel = featureModel;
 		this.featureGraph = featureGraph;
 		this.variableConfiguration = variableConfiguration;
-		this.calcThread = new SatCalcThread(featureGraph, this, new CNFNodeCreator().createNodes(featureModel));
+		this.calcThread = new SatCalcThread(featureGraph, this, AdvancedNodeCreator.createNodes(featureModel));
 	}
 
 	private final ConcurrentLinkedQueue<String> changedFeatures = new ConcurrentLinkedQueue<>();

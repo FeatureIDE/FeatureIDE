@@ -18,38 +18,17 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.core.signature.documentation;
-
-import de.ovgu.featureide.core.signature.documentation.base.ADocumentationCommentMerger;
-import de.ovgu.featureide.core.signature.documentation.base.BlockTag;
-import de.ovgu.featureide.fm.core.filter.base.IFilter;
+package de.ovgu.featureide.fm.core.filter.base;
 
 /**
- * Modul-Comment merger for context interfaces.
+ * Performs a test on an object based on its properties and returns whether the object passes or fails the test.
  * 
  * @author Sebastian Krieter
+ * 
+ * @see Filter
  */
-public class ContextMerger extends ADocumentationCommentMerger {
+public interface IFilter<T> {
 
-	private static final long serialVersionUID = 2811545559986504025L;
-	
-	private static final class BlockTagFilter implements IFilter<BlockTag> {
-		@Override
-		public boolean isValid(BlockTag blockTag) {
-			return blockTag.isFeatureIndependent() || blockTag.getPriority() >= 0;
-		}
-	}
-
-	public ContextMerger() {
-		addFilter(new BlockTagFilter());
-	}
-
-	@Override
-	protected BlockTag adaptBlockTag(BlockTag tag) {
-		if (tag.isFeatureSpecific() && tag.getTagtype() != BlockTag.TAG_SEE) {
-			tag.setDesc("<b>[" + tag.getConstraint() + "]</b> " + tag.getDesc());
-		}
-		return tag;
-	}
+	boolean isValid(T object);
 
 }

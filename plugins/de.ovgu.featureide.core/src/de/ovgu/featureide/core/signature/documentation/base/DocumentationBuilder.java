@@ -25,7 +25,7 @@ import java.util.Collection;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
-import de.ovgu.featureide.core.signature.filter.IFilter;
+import de.ovgu.featureide.fm.core.filter.base.IFilter;
 
 /**
  * Abstract documentation builder.

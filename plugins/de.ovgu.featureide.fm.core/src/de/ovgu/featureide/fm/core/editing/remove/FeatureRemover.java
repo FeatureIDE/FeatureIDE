@@ -34,8 +34,6 @@ import org.prop4j.Node;
 import org.prop4j.Or;
 import org.sat4j.specs.TimeoutException;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.editing.CNFNodeCreator;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.editing.cnf.CNFSolver;
 import de.ovgu.featureide.fm.core.editing.cnf.Clause;
@@ -50,7 +48,7 @@ import de.ovgu.featureide.fm.core.job.WorkMonitor;
  */
 public class FeatureRemover implements LongRunningMethod<Node> {
 
-	private final FeatureModel fm;
+	private final Node fmNode;
 
 	private final Collection<String> features;
 
@@ -63,16 +61,42 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 
 	private DeprecatedFeatureMap map;
 
-	public FeatureRemover(FeatureModel fm, Collection<String> features) {
-		this.fm = fm;
+	public FeatureRemover(Node cnf, Collection<String> features) {
+		this.fmNode = cnf;
 		this.features = features;
 	}
 
+	private void addLiteral(HashSet<String> retainedFeatures, Node orChild) {
+		final Literal literal = (Literal) orChild;
+		if (literal.var instanceof String) {
+			retainedFeatures.add((String) literal.var);
+		}
+	}
+
 	public Node execute(WorkMonitor workMonitor) throws TimeoutException, UnkownLiteralException {
-		workMonitor.setMaxAbsoluteWork(features.size() + 3);
-		final Node fmNode = new CNFNodeCreator().createNodes(fm);
-		workMonitor.worked();
+		final HashSet<String> retainedFeatures = new HashSet<>();
 		if (fmNode instanceof And) {
+			for (Node andChild : fmNode.getChildren()) {
+				if (andChild instanceof Or) {
+					for (Node orChild : andChild.getChildren()) {
+						addLiteral(retainedFeatures, orChild);
+					}
+				} else {
+					addLiteral(retainedFeatures, andChild);
+				}
+			}
+		} else if (fmNode instanceof Or) {
+			for (Node orChild : fmNode.getChildren()) {
+				addLiteral(retainedFeatures, orChild);
+			}
+		} else {
+			addLiteral(retainedFeatures, fmNode);
+		}
+		retainedFeatures.removeAll(features);
+
+		if (fmNode instanceof And) {
+			workMonitor.setMaxAbsoluteWork(features.size() + 2);
+
 			final Node[] andChildren = fmNode.getChildren();
 
 			relevantClauseList = new ArrayList<>(andChildren.length);
@@ -266,12 +290,10 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 			}
 
 			// create clause that contains all retained features
-			final Node[] allLiterals = new Node[fm.getNumberOfFeatures() - features.size() + 1];
+			final Node[] allLiterals = new Node[retainedFeatures.size() + 1];
 			int i = 0;
-			for (String featureName : fm.getFeatureNames()) {
-				if (!features.contains(featureName)) {
-					allLiterals[i++] = new Literal(featureName);
-				}
+			for (String featureName : retainedFeatures) {
+				allLiterals[i++] = new Literal(featureName);
 			}
 			allLiterals[i] = new Literal(NodeCreator.varTrue);
 

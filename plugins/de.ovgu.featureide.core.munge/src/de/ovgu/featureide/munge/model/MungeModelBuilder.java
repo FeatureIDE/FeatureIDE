@@ -39,7 +39,7 @@ import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.core.signature.ProjectSignatures.SignatureIterator;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.core.signature.base.PreprocessorFeatureData;
-import de.ovgu.featureide.core.signature.filter.IFilter;
+import de.ovgu.featureide.fm.core.filter.base.IFilter;
 import de.ovgu.featureide.munge.MungePreprocessor;
 import de.ovgu.featureide.munge.signatures.MungeSignatureBuilder;
 

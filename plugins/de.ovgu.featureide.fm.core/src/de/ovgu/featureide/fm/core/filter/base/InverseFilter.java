@@ -18,38 +18,26 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.core.signature.documentation;
-
-import de.ovgu.featureide.core.signature.documentation.base.ADocumentationCommentMerger;
-import de.ovgu.featureide.core.signature.documentation.base.BlockTag;
-import de.ovgu.featureide.fm.core.filter.base.IFilter;
+package de.ovgu.featureide.fm.core.filter.base;
 
 /**
- * Modul-Comment merger for context interfaces.
+ * Returns the opposite result of a given {@link IFilter}.
  * 
  * @author Sebastian Krieter
+ * 
+ * @see Filter
  */
-public class ContextMerger extends ADocumentationCommentMerger {
-
-	private static final long serialVersionUID = 2811545559986504025L;
+public class InverseFilter<T> implements IFilter<T> {
 	
-	private static final class BlockTagFilter implements IFilter<BlockTag> {
-		@Override
-		public boolean isValid(BlockTag blockTag) {
-			return blockTag.isFeatureIndependent() || blockTag.getPriority() >= 0;
-		}
-	}
+	private final IFilter<T> originalFilter;
 
-	public ContextMerger() {
-		addFilter(new BlockTagFilter());
+	public InverseFilter(IFilter<T> originalFilter) {
+		this.originalFilter = originalFilter;
 	}
 
 	@Override
-	protected BlockTag adaptBlockTag(BlockTag tag) {
-		if (tag.isFeatureSpecific() && tag.getTagtype() != BlockTag.TAG_SEE) {
-			tag.setDesc("<b>[" + tag.getConstraint() + "]</b> " + tag.getDesc());
-		}
-		return tag;
+	public boolean isValid(T object) {
+		return !originalFilter.isValid(object);
 	}
 
 }

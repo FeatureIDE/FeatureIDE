@@ -40,9 +40,8 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.Preferences;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
-import de.ovgu.featureide.fm.core.editing.remove.FeatureRemover;
-import de.ovgu.featureide.fm.core.job.LongRunningJob;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.WorkMonitor;
 
@@ -74,7 +73,10 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 		@Override
 		public void run() {
 			if (featureSet != null) {
-				buildNode = LongRunningJob.runMethod(new FeatureRemover(featureModel, featureSet));
+				final AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(featureModel);
+				nodeCreator.setCnfType(AdvancedNodeCreator.CNFType.Compact);
+				nodeCreator.setExcludedFeatureNames(featureSet);
+				buildNode = nodeCreator.createNodes();
 			} else {
 				buildNode = NodeCreator.createNodes(featureModel, ignoreAbstractFeatures).toCNF();
 			}

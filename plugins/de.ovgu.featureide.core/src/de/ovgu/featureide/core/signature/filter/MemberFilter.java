@@ -22,6 +22,7 @@ package de.ovgu.featureide.core.signature.filter;
 
 import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
+import de.ovgu.featureide.fm.core.filter.base.IFilter;
 
 public class MemberFilter implements IFilter<AbstractSignature> {
 

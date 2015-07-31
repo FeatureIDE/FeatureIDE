@@ -84,11 +84,10 @@ import de.ovgu.featureide.core.signature.filter.ContextFilter;
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.cnf.UnkownLiteralException;
-import de.ovgu.featureide.fm.core.editing.remove.FeatureRemover;
 import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
 
 /**
  * The activator class controls the plug-in life cycle.
@@ -787,7 +786,10 @@ public class CorePlugin extends AbstractCorePlugin {
 	}
 
 	public static Node removeFeatures(FeatureModel featureModel, Collection<String> removeFeatures) throws TimeoutException, UnkownLiteralException {
-		return new FeatureRemover(featureModel, removeFeatures).execute(new WorkMonitor());
+		final AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(featureModel);
+		nodeCreator.setExcludedFeatureNames(removeFeatures);
+		nodeCreator.setCnfType(AdvancedNodeCreator.CNFType.Regular);
+		return nodeCreator.createNodes();
 	}
 
 }

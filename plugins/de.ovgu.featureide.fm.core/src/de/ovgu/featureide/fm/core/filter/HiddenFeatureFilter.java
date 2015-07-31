@@ -18,8 +18,21 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.core.signature.filter;
+package de.ovgu.featureide.fm.core.filter;
 
-public interface IFilter<T> {
-	boolean isValid(T object);
+import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.filter.base.IFilter;
+
+/**
+ * Checks whether a feature is hidden.
+ * 
+ * @author Sebastian Krieter
+ */
+public class HiddenFeatureFilter implements IFilter<Feature> {
+	
+	@Override
+	public boolean isValid(Feature object) {
+		return object.hasHiddenParent();
+	}
+
 }

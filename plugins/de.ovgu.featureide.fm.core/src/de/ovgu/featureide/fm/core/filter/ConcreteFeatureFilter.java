@@ -18,38 +18,21 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.core.signature.documentation;
+package de.ovgu.featureide.fm.core.filter;
 
-import de.ovgu.featureide.core.signature.documentation.base.ADocumentationCommentMerger;
-import de.ovgu.featureide.core.signature.documentation.base.BlockTag;
+import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.filter.base.IFilter;
 
 /**
- * Modul-Comment merger for context interfaces.
+ * Checks whether a feature is concrete.
  * 
  * @author Sebastian Krieter
  */
-public class ContextMerger extends ADocumentationCommentMerger {
-
-	private static final long serialVersionUID = 2811545559986504025L;
+public class ConcreteFeatureFilter implements IFilter<Feature> {
 	
-	private static final class BlockTagFilter implements IFilter<BlockTag> {
-		@Override
-		public boolean isValid(BlockTag blockTag) {
-			return blockTag.isFeatureIndependent() || blockTag.getPriority() >= 0;
-		}
-	}
-
-	public ContextMerger() {
-		addFilter(new BlockTagFilter());
-	}
-
 	@Override
-	protected BlockTag adaptBlockTag(BlockTag tag) {
-		if (tag.isFeatureSpecific() && tag.getTagtype() != BlockTag.TAG_SEE) {
-			tag.setDesc("<b>[" + tag.getConstraint() + "]</b> " + tag.getDesc());
-		}
-		return tag;
+	public boolean isValid(Feature object) {
+		return object.isConcrete();
 	}
 
 }

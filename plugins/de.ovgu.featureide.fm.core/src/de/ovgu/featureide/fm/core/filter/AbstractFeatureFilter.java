@@ -18,34 +18,21 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.core.signature.filter;
+package de.ovgu.featureide.fm.core.filter;
 
-import java.util.Collection;
-import java.util.Iterator;
+import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.filter.base.IFilter;
 
-public abstract class Filter {
-
-	public static <U, T extends U> void filter(Collection<T> collection, IFilter<U> filter) {
-		if (collection != null && filter != null) {
-			for (Iterator<T> iterator = collection.iterator(); iterator.hasNext();) {
-				if (!filter.isValid(iterator.next())) {
-					iterator.remove();
-				}
-			}
-		}
-	}
-
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static <T> void filter(Collection<T> collection, Collection<IFilter<?>> filterList) {
-		if (collection != null && filterList != null) {
-			for (IFilter filter : filterList) {
-				for (Iterator<T> iterator = collection.iterator(); iterator.hasNext();) {
-					if (!filter.isValid(iterator.next())) {
-						iterator.remove();
-					}
-				}
-			}
-		}
+/**
+ * Checks whether a feature is abstract.
+ * 
+ * @author Sebastian Krieter
+ */
+public class AbstractFeatureFilter implements IFilter<Feature> {
+	
+	@Override
+	public boolean isValid(Feature object) {
+		return object.isAbstract();
 	}
 
 }
