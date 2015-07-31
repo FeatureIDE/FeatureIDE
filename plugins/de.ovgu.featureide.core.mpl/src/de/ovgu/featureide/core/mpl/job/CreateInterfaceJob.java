@@ -48,6 +48,8 @@ import de.ovgu.featureide.fm.core.editing.cnf.UnkownLiteralException;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
+import de.ovgu.featureide.fm.core.job.LongRunningMethod;
+import de.ovgu.featureide.fm.core.job.WorkMonitor;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
 /**
@@ -55,7 +57,7 @@ import de.ovgu.featureide.fm.core.job.util.JobArguments;
  * 
  * @author Sebastian Krieter
  */
-public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments> {
+public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments> implements LongRunningMethod<FeatureModel> {
 
 	public static class Arguments extends JobArguments {
 		private final FeatureModel featuremodel;
@@ -78,6 +80,11 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 
 	public FeatureModel getInterfaceModel() {
 		return newInterfaceModel;
+	}
+
+	@Override
+	public FeatureModel execute(WorkMonitor monitor) throws Exception {
+		return createInterface(arguments.featuremodel, arguments.featureNames);
 	}
 
 	@Override
@@ -390,4 +397,5 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 		}
 		return false;
 	}
+
 }
