@@ -48,9 +48,14 @@ public class NewNodeCreator implements INodeCreator<And> {
 		final Node[] andChildren1 = createStructuralNodes(featureModel).getChildren();
 		final Node[] andChildren2 = createConstraintNodes(featureModel).getChildren();
 
-		final Node[] nodeArray = new Node[andChildren1.length + andChildren2.length];
+		final int length = andChildren1.length + andChildren2.length;
+		final Node[] nodeArray = new Node[length + 2];
+		
 		System.arraycopy(andChildren1, 0, nodeArray, 0, andChildren1.length);
 		System.arraycopy(andChildren2, 0, nodeArray, andChildren1.length, andChildren2.length);
+		
+		nodeArray[length] = new Literal(NodeCreator.varTrue);
+		nodeArray[length + 1] = new Literal(NodeCreator.varFalse, false);
 
 		return new And(nodeArray);
 	}
