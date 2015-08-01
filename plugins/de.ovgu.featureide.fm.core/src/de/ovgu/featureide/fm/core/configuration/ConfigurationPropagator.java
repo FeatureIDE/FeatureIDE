@@ -22,13 +22,11 @@ package de.ovgu.featureide.fm.core.configuration;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.Set;
 
 import org.prop4j.And;
 import org.prop4j.Literal;
@@ -41,8 +39,12 @@ import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.Preferences;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
-import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.filter.AbstractFeatureFilter;
+import de.ovgu.featureide.fm.core.filter.HiddenFeatureFilter;
+import de.ovgu.featureide.fm.core.filter.base.OrFilter;
+import de.ovgu.featureide.fm.core.job.LongRunningJob;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.WorkMonitor;
 
 /**
@@ -50,44 +52,9 @@ import de.ovgu.featureide.fm.core.job.WorkMonitor;
  */
 public class ConfigurationPropagator implements IConfigurationPropagator {
 
-	private static class BuildThread extends Thread {
-		private final FeatureModel featureModel;
-		private final Set<String> featureSet;
-		private final boolean ignoreAbstractFeatures;
-		private Node buildNode;
-
-		public BuildThread(FeatureModel featureModel, Set<String> featureSet) {
-			super();
-			this.featureModel = featureModel;
-			this.featureSet = featureSet;
-			this.ignoreAbstractFeatures = false;
-		}
-
-		public BuildThread(FeatureModel featureModel, boolean ignoreAbstractFeatures) {
-			super();
-			this.featureModel = featureModel;
-			this.featureSet = null;
-			this.ignoreAbstractFeatures = ignoreAbstractFeatures;
-		}
-
-		@Override
-		public void run() {
-			if (featureSet != null) {
-				final AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(featureModel);
-				nodeCreator.setCnfType(AdvancedNodeCreator.CNFType.Compact);
-				nodeCreator.setExcludedFeatureNames(featureSet);
-				buildNode = nodeCreator.createNodes();
-			} else {
-				buildNode = NodeCreator.createNodes(featureModel, ignoreAbstractFeatures).toCNF();
-			}
-		}
-	}
-
 	public static int FEATURE_LIMIT_FOR_DEFAULT_COMPLETION = 150;
 
 	private static final int TIMEOUT = 1000;
-
-	//	private final ConfigurationPropagatorJobWrapper jobWrapper = new ConfigurationPropagatorJobWrapper(this);
 
 	private Node rootNode = null, rootNodeWithoutHidden = null;
 	private final Configuration configuration;
@@ -111,10 +78,6 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 		this(propagator, propagator.configuration);
 	}
 
-	//	public ConfigurationPropagatorJobWrapper getJobWrapper() {
-	//		return jobWrapper;
-	//	}
-
 	public class LoadMethod implements LongRunningMethod<Void> {
 		@Override
 		public Void execute(WorkMonitor monitor) {
@@ -122,27 +85,33 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 				return null;
 			}
 			final FeatureModel featureModel = configuration.getFeatureModel();
-			if (featureModel.getRoot() != null) {
-				// Build both cnfs simultaneously for better performance
-				BuildThread buildThread1 = new BuildThread(featureModel, getRemoveFeatures(!configuration.ignoreAbstractFeatures, true));
-				BuildThread buildThread2 = new BuildThread(featureModel, configuration.ignoreAbstractFeatures);
+			final AdvancedNodeCreator nodeCreator1 = new AdvancedNodeCreator(featureModel);
+			final AdvancedNodeCreator nodeCreator2 = new AdvancedNodeCreator(featureModel);
+			nodeCreator1.setCnfType(AdvancedNodeCreator.CNFType.Regular);
+			nodeCreator2.setCnfType(AdvancedNodeCreator.CNFType.Regular);
 
-				buildThread1.start();
-				buildThread2.start();
-
-				try {
-					buildThread2.join();
-					buildThread1.join();
-				} catch (InterruptedException e) {
-					FMCorePlugin.getDefault().logError(e);
-				}
-
-				rootNodeWithoutHidden = buildThread1.buildNode;
-				rootNode = buildThread2.buildNode;
+			if (configuration.ignoreAbstractFeatures) {
+				nodeCreator1.setExcludedFeatures(new HiddenFeatureFilter());
 			} else {
-				rootNode = NodeCreator.createNodes(featureModel, configuration.ignoreAbstractFeatures).toCNF();
-				rootNodeWithoutHidden = rootNode.clone();
+				final OrFilter<Feature> orFilter = new OrFilter<>();
+				orFilter.add(new HiddenFeatureFilter());
+				orFilter.add(new AbstractFeatureFilter());
+				nodeCreator1.setExcludedFeatures(orFilter);
+				nodeCreator1.setExcludedFeatures(new AbstractFeatureFilter());
 			}
+
+			LongRunningJob<Node> buildThread1 = LongRunningWrapper.startJob("", nodeCreator1);
+			LongRunningJob<Node> buildThread2 = LongRunningWrapper.startJob("", nodeCreator2);
+
+			try {
+				buildThread2.join();
+				buildThread1.join();
+			} catch (InterruptedException e) {
+				FMCorePlugin.getDefault().logError(e);
+			}
+
+			rootNodeWithoutHidden = buildThread1.getResults();
+			rootNode = buildThread2.getResults();
 			return null;
 		}
 	}
@@ -496,21 +465,6 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 
 		return children;
 	}
-
-	private Set<String> getRemoveFeatures(boolean abstractFeatures, boolean hiddenFeatures) {
-		final Set<String> resultSet = new HashSet<String>();
-		for (SelectableFeature selectableFeature : configuration.features) {
-			final Feature f = selectableFeature.getFeature();
-			if ((abstractFeatures && f.isAbstract()) || (hiddenFeatures && f.hasHiddenParent())) {
-				resultSet.add(f.getName());
-			}
-		}
-		return resultSet;
-	}
-
-	//	public void update2(boolean redundantManual, String startFeatureName, WorkMonitor workMonitor) {
-	//		ConfigurationChanger confChanger = new ConfigurationChanger(configuration.getFeatureModel(), featureGraph, variableConfiguration); 
-	//	}
 
 	public class UpdateMethod implements LongRunningMethod<List<String>> {
 		private final boolean redundantManual;

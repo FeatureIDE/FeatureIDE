@@ -38,8 +38,8 @@ import de.ovgu.featureide.fm.core.filter.AbstractFeatureFilter;
 import de.ovgu.featureide.fm.core.filter.HiddenFeatureFilter;
 import de.ovgu.featureide.fm.core.filter.base.Filter;
 import de.ovgu.featureide.fm.core.filter.base.IFilter;
-import de.ovgu.featureide.fm.core.job.LongRunningJob;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.WorkMonitor;
 
 /**
@@ -80,6 +80,10 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	public static Node createNodes(FeatureModel featureModel) {
 		return new AdvancedNodeCreator(featureModel).createNodes();
 	}
+	
+	public static Node createNodes(FeatureModel featureModel, CNFType cnfType, ModelType modelType, Collection<String> excludedFeatureNames) {
+		return new AdvancedNodeCreator(featureModel, cnfType, modelType, excludedFeatureNames).createNodes();
+	}
 
 	public static Node createNodesWithoutAbstract(FeatureModel featureModel) {
 		AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(featureModel);
@@ -107,6 +111,13 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 
 	public AdvancedNodeCreator(FeatureModel featureModel) {
 		this.featureModel = featureModel;
+	}
+
+	public AdvancedNodeCreator(FeatureModel featureModel, CNFType cnfType, ModelType modelType, Collection<String> excludedFeatureNames) {
+		this.cnfType = cnfType;
+		this.modelType = modelType;
+		this.featureModel = featureModel;
+		this.excludedFeatureNames = excludedFeatureNames;
 	}
 
 	public Node createNodes() {
@@ -156,7 +167,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		}
 
 		if (excludedFeatureNames != null && !excludedFeatureNames.isEmpty()) {
-			return LongRunningJob.runMethod(new FeatureRemover(new And(nodeArray), excludedFeatureNames));
+			return LongRunningWrapper.runMethod(new FeatureRemover(new And(nodeArray), excludedFeatureNames));
 		} else {
 			return new And(nodeArray);
 		}

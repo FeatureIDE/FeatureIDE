@@ -56,6 +56,7 @@ import de.ovgu.featureide.fm.core.configuration.TreeElement;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.IStoppableJob;
 import de.ovgu.featureide.fm.core.job.LongRunningJob;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
@@ -265,7 +266,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		if (configurationEditor.getConfiguration().getPropagator() == null) {
 			return;
 		}
-		final LongRunningJob<Long> job = LongRunningJob.createJob("", configurationEditor.getConfiguration().getPropagator().number(250));
+		final LongRunningJob<Long> job = LongRunningWrapper.createJob("", configurationEditor.getConfiguration().getPropagator().number(250));
 		job.addJobFinishedListener(new JobFinishListener() {
 			@Override
 			public void jobFinished(IJob finishedJob, boolean success) {
@@ -439,7 +440,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			return null;
 		}
 		final List<SelectableFeature> featureList = configurationEditor.getConfiguration().getManualFeatures();
-		final LongRunningJob<Void> job = LongRunningJob.createJob("",
+		final LongRunningJob<Void> job = LongRunningWrapper.createJob("",
 				configurationEditor.getConfiguration().getPropagator().leadToValidConfiguration(featureList));
 
 		job.setIntermediateFunction(new IFunction<Object, Void>() {
@@ -485,7 +486,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		}
 		final TreeItem topItem = tree.getTopItem();
 		SelectableFeature feature = (SelectableFeature) (topItem.getData());
-		final LongRunningJob<List<String>> job = LongRunningJob.createJob("",
+		final LongRunningJob<List<String>> job = LongRunningWrapper.createJob("",
 				configurationEditor.getConfiguration().getPropagator().update(redundantManual, feature.getFeature().getName()));
 		job.setIntermediateFunction(new IFunction<Object, Void>() {
 			@Override

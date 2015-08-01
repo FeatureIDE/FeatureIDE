@@ -190,7 +190,7 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 		if (cnf instanceof And) {
 			final Node[] children = cnf.getChildren();
 			workMonitor.setMaxAbsoluteWork(children.length + 2);
-			final SatSolver modelSatSolver = new SatSolver(AdvancedNodeCreator.createNodes(m), 1000);
+			final SatSolver modelSatSolver = new SatSolver(AdvancedNodeCreator.createCNF(m), 1000, false);
 			workMonitor.worked();
 			for (int i = 0; i < children.length; i++) {
 				final Node child = children[i];

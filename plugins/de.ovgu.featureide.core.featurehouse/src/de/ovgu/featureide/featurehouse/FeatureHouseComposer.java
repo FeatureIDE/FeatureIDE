@@ -90,7 +90,7 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.job.AStoppableJob;
 import fuji.CompilerWarningException;
@@ -607,7 +607,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		composer.addCompositionErrorListener(compositionErrorListener);
 		try {
 			IFile cnfFile = featureProject.getSourceFolder().getFile("model.cnf");
-			Node nodes = NodeCreator.createNodes(featureProject.getFeatureModel().clone()).toCNF();
+			Node nodes = AdvancedNodeCreator.createCNF(featureProject.getFeatureModel());
 			String input = nodes.toString(NodeWriter.javaSymbols);
 			input = input.replaceAll("!", "! ");
 			InputStream cnfSource = new ByteArrayInputStream(input.getBytes(Charset.availableCharsets().get("UTF-8")));

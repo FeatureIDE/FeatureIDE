@@ -392,11 +392,11 @@ public class InterfaceCompositionTester {
 
 	private static boolean compareModels(final FeatureModel newCompleteModel, final FeatureModel newCompleteModel2) {
 		System.out.print("Creating node for model 1 ...");
-		Node cnf1 = AdvancedNodeCreator.createNodes(newCompleteModel);
+		Node cnf1 = AdvancedNodeCreator.createCNF(newCompleteModel);
 		System.out.println(" > Done!");
 
 		System.out.print("Creating node for model 2 ...");
-		Node cnf2 = AdvancedNodeCreator.createNodes(newCompleteModel2);
+		Node cnf2 = AdvancedNodeCreator.createCNF(newCompleteModel2);
 		System.out.println(" > Done!");
 
 		System.out.print("Comparing both model ...");

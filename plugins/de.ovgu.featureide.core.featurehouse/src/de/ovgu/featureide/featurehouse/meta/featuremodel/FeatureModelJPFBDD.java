@@ -28,7 +28,7 @@ import org.prop4j.NodeWriter;
 
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 
 /**
  * Defines the content of the feature model class specific for JPF-BDD.
@@ -81,7 +81,7 @@ public class FeatureModelJPFBDD implements IFeatureModelClass {
 
 	@Override
 	public String getFormula() {
-		final Node nodes = NodeCreator.createNodes(featureModel.clone()).toCNF();//.eliminateNotSupportedSymbols(NodeWriter.javaSymbols);
+		final Node nodes = AdvancedNodeCreator.createCNF(featureModel);//.eliminateNotSupportedSymbols(NodeWriter.javaSymbols);
 		String formula = nodes.toString(NodeWriter.javaSymbols).toLowerCase(Locale.ENGLISH);
 		if (formula.contains("  &&  true  &&  ! false")) {
 			formula = formula.substring(0, formula.indexOf("  &&  true  &&  ! false"));

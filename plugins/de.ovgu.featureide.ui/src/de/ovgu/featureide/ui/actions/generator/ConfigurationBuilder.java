@@ -64,7 +64,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.configuration.Selection;
-import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.job.AStoppableJob;
 import de.ovgu.featureide.ui.UIPlugin;
 
@@ -670,7 +670,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	private void buildAll(Feature root, IProgressMonitor monitor) {
 		LinkedList<Feature> selectedFeatures2 = new LinkedList<Feature>();
 		selectedFeatures2.add(root);
-		rootNode = NodeCreator.createNodes(featureModel, false).toCNF();
+		rootNode = AdvancedNodeCreator.createCNFWithoutAbstract(featureModel);
 		children = new LinkedList<Node>();
 		build(root, "", selectedFeatures2, monitor);
 	}

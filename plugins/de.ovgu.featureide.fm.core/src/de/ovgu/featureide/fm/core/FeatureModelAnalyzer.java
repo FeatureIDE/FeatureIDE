@@ -44,6 +44,7 @@ import org.prop4j.Or;
 import org.prop4j.SatSolver;
 import org.sat4j.specs.TimeoutException;
 
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.Comparison;
 import de.ovgu.featureide.fm.core.editing.ModelComparator;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
@@ -153,8 +154,7 @@ public class FeatureModelAnalyzer {
 	}
 
 	public boolean isValid() throws TimeoutException {
-		Node root = NodeCreator.createNodes(fm.clone());
-		return new SatSolver(root, 1000).isSatisfiable();
+		return new SatSolver(AdvancedNodeCreator.createCNF(fm), 1000, false).isSatisfiable();
 	}
 
 	/**
@@ -213,8 +213,7 @@ public class FeatureModelAnalyzer {
 	 * @throws TimeoutException
 	 */
 	public boolean checkCondition(Node condition) {
-
-		Node featureModel = NodeCreator.createNodes(fm);
+		Node featureModel = AdvancedNodeCreator.createNodes(fm);
 		// FM => (condition)
 		Implies finalFormula = new Implies(featureModel, condition.clone());
 		try {
@@ -257,7 +256,7 @@ public class FeatureModelAnalyzer {
 		if ((featureSets == null) || (featureSets.size() < 2))
 			return true;
 
-		Node featureModel = NodeCreator.createNodes(fm);
+		Node featureModel = AdvancedNodeCreator.createNodes(fm);
 
 		ArrayList<Node> conjunctions = new ArrayList<Node>(featureSets.size());
 		for (Collection<Feature> features : featureSets) {
@@ -453,11 +452,13 @@ public class FeatureModelAnalyzer {
 		result.add(cachedCoreFeatures);
 		result.add(cachedDeadFeatures);
 		
-		Node formula = NodeCreator.createNodes(fm);
+		Node formula = AdvancedNodeCreator.createCNF(fm);
 		if (selectedFeatures.length > 0) {
-			formula = new And(formula, new Or(selectedFeatures));
+			final Node[] extendedChildren = Arrays.copyOf(formula.getChildren(), formula.getChildren().length + 1);
+			extendedChildren[formula.getChildren().length] = new Or(selectedFeatures);
+			formula.setChildren(extendedChildren);
 		}
-		final SatSolver solver = new SatSolver(formula, timeout);
+		final SatSolver solver = new SatSolver(formula, timeout, false);
 
 		cachedCoreFeatures.clear();
 		cachedDeadFeatures.clear();
@@ -481,7 +482,7 @@ public class FeatureModelAnalyzer {
 	public List<List<Feature>> getAtomicSets() {
 		final ArrayList<List<Feature>> result = new ArrayList<>();
 		
-		final SatSolver solver = new SatSolver(NodeCreator.createNodes(fm), 1000);
+		final SatSolver solver = new SatSolver(AdvancedNodeCreator.createCNF(fm), 1000, false);
 		
 		for (List<Literal> literalList : solver.atomicSets()) {
 			final List<Feature> setList = new ArrayList<>();
@@ -879,27 +880,26 @@ public class FeatureModelAnalyzer {
 			chachedFalseOptionalFeatures.add(f);
 		}
 	}
-	
+
 	public Collection<Feature> getFalseOptionalFeatures() {
-		Collection<Feature> falseOptionalFeatures = new LinkedList<Feature>();
+		final SatSolver solver = new SatSolver(AdvancedNodeCreator.createCNF(fm), 1000, false);
+		Collection<Feature> falseOptionalFeatures = new ArrayList<>();
+
 		for (Feature feature : fm.getFeatures()) {
-			try {
-				if (!feature.isMandatory() && !feature.isRoot()) {
-					SatSolver satsolver = new SatSolver(new Not(new Implies(
-							new And(new Literal(feature.getParent().getName()),
-									NodeCreator.createNodes(fm.clone())),
-							new Literal(feature.getName()))), 1000);
-					if (!satsolver.isSatisfiable()) {
+			if (!feature.isMandatory() && !feature.isRoot()) {
+				try {
+					if (!solver.isSatisfiable(new Literal[] { new Literal(feature.getParent().getName()), new Literal(feature.getName(), false) })) {
 						falseOptionalFeatures.add(feature);
 					}
+				} catch (TimeoutException e) {
+					FMCorePlugin.getDefault().logError(e);
 				}
-			} catch (TimeoutException e) {
-				FMCorePlugin.getDefault().logError(e);
 			}
 		}
+
 		return falseOptionalFeatures;
 	}
-	
+
 	public Collection<Feature> getFalseOptionalFeatures(Collection<Feature> fmFalseOptionals) {
 		Collection<Feature> falseOptionalFeatures = new LinkedList<Feature>();
 		for (Feature feature : fmFalseOptionals) {

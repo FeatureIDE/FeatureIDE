@@ -51,7 +51,7 @@ public class SatConfChanger implements IConfigurationChanger {
 		this.featureModel = featureModel;
 		this.featureGraph = featureGraph;
 		this.variableConfiguration = variableConfiguration;
-		this.calcThread = new SatCalcThread(featureGraph, this, AdvancedNodeCreator.createNodes(featureModel));
+		this.calcThread = new SatCalcThread(featureGraph, this, AdvancedNodeCreator.createCNF(featureModel));
 	}
 
 	private final ConcurrentLinkedQueue<String> changedFeatures = new ConcurrentLinkedQueue<>();

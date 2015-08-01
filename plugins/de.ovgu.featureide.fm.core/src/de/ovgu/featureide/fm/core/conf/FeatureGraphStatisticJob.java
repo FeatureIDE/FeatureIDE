@@ -36,7 +36,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.conf.nodes.Variable;
 import de.ovgu.featureide.fm.core.conf.nodes.VariableConfiguration;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
-import de.ovgu.featureide.fm.core.job.LongRunningJob;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
 public class FeatureGraphStatisticJob extends AProjectJob<FeatureGraphStatisticJob.Arguments> {
@@ -243,7 +243,7 @@ public class FeatureGraphStatisticJob extends AProjectJob<FeatureGraphStatisticJ
 	private void write(boolean value, StringBuilder sb, ArrayList<Integer> indexArray, IConfigurationChanger c1, int vIndex) throws CoreException {
 		final int index = indexArray.get(vIndex);
 		c1.setNewValue(vIndex, value ? Variable.TRUE : Variable.FALSE, true);
-		final List<String> x = LongRunningJob.runMethod(c1.update(false, null));
+		final List<String> x = LongRunningWrapper.runMethod(c1.update(false, null));
 		final String result = x.toString() + "\n";
 		sb.append(result);
 		System.out.print(vIndex + " (" + index + ")");
@@ -256,7 +256,7 @@ public class FeatureGraphStatisticJob extends AProjectJob<FeatureGraphStatisticJ
 		}
 		final int index = indexArray.get(vIndex);
 		c1.setNewValue(vIndex, value ? Variable.TRUE : Variable.FALSE, true);
-		final List<String> x = LongRunningJob.runMethod(c1.update(false, null));
+		final List<String> x = LongRunningWrapper.runMethod(c1.update(false, null));
 		final String result = x.toString();
 		if (!result.equals(satResult)) {
 			System.out.print("false | ");
@@ -290,12 +290,12 @@ public class FeatureGraphStatisticJob extends AProjectJob<FeatureGraphStatisticJ
 			}
 			if (vIndex < featureGraph.getSize()) {
 				c1.setNewValue(vIndex, getValue(type), true);
-				LongRunningJob.runMethod(c1.updateNext());
+				LongRunningWrapper.runMethod(c1.updateNext());
 			}
 		}
 		curTime = split(curTime);
 		count(variableConfiguration);
-		System.out.println(LongRunningJob.runMethod(c1.isValid()));
+		System.out.println(LongRunningWrapper.runMethod(c1.isValid()));
 	}
 
 	private int getValue(int type) {
@@ -317,11 +317,11 @@ public class FeatureGraphStatisticJob extends AProjectJob<FeatureGraphStatisticJ
 		final ConfigurationChanger c1 = new ConfigurationChanger(arguments.featureModel, variableConfiguration, null);
 
 		curTime = split(curTime);
-		LongRunningJob.runMethod(c1.autoCompletion(type));
+		LongRunningWrapper.runMethod(c1.autoCompletion(type));
 
 		curTime = split(curTime);
 		count(variableConfiguration);
-		System.out.println(LongRunningJob.runMethod(c1.isValid()));
+		System.out.println(LongRunningWrapper.runMethod(c1.isValid()));
 	}
 
 	private void statisticPart11(boolean positive) throws IOException, CoreException {
@@ -331,11 +331,11 @@ public class FeatureGraphStatisticJob extends AProjectJob<FeatureGraphStatisticJ
 		final ConfigurationChanger c1 = new ConfigurationChanger(arguments.featureModel, variableConfiguration, null);
 
 		curTime = split(curTime);
-		LongRunningJob.runMethod(c1.simpleAutoCompletion(positive));
+		LongRunningWrapper.runMethod(c1.simpleAutoCompletion(positive));
 
 		curTime = split(curTime);
 		count(variableConfiguration);
-		System.out.println(LongRunningJob.runMethod(c1.isValid()));
+		System.out.println(LongRunningWrapper.runMethod(c1.isValid()));
 	}
 
 	private void statisticPart12() throws IOException, CoreException {

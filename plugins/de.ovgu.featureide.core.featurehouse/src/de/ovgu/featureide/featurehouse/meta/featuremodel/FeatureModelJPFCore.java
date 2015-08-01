@@ -34,7 +34,7 @@ import org.prop4j.Or;
 
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 
 /**
  * Defines the content of the feature model class specific for JPF-Core.
@@ -130,7 +130,7 @@ public class FeatureModelJPFCore implements IFeatureModelClass {
 	private LinkedList<String> addedFeatures = new LinkedList<String>();
 
 	private Node getFormulaJPF(FeatureModel model) {
-		return NodeCreator.createNodes(model.clone()).toCNF();
+		return AdvancedNodeCreator.createCNF(model);
 	}
 	
 	/**

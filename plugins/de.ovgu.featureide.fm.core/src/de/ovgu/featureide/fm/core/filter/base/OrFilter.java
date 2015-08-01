@@ -18,32 +18,29 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.job;
+package de.ovgu.featureide.fm.core.filter.base;
 
-import org.eclipse.core.runtime.jobs.Job;
+import java.util.ArrayList;
 
 /**
- * Job that wraps the functionality of a {@link LongRunningMethod}.
+ * Returns the opposite result of a given {@link IFilter}.
  * 
  * @author Sebastian Krieter
+ * 
+ * @see Filter
  */
-public class LongRunningJob<T> extends AStoppableJob implements IStoppableJob {
+public class OrFilter<T> extends ArrayList<IFilter<T>> implements IFilter<T> {
 
-	private final LongRunningMethod<T> method;
-	private T methodResult = null;
+	private static final long serialVersionUID = 1L;
 
-	public LongRunningJob(String name, LongRunningMethod<T> method) {
-		super(name, Job.LONG);
-		this.method = method;
-	}
-
-	protected boolean work() throws Exception {
-		methodResult = method.execute(workMonitor);
-		return true;
-	}
-
-	public T getResults() {
-		return methodResult;
+	@Override
+	public boolean isValid(T object) {
+		for (IFilter<T> filter : this) {
+			if (filter.isValid(object)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

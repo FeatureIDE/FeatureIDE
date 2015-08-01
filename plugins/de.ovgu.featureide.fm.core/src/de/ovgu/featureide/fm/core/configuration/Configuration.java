@@ -33,7 +33,7 @@ import org.sat4j.specs.TimeoutException;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.job.LongRunningJob;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.WorkMonitor;
 
 /**
@@ -156,7 +156,7 @@ public class Configuration implements Cloneable, IConfiguration {
 	}
 
 	private void loadPropagator(boolean propagate) {
-		LongRunningJob.runMethod(this.propagator.load());
+		LongRunningWrapper.runMethod(this.propagator.load());
 		this.propagate = propagate;
 		update(false, null);
 	}
@@ -184,7 +184,7 @@ public class Configuration implements Cloneable, IConfiguration {
 	}
 	
 	public boolean canBeValid() {
-		return LongRunningJob.runMethod(propagator.canBeValid());
+		return LongRunningWrapper.runMethod(propagator.canBeValid());
 	}
 
 	public FeatureModel getFeatureModel() {
@@ -234,7 +234,7 @@ public class Configuration implements Cloneable, IConfiguration {
 	}
 	
 	public LinkedList<List<String>> getSolutions(int max) throws TimeoutException {
-		return LongRunningJob.runMethod(propagator.getSolutions(max));
+		return LongRunningWrapper.runMethod(propagator.getSolutions(max));
 	}
 	
 	public List<Feature> getUnSelectedFeatures() {
@@ -259,7 +259,7 @@ public class Configuration implements Cloneable, IConfiguration {
 	 * @return  {@code true} if the current selection is a valid configuration
 	 */
 	public boolean isValid() {
-		return LongRunningJob.runMethod(propagator.isValid());
+		return LongRunningWrapper.runMethod(propagator.isValid());
 	}
 	
 	/**
@@ -267,15 +267,15 @@ public class Configuration implements Cloneable, IConfiguration {
 	 * Use this, when propgate is disabled (hidden features are not updated).
 	 */
 	public boolean isValidNoHidden() {
-		return LongRunningJob.runMethod(propagator.isValidNoHidden());
+		return LongRunningWrapper.runMethod(propagator.isValidNoHidden());
 	}
 	
 	public void leadToValidConfiguration(List<SelectableFeature> featureList, WorkMonitor workMonitor) {
-		LongRunningJob.runMethod(propagator.leadToValidConfiguration(featureList));
+		LongRunningWrapper.runMethod(propagator.leadToValidConfiguration(featureList));
 	}
 	
 	public void leadToValidConfiguration(List<SelectableFeature> featureList, int mode, WorkMonitor workMonitor) {
-		LongRunningJob.runMethod(propagator.leadToValidConfiguration(featureList, mode));
+		LongRunningWrapper.runMethod(propagator.leadToValidConfiguration(featureList, mode));
 	}
 
 	/**
@@ -300,7 +300,7 @@ public class Configuration implements Cloneable, IConfiguration {
 	 * @see #number(long)
 	 */
 	public long number() {
-		return LongRunningJob.runMethod(propagator.number(250));
+		return LongRunningWrapper.runMethod(propagator.number(250));
 	}
 	
 	/**
@@ -309,7 +309,7 @@ public class Configuration implements Cloneable, IConfiguration {
 	 * 	or a negative value (if a timeout occured) that indicates that there are more solutions than the absolute value
 	 */
 	public long number(long timeout) {
-		return LongRunningJob.runMethod(propagator.number(timeout));
+		return LongRunningWrapper.runMethod(propagator.number(timeout));
 	}
 
 	public void resetValues() {
@@ -355,7 +355,7 @@ public class Configuration implements Cloneable, IConfiguration {
 	
 	public void update(boolean redundantManual, String startFeatureName) {
 		if (propagate) {
-			LongRunningJob.runMethod(propagator.update(redundantManual, startFeatureName));
+			LongRunningWrapper.runMethod(propagator.update(redundantManual, startFeatureName));
 		}
 	}
 

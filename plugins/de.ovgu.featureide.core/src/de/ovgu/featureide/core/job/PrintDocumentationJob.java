@@ -49,7 +49,7 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
-import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.filter.base.IFilter;
 import de.ovgu.featureide.fm.core.io.IOConstants;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
@@ -137,9 +137,8 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 				}
 			}
 
-//			filters.add(new FeatureFilter(validFeatureIDs));
 			final Node[] nodes = new Node[conf.getFeatures().size() + 1];
-			nodes[0] = NodeCreator.createNodes(conf.getFeatureModel());
+			nodes[0] = AdvancedNodeCreator.createCNF(conf.getFeatureModel());
 			int i = 1;
 			for (SelectableFeature feature : conf.getFeatures()) {
 				Selection selection = feature.getSelection();
@@ -150,10 +149,8 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 			
 			arguments.merger.setValidFeatureIDs(featureIDs.length, validFeatureIDs);
 		} else if (arguments.merger instanceof ContextMerger) {
-			
-//			filters.add(new ContextFilter(arguments.featureName, projectSignatures));
 			final Node[] nodes = new Node[2];
-			nodes[0] = NodeCreator.createNodes(projectSignatures.getFeatureModel());
+			nodes[0] = AdvancedNodeCreator.createCNF(projectSignatures.getFeatureModel());
 			nodes[1] = new Literal(arguments.featureName, true);
 			signatureFilters.add(new ConstraintFilter(nodes));
 			commentFilters.add(new ConstraintFilter(nodes));
@@ -165,7 +162,7 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 			
 			if (featureProject.getComposer().getGenerationMechanism() == Mechanism.PREPROCESSOR) {
 				final Node[] nodes = new Node[2];
-				nodes[0] = NodeCreator.createNodes(projectSignatures.getFeatureModel());
+				nodes[0] = AdvancedNodeCreator.createCNF(projectSignatures.getFeatureModel());
 				nodes[1] = new Literal(arguments.featureName, true);
 				signatureFilters.add(new ConstraintFilter(nodes));
 				commentFilters.add(new ConstraintFilter(nodes));

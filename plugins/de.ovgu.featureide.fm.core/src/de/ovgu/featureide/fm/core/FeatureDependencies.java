@@ -34,7 +34,7 @@ import org.prop4j.Not;
 import org.prop4j.SatSolver;
 import org.sat4j.specs.TimeoutException;
 
-import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 
 /**
  * Calculates dependencies of features
@@ -160,7 +160,7 @@ public class FeatureDependencies {
      * @return Node representing the featureModel
      */
     private  Node createRootNode(FeatureModel fm) {
-		return NodeCreator.createNodes(fm, true).toCNF();
+		return AdvancedNodeCreator.createCNF(fm);
     }
 
     /**

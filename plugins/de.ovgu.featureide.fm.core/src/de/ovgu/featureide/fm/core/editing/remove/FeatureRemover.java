@@ -303,18 +303,16 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 
 			int j = 0;
 			for (Clause newClause : newClauseSet) {
-				newClauses[j++] = new Or(newClause.getLiterals());
+				newClauses[j++] = new Or(Node.clone(newClause.getLiterals()));
 			}
 
 			newClauses[newClauseSize] = new Or(allLiterals);
 			newClauses[newClauseSize + 1] = new Literal(NodeCreator.varTrue);
 			newClauses[newClauseSize + 2] = new Literal(NodeCreator.varFalse, false);
 
-			fmNode.setChildren(newClauses);
-
 			workMonitor.worked();
 
-			return fmNode;
+			return new And(newClauses);
 		} else if (fmNode instanceof Or) {
 			for (Node clauseChildren : fmNode.getChildren()) {
 				final Literal literal = (Literal) clauseChildren;
@@ -322,11 +320,9 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 					return new Literal(NodeCreator.varTrue);
 				}
 			}
-			workMonitor.worked();
-			return fmNode;
+			return fmNode.clone();
 		} else {
-			workMonitor.worked();
-			return (features.contains(((Literal) fmNode).var)) ? new Literal(NodeCreator.varTrue) : fmNode;
+			return (features.contains(((Literal) fmNode).var)) ? new Literal(NodeCreator.varTrue) : fmNode.clone();
 		}
 	}
 

@@ -31,7 +31,7 @@ import org.prop4j.NodeWriter;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureComparator;
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 
 /**
  * Defines the content of the feature model class specific for VarexJ.
@@ -88,7 +88,7 @@ public class FeatureModelVarexJ implements IFeatureModelClass {
 
 	@Override
 	public String getFormula() {
-		final Node nodes = NodeCreator.createNodes(featureModel.clone()).toCNF();
+		final Node nodes = AdvancedNodeCreator.createCNF(featureModel);
 		String formula = nodes.toString(NodeWriter.javaSymbols);
 		if (formula.contains(TRUE_FALSE)) {
 			formula = formula.substring(0, formula.indexOf(TRUE_FALSE));

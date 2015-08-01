@@ -43,7 +43,7 @@ import org.prop4j.Literal;
 import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
@@ -90,7 +90,7 @@ public class ExportDIMACSHandler extends AFileHandler {
 			 * @return
 			 */
 			private String getCNF(FeatureModel model) {
-				Node nodes = NodeCreator.createNodes(model.clone()).toCNF();
+				Node nodes = AdvancedNodeCreator.createCNF(model);
 				StringBuilder string = new StringBuilder();
 				Map<String, Integer> featureMap = new HashMap<String, Integer>();
 				int i = 1;

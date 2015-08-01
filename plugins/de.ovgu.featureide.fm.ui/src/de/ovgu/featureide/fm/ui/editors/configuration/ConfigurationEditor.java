@@ -77,7 +77,7 @@ import de.ovgu.featureide.fm.core.io.ModelIOFactory;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.IStoppableJob;
-import de.ovgu.featureide.fm.core.job.LongRunningJob;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -245,7 +245,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		}
 
 		final Display currentDisplay = Display.getCurrent();
-		final IStoppableJob configJob = LongRunningJob.createJob("Load Configuation", configuration.getPropagator().load());
+		final IStoppableJob configJob = LongRunningWrapper.createJob("Load Configuation", configuration.getPropagator().load());
 		configJob.addJobFinishedListener(new JobFinishListener() {
 			@Override
 			public void jobFinished(IJob finishedJob, boolean success) {

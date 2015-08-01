@@ -43,8 +43,8 @@ import de.ovgu.featureide.fm.core.configuration.IConfigurationPropagator;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
-import de.ovgu.featureide.fm.core.job.LongRunningJob;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.WorkMonitor;
 
 /**
@@ -65,7 +65,6 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 
 	private GraphCalcThread calcThread;
 	private SatSolver satSolver1 = null;
-	private SatSolver satSolver2 = null;
 
 	private boolean initialized = false;
 
@@ -74,7 +73,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 		this.featureGraph = featureModel.getFeatureGraph();
 		this.variableConfiguration = variableConfiguration;
 		this.c = c;
-		LongRunningJob.runMethod(load());
+		LongRunningWrapper.runMethod(load());
 	}
 
 	public class LoadMethod implements LongRunningMethod<Void> {
@@ -83,7 +82,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 			if (!initialized) {
 				lastComputedValues = new byte[variableConfiguration.size()];
 				Arrays.fill(lastComputedValues, (byte) Variable.UNDEFINED);
-				node = AdvancedNodeCreator.createNodes(featureModel);
+				node = AdvancedNodeCreator.createCNF(featureModel);
 				calcThread = new GraphCalcThread(featureGraph.getFeatureArray(), ConfigurationChanger.this, node);
 				initialized = true;
 			}
@@ -132,10 +131,7 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 	public class CountSolutionsMethod implements LongRunningMethod<Long> {
 		@Override
 		public Long execute(WorkMonitor monitor) {
-			if (satSolver2 == null) {
-				satSolver2 = new SatSolver(node, 1000, false);
-			}
-			return satSolver2.countSolutions(getCurrentLiterals(true));
+			return new SatSolver(node, 1000, false).countSolutions(getCurrentLiterals(true));
 		}
 	}
 

@@ -41,7 +41,7 @@ import org.prop4j.Node;
 import org.prop4j.NodeWriter;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
@@ -88,7 +88,7 @@ public class ExportCNFHandler extends AFileHandler {
 			 * @return
 			 */
 			private String getCNF(FeatureModel model) {
-				Node nodes = NodeCreator.createNodes(model.clone()).toCNF();
+				Node nodes = AdvancedNodeCreator.createCNF(model);
 				StringBuilder cnf = new StringBuilder();
 				cnf.append("Logical Symbols:\r\n");
 				cnf.append(nodes.toString(NodeWriter.logicalSymbols));

@@ -105,7 +105,7 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 
 			workMonitor.setMaxAbsoluteWork((2 * arguments.featureModel.getFeatureNames().size()) + 1);
 
-			final CalcFixedThread calcThread = new CalcFixedThread(AdvancedNodeCreator.createNodes(arguments.featureModel), workMonitor);
+			final CalcFixedThread calcThread = new CalcFixedThread(AdvancedNodeCreator.createCNF(arguments.featureModel), workMonitor);
 			calcThread.addObjects(arguments.featureModel.getFeatureNames());
 			calcThread.start();
 
