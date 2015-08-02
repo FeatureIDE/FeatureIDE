@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.core.editing;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -207,7 +208,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	}
 
 	public void setExcludedFeatures(IFilter<Feature> featureFilter) {
-		this.excludedFeatureNames = Filter.toString(Filter.filter(featureModel.getFeatures(), featureFilter));
+		this.excludedFeatureNames = Filter.toString(Filter.filter(new LinkedList<>(featureModel.getFeatures()), featureFilter));
 	}
 
 	public void setFeatureModel(FeatureModel featureModel) {
