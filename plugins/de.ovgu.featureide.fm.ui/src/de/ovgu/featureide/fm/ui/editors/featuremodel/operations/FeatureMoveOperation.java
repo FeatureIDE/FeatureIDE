@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.MOVE_FEATURE;
+
 import java.util.LinkedList;
 
 import org.eclipse.draw2d.geometry.Point;
@@ -36,7 +38,7 @@ import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
  */
 public class FeatureMoveOperation extends AbstractFeatureModelOperation {
 
-	private static final String LABEL = "Move Feature";
+	private static final String LABEL = MOVE_FEATURE;
 	private FeatureOperationData data;
 	private Point newPos;
 	private Point oldPos;

@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.configuration;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.SELECT_THE_CORRESPONDING_FEATUREMODEL_;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -182,13 +184,11 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		// if mpl.velvet exists then it is a multi product line
 		IResource res = project.findMember("mpl.velvet");
 		boolean mappingModel = false;
-		if (res != null && res instanceof IFile) {
-			featureModel = new ExtendedFeatureModel();
+		if (res instanceof IFile) {
 			IContainer parentFolder = file.getParent();
 			mappingModel = parentFolder != null && "InterfaceMapping".equals(parentFolder.getName());
 		} else {
 			res = project.findMember("model.xml");
-			featureModel = new FeatureModel();
 		}
 
 		if (res instanceof IFile) {
@@ -301,7 +301,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	// TODO add all model extensions
 	private String openFileDialog() {
 		FileDialog dialog = new FileDialog(getSite().getWorkbenchWindow().getShell(), SWT.MULTI);
-		dialog.setText("Select the corresponding Featuremodel.");
+		dialog.setText(SELECT_THE_CORRESPONDING_FEATUREMODEL_);
 		dialog.setFileName("model.xml");
 		dialog.setFilterExtensions(new String[] { "*.xml", "*.velvet" });
 		dialog.setFilterNames(new String[] { "XML *.xml", "VELVET *.velvet" });
@@ -391,19 +391,15 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	 * Reads the featureModel from the modelFile.
 	 */
 	private void readFeatureModel() {
+		final int fileType = ModelIOFactory.getTypeByFileName(modelFile.getName());
+
+		featureModel = ModelIOFactory.getNewFeatureModel(fileType);
 		featureModel.initFMComposerExtension(file.getProject());
 
-		final AbstractFeatureModelReader reader;
-		if (featureModel instanceof ExtendedFeatureModel) {
-			reader = ModelIOFactory.getModelReader(featureModel, ModelIOFactory.TYPE_VELVET);
-		} else {
-			reader = ModelIOFactory.getModelReader(featureModel, ModelIOFactory.TYPE_XML);
-		}
+		final AbstractFeatureModelReader reader = ModelIOFactory.getModelReader(featureModel, fileType);
 		try {
 			reader.readFromFile(modelFile);
-		} catch (FileNotFoundException e) {
-			FMUIPlugin.getDefault().logError(e);
-		} catch (UnsupportedModelException e) {
+		} catch (FileNotFoundException | UnsupportedModelException e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
 	}

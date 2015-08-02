@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Feature Model Core Plug-In
 Bundle-SymbolicName: de.ovgu.featureide.fm.core;singleton:=true
-Bundle-Version: 2.7.3.qualifier
+Bundle-Version: 2.7.4.qualifier
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources
 Bundle-ActivationPolicy: lazy
@@ -35,6 +35,7 @@ Export-Package: Jakarta.DRAttributes,
  de.ovgu.featureide.fm.core.io.xml,
  de.ovgu.featureide.fm.core.job,
  de.ovgu.featureide.fm.core.job.util,
+ de.ovgu.featureide.fm.core.localization,
  guidsl,
  org.prop4j,
  org.sat4j;uses:="org.sat4j.core,org.sat4j.specs,org.sat4j.reader",

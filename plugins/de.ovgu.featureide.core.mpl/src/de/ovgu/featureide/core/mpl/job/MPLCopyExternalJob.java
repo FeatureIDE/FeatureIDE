@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.core.mpl.job;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.COPIED_SOURCE_FILES_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.COPYING_SOURCE_FILES;
+
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -47,7 +50,7 @@ public class MPLCopyExternalJob extends AProjectJob<MPLCopyExternalJob.Arguments
 	}
 	
 	protected MPLCopyExternalJob(Arguments arguments) {
-		super("Copying Source Files", arguments);
+		super(COPYING_SOURCE_FILES, arguments);
 		setPriority(BUILD);
 	}
 	
@@ -69,7 +72,7 @@ public class MPLCopyExternalJob extends AProjectJob<MPLCopyExternalJob.Arguments
 			return false;
 		}
 
-		MPLPlugin.getDefault().logInfo("Copied Source Files.");
+		MPLPlugin.getDefault().logInfo(COPIED_SOURCE_FILES_);
 		return true;
 	}
 }

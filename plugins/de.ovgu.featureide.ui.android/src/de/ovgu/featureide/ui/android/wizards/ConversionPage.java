@@ -20,6 +20,21 @@
  */
 package de.ovgu.featureide.ui.android.wizards;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.ADD_THE_FEATUREIDE_NATURE_TO_ANDROID_PROJECTS_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD;
+import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD_PATH_EQUALS_CONFIGURATIONS_PATH_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.EQUATIONS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NO_COMPOSITION_ENGINES_INSTALLED_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.PLEASE_SELECT_A_COMPOSER_FROM_THE_SELECTION_BELOW_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SETS_THE_PATH_OF_COMPOSED_FILES_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SETS_THE_PATH_OF_CONFIGURATIONFILES_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SETS_THE_PATH_OF_SOURCE_FILES_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SOURCE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SOURCE_PATH_EQUALS_BUILD_PATH_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SOURCE_PATH_EQUALS_CONFIGURATIONS_PATH_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.THE_ANDROID_RESOURCE_FILE_PATH_CANNOT_BE_CHANGED_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.THE_ANDROID_SOURCE_FILE_PATH_CANNOT_BE_CHANGED_;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -51,7 +66,7 @@ public class ConversionPage extends NewFeatureProjectPage {
 	
 	public ConversionPage() {
 		super();
-		setDescription("Add the FeatureIDE nature to Android projects.");
+		setDescription(ADD_THE_FEATUREIDE_NATURE_TO_ANDROID_PROJECTS_);
 	}
 	
 	@Override
@@ -73,7 +88,7 @@ public class ConversionPage extends NewFeatureProjectPage {
 		GridData gridData = new GridData(GridData.FILL_BOTH);
 		gridData.horizontalSpan = 2;
 		helloLabel.setLayoutData(gridData);
-		helloLabel.setText("Please select a composer from the selection below.");
+		helloLabel.setText(PLEASE_SELECT_A_COMPOSER_FROM_THE_SELECTION_BELOW_);
 		
 	    Label label = new Label(toolGroup, SWT.NONE);
 	    label.setText("Composers:");
@@ -115,7 +130,7 @@ public class ConversionPage extends NewFeatureProjectPage {
 		
 		String descriptionString = descriptionStringBuilder.toString();
 		if (composerExtensions.isEmpty()) {
-			descriptionString = "No composition engines installed.";
+			descriptionString = NO_COMPOSITION_ENGINES_INSTALLED_;
 			setDescription(descriptionString);
 			toolCB.setEnabled(false);
 		}
@@ -135,7 +150,7 @@ public class ConversionPage extends NewFeatureProjectPage {
 		pathGroup.setLayoutData(gd);
 		pathGroup.setLayout(layout);
 		
-		String tooltip = "The Android source file path cannot be changed.";
+		String tooltip = THE_ANDROID_SOURCE_FILE_PATH_CANNOT_BE_CHANGED_;
 		label = new Label(pathGroup, SWT.NULL);
 		label.setText("Android Source Path:");
 		label.setToolTipText(tooltip);
@@ -144,7 +159,7 @@ public class ConversionPage extends NewFeatureProjectPage {
 		androidSrcPath.setText("src");
 		androidSrcPath.setToolTipText(tooltip);
 		
-		tooltip = "The Android resource file path cannot be changed.";
+		tooltip = THE_ANDROID_RESOURCE_FILE_PATH_CANNOT_BE_CHANGED_;
 		label = new Label(pathGroup, SWT.NULL);
 		label.setText("Android Resource Files Path:");
 		label.setToolTipText(tooltip);
@@ -153,7 +168,7 @@ public class ConversionPage extends NewFeatureProjectPage {
 		androidResPath.setText("res");
 		androidResPath.setToolTipText(tooltip);
 		
-		tooltip = "Sets the path of composed files.";
+		tooltip = SETS_THE_PATH_OF_COMPOSED_FILES_;
 		buildLabel = new Label(pathGroup, SWT.NULL);
 		buildLabel.setText("&Composed files Path:");
 		buildLabel.setToolTipText(tooltip);
@@ -162,7 +177,7 @@ public class ConversionPage extends NewFeatureProjectPage {
 		buildPath.setText("composed");
 		buildPath.setToolTipText(tooltip);
 		
-		tooltip = "Sets the path of source files.";
+		tooltip = SETS_THE_PATH_OF_SOURCE_FILES_;
 		label = new Label(pathGroup, SWT.NULL);
 		label.setText("&Source Path:");
 		label.setToolTipText(tooltip);
@@ -171,7 +186,7 @@ public class ConversionPage extends NewFeatureProjectPage {
 		sourcePath.setText("source");
 		sourcePath.setToolTipText(tooltip);
 		
-		tooltip = "Sets the path of configurationfiles.";
+		tooltip = SETS_THE_PATH_OF_CONFIGURATIONFILES_;
 		label = new Label(pathGroup, SWT.NULL);
 		label.setText("&Configurations Path:");
 		label.setToolTipText(tooltip);
@@ -202,23 +217,23 @@ public class ConversionPage extends NewFeatureProjectPage {
 			return;
 		}
 		if (getSourcePath().equals(getConfigPath())) {
-			updateStatus("Source path equals configurations path.");
+			updateStatus(SOURCE_PATH_EQUALS_CONFIGURATIONS_PATH_);
 			return;
 		}
 		if (getSourcePath().equals(getBuildPath())) {
-			updateStatus("Source path equals build path.");
+			updateStatus(SOURCE_PATH_EQUALS_BUILD_PATH_);
 			return;
 		}
 		if (getBuildPath().equals(getConfigPath())) {
-			updateStatus("Build path equals configurations path.");
+			updateStatus(BUILD_PATH_EQUALS_CONFIGURATIONS_PATH_);
 			return;
 		}
-		if (isPathEmpty(getSourcePath(), "Source")
-				|| isPathEmpty(getBuildPath(), "Build")
-				|| isPathEmpty(getConfigPath(), "Equations")
-				|| isInvalidPath(getSourcePath(), "Source")
-				|| isInvalidPath(getBuildPath(), "Build")
-				|| isInvalidPath(getConfigPath(), "Equations")) {
+		if (isPathEmpty(getSourcePath(), SOURCE)
+				|| isPathEmpty(getBuildPath(), BUILD)
+				|| isPathEmpty(getConfigPath(), EQUATIONS)
+				|| isInvalidPath(getSourcePath(), SOURCE)
+				|| isInvalidPath(getBuildPath(), BUILD)
+				|| isInvalidPath(getConfigPath(), EQUATIONS)) {
 			return;
 		}
 		

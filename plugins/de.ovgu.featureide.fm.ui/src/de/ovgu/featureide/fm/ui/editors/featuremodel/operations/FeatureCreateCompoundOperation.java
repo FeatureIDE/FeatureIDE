@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_COMPOUND;
+
 import java.util.LinkedList;
 
 import org.eclipse.core.commands.ExecutionException;
@@ -47,7 +49,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayou
  */
 public class FeatureCreateCompoundOperation extends AbstractFeatureModelOperation {
 
-	private static final String LABEL = "Create Compound";
+	private static final String LABEL = CREATE_COMPOUND;
 	Feature newCompound;
 	private Feature parent;
 	private Object viewer;

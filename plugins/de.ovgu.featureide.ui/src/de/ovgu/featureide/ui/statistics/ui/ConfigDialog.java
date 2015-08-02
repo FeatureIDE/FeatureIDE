@@ -20,6 +20,16 @@
  */
 package de.ovgu.featureide.ui.statistics.ui;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.AVERAGE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CONFIGURATION_DIALOG;
+import static de.ovgu.featureide.fm.core.localization.StringTable.HIGH;
+import static de.ovgu.featureide.fm.core.localization.StringTable.HIGH_TO_THREAD_MAX_PRIORITY_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.INVALID_SELECTION_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.LOW;
+import static de.ovgu.featureide.fm.core.localization.StringTable.MAXIMUM_DURATION_OF_THE_CALCULATION_IN_SECONDS_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.YOUR_CHOOSEN_TIMEOUT_MAY_NOT_BE_ENOUGH_TO_SHOW_THE_EXACT_RESULT_;
+
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.core.runtime.jobs.Job;
@@ -52,9 +62,6 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
  * @author Patrick Haese
  */
 public class ConfigDialog extends TitleAreaDialog {
-	private static final String HIGH = "High";
-	private static final String AVERAGE = "Average";
-	private static final String LOW = "Low";
 	private static final String MINUTE = "60";
 	
 	private int priority;
@@ -87,7 +94,7 @@ public class ConfigDialog extends TitleAreaDialog {
 	@Override
 	protected void configureShell(Shell newShell) {
 		super.configureShell(newShell);
-		newShell.setText("Configuration Dialog");
+		newShell.setText(CONFIGURATION_DIALOG);
 		newShell.setImage(GUIDefaults.FEATURE_SYMBOL);
 	}
 	
@@ -101,8 +108,8 @@ public class ConfigDialog extends TitleAreaDialog {
 		
 		setHelpAvailable(false);
 		setMessage("In this dialog you can set the options for the calculation. Be aware that\n"
-				+ "your choosen timeout may not be enough to show the exact result.");
-		setTitle("Calculate " + titlePart);
+				+ YOUR_CHOOSEN_TIMEOUT_MAY_NOT_BE_ENOUGH_TO_SHOW_THE_EXACT_RESULT_);
+		setTitle(CALCULATE + titlePart);
 		container = (Composite) super.createDialogArea(parent);
 		GridLayout gl_container = new GridLayout(2, false);
 		container.setLayout(gl_container);
@@ -146,7 +153,7 @@ public class ConfigDialog extends TitleAreaDialog {
 	    		convertToReadable();
 	    	}
 	    });
-	    timeOutComboBox.setToolTipText("Maximum duration of the calculation in seconds.");
+	    timeOutComboBox.setToolTipText(MAXIMUM_DURATION_OF_THE_CALCULATION_IN_SECONDS_);
 	    timeOutComboBox.setTextLimit(300000);
 	    
 	    timeOutComboBox.setItems(new String[] { "1", "10", "30", MINUTE, "180", "300", "900", "1800", "3600" });
@@ -162,7 +169,7 @@ public class ConfigDialog extends TitleAreaDialog {
 	private void createPriorityComboBox() {
 	    priorityComboBox = new Combo(container, SWT.READ_ONLY);
 	    priorityComboBox.setToolTipText("Priority of the calculation.\n" + "Low coresponds to Thread.MIN_PRIORITY,\n" + "Average to Thread.NORM_PRIORITY and\n"
-	    		+ "High to Thread.MAX_PRIORITY.");
+	    		+ HIGH_TO_THREAD_MAX_PRIORITY_);
 	    priorityComboBox.setItems(new String[] { LOW, AVERAGE, HIGH });
 	    GridData gd_combo = new GridData(SWT.RIGHT, SWT.TOP, false, false, 1, 1);
 	    gd_combo.heightHint = 20;
@@ -204,7 +211,7 @@ public class ConfigDialog extends TitleAreaDialog {
 		} else if (p.equals(HIGH)) {
 			priority = Job.SHORT;
 		} else {
-			throw new RuntimeException("Invalid Selection.");
+			throw new RuntimeException(INVALID_SELECTION_);
 		}
 		
 		String t = timeOutComboBox.getText();

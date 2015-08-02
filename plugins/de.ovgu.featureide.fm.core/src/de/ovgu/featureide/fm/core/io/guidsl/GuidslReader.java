@@ -20,6 +20,13 @@
  */
 package de.ovgu.featureide.fm.core.io.guidsl;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT_IS_A_TAUTOLOGY_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT_IS_NOT_SATISFIABLE_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.EMPTY___;
+import static de.ovgu.featureide.fm.core.localization.StringTable.HIDDEN;
+import static de.ovgu.featureide.fm.core.localization.StringTable.THE_COMPOUND_FEATURE_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.THE_FEATURE_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.UNSUPPORTED_TYPE_IN_GUIDSL_GRAMMAR;
 import guidsl.AstListNode;
 import guidsl.AstNode;
 import guidsl.AstOptNode;
@@ -199,15 +206,15 @@ public class GuidslReader extends AbstractFeatureModelReader {
 				String line = list.get(i);
 				if(line.contains("{")){
 					String tempLine = line.substring(line.indexOf('{')).toLowerCase(Locale.ENGLISH);
-					if(tempLine.contains("hidden")){
-						int ix = tempLine.indexOf("hidden");
+					if(tempLine.contains(HIDDEN)){
+						int ix = tempLine.indexOf(HIDDEN);
 						String ch = tempLine.substring(ix-1,ix);
 						if (ch.equals(" ") || ch.equals("{")){
 							String featName = line.substring(0,line.indexOf('{')-1);
 							if (featureModel.getFeature(featName) != null)
 								featureModel.getFeature(featName).setHidden(true);
 							else 
-								throw new UnsupportedModelException("The feature '" + featName + "' does not occur in the feature model!", 0);
+								throw new UnsupportedModelException(THE_FEATURE_ + featName + "' does not occur in the feature model!", 0);
 						}
 						else{
 							// SAVE OTHER ANNOTATIONS - Write to the comment session
@@ -245,7 +252,7 @@ public class GuidslReader extends AbstractFeatureModelReader {
 		final String name = gProduction.getIDENTIFIER().name;
 		final Feature feature = featureModel.getFeature(gProduction.getIDENTIFIER().name);
 		if (feature == null) {
-			throw new UnsupportedModelException("The compound feature '" + name + "' have to occur on a right side of a rule before using it on a left side!", gProduction.getIDENTIFIER().lineNum());
+			throw new UnsupportedModelException(THE_COMPOUND_FEATURE_ + name + "' have to occur on a right side of a rule before using it on a left side!", gProduction.getIDENTIFIER().lineNum());
 		}
 		readGProduction(gProduction, feature);
 	}
@@ -299,20 +306,20 @@ public class GuidslReader extends AbstractFeatureModelReader {
 	private Feature createFeature(AstToken token) throws UnsupportedModelException {
 		Feature feature = new Feature(featureModel, token.name);
 		if (!featureModel.addFeature(feature))
-			throw new UnsupportedModelException("The feature '" + feature.getName() + "' occurs again on a right side of a rule and that's not allowed!", token.lineNum());
+			throw new UnsupportedModelException(THE_FEATURE_ + feature.getName() + "' occurs again on a right side of a rule and that's not allowed!", token.lineNum());
 		return feature;
 	}
 
 	private Feature simplify(Feature feature) {
 		if (feature.getChildrenCount() == 1) {
 			Feature child = feature.getFirstChild();
-			if (child.getName().equals("_" + feature.getName())) {
+			if (child.getName().equals(EMPTY___ + feature.getName())) {
 				feature.removeChild(child);
 				feature.setChildren(child.getChildren());
 				feature.setAND(child.isAnd());
 				featureModel.deleteFeatureFromTable(child);
 			}
-			else if (feature.getName().equals(child.getName() + "_")) {
+			else if (feature.getName().equals(child.getName() + EMPTY___)) {
 				feature.removeChild(child);
 				if (feature == featureModel.getRoot())
 					featureModel.replaceRoot(child);
@@ -320,7 +327,7 @@ public class GuidslReader extends AbstractFeatureModelReader {
 					featureModel.deleteFeatureFromTable(feature);
 				feature = child;
 			}
-			else if (feature != featureModel.getRoot() && feature.getName().equals("_" + child.getName())) {
+			else if (feature != featureModel.getRoot() && feature.getName().equals(EMPTY___ + child.getName())) {
 				feature.removeChild(child);
 				featureModel.deleteFeatureFromTable(feature);
 				feature = child;
@@ -339,9 +346,9 @@ public class GuidslReader extends AbstractFeatureModelReader {
 			Node node = exprToNode(((EStmt) astListNode.arg[0]).getExpr());
 			try {
 				if (!new SatSolver(new Not(node.clone()), 250).isSatisfiable())
-					warnings.add(new ModelWarning("Constraint is a tautology.", line));
+					warnings.add(new ModelWarning(CONSTRAINT_IS_A_TAUTOLOGY_, line));
 				if (!new SatSolver(node.clone(), 250).isSatisfiable())
-					warnings.add(new ModelWarning("Constraint is not satisfiable.", line));
+					warnings.add(new ModelWarning(CONSTRAINT_IS_NOT_SATISFIABLE_, line));
 			} catch (Exception e) {
 			}
 			featureModel.addPropositionalNode(node);
@@ -355,7 +362,7 @@ public class GuidslReader extends AbstractFeatureModelReader {
 			line = token.lineNum();
 			String var = token.name;
 			if (featureModel.getFeature(var) == null)
-				throw new UnsupportedModelException("The feature '" + var + "' does not occur in the grammar!", token.lineNum());	
+				throw new UnsupportedModelException(THE_FEATURE_ + var + "' does not occur in the grammar!", token.lineNum());	
 			//return new Literal(featureModel.getFeature(var));
 			return new Literal(var);
 		}
@@ -381,7 +388,7 @@ public class GuidslReader extends AbstractFeatureModelReader {
 			} while (astListNode != null);
 			return new Choose(1, nodes);
 		}
-		throw new RuntimeException("unsupported type in guidsl grammar");
+		throw new RuntimeException(UNSUPPORTED_TYPE_IN_GUIDSL_GRAMMAR);
 	}
 
 	private void readVarStmt(VarStmt varStmt) {

@@ -1,5 +1,7 @@
 package br.ufal.ic.colligens.preferences;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.ANALYZING_IFDEF_VARIABILITY_IN_C_CODE_;
+
 import org.eclipse.jface.preference.DirectoryFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.StringFieldEditor;
@@ -36,7 +38,7 @@ public class PreferenceGcc extends FieldEditorPreferencePage implements
 	@Override
 	public void init(IWorkbench workbench) {
 		setPreferenceStore(Colligens.getDefault().getPreferenceStore());
-		setDescription("Analyzing ifdef variability in C code.");
+		setDescription(ANALYZING_IFDEF_VARIABILITY_IN_C_CODE_);
 	}
 
 }

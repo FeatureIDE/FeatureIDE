@@ -1,5 +1,10 @@
 package br.ufal.ic.colligens.models;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.ANALYZING_SELECTED_FILES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NOT_A_VALID_FILE_FOUND_C;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.TYPECHEF_DID_NOT_RUN_CORRECTLY_;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -42,7 +47,7 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
-@SuppressWarnings("restriction")
+@SuppressWarnings(RESTRICTION)
 public class TypeChef {
 
 	private IProject project;
@@ -191,7 +196,7 @@ public class TypeChef {
 		try {
 			if (fileProxies.isEmpty()) {
 				monitor = null;
-				throw new TypeChefException("Not a valid file found C");
+				throw new TypeChefException(NOT_A_VALID_FILE_FOUND_C);
 			}
 
 			header.setProject(fileProxies.get(0).getResource().getProject()
@@ -201,7 +206,7 @@ public class TypeChef {
 
 			header.run();
 
-			monitorbeginTask("Analyzing selected files", fileProxies.size());
+			monitorbeginTask(ANALYZING_SELECTED_FILES, fileProxies.size());
 
 			for (FileProxy fileProxy : fileProxies) {
 				// Monitor Update
@@ -404,7 +409,7 @@ public class TypeChef {
 					int exitValue = process.exitValue();
 					if (exitValue != 0) {
 						throw new TypeChefException(
-								"TypeChef did not run correctly.");
+								TYPECHEF_DID_NOT_RUN_CORRECTLY_);
 					}
 					x = false;
 				} catch (IllegalThreadStateException e) {
@@ -415,7 +420,7 @@ public class TypeChef {
 		} catch (IOException e) {
 			System.out.println(e.toString());
 			Colligens.getDefault().logError(e);
-			throw new TypeChefException("TypeChef did not run correctly.");
+			throw new TypeChefException(TYPECHEF_DID_NOT_RUN_CORRECTLY_);
 		} finally {
 			try {
 				if (input != null)

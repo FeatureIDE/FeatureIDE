@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.featurehouse.meta.featuremodel;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.EMPTY___;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -322,7 +324,7 @@ public class FeatureModelJPFCore implements IFeatureModelClass {
 			if (i != 0) {
 				stringBuilder.append(" + \"|\" + ");	
 			}
-			stringBuilder.append(features.get(i).getName().toLowerCase(Locale.ENGLISH) + "_");
+			stringBuilder.append(features.get(i).getName().toLowerCase(Locale.ENGLISH) + EMPTY___);
 		}
 		stringBuilder.append(";\r\n\t}\r\n");
 		return stringBuilder.toString();

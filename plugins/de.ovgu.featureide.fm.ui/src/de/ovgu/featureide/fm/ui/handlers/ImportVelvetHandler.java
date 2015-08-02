@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.handlers;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.VELVET;
+
 import org.eclipse.swt.widgets.FileDialog;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -46,6 +48,6 @@ public class ImportVelvetHandler extends AbstractImportHandler {
 	@Override
 	protected void setFilter(FileDialog fileDialog) {
 		fileDialog.setFilterExtensions(new String[] { "*.velvet" });
-		fileDialog.setFilterNames(new String[] { "Velvet" });
+		fileDialog.setFilterNames(new String[] { VELVET });
 	}
 }

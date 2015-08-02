@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.ALTERNATIVE;
+
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.ui.PlatformUI;
@@ -40,7 +42,7 @@ public class AlternativeAction extends SingleSelectionAction {
 	private final FeatureModel featureModel;
 
 	public AlternativeAction(Object viewer, FeatureModel featureModel) {
-		super("Alternative", viewer);
+		super(ALTERNATIVE, viewer);
 		this.featureModel = featureModel;
 	}
 

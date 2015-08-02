@@ -20,6 +20,11 @@
  */
 package de.ovgu.featureide.core.conversion.ahead_featurehouse.actions;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CHANGE_COMPOSER_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CHANGE_THE_COMPOSER_OF_PROJECT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FROM_AHEAD_TO_FEATUREHOUSE_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.JAK;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
@@ -47,10 +52,10 @@ public class AHEADToFeatureHouseConversion extends ComposerConversion {
 		if (featureProject == null) {
 			return;
 		}
-		AheadCorePlugin.getDefault().logInfo("Change the composer of project "
+		AheadCorePlugin.getDefault().logInfo(CHANGE_THE_COMPOSER_OF_PROJECT
 				+ featureProject.getProjectName() + 
-				" from AHEAD to FeatureHouse.");
-		Job job = new Job("Change composer.") {
+				FROM_AHEAD_TO_FEATUREHOUSE_);
+		Job job = new Job(CHANGE_COMPOSER_) {
 			protected IStatus run(IProgressMonitor monitor) {
 				startProjectConversion(featureProject);
 				return Status.OK_STATUS;
@@ -89,7 +94,7 @@ public class AHEADToFeatureHouseConversion extends ComposerConversion {
 	@Override
 	void replaceFileExtension(IFile file) {
 		try {
-			file.move(((IFolder)file.getParent()).getFile(file.getName().replace(".jak", ".java")).getFullPath(), true, null);
+			file.move(((IFolder)file.getParent()).getFile(file.getName().replace(JAK, ".java")).getFullPath(), true, null);
 		} catch (CoreException e) {
 			AheadCorePlugin.getDefault().logError(e);
 		}

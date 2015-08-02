@@ -20,6 +20,17 @@
  */
 package de.ovgu.featureide.munge;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.PREPROCESSOR_ANNOTATION_CHECKING;
+import static de.ovgu.featureide.fm.core.localization.StringTable.PROPAGATE_PROBLEM_MARKERS_FOR;
+
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -131,7 +142,7 @@ public class MungePreprocessor extends PPComposerExtensionClass {
 
 	protected void annotationChecking() {
 		deleteAllPreprocessorAnotationMarkers();
-		Job job = new Job("preprocessor annotation checking") {
+		Job job = new Job(PREPROCESSOR_ANNOTATION_CHECKING) {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				annotationChecking(featureProject.getSourceFolder());
@@ -360,7 +371,7 @@ public class MungePreprocessor extends PPComposerExtensionClass {
 	@Override
 	public void postCompile(IResourceDelta delta, final IFile file) {
 		super.postCompile(delta, file);
-		Job job = new Job("Propagate problem markers for " + CorePlugin.getFeatureProject(file)) {
+		Job job = new Job(PROPAGATE_PROBLEM_MARKERS_FOR + CorePlugin.getFeatureProject(file)) {
 			@Override
 			public IStatus run(IProgressMonitor monitor) {
 				try {
@@ -487,5 +498,69 @@ public class MungePreprocessor extends PPComposerExtensionClass {
 		}
 		return super.getComposerObjectInstance(c);
 	}
+	
+	/**
+	 * Removes duplicate empty lines.
+	 */
+	@Override
+	public void postProcess(IFolder folder) {
+		// TODO remove ALL lines that correspond to annotations 
+		try {
+			folder.refreshLocal(IResource.DEPTH_INFINITE, null);
+			for (final IResource res : folder.members()) {
+				if (res instanceof IFolder) {
+					postProcess((IFolder) res);
+				} else if (res instanceof IFile) {
+					if (res.getFileExtension().equals(getConfigurationExtension())) {
+						continue;
+					}
+					try (final FileInputStream inputStream = new FileInputStream(new File(res.getLocationURI()));
+							final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, Charset.availableCharsets().get("UTF-8")))) {
+						String line = null;
+						final StringBuilder content = new StringBuilder();
+						boolean hasAnnotations = false;
+						boolean lastLineEmpty = false;
+						while ((line = reader.readLine()) != null) {
+							if (line.trim().isEmpty()) {
+								if (!lastLineEmpty) {
+									content.append(line);
+									content.append("\r\n");
+								} else {
+									lastLineEmpty = true;
+									hasAnnotations = true;
+								}
+							} else {
+								content.append(line);
+								content.append("\r\n");
+								lastLineEmpty = false;
+							}
+						}
+						if (hasAnnotations) {
+							setFileContent((IFile) res, content);
+						}
+					} catch (IOException e) {
+						MungeCorePlugin.getDefault().logError(e);
+					}
+				}
+			}
+		} catch (CoreException e) {
+			MungeCorePlugin.getDefault().logError(e);
+		}
+	}
+
+	/**
+	 * Sets the files new content.
+	 * @param file The file
+	 * @param content The new content to set
+	 */
+	private void setFileContent(IFile file, StringBuilder content) {
+		InputStream source = new ByteArrayInputStream(content.toString().getBytes(Charset.availableCharsets().get("UTF-8")));
+		try {
+			file.setContents(source, false, true, null);
+		} catch (CoreException e) {
+			MungeCorePlugin.getDefault().logError(e);
+		}
+	}
+
 
 }

@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.core;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.UNKNOWN;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -84,7 +86,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	}
 
 	public Feature(FeatureModel featureModel) {
-		this(featureModel, "Unknown");
+		this(featureModel, UNKNOWN);
 	}
 
 	public Feature(FeatureModel featureModel, String name) {

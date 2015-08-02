@@ -87,7 +87,6 @@ public class Constraint implements PropertyConstants, IGraphicItem {
 
 		deadFeaturesAfter.addAll(fmDeadFeatures);
 		deadFeaturesAfter.retainAll(deadFeatures);
-		fmDeadFeatures.removeAll(deadFeaturesAfter);
 		return deadFeaturesAfter;
 	}
 

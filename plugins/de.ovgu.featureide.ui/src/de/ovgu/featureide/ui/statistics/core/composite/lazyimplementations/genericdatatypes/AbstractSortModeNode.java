@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.genericdatatypes;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.DOUBLE_CLICK_TO_SORT_BY_VALUE_IN_DESCENDING_ORDER;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DOUBLE_CLICK_TO_SORT_IN_ALPHABETICAL_ORDER;
+
 import java.util.Collections;
 import java.util.Comparator;
 
@@ -92,9 +95,9 @@ public abstract class AbstractSortModeNode extends LazyParent implements IToolTi
 	public String getToolTip() {
 		if (hasChildren()) {
 			if (sortByValue) {
-				return "Double-click to sort in alphabetical order";
+				return DOUBLE_CLICK_TO_SORT_IN_ALPHABETICAL_ORDER;
 			}
-			return "Double-click to sort by value in descending order";
+			return DOUBLE_CLICK_TO_SORT_BY_VALUE_IN_DESCENDING_ORDER;
 		}
 		return null;
 	}

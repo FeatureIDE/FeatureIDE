@@ -28,27 +28,27 @@ package de.ovgu.featureide.fm.ui.properties.language;
 public interface ILanguage {
 
 	/**
-	 * @return The translation for: "Redundant constraint"
+	 * @return The translation for: REDUNDANT_CONSTRAINT
 	 */
 	public String getRedundantConst();
 
 	/**
-	 * @return The translation for: "Unsatisfiable constraint"
+	 * @return The translation for: UNSATISFIABLE_CONSTRAINT
 	 */
 	public String getUnsatisfiableConst();
 
 	/**
-	 * @return The translation for: "Constraint is tautology"
+	 * @return The translation for: CONSTRAINT_IS_TAUTOLOGY
 	 */
 	public String getTautologyConst();
 
 	/**
-	 * @return The translation for: "Constraint makes the model void"
+	 * @return The translation for: CONSTRAINT_MAKES_THE_MODEL_VOID
 	 */
 	public String getVoidModelConst();
 
 	/**
-	 * @return The translation for: "Indeterminate hidden"
+	 * @return The translation for: INDETERMINATE_HIDDEN
 	 */
 	public String getIndetHidden();
 
@@ -63,12 +63,12 @@ public interface ILanguage {
 	public String getName();
 
 	/**
-	 * @return The word for: "mandatory"
+	 * @return The word for: MANDATORY
 	 */
 	public String getMandatory();
 
 	/**
-	 * @return The word for: "abstract"
+	 * @return The word for: ABSTRACT
 	 */
 	public String getAbstract();
 
@@ -118,7 +118,7 @@ public interface ILanguage {
 	public String getOr();
 
 	/**
-	 * @return The word for: "optional"
+	 * @return The word for: OPTIONAL
 	 */
 	public String getOptional();
 }

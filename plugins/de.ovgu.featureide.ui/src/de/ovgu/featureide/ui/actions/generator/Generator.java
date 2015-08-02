@@ -20,6 +20,14 @@
  */
 package de.ovgu.featureide.ui.actions.generator;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.ERROR_IN_CONFIGURATION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.GENARATOR_NR_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.GENERATE_PRODUCTS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.GENERATOR;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.THE_GENERATOR_NR_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.WILL_BE_RESTARTED_;
+
 import javax.annotation.CheckForNull;
 
 import org.eclipse.core.internal.resources.Workspace;
@@ -44,6 +52,8 @@ import org.eclipse.jdt.internal.core.JavaProject;
 
 import de.ovgu.featureide.core.builder.ExtensibleFeatureProjectBuilder;
 import de.ovgu.featureide.core.builder.FeatureProjectNature;
+import de.ovgu.featureide.core.builder.IComposerExtensionClass;
+import de.ovgu.featureide.core.builder.preprocessor.PPComposerExtensionClass;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.ui.UIPlugin;
 
@@ -52,7 +62,7 @@ import de.ovgu.featureide.ui.UIPlugin;
  * 
  * @author Jens Meinicke
  */
-@SuppressWarnings("restriction")
+@SuppressWarnings(RESTRICTION)
 public class Generator extends Job implements IConfigurationBuilderBasics {
 	
 	protected static final String JAVA_NATURE = "org.eclipse.jdt.core.javanature";
@@ -73,7 +83,9 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 	private int nr;
 
 	@CheckForNull
-	private Compiler compiler;
+	private JavaCompiler compiler;
+
+	private TestRunner testRunner;
 
 	private BuilderConfiguration configuration;
 
@@ -83,12 +95,18 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 	  * @param builder The {@link ConfigurationBuilder} containing the {@link Generator}
 	  */
 	public Generator(int nr, ConfigurationBuilder builder) {
-		super(nr == 0 ? "Generator" : "Genarator nr. " + nr);
+		super(nr == 0 ? GENERATOR : GENARATOR_NR_ + nr);
 		this.nr = nr;
 		this.builder = builder;
-		
 		if (!builder.createNewProjects) {
-			compiler = new Compiler(nr , this);
+			try {
+				if (builder.featureProject.getProject().hasNature(JAVA_NATURE)) {
+					compiler = new JavaCompiler(nr , this);
+					testRunner = new TestRunner(compiler.tmp, builder.testResults, builder);
+				}
+			} catch (CoreException e) {
+				UIPlugin.getDefault().logError(e);
+			}
 		}
 	}
 	
@@ -99,7 +117,7 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
 		try {
-			monitor.setTaskName("Generate products");
+			monitor.setTaskName(GENERATE_PRODUCTS);
 			while (true) {
 				synchronized (this) {
 					if (builder.cancelGeneratorJobs || monitor.isCanceled()) {
@@ -139,12 +157,20 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 								configuration, name);
 					}
 					break;
+				case INTEGRATION:
+					if (builder.createNewProjects) {
+						buildConfiguration(builder.featureProject.getProjectName() + SEPARATOR_INTEGRATION + name, configuration);
+					} else {
+						builder.featureProject.getComposer().buildConfiguration(builder.folder.getFolder(name), 
+								configuration, name);
+					}
+					break;
 				case ALL_VALID:
 					if (builder.createNewProjects) {
 						buildConfiguration(builder.featureProject.getProjectName() + SEPARATOR_VARIANT + name, configuration);
 					} else {
-						builder.featureProject.getComposer().buildConfiguration(builder.folder.getFolder(CONFIGURATION_NAME + name), 
-								configuration, CONFIGURATION_NAME + name);
+						builder.featureProject.getComposer().buildConfiguration(builder.folder.getFolder(name), 
+								configuration, name);
 					}
 					break;
 				case T_WISE:
@@ -155,22 +181,25 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 								configuration, name);
 					}
 					break;
-
 				}
 				if (compiler != null) {
 					monitor.subTask("(Compile)");
 					compiler.compile(configuration);
+					if (builder.runTests) {
+						monitor.subTask("(Test)");
+						testRunner.runTests(configuration);
+					}
 				}
 				
 				builder.builtConfigurations++;
 			}
 		} catch (Exception e) {
-			UIPlugin.getDefault().logError("Error in configuration " + configuration, e);
+			UIPlugin.getDefault().logError(ERROR_IN_CONFIGURATION + configuration, e);
 			/**
 			 * If there is any build error the configuration will be built again.
 			 * And because this job is terminated a new one will be created.
 			 */
-			UIPlugin.getDefault().logWarning("The Generator nr. " + nr + " will be restarted.");
+			UIPlugin.getDefault().logWarning(THE_GENERATOR_NR_ + nr + WILL_BE_RESTARTED_);
 			builder.createNewGenerator(nr);
 		} finally {
 			builder.generatorJobs.remove(this);
@@ -203,7 +232,13 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 			UIPlugin.getDefault().logError(e);
 		}
 			
-		builder.featureProject.getComposer().buildConfiguration(project.getFolder("src"), configuration, name);
+		final IComposerExtensionClass composer = builder.featureProject.getComposer();
+		final IFolder sourceFolder = project.getFolder("src");
+		composer.buildConfiguration(sourceFolder, configuration, name);
+		if (composer instanceof PPComposerExtensionClass) {
+			((PPComposerExtensionClass)composer).postProcess(sourceFolder);
+		}
+			
 		try {
 			IFile modelFile = builder.featureProject.getModelFile();
 			modelFile.copy(project.getFile(modelFile.getName()).getFullPath(), true, null);

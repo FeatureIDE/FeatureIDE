@@ -20,6 +20,13 @@
  */
 package de.ovgu.featureide.fm.core.io.velvet;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.ILLEGAL_SYNTAX_IN_LINE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IN_FILE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IS_ALREADY_IN_USE_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IS_ALREADY_USED_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NO_SUCH_ATTRIBUTE_DEFINED_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.THE_PARENT_MODEL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.THE_VARIABLE_NAME;
 import static java.lang.String.format;
 
 import java.io.File;
@@ -533,7 +540,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 					if (attributes == null) {
 						throw new UnsupportedModelException(curNode.getLine()
 								+ ":" + curNode.getCharPositionInLine()
-								+ " no such attribute defined.",
+								+ NO_SUCH_ATTRIBUTE_DEFINED_,
 								curNode.getLine());
 					}
 
@@ -861,7 +868,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 			}
 			
 			if (!extFeatureModel.addInheritance(parentModelName, parentModelName)) {
-				reportWarning(curNode, "The parent model " + parentModelName + " is already used.");
+				reportWarning(curNode, THE_PARENT_MODEL + parentModelName + IS_ALREADY_USED_);
 				return;
 			}
 			addExternalFeatures(fm, parentModelName, extFeatureModel.getRoot(), ExtendedFeature.TYPE_INHERITED);
@@ -916,7 +923,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 			
 			if (checkInterfaceModelFile(idNode)) {
 				if (!extFeatureModel.addInterface(interfaceName, varName)) {
-					reportWarning(idNode, "The variable name " + varName + " is already in use.");
+					reportWarning(idNode, THE_VARIABLE_NAME + varName + IS_ALREADY_IN_USE_);
 				}
 			}
 		}
@@ -933,7 +940,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 			
 			if (checkExternalModelFile(idNode)) {
 				if (!extFeatureModel.addInstance(interfaceName, varName)) {
-					reportWarning(idNode, "The variable name " + varName + " is already in use.");
+					reportWarning(idNode, THE_VARIABLE_NAME + varName + IS_ALREADY_IN_USE_);
 				}
 			}
 		}
@@ -1036,7 +1043,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 		if (modelMarkerHandler != null) {
 			modelMarkerHandler.createModelMarker(message, org.eclipse.core.resources.IMarker.SEVERITY_WARNING, curNode.getLine());
 		}
-		FMCorePlugin.getDefault().logWarning(message + " (at line "+ curNode.getLine() + ((featureModelFile != null)?" in file " + featureModelFile.getName():"") + ": \"" + curNode.getText() + "\")");		
+		FMCorePlugin.getDefault().logWarning(message + " (at line "+ curNode.getLine() + ((featureModelFile != null)?IN_FILE + featureModelFile.getName():"") + ": \"" + curNode.getText() + "\")");		
 	}
 	
 	private Tree checkTree(Tree root) throws RecognitionException {
@@ -1056,7 +1063,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 	
 	private void throwException(RecognitionException e, Tree curNode) throws RecognitionException {
 		if (modelMarkerHandler != null) {
-			final String message = "Illegal syntax in Line " + e.line + ":" + e.charPositionInLine + ". " + curNode.getText();
+			final String message = ILLEGAL_SYNTAX_IN_LINE + e.line + ":" + e.charPositionInLine + ". " + curNode.getText();
 			modelMarkerHandler.createModelMarker(message, org.eclipse.core.resources.IMarker.SEVERITY_ERROR, e.line);
 		}
 		throw e;

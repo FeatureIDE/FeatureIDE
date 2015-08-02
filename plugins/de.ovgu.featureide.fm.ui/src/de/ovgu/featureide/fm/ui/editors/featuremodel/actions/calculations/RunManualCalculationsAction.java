@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.RUN_MANUAL_CALCULATIONS;
+
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 
@@ -35,7 +37,7 @@ public class RunManualCalculationsAction extends Action {
 	private final FeatureModel featureModel;
 
 	public RunManualCalculationsAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
-		super("Run Manual Calculations");
+		super(RUN_MANUAL_CALCULATIONS);
 		this.featureModel = featureModel;
 	}
 

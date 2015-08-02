@@ -20,6 +20,10 @@
  */
 package de.ovgu.featureide.fm.ui.wizards;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CHOOSE_A_FOLDER_FOR_EXTENDED_MODULES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CHOOSE_FOLDER;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ENTER_A_FOLDER_NAME;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -41,8 +45,8 @@ public class ChooseFolderPage extends AbstractWizardPage {
 	private String folderNameString;
 
 	public ChooseFolderPage(String defaultFolderName) {
-		super("Choose Folder");
-		setDescription("Choose a Folder for Extended Modules");
+		super(CHOOSE_FOLDER);
+		setDescription(CHOOSE_A_FOLDER_FOR_EXTENDED_MODULES);
 		this.folderNameString = defaultFolderName;
 	}
 
@@ -82,7 +86,7 @@ public class ChooseFolderPage extends AbstractWizardPage {
 	protected String checkPage() {
 		folderNameString = folderName.getText();
 		if (folderNameString.isEmpty()) {
-			return "Enter a folder name";
+			return ENTER_A_FOLDER_NAME;
 		}
 		return null;
 	}

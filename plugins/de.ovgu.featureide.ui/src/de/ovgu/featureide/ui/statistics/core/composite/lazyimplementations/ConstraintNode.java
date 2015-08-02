@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT;
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 
@@ -35,7 +36,7 @@ public class ConstraintNode extends LazyParent {
 	protected final Constraint constr;
 
 	public ConstraintNode(Constraint constr) {
-		super("Constraint", constr.toString());
+		super(CONSTRAINT, constr.toString());
 		this.constr = constr;
 		lazy = false;
 	}

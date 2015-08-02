@@ -20,6 +20,8 @@
  */
 package org.prop4j;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.IS_NOT_SUPPORTED;
+
 import java.util.List;
 
 /**
@@ -72,7 +74,7 @@ public class Not extends Node {
 			node.eliminate(list);
 			return new AtMost(((AtLeast) node).min - 1, (Object[]) node.children);
 		}
-		throw new RuntimeException(node.getClass().getName() + " is not supported");
+		throw new RuntimeException(node.getClass().getName() + IS_NOT_SUPPORTED);
 	}
 
 	@Override

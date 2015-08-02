@@ -6,5 +6,7 @@
 	<classpathentry kind="lib" path="lib/SPLACAT.jar"/>
 	<classpathentry kind="lib" path="/de.ovgu.featureide.fm.core/lib/annotations.jar"/>
 	<classpathentry kind="lib" path="lib/commons-math-2.2.jar"/>
+	<classpathentry kind="lib" path="lib/FeatureIDEAnnotations.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

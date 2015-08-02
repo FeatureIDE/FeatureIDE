@@ -20,6 +20,14 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CONCRETE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE_MODEL_IS_VOID;
+import static de.ovgu.featureide.fm.core.localization.StringTable.INHERITED_HIDDEN;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IS_DEAD;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IS_FALSE_OPTIONAL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IS_HIDDEN_AND_INDETERMINATE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ROOT;
+
 import org.eclipse.draw2d.ConnectionAnchor;
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.FreeformLayout;
@@ -61,16 +69,14 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 
 	private static GridLayout gl = new GridLayout();
 
-	private static String CONCRETE = " Concrete";
 	private static String ABSTRACT = " Abstract";
 	private static String HIDDEN = " hidden";
-	private static String HIDDEN_PARENT = " inherited hidden";
-	private static String DEAD = "is dead ";
+	private static String HIDDEN_PARENT = INHERITED_HIDDEN;
+	private static String DEAD = IS_DEAD;
 	private static String FEATURE = " feature ";
-	private static String FALSE_OPTIONAL = "is false optional ";
-	private static String INDETERMINATE_HIDDEN = "is hidden and indeterminate";
-	private static String VOID = " Feature Model is void ";
-	private static String ROOT = " Root ";
+	private static String FALSE_OPTIONAL = IS_FALSE_OPTIONAL;
+	private static String INDETERMINATE_HIDDEN = IS_HIDDEN_AND_INDETERMINATE;
+	private static String VOID = FEATURE_MODEL_IS_VOID;
 
 	public FeatureFigure(Feature feature, FeatureModel featureModel) {
 		super();
@@ -210,11 +216,17 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 			toolTip.append("\n\nConstraints:\n");
 			toolTip.append(contraints);
 		}
+		
+		
 		Figure toolTipContent = new Figure();
 		toolTipContent.setLayoutManager(gl);
-		toolTipContent.setFont(DEFAULT_FONT);
-		toolTipContent.add(new Label(toolTip.toString()));
-
+		Label featureName = new Label(feature.getName());
+		featureName.setFont(DEFAULT_FONT_BOLD);
+		Label furtherInfos = new Label(toolTip.toString());
+		furtherInfos.setFont(DEFAULT_FONT);
+		toolTipContent.add(featureName);
+		toolTipContent.add(furtherInfos);
+		
 		// call of the FeatureDiagramExtensions
 		for (FeatureDiagramExtension extension : FeatureDiagramExtension.getExtensions()) {
 			toolTipContent = extension.extendFeatureFigureToolTip(toolTipContent, this);

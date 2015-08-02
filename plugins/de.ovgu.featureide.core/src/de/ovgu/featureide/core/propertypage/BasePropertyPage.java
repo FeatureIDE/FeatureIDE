@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.core.propertypage;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.NO_RESOURCE_SELECTED;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
@@ -38,7 +41,7 @@ import org.eclipse.ui.dialogs.PropertyPage;
  * 
  * @author Jens Meinicke
  */
-@SuppressWarnings("restriction")
+@SuppressWarnings(RESTRICTION)
 public class BasePropertyPage extends PropertyPage {
 
 	private static final String DESCRIPTION = null;
@@ -54,7 +57,7 @@ public class BasePropertyPage extends PropertyPage {
 		
 		if (!getProject()) {
 			Label label = new Label(composite, SWT.NULL);
-			label.setText("No resource selected");	
+			label.setText(NO_RESOURCE_SELECTED);	
 			return null;
 		}
 

@@ -43,25 +43,31 @@ public class AbstractConfigurationSorter {
 
 	protected final Collection<String> concreteFeatures;
 
+	protected boolean sorted = true;
+
 	public AbstractConfigurationSorter(final FeatureModel featureModel) {
 		concreteFeatures = featureModel.getConcreteFeatureNames();// TODO move to implementations
 	}
 	
-	public int sort(final IProgressMonitor monitor) {
+	public int sortConfigurations(final IProgressMonitor monitor) {
+		int numberOfConfigurations = sort(monitor);
+		sorted = true;
+		return numberOfConfigurations;
+	}
+	
+	protected int sort(final IProgressMonitor monitor) {
 		return configurations.size();
 	}
 
-	public synchronized void addConfiguration(BuilderConfiguration configuration, boolean sort) {
+	public synchronized void addConfiguration(BuilderConfiguration configuration) {
 		configurations.add(configuration);
 	}
 
-	public synchronized BuilderConfiguration getConfiguration(boolean sort) {
-		if (configurations.isEmpty()) {
+	public synchronized BuilderConfiguration getConfiguration() {
+		if (!sorted  || configurations.isEmpty()) {
 			return null;
 		}
-		BuilderConfiguration c = configurations.getFirst();
-		configurations.remove();
-		return c;
+		return configurations.remove();
 	}
 	
 	public int getBufferSize() {

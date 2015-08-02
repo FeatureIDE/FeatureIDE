@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_ABSTRACT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_CONCRETE;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
@@ -31,8 +33,8 @@ import de.ovgu.featureide.fm.core.FeatureModel;
  */
 public class FeatureSetAbstractOperation extends AbstractFeatureModelOperation {
 
-	private static final String LABEL_ABSTRACT = "Set Feature Abstract";
-	private static final String LABEL_CONCRETE = "Set Feature Concrete";
+	private static final String LABEL_ABSTRACT = SET_FEATURE_ABSTRACT;
+	private static final String LABEL_CONCRETE = SET_FEATURE_CONCRETE;
 
 	private Feature feature;
 

@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.ui.quickfix;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CONFIGURATION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_MISSING_CONFIGURATIONS_;
+
 import java.util.Collection;
 
 import org.eclipse.core.resources.IFile;
@@ -44,7 +47,7 @@ import de.ovgu.featureide.fm.core.configuration.ConfigurationWriter;
  */
 public abstract class QuickFixMissingConfigurations implements IMarkerResolution {
 	
-	private static final String PREFIX = "Configuration";
+	private static final String PREFIX = CONFIGURATION;
 	private static final AbstractCorePlugin LOGGER = FMCorePlugin.getDefault();
 	
 	protected final IFeatureProject project;
@@ -52,7 +55,7 @@ public abstract class QuickFixMissingConfigurations implements IMarkerResolution
 	private int configurationNr = 0;
 	
 	public String getLabel() {
-		return "Create missing configurations.";
+		return CREATE_MISSING_CONFIGURATIONS_;
 	}
 
 	public QuickFixMissingConfigurations(final IMarker marker) {
@@ -101,6 +104,21 @@ public abstract class QuickFixMissingConfigurations implements IMarkerResolution
 	
 	private String getConfigurationName(final int number) {
 		return PREFIX + number + "." + project.getComposer().getConfigurationExtension();
+	}
+	
+	protected String createShortMessage(Collection<String> features) {
+		StringBuilder message = new StringBuilder();
+		int addedFeatures = 0;
+		for (String feature : features) {
+			message.append(feature);
+			message.append(", ");
+			if (addedFeatures++ >= 25) {
+				message.append("...");
+				break;
+			}
+		}
+		
+		return message.toString();
 	}
 	
 }

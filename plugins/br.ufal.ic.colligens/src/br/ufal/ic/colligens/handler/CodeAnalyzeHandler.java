@@ -1,5 +1,7 @@
 package br.ufal.ic.colligens.handler;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.PLEASE_SAVE_ALL_FILES_BEFORE_PROCEEDING_;
+
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -50,7 +52,7 @@ public class CodeAnalyzeHandler extends ColligensAbstractHandler {
 			} else {
 				MessageDialog.openError(window.getShell(),
 						Colligens.PLUGIN_NAME,
-						"Please save all files before proceeding.");
+						PLEASE_SAVE_ALL_FILES_BEFORE_PROCEEDING_);
 			}
 
 		}

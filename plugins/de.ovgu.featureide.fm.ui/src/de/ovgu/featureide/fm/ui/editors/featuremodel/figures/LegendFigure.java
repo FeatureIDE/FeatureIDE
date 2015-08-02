@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT_MAKES_THE_MODEL_VOID_;
+
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.GridLayout;
 import org.eclipse.draw2d.Label;
@@ -94,7 +96,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 	private static final String REDUNDANT_TOOLTIP = "Redundant constraint:\n\n This constraint does not change the product line.";
 	private static final String UNSATISFIABLE_CONST_TOOLTIP = "Unsatisfiable Constraint\n\nThis constraint cannot become true";
 	private static final String TAUTOLOGY_CONST_TOOLTIP = "Constraint is tautology\n\n This constraint cannot become false.";
-	private static final String MODEL_CONST_TOOLTIP = "Constraint makes the model void.";
+	private static final String MODEL_CONST_TOOLTIP = CONSTRAINT_MAKES_THE_MODEL_VOID_;
 
 	private static final int ABSTRACT = 0;
 	private static final int CONCRETE = 1;
@@ -144,13 +146,14 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		optional = featureModel.hasOptionalFeatures();
 		alternative = featureModel.hasAlternativeGroup();
 		or = featureModel.hasOrGroup();
-		_abstract = analyser.getAttributeFlag(Attribute.Abstract);
-		concrete = analyser.getAttributeFlag(Attribute.Concrete);
-		hidden = analyser.getAttributeFlag(Attribute.Hidden);
+		_abstract = featureModel.hasAbstract();
+		concrete = featureModel.hasConcrete();
+		hidden = featureModel.hasHidden();
 		dead = analyser.getAttributeFlag(Attribute.Dead);
+		
 		showHidden = featureModel.getLayout().showHiddenFeatures();
-		falseoptional = analyser.getAttributeFlag(Attribute.FalseOptional);
-		indetHidden = analyser.getAttributeFlag(Attribute.IndetHidden);
+		falseoptional = featureModel.hasFalseOptionalFeatures();
+		indetHidden = featureModel.hasIndetHidden();
 
 		unsatisfiableConst = analyser.calculateConstraints && featureModel.hasUnsatisfiableConst();
 		tautologyConst = analyser.calculateTautologyConstraints && featureModel.hasTautologyConst();

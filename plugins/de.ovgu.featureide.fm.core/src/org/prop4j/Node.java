@@ -20,6 +20,8 @@
  */
 package org.prop4j;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.IS_NOT_SUPPORTING_THIS_METHOD;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -209,7 +211,7 @@ public abstract class Node {
 	}
 
 	protected Node clausify() {
-		throw new RuntimeException(getClass().getName() + " is not supporting this method");
+		throw new RuntimeException(getClass().getName() + IS_NOT_SUPPORTING_THIS_METHOD);
 	}
 
 	public List<Node> replaceFeature(Feature feature, Feature replaceWithFeature) {

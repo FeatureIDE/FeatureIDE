@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.core;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.EMPTY_FEATURE_MODEL;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
@@ -858,7 +860,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 				x += c.toString() + " ";
 			}
 		} catch (Exception e) {
-			return "Empty Feature Model";
+			return EMPTY_FEATURE_MODEL;
 		}
 		return x;
 	}

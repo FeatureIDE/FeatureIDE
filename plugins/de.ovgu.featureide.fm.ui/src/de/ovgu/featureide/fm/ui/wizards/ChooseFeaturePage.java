@@ -20,6 +20,10 @@
  */
 package de.ovgu.featureide.fm.ui.wizards;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CHOOSE_A_FEATURE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CHOOSE_FEATURE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ENTER_A_FEATURE_NAME;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -38,8 +42,8 @@ public class ChooseFeaturePage extends AbstractWizardPage {
 	private Text featureName;
 
 	public ChooseFeaturePage() {
-		super("Choose Feature");
-		setDescription("Choose a Feature");
+		super(CHOOSE_FEATURE);
+		setDescription(CHOOSE_A_FEATURE);
 	}
 
 	public void createControl(Composite parent) {
@@ -76,7 +80,7 @@ public class ChooseFeaturePage extends AbstractWizardPage {
 	@Override
 	protected String checkPage() {
 		if (featureName.getText().isEmpty()) {
-			return "Enter a feature name";
+			return ENTER_A_FEATURE_NAME;
 		}
 		return null;
 	}

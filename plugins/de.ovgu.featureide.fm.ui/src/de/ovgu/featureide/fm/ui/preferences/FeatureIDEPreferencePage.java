@@ -20,6 +20,14 @@
  */
 package de.ovgu.featureide.fm.ui.preferences;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CONFIGURATION_COLORING;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE_NAME_SCHEME;
+import static de.ovgu.featureide.fm.core.localization.StringTable.LOOKS_FOR_OPEN_CLAUSES_IN_THE_CNF_REPRESENTATION_OF_THE_FEATURE_MODEL_AND_HIGHLIGHTS_THE_CORRESPONDING_FEATURES_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.THE_CONFIGURATION_EDITOR_PROVIDES_FEATURE_HIGHLIGHTING_FOR_INVALID_CONFIGURATIONS_IN_ODER_TO_FIND_VALID_CONFIGURATIONS_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.TRIES_TO_FIND_FEATURES_WHICH_LEAD_TO_A_VALID_CONFIGURATION_BY_SOLVING_A_SATISFIABILITY_PROBLEM_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.USE_LONG_FEATURE_NAMES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.USE_SHORT_FEATURE_NAMES;
+
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
@@ -81,10 +89,10 @@ public class FeatureIDEPreferencePage extends PreferencePage implements IWorkben
 		container.setLayout(new FillLayout(SWT.VERTICAL));
 
 		final Group completionGroup = new Group(container, SWT.SHADOW_IN);
-		completionGroup.setText("Configuration Coloring");
+		completionGroup.setText(CONFIGURATION_COLORING);
 		completionGroup.setLayout(new RowLayout(SWT.VERTICAL));
 		completionGroup
-				.setToolTipText("The configuration editor provides feature highlighting for invalid configurations in oder to find valid configurations.");
+				.setToolTipText(THE_CONFIGURATION_EDITOR_PROVIDES_FEATURE_HIGHLIGHTING_FOR_INVALID_CONFIGURATIONS_IN_ODER_TO_FIND_VALID_CONFIGURATIONS_);
 		final Button noneButton = new Button(completionGroup, SWT.RADIO);
 		final Button openClauseButton = new Button(completionGroup, SWT.RADIO);
 		final Button contradictionButton = new Button(completionGroup, SWT.RADIO);
@@ -98,8 +106,8 @@ public class FeatureIDEPreferencePage extends PreferencePage implements IWorkben
 		contradictionButton.setText("Check contradiction (Better results)");
 
 		noneButton.setToolTipText("Diseable the functionality (Yields best performance for large feature models).");
-		openClauseButton.setToolTipText("Looks for open clauses in the CNF representation of the feature model and highlights the corresponding features.");
-		contradictionButton.setToolTipText("Tries to find features which lead to a valid configuration by solving a satisfiability problem.");
+		openClauseButton.setToolTipText(LOOKS_FOR_OPEN_CLAUSES_IN_THE_CNF_REPRESENTATION_OF_THE_FEATURE_MODEL_AND_HIGHLIGHTS_THE_CORRESPONDING_FEATURES_);
+		contradictionButton.setToolTipText(TRIES_TO_FIND_FEATURES_WHICH_LEAD_TO_A_VALID_CONFIGURATION_BY_SOLVING_A_SATISFIABILITY_PROBLEM_);
 
 		switch (Preferences.getDefaultCompletion()) {
 		case Preferences.COMPLETION_NONE:
@@ -114,7 +122,7 @@ public class FeatureIDEPreferencePage extends PreferencePage implements IWorkben
 		}
 
 		final Group schemeGroup = new Group(container, SWT.SHADOW_IN);
-		schemeGroup.setText("Feature name scheme");
+		schemeGroup.setText(FEATURE_NAME_SCHEME);
 		schemeGroup.setLayout(new RowLayout(SWT.VERTICAL));
 		final Button useShortFeatureNames = new Button(schemeGroup, SWT.RADIO);
 		final Button useLongFeatureName = new Button(schemeGroup, SWT.RADIO);
@@ -122,8 +130,8 @@ public class FeatureIDEPreferencePage extends PreferencePage implements IWorkben
 		useShortFeatureNames.setData(Preferences.SCHEME_SHORT);
 		useLongFeatureName.setData(Preferences.SCHEME_LONG);
 
-		useShortFeatureNames.setText("Use short feature names");
-		useLongFeatureName.setText("Use long feature names");
+		useShortFeatureNames.setText(USE_SHORT_FEATURE_NAMES);
+		useLongFeatureName.setText(USE_LONG_FEATURE_NAMES);
 
 		switch (Preferences.getDefaultFeatureNameScheme()) {
 		case Preferences.SCHEME_SHORT:

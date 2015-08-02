@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.core.conversion.ahead_featurehouse.handlers;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.COMPOSER_CONVERSION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SOURCE_FILES_WILL_BE_CHANGED_AUTOMATICALLY__FEATUREHOUSE_SUPPORS_JAVA_5_AND_AHEAD_JAVA_4_COMMA__THIS_CAN_CAUSE_PROBLEMS_DURING_CONVERION__YOU_SHOULD_HAVE_A_COPY_OF_THIS_PROJECT_;
+
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
@@ -44,8 +47,8 @@ public class ChangeComposerHandler extends AFeatureProjectHandler {
 	@Override
 	protected boolean startAction(IStructuredSelection selection) {
 		return MessageDialog.open(MessageDialog.WARNING, PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-				"Composer Conversion", 
-				"Source files will be changed automatically. FeatureHouse suppors Java 5 and AHEAD Java 4, this can cause problems during converion. You should have a copy of this project.",
+				COMPOSER_CONVERSION, 
+				SOURCE_FILES_WILL_BE_CHANGED_AUTOMATICALLY__FEATUREHOUSE_SUPPORS_JAVA_5_AND_AHEAD_JAVA_4_COMMA__THIS_CAN_CAUSE_PROBLEMS_DURING_CONVERION__YOU_SHOULD_HAVE_A_COPY_OF_THIS_PROJECT_,
 				SWT.NONE);	
 	}
 

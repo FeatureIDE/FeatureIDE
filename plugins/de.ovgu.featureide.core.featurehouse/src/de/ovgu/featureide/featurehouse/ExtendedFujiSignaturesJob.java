@@ -20,6 +20,11 @@
  */
 package de.ovgu.featureide.featurehouse;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.FUJI_SIGNATURES_LOADED_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.LOADING_SIGNATURES_FOR;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NO_FSTMODEL_PROVIDED_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -82,7 +87,7 @@ import fuji.SPLStructure;
  * 
  * @author Sebastian Krieter
  */
-@SuppressWarnings("restriction")
+@SuppressWarnings(RESTRICTION)
 public class ExtendedFujiSignaturesJob extends AStoppableJob {
 
 	private static final class SignatureReference {
@@ -213,7 +218,7 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 	}
 	
 	public ExtendedFujiSignaturesJob(IFeatureProject featureProject) {
-		super("Loading Signatures for " + featureProject.getProjectName());
+		super(LOADING_SIGNATURES_FOR + featureProject.getProjectName());
 		this.featureProject = featureProject;
 		this.projectSignatures = new ProjectSignatures(this.featureProject.getFeatureModel());
 		this.featureDataConstructor = new FeatureDataConstructor(projectSignatures, FeatureDataConstructor.TYPE_FOP);
@@ -292,7 +297,7 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 
 		createSignatures(featureProject, ast);
 
-		FeatureHouseCorePlugin.getDefault().logInfo("Fuji signatures loaded.");
+		FeatureHouseCorePlugin.getDefault().logInfo(FUJI_SIGNATURES_LOADED_);
 		return true;
 	}
 
@@ -557,7 +562,7 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 		FSTModel fst = fp.getFSTModel();
 
 		if (fst == null) {
-			FeatureHouseCorePlugin.getDefault().logInfo("No FSTModel provided.");
+			FeatureHouseCorePlugin.getDefault().logInfo(NO_FSTMODEL_PROVIDED_);
 		} else {
 			for (FSTFeature fstFeature : fst.getFeatures()) {
 				final int id = projectSignatures.getFeatureID(fstFeature.getName());

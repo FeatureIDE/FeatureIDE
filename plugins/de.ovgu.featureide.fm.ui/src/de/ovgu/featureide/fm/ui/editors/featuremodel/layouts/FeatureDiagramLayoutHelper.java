@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.layouts;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.MANUAL_LAYOUT;
+
 import java.util.LinkedList;
 
 import org.eclipse.draw2d.geometry.Point;
@@ -44,7 +46,7 @@ public class FeatureDiagramLayoutHelper {
 	public static String getLayoutLabel(int layoutAlgorithmNum) {
 		switch (layoutAlgorithmNum) {
 		case 0:
-			return "Manual Layout";
+			return MANUAL_LAYOUT;
 		case 1:
 			return "Top-Down (ordered)";
 		case 2:

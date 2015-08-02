@@ -20,6 +20,10 @@
  */
 package de.ovgu.featureide.core.mpl.job;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.PACKAGES_RENAMED_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RENAMING_PACKAGES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
+
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -59,7 +63,7 @@ import de.ovgu.featureide.fm.core.job.util.JobArguments;
  * 
  * @author Sebastian Krieter
  */
-@SuppressWarnings("restriction")
+@SuppressWarnings(RESTRICTION)
 public class MPLRenameExternalJob extends AProjectJob<MPLRenameExternalJob.Arguments> {
 
 	public static class Arguments extends JobArguments {
@@ -76,7 +80,7 @@ public class MPLRenameExternalJob extends AProjectJob<MPLRenameExternalJob.Argum
 	}
 
 	protected MPLRenameExternalJob(Arguments arguments) {
-		super("Renaming Packages", arguments);
+		super(RENAMING_PACKAGES, arguments);
 		setPriority(BUILD);
 		javaProject = new JavaProject(arguments.externalProject, null);
 	}
@@ -222,7 +226,7 @@ public class MPLRenameExternalJob extends AProjectJob<MPLRenameExternalJob.Argum
 		} catch (CoreException e) {
 			MPLPlugin.getDefault().logError(e);
 		}
-		MPLPlugin.getDefault().logInfo("Packages renamed.");
+		MPLPlugin.getDefault().logInfo(PACKAGES_RENAMED_);
 		return true;
 	}
 

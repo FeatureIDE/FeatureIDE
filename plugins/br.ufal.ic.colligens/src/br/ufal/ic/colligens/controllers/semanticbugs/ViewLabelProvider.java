@@ -1,5 +1,7 @@
 package br.ufal.ic.colligens.controllers.semanticbugs;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.ERROR;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -25,7 +27,7 @@ class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
 								iFile.getLocation().toOSString().length())
 						+ " ("
 						+ ((CppCheckerFileLogs) obj).getLogs().size()
-						+ " error"
+						+ ERROR
 						+ ((((CppCheckerFileLogs) obj).getLogs().size() == 1) ? ""
 								: "s") + ")";
 			}

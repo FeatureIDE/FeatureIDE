@@ -20,7 +20,17 @@
  */
 package de.ovgu.featureide.fm.ui;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.DISABLECLIPPINGBUTTON;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ECLIPSE_PLUGIN_FOR_EXPORTING_DIAGRAM_IN_SVG_FORMAT_IS_NOT_EXISTING_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NL_UTWENTE_CE_IMAGEEXPORT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NL_UTWENTE_CE_IMAGEEXPORT_CORE_IMAGEEXPORTPLUGIN;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NOTHING_HAS_BEEN_SAVED_FOR_DIAGRAM_EXPORT___;
+import static de.ovgu.featureide.fm.core.localization.StringTable.PROVIDESETTINGS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SVG_EXPORT_FAILED;
+
 import java.io.File;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import org.eclipse.core.internal.runtime.InternalPlatform;
@@ -30,7 +40,9 @@ import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.osgi.framework.Bundle;
@@ -49,7 +61,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GEFImageWriter;
  * 
  * @author Guenter Ulreich
  */
-@SuppressWarnings("restriction")
+@SuppressWarnings(RESTRICTION)
 public class GraphicsExporter {
 
 	public static boolean exportAs(FeatureModel featureModel, FeatureDiagramEditor diagramEditor, IFeatureModelWriter featureModelWriter) {
@@ -106,34 +118,55 @@ public class GraphicsExporter {
 		if (file.getAbsolutePath().endsWith(".svg")) {
 			ScalableFreeformRootEditPart part = (ScalableFreeformRootEditPart) viewer.getEditPartRegistry().get(LayerManager.ID);
 			IFigure rootFigure = part.getFigure();
+
+			Bundle bundleExport = null;
 			Bundle bundleExportSVG = null;
 			for (Bundle b : InternalPlatform.getDefault().getBundleContext().getBundles()) {
+				if (b.getSymbolicName().equals(NL_UTWENTE_CE_IMAGEEXPORT)) {
+					bundleExport = b;
+				}
 				if (b.getSymbolicName().equals("nl.utwente.ce.imageexport.svg")) {
 					bundleExportSVG = b;
+				}
+				if (bundleExport != null && bundleExportSVG != null) {
 					break;
 				}
 			}
 
 			// check if gef-imageexport is existing and activated!
-			if (bundleExportSVG != null) {
+			if (bundleExport != null && bundleExportSVG != null) {
 				try {
-					org.osgi.framework.BundleActivator act = ((org.osgi.framework.BundleActivator) bundleExportSVG.loadClass(
-							"nl.utwente.ce.imagexport.export.svg.Activator").newInstance());
+					org.osgi.framework.BundleActivator act = ((org.osgi.framework.BundleActivator) bundleExport.loadClass(
+							NL_UTWENTE_CE_IMAGEEXPORT_CORE_IMAGEEXPORTPLUGIN).newInstance());
 					act.start(InternalPlatform.getDefault().getBundleContext());
 
 					Class<?> cl = bundleExportSVG.loadClass("nl.utwente.ce.imagexport.export.svg.ExportSVG");
-					Method m = cl.getMethod("exportImage", String.class, String.class, IFigure.class);
-					m.invoke(cl.newInstance(), "SVG", file.getAbsolutePath(), rootFigure);
+					Object exportSVGObject = cl.newInstance();
+
+					Method provideSettings = cl.getMethod(PROVIDESETTINGS, String.class, org.eclipse.swt.widgets.Composite.class, IPreferenceStore.class);
+					provideSettings.invoke(exportSVGObject, "SVG", viewer.getControl(), FMUIPlugin.getDefault().getPreferenceStore());
+
+					Method exportImage = cl.getMethod("exportImage", String.class, String.class, IFigure.class);
+					exportImage.invoke(exportSVGObject, "SVG", file.getAbsolutePath(), rootFigure);
+
+					Field disableClippingButton = cl.getDeclaredField(DISABLECLIPPINGBUTTON);
+					disableClippingButton.setAccessible(true);
+
+					Object disableClippingButtonObj = disableClippingButton.get(exportSVGObject);
+					if (disableClippingButtonObj instanceof Button) {
+						((Button) disableClippingButtonObj).dispose();
+					}
+
 					succ = true;
 				} catch (Exception e) {
 					FMUIPlugin.getDefault().logError(e);
 				}
 			} else {
-				final String infoMessage = "Eclipse plugin for exporting diagram in SVG format is not existing."
+				final String infoMessage = ECLIPSE_PLUGIN_FOR_EXPORTING_DIAGRAM_IN_SVG_FORMAT_IS_NOT_EXISTING_
 						+ "\nIf you want to use this, you have to install GEF Imageexport with SVG in Eclipse from "
 						+ "\nhttp://veger.github.com/eclipse-gef-imageexport";
 
-				MessageDialog dialog = new MessageDialog(new Shell(), "SVG export failed", FMUIPlugin.getImage("FeatureIconSmall.ico"), infoMessage,
+				MessageDialog dialog = new MessageDialog(new Shell(), SVG_EXPORT_FAILED, FMUIPlugin.getImage("FeatureIconSmall.ico"), infoMessage,
 						MessageDialog.INFORMATION, new String[] { IDialogConstants.OK_LABEL }, 0);
 
 				dialog.open();
@@ -152,7 +185,7 @@ public class GraphicsExporter {
 
 	public static void printExportMessage(File file, boolean successful) {
 		boolean done = successful && file != null;
-		String infoMessage = done ? "Graphic export has been saved to\n" + file.getAbsolutePath() : "Nothing has been saved for diagram export...";
+		String infoMessage = done ? "Graphic export has been saved to\n" + file.getAbsolutePath() : NOTHING_HAS_BEEN_SAVED_FOR_DIAGRAM_EXPORT___;
 		FMUIPlugin.getDefault().logInfo(infoMessage);
 	}
 }

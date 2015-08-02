@@ -20,6 +20,12 @@
  */
 package de.ovgu.featureide.fm.ui.editors;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.DEFAULT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DOWN;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE_ORDER;
+import static de.ovgu.featureide.fm.core.localization.StringTable.UP;
+import static de.ovgu.featureide.fm.core.localization.StringTable.USER_DEFINED_FEATURE_ORDER;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -70,7 +76,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 
 	private static final String BUILDER_ID = "de.ovgu.featureide.core" + ".extensibleFeatureProjectBuilder";
 
-	private static final String PAGE_TEXT = "Feature Order";
+	private static final String PAGE_TEXT = FEATURE_ORDER;
 
 	private org.eclipse.swt.widgets.List featurelist = null;
 
@@ -186,7 +192,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 			featurelist.setVisible(false);
 		} else {
 			layout.numColumns = 3;
-			label.setText("User-defined feature order");
+			label.setText(USER_DEFINED_FEATURE_ORDER);
 			createButtons();
 		}
 	}
@@ -230,7 +236,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 
 	private void createUpButton() {
 		up = new Button(comp, SWT.NONE);
-		up.setText("Up");
+		up.setText(UP);
 		up.setLayoutData(gridData);
 		up.setEnabled(false);
 		up.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
@@ -260,7 +266,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 
 	private void createDownButton() {
 		down = new Button(comp, SWT.NONE);
-		down.setText("Down");
+		down.setText(DOWN);
 		down.setLayoutData(gridData);
 		down.setEnabled(false);
 		down.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
@@ -325,7 +331,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	 */
 	private void createDeafaultButton() {
 		defaultButton = new Button(comp, SWT.NONE);
-		defaultButton.setText("Default");
+		defaultButton.setText(DEFAULT);
 		defaultButton.setLayoutData(gridData);
 		defaultButton.setEnabled(false);
 		defaultButton.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
@@ -453,7 +459,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	/**
 	 * 
 	 * @return Return the FeatureOrder as an ArrayList. Return null if the
-	 *         "userdefined-order" is deactivate or if no order file exists.
+	 *         USERDEFINED_ORDER is deactivate or if no order file exists.
 	 * @deprecated is no longer supported, use {@link #readFeatureOrderList()} instead
 	 */
 	@Deprecated

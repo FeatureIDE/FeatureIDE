@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE_CONSTRAINT;
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
@@ -31,7 +32,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayou
  */
 public class ConstraintDeleteOperation extends AbstractFeatureModelOperation {
 
-	private static final String LABEL = "Delete Constraint";
+	private static final String LABEL = DELETE_CONSTRAINT;
 	private Constraint constraint;
 
 	private int index;

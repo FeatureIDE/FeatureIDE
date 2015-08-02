@@ -20,6 +20,18 @@
  */
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.AVERAGE_FEATURES_PER_DIRECTIVE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.AVERAGE_NUMBER_OF_DIRECTIVES_PER_CLASS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CLASS_STATISTICS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DIRECTIVES_PER_CLASS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURES_PER_DIRECTIVE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IN_CLASS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.MAXIMUM_FEATURES_PER_DIRECTIVE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.MAXIMUM_NESTING_OF_DIRECTIVES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.MINIMUM_FEATURES_PER_DIRECTIVE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NUMBER_OF_DIRECTIVES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.PROJECT_STATISTICS;
+
 import java.util.List;
 
 import de.ovgu.featureide.core.fstmodel.FSTClass;
@@ -56,11 +68,11 @@ public class DirectivesNode extends LazyParent {
 	@Override
 	protected void initChildren() {
 		final Parent internClasses = new Parent("Classes");
-		Parent project = new Parent("Project statistics");
+		Parent project = new Parent(PROJECT_STATISTICS);
 		Integer maxNesting = 0;
 		String maxNestingClass = null;
 
-		project.addChild(new LazyParent("Number of directives") {
+		project.addChild(new LazyParent(NUMBER_OF_DIRECTIVES) {
 			@Override
 			protected void initChildren() {
 				new Aggregator().processAll(fstModel, this);
@@ -79,7 +91,7 @@ public class DirectivesNode extends LazyParent {
 
 			if (!clazz.getRoles().isEmpty()) {
 				final Integer currentNesting = aggProject.getMaxNesting();
-				classNode.addChild(new Parent("Maximum nesting of directives", currentNesting));
+				classNode.addChild(new Parent(MAXIMUM_NESTING_OF_DIRECTIVES, currentNesting));
 				if (currentNesting > maxNesting) {
 					maxNesting = currentNesting;
 					maxNestingClass = className;
@@ -91,15 +103,15 @@ public class DirectivesNode extends LazyParent {
 		final Integer maximumSum = aggProject.getMaximumSum();
 		final Integer minimumSum = aggProject.getMinimumSum();
 
-		final Parent directivesPerClass = new Parent("Directives per class");
-		directivesPerClass.addChild(new Parent("Maximum number of directives: " + maximumSum + " in class "
+		final Parent directivesPerClass = new Parent(DIRECTIVES_PER_CLASS);
+		directivesPerClass.addChild(new Parent("Maximum number of directives: " + maximumSum + IN_CLASS
 				+ searchClass(internClasses.getChildren(), maximumSum)));
-		directivesPerClass.addChild(new Parent("Minimum number of directives: " + minimumSum + " in class "
+		directivesPerClass.addChild(new Parent("Minimum number of directives: " + minimumSum + IN_CLASS
 				+ searchClass(internClasses.getChildren(), minimumSum)));
-		directivesPerClass.addChild(new Parent("Average number of directives per class", getAverage(internClasses)));
+		directivesPerClass.addChild(new Parent(AVERAGE_NUMBER_OF_DIRECTIVES_PER_CLASS, getAverage(internClasses)));
 		project.addChild(directivesPerClass);
 
-		project.addChild(new LazyParent("Features per directive") {
+		project.addChild(new LazyParent(FEATURES_PER_DIRECTIVE) {
 
 			@Override
 			protected void initChildren() {
@@ -122,16 +134,16 @@ public class DirectivesNode extends LazyParent {
 					average = 0.0;
 				}
 
-				addChild(new Parent("Maximum features per directive", aggregator.getMaxNesting()));
-				addChild(new Parent("Minimum features per directive", aggregator.getMinNesting()));
-				addChild(new Parent("Average features per directive", average));
+				addChild(new Parent(MAXIMUM_FEATURES_PER_DIRECTIVE, aggregator.getMaxNesting()));
+				addChild(new Parent(MINIMUM_FEATURES_PER_DIRECTIVE, aggregator.getMinNesting()));
+				addChild(new Parent(AVERAGE_FEATURES_PER_DIRECTIVE, average));
 			}
 		});
-		project.addChild(new Parent("Maximum nesting of directives: " + maxNesting + " in class " + maxNestingClass));
+		project.addChild(new Parent("Maximum nesting of directives: " + maxNesting + IN_CLASS + maxNestingClass));
 
 		addChild(project);
 
-		Parent classes = new AbstractSortModeNode("Class statistics") {
+		Parent classes = new AbstractSortModeNode(CLASS_STATISTICS) {
 			@Override
 			protected void initChildren() {
 				for (Parent child : internClasses.getChildren()) {

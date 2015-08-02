@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.ui.mpl.handlers.interfaces;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.FOLDER_OF_EXTENDED_MODULES;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.fm.ui.handlers.base.AProjectJobHandler;
 import de.ovgu.featureide.fm.ui.wizards.AbstractWizard;
@@ -35,7 +36,7 @@ public class BuildExtendedModulesHandler extends AProjectJobHandler {
 
 	@Override
 	protected AbstractWizard instantiateWizard() {
-		return new BuildExtendedModulesWizard("Folder of extended modules", "ExtendedModules");
+		return new BuildExtendedModulesWizard(FOLDER_OF_EXTENDED_MODULES, "ExtendedModules");
 	}
 	
 	@Override

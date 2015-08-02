@@ -20,6 +20,14 @@
  */
 package de.ovgu.featureide.fm.ui.editors;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.MODEL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.MODEL_SHOULD_BE_SAVED_AFTER_RENAMINGS_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SAVE_FEATURE_MODEL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SAVE_RESOURCES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SOME_MODIFIED_RESOURCES_MUST_BE_SAVED_BEFORE_SAVING_THE_FEATUREMODEL_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.THE_FEATURE_MODEL_IS_VOID_COMMA__I_E__COMMA__IT_CONTAINS_NO_PRODUCTS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.UNKNOWN_FILE_EXTENSION_;
+
 import java.beans.PropertyChangeEvent;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -341,9 +349,9 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 		dialog.setLabelProvider(new LabelProvider());
 		dialog.setInput(editor);
 		dialog.setInitialElementSelections(editor);
-		dialog.setTitle("Save feature model");
+		dialog.setTitle(SAVE_FEATURE_MODEL);
 		dialog.setHelpAvailable(false);
-		dialog.setMessage("Model should be saved after renamings.");
+		dialog.setMessage(MODEL_SHOULD_BE_SAVED_AFTER_RENAMINGS_);
 		dialog.open();
 
 		if (dialog.getResult() != null) {
@@ -428,13 +436,13 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 		file = (IFile) input.getAdapter(IFile.class);
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(this);
 		fmFile = new FeatureModelFile(file);
-		setPartName(file.getProject().getName() + " Model");
+		setPartName(file.getProject().getName() + MODEL);
 		setTitleToolTip(input.getToolTipText());
 		super.setInput(input);
 
 		ioType = ModelIOFactory.getTypeByFileName(file.getName());
 		if (ioType == ModelIOFactory.TYPE_UNKNOWN) {
-			FMUIPlugin.getDefault().logWarning("Unknown file extension.");
+			FMUIPlugin.getDefault().logWarning(UNKNOWN_FILE_EXTENSION_);
 		}
 
 		featureModel = ModelIOFactory.getNewFeatureModel(ioType);
@@ -559,7 +567,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 		}
 		try {
 			if (!featureModel.getAnalyser().isValid()) {
-				fmFile.createModelMarker("The feature model is void, i.e., it contains no products", IMarker.SEVERITY_ERROR, 0);
+				fmFile.createModelMarker(THE_FEATURE_MODEL_IS_VOID_COMMA__I_E__COMMA__IT_CONTAINS_NO_PRODUCTS, IMarker.SEVERITY_ERROR, 0);
 			}
 		} catch (TimeoutException e) {
 			// do nothing, assume the model is correct
@@ -673,9 +681,9 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 				dialog.setLabelProvider(new LabelProvider());
 				dialog.setInput(dirtyEditors);
 				dialog.setInitialElementSelections(dirtyEditors);
-				dialog.setTitle("Save Resources");
+				dialog.setTitle(SAVE_RESOURCES);
 				dialog.setHelpAvailable(false);
-				dialog.setMessage("Some modified resources must be saved before saving the featuremodel.");
+				dialog.setMessage(SOME_MODIFIED_RESOURCES_MUST_BE_SAVED_BEFORE_SAVING_THE_FEATUREMODEL_);
 				dialog.open();
 
 				if (dialog.getResult() != null) {

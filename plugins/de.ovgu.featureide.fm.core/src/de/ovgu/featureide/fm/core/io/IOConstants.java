@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.fm.core.io;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.JAK;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -45,12 +48,12 @@ public final class IOConstants {
 		FILENAME_EXPORTFST = "fst_exported_file.txt",
 		FILENAME_COMPARE_MATRIX = "similarity_matrix.csv",
 		
-		FOLDERNAME_FEATURE_ROLES = "features",
+		FOLDERNAME_FEATURE_ROLES = FEATURES,
 		FOLDERNAME_FEATURE_INTERFACES = "feature_interfaces",
 		FOLDERNAME_WRAPPER_INTERFACES = "wrapper_interfaces",
 		
 		EXTENSION_JAVA = ".java",
-		EXTENSION_JAK = ".jak",
+		EXTENSION_JAK = JAK,
 		EXTENSION_SOLUTION = ".solution",
 	
 		LINE_SEPARATOR = System.getProperty("line.separator", "\n");

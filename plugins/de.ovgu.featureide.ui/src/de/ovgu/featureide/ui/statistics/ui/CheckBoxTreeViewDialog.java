@@ -20,6 +20,10 @@
  */
 package de.ovgu.featureide.ui.statistics.ui;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CHOOSE_WHAT_TO_EXPORT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DOUBLE_CLICK_TO_SELECT_ALL_CHILDNODES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.INIT_DIALOG___TREEVIEWER;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -55,8 +59,8 @@ import de.ovgu.featureide.ui.statistics.ui.helper.TreeLabelProvider;
  */
 public class CheckBoxTreeViewDialog extends Dialog {
 
-	private static final String TOOLTIP = "double-click to select all childnodes";
-	private static final String TITLE = "Choose what to export";
+	private static final String TOOLTIP = DOUBLE_CLICK_TO_SELECT_ALL_CHILDNODES;
+	private static final String TITLE = CHOOSE_WHAT_TO_EXPORT;
 	private Parent invisibleRoot;
 	private CheckboxTreeViewer viewer;
 	private TreeViewer oldTree;
@@ -117,7 +121,7 @@ public class CheckBoxTreeViewDialog extends Dialog {
 	 * 
 	 */
 	private void initViewer() {
-		UIJob job = new UIJob("init dialog - treeviewer") {
+		UIJob job = new UIJob(INIT_DIALOG___TREEVIEWER) {
 
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {

@@ -20,6 +20,11 @@
  */
 package de.ovgu.featureide.fm.ui.views;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CONVERTING_FEATURE_MODELS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DISABLE_AUTOMATIC_CALCULATIONS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.START_CALCULATION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATING_FEATURE_MODEL_EDITS;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -86,8 +91,8 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 	private static final QualifiedName ACTIVATOR_KEY = new QualifiedName(FMUIPlugin.PLUGIN_ID + ".EditViewActivator", FMUIPlugin.PLUGIN_ID
 			+ ".EditViewActivator");
 
-	private static final String ACTIVATOR_ACTION_TEXT = "Disable automatic calculations";
-	private static final String MANUAL_CALCULATION_TEXT = "Start calculation";
+	private static final String ACTIVATOR_ACTION_TEXT = DISABLE_AUTOMATIC_CALCULATIONS;
+	private static final String MANUAL_CALCULATION_TEXT = START_CALCULATION;
 
 	private static final IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
 
@@ -102,7 +107,7 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 	 */
 	private Action manualAction = new Action() {
 		public void run() {
-			Job job = new Job("Updating Feature Model Edits") {
+			Job job = new Job(UPDATING_FEATURE_MODEL_EDITS) {
 				protected IStatus run(IProgressMonitor monitor) {
 					if (featureModelEditor == null)
 						contentProvider.defaultContent();
@@ -271,7 +276,7 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 				};
 				evaluation.setPriority(Job.LONG);
 				evaluation.schedule();
-				UIJob conversion = new UIJob("Converting Feature Models") {
+				UIJob conversion = new UIJob(CONVERTING_FEATURE_MODELS) {
 					@Override
 					public IStatus runInUIThread(IProgressMonitor monitor) {
 						try {
@@ -334,7 +339,7 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 		 * This job waits for the calculation job to finish and starts
 		 * immediately a new one
 		 */
-		Job waiter = new Job("Updating Feature Model Edits") {
+		Job waiter = new Job(UPDATING_FEATURE_MODEL_EDITS) {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				try {
@@ -350,7 +355,7 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 					FMUIPlugin.getDefault().logError(e);
 				}
 
-				job = new Job("Updating Feature Model Edits") {
+				job = new Job(UPDATING_FEATURE_MODEL_EDITS) {
 					@Override
 					protected IStatus run(IProgressMonitor monitor) {
 						activatorAction.setEnabled(true);

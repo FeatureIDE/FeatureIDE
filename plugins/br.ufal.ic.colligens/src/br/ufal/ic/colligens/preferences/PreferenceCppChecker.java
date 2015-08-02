@@ -1,5 +1,7 @@
 package br.ufal.ic.colligens.preferences;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.H;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -49,7 +51,7 @@ public class PreferenceCppChecker extends FieldEditorPreferencePage implements
 				if (value != null) {
 					try {
 						Runtime rt = Runtime.getRuntime();
-						Process pr = rt.exec(value + " -h");
+						Process pr = rt.exec(value + H);
 
 						BufferedReader input = new BufferedReader(
 								new InputStreamReader(pr.getInputStream()));

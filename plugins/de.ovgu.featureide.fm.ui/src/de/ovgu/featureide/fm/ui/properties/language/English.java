@@ -20,6 +20,18 @@
  */
 package de.ovgu.featureide.fm.ui.properties.language;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.ALTERNATIVE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT_IS_TAUTOLOGY;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT_MAKES_THE_MODEL_VOID;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ENGLISH;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FALSE_OPTIONAL_FEATURE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FROM_INTERFACE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IMPORTED;
+import static de.ovgu.featureide.fm.core.localization.StringTable.INDETERMINATE_HIDDEN;
+import static de.ovgu.featureide.fm.core.localization.StringTable.INHERITED;
+import static de.ovgu.featureide.fm.core.localization.StringTable.OR;
+import static de.ovgu.featureide.fm.core.localization.StringTable.REDUNDANT_CONSTRAINT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.UNSATISFIABLE_CONSTRAINT;
 /**
  * Class implementing the extension point <code>"de.ovgu.featureide.fm.core.language"</code>
  * 
@@ -29,26 +41,22 @@ package de.ovgu.featureide.fm.ui.properties.language;
  */
 public class English implements ILanguage {
 
-	public static final String NAME = "English";
+	public static final String NAME = ENGLISH;
 
 	private static final String LEGEND = "Legend:";
 	private static final String MANDATORY = "Mandatory";
 	private static final String ABSTRACT = "Abstract";
-	private static final String IMPORTED = "Imported";
-	private static final String INHERITED = "Inherited";
-	private static final String INTERFACED = "from Interface";
+	private static final String INTERFACED = FROM_INTERFACE;
 	private static final String CONCRETE = "Concrete";
 	private static final String HIDDEN = "Hidden";
 	private static final String DEAD = "Dead feature";
-	private static final String FALSE_OPTIONAL = "False optional feature";
-	private static final String ALTERNATIVE = "Alternative";
-	private static final String OR = "Or";
+	private static final String FALSE_OPTIONAL = FALSE_OPTIONAL_FEATURE;
 	private static final String OPTIONAL = "Optional";
-	private static final String INDETHIDDEN = "Indeterminate hidden";
-	private static final String REDUNDANT = "Redundant constraint";
-	private static final String UNSATISFIABLE_CONST = "Unsatisfiable constraint";
-	private static final String TAUTOLOGY_CONST = "Constraint is tautology";
-	private static final String VOID_MODEL_CONST = "Constraint makes the model void";
+	private static final String INDETHIDDEN = INDETERMINATE_HIDDEN;
+	private static final String REDUNDANT = REDUNDANT_CONSTRAINT;
+	private static final String UNSATISFIABLE_CONST = UNSATISFIABLE_CONSTRAINT;
+	private static final String TAUTOLOGY_CONST = CONSTRAINT_IS_TAUTOLOGY;
+	private static final String VOID_MODEL_CONST = CONSTRAINT_MAKES_THE_MODEL_VOID;
 
 	@Override
 	public String getRedundantConst() {

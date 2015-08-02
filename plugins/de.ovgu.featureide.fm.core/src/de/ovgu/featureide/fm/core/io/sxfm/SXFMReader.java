@@ -20,6 +20,19 @@
  */
 package de.ovgu.featureide.fm.core.io.sxfm;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.COULDNT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.COULDNT_MATCH_WITH;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DATA;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DETERMINE_GROUP_CARDINALITY;
+import static de.ovgu.featureide.fm.core.localization.StringTable.EMPTY___;
+import static de.ovgu.featureide.fm.core.localization.StringTable.GROUP_CARDINALITY;
+import static de.ovgu.featureide.fm.core.localization.StringTable.INVALID;
+import static de.ovgu.featureide.fm.core.localization.StringTable.META;
+import static de.ovgu.featureide.fm.core.localization.StringTable.MISSING_ELEMENT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SECOND_TIME_COMMA__BUT_MAY_ONLY_OCCUR_ONCE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.THE_FEATURE_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.UNKNOWN_XML_TAG;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -138,12 +151,12 @@ public class SXFMReader extends AbstractFeatureModelReader {
     	} else if ("constraints".equals(tag)) {
     		line++;
     		handleConstraints(n);
-    	} else if ("meta".equals(tag)) {
+    	} else if (META.equals(tag)) {
     	    	return;
-    	} else if("data".equals(tag) && "meta".equals(n.getParentNode().getNodeName())) {
+    	} else if(DATA.equals(tag) && META.equals(n.getParentNode().getNodeName())) {
     	    return;
     	} else {
-    		throw new UnsupportedModelException("Unknown Xml-Tag", line);
+    		throw new UnsupportedModelException(UNKNOWN_XML_TAG, line);
     	}
     }
     
@@ -212,7 +225,7 @@ public class SXFMReader extends AbstractFeatureModelReader {
 				int relativeIndent = countIndent - lastFeat.getIndentation();
 				while (relativeIndent < 1) {
 //					if (lastFeat.isRoot()) throw new UnsupportedModelException(
-//							"Indentation error, feature has no parent", line);
+//							INDENTATION_ERROR_COMMA__FEATURE_HAS_NO_PARENT, line);
 //					lastFeat = (FeatureIndent) lastFeat.getParent();
 //					relativeIndent = countIndent - lastFeat.getIndentation();
 					
@@ -266,7 +279,7 @@ public class SXFMReader extends AbstractFeatureModelReader {
 		    		feat.setMandatory(true);
 		    		feat.setAbstract(true);
 		    		//try to generate a name that hopefully does not exist in the model
-		    		featId = lastFeat.getName() + "_" + (lastFeat.getChildrenCount()+1);
+		    		featId = lastFeat.getName() + EMPTY___ + (lastFeat.getChildrenCount()+1);
 		    		feat.setName(featId);
 		    		feat.setParent(lastFeat);
 		    		lastFeat.addChild(feat);
@@ -281,8 +294,8 @@ public class SXFMReader extends AbstractFeatureModelReader {
 						int end = Character.getNumericValue(lineText.charAt(index + 3));
 						FeatCardinality featCard = new FeatCardinality(lastFeat, start, end);
 						arbCardGroupFeats.add(featCard);
-					} else throw new UnsupportedModelException("Couldn't " +
-							"determine group cardinality", line);
+					} else throw new UnsupportedModelException(COULDNT +
+							DETERMINE_GROUP_CARDINALITY, line);
 					//lastFeat = feat;
 					//featId = featId + "_ ";
 					lineText = reader.readLine();
@@ -305,13 +318,13 @@ public class SXFMReader extends AbstractFeatureModelReader {
 		    		feat.setParent(lastFeat);
 		    		lastFeat.addChild(feat);
 		    		feat.changeToAnd();
-				} else throw new UnsupportedModelException("Couldn't match with " +
+				} else throw new UnsupportedModelException(COULDNT_MATCH_WITH +
 						"known Types: :r, :m, :o, :g, :", line);
 				addFeatureToModel(feat);
 
 				if (idTable.containsKey(featId)) throw 
 					new UnsupportedModelException("Feature \"" + featId + "\" occured" +
-					" second time, but may only occur once", line);
+					SECOND_TIME_COMMA__BUT_MAY_ONLY_OCCUR_ONCE, line);
 				idTable.put(featId, feat);
 				
 				lastFeat = feat;
@@ -357,7 +370,7 @@ public class SXFMReader extends AbstractFeatureModelReader {
 		String orig_name = feat.getName();
 		int i=1;
 		while(!featureModel.addFeature(feat)){
-			feat.setName(orig_name+"_"+i++);
+			feat.setName(orig_name+EMPTY___+i++);
 		}
 		
 	}
@@ -393,8 +406,8 @@ public class SXFMReader extends AbstractFeatureModelReader {
     		int start = featCard.start;
     		int end = featCard.end;
     		if ((start < 0) || (start > end) || (end > children.size())) 
-    			throw new UnsupportedModelException("Group cardinality " +
-					"invalid", line);
+    			throw new UnsupportedModelException(GROUP_CARDINALITY +
+					INVALID, line);
     		int f = children.size();
     		node = buildMinConstr(children, f - start + 1, feat.getName());
     		featureModel.addPropositionalNode(node);
@@ -603,7 +616,7 @@ public class SXFMReader extends AbstractFeatureModelReader {
 			throws UnsupportedModelException {
 		String element;
 		if (list.isEmpty()) 
-			throw new UnsupportedModelException("Missing element", line);
+			throw new UnsupportedModelException(MISSING_ELEMENT, line);
 		element = list.removeFirst();
 		if (("(".equals(element)) && (!list.isEmpty())) 
 			element = list.removeFirst();
@@ -612,7 +625,7 @@ public class SXFMReader extends AbstractFeatureModelReader {
 		} else {
 			Feature feat = idTable.get(element);
 			if (feat == null)
-				throw new UnsupportedModelException("The feature '" + element + 
+				throw new UnsupportedModelException(THE_FEATURE_ + element + 
 						"' does not occur in the grammar!", 0);			
 			return new Literal(feat.getName());
 		}

@@ -1,5 +1,6 @@
 package br.ufal.ic.colligens.models;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.TYPE_ERROR;
 import scala.Function1;
 import scala.runtime.BoxedUnit;
 import br.ufal.ic.colligens.util.Log;
@@ -43,7 +44,7 @@ public class RenderTypeError implements Function1<TypeChefError, Object> {
 						typeError.msg());
 
 				fileProxy.getLogs().add(newlog);
-				System.out.println("Type error " + fileProxy.getLogs().size());
+				System.out.println(TYPE_ERROR + fileProxy.getLogs().size());
 			}
 
 		}

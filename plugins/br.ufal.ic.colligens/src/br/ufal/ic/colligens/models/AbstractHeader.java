@@ -1,5 +1,7 @@
 package br.ufal.ic.colligens.models;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.NOT_A_VALID_FILE_C_IN;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -71,7 +73,7 @@ public abstract class AbstractHeader {
 		project = CoreModel.getDefault().getCModel().getCProject(projectName);
 
 		if (project == null) {
-			throw new PlatformException("Not a valid file C in " + projectName);
+			throw new PlatformException(NOT_A_VALID_FILE_C_IN + projectName);
 		}
 	}
 

@@ -173,23 +173,24 @@
 	<extension
 			point="org.eclipse.ui.editors.markerAnnotationSpecification">
 		<specification
-				annotationImageProvider="de.ovgu.featureide.ui.editors.annotation.ColorAnnotationImageProvider"
-				annotationType="de.ovgu.featureide.ui.editors.annotations.image"
-				colorPreferenceKey="colorAnnotationImage_color"
-				colorPreferenceValue="0,0,0"
-				contributesToHeader="false"
-				highlightPreferenceKey="colorAnnotationImage_highlight"
-				highlightPreferenceValue="false"
-				includeOnPreferencePage="false"
-				label="ColorAnnotationImage"
-				overviewRulerPreferenceKey="colorAnnotationImage_overviewRuler"
-				overviewRulerPreferenceValue="false"
-				textPreferenceKey="colorAnnotationImage_text"
-				textPreferenceValue="false"
-				textStylePreferenceKey="colorAnnotationImage_textStyle"
-				textStylePreferenceValue="NONE"
-				verticalRulerPreferenceKey="colorAnnotationImage_verticalRuler"
-				verticalRulerPreferenceValue="true">
+        annotationImageProvider="de.ovgu.featureide.ui.editors.annotation.ColorAnnotationImageProvider"
+        annotationType="de.ovgu.featureide.ui.editors.annotations.image"
+        colorPreferenceKey="colorAnnotationImage_color"
+        colorPreferenceValue="0,0,0"
+        contributesToHeader="false"
+        highlightPreferenceKey="colorAnnotationImage_highlight"
+        highlightPreferenceValue="false"
+        includeOnPreferencePage="false"
+        label="ColorAnnotationImage"
+        overviewRulerPreferenceKey="colorAnnotationImage_overviewRuler"
+        overviewRulerPreferenceValue="false"
+        presentationLayer="0"
+        textPreferenceKey="colorAnnotationImage_text"
+        textPreferenceValue="false"
+        textStylePreferenceKey="colorAnnotationImage_textStyle"
+        textStylePreferenceValue="NONE"
+        verticalRulerPreferenceKey="colorAnnotationImage_verticalRuler"
+        verticalRulerPreferenceValue="true">
 		</specification>
 		<specification
 				annotationImageProvider="de.ovgu.featureide.ui.editors.annotation.ColorAnnotationImageProvider"
@@ -202,10 +203,10 @@
 				includeOnPreferencePage="false"
 				label="ColorAnnotation_Red"
 				overviewRulerPreferenceKey="colorAnnotationRed_overviewRuler"
-				overviewRulerPreferenceValue="true"
+				overviewRulerPreferenceValue="false"
 				presentationLayer="0"
 				textPreferenceKey="colorAnnotationRed_text"
-				textPreferenceValue="true"
+				textPreferenceValue="false"
 				textStylePreferenceKey="colorAnnotationRed_textStyle"
 				textStylePreferenceValue="NONE"
 				verticalRulerPreferenceKey="colorAnnotationRed_verticalRuler"
@@ -605,7 +606,7 @@
 				overviewRulerPreferenceValue="true"
 				presentationLayer="0"
 				textPreferenceKey="colorAnnotationRed_text"
-				textPreferenceValue="true"
+				textPreferenceValue="false"
 				textStylePreferenceKey="colorAnnotationRed_textStyle"
 				textStylePreferenceValue="NONE"
 				verticalRulerPreferenceKey="colorAnnotationRed_verticalRuler"
@@ -625,7 +626,7 @@
 				overviewRulerPreferenceValue="true"
 				presentationLayer="0"
 				textPreferenceKey="colorAnnotationOrange_text"
-				textPreferenceValue="true"
+				textPreferenceValue="false"
 				textStylePreferenceKey="colorAnnotationOrange_textStyle"
 				textStylePreferenceValue="NONE"
 				verticalRulerPreferenceKey="colorAnnotationOrange_verticalRuler"
@@ -645,7 +646,7 @@
 				overviewRulerPreferenceValue="true"
 				presentationLayer="0"
 				textPreferenceKey="colorAnnotationYellow_text"
-				textPreferenceValue="true"
+				textPreferenceValue="false"
 				textStylePreferenceKey="colorAnnotationYellow_textStyle"
 				textStylePreferenceValue="NONE"
 				verticalRulerPreferenceKey="colorAnnotationYellow_verticalRuler"
@@ -665,7 +666,7 @@
 				overviewRulerPreferenceValue="true"
 				presentationLayer="0"
 				textPreferenceKey="colorAnnotationDarkGreen_text"
-				textPreferenceValue="true"
+				textPreferenceValue="false"
 				textStylePreferenceKey="colorAnnotationDarkGreen_textStyle"
 				textStylePreferenceValue="NONE"
 				verticalRulerPreferenceKey="colorAnnotationDarkGreen_verticalRuler"
@@ -685,7 +686,7 @@
 				overviewRulerPreferenceValue="true"
 				presentationLayer="0"
 				textPreferenceKey="colorAnnotationLightGreen_text"
-				textPreferenceValue="true"
+				textPreferenceValue="false"
 				textStylePreferenceKey="colorAnnotationLightGreen_textStyle"
 				textStylePreferenceValue="NONE"
 				verticalRulerPreferenceKey="colorAnnotationLightGreen_verticalRuler"
@@ -705,7 +706,7 @@
 				overviewRulerPreferenceValue="true"
 				presentationLayer="0"
 				textPreferenceKey="colorAnnotationCyan_text"
-				textPreferenceValue="true"
+				textPreferenceValue="false"
 				textStylePreferenceKey="colorAnnotationCyan_textStyle"
 				textStylePreferenceValue="NONE"
 				verticalRulerPreferenceKey="colorAnnotationCyan_verticalRuler"
@@ -725,7 +726,7 @@
 				overviewRulerPreferenceValue="true"
 				presentationLayer="0"
 				textPreferenceKey="colorAnnotationLightGrey_text"
-				textPreferenceValue="true"
+				textPreferenceValue="false"
 				textStylePreferenceKey="colorAnnotationLightGrey_textStyle"
 				textStylePreferenceValue="NONE"
 				verticalRulerPreferenceKey="colorAnnotationLightGrey_verticalRuler"
@@ -745,7 +746,7 @@
 				overviewRulerPreferenceValue="true"
 				presentationLayer="0"
 				textPreferenceKey="colorAnnotationBlue_text"
-				textPreferenceValue="true"
+				textPreferenceValue="false"
 				textStylePreferenceKey="colorAnnotationBlue_textStyle"
 				textStylePreferenceValue="NONE"
 				verticalRulerPreferenceKey="colorAnnotationBlue_verticalRuler"
@@ -765,7 +766,7 @@
 				overviewRulerPreferenceValue="true"
 				presentationLayer="0"
 				textPreferenceKey="colorAnnotationMargenta_text"
-				textPreferenceValue="true"
+				textPreferenceValue="false"
 				textStylePreferenceKey="colorAnnotationMargenta_textStyle"
 				textStylePreferenceValue="NONE"
 				verticalRulerPreferenceKey="colorAnnotationMargenta_verticalRuler"
@@ -785,7 +786,7 @@
 				overviewRulerPreferenceValue="true"
 				presentationLayer="0"
 				textPreferenceKey="colorAnnotationPink_text"
-				textPreferenceValue="true"
+				textPreferenceValue="false"
 				textStylePreferenceKey="colorAnnotationPink_textStyle"
 				textStylePreferenceValue="NONE"
 				verticalRulerPreferenceKey="colorAnnotationPink_verticalRuler"
@@ -1330,6 +1331,45 @@
 				namespace="de.ovgu.featureide.fm.ui.properties"
 				properties="composer"
 				type="java.lang.Object">
+		</propertyTester>
+	</extension>
+	<extension point="org.eclipse.debug.ui.launchShortcuts">
+	    <shortcut
+           class="de.ovgu.featureide.ui.actions.generator.IntegrationTestLaunchShortcut"
+           description="Runs JUnit test cases on a product with and a product without the feature (if possible)."
+           icon="icons/FeatureIconSmall.ico"
+           id="de.ovgu.javaAppletShortcut"
+           label="Run as JUnit Integration Test"
+           modes="run">
+            <contextualLaunch>
+				  <enablement>
+				    <with variable="selection">
+				     <count value="1"/>
+				      <iterate operator="and">
+				             <instanceof
+				                   value="org.eclipse.core.resources.IFolder">
+				             </instanceof>
+				             <test
+				                   property="de.ovgu.featureide.ui.properties.integration">
+				             </test>
+             				<test
+									args="de.ovgu.featureide.core.featureProjectNature"
+									property="de.ovgu.featureide.fm.ui.properties.nature"
+									value="true">
+							</test>
+				      </iterate>
+				     </with>
+				  </enablement>
+			  </contextualLaunch>
+	    </shortcut>
+	</extension>
+	<extension point="org.eclipse.core.expressions.propertyTesters">
+		<propertyTester
+				class="de.ovgu.featureide.ui.properties.IntegrationTester"
+				id="de.ovgu.featureide.ui.properties.integrationtester"
+				namespace="de.ovgu.featureide.ui.properties"
+				properties="integration"
+				type="org.eclipse.core.resources.IFolder">
 		</propertyTester>
 	</extension>
 </plugin>

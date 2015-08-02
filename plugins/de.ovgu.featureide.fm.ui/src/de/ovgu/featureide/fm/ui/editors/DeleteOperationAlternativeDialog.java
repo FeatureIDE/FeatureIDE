@@ -20,6 +20,13 @@
  */
 package de.ovgu.featureide.fm.ui.editors;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.ALTERNATIVE_FEATURES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CLOSE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURES_SUPPOSED_TO_BE_DELETED;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE_DELETION_AND_REPLACEMENT_IN_CONSTRAINTS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ON_THE_RIGHT_HAND_SIDE_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.REPLACE;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -116,7 +123,7 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 	 */
 	private void initShell() {
 		shell = new Shell(Display.getCurrent(), SWT.APPLICATION_MODAL | SWT.DIALOG_TRIM);
-		shell.setText("Feature Deletion and Replacement in constraints");
+		shell.setText(FEATURE_DELETION_AND_REPLACEMENT_IN_CONSTRAINTS);
 		shell.setImage(FEATURE_SYMBOL);
 		shell.setSize(520, 450);
 		GridLayout shellLayout = new GridLayout();
@@ -169,7 +176,7 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 		lastComposite.setLayout(lastCompositeLayout);
 
 		Button okButton = new Button(lastComposite, SWT.NONE);
-		okButton.setText("Close");
+		okButton.setText(CLOSE);
 		FormData formDataCancel = new FormData();
 		formDataCancel.width = 70;
 		formDataCancel.right = new FormAttachment(100, 5);
@@ -205,7 +212,7 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 		capture.setText("One or more features could not be deleted, because they are contained within one or\n" + "more constraints.\n"
 				+ "To delete these features anyway you can replace their occurences in\n"
 				+ "constraints with another feature. Select one or more features on the left in order to\n"
-				+ "replace them with one of their respective semantically equivalent features shown\n" + "on the right hand side.");
+				+ "replace them with one of their respective semantically equivalent features shown\n" + ON_THE_RIGHT_HAND_SIDE_);
 		capture.setBackground(shell.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 
 		gridData = new GridData();
@@ -253,7 +260,7 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 		final TableViewer tableViewer = new TableViewer(tableComposite, SWT.BORDER | SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
 		alternativefeatureTable = tableViewer.getTable();
 		alternativefeatureTable.setLayoutData(gridData);
-		alternativefeatureTable.setToolTipText("Features supposed to be deleted");
+		alternativefeatureTable.setToolTipText(FEATURES_SUPPOSED_TO_BE_DELETED);
 		TableViewerColumn viewerNameColumn = new TableViewerColumn(tableViewer, SWT.NONE);
 		TableColumnLayout tableColumnLayout = new TableColumnLayout();
 		tableComposite.setLayout(tableColumnLayout);
@@ -288,7 +295,7 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 		final TableViewer tableViewer2 = new TableViewer(tableComposite, SWT.BORDER | SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL);
 		featureTable = tableViewer2.getTable();
 		featureTable.setLayoutData(gridData);
-		featureTable.setToolTipText("alternative features");
+		featureTable.setToolTipText(ALTERNATIVE_FEATURES);
 		TableViewerColumn viewerNameColumn2 = new TableViewerColumn(tableViewer2, SWT.NONE);
 		tableColumnLayout = new TableColumnLayout();
 		tableComposite.setLayout(tableColumnLayout);
@@ -334,7 +341,7 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 		label.setLayoutData(gridData);
 
 		final Button button = new Button(featureGroup, SWT.PUSH);
-		button.setText("Replace");
+		button.setText(REPLACE);
 		gridData = new GridData(GridData.FILL_HORIZONTAL);
 		button.setLayoutData(gridData);
 

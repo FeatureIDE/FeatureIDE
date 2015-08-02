@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.core.mpl.job.statistics;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_STATISTICS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.PRINTED_STATISTICS;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -148,7 +151,7 @@ public class PrintStatisticsJob extends AProjectJob<PrintStatisticsJob.Arguments
 	private int curFeatureID = -1;
 	
 	protected PrintStatisticsJob(Arguments arguments) {
-		super("Create Statistics", arguments);
+		super(CREATE_STATISTICS, arguments);
 	}
 
 	@Override
@@ -252,7 +255,7 @@ public class PrintStatisticsJob extends AProjectJob<PrintStatisticsJob.Arguments
 		}
 
 		IOConstants.writeToFile(folder.getFile("_all_statistics.csv"), stat.toCSVString());
-		MPLPlugin.getDefault().logInfo("Printed Statistics");
+		MPLPlugin.getDefault().logInfo(PRINTED_STATISTICS);
 		return true;
 	}
 

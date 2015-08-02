@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.featurehouse;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -99,7 +100,7 @@ public class FujiSignaturesCreator {
 		int featureID = astNode.featureID();
 
 		String featurename = featureModulePathnames.get(featureID);
-		return featurename.substring(featurename.lastIndexOf('\\') + 1);
+		return featurename.substring(featurename.lastIndexOf(File.separator) + 1);
 	}
 
 	private final HashMap<AbstractSignature, SignatureReference> signatureSet = new HashMap<AbstractSignature, SignatureReference>();

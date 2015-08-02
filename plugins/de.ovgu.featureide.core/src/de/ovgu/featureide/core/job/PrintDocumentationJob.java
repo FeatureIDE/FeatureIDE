@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.core.job;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD_DOCUMENTATION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.BUILT_DOCUMENTATION;
+
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -79,7 +82,7 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 	}
 	
 	protected PrintDocumentationJob(Arguments arguments) {
-		super("Build Documentation", arguments);
+		super(BUILD_DOCUMENTATION, arguments);
 	}
 
 	@Override
@@ -291,6 +294,6 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 		}
 		workMonitor.worked();
 		
-		CorePlugin.getDefault().logInfo("Built Documentation");
+		CorePlugin.getDefault().logInfo(BUILT_DOCUMENTATION);
 	}
 }

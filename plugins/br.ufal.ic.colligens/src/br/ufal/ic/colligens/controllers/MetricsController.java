@@ -1,5 +1,11 @@
 package br.ufal.ic.colligens.controllers;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.LOC;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NOT_A_VALID_FILE_FOUND_C;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NUMBER_OF_DIRECTIVES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NUMBER_OF_FILES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NUMBER_OF_FILES_WITH_DIRECTIVES;
+
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,13 +44,13 @@ public class MetricsController {
 			List<String> listFiles = pkgExplorerController.getListToString();
 
 			if (listFiles.isEmpty()) {
-				throw new ProjectExplorerException("Not a valid file found C");
+				throw new ProjectExplorerException(NOT_A_VALID_FILE_FOUND_C);
 			}
 
 			int numberFiles = 0;
 			int numberFilesWithDirec = 0;
 			int directivesPerFile = 0;
-			int LOC = 0;
+			int LinesOfCode = 0;
 
 			CountDirectives countDirectives = new CountDirectives();
 
@@ -55,7 +61,7 @@ public class MetricsController {
 				try {
 					CountDirectives countDirective = new CountDirectives();
 					int count = countDirective.count(file);
-					LOC = LOC + countDirective.numberLine;
+					LinesOfCode = LinesOfCode + countDirective.numberLine;
 					if (count > 0) {
 						numberFilesWithDirec++;
 						if (directivesPerFile == 0) {
@@ -73,17 +79,17 @@ public class MetricsController {
 
 			LinkedList<Metrics> list = new LinkedList<Metrics>();
 
-			Metrics statistics = new Metrics("Number of directives", ""
+			Metrics statistics = new Metrics(NUMBER_OF_DIRECTIVES, ""
 					+ countDirectives.directives.size());
 			list.add(statistics);
 
-			// statistics = new Statistics("Number of products", "32");
+			// statistics = new Statistics(NUMBER_OF_PRODUCTS, "32");
 			// list.add(statistics);
 
-			statistics = new Metrics("Number of files", "" + numberFiles);
+			statistics = new Metrics(NUMBER_OF_FILES, "" + numberFiles);
 			list.add(statistics);
 
-			statistics = new Metrics("Number of files with directives", ""
+			statistics = new Metrics(NUMBER_OF_FILES_WITH_DIRECTIVES, ""
 					+ numberFilesWithDirec);
 			list.add(statistics);
 
@@ -91,7 +97,7 @@ public class MetricsController {
 					+ (directivesPerFile));
 			list.add(statistics);
 
-			statistics = new Metrics("LOC", "" + LOC);
+			statistics = new Metrics(LOC, "" + LOC);
 			list.add(statistics);
 
 			MetricsViewController statisticsViewController = MetricsViewController

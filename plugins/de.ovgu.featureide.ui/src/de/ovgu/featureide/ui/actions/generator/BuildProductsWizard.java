@@ -20,6 +20,12 @@
  */
 package de.ovgu.featureide.ui.actions.generator;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.ALL_VALID_CONFIGURATIONS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD_PRODUCTS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CASA;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CHVATAL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DEFAULT;
+
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -51,17 +57,17 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 		setTWise(page.getAlgorithm(), page.getT());
 		setGenerate(page.getBuildTypeText(page.getGeneration()));
 		setOrder(page.getSelectedOrder());
-		setBuffer(page.getBuffer());
+		setTest(page.getTest());
 		new ConfigurationBuilder(featureProject, page.getGeneration(),
-				toggleState, page.getAlgorithm(), page.getT(), page.getOrder(), page.getBuffer());
+				toggleState, page.getAlgorithm(), page.getT(), page.getOrder(), page.getTest());
 		
 		return true;
 	}
 
 	@Override
 	public void addPages() {
-		setWindowTitle("Build Products");
-		page = new BuildProductsPage(featureProject.getProjectName(), featureProject, getGenerate(), toggleState, getAlgorithm(), getT(), getOrder(), getBuffer());
+		setWindowTitle(BUILD_PRODUCTS);
+		page = new BuildProductsPage(featureProject.getProjectName(), featureProject, getGenerate(), toggleState, getAlgorithm(), getT(), getOrder(), getTest());
 		addPage(page);
 	}
 
@@ -161,13 +167,13 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 		}
 	}
 	
-	private static boolean getBuffer() {
+	private static boolean getTest() {
 		try {
-			final String buffer = ResourcesPlugin.getWorkspace().getRoot().getPersistentProperty(BUFFER);
-			if ("true".equals(buffer)) {
+			final String test = ResourcesPlugin.getWorkspace().getRoot().getPersistentProperty(TEST);
+			if ("true".equals(test)) {
 				return true;
 			}
-			if ("false".equals(buffer)) {
+			if ("false".equals(test)) {
 				return false;
 			}
 			return true;
@@ -177,9 +183,9 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 		return false;
 	}
 	
-	private static void setBuffer(boolean buffer) {
+	private static void setTest(boolean test) {
 		try {
-			ResourcesPlugin.getWorkspace().getRoot().setPersistentProperty(BUFFER, buffer + "");
+			ResourcesPlugin.getWorkspace().getRoot().setPersistentProperty(TEST, test + "");
 		} catch (CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}

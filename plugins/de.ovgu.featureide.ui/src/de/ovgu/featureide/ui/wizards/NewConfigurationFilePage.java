@@ -20,6 +20,16 @@
  */
 package de.ovgu.featureide.ui.wizards;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.ALREADY_EXISTS_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ENTER_THE_NAME_OF_THE_CONFIGURATION_FILE__IT_WILL_BE_PLACED_IN_THE_CONFIGURATIONS_DIRECTORY_OF_THE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FILE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FILE_NAME_MUST_BE_SPECIFIED;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FILE_NAME_MUST_BE_VALID;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NEW_CONFIGURATION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NO_PROJECT_SELECTED;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTED_FEATUREIDE_PROJECT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTED_PROJECT_IS_NOT_A_FEATUREIDE_PROJECT;
+
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -45,7 +55,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
- * The "New" wizard page allows setting the container for the new file as well
+ * The NEW wizard page allows setting the container for the new file as well
  * as the file name. The page will only accept file name without the extension
  * OR with the extension that matches the expected one (.config).
  * 
@@ -77,8 +87,8 @@ public class NewConfigurationFilePage extends WizardPage {
 	 */
 	public NewConfigurationFilePage(IFolder configFolder) {
 		super("wizardPage");
-		setTitle("New Configuration");
-		setDescription("Enter the name of the configuration file. It will be placed in the configurations directory of the " + "selected FeatureIDE project");
+		setTitle(NEW_CONFIGURATION);
+		setDescription(ENTER_THE_NAME_OF_THE_CONFIGURATION_FILE__IT_WILL_BE_PLACED_IN_THE_CONFIGURATIONS_DIRECTORY_OF_THE + SELECTED_FEATUREIDE_PROJECT);
 		this.configFolder = configFolder;
 	}
 
@@ -167,12 +177,12 @@ public class NewConfigurationFilePage extends WizardPage {
 		}
 
 		if (featureComboProject.getText().length() == 0) {
-			updateStatus("No Project selected");
+			updateStatus(NO_PROJECT_SELECTED);
 			return;
 		}
 
 		if (!isFeatureProject(featureComboProject.getText())) {
-			updateStatus("Selected project is not a FeatureIDE Project");
+			updateStatus(SELECTED_PROJECT_IS_NOT_A_FEATUREIDE_PROJECT);
 			return;
 		}
 
@@ -180,11 +190,11 @@ public class NewConfigurationFilePage extends WizardPage {
 			configbool = true;
 			String fullFileName = fileName + "." + featureProject.getComposer().getConfigurationExtension();
 			if (featureProject.getConfigFolder().getFile(fullFileName).exists()) {
-				updateStatus("File " + fullFileName + " already exists.");
+				updateStatus(FILE + fullFileName + ALREADY_EXISTS_);
 				return;
 			}
 		} else if (configbool) {
-			updateStatus("File name must be specified");
+			updateStatus(FILE_NAME_MUST_BE_SPECIFIED);
 			return;
 		} else {
 			setErrorMessage(null);
@@ -192,7 +202,7 @@ public class NewConfigurationFilePage extends WizardPage {
 			return;
 		}
 		if (fileName.replace('\\', '/').indexOf('/', 1) > 0) {
-			updateStatus("File name must be valid");
+			updateStatus(FILE_NAME_MUST_BE_VALID);
 			return;
 		}
 

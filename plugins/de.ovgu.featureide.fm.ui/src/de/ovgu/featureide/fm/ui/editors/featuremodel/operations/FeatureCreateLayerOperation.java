@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_LAYER;
+
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -45,7 +47,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayou
  */
 public class FeatureCreateLayerOperation extends AbstractFeatureModelOperation {
 
-	private static final String LABEL = "Create Layer";
+	private static final String LABEL = CREATE_LAYER;
 	private Feature feature;
 	private Object viewer;
 	private Feature newFeature;

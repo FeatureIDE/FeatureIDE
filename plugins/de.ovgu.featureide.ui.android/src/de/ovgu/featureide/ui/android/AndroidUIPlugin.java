@@ -20,8 +20,9 @@
  */
 package de.ovgu.featureide.ui.android;
 
-import de.ovgu.featureide.fm.ui.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
+
+import de.ovgu.featureide.fm.ui.AbstractUIPlugin;
 
 /**
  * The activator class controls the plug-in life cycle

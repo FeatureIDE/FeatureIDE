@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.core.mpl.builder;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.NO_PROJECT_GOT;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -60,7 +62,7 @@ public class MSPLBuilder extends IncrementalProjectBuilder {
 //		if (project != null) {
 //			cleanProject(CorePlugin.getFeatureProject(project), monitor);
 //		} else {
-//			MPLPlugin.getDefault().logWarning("no project got");
+//			MPLPlugin.getDefault().logWarning(NO_PROJECT_GOT);
 //		}
 	}
 	
@@ -140,7 +142,7 @@ public class MSPLBuilder extends IncrementalProjectBuilder {
 				}
 			}
 		} else {
-			MPLPlugin.getDefault().logWarning("no project got");
+			MPLPlugin.getDefault().logWarning(NO_PROJECT_GOT);
 		}
 		return null;
 	}

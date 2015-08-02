@@ -1,5 +1,7 @@
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.PROJECT_BASED__;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -136,10 +138,10 @@ public class StatisticsContractComplexityNew extends LazyParent {
 			} else {
 				for (String refinement : contractRefinementMap.keySet()) {
 					contractRefinementRealNameMap.put(
-							"Project based - " + contractComposition,
+							PROJECT_BASED__ + contractComposition,
 							contractRefinementMap.get(refinement)
-									+ (contractRefinementRealNameMap.containsKey("Project based - " + contractComposition) ? contractRefinementRealNameMap
-											.get("Project based - " + contractComposition) : 0));
+									+ (contractRefinementRealNameMap.containsKey(PROJECT_BASED__ + contractComposition) ? contractRefinementRealNameMap
+											.get(PROJECT_BASED__ + contractComposition) : 0));
 				}
 			}
 			//TODO new node?

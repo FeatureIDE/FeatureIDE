@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_CONSTRAINT;
+
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -31,7 +33,7 @@ import de.ovgu.featureide.fm.ui.editors.ConstraintDialog;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 
 /**
- * The "Create Constraint" action for a selected feature inside the feature diagram.
+ * The CREATE_CONSTRAINT action for a selected feature inside the feature diagram.
  * Calling this action the constraint dialog will automatically contains the selected
  * feature inside the input control.
  * 
@@ -73,7 +75,7 @@ public class CreateConstraintWithAction extends CreateConstraintAction {
 	 */
 	protected void updateConstraintActionText(String featureName) {
 		this.selectedFeature = featureName;
-		this.setText("Create Constraint" + (featureName.isEmpty() ? "" : " starting with \"" + featureName + "\""));
+		this.setText(CREATE_CONSTRAINT + (featureName.isEmpty() ? "" : " starting with \"" + featureName + "\""));
 	}
 
 	/* (non-Javadoc)

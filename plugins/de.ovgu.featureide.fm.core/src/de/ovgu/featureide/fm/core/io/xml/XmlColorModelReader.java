@@ -20,6 +20,12 @@
  */
 package de.ovgu.featureide.fm.core.io.xml;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.COLOR;
+import static de.ovgu.featureide.fm.core.localization.StringTable.COLORSCHEME;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.INDEX;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SCHEME;
+
 import java.io.InputStream;
 import java.util.Iterator;
 
@@ -69,15 +75,15 @@ public class XmlColorModelReader extends XmlFeatureModelReader {
 					String currentTag = currentStartTag.getName()
 							.getLocalPart();
 
-					if (mode == 1 && currentTag.equals("color")) {
+					if (mode == 1 && currentTag.equals(COLOR)) {
 						
 						@SuppressWarnings("unchecked")
 						Iterator<Attribute> attributes = currentStartTag.getAttributes();
 						Attribute indexAttribute = attributes.next();
 						Attribute schemeAttribute = attributes.next();
 						
-						if (schemeAttribute.getName().getLocalPart().equals("scheme") &&
-								indexAttribute.getName().getLocalPart().equals("index")) {
+						if (schemeAttribute.getName().getLocalPart().equals(SCHEME) &&
+								indexAttribute.getName().getLocalPart().equals(INDEX)) {
 							colors.setColor(Integer.parseInt(schemeAttribute.getValue()), 
 									Integer.parseInt(indexAttribute.getValue()));
 						}
@@ -90,9 +96,9 @@ public class XmlColorModelReader extends XmlFeatureModelReader {
 							String curName = attribute.getName().getLocalPart();
 							String curValue = attribute.getValue();
 							
-							if (currentTag.equals("colorscheme") && curName.equals("name")) {
+							if (currentTag.equals(COLORSCHEME) && curName.equals("name")) {
 								colorschemeTable.addColorscheme(curValue);
-							} else if (currentTag.equals("curColorscheme") && curName.equals("index")) {
+							} else if (currentTag.equals("curColorscheme") && curName.equals(INDEX)) {
 								colorschemeTable.setSelectedColorscheme(Integer.parseInt(curValue));
 							}
 						}
@@ -108,7 +114,7 @@ public class XmlColorModelReader extends XmlFeatureModelReader {
 					} else {
 						if (currentTag.equals("colorSchemes")) {
 							mode = 2;
-						} else if (currentTag.equals("features")) {
+						} else if (currentTag.equals(FEATURES)) {
 							mode = 3;
 						}
 					}
@@ -120,7 +126,7 @@ public class XmlColorModelReader extends XmlFeatureModelReader {
 						mode = 3;
 					} else if (mode == 2 && currentTag.equals("colorSchemes")) {
 						mode = 0;
-					} else if (mode == 3 && currentTag.equals("features")) {
+					} else if (mode == 3 && currentTag.equals(FEATURES)) {
 						mode = 0;
 					}
 				}

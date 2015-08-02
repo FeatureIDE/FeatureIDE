@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_CONSTRAINT;
+
 import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.Constraint;
@@ -33,7 +35,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayou
  * @author Fabian Benduhn
  */
 public class ConstraintCreateOperation extends AbstractFeatureModelOperation {
-	private final static String LABEL = "Create Constraint";
+	private final static String LABEL = CREATE_CONSTRAINT;
 	private Constraint constraint;
 
 	/**
