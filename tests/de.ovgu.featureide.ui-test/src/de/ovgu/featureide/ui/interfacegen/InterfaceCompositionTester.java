@@ -27,9 +27,8 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -46,14 +45,14 @@ import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.cnf.ModelComparator;
+import de.ovgu.featureide.fm.core.filter.base.IFilter;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
-import de.ovgu.featureide.fm.core.job.IJob;
-import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 
 /**
- * @author Reimar Schr�ter
+ * @author Reimar Schröter
  * @author Sebastian Krieter
  */
 public class InterfaceCompositionTester {
@@ -96,56 +95,30 @@ public class InterfaceCompositionTester {
 
 		}
 
-		Iterator<InterfaceCompositionTester> it = allVersions.iterator();
+		computeAtomicSets(allVersions.iterator().next());
+	}
 
-		HashMap<String, String[]> root_intefaceS = new HashMap<>();
-		HashMap<String, String[]> root_org = new HashMap<>();
+	private static void computeAtomicSets(InterfaceCompositionTester next) {
+		long startTime = System.nanoTime();
+		long curTime = startTime;
 
-		int round = 0;
-		if (it.hasNext()) {
-			InterfaceCompositionTester compareVersion = it.next();
-			while (it.hasNext()) {
-				InterfaceCompositionTester newVersion = it.next();
+		List<List<List<Feature>>> atomicSetsOfallSubModels = new ArrayList<List<List<Feature>>>();
 
-				//compare
-				for (String root : compareVersion.rootFeatures) {
-
-					if (!root_intefaceS.containsKey(root)) {
-						root_intefaceS.put(root, new String[allVersions.size()]);
-						root_intefaceS.get(root)[allVersions.size() - 1] = "Interface: " + root;
-
-						root_org.put(root, new String[allVersions.size()]);
-						root_org.get(root)[allVersions.size() - 1] = "Org:" + root;
-					}
-
-					int id = compareVersion.rootFeatures.indexOf(root);
-					FeatureModel compareInterfaceModel = compareVersion.interfacesOfSubModels.get(id);
-					FeatureModel compareOrgModel = compareVersion.subModels.get(id);
-
-					if (newVersion.rootFeatures.contains(root)) {
-						FeatureModel newInterface = newVersion.interfacesOfSubModels.get(newVersion.rootFeatures.indexOf(root));
-						FeatureModel newOrg = newVersion.subModels.get(newVersion.rootFeatures.indexOf(root));
-
-						boolean resOrg = compareModels(compareOrgModel, newOrg);
-						boolean res = compareModels(compareInterfaceModel, newInterface);
-
-						root_intefaceS.get(root)[round] = new Boolean(res).toString() + " (" + newInterface.getFeatureNames().size() + ")";
-						root_org.get(root)[round] = new Boolean(resOrg).toString() + " (" + newOrg.getFeatureNames().size() + ")";
-
-					} else {
-						root_intefaceS.get(root)[round] = "nicht drin";
-					}
-				}
-				round++;
-
-				compareVersion = newVersion;
-			}
-
-			for (String root : root_intefaceS.keySet()) {
-				System.out.println(Arrays.toString(root_intefaceS.get(root)));
-				System.out.println(Arrays.toString(root_org.get(root)));
-			}
+		int i = 0;
+		for (FeatureModel subModel : next.subModels) {
+			System.out.println("Compute atomic sets for feature model " + i + "//" + next.subModels.size() + " with " + subModel.getFeatureNames().size()
+					+ " features:");
+			atomicSetsOfallSubModels.add(subModel.getAnalyser().getAtomicSets());
+			curTime = split(curTime);
 		}
+		System.out.println("Compute atomic sets - time for all sub feature models:");
+		curTime = split(startTime);
+
+		next.newCompleteModel_directInterface.getAnalyser().getAtomicSets();
+		System.out.println("Compute atomic sets - time for reduced feature model");
+		curTime = split(curTime);
+
+		//Todo merge of atomic sets
 	}
 
 	public InterfaceCompositionTester(String subModelDir, List<String> features, String modelPath, String outputPath) {
@@ -159,7 +132,38 @@ public class InterfaceCompositionTester {
 		} catch (FileNotFoundException | UnsupportedModelException e) {
 			e.printStackTrace();
 		}
+
+		long startTime = System.nanoTime();
 		createOrGet_InterfaceOfCompleteModel(completeModel);
+		split(startTime);
+
+		compareInterfacesOfCompleteModel(newCompleteModel_usingSubModels, newCompleteModel_directInterface);
+
+	}
+
+	private void compareInterfacesOfCompleteModel(FeatureModel comp1, FeatureModel comp2) {
+		final IFilter<Feature> featureFilter = new IFilter<Feature>() {
+			@Override
+			public boolean isValid(Feature object) {
+				return object.getName().contains("_Abstract_") || object.getName().equals("nroot");
+			}
+		};
+
+		final AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(comp1, featureFilter);
+		nodeCreator.setCnfType(AdvancedNodeCreator.CNFType.Regular);
+
+		final Node n1 = nodeCreator.createNodes();
+
+		nodeCreator.setFeatureModel(comp2, featureFilter);
+
+		final Node n2 = nodeCreator.createNodes();
+
+		try {
+			boolean b = ModelComparator.eq(n1, n2);
+			System.out.println("Are resulting models equal? -> " + b);
+		} catch (TimeoutException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private FeatureModel createOrLoadInterface(final FeatureModel subModel, final Collection<String> includeFeatures) {
@@ -179,43 +183,7 @@ public class InterfaceCompositionTester {
 			}
 		}
 
-		final CreateInterfaceJob job = (CreateInterfaceJob) new CreateInterfaceJob.Arguments(null, subModel, includeFeatures).createJob();
-
-		job.addJobFinishedListener(new JobFinishListener() {
-			@Override
-			public void jobFinished(final IJob finishedJob, final boolean success) {
-				synchronized (finishedJob) {
-					finishedJob.notify();
-				}
-			}
-		});
-
-		synchronized (job) {
-			job.schedule();
-			try {
-				job.wait();
-			} catch (InterruptedException e) {
-				CorePlugin.getDefault().logError(e);
-			}
-		}
-
-		return job.getInterfaceModel();
-	}
-
-	public void compareResultingModels() {
-		FeatureModel newCompleteModel = new FeatureModel();
-		FeatureModel newCompleteModel2 = new FeatureModel();
-
-		try {
-			new XmlFeatureModelReader(newCompleteModel).readFromFile(new File(outputPath + "//newmodel.xml"));
-			new XmlFeatureModelReader(newCompleteModel2).readFromFile(new File(outputPath + "//newmodel2.xml"));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (UnsupportedModelException e) {
-			e.printStackTrace();
-		}
-
-		compareModels(newCompleteModel, newCompleteModel2);
+		return LongRunningWrapper.runMethod((CreateInterfaceJob) new CreateInterfaceJob.Arguments(null, subModel, includeFeatures).createJob());
 	}
 
 	private static void writeModel(final String path, FeatureModel newSubModel, Collection<String> includedFeatures, int crossModelConstraintSize, String name) {
@@ -390,30 +358,6 @@ public class InterfaceCompositionTester {
 		System.out.println(" > Done!");
 	}
 
-	private static boolean compareModels(final FeatureModel newCompleteModel, final FeatureModel newCompleteModel2) {
-		System.out.print("Creating node for model 1 ...");
-		Node cnf1 = AdvancedNodeCreator.createCNF(newCompleteModel);
-		System.out.println(" > Done!");
-
-		System.out.print("Creating node for model 2 ...");
-		Node cnf2 = AdvancedNodeCreator.createCNF(newCompleteModel2);
-		System.out.println(" > Done!");
-
-		System.out.print("Comparing both model ...");
-		try {
-			if (ModelComparator.eq(cnf1, cnf2)) {
-				System.out.println(" > True!");
-				return true;
-			} else {
-				System.out.println(" > False!");
-				return false;
-			}
-		} catch (TimeoutException e) {
-			System.out.println(" > Timeout!");
-		}
-		return false;
-	}
-
 	private void createOrLoadSubModels(List<FeatureModel> subModels, List<Set<String>> selectedFeatures, FeatureModel model, List<String> rootFeatureNames) {
 		internConstraintsOfAllModels.clear();
 
@@ -430,8 +374,14 @@ public class InterfaceCompositionTester {
 					}
 				}
 			}
+		}
 
-			if (root != null) {
+		for (final String rootFeature : rootFeatureNames) {
+			Feature root = model.getFeature(rootFeature);
+
+			if (root == null) {
+				System.out.println(" -> Error - Feature not found");
+			} else {
 
 				FeatureModel newSubModel;
 
@@ -457,6 +407,14 @@ public class InterfaceCompositionTester {
 							includeFeatures.add(feature.getName());
 						}
 					}
+
+					List<String> clone = new ArrayList<>(rootFeatureNames);
+					clone.remove(newSubModel.getRoot().getName());
+					if (!Collections.disjoint(newSubModel.getFeatureNames(), clone)) {
+						System.out.println("Is any other root feature included?");
+						System.out.println(!Collections.disjoint(newSubModel.getFeatureNames(), clone));
+					}
+
 					includeFeatures.retainAll(newSubModel.getFeatureNames());
 
 					internConstraintsOfAllModels.addAll(newSubModel.getConstraints());
