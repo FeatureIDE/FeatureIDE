@@ -36,6 +36,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.REMOVED;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -96,6 +97,7 @@ import de.ovgu.featureide.core.signature.documentation.VariantMerger;
 import de.ovgu.featureide.core.signature.filter.ContextFilter;
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.cnf.UnkownLiteralException;
@@ -799,10 +801,41 @@ public class CorePlugin extends AbstractCorePlugin {
 	}
 
 	public static Node removeFeatures(FeatureModel featureModel, Collection<String> removeFeatures) throws TimeoutException, UnkownLiteralException {
-		final AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(featureModel);
-		nodeCreator.setExcludedFeatureNames(removeFeatures);
+		final AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(featureModel, removeFeatures);
 		nodeCreator.setCnfType(AdvancedNodeCreator.CNFType.Regular);
 		return nodeCreator.createNodes();
+	}
+
+	public static List<String> splitFeatureModel(FeatureModel featureModel) {
+		final ArrayList<String> rootNames = new ArrayList<>();
+		final Feature root = featureModel.getRoot();
+		split_rec(root, rootNames, 0);
+		return rootNames;
+	}
+
+	private static void split_rec(Feature root, ArrayList<String> rootNames, int level) {
+		final int featureLimit = 1000;
+		final int levelLimit = 10;
+		final LinkedList<Feature> children = root.getChildren();
+		for (Feature feature : children) {
+			final int c = countChildren(feature);
+			if (c > 0) {
+				if (c > featureLimit && level < levelLimit) {
+					split_rec(feature, rootNames, level + 1);
+				} else {
+					rootNames.add(feature.getName());
+				}
+			}
+		}
+	}
+
+	private static int countChildren(Feature root) {
+		final LinkedList<Feature> children = root.getChildren();
+		int count = children.size();
+		for (Feature feature : children) {
+			count += countChildren(feature);
+		}
+		return count;
 	}
 
 }

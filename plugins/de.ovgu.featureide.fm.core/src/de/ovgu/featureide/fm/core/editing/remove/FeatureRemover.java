@@ -52,6 +52,8 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 
 	private final Collection<String> features;
 
+	private final boolean includeBooleanValues;
+
 	// all clauses that have both kinds of literals (remove AND retain)
 	private List<DeprecatedClause> relevantClauseList;
 	private Set<DeprecatedClause> relevantClauseSet;
@@ -62,8 +64,13 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 	private DeprecatedFeatureMap map;
 
 	public FeatureRemover(Node cnf, Collection<String> features) {
+		this(cnf, features, true);
+	}
+
+	public FeatureRemover(Node cnf, Collection<String> features, boolean includeBooleanValues) {
 		this.fmNode = cnf;
 		this.features = features;
+		this.includeBooleanValues = includeBooleanValues;
 	}
 
 	private void addLiteral(HashSet<String> retainedFeatures, Node orChild) {
@@ -289,26 +296,30 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 				}
 			}
 
-			// create clause that contains all retained features
-			final Node[] allLiterals = new Node[retainedFeatures.size() + 1];
-			int i = 0;
-			for (String featureName : retainedFeatures) {
-				allLiterals[i++] = new Literal(featureName);
-			}
-			allLiterals[i] = new Literal(NodeCreator.varTrue);
-
 			// create new clauses list
 			final int newClauseSize = newClauseSet.size();
-			final Node[] newClauses = new Node[newClauseSize + 3];
+			final Node[] newClauses;
+			if (includeBooleanValues) {
+				newClauses = new Node[newClauseSize + 3];
 
+				// create clause that contains all retained features
+				final Node[] allLiterals = new Node[retainedFeatures.size() + 1];
+				int i = 0;
+				for (String featureName : retainedFeatures) {
+					allLiterals[i++] = new Literal(featureName);
+				}
+				allLiterals[i] = new Literal(NodeCreator.varTrue);
+
+				newClauses[newClauseSize] = new Or(allLiterals);
+				newClauses[newClauseSize + 1] = new Literal(NodeCreator.varTrue);
+				newClauses[newClauseSize + 2] = new Literal(NodeCreator.varFalse, false);
+			} else {
+				newClauses = new Node[newClauseSize];
+			}
 			int j = 0;
 			for (Clause newClause : newClauseSet) {
 				newClauses[j++] = new Or(Node.clone(newClause.getLiterals()));
 			}
-
-			newClauses[newClauseSize] = new Or(allLiterals);
-			newClauses[newClauseSize + 1] = new Literal(NodeCreator.varTrue);
-			newClauses[newClauseSize + 2] = new Literal(NodeCreator.varFalse, false);
 
 			workMonitor.worked();
 

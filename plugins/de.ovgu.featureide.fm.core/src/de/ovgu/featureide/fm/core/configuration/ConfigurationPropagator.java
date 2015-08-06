@@ -85,20 +85,21 @@ public class ConfigurationPropagator implements IConfigurationPropagator {
 				return null;
 			}
 			final FeatureModel featureModel = configuration.getFeatureModel();
-			final AdvancedNodeCreator nodeCreator1 = new AdvancedNodeCreator(featureModel);
-			final AdvancedNodeCreator nodeCreator2 = new AdvancedNodeCreator(featureModel);
-			nodeCreator1.setCnfType(AdvancedNodeCreator.CNFType.Regular);
-			nodeCreator2.setCnfType(AdvancedNodeCreator.CNFType.Regular);
-
+			
+			final AdvancedNodeCreator nodeCreator1;
+			final AdvancedNodeCreator nodeCreator2;
 			if (configuration.ignoreAbstractFeatures) {
-				nodeCreator1.setExcludedFeatures(new HiddenFeatureFilter());
+				nodeCreator1 = new AdvancedNodeCreator(featureModel, new HiddenFeatureFilter());
+				nodeCreator2 = new AdvancedNodeCreator(featureModel);
 			} else {
 				final OrFilter<Feature> orFilter = new OrFilter<>();
 				orFilter.add(new HiddenFeatureFilter());
 				orFilter.add(new AbstractFeatureFilter());
-				nodeCreator1.setExcludedFeatures(orFilter);
-				nodeCreator1.setExcludedFeatures(new AbstractFeatureFilter());
+				nodeCreator1 = new AdvancedNodeCreator(featureModel, orFilter);
+				nodeCreator2 = new AdvancedNodeCreator(featureModel, new AbstractFeatureFilter());
 			}
+			nodeCreator1.setCnfType(AdvancedNodeCreator.CNFType.Regular);
+			nodeCreator2.setCnfType(AdvancedNodeCreator.CNFType.Regular);
 
 			LongRunningJob<Node> buildThread1 = LongRunningWrapper.startJob("", nodeCreator1);
 			LongRunningJob<Node> buildThread2 = LongRunningWrapper.startJob("", nodeCreator2);

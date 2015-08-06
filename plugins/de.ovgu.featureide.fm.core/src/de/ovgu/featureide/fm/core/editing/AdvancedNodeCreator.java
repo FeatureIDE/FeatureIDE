@@ -65,15 +65,13 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	}
 
 	public static Node createCNFWithoutAbstract(FeatureModel featureModel) {
-		AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(featureModel);
-		nodeCreator.setExcludedFeatures(new AbstractFeatureFilter());
+		AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(featureModel, new AbstractFeatureFilter());
 		nodeCreator.setCnfType(CNFType.Compact);
 		return nodeCreator.createNodes();
 	}
 
 	public static Node createCNFWithoutHidden(FeatureModel featureModel) {
-		AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(featureModel);
-		nodeCreator.setExcludedFeatures(new HiddenFeatureFilter());
+		AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(featureModel, new HiddenFeatureFilter());
 		nodeCreator.setCnfType(CNFType.Compact);
 		return nodeCreator.createNodes();
 	}
@@ -81,20 +79,23 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	public static Node createNodes(FeatureModel featureModel) {
 		return new AdvancedNodeCreator(featureModel).createNodes();
 	}
-	
-	public static Node createNodes(FeatureModel featureModel, CNFType cnfType, ModelType modelType, Collection<String> excludedFeatureNames) {
-		return new AdvancedNodeCreator(featureModel, cnfType, modelType, excludedFeatureNames).createNodes();
+
+	public static Node createNodes(FeatureModel featureModel, Collection<String> excludedFeatureNames, CNFType cnfType, ModelType modelType,
+			boolean includeBooleanValues) {
+		return new AdvancedNodeCreator(featureModel, excludedFeatureNames, cnfType, modelType, includeBooleanValues).createNodes();
+	}
+
+	public static Node createNodes(FeatureModel featureModel, IFilter<Feature> featureFilter, CNFType cnfType, ModelType modelType, boolean includeBooleanValues) {
+		return new AdvancedNodeCreator(featureModel, featureFilter, cnfType, modelType, includeBooleanValues).createNodes();
 	}
 
 	public static Node createNodesWithoutAbstract(FeatureModel featureModel) {
-		AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(featureModel);
-		nodeCreator.setExcludedFeatures(new AbstractFeatureFilter());
+		AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(featureModel, new AbstractFeatureFilter());
 		return nodeCreator.createNodes();
 	}
 
 	public static Node createNodesWithoutHidden(FeatureModel featureModel) {
-		AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(featureModel);
-		nodeCreator.setExcludedFeatures(new HiddenFeatureFilter());
+		AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(featureModel, (new HiddenFeatureFilter()));
 		return nodeCreator.createNodes();
 	}
 
@@ -106,117 +107,44 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 
 	private ModelType modelType = ModelType.All;
 
+	/**
+	 * Specifies whether the literals <b>True</b> and <b>False</b> should be included in the created formula.</br>
+	 * Default values is {@code true} (values will be included).
+	 */
+	private boolean includeBooleanValues = true;
+
 	private FeatureModel featureModel = null;
 
 	private Collection<String> excludedFeatureNames = null;
 
+	public AdvancedNodeCreator() {
+	}
+
 	public AdvancedNodeCreator(FeatureModel featureModel) {
-		this.featureModel = featureModel;
+		setFeatureModel(featureModel);
 	}
 
-	public AdvancedNodeCreator(FeatureModel featureModel, CNFType cnfType, ModelType modelType, Collection<String> excludedFeatureNames) {
+	public AdvancedNodeCreator(FeatureModel featureModel, IFilter<Feature> featureFilter) {
+		setFeatureModel(featureModel, featureFilter);
+	}
+
+	public AdvancedNodeCreator(FeatureModel featureModel, Collection<String> excludedFeatureNames) {
+		setFeatureModel(featureModel, excludedFeatureNames);
+	}
+
+	public AdvancedNodeCreator(FeatureModel featureModel, Collection<String> excludedFeatureNames, CNFType cnfType, ModelType modelType,
+			boolean includeBooleanValues) {
 		this.cnfType = cnfType;
 		this.modelType = modelType;
-		this.featureModel = featureModel;
-		this.excludedFeatureNames = excludedFeatureNames;
+		this.includeBooleanValues = includeBooleanValues;
+		setFeatureModel(featureModel, excludedFeatureNames);
 	}
 
-	public Node createNodes() {
-		if (featureModel == null) {
-			return null;
-		}
-
-		final Node[] andChildren1;
-		final Node[] andChildren2;
-
-		switch (modelType) {
-		case All:
-			andChildren1 = createStructuralNodes().getChildren();
-			andChildren2 = createConstraintNodes().getChildren();
-			break;
-		case OnlyConstraints:
-			andChildren1 = new Node[0];
-			andChildren2 = createConstraintNodes().getChildren();
-			break;
-		case OnlyStructure:
-			andChildren1 = createStructuralNodes().getChildren();
-			andChildren2 = new Node[0];
-			break;
-		default:
-			andChildren1 = new Node[0];
-			andChildren2 = new Node[0];
-			break;
-		}
-
-		final int length = andChildren1.length + andChildren2.length;
-		final Node[] nodeArray = new Node[length + 2];
-
-		System.arraycopy(andChildren1, 0, nodeArray, 0, andChildren1.length);
-		System.arraycopy(andChildren2, 0, nodeArray, andChildren1.length, andChildren2.length);
-
-		switch (cnfType) {
-		case Regular:
-			nodeArray[length] = new Or(new Node[] { new Literal(NodeCreator.varTrue) });
-			nodeArray[length + 1] = new Or(new Node[] { new Literal(NodeCreator.varFalse, false) });
-			break;
-		case None:
-		case Compact:
-		default:
-			nodeArray[length] = new Literal(NodeCreator.varTrue);
-			nodeArray[length + 1] = new Literal(NodeCreator.varFalse, false);
-			break;
-		}
-
-		if (excludedFeatureNames != null && !excludedFeatureNames.isEmpty()) {
-			return LongRunningWrapper.runMethod(new FeatureRemover(new And(nodeArray), excludedFeatureNames));
-		} else {
-			return new And(nodeArray);
-		}
-	}
-
-	@Override
-	public Node execute(WorkMonitor monitor) throws Exception {
-		return createNodes();
-	}
-
-	public CNFType getCnfType() {
-		return cnfType;
-	}
-
-	public Collection<String> getExcludedFeatureNames() {
-		return excludedFeatureNames;
-	}
-
-	public FeatureModel getFeatureModel() {
-		return featureModel;
-	}
-
-	public ModelType getModelType() {
-		return modelType;
-	}
-
-	public void setCnfType(CNFType cnfType) {
+	public AdvancedNodeCreator(FeatureModel featureModel, IFilter<Feature> featureFilter, CNFType cnfType, ModelType modelType, boolean includeBooleanValues) {
 		this.cnfType = cnfType;
-	}
-
-	public void setExcludedFeatureNames(Collection<String> excludedFeatureNames) {
-		this.excludedFeatureNames = excludedFeatureNames;
-	}
-
-	public void setExcludedFeatures(Collection<Feature> excludedFeatures) {
-		this.excludedFeatureNames = Filter.toString(excludedFeatures);
-	}
-
-	public void setExcludedFeatures(IFilter<Feature> featureFilter) {
-		this.excludedFeatureNames = Filter.toString(Filter.filter(new LinkedList<>(featureModel.getFeatures()), featureFilter));
-	}
-
-	public void setFeatureModel(FeatureModel featureModel) {
-		this.featureModel = featureModel;
-	}
-
-	public void setModelType(ModelType modelType) {
 		this.modelType = modelType;
+		this.includeBooleanValues = includeBooleanValues;
+		setFeatureModel(featureModel, featureFilter);
 	}
 
 	private And createConstraintNodes() {
@@ -264,6 +192,71 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 			break;
 		}
 		return new And(clauses.toArray(new Node[0]));
+	}
+
+	public Node createNodes() {
+		if (featureModel == null) {
+			final Or emptyNode = includeBooleanValues ? new Or(new Literal(NodeCreator.varTrue), new Literal(NodeCreator.varFalse, false)) : new Or();
+			switch (cnfType) {
+			case Regular:
+				return new And(emptyNode);
+			case None:
+			case Compact:
+			default:
+				return emptyNode;
+			}
+		}
+
+		final Node[] andChildren1;
+		final Node[] andChildren2;
+
+		switch (modelType) {
+		case All:
+			andChildren1 = createStructuralNodes().getChildren();
+			andChildren2 = createConstraintNodes().getChildren();
+			break;
+		case OnlyConstraints:
+			andChildren1 = new Node[0];
+			andChildren2 = createConstraintNodes().getChildren();
+			break;
+		case OnlyStructure:
+			andChildren1 = createStructuralNodes().getChildren();
+			andChildren2 = new Node[0];
+			break;
+		default:
+			andChildren1 = new Node[0];
+			andChildren2 = new Node[0];
+			break;
+		}
+
+		final int length = andChildren1.length + andChildren2.length;
+		final Node[] nodeArray;
+		if (includeBooleanValues) {
+			nodeArray = new Node[length + 2];
+
+			switch (cnfType) {
+			case Regular:
+				nodeArray[length] = new Or(new Node[] { new Literal(NodeCreator.varTrue) });
+				nodeArray[length + 1] = new Or(new Node[] { new Literal(NodeCreator.varFalse, false) });
+				break;
+			case None:
+			case Compact:
+			default:
+				nodeArray[length] = new Literal(NodeCreator.varTrue);
+				nodeArray[length + 1] = new Literal(NodeCreator.varFalse, false);
+				break;
+			}
+		} else {
+			nodeArray = new Node[length];
+		}
+		System.arraycopy(andChildren1, 0, nodeArray, 0, andChildren1.length);
+		System.arraycopy(andChildren2, 0, nodeArray, andChildren1.length, andChildren2.length);
+
+		if (excludedFeatureNames != null && !excludedFeatureNames.isEmpty()) {
+			return LongRunningWrapper.runMethod(new FeatureRemover(new And(nodeArray), excludedFeatureNames, includeBooleanValues));
+		} else {
+			return new And(nodeArray);
+		}
 	}
 
 	private And createStructuralNodes() {
@@ -324,6 +317,67 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 			return new And(clauses.toArray(new Node[0]));
 		}
 		return new And(new Node[0]);
+	}
+
+	@Override
+	public Node execute(WorkMonitor monitor) throws Exception {
+		return createNodes();
+	}
+
+	public CNFType getCnfType() {
+		return cnfType;
+	}
+
+	public Collection<String> getExcludedFeatureNames() {
+		return excludedFeatureNames;
+	}
+
+	public FeatureModel getFeatureModel() {
+		return featureModel;
+	}
+
+	public ModelType getModelType() {
+		return modelType;
+	}
+
+	/**
+	 * {@link #includeBooleanValues}
+	 * 
+	 * @return the currently set value
+	 */
+	public boolean includeBooleanValues() {
+		return includeBooleanValues;
+	}
+
+	public void setCnfType(CNFType cnfType) {
+		this.cnfType = cnfType;
+	}
+
+	public void setFeatureModel(FeatureModel featureModel) {
+		this.featureModel = featureModel;
+	}
+
+	public void setFeatureModel(FeatureModel featureModel, IFilter<Feature> featureFilter) {
+		this.featureModel = featureModel;
+		this.excludedFeatureNames = Filter.toString(Filter.filter(new LinkedList<>(featureModel.getFeatures()), featureFilter));
+	}
+
+	public void setFeatureModel(FeatureModel featureModel, Collection<String> excludedFeatureNames) {
+		this.featureModel = featureModel;
+		this.excludedFeatureNames = excludedFeatureNames;
+	}
+
+	/**
+	 * {@link #includeBooleanValues}
+	 * 
+	 * @param includeBooleanValues the value to set
+	 */
+	public void setIncludeBooleanValues(boolean includeBooleanValues) {
+		this.includeBooleanValues = includeBooleanValues;
+	}
+
+	public void setModelType(ModelType modelType) {
+		this.modelType = modelType;
 	}
 
 }
