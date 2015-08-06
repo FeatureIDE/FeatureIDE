@@ -23,7 +23,7 @@ package de.ovgu.featureide.fm.core.filter.base;
 import java.util.ArrayList;
 
 /**
- * Returns the opposite result of a given {@link IFilter}.
+ * Returns the conjunction of multiple {@link IFilter}s.
  * 
  * @author Sebastian Krieter
  * 

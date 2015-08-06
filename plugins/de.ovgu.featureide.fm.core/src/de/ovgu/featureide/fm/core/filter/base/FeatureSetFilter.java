@@ -20,27 +20,28 @@
  */
 package de.ovgu.featureide.fm.core.filter.base;
 
-import java.util.ArrayList;
+import java.util.Collection;
+
+import de.ovgu.featureide.fm.core.Feature;
 
 /**
- * Returns the disjunction of multiple {@link IFilter}s.
+ * Filters all features that are contained in a given collection.
  * 
  * @author Sebastian Krieter
  * 
  * @see Filter
  */
-public class OrFilter<T> extends ArrayList<IFilter<T>> implements IFilter<T> {
+public class FeatureSetFilter implements IFilter<Feature> {
 
-	private static final long serialVersionUID = 1L;
+	private final Collection<Feature> features;
+
+	public FeatureSetFilter(Collection<Feature> features) {
+		this.features = features;
+	}
 
 	@Override
-	public boolean isValid(T object) {
-		for (IFilter<T> filter : this) {
-			if (filter.isValid(object)) {
-				return true;
-			}
-		}
-		return false;
+	public boolean isValid(Feature object) {
+		return features.contains(object);
 	}
 
 }
