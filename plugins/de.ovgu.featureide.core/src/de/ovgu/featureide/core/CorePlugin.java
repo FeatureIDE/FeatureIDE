@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -836,6 +837,24 @@ public class CorePlugin extends AbstractCorePlugin {
 			count += countChildren(feature);
 		}
 		return count;
+	}
+
+	public static void mergeAtomicSets(List<List<List<String>>> atomicSetLists) {
+		final HashMap<String, Collection<String>> atomicSetMap = new HashMap<>();
+		for (List<List<String>> atomicSetList : atomicSetLists) {
+			for (List<String> atomicSet : atomicSetList) {
+				final HashSet<String> newSet = new HashSet<>(atomicSet);
+				for (String featureName : atomicSet) {
+					final Collection<String> oldSet = atomicSetMap.get(featureName);
+					if (oldSet != null) {
+						newSet.addAll(oldSet);
+					}
+				}
+				for (String featureName : newSet) {
+					atomicSetMap.put(featureName, newSet);
+				}
+			}
+		}
 	}
 
 }
