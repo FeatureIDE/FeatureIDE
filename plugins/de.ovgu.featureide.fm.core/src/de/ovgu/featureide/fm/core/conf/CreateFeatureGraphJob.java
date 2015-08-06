@@ -54,9 +54,11 @@ import de.ovgu.featureide.fm.core.conf.worker.CalcFixedThread;
 import de.ovgu.featureide.fm.core.conf.worker.DFSThread;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
+import de.ovgu.featureide.fm.core.job.LongRunningMethod;
+import de.ovgu.featureide.fm.core.job.WorkMonitor;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
-public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arguments> {
+public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arguments> implements LongRunningMethod<IFeatureGraph> {
 
 	public static class Arguments extends JobArguments {
 		private final FeatureModel featureModel;
@@ -99,173 +101,183 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 	}
 
 	@Override
-	protected boolean work() throws Exception {
-		if (!loadFeatureGraph()) {
-			System.out.println("Computing...");
+	public IFeatureGraph execute(WorkMonitor monitor) throws Exception {
+		return createFeatureGraph();
+	}
 
-			workMonitor.setMaxAbsoluteWork((2 * arguments.featureModel.getFeatureNames().size()) + 1);
+	private IFeatureGraph createFeatureGraph() {
+		System.out.println("Computing...");
 
-			final CalcFixedThread calcThread = new CalcFixedThread(AdvancedNodeCreator.createCNF(arguments.featureModel), workMonitor);
-			calcThread.addObjects(arguments.featureModel.getFeatureNames());
-			calcThread.start();
+		workMonitor.setMaxAbsoluteWork((2 * arguments.featureModel.getFeatureNames().size()) + 1);
 
-			for (Literal literal : calcThread.getFixedLiterals()) {
-				final Feature feature = arguments.featureModel.getFeature((String) literal.var);
-				if (literal.positive) {
-					coreFeatures.add(feature);
-				} else {
-					deadFeatures.add(feature);
+		final CalcFixedThread calcThread = new CalcFixedThread(AdvancedNodeCreator.createCNF(arguments.featureModel), workMonitor);
+		calcThread.addObjects(arguments.featureModel.getFeatureNames());
+		calcThread.start();
+
+		for (Literal literal : calcThread.getFixedLiterals()) {
+			final Feature feature = arguments.featureModel.getFeature((String) literal.var);
+			if (literal.positive) {
+				coreFeatures.add(feature);
+			} else {
+				deadFeatures.add(feature);
+			}
+		}
+
+		fixedFeatures.addAll(coreFeatures);
+		fixedFeatures.addAll(deadFeatures);
+		final List<Constraint> constraints = arguments.featureModel.getConstraints();
+		final Collection<Feature> features = new ArrayList<Feature>(arguments.featureModel.getFeatures());
+		features.removeAll(fixedFeatures);
+
+		processedParents.clear();
+
+		workMonitor.setMaxAbsoluteWork(arguments.featureModel.getFeatureNames().size() + features.size() + 1);
+
+		featureGraph = new MatrixFeatureGraph(features, coreFeatures, deadFeatures);
+
+		workMonitor.worked();
+
+		VariableConfiguration conf = new VariableConfiguration(features.size());
+
+		for (Feature feature : features) {
+			final Feature parent = feature.getParent();
+			final String featureName = feature.getName();
+			final String parentName = parent.getName();
+
+			// count non dead siblings of the current features
+			int nonDeadSibilingCount = 0;
+			for (Feature sibiling : parent.getChildren()) {
+				if (!deadFeatures.contains(sibiling)) {
+					nonDeadSibilingCount++;
 				}
 			}
 
-			fixedFeatures.addAll(coreFeatures);
-			fixedFeatures.addAll(deadFeatures);
-			final List<Constraint> constraints = arguments.featureModel.getConstraints();
-			final Collection<Feature> features = new ArrayList<Feature>(arguments.featureModel.getFeatures());
-			features.removeAll(fixedFeatures);
-
-			processedParents.clear();
-
-			workMonitor.setMaxAbsoluteWork(arguments.featureModel.getFeatureNames().size() + features.size() + 1);
-
-			featureGraph = new MatrixFeatureGraph(features, coreFeatures, deadFeatures);
-
-			workMonitor.worked();
-
-			VariableConfiguration conf = new VariableConfiguration(features.size());
-
-			for (Feature feature : features) {
-				final Feature parent = feature.getParent();
-				final String featureName = feature.getName();
-				final String parentName = parent.getName();
-
-				// count non dead siblings of the current features
-				int nonDeadSibilingCount = 0;
-				for (Feature sibiling : parent.getChildren()) {
-					if (!deadFeatures.contains(sibiling)) {
-						nonDeadSibilingCount++;
+			// connect current feature to parent
+			if (!coreFeatures.contains(parent)) {
+				featureGraph.implies(featureName, parentName);
+				if (parent.isAnd()) {
+					if (feature.isMandatory()) {
+						featureGraph.implies(parentName, featureName);
+					}
+				} else {
+					if (nonDeadSibilingCount == 1) {
+						featureGraph.implies(parentName, featureName);
+					} else {
+						featureGraph.setEdge(parentName, featureName, MatrixFeatureGraph.EDGE_11Q);
+						featureGraph.setEdge(featureName, parentName, MatrixFeatureGraph.EDGE_00Q);
 					}
 				}
+			}
 
-				// connect current feature to parent
-				if (!coreFeatures.contains(parent)) {
-					featureGraph.implies(featureName, parentName);
-					if (parent.isAnd()) {
-						if (feature.isMandatory()) {
-							featureGraph.implies(parentName, featureName);
+			// connect current feature to siblings
+			if (nonDeadSibilingCount > 1) {
+				if (parent.isAlternative()) {
+					// XOR between two children
+					if (coreFeatures.contains(parent) && nonDeadSibilingCount == 2) {
+						for (Feature sibiling : parent.getChildren()) {
+							if (!deadFeatures.contains(sibiling)) {
+								featureGraph.setEdge(featureName, sibiling.getName(), MatrixFeatureGraph.EDGE_10);
+								featureGraph.setEdge(featureName, sibiling.getName(), MatrixFeatureGraph.EDGE_01);
+							}
 						}
 					} else {
-						if (nonDeadSibilingCount == 1) {
-							featureGraph.implies(parentName, featureName);
-						} else {
-							featureGraph.setEdge(parentName, featureName, MatrixFeatureGraph.EDGE_11Q);
-							featureGraph.setEdge(featureName, parentName, MatrixFeatureGraph.EDGE_00Q);
-						}
-					}
-				}
-
-				// connect current feature to siblings
-				if (nonDeadSibilingCount > 1) {
-					if (parent.isAlternative()) {
-						// XOR between two children
-						if (coreFeatures.contains(parent) && nonDeadSibilingCount == 2) {
-							for (Feature sibiling : parent.getChildren()) {
-								if (!deadFeatures.contains(sibiling)) {
-									featureGraph.setEdge(featureName, sibiling.getName(), MatrixFeatureGraph.EDGE_10);
-									featureGraph.setEdge(featureName, sibiling.getName(), MatrixFeatureGraph.EDGE_01);
-								}
-							}
-						} else {
-							for (Feature sibiling : parent.getChildren()) {
-								if (!deadFeatures.contains(sibiling)) {
-									featureGraph.setEdge(featureName, sibiling.getName(), MatrixFeatureGraph.EDGE_10);
-									featureGraph.setEdge(featureName, sibiling.getName(), MatrixFeatureGraph.EDGE_01Q);
-								}
-							}
-
-							if (processedParents.add(parent)) {
-								final ArrayList<Variable> list = new ArrayList<>(nonDeadSibilingCount + 1);
-								for (Feature sibiling : parent.getChildren()) {
-									if (!deadFeatures.contains(sibiling)) {
-										list.add(conf.getVariable(featureGraph.getFeatureIndex(sibiling.getName())));
-									}
-								}
-								if (!coreFeatures.contains(parent)) {
-									list.add(new Not2(conf.getVariable(featureGraph.getFeatureIndex(parent.getName()))));
-								}
-								expList.add(new Xor(list.toArray(new Variable[0])));
-							}
-						}
-					} else if (parent.isOr()) {
-						// TODO atomic set would be better than core feature
-						boolean optionalFeature = false;
 						for (Feature sibiling : parent.getChildren()) {
-							if (coreFeatures.contains(sibiling)) {
-								optionalFeature = true;
-								break;
+							if (!deadFeatures.contains(sibiling)) {
+								featureGraph.setEdge(featureName, sibiling.getName(), MatrixFeatureGraph.EDGE_10);
+								featureGraph.setEdge(featureName, sibiling.getName(), MatrixFeatureGraph.EDGE_01Q);
 							}
 						}
-						if (!optionalFeature) {
+
+						if (processedParents.add(parent)) {
+							final ArrayList<Variable> list = new ArrayList<>(nonDeadSibilingCount + 1);
 							for (Feature sibiling : parent.getChildren()) {
 								if (!deadFeatures.contains(sibiling)) {
-									featureGraph.setEdge(featureName, sibiling.getName(), MatrixFeatureGraph.EDGE_01Q);
+									list.add(conf.getVariable(featureGraph.getFeatureIndex(sibiling.getName())));
 								}
 							}
+							if (!coreFeatures.contains(parent)) {
+								list.add(new Not2(conf.getVariable(featureGraph.getFeatureIndex(parent.getName()))));
+							}
+							expList.add(new Xor(list.toArray(new Variable[0])));
+						}
+					}
+				} else if (parent.isOr()) {
+					// TODO atomic set would be better than core feature
+					boolean optionalFeature = false;
+					for (Feature sibiling : parent.getChildren()) {
+						if (coreFeatures.contains(sibiling)) {
+							optionalFeature = true;
+							break;
+						}
+					}
+					if (!optionalFeature) {
+						for (Feature sibiling : parent.getChildren()) {
+							if (!deadFeatures.contains(sibiling)) {
+								featureGraph.setEdge(featureName, sibiling.getName(), MatrixFeatureGraph.EDGE_01Q);
+							}
+						}
 
-							if (processedParents.add(parent)) {
-								final ArrayList<Variable> list = new ArrayList<>(nonDeadSibilingCount);
-								for (Feature sibiling : parent.getChildren()) {
-									if (!deadFeatures.contains(sibiling)) {
-										list.add(conf.getVariable(featureGraph.getFeatureIndex(sibiling.getName())));
-									}
+						if (processedParents.add(parent)) {
+							final ArrayList<Variable> list = new ArrayList<>(nonDeadSibilingCount);
+							for (Feature sibiling : parent.getChildren()) {
+								if (!deadFeatures.contains(sibiling)) {
+									list.add(conf.getVariable(featureGraph.getFeatureIndex(sibiling.getName())));
 								}
-								final Or2 or2 = new Or2(list.toArray(new Variable[0]));
-								if (coreFeatures.contains(parent)) {
-									expList.add(or2);
-								} else {
-									expList.add(new Xor(new Variable[] { or2, new Not2(conf.getVariable(featureGraph.getFeatureIndex(parent.getName()))) }));
-								}
+							}
+							final Or2 or2 = new Or2(list.toArray(new Variable[0]));
+							if (coreFeatures.contains(parent)) {
+								expList.add(or2);
+							} else {
+								expList.add(new Xor(new Variable[] { or2, new Not2(conf.getVariable(featureGraph.getFeatureIndex(parent.getName()))) }));
 							}
 						}
 					}
 				}
 			}
+		}
 
-			c1 = 0;
-			c2 = 0;
-			for (Constraint constraint : constraints) {
-				connect(constraint.getNode(), conf);
-			}
+		c1 = 0;
+		c2 = 0;
+		for (Constraint constraint : constraints) {
+			connect(constraint.getNode(), conf);
+		}
 
-			System.out.println(c1);
-			System.out.println(c2);
-			System.out.println();
+		System.out.println(c1);
+		System.out.println(c2);
+		System.out.println();
 
-			final ArrayList<LinkedList<Expression>> expListAr = featureGraph.getExpListAr();
-			for (Expression exp : expList) {
-				for (Integer i : exp.getVariables()) {
-					LinkedList<Expression> varExpList = expListAr.get(i);
-					if (varExpList == null) {
-						varExpList = new LinkedList<Expression>();
-						expListAr.set(i, varExpList);
-					}
-					varExpList.add(exp);
+		final ArrayList<LinkedList<Expression>> expListAr = featureGraph.getExpListAr();
+		for (Expression exp : expList) {
+			for (Integer i : exp.getVariables()) {
+				LinkedList<Expression> varExpList = expListAr.get(i);
+				if (varExpList == null) {
+					varExpList = new LinkedList<Expression>();
+					expListAr.set(i, varExpList);
 				}
+				varExpList.add(exp);
 			}
+		}
 
-			final ArrayList<String> featureNames = new ArrayList<>();
-			for (Feature feature : features) {
-				featureNames.add(feature.getName());
-			}
+		final ArrayList<String> featureNames = new ArrayList<>();
+		for (Feature feature : features) {
+			featureNames.add(feature.getName());
+		}
 
-			if (featureGraph instanceof MatrixFeatureGraph) {
-				final long start = System.nanoTime();
-				final DFSThread dfsThread = new DFSThread((MatrixFeatureGraph) featureGraph, workMonitor);
-				dfsThread.addObjects(featureNames);
-				dfsThread.start();
-				System.out.println("DFS Time: " + Math.floor((System.nanoTime() - start) / 1000000.0) / 1000.0 + "s");
-			}
+		if (featureGraph instanceof MatrixFeatureGraph) {
+			final long start = System.nanoTime();
+			final DFSThread dfsThread = new DFSThread((MatrixFeatureGraph) featureGraph, workMonitor);
+			dfsThread.addObjects(featureNames);
+			dfsThread.start();
+			System.out.println("DFS Time: " + Math.floor((System.nanoTime() - start) / 1000000.0) / 1000.0 + "s");
+		}
 
+		return featureGraph;
+	}
+
+	@Override
+	protected boolean work() throws Exception {
+		if (!loadFeatureGraph()) {
+			createFeatureGraph();
 			writeFeatureGraph();
 		}
 
