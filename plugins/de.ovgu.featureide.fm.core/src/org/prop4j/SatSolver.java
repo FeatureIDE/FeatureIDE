@@ -317,7 +317,7 @@ public class SatSolver {
 	private boolean sat(IVecInt backbone, int x) {
 		backbone.push(x);
 		try {
-			return (solver.isSatisfiable(backbone));
+			return (solver.isSatisfiable(backbone, false));
 		} catch (TimeoutException e) {
 			FMCorePlugin.getDefault().logError(e);
 			return false;
