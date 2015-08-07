@@ -68,6 +68,7 @@ import org.eclipse.jdt.core.CompletionProposal;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.Signature;
 import org.osgi.framework.BundleContext;
+import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.sat4j.specs.TimeoutException;
 
@@ -810,12 +811,14 @@ public class CorePlugin extends AbstractCorePlugin {
 	public static List<String> splitFeatureModel(FeatureModel featureModel) {
 		final ArrayList<String> rootNames = new ArrayList<>();
 		final Feature root = featureModel.getRoot();
-		split_rec(root, rootNames, 0);
+		if (root != null) {
+			split_rec(root, rootNames, 0);
+		}
 		return rootNames;
 	}
 
 	private static void split_rec(Feature root, ArrayList<String> rootNames, int level) {
-		final int featureLimit = 1000;
+		final int featureLimit = 300;
 		final int levelLimit = 10;
 		final LinkedList<Feature> children = root.getChildren();
 		for (Feature feature : children) {
@@ -839,13 +842,16 @@ public class CorePlugin extends AbstractCorePlugin {
 		return count;
 	}
 
-	public static void mergeAtomicSets(List<List<List<String>>> atomicSetLists) {
+	public static List<List<String>> mergeAtomicSets(List<List<List<Literal>>> atomicSetLists) {
 		final HashMap<String, Collection<String>> atomicSetMap = new HashMap<>();
-		for (List<List<String>> atomicSetList : atomicSetLists) {
-			for (List<String> atomicSet : atomicSetList) {
-				final HashSet<String> newSet = new HashSet<>(atomicSet);
-				for (String featureName : atomicSet) {
-					final Collection<String> oldSet = atomicSetMap.get(featureName);
+		for (List<List<Literal>> atomicSetList : atomicSetLists) {
+			for (List<Literal> atomicSet : atomicSetList) {
+				final HashSet<String> newSet = new HashSet<>();
+				for (Literal literal : atomicSet) {
+					newSet.add(literal.var.toString());
+				}
+				for (Literal literal : atomicSet) {
+					final Collection<String> oldSet = atomicSetMap.get(literal.var.toString());
 					if (oldSet != null) {
 						newSet.addAll(oldSet);
 					}
@@ -855,6 +861,12 @@ public class CorePlugin extends AbstractCorePlugin {
 				}
 			}
 		}
+		final HashSet<Collection<String>> mergedAtomicSetsSet = new HashSet<>(atomicSetMap.values());
+		final List<List<String>> mergedAtomicSets = new ArrayList<>(mergedAtomicSetsSet.size());
+		for (Collection<String> atomicSet : mergedAtomicSetsSet) {
+			mergedAtomicSets.add(new ArrayList<>(atomicSet));
+		}
+		return mergedAtomicSets;
 	}
 
 }
