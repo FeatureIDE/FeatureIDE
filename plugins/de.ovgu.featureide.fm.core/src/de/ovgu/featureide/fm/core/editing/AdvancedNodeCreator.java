@@ -154,23 +154,25 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 			for (Constraint constraint : featureModel.getConstraints()) {
 				clauses.add(constraint.getNode().clone());
 			}
+			break;
 		case Regular:
 			for (Constraint constraint : featureModel.getConstraints()) {
 				final Node cnfNode = constraint.getNode().clone().toCNF();
 				if (cnfNode instanceof And) {
 					for (Node andChild : cnfNode.getChildren()) {
 						if (andChild instanceof Or) {
-							clauses.add(new Or(andChild.getChildren()));
+							clauses.add(andChild);
 						} else {
 							clauses.add(new Or((Literal) andChild));
 						}
 					}
 				} else if (cnfNode instanceof Or) {
-					clauses.add(new Or(cnfNode.getChildren()));
+					clauses.add(cnfNode);
 				} else {
 					clauses.add(new Or((Literal) cnfNode));
 				}
 			}
+			break;
 		case Compact:
 		default:
 			for (Constraint constraint : featureModel.getConstraints()) {
@@ -236,8 +238,8 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 
 			switch (cnfType) {
 			case Regular:
-				nodeArray[length] = new Or(new Node[] { new Literal(NodeCreator.varTrue) });
-				nodeArray[length + 1] = new Or(new Node[] { new Literal(NodeCreator.varFalse, false) });
+				nodeArray[length] = new Or(new Literal[] { new Literal(NodeCreator.varTrue) });
+				nodeArray[length + 1] = new Or(new Literal[] { new Literal(NodeCreator.varFalse, false) });
 				break;
 			case None:
 			case Compact:
@@ -355,6 +357,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 
 	public void setFeatureModel(FeatureModel featureModel) {
 		this.featureModel = featureModel;
+		this.excludedFeatureNames = null;
 	}
 
 	public void setFeatureModel(FeatureModel featureModel, IFilter<Feature> featureFilter) {
