@@ -46,7 +46,12 @@ public class Literal extends Node {
 	public void flip() {
 		positive = !positive;
 	}
-	
+
+	@Override
+	protected Node eliminateNonCNFOperators(Node[] newChildren) {
+		return clone();
+	}
+
 	@Override
 	protected Node eliminate(List<Class<? extends Node>> list) {
 		//nothing to do with children

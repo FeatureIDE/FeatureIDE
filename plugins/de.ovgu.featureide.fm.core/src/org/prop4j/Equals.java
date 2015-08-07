@@ -32,7 +32,14 @@ public class Equals extends Node {
 	public Equals(Object leftChild, Object rightChild) {
 		setChildren(leftChild, rightChild);
 	}
-	
+
+	@Override
+	protected Node eliminateNonCNFOperators(Node[] newChildren) {
+		return new And(
+				new Or(new Not(newChildren[0]), newChildren[1]),
+				new Or(new Not(newChildren[1]), newChildren[0]));
+	}
+
 	@Override
 	protected Node eliminate(List<Class<? extends Node>> list) {
 		super.eliminate(list);

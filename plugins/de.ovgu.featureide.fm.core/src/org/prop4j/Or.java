@@ -65,6 +65,11 @@ public class Or extends Node {
 		return new And(children);
 	}
 
+	@Override
+	protected Node eliminateNonCNFOperators(Node[] newChildren) {
+		return new Or(newChildren);
+	}
+
 	private LinkedList<LinkedList<Node>> updateClauses(LinkedList<LinkedList<Node>> clauses,
 			LinkedList<Node[]> newClauses) {
 		LinkedList<LinkedList<Node>> updatedClauses = new LinkedList<LinkedList<Node>>();

@@ -33,7 +33,12 @@ public class Implies extends Node {
 	public Implies(Object leftChild, Object rightChild) {
 		setChildren(leftChild, rightChild);
 	}
-	
+
+	@Override
+	protected Node eliminateNonCNFOperators(Node[] newChildren) {
+		return new Or(new Not(newChildren[0]), newChildren[1]);
+	}
+
 	@Override
 	protected Node eliminate(List<Class<? extends Node>> list) {
 		super.eliminate(list);

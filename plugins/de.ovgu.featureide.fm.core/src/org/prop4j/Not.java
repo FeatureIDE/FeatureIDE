@@ -78,6 +78,11 @@ public class Not extends Node {
 	}
 
 	@Override
+	protected Node eliminateNonCNFOperators(Node[] newChildren) {
+		return new Not(newChildren[0]);
+	}
+
+	@Override
 	public Node clone() {
 		return new Not(children[0].clone());
 	}

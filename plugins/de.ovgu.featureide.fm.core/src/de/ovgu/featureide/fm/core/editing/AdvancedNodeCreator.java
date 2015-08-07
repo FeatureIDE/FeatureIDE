@@ -157,6 +157,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 			break;
 		case Regular:
 			for (Constraint constraint : featureModel.getConstraints()) {
+//				final Node cnfNode = Node.buildCNF(constraint.getNode());
 				final Node cnfNode = constraint.getNode().clone().toCNF();
 				if (cnfNode instanceof And) {
 					for (Node andChild : cnfNode.getChildren()) {
@@ -176,6 +177,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		case Compact:
 		default:
 			for (Constraint constraint : featureModel.getConstraints()) {
+//				final Node cnfNode = Node.buildCNF(constraint.getNode());
 				final Node cnfNode = constraint.getNode().clone().toCNF();
 				if (cnfNode instanceof And) {
 					for (Node andChild : cnfNode.getChildren()) {

@@ -107,10 +107,15 @@ public class CompositionalAnaylsisTester {
 		}
 
 		curTime = split(curTime);
-		System.out.print("Removing features (" + unusedFeatures.size() + " / " + completeModel.getNumberOfFeatures() + ")...");
+		System.out.print("Creating CNF...");
 
 		nodeCreator.setFeatureModel(completeModel);
-		nodeList.add(createInterfaceNode(nodeCreator.createNodes(), interfaceNodeList, unusedFeatures));
+		final Node cnf = nodeCreator.createNodes();
+
+		curTime = split(curTime);
+		System.out.print("Removing features (" + unusedFeatures.size() + " / " + completeModel.getNumberOfFeatures() + ")...");
+
+		nodeList.add(createInterfaceNode(cnf, interfaceNodeList, unusedFeatures));
 
 		curTime = split(curTime);
 		System.out.println("Computing atomic sets:");
@@ -126,7 +131,6 @@ public class CompositionalAnaylsisTester {
 			curTime = split(curTime);
 		}
 
-		curTime = split(curTime);
 		System.out.print("Merging atomic sets...");
 
 		final List<List<String>> mergeAtomicSets = CorePlugin.mergeAtomicSets(atomicSetLists);

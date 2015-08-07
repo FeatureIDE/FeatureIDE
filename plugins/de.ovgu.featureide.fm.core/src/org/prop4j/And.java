@@ -45,7 +45,12 @@ public class And extends Node {
 		fuseWithSimilarChildren();
 		return this;
 	}
-	
+
+	@Override
+	protected Node eliminateNonCNFOperators(Node[] newChildren) {
+		return new And(newChildren);
+	}
+
 	protected void collectChildren(Node node, List<Node> nodes) {
 		if (node instanceof And) {
 			for (Node childNode : node.getChildren()) {
