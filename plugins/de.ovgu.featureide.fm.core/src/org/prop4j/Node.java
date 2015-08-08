@@ -138,6 +138,7 @@ public abstract class Node {
 				if (newNode != null) {
 					if (newNode instanceof And) {
 						containsAnd = true;
+						newChildren.add(newNode);
 					} else if (newNode instanceof Or) {
 						newChildren.addAll(Arrays.asList(newNode.getChildren()));
 					} else {
@@ -150,9 +151,10 @@ public abstract class Node {
 				final ArrayList<Node> newCleanChildren = new ArrayList<>(newChildren.size());
 				
 				final int[] indexArray = new int[newChildren.size()];
-				boolean carry = true;
+				boolean carry;
 				final ArrayList<Node> newClauseChildren = new ArrayList<>(newChildren.size());
 				do {
+					carry = true;
 					for (int i = 0; i < newChildren.size(); i++) {
 						final Node newChild = newChildren.get(i);
 						if (newChild instanceof And) {
@@ -166,8 +168,9 @@ public abstract class Node {
 								} else {
 									carry = false;
 								}
+								indexArray[i] = index;
 							}
-							final Node newChildChild = children[index];
+							final Node newChildChild = newChildChildren[index];
 							if (newChildChild instanceof Or) {
 								newClauseChildren.addAll(Arrays.asList(newChildChild.getChildren()));
 							} else {
@@ -177,9 +180,7 @@ public abstract class Node {
 							newClauseChildren.add(newChild);
 						}
 					}
-					if (!carry) {
-						newCleanChildren.add(new Or(newClauseChildren.toArray(new Node[0])));
-					}
+					newCleanChildren.add(new Or(newClauseChildren.toArray(new Node[0])));
 					newClauseChildren.clear();
 				} while (!carry);
 				return new And(newCleanChildren.toArray(new Node[0]));
