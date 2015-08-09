@@ -74,7 +74,10 @@ public abstract class Node {
 	}
 	
 	public static Node buildCNF(Node node) {
-		return buildCNF_rec(deMorgan(node.eliminateNonCNFOperators()));
+		Node cnf = node.eliminateNonCNFOperators();
+		cnf = deMorgan(cnf);
+		cnf = buildCNF_rec(cnf);
+		return cnf;
 	}
 	
 	protected final Node eliminateNonCNFOperators() {
@@ -131,7 +134,7 @@ public abstract class Node {
 			return node;
 		} else if (node instanceof Or) {
 			final ArrayList<Node> newChildren = new ArrayList<>();
-			final Node[] children = node.getChildren();
+			Node[] children = node.getChildren();
 			boolean containsAnd = false;
 			for (int i = 0; i < children.length; i++) {
 				final Node newNode = buildCNF_rec(children[i]);
@@ -146,23 +149,41 @@ public abstract class Node {
 					}
 				}
 			}
-			
+
 			if (containsAnd) {
-				final ArrayList<Node> newCleanChildren = new ArrayList<>(newChildren.size());
-				
+				final int[][] sizeArrays = new int[newChildren.size()][];
+				children = null;
+				node.setChildren(null);
+				int overallSize = 1;
+				for (int i = 0; i < newChildren.size(); i++) {
+					final Node newChild = newChildren.get(i);
+					if (newChild instanceof And) {
+						final Node[] newChildChildren = newChild.getChildren();
+						final int[] curSizeArray = new int[newChildChildren.length];
+						sizeArrays[i] = curSizeArray;
+						overallSize *= newChildChildren.length;
+						for (int j = 0; j < newChildChildren.length; j++) {
+							final Node child = newChildChildren[j];
+							curSizeArray[j] = (child instanceof Or) ? child.getChildren().length : -1;
+						}
+					} else {
+						sizeArrays[i] = null;
+					}
+				}
+				final Node[] newCleanChildren = new Node[overallSize];
+
 				final int[] indexArray = new int[newChildren.size()];
 				boolean carry;
-				final ArrayList<Node> newClauseChildren = new ArrayList<>(newChildren.size());
 				do {
 					carry = true;
-					for (int i = 0; i < newChildren.size(); i++) {
-						final Node newChild = newChildren.get(i);
-						if (newChild instanceof And) {
-							final Node[] newChildChildren = newChild.getChildren();
+					int sum = 0;
+					for (int i = 0; i < sizeArrays.length; i++) {
+						final int[] curSizeArray = sizeArrays[i];
+						if (curSizeArray != null) {
 							int index = indexArray[i];
 							if (carry) {
 								index++;
-								if (index >= newChildChildren.length) {
+								if (index >= curSizeArray.length) {
 									index = 0;
 									carry = true;
 								} else {
@@ -170,22 +191,39 @@ public abstract class Node {
 								}
 								indexArray[i] = index;
 							}
-							final Node newChildChild = newChildChildren[index];
-							if (newChildChild instanceof Or) {
-								newClauseChildren.addAll(Arrays.asList(newChildChild.getChildren()));
-							} else {
-								newClauseChildren.add(newChildChild);
-							}
+							sum += Math.abs(curSizeArray[index]);
 						} else {
-							newClauseChildren.add(newChild);
+							sum++;
 						}
 					}
-					newCleanChildren.add(new Or(newClauseChildren.toArray(new Node[0])));
-					newClauseChildren.clear();
+
+					final Node[] newClause = new Node[sum];
+					int curIndex = 0;
+					for (int i = 0; i < sizeArrays.length; i++) {
+						final Node newChild = newChildren.get(i);
+						final int[] curSizeArray = sizeArrays[i];
+
+						if (curSizeArray != null) {
+							int index = indexArray[i];
+							final Node newChildChild = newChild.getChildren()[index];
+							if (curSizeArray[index] < 0) {
+								newClause[curIndex++] = newChildChild;
+							} else {
+								final Node[] newChildChildChildren = newChildChild.getChildren();
+								System.arraycopy(newChildChildChildren, 0, newClause, curIndex, newChildChildChildren.length);
+								curIndex += newChildChildChildren.length;
+							}
+						} else {
+							newClause[curIndex++] = newChild;
+						}
+					}
+
+					newCleanChildren[--overallSize] = new Or(newClause);
 				} while (!carry);
-				return new And(newCleanChildren.toArray(new Node[0]));
+				return new And(newCleanChildren);
 			} else {
-				return new Or(newChildren.toArray(new Node[0]));
+				node.setChildren(newChildren.toArray(new Node[newChildren.size()]));
+				return node;
 			}
 		} else {
 			final ArrayList<Node> newChildren = new ArrayList<>();
@@ -200,8 +238,9 @@ public abstract class Node {
 					}
 				}
 			}
-			return new And(newChildren.toArray(new Node[0]));
-		} 
+			node.setChildren(newChildren.toArray(new Node[newChildren.size()]));
+			return node;
+		}
 	}
 
 	@SuppressWarnings("unchecked")
