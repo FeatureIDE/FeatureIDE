@@ -1111,6 +1111,30 @@
 					</reference>
 				</visibleWhen>
 			</command>
+   <menu
+         icon="icons/FeatureIconSmall.ico"
+         id="Profilemenu"
+         label="Profile">
+      <visibleWhen
+            checkEnabled="false">
+         <reference
+               definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
+         </reference>
+      </visibleWhen>
+      <command
+            commandId="de.ovgu.featureide.fm.ui.colorscheme"
+            icon="icons/FeatureProjectSmall.png"
+            id="de.ovgu.featureide.fm.ui.actions.colorscheme"
+            label="Color"
+            style="push">
+      </command>
+      <dynamic
+            id="whatever">
+         <class
+               class="de.ovgu.featureide.ui.views.collaboration.action.AddColorSchemAction.java">
+         </class>
+      </dynamic>
+   </menu>
 		</menuContribution>
 
 		<menuContribution
@@ -1204,6 +1228,10 @@
 				id="de.ovgu.featureide.ui.mpl.commands.javadoc.statistic"
 				name="Create documentation statistics">
 		</command>
+  <command
+        id="de.ovgu.featureide.fm.ui.colorscheme"
+        name="Colorscheme">
+  </command>
 	</extension>
 	<extension
 			point="org.eclipse.ui.handlers">
