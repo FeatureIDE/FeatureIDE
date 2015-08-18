@@ -23,8 +23,8 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel;
 import org.eclipse.draw2d.geometry.Point;
 
 import de.ovgu.featureide.fm.core.FMPoint;
-import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.IGraphicItem;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
  * Represents the legend in the FeatureModel
@@ -32,16 +32,16 @@ import de.ovgu.featureide.fm.core.IGraphicItem;
  * @author Fabian Benduhn
  */
 public class Legend implements IGraphicItem {
-	private final FeatureModel model;
+	private final IFeatureModel model;
 	private Point pos;
 
-	public Legend(FeatureModel model) {
+	public Legend(IFeatureModel model) {
 		this.model = model;
 		final FMPoint legendPos = model.getLayout().getLegendPos();
 		this.pos = new Point(legendPos.x, legendPos.y);
 	}
 
-	public FeatureModel getModel() {
+	public IFeatureModel getModel() {
 		return model;
 	}
 

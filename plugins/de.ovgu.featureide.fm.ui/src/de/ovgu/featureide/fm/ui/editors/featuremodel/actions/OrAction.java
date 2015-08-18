@@ -26,7 +26,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureChangeGroupTypeOperation;
 
@@ -39,9 +39,9 @@ public class OrAction extends SingleSelectionAction {
 
 	public static final String ID = "de.ovgu.featureide.or";
 
-	private final FeatureModel featureModel;
+	private final IFeatureModel featureModel;
 
-	public OrAction(Object viewer, FeatureModel featureModel) {
+	public OrAction(Object viewer, IFeatureModel featureModel) {
 		super(OR, viewer);
 		this.featureModel = featureModel;
 	}

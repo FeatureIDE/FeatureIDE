@@ -40,7 +40,7 @@ import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
-import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
  * Build the FSTModel for preprocessor projects.
@@ -67,7 +67,7 @@ public class PPModelBuilder {
 		System.err.println("buildModel(): featureNames: " + featureNames);
 		for (String featureName : featureNames) {
 			FSTFeature fstFeature = model.addFeature(featureName);
-			Feature feature = featureProject.getFeatureModel().getFeature(featureName);
+			IFeature feature = featureProject.getFeatureModel().getFeature(featureName);
 			fstFeature.setColor(feature.getColorList().getColor());
 		}
 		try {

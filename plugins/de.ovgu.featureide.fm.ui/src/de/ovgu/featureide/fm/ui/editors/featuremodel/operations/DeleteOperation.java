@@ -47,10 +47,10 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.Constraint;
-import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureDependencies;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.DeleteOperationAlternativeDialog;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
@@ -70,7 +70,7 @@ public class DeleteOperation extends AbstractFeatureModelOperation implements GU
 	private Object viewer;
 	private Deque<AbstractFeatureModelOperation> operations = new LinkedList<AbstractFeatureModelOperation>();
 
-	public DeleteOperation(Object viewer, FeatureModel featureModel) {
+	public DeleteOperation(Object viewer, IFeatureModel featureModel) {
 		super(featureModel, LABEL);
 		this.viewer = viewer;
 	}
@@ -89,8 +89,8 @@ public class DeleteOperation extends AbstractFeatureModelOperation implements GU
 		 * The key of the Map is the feature which could be replaced by their equivalents given at the
 		 * corresponding List.
 		 */
-		Map<Feature, List<Feature>> removalMap = new HashMap<Feature, List<Feature>>();
-		List<Feature> alreadyDeleted = new LinkedList<Feature>();
+		Map<IFeature, List<IFeature>> removalMap = new HashMap<IFeature, List<IFeature>>();
+		List<IFeature> alreadyDeleted = new LinkedList<IFeature>();
 
 		for (Object element : getSelection().toArray()) {
 			if (removeConstraint(element)) {
@@ -111,18 +111,18 @@ public class DeleteOperation extends AbstractFeatureModelOperation implements GU
 	}
 
 	/**
-	 * If the given element is a {@link Constraint} it will be removed instantly.
+	 * If the given element is a {@link IConstraint} it will be removed instantly.
 	 * 
 	 * @param element The constraint to remove.
 	 * @return <code>true</code> if the given element was a constraint.
 	 */
 	private boolean removeConstraint(Object element) {
 		if (element instanceof ConstraintEditPart) {
-			Constraint constraint = ((ConstraintEditPart) element).getConstraintModel();
+			IConstraint constraint = ((ConstraintEditPart) element).getConstraintModel();
 			executeOperation(new ConstraintDeleteOperation(constraint, featureModel));
 			return true;
-		} else if (element instanceof Constraint) {
-			Constraint constraint = ((Constraint) element);
+		} else if (element instanceof IConstraint) {
+			IConstraint constraint = ((IConstraint) element);
 			executeOperation(new ConstraintDeleteOperation(constraint, featureModel));
 			return true;
 		}
@@ -130,16 +130,16 @@ public class DeleteOperation extends AbstractFeatureModelOperation implements GU
 	}
 
 	/**
-	 * Tries to remove the given {@link Feature} else there will be an dialog for exception handling.
+	 * Tries to remove the given {@link IFeature} else there will be an dialog for exception handling.
 	 * 
 	 * @param element The feature to remove.
 	 * @param removalMap A map with the features and their equivalents.
 	 * @param alreadyDeleted A List of features which are already deleted.
 	 */
-	private void removeFeature(Object element, Map<Feature, List<Feature>> removalMap, List<Feature> alreadyDeleted) {
-		Feature feature = null;
-		if (element instanceof Feature) {
-			feature = ((Feature) element);
+	private void removeFeature(Object element, Map<IFeature, List<IFeature>> removalMap, List<IFeature> alreadyDeleted) {
+		IFeature feature = null;
+		if (element instanceof IFeature) {
+			feature = ((IFeature) element);
 		} else if (element instanceof FeatureEditPart) {
 			feature = ((FeatureEditPart) element).getFeature();
 		}
@@ -151,8 +151,8 @@ public class DeleteOperation extends AbstractFeatureModelOperation implements GU
 			} else {
 				// check for all equivalent features
 				FeatureDependencies featureDependencies = new FeatureDependencies(featureModel, false);
-				List<Feature> equivalent = new LinkedList<Feature>();
-				for (Feature f2 : featureDependencies.getImpliedFeatures(feature)) {
+				List<IFeature> equivalent = new LinkedList<IFeature>();
+				for (IFeature f2 : featureDependencies.getImpliedFeatures(feature)) {
 					if (featureDependencies.isAlways(f2, feature)) {
 						equivalent.add(f2);
 					}
@@ -175,7 +175,7 @@ public class DeleteOperation extends AbstractFeatureModelOperation implements GU
 	}
 
 	/**
-	 * Exception handling if the {@link Feature} to remove is contained in {@link Constraint}s.<br>
+	 * Exception handling if the {@link IFeature} to remove is contained in {@link IConstraint}s.<br>
 	 * If the feature could be removed a {@link DeleteOperationAlternativeDialog} will be opened to
 	 * select the features to replace with.<br>
 	 * If the feature has no equivalent an error message will be displayed.
@@ -183,14 +183,14 @@ public class DeleteOperation extends AbstractFeatureModelOperation implements GU
 	 * @param removalMap A map with the features and their equivalents.
 	 * @param alreadyDeleted A List of features which are already deleted.
 	 */
-	private void removeContainedFeatures(Map<Feature, List<Feature>> removalMap, List<Feature> alreadyDeleted) {
+	private void removeContainedFeatures(Map<IFeature, List<IFeature>> removalMap, List<IFeature> alreadyDeleted) {
 		if (!removalMap.isEmpty()) {
 			boolean hasDeletableFeature = false;
-			List<Feature> toBeDeleted = new ArrayList<Feature>(removalMap.keySet());
+			List<IFeature> toBeDeleted = new ArrayList<IFeature>(removalMap.keySet());
 
-			List<Feature> notDeletable = new LinkedList<Feature>();
-			for (Entry<Feature, List<Feature>> entry : removalMap.entrySet()) {
-				List<Feature> featureList = entry.getValue();
+			List<IFeature> notDeletable = new LinkedList<IFeature>();
+			for (Entry<IFeature, List<IFeature>> entry : removalMap.entrySet()) {
+				List<IFeature> featureList = entry.getValue();
 				featureList.removeAll(toBeDeleted);
 				featureList.removeAll(alreadyDeleted);
 				if (featureList.isEmpty()) {
@@ -211,13 +211,13 @@ public class DeleteOperation extends AbstractFeatureModelOperation implements GU
 	}
 
 	/**
-	 * Opens an error dialog displaying the {@link Feature}s which could not be replaced by alternatives.
+	 * Opens an error dialog displaying the {@link IFeature}s which could not be replaced by alternatives.
 	 * 
 	 * @param notDeletable The not deletable features
 	 */
-	private void openErrorDialog(List<Feature> notDeletable) {
+	private void openErrorDialog(List<IFeature> notDeletable) {
 		String notDeletedFeatures = null;
-		for (Feature f : notDeletable) {
+		for (IFeature f : notDeletable) {
 			if (notDeletedFeatures == null) {
 				notDeletedFeatures = "\"" + f.getName() + "\"";
 			} else {

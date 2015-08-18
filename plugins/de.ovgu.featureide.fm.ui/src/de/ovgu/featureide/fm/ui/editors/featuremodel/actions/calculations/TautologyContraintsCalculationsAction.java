@@ -25,7 +25,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE_TAUT
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
  * TODO description
@@ -34,9 +34,9 @@ import de.ovgu.featureide.fm.core.FeatureModel;
  */
 public class TautologyContraintsCalculationsAction extends Action {
 
-	private final FeatureModel featureModel;
+	private final IFeatureModel featureModel;
 
-	public TautologyContraintsCalculationsAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
+	public TautologyContraintsCalculationsAction(GraphicalViewerImpl viewer, IFeatureModel featureModel) {
 		super(CALCULATE_TAUTOLOGY_CONSTRAINTS);
 		this.featureModel = featureModel;
 		setChecked(featureModel.getAnalyser().calculateTautologyConstraints);

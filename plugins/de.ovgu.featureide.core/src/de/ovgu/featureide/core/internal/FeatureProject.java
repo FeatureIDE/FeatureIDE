@@ -90,10 +90,10 @@ import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.fm.core.ExtendedFeature;
 import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureModelFile;
 import de.ovgu.featureide.fm.core.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.configuration.FeatureIDEFormat;
@@ -142,7 +142,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	/**
 	 * the model representation of the model file
 	 */
-	private final FeatureModel featureModel;
+	private final IFeatureModel featureModel;
 
 	private FeatureModelReaderIFileWrapper modelReader;
 
@@ -202,7 +202,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		protected boolean work() {
 			try {
 				final IFolder folder = sourceFolder;
-				final FeatureModel model = featureModel;
+				final IFeatureModel model = featureModel;
 				// prevent warnings, if the user has just created a project
 				// without any source files
 				// TODO This could be removed because the user could use the
@@ -327,7 +327,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			tmpModelReader = ModelIOFactory.getModelReader(featureModel, ModelIOFactory.TYPE_VELVET);
 		} else {
 			modelFile = new FeatureModelFile(project.getFile("model.xml"));
-			featureModel = new FeatureModel();
+			featureModel = new IFeatureModel();
 			tmpModelReader = ModelIOFactory.getModelReader(featureModel, ModelIOFactory.TYPE_XML);
 		}
 
@@ -463,7 +463,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		if (project.getFile("model.m").exists() && !project.getFile("model.xml").exists()) {
 			try {
 				IFile file = project.getFile("model.xml");
-				FeatureModel fm = new FeatureModel();
+				IFeatureModel fm = new IFeatureModel();
 				// fm.getFMComposerExtension(project);
 				GuidslReader guidslReader = new GuidslReader(fm);
 				FeatureModelReaderIFileWrapper reader = new FeatureModelReaderIFileWrapper(guidslReader);
@@ -492,7 +492,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		sourceFolder.refreshLocal(IResource.DEPTH_ONE, null);
 		// create folders for all layers
 		if (featureModel instanceof ExtendedFeatureModel) {
-			for (Feature feature : featureModel.getFeatures()) {
+			for (IFeature feature : featureModel.getFeatures()) {
 				if (feature.isConcrete() && 
 						feature instanceof ExtendedFeature && 
 						!((ExtendedFeature)feature).isFromExtern()) {
@@ -500,7 +500,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 				}
 			}
 		} else {
-			for (Feature feature : featureModel.getFeatures()) {
+			for (IFeature feature : featureModel.getFeatures()) {
 				if (feature.isConcrete()) {
 					createFeatureFolder(feature.getName());
 				}
@@ -510,7 +510,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		for (IResource res : sourceFolder.members())
 			if (res instanceof IFolder && res.exists()) {
 				IFolder folder = (IFolder) res;
-				Feature feature = featureModel.getFeature(folder.getName());
+				IFeature feature = featureModel.getFeature(folder.getName());
 				if (feature == null || !feature.isConcrete()) {
 					folder.refreshLocal(IResource.DEPTH_ONE, null);
 					if (folder.members().length == 0)
@@ -698,7 +698,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		return fstModel;
 	}
 	
-	public FeatureModel getFeatureModel() {
+	public IFeatureModel getFeatureModel() {
 		return featureModel;
 	}
 
@@ -776,8 +776,8 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	 * @param folder
 	 *            the folder
 	 */
-	private void setFeatureModuleMarker(final FeatureModel featureModel, IFolder folder) {
-		Feature feature = featureModel.getFeature(folder.getName());
+	private void setFeatureModuleMarker(final IFeatureModel featureModel, IFolder folder) {
+		IFeature feature = featureModel.getFeature(folder.getName());
 		try {
 			folder.deleteMarkers(FEATURE_MODULE_MARKER, true, IResource.DEPTH_ZERO);
 		} catch (CoreException e) {
@@ -1127,11 +1127,11 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 	private Collection<String> getOptionalConcreteFeatures() {
 		final Collection<String> concreteFeatures = featureModel.getConcreteFeatureNames();
-		List<List<Feature>> deadCoreList = featureModel.getAnalyser().analyzeFeatures();
-		for (final Feature feature : deadCoreList.get(0)) {
+		List<List<IFeature>> deadCoreList = featureModel.getAnalyser().analyzeFeatures();
+		for (final IFeature feature : deadCoreList.get(0)) {
 			concreteFeatures.remove(feature.getName());
 		}
-		for (final Feature feature : deadCoreList.get(1)) {
+		for (final IFeature feature : deadCoreList.get(1)) {
 			concreteFeatures.remove(feature.getName());
 		}
 		return concreteFeatures;

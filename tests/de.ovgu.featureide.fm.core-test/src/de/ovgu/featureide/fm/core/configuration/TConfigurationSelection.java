@@ -25,7 +25,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
  * Tests about feature selection.
@@ -35,7 +35,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 public class TConfigurationSelection extends AbstractConfigurationTest{
 	
 	@Override
-	FeatureModel loadModel() 
+	IFeatureModel loadModel() 
 	{
 		return loadGUIDSL("S : [A] [B] C :: _S; %% not B;");
 	}

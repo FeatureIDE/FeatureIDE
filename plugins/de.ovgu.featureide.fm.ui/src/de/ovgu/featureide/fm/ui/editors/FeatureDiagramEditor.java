@@ -70,15 +70,15 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.progress.UIJob;
 
-import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.ConstraintAttribute;
 import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.FeatureStatus;
 import de.ovgu.featureide.fm.core.Preferences;
 import de.ovgu.featureide.fm.core.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.job.AStoppableJob;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -211,7 +211,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 				// checks for null are necessary because we cannot prevent this
 				// method may be called before the model is loaded correctly
 				// (including positions in FeatureUIHelper)
-				FeatureModel fm = getFeatureModel();
+				IFeatureModel fm = getFeatureModel();
 				if (fm == null)
 					return;
 
@@ -239,7 +239,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			 * @param fm
 			 * @param delta
 			 */
-			private void moveLegend(FeatureModel fm, int delta) {
+			private void moveLegend(IFeatureModel fm, int delta) {
 				org.eclipse.draw2d.geometry.Point location = FeatureUIHelper.getLegendFigure(fm).getLocation();
 				FeatureUIHelper.getLegendFigure(fm).setLocation(new org.eclipse.draw2d.geometry.Point(location.x + delta, location.y));
 			}
@@ -257,12 +257,12 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		setRootEditPart(rootEditPart);
 	}
 
-	public FeatureModel getFeatureModel() {
+	public IFeatureModel getFeatureModel() {
 		return featureModelEditor.getFeatureModel();
 	}
 
 	public void createActions() {
-		FeatureModel featureModel = getFeatureModel();
+		IFeatureModel featureModel = getFeatureModel();
 
 		createLayerAction = new CreateLayerAction(this, featureModel, null);
 		createCompoundAction = new CreateCompoundAction(this, featureModel, null);
@@ -577,10 +577,10 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 
 								@Override
 								public IStatus runInUIThread(IProgressMonitor monitor) {
-									for (Feature f : featureModelEditor.getFeatureModel().getFeatures()) {
+									for (IFeature f : featureModelEditor.getFeatureModel().getFeatures()) {
 										f.setFeatureStatus(FeatureStatus.NORMAL, true);
 									}
-									for (Constraint c : featureModelEditor.getFeatureModel().getConstraints()) {
+									for (IConstraint c : featureModelEditor.getFeatureModel().getConstraints()) {
 										c.setConstraintAttribute(ConstraintAttribute.NORMAL, true);
 									}
 									getContents().refresh();
@@ -623,18 +623,18 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				if (changedAttributes == null) {
-					for (Feature f : featureModelEditor.getFeatureModel().getFeatures()) {
+					for (IFeature f : featureModelEditor.getFeatureModel().getFeatures()) {
 						f.fire(new PropertyChangeEvent(this, ATTRIBUTE_CHANGED, false, true));
 					}
-					for (Constraint c : featureModelEditor.getFeatureModel().getConstraints()) {
+					for (IConstraint c : featureModelEditor.getFeatureModel().getConstraints()) {
 						c.fire(new PropertyChangeEvent(this, ATTRIBUTE_CHANGED, false, true));
 					}
 				} else {
 					for (Object f : changedAttributes.keySet()) {
-						if (f instanceof Feature) {
-							((Feature) f).fire(new PropertyChangeEvent(this, ATTRIBUTE_CHANGED, Boolean.FALSE, true));
-						} else if (f instanceof Constraint) {
-							((Constraint) f).fire(new PropertyChangeEvent(this, ATTRIBUTE_CHANGED, false, true));
+						if (f instanceof IFeature) {
+							((IFeature) f).fire(new PropertyChangeEvent(this, ATTRIBUTE_CHANGED, Boolean.FALSE, true));
+						} else if (f instanceof IConstraint) {
+							((IConstraint) f).fire(new PropertyChangeEvent(this, ATTRIBUTE_CHANGED, false, true));
 						}
 					}
 				}
@@ -652,7 +652,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	public void setLayout() {
 
 		FeatureDiagramLayoutManager layoutManager;
-		FeatureModel featureModel = getFeatureModel();
+		IFeatureModel featureModel = getFeatureModel();
 
 		layoutManager = FeatureDiagramLayoutHelper.getLayoutManager(featureModel.getLayout().getLayoutAlgorithm(), featureModel);
 

@@ -52,8 +52,8 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionBase;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.handlers.base.SelectionWrapper;
 import de.ovgu.featureide.ui.migration.wizard.SPLMigrationDialogSettingsPage;
 
@@ -280,23 +280,23 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator {
 	 * {@link IComposerExtensionBase Composers} needs.
 	 */
 	protected void adjustFeatureModel() {
-		final FeatureModel featureModelOfVariants = generateFeatureModelOfVariants();
+		final IFeatureModel featureModelOfVariants = generateFeatureModelOfVariants();
 
 		SPLMigrationUtils.writeFeatureModelToDefaultFile(newProject, featureModelOfVariants);
 	}
 
-	private FeatureModel generateFeatureModelOfVariants() {
+	private IFeatureModel generateFeatureModelOfVariants() {
 		final IFeatureProject featureProject = CorePlugin.getFeatureProject(newProject);
-		final FeatureModel featureModel = featureProject.getFeatureModel();
+		final IFeatureModel featureModel = featureProject.getFeatureModel();
 
 		featureModel.reset();
 
-		featureModel.setRoot(new Feature(featureModel, "Base"));
+		featureModel.setRoot(new IFeature(featureModel, "Base"));
 		featureModel.getRoot().changeToAlternative();
 		featureModel.getRoot().setAbstract(true);
 
 		for (IProject project : projects)
-			featureModel.getRoot().addChild(new Feature(featureModel, project.getName()));
+			featureModel.getRoot().addChild(new IFeature(featureModel, project.getName()));
 
 		return featureModel;
 	}

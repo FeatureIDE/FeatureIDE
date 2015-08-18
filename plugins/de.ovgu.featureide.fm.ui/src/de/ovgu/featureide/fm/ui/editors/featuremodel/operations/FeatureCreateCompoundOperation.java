@@ -34,8 +34,8 @@ import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TextCellEditor;
 
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureCellEditorLocator;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureLabelEditManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
@@ -50,20 +50,20 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayou
 public class FeatureCreateCompoundOperation extends AbstractFeatureModelOperation {
 
 	private static final String LABEL = CREATE_COMPOUND;
-	Feature newCompound;
-	private Feature parent;
+	IFeature newCompound;
+	private IFeature parent;
 	private Object viewer;
-	private LinkedList<Feature> selectedFeatures;
+	private LinkedList<IFeature> selectedFeatures;
 	private Object diagramEditor;
 
 	/**
 	 * @param label
 	 */
-	public FeatureCreateCompoundOperation(Object viewer, Feature parent, FeatureModel featureModel, LinkedList<Feature> selectedFeatures, Object diagramEditor) {
+	public FeatureCreateCompoundOperation(Object viewer, IFeature parent, IFeatureModel featureModel, LinkedList<IFeature> selectedFeatures, Object diagramEditor) {
 		super(featureModel, LABEL);
 		this.viewer = viewer;
 		this.parent = parent;
-		this.selectedFeatures = new LinkedList<Feature>();
+		this.selectedFeatures = new LinkedList<IFeature>();
 		this.selectedFeatures.addAll(selectedFeatures);
 		this.diagramEditor = diagramEditor;
 	}
@@ -73,7 +73,7 @@ public class FeatureCreateCompoundOperation extends AbstractFeatureModelOperatio
 		int number = 0;
 		while (featureModel.getFeatureNames().contains("NewCompound" + ++number))
 			;
-		newCompound = new Feature(featureModel, "NewCompound" + number);
+		newCompound = new IFeature(featureModel, "NewCompound" + number);
 		if (parent != null) {
 			newCompound.setAND(true);
 			newCompound.setMultiple(parent.isMultiple());
@@ -108,8 +108,8 @@ public class FeatureCreateCompoundOperation extends AbstractFeatureModelOperatio
 	@Override
 	protected void redo() {
 		if (parent != null) {
-			LinkedList<Feature> newChildren = new LinkedList<Feature>();
-			for (Feature feature : parent.getChildren()) {
+			LinkedList<IFeature> newChildren = new LinkedList<IFeature>();
+			for (IFeature feature : parent.getChildren()) {
 				if (selectedFeatures.contains(feature)) {
 					if (!newCompound.hasChildren())
 						newChildren.add(newCompound);

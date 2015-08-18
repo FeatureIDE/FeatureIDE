@@ -35,6 +35,10 @@ import org.eclipse.core.runtime.IPath;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+
 /**
  * Handles feature renamings.
  * 
@@ -45,7 +49,7 @@ public class RenamingsManager {
 	 * a list containing all renamings since the last save
 	 */
 	private final List<Renaming> renamings = new LinkedList<Renaming>();
-	private final FeatureModel model;
+	private final IFeatureModel model;
 	private IFolder sourceFolder;
 	
 	/* *****************************************************************
@@ -54,23 +58,23 @@ public class RenamingsManager {
 	 * 
 	 *#*****************************************************************/
 	
-	public RenamingsManager(FeatureModel model) {
+	public RenamingsManager(IFeatureModel model) {
 		 this.model = model;
 	}
 	
 	public boolean renameFeature(final String oldName, final String newName) {
-		final Map<String, Feature> featureTable = model.getFeatureTable();
+		final Map<String, IFeature> featureTable = model.getFeatureTable();
 		if (!featureTable.containsKey(oldName)
 				|| featureTable.containsKey(newName)) {
 			return false;
 		}
-		final List<Constraint> constraints = model.getConstraints();
+		final List<IConstraint> constraints = model.getConstraints();
 		final List<String> featureOrderList = model.getFeatureOrderList();
-		Feature feature = featureTable.remove(oldName);
+		IFeature feature = featureTable.remove(oldName);
 		feature.setName(newName);
 		featureTable.put(newName, feature);
 		renamings.add(new Renaming(oldName, newName));
-		for (Constraint c : constraints) {
+		for (IConstraint c : constraints) {
 			renameVariables(c.getNode(), oldName, newName);
 		}
 		
@@ -89,9 +93,9 @@ public class RenamingsManager {
 	}
 
 	public void performRenamings() {
-		final List<Constraint> constraints = model.getConstraints();
+		final List<IConstraint> constraints = model.getConstraints();
 		for (Renaming renaming : renamings) {
-			for (Constraint c : constraints) {
+			for (IConstraint c : constraints) {
 				renameVariables(c.getNode(), renaming.oldName, renaming.newName);
 			}
 		}

@@ -29,11 +29,10 @@ import org.prop4j.Node;
 import org.prop4j.NodeWriter;
 
 import composer.rules.meta.FeatureModelInfo;
-
 import de.ovgu.cide.fstgen.ast.FSTNode;
 import de.ovgu.cide.fstgen.ast.FSTNonTerminal;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
@@ -48,12 +47,12 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
  */
 public class FeatureIDEModelInfo implements FeatureModelInfo {
 	
-	private FeatureModel featureModel;
+	private IFeatureModel featureModel;
 	private Configuration currentConfig;
 	private List<String> coreFeatureNames;
 	private boolean validSelect = true;
 	private boolean validReject = true;
-	private HashMap<String, HashMap<String, List<Feature>>> rootsForMethod = new HashMap<String, HashMap<String,List<Feature>>>();
+	private HashMap<String, HashMap<String, List<IFeature>>> rootsForMethod = new HashMap<String, HashMap<String,List<IFeature>>>();
 
 	private boolean obligatory = true;
 	private boolean obligatoryMethod = true;
@@ -64,7 +63,7 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 	/**
 	 * @param useValidMethod Defines whether the valid() or the complete formula is used as requieres clause.  
 	 */
-	public FeatureIDEModelInfo(final FeatureModel featureModel, final boolean useValidMethod){
+	public FeatureIDEModelInfo(final IFeatureModel featureModel, final boolean useValidMethod){
 		this.featureModel = featureModel;
 		this.useValidMethod = useValidMethod;
 		currentConfig = new Configuration(featureModel);
@@ -93,7 +92,7 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 		if (coreFeatureNames == null){
 			Configuration newConfig = new Configuration(featureModel);
 			coreFeatureNames = new LinkedList<String>();
-			for (Feature feature : newConfig.getSelectedFeatures())
+			for (IFeature feature : newConfig.getSelectedFeatures())
 				coreFeatureNames.add(feature.getName());
 		}
 		
@@ -107,7 +106,7 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 		if (!useSelection)
 			return isCoreFeature(featureName);
 		
-		for (Feature feature : currentConfig.getSelectedFeatures())
+		for (IFeature feature : currentConfig.getSelectedFeatures())
 			if (feature.getName().equals(featureName))
 				return true;
 		
@@ -118,13 +117,13 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 	public boolean isMethodCoreFeature(String className, String methodName, String featureName) {
 		if (!obligatoryMethod)
 			return false;
-		HashMap<String, List<Feature>> methodFeatures = rootsForMethod.get(className);
+		HashMap<String, List<IFeature>> methodFeatures = rootsForMethod.get(className);
 		if (methodFeatures == null)
 			return false;
-		List<Feature> features = methodFeatures.get(methodName);
+		List<IFeature> features = methodFeatures.get(methodName);
 		if (features == null)
 			return false;
-		for (Feature rootFeature : features){
+		for (IFeature rootFeature : features){
 			if (!rootFeature.getName().equals(featureName)){
 				Configuration config = new Configuration(featureModel);
 				config.setManual(rootFeature.getName(), Selection.SELECTED);
@@ -144,18 +143,18 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 		if (!useSelection)
 			return isMethodCoreFeature(className, methodName, featureName);
 		
-		HashMap<String, List<Feature>> methodFeatures = rootsForMethod.get(className);
+		HashMap<String, List<IFeature>> methodFeatures = rootsForMethod.get(className);
 		if (methodFeatures == null)
 			return false;
-		List<Feature> features = methodFeatures.get(methodName);
+		List<IFeature> features = methodFeatures.get(methodName);
 		if (features == null)
 			return false;
-		for (Feature rootFeature : features){
+		for (IFeature rootFeature : features){
 			if (!rootFeature.getName().equals(featureName)){
 				Configuration config = new Configuration(featureModel);
-				for (Feature feat : currentConfig.getSelectedFeatures())
+				for (IFeature feat : currentConfig.getSelectedFeatures())
 					config.setManual(feat.getName(),Selection.SELECTED);
-				for (Feature feat : currentConfig.getUnSelectedFeatures())
+				for (IFeature feat : currentConfig.getUnSelectedFeatures())
 					config.setManual(feat.getName(),Selection.UNSELECTED);
 				config.setManual(rootFeature.getName(), Selection.SELECTED);
 				if (config.getSelectablefeature(featureName).getAutomatic() != Selection.SELECTED)
@@ -192,7 +191,7 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 	public void resetSelections() {
 		if (!fm)
 			return;
-		for (Feature feature : currentConfig.getSelectedFeatures())
+		for (IFeature feature : currentConfig.getSelectedFeatures())
 			currentConfig.setManual(feature.getName(), Selection.UNDEFINED);
 		validSelect = true;
 		
@@ -202,7 +201,7 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 	public void resetEliminations() {
 		if (!fm)
 			return;
-		for (Feature feature : currentConfig.getUnSelectedFeatures())
+		for (IFeature feature : currentConfig.getUnSelectedFeatures())
 			currentConfig.setManual(feature.getName(), Selection.UNDEFINED);
 		validReject = true;
 	}
@@ -271,7 +270,7 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 	public void addFeatureNodes(List<FSTNonTerminal> features) {
 		if (!obligatoryMethod)
 			return;
-		rootsForMethod = new HashMap<String, HashMap<String,List<Feature>>>();
+		rootsForMethod = new HashMap<String, HashMap<String,List<IFeature>>>();
 		for (FSTNonTerminal featureNode : features){
 			String featureName = getFeatureName(featureNode);
 			
@@ -280,15 +279,15 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 				String className = getClassName(methodNode);
 				String methodName = getMethodName(methodNode);
 				
-				HashMap<String, List<Feature>> methodFeature = rootsForMethod.get(className);
+				HashMap<String, List<IFeature>> methodFeature = rootsForMethod.get(className);
 				if (methodFeature == null) {
-					methodFeature = new HashMap<String, List<Feature>>();
+					methodFeature = new HashMap<String, List<IFeature>>();
 					rootsForMethod.put(className, methodFeature);
 				}
 				
-				List<Feature> featureList = methodFeature.get(methodName);
+				List<IFeature> featureList = methodFeature.get(methodName);
 				if (featureList == null){
-					featureList = new LinkedList<Feature>();
+					featureList = new LinkedList<IFeature>();
 					methodFeature.put(methodName, featureList);
 				}
 				
@@ -346,7 +345,7 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 		rootsForMethod.clear();
 	}
 	
-	private void addToFeatureList(Feature feature, List<Feature> featureList){
+	private void addToFeatureList(IFeature feature, List<IFeature> featureList){
 		if (!featureList.contains(feature)) {
 			featureList.add(feature);
 		}

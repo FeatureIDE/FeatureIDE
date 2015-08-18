@@ -80,8 +80,8 @@ import org.prop4j.Not;
 import org.prop4j.Or;
 import org.prop4j.SatSolver;
 
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.ModelWarning;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
@@ -113,7 +113,7 @@ public class GuidslReader extends AbstractFeatureModelReader {
 	 * 
 	 * @param featureModel the structure to fill
 	 */
-	public GuidslReader(FeatureModel featureModel) {
+	public GuidslReader(IFeatureModel featureModel) {
 		setFeatureModel(featureModel);
 	}
 
@@ -235,12 +235,12 @@ public class GuidslReader extends AbstractFeatureModelReader {
 		featureModel.handleModelDataLoaded();
 	}
 	
-	private void readGProduction(GProduction gProduction, Feature feature) throws UnsupportedModelException {
+	private void readGProduction(GProduction gProduction, IFeature feature) throws UnsupportedModelException {
 		feature.setAND(false);
 		Pats pats = gProduction.getPats();
 		AstListNode astListNode = (AstListNode) pats.arg[0];
 		do {
-			Feature child = readPat((Pat) astListNode.arg[0]);
+			IFeature child = readPat((Pat) astListNode.arg[0]);
 			feature.addChild(child);
 			feature.setAbstract(!noAbstractFeatures);
 			astListNode = (AstListNode) astListNode.right;
@@ -250,7 +250,7 @@ public class GuidslReader extends AbstractFeatureModelReader {
 	
 	private void readGProduction(GProduction gProduction) throws UnsupportedModelException {
 		final String name = gProduction.getIDENTIFIER().name;
-		final Feature feature = featureModel.getFeature(gProduction.getIDENTIFIER().name);
+		final IFeature feature = featureModel.getFeature(gProduction.getIDENTIFIER().name);
 		if (feature == null) {
 			throw new UnsupportedModelException(THE_COMPOUND_FEATURE_ + name + "' have to occur on a right side of a rule before using it on a left side!", gProduction.getIDENTIFIER().lineNum());
 		}
@@ -258,13 +258,13 @@ public class GuidslReader extends AbstractFeatureModelReader {
 	}
 	
 	private void readGProductionRoot(GProduction gProduction) throws UnsupportedModelException {
-		final Feature root = new Feature(featureModel, gProduction.getIDENTIFIER().name);
+		final IFeature root = new IFeature(featureModel, gProduction.getIDENTIFIER().name);
 		featureModel.addFeature(root);
 		featureModel.setRoot(root);
 		readGProduction(gProduction, root);
 	}
 
-	private Feature readPat(Pat pat) throws UnsupportedModelException {
+	private IFeature readPat(Pat pat) throws UnsupportedModelException {
 		if (pat instanceof GPattern)
 			return readGPattern((GPattern) pat);
 		SimplePattern simplePattern = (SimplePattern) pat;
@@ -272,14 +272,14 @@ public class GuidslReader extends AbstractFeatureModelReader {
 		return createFeature(token);
 	}
 
-	private Feature readGPattern(GPattern gPattern) throws UnsupportedModelException {
+	private IFeature readGPattern(GPattern gPattern) throws UnsupportedModelException {
 		AstToken token = gPattern.getIDENTIFIER();
-		Feature feature = createFeature(token);
+		IFeature feature = createFeature(token);
 		feature.setAND(true);
 		TermList termList = gPattern.getTermList();
 		AstListNode astListNode = (AstListNode) termList.arg[0];
 		do {
-			Feature child = readGTerm((GTerm) astListNode.arg[0]);
+			IFeature child = readGTerm((GTerm) astListNode.arg[0]);
 			feature.addChild(child);
 			feature.setAbstract(!noAbstractFeatures);
 			astListNode = (AstListNode) astListNode.right;
@@ -287,7 +287,7 @@ public class GuidslReader extends AbstractFeatureModelReader {
 		return simplify(feature);
 	}
 
-	private Feature readGTerm(GTerm term) throws UnsupportedModelException {
+	private IFeature readGTerm(GTerm term) throws UnsupportedModelException {
 		AstToken token;
 		if (term instanceof PlusTerm)
 			token = ((PlusTerm) term).getIDENTIFIER();
@@ -297,22 +297,22 @@ public class GuidslReader extends AbstractFeatureModelReader {
 			token = ((TermName) term).getIDENTIFIER();
 		else
 			token = ((OptTerm) term).getIDENTIFIER();
-		Feature feature = createFeature(token);
+		IFeature feature = createFeature(token);
 		feature.setMandatory(term instanceof PlusTerm || term instanceof TermName);
 		feature.setMultiple(term instanceof PlusTerm || term instanceof StarTerm);
 		return feature;
 	}
 
-	private Feature createFeature(AstToken token) throws UnsupportedModelException {
-		Feature feature = new Feature(featureModel, token.name);
+	private IFeature createFeature(AstToken token) throws UnsupportedModelException {
+		IFeature feature = new IFeature(featureModel, token.name);
 		if (!featureModel.addFeature(feature))
 			throw new UnsupportedModelException(THE_FEATURE_ + feature.getName() + "' occurs again on a right side of a rule and that's not allowed!", token.lineNum());
 		return feature;
 	}
 
-	private Feature simplify(Feature feature) {
+	private IFeature simplify(IFeature feature) {
 		if (feature.getChildrenCount() == 1) {
-			Feature child = feature.getFirstChild();
+			IFeature child = feature.getFirstChild();
 			if (child.getName().equals(EMPTY___ + feature.getName())) {
 				feature.removeChild(child);
 				feature.setChildren(child.getChildren());
@@ -404,7 +404,7 @@ public class GuidslReader extends AbstractFeatureModelReader {
 		//TODO #31: reading annotations not yet implemented
 	}
 
-	public Node readPropositionalString(String propString, FeatureModel featureModel) throws UnsupportedModelException{
+	public Node readPropositionalString(String propString, IFeatureModel featureModel) throws UnsupportedModelException{
 		//String featureString = new FeatureModelWriter(featureModel).writeToString();
 		StringBuilder featureString= new StringBuilder(
 				new GuidslWriter(featureModel).writeToString());		

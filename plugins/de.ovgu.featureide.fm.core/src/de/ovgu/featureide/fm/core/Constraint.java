@@ -31,6 +31,14 @@ import org.prop4j.Node;
 import org.prop4j.NodeWriter;
 import org.prop4j.SatSolver;
 
+import de.ovgu.featureide.fm.core.ConstraintAttribute;
+import de.ovgu.featureide.fm.core.FMPoint;
+import de.ovgu.featureide.fm.core.FeatureComparator;
+import de.ovgu.featureide.fm.core.IGraphicItem;
+import de.ovgu.featureide.fm.core.PropertyConstants;
+import de.ovgu.featureide.fm.core.IGraphicItem.GraphicItem;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+
 /**
  * Represents a propositional constraint below the feature diagram.
  * 
@@ -40,16 +48,16 @@ import org.prop4j.SatSolver;
  */
 public class Constraint implements PropertyConstants, IGraphicItem {
 
-	private FeatureModel featureModel;
+	private IFeatureModel featureModel;
 	private Node propNode;
 	private FMPoint location = new FMPoint(0, 0);
 	private boolean featureSelected = false;
-	private Collection<Feature> containedFeatureList = new LinkedList<Feature>();
-	private Collection<Feature> falseOptionalFeatures = new LinkedList<Feature>();
+	private Collection<IFeature> containedFeatureList = new LinkedList<IFeature>();
+	private Collection<IFeature> falseOptionalFeatures = new LinkedList<IFeature>();
 	private ConstraintAttribute attribute = ConstraintAttribute.NORMAL;
-	private Collection<Feature> deadFeatures = new LinkedList<Feature>();
+	private Collection<IFeature> deadFeatures = new LinkedList<IFeature>();
 
-	public Constraint(FeatureModel featureModel, Node propNode) {
+	public Constraint(IFeatureModel featureModel, Node propNode) {
 		this.featureModel = featureModel;
 		this.propNode = propNode;
 	}
@@ -62,7 +70,7 @@ public class Constraint implements PropertyConstants, IGraphicItem {
 		return location;
 	}
 
-	public FeatureModel getFeatureModel() {
+	public IFeatureModel getFeatureModel() {
 		return featureModel;
 	}
 
@@ -74,16 +82,16 @@ public class Constraint implements PropertyConstants, IGraphicItem {
 	 * @param fmDeadFeatures The dead features the complete model
 	 * @return The dead features caused by this constraint
 	 */
-	public Collection<Feature> getDeadFeatures(SatSolver solver, FeatureModel fm, Collection<Feature> fmDeadFeatures) {
-		final Collection<Feature> deadFeatures;
+	public Collection<IFeature> getDeadFeatures(SatSolver solver, IFeatureModel fm, Collection<IFeature> fmDeadFeatures) {
+		final Collection<IFeature> deadFeatures;
 		final Node propNode = this.getNode();
-		final Comparator<Feature> featComp = new FeatureComparator(true);
+		final Comparator<IFeature> featComp = new FeatureComparator(true);
 		if (propNode != null) {
 			deadFeatures = fm.getAnalyser().getDeadFeatures(solver, propNode);
 		} else {
-			deadFeatures = new TreeSet<Feature>(featComp);
+			deadFeatures = new TreeSet<IFeature>(featComp);
 		}
-		final Collection<Feature> deadFeaturesAfter = new TreeSet<Feature>(featComp);
+		final Collection<IFeature> deadFeaturesAfter = new TreeSet<IFeature>(featComp);
 
 		deadFeaturesAfter.addAll(fmDeadFeatures);
 		deadFeaturesAfter.retainAll(deadFeatures);
@@ -93,8 +101,8 @@ public class Constraint implements PropertyConstants, IGraphicItem {
 	/**
 	 * Removes the constraints from the model, and looks for dead features.
 	 */
-	public Collection<Feature> getDeadFeatures(FeatureModel fm, Collection<Feature> fmDeadFeatures) {
-		Collection<Feature> deadFeaturesBefore = null;
+	public Collection<IFeature> getDeadFeatures(IFeatureModel fm, Collection<IFeature> fmDeadFeatures) {
+		Collection<IFeature> deadFeaturesBefore = null;
 		Node propNode = this.getNode();
 		if (propNode != null) {
 			fm.removeConstraint(this);
@@ -103,9 +111,9 @@ public class Constraint implements PropertyConstants, IGraphicItem {
 			fm.handleModelDataChanged();
 		}
 
-		Collection<Feature> deadFeaturesAfter = new LinkedList<Feature>();
-		for (Feature f : fmDeadFeatures) {
-			Feature feature = fm.getFeature(f.getName());
+		Collection<IFeature> deadFeaturesAfter = new LinkedList<IFeature>();
+		for (IFeature f : fmDeadFeatures) {
+			IFeature feature = fm.getFeature(f.getName());
 			// XXX why can the given feature not be found?
 			if (feature != null && !deadFeaturesBefore.contains(feature)) {
 				deadFeaturesAfter.add(f);
@@ -149,16 +157,16 @@ public class Constraint implements PropertyConstants, IGraphicItem {
 
 	/**
 	 * 
-	 * @return All {@link Feature}s contained at this {@link Constraint}.
+	 * @return All {@link IFeature}s contained at this {@link Constraint}.
 	 */
-	public Collection<Feature> getContainedFeatures() {
+	public Collection<IFeature> getContainedFeatures() {
 		if (containedFeatureList.isEmpty()) {
 			setContainedFeatures();
 		}
 		return containedFeatureList;
 	}
 
-	public boolean setFalseOptionalFeatures(FeatureModel clone, Collection<Feature> fmFalseOptionals) {
+	public boolean setFalseOptionalFeatures(IFeatureModel clone, Collection<IFeature> fmFalseOptionals) {
 		falseOptionalFeatures.clear();
 		falseOptionalFeatures.addAll(clone.getAnalyser().getFalseOptionalFeatures(fmFalseOptionals));
 		fmFalseOptionals.removeAll(falseOptionalFeatures);
@@ -168,10 +176,10 @@ public class Constraint implements PropertyConstants, IGraphicItem {
 	public boolean setFalseOptionalFeatures() {
 		falseOptionalFeatures.clear();
 		boolean found = false;
-		FeatureModel clonedModel = featureModel.clone();
+		IFeatureModel clonedModel = featureModel.clone();
 		clonedModel.removeConstraint(this);
-		Collection<Feature> foFeatures = clonedModel.getAnalyser().getFalseOptionalFeatures();
-		for (Feature feature : featureModel.getAnalyser().getFalseOptionalFeatures()) {
+		Collection<IFeature> foFeatures = clonedModel.getAnalyser().getFalseOptionalFeatures();
+		for (IFeature feature : featureModel.getAnalyser().getFalseOptionalFeatures()) {
 			if (!foFeatures.contains(clonedModel.getFeature(feature.getName())) && !falseOptionalFeatures.contains(feature)) {
 				falseOptionalFeatures.add(feature);
 				found = true;
@@ -180,7 +188,7 @@ public class Constraint implements PropertyConstants, IGraphicItem {
 		return found;
 	}
 
-	public Collection<Feature> getFalseOptional() {
+	public Collection<IFeature> getFalseOptional() {
 		return falseOptionalFeatures;
 	}
 
@@ -222,7 +230,7 @@ public class Constraint implements PropertyConstants, IGraphicItem {
 	 */
 
 	public boolean hasHiddenFeatures() {
-		for (Feature f : getContainedFeatures()) {
+		for (IFeature f : getContainedFeatures()) {
 			if (f.isHidden() || f.hasHiddenParent()) {
 				return true;
 			}
@@ -235,7 +243,7 @@ public class Constraint implements PropertyConstants, IGraphicItem {
 	 * 
 	 * @param deadFeatures
 	 */
-	public void setDeadFeatures(Collection<Feature> deadFeatures) {
+	public void setDeadFeatures(Collection<IFeature> deadFeatures) {
 		this.deadFeatures = deadFeatures;
 	}
 
@@ -244,7 +252,7 @@ public class Constraint implements PropertyConstants, IGraphicItem {
 	 * 
 	 * @return The dead features
 	 */
-	public Collection<Feature> getDeadFeatures() {
+	public Collection<IFeature> getDeadFeatures() {
 		return deadFeatures;
 	}
 	

@@ -29,9 +29,9 @@ import java.util.List;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
-import de.ovgu.featureide.fm.core.Constraint;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
  * This class is part of the outline. It provides the content that should be
@@ -43,7 +43,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
  */
 public class FmTreeContentProvider implements ITreeContentProvider {
 
-	private FeatureModel fModel;
+	private IFeatureModel fModel;
 
 	@Override
 	public void dispose() {
@@ -51,8 +51,8 @@ public class FmTreeContentProvider implements ITreeContentProvider {
 
 	@Override
 	public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-		if (newInput != null && newInput instanceof FeatureModel)
-			fModel = ((FeatureModel) newInput);
+		if (newInput != null && newInput instanceof IFeatureModel)
+			fModel = ((IFeatureModel) newInput);
 
 	}
 
@@ -77,7 +77,7 @@ public class FmTreeContentProvider implements ITreeContentProvider {
 		// we have a String as parent of constraints
 		if (parentElement instanceof String && CONSTRAINTS.equals(parentElement)) {
 			Object[] elements = new Object[fModel.getConstraintCount()];
-			List<Constraint> cList = fModel.getConstraints();
+			List<IConstraint> cList = fModel.getConstraints();
 			for (int i = 0; i < fModel.getConstraintCount(); i++) {
 				elements[i] = cList.get(i);
 			}
@@ -90,12 +90,12 @@ public class FmTreeContentProvider implements ITreeContentProvider {
 			return featureListToArray(((FmOutlineGroupStateStorage) parentElement).getFeature().getChildren());
 		}
 
-		if (!(parentElement instanceof Feature))
+		if (!(parentElement instanceof IFeature))
 			return null;
-		if (!((Feature) parentElement).hasChildren())
+		if (!((IFeature) parentElement).hasChildren())
 			return null;
 
-		return featureListToArray(((Feature) parentElement).getChildren());
+		return featureListToArray(((IFeature) parentElement).getChildren());
 	}
 
 	/**
@@ -105,8 +105,8 @@ public class FmTreeContentProvider implements ITreeContentProvider {
 	 *            FeatureList
 	 * @return Array of Features
 	 */
-	private Feature[] featureListToArray(LinkedList<Feature> f) {
-		Feature[] fArray = new Feature[f.size()];
+	private IFeature[] featureListToArray(LinkedList<IFeature> f) {
+		IFeature[] fArray = new IFeature[f.size()];
 		for (int i = 0; i < f.size(); i++) {
 			fArray[i] = f.get(i);
 		}
@@ -115,9 +115,9 @@ public class FmTreeContentProvider implements ITreeContentProvider {
 
 	@Override
 	public Object getParent(Object element) {
-		if (element instanceof Feature)
-			return ((Feature) element).getParent();
-		else if (element instanceof Constraint)
+		if (element instanceof IFeature)
+			return ((IFeature) element).getParent();
+		else if (element instanceof IConstraint)
 			return CONSTRAINTS;
 		else if (element instanceof FmOutlineGroupStateStorage)
 			return ((FmOutlineGroupStateStorage) element).getFeature();
@@ -127,8 +127,8 @@ public class FmTreeContentProvider implements ITreeContentProvider {
 
 	@Override
 	public boolean hasChildren(Object element) {
-		if (element instanceof Feature)
-			return ((Feature) element).hasChildren();
+		if (element instanceof IFeature)
+			return ((IFeature) element).hasChildren();
 		else if (element instanceof FmOutlineGroupStateStorage)
 			return true;
 		else if (element instanceof String)

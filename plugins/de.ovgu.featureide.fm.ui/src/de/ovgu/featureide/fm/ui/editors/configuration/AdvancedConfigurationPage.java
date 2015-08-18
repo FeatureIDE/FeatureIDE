@@ -41,7 +41,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
-import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -61,7 +61,7 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 	private static HashMap<String, Image> combinedImages = new HashMap<String, Image>();
 
 	private static Image getImage(SelectableFeature selFeature, Selection selection) {
-		final Feature feature = selFeature.getFeature();
+		final IFeature feature = selFeature.getFeature();
 
 		final Image image1 = getConnectionImage(feature);
 		final Image image2 = getSelectionImage(selFeature, selection);
@@ -97,7 +97,7 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 		return combinedImage;
 	}
 
-	private static Image getConnectionImage(Feature feature) {
+	private static Image getConnectionImage(IFeature feature) {
 		if (!feature.isRoot()) {
 			if (feature.getParent() != null) {
 				if (feature.getParent().isOr()) {

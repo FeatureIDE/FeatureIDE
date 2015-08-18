@@ -39,6 +39,20 @@ import javax.annotation.Nonnull;
 import org.eclipse.core.resources.IProject;
 import org.prop4j.Node;
 
+import de.ovgu.featureide.fm.core.ColorschemeTable;
+import de.ovgu.featureide.fm.core.ConstraintAttribute;
+import de.ovgu.featureide.fm.core.DeprecatedFeatureModel;
+import de.ovgu.featureide.fm.core.EmptyColorschemeTable;
+import de.ovgu.featureide.fm.core.FMComposerManager;
+import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
+import de.ovgu.featureide.fm.core.FeatureModelLayout;
+import de.ovgu.featureide.fm.core.FeatureStatus;
+import de.ovgu.featureide.fm.core.IFMComposerExtension;
+import de.ovgu.featureide.fm.core.IGraphicItem;
+import de.ovgu.featureide.fm.core.PropertyConstants;
+import de.ovgu.featureide.fm.core.RenamingsManager;
+import de.ovgu.featureide.fm.core.IGraphicItem.GraphicItem;
+
 /**
  * The model representation of the feature tree that notifies listeners of
  * changes in the tree.
@@ -50,14 +64,14 @@ import org.prop4j.Node;
  */
 public class FeatureModel extends DeprecatedFeatureModel implements PropertyConstants, IGraphicItem {
 	
-	private Feature rootFeature;
+	private IFeature rootFeature;
 	
 	/**
 	 * A {@link Map} containing all features.
 	 */
-	private final Map<String, Feature> featureTable = new ConcurrentHashMap<String, Feature>();
+	private final Map<String, IFeature> featureTable = new ConcurrentHashMap<String, IFeature>();
 
-	protected final List<Constraint> constraints = new LinkedList<Constraint>();
+	protected final List<IConstraint> constraints = new LinkedList<IConstraint>();
 	
 	private final List<PropertyChangeListener> listenerList = new LinkedList<PropertyChangeListener>();
 	
@@ -130,8 +144,8 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		if (oldFeatureModel.rootFeature != null) {
 			this.rootFeature = oldFeatureModel.rootFeature.clone(this, complete);
 			
-			for (final Constraint constraint : oldFeatureModel.constraints) {
-				this.addConstraint(new Constraint(this, constraint.getNode().clone()));
+			for (final IConstraint constraint : oldFeatureModel.constraints) {
+				this.addConstraint(new IConstraint(this, constraint.getNode().clone()));
 			}
 		}		
 	}
@@ -181,7 +195,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	public void reset() {
 		if (rootFeature != null) {
 			while (rootFeature.hasChildren()) {
-				Feature child = rootFeature.getLastChild();
+				IFeature child = rootFeature.getLastChild();
 				deleteChildFeatures(child);
 				rootFeature.removeChild(child);
 				featureTable.remove(child.getName());
@@ -201,9 +215,9 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		featureOrderList.clear();
 	}
 	
-	private void deleteChildFeatures(Feature feature) {
+	private void deleteChildFeatures(IFeature feature) {
 		while (feature.hasChildren()) {
-			Feature child = feature.getLastChild();
+			IFeature child = feature.getLastChild();
 			deleteChildFeatures(child);
 			feature.removeChild(child);
 			featureTable.remove(child.getName());
@@ -221,10 +235,10 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 			rootName = "Root";
 		}		
 		if (featureTable.isEmpty()) {
-			rootFeature = new Feature(this, rootName);
+			rootFeature = new IFeature(this, rootName);
 			addFeature(rootFeature);
 		}
-		Feature feature = new Feature(this, "Base");
+		IFeature feature = new IFeature(this, "Base");
 		addFeature(feature);
 		
 		rootFeature.addChild(feature);
@@ -257,11 +271,11 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	 * Feature handling
 	 * 
 	 *******************************************************************/
-	public void setRoot(Feature root) {
+	public void setRoot(IFeature root) {
 		this.rootFeature = root;
 	}
 	
-	public Feature getRoot() {
+	public IFeature getRoot() {
 		return rootFeature;
 	}
 
@@ -269,12 +283,12 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	 * @param featureTable
 	 *            the featureTable to set
 	 */
-	public void setFeatureTable(final Hashtable<String, Feature> featureTable) {
+	public void setFeatureTable(final Hashtable<String, IFeature> featureTable) {
 		this.featureTable.clear();
 		this.featureTable.putAll(featureTable);
 	}
 	
-	public boolean addFeature(Feature feature) {
+	public boolean addFeature(IFeature feature) {
 		String name = feature.getName();
 		if (featureTable.containsKey(name))
 			return false;
@@ -282,15 +296,15 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		return true;
 	}
 	
-	public Collection<Feature> getFeatures() {
+	public Collection<IFeature> getFeatures() {
 		return Collections.unmodifiableCollection(featureTable.values());
 	}
 	
 	/**
-	 * @return The {@link Feature} with the given name or {@code null} if there is no feature with this name. 
+	 * @return The {@link IFeature} with the given name or {@code null} if there is no feature with this name. 
 	 */
 	@CheckForNull
-	public Feature getFeature(String name) {
+	public IFeature getFeature(String name) {
 		return featureTable.get(name);
 	}
 
@@ -299,19 +313,19 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	 * @return A list of all concrete features. This list is in preorder of the tree. 
 	 */
 	@Nonnull
-	public Collection<Feature> getConcreteFeatures() {
-		List<Feature> concreteFeatures = new LinkedList<Feature>();
+	public Collection<IFeature> getConcreteFeatures() {
+		List<IFeature> concreteFeatures = new LinkedList<IFeature>();
 		if (rootFeature != null) {
 			getConcreteFeatures(rootFeature, concreteFeatures);
 		}
 		return Collections.unmodifiableCollection(concreteFeatures);
 	}
 
-	private void getConcreteFeatures(Feature feature, List<Feature> concreteFeatures) {
+	private void getConcreteFeatures(IFeature feature, List<IFeature> concreteFeatures) {
 		if (feature.isConcrete()) {
 			concreteFeatures.add(feature);
 		}
-		for (Feature child : feature.getChildren()) {
+		for (IFeature child : feature.getChildren()) {
 			getConcreteFeatures(child, concreteFeatures);
 		}
 	}
@@ -323,31 +337,31 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	@Nonnull
 	public List<String> getConcreteFeatureNames() {
 		List<String> concreteFeatureNames = new LinkedList<String>();
-		for (Feature f : getConcreteFeatures()) {
+		for (IFeature f : getConcreteFeatures()) {
 			concreteFeatureNames.add(f.getName());
 		}
 		return concreteFeatureNames;
 	}
 	
-	public Collection<Feature> getFeaturesPreorder() {
-		List<Feature> preorderFeatures = new LinkedList<Feature>();
+	public Collection<IFeature> getFeaturesPreorder() {
+		List<IFeature> preorderFeatures = new LinkedList<IFeature>();
 		if (rootFeature != null) {
 			getFeaturesPreorder(rootFeature, preorderFeatures);
 		}
 		return Collections.unmodifiableCollection(preorderFeatures);
 	}
 
-	private void getFeaturesPreorder(Feature feature, List<Feature> preorderFeatures) {
+	private void getFeaturesPreorder(IFeature feature, List<IFeature> preorderFeatures) {
 		
 		preorderFeatures.add(feature);
-		for (Feature child : feature.getChildren()) {
+		for (IFeature child : feature.getChildren()) {
 			getFeaturesPreorder(child, preorderFeatures);
 		}
 	}
 	
 	public List<String> getFeatureNamesPreorder() {
 		List<String> preorderFeaturesNames = new LinkedList<String>();
-		for (Feature f : getFeaturesPreorder()) {
+		for (IFeature f : getFeaturesPreorder()) {
 			preorderFeaturesNames.add(f.getName());
 		}
 		return preorderFeaturesNames;
@@ -359,14 +373,14 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	 */
 	@Deprecated
 	public boolean isConcrete(String featureName) {
-		Feature feature = featureTable.get(featureName);
+		IFeature feature = featureTable.get(featureName);
 		return feature != null && feature.isConcrete();
 	}
 	
 	/**
 	 * @return the featureTable
 	 */
-	protected Map<String, Feature> getFeatureTable() {
+	protected Map<String, IFeature> getFeatureTable() {
 		return featureTable;
 	}
 	
@@ -378,11 +392,11 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		return featureTable.size();
 	}
 
-	public void deleteFeatureFromTable(Feature feature) {
+	public void deleteFeatureFromTable(IFeature feature) {
 		featureTable.remove(feature.getName());
 	}
 
-	public boolean deleteFeature(Feature feature) {
+	public boolean deleteFeature(IFeature feature) {
 		// the root can not be deleted
 		if (feature == rootFeature) {
 			return false;
@@ -395,7 +409,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		}
 
 		// use the group type of the feature to delete
-		Feature parent = feature.getParent();
+		IFeature parent = feature.getParent();
 
 		if (parent.getChildrenCount() == 1) {
 			if (feature.isAnd()) {
@@ -420,7 +434,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		return true;
 	}
 	
-	public void replaceRoot(Feature feature) {
+	public void replaceRoot(IFeature feature) {
 		featureTable.remove(rootFeature.getName());
 		rootFeature = feature;
 	}
@@ -430,30 +444,30 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	 * Constraint handling
 	 * 
 	 *#*****************************************************************/
-	public void setConstraints(final LinkedList<Constraint> constraints) {
+	public void setConstraints(final LinkedList<IConstraint> constraints) {
 		this.constraints.clear();
 		this.constraints.addAll(constraints);
 	}
 	
 	public void addPropositionalNode(Node node) {
-		addConstraint(new Constraint(this, node));
+		addConstraint(new IConstraint(this, node));
 	}
 	
-	public void addConstraint(Constraint constraint) {
+	public void addConstraint(IConstraint constraint) {
 		constraints.add(constraint);
 	}
 
 	public void addPropositionalNode(Node node, int index) {
-		addConstraint(new Constraint(this, node), index);
+		addConstraint(new IConstraint(this, node), index);
 	}
 	
-	public void addConstraint(Constraint constraint, int index) {
+	public void addConstraint(IConstraint constraint, int index) {
 		constraints.add(index, constraint);
 	}
 	
 	public List<Node> getPropositionalNodes() {
 		LinkedList<Node> nodes = new LinkedList<Node>();
-		for (Constraint c : constraints) {
+		for (IConstraint c : constraints) {
 			nodes.add(c.getNode());
 		}
 		return Collections.unmodifiableList(nodes);
@@ -463,19 +477,19 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		return constraints.get(index).getNode();
 	}
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
-	public List<Constraint> getConstraints() {
+	public List<IConstraint> getConstraints() {
 		return Collections.unmodifiableList(constraints);
 	}
 
 	/**
 	 * 
 	 * @param constraint
-	 * @return The position of the given {@link Constraint} or 
+	 * @return The position of the given {@link IConstraint} or 
 	 * 			-1 if it does not exist.
 	 */
-	public int getConstraintIndex(Constraint constraint) {
+	public int getConstraintIndex(IConstraint constraint) {
 		int j = 0;
-		for (Constraint c : constraints) {
+		for (IConstraint c : constraints) {
 			if (constraint == c) {
 				return j;
 			}
@@ -485,7 +499,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	}
 
 	public void removePropositionalNode(Node node) {
-		for (Constraint c : constraints) {
+		for (IConstraint c : constraints) {
 			if (c.getNode().equals(node)) {
 				removeConstraint(c);
 				break;
@@ -493,7 +507,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		}
 	}
 
-	public void removeConstraint(Constraint constraint) {
+	public void removeConstraint(IConstraint constraint) {
 		constraints.remove(constraint);
 	}
 
@@ -503,7 +517,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	
 	public void replacePropNode(int index, Node node) {
 		assert (index < constraints.size());
-		constraints.set(index, new Constraint(this, node));
+		constraints.set(index, new IConstraint(this, node));
 	}
 	
 	public int getConstraintCount() {
@@ -576,7 +590,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		clone.featureTable.putAll(featureTable);
 		if (rootFeature == null) {
 			// TODO this should never happen
-			clone.rootFeature = new Feature(clone, "Root");
+			clone.rootFeature = new IFeature(clone, "Root");
 			clone.featureTable.put("root", clone.rootFeature);
 		} else {
 			clone.rootFeature = clone.getFeature(rootFeature.getName());
@@ -617,8 +631,8 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	 * @return true if feature model contains mandatory features otherwise false
 	 */
 	public boolean hasMandatoryFeatures() {
-		for (Feature f : featureTable.values()) {
-			Feature parent = f.getParent();
+		for (IFeature f : featureTable.values()) {
+			IFeature parent = f.getParent();
 			if (parent != null && parent.isAnd() && f.isMandatory())
 				return true;
 		}
@@ -629,7 +643,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	 * @return <code>true</code> if feature model contains optional features otherwise false
 	 */
 	public boolean hasOptionalFeatures() {
-		for (Feature f : featureTable.values()) {
+		for (IFeature f : featureTable.values()) {
 			if (!f.equals(rootFeature) && f.getParent().isAnd()
 					&& !f.isMandatory())
 				return true;
@@ -641,7 +655,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	 * @return true if feature model contains and group otherwise false
 	 */
 	public boolean hasAndGroup() {
-		for (Feature f : featureTable.values()) {
+		for (IFeature f : featureTable.values()) {
 			if (f.getChildrenCount() > 1 && f.isAnd())
 				return true;
 		}
@@ -652,7 +666,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	 * @return true if feature model contains alternative group otherwise false
 	 */
 	public boolean hasAlternativeGroup() {
-		for (Feature f : featureTable.values()) {
+		for (IFeature f : featureTable.values()) {
 			if (f.getChildrenCount() > 1 && f.isAlternative())
 				return true;
 		}
@@ -663,7 +677,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	 * @return true if feature model contains or group otherwise false
 	 */
 	public boolean hasOrGroup() {
-		for (Feature f : featureTable.values()) {
+		for (IFeature f : featureTable.values()) {
 			if (f.getChildrenCount() > 1 && f.isOr())
 				return true;
 		}
@@ -671,7 +685,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	}
 
 	public boolean hasAbstract() {
-		for (Feature f : featureTable.values()) {
+		for (IFeature f : featureTable.values()) {
 			if (f.isAbstract())
 				return true;
 		}
@@ -679,7 +693,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	}
 
 	public boolean hasConcrete() {
-		for (Feature f : featureTable.values()) {
+		for (IFeature f : featureTable.values()) {
 			if (f.isConcrete())
 				return true;
 		}
@@ -691,7 +705,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	 */
 	public int numOrGroup() {
 		int count = 0;
-		for (Feature f : featureTable.values()) {
+		for (IFeature f : featureTable.values()) {
 			if (f.getChildrenCount() > 1 && f.isOr()) {
 				count++;
 			}
@@ -701,7 +715,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	
 	public int numAlternativeGroup() {
 		int count = 0;
-		for (Feature f : featureTable.values()) {
+		for (IFeature f : featureTable.values()) {
 			if (f.getChildrenCount() > 1 && f.isAlternative()) {
 				count++;
 			}
@@ -714,7 +728,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	 * @return <code>true</code> if the feature model contains a hidden feature
 	 */
 	public boolean hasHidden() {
-		for (Feature f : featureTable.values()) {
+		for (IFeature f : featureTable.values()) {
 			if (f.isHidden()) {
 				return true;
 			}
@@ -723,7 +737,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	}
 
 	public boolean hasIndetHidden() {
-		for (Feature f : featureTable.values()) {
+		for (IFeature f : featureTable.values()) {
 			if (f.getFeatureStatus() == FeatureStatus.INDETERMINATE_HIDDEN) {
 				return true;
 			}
@@ -732,7 +746,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	}
 	
 	public boolean hasUnsatisfiableConst() {
-		for (Constraint c : constraints) {
+		for (IConstraint c : constraints) {
 			if (c.getConstraintAttribute() == ConstraintAttribute.UNSATISFIABLE) {
 				return true;
 			}
@@ -741,7 +755,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	}
 	
 	public boolean hasTautologyConst() {
-		for (Constraint c : constraints) {
+		for (IConstraint c : constraints) {
 			if (c.getConstraintAttribute() == ConstraintAttribute.TAUTOLOGY) {
 				return true;
 			}
@@ -749,7 +763,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		return false;
 	}
 	public boolean hasDeadConst() {
-		for (Constraint c : constraints) {
+		for (IConstraint c : constraints) {
 			if (c.getConstraintAttribute() == ConstraintAttribute.DEAD || !c.getDeadFeatures().isEmpty()) {
 				return true;
 			}
@@ -758,7 +772,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	}
 	
 	public boolean hasVoidModelConst() {
-		for (Constraint c : constraints) {
+		for (IConstraint c : constraints) {
 			if (c.getConstraintAttribute() == ConstraintAttribute.VOID_MODEL)
 				return true;
 		}
@@ -766,7 +780,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	}
 	
 	public boolean hasRedundantConst() {
-		for (Constraint c : constraints) {
+		for (IConstraint c : constraints) {
 			if (c.getConstraintAttribute() == ConstraintAttribute.REDUNDANT) {
 				return true;
 			}
@@ -776,7 +790,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 
 
 	public boolean hasFalseOptionalFeatures() {
-		for (Feature f : featureTable.values()) {
+		for (IFeature f : featureTable.values()) {
 			if (f.getFeatureStatus() == FeatureStatus.FALSE_OPTIONAL) {
 				return true;
 			}
@@ -825,7 +839,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		String x = "";
 		try {
 			x = toString(getRoot());
-			for (Constraint c : getConstraints()) {
+			for (IConstraint c : getConstraints()) {
 				x +=c.toString() + " ";
 			}
 		} catch (Exception e) {
@@ -834,7 +848,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		return x;
 	}
 	
-	private String toString(Feature feature) {
+	private String toString(IFeature feature) {
 		String x = feature.getName();
 		if (!feature.hasChildren()) {
 			return x;
@@ -847,7 +861,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 			x += " and [";
 		}
 		
-		for (Feature child : feature.getChildren()) {
+		for (IFeature child : feature.getChildren()) {
 			x += " ";
 			if (feature.isAnd()) {
 				if (child.isMandatory()) {
@@ -877,7 +891,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		for (String f : featureOrderList) {
 			hash = hash * 7 + f.hashCode();
 		}
-		for (Constraint c : constraints) {
+		for (IConstraint c : constraints) {
 			hash = hash * 7 + c.toString().hashCode();
 		}
 		return hash;

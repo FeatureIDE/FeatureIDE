@@ -38,9 +38,9 @@ import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.prop4j.NodeWriter;
 
-import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.ConstraintAttribute;
-import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIBasics;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -75,9 +75,9 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 
 	private final Label label = new Label();
 
-	private Constraint constraint;
+	private IConstraint constraint;
 
-	public ConstraintFigure(Constraint constraint) {
+	public ConstraintFigure(IConstraint constraint) {
 		super();
 		this.constraint = constraint;
 		setLayoutManager(new FreeformLayout());
@@ -137,7 +137,7 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
 			toolTip.append(DEAD_FEATURE);
 			ArrayList<String> deadFeatures = new ArrayList<String>(constraint.getDeadFeatures().size());
-			for (Feature dead : constraint.getDeadFeatures()) {
+			for (IFeature dead : constraint.getDeadFeatures()) {
 				deadFeatures.add(dead.toString());
 			}
 			Collections.sort(deadFeatures, String.CASE_INSENSITIVE_ORDER);
@@ -157,7 +157,7 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 			}
 
 			ArrayList<String> falseOptionalFeatures = new ArrayList<String>(constraint.getFalseOptional().size());
-			for (Feature feature : constraint.getFalseOptional()) {
+			for (IFeature feature : constraint.getFalseOptional()) {
 				falseOptionalFeatures.add(feature.toString());
 			}
 			Collections.sort(falseOptionalFeatures, String.CASE_INSENSITIVE_ORDER);
@@ -178,7 +178,7 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 		}
 	}
 
-	private String getConstraintText(Constraint constraint) {
+	private String getConstraintText(IConstraint constraint) {
 		return constraint.getNode().toString(symbols);
 	}
 

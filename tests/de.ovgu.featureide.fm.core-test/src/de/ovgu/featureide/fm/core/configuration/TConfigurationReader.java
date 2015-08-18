@@ -31,7 +31,7 @@ import java.io.InputStream;
 import org.junit.Test;
 
 import de.ovgu.featureide.core.featuremodeling.FeatureModelingFMExtension;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 
@@ -57,7 +57,7 @@ protected static File MODEL_FILE_FOLDER = getFolder();
 	String text = ""; 
 	InputStream a; // = new InputStream(text.getBytes(Charset.availableCharsets().get("UTF-8")));
 	
-	private FeatureModel FM_test_1 = init("test_5.xml");
+	private IFeatureModel FM_test_1 = init("test_5.xml");
 	
 	
 	private static File getFolder() { 
@@ -69,8 +69,8 @@ protected static File MODEL_FILE_FOLDER = getFolder();
 	}
 	
 	
-	private final FeatureModel init(String name) {
-		FeatureModel fm = new FeatureModel();
+	private final IFeatureModel init(String name) {
+		IFeatureModel fm = new IFeatureModel();
 		FeatureModelingFMExtension comp = new FeatureModelingFMExtension();
 		fm.getFMComposerManager(null).setComposerID("de.ovgu.featureide.core.FeatureModeling", comp);
 		for (File f : MODEL_FILE_FOLDER.listFiles(filter)) {

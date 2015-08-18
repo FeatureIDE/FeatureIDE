@@ -69,8 +69,8 @@ import org.prop4j.SatSolver;
 import splar.core.fm.FeatureModelException;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
@@ -90,7 +90,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	private static final UIPlugin LOGGER = UIPlugin.getDefault();
 
 	IFeatureProject featureProject;
-	private FeatureModel featureModel;
+	private IFeatureModel featureModel;
 
 	/**
 	 * This is the place where all configurations should be generated if no new
@@ -567,7 +567,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		}
 		
 
-		for (Feature coreFeature : featureModel.getAnalyser().getCoreFeatures()) {
+		for (IFeature coreFeature : featureModel.getAnalyser().getCoreFeatures()) {
 			if (coreFeature.getName().equals(featureName)) {
 				configurationNumber = 1;
 				return;
@@ -606,7 +606,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		boolean canDeselect = true;
 		while (canDeselect) {
 			canDeselect = false;
-			for (Feature feature : configuration.getSelectedFeatures()) {
+			for (IFeature feature : configuration.getSelectedFeatures()) {
 				if (feature.getName().equals(featureName)) {
 					continue;
 				}
@@ -698,7 +698,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			for (final Integer i : solution) {
 				if (i > 0) {
 					String id = ca.getId(i);
-					final Feature feature = featureModel.getFeature(id);
+					final IFeature feature = featureModel.getFeature(id);
 					if (feature != null && feature.isConcrete()) {
 						convertedSolution.add(feature.getName());
 					}
@@ -793,8 +793,8 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 *            The root feature of the feature model
 	 * @param monitor
 	 */
-	private void buildAll(Feature root, IProgressMonitor monitor) {
-		LinkedList<Feature> selectedFeatures2 = new LinkedList<Feature>();
+	private void buildAll(IFeature root, IProgressMonitor monitor) {
+		LinkedList<IFeature> selectedFeatures2 = new LinkedList<IFeature>();
 		selectedFeatures2.add(root);
 		rootNode = NodeCreator.createNodes(featureModel, false).toCNF();
 		children = new LinkedList<Node>();
@@ -802,7 +802,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		sorter.sortConfigurations(monitor);
 	}
 
-	private void build(Feature currentFeature, String selected, LinkedList<Feature> selectedFeatures2, IProgressMonitor monitor) {
+	private void build(IFeature currentFeature, String selected, LinkedList<IFeature> selectedFeatures2, IProgressMonitor monitor) {
 		if (monitor.isCanceled()) {
 			cancelGenerationJobs();
 			return;
@@ -852,7 +852,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 						selectedFeatures3.add(f);
 					}
 				}
-				for (Feature f : configuration.getSelectedFeatures()) {
+				for (IFeature f : configuration.getSelectedFeatures()) {
 					if (f.isConcrete()) {
 						if (!selectedFeatures3.contains(f.getName())) {
 							return;
@@ -929,10 +929,10 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		return "Built configurations: " + built + "/" + (configurationNumber == 0 ? COUNTING___ : configurationNumber) + "(" + buffer + " buffered)" + " Expected time: " + t;
 	}
 
-	private void buildAlternative(String selected, LinkedList<Feature> selectedFeatures2, IProgressMonitor monitor) {
-		Feature currentFeature = selectedFeatures2.getFirst();
+	private void buildAlternative(String selected, LinkedList<IFeature> selectedFeatures2, IProgressMonitor monitor) {
+		IFeature currentFeature = selectedFeatures2.getFirst();
 		selectedFeatures2.removeFirst();
-		LinkedList<Feature> selectedFeatures3 = new LinkedList<Feature>();
+		LinkedList<IFeature> selectedFeatures3 = new LinkedList<IFeature>();
 		if (currentFeature.isConcrete()) {
 			if ("".equals(selected)) {
 				selected = currentFeature.getName();
@@ -951,17 +951,17 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			return;
 		}
 		for (int i2 = 0; i2 < getChildren(currentFeature).size(); i2++) {
-			selectedFeatures3 = new LinkedList<Feature>();
+			selectedFeatures3 = new LinkedList<IFeature>();
 			selectedFeatures3.add(getChildren(currentFeature).get(i2));
 			selectedFeatures3.addAll(selectedFeatures2);
 			build(selectedFeatures3.isEmpty() ? null : selectedFeatures3.getFirst(), selected, selectedFeatures3, monitor);
 		}
 	}
 
-	private void buildOr(String selected, LinkedList<Feature> selectedFeatures2, IProgressMonitor monitor) {
-		Feature currentFeature = selectedFeatures2.getFirst();
+	private void buildOr(String selected, LinkedList<IFeature> selectedFeatures2, IProgressMonitor monitor) {
+		IFeature currentFeature = selectedFeatures2.getFirst();
 		selectedFeatures2.removeFirst();
-		LinkedList<Feature> selectedFeatures3 = new LinkedList<Feature>();
+		LinkedList<IFeature> selectedFeatures3 = new LinkedList<IFeature>();
 		if (currentFeature.isConcrete()) {
 			if ("".equals(selected)) {
 				selected = currentFeature.getName();
@@ -986,7 +986,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		}
 		for (; i2 < (int) java.lang.Math.pow(2, getChildren(currentFeature).size()); i2++) {
 			k2 = i2;
-			selectedFeatures3 = new LinkedList<Feature>();
+			selectedFeatures3 = new LinkedList<IFeature>();
 			for (int j = 0; j < getChildren(currentFeature).size(); j++) {
 				if (k2 % 2 != 0) {
 					selectedFeatures3.add(getChildren(currentFeature).get(j));
@@ -998,9 +998,9 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		}
 	}
 
-	private void buildAnd(String selected, LinkedList<Feature> selectedFeatures2, IProgressMonitor monitor) {
-		Feature currentFeature = selectedFeatures2.removeFirst();
-		LinkedList<Feature> selectedFeatures3 = new LinkedList<Feature>();
+	private void buildAnd(String selected, LinkedList<IFeature> selectedFeatures2, IProgressMonitor monitor) {
+		IFeature currentFeature = selectedFeatures2.removeFirst();
+		LinkedList<IFeature> selectedFeatures3 = new LinkedList<IFeature>();
 		if (currentFeature.isConcrete()) {
 			if ("".equals(selected)) {
 				selected = currentFeature.getName();
@@ -1019,8 +1019,8 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			return;
 		}
 		int k2;
-		LinkedList<Feature> optionalFeatures = new LinkedList<Feature>();
-		for (Feature f : getChildren(currentFeature)) {
+		LinkedList<IFeature> optionalFeatures = new LinkedList<IFeature>();
+		for (IFeature f : getChildren(currentFeature)) {
 			if (f.isMandatory()) {
 				selectedFeatures2.add(f);
 			} else {
@@ -1030,7 +1030,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 
 		for (int i2 = 0; i2 < (int) java.lang.Math.pow(2, optionalFeatures.size()); i2++) {
 			k2 = i2;
-			selectedFeatures3 = new LinkedList<Feature>();
+			selectedFeatures3 = new LinkedList<IFeature>();
 			for (int j = 0; j < optionalFeatures.size(); j++) {
 				if (k2 % 2 != 0) {
 					selectedFeatures3.add(optionalFeatures.get(j));
@@ -1051,9 +1051,9 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 *            The feature
 	 * @return The children
 	 */
-	private LinkedList<Feature> getChildren(Feature currentFeature) {
-		LinkedList<Feature> children = new LinkedList<Feature>();
-		for (Feature child : currentFeature.getChildren()) {
+	private LinkedList<IFeature> getChildren(IFeature currentFeature) {
+		LinkedList<IFeature> children = new LinkedList<IFeature>();
+		for (IFeature child : currentFeature.getChildren()) {
 			if (child.isConcrete() || hasLayerChild(child)) {
 				children.add(child);
 			}
@@ -1067,9 +1067,9 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 * @return <code>true</code> if the feature is a layer or if it has a child
 	 *         that is a layer
 	 */
-	private boolean hasLayerChild(Feature feature) {
+	private boolean hasLayerChild(IFeature feature) {
 		if (feature.hasChildren()) {
-			for (Feature child : feature.getChildren()) {
+			for (IFeature child : feature.getChildren()) {
 				if (child.isConcrete() || hasLayerChild(child)) {
 					return true;
 				}

@@ -24,7 +24,7 @@ import org.eclipse.draw2d.AbstractConnectionAnchor;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.geometry.Point;
 
-import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 
 /**
@@ -34,9 +34,9 @@ import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
  */
 public class SourceAnchor extends AbstractConnectionAnchor {
 
-	private Feature model;
+	private IFeature model;
 
-	public SourceAnchor(IFigure owner, Feature model) {
+	public SourceAnchor(IFigure owner, IFeature model) {
 		super(owner);
 		this.model = model;
 	}

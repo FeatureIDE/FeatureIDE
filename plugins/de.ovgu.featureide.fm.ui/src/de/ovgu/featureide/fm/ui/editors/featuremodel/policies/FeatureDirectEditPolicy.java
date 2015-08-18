@@ -24,8 +24,8 @@ import org.eclipse.gef.commands.Command;
 import org.eclipse.gef.editpolicies.DirectEditPolicy;
 import org.eclipse.gef.requests.DirectEditRequest;
 
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.FeatureRenamingCommand;
 
 /**
@@ -35,11 +35,11 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.FeatureRenamingCom
  */
 public class FeatureDirectEditPolicy extends DirectEditPolicy {
 
-	private final FeatureModel featureModel;
+	private final IFeatureModel featureModel;
 
-	private final Feature feature;
+	private final IFeature feature;
 
-	public FeatureDirectEditPolicy(FeatureModel featureModel, Feature feature) {
+	public FeatureDirectEditPolicy(IFeatureModel featureModel, IFeature feature) {
 		this.featureModel = featureModel;
 		this.feature = feature;
 	}

@@ -20,9 +20,9 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.layouts;
 
-import de.ovgu.featureide.fm.core.Constraint;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 
 /**
@@ -40,11 +40,11 @@ public class ManualLayout extends FeatureDiagramLayoutManager {
 		super();
 	}
 
-	public void layoutFeatureModel(FeatureModel featureModel) {
-		for (Feature feature : featureModel.getFeatures()) {
+	public void layoutFeatureModel(IFeatureModel featureModel) {
+		for (IFeature feature : featureModel.getFeatures()) {
 			FeatureUIHelper.setLocation(feature, feature.getLocation());
 		}
-		for (Constraint constraint : featureModel.getConstraints()) {
+		for (IConstraint constraint : featureModel.getConstraints()) {
 			FeatureUIHelper.setLocation(constraint, constraint.getLocation());
 		}
 	}

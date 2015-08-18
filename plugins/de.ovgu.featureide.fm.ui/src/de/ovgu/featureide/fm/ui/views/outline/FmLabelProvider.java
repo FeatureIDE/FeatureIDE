@@ -27,8 +27,8 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.prop4j.NodeWriter;
 
-import de.ovgu.featureide.fm.core.Constraint;
-import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 
 /**
@@ -90,23 +90,23 @@ public class FmLabelProvider implements ILabelProvider,IFontProvider, GUIDefault
 	 */
 	@Override
 	public Image getImage(Object element) {
-		if (element instanceof Feature) {
-			if ((((Feature) element).isRoot()))
+		if (element instanceof IFeature) {
+			if ((((IFeature) element).isRoot()))
 				return null; // TODO: Add here icon for feature model
-			if (((Feature) element).getParent().isAlternative()) {
+			if (((IFeature) element).getParent().isAlternative()) {
 				return IMG_XOR;
 			}
-			else if (((Feature) element).getParent().isOr()) {
+			else if (((IFeature) element).getParent().isOr()) {
 				return IMG_OR;
 			}
-			else if (((Feature) element).isMandatory()) {
+			else if (((IFeature) element).isMandatory()) {
 				return IMG_MANDATORY;
 			} else {
 				return IMG_OPTIONAL;
 			}
 		} else if (element instanceof String) {
 			return null; // TODO: Add here icon for "constraint" node
-		} else if (element instanceof Constraint) {
+		} else if (element instanceof IConstraint) {
 			return null; // TODO: Add here icon for CONSTRAINT_ELEMENT node
 		} else return null;
 	}
@@ -119,10 +119,10 @@ public class FmLabelProvider implements ILabelProvider,IFontProvider, GUIDefault
 	 */
 	@Override
 	public String getText(Object element) {
-		if (element instanceof Feature)
-			return ((Feature) element).getName();
-		else if (element instanceof Constraint)
-			return ((Constraint) element).getNode().toString(NodeWriter.logicalSymbols);
+		if (element instanceof IFeature)
+			return ((IFeature) element).getName();
+		else if (element instanceof IConstraint)
+			return ((IConstraint) element).getNode().toString(NodeWriter.logicalSymbols);
 		else if (element instanceof FmOutlineGroupStateStorage)
 			return "";
 	

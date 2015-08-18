@@ -26,8 +26,8 @@ import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.gef.commands.Command;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.Constraint;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ConstraintMoveOperation;
@@ -43,13 +43,13 @@ public class ConstraintDragAndDropCommand extends Command {
 	private int maxRight;
 	private int maxUp;
 	private int maxDown;
-	private FeatureModel featureModel;
-	private Constraint constraint;
+	private IFeatureModel featureModel;
+	private IConstraint constraint;
 	private Point newLocation;
 	private boolean hasAutoLayout;
 	boolean isLastPos;
 
-	public ConstraintDragAndDropCommand(FeatureModel featureModel, Constraint constraint, Point newLocation) {
+	public ConstraintDragAndDropCommand(IFeatureModel featureModel, IConstraint constraint, Point newLocation) {
 		// super("Moving " + constraint.getNode().toString());
 		this.featureModel = featureModel;
 		this.constraint = constraint;
@@ -94,7 +94,7 @@ public class ConstraintDragAndDropCommand extends Command {
 	 */
 	private int calculateNewIndex() {
 
-		for (Constraint c : featureModel.getConstraints()) {
+		for (IConstraint c : featureModel.getConstraints()) {
 			if ((FeatureUIHelper.getLocation(c).y + 17) > newLocation.y) {
 				isLastPos = false;
 
@@ -110,7 +110,7 @@ public class ConstraintDragAndDropCommand extends Command {
 	public void setMaxValues() {
 		maxLeft = FeatureUIHelper.getLocation(constraint).x;
 		maxUp = FeatureUIHelper.getLocation(constraint).y;
-		for (Constraint c : featureModel.getConstraints()) {
+		for (IConstraint c : featureModel.getConstraints()) {
 
 			if (FeatureUIHelper.getLocation(c).x < maxLeft) {
 				maxLeft = FeatureUIHelper.getLocation(c).x;

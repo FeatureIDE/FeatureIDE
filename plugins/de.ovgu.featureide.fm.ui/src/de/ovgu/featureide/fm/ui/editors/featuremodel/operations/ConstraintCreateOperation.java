@@ -24,8 +24,8 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_CONSTRA
 
 import org.prop4j.Node;
 
-import de.ovgu.featureide.fm.core.Constraint;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
 
 /**
@@ -36,7 +36,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayou
  */
 public class ConstraintCreateOperation extends AbstractFeatureModelOperation {
 	private final static String LABEL = CREATE_CONSTRAINT;
-	private Constraint constraint;
+	private IConstraint constraint;
 
 	/**
 	 * @param node
@@ -44,9 +44,9 @@ public class ConstraintCreateOperation extends AbstractFeatureModelOperation {
 	 * @param featureModel
 	 *            model that will be used to add the constraint
 	 */
-	public ConstraintCreateOperation(Node node, FeatureModel featureModel) {
+	public ConstraintCreateOperation(Node node, IFeatureModel featureModel) {
 		super(featureModel, LABEL);
-		constraint = new Constraint(featureModel, node);
+		constraint = new IConstraint(featureModel, node);
 	}
 
 	@Override

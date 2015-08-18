@@ -22,8 +22,8 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_HIDDEN;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_NOT_HIDDEN;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
  * Operation with functionality to set a Feature hidden. Enables undo/redo
@@ -35,14 +35,14 @@ public class FeatureSetHiddenOperation extends AbstractFeatureModelOperation {
 
 	private static final String LABEL_NOT_HIDDEN = SET_FEATURE_NOT_HIDDEN;
 	private static final String LABEL_HIDDEN = SET_FEATURE_HIDDEN;
-	private Feature feature;
+	private IFeature feature;
 
-	public FeatureSetHiddenOperation(Feature feature, FeatureModel featureModel) {
+	public FeatureSetHiddenOperation(IFeature feature, IFeatureModel featureModel) {
 		super(featureModel, getLabel(feature));
 		this.feature = feature;
 	}
 
-	private static String getLabel(Feature feature) {
+	private static String getLabel(IFeature feature) {
 		if (feature.isHidden()) {
 			return LABEL_NOT_HIDDEN;
 		} else {

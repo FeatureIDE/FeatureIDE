@@ -30,8 +30,11 @@ import org.eclipse.core.resources.IProject;
 import org.prop4j.Node;
 import org.sat4j.specs.TimeoutException;
 
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+
 /**
- * Contains all deprecated functionality of {@link FeatureModel}.
+ * Contains all deprecated functionality of {@link IFeatureModel}.
  * 
  * @author Jens Meinicke
  */
@@ -66,7 +69,7 @@ abstract class DeprecatedFeatureModel {
 	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#checkImplies(Set, Set)} instead.
 	 */
 	@Deprecated
-	public boolean checkImplies(Set<Feature> a, Set<Feature> b) throws TimeoutException {
+	public boolean checkImplies(Set<IFeature> a, Set<IFeature> b) throws TimeoutException {
 	    	return getAnalyser().checkImplies(a, b);
 	}
 
@@ -82,8 +85,8 @@ abstract class DeprecatedFeatureModel {
 	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#areMutualExclusive(Set, List)} instead.
 	 */
 	@Deprecated
-	public boolean areMutualExclusive(Set<Feature> context,
-			List<Set<Feature>> featureSets) throws TimeoutException {
+	public boolean areMutualExclusive(Set<IFeature> context,
+			List<Set<IFeature>> featureSets) throws TimeoutException {
 	    	return getAnalyser().areMutualExclusive(context, featureSets);
 	}
 
@@ -91,8 +94,8 @@ abstract class DeprecatedFeatureModel {
 	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#mayBeMissing(Set, List)} instead.
 	 */
 	@Deprecated
-	public boolean mayBeMissing(Set<Feature> context,
-			List<Set<Feature>> featureSets) throws TimeoutException {
+	public boolean mayBeMissing(Set<IFeature> context,
+			List<Set<IFeature>> featureSets) throws TimeoutException {
 		return getAnalyser().mayBeMissing(context, featureSets);
 	}
 
@@ -100,7 +103,7 @@ abstract class DeprecatedFeatureModel {
 	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#exists(Set)} instead.
 	 */
 	@Deprecated
-	public boolean exists(Set<Feature> features) throws TimeoutException {
+	public boolean exists(Set<IFeature> features) throws TimeoutException {
 	    	return getAnalyser().exists(features);
 	}
 
@@ -108,7 +111,7 @@ abstract class DeprecatedFeatureModel {
 	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#conjunct(Set)} instead.
 	 */
 	@Deprecated
-	public Node conjunct(Set<Feature> b) {
+	public Node conjunct(Set<IFeature> b) {
 	    	return getAnalyser().conjunct(b);
 	}
 
@@ -149,8 +152,8 @@ abstract class DeprecatedFeatureModel {
 	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#getDeadFeatures()} instead.
 	 */
 	@Deprecated
-	public LinkedList<Feature> getDeadFeatures() {
-		return new LinkedList<Feature>(getAnalyser().getDeadFeatures());
+	public LinkedList<IFeature> getDeadFeatures() {
+		return new LinkedList<IFeature>(getAnalyser().getDeadFeatures());
 	}
 	/**
 	 * @deprecated Will be removed in a future release. Use {@link FeatureModelLayout#getLegendPos()} instead.
@@ -313,8 +316,8 @@ abstract class DeprecatedFeatureModel {
 	 * @deprecated Will be removed in a future release. Use {@link FeatureModelAnalyzer#getCachedDeadFeatures()} instead.
 	 */
 	@Deprecated
-	public LinkedList<Feature> getCalculatedDeadFeatures() {
-		return new LinkedList<Feature>(getAnalyser().getCachedDeadFeatures());
+	public LinkedList<IFeature> getCalculatedDeadFeatures() {
+		return new LinkedList<IFeature>(getAnalyser().getCachedDeadFeatures());
 	}
 
 	/**
@@ -332,7 +335,7 @@ abstract class DeprecatedFeatureModel {
 	 * Or use {@link FeatureModelAnalyzer#getFalseOptionalFeatures()} to recalculate false optional features.
 	 */
 	@Deprecated
-	public LinkedList<Feature> getFalseOptionalFeatures() {
-		return new LinkedList<Feature>(getAnalyser().getCachedFalseOptionalFeatures());
+	public LinkedList<IFeature> getFalseOptionalFeatures() {
+		return new LinkedList<IFeature>(getAnalyser().getCachedFalseOptionalFeatures());
 	}
 }

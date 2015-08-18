@@ -24,8 +24,8 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.MOVE_CONSTRAIN
 
 import org.eclipse.draw2d.geometry.Point;
 
-import de.ovgu.featureide.fm.core.Constraint;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 
 /**
@@ -38,7 +38,7 @@ public class ConstraintMoveOperation extends AbstractFeatureModelOperation {
 
 	private static final String LABEL = MOVE_CONSTRAINT;
 
-	private Constraint constraint;
+	private IConstraint constraint;
 	private int index;
 
 	private int oldIndex;
@@ -46,7 +46,7 @@ public class ConstraintMoveOperation extends AbstractFeatureModelOperation {
 	private Point newPos;
 	private Point oldPos;
 
-	public ConstraintMoveOperation(Constraint constraint, FeatureModel featureModel, int newIndex, int oldIndex, boolean isLastPos, Point newPos, Point oldPos) {
+	public ConstraintMoveOperation(IConstraint constraint, IFeatureModel featureModel, int newIndex, int oldIndex, boolean isLastPos, Point newPos, Point oldPos) {
 
 		super(featureModel, LABEL);
 		this.constraint = constraint;

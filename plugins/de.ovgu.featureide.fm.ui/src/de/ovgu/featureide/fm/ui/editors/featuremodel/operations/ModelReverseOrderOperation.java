@@ -27,8 +27,8 @@ import java.util.LinkedList;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 
 /**
@@ -41,13 +41,13 @@ public class ModelReverseOrderOperation extends AbstractFeatureModelOperation {
 
 	private static final String LABEL = REVERSE_LAYOUT_ORDER;
 
-	public ModelReverseOrderOperation(FeatureModel featureModel) {
+	public ModelReverseOrderOperation(IFeatureModel featureModel) {
 		super(featureModel, LABEL);
 	}
 
 	@Override
 	protected void redo() {
-		final Feature root = featureModel.getRoot();
+		final IFeature root = featureModel.getRoot();
 		reverse(root);
 		if (!featureModel.getLayout().hasFeaturesAutoLayout()) {
 			Point mid = FeatureUIHelper.getLocation(root).getCopy();
@@ -57,7 +57,7 @@ public class ModelReverseOrderOperation extends AbstractFeatureModelOperation {
 		}
 	}
 
-	private void mirrorFeaturePositions(Feature feature, Point mid, boolean vertical) {
+	private void mirrorFeaturePositions(IFeature feature, Point mid, boolean vertical) {
 		if (!feature.isRoot()) {
 			Point featureMid = FeatureUIHelper.getLocation(feature).getCopy();
 			Dimension size = FeatureUIHelper.getSize(feature).getCopy();
@@ -75,17 +75,17 @@ public class ModelReverseOrderOperation extends AbstractFeatureModelOperation {
 			FeatureUIHelper.setLocation(feature, featureMid);
 		}
 		if (feature.hasChildren()) {
-			for (Feature child : feature.getChildren())
+			for (IFeature child : feature.getChildren())
 				mirrorFeaturePositions(child, mid, vertical);
 		}
 
 	}
 
-	private void reverse(Feature feature) {
-		LinkedList<Feature> children = feature.getChildren();
+	private void reverse(IFeature feature) {
+		LinkedList<IFeature> children = feature.getChildren();
 		for (int i = 0; i < children.size() - 1; i++)
 			children.add(i, children.removeLast());
-		for (Feature child : feature.getChildren())
+		for (IFeature child : feature.getChildren())
 			reverse(child);
 	}
 

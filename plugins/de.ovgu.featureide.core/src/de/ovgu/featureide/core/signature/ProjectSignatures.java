@@ -34,8 +34,8 @@ import de.ovgu.featureide.core.signature.base.AbstractFieldSignature;
 import de.ovgu.featureide.core.signature.base.AbstractMethodSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.core.signature.filter.IFilter;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /** 
  * Holds the signature information for a whole java project.
@@ -119,17 +119,17 @@ public class ProjectSignatures implements Iterable<AbstractSignature> {
 	private final String[] featureNames;
 	private AbstractSignature[] signatureArray = null;
 	
-	private final FeatureModel featureModel;
+	private final IFeatureModel featureModel;
 	
 	private int hashCode = 0;
 	private boolean hasHashCode = false;
 	
-	public ProjectSignatures(FeatureModel featureModel) {
+	public ProjectSignatures(IFeatureModel featureModel) {
 		this.featureModel = featureModel;
 		final String[] tempFeatureNames = new String[featureModel.getNumberOfFeatures()];
 		int countConcreteFeatures = 0;
 		
-		for (Feature feature : featureModel.getFeatures()) {
+		for (IFeature feature : featureModel.getFeatures()) {
 			if (feature.isConcrete()) {
 				tempFeatureNames[countConcreteFeatures++] = feature.getName();
 			}
@@ -198,7 +198,7 @@ public class ProjectSignatures implements Iterable<AbstractSignature> {
 		return signatureArray.length;
 	}
 	
-	public FeatureModel getFeatureModel() {
+	public IFeatureModel getFeatureModel() {
 		return featureModel;
 	}
 	

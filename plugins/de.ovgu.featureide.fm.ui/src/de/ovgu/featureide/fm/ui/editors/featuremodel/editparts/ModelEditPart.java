@@ -32,7 +32,7 @@ import org.eclipse.draw2d.MarginBorder;
 import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.Legend;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.policies.ModelLayoutEditPolicy;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
@@ -52,8 +52,8 @@ public class ModelEditPart extends AbstractGraphicalEditPart {
 		setModel(featureModel);
 	}
 
-	public FeatureModel getFeatureModel() {
-		return (FeatureModel) getModel();
+	public IFeatureModel getFeatureModel() {
+		return (IFeatureModel) getModel();
 	}
 
 	protected IFigure createFigure() {
@@ -70,7 +70,7 @@ public class ModelEditPart extends AbstractGraphicalEditPart {
 
 	@Override
 	protected List<Object> getModelChildren() {
-		final FeatureModel fm = getFeatureModel();
+		final IFeatureModel fm = getFeatureModel();
 
 		final List<?> constraints = fm.getConstraints();
 		final Collection<?> features = fm.getFeatures();

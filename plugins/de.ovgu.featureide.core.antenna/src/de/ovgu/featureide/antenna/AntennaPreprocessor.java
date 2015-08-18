@@ -67,7 +67,7 @@ import de.ovgu.featureide.core.builder.IComposerObject;
 import de.ovgu.featureide.core.builder.preprocessor.PPComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.core.signature.documentation.base.ADocumentationCommentParser;
-import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
@@ -524,7 +524,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 		}
 
 		ArrayList<String> activatedFeatures = new ArrayList<String>();
-		for (Feature f : configuration.getSelectedFeatures()) {
+		for (IFeature f : configuration.getSelectedFeatures()) {
 			activatedFeatures.add(f.getName());
 		}
 		// generate comma separated string of activated features

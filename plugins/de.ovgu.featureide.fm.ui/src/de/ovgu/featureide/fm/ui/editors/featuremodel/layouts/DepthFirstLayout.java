@@ -22,7 +22,7 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.layouts;
 
 import org.eclipse.draw2d.geometry.Point;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
@@ -43,7 +43,7 @@ public class DepthFirstLayout extends FeatureDiagramLayoutManager {
 	int yoffset;
 
 	@Override
-	public void layoutFeatureModel(FeatureModel featureModel) {
+	public void layoutFeatureModel(IFeatureModel featureModel) {
 		yoffset = 0;
 		LayoutableFeature root = new LayoutableFeature(featureModel.getRoot(), showHidden);
 		depthFirstLayout(root, 0, FMPropertyManager.getLayoutMarginX());

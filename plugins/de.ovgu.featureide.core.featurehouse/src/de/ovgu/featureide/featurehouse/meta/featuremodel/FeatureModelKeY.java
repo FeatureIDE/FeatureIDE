@@ -22,7 +22,7 @@ package de.ovgu.featureide.featurehouse.meta.featuremodel;
 
 import java.util.Locale;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
  * Defines the content of the feature model class specific for KeY.
@@ -34,9 +34,9 @@ public class FeatureModelKeY implements IFeatureModelClass {
 	private final static String HEAD = "/**\r\n * Variability encoding of the feature model for KeY.\r\n * Auto-generated class.\r\n */\r\npublic class FeatureModel {\n\n";
 	private final static String FIELD_MODIFIER = "\tpublic static boolean ";
 	
-	private FeatureModel featureModel;
+	private IFeatureModel featureModel;
 
-	public FeatureModelKeY(FeatureModel featureModel) {
+	public FeatureModelKeY(IFeatureModel featureModel) {
 		this.featureModel = featureModel;
 	}
 	

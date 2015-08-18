@@ -27,8 +27,8 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 
-import de.ovgu.featureide.fm.core.Constraint;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 import de.ovgu.featureide.fm.ui.editors.ConstraintDialog;
 
@@ -42,7 +42,7 @@ public abstract class AbstractConstraintEditorAction extends Action {
 
 	protected Object viewer;
 
-	protected FeatureModel featuremodel;
+	protected IFeatureModel featuremodel;
 
 	protected XmlFeatureModelWriter writer;
 
@@ -55,7 +55,7 @@ public abstract class AbstractConstraintEditorAction extends Action {
 		}
 	};
 
-	public AbstractConstraintEditorAction(Object viewer, FeatureModel featuremodel, String menuname) {
+	public AbstractConstraintEditorAction(Object viewer, IFeatureModel featuremodel, String menuname) {
 		super(menuname);
 		this.viewer = viewer;
 		this.featuremodel = featuremodel;
@@ -70,7 +70,7 @@ public abstract class AbstractConstraintEditorAction extends Action {
 		featuretext = writer.writeToString();
 	}
 
-	protected void openEditor(Constraint constraint) {
+	protected void openEditor(IConstraint constraint) {
 		new ConstraintDialog(featuremodel, constraint);
 	}
 

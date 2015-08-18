@@ -27,8 +27,8 @@ import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.gef.commands.Command;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
@@ -43,17 +43,17 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureOperation
  */
 public class FeatureDragAndDropCommand extends Command {
 
-	private final FeatureModel featureModel;
+	private final IFeatureModel featureModel;
 
-	private final Feature feature;
+	private final IFeature feature;
 
 	private final Point newLocation;
 
-	private final Feature oldParent;
+	private final IFeature oldParent;
 
 	private final int oldIndex;
 
-	private Feature newParent;
+	private IFeature newParent;
 
 	private int newIndex;
 
@@ -63,7 +63,7 @@ public class FeatureDragAndDropCommand extends Command {
 
 	private FeatureEditPart editPart;
 
-	public FeatureDragAndDropCommand(FeatureModel featureModel, Feature feature, Point newLocation, FeatureEditPart editPart) {
+	public FeatureDragAndDropCommand(IFeatureModel featureModel, IFeature feature, Point newLocation, FeatureEditPart editPart) {
 		super("Moving " + feature.getName());
 		this.featureModel = featureModel;
 		this.feature = feature;
@@ -83,7 +83,7 @@ public class FeatureDragAndDropCommand extends Command {
 				return false;
 			}
 			Point referencePoint = FeatureUIHelper.getSourceLocation(feature, newLocation);
-			Feature next = calculateNext(featureModel.getRoot(), referencePoint);
+			IFeature next = calculateNext(featureModel.getRoot(), referencePoint);
 
 			// calculate new parent (if exists)
 			if (!calculateNewParentAndIndex(next))
@@ -117,7 +117,7 @@ public class FeatureDragAndDropCommand extends Command {
 		}
 	}
 
-	private boolean calculateNewParentAndIndex(Feature next) {
+	private boolean calculateNewParentAndIndex(IFeature next) {
 		Point location = FeatureUIHelper.getSourceLocation(feature, newLocation);
 		Point nextLocation = FeatureUIHelper.getTargetLocation(next);
 		Dimension d = location.getDifference(nextLocation);
@@ -126,7 +126,7 @@ public class FeatureDragAndDropCommand extends Command {
 				// insert below
 				newParent = next;
 				newIndex = 0;
-				for (Feature child : next.getChildren()) {
+				for (IFeature child : next.getChildren()) {
 					Dimension cd = FeatureUIHelper.getSourceLocation(child).getDifference(nextLocation);
 					if (d.width / (double) d.height <= cd.width / (double) cd.height)
 						break;
@@ -156,7 +156,7 @@ public class FeatureDragAndDropCommand extends Command {
 				// insert below
 				newParent = next;
 				newIndex = 0;
-				for (Feature child : next.getChildren()) {
+				for (IFeature child : next.getChildren()) {
 					Dimension cd = FeatureUIHelper.getSourceLocation(child).getDifference(nextLocation);
 					if (d.height / (double) d.width <= cd.height / (double) cd.width)
 						break;
@@ -185,13 +185,13 @@ public class FeatureDragAndDropCommand extends Command {
 
 	}
 
-	public static Feature calculateNext(Feature feature, Point referencePoint) {
+	public static IFeature calculateNext(IFeature feature, Point referencePoint) {
 		if (feature == null)
 			return null;
-		Feature next = feature;
+		IFeature next = feature;
 		double distance = FeatureUIHelper.getTargetLocation(next).getDistance(referencePoint);
-		for (Feature child : feature.getChildren()) {
-			Feature childsNext = calculateNext(child, referencePoint);
+		for (IFeature child : feature.getChildren()) {
+			IFeature childsNext = calculateNext(child, referencePoint);
 			double newDistance = FeatureUIHelper.getTargetLocation(childsNext).getDistance(referencePoint);
 			if (newDistance > 0 && newDistance < distance) {
 				next = childsNext;
@@ -201,11 +201,11 @@ public class FeatureDragAndDropCommand extends Command {
 		return next;
 	}
 
-	public Feature getFeature() {
+	public IFeature getFeature() {
 		return feature;
 	}
 
-	public Feature getNewParent() {
+	public IFeature getNewParent() {
 
 		return newParent;
 	}

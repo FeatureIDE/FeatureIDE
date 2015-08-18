@@ -35,9 +35,9 @@ import java.util.List;
 
 import org.eclipse.jface.viewers.TreeViewer;
 
-import de.ovgu.featureide.fm.core.Constraint;
-import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureStatus;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.ui.statistics.core.composite.IToolTip;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
@@ -57,9 +57,9 @@ public class FeatureNode extends LazyParent implements IToolTip {
 	protected final String tooltip;
 	
 	private final boolean hasConstraints, expand;
-	private final Feature feat;
+	private final IFeature feat;
 
-	public FeatureNode(final Feature feat, boolean expand) {
+	public FeatureNode(final IFeature feat, boolean expand) {
 		super(feat.toString());
 		this.feat = feat;
 		this.expand = expand;
@@ -170,7 +170,7 @@ public class FeatureNode extends LazyParent implements IToolTip {
 	
 	private Parent findConstraints(Parent constraints) {
 		if (hasConstraints) {
-			for (Constraint constr : feat.getRelevantConstraints()) {
+			for (IConstraint constr : feat.getRelevantConstraints()) {
 				constraints.addChild(new Parent(CONSTRAINT, constr.toString()));
 			}
 		}
@@ -179,7 +179,7 @@ public class FeatureNode extends LazyParent implements IToolTip {
 	
 	private Parent findChildFeatures(Parent childFeat) {
 		if (feat.hasChildren()) {
-			for (Feature temp : feat.getChildren()) {
+			for (IFeature temp : feat.getChildren()) {
 				childFeat.addChild(new FeatureNode(temp, expand));
 			}
 		}

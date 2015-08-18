@@ -76,7 +76,7 @@ import de.ovgu.featureide.core.signature.base.FeatureDataConstructor;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiClassSignature;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiFieldSignature;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.job.AStoppableJob;
 import fuji.Composition;
 import fuji.Main;
@@ -272,7 +272,7 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 
 	@Override
 	protected boolean work() {
-		FeatureModel fm = featureProject.getFeatureModel();
+		IFeatureModel fm = featureProject.getFeatureModel();
 		fm.getAnalyser().setDependencies();
 
 		String sourcePath = featureProject.getSourcePath();

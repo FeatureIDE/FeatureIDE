@@ -79,9 +79,9 @@ import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureModelFile;
 import de.ovgu.featureide.fm.core.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
@@ -113,7 +113,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 	public FeatureModelTextEditorPage textEditor;
 
 	public LinkedList<IFeatureModelEditorPage> extensionPages = new LinkedList<IFeatureModelEditorPage>();
-	public FeatureModel featureModel;
+	public IFeatureModel featureModel;
 
 	FeatureModelFile fmFile;
 	boolean isPageModified = false;
@@ -214,7 +214,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 		return null;
 	}
 
-	public FeatureModel getFeatureModel() {
+	public IFeatureModel getFeatureModel() {
 		return featureModel;
 	}
 
@@ -226,8 +226,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 		return file;
 	}
 
-	public FeatureModel getOriginalFeatureModel() {
-		final FeatureModel originalFeatureModel = ModelIOFactory.getNewFeatureModel(ioType);
+	public IFeatureModel getOriginalFeatureModel() {
+		final IFeatureModel originalFeatureModel = ModelIOFactory.getNewFeatureModel(ioType);
 		try {
 			new FeatureModelReaderIFileWrapper(ModelIOFactory.getModelReader(originalFeatureModel, ioType)).readFromFile(file);
 		} catch (Exception e) {

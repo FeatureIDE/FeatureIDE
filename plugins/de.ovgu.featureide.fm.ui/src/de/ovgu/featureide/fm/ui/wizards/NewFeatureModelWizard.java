@@ -42,7 +42,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -73,7 +73,7 @@ public class NewFeatureModelWizard extends Wizard implements INewWizard {
 				}
 			}
 			if (!foundParent) {
-				final FeatureModel featureModel = new FeatureModel();
+				final IFeatureModel featureModel = new IFeatureModel();
 				featureModel.createDefaultValues("");
 				new XmlFeatureModelWriter(featureModel).writeToFile(fullFilePath.toFile());
 			}
@@ -111,7 +111,7 @@ public class NewFeatureModelWizard extends Wizard implements INewWizard {
 		if (parentProject.getLocation().isPrefixOf(fullFilePath)) {
 			final IFile file = parentProject.getFile(fullFilePath.makeRelativeTo(parentProject.getLocation()));
 
-			final FeatureModel featureModel = new FeatureModel();
+			final IFeatureModel featureModel = new IFeatureModel();
 			featureModel.createDefaultValues("");
 			featureModel.initFMComposerExtension(file.getProject());
 			try {

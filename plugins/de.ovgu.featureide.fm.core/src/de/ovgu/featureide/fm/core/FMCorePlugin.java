@@ -36,6 +36,8 @@ import org.eclipse.core.resources.IProject;
 import org.osgi.framework.BundleContext;
 
 import de.ovgu.featureide.fm.core.ExtendedFeatureModel.UsedModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.ModelIOFactory;
 import de.ovgu.featureide.fm.core.job.IJob;
@@ -119,7 +121,7 @@ public class FMCorePlugin extends AbstractCorePlugin {
 		if (modelType == ModelIOFactory.TYPE_UNKNOWN) {
 			return;
 		}
-		final FeatureModel fm = ModelIOFactory.getNewFeatureModel(modelType);
+		final IFeatureModel fm = ModelIOFactory.getNewFeatureModel(modelType);
 		final AbstractFeatureModelReader reader = ModelIOFactory.getModelReader(fm, modelType);
 
 		try {
@@ -156,13 +158,13 @@ public class FMCorePlugin extends AbstractCorePlugin {
 				sb.append("\n");
 			}
 
-			final List<List<Feature>> unnomralFeature = fma.analyzeFeatures();
+			final List<List<IFeature>> unnomralFeature = fma.analyzeFeatures();
 
-			Collection<Feature> analyzedFeatures = unnomralFeature.get(0);
+			Collection<IFeature> analyzedFeatures = unnomralFeature.get(0);
 			sb.append("Core Features (");
 			sb.append(analyzedFeatures.size());
 			sb.append("): ");
-			for (Feature coreFeature : analyzedFeatures) {
+			for (IFeature coreFeature : analyzedFeatures) {
 				sb.append(coreFeature.getName());
 				sb.append(", ");
 			}
@@ -170,7 +172,7 @@ public class FMCorePlugin extends AbstractCorePlugin {
 			sb.append("\nDead Features (");
 			sb.append(analyzedFeatures.size());
 			sb.append("): ");
-			for (Feature deadFeature : analyzedFeatures) {
+			for (IFeature deadFeature : analyzedFeatures) {
 				sb.append(deadFeature.getName());
 				sb.append(", ");
 			}
@@ -178,7 +180,7 @@ public class FMCorePlugin extends AbstractCorePlugin {
 			sb.append("\nFO Features (");
 			sb.append(analyzedFeatures.size());
 			sb.append("): ");
-			for (Feature foFeature : analyzedFeatures) {
+			for (IFeature foFeature : analyzedFeatures) {
 				sb.append(foFeature.getName());
 				sb.append(", ");
 			}

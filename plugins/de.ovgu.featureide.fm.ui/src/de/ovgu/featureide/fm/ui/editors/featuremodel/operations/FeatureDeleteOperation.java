@@ -24,9 +24,9 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE;
 
 import java.util.LinkedList;
 
-import de.ovgu.featureide.fm.core.Constraint;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
@@ -36,20 +36,20 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  */
 public class FeatureDeleteOperation extends AbstractFeatureModelOperation {
 
-	private Feature feature;
-	private Feature oldParent;
+	private IFeature feature;
+	private IFeature oldParent;
 	private int oldIndex;
-	private LinkedList<Feature> oldChildren;
+	private LinkedList<IFeature> oldChildren;
 	private boolean deleted = false;
-	private Feature replacement;
+	private IFeature replacement;
 
-	public FeatureDeleteOperation(FeatureModel featureModel, Feature feature) {
+	public FeatureDeleteOperation(IFeatureModel featureModel, IFeature feature) {
 		super(featureModel, DELETE);
 		this.feature = feature;
 		this.replacement = null;
 	}
 
-	public FeatureDeleteOperation(FeatureModel featureModel, Feature feature, Feature replacement) {
+	public FeatureDeleteOperation(IFeatureModel featureModel, IFeature feature, IFeature replacement) {
 		super(featureModel, DELETE);
 		this.feature = feature;
 		this.replacement = replacement;
@@ -62,17 +62,17 @@ public class FeatureDeleteOperation extends AbstractFeatureModelOperation {
 		if (oldParent != null) {
 			oldIndex = oldParent.getChildIndex(feature);
 		}
-		oldChildren = new LinkedList<Feature>();
+		oldChildren = new LinkedList<IFeature>();
 		oldChildren.addAll(feature.getChildren());
 
 		if (oldParent != null) {
 			oldParent = featureModel.getFeature(oldParent.getName());
 		}
-		LinkedList<Feature> oldChildrenCopy = new LinkedList<Feature>();
+		LinkedList<IFeature> oldChildrenCopy = new LinkedList<IFeature>();
 
-		for (Feature f : oldChildren) {
+		for (IFeature f : oldChildren) {
 			if (!f.getName().equals(feature.getName())) {
-				Feature oldChild = featureModel.getFeature(f.getName());
+				IFeature oldChild = featureModel.getFeature(f.getName());
 				oldChildrenCopy.add(oldChild);
 			}
 		}
@@ -87,7 +87,7 @@ public class FeatureDeleteOperation extends AbstractFeatureModelOperation {
 
 		//Replace feature name in constraints
 		if (replacement != null) {
-			for (Constraint c : featureModel.getConstraints()) {
+			for (IConstraint c : featureModel.getConstraints()) {
 				if (c.getContainedFeatures().contains(feature)) {
 					c.getNode().replaceFeature(feature, replacement);
 				}
@@ -105,11 +105,11 @@ public class FeatureDeleteOperation extends AbstractFeatureModelOperation {
 			if (oldParent != null) {
 				oldParent = featureModel.getFeature(oldParent.getName());
 			}
-			LinkedList<Feature> oldChildrenCopy = new LinkedList<Feature>();
+			LinkedList<IFeature> oldChildrenCopy = new LinkedList<IFeature>();
 
-			for (Feature f : oldChildren) {
+			for (IFeature f : oldChildren) {
 				if (!f.getName().equals(feature.getName())) {
-					Feature child = featureModel.getFeature(f.getName());
+					IFeature child = featureModel.getFeature(f.getName());
 					if (child != null && child.getParent() != null) {
 						child.getParent().removeChild(child);
 					}
@@ -129,7 +129,7 @@ public class FeatureDeleteOperation extends AbstractFeatureModelOperation {
 
 			//Replace Featurename in Constraints
 			if (replacement != null) {
-				for (Constraint c : featureModel.getConstraints()) {
+				for (IConstraint c : featureModel.getConstraints()) {
 					if (c.getContainedFeatures().contains(replacement)) {
 						c.getNode().replaceFeature(replacement, feature);
 					}

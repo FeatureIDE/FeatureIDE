@@ -29,7 +29,7 @@ import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.LegendHideOperation;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
@@ -41,9 +41,9 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  */
 public class LegendAction extends Action {
 
-	private final FeatureModel featureModel;
+	private final IFeatureModel featureModel;
 
-	public LegendAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
+	public LegendAction(GraphicalViewerImpl viewer, IFeatureModel featureModel) {
 		super();
 		this.featureModel = featureModel;
 		if (!FMPropertyManager.isLegendHidden()) {

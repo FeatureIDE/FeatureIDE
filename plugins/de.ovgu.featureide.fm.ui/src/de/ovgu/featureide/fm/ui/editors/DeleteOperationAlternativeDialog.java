@@ -63,14 +63,14 @@ import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.DeleteOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureDeleteOperation;
 
 /**
- * Provides a dialog for choosing an alternative {@link Feature} for the Feature to delete.
+ * Provides a dialog for choosing an alternative {@link IFeature} for the Feature to delete.
  * 
  * @author Florian Proksch
  * @author Stefan Krueger
@@ -78,11 +78,11 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureDeleteOpe
 public class DeleteOperationAlternativeDialog implements GUIDefaults {
 	Shell shell;
 
-	private FeatureModel featureModel;
+	private IFeatureModel featureModel;
 
 	Table alternativefeatureTable;
 	Table featureTable;
-	Map<Feature, List<Feature>> featureMap;
+	Map<IFeature, List<IFeature>> featureMap;
 
 	private DeleteOperation parent;
 
@@ -93,20 +93,20 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 	 * @param featureMap
 	 * @param deleteOperation
 	 */
-	public DeleteOperationAlternativeDialog(FeatureModel featureModel, Map<Feature, List<Feature>> featureMap, DeleteOperation parent) {
+	public DeleteOperationAlternativeDialog(IFeatureModel featureModel, Map<IFeature, List<IFeature>> featureMap, DeleteOperation parent) {
 		this.featureMap = featureMap;
 		this.featureModel = featureModel;
 		this.parent = parent;
 
-		List<Feature> toBeDeleted = new LinkedList<Feature>();
-		for (Feature f : featureMap.keySet()) {
+		List<IFeature> toBeDeleted = new LinkedList<IFeature>();
+		for (IFeature f : featureMap.keySet()) {
 			if (featureMap.get(f).isEmpty())
 				toBeDeleted.add(f);
 		}
 
 		String labeltext = " ";
 
-		for (Feature f : toBeDeleted) {
+		for (IFeature f : toBeDeleted) {
 			labeltext += f.getName() + ", ";
 			featureMap.remove(f);
 		}
@@ -269,7 +269,7 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 		tableViewer.setComparator(new ViewerComparator() {
 			@Override
 			public int compare(Viewer viewer, Object feature1, Object feature2) {
-				return ((Feature) feature1).getName().compareToIgnoreCase(((Feature) feature2).getName());
+				return ((IFeature) feature1).getName().compareToIgnoreCase(((IFeature) feature2).getName());
 			}
 
 		});
@@ -277,11 +277,11 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 		viewerNameColumn.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(ViewerCell cell) {
-				cell.setText(((Feature) cell.getElement()).getName());
+				cell.setText(((IFeature) cell.getElement()).getName());
 
 			}
 		});
-		Collection<Feature> l = new ArrayList<Feature>();
+		Collection<IFeature> l = new ArrayList<IFeature>();
 		l.addAll(featureMap.keySet());
 		tableViewer.setContentProvider(new ArrayContentProvider());
 		tableViewer.setInput(l);
@@ -312,7 +312,7 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 		alternativefeatureTable.addListener(SWT.MouseUp, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
-				final Collection<Feature> l = new ArrayList<Feature>();
+				final Collection<IFeature> l = new ArrayList<IFeature>();
 				l.addAll(featureMap.get((alternativefeatureTable.getSelection()[0]).getData()));
 				for (int i = 0; i < alternativefeatureTable.getSelectionCount(); i++) {
 
@@ -331,7 +331,7 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 		viewerNameColumn2.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(ViewerCell cell) {
-				cell.setText(((Feature) cell.getElement()).getName());
+				cell.setText(((IFeature) cell.getElement()).getName());
 
 			}
 		});
@@ -353,26 +353,26 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 	}
 
 	void execute() {
-		Feature toBeDeleted;
-		Feature alternative;
-		List<Feature> delFeatures = new LinkedList<Feature>();
+		IFeature toBeDeleted;
+		IFeature alternative;
+		List<IFeature> delFeatures = new LinkedList<IFeature>();
 
 		if (featureTable.getSelectionCount() > 0) {
-			alternative = (Feature) (featureTable.getSelection()[0]).getData();
+			alternative = (IFeature) (featureTable.getSelection()[0]).getData();
 		} else {
 			return;
 		}
 
 		for (int i = 0; i < alternativefeatureTable.getSelectionCount(); i++) {
-			toBeDeleted = (Feature) (alternativefeatureTable.getSelection()[i]).getData();
+			toBeDeleted = (IFeature) (alternativefeatureTable.getSelection()[i]).getData();
 			parent.executeOperation(new FeatureDeleteOperation(featureModel, toBeDeleted, alternative));
 			delFeatures.add(toBeDeleted);
 		}
 
 		List<Integer> removableIndices = new LinkedList<Integer>();
-		for (Feature f : delFeatures) {
+		for (IFeature f : delFeatures) {
 			for (int j = 0; j < alternativefeatureTable.getItemCount(); j++) {
-				if (f.getName().equals(((Feature) alternativefeatureTable.getItem(j).getData()).getName())) {
+				if (f.getName().equals(((IFeature) alternativefeatureTable.getItem(j).getData()).getName())) {
 					removableIndices.add(j);
 				}
 			}

@@ -22,8 +22,8 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_ABSTRACT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_CONCRETE;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
  * Operation with functionality to set a Feature abstract/concrete. Enables
@@ -36,7 +36,7 @@ public class FeatureSetAbstractOperation extends AbstractFeatureModelOperation {
 	private static final String LABEL_ABSTRACT = SET_FEATURE_ABSTRACT;
 	private static final String LABEL_CONCRETE = SET_FEATURE_CONCRETE;
 
-	private Feature feature;
+	private IFeature feature;
 
 	/**
 	 * @param label
@@ -45,7 +45,7 @@ public class FeatureSetAbstractOperation extends AbstractFeatureModelOperation {
 	 *            feature on which this operation will be executed
 	 * 
 	 */
-	public FeatureSetAbstractOperation(Feature feature, FeatureModel featureModel) {
+	public FeatureSetAbstractOperation(IFeature feature, IFeatureModel featureModel) {
 		super(featureModel, getLabel(feature));
 		this.feature = feature;
 	}
@@ -54,7 +54,7 @@ public class FeatureSetAbstractOperation extends AbstractFeatureModelOperation {
 	 * @param feature
 	 * @return String to be used in undo/redo menu
 	 */
-	private static String getLabel(Feature feature) {
+	private static String getLabel(IFeature feature) {
 		if (feature.isAbstract())
 			return LABEL_CONCRETE;
 		else

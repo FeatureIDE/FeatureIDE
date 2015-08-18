@@ -24,7 +24,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.RENAME_COLORSC
 
 import org.eclipse.jface.wizard.Wizard;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
@@ -39,12 +39,12 @@ public class RenameColorSchemeWizard extends Wizard {
 
 	public RenameColorSchemePage page;
 	
-	private final FeatureModel featureModel;
+	private final IFeatureModel featureModel;
 
 	/**
 	 * Constructor for RenameColorSchemeWizard.
 	 */
-	public RenameColorSchemeWizard(FeatureModel featureModel) {
+	public RenameColorSchemeWizard(IFeatureModel featureModel) {
 		super();
 		this.featureModel = featureModel;
 		setWindowTitle(RENAME_COLORSCHEME);

@@ -48,7 +48,7 @@ import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin;
-import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
  * Propagates error markers for composed files to sources files.
@@ -337,9 +337,9 @@ public abstract class ErrorPropagation {
 			return null;
 		}
 
-		Collection<Feature> features = featureProject.getFeatureModel().getFeatures();
+		Collection<IFeature> features = featureProject.getFeatureModel().getFeatures();
 		for (String confFeature : configurationFeatures) {
-			for (Feature feature : features) {
+			for (IFeature feature : features) {
 				if (feature.getName().equals(confFeature)) {
 					list.add(feature.getName());
 				}

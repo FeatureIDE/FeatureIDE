@@ -22,7 +22,7 @@ package de.ovgu.featureide.fm.core.io;
 
 import java.io.File;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
  * Writes a feature model to a file or string.
@@ -36,14 +36,14 @@ public interface IFeatureModelWriter {
 	 * 
 	 * @return the model to write
 	 */
-	public FeatureModel getFeatureModel();
+	public IFeatureModel getFeatureModel();
 	
 	/**
 	 * Sets the feature model to be saved in a textual representation.
 	 * 
 	 * @param featureModel the model to write
 	 */
-	public void setFeatureModel(FeatureModel featureModel);
+	public void setFeatureModel(IFeatureModel featureModel);
 
 	/**
 	 * Saves a feature model to a file.

@@ -35,7 +35,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.editors.text.TextEditor;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SourceChangeOperation;
 
@@ -149,7 +149,7 @@ public class FeatureModelTextEditorPage extends TextEditor implements IFeatureMo
 	private void executeSaveOperation() {
 		final String newText = getCurrentContent();
 		if (!oldText.equals(newText)) {
-			final FeatureModel fm = featureModelEditor.featureModel;
+			final IFeatureModel fm = featureModelEditor.featureModel;
 			SourceChangeOperation op = new SourceChangeOperation(fm, featureModelEditor, newText, oldText);
 
 			op.addContext((IUndoContext) fm.getUndoContext());

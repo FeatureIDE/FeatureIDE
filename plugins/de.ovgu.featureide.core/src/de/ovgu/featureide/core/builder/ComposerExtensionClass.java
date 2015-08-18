@@ -53,7 +53,7 @@ import org.osgi.framework.Bundle;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
-import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationWriter;
 
@@ -116,13 +116,13 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	}
 
 	public void copyNotComposedFiles(Configuration c, IFolder destination) {
-		List<Feature> selectedFeatures = c.getSelectedFeatures();
+		List<IFeature> selectedFeatures = c.getSelectedFeatures();
 		if (selectedFeatures != null) {
 			if (destination == null) {
 				destination = featureProject.getBuildFolder();
 			}
 
-			for (Feature feature : selectedFeatures) {
+			for (IFeature feature : selectedFeatures) {
 				IFolder folder = featureProject.getSourceFolder().getFolder(feature.getName());
 				try {
 					if (!destination.exists()) {

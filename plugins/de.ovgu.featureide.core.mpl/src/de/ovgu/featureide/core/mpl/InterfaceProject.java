@@ -30,8 +30,8 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.mpl.io.FileLoader;
 import de.ovgu.featureide.core.mpl.signature.ViewTag;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 
 /**
@@ -54,7 +54,7 @@ public class InterfaceProject {
 	
 	private Configuration configuration;
 
-	private final FeatureModel featureModel;
+	private final IFeatureModel featureModel;
 	private String[] featureNames;
 	
 //	private IChainJob loadJob = null;
@@ -78,13 +78,13 @@ public class InterfaceProject {
 		@Override
 		public void propertyChange(PropertyChangeEvent event) {
 			String prop = event.getPropertyName();
-			if (Feature.LOCATION_CHANGED.equals(prop)) {
+			if (IFeature.LOCATION_CHANGED.equals(prop)) {
 				
-			} else if (Feature.CHILDREN_CHANGED.equals(prop)) {
+			} else if (IFeature.CHILDREN_CHANGED.equals(prop)) {
 				
-			} else if (Feature.NAME_CHANGED.equals(prop)) {
-				featureNames[id] = ((Feature)event.getSource()).getName();
-			} else if (Feature.ATTRIBUTE_CHANGED.equals(prop)) {
+			} else if (IFeature.NAME_CHANGED.equals(prop)) {
+				featureNames[id] = ((IFeature)event.getSource()).getName();
+			} else if (IFeature.ATTRIBUTE_CHANGED.equals(prop)) {
 				
 			}
 		}
@@ -123,7 +123,7 @@ public class InterfaceProject {
 			final String[] tempFeatureNames = new String[featureModel.getNumberOfFeatures()];
 			int count = 0;
 			
-			for (Feature feature : featureModel.getFeatures()) {
+			for (IFeature feature : featureModel.getFeatures()) {
 				if (feature.isConcrete()) {
 					feature.addListener(new FeaturePropertyChangeListener(count));
 					tempFeatureNames[count++] = feature.getName();
@@ -189,7 +189,7 @@ public class InterfaceProject {
 		return featureProject;
 	}
 	
-	public FeatureModel getFeatureModel() {
+	public IFeatureModel getFeatureModel() {
 		return featureModel;
 	}
 	

@@ -101,11 +101,11 @@ import org.eclipse.ui.PlatformUI;
 import org.prop4j.Node;
 import org.prop4j.NodeReader;
 
-import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Constraints;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FunctionalInterfaces.IConsumer;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.Operator;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.ConstraintTextValidator.ValidationMessage;
@@ -411,10 +411,10 @@ public class ConstraintDialog implements GUIDefaults {
 	private Group buttonGroup;
 	private Composite constraintTextComposite;
 	private SimpleSyntaxHighlightEditor constraintText;
-	private FeatureModel featureModel;
+	private IFeatureModel featureModel;
 	private Button okButton;
 
-	private Constraint constraint;
+	private IConstraint constraint;
 	private String defaultDetailsText;
 
 	private String defaultHeaderText;
@@ -537,7 +537,7 @@ public class ConstraintDialog implements GUIDefaults {
 	 * @param featuremodel
 	 * @param constraint
 	 */
-	public ConstraintDialog(final FeatureModel featuremodel, final Constraint constraint) {
+	public ConstraintDialog(final IFeatureModel featuremodel, final IConstraint constraint) {
 		this.constraint = constraint;
 		this.featureModel = featuremodel;
 
@@ -604,7 +604,7 @@ public class ConstraintDialog implements GUIDefaults {
 		AbstractOperation op = null;
 		if (constraint != null && featureModel.getConstraints().contains(constraint)) {
 			int index = 0;
-			for (Constraint c : featureModel.getConstraints()) {
+			for (IConstraint c : featureModel.getConstraints()) {
 				if (c == constraint) {
 					op = new ConstraintEditOperation(propNode, featureModel, index);
 					break;
@@ -637,9 +637,9 @@ public class ConstraintDialog implements GUIDefaults {
 	 * @return List of all dead Features, empty if no feature is caused to be
 	 *         dead
 	 */
-	public List<Feature> getDeadFeatures(String input, FeatureModel model) {
-		Collection<Feature> deadFeaturesBefore = null;
-		FeatureModel clonedModel = model.clone();
+	public List<IFeature> getDeadFeatures(String input, IFeatureModel model) {
+		Collection<IFeature> deadFeaturesBefore = null;
+		IFeatureModel clonedModel = model.clone();
 
 		NodeReader nodeReader = new NodeReader();
 
@@ -654,8 +654,8 @@ public class ConstraintDialog implements GUIDefaults {
 			clonedModel.handleModelDataChanged();
 		}
 
-		List<Feature> deadFeaturesAfter = new ArrayList<Feature>();
-		for (Feature l : clonedModel.getAnalyser().getDeadFeatures()) {
+		List<IFeature> deadFeaturesAfter = new ArrayList<IFeature>();
+		for (IFeature l : clonedModel.getAnalyser().getDeadFeatures()) {
 			if (!deadFeaturesBefore.contains(l)) {
 				deadFeaturesAfter.add(l);
 
@@ -670,7 +670,7 @@ public class ConstraintDialog implements GUIDefaults {
 	 * @param featuremodel
 	 * @param constraint
 	 */
-	private void initBottom(final FeatureModel featuremodel, final Constraint constraint) {
+	private void initBottom(final IFeatureModel featuremodel, final IConstraint constraint) {
 		GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
 
 		Composite lastComposite = new Composite(shell, SWT.NONE);
@@ -802,7 +802,7 @@ public class ConstraintDialog implements GUIDefaults {
 	 * 
 	 * @param featuremodel
 	 */
-	private void initFeatureGroup(final FeatureModel featuremodel) {
+	private void initFeatureGroup(final IFeatureModel featuremodel) {
 
 		featureGroup = new Group(shell, SWT.NONE);
 		featureGroup.setText("Features");
@@ -840,7 +840,7 @@ public class ConstraintDialog implements GUIDefaults {
 			@Override
 			public int compare(Viewer viewer, Object feature1, Object feature2) {
 
-				return ((Feature) feature1).getName().compareToIgnoreCase(((Feature) feature2).getName());
+				return ((IFeature) feature1).getName().compareToIgnoreCase(((IFeature) feature2).getName());
 			}
 
 		});
@@ -848,7 +848,7 @@ public class ConstraintDialog implements GUIDefaults {
 		viewerNameColumn.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(ViewerCell cell) {
-				cell.setText(((Feature) cell.getElement()).getName());
+				cell.setText(((IFeature) cell.getElement()).getName());
 				cell.setImage(FEATURE_SYMBOL);
 			}
 		});
@@ -862,7 +862,7 @@ public class ConstraintDialog implements GUIDefaults {
 
 						@Override
 						public boolean select(Viewer viewer, Object parentElement, Object element) {
-							return ((Feature) element).getName().toLowerCase(Locale.ENGLISH).contains(searchFeatureText.getText().toLowerCase(Locale.ENGLISH));
+							return ((IFeature) element).getName().toLowerCase(Locale.ENGLISH).contains(searchFeatureText.getText().toLowerCase(Locale.ENGLISH));
 						}
 
 					};

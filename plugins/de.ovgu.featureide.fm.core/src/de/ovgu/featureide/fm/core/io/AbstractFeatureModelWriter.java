@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
  * Default writer to be extended for each feature model format.
@@ -40,13 +40,13 @@ public abstract class AbstractFeatureModelWriter implements IFeatureModelWriter 
 	/**
 	 * the feature model to write out
 	 */
-	protected FeatureModel featureModel;
+	protected IFeatureModel featureModel;
 	
-	public void setFeatureModel(FeatureModel featureModel) {
+	public void setFeatureModel(IFeatureModel featureModel) {
 		this.featureModel = featureModel;
 	}
 	
-	public FeatureModel getFeatureModel() {
+	public IFeatureModel getFeatureModel() {
 		return featureModel;
 	}
 	

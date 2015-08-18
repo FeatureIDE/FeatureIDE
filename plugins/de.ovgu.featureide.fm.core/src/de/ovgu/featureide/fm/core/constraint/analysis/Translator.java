@@ -35,9 +35,9 @@ import org.prop4j.Or;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
-import de.ovgu.featureide.fm.core.Constraint;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.constraint.Equation;
 import de.ovgu.featureide.fm.core.constraint.FeatureAttributeMap;
 import de.ovgu.featureide.fm.core.constraint.Reference;
@@ -59,7 +59,7 @@ public class Translator {
 	 * @param fm The feature model.
 	 * @return 1-to-1 mapping of natural numbers to features.
 	 */
-	public static BiMap<String, Integer> buildFeatureNameMap(FeatureModel fm,
+	public static BiMap<String, Integer> buildFeatureNameMap(IFeatureModel fm,
 			UniqueId idGen) {
 		BiMap<String, Integer> m = HashBiMap.create(); 
 	
@@ -79,7 +79,7 @@ public class Translator {
 	 * @param idGen
 	 */
 	public static void extendFeatureNameMap(BiMap<String, Integer> m, 
-			FeatureModel fm, UniqueId idGen) {
+			IFeatureModel fm, UniqueId idGen) {
 		
 		for (String f : fm.getFeatureNames()) {
 			if (!m.containsKey(f)) {
@@ -104,7 +104,7 @@ public class Translator {
 	 * @return
 	 */
 	public static <T> List<T> translateFm(Map<String, Integer> map, 
-			FeatureModel fm, RestrictionFactory<T> factory) {
+			IFeatureModel fm, RestrictionFactory<T> factory) {
 		
 		List<T> rs = translateFmTree(map, fm, factory);
 		rs.addAll(translateFmConstraints(map, fm, factory));
@@ -116,7 +116,7 @@ public class Translator {
 	 * @category tree
 	 */
 	public static <T> List<T> translateFmTree(Map<String, Integer> map, 
-			FeatureModel fm, RestrictionFactory<T> factory) {
+			IFeatureModel fm, RestrictionFactory<T> factory) {
 		List<T> rs = new ArrayList<T>();
 		
 		// root has to be included (r == 1)
@@ -131,7 +131,7 @@ public class Translator {
 	 * @category constraints
 	 */
 	public static <T> List<T> translateFmConstraints(Map<String, Integer> m,
-			FeatureModel fm, RestrictionFactory<T> factory) {
+			IFeatureModel fm, RestrictionFactory<T> factory) {
 		List<T> rs = new ArrayList<T>();
 		
 		translateFmConstraints(m, fm.getConstraints(), rs, factory);
@@ -143,7 +143,7 @@ public class Translator {
 	 * @category tree
 	 */
 	private static <T> void translateFmTree(Map<String, Integer> m, 
-			Feature feature, List<T> rs, 
+			IFeature feature, List<T> rs, 
 			RestrictionFactory<T> factory) {
 		
 		if (feature.isAlternative()) {
@@ -154,7 +154,7 @@ public class Translator {
 			translateFmTreeAnd(m, feature, rs, factory);
 		}
 		
-		for (Feature child : feature.getChildren()) {
+		for (IFeature child : feature.getChildren()) {
 			translateFmTree(m, child, rs, factory);
 		}
 	}
@@ -163,12 +163,12 @@ public class Translator {
 	 * @category tree helper
 	 */
 	private static <T> void translateFmTreeAlternative(Map<String, Integer> m, 
-			Feature f, List<T> rs, RestrictionFactory<T> factory) {
+			IFeature f, List<T> rs, RestrictionFactory<T> factory) {
 		
 		List<Term> terms = new ArrayList<Term>();
 		terms.add(new Term(m.get(f.getName()), 1, true));
 		
-		for (Feature child : f.getChildren()) {
+		for (IFeature child : f.getChildren()) {
 			terms.add(new Term(m.get(child.getName()), -1, true));
 		}
 		
@@ -180,14 +180,14 @@ public class Translator {
 	 * @category tree helper
 	 */
 	private static <T> void translateFmTreeOr(Map<String, Integer> m, 
-			Feature f, List<T> rs, RestrictionFactory<T> factory) {
+			IFeature f, List<T> rs, RestrictionFactory<T> factory) {
 		
 		int numChildren = f.getChildren().size();
 		
 		List<Term> terms = new ArrayList<Term>();
 		terms.add(new Term(m.get(f.getName()), numChildren, true));
 		
-		for (Feature child : f.getChildren()) {
+		for (IFeature child : f.getChildren()) {
 			terms.add(new Term(m.get(child.getName()), -1, true));
 		}
 		
@@ -202,9 +202,9 @@ public class Translator {
 	 * @category tree helper
 	 */
 	private static <T> void translateFmTreeAnd(Map<String, Integer> m, 
-			Feature f, List<T> rs, RestrictionFactory<T> factory) {
+			IFeature f, List<T> rs, RestrictionFactory<T> factory) {
 		
-		for (Feature child : f.getChildren()) {
+		for (IFeature child : f.getChildren()) {
 			List<Term> terms1 = new ArrayList<Term>();
 			List<Term> terms2 = new ArrayList<Term>();
 			terms1.add(new Term(m.get(f.getName()), 1, true));
@@ -224,10 +224,10 @@ public class Translator {
 	 * @category constraints
 	 */
 	private static <T> void translateFmConstraints(Map<String, Integer> map,
-			List<Constraint> fmConstraints, List<T> rs, 
+			List<IConstraint> fmConstraints, List<T> rs, 
 			RestrictionFactory<T> factory) {
 		
-		for (Constraint fmConstraint : fmConstraints) {
+		for (IConstraint fmConstraint : fmConstraints) {
 			
 			Node cnfNode = fmConstraint.getNode().clone().toCNF();
 				
@@ -283,7 +283,7 @@ public class Translator {
 	 * @category equations
 	 */
 	public static <T> List<T> translateEquations(Map<String, Integer> map,
-			FeatureModel fm, FeatureAttributeMap<Integer> attributes, List<Equation> equations, 
+			IFeatureModel fm, FeatureAttributeMap<Integer> attributes, List<Equation> equations, 
 			RestrictionFactory<T> factory) {
 		
 		List<T> rs = new ArrayList<T>();
@@ -306,7 +306,7 @@ public class Translator {
 	/**
 	 * @category equations helper
 	 */
-	private static void transformVars(Map<String, Integer> map, FeatureModel fm,
+	private static void transformVars(Map<String, Integer> map, IFeatureModel fm,
 			FeatureAttributeMap<Integer> attributes, List<Term> terms, WeightedTerm term) {
 		
 		int coefficient = term.getWeight();
@@ -337,17 +337,17 @@ public class Translator {
 	/**
 	 * @category equations helper
 	 */
-	private static List<String> getSubtreeFeatureNames(FeatureModel fm, 
+	private static List<String> getSubtreeFeatureNames(IFeatureModel fm, 
 			String featureName) {
 		
 		List<String> result = new ArrayList<String>();
 		
-		Queue<Feature> bfsStack = new LinkedList<Feature>();
+		Queue<IFeature> bfsStack = new LinkedList<IFeature>();
 		bfsStack.add(fm.getFeature(featureName));
 		while (!bfsStack.isEmpty()) {
-			Feature feature = bfsStack.poll();
+			IFeature feature = bfsStack.poll();
 			result.add(feature.getName());
-			for (Feature childFeature : feature.getChildren()) {
+			for (IFeature childFeature : feature.getChildren()) {
 				bfsStack.add(childFeature);
 			}
 		}

@@ -35,8 +35,8 @@ import org.prop4j.SatSolver;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 
 /**
@@ -55,9 +55,9 @@ public class ModelComparator {
 
 	private Set<Strategy> strategy = new HashSet<Strategy>();
 
-	private FeatureModel oldModel;
+	private IFeatureModel oldModel;
 
-	private FeatureModel newModel;
+	private IFeatureModel newModel;
 
 	private Set<String> addedFeatures;
 
@@ -95,7 +95,7 @@ public class ModelComparator {
 			strategy.add(Strategy.SingleTestingAborted);
 	}
 
-	public Comparison compare(FeatureModel oldModel, FeatureModel newModel) {
+	public Comparison compare(IFeatureModel oldModel, IFeatureModel newModel) {
 		this.oldModel = oldModel;
 		this.newModel = newModel;
 		try {
@@ -148,13 +148,13 @@ public class ModelComparator {
 		return result;
 	}
 
-	private Set<String> calculateAddedFeatures(FeatureModel oldModel,
-			FeatureModel newModel) {
+	private Set<String> calculateAddedFeatures(IFeatureModel oldModel,
+			IFeatureModel newModel) {
 		Set<String> addedFeatures = new HashSet<String>();
-		for (Feature feature : newModel.getFeatures())
+		for (IFeature feature : newModel.getFeatures())
 			if (feature.isConcrete()) {
 				String name = newModel.getRenamingsManager().getOldName(feature.getName());
-				Feature associatedFeature = oldModel.getFeature(oldModel
+				IFeature associatedFeature = oldModel.getFeature(oldModel
 						.getRenamingsManager().getNewName(name));
 				if (associatedFeature == null || associatedFeature.isAbstract())
 					addedFeatures.add(name);
@@ -242,11 +242,11 @@ public class ModelComparator {
 		return strategy;
 	}
 
-	public FeatureModel getOldModel() {
+	public IFeatureModel getOldModel() {
 		return oldModel;
 	}
 
-	public FeatureModel getNewModel() {
+	public IFeatureModel getNewModel() {
 		return newModel;
 	}
 

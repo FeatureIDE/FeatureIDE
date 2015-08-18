@@ -33,7 +33,7 @@ import org.prop4j.NodeReader;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.common.Commons;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
@@ -336,10 +336,10 @@ public class TModelComparator {
 	private Comparison compare(String fm1, String fm2)
 			throws UnsupportedModelException {
 		ModelComparator comperator = new ModelComparator(TIMEOUT);
-		FeatureModel oldModel = new FeatureModel();
+		IFeatureModel oldModel = new IFeatureModel();
 		IFeatureModelReader reader = new GuidslReader(oldModel);
 		reader.readFromString(fm1);
-		FeatureModel newModel = new FeatureModel();
+		IFeatureModel newModel = new IFeatureModel();
 		reader = new GuidslReader(newModel);
 		reader.readFromString(fm2);
 		return comperator.compare(oldModel, newModel);
@@ -352,8 +352,8 @@ public class TModelComparator {
 	 * 
 	 */
 	public void testForFeatureIDEaddedProducts() throws FileNotFoundException, UnsupportedModelException, TimeoutException {
-	    final FeatureModel fm = Commons.loadFeatureModelFromFile("issue_264_model_optional.xml", Commons.FEATURE_MODEL_BENCHMARK_PATH_REMOTE, Commons.FEATURE_MODEL_BENCHMARK_PATH_LOCAL_CLASS_PATH);
-	    final FeatureModel fmGen = Commons.loadFeatureModelFromFile("issue_264_model_alternative.xml", Commons.FEATURE_MODEL_BENCHMARK_PATH_REMOTE, Commons.FEATURE_MODEL_BENCHMARK_PATH_LOCAL_CLASS_PATH);
+	    final IFeatureModel fm = Commons.loadFeatureModelFromFile("issue_264_model_optional.xml", Commons.FEATURE_MODEL_BENCHMARK_PATH_REMOTE, Commons.FEATURE_MODEL_BENCHMARK_PATH_LOCAL_CLASS_PATH);
+	    final IFeatureModel fmGen = Commons.loadFeatureModelFromFile("issue_264_model_alternative.xml", Commons.FEATURE_MODEL_BENCHMARK_PATH_REMOTE, Commons.FEATURE_MODEL_BENCHMARK_PATH_LOCAL_CLASS_PATH);
 	    final ModelComparator comparator = new ModelComparator(1000000);
 	    final Comparison comparison = comparator.compare(fm, fmGen);
 	    

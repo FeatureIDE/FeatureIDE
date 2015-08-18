@@ -24,8 +24,11 @@ import static org.junit.Assert.assertSame;
 
 import org.junit.Test;
 
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+
 /**
- * Tests for the {@link FeatureModel}.
+ * Tests for the {@link IFeatureModel}.
  * 
  * @author Jens Meinicke
  */
@@ -33,15 +36,15 @@ public class TFeatureModel {
 
 	@Test
     public void recordGetFeatureName(){
-        FeatureModel fm = new FeatureModel();
-        Feature feature = new Feature(fm, "test_root");
+        IFeatureModel fm = new IFeatureModel();
+        IFeature feature = new IFeature(fm, "test_root");
         fm.addFeature(feature);
         fm.setRoot(feature);
-        Feature root = fm.getFeature("test_root");
+        IFeature root = fm.getFeature("test_root");
         assertSame(root, fm.getRoot());
         
-        FeatureModel clonedModel = fm.clone();
-        Feature root2 = clonedModel.getFeature("test_root");
+        IFeatureModel clonedModel = fm.clone();
+        IFeature root2 = clonedModel.getFeature("test_root");
         
         assertSame(root2, clonedModel.getRoot());
 	}

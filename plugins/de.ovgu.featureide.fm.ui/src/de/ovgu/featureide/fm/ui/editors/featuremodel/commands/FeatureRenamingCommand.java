@@ -27,7 +27,7 @@ import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.gef.commands.Command;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureRenamingOperation;
 
@@ -38,13 +38,13 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureRenamingO
  */
 public class FeatureRenamingCommand extends Command {
 
-	private final FeatureModel featureModel;
+	private final IFeatureModel featureModel;
 
 	private final String oldName;
 
 	private final String newName;
 
-	public FeatureRenamingCommand(FeatureModel featureModel, String oldName, String newName) {
+	public FeatureRenamingCommand(IFeatureModel featureModel, String oldName, String newName) {
 		super(RENAMING_FEATURE + oldName);
 		this.featureModel = featureModel;
 		this.oldName = oldName;

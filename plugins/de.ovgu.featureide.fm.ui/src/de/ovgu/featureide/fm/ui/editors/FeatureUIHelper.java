@@ -33,12 +33,12 @@ import org.eclipse.gef.EditPartViewer;
 import org.eclipse.gef.editparts.ZoomListener;
 import org.eclipse.gef.editparts.ZoomManager;
 
-import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.FMPoint;
-import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureConnection;
-import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConnectionEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
 
@@ -51,12 +51,12 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
  */
 public class FeatureUIHelper {
 
-	private static final WeakHashMap<Feature, Point> featureLocation = new WeakHashMap<>();
-	private static final WeakHashMap<Feature, Dimension> featureSize = new WeakHashMap<>();
-	private static final WeakHashMap<Constraint, Point> constraintLocation = new WeakHashMap<>();
-	private static final WeakHashMap<Constraint, Dimension> constraintSize = new WeakHashMap<>();
-	private static final WeakHashMap<FeatureModel, Dimension> legendSize = new WeakHashMap<>();
-	private static final WeakHashMap<FeatureModel, LegendFigure> legendFigure = new WeakHashMap<>();
+	private static final WeakHashMap<IFeature, Point> featureLocation = new WeakHashMap<>();
+	private static final WeakHashMap<IFeature, Dimension> featureSize = new WeakHashMap<>();
+	private static final WeakHashMap<IConstraint, Point> constraintLocation = new WeakHashMap<>();
+	private static final WeakHashMap<IConstraint, Dimension> constraintSize = new WeakHashMap<>();
+	private static final WeakHashMap<IFeatureModel, Dimension> legendSize = new WeakHashMap<>();
+	private static final WeakHashMap<IFeatureModel, LegendFigure> legendFigure = new WeakHashMap<>();
 
 	/**
 	 * Necessary for correct manual drag-and-drop movement while zoomed.
@@ -64,31 +64,31 @@ public class FeatureUIHelper {
 	private static double zoomFactor = 1.0;
 	private static ZoomManager zoomManager = null;
 
-	public static Dimension getLegendSize(FeatureModel featureModel) {
+	public static Dimension getLegendSize(IFeatureModel featureModel) {
 		return legendSize.get(featureModel);
 	}
 
-	public static boolean showHiddenFeatures(FeatureModel featureModel) {
+	public static boolean showHiddenFeatures(IFeatureModel featureModel) {
 		return featureModel.getLayout().showHiddenFeatures();
 	}
 
-	public static void showHiddenFeatures(boolean show, FeatureModel featureModel) {
+	public static void showHiddenFeatures(boolean show, IFeatureModel featureModel) {
 		featureModel.getLayout().showHiddenFeatures(show);
 	}
 
-	public static void setLegendSize(FeatureModel featureModel, Dimension dim) {
+	public static void setLegendSize(IFeatureModel featureModel, Dimension dim) {
 		legendSize.put(featureModel, dim);
 	}
 
-	public static Point getLocation(Feature feature) {
+	public static Point getLocation(IFeature feature) {
 		return featureLocation.get(feature);
 	}
 
-	public static void setLocation(Feature feature, FMPoint newLocation) {
+	public static void setLocation(IFeature feature, FMPoint newLocation) {
 		setLocation(feature, toPoint(newLocation));
 	}
 
-	public static void setLocation(Feature feature, Point newLocation) {
+	public static void setLocation(IFeature feature, Point newLocation) {
 		Point oldLocation = getLocation(feature);
 		feature.setNewLocation(toFMPoint(newLocation));
 		if (newLocation == null) {
@@ -98,7 +98,7 @@ public class FeatureUIHelper {
 		fireLocationChanged(feature, oldLocation, newLocation);
 	}
 
-	public static void setTemporaryLocation(Feature feature, Point newLocation) {
+	public static void setTemporaryLocation(IFeature feature, Point newLocation) {
 		Point oldLocation = getLocation(feature);
 		if (newLocation == null || newLocation.equals(oldLocation)) {
 			return;
@@ -107,15 +107,15 @@ public class FeatureUIHelper {
 		fireLocationChanged(feature, oldLocation, newLocation);
 	}
 
-	public static Dimension getSize(Feature feature) {
+	public static Dimension getSize(IFeature feature) {
 		return featureSize.get(feature);
 	}
 
-	public static void setSize(Feature feature, Dimension size) {
+	public static void setSize(IFeature feature, Dimension size) {
 		featureSize.put(feature, size);
 	}
 
-	public static Rectangle getBounds(Feature feature) {
+	public static Rectangle getBounds(IFeature feature) {
 		if (getLocation(feature) == null || getSize(feature) == null) {
 			// UIHelper not set up correctly, refresh the feature model
 			feature.getFeatureModel().handleModelDataChanged();
@@ -123,7 +123,7 @@ public class FeatureUIHelper {
 		return new Rectangle(getLocation(feature), getSize(feature));
 	}
 
-	public static Rectangle getBounds(Constraint constraint) {
+	public static Rectangle getBounds(IConstraint constraint) {
 		if (getLocation(constraint) == null || getSize(constraint) == null) {
 			// UIHelper not set up correctly, refresh the feature model
 			constraint.getFeatureModel().handleModelDataChanged();
@@ -131,7 +131,7 @@ public class FeatureUIHelper {
 		return new Rectangle(getLocation(constraint), getSize(constraint));
 	}
 
-	public static List<ConnectionEditPart> getConnections(Feature feature, EditPartViewer viewer) {
+	public static List<ConnectionEditPart> getConnections(IFeature feature, EditPartViewer viewer) {
 		final List<ConnectionEditPart> editPartList = new LinkedList<ConnectionEditPart>();
 		final Map<?, ?> registry = viewer.getEditPartRegistry();
 		for (FeatureConnection connection : feature.getTargetConnections()) {
@@ -143,21 +143,21 @@ public class FeatureUIHelper {
 		return editPartList;
 	}
 
-	private static void fireLocationChanged(Feature feature, Point oldLocation, Point newLocation) {
+	private static void fireLocationChanged(IFeature feature, Point oldLocation, Point newLocation) {
 		PropertyChangeEvent event = new PropertyChangeEvent(feature, PropertyConstants.LOCATION_CHANGED, oldLocation, newLocation);
 		feature.fire(event);
 	}
 
-	public static Point getReferencePoint(Feature feature) {
+	public static Point getReferencePoint(IFeature feature) {
 		return getBounds(feature).getCenter();
 	}
 
-	public static Point calculateReferencePoint(Feature feature, Point newLocation) {
+	public static Point calculateReferencePoint(IFeature feature, Point newLocation) {
 		return new Rectangle(newLocation, getSize(feature)).getCenter();
 	}
 
-	public static Point getSourceLocation(Feature feature) {
-		Feature parentFeature = feature;
+	public static Point getSourceLocation(IFeature feature) {
+		IFeature parentFeature = feature;
 		boolean parentFeatureHidden = false;
 		while (!parentFeature.isRoot()) {
 			parentFeature = parentFeature.getParent();
@@ -172,11 +172,11 @@ public class FeatureUIHelper {
 		return getSourceLocation(getBounds(feature), feature.getFeatureModel());
 	}
 
-	public static Point getSourceLocation(Feature feature, Point newLocation) {
+	public static Point getSourceLocation(IFeature feature, Point newLocation) {
 		return getSourceLocation(new Rectangle(newLocation, getSize(feature)), feature.getFeatureModel());
 	}
 
-	private static Point getSourceLocation(Rectangle bounds, FeatureModel featureModel) {
+	private static Point getSourceLocation(Rectangle bounds, IFeatureModel featureModel) {
 		if (featureModel.getLayout().verticalLayout()) {
 			return new Point(bounds.getLeft().x, (bounds.bottom() + bounds.getTop().y) / 2);
 		} else {
@@ -184,7 +184,7 @@ public class FeatureUIHelper {
 		}
 	}
 
-	public static Point getTargetLocation(Feature feature) {
+	public static Point getTargetLocation(IFeature feature) {
 		Rectangle bounds = getBounds(feature);
 		if (feature.getFeatureModel().getLayout().verticalLayout()) {
 			return new Point(bounds.getRight().x, (bounds.bottom() + bounds.getTop().y) / 2);
@@ -194,31 +194,31 @@ public class FeatureUIHelper {
 
 	}
 
-	public static void setVerticalLayoutBounds(boolean isVerticalLayout, FeatureModel featureModel) {
+	public static void setVerticalLayoutBounds(boolean isVerticalLayout, IFeatureModel featureModel) {
 		featureModel.getLayout().verticalLayout(isVerticalLayout);
 	}
 
-	public static boolean hasVerticalLayout(FeatureModel featureModel) {
+	public static boolean hasVerticalLayout(IFeatureModel featureModel) {
 		return featureModel.getLayout().verticalLayout();
 	}
 
-	public static Dimension getSize(Constraint constraint) {
+	public static Dimension getSize(IConstraint constraint) {
 		return constraintSize.get(constraint);
 	}
 
-	public static void setSize(Constraint constraint, Dimension size) {
+	public static void setSize(IConstraint constraint, Dimension size) {
 		constraintSize.put(constraint, size);
 	}
 
-	public static Point getLocation(Constraint constraint) {
+	public static Point getLocation(IConstraint constraint) {
 		return constraintLocation.get(constraint);
 	}
 
-	public static void setLocation(Constraint constraint, FMPoint newLocation) {
+	public static void setLocation(IConstraint constraint, FMPoint newLocation) {
 		setLocation(constraint, toPoint(newLocation));
 	}
 
-	public static void setLocation(Constraint constraint, Point newLocation) {
+	public static void setLocation(IConstraint constraint, Point newLocation) {
 		Point oldLocation = getLocation(constraint);
 		if (newLocation == null || newLocation.equals(oldLocation)) {
 			return;
@@ -228,16 +228,16 @@ public class FeatureUIHelper {
 		constraint.setLocation(toFMPoint(newLocation));
 	}
 
-	private static void fireLocationChanged(Constraint constraint, Point oldLocation, Point newLocation) {
+	private static void fireLocationChanged(IConstraint constraint, Point oldLocation, Point newLocation) {
 		PropertyChangeEvent event = new PropertyChangeEvent(constraint, PropertyConstants.LOCATION_CHANGED, oldLocation, newLocation);
 		constraint.fire(event);
 	}
 
-	public static void setLegendFigure(FeatureModel featureModel, LegendFigure figure) {
+	public static void setLegendFigure(IFeatureModel featureModel, LegendFigure figure) {
 		legendFigure.put(featureModel, figure);
 	}
 
-	public static LegendFigure getLegendFigure(FeatureModel featureModel) {
+	public static LegendFigure getLegendFigure(IFeatureModel featureModel) {
 		return legendFigure.get(featureModel);
 	}
 

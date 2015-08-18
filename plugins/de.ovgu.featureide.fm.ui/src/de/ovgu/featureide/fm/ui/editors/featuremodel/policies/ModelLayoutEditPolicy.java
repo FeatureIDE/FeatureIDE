@@ -30,11 +30,11 @@ import org.eclipse.gef.editpolicies.LayoutEditPolicy;
 import org.eclipse.gef.requests.ChangeBoundsRequest;
 import org.eclipse.gef.requests.CreateRequest;
 
-import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.ExtendedFeature;
 import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.ConstraintDragAndDropCommand;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.FeatureDragAndDropCommand;
@@ -50,11 +50,11 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
  */
 public class ModelLayoutEditPolicy extends LayoutEditPolicy {
 
-	private final FeatureModel featureModel;
+	private final IFeatureModel featureModel;
 
 	private Command cmd;
 
-	public ModelLayoutEditPolicy(FeatureModel featureModel) {
+	public ModelLayoutEditPolicy(IFeatureModel featureModel) {
 		super();
 		this.featureModel = featureModel;
 	}
@@ -65,7 +65,7 @@ public class ModelLayoutEditPolicy extends LayoutEditPolicy {
 			return new ConstraintMoveEditPolicy((ConstraintEditPart) child, this);
 		} else if (child instanceof FeatureEditPart) {
 			if (featureModel instanceof ExtendedFeatureModel) {
-				Feature feature = ((FeatureEditPart) child).getFeature();
+				IFeature feature = ((FeatureEditPart) child).getFeature();
 				if (feature instanceof ExtendedFeature && ((ExtendedFeature) feature).isFromExtern()) {
 					if (feature.getFeatureModel().getLayout().getLayoutAlgorithm() != 0) {
 						return null;
@@ -91,12 +91,12 @@ public class ModelLayoutEditPolicy extends LayoutEditPolicy {
 			Object editPart = r.getEditParts().get(0);
 			if (editPart instanceof FeatureEditPart) {
 				FeatureEditPart featureEditPart = (FeatureEditPart) editPart;
-				Feature feature = featureEditPart.getFeature();
+				IFeature feature = featureEditPart.getFeature();
 				Rectangle bounds = FeatureUIHelper.getBounds(feature);
 				bounds = bounds.getTranslated(r.getMoveDelta().getScaled(1 / FeatureUIHelper.getZoomFactor()));
 				cmd = new FeatureDragAndDropCommand(featureModel, feature, bounds.getLocation(), featureEditPart);
 			} else if (editPart instanceof ConstraintEditPart) {
-				Constraint constraint = ((ConstraintEditPart) editPart).getConstraintModel();
+				IConstraint constraint = ((ConstraintEditPart) editPart).getConstraintModel();
 
 				if (featureModel.getLayout().hasFeaturesAutoLayout()) {
 					Point point = r.getLocation().getCopy();

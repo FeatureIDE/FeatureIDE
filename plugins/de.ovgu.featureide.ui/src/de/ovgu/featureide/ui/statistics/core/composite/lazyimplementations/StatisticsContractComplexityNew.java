@@ -10,7 +10,7 @@ import de.ovgu.featureide.core.fstmodel.FSTInvariant;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.genericdatatypes.HashMapNode;
@@ -24,10 +24,10 @@ import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.gener
 public class StatisticsContractComplexityNew extends LazyParent {
 
 	private final FSTModel fstModel;
-	private final FeatureModel featModel;
+	private final IFeatureModel featModel;
 	private final String contractComposition;
 
-	public StatisticsContractComplexityNew(String description, FSTModel fstmodel, FeatureModel featmodel, String contractComposition) {
+	public StatisticsContractComplexityNew(String description, FSTModel fstmodel, IFeatureModel featmodel, String contractComposition) {
 		super(description, null);
 		this.fstModel = fstmodel;
 		this.featModel = featmodel;

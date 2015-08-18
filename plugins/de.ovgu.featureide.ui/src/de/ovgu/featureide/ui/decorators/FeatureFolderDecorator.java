@@ -32,7 +32,7 @@ import org.eclipse.jface.viewers.LabelProviderChangedEvent;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.listeners.IFeatureFolderListener;
-import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
@@ -64,7 +64,7 @@ public class FeatureFolderDecorator implements ILightweightLabelDecorator, IFeat
 		}
 		
 		//handle only not-in-use folders
-		final Feature feature = featureProject.getFeatureModel().getFeature(folder.getName());
+		final IFeature feature = featureProject.getFeatureModel().getFeature(folder.getName());
 		if (feature == null || feature.isConcrete()) {
 			return;
 		}

@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
  * Contains all information needed to execute commands that move features
@@ -29,13 +29,13 @@ import de.ovgu.featureide.fm.core.Feature;
  */
 public class FeatureOperationData {
 
-	private Feature oldParent;
-	private Feature feature;
-	private Feature newParent;
+	private IFeature oldParent;
+	private IFeature feature;
+	private IFeature newParent;
 	private int newIndex;
 	private int oldIndex;
 
-	public FeatureOperationData(Feature feature, Feature oldParent, Feature newParent, int newIndex, int oldIndex) {
+	public FeatureOperationData(IFeature feature, IFeature oldParent, IFeature newParent, int newIndex, int oldIndex) {
 		this.feature = feature;
 		this.newIndex = newIndex;
 		this.newParent = newParent;
@@ -47,7 +47,7 @@ public class FeatureOperationData {
 	/**
 	 * @return the oldParent
 	 */
-	public Feature getOldParent() {
+	public IFeature getOldParent() {
 		return oldParent;
 	}
 
@@ -55,14 +55,14 @@ public class FeatureOperationData {
 	 * @param oldParent
 	 *            the oldParent to set
 	 */
-	public void setOldParent(Feature oldParent) {
+	public void setOldParent(IFeature oldParent) {
 		this.oldParent = oldParent;
 	}
 
 	/**
 	 * @return the feature
 	 */
-	public Feature getFeature() {
+	public IFeature getFeature() {
 		return feature;
 	}
 
@@ -70,14 +70,14 @@ public class FeatureOperationData {
 	 * @param feature
 	 *            the feature to set
 	 */
-	public void setFeature(Feature feature) {
+	public void setFeature(IFeature feature) {
 		this.feature = feature;
 	}
 
 	/**
 	 * @return the newParent
 	 */
-	public Feature getNewParent() {
+	public IFeature getNewParent() {
 		return newParent;
 	}
 
@@ -85,7 +85,7 @@ public class FeatureOperationData {
 	 * @param newParent
 	 *            the newParent to set
 	 */
-	public void setNewParent(Feature newParent) {
+	public void setNewParent(IFeature newParent) {
 		this.newParent = newParent;
 	}
 

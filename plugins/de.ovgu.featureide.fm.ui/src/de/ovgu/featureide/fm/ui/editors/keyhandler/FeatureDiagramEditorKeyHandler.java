@@ -32,8 +32,8 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.events.KeyEvent;
 
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
@@ -54,7 +54,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
 public class FeatureDiagramEditorKeyHandler extends KeyHandler implements PropertyChangeListener {
 
 	private static final long timeoutThreshold = 1000;
-	private final FeatureModel featureModel;
+	private final IFeatureModel featureModel;
 	private final GraphicalViewerKeyHandler gvKeyHandler;
 	private final KeyHandler alternativeKeyHandler;
 	private final FeatureDiagramEditor viewer;
@@ -69,7 +69,7 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements Proper
 	 * alternativeKeyHandler handles the KeyEvents, if the
 	 * GraphicalViewerKeyHandler is active for auto-layout
 	 */
-	public FeatureDiagramEditorKeyHandler(FeatureDiagramEditor view, FeatureModel featureModel) {
+	public FeatureDiagramEditorKeyHandler(FeatureDiagramEditor view, IFeatureModel featureModel) {
 		super();
 
 		this.featureModel = featureModel;
@@ -121,7 +121,7 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements Proper
 		final int foundIndex = search();
 		if (foundIndex >= 0) {
 			// select the new feature
-			final Feature curFeature = featureModel.getFeature(featureList.get(foundIndex));
+			final IFeature curFeature = featureModel.getFeature(featureList.get(foundIndex));
 			if (curFeature != null) {
 				FeatureEditPart part = (FeatureEditPart) viewer.getEditPartRegistry().get(curFeature);
 				viewer.setSelection(new StructuredSelection(part));
@@ -173,8 +173,8 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements Proper
 
 			if (element instanceof FeatureEditPart) {
 				featureName = ((FeatureEditPart) element).getFeature().getName();
-			} else if (element instanceof Feature) {
-				featureName = ((Feature) element).getName();
+			} else if (element instanceof IFeature) {
+				featureName = ((IFeature) element).getName();
 			} else {
 				return 0;
 			}

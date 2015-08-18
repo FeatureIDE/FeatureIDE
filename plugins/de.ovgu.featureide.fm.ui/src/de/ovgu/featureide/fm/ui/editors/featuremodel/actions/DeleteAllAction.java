@@ -28,7 +28,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.DeleteAllOperation;
 
@@ -41,7 +41,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.DeleteAllOperati
 public class DeleteAllAction extends SingleSelectionAction {
 
 	public static final String ID = "de.ovgu.featureide.deleteall";
-	private FeatureModel featureModel;
+	private IFeatureModel featureModel;
 	private static ImageDescriptor deleteImage = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_DELETE);
 
 	/**
@@ -49,7 +49,7 @@ public class DeleteAllAction extends SingleSelectionAction {
 	 * @param viewer
 	 * @param featureModel
 	 */
-	public DeleteAllAction(Object viewer, FeatureModel featureModel) {
+	public DeleteAllAction(Object viewer, IFeatureModel featureModel) {
 		super(DELETE_INCLUDING_SUBFEATURES, viewer);
 		this.featureModel = featureModel;
 		this.viewer = viewer;

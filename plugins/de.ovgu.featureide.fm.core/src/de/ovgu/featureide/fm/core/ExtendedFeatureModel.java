@@ -34,6 +34,9 @@ import javax.annotation.CheckForNull;
 
 import org.sat4j.specs.TimeoutException;
 
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.constraint.Equation;
 import de.ovgu.featureide.fm.core.constraint.FeatureAttributeMap;
 import de.ovgu.featureide.fm.core.constraint.analysis.ExtendedFeatureModelAnalyzer;
@@ -44,7 +47,7 @@ import de.ovgu.featureide.fm.core.constraint.analysis.ExtendedFeatureModelAnalyz
  * @author Sebastian Krieter
  * @author Matthias Strauss
  */
-public class ExtendedFeatureModel extends FeatureModel {
+public class ExtendedFeatureModel extends IFeatureModel {
 
 	public static class UsedModel {
 		private final String modelName;
@@ -96,9 +99,9 @@ public class ExtendedFeatureModel extends FeatureModel {
 	protected final LinkedList<Equation> attributeConstraints = new LinkedList<Equation>();
 	
 	protected final Map<String, UsedModel> usedModels = new HashMap<String, UsedModel>();
-	protected final List<Constraint> ownConstraints = new LinkedList<Constraint>();
+	protected final List<IConstraint> ownConstraints = new LinkedList<IConstraint>();
 	
-	protected FeatureModel mappingModel = null;
+	protected IFeatureModel mappingModel = null;
 	
 	private boolean isInterface = false;
 
@@ -192,7 +195,7 @@ public class ExtendedFeatureModel extends FeatureModel {
 	 * @return true if imported features exists
 	 */
 	public boolean hasInstance() {
-		for (Feature feature : getFeatureTable().values()) {
+		for (IFeature feature : getFeatureTable().values()) {
 			if (feature instanceof ExtendedFeature && ((ExtendedFeature) feature).isInstance()) {
 				return true;
 			}
@@ -206,7 +209,7 @@ public class ExtendedFeatureModel extends FeatureModel {
 	 * @return true if inherited features exists
 	 */
 	public boolean hasInherited() {
-		for (Feature feature : getFeatureTable().values()) {
+		for (IFeature feature : getFeatureTable().values()) {
 			if (feature instanceof ExtendedFeature && ((ExtendedFeature) feature).isInherited()) {
 				return true;
 			}
@@ -215,7 +218,7 @@ public class ExtendedFeatureModel extends FeatureModel {
 	}
 
 	public boolean hasInterface() {
-		for (Feature feature : getFeatureTable().values()) {
+		for (IFeature feature : getFeatureTable().values()) {
 			if (feature instanceof ExtendedFeature && ((ExtendedFeature) feature).isInterface()) {
 				return true;
 			}
@@ -232,7 +235,7 @@ public class ExtendedFeatureModel extends FeatureModel {
 	/**
 	 * @return the mappingModel
 	 */
-	public FeatureModel getMappingModel() {
+	public IFeatureModel getMappingModel() {
 		return mappingModel;
 	}
 
@@ -243,7 +246,7 @@ public class ExtendedFeatureModel extends FeatureModel {
 	/**
 	 * @param mappingModel the mappingModel to set
 	 */
-	public void setMappingModel(FeatureModel mappingModel) {
+	public void setMappingModel(IFeatureModel mappingModel) {
 		this.mappingModel = mappingModel;
 	}
 
@@ -254,13 +257,13 @@ public class ExtendedFeatureModel extends FeatureModel {
 		try {
 			FMCorePlugin.getDefault().logInfo(analyzer.isValid() ? VALID : INVALID);
 			StringBuilder sb = new StringBuilder("Dead Features: ");
-			for (Feature deadFeature : analyzer.getDeadFeatures()) {
+			for (IFeature deadFeature : analyzer.getDeadFeatures()) {
 				sb.append(deadFeature.getName() + ", ");
 			}
 			FMCorePlugin.getDefault().logInfo(sb.toString());
 			sb.delete(0, sb.length());
 			sb.append("FO Features: ");
-			for (Feature deadFeature : analyzer.getFalseOptionalFeatures()) {
+			for (IFeature deadFeature : analyzer.getFalseOptionalFeatures()) {
 				sb.append(deadFeature.getName() + ", ");
 			}
 			FMCorePlugin.getDefault().logInfo(sb.toString());
@@ -271,8 +274,8 @@ public class ExtendedFeatureModel extends FeatureModel {
 	
 	@Override
 	@CheckForNull
-	public Feature getFeature(String name) {
-		Feature feature = super.getFeature(name);
+	public IFeature getFeature(String name) {
+		IFeature feature = super.getFeature(name);
 		if (feature != null) {
 			return feature;
 		}

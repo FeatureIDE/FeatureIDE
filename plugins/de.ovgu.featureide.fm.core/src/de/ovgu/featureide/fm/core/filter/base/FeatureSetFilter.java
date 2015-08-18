@@ -22,7 +22,7 @@ package de.ovgu.featureide.fm.core.filter.base;
 
 import java.util.Collection;
 
-import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
  * Filters all features that are contained in a given collection.
@@ -31,16 +31,16 @@ import de.ovgu.featureide.fm.core.Feature;
  * 
  * @see Filter
  */
-public class FeatureSetFilter implements IFilter<Feature> {
+public class FeatureSetFilter implements IFilter<IFeature> {
 
-	private final Collection<Feature> features;
+	private final Collection<IFeature> features;
 
-	public FeatureSetFilter(Collection<Feature> features) {
+	public FeatureSetFilter(Collection<IFeature> features) {
 		this.features = features;
 	}
 
 	@Override
-	public boolean isValid(Feature object) {
+	public boolean isValid(IFeature object) {
 		return features.contains(object);
 	}
 

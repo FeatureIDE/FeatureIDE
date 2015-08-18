@@ -26,8 +26,8 @@ import java.util.LinkedList;
 
 import org.eclipse.draw2d.geometry.Point;
 
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 
@@ -42,9 +42,9 @@ public class FeatureMoveOperation extends AbstractFeatureModelOperation {
 	private FeatureOperationData data;
 	private Point newPos;
 	private Point oldPos;
-	private Feature feature;
+	private IFeature feature;
 
-	public FeatureMoveOperation(FeatureOperationData data, FeatureModel featureModel, Point newPos, Point oldPos, Feature feature) {
+	public FeatureMoveOperation(FeatureOperationData data, IFeatureModel featureModel, Point newPos, Point oldPos, IFeature feature) {
 		super(featureModel, LABEL);
 		this.data = data;
 		this.newPos = newPos;
@@ -56,8 +56,8 @@ public class FeatureMoveOperation extends AbstractFeatureModelOperation {
 		FeatureUIHelper.setLocation(feature, newPos);
 		if (!data.getFeature().isRoot()) {
 			data.getOldParent().removeChild(data.getFeature());
-			LinkedList<Feature> featureList = new LinkedList<Feature>(data.getOldParent().getChildren());
-			LinkedList<Feature> newFeatureList = new LinkedList<Feature>();
+			LinkedList<IFeature> featureList = new LinkedList<IFeature>(data.getOldParent().getChildren());
+			LinkedList<IFeature> newFeatureList = new LinkedList<IFeature>();
 			int counter2 = 0;
 			int counter = 0;
 

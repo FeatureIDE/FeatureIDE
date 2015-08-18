@@ -29,8 +29,8 @@ import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.graphics.Color;
 
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
@@ -46,13 +46,13 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 
 	private Point referencePoint;
 
-	private Feature lastChild;
-	private LinkedList<Feature> children;
+	private IFeature lastChild;
+	private LinkedList<IFeature> children;
 
 	private boolean vertical;
-	private FeatureModel featureModel;
+	private IFeatureModel featureModel;
 
-	public RelationDecoration(boolean fill, Feature lastChild, LinkedList<Feature> children) {
+	public RelationDecoration(boolean fill, IFeature lastChild, LinkedList<IFeature> children) {
 		super();
 		this.fill = fill;
 		this.children = children;
@@ -102,7 +102,7 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 
 			if (children != null) {
 				for (int i = 0; i < children.size(); i++) {
-					Feature temp;
+					IFeature temp;
 					temp = this.lastChild;
 					this.lastChild = children.get(i);
 					if (!(this.lastChild.isHidden() && !FeatureUIHelper.showHiddenFeatures(featureModel))) {
@@ -164,7 +164,7 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 
 			if (children != null) {
 				for (int i = 0; i < children.size(); i++) {
-					Feature temp;
+					IFeature temp;
 					temp = this.lastChild;
 					this.lastChild = children.get(i);
 					if (!(this.lastChild.isHidden() && !FeatureUIHelper.showHiddenFeatures(featureModel))) {

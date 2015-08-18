@@ -40,10 +40,10 @@ import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gef.editparts.ZoomListener;
 
 import de.ovgu.featureide.fm.core.ExtendedFeature;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer.Attribute;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramExtension;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -65,7 +65,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 	private final ConnectionAnchor sourceAnchor;
 	private final ConnectionAnchor targetAnchor;
 
-	private Feature feature;
+	private IFeature feature;
 
 	private static GridLayout gl = new GridLayout();
 
@@ -78,7 +78,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 	private static String INDETERMINATE_HIDDEN = IS_HIDDEN_AND_INDETERMINATE;
 	private static String VOID = FEATURE_MODEL_IS_VOID;
 
-	public FeatureFigure(Feature feature, FeatureModel featureModel) {
+	public FeatureFigure(IFeature feature, IFeatureModel featureModel) {
 		super();
 		this.feature = feature;
 
@@ -128,7 +128,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		}
 	}
 
-	private boolean isHidden(Feature feature) {
+	private boolean isHidden(IFeature feature) {
 		return !feature.getFeatureModel().getLayout().showHiddenFeatures() && feature.hasHiddenParent();
 	}
 
@@ -269,9 +269,9 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 	}
 
 	/**
-	 * @return The {@link Feature} represented by this {@link FeatureFigure}
+	 * @return The {@link IFeature} represented by this {@link FeatureFigure}
 	 */
-	public Feature getFeature() {
+	public IFeature getFeature() {
 		return feature;
 	}
 }

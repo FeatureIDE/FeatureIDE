@@ -25,8 +25,8 @@ import java.util.LinkedList;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
@@ -48,7 +48,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 	}
 
 	@Override
-	public void layoutFeatureModel(FeatureModel featureModel) {
+	public void layoutFeatureModel(IFeatureModel featureModel) {
 		LayoutableFeature root = new LayoutableFeature(featureModel.getRoot(), showHidden);
 		layout(root);
 		layout(featureDiagramBottom, featureModel.getConstraints());
@@ -165,7 +165,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 	private void centerAboveChildren(LayoutableFeature feature) {
 		int minX = FeatureUIHelper.getBounds(feature.getFirstChild().getFeature()).x;
 		int maxX = FeatureUIHelper.getBounds(feature.getLastChild().getFeature()).right();
-		Feature f = feature.getFeature();
+		IFeature f = feature.getFeature();
 		Point location = FeatureUIHelper.getLocation(f);
 		int x = (maxX + minX) / 2 - FeatureUIHelper.getSize(f).width / 2;
 		FeatureUIHelper.setLocation(f, new Point(x, location.y));
@@ -184,7 +184,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 	}
 
 	private void moveTree(LayoutableFeature root, int deltaX) {
-		Feature f = root.getFeature();
+		IFeature f = root.getFeature();
 		Point location = FeatureUIHelper.getLocation(f);
 		FeatureUIHelper.setLocation(f, new Point(location.x + deltaX, location.y));
 		for (LayoutableFeature child : root.getChildren())
@@ -192,7 +192,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 	}
 
 	private void centerTheRoot(LayoutableFeature root) {
-		Feature f = root.getFeature();
+		IFeature f = root.getFeature();
 		int newX = (controlWidth - FeatureUIHelper.getBounds(f).width) / 2;
 		moveTree(root, newX - FeatureUIHelper.getLocation(f).x);
 	}

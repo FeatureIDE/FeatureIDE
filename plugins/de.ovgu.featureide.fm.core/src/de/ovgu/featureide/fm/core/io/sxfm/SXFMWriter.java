@@ -47,8 +47,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
 
 /**
@@ -65,7 +65,7 @@ public class SXFMWriter extends AbstractFeatureModelWriter {
 	 * 
 	 * @param featureModel the structure to write
 	 */
-	public SXFMWriter(FeatureModel featureModel) {
+	public SXFMWriter(IFeatureModel featureModel) {
 		setFeatureModel(featureModel);
 	}
 	
@@ -137,11 +137,11 @@ public class SXFMWriter extends AbstractFeatureModelWriter {
      * its parent is of the type "and", false otherwise
      * @param indent indentation of the parent feature
      */
-    private void createXmlDocRec(Document doc, Node nod, Feature feat, 
+    private void createXmlDocRec(Document doc, Node nod, IFeature feat, 
     		boolean andMode, String indent) {
     	String newIndent;
     	Node textNode;
-    	LinkedList<Feature> children;
+    	LinkedList<IFeature> children;
     	boolean nextAndMode = false;
     	if (feat == null) return;
     	String fName = feat.getName();
@@ -179,7 +179,7 @@ public class SXFMWriter extends AbstractFeatureModelWriter {
     	} else throw new IllegalStateException (CANT_DETERMINE +
 				CONNECTIONTYPE_OF_ROOTFEATURE);
     	
-    	Iterator<Feature> i = children.iterator();
+    	Iterator<IFeature> i = children.iterator();
     	while (i.hasNext()) {
     		createXmlDocRec(doc, nod , i.next(), nextAndMode, newIndent);
     	}

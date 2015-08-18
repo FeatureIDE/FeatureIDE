@@ -36,8 +36,8 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
 
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
@@ -58,7 +58,7 @@ public class DeleteAction extends Action {
 
 	private final Object viewer;
 
-	private final FeatureModel featureModel;
+	private final IFeatureModel featureModel;
 
 	private ISelectionChangedListener listener = new ISelectionChangedListener() {
 		public void selectionChanged(SelectionChangedEvent event) {
@@ -67,7 +67,7 @@ public class DeleteAction extends Action {
 		}
 	};
 
-	public DeleteAction(Object viewer, FeatureModel featureModel) {
+	public DeleteAction(Object viewer, IFeatureModel featureModel) {
 		super("Delete (Del)", deleteImage);
 		this.viewer = viewer;
 		this.featureModel = featureModel;
@@ -98,15 +98,15 @@ public class DeleteAction extends Action {
 			return false;
 
 		// check that a possibly new root can be determined unique
-		Feature root = featureModel.getRoot();
-		Feature newRoot = root;
-		LinkedList<Feature> features = new LinkedList<Feature>(featureModel.getFeatures());
+		IFeature root = featureModel.getRoot();
+		IFeature newRoot = root;
+		LinkedList<IFeature> features = new LinkedList<IFeature>(featureModel.getFeatures());
 		Iterator<?> iter = selection.iterator();
 		while (iter.hasNext()) {
 			Object editPart = iter.next();
-			if (!(editPart instanceof FeatureEditPart) && !(editPart instanceof Feature))
+			if (!(editPart instanceof FeatureEditPart) && !(editPart instanceof IFeature))
 				continue;
-			Feature feature = editPart instanceof FeatureEditPart ? ((FeatureEditPart) editPart).getFeature() : (Feature) editPart;
+			IFeature feature = editPart instanceof FeatureEditPart ? ((FeatureEditPart) editPart).getFeature() : (IFeature) editPart;
 			if (feature == root) {
 				if (root.getChildrenCount() != 1)
 					return false;

@@ -33,6 +33,17 @@ import javax.annotation.CheckForNull;
 
 import org.prop4j.NodeWriter;
 
+import de.ovgu.featureide.fm.core.ColorList;
+import de.ovgu.featureide.fm.core.FMPoint;
+import de.ovgu.featureide.fm.core.FeatureConnection;
+import de.ovgu.featureide.fm.core.FeatureStatus;
+import de.ovgu.featureide.fm.core.IGraphicItem;
+import de.ovgu.featureide.fm.core.Operator;
+import de.ovgu.featureide.fm.core.PropertyConstants;
+import de.ovgu.featureide.fm.core.IGraphicItem.GraphicItem;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+
 /**
  * Provides all properties of a feature. This includes its connections to parent
  * and child features.
@@ -58,11 +69,11 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 
 	private ColorList colorList;
 
-	private List<Constraint> partOfConstraints = new LinkedList<Constraint>();
+	private List<IConstraint> partOfConstraints = new LinkedList<IConstraint>();
 
 	private FeatureStatus status;
 
-	private FeatureModel featureModel;
+	private IFeatureModel featureModel;
 
 	private FMPoint location;
 	
@@ -84,11 +95,11 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 		this.description = description;
 	}
 
-	public Feature(FeatureModel featureModel) {
+	public Feature(IFeatureModel featureModel) {
 		this(featureModel, UNKNOWN);
 	}
 
-	public Feature(FeatureModel featureModel, String name) {
+	public Feature(IFeatureModel featureModel, String name) {
 		this.featureModel = featureModel;
 		this.name = name;
 		
@@ -108,7 +119,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 		colorList = new ColorList(this);
 	}
 	
-	protected Feature(Feature feature, FeatureModel featureModel, boolean complete) {
+	protected Feature(Feature feature, IFeatureModel featureModel, boolean complete) {
 		this.featureModel = featureModel;
 		
 		this.name = feature.name;
@@ -224,7 +235,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 		fireChildrenChanged();
 	}
 
-	public Collection<Constraint> getRelevantConstraints() {
+	public Collection<IConstraint> getRelevantConstraints() {
 		return partOfConstraints;
 	}
 	
@@ -234,7 +245,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	public String getRelevantConstraintsString() {
 		StringBuilder relevant = new StringBuilder();
-		for (Constraint constraint : featureModel.getConstraints()) {
+		for (IConstraint constraint : featureModel.getConstraints()) {
 			for (Feature f : constraint.getContainedFeatures()) {
 				if (f.getName().equals(getName())) {
 					relevant.append((relevant.length() == 0 ? " " : "\n ") + constraint.getNode().toString(NodeWriter.logicalSymbols) + " ");
@@ -246,8 +257,8 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	}
 
 	public void setRelevantConstraints() {
-		List<Constraint> constraintList = new LinkedList<Constraint>();
-		for (Constraint constraint : featureModel.getConstraints()) {
+		List<IConstraint> constraintList = new LinkedList<IConstraint>();
+		for (IConstraint constraint : featureModel.getConstraints()) {
 			for (Feature f : constraint.getContainedFeatures()) {
 				if (f.getName().equals(getName())) {
 					constraintList.add(constraint);
@@ -262,7 +273,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 		return status;
 	}
 
-	public FeatureModel getFeatureModel() {
+	public IFeatureModel getFeatureModel() {
 		return featureModel;
 	}
 
@@ -575,7 +586,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * 
 	 * @return a deep copy from the feature
 	 * 
-	 * @see #clone(FeatureModel, boolean)
+	 * @see #clone(IFeatureModel, boolean)
 	 */
 	@Override
 	public Feature clone() {
@@ -590,10 +601,10 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * @param complete If {@code false} the fields colorList and location will not be copied for a faster cloning process.
 	 * @return a deep copy from the feature
 	 * 
-	 * @see FeatureModel#clone()
-	 * @see FeatureModel#clone(boolean)
+	 * @see IFeatureModel#clone()
+	 * @see IFeatureModel#clone(boolean)
 	 */
-	public Feature clone(FeatureModel featureModel, boolean complete) {
+	public Feature clone(IFeatureModel featureModel, boolean complete) {
 		return new Feature(this, featureModel, complete);
 	}
 

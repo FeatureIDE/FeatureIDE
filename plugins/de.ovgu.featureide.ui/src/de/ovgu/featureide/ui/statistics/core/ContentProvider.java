@@ -38,7 +38,7 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 import de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.AtomicParentNode;
@@ -152,7 +152,7 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 	private synchronized void addNodes() {
 		IComposerExtensionClass composer = project.getComposer();
 		FSTModel fstModel = getFSTModel(composer);
-		FeatureModel featModel = project.getFeatureModel();
+		IFeatureModel featModel = project.getFeatureModel();
 		JobDoneListener.getInstance().init(viewer);
 
 		godfather = new Parent("GODFATHER", null);

@@ -44,7 +44,7 @@ import org.eclipse.ui.PlatformUI;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
@@ -62,7 +62,7 @@ public class ExportDIMACSHandler extends AFileHandler {
 
 	@Override
 	protected void singleAction(final IFile inputFile) {
-		final FeatureModel model = readModel(inputFile);
+		final IFeatureModel model = readModel(inputFile);
 		Job job = new Job(EXPORT_TO_DIMACS) {
 			protected IStatus run(IProgressMonitor monitor) {
 				final String text = getCNF(model);
@@ -91,7 +91,7 @@ public class ExportDIMACSHandler extends AFileHandler {
 			 * @param model
 			 * @return
 			 */
-			private String getCNF(FeatureModel model) {
+			private String getCNF(IFeatureModel model) {
 				Node nodes = NodeCreator.createNodes(model.clone()).toCNF();
 				StringBuilder string = new StringBuilder();
 				Map<String, Integer> featureMap = new HashMap<String, Integer>();
@@ -211,8 +211,8 @@ public class ExportDIMACSHandler extends AFileHandler {
 	 * @throws UnsupportedModelException
 	 * @throws FileNotFoundException
 	 */
-	private FeatureModel readModel(IFile inputFile) {
-		FeatureModel fm = new FeatureModel();
+	private IFeatureModel readModel(IFile inputFile) {
+		IFeatureModel fm = new IFeatureModel();
 		FeatureModelReaderIFileWrapper fmReader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(fm));
 
 		try {

@@ -34,9 +34,9 @@ import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.graphics.Color;
 
 import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
-import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer.Attribute;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
@@ -139,7 +139,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		return true;
 	}
 
-	public LegendFigure(FeatureModel featureModel, Point pos) {
+	public LegendFigure(IFeatureModel featureModel, Point pos) {
 		final FeatureModelAnalyzer analyser = featureModel.getAnalyser();
 
 		mandatory = featureModel.hasMandatoryFeatures();

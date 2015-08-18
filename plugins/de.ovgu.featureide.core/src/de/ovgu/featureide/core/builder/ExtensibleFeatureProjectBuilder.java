@@ -38,7 +38,7 @@ import org.eclipse.core.runtime.IStatus;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 
@@ -163,7 +163,7 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 		if (configFile == null) {
 			return null;
 		}
-		FeatureModel featureModel = featureProject.getFeatureModel();
+		IFeatureModel featureModel = featureProject.getFeatureModel();
 		if (featureModel == null || featureModel.getRoot() == null) {
 			return null;
 		}
