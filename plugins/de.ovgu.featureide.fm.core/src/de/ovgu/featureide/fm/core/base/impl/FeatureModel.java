@@ -60,288 +60,191 @@ import de.ovgu.featureide.fm.core.base.IFeatureModelStructure;
  */
 public class FeatureModel implements IFeatureModel {
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.IFeatureModel#addConstraint(de.ovgu.featureide.fm.core.base.IConstraint)
-	 */
 	@Override
 	public void addConstraint(IConstraint constraint) {
 		// TODO Auto-generated method stub
 		
 	}
-
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.IFeatureModel#addConstraint(de.ovgu.featureide.fm.core.base.IConstraint, int)
-	 */
 	@Override
 	public void addConstraint(IConstraint constraint, int index) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.IFeatureModel#addFeature(de.ovgu.featureide.fm.core.base.IFeature)
-	 */
 	@Override
 	public boolean addFeature(IFeature feature) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.IFeatureModel#addListener(java.beans.PropertyChangeListener)
-	 */
 	@Override
 	public void addListener(PropertyChangeListener listener) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.IFeatureModel#createDefaultValues(java.lang.String)
-	 */
 	@Override
 	public void createDefaultValues(String projectName) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.IFeatureModel#deepClone()
-	 */
 	@Override
 	public IFeatureModel deepClone() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.IFeatureModel#deepClone(boolean)
-	 */
 	@Override
 	public IFeatureModel deepClone(boolean complete) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.IFeatureModel#deleteFeature(de.ovgu.featureide.fm.core.base.IFeature)
-	 */
 	@Override
 	public boolean deleteFeature(IFeature feature) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.IFeatureModel#deleteFeatureFromTable(de.ovgu.featureide.fm.core.base.IFeature)
-	 */
 	@Override
 	public void deleteFeatureFromTable(IFeature feature) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.IFeatureModel#getAnalyser()
-	 */
 	@Override
 	public FeatureModelAnalyzer getAnalyser() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.IFeatureModel#getConstraintCount()
-	 */
 	@Override
 	public int getConstraintCount() {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.IFeatureModel#getConstraintIndex(de.ovgu.featureide.fm.core.base.IConstraint)
-	 */
 	@Override
 	public int getConstraintIndex(IConstraint constraint) {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.IFeatureModel#getConstraints()
-	 */
 	@Override
 	public List<IConstraint> getConstraints() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.IFeatureModel#getFeature(java.lang.String)
-	 */
 	@Override
 	public IFeature getFeature(String name) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.IFeatureModel#getFeatureProperty()
-	 */
 	@Override
 	public IFeatureModelProperty getFeatureProperty() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.IFeatureModel#getFeatures()
-	 */
 	@Override
 	public Collection<IFeature> getFeatures() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.IFeatureModel#getFeatureStructure()
-	 */
 	@Override
 	public IFeatureModelStructure getFeatureStructure() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.IFeatureModel#getFMComposerExtension()
-	 */
 	@Override
 	public IFMComposerExtension getFMComposerExtension() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.IFeatureModel#getFMComposerManager(org.eclipse.core.resources.IProject)
-	 */
 	@Override
 	public FMComposerManager getFMComposerManager(IProject project) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.IFeatureModel#getNumberOfFeatures()
-	 */
 	@Override
 	public int getNumberOfFeatures() {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.IFeatureModel#getRenamingsManager()
-	 */
 	@Override
 	public RenamingsManager getRenamingsManager() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.IFeatureModel#handleModelDataChanged()
-	 */
 	@Override
 	public void handleModelDataChanged() {
 		// TODO Auto-generated method stub
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.IFeatureModel#handleModelDataLoaded()
-	 */
 	@Override
 	public void handleModelDataLoaded() {
 		// TODO Auto-generated method stub
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.IFeatureModel#initFMComposerExtension(org.eclipse.core.resources.IProject)
-	 */
 	@Override
 	public IFMComposerExtension initFMComposerExtension(IProject project) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.IFeatureModel#removeConstraint(de.ovgu.featureide.fm.core.base.IConstraint)
-	 */
 	@Override
 	public void removeConstraint(IConstraint constraint) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.IFeatureModel#removeConstraint(int)
-	 */
 	@Override
 	public void removeConstraint(int index) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.IFeatureModel#removeListener(java.beans.PropertyChangeListener)
-	 */
 	@Override
 	public void removeListener(PropertyChangeListener listener) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.IFeatureModel#replaceConstraint(de.ovgu.featureide.fm.core.base.IConstraint, int)
-	 */
 	@Override
 	public void replaceConstraint(IConstraint constraint, int index) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.IFeatureModel#reset()
-	 */
 	@Override
 	public void reset() {
 		// TODO Auto-generated method stub
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.IFeatureModel#setConstraints(java.util.List)
-	 */
 	@Override
 	public void setConstraints(List<IConstraint> constraints) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.IFeatureModel#setFeatureTable(java.util.Hashtable)
-	 */
 	@Override
 	public void setFeatureTable(Hashtable<String, IFeature> featureTable) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.IFeatureModel#fireEvent(java.beans.PropertyChangeEvent)
-	 */
 	@Override
 	public void fireEvent(PropertyChangeEvent event) {
 		// TODO Auto-generated method stub
