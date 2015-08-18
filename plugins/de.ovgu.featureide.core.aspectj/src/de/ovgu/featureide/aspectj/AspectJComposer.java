@@ -62,6 +62,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
+import de.ovgu.featureide.fm.core.filter.base.Filter;
 import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 
@@ -137,7 +138,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 		for (IFeature feature : configuration.getSelectedFeatures()) {
 			selectedFeatures.add(feature.getName());
 		}
-		for (IFeature feature : featureProject.getFeatureModel().getConcreteFeatures()) {
+		for (IFeature feature : Filter.filter(new LinkedList<>(featureProject.getFeatureModel().getFeatures()), Filter.CONCRETE_FEATURE_FILTER)) {
 			if (!selectedFeatures.contains(feature.getName())) {
 				unSelectedFeatures.add(feature.getName());
 			}
@@ -250,11 +251,11 @@ public class AspectJComposer extends ComposerExtensionClass {
 		featureModel = project.getFeatureModel();
 		try {
 			if (addAspects(project.getBuildFolder(), "")) {
-				featureModel.getRoot().removeChild(featureModel.getFeature("Base"));
-				IFeature root = featureModel.getRoot();
+				featureModel.getFeatureStructure().getRoot().getFeatureStructure().removeChild(featureModel.getFeature("Base"));
+				IFeature root = featureModel.getFeatureStructure().getRoot();
 				root.setName("Base");
-				featureModel.setRoot(root);
-				featureModel.getRoot().setAbstract(false);
+				featureModel.getFeatureStructure().setRoot(root);
+				featureModel.getFeatureStructure().getRoot().getFeatureStructure().setAbstract(false);
 				FeatureModelWriterIFileWrapper w = new FeatureModelWriterIFileWrapper(new XmlFeatureModelWriter(featureModel));
 				IFile file = project.getProject().getFile("model.xml");
 				w.writeToFile(file);
@@ -274,7 +275,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 				String name = res.getName();
 				if (name.endsWith(".aj")) {
 					IFeature feature = new IFeature(featureModel, folders + name.split("[.]")[0]);
-					featureModel.getRoot().addChild(feature);
+					featureModel.getFeatureStructure().getRoot().getFeatureStructure().addChild(feature);
 					hasAspects = true;
 				}
 			}
@@ -438,20 +439,20 @@ public class AspectJComposer extends ComposerExtensionClass {
 		} catch (NullPointerException e) {
 			AspectJCorePlugin.getDefault().reportBug(321);
 		}
-		IFeature root = featureProject.getFeatureModel().getRoot();
+		IFeature root = featureProject.getFeatureModel().getFeatureStructure().getRoot();
 		if (root == null) {
 			return;
 		}
 		rootName = root.getName();
-		if (!"".equals(rootName) && root.hasChildren()) {
+		if (!"".equals(rootName) && root.getFeatureStructure().hasChildren()) {
 			checkAspect(root);
 		}
 	}
 
 	private void checkAspect(IFeature feature) {
-		if (feature.hasChildren()) {
-			for (IFeature child : feature.getChildren()) {
-				if (child.isConcrete() && !child.getName().equals(rootName)) {
+		if (feature.getFeatureStructure().hasChildren()) {
+			for (IFeature child : feature.getFeatureStructure().getChildren()) {
+				if (child.getFeatureStructure().isConcrete() && !child.getName().equals(rootName)) {
 					createAspect(child.getName(), featureProject.getBuildFolder(), null);
 				}
 				checkAspect(child);
