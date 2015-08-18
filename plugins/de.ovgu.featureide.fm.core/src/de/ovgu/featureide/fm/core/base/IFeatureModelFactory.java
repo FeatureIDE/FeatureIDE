@@ -38,5 +38,13 @@ public interface IFeatureModelFactory {
 	IFeature createFeature(IFeatureModel featureModel, String name);
 
 	IFeatureModel createFeatureModel();
+	
+	IFeatureStructure createFeatureStructure(IFeature feature);
+	
+	IFeatureProperty createFeatureProperty(IFeature feature);
+	
+	IFeatureModelStructure createFeatureModelStructure(IFeatureModel featureModel);
+	
+	IFeatureModelProperty createFeatureModelProperty(IFeatureModel featureModel);
 
 }

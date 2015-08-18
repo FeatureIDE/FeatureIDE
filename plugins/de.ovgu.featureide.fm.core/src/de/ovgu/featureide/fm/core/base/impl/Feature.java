@@ -58,8 +58,8 @@ public class Feature implements IFeature, PropertyConstants {
 		this.featureModel = featureModel;
 		this.name = name;
 
-		this.property = new FeatureProperty(this);
-		this.structure = new FeatureStructure(this);
+		this.property = FeatureModelFactory.getInstance().createFeatureProperty(this);
+		this.structure = FeatureModelFactory.getInstance().createFeatureStructure(this);
 	}
 
 	protected Feature(IFeature feature, IFeatureModel featureModel) {
@@ -67,8 +67,8 @@ public class Feature implements IFeature, PropertyConstants {
 
 		this.name = feature.getName();
 
-		this.property = new FeatureProperty(feature.getFeatureProperty(), this);
-		this.structure = new FeatureStructure(feature.getFeatureStructure(), this);
+		this.property = feature.getFeatureProperty().clone(this);
+		this.structure = feature.getFeatureStructure().clone(this);
 	}
 
 	@Override

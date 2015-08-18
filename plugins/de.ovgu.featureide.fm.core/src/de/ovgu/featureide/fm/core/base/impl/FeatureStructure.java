@@ -52,8 +52,8 @@ public class FeatureStructure implements IFeatureStructure, PropertyConstants {
 
 	private List<IConstraint> partOfConstraints = new LinkedList<>();
 
-	private LinkedList<IFeature> children = new LinkedList<>();
-	private IFeature parent = null;
+	private LinkedList<IFeatureStructure> children = new LinkedList<>();
+	private IFeatureStructure parent = null;
 
 	private boolean and;
 	private boolean concrete;
@@ -72,12 +72,12 @@ public class FeatureStructure implements IFeatureStructure, PropertyConstants {
 		this.parentConnection = new FeatureConnection(this.correspondingFeature);
 
 		this.children = new LinkedList<>();
-		for (IFeature child : featureStructure.getChildren()) {
-			this.children.add(feature.getFeatureModel().getFeature(child.getName()));
-		}
-		if (featureStructure.getParent() != null) {
-			this.parent = feature.getFeatureModel().getFeature(featureStructure.getParent().getName());
-		}
+//		for (IFeatureStructure child : featureStructure.getChildren()) {
+//			this.children.add(feature.getFeatureModel().getFeature(child.getName()));
+//		}
+//		if (featureStructure.getParent() != null) {
+//			this.parent = feature.getFeatureModel().getFeature(featureStructure.getParent().getName());
+//		}
 	}
 
 	public FeatureStructure(IFeature correspondingFeature) {
@@ -93,15 +93,15 @@ public class FeatureStructure implements IFeatureStructure, PropertyConstants {
 		sourceConnections.add(parentConnection);
 	}
 
-	public void addChild(IFeature newChild) {
+	public void addChild(IFeatureStructure newChild) {
 		children.add(newChild);
-		newChild.getFeatureStructure().setParent(this.getFeature());
+		newChild.setParent(this);
 		fireChildrenChanged();
 	}
 
-	public void addChildAtPosition(int index, IFeature newChild) {
+	public void addChildAtPosition(int index, IFeatureStructure newChild) {
 		children.add(index, newChild);
-		newChild.getFeatureStructure().setParent(this.getFeature());
+		newChild.setParent(this);
 		fireChildrenChanged();
 	}
 
@@ -142,11 +142,11 @@ public class FeatureStructure implements IFeatureStructure, PropertyConstants {
 		correspondingFeature.fireEvent(event);
 	}
 
-	public int getChildIndex(IFeature feature) {
+	public int getChildIndex(IFeatureStructure feature) {
 		return children.indexOf(feature);
 	}
 
-	public LinkedList<IFeature> getChildren() {
+	public LinkedList<IFeatureStructure> getChildren() {
 		return children;
 	}
 
@@ -159,20 +159,20 @@ public class FeatureStructure implements IFeatureStructure, PropertyConstants {
 		return correspondingFeature;
 	}
 
-	public IFeature getFirstChild() {
+	public IFeatureStructure getFirstChild() {
 		if (children.isEmpty())
 			return null;
 		return children.get(0);
 	}
 
-	public IFeature getLastChild() {
+	public IFeatureStructure getLastChild() {
 		if (!children.isEmpty()) {
 			return children.getLast();
 		}
 		return null;
 	}
 
-	public IFeature getParent() {
+	public IFeatureStructure getParent() {
 		return parent;
 	}
 
@@ -200,12 +200,12 @@ public class FeatureStructure implements IFeatureStructure, PropertyConstants {
 
 			return false;
 		}
-		IFeature p = getParent();
+		IFeatureStructure p = getParent();
 
-		while (!p.getFeatureStructure().isRoot()) {
-			if (p.getFeatureStructure().isHidden())
+		while (!p.isRoot()) {
+			if (p.isHidden())
 				return true;
-			p = p.getFeatureStructure().getParent();
+			p = p.getParent();
 
 		}
 
@@ -228,11 +228,11 @@ public class FeatureStructure implements IFeatureStructure, PropertyConstants {
 		return !and && !multiple;
 	}
 
-	public boolean isAncestorOf(IFeature next) {
-		while (next.getFeatureStructure().getParent() != null) {
-			if (next.getFeatureStructure().getParent() == this.getParent())
+	public boolean isAncestorOf(IFeatureStructure next) {
+		while (next.getParent() != null) {
+			if (next.getParent() == this.getParent())
 				return true;
-			next = next.getFeatureStructure().getParent();
+			next = next.getParent();
 		}
 		return false;
 	}
@@ -242,10 +242,10 @@ public class FeatureStructure implements IFeatureStructure, PropertyConstants {
 	}
 
 	public boolean isANDPossible() {
-		if (parent == null || parent.getFeatureStructure().isAnd())
+		if (parent == null || parent.isAnd())
 			return false;
-		for (IFeature child : children) {
-			if (child.getFeatureStructure().isAnd())
+		for (IFeatureStructure child : children) {
+			if (child.isAnd())
 				return false;
 		}
 		return true;
@@ -255,7 +255,7 @@ public class FeatureStructure implements IFeatureStructure, PropertyConstants {
 		return concrete;
 	}
 
-	public boolean isFirstChild(IFeature child) {
+	public boolean isFirstChild(IFeatureStructure child) {
 		return children.indexOf(child) == 0;
 	}
 
@@ -264,7 +264,7 @@ public class FeatureStructure implements IFeatureStructure, PropertyConstants {
 	}
 
 	public boolean isMandatory() {
-		return parent == null || !parent.getFeatureStructure().isAnd() || mandatory;
+		return parent == null || !parent.isAnd() || mandatory;
 	}
 
 	public boolean isMandatorySet() {
@@ -283,15 +283,15 @@ public class FeatureStructure implements IFeatureStructure, PropertyConstants {
 		return parent == null;
 	}
 
-	public void removeChild(IFeature child) {
+	public void removeChild(IFeatureStructure child) {
 		children.remove(child);
-		child.getFeatureStructure().setParent(null);
+		child.setParent(null);
 		fireChildrenChanged();
 	}
 
-	public IFeature removeLastChild() {
-		IFeature child = children.removeLast();
-		child.getFeatureStructure().setParent(null);
+	public IFeatureStructure removeLastChild() {
+		IFeatureStructure child = children.removeLast();
+		child.setParent(null);
 		fireChildrenChanged();
 		return child;
 	}
@@ -300,11 +300,11 @@ public class FeatureStructure implements IFeatureStructure, PropertyConstants {
 		return targetConnections.remove(connection);
 	}
 
-	public void replaceChild(IFeature oldChild, IFeature newChild) {
+	public void replaceChild(IFeatureStructure oldChild, IFeatureStructure newChild) {
 		int index = children.indexOf(oldChild);
 		children.set(index, newChild);
-		oldChild.getFeatureStructure().setParent(null);
-		newChild.getFeatureStructure().setParent(this.getFeature());
+		oldChild.setParent(null);
+		newChild.setParent(this);
 		fireChildrenChanged();
 	}
 
@@ -327,11 +327,11 @@ public class FeatureStructure implements IFeatureStructure, PropertyConstants {
 		fireChildrenChanged();
 	}
 
-	public void setChildren(LinkedList<IFeature> children) {
+	public void setChildren(LinkedList<IFeatureStructure> children) {
 		if (this.children == children)
 			return;
-		for (IFeature child : children) {
-			child.getFeatureStructure().setParent(this.getFeature());
+		for (IFeatureStructure child : children) {
+			child.setParent(this);
 		}
 		this.children = children;
 		fireChildrenChanged();
@@ -357,21 +357,21 @@ public class FeatureStructure implements IFeatureStructure, PropertyConstants {
 		this.multiple = true;
 	}
 
-	public void setParent(IFeature newParent) {
+	public void setParent(IFeatureStructure newParent) {
 		if (newParent == parent)
 			return;
 
 		// delete old parent connection (if existing)
 		if (parent != null) {
-			parent.getFeatureStructure().removeTargetConnection(parentConnection);
+			parent.removeTargetConnection(parentConnection);
 			parentConnection.setTarget(null);
 		}
 
 		// update the target
 		parent = newParent;
 		if (newParent != null) {
-			parentConnection.setTarget(newParent);
-			newParent.getFeatureStructure().addTargetConnection(parentConnection);
+			parentConnection.setTarget(newParent.getFeature());
+			newParent.addTargetConnection(parentConnection);
 		}
 	}
 
@@ -386,6 +386,11 @@ public class FeatureStructure implements IFeatureStructure, PropertyConstants {
 			}
 		}
 		partOfConstraints = constraintList;
+	}
+
+	@Override
+	public IFeatureStructure clone(IFeature newFeature) {
+		return new FeatureStructure(this, newFeature);
 	}
 
 }

@@ -26,8 +26,6 @@ import java.util.List;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelProperty;
-import de.ovgu.featureide.fm.core.filter.ConcreteFeatureFilter;
-import de.ovgu.featureide.fm.core.filter.base.Filter;
 
 /**
  * The model representation of the feature tree that notifies listeners of
@@ -55,36 +53,29 @@ public class FeatureModelProperty implements IFeatureModelProperty {
 	 */
 	private final List<String> annotations;
 
-	/**
-	 * A list containing the feature names in their specified order will be
-	 * initialized in XmlFeatureModelReader.
-	 */
-	private final List<String> featureOrderList;
-
-	private boolean featureOrderUserDefined;
-
 	private boolean featureOrderInXML;
 
 	public FeatureModelProperty(IFeatureModel correspondingFeatureModel) {
 		this.correspondingFeatureModel = correspondingFeatureModel;
 
-		this.featureOrderList = new LinkedList<String>();
-		this.featureOrderUserDefined = false;
+//		this.featureOrderList = new LinkedList<>();
+//		this.featureOrderUserDefined = false;
 		this.featureOrderInXML = false;
 
-		this.comments = new LinkedList<String>();
-		this.annotations = new LinkedList<String>();
+		this.comments = new LinkedList<>();
+		this.annotations = new LinkedList<>();
 	}
 
 	public FeatureModelProperty(IFeatureModelProperty property, IFeatureModel correspondingFeatureModel) {
 		this.correspondingFeatureModel = correspondingFeatureModel;
 
-		this.featureOrderUserDefined = property.isFeatureOrderUserDefined();
-		if (this.featureOrderUserDefined) {
-			this.featureOrderList = new LinkedList<String>(property.getFeatureOrderList());
-		} else {
-			this.featureOrderList = new LinkedList<String>();
-		}
+//		this.featureOrderUserDefined = property.isFeatureOrderUserDefined();
+//		if (this.featureOrderUserDefined) {
+//			this.featureOrderList = new LinkedList<>(property.getFeatureOrderList());
+//		} else {
+//			this.featureOrderList = new LinkedList<>();
+//		}
+		
 		this.featureOrderInXML = property.isFeatureOrderInXML();
 
 		this.comments = new LinkedList<>(property.getComments());
@@ -116,23 +107,10 @@ public class FeatureModelProperty implements IFeatureModelProperty {
 	public IFeatureModel getFeatureModel() {
 		return correspondingFeatureModel;
 	}
-
-	@Override
-	public List<String> getFeatureOrderList() {
-		if (featureOrderList.isEmpty()) {
-			return Filter.toString(correspondingFeatureModel.getFeatures(), new ConcreteFeatureFilter());
-		}
-		return featureOrderList;
-	}
-
+	
 	@Override
 	public boolean isFeatureOrderInXML() {
 		return featureOrderInXML;
-	}
-
-	@Override
-	public boolean isFeatureOrderUserDefined() {
-		return featureOrderUserDefined;
 	}
 
 	@Override
@@ -140,15 +118,10 @@ public class FeatureModelProperty implements IFeatureModelProperty {
 		this.featureOrderInXML = featureOrderInXML;
 	}
 
-	@Override
-	public void setFeatureOrderList(List<String> featureOrderList) {
-		this.featureOrderList.clear();
-		this.featureOrderList.addAll(featureOrderList);
-	}
 
 	@Override
-	public void setFeatureOrderUserDefined(boolean featureOrderUserDefined) {
-		this.featureOrderUserDefined = featureOrderUserDefined;
+	public IFeatureModelProperty clone(IFeatureModel newFeatureNodel) {
+		return new FeatureModelProperty(this, newFeatureNodel);
 	}
 
 }

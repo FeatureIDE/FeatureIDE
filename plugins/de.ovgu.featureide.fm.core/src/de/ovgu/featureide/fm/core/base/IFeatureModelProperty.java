@@ -39,16 +39,10 @@ public interface IFeatureModelProperty {
 
 	IFeatureModel getFeatureModel();
 
-	List<String> getFeatureOrderList();
-
 	boolean isFeatureOrderInXML();
-
-	boolean isFeatureOrderUserDefined();
 
 	void setFeatureOrderInXML(boolean featureOrderInXML);
 
-	void setFeatureOrderList(final List<String> featureOrderList);
-
-	void setFeatureOrderUserDefined(boolean featureOrderUserDefined);
+	IFeatureModelProperty clone(IFeatureModel newFeatureNodel);
 
 }

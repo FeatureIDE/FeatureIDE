@@ -42,5 +42,7 @@ public interface IFeatureProperty {
 	void setDisplayName(String name);
 
 	void setFeatureStatus(FeatureStatus status);
+	
+	IFeatureProperty clone(IFeature newFeature);
 
 }

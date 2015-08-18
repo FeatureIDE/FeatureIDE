@@ -29,6 +29,7 @@ import de.ovgu.featureide.fm.core.FeatureStatus;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelStructure;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 
 /**
  * The model representation of the feature tree that notifies listeners of
@@ -44,7 +45,7 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 
 	private final IFeatureModel correspondingFeatureModel;
 
-	private IFeature rootFeature;
+	private IFeatureStructure rootFeature;
 
 	public FeatureModelStructure(IFeatureModel correspondingFeatureModel) {
 		this.correspondingFeatureModel = correspondingFeatureModel;
@@ -72,15 +73,15 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 		return Collections.unmodifiableCollection(preorderFeatures);
 	}
 
-	private void getFeaturesPreorder(IFeature feature, List<IFeature> preorderFeatures) {
-		preorderFeatures.add(feature);
-		for (IFeature child : feature.getFeatureStructure().getChildren()) {
+	private void getFeaturesPreorder(IFeatureStructure featureStructure, List<IFeature> preorderFeatures) {
+		preorderFeatures.add(featureStructure.getFeature());
+		for (IFeatureStructure child : featureStructure.getChildren()) {
 			getFeaturesPreorder(child, preorderFeatures);
 		}
 	}
 
 	@Override
-	public IFeature getRoot() {
+	public IFeatureStructure getRoot() {
 		return rootFeature;
 	}
 
@@ -143,8 +144,8 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 	@Override
 	public boolean hasMandatoryFeatures() {
 		for (IFeature f : correspondingFeatureModel.getFeatures()) {
-			IFeature parent = f.getFeatureStructure().getParent();
-			if (parent != null && parent.getFeatureStructure().isAnd() && f.getFeatureStructure().isMandatory())
+			IFeatureStructure parent = f.getFeatureStructure().getParent();
+			if (parent != null && parent.isAnd() && f.getFeatureStructure().isMandatory())
 				return true;
 		}
 		return false;
@@ -153,7 +154,7 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 	@Override
 	public boolean hasOptionalFeatures() {
 		for (IFeature f : correspondingFeatureModel.getFeatures()) {
-			if (!f.equals(rootFeature) && f.getFeatureStructure().getParent().getFeatureStructure().isAnd() && !f.getFeatureStructure().isMandatory())
+			if (!f.equals(rootFeature) && f.getFeatureStructure().getParent().isAnd() && !f.getFeatureStructure().isMandatory())
 				return true;
 		}
 		return false;
@@ -191,14 +192,19 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 	}
 
 	@Override
-	public void replaceRoot(IFeature feature) {
-		correspondingFeatureModel.deleteFeature(rootFeature);
+	public void replaceRoot(IFeatureStructure feature) {
+		correspondingFeatureModel.deleteFeatureFromTable(rootFeature.getFeature());
 		rootFeature = feature;
 	}
 
 	@Override
-	public void setRoot(IFeature root) {
+	public void setRoot(IFeatureStructure root) {
 		this.rootFeature = root;
+	}
+
+	@Override
+	public IFeatureModelStructure clone(IFeatureModel newFeatureNodel) {
+		return new FeatureModelStructure(this, newFeatureNodel);
 	}
 
 }

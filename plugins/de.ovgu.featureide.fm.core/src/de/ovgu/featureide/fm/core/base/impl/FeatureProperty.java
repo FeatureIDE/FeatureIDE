@@ -94,4 +94,9 @@ public class FeatureProperty implements IFeatureProperty {
 		this.status = status;
 	}
 
+	@Override
+	public IFeatureProperty clone(IFeature newFeature) {
+		return new FeatureProperty(this, newFeature);
+	}
+
 }

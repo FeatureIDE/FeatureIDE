@@ -107,4 +107,12 @@ public interface IFeatureModel {
 
 	void fireEvent(PropertyChangeEvent event);
 
+	List<String> getFeatureOrderList();
+
+	boolean isFeatureOrderUserDefined();
+
+	void setFeatureOrderList(final List<String> featureOrderList);
+
+	void setFeatureOrderUserDefined(boolean featureOrderUserDefined);
+
 }

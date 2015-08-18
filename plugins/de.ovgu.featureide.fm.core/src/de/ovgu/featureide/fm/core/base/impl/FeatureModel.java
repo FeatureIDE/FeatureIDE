@@ -41,13 +41,18 @@ import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.FMComposerManager;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
+import de.ovgu.featureide.fm.core.FeatureModelLayout;
 import de.ovgu.featureide.fm.core.IFMComposerExtension;
+import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.RenamingsManager;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelProperty;
 import de.ovgu.featureide.fm.core.base.IFeatureModelStructure;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.filter.ConcreteFeatureFilter;
+import de.ovgu.featureide.fm.core.filter.base.Filter;
 
 /**
  * The model representation of the feature tree that notifies listeners of
@@ -58,197 +63,330 @@ import de.ovgu.featureide.fm.core.base.IFeatureModelStructure;
  * @author Stefan Krueger
  * 
  */
-public class FeatureModel implements IFeatureModel {
+public class FeatureModel implements IFeatureModel, PropertyConstants {
+
+	private final IFeatureModelProperty property;
+	private final IFeatureModelStructure structure;
+	
+	/**
+	 * A list containing the feature names in their specified order will be
+	 * initialized in XmlFeatureModelReader.
+	 */
+	private final List<String> featureOrderList;
+
+	private boolean featureOrderUserDefined;
+	
+	@Override
+	public List<String> getFeatureOrderList() {
+		if (featureOrderList.isEmpty()) {
+			return Filter.toString(getFeatures(), new ConcreteFeatureFilter());
+		}
+		return featureOrderList;
+	}
 
 	@Override
-	public void addConstraint(IConstraint constraint) {
-		// TODO Auto-generated method stub
-		
+	public boolean isFeatureOrderUserDefined() {
+		return featureOrderUserDefined;
 	}
+
+	@Override
+	public void setFeatureOrderList(List<String> featureOrderList) {
+		this.featureOrderList.clear();
+		this.featureOrderList.addAll(featureOrderList);
+	}
+
+	@Override
+	public void setFeatureOrderUserDefined(boolean featureOrderUserDefined) {
+		this.featureOrderUserDefined = featureOrderUserDefined;
+	}
+	
+	/**
+	 * A {@link Map} containing all features.
+	 */
+	private final Map<String, IFeature> featureTable = new ConcurrentHashMap<>();
+
+	protected final List<IConstraint> constraints = new LinkedList<>();
+	
+	private final List<PropertyChangeListener> listenerList = new LinkedList<>();
+	
+	private final FeatureModelAnalyzer analyser = createAnalyser();
+	
+	private final RenamingsManager renamingsManager = new RenamingsManager(this);
+	
+	private Object undoContext;
+	
+	private FMComposerManager fmComposerManager;
+	
+	@Override
+	public void addConstraint(IConstraint constraint) {
+		constraints.add(constraint);
+	}
+
 	@Override
 	public void addConstraint(IConstraint constraint, int index) {
-		// TODO Auto-generated method stub
-		
+		constraints.add(index, constraint);
 	}
 
 	@Override
 	public boolean addFeature(IFeature feature) {
-		// TODO Auto-generated method stub
-		return false;
+		final String name = feature.getName();
+		if (featureTable.containsKey(name)) {
+			return false;
+		}
+		featureTable.put(name, feature);
+		return true;
 	}
 
 	@Override
 	public void addListener(PropertyChangeListener listener) {
-		// TODO Auto-generated method stub
-		
+		if (!listenerList.contains(listener)) {
+			listenerList.add(listener);
+		}
 	}
 
 	@Override
 	public void createDefaultValues(String projectName) {
-		// TODO Auto-generated method stub
+		String rootName = getValidJavaIdentifier(projectName);
+		if (rootName.isEmpty()) {
+			rootName = "Root";
+		}		
+		if (featureTable.isEmpty()) {
+			IFeature root = new Feature(this, rootName);
+			structure.setRoot(root.getFeatureStructure());
+			addFeature(root);
+		}
+		IFeature feature = new Feature(this, "Base");
+		addFeature(feature);
 		
+		structure.getRoot().addChild(feature.getFeatureStructure());
+		structure.getRoot().setAbstract(true);		
 	}
 
-	@Override
-	public IFeatureModel deepClone() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public IFeatureModel deepClone(boolean complete) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public boolean deleteFeature(IFeature feature) {
-		// TODO Auto-generated method stub
-		return false;
-	}
+//	@Override
+//	public IFeatureModel deepClone() {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
+//
+//	@Override
+//	public IFeatureModel deepClone(boolean complete) {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
 
 	@Override
 	public void deleteFeatureFromTable(IFeature feature) {
-		// TODO Auto-generated method stub
-		
+		featureTable.remove(feature.getName());
+	}
+	
+	@Override
+	public boolean deleteFeature(IFeature feature) {
+		// the root can not be deleted
+		if (feature == structure.getRoot()) {
+			return false;
+		}
+
+		// check if it exists
+		String name = feature.getName();
+		if (!featureTable.containsKey(name)) {
+			return false;
+		}
+
+		// use the group type of the feature to delete
+		IFeatureStructure parent = feature.getFeatureStructure().getParent();
+
+		if (parent.getChildrenCount() == 1) {
+			if (feature.getFeatureStructure().isAnd()) {
+				parent.setAnd();
+			} else if (feature.getFeatureStructure().isAlternative()) {
+				parent.setAlternative();
+			} else {
+				parent.setOr();
+			}
+		}
+
+		// add children to parent
+		int index = parent.getChildIndex(feature.getFeatureStructure());
+		while (feature.getFeatureStructure().hasChildren()) {
+			parent.addChildAtPosition(index, feature.getFeatureStructure().removeLastChild());
+		}
+
+		// delete feature
+		parent.removeChild(feature.getFeatureStructure());
+		featureTable.remove(name);
+		featureOrderList.remove(name);
+		return true;
 	}
 
 	@Override
 	public FeatureModelAnalyzer getAnalyser() {
-		// TODO Auto-generated method stub
-		return null;
+		return analyser;
 	}
 
 	@Override
 	public int getConstraintCount() {
-		// TODO Auto-generated method stub
-		return 0;
+		return constraints.size();
 	}
 
 	@Override
 	public int getConstraintIndex(IConstraint constraint) {
-		// TODO Auto-generated method stub
-		return 0;
+		return constraints.indexOf(constraint);
 	}
 
 	@Override
 	public List<IConstraint> getConstraints() {
-		// TODO Auto-generated method stub
-		return null;
+		return Collections.unmodifiableList(constraints);
 	}
 
 	@Override
 	public IFeature getFeature(String name) {
-		// TODO Auto-generated method stub
-		return null;
+		return featureTable.get(name);
 	}
 
 	@Override
 	public IFeatureModelProperty getFeatureProperty() {
-		// TODO Auto-generated method stub
-		return null;
+		return property;
 	}
 
 	@Override
 	public Collection<IFeature> getFeatures() {
-		// TODO Auto-generated method stub
-		return null;
+		return Collections.unmodifiableCollection(featureTable.values());
 	}
 
 	@Override
 	public IFeatureModelStructure getFeatureStructure() {
-		// TODO Auto-generated method stub
-		return null;
+		return structure;
 	}
 
 	@Override
 	public IFMComposerExtension getFMComposerExtension() {
-		// TODO Auto-generated method stub
-		return null;
+		return getFMComposerManager(null).getFMComposerExtension();
 	}
 
 	@Override
 	public FMComposerManager getFMComposerManager(IProject project) {
-		// TODO Auto-generated method stub
-		return null;
+		if (fmComposerManager == null) {
+		fmComposerManager = new FMComposerManager(project);
+	}
+	return fmComposerManager;
 	}
 
 	@Override
 	public int getNumberOfFeatures() {
-		// TODO Auto-generated method stub
-		return 0;
+		return featureTable.size();
 	}
 
 	@Override
 	public RenamingsManager getRenamingsManager() {
-		// TODO Auto-generated method stub
-		return null;
+		return renamingsManager;
 	}
 
 	@Override
 	public void handleModelDataChanged() {
-		// TODO Auto-generated method stub
-		
+		fireEvent(MODEL_DATA_CHANGED);		
 	}
 
 	@Override
 	public void handleModelDataLoaded() {
-		// TODO Auto-generated method stub
+		fireEvent(MODEL_DATA_LOADED);
 		
 	}
 
 	@Override
 	public IFMComposerExtension initFMComposerExtension(IProject project) {
-		// TODO Auto-generated method stub
-		return null;
+		return getFMComposerManager(project);
 	}
 
 	@Override
 	public void removeConstraint(IConstraint constraint) {
-		// TODO Auto-generated method stub
-		
+		constraints.remove(constraint);		
 	}
 
 	@Override
 	public void removeConstraint(int index) {
-		// TODO Auto-generated method stub
+		constraints.remove(index);		
 		
 	}
 
 	@Override
 	public void removeListener(PropertyChangeListener listener) {
-		// TODO Auto-generated method stub
-		
+		listenerList.remove(listener);		
 	}
 
 	@Override
 	public void replaceConstraint(IConstraint constraint, int index) {
-		// TODO Auto-generated method stub
-		
+		constraints.set(index, constraint);		
 	}
 
 	@Override
 	public void reset() {
-		// TODO Auto-generated method stub
-		
+		if (structure.getRoot() != null) {
+		while (structure.getRoot().hasChildren()) {
+			IFeatureStructure child = structure.getRoot().getLastChild();
+			deleteChildFeatures(child);
+			structure.getRoot().removeChild(child);
+			featureTable.remove(child.getName());
+		}
+		rootFeature = null;
+	}
+	featureTable.clear();
+	renamingsManager.clear();
+	constraints.clear();
+	
+	property.reset();
+	
+//	if (property.getComments() != null) {
+//		property.getComments().clear();
+//	}
+//	if (annotations != null) {
+//		annotations.clear();
+//	}
+	featureOrderList.clear();
 	}
 
 	@Override
 	public void setConstraints(List<IConstraint> constraints) {
-		// TODO Auto-generated method stub
-		
+		this.constraints.clear();
+		this.constraints.addAll(constraints);		
 	}
 
 	@Override
 	public void setFeatureTable(Hashtable<String, IFeature> featureTable) {
-		// TODO Auto-generated method stub
-		
+		this.featureTable.clear();
+		this.featureTable.putAll(featureTable);		
 	}
 
 	@Override
 	public void fireEvent(PropertyChangeEvent event) {
-		// TODO Auto-generated method stub
-		
+		for (PropertyChangeListener listener : listenerList) {
+			listener.propertyChange(event);
+		}
+	}
+	
+	private void fireEvent(final String action) {
+		fireEvent(new PropertyChangeEvent(this,
+			action, Boolean.FALSE, Boolean.TRUE));
+	}
+
+	/**
+	 * Removes all invalid java identifiers form a given string.
+	 */
+	private String getValidJavaIdentifier(String s) {
+		StringBuilder stringBuilder = new StringBuilder();
+		int i = 0;
+		for (; i < s.length(); i++) {
+			if (Character.isJavaIdentifierStart(s.charAt(i))) {
+				stringBuilder.append(s.charAt(i));
+				i++;
+				break;
+			}
+		}
+		for (; i < s.length(); i++) {
+			if (Character.isJavaIdentifierPart(s.charAt(i))) {
+				stringBuilder.append(s.charAt(i));
+			}
+		}
+		return stringBuilder.toString();
 	}
 	
 //	private Feature rootFeature;
@@ -432,26 +570,7 @@ public class FeatureModel implements IFeatureModel {
 //		rootFeature.setAbstract(true);
 //	}
 //	
-//	/**
-//	 * Removes all invalid java identifiers form a given string.
-//	 */
-//	private String getValidJavaIdentifier(String s) {
-//		StringBuilder stringBuilder = new StringBuilder();
-//		int i = 0;
-//		for (; i < s.length(); i++) {
-//			if (Character.isJavaIdentifierStart(s.charAt(i))) {
-//				stringBuilder.append(s.charAt(i));
-//				i++;
-//				break;
-//			}
-//		}
-//		for (; i < s.length(); i++) {
-//			if (Character.isJavaIdentifierPart(s.charAt(i))) {
-//				stringBuilder.append(s.charAt(i));
-//			}
-//		}
-//		return stringBuilder.toString();
-//	}
+
 //
 //	/* *****************************************************************
 //	 * 

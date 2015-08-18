@@ -34,11 +34,11 @@ public interface IFeatureModelStructure {
 
 	Collection<IFeature> getFeaturesPreorder();
 
-	IFeature getRoot();
+	IFeatureStructure getRoot();
 
-//	void handleModelDataChanged();
-//
-//	void handleModelDataLoaded();
+	//	void handleModelDataChanged();
+	//
+	//	void handleModelDataLoaded();
 
 	boolean hasAbstract();
 
@@ -62,8 +62,10 @@ public interface IFeatureModelStructure {
 
 	int numOrGroup();
 
-	void replaceRoot(IFeature feature);
+	void replaceRoot(IFeatureStructure feature);
 
-	void setRoot(IFeature root);
+	void setRoot(IFeatureStructure root);
+
+	IFeatureModelStructure clone(IFeatureModel newFeatureNodel);
 
 }

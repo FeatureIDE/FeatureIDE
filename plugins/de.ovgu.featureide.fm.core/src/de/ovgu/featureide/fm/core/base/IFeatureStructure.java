@@ -34,9 +34,9 @@ import de.ovgu.featureide.fm.core.FeatureConnection;
  */
 public interface IFeatureStructure {
 
-	void addChild(IFeature newChild);
+	void addChild(IFeatureStructure newChild);
 
-	void addChildAtPosition(int index, IFeature newChild);
+	void addChildAtPosition(int index, IFeatureStructure newChild);
 
 	void addTargetConnection(FeatureConnection connection);
 
@@ -46,19 +46,19 @@ public interface IFeatureStructure {
 
 	void changeToOr();
 
-	int getChildIndex(IFeature feature);
+	int getChildIndex(IFeatureStructure feature);
 
-	LinkedList<IFeature> getChildren();
+	LinkedList<IFeatureStructure> getChildren();
 
 	int getChildrenCount();
 
 	IFeature getFeature();
 
-	IFeature getFirstChild();
+	IFeatureStructure getFirstChild();
 
-	IFeature getLastChild();
+	IFeatureStructure getLastChild();
 
-	IFeature getParent();
+	IFeatureStructure getParent();
 
 	Collection<IConstraint> getRelevantConstraints();
 
@@ -76,7 +76,7 @@ public interface IFeatureStructure {
 
 	boolean isAlternative();
 
-	boolean isAncestorOf(IFeature next);
+	boolean isAncestorOf(IFeatureStructure next);
 
 	boolean isAnd();
 
@@ -84,7 +84,7 @@ public interface IFeatureStructure {
 
 	boolean isConcrete();
 
-	boolean isFirstChild(IFeature child);
+	boolean isFirstChild(IFeatureStructure child);
 
 	boolean isHidden();
 
@@ -98,13 +98,13 @@ public interface IFeatureStructure {
 
 	boolean isRoot();
 
-	void removeChild(IFeature child);
+	void removeChild(IFeatureStructure child);
 
-	IFeature removeLastChild();
+	IFeatureStructure removeLastChild();
 
 	boolean removeTargetConnection(FeatureConnection connection);
 
-	void replaceChild(IFeature oldChild, IFeature newChild);
+	void replaceChild(IFeatureStructure oldChild, IFeatureStructure newChild);
 
 	void setAbstract(boolean value);
 
@@ -114,7 +114,7 @@ public interface IFeatureStructure {
 
 	void setAND(boolean and);
 
-	void setChildren(LinkedList<IFeature> children);
+	void setChildren(LinkedList<IFeatureStructure> children);
 
 	void setHidden(boolean hid);
 
@@ -124,8 +124,10 @@ public interface IFeatureStructure {
 
 	void setOr();
 
-	void setParent(IFeature newParent);
+	void setParent(IFeatureStructure newParent);
 
 	void setRelevantConstraints();
+
+	IFeatureStructure clone(IFeature newFeature);
 
 }

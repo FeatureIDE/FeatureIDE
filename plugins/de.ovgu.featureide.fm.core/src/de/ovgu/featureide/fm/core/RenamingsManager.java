@@ -35,6 +35,8 @@ import org.eclipse.core.runtime.IPath;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+
 /**
  * Handles feature renamings.
  * 
@@ -54,7 +56,7 @@ public class RenamingsManager {
 	 * 
 	 *#*****************************************************************/
 	
-	public RenamingsManager(FeatureModel model) {
+	public RenamingsManager(IFeatureModel model) {
 		 this.model = model;
 	}
 	
