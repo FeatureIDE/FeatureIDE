@@ -31,10 +31,10 @@ import org.eclipse.gef.RequestConstants;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.gef.editpolicies.NonResizableEditPolicy;
 
-import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.ui.editors.ConstraintDialog;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.ConstraintFigure;
 
@@ -50,8 +50,8 @@ public class ConstraintEditPart extends AbstractGraphicalEditPart implements Pro
 		setModel(constraint);
 	}
 
-	public Constraint getConstraintModel() {
-		return (Constraint) getModel();
+	public IConstraint getConstraintModel() {
+		return (IConstraint) getModel();
 	}
 
 	public ConstraintFigure getConstraintFigure() {
@@ -73,7 +73,7 @@ public class ConstraintEditPart extends AbstractGraphicalEditPart implements Pro
 			new ConstraintDialog(getConstraintModel().getFeatureModel(), getConstraintModel());
 		} else if (request.getType() == RequestConstants.REQ_SELECTION) {
 			try {
-				for (Feature containedFeature : getConstraintModel().getContainedFeatures()) {
+				for (IFeature containedFeature : getConstraintModel().getContainedFeatures()) {
 					containedFeature.setConstraintSelected(true);
 				}
 			} catch (NullPointerException e) {

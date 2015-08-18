@@ -28,14 +28,14 @@ import java.nio.charset.Charset;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
  * This Wrapper makes it possible, to write feature models to IFiles, e.g. if
  * working with Eclipse plugins Otherwise only the classes extending
  * {@link AbstractFeatureModelWriter} are needed
  * 
- * @author Sönke Holthusen
+ * @author Sï¿½nke Holthusen
  */
 public class FeatureModelWriterIFileWrapper extends AbstractFeatureModelWriter {
 
@@ -45,11 +45,11 @@ public class FeatureModelWriterIFileWrapper extends AbstractFeatureModelWriter {
 		this.writer = writer;
 	}
 
-	public void setFeatureModel(FeatureModel featureModel) {
+	public void setFeatureModel(IFeatureModel featureModel) {
 		writer.setFeatureModel(featureModel);
 	}
 
-	public FeatureModel getFeatureModel() {
+	public IFeatureModel getFeatureModel() {
 		return writer.getFeatureModel();
 	}
 

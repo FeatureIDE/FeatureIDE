@@ -5,7 +5,7 @@ import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.util.List;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 
@@ -89,7 +89,7 @@ public class Commons {
 	 *            instance).
 	 * @return Feature model loaded from the given file
 	 */
-	public final static FeatureModel loadFeatureModelFromFile(final String featureModelXmlFilename, final String remotePath, final String localClassPath) {
+	public final static IFeatureModel loadFeatureModelFromFile(final String featureModelXmlFilename, final String remotePath, final String localClassPath) {
 		return loadFeatureModelFromFile(featureModelXmlFilename, new FileFilterByExtension(extractFileExtension(featureModelXmlFilename)), remotePath,
 				localClassPath);
 	}
@@ -121,9 +121,9 @@ public class Commons {
 	 *            instance).
 	 * @return Feature model loaded from the given file
 	 */
-	public final static FeatureModel loadFeatureModelFromFile(final String featureModelXmlFilename, final FileFilter filter, final String remotePath,
+	public final static IFeatureModel loadFeatureModelFromFile(final String featureModelXmlFilename, final FileFilter filter, final String remotePath,
 			final String localClassPath) {
-		FeatureModel fm = new FeatureModel();
+		IFeatureModel fm = new IFeatureModel();
 		File modelFileFolder = getFile(remotePath, localClassPath);
 		for (File f : modelFileFolder.listFiles(filter)) {
 			if (f.getName().equals(featureModelXmlFilename)) {

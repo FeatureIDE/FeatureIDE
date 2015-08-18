@@ -24,7 +24,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslWriter;
 import de.ovgu.featureide.fm.ui.handlers.base.AbstractExportHandler;
@@ -37,7 +37,7 @@ import de.ovgu.featureide.fm.ui.handlers.base.AbstractExportHandler;
 public class ExportGUIDSLHandler extends AbstractExportHandler {
 
 	@Override
-	protected IFeatureModelWriter getFeatureModelWriter(FeatureModel fm) {
+	protected IFeatureModelWriter getFeatureModelWriter(IFeatureModel fm) {
 		final GuidslWriter fmWriter = new GuidslWriter(fm);
 		if (fmWriter.hasConcreteCompounds()
 				&& !MessageDialog.openQuestion(new Shell(), "Warning!",

@@ -24,8 +24,10 @@ import java.util.List;
 
 import org.eclipse.core.resources.IProject;
 
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+
 /** 
- * Holds the color scheme names for a {@link FeatureModel}.
+ * Holds the color scheme names for a {@link IFeatureModel}.
  * 
  * @author Sebastian Krieter
  */
@@ -91,7 +93,7 @@ public class EmptyColorschemeTable extends ColorschemeTable {
 	}
 
 	@Override
-	public ColorschemeTable clone(FeatureModel fm) {
+	public ColorschemeTable clone(IFeatureModel fm) {
 		return new EmptyColorschemeTable();
 	}
 	

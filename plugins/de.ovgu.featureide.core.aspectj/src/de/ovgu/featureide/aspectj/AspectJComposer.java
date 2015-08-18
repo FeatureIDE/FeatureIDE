@@ -58,10 +58,11 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
+import de.ovgu.featureide.fm.core.filter.base.Filter;
 import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 
@@ -86,7 +87,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 	private static final Object BUILDER_JAVA = "org.eclipse.jdt.core.javabuilder";
 
 	private LinkedList<String> unSelectedFeatures;
-	private FeatureModel featureModel;
+	private IFeatureModel featureModel;
 	private boolean hadAspectJNature;
 
 	private static final LinkedHashSet<String> EXTENSIONS = createExtensions();
@@ -134,10 +135,10 @@ public class AspectJComposer extends ComposerExtensionClass {
 		}
 		LinkedList<String> selectedFeatures = new LinkedList<String>();
 		unSelectedFeatures = new LinkedList<String>();
-		for (Feature feature : configuration.getSelectedFeatures()) {
+		for (IFeature feature : configuration.getSelectedFeatures()) {
 			selectedFeatures.add(feature.getName());
 		}
-		for (Feature feature : featureProject.getFeatureModel().getConcreteFeatures()) {
+		for (IFeature feature : Filter.filter(new LinkedList<>(featureProject.getFeatureModel().getFeatures()), Filter.CONCRETE_FEATURE_FILTER)) {
 			if (!selectedFeatures.contains(feature.getName())) {
 				unSelectedFeatures.add(feature.getName());
 			}
@@ -250,11 +251,11 @@ public class AspectJComposer extends ComposerExtensionClass {
 		featureModel = project.getFeatureModel();
 		try {
 			if (addAspects(project.getBuildFolder(), "")) {
-				featureModel.getRoot().removeChild(featureModel.getFeature("Base"));
-				Feature root = featureModel.getRoot();
+				featureModel.getFeatureStructure().getRoot().getFeatureStructure().removeChild(featureModel.getFeature("Base"));
+				IFeature root = featureModel.getFeatureStructure().getRoot();
 				root.setName("Base");
-				featureModel.setRoot(root);
-				featureModel.getRoot().setAbstract(false);
+				featureModel.getFeatureStructure().setRoot(root);
+				featureModel.getFeatureStructure().getRoot().getFeatureStructure().setAbstract(false);
 				FeatureModelWriterIFileWrapper w = new FeatureModelWriterIFileWrapper(new XmlFeatureModelWriter(featureModel));
 				IFile file = project.getProject().getFile("model.xml");
 				w.writeToFile(file);
@@ -273,8 +274,8 @@ public class AspectJComposer extends ComposerExtensionClass {
 			} else if (res instanceof IFile) {
 				String name = res.getName();
 				if (name.endsWith(".aj")) {
-					Feature feature = new Feature(featureModel, folders + name.split("[.]")[0]);
-					featureModel.getRoot().addChild(feature);
+					IFeature feature = new IFeature(featureModel, folders + name.split("[.]")[0]);
+					featureModel.getFeatureStructure().getRoot().getFeatureStructure().addChild(feature);
 					hasAspects = true;
 				}
 			}
@@ -438,20 +439,20 @@ public class AspectJComposer extends ComposerExtensionClass {
 		} catch (NullPointerException e) {
 			AspectJCorePlugin.getDefault().reportBug(321);
 		}
-		Feature root = featureProject.getFeatureModel().getRoot();
+		IFeature root = featureProject.getFeatureModel().getFeatureStructure().getRoot();
 		if (root == null) {
 			return;
 		}
 		rootName = root.getName();
-		if (!"".equals(rootName) && root.hasChildren()) {
+		if (!"".equals(rootName) && root.getFeatureStructure().hasChildren()) {
 			checkAspect(root);
 		}
 	}
 
-	private void checkAspect(Feature feature) {
-		if (feature.hasChildren()) {
-			for (Feature child : feature.getChildren()) {
-				if (child.isConcrete() && !child.getName().equals(rootName)) {
+	private void checkAspect(IFeature feature) {
+		if (feature.getFeatureStructure().hasChildren()) {
+			for (IFeature child : feature.getFeatureStructure().getChildren()) {
+				if (child.getFeatureStructure().isConcrete() && !child.getName().equals(rootName)) {
 					createAspect(child.getName(), featureProject.getBuildFolder(), null);
 				}
 				checkAspect(child);

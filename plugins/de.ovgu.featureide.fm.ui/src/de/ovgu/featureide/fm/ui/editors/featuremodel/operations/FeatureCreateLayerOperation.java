@@ -32,8 +32,8 @@ import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TextCellEditor;
 
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureCellEditorLocator;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureLabelEditManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
@@ -48,12 +48,12 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayou
 public class FeatureCreateLayerOperation extends AbstractFeatureModelOperation {
 
 	private static final String LABEL = CREATE_LAYER;
-	private Feature feature;
+	private IFeature feature;
 	private Object viewer;
-	private Feature newFeature;
+	private IFeature newFeature;
 	private Object diagramEditor;
 
-	public FeatureCreateLayerOperation(Feature feature, Object viewer, FeatureModel featureModel, Object diagramEditor) {
+	public FeatureCreateLayerOperation(IFeature feature, Object viewer, IFeatureModel featureModel, Object diagramEditor) {
 		super(featureModel, LABEL);
 		this.feature = feature;
 		this.viewer = viewer;
@@ -73,7 +73,7 @@ public class FeatureCreateLayerOperation extends AbstractFeatureModelOperation {
 		while (featureModel.getFeatureNames().contains("NewLayer" + ++number))
 			;
 
-		newFeature = new Feature(featureModel, "NewLayer" + number);
+		newFeature = new IFeature(featureModel, "NewLayer" + number);
 		featureModel.addFeature(newFeature);
 		feature = featureModel.getFeature(feature.getName());
 		feature.addChild(newFeature);

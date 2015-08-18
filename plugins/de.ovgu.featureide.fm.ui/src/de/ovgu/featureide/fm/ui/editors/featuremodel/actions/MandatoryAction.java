@@ -24,7 +24,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureSetMandatoryOperation;
 
@@ -37,9 +37,9 @@ public class MandatoryAction extends SingleSelectionAction {
 
 	public static final String ID = "de.ovgu.featureide.mandatory";
 
-	private final FeatureModel featureModel;
+	private final IFeatureModel featureModel;
 
-	public MandatoryAction(Object viewer, FeatureModel featureModel) {
+	public MandatoryAction(Object viewer, IFeatureModel featureModel) {
 		super("Mandatory (Double Click)", viewer);
 		this.featureModel = featureModel;
 	}

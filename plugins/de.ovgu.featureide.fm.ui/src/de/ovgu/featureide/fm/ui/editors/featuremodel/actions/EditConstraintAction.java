@@ -26,8 +26,8 @@ import java.util.Iterator;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
 
-import de.ovgu.featureide.fm.core.Constraint;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
 
@@ -40,9 +40,9 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
  */
 public class EditConstraintAction extends AbstractConstraintEditorAction {
 
-	private Constraint constraint;
+	private IConstraint constraint;
 
-	public EditConstraintAction(Object viewer, FeatureModel featuremodel) {
+	public EditConstraintAction(Object viewer, IFeatureModel featuremodel) {
 		super(viewer, featuremodel, EDIT_CONSTRAINT);
 		setEnabled(false);
 	}
@@ -65,8 +65,8 @@ public class EditConstraintAction extends AbstractConstraintEditorAction {
 				constraint = ((ConstraintEditPart) editPart).getConstraintModel();
 				return true;
 			}
-			if (editPart instanceof Constraint) {
-				constraint = (Constraint) editPart;
+			if (editPart instanceof IConstraint) {
+				constraint = (IConstraint) editPart;
 				return true;
 			}
 		}

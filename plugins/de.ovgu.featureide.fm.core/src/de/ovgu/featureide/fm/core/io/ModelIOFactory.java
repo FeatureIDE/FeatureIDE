@@ -21,7 +21,7 @@
 package de.ovgu.featureide.fm.core.io;
 
 import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelWriter;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
@@ -47,7 +47,7 @@ public abstract class ModelIOFactory {
 		return getModelWriter(getNewFeatureModel(type), type);
 	}
 	
-	public static AbstractFeatureModelReader getModelReader(FeatureModel featureModel, int type) {
+	public static AbstractFeatureModelReader getModelReader(IFeatureModel featureModel, int type) {
 		switch (type) {
 		case TYPE_XML:
 			return new XmlFeatureModelReader(featureModel);
@@ -60,7 +60,7 @@ public abstract class ModelIOFactory {
 		}
 	}
 	
-	public static AbstractFeatureModelWriter getModelWriter(FeatureModel featureModel, int type) {
+	public static AbstractFeatureModelWriter getModelWriter(IFeatureModel featureModel, int type) {
 		switch (type) {
 		case TYPE_XML:
 			return new XmlFeatureModelWriter(featureModel);
@@ -82,10 +82,10 @@ public abstract class ModelIOFactory {
 		return TYPE_UNKNOWN;
 	}
 	
-	public static FeatureModel getNewFeatureModel(int type) {
+	public static IFeatureModel getNewFeatureModel(int type) {
 		switch (type) {
 		case TYPE_XML:
-			return new FeatureModel();
+			return new IFeatureModel();
 		case TYPE_VELVET:
 			return new ExtendedFeatureModel();
 		case TYPE_VELVET_IMPORT:

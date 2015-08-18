@@ -60,8 +60,8 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.progress.UIJob;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.evaluation.Evaluation;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
@@ -292,7 +292,7 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 							if (res instanceof IFile && res.getName().endsWith(".m")) {
 								IFile fmFile = (IFile) res;
 								try {
-									FeatureModel fm = new FeatureModel();
+									IFeatureModel fm = new IFeatureModel();
 
 									FeatureModelReaderIFileWrapper reader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(fm));
 									reader.readFromFile(fmFile);
@@ -309,7 +309,7 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 						folder.refreshLocal(IResource.DEPTH_ONE, null);
 					}
 
-					private void createBitmap(FeatureModel featureModel, File file) {
+					private void createBitmap(IFeatureModel featureModel, File file) {
 						GraphicalViewerImpl graphicalViewer = new ScrollingGraphicalViewer();
 						graphicalViewer.createControl(viewer.getControl().getParent());
 						graphicalViewer.getControl().setBackground(DIAGRAM_BACKGROUND);

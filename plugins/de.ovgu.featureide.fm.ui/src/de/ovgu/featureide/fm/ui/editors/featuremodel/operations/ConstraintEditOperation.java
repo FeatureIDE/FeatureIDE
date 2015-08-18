@@ -24,7 +24,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.EDIT_CONSTRAIN
 
 import org.prop4j.Node;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
 
 /**
@@ -40,7 +40,7 @@ public class ConstraintEditOperation extends AbstractFeatureModelOperation {
 	private int index;
 	private Node oldPropNode;
 
-	public ConstraintEditOperation(Node propNode, FeatureModel featuremodel, int index) {
+	public ConstraintEditOperation(Node propNode, IFeatureModel featuremodel, int index) {
 		super(featuremodel, LABEL);
 		this.propNode = propNode;
 		this.index = index;

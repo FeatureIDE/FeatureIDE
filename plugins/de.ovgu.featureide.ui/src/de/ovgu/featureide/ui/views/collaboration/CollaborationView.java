@@ -119,8 +119,8 @@ import de.ovgu.featureide.core.listeners.ICurrentBuildListener;
 import de.ovgu.featureide.fm.core.AWaitingJob;
 import de.ovgu.featureide.fm.core.ColorList;
 import de.ovgu.featureide.fm.core.ColorschemeTable;
-import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.job.AStoppableJob;
 import de.ovgu.featureide.fm.ui.GraphicsExporter;
 import de.ovgu.featureide.ui.UIPlugin;
@@ -545,7 +545,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		if (selection instanceof CollaborationEditPart) {
 			FSTFeature coll = ((CollaborationEditPart) selection).getCollaborationModel();
 			if (!(coll instanceof FSTConfiguration)) {
-				FeatureModel fm = featureProject.getFeatureModel();
+				IFeatureModel fm = featureProject.getFeatureModel();
 				ColorschemeTable colorschemeTable = fm.getColorschemeTable();
 				List<String> csNames = colorschemeTable.getColorschemeNames();
 

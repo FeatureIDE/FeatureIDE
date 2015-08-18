@@ -22,7 +22,7 @@ package de.ovgu.featureide.fm.ui.handlers;
 
 import org.eclipse.swt.widgets.FileDialog;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
 import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelWriter;
 import de.ovgu.featureide.fm.ui.handlers.base.AbstractExportHandler;
@@ -35,7 +35,7 @@ import de.ovgu.featureide.fm.ui.handlers.base.AbstractExportHandler;
 public class ExportVelvetHandler extends AbstractExportHandler {
 
 	@Override
-	protected IFeatureModelWriter getFeatureModelWriter(FeatureModel fm) {
+	protected IFeatureModelWriter getFeatureModelWriter(IFeatureModel fm) {
 		return new VelvetFeatureModelWriter(fm);
 	}
 

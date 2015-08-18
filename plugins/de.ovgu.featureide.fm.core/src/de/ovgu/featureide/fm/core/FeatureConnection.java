@@ -43,12 +43,12 @@ public class FeatureConnection implements PropertyConstants, IGraphicItem {
 		this.source = source;
 	}
 	
-	public Feature getSource() {
-		return (Feature) source;
+	public IFeature getSource() {
+		return (IFeature) source;
 	}
 	
-	public Feature getTarget() {
-		return (Feature) target;
+	public IFeature getTarget() {
+		return (IFeature) target;
 	}
 	
 	public void setTarget(IFeature target) {

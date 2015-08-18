@@ -64,8 +64,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
 
 /**
@@ -82,7 +82,7 @@ public class ConquererFMWriter extends AbstractFeatureModelWriter {
 	 * 
 	 * @param featureModel the structure to write
 	 */
-	public ConquererFMWriter(FeatureModel featureModel) {
+	public ConquererFMWriter(IFeatureModel featureModel) {
 		setFeatureModel(featureModel);
 	}
 	
@@ -155,15 +155,15 @@ public class ConquererFMWriter extends AbstractFeatureModelWriter {
 		}
     }
     
-    private void generateSubtree(Document doc, Element node, Feature feature) {
+    private void generateSubtree(Document doc, Element node, IFeature feature) {
     	if (!feature.isRoot())
     		generateElement(doc, node, feature);
     	
-    	for (Feature child : feature.getChildren())
+    	for (IFeature child : feature.getChildren())
     		generateSubtree(doc, node, child);
     }
   
-	private void generateElement(Document doc, Element node, Feature feature) {
+	private void generateElement(Document doc, Element node, IFeature feature) {
     	Element element = doc.createElement(ELEMENT);
     	node.appendChild(element);
 		element.setAttribute("id", getID(feature.getName()));
@@ -190,7 +190,7 @@ public class ConquererFMWriter extends AbstractFeatureModelWriter {
     	constraints.appendChild(alternative);
 		alternative.setAttribute(TYPE, "alternative");
     	if (!feature.isRoot() && feature.getParent().isAlternative()) {
-        	for (Feature childFeature : feature.getParent().getChildren())
+        	for (IFeature childFeature : feature.getParent().getChildren())
         		if (childFeature != feature) {
 	            	Element constraint_element = doc.createElement("constraint_element");
 	            	alternative.appendChild(constraint_element);
@@ -207,7 +207,7 @@ public class ConquererFMWriter extends AbstractFeatureModelWriter {
     	constraints.appendChild(commulative);
     	commulative.setAttribute(TYPE, COMMULATIVE);
     	if (!feature.isRoot() && feature.getParent().isOr()) {
-        	for (Feature childFeature : feature.getParent().getChildren())
+        	for (IFeature childFeature : feature.getParent().getChildren())
         		if (childFeature != feature) {
 	            	Element constraint_element = doc.createElement("constraint_element");
 	            	commulative.appendChild(constraint_element);
@@ -254,7 +254,7 @@ public class ConquererFMWriter extends AbstractFeatureModelWriter {
     	
     	Element childElements = doc.createElement("childElements");
     	element.appendChild(childElements);
-    	for (Feature childFeature : feature.getChildren()) {
+    	for (IFeature childFeature : feature.getChildren()) {
         	Element child = doc.createElement(CHILD);
         	childElements.appendChild(child);
     		child.setAttribute(OPTIONAL, childFeature.isMandatory() ? "false" : "true");
@@ -360,9 +360,9 @@ public class ConquererFMWriter extends AbstractFeatureModelWriter {
     	initializeIDs(featureModel.getRoot());
     }
     
-    private void initializeIDs(Feature feature) {
+    private void initializeIDs(IFeature feature) {
     	getID(feature.getName());
-    	for (Feature child : feature.getChildren())
+    	for (IFeature child : feature.getChildren())
     		initializeIDs(child);
     }
     

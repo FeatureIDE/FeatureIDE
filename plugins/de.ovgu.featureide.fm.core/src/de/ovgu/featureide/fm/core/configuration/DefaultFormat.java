@@ -33,9 +33,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.RenamingsManager;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
  * Simple configuration format.</br> Lists all selected features in the
@@ -77,7 +77,7 @@ public class DefaultFormat extends ConfigurationFormat {
 					}
 				}
 				name = renamingsManager.getNewName(name);
-				Feature feature = configuration.getFeatureModel().getFeature(name);
+				IFeature feature = configuration.getFeatureModel().getFeature(name);
 				if (feature != null && feature.hasHiddenParent()) {
 					hiddenFeatures.add(name);
 				} else {
@@ -114,7 +114,7 @@ public class DefaultFormat extends ConfigurationFormat {
 	@Override
 	public String write(Configuration configuration) {
 		final StringBuilder buffer = new StringBuilder();
-		final FeatureModel featureModel = configuration.getFeatureModel();
+		final IFeatureModel featureModel = configuration.getFeatureModel();
 		if (featureModel.isFeatureOrderUserDefined()) {
 			final List<String> list = featureModel.getFeatureOrderList();
 			final Set<String> featureSet = configuration.getSelectedFeatureNames();

@@ -43,7 +43,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.FileEditorInput;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
 import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
@@ -81,7 +81,7 @@ public abstract class AbstractImportHandler extends AFileHandler {
 					MessageDialog.openInformation(new Shell(), FILE + NOT_FOUND, SPECIFIED_FILE_WASNT_FOUND);
 				}
 
-				final FeatureModel fm = createFeatureModel();
+				final IFeatureModel fm = createFeatureModel();
 				modelReader = setModelReader(fm);
 				modelReader.readFromFile(inputFile);
 
@@ -103,8 +103,8 @@ public abstract class AbstractImportHandler extends AFileHandler {
 		fileDialog.setFilterNames(new String[] { XML });
 	}
 
-	protected FeatureModel createFeatureModel() {
-		return new FeatureModel();
+	protected IFeatureModel createFeatureModel() {
+		return new IFeatureModel();
 	}
 
 	/**
@@ -133,5 +133,5 @@ public abstract class AbstractImportHandler extends AFileHandler {
 	 * @param fm
 	 *            the feature model to initialize the IFeatureModelReader
 	 */
-	protected abstract IFeatureModelReader setModelReader(FeatureModel fm);
+	protected abstract IFeatureModelReader setModelReader(IFeatureModel fm);
 }

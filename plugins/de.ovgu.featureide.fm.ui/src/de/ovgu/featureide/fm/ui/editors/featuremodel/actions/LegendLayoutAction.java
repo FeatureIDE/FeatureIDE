@@ -28,7 +28,7 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
 
 /**
@@ -38,7 +38,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
  */
 public class LegendLayoutAction extends Action {
 
-	private FeatureModel featureModel;
+	private IFeatureModel featureModel;
 	private ISelectionChangedListener listener = new ISelectionChangedListener() {
 		public void selectionChanged(SelectionChangedEvent event) {
 			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
@@ -46,7 +46,7 @@ public class LegendLayoutAction extends Action {
 		}
 	};
 
-	public LegendLayoutAction(GraphicalViewerImpl viewer, FeatureModel featuremodel) {
+	public LegendLayoutAction(GraphicalViewerImpl viewer, IFeatureModel featuremodel) {
 		super(AUTO_LAYOUT_LEGEND);
 		this.featureModel = featuremodel;
 		this.setEnabled(false);

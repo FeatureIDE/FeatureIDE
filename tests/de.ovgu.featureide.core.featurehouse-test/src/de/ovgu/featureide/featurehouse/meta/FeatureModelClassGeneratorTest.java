@@ -28,7 +28,7 @@ import org.junit.Test;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.featurehouse.meta.featuremodel.FeatureModelClassGenerator;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 
@@ -41,7 +41,7 @@ public class FeatureModelClassGeneratorTest {
 
 	@Test
 	public void testMetaJPF() {
-		FeatureModel model = init("model.xml");
+		IFeatureModel model = init("model.xml");
 		System.out.println();
 		System.out.println("------------------------- Start Test JPF  ---------------------");
 		System.out.println();
@@ -56,7 +56,7 @@ public class FeatureModelClassGeneratorTest {
 		System.out.println();
 		System.out.println("------------------------- Start Test KEY  ---------------------");
 		System.out.println();
-		FeatureModel model = init("model.xml");
+		IFeatureModel model = init("model.xml");
 		new FeatureModelClassGenerator(model, IFeatureProject.META_THEOREM_PROVING);
 		System.out.println();
 		System.out.println("------------------------- End Test KEY  ---------------------");
@@ -68,7 +68,7 @@ public class FeatureModelClassGeneratorTest {
 		System.out.println();
 		System.out.println("------------------------- Start Test BDD  ---------------------");
 		System.out.println();
-		FeatureModel model = init("model.xml");
+		IFeatureModel model = init("model.xml");
 		new FeatureModelClassGenerator(model, IFeatureProject.META_MODEL_CHECKING_BDD_JAVA_JML);
 		System.out.println();
 		System.out.println("------------------------- End Test BDD  ---------------------");
@@ -80,7 +80,7 @@ public class FeatureModelClassGeneratorTest {
 		System.out.println();
 		System.out.println("------------------------- Start Test VarexJ  ---------------------");
 		System.out.println();
-		FeatureModel model = init("model.xml");
+		IFeatureModel model = init("model.xml");
 		new FeatureModelClassGenerator(model, IFeatureProject.META_VAREXJ);
 		System.out.println();
 		System.out.println("------------------------- End Test VarexJ  ---------------------");
@@ -104,8 +104,8 @@ public class FeatureModelClassGeneratorTest {
 		return folder; 
 	}
 	
-	private final FeatureModel init(String name) {
-		FeatureModel fm = new FeatureModel();
+	private final IFeatureModel init(String name) {
+		IFeatureModel fm = new IFeatureModel();
 		for (File f : MODEL_FILE_FOLDER.listFiles(filter)) {
 			if (f.getName().equals(name)) {
 				try {

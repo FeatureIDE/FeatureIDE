@@ -35,8 +35,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
@@ -57,9 +57,9 @@ public class QuickFixFalseOptionalFeaturesTest {
 
 	protected String failureMessage;
 
-	private final FeatureModel fm;
+	private final IFeatureModel fm;
 
-	public QuickFixFalseOptionalFeaturesTest(FeatureModel fm, String s)
+	public QuickFixFalseOptionalFeaturesTest(IFeatureModel fm, String s)
 			throws UnsupportedModelException {
 		this.fm = fm;
 		this.failureMessage = "(" + s + ")";
@@ -78,7 +78,7 @@ public class QuickFixFalseOptionalFeaturesTest {
 		for (final File f : MODEL_FILE_FOLDER.listFiles(getFileFilter(".xml"))) {
 			Object[] models = new Object[2];
 
-			FeatureModel fm = new FeatureModel() {
+			IFeatureModel fm = new IFeatureModel() {
 				// display file name at JUnit view
 				public String toString() {
 					return f.getName();
@@ -107,11 +107,11 @@ public class QuickFixFalseOptionalFeaturesTest {
 	
 	@Test(timeout = 20000)
 	public void createConfigurationsTest() {
-		final Collection<Feature> concrete = fm.getConcreteFeatures();
-		final Collection<Feature> core = fm.getAnalyser().getCoreFeatures();
+		final Collection<IFeature> concrete = fm.getConcreteFeatures();
+		final Collection<IFeature> core = fm.getAnalyser().getCoreFeatures();
 		final Collection<String> falseOptionalFeatures = new LinkedList<String>();
 		
-		for (Feature feature : concrete) {
+		for (IFeature feature : concrete) {
 			if (!core.contains(feature)) {
 				falseOptionalFeatures.add(feature.getName());
 			}
@@ -120,7 +120,7 @@ public class QuickFixFalseOptionalFeaturesTest {
 		final Collection<String> falseOptionalFeaturesTest = new ArrayList<String>(falseOptionalFeatures);
 		final Collection<Configuration> confs = quickFix.createConfigurations(falseOptionalFeatures, fm, new NullProgressMonitor());
 		for (final Configuration conf : confs) {
-			for (final Feature feature : conf.getUnSelectedFeatures()) {
+			for (final IFeature feature : conf.getUnSelectedFeatures()) {
 				falseOptionalFeaturesTest.remove(feature.getName());
 			}
 		}

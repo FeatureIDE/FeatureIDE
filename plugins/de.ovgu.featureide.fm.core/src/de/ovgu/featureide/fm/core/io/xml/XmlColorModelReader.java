@@ -39,8 +39,8 @@ import javax.xml.stream.events.XMLEvent;
 
 import de.ovgu.featureide.fm.core.ColorList;
 import de.ovgu.featureide.fm.core.ColorschemeTable;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
 /**
@@ -50,7 +50,7 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
  */
 public class XmlColorModelReader extends XmlFeatureModelReader {
 
-	public XmlColorModelReader(FeatureModel featureModel) {
+	public XmlColorModelReader(IFeatureModel featureModel) {
 		super(featureModel);
 	}
 
@@ -105,7 +105,7 @@ public class XmlColorModelReader extends XmlFeatureModelReader {
 					} else if (mode == 3 && currentTag.equals("feature")) {
 						Attribute attribute = (Attribute) currentStartTag.getAttributes().next();
 						if (attribute.getName().getLocalPart().equals("name")) {
-							Feature feat = featureModel.getFeature(featureModel.getRenamingsManager().getNewName(attribute.getValue()));
+							IFeature feat = featureModel.getFeature(featureModel.getRenamingsManager().getNewName(attribute.getValue()));
 							if (feat != null) {
 								colors = feat.getColorList();
 								mode = 1;

@@ -33,8 +33,8 @@ import org.w3c.dom.Element;
 
 import de.ovgu.featureide.fm.core.ColorList;
 import de.ovgu.featureide.fm.core.ColorschemeTable;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
  * Prints the colorschemes for the feature model in XML format.
@@ -43,7 +43,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
  */
 public class XmlColorModelWriter extends XmlFeatureModelWriter {
 	
-	public XmlColorModelWriter(FeatureModel featureModel) {
+	public XmlColorModelWriter(IFeatureModel featureModel) {
 		super(featureModel);
 	}
 	
@@ -70,7 +70,7 @@ public class XmlColorModelWriter extends XmlFeatureModelWriter {
     	
     	root.appendChild(colorSchemesRoot);
     	
-		for (Feature feat : featureModel.getFeatures()) {
+		for (IFeature feat : featureModel.getFeatures()) {
 			ColorList colors = feat.getColorList();
 
 			boolean noColor = true;

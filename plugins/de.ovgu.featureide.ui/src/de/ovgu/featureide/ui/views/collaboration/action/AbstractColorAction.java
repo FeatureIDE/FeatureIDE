@@ -26,7 +26,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 
 import de.ovgu.featureide.core.fstmodel.FSTConfiguration;
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
 import de.ovgu.featureide.ui.views.collaboration.editparts.CollaborationEditPart;
 
@@ -61,7 +61,7 @@ public abstract class AbstractColorAction extends Action {
 		if (selectedItem instanceof CollaborationEditPart) {
 			FSTFeature coll = ((CollaborationEditPart) selectedItem).getCollaborationModel();
 			if (!(coll instanceof FSTConfiguration)) {
-				FeatureModel fm = collaborationView.getFeatureProject().getFeatureModel();
+				IFeatureModel fm = collaborationView.getFeatureProject().getFeatureModel();
 				
 				boolean refresh = action(fm, coll.getName());
 				collaborationView.saveColorsToFile();
@@ -73,5 +73,5 @@ public abstract class AbstractColorAction extends Action {
 		}
 	}
 	
-	protected abstract boolean action(FeatureModel fm, String collName);
+	protected abstract boolean action(IFeatureModel fm, String collName);
 }

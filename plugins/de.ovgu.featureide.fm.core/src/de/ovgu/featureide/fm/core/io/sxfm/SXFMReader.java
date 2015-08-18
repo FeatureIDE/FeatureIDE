@@ -58,8 +58,8 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
@@ -73,14 +73,14 @@ public class SXFMReader extends AbstractFeatureModelReader {
 	
 	private int line;
 	
-	private Hashtable<String, Feature> idTable;
+	private Hashtable<String, IFeature> idTable;
 	
 	/**
 	 * Creates a new reader and sets the feature model to store the data.
 	 * 
 	 * @param featureModel the structure to fill
 	 */
-	public SXFMReader(FeatureModel featureModel) {
+	public SXFMReader(IFeatureModel featureModel) {
 		setFeatureModel(featureModel);
 	}
 	
@@ -116,7 +116,7 @@ public class SXFMReader extends AbstractFeatureModelReader {
         }       
         featureModel.reset();
     	line = 0;
-    	idTable = new Hashtable<String, Feature>();
+    	idTable = new Hashtable<String, IFeature>();
     	// Create the Feature Model from the DOM-Document
     	buildFModelRec(doc); 
     	featureModel.handleModelDataLoaded();
@@ -338,11 +338,11 @@ public class SXFMReader extends AbstractFeatureModelReader {
 		}
     }
 
-	private void removeUnnecessaryAbstractFeatures(Feature feature) {
+	private void removeUnnecessaryAbstractFeatures(IFeature feature) {
 		if (feature.getChildrenCount() == 1) {
-			Feature child = feature.getFirstChild();
+			IFeature child = feature.getFirstChild();
 			if (child.isAbstract()) {
-				for (Feature grantChild : feature.getFirstChild().getChildren()) {
+				for (IFeature grantChild : feature.getFirstChild().getChildren()) {
 					grantChild.setParent(feature);
 					feature.addChild(grantChild);
 				}
@@ -356,7 +356,7 @@ public class SXFMReader extends AbstractFeatureModelReader {
 				feature.removeChild(child);
 			}
 		}
-		for (Feature child : feature.getChildren())
+		for (IFeature child : feature.getChildren())
 			removeUnnecessaryAbstractFeatures(child);
 	}
     
@@ -366,7 +366,7 @@ public class SXFMReader extends AbstractFeatureModelReader {
      * a unique identifier i is added to the name (FeatureA -> FeatureA_i)
      * @param feat
      */
-	private void addFeatureToModel(Feature feat) {
+	private void addFeatureToModel(IFeature feat) {
 		String orig_name = feat.getName();
 		int i=1;
 		while(!featureModel.addFeature(feat)){
@@ -375,7 +375,7 @@ public class SXFMReader extends AbstractFeatureModelReader {
 		
 	}
     
-    private String setNameGetID (Feature feat, String lineText) {
+    private String setNameGetID (IFeature feat, String lineText) {
     	String featId, name;    	
     	if (lineText.contains("(")) {
     		name = lineText.substring(3, lineText.indexOf('(') );
@@ -400,9 +400,9 @@ public class SXFMReader extends AbstractFeatureModelReader {
     		throws UnsupportedModelException {
     	org.prop4j.Node node;
     	for (FeatCardinality featCard : featList) {   		
-    		Feature feat = featCard.feat;    		
-    		LinkedList<Feature> children = feat.getChildren();
-    		for (Feature child : children) child.setMandatory(false);
+    		IFeature feat = featCard.feat;    		
+    		LinkedList<IFeature> children = feat.getChildren();
+    		for (IFeature child : children) child.setMandatory(false);
     		int start = featCard.start;
     		int end = featCard.end;
     		if ((start < 0) || (start > end) || (end > children.size())) 
@@ -426,7 +426,7 @@ public class SXFMReader extends AbstractFeatureModelReader {
      * @param parentName
      * @return
      */
-    private org.prop4j.Node buildMinConstr (LinkedList<Feature> list, int length, 
+    private org.prop4j.Node buildMinConstr (LinkedList<IFeature> list, int length, 
     		String parentName) {
     	LinkedList<org.prop4j.Node> result = new LinkedList<org.prop4j.Node>();
     	LinkedList<org.prop4j.Node> partResult = new LinkedList<org.prop4j.Node>();
@@ -469,7 +469,7 @@ public class SXFMReader extends AbstractFeatureModelReader {
      * @param length
      * @return
      */
-    private org.prop4j.Node buildMaxConstr (LinkedList<Feature> list, int length) {
+    private org.prop4j.Node buildMaxConstr (LinkedList<IFeature> list, int length) {
        	LinkedList<org.prop4j.Node> result = new LinkedList<org.prop4j.Node>();
     	LinkedList<org.prop4j.Node> partResult = new LinkedList<org.prop4j.Node>();
     	int listLength = list.size();
@@ -623,7 +623,7 @@ public class SXFMReader extends AbstractFeatureModelReader {
 		if ("~".equals(element)) {
 			return new Not(buildPropNode(list));
 		} else {
-			Feature feat = idTable.get(element);
+			IFeature feat = idTable.get(element);
 			if (feat == null)
 				throw new UnsupportedModelException(THE_FEATURE_ + element + 
 						"' does not occur in the grammar!", 0);			
@@ -631,15 +631,15 @@ public class SXFMReader extends AbstractFeatureModelReader {
 		}
     }
     
-    private static class FeatureIndent extends Feature {
+    private static class FeatureIndent extends IFeature {
     	
     	private int indentation = 0;
     	
-		public FeatureIndent(FeatureModel featureModel) {
+		public FeatureIndent(IFeatureModel featureModel) {
 			super(featureModel);
 		}
 
-		public FeatureIndent(FeatureModel featureModel, int indent) {
+		public FeatureIndent(IFeatureModel featureModel, int indent) {
 			super(featureModel);
 			indentation = indent;
 		}
@@ -655,11 +655,11 @@ public class SXFMReader extends AbstractFeatureModelReader {
     
     private static class FeatCardinality {
     	
-    	Feature feat;
+    	IFeature feat;
     	int start;
     	int end;
     	
-    	FeatCardinality (Feature feat, int start, int end) {
+    	FeatCardinality (IFeature feat, int start, int end) {
     		this.feat = feat;
     		this.start = start;
     		this.end = end;

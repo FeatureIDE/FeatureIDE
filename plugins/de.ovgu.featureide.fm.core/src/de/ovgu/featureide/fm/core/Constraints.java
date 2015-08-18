@@ -25,6 +25,8 @@ import java.util.List;
 
 import org.prop4j.NodeWriter;
 
+import de.ovgu.featureide.fm.core.base.IConstraint;
+
 public final class Constraints {
 
 	/**
@@ -38,7 +40,7 @@ public final class Constraints {
 	 * @param c The constraint
 	 * @return A string representation
 	 */
-	public static final String autoQuote(final Constraint constraint) {
+	public static final String autoQuote(final IConstraint constraint) {
 		final String c = constraint.getNode().toString(NodeWriter.shortSymbols);
 		return autoQuote(c);
 	}

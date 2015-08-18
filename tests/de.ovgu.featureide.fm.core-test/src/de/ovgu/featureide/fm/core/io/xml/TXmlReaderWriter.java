@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.io.xml;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
 import de.ovgu.featureide.fm.core.io.TAbstractFeatureModelReaderWriter;
@@ -37,7 +37,7 @@ public class TXmlReaderWriter extends TAbstractFeatureModelReaderWriter {
 	 * @param file
 	 * @throws UnsupportedModelException 
 	 */
-	public TXmlReaderWriter(FeatureModel fm,String s) throws UnsupportedModelException {
+	public TXmlReaderWriter(IFeatureModel fm,String s) throws UnsupportedModelException {
 		super(fm,s);
 	}
 
@@ -45,7 +45,7 @@ public class TXmlReaderWriter extends TAbstractFeatureModelReaderWriter {
 	 * @see de.ovgu.featureide.fm.core.io.TAbstractFeatureModelReaderWriter#getWriter(de.ovgu.featureide.fm.core.FeatureModel)
 	 */
 	@Override
-	protected IFeatureModelWriter getWriter(FeatureModel fm) {
+	protected IFeatureModelWriter getWriter(IFeatureModel fm) {
 		return new XmlFeatureModelWriter(fm);
 	}
 
@@ -53,7 +53,7 @@ public class TXmlReaderWriter extends TAbstractFeatureModelReaderWriter {
 	 * @see de.ovgu.featureide.fm.core.io.TAbstractFeatureModelReaderWriter#getReader(de.ovgu.featureide.fm.core.FeatureModel)
 	 */
 	@Override
-	protected IFeatureModelReader getReader(FeatureModel fm) {
+	protected IFeatureModelReader getReader(IFeatureModel fm) {
 		return new XmlFeatureModelReader(fm);
 	}
 

@@ -31,6 +31,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
@@ -39,7 +40,7 @@ import de.ovgu.featureide.fm.core.io.xml.XmlColorModelReader;
 import de.ovgu.featureide.fm.core.io.xml.XmlColorModelWriter;
 
 /** 
- * Holds the color scheme names for a {@link FeatureModel}.
+ * Holds the color scheme names for a {@link IFeatureModel}.
  * 
  * @author Sebastian Krieter
  */
@@ -47,7 +48,7 @@ public class ColorschemeTable {
 	private static final String DEFAULT_COLORSCHEMENAME = DEFAULT_COLORSCHEME;
 	private static final String COLOR_FILE_NAME = ".color.xml";
 	
-	private final FeatureModel featureModel;
+	private final IFeatureModel featureModel;
 	
 	protected final List<String> colorschemeNames;
 	private int selectedColorscheme;
@@ -85,7 +86,7 @@ public class ColorschemeTable {
 	 */
 	public void addColorscheme(String name) {
 		colorschemeNames.add(name);
-		for (Feature feat : featureModel.getFeatures()) {
+		for (IFeature feat : featureModel.getFeatures()) {
 			feat.getColorList().addColorscheme();
 		}
 	}
@@ -96,12 +97,12 @@ public class ColorschemeTable {
 	public void removeColorscheme() {
 		if (colorschemeNames.size() == 2) {
 			colorschemeNames.set(1, DEFAULT_COLORSCHEMENAME);
-			for (Feature feat : featureModel.getFeatures()) {
+			for (IFeature feat : featureModel.getFeatures()) {
 				feat.getColorList().removeColor();
 			}
 		} else {
 			colorschemeNames.remove(selectedColorscheme);
-			for (Feature feat : featureModel.getFeatures()) {
+			for (IFeature feat : featureModel.getFeatures()) {
 				feat.getColorList().removeColorscheme();
 			}
 			if (selectedColorscheme == colorschemeNames.size()) {
@@ -207,7 +208,7 @@ public class ColorschemeTable {
 		}
 	}
 	
-	public ColorschemeTable clone(FeatureModel fm) {		
+	public ColorschemeTable clone(IFeatureModel fm) {		
 		return new ColorschemeTable(this, fm);
 	}
 }

@@ -25,7 +25,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.NEW_COLORSCHEM
 import org.eclipse.jface.wizard.Wizard;
 
 import de.ovgu.featureide.fm.core.ColorschemeTable;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
@@ -40,9 +40,9 @@ public class NewColorSchemeWizard extends Wizard {
 
 	public NewColorSchemePage page;
 	
-	private FeatureModel featureModel;
+	private IFeatureModel featureModel;
 
-	public NewColorSchemeWizard(FeatureModel featureModel) {
+	public NewColorSchemeWizard(IFeatureModel featureModel) {
 		super();
 		setWindowTitle(NEW_COLORSCHEME);
 		this.featureModel = featureModel;

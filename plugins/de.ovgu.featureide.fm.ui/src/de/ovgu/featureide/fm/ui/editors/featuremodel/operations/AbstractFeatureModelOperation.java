@@ -27,7 +27,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
  * This operation should be used as superclass for all operations on the feature model.
@@ -37,9 +37,9 @@ import de.ovgu.featureide.fm.core.FeatureModel;
  */
 public abstract class AbstractFeatureModelOperation extends AbstractOperation {
 
-	FeatureModel featureModel;
+	IFeatureModel featureModel;
 
-	public AbstractFeatureModelOperation(FeatureModel featureModel, String label) {
+	public AbstractFeatureModelOperation(IFeatureModel featureModel, String label) {
 		super(label);
 		this.featureModel = featureModel;
 	}

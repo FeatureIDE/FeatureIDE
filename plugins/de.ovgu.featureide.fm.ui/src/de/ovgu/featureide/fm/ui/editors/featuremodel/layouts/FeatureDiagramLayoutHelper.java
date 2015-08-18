@@ -26,9 +26,9 @@ import java.util.LinkedList;
 
 import org.eclipse.draw2d.geometry.Point;
 
-import de.ovgu.featureide.fm.core.Constraint;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
@@ -66,13 +66,13 @@ public class FeatureDiagramLayoutHelper {
 	 * sets initial positions for new constraints
 	 * needed for manual layout
 	 */
-	public static void initializeConstraintPosition(FeatureModel featureModel, int index) {
+	public static void initializeConstraintPosition(IFeatureModel featureModel, int index) {
 		Point newLocation = new Point(0, 0);
-		Constraint constraint = featureModel.getConstraints().get(index);
+		IConstraint constraint = featureModel.getConstraints().get(index);
 		int leftX = Integer.MAX_VALUE;
 		int rightX = Integer.MIN_VALUE;
 		if (featureModel.getConstraintCount() == 1) {
-			for (Feature feature : featureModel.getFeatures()) {
+			for (IFeature feature : featureModel.getFeatures()) {
 				if (FeatureUIHelper.getLocation(feature).y > newLocation.y) {
 					newLocation.y = FeatureUIHelper.getLocation(feature).y;
 				}
@@ -86,7 +86,7 @@ public class FeatureDiagramLayoutHelper {
 			newLocation.x = (leftX + rightX) / 2;
 			newLocation.y += FMPropertyManager.getFeatureSpaceY();
 		} else {
-			Constraint lastConstraint = featureModel.getConstraints().get(featureModel.getConstraintCount() - 2);
+			IConstraint lastConstraint = featureModel.getConstraints().get(featureModel.getConstraintCount() - 2);
 			newLocation = FeatureUIHelper.getLocation(lastConstraint).getCopy();
 			newLocation.y += FMPropertyManager.getConstraintSpace();
 		}
@@ -97,10 +97,10 @@ public class FeatureDiagramLayoutHelper {
 	 * sets initial positions for new features (above)
 	 * needed for manual layout
 	 */
-	public static void initializeCompoundFeaturePosition(FeatureModel featureModel, LinkedList<Feature> selectedFeatures, Feature newCompound) {
+	public static void initializeCompoundFeaturePosition(IFeatureModel featureModel, LinkedList<IFeature> selectedFeatures, IFeature newCompound) {
 		Point initPos = new Point(0, 0);
 		int xAcc = 0;
-		for (Feature feature : selectedFeatures) {
+		for (IFeature feature : selectedFeatures) {
 			if (initPos.y < FeatureUIHelper.getLocation(feature).y) {
 				initPos.y = FeatureUIHelper.getLocation(feature).y;
 			}
@@ -110,7 +110,7 @@ public class FeatureDiagramLayoutHelper {
 		if (newCompound.isRoot()) {
 			initPos.y = (initPos.y - FMPropertyManager.getFeatureSpaceY());
 		} else {
-			Feature parent = newCompound.getParent();
+			IFeature parent = newCompound.getParent();
 			initPos.y = (initPos.y + FeatureUIHelper.getLocation(parent).y) / 2;
 			initPos.x = (initPos.x + FeatureUIHelper.getLocation(parent).x) / 2;
 		}
@@ -122,11 +122,11 @@ public class FeatureDiagramLayoutHelper {
 	 * sets initial positions for new features (below)
 	 * needed for manual layout
 	 */
-	public static void initializeLayerFeaturePosition(FeatureModel featureModel, Feature newLayer, Feature feature) {
+	public static void initializeLayerFeaturePosition(IFeatureModel featureModel, IFeature newLayer, IFeature feature) {
 		if (!FeatureUIHelper.hasVerticalLayout(featureModel)) {
 			Point initPos = FeatureUIHelper.getLocation(newLayer.getParent()).getCopy();
 			if (feature.getChildrenCount() > 1) {
-				Feature lastChild = feature.getChildren().get(feature.getChildIndex(newLayer) - 1);
+				IFeature lastChild = feature.getChildren().get(feature.getChildIndex(newLayer) - 1);
 				initPos.x = FeatureUIHelper.getLocation(lastChild).x + FeatureUIHelper.getSize(lastChild).width + FMPropertyManager.getFeatureSpaceX();
 				initPos.y = FeatureUIHelper.getLocation(lastChild).y;
 			} else {
@@ -136,7 +136,7 @@ public class FeatureDiagramLayoutHelper {
 		} else {
 			Point initPos = FeatureUIHelper.getLocation(newLayer.getParent()).getCopy();
 			if (feature.getChildrenCount() > 1) {
-				Feature lastChild = feature.getChildren().get(feature.getChildIndex(newLayer) - 1);
+				IFeature lastChild = feature.getChildren().get(feature.getChildIndex(newLayer) - 1);
 				initPos.y = FeatureUIHelper.getLocation(lastChild).y + FeatureUIHelper.getSize(lastChild).height + FMPropertyManager.getFeatureSpaceX();
 				initPos.x = FeatureUIHelper.getLocation(lastChild).x;
 			} else {
@@ -150,7 +150,7 @@ public class FeatureDiagramLayoutHelper {
 	 * returns the layout manager for the chosen algorithm(id)
 	 * 
 	 */
-	public static FeatureDiagramLayoutManager getLayoutManager(int layoutAlgorithm, FeatureModel featureModel) {
+	public static FeatureDiagramLayoutManager getLayoutManager(int layoutAlgorithm, IFeatureModel featureModel) {
 		switch (layoutAlgorithm) {
 		case 0:
 			return new ManualLayout();

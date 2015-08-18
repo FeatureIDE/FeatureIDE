@@ -31,7 +31,7 @@ import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AutoLayoutConstraintOperation;
@@ -44,10 +44,10 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AutoLayoutConstr
  */
 public class AutoLayoutConstraintAction extends Action {
 
-	private final FeatureModel featureModel;
+	private final IFeatureModel featureModel;
 	private LinkedList<LinkedList<Point>> oldPos = new LinkedList<LinkedList<Point>>();
 
-	public AutoLayoutConstraintAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
+	public AutoLayoutConstraintAction(GraphicalViewerImpl viewer, IFeatureModel featureModel) {
 		super(AUTO_LAYOUT_CONSTRAINTS);
 		this.featureModel = featureModel;
 	}

@@ -28,7 +28,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
  * A propositional node that can be transformed into conjunctive normal form
@@ -205,11 +205,11 @@ public abstract class Node {
 		throw new RuntimeException(getClass().getName() + IS_NOT_SUPPORTING_THIS_METHOD);
 	}
 
-	public List<Node> replaceFeature(Feature feature, Feature replaceWithFeature) {
+	public List<Node> replaceFeature(IFeature feature, IFeature replaceWithFeature) {
 		return replaceFeature(feature, replaceWithFeature, new LinkedList<Node>());
 	}
 
-	public List<Node> replaceFeature(Feature feature, Feature replaceWithFeature, List<Node> list) {
+	public List<Node> replaceFeature(IFeature feature, IFeature replaceWithFeature, List<Node> list) {
 		if (this instanceof Literal) {
 			if (((Literal) this).var.equals(feature.getName())) {
 				((Literal) this).var = replaceWithFeature.getName();

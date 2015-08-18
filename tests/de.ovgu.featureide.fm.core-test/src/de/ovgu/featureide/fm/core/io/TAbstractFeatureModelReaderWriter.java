@@ -36,8 +36,8 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.prop4j.Node;
 
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.Comparison;
 import de.ovgu.featureide.fm.core.editing.ModelComparator;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
@@ -67,11 +67,11 @@ public abstract class TAbstractFeatureModelReaderWriter {
 
 
 	static boolean online = false;
-	protected FeatureModel origFm;
-	protected FeatureModel newFm;
+	protected IFeatureModel origFm;
+	protected IFeatureModel newFm;
 	protected String failureMessage;
 
-	public TAbstractFeatureModelReaderWriter(FeatureModel fm, String s)
+	public TAbstractFeatureModelReaderWriter(IFeatureModel fm, String s)
 			throws UnsupportedModelException {
 
 		this.origFm = fm;
@@ -92,7 +92,7 @@ public abstract class TAbstractFeatureModelReaderWriter {
 		for (File f : MODEL_FILE_FOLDER.listFiles(getFileFilter(".xml"))) {
 			Object[] models = new Object[2];
 
-			FeatureModel fm = new FeatureModel();
+			IFeatureModel fm = new IFeatureModel();
 			XmlFeatureModelReader r = new XmlFeatureModelReader(fm);
 			r.readFromFile(f);
 			models[0] = fm;
@@ -130,10 +130,10 @@ public abstract class TAbstractFeatureModelReaderWriter {
 	@Test
 	public void testFeatureGroupTypeAnd() throws FileNotFoundException,
 			UnsupportedModelException {
-		for (Feature origF : origFm.getFeatures()) {
+		for (IFeature origF : origFm.getFeatures()) {
 
 			if (origF.isAnd()) {
-				Feature newF = newFm.getFeature(origF.getName());
+				IFeature newF = newFm.getFeature(origF.getName());
 				if (newF == null) {
 					// fail("Feature " + origF.getName() + " cannot be found");
 				} else {
@@ -147,10 +147,10 @@ public abstract class TAbstractFeatureModelReaderWriter {
 	@Test
 	public void testFeatureGroupTypeOr() throws FileNotFoundException,
 			UnsupportedModelException {
-		for (Feature origF : origFm.getFeatures()) {
+		for (IFeature origF : origFm.getFeatures()) {
 
 			if (origF.isOr()) {
-				Feature newF = newFm.getFeature(origF.getName());
+				IFeature newF = newFm.getFeature(origF.getName());
 				if (newF == null) {
 					// fail("Feature " + origF.getName() + " cannot be found");
 				} else {
@@ -164,10 +164,10 @@ public abstract class TAbstractFeatureModelReaderWriter {
 	@Test
 	public void testFeatureGroupTypeAlternative() throws FileNotFoundException,
 			UnsupportedModelException {
-		for (Feature origF : origFm.getFeatures()) {
+		for (IFeature origF : origFm.getFeatures()) {
 
 			if (origF.isAlternative()) {
-				Feature newF = newFm.getFeature(origF.getName());
+				IFeature newF = newFm.getFeature(origF.getName());
 				if (newF == null) {
 					// fail("Feature " + origF.getName() + " cannot be found");
 				} else {
@@ -181,10 +181,10 @@ public abstract class TAbstractFeatureModelReaderWriter {
 	@Test
 	public void testFeatureConcrete() throws FileNotFoundException,
 			UnsupportedModelException {
-		for (Feature origF : origFm.getFeatures()) {
+		for (IFeature origF : origFm.getFeatures()) {
 
 			if (origF.isConcrete()) {
-				Feature newF = newFm.getFeature(origF.getName());
+				IFeature newF = newFm.getFeature(origF.getName());
 				if (newF == null) {
 					// fail("Feature " + origF.getName() + " cannot be found");
 				} else {
@@ -198,10 +198,10 @@ public abstract class TAbstractFeatureModelReaderWriter {
 	@Test
 	public void testFeatureHidden() throws FileNotFoundException,
 			UnsupportedModelException {
-		for (Feature origF : origFm.getFeatures()) {
+		for (IFeature origF : origFm.getFeatures()) {
 
 			if (origF.isHidden()) {
-				Feature newF = newFm.getFeature(origF.getName());
+				IFeature newF = newFm.getFeature(origF.getName());
 				if (newF == null) {
 					// fail("Feature " + origF.getName() + " cannot be found");
 				} else {
@@ -217,10 +217,10 @@ public abstract class TAbstractFeatureModelReaderWriter {
 	@Test
 	public void testFeatureMandatory() throws FileNotFoundException,
 			UnsupportedModelException {
-		for (Feature origF : origFm.getFeatures()) {
+		for (IFeature origF : origFm.getFeatures()) {
 
 			if (origF.isMandatory()) {
-				Feature newF = newFm.getFeature(origF.getName());
+				IFeature newF = newFm.getFeature(origF.getName());
 				if (newF == null) {
 					// fail("Feature " + origF.getName() + " cannot be found");
 				} else {
@@ -276,15 +276,15 @@ public abstract class TAbstractFeatureModelReaderWriter {
 	
 	@Test
 	public void testDescription() {
-		for (Feature origFeature : origFm.getFeatures()) {
-			Feature newFeature = newFm.getFeature(origFeature.getName());
+		for (IFeature origFeature : origFm.getFeatures()) {
+			IFeature newFeature = newFm.getFeature(origFeature.getName());
 			assertEquals(origFeature.getDescription(), newFeature.getDescription());
 		}
 	}
 
-	private final FeatureModel writeAndReadModel()
+	private final IFeatureModel writeAndReadModel()
 			throws UnsupportedModelException {
-		FeatureModel newFm = new FeatureModel();
+		IFeatureModel newFm = new IFeatureModel();
 		IFeatureModelWriter writer = getWriter(origFm);
 		IFeatureModelReader reader = getReader(newFm);
 		reader.readFromString(writer.writeToString());
@@ -303,8 +303,8 @@ public abstract class TAbstractFeatureModelReaderWriter {
 		return filter;
 	}
 
-	protected abstract IFeatureModelWriter getWriter(FeatureModel fm);
+	protected abstract IFeatureModelWriter getWriter(IFeatureModel fm);
 
-	protected abstract IFeatureModelReader getReader(FeatureModel fm);
+	protected abstract IFeatureModelReader getReader(IFeatureModel fm);
 
 }

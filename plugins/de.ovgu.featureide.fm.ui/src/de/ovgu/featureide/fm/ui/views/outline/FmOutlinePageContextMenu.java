@@ -50,10 +50,10 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.part.IPageSite;
 
-import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.ExtendedFeature;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractAction;
@@ -82,7 +82,7 @@ public class FmOutlinePageContextMenu {
 	private Object site;
 	private FeatureModelEditor fTextEditor;
 	private TreeViewer viewer;
-	private FeatureModel fInput;
+	private IFeatureModel fInput;
 
 	private HiddenAction hAction;
 	private MandatoryAction mAction;
@@ -107,7 +107,7 @@ public class FmOutlinePageContextMenu {
 	private static final ImageDescriptor IMG_COLLAPSE = FMUIPlugin.getDefault().getImageDescriptor("icons/collapse.gif");
 	private static final ImageDescriptor IMG_EXPAND = FMUIPlugin.getDefault().getImageDescriptor("icons/expand.gif");
 
-	public FmOutlinePageContextMenu(Object site, FeatureModelEditor fTextEditor, TreeViewer viewer, FeatureModel fInput) {
+	public FmOutlinePageContextMenu(Object site, FeatureModelEditor fTextEditor, TreeViewer viewer, IFeatureModel fInput) {
 		this.site = site;
 		this.fTextEditor = fTextEditor;
 		this.viewer = viewer;
@@ -172,9 +172,9 @@ public class FmOutlinePageContextMenu {
 
 		dblClickListener = new IDoubleClickListener() {
 			public void doubleClick(DoubleClickEvent event) {
-				if ((((IStructuredSelection) viewer.getSelection()).getFirstElement() instanceof Feature))
+				if ((((IStructuredSelection) viewer.getSelection()).getFirstElement() instanceof IFeature))
 					mAction.run();
-				else if ((((IStructuredSelection) viewer.getSelection()).getFirstElement() instanceof Constraint))
+				else if ((((IStructuredSelection) viewer.getSelection()).getFirstElement() instanceof IConstraint))
 					ecAction.run();
 
 			}
@@ -194,14 +194,14 @@ public class FmOutlinePageContextMenu {
 					return;
 
 				EditPart part;
-				if ((((IStructuredSelection) viewer.getSelection()).getFirstElement() instanceof Feature)) {
+				if ((((IStructuredSelection) viewer.getSelection()).getFirstElement() instanceof IFeature)) {
 
-					Feature feat = (Feature) ((IStructuredSelection) viewer.getSelection()).getFirstElement();
+					IFeature feat = (IFeature) ((IStructuredSelection) viewer.getSelection()).getFirstElement();
 
 					part = (EditPart) fTextEditor.diagramEditor.getEditPartRegistry().get(feat);
-				} else if ((((IStructuredSelection) viewer.getSelection()).getFirstElement() instanceof Constraint)) {
+				} else if ((((IStructuredSelection) viewer.getSelection()).getFirstElement() instanceof IConstraint)) {
 
-					Constraint constr = (Constraint) ((IStructuredSelection) viewer.getSelection()).getFirstElement();
+					IConstraint constr = (IConstraint) ((IStructuredSelection) viewer.getSelection()).getFirstElement();
 
 					part = (EditPart) fTextEditor.diagramEditor.getEditPartRegistry().get(constr);
 
@@ -232,7 +232,7 @@ public class FmOutlinePageContextMenu {
 	protected void fillContextMenu(IMenuManager manager) {
 		Object sel = ((IStructuredSelection) viewer.getSelection()).getFirstElement();
 		if (sel instanceof FmOutlineGroupStateStorage) {
-			Feature feature = ((FmOutlineGroupStateStorage) sel).getFeature();
+			IFeature feature = ((FmOutlineGroupStateStorage) sel).getFeature();
 			if (feature instanceof ExtendedFeature && ((ExtendedFeature) feature).isFromExtern()) {
 				return;
 			}
@@ -242,7 +242,7 @@ public class FmOutlinePageContextMenu {
 			manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 			manager.add(roAction);
 		}
-		if (sel instanceof Feature) {
+		if (sel instanceof IFeature) {
 
 			manager.add(cAction);
 
@@ -273,7 +273,7 @@ public class FmOutlinePageContextMenu {
 			manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 			manager.add(roAction);
 		}
-		if (sel instanceof Constraint) {
+		if (sel instanceof IConstraint) {
 			manager.add(ccAction);
 			manager.add(ecAction);
 
@@ -293,7 +293,7 @@ public class FmOutlinePageContextMenu {
 		iToolBarManager.add(expandAllAction);
 	}
 
-	public FeatureModel getFeatureModel() {
+	public IFeatureModel getFeatureModel() {
 		return fInput;
 	}
 }

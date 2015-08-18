@@ -36,7 +36,7 @@ import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
  * Propagates errors for <code>FeatureHouse</code> Java files.
@@ -274,7 +274,7 @@ public class JavaErrorPropagation extends ErrorPropagation {
 		}
 
 		if (layerNames == null) {
-			FeatureModel model = project.getFeatureModel();
+			IFeatureModel model = project.getFeatureModel();
 			if (model.isFeatureOrderUserDefined()) {
 				layerNames = model.getFeatureOrderList();
 			} else {

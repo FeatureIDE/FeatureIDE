@@ -53,6 +53,7 @@ import org.prop4j.Or;
 import org.prop4j.SatSolver;
 import org.sat4j.specs.TimeoutException;
 
+import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.Comparison;
@@ -60,8 +61,8 @@ import de.ovgu.featureide.fm.core.editing.ModelComparator;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
 /**
- * A collection of methods for working with {@link FeatureModel} will replace
- * the corresponding methods in {@link FeatureModel}
+ * A collection of methods for working with {@link IFeatureModel} will replace
+ * the corresponding methods in {@link IFeatureModel}
  * 
  * @author Soenke Holthusen
  * @author Florian Proksch
@@ -124,7 +125,7 @@ public class FeatureModelAnalyzer {
 
 	private FeatureDependencies dependencies;
 	
-	public Collection<Feature> getCachedFalseOptionalFeatures() {
+	public Collection<IFeature> getCachedFalseOptionalFeatures() {
 		return chachedFalseOptionalFeatures;
 	}
 
@@ -138,7 +139,7 @@ public class FeatureModelAnalyzer {
 		return cachedValidity;
 	}
 	
-	protected FeatureModelAnalyzer(FeatureModel fm) {
+	protected FeatureModelAnalyzer(IFeatureModel fm) {
 		this.fm = fm;
 	}
 
@@ -184,7 +185,7 @@ public class FeatureModelAnalyzer {
 	 * @return
 	 * @throws TimeoutException
 	 */
-	public boolean checkImplies(Collection<Feature> a, Collection<Feature> b)
+	public boolean checkImplies(Collection<IFeature> a, Collection<IFeature> b)
 			throws TimeoutException {
 		if (b.isEmpty())
 			return true;
@@ -201,13 +202,13 @@ public class FeatureModelAnalyzer {
 		return !new SatSolver(new Not(finalFormula), 1000).isSatisfiable();
 	}
 	
-	public boolean checkIfFeatureCombinationNotPossible(Feature a, Collection<Feature> b) throws TimeoutException {
+	public boolean checkIfFeatureCombinationNotPossible(IFeature a, Collection<IFeature> b) throws TimeoutException {
 		if (b.isEmpty())
 			return true;
 
 		Node featureModel = NodeCreator.createNodes(fm.clone());
 		boolean notValid = true;
-		for (Feature f : b) {
+		for (IFeature f : b) {
 			Node node = new And(new And(featureModel, new Literal(NodeCreator.getVariable(f, fm.clone()))),  
 					new Literal(NodeCreator.getVariable(a, fm.clone())));
 			notValid &= !new SatSolver(node, 1000).isSatisfiable();
@@ -263,15 +264,15 @@ public class FeatureModelAnalyzer {
 	 *         otherwise
 	 * @throws TimeoutException
 	 */
-	public boolean areMutualExclusive(Collection<Feature> context,
-			Collection<Set<Feature>> featureSets) throws TimeoutException {
+	public boolean areMutualExclusive(Collection<IFeature> context,
+			Collection<Set<IFeature>> featureSets) throws TimeoutException {
 		if ((featureSets == null) || (featureSets.size() < 2))
 			return true;
 
 		Node featureModel = NodeCreator.createNodes(fm);
 
 		ArrayList<Node> conjunctions = new ArrayList<Node>(featureSets.size());
-		for (Collection<Feature> features : featureSets) {
+		for (Collection<IFeature> features : featureSets) {
 			if ((features != null) && !features.isEmpty())
 				conjunctions.add(conjunct(features));
 			else
@@ -327,15 +328,15 @@ public class FeatureModelAnalyzer {
 	 *         code-fragment may be missing || false, otherwise
 	 * @throws TimeoutException
 	 */
-	public boolean mayBeMissing(Collection<Feature> context,
-			Collection<Set<Feature>> featureSets) throws TimeoutException {
+	public boolean mayBeMissing(Collection<IFeature> context,
+			Collection<Set<IFeature>> featureSets) throws TimeoutException {
 		if ((featureSets == null) || featureSets.isEmpty())
 			return false;
 
 		Node featureModel = NodeCreator.createNodes(fm);
 		Collection<Object> forAnd = new LinkedList<Object>();
 
-		for (Collection<Feature> features : featureSets) {
+		for (Collection<IFeature> features : featureSets) {
 			if ((features != null) && !features.isEmpty())
 				forAnd.add(new Not(conjunct(features)));
 			else
@@ -362,7 +363,7 @@ public class FeatureModelAnalyzer {
 	 * @return true if there exists such a set of features || false, otherwise
 	 * @throws TimeoutException
 	 */
-	public boolean exists(Collection<Feature> features) throws TimeoutException {
+	public boolean exists(Collection<IFeature> features) throws TimeoutException {
 		if ((features == null) || (features.isEmpty()))
 			return true;
 
@@ -371,8 +372,8 @@ public class FeatureModelAnalyzer {
 		return new SatSolver(finalFormula, 1000).isSatisfiable();
 	}
 
-	public Node conjunct(Collection<Feature> b) {
-		Iterator<Feature> iterator = b.iterator();
+	public Node conjunct(Collection<IFeature> b) {
+		Iterator<IFeature> iterator = b.iterator();
 		Node result = new Literal(NodeCreator.getVariable(iterator.next(), fm));
 		while (iterator.hasNext())
 			result = new And(result, new Literal(NodeCreator.getVariable(
@@ -381,8 +382,8 @@ public class FeatureModelAnalyzer {
 		return result;
 	}
 	
-	public Node disjunct(Collection<Feature> b) {
-		Iterator<Feature> iterator = b.iterator();
+	public Node disjunct(Collection<IFeature> b) {
+		Iterator<IFeature> iterator = b.iterator();
 		Node result = new Literal(NodeCreator.getVariable(iterator.next(), fm));
 		while (iterator.hasNext())
 			result = new Or(result, new Literal(NodeCreator.getVariable(
@@ -438,33 +439,33 @@ public class FeatureModelAnalyzer {
 		return getCachedDeadFeatures();
 	}
 	
-	public List<Feature> getCoreFeatures() {
+	public List<IFeature> getCoreFeatures() {
 		return getCoreFeatures(1000);	
 	}
 	
-	public List<Feature> getDeadFeatures() {
+	public List<IFeature> getDeadFeatures() {
 		return getDeadFeatures(1000);	
 	}
 
-	public List<List<Feature>> analyzeFeatures() {
+	public List<List<IFeature>> analyzeFeatures() {
 		return analyzeFeatures(1000);
 	}
 	
-	public List<Feature> getCoreFeatures(long timeout, Object... selectedFeatures) {
+	public List<IFeature> getCoreFeatures(long timeout, Object... selectedFeatures) {
 		return analyzeFeatures(timeout, SatSolver.ValueType.TRUE, selectedFeatures).get(0);
 	}
 	
-	public List<Feature> getDeadFeatures(long timeout, Object... selectedFeatures) {
+	public List<IFeature> getDeadFeatures(long timeout, Object... selectedFeatures) {
 		return analyzeFeatures(timeout, SatSolver.ValueType.FALSE, selectedFeatures).get(1);
 	}
 
-	public List<List<Feature>> analyzeFeatures(long timeout, Object... selectedFeatures) {
+	public List<List<IFeature>> analyzeFeatures(long timeout, Object... selectedFeatures) {
 		return analyzeFeatures(timeout, SatSolver.ValueType.ALL, selectedFeatures);
 	}
 	
-	private List<List<Feature>> analyzeFeatures(long timeout, SatSolver.ValueType vt, Object... selectedFeatures) {
-		final ArrayList<Feature> coreFeatures = new ArrayList<>();
-		final ArrayList<Feature> deadFeatures = new ArrayList<>();
+	private List<List<IFeature>> analyzeFeatures(long timeout, SatSolver.ValueType vt, Object... selectedFeatures) {
+		final ArrayList<IFeature> coreFeatures = new ArrayList<>();
+		final ArrayList<IFeature> deadFeatures = new ArrayList<>();
 		
 		Node formula = NodeCreator.createNodes(fm);
 		if (selectedFeatures.length > 0) {
@@ -475,7 +476,7 @@ public class FeatureModelAnalyzer {
 		for (Literal literal : solver.knownValues(vt)) {
 			final String var = literal.var.toString();
 			if (!FALSE.equals(var) && !TRUE.equals(var)) {
-				final Feature feature = fm.getFeature(var);
+				final IFeature feature = fm.getFeature(var);
 				if (feature != null) {
 					if (literal.positive) {
 						coreFeatures.add(feature);
@@ -489,25 +490,25 @@ public class FeatureModelAnalyzer {
 		cachedCoreFeatures = coreFeatures;
 		cachedDeadFeatures = deadFeatures;
 
-		final ArrayList<List<Feature>> result = new ArrayList<>(2);
+		final ArrayList<List<IFeature>> result = new ArrayList<>(2);
 		result.add(getCachedCoreFeatures());
 		result.add(getCachedDeadFeatures());
 		
 		return result;
 	}
 	
-	public List<List<Feature>> getAtomicSets() {
-		final ArrayList<List<Feature>> result = new ArrayList<>();
+	public List<List<IFeature>> getAtomicSets() {
+		final ArrayList<List<IFeature>> result = new ArrayList<>();
 		
 		final SatSolver solver = new SatSolver(NodeCreator.createNodes(fm), 1000);
 		
 		for (List<Literal> literalList : solver.atomicSets()) {
-			final List<Feature> setList = new ArrayList<>();
+			final List<IFeature> setList = new ArrayList<>();
 			result.add(setList);
 			for (Literal literal : literalList) {
 				final String var = literal.var.toString();
 				if (!FALSE.equals(var) && !TRUE.equals(var)) {
-					final Feature feature = fm.getFeature(var);
+					final IFeature feature = fm.getFeature(var);
 					if (feature != null) {
 						setList.add(feature);
 					}
@@ -562,17 +563,17 @@ public class FeatureModelAnalyzer {
 
 	public void updateConstraints(HashMap<Object, Object> oldAttributes,
 			HashMap<Object, Object> changedAttributes) {
-		FeatureModel clone = fm.clone();
+		IFeatureModel clone = fm.clone();
 		clone.constraints.clear();
 		SatSolver solver = new SatSolver(NodeCreator.createNodes(clone), 1000);
 	
-		Collection<Feature> fmDeadFeatures = new ArrayList<>(getCachedDeadFeatures());
-		Collection<Feature> fmFalseOptionals = getCachedFalseOptionalFeatures();
+		Collection<IFeature> fmDeadFeatures = new ArrayList<>(getCachedDeadFeatures());
+		Collection<IFeature> fmFalseOptionals = getCachedFalseOptionalFeatures();
 		try {
 			if (!cachedValidity) { 
 				// case: invalid model
 				boolean contraintFound = false;
-				for (Constraint constraint : fm.getConstraints()) {
+				for (IConstraint constraint : fm.getConstraints()) {
 					if (canceled()) {
 						return;
 					}
@@ -622,7 +623,7 @@ public class FeatureModelAnalyzer {
 			if (calculateRedundantConstraints || calculateTautologyConstraints) {
 				setSubTask(FIND_REDUNDANT_CONSTRAINTS);
 				/** Remove redundant constraints for further analysis **/
-				for (Constraint constraint : fm.getConstraints()) {
+				for (IConstraint constraint : fm.getConstraints()) {
 					if (canceled()) {
 						return;
 					}
@@ -655,7 +656,7 @@ public class FeatureModelAnalyzer {
 				clone.constraints.clear();
 			}
 			/** Look for dead and false optional features **/
-			for (Constraint constraint : fm.getConstraints()) {
+			for (IConstraint constraint : fm.getConstraints()) {
 				if (canceled()) {
 					return;
 				}
@@ -690,7 +691,7 @@ public class FeatureModelAnalyzer {
 				}
 				
 				if (!fmDeadFeatures.isEmpty()) {
-					Collection<Feature> deadFeatures = constraint.getDeadFeatures(solver, clone, fmDeadFeatures);
+					Collection<IFeature> deadFeatures = constraint.getDeadFeatures(solver, clone, fmDeadFeatures);
 					if (!deadFeatures.isEmpty()) {
 						fmDeadFeatures.removeAll(deadFeatures);
 						constraint.setDeadFeatures(deadFeatures);
@@ -727,8 +728,8 @@ public class FeatureModelAnalyzer {
 		}
 	}
 
-	private void findRedundantConstraints(FeatureModel clone, Constraint constraint, Map<Object, Object> changedAttributes, Map<Object,Object> oldAttributes) {
-		FeatureModel oldModel = clone.clone();
+	private void findRedundantConstraints(IFeatureModel clone, IConstraint constraint, Map<Object, Object> changedAttributes, Map<Object,Object> oldAttributes) {
+		IFeatureModel oldModel = clone.clone();
 		clone.addConstraint(constraint);
 		ModelComparator comparator = new ModelComparator(500);
 		Comparison comparison = comparator.compare(clone, oldModel);
@@ -743,7 +744,7 @@ public class FeatureModelAnalyzer {
 	public void updateFeatures(Map<Object, Object> oldAttributes,
 			Map<Object, Object> changedAttributes) {
 		setSubTask(ANALYZE_FEATURES_);
-		for (Feature bone : fm.getFeatures()) {
+		for (IFeature bone : fm.getFeatures()) {
 			oldAttributes.put(bone, bone.getFeatureStatus());
 			
 			if (bone.getFeatureStatus() != FeatureStatus.NORMAL) {
@@ -768,7 +769,7 @@ public class FeatureModelAnalyzer {
 			 * here the saved dead features at the feature model are calculated and set
 			 */
 			setSubTask(GET_DEAD_FEATURES_);
-			for (Feature deadFeature : getDeadFeatures()) {
+			for (IFeature deadFeature : getDeadFeatures()) {
 				if (oldAttributes.get(deadFeature) != FeatureStatus.DEAD) {
 					changedAttributes.put(deadFeature, FeatureStatus.DEAD);
 				}
@@ -810,17 +811,17 @@ public class FeatureModelAnalyzer {
 		 * where A is an expression containing only non hidden features
 		 * If there is a constraint of that kind for a hidden feature it is added to a list. 
 		 */
-		Collection<Feature> list = new LinkedList<Feature>();
-		Collection<Feature> hiddenFeatures = getHiddenFeatures();
-		for (Feature feature : hiddenFeatures) {	
-			for (Constraint constraint : feature.getRelevantConstraints()) {
+		Collection<IFeature> list = new LinkedList<IFeature>();
+		Collection<IFeature> hiddenFeatures = getHiddenFeatures();
+		for (IFeature feature : hiddenFeatures) {	
+			for (IConstraint constraint : feature.getRelevantConstraints()) {
 				Node node = constraint.getNode();
 				if (node instanceof Equals) {
 					Node[] children = node.getChildren();
 					Node leftChild = children[0];
 					Node rightChild = children[1];
 					if (leftChild instanceof Literal && ((Literal) leftChild).var.equals(feature.getName())) {
-						Constraint	rightConstraint = new Constraint(fm, rightChild);
+						IConstraint	rightConstraint = new IConstraint(fm, rightChild);
 						rightConstraint.setContainedFeatures();
 						if (!rightConstraint.hasHiddenFeatures()) {
 							list.add(feature);
@@ -828,7 +829,7 @@ public class FeatureModelAnalyzer {
 						}
 					}
 					if (rightChild instanceof Literal &&  ((Literal) rightChild).var.equals(feature.getName())) {
-						Constraint  leftConstraint = new Constraint(fm, leftChild);
+						IConstraint  leftConstraint = new IConstraint(fm, leftChild);
 						leftConstraint.setContainedFeatures();
 						if (!leftConstraint.hasHiddenFeatures()) {
 							list.add(feature);
@@ -848,15 +849,15 @@ public class FeatureModelAnalyzer {
 		 */
 		FeatureDependencies featureDependencies = new FeatureDependencies(fm, false);
 		beginTask(fm.getConstraintCount() + hiddenFeatures.size());
-		for (Feature feature: hiddenFeatures) {
+		for (IFeature feature: hiddenFeatures) {
 			if (canceled()) {
 				return;
 			}
 			setSubTask(CALCULATE_INDETRMINATE_HIDDEN_FEATURES_FOR + feature.getName());
 			if (!list.contains(feature)) {
-				Collection<Feature> set = featureDependencies.getImpliedFeatures(feature);
+				Collection<IFeature> set = featureDependencies.getImpliedFeatures(feature);
 				boolean noHidden = false;
-				for (Feature f : set) {
+				for (IFeature f : set) {
 					if (!f.isHidden() && !f.hasHiddenParent() || list.contains(f)) {
 						if (featureDependencies.isAlways(f, feature)) {
 							noHidden = true; 
@@ -879,9 +880,9 @@ public class FeatureModelAnalyzer {
 	 * Gets all hidden features their children
 	 * @return
 	 */
-	public Collection<Feature> getHiddenFeatures() {
-		Collection<Feature> hiddenFeatures = new LinkedList<Feature>();
-		for (Feature f : fm.getFeatures()) {
+	public Collection<IFeature> getHiddenFeatures() {
+		Collection<IFeature> hiddenFeatures = new LinkedList<IFeature>();
+		for (IFeature f : fm.getFeatures()) {
 			if (f.isHidden() || f.hasHiddenParent()) {
 				hiddenFeatures.add(f);
 			}
@@ -892,7 +893,7 @@ public class FeatureModelAnalyzer {
 	private void getFalseOptionalFeature(Map<Object, Object> oldAttributes,
 			Map<Object, Object> changedAttributes) {
 		chachedFalseOptionalFeatures.clear();
-		for (Feature f : getFalseOptionalFeatures()) {
+		for (IFeature f : getFalseOptionalFeatures()) {
 			changedAttributes.put(f,FeatureStatus.FALSE_OPTIONAL);
 			f.setFeatureStatus(FeatureStatus.FALSE_OPTIONAL, false);
 			chachedFalseOptionalFeatures.add(f);
@@ -941,7 +942,7 @@ public class FeatureModelAnalyzer {
 
 	public int countConcreteFeatures() {
 		int number = 0;
-		for (Feature feature : fm.getFeatures())
+		for (IFeature feature : fm.getFeatures())
 			if (feature.isConcrete())
 				number++;
 		return number;
@@ -949,7 +950,7 @@ public class FeatureModelAnalyzer {
 
 	public int countHiddenFeatures() {
 		int number = 0;
-		for (Feature feature : fm.getFeatures()) {
+		for (IFeature feature : fm.getFeatures()) {
 			if (feature.isHidden() || feature.hasHiddenParent()) {
 				number++;
 			}
@@ -959,7 +960,7 @@ public class FeatureModelAnalyzer {
 
 	public int countTerminalFeatures() {
 		int number = 0;
-		for (Feature feature : fm.getFeatures())
+		for (IFeature feature : fm.getFeatures())
 			if (!feature.hasChildren())
 				number++;
 		return number;

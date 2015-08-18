@@ -50,8 +50,8 @@ import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
 /**
@@ -166,8 +166,8 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 		// get all concrete and abstract features and generate pattern
 		StringBuilder concreteFeatures = new StringBuilder();
 		StringBuilder abstractFeatures = new StringBuilder();
-		FeatureModel fm = featureProject.getFeatureModel();
-		for (Feature feature : fm.getFeatures()) {
+		IFeatureModel fm = featureProject.getFeatureModel();
+		for (IFeature feature : fm.getFeatures()) {
 			if (feature.isConcrete()) {
 				concreteFeatures.append(feature.getName());
 				concreteFeatures.append("|");
@@ -418,7 +418,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	protected void setModelMarkers() {
 		removeModelMarkers();
 		LinkedList<String> features = new LinkedList<>(usedFeatures);
-		for (Feature f : featureProject.getFeatureModel().getFeatures()) {
+		for (IFeature f : featureProject.getFeatureModel().getFeatures()) {
 			if (f.isAbstract() && features.contains(f.getName())) {
 				features.remove(f.getName());
 				createMarker("The Feature \"" + f.getName() + "\" needs to be concrete.");

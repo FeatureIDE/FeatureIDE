@@ -28,9 +28,9 @@ import java.util.Locale;
 import org.prop4j.Node;
 import org.prop4j.NodeWriter;
 
-import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureComparator;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
 /**
@@ -44,12 +44,12 @@ public class FeatureModelVarexJ implements IFeatureModelClass {
 	private final static String FIELD_MODIFIER = "\tpublic static boolean ";
 	private final static String ANNOTATION = "\t@Conditional\r\n";
 
-	private final FeatureModel featureModel;
-	private final ArrayList<Feature> features;
+	private final IFeatureModel featureModel;
+	private final ArrayList<IFeature> features;
 
-	public FeatureModelVarexJ(FeatureModel featureModel) {
+	public FeatureModelVarexJ(IFeatureModel featureModel) {
 		this.featureModel = featureModel;
-		features = new ArrayList<Feature>(featureModel.getFeatures());
+		features = new ArrayList<IFeature>(featureModel.getFeatures());
 		Collections.sort(features, new FeatureComparator(true));
 	}
 	
@@ -66,8 +66,8 @@ public class FeatureModelVarexJ implements IFeatureModelClass {
 	@Override
 	public String getFeatureFields() {
 		StringBuilder fields = new StringBuilder();
-		final List<List<Feature>> deadCoreList = featureModel.getAnalyser().analyzeFeatures();
-		for (Feature feature : features) {
+		final List<List<IFeature>> deadCoreList = featureModel.getAnalyser().analyzeFeatures();
+		for (IFeature feature : features) {
 			final boolean isCoreFeature = deadCoreList.get(0).contains(feature);
 			final boolean isDeadFeature = deadCoreList.get(1).contains(feature);
 			if (!isCoreFeature && !isDeadFeature) {

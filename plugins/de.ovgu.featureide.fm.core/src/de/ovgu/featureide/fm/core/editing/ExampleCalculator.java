@@ -30,7 +30,7 @@ import org.prop4j.Or;
 import org.prop4j.SatSolver;
 import org.sat4j.specs.TimeoutException;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 
@@ -41,7 +41,7 @@ import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
  */
 public class ExampleCalculator {
 	
-	private FeatureModel fm;
+	private IFeatureModel fm;
 
 	private Node a;
 
@@ -59,7 +59,7 @@ public class ExampleCalculator {
 
 	private long timeout;
 	
-	public ExampleCalculator(FeatureModel fm, long timeout) {
+	public ExampleCalculator(IFeatureModel fm, long timeout) {
 		this.fm = fm;
 		this.timeout = timeout;
 	}

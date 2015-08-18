@@ -28,9 +28,9 @@ import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gef.commands.Command;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.Constraint;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConnectionEditPart;
@@ -45,11 +45,11 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.LegendMoveOperat
  */
 public class LegendDragAndDropCommand extends Command {
 
-	private final FeatureModel model;
+	private final IFeatureModel model;
 	private final LegendEditPart legendEditPart;
 	private Point newLocation;
 
-	public LegendDragAndDropCommand(FeatureModel model, LegendEditPart legendEditPart, Point moveDelta) {
+	public LegendDragAndDropCommand(IFeatureModel model, LegendEditPart legendEditPart, Point moveDelta) {
 		this.legendEditPart = legendEditPart;
 		this.model = model;
 
@@ -67,7 +67,7 @@ public class LegendDragAndDropCommand extends Command {
 		Rectangle newBounds = new Rectangle(newLocation, legendEditPart.getFigure().getSize());
 
 		// check if legend intersects with a feature
-		for (Feature f : model.getFeatures()) {
+		for (IFeature f : model.getFeatures()) {
 			if (newBounds.intersects(FeatureUIHelper.getBounds(f))) {
 				return false;
 			}
@@ -81,7 +81,7 @@ public class LegendDragAndDropCommand extends Command {
 		}
 
 		// check if legend intersects with a constraint
-		for (Constraint c : model.getConstraints()) {
+		for (IConstraint c : model.getConstraints()) {
 			if (newBounds.intersects(FeatureUIHelper.getBounds(c))) {
 				return false;
 			}

@@ -24,7 +24,7 @@ import java.util.LinkedList;
 
 import org.eclipse.draw2d.geometry.Point;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
@@ -50,7 +50,7 @@ public class VerticalLayout2 extends FeatureDiagramLayoutManager {
 	int yAcc = 0;
 
 	@Override
-	public void layoutFeatureModel(FeatureModel featureModel) {
+	public void layoutFeatureModel(IFeatureModel featureModel) {
 		this.xoffset = 0;
 		LayoutableFeature root = new LayoutableFeature(featureModel.getRoot(), showHidden);
 		layout(root);

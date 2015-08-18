@@ -27,9 +27,9 @@ import java.util.List;
 
 import org.sat4j.specs.TimeoutException;
 
-import de.ovgu.featureide.fm.core.Constraint;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
@@ -44,9 +44,9 @@ public final class StatisticsFeatureComplexity extends LazyParent {
 
 	private static final double precision = 1000.0;
 	
-	private final FeatureModel model;
+	private final IFeatureModel model;
 
-	public StatisticsFeatureComplexity(String description, FeatureModel model) {
+	public StatisticsFeatureComplexity(String description, IFeatureModel model) {
 		super(description, null);
 		this.model = model;
 	}
@@ -64,14 +64,14 @@ public final class StatisticsFeatureComplexity extends LazyParent {
 				UIPlugin.getDefault().logError(e);
 			}
 
-			final Collection<Feature> listOfFeatures = model.getFeatures();
+			final Collection<IFeature> listOfFeatures = model.getFeatures();
 
-			final List<Feature> listOfCompoundFeatures = new ArrayList<Feature>();
-			final List<Feature> listOfPrimitiveFeatures = new ArrayList<Feature>();
-			final List<Feature> listOfAbstractFeatures = new ArrayList<Feature>();
-			final List<Feature> listOfConcreteFeatures = new ArrayList<Feature>();
+			final List<IFeature> listOfCompoundFeatures = new ArrayList<IFeature>();
+			final List<IFeature> listOfPrimitiveFeatures = new ArrayList<IFeature>();
+			final List<IFeature> listOfAbstractFeatures = new ArrayList<IFeature>();
+			final List<IFeature> listOfConcreteFeatures = new ArrayList<IFeature>();
 
-			for (Feature f : listOfFeatures) {
+			for (IFeature f : listOfFeatures) {
 				if (f.getChildren().isEmpty()) {
 					listOfPrimitiveFeatures.add(f);
 				} else {
@@ -84,8 +84,8 @@ public final class StatisticsFeatureComplexity extends LazyParent {
 				}
 			}
 
-			final HashSet<Feature> constraintFeatures = new HashSet<>(model.getNumberOfFeatures() << 1);
-			for (Constraint constraint : model.getConstraints()) {
+			final HashSet<IFeature> constraintFeatures = new HashSet<>(model.getNumberOfFeatures() << 1);
+			for (IConstraint constraint : model.getConstraints()) {
 				constraintFeatures.addAll(constraint.getContainedFeatures());
 			}
 

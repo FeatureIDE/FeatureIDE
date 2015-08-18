@@ -54,6 +54,8 @@ import de.ovgu.featureide.ahead.model.AbstractJakModelBuilder;
 import de.ovgu.featureide.ahead.model.JampackJakModelBuilder;
 import de.ovgu.featureide.ahead.model.MixinJakModelBuilder;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.fm.core.filter.ConcreteFeatureFilter;
+import de.ovgu.featureide.fm.core.filter.base.Filter;
 
 /**
  * 
@@ -148,7 +150,7 @@ public class ComposerWrapper {
 			try {
 				if (featureFolder.exists())
 					featureFolder.accept(new FeatureVisitor(this));
-				else if (featureProject.getFeatureModel().getConcreteFeatureNames()
+				  else if (Filter.toString(featureProject.getFeatureModel().getFeatures(), Filter.CONCRETE_FEATURE_FILTER)
 						.contains(featureFolder.getName()))
 					featureProject.createBuilderMarker(featureProject
 							.getProject(), "Feature folder "
@@ -209,12 +211,12 @@ public class ComposerWrapper {
 					featureProject.getProject().getLocation().toFile());
 			list = reader2.featureOrderRead();
 		}*/
-		List<String> featureOrderList = featureProject.getFeatureModel().getFeatureOrderList();
+		List<String> featureOrderList = featureProject.getFeatureModel().getFeatureProperty().getFeatureOrderList();
 		for (IFolder folder : featureFolders) {
 			allFeatureFolders.add(folder);
 		}
 		if (featureOrderList == null || featureOrderList.isEmpty()) {	
-			for (String feature : featureProject.getFeatureModel().getConcreteFeatureNames()) {
+			for (String feature : Filter.toString(featureProject.getFeatureModel().getFeatures(), Filter.CONCRETE_FEATURE_FILTER)) {
 				IFolder folder = featureProject.getSourceFolder().getFolder(feature);
 				if (!allFeatureFolders.contains(folder)) {
 					allFeatureFolders.add(folder);

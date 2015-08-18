@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
@@ -35,7 +35,7 @@ public class LegendHideOperation extends AbstractFeatureModelOperation {
 	/**
 	 * @param label
 	 */
-	public LegendHideOperation(FeatureModel featureModel) {
+	public LegendHideOperation(IFeatureModel featureModel) {
 		super(featureModel, LABEL);
 		this.featureModel = featureModel;
 	}

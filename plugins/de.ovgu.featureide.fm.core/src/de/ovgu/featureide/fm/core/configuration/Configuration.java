@@ -31,8 +31,8 @@ import java.util.Set;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.job.WorkMonitor;
 
 /**
@@ -49,7 +49,7 @@ public class Configuration implements Cloneable {
 
 	final boolean ignoreAbstractFeatures;
 
-	private final FeatureModel featureModel;
+	private final IFeatureModel featureModel;
 	private final SelectableFeature root;
 	private final ConfigurationPropagator propagator;
 	private boolean propagate = true;
@@ -78,7 +78,7 @@ public class Configuration implements Cloneable {
 	 * @param featureModel the underlying feature model. The model can be different from the old configuration.
 	 * @param propagate
 	 */
-	public Configuration(Configuration configuration, FeatureModel featureModel) {
+	public Configuration(Configuration configuration, IFeatureModel featureModel) {
 		this.featureModel = featureModel;
 		this.ignoreAbstractFeatures = configuration.ignoreAbstractFeatures;
 		this.propagator = new ConfigurationPropagator(this);
@@ -95,15 +95,15 @@ public class Configuration implements Cloneable {
 		loadPropagator(configuration.propagate);
 	}
 	
-	public Configuration(FeatureModel featureModel) {
+	public Configuration(IFeatureModel featureModel) {
 		this(featureModel, PARAM_PROPAGATE | PARAM_IGNOREABSTRACT);
 	}
 	
-	public Configuration(FeatureModel featureModel, boolean propagate) {
+	public Configuration(IFeatureModel featureModel, boolean propagate) {
 		this(featureModel, (propagate ? PARAM_PROPAGATE : 0) | PARAM_IGNOREABSTRACT);
 	}
 	
-	public Configuration(FeatureModel featureModel, boolean propagate, boolean ignoreAbstractFeatures) {
+	public Configuration(IFeatureModel featureModel, boolean propagate, boolean ignoreAbstractFeatures) {
 		this(featureModel, (propagate ? PARAM_PROPAGATE : 0) | (ignoreAbstractFeatures ? PARAM_IGNOREABSTRACT : 0));
 	}
 	
@@ -115,7 +115,7 @@ public class Configuration implements Cloneable {
 	 *  &nbsp;&nbsp;&nbsp;{@link #PARAM_LAZY},</br>
 	 *  &nbsp;&nbsp;&nbsp;{@link #PARAM_PROPAGATE}
 	 */
-	public Configuration(FeatureModel featureModel, int options) {
+	public Configuration(IFeatureModel featureModel, int options) {
 		this.featureModel = featureModel;
 		this.ignoreAbstractFeatures = (options & PARAM_IGNOREABSTRACT) != 0;
 		this.propagator = new ConfigurationPropagator(this);
@@ -128,11 +128,11 @@ public class Configuration implements Cloneable {
 		}
 	}
 	
-	private void initFeatures(SelectableFeature sFeature, Feature feature) {
+	private void initFeatures(SelectableFeature sFeature, IFeature feature) {
 		if (sFeature != null && sFeature.getName() != null) {
 			features.add(sFeature);
 			table.put(sFeature.getName(), sFeature);
-			for (Feature child : feature.getChildren()) {
+			for (IFeature child : feature.getChildren()) {
 				SelectableFeature sChild = new SelectableFeature(this, child);
 				sFeature.addChild(sChild);
 				initFeatures(sChild, child);
@@ -141,7 +141,7 @@ public class Configuration implements Cloneable {
 	}
 
 	private SelectableFeature initRoot() {
-		final Feature featureRoot = featureModel.getRoot();
+		final IFeature featureRoot = featureModel.getRoot();
 		final SelectableFeature root = new SelectableFeature(this, featureRoot);
 		
 		if (featureRoot != null) {
@@ -186,7 +186,7 @@ public class Configuration implements Cloneable {
 		return propagator.canBeValid(new WorkMonitor());
 	}
 
-	public FeatureModel getFeatureModel() {
+	public IFeatureModel getFeatureModel() {
 		return featureModel;
 	}
 	
@@ -222,8 +222,8 @@ public class Configuration implements Cloneable {
 		return result;
 	}
 	
-	public List<Feature> getSelectedFeatures() {
-		final List<Feature> result = new ArrayList<Feature>();
+	public List<IFeature> getSelectedFeatures() {
+		final List<IFeature> result = new ArrayList<IFeature>();
 		for (SelectableFeature feature : features) {
 			if (feature.getSelection() == Selection.SELECTED) {
 				result.add(feature.getFeature());
@@ -236,8 +236,8 @@ public class Configuration implements Cloneable {
 		return propagator.getSolutions(max, new WorkMonitor());
 	}
 	
-	public List<Feature> getUnSelectedFeatures() {
-		final List<Feature> result = new ArrayList<Feature>();
+	public List<IFeature> getUnSelectedFeatures() {
+		final List<IFeature> result = new ArrayList<IFeature>();
 		
 		for (SelectableFeature feature : features) {
 			if (feature.getSelection() == Selection.UNSELECTED) {

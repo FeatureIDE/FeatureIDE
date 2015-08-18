@@ -39,11 +39,11 @@ import org.eclipse.gef.tools.DirectEditManager;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.Constraint;
-import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureConnection;
-import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureCellEditorLocator;
@@ -68,8 +68,8 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 		setModel(feature);
 	}
 
-	public Feature getFeature() {
-		return (Feature) getModel();
+	public IFeature getFeature() {
+		return (IFeature) getModel();
 	}
 
 	public FeatureFigure getFeatureFigure() {
@@ -78,7 +78,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 
 	@Override
 	protected IFigure createFigure() {
-		final Feature f = getFeature();
+		final IFeature f = getFeature();
 		final FeatureFigure featureFigure = new FeatureFigure(f, f.getFeatureModel());
 		sourceAnchor = featureFigure.getSourceAnchor();
 		targetAnchor = featureFigure.getTargetAnchor();
@@ -87,7 +87,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 
 	@Override
 	protected void createEditPolicies() {
-		final Feature f = getFeature();
+		final IFeature f = getFeature();
 		installEditPolicy(EditPolicy.DIRECT_EDIT_ROLE, new FeatureDirectEditPolicy(f.getFeatureModel(), f));
 	}
 
@@ -95,7 +95,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 
 	public void showRenameManager() {
 		if (manager == null) {
-			final Feature f = getFeature();
+			final IFeature f = getFeature();
 			manager = new FeatureLabelEditManager(this, TextCellEditor.class, new FeatureCellEditorLocator(getFeatureFigure()), f.getFeatureModel());
 		}
 		manager.show();
@@ -103,10 +103,10 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 
 	@Override
 	public void performRequest(Request request) {
-		Feature feature = getFeature();
-		FeatureModel featureModel = ((ModelEditPart) this.getParent()).getFeatureModel();
+		IFeature feature = getFeature();
+		IFeatureModel featureModel = ((ModelEditPart) this.getParent()).getFeatureModel();
 
-		for (Constraint constraint : featureModel.getConstraints()) {
+		for (IConstraint constraint : featureModel.getConstraints()) {
 			if (constraint.isFeatureSelected())
 				constraint.setFeatureSelected(false);
 		}
@@ -129,7 +129,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 
 			featureModel.handleModelDataChanged();
 		} else if (request.getType() == RequestConstants.REQ_SELECTION) {
-			for (Constraint partOf : feature.getRelevantConstraints()) {
+			for (IConstraint partOf : feature.getRelevantConstraints()) {
 				partOf.setFeatureSelected(true);
 			}
 		}
@@ -137,12 +137,12 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 
 	@Override
 	protected List<FeatureConnection> getModelSourceConnections() {
-		return ((Feature) getModel()).getSourceConnections();
+		return ((IFeature) getModel()).getSourceConnections();
 	}
 
 	@Override
 	protected List<FeatureConnection> getModelTargetConnections() {
-		return ((Feature) getModel()).getTargetConnections();
+		return ((IFeature) getModel()).getTargetConnections();
 	}
 
 	public ConnectionAnchor getSourceConnectionAnchor(org.eclipse.gef.ConnectionEditPart connection) {

@@ -30,8 +30,8 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
@@ -68,11 +68,11 @@ public class QuickFixFalseOptionalFeatures extends QuickFixMissingConfigurations
 		return createConfigurations(falseOptionalFeatures, featureModel, monitor);
 	}
 		
-	List<Configuration> createConfigurations(final Collection<String> falseOptionalFeatures, FeatureModel featureModel, final IProgressMonitor monitor) {
+	List<Configuration> createConfigurations(final Collection<String> falseOptionalFeatures, IFeatureModel featureModel, final IProgressMonitor monitor) {
 		if (monitor != null) {
 			monitor.beginTask(CREATE_CONFIGURATIONS, falseOptionalFeatures.size());
 		}
-		for (Feature dead : featureModel.getAnalyser().getDeadFeatures()) {
+		for (IFeature dead : featureModel.getAnalyser().getDeadFeatures()) {
 			falseOptionalFeatures.remove(dead.getName());
 		}
 		

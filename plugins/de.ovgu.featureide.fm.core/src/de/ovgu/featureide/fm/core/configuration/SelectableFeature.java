@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.configuration;
 
-import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
  * A representation of a selectable feature for the configuration process.
@@ -33,13 +33,13 @@ public class SelectableFeature extends TreeElement {
 	
 	private Selection recommended = Selection.UNDEFINED;
 
-	private final Feature feature;
+	private final IFeature feature;
 
 	private final Configuration configuration;
 
 	private String name;
 
-	public SelectableFeature(Configuration configuration, Feature feature) {
+	public SelectableFeature(Configuration configuration, IFeature feature) {
 		this.configuration = configuration;
 		this.feature = feature;
 	}
@@ -79,7 +79,7 @@ public class SelectableFeature extends TreeElement {
 		return feature == null ? null : feature.getName();
 	}
 
-	public Feature getFeature() {
+	public IFeature getFeature() {
 		return feature;
 	}
 	

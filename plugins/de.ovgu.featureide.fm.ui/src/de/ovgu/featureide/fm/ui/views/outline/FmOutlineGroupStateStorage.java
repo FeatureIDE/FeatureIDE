@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.views.outline;
 
-import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
  * Holds information for the GroupStates of features in outline views
@@ -28,10 +28,10 @@ import de.ovgu.featureide.fm.core.Feature;
  * @author Jan Wedding
  */
 public class FmOutlineGroupStateStorage {
-	private Feature feature;
+	private IFeature feature;
 	private boolean isOrGroup;
 
-	public FmOutlineGroupStateStorage(Feature parentFeature, boolean isOr) {
+	public FmOutlineGroupStateStorage(IFeature parentFeature, boolean isOr) {
 		feature = parentFeature;
 		isOrGroup = isOr;
 	}
@@ -40,7 +40,7 @@ public class FmOutlineGroupStateStorage {
 		return isOrGroup;
 	}
 
-	public Feature getFeature() {
+	public IFeature getFeature() {
 		return feature;
 	}
 

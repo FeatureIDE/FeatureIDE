@@ -26,7 +26,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 
 /**
@@ -41,7 +41,7 @@ import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
  */
 public class FmOutlinePage extends ContentOutlinePage {
 
-	protected FeatureModel fInput;
+	protected IFeatureModel fInput;
 
 	protected IDocumentProvider fDocumentProvider;
 
@@ -64,7 +64,7 @@ public class FmOutlinePage extends ContentOutlinePage {
 	 * @param input
 	 *            the input of this outline page
 	 */
-	public void setInput(FeatureModel input) {
+	public void setInput(IFeatureModel input) {
 		fInput = input;
 		update();
 	}

@@ -28,8 +28,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.draw2d.geometry.Point;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureModelLayout;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
 
@@ -45,7 +45,7 @@ public class LegendMoveOperation extends AbstractFeatureModelOperation {
 	private Point oldLocation;
 	private boolean wasAutoLayout;
 
-	public LegendMoveOperation(FeatureModel featureModel, Point newLocation, LegendFigure legendFigure) {
+	public LegendMoveOperation(IFeatureModel featureModel, Point newLocation, LegendFigure legendFigure) {
 		super(featureModel, LABEL);
 		this.newLocation = newLocation;
 		this.oldLocation = legendFigure.getLocation();

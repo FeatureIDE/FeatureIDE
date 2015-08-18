@@ -45,8 +45,8 @@ import de.ovgu.featureide.core.mpl.builder.MSPLNature;
 import de.ovgu.featureide.fm.core.ExtendedFeature;
 import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.ExtendedFeatureModel.UsedModel;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
@@ -139,7 +139,7 @@ public class MPLBuildProjectJob extends AProjectJob<MPLBuildProjectJob.Arguments
 	}
 	
 	private boolean buildMPLProject() {
-		final FeatureModel featureModel = arguments.externalFeatureProject.getFeatureModel();
+		final IFeatureModel featureModel = arguments.externalFeatureProject.getFeatureModel();
 		if (!(featureModel instanceof ExtendedFeatureModel)) {
 			return false;
 		}
@@ -205,7 +205,7 @@ public class MPLBuildProjectJob extends AProjectJob<MPLBuildProjectJob.Arguments
 		
 		// build other projects
 		// build interfaces
-		for (final Feature mappedProject : mappedProjects.getSelectedFeatures()) {
+		for (final IFeature mappedProject : mappedProjects.getSelectedFeatures()) {
 			if (mappedProject.isConcrete()) {
 				final int splittIndex = mappedProject.getName().lastIndexOf('.');
 				if (splittIndex == -1) {
@@ -254,7 +254,7 @@ public class MPLBuildProjectJob extends AProjectJob<MPLBuildProjectJob.Arguments
 		if (varName != null) {
 			// Get partial configs 
 			// TODO MPL: config for other MPL projects may not working
-			FeatureModel fm = arguments.rootFeatureProject.getFeatureModel();
+			IFeatureModel fm = arguments.rootFeatureProject.getFeatureModel();
 			if (fm instanceof ExtendedFeatureModel) {
 				ExtendedFeatureModel efm = (ExtendedFeatureModel) fm;
 				UsedModel usedModel = efm.getExternalModel(varName);

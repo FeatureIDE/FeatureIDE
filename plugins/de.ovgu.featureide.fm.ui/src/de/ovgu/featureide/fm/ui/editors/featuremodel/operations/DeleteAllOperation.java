@@ -38,8 +38,8 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 
@@ -52,12 +52,12 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 public class DeleteAllOperation extends AbstractFeatureModelOperation implements GUIDefaults {
 
 	private static final String LABEL = DELETE_INCLUDING_SUBFEATURES;
-	private Feature feature;
-	private LinkedList<Feature> featureList;
-	private LinkedList<Feature> containedFeatureList;
+	private IFeature feature;
+	private LinkedList<IFeature> featureList;
+	private LinkedList<IFeature> containedFeatureList;
 	private Deque<AbstractFeatureModelOperation> operations = new LinkedList<AbstractFeatureModelOperation>();
 
-	public DeleteAllOperation(FeatureModel featureModel, Feature parent) {
+	public DeleteAllOperation(IFeatureModel featureModel, IFeature parent) {
 		super(featureModel, LABEL);
 		this.feature = parent;
 	}
@@ -65,14 +65,14 @@ public class DeleteAllOperation extends AbstractFeatureModelOperation implements
 	@Override
 	public IStatus execute(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
 
-		featureList = new LinkedList<Feature>();
-		containedFeatureList = new LinkedList<Feature>();
-		LinkedList<Feature> list = new LinkedList<Feature>();
+		featureList = new LinkedList<IFeature>();
+		containedFeatureList = new LinkedList<IFeature>();
+		LinkedList<IFeature> list = new LinkedList<IFeature>();
 		list.add(feature);
 		getFeaturesToDelete(list);
 
 		if (containedFeatureList.isEmpty()) {
-			for (Feature feat : featureList) {
+			for (IFeature feat : featureList) {
 				AbstractFeatureModelOperation op = new FeatureDeleteOperation(featureModel, feat);
 				executeOperation(op);
 				operations.add(op);
@@ -124,8 +124,8 @@ public class DeleteAllOperation extends AbstractFeatureModelOperation implements
 	 * 
 	 * @param linkedList
 	 */
-	private void getFeaturesToDelete(LinkedList<Feature> linkedList) {
-		for (Feature feat : linkedList) {
+	private void getFeaturesToDelete(LinkedList<IFeature> linkedList) {
+		for (IFeature feat : linkedList) {
 			if (!feat.getRelevantConstraints().isEmpty()) {
 				containedFeatureList.add(feat);
 			}

@@ -52,11 +52,11 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.FMPoint;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
@@ -67,7 +67,7 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
  */
 public class XmlFeatureModelReader extends AbstractFeatureModelReader implements XMLFeatureModelTags {
 
-	public XmlFeatureModelReader(FeatureModel featureModel) {
+	public XmlFeatureModelReader(IFeatureModel featureModel) {
 		setFeatureModel(featureModel);
 	}
 
@@ -152,7 +152,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 		}
 	}
 	
-	private void parseFeatures(NodeList nodeList, Feature parent) throws UnsupportedModelException {
+	private void parseFeatures(NodeList nodeList, IFeature parent) throws UnsupportedModelException {
 		for (Element e : getElements(nodeList)) {
 			String nodeName = e.getNodeName();
 			if (nodeName.equals(DESCRIPTION)) {
@@ -206,7 +206,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 			if (!featureModel.getFMComposerExtension().isValidFeatureName(name)) {
 				throwError(name + IS_NO_VALID_FEATURE_NAME, e);
 			}
-			Feature f = new Feature(featureModel, name);
+			IFeature f = new IFeature(featureModel, name);
 			f.setMandatory(true);
 			if (nodeName.equals(AND)) {
 				f.setAnd();
@@ -245,7 +245,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 			for (Element child: getElements(e.getChildNodes())) {
 				String nodeName = child.getNodeName();
 				if (nodeName.equals(RULE)) {
-					Constraint c = new Constraint(featureModel, parseConstraints2(child.getChildNodes()).getFirst());
+					IConstraint c = new IConstraint(featureModel, parseConstraints2(child.getChildNodes()).getFirst());
 					if (child.hasAttributes()) {
 						NamedNodeMap nodeMap = child.getAttributes();
 						for (int i = 0; i < nodeMap.getLength(); i++) {

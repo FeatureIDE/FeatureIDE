@@ -46,7 +46,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 
@@ -204,7 +204,7 @@ public class SPLMigrationUtils
 	 * @param featureModel
 	 */
 	public static void writeFeatureModelToDefaultFile(IProject featureProject,
-			FeatureModel featureModel)
+			IFeatureModel featureModel)
 	{
 		FeatureModelWriterIFileWrapper fmWriter = new FeatureModelWriterIFileWrapper(
 				new XmlFeatureModelWriter(featureModel));

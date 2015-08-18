@@ -109,7 +109,7 @@ public class ColorList {
 		}
 	}
 
-	public ColorList clone(Feature feature) {
+	public ColorList clone(IFeature feature) {
 		ColorList newColorScheme = new ColorList(feature);
 		newColorScheme.colors.ensureCapacity(colors.size());
 		for (Integer value : colors) {

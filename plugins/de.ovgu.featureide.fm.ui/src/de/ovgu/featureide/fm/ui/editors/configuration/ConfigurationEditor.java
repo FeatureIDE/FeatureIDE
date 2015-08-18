@@ -62,8 +62,8 @@ import org.eclipse.ui.part.MultiPageEditorPart;
 
 import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagatorJobWrapper.IConfigJob;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
@@ -106,7 +106,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	public IFile file;
 	private IFile internalFile;
 
-	public FeatureModel featureModel = new FeatureModel();
+	public IFeatureModel featureModel = new IFeatureModel();
 
 	public Configuration configuration;
 
@@ -271,7 +271,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	}
 
 	/**
-	 * Opens a Dialog to select the file of the {@link FeatureModel}
+	 * Opens a Dialog to select the file of the {@link IFeatureModel}
 	 * 
 	 * @return a string describing the absolute path of the selected model file
 	 * @see FileDialog#open()

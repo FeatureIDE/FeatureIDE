@@ -22,11 +22,14 @@ package de.ovgu.featureide.fm.core;
 
 import org.prop4j.Node;
 
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+
 /**
  * 
  * @author Sebastian Krieter
  */
-public class ExtendedConstraint extends Constraint {
+public class ExtendedConstraint extends IConstraint {
 	
 	private int type = ExtendedFeature.TYPE_INTERN;
 	
@@ -34,7 +37,7 @@ public class ExtendedConstraint extends Constraint {
 	 * @param featureModel
 	 * @param propNode
 	 */
-	public ExtendedConstraint(FeatureModel featureModel, Node propNode) {
+	public ExtendedConstraint(IFeatureModel featureModel, Node propNode) {
 		super(featureModel, propNode);
 	}
 

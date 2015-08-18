@@ -37,8 +37,8 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
@@ -53,13 +53,13 @@ public class CreateCompoundAction extends Action {
 
 	public static final String ID = "de.ovgu.featureide.createcompound";
 
-	private final FeatureModel featureModel;
+	private final IFeatureModel featureModel;
 
 	private Object viewer;
 
-	private Feature parent = null;
+	private IFeature parent = null;
 
-	private LinkedList<Feature> selectedFeatures = new LinkedList<Feature>();
+	private LinkedList<IFeature> selectedFeatures = new LinkedList<IFeature>();
 
 	private Object diagramEditor;
 
@@ -72,7 +72,7 @@ public class CreateCompoundAction extends Action {
 		}
 	};
 
-	public CreateCompoundAction(Object viewer, FeatureModel featureModel, Object diagramEditor) {
+	public CreateCompoundAction(Object viewer, IFeatureModel featureModel, Object diagramEditor) {
 		super(CREATE_FEATURE_ABOVE, createImage);
 		this.viewer = viewer;
 		this.featureModel = featureModel;
@@ -109,14 +109,14 @@ public class CreateCompoundAction extends Action {
 		Iterator<?> iter = selection.iterator();
 		while (iter.hasNext()) {
 			Object editPart = iter.next();
-			if (!(editPart instanceof FeatureEditPart) && !(editPart instanceof Feature))
+			if (!(editPart instanceof FeatureEditPart) && !(editPart instanceof IFeature))
 				continue;
-			Feature feature;
+			IFeature feature;
 
 			if (editPart instanceof FeatureEditPart)
 				feature = ((FeatureEditPart) editPart).getFeature();
 			else
-				feature = (Feature) editPart;
+				feature = (IFeature) editPart;
 
 			if (selectedFeatures.isEmpty())
 				parent = feature.getParent();

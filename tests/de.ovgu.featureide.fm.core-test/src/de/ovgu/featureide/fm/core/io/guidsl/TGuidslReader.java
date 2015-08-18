@@ -25,8 +25,8 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
 /**
@@ -44,12 +44,12 @@ public class TGuidslReader {
 	
 	@Test
 	public void testReaderAndGroupAllOptional() throws UnsupportedModelException {
-		FeatureModel model = new FeatureModel();
+		IFeatureModel model = new IFeatureModel();
 		GuidslReader reader = new GuidslReader(model);
 
 		reader.readFromString(AND_GROUP_ALL_OPTIONAL);
-		Feature a = model.getFeature("A");
-		Feature base = model.getFeature("Base");
+		IFeature a = model.getFeature("A");
+		IFeature base = model.getFeature("Base");
 		assertTrue(base.isAnd());
 		assertFalse(a.isMandatory());
 
@@ -57,37 +57,37 @@ public class TGuidslReader {
 
 	@Test
 	public void testReaderAndGroupAMandatory() throws UnsupportedModelException {
-		FeatureModel model = new FeatureModel();
+		IFeatureModel model = new IFeatureModel();
 		GuidslReader reader = new GuidslReader(model);
 
 		reader.readFromString(AND_GROUP_A_MANDATORY);
 
-		Feature base = model.getFeature("Base");
-		Feature a = model.getFeature("A");
+		IFeature base = model.getFeature("Base");
+		IFeature a = model.getFeature("A");
 		assertTrue(base.isAnd());
 		assertTrue(a.isMandatory());
 	}
 
 	@Test
 	public void testReaderOrGroup() throws UnsupportedModelException {
-		FeatureModel model = new FeatureModel();
+		IFeatureModel model = new IFeatureModel();
 		GuidslReader reader = new GuidslReader(model);
 
 		reader.readFromString(OR_GROUP);
 
-		Feature base = model.getFeature("Base");
+		IFeature base = model.getFeature("Base");
 		assertTrue(base.isOr());
 
 	}
 
 	@Test
 	public void testReaderAlternativeGroup() throws UnsupportedModelException {
-		FeatureModel model = new FeatureModel();
+		IFeatureModel model = new IFeatureModel();
 		GuidslReader reader = new GuidslReader(model);
 
 		reader.readFromString(ALTERNATIVE_GROUP);
 
-		Feature base = model.getFeature("Base");
+		IFeature base = model.getFeature("Base");
 		assertTrue(base.isAlternative());
 
 	}

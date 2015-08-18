@@ -60,8 +60,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Text;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
 
 /**
@@ -79,7 +79,7 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter implements
 	 * 
 	 * @param featureModel the structure to write
 	 */
-	public XmlFeatureModelWriter(FeatureModel featureModel) {
+	public XmlFeatureModelWriter(IFeatureModel featureModel) {
 		setFeatureModel(featureModel);
 	}
 	
@@ -159,12 +159,12 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter implements
      * @param node parent node
      * @param feat current feature
      */
-    private void createXmlDocRec(Document doc, Element node, Feature feat) {
+    private void createXmlDocRec(Document doc, Element node, IFeature feat) {
 
     	if (feat == null) return;
     	
     	Element fnod;
-    	LinkedList<Feature> children;
+    	LinkedList<IFeature> children;
     	
     	children = feat.getChildren();
     	if (children.isEmpty()) {
@@ -195,14 +195,14 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter implements
 	    	
     		writeAttributes(node, fnod, feat);
 	    	
-	    	Iterator<Feature> i = children.iterator();
+	    	Iterator<IFeature> i = children.iterator();
 	    	while (i.hasNext()) {
 	    		createXmlDocRec(doc, fnod ,i.next());
 	    	}
     	}
     }
     
-    private void writeAttributes(Element node, Element fnod, Feature feat) {
+    private void writeAttributes(Element node, Element fnod, IFeature feat) {
     	fnod.setAttribute(NAME, feat.getName());
 		if(feat.isHidden())		fnod.setAttribute(HIDDEN, TRUE);
     	if(feat.isMandatory())	fnod.setAttribute(MANDATORY, TRUE);

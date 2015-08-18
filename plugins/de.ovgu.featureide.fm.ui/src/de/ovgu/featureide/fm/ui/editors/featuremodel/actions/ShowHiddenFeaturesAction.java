@@ -28,7 +28,7 @@ import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ShowHiddenFeaturesOperation;
 
@@ -40,9 +40,9 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ShowHiddenFeatur
  */
 public class ShowHiddenFeaturesAction extends Action {
 
-	private final FeatureModel featureModel;
+	private final IFeatureModel featureModel;
 
-	public ShowHiddenFeaturesAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
+	public ShowHiddenFeaturesAction(GraphicalViewerImpl viewer, IFeatureModel featureModel) {
 		super(SHOW_HIDDEN_FEATURES);
 		this.featureModel = featureModel;
 

@@ -32,7 +32,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIBasics;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.properties.language.English;
@@ -110,14 +110,14 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 		CURRENT_FEATURE_BORDER = null;
 	}
 
-	private static LinkedList<FeatureModel> featureModels = new LinkedList<FeatureModel>();
+	private static LinkedList<IFeatureModel> featureModels = new LinkedList<IFeatureModel>();
 
 	/**
 	 * Register the model for property changes.
 	 * 
 	 * @param model
 	 */
-	public static void registerEditor(FeatureModel model) {
+	public static void registerEditor(IFeatureModel model) {
 		featureModels.add(model);
 	}
 
@@ -126,7 +126,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 	 * 
 	 * @param model
 	 */
-	public static void unregisterEditor(FeatureModel model) {
+	public static void unregisterEditor(IFeatureModel model) {
 		featureModels.remove(model);
 	}
 
@@ -134,7 +134,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 	 * Refreshes registered models.
 	 */
 	public static void updateEditors() {
-		for (FeatureModel model : featureModels) {
+		for (IFeatureModel model : featureModels) {
 			model.redrawDiagram();
 		}
 	}

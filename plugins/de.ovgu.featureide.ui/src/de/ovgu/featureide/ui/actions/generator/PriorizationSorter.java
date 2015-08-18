@@ -35,7 +35,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 
@@ -50,9 +50,9 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 	HashMap<String,Double> configsDistancesResult = new HashMap<String,Double>();
 
 	//	private static final UIPlugin LOGGER = UIPlugin.getDefault();
-	private FeatureModel featureModel;
+	private IFeatureModel featureModel;
 
-	public PriorizationSorter(FeatureModel featureModel) {
+	public PriorizationSorter(IFeatureModel featureModel) {
 		super(featureModel);
 		super.sorted = false;
 		this.featureModel = featureModel;

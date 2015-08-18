@@ -37,9 +37,9 @@ import org.prop4j.SatSolver;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.Preferences;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.job.WorkMonitor;
 
@@ -49,19 +49,19 @@ import de.ovgu.featureide.fm.core.job.WorkMonitor;
 public class ConfigurationPropagator {
 	
 	private static class BuildThread extends Thread {
-		private final FeatureModel featureModel;
+		private final IFeatureModel featureModel;
 		private final Set<String> featureSet;
 		private final boolean ignoreAbstractFeatures;
 		private Node buildNode;
 		
-		public BuildThread(FeatureModel featureModel, Set<String> featureSet) {
+		public BuildThread(IFeatureModel featureModel, Set<String> featureSet) {
 			super();
 			this.featureModel = featureModel;
 			this.featureSet = featureSet;
 			this.ignoreAbstractFeatures = false;
 		}
 		
-		public BuildThread(FeatureModel featureModel, boolean ignoreAbstractFeatures) {
+		public BuildThread(IFeatureModel featureModel, boolean ignoreAbstractFeatures) {
 			super();
 			this.featureModel = featureModel;
 			this.featureSet = null;
@@ -113,7 +113,7 @@ public class ConfigurationPropagator {
 		if (rootNode != null) {
 			return;
 		}
-		final FeatureModel featureModel = configuration.getFeatureModel();
+		final IFeatureModel featureModel = configuration.getFeatureModel();
 		if (featureModel.getRoot() != null) {
 			// Build both cnfs simultaneously for better performance
 			BuildThread buildThread1 = new BuildThread(featureModel, getRemoveFeatures(!configuration.ignoreAbstractFeatures, true));
@@ -255,7 +255,7 @@ public class ConfigurationPropagator {
 		final Map<String, Integer> featureToIndexMap = new HashMap<String, Integer>(featureList.size() << 1);
 		
 		for (SelectableFeature selectableFeature : configuration.features) {
-			final Feature feature = selectableFeature.getFeature();
+			final IFeature feature = selectableFeature.getFeature();
 			if ((configuration.ignoreAbstractFeatures || feature.isConcrete()) && !feature.hasHiddenParent()) {
 				final String featureName = feature.getName();
 				featureMap.put(featureName,
@@ -344,7 +344,7 @@ public class ConfigurationPropagator {
 		final Map<String, Boolean> featureMap = new HashMap<String, Boolean>(configuration.features.size() << 1);
 		
 		for (SelectableFeature selectableFeature : configuration.features) {
-			final Feature feature = selectableFeature.getFeature();
+			final IFeature feature = selectableFeature.getFeature();
 			if ((configuration.ignoreAbstractFeatures || feature.isConcrete()) && !feature.hasHiddenParent()) {
 				featureMap.put(feature.getName(), selectableFeature.getSelection() == Selection.SELECTED);
 			}
@@ -455,7 +455,7 @@ public class ConfigurationPropagator {
 	private Set<String> getRemoveFeatures(boolean abstractFeatures, boolean hiddenFeatures) {
 		final Set<String> resultSet = new HashSet<String>();
 		for (SelectableFeature selectableFeature : configuration.features) {
-			final Feature f = selectableFeature.getFeature();
+			final IFeature f = selectableFeature.getFeature();
 			if ((abstractFeatures && f.isAbstract()) || (hiddenFeatures && f.hasHiddenParent())) {
 				resultSet.add(f.getName());
 			}

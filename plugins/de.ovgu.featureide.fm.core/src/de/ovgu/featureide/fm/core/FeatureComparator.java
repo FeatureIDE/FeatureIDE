@@ -26,7 +26,7 @@ import java.util.Comparator;
 import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
- * Compares two {@link Feature}s by their name.
+ * Compares two {@link IFeature}s by their name.
  * 
  * @author Sebastian Krieter
  */

@@ -26,8 +26,8 @@ import java.util.Locale;
 import org.prop4j.Node;
 import org.prop4j.NodeWriter;
 
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
 /**
@@ -41,9 +41,9 @@ public class FeatureModelJPFBDD implements IFeatureModelClass {
 	private final static String FIELD_MODIFIER = "\tpublic static boolean ";
 	private final static String ANNOTATION = "\t@gov.nasa.jpf.bdd.TrackWithBDD\r\n";
 	private static final String SELECTFEATURES = "\tpublic static void select_features() {\r\n";
-	private FeatureModel featureModel;
+	private IFeatureModel featureModel;
 
-	public FeatureModelJPFBDD(FeatureModel featureModel) {
+	public FeatureModelJPFBDD(IFeatureModel featureModel) {
 		this.featureModel = featureModel;
 	}
 	
@@ -98,7 +98,7 @@ public class FeatureModelJPFBDD implements IFeatureModelClass {
 	public String getSelection() {
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append("\t/**\r\n\t * @return The current feature-selection.\r\n\t */\r\n\tpublic static String getSelection(boolean names) {\r\n\t\t");
-		ArrayList<Feature> features = new ArrayList<Feature>(featureModel.getConcreteFeatures());
+		ArrayList<IFeature> features = new ArrayList<IFeature>(featureModel.getConcreteFeatures());
 		stringBuilder.append("if (names) return ");
 		for (int i = 0;i < features.size();i++) {
 			if (i != 0) {

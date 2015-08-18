@@ -20,13 +20,16 @@
  */
 package de.ovgu.featureide.fm.core;
 
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+
 
 /**
  * Feature for the {@link ExtendedFeatureModel}.
  * 
  * @author Sebastian Krieter
  */
-public class ExtendedFeature extends Feature {
+public class ExtendedFeature extends IFeature {
 	
 	public static final int 
 		TYPE_INTERN = 0,
@@ -42,7 +45,7 @@ public class ExtendedFeature extends Feature {
 	 * @param featureModel
 	 * @param name
 	 */
-	public ExtendedFeature(FeatureModel featureModel, String name) {
+	public ExtendedFeature(IFeatureModel featureModel, String name) {
 		super(featureModel, name);
 	}
 	

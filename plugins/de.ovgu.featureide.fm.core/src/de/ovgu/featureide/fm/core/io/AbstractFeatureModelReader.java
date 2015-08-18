@@ -31,7 +31,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
  * Default reader to be extended for each feature model format.
@@ -45,7 +45,7 @@ public abstract class AbstractFeatureModelReader implements IFeatureModelReader 
 	/**
 	 * the structure to store the parsed data
 	 */
-	protected FeatureModel featureModel;
+	protected IFeatureModel featureModel;
 	
 	/**
 	 * warnings occurred while parsing
@@ -59,11 +59,11 @@ public abstract class AbstractFeatureModelReader implements IFeatureModelReader 
 	 */
 	protected File featureModelFile;
 	
-	public void setFeatureModel(FeatureModel featureModel) {
+	public void setFeatureModel(IFeatureModel featureModel) {
 		this.featureModel = featureModel;
 	}
 	
-	public FeatureModel getFeatureModel() {
+	public IFeatureModel getFeatureModel() {
 		return featureModel;
 	}
 
