@@ -24,6 +24,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.LinkedList;
 
+import de.ovgu.featureide.fm.core.base.IFeature;
+
 /**
  * An instance of this class represents a connection between a feature and its
  * parent. It is necessary because every figure in GEF needs a associated model.
@@ -33,23 +35,23 @@ import java.util.LinkedList;
  */
 public class FeatureConnection implements PropertyConstants, IGraphicItem {
 	
-	private Feature source;
+	private IFeature source;
 	
-	private Feature target;
+	private IFeature target;
 	
-	public FeatureConnection(Feature source) {
+	public FeatureConnection(IFeature source) {
 		this.source = source;
 	}
 	
 	public Feature getSource() {
-		return source;
+		return (Feature) source;
 	}
 	
 	public Feature getTarget() {
-		return target;
+		return (Feature) target;
 	}
 	
-	public void setTarget(Feature target) {
+	public void setTarget(IFeature target) {
 		if (this.target == target)
 			return;
 		this.target = target;

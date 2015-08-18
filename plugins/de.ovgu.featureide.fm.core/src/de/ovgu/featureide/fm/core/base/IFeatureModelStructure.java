@@ -18,33 +18,52 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core;
+package de.ovgu.featureide.fm.core.base;
 
-import java.io.Serializable;
-import java.util.Comparator;
-
-import de.ovgu.featureide.fm.core.base.IFeature;
+import java.util.Collection;
 
 /**
- * Compares two {@link Feature}s by their name.
+ * Manages all structural information of a feature model.
+ * Intended for tree structures (features are represented by tree nodes).
  * 
  * @author Sebastian Krieter
  */
-public class FeatureComparator implements Comparator<IFeature>, Serializable {
+public interface IFeatureModelStructure {
 
-	private static final long serialVersionUID = 3133122730880756050L;
+	IFeatureModel getFeatureModel();
 
-	private final boolean caseSensitive;
+	Collection<IFeature> getFeaturesPreorder();
 
-	public FeatureComparator(boolean caseSensitive) {
-		this.caseSensitive = caseSensitive;
-	}
+	IFeature getRoot();
 
-	@Override
-	public int compare(IFeature feature1, IFeature feature2) {
-		return caseSensitive 
-			? feature1.getName().compareTo(feature2.getName()) 
-			: feature1.getName().compareToIgnoreCase(feature2.getName());
-	}
+//	void handleModelDataChanged();
+//
+//	void handleModelDataLoaded();
+
+	boolean hasAbstract();
+
+	boolean hasAlternativeGroup();
+
+	boolean hasAndGroup();
+
+	boolean hasConcrete();
+
+	boolean hasHidden();
+
+	boolean hasIndetHidden();
+
+	boolean hasMandatoryFeatures();
+
+	boolean hasOptionalFeatures();
+
+	boolean hasOrGroup();
+
+	int numAlternativeGroup();
+
+	int numOrGroup();
+
+	void replaceRoot(IFeature feature);
+
+	void setRoot(IFeature root);
 
 }

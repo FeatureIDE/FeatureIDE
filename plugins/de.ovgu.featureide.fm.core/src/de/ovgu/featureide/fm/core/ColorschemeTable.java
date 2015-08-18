@@ -31,6 +31,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
@@ -60,13 +61,13 @@ public class ColorschemeTable {
 	/**
 	 * @param featureModel
 	 */
-	public ColorschemeTable(FeatureModel featureModel) {
+	public ColorschemeTable(IFeatureModel featureModel) {
 		this.featureModel = featureModel;
 		this.colorschemeNames = new ArrayList<String>();
 		reset();
 	}
 	
-	protected ColorschemeTable(ColorschemeTable oldColorschemeTable, FeatureModel featureModel) {
+	protected ColorschemeTable(ColorschemeTable oldColorschemeTable, IFeatureModel featureModel) {
 		this.featureModel = featureModel;
 		this.colorschemeNames = new ArrayList<String>(oldColorschemeTable.colorschemeNames);
 		this.selectedColorscheme = oldColorschemeTable.selectedColorscheme;

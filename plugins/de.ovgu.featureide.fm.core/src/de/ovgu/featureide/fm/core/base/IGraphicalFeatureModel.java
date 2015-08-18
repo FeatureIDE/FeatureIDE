@@ -18,33 +18,31 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core;
+package de.ovgu.featureide.fm.core.base;
 
-import java.io.Serializable;
-import java.util.Comparator;
-
-import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.ColorschemeTable;
+import de.ovgu.featureide.fm.core.FeatureModelLayout;
+import de.ovgu.featureide.fm.core.IGraphicItem;
 
 /**
- * Compares two {@link Feature}s by their name.
+ * Graphical representation of a feature model.
  * 
  * @author Sebastian Krieter
  */
-public class FeatureComparator implements Comparator<IFeature>, Serializable {
+public interface IGraphicalFeatureModel extends IGraphicItem {
 
-	private static final long serialVersionUID = 3133122730880756050L;
+	ColorschemeTable getColorschemeTable();
 
-	private final boolean caseSensitive;
+	IFeatureModel getFeatureModel();
 
-	public FeatureComparator(boolean caseSensitive) {
-		this.caseSensitive = caseSensitive;
-	}
+	FeatureModelLayout getLayout();
 
-	@Override
-	public int compare(IFeature feature1, IFeature feature2) {
-		return caseSensitive 
-			? feature1.getName().compareTo(feature2.getName()) 
-			: feature1.getName().compareToIgnoreCase(feature2.getName());
-	}
+	void handleLegendLayoutChanged();
+
+	void handleModelLayoutChanged();
+
+	void redrawDiagram();
+
+	void refreshContextMenu();
 
 }

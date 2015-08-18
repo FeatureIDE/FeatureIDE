@@ -53,6 +53,8 @@ import org.prop4j.Or;
 import org.prop4j.SatSolver;
 import org.sat4j.specs.TimeoutException;
 
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.Comparison;
 import de.ovgu.featureide.fm.core.editing.ModelComparator;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
@@ -81,14 +83,14 @@ public class FeatureModelAnalyzer {
 
 	private static final String FALSE = "False";
 
-	private List<Feature> cachedDeadFeatures = Collections.emptyList();
-	private List<Feature> cachedCoreFeatures = Collections.emptyList();
+	private List<IFeature> cachedDeadFeatures = Collections.emptyList();
+	private List<IFeature> cachedCoreFeatures = Collections.emptyList();
 	
-	private final Collection<Feature> chachedFalseOptionalFeatures = new LinkedList<Feature>();
+	private final Collection<IFeature> chachedFalseOptionalFeatures = new LinkedList<>();
 	
 	private boolean cachedValidity = true;
 	
-	private FeatureModel fm;
+	private IFeatureModel fm;
 	
 	/**
 	 * Defines whether features should be included into calculations.
@@ -417,15 +419,15 @@ public class FeatureModelAnalyzer {
 	/**
 	 * Adds the propNode to the solver to calculate dead features.
 	 */
-	public List<Feature> getDeadFeatures(SatSolver solver, Node propNode) {
+	public List<IFeature> getDeadFeatures(SatSolver solver, Node propNode) {
 		solver.addClauses(propNode.clone().toCNF());
-		final ArrayList<Feature> deadFeatures = new ArrayList<>();
+		final ArrayList<IFeature> deadFeatures = new ArrayList<>();
 		deadFeatures.clear();
 		
 		for (Literal e : solver.knownValues(SatSolver.ValueType.FALSE)) {
 			final String var = e.var.toString();
 			if (!FALSE.equals(var) && !TRUE.equals(var)) {
-				final Feature feature = fm.getFeature(var);
+				final IFeature feature = fm.getFeature(var);
 				if (feature != null) {
 					deadFeatures.add(feature);
 				}
@@ -897,9 +899,9 @@ public class FeatureModelAnalyzer {
 		}
 	}
 	
-	public Collection<Feature> getFalseOptionalFeatures() {
-		Collection<Feature> falseOptionalFeatures = new LinkedList<Feature>();
-		for (Feature feature : fm.getFeatures()) {
+	public Collection<IFeature> getFalseOptionalFeatures() {
+		Collection<IFeature> falseOptionalFeatures = new LinkedList<>();
+		for (IFeature feature : fm.getFeatures()) {
 			try {
 				if (!feature.isMandatory() && !feature.isRoot()) {
 					SatSolver satsolver = new SatSolver(new Not(new Implies(
@@ -917,13 +919,13 @@ public class FeatureModelAnalyzer {
 		return falseOptionalFeatures;
 	}
 	
-	public Collection<Feature> getFalseOptionalFeatures(Collection<Feature> fmFalseOptionals) {
-		Collection<Feature> falseOptionalFeatures = new LinkedList<Feature>();
-		for (Feature feature : fmFalseOptionals) {
+	public Collection<IFeature> getFalseOptionalFeatures(Collection<IFeature> fmFalseOptionals) {
+		Collection<IFeature> falseOptionalFeatures = new LinkedList<>();
+		for (IFeature feature : fmFalseOptionals) {
 			try {
-				if (!feature.isMandatory() && !feature.isRoot()) {
+				if (!feature.getFeatureStructure().isMandatory() && !feature.getFeatureStructure().isRoot()) {
 					SatSolver satsolver = new SatSolver(new Not(new Implies(
-							new And(new Literal(feature.getParent().getName()),
+							new And(new Literal(feature.getFeatureStructure().getParent().getName()),
 									NodeCreator.createNodes(fm.clone())),
 							new Literal(feature.getName()))), 1000);
 					if (!satsolver.isSatisfiable()) {
@@ -971,11 +973,11 @@ public class FeatureModelAnalyzer {
 		cancel = value;
 	}
 
-	public List<Feature> getCachedDeadFeatures() {
+	public List<IFeature> getCachedDeadFeatures() {
 		return Collections.unmodifiableList(cachedDeadFeatures);
 	}
 
-	public List<Feature> getCachedCoreFeatures() {
+	public List<IFeature> getCachedCoreFeatures() {
 		return Collections.unmodifiableList(cachedCoreFeatures);
 	}
 

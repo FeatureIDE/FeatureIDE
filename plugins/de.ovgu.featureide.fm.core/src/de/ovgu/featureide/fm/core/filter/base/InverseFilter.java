@@ -18,33 +18,26 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core;
-
-import java.io.Serializable;
-import java.util.Comparator;
-
-import de.ovgu.featureide.fm.core.base.IFeature;
+package de.ovgu.featureide.fm.core.filter.base;
 
 /**
- * Compares two {@link Feature}s by their name.
+ * Returns the opposite result of a given {@link IFilter}.
  * 
  * @author Sebastian Krieter
+ * 
+ * @see Filter
  */
-public class FeatureComparator implements Comparator<IFeature>, Serializable {
+public class InverseFilter<T> implements IFilter<T> {
+	
+	private final IFilter<T> originalFilter;
 
-	private static final long serialVersionUID = 3133122730880756050L;
-
-	private final boolean caseSensitive;
-
-	public FeatureComparator(boolean caseSensitive) {
-		this.caseSensitive = caseSensitive;
+	public InverseFilter(IFilter<T> originalFilter) {
+		this.originalFilter = originalFilter;
 	}
 
 	@Override
-	public int compare(IFeature feature1, IFeature feature2) {
-		return caseSensitive 
-			? feature1.getName().compareTo(feature2.getName()) 
-			: feature1.getName().compareToIgnoreCase(feature2.getName());
+	public boolean isValid(T object) {
+		return !originalFilter.isValid(object);
 	}
 
 }

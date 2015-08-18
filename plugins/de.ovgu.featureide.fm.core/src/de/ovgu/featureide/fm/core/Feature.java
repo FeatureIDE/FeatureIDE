@@ -452,29 +452,25 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	// }
 
 	private void fireNameChanged() {
-		PropertyChangeEvent event = new PropertyChangeEvent(this, NAME_CHANGED,
-				Boolean.FALSE, Boolean.TRUE);
+		PropertyChangeEvent event = new PropertyChangeEvent(this, NAME_CHANGED, Boolean.FALSE, Boolean.TRUE);
 		for (PropertyChangeListener listener : listenerList)
 			listener.propertyChange(event);
 	}
 
 	private void fireHiddenChanged() {
-		PropertyChangeEvent event = new PropertyChangeEvent(this,
-				HIDDEN_CHANGED, Boolean.FALSE, Boolean.TRUE);
+		PropertyChangeEvent event = new PropertyChangeEvent(this, HIDDEN_CHANGED, Boolean.FALSE, Boolean.TRUE);
 		for (PropertyChangeListener listener : listenerList)
 			listener.propertyChange(event);
 	}
 
 	private void fireChildrenChanged() {
-		PropertyChangeEvent event = new PropertyChangeEvent(this,
-				CHILDREN_CHANGED, Boolean.FALSE, Boolean.TRUE);
+		PropertyChangeEvent event = new PropertyChangeEvent(this, CHILDREN_CHANGED, Boolean.FALSE, Boolean.TRUE);
 		for (PropertyChangeListener listener : listenerList)
 			listener.propertyChange(event);
 	}
 
 	private void fireMandatoryChanged() {
-		PropertyChangeEvent event = new PropertyChangeEvent(this,
-				MANDATORY_CHANGED, Boolean.FALSE, Boolean.TRUE);
+		PropertyChangeEvent event = new PropertyChangeEvent(this, MANDATORY_CHANGED, Boolean.FALSE, Boolean.TRUE);
 		for (PropertyChangeListener listener : listenerList)
 			listener.propertyChange(event);
 	}

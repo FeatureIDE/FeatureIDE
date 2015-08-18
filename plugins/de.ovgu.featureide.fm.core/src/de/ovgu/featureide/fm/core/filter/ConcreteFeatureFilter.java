@@ -18,33 +18,21 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core;
-
-import java.io.Serializable;
-import java.util.Comparator;
+package de.ovgu.featureide.fm.core.filter;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.filter.base.IFilter;
 
 /**
- * Compares two {@link Feature}s by their name.
+ * Checks whether a feature is concrete.
  * 
  * @author Sebastian Krieter
  */
-public class FeatureComparator implements Comparator<IFeature>, Serializable {
-
-	private static final long serialVersionUID = 3133122730880756050L;
-
-	private final boolean caseSensitive;
-
-	public FeatureComparator(boolean caseSensitive) {
-		this.caseSensitive = caseSensitive;
-	}
-
+public class ConcreteFeatureFilter implements IFilter<IFeature> {
+	
 	@Override
-	public int compare(IFeature feature1, IFeature feature2) {
-		return caseSensitive 
-			? feature1.getName().compareTo(feature2.getName()) 
-			: feature1.getName().compareToIgnoreCase(feature2.getName());
+	public boolean isValid(IFeature object) {
+		return object.getFeatureStructure().isConcrete();
 	}
 
 }

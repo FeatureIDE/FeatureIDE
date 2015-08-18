@@ -18,33 +18,17 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core;
-
-import java.io.Serializable;
-import java.util.Comparator;
-
-import de.ovgu.featureide.fm.core.base.IFeature;
+package de.ovgu.featureide.fm.core.filter.base;
 
 /**
- * Compares two {@link Feature}s by their name.
+ * Performs a test on an object based on its properties and returns whether the object passes or fails the test.
  * 
  * @author Sebastian Krieter
+ * 
+ * @see Filter
  */
-public class FeatureComparator implements Comparator<IFeature>, Serializable {
+public interface IFilter<T> {
 
-	private static final long serialVersionUID = 3133122730880756050L;
-
-	private final boolean caseSensitive;
-
-	public FeatureComparator(boolean caseSensitive) {
-		this.caseSensitive = caseSensitive;
-	}
-
-	@Override
-	public int compare(IFeature feature1, IFeature feature2) {
-		return caseSensitive 
-			? feature1.getName().compareTo(feature2.getName()) 
-			: feature1.getName().compareToIgnoreCase(feature2.getName());
-	}
+	boolean isValid(T object);
 
 }

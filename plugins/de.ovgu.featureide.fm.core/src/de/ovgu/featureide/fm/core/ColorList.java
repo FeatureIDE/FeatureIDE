@@ -22,6 +22,9 @@ package de.ovgu.featureide.fm.core;
 
 import java.util.ArrayList;
 
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+
 /**
  * Holds the colors for a feature.
  * 
@@ -33,8 +36,8 @@ public class ColorList {
 	private final ColorschemeTable colorschemeTable;
 	private final ArrayList<Integer> colors = new ArrayList<Integer>();
 	
-	public ColorList(Feature feature) {
-		FeatureModel fm = feature.getFeatureModel();
+	public ColorList(IFeature feature) {
+		IFeatureModel fm = feature.getFeatureModel();
 		if (fm != null) {
 			colorschemeTable = fm.getColorschemeTable();
 			for (int i = 0; i < colorschemeTable.size() + 1; i++) {

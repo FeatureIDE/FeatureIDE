@@ -40,6 +40,7 @@ import org.prop4j.Or;
 
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
  * Takes a feature model as input and returns a propositional formula
@@ -51,11 +52,11 @@ public class NodeCreator {
 
 	private static final HashMap<Object, Node> EMPTY_MAP = new HashMap<Object, Node>();
 
-	public static Node createNodes(FeatureModel featureModel) {
+	public static Node createNodes(IFeatureModel featureModel) {
 		return createNodes(featureModel, true);
 	}
 
-	public static Node createNodes(FeatureModel featureModel, boolean ignoreAbstractFeatures) {
+	public static Node createNodes(IFeatureModel featureModel, boolean ignoreAbstractFeatures) {
 		return createNodes(featureModel, ignoreAbstractFeatures 
 			? EMPTY_MAP 
 			: calculateReplacingMap(featureModel));

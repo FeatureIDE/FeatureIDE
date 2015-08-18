@@ -18,33 +18,25 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core;
+package de.ovgu.featureide.fm.core.base;
 
-import java.io.Serializable;
-import java.util.Comparator;
-
-import de.ovgu.featureide.fm.core.base.IFeature;
+import org.prop4j.Node;
 
 /**
- * Compares two {@link Feature}s by their name.
+ * Factory to create or copy instance of {@link IFeature},  {@link IFeatureModel}, and {@link IConstraint}.
  * 
  * @author Sebastian Krieter
  */
-public class FeatureComparator implements Comparator<IFeature>, Serializable {
+public interface IFeatureModelFactory {
 
-	private static final long serialVersionUID = 3133122730880756050L;
+	IFeature copyFeature(IFeature feature, IFeatureModel featureModel);
 
-	private final boolean caseSensitive;
+	IFeatureModel copyFeatureModel(IFeatureModel oldFeatureModel);
 
-	public FeatureComparator(boolean caseSensitive) {
-		this.caseSensitive = caseSensitive;
-	}
+	IConstraint createConstraint(IFeatureModel featureModel, Node propNode);
 
-	@Override
-	public int compare(IFeature feature1, IFeature feature2) {
-		return caseSensitive 
-			? feature1.getName().compareTo(feature2.getName()) 
-			: feature1.getName().compareToIgnoreCase(feature2.getName());
-	}
+	IFeature createFeature(IFeatureModel featureModel, String name);
+
+	IFeatureModel createFeatureModel();
 
 }
