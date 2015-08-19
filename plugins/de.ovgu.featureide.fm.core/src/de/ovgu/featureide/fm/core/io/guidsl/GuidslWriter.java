@@ -81,8 +81,8 @@ public class GuidslWriter extends AbstractFeatureModelWriter {
 	}
 	
 	private void writeComments(StringBuilder out) {
-		for (int i = 0; i<featureModel.getComments().size(); i++)
-			out.append("//" + featureModel.getComments().get(i) + "\n");
+		for (int i = 0; i<featureModel.getProperty().getComments().size(); i++)
+			out.append("//" + featureModel.getProperty().getComments().get(i) + "\n");
 	}
 
 	private void writeGrammarDefinition(StringBuilder out) {

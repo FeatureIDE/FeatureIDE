@@ -196,7 +196,7 @@ public class VelvetFeatureModelWriter extends AbstractFeatureModelWriter {
 		}
 		sb.append("feature ");
 		sb.append(curFeature.getName());
-		final String description = curFeature.getDescription();
+		final String description = curFeature.getProperty().getDescription();
 		final boolean hasDescription = description != null && !description.isEmpty();
 
 		if (curFeature.getChildrenCount() == 0 && !hasDescription) {

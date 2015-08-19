@@ -252,7 +252,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 		featureModel = project.getFeatureModel();
 		try {
 			if (addAspects(project.getBuildFolder(), "")) {
-				featureModel.getStructure().getRoot().getStructure().removeChild(featureModel.getFeature("Base"));
+				featureModel.getStructure().getRoot().removeChild(featureModel.getFeature("Base"));
 				IFeature root = featureModel.getStructure().getRoot();
 				root.setName("Base");
 				featureModel.getStructure().setRoot(root);

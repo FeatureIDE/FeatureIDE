@@ -45,4 +45,6 @@ public interface IFeatureProperty {
 
 	void setFeatureStatus(FeatureStatus status);
 
+	void setFeatureStatus(FeatureStatus stat, boolean fire);
+
 }

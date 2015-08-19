@@ -20,9 +20,12 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
+import java.beans.PropertyChangeEvent;
+
 import javax.annotation.CheckForNull;
 
 import de.ovgu.featureide.fm.core.FeatureStatus;
+import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureProperty;
 
@@ -32,7 +35,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureProperty;
  * @author Sebastian Krieter
  * 
  */
-public class FeatureProperty implements IFeatureProperty {
+public class FeatureProperty implements IFeatureProperty, PropertyConstants {
 
 	protected final IFeature correspondingFeature;
 
@@ -94,6 +97,14 @@ public class FeatureProperty implements IFeatureProperty {
 	@Override
 	public void setFeatureStatus(FeatureStatus status) {
 		this.status = status;
+	}
+
+	@Override
+	public void setFeatureStatus(FeatureStatus stat, boolean fire) {
+		this.status = stat;
+		if (fire) {
+			correspondingFeature.fireEvent(new PropertyChangeEvent(this, ATTRIBUTE_CHANGED, Boolean.FALSE, Boolean.TRUE));
+		}
 	}
 
 }

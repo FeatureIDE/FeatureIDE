@@ -164,7 +164,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 					nodeValue = nodeValue.substring(1, nodeValue.length() - 1);
 					nodeValue = nodeValue.trim(); 
 				} 
-				parent.setDescription(nodeValue);
+				parent.getProperty().setDescription(nodeValue);
 				continue;
 			}
 			boolean mandatory = false;

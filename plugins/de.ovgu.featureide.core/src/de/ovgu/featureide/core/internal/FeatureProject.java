@@ -430,7 +430,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	 */
 	private void readFeatureOrder() throws CoreException {
 		IFile orderFile = project.getFile(".order");
-		if (featureModel.getFeatureOrderList().isEmpty() && !featureModel.isFeatureOrderInXML() && orderFile.exists()) {
+		if (featureModel.getFeatureOrderList().isEmpty() && !featureModel.getProperty().isFeatureOrderInXML() && orderFile.exists()) {
 
 			FeatureOrderReader reader = new FeatureOrderReader(orderFile);
 			LinkedList<String> list = reader.featureOrderRead();

@@ -565,7 +565,7 @@ public class FeatureModelAnalyzer {
 	public void updateConstraints(HashMap<Object, Object> oldAttributes,
 			HashMap<Object, Object> changedAttributes) {
 		IFeatureModel clone = fm.clone(null);
-		clone.constraints.clear();
+		clone.setConstraints(new LinkedList<IConstraint>());
 		SatSolver solver = new SatSolver(NodeCreator.createNodes(clone), 1000);
 	
 		Collection<IFeature> fmDeadFeatures = new ArrayList<>(getCachedDeadFeatures());
@@ -654,7 +654,7 @@ public class FeatureModelAnalyzer {
 					
 				}
 				clone = fm.clone(null);
-				clone.constraints.clear();
+				clone.setConstraints(new LinkedList<IConstraint>());
 			}
 			/** Look for dead and false optional features **/
 			for (IConstraint constraint : fm.getConstraints()) {
@@ -746,12 +746,12 @@ public class FeatureModelAnalyzer {
 			Map<Object, Object> changedAttributes) {
 		setSubTask(ANALYZE_FEATURES_);
 		for (IFeature bone : fm.getFeatures()) {
-			oldAttributes.put(bone, bone.getFeatureStatus());
+			oldAttributes.put(bone, bone.getProperty().getFeatureStatus());
 			
-			if (bone.getFeatureStatus() != FeatureStatus.NORMAL) {
+			if (bone.getProperty().getFeatureStatus() != FeatureStatus.NORMAL) {
 				changedAttributes.put(bone, FeatureStatus.FALSE_OPTIONAL);
 			}
-			bone.setFeatureStatus(FeatureStatus.NORMAL, false);
+			bone.getProperty().setFeatureStatus(FeatureStatus.NORMAL, false);
 			bone.setRelevantConstraints();
 		}
 
@@ -774,7 +774,7 @@ public class FeatureModelAnalyzer {
 				if (oldAttributes.get(deadFeature) != FeatureStatus.DEAD) {
 					changedAttributes.put(deadFeature, FeatureStatus.DEAD);
 				}
-				deadFeature.setFeatureStatus(FeatureStatus.DEAD, false);
+				deadFeature.getProperty().setFeatureStatus(FeatureStatus.DEAD, false);
 			}
 			worked(1);
 			if (canceled()) {
@@ -869,7 +869,7 @@ public class FeatureModelAnalyzer {
 
 				if (!noHidden) {
 					changedAttributes.put(feature, FeatureStatus.INDETERMINATE_HIDDEN);					
-					feature.setFeatureStatus(FeatureStatus.INDETERMINATE_HIDDEN, false);
+					feature.getProperty().setFeatureStatus(FeatureStatus.INDETERMINATE_HIDDEN, false);
 				}
 				
 				worked(1);
@@ -896,7 +896,7 @@ public class FeatureModelAnalyzer {
 		chachedFalseOptionalFeatures.clear();
 		for (IFeature f : getFalseOptionalFeatures()) {
 			changedAttributes.put(f,FeatureStatus.FALSE_OPTIONAL);
-			f.setFeatureStatus(FeatureStatus.FALSE_OPTIONAL, false);
+			f.getProperty().setFeatureStatus(FeatureStatus.FALSE_OPTIONAL, false);
 			chachedFalseOptionalFeatures.add(f);
 		}
 	}

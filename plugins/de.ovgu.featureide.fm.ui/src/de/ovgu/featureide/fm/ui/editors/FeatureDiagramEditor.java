@@ -578,7 +578,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 								@Override
 								public IStatus runInUIThread(IProgressMonitor monitor) {
 									for (IFeature f : featureModelEditor.getFeatureModel().getFeatures()) {
-										f.setFeatureStatus(FeatureStatus.NORMAL, true);
+										f.getProperty().setFeatureStatus(FeatureStatus.NORMAL, true);
 									}
 									for (IConstraint c : featureModelEditor.getFeatureModel().getConstraints()) {
 										c.setConstraintAttribute(ConstraintAttribute.NORMAL, true);

@@ -99,7 +99,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 
 		label.setLocation(new Point(FEATURE_INSETS.left, FEATURE_INSETS.top));
 
-		setName(feature.getDisplayName());
+		setName(feature.getProperty().getDisplayName());
 
 		setProperties();
 
@@ -163,7 +163,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 
 			toolTip.append(feature.isRoot() ? ROOT : FEATURE);
 
-			switch (feature.getFeatureStatus()) {
+			switch (feature.getProperty().getFeatureStatus()) {
 			case DEAD:
 				if (analyser.valid()) {
 					setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
@@ -205,7 +205,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 			}
 		}
 
-		final String description = feature.getDescription();
+		final String description = feature.getProperty().getDescription();
 		if (description != null && !description.trim().isEmpty()) {
 			toolTip.append("\n\nDescription:\n");
 			toolTip.append(description);

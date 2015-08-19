@@ -51,7 +51,7 @@ public class AutomatedCalculationsAction extends Action {
 	public void run() {
 		if (featureModel.getAnalyser().runCalculationAutomatically) {
 			for (IFeature f : featureModel.getFeatures()) {
-				f.setFeatureStatus(FeatureStatus.NORMAL, false);
+				f.getProperty().setFeatureStatus(FeatureStatus.NORMAL, false);
 			}
 			for (IConstraint c : featureModel.getConstraints()) {
 				c.setConstraintAttribute(ConstraintAttribute.NORMAL, false);
