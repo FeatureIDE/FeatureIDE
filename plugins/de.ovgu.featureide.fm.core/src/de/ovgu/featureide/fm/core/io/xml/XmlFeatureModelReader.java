@@ -321,7 +321,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 	private void parseComments2(NodeList nodeList) throws UnsupportedModelException {
 		for (Element e: getElements(nodeList)) {
 			if (e.getNodeName().equals(C)) {
-				featureModel.addComment(e.getTextContent());
+				featureModel.getProperty().addComment(e.getTextContent());
 			} else {
 				throwError("Unknown comment attribute: " + e.getNodeName(), e);
 			}

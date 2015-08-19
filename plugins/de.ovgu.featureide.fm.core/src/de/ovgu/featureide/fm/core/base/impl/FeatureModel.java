@@ -87,8 +87,8 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 		featureOrderList = new LinkedList<String>();
 		featureOrderUserDefined = false;
 
-		property = FeatureModelFactory.getInstance().createFeatureModelProperty(this);
-		structure = FeatureModelFactory.getInstance().createFeatureModelStructure(this);
+		property = createProperty();
+		structure = createStructure();
 	}
 
 	protected FeatureModel(FeatureModel oldFeatureModel, IFeature newRoot) {
@@ -96,7 +96,7 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 		featureOrderUserDefined = oldFeatureModel.featureOrderUserDefined;
 
 		property = oldFeatureModel.getProperty().clone(this);
-		structure = FeatureModelFactory.getInstance().createFeatureModelStructure(this);
+		structure = createStructure();
 
 		if (newRoot == null) {
 			structure.setRoot(structure.getRoot().cloneSubtree(this));
@@ -111,6 +111,14 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 				}
 			}
 		}
+	}
+	
+	protected IFeatureModelProperty createProperty() {
+		return new FeatureModelProperty(this);
+	}
+	
+	protected IFeatureModelStructure createStructure() {
+		return new FeatureModelStructure(this);
 	}
 
 	@Override
@@ -140,13 +148,9 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.IFeatureModel#clone(de.ovgu.featureide.fm.core.base.IFeature)
-	 */
 	@Override
 	public IFeatureModel clone(IFeature newRoot) {
-		// TODO Auto-generated method stub
-		return null;
+		return new FeatureModel(this, newRoot);
 	}
 
 	protected FeatureModelAnalyzer createAnalyser() {

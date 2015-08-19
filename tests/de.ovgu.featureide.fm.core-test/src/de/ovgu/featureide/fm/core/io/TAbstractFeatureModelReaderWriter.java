@@ -34,13 +34,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import org.prop4j.Node;
 
+import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
 import de.ovgu.featureide.fm.core.editing.Comparison;
 import de.ovgu.featureide.fm.core.editing.ModelComparator;
+import de.ovgu.featureide.fm.core.filter.base.Filter;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 
 /**
@@ -63,17 +64,15 @@ public abstract class TAbstractFeatureModelReaderWriter {
 	// there should be an corresponding test case for the
 	// GuidslReader which tests the resulting FeatureModel directly
 
-	 protected static File MODEL_FILE_FOLDER = new
-	 File("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/testFeatureModels/");
-
+	protected static File MODEL_FILE_FOLDER = new File(
+			"/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/testFeatureModels/");
 
 	static boolean online = false;
 	protected IFeatureModel origFm;
 	protected IFeatureModel newFm;
 	protected String failureMessage;
 
-	public TAbstractFeatureModelReaderWriter(IFeatureModel fm, String s)
-			throws UnsupportedModelException {
+	public TAbstractFeatureModelReaderWriter(IFeatureModel fm, String s) throws UnsupportedModelException {
 
 		this.origFm = fm;
 		this.newFm = writeAndReadModel();
@@ -82,12 +81,10 @@ public abstract class TAbstractFeatureModelReaderWriter {
 	}
 
 	@Parameters
-	public static Collection<Object[]> getModels()
-			throws FileNotFoundException, UnsupportedModelException {
+	public static Collection<Object[]> getModels() throws FileNotFoundException, UnsupportedModelException {
 		//first tries the location on build server, if this fails tries to use local location
-		if (!MODEL_FILE_FOLDER.canRead()){
-			MODEL_FILE_FOLDER = new File(ClassLoader.getSystemResource(
-			"testFeatureModels").getPath());
+		if (!MODEL_FILE_FOLDER.canRead()) {
+			MODEL_FILE_FOLDER = new File(ClassLoader.getSystemResource("testFeatureModels").getPath());
 		}
 		Collection<Object[]> params = new ArrayList<Object[]>();
 		for (File f : MODEL_FILE_FOLDER.listFiles(getFileFilter(".xml"))) {
@@ -106,193 +103,158 @@ public abstract class TAbstractFeatureModelReaderWriter {
 	}
 
 	@Test
-	public void testRoot() throws FileNotFoundException,
-			UnsupportedModelException {
-		assertEquals(failureMessage, origFm.getRoot().getName(), newFm
-				.getRoot().getName());
+	public void testRoot() throws FileNotFoundException, UnsupportedModelException {
+		assertEquals(failureMessage, origFm.getStructure().getRoot().getFeature().getName(), newFm.getStructure().getRoot().getFeature().getName());
 	}
 
 	@Test
-	public void testFeatureCount() throws FileNotFoundException,
-		UnsupportedModelException {
+	public void testFeatureCount() throws FileNotFoundException, UnsupportedModelException {
 
-		assertEquals(failureMessage, origFm.getFeatures().size(), newFm
-				.getFeatures().size());
+		assertEquals(failureMessage, origFm.getFeatures().size(), newFm.getFeatures().size());
 	}
 
 	@Test
-	public void testFeatureNames() throws FileNotFoundException,
-			UnsupportedModelException {
-
-		assertEquals(failureMessage, origFm.getFeatureNames(),
-				newFm.getFeatureNames());
+	public void testFeatureNames() throws FileNotFoundException, UnsupportedModelException {
+		assertEquals(failureMessage, Filter.toString(origFm.getFeatures()), Filter.toString(newFm.getFeatures()));
 	}
 
 	@Test
-	public void testFeatureGroupTypeAnd() throws FileNotFoundException,
-			UnsupportedModelException {
+	public void testFeatureGroupTypeAnd() throws FileNotFoundException, UnsupportedModelException {
 		for (IFeature origF : origFm.getFeatures()) {
 
-			if (origF.isAnd()) {
+			if (origF.getStructure().isAnd()) {
 				IFeature newF = newFm.getFeature(origF.getName());
 				if (newF == null) {
 					// fail("Feature " + origF.getName() + " cannot be found");
 				} else {
-					assertTrue(failureMessage, newFm
-							.getFeature(origF.getName()).isAnd());
+					assertTrue(failureMessage, newFm.getFeature(origF.getName()).getStructure().isAnd());
 				}
 			}
 		}
 	}
 
 	@Test
-	public void testFeatureGroupTypeOr() throws FileNotFoundException,
-			UnsupportedModelException {
+	public void testFeatureGroupTypeOr() throws FileNotFoundException, UnsupportedModelException {
 		for (IFeature origF : origFm.getFeatures()) {
 
-			if (origF.isOr()) {
+			if (origF.getStructure().isOr()) {
 				IFeature newF = newFm.getFeature(origF.getName());
 				if (newF == null) {
 					// fail("Feature " + origF.getName() + " cannot be found");
 				} else {
-					assertTrue(failureMessage, newFm
-							.getFeature(origF.getName()).isOr());
+					assertTrue(failureMessage, newFm.getFeature(origF.getName()).getStructure().isOr());
 				}
 			}
 		}
 	}
 
 	@Test
-	public void testFeatureGroupTypeAlternative() throws FileNotFoundException,
-			UnsupportedModelException {
+	public void testFeatureGroupTypeAlternative() throws FileNotFoundException, UnsupportedModelException {
 		for (IFeature origF : origFm.getFeatures()) {
 
-			if (origF.isAlternative()) {
+			if (origF.getStructure().isAlternative()) {
 				IFeature newF = newFm.getFeature(origF.getName());
 				if (newF == null) {
 					// fail("Feature " + origF.getName() + " cannot be found");
 				} else {
-					assertTrue(failureMessage, newFm
-							.getFeature(origF.getName()).isAlternative());
+					assertTrue(failureMessage, newFm.getFeature(origF.getName()).getStructure().isAlternative());
 				}
 			}
 		}
 	}
 
 	@Test
-	public void testFeatureConcrete() throws FileNotFoundException,
-			UnsupportedModelException {
+	public void testFeatureConcrete() throws FileNotFoundException, UnsupportedModelException {
 		for (IFeature origF : origFm.getFeatures()) {
 
-			if (origF.isConcrete()) {
+			if (origF.getStructure().isConcrete()) {
 				IFeature newF = newFm.getFeature(origF.getName());
 				if (newF == null) {
 					// fail("Feature " + origF.getName() + " cannot be found");
 				} else {
-					assertTrue(failureMessage + origF,
-							newFm.getFeature(origF.getName()).isConcrete());
+					assertTrue(failureMessage + origF, newFm.getFeature(origF.getName()).getStructure().isConcrete());
 				}
 			}
 		}
 	}
 
 	@Test
-	public void testFeatureHidden() throws FileNotFoundException,
-			UnsupportedModelException {
+	public void testFeatureHidden() throws FileNotFoundException, UnsupportedModelException {
 		for (IFeature origF : origFm.getFeatures()) {
 
-			if (origF.isHidden()) {
+			if (origF.getStructure().isHidden()) {
 				IFeature newF = newFm.getFeature(origF.getName());
 				if (newF == null) {
 					// fail("Feature " + origF.getName() + " cannot be found");
 				} else {
-					assertEquals(
-							failureMessage + "Feature: " + origF.getName(),
-							origF.isHidden(), newFm.getFeature(origF.getName())
-									.isHidden());
+					assertEquals(failureMessage + "Feature: " + origF.getName(), origF.getStructure().isHidden(), newFm.getFeature(origF.getName()).getStructure().isHidden());
 				}
 			}
 		}
 	}
 
 	@Test
-	public void testFeatureMandatory() throws FileNotFoundException,
-			UnsupportedModelException {
+	public void testFeatureMandatory() throws FileNotFoundException, UnsupportedModelException {
 		for (IFeature origF : origFm.getFeatures()) {
 
-			if (origF.isMandatory()) {
+			if (origF.getStructure().isMandatory()) {
 				IFeature newF = newFm.getFeature(origF.getName());
 				if (newF == null) {
 					// fail("Feature " + origF.getName() + " cannot be found");
 				} else {
-					assertTrue(failureMessage, newFm
-							.getFeature(origF.getName()).isMandatory());
+					assertTrue(failureMessage, newFm.getFeature(origF.getName()).getStructure().isMandatory());
 				}
 			}
 		}
 	}
 
 	//TODO @Fabian @Test
-	public void testPropNodes() throws FileNotFoundException,
-			UnsupportedModelException {
-
-		for (Node n : origFm.getPropositionalNodes()) {
-
-			System.out.println(newFm.getPropositionalNodes());
-			assertFalse(failureMessage + n, newFm.getPropositionalNodes()
-					.contains(n));
+	public void testPropNodes() throws FileNotFoundException, UnsupportedModelException {
+		for (IConstraint constraint : origFm.getConstraints()) {
+			System.out.println(newFm.getConstraints());
+			assertFalse(failureMessage + constraint, newFm.getConstraints().contains(constraint));
 		}
 	}
 
 	@Test
-	public void testConstraintCount() throws FileNotFoundException,
-			UnsupportedModelException {
-		assertEquals(failureMessage, origFm.getConstraintCount(),
-				origFm.getConstraintCount());
+	public void testConstraintCount() throws FileNotFoundException, UnsupportedModelException {
+		assertEquals(failureMessage, origFm.getConstraintCount(), origFm.getConstraintCount());
 	}
 
 	@Test
-	public void testConstraints() throws FileNotFoundException,
-			UnsupportedModelException {
-		assertEquals(failureMessage, origFm.getConstraints(),
-				origFm.getConstraints());
+	public void testConstraints() throws FileNotFoundException, UnsupportedModelException {
+		assertEquals(failureMessage, origFm.getConstraints(), origFm.getConstraints());
 	}
 
 	@Test
-	public void testAnnotations() throws FileNotFoundException,
-			UnsupportedModelException {
-		assertEquals(failureMessage, origFm.getAnnotations(),
-				origFm.getAnnotations());
+	public void testAnnotations() throws FileNotFoundException, UnsupportedModelException {
+		assertEquals(failureMessage, origFm.getProperty().getAnnotations(), origFm.getProperty().getAnnotations());
 	}
 
 	// @Test // java.lang.AssertionError: (gpl_medium_model.xml) expected:<REFACTORING> but was:<SPECIALIZATION>
-	public void testIsRefactoring() throws FileNotFoundException,
-			UnsupportedModelException {
+	public void testIsRefactoring() throws FileNotFoundException, UnsupportedModelException {
 		Comparison compare = new ModelComparator(1000).compare(origFm, newFm);
 		if (!compare.equals(Comparison.ARBITRARY)) {
 			assertEquals(failureMessage, Comparison.REFACTORING, compare);
 		}
 
 	}
-	
+
 	@Test
 	public void testDescription() {
 		for (IFeature origFeature : origFm.getFeatures()) {
 			IFeature newFeature = newFm.getFeature(origFeature.getName());
-			assertEquals(origFeature.getDescription(), newFeature.getDescription());
+			assertEquals(origFeature.getProperty().getDescription(), newFeature.getProperty().getDescription());
 		}
 	}
 
-	private final IFeatureModel writeAndReadModel()
-			throws UnsupportedModelException {
+	private final IFeatureModel writeAndReadModel() throws UnsupportedModelException {
 		IFeatureModel newFm = FeatureModelFactory.getInstance().createFeatureModel();
 		IFeatureModelWriter writer = getWriter(origFm);
 		IFeatureModelReader reader = getReader(newFm);
 		reader.readFromString(writer.writeToString());
 		return newFm;
 	}
-
-	
 
 	private final static FileFilter getFileFilter(final String s) {
 		FileFilter filter = new FileFilter() {

@@ -145,7 +145,7 @@ public class FeatureUIHelper {
 
 	private static void fireLocationChanged(IFeature feature, Point oldLocation, Point newLocation) {
 		PropertyChangeEvent event = new PropertyChangeEvent(feature, PropertyConstants.LOCATION_CHANGED, oldLocation, newLocation);
-		feature.fire(event);
+		feature.fireEvent(event);
 	}
 
 	public static Point getReferencePoint(IFeature feature) {
@@ -230,7 +230,7 @@ public class FeatureUIHelper {
 
 	private static void fireLocationChanged(IConstraint constraint, Point oldLocation, Point newLocation) {
 		PropertyChangeEvent event = new PropertyChangeEvent(constraint, PropertyConstants.LOCATION_CHANGED, oldLocation, newLocation);
-		constraint.fire(event);
+		constraint.fireEvent(event);
 	}
 
 	public static void setLegendFigure(IFeatureModel featureModel, LegendFigure figure) {

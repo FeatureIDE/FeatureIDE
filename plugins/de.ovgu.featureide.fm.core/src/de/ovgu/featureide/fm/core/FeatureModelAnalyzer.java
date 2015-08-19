@@ -166,7 +166,7 @@ public class FeatureModelAnalyzer {
 	}
 
 	public boolean isValid() throws TimeoutException {
-		Node root = NodeCreator.createNodes(fm.clone());
+		Node root = NodeCreator.createNodes(fm.clone(null));
 		return new SatSolver(root, 1000).isSatisfiable();
 	}
 
@@ -191,7 +191,7 @@ public class FeatureModelAnalyzer {
 		if (b.isEmpty())
 			return true;
 
-		Node featureModel = NodeCreator.createNodes(fm.clone());
+		Node featureModel = NodeCreator.createNodes(fm.clone(null));
 
 		// B1 or B2 or ... Bn
 		Node condition = disjunct(b);
@@ -207,11 +207,11 @@ public class FeatureModelAnalyzer {
 		if (b.isEmpty())
 			return true;
 
-		Node featureModel = NodeCreator.createNodes(fm.clone());
+		Node featureModel = NodeCreator.createNodes(fm.clone(null));
 		boolean notValid = true;
 		for (IFeature f : b) {
-			Node node = new And(new And(featureModel, new Literal(NodeCreator.getVariable(f, fm.clone()))),  
-					new Literal(NodeCreator.getVariable(a, fm.clone())));
+			Node node = new And(new And(featureModel, new Literal(NodeCreator.getVariable(f, fm.clone(null)))),  
+					new Literal(NodeCreator.getVariable(a, fm.clone(null))));
 			notValid &= !new SatSolver(node, 1000).isSatisfiable();
 		}
 		return notValid;
@@ -564,7 +564,7 @@ public class FeatureModelAnalyzer {
 
 	public void updateConstraints(HashMap<Object, Object> oldAttributes,
 			HashMap<Object, Object> changedAttributes) {
-		IFeatureModel clone = fm.clone();
+		IFeatureModel clone = fm.clone(null);
 		clone.constraints.clear();
 		SatSolver solver = new SatSolver(NodeCreator.createNodes(clone), 1000);
 	
@@ -653,7 +653,7 @@ public class FeatureModelAnalyzer {
 					}
 					
 				}
-				clone = fm.clone();
+				clone = fm.clone(null);
 				clone.constraints.clear();
 			}
 			/** Look for dead and false optional features **/
@@ -730,7 +730,7 @@ public class FeatureModelAnalyzer {
 	}
 
 	private void findRedundantConstraints(IFeatureModel clone, IConstraint constraint, Map<Object, Object> changedAttributes, Map<Object,Object> oldAttributes) {
-		IFeatureModel oldModel = clone.clone();
+		IFeatureModel oldModel = clone.clone(null);
 		clone.addConstraint(constraint);
 		ModelComparator comparator = new ModelComparator(500);
 		Comparison comparison = comparator.compare(clone, oldModel);
@@ -908,7 +908,7 @@ public class FeatureModelAnalyzer {
 				if (!feature.isMandatory() && !feature.isRoot()) {
 					SatSolver satsolver = new SatSolver(new Not(new Implies(
 							new And(new Literal(feature.getParent().getName()),
-									NodeCreator.createNodes(fm.clone())),
+									NodeCreator.createNodes(fm.clone(null))),
 							new Literal(feature.getName()))), 1000);
 					if (!satsolver.isSatisfiable()) {
 						falseOptionalFeatures.add(feature);
@@ -928,7 +928,7 @@ public class FeatureModelAnalyzer {
 				if (!feature.getStructure().isMandatory() && !feature.getStructure().isRoot()) {
 					SatSolver satsolver = new SatSolver(new Not(new Implies(
 							new And(new Literal(feature.getStructure().getParent().getName()),
-									NodeCreator.createNodes(fm.clone())),
+									NodeCreator.createNodes(fm.clone(null))),
 							new Literal(feature.getName()))), 1000);
 					if (!satsolver.isSatisfiable()) {
 						falseOptionalFeatures.add(feature);

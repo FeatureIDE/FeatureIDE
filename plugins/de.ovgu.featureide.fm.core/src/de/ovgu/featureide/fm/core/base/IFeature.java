@@ -39,7 +39,7 @@ public interface IFeature extends PropertyChangeListener {
 
 	IFeatureModel getFeatureModel();
 
-	IFeatureProperty getFeatureProperty();
+	IFeatureProperty getProperty();
 
 	IFeatureStructure getStructure();
 

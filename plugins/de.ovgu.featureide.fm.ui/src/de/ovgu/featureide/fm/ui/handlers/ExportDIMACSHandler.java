@@ -93,7 +93,7 @@ public class ExportDIMACSHandler extends AFileHandler {
 			 * @return
 			 */
 			private String getCNF(IFeatureModel model) {
-				Node nodes = NodeCreator.createNodes(model.clone()).toCNF();
+				Node nodes = NodeCreator.createNodes(model.clone(null)).toCNF();
 				StringBuilder string = new StringBuilder();
 				Map<String, Integer> featureMap = new HashMap<String, Integer>();
 				int i = 1;

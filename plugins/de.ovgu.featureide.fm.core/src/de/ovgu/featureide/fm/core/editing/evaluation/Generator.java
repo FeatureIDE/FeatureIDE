@@ -137,7 +137,7 @@ public abstract class Generator {
 	}
 
 	public static IFeatureModel refactoring(IFeatureModel originalFM, long id, int numberOfEdits) {
-		IFeatureModel fm = originalFM.clone();
+		IFeatureModel fm = originalFM.clone(null);
 		Random random = new Random(id);
 		
 		for (int i = 0; i < numberOfEdits; i++) {
@@ -188,7 +188,7 @@ public abstract class Generator {
 	}
 
 	public static IFeatureModel generalization(IFeatureModel originalFM, long id, int numberOfEdits) {
-		IFeatureModel fm = originalFM.clone();
+		IFeatureModel fm = originalFM.clone(null);
 		Random random = new Random(id);
 		
 		for (int i = 0; i < numberOfEdits; i++) {
@@ -315,11 +315,11 @@ public abstract class Generator {
 		} catch (TimeoutException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
-		IFeatureModel fm = originalFM.clone();
+		IFeatureModel fm = originalFM.clone(null);
 		Random random = new Random(id);
 		
 		for (int i = 0; i < numberOfEdits; i++) {
-			IFeatureModel backup = valid ? fm.clone() : null;
+			IFeatureModel backup = valid ? fm.clone(null) : null;
 			
 			List<IFeature> list = new LinkedList<IFeature>(fm.getFeatures());
 			List<IFeature> randomizedList = new LinkedList<IFeature>();

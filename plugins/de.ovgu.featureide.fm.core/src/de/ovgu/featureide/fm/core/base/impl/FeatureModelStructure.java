@@ -137,7 +137,7 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 	@Override
 	public boolean hasIndetHidden() {
 		for (final IFeature f : correspondingFeatureModel.getFeatures()) {
-			if (f.getFeatureProperty().getFeatureStatus() == FeatureStatus.INDETERMINATE_HIDDEN) {
+			if (f.getProperty().getFeatureStatus() == FeatureStatus.INDETERMINATE_HIDDEN) {
 				return true;
 			}
 		}

@@ -174,7 +174,7 @@ public class GuidslReader extends AbstractFeatureModelReader {
 		}
 
 		for(int i=0; i<comments.size(); i++)
-			featureModel.addComment(comments.get(i));
+			featureModel.getProperty().addComment(comments.get(i));
 
 
 		Prods prods = ((MainModel) root).getProds();
@@ -220,13 +220,13 @@ public class GuidslReader extends AbstractFeatureModelReader {
 						else{
 							// SAVE OTHER ANNOTATIONS - Write to the comment session
 							annLine.add(counter+i);
-							featureModel.addComment(line);							
+							featureModel.getProperty().addComment(line);							
 						}
 					}
 					else{
 						// SAVE OTHER ANNOTATIONS - Write to the comment session
 						annLine.add(counter+i);
-						featureModel.addComment(line);
+						featureModel.getProperty().addComment(line);
 
 					}
 				}

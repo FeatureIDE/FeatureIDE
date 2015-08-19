@@ -60,8 +60,16 @@ public class Feature implements IFeature, PropertyConstants {
 		this.featureModel = featureModel;
 		this.name = name;
 
-		property = FeatureModelFactory.getInstance().createFeatureProperty(this);
-		structure = FeatureModelFactory.getInstance().createFeatureStructure(this);
+		property = createProperty();
+		structure = createStructure();
+	}
+	
+	protected IFeatureProperty createProperty() {
+		return new FeatureProperty(this);
+	}
+	
+	protected IFeatureStructure createStructure() {
+		return new FeatureStructure(this);
 	}
 
 	@Override
@@ -81,7 +89,6 @@ public class Feature implements IFeature, PropertyConstants {
 		for (final PropertyChangeListener listener : listenerList) {
 			listener.propertyChange(event);
 		}
-
 	}
 
 	protected void fireNameChanged() {
@@ -94,7 +101,7 @@ public class Feature implements IFeature, PropertyConstants {
 	}
 
 	@Override
-	public IFeatureProperty getFeatureProperty() {
+	public IFeatureProperty getProperty() {
 		return property;
 	}
 

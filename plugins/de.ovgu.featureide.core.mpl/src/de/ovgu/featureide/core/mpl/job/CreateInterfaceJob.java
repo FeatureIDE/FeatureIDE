@@ -115,7 +115,7 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 	
 	private IFeatureModel createInterface(IFeatureModel orgFeatureModel, Collection<String> selectedFeatureNames) {
 		// Calculate Constraints
-		IFeatureModel m = orgFeatureModel.deepClone(false);		
+		IFeatureModel m = orgFeatureModel.clone(null);		
 		for (IFeature feat : m.getFeatures()) {
 			feat.setAbstract(!selectedFeatureNames.contains(feat.getName()));
         }
@@ -126,7 +126,7 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 		workMonitor.worked();
 		
 		// Calculate Model
-		m = orgFeatureModel.deepClone(false);
+		m = orgFeatureModel.clone(null);
 		
         // mark features
         for (IFeature feat : m.getFeatures()) {

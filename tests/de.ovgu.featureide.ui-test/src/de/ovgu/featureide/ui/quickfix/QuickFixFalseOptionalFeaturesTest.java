@@ -37,7 +37,10 @@ import org.junit.runners.Parameterized.Parameters;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.filter.ConcreteFeatureFilter;
+import de.ovgu.featureide.fm.core.filter.base.Filter;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 
@@ -78,7 +81,7 @@ public class QuickFixFalseOptionalFeaturesTest {
 		for (final File f : MODEL_FILE_FOLDER.listFiles(getFileFilter(".xml"))) {
 			Object[] models = new Object[2];
 
-			IFeatureModel fm = new IFeatureModel() {
+			IFeatureModel fm = new FeatureModel() {
 				// display file name at JUnit view
 				public String toString() {
 					return f.getName();
@@ -107,7 +110,7 @@ public class QuickFixFalseOptionalFeaturesTest {
 	
 	@Test(timeout = 20000)
 	public void createConfigurationsTest() {
-		final Collection<IFeature> concrete = fm.getConcreteFeatures();
+		final Collection<IFeature> concrete = Filter.filter(new LinkedList<>(fm.getFeatures()), new ConcreteFeatureFilter());
 		final Collection<IFeature> core = fm.getAnalyser().getCoreFeatures();
 		final Collection<String> falseOptionalFeatures = new LinkedList<String>();
 		

@@ -81,7 +81,7 @@ public class FeatureModelJPFBDD implements IFeatureModelClass {
 
 	@Override
 	public String getFormula() {
-		final Node nodes = NodeCreator.createNodes(featureModel.clone()).toCNF();//.eliminateNotSupportedSymbols(NodeWriter.javaSymbols);
+		final Node nodes = NodeCreator.createNodes(featureModel.clone(null)).toCNF();//.eliminateNotSupportedSymbols(NodeWriter.javaSymbols);
 		String formula = nodes.toString(NodeWriter.javaSymbols).toLowerCase(Locale.ENGLISH);
 		if (formula.contains("  &&  true  &&  ! false")) {
 			formula = formula.substring(0, formula.indexOf("  &&  true  &&  ! false"));

@@ -79,7 +79,7 @@ public final class ConstraintTextValidator {
 	 */
 	private SortedSet<IFeature> getDeadFeatures(IConstraint constraint, String input, IFeatureModel model) {
 		Collection<IFeature> deadFeaturesBefore = null;
-		IFeatureModel clonedModel = model.clone();
+		IFeatureModel clonedModel = model.clone(null);
 
 		NodeReader nodeReader = new NodeReader();
 
@@ -142,7 +142,7 @@ public final class ConstraintTextValidator {
 
 	private List<IFeature> getFalseOptional(String input, IFeatureModel model) {
 		List<IFeature> list = new ArrayList<IFeature>();
-		IFeatureModel clonedModel = model.clone();
+		IFeatureModel clonedModel = model.clone(null);
 
 		NodeReader nodeReader = new NodeReader();
 
@@ -179,7 +179,7 @@ public final class ConstraintTextValidator {
 		if (constraint.length() == 0) {
 			return false;
 		}
-		IFeatureModel clonedModel = featureModel.clone();
+		IFeatureModel clonedModel = featureModel.clone(null);
 		Node propNode = new NodeReader().stringToNode(constraint, clonedModel.getFeatureNames());
 		clonedModel.addPropositionalNode(propNode);
 		if (new ModelComparator(20000).compare(featureModel, clonedModel) == Comparison.REFACTORING) {
@@ -529,7 +529,7 @@ public final class ConstraintTextValidator {
 
 			return false;
 		}
-		IFeatureModel clonedModel = model.clone();
+		IFeatureModel clonedModel = model.clone(null);
 		NodeReader nodeReader = new NodeReader();
 
 		Node propNode = nodeReader.stringToNode(input, clonedModel.getFeatureNames());

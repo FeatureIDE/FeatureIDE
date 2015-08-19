@@ -91,7 +91,7 @@ public class ExportCNFHandler extends AFileHandler {
 			 * @return
 			 */
 			private String getCNF(IFeatureModel model) {
-				Node nodes = NodeCreator.createNodes(model.clone()).toCNF();
+				Node nodes = NodeCreator.createNodes(model.clone(null)).toCNF();
 				StringBuilder cnf = new StringBuilder();
 				cnf.append("Logical Symbols:\r\n");
 				cnf.append(nodes.toString(NodeWriter.logicalSymbols));

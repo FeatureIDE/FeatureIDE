@@ -35,12 +35,10 @@ public interface IFeatureModelFactory {
 
 	IFeatureModel createFeatureModel();
 
-	IFeatureModelProperty createFeatureModelProperty(IFeatureModel featureModel);
+	IGraphicalConstraint createGraphicalRepresentation(IConstraint constraint);
 
-	IFeatureModelStructure createFeatureModelStructure(IFeatureModel featureModel);
+	IGraphicalFeature createGraphicalRepresentation(IFeature feature);
 
-	IFeatureProperty createFeatureProperty(IFeature feature);
-
-	IFeatureStructure createFeatureStructure(IFeature feature);
+	IGraphicalFeatureModel createGraphicalRepresentation(IFeatureModel featureModel);
 
 }

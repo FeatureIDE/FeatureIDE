@@ -78,7 +78,7 @@ public class TypeChef {
 			FeatureModelReaderIFileWrapper fmReader = new FeatureModelReaderIFileWrapper(
 					new XmlFeatureModelReader(fm));
 			fmReader.readFromFile(inputFile);
-			Node nodes = NodeCreator.createNodes(fm.clone()).toCNF();
+			Node nodes = NodeCreator.createNodes(fm.clone(null)).toCNF();
 			StringBuilder cnf = new StringBuilder();
 			cnf.append(nodes.toString(NodeWriter.javaSymbols));
 			print.write(cnf.toString());

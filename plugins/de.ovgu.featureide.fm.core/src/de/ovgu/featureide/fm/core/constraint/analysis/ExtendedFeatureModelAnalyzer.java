@@ -26,8 +26,8 @@ import org.sat4j.specs.TimeoutException;
 
 import com.google.common.collect.BiMap;
 
-import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
+import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 
 /**
  * Checks the {@link ExtendedFeatureModel} for validation.

@@ -20,62 +20,16 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
-import org.prop4j.Node;
-
-import de.ovgu.featureide.fm.core.base.IConstraint;
-import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
-import de.ovgu.featureide.fm.core.base.IFeatureModelProperty;
-import de.ovgu.featureide.fm.core.base.IFeatureModelStructure;
-import de.ovgu.featureide.fm.core.base.IFeatureProperty;
-import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 
 /**
  * 
  * @author Sebastian Krieter
  */
-public class FeatureModelFactory implements IFeatureModelFactory {
+public abstract class FeatureModelFactory {
 
-	private static final FeatureModelFactory INSTANCE = new FeatureModelFactory();
-
-	public static FeatureModelFactory getInstance() {
-		return INSTANCE;
-	}
-
-	@Override
-	public IConstraint createConstraint(IFeatureModel featureModel, Node propNode) {
-		return new Constraint(featureModel, propNode);
-	}
-
-	@Override
-	public IFeature createFeature(IFeatureModel featureModel, String name) {
-		return new Feature(featureModel, name);
-	}
-
-	@Override
-	public IFeatureModel createFeatureModel() {
-		return new FeatureModel();
-	}
-
-	@Override
-	public IFeatureModelProperty createFeatureModelProperty(IFeatureModel featureModel) {
-		return new FeatureModelProperty(featureModel);
-	}
-
-	@Override
-	public IFeatureModelStructure createFeatureModelStructure(IFeatureModel featureModel) {
-		return new FeatureModelStructure(featureModel);
-	}
-
-	@Override
-	public IFeatureProperty createFeatureProperty(IFeature feature) {
-		return new FeatureProperty(feature);
-	}
-
-	@Override
-	public IFeatureStructure createFeatureStructure(IFeature feature) {
-		return new FeatureStructure(feature);
+	public static IFeatureModelFactory getInstance() {
+		return DefaultFeatureModelFactory.getInstance();
 	}
 
 }

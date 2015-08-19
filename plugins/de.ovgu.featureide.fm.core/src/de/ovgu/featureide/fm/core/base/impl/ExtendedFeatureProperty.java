@@ -18,21 +18,43 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.filter;
+package de.ovgu.featureide.fm.core.base.impl;
 
+import de.ovgu.featureide.fm.core.Preferences;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.filter.base.IFilter;
+import de.ovgu.featureide.fm.core.base.IFeatureProperty;
 
 /**
- * Checks whether a feature is abstract.
  * 
  * @author Sebastian Krieter
+ * 
  */
-public class AbstractFeatureFilter implements IFilter<IFeature> {
-	
+public class ExtendedFeatureProperty extends FeatureProperty {
+
+	public ExtendedFeatureProperty(IFeature correspondingFeature) {
+		super(correspondingFeature);
+	}
+
+	protected ExtendedFeatureProperty(FeatureProperty oldProperty, IFeature correspondingFeature) {
+		super(oldProperty, correspondingFeature);
+	}
+
 	@Override
-	public boolean isValid(IFeature object) {
-		return object.getStructure().isAbstract();
+	public String getDisplayName() {
+		final String name = correspondingFeature.getName();
+		switch (Preferences.getDefaultFeatureNameScheme()) {
+			case Preferences.SCHEME_SHORT:
+				int separatorIndex = name.lastIndexOf(".");
+				return name.substring(separatorIndex + 1);
+			case Preferences.SCHEME_LONG: 
+			default: 
+				return name;
+		}
+	}
+
+	@Override
+	public IFeatureProperty clone(IFeature newFeature) {
+		return new ExtendedFeatureProperty(this, newFeature);
 	}
 
 }

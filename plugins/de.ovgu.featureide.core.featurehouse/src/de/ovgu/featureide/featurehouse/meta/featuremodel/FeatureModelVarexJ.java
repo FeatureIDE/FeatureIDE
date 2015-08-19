@@ -88,7 +88,7 @@ public class FeatureModelVarexJ implements IFeatureModelClass {
 
 	@Override
 	public String getFormula() {
-		final Node nodes = NodeCreator.createNodes(featureModel.clone()).toCNF();
+		final Node nodes = NodeCreator.createNodes(featureModel.clone(null)).toCNF();
 		String formula = nodes.toString(NodeWriter.javaSymbols);
 		if (formula.contains(TRUE_FALSE)) {
 			formula = formula.substring(0, formula.indexOf(TRUE_FALSE));

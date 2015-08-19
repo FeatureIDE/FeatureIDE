@@ -606,7 +606,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		composer.addCompositionErrorListener(compositionErrorListener);
 		try {
 			IFile cnfFile = featureProject.getSourceFolder().getFile("model.cnf");
-			Node nodes = NodeCreator.createNodes(featureProject.getFeatureModel().clone()).toCNF();
+			Node nodes = NodeCreator.createNodes(featureProject.getFeatureModel().clone(null)).toCNF();
 			String input = nodes.toString(NodeWriter.javaSymbols);
 			input = input.replaceAll("!", "! ");
 			InputStream cnfSource = new ByteArrayInputStream(input.getBytes(Charset.availableCharsets().get("UTF-8")));

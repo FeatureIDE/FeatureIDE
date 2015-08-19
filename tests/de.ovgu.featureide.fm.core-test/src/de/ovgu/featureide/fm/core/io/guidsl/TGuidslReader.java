@@ -51,8 +51,8 @@ public class TGuidslReader {
 		reader.readFromString(AND_GROUP_ALL_OPTIONAL);
 		IFeature a = model.getFeature("A");
 		IFeature base = model.getFeature("Base");
-		assertTrue(base.isAnd());
-		assertFalse(a.isMandatory());
+		assertTrue(base.getStructure().isAnd());
+		assertFalse(a.getStructure().isMandatory());
 	}
 
 	@Test
@@ -64,8 +64,8 @@ public class TGuidslReader {
 
 		IFeature base = model.getFeature("Base");
 		IFeature a = model.getFeature("A");
-		assertTrue(base.isAnd());
-		assertTrue(a.isMandatory());
+		assertTrue(base.getStructure().isAnd());
+		assertTrue(a.getStructure().isMandatory());
 	}
 
 	@Test
@@ -76,7 +76,7 @@ public class TGuidslReader {
 		reader.readFromString(OR_GROUP);
 
 		IFeature base = model.getFeature("Base");
-		assertTrue(base.isOr());
+		assertTrue(base.getStructure().isOr());
 
 	}
 
@@ -88,7 +88,7 @@ public class TGuidslReader {
 		reader.readFromString(ALTERNATIVE_GROUP);
 
 		IFeature base = model.getFeature("Base");
-		assertTrue(base.isAlternative());
+		assertTrue(base.getStructure().isAlternative());
 
 	}
 }

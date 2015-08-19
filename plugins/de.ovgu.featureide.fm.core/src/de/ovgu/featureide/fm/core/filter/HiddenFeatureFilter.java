@@ -32,7 +32,7 @@ public class HiddenFeatureFilter implements IFilter<IFeature> {
 	
 	@Override
 	public boolean isValid(IFeature object) {
-		return object.hasHiddenParent();
+		return object.getStructure().hasHiddenParent();
 	}
 
 }

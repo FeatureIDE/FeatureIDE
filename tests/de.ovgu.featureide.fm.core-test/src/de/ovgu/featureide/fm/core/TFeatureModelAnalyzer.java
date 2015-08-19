@@ -230,47 +230,47 @@ public class TFeatureModelAnalyzer {
 	
 	@Test
 	public void TIndeterminate_Hidden_FM1_F0() {
-		assertFalse(FM4_F2.getFeatureStatus() == FeatureStatus.INDETERMINATE_HIDDEN);
+		assertFalse(FM4_F2.getProperty().getFeatureStatus() == FeatureStatus.INDETERMINATE_HIDDEN);
 	}
 	
 	@Test
 	public void TIndeterminate_Hidden_FM1_F1() {
-		assertTrue(FM4_F3.getFeatureStatus() == FeatureStatus.INDETERMINATE_HIDDEN);
+		assertTrue(FM4_F3.getProperty().getFeatureStatus() == FeatureStatus.INDETERMINATE_HIDDEN);
 	}
 	
 	@Test
 	public void TIndeterminate_Hidden_FM1_F2() {
-		assertFalse(FM4_F4.getFeatureStatus() == FeatureStatus.INDETERMINATE_HIDDEN);
+		assertFalse(FM4_F4.getProperty().getFeatureStatus() == FeatureStatus.INDETERMINATE_HIDDEN);
 	}
 	
 	@Test
 	public void TIndeterminate_Hidden_FM1_F3() {
-		assertFalse(FM4_F5.getFeatureStatus() == FeatureStatus.INDETERMINATE_HIDDEN);
+		assertFalse(FM4_F5.getProperty().getFeatureStatus() == FeatureStatus.INDETERMINATE_HIDDEN);
 	}
 	
 	@Test
 	public void TIndeterminate_Hidden_FM1_F4() {
-		assertTrue(FM4_F6.getFeatureStatus() == FeatureStatus.INDETERMINATE_HIDDEN);
+		assertTrue(FM4_F6.getProperty().getFeatureStatus() == FeatureStatus.INDETERMINATE_HIDDEN);
 	}
 	
 	@Test
 	public void TIndeterminate_Hidden_FM1_F5() {
-		assertTrue(FM4_F7.getFeatureStatus() == FeatureStatus.INDETERMINATE_HIDDEN);
+		assertTrue(FM4_F7.getProperty().getFeatureStatus() == FeatureStatus.INDETERMINATE_HIDDEN);
 	}
 	
 	@Test
 	public void TIndeterminate_Hidden_FM1_F6() {
-		assertFalse(FM4_F8.getFeatureStatus() == FeatureStatus.INDETERMINATE_HIDDEN);
+		assertFalse(FM4_F8.getProperty().getFeatureStatus() == FeatureStatus.INDETERMINATE_HIDDEN);
 	}
 	
 	@Test
 	public void TIndeterminate_Hidden_FM1_F7() {
-		assertFalse(FM4_F9.getFeatureStatus() == FeatureStatus.INDETERMINATE_HIDDEN);
+		assertFalse(FM4_F9.getProperty().getFeatureStatus() == FeatureStatus.INDETERMINATE_HIDDEN);
 	}
 	
 	@Test
 	public void TIndeterminate_Hidden_FM1_F8() {
-		assertTrue(FM4_F1.getFeatureStatus() == FeatureStatus.INDETERMINATE_HIDDEN);
+		assertTrue(FM4_F1.getProperty().getFeatureStatus() == FeatureStatus.INDETERMINATE_HIDDEN);
 	}
 	
 }
