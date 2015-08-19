@@ -36,6 +36,7 @@ import org.eclipse.jface.viewers.TextCellEditor;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureCellEditorLocator;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureLabelEditManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
@@ -73,7 +74,7 @@ public class FeatureCreateCompoundOperation extends AbstractFeatureModelOperatio
 		int number = 0;
 		while (featureModel.getFeatureNames().contains("NewCompound" + ++number))
 			;
-		newCompound = new IFeature(featureModel, "NewCompound" + number);
+		newCompound = FeatureModelFactory.getInstance().createFeature(featureModel, "NewCompound" + number);
 		if (parent != null) {
 			newCompound.setAND(true);
 			newCompound.setMultiple(parent.isMultiple());

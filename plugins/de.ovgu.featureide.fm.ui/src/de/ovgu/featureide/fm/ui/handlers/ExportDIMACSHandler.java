@@ -45,6 +45,7 @@ import org.prop4j.Literal;
 import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
@@ -212,7 +213,7 @@ public class ExportDIMACSHandler extends AFileHandler {
 	 * @throws FileNotFoundException
 	 */
 	private IFeatureModel readModel(IFile inputFile) {
-		IFeatureModel fm = new IFeatureModel();
+		IFeatureModel fm = FeatureModelFactory.getInstance().createFeatureModel();
 		FeatureModelReaderIFileWrapper fmReader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(fm));
 
 		try {

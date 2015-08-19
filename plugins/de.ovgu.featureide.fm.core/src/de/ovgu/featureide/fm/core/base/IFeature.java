@@ -41,7 +41,7 @@ public interface IFeature extends PropertyChangeListener {
 
 	IFeatureProperty getFeatureProperty();
 
-	IFeatureStructure getFeatureStructure();
+	IFeatureStructure getStructure();
 
 	int getId();
 

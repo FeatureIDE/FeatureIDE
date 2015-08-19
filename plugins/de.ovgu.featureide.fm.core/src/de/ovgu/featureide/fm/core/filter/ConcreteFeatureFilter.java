@@ -32,7 +32,7 @@ public class ConcreteFeatureFilter implements IFilter<IFeature> {
 	
 	@Override
 	public boolean isValid(IFeature object) {
-		return object.getFeatureStructure().isConcrete();
+		return object.getStructure().isConcrete();
 	}
 
 }

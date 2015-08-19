@@ -56,6 +56,7 @@ import org.sat4j.specs.TimeoutException;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
 import de.ovgu.featureide.fm.core.editing.Comparison;
 import de.ovgu.featureide.fm.core.editing.ModelComparator;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
@@ -821,7 +822,7 @@ public class FeatureModelAnalyzer {
 					Node leftChild = children[0];
 					Node rightChild = children[1];
 					if (leftChild instanceof Literal && ((Literal) leftChild).var.equals(feature.getName())) {
-						IConstraint	rightConstraint = new IConstraint(fm, rightChild);
+						IConstraint	rightConstraint = FeatureModelFactory.getInstance().createConstraint(fm, rightChild);
 						rightConstraint.setContainedFeatures();
 						if (!rightConstraint.hasHiddenFeatures()) {
 							list.add(feature);
@@ -829,7 +830,7 @@ public class FeatureModelAnalyzer {
 						}
 					}
 					if (rightChild instanceof Literal &&  ((Literal) rightChild).var.equals(feature.getName())) {
-						IConstraint  leftConstraint = new IConstraint(fm, leftChild);
+						IConstraint  leftConstraint = FeatureModelFactory.getInstance().createConstraint(fm, leftChild);
 						leftConstraint.setContainedFeatures();
 						if (!leftConstraint.hasHiddenFeatures()) {
 							list.add(feature);
@@ -924,9 +925,9 @@ public class FeatureModelAnalyzer {
 		Collection<IFeature> falseOptionalFeatures = new LinkedList<>();
 		for (IFeature feature : fmFalseOptionals) {
 			try {
-				if (!feature.getFeatureStructure().isMandatory() && !feature.getFeatureStructure().isRoot()) {
+				if (!feature.getStructure().isMandatory() && !feature.getStructure().isRoot()) {
 					SatSolver satsolver = new SatSolver(new Not(new Implies(
-							new And(new Literal(feature.getFeatureStructure().getParent().getName()),
+							new And(new Literal(feature.getStructure().getParent().getName()),
 									NodeCreator.createNodes(fm.clone())),
 							new Literal(feature.getName()))), 1000);
 					if (!satsolver.isSatisfiable()) {

@@ -26,6 +26,7 @@ import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
 
 /**
@@ -46,7 +47,7 @@ public class ConstraintCreateOperation extends AbstractFeatureModelOperation {
 	 */
 	public ConstraintCreateOperation(Node node, IFeatureModel featureModel) {
 		super(featureModel, LABEL);
-		constraint = new IConstraint(featureModel, node);
+		constraint = FeatureModelFactory.getInstance().createConstraint(featureModel, node);
 	}
 
 	@Override

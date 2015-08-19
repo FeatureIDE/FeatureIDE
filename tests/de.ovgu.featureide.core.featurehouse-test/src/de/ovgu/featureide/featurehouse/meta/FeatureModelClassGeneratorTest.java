@@ -29,6 +29,7 @@ import org.junit.Test;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.featurehouse.meta.featuremodel.FeatureModelClassGenerator;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 
@@ -105,7 +106,7 @@ public class FeatureModelClassGeneratorTest {
 	}
 	
 	private final IFeatureModel init(String name) {
-		IFeatureModel fm = new IFeatureModel();
+		IFeatureModel fm = FeatureModelFactory.getInstance().createFeatureModel();
 		for (File f : MODEL_FILE_FOLDER.listFiles(filter)) {
 			if (f.getName().equals(name)) {
 				try {

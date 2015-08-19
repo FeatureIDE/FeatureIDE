@@ -37,6 +37,7 @@ import org.sat4j.specs.TimeoutException;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
 
 /**
  * A generator for feature models.
@@ -60,7 +61,7 @@ public abstract class Generator {
 	}
 	
 	public static IFeatureModel generateFeatureDiagram(Random random, int numberOfFeatures) {
-		IFeatureModel fm = new IFeatureModel();
+		IFeatureModel fm = FeatureModelFactory.getInstance().createFeatureModel();
 		List<IFeature> leaves = new LinkedList<IFeature>();
 		leaves.add(fm.getFeature("C1"));
 		int count = 1;
@@ -71,7 +72,7 @@ public abstract class Generator {
 			int childrenCount = random.nextInt(maxChildren) + 1;
 			childrenCount = Math.min(childrenCount, numberOfFeatures - count);
 			for (int i = 1; i <= childrenCount; i++) {
-				IFeature child = new IFeature(fm, "C" + (count + i));
+				IFeature child = FeatureModelFactory.getInstance().createFeature(fm, "C" + (count + i));
 				fm.addFeature(child);
 				parent.addChild(child);
 				leaves.add(child);
@@ -234,7 +235,7 @@ public abstract class Generator {
 						int j = 1;
 						IFeature child;
 						do {
-							child = new IFeature(fm, "C" + j++);
+							child = FeatureModelFactory.getInstance().createFeature(fm, "C" + j++);
 						} while (!fm.addFeature(child));
 						feature.addChild(child);
 						break;
@@ -288,7 +289,7 @@ public abstract class Generator {
 						int j = 1;
 						IFeature child;
 						do {
-							child = new IFeature(fm, "C" + j++);
+							child = FeatureModelFactory.getInstance().createFeature(fm, "C" + j++);
 						} while (!fm.addFeature(child));
 						child.setMandatory(false);
 						feature.addChild(child);
@@ -341,7 +342,7 @@ public abstract class Generator {
 							int j = 1;
 							IFeature child;
 							do {
-								child = new IFeature(fm, "C" + j++);
+								child = FeatureModelFactory.getInstance().createFeature(fm, "C" + j++);
 							} while (!fm.addFeature(child));
 							feature.addChild(child);
 							break;

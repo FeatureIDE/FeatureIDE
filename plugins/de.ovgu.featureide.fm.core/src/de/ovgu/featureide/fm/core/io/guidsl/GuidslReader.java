@@ -82,6 +82,7 @@ import org.prop4j.SatSolver;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.ModelWarning;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
@@ -258,7 +259,7 @@ public class GuidslReader extends AbstractFeatureModelReader {
 	}
 	
 	private void readGProductionRoot(GProduction gProduction) throws UnsupportedModelException {
-		final IFeature root = new IFeature(featureModel, gProduction.getIDENTIFIER().name);
+		final IFeature root = FeatureModelFactory.getInstance().createFeature(featureModel, gProduction.getIDENTIFIER().name);
 		featureModel.addFeature(root);
 		featureModel.setRoot(root);
 		readGProduction(gProduction, root);
@@ -304,7 +305,7 @@ public class GuidslReader extends AbstractFeatureModelReader {
 	}
 
 	private IFeature createFeature(AstToken token) throws UnsupportedModelException {
-		IFeature feature = new IFeature(featureModel, token.name);
+		IFeature feature = FeatureModelFactory.getInstance().createFeature(featureModel, token.name);
 		if (!featureModel.addFeature(feature))
 			throw new UnsupportedModelException(THE_FEATURE_ + feature.getName() + "' occurs again on a right side of a rule and that's not allowed!", token.lineNum());
 		return feature;

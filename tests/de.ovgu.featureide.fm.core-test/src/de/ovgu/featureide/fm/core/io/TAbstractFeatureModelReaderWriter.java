@@ -38,6 +38,7 @@ import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
 import de.ovgu.featureide.fm.core.editing.Comparison;
 import de.ovgu.featureide.fm.core.editing.ModelComparator;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
@@ -92,7 +93,7 @@ public abstract class TAbstractFeatureModelReaderWriter {
 		for (File f : MODEL_FILE_FOLDER.listFiles(getFileFilter(".xml"))) {
 			Object[] models = new Object[2];
 
-			IFeatureModel fm = new IFeatureModel();
+			IFeatureModel fm = FeatureModelFactory.getInstance().createFeatureModel();
 			XmlFeatureModelReader r = new XmlFeatureModelReader(fm);
 			r.readFromFile(f);
 			models[0] = fm;
@@ -284,7 +285,7 @@ public abstract class TAbstractFeatureModelReaderWriter {
 
 	private final IFeatureModel writeAndReadModel()
 			throws UnsupportedModelException {
-		IFeatureModel newFm = new IFeatureModel();
+		IFeatureModel newFm = FeatureModelFactory.getInstance().createFeatureModel();
 		IFeatureModelWriter writer = getWriter(origFm);
 		IFeatureModelReader reader = getReader(newFm);
 		reader.readFromString(writer.writeToString());

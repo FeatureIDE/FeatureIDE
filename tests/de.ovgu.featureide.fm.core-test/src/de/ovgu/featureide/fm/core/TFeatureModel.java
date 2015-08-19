@@ -26,6 +26,7 @@ import org.junit.Test;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
 
 /**
  * Tests for the {@link IFeatureModel}.
@@ -36,8 +37,8 @@ public class TFeatureModel {
 
 	@Test
     public void recordGetFeatureName(){
-        IFeatureModel fm = new IFeatureModel();
-        IFeature feature = new IFeature(fm, "test_root");
+        IFeatureModel fm = FeatureModelFactory.getInstance().createFeatureModel();
+        IFeature feature = FeatureModelFactory.getInstance().createFeature(fm, "test_root");
         fm.addFeature(feature);
         fm.setRoot(feature);
         IFeature root = fm.getFeature("test_root");

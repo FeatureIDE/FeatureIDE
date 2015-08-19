@@ -104,7 +104,7 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 				constraints.add(constraint.clone(this));
 			}
 		} else {
-			structure.setRoot(newRoot.getFeatureStructure().cloneSubtree(this));
+			structure.setRoot(newRoot.getStructure().cloneSubtree(this));
 			for (final IConstraint constraint : oldFeatureModel.constraints) {
 				if (featureTable.keySet().containsAll(Filter.toString(constraint.getContainedFeatures()))) {
 					constraints.add(constraint.clone(this));
@@ -161,13 +161,13 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 		}
 		if (featureTable.isEmpty()) {
 			final IFeature root = new Feature(this, rootName);
-			structure.setRoot(root.getFeatureStructure());
+			structure.setRoot(root.getStructure());
 			addFeature(root);
 		}
 		final IFeature feature = new Feature(this, "Base");
 		addFeature(feature);
 
-		structure.getRoot().addChild(feature.getFeatureStructure());
+		structure.getRoot().addChild(feature.getStructure());
 		structure.getRoot().setAbstract(true);
 	}
 
@@ -185,12 +185,12 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 		}
 
 		// use the group type of the feature to delete
-		final IFeatureStructure parent = feature.getFeatureStructure().getParent();
+		final IFeatureStructure parent = feature.getStructure().getParent();
 
 		if (parent.getChildrenCount() == 1) {
-			if (feature.getFeatureStructure().isAnd()) {
+			if (feature.getStructure().isAnd()) {
 				parent.setAnd();
-			} else if (feature.getFeatureStructure().isAlternative()) {
+			} else if (feature.getStructure().isAlternative()) {
 				parent.setAlternative();
 			} else {
 				parent.setOr();
@@ -198,13 +198,13 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 		}
 
 		// add children to parent
-		final int index = parent.getChildIndex(feature.getFeatureStructure());
-		while (feature.getFeatureStructure().hasChildren()) {
-			parent.addChildAtPosition(index, feature.getFeatureStructure().removeLastChild());
+		final int index = parent.getChildIndex(feature.getStructure());
+		while (feature.getStructure().hasChildren()) {
+			parent.addChildAtPosition(index, feature.getStructure().removeLastChild());
 		}
 
 		// delete feature
-		parent.removeChild(feature.getFeatureStructure());
+		parent.removeChild(feature.getStructure());
 		featureTable.remove(name);
 		featureOrderList.remove(name);
 		return true;

@@ -87,7 +87,7 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 	@Override
 	public boolean hasAbstract() {
 		for (final IFeature f : correspondingFeatureModel.getFeatures()) {
-			if (f.getFeatureStructure().isAbstract()) {
+			if (f.getStructure().isAbstract()) {
 				return true;
 			}
 		}
@@ -97,7 +97,7 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 	@Override
 	public boolean hasAlternativeGroup() {
 		for (final IFeature f : correspondingFeatureModel.getFeatures()) {
-			if ((f.getFeatureStructure().getChildrenCount() > 1) && f.getFeatureStructure().isAlternative()) {
+			if ((f.getStructure().getChildrenCount() > 1) && f.getStructure().isAlternative()) {
 				return true;
 			}
 		}
@@ -107,7 +107,7 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 	@Override
 	public boolean hasAndGroup() {
 		for (final IFeature f : correspondingFeatureModel.getFeatures()) {
-			if ((f.getFeatureStructure().getChildrenCount() > 1) && f.getFeatureStructure().isAnd()) {
+			if ((f.getStructure().getChildrenCount() > 1) && f.getStructure().isAnd()) {
 				return true;
 			}
 		}
@@ -117,7 +117,7 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 	@Override
 	public boolean hasConcrete() {
 		for (final IFeature f : correspondingFeatureModel.getFeatures()) {
-			if (f.getFeatureStructure().isConcrete()) {
+			if (f.getStructure().isConcrete()) {
 				return true;
 			}
 		}
@@ -127,7 +127,7 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 	@Override
 	public boolean hasHidden() {
 		for (final IFeature f : correspondingFeatureModel.getFeatures()) {
-			if (f.getFeatureStructure().isHidden()) {
+			if (f.getStructure().isHidden()) {
 				return true;
 			}
 		}
@@ -147,8 +147,8 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 	@Override
 	public boolean hasMandatoryFeatures() {
 		for (final IFeature f : correspondingFeatureModel.getFeatures()) {
-			final IFeatureStructure parent = f.getFeatureStructure().getParent();
-			if ((parent != null) && parent.isAnd() && f.getFeatureStructure().isMandatory()) {
+			final IFeatureStructure parent = f.getStructure().getParent();
+			if ((parent != null) && parent.isAnd() && f.getStructure().isMandatory()) {
 				return true;
 			}
 		}
@@ -158,7 +158,7 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 	@Override
 	public boolean hasOptionalFeatures() {
 		for (final IFeature f : correspondingFeatureModel.getFeatures()) {
-			if (!f.equals(rootFeature) && f.getFeatureStructure().getParent().isAnd() && !f.getFeatureStructure().isMandatory()) {
+			if (!f.equals(rootFeature) && f.getStructure().getParent().isAnd() && !f.getStructure().isMandatory()) {
 				return true;
 			}
 		}
@@ -168,7 +168,7 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 	@Override
 	public boolean hasOrGroup() {
 		for (final IFeature f : correspondingFeatureModel.getFeatures()) {
-			if ((f.getFeatureStructure().getChildrenCount() > 1) && f.getFeatureStructure().isOr()) {
+			if ((f.getStructure().getChildrenCount() > 1) && f.getStructure().isOr()) {
 				return true;
 			}
 		}
@@ -179,7 +179,7 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 	public int numAlternativeGroup() {
 		int count = 0;
 		for (final IFeature f : correspondingFeatureModel.getFeatures()) {
-			if ((f.getFeatureStructure().getChildrenCount() > 1) && f.getFeatureStructure().isAlternative()) {
+			if ((f.getStructure().getChildrenCount() > 1) && f.getStructure().isAlternative()) {
 				count++;
 			}
 		}
@@ -190,7 +190,7 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 	public int numOrGroup() {
 		int count = 0;
 		for (final IFeature f : correspondingFeatureModel.getFeatures()) {
-			if ((f.getFeatureStructure().getChildrenCount() > 1) && f.getFeatureStructure().isOr()) {
+			if ((f.getStructure().getChildrenCount() > 1) && f.getStructure().isOr()) {
 				count++;
 			}
 		}

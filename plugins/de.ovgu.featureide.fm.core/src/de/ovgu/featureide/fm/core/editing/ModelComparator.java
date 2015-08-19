@@ -152,11 +152,11 @@ public class ModelComparator {
 			IFeatureModel newModel) {
 		Set<String> addedFeatures = new HashSet<String>();
 		for (IFeature feature : newModel.getFeatures())
-			if (feature.isConcrete()) {
+			if (feature.getStructure().isConcrete()) {
 				String name = newModel.getRenamingsManager().getOldName(feature.getName());
 				IFeature associatedFeature = oldModel.getFeature(oldModel
 						.getRenamingsManager().getNewName(name));
-				if (associatedFeature == null || associatedFeature.isAbstract())
+				if (associatedFeature == null || associatedFeature.getStructure().isAbstract())
 					addedFeatures.add(name);
 			}
 		return addedFeatures;

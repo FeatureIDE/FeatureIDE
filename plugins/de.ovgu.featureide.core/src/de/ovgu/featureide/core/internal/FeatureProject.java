@@ -94,6 +94,7 @@ import de.ovgu.featureide.fm.core.FeatureModelFile;
 import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.configuration.FeatureIDEFormat;
@@ -327,7 +328,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			tmpModelReader = ModelIOFactory.getModelReader(featureModel, ModelIOFactory.TYPE_VELVET);
 		} else {
 			modelFile = new FeatureModelFile(project.getFile("model.xml"));
-			featureModel = new IFeatureModel();
+			featureModel = FeatureModelFactory.getInstance().createFeatureModel();
 			tmpModelReader = ModelIOFactory.getModelReader(featureModel, ModelIOFactory.TYPE_XML);
 		}
 
@@ -463,7 +464,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		if (project.getFile("model.m").exists() && !project.getFile("model.xml").exists()) {
 			try {
 				IFile file = project.getFile("model.xml");
-				IFeatureModel fm = new IFeatureModel();
+				IFeatureModel fm = FeatureModelFactory.getInstance().createFeatureModel();
 				// fm.getFMComposerExtension(project);
 				GuidslReader guidslReader = new GuidslReader(fm);
 				FeatureModelReaderIFileWrapper reader = new FeatureModelReaderIFileWrapper(guidslReader);

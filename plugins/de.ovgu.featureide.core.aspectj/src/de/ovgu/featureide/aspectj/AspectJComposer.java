@@ -60,6 +60,7 @@ import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.filter.base.Filter;
@@ -274,7 +275,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 			} else if (res instanceof IFile) {
 				String name = res.getName();
 				if (name.endsWith(".aj")) {
-					IFeature feature = new IFeature(featureModel, folders + name.split("[.]")[0]);
+					IFeature feature = FeatureModelFactory.getInstance().createFeature(featureModel, folders + name.split("[.]")[0]);
 					featureModel.getStructure().getRoot().getStructure().addChild(feature);
 					hasAspects = true;
 				}
@@ -444,15 +445,15 @@ public class AspectJComposer extends ComposerExtensionClass {
 			return;
 		}
 		rootName = root.getName();
-		if (!"".equals(rootName) && root.getFeatureStructure().hasChildren()) {
+		if (!"".equals(rootName) && root.getStructure().hasChildren()) {
 			checkAspect(root);
 		}
 	}
 
 	private void checkAspect(IFeature feature) {
-		if (feature.getFeatureStructure().hasChildren()) {
-			for (IFeature child : feature.getFeatureStructure().getChildren()) {
-				if (child.getFeatureStructure().isConcrete() && !child.getName().equals(rootName)) {
+		if (feature.getStructure().hasChildren()) {
+			for (IFeature child : feature.getStructure().getChildren()) {
+				if (child.getStructure().isConcrete() && !child.getName().equals(rootName)) {
 					createAspect(child.getName(), featureProject.getBuildFolder(), null);
 				}
 				checkAspect(child);

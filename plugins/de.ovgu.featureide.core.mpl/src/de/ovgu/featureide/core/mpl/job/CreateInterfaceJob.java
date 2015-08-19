@@ -45,6 +45,7 @@ import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelWriter;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
@@ -140,7 +141,7 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
         m.reset();
         
         // set new abstract root
-        IFeature nroot = new IFeature(m, "nroot");
+        IFeature nroot = FeatureModelFactory.getInstance().createFeature(m, "nroot");
         nroot.setAbstract(true);
         nroot.setAnd();
         nroot.addChild(root);
@@ -181,7 +182,7 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
         		SatSolver modelSatSolver = new SatSolver(new And(NodeCreator.createNodes(m), notChild), 1000);
         		try {
 					if (modelSatSolver.isSatisfiable()) {
-						m.addConstraint(new IConstraint(m, child));
+						m.addConstraint(FeatureModelFactory.getInstance().createConstraint(m, child));
 					}
 				} catch (TimeoutException e) {
 					MPLPlugin.getDefault().logError(e);
@@ -330,7 +331,7 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
             	    			child.setMandatory(false);
             				}
         				} else {
-            				IFeature pseudoAlternative = new IFeature(curFeature.getFeatureModel(), MARK2);
+            				IFeature pseudoAlternative = FeatureModelFactory.getInstance().createFeature(curFeature.getFeatureModel(), MARK2);
             				pseudoAlternative.setMandatory(false);
             				pseudoAlternative.setAlternative();
             				for (IFeature child : list) {

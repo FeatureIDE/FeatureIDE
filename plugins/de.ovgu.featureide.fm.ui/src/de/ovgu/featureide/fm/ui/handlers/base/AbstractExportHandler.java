@@ -31,6 +31,7 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
@@ -42,7 +43,7 @@ public abstract class AbstractExportHandler extends AFileHandler {
 	@Override
 	protected final void singleAction(IFile modelFile) {
 		try {
-			final IFeatureModel fm = new IFeatureModel();
+			final IFeatureModel fm = FeatureModelFactory.getInstance().createFeatureModel();
 
 			// Read model
 			final FeatureModelReaderIFileWrapper reader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(fm));

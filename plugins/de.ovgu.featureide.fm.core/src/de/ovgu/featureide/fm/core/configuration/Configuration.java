@@ -33,6 +33,7 @@ import org.sat4j.specs.TimeoutException;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.job.WorkMonitor;
 
 /**
@@ -132,16 +133,16 @@ public class Configuration implements Cloneable {
 		if (sFeature != null && sFeature.getName() != null) {
 			features.add(sFeature);
 			table.put(sFeature.getName(), sFeature);
-			for (IFeature child : feature.getChildren()) {
-				SelectableFeature sChild = new SelectableFeature(this, child);
+			for (IFeatureStructure child : feature.getStructure().getChildren()) {
+				SelectableFeature sChild = new SelectableFeature(this, child.getFeature());
 				sFeature.addChild(sChild);
-				initFeatures(sChild, child);
+				initFeatures(sChild, child.getFeature());
 			}
 		}
 	}
 
 	private SelectableFeature initRoot() {
-		final IFeature featureRoot = featureModel.getRoot();
+		final IFeature featureRoot = featureModel.getStructure().getRoot().getFeature();
 		final SelectableFeature root = new SelectableFeature(this, featureRoot);
 		
 		if (featureRoot != null) {
@@ -197,7 +198,7 @@ public class Configuration implements Cloneable {
 	public List<SelectableFeature> getManualFeatures() {
 		final List<SelectableFeature> featureList = new LinkedList<SelectableFeature>();
 		for (SelectableFeature selectableFeature : features) {
-			if (selectableFeature.getAutomatic() == Selection.UNDEFINED && !selectableFeature.getFeature().hasHiddenParent()) {
+			if (selectableFeature.getAutomatic() == Selection.UNDEFINED && !selectableFeature.getFeature().getStructure().hasHiddenParent()) {
 				featureList.add(selectableFeature);
 			}
 		}
@@ -340,7 +341,7 @@ public class Configuration implements Cloneable {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		for (SelectableFeature feature : features) {
-			if (feature.getSelection() == Selection.SELECTED && feature.getFeature().isConcrete()) {
+			if (feature.getSelection() == Selection.SELECTED && feature.getFeature().getStructure().isConcrete()) {
 				builder.append(feature.getFeature().getName());
 				builder.append("\n");
 			}

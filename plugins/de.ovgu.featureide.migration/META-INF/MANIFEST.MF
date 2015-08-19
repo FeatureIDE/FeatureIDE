@@ -8,14 +8,9 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.core.resources,
  org.eclipse.jdt.core,
- de.ovgu.featureide.fm.ui
+ de.ovgu.featureide.fm.ui,
+ de.ovgu.featureide.fm.core,
+ de.ovgu.featureide.core,
+ de.ovgu.featureide.ui
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Import-Package: de.ovgu.featureide.core,
- de.ovgu.featureide.core.builder,
- de.ovgu.featureide.core.fstmodel,
- de.ovgu.featureide.fm.core,
- de.ovgu.featureide.fm.core.io,
- de.ovgu.featureide.fm.core.io.xml,
- de.ovgu.featureide.fm.core.localization,
- de.ovgu.featureide.ui.wizards

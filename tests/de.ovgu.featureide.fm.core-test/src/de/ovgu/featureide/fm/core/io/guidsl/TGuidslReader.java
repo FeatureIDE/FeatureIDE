@@ -27,6 +27,7 @@ import org.junit.Test;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
 /**
@@ -44,7 +45,7 @@ public class TGuidslReader {
 	
 	@Test
 	public void testReaderAndGroupAllOptional() throws UnsupportedModelException {
-		IFeatureModel model = new IFeatureModel();
+		IFeatureModel model = FeatureModelFactory.getInstance().createFeatureModel();
 		GuidslReader reader = new GuidslReader(model);
 
 		reader.readFromString(AND_GROUP_ALL_OPTIONAL);
@@ -52,12 +53,11 @@ public class TGuidslReader {
 		IFeature base = model.getFeature("Base");
 		assertTrue(base.isAnd());
 		assertFalse(a.isMandatory());
-
 	}
 
 	@Test
 	public void testReaderAndGroupAMandatory() throws UnsupportedModelException {
-		IFeatureModel model = new IFeatureModel();
+		IFeatureModel model = FeatureModelFactory.getInstance().createFeatureModel();
 		GuidslReader reader = new GuidslReader(model);
 
 		reader.readFromString(AND_GROUP_A_MANDATORY);
@@ -70,7 +70,7 @@ public class TGuidslReader {
 
 	@Test
 	public void testReaderOrGroup() throws UnsupportedModelException {
-		IFeatureModel model = new IFeatureModel();
+		IFeatureModel model = FeatureModelFactory.getInstance().createFeatureModel();
 		GuidslReader reader = new GuidslReader(model);
 
 		reader.readFromString(OR_GROUP);
@@ -82,7 +82,7 @@ public class TGuidslReader {
 
 	@Test
 	public void testReaderAlternativeGroup() throws UnsupportedModelException {
-		IFeatureModel model = new IFeatureModel();
+		IFeatureModel model = FeatureModelFactory.getInstance().createFeatureModel();
 		GuidslReader reader = new GuidslReader(model);
 
 		reader.readFromString(ALTERNATIVE_GROUP);

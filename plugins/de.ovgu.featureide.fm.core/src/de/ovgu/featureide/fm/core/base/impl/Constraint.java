@@ -156,7 +156,7 @@ public class Constraint implements IConstraint, PropertyConstants {
 	@Override
 	public boolean hasHiddenFeatures() {
 		for (final IFeature f : getContainedFeatures()) {
-			if (f.getFeatureStructure().isHidden() || f.getFeatureStructure().hasHiddenParent()) {
+			if (f.getStructure().isHidden() || f.getStructure().hasHiddenParent()) {
 				return true;
 			}
 		}

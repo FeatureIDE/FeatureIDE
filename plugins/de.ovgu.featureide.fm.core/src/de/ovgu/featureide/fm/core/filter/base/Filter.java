@@ -27,8 +27,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.filter.ConcreteFeatureFilter;
 
 /**
@@ -38,6 +36,8 @@ import de.ovgu.featureide.fm.core.filter.ConcreteFeatureFilter;
  * @author Marcus Pinnecke
  * 
  * @see InverseFilter
+ * @see AndFilter
+ * @see OrFilter
  */
 public abstract class Filter {
 
@@ -100,11 +100,11 @@ public abstract class Filter {
 	
 	private static class FilteredIterator<U, T extends U> implements Iterator<T> {
 		
-		private IFilter<U> filter;
+		private final IFilter<U> filter;
 		
-		private Iterator<T> collectionIterator;
+		private final Iterator<T> collectionIterator;
 		
-		private T next;
+		private T next = null;
 		
 		public FilteredIterator(Collection<T> collection, IFilter<U> filter) {
 			assert (collection != null);
@@ -114,40 +114,52 @@ public abstract class Filter {
 			this.filter = filter;
 		}
 		
+		private boolean findNext() {
+			if (next != null) {
+				return true;
+			} else {
+				while (collectionIterator.hasNext()) {
+					next = collectionIterator.next();
+					if (filter.isValid(next)) {
+						return true;
+					}
+				}
+				next = null;
+				return false;
+			}
+		}
+		
 
 		@Override
 		public boolean hasNext() {
-			if (!collectionIterator.hasNext())
-				return false;
-			else {
-				this.next = collectionIterator.next();
-				return filter.isValid(this.next)? true : hasNext();
-			}
+			return findNext();
 		}
 
 		@Override
 		public T next() {
-			if (this.next == null)
+			if (findNext()) {
+				final T ret = next;
+				next = null;
+				return ret;
+			} else {
 				throw new NoSuchElementException();
-			return this.next;
+			}
 		}
 
 		@Override
 		public void remove() {
-			throw new UnsupportedOperationException();
+			if (findNext()) {
+				collectionIterator.remove();
+				next = null;
+			} else {
+				throw new NoSuchElementException();
+			}
 		}
 		
 	}
 	
 	public static <U, T extends U> Iterator<T> filteredIterator(Collection<T> collection, IFilter<U> filter) {
-		if (collection != null && filter != null) {
-			for (Iterator<T> iterator = collection.iterator(); iterator.hasNext();) {
-				if (!filter.isValid(iterator.next())) {
-					iterator.remove();
-				}
-			}
-		}
-		return collection;
+		return new FilteredIterator<>(collection, filter);
 	}
 
 }

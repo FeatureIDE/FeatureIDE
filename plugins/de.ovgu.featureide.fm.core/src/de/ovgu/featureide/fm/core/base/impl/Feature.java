@@ -99,7 +99,7 @@ public class Feature implements IFeature, PropertyConstants {
 	}
 
 	@Override
-	public IFeatureStructure getFeatureStructure() {
+	public IFeatureStructure getStructure() {
 		return structure;
 	}
 

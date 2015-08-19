@@ -78,7 +78,7 @@ public class DefaultFormat extends ConfigurationFormat {
 				}
 				name = renamingsManager.getNewName(name);
 				IFeature feature = configuration.getFeatureModel().getFeature(name);
-				if (feature != null && feature.hasHiddenParent()) {
+				if (feature != null && feature.getStructure().hasHiddenParent()) {
 					hiddenFeatures.add(name);
 				} else {
 					try {
@@ -135,7 +135,7 @@ public class DefaultFormat extends ConfigurationFormat {
 	}
 
 	private void writeSelectedFeatures(SelectableFeature feature, StringBuilder buffer) {
-		if (feature.getFeature().isConcrete() && feature.getSelection() == Selection.SELECTED) {
+		if (feature.getFeature().getStructure().isConcrete() && feature.getSelection() == Selection.SELECTED) {
 			if (feature.getName().contains(" ")) {
 				buffer.append("\"" + feature.getName() + "\"" + NEWLINE);
 			} else {

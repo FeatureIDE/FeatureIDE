@@ -114,7 +114,7 @@ public class ConfigurationPropagator {
 			return;
 		}
 		final IFeatureModel featureModel = configuration.getFeatureModel();
-		if (featureModel.getRoot() != null) {
+		if (featureModel.getStructure().getRoot() != null) {
 			// Build both cnfs simultaneously for better performance
 			BuildThread buildThread1 = new BuildThread(featureModel, getRemoveFeatures(!configuration.ignoreAbstractFeatures, true));
 			BuildThread buildThread2 = new BuildThread(featureModel, configuration.ignoreAbstractFeatures);
@@ -179,7 +179,7 @@ public class ConfigurationPropagator {
 		final LinkedList<SelectableFeature> nonHiddenFeautres = new LinkedList<SelectableFeature>();
 
 		for (SelectableFeature feature : configuration.features) {
-			if (!feature.getFeature().hasHiddenParent()) {
+			if (!feature.getFeature().getStructure().hasHiddenParent()) {
 				nonHiddenFeautres.add(feature);
 			}
 		}
@@ -205,7 +205,7 @@ public class ConfigurationPropagator {
 		
 		for (SelectableFeature feature : configuration.features) {
 			if (feature.getSelection() != Selection.UNDEFINED
-					&& (configuration.ignoreAbstractFeatures || feature.getFeature().isConcrete())) {
+					&& (configuration.ignoreAbstractFeatures || feature.getFeature().getStructure().isConcrete())) {
 				children.add(new Literal(feature.getFeature().getName(), feature.getSelection() == Selection.SELECTED));
 			}
 		}
@@ -256,7 +256,7 @@ public class ConfigurationPropagator {
 		
 		for (SelectableFeature selectableFeature : configuration.features) {
 			final IFeature feature = selectableFeature.getFeature();
-			if ((configuration.ignoreAbstractFeatures || feature.isConcrete()) && !feature.hasHiddenParent()) {
+			if ((configuration.ignoreAbstractFeatures || feature.getStructure().isConcrete()) && !feature.getStructure().hasHiddenParent()) {
 				final String featureName = feature.getName();
 				featureMap.put(featureName,
 					new Literal(featureName, selectableFeature.getSelection() == Selection.SELECTED));
@@ -345,7 +345,7 @@ public class ConfigurationPropagator {
 		
 		for (SelectableFeature selectableFeature : configuration.features) {
 			final IFeature feature = selectableFeature.getFeature();
-			if ((configuration.ignoreAbstractFeatures || feature.isConcrete()) && !feature.hasHiddenParent()) {
+			if ((configuration.ignoreAbstractFeatures || feature.getStructure().isConcrete()) && !feature.getStructure().hasHiddenParent()) {
 				featureMap.put(feature.getName(), selectableFeature.getSelection() == Selection.SELECTED);
 			}
 		}
@@ -421,8 +421,8 @@ public class ConfigurationPropagator {
 		
 		for (SelectableFeature feature : configuration.features) {
 			if (feature.getSelection() != Selection.UNDEFINED 
-					&& (configuration.ignoreAbstractFeatures || feature.getFeature().isConcrete())
-					&& !feature.getFeature().hasHiddenParent()) {
+					&& (configuration.ignoreAbstractFeatures || feature.getFeature().getStructure().isConcrete())
+					&& !feature.getFeature().getStructure().hasHiddenParent()) {
 				children.add(new Literal(feature.getFeature().getName(), feature.getSelection() == Selection.SELECTED));
 			}
 		}
@@ -456,7 +456,7 @@ public class ConfigurationPropagator {
 		final Set<String> resultSet = new HashSet<String>();
 		for (SelectableFeature selectableFeature : configuration.features) {
 			final IFeature f = selectableFeature.getFeature();
-			if ((abstractFeatures && f.isAbstract()) || (hiddenFeatures && f.hasHiddenParent())) {
+			if ((abstractFeatures && f.getStructure().isAbstract()) || (hiddenFeatures && f.getStructure().hasHiddenParent())) {
 				resultSet.add(f.getName());
 			}
 		}
