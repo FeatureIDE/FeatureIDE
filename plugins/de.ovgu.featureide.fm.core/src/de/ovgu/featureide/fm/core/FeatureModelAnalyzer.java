@@ -139,7 +139,7 @@ public class FeatureModelAnalyzer {
 		return cachedValidity;
 	}
 	
-	protected FeatureModelAnalyzer(IFeatureModel fm) {
+	public FeatureModelAnalyzer(IFeatureModel fm) {
 		this.fm = fm;
 	}
 

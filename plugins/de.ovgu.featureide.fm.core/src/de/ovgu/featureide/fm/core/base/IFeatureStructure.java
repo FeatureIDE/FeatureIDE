@@ -46,6 +46,8 @@ public interface IFeatureStructure {
 
 	void changeToOr();
 
+	IFeatureStructure cloneSubtree(IFeatureModel newFeatureModel);
+
 	int getChildIndex(IFeatureStructure feature);
 
 	LinkedList<IFeatureStructure> getChildren();
@@ -127,7 +129,5 @@ public interface IFeatureStructure {
 	void setParent(IFeatureStructure newParent);
 
 	void setRelevantConstraints();
-
-	IFeatureStructure clone(IFeature newFeature);
 
 }

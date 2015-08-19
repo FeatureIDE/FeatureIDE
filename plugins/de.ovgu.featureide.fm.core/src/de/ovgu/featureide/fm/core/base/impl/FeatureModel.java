@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.EMPTY_FEATURE_MODEL;
-
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
@@ -30,18 +28,12 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
-
 import org.eclipse.core.resources.IProject;
-import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.FMComposerManager;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
-import de.ovgu.featureide.fm.core.FeatureModelLayout;
 import de.ovgu.featureide.fm.core.IFMComposerExtension;
 import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.RenamingsManager;
@@ -65,58 +57,62 @@ import de.ovgu.featureide.fm.core.filter.base.Filter;
  */
 public class FeatureModel implements IFeatureModel, PropertyConstants {
 
-	private final IFeatureModelProperty property;
-	private final IFeatureModelStructure structure;
-	
+	protected final FeatureModelAnalyzer analyser = createAnalyser();
+	protected final List<IConstraint> constraints = new LinkedList<>();
+
 	/**
 	 * A list containing the feature names in their specified order will be
 	 * initialized in XmlFeatureModelReader.
 	 */
-	private final List<String> featureOrderList;
-
-	private boolean featureOrderUserDefined;
-	
-	@Override
-	public List<String> getFeatureOrderList() {
-		if (featureOrderList.isEmpty()) {
-			return Filter.toString(getFeatures(), new ConcreteFeatureFilter());
-		}
-		return featureOrderList;
-	}
-
-	@Override
-	public boolean isFeatureOrderUserDefined() {
-		return featureOrderUserDefined;
-	}
-
-	@Override
-	public void setFeatureOrderList(List<String> featureOrderList) {
-		this.featureOrderList.clear();
-		this.featureOrderList.addAll(featureOrderList);
-	}
-
-	@Override
-	public void setFeatureOrderUserDefined(boolean featureOrderUserDefined) {
-		this.featureOrderUserDefined = featureOrderUserDefined;
-	}
-	
+	protected final List<String> featureOrderList;
+	protected boolean featureOrderUserDefined;
 	/**
 	 * A {@link Map} containing all features.
 	 */
-	private final Map<String, IFeature> featureTable = new ConcurrentHashMap<>();
+	protected final Map<String, IFeature> featureTable = new ConcurrentHashMap<>();
 
-	protected final List<IConstraint> constraints = new LinkedList<>();
-	
-	private final List<PropertyChangeListener> listenerList = new LinkedList<>();
-	
-	private final FeatureModelAnalyzer analyser = createAnalyser();
-	
-	private final RenamingsManager renamingsManager = new RenamingsManager(this);
-	
-	private Object undoContext;
-	
-	private FMComposerManager fmComposerManager;
-	
+	protected FMComposerManager fmComposerManager = null;
+
+	protected final List<PropertyChangeListener> listenerList = new LinkedList<>();
+
+	protected final IFeatureModelProperty property;
+
+	protected final RenamingsManager renamingsManager = new RenamingsManager(this);
+
+	protected final IFeatureModelStructure structure;
+
+	protected Object undoContext = null;
+
+	public FeatureModel() {
+		featureOrderList = new LinkedList<String>();
+		featureOrderUserDefined = false;
+
+		property = FeatureModelFactory.getInstance().createFeatureModelProperty(this);
+		structure = FeatureModelFactory.getInstance().createFeatureModelStructure(this);
+	}
+
+	protected FeatureModel(FeatureModel oldFeatureModel, IFeature newRoot) {
+		featureOrderList = new LinkedList<String>(oldFeatureModel.featureOrderList);
+		featureOrderUserDefined = oldFeatureModel.featureOrderUserDefined;
+
+		property = oldFeatureModel.getProperty().clone(this);
+		structure = FeatureModelFactory.getInstance().createFeatureModelStructure(this);
+
+		if (newRoot == null) {
+			structure.setRoot(structure.getRoot().cloneSubtree(this));
+			for (final IConstraint constraint : oldFeatureModel.constraints) {
+				constraints.add(constraint.clone(this));
+			}
+		} else {
+			structure.setRoot(newRoot.getFeatureStructure().cloneSubtree(this));
+			for (final IConstraint constraint : oldFeatureModel.constraints) {
+				if (featureTable.keySet().containsAll(Filter.toString(constraint.getContainedFeatures()))) {
+					constraints.add(constraint.clone(this));
+				}
+			}
+		}
+	}
+
 	@Override
 	public void addConstraint(IConstraint constraint) {
 		constraints.add(constraint);
@@ -144,41 +140,37 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.base.IFeatureModel#clone(de.ovgu.featureide.fm.core.base.IFeature)
+	 */
+	@Override
+	public IFeatureModel clone(IFeature newRoot) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	protected FeatureModelAnalyzer createAnalyser() {
+		return new FeatureModelAnalyzer(this);
+	}
+
 	@Override
 	public void createDefaultValues(String projectName) {
 		String rootName = getValidJavaIdentifier(projectName);
 		if (rootName.isEmpty()) {
 			rootName = "Root";
-		}		
+		}
 		if (featureTable.isEmpty()) {
-			IFeature root = new Feature(this, rootName);
+			final IFeature root = new Feature(this, rootName);
 			structure.setRoot(root.getFeatureStructure());
 			addFeature(root);
 		}
-		IFeature feature = new Feature(this, "Base");
+		final IFeature feature = new Feature(this, "Base");
 		addFeature(feature);
-		
+
 		structure.getRoot().addChild(feature.getFeatureStructure());
-		structure.getRoot().setAbstract(true);		
+		structure.getRoot().setAbstract(true);
 	}
 
-//	@Override
-//	public IFeatureModel deepClone() {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
-//
-//	@Override
-//	public IFeatureModel deepClone(boolean complete) {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
-
-	@Override
-	public void deleteFeatureFromTable(IFeature feature) {
-		featureTable.remove(feature.getName());
-	}
-	
 	@Override
 	public boolean deleteFeature(IFeature feature) {
 		// the root can not be deleted
@@ -187,13 +179,13 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 		}
 
 		// check if it exists
-		String name = feature.getName();
+		final String name = feature.getName();
 		if (!featureTable.containsKey(name)) {
 			return false;
 		}
 
 		// use the group type of the feature to delete
-		IFeatureStructure parent = feature.getFeatureStructure().getParent();
+		final IFeatureStructure parent = feature.getFeatureStructure().getParent();
 
 		if (parent.getChildrenCount() == 1) {
 			if (feature.getFeatureStructure().isAnd()) {
@@ -206,7 +198,7 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 		}
 
 		// add children to parent
-		int index = parent.getChildIndex(feature.getFeatureStructure());
+		final int index = parent.getChildIndex(feature.getFeatureStructure());
 		while (feature.getFeatureStructure().hasChildren()) {
 			parent.addChildAtPosition(index, feature.getFeatureStructure().removeLastChild());
 		}
@@ -216,6 +208,22 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 		featureTable.remove(name);
 		featureOrderList.remove(name);
 		return true;
+	}
+
+	@Override
+	public void deleteFeatureFromTable(IFeature feature) {
+		featureTable.remove(feature.getName());
+	}
+
+	@Override
+	public void fireEvent(PropertyChangeEvent event) {
+		for (final PropertyChangeListener listener : listenerList) {
+			listener.propertyChange(event);
+		}
+	}
+
+	protected void fireEvent(final String action) {
+		fireEvent(new PropertyChangeEvent(this, action, Boolean.FALSE, Boolean.TRUE));
 	}
 
 	@Override
@@ -244,18 +252,16 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	}
 
 	@Override
-	public IFeatureModelProperty getFeatureProperty() {
-		return property;
+	public List<String> getFeatureOrderList() {
+		if (featureOrderList.isEmpty()) {
+			return Filter.toString(getFeatures(), new ConcreteFeatureFilter());
+		}
+		return featureOrderList;
 	}
 
 	@Override
 	public Collection<IFeature> getFeatures() {
 		return Collections.unmodifiableCollection(featureTable.values());
-	}
-
-	@Override
-	public IFeatureModelStructure getFeatureStructure() {
-		return structure;
 	}
 
 	@Override
@@ -266,9 +272,9 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	@Override
 	public FMComposerManager getFMComposerManager(IProject project) {
 		if (fmComposerManager == null) {
-		fmComposerManager = new FMComposerManager(project);
-	}
-	return fmComposerManager;
+			fmComposerManager = new FMComposerManager(project);
+		}
+		return fmComposerManager;
 	}
 
 	@Override
@@ -277,102 +283,29 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	}
 
 	@Override
+	public IFeatureModelProperty getProperty() {
+		return property;
+	}
+
+	@Override
 	public RenamingsManager getRenamingsManager() {
 		return renamingsManager;
 	}
 
 	@Override
-	public void handleModelDataChanged() {
-		fireEvent(MODEL_DATA_CHANGED);		
+	public IFeatureModelStructure getStructure() {
+		return structure;
 	}
 
-	@Override
-	public void handleModelDataLoaded() {
-		fireEvent(MODEL_DATA_LOADED);
-		
-	}
-
-	@Override
-	public IFMComposerExtension initFMComposerExtension(IProject project) {
-		return getFMComposerManager(project);
-	}
-
-	@Override
-	public void removeConstraint(IConstraint constraint) {
-		constraints.remove(constraint);		
-	}
-
-	@Override
-	public void removeConstraint(int index) {
-		constraints.remove(index);		
-		
-	}
-
-	@Override
-	public void removeListener(PropertyChangeListener listener) {
-		listenerList.remove(listener);		
-	}
-
-	@Override
-	public void replaceConstraint(IConstraint constraint, int index) {
-		constraints.set(index, constraint);		
-	}
-
-	@Override
-	public void reset() {
-		if (structure.getRoot() != null) {
-		while (structure.getRoot().hasChildren()) {
-			IFeatureStructure child = structure.getRoot().getLastChild();
-			deleteChildFeatures(child);
-			structure.getRoot().removeChild(child);
-			featureTable.remove(child.getName());
-		}
-		rootFeature = null;
-	}
-	featureTable.clear();
-	renamingsManager.clear();
-	constraints.clear();
-	
-	property.reset();
-	
-//	if (property.getComments() != null) {
-//		property.getComments().clear();
-//	}
-//	if (annotations != null) {
-//		annotations.clear();
-//	}
-	featureOrderList.clear();
-	}
-
-	@Override
-	public void setConstraints(List<IConstraint> constraints) {
-		this.constraints.clear();
-		this.constraints.addAll(constraints);		
-	}
-
-	@Override
-	public void setFeatureTable(Hashtable<String, IFeature> featureTable) {
-		this.featureTable.clear();
-		this.featureTable.putAll(featureTable);		
-	}
-
-	@Override
-	public void fireEvent(PropertyChangeEvent event) {
-		for (PropertyChangeListener listener : listenerList) {
-			listener.propertyChange(event);
-		}
-	}
-	
-	private void fireEvent(final String action) {
-		fireEvent(new PropertyChangeEvent(this,
-			action, Boolean.FALSE, Boolean.TRUE));
+	public Object getUndoContext() {
+		return undoContext;
 	}
 
 	/**
 	 * Removes all invalid java identifiers form a given string.
 	 */
-	private String getValidJavaIdentifier(String s) {
-		StringBuilder stringBuilder = new StringBuilder();
+	protected String getValidJavaIdentifier(String s) {
+		final StringBuilder stringBuilder = new StringBuilder();
 		int i = 0;
 		for (; i < s.length(); i++) {
 			if (Character.isJavaIdentifierStart(s.charAt(i))) {
@@ -388,824 +321,86 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 		}
 		return stringBuilder.toString();
 	}
-	
-//	private Feature rootFeature;
-//	
-//	/**
-//	 * A {@link Map} containing all features.
-//	 */
-//	private final Map<String, Feature> featureTable = new ConcurrentHashMap<String, Feature>();
-//
-//	protected final List<Constraint> constraints = new LinkedList<Constraint>();
-//	
-//	private final List<PropertyChangeListener> listenerList = new LinkedList<PropertyChangeListener>();
-//	
-//	private final FeatureModelAnalyzer analyser = createAnalyser();
-//	
-//	private final RenamingsManager renamingsManager = new RenamingsManager(this);
-//	
-//	/**
-//	 * All comment lines from the model file without line number at which they
-//	 * occur
-//	 */
-//	private final List<String> comments;
-//	
-//	/**
-//	 * Saves the annotations from the model file as they were read,
-//	 * because they were not yet used.
-//	 */
-//	private final List<String> annotations;
-//	
-//	/**
-//	 * A list containing the feature names in their specified order will be
-//	 * initialized in XmlFeatureModelReader.
-//	 */
-//	private final List<String> featureOrderList;
-//	
-//	private final FeatureModelLayout layout;
-//	
-//	private boolean featureOrderUserDefined;
-//	
-//	private boolean featureOrderInXML;
-//	
-//	private Object undoContext;
-//	
-//	private ColorschemeTable colorschemeTable;
-//
-//	private FMComposerManager fmComposerManager;
-//	
-//	public FeatureModel() {
-//		super();
-//
-//		this.featureOrderList = new LinkedList<String>();
-//		this.featureOrderUserDefined = false;
-//		this.featureOrderInXML = false;
-//		
-//		this.comments = new LinkedList<String>();
-//		this.annotations = new LinkedList<String>();
-//		this.colorschemeTable = new ColorschemeTable(this);
-//		this.layout = new FeatureModelLayout();
-//	}
-//
-//	protected FeatureModel(FeatureModel oldFeatureModel, boolean complete) {
-//		super();
-//		
-//		this.featureOrderList = new LinkedList<String>(oldFeatureModel.featureOrderList);
-//		this.featureOrderUserDefined = oldFeatureModel.featureOrderUserDefined;
-//		this.featureOrderInXML = oldFeatureModel.featureOrderInXML;
-//		
-//		if (complete) {
-//			this.annotations = new LinkedList<String>(oldFeatureModel.annotations);
-//			this.comments = new LinkedList<String>(oldFeatureModel.comments);
-//			this.colorschemeTable = oldFeatureModel.colorschemeTable.clone(this);
-//			this.layout = oldFeatureModel.layout.clone();
-//		} else {
-//			this.annotations = null;
-//			this.comments = null;
-//			this.colorschemeTable = new EmptyColorschemeTable();
-//			this.layout = null;
-//		}
-//		
-//		if (oldFeatureModel.rootFeature != null) {
-//			this.rootFeature = oldFeatureModel.rootFeature.clone(this, complete);
-//			
-//			for (final Constraint constraint : oldFeatureModel.constraints) {
-//				this.addConstraint(new Constraint(this, constraint.getNode().clone()));
-//			}
-//		}		
-//	}
-//	
-//	protected FeatureModelAnalyzer createAnalyser() {
-//		return new FeatureModelAnalyzer(this);
-//	}
-//	/**
-//	 * Returns the {@link FeatureModelAnalyzer} which should be used for all calculation 
-//	 * on the {@link FeatureModel}.
-//	 */
-//	@Override
-//    public FeatureModelAnalyzer getAnalyser() {
-//    	return analyser;
-//    }
-//
-//	@Override
-//    public FeatureModelLayout getLayout() {
-//		return layout;
-//    }
-//
-//	public ColorschemeTable getColorschemeTable() {
-//		return colorschemeTable;
-//	}
-//	
-//	@Override
-//	public FMComposerManager getFMComposerManager(final IProject project) {
-//		if (fmComposerManager == null) {
-//			fmComposerManager = new FMComposerManager(project);
-//		}
-//		return fmComposerManager;
-//	}
-//
-//	public IFMComposerExtension initFMComposerExtension(final IProject project) {
-//		return getFMComposerManager(project);
-//	}
-//
-//	public IFMComposerExtension getFMComposerExtension() {
-//		return getFMComposerManager(null).getFMComposerExtension();
-//	}
-//	
-//	@Override
-//	public RenamingsManager getRenamingsManager() {
-//		return renamingsManager;
-//	}
-//	
-//	public void reset() {
-//		if (rootFeature != null) {
-//			while (rootFeature.hasChildren()) {
-//				Feature child = rootFeature.getLastChild();
-//				deleteChildFeatures(child);
-//				rootFeature.removeChild(child);
-//				featureTable.remove(child.getName());
-//			}
-//			rootFeature = null;
-//		}
-//		featureTable.clear();
-//		renamingsManager.clear();
-//		constraints.clear();
-//		if (comments != null) {
-//			comments.clear();
-//		}
-//		if (annotations != null) {
-//			annotations.clear();
-//		}
-//		colorschemeTable.reset();
-//		featureOrderList.clear();
-//	}
-//	
-//	private void deleteChildFeatures(Feature feature) {
-//		while (feature.hasChildren()) {
-//			Feature child = feature.getLastChild();
-//			deleteChildFeatures(child);
-//			feature.removeChild(child);
-//			featureTable.remove(child.getName());
-//		}
-//	}
-//	
-//	/**
-//	 * Creates a default {@link FeatureModel} with a root feature named as the project and a
-//	 * child feature named base.
-//	 * @param projectName The name of the project
-//	 */
-//	public void createDefaultValues(String projectName) {
-//		String rootName = getValidJavaIdentifier(projectName);
-//		if (rootName.isEmpty()) {
-//			rootName = "Root";
-//		}		
-//		if (featureTable.isEmpty()) {
-//			rootFeature = new Feature(this, rootName);
-//			addFeature(rootFeature);
-//		}
-//		Feature feature = new Feature(this, "Base");
-//		addFeature(feature);
-//		
-//		rootFeature.addChild(feature);
-//		rootFeature.setAbstract(true);
-//	}
-//	
 
-//
-//	/* *****************************************************************
-//	 * 
-//	 * Feature handling
-//	 * 
-//	 *******************************************************************/
-//	public void setRoot(Feature root) {
-//		this.rootFeature = root;
-//	}
-//	
-//	public Feature getRoot() {
-//		return rootFeature;
-//	}
-//
-//	/**
-//	 * @param featureTable
-//	 *            the featureTable to set
-//	 */
-//	public void setFeatureTable(final Hashtable<String, Feature> featureTable) {
-//		this.featureTable.clear();
-//		this.featureTable.putAll(featureTable);
-//	}
-//	
-//	public boolean addFeature(Feature feature) {
-//		String name = feature.getName();
-//		if (featureTable.containsKey(name))
-//			return false;
-//		featureTable.put(name, feature);
-//		return true;
-//	}
-//	
-//	public Collection<Feature> getFeatures() {
-//		return Collections.unmodifiableCollection(featureTable.values());
-//	}
-//	
-//	/**
-//	 * @return The {@link Feature} with the given name or {@code null} if there is no feature with this name. 
-//	 */
-//	@CheckForNull
-//	public Feature getFeature(String name) {
-//		return featureTable.get(name);
-//	}
-//
-//	/**
-//	 * 
-//	 * @return A list of all concrete features. This list is in preorder of the tree. 
-//	 */
-//	@Nonnull
-//	public Collection<Feature> getConcreteFeatures() {
-//		List<Feature> concreteFeatures = new LinkedList<Feature>();
-//		if (rootFeature != null) {
-//			getConcreteFeatures(rootFeature, concreteFeatures);
-//		}
-//		return Collections.unmodifiableCollection(concreteFeatures);
-//	}
-//
-//	private void getConcreteFeatures(Feature feature, List<Feature> concreteFeatures) {
-//		if (feature.isConcrete()) {
-//			concreteFeatures.add(feature);
-//		}
-//		for (Feature child : feature.getChildren()) {
-//			getConcreteFeatures(child, concreteFeatures);
-//		}
-//	}
-//	
-//	/**
-//	 * 
-//	 * @return A list of all concrete feature names. This list is in preorder of the tree. 
-//	 */
-//	@Nonnull
-//	public List<String> getConcreteFeatureNames() {
-//		List<String> concreteFeatureNames = new LinkedList<String>();
-//		for (Feature f : getConcreteFeatures()) {
-//			concreteFeatureNames.add(f.getName());
-//		}
-//		return concreteFeatureNames;
-//	}
-//	
-//	public Collection<Feature> getFeaturesPreorder() {
-//		List<Feature> preorderFeatures = new LinkedList<Feature>();
-//		if (rootFeature != null) {
-//			getFeaturesPreorder(rootFeature, preorderFeatures);
-//		}
-//		return Collections.unmodifiableCollection(preorderFeatures);
-//	}
-//
-//	private void getFeaturesPreorder(Feature feature, List<Feature> preorderFeatures) {
-//		
-//		preorderFeatures.add(feature);
-//		for (Feature child : feature.getChildren()) {
-//			getFeaturesPreorder(child, preorderFeatures);
-//		}
-//	}
-//	
-//	public List<String> getFeatureNamesPreorder() {
-//		List<String> preorderFeaturesNames = new LinkedList<String>();
-//		for (Feature f : getFeaturesPreorder()) {
-//			preorderFeaturesNames.add(f.getName());
-//		}
-//		return preorderFeaturesNames;
-//	}
-//	
-//	/**
-//	 * @return <code>true</code> if a feature with the given name exists and is concrete.
-//	 * @deprecated Will be removed in a future release. Use {@link #getFeature(String)}.isConcrete() instead.
-//	 */
-//	@Deprecated
-//	public boolean isConcrete(String featureName) {
-//		Feature feature = featureTable.get(featureName);
-//		return feature != null && feature.isConcrete();
-//	}
-//	
-//	/**
-//	 * @return the featureTable
-//	 */
-//	protected Map<String, Feature> getFeatureTable() {
-//		return featureTable;
-//	}
-//	
-//	public Set<String> getFeatureNames() {
-//		return Collections.unmodifiableSet(featureTable.keySet());
-//	}
-//	
-//	public int getNumberOfFeatures() {
-//		return featureTable.size();
-//	}
-//
-//	public void deleteFeatureFromTable(Feature feature) {
-//		featureTable.remove(feature.getName());
-//	}
-//
-//	public boolean deleteFeature(Feature feature) {
-//		// the root can not be deleted
-//		if (feature == rootFeature) {
-//			return false;
-//		}
-//
-//		// check if it exists
-//		String name = feature.getName();
-//		if (!featureTable.containsKey(name)) {
-//			return false;
-//		}
-//
-//		// use the group type of the feature to delete
-//		Feature parent = feature.getParent();
-//
-//		if (parent.getChildrenCount() == 1) {
-//			if (feature.isAnd()) {
-//				parent.setAnd();
-//			} else if (feature.isAlternative()) {
-//				parent.setAlternative();
-//			} else {
-//				parent.setOr();
-//			}
-//		}
-//
-//		// add children to parent
-//		int index = parent.getChildIndex(feature);
-//		while (feature.hasChildren()) {
-//			parent.addChildAtPosition(index, feature.removeLastChild());
-//		}
-//
-//		// delete feature
-//		parent.removeChild(feature);
-//		featureTable.remove(name);
-//		featureOrderList.remove(name);
-//		return true;
-//	}
-//	
-//	public void replaceRoot(Feature feature) {
-//		featureTable.remove(rootFeature.getName());
-//		rootFeature = feature;
-//	}
-//
-//	/* *****************************************************************
-//	 * 
-//	 * Constraint handling
-//	 * 
-//	 *#*****************************************************************/
-//	public void setConstraints(final LinkedList<Constraint> constraints) {
-//		this.constraints.clear();
-//		this.constraints.addAll(constraints);
-//	}
-//	
-//	public void addPropositionalNode(Node node) {
-//		addConstraint(new Constraint(this, node));
-//	}
-//	
-//	public void addConstraint(Constraint constraint) {
-//		constraints.add(constraint);
-//	}
-//
-//	public void addPropositionalNode(Node node, int index) {
-//		addConstraint(new Constraint(this, node), index);
-//	}
-//	
-//	public void addConstraint(Constraint constraint, int index) {
-//		constraints.add(index, constraint);
-//	}
-//	
-//	public List<Node> getPropositionalNodes() {
-//		LinkedList<Node> nodes = new LinkedList<Node>();
-//		for (Constraint c : constraints) {
-//			nodes.add(c.getNode());
-//		}
-//		return Collections.unmodifiableList(nodes);
-//	}
-//	
-//	public Node getConstraint(int index) {
-//		return constraints.get(index).getNode();
-//	}
-//	                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
-//	public List<Constraint> getConstraints() {
-//		return Collections.unmodifiableList(constraints);
-//	}
-//
-//	/**
-//	 * 
-//	 * @param constraint
-//	 * @return The position of the given {@link Constraint} or 
-//	 * 			-1 if it does not exist.
-//	 */
-//	public int getConstraintIndex(Constraint constraint) {
-//		int j = 0;
-//		for (Constraint c : constraints) {
-//			if (constraint == c) {
-//				return j;
-//			}
-//			j++;
-//		}
-//		return -1;
-//	}
-//
-//	public void removePropositionalNode(Node node) {
-//		for (Constraint c : constraints) {
-//			if (c.getNode().equals(node)) {
-//				removeConstraint(c);
-//				break;
-//			}
-//		}
-//	}
-//
-//	public void removeConstraint(Constraint constraint) {
-//		constraints.remove(constraint);
-//	}
-//
-//	public void removeConstraint(int index) {
-//		constraints.remove(index);
-//	}
-//	
-//	public void replacePropNode(int index, Node node) {
-//		assert (index < constraints.size());
-//		constraints.set(index, new Constraint(this, node));
-//	}
-//	
-//	public int getConstraintCount() {
-//		return constraints.size();
-//	}
-//	
-//	public List<String> getAnnotations() {
-//		return Collections.unmodifiableList(annotations);
-//	}
-//
-//	public void addAnnotation(String annotation) {
-//		annotations.add(annotation);
-//	}
-//
-//	public List<String> getComments() {
-//		return Collections.unmodifiableList(comments);
-//	}
-//
-//	public void addComment(String comment) {
-//		comments.add(comment);
-//	}
-//	
-//	public void addListener(PropertyChangeListener listener) {
-//		if (!listenerList.contains(listener)) {
-//			listenerList.add(listener);
-//		}
-//	}
-//
-//	public void removeListener(PropertyChangeListener listener) {
-//		listenerList.remove(listener);
-//	}
-//	
-//	public void handleModelDataLoaded() {
-//		fireEvent(MODEL_DATA_LOADED);
-//	}
-//
-//	public void handleModelDataChanged() {
-//		fireEvent(MODEL_DATA_CHANGED);
-//	}
-//	
-//	public void handleModelLayoutChanged() {
-//		fireEvent(MODEL_LAYOUT_CHANGED);
-//	}
-//	
-//	public void handleLegendLayoutChanged() {
-//		fireEvent(LEGEND_LAYOUT_CHANGED);
-//	}
-//	
-//	public void refreshContextMenu() {
-//		fireEvent(REFRESH_ACTIONS);
-//	}
-//	/**
-//	 * Refreshes the diagram colors.
-//	 */
-//	public void redrawDiagram() {
-//		fireEvent(REDRAW_DIAGRAM);
-//	}
-//	
-//	private final void fireEvent(final String action) {
-//		final PropertyChangeEvent event = new PropertyChangeEvent(this,
-//				action, Boolean.FALSE, Boolean.TRUE);
-//		for (PropertyChangeListener listener : listenerList) {
-//			listener.propertyChange(event);
-//		}
-//	}
-//	
-//	@Override
-//	public FeatureModel clone() {
-//		final FeatureModel clone = new FeatureModel();
-//		clone.featureTable.putAll(featureTable);
-//		if (rootFeature == null) {
-//			// TODO this should never happen
-//			clone.rootFeature = new Feature(clone, "Root");
-//			clone.featureTable.put("root", clone.rootFeature);
-//		} else {
-//			clone.rootFeature = clone.getFeature(rootFeature.getName());
-//		}
-//		clone.constraints.addAll(constraints);
-//		clone.annotations.addAll(annotations);
-//		clone.comments.addAll(comments);
-//		clone.colorschemeTable = colorschemeTable.clone(clone);
-//		return clone;
-//	}
-//	
-//	/**
-//	 * Will return the value of clone(true).
-//	 * @return a deep copy from the feature model
-//	 * 
-//	 * @see #clone(boolean)
-//	 */
-//	public FeatureModel deepClone() {
-//		return deepClone(true);
-//	}
-//	
-//	/**
-//	 * Clones the feature model.
-//	 * Makes a deep copy from all fields in the model.</br>
-//	 * Note that: {@code fm == fm.clone(false)} and {@code fm == fm.clone(true)} are {@code false} in every case.
-//	 * 
-//	 * @param complete If {@code false} the fields annotations, comments, colorschemeTable and layout
-//	 * are set to {@code null} for a faster cloning process.
-//	 * @return a deep copy from the feature model
-//	 * 
-//	 * @see #clone()
-//	 */
-//	public FeatureModel deepClone(boolean complete) {
-//		return new FeatureModel(this, complete);
-//	}
-//
-//	/**
-//	 * @return true if feature model contains mandatory features otherwise false
-//	 */
-//	public boolean hasMandatoryFeatures() {
-//		for (Feature f : featureTable.values()) {
-//			Feature parent = f.getParent();
-//			if (parent != null && parent.isAnd() && f.isMandatory())
-//				return true;
-//		}
-//		return false;
-//	}
-//
-//	/**
-//	 * @return <code>true</code> if feature model contains optional features otherwise false
-//	 */
-//	public boolean hasOptionalFeatures() {
-//		for (Feature f : featureTable.values()) {
-//			if (!f.equals(rootFeature) && f.getParent().isAnd()
-//					&& !f.isMandatory())
-//				return true;
-//		}
-//		return false;
-//	}
-//
-//	/**
-//	 * @return true if feature model contains and group otherwise false
-//	 */
-//	public boolean hasAndGroup() {
-//		for (Feature f : featureTable.values()) {
-//			if (f.getChildrenCount() > 1 && f.isAnd())
-//				return true;
-//		}
-//		return false;
-//	}
-//
-//	/**
-//	 * @return true if feature model contains alternative group otherwise false
-//	 */
-//	public boolean hasAlternativeGroup() {
-//		for (Feature f : featureTable.values()) {
-//			if (f.getChildrenCount() > 1 && f.isAlternative())
-//				return true;
-//		}
-//		return false;
-//	}
-//	
-//	/**
-//	 * @return true if feature model contains or group otherwise false
-//	 */
-//	public boolean hasOrGroup() {
-//		for (Feature f : featureTable.values()) {
-//			if (f.getChildrenCount() > 1 && f.isOr())
-//				return true;
-//		}
-//		return false;
-//	}
-//
-//	public boolean hasAbstract() {
-//		for (Feature f : featureTable.values()) {
-//			if (f.isAbstract())
-//				return true;
-//		}
-//		return false;
-//	}
-//
-//	public boolean hasConcrete() {
-//		for (Feature f : featureTable.values()) {
-//			if (f.isConcrete())
-//				return true;
-//		}
-//		return false;
-//	}
-//	
-//	/**
-//	 * @return number of or groups contained in the feature model
-//	 */
-//	public int numOrGroup() {
-//		int count = 0;
-//		for (Feature f : featureTable.values()) {
-//			if (f.getChildrenCount() > 1 && f.isOr()) {
-//				count++;
-//			}
-//		}
-//		return count;
-//	}
-//	
-//	public int numAlternativeGroup() {
-//		int count = 0;
-//		for (Feature f : featureTable.values()) {
-//			if (f.getChildrenCount() > 1 && f.isAlternative()) {
-//				count++;
-//			}
-//		}
-//		return count;
-//	}
-//	
-//	/**
-//	 * 
-//	 * @return <code>true</code> if the feature model contains a hidden feature
-//	 */
-//	public boolean hasHidden() {
-//		for (Feature f : featureTable.values()) {
-//			if (f.isHidden()) {
-//				return true;
-//			}
-//		}
-//		return false;
-//	}
-//
-//	public boolean hasIndetHidden() {
-//		for (Feature f : featureTable.values()) {
-//			if (f.getFeatureStatus() == FeatureStatus.INDETERMINATE_HIDDEN) {
-//				return true;
-//			}
-//		}
-//		return false;
-//	}
-//	
-//	public boolean hasUnsatisfiableConst() {
-//		for (Constraint c : constraints) {
-//			if (c.getConstraintAttribute() == ConstraintAttribute.UNSATISFIABLE) {
-//				return true;
-//			}
-//		}
-//		return false;
-//	}
-//	
-//	public boolean hasTautologyConst() {
-//		for (Constraint c : constraints) {
-//			if (c.getConstraintAttribute() == ConstraintAttribute.TAUTOLOGY) {
-//				return true;
-//			}
-//		}
-//		return false;
-//	}
-//	public boolean hasDeadConst() {
-//		for (Constraint c : constraints) {
-//			if (c.getConstraintAttribute() == ConstraintAttribute.DEAD || !c.getDeadFeatures().isEmpty()) {
-//				return true;
-//			}
-//		}
-//		return false;
-//	}
-//	
-//	public boolean hasVoidModelConst() {
-//		for (Constraint c : constraints) {
-//			if (c.getConstraintAttribute() == ConstraintAttribute.VOID_MODEL)
-//				return true;
-//		}
-//		return false;
-//	}
-//	
-//	public boolean hasRedundantConst() {
-//		for (Constraint c : constraints) {
-//			if (c.getConstraintAttribute() == ConstraintAttribute.REDUNDANT) {
-//				return true;
-//			}
-//		}
-//		return false;
-//	}
-//
-//
-//	public boolean hasFalseOptionalFeatures() {
-//		for (Feature f : featureTable.values()) {
-//			if (f.getFeatureStatus() == FeatureStatus.FALSE_OPTIONAL) {
-//				return true;
-//			}
-//		}
-//		return false;
-//	}
-//
-//	public void setUndoContext(Object undoContext) {
-//		this.undoContext = undoContext;
-//	}
-//
-//	public Object getUndoContext() {
-//		return undoContext;
-//	}
-//
-//	public List<String> getFeatureOrderList() {
-//		if (featureOrderList.isEmpty()) {
-//			return getConcreteFeatureNames();
-//		}
-//		return featureOrderList;
-//	}
-//
-//	public void setFeatureOrderList(final List<String> featureOrderList) {
-//		this.featureOrderList.clear();
-//		this.featureOrderList.addAll(featureOrderList);
-//	}
-//
-//	public boolean isFeatureOrderUserDefined() {
-//		return featureOrderUserDefined;
-//	}
-//
-//	public void setFeatureOrderUserDefined(boolean featureOrderUserDefined) {
-//		this.featureOrderUserDefined = featureOrderUserDefined;
-//	}
-//
-//	public boolean isFeatureOrderInXML() {
-//		return featureOrderInXML;
-//	}
-//
-//	public void setFeatureOrderInXML(boolean featureOrderInXML) {
-//		this.featureOrderInXML = featureOrderInXML;
-//	}
-//	
-//	@Override
-//	public String toString() {
-//		String x = "";
-//		try {
-//			x = toString(getRoot());
-//			for (Constraint c : getConstraints()) {
-//				x +=c.toString() + " ";
-//			}
-//		} catch (Exception e) {
-//			return EMPTY_FEATURE_MODEL;
-//		}
-//		return x;
-//	}
-//	
-//	private String toString(Feature feature) {
-//		String x = feature.getName();
-//		if (!feature.hasChildren()) {
-//			return x;
-//		}
-//		if (feature.isOr()) {
-//			x += " or [";
-//		} else if (feature.isAlternative()) {
-//			x += " alt [";
-//		} else {
-//			x += " and [";
-//		}
-//		
-//		for (Feature child : feature.getChildren()) {
-//			x += " ";
-//			if (feature.isAnd()) {
-//				if (child.isMandatory()) {
-//					x += "M ";
-//				} else {
-//					x += "O ";
-//				}
-//			}
-//			
-//			if (child.hasChildren()) {
-//				x += toString(child);
-//			} else {
-//				x += child.getName();
-//			}
-//		}
-//		return x + " ] ";
-//	}
-//	
-//	@Override
-//	public boolean equals(Object obj) {
-//		return obj == this;// TODO equals should be implemented
-//	}
-//	
-//	@Override
-//	public int hashCode() {
-//		int hash = 31;
-//		for (String f : featureOrderList) {
-//			hash = hash * 7 + f.hashCode();
-//		}
-//		for (Constraint c : constraints) {
-//			hash = hash * 7 + c.toString().hashCode();
-//		}
-//		return hash;
-//	}
-//
-//	@Override
-//	public GraphicItem getItemType() {
-//		return GraphicItem.Model;
-//	}
+	@Override
+	public void handleModelDataChanged() {
+		fireEvent(MODEL_DATA_CHANGED);
+	}
+
+	@Override
+	public void handleModelDataLoaded() {
+		fireEvent(MODEL_DATA_LOADED);
+
+	}
+
+	@Override
+	public IFMComposerExtension initFMComposerExtension(IProject project) {
+		return getFMComposerManager(project);
+	}
+
+	@Override
+	public boolean isFeatureOrderUserDefined() {
+		return featureOrderUserDefined;
+	}
+
+	@Override
+	public void removeConstraint(IConstraint constraint) {
+		constraints.remove(constraint);
+	}
+
+	@Override
+	public void removeConstraint(int index) {
+		constraints.remove(index);
+
+	}
+
+	@Override
+	public void removeListener(PropertyChangeListener listener) {
+		listenerList.remove(listener);
+	}
+
+	@Override
+	public void replaceConstraint(IConstraint constraint, int index) {
+		constraints.set(index, constraint);
+	}
+
+	@Override
+	public void reset() {
+		structure.setRoot(null);
+
+		featureTable.clear();
+		renamingsManager.clear();
+		constraints.clear();
+		featureOrderList.clear();
+
+		property.reset();
+	}
+
+	@Override
+	public void setConstraints(List<IConstraint> constraints) {
+		this.constraints.clear();
+		this.constraints.addAll(constraints);
+	}
+
+	@Override
+	public void setFeatureOrderList(List<String> featureOrderList) {
+		this.featureOrderList.clear();
+		this.featureOrderList.addAll(featureOrderList);
+	}
+
+	@Override
+	public void setFeatureOrderUserDefined(boolean featureOrderUserDefined) {
+		this.featureOrderUserDefined = featureOrderUserDefined;
+	}
+
+	@Override
+	public void setFeatureTable(Hashtable<String, IFeature> featureTable) {
+		this.featureTable.clear();
+		this.featureTable.putAll(featureTable);
+	}
+
+	public void setUndoContext(Object undoContext) {
+		this.undoContext = undoContext;
+	}
 
 }

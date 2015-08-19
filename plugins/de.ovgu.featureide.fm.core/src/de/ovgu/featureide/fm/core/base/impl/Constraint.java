@@ -47,57 +47,25 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  */
 public class Constraint implements IConstraint, PropertyConstants {
 
-	private final Collection<PropertyChangeListener> listenerList = new LinkedList<>();
+	protected ConstraintAttribute attribute = ConstraintAttribute.NORMAL;
 
-	private final IFeatureModel featureModel;
-	private final Node propNode;
+	protected final Collection<IFeature> containedFeatureList = new LinkedList<>();
+	protected final Collection<IFeature> deadFeatures = new LinkedList<>();
 
-	private final Collection<IFeature> containedFeatureList = new LinkedList<>();
-	private final Collection<IFeature> falseOptionalFeatures = new LinkedList<>();
-	private final Collection<IFeature> deadFeatures = new LinkedList<>();
+	protected final Collection<IFeature> falseOptionalFeatures = new LinkedList<>();
+	protected final IFeatureModel featureModel;
+	protected final Collection<PropertyChangeListener> listenerList = new LinkedList<>();
 
-	private ConstraintAttribute attribute = ConstraintAttribute.NORMAL;
+	protected final Node propNode;
+
+	protected Constraint(Constraint oldConstraint, IFeatureModel featureModel) {
+		this.featureModel = featureModel;
+		propNode = oldConstraint.propNode;
+	}
 
 	public Constraint(IFeatureModel featureModel, Node propNode) {
 		this.featureModel = featureModel;
 		this.propNode = propNode;
-	}
-
-	/**
-	 * Looks for all dead features if they ares caused dead by this constraint
-	 * 
-	 * @param solver
-	 * @param fm The actual model
-	 * @param fmDeadFeatures The dead features the complete model
-	 * @return The dead features caused by this constraint
-	 */
-	@Override
-	public Collection<IFeature> getDeadFeatures(SatSolver solver, IFeatureModel fm, Collection<IFeature> fmDeadFeatures) {
-		final Collection<IFeature> deadFeatures;
-		final Node propNode = this.getNode();
-		final Comparator<IFeature> featComp = new FeatureComparator(true);
-		if (propNode != null) {
-			deadFeatures = fm.getAnalyser().getDeadFeatures(solver, propNode);
-		} else {
-			deadFeatures = new TreeSet<IFeature>(featComp);
-		}
-		final Collection<IFeature> deadFeaturesAfter = new TreeSet<>(featComp);
-
-		deadFeaturesAfter.addAll(fmDeadFeatures);
-		deadFeaturesAfter.retainAll(deadFeatures);
-		return deadFeaturesAfter;
-	}
-
-	@Override
-	public boolean setFalseOptionalFeatures(IFeatureModel clone, Collection<IFeature> fmFalseOptionals) {
-		falseOptionalFeatures.clear();
-		falseOptionalFeatures.addAll(clone.getAnalyser().getFalseOptionalFeatures(fmFalseOptionals));
-		fmFalseOptionals.removeAll(falseOptionalFeatures);
-		return !falseOptionalFeatures.isEmpty();
-	}
-
-	private void fire(PropertyChangeEvent event) {
-		fireEvent(event);
 	}
 
 	@Override
@@ -108,19 +76,24 @@ public class Constraint implements IConstraint, PropertyConstants {
 	}
 
 	@Override
-	public ConstraintAttribute getConstraintAttribute() {
-		return attribute;
+	public IConstraint clone(IFeatureModel newFeatureModel) {
+		return new Constraint(this, newFeatureModel);
 	}
 
-	/**
-	 * Sets the <code>containedFeatureList</code> given by <code>propNode</code>.
-	 */
+	protected void fire(PropertyChangeEvent event) {
+		fireEvent(event);
+	}
+
 	@Override
-	public void setContainedFeatures() {
-		containedFeatureList.clear();
-		for (String featureName : propNode.getContainedFeatures()) {
-			containedFeatureList.add(featureModel.getFeature(featureName));
+	public void fireEvent(PropertyChangeEvent event) {
+		for (final PropertyChangeListener listener : listenerList) {
+			listener.propertyChange(event);
 		}
+	}
+
+	@Override
+	public ConstraintAttribute getConstraintAttribute() {
+		return attribute;
 	}
 
 	/**
@@ -140,6 +113,31 @@ public class Constraint implements IConstraint, PropertyConstants {
 		return deadFeatures;
 	}
 
+	/**
+	 * Looks for all dead features if they ares caused dead by this constraint
+	 * 
+	 * @param solver
+	 * @param fm The actual model
+	 * @param fmDeadFeatures The dead features the complete model
+	 * @return The dead features caused by this constraint
+	 */
+	@Override
+	public Collection<IFeature> getDeadFeatures(SatSolver solver, IFeatureModel fm, Collection<IFeature> fmDeadFeatures) {
+		final Collection<IFeature> deadFeatures;
+		final Node propNode = getNode();
+		final Comparator<IFeature> featComp = new FeatureComparator(true);
+		if (propNode != null) {
+			deadFeatures = fm.getAnalyser().getDeadFeatures(solver, propNode);
+		} else {
+			deadFeatures = new TreeSet<IFeature>(featComp);
+		}
+		final Collection<IFeature> deadFeaturesAfter = new TreeSet<>(featComp);
+
+		deadFeaturesAfter.addAll(fmDeadFeatures);
+		deadFeaturesAfter.retainAll(deadFeatures);
+		return deadFeaturesAfter;
+	}
+
 	@Override
 	public Collection<IFeature> getFalseOptional() {
 		return falseOptionalFeatures;
@@ -157,7 +155,7 @@ public class Constraint implements IConstraint, PropertyConstants {
 
 	@Override
 	public boolean hasHiddenFeatures() {
-		for (IFeature f : getContainedFeatures()) {
+		for (final IFeature f : getContainedFeatures()) {
 			if (f.getFeatureStructure().isHidden() || f.getFeatureStructure().hasHiddenParent()) {
 				return true;
 			}
@@ -172,11 +170,22 @@ public class Constraint implements IConstraint, PropertyConstants {
 
 	@Override
 	public void setConstraintAttribute(ConstraintAttribute attri, boolean fire) {
-		this.attribute = attri;
+		attribute = attri;
 		if (fire) {
 			fire(new PropertyChangeEvent(this, ATTRIBUTE_CHANGED, Boolean.FALSE, Boolean.TRUE));
 		}
 
+	}
+
+	/**
+	 * Sets the <code>containedFeatureList</code> given by <code>propNode</code>.
+	 */
+	@Override
+	public void setContainedFeatures() {
+		containedFeatureList.clear();
+		for (final String featureName : propNode.getContainedFeatures()) {
+			containedFeatureList.add(featureModel.getFeature(featureName));
+		}
 	}
 
 	@Override
@@ -186,9 +195,11 @@ public class Constraint implements IConstraint, PropertyConstants {
 	}
 
 	@Override
-	public void fireEvent(PropertyChangeEvent event) {
-		for (PropertyChangeListener listener : listenerList)
-			listener.propertyChange(event);
+	public boolean setFalseOptionalFeatures(IFeatureModel clone, Collection<IFeature> fmFalseOptionals) {
+		falseOptionalFeatures.clear();
+		falseOptionalFeatures.addAll(clone.getAnalyser().getFalseOptionalFeatures(fmFalseOptionals));
+		fmFalseOptionals.removeAll(falseOptionalFeatures);
+		return !falseOptionalFeatures.isEmpty();
 	}
 
 }

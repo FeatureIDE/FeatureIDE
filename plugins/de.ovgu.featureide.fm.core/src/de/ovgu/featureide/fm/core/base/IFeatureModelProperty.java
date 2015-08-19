@@ -33,6 +33,8 @@ public interface IFeatureModelProperty {
 
 	void addComment(String comment);
 
+	IFeatureModelProperty clone(IFeatureModel newFeatureNodel);
+
 	List<String> getAnnotations();
 
 	List<String> getComments();
@@ -41,8 +43,8 @@ public interface IFeatureModelProperty {
 
 	boolean isFeatureOrderInXML();
 
-	void setFeatureOrderInXML(boolean featureOrderInXML);
+	void reset();
 
-	IFeatureModelProperty clone(IFeatureModel newFeatureNodel);
+	void setFeatureOrderInXML(boolean featureOrderInXML);
 
 }

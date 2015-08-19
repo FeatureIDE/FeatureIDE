@@ -29,29 +29,22 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IGraphicalFeature;
 
 /**
- * Provides all properties of a feature. This includes its connections to parent
- * and child features.
+ * Graphical representation of an {@link IFeature} instance.
  * 
- * @author Thomas Thuem
  * @author Sebastian Krieter
  * 
  */
 public class GraphicalFeature implements IGraphicalFeature, PropertyConstants {
 
-	private boolean constraintSelected;
+	protected ColorList colorList = new ColorList(getFeature());
 
-	private ColorList colorList = new ColorList(this.getFeature());
-	private IFeature correspondingFeature;
+	protected boolean constraintSelected;
+	protected IFeature correspondingFeature;
 
-	private FMPoint location = new FMPoint(0, 0);;
+	protected FMPoint location = new FMPoint(0, 0);;
 
 	public GraphicalFeature(IFeature correspondingFeature) {
 		this.correspondingFeature = correspondingFeature;
-	}
-
-	@Override
-	public GraphicItem getItemType() {
-		return GraphicItem.Feature;
 	}
 
 	@Override
@@ -62,6 +55,11 @@ public class GraphicalFeature implements IGraphicalFeature, PropertyConstants {
 	@Override
 	public IFeature getFeature() {
 		return correspondingFeature;
+	}
+
+	@Override
+	public GraphicItem getItemType() {
+		return GraphicItem.Feature;
 	}
 
 	@Override
@@ -76,7 +74,7 @@ public class GraphicalFeature implements IGraphicalFeature, PropertyConstants {
 
 	@Override
 	public void setConstraintSelected(boolean selection) {
-		this.constraintSelected = selection;
+		constraintSelected = selection;
 		correspondingFeature.fireEvent(new PropertyChangeEvent(this, ATTRIBUTE_CHANGED, Boolean.FALSE, Boolean.TRUE));
 	}
 

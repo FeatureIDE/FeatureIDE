@@ -24,62 +24,50 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelProperty;
 
 /**
- * The model representation of the feature tree that notifies listeners of
- * changes in the tree.
+ * All additional properties of one {@link IFeature} instance.
  * 
- * @author Thomas Thuem
- * @author Florian Proksch
- * @author Stefan Krueger
  * @author Sebastian Krieter
  * 
  */
 public class FeatureModelProperty implements IFeatureModelProperty {
 
-	private final IFeatureModel correspondingFeatureModel;
+	/**
+	 * Saves the annotations from the model file as they were read,
+	 * because they were not yet used.
+	 */
+	protected final List<String> annotations;
 
 	/**
 	 * All comment lines from the model file without line number at which they
 	 * occur
 	 */
-	private final List<String> comments;
+	protected final List<String> comments;
 
-	/**
-	 * Saves the annotations from the model file as they were read,
-	 * because they were not yet used.
-	 */
-	private final List<String> annotations;
+	protected final IFeatureModel correspondingFeatureModel;
 
-	private boolean featureOrderInXML;
+	protected boolean featureOrderInXML;
+
+	protected FeatureModelProperty(FeatureModelProperty oldProperty, IFeatureModel correspondingFeatureModel) {
+		this.correspondingFeatureModel = correspondingFeatureModel != null ? correspondingFeatureModel : oldProperty.correspondingFeatureModel;
+
+		featureOrderInXML = oldProperty.featureOrderInXML;
+
+		comments = new LinkedList<>(oldProperty.comments);
+		annotations = new LinkedList<>(oldProperty.annotations);
+	}
 
 	public FeatureModelProperty(IFeatureModel correspondingFeatureModel) {
 		this.correspondingFeatureModel = correspondingFeatureModel;
 
-//		this.featureOrderList = new LinkedList<>();
-//		this.featureOrderUserDefined = false;
-		this.featureOrderInXML = false;
+		featureOrderInXML = false;
 
-		this.comments = new LinkedList<>();
-		this.annotations = new LinkedList<>();
-	}
-
-	public FeatureModelProperty(IFeatureModelProperty property, IFeatureModel correspondingFeatureModel) {
-		this.correspondingFeatureModel = correspondingFeatureModel;
-
-//		this.featureOrderUserDefined = property.isFeatureOrderUserDefined();
-//		if (this.featureOrderUserDefined) {
-//			this.featureOrderList = new LinkedList<>(property.getFeatureOrderList());
-//		} else {
-//			this.featureOrderList = new LinkedList<>();
-//		}
-		
-		this.featureOrderInXML = property.isFeatureOrderInXML();
-
-		this.comments = new LinkedList<>(property.getComments());
-		this.annotations = new LinkedList<>(property.getAnnotations());
+		comments = new LinkedList<>();
+		annotations = new LinkedList<>();
 	}
 
 	@Override
@@ -91,6 +79,11 @@ public class FeatureModelProperty implements IFeatureModelProperty {
 	@Override
 	public void addComment(String comment) {
 		comments.add(comment);
+	}
+
+	@Override
+	public IFeatureModelProperty clone(IFeatureModel newFeatureNodel) {
+		return new FeatureModelProperty(this, newFeatureNodel);
 	}
 
 	@Override
@@ -107,21 +100,22 @@ public class FeatureModelProperty implements IFeatureModelProperty {
 	public IFeatureModel getFeatureModel() {
 		return correspondingFeatureModel;
 	}
-	
+
 	@Override
 	public boolean isFeatureOrderInXML() {
 		return featureOrderInXML;
 	}
 
 	@Override
-	public void setFeatureOrderInXML(boolean featureOrderInXML) {
-		this.featureOrderInXML = featureOrderInXML;
+	public void reset() {
+		featureOrderInXML = false;
+		comments.clear();
+		annotations.clear();
 	}
 
-
 	@Override
-	public IFeatureModelProperty clone(IFeatureModel newFeatureNodel) {
-		return new FeatureModelProperty(this, newFeatureNodel);
+	public void setFeatureOrderInXML(boolean featureOrderInXML) {
+		this.featureOrderInXML = featureOrderInXML;
 	}
 
 }

@@ -44,16 +44,6 @@ public class FeatureModelFactory implements IFeatureModelFactory {
 	}
 
 	@Override
-	public IFeature copyFeature(IFeature feature, IFeatureModel featureModel) {
-		return new Feature(feature, featureModel);
-	}
-
-	@Override
-	public IFeatureModel copyFeatureModel(IFeatureModel oldFeatureModel) {
-		return null;
-	}
-
-	@Override
 	public IConstraint createConstraint(IFeatureModel featureModel, Node propNode) {
 		return new Constraint(featureModel, propNode);
 	}
@@ -65,27 +55,27 @@ public class FeatureModelFactory implements IFeatureModelFactory {
 
 	@Override
 	public IFeatureModel createFeatureModel() {
-		return null;
+		return new FeatureModel();
 	}
-	
+
 	@Override
-	public IFeatureStructure createFeatureStructure(IFeature feature) {
-		return new FeatureStructure(feature);
-	}	
-	
+	public IFeatureModelProperty createFeatureModelProperty(IFeatureModel featureModel) {
+		return new FeatureModelProperty(featureModel);
+	}
+
+	@Override
+	public IFeatureModelStructure createFeatureModelStructure(IFeatureModel featureModel) {
+		return new FeatureModelStructure(featureModel);
+	}
+
 	@Override
 	public IFeatureProperty createFeatureProperty(IFeature feature) {
 		return new FeatureProperty(feature);
 	}
-	
+
 	@Override
-	public IFeatureModelStructure createFeatureModelStructure(IFeatureModel featureModel) {
-		return new FeatureModelStructure(featureModel);
-	}	
-	
-	@Override
-	public IFeatureModelProperty createFeatureModelProperty(IFeatureModel featureModel) {
-		return new FeatureModelProperty(featureModel);
-	}	
-	
+	public IFeatureStructure createFeatureStructure(IFeature feature) {
+		return new FeatureStructure(feature);
+	}
+
 }

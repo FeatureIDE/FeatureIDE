@@ -39,6 +39,10 @@ public interface IConstraint {
 
 	void addListener(PropertyChangeListener listener);
 
+	IConstraint clone(IFeatureModel newFeatureModel);
+
+	void fireEvent(PropertyChangeEvent event);
+
 	ConstraintAttribute getConstraintAttribute();
 
 	Collection<IFeature> getContainedFeatures();
@@ -64,7 +68,5 @@ public interface IConstraint {
 	void setDeadFeatures(Collection<IFeature> deadFeatures);
 
 	boolean setFalseOptionalFeatures(IFeatureModel clone, Collection<IFeature> fmFalseOptionals);
-	
-	void fireEvent(PropertyChangeEvent event);
 
 }

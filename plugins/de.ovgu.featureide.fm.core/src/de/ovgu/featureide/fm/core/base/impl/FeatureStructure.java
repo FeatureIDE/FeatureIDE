@@ -30,126 +30,144 @@ import de.ovgu.featureide.fm.core.FeatureConnection;
 import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 
 /**
- * Provides all properties of a feature. This includes its connections to parent
- * and child features.
+ * All structural information of an {@link IFeatureModel}.
  * 
- * @author Thomas Thuem
  * @author Sebastian Krieter
  * 
  */
 public class FeatureStructure implements IFeatureStructure, PropertyConstants {
 
-	private static final List<FeatureConnection> EMPTY_LIST = Collections.<FeatureConnection> emptyList();
+	protected boolean and;
 
-	private final IFeature correspondingFeature;
+	protected final LinkedList<IFeatureStructure> children = new LinkedList<>();
+	protected boolean concrete;
+	protected final IFeature correspondingFeature;
 
-	private final LinkedList<FeatureConnection> sourceConnections = new LinkedList<FeatureConnection>();
-	private final LinkedList<FeatureConnection> targetConnections = new LinkedList<FeatureConnection>();
-	private FeatureConnection parentConnection;
+	protected boolean hidden;
 
-	private List<IConstraint> partOfConstraints = new LinkedList<>();
+	protected boolean mandatory;
+	protected boolean multiple;
 
-	private LinkedList<IFeatureStructure> children = new LinkedList<>();
-	private IFeatureStructure parent = null;
+	protected IFeatureStructure parent = null;
+	protected final FeatureConnection parentConnection;
+	protected List<IConstraint> partOfConstraints = new LinkedList<>();
+	protected final LinkedList<FeatureConnection> sourceConnections = new LinkedList<FeatureConnection>();
+	protected final LinkedList<FeatureConnection> targetConnections = new LinkedList<FeatureConnection>();
 
-	private boolean and;
-	private boolean concrete;
-	private boolean hidden;
-	private boolean mandatory;
-	private boolean multiple;
+	protected FeatureStructure(FeatureStructure oldStructure, IFeatureModel newFeatureModel) {
+		if (newFeatureModel != null) {
+			correspondingFeature = oldStructure.correspondingFeature.clone(newFeatureModel, this);
+			newFeatureModel.addFeature(correspondingFeature);
+		} else {
+			correspondingFeature = oldStructure.correspondingFeature;
+		}
 
-	protected FeatureStructure(IFeatureStructure featureStructure, IFeature feature) {
-		this.correspondingFeature = feature;
+		mandatory = oldStructure.mandatory;
+		concrete = oldStructure.concrete;
+		and = oldStructure.and;
+		multiple = oldStructure.multiple;
+		hidden = oldStructure.hidden;
 
-		this.mandatory = featureStructure.isMandatory();
-		this.concrete = featureStructure.isConcrete();
-		this.and = featureStructure.isAnd();
-		this.multiple = featureStructure.isMultiple();
-		this.hidden = featureStructure.isHidden();
-		this.parentConnection = new FeatureConnection(this.correspondingFeature);
+		parentConnection = new FeatureConnection(correspondingFeature);
+		sourceConnections.add(parentConnection);
 
-		this.children = new LinkedList<>();
-//		for (IFeatureStructure child : featureStructure.getChildren()) {
-//			this.children.add(feature.getFeatureModel().getFeature(child.getName()));
-//		}
-//		if (featureStructure.getParent() != null) {
-//			this.parent = feature.getFeatureModel().getFeature(featureStructure.getParent().getName());
-//		}
+		for (final IFeatureStructure child : oldStructure.children) {
+			addNewChild(child.cloneSubtree(newFeatureModel));
+		}
 	}
 
 	public FeatureStructure(IFeature correspondingFeature) {
 		this.correspondingFeature = correspondingFeature;
 
-		this.mandatory = false;
-		this.concrete = true;
-		this.and = true;
-		this.multiple = false;
-		this.hidden = false;
-		this.parent = null;
-		this.parentConnection = new FeatureConnection(this.correspondingFeature);
+		mandatory = false;
+		concrete = true;
+		and = true;
+		multiple = false;
+		hidden = false;
+
+		parentConnection = new FeatureConnection(this.correspondingFeature);
 		sourceConnections.add(parentConnection);
 	}
 
+	@Override
 	public void addChild(IFeatureStructure newChild) {
-		children.add(newChild);
-		newChild.setParent(this);
+		addNewChild(newChild);
 		fireChildrenChanged();
 	}
 
+	@Override
 	public void addChildAtPosition(int index, IFeatureStructure newChild) {
 		children.add(index, newChild);
 		newChild.setParent(this);
 		fireChildrenChanged();
 	}
 
+	protected void addNewChild(IFeatureStructure newChild) {
+		children.add(newChild);
+		newChild.setParent(this);
+	}
+
+	@Override
 	public void addTargetConnection(FeatureConnection connection) {
 		targetConnections.add(connection);
 	}
 
+	@Override
 	public void changeToAlternative() {
 		and = false;
 		multiple = false;
 		fireChildrenChanged();
 	}
 
+	@Override
 	public void changeToAnd() {
 		and = true;
 		multiple = false;
 		fireChildrenChanged();
 	}
 
+	@Override
 	public void changeToOr() {
 		and = false;
 		multiple = true;
 		fireChildrenChanged();
 	}
 
-	private void fireChildrenChanged() {
-		PropertyChangeEvent event = new PropertyChangeEvent(this, CHILDREN_CHANGED, Boolean.FALSE, Boolean.TRUE);
+	@Override
+	public IFeatureStructure cloneSubtree(IFeatureModel newFeatureModel) {
+		return new FeatureStructure(this, newFeatureModel);
+	}
+
+	protected void fireChildrenChanged() {
+		final PropertyChangeEvent event = new PropertyChangeEvent(this, CHILDREN_CHANGED, Boolean.FALSE, Boolean.TRUE);
 		correspondingFeature.fireEvent(event);
 	}
 
-	private void fireHiddenChanged() {
-		PropertyChangeEvent event = new PropertyChangeEvent(this, HIDDEN_CHANGED, Boolean.FALSE, Boolean.TRUE);
+	protected void fireHiddenChanged() {
+		final PropertyChangeEvent event = new PropertyChangeEvent(this, HIDDEN_CHANGED, Boolean.FALSE, Boolean.TRUE);
 		correspondingFeature.fireEvent(event);
 	}
 
-	private void fireMandatoryChanged() {
-		PropertyChangeEvent event = new PropertyChangeEvent(this, MANDATORY_CHANGED, Boolean.FALSE, Boolean.TRUE);
+	protected void fireMandatoryChanged() {
+		final PropertyChangeEvent event = new PropertyChangeEvent(this, MANDATORY_CHANGED, Boolean.FALSE, Boolean.TRUE);
 		correspondingFeature.fireEvent(event);
 	}
 
+	@Override
 	public int getChildIndex(IFeatureStructure feature) {
 		return children.indexOf(feature);
 	}
 
+	@Override
 	public LinkedList<IFeatureStructure> getChildren() {
 		return children;
 	}
 
+	@Override
 	public int getChildrenCount() {
 		return children.size();
 	}
@@ -159,12 +177,15 @@ public class FeatureStructure implements IFeatureStructure, PropertyConstants {
 		return correspondingFeature;
 	}
 
+	@Override
 	public IFeatureStructure getFirstChild() {
-		if (children.isEmpty())
+		if (children.isEmpty()) {
 			return null;
+		}
 		return children.get(0);
 	}
 
+	@Override
 	public IFeatureStructure getLastChild() {
 		if (!children.isEmpty()) {
 			return children.getLast();
@@ -172,30 +193,37 @@ public class FeatureStructure implements IFeatureStructure, PropertyConstants {
 		return null;
 	}
 
+	@Override
 	public IFeatureStructure getParent() {
 		return parent;
 	}
 
+	@Override
 	public Collection<IConstraint> getRelevantConstraints() {
 		return partOfConstraints;
 	}
 
+	@Override
 	public List<FeatureConnection> getSourceConnections() {
-		return parent == null ? EMPTY_LIST : sourceConnections;
+		return parent == null ? Collections.<FeatureConnection> emptyList() : sourceConnections;
 	}
 
+	@Override
 	public List<FeatureConnection> getTargetConnections() {
 		return targetConnections;
 	}
 
+	@Override
 	public boolean hasChildren() {
 		return !children.isEmpty();
 	}
 
+	@Override
 	public boolean hasHiddenParent() {
 
-		if (isHidden())
+		if (isHidden()) {
 			return true;
+		}
 		if (isRoot()) {
 
 			return false;
@@ -203,8 +231,9 @@ public class FeatureStructure implements IFeatureStructure, PropertyConstants {
 		IFeatureStructure p = getParent();
 
 		while (!p.isRoot()) {
-			if (p.isHidden())
+			if (p.isHidden()) {
 				return true;
+			}
 			p = p.getParent();
 
 		}
@@ -216,150 +245,180 @@ public class FeatureStructure implements IFeatureStructure, PropertyConstants {
 	 * Returns true if the rule can be writen in a format like 'Ab [Cd] Ef ::
 	 * Gh'.
 	 */
+	@Override
 	public boolean hasInlineRule() {
-		return getChildrenCount() > 1 && and && isMandatory() && !multiple;
+		return (getChildrenCount() > 1) && and && isMandatory() && !multiple;
 	}
 
+	@Override
 	public boolean isAbstract() {
 		return !isConcrete();
 	}
 
+	@Override
 	public boolean isAlternative() {
 		return !and && !multiple;
 	}
 
+	@Override
 	public boolean isAncestorOf(IFeatureStructure next) {
 		while (next.getParent() != null) {
-			if (next.getParent() == this.getParent())
+			if (next.getParent() == getParent()) {
 				return true;
+			}
 			next = next.getParent();
 		}
 		return false;
 	}
 
+	@Override
 	public boolean isAnd() {
 		return and;
 	}
 
+	@Override
 	public boolean isANDPossible() {
-		if (parent == null || parent.isAnd())
+		if ((parent == null) || parent.isAnd()) {
 			return false;
-		for (IFeatureStructure child : children) {
-			if (child.isAnd())
+		}
+		for (final IFeatureStructure child : children) {
+			if (child.isAnd()) {
 				return false;
+			}
 		}
 		return true;
 	}
 
+	@Override
 	public boolean isConcrete() {
 		return concrete;
 	}
 
+	@Override
 	public boolean isFirstChild(IFeatureStructure child) {
 		return children.indexOf(child) == 0;
 	}
 
+	@Override
 	public boolean isHidden() {
 		return hidden;
 	}
 
+	@Override
 	public boolean isMandatory() {
-		return parent == null || !parent.isAnd() || mandatory;
+		return (parent == null) || !parent.isAnd() || mandatory;
 	}
 
+	@Override
 	public boolean isMandatorySet() {
 		return mandatory;
 	}
 
+	@Override
 	public boolean isMultiple() {
 		return multiple;
 	}
 
+	@Override
 	public boolean isOr() {
 		return !and && multiple;
 	}
 
+	@Override
 	public boolean isRoot() {
 		return parent == null;
 	}
 
+	@Override
 	public void removeChild(IFeatureStructure child) {
 		children.remove(child);
 		child.setParent(null);
 		fireChildrenChanged();
 	}
 
+	@Override
 	public IFeatureStructure removeLastChild() {
-		IFeatureStructure child = children.removeLast();
+		final IFeatureStructure child = children.removeLast();
 		child.setParent(null);
 		fireChildrenChanged();
 		return child;
 	}
 
+	@Override
 	public boolean removeTargetConnection(FeatureConnection connection) {
 		return targetConnections.remove(connection);
 	}
 
+	@Override
 	public void replaceChild(IFeatureStructure oldChild, IFeatureStructure newChild) {
-		int index = children.indexOf(oldChild);
+		final int index = children.indexOf(oldChild);
 		children.set(index, newChild);
 		oldChild.setParent(null);
 		newChild.setParent(this);
 		fireChildrenChanged();
 	}
 
+	@Override
 	public void setAbstract(boolean value) {
-		this.concrete = !value;
+		concrete = !value;
 		fireChildrenChanged();
 	}
 
+	@Override
 	public void setAlternative() {
-		this.and = false;
-		this.multiple = false;
+		and = false;
+		multiple = false;
 	}
 
+	@Override
 	public void setAnd() {
-		this.and = true;
+		and = true;
 	}
 
+	@Override
 	public void setAND(boolean and) {
 		this.and = and;
 		fireChildrenChanged();
 	}
 
+	@Override
 	public void setChildren(LinkedList<IFeatureStructure> children) {
-		if (this.children == children)
-			return;
-		for (IFeatureStructure child : children) {
-			child.setParent(this);
+		children.clear();
+		for (final IFeatureStructure child : children) {
+			addNewChild(child);
 		}
-		this.children = children;
 		fireChildrenChanged();
 	}
 
+	@Override
 	public void setHidden(boolean hid) {
-		this.hidden = hid;
+		hidden = hid;
 		fireHiddenChanged();
 	}
 
+	@Override
 	public void setMandatory(boolean mandatory) {
 		this.mandatory = mandatory;
 		fireMandatoryChanged();
 	}
 
+	@Override
 	public void setMultiple(boolean multiple) {
 		this.multiple = multiple;
 		fireChildrenChanged();
 	}
 
+	@Override
 	public void setOr() {
-		this.and = false;
-		this.multiple = true;
+		and = false;
+		multiple = true;
 	}
 
+	@Override
 	public void setParent(IFeatureStructure newParent) {
-		if (newParent == parent)
+		if (newParent == parent) {
 			return;
+		}
 
 		// delete old parent connection (if existing)
 		if (parent != null) {
@@ -375,10 +434,11 @@ public class FeatureStructure implements IFeatureStructure, PropertyConstants {
 		}
 	}
 
+	@Override
 	public void setRelevantConstraints() {
-		List<IConstraint> constraintList = new LinkedList<>();
-		for (IConstraint constraint : correspondingFeature.getFeatureModel().getConstraints()) {
-			for (IFeature f : constraint.getContainedFeatures()) {
+		final List<IConstraint> constraintList = new LinkedList<>();
+		for (final IConstraint constraint : correspondingFeature.getFeatureModel().getConstraints()) {
+			for (final IFeature f : constraint.getContainedFeatures()) {
 				if (f.getName().equals(correspondingFeature.getName())) {
 					constraintList.add(constraint);
 					break;
@@ -386,11 +446,6 @@ public class FeatureStructure implements IFeatureStructure, PropertyConstants {
 			}
 		}
 		partOfConstraints = constraintList;
-	}
-
-	@Override
-	public IFeatureStructure clone(IFeature newFeature) {
-		return new FeatureStructure(this, newFeature);
 	}
 
 }

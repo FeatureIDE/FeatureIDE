@@ -30,15 +30,13 @@ import java.util.Collection;
  */
 public interface IFeatureModelStructure {
 
+	IFeatureModelStructure clone(IFeatureModel newFeatureNodel);
+
 	IFeatureModel getFeatureModel();
 
 	Collection<IFeature> getFeaturesPreorder();
 
 	IFeatureStructure getRoot();
-
-	//	void handleModelDataChanged();
-	//
-	//	void handleModelDataLoaded();
 
 	boolean hasAbstract();
 
@@ -65,7 +63,5 @@ public interface IFeatureModelStructure {
 	void replaceRoot(IFeatureStructure feature);
 
 	void setRoot(IFeatureStructure root);
-
-	IFeatureModelStructure clone(IFeatureModel newFeatureNodel);
 
 }

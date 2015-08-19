@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.UNKNOWN;
-
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.LinkedList;
@@ -42,49 +40,51 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
  */
 public class Feature implements IFeature, PropertyConstants {
 
-	private final IFeatureProperty property;
-	private final IFeatureStructure structure;
+	protected IFeatureModel featureModel;
+	protected LinkedList<PropertyChangeListener> listenerList = new LinkedList<PropertyChangeListener>();
 
-	private LinkedList<PropertyChangeListener> listenerList = new LinkedList<PropertyChangeListener>();
+	protected String name;
 
-	private IFeatureModel featureModel;
-	private String name;
+	protected final IFeatureProperty property;
+	protected final IFeatureStructure structure;
 
-	public Feature(IFeatureModel featureModel) {
-		this(featureModel, UNKNOWN);
+	protected Feature(Feature oldFeature, IFeatureModel featureModel, IFeatureStructure newFeatrureStructure) {
+		this.featureModel = featureModel != null ? featureModel : oldFeature.featureModel;
+		name = new String(oldFeature.name);
+
+		property = oldFeature.property.clone(this);
+		structure = newFeatrureStructure != null ? newFeatrureStructure : oldFeature.structure;
 	}
 
 	public Feature(IFeatureModel featureModel, String name) {
 		this.featureModel = featureModel;
 		this.name = name;
 
-		this.property = FeatureModelFactory.getInstance().createFeatureProperty(this);
-		this.structure = FeatureModelFactory.getInstance().createFeatureStructure(this);
-	}
-
-	protected Feature(IFeature feature, IFeatureModel featureModel) {
-		this.featureModel = featureModel;
-
-		this.name = feature.getName();
-
-		this.property = feature.getFeatureProperty().clone(this);
-		this.structure = feature.getFeatureStructure().clone(this);
+		property = FeatureModelFactory.getInstance().createFeatureProperty(this);
+		structure = FeatureModelFactory.getInstance().createFeatureStructure(this);
 	}
 
 	@Override
 	public void addListener(PropertyChangeListener listener) {
-		if (!listenerList.contains(listener))
+		if (!listenerList.contains(listener)) {
 			listenerList.add(listener);
+		}
+	}
+
+	@Override
+	public IFeature clone(IFeatureModel newFeatureModel, IFeatureStructure newStructure) {
+		return new Feature(this, newFeatureModel, newStructure);
 	}
 
 	@Override
 	public void fireEvent(PropertyChangeEvent event) {
-		for (PropertyChangeListener listener : listenerList)
+		for (final PropertyChangeListener listener : listenerList) {
 			listener.propertyChange(event);
+		}
 
 	}
 
-	private void fireNameChanged() {
+	protected void fireNameChanged() {
 		fireEvent(new PropertyChangeEvent(this, NAME_CHANGED, Boolean.FALSE, Boolean.TRUE));
 	}
 
@@ -128,6 +128,7 @@ public class Feature implements IFeature, PropertyConstants {
 		listenerList.remove(listener);
 	}
 
+	@Override
 	public void setName(String name) {
 		this.name = name;
 		fireNameChanged();
@@ -137,4 +138,5 @@ public class Feature implements IFeature, PropertyConstants {
 	public String toString() {
 		return name;
 	}
+
 }

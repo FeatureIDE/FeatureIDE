@@ -29,32 +29,27 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IGraphicalFeatureModel;
 
 /**
- * The model representation of the feature tree that notifies listeners of
- * changes in the tree.
+ * Graphical representation of an {@link IFeatureModel} instance.
  * 
- * @author Thomas Thuem
- * @author Florian Proksch
- * @author Stefan Krueger
  * @author Sebastian Krieter
  * 
  */
 public class GraphicalFeatureModel implements IGraphicalFeatureModel, PropertyConstants {
-	
-	private final IFeatureModel correspondingFeatureModel;
+
+	protected final ColorschemeTable colorschemeTable;
+
+	protected final IFeatureModel correspondingFeatureModel;
+
+	protected final FeatureModelLayout layout;
 
 	public GraphicalFeatureModel(IFeatureModel correspondingFeatureModel) {
 		this.correspondingFeatureModel = correspondingFeatureModel;
-		this.layout = new FeatureModelLayout();
-		this.colorschemeTable = new ColorschemeTable(correspondingFeatureModel);
+		layout = new FeatureModelLayout();
+		colorschemeTable = new ColorschemeTable(correspondingFeatureModel);
 	}
 
-	private final FeatureModelLayout layout;
-
-	private final ColorschemeTable colorschemeTable;
-
-	@Override
-	public GraphicItem getItemType() {
-		return GraphicItem.Model;
+	protected void fireEvent(final String action) {
+		correspondingFeatureModel.fireEvent(new PropertyChangeEvent(this, action, Boolean.FALSE, Boolean.TRUE));
 	}
 
 	@Override
@@ -65,6 +60,11 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel, PropertyCo
 	@Override
 	public IFeatureModel getFeatureModel() {
 		return correspondingFeatureModel;
+	}
+
+	@Override
+	public GraphicItem getItemType() {
+		return GraphicItem.Model;
 	}
 
 	@Override
@@ -84,16 +84,12 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel, PropertyCo
 
 	@Override
 	public void redrawDiagram() {
-		fireEvent(REDRAW_DIAGRAM);		
+		fireEvent(REDRAW_DIAGRAM);
 	}
 
 	@Override
 	public void refreshContextMenu() {
 		fireEvent(REFRESH_ACTIONS);
-	}
-
-	private void fireEvent(final String action) {
-		correspondingFeatureModel.fireEvent(new PropertyChangeEvent(this, action, Boolean.FALSE, Boolean.TRUE));
 	}
 
 }
