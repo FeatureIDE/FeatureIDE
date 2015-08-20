@@ -34,19 +34,22 @@ public interface IFeature extends PropertyChangeListener {
 
 	void addListener(PropertyChangeListener listener);
 
+	IFeature clone(IFeatureModel newFeatureModel, IFeatureStructure newStructure);
+
+	void fireEvent(PropertyChangeEvent event);
+
 	IFeatureModel getFeatureModel();
 
-	IFeatureProperty getFeatureProperty();
+	IFeatureProperty getProperty();
 
-	IFeatureStructure getFeatureStructure();
+	IFeatureStructure getStructure();
 
 	int getId();
 
 	String getName();
 
 	void removeListener(PropertyChangeListener listener);
-	
-	void fireEvent(PropertyChangeEvent event);
 
 	void setName(String name);
+
 }

@@ -18,25 +18,20 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core;
+package de.ovgu.featureide.fm.core.base.impl;
 
 import org.prop4j.Node;
 
-import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
  * 
  * @author Sebastian Krieter
  */
-public class ExtendedConstraint extends IConstraint {
-	
+public class ExtendedConstraint extends Constraint {
+
 	private int type = ExtendedFeature.TYPE_INTERN;
-	
-	/**
-	 * @param featureModel
-	 * @param propNode
-	 */
+
 	public ExtendedConstraint(IFeatureModel featureModel, Node propNode) {
 		super(featureModel, propNode);
 	}
@@ -48,4 +43,5 @@ public class ExtendedConstraint extends IConstraint {
 	public void setType(int type) {
 		this.type = type;
 	}
+
 }

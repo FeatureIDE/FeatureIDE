@@ -33,22 +33,18 @@ public interface IFeatureModelProperty {
 
 	void addComment(String comment);
 
+	IFeatureModelProperty clone(IFeatureModel newFeatureNodel);
+
 	List<String> getAnnotations();
 
 	List<String> getComments();
 
 	IFeatureModel getFeatureModel();
 
-	List<String> getFeatureOrderList();
-
 	boolean isFeatureOrderInXML();
 
-	boolean isFeatureOrderUserDefined();
+	void reset();
 
 	void setFeatureOrderInXML(boolean featureOrderInXML);
-
-	void setFeatureOrderList(final List<String> featureOrderList);
-
-	void setFeatureOrderUserDefined(boolean featureOrderUserDefined);
 
 }

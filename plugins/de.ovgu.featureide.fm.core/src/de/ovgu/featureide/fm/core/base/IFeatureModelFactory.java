@@ -23,20 +23,22 @@ package de.ovgu.featureide.fm.core.base;
 import org.prop4j.Node;
 
 /**
- * Factory to create or copy instance of {@link IFeature},  {@link IFeatureModel}, and {@link IConstraint}.
+ * Factory to create or copy instance of {@link IFeature}, {@link IFeatureModel}, and {@link IConstraint}.
  * 
  * @author Sebastian Krieter
  */
 public interface IFeatureModelFactory {
-
-	IFeature copyFeature(IFeature feature, IFeatureModel featureModel);
-
-	IFeatureModel copyFeatureModel(IFeatureModel oldFeatureModel);
 
 	IConstraint createConstraint(IFeatureModel featureModel, Node propNode);
 
 	IFeature createFeature(IFeatureModel featureModel, String name);
 
 	IFeatureModel createFeatureModel();
+
+	IGraphicalConstraint createGraphicalRepresentation(IConstraint constraint);
+
+	IGraphicalFeature createGraphicalRepresentation(IFeature feature);
+
+	IGraphicalFeatureModel createGraphicalRepresentation(IFeatureModel featureModel);
 
 }

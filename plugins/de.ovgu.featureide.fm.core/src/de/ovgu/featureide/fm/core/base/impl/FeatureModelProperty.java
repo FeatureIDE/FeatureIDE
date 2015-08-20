@@ -24,71 +24,50 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelProperty;
-import de.ovgu.featureide.fm.core.filter.ConcreteFeatureFilter;
-import de.ovgu.featureide.fm.core.filter.base.Filter;
 
 /**
- * The model representation of the feature tree that notifies listeners of
- * changes in the tree.
+ * All additional properties of one {@link IFeature} instance.
  * 
- * @author Thomas Thuem
- * @author Florian Proksch
- * @author Stefan Krueger
  * @author Sebastian Krieter
  * 
  */
 public class FeatureModelProperty implements IFeatureModelProperty {
 
-	private final IFeatureModel correspondingFeatureModel;
+	/**
+	 * Saves the annotations from the model file as they were read,
+	 * because they were not yet used.
+	 */
+	protected final List<String> annotations;
 
 	/**
 	 * All comment lines from the model file without line number at which they
 	 * occur
 	 */
-	private final List<String> comments;
+	protected final List<String> comments;
 
-	/**
-	 * Saves the annotations from the model file as they were read,
-	 * because they were not yet used.
-	 */
-	private final List<String> annotations;
+	protected final IFeatureModel correspondingFeatureModel;
 
-	/**
-	 * A list containing the feature names in their specified order will be
-	 * initialized in XmlFeatureModelReader.
-	 */
-	private final List<String> featureOrderList;
+	protected boolean featureOrderInXML;
 
-	private boolean featureOrderUserDefined;
+	protected FeatureModelProperty(FeatureModelProperty oldProperty, IFeatureModel correspondingFeatureModel) {
+		this.correspondingFeatureModel = correspondingFeatureModel != null ? correspondingFeatureModel : oldProperty.correspondingFeatureModel;
 
-	private boolean featureOrderInXML;
+		featureOrderInXML = oldProperty.featureOrderInXML;
+
+		comments = new LinkedList<>(oldProperty.comments);
+		annotations = new LinkedList<>(oldProperty.annotations);
+	}
 
 	public FeatureModelProperty(IFeatureModel correspondingFeatureModel) {
 		this.correspondingFeatureModel = correspondingFeatureModel;
 
-		this.featureOrderList = new LinkedList<String>();
-		this.featureOrderUserDefined = false;
-		this.featureOrderInXML = false;
+		featureOrderInXML = false;
 
-		this.comments = new LinkedList<String>();
-		this.annotations = new LinkedList<String>();
-	}
-
-	public FeatureModelProperty(IFeatureModelProperty property, IFeatureModel correspondingFeatureModel) {
-		this.correspondingFeatureModel = correspondingFeatureModel;
-
-		this.featureOrderUserDefined = property.isFeatureOrderUserDefined();
-		if (this.featureOrderUserDefined) {
-			this.featureOrderList = new LinkedList<String>(property.getFeatureOrderList());
-		} else {
-			this.featureOrderList = new LinkedList<String>();
-		}
-		this.featureOrderInXML = property.isFeatureOrderInXML();
-
-		this.comments = new LinkedList<>(property.getComments());
-		this.annotations = new LinkedList<>(property.getAnnotations());
+		comments = new LinkedList<>();
+		annotations = new LinkedList<>();
 	}
 
 	@Override
@@ -100,6 +79,11 @@ public class FeatureModelProperty implements IFeatureModelProperty {
 	@Override
 	public void addComment(String comment) {
 		comments.add(comment);
+	}
+
+	@Override
+	public IFeatureModelProperty clone(IFeatureModel newFeatureNodel) {
+		return new FeatureModelProperty(this, newFeatureNodel);
 	}
 
 	@Override
@@ -118,37 +102,20 @@ public class FeatureModelProperty implements IFeatureModelProperty {
 	}
 
 	@Override
-	public List<String> getFeatureOrderList() {
-		if (featureOrderList.isEmpty()) {
-			return Filter.toString(correspondingFeatureModel.getFeatures(), new ConcreteFeatureFilter());
-		}
-		return featureOrderList;
-	}
-
-	@Override
 	public boolean isFeatureOrderInXML() {
 		return featureOrderInXML;
 	}
 
 	@Override
-	public boolean isFeatureOrderUserDefined() {
-		return featureOrderUserDefined;
+	public void reset() {
+		featureOrderInXML = false;
+		comments.clear();
+		annotations.clear();
 	}
 
 	@Override
 	public void setFeatureOrderInXML(boolean featureOrderInXML) {
 		this.featureOrderInXML = featureOrderInXML;
-	}
-
-	@Override
-	public void setFeatureOrderList(List<String> featureOrderList) {
-		this.featureOrderList.clear();
-		this.featureOrderList.addAll(featureOrderList);
-	}
-
-	@Override
-	public void setFeatureOrderUserDefined(boolean featureOrderUserDefined) {
-		this.featureOrderUserDefined = featureOrderUserDefined;
 	}
 
 }

@@ -95,6 +95,7 @@ import de.ovgu.featureide.core.signature.filter.ContextFilter;
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
 import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 
@@ -549,7 +550,7 @@ public class CorePlugin extends AbstractCorePlugin {
 		createFolder(project, sourcePath);
 		createFolder(project, configPath);
 		createFolder(project, buildPath);
-		IFeatureModel featureModel = new IFeatureModel();
+		IFeatureModel featureModel = FeatureModelFactory.getInstance().createFeatureModel();
 		featureModel.initFMComposerExtension(project);
 		featureModel.createDefaultValues(project.getName());
 		try {

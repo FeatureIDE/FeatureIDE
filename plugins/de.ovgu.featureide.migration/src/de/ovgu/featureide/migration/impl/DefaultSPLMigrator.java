@@ -54,6 +54,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionBase;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
 import de.ovgu.featureide.fm.ui.handlers.base.SelectionWrapper;
 import de.ovgu.featureide.ui.migration.wizard.SPLMigrationDialogSettingsPage;
 
@@ -291,12 +292,12 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator {
 
 		featureModel.reset();
 
-		featureModel.setRoot(new IFeature(featureModel, "Base"));
+		featureModel.setRoot(FeatureModelFactory.getInstance().createFeature(featureModel, "Base"));
 		featureModel.getRoot().changeToAlternative();
 		featureModel.getRoot().setAbstract(true);
 
 		for (IProject project : projects)
-			featureModel.getRoot().addChild(new IFeature(featureModel, project.getName()));
+			featureModel.getRoot().addChild(FeatureModelFactory.getInstance().createFeature(featureModel, project.getName()));
 
 		return featureModel;
 	}

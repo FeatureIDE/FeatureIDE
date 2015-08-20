@@ -25,13 +25,13 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.USE;
 import java.util.HashSet;
 import java.util.LinkedList;
 
-import de.ovgu.featureide.fm.core.ExtendedConstraint;
-import de.ovgu.featureide.fm.core.ExtendedFeature;
-import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
-import de.ovgu.featureide.fm.core.ExtendedFeatureModel.UsedModel;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.ExtendedConstraint;
+import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
+import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel.UsedModel;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
 
 /**
@@ -196,7 +196,7 @@ public class VelvetFeatureModelWriter extends AbstractFeatureModelWriter {
 		}
 		sb.append("feature ");
 		sb.append(curFeature.getName());
-		final String description = curFeature.getDescription();
+		final String description = curFeature.getProperty().getDescription();
 		final boolean hasDescription = description != null && !description.isEmpty();
 
 		if (curFeature.getChildrenCount() == 0 && !hasDescription) {

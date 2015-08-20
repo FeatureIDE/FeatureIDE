@@ -49,17 +49,15 @@ public interface IFeatureModel {
 
 	void addListener(PropertyChangeListener listener);
 
-	IFeatureModel clone();
+	IFeatureModel clone(IFeature newRoot);
 
 	void createDefaultValues(String projectName);
-
-	IFeatureModel deepClone();
-
-	IFeatureModel deepClone(boolean complete);
 
 	boolean deleteFeature(IFeature feature);
 
 	void deleteFeatureFromTable(IFeature feature);
+
+	void fireEvent(PropertyChangeEvent event);
 
 	FeatureModelAnalyzer getAnalyser();
 
@@ -71,11 +69,9 @@ public interface IFeatureModel {
 
 	IFeature getFeature(String name);
 
-	IFeatureModelProperty getFeatureProperty();
+	List<String> getFeatureOrderList();
 
 	Collection<IFeature> getFeatures();
-
-	IFeatureModelStructure getFeatureStructure();
 
 	IFMComposerExtension getFMComposerExtension();
 
@@ -83,13 +79,19 @@ public interface IFeatureModel {
 
 	int getNumberOfFeatures();
 
+	IFeatureModelProperty getProperty();
+
 	RenamingsManager getRenamingsManager();
+
+	IFeatureModelStructure getStructure();
 
 	void handleModelDataChanged();
 
 	void handleModelDataLoaded();
 
 	IFMComposerExtension initFMComposerExtension(final IProject project);
+
+	boolean isFeatureOrderUserDefined();
 
 	void removeConstraint(IConstraint constraint);
 
@@ -103,8 +105,10 @@ public interface IFeatureModel {
 
 	void setConstraints(final List<IConstraint> constraints);
 
-	void setFeatureTable(final Hashtable<String, IFeature> featureTable);
+	void setFeatureOrderList(final List<String> featureOrderList);
 
-	void fireEvent(PropertyChangeEvent event);
+	void setFeatureOrderUserDefined(boolean featureOrderUserDefined);
+
+	void setFeatureTable(final Hashtable<String, IFeature> featureTable);
 
 }

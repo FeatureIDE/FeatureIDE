@@ -18,40 +18,33 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core;
+package de.ovgu.featureide.fm.core.base.impl;
 
-import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-
+import de.ovgu.featureide.fm.core.base.IFeatureProperty;
 
 /**
  * Feature for the {@link ExtendedFeatureModel}.
  * 
  * @author Sebastian Krieter
  */
-public class ExtendedFeature extends IFeature {
-	
-	public static final int 
-		TYPE_INTERN = 0,
-		TYPE_INHERITED = 1,
-		TYPE_INTERFACE = 2,
-		TYPE_INSTANCE = 3;
-	
+public class ExtendedFeature extends Feature {
+
+	public static final int TYPE_INTERN = 0, TYPE_INHERITED = 1, TYPE_INTERFACE = 2, TYPE_INSTANCE = 3;
+
 	private int type = TYPE_INTERN;
 	private String externalModelName = null;
 	private boolean newDefined = false;
 
-	/**
-	 * @param featureModel
-	 * @param name
-	 */
 	public ExtendedFeature(IFeatureModel featureModel, String name) {
 		super(featureModel, name);
 	}
-	
-	/**
-	 * @return the type
-	 */
+
+	@Override
+	protected IFeatureProperty createProperty() {
+		return new ExtendedFeatureProperty(this);
+	}
+
 	public int getType() {
 		return type;
 	}
@@ -59,19 +52,19 @@ public class ExtendedFeature extends IFeature {
 	public boolean isInherited() {
 		return type == TYPE_INHERITED;
 	}
-	
+
 	public boolean isInterface() {
 		return type == TYPE_INTERFACE;
 	}
-	
+
 	public boolean isInstance() {
 		return type == TYPE_INSTANCE;
 	}
-	
+
 	public boolean isFromExtern() {
 		return type != TYPE_INTERN;
 	}
-	
+
 	public void setType(int type) {
 		this.type = type;
 	}
@@ -84,24 +77,12 @@ public class ExtendedFeature extends IFeature {
 		this.externalModelName = externalModelName;
 	}
 
-	@Override
-	public String getDisplayName() {
-		switch (Preferences.getDefaultFeatureNameScheme()) {
-			case Preferences.SCHEME_SHORT:
-				String name = getName();
-				int separatorIndex = name.lastIndexOf(".");
-				return name.substring(separatorIndex + 1);
-			case Preferences.SCHEME_LONG: 
-			default: 
-				return getName();
-		}
-	}
-	
 	public boolean isNewDefined() {
 		return newDefined;
 	}
-	
+
 	public void setNewDefined(boolean newDefined) {
 		this.newDefined = newDefined;
 	}
+
 }

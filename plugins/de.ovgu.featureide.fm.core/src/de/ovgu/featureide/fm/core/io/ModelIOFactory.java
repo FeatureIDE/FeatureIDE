@@ -20,8 +20,9 @@
  */
 package de.ovgu.featureide.fm.core.io;
 
-import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
 import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelWriter;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
@@ -85,7 +86,7 @@ public abstract class ModelIOFactory {
 	public static IFeatureModel getNewFeatureModel(int type) {
 		switch (type) {
 		case TYPE_XML:
-			return new IFeatureModel();
+			return FeatureModelFactory.getInstance().createFeatureModel();
 		case TYPE_VELVET:
 			return new ExtendedFeatureModel();
 		case TYPE_VELVET_IMPORT:

@@ -639,7 +639,7 @@ public class ConstraintDialog implements GUIDefaults {
 	 */
 	public List<IFeature> getDeadFeatures(String input, IFeatureModel model) {
 		Collection<IFeature> deadFeaturesBefore = null;
-		IFeatureModel clonedModel = model.clone();
+		IFeatureModel clonedModel = model.clone(null);
 
 		NodeReader nodeReader = new NodeReader();
 

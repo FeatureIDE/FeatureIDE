@@ -56,6 +56,7 @@ import org.sat4j.specs.TimeoutException;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
 import de.ovgu.featureide.fm.core.editing.Comparison;
 import de.ovgu.featureide.fm.core.editing.ModelComparator;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
@@ -139,7 +140,7 @@ public class FeatureModelAnalyzer {
 		return cachedValidity;
 	}
 	
-	protected FeatureModelAnalyzer(IFeatureModel fm) {
+	public FeatureModelAnalyzer(IFeatureModel fm) {
 		this.fm = fm;
 	}
 
@@ -165,7 +166,7 @@ public class FeatureModelAnalyzer {
 	}
 
 	public boolean isValid() throws TimeoutException {
-		Node root = NodeCreator.createNodes(fm.clone());
+		Node root = NodeCreator.createNodes(fm.clone(null));
 		return new SatSolver(root, 1000).isSatisfiable();
 	}
 
@@ -190,7 +191,7 @@ public class FeatureModelAnalyzer {
 		if (b.isEmpty())
 			return true;
 
-		Node featureModel = NodeCreator.createNodes(fm.clone());
+		Node featureModel = NodeCreator.createNodes(fm.clone(null));
 
 		// B1 or B2 or ... Bn
 		Node condition = disjunct(b);
@@ -206,11 +207,11 @@ public class FeatureModelAnalyzer {
 		if (b.isEmpty())
 			return true;
 
-		Node featureModel = NodeCreator.createNodes(fm.clone());
+		Node featureModel = NodeCreator.createNodes(fm.clone(null));
 		boolean notValid = true;
 		for (IFeature f : b) {
-			Node node = new And(new And(featureModel, new Literal(NodeCreator.getVariable(f, fm.clone()))),  
-					new Literal(NodeCreator.getVariable(a, fm.clone())));
+			Node node = new And(new And(featureModel, new Literal(NodeCreator.getVariable(f, fm.clone(null)))),  
+					new Literal(NodeCreator.getVariable(a, fm.clone(null))));
 			notValid &= !new SatSolver(node, 1000).isSatisfiable();
 		}
 		return notValid;
@@ -563,8 +564,8 @@ public class FeatureModelAnalyzer {
 
 	public void updateConstraints(HashMap<Object, Object> oldAttributes,
 			HashMap<Object, Object> changedAttributes) {
-		IFeatureModel clone = fm.clone();
-		clone.constraints.clear();
+		IFeatureModel clone = fm.clone(null);
+		clone.setConstraints(new LinkedList<IConstraint>());
 		SatSolver solver = new SatSolver(NodeCreator.createNodes(clone), 1000);
 	
 		Collection<IFeature> fmDeadFeatures = new ArrayList<>(getCachedDeadFeatures());
@@ -652,8 +653,8 @@ public class FeatureModelAnalyzer {
 					}
 					
 				}
-				clone = fm.clone();
-				clone.constraints.clear();
+				clone = fm.clone(null);
+				clone.setConstraints(new LinkedList<IConstraint>());
 			}
 			/** Look for dead and false optional features **/
 			for (IConstraint constraint : fm.getConstraints()) {
@@ -729,7 +730,7 @@ public class FeatureModelAnalyzer {
 	}
 
 	private void findRedundantConstraints(IFeatureModel clone, IConstraint constraint, Map<Object, Object> changedAttributes, Map<Object,Object> oldAttributes) {
-		IFeatureModel oldModel = clone.clone();
+		IFeatureModel oldModel = clone.clone(null);
 		clone.addConstraint(constraint);
 		ModelComparator comparator = new ModelComparator(500);
 		Comparison comparison = comparator.compare(clone, oldModel);
@@ -745,12 +746,12 @@ public class FeatureModelAnalyzer {
 			Map<Object, Object> changedAttributes) {
 		setSubTask(ANALYZE_FEATURES_);
 		for (IFeature bone : fm.getFeatures()) {
-			oldAttributes.put(bone, bone.getFeatureStatus());
+			oldAttributes.put(bone, bone.getProperty().getFeatureStatus());
 			
-			if (bone.getFeatureStatus() != FeatureStatus.NORMAL) {
+			if (bone.getProperty().getFeatureStatus() != FeatureStatus.NORMAL) {
 				changedAttributes.put(bone, FeatureStatus.FALSE_OPTIONAL);
 			}
-			bone.setFeatureStatus(FeatureStatus.NORMAL, false);
+			bone.getProperty().setFeatureStatus(FeatureStatus.NORMAL, false);
 			bone.setRelevantConstraints();
 		}
 
@@ -773,7 +774,7 @@ public class FeatureModelAnalyzer {
 				if (oldAttributes.get(deadFeature) != FeatureStatus.DEAD) {
 					changedAttributes.put(deadFeature, FeatureStatus.DEAD);
 				}
-				deadFeature.setFeatureStatus(FeatureStatus.DEAD, false);
+				deadFeature.getProperty().setFeatureStatus(FeatureStatus.DEAD, false);
 			}
 			worked(1);
 			if (canceled()) {
@@ -821,7 +822,7 @@ public class FeatureModelAnalyzer {
 					Node leftChild = children[0];
 					Node rightChild = children[1];
 					if (leftChild instanceof Literal && ((Literal) leftChild).var.equals(feature.getName())) {
-						IConstraint	rightConstraint = new IConstraint(fm, rightChild);
+						IConstraint	rightConstraint = FeatureModelFactory.getInstance().createConstraint(fm, rightChild);
 						rightConstraint.setContainedFeatures();
 						if (!rightConstraint.hasHiddenFeatures()) {
 							list.add(feature);
@@ -829,7 +830,7 @@ public class FeatureModelAnalyzer {
 						}
 					}
 					if (rightChild instanceof Literal &&  ((Literal) rightChild).var.equals(feature.getName())) {
-						IConstraint  leftConstraint = new IConstraint(fm, leftChild);
+						IConstraint  leftConstraint = FeatureModelFactory.getInstance().createConstraint(fm, leftChild);
 						leftConstraint.setContainedFeatures();
 						if (!leftConstraint.hasHiddenFeatures()) {
 							list.add(feature);
@@ -868,7 +869,7 @@ public class FeatureModelAnalyzer {
 
 				if (!noHidden) {
 					changedAttributes.put(feature, FeatureStatus.INDETERMINATE_HIDDEN);					
-					feature.setFeatureStatus(FeatureStatus.INDETERMINATE_HIDDEN, false);
+					feature.getProperty().setFeatureStatus(FeatureStatus.INDETERMINATE_HIDDEN, false);
 				}
 				
 				worked(1);
@@ -895,7 +896,7 @@ public class FeatureModelAnalyzer {
 		chachedFalseOptionalFeatures.clear();
 		for (IFeature f : getFalseOptionalFeatures()) {
 			changedAttributes.put(f,FeatureStatus.FALSE_OPTIONAL);
-			f.setFeatureStatus(FeatureStatus.FALSE_OPTIONAL, false);
+			f.getProperty().setFeatureStatus(FeatureStatus.FALSE_OPTIONAL, false);
 			chachedFalseOptionalFeatures.add(f);
 		}
 	}
@@ -907,7 +908,7 @@ public class FeatureModelAnalyzer {
 				if (!feature.isMandatory() && !feature.isRoot()) {
 					SatSolver satsolver = new SatSolver(new Not(new Implies(
 							new And(new Literal(feature.getParent().getName()),
-									NodeCreator.createNodes(fm.clone())),
+									NodeCreator.createNodes(fm.clone(null))),
 							new Literal(feature.getName()))), 1000);
 					if (!satsolver.isSatisfiable()) {
 						falseOptionalFeatures.add(feature);
@@ -924,10 +925,10 @@ public class FeatureModelAnalyzer {
 		Collection<IFeature> falseOptionalFeatures = new LinkedList<>();
 		for (IFeature feature : fmFalseOptionals) {
 			try {
-				if (!feature.getFeatureStructure().isMandatory() && !feature.getFeatureStructure().isRoot()) {
+				if (!feature.getStructure().isMandatory() && !feature.getStructure().isRoot()) {
 					SatSolver satsolver = new SatSolver(new Not(new Implies(
-							new And(new Literal(feature.getFeatureStructure().getParent().getName()),
-									NodeCreator.createNodes(fm.clone())),
+							new And(new Literal(feature.getStructure().getParent().getName()),
+									NodeCreator.createNodes(fm.clone(null))),
 							new Literal(feature.getName()))), 1000);
 					if (!satsolver.isSatisfiable()) {
 						falseOptionalFeatures.add(feature);

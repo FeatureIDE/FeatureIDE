@@ -58,8 +58,10 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.Feature;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
@@ -631,26 +633,19 @@ public class SXFMReader extends AbstractFeatureModelReader {
 		}
     }
     
-    private static class FeatureIndent extends IFeature {
+    private static class FeatureIndent extends Feature {
     	
-    	private int indentation = 0;
-    	
-		public FeatureIndent(IFeatureModel featureModel) {
-			super(featureModel);
-		}
+    	private final int indentation;
 
 		public FeatureIndent(IFeatureModel featureModel, int indent) {
-			super(featureModel);
+			super(featureModel, "");
 			indentation = indent;
 		}
 		
 		public int getIndentation() {
 			return indentation;
 		}
-
-//		public void setIndentation(int indentation) {
-//			this.indentation = indentation;
-//		}
+		
     }
     
     private static class FeatCardinality {

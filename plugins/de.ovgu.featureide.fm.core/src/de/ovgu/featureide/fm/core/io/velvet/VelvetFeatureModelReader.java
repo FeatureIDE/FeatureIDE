@@ -61,15 +61,16 @@ import org.prop4j.Node;
 import org.prop4j.Not;
 import org.prop4j.Or;
 
-import de.ovgu.featureide.fm.core.ExtendedConstraint;
-import de.ovgu.featureide.fm.core.ExtendedFeature;
-import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
-import de.ovgu.featureide.fm.core.ExtendedFeatureModel.UsedModel;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.ModelMarkerHandler;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.ExtendedConstraint;
+import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
+import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel.UsedModel;
 import de.ovgu.featureide.fm.core.constraint.Equation;
 import de.ovgu.featureide.fm.core.constraint.FeatureAttribute;
 import de.ovgu.featureide.fm.core.constraint.Reference;
@@ -786,7 +787,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 		switch (valueNode.getType()) {
 		case VelvetParser.STRING:
 			final String valueNodeText = valueNode.getText();
-			parent.setDescription(valueNodeText.substring(1, valueNodeText.length() - 1).replace("\\\"", "\""));
+			parent.getProperty().setDescription(valueNodeText.substring(1, valueNodeText.length() - 1).replace("\\\"", "\""));
 			break;
 		default:
 			reportSyntaxError(valueNode);
@@ -966,8 +967,8 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 				reportSyntaxError(curNode);
 			}
 		}
-		IFeatureModel mappingModel = new IFeatureModel();
-		IFeature rootFeature = new IFeature(mappingModel, "MPL");
+		IFeatureModel mappingModel = FeatureModelFactory.getInstance().createFeatureModel();
+		IFeature rootFeature = FeatureModelFactory.getInstance().createFeature(mappingModel, "MPL");
 		rootFeature.setAnd();
 		rootFeature.setAbstract(true);
 		rootFeature.setMandatory(true);
@@ -983,14 +984,14 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 		
 		for (Entry<String, UsedModel> parameter : extFeatureModel.getExternalModels().entrySet()) {
 			if (parameter.getValue().getType() == ExtendedFeature.TYPE_INTERFACE) {
-				IFeature parameterFeature = new IFeature(mappingModel, parameter.getKey());
+				IFeature parameterFeature = FeatureModelFactory.getInstance().createFeature(mappingModel, parameter.getKey());
 				parameterFeature.setOr();
 				parameterFeature.setAbstract(true);
 				parameterFeature.setMandatory(true);
 				rootFeature.addChild(parameterFeature);
 				
 				for (String projectName : possibleProjects) {
-					IFeature projectFeature = new IFeature(mappingModel, parameterFeature.getName() + "." + projectName);
+					IFeature projectFeature = FeatureModelFactory.getInstance().createFeature(mappingModel, parameterFeature.getName() + "." + projectName);
 					projectFeature.setAbstract(false);
 					projectFeature.setMandatory(false);
 					parameterFeature.addChild(projectFeature);

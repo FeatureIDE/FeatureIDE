@@ -60,10 +60,11 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.MultiPageEditorPart;
 
-import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagatorJobWrapper.IConfigJob;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
@@ -106,7 +107,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	public IFile file;
 	private IFile internalFile;
 
-	public IFeatureModel featureModel = new IFeatureModel();
+	public IFeatureModel featureModel = FeatureModelFactory.getInstance().createFeatureModel();
 
 	public Configuration configuration;
 

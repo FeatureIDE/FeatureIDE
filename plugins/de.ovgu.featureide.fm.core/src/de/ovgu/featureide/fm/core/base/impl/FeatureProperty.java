@@ -20,52 +20,57 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
+import java.beans.PropertyChangeEvent;
+
 import javax.annotation.CheckForNull;
 
 import de.ovgu.featureide.fm.core.FeatureStatus;
+import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureProperty;
 
 /**
- * Provides all properties of a feature. This includes its connections to parent
- * and child features.
+ * All additional properties of an {@link IFeature}.
  * 
- * @author Thomas Thuem
  * @author Sebastian Krieter
  * 
  */
-public class FeatureProperty implements IFeatureProperty {
+public class FeatureProperty implements IFeatureProperty, PropertyConstants {
 
-	private final IFeature correspondingFeature;
+	protected final IFeature correspondingFeature;
 
-	private String description;
-	private FeatureStatus status;
+	protected String description;
+	protected FeatureStatus status;
+
+	public FeatureProperty(FeatureProperty oldProperty, IFeature correspondingFeature) {
+		this.correspondingFeature = correspondingFeature != null ? correspondingFeature : oldProperty.correspondingFeature;
+
+		description = new String(oldProperty.description);
+		status = oldProperty.status;
+	}
 
 	public FeatureProperty(IFeature correspondingFeature) {
 		this.correspondingFeature = correspondingFeature;
-		this.description = null;
-		this.status = FeatureStatus.NORMAL;
+		description = null;
+		status = FeatureStatus.NORMAL;
 	}
-	
-	public FeatureProperty(IFeatureProperty featureProperty) {
-		this(featureProperty, featureProperty.getFeature());
-	}
-	
-	public FeatureProperty(IFeatureProperty featureProperty, IFeature correspondingFeature) {
-		this.correspondingFeature = correspondingFeature;
-		this.description = new String(featureProperty.getDescription());
-		this.status = featureProperty.getFeatureStatus();
+
+	@Override
+	public IFeatureProperty clone(IFeature newFeature) {
+		return new FeatureProperty(this, newFeature);
 	}
 
 	/**
 	 * 
 	 * @return The description of the Feature.
 	 */
+	@Override
 	@CheckForNull
 	public String getDescription() {
 		return description;
 	}
 
+	@Override
 	public String getDisplayName() {
 		return correspondingFeature.getName();
 	}
@@ -92,6 +97,14 @@ public class FeatureProperty implements IFeatureProperty {
 	@Override
 	public void setFeatureStatus(FeatureStatus status) {
 		this.status = status;
+	}
+
+	@Override
+	public void setFeatureStatus(FeatureStatus stat, boolean fire) {
+		this.status = stat;
+		if (fire) {
+			correspondingFeature.fireEvent(new PropertyChangeEvent(this, ATTRIBUTE_CHANGED, Boolean.FALSE, Boolean.TRUE));
+		}
 	}
 
 }

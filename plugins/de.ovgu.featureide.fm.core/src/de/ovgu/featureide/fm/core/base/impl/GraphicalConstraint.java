@@ -28,32 +28,30 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IGraphicalConstraint;
 
 /**
- * Represents a propositional constraint below the feature diagram.
+ * Graphical representation of an {@link IConstraint} instance.
  * 
- * @author Thomas Thuem
- * @author Florian Proksch
- * @author Stefan Krueger
  * @author Sebastian Krieter
+ * 
  */
 public class GraphicalConstraint implements IGraphicalConstraint, PropertyConstants {
 
-	private FMPoint location = new FMPoint(0, 0);
-	private boolean featureSelected = false;
+	protected final IConstraint correspondingConstraint;
+	protected boolean featureSelected = false;
 
-	private final IConstraint correspondingConstraint;
+	protected FMPoint location = new FMPoint(0, 0);
 
 	public GraphicalConstraint(IConstraint correspondingConstraint) {
 		this.correspondingConstraint = correspondingConstraint;
 	}
 
 	@Override
-	public GraphicItem getItemType() {
-		return GraphicItem.Constraint;
+	public IConstraint getConstraint() {
+		return correspondingConstraint;
 	}
 
 	@Override
-	public IConstraint getConstraint() {
-		return correspondingConstraint;
+	public GraphicItem getItemType() {
+		return GraphicItem.Constraint;
 	}
 
 	@Override
@@ -68,7 +66,7 @@ public class GraphicalConstraint implements IGraphicalConstraint, PropertyConsta
 
 	@Override
 	public void setFeatureSelected(boolean selected) {
-		this.featureSelected = selected;
+		featureSelected = selected;
 		correspondingConstraint.fireEvent(new PropertyChangeEvent(this, CONSTRAINT_SELECTED, Boolean.FALSE, Boolean.TRUE));
 	}
 

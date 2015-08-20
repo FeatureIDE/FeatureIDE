@@ -41,6 +41,7 @@ import de.fosd.typechef.options.FrontendOptionsWithConfigFiles;
 import de.fosd.typechef.options.OptionException;
 import de.fosd.typechef.options.Options;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
@@ -73,11 +74,11 @@ public class TypeChef {
 		BufferedWriter print = null;
 		try {
 			print = new BufferedWriter(new FileWriter(outputFile));
-			IFeatureModel fm = new IFeatureModel();
+			IFeatureModel fm = FeatureModelFactory.getInstance().createFeatureModel();
 			FeatureModelReaderIFileWrapper fmReader = new FeatureModelReaderIFileWrapper(
 					new XmlFeatureModelReader(fm));
 			fmReader.readFromFile(inputFile);
-			Node nodes = NodeCreator.createNodes(fm.clone()).toCNF();
+			Node nodes = NodeCreator.createNodes(fm.clone(null)).toCNF();
 			StringBuilder cnf = new StringBuilder();
 			cnf.append(nodes.toString(NodeWriter.javaSymbols));
 			print.write(cnf.toString());

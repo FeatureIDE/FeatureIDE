@@ -130,10 +130,10 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter implements
     	calculations.setAttribute(CALCULATE_TAUTOLOGY, "" + featureModel.getAnalyser().calculateTautologyConstraints);
 
     	root.appendChild(comments);
-    	for(int i=0; i<featureModel.getComments().size(); i++){
+    	for(int i=0; i<featureModel.getProperty().getComments().size(); i++){
         	Element c = doc.createElement(C);
         	comments.appendChild(c);        	
-        	Text text = doc.createTextNode(featureModel.getComments().get(i));
+        	Text text = doc.createTextNode(featureModel.getProperty().getComments().get(i));
         	c.appendChild(text);
         }
     	order.setAttribute(USER_DEFINED, Boolean.toString(featureModel.isFeatureOrderUserDefined()));
@@ -169,7 +169,7 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter implements
     	children = feat.getChildren();
     	if (children.isEmpty()) {
     		fnod = doc.createElement(FEATURE);
-    		String description = feat.getDescription();
+    		String description = feat.getProperty().getDescription();
 	    	if (description != null) {
 	    		Element descr = doc.createElement(DESCRIPTION);
 	    		descr.setTextContent("\n" + description.replace("\r", "") + "\n");
@@ -186,7 +186,7 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter implements
 	    	} else {
 	    		fnod = doc.createElement(UNKNOWN);//FMCorePlugin.getDefault().logInfo("creatXMlDockRec: Unexpected error!");
 	    	}
-    		String description = feat.getDescription();
+    		String description = feat.getProperty().getDescription();
 	    	if (description != null) {
 	    		Element descr = doc.createElement(DESCRIPTION);
 	    		descr.setTextContent("\n" + description.replace("\r", "") + "\n");

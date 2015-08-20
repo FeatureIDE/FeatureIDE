@@ -87,13 +87,14 @@ import de.ovgu.featureide.core.builder.FeatureProjectNature;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
-import de.ovgu.featureide.fm.core.ExtendedFeature;
-import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.FeatureModelFile;
 import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
+import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.configuration.FeatureIDEFormat;
@@ -327,7 +328,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			tmpModelReader = ModelIOFactory.getModelReader(featureModel, ModelIOFactory.TYPE_VELVET);
 		} else {
 			modelFile = new FeatureModelFile(project.getFile("model.xml"));
-			featureModel = new IFeatureModel();
+			featureModel = FeatureModelFactory.getInstance().createFeatureModel();
 			tmpModelReader = ModelIOFactory.getModelReader(featureModel, ModelIOFactory.TYPE_XML);
 		}
 
@@ -429,7 +430,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	 */
 	private void readFeatureOrder() throws CoreException {
 		IFile orderFile = project.getFile(".order");
-		if (featureModel.getFeatureOrderList().isEmpty() && !featureModel.isFeatureOrderInXML() && orderFile.exists()) {
+		if (featureModel.getFeatureOrderList().isEmpty() && !featureModel.getProperty().isFeatureOrderInXML() && orderFile.exists()) {
 
 			FeatureOrderReader reader = new FeatureOrderReader(orderFile);
 			LinkedList<String> list = reader.featureOrderRead();
@@ -463,7 +464,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		if (project.getFile("model.m").exists() && !project.getFile("model.xml").exists()) {
 			try {
 				IFile file = project.getFile("model.xml");
-				IFeatureModel fm = new IFeatureModel();
+				IFeatureModel fm = FeatureModelFactory.getInstance().createFeatureModel();
 				// fm.getFMComposerExtension(project);
 				GuidslReader guidslReader = new GuidslReader(fm);
 				FeatureModelReaderIFileWrapper reader = new FeatureModelReaderIFileWrapper(guidslReader);

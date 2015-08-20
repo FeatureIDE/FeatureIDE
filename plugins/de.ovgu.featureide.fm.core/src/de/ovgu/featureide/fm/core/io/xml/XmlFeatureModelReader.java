@@ -57,6 +57,7 @@ import de.ovgu.featureide.fm.core.FMPoint;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
@@ -163,7 +164,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 					nodeValue = nodeValue.substring(1, nodeValue.length() - 1);
 					nodeValue = nodeValue.trim(); 
 				} 
-				parent.setDescription(nodeValue);
+				parent.getProperty().setDescription(nodeValue);
 				continue;
 			}
 			boolean mandatory = false;
@@ -206,7 +207,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 			if (!featureModel.getFMComposerExtension().isValidFeatureName(name)) {
 				throwError(name + IS_NO_VALID_FEATURE_NAME, e);
 			}
-			IFeature f = new IFeature(featureModel, name);
+			IFeature f = FeatureModelFactory.getInstance().createFeature(featureModel, name);
 			f.setMandatory(true);
 			if (nodeName.equals(AND)) {
 				f.setAnd();
@@ -245,7 +246,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 			for (Element child: getElements(e.getChildNodes())) {
 				String nodeName = child.getNodeName();
 				if (nodeName.equals(RULE)) {
-					IConstraint c = new IConstraint(featureModel, parseConstraints2(child.getChildNodes()).getFirst());
+					IConstraint c = FeatureModelFactory.getInstance().createConstraint(featureModel, parseConstraints2(child.getChildNodes()).getFirst());
 					if (child.hasAttributes()) {
 						NamedNodeMap nodeMap = child.getAttributes();
 						for (int i = 0; i < nodeMap.getLength(); i++) {
@@ -320,7 +321,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 	private void parseComments2(NodeList nodeList) throws UnsupportedModelException {
 		for (Element e: getElements(nodeList)) {
 			if (e.getNodeName().equals(C)) {
-				featureModel.addComment(e.getTextContent());
+				featureModel.getProperty().addComment(e.getTextContent());
 			} else {
 				throwError("Unknown comment attribute: " + e.getNodeName(), e);
 			}

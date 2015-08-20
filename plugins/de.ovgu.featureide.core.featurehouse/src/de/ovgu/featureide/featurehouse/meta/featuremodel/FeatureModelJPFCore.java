@@ -132,7 +132,7 @@ public class FeatureModelJPFCore implements IFeatureModelClass {
 	private LinkedList<String> addedFeatures = new LinkedList<String>();
 
 	private Node getFormulaJPF(IFeatureModel model) {
-		return NodeCreator.createNodes(model.clone()).toCNF();
+		return NodeCreator.createNodes(model.clone(null)).toCNF();
 	}
 	
 	/**

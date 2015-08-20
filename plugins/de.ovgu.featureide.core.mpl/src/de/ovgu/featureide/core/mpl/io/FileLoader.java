@@ -26,6 +26,7 @@ import org.eclipse.core.resources.IProject;
 import de.ovgu.featureide.core.mpl.InterfaceProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.io.IOConstants;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
@@ -51,7 +52,7 @@ public final class FileLoader {
 
 	public static IFeatureModel loadFeatureModel(IProject project) {
 		try {
-			IFeatureModel featureModel = new IFeatureModel();
+			IFeatureModel featureModel = FeatureModelFactory.getInstance().createFeatureModel();
 			XmlFeatureModelReader reader = new XmlFeatureModelReader(featureModel);
 			reader.readFromFile(project.getFile(IOConstants.FILENAME_MODEL).getLocation().toFile());
 			return featureModel;

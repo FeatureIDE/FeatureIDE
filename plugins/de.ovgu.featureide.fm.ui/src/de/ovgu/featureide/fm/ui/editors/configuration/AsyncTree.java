@@ -66,7 +66,7 @@ public class AsyncTree extends Thread {
 							AsyncTree.this.interrupt();
 							return;
 						}
-						childNode.setText(currentFeature.getFeature().getDisplayName());
+						childNode.setText(currentFeature.getFeature().getProperty().getDisplayName());
 						childNode.setData(currentFeature);
 						itemMap.put(currentFeature, childNode);
 						if (currentFeature.hasChildren()) {

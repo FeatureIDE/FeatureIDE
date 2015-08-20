@@ -29,6 +29,8 @@ import de.ovgu.featureide.fm.core.FeatureStatus;
  */
 public interface IFeatureProperty {
 
+	IFeatureProperty clone(IFeature newFeature);
+
 	String getDescription();
 
 	String getDisplayName();
@@ -42,5 +44,7 @@ public interface IFeatureProperty {
 	void setDisplayName(String name);
 
 	void setFeatureStatus(FeatureStatus status);
+
+	void setFeatureStatus(FeatureStatus stat, boolean fire);
 
 }

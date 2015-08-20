@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core;
+package de.ovgu.featureide.fm.core.base.impl;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.INVALID;
 import static de.ovgu.featureide.fm.core.localization.StringTable.VALID;
@@ -34,6 +34,8 @@ import javax.annotation.CheckForNull;
 
 import org.sat4j.specs.TimeoutException;
 
+import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -47,7 +49,7 @@ import de.ovgu.featureide.fm.core.constraint.analysis.ExtendedFeatureModelAnalyz
  * @author Sebastian Krieter
  * @author Matthias Strauss
  */
-public class ExtendedFeatureModel extends IFeatureModel {
+public class ExtendedFeatureModel extends FeatureModel {
 
 	public static class UsedModel {
 		private final String modelName;
@@ -195,7 +197,7 @@ public class ExtendedFeatureModel extends IFeatureModel {
 	 * @return true if imported features exists
 	 */
 	public boolean hasInstance() {
-		for (IFeature feature : getFeatureTable().values()) {
+		for (IFeature feature : featureTable.values()) {
 			if (feature instanceof ExtendedFeature && ((ExtendedFeature) feature).isInstance()) {
 				return true;
 			}
@@ -209,7 +211,7 @@ public class ExtendedFeatureModel extends IFeatureModel {
 	 * @return true if inherited features exists
 	 */
 	public boolean hasInherited() {
-		for (IFeature feature : getFeatureTable().values()) {
+		for (IFeature feature : featureTable.values()) {
 			if (feature instanceof ExtendedFeature && ((ExtendedFeature) feature).isInherited()) {
 				return true;
 			}
@@ -218,7 +220,7 @@ public class ExtendedFeatureModel extends IFeatureModel {
 	}
 
 	public boolean hasInterface() {
-		for (IFeature feature : getFeatureTable().values()) {
+		for (IFeature feature : featureTable.values()) {
 			if (feature instanceof ExtendedFeature && ((ExtendedFeature) feature).isInterface()) {
 				return true;
 			}

@@ -71,7 +71,7 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 	}
 	
 	private String createdValidClause() {
-		final Node nodes = NodeCreator.createNodes(featureModel.clone()).eliminateNotSupportedSymbols(NodeWriter.javaSymbols);
+		final Node nodes = NodeCreator.createNodes(featureModel.clone(null)).eliminateNotSupportedSymbols(NodeWriter.javaSymbols);
 		String formula = " " + nodes.toString(NodeWriter.javaSymbols).toLowerCase(Locale.ENGLISH);
 		
 		final String truefalse = "  &&  true  &&  ! false";
