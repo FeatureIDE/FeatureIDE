@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.core.base;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Collection;
 
 /**
  * Interface for a class that represents a feature.</br>
