@@ -45,20 +45,31 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 
 /**
- * @author Reimar SchrÃ¶ter
+ * @author Reimar Schröter
  * @author Sebastian Krieter
  */
 public class CompositionalAnaylsisTester {
 
-	private final List<String> rootFeatures;
 	private final FeatureModel completeModel;
 	private final long startTime;
+
+	private final HashSet<String> core = new HashSet<>();
+	private final HashSet<String> dead = new HashSet<>();
+	
+	private List<String> rootFeatures;
+	
+	private HashSet<List<String>> lastSet = null;
 
 	private long curTime = 0;
 
 	public static void main(final String[] args) throws FileNotFoundException, UnsupportedModelException {
 		final CompositionalAnaylsisTester tester = new CompositionalAnaylsisTester(args[0] + "model.xml");
-		tester.computeAtomicSets();
+		for (int i = 1; i < 3; i++) {
+			tester.computeAtomicSets(i);
+		}
+//		tester.computeAtomicSets(3);
+//		tester.computeAtomicSets(6);
+//		tester.computeAtomicSets(15);
 	}
 
 	public CompositionalAnaylsisTester(String modelFileName) {
@@ -73,11 +84,22 @@ public class CompositionalAnaylsisTester {
 			CorePlugin.getDefault().logError(e);
 			throw new RuntimeException("Could not read feature model from " + modelFileName);
 		}
-
+		
 		curTime = split(curTime);
-		System.out.print("Computing root features...");
-		this.rootFeatures = CorePlugin.splitFeatureModel(completeModel);
+		System.out.print("Computing Core/Dead Features...");
+		
+		final List<List<Feature>> x = completeModel.getAnalyser().analyzeFeatures();
+		for (Feature f : x.get(0)) {
+			core.add(f.getName());
+		}
+		for (Feature f : x.get(1)) {
+			dead.add(f.getName());
+		}
+		
 		curTime = split(curTime);
+		System.out.println(core);
+		System.out.println(dead);
+		System.out.println("-----------------------------------------------------------------");
 	}
 
 	private static long split(long startTime) {
@@ -86,36 +108,68 @@ public class CompositionalAnaylsisTester {
 		return curTime;
 	}
 
-	public void computeAtomicSets() {
+	public void computeAtomicSets(int x) {		
+		System.out.print("Computing root features...");
+		
+		rootFeatures = CorePlugin.splitFeatureModel(completeModel, x);		
+		
+		curTime = split(curTime);		
 		System.out.print("Creating sub models...");
 
 		final List<FeatureModel> subModels = new ArrayList<>();
 		final List<Set<String>> unselectedFeatures = new ArrayList<>();
-		final List<String> unusedFeatures = createSubModels(subModels, unselectedFeatures, completeModel, rootFeatures);
+		final List<Set<String>> selectedFeatures = new ArrayList<>();
+		final List<String> unusedFeatures = createSubModels(subModels, unselectedFeatures, selectedFeatures, completeModel, rootFeatures);
 
 		final AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator();
 		nodeCreator.setCnfType(CNFType.Regular);
+		nodeCreator.setIncludeBooleanValues(false);
 		final List<Node> nodeList = new ArrayList<>();
-		final List<Node> interfaceNodeList = new ArrayList<>();
-
-		final Iterator<Set<String>> excludedFeaturesIterator = unselectedFeatures.iterator();
+		
+//		final List<Node> interfaceNodeList = new ArrayList<>();
+//		final Iterator<Set<String>> excludedFeaturesIterator = unselectedFeatures.iterator();
+		
 		for (FeatureModel subModel : subModels) {
-			nodeCreator.setFeatureModel(subModel);
-			nodeList.add(nodeCreator.createNodes());
-			nodeCreator.setFeatureModel(subModel, excludedFeaturesIterator.next());
-			interfaceNodeList.add(nodeCreator.createNodes());
+			HashSet<String> removeFeatures = new HashSet<>(completeModel.getFeatureNames());
+			removeFeatures.removeAll(subModel.getFeatureNames());
+			nodeCreator.setFeatureModel(completeModel, removeFeatures);
+			Node createNodes = nodeCreator.createNodes();
+			if (createNodes.getChildren().length > 0 && !(createNodes.getChildren().length == 1 && createNodes.getChildren()[0].getChildren().length == 0)) {
+				nodeList.add(createNodes);
+				
+//				final Node in = LongRunningWrapper.runMethod(new FeatureRemover(createNodes,  excludedFeaturesIterator.next()));
+//				if (in.getChildren().length > 0 && !(in.getChildren().length == 1 && in.getChildren()[0].getChildren().length == 0)) {
+//					interfaceNodeList.add(in);
+//				}
+			}
 		}
 
-		curTime = split(curTime);
-		System.out.print("Creating CNF...");
-
-		nodeCreator.setFeatureModel(completeModel);
-		final Node cnf = nodeCreator.createNodes();
-
+//		nodeCreator.setOptionalRoot(true);
+//		for (FeatureModel subModel : subModels) {
+//			nodeCreator.setFeatureModel(subModel);
+//			nodeList.add(nodeCreator.createNodes());
+//			nodeCreator.setFeatureModel(subModel, excludedFeaturesIterator.next());
+//			interfaceNodeList.add(nodeCreator.createNodes());
+//		}
+//
+//		curTime = split(curTime);
+//		System.out.print("Creating CNF...");
+//
+//		nodeCreator.setFeatureModel(completeModel);
+//		final Node cnf = nodeCreator.createNodes();
+//
 		curTime = split(curTime);
 		System.out.print("Removing features (" + unusedFeatures.size() + " / " + completeModel.getNumberOfFeatures() + ")...");
 
-		nodeList.add(createInterfaceNode(cnf, interfaceNodeList, unusedFeatures));
+//		nodeList.add(createInterfaceNode(cnf, interfaceNodeList, unusedFeatures));
+//		nodeList.add(0, cnf);
+		
+		nodeCreator.setFeatureModel(completeModel, unusedFeatures);
+		nodeCreator.setOptionalRoot(false);
+		Node createNodes = nodeCreator.createNodes();
+		if (createNodes.getChildren().length > 0 && !(createNodes.getChildren().length == 1 && createNodes.getChildren()[0].getChildren().length == 0)) {
+			nodeList.add(0, createNodes);
+		}
 
 		curTime = split(curTime);
 		System.out.println("Computing atomic sets:");
@@ -126,21 +180,60 @@ public class CompositionalAnaylsisTester {
 			System.out.print("\t" + i-- + " " + rootNode.getChildren().length);
 
 			final SatSolver solver = new SatSolver(rootNode, 1000, false);
-			atomicSetLists.add(solver.atomicSets());
+			List<List<Literal>> atomicSets = solver.atomicSuperSets();
+			for (Iterator<List<Literal>> iterator2 = atomicSets.iterator(); iterator2.hasNext();) {
+				List<Literal> list = iterator2.next();
+				for (Iterator<Literal> iterator = list.iterator(); iterator.hasNext();) {
+					Literal literal = iterator.next();
+					if (core.contains(literal.var) || dead.contains(literal.var)) {
+						iterator.remove();
+					}
+				}
+				if (list.isEmpty()) {
+					iterator2.remove();
+				}
+			}
+			if (!atomicSets.isEmpty()) {
+				atomicSetLists.add(atomicSets);
+			}
 
 			curTime = split(curTime);
 		}
-
+		
+		curTime = split(curTime);
 		System.out.print("Merging atomic sets...");
 
 		final List<List<String>> mergeAtomicSets = CorePlugin.mergeAtomicSets(atomicSetLists);
+		
 
+		
 		curTime = split(curTime);
 		System.out.println();
 		System.out.println(" > Done!");
 		System.out.print("Global Time");
 		split(startTime);
-
+		
+		for (List<String> list : mergeAtomicSets) {
+			Collections.sort(list);
+		}
+		
+		final HashSet<List<String>> curSet = new HashSet<>(mergeAtomicSets);
+		final boolean compare = compare(curSet);
+		System.out.println(compare);
+		if (!compare) {
+			HashSet<List<String>> curSet2 = new HashSet<>(curSet);
+			curSet2.removeAll(lastSet);
+			lastSet.removeAll(curSet);
+			for (List<String> list : lastSet) {
+				System.out.println(list);
+			}
+			System.out.println("----------");
+			for (List<String> list : curSet2) {
+				System.out.println(list);
+			}
+		}
+		lastSet = curSet;
+		
 		System.out.println();
 		System.out.println("Result:");
 		System.out.println(mergeAtomicSets.size());
@@ -150,6 +243,8 @@ public class CompositionalAnaylsisTester {
 			}
 		}
 		System.out.println(mergeAtomicSets);
+		System.out.println("-----------------------------------------------------------------");
+		System.out.println();
 	}
 
 	private Node createInterfaceNode(Node rootNode, List<Node> interfaceNodes, Collection<String> unusedFeatures) {
@@ -199,21 +294,8 @@ public class CompositionalAnaylsisTester {
 		return new And(newClauses);
 	}
 
-	private List<String> createSubModels(List<FeatureModel> subModels, List<Set<String>> unselectedFeatures, FeatureModel model, List<String> rootFeatureNames) {
-		for (int i = 0; i < rootFeatureNames.size(); i++) {
-			final String rootFeatureName = rootFeatureNames.get(i);
-
-			if (model.getFeature(rootFeatureName) == null) {
-				for (final Feature feature : model.getFeatures()) {
-					if (feature.getName().endsWith(rootFeatureName)) {
-						rootFeatureNames.set(i, feature.getName());
-						break;
-					}
-				}
-			}
-		}
-
-		final List<String> unusedFeatures = new ArrayList<>();
+	private List<String> createSubModels(List<FeatureModel> subModels, List<Set<String>> unselectedFeatures, List<Set<String>> selectedFeatures, FeatureModel model, List<String> rootFeatureNames) {
+		final HashSet<String> unusedFeatures = new HashSet<>();
 
 		for (final String rootFeature : rootFeatureNames) {
 			final Feature root = model.getFeature(rootFeature);
@@ -242,11 +324,16 @@ public class CompositionalAnaylsisTester {
 				throw new RuntimeException("Nested Root " + rootFeature + "!");
 			}
 
+			selectedFeatures.add(includeFeatures);
 			unselectedFeatures.add(excludeFeatures);
 			unusedFeatures.addAll(excludeFeatures);
 			subModels.add(newSubModel);
 		}
-		return unusedFeatures;
+		return new ArrayList<>(unusedFeatures);
+	}
+	
+	public boolean compare(HashSet<List<String>> curSet) {
+		return lastSet == null || curSet.equals(lastSet);
 	}
 
 }

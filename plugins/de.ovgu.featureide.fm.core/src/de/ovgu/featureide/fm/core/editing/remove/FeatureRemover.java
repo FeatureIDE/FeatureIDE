@@ -193,7 +193,9 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 					relevantClauseSet.clear();
 					break;
 				}
-				//	System.out.println(map.size());
+//				if (map.size() % 10 == 9) {
+//					System.out.println(map.size());
+//				}
 				if (workMonitor.checkCancel()) {
 					return null;
 				}
@@ -328,12 +330,12 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 			for (Node clauseChildren : fmNode.getChildren()) {
 				final Literal literal = (Literal) clauseChildren;
 				if (features.contains(literal.var)) {
-					return new Literal(NodeCreator.varTrue);
+					return includeBooleanValues ? new Literal(NodeCreator.varTrue) : new And();
 				}
 			}
 			return fmNode.clone();
 		} else {
-			return (features.contains(((Literal) fmNode).var)) ? new Literal(NodeCreator.varTrue) : fmNode.clone();
+			return (features.contains(((Literal) fmNode).var)) ? (includeBooleanValues ? new Literal(NodeCreator.varTrue) : new And()) : fmNode.clone();
 		}
 	}
 

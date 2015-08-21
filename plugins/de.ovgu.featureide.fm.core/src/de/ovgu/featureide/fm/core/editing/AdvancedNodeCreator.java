@@ -112,6 +112,8 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	 * Default values is {@code true} (values will be included).
 	 */
 	private boolean includeBooleanValues = true;
+	
+	private boolean optionalRoot = false;
 
 	private FeatureModel featureModel = null;
 
@@ -149,6 +151,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 
 	private And createConstraintNodes() {
 		final List<Node> clauses = new ArrayList<>(featureModel.getConstraints().size());
+		boolean compact = true;
 		switch (cnfType) {
 		case None:
 			for (Constraint constraint : featureModel.getConstraints()) {
@@ -156,39 +159,18 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 			}
 			break;
 		case Regular:
-			for (Constraint constraint : featureModel.getConstraints()) {
-				final Node cnfNode = Node.buildCNF(constraint.getNode());
-				if (cnfNode instanceof And) {
-					for (Node andChild : cnfNode.getChildren()) {
-						if (andChild instanceof Or) {
-							clauses.add(andChild);
-						} else {
-							clauses.add(new Or((Literal) andChild));
-						}
-					}
-				} else if (cnfNode instanceof Or) {
-					clauses.add(cnfNode);
-				} else {
-					clauses.add(new Or((Literal) cnfNode));
-				}
-			}
-			break;
+			compact = false;
 		case Compact:
 		default:
 			for (Constraint constraint : featureModel.getConstraints()) {
 				final Node cnfNode = Node.buildCNF(constraint.getNode());
+//				final Node cnfNode = constraint.getNode().clone().toCNF();
 				if (cnfNode instanceof And) {
 					for (Node andChild : cnfNode.getChildren()) {
-						if (andChild instanceof Or) {
-							clauses.add(new Or(andChild.getChildren()));
-						} else {
-							clauses.add(andChild);
-						}
+						clauses.add((compact || (andChild instanceof Or)) ? andChild : new Or(andChild));
 					}
-				} else if (cnfNode instanceof Or) {
-					clauses.add(new Or(cnfNode.getChildren()));
 				} else {
-					clauses.add(cnfNode);
+					clauses.add((compact || (cnfNode instanceof Or)) ? cnfNode : new Or(cnfNode));
 				}
 			}
 			break;
@@ -266,15 +248,17 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		if (root != null) {
 			final List<Node> clauses = new ArrayList<>(featureModel.getNumberOfFeatures());
 
-			switch (cnfType) {
-			case Regular:
-				clauses.add(new Or(getVariable(root, true)));
-				break;
-			case None:
-			case Compact:
-			default:
-				clauses.add(getVariable(root, true));
-				break;
+			if (!optionalRoot) {
+				switch (cnfType) {
+				case Regular:
+					clauses.add(new Or(getVariable(root, true)));
+					break;
+				case None:
+				case Compact:
+				default:
+					clauses.add(getVariable(root, true));
+					break;
+				}
 			}
 
 			final Collection<Feature> features = featureModel.getFeatures();
@@ -381,6 +365,14 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 
 	public void setModelType(ModelType modelType) {
 		this.modelType = modelType;
+	}
+
+	public boolean optionalRoot() {
+		return optionalRoot;
+	}
+
+	public void setOptionalRoot(boolean optionalRoot) {
+		this.optionalRoot = optionalRoot;
 	}
 
 }

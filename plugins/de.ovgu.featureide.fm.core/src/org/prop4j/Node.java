@@ -25,8 +25,10 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.IS_NOT_SUPPORT
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import de.ovgu.featureide.fm.core.Feature;
 
@@ -63,16 +65,17 @@ public abstract class Node {
 		return children;
 	}
 
-	@SuppressWarnings("unchecked")
 	public Node toCNF() {
-		Node node = this;
-		node = node.eliminate(Choose.class, Equals.class, Implies.class);
-		node = node.eliminate(Not.class);
-		node = node.eliminate(AtMost.class, AtLeast.class);
-		node = node.eliminate(Not.class);
-		return node.clausify();
+		Node cnf = this;
+		cnf = cnf.eliminateNonCNFOperators();
+		cnf = deMorgan(cnf);
+		return cnf.clausify();
 	}
-	
+
+	public boolean getValue(Map<Object, Boolean> map) {
+		throw new RuntimeException(getClass().getName() + IS_NOT_SUPPORTING_THIS_METHOD);
+	}
+
 	public static Node buildCNF(Node node) {
 		Node cnf = node.eliminateNonCNFOperators();
 		cnf = deMorgan(cnf);
@@ -154,14 +157,12 @@ public abstract class Node {
 				final int[][] sizeArrays = new int[newChildren.size()][];
 				children = null;
 				node.setChildren(null);
-				int overallSize = 1;
 				for (int i = 0; i < newChildren.size(); i++) {
 					final Node newChild = newChildren.get(i);
 					if (newChild instanceof And) {
 						final Node[] newChildChildren = newChild.getChildren();
 						final int[] curSizeArray = new int[newChildChildren.length];
 						sizeArrays[i] = curSizeArray;
-						overallSize *= newChildChildren.length;
 						for (int j = 0; j < newChildChildren.length; j++) {
 							final Node child = newChildChildren[j];
 							curSizeArray[j] = (child instanceof Or) ? child.getChildren().length : -1;
@@ -170,7 +171,7 @@ public abstract class Node {
 						sizeArrays[i] = null;
 					}
 				}
-				final Node[] newCleanChildren = new Node[overallSize];
+				final HashSet<Node> newCleanChildren = new HashSet<>();
 
 				final int[] indexArray = new int[newChildren.size()];
 				boolean carry;
@@ -218,7 +219,7 @@ public abstract class Node {
 						}
 					}
 
-					newCleanChildren[--overallSize] = new Or(newClause);
+					newCleanChildren.add(new Or(newClause));
 				} while (!carry);
 				return new And(newCleanChildren);
 			} else {
@@ -402,19 +403,22 @@ public abstract class Node {
 		return list;
 	}
 
-	protected void fuseWithSimilarChildren() {
+	protected final void fuseWithSimilarChildren() {
 		int count = children.length;
-		for (Node child : children)
-			if (getClass().isInstance(child))
+		for (Node child : children) {
+			if (getClass().isInstance(child)) {
 				count += child.children.length - 1;
-		Node[] newChildren = new Node[count];
+			}
+		}
+		final Node[] newChildren = new Node[count];
 		int i = 0;
 		for (Node child : children) {
-			if (getClass().isInstance(child))
-				for (Node childsChild : child.children)
-					newChildren[i++] = childsChild;
-			else
+			if (getClass().isInstance(child)) {
+				System.arraycopy(child.children, 0, newChildren, i, child.children.length);
+				i += child.children.length;
+			} else {
 				newChildren[i++] = child;
+			}
 		}
 		children = newChildren;
 	}

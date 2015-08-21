@@ -22,6 +22,7 @@ package org.prop4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A constraint that is true iff all child nodes are true.
@@ -40,8 +41,9 @@ public class And extends Node {
 
 	@Override
 	protected Node clausify() {
-		for (int i = 0; i < children.length; i++)
+		for (int i = 0; i < children.length; i++) {
 			children[i] = children[i].clausify();
+		}
 		fuseWithSimilarChildren();
 		return this;
 	}
@@ -81,6 +83,16 @@ public class And extends Node {
 	@Override
 	public Node clone() {
 		return new And(clone(children));
+	}
+
+	@Override
+	public boolean getValue(Map<Object, Boolean> map) {
+		for (Node child : children) {
+			if (!child.getValue(map)) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 }

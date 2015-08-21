@@ -21,6 +21,7 @@
 package org.prop4j;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * A variable or negated variable.
@@ -89,6 +90,11 @@ public class Literal extends Node {
 		}
 		final Literal other = (Literal) node;
 		return (positive == other.positive) && (var.equals(other.var));
+	}
+
+	@Override
+	public boolean getValue(Map<Object, Boolean> map) {
+		return this.positive == map.get(this.var);
 	}
 
 }

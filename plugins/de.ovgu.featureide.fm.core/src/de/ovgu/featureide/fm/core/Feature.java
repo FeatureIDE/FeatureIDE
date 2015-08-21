@@ -136,7 +136,6 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 			if (thisChild == null) {
 				thisChild = child.clone(featureModel, complete);
 			}
-			this.featureModel.addFeature(thisChild);
 			children.add(thisChild);
 		}
 		

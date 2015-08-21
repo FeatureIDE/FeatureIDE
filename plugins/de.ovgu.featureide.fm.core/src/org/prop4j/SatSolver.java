@@ -189,74 +189,34 @@ public class SatSolver {
 	}
 
 	public List<Literal> knownValues(ValueType vt, Literal... tempNodes) {
-		if (!contradiction) {
+		if (test()) {
 			final IVecInt backbone = new VecInt();
 			for (int i = 0; i < tempNodes.length; i++) {
 				backbone.push(getIntOfLiteral(tempNodes[i]));
 			}
 
-			final Solver<?> s = ((Solver<?>) solver);
-			final IOrder oldOrder = s.getOrder();
-
-			int[] model = null;
-			byte[] b = null;
-			try {
-				s.setOrder(new VarOrderHeap(new PositiveLiteralSelectionStrategy()));
-				int[] model1 = solver.findModel(backbone);
-				if (model1 != null) {
-					s.unset(2);
-					s.setOrder(new VarOrderHeap(new NegativeLiteralSelectionStrategy()));
-					int[] model2 = solver.findModel(backbone);
-					if (model2 != null) {
-						model = new int[model1.length];
-						System.arraycopy(model1, 0, model, 0, model.length);
-
-						b = new byte[model.length];
-
-						for (int i = 0; i < model.length; i++) {
-							b[i] = (byte) ((model1[i] >>> 31) + 1);
-						}
-						for (int i = 0; i < model.length; i++) {
-							b[i] &= (model2[i] >>> 31) + 1;
-						}
-					}
-				}
-			} catch (Exception e) {
-				FMCorePlugin.getDefault().logError(e);
-			} finally {
-				s.setOrder(oldOrder);
-			}
-
-			if (model != null) {
-				for (int i = 0; i < model.length; i++) {
-					if (b[i] == 0) {
-						continue;
-					}
-					final int x = model[i];
-					if ((x * vt.factor) >= 0) {
-						backbone.push(-x);
-						try {
-							if (solver.isSatisfiable(backbone)) {
-								backbone.pop();
-								final int[] tempModel = solver.model();
-								for (int j = i + 1; j < tempModel.length; j++) {
-									b[j] &= (tempModel[j] >>> 31) + 1;
-								}
-							} else {
-								backbone.pop().push(x);
-							}
-						} catch (TimeoutException e) {
-							FMCorePlugin.getDefault().logError(e);
+			final int[] model = solver.model();
+			for (int i = 0; i < model.length; i++) {
+				final int x = model[i];
+				if ((x * vt.factor) >= 0) {
+					backbone.push(-x);
+					try {
+						if (solver.isSatisfiable(backbone)) {
 							backbone.pop();
+						} else {
+							backbone.pop().push(x);
 						}
+					} catch (TimeoutException e) {
+						FMCorePlugin.getDefault().logError(e);
+						backbone.pop();
 					}
 				}
-
-				for (int i = 0; i < tempNodes.length; i++) {
-					backbone.delete(i);
-				}
-				return convertToNodes(backbone);
 			}
+			
+			for (int i = 0; i < tempNodes.length; i++) {
+				backbone.delete(i);
+			}
+			return convertToNodes(backbone);
 		}
 		return Collections.emptyList();
 	}
@@ -307,6 +267,63 @@ public class SatSolver {
 					}
 					backbone.pop();
 					result.add(setList);
+				}
+			}
+			return result;
+		}
+		return Collections.emptyList();
+	}
+	
+	public List<List<Literal>> atomicSuperSets() {
+		if (test()) {
+			final List<List<Literal>> result = new ArrayList<>();
+
+			final IVecInt backbone = new VecInt();
+			final int[] globalModel = solver.model();
+			final byte[] done = new byte[globalModel.length];
+
+			for (int i = 0; i < globalModel.length; i++) {
+				final int x = globalModel[i];
+				if (done[i] == 0) {
+					done[i] = 2;
+
+					if (!sat(backbone, -x)) {
+						backbone.push(x);
+					} else {
+						final ArrayList<Literal> setList = new ArrayList<>();
+						setList.add(new Literal(intToVar.get(Math.abs(x)), x > 0));
+						
+						final int[] model = solver.model();
+						backbone.push(-x);
+						
+						for (int j = i + 1; j < model.length; j++) {
+							if (done[j] == 0) {
+								final int y = model[j];
+								
+								if (!sat(backbone, -y)) {
+									done[j] = 1;
+								}
+							}
+						}
+					
+						backbone.pop().push(x);
+						for (int j = i + 1; j < model.length; j++) {
+							if (done[j] == 1) {
+								final int y = model[j];
+								
+								if (!sat(backbone, y)) {
+									done[j] = 2;
+									setList.add(new Literal(intToVar.get(Math.abs(y)), y > 0));
+								} else {
+									done[j] = 0;
+								}
+							}
+						}
+						backbone.pop();
+						if (setList.size() > 1) {
+							result.add(setList);
+						}
+					}
 				}
 			}
 			return result;

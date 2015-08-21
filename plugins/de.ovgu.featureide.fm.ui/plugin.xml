@@ -275,6 +275,40 @@
 					</reference>
 				</visibleWhen>
 			</command>
+   <separator
+         name="de.ovgu.featureide.fm.ui.separator5"
+         visible="true">
+   </separator>
+			<command
+					commandId="de.ovgu.featureide.fm.ui.commands.ExportDIMACS"
+					icon="icons/export_wiz.gif"
+					id="de.ovgu.featureide.fm.ui.actions.ExportDIMACS"
+					label="Export model to DIMACS format"
+					style="push">
+				<visibleWhen
+						checkEnabled="false">
+					<reference
+							definitionId="de.ovgu.featureide.fm.ui.expressions.containsXml">
+					</reference>
+				</visibleWhen>
+			</command>
+			<command
+					commandId="de.ovgu.featureide.fm.ui.commands.ImportDimacs"
+					icon="icons/import_wiz.gif"
+					id="de.ovgu.featureide.fm.ui.actions.ImportDimcas"
+					label="Import model from DIMACS format"
+					style="push">
+				<visibleWhen
+						checkEnabled="false">
+					<reference
+							definitionId="de.ovgu.featureide.fm.ui.expressions.containsXml">
+					</reference>
+				</visibleWhen>
+			</command>
+			<separator
+					name="de.ovgu.featureide.fm.ui.separator2"
+					visible="true">
+			</separator>
 			<command
 					commandId="de.ovgu.featureide.fm.ui.commands.AnalyzeVelvet"
 					icon="icons/FeatureIconSmall.ico"
@@ -289,39 +323,9 @@
 				</visibleWhen>
 			</command>
 			<separator
-					name="de.ovgu.featureide.fm.ui.separator2"
-					visible="true">
-			</separator>
-			<command
-					commandId="de.ovgu.featureide.fm.ui.commands.ExportSPLConquerer"
-					icon="icons/export_wiz.gif"
-					id="de.ovgu.featureide.fm.ui.actions.ExportSPLConquerer"
-					label="Export model to SPL Conquerer format"
-					style="push">
-				<visibleWhen
-						checkEnabled="false">
-					<reference
-							definitionId="de.ovgu.featureide.fm.ui.expressions.containsXml">
-					</reference>
-				</visibleWhen>
-			</command>
-			<separator
 					name="de.ovgu.featureide.fm.ui.separator4"
 					visible="true">
 			</separator>
-			<command
-					commandId="de.ovgu.featureide.fm.ui.commands.FeatureDependencies"
-					icon="icons/export_wiz.gif"
-					id="de.ovgu.featureide.fm.ui.actions.FeatureDependencies"
-					label="Export feature dependency information"
-					style="push">
-				<visibleWhen
-						checkEnabled="false">
-					<reference
-							definitionId="de.ovgu.featureide.fm.ui.expressions.containsXml">
-					</reference>
-				</visibleWhen>
-			</command>
 			<command
 					commandId="de.ovgu.featureide.fm.ui.commands.ExportCNF"
 					icon="icons/export_wiz.gif"
@@ -336,10 +340,23 @@
 				</visibleWhen>
 			</command>
 			<command
-					commandId="de.ovgu.featureide.fm.ui.commands.ExportDIMACS"
+					commandId="de.ovgu.featureide.fm.ui.commands.ExportSPLConquerer"
 					icon="icons/export_wiz.gif"
-					id="de.ovgu.featureide.fm.ui.actions.ExportDIMACS"
-					label="Export DIMACS"
+					id="de.ovgu.featureide.fm.ui.actions.ExportSPLConquerer"
+					label="Export model to SPL Conquerer format"
+					style="push">
+				<visibleWhen
+						checkEnabled="false">
+					<reference
+							definitionId="de.ovgu.featureide.fm.ui.expressions.containsXml">
+					</reference>
+				</visibleWhen>
+			</command>
+			<command
+					commandId="de.ovgu.featureide.fm.ui.commands.FeatureDependencies"
+					icon="icons/export_wiz.gif"
+					id="de.ovgu.featureide.fm.ui.actions.FeatureDependencies"
+					label="Export feature dependency information"
 					style="push">
 				<visibleWhen
 						checkEnabled="false">
@@ -397,6 +414,10 @@
 				name="Import model from Velvet format">
 		</command>
 		<command
+				id="de.ovgu.featureide.fm.ui.commands.ImportDimacs"
+				name="Import model from Dimacs format">
+		</command>
+		<command
 				id="de.ovgu.featureide.fm.ui.commands.openWithGuidsl"
 				name="Open with GUIDSL">
 		</command>
@@ -446,6 +467,10 @@
 		<handler
 				class="de.ovgu.featureide.fm.ui.handlers.ImportVelvetHandler"
 				commandId="de.ovgu.featureide.fm.ui.commands.ImportVelvet">
+		</handler>
+		<handler
+				class="de.ovgu.featureide.fm.ui.handlers.ImportDIMACSHandler"
+				commandId="de.ovgu.featureide.fm.ui.commands.ImportDimacs">
 		</handler>
 		<handler
 				class="de.ovgu.featureide.fm.ui.handlers.OpenWithGUIDSLHandler"
