@@ -45,6 +45,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModelStructure;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.filter.ConcreteFeatureFilter;
 import de.ovgu.featureide.fm.core.filter.base.Filter;
+import de.ovgu.featureide.fm.core.functional.FunctionalInterfaces;
 
 /**
  * The model representation of the feature tree that notifies listeners of
@@ -106,7 +107,7 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 		} else {
 			structure.setRoot(newRoot.getStructure().cloneSubtree(this));
 			for (final IConstraint constraint : oldFeatureModel.constraints) {
-				if (featureTable.keySet().containsAll(Filter.toString(constraint.getContainedFeatures()))) {
+				if (featureTable.keySet().containsAll(FunctionalInterfaces.mapToString(constraint.getContainedFeatures()))) {
 					constraints.add(constraint.clone(this));
 				}
 			}
@@ -258,7 +259,7 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	@Override
 	public List<String> getFeatureOrderList() {
 		if (featureOrderList.isEmpty()) {
-			return Filter.toString(getFeatures(), new ConcreteFeatureFilter());
+			return FunctionalInterfaces.mapToStringList(FunctionalInterfaces.filter(getFeatures(), new ConcreteFeatureFilter()));
 		}
 		return featureOrderList;
 	}

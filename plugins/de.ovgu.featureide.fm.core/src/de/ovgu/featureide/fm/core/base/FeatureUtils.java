@@ -30,7 +30,7 @@ import de.ovgu.featureide.fm.core.functional.FunctionalInterfaces;
 /**
  * @author Marcus Pinnecke
  */
-public class FeatureUtils {
+public abstract class FeatureUtils {
 	
 	public static final ConcreteFeatureFilter CONCRETE_FEATURE_FILTER = new ConcreteFeatureFilter();
 	

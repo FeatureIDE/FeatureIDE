@@ -110,7 +110,7 @@ public class QuickFixFalseOptionalFeaturesTest {
 	
 	@Test(timeout = 20000)
 	public void createConfigurationsTest() {
-		final Collection<IFeature> concrete = Filter.filter(new LinkedList<>(fm.getFeatures()), new ConcreteFeatureFilter());
+		final Iterable<IFeature> concrete = Filter.retain(new LinkedList<>(fm.getFeatures()), new ConcreteFeatureFilter());
 		final Collection<IFeature> core = fm.getAnalyser().getCoreFeatures();
 		final Collection<String> falseOptionalFeatures = new LinkedList<String>();
 		

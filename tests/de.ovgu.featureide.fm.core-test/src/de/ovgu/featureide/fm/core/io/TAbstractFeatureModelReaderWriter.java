@@ -42,6 +42,7 @@ import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
 import de.ovgu.featureide.fm.core.editing.Comparison;
 import de.ovgu.featureide.fm.core.editing.ModelComparator;
 import de.ovgu.featureide.fm.core.filter.base.Filter;
+import de.ovgu.featureide.fm.core.functional.FunctionalInterfaces;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 
 /**
@@ -115,7 +116,7 @@ public abstract class TAbstractFeatureModelReaderWriter {
 
 	@Test
 	public void testFeatureNames() throws FileNotFoundException, UnsupportedModelException {
-		assertEquals(failureMessage, Filter.toString(origFm.getFeatures()), Filter.toString(newFm.getFeatures()));
+		assertEquals(failureMessage, FunctionalInterfaces.mapToString(origFm.getFeatures()), FunctionalInterfaces.mapToString(newFm.getFeatures()));
 	}
 
 	@Test

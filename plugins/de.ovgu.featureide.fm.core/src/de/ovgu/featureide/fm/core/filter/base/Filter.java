@@ -20,16 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.filter.base;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
-import java.util.NoSuchElementException;
-
-import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.filter.ConcreteFeatureFilter;
 
 /**
  * Filters elements out of a collection based on a test from one or more {@link IFilter} instances.
@@ -44,55 +35,35 @@ public abstract class Filter {
 	/**
 	 * Removes all elements from the collection that do <b>not</b> pass the filter.
 	 * 
-	 * @param collection the collection
-	 * @param filter the filter
+	 * @param source the collection
+	 * @param predicate the filter
 	 */
-	public static <U, T extends U> Collection<T> filter(Collection<T> collection, IFilter<U> filter) {
-		if (collection != null && filter != null) {
-			for (Iterator<T> iterator = collection.iterator(); iterator.hasNext();) {
-				if (!filter.isValid(iterator.next())) {
+	public static <U, T extends U> Iterable<T> retain(Iterable<T> source, IFilter<U> predicate) {
+		if (source != null && predicate != null) {
+			for (Iterator<T> iterator = source.iterator(); iterator.hasNext();) {
+				if (!predicate.isValid(iterator.next())) {
 					iterator.remove();
 				}
 			}
 		}
-		return collection;
+		return source;
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static <T> Collection<T> filter(Collection<T> collection, Collection<IFilter<?>> filterList) {
-		if (collection != null && filterList != null) {
-			for (IFilter filter : filterList) {
-				for (Iterator<T> iterator = collection.iterator(); iterator.hasNext();) {
-					if (!filter.isValid(iterator.next())) {
-						iterator.remove();
-					}
+	/**
+	 * Removes all elements from the collection that pass the filter.
+	 * 
+	 * @param source the collection
+	 * @param predicate the filter
+	 */
+	public static <U, T extends U> Iterable<T> remove(Iterable<T> source, IFilter<U> predicate) {
+		if (source != null && predicate != null) {
+			for (Iterator<T> iterator = source.iterator(); iterator.hasNext();) {
+				if (predicate.isValid(iterator.next())) {
+					iterator.remove();
 				}
 			}
 		}
-		return collection;
-	}
-	
-	public static List<String> toString(Collection<?> collection) {
-		if (collection != null) {
-			final ArrayList<String> result = new ArrayList<>(collection.size());
-			for (Iterator<?> iterator = collection.iterator(); iterator.hasNext();) {
-				result.add(iterator.next().toString());
-			}
-			return result;
-		}
-		return Collections.emptyList();
+		return source;
 	}
 
-	public static <U, T extends U> List<String> toString(Collection<T> collection, IFilter<U> filter) {
-		if (collection != null && filter != null) {
-			final ArrayList<String> result = new ArrayList<>(collection.size());
-			for (Iterator<T> iterator = collection.iterator(); iterator.hasNext();) {
-				if (filter.isValid(iterator.next())) {
-					result.add(iterator.next().toString());
-				}
-			}
-			return result;
-		}
-		return Collections.emptyList();
-	}
 }
