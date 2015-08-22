@@ -255,10 +255,9 @@ public abstract class FunctionalInterfaces {
 	}
 
 	/**
-	 * Converts the iterator of type <b>T</b> into an interator of type <b>String</b> by invoking <code>toString</code> on each element using
-	 * {@link #map(Iterable, String, Object...)}. <br/>
+	 * Converts the iterator of type <b>T</b> into an iterator of type <b>String</b> by invoking <code>toString()</code> on each element.
 	 * <br/>
-	 * It is guaranteed not to remove any element from the iterator. <br/>
+	 * It is guaranteed to not remove any element from the iterator. <br/>
 	 * <br/>
 	 * This is a <b>non-blocking</b> operation.
 	 * 
