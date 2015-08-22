@@ -22,13 +22,11 @@ package de.ovgu.featureide.fm.core.base.impl;
 
 import org.prop4j.Node;
 
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
-import de.ovgu.featureide.fm.core.base.IGraphicalConstraint;
-import de.ovgu.featureide.fm.core.base.IGraphicalFeature;
-import de.ovgu.featureide.fm.core.base.IGraphicalFeatureModel;
 
 /**
  * 
@@ -36,7 +34,9 @@ import de.ovgu.featureide.fm.core.base.IGraphicalFeatureModel;
  */
 public class ExtendedFeatureModelFactory implements IFeatureModelFactory {
 
-	public static IFeatureModelFactory getInstance() {
+	public static final String ID = FMCorePlugin.PLUGIN_ID + ".ExtendedFeatureModelFactory";
+
+	public static ExtendedFeatureModelFactory getInstance() {
 		return new ExtendedFeatureModelFactory();
 	}
 
@@ -44,32 +44,37 @@ public class ExtendedFeatureModelFactory implements IFeatureModelFactory {
 	}
 
 	@Override
-	public IConstraint createConstraint(IFeatureModel featureModel, Node propNode) {
+	public String getId() {
+		return ID;
+	}
+
+	@Override
+	public ExtendedConstraint createConstraint(IFeatureModel featureModel, Node propNode) {
 		return new ExtendedConstraint(featureModel, propNode);
 	}
 
 	@Override
-	public IFeature createFeature(IFeatureModel featureModel, String name) {
+	public ExtendedFeature createFeature(IFeatureModel featureModel, String name) {
 		return new ExtendedFeature(featureModel, name);
 	}
 
 	@Override
-	public IFeatureModel createFeatureModel() {
+	public ExtendedFeatureModel createFeatureModel() {
 		return new ExtendedFeatureModel();
 	}
 
 	@Override
-	public IGraphicalConstraint createGraphicalRepresentation(IConstraint constraint) {
+	public GraphicalConstraint createGraphicalRepresentation(IConstraint constraint) {
 		return new GraphicalConstraint(constraint);
 	}
 
 	@Override
-	public IGraphicalFeature createGraphicalRepresentation(IFeature feature) {
+	public GraphicalFeature createGraphicalRepresentation(IFeature feature) {
 		return new GraphicalFeature(feature);
 	}
 
 	@Override
-	public IGraphicalFeatureModel createGraphicalRepresentation(IFeatureModel featureModel) {
+	public GraphicalFeatureModel createGraphicalRepresentation(IFeatureModel featureModel) {
 		return new GraphicalFeatureModel(featureModel);
 	}
 

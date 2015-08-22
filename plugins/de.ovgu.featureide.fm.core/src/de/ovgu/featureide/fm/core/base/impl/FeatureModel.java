@@ -44,7 +44,6 @@ import de.ovgu.featureide.fm.core.base.IFeatureModelProperty;
 import de.ovgu.featureide.fm.core.base.IFeatureModelStructure;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.filter.ConcreteFeatureFilter;
-import de.ovgu.featureide.fm.core.filter.base.Filter;
 import de.ovgu.featureide.fm.core.functional.FunctionalInterfaces;
 
 /**
@@ -107,7 +106,7 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 		} else {
 			structure.setRoot(newRoot.getStructure().cloneSubtree(this));
 			for (final IConstraint constraint : oldFeatureModel.constraints) {
-				if (featureTable.keySet().containsAll(FunctionalInterfaces.mapToString(constraint.getContainedFeatures()))) {
+				if (featureTable.keySet().containsAll(FunctionalInterfaces.mapToStringList(constraint.getContainedFeatures()))) {
 					constraints.add(constraint.clone(this));
 				}
 			}

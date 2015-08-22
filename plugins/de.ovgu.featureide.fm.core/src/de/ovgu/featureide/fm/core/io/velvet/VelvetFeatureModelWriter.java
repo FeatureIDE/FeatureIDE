@@ -26,8 +26,8 @@ import java.util.HashSet;
 import java.util.LinkedList;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
-import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedConstraint;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
@@ -69,7 +69,7 @@ public class VelvetFeatureModelWriter extends AbstractFeatureModelWriter {
 			extFeatureModel = (ExtendedFeatureModel) featureModel;
 			isInterface = isInterface || extFeatureModel.isInterface();
 		}
-		IFeature root = featureModel.getRoot();
+		IFeatureStructure root = featureModel.getStructure().getRoot();
 		sb.delete(0, sb.length());
 
 		if (isInterface) {
@@ -77,7 +77,7 @@ public class VelvetFeatureModelWriter extends AbstractFeatureModelWriter {
 		} else {
 			sb.append("concept ");
 		}
-		sb.append(root.getName());
+		sb.append(root.getFeature().getName());
 		if (extFeatureModel != null) {
 			usedVariables.clear();
 			LinkedList<ExtendedFeatureModel.UsedModel> inheritedModels = new LinkedList<ExtendedFeatureModel.UsedModel>();
@@ -130,7 +130,7 @@ public class VelvetFeatureModelWriter extends AbstractFeatureModelWriter {
 		sb.append(NEWLINE);
 
 		if (extFeatureModel != null && !isInterface) {
-			for (IFeature child : root.getChildren()) {
+			for (IFeatureStructure child : root.getChildren()) {
 				writeNewDefined(child, 1);
 			}
 			
@@ -158,26 +158,26 @@ public class VelvetFeatureModelWriter extends AbstractFeatureModelWriter {
 		return sb.toString();
 	}
 	
-	private void writeFeatureGroup(IFeature curFeature, int depth) {
-		if (curFeature.isAnd()) {
-			for (IFeature feature : curFeature.getChildren()) {
+	private void writeFeatureGroup(IFeatureStructure root, int depth) {
+		if (root.isAnd()) {
+			for (IFeatureStructure feature : root.getChildren()) {
 				writeFeature(feature, depth + 1);
 			}
-		} else if (curFeature.isOr()) {
+		} else if (root.isOr()) {
 			writeTab(depth + 1);
 			sb.append("someOf {");
 			sb.append(NEWLINE);
-			for (IFeature feature : curFeature.getChildren()) {
+			for (IFeatureStructure feature : root.getChildren()) {
 				writeFeature(feature, depth + 2);
 			}
 			writeTab(depth + 1);
 			sb.append("}");
 			sb.append(NEWLINE);
-		} else if (curFeature.isAlternative()) {
+		} else if (root.isAlternative()) {
 			writeTab(depth + 1);
 			sb.append("oneOf {");
 			sb.append(NEWLINE);
-			for (IFeature f : curFeature.getChildren()) {
+			for (IFeatureStructure f : root.getChildren()) {
 				writeFeature(f, depth + 2);
 			}
 			writeTab(depth + 1);
@@ -186,20 +186,20 @@ public class VelvetFeatureModelWriter extends AbstractFeatureModelWriter {
 		}
 	}
 
-	private void writeFeature(IFeature curFeature, int depth) {
+	private void writeFeature(IFeatureStructure feature, int depth) {
 		writeTab(depth);
-		if (curFeature.isAbstract()) {
+		if (feature.isAbstract()) {
 			sb.append("abstract ");
 		}
-		if (curFeature.isMandatory() && (curFeature.getParent() == null || curFeature.getParent().isAnd())) {
+		if (feature.isMandatory() && (feature.getParent() == null || feature.getParent().isAnd())) {
 			sb.append("mandatory ");
 		}
 		sb.append("feature ");
-		sb.append(curFeature.getName());
-		final String description = curFeature.getProperty().getDescription();
+		sb.append(feature.getFeature().getName());
+		final String description = feature.getFeature().getProperty().getDescription();
 		final boolean hasDescription = description != null && !description.isEmpty();
 
-		if (curFeature.getChildrenCount() == 0 && !hasDescription) {
+		if (feature.getChildrenCount() == 0 && !hasDescription) {
 			sb.append(";");
 		} else {
 			sb.append(" {");
@@ -212,7 +212,7 @@ public class VelvetFeatureModelWriter extends AbstractFeatureModelWriter {
 				sb.append(NEWLINE);
 			}
 			
-			writeFeatureGroup(curFeature, depth);
+			writeFeatureGroup(feature, depth);
 			
 			writeTab(depth);
 			sb.append("}");
@@ -220,17 +220,17 @@ public class VelvetFeatureModelWriter extends AbstractFeatureModelWriter {
 		sb.append(NEWLINE);
 	}
 	
-	private void writeNewDefined(IFeature curFeature, int depth) {
-		if (curFeature instanceof ExtendedFeature) {
-			final ExtendedFeature extFeature = (ExtendedFeature) curFeature;
+	private void writeNewDefined(IFeatureStructure child2, int depth) {
+		if (child2 instanceof ExtendedFeature) {
+			final ExtendedFeature extFeature = (ExtendedFeature) child2;
 			
 			if (extFeature.getType() == ExtendedFeature.TYPE_INSTANCE || extFeature.getType() == ExtendedFeature.TYPE_INTERFACE) {
 				if (usedVariables.add(extFeature.getExternalModelName())) {
-					IFeature parent = curFeature.getParent();
+					IFeatureStructure parent = child2.getParent();
 					writeTab(depth);
 					if (!parent.isRoot()) {
 						sb.append("feature ");
-						sb.append(parent.getName());
+						sb.append(parent.getFeature().getName());
 						sb.append(" {");
 						sb.append(NEWLINE);
 						writeTab(depth + 1);
@@ -247,7 +247,7 @@ public class VelvetFeatureModelWriter extends AbstractFeatureModelWriter {
 				}
 			}
 		}
-		for (IFeature child : curFeature.getChildren()) {
+		for (IFeatureStructure child : child2.getChildren()) {
 			writeNewDefined(child, depth);
 		}
 	}

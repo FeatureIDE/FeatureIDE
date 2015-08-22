@@ -37,6 +37,7 @@ import org.sat4j.specs.TimeoutException;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
 
 /**
@@ -74,16 +75,16 @@ public abstract class Generator {
 			for (int i = 1; i <= childrenCount; i++) {
 				IFeature child = FeatureModelFactory.getInstance().createFeature(fm, "C" + (count + i));
 				fm.addFeature(child);
-				parent.addChild(child);
+				parent.getStructure().addChild(child.getStructure());
 				leaves.add(child);
 			}
 			if (random.nextBoolean()) {
-				parent.changeToAnd();
-				for (IFeature child : parent.getChildren())
+				parent.getStructure().changeToAnd();
+				for (IFeatureStructure child : parent.getStructure().getChildren())
 					child.setMandatory(random.nextBoolean());
 			}
 			else if (random.nextBoolean())
-				parent.changeToOr();
+				parent.getStructure().changeToOr();
 			count += childrenCount;
 		}
 		fm.getRenamingsManager().performRenamings();

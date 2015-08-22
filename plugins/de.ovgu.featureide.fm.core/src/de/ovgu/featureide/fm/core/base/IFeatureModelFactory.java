@@ -29,6 +29,8 @@ import org.prop4j.Node;
  */
 public interface IFeatureModelFactory {
 
+	String getId();
+	
 	IConstraint createConstraint(IFeatureModel featureModel, Node propNode);
 
 	IFeature createFeature(IFeatureModel featureModel, String name);

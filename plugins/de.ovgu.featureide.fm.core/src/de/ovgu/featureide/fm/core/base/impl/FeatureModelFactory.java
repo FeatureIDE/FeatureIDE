@@ -26,10 +26,26 @@ import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
  * 
  * @author Sebastian Krieter
  */
-public abstract class FeatureModelFactory {
+public abstract class FeatureModelFactory implements IFeatureModelFactory {
+	
+	private final static IFeatureModelFactory[] factoryArray;
+	static {
+		factoryArray = new IFeatureModelFactory[2];
+		factoryArray[0] = DefaultFeatureModelFactory.getInstance();
+		factoryArray[1] = ExtendedFeatureModelFactory.getInstance();
+	}
 
 	public static IFeatureModelFactory getInstance() {
 		return DefaultFeatureModelFactory.getInstance();
+	}
+	
+	public static IFeatureModelFactory getInstance(String id) {
+		for (IFeatureModelFactory factory : factoryArray) {
+			if (factory.getId().equals(id)) {
+				return factory;
+			}
+		}
+		throw new RuntimeException("No factory found for ID " + id);
 	}
 
 }
