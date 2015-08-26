@@ -129,7 +129,9 @@ public class CompositionalAnaylsisTester {
 //		final List<Node> interfaceNodeList = new ArrayList<>();
 //		final Iterator<Set<String>> excludedFeaturesIterator = unselectedFeatures.iterator();
 		
+		int i = subModels.size();
 		for (FeatureModel subModel : subModels) {
+			System.out.print("\t" + i-- + " " + subModel.getNumberOfFeatures());
 			HashSet<String> removeFeatures = new HashSet<>(completeModel.getFeatureNames());
 			removeFeatures.removeAll(subModel.getFeatureNames());
 			nodeCreator.setFeatureModel(completeModel, removeFeatures);
@@ -142,6 +144,7 @@ public class CompositionalAnaylsisTester {
 //					interfaceNodeList.add(in);
 //				}
 			}
+			curTime = split(curTime);
 		}
 
 //		nodeCreator.setOptionalRoot(true);
@@ -175,7 +178,7 @@ public class CompositionalAnaylsisTester {
 		System.out.println("Computing atomic sets:");
 
 		final List<List<List<Literal>>> atomicSetLists = new ArrayList<>(nodeList.size());
-		int i = nodeList.size();
+		i = nodeList.size();
 		for (Node rootNode : nodeList) {
 			System.out.print("\t" + i-- + " " + rootNode.getChildren().length);
 

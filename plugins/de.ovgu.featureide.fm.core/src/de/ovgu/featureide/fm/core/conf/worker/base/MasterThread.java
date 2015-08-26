@@ -26,12 +26,14 @@ import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.job.AWorkMonitor;
+import de.ovgu.featureide.fm.core.job.SyncWorkMonitor;
 import de.ovgu.featureide.fm.core.job.WorkMonitor;
 
 final class MasterThread<T> {
 
 	final ConcurrentLinkedQueue<T> objects = new ConcurrentLinkedQueue<>();
-	final WorkMonitor workMonitor;
+	final AWorkMonitor workMonitor;
 
 	private final AWorkerThread<T> factory;
 
@@ -41,7 +43,7 @@ final class MasterThread<T> {
 
 	MasterThread(AWorkerThread<T> factory, WorkMonitor workMonitor) {
 		this.factory = factory;
-		this.workMonitor = (workMonitor != null) ? workMonitor : new WorkMonitor();
+		this.workMonitor = (workMonitor != null) ? new SyncWorkMonitor(workMonitor) : new WorkMonitor();
 	}
 
 	private void init(int numberOfThreads) {

@@ -102,8 +102,6 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 		retainedFeatures.removeAll(features);
 
 		if (fmNode instanceof And) {
-			workMonitor.setMaxAbsoluteWork(features.size() + 2);
-
 			final Node[] andChildren = fmNode.getChildren();
 
 			relevantClauseList = new ArrayList<>(andChildren.length);
@@ -184,7 +182,8 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 
 				addNewClause(curClause);
 			}
-			workMonitor.worked();
+
+			workMonitor.setMaxAbsoluteWork(map.size() + 1);
 
 			while (!map.isEmpty()) {
 				final String curFeature = map.next().getFeature();
@@ -193,13 +192,9 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 					relevantClauseSet.clear();
 					break;
 				}
-//				if (map.size() % 10 == 9) {
-//					System.out.println(map.size());
-//				}
-				if (workMonitor.checkCancel()) {
+				if (workMonitor.step()) {
 					return null;
 				}
-				workMonitor.worked();
 
 				// ... create list of clauses that contain this feature
 				int relevantIndex = 0;
@@ -222,22 +217,12 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 						}
 					}
 				}
-
+				
 				final CNFSolver solver = new CNFSolver(relevantClauseList.subList(0, relevantIndex));
 
 				// ... combine relevant clauses if possible
-				for (int i = relevantIndex - 1; i >= 0; i--) {
-					final boolean positive;
-					switch (clauseStates[i]) {
-					case 1:
-						positive = true;
-						break;
-					case 2:
-						positive = false;
-						break;
-					case -1:
-					case 0:
-					default:
+				for (int i = relevantIndex - 1; i >= 0; i--) {					
+					if (clauseStates[i] < 1) {
 						continue;
 					}
 
@@ -272,15 +257,33 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 						addNewClause(DeprecatedClause.createClause(map, retainLiterals));
 
 						// try to combine with other clauses
-					} else {
+						clauseStates[i] = -1;
+					}
+				}
+				for (int i = relevantIndex - 1; i >= 0; i--) {
+					final boolean positive;
+					switch (clauseStates[i]) {
+					case 1:
+						positive = true;
+						break;
+					case 2:
+						positive = false;
+						break;
+					case -1:
+					case 0:
+					default:
+						continue;
+					}
+					final Literal[] orChildren = relevantClauseList.get(i).getLiterals();
+						{
 						for (int j = i - 1; j >= 0; j--) {
 							if ((positive && clauseStates[j] == 2) || (!positive && clauseStates[j] == 1)) {
 								final Node[] children2 = relevantClauseList.get(j).getLiterals();
 								final Literal[] newChildren = new Literal[orChildren.length + children2.length];
-
+	
 								System.arraycopy(orChildren, 0, newChildren, 0, orChildren.length);
 								System.arraycopy(children2, 0, newChildren, orChildren.length, children2.length);
-
+	
 								addNewClause(DeprecatedClause.createClause(map, newChildren, curFeature));
 							}
 						}
@@ -323,7 +326,7 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 				newClauses[j++] = new Or(Node.clone(newClause.getLiterals()));
 			}
 
-			workMonitor.worked();
+			workMonitor.step();
 
 			return new And(newClauses);
 		} else if (fmNode instanceof Or) {

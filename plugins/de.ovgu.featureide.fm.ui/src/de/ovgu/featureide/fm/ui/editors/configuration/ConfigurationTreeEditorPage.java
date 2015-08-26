@@ -60,6 +60,7 @@ import org.sat4j.specs.TimeoutException;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.FunctionalInterfaces;
 import de.ovgu.featureide.fm.core.FunctionalInterfaces.IBinaryFunction;
+import de.ovgu.featureide.fm.core.FunctionalInterfaces.IConsumer;
 import de.ovgu.featureide.fm.core.FunctionalInterfaces.IFunction;
 import de.ovgu.featureide.fm.core.configuration.IConfiguration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
@@ -455,14 +456,14 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		final LongRunningJob<Void> job = LongRunningWrapper.createJob("",
 				configurationEditor.getConfiguration().getPropagator().leadToValidConfiguration(featureList));
 
-		job.setIntermediateFunction(new IFunction<Object, Void>() {
+		job.setIntermediateFunction(new IConsumer<Object>() {
 			@Override
-			public Void invoke(Object t) {
+			public void invoke(Object t) {
 				if (t instanceof SelectableFeature) {
 					final SelectableFeature feature = (SelectableFeature) t;
 					final TreeItem item = itemMap.get(feature);
 					if (item == null) {
-						return null;
+						return;
 					}
 					currentDisplay.asyncExec(new Runnable() {
 						@Override
@@ -486,7 +487,6 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 						}
 					});
 				}
-				return null;
 			}
 		});
 		return job;
@@ -500,14 +500,14 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		SelectableFeature feature = (SelectableFeature) (topItem.getData());
 		final LongRunningJob<List<String>> job = LongRunningWrapper.createJob("",
 				configurationEditor.getConfiguration().getPropagator().update(redundantManual, feature.getFeature().getName()));
-		job.setIntermediateFunction(new IFunction<Object, Void>() {
+		job.setIntermediateFunction(new IConsumer<Object>() {
 			@Override
-			public Void invoke(Object t) {
+			public void invoke(Object t) {
 				if (t instanceof SelectableFeature) {
 					final SelectableFeature feature = (SelectableFeature) t;
 					final TreeItem item = itemMap.get(feature);
 					if (item == null) {
-						return null;
+						return;
 					}
 					currentDisplay.asyncExec(new Runnable() {
 						@Override
@@ -517,7 +517,6 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 						}
 					});
 				}
-				return null;
 			}
 		});
 		return job;

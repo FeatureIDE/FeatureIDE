@@ -26,19 +26,23 @@ package de.ovgu.featureide.fm.core.job;
  * 
  * @author Sebastian Krieter
  */
-public final class WorkMonitor extends AWorkMonitor {
+public final class SyncWorkMonitor extends AWorkMonitor {
+	
+	public SyncWorkMonitor(AWorkMonitor oldMonitor) {
+		super(oldMonitor);
+	}
 
-	public void worked() {
+	public synchronized void worked() {
 		internalWorked();
 	}
 
 	@Override
-	public boolean checkCancel() {
+	public synchronized boolean checkCancel() {
 		return internalCheckCancel();
 	}
 
 	@Override
-	public void invoke(Object t) {
+	public synchronized void invoke(Object t) {
 		internalInvoke(t);
 	}
 

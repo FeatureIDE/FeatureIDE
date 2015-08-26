@@ -69,7 +69,11 @@ public abstract class LongRunningWrapper {
 
 	public static <T> T runMethod(LongRunningMethod<T> method, WorkMonitor monitor) {
 		try {
-			return method.execute(monitor != null ? monitor : new WorkMonitor());
+			monitor = monitor != null ? monitor : new WorkMonitor();
+			monitor.begin("");
+			final T result = method.execute(monitor);
+			monitor.done();
+			return result;
 		} catch (Exception e) {
 			FMCorePlugin.getDefault().logError(e);
 			return null;

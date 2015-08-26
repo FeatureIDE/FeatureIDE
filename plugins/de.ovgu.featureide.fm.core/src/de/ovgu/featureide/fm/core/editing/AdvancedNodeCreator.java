@@ -163,8 +163,8 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		case Compact:
 		default:
 			for (Constraint constraint : featureModel.getConstraints()) {
-				final Node cnfNode = Node.buildCNF(constraint.getNode());
-//				final Node cnfNode = constraint.getNode().clone().toCNF();
+//				final Node cnfNode = Node.buildCNF(constraint.getNode());
+				final Node cnfNode = constraint.getNode().toCNF();
 				if (cnfNode instanceof And) {
 					for (Node andChild : cnfNode.getChildren()) {
 						clauses.add((compact || (andChild instanceof Or)) ? andChild : new Or(andChild));

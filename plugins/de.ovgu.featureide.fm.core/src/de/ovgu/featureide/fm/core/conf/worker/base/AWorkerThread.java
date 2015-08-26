@@ -59,7 +59,7 @@ public abstract class AWorkerThread<T> implements Runnable {
 		if (beforeWork()) {
 			for (T object = masterThread.objects.poll(); object != null; object = masterThread.objects.poll()) {
 				work(object);
-				masterThread.workMonitor.synchronizedWorked();
+				masterThread.workMonitor.worked();
 			}
 			afterWork(true);
 		} else {

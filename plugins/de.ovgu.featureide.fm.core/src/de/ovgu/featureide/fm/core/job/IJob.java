@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.job;
 
-import de.ovgu.featureide.fm.core.FunctionalInterfaces.IFunction;
+import de.ovgu.featureide.fm.core.FunctionalInterfaces.IConsumer;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 
 /**
@@ -96,5 +96,5 @@ public interface IJob {
 	 */
 	void schedule();
 	
-	void setIntermediateFunction(IFunction<Object, Void> intermediateFunction);
+	void setIntermediateFunction(IConsumer<Object> intermediateFunction);
 }

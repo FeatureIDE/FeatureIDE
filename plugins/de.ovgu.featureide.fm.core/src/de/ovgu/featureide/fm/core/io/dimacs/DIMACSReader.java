@@ -39,7 +39,9 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.editing.remove.FeatureRemover;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import de.ovgu.featureide.fm.core.job.ConsoleProgressMonitor;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
+import de.ovgu.featureide.fm.core.job.WorkMonitor;
 
 /**
  * Parses feature models in the DIMACS CNF format.
@@ -113,7 +115,9 @@ public class DIMACSReader extends AbstractFeatureModelReader {
 			clauseParts.clear();
 		}
 		Node cnf = new And(clauses.toArray(new Or[0]));
-		cnf = LongRunningWrapper.runMethod(new FeatureRemover(cnf, abstractNames, false));
+		final WorkMonitor workMonitor = new WorkMonitor();
+		workMonitor.setMonitor(new ConsoleProgressMonitor());
+		cnf = LongRunningWrapper.runMethod(new FeatureRemover(cnf, abstractNames, false), workMonitor);
 		for (Node clause : cnf.getChildren()) {
 			featureModel.addConstraint(new Constraint(featureModel, clause));
 		}

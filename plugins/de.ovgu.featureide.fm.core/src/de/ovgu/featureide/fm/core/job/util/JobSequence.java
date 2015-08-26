@@ -28,7 +28,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.FunctionalInterfaces.IFunction;
+import de.ovgu.featureide.fm.core.FunctionalInterfaces.IConsumer;
 import de.ovgu.featureide.fm.core.job.IJob;
 
 /**
@@ -196,7 +196,7 @@ public final class JobSequence implements IJob {
 	}
 
 	@Override
-	public void setIntermediateFunction(IFunction<Object, Void> intermediateFunction) {
+	public void setIntermediateFunction(IConsumer<Object> intermediateFunction) {
 	}
 
 	@Override
