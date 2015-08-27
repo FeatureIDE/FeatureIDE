@@ -21,6 +21,7 @@
 package de.ovgu.featureide.featurehouse.errorpropagation;
 
 import java.io.FileNotFoundException;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
@@ -36,7 +37,11 @@ import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.functional.FunctionalInterfaces;
+import de.ovgu.featureide.fm.core.functional.FunctionalInterfaces.IFunction;
 
 /**
  * Propagates errors for <code>FeatureHouse</code> Java files.
@@ -55,7 +60,7 @@ public class JavaErrorPropagation extends ErrorPropagation {
 	// private static final String IMPORT = THE_IMPORT;
 
 	private static final String TASK = "org.eclipse.jdt.core.task";
-	private List<String> layerNames = null;
+	private Collection<String> layerNames = null;
 
 	protected JavaErrorPropagation(IFeatureProject featureProject) {
 		super(featureProject);
@@ -278,7 +283,14 @@ public class JavaErrorPropagation extends ErrorPropagation {
 			if (model.isFeatureOrderUserDefined()) {
 				layerNames = model.getFeatureOrderList();
 			} else {
-				layerNames = model.getConcreteFeatureNames();
+				layerNames = FunctionalInterfaces.toList(FunctionalInterfaces.map(model.getFeatures(), new  IFunction<IFeature, String>() {
+
+					@Override
+					public String invoke(IFeature t) {
+						return t.getName();
+					}
+					
+				}));
 			}
 		}
 

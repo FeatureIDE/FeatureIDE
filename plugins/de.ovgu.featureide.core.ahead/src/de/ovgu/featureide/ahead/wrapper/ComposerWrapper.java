@@ -212,7 +212,7 @@ public class ComposerWrapper {
 					featureProject.getProject().getLocation().toFile());
 			list = reader2.featureOrderRead();
 		}*/
-		List<String> featureOrderList = featureProject.getFeatureModel().getProperty().getFeatureOrderList();
+		List<String> featureOrderList = featureProject.getFeatureModel().getFeatureOrderList();
 		for (IFolder folder : featureFolders) {
 			allFeatureFolders.add(folder);
 		}

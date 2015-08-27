@@ -76,6 +76,7 @@ import de.ovgu.featureide.core.signature.base.FeatureDataConstructor;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiClassSignature;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiFieldSignature;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.job.AStoppableJob;
 import fuji.Composition;
@@ -282,7 +283,7 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 		SPLStructure spl = null;
 		Program ast;
 		try {
-			Main fuji = new Main(fujiOptions, fm, fm.getConcreteFeatureNames());
+			Main fuji = new Main(fujiOptions, fm, FeatureUtils.extractConcreteFeaturesAsStringList(fm));
 			Composition composition = fuji.getComposition(fuji);
 			ast = composition.composeAST();
 			fuji.typecheckAST(ast);

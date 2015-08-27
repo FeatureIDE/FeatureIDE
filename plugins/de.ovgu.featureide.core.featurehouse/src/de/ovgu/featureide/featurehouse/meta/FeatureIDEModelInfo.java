@@ -38,6 +38,7 @@ import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.configuration.SelectionNotPossibleException;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.functional.FunctionalInterfaces;
 
 /**
  * Representation of the feature model. 
@@ -79,7 +80,11 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 			formula = formula.substring(0, formula.indexOf(truefalse));
 		}
 		
-		for (String feature : featureModel.getFeatureNames()) {
+		for (String feature : FunctionalInterfaces.map( featureModel.getFeatures())) {
+			
+		}
+		
+		for (String feature : FunctionalInterfaces.map( featureModel.getFeatures(), new getFeatureNames()) {
 			formula = formula.replaceAll("([\\s,\\(])" + feature.toLowerCase(Locale.ENGLISH), "$1FM.FeatureModel." + feature.toLowerCase(Locale.ENGLISH));
 		}
 		return formula.trim();

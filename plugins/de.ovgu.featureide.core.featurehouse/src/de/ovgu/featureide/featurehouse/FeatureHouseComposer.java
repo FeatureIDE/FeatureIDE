@@ -85,6 +85,7 @@ import de.ovgu.featureide.featurehouse.meta.featuremodel.FeatureModelClassGenera
 import de.ovgu.featureide.featurehouse.model.FeatureHouseModelBuilder;
 import de.ovgu.featureide.featurehouse.signature.documentation.DocumentationCommentParser;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
@@ -707,7 +708,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			IFeatureModel fm = featureProject.getFeatureModel();
 			fm.getAnalyser().setDependencies();
 
-			Main fuji = new Main(fujiOptions, fm, featureProject.getFeatureModel().getConcreteFeatureNames());
+			Main fuji = new Main(fujiOptions, fm, FeatureUtils.extractConcreteFeaturesAsStringList(featureProject.getFeatureModel()));
 			Composition composition = fuji.getComposition(fuji);
 			ast = composition.composeAST();
 
@@ -909,7 +910,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		final FSTGenComposerExtension composerExtension = new FSTGenComposerExtension();
 		composer = composerExtension;
 		composerExtension.addParseErrorListener(listener);
-		List<String> featureOrder = featureProject.getFeatureModel().getConcreteFeatureNames();
+		List<String> featureOrder = FeatureUtils.extractConcreteFeaturesAsStringList(featureProject.getFeatureModel());
 		String[] features = new String[featureOrder.size()];
 		int i = 0;
 		for (String f : featureOrder) {
@@ -1113,7 +1114,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		composer = composerExtension;
 		composerExtension.addParseErrorListener(listener);
 
-		List<String> featureOrderList = featureProject.getFeatureModel().getConcreteFeatureNames();
+		List<String> featureOrderList = FeatureUtils.extractConcreteFeaturesAsStringList(featureProject.getFeatureModel());
 		String[] features = new String[featureOrderList.size()];
 		int i = 0;
 		for (String f : featureOrderList) {
