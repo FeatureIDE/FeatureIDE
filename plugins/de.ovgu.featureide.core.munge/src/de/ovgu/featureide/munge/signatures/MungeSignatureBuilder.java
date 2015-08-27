@@ -201,7 +201,7 @@ public abstract class MungeSignatureBuilder {
 		final ProjectSignatures projectSignatures = new ProjectSignatures(featureProject.getFeatureModel());
 		final ArrayList<AbstractSignature> signatureList = new ArrayList<>();
 
-		final ASTParser parser = ASTParser.newParser(AST.JLS4);
+		@SuppressWarnings("deprecation") final ASTParser parser = ASTParser.newParser(AST.JLS4);
 
 		IFolder sourceFolder = featureProject.getSourceFolder();
 		try {

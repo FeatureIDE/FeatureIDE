@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.editors.annotation;
+package de.ovgu.featureide.core.annotation;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.CANT_CONNECT_TO_DIFFERENT_DOCUMENT_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CANT_DISCONNECT_FROM_DIFFERENT_DOCUMENT_;
@@ -33,7 +33,9 @@ import java.util.ListIterator;
 import java.util.Set;
 import java.util.Vector;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
@@ -56,11 +58,16 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
+import de.ovgu.featureide.core.fstmodel.FSTField;
+import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
+import de.ovgu.featureide.core.fstmodel.RoleElement;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.fm.core.ColorList;
-import de.ovgu.featureide.ui.UIPlugin;
+import de.ovgu.featureide.fm.core.annotation.ColorAnnotation;
+import de.ovgu.featureide.fm.core.annotation.LogService;
+import de.ovgu.featureide.fm.core.annotation.LogService.LogLevel;
 
 /**
  * Assigns color annotations to the editor.
@@ -71,7 +78,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 
 	/** Key used to piggyback the model to the editors model. */
 	private static final Object KEY = new Object();
-	
+
 	private static boolean highlighting = true;
 
 	/** List of current ColorAnnotations */
@@ -88,7 +95,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 	private final IFeatureProject project;
 	private final IComposerExtensionClass composer;
 	private final IFile file;
-	
+
 	private int openConnections = 0;
 	private int docLines, docLength;
 
@@ -109,18 +116,18 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 		public void documentAboutToBeChanged(DocumentEvent event) {
 		}
 	};
-	
+
 	private ColorAnnotationModel(IDocument document, IFile file, IFeatureProject project, ITextEditor editor) {
 		this.document = document;
 		this.project = project;
 		this.file = file;
 		composer = project.getComposer();
-		
+
 		docLines = document.getNumberOfLines();
 		docLength = document.getLength();
-		
+
 		updateAnnotations(true);
-		
+
 		editor.addPropertyListener(new IPropertyListener() {
 			@Override
 			public void propertyChanged(Object source, int propId) {
@@ -137,27 +144,27 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 	 * 
 	 * @param editor
 	 *            Editor to attach a annotation model to
-	 */	
+	 */
 	public static boolean attach(ITextEditor editor) {
 		IDocumentProvider provider = editor.getDocumentProvider();
 		IEditorInput input = editor.getEditorInput();
-		
+
 		if (provider != null && input instanceof FileEditorInput) {
 			IAnnotationModel model = provider.getAnnotationModel(input);
 
 			if (model instanceof IAnnotationModelExtension) {
 				IAnnotationModelExtension modelex = (IAnnotationModelExtension) model;
-				
+
 				ColorAnnotationModel colormodel = (ColorAnnotationModel) modelex.getAnnotationModel(KEY);
-				
+
 				if (colormodel == null) {
 					IFile file = ((FileEditorInput) input).getFile();
 					IFeatureProject project = CorePlugin.getFeatureProject(file);
-					if (project != null && project.getComposer()!=null&&project.getComposer().needColor()) {
+					if (project != null && project.getComposer() != null && project.getComposer().needColor()) {
 						IDocument document = provider.getDocument(input);
 						colormodel = new ColorAnnotationModel(document, file, project, editor);
 						modelex.addAnnotationModel(KEY, colormodel);
-						
+
 						return true;
 					}
 				} else {
@@ -187,14 +194,14 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 			}
 		}
 	}
-	
+
 	/**
 	 * Changes the whether the editor highlights the directives or not.
 	 * 
 	 * Updates the annotations if the value changed.
 	 * 
-	 * @param highlighting 
-	 *			true: highlights directives in the editor
+	 * @param highlighting
+	 *            true: highlights directives in the editor
 	 */
 	public static void setHighlighting(boolean highlighting, ITextEditor editor) {
 		if (ColorAnnotationModel.highlighting != highlighting) {
@@ -202,45 +209,44 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 			attach(editor);
 		}
 	}
-	
+
 	/**
 	 * This method is called, when the document is changed,
 	 * but the number of lines stays the same.
 	 * 
-	 * It updates the offset and length of annotations, 
+	 * It updates the offset and length of annotations,
 	 * with an offset greater than the CHANGE_OFFSET.
-	 *  
-	 *  @param offset the change offset
-	 *  @param newLength the length of the changed document
+	 * 
+	 * @param offset the change offset
+	 * @param newLength the length of the changed document
 	 */
 	private void changeAnnotations(int offset, int newLength) {
 		AnnotationModelEvent modelEvent = new AnnotationModelEvent(this);
-		
+
 		for (ColorAnnotation annotation : annotations) {
 			Position pos = annotation.getPosition();
 			if (pos.getOffset() > offset) {
 				annotation.updateOffset(newLength - docLength);
 				modelEvent.annotationChanged(annotation);
-			}
-			else if (pos.includes(offset)) {
+			} else if (pos.includes(offset)) {
 				annotation.updateLength(newLength - docLength);
 				modelEvent.annotationChanged(annotation);
 			}
 		}
 		docLength = newLength;
-		
+
 		fireModelChanged(modelEvent);
 	}
-	
+
 	/**
 	 * This method is called, when the document is saved or
 	 * when the document and the number of lines are changed.
 	 * 
 	 * It removes all annotations and creates new.
-	 *  
-	 *  @param createNew 
-	 *  	true: builds new FSTModel
-	 *  	false: only gets new FSTDirectives				 
+	 * 
+	 * @param createNew
+	 *            true: builds new FSTModel
+	 *            false: only gets new FSTDirectives
 	 */
 	private void updateAnnotations(boolean createNew) {
 		if (!annotations.isEmpty()) {
@@ -248,17 +254,36 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 		}
 		if (createNew) {
 			annotatedPositions = new HashMap<Integer, Position>(docLines);
-			createDirectiveList();
-			createAnnotations();
-		} else if (!directiveMap.isEmpty()) {
-			annotatedPositions.clear();
-			updateDirectives();
-			createAnnotations();
+			if (project.getComposerID().equals("de.ovgu.featureide.composer.featurehouse")) {//our FeatureHouseComposerAnnotations
+				try {
+					createFOPAnnotations();
+
+				} catch (BadLocationException e) {
+					CorePlugin.getDefault().logError(e);
+				}
+			} else {
+				createDirectiveList();
+				createAnnotations();
+			}
+		} else {
+			if (project.getComposerID().equals("de.ovgu.featureide.composer.featurehouse")) {//ourFeatureHouseComposerAnnotations
+				try {
+					createFOPAnnotations();
+				} catch (BadLocationException e) {
+					CorePlugin.getDefault().logError(e);
+				}
+			}
+			if (!directiveMap.isEmpty()) {
+				annotatedPositions.clear();
+				updateDirectives();
+				createAnnotations();
+			}
+
 		}
 	}
-	
+
 	/**
-	 * Removes all annotations.		 
+	 * Removes all annotations.
 	 */
 	private void clear() {
 		AnnotationModelEvent event = new AnnotationModelEvent(this);
@@ -266,15 +291,15 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 			event.annotationRemoved(ca, ca.getPosition());
 		}
 		annotations.clear();
-		
+
 		fireModelChanged(event);
 	}
-	
+
 	/**
-	 *  Builds the FSTModel of the feature project and
-	 *  creates a list of all directives with valid colors
-	 *  
-	 *  @return the directive list
+	 * Builds the FSTModel of the feature project and
+	 * creates a list of all directives with valid colors
+	 * 
+	 * @return the directive list
 	 */
 	private void createDirectiveList() {
 		directiveMap.clear();
@@ -287,7 +312,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 		if (model == null) {
 			return;
 		}
-		
+
 		int index = 0;
 		for (FSTFeature fstFeature : model.getFeatures()) {
 			for (FSTRole role : fstFeature.getRoles()) {
@@ -299,37 +324,35 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 				}
 			}
 		}
-		
+
 		for (int i = 0; i < index; i++) {
 			FSTDirective dir = directiveMap.get(i);
 			validDirectiveList.add(dir);
 		}
 	}
-	
+
 	/**
-	 *  Assigns the mapped colors to the FSTDirectives 
-	 *  from the changed document.
-	 *  
-	 *  @return the directive list
+	 * Assigns the mapped colors to the FSTDirectives
+	 * from the changed document.
+	 * 
+	 * @return the directive list
 	 */
-	private void updateDirectives() {	
+	private void updateDirectives() {
 		ListIterator<FSTDirective> newDirIt = getNewDirectives().listIterator(0);
-		
-		while(newDirIt.hasNext()) {
+
+		while (newDirIt.hasNext()) {
 			FSTDirective newDir = newDirIt.next();
 			FSTDirective oldDir = directiveMap.get(newDir.getId());
-				
-			if (oldDir != null &&
-					newDir.getCommand() == oldDir.getCommand() &&
-					newDir.getFeatureNames().equals(oldDir.getFeatureNames())) {
-			
+
+			if (oldDir != null && newDir.getCommand() == oldDir.getCommand() && newDir.getFeatureNames().equals(oldDir.getFeatureNames())) {
+
 				oldDir.setStartLine(newDir.getStartLine(), newDir.getStartOffset());
 				oldDir.setEndLine(newDir.getEndLine(), newDir.getEndLength());
 			} else {
 				directiveMap.clear();
 				return;
 			}
-			
+
 			if (newDir.hasChildren()) {
 				for (FSTDirective newDirChild : newDir.getChildrenList()) {
 					newDirIt.add(newDirChild);
@@ -338,30 +361,160 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 			}
 		}
 	}
-	
+
 	/**
-	 *  Retrieves the FSTDirectives from the changed document.
+	 * Retrieves the FSTDirectives from the changed document.
 	 */
 	private LinkedList<FSTDirective> getNewDirectives() {
 		Vector<String> lines = new Vector<String>();
-		
+
 		for (int i = 0; i < document.getNumberOfLines(); i++) {
 			try {
 				lines.add(document.get(document.getLineOffset(i), document.getLineLength(i)));
 			} catch (BadLocationException e) {
-				UIPlugin.getDefault().logError(e);
+				LogService.getInstance().log(LogLevel.DEBUG, e.getMessage());
 			}
 		}
-		
+
 		return composer.buildModelDirectivesForFile(lines);
 	}
-	
+
 	/**
-	 *  Creates the color annotations from the FSTDirectives.
+	 * Creates Annotations for FOP
+	 */
+	private void createFOPAnnotations() throws BadLocationException {
+		AnnotationModelEvent event = new AnnotationModelEvent(this);
+		FSTModel model = project.getFSTModel();
+
+		if (model == null) {
+			composer.buildFSTModel();
+			model = project.getFSTModel();
+		}
+		if (model == null) {
+			return;
+		}
+
+		clear();
+
+		/*
+		 *COMPOSED FILE ANNOTATIONS
+		 */
+		if (file.getParent() instanceof IFolder) {
+
+			if (isInBuildFolder((IFolder) file.getParent())) {
+				composer.postCompile(null, file);
+				for (FSTFeature fstFeature : model.getFeatures()) {
+					for (FSTRole role : fstFeature.getRoles()) {
+						for (FSTMethod m : role.getAllMethods()) {
+							createFOPComposedAnnotations(event, fstFeature, m);
+						}
+						for (FSTField f : role.getAllFields()) {
+							createFOPComposedAnnotations(event, fstFeature, f);
+						}
+					}
+				}
+			}
+		} else {
+			String featureName = getFeature((IFolder) file.getParent());
+			if (featureName != null) {
+				FSTFeature fstFeature = model.getFeature(featureName);
+				if (fstFeature != null) {
+					int color = fstFeature.getColor();
+
+					for (int line = 0; line < document.getNumberOfLines(); line++) {
+						// bar at the left of the editor
+						Position newPosition = new Position(document.getLineOffset(line), document.getLineLength(line));
+						ColorAnnotation cafh = new ColorAnnotation(color, newPosition, ColorAnnotation.TYPE_IMAGE);
+						cafh.setText(fstFeature.getName());
+						annotations.add(cafh);
+						event.annotationAdded(cafh);
+					}
+				}
+			}
+		}
+
+	}
+
+	/**
+	 * Creates Annotations for FOP Composed File
+	 * 
+	 * @param event
+	 * @param fstFeature
+	 * @param m
+	 * @throws BadLocationException
+	 */
+	private void createFOPComposedAnnotations(AnnotationModelEvent event, FSTFeature fstFeature, RoleElement<?> m) throws BadLocationException {
+		if (m.getComposedLine() <= 0) {
+			return;
+		}
+		int startline = m.getComposedLine() - 1;
+		int endline = m.getComposedLine() + m.getMethodLength() - 1;
+		int lineOffset = document.getLineOffset(startline);
+		int length = 0;
+		for (int line = startline; line <= endline; line++) {
+			length += document.getLineLength(line);
+			// bar at the left of the editor
+			Position methodposition = new Position(document.getLineOffset(line), document.getLineLength(line));
+			ColorAnnotation cafh = new ColorAnnotation(m.getRole().getFeature().getColor(), methodposition, ColorAnnotation.TYPE_IMAGE);
+			cafh.setText(m.getRole().getFeature().getName());
+			annotations.add(cafh);
+			event.annotationAdded(cafh);
+		}
+		Position methodposition = new Position(lineOffset, length);
+		// bar at the right of the editor
+		ColorAnnotation cafho = new ColorAnnotation(m.getRole().getFeature().getColor(), methodposition, ColorAnnotation.TYPE_OVERVIEW);
+		cafho.setText(m.getRole().getFeature().getName());
+		annotations.add(cafho);
+		event.annotationAdded(cafho);
+		if (highlighting) {
+			//background colors
+			ColorAnnotation cafhh = new ColorAnnotation(m.getRole().getFeature().getColor(), methodposition, ColorAnnotation.TYPE_HIGHLIGHT);
+			cafhh.setText(fstFeature.getName());
+			annotations.add(cafhh);
+			event.annotationAdded(cafhh);
+		}
+	}
+
+	/**
+	 * Checks whether the File is in the SourceFolder
+	 * 
+	 * @param folder
+	 * @return Feature from the SourceFolder
+	 */
+	private String getFeature(IFolder folder) {
+		IContainer parent = folder.getParent();
+		if (parent.equals(project.getSourceFolder())) {
+			return folder.getName();
+		}
+		if (parent instanceof IFolder) {
+			return getFeature((IFolder) parent);
+		}
+		return null;
+	}
+
+	/**
+	 * Checks whether the File is in the BuildFolder
+	 * 
+	 * @param folder
+	 * @return true if BuildFolder or child of BuildFolder
+	 */
+	private boolean isInBuildFolder(IFolder folder) {
+		if (folder.equals(project.getBuildFolder())) {
+			return true;
+		}
+		IContainer parent = folder.getParent();
+		if (parent instanceof IFolder) {
+			return isInBuildFolder((IFolder) parent);
+		}
+		return false;
+	}
+
+	/**
+	 * Creates the color annotations from the FSTDirectives.
 	 */
 	private void createAnnotations() {
 		AnnotationModelEvent event = new AnnotationModelEvent(this);
-		
+
 		for (FSTDirective directive : validDirectiveList) {
 			if (directive == null) {
 				continue;
@@ -376,7 +529,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 					if (line < endline || directive.getEndLength() > 0) {
 						int length = document.getLineLength(line);
 						int lineOffset = document.getLineOffset(line);
-						
+
 						if (line == directive.getEndLine()) {
 							length = directive.getEndLength();
 						}
@@ -384,23 +537,23 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 							lineOffset += directive.getStartOffset();
 							length -= directive.getStartOffset();
 						}
-						
+
 						if (hasChildAtLine(directive, line)) {
 							length = 1;
-						}	
-						
+						}
+
 						if (overViewStartOffset != -1 && hasChildAtLineWithColor(directive, line)) {
 							Position overViewPos = new Position(overViewStartOffset, overViewLength);
 							createOverViewRuler(event, directive, color, overViewPos);
 							overViewStartOffset = -1;
 							overViewLength = 0;
-						} else if (!hasChildAtLineWithColor(directive, line)){
+						} else if (!hasChildAtLineWithColor(directive, line)) {
 							if (overViewStartOffset == -1) {
 								overViewStartOffset = document.getLineOffset(line);
 							}
 							overViewLength += document.getLineLength(line);
 						}
-							
+
 						FSTDirective parent = directive.getParent();
 						while (parent != null) {
 							lineOffset++;
@@ -410,22 +563,20 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 							parent = parent.getParent();
 						}
 						Position newPos = new Position(lineOffset, length);
-						
-						
+
 						if (!hasChildAtLine(directive, line)) {
 							// bar at the left of the editor
-							ColorAnnotation ca = new ColorAnnotation(color, 
-									newPos, ColorAnnotation.TYPE_IMAGE);
+							ColorAnnotation ca = new ColorAnnotation(color, newPos, ColorAnnotation.TYPE_IMAGE);
 							ca.setText(directive.toString());
 							annotations.add(ca);
 							event.annotationAdded(ca);
 						}
-						if(!ColorList.isValidColor(color)) {
+						if (!ColorList.isValidColor(color)) {
 							continue;
 						}
 						if (!hasChildAtLine(directive, line)) {
 							// bar at the right of the editor
-							
+
 						}
 						if (highlighting) {
 							// background colors
@@ -435,7 +586,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 							event.annotationAdded(ca);
 						}
 					}
-					
+
 				}
 				if (overViewStartOffset != -1) {
 					Position overViewPos = new Position(overViewStartOffset, overViewLength);
@@ -444,10 +595,10 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 					overViewLength = 0;
 				}
 			} catch (BadLocationException e) {
-				UIPlugin.getDefault().logError(e);
+				LogService.getInstance().log(LogLevel.DEBUG, e.getMessage());
 			}
 		}
-		
+
 		fireModelChanged(event);
 	}
 
@@ -465,7 +616,8 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 	}
 
 	/**
-	 * Returns whether the given annotation has a child <b>with a color</b> at the given line. 
+	 * Returns whether the given annotation has a child <b>with a color</b> at the given line.
+	 * 
 	 * @param directive The directive
 	 * @param line The line
 	 * @return <code>true</code> if there is a child at the line
@@ -473,9 +625,10 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 	private boolean hasChildAtLineWithColor(FSTDirective directive, int line) {
 		return hasChildAtLine(directive, line, true);
 	}
-	
+
 	/**
-	 * Returns whether the given annotation has a child at the given line. 
+	 * Returns whether the given annotation has a child at the given line.
+	 * 
 	 * @param directive The directive
 	 * @param line The line
 	 * @return <code>true</code> if there is a child at the line
@@ -483,19 +636,19 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 	private boolean hasChildAtLine(FSTDirective directive, int line) {
 		return hasChildAtLine(directive, line, false);
 	}
-		
+
 	private boolean hasChildAtLine(FSTDirective directive, int line, boolean hasValidColor) {
 		for (FSTDirective child : directive.getChildren()) {
 			int start = child.getStartLine();
 			int end = child.getEndLine();
-			
+
 			if (line >= start && line <= end && (!hasValidColor || ColorList.isValidColor(child.getColor()))) {
 				return true;
 			}
 			if (hasChildAtLine(child, line, hasValidColor)) {
 				return true;
 			}
-			
+
 		}
 		return false;
 	}
@@ -526,7 +679,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 			}
 		}
 	}
-	
+
 	@Override
 	public void addAnnotationModelListener(IAnnotationModelListener listener) {
 		if (!annotationModelListeners.contains(listener)) {

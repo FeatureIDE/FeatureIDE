@@ -50,6 +50,7 @@ import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
 
+
 /**
  * Propagates error markers for composed files to sources files.
  * 
@@ -71,6 +72,8 @@ public abstract class ErrorPropagation {
 	 * for each file.
 	 */
 	public final Job job;
+
+	public boolean force = false; //FOP Composed Lines
 
 	/**
 	 * Propagates error markers for composed files to sources files.<br>
@@ -97,6 +100,7 @@ public abstract class ErrorPropagation {
 			@Override
 			public IStatus run(IProgressMonitor monitor) {
 				propagateMarkers(monitor);
+				force = false;
 				return Status.OK_STATUS;
 			}
 		};
@@ -138,6 +142,19 @@ public abstract class ErrorPropagation {
 
 			if (job.getState() == Job.NONE) {
 				job.schedule();
+				/*
+				 * waiting to get the job done (FOP only) 
+				 * used for ComposedLines
+				 */
+				if(force){
+					while(job.getState() != Job.NONE){
+						try {
+							Thread.sleep(10);
+						} catch (InterruptedException e) {
+							CorePlugin.getDefault().logError(e);
+						}
+					}
+				}
 			}
 		}
 	}
@@ -175,13 +192,13 @@ public abstract class ErrorPropagation {
 	 * Removes the not composed markers form the given source file and calls
 	 * <code>propagateMarkers(marker, file)</code>
 	 */
-	protected void propagateMarkers(IFile file) {
+	protected void propagateMarkers(IFile file) {//boolean force
 		if (!file.exists()) {
 			return;
 		}
 		try {
 			IMarker[] markers = file.findMarkers(null, true, IResource.DEPTH_INFINITE);
-			if (markers.length != 0) {
+			if (force  || markers.length != 0) {
 				LinkedList<IMarker> marker = new LinkedList<IMarker>();
 				for (IMarker m : markers) {
 					String message = m.getAttribute(IMarker.MESSAGE, null);
@@ -191,7 +208,7 @@ public abstract class ErrorPropagation {
 						marker.add(m);
 					}
 				}
-				if (!marker.isEmpty()) {
+				if (force || !marker.isEmpty()) {
 					propagateMarkers(marker, file);
 				}
 			}

@@ -85,6 +85,10 @@ public abstract class AbstractFeatureModelReader implements IFeatureModelReader 
 		try {
 			inputStream = new FileInputStream(fileName);
 			parseInputStream(inputStream);
+			// TODO: REMOVE THIS, THIS IS A HACK
+			// THIS IS A HACK
+			featureModel.xxxSetSourceFile(file.getAbsolutePath());
+			// END HACK
 		} finally {
 			if (inputStream != null) {
 				try {

@@ -20,15 +20,24 @@
  */
 package de.ovgu.featureide.fm.ui.views.outline;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.IFontProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.TreeItem;
 import org.prop4j.NodeWriter;
 
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.ProfileManager;
+import de.ovgu.featureide.fm.core.ProfileManager.Project.Profile;
+import de.ovgu.featureide.fm.core.annotation.ColorPalette;
+import de.ovgu.featureide.fm.ui.PlugInProfileSerializer;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 
 /**
@@ -38,7 +47,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
  * @author Jan Wedding
  * @author Melanie Pflaume
  */
-public class FmLabelProvider implements ILabelProvider,IFontProvider, GUIDefaults {
+public class FmLabelProvider implements ILabelProvider, IFontProvider, GUIDefaults, IColorProvider {
 
 	/*
 	 * (non-Javadoc)
@@ -83,6 +92,10 @@ public class FmLabelProvider implements ILabelProvider,IFontProvider, GUIDefault
 	public void removeListener(ILabelProviderListener listener) {
 	}
 
+	public void colorizeItems(TreeItem[] treeItems, IFile file) {
+
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -95,11 +108,9 @@ public class FmLabelProvider implements ILabelProvider,IFontProvider, GUIDefault
 				return null; // TODO: Add here icon for feature model
 			if (((Feature) element).getParent().isAlternative()) {
 				return IMG_XOR;
-			}
-			else if (((Feature) element).getParent().isOr()) {
+			} else if (((Feature) element).getParent().isOr()) {
 				return IMG_OR;
-			}
-			else if (((Feature) element).isMandatory()) {
+			} else if (((Feature) element).isMandatory()) {
 				return IMG_MANDATORY;
 			} else {
 				return IMG_OPTIONAL;
@@ -108,9 +119,9 @@ public class FmLabelProvider implements ILabelProvider,IFontProvider, GUIDefault
 			return null; // TODO: Add here icon for "constraint" node
 		} else if (element instanceof Constraint) {
 			return null; // TODO: Add here icon for CONSTRAINT_ELEMENT node
-		} else return null;
+		} else
+			return null;
 	}
-	
 
 	/*
 	 * (non-Javadoc)
@@ -125,11 +136,9 @@ public class FmLabelProvider implements ILabelProvider,IFontProvider, GUIDefault
 			return ((Constraint) element).getNode().toString(NodeWriter.logicalSymbols);
 		else if (element instanceof FmOutlineGroupStateStorage)
 			return "";
-	
+
 		return element.toString();
 	}
-
-
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.IFontProvider#getFont(java.lang.Object)
@@ -137,5 +146,41 @@ public class FmLabelProvider implements ILabelProvider,IFontProvider, GUIDefault
 	@Override
 	public Font getFont(Object element) {
 		return DEFAULT_FONT;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.IColorProvider#getForeground(java.lang.Object)
+	 */
+	@Override
+	public Color getForeground(Object element) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.IColorProvider#getBackground(java.lang.Object)
+	 */
+
+	/**
+	 * @author Marcus Pinnecke
+	 */
+	//TODO: outsource method to global state
+	private Profile getCurrentProfile(FeatureModel featureModel) {
+		return ProfileManager.getProject(featureModel.xxxGetEclipseProjectPath(), PlugInProfileSerializer.FEATURE_PROJECT_SERIALIZER).getActiveProfile();
+	}
+
+	public Color getBackground(Object element) {
+		Color col = null;
+
+		if (element instanceof Feature) {
+
+			Feature feature = (Feature) element;
+
+			if (ProfileManager.toColorIndex(getCurrentProfile(feature.getFeatureModel()).getColor(feature.getName())) != -1) {
+				col = new Color(null, ColorPalette.getRGB(
+						ProfileManager.toColorIndex(getCurrentProfile(feature.getFeatureModel()).getColor(feature.getName())), 0.5f));
+			}
+		}
+		return col;
 	}
 }

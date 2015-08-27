@@ -37,7 +37,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.HIDE_PARAMETER
 import static de.ovgu.featureide.fm.core.localization.StringTable.METHODS_WITHOUT_REFINEMENTS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.METHODS_WITH_REFINEMENTS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.MODEL_LOADING_ERROR;
-import static de.ovgu.featureide.fm.core.localization.StringTable.NO_COLORSCHEME_SELECTED;
 import static de.ovgu.featureide.fm.core.localization.StringTable.OPEN_A_FILE_FROM_A_FEATUREIDE_PROJECT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PRIVATE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PROTECTED;
@@ -57,7 +56,6 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Vector;
 
 import org.eclipse.core.resources.IFile;
@@ -118,23 +116,21 @@ import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.listeners.ICurrentBuildListener;
 import de.ovgu.featureide.fm.core.AWaitingJob;
 import de.ovgu.featureide.fm.core.ColorList;
-import de.ovgu.featureide.fm.core.ColorschemeTable;
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.ProfileManager;
+import de.ovgu.featureide.fm.core.ProfileManager.Color;
 import de.ovgu.featureide.fm.core.PropertyConstants;
+import de.ovgu.featureide.fm.core.annotation.ColorPalette;
 import de.ovgu.featureide.fm.core.job.AStoppableJob;
 import de.ovgu.featureide.fm.ui.GraphicsExporter;
+import de.ovgu.featureide.fm.ui.PlugInProfileSerializer;
 import de.ovgu.featureide.ui.UIPlugin;
-import de.ovgu.featureide.ui.editors.annotation.ColorPalette;
-import de.ovgu.featureide.ui.views.collaboration.action.AddColorSchemeAction;
 import de.ovgu.featureide.ui.views.collaboration.action.AddRoleAction;
 import de.ovgu.featureide.ui.views.collaboration.action.DeleteAction;
-import de.ovgu.featureide.ui.views.collaboration.action.DeleteColorSchemeAction;
 import de.ovgu.featureide.ui.views.collaboration.action.ExportAsImageImpl;
 import de.ovgu.featureide.ui.views.collaboration.action.ExportAsXmlImpl;
 import de.ovgu.featureide.ui.views.collaboration.action.FilterAction;
-import de.ovgu.featureide.ui.views.collaboration.action.RenameColorSchemeAction;
 import de.ovgu.featureide.ui.views.collaboration.action.SetColorAction;
-import de.ovgu.featureide.ui.views.collaboration.action.SetColorSchemeAction;
 import de.ovgu.featureide.ui.views.collaboration.action.ShowFieldsMethodsAction;
 import de.ovgu.featureide.ui.views.collaboration.action.ShowUnselectedAction;
 import de.ovgu.featureide.ui.views.collaboration.editparts.CollaborationEditPart;
@@ -189,9 +185,13 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	private Point cursorPosition;
 	private CollaborationViewSearch search;
 	private MenuManager colorSubMenu;
-	private AddColorSchemeAction addColorSchemeAction;
-	private RenameColorSchemeAction renameColorSchemeAction;
-	private DeleteColorSchemeAction deleteColorSchemeAction;
+	
+	/*
+	 * the following codefragments which are commented out, create the submenu of the colorscheme
+	 */
+//	private AddColorSchemeAction addColorSchemeAction;
+//	private RenameColorSchemeAction renameColorSchemeAction;
+//	private DeleteColorSchemeAction deleteColorSchemeAction;
 	private ExportAsImageImpl exportAsImage;
 	private ExportAsXmlImpl exportAsXML;
 
@@ -546,47 +546,61 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 			FSTFeature coll = ((CollaborationEditPart) selection).getCollaborationModel();
 			if (!(coll instanceof FSTConfiguration)) {
 				FeatureModel fm = featureProject.getFeatureModel();
-				ColorschemeTable colorschemeTable = fm.getColorschemeTable();
-				List<String> csNames = colorschemeTable.getColorschemeNames();
-
-				String curColorSchemeName = colorschemeTable.getSelectedColorschemeName();
-				MenuManager colorSchemeSubMenu = null;
-
-				if (curColorSchemeName != null) {
-					colorSchemeSubMenu = new MenuManager(curColorSchemeName);
-				} else {
-					colorSchemeSubMenu = new MenuManager(NO_COLORSCHEME_SELECTED);
-				}
-
-				int count = 0;
-				for (String name : csNames) {
-					SetColorSchemeAction setCSAction = new SetColorSchemeAction(name, viewer, this, ++count);
-					if (count == colorschemeTable.getSelectedColorscheme()) {
-						setCSAction.setChecked(true);
-					}
-					colorSchemeSubMenu.add(setCSAction);
-				}
-
-				colorSchemeSubMenu.add(new Separator());
-				colorSchemeSubMenu.add(addColorSchemeAction);
-				colorSchemeSubMenu.add(renameColorSchemeAction);
-				colorSchemeSubMenu.add(deleteColorSchemeAction);
+//				ColorschemeTable colorschemeTable = fm.getColorschemeTable();
+//				List<String> csNames = colorschemeTable.getColorschemeNames();
+//
+//				ProfileManager.Project projet = ProfileManager.getProject(fm.xxxGetEclipseProjectPath(), PlugInProfileSerializer.FEATURE_PROJECT_SERIALIZER);
+//				final String curColorSchemeName = ProfileManager.getProject(fm.xxxGetEclipseProjectPath(), PlugInProfileSerializer.FEATURE_PROJECT_SERIALIZER).getActiveProfile().getName();
+//				
+//				MenuManager colorSchemeSubMenu = null;
+//
+//				if (curColorSchemeName != null) {
+//					colorSchemeSubMenu = new MenuManager(curColorSchemeName);
+//				} else {
+//					colorSchemeSubMenu = new MenuManager(NO_COLORSCHEME_SELECTED);
+//				}
+//
+//				int count = 0;
+//				for (String name : projet.getProfileNames()) {
+//					SetColorSchemeAction setCSAction = new SetColorSchemeAction(name, viewer, this, ++count, name);
+//					if (name.equals(curColorSchemeName)) {
+//						setCSAction.setChecked(true);
+//					}
+//					colorSchemeSubMenu.add(setCSAction);
+//				}
+//
+//				colorSchemeSubMenu.add(new Separator());
+//				colorSchemeSubMenu.add(addColorSchemeAction);
+//				
+//				colorSchemeSubMenu.add(renameColorSchemeAction);
+//				colorSchemeSubMenu.add(deleteColorSchemeAction);
+//				renameColorSchemeAction.setEnabled(!curColorSchemeName.equals("Default"));
+//				deleteColorSchemeAction.setEnabled(!curColorSchemeName.equals("Default"));
+				
 				colorSubMenu.removeAll();
-				colorSubMenu.add(colorSchemeSubMenu);
+				//colorSubMenu.add(colorSchemeSubMenu);
 				colorSubMenu.add(new Separator());
 
-				boolean enableColorActions = colorschemeTable.getSelectedColorscheme() > 0;
-				for (int i = 0; i < setColorActions.length; i++) {
-					setColorActions[i].setEnabled(enableColorActions);
-					setColorActions[i].setChecked(false);
-					colorSubMenu.add(setColorActions[i]);
-				}
+				//boolean enableColorActions = colorschemeTable.getSelectedColorscheme() > 0;
+//				for (int i = 0; i < setColorActions.length; i++) {
+//					//setColorActions[i].setEnabled(enableColorActions);
+//					setColorActions[i].setChecked(false);
+//					colorSubMenu.add(setColorActions[i]);
+//				}
 
-				int color = fm.getFeature(coll.getName()).getColorList().getColor();
-				if (ColorList.isValidColor(color)) {
-					setColorActions[color].setChecked(true);
-				}
-
+				
+//				int color = fm.getFeature(coll.getName()).getColorList().getColor();
+//				if (ColorList.isValidColor(color)) {
+//					setColorActions[color].setChecked(true);
+//				}
+//				ProfileManager.Project.Profile profile =  ProfileManager.getProject(fm.xxxGetEclipseProjectPath(), PlugInProfileSerializer.FEATURE_PROJECT_SERIALIZER).getActiveProfile();
+//				Color color = profile.getColor(coll.getName());
+//				int colorIndex = ProfileManager.toColorIndex(color);
+//				if (ColorList.isValidColor(ProfileManager.toColorIndex(color))) {
+//					setColorActions[colorIndex].setChecked(true);
+//				}
+//				
+//
 				menuMgr.add(colorSubMenu);
 			}
 		}
@@ -633,9 +647,9 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 			setColorActions[i] = new SetColorAction(viewer, this, i);
 		}
 
-		addColorSchemeAction = new AddColorSchemeAction("&Add Colorscheme", viewer, this);
-		renameColorSchemeAction = new RenameColorSchemeAction("&Rename Selected Colorscheme", viewer, this);
-		deleteColorSchemeAction = new DeleteColorSchemeAction("&Delete Selected Colorscheme", viewer, this);
+//		addColorSchemeAction = new AddColorSchemeAction("&Add Colorscheme", viewer, this);
+//		renameColorSchemeAction = new RenameColorSchemeAction("&Rename Selected Colorscheme", viewer, this);
+//		deleteColorSchemeAction = new DeleteColorSchemeAction("&Delete Selected Colorscheme", viewer, this);
 	}
 
 	private boolean deselectAll() {

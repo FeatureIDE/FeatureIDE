@@ -18,44 +18,61 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.views.collaboration.action;
+package de.ovgu.featureide.ui.actions;
 
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
+import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.ProfileManager;
-import de.ovgu.featureide.fm.ui.PlugInProfileSerializer;
-import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
-import de.ovgu.featureide.ui.wizards.RenameColorSchemeWizard;
+import de.ovgu.featureide.ui.wizards.NewColorSchemeWizard;
 
 /**
- * Action to rename a colorscheme
+ * This Class contains one of the three actions, which is added to the menu
  * 
- * @author Sebastian Krieter
+ * The other related classes are:
+ * @see de.ovgu.featureide.ui.actions.DeleteProfileColorScheme.java
+ * @see de.ovgu.featureide.ui.actions.RenameProfileColorScheme.java
+ * 
+ * @author Jonas Weigt
+ * @author Christian Harnisch
  */
-public class RenameColorSchemeAction extends AbstractColorAction {
-	
-	public RenameColorSchemeAction(String text, GraphicalViewerImpl view, CollaborationView collaborationView) {
-		super(text, view, collaborationView, 0);
-		setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
-				.getImageDescriptor(ISharedImages.IMG_ETOOL_CLEAR));
-	}
+public class AddProfileColorSchemeAction extends Action {
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.ui.views.collaboration.color.action.AbstractColorAction#action(de.ovgu.featureide.fm.core.Feature)
+	
+	private FeatureModel model;
+	private IFeatureProject project;
+	
+	/*
+	 * Constructor
 	 */
-	@Override
-	protected boolean action(FeatureModel fm, String collName) {
-		RenameColorSchemeWizard wizard = new RenameColorSchemeWizard(fm);
+	public AddProfileColorSchemeAction(String text, FeatureModel model, IFeatureProject project) {
+		super(text);
+		this.model = model;	
+		this.project = project;
+		
+		setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ADD));
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.action.Action#run()
+	 * 
+	 * this Method calls the Wizard and saves the configuration
+	 */
+	public void run() {
+		NewColorSchemeWizard wizard = new NewColorSchemeWizard(model, null);
 
 		WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
 		dialog.create();
-		if (dialog.open() == WizardDialog.OK)
-			collaborationView.refresh();
-		
-		return false;
+		dialog.open();
+		model.getColorschemeTable().saveColorsToFile(project.getProject());
+	
 	}
+	
 }
+	
+
+	

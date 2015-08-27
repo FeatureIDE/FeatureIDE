@@ -18,44 +18,49 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.views.collaboration.action;
+package de.ovgu.featureide.ui.actions;
 
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
-import org.eclipse.jface.wizard.WizardDialog;
-import org.eclipse.ui.ISharedImages;
-import org.eclipse.ui.PlatformUI;
+import org.eclipse.jface.action.Action;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.ProfileManager;
+import de.ovgu.featureide.fm.core.ProfileManager.Project.Profile;
 import de.ovgu.featureide.fm.ui.PlugInProfileSerializer;
-import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
-import de.ovgu.featureide.ui.wizards.RenameColorSchemeWizard;
 
 /**
- * Action to rename a colorscheme
+ * This class enables you to switch profiles
  * 
- * @author Sebastian Krieter
+ * @author Jonas Weigt
+ * @author Christian Harnisch
  */
-public class RenameColorSchemeAction extends AbstractColorAction {
-	
-	public RenameColorSchemeAction(String text, GraphicalViewerImpl view, CollaborationView collaborationView) {
-		super(text, view, collaborationView, 0);
-		setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
-				.getImageDescriptor(ISharedImages.IMG_ETOOL_CLEAR));
+
+public class SetProfileColorSchemeAction extends Action {
+	private FeatureModel model;
+	private String newProfileColorSchemeName;
+
+	/*
+	 * Constructor
+	 */
+	public SetProfileColorSchemeAction(String text, int style, FeatureModel model) {
+		super(text, Action.AS_CHECK_BOX);
+		this.model = model;
+		this.newProfileColorSchemeName = text;
 	}
 
 	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.ui.views.collaboration.color.action.AbstractColorAction#action(de.ovgu.featureide.fm.core.Feature)
+	 * 
+	 * this method changes selected Colorscheme and saves the configuration 
 	 */
-	@Override
-	protected boolean action(FeatureModel fm, String collName) {
-		RenameColorSchemeWizard wizard = new RenameColorSchemeWizard(fm);
+	public void run() {
+		ProfileManager.Project projet = ProfileManager.getProject(model.xxxGetEclipseProjectPath(), PlugInProfileSerializer.FEATURE_PROJECT_SERIALIZER);
+		Profile p = projet.getProfile(newProfileColorSchemeName);
+		if (!projet.getActiveProfile().getName().equals(p.getName())) {
+			p.setAsActiveProfile();
 
-		WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
-		dialog.create();
-		if (dialog.open() == WizardDialog.OK)
-			collaborationView.refresh();
+		}
 		
-		return false;
+		
+
 	}
 }

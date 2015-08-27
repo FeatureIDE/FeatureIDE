@@ -24,9 +24,11 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.NEW_COLORSCHEM
 
 import org.eclipse.jface.wizard.Wizard;
 
-import de.ovgu.featureide.fm.core.ColorschemeTable;
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.ProfileManager;
+import de.ovgu.featureide.fm.ui.PlugInProfileSerializer;
 import de.ovgu.featureide.ui.UIPlugin;
+import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
 
 /**
  * A wizard for adding a new color scheme.
@@ -41,10 +43,13 @@ public class NewColorSchemeWizard extends Wizard {
 	public NewColorSchemePage page;
 	
 	private FeatureModel featureModel;
+	
+	CollaborationView cv;
 
-	public NewColorSchemeWizard(FeatureModel featureModel) {
+	public NewColorSchemeWizard(FeatureModel featureModel, CollaborationView collaborationView) {
 		super();
 		setWindowTitle(NEW_COLORSCHEME);
+		this.cv = collaborationView;
 		this.featureModel = featureModel;
 	}
 
@@ -54,12 +59,13 @@ public class NewColorSchemeWizard extends Wizard {
 	}
 
 	public boolean performFinish() {
+		ProfileManager.Project project = ProfileManager.getProject(featureModel.xxxGetEclipseProjectPath(), PlugInProfileSerializer.FEATURE_PROJECT_SERIALIZER);
+		
 		final String csName = page.getColorSchemeName();
-		if (csName != null && !csName.isEmpty()) {
-			ColorschemeTable colorschemeTable = featureModel.getColorschemeTable();
-			colorschemeTable.addColorscheme(csName);
+		if (csName != null && !csName.isEmpty() && !project.getProfileNames().contains(csName)) {
+			ProfileManager.Project.Profile newProfile = project.addProfile(csName);
 			if (page.isCurColorScheme()) {
-				colorschemeTable.setSelectedColorscheme(colorschemeTable.size());
+				newProfile.setAsActiveProfile();
 			}
 			return true;
 		} else {

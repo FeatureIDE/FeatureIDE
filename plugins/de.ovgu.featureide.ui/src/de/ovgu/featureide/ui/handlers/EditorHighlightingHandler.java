@@ -27,7 +27,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.texteditor.ITextEditor;
 
-import de.ovgu.featureide.ui.editors.annotation.ColorAnnotationModel;
+import de.ovgu.featureide.core.annotation.ColorAnnotationModel;
 
 /**
  * Action in the editor's context menu to toggle 

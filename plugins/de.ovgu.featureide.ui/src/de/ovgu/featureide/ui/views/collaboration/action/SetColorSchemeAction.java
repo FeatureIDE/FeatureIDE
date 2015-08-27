@@ -24,6 +24,9 @@ import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.ProfileManager;
+import de.ovgu.featureide.fm.core.ProfileManager.Project.Profile;
+import de.ovgu.featureide.fm.ui.PlugInProfileSerializer;
 import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
 
 /**
@@ -33,8 +36,11 @@ import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
  */
 public class SetColorSchemeAction extends AbstractColorAction {
 	
-	public SetColorSchemeAction(String text, GraphicalViewerImpl view, CollaborationView collaborationView, int index) {
+	String newColorSchemeName;
+	
+	public SetColorSchemeAction(String text, GraphicalViewerImpl view, CollaborationView collaborationView, int index, String newColorSchemeName) {
 		super(text, view, collaborationView, index, Action.AS_CHECK_BOX);
+		this.newColorSchemeName = newColorSchemeName;
 	}
 
 	/* (non-Javadoc)
@@ -42,11 +48,16 @@ public class SetColorSchemeAction extends AbstractColorAction {
 	 */
 	@Override
 	protected boolean action(FeatureModel fm, String collName) {
-		if (fm.getColorschemeTable().getSelectedColorscheme() != index) {
-			fm.getColorschemeTable().setSelectedColorscheme(index);
-		} else {
-			fm.getColorschemeTable().setEmptyColorscheme();
-		}
+		ProfileManager.Project project = ProfileManager.getProject(fm.xxxGetEclipseProjectPath(), PlugInProfileSerializer.FEATURE_PROJECT_SERIALIZER);
+		Profile p = project.getProfile(newColorSchemeName);
+		if (!project.getActiveProfile().getName().equals(newColorSchemeName))
+			p.setAsActiveProfile();
+		
+//		if (fm.getColorschemeTable().getSelectedColorscheme() != index) {
+//			fm.getColorschemeTable().setSelectedColorscheme(index);
+//		} else {
+//			fm.getColorschemeTable().setEmptyColorscheme();
+//		}
 		return true;
 	}
 	

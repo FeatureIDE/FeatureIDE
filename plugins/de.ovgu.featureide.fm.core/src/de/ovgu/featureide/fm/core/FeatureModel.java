@@ -24,6 +24,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.EMPTY_FEATURE_
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Hashtable;
@@ -886,6 +887,43 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	@Override
 	public GraphicItem getItemType() {
 		return GraphicItem.Model;
+	}
+	
+	/**
+	 * TODO: REMOVE THIS, THIS IS A HACK
+	 */
+	String xmlModelSourceFilePath;
+
+	/**
+	 * TODO: REMOVE THIS, THIS IS A HACK
+	 */
+	public void xxxSetSourceFile(String absolutePath) {
+		xmlModelSourceFilePath = absolutePath;
+	}
+	
+	/**
+	 * TODO: REMOVE THIS, THIS IS A HACK
+	 */
+	public boolean xxxIsBasedOnModelFile() {
+		return xmlModelSourceFilePath != null;
+	}
+	
+	/**
+	 * TODO: REMOVE THIS, THIS IS A HACK
+	 */
+	public String xxxGetSourceFile() {
+		if (xmlModelSourceFilePath == null)
+			throw new IllegalStateException();
+		return xmlModelSourceFilePath;
+	}
+	
+	/**
+	 * TODO: REMOVE THIS, THIS IS A HACK
+	 */
+	public String xxxGetEclipseProjectPath() {
+		if (!xxxIsBasedOnModelFile())
+			throw new IllegalStateException();
+		return new File(xmlModelSourceFilePath).getParentFile().getAbsolutePath();
 	}
 
 }

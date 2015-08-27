@@ -18,40 +18,50 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.views.collaboration.action;
+package de.ovgu.featureide.ui.actions;
 
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
+import org.eclipse.jface.action.Action;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.ProfileManager;
 import de.ovgu.featureide.fm.ui.PlugInProfileSerializer;
-import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
 
 /**
- * Action to delete a colorscheme
+ * This Class contains one of the three actions, which is added to the menu
  * 
- * @author Sebastian Krieter
+ * The other related classes are:
+ * @see de.ovgu.featureide.ui.actions.AddProfileColorScheme.java
+ * @see de.ovgu.featureide.ui.actions.RenameProfileColorScheme.java
+ * 
+ * @author Jonas Weigt
+ * @author Christian Harnisch
  */
-public class DeleteColorSchemeAction extends AbstractColorAction {
+public class DeleteProfileColorSchemeAction extends Action {
+
+	private FeatureModel model;
 	
-	public DeleteColorSchemeAction(String text, GraphicalViewerImpl view, CollaborationView collaborationView) {
-		super(text, view, collaborationView, 0);
-		setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
-				.getImageDescriptor(ISharedImages.IMG_ETOOL_DELETE));
+
+	/*
+	 * Constructor
+	 */
+	public DeleteProfileColorSchemeAction(String text, FeatureModel model) {
+		super(text);
+		this.model = model;
+		setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_ETOOL_DELETE));
+
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.ui.views.collaboration.color.action.AbstractColorAction#action(de.ovgu.featureide.fm.core.Feature)
+	/*
+	 * (non-Javadoc)
+	 * @see org.eclipse.jface.action.Action#run()
+	 * 
+	 * this method removes the profile and saves the configuration
 	 */
-	@Override
-	protected boolean action(FeatureModel fm, String collName) {
-		//fm.getColorschemeTable().removeColorscheme();
-		
-		ProfileManager.Project project = ProfileManager.getProject(fm.xxxGetEclipseProjectPath(), PlugInProfileSerializer.FEATURE_PROJECT_SERIALIZER);
-		project.removeProfile(project.getActiveProfile().getName());
-		return true;
+	public void run() {	
+		ProfileManager.getProject(model.xxxGetEclipseProjectPath(), PlugInProfileSerializer.FEATURE_PROJECT_SERIALIZER).getActiveProfile().clearColors();
+		ProfileManager.getProject(model.xxxGetEclipseProjectPath(), PlugInProfileSerializer.FEATURE_PROJECT_SERIALIZER).getActiveProfile().delete();
 	}
-	
+
 }

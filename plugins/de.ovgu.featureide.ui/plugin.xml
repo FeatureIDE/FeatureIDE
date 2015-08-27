@@ -174,7 +174,7 @@
 	<extension
 			point="org.eclipse.ui.editors.markerAnnotationSpecification">
 		<specification
-        annotationImageProvider="de.ovgu.featureide.ui.editors.annotation.ColorAnnotationImageProvider"
+        annotationImageProvider="de.ovgu.featureide.fm.core.annotation.ColorAnnotationImageProvider"
         annotationType="de.ovgu.featureide.ui.editors.annotations.image"
         colorPreferenceKey="colorAnnotationImage_color"
         colorPreferenceValue="0,0,0"
@@ -194,7 +194,7 @@
         verticalRulerPreferenceValue="true">
 		</specification>
 		<specification
-				annotationImageProvider="de.ovgu.featureide.ui.editors.annotation.ColorAnnotationImageProvider"
+				annotationImageProvider="de.ovgu.featureide.fm.core.annotation.ColorAnnotationImageProvider"
 				annotationType="de.ovgu.featureide.ui.editors.annotations.red1"
 				colorPreferenceKey="colorAnnotationRed_color"
 				colorPreferenceValue="255, 175, 177"
@@ -214,7 +214,7 @@
 				verticalRulerPreferenceValue="false">
 		</specification>
 		<specification
-				annotationImageProvider="de.ovgu.featureide.ui.editors.annotation.ColorAnnotationImageProvider"
+				annotationImageProvider="de.ovgu.featureide.fm.core.annotation.ColorAnnotationImageProvider"
 				annotationType="de.ovgu.featureide.ui.editors.annotations.orange1"
 				colorPreferenceKey="colorAnnotationOrange_color"
 				colorPreferenceValue="255, 216, 166"
@@ -234,7 +234,7 @@
 				verticalRulerPreferenceValue="false">
 		</specification>
 		<specification
-				annotationImageProvider="de.ovgu.featureide.ui.editors.annotation.ColorAnnotationImageProvider"
+				annotationImageProvider="de.ovgu.featureide.fm.core.annotation.ColorAnnotationImageProvider"
 				annotationType="de.ovgu.featureide.ui.editors.annotations.yellow1"
 				colorPreferenceKey="colorAnnotationYellow_color"
 				colorPreferenceValue="237, 255, 166"
@@ -254,7 +254,7 @@
 				verticalRulerPreferenceValue="false">
 		</specification>
 		<specification
-				annotationImageProvider="de.ovgu.featureide.ui.editors.annotation.ColorAnnotationImageProvider"
+				annotationImageProvider="de.ovgu.featureide.fm.core.annotation.ColorAnnotationImageProvider"
 				annotationType="de.ovgu.featureide.ui.editors.annotations.darkgreen1"
 				colorPreferenceKey="colorAnnotationDarkGreen_color"
 				colorPreferenceValue="164, 228, 148"
@@ -274,7 +274,7 @@
 				verticalRulerPreferenceValue="false">
 		</specification>
 		<specification
-				annotationImageProvider="de.ovgu.featureide.ui.editors.annotation.ColorAnnotationImageProvider"
+				annotationImageProvider="de.ovgu.featureide.fm.core.annotation.ColorAnnotationImageProvider"
 				annotationType="de.ovgu.featureide.ui.editors.annotations.lightgreen1"
 				colorPreferenceKey="colorAnnotationLightGreen_color"
 				colorPreferenceValue="166, 255, 201"
@@ -294,7 +294,7 @@
 				verticalRulerPreferenceValue="false">
 		</specification>
 		<specification
-				annotationImageProvider="de.ovgu.featureide.ui.editors.annotation.ColorAnnotationImageProvider"
+				annotationImageProvider="de.ovgu.featureide.fm.core.annotation.ColorAnnotationImageProvider"
 				annotationType="de.ovgu.featureide.ui.editors.annotations.cyan1"
 				colorPreferenceKey="colorAnnotationCyan_color"
 				colorPreferenceValue="163, 251, 251"
@@ -314,7 +314,7 @@
 				verticalRulerPreferenceValue="false">
 		</specification>
 		<specification
-				annotationImageProvider="de.ovgu.featureide.ui.editors.annotation.ColorAnnotationImageProvider"
+				annotationImageProvider="de.ovgu.featureide.fm.core.annotation.ColorAnnotationImageProvider"
 				annotationType="de.ovgu.featureide.ui.editors.annotations.lightgrey1"
 				colorPreferenceKey="colorAnnotationLightGrey_color"
 				colorPreferenceValue="228, 228, 228"
@@ -334,7 +334,7 @@
 				verticalRulerPreferenceValue="false">
 		</specification>
 		<specification
-				annotationImageProvider="de.ovgu.featureide.ui.editors.annotation.ColorAnnotationImageProvider"
+				annotationImageProvider="de.ovgu.featureide.fm.core.annotation.ColorAnnotationImageProvider"
 				annotationType="de.ovgu.featureide.ui.editors.annotations.blue1"
 				colorPreferenceKey="colorAnnotationBlue_color"
 				colorPreferenceValue="164, 148, 228"
@@ -354,7 +354,7 @@
 				verticalRulerPreferenceValue="false">
 		</specification>
 		<specification
-				annotationImageProvider="de.ovgu.featureide.ui.editors.annotation.ColorAnnotationImageProvider"
+				annotationImageProvider="de.ovgu.featureide.fm.core.annotation.ColorAnnotationImageProvider"
 				annotationType="de.ovgu.featureide.ui.editors.annotations.margenta1"
 				colorPreferenceKey="colorAnnotationMargenta_color"
 				colorPreferenceValue="240, 166, 255"
@@ -374,7 +374,7 @@
 				verticalRulerPreferenceValue="false">
 		</specification>
 		<specification
-				annotationImageProvider="de.ovgu.featureide.ui.editors.annotation.ColorAnnotationImageProvider"
+				annotationImageProvider="de.ovgu.featureide.fm.core.annotation.ColorAnnotationImageProvider"
 				annotationType="de.ovgu.featureide.ui.editors.annotations.pink1"
 				colorPreferenceKey="colorAnnotationPink_color"
 				colorPreferenceValue="228, 148, 194"
@@ -394,7 +394,7 @@
 				verticalRulerPreferenceValue="false">
 		</specification>
 		<specification
-				annotationImageProvider="de.ovgu.featureide.ui.editors.annotation.ColorAnnotationImageProvider"
+				annotationImageProvider="de.ovgu.featureide.fm.core.annotation.ColorAnnotationImageProvider"
 				annotationType="de.ovgu.featureide.ui.editors.annotations.red2"
 				colorPreferenceKey="colorAnnotationRed_color"
 				colorPreferenceValue="255, 175, 177"
@@ -414,7 +414,7 @@
 				verticalRulerPreferenceValue="false">
 		</specification>
 		<specification
-				annotationImageProvider="de.ovgu.featureide.ui.editors.annotation.ColorAnnotationImageProvider"
+				annotationImageProvider="de.ovgu.featureide.fm.core.annotation.ColorAnnotationImageProvider"
 				annotationType="de.ovgu.featureide.ui.editors.annotations.orange2"
 				colorPreferenceKey="colorAnnotationOrange_color"
 				colorPreferenceValue="255, 216, 166"
@@ -434,7 +434,7 @@
 				verticalRulerPreferenceValue="false">
 		</specification>
 		<specification
-				annotationImageProvider="de.ovgu.featureide.ui.editors.annotation.ColorAnnotationImageProvider"
+				annotationImageProvider="de.ovgu.featureide.fm.core.annotation.ColorAnnotationImageProvider"
 				annotationType="de.ovgu.featureide.ui.editors.annotations.yellow2"
 				colorPreferenceKey="colorAnnotationYellow_color"
 				colorPreferenceValue="237, 255, 166"
@@ -454,7 +454,7 @@
 				verticalRulerPreferenceValue="false">
 		</specification>
 		<specification
-				annotationImageProvider="de.ovgu.featureide.ui.editors.annotation.ColorAnnotationImageProvider"
+				annotationImageProvider="de.ovgu.featureide.fm.core.annotation.ColorAnnotationImageProvider"
 				annotationType="de.ovgu.featureide.ui.editors.annotations.darkgreen2"
 				colorPreferenceKey="colorAnnotationDarkGreen_color"
 				colorPreferenceValue="164, 228, 148"
@@ -474,7 +474,7 @@
 				verticalRulerPreferenceValue="false">
 		</specification>
 		<specification
-				annotationImageProvider="de.ovgu.featureide.ui.editors.annotation.ColorAnnotationImageProvider"
+				annotationImageProvider="de.ovgu.featureide.fm.core.annotation.ColorAnnotationImageProvider"
 				annotationType="de.ovgu.featureide.ui.editors.annotations.lightgreen2"
 				colorPreferenceKey="colorAnnotationLightGreen_color"
 				colorPreferenceValue="166, 255, 201"
@@ -494,7 +494,7 @@
 				verticalRulerPreferenceValue="false">
 		</specification>
 		<specification
-				annotationImageProvider="de.ovgu.featureide.ui.editors.annotation.ColorAnnotationImageProvider"
+				annotationImageProvider="de.ovgu.featureide.fm.core.annotation.ColorAnnotationImageProvider"
 				annotationType="de.ovgu.featureide.ui.editors.annotations.cyan2"
 				colorPreferenceKey="colorAnnotationCyan_color"
 				colorPreferenceValue="163, 251, 251"
@@ -514,7 +514,7 @@
 				verticalRulerPreferenceValue="false">
 		</specification>
 		<specification
-				annotationImageProvider="de.ovgu.featureide.ui.editors.annotation.ColorAnnotationImageProvider"
+				annotationImageProvider="de.ovgu.featureide.fm.core.annotation.ColorAnnotationImageProvider"
 				annotationType="de.ovgu.featureide.ui.editors.annotations.lightgrey2"
 				colorPreferenceKey="colorAnnotationLightGrey_color"
 				colorPreferenceValue="228, 228, 228"
@@ -534,7 +534,7 @@
 				verticalRulerPreferenceValue="false">
 		</specification>
 		<specification
-				annotationImageProvider="de.ovgu.featureide.ui.editors.annotation.ColorAnnotationImageProvider"
+				annotationImageProvider="de.ovgu.featureide.fm.core.annotation.ColorAnnotationImageProvider"
 				annotationType="de.ovgu.featureide.ui.editors.annotations.blue2"
 				colorPreferenceKey="colorAnnotationBlue_color"
 				colorPreferenceValue="164, 148, 228"
@@ -554,7 +554,7 @@
 				verticalRulerPreferenceValue="false">
 		</specification>
 		<specification
-				annotationImageProvider="de.ovgu.featureide.ui.editors.annotation.ColorAnnotationImageProvider"
+				annotationImageProvider="de.ovgu.featureide.fm.core.annotation.ColorAnnotationImageProvider"
 				annotationType="de.ovgu.featureide.ui.editors.annotations.margenta2"
 				colorPreferenceKey="colorAnnotationMargenta_color"
 				colorPreferenceValue="240, 166, 255"
@@ -574,7 +574,7 @@
 				verticalRulerPreferenceValue="false">
 		</specification>
 		<specification
-				annotationImageProvider="de.ovgu.featureide.ui.editors.annotation.ColorAnnotationImageProvider"
+				annotationImageProvider="de.ovgu.featureide.fm.core.annotation.ColorAnnotationImageProvider"
 				annotationType="de.ovgu.featureide.ui.editors.annotations.pink2"
 				colorPreferenceKey="colorAnnotationPink_color"
 				colorPreferenceValue="228, 148, 194"
@@ -594,7 +594,7 @@
 				verticalRulerPreferenceValue="false">
 		</specification>
 		<specification
-				annotationImageProvider="de.ovgu.featureide.ui.editors.annotation.ColorAnnotationImageProvider"
+				annotationImageProvider="de.ovgu.featureide.fm.core.annotation.ColorAnnotationImageProvider"
 				annotationType="de.ovgu.featureide.ui.editors.annotations.red3"
 				colorPreferenceKey="colorAnnotationRed_color"
 				colorPreferenceValue="255, 175, 177"
@@ -614,7 +614,7 @@
 				verticalRulerPreferenceValue="false">
 		</specification>
 		<specification
-				annotationImageProvider="de.ovgu.featureide.ui.editors.annotation.ColorAnnotationImageProvider"
+				annotationImageProvider="de.ovgu.featureide.fm.core.annotation.ColorAnnotationImageProvider"
 				annotationType="de.ovgu.featureide.ui.editors.annotations.orange3"
 				colorPreferenceKey="colorAnnotationOrange_color"
 				colorPreferenceValue="255, 216, 166"
@@ -634,7 +634,7 @@
 				verticalRulerPreferenceValue="false">
 		</specification>
 		<specification
-				annotationImageProvider="de.ovgu.featureide.ui.editors.annotation.ColorAnnotationImageProvider"
+				annotationImageProvider="de.ovgu.featureide.fm.core.annotation.ColorAnnotationImageProvider"
 				annotationType="de.ovgu.featureide.ui.editors.annotations.yellow3"
 				colorPreferenceKey="colorAnnotationYellow_color"
 				colorPreferenceValue="237, 255, 166"
@@ -654,7 +654,7 @@
 				verticalRulerPreferenceValue="false">
 		</specification>
 		<specification
-				annotationImageProvider="de.ovgu.featureide.ui.editors.annotation.ColorAnnotationImageProvider"
+				annotationImageProvider="de.ovgu.featureide.fm.core.annotation.ColorAnnotationImageProvider"
 				annotationType="de.ovgu.featureide.ui.editors.annotations.darkgreen3"
 				colorPreferenceKey="colorAnnotationDarkGreen_color"
 				colorPreferenceValue="164, 228, 148"
@@ -674,7 +674,7 @@
 				verticalRulerPreferenceValue="false">
 		</specification>
 		<specification
-				annotationImageProvider="de.ovgu.featureide.ui.editors.annotation.ColorAnnotationImageProvider"
+				annotationImageProvider="de.ovgu.featureide.fm.core.annotation.ColorAnnotationImageProvider"
 				annotationType="de.ovgu.featureide.ui.editors.annotations.lightgreen3"
 				colorPreferenceKey="colorAnnotationLightGreen_color"
 				colorPreferenceValue="166, 255, 201"
@@ -694,7 +694,7 @@
 				verticalRulerPreferenceValue="false">
 		</specification>
 		<specification
-				annotationImageProvider="de.ovgu.featureide.ui.editors.annotation.ColorAnnotationImageProvider"
+				annotationImageProvider="de.ovgu.featureide.fm.core.annotation.ColorAnnotationImageProvider"
 				annotationType="de.ovgu.featureide.ui.editors.annotations.cyan3"
 				colorPreferenceKey="colorAnnotationCyan_color"
 				colorPreferenceValue="163, 251, 251"
@@ -714,7 +714,7 @@
 				verticalRulerPreferenceValue="false">
 		</specification>
 		<specification
-				annotationImageProvider="de.ovgu.featureide.ui.editors.annotation.ColorAnnotationImageProvider"
+				annotationImageProvider="de.ovgu.featureide.fm.core.annotation.ColorAnnotationImageProvider"
 				annotationType="de.ovgu.featureide.ui.editors.annotations.lightgrey3"
 				colorPreferenceKey="colorAnnotationLightGrey_color"
 				colorPreferenceValue="228, 228, 228"
@@ -734,7 +734,7 @@
 				verticalRulerPreferenceValue="false">
 		</specification>
 		<specification
-				annotationImageProvider="de.ovgu.featureide.ui.editors.annotation.ColorAnnotationImageProvider"
+				annotationImageProvider="de.ovgu.featureide.fm.core.annotation.ColorAnnotationImageProvider"
 				annotationType="de.ovgu.featureide.ui.editors.annotations.blue3"
 				colorPreferenceKey="colorAnnotationBlue_color"
 				colorPreferenceValue="164, 148, 228"
@@ -754,7 +754,7 @@
 				verticalRulerPreferenceValue="false">
 		</specification>
 		<specification
-				annotationImageProvider="de.ovgu.featureide.ui.editors.annotation.ColorAnnotationImageProvider"
+				annotationImageProvider="de.ovgu.featureide.fm.core.annotation.ColorAnnotationImageProvider"
 				annotationType="de.ovgu.featureide.ui.editors.annotations.margenta3"
 				colorPreferenceKey="colorAnnotationMargenta_color"
 				colorPreferenceValue="240, 166, 255"
@@ -774,7 +774,7 @@
 				verticalRulerPreferenceValue="false">
 		</specification>
 		<specification
-				annotationImageProvider="de.ovgu.featureide.ui.editors.annotation.ColorAnnotationImageProvider"
+				annotationImageProvider="de.ovgu.featureide.fm.core.annotation.ColorAnnotationImageProvider"
 				annotationType="de.ovgu.featureide.ui.editors.annotations.pink3"
 				colorPreferenceKey="colorAnnotationPink_color"
 				colorPreferenceValue="228, 148, 194"
@@ -1111,30 +1111,16 @@
 					</reference>
 				</visibleWhen>
 			</command>
-   <menu
-         icon="icons/FeatureIconSmall.ico"
-         id="Profilemenu"
-         label="Profile">
+   <dynamic
+         class="de.ovgu.featureide.ui.actions.DynamicProfileMenu"
+         id="de.ovgu.featureide.ui.ProfileSchemeMenu">
       <visibleWhen
             checkEnabled="false">
          <reference
                definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
          </reference>
       </visibleWhen>
-      <command
-            commandId="de.ovgu.featureide.fm.ui.colorscheme"
-            icon="icons/FeatureProjectSmall.png"
-            id="de.ovgu.featureide.fm.ui.actions.colorscheme"
-            label="Color"
-            style="push">
-      </command>
-      <dynamic
-            id="whatever">
-         <class
-               class="de.ovgu.featureide.ui.views.collaboration.action.AddColorSchemAction.java">
-         </class>
-      </dynamic>
-   </menu>
+   </dynamic>
 		</menuContribution>
 
 		<menuContribution
@@ -1178,7 +1164,6 @@
 				locationURI="popup:#CompilationUnitEditorContext?after=additions">
 			<command
 					commandId="de.ovgu.featureide.ui.commands.enableHighlighting"
-					icon="icons/FeatureIconSmall.ico"
 					id="de.ovgu.featureide.fm.ui.actions.enableHighlighting"
 					label="Enable Editor Highlighting"
 					style="toggle">
@@ -1358,4 +1343,40 @@
 				type="org.eclipse.core.resources.IFolder">
 		</propertyTester>
 	</extension>
+ <extension
+       point="org.eclipse.ui.navigator.viewer">
+    <viewerContentBinding
+          viewerId="org.eclipse.ui.navigator.ProjectExplorer">
+       <includes>
+          <contentExtension
+                pattern="de.ovgu.featureide.ui.contentID">
+          </contentExtension>
+       </includes>
+    </viewerContentBinding>
+ </extension>
+ <extension
+       point="org.eclipse.ui.navigator.navigatorContent">
+    <navigatorContent
+          contentProvider="de.ovgu.featureide.ui.projectExplorer.ProjectExplorerContentProvider"
+          id="de.ovgu.featureide.ui.contentID"
+          labelProvider="de.ovgu.featureide.ui.projectExplorer.ProjectExplorerLabelProvider"
+          name="FeatureIDEProjectExplorer"
+          priority="highest">
+       <triggerPoints>
+          <or>
+             <instanceof
+                   value="org.eclipse.core.resources.IFile">
+             </instanceof>
+             <instanceof
+                   value="org.eclipse.core.resources.IFolder">
+             </instanceof>
+             <instanceof
+                   value="java.lang.Object">
+             </instanceof>
+          </or>
+       </triggerPoints>
+    </navigatorContent>
+ </extension>
+	
+	
 </plugin>

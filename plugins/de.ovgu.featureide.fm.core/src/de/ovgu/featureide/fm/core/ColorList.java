@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.core;
 
 import java.util.ArrayList;
 
+
 /**
  * Holds the colors for a feature.
  * 
@@ -49,27 +50,27 @@ public class ColorList {
 		return color > INVALID_COLOR;
 	}
 
-	public boolean hasColor() {
+	public boolean xhasColor() {
 		if (colorschemeTable == null) {
 			return false;
 		}
 		return colors.get(colorschemeTable.getSelectedColorscheme()) > INVALID_COLOR;
 	}
 	
-	public int getColor() {
+	public int xgetColor() {
 		if (colorschemeTable == null) {
 			return INVALID_COLOR;
 		}
 		return colors.get(colorschemeTable.getSelectedColorscheme());
 	}
 	
-	public void setColor(int color) {
+	public void xsetColor(int color) {
 		if (colorschemeTable != null) {
 			colors.set(colorschemeTable.getSelectedColorscheme(), color);
 		}
 	}
 	
-	public void removeColor() {
+	public void xremoveColor() {
 		if (colorschemeTable != null) {
 			colors.set(colorschemeTable.getSelectedColorscheme(), INVALID_COLOR);
 		}

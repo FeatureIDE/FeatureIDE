@@ -57,6 +57,7 @@ public class ColorschemeTable {
 		selectedColorscheme = -1;
 	}
 	
+
 	/**
 	 * @param featureModel
 	 */
@@ -68,7 +69,7 @@ public class ColorschemeTable {
 	
 	protected ColorschemeTable(ColorschemeTable oldColorschemeTable, FeatureModel featureModel) {
 		this.featureModel = featureModel;
-		this.colorschemeNames = new ArrayList<String>(oldColorschemeTable.colorschemeNames);
+		this.colorschemeNames = oldColorschemeTable.colorschemeNames;//new ArrayList<String>(oldColorschemeTable.colorschemeNames);
 		this.selectedColorscheme = oldColorschemeTable.selectedColorscheme;
 	}
 
@@ -93,20 +94,20 @@ public class ColorschemeTable {
 	 * Removes the current Colorscheme.
 	 */
 	public void removeColorscheme() {
-		if (colorschemeNames.size() == 2) {
-			colorschemeNames.set(1, DEFAULT_COLORSCHEMENAME);
-			for (Feature feat : featureModel.getFeatures()) {
-				feat.getColorList().removeColor();
-			}
-		} else {
-			colorschemeNames.remove(selectedColorscheme);
-			for (Feature feat : featureModel.getFeatures()) {
-				feat.getColorList().removeColorscheme();
-			}
-			if (selectedColorscheme == colorschemeNames.size()) {
-				selectedColorscheme--;
-			}
-		}
+//		if (colorschemeNames.size() == 2) {
+//			colorschemeNames.set(1, DEFAULT_COLORSCHEMENAME);
+//			for (Feature feat : featureModel.getFeatures()) {
+//				feat.getColorList().removeColor();
+//			}
+//		} else {
+//			colorschemeNames.remove(selectedColorscheme);
+//			for (Feature feat : featureModel.getFeatures()) {
+//				feat.getColorList().removeColorscheme();
+//			}
+//			if (selectedColorscheme == colorschemeNames.size()) {
+//				selectedColorscheme--;
+//			}
+//		}
 	}
 	
 	/**
@@ -150,7 +151,7 @@ public class ColorschemeTable {
 	 * Sets the selected colorscheme to an empty colorschme
 	 */
 	public void setEmptyColorscheme() {
-		this.selectedColorscheme = 0;
+		this.selectedColorscheme = 1;
 	}
 	
 	public void reset() {

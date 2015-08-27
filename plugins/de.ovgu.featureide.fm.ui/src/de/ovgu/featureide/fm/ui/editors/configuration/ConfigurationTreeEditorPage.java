@@ -46,7 +46,9 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IEditorInput;
@@ -57,10 +59,15 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
 import org.sat4j.specs.TimeoutException;
 
+import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.FunctionalInterfaces;
 import de.ovgu.featureide.fm.core.FunctionalInterfaces.IBinaryFunction;
 import de.ovgu.featureide.fm.core.FunctionalInterfaces.IFunction;
+import de.ovgu.featureide.fm.core.ProfileManager;
+import de.ovgu.featureide.fm.core.ProfileManager.Project.Profile;
+import de.ovgu.featureide.fm.core.annotation.ColorPalette;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagatorJobWrapper.IConfigJob;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
@@ -69,6 +76,7 @@ import de.ovgu.featureide.fm.core.configuration.TreeElement;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.PlugInProfileSerializer;
 
 /**
  * Basic class with some default methods for configuration editor pages.
@@ -389,12 +397,35 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		}
 	}
 
+	private Profile getCurrentProfile(FeatureModel featureModel) {
+		return ProfileManager.getProject(featureModel.xxxGetEclipseProjectPath(), PlugInProfileSerializer.FEATURE_PROJECT_SERIALIZER).getActiveProfile();
+	}
+
 	protected void updateTree() {
 		itemMap.clear();
 		if (errorMessage(tree)) {
 			final Configuration configuration = configurationEditor.getConfiguration();
 			tree.removeAll();
+			tree.addListener(SWT.PaintItem, new Listener() {
+
+				@Override
+				public void handleEvent(Event event) {
+					if (event.item instanceof TreeItem) {
+						TreeItem item = (TreeItem) event.item;
+						if (item.getData() instanceof SelectableFeature) {
+							SelectableFeature selectableFeature = (SelectableFeature) item.getData();
+							Feature feature = selectableFeature.getFeature();
+							
+							if (ProfileManager.toColorIndex(getCurrentProfile(feature.getFeatureModel()).getColor(feature.getName())) != -1) {
+								item.setBackground(new Color(null, ColorPalette.getRGB(
+										ProfileManager.toColorIndex(getCurrentProfile(feature.getFeatureModel()).getColor(feature.getName())), 0.5f)));
+							}
+						}
+					}
+				}
+			});
 			final TreeItem root = new TreeItem(tree, 0);
+
 			root.setText(configuration.getRoot().getName());
 			root.setData(configuration.getRoot());
 			itemMap.put(configuration.getRoot(), root);

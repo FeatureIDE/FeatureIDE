@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.editors.annotation;
+package de.ovgu.featureide.fm.core.annotation;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.source.Annotation;
@@ -27,6 +27,7 @@ import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.ui.texteditor.IAnnotationImageProvider;
+
 
 /**
  * Image for the annotations shown in the vertical ruler
