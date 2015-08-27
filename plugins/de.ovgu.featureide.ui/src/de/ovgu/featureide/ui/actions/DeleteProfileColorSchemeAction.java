@@ -60,7 +60,6 @@ public class DeleteProfileColorSchemeAction extends Action {
 	 * this method removes the profile and saves the configuration
 	 */
 	public void run() {	
-		ProfileManager.getProject(model.xxxGetEclipseProjectPath(), PlugInProfileSerializer.FEATURE_PROJECT_SERIALIZER).getActiveProfile().clearColors();
 		ProfileManager.getProject(model.xxxGetEclipseProjectPath(), PlugInProfileSerializer.FEATURE_PROJECT_SERIALIZER).getActiveProfile().delete();
 	}
 

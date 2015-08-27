@@ -77,7 +77,9 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 			}
 			IComposerExtensionClass composer = featureProject.getComposer();
 			getPackageColors(folder, myColors, model, !composer.hasFeatureFolder());
-
+			if(myColors.isEmpty()){
+				return null;
+			}
 			return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.PACKAGE, myColors);
 
 		}
@@ -100,6 +102,9 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 				//folder inSourceFolder but not SourceFolder itself
 				if (folder.getParent().equals(featureProject.getSourceFolder())) {
 					getFeatureFolderColors(folder, myColors, model);
+					if(myColors.isEmpty()){
+						return null;
+					}
 					return DrawImageForProjectExplorer.drawFeatureHouseExplorerImage(myColors);
 				}
 			}
@@ -110,6 +115,9 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 					IFolder folder = (IFolder) element;
 					if (isInSourceFolder(folder) && !folder.equals(featureProject.getSourceFolder())) {
 						getPackageColors(folder, myColors, model, true);
+						if(myColors.isEmpty()){
+							return null;
+						}
 						return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.FOLDER, myColors);
 					}
 				}
@@ -119,6 +127,9 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 					if (folder instanceof IFolder) {
 						if (isInSourceFolder((IFolder) folder)) {
 							getPackageColors((IFolder)folder, myColors, model, true);
+							if(myColors.isEmpty()){
+								return null;
+							}
 							return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.FILE, myColors);
 						}
 					}
@@ -141,7 +152,9 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 				model = featureProject.getFSTModel();
 			}
 			getColors(myColors, myfile, model, !featureProject.getComposer().hasFeatureFolder());
-
+			if(myColors.isEmpty()){
+				return null;
+			}
 			return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.FILE, myColors);
 		}
 		
