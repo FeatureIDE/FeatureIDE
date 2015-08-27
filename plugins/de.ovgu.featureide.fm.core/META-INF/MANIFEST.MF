@@ -15,6 +15,7 @@ Export-Package: Jakarta.DRAttributes,
  Jakarta.symtab,
  Jakarta.util;uses:="Jakarta.loader",
  de.ovgu.featureide.fm.core;uses:="org.prop4j,org.eclipse.core.resources",
+ de.ovgu.featureide.fm.core.annotation,
  de.ovgu.featureide.fm.core.configuration;uses:="de.ovgu.featureide.fm.core.model,org.eclipse.core.resources",
  de.ovgu.featureide.fm.core.constraint,
  de.ovgu.featureide.fm.core.constraint.analysis,
@@ -65,4 +66,11 @@ Bundle-ClassPath: .,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Activator: de.ovgu.featureide.fm.core.FMCorePlugin
 Bundle-Vendor: University of Magdeburg
+Import-Package: org.eclipse.jdt.internal.core.util,
+ org.eclipse.jface.resource,
+ org.eclipse.jface.text,
+ org.eclipse.jface.text.source,
+ org.eclipse.jface.viewers,
+ org.eclipse.swt.graphics,
+ org.eclipse.ui.texteditor
 

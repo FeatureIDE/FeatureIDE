@@ -90,7 +90,7 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 			}
 			IComposerExtensionClass composer = featureProject.getComposer();
 			FSTModel model = featureProject.getFSTModel();
-			if (model.getClasses().isEmpty()) {
+			if (model == null || model.getClasses().isEmpty()) {
 				featureProject.getComposer().buildFSTModel();
 				model = featureProject.getFSTModel();
 			}

@@ -21,6 +21,7 @@
 package de.ovgu.featureide.ui.projectExplorer;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -67,7 +68,8 @@ public class DrawImageForProjectExplorer {
 	 * @return the image with the icon of the file, folder or package (explorerObject) and the color of the feature
 	 */
 	public static Image drawExplorerImage(ExplorerObject explorerObject, List<Integer> colors) {
-		colors.sort(new Comparator<Integer>() {
+		Collections.sort(colors, 
+		new Comparator<Integer>() {
 
 			@Override
 			public int compare(Integer i0, Integer i1) {
