@@ -99,7 +99,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 			parseComments(e.getElementsByTagName(COMMENTS));
 			parseFeatureOrder(e.getElementsByTagName(FEATURE_ORDER));	
 		}
-		if (featureModel.getRoot() == null) {
+		if (featureModel.getStructure().getRoot() == null) {
 			throw new UnsupportedModelException(WRONG_SYNTAX, 1);
 		}
 		featureModel.handleModelDataLoaded();
@@ -208,29 +208,29 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 				throwError(name + IS_NO_VALID_FEATURE_NAME, e);
 			}
 			IFeature f = FeatureModelFactory.getInstance().createFeature(featureModel, name);
-			f.setMandatory(true);
+			f.getStructure().setMandatory(true);
 			if (nodeName.equals(AND)) {
-				f.setAnd();
+				f.getStructure().setAnd();
 			} else if (nodeName.equals(ALT)) {
-				f.setAlternative();
+				f.getStructure().setAlternative();
 			} else if (nodeName.equals(OR)) {
-				f.setOr();
+				f.getStructure().setOr();
 			} else if (nodeName.equals(FEATURE)) {
 				
 			} else {
 				throwError("Unknown feature type: " + nodeName, e);
 			}
-			f.setAbstract(_abstract);
-			f.setMandatory(mandatory);
-			f.setHidden(hidden);
+			f.getStructure().setAbstract(_abstract);
+			f.getStructure().setMandatory(mandatory);
+			f.getStructure().setHidden(hidden);
 			if (featureLocation != null) {
-				f.setNewLocation(featureLocation);
+				f.etNewLocation(featureLocation);
 			}
 			featureModel.addFeature(f);
 			if (parent == null) {
-				featureModel.setRoot(f);
+				featureModel.getStructure().setRoot(f.getStructure());
 			} else {
-				parent.addChild(f);
+				parent.getStructure().addChild(f.getStructure());
 			}
 			if (e.hasChildNodes()) {
 				parseFeatures(e.getChildNodes(), f);

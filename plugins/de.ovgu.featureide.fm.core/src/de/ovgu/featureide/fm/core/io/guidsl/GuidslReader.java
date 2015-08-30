@@ -82,6 +82,7 @@ import org.prop4j.SatSolver;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.ModelWarning;
@@ -213,7 +214,7 @@ public class GuidslReader extends AbstractFeatureModelReader {
 						if (ch.equals(" ") || ch.equals("{")){
 							String featName = line.substring(0,line.indexOf('{')-1);
 							if (featureModel.getFeature(featName) != null)
-								featureModel.getFeature(featName).setHidden(true);
+								featureModel.getFeature(featName).getStructure().setHidden(true);
 							else 
 								throw new UnsupportedModelException(THE_FEATURE_ + featName + "' does not occur in the feature model!", 0);
 						}
@@ -237,13 +238,13 @@ public class GuidslReader extends AbstractFeatureModelReader {
 	}
 	
 	private void readGProduction(GProduction gProduction, IFeature feature) throws UnsupportedModelException {
-		feature.setAND(false);
+		feature.getStructure().setAND(false);
 		Pats pats = gProduction.getPats();
 		AstListNode astListNode = (AstListNode) pats.arg[0];
 		do {
 			IFeature child = readPat((Pat) astListNode.arg[0]);
-			feature.addChild(child);
-			feature.setAbstract(!noAbstractFeatures);
+			feature.getStructure().addChild(child.getStructure());
+			feature.getStructure().setAbstract(!noAbstractFeatures);
 			astListNode = (AstListNode) astListNode.right;
 		} while (astListNode != null);
 		simplify(feature);
@@ -261,7 +262,7 @@ public class GuidslReader extends AbstractFeatureModelReader {
 	private void readGProductionRoot(GProduction gProduction) throws UnsupportedModelException {
 		final IFeature root = FeatureModelFactory.getInstance().createFeature(featureModel, gProduction.getIDENTIFIER().name);
 		featureModel.addFeature(root);
-		featureModel.setRoot(root);
+		featureModel.getStructure().setRoot(root.getStructure());
 		readGProduction(gProduction, root);
 	}
 
@@ -276,13 +277,13 @@ public class GuidslReader extends AbstractFeatureModelReader {
 	private IFeature readGPattern(GPattern gPattern) throws UnsupportedModelException {
 		AstToken token = gPattern.getIDENTIFIER();
 		IFeature feature = createFeature(token);
-		feature.setAND(true);
+		feature.getStructure().setAND(true);
 		TermList termList = gPattern.getTermList();
 		AstListNode astListNode = (AstListNode) termList.arg[0];
 		do {
 			IFeature child = readGTerm((GTerm) astListNode.arg[0]);
-			feature.addChild(child);
-			feature.setAbstract(!noAbstractFeatures);
+			feature.getStructure().addChild(child.getStructure());
+			feature.getStructure().setAbstract(!noAbstractFeatures);
 			astListNode = (AstListNode) astListNode.right;
 		} while (astListNode != null);
 		return simplify(feature);
@@ -299,8 +300,8 @@ public class GuidslReader extends AbstractFeatureModelReader {
 		else
 			token = ((OptTerm) term).getIDENTIFIER();
 		IFeature feature = createFeature(token);
-		feature.setMandatory(term instanceof PlusTerm || term instanceof TermName);
-		feature.setMultiple(term instanceof PlusTerm || term instanceof StarTerm);
+		feature.getStructure().setMandatory(term instanceof PlusTerm || term instanceof TermName);
+		feature.getStructure().setMultiple(term instanceof PlusTerm || term instanceof StarTerm);
 		return feature;
 	}
 
@@ -312,26 +313,26 @@ public class GuidslReader extends AbstractFeatureModelReader {
 	}
 
 	private IFeature simplify(IFeature feature) {
-		if (feature.getChildrenCount() == 1) {
-			IFeature child = feature.getFirstChild();
-			if (child.getName().equals(EMPTY___ + feature.getName())) {
-				feature.removeChild(child);
-				feature.setChildren(child.getChildren());
-				feature.setAND(child.isAnd());
-				featureModel.deleteFeatureFromTable(child);
+		if (feature.getStructure().getChildrenCount() == 1) {
+			IFeatureStructure child = feature.getStructure().getFirstChild();
+			if (child.getFeature().getName().equals(EMPTY___ + feature.getName())) {
+				feature.getStructure().removeChild(child);
+				feature.getStructure().setChildren(child.getChildren());
+				feature.getStructure().setAND(child.isAnd());
+				featureModel.deleteFeatureFromTable(child.getFeature());
 			}
-			else if (feature.getName().equals(child.getName() + EMPTY___)) {
-				feature.removeChild(child);
-				if (feature == featureModel.getRoot())
-					featureModel.replaceRoot(child);
+			else if (feature.getName().equals(child.getFeature().getName() + EMPTY___)) {
+				feature.getStructure().removeChild(child);
+				if (feature == featureModel.getStructure().getRoot())
+					featureModel.getStructure().replaceRoot(child);
 				else
 					featureModel.deleteFeatureFromTable(feature);
-				feature = child;
+				feature = child.getFeature();
 			}
-			else if (feature != featureModel.getRoot() && feature.getName().equals(EMPTY___ + child.getName())) {
-				feature.removeChild(child);
+			else if (feature != featureModel.getStructure().getRoot() && feature.getName().equals(EMPTY___ + child.getFeature().getName())) {
+				feature.getStructure().removeChild(child);
 				featureModel.deleteFeatureFromTable(feature);
-				feature = child;
+				feature = child.getFeature();
 			}
 		}
 		return feature;

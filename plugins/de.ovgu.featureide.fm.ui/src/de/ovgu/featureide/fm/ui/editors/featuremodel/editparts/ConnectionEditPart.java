@@ -43,6 +43,7 @@ import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.FeatureConnection;
 import de.ovgu.featureide.fm.core.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
@@ -189,13 +190,13 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		FeatureConnection connectionModel = (FeatureConnection) getModel();
 		IFeature target = connectionModel.getTarget();
 		RotatableDecoration targetDecoration = null;
-		if (target.getChildrenCount() > 1 || HALF_ARC) {
+		if (target.getStructure().getChildrenCount() > 1 || HALF_ARC) {
 			IFeature source = connectionModel.getSource();
 			if (FeatureUIHelper.hasVerticalLayout(getFeatureModel())) {
-				if (!target.isAnd() && (target.getChildIndex(source) == (target.getChildrenCount() - 1)))
-					targetDecoration = new RelationDecoration(target.isMultiple(), target.getFirstChild(), target.getChildren());
+				if (!target.getStructure().isAnd() && (target.getStructure().getChildIndex(source.getStructure()) == (target.getStructure().getChildrenCount() - 1)))
+					targetDecoration = new RelationDecoration(target.getStructure().isMultiple(), target.getStructure().getFirstChild(), FeatureUtils.convertToFeatureStructureList(target.getStructure().getChildren()));
 			} else {
-				if (!target.isAnd() && target.isFirstChild(source))
+				if (!target.getStructure().isAnd() && target.getStructure().isFirstChild(source))
 					targetDecoration = new RelationDecoration(target.isMultiple(), target.getLastChild(), target.getChildren());
 			}
 		}

@@ -163,7 +163,7 @@ public class FeatureStructure implements IFeatureStructure, PropertyConstants {
 	}
 
 	@Override
-	public LinkedList<IFeatureStructure> getChildren() {
+	public List<IFeatureStructure> getChildren() {	// Changed type LinkedList to List, Marcus Pinnecke 30.08.15
 		return children;
 	}
 
@@ -382,7 +382,7 @@ public class FeatureStructure implements IFeatureStructure, PropertyConstants {
 	}
 
 	@Override
-	public void setChildren(LinkedList<IFeatureStructure> children) {
+	public void setChildren(List<IFeatureStructure> children) {	// Changed type LinkedList to List, Marcus Pinnecke 30.08.15
 		children.clear();
 		for (final IFeatureStructure child : children) {
 			addNewChild(child);

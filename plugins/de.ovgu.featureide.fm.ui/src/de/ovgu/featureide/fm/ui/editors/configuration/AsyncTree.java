@@ -57,7 +57,7 @@ public class AsyncTree extends Thread {
 				final TreeElement child = children[i];
 				if (child instanceof SelectableFeature) {
 					final SelectableFeature currentFeature = (SelectableFeature) child;
-					if (!currentFeature.getFeature().isHidden()) {
+					if (!currentFeature.getFeature().getStructure().isHidden()) {
 						TreeItem childNode = null;
 						// This try for the case that the parent item is already disposed.
 						try {

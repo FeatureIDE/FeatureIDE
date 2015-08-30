@@ -21,7 +21,6 @@
 package de.ovgu.featureide.fm.core.base;
 
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 
 import de.ovgu.featureide.fm.core.FeatureConnection;
@@ -50,7 +49,7 @@ public interface IFeatureStructure {
 
 	int getChildIndex(IFeatureStructure feature);
 
-	LinkedList<IFeatureStructure> getChildren();
+	List<IFeatureStructure> getChildren();	// Changed type LinkedList to List, Marcus Pinnecke 30.08.15
 
 	int getChildrenCount();
 
@@ -116,7 +115,7 @@ public interface IFeatureStructure {
 
 	void setAND(boolean and);
 
-	void setChildren(LinkedList<IFeatureStructure> children);
+	void setChildren(List<IFeatureStructure> children);	// Changed type LinkedList to List, Marcus Pinnecke 30.08.15
 
 	void setHidden(boolean hid);
 

@@ -34,9 +34,12 @@ import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TextCellEditor;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
+import de.ovgu.featureide.fm.core.functional.FunctionalInterfaces;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureCellEditorLocator;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureLabelEditManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
@@ -72,12 +75,12 @@ public class FeatureCreateCompoundOperation extends AbstractFeatureModelOperatio
 	@Override
 	public IStatus execute(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
 		int number = 0;
-		while (featureModel.getFeatureNames().contains("NewCompound" + ++number))
+		while (FunctionalInterfaces.toList(FeatureUtils.extractFeatureNames(featureModel.getFeatures())).contains("NewCompound" + ++number))
 			;
 		newCompound = FeatureModelFactory.getInstance().createFeature(featureModel, "NewCompound" + number);
 		if (parent != null) {
-			newCompound.setAND(true);
-			newCompound.setMultiple(parent.isMultiple());
+			newCompound.getStructure().setAND(true);
+			newCompound.getStructure().setMultiple(parent.getStructure().isMultiple());
 		}
 		redo(monitor, info);
 
@@ -109,23 +112,23 @@ public class FeatureCreateCompoundOperation extends AbstractFeatureModelOperatio
 	@Override
 	protected void redo() {
 		if (parent != null) {
-			LinkedList<IFeature> newChildren = new LinkedList<IFeature>();
-			for (IFeature feature : parent.getChildren()) {
+			LinkedList<IFeatureStructure> newChildren = new LinkedList<IFeatureStructure>();
+			for (IFeatureStructure feature : parent.getStructure().getChildren()) {
 				if (selectedFeatures.contains(feature)) {
-					if (!newCompound.hasChildren())
-						newChildren.add(newCompound);
+					if (!newCompound.getStructure().hasChildren())
+						newChildren.add(newCompound.getStructure());
 					feature.setMandatory(false);
-					newCompound.addChild(feature);
+					newCompound.getStructure().addChild(feature);
 				} else {
 					newChildren.add(feature);
 				}
 			}
-			parent.setChildren(newChildren);
+			parent.getStructure().setChildren(newChildren);
 			featureModel.addFeature(newCompound);
 		} else {
-			newCompound.addChild(featureModel.getRoot());
+			newCompound.getStructure().addChild(featureModel.getStructure().getRoot());
 			featureModel.addFeature(newCompound);
-			featureModel.setRoot(newCompound);
+			featureModel.getStructure().setRoot(newCompound.getStructure());
 		}
 
 		//		newCompound = featureModel.getFeature(newCompound.getName());
@@ -136,7 +139,7 @@ public class FeatureCreateCompoundOperation extends AbstractFeatureModelOperatio
 	@Override
 	protected void undo() {
 		if (parent == null) {
-			featureModel.replaceRoot(featureModel.getRoot().removeLastChild());
+			featureModel.getStructure().replaceRoot(featureModel.getStructure().getRoot().removeLastChild());
 		} else {
 			featureModel.deleteFeature(featureModel.getFeature(newCompound.getName()));
 		}

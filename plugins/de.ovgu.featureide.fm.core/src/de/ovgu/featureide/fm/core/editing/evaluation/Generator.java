@@ -150,11 +150,11 @@ public abstract class Generator {
 			if (r == 0) {
 				//Alternative to Or+Constraint
 				for (IFeature feature : randomizedList)
-					if (feature.getChildrenCount() > 1 && feature.isAlternative()) {
-						feature.changeToOr();
+					if (feature.getStructure().getChildrenCount() > 1 && feature.getStructure().isAlternative()) {
+						feature.getStructure().changeToOr();
 						LinkedList<Node> nodes = new LinkedList<Node>();
-						for (IFeature child : feature.getChildren())
-							nodes.add(new Literal(child.getName()));
+						for (IFeatureStructure child : feature.getStructure().getChildren())
+							nodes.add(new Literal(child.getFeature().getName()));
 						fm.addPropositionalNode(new AtMost(1,nodes).toCNF());
 						break;
 					}
@@ -162,10 +162,10 @@ public abstract class Generator {
 			else if (r == 1) {
 				//Mandatory to Optional+Constraint
 				for (IFeature feature : randomizedList) {
-					IFeature parent = feature.getParent();
-					if (parent != null && parent.isAnd() && !parent.isFirstChild(feature) && feature.isMandatory()) {
-						feature.setMandatory(false);
-						fm.addPropositionalNode(new Implies(new Literal(parent.getName()),new Literal(feature.getName())));
+					IFeatureStructure parent = feature.getStructure().getParent();
+					if (parent != null && parent.isAnd() && !parent.isFirstChild(feature) && feature.getStructure().isMandatory()) {
+						feature.getStructure().setMandatory(false);
+						fm.addPropositionalNode(new Implies(new Literal(parent.getFeature().getName()),new Literal(feature.getName())));
 						break;
 					}
 				}
@@ -173,12 +173,12 @@ public abstract class Generator {
 			else {
 				//move feature to parent's parent
 				for (IFeature child : randomizedList) {
-					IFeature feature = child.getParent();
+					IFeatureStructure feature = child.getStructure().getParent();
 					if (feature != null && feature.isMandatory() && feature.isAnd() && !feature.isFirstChild(child)) {
-						IFeature parent = feature.getParent();
+						IFeatureStructure parent = feature.getParent();
 						if (parent != null && parent.isAnd()) {
-							feature.removeChild(child);
-							parent.addChild(child);
+							feature.removeChild(child.getStructure());
+							parent.addChild(child.getStructure());
 							break;
 						}
 					}
@@ -201,8 +201,8 @@ public abstract class Generator {
 			if (r == 1) {
 				//Alternative to Or
 				for (IFeature feature : randomizedList)
-					if (feature.getChildrenCount() > 1 && feature.isAlternative()) {
-						feature.changeToOr();
+					if (feature.getStructure().getChildrenCount() > 1 && feature.getStructure().isAlternative()) {
+						feature.getStructure().changeToOr();
 						break;
 					}
 			}
@@ -210,12 +210,12 @@ public abstract class Generator {
 				//move Optional into Or
 				r2:
 				for (IFeature feature : randomizedList) {
-					IFeature parent = feature.getParent();
-					if (parent != null && parent.isAnd() && feature.isMandatory() && feature.isOr()) {
-						for (IFeature child : parent.getChildren()) 
+					IFeatureStructure parent = feature.getStructure().getParent();
+					if (parent != null && parent.isAnd() && feature.getStructure().isMandatory() && feature.getStructure().isOr()) {
+						for (IFeatureStructure child : parent.getChildren()) 
 							if (!child.isMandatory()) {
 								parent.removeChild(child);
-								feature.addChild(child);
+								feature.getStructure().addChild(child);
 								break r2;
 							}
 					}
@@ -224,32 +224,32 @@ public abstract class Generator {
 			else if (r == 3) {
 				//And to Or
 				for (IFeature feature : randomizedList)
-					if (feature.getChildrenCount() > 1 && feature.isAnd()) {
-						feature.changeToOr();
+					if (feature.getStructure().getChildrenCount() > 1 && feature.getStructure().isAnd()) {
+						feature.getStructure().changeToOr();
 						break;
 					}
 			}
 			else if (r == 4) {
 				//new feature in Alternative
 				for (IFeature feature : randomizedList)
-					if (feature.hasChildren() && feature.isAlternative()) {
+					if (feature.getStructure().hasChildren() && feature.getStructure().isAlternative()) {
 						int j = 1;
 						IFeature child;
 						do {
 							child = FeatureModelFactory.getInstance().createFeature(fm, "C" + j++);
 						} while (!fm.addFeature(child));
-						feature.addChild(child);
+						feature.getStructure().addChild(child.getStructure());
 						break;
 					}
 			}
 			else if (r == 5) {
 				//Or to And
 				for (IFeature feature : randomizedList)
-					if (feature.getChildrenCount() > 1 && feature.isOr()) {
-						IFeature parent = feature.getParent();
-						if (parent != null && !parent.isFirstChild(feature) && parent.isAnd()) {
-							parent.removeChild(feature);
-							for (IFeature child : feature.getChildren()) {
+					if (feature.getStructure().getChildrenCount() > 1 && feature.getStructure().isOr()) {
+						IFeatureStructure parent = feature.getStructure().getParent();
+						if (parent != null && !parent.isFirstChild(feature.getStructure()) && parent.isAnd()) {
+							parent.removeChild(feature.getStructure());
+							for (IFeatureStructure child : feature.getStructure().getChildren()) {
 								parent.addChild(child);
 								child.setMandatory(false);
 							}
@@ -260,10 +260,10 @@ public abstract class Generator {
 			else if (r == 6) {
 				//Mandatory to Optional
 				for (IFeature feature : randomizedList) {
-					IFeature parent = feature.getParent();
-					if (parent != null && parent.isAnd() && !parent.isFirstChild(feature) && feature.isMandatory()) {
-						feature.setMandatory(false);
-						fm.addPropositionalNode(new Implies(new Literal(parent.getName()),new Literal(feature.getName())));
+					IFeatureStructure parent = feature.getStructure().getParent();
+					if (parent != null && parent.isAnd() && !parent.isFirstChild(feature.getStructure()) && feature.getStructure().isMandatory()) {
+						feature.getStructure().setMandatory(false);
+						fm.addPropositionalNode(new Implies(new Literal(parent.getFeature().getName()),new Literal(feature.getName())));
 						break;
 					}
 				}
@@ -271,11 +271,11 @@ public abstract class Generator {
 			else if (r == 7) {
 				//Alternative to And
 				for (IFeature feature : randomizedList)
-					if (feature.getChildrenCount() > 1 && feature.isAlternative()) {
-						IFeature parent = feature.getParent();
-						if (parent != null && !parent.isFirstChild(feature) && parent.isAnd()) {
-							parent.removeChild(feature);
-							for (IFeature child : feature.getChildren()) {
+					if (feature.getStructure().getChildrenCount() > 1 && feature.getStructure().isAlternative()) {
+						IFeatureStructure parent = feature.getStructure().getParent();
+						if (parent != null && !parent.isFirstChild(feature.getStructure()) && parent.isAnd()) {
+							parent.removeChild(feature.getStructure());
+							for (IFeatureStructure child : feature.getStructure().getChildren()) {
 								parent.addChild(child);
 								child.setMandatory(false);
 							}
@@ -286,14 +286,14 @@ public abstract class Generator {
 			else if (r == 8) {
 				//new Optional in And
 				for (IFeature feature : randomizedList)
-					if (feature.hasChildren() && feature.isAnd()) {
+					if (feature.getStructure().hasChildren() && feature.getStructure().isAnd()) {
 						int j = 1;
 						IFeature child;
 						do {
 							child = FeatureModelFactory.getInstance().createFeature(fm, "C" + j++);
 						} while (!fm.addFeature(child));
-						child.setMandatory(false);
-						feature.addChild(child);
+						child.getStructure().setMandatory(false);
+						feature.getStructure().addChild(child.getStructure());
 						break;
 					}
 			}
@@ -331,43 +331,43 @@ public abstract class Generator {
 				//delete or add feature
 				if (random.nextBoolean())
 					for (IFeature feature : randomizedList) {
-						IFeature parent = feature.getParent();
-						if (!feature.hasChildren() && parent != null && !parent.isFirstChild(feature)) {
+						IFeatureStructure parent = feature.getStructure().getParent();
+						if (!feature.getStructure().hasChildren() && parent != null && !parent.isFirstChild(feature.getStructure())) {
 							fm.deleteFeature(feature);
 							break;
 						}
 					}
 				else
 					for (IFeature feature : randomizedList)
-						if (feature.hasChildren()) {
+						if (feature.getStructure().hasChildren()) {
 							int j = 1;
 							IFeature child;
 							do {
 								child = FeatureModelFactory.getInstance().createFeature(fm, "C" + j++);
 							} while (!fm.addFeature(child));
-							feature.addChild(child);
+							feature.getStructure().addChild(child.getStructure());
 							break;
 						}
 			}
 			else if (r == 2) {
 				//alter group type
 				for (IFeature feature : randomizedList) {
-					if (feature.hasChildren()) {
-						if (feature.isAlternative())
+					if (feature.getStructure().hasChildren()) {
+						if (feature.getStructure().isAlternative())
 							if (random.nextBoolean())
-								feature.changeToAnd();
+								feature.getStructure().changeToAnd();
 							else
-								feature.changeToOr();
-						else if (feature.isAnd())
+								feature.getStructure().changeToOr();
+						else if (feature.getStructure().isAnd())
 							if (random.nextBoolean())
-								feature.changeToAlternative();
+								feature.getStructure().changeToAlternative();
 							else
-								feature.changeToOr();
+								feature.getStructure().changeToOr();
 						else
 							if (random.nextBoolean())
-								feature.changeToAnd();
+								feature.getStructure().changeToAnd();
 							else
-								feature.changeToAlternative();
+								feature.getStructure().changeToAlternative();
 						break;
 					}
 				}
@@ -375,9 +375,9 @@ public abstract class Generator {
 			else if (r == 3) {
 				//change mandatory/optional
 				for (IFeature feature : randomizedList) {
-					IFeature parent = feature.getParent();
-					if (parent != null && parent.isAnd() && !parent.isFirstChild(feature)) {
-						feature.setMandatory(!feature.isMandatory());
+					IFeatureStructure parent = feature.getStructure().getParent();
+					if (parent != null && parent.isAnd() && !parent.isFirstChild(feature.getStructure())) {
+						feature.getStructure().setMandatory(!feature.getStructure().isMandatory());
 						break;
 					}
 				}
@@ -385,14 +385,14 @@ public abstract class Generator {
 			else if (r == 4) {
 				//move a concrete feature to another branch
 				for (IFeature feature : randomizedList) {
-					IFeature parent = feature.getParent();
-					if (!feature.hasChildren() && parent != null && !parent.isFirstChild(feature)) {
-						parent.removeChild(feature);
-						IFeature newParent = parent;
+					IFeatureStructure parent = feature.getStructure().getParent();
+					if (!feature.getStructure().hasChildren() && parent != null && !parent.isFirstChild(feature.getStructure())) {
+						parent.removeChild(feature.getStructure());
+						IFeatureStructure newParent = parent;
 						for (IFeature compound : randomizedList)
-							if (compound != parent && compound.hasChildren())
-								newParent = compound;
-						newParent.addChild(feature);
+							if (compound != parent && compound.getStructure().hasChildren())
+								newParent = compound.getStructure();
+						newParent.addChild(feature.getStructure());
 						break;
 					}
 				}

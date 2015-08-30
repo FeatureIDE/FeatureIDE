@@ -31,6 +31,7 @@ import org.prop4j.NodeWriter;
 import composer.rules.meta.FeatureModelInfo;
 import de.ovgu.cide.fstgen.ast.FSTNode;
 import de.ovgu.cide.fstgen.ast.FSTNonTerminal;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
@@ -80,11 +81,7 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 			formula = formula.substring(0, formula.indexOf(truefalse));
 		}
 		
-		for (String feature : FunctionalInterfaces.map( featureModel.getFeatures())) {
-			
-		}
-		
-		for (String feature : FunctionalInterfaces.map( featureModel.getFeatures(), new getFeatureNames()) {
+		for (String feature : FeatureUtils.extractFeatureNames(featureModel.getFeatures())) {
 			formula = formula.replaceAll("([\\s,\\(])" + feature.toLowerCase(Locale.ENGLISH), "$1FM.FeatureModel." + feature.toLowerCase(Locale.ENGLISH));
 		}
 		return formula.trim();

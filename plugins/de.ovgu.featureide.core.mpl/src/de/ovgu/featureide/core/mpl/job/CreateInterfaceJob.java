@@ -45,6 +45,7 @@ import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelWriter;
@@ -142,10 +143,10 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
         
         // set new abstract root
         IFeature nroot = FeatureModelFactory.getInstance().createFeature(m, "nroot");
-        nroot.setAbstract(true);
-        nroot.setAnd();
-        nroot.addChild(root);
-        root.setParent(nroot);
+        nroot.getStructure().setAbstract(true);
+        nroot.getStructure().setAnd();
+        nroot.getStructure().addChild(root.getStructure());
+        root.getStructure().setParent(nroot.getStructure());
         
         // merge tree
     	cut(nroot);
@@ -269,12 +270,12 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
     }
 	
 	private void deleteFeature(IFeature curFeature) {
-		IFeature parent = curFeature.getParent();
-        LinkedList<IFeature> list = curFeature.getChildren();
-		parent.removeChild(curFeature);
+		IFeature parent = curFeature.getStructure().getParent().getFeature();
+        LinkedList<IFeatureStructure> list = curFeature.getStructure().getChildren();
+		parent.getStructure().removeChild(curFeature.getStructure());
 		changed = true;
-		for (IFeature child : list) {
-			parent.addChild(child);
+		for (IFeatureStructure child : list) {
+			parent.getStructure().addChild(child);
 		}
 		list.clear();
 	}
@@ -332,19 +333,19 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
             				}
         				} else {
             				IFeature pseudoAlternative = FeatureModelFactory.getInstance().createFeature(curFeature.getFeatureModel(), MARK2);
-            				pseudoAlternative.setMandatory(false);
-            				pseudoAlternative.setAlternative();
+            				pseudoAlternative.getStructure().setMandatory(false);
+            				pseudoAlternative.getStructure().setAlternative();
             				for (IFeature child : list) {
-            					pseudoAlternative.addChild(child);
+            					pseudoAlternative.getStructure().addChild(child.getStructure());
             				}
             				list.clear();
-            				curFeature.setAnd();
-            				curFeature.addChild(pseudoAlternative);
+            				curFeature.getStructure().setAnd();
+            				curFeature.getStructure().addChild(pseudoAlternative.getStructure());
         				}
     				} else if (list.size() == 1) {
-    					curFeature.setAnd();
+    					curFeature.getStructure().setAnd();
         				for (IFeature child : list) {
-        	    			child.setMandatory(true);
+        	    			child.getStructure().setMandatory(true);
         				}
     				}
     				break;

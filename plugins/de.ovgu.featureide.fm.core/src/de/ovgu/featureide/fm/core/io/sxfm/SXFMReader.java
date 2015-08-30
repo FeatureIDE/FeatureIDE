@@ -40,6 +40,7 @@ import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Scanner;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -59,8 +60,10 @@ import org.xml.sax.SAXException;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.Feature;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
@@ -181,7 +184,7 @@ public class SXFMReader extends AbstractFeatureModelReader {
     	BufferedReader reader = new BufferedReader(new StringReader(
     			buffer.toString()));
     	buildFeatureTree(reader);
-    	removeUnnecessaryAbstractFeatures(featureModel.getRoot());
+    	removeUnnecessaryAbstractFeatures(featureModel.getStructure().getRoot().getFeature());
     }
     
 	private String removeWhitespaces(String str){
@@ -231,8 +234,8 @@ public class SXFMReader extends AbstractFeatureModelReader {
 //					lastFeat = (FeatureIndent) lastFeat.getParent();
 //					relativeIndent = countIndent - lastFeat.getIndentation();
 					
-					if (!lastFeat.isRoot()){
-						lastFeat = (FeatureIndent) lastFeat.getParent();
+					if (!lastFeat.getStructure().isRoot()){
+						lastFeat = (FeatureIndent) lastFeat.getStructure().getParent();
 						relativeIndent = countIndent - lastFeat.getIndentation();
 					}
 				}
@@ -254,42 +257,42 @@ public class SXFMReader extends AbstractFeatureModelReader {
 				
 				if (lineText.startsWith(":r")) {
 					feat = new FeatureIndent(featureModel, 0);
-		    		feat.setMandatory(true);
+		    		feat.getStructure().setMandatory(true);
 		    		featId = setNameGetID(feat, lineText);
 //		    		if (feat.getName().trim().toLowerCase().equals("root"))
 //		    			feat.setName("root_");
-		    		featureModel.setRoot(feat);	
-		    		feat.changeToAnd();
+		    		featureModel.getStructure().setRoot(feat);	
+		    		feat.getStructure().changeToAnd();
 		    		countIndent = 0;
 				} else if (lineText.startsWith(":m")) {
 					feat = new FeatureIndent(featureModel, countIndent);
-		    		feat.setMandatory(true);
+		    		feat.getStructure().setMandatory(true);
 		    		featId = setNameGetID(feat, lineText);
-		    		feat.setParent(lastFeat);
-		    		lastFeat.addChild(feat);
-		    		feat.changeToAnd();
+		    		feat.getStructure().setParent(lastFeat.getStructure());
+		    		lastFeat.getStructure().addChild(feat.getStructure());
+		    		feat.getStructure().changeToAnd();
 				} else if (lineText.startsWith(":o")) {
 					feat = new FeatureIndent(featureModel, countIndent);
-		    		feat.setMandatory(false);
+		    		feat.getStructure().setMandatory(false);
 		    		featId = setNameGetID(feat, lineText);
-		    		feat.setParent(lastFeat);
-		    		lastFeat.addChild(feat);
-		    		feat.changeToAnd();
+		    		feat.getStructure().setParent(lastFeat.getStructure());
+		    		lastFeat.getStructure().addChild(feat.getStructure());
+		    		feat.getStructure().changeToAnd();
 				} else if (lineText.startsWith(":g")) {
 					//create an abstract feature for each group (could be optimized, but avoid mixing up several groups)
 					feat = new FeatureIndent(featureModel, countIndent);
-		    		feat.setMandatory(true);
-		    		feat.setAbstract(true);
+		    		feat.getStructure().setMandatory(true);
+		    		feat.getStructure().setAbstract(true);
 		    		//try to generate a name that hopefully does not exist in the model
-		    		featId = lastFeat.getName() + EMPTY___ + (lastFeat.getChildrenCount()+1);
+		    		featId = lastFeat.getName() + EMPTY___ + (lastFeat.getStructure().getChildrenCount()+1);
 		    		feat.setName(featId);
-		    		feat.setParent(lastFeat);
-		    		lastFeat.addChild(feat);
+		    		feat.getStructure().setParent(lastFeat.getStructure());
+		    		lastFeat.getStructure().addChild(feat.getStructure());
 		    		lastFeat = feat;
 					if (lineText.contains("[1,1]")) {
-						lastFeat.changeToAlternative();
+						lastFeat.getStructure().changeToAlternative();
 					} else if (lineText.contains("[1,*]")) {
-						lastFeat.changeToOr();
+						lastFeat.getStructure().changeToOr();
 					} else if ((lineText.contains("[")) && (lineText.contains("]")))  {
 						int index = lineText.indexOf('[');
 						int start = Character.getNumericValue(lineText.charAt(index + 1));
@@ -305,7 +308,7 @@ public class SXFMReader extends AbstractFeatureModelReader {
 					continue;
 				} else if (lineText.startsWith(":")) {
 					feat = new FeatureIndent(featureModel, countIndent);
-		    		feat.setMandatory(true);
+		    		feat.getStructure().setMandatory(true);
 		    		String name;
 		    		if (lineText.contains("(")) {
 		    			name = lineText.substring(2, lineText.indexOf('('));
@@ -317,9 +320,9 @@ public class SXFMReader extends AbstractFeatureModelReader {
 		        	}
 	    			if (Character.isDigit(name.charAt(0))) name = "a" + name;
 	        		feat.setName(name);
-		    		feat.setParent(lastFeat);
-		    		lastFeat.addChild(feat);
-		    		feat.changeToAnd();
+		    		feat.getStructure().setParent(lastFeat.getStructure());
+		    		lastFeat.getStructure().addChild(feat.getStructure());
+		    		feat.getStructure().changeToAnd();
 				} else throw new UnsupportedModelException(COULDNT_MATCH_WITH +
 						"known Types: :r, :m, :o, :g, :", line);
 				addFeatureToModel(feat);
@@ -341,25 +344,25 @@ public class SXFMReader extends AbstractFeatureModelReader {
     }
 
 	private void removeUnnecessaryAbstractFeatures(IFeature feature) {
-		if (feature.getChildrenCount() == 1) {
-			IFeature child = feature.getFirstChild();
+		if (feature.getStructure().getChildrenCount() == 1) {
+			IFeatureStructure child = feature.getStructure().getFirstChild();
 			if (child.isAbstract()) {
-				for (IFeature grantChild : feature.getFirstChild().getChildren()) {
-					grantChild.setParent(feature);
-					feature.addChild(grantChild);
+				for (IFeatureStructure grantChild : feature.getStructure().getFirstChild().getChildren()) {
+					grantChild.setParent(feature.getStructure());
+					feature.getStructure().addChild(grantChild);
 				}
 				if (child.isAnd())
-					feature.changeToAnd();
+					feature.getStructure().changeToAnd();
 				else if (child.isOr())
-					feature.changeToOr();
+					feature.getStructure().changeToOr();
 				else if (child.isAlternative())
-					feature.changeToAlternative();
+					feature.getStructure().changeToAlternative();
 				child.setParent(null);
-				feature.removeChild(child);
+				feature.getStructure().removeChild(child);
 			}
 		}
-		for (IFeature child : feature.getChildren())
-			removeUnnecessaryAbstractFeatures(child);
+		for (IFeatureStructure child : feature.getStructure().getChildren())
+			removeUnnecessaryAbstractFeatures(child.getFeature());
 	}
     
     /**
@@ -403,18 +406,18 @@ public class SXFMReader extends AbstractFeatureModelReader {
     	org.prop4j.Node node;
     	for (FeatCardinality featCard : featList) {   		
     		IFeature feat = featCard.feat;    		
-    		LinkedList<IFeature> children = feat.getChildren();
-    		for (IFeature child : children) child.setMandatory(false);
+    		LinkedList<IFeatureStructure> children = feat.getStructure().getChildren();
+    		for (IFeatureStructure child : children) child.setMandatory(false);
     		int start = featCard.start;
     		int end = featCard.end;
     		if ((start < 0) || (start > end) || (end > children.size())) 
     			throw new UnsupportedModelException(GROUP_CARDINALITY +
 					INVALID, line);
     		int f = children.size();
-    		node = buildMinConstr(children, f - start + 1, feat.getName());
+    		node = buildMinConstr(FeatureUtils.convertToFeatureList(children), f - start + 1, feat.getName());
     		featureModel.addPropositionalNode(node);
     		if ((start > 0) && (end < f)) {
-    			node = buildMaxConstr(children, end + 1);
+    			node = buildMaxConstr(FeatureUtils.convertToFeatureList(children), end + 1);
     			featureModel.addPropositionalNode(node);
     		}
     	}
@@ -428,7 +431,7 @@ public class SXFMReader extends AbstractFeatureModelReader {
      * @param parentName
      * @return
      */
-    private org.prop4j.Node buildMinConstr (LinkedList<IFeature> list, int length, 
+    private org.prop4j.Node buildMinConstr (List<IFeature> list, int length, 
     		String parentName) {
     	LinkedList<org.prop4j.Node> result = new LinkedList<org.prop4j.Node>();
     	LinkedList<org.prop4j.Node> partResult = new LinkedList<org.prop4j.Node>();
@@ -471,7 +474,7 @@ public class SXFMReader extends AbstractFeatureModelReader {
      * @param length
      * @return
      */
-    private org.prop4j.Node buildMaxConstr (LinkedList<IFeature> list, int length) {
+    private org.prop4j.Node buildMaxConstr (List<IFeature> list, int length) {
        	LinkedList<org.prop4j.Node> result = new LinkedList<org.prop4j.Node>();
     	LinkedList<org.prop4j.Node> partResult = new LinkedList<org.prop4j.Node>();
     	int listLength = list.size();

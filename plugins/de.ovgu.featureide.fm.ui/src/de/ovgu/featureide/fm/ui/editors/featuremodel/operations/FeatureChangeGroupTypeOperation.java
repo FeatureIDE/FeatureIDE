@@ -55,29 +55,29 @@ public class FeatureChangeGroupTypeOperation extends AbstractFeatureModelOperati
 	@Override
 	protected void redo() {
 		if (groupType == ALTERNATIVE) {
-			feature.changeToAlternative();
+			feature.getStructure().changeToAlternative();
 		} else if (groupType == OR) {
-			feature.changeToOr();
+			feature.getStructure().changeToOr();
 		} else {
-			feature.changeToAnd();
+			feature.getStructure().changeToAnd();
 		}
 	}
 
 	@Override
 	protected void undo() {
 		if (oldGroupType == ALTERNATIVE) {
-			feature.changeToAlternative();
+			feature.getStructure().changeToAlternative();
 		} else if (oldGroupType == AND) {
-			feature.changeToAnd();
+			feature.getStructure().changeToAnd();
 		} else {
-			feature.changeToOr();
+			feature.getStructure().changeToOr();
 		}
 	}
 
 	private static int getGroupType(IFeature feature) {
-		if (feature.isAlternative()) {
+		if (feature.getStructure().isAlternative()) {
 			return ALTERNATIVE;
-		} else if (feature.isAnd()) {
+		} else if (feature.getStructure().isAnd()) {
 			return AND;
 		} else {
 			return OR;

@@ -24,6 +24,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE;
 
 import java.util.LinkedList;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -60,10 +61,10 @@ public class FeatureDeleteOperation extends AbstractFeatureModelOperation {
 		feature = featureModel.getFeature(feature.getName());
 		oldParent = feature.getParent();
 		if (oldParent != null) {
-			oldIndex = oldParent.getChildIndex(feature);
+			oldIndex = oldParent.getStructure().getChildIndex(feature.getStructure());
 		}
 		oldChildren = new LinkedList<IFeature>();
-		oldChildren.addAll(feature.getChildren());
+		oldChildren.addAll(FeatureUtils.convertToFeatureList(feature.getStructure().getChildren()));
 
 		if (oldParent != null) {
 			oldParent = featureModel.getFeature(oldParent.getName());
@@ -119,9 +120,9 @@ public class FeatureDeleteOperation extends AbstractFeatureModelOperation {
 
 			oldChildren = oldChildrenCopy;
 
-			feature.setChildren(oldChildren);
+			feature.getStructure().setChildren(FeatureUtils.convertToFeatureStructureList(oldChildren));
 			if (oldParent != null) {
-				oldParent.addChildAtPosition(oldIndex, feature);
+				oldParent.getStructure().addChildAtPosition(oldIndex, feature.getStructure());
 			} else {
 				featureModel.setRoot(feature);
 			}

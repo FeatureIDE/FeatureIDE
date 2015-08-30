@@ -22,10 +22,13 @@ package de.ovgu.featureide.fm.core.base;
 
 import static de.ovgu.featureide.fm.core.functional.FunctionalInterfaces.filter;
 
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 
 import de.ovgu.featureide.fm.core.filter.ConcreteFeatureFilter;
 import de.ovgu.featureide.fm.core.functional.FunctionalInterfaces;
+import de.ovgu.featureide.fm.core.functional.FunctionalInterfaces.IFunction;
 
 /**
  * @author Marcus Pinnecke
@@ -33,6 +36,30 @@ import de.ovgu.featureide.fm.core.functional.FunctionalInterfaces;
 public abstract class FeatureUtils {
 	
 	public static final ConcreteFeatureFilter CONCRETE_FEATURE_FILTER = new ConcreteFeatureFilter();
+	
+	public static final IFunction<IFeature, String> GET_FEATURE_NAME = new IFunction<IFeature, String>() {
+		
+		@Override
+		public String invoke(IFeature t) {
+			return t.getName();
+		}
+	};
+	
+	public static final IFunction<IFeatureStructure, IFeature> STRUCTURE_TO_FEATURE = new IFunction<IFeatureStructure, IFeature>() {
+		
+		@Override
+		public IFeature invoke(IFeatureStructure t) {
+			return t.getFeature();
+		}
+	};
+	
+	public static final IFunction<IFeature, IFeatureStructure> FEATURE_TO_STRUCTURE = new IFunction<IFeature, IFeatureStructure>() {
+		
+		@Override
+		public IFeatureStructure invoke(IFeature t) {
+			return t.getStructure();
+		}
+	};
 	
 	/**
 	 * Extracts all concrete features from an object that yields features. Basically, an invocation of this method on <b>features</b> will return an iterable object that
@@ -74,6 +101,18 @@ public abstract class FeatureUtils {
 	 */
 	public static List<String> extractConcreteFeaturesAsStringList(IFeatureModel model) {
 		return FunctionalInterfaces.mapToStringList(FeatureUtils.extractConcreteFeatures(model.getFeatures()));
+	}
+
+	public static Iterable<String> extractFeatureNames(Collection<IFeature> features) {
+		return FunctionalInterfaces.map(features, GET_FEATURE_NAME);
+	}
+
+	public static List<IFeature> convertToFeatureList(List<IFeatureStructure> list) {
+		return FunctionalInterfaces.toList(FunctionalInterfaces.map(list, STRUCTURE_TO_FEATURE));
+	}
+
+	public static List<IFeatureStructure> convertToFeatureStructureList(List<IFeature> list) {
+		return FunctionalInterfaces.toList(FunctionalInterfaces.map(list, FEATURE_TO_STRUCTURE));
 	}
 
 }
