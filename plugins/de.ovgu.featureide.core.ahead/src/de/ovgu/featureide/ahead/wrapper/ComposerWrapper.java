@@ -57,7 +57,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.filter.ConcreteFeatureFilter;
 import de.ovgu.featureide.fm.core.filter.base.Filter;
-import de.ovgu.featureide.fm.core.functional.FunctionalInterfaces;
+import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
  * 

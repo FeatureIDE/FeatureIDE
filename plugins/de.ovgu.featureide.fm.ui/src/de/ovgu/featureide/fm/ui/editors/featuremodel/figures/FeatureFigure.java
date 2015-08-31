@@ -129,7 +129,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 	}
 
 	private boolean isHidden(IFeature feature) {
-		return !feature.getFeatureModel().getLayout().showHiddenFeatures() && feature.hasHiddenParent();
+		return !feature.getFeatureModel().getGraphicRepresenation().getLayout().showHiddenFeatures() && feature.getStructure().hasHiddenParent();
 	}
 
 	public void setProperties() {
@@ -140,12 +140,12 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		setBorder(FMPropertyManager.getFeatureBorder(feature.isConstraintSelected()));
 
 		final FeatureModelAnalyzer analyser = feature.getFeatureModel().getAnalyser();
-		if (feature.isRoot() && !analyser.valid()) {
+		if (feature.getStructure().isRoot() && !analyser.valid()) {
 			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
 			setBorder(FMPropertyManager.getDeadFeatureBorder(feature.isConstraintSelected()));
 			toolTip.append(VOID);
 		} else {
-			if (feature.isConcrete()) {
+			if (feature.getStructure().isConcrete()) {
 				toolTip.append(CONCRETE);
 				analyser.setAttributeFlag(Attribute.Concrete, true);
 			} else {
@@ -154,14 +154,14 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 				analyser.setAttributeFlag(Attribute.Abstract, true);
 			}
 
-			if (feature.hasHiddenParent()) {
+			if (feature.getStructure().hasHiddenParent()) {
 				setBorder(FMPropertyManager.getHiddenFeatureBorder(feature.isConstraintSelected()));
 				label.setForegroundColor(HIDDEN_FOREGROUND);
-				toolTip.append(feature.isHidden() ? HIDDEN : HIDDEN_PARENT);
+				toolTip.append(feature.getStructure().isHidden() ? HIDDEN : HIDDEN_PARENT);
 				analyser.setAttributeFlag(Attribute.Hidden, true);
 			}
 
-			toolTip.append(feature.isRoot() ? ROOT : FEATURE);
+			toolTip.append(feature.getStructure().isRoot() ? ROOT : FEATURE);
 
 			switch (feature.getProperty().getFeatureStatus()) {
 			case DEAD:

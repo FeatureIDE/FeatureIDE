@@ -40,8 +40,8 @@ import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.functional.FunctionalInterfaces;
-import de.ovgu.featureide.fm.core.functional.FunctionalInterfaces.IFunction;
+import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
 
 /**
  * Propagates errors for <code>FeatureHouse</code> Java files.
@@ -283,7 +283,7 @@ public class JavaErrorPropagation extends ErrorPropagation {
 			if (model.isFeatureOrderUserDefined()) {
 				layerNames = model.getFeatureOrderList();
 			} else {
-				layerNames = FunctionalInterfaces.toList(FunctionalInterfaces.map(model.getFeatures(), new  IFunction<IFeature, String>() {
+				layerNames = Functional.toList(Functional.map(model.getFeatures(), new  IFunction<IFeature, String>() {
 
 					@Override
 					public String invoke(IFeature t) {

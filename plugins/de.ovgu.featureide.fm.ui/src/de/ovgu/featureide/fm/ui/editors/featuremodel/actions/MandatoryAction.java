@@ -46,7 +46,7 @@ public class MandatoryAction extends SingleSelectionAction {
 
 	@Override
 	public void run() {
-		setChecked(feature.isMandatory());
+		setChecked(feature.getStructure().isMandatory());
 		FeatureSetMandatoryOperation op = new FeatureSetMandatoryOperation(feature, featureModel);
 		op.addContext((IUndoContext) featureModel.getUndoContext());
 
@@ -61,8 +61,8 @@ public class MandatoryAction extends SingleSelectionAction {
 
 	@Override
 	protected void updateProperties() {
-		setEnabled(!feature.isRoot() && feature.getParent().isAnd());
-		setChecked(feature.isMandatory());
+		setEnabled(!feature.getStructure().isRoot() && feature.getStructure().getParent().isAnd());
+		setChecked(feature.getStructure().isMandatory());
 	}
 
 }

@@ -26,9 +26,11 @@ import java.util.Locale;
 import org.prop4j.Node;
 import org.prop4j.NodeWriter;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
  * Defines the content of the feature model class specific for JPF-BDD.
@@ -60,7 +62,7 @@ public class FeatureModelJPFBDD implements IFeatureModelClass {
 	@Override
 	public String getFeatureFields() {
 		StringBuilder fields = new StringBuilder();
-		for (String f : featureModel.getFeatureNames()) {
+		for (String f : Functional.toList(FeatureUtils.extractFeatureNames(featureModel.getFeatures()))) {
 			fields.append(ANNOTATION);
 			fields.append(FIELD_MODIFIER);
 			fields.append(f.toLowerCase(Locale.ENGLISH));
@@ -69,7 +71,7 @@ public class FeatureModelJPFBDD implements IFeatureModelClass {
 		
 		fields.append(SELECTFEATURES);
 		
-		for (String f : featureModel.getFeatureNames()) {
+		for (String f : Functional.toList(FeatureUtils.extractFeatureNames(featureModel.getFeatures()))) {
 			fields.append("\t\t");
 			fields.append(f.toLowerCase(Locale.ENGLISH));
 			fields.append(" = Verify.getBoolean(false);\r\n");
@@ -98,7 +100,7 @@ public class FeatureModelJPFBDD implements IFeatureModelClass {
 	public String getSelection() {
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.append("\t/**\r\n\t * @return The current feature-selection.\r\n\t */\r\n\tpublic static String getSelection(boolean names) {\r\n\t\t");
-		ArrayList<IFeature> features = new ArrayList<IFeature>(featureModel.getConcreteFeatures());
+		ArrayList<IFeature> features = new ArrayList<IFeature>(Functional.toList(FeatureUtils.extractConcreteFeatures(featureModel)));
 		stringBuilder.append("if (names) return ");
 		for (int i = 0;i < features.size();i++) {
 			if (i != 0) {

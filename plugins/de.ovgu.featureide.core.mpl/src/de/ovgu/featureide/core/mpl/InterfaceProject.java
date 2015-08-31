@@ -125,7 +125,7 @@ public class InterfaceProject {
 			int count = 0;
 			
 			for (IFeature feature : featureModel.getFeatures()) {
-				if (feature.isConcrete()) {
+				if (feature.getStructure().isConcrete()) {
 					feature.addListener(new FeaturePropertyChangeListener(count));
 					tempFeatureNames[count++] = feature.getName();
 				}

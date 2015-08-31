@@ -49,7 +49,7 @@ public class FeatureSetMandatoryOperation extends AbstractFeatureModelOperation 
 	 * @return
 	 */
 	private static String getLabel(IFeature feature) {
-		if (feature.isMandatory())
+		if (feature.getStructure().isMandatory())
 			return LABEL_OPTIONAL;
 		else
 			return LABEL_MANDATORY;
@@ -57,7 +57,7 @@ public class FeatureSetMandatoryOperation extends AbstractFeatureModelOperation 
 
 	@Override
 	protected void redo() {
-		feature.setMandatory(!feature.isMandatory());
+		feature.getStructure().setMandatory(!feature.getStructure().isMandatory());
 	}
 
 	@Override

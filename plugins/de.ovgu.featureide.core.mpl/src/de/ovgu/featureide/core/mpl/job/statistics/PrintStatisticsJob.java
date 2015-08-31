@@ -46,6 +46,7 @@ import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.core.signature.filter.ContextFilter;
 import de.ovgu.featureide.core.signature.filter.FeatureFilter;
 import de.ovgu.featureide.core.signature.filter.IFilter;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
@@ -166,7 +167,7 @@ public class PrintStatisticsJob extends AProjectJob<PrintStatisticsJob.Arguments
 		
 		IFeatureModel fm = interfaceProject.getFeatureModel();
 		LinkedList<String> allConcreteFeatures = new LinkedList<String>();
-		for (IFeature feature : fm.getConcreteFeatures()) {
+		for (IFeature feature : FeatureUtils.extractConcreteFeatures(fm)) {
 			allConcreteFeatures.add(feature.getName());
 		}
 		workMonitor.setMaxAbsoluteWork(allConcreteFeatures.size() + 1);
@@ -280,7 +281,7 @@ public class PrintStatisticsJob extends AProjectJob<PrintStatisticsJob.Arguments
 			int numFeatures = 0;
 			for (String name : featureList) {
 				IFeature feature = conf.getFeatureModel().getFeature(name);
-				if (feature != null && feature.isConcrete()) {
+				if (feature != null && feature.getStructure().isConcrete()) {
 					numFeatures++;
 				}
 			}

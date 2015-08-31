@@ -50,9 +50,11 @@ import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
  * Abstract class for FeatureIDE preprocessor composer extensions with
@@ -168,7 +170,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 		StringBuilder abstractFeatures = new StringBuilder();
 		IFeatureModel fm = featureProject.getFeatureModel();
 		for (IFeature feature : fm.getFeatures()) {
-			if (feature.isConcrete()) {
+			if (feature.getStructure().isConcrete()) {
 				concreteFeatures.append(feature.getName());
 				concreteFeatures.append("|");
 			} else {
@@ -185,7 +187,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 		// create expression of feature model
 		featureModel = NodeCreator.createNodes(fm);
 
-		featureList = fm.getFeatureNames();
+		featureList = Functional.toList(FeatureUtils.extractFeatureNames(fm.getFeatures()));
 
 		return true;
 	}
@@ -419,10 +421,10 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 		removeModelMarkers();
 		LinkedList<String> features = new LinkedList<>(usedFeatures);
 		for (IFeature f : featureProject.getFeatureModel().getFeatures()) {
-			if (f.isAbstract() && features.contains(f.getName())) {
+			if (f.getStructure().isAbstract() && features.contains(f.getName())) {
 				features.remove(f.getName());
 				createMarker("The Feature \"" + f.getName() + "\" needs to be concrete.");
-			} else if (f.isConcrete() && !features.contains(f.getName())) {
+			} else if (f.getStructure().isConcrete() && !features.contains(f.getName())) {
 				createMarker("You should use the Feature \"" + f.getName() + "\" or set it abstract.");
 			} else {
 				features.remove(f.getName());

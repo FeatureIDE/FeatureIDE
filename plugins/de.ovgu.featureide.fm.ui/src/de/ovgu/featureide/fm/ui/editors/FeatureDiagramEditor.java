@@ -215,12 +215,12 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 				if (fm == null)
 					return;
 
-				org.eclipse.draw2d.geometry.Point oldLoc = FeatureUIHelper.getLocation(fm.getRoot());
+				org.eclipse.draw2d.geometry.Point oldLoc = FeatureUIHelper.getLocation(fm.getStructure().getRoot().getFeature());
 				if (oldLoc == null)
 					return;
 				internRefresh(true);
 
-				org.eclipse.draw2d.geometry.Point newLoc = FeatureUIHelper.getLocation(fm.getRoot());
+				org.eclipse.draw2d.geometry.Point newLoc = FeatureUIHelper.getLocation(fm.getStructure().getRoot().getFeature());
 				if (newLoc == null)
 					return;
 				int difX = newLoc.x - oldLoc.x;
@@ -349,7 +349,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		subMenuCalculations.add(new RedundantConstrainsCalculationsAction(this, getFeatureModel()));
 		subMenuCalculations.add(new TautologyContraintsCalculationsAction(this, getFeatureModel()));
 
-		showHiddenFeaturesAction.setChecked(getFeatureModel().getLayout().showHiddenFeatures());
+		showHiddenFeaturesAction.setChecked(getFeatureModel().getGraphicRepresenation().getLayout().showHiddenFeatures());
 
 		final IMenuManager subMenuLayout = new MenuManager(SET_LAYOUT);
 		for (int i = 0; i < setLayoutActions.size(); i++) {
@@ -358,7 +358,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 				subMenuLayout.add(autoLayoutConstraintAction);
 				subMenuLayout.add(new Separator());
 			}
-			boolean isChosen = (i == getFeatureModel().getLayout().getLayoutAlgorithm());
+			boolean isChosen = (i == getFeatureModel().getGraphicRepresenation().getLayout().getLayoutAlgorithm());
 			setLayoutActions.get(i).setChecked(isChosen);
 			setLayoutActions.get(i).setEnabled(!isChosen);
 		}
@@ -374,7 +374,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		curNameType.setChecked(true);
 		curNameType.setEnabled(false);
 
-		autoLayoutConstraintAction.setEnabled(!getFeatureModel().getLayout().hasFeaturesAutoLayout());
+		autoLayoutConstraintAction.setEnabled(!getFeatureModel().getGraphicRepresenation().getLayout().hasFeaturesAutoLayout());
 
 		boolean connectionSelected = alternativeAction.isConnectionSelected();
 		boolean mplModel = false;
@@ -427,7 +427,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			menu.add(legendAction);
 		}
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-		if (featureModelEditor.getFeatureModel().hasHidden()) {
+		if (featureModelEditor.getFeatureModel().getStructure().hasHidden()) {
 			menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 			menu.add(showHiddenFeaturesAction);
 		}
@@ -531,7 +531,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	}
 
 	public void refresh() {
-		if (getFeatureModel() == null || getFeatureModel().getRoot() == null || getContents() == null) {
+		if (getFeatureModel() == null || getFeatureModel().getStructure().getRoot() == null || getContents() == null) {
 			return;
 		}
 
@@ -654,9 +654,9 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		FeatureDiagramLayoutManager layoutManager;
 		IFeatureModel featureModel = getFeatureModel();
 
-		layoutManager = FeatureDiagramLayoutHelper.getLayoutManager(featureModel.getLayout().getLayoutAlgorithm(), featureModel);
+		layoutManager = FeatureDiagramLayoutHelper.getLayoutManager(featureModel.getGraphicRepresenation().getLayout().getLayoutAlgorithm(), featureModel);
 
-		int previousLayout = featureModel.getLayout().getLayoutAlgorithm();
+		int previousLayout = featureModel.getGraphicRepresenation().getLayout().getLayoutAlgorithm();
 
 		for (int i = 0; i < setLayoutActions.size(); i++) {
 			setLayoutActions.set(i, new LayoutSelectionAction(this, featureModel, i, previousLayout));

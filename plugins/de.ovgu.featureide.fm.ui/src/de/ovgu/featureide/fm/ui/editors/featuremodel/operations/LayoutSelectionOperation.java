@@ -40,12 +40,12 @@ public class LayoutSelectionOperation extends AbstractFeatureModelOperation {
 
 	@Override
 	protected void redo() {
-		featureModel.getLayout().setLayout(newSelectedLayoutAlgorithm);
+		featureModel.getGraphicRepresenation().getLayout().setLayout(newSelectedLayoutAlgorithm);
 	}
 
 	@Override
 	protected void undo() {
-		featureModel.getLayout().setLayout(oldSelectedLayoutAlgorithm);
+		featureModel.getGraphicRepresenation().getLayout().setLayout(oldSelectedLayoutAlgorithm);
 	}
 
 }

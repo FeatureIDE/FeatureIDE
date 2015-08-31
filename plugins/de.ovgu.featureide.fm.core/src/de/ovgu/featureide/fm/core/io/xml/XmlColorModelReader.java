@@ -63,7 +63,7 @@ public class XmlColorModelReader extends XmlFeatureModelReader {
 			// mode: 0 = start; 1 = feature; 2 = colorSchemes; 3 = features;
 			int mode = 0;
 
-			ColorschemeTable colorschemeTable = featureModel.getColorschemeTable();
+			ColorschemeTable colorschemeTable = featureModel.getGraphicRepresenation().getColorschemeTable();
 			ColorList colors = null;
 			
 			colorschemeTable.clearBeforeLoading();
@@ -107,7 +107,7 @@ public class XmlColorModelReader extends XmlFeatureModelReader {
 						if (attribute.getName().getLocalPart().equals("name")) {
 							IFeature feat = featureModel.getFeature(featureModel.getRenamingsManager().getNewName(attribute.getValue()));
 							if (feat != null) {
-								colors = feat.getColorList();
+								colors = feat.getGraphicRepresenation().getColorList();
 								mode = 1;
 							}
 						}

@@ -37,7 +37,7 @@ public class Legend implements IGraphicItem {
 
 	public Legend(IFeatureModel model) {
 		this.model = model;
-		final FMPoint legendPos = model.getLayout().getLegendPos();
+		final FMPoint legendPos = model.getGraphicRepresenation().getLayout().getLegendPos();
 		this.pos = new Point(legendPos.x, legendPos.y);
 	}
 
@@ -55,7 +55,7 @@ public class Legend implements IGraphicItem {
 
 	public void setPos(Point pos) {
 		this.pos = pos;
-		model.getLayout().setLegendPos(pos.x, pos.y);
+		model.getGraphicRepresenation().getLayout().setLegendPos(pos.x, pos.y);
 	}
 
 	@Override

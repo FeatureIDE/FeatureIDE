@@ -25,6 +25,7 @@ import java.beans.PropertyChangeListener;
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
 
@@ -110,5 +111,9 @@ public interface IFeatureModel {
 	void setFeatureOrderUserDefined(boolean featureOrderUserDefined);
 
 	void setFeatureTable(final Hashtable<String, IFeature> featureTable);
+	
+	IGraphicalFeatureModel getGraphicRepresenation();  // Added, Marcus Pinnecke 31.08.15
 
+	Map<String, IFeature> getFeatureTable(); // Added, Marcus Pinnecke 31.08.15
+	
 }

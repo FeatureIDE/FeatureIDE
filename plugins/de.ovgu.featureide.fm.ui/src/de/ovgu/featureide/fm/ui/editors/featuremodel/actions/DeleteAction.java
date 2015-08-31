@@ -98,7 +98,7 @@ public class DeleteAction extends Action {
 			return false;
 
 		// check that a possibly new root can be determined unique
-		IFeature root = featureModel.getRoot();
+		IFeature root = featureModel.getStructure().getRoot().getFeature();
 		IFeature newRoot = root;
 		LinkedList<IFeature> features = new LinkedList<IFeature>(featureModel.getFeatures());
 		Iterator<?> iter = selection.iterator();
@@ -108,10 +108,10 @@ public class DeleteAction extends Action {
 				continue;
 			IFeature feature = editPart instanceof FeatureEditPart ? ((FeatureEditPart) editPart).getFeature() : (IFeature) editPart;
 			if (feature == root) {
-				if (root.getChildrenCount() != 1)
+				if (root.getStructure().getChildrenCount() != 1)
 					return false;
-				newRoot = root.getFirstChild();
-				if (!newRoot.hasChildren())
+				newRoot = root.getStructure().getFirstChild().getFeature();
+				if (!newRoot.getStructure().hasChildren())
 					return false;
 			}
 			features.remove(feature);

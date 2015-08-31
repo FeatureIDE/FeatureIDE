@@ -50,12 +50,14 @@ import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.FeatureComparator;
 import de.ovgu.featureide.fm.core.FeatureStatus;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.Comparison;
 import de.ovgu.featureide.fm.core.editing.ModelComparator;
-import de.ovgu.featureide.fm.core.functional.FunctionalInterfaces.IConsumer;
+import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
@@ -83,7 +85,7 @@ public final class ConstraintTextValidator {
 
 		NodeReader nodeReader = new NodeReader();
 
-		Node propNode = nodeReader.stringToNode(input, clonedModel.getFeatureNames());
+		Node propNode = nodeReader.stringToNode(input, Functional.toList(FeatureUtils.extractFeatureNames(clonedModel.getFeatures())));
 
 		if (propNode != null) {
 			if (constraint != null) {
@@ -146,7 +148,7 @@ public final class ConstraintTextValidator {
 
 		NodeReader nodeReader = new NodeReader();
 
-		Node propNode = nodeReader.stringToNode(input, clonedModel.getFeatureNames());
+		Node propNode = nodeReader.stringToNode(input, Functional.toList(FeatureUtils.extractFeatureNames(clonedModel.getFeatures())));
 
 		for (IFeature feature : model.getFeatures()) {
 			if (input.contains(feature.getName())) {
@@ -180,7 +182,7 @@ public final class ConstraintTextValidator {
 			return false;
 		}
 		IFeatureModel clonedModel = featureModel.clone(null);
-		Node propNode = new NodeReader().stringToNode(constraint, clonedModel.getFeatureNames());
+		Node propNode = new NodeReader().stringToNode(constraint, Functional.toList(FeatureUtils.extractFeatureNames(clonedModel.getFeatures())));
 		clonedModel.addPropositionalNode(propNode);
 		if (new ModelComparator(20000).compare(featureModel, clonedModel) == Comparison.REFACTORING) {
 			return true;
@@ -503,7 +505,7 @@ public final class ConstraintTextValidator {
 	 */
 	private boolean isWellformed(IFeatureModel featureModel, String con) {
 		NodeReader nodereader = new NodeReader();
-		boolean isWellformed = nodereader.isWellFormed(con, featureModel.getFeatureNames());
+		boolean isWellformed = nodereader.isWellFormed(con, Functional.toList(FeatureUtils.extractFeatureNames(featureModel.getFeatures())));
 
 		return isWellformed;
 	}
@@ -532,7 +534,7 @@ public final class ConstraintTextValidator {
 		IFeatureModel clonedModel = model.clone(null);
 		NodeReader nodeReader = new NodeReader();
 
-		Node propNode = nodeReader.stringToNode(input, clonedModel.getFeatureNames());
+		Node propNode = nodeReader.stringToNode(input, Functional.toList(FeatureUtils.extractFeatureNames(clonedModel.getFeatures())));
 		if (propNode != null) {
 			if (constraint != null) {
 				clonedModel.removeConstraint(constraint);

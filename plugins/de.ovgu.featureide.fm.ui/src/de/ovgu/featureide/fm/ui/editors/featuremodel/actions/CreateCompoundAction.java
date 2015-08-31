@@ -119,8 +119,8 @@ public class CreateCompoundAction extends Action {
 				feature = (IFeature) editPart;
 
 			if (selectedFeatures.isEmpty())
-				parent = feature.getParent();
-			else if (parent != feature.getParent())
+				parent = feature.getStructure().getParent().getFeature();
+			else if (parent != feature.getStructure().getParent())
 				return false;
 			selectedFeatures.add(feature);
 		}

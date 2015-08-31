@@ -69,11 +69,11 @@ public class FeatureUIHelper {
 	}
 
 	public static boolean showHiddenFeatures(IFeatureModel featureModel) {
-		return featureModel.getLayout().showHiddenFeatures();
+		return featureModel.getGraphicRepresenation().getLayout().showHiddenFeatures();
 	}
 
 	public static void showHiddenFeatures(boolean show, IFeatureModel featureModel) {
-		featureModel.getLayout().showHiddenFeatures(show);
+		featureModel.getGraphicRepresenation().getLayout().showHiddenFeatures(show);
 	}
 
 	public static void setLegendSize(IFeatureModel featureModel, Dimension dim) {
@@ -90,7 +90,7 @@ public class FeatureUIHelper {
 
 	public static void setLocation(IFeature feature, Point newLocation) {
 		Point oldLocation = getLocation(feature);
-		feature.setNewLocation(toFMPoint(newLocation));
+		feature.getGraphicRepresenation().setNewLocation(toFMPoint(newLocation));
 		if (newLocation == null) {
 			return;
 		}
@@ -159,14 +159,14 @@ public class FeatureUIHelper {
 	public static Point getSourceLocation(IFeature feature) {
 		IFeature parentFeature = feature;
 		boolean parentFeatureHidden = false;
-		while (!parentFeature.isRoot()) {
-			parentFeature = parentFeature.getParent();
-			if (parentFeature.isHidden()) {
+		while (!parentFeature.getStructure().isRoot()) {
+			parentFeature = parentFeature.getStructure().getParent().getFeature();
+			if (parentFeature.getStructure().isHidden()) {
 				parentFeatureHidden = true;
 			}
 		}
-		if ((feature.isHidden() || parentFeatureHidden) && !feature.getFeatureModel().getLayout().showHiddenFeatures()) {
-			return getTargetLocation(feature.getParent());
+		if ((feature.getStructure().isHidden() || parentFeatureHidden) && !feature.getFeatureModel().getGraphicRepresenation().getLayout().showHiddenFeatures()) {
+			return getTargetLocation(feature.getStructure().getParent().getFeature());
 		}
 
 		return getSourceLocation(getBounds(feature), feature.getFeatureModel());
@@ -177,7 +177,7 @@ public class FeatureUIHelper {
 	}
 
 	private static Point getSourceLocation(Rectangle bounds, IFeatureModel featureModel) {
-		if (featureModel.getLayout().verticalLayout()) {
+		if (featureModel.getGraphicRepresenation().getLayout().verticalLayout()) {
 			return new Point(bounds.getLeft().x, (bounds.bottom() + bounds.getTop().y) / 2);
 		} else {
 			return new Point(bounds.getCenter().x, bounds.y);
@@ -186,7 +186,7 @@ public class FeatureUIHelper {
 
 	public static Point getTargetLocation(IFeature feature) {
 		Rectangle bounds = getBounds(feature);
-		if (feature.getFeatureModel().getLayout().verticalLayout()) {
+		if (feature.getFeatureModel().getGraphicRepresenation().getLayout().verticalLayout()) {
 			return new Point(bounds.getRight().x, (bounds.bottom() + bounds.getTop().y) / 2);
 		}
 
@@ -195,11 +195,11 @@ public class FeatureUIHelper {
 	}
 
 	public static void setVerticalLayoutBounds(boolean isVerticalLayout, IFeatureModel featureModel) {
-		featureModel.getLayout().verticalLayout(isVerticalLayout);
+		featureModel.getGraphicRepresenation().getLayout().verticalLayout(isVerticalLayout);
 	}
 
 	public static boolean hasVerticalLayout(IFeatureModel featureModel) {
-		return featureModel.getLayout().verticalLayout();
+		return featureModel.getGraphicRepresenation().getLayout().verticalLayout();
 	}
 
 	public static Dimension getSize(IConstraint constraint) {
@@ -225,7 +225,7 @@ public class FeatureUIHelper {
 		}
 		constraintLocation.put(constraint, newLocation);
 		fireLocationChanged(constraint, oldLocation, newLocation);
-		constraint.setLocation(toFMPoint(newLocation));
+		constraint.getGraphicRepresenation().setLocation(toFMPoint(newLocation));
 	}
 
 	private static void fireLocationChanged(IConstraint constraint, Point oldLocation, Point newLocation) {

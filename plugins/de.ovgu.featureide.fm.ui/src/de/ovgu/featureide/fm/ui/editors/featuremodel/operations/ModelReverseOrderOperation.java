@@ -23,10 +23,12 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 import static de.ovgu.featureide.fm.core.localization.StringTable.REVERSE_LAYOUT_ORDER;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
@@ -47,9 +49,9 @@ public class ModelReverseOrderOperation extends AbstractFeatureModelOperation {
 
 	@Override
 	protected void redo() {
-		final IFeature root = featureModel.getRoot();
+		final IFeature root = featureModel.getStructure().getRoot().getFeature();
 		reverse(root);
-		if (!featureModel.getLayout().hasFeaturesAutoLayout()) {
+		if (!featureModel.getGraphicRepresenation().getLayout().hasFeaturesAutoLayout()) {
 			Point mid = FeatureUIHelper.getLocation(root).getCopy();
 			mid.x += FeatureUIHelper.getSize(root).width / 2;
 			mid.y += FeatureUIHelper.getSize(root).height / 2;
@@ -58,7 +60,7 @@ public class ModelReverseOrderOperation extends AbstractFeatureModelOperation {
 	}
 
 	private void mirrorFeaturePositions(IFeature feature, Point mid, boolean vertical) {
-		if (!feature.isRoot()) {
+		if (!feature.getStructure().isRoot()) {
 			Point featureMid = FeatureUIHelper.getLocation(feature).getCopy();
 			Dimension size = FeatureUIHelper.getSize(feature).getCopy();
 
@@ -74,18 +76,18 @@ public class ModelReverseOrderOperation extends AbstractFeatureModelOperation {
 
 			FeatureUIHelper.setLocation(feature, featureMid);
 		}
-		if (feature.hasChildren()) {
-			for (IFeature child : feature.getChildren())
+		if (feature.getStructure().hasChildren()) {
+			for (IFeature child : FeatureUtils.convertToFeatureList(feature.getStructure().getChildren()))
 				mirrorFeaturePositions(child, mid, vertical);
 		}
 
 	}
 
 	private void reverse(IFeature feature) {
-		LinkedList<IFeature> children = feature.getChildren();
+		LinkedList<IFeature> children = new LinkedList<>(FeatureUtils.convertToFeatureList(feature.getStructure().getChildren()));
 		for (int i = 0; i < children.size() - 1; i++)
 			children.add(i, children.removeLast());
-		for (IFeature child : feature.getChildren())
+		for (IFeature child : FeatureUtils.convertToFeatureList(feature.getStructure().getChildren()))
 			reverse(child);
 	}
 

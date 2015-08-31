@@ -45,7 +45,7 @@ public class DepthFirstLayout extends FeatureDiagramLayoutManager {
 	@Override
 	public void layoutFeatureModel(IFeatureModel featureModel) {
 		yoffset = 0;
-		LayoutableFeature root = new LayoutableFeature(featureModel.getRoot(), showHidden);
+		LayoutableFeature root = new LayoutableFeature(featureModel.getStructure().getRoot(), showHidden);
 		depthFirstLayout(root, 0, FMPropertyManager.getLayoutMarginX());
 		yoffset = yoffset + FMPropertyManager.getFeatureSpaceX();
 		layout(yoffset, featureModel.getConstraints());

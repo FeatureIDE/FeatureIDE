@@ -61,8 +61,8 @@ public class AndAction extends SingleSelectionAction {
 
 	@Override
 	protected void updateProperties() {
-		boolean and = feature.isAnd();
-		setEnabled(!and && feature.hasChildren());
+		boolean and = feature.getStructure().isAnd();
+		setEnabled(!and && feature.getStructure().hasChildren());
 		setChecked(and);
 	}
 

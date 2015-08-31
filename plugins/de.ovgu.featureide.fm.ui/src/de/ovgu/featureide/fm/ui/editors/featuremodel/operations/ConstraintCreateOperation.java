@@ -55,7 +55,7 @@ public class ConstraintCreateOperation extends AbstractFeatureModelOperation {
 		featureModel.addConstraint(constraint);
 
 		//initialize constraint position in manual layout
-		if (!featureModel.getLayout().hasFeaturesAutoLayout())
+		if (!featureModel.getGraphicRepresenation().getLayout().hasFeaturesAutoLayout())
 			FeatureDiagramLayoutHelper.initializeConstraintPosition(featureModel, featureModel.getConstraintCount() - 1);
 	}
 

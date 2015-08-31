@@ -36,7 +36,7 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
-import de.ovgu.featureide.fm.core.functional.FunctionalInterfaces;
+import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureCellEditorLocator;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureLabelEditManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
@@ -73,7 +73,7 @@ public class FeatureCreateLayerOperation extends AbstractFeatureModelOperation {
 	protected void redo() {
 		int number = 0;
 
-		while (FunctionalInterfaces.toList(FeatureUtils.extractFeatureNames(featureModel.getFeatures())).contains("NewLayer" + ++number))
+		while (Functional.toList(FeatureUtils.extractFeatureNames(featureModel.getFeatures())).contains("NewLayer" + ++number))
 			;
 
 		newFeature = FeatureModelFactory.getInstance().createFeature(featureModel, "NewLayer" + number);

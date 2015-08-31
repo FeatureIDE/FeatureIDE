@@ -73,7 +73,7 @@ public class FmOutlinePage extends ContentOutlinePage {
 	 * Updates the outline page.
 	 */
 	public void update() {
-		if (fInput == null || fInput.getRoot() == null)
+		if (fInput == null || fInput.getStructure().getRoot() == null)
 			return;
 		if (viewer != null) {
 			Control control = viewer.getControl();
@@ -95,7 +95,7 @@ public class FmOutlinePage extends ContentOutlinePage {
 			viewer.setLabelProvider(new FmLabelProvider());
 		}
 
-		if (fInput != null && fInput.getRoot() != null) {
+		if (fInput != null && fInput.getStructure().getRoot() != null) {
 			viewer.setInput(fInput);
 		}
 

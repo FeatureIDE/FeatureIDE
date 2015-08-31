@@ -20,15 +20,15 @@
  */
 package de.ovgu.featureide.fm.core.base;
 
-import static de.ovgu.featureide.fm.core.functional.FunctionalInterfaces.filter;
+import static de.ovgu.featureide.fm.core.functional.Functional.filter;
 
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
 import de.ovgu.featureide.fm.core.filter.ConcreteFeatureFilter;
-import de.ovgu.featureide.fm.core.functional.FunctionalInterfaces;
-import de.ovgu.featureide.fm.core.functional.FunctionalInterfaces.IFunction;
+import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
 
 /**
  * @author Marcus Pinnecke
@@ -66,7 +66,7 @@ public abstract class FeatureUtils {
 	 * yields a feature <i>f</i> from <b>features</b> if and only if <i>f</i> is concrete. Since the implementation based on iterators, it is a lazy filtering without
 	 * modification of <b>features</b>. 
 	 * 
-	 * <br/><br/>The extraction is done via {@link de.ovgu.featureide.fm.core.functional.FunctionalInterfaces#filter(Iterable, de.ovgu.featureide.fm.core.filter.base.IFilter)}
+	 * <br/><br/>The extraction is done via {@link de.ovgu.featureide.fm.core.functional.Functional#filter(Iterable, de.ovgu.featureide.fm.core.filter.base.IFilter)}
 	 * 
 	 * @since 2.7.5
 	 * @param features An iterable object providing features
@@ -91,7 +91,7 @@ public abstract class FeatureUtils {
 	
 	/**
 	 * Extracts all concrete features from a feature model as a list of strings by calling 
-	 * {@link de.ovgu.featureide.fm.core.functional.FunctionalInterfaces#mapToStringList(Iterable)} on the result of {@link #extractConcreteFeatures(IFeatureModel)}
+	 * {@link de.ovgu.featureide.fm.core.functional.Functional#mapToStringList(Iterable)} on the result of {@link #extractConcreteFeatures(IFeatureModel)}
  	 * using <code>model.getFeatures()</code>.
 	 * 
 	 * @since 2.7.5
@@ -100,19 +100,19 @@ public abstract class FeatureUtils {
 	 * @return A list of strings that contains the feature names of all concrete features of <b>features</b>
 	 */
 	public static List<String> extractConcreteFeaturesAsStringList(IFeatureModel model) {
-		return FunctionalInterfaces.mapToStringList(FeatureUtils.extractConcreteFeatures(model.getFeatures()));
+		return Functional.mapToStringList(FeatureUtils.extractConcreteFeatures(model.getFeatures()));
 	}
 
 	public static Iterable<String> extractFeatureNames(Collection<IFeature> features) {
-		return FunctionalInterfaces.map(features, GET_FEATURE_NAME);
+		return Functional.map(features, GET_FEATURE_NAME);
 	}
 
 	public static List<IFeature> convertToFeatureList(List<IFeatureStructure> list) {
-		return FunctionalInterfaces.toList(FunctionalInterfaces.map(list, STRUCTURE_TO_FEATURE));
+		return Functional.toList(Functional.map(list, STRUCTURE_TO_FEATURE));
 	}
 
 	public static List<IFeatureStructure> convertToFeatureStructureList(List<IFeature> list) {
-		return FunctionalInterfaces.toList(FunctionalInterfaces.map(list, FEATURE_TO_STRUCTURE));
+		return Functional.toList(Functional.map(list, FEATURE_TO_STRUCTURE));
 	}
 
 }

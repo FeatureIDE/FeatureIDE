@@ -48,7 +48,7 @@ public class AbstractAction extends SingleSelectionAction {
 	@Override
 	public void run() {
 
-		setChecked(feature.isAbstract());
+		setChecked(feature.getStructure().isAbstract());
 		FeatureSetAbstractOperation op = new FeatureSetAbstractOperation(feature, featureModel);
 		op.addContext(undoContext);
 
@@ -64,7 +64,7 @@ public class AbstractAction extends SingleSelectionAction {
 	@Override
 	protected void updateProperties() {
 		setEnabled(true);
-		setChecked(feature.isAbstract());
+		setChecked(feature.getStructure().isAbstract());
 	}
 
 }

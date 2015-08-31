@@ -97,7 +97,7 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements Proper
 	@Override
 	public boolean keyPressed(KeyEvent e) {
 		if (Character.isISOControl(e.character)) {
-			if (featureModel.getLayout().hasFeaturesAutoLayout()) {
+			if (featureModel.getGraphicRepresenation().getLayout().hasFeaturesAutoLayout()) {
 				return gvKeyHandler.keyPressed(e);
 			} else {
 				return super.keyPressed(e);

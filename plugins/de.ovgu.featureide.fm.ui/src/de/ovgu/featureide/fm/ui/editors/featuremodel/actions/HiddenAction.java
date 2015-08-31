@@ -44,7 +44,7 @@ public class HiddenAction extends SingleSelectionAction {
 
 	@Override
 	public void run() {
-		setChecked(feature.isHidden());
+		setChecked(feature.getStructure().isHidden());
 		FeatureSetHiddenOperation op = new FeatureSetHiddenOperation(feature, featureModel);
 		op.addContext((IUndoContext) featureModel.getUndoContext());
 
@@ -59,7 +59,7 @@ public class HiddenAction extends SingleSelectionAction {
 	@Override
 	protected void updateProperties() {
 		setEnabled(true);
-		setChecked(feature.isHidden());
+		setChecked(feature.getStructure().isHidden());
 	}
 
 }

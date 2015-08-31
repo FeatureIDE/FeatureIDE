@@ -39,7 +39,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
-import de.ovgu.featureide.fm.core.functional.FunctionalInterfaces;
+import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureCellEditorLocator;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureLabelEditManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
@@ -75,7 +75,7 @@ public class FeatureCreateCompoundOperation extends AbstractFeatureModelOperatio
 	@Override
 	public IStatus execute(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
 		int number = 0;
-		while (FunctionalInterfaces.toList(FeatureUtils.extractFeatureNames(featureModel.getFeatures())).contains("NewCompound" + ++number))
+		while (Functional.toList(FeatureUtils.extractFeatureNames(featureModel.getFeatures())).contains("NewCompound" + ++number))
 			;
 		newCompound = FeatureModelFactory.getInstance().createFeature(featureModel, "NewCompound" + number);
 		if (parent != null) {

@@ -44,7 +44,7 @@ import de.ovgu.featureide.fm.core.constraint.Reference;
 import de.ovgu.featureide.fm.core.constraint.RelationOperator;
 import de.ovgu.featureide.fm.core.constraint.WeightedTerm;
 import de.ovgu.featureide.fm.core.filter.base.Filter;
-import de.ovgu.featureide.fm.core.functional.FunctionalInterfaces;
+import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
  * The Translator utility provides a bunch of handy tools to translate feature
@@ -64,7 +64,7 @@ public class Translator {
 	public static BiMap<String, Integer> buildFeatureNameMap(IFeatureModel fm, UniqueId idGen) {
 		BiMap<String, Integer> m = HashBiMap.create();
 
-		for (String f : FunctionalInterfaces.mapToString(fm.getFeatures())) {
+		for (String f : Functional.mapToString(fm.getFeatures())) {
 			m.put(f, idGen.getNext());
 		}
 
@@ -81,7 +81,7 @@ public class Translator {
 	 */
 	public static void extendFeatureNameMap(BiMap<String, Integer> m, IFeatureModel fm, UniqueId idGen) {
 
-		for (String f : FunctionalInterfaces.mapToString(fm.getFeatures())) {
+		for (String f : Functional.mapToString(fm.getFeatures())) {
 			if (!m.containsKey(f)) {
 				m.put(f, idGen.getNext());
 			}

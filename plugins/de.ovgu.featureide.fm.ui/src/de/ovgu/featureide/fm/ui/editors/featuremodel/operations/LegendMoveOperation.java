@@ -53,14 +53,14 @@ public class LegendMoveOperation extends AbstractFeatureModelOperation {
 
 	@Override
 	public IStatus execute(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
-		this.wasAutoLayout = featureModel.getLayout().hasLegendAutoLayout();
+		this.wasAutoLayout = featureModel.getGraphicRepresenation().getLayout().hasLegendAutoLayout();
 		return redo(monitor, info);
 	}
 
 	@Override
 	protected void redo() {
 		FeatureUIHelper.getLegendFigure(featureModel).setLocation(newLocation);
-		final FeatureModelLayout layout = featureModel.getLayout();
+		final FeatureModelLayout layout = featureModel.getGraphicRepresenation().getLayout();
 		layout.setLegendPos(newLocation.x, newLocation.y);
 		layout.setLegendAutoLayout(false);
 		featureModel.handleLegendLayoutChanged();
@@ -69,7 +69,7 @@ public class LegendMoveOperation extends AbstractFeatureModelOperation {
 	@Override
 	protected void undo() {
 		FeatureUIHelper.getLegendFigure(featureModel).setLocation(oldLocation);
-		final FeatureModelLayout layout = featureModel.getLayout();
+		final FeatureModelLayout layout = featureModel.getGraphicRepresenation().getLayout();
 		layout.setLegendPos(oldLocation.x, oldLocation.y);
 		layout.setLegendAutoLayout(wasAutoLayout);
 		featureModel.handleLegendLayoutChanged();

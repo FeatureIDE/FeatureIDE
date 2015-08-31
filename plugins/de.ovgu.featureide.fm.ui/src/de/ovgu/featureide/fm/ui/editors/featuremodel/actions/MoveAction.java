@@ -173,8 +173,8 @@ public class MoveAction extends Action {
 			LegendFigure legendFigure = FeatureUIHelper.getLegendFigure(featureModel);
 			final Point newPos = legendFigure.getLocation().translate(deltaPos);
 			legendFigure.setLocation(newPos);
-			featureModel.getLayout().setLegendPos(newPos.x(), newPos.y());
-			featureModel.getLayout().setLegendAutoLayout(false);
+			featureModel.getGraphicRepresenation().getLayout().setLegendPos(newPos.x(), newPos.y());
+			featureModel.getGraphicRepresenation().getLayout().setLegendAutoLayout(false);
 			featureModel.handleLegendLayoutChanged();
 			this.isLegendMoving = true;
 		}
@@ -182,7 +182,7 @@ public class MoveAction extends Action {
 
 	private void stop() {
 		this.doMove(true);
-		if (!isLegendMoving && featureModel.getLayout().hasLegendAutoLayout())
+		if (!isLegendMoving && featureModel.getGraphicRepresenation().getLayout().hasLegendAutoLayout())
 			featureModel.handleModelDataChanged();
 
 		this.init();
@@ -194,7 +194,7 @@ public class MoveAction extends Action {
 	 * @return true if rules are not infringed
 	 */
 	private boolean isMovingAllowed() {
-		return !featureModel.getLayout().hasFeaturesAutoLayout();
+		return !featureModel.getGraphicRepresenation().getLayout().hasFeaturesAutoLayout();
 	}
 
 	/**

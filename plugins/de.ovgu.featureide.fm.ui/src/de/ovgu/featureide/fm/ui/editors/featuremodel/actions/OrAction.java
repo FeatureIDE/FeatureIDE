@@ -61,9 +61,9 @@ public class OrAction extends SingleSelectionAction {
 
 	@Override
 	protected void updateProperties() {
-		boolean or = feature.isOr();
+		boolean or = feature.getStructure().isOr();
 		// setEnabled(connectionSelected && !feature.isRoot() && !or)
-		setEnabled(!or && feature.hasChildren());
+		setEnabled(!or && feature.getStructure().hasChildren());
 		setChecked(or);
 	}
 

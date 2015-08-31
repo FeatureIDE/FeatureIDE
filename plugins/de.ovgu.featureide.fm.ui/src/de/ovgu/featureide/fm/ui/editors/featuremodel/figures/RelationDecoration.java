@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import org.eclipse.draw2d.Ellipse;
 import org.eclipse.draw2d.Graphics;
@@ -47,12 +48,12 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 	private Point referencePoint;
 
 	private IFeature lastChild;
-	private LinkedList<IFeature> children;
+	private List<IFeature> children;
 
 	private boolean vertical;
 	private IFeatureModel featureModel;
 
-	public RelationDecoration(boolean fill, IFeature lastChild, LinkedList<IFeature> children) {
+	public RelationDecoration(boolean fill, IFeature lastChild, List<IFeature> children) {
 		super();
 		this.fill = fill;
 		this.children = children;
@@ -105,7 +106,7 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 					IFeature temp;
 					temp = this.lastChild;
 					this.lastChild = children.get(i);
-					if (!(this.lastChild.isHidden() && !FeatureUIHelper.showHiddenFeatures(featureModel))) {
+					if (!(this.lastChild.getStructure().isHidden() && !FeatureUIHelper.showHiddenFeatures(featureModel))) {
 						double angle2 = HALF_ARC ? 360 : calculateAngle(center, getFeatureLocation());
 						double angle1 = HALF_ARC ? 180 : calculateAngle(center, getFeatureLocation());
 						if (angle2 > 450 && !vertical) {
@@ -167,7 +168,7 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 					IFeature temp;
 					temp = this.lastChild;
 					this.lastChild = children.get(i);
-					if (!(this.lastChild.isHidden() && !FeatureUIHelper.showHiddenFeatures(featureModel))) {
+					if (!(this.lastChild.getStructure().isHidden() && !FeatureUIHelper.showHiddenFeatures(featureModel))) {
 						double angle2 = HALF_ARC ? 360 : calculateAngle(r.getCenter(), getFeatureLocation());
 						double angle1 = HALF_ARC ? 180 : calculateAngle(r.getCenter(), getFeatureLocation());
 						if (angle2 > 450 && !vertical) {
@@ -188,7 +189,7 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 				highestAngle2 = HALF_ARC ? 360 : calculateAngle(r.getCenter(), getFeatureLocation());
 			}
 			r.shrink(7, 7);
-			r.y += FeatureUIHelper.getSize(lastChild.getParent()).height / 2;
+			r.y += FeatureUIHelper.getSize(lastChild.getStructure().getParent().getFeature()).height / 2;
 			if (vertical) {
 				r.shrink(2, 2);
 				if (highestAngle2 < 270)

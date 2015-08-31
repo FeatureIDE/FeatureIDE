@@ -63,9 +63,9 @@ import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagatorJobWrappe
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.configuration.TreeElement;
-import de.ovgu.featureide.fm.core.functional.FunctionalInterfaces;
-import de.ovgu.featureide.fm.core.functional.FunctionalInterfaces.IBinaryFunction;
-import de.ovgu.featureide.fm.core.functional.FunctionalInterfaces.IFunction;
+import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.core.functional.Functional.IBinaryFunction;
+import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -399,7 +399,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			root.setData(configuration.getRoot());
 			itemMap.put(configuration.getRoot(), root);
 
-			buildTree(root, configuration.getRoot().getChildren(), new FunctionalInterfaces.IFunction<Void, Void>() {
+			buildTree(root, configuration.getRoot().getChildren(), new Functional.IFunction<Void, Void>() {
 				@Override
 				public Void invoke(Void t) {
 					//					updateInfoLabel();
@@ -557,12 +557,12 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		});
 	}
 
-	protected final void walkTree(final FunctionalInterfaces.IBinaryFunction<TreeItem, SelectableFeature, Void> perNodeFunction,
-			final FunctionalInterfaces.IFunction<Void, Void> callbackIfDone) {
+	protected final void walkTree(final Functional.IBinaryFunction<TreeItem, SelectableFeature, Void> perNodeFunction,
+			final Functional.IFunction<Void, Void> callbackIfDone) {
 		AsyncTree.traverse(itemMap, tree.getItem(0), perNodeFunction, callbackIfDone);
 	}
 
-	private void buildTree(final TreeItem node, final TreeElement[] children, final FunctionalInterfaces.IFunction<Void, Void> callbackIfDone) {
+	private void buildTree(final TreeItem node, final TreeElement[] children, final Functional.IFunction<Void, Void> callbackIfDone) {
 		AsyncTree.build(itemMap, node, children, callbackIfDone);
 	}
 

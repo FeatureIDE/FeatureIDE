@@ -544,7 +544,7 @@ public class FeatureModelAnalyzer {
 		HashMap<Object, Object> changedAttributes = new HashMap<Object, Object>();
 
 		// put root always in so it will be refreshed (void/non-void)
-		changedAttributes.put(fm.getRoot(), FeatureStatus.NORMAL);
+		changedAttributes.put(fm.getStructure().getRoot(), FeatureStatus.NORMAL);
 		if (calculateFeatures) {
 			updateFeatures(oldAttributes, changedAttributes);
 		}
@@ -802,7 +802,7 @@ public class FeatureModelAnalyzer {
 	 * @param changedAttributes
 	 */
 	public void calculateHidden(Map<Object, Object> changedAttributes) {
-		if (!fm.hasHidden()) {
+		if (!fm.getStructure().hasHidden()) {
 			return;
 		}			
 		setSubTask(CALCULATE_INDETRMINATE_HIDDEN_FEATURES);
@@ -859,7 +859,7 @@ public class FeatureModelAnalyzer {
 				Collection<IFeature> set = featureDependencies.getImpliedFeatures(feature);
 				boolean noHidden = false;
 				for (IFeature f : set) {
-					if (!f.isHidden() && !f.hasHiddenParent() || list.contains(f)) {
+					if (!f.getStructure().isHidden() && !f.getStructure().hasHiddenParent() || list.contains(f)) {
 						if (featureDependencies.isAlways(f, feature)) {
 							noHidden = true; 
 							break;
@@ -884,7 +884,7 @@ public class FeatureModelAnalyzer {
 	public Collection<IFeature> getHiddenFeatures() {
 		Collection<IFeature> hiddenFeatures = new LinkedList<IFeature>();
 		for (IFeature f : fm.getFeatures()) {
-			if (f.isHidden() || f.hasHiddenParent()) {
+			if (f.getStructure().isHidden() || f.getStructure().hasHiddenParent()) {
 				hiddenFeatures.add(f);
 			}
 		}
@@ -905,9 +905,9 @@ public class FeatureModelAnalyzer {
 		Collection<IFeature> falseOptionalFeatures = new LinkedList<>();
 		for (IFeature feature : fm.getFeatures()) {
 			try {
-				if (!feature.isMandatory() && !feature.isRoot()) {
+				if (!feature.getStructure().isMandatory() && !feature.getStructure().isRoot()) {
 					SatSolver satsolver = new SatSolver(new Not(new Implies(
-							new And(new Literal(feature.getParent().getName()),
+							new And(new Literal(feature.getStructure().getParent().getFeature().getName()),
 									NodeCreator.createNodes(fm.clone(null))),
 							new Literal(feature.getName()))), 1000);
 					if (!satsolver.isSatisfiable()) {
@@ -927,7 +927,7 @@ public class FeatureModelAnalyzer {
 			try {
 				if (!feature.getStructure().isMandatory() && !feature.getStructure().isRoot()) {
 					SatSolver satsolver = new SatSolver(new Not(new Implies(
-							new And(new Literal(feature.getStructure().getParent().getName()),
+							new And(new Literal(feature.getStructure().getParent().getFeature().getName()),
 									NodeCreator.createNodes(fm.clone(null))),
 							new Literal(feature.getName()))), 1000);
 					if (!satsolver.isSatisfiable()) {
@@ -944,7 +944,7 @@ public class FeatureModelAnalyzer {
 	public int countConcreteFeatures() {
 		int number = 0;
 		for (IFeature feature : fm.getFeatures())
-			if (feature.isConcrete())
+			if (feature.getStructure().isConcrete())
 				number++;
 		return number;
 	}
@@ -952,7 +952,7 @@ public class FeatureModelAnalyzer {
 	public int countHiddenFeatures() {
 		int number = 0;
 		for (IFeature feature : fm.getFeatures()) {
-			if (feature.isHidden() || feature.hasHiddenParent()) {
+			if (feature.getStructure().isHidden() || feature.getStructure().hasHiddenParent()) {
 				number++;
 			}
 		}
@@ -962,7 +962,7 @@ public class FeatureModelAnalyzer {
 	public int countTerminalFeatures() {
 		int number = 0;
 		for (IFeature feature : fm.getFeatures())
-			if (!feature.hasChildren())
+			if (!feature.getStructure().hasChildren())
 				number++;
 		return number;
 	}

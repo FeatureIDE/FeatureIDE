@@ -107,10 +107,10 @@ public class FeatureDiagramLayoutHelper {
 			xAcc += FeatureUIHelper.getLocation(feature).x;
 		}
 		initPos.x = (xAcc / selectedFeatures.size());
-		if (newCompound.isRoot()) {
+		if (newCompound.getStructure().isRoot()) {
 			initPos.y = (initPos.y - FMPropertyManager.getFeatureSpaceY());
 		} else {
-			IFeature parent = newCompound.getParent();
+			IFeature parent = newCompound.getStructure().getParent().getFeature();
 			initPos.y = (initPos.y + FeatureUIHelper.getLocation(parent).y) / 2;
 			initPos.x = (initPos.x + FeatureUIHelper.getLocation(parent).x) / 2;
 		}
@@ -124,9 +124,9 @@ public class FeatureDiagramLayoutHelper {
 	 */
 	public static void initializeLayerFeaturePosition(IFeatureModel featureModel, IFeature newLayer, IFeature feature) {
 		if (!FeatureUIHelper.hasVerticalLayout(featureModel)) {
-			Point initPos = FeatureUIHelper.getLocation(newLayer.getParent()).getCopy();
-			if (feature.getChildrenCount() > 1) {
-				IFeature lastChild = feature.getChildren().get(feature.getChildIndex(newLayer) - 1);
+			Point initPos = FeatureUIHelper.getLocation(newLayer.getStructure().getParent().getFeature()).getCopy();
+			if (feature.getStructure().getChildrenCount() > 1) {
+				IFeature lastChild = feature.getStructure().getChildren().get(feature.getStructure().getChildIndex(newLayer.getStructure()) - 1).getFeature();
 				initPos.x = FeatureUIHelper.getLocation(lastChild).x + FeatureUIHelper.getSize(lastChild).width + FMPropertyManager.getFeatureSpaceX();
 				initPos.y = FeatureUIHelper.getLocation(lastChild).y;
 			} else {
@@ -134,13 +134,13 @@ public class FeatureDiagramLayoutHelper {
 			}
 			FeatureUIHelper.setLocation(newLayer, initPos);
 		} else {
-			Point initPos = FeatureUIHelper.getLocation(newLayer.getParent()).getCopy();
-			if (feature.getChildrenCount() > 1) {
-				IFeature lastChild = feature.getChildren().get(feature.getChildIndex(newLayer) - 1);
+			Point initPos = FeatureUIHelper.getLocation(newLayer.getStructure().getParent().getFeature()).getCopy();
+			if (feature.getStructure().getChildrenCount() > 1) {
+				IFeature lastChild = feature.getStructure().getChildren().get(feature.getStructure().getChildIndex(newLayer.getStructure()) - 1).getFeature();
 				initPos.y = FeatureUIHelper.getLocation(lastChild).y + FeatureUIHelper.getSize(lastChild).height + FMPropertyManager.getFeatureSpaceX();
 				initPos.x = FeatureUIHelper.getLocation(lastChild).x;
 			} else {
-				initPos.x += FeatureUIHelper.getSize(newLayer.getParent()).width + FMPropertyManager.getFeatureSpaceY();
+				initPos.x += FeatureUIHelper.getSize(newLayer.getStructure().getParent().getFeature()).width + FMPropertyManager.getFeatureSpaceY();
 			}
 			FeatureUIHelper.setLocation(newLayer, initPos);
 		}
@@ -156,27 +156,27 @@ public class FeatureDiagramLayoutHelper {
 			return new ManualLayout();
 		case 1:
 			FeatureUIHelper.setVerticalLayoutBounds(false, featureModel);
-			featureModel.getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout(featureModel));
+			featureModel.getGraphicRepresenation().getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout(featureModel));
 			return new LevelOrderLayout();
 		case 2:
 			FeatureUIHelper.setVerticalLayoutBounds(false, featureModel);
-			featureModel.getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout(featureModel));
+			featureModel.getGraphicRepresenation().getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout(featureModel));
 			return new BreadthFirstLayout();
 		case 3:
 			FeatureUIHelper.setVerticalLayoutBounds(false, featureModel);
-			featureModel.getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout(featureModel));
+			featureModel.getGraphicRepresenation().getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout(featureModel));
 			return new DepthFirstLayout();
 		case 4:
 			FeatureUIHelper.setVerticalLayoutBounds(true, featureModel);
-			featureModel.getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout(featureModel));
+			featureModel.getGraphicRepresenation().getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout(featureModel));
 			return new VerticalLayout();
 		case 5:
 			FeatureUIHelper.setVerticalLayoutBounds(true, featureModel);
-			featureModel.getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout(featureModel));
+			featureModel.getGraphicRepresenation().getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout(featureModel));
 			return new VerticalLayout2();
 		default:
 			FeatureUIHelper.setVerticalLayoutBounds(false, featureModel);
-			featureModel.getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout(featureModel));
+			featureModel.getGraphicRepresenation().getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout(featureModel));
 			return new LevelOrderLayout();
 		}
 

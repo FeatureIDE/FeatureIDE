@@ -34,6 +34,7 @@ import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.core.signature.ProjectSignatures.SignatureIterator;
 import de.ovgu.featureide.core.signature.ProjectStructure;
 import de.ovgu.featureide.core.signature.filter.ContextFilter;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.io.IOConstants;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
@@ -71,8 +72,8 @@ public class PrintExtendedSignaturesJob extends AProjectJob<PrintExtendedSignatu
 		IOConstants.clearFolder(folder);
 		
 		LinkedList<String> allConcreteFeatures = new LinkedList<String>();
-		for (IFeature feature : interfaceProject.getFeatureModel().getConcreteFeatures()) {
-			if (!feature.isHidden()) {
+		for (IFeature feature : FeatureUtils.extractConcreteFeatures(interfaceProject.getFeatureModel())) {
+			if (!feature.getStructure().isHidden()) {
 				allConcreteFeatures.add(feature.getName());
 			}
 		}

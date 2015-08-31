@@ -68,5 +68,7 @@ public interface IConstraint {
 	void setDeadFeatures(Collection<IFeature> deadFeatures);
 
 	boolean setFalseOptionalFeatures(IFeatureModel clone, Collection<IFeature> fmFalseOptionals);
+	
+	IGraphicalConstraint getGraphicRepresenation(); // Added, Marcus Pinnecke 31.08.15
 
 }

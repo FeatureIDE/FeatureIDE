@@ -126,9 +126,9 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 
 		int groupType;
 
-		if (feature.isAlternative()) {
+		if (feature.getStructure().isAlternative()) {
 			groupType = FeatureChangeGroupTypeOperation.AND;
-		} else if (feature.isAnd()) {
+		} else if (feature.getStructure().isAnd()) {
 			groupType = FeatureChangeGroupTypeOperation.OR;
 		} else {
 			groupType = FeatureChangeGroupTypeOperation.ALTERNATIVE;
@@ -172,15 +172,15 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		boolean parentHidden = false;
 
 		RotatableDecoration sourceDecoration = null;
-		while (!sourceParent.isRoot()) {
-			sourceParent = sourceParent.getParent();
-			if (sourceParent.isHidden())
+		while (!sourceParent.getStructure().isRoot()) {
+			sourceParent = sourceParent.getStructure().getParent().getFeature();
+			if (sourceParent.getStructure().isHidden())
 				parentHidden = true;
 
 		}
-		if ((target.isAnd() || OR_CIRCLES) && !(source.isHidden() && !FeatureUIHelper.showHiddenFeatures(getFeatureModel())))
+		if ((target.getStructure().isAnd() || OR_CIRCLES) && !(source.getStructure().isHidden() && !FeatureUIHelper.showHiddenFeatures(getFeatureModel())))
 			if (!(parentHidden && !FeatureUIHelper.showHiddenFeatures(getFeatureModel())))
-				sourceDecoration = new CircleDecoration(source.isMandatory());
+				sourceDecoration = new CircleDecoration(source.getStructure().isMandatory());
 
 		PolylineConnection connection = (PolylineConnection) getConnectionFigure();
 		connection.setSourceDecoration(sourceDecoration);
@@ -194,10 +194,10 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 			IFeature source = connectionModel.getSource();
 			if (FeatureUIHelper.hasVerticalLayout(getFeatureModel())) {
 				if (!target.getStructure().isAnd() && (target.getStructure().getChildIndex(source.getStructure()) == (target.getStructure().getChildrenCount() - 1)))
-					targetDecoration = new RelationDecoration(target.getStructure().isMultiple(), target.getStructure().getFirstChild(), FeatureUtils.convertToFeatureStructureList(target.getStructure().getChildren()));
+					targetDecoration = new RelationDecoration(target.getStructure().isMultiple(), target.getStructure().getFirstChild().getFeature(), FeatureUtils.convertToFeatureList(target.getStructure().getChildren()));
 			} else {
-				if (!target.getStructure().isAnd() && target.getStructure().isFirstChild(source))
-					targetDecoration = new RelationDecoration(target.isMultiple(), target.getLastChild(), target.getChildren());
+				if (!target.getStructure().isAnd() && target.getStructure().isFirstChild(source.getStructure()))
+					targetDecoration = new RelationDecoration(target.getStructure().isMultiple(), target.getStructure().getLastChild().getFeature(), FeatureUtils.convertToFeatureList(target.getStructure().getChildren()));
 			}
 		}
 
@@ -209,7 +209,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		IFeature target = ((FeatureConnection) getModel()).getTarget();
 		toolTipContent.removeAll();
 		toolTipContent.setLayoutManager(new GridLayout());
-		toolTipContent.add(new Label(" Connection type: \n" + (target.isAnd() ? " And" : (target.isMultiple() ? " Or" : " Alternative"))));
+		toolTipContent.add(new Label(" Connection type: \n" + (target.getStructure().isAnd() ? " And" : (target.getStructure().isMultiple() ? " Or" : " Alternative"))));
 
 		// call of the FeatureDiagramExtensions
 		for (FeatureDiagramExtension extension : FeatureDiagramExtension.getExtensions()) {

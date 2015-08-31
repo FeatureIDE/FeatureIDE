@@ -24,7 +24,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 
 /**
  * A feature representation for layout.
@@ -35,6 +37,10 @@ public class LayoutableFeature {
 
 	private boolean showHidden;
 	private IFeature feature;
+	
+	public LayoutableFeature(IFeatureStructure featureStructure, boolean showHidden) {
+		this (featureStructure.getFeature(), showHidden);
+	}
 
 	public LayoutableFeature(IFeature feature, boolean showHidden) {
 		this.feature = feature;
@@ -45,11 +51,11 @@ public class LayoutableFeature {
 
 		LinkedList<LayoutableFeature> children = new LinkedList<LayoutableFeature>();
 
-		for (IFeature child : feature.getChildren()) {
+		for (IFeature child : FeatureUtils.convertToFeatureList(feature.getStructure().getChildren())) {
 			if (showHidden) {
 				children.add(new LayoutableFeature(child, showHidden));
 			} else {
-				if (!child.isHidden()) {
+				if (!child.getStructure().isHidden()) {
 					children.add(new LayoutableFeature(child, showHidden));
 				}
 			}
@@ -87,7 +93,7 @@ public class LayoutableFeature {
 		} else {
 			final ArrayList<IFeature> newFeatures = new ArrayList<IFeature>();
 			for (IFeature feature : features) {
-				if (feature.hasHiddenParent()) {
+				if (feature.getStructure().hasHiddenParent()) {
 					newFeatures.add(feature);
 				}
 			}
@@ -98,10 +104,10 @@ public class LayoutableFeature {
 	public static boolean isHidden(IFeature feature, boolean showHidden) {
 		if (showHidden)
 			return false;
-		if (!feature.isRoot())
-			return (feature.isHidden() || isHidden(feature.getParent(), showHidden));
+		if (!feature.getStructure().isRoot())
+			return (feature.getStructure().isHidden() || isHidden(feature.getStructure().getParent().getFeature(), showHidden));
 		else
-			return feature.isHidden();
+			return feature.getStructure().isHidden();
 	}
 
 }

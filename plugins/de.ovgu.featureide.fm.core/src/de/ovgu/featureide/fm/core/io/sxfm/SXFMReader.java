@@ -261,7 +261,7 @@ public class SXFMReader extends AbstractFeatureModelReader {
 		    		featId = setNameGetID(feat, lineText);
 //		    		if (feat.getName().trim().toLowerCase().equals("root"))
 //		    			feat.setName("root_");
-		    		featureModel.getStructure().setRoot(feat);	
+		    		featureModel.getStructure().setRoot(feat.getStructure());	
 		    		feat.getStructure().changeToAnd();
 		    		countIndent = 0;
 				} else if (lineText.startsWith(":m")) {
@@ -406,7 +406,7 @@ public class SXFMReader extends AbstractFeatureModelReader {
     	org.prop4j.Node node;
     	for (FeatCardinality featCard : featList) {   		
     		IFeature feat = featCard.feat;    		
-    		LinkedList<IFeatureStructure> children = feat.getStructure().getChildren();
+    		List<IFeatureStructure> children = feat.getStructure().getChildren();
     		for (IFeatureStructure child : children) child.setMandatory(false);
     		int start = featCard.start;
     		int end = featCard.end;

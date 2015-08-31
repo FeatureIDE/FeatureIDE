@@ -52,7 +52,7 @@ public class ConstraintDeleteOperation extends AbstractFeatureModelOperation {
 	protected void undo() {
 		featureModel.addConstraint(constraint, index);
 		//initialize constraint position in manual layout
-		if (!featureModel.getLayout().hasFeaturesAutoLayout())
+		if (!featureModel.getGraphicRepresenation().getLayout().hasFeaturesAutoLayout())
 			FeatureDiagramLayoutHelper.initializeConstraintPosition(featureModel, featureModel.getConstraintCount() - 1);
 	}
 

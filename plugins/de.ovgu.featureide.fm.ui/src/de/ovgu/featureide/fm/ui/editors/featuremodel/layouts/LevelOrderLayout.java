@@ -49,7 +49,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 
 	@Override
 	public void layoutFeatureModel(IFeatureModel featureModel) {
-		LayoutableFeature root = new LayoutableFeature(featureModel.getRoot(), showHidden);
+		LayoutableFeature root = new LayoutableFeature(featureModel.getStructure().getRoot(), showHidden);
 		layout(root);
 		layout(featureDiagramBottom, featureModel.getConstraints());
 	}
@@ -120,7 +120,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 		boolean right = true;
 		for (int k = j - 1; k >= 0; k--) {
 			LayoutableFeature sibling = level.get(k);
-			if (sibling.getFeature().getParent() != feature.getFeature().getParent()) {
+			if (sibling.getFeature().getStructure().getParent() != feature.getFeature().getStructure().getParent()) {
 				l = k + 1;
 				break;
 			}

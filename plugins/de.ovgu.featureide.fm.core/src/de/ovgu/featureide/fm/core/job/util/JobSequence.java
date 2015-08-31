@@ -28,7 +28,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.functional.FunctionalInterfaces.IFunction;
+import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
 import de.ovgu.featureide.fm.core.job.IJob;
 
 /**

@@ -91,15 +91,15 @@ public class FmLabelProvider implements ILabelProvider,IFontProvider, GUIDefault
 	@Override
 	public Image getImage(Object element) {
 		if (element instanceof IFeature) {
-			if ((((IFeature) element).isRoot()))
+			if ((((IFeature) element).getStructure().isRoot()))
 				return null; // TODO: Add here icon for feature model
-			if (((IFeature) element).getParent().isAlternative()) {
+			if (((IFeature) element).getStructure().getParent().isAlternative()) {
 				return IMG_XOR;
 			}
-			else if (((IFeature) element).getParent().isOr()) {
+			else if (((IFeature) element).getStructure().getParent().isOr()) {
 				return IMG_OR;
 			}
-			else if (((IFeature) element).isMandatory()) {
+			else if (((IFeature) element).getStructure().isMandatory()) {
 				return IMG_MANDATORY;
 			} else {
 				return IMG_OPTIONAL;

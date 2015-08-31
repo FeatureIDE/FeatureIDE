@@ -113,9 +113,9 @@ public class RenamingsManager {
 				}
 			}
 		}
-		if (model.getColorschemeTable().getColorFile(project).exists()) {
-			model.getColorschemeTable().readColorsFromFile(project);
-			model.getColorschemeTable().saveColorsToFile(project);
+		if (model.getGraphicRepresenation().getColorschemeTable().getColorFile(project).exists()) {
+			model.getGraphicRepresenation().getColorschemeTable().readColorsFromFile(project);
+			model.getGraphicRepresenation().getColorschemeTable().saveColorsToFile(project);
 		}
 		renamings.clear();
 	}

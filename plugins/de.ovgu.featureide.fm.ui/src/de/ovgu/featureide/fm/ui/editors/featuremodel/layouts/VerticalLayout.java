@@ -23,10 +23,12 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.layouts;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.ListIterator;
 
 import org.eclipse.draw2d.geometry.Point;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
@@ -50,11 +52,11 @@ public class VerticalLayout extends FeatureDiagramLayoutManager {
 	private int height;
 
 	public void layoutFeatureModel(IFeatureModel featureModel) {
-		heightStep = FeatureUIHelper.getSize(featureModel.getRoot()).height + featureSpaceY;
+		heightStep = FeatureUIHelper.getSize(featureModel.getStructure().getRoot().getFeature()).height + featureSpaceY;
 		height = FMPropertyManager.getLayoutMarginX() - heightStep;
 
-		calculateLevelWidth(featureModel.getRoot());
-		centerOther(featureModel.getRoot(), 0);
+		calculateLevelWidth(featureModel.getStructure().getRoot().getFeature());
+		centerOther(featureModel.getStructure().getRoot().getFeature(), 0);
 		layout(height, featureModel.getConstraints());
 	}
 
@@ -63,7 +65,7 @@ public class VerticalLayout extends FeatureDiagramLayoutManager {
 	 * (centered by their children's positions
 	 */
 	private int centerOther(IFeature parent, int level) {
-		final LinkedList<IFeature> children = parent.getChildren();
+		final List<IFeature> children = FeatureUtils.convertToFeatureList(parent.getStructure().getChildren());
 		if (children.isEmpty()) {
 			height += heightStep;
 			FeatureUIHelper.setLocation(parent, new Point(levelWidth.get(level), height));
@@ -101,7 +103,7 @@ public class VerticalLayout extends FeatureDiagramLayoutManager {
 			levelWidth.set(level, parentWidth);
 		}
 
-		for (IFeature feature : parent.getChildren()) {
+		for (IFeature feature : FeatureUtils.convertToFeatureList(parent.getStructure().getChildren())) {
 			calculateLevelWidth(feature, level + 1);
 		}
 	}

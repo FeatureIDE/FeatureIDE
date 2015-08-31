@@ -67,11 +67,11 @@ public class LegendLayoutAction extends Action {
 	@Override
 	public void run() {
 		super.run();
-		if (featureModel.getLayout().hasLegendAutoLayout()) {
-			featureModel.getLayout().setLegendAutoLayout(false);
+		if (featureModel.getGraphicRepresenation().getLayout().hasLegendAutoLayout()) {
+			featureModel.getGraphicRepresenation().getLayout().setLegendAutoLayout(false);
 			this.setChecked(false);
 		} else {
-			featureModel.getLayout().setLegendAutoLayout(true);
+			featureModel.getGraphicRepresenation().getLayout().setLegendAutoLayout(true);
 			this.setChecked(true);
 			featureModel.handleModelDataChanged();
 		}
@@ -79,7 +79,7 @@ public class LegendLayoutAction extends Action {
 	}
 
 	public void refresh() {
-		if (featureModel.getLayout().hasLegendAutoLayout()) {
+		if (featureModel.getGraphicRepresenation().getLayout().hasLegendAutoLayout()) {
 			this.setChecked(true);
 		} else {
 			this.setChecked(false);

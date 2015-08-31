@@ -55,7 +55,7 @@ public class FeatureSetAbstractOperation extends AbstractFeatureModelOperation {
 	 * @return String to be used in undo/redo menu
 	 */
 	private static String getLabel(IFeature feature) {
-		if (feature.isAbstract())
+		if (feature.getStructure().isAbstract())
 			return LABEL_CONCRETE;
 		else
 			return LABEL_ABSTRACT;
@@ -63,7 +63,7 @@ public class FeatureSetAbstractOperation extends AbstractFeatureModelOperation {
 
 	@Override
 	protected void redo() {
-		feature.setAbstract(!feature.isAbstract());
+		feature.getStructure().setAbstract(!feature.getStructure().isAbstract());
 	}
 
 	@Override

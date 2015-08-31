@@ -458,8 +458,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 
 		readModel();
 
-		FeatureUIHelper.showHiddenFeatures(featureModel.getLayout().showHiddenFeatures(), featureModel);
-		FeatureUIHelper.setVerticalLayoutBounds(featureModel.getLayout().verticalLayout(), featureModel);
+		FeatureUIHelper.showHiddenFeatures(featureModel.getGraphicRepresenation().getLayout().showHiddenFeatures(), featureModel);
+		FeatureUIHelper.setVerticalLayoutBounds(featureModel.getGraphicRepresenation().getLayout().verticalLayout(), featureModel);
 
 		getExtensions();
 

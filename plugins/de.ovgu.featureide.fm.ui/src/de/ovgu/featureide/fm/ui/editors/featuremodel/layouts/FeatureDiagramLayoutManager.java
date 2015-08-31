@@ -44,10 +44,10 @@ abstract public class FeatureDiagramLayoutManager {
 	protected boolean showHidden;
 
 	public void layout(IFeatureModel featureModel) {
-		showHidden = featureModel.getLayout().showHiddenFeatures();
+		showHidden = featureModel.getGraphicRepresenation().getLayout().showHiddenFeatures();
 		FeatureUIHelper.showHiddenFeatures(showHidden, featureModel);
 		layoutFeatureModel(featureModel);
-		if (!FMPropertyManager.isLegendHidden() && featureModel.getLayout().hasLegendAutoLayout()) {
+		if (!FMPropertyManager.isLegendHidden() && featureModel.getGraphicRepresenation().getLayout().hasLegendAutoLayout()) {
 			layoutLegend(featureModel, showHidden);
 		}
 		layoutHidden(featureModel);
@@ -59,10 +59,10 @@ abstract public class FeatureDiagramLayoutManager {
 	boolean isHidden(IFeature feature) {
 		if (showHidden)
 			return false;
-		if (!feature.isRoot())
-			return (feature.isHidden() || isHidden(feature.getParent()));
+		if (!feature.getStructure().isRoot())
+			return (feature.getStructure().isHidden() || isHidden(feature.getStructure().getParent().getFeature()));
 		else
-			return feature.isHidden();
+			return feature.getStructure().isHidden();
 	}
 
 	/**
@@ -71,7 +71,7 @@ abstract public class FeatureDiagramLayoutManager {
 	 */
 	void layoutHidden(IFeatureModel featureModel) {
 		for (IFeature feature : featureModel.getFeatures()) {
-			if (isHidden(feature) && !feature.isRoot()) {
+			if (isHidden(feature) && !feature.getStructure().isRoot()) {
 				FeatureUIHelper.setTemporaryLocation(feature, new Point(0, 0));
 			}
 		}
@@ -225,15 +225,15 @@ abstract public class FeatureDiagramLayoutManager {
 		 * set the legend position
 		 */
 		if (topRight) {
-			featureModel.getLayout().setLegendPos(max.x - legendSize.width, min.y);
+			featureModel.getGraphicRepresenation().getLayout().setLegendPos(max.x - legendSize.width, min.y);
 		} else if (topLeft) {
-			featureModel.getLayout().setLegendPos(min.x, min.y);
+			featureModel.getGraphicRepresenation().getLayout().setLegendPos(min.x, min.y);
 		} else if (botLeft) {
-			featureModel.getLayout().setLegendPos(min.x, max.y - legendSize.height);
+			featureModel.getGraphicRepresenation().getLayout().setLegendPos(min.x, max.y - legendSize.height);
 		} else if (botRight) {
-			featureModel.getLayout().setLegendPos(max.x - legendSize.width, max.y - legendSize.height);
+			featureModel.getGraphicRepresenation().getLayout().setLegendPos(max.x - legendSize.width, max.y - legendSize.height);
 		} else {
-			featureModel.getLayout().setLegendPos(max.x + FMPropertyManager.getFeatureSpaceX(), min.y);
+			featureModel.getGraphicRepresenation().getLayout().setLegendPos(max.x + FMPropertyManager.getFeatureSpaceX(), min.y);
 		}
 	}
 }

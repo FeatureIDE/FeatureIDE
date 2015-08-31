@@ -87,7 +87,7 @@ public class ColorschemeTable {
 	public void addColorscheme(String name) {
 		colorschemeNames.add(name);
 		for (IFeature feat : featureModel.getFeatures()) {
-			feat.getColorList().addColorscheme();
+			feat.getGraphicRepresenation().getColorList().addColorscheme();
 		}
 	}
 	
@@ -98,12 +98,12 @@ public class ColorschemeTable {
 		if (colorschemeNames.size() == 2) {
 			colorschemeNames.set(1, DEFAULT_COLORSCHEMENAME);
 			for (IFeature feat : featureModel.getFeatures()) {
-				feat.getColorList().removeColor();
+				feat.getGraphicRepresenation().getColorList().removeColor();
 			}
 		} else {
 			colorschemeNames.remove(selectedColorscheme);
 			for (IFeature feat : featureModel.getFeatures()) {
-				feat.getColorList().removeColorscheme();
+				feat.getGraphicRepresenation().getColorList().removeColorscheme();
 			}
 			if (selectedColorscheme == colorschemeNames.size()) {
 				selectedColorscheme--;

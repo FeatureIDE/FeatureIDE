@@ -90,6 +90,7 @@ import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.FeatureModelFile;
 import de.ovgu.featureide.fm.core.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
@@ -494,7 +495,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		// create folders for all layers
 		if (featureModel instanceof ExtendedFeatureModel) {
 			for (IFeature feature : featureModel.getFeatures()) {
-				if (feature.isConcrete() && 
+				if (feature.getStructure().isConcrete() && 
 						feature instanceof ExtendedFeature && 
 						!((ExtendedFeature)feature).isFromExtern()) {
 					createFeatureFolder(feature.getName());
@@ -502,7 +503,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			}
 		} else {
 			for (IFeature feature : featureModel.getFeatures()) {
-				if (feature.isConcrete()) {
+				if (feature.getStructure().isConcrete()) {
 					createFeatureFolder(feature.getName());
 				}
 			}
@@ -512,7 +513,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			if (res instanceof IFolder && res.exists()) {
 				IFolder folder = (IFolder) res;
 				IFeature feature = featureModel.getFeature(folder.getName());
-				if (feature == null || !feature.isConcrete()) {
+				if (feature == null || !feature.getStructure().isConcrete()) {
 					folder.refreshLocal(IResource.DEPTH_ONE, null);
 					if (folder.members().length == 0)
 						folder.delete(false, null);
@@ -793,9 +794,9 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		} else {
 			try {
 				final int memberCount = folder.members().length;
-				if (feature.isConcrete() && memberCount == 0) {
+				if (feature.getStructure().isConcrete() && memberCount == 0) {
 					message = THE_FEATURE_MODULE_IS_EMPTY__YOU_EITHER_SHOULD_IMPLEMENT_IT_COMMA__MARK_THE_FEATURE_AS_ABSTRACT_COMMA__OR_REMOVE_THE_FEATURE_FROM_THE_FEATURE_MODEL_;
-				} else if (feature.isAbstract() && memberCount > 0) {
+				} else if (feature.getStructure().isAbstract() && memberCount > 0) {
 					message = "This feature module is ignored as \"" + feature.getName() + "\" is marked as abstract.";
 				}
 			} catch (CoreException e) {
@@ -1127,7 +1128,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	}
 
 	private Collection<String> getOptionalConcreteFeatures() {
-		final Collection<String> concreteFeatures = featureModel.getConcreteFeatureNames();
+		final Collection<String> concreteFeatures = FeatureUtils.extractConcreteFeaturesAsStringList(featureModel);
 		List<List<IFeature>> deadCoreList = featureModel.getAnalyser().analyzeFeatures();
 		for (final IFeature feature : deadCoreList.get(0)) {
 			concreteFeatures.remove(feature.getName());

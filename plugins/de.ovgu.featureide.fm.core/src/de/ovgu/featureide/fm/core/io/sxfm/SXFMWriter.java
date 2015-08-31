@@ -47,6 +47,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
@@ -122,7 +123,7 @@ public class SXFMWriter extends AbstractFeatureModelWriter {
         Node featTree = doc.createElement("feature_tree");
         elem.appendChild(featTree);
         featTree.appendChild(doc.createTextNode("\n"));
-        createXmlDocRec(doc, featTree, featureModel.getRoot(), false, "");
+        createXmlDocRec(doc, featTree, featureModel.getStructure().getRoot().getFeature(), false, "");
         createPropositionalConstraints(doc, elem);
     }
 	
@@ -145,11 +146,11 @@ public class SXFMWriter extends AbstractFeatureModelWriter {
     	boolean nextAndMode = false;
     	if (feat == null) return;
     	String fName = feat.getName();
-    	if (feat.isRoot()) {
+    	if (feat.getStructure().isRoot()) {
     		textNode = doc.createTextNode(":r " + fName + "(" + fName + ")\n");
     		newIndent = "\t";
     	} else if (andMode) {
-    		if (feat.isMandatory()) {
+    		if (feat.getStructure().isMandatory()) {
         		textNode = doc.createTextNode(indent + ":m " + fName + "(" + 
         									  fName + ")\n") ;
         	} else {
@@ -161,17 +162,17 @@ public class SXFMWriter extends AbstractFeatureModelWriter {
     									  fName + ")\n");
     	}
     	nod.appendChild(textNode);
-    	children = feat.getChildren();
+    	children = new LinkedList<>(FeatureUtils.convertToFeatureList(feat.getStructure().getChildren()));
     	if (children.isEmpty()) return;
-    	if (feat.isAnd()) {
+    	if (feat.getStructure().isAnd()) {
     		nextAndMode = true;
     		newIndent = indent + "\t";
-    	} else if (feat.isOr()) {
+    	} else if (feat.getStructure().isOr()) {
     		textNode = doc.createTextNode(indent + "\t:g [1,*]\n");
     		nod.appendChild(textNode);
     		newIndent = indent + "\t\t";
     		nextAndMode = false;
-    	} else if (feat.isAlternative()) {
+    	} else if (feat.getStructure().isAlternative()) {
     		textNode = doc.createTextNode(indent + "\t:g [1,1]\n");
     		nod.appendChild(textNode);
     		newIndent = indent + "\t\t";

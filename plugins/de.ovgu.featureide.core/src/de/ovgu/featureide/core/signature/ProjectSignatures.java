@@ -130,7 +130,7 @@ public class ProjectSignatures implements Iterable<AbstractSignature> {
 		int countConcreteFeatures = 0;
 		
 		for (IFeature feature : featureModel.getFeatures()) {
-			if (feature.isConcrete()) {
+			if (feature.getStructure().isConcrete()) {
 				tempFeatureNames[countConcreteFeatures++] = feature.getName();
 			}
 		}

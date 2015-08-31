@@ -27,6 +27,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.UNABLE_TO_DELE
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IAdaptable;
@@ -38,6 +39,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -124,13 +126,13 @@ public class DeleteAllOperation extends AbstractFeatureModelOperation implements
 	 * 
 	 * @param linkedList
 	 */
-	private void getFeaturesToDelete(LinkedList<IFeature> linkedList) {
+	private void getFeaturesToDelete(List<IFeature> linkedList) {
 		for (IFeature feat : linkedList) {
-			if (!feat.getRelevantConstraints().isEmpty()) {
+			if (!feat.getStructure().getRelevantConstraints().isEmpty()) {
 				containedFeatureList.add(feat);
 			}
-			if (feat.hasChildren()) {
-				getFeaturesToDelete(feat.getChildren());
+			if (feat.getStructure().hasChildren()) {
+				getFeaturesToDelete(FeatureUtils.convertToFeatureList(feat.getStructure().getChildren()));
 			}
 			featureList.add(feat);
 		}

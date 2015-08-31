@@ -31,7 +31,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.ToolTip;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 
@@ -74,7 +76,7 @@ public class FeatureLabelEditManager extends DirectEditManager implements GUIDef
 						// TODO #455 wrong usage of extension
 					} else if ((!featureModel.getFMComposerExtension().isValidFeatureName(value))) {
 						createTooltip(featureModel.getFMComposerExtension().getErroMessage(), SWT.ICON_ERROR);
-					} else if (featureModel.getFeatureNames().contains(value)) {
+					} else if (Functional.toList(FeatureUtils.extractFeatureNames(featureModel.getFeatures())).contains(value)) {
 						createTooltip(THIS_NAME_IS_ALREADY_USED_FOR_ANOTHER_FEATURE_, SWT.ICON_ERROR);
 					}
 				}

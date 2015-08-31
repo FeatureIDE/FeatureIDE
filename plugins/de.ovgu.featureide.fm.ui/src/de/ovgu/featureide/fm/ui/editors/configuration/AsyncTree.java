@@ -30,8 +30,8 @@ import org.eclipse.swt.widgets.TreeItem;
 
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.TreeElement;
-import de.ovgu.featureide.fm.core.functional.FunctionalInterfaces;
-import de.ovgu.featureide.fm.core.functional.FunctionalInterfaces.IBinaryFunction;
+import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.core.functional.Functional.IBinaryFunction;
 
 /**
  * Builds and traverses a {@link Tree} recursively with single asynchronous UI calls for each item.
@@ -119,7 +119,7 @@ public class AsyncTree extends Thread {
 
 	private final HashMap<SelectableFeature, TreeItem> itemMap;
 
-	private final FunctionalInterfaces.IFunction<Void, Void> callbackIfDone;
+	private final Functional.IFunction<Void, Void> callbackIfDone;
 	private Integer count = 0;
 
 	public void inc() {
@@ -149,14 +149,14 @@ public class AsyncTree extends Thread {
 		}
 	}
 
-	private AsyncTree(HashMap<SelectableFeature, TreeItem> itemMap, final FunctionalInterfaces.IFunction<Void, Void> callbackIfDone) {
+	private AsyncTree(HashMap<SelectableFeature, TreeItem> itemMap, final Functional.IFunction<Void, Void> callbackIfDone) {
 		this.itemMap = itemMap;
 		this.currentDisplay = Display.getCurrent();
 		this.callbackIfDone = callbackIfDone;
 	}
 
 	public static void build(HashMap<SelectableFeature, TreeItem> itemMap, final TreeItem node, final TreeElement[] children,
-			final FunctionalInterfaces.IFunction<Void, Void> callbackIfDone) {
+			final Functional.IFunction<Void, Void> callbackIfDone) {
 		final AsyncTree curInstance = new AsyncTree(itemMap, callbackIfDone);
 		if (curInstance.currentDisplay != null && !node.isDisposed()) {
 			curInstance.runnableList.add(curInstance.new Builder(node, children));
@@ -165,8 +165,8 @@ public class AsyncTree extends Thread {
 	}
 
 	public static void traverse(HashMap<SelectableFeature, TreeItem> itemMap, final TreeItem node,
-			final FunctionalInterfaces.IBinaryFunction<TreeItem, SelectableFeature, Void> perNodeFunction,
-			final FunctionalInterfaces.IFunction<Void, Void> callbackIfDone) {
+			final Functional.IBinaryFunction<TreeItem, SelectableFeature, Void> perNodeFunction,
+			final Functional.IFunction<Void, Void> callbackIfDone) {
 		final AsyncTree curInstance = new AsyncTree(itemMap, callbackIfDone);
 		if (curInstance.currentDisplay != null && !node.isDisposed()) {
 			curInstance.runnableList.add(curInstance.new Traverser(node, perNodeFunction));

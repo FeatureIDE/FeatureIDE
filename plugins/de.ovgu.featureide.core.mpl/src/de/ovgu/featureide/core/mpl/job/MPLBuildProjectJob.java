@@ -206,7 +206,7 @@ public class MPLBuildProjectJob extends AProjectJob<MPLBuildProjectJob.Arguments
 		// build other projects
 		// build interfaces
 		for (final IFeature mappedProject : mappedProjects.getSelectedFeatures()) {
-			if (mappedProject.isConcrete()) {
+			if (mappedProject.getStructure().isConcrete()) {
 				final int splittIndex = mappedProject.getName().lastIndexOf('.');
 				if (splittIndex == -1) {
 					// can this happen???

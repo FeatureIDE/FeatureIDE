@@ -38,6 +38,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.ui.wizards.AbstractWizardPage;
 import de.ovgu.featureide.fm.ui.wizards.WizardConstants;
@@ -154,7 +155,7 @@ public class SelectFeaturesWizardPage extends AbstractWizardPage {
 			featureNames.clear();
 			Object featureProject = abstractWizard.getData(WizardConstants.KEY_OUT_PROJECT);
 			if (featureProject != null) {
-				addFeaturesToTree(((IFeatureProject)featureProject).getFeatureModel().getRoot());
+				addFeaturesToTree(((IFeatureProject)featureProject).getFeatureModel().getStructure().getRoot().getFeature());
 			} else {
 				setErrorMessage(PLEASE_SELECT_A_PROJECT_IN_THE_PREVIOUS_PAGE_);
 				setPageComplete(false);
@@ -174,7 +175,7 @@ public class SelectFeaturesWizardPage extends AbstractWizardPage {
 		item.setText(root.getName());
 		item.setData(root);
 		
-		for (IFeature feature : root.getChildren()) {
+		for (IFeature feature : FeatureUtils.convertToFeatureList(root.getStructure().getChildren())) {
 			addFeaturesToTree(feature, item);
 		}
 		item.setExpanded(true);
@@ -194,7 +195,7 @@ public class SelectFeaturesWizardPage extends AbstractWizardPage {
 		item.setData(root);
 		item.setExpanded(true);
 
-		for (IFeature feature : root.getChildren())
+		for (IFeature feature : FeatureUtils.convertToFeatureList(root.getStructure().getChildren()))
 			addFeaturesToTree(feature, item);
 
 		item.setExpanded(true);

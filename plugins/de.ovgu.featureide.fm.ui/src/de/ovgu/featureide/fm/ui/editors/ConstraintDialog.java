@@ -102,10 +102,12 @@ import org.prop4j.Node;
 import org.prop4j.NodeReader;
 
 import de.ovgu.featureide.fm.core.Constraints;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.functional.FunctionalInterfaces.IConsumer;
+import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
 import de.ovgu.featureide.fm.core.Operator;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.ConstraintTextValidator.ValidationMessage;
@@ -599,7 +601,7 @@ public class ConstraintDialog implements GUIDefaults {
 	private void closeShell() {
 		final NodeReader nodeReader = new NodeReader();
 		final String input = constraintText.getText().trim();
-		final Node propNode = nodeReader.stringToNode(input, featureModel.getFeatureNames());
+		final Node propNode = nodeReader.stringToNode(input, Functional.toList(FeatureUtils.extractFeatureNames(featureModel.getFeatures())));
 
 		AbstractOperation op = null;
 		if (constraint != null && featureModel.getConstraints().contains(constraint)) {
@@ -643,7 +645,7 @@ public class ConstraintDialog implements GUIDefaults {
 
 		NodeReader nodeReader = new NodeReader();
 
-		Node propNode = nodeReader.stringToNode(input, clonedModel.getFeatureNames());
+		Node propNode = nodeReader.stringToNode(input, Functional.toList(FeatureUtils.extractFeatureNames(clonedModel.getFeatures())));
 
 		if (propNode != null) {
 			if (constraint != null) {
@@ -780,7 +782,7 @@ public class ConstraintDialog implements GUIDefaults {
 		constraintText.setLayoutData(formDataConstraintText);
 		constraintText.setText(initialConstraint);
 		constraintText.setMargins(10, 5, 3, 5);
-		constraintText.setPossibleWords(featureModel.getFeatureNames());
+		constraintText.setPossibleWords(Functional.toList(FeatureUtils.extractFeatureNames(featureModel.getFeatures())));
 
 		constraintText.addModifyListener(new ModifyListener() {
 
@@ -993,7 +995,7 @@ public class ConstraintDialog implements GUIDefaults {
 				autoActivationCharacters[c] = c;
 
 			adapter = new ContentProposalAdapter(constraintText, new SimpleSyntaxHighlighterConstraintContentAdapter(), new ConstraintContentProposalProvider(
-					featureModel.getFeatureNames()), keyStroke, autoActivationCharacters);
+					Functional.toSet(FeatureUtils.extractFeatureNames(featureModel.getFeatures()))), keyStroke, autoActivationCharacters);
 
 			adapter.setAutoActivationDelay(PROPOSAL_AUTO_ACTIVATION_DELAY);
 			adapter.setPopupSize(new Point(250, 85));

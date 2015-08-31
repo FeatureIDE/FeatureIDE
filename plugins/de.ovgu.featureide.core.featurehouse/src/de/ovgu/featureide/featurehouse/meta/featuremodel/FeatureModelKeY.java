@@ -22,7 +22,9 @@ package de.ovgu.featureide.featurehouse.meta.featuremodel;
 
 import java.util.Locale;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
  * Defines the content of the feature model class specific for KeY.
@@ -53,7 +55,7 @@ public class FeatureModelKeY implements IFeatureModelClass {
 	@Override
 	public String getFeatureFields() {
 		final StringBuilder fields = new StringBuilder();
-		for (final String f : featureModel.getFeatureNames()) {
+		for (final String f : Functional.toList(FeatureUtils.extractFeatureNames(featureModel.getFeatures()))) {
 			fields.append(FIELD_MODIFIER);
 			fields.append(f.toLowerCase(Locale.ENGLISH));
 			fields.append(";\r\n");

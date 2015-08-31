@@ -114,7 +114,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 		if (request.getType() == RequestConstants.REQ_DIRECT_EDIT) {
 			showRenameManager();
 		} else if (request.getType() == RequestConstants.REQ_OPEN) {
-			if (feature.isRoot() || !feature.getParent().isAnd()) {
+			if (feature.getStructure().isRoot() || !feature.getStructure().getParent().isAnd()) {
 				return;
 			}
 

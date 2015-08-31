@@ -182,7 +182,7 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
 	private static ModelComparator comparator = new ModelComparator(TIMEOUT);
 
 	public void calculateContent(final IFeatureModel oldModel, final IFeatureModel newModel, IProgressMonitor monitor) {
-		if (oldModel.getRoot() == null || newModel.getRoot() == null)
+		if (oldModel.getStructure().getRoot() == null || newModel.getStructure().getRoot() == null)
 			return;
 
 		if (isCanceled())

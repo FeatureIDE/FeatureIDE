@@ -39,7 +39,7 @@ import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.configuration.SelectionNotPossibleException;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
-import de.ovgu.featureide.fm.core.functional.FunctionalInterfaces;
+import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
  * Representation of the feature model. 

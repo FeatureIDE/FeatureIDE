@@ -163,7 +163,7 @@ public abstract class Generator {
 				//Mandatory to Optional+Constraint
 				for (IFeature feature : randomizedList) {
 					IFeatureStructure parent = feature.getStructure().getParent();
-					if (parent != null && parent.isAnd() && !parent.isFirstChild(feature) && feature.getStructure().isMandatory()) {
+					if (parent != null && parent.isAnd() && !parent.isFirstChild(feature.getStructure()) && feature.getStructure().isMandatory()) {
 						feature.getStructure().setMandatory(false);
 						fm.addPropositionalNode(new Implies(new Literal(parent.getFeature().getName()),new Literal(feature.getName())));
 						break;
@@ -174,7 +174,7 @@ public abstract class Generator {
 				//move feature to parent's parent
 				for (IFeature child : randomizedList) {
 					IFeatureStructure feature = child.getStructure().getParent();
-					if (feature != null && feature.isMandatory() && feature.isAnd() && !feature.isFirstChild(child)) {
+					if (feature != null && feature.isMandatory() && feature.isAnd() && !feature.isFirstChild(child.getStructure())) {
 						IFeatureStructure parent = feature.getParent();
 						if (parent != null && parent.isAnd()) {
 							feature.removeChild(child.getStructure());

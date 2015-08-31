@@ -44,9 +44,11 @@ import org.eclipse.ui.PlatformUI;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
@@ -97,7 +99,7 @@ public class ExportDIMACSHandler extends AFileHandler {
 				StringBuilder string = new StringBuilder();
 				Map<String, Integer> featureMap = new HashMap<String, Integer>();
 				int i = 1;
-				for (String name : model.getFeatureNames()) {
+				for (String name : Functional.toList(FeatureUtils.extractFeatureNames(model.getFeatures()))) {
 					featureMap.put(name, i);
 					string.append("c ");
 					string.append(i);

@@ -23,8 +23,8 @@ package de.ovgu.featureide.fm.core.job;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 
-import de.ovgu.featureide.fm.core.functional.FunctionalInterfaces;
-import de.ovgu.featureide.fm.core.functional.FunctionalInterfaces.IFunction;
+import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
 
 /**
  * Control object for {@link IJob}s.
@@ -90,7 +90,7 @@ public final class WorkMonitor {
 	}
 
 	public void setIntermediateFunction(IFunction<Object, Void> intermediateFunction) {
-		this.intermediateFunction = (intermediateFunction != null) ? intermediateFunction : new FunctionalInterfaces.NullFunction<Object, Void>();
+		this.intermediateFunction = (intermediateFunction != null) ? intermediateFunction : new Functional.NullFunction<Object, Void>();
 	}
 	
 	public void invoke(Object t) {

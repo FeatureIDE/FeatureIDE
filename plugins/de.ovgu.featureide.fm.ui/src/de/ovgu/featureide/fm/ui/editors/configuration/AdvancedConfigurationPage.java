@@ -87,7 +87,7 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 
 			gc.dispose();
 
-			if (feature.isRoot()) {
+			if (feature.getStructure().isRoot()) {
 				image1.dispose();
 			}
 
@@ -98,16 +98,16 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 	}
 
 	private static Image getConnectionImage(IFeature feature) {
-		if (!feature.isRoot()) {
-			if (feature.getParent() != null) {
-				if (feature.getParent().isOr()) {
+		if (!feature.getStructure().isRoot()) {
+			if (feature.getStructure().getParent() != null) {
+				if (feature.getStructure().getParent().isOr()) {
 					return IMG_OR;
 				}
-				if (feature.getParent().isAlternative()) {
+				if (feature.getStructure().getParent().isAlternative()) {
 					return IMG_XOR;
 				}
 			}
-			if (feature.isMandatory()) {
+			if (feature.getStructure().isMandatory()) {
 				return IMG_MANDATORY;
 			}
 			return IMG_OPTIONAL;

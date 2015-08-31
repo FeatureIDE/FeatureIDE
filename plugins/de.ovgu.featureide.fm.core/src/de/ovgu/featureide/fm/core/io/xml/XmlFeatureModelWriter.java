@@ -35,6 +35,7 @@ import java.io.StringWriter;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -60,8 +61,10 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Text;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
 
 /**
@@ -94,27 +97,27 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter implements
     	Element calculations = doc.createElement(CALCULATIONS);
     	Element comments = doc.createElement(COMMENTS);
     	Element order = doc.createElement(FEATURE_ORDER);
-    	root.setAttribute(CHOSEN_LAYOUT_ALGORITHM, ""+featureModel.getLayout().getLayoutAlgorithm());
+    	root.setAttribute(CHOSEN_LAYOUT_ALGORITHM, ""+featureModel.getGraphicRepresenation().getLayout().getLayoutAlgorithm());
     	
-    	if(featureModel.getLayout().verticalLayout() && !featureModel.getLayout().hasFeaturesAutoLayout()){
+    	if(featureModel.getGraphicRepresenation().getLayout().verticalLayout() && !featureModel.getGraphicRepresenation().getLayout().hasFeaturesAutoLayout()){
     		root.setAttribute(HORIZONTAL_LAYOUT, TRUE);
 		}
-    	if(!featureModel.getLayout().showHiddenFeatures()){
+    	if(!featureModel.getGraphicRepresenation().getLayout().showHiddenFeatures()){
     		root.setAttribute(SHOW_HIDDEN_FEATURES, FALSE);
     	}
     	
     	doc.appendChild(root);
     	root.appendChild(struct);
-    	createXmlDocRec(doc, struct, featureModel.getRoot());
+    	createXmlDocRec(doc, struct, featureModel.getStructure().getRoot().getFeature());
     	
     	root.appendChild(constraints);
     	for(int i = 0; i < featureModel.getConstraints().size(); i++){
         	Element rule;
         	rule = doc.createElement(RULE);
-        	if(!featureModel.getLayout().hasFeaturesAutoLayout()){
+        	if(!featureModel.getGraphicRepresenation().getLayout().hasFeaturesAutoLayout()){
         		   rule.setAttribute(COORDINATES, 
-                   		""+featureModel.getConstraints().get(i).getLocation().x+"," 
-                   		+" "+featureModel.getConstraints().get(i).getLocation().y);
+                   		""+featureModel.getConstraints().get(i).getGraphicRepresenation().getLocation().x+"," 
+                   		+" "+featureModel.getConstraints().get(i).getGraphicRepresenation().getLocation().y);
         	}
          
            
@@ -143,7 +146,7 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter implements
 	    	Collection<String> featureOrderList = featureModel.getFeatureOrderList();
 	    	
 	    	if (featureOrderList.isEmpty())
-	    		featureOrderList = featureModel.getConcreteFeatureNames();
+	    		featureOrderList = FeatureUtils.extractConcreteFeaturesAsStringList(featureModel);
 	    	
 	    	for(String featureName : featureOrderList){
 	    		Element feature = doc.createElement(FEATURE);
@@ -152,7 +155,7 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter implements
 	    	}
     	}
     }
-    
+   
     /**
      * Creates document based on feature model step by step
      * @param doc document to write
@@ -164,9 +167,9 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter implements
     	if (feat == null) return;
     	
     	Element fnod;
-    	LinkedList<IFeature> children;
+    	List<IFeature> children;
     	
-    	children = feat.getChildren();
+    	children = FeatureUtils.convertToFeatureList(feat.getStructure().getChildren());
     	if (children.isEmpty()) {
     		fnod = doc.createElement(FEATURE);
     		String description = feat.getProperty().getDescription();
@@ -177,11 +180,11 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter implements
 	    	}
     		writeAttributes(node, fnod, feat);
     	} else {
-    		if (feat.isAnd()) {
+    		if (feat.getStructure().isAnd()) {
     			fnod = doc.createElement(AND);
-    		} else if (feat.isOr()) {
+    		} else if (feat.getStructure().isOr()) {
     			fnod = doc.createElement(OR);
-    		} else if (feat.isAlternative()) {
+    		} else if (feat.getStructure().isAlternative()) {
     			fnod = doc.createElement(ALT);
 	    	} else {
 	    		fnod = doc.createElement(UNKNOWN);//FMCorePlugin.getDefault().logInfo("creatXMlDockRec: Unexpected error!");
@@ -204,13 +207,13 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter implements
     
     private void writeAttributes(Element node, Element fnod, IFeature feat) {
     	fnod.setAttribute(NAME, feat.getName());
-		if(feat.isHidden())		fnod.setAttribute(HIDDEN, TRUE);
-    	if(feat.isMandatory())	fnod.setAttribute(MANDATORY, TRUE);
-    	if(feat.isAbstract())	fnod.setAttribute(ABSTRACT, TRUE);
+		if(feat.getStructure().isHidden())		fnod.setAttribute(HIDDEN, TRUE);
+    	if(feat.getStructure().isMandatory())	fnod.setAttribute(MANDATORY, TRUE);
+    	if(feat.getStructure().isAbstract())	fnod.setAttribute(ABSTRACT, TRUE);
     	
-    	if(!featureModel.getLayout().showHiddenFeatures() || !featureModel.getLayout().hasFeaturesAutoLayout()) {
-    		fnod.setAttribute(COORDINATES, +feat.getLocation().x
-    				+", "+feat.getLocation().y);
+    	if(!featureModel.getGraphicRepresenation().getLayout().showHiddenFeatures() || !featureModel.getGraphicRepresenation().getLayout().hasFeaturesAutoLayout()) {
+    		fnod.setAttribute(COORDINATES, +feat.getGraphicRepresenation().getLocation().x
+    				+", "+feat.getGraphicRepresenation().getLocation().y);
     	}
     	node.appendChild(fnod);
     }

@@ -67,7 +67,7 @@ public class ModelLayoutEditPolicy extends LayoutEditPolicy {
 			if (featureModel instanceof ExtendedFeatureModel) {
 				IFeature feature = ((FeatureEditPart) child).getFeature();
 				if (feature instanceof ExtendedFeature && ((ExtendedFeature) feature).isFromExtern()) {
-					if (feature.getFeatureModel().getLayout().getLayoutAlgorithm() != 0) {
+					if (feature.getFeatureModel().getGraphicRepresenation().getLayout().getLayoutAlgorithm() != 0) {
 						return null;
 					}
 				}
@@ -98,7 +98,7 @@ public class ModelLayoutEditPolicy extends LayoutEditPolicy {
 			} else if (editPart instanceof ConstraintEditPart) {
 				IConstraint constraint = ((ConstraintEditPart) editPart).getConstraintModel();
 
-				if (featureModel.getLayout().hasFeaturesAutoLayout()) {
+				if (featureModel.getGraphicRepresenation().getLayout().hasFeaturesAutoLayout()) {
 					Point point = r.getLocation().getCopy();
 					getHostFigure().translateToRelative(point);
 					cmd = new ConstraintDragAndDropCommand(featureModel, constraint, point);

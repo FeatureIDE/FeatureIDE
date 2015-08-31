@@ -43,7 +43,7 @@ public class FeatureSetHiddenOperation extends AbstractFeatureModelOperation {
 	}
 
 	private static String getLabel(IFeature feature) {
-		if (feature.isHidden()) {
+		if (feature.getStructure().isHidden()) {
 			return LABEL_NOT_HIDDEN;
 		} else {
 			return LABEL_HIDDEN;
@@ -52,7 +52,7 @@ public class FeatureSetHiddenOperation extends AbstractFeatureModelOperation {
 
 	@Override
 	protected void redo() {
-		feature.setHidden(!feature.isHidden());
+		feature.getStructure().setHidden(!feature.getStructure().isHidden());
 	}
 
 	@Override

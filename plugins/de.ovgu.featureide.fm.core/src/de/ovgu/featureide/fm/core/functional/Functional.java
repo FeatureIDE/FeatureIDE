@@ -21,8 +21,10 @@
 package de.ovgu.featureide.fm.core.functional;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import de.ovgu.featureide.fm.core.filter.base.IFilter;
 
@@ -31,7 +33,7 @@ import de.ovgu.featureide.fm.core.filter.base.IFilter;
  * 
  * @author Marcus Pinnecke
  */
-public abstract class FunctionalInterfaces {
+public abstract class Functional {
 
 	/**
 	 * Represents a function that takes one argument of type <b>T</b> and returns a result of type <b>R</b>.
@@ -101,7 +103,7 @@ public abstract class FunctionalInterfaces {
 	};
 
 	/**
-	 * Implements an iterable iterator that invokes a user-defined {@link FunctionalInterfaces.IFunction Function} <i>f</i> of type <b>T</b> and <b>U</b> on
+	 * Implements an iterable iterator that invokes a user-defined {@link Functional.IFunction Function} <i>f</i> of type <b>T</b> and <b>U</b> on
 	 * each
 	 * element that is yield by a user provided iterator <i>i</i> of type <b>T</b>. Since this is implemented using iterator logic, the application of <i>f</i>
 	 * on the entire
@@ -117,7 +119,7 @@ public abstract class FunctionalInterfaces {
 		private final Iterator<T> collectionIterator;
 
 		/**
-		 * An iterable iterator that invokes a user-defined {@link FunctionalInterfaces.IFunction Function} of type <b>T</b> and <b>U</b> on
+		 * An iterable iterator that invokes a user-defined {@link Functional.IFunction Function} of type <b>T</b> and <b>U</b> on
 		 * each element providing by the iterator of <b>it</b> over type <b>T</b> and returns the modified element afterwards. It is guaranteed not to remove
 		 * any element from <b>it</b> during this process.
 		 * 
@@ -286,6 +288,27 @@ public abstract class FunctionalInterfaces {
 	 */
 	public static <T> List<T> toList(final Iterable<T> source) {
 		ArrayList<T> retval = new ArrayList<T>();
+		for (T t : source) {
+			retval.add(t);
+		}
+		return retval;
+	}
+	
+	/**
+	 * Converts the iterator <i>i</i> of type <b>T</b> into an set of type <b>T</b> by adding each element of <i>i</i> to the result set. <br/>
+	 * <br/>
+	 * It is guaranteed not to remove any element from the iterator. <br/>
+	 * <br/>
+	 * This is a <b>blocking</b> operation.
+	 * 
+	 * @param source Source of elements
+	 * @return A list of object that were yielded by <b>source</b>
+	 * 
+	 * @author Marcus Pinnecke
+	 * @since 2.7.5
+	 */
+	public static <T> Set<T> toSet(final Iterable<T> source) {
+		HashSet<T> retval = new HashSet<T>();
 		for (T t : source) {
 			retval.add(t);
 		}

@@ -27,7 +27,9 @@ import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.gef.commands.Command;
 import org.eclipse.ui.PlatformUI;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureRenamingOperation;
 
@@ -55,7 +57,7 @@ public class FeatureRenamingCommand extends Command {
 	public boolean canExecute() {
 		if (newName == null)
 			return false;
-		if (featureModel.getFeatureNames().contains(newName))
+		if (Functional.toList(FeatureUtils.extractFeatureNames(featureModel.getFeatures())).contains(newName))
 			return false;
 		return featureModel.getFMComposerExtension().isValidFeatureName(newName);
 	}

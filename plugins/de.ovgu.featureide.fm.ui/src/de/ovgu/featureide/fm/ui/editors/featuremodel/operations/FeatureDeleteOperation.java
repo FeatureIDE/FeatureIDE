@@ -59,7 +59,7 @@ public class FeatureDeleteOperation extends AbstractFeatureModelOperation {
 	@Override
 	protected void redo() {
 		feature = featureModel.getFeature(feature.getName());
-		oldParent = feature.getParent();
+		oldParent = feature.getStructure().getParent().getFeature();
 		if (oldParent != null) {
 			oldIndex = oldParent.getStructure().getChildIndex(feature.getStructure());
 		}
@@ -79,8 +79,8 @@ public class FeatureDeleteOperation extends AbstractFeatureModelOperation {
 		}
 
 		oldChildren = oldChildrenCopy;
-		if (feature == featureModel.getRoot()) {
-			featureModel.replaceRoot(featureModel.getRoot().removeLastChild());
+		if (feature == featureModel.getStructure().getRoot()) {
+			featureModel.getStructure().replaceRoot(featureModel.getStructure().getRoot().removeLastChild());
 			deleted = true;
 		} else {
 			deleted = featureModel.deleteFeature(feature);
@@ -111,8 +111,8 @@ public class FeatureDeleteOperation extends AbstractFeatureModelOperation {
 			for (IFeature f : oldChildren) {
 				if (!f.getName().equals(feature.getName())) {
 					IFeature child = featureModel.getFeature(f.getName());
-					if (child != null && child.getParent() != null) {
-						child.getParent().removeChild(child);
+					if (child != null && child.getStructure().getParent() != null) {
+						child.getStructure().getParent().removeChild(child.getStructure());
 					}
 					oldChildrenCopy.add(child);
 				}
@@ -124,7 +124,7 @@ public class FeatureDeleteOperation extends AbstractFeatureModelOperation {
 			if (oldParent != null) {
 				oldParent.getStructure().addChildAtPosition(oldIndex, feature.getStructure());
 			} else {
-				featureModel.setRoot(feature);
+				featureModel.getStructure().setRoot(feature.getStructure());
 			}
 			featureModel.addFeature(feature);
 

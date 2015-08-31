@@ -52,7 +52,7 @@ public class VerticalLayout2 extends FeatureDiagramLayoutManager {
 	@Override
 	public void layoutFeatureModel(IFeatureModel featureModel) {
 		this.xoffset = 0;
-		LayoutableFeature root = new LayoutableFeature(featureModel.getRoot(), showHidden);
+		LayoutableFeature root = new LayoutableFeature(featureModel.getStructure().getRoot(), showHidden);
 		layout(root);
 		centerLayoutX(featureModel);
 		layout(yoffset, featureModel.getConstraints());

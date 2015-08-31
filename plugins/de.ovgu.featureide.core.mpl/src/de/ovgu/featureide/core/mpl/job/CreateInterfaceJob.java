@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -42,6 +43,7 @@ import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -80,7 +82,7 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 
 		String projectName = arguments.featureProject.getProjectName();
 		String interfaceName = "I" + projectName;
-		newFeatureModel.getRoot().setName(interfaceName);
+		newFeatureModel.getStructure().getRoot().getFeature().setName(interfaceName);
 
 		VelvetFeatureModelWriter modelWriter = new VelvetFeatureModelWriter(newFeatureModel, true);
 		String interfaceContent = modelWriter.writeToString();
@@ -118,7 +120,7 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 		// Calculate Constraints
 		IFeatureModel m = orgFeatureModel.clone(null);		
 		for (IFeature feat : m.getFeatures()) {
-			feat.setAbstract(!selectedFeatureNames.contains(feat.getName()));
+			feat.getStructure().setAbstract(!selectedFeatureNames.contains(feat.getName()));
         }
 		workMonitor.setMaxAbsoluteWork(3);
 		Node nodes = NodeCreator.createNodes(m, false);
@@ -136,9 +138,9 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
             }
         }
         
-        IFeature root = m.getRoot();
+        IFeature root = m.getStructure().getRoot().getFeature();
 
-        m.setRoot(null);
+        m.getStructure().setRoot(null);
         m.reset();
         
         // set new abstract root
@@ -161,17 +163,17 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
         featureStack.push(nroot);
         while (!featureStack.isEmpty()) {
         	IFeature curFeature = featureStack.pop();
-        	for (IFeature feature : curFeature.getChildren()) {
+        	for (IFeature feature : FeatureUtils.convertToFeatureList(curFeature.getStructure().getChildren())) {
 				featureStack.push(feature);
 			}
         	if (curFeature.getName().startsWith(MARK1)) {
         		curFeature.setName("_Abstract_" + count++);
-        		curFeature.setAbstract(true);
+        		curFeature.getStructure().setAbstract(true);
         	}
         	featureTable.put(curFeature.getName(), curFeature);
         }
         m.setFeatureTable(featureTable);
-        m.setRoot(nroot);
+        m.getStructure().setRoot(nroot.getStructure());
         
         if (cnf instanceof And) {
         	final Node[] children = cnf.getChildren();
@@ -206,9 +208,9 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 	private static int getGroup(IFeature f) {
 		if (f == null) {
 			return GROUP_NO;
-		} else if (f.isAnd()) {
+		} else if (f.getStructure().isAnd()) {
 			return GROUP_AND;
-		} else if (f.isOr()) {
+		} else if (f.getStructure().isOr()) {
 			return GROUP_OR;
 		} else {
 			return GROUP_ALT;
@@ -216,11 +218,11 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 	}
 	
 	private void merge(IFeature curFeature, int parentGroup) {
-        if (!curFeature.hasChildren()) {
+        if (!curFeature.getStructure().hasChildren()) {
         	return;
         }
         int curFeatureGroup = getGroup(curFeature);
-		LinkedList<IFeature> list = new LinkedList<IFeature>(curFeature.getChildren());
+		LinkedList<IFeature> list = new LinkedList<IFeature>(FeatureUtils.convertToFeatureList(curFeature.getStructure().getChildren()));
         for (IFeature child : list) {
             merge(child, curFeatureGroup);
 	        curFeatureGroup = getGroup(curFeature);
@@ -232,14 +234,14 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 			} else {
 				switch (parentGroup) {
 				case GROUP_AND:
-					IFeature parent = curFeature.getParent();
-					if (parent.getChildrenCount() == 1) {
+					IFeature parent = curFeature.getStructure().getParent().getFeature();
+					if (parent.getStructure().getChildrenCount() == 1) {
 						switch (curFeatureGroup) {
 						case GROUP_OR:
-							parent.setOr();
+							parent.getStructure().setOr();
 							break;
 						case GROUP_ALT:
-							parent.setAlternative();
+							parent.getStructure().setAlternative();
 							break;
 						}
 						deleteFeature(curFeature);
@@ -249,7 +251,7 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 					if (curFeatureGroup == GROUP_AND) {
 						boolean allOptional = true;
 						for (IFeature child : list) {
-							if (child.isMandatory()) {
+							if (child.getStructure().isMandatory()) {
 								allOptional = false;
 								break;
 							}
@@ -271,7 +273,7 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 	
 	private void deleteFeature(IFeature curFeature) {
 		IFeature parent = curFeature.getStructure().getParent().getFeature();
-        LinkedList<IFeatureStructure> list = curFeature.getStructure().getChildren();
+        List<IFeatureStructure> list = curFeature.getStructure().getChildren();
 		parent.getStructure().removeChild(curFeature.getStructure());
 		changed = true;
 		for (IFeatureStructure child : list) {
@@ -283,7 +285,7 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 	private static boolean cut(IFeature curFeature) {
         boolean notSelected = curFeature.getName().equals(MARK1);
         
-		LinkedList<IFeature> list = curFeature.getChildren();
+		List<IFeature> list = FeatureUtils.convertToFeatureList(curFeature.getStructure().getChildren());
         if (list.isEmpty()) {
         	return notSelected;
         } else {
@@ -301,35 +303,35 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
                 IFeature feat = it.next();
                 if (remove[i]) {
                 	it.remove();
-                	feat.setParent(null);
+                	feat.getStructure().setParent(null);
                 	removeCount++;
 //    				changed = true;
                 }
             }
 			if (list.isEmpty()) {
-    			curFeature.setAnd();
+    			curFeature.getStructure().setAnd();
 				return notSelected;
     		} else {
     			switch (getGroup(curFeature)) {
     			case GROUP_OR:
     				if (removeCount > 0) {
-    					curFeature.setAnd();
+    					curFeature.getStructure().setAnd();
         				for (IFeature child : list) {
-        	    			child.setMandatory(false);
+        	    			child.getStructure().setMandatory(false);
         				}
     				} else if (list.size() == 1) {
-    					curFeature.setAnd();
+    					curFeature.getStructure().setAnd();
         				for (IFeature child : list) {
-        	    			child.setMandatory(true);
+        	    			child.getStructure().setMandatory(true);
         				}
     				}
     				break;
     			case GROUP_ALT:
     				if (removeCount > 0) {
     					if (list.size() == 1) {
-        					curFeature.setAnd();
+        					curFeature.getStructure().setAnd();
             				for (IFeature child : list) {
-            	    			child.setMandatory(false);
+            	    			child.getStructure().setMandatory(false);
             				}
         				} else {
             				IFeature pseudoAlternative = FeatureModelFactory.getInstance().createFeature(curFeature.getFeatureModel(), MARK2);

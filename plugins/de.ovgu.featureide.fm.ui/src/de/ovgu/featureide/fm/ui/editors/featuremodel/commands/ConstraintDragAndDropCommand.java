@@ -55,7 +55,7 @@ public class ConstraintDragAndDropCommand extends Command {
 		this.constraint = constraint;
 		this.newLocation = newLocation;
 		isLastPos = false;
-		this.hasAutoLayout = featureModel.getLayout().hasFeaturesAutoLayout();
+		this.hasAutoLayout = featureModel.getGraphicRepresenation().getLayout().hasFeaturesAutoLayout();
 	}
 
 	public boolean canExecute() {

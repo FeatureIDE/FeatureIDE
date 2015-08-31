@@ -29,6 +29,7 @@ import java.util.List;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -59,9 +60,9 @@ public class FmTreeContentProvider implements ITreeContentProvider {
 	@Override
 	public Object[] getElements(Object inputElement) {
 		Object[] elements;
-		if (fModel != null && fModel.getRoot() != null) {
+		if (fModel != null && fModel.getStructure().getRoot() != null) {
 			elements = new Object[2];
-			elements[0] = fModel.getRoot();
+			elements[0] = fModel.getStructure().getRoot();
 			elements[1] = CONSTRAINTS;
 			return elements;
 		}
@@ -87,15 +88,15 @@ public class FmTreeContentProvider implements ITreeContentProvider {
 		// we store the group stage into an extra object in order to be able to
 		// show an own element for GroupStages
 		if (parentElement instanceof FmOutlineGroupStateStorage) {
-			return featureListToArray(((FmOutlineGroupStateStorage) parentElement).getFeature().getChildren());
+			return featureListToArray(FeatureUtils.convertToFeatureList(((FmOutlineGroupStateStorage) parentElement).getFeature().getStructure().getChildren()));
 		}
 
 		if (!(parentElement instanceof IFeature))
 			return null;
-		if (!((IFeature) parentElement).hasChildren())
+		if (!((IFeature) parentElement).getStructure().hasChildren())
 			return null;
 
-		return featureListToArray(((IFeature) parentElement).getChildren());
+		return featureListToArray(FeatureUtils.convertToFeatureList(((IFeature) parentElement).getStructure().getChildren()));
 	}
 
 	/**
@@ -105,7 +106,7 @@ public class FmTreeContentProvider implements ITreeContentProvider {
 	 *            FeatureList
 	 * @return Array of Features
 	 */
-	private IFeature[] featureListToArray(LinkedList<IFeature> f) {
+	private IFeature[] featureListToArray(List<IFeature> f) {
 		IFeature[] fArray = new IFeature[f.size()];
 		for (int i = 0; i < f.size(); i++) {
 			fArray[i] = f.get(i);
@@ -116,7 +117,7 @@ public class FmTreeContentProvider implements ITreeContentProvider {
 	@Override
 	public Object getParent(Object element) {
 		if (element instanceof IFeature)
-			return ((IFeature) element).getParent();
+			return ((IFeature) element).getStructure().getParent();
 		else if (element instanceof IConstraint)
 			return CONSTRAINTS;
 		else if (element instanceof FmOutlineGroupStateStorage)
@@ -128,7 +129,7 @@ public class FmTreeContentProvider implements ITreeContentProvider {
 	@Override
 	public boolean hasChildren(Object element) {
 		if (element instanceof IFeature)
-			return ((IFeature) element).hasChildren();
+			return ((IFeature) element).getStructure().hasChildren();
 		else if (element instanceof FmOutlineGroupStateStorage)
 			return true;
 		else if (element instanceof String)

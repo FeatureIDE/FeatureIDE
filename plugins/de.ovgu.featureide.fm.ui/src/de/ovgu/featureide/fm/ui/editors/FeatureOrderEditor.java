@@ -54,6 +54,7 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationWriter;
@@ -348,8 +349,8 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	private void defaultFeatureList() {
 		featurelist.removeAll();
 
-		if (featureModelEditor.featureModel != null && featureModelEditor.featureModel.getRoot() != null) {
-			for (String featureName : featureModelEditor.featureModel.getConcreteFeatureNames()) {
+		if (featureModelEditor.featureModel != null && featureModelEditor.featureModel.getStructure().getRoot() != null) {
+			for (String featureName : FeatureUtils.extractConcreteFeaturesAsStringList(featureModelEditor.featureModel)) {
 				featurelist.add(featureName);
 			}
 		}
@@ -362,8 +363,8 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	 */
 	private boolean updateFeatureList() {
 		boolean changed = false;
-		if (featureModelEditor.featureModel != null && featureModelEditor.featureModel.getRoot() != null) {
-			HashSet<String> featureSet = new HashSet<String>(featureModelEditor.featureModel.getConcreteFeatureNames());
+		if (featureModelEditor.featureModel != null && featureModelEditor.featureModel.getStructure().getRoot() != null) {
+			HashSet<String> featureSet = new HashSet<String>(FeatureUtils.extractConcreteFeaturesAsStringList(featureModelEditor.featureModel));
 
 			int itemcount = featurelist.getItemCount();
 			for (int i = 0; i < itemcount; i++) {
@@ -416,7 +417,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 
 			Collection<String> list = featureModelEditor.featureModel.getFeatureOrderList();
 			if (list.isEmpty()) {
-				list = featureModelEditor.featureModel.getConcreteFeatureNames(); // set
+				list = FeatureUtils.extractConcreteFeaturesAsStringList(featureModelEditor.featureModel); // set
 																					// default
 																					// values
 			}

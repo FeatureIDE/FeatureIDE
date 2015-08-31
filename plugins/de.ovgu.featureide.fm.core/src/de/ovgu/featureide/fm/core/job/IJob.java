@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.job;
 
-import de.ovgu.featureide.fm.core.functional.FunctionalInterfaces.IFunction;
+import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 
 /**

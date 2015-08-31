@@ -76,8 +76,8 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 	protected synchronized void parseInputStream(final InputStream inputStream)
 			throws UnsupportedModelException {
 		featureModel.reset();
-		featureModel.getLayout().showHiddenFeatures(true);
-		featureModel.getLayout().verticalLayout(false);
+		featureModel.getGraphicRepresenation().getLayout().showHiddenFeatures(true);
+		featureModel.getGraphicRepresenation().getLayout().verticalLayout(false);
 		Document  doc = null;
 		try {
 			doc = PositionalXMLReader.readXML(inputStream);
@@ -127,20 +127,20 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 	private void setFeatureModelAttributes(Element eElement) {
 		String algorithm = eElement.getAttribute(CHOSEN_LAYOUT_ALGORITHM);
 		if (!algorithm.equals("")) {
-			featureModel.getLayout().setLayout(
+			featureModel.getGraphicRepresenation().getLayout().setLayout(
 					Integer.parseInt(algorithm));
 		}
 		String layout = eElement.getAttribute(HORIZONTAL_LAYOUT);
 		if (layout.equals(TRUE)) {
-			featureModel.getLayout().verticalLayout(false);
+			featureModel.getGraphicRepresenation().getLayout().verticalLayout(false);
 		} else if (layout.equals(FALSE)) {
-			featureModel.getLayout().verticalLayout(true);
+			featureModel.getGraphicRepresenation().getLayout().verticalLayout(true);
 		}
 		String showHidden = eElement.getAttribute(SHOW_HIDDEN_FEATURES);
 		if (showHidden.equals(TRUE)) {
-			featureModel.getLayout().showHiddenFeatures(true);
+			featureModel.getGraphicRepresenation().getLayout().showHiddenFeatures(true);
 		} else if (showHidden.equals(FALSE)) {
-			featureModel.getLayout().showHiddenFeatures(false);
+			featureModel.getGraphicRepresenation().getLayout().showHiddenFeatures(false);
 		}
 	}
 
@@ -224,7 +224,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 			f.getStructure().setMandatory(mandatory);
 			f.getStructure().setHidden(hidden);
 			if (featureLocation != null) {
-				f.etNewLocation(featureLocation);
+				f.getGraphicRepresenation().setNewLocation(featureLocation);
 			}
 			featureModel.addFeature(f);
 			if (parent == null) {
@@ -257,7 +257,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 								String subStringX = attributeValue.substring(0, attributeValue.indexOf(", "));
 								String subStringY = attributeValue.substring(attributeValue.indexOf(", ")+2);
 								try {
-									c.setLocation(new FMPoint(Integer.parseInt (subStringX),
+									c.getGraphicRepresenation().setLocation(new FMPoint(Integer.parseInt (subStringX),
 												Integer.parseInt (subStringY)));
 								} catch (NumberFormatException error) {
 									throwError(error.getMessage() + IS_NO_VALID_INTEGER_VALUE, child);

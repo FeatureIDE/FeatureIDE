@@ -56,7 +56,7 @@ public class FMPrintAction extends PrintAction {
 			return;
 		FeatureModelEditor fmEditor = (FeatureModelEditor) this.getWorkbenchPart();
 		IFeatureModel featureModel = fmEditor.getFeatureModel();
-		FeatureModelLayout layout = featureModel.getLayout();
+		FeatureModelLayout layout = featureModel.getGraphicRepresenation().getLayout();
 		int layoutOld = layout.getLayoutAlgorithm();
 
 		Collection<IFeature> features = featureModel.getFeatures();

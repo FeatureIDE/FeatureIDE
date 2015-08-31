@@ -51,5 +51,7 @@ public interface IFeature extends PropertyChangeListener {
 	void removeListener(PropertyChangeListener listener);
 
 	void setName(String name);
+	
+	IGraphicalFeature getGraphicRepresenation(); // Added, Marcus Pinnecke 31.08.15
 
 }

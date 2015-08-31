@@ -57,7 +57,7 @@ public class XmlColorModelWriter extends XmlFeatureModelWriter {
     	Element colorSchemesRoot = doc.createElement("colorSchemes");
     	Element featuresRoot = doc.createElement(FEATURES);
 
-    	ColorschemeTable colorschemeTable = featureModel.getColorschemeTable();
+    	ColorschemeTable colorschemeTable = featureModel.getGraphicRepresenation().getColorschemeTable();
     	List<String> csNames = colorschemeTable.getColorschemeNames();
     	for (String name : csNames) {
     		Element colorSchemesElement = doc.createElement(COLORSCHEME);
@@ -71,7 +71,7 @@ public class XmlColorModelWriter extends XmlFeatureModelWriter {
     	root.appendChild(colorSchemesRoot);
     	
 		for (IFeature feat : featureModel.getFeatures()) {
-			ColorList colors = feat.getColorList();
+			ColorList colors = feat.getGraphicRepresenation().getColorList();
 
 			boolean noColor = true;
 			Element featuresElement = null;
