@@ -20,18 +20,18 @@
  */
 package de.ovgu.featureide.ui.projectExplorer;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.jdt.ui.ISharedImages;
 import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.jdt.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.annotation.ColorPalette;
@@ -47,19 +47,61 @@ import de.ovgu.featureide.ui.UIPlugin;
  */
 
 public class DrawImageForProjectExplorer {
-	public static final String ID = UIPlugin.PLUGIN_ID + ".editors.JavaEditor";
-	private static final Image JAVA_IMAGE = UIPlugin
-			.getImage("JakFileIcon.png");
-
-	public enum ExplorerObject {
-		FILE, FOLDER, PACKAGE;
-	}
 	
+	private static final int NRUMBER_OF_COLORS = 10;
+	private static final Image JAVA_IMAGE = UIPlugin.getImage("JakFileIcon.png");
+	private static final Image FOLDER_IMAGE = PlatformUI.getWorkbench().getSharedImages().getImage(org.eclipse.ui.ISharedImages.IMG_OBJ_FOLDER);
+	private static final Image PACKAGE_IMAGE = JavaUI.getSharedImages().getImage(ISharedImages.IMG_OBJS_PACKAGE);
+
+	private static final Device DEVICE = FOLDER_IMAGE.getDevice();
+	private static final int ICON_HEIGHT = FOLDER_IMAGE.getBounds().height;
+	private static final int ICON_WIDTH = FOLDER_IMAGE.getBounds().width;
+
 	/**
 	 * constant for the width of the single colorImage
 	 */
-	final static int WIDTHCONSTANT = 4;
-
+	private final static int COLOR_IMAGE_WIDTH = FOLDER_IMAGE.getBounds().width / 4 + 1;
+	private final static Image WHITESPACE_IMAGE;
+	static {
+		ImageData imageData = FOLDER_IMAGE.getImageData();
+		Image finalImage = new Image(DEVICE, COLOR_IMAGE_WIDTH, imageData.height);
+		org.eclipse.swt.graphics.GC gc = new org.eclipse.swt.graphics.GC(finalImage);
+		gc.setForeground(new Color(DEVICE, 0, 0, 0));
+		gc.drawRectangle(0, 0, COLOR_IMAGE_WIDTH - 1, ICON_HEIGHT - 1);
+		gc.setBackground(new Color(DEVICE, 255, 255, 255));
+		gc.fillRectangle(1, 1, COLOR_IMAGE_WIDTH - 2, ICON_HEIGHT - 2);
+		gc.dispose();
+		WHITESPACE_IMAGE = finalImage;
+	}
+	
+	private final static Image[] COLOR_IMAGES = new Image[NRUMBER_OF_COLORS]; 
+	static {
+		final ImageData imageData = FOLDER_IMAGE.getImageData();
+		for (int i = 0; i < NRUMBER_OF_COLORS; i++) {
+			Image finalImage = new Image(DEVICE, COLOR_IMAGE_WIDTH, imageData.height);
+			org.eclipse.swt.graphics.GC gc = new org.eclipse.swt.graphics.GC(finalImage);
+			gc.setForeground(new Color(DEVICE, 0, 0, 0));
+			gc.setBackground(ColorPalette.getColor(i, 0.4f));
+			gc.fillRectangle(1, 1, COLOR_IMAGE_WIDTH - 2, ICON_HEIGHT - 2);
+			gc.drawRectangle(0, 0, COLOR_IMAGE_WIDTH - 1, ICON_HEIGHT - 1);
+			gc.dispose();
+			COLOR_IMAGES[i] = finalImage;
+		}
+	}
+	
+	public enum ExplorerObject {
+		FILE(1), FOLDER(2), PACKAGE(3);
+		
+		final int value;
+		
+		private ExplorerObject(int value) {
+			this.value = value;
+		}
+	}
+	
+	/**
+	 * Cache for generated images. 
+	 */
 	private final static Map<Integer, Image> images = new HashMap<Integer, Image>();
 
 	/**
@@ -68,71 +110,52 @@ public class DrawImageForProjectExplorer {
 	 * @return the image with the icon of the file, folder or package (explorerObject) and the color of the feature
 	 */
 	public static Image drawExplorerImage(ExplorerObject explorerObject, List<Integer> colors) {
-		Collections.sort(colors, 
-		new Comparator<Integer>() {
+		Collections.sort(colors, new Comparator<Integer>() {
 
 			@Override
 			public int compare(Integer i0, Integer i1) {
 				return i0.compareTo(i1);
 			}
 		});
+		
 		// create hash value
-		switch (explorerObject) {
-		case FILE:
-			colors.add(1);
-			break;
-		case FOLDER:
-			colors.add(2);
-			break;
-		case PACKAGE:
-			colors.add(3);
-			break;
-		default:
-			throw new RuntimeException(explorerObject + " not implemented");
-		}
+		colors.add(explorerObject.value);
 		Integer hashCode = colors.hashCode();
 		if (images.containsKey(hashCode)) {
 			return images.get(hashCode);
 		}
 		colors.remove(colors.size() - 1);
 
-		Image dummyImage = PlatformUI.getWorkbench().getSharedImages().getImage(org.eclipse.ui.ISharedImages.IMG_OBJ_FOLDER);
-		Image finalImage = new Image(dummyImage.getDevice(), dummyImage.getImageData().width +42, dummyImage.getImageData().height);
-		ImageData data = null;
-		org.eclipse.swt.graphics.GC gc = new org.eclipse.swt.graphics.GC(finalImage);
+		Image finalImage = new Image(DEVICE, ICON_WIDTH + 1 + NRUMBER_OF_COLORS * COLOR_IMAGE_WIDTH - NRUMBER_OF_COLORS, ICON_HEIGHT);
 
-		ArrayList<Image> liste = new ArrayList<>();
 		Image icon = null;
 		switch (explorerObject) {
 		case FILE:
 			icon = JAVA_IMAGE;
 			break;
 		case FOLDER:
-			icon = PlatformUI.getWorkbench().getSharedImages().getImage(org.eclipse.ui.ISharedImages.IMG_OBJ_FOLDER);
+			icon = FOLDER_IMAGE;
 			break;
 		case PACKAGE:
-			icon = JavaUI.getSharedImages().getImage(ISharedImages.IMG_OBJS_PACKAGE);
+			icon = PACKAGE_IMAGE;
 			break;
+		default:
+			throw new RuntimeException(explorerObject + " not supported");
 		}
 
+		org.eclipse.swt.graphics.GC gc = new org.eclipse.swt.graphics.GC(finalImage);
 		gc.drawImage(icon, 0, 0);
-		liste.add(icon);
 		
 		for (int i = 0; i < 10; i++) {
 			if (colors.contains(i)) {
-				gc.drawImage(getColorImage(i), 17 + WIDTHCONSTANT * i, 0);
+				gc.drawImage(getColorImage(i), ICON_WIDTH + COLOR_IMAGE_WIDTH * i - i, 0);
 			} else {
-				gc.drawImage(getWhiteImage(), 17 + WIDTHCONSTANT * i, 0);
+				gc.drawImage(WHITESPACE_IMAGE, ICON_WIDTH + COLOR_IMAGE_WIDTH * i - i, 0);
 			}
 		}
-		gc.setForeground(new Color(liste.get(0).getDevice(), 0, 0, 0));
-		gc.drawLine(57, 0, 57, 21); //draws the last vertical line
-		gc.drawLine(17, 15, 57, 15);//draws the horizontal line
-		data = finalImage.getImageData();
 		gc.dispose();
-		Image image = new Image(liste.get(0).getDevice(), data);
-		images.put(hashCode, image);
-		return image;
+		images.put(hashCode, finalImage);
+		return finalImage;
 	}
 
 	/**
@@ -140,62 +163,24 @@ public class DrawImageForProjectExplorer {
 	 * @return the image for the featureHouseExplorer with the folderIcon as default and only one color
 	 */
 	public static Image drawFeatureHouseExplorerImage(List<Integer> colors) {
-		colors.add(2);
-		Integer hashCode = colors.hashCode();
+		colors.add(ExplorerObject.FOLDER.value);
+		final Integer hashCode = colors.hashCode();
 		if (images.containsKey(hashCode)) {
 			return images.get(hashCode);
 		}
 		colors.remove(colors.size() - 1);
 
-		Image dummyImage = PlatformUI.getWorkbench().getSharedImages().getImage(org.eclipse.ui.ISharedImages.IMG_OBJ_FOLDER);
-		Image finalImage = new Image(dummyImage.getDevice(), dummyImage.getImageData().width + 6, dummyImage.getImageData().height);
-		ImageData data = null;
+		Image finalImage = new Image(DEVICE, FOLDER_IMAGE.getImageData().width + COLOR_IMAGE_WIDTH + 2, FOLDER_IMAGE.getImageData().height);
 		org.eclipse.swt.graphics.GC gc = new org.eclipse.swt.graphics.GC(finalImage);
-
-		Image folderImage = PlatformUI.getWorkbench().getSharedImages().getImage(org.eclipse.ui.ISharedImages.IMG_OBJ_FOLDER);
-		gc.drawImage(folderImage, 0, 0);
-
+		gc.drawImage(FOLDER_IMAGE, 0, 0);
 		if (colors.get(0).equals(-1)) {
-			gc.drawImage(getWhiteImage(), 17, 0);
-			gc.setForeground(new Color(folderImage.getDevice(), 0, 0, 0));
-			gc.drawLine(21, 0, 21, 16);//draws the last vertical line
-			gc.drawLine(17, 15, 21, 15);//draws the horizontal line
-			data = finalImage.getImageData();
-			gc.dispose();
-			Image image = new Image(dummyImage.getDevice(), data);
-			images.put(hashCode, image);
-
-			return image;
+			gc.drawImage(WHITESPACE_IMAGE, ICON_WIDTH + 1, 0);
+		} else {
+			gc.drawImage(getColorImage(colors.get(0)), ICON_WIDTH + 1, 0);
 		}
-		gc.drawImage(getColorImage(colors.get(0)), 17, 0);
-		gc.setForeground(new Color(folderImage.getDevice(), 0, 0, 0));
-		gc.drawLine(21, 0, 21, 16);//draws the last vertical line
-		gc.drawLine(17, 15, 21, 15);//draws the horizontal line
-		data = finalImage.getImageData();
 		gc.dispose();
-		Image image = new Image(dummyImage.getDevice(), data);
-		images.put(hashCode, image);
-
-		return image;
-	}
-
-	/**
-	 * @return a white image, is needed to fill the parts, where no color is selected
-	 */
-	public static Image getWhiteImage() {
-		Image folderImage = PlatformUI.getWorkbench().getSharedImages().getImage(org.eclipse.ui.ISharedImages.IMG_OBJ_FOLDER);
-		Image finalImage = new Image(folderImage.getDevice(), folderImage.getImageData().width / 4, folderImage.getImageData().height);
-		ImageData data = null;
-		org.eclipse.swt.graphics.GC gc = new org.eclipse.swt.graphics.GC(finalImage);
-		gc.setForeground(new Color(folderImage.getDevice(), 0, 0, 0));
-		gc.drawRectangle(0, 0, folderImage.getImageData().width / 4, folderImage.getImageData().height);
-
-		gc.setBackground(new Color(folderImage.getDevice(), 255, 255, 255));
-		gc.fillRectangle(1, 1, (folderImage.getImageData().width / 4) - 1, (folderImage.getImageData().height) - 1);
-		data = finalImage.getImageData();
-		gc.dispose();
-		return new Image(finalImage.getDevice(), data);
-
+		images.put(hashCode, finalImage);
+		return finalImage;
 	}
 
 	/**
@@ -203,20 +188,8 @@ public class DrawImageForProjectExplorer {
 	 * @return a colored image with the original colors from
 	 *         de.ovgu.featureide.fm.core.annotation.ColorPalette
 	 */
-	public static Image getColorImage(int colorID) {
-		Image folderImage = PlatformUI.getWorkbench().getSharedImages().getImage(org.eclipse.ui.ISharedImages.IMG_OBJ_FOLDER);
-		Image finalImage = new Image(folderImage.getDevice(), folderImage.getImageData().width / 4, folderImage.getImageData().height);
-		ImageData data = null;
-		org.eclipse.swt.graphics.GC gc = new org.eclipse.swt.graphics.GC(finalImage);
-		gc.setForeground(new Color(folderImage.getDevice(), 0, 0, 0));
-		gc.drawRectangle(0, 0, folderImage.getImageData().width / 4, folderImage.getImageData().height);
-
-		gc.setBackground(ColorPalette.getColor(colorID, 0.4f));
-		gc.fillRectangle(1, 1, (folderImage.getImageData().width / 4) - 1, (folderImage.getImageData().height) - 1);
-		data = finalImage.getImageData();
-		gc.dispose();
-		return new Image(finalImage.getDevice(), data);
-
+	private static Image getColorImage(int colorID) {
+		return COLOR_IMAGES[colorID];
 	}
 
 }

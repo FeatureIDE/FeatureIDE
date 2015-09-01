@@ -57,6 +57,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
+import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
@@ -74,6 +75,7 @@ import de.ovgu.featureide.fm.core.annotation.LogService.LogLevel;
  * 
  * @author Sebastian Krieter
  */
+// TODO move to ui plugin
 public final class ColorAnnotationModel implements IAnnotationModel {
 
 	/** Key used to piggyback the model to the editors model. */
@@ -396,43 +398,45 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 
 		clear();
 
-		/*
-		 *COMPOSED FILE ANNOTATIONS
-		 */
 		if (file.getParent() instanceof IFolder) {
-
 			if (isInBuildFolder((IFolder) file.getParent())) {
-				composer.postCompile(null, file);
+				/* annotations for generated files */
+				FSTClass clazz = model.getClass(model.getAbsoluteClassName(file));
+				if (!clazz.hasComposedLines) {
+					clazz.hasComposedLines = true;
+					composer.postCompile(null, file);
+				}
 				for (FSTFeature fstFeature : model.getFeatures()) {
-					for (FSTRole role : fstFeature.getRoles()) {
-						for (FSTMethod m : role.getAllMethods()) {
-							createFOPComposedAnnotations(event, fstFeature, m);
-						}
-						for (FSTField f : role.getAllFields()) {
-							createFOPComposedAnnotations(event, fstFeature, f);
-						}
+					FSTRole role = clazz.getRole(fstFeature.getName());
+					if (role == null) {
+						continue;
+					}
+					for (FSTMethod m : role.getAllMethods()) {
+						createFOPComposedAnnotations(event, fstFeature, m);
+					}
+					for (FSTField f : role.getAllFields()) {
+						createFOPComposedAnnotations(event, fstFeature, f);
 					}
 				}
-			}
-		} else {
-			String featureName = getFeature((IFolder) file.getParent());
-			if (featureName != null) {
-				FSTFeature fstFeature = model.getFeature(featureName);
-				if (fstFeature != null) {
-					int color = fstFeature.getColor();
-
-					for (int line = 0; line < document.getNumberOfLines(); line++) {
+			} else {
+				/* annotations for source files */
+				String featureName = getFeature((IFolder) file.getParent());
+				if (featureName != null) {
+					FSTFeature fstFeature = model.getFeature(featureName);
+					if (fstFeature != null) {
 						// bar at the left of the editor
-						Position newPosition = new Position(document.getLineOffset(line), document.getLineLength(line));
-						ColorAnnotation cafh = new ColorAnnotation(color, newPosition, ColorAnnotation.TYPE_IMAGE);
-						cafh.setText(fstFeature.getName());
-						annotations.add(cafh);
-						event.annotationAdded(cafh);
+						final int color = fstFeature.getColor();
+						for (int line = 0; line < document.getNumberOfLines(); line++) {
+							Position position = new Position(document.getLineOffset(line), 1);
+							ColorAnnotation cafh = new ColorAnnotation(color, position, ColorAnnotation.TYPE_IMAGE);
+							cafh.setText(fstFeature.getName());
+							annotations.add(cafh);
+							event.annotationAdded(cafh);
+						}
 					}
 				}
 			}
 		}
-
 	}
 
 	/**

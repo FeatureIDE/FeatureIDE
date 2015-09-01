@@ -27,8 +27,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.AbstractCollection;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Scanner;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -65,7 +68,7 @@ public abstract class ErrorPropagation {
 	 * A list containing composed files. These files will be checked for
 	 * propagation.
 	 */
-	private final LinkedList<IFile> composedFiles = new LinkedList<IFile>();
+	private final Set<IFile> composedFiles = Collections.newSetFromMap(new ConcurrentHashMap<IFile, Boolean>());
 
 	/**
 	 * The main background job calling the corresponding error propagation class
@@ -108,20 +111,16 @@ public abstract class ErrorPropagation {
 	}
 
 	private void addComposedFile(IFile file) {
-		synchronized (composedFiles) {
-			if (!composedFiles.contains(file)) {
-				composedFiles.add(file);
-			}
-		}
+		composedFiles.add(file);
 	}
 
 	private IFile removeComposedFile() {
-		synchronized (composedFiles) {
-			if (composedFiles.isEmpty()) {
-				return null;
-			}
-			return composedFiles.remove();
+		if (composedFiles.isEmpty()) {
+			return null;
 		}
+		IFile file = composedFiles.iterator().next();
+		composedFiles.remove(file);
+		return file;
 	}
 
 	/**
@@ -132,6 +131,9 @@ public abstract class ErrorPropagation {
 	 *            The composed file
 	 */
 	public void addFile(IFile sourceFile) {
+		if (composedFiles.contains(sourceFile)) {
+			return;
+		}
 
 		final String fileExtension = sourceFile.getFileExtension();
 		if (fileExtension == null) {
@@ -142,19 +144,6 @@ public abstract class ErrorPropagation {
 
 			if (job.getState() == Job.NONE) {
 				job.schedule();
-				/*
-				 * waiting to get the job done (FOP only) 
-				 * used for ComposedLines
-				 */
-				if(force){
-					while(job.getState() != Job.NONE){
-						try {
-							Thread.sleep(10);
-						} catch (InterruptedException e) {
-							CorePlugin.getDefault().logError(e);
-						}
-					}
-				}
 			}
 		}
 	}
@@ -173,17 +162,15 @@ public abstract class ErrorPropagation {
 		}
 		monitor.beginTask(PROPAGATE_MARKERS_FOR, IProgressMonitor.UNKNOWN);
 
-		IFile file = removeComposedFile();
-		while (file != null) {
+		IFile file;
+		while ((file = removeComposedFile()) != null) {
 			if (monitor.isCanceled()) {
+				composedFiles.clear();
 				break;
 			}
 			monitor.subTask(file.getName());
-
 			propagateMarkers(file);
 			monitor.worked(1);
-
-			file = removeComposedFile();
 		}
 		monitor.done();
 	}
@@ -192,7 +179,7 @@ public abstract class ErrorPropagation {
 	 * Removes the not composed markers form the given source file and calls
 	 * <code>propagateMarkers(marker, file)</code>
 	 */
-	protected void propagateMarkers(IFile file) {//boolean force
+	protected void propagateMarkers(IFile file) {
 		if (!file.exists()) {
 			return;
 		}
