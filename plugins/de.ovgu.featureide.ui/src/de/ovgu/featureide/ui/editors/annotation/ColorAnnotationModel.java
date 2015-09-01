@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.core.annotation;
+package de.ovgu.featureide.ui.editors.annotation;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.CANT_CONNECT_TO_DIFFERENT_DOCUMENT_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CANT_DISCONNECT_FROM_DIFFERENT_DOCUMENT_;
@@ -66,7 +66,6 @@ import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.core.fstmodel.RoleElement;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.fm.core.ColorList;
-import de.ovgu.featureide.fm.core.annotation.ColorAnnotation;
 import de.ovgu.featureide.fm.core.annotation.LogService;
 import de.ovgu.featureide.fm.core.annotation.LogService.LogLevel;
 
@@ -75,7 +74,6 @@ import de.ovgu.featureide.fm.core.annotation.LogService.LogLevel;
  * 
  * @author Sebastian Krieter
  */
-// TODO move to ui plugin
 public final class ColorAnnotationModel implements IAnnotationModel {
 
 	/** Key used to piggyback the model to the editors model. */

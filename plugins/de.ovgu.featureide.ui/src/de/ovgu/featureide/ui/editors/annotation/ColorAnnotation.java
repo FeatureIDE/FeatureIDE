@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.annotation;
+package de.ovgu.featureide.ui.editors.annotation;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.BLUE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.COLOR_ANNOTATION;
