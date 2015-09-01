@@ -26,11 +26,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.SatSolver;
@@ -39,10 +37,13 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.conf.worker.RemoveThread;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.CNFType;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
+import de.ovgu.featureide.fm.core.job.ConsoleProgressMonitor;
+import de.ovgu.featureide.fm.core.job.WorkMonitor;
 
 /**
  * @author Reimar Schröter
@@ -52,9 +53,6 @@ public class CompositionalAnaylsisTester {
 
 	private final FeatureModel completeModel;
 	private final long startTime;
-
-	private final HashSet<String> core = new HashSet<>();
-	private final HashSet<String> dead = new HashSet<>();
 	
 	private List<String> rootFeatures;
 	
@@ -64,12 +62,7 @@ public class CompositionalAnaylsisTester {
 
 	public static void main(final String[] args) throws FileNotFoundException, UnsupportedModelException {
 		final CompositionalAnaylsisTester tester = new CompositionalAnaylsisTester(args[0] + "model.xml");
-		for (int i = 1; i < 3; i++) {
-			tester.computeAtomicSets(i);
-		}
-//		tester.computeAtomicSets(3);
-//		tester.computeAtomicSets(6);
-//		tester.computeAtomicSets(15);
+		tester.computeAtomicSets(2);
 	}
 
 	public CompositionalAnaylsisTester(String modelFileName) {
@@ -86,20 +79,6 @@ public class CompositionalAnaylsisTester {
 		}
 		
 		curTime = split(curTime);
-		System.out.print("Computing Core/Dead Features...");
-		
-		final List<List<Feature>> x = completeModel.getAnalyser().analyzeFeatures();
-		for (Feature f : x.get(0)) {
-			core.add(f.getName());
-		}
-		for (Feature f : x.get(1)) {
-			dead.add(f.getName());
-		}
-		
-		curTime = split(curTime);
-		System.out.println(core);
-		System.out.println(dead);
-		System.out.println("-----------------------------------------------------------------");
 	}
 
 	private static long split(long startTime) {
@@ -111,7 +90,7 @@ public class CompositionalAnaylsisTester {
 	public void computeAtomicSets(int x) {		
 		System.out.print("Computing root features...");
 		
-		rootFeatures = CorePlugin.splitFeatureModel(completeModel, x);		
+		rootFeatures = CorePlugin.splitFeatureModel(completeModel, 10, 300);		
 		
 		curTime = split(curTime);		
 		System.out.print("Creating sub models...");
@@ -125,77 +104,43 @@ public class CompositionalAnaylsisTester {
 		nodeCreator.setCnfType(CNFType.Regular);
 		nodeCreator.setIncludeBooleanValues(false);
 		final List<Node> nodeList = new ArrayList<>();
+
+		nodeCreator.setFeatureModel(completeModel);
+		final Node completeNode = nodeCreator.createNodes();
+
+		final WorkMonitor wm = new WorkMonitor();
+		wm.setMonitor(new ConsoleProgressMonitor());
+		final RemoveThread rt = new RemoveThread(wm, nodeList, completeNode);
+		Collection<Collection<String>> removeFeaturesList = new ArrayList<>();
 		
-//		final List<Node> interfaceNodeList = new ArrayList<>();
-//		final Iterator<Set<String>> excludedFeaturesIterator = unselectedFeatures.iterator();
-		
+		System.out.println();
 		int i = subModels.size();
-		for (FeatureModel subModel : subModels) {
-			System.out.print("\t" + i-- + " " + subModel.getNumberOfFeatures());
-			HashSet<String> removeFeatures = new HashSet<>(completeModel.getFeatureNames());
+		for (FeatureModel subModel : subModels) {			
+			final HashSet<String> removeFeatures = new HashSet<>(completeModel.getFeatureNames());
 			removeFeatures.removeAll(subModel.getFeatureNames());
-			nodeCreator.setFeatureModel(completeModel, removeFeatures);
-			Node createNodes = nodeCreator.createNodes();
-			if (createNodes.getChildren().length > 0 && !(createNodes.getChildren().length == 1 && createNodes.getChildren()[0].getChildren().length == 0)) {
-				nodeList.add(createNodes);
-				
-//				final Node in = LongRunningWrapper.runMethod(new FeatureRemover(createNodes,  excludedFeaturesIterator.next()));
-//				if (in.getChildren().length > 0 && !(in.getChildren().length == 1 && in.getChildren()[0].getChildren().length == 0)) {
-//					interfaceNodeList.add(in);
-//				}
-			}
-			curTime = split(curTime);
+			System.out.println(removeFeatures.size() + " / " + completeModel.getNumberOfFeatures());
+			removeFeaturesList.add(removeFeatures);
 		}
 
-//		nodeCreator.setOptionalRoot(true);
-//		for (FeatureModel subModel : subModels) {
-//			nodeCreator.setFeatureModel(subModel);
-//			nodeList.add(nodeCreator.createNodes());
-//			nodeCreator.setFeatureModel(subModel, excludedFeaturesIterator.next());
-//			interfaceNodeList.add(nodeCreator.createNodes());
-//		}
-//
-//		curTime = split(curTime);
-//		System.out.print("Creating CNF...");
-//
-//		nodeCreator.setFeatureModel(completeModel);
-//		final Node cnf = nodeCreator.createNodes();
-//
 		curTime = split(curTime);
 		System.out.print("Removing features (" + unusedFeatures.size() + " / " + completeModel.getNumberOfFeatures() + ")...");
 
-//		nodeList.add(createInterfaceNode(cnf, interfaceNodeList, unusedFeatures));
-//		nodeList.add(0, cnf);
-		
-		nodeCreator.setFeatureModel(completeModel, unusedFeatures);
-		nodeCreator.setOptionalRoot(false);
-		Node createNodes = nodeCreator.createNodes();
-		if (createNodes.getChildren().length > 0 && !(createNodes.getChildren().length == 1 && createNodes.getChildren()[0].getChildren().length == 0)) {
-			nodeList.add(0, createNodes);
-		}
+		removeFeaturesList.add(unusedFeatures);
 
+		rt.addObjects(removeFeaturesList);
+		
+		rt.start();
+		
 		curTime = split(curTime);
 		System.out.println("Computing atomic sets:");
 
 		final List<List<List<Literal>>> atomicSetLists = new ArrayList<>(nodeList.size());
 		i = nodeList.size();
 		for (Node rootNode : nodeList) {
-			System.out.print("\t" + i-- + " " + rootNode.getChildren().length);
+			System.out.print("\t" + i-- + " " + rootNode.getContainedFeatures().size());
 
 			final SatSolver solver = new SatSolver(rootNode, 1000, false);
 			List<List<Literal>> atomicSets = solver.atomicSuperSets();
-			for (Iterator<List<Literal>> iterator2 = atomicSets.iterator(); iterator2.hasNext();) {
-				List<Literal> list = iterator2.next();
-				for (Iterator<Literal> iterator = list.iterator(); iterator.hasNext();) {
-					Literal literal = iterator.next();
-					if (core.contains(literal.var) || dead.contains(literal.var)) {
-						iterator.remove();
-					}
-				}
-				if (list.isEmpty()) {
-					iterator2.remove();
-				}
-			}
 			if (!atomicSets.isEmpty()) {
 				atomicSetLists.add(atomicSets);
 			}
@@ -207,8 +152,6 @@ public class CompositionalAnaylsisTester {
 		System.out.print("Merging atomic sets...");
 
 		final List<List<String>> mergeAtomicSets = CorePlugin.mergeAtomicSets(atomicSetLists);
-		
-
 		
 		curTime = split(curTime);
 		System.out.println();
@@ -248,53 +191,6 @@ public class CompositionalAnaylsisTester {
 		System.out.println(mergeAtomicSets);
 		System.out.println("-----------------------------------------------------------------");
 		System.out.println();
-	}
-
-	private Node createInterfaceNode(Node rootNode, List<Node> interfaceNodes, Collection<String> unusedFeatures) {
-		final HashSet<String> unusedFeatureSet = new HashSet<>(unusedFeatures);
-		final Node[] clauses = rootNode.getChildren();
-
-		int removeCount = 0;
-		for (int i = 0; i < clauses.length; i++) {
-			final Node[] literals = clauses[i].getChildren();
-			for (int j = 0; j < literals.length; j++) {
-				final Literal literal = (Literal) literals[j];
-				if (unusedFeatureSet.contains(literal.var)) {
-					clauses[i] = null;
-					removeCount++;
-					break;
-				}
-			}
-		}
-
-		int newLength = clauses.length - removeCount;
-		int curIndex = newLength;
-
-		for (Node clause : interfaceNodes) {
-			newLength += clause.getChildren().length;
-		}
-
-		final Node[] newClauses = new Node[newLength];
-
-		if (removeCount > 0) {
-			int j = 0;
-			for (int i = 0; i < clauses.length; i++) {
-				final Node clause = clauses[i];
-				if (clause != null) {
-					newClauses[j++] = clause;
-				}
-			}
-		} else {
-			System.arraycopy(clauses, 0, newClauses, 0, clauses.length);
-		}
-
-		for (Node clause : interfaceNodes) {
-			final Node[] children = clause.getChildren();
-			System.arraycopy(children, 0, newClauses, curIndex, children.length);
-			curIndex += children.length;
-		}
-
-		return new And(newClauses);
 	}
 
 	private List<String> createSubModels(List<FeatureModel> subModels, List<Set<String>> unselectedFeatures, List<Set<String>> selectedFeatures, FeatureModel model, List<String> rootFeatureNames) {
@@ -337,6 +233,6 @@ public class CompositionalAnaylsisTester {
 	
 	public boolean compare(HashSet<List<String>> curSet) {
 		return lastSet == null || curSet.equals(lastSet);
-	}
+	}	
 
 }

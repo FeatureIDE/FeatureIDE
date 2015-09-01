@@ -24,6 +24,8 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.EXPRESSION_IS_
 import static de.ovgu.featureide.fm.core.localization.StringTable.ONLY;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -276,59 +278,92 @@ public class SatSolver {
 	
 	public List<List<Literal>> atomicSuperSets() {
 		if (test()) {
-			final List<List<Literal>> result = new ArrayList<>();
-
-			final IVecInt backbone = new VecInt();
 			final int[] globalModel = solver.model();
 			final byte[] done = new byte[globalModel.length];
+			max = solver.nVars();
 
-			for (int i = 0; i < globalModel.length; i++) {
-				final int x = globalModel[i];
-				if (done[i] == 0) {
-					done[i] = 2;
-
-					if (!sat(backbone, -x)) {
-						backbone.push(x);
-					} else {
-						final ArrayList<Literal> setList = new ArrayList<>();
-						setList.add(new Literal(intToVar.get(Math.abs(x)), x > 0));
-						
-						final int[] model = solver.model();
-						backbone.push(-x);
-						
-						for (int j = i + 1; j < model.length; j++) {
-							if (done[j] == 0) {
-								final int y = model[j];
-								
-								if (!sat(backbone, -y)) {
-									done[j] = 1;
-								}
-							}
-						}
-					
-						backbone.pop().push(x);
-						for (int j = i + 1; j < model.length; j++) {
-							if (done[j] == 1) {
-								final int y = model[j];
-								
-								if (!sat(backbone, y)) {
-									done[j] = 2;
-									setList.add(new Literal(intToVar.get(Math.abs(y)), y > 0));
-								} else {
-									done[j] = 0;
-								}
-							}
-						}
-						backbone.pop();
-						if (setList.size() > 1) {
-							result.add(setList);
-						}
-					}
-				}
-			}
-			return result;
+			return atomicSuperSets(globalModel, done);
 		}
 		return Collections.emptyList();
+	}
+	
+	public List<List<Literal>> atomicSuperSets(Collection<String> featureSet) {
+		if (test()) {
+			final int[] globalModel = solver.model();
+			final byte[] done = new byte[globalModel.length];
+			max = 0;
+			
+			Arrays.fill(done, (byte)2);
+			for (String b : featureSet) {
+				Integer x = varToInt.get(b);
+				if (x != null) {
+					done[x] = 0;
+					max++;
+				} else {
+					throw new RuntimeException("Unkown Feature " + b);
+				}
+			}
+
+			return atomicSuperSets(globalModel, done);
+		}
+		return Collections.emptyList();
+	}
+	
+	private int max = 0;
+
+	private List<List<Literal>> atomicSuperSets(final int[] globalModel, final byte[] done) {
+		final List<List<Literal>> result = new ArrayList<>();
+		final ArrayList<Literal> coreList = new ArrayList<>();
+		
+		final IVecInt backbone = new VecInt();
+		
+		int c = 0;
+		for (int i = 0; i < globalModel.length; i++) {
+			final int x = globalModel[i];
+			if (done[i] == 0) {
+				System.out.println("\t\t" + ++c + " / " + max);
+				done[i] = 2;
+
+				if (!sat(backbone, -x)) {
+					backbone.push(x);
+					coreList.add(new Literal(intToVar.get(Math.abs(x)), x > 0));
+				} else {
+					final ArrayList<Literal> setList = new ArrayList<>();
+					setList.add(new Literal(intToVar.get(Math.abs(x)), x > 0));
+					
+					final int[] model = solver.model();
+					backbone.push(-x);
+					
+					for (int j = i + 1; j < model.length; j++) {
+						if (done[j] == 0) {
+							final int y = model[j];
+							
+							if (!sat(backbone, -y)) {
+								done[j] = 1;
+							}
+						}
+					}
+				
+					backbone.pop().push(x);
+					for (int j = i + 1; j < model.length; j++) {
+						if (done[j] == 1) {
+							final int y = model[j];
+							
+							if (!sat(backbone, y)) {
+								done[j] = 2;
+								setList.add(new Literal(intToVar.get(Math.abs(y)), y > 0));
+							} else {
+								done[j] = 0;
+							}
+						}
+					}
+					backbone.pop();
+					result.add(setList);
+				}
+			}
+		}
+		result.add(coreList);
+		return result;
 	}
 
 	private boolean sat(IVecInt backbone, int x) {

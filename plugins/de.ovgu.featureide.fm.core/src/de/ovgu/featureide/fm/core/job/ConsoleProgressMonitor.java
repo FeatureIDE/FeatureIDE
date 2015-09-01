@@ -43,7 +43,9 @@ public class ConsoleProgressMonitor extends NullProgressMonitor {
 		super.worked(work);
 		if (work > 0) {
 			worked -= work;
-			System.out.println(worked);
+			synchronized (System.out) {
+				System.out.println(worked);
+			}
 		}
 	}
 	

@@ -54,11 +54,11 @@ public abstract class AWorkMonitor {
 		this.maxAbsoluteWork = oldMonitor.maxAbsoluteWork;
 	}
 
-	final void begin(String taskName) {
+	public final void begin(String taskName) {
 		monitor.beginTask(taskName, maxRelativeWork);
 	}
 
-	final void done() {
+	public final void done() {
 		monitor.done();
 	}
 

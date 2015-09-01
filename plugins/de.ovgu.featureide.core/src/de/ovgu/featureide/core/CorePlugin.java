@@ -808,24 +808,24 @@ public class CorePlugin extends AbstractCorePlugin {
 		return nodeCreator.createNodes();
 	}
 
-	public static List<String> splitFeatureModel(FeatureModel featureModel, int x) {
+	public static List<String> splitFeatureModel(FeatureModel featureModel, int level, int limit) {
 		final ArrayList<String> rootNames = new ArrayList<>();
 		final Feature root = featureModel.getRoot();
 		if (root != null) {
-			split_rec(root, rootNames, 0, x);
+			split_rec(root, rootNames, 0, level, limit);
 		}
 		return rootNames;
 	}
 
-	private static void split_rec(Feature root, ArrayList<String> rootNames, int level, int x) {
-		final int featureLimit = 0;
+	private static void split_rec(Feature root, ArrayList<String> rootNames, int level, int x, int y) {
+		final int featureLimit = y;
 		final int levelLimit = x;
 		final LinkedList<Feature> children = root.getChildren();
 		for (Feature feature : children) {
 			final int c = countChildren(feature);
 			if (c > 0) {
 				if (c > featureLimit && level < levelLimit) {
-					split_rec(feature, rootNames, level + 1, x);
+					split_rec(feature, rootNames, level + 1, x, y);
 				} else {
 					rootNames.add(feature.getName());
 				}

@@ -52,16 +52,19 @@ public abstract class AWorkerThread<T> implements Runnable {
 
 	public void addObjects(Collection<T> objects) {
 		masterThread.objects.addAll(objects);
+		masterThread.workMonitor.setMaxAbsoluteWork(objects.size());
 	}
 
 	@Override
 	public final void run() {
 		if (beforeWork()) {
+			masterThread.workMonitor.begin("");
 			for (T object = masterThread.objects.poll(); object != null; object = masterThread.objects.poll()) {
 				work(object);
-				masterThread.workMonitor.worked();
+				masterThread.workMonitor.step();
 			}
 			afterWork(true);
+			masterThread.workMonitor.done();
 		} else {
 			afterWork(false);
 		}

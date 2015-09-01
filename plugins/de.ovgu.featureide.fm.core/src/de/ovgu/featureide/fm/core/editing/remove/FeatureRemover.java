@@ -182,6 +182,7 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 
 				addNewClause(curClause);
 			}
+			final CNFSolver solver = new CNFSolver(fmNode);
 
 			workMonitor.setMaxAbsoluteWork(map.size() + 1);
 
@@ -218,8 +219,6 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 					}
 				}
 				
-				final CNFSolver solver = new CNFSolver(relevantClauseList.subList(0, relevantIndex));
-
 				// ... combine relevant clauses if possible
 				for (int i = relevantIndex - 1; i >= 0; i--) {					
 					if (clauseStates[i] < 1) {
@@ -289,7 +288,6 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 						}
 					}
 				}
-				solver.reset();
 				final List<DeprecatedClause> subList = relevantClauseList.subList(0, relevantIndex);
 				relevantClauseSet.removeAll(subList);
 				for (DeprecatedClause clause : subList) {
