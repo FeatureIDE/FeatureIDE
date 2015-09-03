@@ -27,8 +27,8 @@ import javax.annotation.Nonnull;
 
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.ProfileManager;
-import de.ovgu.featureide.fm.ui.PlugInProfileSerializer;
+import de.ovgu.featureide.fm.core.color.FeatureColor;
+import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 
 /**
  * Represents a feature at the {@link FSTModel}.<br>
@@ -40,7 +40,6 @@ public class FSTFeature {
 
 	private final HashMap<String, FSTRole> roles = new HashMap<String, FSTRole>();
 	protected String name;
-	private int color = -1;
 	private final FSTModel model;
 	private static final int hashCodePrime = 37;
 	private boolean hasMethodContracts = false;
@@ -57,23 +56,14 @@ public class FSTFeature {
 		}
 		return false;
 	}
-
-	public void setColor(int color) {
-		this.color = color;
-	}
 	
 	public int getColor() {
-		if (model != null  && model.getFeatureProject().getFeatureModel().getFeature(name).getColorList() != null){
-			Feature feature = model.getFeatureProject().getFeatureModel().getFeature(name);
-			if(feature.getColorList() != null){
-				final FeatureModel featureModel = model.getFeatureProject().getFeatureModel();
-				ProfileManager.Project project = ProfileManager.getProject(featureModel.xxxGetEclipseProjectPath(), PlugInProfileSerializer.FEATURE_PROJECT_SERIALIZER);
-				return ProfileManager.toColorIndex(project.getActiveProfile().getColor(name));
-				 //return model.getFeatureProject().getFeatureModel().getFeature(name).getColorList().getColor();
-			}
+		if (model == null) {
+			return FeatureColor.NO_COLOR.getValue();
 		}
-		return color;
-
+		final FeatureModel featureModel = model.getFeatureProject().getFeatureModel();
+		Feature feature = featureModel.getFeature(name);
+		return FeatureColorManager.getColor(feature).getValue();
 	}
 
 	public String getName() {

@@ -25,8 +25,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.RENAME_COLORSC
 import org.eclipse.jface.wizard.Wizard;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.ProfileManager;
-import de.ovgu.featureide.fm.ui.PlugInProfileSerializer;
+import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
@@ -67,8 +66,7 @@ public class RenameColorSchemeWizard extends Wizard {
 	public boolean performFinish() {
 		final String csName = page.getColorSchemeName();
 		if (csName != null && !csName.isEmpty()) {
-			ProfileManager.Project project = ProfileManager.getProject(featureModel.xxxGetEclipseProjectPath(), PlugInProfileSerializer.FEATURE_PROJECT_SERIALIZER);
-			project.getActiveProfile().setName(csName);
+			FeatureColorManager.renameProfile(featureModel, csName, null);
 			return true;
 		}
 		return false;

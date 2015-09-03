@@ -66,7 +66,7 @@ public class RenameProfileColorSchemeAction extends Action {
 		WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
 		dialog.create();
 		dialog.open();
-		model.getColorschemeTable().saveColorsToFile(project.getProject());
+//		model.getColorschemeTable().saveColorsToFile(project.getProject());
 
 	}
 }

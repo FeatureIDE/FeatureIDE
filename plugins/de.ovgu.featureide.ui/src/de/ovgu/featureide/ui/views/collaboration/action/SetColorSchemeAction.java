@@ -24,9 +24,7 @@ import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.ProfileManager;
-import de.ovgu.featureide.fm.core.ProfileManager.Project.Profile;
-import de.ovgu.featureide.fm.ui.PlugInProfileSerializer;
+import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
 
 /**
@@ -48,16 +46,7 @@ public class SetColorSchemeAction extends AbstractColorAction {
 	 */
 	@Override
 	protected boolean action(FeatureModel fm, String collName) {
-		ProfileManager.Project project = ProfileManager.getProject(fm.xxxGetEclipseProjectPath(), PlugInProfileSerializer.FEATURE_PROJECT_SERIALIZER);
-		Profile p = project.getProfile(newColorSchemeName);
-		if (!project.getActiveProfile().getName().equals(newColorSchemeName))
-			p.setAsActiveProfile();
-		
-//		if (fm.getColorschemeTable().getSelectedColorscheme() != index) {
-//			fm.getColorschemeTable().setSelectedColorscheme(index);
-//		} else {
-//			fm.getColorschemeTable().setEmptyColorscheme();
-//		}
+		FeatureColorManager.setActive(fm, collName);
 		return true;
 	}
 	

@@ -78,12 +78,10 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.FeatureStatus;
 import de.ovgu.featureide.fm.core.Preferences;
-import de.ovgu.featureide.fm.core.ProfileManager;
-import de.ovgu.featureide.fm.core.ProfileManager.Project.Profile;
 import de.ovgu.featureide.fm.core.PropertyConstants;
+import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.job.AStoppableJob;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.PlugInProfileSerializer;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AlternativeAction;
@@ -391,7 +389,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			mplModel = ext.isMultiProductLineModel();
 		}
 		// only allow coloration if the active profile is not the default profile
-		if (getCurrentProfile(getFeatureModel()).getActiveProfile().getName().equals("Default")) {
+		if (FeatureColorManager.isDefault(getFeatureModel())) {
 			colorSelectedFeatureAction.setEnabled(false);
 		} 
 		if (mplModel) {
@@ -493,10 +491,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			menu.add(alternativeAction);
 			menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 		}
-	}
-
-	private Profile getCurrentProfile(FeatureModel featureModel) {
-		return ProfileManager.getProject(featureModel.xxxGetEclipseProjectPath(), PlugInProfileSerializer.FEATURE_PROJECT_SERIALIZER).getActiveProfile();
 	}
 
 	public IAction getDiagramAction(String workbenchActionID) {

@@ -87,7 +87,7 @@ public abstract class AbstractFeatureModelReader implements IFeatureModelReader 
 			parseInputStream(inputStream);
 			// TODO: REMOVE THIS, THIS IS A HACK
 			// THIS IS A HACK
-			featureModel.xxxSetSourceFile(file.getAbsolutePath());
+			featureModel.xxxSetSourceFile(file);
 			// END HACK
 		} finally {
 			if (inputStream != null) {

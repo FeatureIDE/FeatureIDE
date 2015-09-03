@@ -23,9 +23,7 @@ package de.ovgu.featureide.ui.actions;
 import org.eclipse.jface.action.Action;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.ProfileManager;
-import de.ovgu.featureide.fm.core.ProfileManager.Project.Profile;
-import de.ovgu.featureide.fm.ui.PlugInProfileSerializer;
+import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 
 /**
  * This class enables you to switch profiles
@@ -53,13 +51,7 @@ public class SetProfileColorSchemeAction extends Action {
 	 * this method changes selected Colorscheme and saves the configuration 
 	 */
 	public void run() {
-		ProfileManager.Project projet = ProfileManager.getProject(model.xxxGetEclipseProjectPath(), PlugInProfileSerializer.FEATURE_PROJECT_SERIALIZER);
-		Profile p = projet.getProfile(newProfileColorSchemeName);
-		if (!projet.getActiveProfile().getName().equals(p.getName())) {
-			p.setAsActiveProfile();
-
-		}
-		
+		FeatureColorManager.setActive(model, newProfileColorSchemeName);		
 		
 
 	}

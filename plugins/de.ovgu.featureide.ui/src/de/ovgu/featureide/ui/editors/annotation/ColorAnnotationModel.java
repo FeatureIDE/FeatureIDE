@@ -65,7 +65,6 @@ import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.core.fstmodel.RoleElement;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
-import de.ovgu.featureide.fm.core.ColorList;
 import de.ovgu.featureide.fm.core.annotation.LogService;
 import de.ovgu.featureide.fm.core.annotation.LogService.LogLevel;
 
@@ -573,9 +572,6 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 							annotations.add(ca);
 							event.annotationAdded(ca);
 						}
-						if (!ColorList.isValidColor(color)) {
-							continue;
-						}
 						if (!hasChildAtLine(directive, line)) {
 							// bar at the right of the editor
 
@@ -609,12 +605,10 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 	 * 
 	 */
 	private void createOverViewRuler(AnnotationModelEvent event, FSTDirective directive, final int color, Position newPos) {
-		if (ColorList.isValidColor(color)) {
-			ColorAnnotation ca = new ColorAnnotation(color, newPos, ColorAnnotation.TYPE_OVERVIEW);
-			ca.setText(directive.toString());
-			annotations.add(ca);
-			event.annotationAdded(ca);
-		}
+		ColorAnnotation ca = new ColorAnnotation(color, newPos, ColorAnnotation.TYPE_OVERVIEW);
+		ca.setText(directive.toString());
+		annotations.add(ca);
+		event.annotationAdded(ca);
 	}
 
 	/**
@@ -644,9 +638,9 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 			int start = child.getStartLine();
 			int end = child.getEndLine();
 
-			if (line >= start && line <= end && (!hasValidColor || ColorList.isValidColor(child.getColor()))) {
-				return true;
-			}
+//			if (line >= start && line <= end && (!hasValidColor || ColorList.isValidColor(child.getColor()))) {
+//				return true;
+//			}
 			if (hasChildAtLine(child, line, hasValidColor)) {
 				return true;
 			}

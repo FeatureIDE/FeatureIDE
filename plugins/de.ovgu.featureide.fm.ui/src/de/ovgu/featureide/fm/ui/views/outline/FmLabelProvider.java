@@ -33,11 +33,9 @@ import org.prop4j.NodeWriter;
 
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.ProfileManager;
-import de.ovgu.featureide.fm.core.ProfileManager.Project.Profile;
 import de.ovgu.featureide.fm.core.annotation.ColorPalette;
-import de.ovgu.featureide.fm.ui.PlugInProfileSerializer;
+import de.ovgu.featureide.fm.core.color.FeatureColor;
+import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 
 /**
@@ -157,28 +155,14 @@ public class FmLabelProvider implements ILabelProvider, IFontProvider, GUIDefaul
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.IColorProvider#getBackground(java.lang.Object)
-	 */
-
-	/**
-	 * @author Marcus Pinnecke
-	 */
-	//TODO: outsource method to global state
-	private Profile getCurrentProfile(FeatureModel featureModel) {
-		return ProfileManager.getProject(featureModel.xxxGetEclipseProjectPath(), PlugInProfileSerializer.FEATURE_PROJECT_SERIALIZER).getActiveProfile();
-	}
-
 	public Color getBackground(Object element) {
 		Color col = null;
 
 		if (element instanceof Feature) {
-
 			Feature feature = (Feature) element;
-
-			if (ProfileManager.toColorIndex(getCurrentProfile(feature.getFeatureModel()).getColor(feature.getName())) != -1) {
-				col = new Color(null, ColorPalette.getRGB(
-						ProfileManager.toColorIndex(getCurrentProfile(feature.getFeatureModel()).getColor(feature.getName())), 0.5f));
+			FeatureColor color = FeatureColorManager.getColor(feature);
+			if (color != FeatureColor.NO_COLOR) {
+				col = new Color(null, ColorPalette.getRGB(color.getValue(), 0.5f));
 			}
 		}
 		return col;

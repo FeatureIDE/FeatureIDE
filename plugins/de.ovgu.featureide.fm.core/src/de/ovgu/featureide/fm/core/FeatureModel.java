@@ -92,8 +92,6 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	
 	private Object undoContext;
 	
-	private ColorschemeTable colorschemeTable;
-
 	private FMComposerManager fmComposerManager;
 	
 	public FeatureModel() {
@@ -105,7 +103,6 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		
 		this.comments = new LinkedList<String>();
 		this.annotations = new LinkedList<String>();
-		this.colorschemeTable = new ColorschemeTable(this);
 		this.layout = new FeatureModelLayout();
 	}
 
@@ -119,12 +116,10 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		if (complete) {
 			this.annotations = new LinkedList<String>(oldFeatureModel.annotations);
 			this.comments = new LinkedList<String>(oldFeatureModel.comments);
-			this.colorschemeTable = oldFeatureModel.colorschemeTable.clone(this);
 			this.layout = oldFeatureModel.layout.clone();
 		} else {
 			this.annotations = null;
 			this.comments = null;
-			this.colorschemeTable = new EmptyColorschemeTable();
 			this.layout = null;
 		}
 		
@@ -153,10 +148,6 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
     public FeatureModelLayout getLayout() {
 		return layout;
     }
-
-	public ColorschemeTable getColorschemeTable() {
-		return colorschemeTable;
-	}
 	
 	@Override
 	public FMComposerManager getFMComposerManager(final IProject project) {
@@ -198,7 +189,6 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		if (annotations != null) {
 			annotations.clear();
 		}
-		colorschemeTable.reset();
 		featureOrderList.clear();
 	}
 	
@@ -585,7 +575,6 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		clone.constraints.addAll(constraints);
 		clone.annotations.addAll(annotations);
 		clone.comments.addAll(comments);
-		clone.colorschemeTable = colorschemeTable.clone(clone);
 		return clone;
 	}
 	
@@ -892,38 +881,21 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	/**
 	 * TODO: REMOVE THIS, THIS IS A HACK
 	 */
-	String xmlModelSourceFilePath;
+	File sourceFile;
 
 	/**
 	 * TODO: REMOVE THIS, THIS IS A HACK
 	 */
-	public void xxxSetSourceFile(String absolutePath) {
-		xmlModelSourceFilePath = absolutePath;
-	}
-	
-	/**
-	 * TODO: REMOVE THIS, THIS IS A HACK
-	 */
-	public boolean xxxIsBasedOnModelFile() {
-		return xmlModelSourceFilePath != null;
-	}
-	
-	/**
-	 * TODO: REMOVE THIS, THIS IS A HACK
-	 */
-	public String xxxGetSourceFile() {
-		if (xmlModelSourceFilePath == null)
-			throw new IllegalStateException();
-		return xmlModelSourceFilePath;
-	}
-	
-	/**
-	 * TODO: REMOVE THIS, THIS IS A HACK
-	 */
-	public String xxxGetEclipseProjectPath() {
-		if (!xxxIsBasedOnModelFile())
-			throw new IllegalStateException();
-		return new File(xmlModelSourceFilePath).getParentFile().getAbsolutePath();
+	public void xxxSetSourceFile(File file) {
+		sourceFile = file;
 	}
 
+	
+	/**
+	 * TODO: REMOVE THIS, THIS IS A HACK
+	 */
+	public File xxxGetSourceFile() {
+		return sourceFile;
+	}
+	
 }

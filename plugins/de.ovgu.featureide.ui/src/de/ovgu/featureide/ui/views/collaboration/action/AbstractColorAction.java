@@ -68,7 +68,6 @@ public abstract class AbstractColorAction extends Action {
 				FeatureModel fm = collaborationView.getFeatureProject().getFeatureModel();
 				
 				boolean refresh = action(fm, coll.getName());
-				collaborationView.saveColorsToFile();
 				
 				if (refresh) {	
 					collaborationView.refreshAll();

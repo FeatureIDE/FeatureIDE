@@ -35,6 +35,8 @@ import org.eclipse.core.runtime.IPath;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 
+import de.ovgu.featureide.fm.core.color.FeatureColorManager;
+
 /**
  * Handles feature renamings.
  * 
@@ -81,6 +83,7 @@ public class RenamingsManager {
 				break;
 			}
 		}
+		FeatureColorManager.renameFeature(model, oldName, newName);
 		return true;
 	}
 	
@@ -108,10 +111,6 @@ public class RenamingsManager {
 					moveFolder(renaming.oldName, renaming.newName);
 				}
 			}
-		}
-		if (model.getColorschemeTable().getColorFile(project).exists()) {
-			model.getColorschemeTable().readColorsFromFile(project);
-			model.getColorschemeTable().saveColorsToFile(project);
 		}
 		renamings.clear();
 	}

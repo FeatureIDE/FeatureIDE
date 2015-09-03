@@ -1,9 +1,5 @@
 package de.ovgu.featureide.ui.actions;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.NO_COLORSCHEME_SELECTED;
-
-import java.util.List;
-
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jdt.core.IJavaElement;
@@ -28,10 +24,9 @@ import org.eclipse.ui.internal.Workbench;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.fm.core.ColorschemeTable;
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.ProfileManager;
-import de.ovgu.featureide.fm.ui.PlugInProfileSerializer;
+import de.ovgu.featureide.fm.core.color.ColorScheme;
+import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 
 /**
  * Class to add the profilemenu to the contextmenu of the project (projectonly)
@@ -40,13 +35,13 @@ import de.ovgu.featureide.fm.ui.PlugInProfileSerializer;
  * @author Christian Harnisch
  */
 
-@SuppressWarnings({ "unused", "restriction" })
+@SuppressWarnings({ "restriction" })
 public class DynamicProfileMenu extends ContributionItem {
 	private AddProfileColorSchemeAction addProfileSchemeAction;
 	private RenameProfileColorSchemeAction renameProfileSchemeAction;
 	private DeleteProfileColorSchemeAction deleteProfileSchemeAction;
 	private IFeatureProject myFeatureProject = getCurrentFeatureProject();
-	private FeatureModel myFeatureModel = myFeatureProject.getFeatureModel();
+	private FeatureModel featureModel = myFeatureProject.getFeatureModel();
 	private boolean multipleSelected = isMultipleSelection();
 
 	/*
@@ -98,18 +93,9 @@ public class DynamicProfileMenu extends ContributionItem {
 	 * this method fills the menumanager with actionbuttons
 	 */
 	private void fillContextMenu(IMenuManager menuMgr) {
-		FeatureModel fm = myFeatureModel;
-		ColorschemeTable colorschemeTable = fm.getColorschemeTable();
-		List<String> csNames = colorschemeTable.getColorschemeNames();
-		
-		ProfileManager.Project project = ProfileManager.getProject(fm.xxxGetEclipseProjectPath(), PlugInProfileSerializer.FEATURE_PROJECT_SERIALIZER);
-		final String curColorSchemeName = ProfileManager.getProject(fm.xxxGetEclipseProjectPath(), PlugInProfileSerializer.FEATURE_PROJECT_SERIALIZER).getActiveProfile().getName();
-		
-		
-		
-		for (String name : project.getProfileNames()) {
-			SetProfileColorSchemeAction setCSAction = new SetProfileColorSchemeAction(name, Action.AS_CHECK_BOX, myFeatureModel);
-			if (name.equals(curColorSchemeName)) {
+		for (ColorScheme cs : FeatureColorManager.getProfiles(featureModel)) {
+			SetProfileColorSchemeAction setCSAction = new SetProfileColorSchemeAction(cs.getName(), Action.AS_CHECK_BOX, featureModel);
+			if (cs.isCurrent()) {
 				setCSAction.setChecked(true);
 			}
 			menuMgr.add(setCSAction);
@@ -119,12 +105,11 @@ public class DynamicProfileMenu extends ContributionItem {
 		menuMgr.add(addProfileSchemeAction);
 		menuMgr.add(renameProfileSchemeAction);
 		menuMgr.add(deleteProfileSchemeAction);
-		colorschemeTable.readColorsFromFile(getCurrentFeatureProject().getProject());
 
 		/*
 		 * disables rename and delete when default colorscheme is selected
 		 */
-		if (curColorSchemeName.equals("Default")) {
+		if (FeatureColorManager.getCurrentColorScheme(featureModel).isDefault()) {
 			renameProfileSchemeAction.setEnabled(false);
 			deleteProfileSchemeAction.setEnabled(false);
 		}
@@ -137,9 +122,9 @@ public class DynamicProfileMenu extends ContributionItem {
 	 */
 
 	private void createActions() {
-		addProfileSchemeAction = new AddProfileColorSchemeAction("Add Colorscheme", myFeatureModel, myFeatureProject);
-		renameProfileSchemeAction = new RenameProfileColorSchemeAction("Change Name", myFeatureModel, myFeatureProject);
-		deleteProfileSchemeAction = new DeleteProfileColorSchemeAction("Delete Colorscheme", myFeatureModel);
+		addProfileSchemeAction = new AddProfileColorSchemeAction("Add Colorscheme", featureModel, myFeatureProject);
+		renameProfileSchemeAction = new RenameProfileColorSchemeAction("Change Name", featureModel, myFeatureProject);
+		deleteProfileSchemeAction = new DeleteProfileColorSchemeAction("Delete Colorscheme", featureModel);
 
 	}
 	/*

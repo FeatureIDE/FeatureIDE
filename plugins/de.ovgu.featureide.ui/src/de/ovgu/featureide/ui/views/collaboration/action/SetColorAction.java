@@ -28,9 +28,9 @@ import org.eclipse.swt.graphics.RGB;
 
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.ProfileManager;
 import de.ovgu.featureide.fm.core.annotation.ColorPalette;
-import de.ovgu.featureide.fm.ui.PlugInProfileSerializer;
+import de.ovgu.featureide.fm.core.color.FeatureColor;
+import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
 
 /**
@@ -122,17 +122,9 @@ public class SetColorAction extends AbstractColorAction {
 
 	@Override
 	protected boolean action(FeatureModel fm, String collName) {
-		Feature feat = fm.getFeature(collName);
-		if (feat != null) {
-			ProfileManager.Project project = ProfileManager.getProject(fm.xxxGetEclipseProjectPath(), PlugInProfileSerializer.FEATURE_PROJECT_SERIALIZER);
-			ProfileManager.Project.Profile activeProfile = project.getActiveProfile();
-			ProfileManager.Color currentColor = activeProfile.getColor(feat.getName());
-			ProfileManager.Color newColor = ProfileManager.getColorFromID(index);
-			if (!currentColor.equals(newColor)) {
-				activeProfile.setFeatureColor(feat.getName(), ProfileManager.getColorFromID(index));				
-			} else {
-				activeProfile.removeFeatureColor(feat.getName());
-			}
+		Feature feature = fm.getFeature(collName);
+		if (feature != null) {
+			FeatureColorManager.setColor(feature, FeatureColor.getColor(index));
 			return true;
 		}
 		return false;

@@ -41,8 +41,6 @@ import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.ProfileManager;
-import de.ovgu.featureide.fm.ui.PlugInProfileSerializer;
 
 /**
  * Build the FSTModel for preprocessor projects.
@@ -68,11 +66,7 @@ public class PPModelBuilder {
 		featureNames = featureProject.getFeatureModel().getConcreteFeatureNames();
 		System.err.println("buildModel(): featureNames: " + featureNames);
 		for (String featureName : featureNames) {
-			FSTFeature fstFeature = model.addFeature(featureName);
-			Feature feature = featureProject.getFeatureModel().getFeature(featureName);
-			int colorIndex = ProfileManager.toColorIndex(ProfileManager.getProject(feature.getFeatureModel().xxxGetEclipseProjectPath(), PlugInProfileSerializer.FEATURE_PROJECT_SERIALIZER).getActiveProfile().getColor(feature.getName()));
-			fstFeature.setColor(colorIndex);
-			//fstFeature.setColor(feature.getColorList().getColor());
+			model.addFeature(featureName);
 		}
 		try {
 			buildModel(featureProject.getSourceFolder(), "");

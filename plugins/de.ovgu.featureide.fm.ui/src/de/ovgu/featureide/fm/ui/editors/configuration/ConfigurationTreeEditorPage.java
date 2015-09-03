@@ -60,14 +60,13 @@ import org.eclipse.ui.part.EditorPart;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.FunctionalInterfaces;
 import de.ovgu.featureide.fm.core.FunctionalInterfaces.IBinaryFunction;
 import de.ovgu.featureide.fm.core.FunctionalInterfaces.IFunction;
-import de.ovgu.featureide.fm.core.ProfileManager;
-import de.ovgu.featureide.fm.core.ProfileManager.Project.Profile;
 import de.ovgu.featureide.fm.core.annotation.ColorPalette;
+import de.ovgu.featureide.fm.core.color.FeatureColor;
+import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagatorJobWrapper.IConfigJob;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
@@ -76,7 +75,6 @@ import de.ovgu.featureide.fm.core.configuration.TreeElement;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.PlugInProfileSerializer;
 
 /**
  * Basic class with some default methods for configuration editor pages.
@@ -397,10 +395,6 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		}
 	}
 
-	private Profile getCurrentProfile(FeatureModel featureModel) {
-		return ProfileManager.getProject(featureModel.xxxGetEclipseProjectPath(), PlugInProfileSerializer.FEATURE_PROJECT_SERIALIZER).getActiveProfile();
-	}
-
 	protected void updateTree() {
 		itemMap.clear();
 		if (errorMessage(tree)) {
@@ -415,10 +409,9 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 						if (item.getData() instanceof SelectableFeature) {
 							SelectableFeature selectableFeature = (SelectableFeature) item.getData();
 							Feature feature = selectableFeature.getFeature();
-							
-							if (ProfileManager.toColorIndex(getCurrentProfile(feature.getFeatureModel()).getColor(feature.getName())) != -1) {
-								item.setBackground(new Color(null, ColorPalette.getRGB(
-										ProfileManager.toColorIndex(getCurrentProfile(feature.getFeatureModel()).getColor(feature.getName())), 0.5f)));
+							FeatureColor color = FeatureColorManager.getColor(feature);
+							if (color != FeatureColor.NO_COLOR) {
+								item.setBackground(new Color(null, ColorPalette.getRGB(color.getValue(), 0.5f)));
 							}
 						}
 					}

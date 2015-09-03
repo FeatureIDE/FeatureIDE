@@ -69,7 +69,14 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 		if (element instanceof PackageFragment) {
 			PackageFragment frag = (PackageFragment) element;
 			IFolder folder = (IFolder) frag.getResource();
-			IFeatureProject featureProject = CorePlugin.getFeatureProject(frag.getParent().getResource());
+			IResource res = frag.getParent().getResource();
+			if (res == null) {
+				return null;
+			}
+			IFeatureProject featureProject = CorePlugin.getFeatureProject(res);
+			if (featureProject == null) {
+				return null;
+			}
 			FSTModel model = featureProject.getFSTModel();
 			if (model.getClasses().isEmpty()) {
 				featureProject.getComposer().buildFSTModel();
@@ -237,7 +244,11 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 		//text for Packages
 		if (element instanceof PackageFragment) {
 			PackageFragment frag = (PackageFragment) element;
-			IFeatureProject featureProject = CorePlugin.getFeatureProject(frag.getParent().getResource());
+			IResource resource = frag.getParent().getResource();
+			if (resource == null) {
+				return null;
+			}
+			IFeatureProject featureProject = CorePlugin.getFeatureProject(resource);
 			if (featureProject == null) {
 				return null;
 			}

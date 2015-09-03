@@ -26,8 +26,6 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.ProfileManager;
-import de.ovgu.featureide.fm.ui.PlugInProfileSerializer;
 import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
 import de.ovgu.featureide.ui.wizards.RenameColorSchemeWizard;
 

@@ -20,8 +20,12 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CHOOSE_ACTION_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CHOOSE_COLOR_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.COLORATION_DIALOG;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CYAN;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DARKGREEN;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURES_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.LIGHTGREEN;
 import static de.ovgu.featureide.fm.core.localization.StringTable.LIGHTGREY;
 import static de.ovgu.featureide.fm.core.localization.StringTable.MAGENTA;
@@ -34,10 +38,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTED_FEATU
 import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTED_FEATURE_DIRECT_CHILDREN;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTED_FEATURE_SIBLINGS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.YELLOW;
-import static de.ovgu.featureide.fm.core.localization.StringTable.COLORATION_DIALOG;
-import static de.ovgu.featureide.fm.core.localization.StringTable.CHOOSE_ACTION_;
-import static de.ovgu.featureide.fm.core.localization.StringTable.CHOOSE_COLOR_;
-import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURES_;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,11 +60,9 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 
 import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.ProfileManager;
-import de.ovgu.featureide.fm.core.ProfileManager.Project.Profile;
 import de.ovgu.featureide.fm.core.annotation.ColorPalette;
-import de.ovgu.featureide.fm.ui.PlugInProfileSerializer;
+import de.ovgu.featureide.fm.core.color.FeatureColor;
+import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 
 /**
  * Sets the color of the features with different methods (children, siblings) in the featurediagram.
@@ -277,10 +275,10 @@ public class ColorSelectedFeatureDialog extends Dialog {
 					item.setText(featureListBuffer.get(i).getName());
 
 					final Feature feature = featureListBuffer.get(i);
-					Profile profile = ProfileManager.getProject(feature.getFeatureModel().xxxGetEclipseProjectPath(),
-							PlugInProfileSerializer.FEATURE_PROJECT_SERIALIZER).getActiveProfile();
-					if (profile.hasFeatureColor(feature.getName()))
-						item.setBackground(new Color(null, ColorPalette.getRGB(ProfileManager.toColorIndex(profile.getColor(feature.getName())), 0.4f)));
+					FeatureColor color = FeatureColorManager.getColor(feature); 
+					if (color != FeatureColor.NO_COLOR) {
+						item.setBackground(new Color(null, ColorPalette.getRGB(color.getValue(), 0.4f)));
+					}
 				}
 			}
 
@@ -315,11 +313,7 @@ public class ColorSelectedFeatureDialog extends Dialog {
 
 			for (int i = 0; i < featureListBuffer.size(); i++) {
 				final Feature feature = featureListBuffer.get(i);
-				final FeatureModel model = feature.getFeatureModel();
-				ProfileManager.Project project = ProfileManager
-						.getProject(model.xxxGetEclipseProjectPath(), PlugInProfileSerializer.FEATURE_PROJECT_SERIALIZER);
-				ProfileManager.Project.Profile activeProfile = project.getActiveProfile();
-				activeProfile.setFeatureColor(feature.getName(), ProfileManager.getColorFromID(colorId));
+				FeatureColorManager.setColor(feature, FeatureColor.getColor(colorId));
 			}
 			okPressed();
 

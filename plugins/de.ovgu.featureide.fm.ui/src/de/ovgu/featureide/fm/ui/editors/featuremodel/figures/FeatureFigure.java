@@ -45,10 +45,9 @@ import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer.Attribute;
-import de.ovgu.featureide.fm.core.ProfileManager;
-import de.ovgu.featureide.fm.core.ProfileManager.Project.Profile;
 import de.ovgu.featureide.fm.core.annotation.ColorPalette;
-import de.ovgu.featureide.fm.ui.PlugInProfileSerializer;
+import de.ovgu.featureide.fm.core.color.FeatureColor;
+import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramExtension;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -137,15 +136,6 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		return !feature.getFeatureModel().getLayout().showHiddenFeatures() && feature.hasHiddenParent();
 	}
 
-	/**
-	 * @author Marcus Pinnecke
-	 */
-	//TODO: outsource method to global state
-
-	private Profile getCurrentProfile(FeatureModel featureModel) {
-		return ProfileManager.getProject(featureModel.xxxGetEclipseProjectPath(), PlugInProfileSerializer.FEATURE_PROJECT_SERIALIZER).getActiveProfile();
-	}
-
 	public void setProperties() {
 		final StringBuilder toolTip = new StringBuilder();
 
@@ -154,10 +144,10 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		setBorder(FMPropertyManager.getFeatureBorder(feature.isConstraintSelected()));
 
 		// only color if the active profile is not the default profile
-		if (ProfileManager.toColorIndex(getCurrentProfile(feature.getFeatureModel()).getColor(feature.getName())) != -1) {
-			if (getCurrentProfile(feature.getFeatureModel()).hasFeatureColor(feature.getName())) {
-				setBackgroundColor(new Color(null, ColorPalette.getRGB(
-						ProfileManager.toColorIndex(getCurrentProfile(feature.getFeatureModel()).getColor(feature.getName())), 0.5f)));
+		if (!FeatureColorManager.getCurrentColorScheme(feature.getFeatureModel()).isDefault()) {
+			FeatureColor color = FeatureColorManager.getColor(feature);
+			if (color != FeatureColor.NO_COLOR) {
+				setBackgroundColor(new Color(null, ColorPalette.getRGB(color.getValue(), 0.5f)));
 			}
 		} else {
 			final FeatureModelAnalyzer analyser = feature.getFeatureModel().getAnalyser();

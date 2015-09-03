@@ -51,8 +51,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SHOW_NESTED_CL
 import static de.ovgu.featureide.fm.core.localization.StringTable.SHOW_UNSELECTED_FEATURES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATE_COLLABORATION_VIEW;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -115,15 +113,10 @@ import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.listeners.ICurrentBuildListener;
 import de.ovgu.featureide.fm.core.AWaitingJob;
-import de.ovgu.featureide.fm.core.ColorList;
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.ProfileManager;
-import de.ovgu.featureide.fm.core.ProfileManager.Color;
-import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.annotation.ColorPalette;
 import de.ovgu.featureide.fm.core.job.AStoppableJob;
 import de.ovgu.featureide.fm.ui.GraphicsExporter;
-import de.ovgu.featureide.fm.ui.PlugInProfileSerializer;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.action.AddRoleAction;
 import de.ovgu.featureide.ui.views.collaboration.action.DeleteAction;
@@ -447,16 +440,14 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 
 			if (featureProject != null) {
 				// case: it's a FeatureIDE project
-				featureProject.getFeatureModel().addListener(new PropertyChangeListener() {
-					@Override
-					public void propertyChange(PropertyChangeEvent event) {
-						if (PropertyConstants.MODEL_DATA_LOADED.equals(event.getPropertyName())) {
-							readColorsFromFile();
-						}
-					}
-				});
-
-				readColorsFromFile();
+//				featureProject.getFeatureModel().addListener(new PropertyChangeListener() {
+//					@Override
+//					public void propertyChange(PropertyChangeEvent event) {
+//						if (PropertyConstants.MODEL_DATA_LOADED.equals(event.getPropertyName())) {
+//							readColorsFromFile();
+//						}
+//					}
+//				});
 
 				if (CorePlugin.getDefault().getConfigurationExtensions().contains(inputFile.getFileExtension())) {
 					// case: open configuration editor
@@ -904,13 +895,4 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	public void refreshAll() {
 		refreshButton.run();
 	}
-
-	public void saveColorsToFile() {
-		featureProject.getFeatureModel().getColorschemeTable().saveColorsToFile(featureProject.getProject());
-	}
-
-	private void readColorsFromFile() {
-		featureProject.getFeatureModel().getColorschemeTable().readColorsFromFile(featureProject.getProject());
-	}
-
 }
