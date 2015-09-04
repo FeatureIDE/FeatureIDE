@@ -88,8 +88,25 @@ public class FeatureColorManager {
 	/**
 	 * Deletes the profile with the given name.
 	 */
-	public static void removeProfile(FeatureModel fm, String collName) {
-		throw new RuntimeException("TODO implement");
+	public static void removeCurrentColorScheme(final FeatureModel featureModel) {
+		final IProject project = getProject(featureModel);
+		final IFolder profileFolder = project.getFolder(".profiles");
+		if (!profileFolder.exists()) {
+			return;
+		}
+		final String currentName = getCurrentColorScheme(featureModel).getName();
+		colorSchemes.get(project).remove(currentName);
+		final IFile file = profileFolder.getFile(currentName + ".profile");
+		if (!file.exists()) {
+			FMCorePlugin.getDefault().logWarning(file  + " does not exist");
+			return;
+		}
+		try {
+			file.delete(true, new NullProgressMonitor());
+		} catch (CoreException e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+		setActive(project, DefaultColorScheme.defaultName, true);
 	}
 
 	/**

@@ -46,7 +46,7 @@ public class DeleteColorSchemeAction extends AbstractColorAction {
 	 */
 	@Override
 	protected boolean action(FeatureModel fm, String collName) {
-		FeatureColorManager.removeProfile(fm, collName);
+		FeatureColorManager.removeCurrentColorScheme(fm);
 		return true;
 	}
 	

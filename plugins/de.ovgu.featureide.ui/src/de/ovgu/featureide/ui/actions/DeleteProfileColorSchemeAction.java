@@ -25,6 +25,7 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 
 /**
  * This Class contains one of the three actions, which is added to the menu
@@ -58,8 +59,7 @@ public class DeleteProfileColorSchemeAction extends Action {
 	 * this method removes the profile and saves the configuration
 	 */
 	public void run() {	
-		throw new RuntimeException("TODO implement");
-//		ProfileManager.getProject(model.xxxGetEclipseProjectPath(), PlugInProfileSerializer.FEATURE_PROJECT_SERIALIZER).getActiveProfile().delete();
+		FeatureColorManager.removeCurrentColorScheme(model);
 	}
 
 }
