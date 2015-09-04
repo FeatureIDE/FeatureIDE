@@ -18,8 +18,6 @@ import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.ISelectionService;
-import org.eclipse.ui.ISharedImages;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.Workbench;
 
 import de.ovgu.featureide.core.CorePlugin;
@@ -27,6 +25,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.color.ColorScheme;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
+import de.ovgu.featureide.ui.UIPlugin;
 
 /**
  * Class to add the profilemenu to the contextmenu of the project (projectonly)
@@ -72,7 +71,7 @@ public class DynamicProfileMenu extends ContributionItem {
 		 *
 		 */
 
-		MenuManager man = new MenuManager("Profile", PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ADD), "");
+		MenuManager man = new MenuManager("Profile", UIPlugin.getDefault().getImageDescriptor("icons/FeatureColorIcon.gif"), "");
 		man.addMenuListener(new IMenuListener() {
 			public void menuAboutToShow(IMenuManager m) {
 

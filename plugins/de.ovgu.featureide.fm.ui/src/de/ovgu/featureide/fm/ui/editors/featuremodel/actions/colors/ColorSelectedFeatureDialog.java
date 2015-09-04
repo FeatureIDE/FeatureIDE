@@ -37,6 +37,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -52,6 +53,7 @@ import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
  * Sets the color of the features in the feature diagram.
@@ -61,6 +63,8 @@ import de.ovgu.featureide.fm.core.color.FeatureColorManager;
  */
 public class ColorSelectedFeatureDialog extends Dialog {
 
+	private final static Image colorImage = FMUIPlugin.getDefault().getImageDescriptor("icons/FeatureColorIcon.gif").createImage();
+	
 	private static final Color WHITE = new Color(null, 255, 255, 255);
 	final protected List<Feature> featureList;
 	protected ArrayList<Feature> featureListBuffer = new ArrayList<Feature>();
@@ -75,6 +79,7 @@ public class ColorSelectedFeatureDialog extends Dialog {
 		super(parentShell);
 		this.featureList = featurelist;
 		setShellStyle(SWT.DIALOG_TRIM | SWT.MIN | SWT.RESIZE);
+		setDefaultImage(colorImage);
 	}
 
 	/**

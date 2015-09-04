@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -35,6 +36,7 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Shell;
 
 import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 
@@ -46,13 +48,14 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
  */
 public class ColorSelectedFeatureAction extends Action {
 
+	private static ImageDescriptor colorImage = FMUIPlugin.getDefault().getImageDescriptor("icons/FeatureColorIcon.gif");
+	
 	protected ArrayList<Feature> featureList = new ArrayList<Feature>();
 	final protected Shell shell = new Shell();
 	TreeViewer viewer;
 
 	public ISelectionChangedListener listener = new ISelectionChangedListener() {
 		public void selectionChanged(SelectionChangedEvent event) {
-
 			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
 			updateFeatureList(selection);
 			if (featureList.isEmpty()) {
@@ -70,8 +73,10 @@ public class ColorSelectedFeatureAction extends Action {
 	 */
 	public ColorSelectedFeatureAction(FeatureDiagramEditor viewer, IProject project) {
 		super(COLORATION);
-		if (viewer instanceof GraphicalViewerImpl)
+		if (viewer instanceof GraphicalViewerImpl) {
 			((GraphicalViewerImpl) viewer).addSelectionChangedListener(listener);
+		}
+		setImageDescriptor(colorImage);
 
 	}
 
@@ -110,4 +115,6 @@ public class ColorSelectedFeatureAction extends Action {
 			featureList.get(0).getFeatureModel().handleModelDataChanged();
 		}
 	}
+	
+	
 }

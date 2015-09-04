@@ -1163,10 +1163,11 @@
 				allPopups="false"
 				locationURI="popup:#CompilationUnitEditorContext?after=additions">
 			<command
-					commandId="de.ovgu.featureide.ui.commands.enableHighlighting"
-					id="de.ovgu.featureide.fm.ui.actions.enableHighlighting"
-					label="Enable Editor Highlighting"
-					style="toggle">
+         commandId="de.ovgu.featureide.ui.commands.enableHighlighting"
+         icon="icons/FeatureColorIcon.gif"
+         id="de.ovgu.featureide.fm.ui.actions.enableHighlighting"
+         label="Enable Editor Highlighting"
+         style="toggle">
 			</command>
 		</menuContribution>
 	</extension>
