@@ -152,7 +152,7 @@ public class FeatureColorManager {
 	 * Returns the default color schme.
 	 */
 	public static ColorScheme getDefaultColorScheme(FeatureModel model) {
-		for (ColorScheme cs : getProfiles(model)) {
+		for (ColorScheme cs : getColorSchemes(model)) {
 			if (cs.isDefault()) {
 				return cs;
 			}
@@ -250,7 +250,7 @@ public class FeatureColorManager {
 	/**
 	 * Returns all profiles for the given model.
 	 */
-	public static Collection<ColorScheme> getProfiles(FeatureModel featureModel) {
+	public static Collection<ColorScheme> getColorSchemes(FeatureModel featureModel) {
 		IProject project = getProject(featureModel);
 		if (!colorSchemes.containsKey(project)) {
 			initColorSchemes(project);
@@ -297,8 +297,15 @@ public class FeatureColorManager {
 	/**
 	 * Changes the name of the color scheme.
 	 */
-	public static void renameProfile(FeatureModel featureModel, String oldName, String newName) {
-		throw new RuntimeException("TODO implement");
+	public static void renameColorScheme(FeatureModel featureModel, String newName) {
+		IProject project = getProject(featureModel);
+		Map<String, ColorScheme> currentColorSchemes = colorSchemes.get(project);
+		String oldName = getCurrentColorScheme(featureModel).getName();
+		ColorScheme scheme = currentColorSchemes.get(oldName);
+		removeCurrentColorScheme(featureModel);
+		scheme.setName(newName);
+		currentColorSchemes.put(newName, scheme);
+		writeColors(project, scheme);
 	}
 
 	/**
@@ -319,19 +326,19 @@ public class FeatureColorManager {
 			throw new RuntimeException("tried to activate scheme " + collName);
 		}
 		for (Entry<String, ColorScheme> cs : currentSchemes.entrySet()) {
-			ColorScheme value = cs.getValue();
+			ColorScheme scheme = cs.getValue();
 			if (cs.getKey().equals(collName)) {
-				if (!value.isCurrent()) {
-					value.setCurrent(true);
+				if (!scheme.isCurrent()) {
+					scheme.setCurrent(true);
 					if (write) {
-						writeColors(project, value);
+						writeColors(project, scheme);
 					}
 				}
 			} else {
-				if (value.isCurrent()) {
-					value.setCurrent(false);
+				if (scheme.isCurrent()) {
+					scheme.setCurrent(false);
 					if (write) {
-						writeColors(project, value);
+						writeColors(project, scheme);
 					}
 				}
 			}
@@ -343,7 +350,7 @@ public class FeatureColorManager {
 	 * Performs the feature renaming.
 	 */
 	public static void renameFeature(FeatureModel model, String oldName, String newName) {
-		Collection<ColorScheme> currentColorSchemes = getProfiles(model);
+		Collection<ColorScheme> currentColorSchemes = getColorSchemes(model);
 		for (ColorScheme colorScheme : currentColorSchemes) {
 			colorScheme.renameFeature(oldName, newName);
 			writeColors(getProject(model), colorScheme);

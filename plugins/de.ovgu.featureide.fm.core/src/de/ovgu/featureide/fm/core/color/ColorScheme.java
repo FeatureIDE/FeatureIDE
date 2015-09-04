@@ -33,12 +33,12 @@ import de.ovgu.featureide.fm.core.Feature;
 public class ColorScheme {
 	
 	/**
-	 * The unique name of the schme.
+	 * The unique name of the scheme.
 	 */
-	private final String name;
+	private String name;
 	
 	/**
-	 * Specifies whether the schme is active-
+	 * Specifies whether the scheme is active-
 	 */
 	private boolean isCurrent = false;
 	
@@ -49,7 +49,7 @@ public class ColorScheme {
 	}
 	
 	/**
-	 * Returns the color schme.
+	 * Returns the color scheme.
 	 */
 	public Map<String, FeatureColor> getColors() {
 		return colors;
@@ -61,6 +61,10 @@ public class ColorScheme {
 	 */
 	public String getName() {
 		return name;
+	}
+	
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public boolean isCurrent() {

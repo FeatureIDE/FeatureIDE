@@ -93,7 +93,7 @@ public class DynamicProfileMenu extends ContributionItem {
 	 * this method fills the menumanager with actionbuttons
 	 */
 	private void fillContextMenu(IMenuManager menuMgr) {
-		for (ColorScheme cs : FeatureColorManager.getProfiles(featureModel)) {
+		for (ColorScheme cs : FeatureColorManager.getColorSchemes(featureModel)) {
 			if (cs.isDefault()) {
 				continue;
 			}
