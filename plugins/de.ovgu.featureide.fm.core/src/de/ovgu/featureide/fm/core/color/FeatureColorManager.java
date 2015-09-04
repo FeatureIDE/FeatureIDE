@@ -95,6 +95,9 @@ public class FeatureColorManager {
 			return;
 		}
 		final String currentName = getCurrentColorScheme(featureModel).getName();
+		if (DefaultColorScheme.defaultName.equals(currentName)) {
+			throw new RuntimeException("Default color schme cannot be removed!");
+		}
 		colorSchemes.get(project).remove(currentName);
 		final IFile file = profileFolder.getFile(currentName + ".profile");
 		if (!file.exists()) {
