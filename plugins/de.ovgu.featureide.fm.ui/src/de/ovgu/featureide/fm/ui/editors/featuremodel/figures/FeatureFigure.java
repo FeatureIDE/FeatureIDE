@@ -45,7 +45,7 @@ import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer.Attribute;
-import de.ovgu.featureide.fm.core.annotation.ColorPalette;
+import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramExtension;
@@ -143,14 +143,23 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		setBackgroundColor(FMPropertyManager.getConcreteFeatureBackgroundColor());
 		setBorder(FMPropertyManager.getFeatureBorder(feature.isConstraintSelected()));
 
-		// only color if the active profile is not the default profile
-		if (!FeatureColorManager.getCurrentColorScheme(feature.getFeatureModel()).isDefault()) {
+		final FeatureModelAnalyzer analyser = feature.getFeatureModel().getAnalyser();
+		if (!FeatureColorManager.getCurrentColorScheme(feature).isDefault()) {
+			// only color if the active profile is not the default profile
 			FeatureColor color = FeatureColorManager.getColor(feature);
 			if (color != FeatureColor.NO_COLOR) {
 				setBackgroundColor(new Color(null, ColorPalette.getRGB(color.getValue(), 0.5f)));
+			} else {
+				if (feature.isConcrete()) {
+					toolTip.append(CONCRETE);
+					analyser.setAttributeFlag(Attribute.Concrete, true);
+				} else {
+					setBackgroundColor(FMPropertyManager.getAbstractFeatureBackgroundColor());
+					toolTip.append(ABSTRACT);
+					analyser.setAttributeFlag(Attribute.Abstract, true);
+				}
 			}
 		} else {
-			final FeatureModelAnalyzer analyser = feature.getFeatureModel().getAnalyser();
 			if (feature.isRoot() && !analyser.valid()) {
 				setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
 				setBorder(FMPropertyManager.getDeadFeatureBorder(feature.isConstraintSelected()));

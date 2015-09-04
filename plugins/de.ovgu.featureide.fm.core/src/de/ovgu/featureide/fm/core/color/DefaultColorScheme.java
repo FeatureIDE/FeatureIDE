@@ -29,7 +29,7 @@ import de.ovgu.featureide.fm.core.Feature;
  */
 public class DefaultColorScheme extends ColorScheme {
 
-	static String defaultName = "Default"; 
+	public static String defaultName = "Default"; 
 	
 	public DefaultColorScheme() {
 		super(defaultName);

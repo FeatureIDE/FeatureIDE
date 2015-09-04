@@ -77,7 +77,7 @@ public class ColorSelectedFeatureAction extends Action {
 
 	/**
 	 * @param selection
-	 * Creates a featureList with the selected features of the featurediagram.
+	 * Creates a featureList with the selected features of the feature diagram.
 	 */
 	public void updateFeatureList(IStructuredSelection selection) {
 
@@ -107,7 +107,7 @@ public class ColorSelectedFeatureAction extends Action {
 		int returnstat = dialog.open();
 
 		if (!featureList.isEmpty() && Window.OK == returnstat) {
-			featureList.get(0).getFeatureModel().redrawDiagram();
+			featureList.get(0).getFeatureModel().handleModelDataChanged();
 		}
 	}
 }

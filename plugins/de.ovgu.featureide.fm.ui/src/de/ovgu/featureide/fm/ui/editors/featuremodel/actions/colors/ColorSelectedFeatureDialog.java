@@ -23,27 +23,16 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CHOOSE_ACTION_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CHOOSE_COLOR_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.COLORATION_DIALOG;
-import static de.ovgu.featureide.fm.core.localization.StringTable.CYAN;
-import static de.ovgu.featureide.fm.core.localization.StringTable.DARKGREEN;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURES_;
-import static de.ovgu.featureide.fm.core.localization.StringTable.LIGHTGREEN;
-import static de.ovgu.featureide.fm.core.localization.StringTable.LIGHTGREY;
-import static de.ovgu.featureide.fm.core.localization.StringTable.MAGENTA;
-import static de.ovgu.featureide.fm.core.localization.StringTable.ORANGE;
-import static de.ovgu.featureide.fm.core.localization.StringTable.PINK;
-import static de.ovgu.featureide.fm.core.localization.StringTable.PURPLE;
-import static de.ovgu.featureide.fm.core.localization.StringTable.RED;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTED_FEATURE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTED_FEATURE_ALL_CHILDREN;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTED_FEATURE_DIRECT_CHILDREN;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTED_FEATURE_SIBLINGS;
-import static de.ovgu.featureide.fm.core.localization.StringTable.YELLOW;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -60,23 +49,23 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 
 import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.annotation.ColorPalette;
+import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 
 /**
- * Sets the color of the features with different methods (children, siblings) in the featurediagram.
+ * Sets the color of the features in the feature diagram.
  * The color is chosen in the dialog.
  * 
  * @author Christian Elzholz, Marcus Schmelz
  */
 public class ColorSelectedFeatureDialog extends Dialog {
 
+	private static final Color WHITE = new Color(null, 255, 255, 255);
 	final protected List<Feature> featureList;
 	protected ArrayList<Feature> featureListBuffer = new ArrayList<Feature>();
-	private int colorId = -1;
-	private boolean actionChecked = false;
-	private boolean colorChecked = false;
+	private FeatureColor newColor = FeatureColor.NO_COLOR;
+	private Combo colorDropDownMenu;
 
 	/**
 	 * @param parentShell
@@ -109,7 +98,6 @@ public class ColorSelectedFeatureDialog extends Dialog {
 	 *            Creates the general layout of the dialog.
 	 */
 	protected Control createDialogArea(Composite parent) {
-
 		final Composite container = (Composite) super.createDialogArea(parent);
 		container.setBackground(new Color(parent.getDisplay(), 255, 255, 255));
 		GridLayout gridLayout = (GridLayout) container.getLayout();
@@ -121,7 +109,7 @@ public class ColorSelectedFeatureDialog extends Dialog {
 
 		Label actionLabel = new Label(container, SWT.NONE);
 		actionLabel.setLayoutData(gridData);
-		actionLabel.setBackground(new Color(null, 255, 255, 255));
+		actionLabel.setBackground(WHITE);
 		actionLabel.setText(CHOOSE_ACTION_);
 
 		final Combo actionDropDownMenu = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
@@ -131,17 +119,22 @@ public class ColorSelectedFeatureDialog extends Dialog {
 
 		Label chooseColorLabel = new Label(container, SWT.NONE);
 		chooseColorLabel.setLayoutData(gridData);
-		chooseColorLabel.setBackground(new Color(null, 255, 255, 255));
+		chooseColorLabel.setBackground(WHITE);
 		chooseColorLabel.setText(CHOOSE_COLOR_);
 
-		final Combo colorDropDownMenu = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
-		final String[] colorDropDownItems = { RED, ORANGE, YELLOW, DARKGREEN, LIGHTGREEN, CYAN, LIGHTGREY, PURPLE, MAGENTA, PINK };
+		colorDropDownMenu = new Combo(container, SWT.DROP_DOWN | SWT.READ_ONLY);
+		final String[] colorDropDownItems = new String[FeatureColor.values().length];
+		int i = 0;
+		for (FeatureColor color : FeatureColor.values()) {
+			colorDropDownItems[i++] = color.getColorName();
+		}
+		
 		colorDropDownMenu.setLayoutData(gridData);
 		colorDropDownMenu.setItems(colorDropDownItems);
 
 		Label featureLabel = new Label(container, SWT.NONE);
 		featureLabel.setLayoutData(gridData);
-		featureLabel.setBackground(new Color(null, 255, 255, 255));
+		featureLabel.setBackground(WHITE);
 		featureLabel.setText(FEATURES_);
 
 		gridData = new GridData();
@@ -153,87 +146,41 @@ public class ColorSelectedFeatureDialog extends Dialog {
 		final Table featureTable = new Table(container, SWT.BORDER | SWT.NO_FOCUS | SWT.HIDE_SELECTION);
 		featureTable.setLayoutData(gridData);
 
-		//listener: defines the future color of the features
 		SelectionListener colorSelectionListener = new SelectionListener() {
 			public void widgetSelected(SelectionEvent event) {
-				Combo colorListener = ((Combo) event.widget);
-
-				for (int i = 0; i < colorDropDownItems.length; i++) {
-					if (colorListener.getText().equals(colorDropDownItems[i])) {
-						colorChecked = true;
-						colorId = i;
-						for (int j = 0; j < featureListBuffer.size(); j++) {
-							featureTable.getItem(j).setBackground(new Color(null, ColorPalette.getRGB(colorId, 0.4f)));
-						}
+				String selectedColor = colorDropDownMenu.getItem(((Combo) event.widget).getSelectionIndex());
+				FeatureColor color = FeatureColor.getColor(selectedColor);
+				for (int j = 0; j < featureListBuffer.size(); j++) {
+					if (color != FeatureColor.NO_COLOR) {
+						featureTable.getItem(j).setBackground(new Color(null, ColorPalette.getRGB(color.getValue(), 0.4f)));
+					} else {
+						featureTable.getItem(j).setBackground(WHITE);
 					}
 				}
-				if (actionChecked && colorChecked) {
-					ColorSelectedFeatureDialog.this.getButton(OK).setEnabled(true);
-				}
+				newColor = color;
 			}
 
 			public void widgetDefaultSelected(SelectionEvent e) {
 			};
 		};
 		colorDropDownMenu.addSelectionListener(colorSelectionListener);
-
-		//listener: defines the used method 
+		colorDropDownMenu.select(0);
+		
+		
 		SelectionListener actionSelectionListener = new SelectionListener() {
 			public void widgetSelected(SelectionEvent event) {
-				Combo actionListener = ((Combo) event.widget);
-
-				// selectedFeature
-				if (actionListener.getText().equals(actionDropDownItems[0])) {
-
-					bufferSelectedFeatures();
-					actionChecked = true;
-					featureTable.redraw();
-					featureTable.removeAll();
-					colorPreview(featureTable);
-				}
-
-				// selectedfeature + direct children
-				if (actionListener.getText().equals(actionDropDownItems[1])) {
-
-					bufferSelectedFeatures();
+				bufferSelectedFeatures();
+				String selectedAction = ((Combo) event.widget).getText();
+				if (selectedAction.equals(SELECTED_FEATURE_DIRECT_CHILDREN)) {
 					findDirectChildren();
-					actionChecked = true;
-					featureTable.redraw();
-					featureTable.removeAll();
-					colorPreview(featureTable);
-				}
-
-				// selectedfeature + all children
-				if (actionListener.getText().equals(actionDropDownItems[2])) {
-
-					bufferSelectedFeatures();
+				} else if (selectedAction.equals(SELECTED_FEATURE_ALL_CHILDREN)) {
 					findAllChildren();
-					actionChecked = true;
-					featureTable.redraw();
-					featureTable.removeAll();
-					colorPreview(featureTable);
-				}
-
-				// selectedfeature + siblings
-				if (actionListener.getText().equals(actionDropDownItems[3])) {
-
-					bufferSelectedFeatures();
+				} else if (selectedAction.equals(SELECTED_FEATURE_SIBLINGS)) {
 					findSiblings();
-					actionChecked = true;
-					featureTable.redraw();
-					featureTable.removeAll();
-					colorPreview(featureTable);
 				}
-				if (actionChecked && colorChecked) {
-					ColorSelectedFeatureDialog.this.getButton(OK).setEnabled(true);
-				}
-			}
-
-			private void bufferSelectedFeatures() {
-				featureListBuffer.clear();
-				for (int i = 0; i < featureList.size(); i++) {
-					featureListBuffer.add(featureList.get(i));
-				}
+				featureTable.redraw();
+				featureTable.removeAll();
+				colorPreview(featureTable);
 			}
 
 			private void findSiblings() {
@@ -265,68 +212,59 @@ public class ColorSelectedFeatureDialog extends Dialog {
 				}
 			}
 
-			/**
-			 * @param featureTable
-			 *            Colors the background of the Tableitems to show a preview of the changed colors
-			 */
-			private void colorPreview(final Table featureTable) {
-				for (int i = 0; i < featureListBuffer.size(); i++) {
-					TableItem item = new TableItem(featureTable, SWT.NONE);
-					item.setText(featureListBuffer.get(i).getName());
-
-					final Feature feature = featureListBuffer.get(i);
-					FeatureColor color = FeatureColorManager.getColor(feature); 
-					if (color != FeatureColor.NO_COLOR) {
-						item.setBackground(new Color(null, ColorPalette.getRGB(color.getValue(), 0.4f)));
-					}
-				}
-			}
+		
 
 			public void widgetDefaultSelected(SelectionEvent e) {
 			};
 		};
 		actionDropDownMenu.addSelectionListener(actionSelectionListener);
-
+		
+		actionDropDownMenu.select(0);
+		bufferSelectedFeatures();
+		featureTable.redraw();
+		featureTable.removeAll();
+		colorPreview(featureTable);
 		return parent;
 
 	}
 
+	private void bufferSelectedFeatures() {
+		featureListBuffer.clear();
+		for (int i = 0; i < featureList.size(); i++) {
+			featureListBuffer.add(featureList.get(i));
+		}
+	}
+	
+	/**
+	 * @param featureTable
+	 *            Colors the background of the table items to show a preview of the changed colors
+	 */
+	private void colorPreview(final Table featureTable) {
+		for (int i = 0; i < featureListBuffer.size(); i++) {
+			TableItem item = new TableItem(featureTable, SWT.NONE);
+			item.setText(featureListBuffer.get(i).getName());
+			FeatureColor color = FeatureColor.getColor(colorDropDownMenu.getText()); 
+			if (color != FeatureColor.NO_COLOR) {
+				item.setBackground(new Color(null, ColorPalette.getRGB(color.getValue(), 0.4f)));
+			} else {
+				item.setBackground(WHITE);
+			}
+		}
+	}
+	
 	/**
 	 * @param parent
 	 */
 	protected Control createContents(Composite parent) {
 		super.createContents(parent);
-
-		getButton(IDialogConstants.OK_ID).setEnabled(false);
-
 		return parent;
 	}
 
-	/**
-	 * @param buttonId
-	 *            on ok press: set color in selected features
-	 *            on cancel press: close dialog, do nothing
-	 */
-	protected void buttonPressed(int buttonId) {
-
-		if (IDialogConstants.OK_ID == buttonId) {
-
-			for (int i = 0; i < featureListBuffer.size(); i++) {
-				final Feature feature = featureListBuffer.get(i);
-				FeatureColorManager.setColor(feature, FeatureColor.getColor(colorId));
-			}
-			okPressed();
-
-		} else if (IDialogConstants.CANCEL_ID == buttonId) {
-			cancelPressed();
-		}
-	}
-
 	protected void okPressed() {
+		for (int i = 0; i < featureListBuffer.size(); i++) {
+			final Feature feature = featureListBuffer.get(i);
+			FeatureColorManager.setColor(feature, newColor);
+		}
 		super.okPressed();
-	}
-
-	protected void cancelPressed() {
-		super.cancelPressed();
 	}
 }

@@ -93,6 +93,17 @@ public class FeatureColorManager {
 	}
 
 	/**
+	 * Checks whether the given scheme is active.
+	 * @param newProfileColorSchemeName
+	 * @return
+	 */
+	public static boolean isCurrentColorScheme(FeatureModel featureModel, String schmeName) {
+		IProject project = getProject(featureModel);
+		Map<String, ColorScheme> currentSchemes = colorSchemes.get(project);
+		return currentSchemes.get(schmeName).isCurrent();
+	}
+	
+	/**
 	 * Returns the current color scheme.
 	 */
 	public static ColorScheme getCurrentColorScheme(Feature feature) {
@@ -115,6 +126,18 @@ public class FeatureColorManager {
 			}
 		}
 		throw new RuntimeException("at least one schould be active");
+	}
+	
+	/**
+	 * Returns the default color schme.
+	 */
+	public static ColorScheme getDefaultColorScheme(FeatureModel model) {
+		for (ColorScheme cs : getProfiles(model)) {
+			if (cs.isDefault()) {
+				return cs;
+			}
+		}
+		throw new RuntimeException("There must be a default color scheme!");
 	}
 
 	/**
@@ -155,7 +178,11 @@ public class FeatureColorManager {
 			
 			while ((line = in.readLine()) != null) {
 				String[] split = line.split("=");
-				newCs.setColor(split[0], FeatureColor.valueOf(split[1]));
+				try {
+					newCs.setColor(split[0], FeatureColor.valueOf(split[1]));					
+				} catch (IllegalArgumentException e) {
+					FMCorePlugin.getDefault().logError("Color not found", e);
+				}
 			}
 		} catch (IOException e) {
 			FMCorePlugin.getDefault().logError(e);
@@ -260,6 +287,7 @@ public class FeatureColorManager {
 	public static void setActive(FeatureModel fm, String collName) {
 		IProject project = getProject(fm);
 		setActive(project, collName, true);
+		fm.handleModelDataChanged();
 	}
 	
 	/**
@@ -298,4 +326,5 @@ public class FeatureColorManager {
 	public static void renameFeature(FeatureModel model, String oldName, String newName) {
 		throw new RuntimeException("TODO implement");
 	}
+
 }

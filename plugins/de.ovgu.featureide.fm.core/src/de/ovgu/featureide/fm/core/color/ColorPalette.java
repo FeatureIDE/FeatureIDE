@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.annotation;
+package de.ovgu.featureide.fm.core.color;
 
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
@@ -31,8 +31,6 @@ import org.eclipse.swt.graphics.RGB;
 public class ColorPalette {
 	public final static int COLOR_COUNT = 10;
 
-	private final static String[] colorNames =
-		{"Red", "Orange", "Yellow", "Dark Green", "Light Green", "Cyan", "Light Grey", "Blue", "Magenta", "Pink"};
 	private final static float[] hue = new float[COLOR_COUNT];
 	private final static float[] brightness = new float[COLOR_COUNT];
 	private final static float[] maxSaturation = new float[COLOR_COUNT];
@@ -79,6 +77,6 @@ public class ColorPalette {
 	}
 	
 	public static String getColorName(int index) {
-		return colorNames[index % COLOR_COUNT];
+		return FeatureColor.getColor(index).toString().replace('_', ' ');
 	}
 }

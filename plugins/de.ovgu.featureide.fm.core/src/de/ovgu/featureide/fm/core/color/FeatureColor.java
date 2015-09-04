@@ -26,11 +26,15 @@ package de.ovgu.featureide.fm.core.color;
  * @author Jens Meinicke
  */
 public enum FeatureColor {
-	NO_COLOR(-1), RED(0), ORANGE(1), YELLOW(2), DARK_GREEN(3), LIGHT_GREEN(4), CYAN(5), LIGHT_GRAY(6), BLUE(7), MAGENTA(8), PINK(9);
+	NO_COLOR(-1), Red(0), Orange(1), Yellow(2), Dark_Green(3), Light_Green(4), Cyan(5), Light_Gray(6), Blue(7), Magenta(8), Pink(9);
 	
 	final int value;
 	FeatureColor(int i) {
 		this.value = i;
+	}
+	
+	public String getColorName() {
+		return name().replace('_', ' ');
 	}
 	
 	public int getValue() {
@@ -44,5 +48,14 @@ public enum FeatureColor {
 			}
 		}
 		throw new RuntimeException("Color " + index + " not found");
+	}
+
+	public static FeatureColor getColor(String colorName) {
+		for (FeatureColor c : values()) {
+			if (c.getColorName().equals(colorName)) {
+				return c;
+			}
+		}
+		return NO_COLOR;
 	}
 }

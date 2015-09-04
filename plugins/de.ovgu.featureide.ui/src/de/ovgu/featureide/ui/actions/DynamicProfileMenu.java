@@ -94,6 +94,9 @@ public class DynamicProfileMenu extends ContributionItem {
 	 */
 	private void fillContextMenu(IMenuManager menuMgr) {
 		for (ColorScheme cs : FeatureColorManager.getProfiles(featureModel)) {
+			if (cs.isDefault()) {
+				continue;
+			}
 			SetProfileColorSchemeAction setCSAction = new SetProfileColorSchemeAction(cs.getName(), Action.AS_CHECK_BOX, featureModel);
 			if (cs.isCurrent()) {
 				setCSAction.setChecked(true);

@@ -67,6 +67,7 @@ import de.ovgu.featureide.core.fstmodel.RoleElement;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.fm.core.annotation.LogService;
 import de.ovgu.featureide.fm.core.annotation.LogService.LogLevel;
+import de.ovgu.featureide.fm.core.color.FeatureColor;
 
 /**
  * Assigns color annotations to the editor.
@@ -638,9 +639,9 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 			int start = child.getStartLine();
 			int end = child.getEndLine();
 
-//			if (line >= start && line <= end && (!hasValidColor || ColorList.isValidColor(child.getColor()))) {
-//				return true;
-//			}
+			if (line >= start && line <= end && (!hasValidColor || child.getColor() != FeatureColor.NO_COLOR.getValue())) {
+				return true;
+			}
 			if (hasChildAtLine(child, line, hasValidColor)) {
 				return true;
 			}
