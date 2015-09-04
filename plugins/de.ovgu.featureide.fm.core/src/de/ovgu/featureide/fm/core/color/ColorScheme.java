@@ -105,9 +105,14 @@ public class ColorScheme {
 		isCurrent = current;
 	}
 
+	public void renameFeature(String oldName, String newName) {
+		if (colors.containsKey(oldName)) {
+			colors.put(newName, colors.remove(oldName));
+		}
+	}
+	
 	@Override
 	public String toString() {
 		return name + ":" + (isCurrent ? "ACTIVE" : "INACTIV") + "  " + colors;
 	}
-	
 }

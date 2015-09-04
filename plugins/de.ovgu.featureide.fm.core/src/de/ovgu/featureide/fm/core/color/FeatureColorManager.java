@@ -339,12 +339,15 @@ public class FeatureColorManager {
 		}
 	}
 
-
 	/**
 	 * Performs the feature renaming.
 	 */
 	public static void renameFeature(FeatureModel model, String oldName, String newName) {
-		throw new RuntimeException("TODO implement");
+		Collection<ColorScheme> currentColorSchemes = getProfiles(model);
+		for (ColorScheme colorScheme : currentColorSchemes) {
+			colorScheme.renameFeature(oldName, newName);
+			writeColors(getProject(model), colorScheme);
+		}
 	}
 
 }

@@ -51,4 +51,8 @@ public class DefaultColorScheme extends ColorScheme {
 		return FeatureColor.NO_COLOR;
 	}
 	
+	@Override
+	public void renameFeature(String oldName, String newName) {
+		// nothing here
+	}
 }
