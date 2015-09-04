@@ -979,14 +979,14 @@ public class StringTable {
 	public static final String MARGENTA = "margenta";
 	public static final String PINK = "pink";
 	public static final String COLOR_TYPE = "Test Color";
-	public static final String COLORATION = "Coloration";
+	public static final String COLORATION = "Feature Color";
 	public static final String MAGENTA = "magenta";
 	public static final String PURPLE = "purple";
 	public static final String SELECTED_FEATURE = "Selected Feature";
 	public static final String SELECTED_FEATURE_DIRECT_CHILDREN = "Selected Feature and all direct Children";
 	public static final String SELECTED_FEATURE_ALL_CHILDREN = "Selected Feature and all Children";
 	public static final String SELECTED_FEATURE_SIBLINGS = "Selected Feature and all Siblings";
-	public static final String COLORATION_DIALOG = "Coloration Dialog";
+	public static final String COLORATION_DIALOG = "Set Feature Colors";
 	public static final String CHOOSE_COLOR_ = "Choose Color:";
 	public static final String CHOOSE_ACTION_ = "Choose Action:";
 	public static final String FEATURES_ = "Features:";
