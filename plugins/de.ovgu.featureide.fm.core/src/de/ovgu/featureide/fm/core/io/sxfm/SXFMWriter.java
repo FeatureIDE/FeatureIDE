@@ -198,11 +198,11 @@ public class SXFMWriter extends AbstractFeatureModelWriter {
 		FeatMod.appendChild(propConstr);
 		Node newNode = doc.createTextNode("\n");
 		propConstr.appendChild(newNode);
-		if (featureModel.getPropositionalNodes().isEmpty())
+		if (featureModel.getConstraints().isEmpty())
 			return;
 		// as before
 		int i = 1;
-		for (org.prop4j.Node node : featureModel.getPropositionalNodes()) {
+		for (org.prop4j.Node node : FeatureUtils.getPropositionalNodes(featureModel.getConstraints())) {
 			// avoid use of parenthesis from the beginning
 			org.prop4j.Node cnf = node.clone().toCNF();
 			if (cnf instanceof And) {

@@ -41,6 +41,7 @@ import org.eclipse.gef.editparts.ZoomListener;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer.Attribute;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
@@ -211,7 +212,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 			toolTip.append(description);
 		}
 
-		final String contraints = feature.getRelevantConstraintsString();
+		final String contraints = FeatureUtils.getRelevantConstraintsString(feature, feature.getFeatureModel().getConstraints());
 		if (!contraints.isEmpty()) {
 			toolTip.append("\n\nConstraints:\n");
 			toolTip.append(contraints);

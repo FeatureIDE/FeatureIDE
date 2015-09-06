@@ -54,6 +54,7 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.Constraint;
 import de.ovgu.featureide.fm.core.editing.Comparison;
 import de.ovgu.featureide.fm.core.editing.ModelComparator;
 import de.ovgu.featureide.fm.core.functional.Functional;
@@ -92,7 +93,7 @@ public final class ConstraintTextValidator {
 				clonedModel.removeConstraint(constraint);
 			}
 			deadFeaturesBefore = clonedModel.getAnalyser().getDeadFeatures();
-			clonedModel.addPropositionalNode(propNode);
+			clonedModel.getConstraints().add(new Constraint(clonedModel, propNode));
 			clonedModel.handleModelDataChanged();
 		}
 
@@ -153,7 +154,7 @@ public final class ConstraintTextValidator {
 		for (IFeature feature : model.getFeatures()) {
 			if (input.contains(feature.getName())) {
 				//if (feature.getFeatureStatus() != FeatureStatus.FALSE_OPTIONAL) {
-				clonedModel.addPropositionalNode(propNode);
+				clonedModel.getConstraints().add(new Constraint(clonedModel, propNode));
 				clonedModel.getAnalyser().analyzeFeatureModel(null);
 				if (clonedModel.getFeature(feature.getName()).getProperty().getFeatureStatus() == FeatureStatus.FALSE_OPTIONAL && !list.contains(feature))
 					list.add(feature);
@@ -183,7 +184,7 @@ public final class ConstraintTextValidator {
 		}
 		IFeatureModel clonedModel = featureModel.clone(null);
 		Node propNode = new NodeReader().stringToNode(constraint, Functional.toList(FeatureUtils.extractFeatureNames(clonedModel.getFeatures())));
-		clonedModel.addPropositionalNode(propNode);
+		clonedModel.getConstraints().add(new Constraint(clonedModel, propNode));
 		if (new ModelComparator(20000).compare(featureModel, clonedModel) == Comparison.REFACTORING) {
 			return true;
 		}
@@ -539,7 +540,7 @@ public final class ConstraintTextValidator {
 			if (constraint != null) {
 				clonedModel.removeConstraint(constraint);
 			}
-			clonedModel.addPropositionalNode(propNode);
+			clonedModel.getConstraints().add(new Constraint(clonedModel, propNode));
 			clonedModel.handleModelDataChanged();
 		}
 

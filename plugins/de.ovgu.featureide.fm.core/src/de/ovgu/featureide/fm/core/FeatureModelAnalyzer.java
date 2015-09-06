@@ -53,6 +53,7 @@ import org.prop4j.Or;
 import org.prop4j.SatSolver;
 import org.sat4j.specs.TimeoutException;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -752,7 +753,7 @@ public class FeatureModelAnalyzer {
 				changedAttributes.put(bone, FeatureStatus.FALSE_OPTIONAL);
 			}
 			bone.getProperty().setFeatureStatus(FeatureStatus.NORMAL, false);
-			bone.setRelevantConstraints();
+			FeatureUtils.setRelevantConstraints(bone);
 		}
 
 		try {
@@ -815,7 +816,7 @@ public class FeatureModelAnalyzer {
 		Collection<IFeature> list = new LinkedList<IFeature>();
 		Collection<IFeature> hiddenFeatures = getHiddenFeatures();
 		for (IFeature feature : hiddenFeatures) {	
-			for (IConstraint constraint : feature.getRelevantConstraints()) {
+			for (IConstraint constraint : feature.getStructure().getRelevantConstraints()) {
 				Node node = constraint.getNode();
 				if (node instanceof Equals) {
 					Node[] children = node.getChildren();

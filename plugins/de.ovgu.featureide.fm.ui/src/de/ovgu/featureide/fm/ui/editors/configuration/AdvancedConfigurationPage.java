@@ -41,6 +41,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
@@ -240,7 +241,7 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 		final Object data = item.getData();
 		if (data instanceof SelectableFeature) {
 			final SelectableFeature feature = (SelectableFeature) item.getData();
-			final String relConst = feature.getFeature().getRelevantConstraintsString();
+			final String relConst = FeatureUtils.getRelevantConstraintsString(feature.getFeature(), feature.getFeature().getFeatureModel().getConstraints());
 			final String describ = feature.getFeature().getProperty().getDescription();
 			final StringBuilder sb = new StringBuilder();
 

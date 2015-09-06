@@ -36,6 +36,7 @@ import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IGraphicalConstraint;
 
 /**
  * Represents a propositional constraint below the feature diagram.
@@ -65,6 +66,37 @@ public class Constraint implements IConstraint, PropertyConstants {
 	public Constraint(IFeatureModel featureModel, Node propNode) {
 		this.featureModel = featureModel;
 		this.propNode = propNode;
+	}
+
+	@Override
+	public int hashCode() { // Marcus: required for Constraints.remove(Constraint), e.g. Generator.java:124
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((featureModel == null) ? 0 : featureModel.hashCode());
+		result = prime * result + ((propNode == null) ? 0 : propNode.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {		// Marcus: required for Constraints.remove(Constraint), e.g. Generator.java:124
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Constraint other = (Constraint) obj;
+		if (featureModel == null) {
+			if (other.featureModel != null)
+				return false;
+		} else if (!featureModel.equals(other.featureModel))
+			return false;
+		if (propNode == null) {
+			if (other.propNode != null)
+				return false;
+		} else if (!propNode.equals(other.propNode))
+			return false;
+		return true;
 	}
 
 	@Override
@@ -199,6 +231,14 @@ public class Constraint implements IConstraint, PropertyConstants {
 		falseOptionalFeatures.addAll(clone.getAnalyser().getFalseOptionalFeatures(fmFalseOptionals));
 		fmFalseOptionals.removeAll(falseOptionalFeatures);
 		return !falseOptionalFeatures.isEmpty();
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.base.IConstraint#getGraphicRepresenation()
+	 */
+	@Override
+	public IGraphicalConstraint getGraphicRepresenation() {
+		throw new UnsupportedOperationException("No implemented");
 	}
 
 }

@@ -80,9 +80,11 @@ import org.prop4j.Not;
 import org.prop4j.Or;
 import org.prop4j.SatSolver;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.base.impl.Constraint;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.ModelWarning;
@@ -353,7 +355,7 @@ public class GuidslReader extends AbstractFeatureModelReader {
 					warnings.add(new ModelWarning(CONSTRAINT_IS_NOT_SATISFIABLE_, line));
 			} catch (Exception e) {
 			}
-			featureModel.addPropositionalNode(node);
+			featureModel.getConstraints().add(new Constraint(featureModel, node));
 			astListNode = (AstListNode) astListNode.right;
 		} while (astListNode != null);
 	}
@@ -415,7 +417,7 @@ public class GuidslReader extends AbstractFeatureModelReader {
 			featureString.append("%%\r\n");
 		featureString.append(propString);
 		readFromString(featureString.toString());
-		List<Node> propNodes = getFeatureModel().getPropositionalNodes();
+		List<Node> propNodes = FeatureUtils.getPropositionalNodes(getFeatureModel().getConstraints());
 
 		return propNodes.get(propNodes.size()-1);
 	}

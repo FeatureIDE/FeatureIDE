@@ -129,7 +129,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 
 			featureModel.handleModelDataChanged();
 		} else if (request.getType() == RequestConstants.REQ_SELECTION) {
-			for (IConstraint partOf : feature.getRelevantConstraints()) {
+			for (IConstraint partOf : feature.getStructure().getRelevantConstraints()) {
 				partOf.setFeatureSelected(true);
 			}
 		}

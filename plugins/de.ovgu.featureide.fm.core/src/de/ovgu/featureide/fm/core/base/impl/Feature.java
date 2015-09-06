@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.core.base.impl;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Collection;
 import java.util.LinkedList;
 
 import de.ovgu.featureide.fm.core.PropertyConstants;
@@ -29,6 +30,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureProperty;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.base.IGraphicalFeature;
 
 /**
  * Provides all properties of a feature. This includes its connections to parent
@@ -144,6 +146,11 @@ public class Feature implements IFeature, PropertyConstants {
 	@Override
 	public String toString() {
 		return name;
+	}
+
+	@Override
+	public Collection<IGraphicalFeature> getGraphicRepresenation() {
+		throw new UnsupportedOperationException("Not implemented yet");
 	}
 
 }

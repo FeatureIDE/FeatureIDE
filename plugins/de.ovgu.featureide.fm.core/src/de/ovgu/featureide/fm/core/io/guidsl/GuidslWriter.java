@@ -105,10 +105,10 @@ public class GuidslWriter extends AbstractFeatureModelWriter {
 	}
 
 	private void writePropositionalConstraints(StringBuilder out) {
-		if (featureModel.getPropositionalNodes().isEmpty())
+		if (featureModel.getConstraints().isEmpty())
 			return;
 		out.append("%%\r\n\r\n");
-		for (Node node : featureModel.getPropositionalNodes())
+		for (Node node : FeatureUtils.getPropositionalNodes(featureModel.getConstraints()))
 			out.append(node.toString(NodeWriter.textualSymbols) + " ;\r\n");
 		out.append("\r\n");
 	}

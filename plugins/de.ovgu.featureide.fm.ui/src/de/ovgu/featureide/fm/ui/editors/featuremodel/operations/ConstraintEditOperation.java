@@ -24,6 +24,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.EDIT_CONSTRAIN
 
 import org.prop4j.Node;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
 
@@ -49,13 +50,13 @@ public class ConstraintEditOperation extends AbstractFeatureModelOperation {
 	@Override
 	protected void redo() {
 		oldPropNode = featureModel.getConstraints().get(index).getNode();
-		featureModel.replacePropNode(index, propNode);
+		FeatureUtils.replacePropNode(featureModel, index, propNode);
 		FeatureDiagramLayoutHelper.initializeConstraintPosition(featureModel, index);
 	}
 
 	@Override
 	protected void undo() {
-		featureModel.replacePropNode(index, oldPropNode);
+		FeatureUtils.replacePropNode(featureModel, index, oldPropNode);
 		//initialize constraint position in manual layout
 		if (!featureModel.getGraphicRepresenation().getLayout().hasFeaturesAutoLayout())
 			FeatureDiagramLayoutHelper.initializeConstraintPosition(featureModel, index);

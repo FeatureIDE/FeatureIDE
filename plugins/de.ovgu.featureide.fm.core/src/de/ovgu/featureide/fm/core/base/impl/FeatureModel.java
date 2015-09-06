@@ -43,6 +43,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelProperty;
 import de.ovgu.featureide.fm.core.base.IFeatureModelStructure;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.base.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.core.filter.ConcreteFeatureFilter;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
@@ -405,6 +406,22 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 
 	public void setUndoContext(Object undoContext) {
 		this.undoContext = undoContext;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.base.IFeatureModel#getGraphicRepresenation()
+	 */
+	@Override
+	public IGraphicalFeatureModel getGraphicRepresenation() {
+		throw new UnsupportedOperationException ("Not implemented yet");
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.base.IFeatureModel#getFeatureTable()
+	 */
+	@Override
+	public Map<String, IFeature> getFeatureTable() {
+		throw new UnsupportedOperationException ("Not implemented yet");
 	}
 
 }

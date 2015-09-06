@@ -64,6 +64,7 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.base.impl.Constraint;
 import de.ovgu.featureide.fm.core.base.impl.Feature;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
@@ -415,10 +416,10 @@ public class SXFMReader extends AbstractFeatureModelReader {
 					INVALID, line);
     		int f = children.size();
     		node = buildMinConstr(FeatureUtils.convertToFeatureList(children), f - start + 1, feat.getName());
-    		featureModel.addPropositionalNode(node);
+    		featureModel.getConstraints().add(new Constraint(featureModel, node));
     		if ((start > 0) && (end < f)) {
     			node = buildMaxConstr(FeatureUtils.convertToFeatureList(children), end + 1);
-    			featureModel.addPropositionalNode(node);
+    			featureModel.getConstraints().add(new Constraint(featureModel, node));
     		}
     	}
     }
@@ -558,7 +559,7 @@ public class SXFMReader extends AbstractFeatureModelReader {
 		}
 		scan .close();
 		org.prop4j.Node propNode = buildPropNode(elements);
-		featureModel.addPropositionalNode(propNode);
+		featureModel.getConstraints().add(new Constraint(featureModel, propNode));
     }
     
     /**

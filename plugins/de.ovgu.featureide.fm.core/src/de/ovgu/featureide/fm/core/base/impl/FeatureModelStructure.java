@@ -208,4 +208,12 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 		rootFeature = root;
 	}
 
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.fm.core.base.IFeatureModelStructure#hasFalseOptionalFeatures()
+	 */
+	@Override
+	public boolean hasFalseOptionalFeatures() {
+		throw new UnsupportedOperationException ("Not implemented yet");
+	}
+
 }

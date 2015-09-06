@@ -35,9 +35,11 @@ import org.prop4j.Or;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.base.impl.Constraint;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
 
 /**
@@ -120,19 +122,19 @@ public abstract class Generator {
 				if (random.nextBoolean() && random.nextBoolean())
 					node = new Not(node);
 			}
-			fm.addPropositionalNode(node);
+			fm.getConstraints().add(new Constraint(fm, node));
 			try {
 				if (!valid || fm.getAnalyser().isValid()) {
 					i++;
 					System.out.println("E\t" + i + "\t" + node);
 				}
 				else {
-					fm.removePropositionalNode(node);
+					fm.getConstraints().remove(new Constraint(fm, node));
 					FMCorePlugin.getDefault().logInfo("F\t" + ++k + "\t" + node);
 				}
 			} catch (TimeoutException e) {
 				FMCorePlugin.getDefault().logError(e);
-				fm.removePropositionalNode(node);
+				fm.getConstraints().add(new Constraint(fm, node));
 			}
 		}		
 	}
@@ -155,7 +157,7 @@ public abstract class Generator {
 						LinkedList<Node> nodes = new LinkedList<Node>();
 						for (IFeatureStructure child : feature.getStructure().getChildren())
 							nodes.add(new Literal(child.getFeature().getName()));
-						fm.addPropositionalNode(new AtMost(1,nodes).toCNF());
+						fm.getConstraints().add(new Constraint(fm, new AtMost(1,nodes).toCNF()));
 						break;
 					}
 			}
@@ -165,7 +167,7 @@ public abstract class Generator {
 					IFeatureStructure parent = feature.getStructure().getParent();
 					if (parent != null && parent.isAnd() && !parent.isFirstChild(feature.getStructure()) && feature.getStructure().isMandatory()) {
 						feature.getStructure().setMandatory(false);
-						fm.addPropositionalNode(new Implies(new Literal(parent.getFeature().getName()),new Literal(feature.getName())));
+						fm.getConstraints().add(new Constraint(fm, new Implies(new Literal(parent.getFeature().getName()),new Literal(feature.getName()))));
 						break;
 					}
 				}
@@ -263,7 +265,7 @@ public abstract class Generator {
 					IFeatureStructure parent = feature.getStructure().getParent();
 					if (parent != null && parent.isAnd() && !parent.isFirstChild(feature.getStructure()) && feature.getStructure().isMandatory()) {
 						feature.getStructure().setMandatory(false);
-						fm.addPropositionalNode(new Implies(new Literal(parent.getFeature().getName()),new Literal(feature.getName())));
+						fm.getConstraints().add(new Constraint(fm, new Implies(new Literal(parent.getFeature().getName()),new Literal(feature.getName()))));
 						break;
 					}
 				}
@@ -299,10 +301,10 @@ public abstract class Generator {
 			}
 			else {
 				//remove Constraint
-				List<Node> nodes = fm.getPropositionalNodes();
+				List<Node> nodes = FeatureUtils.getPropositionalNodes(fm.getConstraints());
 				if (!nodes.isEmpty()) {
 					int index = random.nextInt(nodes.size());
-					fm.removePropositionalNode(nodes.get(index));
+					fm.getConstraints().remove(new Constraint(fm, nodes.get(index)));
 				}
 			}
 		}
@@ -399,8 +401,8 @@ public abstract class Generator {
 			}
 			else {
 				//delete or add constraint
-				if (fm.getPropositionalNodes().size() > 0 && random.nextBoolean()) {
-					int index = random.nextInt(fm.getPropositionalNodes().size());
+				if (fm.getConstraints().size() > 0 && random.nextBoolean()) {
+					int index = random.nextInt(fm.getConstraints().size());
 					fm.removeConstraint(index);
 				}
 				else

@@ -26,6 +26,10 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.prop4j.Node;
+import org.prop4j.NodeWriter;
+
+import de.ovgu.featureide.fm.core.base.impl.Constraint;
 import de.ovgu.featureide.fm.core.filter.ConcreteFeatureFilter;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
@@ -34,39 +38,52 @@ import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
  * @author Marcus Pinnecke
  */
 public abstract class FeatureUtils {
-	
+
 	public static final ConcreteFeatureFilter CONCRETE_FEATURE_FILTER = new ConcreteFeatureFilter();
-	
+
 	public static final IFunction<IFeature, String> GET_FEATURE_NAME = new IFunction<IFeature, String>() {
-		
+
 		@Override
 		public String invoke(IFeature t) {
 			return t.getName();
 		}
 	};
-	
+
 	public static final IFunction<IFeatureStructure, IFeature> STRUCTURE_TO_FEATURE = new IFunction<IFeatureStructure, IFeature>() {
-		
+
 		@Override
 		public IFeature invoke(IFeatureStructure t) {
 			return t.getFeature();
 		}
 	};
-	
+
 	public static final IFunction<IFeature, IFeatureStructure> FEATURE_TO_STRUCTURE = new IFunction<IFeature, IFeatureStructure>() {
-		
+
 		@Override
 		public IFeatureStructure invoke(IFeature t) {
 			return t.getStructure();
 		}
 	};
-	
+
+	private static final IFunction<IConstraint, Node> CONSTRAINT_TO_NODE = new IFunction<IConstraint, Node>() {
+
+		@Override
+		public Node invoke(IConstraint t) {
+			return t.getNode();
+		}
+
+	};
+
 	/**
-	 * Extracts all concrete features from an object that yields features. Basically, an invocation of this method on <b>features</b> will return an iterable object that
-	 * yields a feature <i>f</i> from <b>features</b> if and only if <i>f</i> is concrete. Since the implementation based on iterators, it is a lazy filtering without
-	 * modification of <b>features</b>. 
+	 * Extracts all concrete features from an object that yields features. Basically, an invocation of this method on <b>features</b> will return an iterable
+	 * object that
+	 * yields a feature <i>f</i> from <b>features</b> if and only if <i>f</i> is concrete. Since the implementation based on iterators, it is a lazy filtering
+	 * without
+	 * modification of <b>features</b>.
 	 * 
-	 * <br/><br/>The extraction is done via {@link de.ovgu.featureide.fm.core.functional.Functional#filter(Iterable, de.ovgu.featureide.fm.core.filter.base.IFilter)}
+	 * <br/>
+	 * <br/>
+	 * The extraction is done via {@link de.ovgu.featureide.fm.core.functional.Functional#filter(Iterable, de.ovgu.featureide.fm.core.filter.base.IFilter)}
 	 * 
 	 * @since 2.7.5
 	 * @param features An iterable object providing features
@@ -76,7 +93,7 @@ public abstract class FeatureUtils {
 	public static Iterable<IFeature> extractConcreteFeatures(final Iterable<IFeature> features) {
 		return filter(features, CONCRETE_FEATURE_FILTER);
 	}
-	
+
 	/**
 	 * Extracts all concrete features from a feature model by calling {@link #extractConcreteFeatures(Iterable)} on <code>model.getFeatures()</code>.
 	 * 
@@ -88,11 +105,11 @@ public abstract class FeatureUtils {
 	public static Iterable<IFeature> extractConcreteFeatures(final IFeatureModel model) {
 		return extractConcreteFeatures(model.getFeatures());
 	}
-	
+
 	/**
-	 * Extracts all concrete features from a feature model as a list of strings by calling 
-	 * {@link de.ovgu.featureide.fm.core.functional.Functional#mapToStringList(Iterable)} on the result of {@link #extractConcreteFeatures(IFeatureModel)}
- 	 * using <code>model.getFeatures()</code>.
+	 * Extracts all concrete features from a feature model as a list of strings by calling
+	 * {@link de.ovgu.featureide.fm.core.functional.Functional#mapToStringList(Iterable)} on the result of {@link #extractConcreteFeatures(IFeatureModel)} using
+	 * <code>model.getFeatures()</code>.
 	 * 
 	 * @since 2.7.5
 	 * @param model A feature model
@@ -115,4 +132,49 @@ public abstract class FeatureUtils {
 		return Functional.toList(Functional.map(list, FEATURE_TO_STRUCTURE));
 	}
 
+	public static List<Node> getPropositionalNodes(Iterable<IConstraint> constraints) {
+		return Functional.toList(Functional.map(constraints, CONSTRAINT_TO_NODE));
+	}
+
+	/**
+	 * @param relevantConstraints
+	 * @return
+	 */
+	public static String getRelevantConstraintsString(IFeature feature, Collection<IConstraint> constraints) {
+		StringBuilder relevant = new StringBuilder();
+		for (IConstraint constraint : constraints) {
+			for (IFeature f : constraint.getContainedFeatures()) {
+				if (f.getName().equals(feature.getName())) {
+					relevant.append((relevant.length() == 0 ? " " : "\n ") + constraint.getNode().toString(NodeWriter.logicalSymbols) + " ");
+					break;
+				}
+			}			
+		} 
+		return relevant.toString();
+	}
+
+	/**
+	 * @param featureModel
+	 * @param index
+	 * @param propNode
+	 */
+	public static void replacePropNode(IFeatureModel featureModel, int index, Node propNode) {
+		featureModel.getConstraints().set(index, new Constraint(featureModel, propNode));
+	}
+
+	/**
+	 * @param bone
+	 */
+	public static void setRelevantConstraints(IFeature bone) {
+		List<Constraint> constraintList = new LinkedList<Constraint>();
+		for (IConstraint constraint : bone.getFeatureModel().getConstraints()) {
+			for (IFeature f : constraint.getContainedFeatures()) {
+				if (f.getName().equals(bone.getName())) {
+					constraintList.add(new Constraint(bone.getFeatureModel(), constraint.getNode()));
+					break;
+				}
+			}			
+		} 
+		bone.getStructure().setRelevantConstraints(constraintList);
+	}
 }

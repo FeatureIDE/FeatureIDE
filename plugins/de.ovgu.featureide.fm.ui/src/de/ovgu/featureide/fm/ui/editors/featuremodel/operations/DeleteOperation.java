@@ -144,7 +144,7 @@ public class DeleteOperation extends AbstractFeatureModelOperation implements GU
 			feature = ((FeatureEditPart) element).getFeature();
 		}
 		if (feature != null) {
-			if (feature.getRelevantConstraints().isEmpty()) {
+			if (feature.getStructure().getRelevantConstraints().isEmpty()) {
 				// feature can be removed because it has no relevant constraint
 				executeOperation(new FeatureDeleteOperation(featureModel, feature));
 				alreadyDeleted.add(feature);
