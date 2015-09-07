@@ -27,6 +27,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -40,7 +41,6 @@ import org.prop4j.Or;
 import org.prop4j.SatSolver;
 
 import de.ovgu.featureide.core.CorePlugin;
-import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
@@ -63,8 +63,6 @@ public class CopyOfCompositionalAnaylsisTester {
 
 	private List<String> rootFeatures;
 
-	private HashSet<List<String>> lastSet = null;
-
 	private Path currentDir = null;
 
 	public static void main(final String[] args) throws FileNotFoundException, UnsupportedModelException {
@@ -84,6 +82,84 @@ public class CopyOfCompositionalAnaylsisTester {
 		}
 	}
 
+	public void computeAtomicSets2(int level, int limit) {
+		currentDir = FileSystems.getDefault().getPath("out_" + completeModel.getRoot().getName() + "/" + level + "_" + limit);
+		currentDir.toFile().mkdirs();
+
+		logger.log("Computing root features...");
+
+		rootFeatures = CorePlugin.splitFeatureModel(completeModel, level, limit);
+
+		logger.log("Creating sub models...");
+
+		final AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator();
+		nodeCreator.setCnfType(CNFType.Regular);
+		nodeCreator.setIncludeBooleanValues(true);
+		nodeCreator.setFeatureModel(completeModel);
+		final Node completeNode = nodeCreator.createNodes();
+
+		final List<FeatureModel> subModels = createSubModels(completeModel, rootFeatures);
+
+		final List<Set<String>> selectedFeatures = new ArrayList<>();
+		final List<Set<String>> unselectedFeatures = new ArrayList<>();
+		findIncludedFeatures(subModels, completeNode, selectedFeatures, unselectedFeatures);
+
+		final HashSet<String> unusedFeatures = new HashSet<>();
+		for (Set<String> unselectedFeatureList : unselectedFeatures) {
+			unusedFeatures.addAll(unselectedFeatureList);
+		}
+		final HashSet<String> usedFeatures = new HashSet<>(completeModel.getFeatureNames());
+		usedFeatures.removeAll(unusedFeatures);
+		
+		final List<Set<String>> subModelFeatureNames = new ArrayList<>(subModels.size() + 1);
+		subModelFeatureNames.add(usedFeatures);
+		for (FeatureModel subModel : subModels) {
+			subModelFeatureNames.add(subModel.getFeatureNames());
+		}
+		
+		subModels.add(completeModel);
+
+		logger.log("Computing atomic sets:");
+
+		final List<List<List<Literal>>> atomicSetLists = new ArrayList<>(selectedFeatures.size() + 1);
+		final HashSet<String> coreSet = new HashSet<>();
+
+		final SatSolver solver = new SatSolver(completeNode, 1000, false);
+
+		int i = subModelFeatureNames.size();
+		for (Set<String> featureNames : subModelFeatureNames) {
+			logger.log("\t" + i-- + " " + featureNames.size());
+
+			final List<List<Literal>> atomicSets = solver.atomicSuperSets(featureNames);
+			if (!atomicSets.isEmpty()) {
+				final List<Literal> coreList = atomicSets.remove(0);
+				for (Literal literal : coreList) {
+					coreSet.add(literal.var.toString());
+				}
+				atomicSetLists.add(atomicSets);
+			}
+		}
+
+		logger.log("Merging atomic sets...");
+
+		final List<List<String>> mergeAtomicSets = CorePlugin.mergeAtomicSets(atomicSetLists);
+		mergeAtomicSets.add(new ArrayList<>(coreSet));
+
+		logger.log("Saving Atomic Sets...");
+
+		final List<String> x = sortResults(mergeAtomicSets);
+		saveToFile(x, "new_");
+
+		logger.finish();
+		
+		List<String> y = readOrgAtomicSet(completeNode);
+
+		printResults(x, 1);
+		printResults(y, 2);
+
+		System.out.println("Equal results? " + y.equals(x));
+	}
+
 	public void computeAtomicSets(int level, int limit) {
 		currentDir = FileSystems.getDefault().getPath("out_" + completeModel.getRoot().getName() + "/" + level + "_" + limit);
 		currentDir.toFile().mkdirs();
@@ -94,26 +170,40 @@ public class CopyOfCompositionalAnaylsisTester {
 
 		logger.log("Creating sub models...");
 
-		final List<FeatureModel> subModels = new ArrayList<>();
-		final List<Set<String>> selectedFeatures = new ArrayList<>();
-		final List<String> unusedFeatures = createSubModels(subModels, selectedFeatures, completeModel, rootFeatures);
-
 		final AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator();
 		nodeCreator.setCnfType(CNFType.Regular);
 		nodeCreator.setIncludeBooleanValues(true);
 		nodeCreator.setFeatureModel(completeModel);
 		final Node completeNode = nodeCreator.createNodes();
 
+		final List<FeatureModel> subModels = createSubModels(completeModel, rootFeatures);
+
+		final List<Set<String>> selectedFeatures = new ArrayList<>();
+		final List<Set<String>> unselectedFeatures = new ArrayList<>();
+		findIncludedFeatures(subModels, completeNode, selectedFeatures, unselectedFeatures);
+
+		final HashSet<String> unusedFeatures = new HashSet<>();
+		for (Set<String> unselectedFeatureList : unselectedFeatures) {
+			unusedFeatures.addAll(unselectedFeatureList);
+		}
+		final HashSet<String> usedFeatures = new HashSet<>(completeModel.getFeatureNames());
+		usedFeatures.removeAll(unusedFeatures);
+
 		final Node subNode = getSubNode(unusedFeatures, completeNode);
 
 		logger.log("Computing atomic sets:");
 
 		final List<List<List<Literal>>> atomicSetLists = new ArrayList<>(selectedFeatures.size() + 1);
+		final HashSet<String> coreSet = new HashSet<>();
 		SatSolver solver = new SatSolver(subNode, 1000, false);
 
 		System.out.println("\t" + selectedFeatures.size() + " " + (completeModel.getNumberOfFeatures() - unusedFeatures.size()));
 		List<List<Literal>> atomicSets = solver.atomicSuperSets();
 		if (!atomicSets.isEmpty()) {
+			final List<Literal> core = atomicSets.remove(0);
+			for (Literal literal : core) {
+				coreSet.add(literal.var.toString());
+			}
 			atomicSetLists.add(atomicSets);
 		}
 
@@ -125,6 +215,10 @@ public class CopyOfCompositionalAnaylsisTester {
 
 			atomicSets = solver.atomicSuperSets(subModel.getFeatureNames());
 			if (!atomicSets.isEmpty()) {
+				final List<Literal> coreList = atomicSets.remove(0);
+				for (Literal literal : coreList) {
+					coreSet.add(literal.var.toString());
+				}
 				atomicSetLists.add(atomicSets);
 			}
 		}
@@ -132,33 +226,59 @@ public class CopyOfCompositionalAnaylsisTester {
 		logger.log("Merging atomic sets...");
 
 		final List<List<String>> mergeAtomicSets = CorePlugin.mergeAtomicSets(atomicSetLists);
+		mergeAtomicSets.add(new ArrayList<>(coreSet));
 
 		logger.log("Saving Atomic Sets...");
 
-		final Path output = currentDir.resolve("atomicSets_" + System.currentTimeMillis() + ".txt");
+		final List<String> x = sortResults(mergeAtomicSets);
+		saveToFile(x, "new_");
+
+		logger.finish();
+		
+		List<String> y = readOrgAtomicSet(completeNode);
+
+		printResults(x, 1);
+		printResults(y, 2);
+
+		System.out.println("Equal results? " + y.equals(x));
+	}
+
+	private void printResults(final List<String> atomicSets, int i) {
+		System.out.println();
+		System.out.println("Result " + i + ":");
+		System.out.println(atomicSets.size());
+		for (String list : atomicSets) {
+			int length = list.split(",").length;
+			if (length > 1) {
+				System.out.println("\t Size = " + length);
+			}
+		}
+	}
+
+	private List<String> sortResults(final List<List<String>> orgAtomicSets) {
+		final List<String> stringList = new ArrayList<>(orgAtomicSets.size());
+		for (List<String> list : orgAtomicSets) {
+			Collections.sort(list);
+			stringList.add(list.toString());
+		}
+		Collections.sort(stringList);
+		return stringList;
+	}
+
+	private void saveToFile(List<String> atomicSets, String prefix) {
+		final Path output = currentDir.resolve(prefix + "atomicSets_" + System.currentTimeMillis() + ".txt");
 		try {
 			Files.deleteIfExists(output);
 			Files.createFile(output);
-			Files.write(output, mergeAtomicSets.toString().replace("],", "],\n").getBytes());
+			Files.write(output, atomicSets.toString().replace("[[", "[").replace("]]", "]").replace("], ", "]\n").getBytes());
 			System.out.print(" Sucess.");
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.out.print(" Fail.");
 		}
-
-		logger.finish();
-
-		System.out.println();
-		System.out.println("Result:");
-		System.out.println(mergeAtomicSets.size());
-		for (List<String> list : mergeAtomicSets) {
-			if (list.size() > 1) {
-				System.out.println("\t Size = " + list.size());
-			}
-		}
 	}
 
-	private Node getSubNode(final List<String> unusedFeatures, final Node completeNode) {
+	private Node getSubNode(final Collection<String> unusedFeatures, final Node completeNode) {
 		logger.log("Reading Node...");
 
 		final Path subNodePath = currentDir.resolve("subNode.txt");
@@ -198,6 +318,43 @@ public class CopyOfCompositionalAnaylsisTester {
 			return subNode;
 		}
 	}
+	
+	private List<String> readOrgAtomicSet(final Node completeNode) {
+		logger.log("File...");
+
+		final Path subNodePath = currentDir.resolve("org_atomicSets.txt");
+
+		System.out.println(subNodePath);
+		List<String> nodeString = null;
+		if (subNodePath.toFile().exists()) {
+			try {
+				nodeString = Files.readAllLines(subNodePath);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		if (nodeString != null) {
+			System.out.print(" Sucess.");
+			return nodeString;
+		} else {
+			System.out.print(" Fail.");
+			logger.log("Computing Atomic Sets (normal method)...");
+			final SatSolver solver = new SatSolver(completeNode, 1000, false);
+			final List<List<List<Literal>>> orgAtomicSetsList = new ArrayList<>(1);
+			orgAtomicSetsList.add(solver.atomicSuperSets());
+			final List<List<String>> orgAtomicSets = CorePlugin.mergeAtomicSets(orgAtomicSetsList);
+
+			logger.log("Saving Atomic Sets...");
+
+			final List<String> y = sortResults(orgAtomicSets);
+			saveToFile(y, "org_");
+
+			logger.finish();
+
+			return y;
+		}
+	}
 
 	private Node parseCNFNode(String nodeString) {
 		final String[] clauseStrings = nodeString.split("[&]");
@@ -226,8 +383,8 @@ public class CopyOfCompositionalAnaylsisTester {
 		return new And(clauses);
 	}
 
-	private List<String> createSubModels(List<FeatureModel> subModels, List<Set<String>> selectedFeatures, FeatureModel model, List<String> rootFeatureNames) {
-		final HashSet<String> unusedFeatures = new HashSet<>();
+	private List<FeatureModel> createSubModels(FeatureModel model, List<String> rootFeatureNames) {
+		final List<FeatureModel> subModels = new ArrayList<>();
 
 		for (final String rootFeature : rootFeatureNames) {
 			final Feature root = model.getFeature(rootFeature);
@@ -235,36 +392,41 @@ public class CopyOfCompositionalAnaylsisTester {
 				throw new RuntimeException("Feature " + rootFeature + " not found!");
 			}
 			final FeatureModel newSubModel = new FeatureModel(model, root, false);
-			final Set<String> includeFeatures = new HashSet<>();
-			final Set<String> excludeFeatures = new HashSet<>(newSubModel.getFeatureNames());
-			includeFeatures.add(root.getName());
-
-			final HashSet<Constraint> crossModelConstraints = new HashSet<>(model.getConstraints());
-			crossModelConstraints.removeAll(newSubModel.getConstraints());
-			for (final Constraint constr : crossModelConstraints) {
-				for (Feature feature : constr.getContainedFeatures()) {
-					includeFeatures.add(feature.getName());
-				}
-			}
-			includeFeatures.retainAll(newSubModel.getFeatureNames());
-			excludeFeatures.removeAll(includeFeatures);
-
-			List<String> clone = new ArrayList<>(rootFeatureNames);
-			clone.remove(newSubModel.getRoot().getName());
-
-			if (!Collections.disjoint(newSubModel.getFeatureNames(), clone)) {
-				throw new RuntimeException("Nested Root " + rootFeature + "!");
-			}
-
-			selectedFeatures.add(includeFeatures);
-			unusedFeatures.addAll(excludeFeatures);
 			subModels.add(newSubModel);
 		}
-		return new ArrayList<>(unusedFeatures);
+
+		return subModels;
 	}
 
-	public boolean compare(HashSet<List<String>> curSet) {
-		return lastSet == null || curSet.equals(lastSet);
+	private void findIncludedFeatures(List<FeatureModel> subModels, Node n, List<Set<String>> selectedFeatures, List<Set<String>> unselectedFeatures) {
+		for (FeatureModel subModel : subModels) {
+			final Set<String> excludeFeatures = new HashSet<>(subModel.getFeatureNames());
+			final Set<String> includeFeatures = new HashSet<>();
+
+			final ArrayList<String> internalFeatures = new ArrayList<>();
+			for (Node clause : n.getChildren()) {
+				boolean crossModel = false;
+				for (Node clauseChild : clause.getChildren()) {
+					final Object name = ((Literal) clauseChild).var;
+					if (name instanceof String) {
+						if (excludeFeatures.contains(name)) {
+							internalFeatures.add((String) name);
+						} else {
+							crossModel = true;
+						}
+					}
+				}
+				if (crossModel) {
+					includeFeatures.addAll(internalFeatures);
+				}
+				internalFeatures.clear();
+			}
+
+			excludeFeatures.removeAll(includeFeatures);
+
+			selectedFeatures.add(includeFeatures);
+			unselectedFeatures.add(excludeFeatures);
+		}
 	}
 
 }

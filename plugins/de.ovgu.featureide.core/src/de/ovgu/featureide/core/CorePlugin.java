@@ -864,7 +864,7 @@ public class CorePlugin extends AbstractCorePlugin {
 			}
 		}
 		final HashSet<Collection<String>> mergedAtomicSetsSet = new HashSet<>(atomicSetMap.values());
-		final List<List<String>> mergedAtomicSets = new ArrayList<>(mergedAtomicSetsSet.size());
+		final List<List<String>> mergedAtomicSets = new ArrayList<>(mergedAtomicSetsSet.size() + 1);
 		for (Collection<String> atomicSet : mergedAtomicSetsSet) {
 			mergedAtomicSets.add(new ArrayList<>(atomicSet));
 		}

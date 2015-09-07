@@ -100,7 +100,8 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	}
 
 	private static Literal getVariable(Feature feature, boolean positive) {
-		return new Literal(feature.getFeatureModel().getRenamingsManager().getOldName(feature.getName()), positive);
+		final String oldName = feature.getFeatureModel().getRenamingsManager().getOldName(feature.getName());
+		return new Literal(oldName, positive);
 	}
 
 	private CNFType cnfType = CNFType.None;
@@ -163,8 +164,8 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		case Compact:
 		default:
 			for (Constraint constraint : featureModel.getConstraints()) {
-//				final Node cnfNode = Node.buildCNF(constraint.getNode());
-				final Node cnfNode = constraint.getNode().toCNF();
+				final Node cnfNode = Node.buildCNF(constraint.getNode());
+//				final Node cnfNode = constraint.getNode().toCNF();
 				if (cnfNode instanceof And) {
 					for (Node andChild : cnfNode.getChildren()) {
 						clauses.add((compact || (andChild instanceof Or)) ? andChild : new Or(andChild));

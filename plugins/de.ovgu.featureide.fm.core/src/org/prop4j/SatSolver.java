@@ -297,7 +297,7 @@ public class SatSolver {
 			for (String b : featureSet) {
 				Integer x = varToInt.get(b);
 				if (x != null) {
-					done[x] = 0;
+					done[x - 1] = 0;
 					max++;
 				} else {
 					throw new RuntimeException("Unkown Feature " + b);
@@ -314,6 +314,7 @@ public class SatSolver {
 	private List<List<Literal>> atomicSuperSets(final int[] globalModel, final byte[] done) {
 		final List<List<Literal>> result = new ArrayList<>();
 		final ArrayList<Literal> coreList = new ArrayList<>();
+		result.add(coreList);
 		
 		final IVecInt backbone = new VecInt();
 		
@@ -362,7 +363,6 @@ public class SatSolver {
 				}
 			}
 		}
-		result.add(coreList);
 		return result;
 	}
 
