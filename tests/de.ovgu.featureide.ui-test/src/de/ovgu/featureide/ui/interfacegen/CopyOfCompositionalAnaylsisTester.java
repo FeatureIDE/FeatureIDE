@@ -29,8 +29,11 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.prop4j.And;
@@ -67,7 +70,7 @@ public class CopyOfCompositionalAnaylsisTester {
 
 	public static void main(final String[] args) throws FileNotFoundException, UnsupportedModelException {
 		final CopyOfCompositionalAnaylsisTester tester = new CopyOfCompositionalAnaylsisTester(args[0] + "model.xml");
-		tester.computeAtomicSets(10, 300);
+		tester.test3();
 	}
 
 	public CopyOfCompositionalAnaylsisTester(String modelFileName) {
@@ -82,7 +85,37 @@ public class CopyOfCompositionalAnaylsisTester {
 		}
 	}
 
-	public void computeAtomicSets2(int level, int limit) {
+	public void test1() {
+		List<String> x = computeAtomicSets(10, 300);
+		List<String> y = readOrgAtomicSet();
+
+		printResults(x, 1);
+		printResults(y, 2);
+
+		System.out.println("Equal results? " + y.equals(x));
+	}
+
+	public void test2() {
+		List<String> x = computeAtomicSets2(10, 300);
+		List<String> y = readOrgAtomicSet();
+
+		printResults(x, 1);
+		printResults(y, 2);
+
+		System.out.println("Equal results? " + y.equals(x));
+	}
+
+	public void test3() {
+		List<String> x = computeAtomicSets3();
+		List<String> y = readOrgAtomicSet();
+
+		printResults(x, 1);
+		printResults(y, 2);
+
+		System.out.println("Equal results? " + y.equals(x));
+	}
+
+	private List<String> computeAtomicSets2(int level, int limit) {
 		currentDir = FileSystems.getDefault().getPath("out_" + completeModel.getRoot().getName() + "/" + level + "_" + limit);
 		currentDir.toFile().mkdirs();
 
@@ -110,13 +143,13 @@ public class CopyOfCompositionalAnaylsisTester {
 		}
 		final HashSet<String> usedFeatures = new HashSet<>(completeModel.getFeatureNames());
 		usedFeatures.removeAll(unusedFeatures);
-		
+
 		final List<Set<String>> subModelFeatureNames = new ArrayList<>(subModels.size() + 1);
 		subModelFeatureNames.add(usedFeatures);
 		for (FeatureModel subModel : subModels) {
 			subModelFeatureNames.add(subModel.getFeatureNames());
 		}
-		
+
 		subModels.add(completeModel);
 
 		logger.log("Computing atomic sets:");
@@ -151,16 +184,11 @@ public class CopyOfCompositionalAnaylsisTester {
 		saveToFile(x, "new_");
 
 		logger.finish();
-		
-		List<String> y = readOrgAtomicSet(completeNode);
 
-		printResults(x, 1);
-		printResults(y, 2);
-
-		System.out.println("Equal results? " + y.equals(x));
+		return x;
 	}
 
-	public void computeAtomicSets(int level, int limit) {
+	private List<String> computeAtomicSets(int level, int limit) {
 		currentDir = FileSystems.getDefault().getPath("out_" + completeModel.getRoot().getName() + "/" + level + "_" + limit);
 		currentDir.toFile().mkdirs();
 
@@ -234,13 +262,8 @@ public class CopyOfCompositionalAnaylsisTester {
 		saveToFile(x, "new_");
 
 		logger.finish();
-		
-		List<String> y = readOrgAtomicSet(completeNode);
 
-		printResults(x, 1);
-		printResults(y, 2);
-
-		System.out.println("Equal results? " + y.equals(x));
+		return x;
 	}
 
 	private void printResults(final List<String> atomicSets, int i) {
@@ -260,6 +283,20 @@ public class CopyOfCompositionalAnaylsisTester {
 		for (List<String> list : orgAtomicSets) {
 			Collections.sort(list);
 			stringList.add(list.toString());
+		}
+		Collections.sort(stringList);
+		return stringList;
+	}
+
+	private List<String> sortResults2(final List<List<Literal>> orgAtomicSets) {
+		final List<String> stringList = new ArrayList<>(orgAtomicSets.size());
+		for (List<Literal> list : orgAtomicSets) {
+			ArrayList<String> strings = new ArrayList<>(list.size());
+			for (Literal literal : list) {
+				strings.add(literal.var.toString());
+			}
+			Collections.sort(strings);
+			stringList.add(strings.toString());
 		}
 		Collections.sort(stringList);
 		return stringList;
@@ -318,11 +355,11 @@ public class CopyOfCompositionalAnaylsisTester {
 			return subNode;
 		}
 	}
-	
-	private List<String> readOrgAtomicSet(final Node completeNode) {
+
+	private List<String> readOrgAtomicSet() {
 		logger.log("File...");
 
-		final Path subNodePath = currentDir.resolve("org_atomicSets.txt");
+		final Path subNodePath = currentDir.resolve("../org_atomicSets.txt");
 
 		System.out.println(subNodePath);
 		List<String> nodeString = null;
@@ -340,10 +377,21 @@ public class CopyOfCompositionalAnaylsisTester {
 		} else {
 			System.out.print(" Fail.");
 			logger.log("Computing Atomic Sets (normal method)...");
+
+			final AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator();
+			nodeCreator.setCnfType(CNFType.Regular);
+			nodeCreator.setIncludeBooleanValues(true);
+			nodeCreator.setFeatureModel(completeModel);
+			final Node completeNode = nodeCreator.createNodes();
+
 			final SatSolver solver = new SatSolver(completeNode, 1000, false);
 			final List<List<List<Literal>>> orgAtomicSetsList = new ArrayList<>(1);
 			orgAtomicSetsList.add(solver.atomicSuperSets());
-			final List<List<String>> orgAtomicSets = CorePlugin.mergeAtomicSets(orgAtomicSetsList);
+			final List<List<String>> orgAtomicSets = mergeAtomicSets(orgAtomicSetsList);
+			for (List<String> list : orgAtomicSets) {
+				list.remove("True");
+				list.remove("False");
+			}
 
 			logger.log("Saving Atomic Sets...");
 
@@ -391,8 +439,7 @@ public class CopyOfCompositionalAnaylsisTester {
 			if (root == null) {
 				throw new RuntimeException("Feature " + rootFeature + " not found!");
 			}
-			final FeatureModel newSubModel = new FeatureModel(model, root, false);
-			subModels.add(newSubModel);
+			subModels.add(new FeatureModel(model, root, false));
 		}
 
 		return subModels;
@@ -427,6 +474,178 @@ public class CopyOfCompositionalAnaylsisTester {
 			selectedFeatures.add(includeFeatures);
 			unselectedFeatures.add(excludeFeatures);
 		}
+	}
+
+	private List<Set<String>> getSelectedFeatures(List<FeatureModel> subModels, Node n, Collection<String> modelFeatures) {
+		final List<Set<String>> selectedFeatures = new ArrayList<>();
+
+		for (FeatureModel subModel : subModels) {
+			final Set<String> subModelFeatures = new HashSet<>(subModel.getFeatureNames());
+			final Set<String> includeFeatures = new HashSet<>();
+
+			final ArrayList<String> internalFeatures = new ArrayList<>();
+			for (Node clause : n.getChildren()) {
+				boolean extern = false;
+				for (Node clauseChild : clause.getChildren()) {
+					final Object name = ((Literal) clauseChild).var;
+					if (name instanceof String) {
+						if (subModelFeatures.contains(name)) {
+							internalFeatures.add((String) name);
+						} else if (modelFeatures.contains(name)) {
+							extern = true;
+						}
+					}
+				}
+				if (extern && !internalFeatures.isEmpty()) {
+					includeFeatures.addAll(internalFeatures);
+				}
+				internalFeatures.clear();
+			}
+			
+			selectedFeatures.add(includeFeatures);
+		}
+
+		return selectedFeatures;
+	}
+
+	private List<String> computeAtomicSets3() {
+		currentDir = FileSystems.getDefault().getPath("out_" + completeModel.getRoot().getName() + "/_rec");
+		currentDir.toFile().mkdirs();
+
+		logger.log("Computing propositional node...");
+
+		final AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator();
+		nodeCreator.setCnfType(CNFType.Regular);
+		nodeCreator.setIncludeBooleanValues(true);
+		nodeCreator.setFeatureModel(completeModel);
+		final Node completeNode = nodeCreator.createNodes();
+
+		final SatSolver solver = new SatSolver(completeNode, 1000, false);
+
+		logger.log("Computing atomic sets:");
+
+		final List<List<Literal>> mergeAtomicSets = computeAtomicSets_rec(completeModel, completeNode, solver);
+
+		logger.log("Saving Atomic Sets...");
+
+		final List<String> x = sortResults2(mergeAtomicSets);
+		saveToFile(x, "new_");
+
+		logger.finish();
+
+		return x;
+	}
+
+	private List<List<Literal>> computeAtomicSets_rec(FeatureModel rootModel, Node completeNode, SatSolver solver) {
+		if (rootModel.getNumberOfFeatures() < 100) {
+			return solver.atomicSuperSets(rootModel.getFeatureNames());
+		}
+
+		final List<String> rootFeatures = split(rootModel.getRoot());
+
+		final List<FeatureModel> subModels = createSubModels(rootModel, rootFeatures);
+
+		final List<Set<String>> selectedFeatures = getSelectedFeatures(subModels, completeNode, rootModel.getFeatureNames());
+
+		final HashSet<String> usedFeatures = new HashSet<>();
+		usedFeatures.add(rootModel.getRoot().toString());
+		for (Set<String> selectedFeatureList : selectedFeatures) {
+			usedFeatures.addAll(selectedFeatureList);
+		}
+
+		final List<List<List<Literal>>> atomicSetLists = new ArrayList<>(selectedFeatures.size() + 1);
+		final HashMap<String, Literal> coreSet = new HashMap<>();
+
+		final List<List<Literal>> rootAtomicSets = solver.atomicSuperSets(usedFeatures);
+		if (!rootAtomicSets.isEmpty()) {
+			final List<Literal> coreList = rootAtomicSets.remove(0);
+			for (Literal literal : coreList) {
+				coreSet.put(literal.var.toString(), literal);
+			}
+			atomicSetLists.add(rootAtomicSets);
+		}
+
+		for (FeatureModel subModel : subModels) {
+			final List<List<Literal>> atomicSets = computeAtomicSets_rec(subModel, completeNode, solver);
+			if (!atomicSets.isEmpty()) {
+				final List<Literal> coreList = atomicSets.remove(0);
+				for (Literal literal : coreList) {
+					coreSet.put(literal.var.toString(), literal);
+				}
+				atomicSetLists.add(atomicSets);
+			}
+		}
+
+		final List<List<Literal>> mergeAtomicSets = mergeAtomicSets2(atomicSetLists);
+		mergeAtomicSets.set(0, new ArrayList<>(coreSet.values()));
+
+		return mergeAtomicSets;
+	}
+
+	private static List<String> split(Feature root) {
+		final ArrayList<String> rootNames = new ArrayList<>();
+		final LinkedList<Feature> children = root.getChildren();
+		for (Feature feature : children) {
+			rootNames.add(feature.getName());
+		}
+		return rootNames;
+	}
+
+	private static List<List<String>> mergeAtomicSets(List<List<List<Literal>>> atomicSetLists) {
+		final HashMap<String, Collection<String>> atomicSetMap = new HashMap<>();
+		for (List<List<Literal>> atomicSetList : atomicSetLists) {
+			for (List<Literal> atomicSet : atomicSetList) {
+				final HashSet<String> newSet = new HashSet<>();
+				for (Literal literal : atomicSet) {
+					newSet.add(literal.var.toString());
+				}
+				for (Literal literal : atomicSet) {
+					final Collection<String> oldSet = atomicSetMap.get(literal.var.toString());
+					if (oldSet != null) {
+						newSet.addAll(oldSet);
+					}
+				}
+				for (String featureName : newSet) {
+					atomicSetMap.put(featureName, newSet);
+				}
+			}
+		}
+		final HashSet<Collection<String>> mergedAtomicSetsSet = new HashSet<>(atomicSetMap.values());
+		final List<List<String>> mergedAtomicSets = new ArrayList<>(mergedAtomicSetsSet.size() + 1);
+		for (Collection<String> atomicSet : mergedAtomicSetsSet) {
+			mergedAtomicSets.add(new ArrayList<>(atomicSet));
+		}
+		return mergedAtomicSets;
+	}
+
+	private static List<List<Literal>> mergeAtomicSets2(List<List<List<Literal>>> atomicSetLists) {
+		final HashMap<String, HashMap<String, Literal>> atomicSetMap = new HashMap<>();
+		for (List<List<Literal>> atomicSetList : atomicSetLists) {
+			for (List<Literal> atomicSet : atomicSetList) {
+				final HashMap<String, Literal> newSet = new HashMap<>();
+				for (Literal literal : atomicSet) {
+					newSet.put(literal.var.toString(), literal);
+				}
+				for (Literal literal : atomicSet) {
+					final HashMap<String, Literal> oldSet = atomicSetMap.get(literal.var.toString());
+					if (oldSet != null) {
+						for (Entry<String, Literal> oldEntry : oldSet.entrySet()) {
+							newSet.put(oldEntry.getKey(), oldEntry.getValue());
+						}
+					}
+				}
+				for (String featureName : newSet.keySet()) {
+					atomicSetMap.put(featureName, newSet);
+				}
+			}
+		}
+		final HashSet<HashMap<String, Literal>> mergedAtomicSetsSet = new HashSet<>(atomicSetMap.values());
+		final List<List<Literal>> mergedAtomicSets = new ArrayList<>(mergedAtomicSetsSet.size() + 1);
+		mergedAtomicSets.add(null);
+		for (HashMap<String, Literal> atomicSet : mergedAtomicSetsSet) {
+			mergedAtomicSets.add(new ArrayList<>(atomicSet.values()));
+		}
+		return mergedAtomicSets;
 	}
 
 }

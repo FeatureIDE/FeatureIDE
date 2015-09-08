@@ -322,8 +322,8 @@ public class SatSolver {
 		for (int i = 0; i < globalModel.length; i++) {
 			final int x = globalModel[i];
 			if (done[i] == 0) {
-				System.out.println("\t\t" + ++c + " / " + max);
 				done[i] = 2;
+				System.out.println("\t\t" + ++c + " / " + max);
 
 				if (!sat(backbone, -x)) {
 					backbone.push(x);
@@ -353,6 +353,7 @@ public class SatSolver {
 							if (!sat(backbone, y)) {
 								done[j] = 2;
 								setList.add(new Literal(intToVar.get(Math.abs(y)), y > 0));
+								System.out.println("\t\t" + ++c + " / " + max);
 							} else {
 								done[j] = 0;
 							}
