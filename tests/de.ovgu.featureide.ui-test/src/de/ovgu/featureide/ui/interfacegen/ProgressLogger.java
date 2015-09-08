@@ -44,6 +44,10 @@ public class ProgressLogger {
 		}
 	}
 	
+	public void stop() {
+		timer.stop();
+	}
+	
 	public void finish() {
 		timer.split();
 		System.out.println();

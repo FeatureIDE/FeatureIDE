@@ -53,6 +53,7 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 	private final Collection<String> features;
 
 	private final boolean includeBooleanValues;
+	private final boolean regularCNF;
 
 	// all clauses that have both kinds of literals (remove AND retain)
 	private List<DeprecatedClause> relevantClauseList;
@@ -64,13 +65,18 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 	private DeprecatedFeatureMap map;
 
 	public FeatureRemover(Node cnf, Collection<String> features) {
-		this(cnf, features, true);
+		this(cnf, features, true, false);
+	}	
+	
+	public FeatureRemover(Node cnf, Collection<String> features, boolean includeBooleanValues) {
+		this(cnf, features, includeBooleanValues, false);
 	}
 
-	public FeatureRemover(Node cnf, Collection<String> features, boolean includeBooleanValues) {
+	public FeatureRemover(Node cnf, Collection<String> features, boolean includeBooleanValues, boolean regularCNF) {
 		this.fmNode = cnf;
 		this.features = features;
 		this.includeBooleanValues = includeBooleanValues;
+		this.regularCNF = regularCNF;
 	}
 
 	private void addLiteral(HashSet<String> retainedFeatures, Node orChild) {
@@ -314,8 +320,13 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 				allLiterals[i] = new Literal(NodeCreator.varTrue);
 
 				newClauses[newClauseSize] = new Or(allLiterals);
-				newClauses[newClauseSize + 1] = new Literal(NodeCreator.varTrue);
-				newClauses[newClauseSize + 2] = new Literal(NodeCreator.varFalse, false);
+				if (regularCNF) {
+					newClauses[newClauseSize + 1] = new Or(new Literal(NodeCreator.varTrue, true));
+					newClauses[newClauseSize + 2] = new Or(new Literal(NodeCreator.varFalse, false));
+				} else {
+					newClauses[newClauseSize + 1] = new Literal(NodeCreator.varTrue, true);
+					newClauses[newClauseSize + 2] = new Literal(NodeCreator.varFalse, false);
+				}
 			} else {
 				newClauses = new Node[newClauseSize];
 			}
@@ -331,7 +342,7 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 			for (Node clauseChildren : fmNode.getChildren()) {
 				final Literal literal = (Literal) clauseChildren;
 				if (features.contains(literal.var)) {
-					return includeBooleanValues ? new Literal(NodeCreator.varTrue) : new And();
+					return includeBooleanValues ? (regularCNF ? new Or(new Literal(NodeCreator.varTrue, true)): new Literal(NodeCreator.varTrue, true)) : new And();
 				}
 			}
 			return fmNode.clone();
