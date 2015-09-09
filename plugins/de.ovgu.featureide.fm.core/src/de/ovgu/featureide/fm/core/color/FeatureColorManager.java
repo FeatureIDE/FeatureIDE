@@ -270,7 +270,12 @@ public class FeatureColorManager {
 		IWorkspace workspace= ResourcesPlugin.getWorkspace(); 
 		IPath location= Path.fromOSString(file.getAbsolutePath()); 
 		IFile iFile= workspace.getRoot().getFileForLocation(location);
-		return iFile.getProject();
+		try {
+			return iFile.getProject();
+		} catch (NullPointerException e){
+			FMCorePlugin.getDefault().logWarning(location.toOSString());
+			throw e;
+		}
 	}
 
 	/**

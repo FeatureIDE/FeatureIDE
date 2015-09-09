@@ -424,8 +424,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			menu.add(createConstraintAction);
 			menu.add(editConstraintAction);
 			menu.add(deleteAction);
-			menu.add(new Separator());
-			menu.add(colorSelectedFeatureAction);
 		} else if (legendLayoutAction.isEnabled()) {
 			menu.add(legendLayoutAction);
 			menu.add(legendAction);
@@ -439,8 +437,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			menu.add(new Separator());
 			menu.add(reverseOrderAction);
 			menu.add(legendAction);
-			menu.add(new Separator());
-			menu.add(colorSelectedFeatureAction);
 			
 		}
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
