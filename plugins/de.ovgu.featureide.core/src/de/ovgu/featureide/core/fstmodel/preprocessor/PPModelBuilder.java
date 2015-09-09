@@ -37,10 +37,8 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.preprocessor.PPComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
-import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
-import de.ovgu.featureide.fm.core.Feature;
 
 /**
  * Build the FSTModel for preprocessor projects.
@@ -64,7 +62,6 @@ public class PPModelBuilder {
 		model.reset();
 		
 		featureNames = featureProject.getFeatureModel().getConcreteFeatureNames();
-		System.err.println("buildModel(): featureNames: " + featureNames);
 		for (String featureName : featureNames) {
 			model.addFeature(featureName);
 		}
@@ -96,7 +93,6 @@ public class PPModelBuilder {
 				boolean classAdded = false;
 				for (String feature : featureNames) {
 					if (containsFeature(text, feature)) {
-						System.err.println("buildModel2 :" + feature + " - " + className);
 						model.addRole(feature, className, currentFile);
 						classAdded = true;
 					}
