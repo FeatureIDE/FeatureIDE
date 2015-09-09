@@ -208,7 +208,7 @@ public class StringTable {
 	public static final String IS_NOT_A_DIRECTORY_ = " is not a directory.";
 	public static final String STARTING_FEATUREIDE_PLUG_IN_ = "Starting FeatureIDE plug-in '";
 	public static final String STOPPING_FEATUREIDE_PLUG_IN_ = "Stopping FeatureIDE plug-in '";
-	public static final String DEFAULT_COLORSCHEME = "Default Colorscheme";
+	public static final String DEFAULT_COLORSCHEME = "Default Color Scheme";
 	public static final String LOADING_CNF = "Loading CNF";
 	public static final String CALCULATING_CONFIGURATION_SOLUTIONS = "Calculating Configuration Solutions";
 	public static final String CHECKING_CONFIGURATION_VALIDITY = "Checking Configuration Validity";
@@ -309,7 +309,7 @@ public class StringTable {
 	public static final String COLOR = "color";
 	public static final String SCHEME = "scheme";
 	public static final String INDEX = "index";
-	public static final String COLORSCHEME = "colorscheme";
+	public static final String COLORSCHEME = "color scheme";
 	public static final String WRONG_SYNTAX = "Wrong Syntax";
 	public static final String IS_NO_VALID_INTEGER_VALUE = "is not a valid integer value";
 	public static final String IS_NO_VALID_FEATURE_NAME = " is not a valid feature name";
@@ -796,7 +796,7 @@ public class StringTable {
 	public static final String DESELECT_ALL = "Deselect all";
 	public static final String SEARCH_IN_COLLABORATION_DIAGRAM = "Search in Collaboration Diagram";
 	public static final String SHOW_FIELDS_AND_METHODS = "Show Fields and Methods";
-	public static final String NO_COLORSCHEME_SELECTED = "No Colorscheme Selected";
+	public static final String NO_COLORSCHEME_SELECTED = "No Color Scheme Selected";
 	public static final String EXPORT_AS_IMAGE = "Export as image";
 	public static final String EXPORT_AS_XML = "Export as XML";
 	public static final String EXPORT_AS___ = "Export as...";
@@ -827,7 +827,7 @@ public class StringTable {
 	public static final String ADD_FEATUREIDE_NATURE = "Add FeatureIDE Nature";
 	public static final String JAVADOC_OPTIONS = "JavaDoc Options";
 	public static final String SPECIFY_OPTIONS_FOR_JAVADOC_TOOL = "Specify Options for JavaDoc Tool";
-	public static final String NEW_COLORSCHEME = "New Colorscheme";
+	public static final String NEW_COLORSCHEME = "New Color Scheme";
 	public static final String ENTER_THE_NAME_OF_THE_COLORSCHEME_ = "Enter Name of the Color Scheme.";
 	public static final String NEW = "New";
 	public static final String NEW_CONFIGURATION = "New Configuration";
@@ -866,7 +866,7 @@ public class StringTable {
 	public static final String PATH_MUST_BE_VALID = " Path must be valid";
 	public static final String NEW_FEATUREIDE_PROJECT = "New FeatureIDE Project";
 	public static final String CREATING_ANDROID_PROJECT = "Creating Android project";
-	public static final String RENAME_COLORSCHEME = "Rename Colorscheme";
+	public static final String RENAME_COLORSCHEME = "Rename Color Scheme";
 	public static final String ADD_THE_FEATUREIDE_NATURE_TO_ANDROID_PROJECTS_ = "Add the FeatureIDE nature to Android projects.";
 	public static final String THE_ANDROID_SOURCE_FILE_PATH_CANNOT_BE_CHANGED_ = "The Android source file path cannot be changed.";
 	public static final String THE_ANDROID_RESOURCE_FILE_PATH_CANNOT_BE_CHANGED_ = "The Android resource file path cannot be changed.";

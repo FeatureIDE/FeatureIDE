@@ -71,7 +71,7 @@ public class DynamicProfileMenu extends ContributionItem {
 		 *
 		 */
 
-		MenuManager man = new MenuManager("Profile", UIPlugin.getDefault().getImageDescriptor("icons/FeatureColorIcon.gif"), "");
+		MenuManager man = new MenuManager("Color Scheme", UIPlugin.getDefault().getImageDescriptor("icons/FeatureColorIcon.gif"), "");
 		man.addMenuListener(new IMenuListener() {
 			public void menuAboutToShow(IMenuManager m) {
 
@@ -124,9 +124,9 @@ public class DynamicProfileMenu extends ContributionItem {
 	 */
 
 	private void createActions() {
-		addProfileSchemeAction = new AddProfileColorSchemeAction("Add Colorscheme", featureModel, myFeatureProject);
+		addProfileSchemeAction = new AddProfileColorSchemeAction("Add Color Scheme", featureModel, myFeatureProject);
 		renameProfileSchemeAction = new RenameProfileColorSchemeAction("Change Name", featureModel, myFeatureProject);
-		deleteProfileSchemeAction = new DeleteProfileColorSchemeAction("Delete Colorscheme", featureModel);
+		deleteProfileSchemeAction = new DeleteProfileColorSchemeAction("Delete Color Scheme", featureModel);
 
 	}
 	/*
