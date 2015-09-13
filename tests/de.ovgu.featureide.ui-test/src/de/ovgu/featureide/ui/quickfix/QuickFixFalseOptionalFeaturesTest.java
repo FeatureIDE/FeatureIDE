@@ -41,6 +41,7 @@ import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.filter.ConcreteFeatureFilter;
 import de.ovgu.featureide.fm.core.filter.base.Filter;
+import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 
@@ -110,7 +111,7 @@ public class QuickFixFalseOptionalFeaturesTest {
 	
 	@Test(timeout = 20000)
 	public void createConfigurationsTest() {
-		final Collection<IFeature> concrete = Filter.retain(new LinkedList<>(fm.getFeatures()), new ConcreteFeatureFilter());
+		final Collection<IFeature> concrete = Filter.retain(new LinkedList<>(Functional.toList(fm.getFeatures())), new ConcreteFeatureFilter());
 		final Collection<IFeature> core = fm.getAnalyser().getCoreFeatures();
 		final Collection<String> falseOptionalFeatures = new LinkedList<String>();
 		

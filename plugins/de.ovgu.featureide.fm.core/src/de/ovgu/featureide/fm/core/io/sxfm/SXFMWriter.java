@@ -50,6 +50,7 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
 
 /**
@@ -162,7 +163,7 @@ public class SXFMWriter extends AbstractFeatureModelWriter {
     									  fName + ")\n");
     	}
     	nod.appendChild(textNode);
-    	children = new LinkedList<>(FeatureUtils.convertToFeatureList(feat.getStructure().getChildren()));
+    	children = new LinkedList<>(Functional.toList(FeatureUtils.convertToFeatureList(feat.getStructure().getChildren())));
     	if (children.isEmpty()) return;
     	if (feat.getStructure().isAnd()) {
     		nextAndMode = true;

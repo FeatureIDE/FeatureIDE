@@ -724,15 +724,15 @@ public abstract class FeatureUtils {
 	}
 	
 	@Override
-	public static final FeatureModel clone(IFeatureModel featureModel) {
+	public static final IFeatureModel clone(IFeatureModel featureModel) {
 	
 	}
 	
-	public static final FeatureModel deepClone(IFeatureModel featureModel) {
+	public static final IFeatureModel deepClone(IFeatureModel featureModel) {
 	
 	}
 	
-	public static final FeatureModel deepClone(IFeatureModel featureModel, boolean complete) {
+	public static final IFeatureModel deepClone(IFeatureModel featureModel, boolean complete) {
 	
 	}
 

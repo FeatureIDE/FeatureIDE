@@ -31,6 +31,7 @@ import org.eclipse.draw2d.geometry.Point;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 
 /**
@@ -84,7 +85,7 @@ public class ModelReverseOrderOperation extends AbstractFeatureModelOperation {
 	}
 
 	private void reverse(IFeature feature) {
-		LinkedList<IFeature> children = new LinkedList<>(FeatureUtils.convertToFeatureList(feature.getStructure().getChildren()));
+		LinkedList<IFeature> children = new LinkedList<>(Functional.toList(FeatureUtils.convertToFeatureList(feature.getStructure().getChildren())));
 		for (int i = 0; i < children.size() - 1; i++)
 			children.add(i, children.removeLast());
 		for (IFeature child : FeatureUtils.convertToFeatureList(feature.getStructure().getChildren()))
