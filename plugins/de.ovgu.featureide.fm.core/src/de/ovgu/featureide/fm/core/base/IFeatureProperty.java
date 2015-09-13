@@ -46,5 +46,9 @@ public interface IFeatureProperty {
 	void setFeatureStatus(FeatureStatus status);
 
 	void setFeatureStatus(FeatureStatus stat, boolean fire);
+	
+	boolean isConstraintSelected();
+	
+	boolean selectConstraint(boolean state);
 
 }
