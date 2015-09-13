@@ -31,17 +31,17 @@ public interface IFeatureProperty {
 
 	IFeatureProperty clone(IFeature newFeature);
 
-	String getDescription();
+	CharSequence getDescription();
 
-	String getDisplayName();
+	CharSequence getDisplayName();
 
 	IFeature getFeature();
 
 	FeatureStatus getFeatureStatus();
 
-	void setDescription(String description);
+	void setDescription(CharSequence description);
 
-	void setDisplayName(String name);
+	void setDisplayName(CharSequence name);
 
 	void setFeatureStatus(FeatureStatus status);
 

@@ -37,6 +37,7 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IGraphicalConstraint;
+import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
  * Represents a propositional constraint below the feature diagram.
@@ -220,9 +221,9 @@ public class Constraint implements IConstraint, PropertyConstants {
 	}
 
 	@Override
-	public void setDeadFeatures(Collection<IFeature> deadFeatures) {
+	public void setDeadFeatures(Iterable<IFeature> deadFeatures) {
 		this.deadFeatures.clear();
-		this.deadFeatures.addAll(deadFeatures);
+		this.deadFeatures.addAll(Functional.toList(deadFeatures));
 	}
 
 	@Override
@@ -240,5 +241,6 @@ public class Constraint implements IConstraint, PropertyConstants {
 	public IGraphicalConstraint getGraphicRepresenation() {
 		throw new UnsupportedOperationException("No implemented");
 	}
+
 
 }

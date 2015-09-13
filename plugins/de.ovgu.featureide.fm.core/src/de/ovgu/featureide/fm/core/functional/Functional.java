@@ -95,9 +95,9 @@ public abstract class Functional {
 		}
 	};
 
-	public static class ToStringFunction<T> implements IFunction<T, String> {
+	public static class ToStringFunction<T> implements IFunction<T, CharSequence> {
 		@Override
-		public String invoke(T t) {
+		public CharSequence invoke(T t) {
 			return t.toString();
 		}
 	};
@@ -269,7 +269,7 @@ public abstract class Functional {
 	 * @author Marcus Pinnecke
 	 * @since 2.7.5
 	 */
-	public static <T> Iterable<String> mapToString(final Iterable<T> source) {
+	public static <T> Iterable<CharSequence> mapToString(final Iterable<T> source) {
 		return map(source, new ToStringFunction<T>());
 	}
 
@@ -329,7 +329,7 @@ public abstract class Functional {
 	 * @author Marcus Pinnecke
 	 * @since 2.7.5
 	 */
-	public static <T> List<String> mapToStringList(final Iterable<T> source) {
+	public static <T> List<CharSequence> mapToStringList(final Iterable<T> source) {
 		return toList(map(source, new ToStringFunction<T>()));
 	}
 

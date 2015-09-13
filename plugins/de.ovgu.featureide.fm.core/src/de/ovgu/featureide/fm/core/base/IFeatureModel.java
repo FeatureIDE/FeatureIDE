@@ -31,6 +31,7 @@ import org.eclipse.core.resources.IProject;
 
 import de.ovgu.featureide.fm.core.FMComposerManager;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
+import de.ovgu.featureide.fm.core.FeatureModelLayout;
 import de.ovgu.featureide.fm.core.IFMComposerExtension;
 import de.ovgu.featureide.fm.core.RenamingsManager;
 
@@ -51,8 +52,10 @@ public interface IFeatureModel {
 	void addListener(PropertyChangeListener listener);
 
 	IFeatureModel clone(IFeature newRoot);
+	
+	IFeatureModel clone(IFeature oldFeatureModel, boolean complete);
 
-	void createDefaultValues(String projectName);
+	void createDefaultValues(CharSequence projectName);
 
 	boolean deleteFeature(IFeature feature);
 
@@ -66,13 +69,13 @@ public interface IFeatureModel {
 
 	int getConstraintIndex(IConstraint constraint);
 
-	List<IConstraint> getConstraints();
+	Iterable<IConstraint> getConstraints();
 
 	IFeature getFeature(String name);
 
-	List<String> getFeatureOrderList();
+	Collection<CharSequence> getFeatureOrderList();
 
-	Collection<IFeature> getFeatures();
+	Iterable<IFeature> getFeatures();
 
 	IFMComposerExtension getFMComposerExtension();
 
@@ -104,16 +107,18 @@ public interface IFeatureModel {
 
 	void reset();
 
-	void setConstraints(final List<IConstraint> constraints);
+	void setConstraints(final Iterable<IConstraint> constraints);
 
 	void setFeatureOrderList(final List<String> featureOrderList);
 
 	void setFeatureOrderUserDefined(boolean featureOrderUserDefined);
 
-	void setFeatureTable(final Hashtable<String, IFeature> featureTable);
+	void setFeatureTable(final Hashtable<CharSequence, IFeature> featureTable);
 	
 	IGraphicalFeatureModel getGraphicRepresenation();  // Added, Marcus Pinnecke 31.08.15
 
-	Map<String, IFeature> getFeatureTable(); // Added, Marcus Pinnecke 31.08.15
+	Map<CharSequence, IFeature> getFeatureTable(); // Added, Marcus Pinnecke 31.08.15
+	
+	FeatureModelLayout getLayout(); // Added, Marcus Pinnecke 13.09.15
 	
 }

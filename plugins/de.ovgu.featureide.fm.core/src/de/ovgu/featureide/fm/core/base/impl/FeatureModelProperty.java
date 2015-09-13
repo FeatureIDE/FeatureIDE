@@ -40,13 +40,13 @@ public class FeatureModelProperty implements IFeatureModelProperty {
 	 * Saves the annotations from the model file as they were read,
 	 * because they were not yet used.
 	 */
-	protected final List<String> annotations;
+	protected final List<CharSequence> annotations;
 
 	/**
 	 * All comment lines from the model file without line number at which they
 	 * occur
 	 */
-	protected final List<String> comments;
+	protected final List<CharSequence> comments;
 
 	protected final IFeatureModel correspondingFeatureModel;
 
@@ -71,13 +71,13 @@ public class FeatureModelProperty implements IFeatureModelProperty {
 	}
 
 	@Override
-	public void addAnnotation(String annotation) {
+	public void addAnnotation(CharSequence annotation) {
 		annotations.add(annotation);
 
 	}
 
 	@Override
-	public void addComment(String comment) {
+	public void addComment(CharSequence comment) {
 		comments.add(comment);
 	}
 
@@ -87,13 +87,13 @@ public class FeatureModelProperty implements IFeatureModelProperty {
 	}
 
 	@Override
-	public List<String> getAnnotations() {
-		return Collections.unmodifiableList(annotations);
+	public Iterable<CharSequence> getAnnotations() {
+		return annotations;
 	}
 
 	@Override
-	public List<String> getComments() {
-		return Collections.unmodifiableList(comments);
+	public Iterable<CharSequence> getComments() {
+		return comments;
 	}
 
 	@Override

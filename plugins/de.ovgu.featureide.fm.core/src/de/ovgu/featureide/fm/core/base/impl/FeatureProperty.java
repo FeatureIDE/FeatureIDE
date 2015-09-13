@@ -39,13 +39,13 @@ public class FeatureProperty implements IFeatureProperty, PropertyConstants {
 
 	protected final IFeature correspondingFeature;
 
-	protected String description;
+	protected CharSequence description;
 	protected FeatureStatus status;
 
 	public FeatureProperty(FeatureProperty oldProperty, IFeature correspondingFeature) {
 		this.correspondingFeature = correspondingFeature != null ? correspondingFeature : oldProperty.correspondingFeature;
 
-		description = new String(oldProperty.description);
+		description = new String(oldProperty.description.toString());
 		status = oldProperty.status;
 	}
 
@@ -66,12 +66,12 @@ public class FeatureProperty implements IFeatureProperty, PropertyConstants {
 	 */
 	@Override
 	@CheckForNull
-	public String getDescription() {
+	public CharSequence getDescription() {
 		return description;
 	}
 
 	@Override
-	public String getDisplayName() {
+	public CharSequence getDisplayName() {
 		return correspondingFeature.getName();
 	}
 
@@ -86,12 +86,12 @@ public class FeatureProperty implements IFeatureProperty, PropertyConstants {
 	}
 
 	@Override
-	public void setDescription(String description) {
+	public void setDescription(CharSequence description) {
 		this.description = description;
 	}
 
 	@Override
-	public void setDisplayName(String name) {
+	public void setDisplayName(CharSequence name) {
 	}
 
 	@Override
@@ -105,6 +105,16 @@ public class FeatureProperty implements IFeatureProperty, PropertyConstants {
 		if (fire) {
 			correspondingFeature.fireEvent(new PropertyChangeEvent(this, ATTRIBUTE_CHANGED, Boolean.FALSE, Boolean.TRUE));
 		}
+	}
+
+	@Override
+	public boolean isConstraintSelected() {
+		throw new UnsupportedOperationException("Not implemented yet");
+	}
+
+	@Override
+	public boolean selectConstraint(boolean state) {
+		throw new UnsupportedOperationException("Not implemented yet");
 	}
 
 }

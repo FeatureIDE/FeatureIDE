@@ -29,15 +29,15 @@ import java.util.List;
  */
 public interface IFeatureModelProperty {
 
-	void addAnnotation(String annotation);
+	void addAnnotation(CharSequence annotation);
 
-	void addComment(String comment);
+	void addComment(CharSequence comment);
 
 	IFeatureModelProperty clone(IFeatureModel newFeatureNodel);
 
-	List<String> getAnnotations();
+	Iterable<CharSequence> getAnnotations();
 
-	List<String> getComments();
+	Iterable<CharSequence> getComments();
 
 	IFeatureModel getFeatureModel();
 

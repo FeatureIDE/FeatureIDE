@@ -49,7 +49,7 @@ public interface IConstraint {
 
 	Collection<IFeature> getDeadFeatures();
 
-	Collection<IFeature> getDeadFeatures(SatSolver solver, IFeatureModel fm, Collection<IFeature> fmDeadFeatures);
+	Iterable<IFeature> getDeadFeatures(SatSolver solver, IFeatureModel fm, Collection<IFeature> fmDeadFeatures);
 
 	Collection<IFeature> getFalseOptional();
 
@@ -65,7 +65,7 @@ public interface IConstraint {
 
 	void setContainedFeatures();
 
-	void setDeadFeatures(Collection<IFeature> deadFeatures);
+	void setDeadFeatures(Iterable<IFeature> deadFeatures);
 
 	boolean setFalseOptionalFeatures(IFeatureModel clone, Collection<IFeature> fmFalseOptionals);
 	

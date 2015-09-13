@@ -922,7 +922,7 @@ public class FeatureModelAnalyzer {
 		return falseOptionalFeatures;
 	}
 	
-	public Collection<IFeature> getFalseOptionalFeatures(Collection<IFeature> fmFalseOptionals) {
+	public Collection<IFeature> getFalseOptionalFeatures(Iterable<IFeature> fmFalseOptionals) {
 		Collection<IFeature> falseOptionalFeatures = new LinkedList<>();
 		for (IFeature feature : fmFalseOptionals) {
 			try {

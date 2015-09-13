@@ -29,11 +29,11 @@ import org.prop4j.Node;
  */
 public interface IFeatureModelFactory {
 
-	String getId();
+	CharSequence getId();
 	
 	IConstraint createConstraint(IFeatureModel featureModel, Node propNode);
 
-	IFeature createFeature(IFeatureModel featureModel, String name);
+	IFeature createFeature(IFeatureModel featureModel, CharSequence name);
 
 	IFeatureModel createFeatureModel();
 

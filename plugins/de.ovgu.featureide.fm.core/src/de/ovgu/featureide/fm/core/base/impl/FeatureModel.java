@@ -34,6 +34,7 @@ import org.eclipse.core.resources.IProject;
 
 import de.ovgu.featureide.fm.core.FMComposerManager;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
+import de.ovgu.featureide.fm.core.FeatureModelLayout;
 import de.ovgu.featureide.fm.core.IFMComposerExtension;
 import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.RenamingsManager;
@@ -65,12 +66,12 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	 * A list containing the feature names in their specified order will be
 	 * initialized in XmlFeatureModelReader.
 	 */
-	protected final List<String> featureOrderList;
+	protected final List<CharSequence> featureOrderList;
 	protected boolean featureOrderUserDefined;
 	/**
 	 * A {@link Map} containing all features.
 	 */
-	protected final Map<String, IFeature> featureTable = new ConcurrentHashMap<>();
+	protected final Map<CharSequence, IFeature> featureTable = new ConcurrentHashMap<>();
 
 	protected FMComposerManager fmComposerManager = null;
 
@@ -85,7 +86,7 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	protected Object undoContext = null;
 
 	public FeatureModel() {
-		featureOrderList = new LinkedList<String>();
+		featureOrderList = new LinkedList<CharSequence>();
 		featureOrderUserDefined = false;
 
 		property = createProperty();
@@ -93,7 +94,7 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	}
 
 	protected FeatureModel(FeatureModel oldFeatureModel, IFeature newRoot) {
-		featureOrderList = new LinkedList<String>(oldFeatureModel.featureOrderList);
+		featureOrderList = new LinkedList<CharSequence>(oldFeatureModel.featureOrderList);
 		featureOrderUserDefined = oldFeatureModel.featureOrderUserDefined;
 
 		property = oldFeatureModel.getProperty().clone(this);
@@ -134,7 +135,7 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 
 	@Override
 	public boolean addFeature(IFeature feature) {
-		final String name = feature.getName();
+		final CharSequence name = feature.getName();
 		if (featureTable.containsKey(name)) {
 			return false;
 		}
@@ -159,7 +160,7 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	}
 
 	@Override
-	public void createDefaultValues(String projectName) {
+	public void createDefaultValues(CharSequence projectName) {
 		String rootName = getValidJavaIdentifier(projectName);
 		if (rootName.isEmpty()) {
 			rootName = "Root";
@@ -184,7 +185,7 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 		}
 
 		// check if it exists
-		final String name = feature.getName();
+		final CharSequence name = feature.getName();
 		if (!featureTable.containsKey(name)) {
 			return false;
 		}
@@ -257,7 +258,7 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	}
 
 	@Override
-	public List<String> getFeatureOrderList() {
+	public Collection<CharSequence> getFeatureOrderList() {
 		if (featureOrderList.isEmpty()) {
 			return Functional.mapToStringList(Functional.filter(getFeatures(), new ConcreteFeatureFilter()));
 		}
@@ -309,7 +310,7 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	/**
 	 * Removes all invalid java identifiers form a given string.
 	 */
-	protected String getValidJavaIdentifier(String s) {
+	protected String getValidJavaIdentifier(CharSequence s) {
 		final StringBuilder stringBuilder = new StringBuilder();
 		int i = 0;
 		for (; i < s.length(); i++) {
@@ -382,9 +383,9 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	}
 
 	@Override
-	public void setConstraints(List<IConstraint> constraints) {
+	public void setConstraints(Iterable<IConstraint> constraints) {
 		this.constraints.clear();
-		this.constraints.addAll(constraints);
+		this.constraints.addAll(Functional.toList(constraints));
 	}
 
 	@Override
@@ -399,7 +400,7 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	}
 
 	@Override
-	public void setFeatureTable(Hashtable<String, IFeature> featureTable) {
+	public void setFeatureTable(Hashtable<CharSequence, IFeature> featureTable) {
 		this.featureTable.clear();
 		this.featureTable.putAll(featureTable);
 	}
@@ -408,19 +409,23 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 		this.undoContext = undoContext;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.IFeatureModel#getGraphicRepresenation()
-	 */
 	@Override
 	public IGraphicalFeatureModel getGraphicRepresenation() {
 		throw new UnsupportedOperationException ("Not implemented yet");
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.IFeatureModel#getFeatureTable()
-	 */
 	@Override
-	public Map<String, IFeature> getFeatureTable() {
+	public Map<CharSequence, IFeature> getFeatureTable() {
+		return featureTable;
+	}
+
+	@Override
+	public IFeatureModel clone(IFeature oldFeatureModel, boolean complete) {
+		throw new UnsupportedOperationException ("Not implemented yet");
+	}
+
+	@Override
+	public FeatureModelLayout getLayout() {
 		throw new UnsupportedOperationException ("Not implemented yet");
 	}
 

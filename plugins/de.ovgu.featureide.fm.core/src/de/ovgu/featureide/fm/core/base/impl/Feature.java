@@ -45,20 +45,20 @@ public class Feature implements IFeature, PropertyConstants {
 	protected IFeatureModel featureModel;
 	protected LinkedList<PropertyChangeListener> listenerList = new LinkedList<PropertyChangeListener>();
 
-	protected String name;
+	protected CharSequence name;
 
 	protected final IFeatureProperty property;
 	protected final IFeatureStructure structure;
 
 	protected Feature(Feature oldFeature, IFeatureModel featureModel, IFeatureStructure newFeatrureStructure) {
 		this.featureModel = featureModel != null ? featureModel : oldFeature.featureModel;
-		name = new String(oldFeature.name);
+		name = new String(oldFeature.name.toString());
 
 		property = oldFeature.property.clone(this);
 		structure = newFeatrureStructure != null ? newFeatrureStructure : oldFeature.structure;
 	}
 
-	public Feature(IFeatureModel featureModel, String name) {
+	public Feature(IFeatureModel featureModel, CharSequence name) {
 		this.featureModel = featureModel;
 		this.name = name;
 
@@ -118,7 +118,7 @@ public class Feature implements IFeature, PropertyConstants {
 	}
 
 	@Override
-	public String getName() {
+	public CharSequence getName() {
 		return name;
 	}
 
@@ -138,18 +138,18 @@ public class Feature implements IFeature, PropertyConstants {
 	}
 
 	@Override
-	public void setName(String name) {
+	public void setName(CharSequence name) {
 		this.name = name;
 		fireNameChanged();
 	}
 
 	@Override
 	public String toString() {
-		return name;
+		return name.toString();
 	}
 
 	@Override
-	public Collection<IGraphicalFeature> getGraphicRepresenation() {
+	public IGraphicalFeature getGraphicRepresenation() {
 		throw new UnsupportedOperationException("Not implemented yet");
 	}
 

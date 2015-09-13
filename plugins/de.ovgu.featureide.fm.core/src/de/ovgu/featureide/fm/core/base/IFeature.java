@@ -46,11 +46,11 @@ public interface IFeature extends PropertyChangeListener {
 
 	int getId();
 
-	String getName();
+	CharSequence getName();
 
 	void removeListener(PropertyChangeListener listener);
 
-	void setName(String name);
+	void setName(CharSequence name);
 	
 	IGraphicalFeature getGraphicRepresenation(); // Added, Marcus Pinnecke 31.08.15
 
