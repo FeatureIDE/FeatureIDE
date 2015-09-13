@@ -63,7 +63,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getProperty().getDescription()
+	 * FeatureUtils.getDescription(IFeature);
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -72,7 +72,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	@CheckForNull
 	@Deprecated
 	public String getDescription() {
-		return feature.getProperty().getDescription();
+		return FeatureUtils.getDescription(feature);
 	}
 
 	/**
@@ -81,7 +81,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * feature.getProperty().setDescription(String)
+	 * FeatureUtils.setDescription(IFeature, CharSequence)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -89,7 +89,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public void setDescription(String description) {
-		feature.getProperty().setDescription(description);
+		FeatureUtils.setDescription(feature, description);
 	}
 
 	/**
@@ -112,14 +112,14 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getGraphicRepresenation().setNewLocation(FMPoint);
+	 * FeatureUtils.setNewLocation(IFeature, FMPoint);
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
 	 * @since 2.7.5 
 	 */
 	public void setNewLocation(FMPoint newLocation) {
-		feature.getGraphicRepresenation().setNewLocation(newLocation);
+		FeatureUtils.setNewLocation(feature, newLocation);
 	}
 
 	/**
@@ -128,7 +128,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getLocation();
+	 * FeatureUtils.getLocation(IFeature)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -136,7 +136,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public FMPoint getLocation() {
-		return feature.getLocation();
+		return FeatureUtils.getLocation(feature);
 	}
 
 	/**
@@ -145,7 +145,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getStructure().isAnd();
+	 * FeatureUtils.isAnd(IFeature);
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -153,7 +153,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public boolean isAnd() {
-		return feature.getStructure().isAnd();
+		return FeatureUtils.isAnd(feature);
 	}
 
 	/**
@@ -170,7 +170,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public boolean isOr() {
-		return feature.getStructure().isOr();
+		return FeatureUtils.isOr(feature);
 	}
 
 	/**
@@ -179,7 +179,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getStructure().isAlternative();
+	 * FeatureUtils.isAlternative(IFeature)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -187,7 +187,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public boolean isAlternative() {
-		return feature.getStructure().isAlternative();
+		return FeatureUtils.isAlternative(feature);
 	}
 
 	/**
@@ -196,7 +196,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getStructure().changeToAnd();
+	 * FeatureUtils.changeToAnd(IFeature)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -204,7 +204,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public void changeToAnd() {
-		feature.getStructure().changeToAnd();
+		FeatureUtils.changeToAnd(feature);
 	}
 
 	/**
@@ -213,7 +213,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getStructure().changeToOr();
+	 * FeatureUtils.changeToOr(IFeature);
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -221,7 +221,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public void changeToOr() {
-		feature.getStructure().changeToOr();
+		FeatureUtils.changeToOr(feature);
 	}
 
 	/**
@@ -230,7 +230,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getStructure().changeToAlternative();
+	 * FeatureUtils.changeToAlternative(IFeature)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -238,7 +238,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public void changeToAlternative() {
-		feature.getStructure().changeToAlternative();
+		FeatureUtils.changeToAlternative(feature);
 	}
 
 	/**
@@ -247,7 +247,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getStructure().setAND(and);
+	 * FeatureUtils.setAnd(IFeature, boolean)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -255,7 +255,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public void setAND(boolean and) {
-		feature.getStructure().setAND(and);
+		FeatureUtils.setAnd(feature, and);
 	}
 
 	/**
@@ -264,7 +264,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getStructure().isMandatorySet();
+	 * FeatureUtils.isMandatorySet(IFeature)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -272,7 +272,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public boolean isMandatorySet() {
-		return feature.getStructure().isMandatorySet();
+		return FeatureUtils.isMandatorySet(feature);
 	}
 
 	/**
@@ -281,7 +281,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getStructure().isMandatory();
+	 * FeatureUtils.isMandatory(IFeature)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -289,7 +289,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public boolean isMandatory() {
-		return feature.getStructure().isMandatory();
+		return FeatureUtils.isMandatory(feature);
 	}
 
 	/**
@@ -298,7 +298,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getStructure().setMandatory(mandatory);
+	 * FeatureUtils.setMandatory(IFeature, boolean)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -306,7 +306,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public void setMandatory(boolean mandatory) {
-		feature.getStructure().setMandatory(mandatory);
+		FeatureUtils.setMandatory(feature, mandatory);
 	}
 
 	/**
@@ -315,7 +315,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getStructure().isHidden();
+	 * FeatureUtils.isHidden(IFeature)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -323,7 +323,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public boolean isHidden() {
-		return feature.getStructure().isHidden();
+		return FeatureUtils.isHidden(feature);
 	}
 
 	/**
@@ -332,7 +332,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getStructure().setHidden(hid);
+	 * FeatureUtils.setHiddden(IFeature, boolean)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -340,7 +340,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public void setHidden(boolean hid) {
-		feature.getStructure().setHidden(hid);
+		FeatureUtils.setHiddden(feature, hid);
 	}
 
 	/**
@@ -349,7 +349,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getStructure().isConstraintSelected();
+	 * FeatureUtils.isConstraintSelected(IFeature)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -357,7 +357,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public boolean isConstraintSelected() {
-		return feature.getStructure().isConstraintSelected();
+		return FeatureUtils.isConstraintSelected(feature);
 	}
 
 	/**
@@ -373,7 +373,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * @since 2.7.5 
 	 */
 	public void setConstraintSelected(boolean selection) {
-		return feature.getStructure().selectConstraint(selection);
+		return FeatureUtils.setConstraintSelected(feature, selection);
 	}
 
 	/**
@@ -382,7 +382,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getStructure().setAbstract(value);
+	 * FeatureUtils.setAbstract(IFeature, boolean)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -390,7 +390,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public void setAbstract(boolean value) {
-		feature.getStructure().setAbstract(value);
+		FeatureUtils.setAbstract(feature, value);
 	}
 
 	/**
@@ -399,7 +399,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getStructure().getRelevantConstraints();
+	 * FeatureUtils.getRelevantConstraints(IFeature)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -407,7 +407,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public Collection<IConstraint> getRelevantConstraints() {
-		feature.getStructure().getRelevantConstraints();
+		FeatureUtils.getRelevantConstraints(feature);
 	}
 
 	/**
@@ -450,7 +450,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getProperty().getFeatureStatus();
+	 * FeatureUtils.getFeatureStatus(IFeature)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -458,7 +458,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public FeatureStatus getFeatureStatus() {
-		return feature.getProperty().getFeatureStatus();
+		return FeatureUtils.getFeatureStatus(feature);
 	}
 
 	/**
@@ -467,7 +467,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getFeatureModel();
+	 * FeatureUtils.getFeatureModel(IFeature)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -475,7 +475,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public IFeatureModel getFeatureModel() {
-		return feature.getFeatureModel();
+		return FeatureUtils.getFeatureModel(feature);
 	}
 
 	/**
@@ -484,7 +484,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getProperty().setFeatureStatus(stat, fire);
+	 * FeatureUtils.setFeatureStatus(IFeature, FeatureStatus, boolean);
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -492,7 +492,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public void setFeatureStatus(FeatureStatus stat, boolean fire) {
-		return feature.getProperty().setFeatureStatus(stat, fire);
+		return FeatureUtils.setFeatureStatus(feature, stat, fire);
 	}
 
 	/**
@@ -501,7 +501,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getStructure().isMultiple();
+	 * FeatureUtils.isMultiple(IFeature)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -509,7 +509,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public boolean isMultiple() {
-		return feature.getStructure().isMultiple();
+		return FeatureUtils.isMultiple(feature);
 	}
 
 	/**
@@ -518,7 +518,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getStructure().setMultiple(multiple);
+	 * FeatureUtils.setMultiple(IFeature, boolean)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -526,7 +526,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public void setMultiple(boolean multiple) {
-		feature.getStructure().setMultiple(multiple);
+		FeatureUtils.setMultiple(feature, multiple);
 	}
 
 	/**
@@ -535,7 +535,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getName();
+	 * FeatureUtils.getName(Feature)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -543,7 +543,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public String getName() {
-		return feature.getName();
+		return FeatureUtils.getName(feature);
 	}
 
 	/**
@@ -552,7 +552,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.setName(name);
+	 * FeatureUtils.setName(feature, name)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -560,7 +560,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public void setName(String name) {
-		feature.setName(name);
+		FeatureUtils.setName(feature, name);
 	}
 
 	/**
@@ -569,7 +569,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getStructure().hasInlineRule();
+	 * FeatureUtils.hasInlineRule(IFeature)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -577,7 +577,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public boolean hasInlineRule() {
-		return feature.getStructure().hasInlineRule();
+		return FeatureUtils.hasInlineRule(feature);
 	}
 
 	/**
@@ -586,7 +586,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getStructure().setParent(newParent);
+	 * FeatureUtils.setParent(IFeature)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -594,7 +594,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public void setParent(Feature newParent) {
-		feature.getStructure().setParent(newParent);
+		FeatureUtils.setParent(newParent.feature);
 	}
 
 	/**
@@ -603,7 +603,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getStructure().getParent();
+	 * FeatureUtils.getParent(IFeature)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -611,7 +611,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public Feature getParent() {
-		return feature.getStructure().getParent();
+		return FeatureUtils.getParent(feature);
 	}
 
 	/**
@@ -620,7 +620,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getStructure().isRoot();
+	 * FeatureUtils.isRoot(IFeature)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -628,7 +628,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public boolean isRoot() {
-		return feature.getStructure().isRoot();
+		return FeatureUtils.isRoot(feature);
 	}
 
 	/**
@@ -645,7 +645,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public LinkedList<Feature> getChildren() {
-		return feature.getStructure().getChildren();
+		return FeatureUtils.getChildren(feature);
 	}
 
 	/**
@@ -654,7 +654,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getStructure().setChildren(children);
+	 * FeatureUtils.setChildren(IFeature,  Iterable)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -662,7 +662,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public void setChildren(LinkedList<Feature> children) {
-		return feature.getStructure().setChildren(children);
+		return FeatureUtils.setChildren(feature, children);
 	}
 
 	/**
@@ -671,7 +671,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getStructure().hasChildren();
+	 * FeatureUtils.hasChildren(IFeature)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -679,7 +679,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public boolean hasChildren() {
-		return feature.getStructure().hasChildren();
+		return FeatureUtils.hasChildren(feature);
 	}
 
 	/**
@@ -688,7 +688,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getStructure().addChild(newChild.feature.getStructure());
+	 * FeatureUtils.addChild(IFeature, IFeature)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -696,7 +696,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public void addChild(Feature newChild) {
-		return feature.getStructure().addChild(newChild.feature.getStructure());
+		return FeatureUtils.addChild(feature, newChild.feature);
 	}
 
 	/**
@@ -705,7 +705,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getStructure().addChildAtPosition(index, newChild);
+	 * FeatureUtils.addChildAtPosition(IFeature, int, IFeature)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -713,7 +713,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public void addChildAtPosition(int index, Feature newChild) {
-		feature.getStructure().addChildAtPosition(index, newChild);
+		FeatureUtils.addChildAtPosition(feature, index, newChild.feature);
 	}
 
 	/**
@@ -722,7 +722,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getStructure().replaceChild(oldChild, newChild);
+	 * FeatureUtils.replaceChild(IFeature, IFeature, IFeature)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -730,7 +730,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public void replaceChild(Feature oldChild, Feature newChild) {
-		feature.getStructure().replaceChild(oldChild, newChild);
+		FeatureUtils.replaceChild(feature, oldChild.feature, newChild.feature);
 	}
 
 	/**
@@ -739,7 +739,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getStructure().removeChild(child);
+	 * FeatureUtils.removeChild(IFeature, IFeature)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -747,7 +747,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public void removeChild(Feature child) {
-		feature.getStructure().removeChild(child);
+		FeatureUtils.removeChild(feature, child.feature);
 	}
 
 	/**
@@ -756,7 +756,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getStructure().removeLastChild();
+	 * FeatureUtils.removeLastChild(IFeature)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -764,7 +764,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public Feature removeLastChild() {
-		feature.getStructure().removeLastChild();
+		FeatureUtils.removeLastChild(feature);
 	}
 
 	/**
@@ -773,7 +773,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getStructure().getSourceConnections();
+	 * FeatureUtils.getSourceConnections(IFeature)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -781,7 +781,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public List<FeatureConnection> getSourceConnections() {
-		return feature.getStructure().getSourceConnections();
+		return FeatureUtils.getSourceConnections(feature);
 	}
 
 	/**
@@ -790,7 +790,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getStructure().getTargetConnections();
+	 * FeatureUtils.getTargetConnections(IFeature)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -798,7 +798,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public List<FeatureConnection> getTargetConnections() {
-		return feature.getStructure().getTargetConnections();
+		return FeatureUtils.getTargetConnections(feature);
 	}
 
 	/**
@@ -807,7 +807,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getStructure().addTargetConnection(connection);
+	 * FeatureUtils.addTargetConnection(IFeature, FeatureConnection)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -815,7 +815,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public void addTargetConnection(FeatureConnection connection) {
-		feature.getStructure().addTargetConnection(connection);
+		FeatureUtils.addTargetConnection(feature, connection);
 	}
 
 	/**
@@ -824,7 +824,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getStructure().removeTargetConnection(connection);
+	 * FeatureUtils.removeTargetConnection(IFeature, FeatureConnection)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -832,7 +832,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public boolean removeTargetConnection(FeatureConnection connection) {
-		feature.getStructure().removeTargetConnection(connection);
+		FeatureUtils.removeTargetConnection(feature, connection);
 	}
 
 	/**
@@ -841,7 +841,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.addListener(listener);
+	 * FeatureUtils.addListener(IFeature, PropertyChangeListener);
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -849,7 +849,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public void addListener(PropertyChangeListener listener) {
-		feature.addListener(listener);
+		FeatureUtils.addListener(feature, listener);
 	}
 
 	/**
@@ -858,7 +858,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.removeListener(listener);
+	 * FeatureUtils.removeListener(IFeature, PropertyChangeListener);
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -866,7 +866,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public void removeListener(PropertyChangeListener listener) {
-		feature.removeListener(listener);
+		FeatureUtils.removeListener(feature, listener);
 	}
 
 	/**
@@ -875,75 +875,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.fireEvent(new PropertyChangeEvent(this, NAME_CHANGED, Boolean.FALSE, Boolean.TRUE));
-	 * </code>
-	 * 
-	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
-	 */
-	@Deprecated
-	private void fireNameChanged() {
-		feature.fireEvent(new PropertyChangeEvent(this, NAME_CHANGED, Boolean.FALSE, Boolean.TRUE));
-	}
-
-	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * IFeature.fireEvent(new PropertyChangeEvent(this, HIDDEN_CHANGED, Boolean.FALSE, Boolean.TRUE));
-	 * </code>
-	 * 
-	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
-	 */
-	@Deprecated
-	private void fireHiddenChanged() {
-		feature.fireEvent(new PropertyChangeEvent(this, HIDDEN_CHANGED, Boolean.FALSE, Boolean.TRUE));
-	}
-
-	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * IFeature.fireEvent(new PropertyChangeEvent(this, CHILDREN_CHANGED, Boolean.FALSE, Boolean.TRUE));
-	 * </code>
-	 * 
-	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
-	 */
-	@Deprecated
-	private void fireChildrenChanged() {
-		feature.fireEvent(new PropertyChangeEvent(this, CHILDREN_CHANGED, Boolean.FALSE, Boolean.TRUE));
-	}
-
-	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * IFeature.fireEvent(new PropertyChangeEvent(this, MANDATORY_CHANGED, Boolean.FALSE, Boolean.TRUE));
-	 * </code>
-	 * 
-	 * @author Marcus Pinnecke
-	 * @since 2.7.5 
-	 */
-	@Deprecated
-	private void fireMandatoryChanged() {
-		feature.fireEvent(new PropertyChangeEvent(this, MANDATORY_CHANGED, Boolean.FALSE, Boolean.TRUE));
-	}
-
-	/**
-	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>
-	 * </br>Internally, the <code>de.ovgu.featureide.fm.core.Feature</code> class uses a delegiation to an underlying
-	 * {@link IFeature IFeature interface}.<br/><br/>
-	 * Instead of this method you should use<br/>
-	 * <code>
-	 * IFeature.getStructure().isAncestorOf(next.feature.getStructure());
+	 * FeatureUtils.isAncestorOf(IFeature, IFeature)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -951,7 +883,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public boolean isAncestorOf(Feature next) {
-		return feature.getStructure().isAncestorOf(next.feature.getStructure());
+		return FeatureUtils.isAncestorOf(feature, next.feature);
 	}
 
 	/**
@@ -960,7 +892,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getStructure().isFirstChild(child.feature.getStructure());
+	 * FeatureUtils.isFirstChild(IFeature, IFeature)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -968,7 +900,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public boolean isFirstChild(Feature child) {
-		return feature.getStructure().isFirstChild(child.feature.getStructure());
+		return FeatureUtils.isFirstChild(feature, child.feature);
 	}
 
 	/**
@@ -977,7 +909,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getStructure().getChildrenCount();
+	 * FeatureUtils.getChildrenCount(IFeature)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -985,7 +917,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public int getChildrenCount() {
-		return feature.getStructure().getChildrenCount();
+		return FeatureUtils.getChildrenCount(feature)
 	}
 
 	/**
@@ -994,7 +926,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * new Feature(IFeature.getStructure().getFirstChild().getFeature());
+	 * FeatureUtils.getFirstChild(IFeature)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -1002,7 +934,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public Feature getFirstChild() {
-		return new Feature(feature.getStructure().getFirstChild().getFeature());
+		return new Feature(FeatureUtils.getFirstChild(feature));
 	}
 
 	/**
@@ -1011,7 +943,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * new Feature(IFeature.getStructure().getLastChild().getFeature());
+	 * FeatureUtils.getLastChild(IFeature)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -1019,7 +951,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public Feature getLastChild() {
-		return new Feature(feature.getStructure().getLastChild().getFeature());
+		return new Feature(FeatureUtils.getLastChild(feature));
 	}
 
 	/**
@@ -1028,15 +960,15 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getChildIndex(feature);
+	 * FeatureUtils.getChildIndex(IFeature, IFeature)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
 	 * @since 2.7.5 
 	 */
 	@Deprecated
-	public int getChildIndex(Feature feature) {
-		return feature.getChildIndex(feature);
+	public int getChildIndex(Feature child) {
+		return FeatureUtils.getChildIndex(feature, child.feature);
 	}
 
 	/**
@@ -1045,7 +977,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getStructure().isAbstract();
+	 * FeatureUtils.isAbstract(IFeature)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -1053,7 +985,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public boolean isAbstract() {
-		return feature.getStructure().isAbstract();
+		return FeatureUtils.isAbstract(feature);
 	}
 
 	/**
@@ -1062,7 +994,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getStructure().isConcrete();
+	 * FeatureUtils.isConcrete(IFeature)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -1070,7 +1002,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public boolean isConcrete() {
-		return feature.getStructure().isConcrete();
+		return FeatureUtils.isConcrete(feature);
 	}
 
 	/**
@@ -1079,7 +1011,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getStructure().isANDPossible();
+	 * FeatureUtils.isANDPossible(IFeature)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -1087,7 +1019,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public boolean isANDPossible() {
-		return feature.getStructure().isANDPossible();
+		return FeatureUtils.isANDPossible(feature);
 	}
 
 	/**
@@ -1096,7 +1028,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.fireEvent(event);
+	 * FeatureUtils.fire(IFeature, PropertyChangeEvent)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -1104,7 +1036,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public void fire(PropertyChangeEvent event) {
-		feature.fireEvent(event);
+		FeatureUtils.fire(feature, event);
 	}
 
 	/**
@@ -1113,7 +1045,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * new Feature(feature.clone(feature.getFeatureModel(), feature.getStructure()));
+	 * FeatureUtils.clone(IFeature)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -1122,7 +1054,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	@Deprecated
 	@Override
 	public Feature clone() {
-		return new Feature(feature.clone(feature.getFeatureModel(), feature.getStructure()));
+		return new Feature(FeatureUtils.clone(feature));
 	}
 
 	public Feature clone(IFeatureModel featureModel, boolean complete) {
@@ -1135,7 +1067,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getStructure().setAnd();
+	 * FeatureUtils.setAnd(IFeature)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -1143,7 +1075,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public void setAnd() {
-		feature.getStructure().setAnd();
+		FeatureUtils.setAnd(feature);
 	}
 
 	/**
@@ -1152,7 +1084,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getStructure().setOr();
+	 * FeatureUtils.setOr(IFeature)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -1160,7 +1092,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public void setOr() {
-		feature.getStructure().setOr();
+		FeatureUtils.setOr(feature);
 	}
 
 	/**
@@ -1169,7 +1101,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getStructure().setAlternative();
+	 * FeatureUtils.setAlternative(IFeature)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -1177,7 +1109,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public void setAlternative() {
-		feature.getStructure().setAlternative();
+		FeatureUtils.setAlternative(feature);
 	}
 
 	/**
@@ -1186,7 +1118,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getStructure().hasHiddenParent();
+	 * FeatureUtils.hasHiddenParent(IFeature)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -1194,7 +1126,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public boolean hasHiddenParent() {
-		return feature.getStructure().hasHiddenParent();
+		return FeatureUtils.hasHiddenParent(feature);
 	}
 
 	/**
@@ -1203,7 +1135,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.toString()
+	 * FeatureUtils.toString(IFeature)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -1212,7 +1144,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	@Deprecated
 	@Override
 	public String toString() {
-		return feature.toString();
+		return FeatureUtils.toString(feature);
 	}
 
 	/**
@@ -1221,7 +1153,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getProperty().getDisplayName();
+	 * FeatureUtils.getDisplayName(IFeature)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -1229,7 +1161,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public String getDisplayName() {
-		return feature.getProperty().getDisplayName();
+		return FeatureUtils.getDisplayName(feature);
 	}
 
 	@Override
@@ -1255,7 +1187,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getGraphicRepresenation().getColorList();
+	 * FeatureUtils.getColorList(IFeature)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -1263,7 +1195,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public ColorList getColorList() {
-		return feature.getGraphicRepresenation().getColorList();
+		return FeatureUtils.getColorList(feature);
 	}
 
 	/**
@@ -1272,7 +1204,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.hashCode();
+	 * FeatureUtils.hashCode(IFeature)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -1281,7 +1213,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	@Deprecated
 	@Override
 	public int hashCode() {
-		return feature.hashCode();
+		return FeatureUtils.hashCode(feature);
 	}
 
 	/**
@@ -1290,7 +1222,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * {@link IFeature IFeature interface}.<br/><br/>
 	 * Instead of this method you should use<br/>
 	 * <code>
-	 * IFeature.getGraphicRepresenation().getItemType();
+	 * FeatureUtils.getItemType(IFeature)
 	 * </code>
 	 * 
 	 * @author Marcus Pinnecke
@@ -1299,6 +1231,6 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	@Deprecated
 	@Override
 	public GraphicItem getItemType() {
-		return feature.getGraphicRepresenation().getItemType();
+		return FeatureUtils.getItemType(feature);
 	}
 }

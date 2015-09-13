@@ -69,8 +69,8 @@ public interface IFeatureModel {
 
 	int getConstraintIndex(IConstraint constraint);
 
-	Iterable<IConstraint> getConstraints();
-
+	List<IConstraint> getConstraints();
+	
 	IFeature getFeature(String name);
 
 	Collection<CharSequence> getFeatureOrderList();
