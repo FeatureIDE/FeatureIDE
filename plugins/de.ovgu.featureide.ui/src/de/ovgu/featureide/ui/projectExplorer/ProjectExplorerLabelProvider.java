@@ -21,11 +21,11 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
+import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
+import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.ui.projectExplorer.DrawImageForProjectExplorer.ExplorerObject;
-
-
 
 /**
  * Labelprovider for projectExplorer - sets an image and a text before the files, folders and packages
@@ -91,7 +91,7 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 		// returns the image for folders and preprocessor files
 		if (element instanceof IResource) {
 			IFeatureProject featureProject = CorePlugin.getFeatureProject((IResource) element);
-			if (featureProject == null){
+			if (featureProject == null) {
 				return null;
 			}
 			IComposerExtensionClass composer = featureProject.getComposer();
@@ -124,7 +124,7 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 					IContainer folder = file.getParent();
 					if (folder instanceof IFolder) {
 						if (isInSourceFolder((IFolder) folder)) {
-							getPackageColors((IFolder)folder, elementColors, model, true);
+							getPackageColors((IFolder) folder, elementColors, model, true);
 							return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.FILE, elementColors);
 						}
 					}
@@ -136,7 +136,7 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 		if (element instanceof org.eclipse.jdt.internal.core.CompilationUnit) {
 
 			CompilationUnit cu = (CompilationUnit) element;
-			
+
 			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 			IPath path = cu.getPath();
 			IFile myfile = root.getFile(path);
@@ -149,10 +149,9 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 			getColors(elementColors, myfile, model, !featureProject.getComposer().hasFeatureFolder());
 			return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.FILE, elementColors);
 		}
-		
+
 		return null;
 	}
-
 
 	/**
 	 * @param folder
@@ -160,7 +159,12 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 	 * @return color for featureFolders
 	 */
 	private void getFeatureFolderColors(IFolder folder, List<Integer> myColors, FSTModel model) {
-		myColors.add(model.getFeature(folder.getName()).getColor());
+		FSTFeature feature = model.getFeature(folder.getName());
+		if (feature != null) {
+			myColors.add(feature.getColor());
+		}else{
+			myColors.add(FeatureColor.NO_COLOR.getValue());
+		}
 	}
 
 	/**
@@ -172,7 +176,7 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 	 */
 	private void getColors(List<Integer> myColors, IFile myfile, FSTModel model, boolean colorUnselectedFeature) {
 		FSTClass clazz = model.getClass(model.getAbsoluteClassName(myfile));
-		if(clazz == null){
+		if (clazz == null) {
 			return;
 		}
 		for (FSTRole r : clazz.getRoles()) {
@@ -186,8 +190,8 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 
 	/**
 	 * @param folder
-	 * @param colorUnselectedFeature 
-	 * @return colors for packages 
+	 * @param colorUnselectedFeature
+	 * @return colors for packages
 	 */
 	private void getPackageColors(IFolder folder, List<Integer> myColors, FSTModel model, boolean colorUnselectedFeature) {
 		try {
@@ -201,7 +205,7 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 				}
 			}
 		} catch (CoreException e) {
-				CorePlugin.getDefault().logError(e);
+			CorePlugin.getDefault().logError(e);
 		}
 
 	}
@@ -213,7 +217,7 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 	private boolean isInSourceFolder(IResource res) {
 		return isInFolder(res, CorePlugin.getFeatureProject(res).getSourceFolder());
 	}
-	
+
 	/**
 	 * @param res
 	 * @return if the Folder is in the build folder of the project
@@ -221,7 +225,7 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 	private boolean isInBuildFolder(IResource res) {
 		return isInFolder(res, CorePlugin.getFeatureProject(res).getBuildFolder());
 	}
-	
+
 	private boolean isInFolder(IResource folder, IFolder parentFolder) {
 		if (folder.equals(parentFolder)) {
 			return true;
@@ -233,7 +237,6 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 		return false;
 	}
 
-	
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
 	 * sets customized text to have spacing for our image
@@ -256,7 +259,7 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 			if (mytest.isEmpty()) {
 				return SPACE_STRING + "(default package)";
 			}
-			return SPACE_STRING + mytest;	
+			return SPACE_STRING + mytest;
 		}
 
 		//text for Folders
@@ -274,16 +277,16 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 					}
 				}
 				//composer Preprocessor
-				if (!composer.hasFeatureFolder()){
-					if (element instanceof IFolder){
+				if (!composer.hasFeatureFolder()) {
+					if (element instanceof IFolder) {
 						IFolder folder = (IFolder) element;
-						if (isInBuildFolder(folder)){
+						if (isInBuildFolder(folder)) {
 							return SPACE_STRING + folder.getName();
 						}
 					}
-					if (element instanceof IFile){
+					if (element instanceof IFile) {
 						IFile file = (IFile) element;
-						if (isInBuildFolder(file) || isInSourceFolder(file)){
+						if (isInBuildFolder(file) || isInSourceFolder(file)) {
 							return SPACE_STRING + file.getName();
 						}
 					}
@@ -291,7 +294,7 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 			}
 
 		}
-		
+
 		//text for composed files
 		if (element instanceof org.eclipse.jdt.internal.core.CompilationUnit) {
 
@@ -299,9 +302,9 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 
 			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 			IPath path = cu.getPath();
-			IFile myfile = root.getFile(path);			
+			IFile myfile = root.getFile(path);
 			return SPACE_STRING + myfile.getName();
-			
+
 		}
 
 		return null;

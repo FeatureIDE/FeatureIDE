@@ -128,8 +128,6 @@ public class DrawImageForProjectExplorer {
 		}
 		colors.remove(colors.size() - 1);
 
-		Image image = new Image(DEVICE, ICON_WIDTH + 1 + NRUMBER_OF_COLORS * COLOR_IMAGE_WIDTH - NRUMBER_OF_COLORS, ICON_HEIGHT);
-		GC gc = new GC(image);
 		
 		Image icon = null;
 		switch (explorerObject) {
@@ -145,13 +143,17 @@ public class DrawImageForProjectExplorer {
 		default:
 			throw new RuntimeException(explorerObject + " not supported");
 		}
+		
+		Image image = new Image(DEVICE, icon.getBounds().width + 2 + NRUMBER_OF_COLORS * COLOR_IMAGE_WIDTH - NRUMBER_OF_COLORS, ICON_HEIGHT);
+		GC gc = new GC(image);
+		
 		gc.drawImage(icon, 0, 0);
 		
 		for (int i = 0; i < 10; i++) {
 			if (colors.contains(i)) {
-				gc.drawImage(getColorImage(i), ICON_WIDTH + COLOR_IMAGE_WIDTH * i - i, 0);
+				gc.drawImage(getColorImage(i), icon.getBounds().width + 1 + COLOR_IMAGE_WIDTH * i - i, 0);
 			} else {
-				gc.drawImage(WHITESPACE_IMAGE, ICON_WIDTH + COLOR_IMAGE_WIDTH * i - i, 0);
+				gc.drawImage(WHITESPACE_IMAGE, icon.getBounds().width + 1 + COLOR_IMAGE_WIDTH * i - i, 0);
 			}
 		}
 		ImageData data = image.getImageData();
