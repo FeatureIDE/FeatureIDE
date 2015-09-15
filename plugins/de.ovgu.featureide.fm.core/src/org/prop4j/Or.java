@@ -73,7 +73,7 @@ public class Or extends Node {
 		final Node[] newChildren = new Node[clauses.size()];
 		int i = 0;
 		for (LinkedList<Node> clause : clauses) {
-			newChildren[i] = new Or(clause);
+			newChildren[i++] = new Or(clause);
 		}
 		return new And(newChildren);
 	}

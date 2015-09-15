@@ -106,8 +106,6 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 	}
 
 	private IFeatureGraph createFeatureGraph() {
-		System.out.println("Computing...");
-
 		workMonitor.setMaxAbsoluteWork((2 * arguments.featureModel.getFeatureNames().size()) + 1);
 
 		final CalcFixedThread calcThread = new CalcFixedThread(AdvancedNodeCreator.createCNF(arguments.featureModel), workMonitor);
@@ -242,9 +240,9 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 			connect(constraint.getNode(), conf);
 		}
 
-		System.out.println(c1);
-		System.out.println(c2);
-		System.out.println();
+//		System.out.println(c1);
+//		System.out.println(c2);
+//		System.out.println();
 
 		final ArrayList<LinkedList<Expression>> expListAr = featureGraph.getExpListAr();
 		for (Expression exp : expList) {
@@ -264,11 +262,11 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 		}
 
 		if (featureGraph instanceof MatrixFeatureGraph) {
-			final long start = System.nanoTime();
+//			final long stsart = System.nanoTime();
 			final DFSThread dfsThread = new DFSThread((MatrixFeatureGraph) featureGraph, workMonitor);
 			dfsThread.addObjects(featureNames);
 			dfsThread.start();
-			System.out.println("DFS Time: " + Math.floor((System.nanoTime() - start) / 1000000.0) / 1000.0 + "s");
+//			System.out.println("DFS Time: " + Math.floor((System.nanoTime() - start) / 1000000.0) / 1000.0 + "s");
 		}
 
 		return featureGraph;
@@ -357,7 +355,7 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 
 	private Collection<Node> simplify(Node node) {
 		final Collection<Node> nodeList = new LinkedList<>();
-		node = node.clone().toCNF();
+		node = Node.buildCNF(node);
 
 		//		node = deMorgan(node);
 		node = orToImply(node);
