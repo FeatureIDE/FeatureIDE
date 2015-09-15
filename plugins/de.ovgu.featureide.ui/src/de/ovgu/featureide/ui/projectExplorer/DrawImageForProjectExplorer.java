@@ -169,7 +169,7 @@ public class DrawImageForProjectExplorer {
 	 * @param colors: gets a list of Integer to create an Image with the color in the list
 	 * @return the image for the featureHouseExplorer with the folderIcon as default and only one color
 	 */
-	public static Image drawFeatureHouseExplorerImage(List<Integer> colors) {
+	public static Image getFOPModuleImage(List<Integer> colors) {
 		colors.add(ExplorerObject.FOLDER.value);
 		final Integer hashCode = colors.hashCode();
 		if (images.containsKey(hashCode)) {
@@ -177,13 +177,13 @@ public class DrawImageForProjectExplorer {
 		}
 		colors.remove(colors.size() - 1);
 
-		Image finalImage = new Image(DEVICE, FOLDER_IMAGE.getImageData().width + COLOR_IMAGE_WIDTH + 2, FOLDER_IMAGE.getImageData().height);
+		Image finalImage = new Image(DEVICE, FOLDER_IMAGE.getImageData().width + COLOR_IMAGE_WIDTH + 3, FOLDER_IMAGE.getImageData().height);
 		GC gc = new GC(finalImage);
 		gc.drawImage(FOLDER_IMAGE, 0, 0);
 		if (colors.get(0).equals(-1)) {
-			gc.drawImage(WHITESPACE_IMAGE, ICON_WIDTH + 1, 0);
+			gc.drawImage(WHITESPACE_IMAGE, ICON_WIDTH + 2, 0);
 		} else {
-			gc.drawImage(getColorImage(colors.get(0)), ICON_WIDTH + 1, 0);
+			gc.drawImage(getColorImage(colors.get(0)), ICON_WIDTH + 2, 0);
 		}
 		ImageData data = finalImage.getImageData();
 		data.transparentPixel = data.palette.getPixel(new RGB(255, 255, 255));

@@ -1,7 +1,8 @@
 package de.ovgu.featureide.ui.projectExplorer;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -21,10 +22,10 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
-import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
-import de.ovgu.featureide.fm.core.color.FeatureColor;
+import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.ui.projectExplorer.DrawImageForProjectExplorer.ExplorerObject;
 
 /**
@@ -63,8 +64,7 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 	 */
 	@Override
 	public Image getImage(Object element) {
-		List<Integer> elementColors = new ArrayList<Integer>();
-
+		Set<Integer> elementColors = new HashSet<Integer>();
 		//returns the image for packages
 		if (element instanceof PackageFragment) {
 			PackageFragment frag = (PackageFragment) element;
@@ -84,7 +84,7 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 			}
 			IComposerExtensionClass composer = featureProject.getComposer();
 			getPackageColors(folder, elementColors, model, !composer.hasFeatureFolder());
-			return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.PACKAGE, elementColors);
+			return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.PACKAGE, new ArrayList<Integer>(elementColors));
 
 		}
 
@@ -105,8 +105,8 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 				IFolder folder = (IFolder) element;
 				//folder inSourceFolder but not SourceFolder itself
 				if (folder.getParent().equals(featureProject.getSourceFolder())) {
-					getFeatureFolderColors(folder, elementColors, model);
-					return DrawImageForProjectExplorer.drawFeatureHouseExplorerImage(elementColors);
+					getFeatureFolderColors(folder, elementColors, featureProject);
+					return DrawImageForProjectExplorer.getFOPModuleImage(new ArrayList<Integer>(elementColors));
 				}
 			}
 
@@ -116,16 +116,16 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 					IFolder folder = (IFolder) element;
 					if (isInSourceFolder(folder) && !folder.equals(featureProject.getSourceFolder())) {
 						getPackageColors(folder, elementColors, model, true);
-						return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.FOLDER, elementColors);
+						return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.FOLDER, new ArrayList<Integer>(elementColors));
 					}
 				}
 				if (element instanceof IFile) {
 					IFile file = (IFile) element;
 					IContainer folder = file.getParent();
 					if (folder instanceof IFolder) {
-						if (isInSourceFolder((IFolder) folder)) {
+						if (isInSourceFolder(file)) {
 							getPackageColors((IFolder) folder, elementColors, model, true);
-							return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.FILE, elementColors);
+							return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.FILE, new ArrayList<Integer>(elementColors));
 						}
 					}
 				}
@@ -147,7 +147,7 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 				model = featureProject.getFSTModel();
 			}
 			getColors(elementColors, myfile, model, !featureProject.getComposer().hasFeatureFolder());
-			return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.FILE, elementColors);
+			return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.FILE, new ArrayList<Integer>(elementColors));
 		}
 
 		return null;
@@ -155,16 +155,12 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 
 	/**
 	 * @param folder
-	 * @param model
+	 * @param featureProject
 	 * @return color for featureFolders
 	 */
-	private void getFeatureFolderColors(IFolder folder, List<Integer> myColors, FSTModel model) {
-		FSTFeature feature = model.getFeature(folder.getName());
-		if (feature != null) {
-			myColors.add(feature.getColor());
-		}else{
-			myColors.add(FeatureColor.NO_COLOR.getValue());
-		}
+	private void getFeatureFolderColors(IFolder folder, Set<Integer> myColors, IFeatureProject featureProject) {
+		Feature feature = featureProject.getFeatureModel().getFeature(folder.getName());
+		myColors.add(FeatureColorManager.getColor(feature).getValue());
 	}
 
 	/**
@@ -174,7 +170,7 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 	 * @param colorUnselectedFeature
 	 * @return colors for files
 	 */
-	private void getColors(List<Integer> myColors, IFile myfile, FSTModel model, boolean colorUnselectedFeature) {
+	private void getColors(Set<Integer> myColors, IFile myfile, FSTModel model, boolean colorUnselectedFeature) {
 		FSTClass clazz = model.getClass(model.getAbsoluteClassName(myfile));
 		if (clazz == null) {
 			return;
@@ -193,7 +189,7 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 	 * @param colorUnselectedFeature
 	 * @return colors for packages
 	 */
-	private void getPackageColors(IFolder folder, List<Integer> myColors, FSTModel model, boolean colorUnselectedFeature) {
+	private void getPackageColors(IFolder folder, Set<Integer> myColors, FSTModel model, boolean colorUnselectedFeature) {
 		try {
 			for (IResource member : folder.members()) {
 				if (member instanceof IFile) {
@@ -227,12 +223,12 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 	}
 
 	private boolean isInFolder(IResource folder, IFolder parentFolder) {
-		if (folder.equals(parentFolder)) {
+		IContainer parent = folder.getParent();
+		if (parent.equals(parentFolder)) {
 			return true;
 		}
-		IContainer parent = folder.getParent();
 		if (parent instanceof IFolder) {
-			return isInSourceFolder((IFolder) parent);
+			return isInFolder((IFolder) parent, parentFolder);
 		}
 		return false;
 	}
@@ -273,7 +269,7 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 					IFolder folder = (IFolder) element;
 					//folder inSourceFolder but not SourceFolder itself
 					if (isInSourceFolder(folder) && !folder.equals(featureProject.getSourceFolder())) {
-						return " " + folder.getName();
+						return "  " + folder.getName();
 					}
 				}
 				//composer Preprocessor
