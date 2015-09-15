@@ -84,6 +84,7 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
@@ -690,8 +691,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		Collections.sort(images, new ImageComarator());
 
 		Image finalImage = new Image(images.get(0).getDevice(), images.get(0).getBounds());
-		ImageData data = null;
-		org.eclipse.swt.graphics.GC gc = new org.eclipse.swt.graphics.GC(finalImage);
+		GC gc = new GC(finalImage);
 		int x = 0;
 		int y = 0;
 
@@ -709,8 +709,8 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 					finalImage.getBounds().width / 2, finalImage.getBounds().height / 2);
 
 		}
-		data = finalImage.getImageData();
-		data.transparentPixel = finalImage.getImageData().palette.getPixel(new RGB(255, 255, 255));
+		ImageData data = finalImage.getImageData();
+		data.transparentPixel = data.palette.getPixel(new RGB(255, 255, 255));
 		gc.dispose();
 
 		return new Image(images.get(0).getDevice(), data);

@@ -30,8 +30,10 @@ import org.eclipse.jdt.ui.ISharedImages;
 import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.color.ColorPalette;
@@ -65,10 +67,10 @@ public class DrawImageForProjectExplorer {
 	static {
 		ImageData imageData = FOLDER_IMAGE.getImageData();
 		Image finalImage = new Image(DEVICE, COLOR_IMAGE_WIDTH, imageData.height);
-		org.eclipse.swt.graphics.GC gc = new org.eclipse.swt.graphics.GC(finalImage);
+		GC gc = new GC(finalImage);
 		gc.setForeground(new Color(DEVICE, 0, 0, 0));
 		gc.drawRectangle(0, 0, COLOR_IMAGE_WIDTH - 1, ICON_HEIGHT - 1);
-		gc.setBackground(new Color(DEVICE, 255, 255, 255));
+		gc.setBackground(new Color(DEVICE, 255, 255, 254));// use 255 for trancparency
 		gc.fillRectangle(1, 1, COLOR_IMAGE_WIDTH - 2, ICON_HEIGHT - 2);
 		gc.dispose();
 		WHITESPACE_IMAGE = finalImage;
@@ -79,7 +81,7 @@ public class DrawImageForProjectExplorer {
 		final ImageData imageData = FOLDER_IMAGE.getImageData();
 		for (int i = 0; i < NRUMBER_OF_COLORS; i++) {
 			Image finalImage = new Image(DEVICE, COLOR_IMAGE_WIDTH, imageData.height);
-			org.eclipse.swt.graphics.GC gc = new org.eclipse.swt.graphics.GC(finalImage);
+			GC gc = new GC(finalImage);
 			gc.setForeground(new Color(DEVICE, 0, 0, 0));
 			gc.setBackground(ColorPalette.getColor(i, 0.4f));
 			gc.fillRectangle(1, 1, COLOR_IMAGE_WIDTH - 2, ICON_HEIGHT - 2);
@@ -126,8 +128,9 @@ public class DrawImageForProjectExplorer {
 		}
 		colors.remove(colors.size() - 1);
 
-		Image finalImage = new Image(DEVICE, ICON_WIDTH + 1 + NRUMBER_OF_COLORS * COLOR_IMAGE_WIDTH - NRUMBER_OF_COLORS, ICON_HEIGHT);
-
+		Image image = new Image(DEVICE, ICON_WIDTH + 1 + NRUMBER_OF_COLORS * COLOR_IMAGE_WIDTH - NRUMBER_OF_COLORS, ICON_HEIGHT);
+		GC gc = new GC(image);
+		
 		Image icon = null;
 		switch (explorerObject) {
 		case FILE:
@@ -142,8 +145,6 @@ public class DrawImageForProjectExplorer {
 		default:
 			throw new RuntimeException(explorerObject + " not supported");
 		}
-
-		org.eclipse.swt.graphics.GC gc = new org.eclipse.swt.graphics.GC(finalImage);
 		gc.drawImage(icon, 0, 0);
 		
 		for (int i = 0; i < 10; i++) {
@@ -153,7 +154,11 @@ public class DrawImageForProjectExplorer {
 				gc.drawImage(WHITESPACE_IMAGE, ICON_WIDTH + COLOR_IMAGE_WIDTH * i - i, 0);
 			}
 		}
+		ImageData data = image.getImageData();
+		data.transparentPixel = data.palette.getPixel(new RGB(255, 255, 255));
 		gc.dispose();
+		
+		Image finalImage = new Image(DEVICE, data);
 		images.put(hashCode, finalImage);
 		return finalImage;
 	}
@@ -171,16 +176,19 @@ public class DrawImageForProjectExplorer {
 		colors.remove(colors.size() - 1);
 
 		Image finalImage = new Image(DEVICE, FOLDER_IMAGE.getImageData().width + COLOR_IMAGE_WIDTH + 2, FOLDER_IMAGE.getImageData().height);
-		org.eclipse.swt.graphics.GC gc = new org.eclipse.swt.graphics.GC(finalImage);
+		GC gc = new GC(finalImage);
 		gc.drawImage(FOLDER_IMAGE, 0, 0);
 		if (colors.get(0).equals(-1)) {
 			gc.drawImage(WHITESPACE_IMAGE, ICON_WIDTH + 1, 0);
 		} else {
 			gc.drawImage(getColorImage(colors.get(0)), ICON_WIDTH + 1, 0);
 		}
+		ImageData data = finalImage.getImageData();
+		data.transparentPixel = data.palette.getPixel(new RGB(255, 255, 255));
 		gc.dispose();
-		images.put(hashCode, finalImage);
-		return finalImage;
+		Image image = new Image(DEVICE, data);
+		images.put(hashCode, image);
+		return image;
 	}
 
 	/**
