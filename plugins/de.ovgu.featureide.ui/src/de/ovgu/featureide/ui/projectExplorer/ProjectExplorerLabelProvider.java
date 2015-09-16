@@ -101,12 +101,16 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 				model = featureProject.getFSTModel();
 			}
 
-			if (composer.hasFeatureFolder() && element instanceof IFolder) {
-				IFolder folder = (IFolder) element;
-				//folder inSourceFolder but not SourceFolder itself
-				if (folder.getParent().equals(featureProject.getSourceFolder())) {
-					getFeatureFolderColors(folder, elementColors, featureProject);
-					return DrawImageForProjectExplorer.getFOPModuleImage(new ArrayList<Integer>(elementColors));
+			if (composer.hasFeatureFolder()) {
+				if (element instanceof IFolder) {
+					IFolder folder = (IFolder) element;
+					//folder inSourceFolder but not SourceFolder itself
+					if (folder.getParent().equals(featureProject.getSourceFolder())) {
+						getFeatureFolderColors(folder, elementColors, featureProject);
+						return DrawImageForProjectExplorer.getFOPModuleImage(new ArrayList<Integer>(elementColors));
+					} else if (isInSourceFolder(folder)) {
+						return DrawImageForProjectExplorer.getPackageImage();
+					}
 				}
 			}
 

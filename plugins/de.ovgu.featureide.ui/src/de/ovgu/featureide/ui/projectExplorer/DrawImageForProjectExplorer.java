@@ -206,4 +206,8 @@ public class DrawImageForProjectExplorer {
 		return COLOR_IMAGES[colorID];
 	}
 
+	public static Image getPackageImage() {
+		return PACKAGE_IMAGE;
+	}
+
 }
