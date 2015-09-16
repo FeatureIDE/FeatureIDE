@@ -54,7 +54,8 @@ public class DrawImageForProjectExplorer {
 	private static final Image JAVA_IMAGE = UIPlugin.getImage("JakFileIcon.png");
 	private static final Image FOLDER_IMAGE = PlatformUI.getWorkbench().getSharedImages().getImage(org.eclipse.ui.ISharedImages.IMG_OBJ_FOLDER);
 	private static final Image PACKAGE_IMAGE = JavaUI.getSharedImages().getImage(ISharedImages.IMG_OBJS_PACKAGE);
-
+	private static final Image FILE_IMAGE = PlatformUI.getWorkbench().getSharedImages().getImage(org.eclipse.ui.ISharedImages.IMG_OBJ_FILE);
+	
 	private static final Device DEVICE = FOLDER_IMAGE.getDevice();
 	private static final int ICON_HEIGHT = FOLDER_IMAGE.getBounds().height;
 	private static final int ICON_WIDTH = FOLDER_IMAGE.getBounds().width;
@@ -92,7 +93,7 @@ public class DrawImageForProjectExplorer {
 	}
 	
 	public enum ExplorerObject {
-		FILE(1), FOLDER(2), PACKAGE(3);
+		JAVA_FILE(1), FOLDER(2), PACKAGE(3), FILE(4);
 		
 		final int value;
 		
@@ -131,7 +132,7 @@ public class DrawImageForProjectExplorer {
 		
 		Image icon = null;
 		switch (explorerObject) {
-		case FILE:
+		case JAVA_FILE:
 			icon = JAVA_IMAGE;
 			break;
 		case FOLDER:
@@ -139,6 +140,9 @@ public class DrawImageForProjectExplorer {
 			break;
 		case PACKAGE:
 			icon = PACKAGE_IMAGE;
+			break;
+		case FILE:
+			icon = FILE_IMAGE;
 			break;
 		default:
 			throw new RuntimeException(explorerObject + " not supported");

@@ -83,7 +83,7 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 				model = featureProject.getFSTModel();
 			}
 			IComposerExtensionClass composer = featureProject.getComposer();
-			getPackageColors(folder, elementColors, model, !composer.hasFeatureFolder());
+			getPackageColors(folder, elementColors, model, !composer.hasFeatureFolder() && !composer.hasSourceFolder());
 			return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.PACKAGE, new ArrayList<Integer>(elementColors));
 
 		}
@@ -100,7 +100,7 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 				featureProject.getComposer().buildFSTModel();
 				model = featureProject.getFSTModel();
 			}
-			//composer FeatureHouse
+
 			if (composer.hasFeatureFolder() && element instanceof IFolder) {
 				IFolder folder = (IFolder) element;
 				//folder inSourceFolder but not SourceFolder itself
@@ -110,13 +110,12 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 				}
 			}
 
-			//composer Preprocessor
 			if (composer.hasSourceFolder() && !composer.hasFeatureFolder()) {
 				if (element instanceof IFolder) {
 					IFolder folder = (IFolder) element;
 					if (isInSourceFolder(folder) && !folder.equals(featureProject.getSourceFolder())) {
 						getPackageColors(folder, elementColors, model, true);
-						return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.FOLDER, new ArrayList<Integer>(elementColors));
+						return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.PACKAGE, new ArrayList<Integer>(elementColors));
 					}
 				}
 				if (element instanceof IFile) {
@@ -125,7 +124,7 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 					if (folder instanceof IFolder) {
 						if (isInSourceFolder(file)) {
 							getPackageColors((IFolder) folder, elementColors, model, true);
-							return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.FILE, new ArrayList<Integer>(elementColors));
+							return DrawImageForProjectExplorer.drawExplorerImage(isJavaFile(file) ? ExplorerObject.JAVA_FILE : ExplorerObject.FILE, new ArrayList<Integer>(elementColors));
 						}
 					}
 				}
@@ -142,15 +141,21 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 			IFile myfile = root.getFile(path);
 			IFeatureProject featureProject = CorePlugin.getFeatureProject(myfile);
 			FSTModel model = featureProject.getFSTModel();
+			IComposerExtensionClass composer = featureProject.getComposer();
 			if (model.getClasses().isEmpty()) {
-				featureProject.getComposer().buildFSTModel();
+				composer.buildFSTModel();
 				model = featureProject.getFSTModel();
 			}
-			getColors(elementColors, myfile, model, !featureProject.getComposer().hasFeatureFolder());
-			return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.FILE, new ArrayList<Integer>(elementColors));
+			getColors(elementColors, myfile, model, !composer.hasFeatureFolder() && !composer.hasSourceFolder());
+			return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.JAVA_FILE, new ArrayList<Integer>(elementColors));
 		}
 
 		return null;
+	}
+
+	private boolean isJavaFile(final IFile file) {
+		final String fileExtension = file.getFileExtension();
+		return fileExtension.equals("java") || fileExtension.equals("jak");
 	}
 
 	/**
@@ -263,27 +268,19 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 			IFeatureProject featureProject = CorePlugin.getFeatureProject((IResource) element);
 			if (featureProject != null) {
 				IComposerExtensionClass composer = featureProject.getComposer();
-				//composer FeatureHouse Folder
-				if (composer.hasFeatureFolder() && element instanceof IFolder) {
-
-					IFolder folder = (IFolder) element;
-					//folder inSourceFolder but not SourceFolder itself
-					if (isInSourceFolder(folder) && !folder.equals(featureProject.getSourceFolder())) {
-						return "  " + folder.getName();
-					}
-				}
-				//composer Preprocessor
-				if (!composer.hasFeatureFolder()) {
+				if (composer.hasFeatureFolder()) {
 					if (element instanceof IFolder) {
 						IFolder folder = (IFolder) element;
-						if (isInBuildFolder(folder)) {
-							return SPACE_STRING + folder.getName();
+						//folder inSourceFolder but not SourceFolder itself
+						if (isInSourceFolder(folder) && !folder.equals(featureProject.getSourceFolder())) {
+							return "  " + folder.getName();
 						}
 					}
-					if (element instanceof IFile) {
-						IFile file = (IFile) element;
-						if (isInBuildFolder(file) || isInSourceFolder(file)) {
-							return SPACE_STRING + file.getName();
+				} else {
+					if (element instanceof IResource) {
+						IResource res = (IResource) element;
+						if (isInBuildFolder(res) || isInSourceFolder(res)) {
+							return SPACE_STRING + res.getName();
 						}
 					}
 				}
