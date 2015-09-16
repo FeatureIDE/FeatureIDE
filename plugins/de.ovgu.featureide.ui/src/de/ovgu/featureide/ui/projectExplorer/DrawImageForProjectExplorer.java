@@ -110,9 +110,10 @@ public class DrawImageForProjectExplorer {
 	/**
 	 * @param explorerObject
 	 * @param colors List of colors from de.ovgu.featureide.fm.core.annotation.ColorPalette
+	 * @param superImage The default image (may be null)
 	 * @return the image with the icon of the file, folder or package (explorerObject) and the color of the feature
 	 */
-	public static Image drawExplorerImage(ExplorerObject explorerObject, List<Integer> colors) {
+	public static Image drawExplorerImage(ExplorerObject explorerObject, List<Integer> colors, Image superImage) {
 		Collections.sort(colors, new Comparator<Integer>() {
 
 			@Override
@@ -122,30 +123,35 @@ public class DrawImageForProjectExplorer {
 		});
 		
 		// create hash value
-		colors.add(explorerObject.value);
+		if (superImage == null) {
+			colors.add(explorerObject.value);
+		} else {
+			colors.add(superImage.getImageData().hashCode());
+		}
 		Integer hashCode = colors.hashCode();
 		if (images.containsKey(hashCode)) {
 			return images.get(hashCode);
 		}
 		colors.remove(colors.size() - 1);
-
 		
-		Image icon = null;
-		switch (explorerObject) {
-		case JAVA_FILE:
-			icon = JAVA_IMAGE;
-			break;
-		case FOLDER:
-			icon = FOLDER_IMAGE;
-			break;
-		case PACKAGE:
-			icon = PACKAGE_IMAGE;
-			break;
-		case FILE:
-			icon = FILE_IMAGE;
-			break;
-		default:
-			throw new RuntimeException(explorerObject + " not supported");
+		Image icon = superImage;
+		if (icon == null) {
+			switch (explorerObject) {
+			case JAVA_FILE:
+				icon = JAVA_IMAGE;
+				break;
+			case FOLDER:
+				icon = FOLDER_IMAGE;
+				break;
+			case PACKAGE:
+				icon = PACKAGE_IMAGE;
+				break;
+			case FILE:
+				icon = FILE_IMAGE;
+				break;
+			default:
+				throw new RuntimeException(explorerObject + " not supported");
+			}
 		}
 		
 		Image image = new Image(DEVICE, icon.getBounds().width + 2 + NRUMBER_OF_COLORS * COLOR_IMAGE_WIDTH - NRUMBER_OF_COLORS, ICON_HEIGHT);

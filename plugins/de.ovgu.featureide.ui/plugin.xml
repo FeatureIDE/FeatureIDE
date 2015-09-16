@@ -1358,7 +1358,8 @@
  <extension
        point="org.eclipse.ui.navigator.navigatorContent">
     <navigatorContent
-          contentProvider="de.ovgu.featureide.ui.projectExplorer.ProjectExplorerContentProvider"
+          contentProvider="de.ovgu.featureide.ui.projectExplorer.NullContentProvider"
+          icon="icons/FeatureIconSmall.ico"
           id="de.ovgu.featureide.ui.contentID"
           labelProvider="de.ovgu.featureide.ui.projectExplorer.ProjectExplorerLabelProvider"
           name="FeatureIDEProjectExplorer"

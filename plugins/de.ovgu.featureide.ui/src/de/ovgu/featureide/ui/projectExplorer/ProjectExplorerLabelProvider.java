@@ -14,8 +14,10 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.internal.core.CompilationUnit;
 import org.eclipse.jdt.internal.core.PackageFragment;
-import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jdt.internal.ui.packageview.PackageExplorerContentProvider;
+import org.eclipse.jdt.internal.ui.packageview.PackageExplorerLabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
+import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.graphics.Image;
 
 import de.ovgu.featureide.core.CorePlugin;
@@ -25,45 +27,30 @@ import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.ui.projectExplorer.DrawImageForProjectExplorer.ExplorerObject;
 
 /**
- * Labelprovider for projectExplorer - sets an image and a text before the files, folders and packages
+ * Label provider for projectExplorer - sets an image and a text before the files, folders and packages
  * 
  * @author Jonas Weigt
  */
 @SuppressWarnings("restriction")
-public class ProjectExplorerLabelProvider implements ILabelProvider {
+public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 
+	public ProjectExplorerLabelProvider() {
+		super(new PackageExplorerContentProvider(true));
+	}
+	
 	/*
 	 * constant to create space for the image 
 	 */
 	private static final String SPACE_STRING = "             ";
-
-	@Override
-	public void addListener(ILabelProviderListener listener) {
-	}
-
-	@Override
-	public void dispose() {
-	}
-
-	@Override
-	public boolean isLabelProperty(Object element, String property) {
-		return false;
-	}
-
-	@Override
-	public void removeListener(ILabelProviderListener listener) {
-	}
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ILabelProvider#getImage(java.lang.Object)
-	 * sets custom colored image instead of package, files or folders 
-	 */
+	
 	@Override
 	public Image getImage(Object element) {
+		Image superImage = super.getImage(element);
 		Set<Integer> elementColors = new HashSet<Integer>();
 		//returns the image for packages
 		if (element instanceof PackageFragment) {
@@ -71,11 +58,11 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 			IFolder folder = (IFolder) frag.getResource();
 			IResource res = frag.getParent().getResource();
 			if (res == null) {
-				return null;
+				return superImage;
 			}
 			IFeatureProject featureProject = CorePlugin.getFeatureProject(res);
 			if (featureProject == null) {
-				return null;
+				return superImage;
 			}
 			FSTModel model = featureProject.getFSTModel();
 			if (model.getClasses().isEmpty()) {
@@ -84,15 +71,14 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 			}
 			IComposerExtensionClass composer = featureProject.getComposer();
 			getPackageColors(folder, elementColors, model, !composer.hasFeatureFolder() && !composer.hasSourceFolder());
-			return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.PACKAGE, new ArrayList<Integer>(elementColors));
-
+			return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.PACKAGE, new ArrayList<Integer>(elementColors), superImage);
 		}
 
 		// returns the image for folders and preprocessor files
 		if (element instanceof IResource) {
 			IFeatureProject featureProject = CorePlugin.getFeatureProject((IResource) element);
 			if (featureProject == null) {
-				return null;
+				return superImage;
 			}
 			IComposerExtensionClass composer = featureProject.getComposer();
 			FSTModel model = featureProject.getFSTModel();
@@ -119,7 +105,7 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 					IFolder folder = (IFolder) element;
 					if (isInSourceFolder(folder) && !folder.equals(featureProject.getSourceFolder())) {
 						getPackageColors(folder, elementColors, model, true);
-						return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.PACKAGE, new ArrayList<Integer>(elementColors));
+						return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.PACKAGE, new ArrayList<Integer>(elementColors), superImage);
 					}
 				}
 				if (element instanceof IFile) {
@@ -128,7 +114,7 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 					if (folder instanceof IFolder) {
 						if (isInSourceFolder(file)) {
 							getPackageColors((IFolder) folder, elementColors, model, true);
-							return DrawImageForProjectExplorer.drawExplorerImage(isJavaFile(file) ? ExplorerObject.JAVA_FILE : ExplorerObject.FILE, new ArrayList<Integer>(elementColors));
+							return DrawImageForProjectExplorer.drawExplorerImage(isJavaFile(file) ? ExplorerObject.JAVA_FILE : ExplorerObject.FILE, new ArrayList<Integer>(elementColors), superImage);
 						}
 					}
 				}
@@ -137,9 +123,7 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 
 		// returns the image for composed files
 		if (element instanceof org.eclipse.jdt.internal.core.CompilationUnit) {
-
 			CompilationUnit cu = (CompilationUnit) element;
-
 			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 			IPath path = cu.getPath();
 			IFile myfile = root.getFile(path);
@@ -151,10 +135,10 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 				model = featureProject.getFSTModel();
 			}
 			getColors(elementColors, myfile, model, !composer.hasFeatureFolder() && !composer.hasSourceFolder());
-			return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.JAVA_FILE, new ArrayList<Integer>(elementColors));
+			return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.JAVA_FILE, new ArrayList<Integer>(elementColors), superImage);
 		}
 
-		return null;
+		return superImage;
 	}
 
 	private boolean isJavaFile(final IFile file) {
@@ -186,7 +170,7 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 		}
 		for (FSTRole r : clazz.getRoles()) {
 			if (colorUnselectedFeature || r.getFeature().isSelected()) {
-				if (r.getFeature().getColor() != -1) {
+				if (r.getFeature().getColor() != FeatureColor.NO_COLOR.getValue()) {
 					myColors.add(r.getFeature().getColor());
 				}
 			}
@@ -243,12 +227,20 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
-	 * sets customized text to have spacing for our image
+	 * @see org.eclipse.jdt.internal.ui.packageview.PackageExplorerLabelProvider#getStyledText(java.lang.Object)
 	 */
 	@Override
+	public StyledString getStyledText(Object element) {
+		String content = getText(element);
+		if (content == null) {
+			return super.getStyledText(element);
+		}
+		return new StyledString(content);
+		
+	}
+	
+	@Override
 	public String getText(Object element) {
-
 		//text for Packages
 		if (element instanceof PackageFragment) {
 			PackageFragment frag = (PackageFragment) element;
@@ -276,7 +268,7 @@ public class ProjectExplorerLabelProvider implements ILabelProvider {
 					if (element instanceof IFolder) {
 						IFolder folder = (IFolder) element;
 						//folder inSourceFolder but not SourceFolder itself
-						if (isInSourceFolder(folder) && !folder.equals(featureProject.getSourceFolder())) {
+						if (isInSourceFolder(folder) && folder.getParent().equals(featureProject.getSourceFolder())) {
 							return "  " + folder.getName();
 						}
 					}
