@@ -25,7 +25,6 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.ui.wizards.NewColorSchemeWizard;
 
@@ -43,16 +42,12 @@ public class AddProfileColorSchemeAction extends Action {
 
 	
 	private FeatureModel model;
-	private IFeatureProject project;
-	
 	/*
 	 * Constructor
 	 */
-	public AddProfileColorSchemeAction(String text, FeatureModel model, IFeatureProject project) {
+	public AddProfileColorSchemeAction(String text, FeatureModel model) {
 		super(text);
 		this.model = model;	
-		this.project = project;
-		
 		setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ADD));
 	}
 	
@@ -68,7 +63,6 @@ public class AddProfileColorSchemeAction extends Action {
 		WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
 		dialog.create();
 		dialog.open();
-//		model.getColorschemeTable().saveColorsToFile(project.getProject());
 	
 	}
 	

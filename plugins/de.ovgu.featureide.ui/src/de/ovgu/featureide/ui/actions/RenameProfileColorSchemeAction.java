@@ -25,7 +25,6 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.ui.wizards.RenameColorSchemeWizard;
 
@@ -42,23 +41,17 @@ import de.ovgu.featureide.ui.wizards.RenameColorSchemeWizard;
 public class RenameProfileColorSchemeAction extends Action {
 
 	private FeatureModel model;
-	private IFeatureProject project;
-
 	/*
 	 * Constructor
 	 */
-	public RenameProfileColorSchemeAction(String text, FeatureModel model, IFeatureProject project) {
+	public RenameProfileColorSchemeAction(String text, FeatureModel model) {
 		super(text);
 		this.model = model;
-		this.project = project;
 		setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_ETOOL_CLEAR));
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.jface.action.Action#run()
-	 * 
-	 * this method calls the renamewizard and saves the configuration
+	/**
+	 *  Call the rename wizard and saves the configuration
 	 */
 	public void run() {
 		RenameColorSchemeWizard wizard = new RenameColorSchemeWizard(model);
@@ -66,7 +59,6 @@ public class RenameProfileColorSchemeAction extends Action {
 		WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
 		dialog.create();
 		dialog.open();
-//		model.getColorschemeTable().saveColorsToFile(project.getProject());
 
 	}
 }

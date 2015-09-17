@@ -124,8 +124,8 @@ public class DynamicProfileMenu extends ContributionItem {
 	 */
 
 	private void createActions() {
-		addProfileSchemeAction = new AddProfileColorSchemeAction("Add Color Scheme", featureModel, myFeatureProject);
-		renameProfileSchemeAction = new RenameProfileColorSchemeAction("Change Name", featureModel, myFeatureProject);
+		addProfileSchemeAction = new AddProfileColorSchemeAction("Add Color Scheme", featureModel);
+		renameProfileSchemeAction = new RenameProfileColorSchemeAction("Change Name", featureModel);
 		deleteProfileSchemeAction = new DeleteProfileColorSchemeAction("Delete Color Scheme", featureModel);
 
 	}

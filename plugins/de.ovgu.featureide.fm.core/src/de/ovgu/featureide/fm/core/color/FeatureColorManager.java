@@ -127,6 +127,9 @@ public class FeatureColorManager {
 	 * Returns the current color scheme.
 	 */
 	public static ColorScheme getCurrentColorScheme(Feature feature) {
+		if (feature == null) {
+			return new DefaultColorScheme();
+		}
 		return getCurrentColorScheme(feature.getFeatureModel());
 	}
 
@@ -135,21 +138,30 @@ public class FeatureColorManager {
 	 */
 	public static ColorScheme getCurrentColorScheme(FeatureModel featureModel) {
 		IProject project = getProject(featureModel);
+		if (project == null) {
+			// bad workaround 
+			return new DefaultColorScheme();
+		}
+		
 		if (!colorSchemes.containsKey(project)) {
 			initColorSchemes(project);
 		}
 		Map<String, ColorScheme> currentSchemes = colorSchemes.get(project);
+		if (currentSchemes.isEmpty()) {
+			initColorSchemes(project);
+			currentSchemes = colorSchemes.get(project);
+		}
 		
 		for (ColorScheme cs : currentSchemes.values()) {
 			if (cs.isCurrent()) {
 				return cs;
 			}
 		}
-		throw new RuntimeException("at least one schould be active");
+		return new DefaultColorScheme();
 	}
 	
 	/**
-	 * Returns the default color schme.
+	 * Returns the default color scheme.
 	 */
 	public static ColorScheme getDefaultColorScheme(FeatureModel model) {
 		for (ColorScheme cs : getColorSchemes(model)) {
@@ -199,6 +211,9 @@ public class FeatureColorManager {
 			while ((line = in.readLine()) != null) {
 				String[] split = line.split("=");
 				try {
+					if (split.length != 2) {
+						continue;
+					}
 					newCs.setColor(split[0], FeatureColor.valueOf(split[1]));					
 				} catch (IllegalArgumentException e) {
 					FMCorePlugin.getDefault().logError("Color not found", e);
