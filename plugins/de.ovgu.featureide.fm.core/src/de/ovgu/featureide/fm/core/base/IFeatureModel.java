@@ -53,7 +53,7 @@ public interface IFeatureModel {
 
 	IFeatureModel clone(IFeature newRoot);
 	
-	IFeatureModel clone(IFeature oldFeatureModel, boolean complete);
+	IFeatureModel clone(IFeatureModel oldFeatureModel, boolean complete);
 
 	void createDefaultValues(CharSequence projectName);
 

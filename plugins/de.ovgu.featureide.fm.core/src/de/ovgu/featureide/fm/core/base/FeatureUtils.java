@@ -29,6 +29,7 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import javax.annotation.CheckForNull;
@@ -508,224 +509,241 @@ public abstract class FeatureUtils {
 		return featureModel.getAnalyser();
 	}
 	
-	@Override
     public static final FeatureModelAnalyzer getAnalyser(IFeatureModel featureModel) {
-		return model.getAnalyser();
+		return featureModel.getAnalyser();
     }
 
-	@Override
     public static final FeatureModelLayout getLayout(IFeatureModel featureModel) {
-		return model.getLayout();
+		return featureModel.getLayout();
     }
 
 	public static final ColorschemeTable getColorschemeTable(IFeatureModel featureModel) {
-		return model.getGraphicRepresenation().getColorschemeTable();
+		return featureModel.getGraphicRepresenation().getColorschemeTable();
 	}
 	
-	@Override
 	public static final FMComposerManager getFMComposerManager(IFeatureModel featureModel, final IProject project) {
-		return model.getFMComposerManager(project);
+		return featureModel.getFMComposerManager(project);
 	}
 
 	public static final IFMComposerExtension initFMComposerExtension(IFeatureModel featureModel, final IProject project) {
-		return model.initFMComposerExtension(project);
+		return featureModel.initFMComposerExtension(project);
 	}
 
 	public static final IFMComposerExtension getFMComposerExtension(IFeatureModel featureModel) {
-		return model.getFMComposerExtension();
+		return featureModel.getFMComposerExtension();
 	}
-	
-	@Override
+		
 	public static final RenamingsManager getRenamingsManager(IFeatureModel featureModel) {
-		return model.getRenamingsManager();
+		return featureModel.getRenamingsManager();
 	}
 	
 	public static final void reset(IFeatureModel featureModel) {
-		return model.reset();
+		featureModel.reset();
 	}
 	
 	public static final void createDefaultValues(IFeatureModel featureModel, CharSequence projectName) {
-		return model.createDefaultValues(projectName);
+		featureModel.createDefaultValues(projectName);
 	}
 	
-	public static final void setRoot(IFeature root) {
-		model.getStructure().setRoot(root);
+	public static final void setRoot(IFeatureModel featureModel, IFeature root) {
+		featureModel.getStructure().setRoot(root.getStructure());
 	}
 	
 	public static final IFeature getRoot(IFeatureModel featureModel) {
-		return model.getStructure().getRoot();
+		return featureModel.getStructure().getRoot().getFeature();
 	}
 
 	public static final void setFeatureTable(IFeatureModel featureModel, final Hashtable<CharSequence, IFeature> featureTable) {
-		model.setFeatureTable(featureTable);
+		featureModel.setFeatureTable(featureTable);
 	}
 	
 	public static final boolean addFeature(IFeatureModel featureModel, IFeature feature) {
-		model.addFeature(feature);
+		return featureModel.addFeature(feature);
 	}
 	
 	public static final Collection<IFeature> getFeatures(IFeatureModel featureModel) {
-		return model.getFeatures();
+		return Functional.toList(featureModel.getFeatures());
 	}
 	
-	@CheckForNull
 	public static final IFeature getFeature(IFeatureModel featureModel, CharSequence name) {
-		return model.getFeature(name);
+		return featureModel.getFeature(name.toString());
 	}
 
 	@Nonnull
 	public static final Collection<IFeature> getConcreteFeatures(IFeatureModel featureModel) {
-		return Functional.toList(FeatureUtils.extractConcreteFeatures(model));
+		return Functional.toList(FeatureUtils.extractConcreteFeatures(featureModel));
 	}
 	
 	@Nonnull
 	public static final Iterable<CharSequence> getConcreteFeatureNames(IFeatureModel featureModel) {
-		return FeatureUtils.extractConcreteFeaturesAsString(model);
+		return FeatureUtils.extractConcreteFeaturesAsStringList(featureModel);
 	}
 	
 	public static final Collection<IFeature> getFeaturesPreorder(IFeatureModel featureModel) {
-		return model.getStructure().getFeaturesPreorder();
+		return featureModel.getStructure().getFeaturesPreorder();
 	}
 
 	public static final List<CharSequence> getFeatureNamesPreorder(IFeatureModel featureModel) {
-		return Functional.toList(FeatureUtils.extractFeatureNames(model.getStructure().getFeaturesPreorder()));
+		return Functional.toList(FeatureUtils.extractFeatureNames(featureModel.getStructure().getFeaturesPreorder()));
 	}
 	
 	@Deprecated
 	public static final boolean isConcrete(IFeatureModel featureModel, CharSequence featureName) {
-		for (IFeature feature : FeatureUtils.extractConcreteFeatures(model))
+		for (IFeature feature : FeatureUtils.extractConcreteFeatures(featureModel))
 			if (feature.getName().equals(featureName))
 				return true;
 		return false;
 	}
 	
 	protected static final Map<CharSequence, IFeature> getFeatureTable(IFeatureModel featureModel) {
-		return model.getFeatureTable();
+		return featureModel.getFeatureTable();
 	}
 	
 	public static final Set<CharSequence> getFeatureNames(IFeatureModel featureModel) {
-		return Functional.toSet(FeatureUtils.extractFeatureNames(model.getFeatures()));
+		return Functional.toSet(FeatureUtils.extractFeatureNames(Functional.toList(featureModel.getFeatures())));
 	}
 	
 	public static final int getNumberOfFeatures(IFeatureModel featureModel) {
-		return model.getNumberOfFeatures();
+		return featureModel.getNumberOfFeatures();
 	}
 
 	public static final void deleteFeatureFromTable(IFeatureModel featureModel, IFeature feature) {
-		model.deleteFeatureFromTable(feature);
+		featureModel.deleteFeatureFromTable(feature);
 	}
 
 	public static final boolean deleteFeature(IFeatureModel featureModel, IFeature feature) {
-		return model.deleteFeature(feature);
+		return featureModel.deleteFeature(feature);
 	}
 	
 	public static final void replaceRoot(IFeatureModel featureModel, IFeature feature) {
-		model.getStructure().replaceRoot(feature);
+		featureModel.getStructure().replaceRoot(feature.getStructure());
 	}
 
 	public static final void setConstraints(IFeatureModel featureModel, final Iterable<IConstraint> constraints) {
-		model.setConstraints(constraints);
+		featureModel.setConstraints(constraints);
 	}
 	
 	public static final void addPropositionalNode(IFeatureModel featureModel, Node node) {
-		model.getConstraints().add(new Constraint(node));
+		featureModel.getConstraints().add(new Constraint(featureModel, node));
 	}
 	
 	public static final void addConstraint(IFeatureModel featureModel, IConstraint constraint) {
-		model.getConstraints().add(constraint);
+		featureModel.getConstraints().add(constraint);
 	}
 
 	public static final void addPropositionalNode(IFeatureModel featureModel, Node node, int index) {
-		model.getConstraints().add(index, new Constraint(node));
+		featureModel.getConstraints().add(index, new Constraint(featureModel, node));
 	}
 	
 	public static final void addConstraint(IFeatureModel featureModel, IConstraint constraint, int index) {
-		model.getConstraints().add(index, constraint);
+		featureModel.getConstraints().add(index, constraint);
 	}
 	
 	public static final Iterable<Node> getPropositionalNodes(IFeatureModel featureModel) {
-		return FeatureUtils.getPropositionalNodes(model.getConstraints());
+		return Functional.map(featureModel.getConstraints(), CONSTRAINT_TO_NODE);
 	}
 	
 	public static final Node getConstraint(IFeatureModel featureModel, int index) {
-		return FeatureUtils;
+		return Functional.toList(getPropositionalNodes(featureModel)).get(index);
 	}
 	                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
 	public static final List<IConstraint> getConstraints(IFeatureModel featureModel) {
-	
+		return featureModel.getConstraints();
 	}
 
 	public static final int getConstraintIndex(IFeatureModel featureModel, IConstraint constraint) {
-	
+		final List<IConstraint> constraints = featureModel.getConstraints();
+		for (int i = 0; i < constraints.size(); i++)
+			if (constraints.get(i).equals(constraint))
+				return i;
+		throw new NoSuchElementException();
 	}
 
 	public static final void removePropositionalNode(IFeatureModel featureModel, Node node) {
-	
+		List<IConstraint> constraints = featureModel.getConstraints();
+		int index = -1;
+		for (int i = 0; i < constraints.size(); i++)
+			if (constraints.get(i).getNode().equals(node)) {
+				index = i;
+				break;
+			}
+		tryRemoveConstraint(featureModel, constraints, index);
 	}
 
 	public static final void removeConstraint(IFeatureModel featureModel, IConstraint constraint) {
-	
+		List<IConstraint> constraints = featureModel.getConstraints();
+		int index = getConstraintIndex(featureModel, constraint);
+		tryRemoveConstraint(featureModel, constraints, index);
+	}
+
+	private static void tryRemoveConstraint(IFeatureModel featureModel, List<IConstraint> constraints, int index) {
+		if (index == -1 || index >= constraints.size())
+			throw new NoSuchElementException();
+		else {
+			constraints.remove(index);
+			featureModel.setConstraints(constraints);
+		}
 	}
 
 	public static final void removeConstraint(IFeatureModel featureModel, int index) {
-	
+		tryRemoveConstraint(featureModel, featureModel.getConstraints(), index);
 	}
 	
 	public static final int getConstraintCount(IFeatureModel featureModel) {
-	
+		return featureModel.getConstraintCount();
 	}
 	
 	public static final List<CharSequence> getAnnotations(IFeatureModel featureModel) {
-	
+		return Functional.toList(featureModel.getProperty().getAnnotations());
 	}
 
 	public static final void addAnnotation(IFeatureModel featureModel, CharSequence annotation) {
-	
+		featureModel.getProperty().addAnnotation(annotation);
 	}
 
 	public static final List<CharSequence> getComments(IFeatureModel featureModel) {
-	
+		return Functional.toList(featureModel.getProperty().getComments());
 	}
 
 	public static final void addComment(IFeatureModel featureModel, CharSequence comment) {
-	
+		featureModel.getProperty().addComment(comment);
 	}
 	
 	public static final void addListener(IFeatureModel featureModel, PropertyChangeListener listener) {
-	
+		featureModel.addListener(listener);
 	}
 
 	public static final void removeListener(IFeatureModel featureModel, PropertyChangeListener listener) {
-	
+		featureModel.removeListener(listener);
 	}
 	
 	public static final void handleModelDataLoaded(IFeatureModel featureModel) {
-	
+		featureModel.handleModelDataLoaded();
 	}
 
 	public static final void handleModelDataChanged(IFeatureModel featureModel) {
-	
+		featureModel.handleModelDataChanged();
 	}
 	
 	public static final void handleModelLayoutChanged(IFeatureModel featureModel) {
-	
+		featureModel.getGraphicRepresenation().handleModelLayoutChanged();
 	}
 	
 	public static final void handleLegendLayoutChanged(IFeatureModel featureModel) {
-	
+		featureModel.getGraphicRepresenation().handleLegendLayoutChanged();
 	}
 	
 	public static final void refreshContextMenu(IFeatureModel featureModel) {
-	
+		featureModel.getGraphicRepresenation().refreshContextMenu();
 	}
 	
 	public static final void redrawDiagram(IFeatureModel featureModel) {
-	
+		featureModel.getGraphicRepresenation().redrawDiagram();
 	}
 	
 	@Override
 	public static final IFeatureModel clone(IFeatureModel featureModel) {
-	
+		return featureModel.clone(featureModel, true);
 	}
 	
 	public static final IFeatureModel deepClone(IFeatureModel featureModel) {
