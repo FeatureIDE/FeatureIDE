@@ -67,6 +67,7 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
 
 /**
@@ -102,7 +103,7 @@ public class ConquererFMWriter extends AbstractFeatureModelWriter {
 		require = new HashMap<String, Set<String>>();
 		exclude = new HashMap<String, Set<String>>();
     	List<Node> furtherNodes = new LinkedList<Node>();
-    	List<Node> nodes = FeatureUtils.getPropositionalNodes(featureModel.getConstraints());
+    	List<Node> nodes = Functional.toList(FeatureUtils.getPropositionalNodes(featureModel.getConstraints()));
     	Node[] nodeArray = nodes.toArray(new Node[nodes.size()]);
     	Node node = new And(nodeArray);
     	if (node.getChildren().length > 0) {
@@ -145,7 +146,7 @@ public class ConquererFMWriter extends AbstractFeatureModelWriter {
     	}
 
     	initializeIDs();
-       	generateSubtree(doc, plm, featureModel.getStructure().getRoot());
+       	generateSubtree(doc, plm, featureModel.getStructure().getRoot().getFeature());
     	
     	plm.appendChild(doc.createElement("properties"));
 

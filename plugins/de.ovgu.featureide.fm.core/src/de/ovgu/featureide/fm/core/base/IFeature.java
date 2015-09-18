@@ -23,6 +23,9 @@ package de.ovgu.featureide.fm.core.base;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
+import java.util.List;
+
+import de.ovgu.featureide.fm.core.FeatureConnection;
 
 /**
  * Interface for a class that represents a feature.</br>
@@ -46,12 +49,16 @@ public interface IFeature extends PropertyChangeListener {
 
 	int getId();
 
-	CharSequence getName();
+	String getName();
 
 	void removeListener(PropertyChangeListener listener);
 
 	void setName(CharSequence name);
 	
 	IGraphicalFeature getGraphicRepresenation(); // Added, Marcus Pinnecke 31.08.15
+
+	boolean isConstraintSelected();
+
+	void setConstraintSelected(boolean b);
 
 }

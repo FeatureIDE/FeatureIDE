@@ -99,12 +99,12 @@ public class ExportDIMACSHandler extends AFileHandler {
 				StringBuilder string = new StringBuilder();
 				Map<String, Integer> featureMap = new HashMap<String, Integer>();
 				int i = 1;
-				for (String name : Functional.toList(FeatureUtils.extractFeatureNames(model.getFeatures()))) {
-					featureMap.put(name, i);
+				for (CharSequence name : Functional.toList(FeatureUtils.extractFeatureNames(model.getFeatures()))) {
+					featureMap.put(name.toString(), i);
 					string.append("c ");
 					string.append(i);
 					string.append(' ');
-					string.append(name);
+					string.append(name.toString());
 					string.append("\r\n");
 					i++;
 				}

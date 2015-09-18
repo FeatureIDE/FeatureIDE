@@ -21,6 +21,8 @@
 package de.ovgu.featureide.fm.core.functional;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -95,12 +97,20 @@ public abstract class Functional {
 		}
 	};
 
-	public static class ToStringFunction<T> implements IFunction<T, CharSequence> {
+	public static class ToStringFunction<T> implements IFunction<T, String> {
+		@Override
+		public String invoke(T t) {
+			return t.toString();
+		}
+	};
+
+	public static class ToCharSequenceFunction<T> implements IFunction<T, CharSequence> {
 		@Override
 		public CharSequence invoke(T t) {
 			return t.toString();
 		}
 	};
+
 
 	/**
 	 * Implements an iterable iterator that invokes a user-defined {@link Functional.IFunction Function} <i>f</i> of type <b>T</b> and <b>U</b> on
@@ -270,7 +280,7 @@ public abstract class Functional {
 	 * @since 2.7.5
 	 */
 	public static <T> Iterable<CharSequence> mapToString(final Iterable<T> source) {
-		return map(source, new ToStringFunction<T>());
+		return map(source, new ToCharSequenceFunction<T>());
 	}
 
 	/**
@@ -278,7 +288,7 @@ public abstract class Functional {
 	 * <br/>
 	 * It is guaranteed not to remove any element from the iterator. <br/>
 	 * <br/>
-	 * This is a <b>blocking</b> operation.
+	 * This is a <b>blocking</b> operation. The resulting list <b>is not modifiable</b>
 	 * 
 	 * @param source Source of elements
 	 * @return A list of object that were yielded by <b>source</b>
@@ -291,7 +301,7 @@ public abstract class Functional {
 		for (T t : source) {
 			retval.add(t);
 		}
-		return retval;
+		return Collections.unmodifiableList(retval);
 	}
 	
 	/**
@@ -299,7 +309,7 @@ public abstract class Functional {
 	 * <br/>
 	 * It is guaranteed not to remove any element from the iterator. <br/>
 	 * <br/>
-	 * This is a <b>blocking</b> operation.
+	 * This is a <b>blocking</b> operation. The resulting set <b>is not modifiable</b>.
 	 * 
 	 * @param source Source of elements
 	 * @return A list of object that were yielded by <b>source</b>
@@ -312,7 +322,7 @@ public abstract class Functional {
 		for (T t : source) {
 			retval.add(t);
 		}
-		return retval;
+		return Collections.unmodifiableSet(retval);
 	}
 
 	/**
@@ -324,13 +334,21 @@ public abstract class Functional {
 	 * This is a <b>blocking</b> operation.
 	 * 
 	 * @param source Source of elements
-	 * @return A list of strings that were yielded by <b>source</b>
+	 * @return A collection of strings that were yielded by <b>source</b>
 	 * 
 	 * @author Marcus Pinnecke
 	 * @since 2.7.5
 	 */
-	public static <T> List<CharSequence> mapToStringList(final Iterable<T> source) {
-		return toList(map(source, new ToStringFunction<T>()));
+	public static <T> Collection<String> mapToStringList(final Iterable<T> source) {
+		return mapCollection(source, new ToStringFunction<T>());
+	}
+	
+	public static <T> Collection<CharSequence> mapToCharSequenceList(final Iterable<T> source) {
+		return mapCollection(source, new ToCharSequenceFunction<T>());
+	}
+
+	public static <T,R> Collection<R> mapCollection(Iterable<T> source, Functional.IFunction<T, R> convertFunction) {
+		return toList(map(source, convertFunction));
 	}
 
 }

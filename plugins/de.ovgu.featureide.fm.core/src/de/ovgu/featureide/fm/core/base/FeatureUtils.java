@@ -24,6 +24,7 @@ import static de.ovgu.featureide.fm.core.functional.Functional.filter;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.LinkedList;
@@ -63,10 +64,10 @@ public abstract class FeatureUtils {
 
 	public static final ConcreteFeatureFilter CONCRETE_FEATURE_FILTER = new ConcreteFeatureFilter();
 
-	public static final IFunction<IFeature, CharSequence> GET_FEATURE_NAME = new IFunction<IFeature, CharSequence>() {
+	public static final IFunction<IFeature, String> GET_FEATURE_NAME = new IFunction<IFeature, String>() {
 
 		@Override
-		public CharSequence invoke(IFeature t) {
+		public String invoke(IFeature t) {
 			return t.getName();
 		}
 	};
@@ -92,6 +93,24 @@ public abstract class FeatureUtils {
 		@Override
 		public Node invoke(IConstraint t) {
 			return t.getNode();
+		}
+
+	};
+
+	public static final IFunction<CharSequence, String> CHARSQUENCE_TO_STRING = new IFunction<CharSequence, String>() {
+
+		@Override
+		public String invoke(CharSequence t) {
+			return t.toString();
+		}
+
+	};
+
+	private static final IFunction<String, CharSequence> STRING_TO_CHARSEQUENCE = new IFunction<String, CharSequence>() {
+
+		@Override
+		public CharSequence invoke(String t) {
+			return t;
 		}
 
 	};
@@ -138,16 +157,24 @@ public abstract class FeatureUtils {
 	 * @author Marcus Pinnecke
 	 * @return A list of strings that contains the feature names of all concrete features of <b>features</b>
 	 */
-	public static List<CharSequence> extractConcreteFeaturesAsStringList(IFeatureModel model) {
-		return Functional.mapToStringList(FeatureUtils.extractConcreteFeatures(model.getFeatures()));
+	public static List<String> extractConcreteFeaturesAsStringList(IFeatureModel model) {
+		return new ArrayList<String>(Functional.mapToStringList(FeatureUtils.extractConcreteFeatures(model.getFeatures())));
 	}
 
-	public static Iterable<CharSequence> extractFeatureNames(Collection<IFeature> features) {
+	public static Iterable<String> extractFeatureNames(Collection<IFeature> features) {
 		return Functional.map(features, GET_FEATURE_NAME);
 	}
 
-	public static Iterable<IFeature> convertToFeatureList(List<IFeatureStructure> list) {
+	public static Iterable<String> extractFeatureNames(Iterable<IFeature> features) {
+		return Functional.map(features, GET_FEATURE_NAME);
+	}
+
+	public static Iterable<IFeature> convertToFeatureIteration(List<IFeatureStructure> list) {
 		return Functional.map(list, STRUCTURE_TO_FEATURE);
+	}
+
+	public static List<IFeature> convertToFeatureList(List<IFeatureStructure> list) {
+		return Functional.toList(Functional.map(list, STRUCTURE_TO_FEATURE));
 	}
 
 	public static Iterable<IFeatureStructure> convertToFeatureStructureList(List<IFeature> list) {
@@ -158,7 +185,7 @@ public abstract class FeatureUtils {
 		return Functional.toList(Functional.map(constraints, CONSTRAINT_TO_NODE));
 	}
 
-	public static CharSequence getRelevantConstraintsString(IFeature feature, Collection<IConstraint> constraints) {
+	public static String getRelevantConstraintsString(IFeature feature, Collection<IConstraint> constraints) {
 		StringBuilder relevant = new StringBuilder();
 		for (IConstraint constraint : constraints) {
 			for (IFeature f : constraint.getContainedFeatures()) {
@@ -205,15 +232,7 @@ public abstract class FeatureUtils {
 		}
 		return stringBuilder.toString();
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
 	public static final CharSequence getDescription(IFeature feature) {
 		return feature.getProperty().getDescription();
 	}
@@ -294,7 +313,7 @@ public abstract class FeatureUtils {
 		return feature.getStructure().getRelevantConstraints();
 	}
 
-	public static final CharSequence getRelevantConstraintsString(IFeature feature) {
+	public static final String getRelevantConstraintsString(IFeature feature) {
 		return FeatureUtils.getRelevantConstraintsString(feature, feature.getFeatureModel().getConstraints());
 	}
 
@@ -318,7 +337,7 @@ public abstract class FeatureUtils {
 		feature.getStructure().setMultiple(multiple);
 	}
 
-	public static final CharSequence getName(IFeature feature) {
+	public static final String getName(IFeature feature) {
 		return feature.getName();
 	}
 
@@ -458,11 +477,11 @@ public abstract class FeatureUtils {
 		return feature.getStructure().hasHiddenParent();
 	}
 
-	public static final CharSequence toString(IFeature feature) {
+	public static final String toString(IFeature feature) {
 		return feature.toString();
 	}
 
-	public static final CharSequence getDisplayName(IFeature feature) {
+	public static final String getDisplayName(IFeature feature) {
 		return feature.getProperty().getDisplayName();
 	}
 
@@ -470,7 +489,7 @@ public abstract class FeatureUtils {
 		throw new UnsupportedOperationException("Not implemented yet");
 	}
 
-	public static final CharSequence toString(IFeature feature, boolean writeMarks) {
+	public static final String toString(IFeature feature, boolean writeMarks) {
 		if (writeMarks) {
 			final String featureName = feature.getName().toString();
 			if (featureName.contains(" ") || Operator.isOperatorName(featureName)) {
@@ -493,34 +512,23 @@ public abstract class FeatureUtils {
 	public static final GraphicItem getItemType(IFeature feature) {
 		return feature.getGraphicRepresenation().getItemType();
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
 	public static final FeatureModelAnalyzer createAnalyser(IFeatureModel featureModel) {
 		return featureModel.getAnalyser();
 	}
-	
-    public static final FeatureModelAnalyzer getAnalyser(IFeatureModel featureModel) {
-		return featureModel.getAnalyser();
-    }
 
-    public static final FeatureModelLayout getLayout(IFeatureModel featureModel) {
+	public static final FeatureModelAnalyzer getAnalyser(IFeatureModel featureModel) {
+		return featureModel.getAnalyser();
+	}
+
+	public static final FeatureModelLayout getLayout(IFeatureModel featureModel) {
 		return featureModel.getLayout();
-    }
+	}
 
 	public static final ColorschemeTable getColorschemeTable(IFeatureModel featureModel) {
 		return featureModel.getGraphicRepresenation().getColorschemeTable();
 	}
-	
+
 	public static final FMComposerManager getFMComposerManager(IFeatureModel featureModel, final IProject project) {
 		return featureModel.getFMComposerManager(project);
 	}
@@ -532,39 +540,39 @@ public abstract class FeatureUtils {
 	public static final IFMComposerExtension getFMComposerExtension(IFeatureModel featureModel) {
 		return featureModel.getFMComposerExtension();
 	}
-		
+
 	public static final RenamingsManager getRenamingsManager(IFeatureModel featureModel) {
 		return featureModel.getRenamingsManager();
 	}
-	
+
 	public static final void reset(IFeatureModel featureModel) {
 		featureModel.reset();
 	}
-	
+
 	public static final void createDefaultValues(IFeatureModel featureModel, CharSequence projectName) {
 		featureModel.createDefaultValues(projectName);
 	}
-	
+
 	public static final void setRoot(IFeatureModel featureModel, IFeature root) {
 		featureModel.getStructure().setRoot(root.getStructure());
 	}
-	
+
 	public static final IFeature getRoot(IFeatureModel featureModel) {
 		return featureModel.getStructure().getRoot().getFeature();
 	}
 
-	public static final void setFeatureTable(IFeatureModel featureModel, final Hashtable<CharSequence, IFeature> featureTable) {
+	public static final void setFeatureTable(IFeatureModel featureModel, final Hashtable<String, IFeature> featureTable) {
 		featureModel.setFeatureTable(featureTable);
 	}
-	
+
 	public static final boolean addFeature(IFeatureModel featureModel, IFeature feature) {
 		return featureModel.addFeature(feature);
 	}
-	
+
 	public static final Collection<IFeature> getFeatures(IFeatureModel featureModel) {
 		return Functional.toList(featureModel.getFeatures());
 	}
-	
+
 	public static final IFeature getFeature(IFeatureModel featureModel, CharSequence name) {
 		return featureModel.getFeature(name.toString());
 	}
@@ -573,20 +581,20 @@ public abstract class FeatureUtils {
 	public static final Collection<IFeature> getConcreteFeatures(IFeatureModel featureModel) {
 		return Functional.toList(FeatureUtils.extractConcreteFeatures(featureModel));
 	}
-	
+
 	@Nonnull
-	public static final Iterable<CharSequence> getConcreteFeatureNames(IFeatureModel featureModel) {
+	public static final Iterable<String> getConcreteFeatureNames(IFeatureModel featureModel) {
 		return FeatureUtils.extractConcreteFeaturesAsStringList(featureModel);
 	}
-	
+
 	public static final Collection<IFeature> getFeaturesPreorder(IFeatureModel featureModel) {
 		return featureModel.getStructure().getFeaturesPreorder();
 	}
 
-	public static final List<CharSequence> getFeatureNamesPreorder(IFeatureModel featureModel) {
+	public static final List<String> getFeatureNamesPreorder(IFeatureModel featureModel) {
 		return Functional.toList(FeatureUtils.extractFeatureNames(featureModel.getStructure().getFeaturesPreorder()));
 	}
-	
+
 	@Deprecated
 	public static final boolean isConcrete(IFeatureModel featureModel, CharSequence featureName) {
 		for (IFeature feature : FeatureUtils.extractConcreteFeatures(featureModel))
@@ -594,15 +602,15 @@ public abstract class FeatureUtils {
 				return true;
 		return false;
 	}
-	
-	protected static final Map<CharSequence, IFeature> getFeatureTable(IFeatureModel featureModel) {
+
+	protected static final Map<String, IFeature> getFeatureTable(IFeatureModel featureModel) {
 		return featureModel.getFeatureTable();
 	}
-	
-	public static final Set<CharSequence> getFeatureNames(IFeatureModel featureModel) {
+
+	public static final Set<String> getFeatureNames(IFeatureModel featureModel) {
 		return Functional.toSet(FeatureUtils.extractFeatureNames(Functional.toList(featureModel.getFeatures())));
 	}
-	
+
 	public static final int getNumberOfFeatures(IFeatureModel featureModel) {
 		return featureModel.getNumberOfFeatures();
 	}
@@ -614,7 +622,7 @@ public abstract class FeatureUtils {
 	public static final boolean deleteFeature(IFeatureModel featureModel, IFeature feature) {
 		return featureModel.deleteFeature(feature);
 	}
-	
+
 	public static final void replaceRoot(IFeatureModel featureModel, IFeature feature) {
 		featureModel.getStructure().replaceRoot(feature.getStructure());
 	}
@@ -622,11 +630,11 @@ public abstract class FeatureUtils {
 	public static final void setConstraints(IFeatureModel featureModel, final Iterable<IConstraint> constraints) {
 		featureModel.setConstraints(constraints);
 	}
-	
+
 	public static final void addPropositionalNode(IFeatureModel featureModel, Node node) {
 		featureModel.getConstraints().add(new Constraint(featureModel, node));
 	}
-	
+
 	public static final void addConstraint(IFeatureModel featureModel, IConstraint constraint) {
 		featureModel.getConstraints().add(constraint);
 	}
@@ -634,19 +642,19 @@ public abstract class FeatureUtils {
 	public static final void addPropositionalNode(IFeatureModel featureModel, Node node, int index) {
 		featureModel.getConstraints().add(index, new Constraint(featureModel, node));
 	}
-	
+
 	public static final void addConstraint(IFeatureModel featureModel, IConstraint constraint, int index) {
 		featureModel.getConstraints().add(index, constraint);
 	}
-	
+
 	public static final Iterable<Node> getPropositionalNodes(IFeatureModel featureModel) {
 		return Functional.map(featureModel.getConstraints(), CONSTRAINT_TO_NODE);
 	}
-	
+
 	public static final Node getConstraint(IFeatureModel featureModel, int index) {
 		return Functional.toList(getPropositionalNodes(featureModel)).get(index);
 	}
-	                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+
 	public static final List<IConstraint> getConstraints(IFeatureModel featureModel) {
 		return featureModel.getConstraints();
 	}
@@ -688,12 +696,12 @@ public abstract class FeatureUtils {
 	public static final void removeConstraint(IFeatureModel featureModel, int index) {
 		tryRemoveConstraint(featureModel, featureModel.getConstraints(), index);
 	}
-	
+
 	public static final int getConstraintCount(IFeatureModel featureModel) {
 		return featureModel.getConstraintCount();
 	}
-	
-	public static final List<CharSequence> getAnnotations(IFeatureModel featureModel) {
+
+	public static final List<String> getAnnotations(IFeatureModel featureModel) {
 		return Functional.toList(featureModel.getProperty().getAnnotations());
 	}
 
@@ -701,14 +709,14 @@ public abstract class FeatureUtils {
 		featureModel.getProperty().addAnnotation(annotation);
 	}
 
-	public static final List<CharSequence> getComments(IFeatureModel featureModel) {
+	public static final List<String> getComments(IFeatureModel featureModel) {
 		return Functional.toList(featureModel.getProperty().getComments());
 	}
 
 	public static final void addComment(IFeatureModel featureModel, CharSequence comment) {
 		featureModel.getProperty().addComment(comment);
 	}
-	
+
 	public static final void addListener(IFeatureModel featureModel, PropertyChangeListener listener) {
 		featureModel.addListener(listener);
 	}
@@ -716,7 +724,7 @@ public abstract class FeatureUtils {
 	public static final void removeListener(IFeatureModel featureModel, PropertyChangeListener listener) {
 		featureModel.removeListener(listener);
 	}
-	
+
 	public static final void handleModelDataLoaded(IFeatureModel featureModel) {
 		featureModel.handleModelDataLoaded();
 	}
@@ -724,149 +732,148 @@ public abstract class FeatureUtils {
 	public static final void handleModelDataChanged(IFeatureModel featureModel) {
 		featureModel.handleModelDataChanged();
 	}
-	
+
 	public static final void handleModelLayoutChanged(IFeatureModel featureModel) {
 		featureModel.getGraphicRepresenation().handleModelLayoutChanged();
 	}
-	
+
 	public static final void handleLegendLayoutChanged(IFeatureModel featureModel) {
 		featureModel.getGraphicRepresenation().handleLegendLayoutChanged();
 	}
-	
+
 	public static final void refreshContextMenu(IFeatureModel featureModel) {
 		featureModel.getGraphicRepresenation().refreshContextMenu();
 	}
-	
+
 	public static final void redrawDiagram(IFeatureModel featureModel) {
 		featureModel.getGraphicRepresenation().redrawDiagram();
 	}
-	
-	@Override
+
 	public static final IFeatureModel clone(IFeatureModel featureModel) {
-		return featureModel.clone(featureModel, true);
+		return featureModel.clone();
 	}
-	
+
 	public static final IFeatureModel deepClone(IFeatureModel featureModel) {
-	
+		return featureModel.deepClone();
 	}
-	
+
 	public static final IFeatureModel deepClone(IFeatureModel featureModel, boolean complete) {
-	
+		return featureModel.deepClone(complete);
 	}
 
 	public static final boolean hasMandatoryFeatures(IFeatureModel featureModel) {
-	
+		return featureModel.getStructure().hasMandatoryFeatures();
 	}
 
 	public static final boolean hasOptionalFeatures(IFeatureModel featureModel) {
-	
+		return featureModel.getStructure().hasOptionalFeatures();
 	}
 
 	public static final boolean hasAndGroup(IFeatureModel featureModel) {
-	
+		return featureModel.getStructure().hasAndGroup();
 	}
 
 	public static final boolean hasAlternativeGroup(IFeatureModel featureModel) {
-		
+		return featureModel.getStructure().hasAlternativeGroup();
 	}
-	
+
 	public static final boolean hasOrGroup(IFeatureModel featureModel) {
-	
+		return featureModel.getStructure().hasOrGroup();
 	}
 
 	public static final boolean hasAbstract(IFeatureModel featureModel) {
-	
+		return featureModel.getStructure().hasAbstract();
 	}
 
 	public static final boolean hasConcrete(IFeatureModel featureModel) {
-	
+		return featureModel.getStructure().hasConcrete();
 	}
-	
+
 	public static final int numOrGroup(IFeatureModel featureModel) {
-	
+		return featureModel.getStructure().numOrGroup();
 	}
-	
+
 	public static final int numAlternativeGroup(IFeatureModel featureModel) {
-	
+		return featureModel.getStructure().numAlternativeGroup();
 	}
-	
+
 	public static final boolean hasHidden(IFeatureModel featureModel) {
-	
+		return featureModel.getStructure().hasHidden();
 	}
 
 	public static final boolean hasIndetHidden(IFeatureModel featureModel) {
-	
+		return featureModel.getStructure().hasIndetHidden();
 	}
-	
+
 	public static final boolean hasUnsatisfiableConst(IFeatureModel featureModel) {
-	
+		return featureModel.getStructure().hasUnsatisfiableConstraints();
 	}
-	
+
 	public static final boolean hasTautologyConst(IFeatureModel featureModel) {
-	
+		return featureModel.getStructure().hasTautologyConstraints();
 	}
-	
+
 	public static final boolean hasDeadConst(IFeatureModel featureModel) {
-	
+		return featureModel.getStructure().hasDeadConstraints();
 	}
-	
+
 	public static final boolean hasVoidModelConst(IFeatureModel featureModel) {
-	
+		return featureModel.getStructure().hasVoidModelConstraints();
 	}
-	
+
 	public static final boolean hasRedundantConst(IFeatureModel featureModel) {
-	
+		return featureModel.getStructure().hasRedundantConstraints();
 	}
 
 	public static final boolean hasFalseOptionalFeatures(IFeatureModel featureModel) {
-	
+		return featureModel.getStructure().hasFalseOptionalFeatures();
 	}
 
 	public static final void setUndoContext(IFeatureModel featureModel, Object undoContext) {
-	
+		featureModel.getUndoContext(undoContext);
 	}
 
 	public static final Object getUndoContext(IFeatureModel featureModel) {
-	
+		return featureModel.getUndoContext();
 	}
 
-	public static final List<CharSequence> getFeatureOrderList(IFeatureModel featureModel) {
-	
+	public static final Collection<String> getFeatureOrderList(IFeatureModel featureModel) {
+		return featureModel.getFeatureOrderList();
 	}
 
-	public static final void setFeatureOrderList(IFeatureModel featureModel, final List<CharSequence> featureOrderList) {
-	
+	public static final void setFeatureOrderList(IFeatureModel featureModel, final List<String> featureOrderList) {
+		featureModel.setFeatureOrderList(featureOrderList);
 	}
 
 	public static final boolean isFeatureOrderUserDefined(IFeatureModel featureModel) {
-	
+		return featureModel.isFeatureOrderUserDefined();
 	}
 
 	public static final void setFeatureOrderUserDefined(IFeatureModel featureModel, boolean featureOrderUserDefined) {
-	
+		featureModel.setFeatureOrderUserDefined(featureOrderUserDefined);
 	}
 
 	public static final boolean isFeatureOrderInXML(IFeatureModel featureModel) {
-	
+		return featureModel.isFeatureOrderInXML();
 	}
 
 	public static final void setFeatureOrderInXML(IFeatureModel featureModel, boolean featureOrderInXML) {
-	
+		featureModel.setFeatureOrderInXML(featureModel, featureOrderInXML);
 	}
-	
-	public static final CharSequence toString(IFeatureModel featureModel) {
-	
+
+	public static final String toString(IFeatureModel featureModel) {
+		return featureModel.toString();
 	}
-	
+
 	public static final boolean equals(IFeatureModel featureModel, Object obj) {
-	
+		return featureModel.equals(obj);
 	}
-	
+
 	public static final int hashCode(IFeatureModel featureModel) {
-	
+		return featureModel.hashCode();
 	}
 
 	public static final GraphicItem getItemType(IFeatureModel featureModel) {
-	
+		return featureModel.getGraphicRepresenation().getItemType();
 	}
 }

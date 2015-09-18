@@ -29,6 +29,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.draw2d.geometry.Point;
 
 import de.ovgu.featureide.fm.core.FeatureModelLayout;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
@@ -63,7 +64,7 @@ public class LegendMoveOperation extends AbstractFeatureModelOperation {
 		final FeatureModelLayout layout = featureModel.getGraphicRepresenation().getLayout();
 		layout.setLegendPos(newLocation.x, newLocation.y);
 		layout.setLegendAutoLayout(false);
-		featureModel.handleLegendLayoutChanged();
+		FeatureUtils.handleLegendLayoutChanged(featureModel);
 	}
 
 	@Override
@@ -72,7 +73,7 @@ public class LegendMoveOperation extends AbstractFeatureModelOperation {
 		final FeatureModelLayout layout = featureModel.getGraphicRepresenation().getLayout();
 		layout.setLegendPos(oldLocation.x, oldLocation.y);
 		layout.setLegendAutoLayout(wasAutoLayout);
-		featureModel.handleLegendLayoutChanged();
+		FeatureUtils.handleLegendLayoutChanged(featureModel);
 	}
 
 }

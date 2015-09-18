@@ -36,6 +36,7 @@ import java.util.StringTokenizer;
 import de.ovgu.featureide.fm.core.RenamingsManager;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
  * Simple configuration format.</br> Lists all selected features in the
@@ -116,7 +117,7 @@ public class DefaultFormat extends ConfigurationFormat {
 		final StringBuilder buffer = new StringBuilder();
 		final IFeatureModel featureModel = configuration.getFeatureModel();
 		if (featureModel.isFeatureOrderUserDefined()) {
-			final List<String> list = featureModel.getFeatureOrderList();
+			final List<String> list = Functional.toList(featureModel.getFeatureOrderList());
 			final Set<String> featureSet = configuration.getSelectedFeatureNames();
 			for (String s : list) {
 				if (featureSet.contains(s)) {

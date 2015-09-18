@@ -76,8 +76,10 @@ import de.ovgu.featureide.core.signature.base.FeatureDataConstructor;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiClassSignature;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiFieldSignature;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
+import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.job.AStoppableJob;
 import fuji.Composition;
 import fuji.Main;
@@ -270,36 +272,38 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 		String featurename = featureModulePathnames.get(featureID);
 		return featurename.substring(featurename.lastIndexOf('\\') + 1);
 	}
-
+	
 	@Override
 	protected boolean work() {
-		IFeatureModel fm = featureProject.getFeatureModel();
-		fm.getAnalyser().setDependencies();
+//		IFeatureModel fm = featureProject.getFeatureModel();
+//		fm.getAnalyser().setDependencies();
+//
+//		String sourcePath = featureProject.getSourcePath();
+//		String[] fujiOptions = new String[] { "-" + Main.OptionName.CLASSPATH, getClassPaths(featureProject), "-" + Main.OptionName.PROG_MODE,
+//				"-" + Main.OptionName.COMPOSTION_STRATEGY, Main.OptionName.COMPOSTION_STRATEGY_ARG_FAMILY // "-typechecker",
+//				, "-" + Main.OptionName.BASEDIR, sourcePath };
+//		SPLStructure spl = null;
+//		Program ast;
+//		try {
+			throw new UnsupportedOperationException("Fuji is not supported currently");
+//			Main fuji = new Main(fujiOptions, new FeatureModel(fm), FeatureUtils.extractConcreteFeaturesAsStringList(fm), FeatureUtils.CHARSQUENCE_TO_STRING);
+//			
+//			Composition composition = fuji.getComposition(fuji);
+//			ast = composition.composeAST();
+//			fuji.typecheckAST(ast);
+//			spl = fuji.getSPLStructure();
+//			featureModulePathnames = spl.getFeatureModulePathnames();  
+//		} catch (RuntimeException e) {
+//			throw e;
+//		} catch (Exception e) {
+//			FeatureHouseCorePlugin.getDefault().logError(e);
+//			return false;
+//		}
 
-		String sourcePath = featureProject.getSourcePath();
-		String[] fujiOptions = new String[] { "-" + Main.OptionName.CLASSPATH, getClassPaths(featureProject), "-" + Main.OptionName.PROG_MODE,
-				"-" + Main.OptionName.COMPOSTION_STRATEGY, Main.OptionName.COMPOSTION_STRATEGY_ARG_FAMILY // "-typechecker",
-				, "-" + Main.OptionName.BASEDIR, sourcePath };
-		SPLStructure spl = null;
-		Program ast;
-		try {
-			Main fuji = new Main(fujiOptions, fm, FeatureUtils.extractConcreteFeaturesAsStringList(fm));
-			Composition composition = fuji.getComposition(fuji);
-			ast = composition.composeAST();
-			fuji.typecheckAST(ast);
-			spl = fuji.getSPLStructure();
-			featureModulePathnames = spl.getFeatureModulePathnames();  
-		} catch (RuntimeException e) {
-			throw e;
-		} catch (Exception e) {
-			FeatureHouseCorePlugin.getDefault().logError(e);
-			return false;
-		}
-
-		createSignatures(featureProject, ast);
-
-		FeatureHouseCorePlugin.getDefault().logInfo(FUJI_SIGNATURES_LOADED_);
-		return true;
+//		createSignatures(featureProject, ast);
+//
+//		FeatureHouseCorePlugin.getDefault().logInfo(FUJI_SIGNATURES_LOADED_);
+//		return true;
 	}
 
 	@SuppressWarnings("unchecked")

@@ -35,6 +35,7 @@ import org.eclipse.swt.graphics.Color;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer.Attribute;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
@@ -155,10 +156,10 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		falseoptional = featureModel.getStructure().hasFalseOptionalFeatures();
 		indetHidden = featureModel.getStructure().hasIndetHidden();
 
-		unsatisfiableConst = analyser.calculateConstraints && featureModel.hasUnsatisfiableConst();
-		tautologyConst = analyser.calculateTautologyConstraints && featureModel.hasTautologyConst();
-		voidModelConst = analyser.calculateConstraints && featureModel.hasVoidModelConst();
-		redundantConst = analyser.calculateRedundantConstraints && featureModel.hasRedundantConst();
+		unsatisfiableConst = analyser.calculateConstraints && FeatureUtils.hasUnsatisfiableConst(featureModel);
+		tautologyConst = analyser.calculateTautologyConstraints && FeatureUtils.hasTautologyConst(featureModel);
+		voidModelConst = analyser.calculateConstraints && FeatureUtils.hasVoidModelConst(featureModel);
+		redundantConst = analyser.calculateRedundantConstraints && FeatureUtils.hasRedundantConst(featureModel);
 
 		if (featureModel instanceof ExtendedFeatureModel) {
 			ExtendedFeatureModel extendedFeatureModel = (ExtendedFeatureModel) featureModel;

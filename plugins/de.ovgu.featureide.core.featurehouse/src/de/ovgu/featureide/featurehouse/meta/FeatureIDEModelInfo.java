@@ -81,8 +81,8 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 			formula = formula.substring(0, formula.indexOf(truefalse));
 		}
 		
-		for (String feature : FeatureUtils.extractFeatureNames(featureModel.getFeatures())) {
-			formula = formula.replaceAll("([\\s,\\(])" + feature.toLowerCase(Locale.ENGLISH), "$1FM.FeatureModel." + feature.toLowerCase(Locale.ENGLISH));
+		for (CharSequence feature : FeatureUtils.extractFeatureNames(featureModel.getFeatures())) {
+			formula = formula.replaceAll("([\\s,\\(])" + feature.toString().toLowerCase(Locale.ENGLISH), "$1FM.FeatureModel." + feature.toString().toLowerCase(Locale.ENGLISH));
 		}
 		return formula.trim();
 	}
@@ -95,7 +95,7 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 			Configuration newConfig = new Configuration(featureModel);
 			coreFeatureNames = new LinkedList<String>();
 			for (IFeature feature : newConfig.getSelectedFeatures())
-				coreFeatureNames.add(feature.getName());
+				coreFeatureNames.add(feature.getName().toString());
 		}
 		
 		return coreFeatureNames.contains(featureName);

@@ -69,6 +69,7 @@ import org.prop4j.SatSolver;
 import splar.core.fm.FeatureModelException;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
@@ -659,7 +660,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 				CoveringArrayCASA.CASA_PATH = path.toOSString();
 			}
 
-			ca = new GUIDSL(featureModel).getSXFM().getCNF().getCoveringArrayGenerator(algorithm, t);
+			ca = new GUIDSL(new FeatureModel(featureModel)).getSXFM().getCNF().getCoveringArrayGenerator(algorithm, t);
 			if (ca == null) {
 				return;
 			}

@@ -32,6 +32,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.events.KeyEvent;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
@@ -149,7 +150,7 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements Proper
 
 	private void resetFeatureList() {
 		featureList.clear();
-		featureList.addAll(featureModel.getFeatureNamesPreorder());
+		featureList.addAll(FeatureUtils.getFeatureNamesPreorder(featureModel));
 		curSearchString = "";
 		curIndex = 0;
 	}

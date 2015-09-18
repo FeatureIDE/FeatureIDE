@@ -62,18 +62,18 @@ public class FeatureModelJPFBDD implements IFeatureModelClass {
 	@Override
 	public String getFeatureFields() {
 		StringBuilder fields = new StringBuilder();
-		for (String f : Functional.toList(FeatureUtils.extractFeatureNames(featureModel.getFeatures()))) {
+		for (CharSequence f : Functional.toList(FeatureUtils.extractFeatureNames(featureModel.getFeatures()))) {
 			fields.append(ANNOTATION);
 			fields.append(FIELD_MODIFIER);
-			fields.append(f.toLowerCase(Locale.ENGLISH));
+			fields.append(f.toString().toLowerCase(Locale.ENGLISH));
 			fields.append(";\r\n");
 		}
 		
 		fields.append(SELECTFEATURES);
 		
-		for (String f : Functional.toList(FeatureUtils.extractFeatureNames(featureModel.getFeatures()))) {
+		for (CharSequence f : Functional.toList(FeatureUtils.extractFeatureNames(featureModel.getFeatures()))) {
 			fields.append("\t\t");
-			fields.append(f.toLowerCase(Locale.ENGLISH));
+			fields.append(f.toString().toLowerCase(Locale.ENGLISH));
 			fields.append(" = Verify.getBoolean(false);\r\n");
 		}
 		fields.append("\t}\r\n");

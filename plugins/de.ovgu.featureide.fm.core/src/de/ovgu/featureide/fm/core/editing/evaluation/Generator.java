@@ -41,6 +41,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
+import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
  * A generator for feature models.
@@ -144,7 +145,7 @@ public abstract class Generator {
 		Random random = new Random(id);
 		
 		for (int i = 0; i < numberOfEdits; i++) {
-			List<IFeature> list = new LinkedList<IFeature>(fm.getFeatures());
+			List<IFeature> list = new LinkedList<IFeature>(Functional.toList(fm.getFeatures()));
 			List<IFeature> randomizedList = new LinkedList<IFeature>();
 			while (!list.isEmpty())
 				randomizedList.add(list.remove(random.nextInt(list.size())));
@@ -195,7 +196,7 @@ public abstract class Generator {
 		Random random = new Random(id);
 		
 		for (int i = 0; i < numberOfEdits; i++) {
-			List<IFeature> list = new LinkedList<IFeature>(fm.getFeatures());
+			List<IFeature> list = new LinkedList<IFeature>(Functional.toList(fm.getFeatures()));
 			List<IFeature> randomizedList = new LinkedList<IFeature>();
 			while (!list.isEmpty())
 				randomizedList.add(list.remove(random.nextInt(list.size())));
@@ -301,7 +302,7 @@ public abstract class Generator {
 			}
 			else {
 				//remove Constraint
-				List<Node> nodes = FeatureUtils.getPropositionalNodes(fm.getConstraints());
+				List<Node> nodes = Functional.toList(FeatureUtils.getPropositionalNodes(fm.getConstraints()));
 				if (!nodes.isEmpty()) {
 					int index = random.nextInt(nodes.size());
 					fm.getConstraints().remove(new Constraint(fm, nodes.get(index)));
@@ -324,7 +325,7 @@ public abstract class Generator {
 		for (int i = 0; i < numberOfEdits; i++) {
 			IFeatureModel backup = valid ? fm.clone(null) : null;
 			
-			List<IFeature> list = new LinkedList<IFeature>(fm.getFeatures());
+			List<IFeature> list = new LinkedList<IFeature>(Functional.toList(fm.getFeatures()));
 			List<IFeature> randomizedList = new LinkedList<IFeature>();
 			while (!list.isEmpty())
 				randomizedList.add(list.remove(random.nextInt(list.size())));

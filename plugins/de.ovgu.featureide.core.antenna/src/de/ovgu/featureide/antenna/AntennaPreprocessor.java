@@ -525,7 +525,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 
 		ArrayList<String> activatedFeatures = new ArrayList<String>();
 		for (IFeature f : configuration.getSelectedFeatures()) {
-			activatedFeatures.add(f.getName());
+			activatedFeatures.add(f.getName().toString());
 		}
 		// generate comma separated string of activated features
 		StringBuilder featureList = new StringBuilder();

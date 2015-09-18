@@ -66,12 +66,12 @@ public class FeatureProperty implements IFeatureProperty, PropertyConstants {
 	 */
 	@Override
 	@CheckForNull
-	public CharSequence getDescription() {
-		return description;
+	public String getDescription() {
+		return description.toString();
 	}
 
 	@Override
-	public CharSequence getDisplayName() {
+	public String getDisplayName() {
 		return correspondingFeature.getName();
 	}
 

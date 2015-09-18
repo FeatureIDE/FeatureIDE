@@ -58,6 +58,7 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationWriter;
+import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
@@ -364,7 +365,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	private boolean updateFeatureList() {
 		boolean changed = false;
 		if (featureModelEditor.featureModel != null && featureModelEditor.featureModel.getStructure().getRoot() != null) {
-			HashSet<String> featureSet = new HashSet<String>(FeatureUtils.extractConcreteFeaturesAsStringList(featureModelEditor.featureModel));
+			HashSet<String> featureSet = new HashSet<String>(Functional.toList(FeatureUtils.extractConcreteFeaturesAsStringList(featureModelEditor.featureModel)));
 
 			int itemcount = featurelist.getItemCount();
 			for (int i = 0; i < itemcount; i++) {
@@ -452,7 +453,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 				for (int i = 0; i < featurelist.getItemCount(); i++) {
 					newFeatureOrderlist.add(featurelist.getItem(i));
 				}
-				featureModelEditor.featureModel.setFeatureOrderList(newFeatureOrderlist);
+				FeatureUtils.setFeatureOrderList(featureModelEditor.featureModel, newFeatureOrderlist);
 			}
 		}
 	}
@@ -478,7 +479,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		if (hasFeatureOrder) {
 			activate.setSelection(featureModelEditor.featureModel.isFeatureOrderUserDefined());
 			enableUI(featureModelEditor.featureModel.isFeatureOrderUserDefined());
-			return featureModelEditor.featureModel.getFeatureOrderList();
+			return Functional.toList(featureModelEditor.featureModel.getFeatureOrderList());
 		}
 		return new LinkedList<String>();
 	}

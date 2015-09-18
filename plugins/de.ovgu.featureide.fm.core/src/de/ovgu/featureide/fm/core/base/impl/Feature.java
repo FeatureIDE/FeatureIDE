@@ -118,8 +118,8 @@ public class Feature implements IFeature, PropertyConstants {
 	}
 
 	@Override
-	public CharSequence getName() {
-		return name;
+	public String getName() {
+		return name.toString();
 	}
 
 	@Override
@@ -151,6 +151,16 @@ public class Feature implements IFeature, PropertyConstants {
 	@Override
 	public IGraphicalFeature getGraphicRepresenation() {
 		throw new UnsupportedOperationException("Not implemented yet");
+	}
+
+	@Override
+	public boolean isConstraintSelected() {
+		throw new UnsupportedOperationException("No implemented");
+	}
+
+	@Override
+	public void setConstraintSelected(boolean b) {
+		throw new UnsupportedOperationException("No implemented");
 	}
 
 }

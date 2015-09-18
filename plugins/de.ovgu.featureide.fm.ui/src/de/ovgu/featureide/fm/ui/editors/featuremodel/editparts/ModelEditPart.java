@@ -33,6 +33,7 @@ import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.Legend;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.policies.ModelLayoutEditPolicy;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
@@ -73,7 +74,7 @@ public class ModelEditPart extends AbstractGraphicalEditPart {
 		final IFeatureModel fm = getFeatureModel();
 
 		final List<?> constraints = fm.getConstraints();
-		final Collection<?> features = fm.getFeatures();
+		final Collection<?> features = Functional.toList(fm.getFeatures());
 
 		final ArrayList<Object> list = new ArrayList<Object>(constraints.size() + features.size() + 1);
 

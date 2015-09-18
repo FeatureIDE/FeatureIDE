@@ -276,7 +276,7 @@ public class ExtendedFeatureModel extends FeatureModel {
 	
 	@Override
 	@CheckForNull
-	public IFeature getFeature(String name) {
+	public IFeature getFeature(CharSequence name) {
 		IFeature feature = super.getFeature(name);
 		if (feature != null) {
 			return feature;

@@ -137,12 +137,12 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 
 	@Override
 	protected List<FeatureConnection> getModelSourceConnections() {
-		return ((IFeature) getModel()).getSourceConnections();
+		return ((IFeature) getModel()).getStructure().getSourceConnections();
 	}
 
 	@Override
 	protected List<FeatureConnection> getModelTargetConnections() {
-		return ((IFeature) getModel()).getTargetConnections();
+		return ((IFeature) getModel()).getStructure().getTargetConnections();
 	}
 
 	public ConnectionAnchor getSourceConnectionAnchor(org.eclipse.gef.ConnectionEditPart connection) {
@@ -177,7 +177,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 		String prop = event.getPropertyName();
 		if (LOCATION_CHANGED.equals(prop)) {
 			getFeatureFigure().setLocation((Point) event.getNewValue());
-			for (FeatureConnection connection : getFeature().getTargetConnections()) {
+			for (FeatureConnection connection : getFeature().getStructure().getTargetConnections()) {
 				Map<?, ?> registry = getViewer().getEditPartRegistry();
 				ConnectionEditPart connectionEditPart = (ConnectionEditPart) registry.get(connection);
 				if (connectionEditPart != null) {
@@ -188,7 +188,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 			}
 		} else if (CHILDREN_CHANGED.equals(prop)) {
 			getFeatureFigure().setProperties();
-			for (FeatureConnection connection : getFeature().getTargetConnections()) {
+			for (FeatureConnection connection : getFeature().getStructure().getTargetConnections()) {
 				Map<?, ?> registry = getViewer().getEditPartRegistry();
 				ConnectionEditPart connectionEditPart = (ConnectionEditPart) registry.get(connection);
 				if (connectionEditPart != null) {

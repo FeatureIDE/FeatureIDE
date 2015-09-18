@@ -28,6 +28,7 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
@@ -58,22 +59,22 @@ public class FeatureDeleteOperation extends AbstractFeatureModelOperation {
 
 	@Override
 	protected void redo() {
-		feature = featureModel.getFeature(feature.getName());
+		feature = featureModel.getFeature(feature.getName().toString());
 		oldParent = feature.getStructure().getParent().getFeature();
 		if (oldParent != null) {
 			oldIndex = oldParent.getStructure().getChildIndex(feature.getStructure());
 		}
 		oldChildren = new LinkedList<IFeature>();
-		oldChildren.addAll(FeatureUtils.convertToFeatureList(feature.getStructure().getChildren()));
+		oldChildren.addAll(Functional.toList(FeatureUtils.convertToFeatureList(feature.getStructure().getChildren())));
 
 		if (oldParent != null) {
-			oldParent = featureModel.getFeature(oldParent.getName());
+			oldParent = featureModel.getFeature(oldParent.getName().toString());
 		}
 		LinkedList<IFeature> oldChildrenCopy = new LinkedList<IFeature>();
 
 		for (IFeature f : oldChildren) {
 			if (!f.getName().equals(feature.getName())) {
-				IFeature oldChild = featureModel.getFeature(f.getName());
+				IFeature oldChild = featureModel.getFeature(f.getName().toString());
 				oldChildrenCopy.add(oldChild);
 			}
 		}
@@ -104,13 +105,13 @@ public class FeatureDeleteOperation extends AbstractFeatureModelOperation {
 			}
 
 			if (oldParent != null) {
-				oldParent = featureModel.getFeature(oldParent.getName());
+				oldParent = featureModel.getFeature(oldParent.getName().toString());
 			}
 			LinkedList<IFeature> oldChildrenCopy = new LinkedList<IFeature>();
 
 			for (IFeature f : oldChildren) {
 				if (!f.getName().equals(feature.getName())) {
-					IFeature child = featureModel.getFeature(f.getName());
+					IFeature child = featureModel.getFeature(f.getName().toString());
 					if (child != null && child.getStructure().getParent() != null) {
 						child.getStructure().getParent().removeChild(child.getStructure());
 					}
@@ -120,7 +121,7 @@ public class FeatureDeleteOperation extends AbstractFeatureModelOperation {
 
 			oldChildren = oldChildrenCopy;
 
-			feature.getStructure().setChildren(FeatureUtils.convertToFeatureStructureList(oldChildren));
+			feature.getStructure().setChildren(Functional.toList(FeatureUtils.convertToFeatureStructureList(oldChildren)));
 			if (oldParent != null) {
 				oldParent.getStructure().addChildAtPosition(oldIndex, feature.getStructure());
 			} else {
@@ -143,6 +144,6 @@ public class FeatureDeleteOperation extends AbstractFeatureModelOperation {
 
 	@Override
 	public boolean canUndo() {
-		return oldParent == null || featureModel.getFeature(oldParent.getName()) != null;
+		return oldParent == null || featureModel.getFeature(oldParent.getName().toString()) != null;
 	}
 }

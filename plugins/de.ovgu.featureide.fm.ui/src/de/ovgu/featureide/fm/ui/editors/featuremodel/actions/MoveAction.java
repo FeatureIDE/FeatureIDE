@@ -32,6 +32,7 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -175,7 +176,7 @@ public class MoveAction extends Action {
 			legendFigure.setLocation(newPos);
 			featureModel.getGraphicRepresenation().getLayout().setLegendPos(newPos.x(), newPos.y());
 			featureModel.getGraphicRepresenation().getLayout().setLegendAutoLayout(false);
-			featureModel.handleLegendLayoutChanged();
+			FeatureUtils.handleLegendLayoutChanged(featureModel);
 			this.isLegendMoving = true;
 		}
 	}

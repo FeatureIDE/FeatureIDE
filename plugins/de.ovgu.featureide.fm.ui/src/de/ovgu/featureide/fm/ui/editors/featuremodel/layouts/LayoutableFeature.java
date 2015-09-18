@@ -27,6 +27,7 @@ import java.util.LinkedList;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
  * A feature representation for layout.
@@ -87,9 +88,9 @@ public class LayoutableFeature {
 		return feature;
 	}
 
-	public static Collection<IFeature> convertFeatures(Collection<IFeature> features, boolean showHidden) {
+	public static Collection<IFeature> convertFeatures(Iterable<IFeature> features, boolean showHidden) {
 		if (showHidden) {
-			return features;
+			return Functional.toList(features);
 		} else {
 			final ArrayList<IFeature> newFeatures = new ArrayList<IFeature>();
 			for (IFeature feature : features) {

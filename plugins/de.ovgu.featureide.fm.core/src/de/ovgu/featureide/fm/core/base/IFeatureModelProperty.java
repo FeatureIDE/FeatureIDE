@@ -35,9 +35,9 @@ public interface IFeatureModelProperty {
 
 	IFeatureModelProperty clone(IFeatureModel newFeatureNodel);
 
-	Iterable<CharSequence> getAnnotations();
+	Iterable<String> getAnnotations();
 
-	Iterable<CharSequence> getComments();
+	Iterable<String> getComments();
 
 	IFeatureModel getFeatureModel();
 

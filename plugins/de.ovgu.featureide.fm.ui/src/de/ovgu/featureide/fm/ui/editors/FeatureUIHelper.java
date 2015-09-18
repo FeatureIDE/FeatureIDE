@@ -134,7 +134,7 @@ public class FeatureUIHelper {
 	public static List<ConnectionEditPart> getConnections(IFeature feature, EditPartViewer viewer) {
 		final List<ConnectionEditPart> editPartList = new LinkedList<ConnectionEditPart>();
 		final Map<?, ?> registry = viewer.getEditPartRegistry();
-		for (FeatureConnection connection : feature.getTargetConnections()) {
+		for (FeatureConnection connection : feature.getStructure().getTargetConnections()) {
 			final Object connectionEditPart = registry.get(connection);
 			if (connectionEditPart instanceof ConnectionEditPart) {
 				editPartList.add((ConnectionEditPart) connectionEditPart);

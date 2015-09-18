@@ -32,6 +32,7 @@ import de.ovgu.featureide.fm.core.FeatureModelLayout;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
  * TODO A PrintAction for the FeatureModelEditor that temporarily moves the
@@ -59,7 +60,7 @@ public class FMPrintAction extends PrintAction {
 		FeatureModelLayout layout = featureModel.getGraphicRepresenation().getLayout();
 		int layoutOld = layout.getLayoutAlgorithm();
 
-		Collection<IFeature> features = featureModel.getFeatures();
+		Collection<IFeature> features = Functional.toList(featureModel.getFeatures());
 		Iterator<IFeature> featureIter = features.iterator();
 		Point minP = FeatureUIHelper.getLocation(featureIter.next()).getCopy();
 

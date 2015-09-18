@@ -71,4 +71,8 @@ public interface IConstraint {
 	
 	IGraphicalConstraint getGraphicRepresenation(); // Added, Marcus Pinnecke 31.08.15
 
+	boolean isFeatureSelected();
+
+	void setFeatureSelected(boolean b);
+
 }

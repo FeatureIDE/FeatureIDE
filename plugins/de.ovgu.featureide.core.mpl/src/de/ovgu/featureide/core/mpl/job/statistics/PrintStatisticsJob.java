@@ -168,7 +168,7 @@ public class PrintStatisticsJob extends AProjectJob<PrintStatisticsJob.Arguments
 		IFeatureModel fm = interfaceProject.getFeatureModel();
 		LinkedList<String> allConcreteFeatures = new LinkedList<String>();
 		for (IFeature feature : FeatureUtils.extractConcreteFeatures(fm)) {
-			allConcreteFeatures.add(feature.getName());
+			allConcreteFeatures.add(feature.getName().toString());
 		}
 		workMonitor.setMaxAbsoluteWork(allConcreteFeatures.size() + 1);
 		

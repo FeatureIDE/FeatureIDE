@@ -32,6 +32,7 @@ import de.ovgu.featureide.fm.core.FeatureComparator;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
  * Defines the content of the feature model class specific for VarexJ.
@@ -49,7 +50,7 @@ public class FeatureModelVarexJ implements IFeatureModelClass {
 
 	public FeatureModelVarexJ(IFeatureModel featureModel) {
 		this.featureModel = featureModel;
-		features = new ArrayList<IFeature>(featureModel.getFeatures());
+		features = new ArrayList<IFeature>(Functional.toList(featureModel.getFeatures()));
 		Collections.sort(features, new FeatureComparator(true));
 	}
 	

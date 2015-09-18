@@ -42,6 +42,7 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
  * Takes a feature model as input and returns a propositional formula
@@ -220,8 +221,9 @@ public class NodeCreator {
 				}
 			}
 
-		List<Node> featureList = new ArrayList<Node>(featureModel.getFeatures().size() - removeFeatures.size());
-		for (IFeature feature : featureModel.getFeatures()) {
+		final Collection<IFeature> features = Functional.toList(featureModel.getFeatures());
+		List<Node> featureList = new ArrayList<Node>(features.size() - removeFeatures.size());
+		for (IFeature feature : features) {
 			if (!removeFeatures.contains(feature.getName())) {
 				featureList.add(new Literal(getVariable(feature.getName(), featureModel)));
 			}

@@ -55,9 +55,9 @@ public class FeatureModelKeY implements IFeatureModelClass {
 	@Override
 	public String getFeatureFields() {
 		final StringBuilder fields = new StringBuilder();
-		for (final String f : Functional.toList(FeatureUtils.extractFeatureNames(featureModel.getFeatures()))) {
+		for (final CharSequence f : Functional.toList(FeatureUtils.extractFeatureNames(featureModel.getFeatures()))) {
 			fields.append(FIELD_MODIFIER);
-			fields.append(f.toLowerCase(Locale.ENGLISH));
+			fields.append(f.toString().toLowerCase(Locale.ENGLISH));
 			fields.append(";\r\n");
 		}
 		return fields.toString();

@@ -133,10 +133,10 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter implements
     	calculations.setAttribute(CALCULATE_TAUTOLOGY, "" + featureModel.getAnalyser().calculateTautologyConstraints);
 
     	root.appendChild(comments);
-    	for(int i=0; i<featureModel.getProperty().getComments().size(); i++){
+    	for(String comment : featureModel.getProperty().getComments()){
         	Element c = doc.createElement(C);
         	comments.appendChild(c);        	
-        	Text text = doc.createTextNode(featureModel.getProperty().getComments().get(i));
+        	Text text = doc.createTextNode(comment);
         	c.appendChild(text);
         }
     	order.setAttribute(USER_DEFINED, Boolean.toString(featureModel.isFeatureOrderUserDefined()));

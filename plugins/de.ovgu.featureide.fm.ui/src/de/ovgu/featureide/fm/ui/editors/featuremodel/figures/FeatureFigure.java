@@ -221,7 +221,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		
 		Figure toolTipContent = new Figure();
 		toolTipContent.setLayoutManager(gl);
-		Label featureName = new Label(feature.getName());
+		Label featureName = new Label(feature.getName().toString());
 		featureName.setFont(DEFAULT_FONT_BOLD);
 		Label furtherInfos = new Label(toolTip.toString());
 		furtherInfos.setFont(DEFAULT_FONT);

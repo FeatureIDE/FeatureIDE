@@ -64,6 +64,16 @@ public interface IFeatureModelStructure {
 
 	void setRoot(IFeatureStructure root);
 
-	boolean hasFalseOptionalFeatures(); 	// Added, Marcus 31.08.2015
+	boolean hasFalseOptionalFeatures(); 	
+
+	boolean hasUnsatisfiableConstraints();
+
+	boolean hasTautologyConstraints();
+
+	boolean hasDeadConstraints();
+
+	boolean hasVoidModelConstraints();
+
+	boolean hasRedundantConstraints();
 
 }

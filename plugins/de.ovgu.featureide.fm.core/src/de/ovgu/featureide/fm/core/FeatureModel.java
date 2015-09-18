@@ -68,10 +68,14 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  */
 public class FeatureModel extends DeprecatedFeatureModel implements PropertyConstants, IGraphicItem {
 	
-	IFeatureModel model;
+	public IFeatureModel model;
 	
-	public FeatureModel(IFeatureModel model) {
-		this.model = model;
+	public FeatureModel() {
+		throw IllegalAccessException("Do not use this construction any longer. Use direct assigment to member 'model' instead");
+	}
+
+	protected FeatureModel(FeatureModel oldFeatureModel, boolean complete) {
+		throw IllegalAccessException("Do not use this construction any longer. Use direct assigment to member 'model' instead");	
 	}
 
 	protected FeatureModel(FeatureModel oldFeatureModel, boolean complete) {

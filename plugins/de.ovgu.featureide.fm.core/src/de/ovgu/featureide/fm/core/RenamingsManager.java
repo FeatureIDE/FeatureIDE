@@ -35,9 +35,11 @@ import org.eclipse.core.runtime.IPath;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
  * Handles feature renamings.
@@ -69,7 +71,7 @@ public class RenamingsManager {
 			return false;
 		}
 		final List<IConstraint> constraints = model.getConstraints();
-		final List<String> featureOrderList = model.getFeatureOrderList();
+		final List<String> featureOrderList = Functional.toList(model.getFeatureOrderList());
 		IFeature feature = featureTable.remove(oldName);
 		feature.setName(newName);
 		featureTable.put(newName, feature);
@@ -81,7 +83,7 @@ public class RenamingsManager {
 		// update the feature order list
 		for (int i = 0;i < featureOrderList.size();i++) {
 			if (featureOrderList.get(i).equals(oldName)) {
-				featureOrderList.set(i, newName);
+				model.setFeatureOrderListItem(i, newName);
 				break;
 			}
 		}
@@ -207,7 +209,7 @@ public class RenamingsManager {
 	}
 
 	public Set<String> getOldFeatureNames() {
-		HashSet<String> names = new HashSet<String>(model.getFeatureTable().keySet());
+		HashSet<String> names = new HashSet<String>(Functional.mapToStringList(model.getFeatureTable().keySet()));
 		for (Renaming renaming : renamings) {
 			names.remove(renaming.newName);
 			names.add(renaming.oldName);

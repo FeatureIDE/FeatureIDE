@@ -84,7 +84,7 @@ public class FeatureModelJPFCore implements IFeatureModelClass {
 			fields.append("_;" + NEWLINE);
 		}
 
-		final ArrayList<IFeature> features = new ArrayList<IFeature>(featureModel.getFeatures());
+		final ArrayList<IFeature> features = new ArrayList<IFeature>(Functional.toList(featureModel.getFeatures()));
 		final List<List<IFeature>> deadCoreList = featureModel.getAnalyser().analyzeFeatures();
 		coreFeatures = deadCoreList.get(0);
 		deadFeatures = deadCoreList.get(1);

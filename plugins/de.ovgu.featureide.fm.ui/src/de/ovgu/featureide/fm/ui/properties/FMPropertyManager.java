@@ -135,7 +135,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 	 */
 	public static void updateEditors() {
 		for (IFeatureModel model : featureModels) {
-			model.redrawDiagram();
+			model.getGraphicRepresenation().redrawDiagram();
 		}
 	}
 

@@ -55,6 +55,7 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  * @author Thomas Thuem
  * @author Florian Proksch
  * @author Stefan Krueger
+ * @author Marcus Pinnecke
  * 
  */
 public class FeatureModel implements IFeatureModel, PropertyConstants {
@@ -66,12 +67,12 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	 * A list containing the feature names in their specified order will be
 	 * initialized in XmlFeatureModelReader.
 	 */
-	protected final List<CharSequence> featureOrderList;
+	protected final List<String> featureOrderList;
 	protected boolean featureOrderUserDefined;
 	/**
 	 * A {@link Map} containing all features.
 	 */
-	protected final Map<CharSequence, IFeature> featureTable = new ConcurrentHashMap<>();
+	protected final Map<String, IFeature> featureTable = new ConcurrentHashMap<>();
 
 	protected FMComposerManager fmComposerManager = null;
 
@@ -86,7 +87,7 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	protected Object undoContext = null;
 
 	public FeatureModel() {
-		featureOrderList = new LinkedList<CharSequence>();
+		featureOrderList = new LinkedList<String>();
 		featureOrderUserDefined = false;
 
 		property = createProperty();
@@ -94,7 +95,7 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	}
 
 	protected FeatureModel(FeatureModel oldFeatureModel, IFeature newRoot) {
-		featureOrderList = new LinkedList<CharSequence>(oldFeatureModel.featureOrderList);
+		featureOrderList = new LinkedList<String>(oldFeatureModel.featureOrderList);
 		featureOrderUserDefined = oldFeatureModel.featureOrderUserDefined;
 
 		property = oldFeatureModel.getProperty().clone(this);
@@ -139,7 +140,7 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 		if (featureTable.containsKey(name)) {
 			return false;
 		}
-		featureTable.put(name, feature);
+		featureTable.put(name.toString(), feature);
 		return true;
 	}
 
@@ -180,7 +181,7 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	@Override
 	public boolean deleteFeature(IFeature feature) {
 		// the root can not be deleted
-		if (feature == structure.getRoot()) {
+		if (feature.equals(structure.getRoot().getFeature())) {
 			return false;
 		}
 
@@ -253,16 +254,16 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	}
 
 	@Override
-	public IFeature getFeature(String name) {
+	public IFeature getFeature(CharSequence name) {
 		return featureTable.get(name);
 	}
 
 	@Override
-	public Collection<CharSequence> getFeatureOrderList() {
+	public Collection<String> getFeatureOrderList() {
 		if (featureOrderList.isEmpty()) {
-			return Functional.mapToStringList(Functional.filter(getFeatures(), new ConcreteFeatureFilter()));
+			return Functional.toList(Functional.mapToStringList(Functional.filter(getFeatures(), new ConcreteFeatureFilter())));
 		}
-		return featureOrderList;
+		return Collections.unmodifiableCollection(featureOrderList);
 	}
 
 	@Override
@@ -391,7 +392,8 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	@Override
 	public void setFeatureOrderList(List<String> featureOrderList) {
 		this.featureOrderList.clear();
-		this.featureOrderList.addAll(featureOrderList);
+		for (CharSequence cs : featureOrderList)
+			this.featureOrderList.add(cs.toString());
 	}
 
 	@Override
@@ -400,7 +402,7 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	}
 
 	@Override
-	public void setFeatureTable(Hashtable<CharSequence, IFeature> featureTable) {
+	public void setFeatureTable(Hashtable<String, IFeature> featureTable) {
 		this.featureTable.clear();
 		this.featureTable.putAll(featureTable);
 	}
@@ -415,18 +417,63 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	}
 
 	@Override
-	public Map<CharSequence, IFeature> getFeatureTable() {
+	public Map<String, IFeature> getFeatureTable() {
 		return featureTable;
-	}
-
-	@Override
-	public IFeatureModel clone(IFeature oldFeatureModel, boolean complete) {
-		throw new UnsupportedOperationException ("Not implemented yet");
 	}
 
 	@Override
 	public FeatureModelLayout getLayout() {
 		throw new UnsupportedOperationException ("Not implemented yet");
+	}
+
+	@Override
+	public IFeatureModel clone(IFeatureModel oldFeatureModel, boolean complete) {
+		throw new UnsupportedOperationException("Not implemented yet");
+	}
+
+	@Override
+	public IFeatureModel clone() {
+		throw new UnsupportedOperationException("Not implemented yet");
+	}
+
+	@Override
+	public IFeatureModel deepClone() {
+		throw new UnsupportedOperationException("Not implemented yet");
+	}
+
+	@Override
+	public IFeatureModel deepClone(boolean complete) {
+		throw new UnsupportedOperationException("Not implemented yet");
+	}
+
+	@Override
+	public Object getUndoContext(Object undoContext) {
+		throw new UnsupportedOperationException("Not implemented yet");
+	}
+
+	@Override
+	public boolean isFeatureOrderInXML() {
+		throw new UnsupportedOperationException("Not implemented yet");
+	}
+
+	@Override
+	public Object setFeatureOrderInXML(IFeatureModel featureModel, boolean featureOrderInXML) {
+		throw new UnsupportedOperationException("Not implemented yet");
+	}
+
+	@Override
+	public void refreshContextMenu() {
+		throw new UnsupportedOperationException("Not implemented yet");
+	}
+
+	@Override
+	public void setConstraintSelected(boolean b) {
+		throw new UnsupportedOperationException("Not implemented yet");
+	}
+
+	@Override
+	public void setFeatureOrderListItem(int i, String newName) {
+		throw new UnsupportedOperationException("Not implemented yet");
 	}
 
 }

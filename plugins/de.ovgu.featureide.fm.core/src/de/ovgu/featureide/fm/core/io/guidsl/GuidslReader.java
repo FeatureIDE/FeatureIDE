@@ -86,6 +86,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
+import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.ModelWarning;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
@@ -417,7 +418,7 @@ public class GuidslReader extends AbstractFeatureModelReader {
 			featureString.append("%%\r\n");
 		featureString.append(propString);
 		readFromString(featureString.toString());
-		List<Node> propNodes = FeatureUtils.getPropositionalNodes(getFeatureModel().getConstraints());
+		List<Node> propNodes = Functional.toList(FeatureUtils.getPropositionalNodes(getFeatureModel().getConstraints()));
 
 		return propNodes.get(propNodes.size()-1);
 	}

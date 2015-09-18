@@ -61,6 +61,7 @@ import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
 import de.ovgu.featureide.fm.core.editing.Comparison;
 import de.ovgu.featureide.fm.core.editing.ModelComparator;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
  * A collection of methods for working with {@link IFeatureModel} will replace
@@ -693,7 +694,7 @@ public class FeatureModelAnalyzer {
 				}
 				
 				if (!fmDeadFeatures.isEmpty()) {
-					Collection<IFeature> deadFeatures = constraint.getDeadFeatures(solver, clone, fmDeadFeatures);
+					Collection<IFeature> deadFeatures = Functional.toList(constraint.getDeadFeatures(solver, clone, fmDeadFeatures));
 					if (!deadFeatures.isEmpty()) {
 						fmDeadFeatures.removeAll(deadFeatures);
 						constraint.setDeadFeatures(deadFeatures);

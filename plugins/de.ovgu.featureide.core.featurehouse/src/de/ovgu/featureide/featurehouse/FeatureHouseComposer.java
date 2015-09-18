@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -566,11 +567,11 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		composer = composerExtension;
 		composerExtension.addCompositionErrorListener(compositionErrorListener);
 		IFeatureModel featureModel = featureProject.getFeatureModel();
-		List<String> featureOrderList = featureModel.getFeatureOrderList();
+		Collection<String> featureOrderList = featureModel.getFeatureOrderList();
 		// dead features should not be composed
 		LinkedList<String> deadFeatures = new LinkedList<String>();
 		for (IFeature deadFeature : featureModel.getAnalyser().getDeadFeatures()) {
-			deadFeatures.add(deadFeature.getName());
+			deadFeatures.add(deadFeature.getName().toString());
 		}
 
 		String[] features = new String[featureOrderList.size()];
@@ -700,62 +701,63 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	 *            The feature project of the caller.
 	 */
 	private synchronized static Program runFuji(IFeatureProject featureProject) throws CompositionException {
-		String sourcePath = featureProject.getSourcePath();
-		String[] fujiOptions = new String[] { "-" + Main.OptionName.CLASSPATH, getClassPaths(featureProject), "-" + Main.OptionName.PROG_MODE, "-" + Main.OptionName.COMPOSTION_STRATEGY, Main.OptionName.COMPOSTION_STRATEGY_ARG_FAMILY,
-				"-typechecker", "-basedir", sourcePath };
-		Program ast = null;
-		try {
-			IFeatureModel fm = featureProject.getFeatureModel();
-			fm.getAnalyser().setDependencies();
-
-			Main fuji = new Main(fujiOptions, fm, FeatureUtils.extractConcreteFeaturesAsStringList(featureProject.getFeatureModel()));
-			Composition composition = fuji.getComposition(fuji);
-			ast = composition.composeAST();
-
-			// run type check
-			fuji.typecheckAST(ast);
-
-			// parsing warnings
-			for (Problem warn : fuji.getWarnings()) {
-				createFujiMarker(warn.line(), warn.message(), warn.fileName(), IMarker.SEVERITY_WARNING, featureProject);
-			}
-
-			// parsing errors
-			for (Problem err : fuji.getErrors()) {
-				String message = err.message();
-				if (err.line() == -1) {
-					for (String fileName : err.fileName().split("[\n]")) {
-						// currently bad workaround @ fuji, but seems to work
-						String file = fileName.substring(0, fileName.lastIndexOf(":"));
-						int line = Integer.parseInt(fileName.substring(fileName.lastIndexOf(":") + 1));
-						createFujiMarker(line, message, file, IMarker.SEVERITY_ERROR, featureProject);
-					}
-				} else {
-					createFujiMarker(err.line(), message, err.fileName(), IMarker.SEVERITY_ERROR, featureProject);
-				}
-
-			}
-		} catch (CompositionErrorException e) {
-			createFujiMarker(-1, e.getMessage(), featureProject.getSourceFolder(), IMarker.SEVERITY_ERROR, featureProject);
-		} catch (IllegalArgumentException e) {
-			LOGGER.logError(e);
-		} catch (org.apache.commons.cli.ParseException e) {
-			LOGGER.logError(e);
-		} catch (IOException e) {
-			LOGGER.logError(e);
-		} catch (FeatureDirNotFoundException e) {
-			LOGGER.logError(e);
-		} catch (SyntacticErrorException e) {
-			LOGGER.logError(e);
-		} catch (SemanticErrorException e) {
-			LOGGER.logError(e);
-		} catch (CompilerWarningException e) {
-			LOGGER.logError(e);
-		} catch (UnsupportedModelException e) {
-			LOGGER.logError(e);
-		}
-
-		return ast;
+		throw new UnsupportedOperationException("Not supported currently");
+//		String sourcePath = featureProject.getSourcePath();
+//		String[] fujiOptions = new String[] { "-" + Main.OptionName.CLASSPATH, getClassPaths(featureProject), "-" + Main.OptionName.PROG_MODE, "-" + Main.OptionName.COMPOSTION_STRATEGY, Main.OptionName.COMPOSTION_STRATEGY_ARG_FAMILY,
+//				"-typechecker", "-basedir", sourcePath };
+//		Program ast = null;
+//		try {
+//			IFeatureModel fm = featureProject.getFeatureModel();
+//			fm.getAnalyser().setDependencies();
+//
+//			Main fuji = new Main(fujiOptions, fm, FeatureUtils.extractConcreteFeaturesAsStringList(featureProject.getFeatureModel()));
+//			Composition composition = fuji.getComposition(fuji);
+//			ast = composition.composeAST();
+//
+//			// run type check
+//			fuji.typecheckAST(ast);
+//
+//			// parsing warnings
+//			for (Problem warn : fuji.getWarnings()) {
+//				createFujiMarker(warn.line(), warn.message(), warn.fileName(), IMarker.SEVERITY_WARNING, featureProject);
+//			}
+//
+//			// parsing errors
+//			for (Problem err : fuji.getErrors()) {
+//				String message = err.message();
+//				if (err.line() == -1) {
+//					for (String fileName : err.fileName().split("[\n]")) {
+//						// currently bad workaround @ fuji, but seems to work
+//						String file = fileName.substring(0, fileName.lastIndexOf(":"));
+//						int line = Integer.parseInt(fileName.substring(fileName.lastIndexOf(":") + 1));
+//						createFujiMarker(line, message, file, IMarker.SEVERITY_ERROR, featureProject);
+//					}
+//				} else {
+//					createFujiMarker(err.line(), message, err.fileName(), IMarker.SEVERITY_ERROR, featureProject);
+//				}
+//
+//			}
+//		} catch (CompositionErrorException e) {
+//			createFujiMarker(-1, e.getMessage(), featureProject.getSourceFolder(), IMarker.SEVERITY_ERROR, featureProject);
+//		} catch (IllegalArgumentException e) {
+//			LOGGER.logError(e);
+//		} catch (org.apache.commons.cli.ParseException e) {
+//			LOGGER.logError(e);
+//		} catch (IOException e) {
+//			LOGGER.logError(e);
+//		} catch (FeatureDirNotFoundException e) {
+//			LOGGER.logError(e);
+//		} catch (SyntacticErrorException e) {
+//			LOGGER.logError(e);
+//		} catch (SemanticErrorException e) {
+//			LOGGER.logError(e);
+//		} catch (CompilerWarningException e) {
+//			LOGGER.logError(e);
+//		} catch (UnsupportedModelException e) {
+//			LOGGER.logError(e);
+//		}
+//
+//		return ast;
 	}
 
 	public static String getClassPaths(IFeatureProject featureProject) {

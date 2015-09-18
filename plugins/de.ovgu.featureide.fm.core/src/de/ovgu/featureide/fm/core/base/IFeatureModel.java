@@ -40,8 +40,9 @@ import de.ovgu.featureide.fm.core.RenamingsManager;
  * Can be instantiated via {@link IFeatureModelFactory}.
  * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke
  */
-public interface IFeatureModel {
+public interface IFeatureModel extends Cloneable {
 
 	void addConstraint(IConstraint constraint);
 
@@ -71,9 +72,9 @@ public interface IFeatureModel {
 
 	List<IConstraint> getConstraints();
 	
-	IFeature getFeature(String name);
+	IFeature getFeature(CharSequence name);
 
-	Collection<CharSequence> getFeatureOrderList();
+	Collection<String> getFeatureOrderList();
 
 	Iterable<IFeature> getFeatures();
 
@@ -113,12 +114,34 @@ public interface IFeatureModel {
 
 	void setFeatureOrderUserDefined(boolean featureOrderUserDefined);
 
-	void setFeatureTable(final Hashtable<CharSequence, IFeature> featureTable);
+	void setFeatureTable(final Hashtable<String, IFeature> featureTable);
 	
 	IGraphicalFeatureModel getGraphicRepresenation();  // Added, Marcus Pinnecke 31.08.15
 
-	Map<CharSequence, IFeature> getFeatureTable(); // Added, Marcus Pinnecke 31.08.15
+	Map<String, IFeature> getFeatureTable(); // Added, Marcus Pinnecke 31.08.15
 	
 	FeatureModelLayout getLayout(); // Added, Marcus Pinnecke 13.09.15
+
+	IFeatureModel clone();
+
+	IFeatureModel deepClone();
+
+	IFeatureModel deepClone(boolean complete);
+
+	Object getUndoContext(Object undoContext);
+
+	Object getUndoContext();
+
+	boolean isFeatureOrderInXML();
+
+	Object setFeatureOrderInXML(IFeatureModel featureModel, boolean featureOrderInXML);
+
+	void refreshContextMenu();
+
+	void setConstraintSelected(boolean b);
+
+	void setUndoContext(Object undoContext);
+
+	void setFeatureOrderListItem(int i, String newName);
 	
 }

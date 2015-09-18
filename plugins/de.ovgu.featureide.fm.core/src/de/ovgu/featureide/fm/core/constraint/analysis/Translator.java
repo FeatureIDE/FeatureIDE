@@ -64,8 +64,8 @@ public class Translator {
 	public static BiMap<String, Integer> buildFeatureNameMap(IFeatureModel fm, UniqueId idGen) {
 		BiMap<String, Integer> m = HashBiMap.create();
 
-		for (String f : Functional.mapToString(fm.getFeatures())) {
-			m.put(f, idGen.getNext());
+		for (CharSequence f : Functional.mapToString(fm.getFeatures())) {
+			m.put(f.toString(), idGen.getNext());
 		}
 
 		return m;
@@ -81,9 +81,9 @@ public class Translator {
 	 */
 	public static void extendFeatureNameMap(BiMap<String, Integer> m, IFeatureModel fm, UniqueId idGen) {
 
-		for (String f : Functional.mapToString(fm.getFeatures())) {
+		for (CharSequence f : Functional.mapToString(fm.getFeatures())) {
 			if (!m.containsKey(f)) {
-				m.put(f, idGen.getNext());
+				m.put(f.toString(), idGen.getNext());
 			}
 		}
 	}
@@ -330,7 +330,7 @@ public class Translator {
 		bfsStack.add(fm.getFeature(featureName).getStructure());
 		while (!bfsStack.isEmpty()) {
 			IFeatureStructure feature = bfsStack.poll();
-			result.add(feature.getFeature().getName());
+			result.add(feature.getFeature().getName().toString());
 			for (IFeatureStructure childFeature : feature.getChildren()) {
 				bfsStack.add(childFeature);
 			}

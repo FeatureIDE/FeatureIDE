@@ -31,9 +31,9 @@ public interface IFeatureProperty {
 
 	IFeatureProperty clone(IFeature newFeature);
 
-	CharSequence getDescription();
+	String getDescription();
 
-	CharSequence getDisplayName();
+	String getDisplayName();
 
 	IFeature getFeature();
 

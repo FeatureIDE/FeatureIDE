@@ -208,12 +208,34 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 		rootFeature = root;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.IFeatureModelStructure#hasFalseOptionalFeatures()
-	 */
 	@Override
 	public boolean hasFalseOptionalFeatures() {
-		throw new UnsupportedOperationException ("Not implemented yet");
+		throw new UnsupportedOperationException ("Not implemented");
+	}
+
+	@Override
+	public boolean hasUnsatisfiableConstraints() {
+		throw new UnsupportedOperationException("No implemented");
+	}
+
+	@Override
+	public boolean hasTautologyConstraints() {
+		throw new UnsupportedOperationException("No implemented");
+	}
+
+	@Override
+	public boolean hasDeadConstraints() {
+		throw new UnsupportedOperationException("No implemented");
+	}
+
+	@Override
+	public boolean hasVoidModelConstraints() {
+		throw new UnsupportedOperationException("No implemented");
+	}
+
+	@Override
+	public boolean hasRedundantConstraints() {
+		throw new UnsupportedOperationException("No implemented");
 	}
 
 }

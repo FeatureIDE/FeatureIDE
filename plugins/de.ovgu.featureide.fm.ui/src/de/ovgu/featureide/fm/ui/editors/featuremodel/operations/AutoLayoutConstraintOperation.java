@@ -30,6 +30,7 @@ import org.eclipse.draw2d.geometry.Point;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
@@ -61,7 +62,7 @@ public class AutoLayoutConstraintOperation extends AbstractFeatureModelOperation
 			int y = 0;
 
 			LinkedList<IFeature> featureList = new LinkedList<IFeature>();
-			featureList.addAll(featureModel.getFeatures());
+			featureList.addAll(Functional.toList(featureModel.getFeatures()));
 
 			for (int i = 0; i < featureList.size(); i++) {
 				if (y < FeatureUIHelper.getLocation(featureList.get(i)).y) {

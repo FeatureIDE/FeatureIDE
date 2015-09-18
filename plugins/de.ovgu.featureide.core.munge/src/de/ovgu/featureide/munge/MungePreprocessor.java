@@ -457,7 +457,7 @@ public class MungePreprocessor extends PPComposerExtensionClass {
 			activatedFeatures.clear();
 		}
 		for (IFeature feature : configuration.getSelectedFeatures()) {
-			activatedFeatures.add(feature.getName());
+			activatedFeatures.add(feature.getName().toString());
 		}
 		try {
 			preprocessSourceFiles(folder);

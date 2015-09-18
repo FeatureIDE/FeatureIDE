@@ -131,5 +131,4 @@ public interface IFeatureStructure {
 	void setRelevantConstraints();
 
 	void setRelevantConstraints(List<Constraint> constraints); // Marcus, if calculated outside the class, see FeatureUtils.setRelevantConstraints(...)
-
 }

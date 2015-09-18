@@ -234,11 +234,18 @@ public class Constraint implements IConstraint, PropertyConstants {
 		return !falseOptionalFeatures.isEmpty();
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.IConstraint#getGraphicRepresenation()
-	 */
 	@Override
 	public IGraphicalConstraint getGraphicRepresenation() {
+		throw new UnsupportedOperationException("No implemented");
+	}
+
+	@Override
+	public boolean isFeatureSelected() {
+		throw new UnsupportedOperationException("No implemented");
+	}
+
+	@Override
+	public void setFeatureSelected(boolean b) {
 		throw new UnsupportedOperationException("No implemented");
 	}
 
