@@ -37,6 +37,8 @@ import de.ovgu.featureide.fm.core.FeatureComparator;
 import de.ovgu.featureide.fm.core.IGraphicItem;
 import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.IGraphicItem.GraphicItem;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
@@ -62,6 +64,17 @@ public class Constraint implements PropertyConstants, IGraphicItem {
 		this.propNode = propNode;
 	}
 
+	IConstraint constraint;
+	
+	public Constraint(IConstraint c) {
+		this.constraint = c;
+	}
+	
+	
+	
+	
+	
+
 	public void setLocation(FMPoint newLocation) {
 		location = newLocation;
 	}
@@ -74,14 +87,6 @@ public class Constraint implements PropertyConstants, IGraphicItem {
 		return featureModel;
 	}
 
-	/**
-	 * Looks for all dead features if they ares caused dead by this constraint
-	 * 
-	 * @param solver
-	 * @param fm The actual model
-	 * @param fmDeadFeatures The dead features the complete model
-	 * @return The dead features caused by this constraint
-	 */
 	public Collection<IFeature> getDeadFeatures(SatSolver solver, IFeatureModel fm, Collection<IFeature> fmDeadFeatures) {
 		final Collection<IFeature> deadFeatures;
 		final Node propNode = this.getNode();
@@ -98,9 +103,6 @@ public class Constraint implements PropertyConstants, IGraphicItem {
 		return deadFeaturesAfter;
 	}
 
-	/**
-	 * Removes the constraints from the model, and looks for dead features.
-	 */
 	public Collection<IFeature> getDeadFeatures(IFeatureModel fm, Collection<IFeature> fmDeadFeatures) {
 		Collection<IFeature> deadFeaturesBefore = null;
 		Node propNode = this.getNode();

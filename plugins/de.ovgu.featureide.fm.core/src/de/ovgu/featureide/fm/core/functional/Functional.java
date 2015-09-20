@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.core.functional;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -340,15 +341,29 @@ public abstract class Functional {
 	 * @since 2.7.5
 	 */
 	public static <T> Collection<String> mapToStringList(final Iterable<T> source) {
-		return mapCollection(source, new ToStringFunction<T>());
+		return retype(source, new ToStringFunction<T>());
 	}
 	
 	public static <T> Collection<CharSequence> mapToCharSequenceList(final Iterable<T> source) {
-		return mapCollection(source, new ToCharSequenceFunction<T>());
+		return retype(source, new ToCharSequenceFunction<T>());
 	}
 
-	public static <T,R> Collection<R> mapCollection(Iterable<T> source, Functional.IFunction<T, R> convertFunction) {
+	public static <T,R> Collection<R> retype(Iterable<T> source, Functional.IFunction<T, R> convertFunction) {
 		return toList(map(source, convertFunction));
 	}
+
+	public static <T> Iterable<T> toIterator(Enumeration<T> enumeration) {
+		final Collection<T> col = new ArrayList<T>();
+		while (enumeration.hasMoreElements())
+			col.add(enumeration.nextElement());
+		return new Iterable<T>() {
+
+			@Override
+			public Iterator<T> iterator() {
+				return col.iterator();
+			}
+		};
+	}
+	
 
 }

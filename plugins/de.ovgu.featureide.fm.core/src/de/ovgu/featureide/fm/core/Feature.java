@@ -55,7 +55,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  */
 public class Feature implements PropertyConstants, PropertyChangeListener, IGraphicItem {
 
-	private final IFeature feature;
+	public final IFeature feature;
 
 	/**
 	 * <b>This class and all it's methods are deprecated and should <i>only</i> be used for compatibility reasons</b>

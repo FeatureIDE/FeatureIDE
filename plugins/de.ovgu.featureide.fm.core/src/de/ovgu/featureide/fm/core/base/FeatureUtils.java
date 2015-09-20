@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.base;
 
+import static de.ovgu.featureide.fm.core.base.FeatureUtils.convert;
 import static de.ovgu.featureide.fm.core.functional.Functional.filter;
 
 import java.beans.PropertyChangeEvent;
@@ -44,6 +45,7 @@ import de.ovgu.featureide.fm.core.ColorList;
 import de.ovgu.featureide.fm.core.ColorschemeTable;
 import de.ovgu.featureide.fm.core.FMComposerManager;
 import de.ovgu.featureide.fm.core.FMPoint;
+import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureConnection;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.FeatureModelLayout;
@@ -71,6 +73,26 @@ public abstract class FeatureUtils {
 			return t.getName();
 		}
 	};
+	
+	public static final de.ovgu.featureide.fm.core.Constraint convert(IConstraint c) {
+		return new de.ovgu.featureide.fm.core.Constraint(c);
+	}
+
+	public static final de.ovgu.featureide.fm.core.FeatureModel convert(IFeatureModel fm) {
+		return new de.ovgu.featureide.fm.core.FeatureModel(fm);
+	}
+
+	public static final de.ovgu.featureide.fm.core.Feature convert(IFeature f) {
+		return new de.ovgu.featureide.fm.core.Feature(f);
+	}
+
+	public static final IFeature convert(de.ovgu.featureide.fm.core.Feature f) {
+		return f.feature;
+	}
+
+	public static final IFeatureModel convert(de.ovgu.featureide.fm.core.FeatureModel fm) {
+		return fm.model;
+	}
 
 	public static final IFunction<IFeatureStructure, IFeature> STRUCTURE_TO_FEATURE = new IFunction<IFeatureStructure, IFeature>() {
 
@@ -113,6 +135,22 @@ public abstract class FeatureUtils {
 			return t;
 		}
 
+	};
+
+	public static final IFunction<IFeature, Feature> IFEATURE_TO_FEATURE = new IFunction<IFeature, Feature>() {
+
+		@Override
+		public Feature invoke(IFeature t) {
+			return convert(t);
+		};
+	};
+
+	public static final IFunction<Constraint, IConstraint> CONSTRAINT_TO_ICONSTRANT = new IFunction<Constraint, IConstraint>() {
+
+		@Override
+		public IConstraint invoke(Constraint t) {
+			return convert(t);
+		};
 	};
 
 	/**
@@ -603,7 +641,7 @@ public abstract class FeatureUtils {
 		return false;
 	}
 
-	protected static final Map<String, IFeature> getFeatureTable(IFeatureModel featureModel) {
+	public static final Map<String, IFeature> getFeatureTable(IFeatureModel featureModel) {
 		return featureModel.getFeatureTable();
 	}
 

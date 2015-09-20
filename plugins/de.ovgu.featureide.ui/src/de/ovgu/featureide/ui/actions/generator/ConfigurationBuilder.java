@@ -69,7 +69,6 @@ import org.prop4j.SatSolver;
 import splar.core.fm.FeatureModelException;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
@@ -352,7 +351,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 
 					switch (buildType) {
 					case ALL_VALID:
-						buildAll(featureModel.getRoot(), monitor);
+						buildAll(featureModel.getStructure().getRoot().getFeature(), monitor);
 						break;
 					case ALL_CURRENT:
 						buildCurrentConfigurations(featureProject, monitor);
