@@ -140,8 +140,12 @@ public abstract class AStoppableJob extends AbstractJob implements IStoppableJob
 
 	@SuppressWarnings(DEPRECATION)
 	private void stopInnerThread() {
+		try {
 		if (innerThread.isAlive()) {
-			innerThread.stop();
+			innerThread.join();
+		}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 }
