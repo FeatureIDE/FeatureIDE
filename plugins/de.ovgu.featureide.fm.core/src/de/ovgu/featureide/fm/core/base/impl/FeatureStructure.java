@@ -448,12 +448,9 @@ public class FeatureStructure implements IFeatureStructure, PropertyConstants {
 		partOfConstraints = constraintList;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.base.IFeatureStructure#setRelevantConstraints(java.util.List)
-	 */
 	@Override
-	public void setRelevantConstraints(List<Constraint> constraints) {
-		throw new UnsupportedOperationException ("Not implemented yet");
+	public void setRelevantConstraints(List<IConstraint> constraints) {
+		partOfConstraints = constraints;
 	}
 
 }

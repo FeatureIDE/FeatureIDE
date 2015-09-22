@@ -275,7 +275,14 @@ public abstract class FeatureUtils {
 				}
 			}
 		}
-		bone.getStructure().setRelevantConstraints(constraintList);
+		bone.getStructure().setRelevantConstraints(Functional.toList(Functional.map(constraintList, new IFunction<Constraint, IConstraint>() {
+
+			@Override
+			public IConstraint invoke(Constraint t) {
+				return t;
+			}
+			
+		})));
 	}
 
 	public CharSequence createValidJavaIdentifierFromString(CharSequence s) {

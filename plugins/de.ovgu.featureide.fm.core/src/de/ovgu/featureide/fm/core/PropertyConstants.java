@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.core;
 
+
 /**
  * Provides constants for <code>PropertyChangeListener</code>.
  * 
@@ -44,4 +45,5 @@ public interface PropertyConstants {
 	String FEATURE_NAME_CHANGED = "NAME_CHANGED";
 	String ATTRIBUTE_CHANGED = "ATTRIBUTE_CHANGED";
 	String CONSTRAINT_SELECTED = "CONSTRAINT_SELECTED";
+
 }
