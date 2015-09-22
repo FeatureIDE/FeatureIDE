@@ -32,6 +32,7 @@ import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModelLayout;
 
 /**
  * Contains all deprecated functionality of {@link IFeatureModel}.
@@ -42,7 +43,7 @@ abstract class DeprecatedFeatureModel {
 	
     public abstract FeatureModelAnalyzer getAnalyser();
 	
-    public abstract FeatureModelLayout getLayout();
+    public abstract IFeatureModelLayout getLayout();
     
 	public abstract RenamingsManager getRenamingsManager();
 	

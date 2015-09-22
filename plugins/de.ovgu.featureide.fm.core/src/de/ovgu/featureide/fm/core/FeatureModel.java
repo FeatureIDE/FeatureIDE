@@ -38,6 +38,7 @@ import org.prop4j.Node;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModelLayout;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
 import static de.ovgu.featureide.fm.core.base.FeatureUtils.*;
@@ -77,7 +78,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	}
 
 	@Override
-	public FeatureModelLayout getLayout() {
+	public IFeatureModelLayout getLayout() {
 		return model.getLayout();
 	}
 

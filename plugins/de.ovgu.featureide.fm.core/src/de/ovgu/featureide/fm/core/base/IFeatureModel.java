@@ -120,7 +120,7 @@ public interface IFeatureModel extends Cloneable {
 
 	Map<String, IFeature> getFeatureTable(); // Added, Marcus Pinnecke 31.08.15
 	
-	FeatureModelLayout getLayout(); // Added, Marcus Pinnecke 13.09.15
+	IFeatureModelLayout getLayout(); // Added, Marcus Pinnecke 13.09.15
 
 	IFeatureModel clone();
 

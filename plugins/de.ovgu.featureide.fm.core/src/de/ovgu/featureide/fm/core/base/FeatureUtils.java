@@ -584,7 +584,7 @@ public abstract class FeatureUtils {
 		return featureModel.getAnalyser();
 	}
 
-	public static final FeatureModelLayout getLayout(IFeatureModel featureModel) {
+	public static final IFeatureModelLayout getLayout(IFeatureModel featureModel) {
 		return featureModel.getLayout();
 	}
 

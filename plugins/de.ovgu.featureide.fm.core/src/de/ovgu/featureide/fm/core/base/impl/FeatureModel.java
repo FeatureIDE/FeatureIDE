@@ -41,9 +41,11 @@ import de.ovgu.featureide.fm.core.RenamingsManager;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModelLayout;
 import de.ovgu.featureide.fm.core.base.IFeatureModelProperty;
 import de.ovgu.featureide.fm.core.base.IFeatureModelStructure;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.base.IGraphicalConstraint;
 import de.ovgu.featureide.fm.core.base.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.core.filter.ConcreteFeatureFilter;
 import de.ovgu.featureide.fm.core.functional.Functional;
@@ -83,15 +85,21 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	protected final RenamingsManager renamingsManager = new RenamingsManager(this);
 
 	protected final IFeatureModelStructure structure;
+	
+	protected final IGraphicalFeatureModel graphicalFeatureModel;
+	
+	protected final IFeatureModelLayout modelLayout;
 
 	protected Object undoContext = null;
-
+	
 	public FeatureModel() {
 		featureOrderList = new LinkedList<String>();
 		featureOrderUserDefined = false;
 
 		property = createProperty();
 		structure = createStructure();
+		graphicalFeatureModel = createGraphicalFeatureModel();
+		modelLayout = createFeatureModelLayout();
 	}
 
 	protected FeatureModel(FeatureModel oldFeatureModel, IFeature newRoot) {
@@ -100,6 +108,8 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 
 		property = oldFeatureModel.getProperty().clone(this);
 		structure = createStructure();
+		graphicalFeatureModel = oldFeatureModel.getGraphicRepresenation();	// TODO: Marcus XXX clone here?
+		modelLayout = oldFeatureModel.getLayout();
 
 		if (newRoot == null) {
 			structure.setRoot(structure.getRoot().cloneSubtree(this));
@@ -122,6 +132,14 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	
 	protected IFeatureModelStructure createStructure() {
 		return new FeatureModelStructure(this);
+	}
+	
+	protected IGraphicalFeatureModel createGraphicalFeatureModel() {
+		return new GraphicalFeatureModel(this);
+	}
+	
+	private IFeatureModelLayout createFeatureModelLayout() {
+		return new FeatureModelLayout();
 	}
 
 	@Override
@@ -413,7 +431,7 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 
 	@Override
 	public IGraphicalFeatureModel getGraphicRepresenation() {
-		throw new UnsupportedOperationException ("Not implemented yet");
+		return graphicalFeatureModel;
 	}
 
 	@Override
@@ -422,8 +440,8 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	}
 
 	@Override
-	public FeatureModelLayout getLayout() {
-		throw new UnsupportedOperationException ("Not implemented yet");
+	public IFeatureModelLayout getLayout() {
+		return modelLayout;
 	}
 
 	@Override

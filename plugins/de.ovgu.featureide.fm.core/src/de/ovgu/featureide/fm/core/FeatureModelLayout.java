@@ -20,12 +20,14 @@
  */
 package de.ovgu.featureide.fm.core;
 
+import de.ovgu.featureide.fm.core.base.IFeatureModelLayout;
+
 /**
  * Encapsulates layout functionality for the feature model.
  * 
  * @author soenke
  */
-public class FeatureModelLayout {
+public class FeatureModelLayout implements IFeatureModelLayout {
 	private boolean autoLayoutLegend;
 	private boolean showHiddenFeatures;
 	private boolean hasVerticalLayout;
@@ -49,50 +51,62 @@ public class FeatureModelLayout {
 		this.selectedLayoutAlgorithm = featureModelLayout.selectedLayoutAlgorithm;
 	}
 
+	@Override
 	public void setLegendAutoLayout(boolean b) {
 		autoLayoutLegend = b;
 	}
 
+	@Override
 	public boolean hasLegendAutoLayout() {
 		return autoLayoutLegend;
 	}
 
+	@Override
 	public boolean showHiddenFeatures() {
 		return showHiddenFeatures;
 	}
 
+	@Override
 	public void showHiddenFeatures(boolean b) {
 		showHiddenFeatures = b;
 	}
 
+	@Override
 	public boolean verticalLayout() {
 		return hasVerticalLayout;
 	}
 
+	@Override
 	public void verticalLayout(boolean b) {
 		hasVerticalLayout = b;
 	}
 
+	@Override
 	public FMPoint getLegendPos() {
 		return legendPos;
 	}
 
+	@Override
 	public void setLegendPos(int x, int y) {
 		this.legendPos = new FMPoint(x, y);
 	}
 
+	@Override
 	public void setLayout(int newLayoutAlgorithm) {
 		selectedLayoutAlgorithm = newLayoutAlgorithm;
 	}
 
+	@Override
 	public int getLayoutAlgorithm() {
 		return selectedLayoutAlgorithm;
 	}
 
+	@Override
 	public boolean hasFeaturesAutoLayout() {
 		return (selectedLayoutAlgorithm != 0);
 	}
 	
+	@Override
 	public FeatureModelLayout clone() {
 		return new FeatureModelLayout(this);
 	}
