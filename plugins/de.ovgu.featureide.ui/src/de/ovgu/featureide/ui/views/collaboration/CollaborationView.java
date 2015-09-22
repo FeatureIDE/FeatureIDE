@@ -546,7 +546,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 			FSTFeature coll = ((CollaborationEditPart) selection).getCollaborationModel();
 			if (!(coll instanceof FSTConfiguration)) {
 				IFeatureModel fm = featureProject.getFeatureModel();
-				ColorschemeTable colorschemeTable = fm.getColorschemeTable();
+				ColorschemeTable colorschemeTable = fm.getGraphicRepresenation().getColorschemeTable();
 				List<String> csNames = colorschemeTable.getColorschemeNames();
 
 				String curColorSchemeName = colorschemeTable.getSelectedColorschemeName();
@@ -582,7 +582,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 					colorSubMenu.add(setColorActions[i]);
 				}
 
-				int color = fm.getFeature(coll.getName()).getColorList().getColor();
+				int color = fm.getFeature(coll.getName()).getGraphicRepresenation().getColorList().getColor();
 				if (ColorList.isValidColor(color)) {
 					setColorActions[color].setChecked(true);
 				}
@@ -892,11 +892,11 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	}
 
 	public void saveColorsToFile() {
-		featureProject.getFeatureModel().getColorschemeTable().saveColorsToFile(featureProject.getProject());
+		featureProject.getFeatureModel().getGraphicRepresenation().getColorschemeTable().saveColorsToFile(featureProject.getProject());
 	}
 
 	private void readColorsFromFile() {
-		featureProject.getFeatureModel().getColorschemeTable().readColorsFromFile(featureProject.getProject());
+		featureProject.getFeatureModel().getGraphicRepresenation().getColorschemeTable().readColorsFromFile(featureProject.getProject());
 	}
 
 }

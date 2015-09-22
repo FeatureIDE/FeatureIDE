@@ -25,6 +25,7 @@ import java.util.LinkedList;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
@@ -46,7 +47,7 @@ public class AbstractConfigurationSorter {
 	protected boolean sorted = true;
 
 	public AbstractConfigurationSorter(final IFeatureModel featureModel) {
-		concreteFeatures = featureModel.getConcreteFeatureNames();// TODO move to implementations
+		concreteFeatures = FeatureUtils.extractConcreteFeaturesAsStringList(featureModel);// TODO move to implementations
 	}
 	
 	public int sortConfigurations(final IProgressMonitor monitor) {

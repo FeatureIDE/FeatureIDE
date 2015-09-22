@@ -65,7 +65,7 @@ public class FeatureFolderDecorator implements ILightweightLabelDecorator, IFeat
 		
 		//handle only not-in-use folders
 		final IFeature feature = featureProject.getFeatureModel().getFeature(folder.getName());
-		if (feature == null || feature.isConcrete()) {
+		if (feature == null || feature.getStructure().isConcrete()) {
 			return;
 		}
 

@@ -45,7 +45,7 @@ public class DeleteColorSchemeAction extends AbstractColorAction {
 	 */
 	@Override
 	protected boolean action(IFeatureModel fm, String collName) {
-		fm.getColorschemeTable().removeColorscheme();
+		fm.getGraphicRepresenation().getColorschemeTable().removeColorscheme();
 		return true;
 	}
 	

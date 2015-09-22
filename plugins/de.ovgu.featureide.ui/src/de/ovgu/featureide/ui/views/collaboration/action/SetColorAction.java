@@ -122,10 +122,10 @@ public class SetColorAction extends AbstractColorAction {
 	protected boolean action(IFeatureModel fm, String collName) {
 		IFeature feat = fm.getFeature(collName);
 		if (feat != null) {
-			if (feat.getColorList().getColor() != index) {
-				feat.getColorList().setColor(index);
+			if (feat.getGraphicRepresenation().getColorList().getColor() != index) {
+				feat.getGraphicRepresenation().getColorList().setColor(index);
 			} else {
-				feat.getColorList().removeColor();
+				feat.getGraphicRepresenation().getColorList().removeColor();
 			}
 			return true;
 		}

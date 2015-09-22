@@ -146,7 +146,7 @@ public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 				return ((AbstractClassSignature) element).getName();
 			}
 		} else if (element instanceof IFeature) {
-			return ((IFeature) element).getDisplayName();
+			return ((IFeature) element).getProperty().getDisplayName();
 		}
 		return element.toString();
 	}

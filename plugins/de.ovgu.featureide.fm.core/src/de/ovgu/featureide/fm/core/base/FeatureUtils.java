@@ -296,7 +296,7 @@ public abstract class FeatureUtils {
 		return stringBuilder.toString();
 	}
 
-	public static final CharSequence getDescription(IFeature feature) {
+	public static final String getDescription(IFeature feature) {
 		return feature.getProperty().getDescription();
 	}
 
@@ -1077,5 +1077,17 @@ public abstract class FeatureUtils {
 	
 	public static final GraphicItem getItemType(IConstraint constraint) {
 		return constraint.getGraphicRepresenation().getItemType();
+	}
+
+	public static void setAnd(IFeature feature, boolean and) {
+		feature.getStructure().setAND(and);
+	}
+
+	public static void setHiddden(IFeature feature, boolean hid) {
+		feature.getStructure().setHidden(hid);
+	}
+
+	public static int getChildIndex(IFeature feature, IFeature child) {
+		return feature.getStructure().getChildIndex(child.getStructure());
 	}
 }

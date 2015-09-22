@@ -42,10 +42,10 @@ public class SetColorSchemeAction extends AbstractColorAction {
 	 */
 	@Override
 	protected boolean action(IFeatureModel fm, String collName) {
-		if (fm.getColorschemeTable().getSelectedColorscheme() != index) {
-			fm.getColorschemeTable().setSelectedColorscheme(index);
+		if (fm.getGraphicRepresenation().getColorschemeTable().getSelectedColorscheme() != index) {
+			fm.getGraphicRepresenation().getColorschemeTable().setSelectedColorscheme(index);
 		} else {
-			fm.getColorschemeTable().setEmptyColorscheme();
+			fm.getGraphicRepresenation().getColorschemeTable().setEmptyColorscheme();
 		}
 		return true;
 	}

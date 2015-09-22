@@ -65,7 +65,7 @@ public class RenameColorSchemeWizard extends Wizard {
 	public boolean performFinish() {
 		final String csName = page.getColorSchemeName();
 		if (csName != null && !csName.isEmpty()) {
-			featureModel.getColorschemeTable().renameColorscheme(csName);
+			featureModel.getGraphicRepresenation().getColorschemeTable().renameColorscheme(csName);
 			return true;
 		}
 		return false;

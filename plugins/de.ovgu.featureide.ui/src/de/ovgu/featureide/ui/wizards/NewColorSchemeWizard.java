@@ -56,7 +56,7 @@ public class NewColorSchemeWizard extends Wizard {
 	public boolean performFinish() {
 		final String csName = page.getColorSchemeName();
 		if (csName != null && !csName.isEmpty()) {
-			ColorschemeTable colorschemeTable = featureModel.getColorschemeTable();
+			ColorschemeTable colorschemeTable = featureModel.getGraphicRepresenation().getColorschemeTable();
 			colorschemeTable.addColorscheme(csName);
 			if (page.isCurColorScheme()) {
 				colorschemeTable.setSelectedColorscheme(colorschemeTable.size());

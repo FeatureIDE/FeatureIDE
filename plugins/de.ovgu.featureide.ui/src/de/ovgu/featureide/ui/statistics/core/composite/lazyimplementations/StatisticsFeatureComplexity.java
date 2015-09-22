@@ -30,6 +30,7 @@ import org.sat4j.specs.TimeoutException;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
@@ -64,7 +65,7 @@ public final class StatisticsFeatureComplexity extends LazyParent {
 				UIPlugin.getDefault().logError(e);
 			}
 
-			final Collection<IFeature> listOfFeatures = model.getFeatures();
+			final Collection<IFeature> listOfFeatures = Functional.toList(model.getFeatures());
 
 			final List<IFeature> listOfCompoundFeatures = new ArrayList<IFeature>();
 			final List<IFeature> listOfPrimitiveFeatures = new ArrayList<IFeature>();
@@ -72,12 +73,12 @@ public final class StatisticsFeatureComplexity extends LazyParent {
 			final List<IFeature> listOfConcreteFeatures = new ArrayList<IFeature>();
 
 			for (IFeature f : listOfFeatures) {
-				if (f.getChildren().isEmpty()) {
+				if (f.getStructure().getChildren().isEmpty()) {
 					listOfPrimitiveFeatures.add(f);
 				} else {
 					listOfCompoundFeatures.add(f);
 				}
-				if (f.isConcrete()) {
+				if (f.getStructure().isConcrete()) {
 					listOfConcreteFeatures.add(f);
 				} else {
 					listOfAbstractFeatures.add(f);

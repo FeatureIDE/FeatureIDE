@@ -70,6 +70,7 @@ import org.eclipse.ui.part.FileEditorInput;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
@@ -622,7 +623,7 @@ public class NewFeatureIDEFilePage extends WizardPage {
 			return;
 		}
 		comboFeature.removeAll();
-		for (String s : featureProject.getFeatureModel().getConcreteFeatureNames())
+		for (String s : FeatureUtils.extractConcreteFeaturesAsStringList(featureProject.getFeatureModel()))
 			comboFeature.add(s);
 		if (feature != null) {
 			comboFeature.setText(feature);

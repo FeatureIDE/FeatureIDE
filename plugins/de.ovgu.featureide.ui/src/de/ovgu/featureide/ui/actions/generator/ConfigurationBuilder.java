@@ -69,8 +69,10 @@ import org.prop4j.SatSolver;
 import splar.core.fm.FeatureModelException;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
@@ -699,7 +701,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 				if (i > 0) {
 					String id = ca.getId(i);
 					final IFeature feature = featureModel.getFeature(id);
-					if (feature != null && feature.isConcrete()) {
+					if (feature != null && feature.getStructure().isConcrete()) {
 						convertedSolution.add(feature.getName());
 					}
 				}
@@ -853,7 +855,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 					}
 				}
 				for (IFeature f : configuration.getSelectedFeatures()) {
-					if (f.isConcrete()) {
+					if (f.getStructure().isConcrete()) {
 						if (!selectedFeatures3.contains(f.getName())) {
 							return;
 						}
@@ -903,11 +905,11 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			return;
 		}
 
-		if (currentFeature.isAnd()) {
+		if (currentFeature.getStructure().isAnd()) {
 			buildAnd(selected, selectedFeatures2, monitor);
-		} else if (currentFeature.isOr()) {
+		} else if (currentFeature.getStructure().isOr()) {
 			buildOr(selected, selectedFeatures2, monitor);
-		} else if (currentFeature.isAlternative()) {
+		} else if (currentFeature.getStructure().isAlternative()) {
 			buildAlternative(selected, selectedFeatures2, monitor);
 		}
 	}
@@ -933,14 +935,14 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		IFeature currentFeature = selectedFeatures2.getFirst();
 		selectedFeatures2.removeFirst();
 		LinkedList<IFeature> selectedFeatures3 = new LinkedList<IFeature>();
-		if (currentFeature.isConcrete()) {
+		if (currentFeature.getStructure().isConcrete()) {
 			if ("".equals(selected)) {
 				selected = currentFeature.getName();
 			} else {
 				selected += " " + currentFeature.getName();
 			}
 		}
-		if (!currentFeature.hasChildren()) {
+		if (!currentFeature.getStructure().hasChildren()) {
 			if (selectedFeatures2.isEmpty()) {
 				currentFeature = null;
 			} else {
@@ -962,14 +964,14 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		IFeature currentFeature = selectedFeatures2.getFirst();
 		selectedFeatures2.removeFirst();
 		LinkedList<IFeature> selectedFeatures3 = new LinkedList<IFeature>();
-		if (currentFeature.isConcrete()) {
+		if (currentFeature.getStructure().isConcrete()) {
 			if ("".equals(selected)) {
 				selected = currentFeature.getName();
 			} else {
 				selected += " " + currentFeature.getName();
 			}
 		}
-		if (!currentFeature.hasChildren()) {
+		if (!currentFeature.getStructure().hasChildren()) {
 			if (selectedFeatures2.isEmpty()) {
 				currentFeature = null;
 			} else {
@@ -981,7 +983,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		}
 		int k2;
 		int i2 = 1;
-		if (getChildren(currentFeature).size() < currentFeature.getChildren().size()) {
+		if (getChildren(currentFeature).size() < currentFeature.getStructure().getChildren().size()) {
 			i2 = 0;
 		}
 		for (; i2 < (int) java.lang.Math.pow(2, getChildren(currentFeature).size()); i2++) {
@@ -1001,14 +1003,14 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	private void buildAnd(String selected, LinkedList<IFeature> selectedFeatures2, IProgressMonitor monitor) {
 		IFeature currentFeature = selectedFeatures2.removeFirst();
 		LinkedList<IFeature> selectedFeatures3 = new LinkedList<IFeature>();
-		if (currentFeature.isConcrete()) {
+		if (currentFeature.getStructure().isConcrete()) {
 			if ("".equals(selected)) {
 				selected = currentFeature.getName();
 			} else {
 				selected += " " + currentFeature.getName();
 			}
 		}
-		if (!currentFeature.hasChildren()) {
+		if (!currentFeature.getStructure().hasChildren()) {
 			if (selectedFeatures2.isEmpty()) {
 				currentFeature = null;
 			} else {
@@ -1021,7 +1023,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		int k2;
 		LinkedList<IFeature> optionalFeatures = new LinkedList<IFeature>();
 		for (IFeature f : getChildren(currentFeature)) {
-			if (f.isMandatory()) {
+			if (f.getStructure().isMandatory()) {
 				selectedFeatures2.add(f);
 			} else {
 				optionalFeatures.add(f);
@@ -1053,8 +1055,9 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 */
 	private LinkedList<IFeature> getChildren(IFeature currentFeature) {
 		LinkedList<IFeature> children = new LinkedList<IFeature>();
-		for (IFeature child : currentFeature.getChildren()) {
-			if (child.isConcrete() || hasLayerChild(child)) {
+		for (IFeatureStructure childStructure : currentFeature.getStructure().getChildren()) {
+			IFeature child = childStructure.getFeature();
+			if (child.getStructure().isConcrete() || hasLayerChild(child)) {
 				children.add(child);
 			}
 		}
@@ -1068,9 +1071,10 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 *         that is a layer
 	 */
 	private boolean hasLayerChild(IFeature feature) {
-		if (feature.hasChildren()) {
-			for (IFeature child : feature.getChildren()) {
-				if (child.isConcrete() || hasLayerChild(child)) {
+		if (feature.getStructure().hasChildren()) {
+			for (IFeatureStructure childStructure : feature.getStructure().getChildren()) {
+				IFeature child = childStructure.getFeature();
+				if (child.getStructure().isConcrete() || hasLayerChild(child)) {
 					return true;
 				}
 			}

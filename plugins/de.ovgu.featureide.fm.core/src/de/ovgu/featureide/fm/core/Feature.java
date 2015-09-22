@@ -45,6 +45,7 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
  * Provides all properties of a feature. This includes its connections to parent
@@ -373,7 +374,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 * @since 2.7.5 
 	 */
 	public void setConstraintSelected(boolean selection) {
-		return FeatureUtils.setConstraintSelected(feature, selection);
+		FeatureUtils.setConstraintSelected(feature, selection);
 	}
 
 	/**
@@ -407,7 +408,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public Collection<IConstraint> getRelevantConstraints() {
-		FeatureUtils.getRelevantConstraints(feature);
+		return FeatureUtils.getRelevantConstraints(feature);
 	}
 
 	/**
@@ -492,7 +493,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public void setFeatureStatus(FeatureStatus stat, boolean fire) {
-		return FeatureUtils.setFeatureStatus(feature, stat, fire);
+		FeatureUtils.setFeatureStatus(feature, stat, fire);
 	}
 
 	/**
@@ -594,7 +595,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public void setParent(Feature newParent) {
-		FeatureUtils.setParent(newParent.feature);
+		FeatureUtils.setParent(feature, newParent.feature);
 	}
 
 	/**
@@ -611,7 +612,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public Feature getParent() {
-		return FeatureUtils.getParent(feature);
+		return FeatureUtils.convert(FeatureUtils.getParent(feature));
 	}
 
 	/**
@@ -645,7 +646,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public LinkedList<Feature> getChildren() {
-		return FeatureUtils.getChildren(feature);
+		return new LinkedList<>(Functional.toList(Functional.retype(FeatureUtils.getChildren(feature), FeatureUtils.IFEATURE_TO_FEATURE)));
 	}
 
 	/**
@@ -662,7 +663,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public void setChildren(LinkedList<Feature> children) {
-		return FeatureUtils.setChildren(feature, children);
+		FeatureUtils.setChildren(feature, Functional.retype(children, FeatureUtils.FEATURE_TO_IFEATURE));
 	}
 
 	/**
@@ -696,7 +697,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public void addChild(Feature newChild) {
-		return FeatureUtils.addChild(feature, newChild.feature);
+		FeatureUtils.addChild(feature, newChild.feature);
 	}
 
 	/**
@@ -764,7 +765,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public Feature removeLastChild() {
-		FeatureUtils.removeLastChild(feature);
+		return FeatureUtils.convert(FeatureUtils.removeLastChild(feature));
 	}
 
 	/**
@@ -781,7 +782,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public List<FeatureConnection> getSourceConnections() {
-		return FeatureUtils.getSourceConnections(feature);
+		return Functional.toList(FeatureUtils.getSourceConnections(feature));
 	}
 
 	/**
@@ -798,7 +799,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public List<FeatureConnection> getTargetConnections() {
-		return FeatureUtils.getTargetConnections(feature);
+		return Functional.toList(FeatureUtils.getTargetConnections(feature));
 	}
 
 	/**
@@ -832,7 +833,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public boolean removeTargetConnection(FeatureConnection connection) {
-		FeatureUtils.removeTargetConnection(feature, connection);
+		return FeatureUtils.removeTargetConnection(feature, connection);
 	}
 
 	/**
@@ -917,7 +918,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public int getChildrenCount() {
-		return FeatureUtils.getChildrenCount(feature)
+		return FeatureUtils.getChildrenCount(feature);
 	}
 
 	/**
@@ -968,7 +969,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public int getChildIndex(Feature child) {
-		return FeatureUtils.getChildIndex(feature, child.feature);
+		return FeatureUtils.getChildIndex(feature, FeatureUtils.convert(child));
 	}
 
 	/**
@@ -1058,7 +1059,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	}
 
 	public Feature clone(IFeatureModel featureModel, boolean complete) {
-		throw new UnsupportedOperationException("Not implemented yet"):
+		throw new UnsupportedOperationException("Not implemented yet");
 	}
 
 	/**
@@ -1172,7 +1173,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	@Deprecated
 	public String toString(boolean writeMarks) {
 		if (writeMarks) {
-			if (feature.getName().name.contains(" ") || Operator.isOperatorName(feature.getName())) {
+			if (feature.getName().contains(" ") || Operator.isOperatorName(feature.getName())) {
 				return "\"" + feature.getName() + "\"";
 			}
 			return feature.getName();

@@ -49,7 +49,7 @@ public class AddColorSchemeAction extends AbstractColorAction {
 		WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
 		dialog.create();
 		if (dialog.open() == WizardDialog.OK && 
-				fm.getColorschemeTable().getSelectedColorscheme() == fm.getColorschemeTable().size()) {
+				fm.getGraphicRepresenation().getColorschemeTable().getSelectedColorscheme() == fm.getGraphicRepresenation().getColorschemeTable().size()) {
 			return true;
 		}
 		return false;
