@@ -191,7 +191,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	}
 
 	public void setConstraints(final LinkedList<Constraint> constraints) {
-		FeatureUtils.setConstraints(model, Functional.retype(constraints, FeatureUtils.CONSTRAINT_TO_ICONSTRANT);
+		FeatureUtils.setConstraints(model, Functional.retype(Functional.toIterator(constraints), FeatureUtils.CONSTRAINT_TO_ICONSTRANT));
 	}
 
 	public void addPropositionalNode(Node node) {
@@ -199,7 +199,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	}
 
 	public void addConstraint(Constraint constraint) {
-		FeatureUtils.addConstraint(model, constraint);
+		FeatureUtils.addConstraint(model, FeatureUtils.convert(constraint));
 	}
 
 	public void addPropositionalNode(Node node, int index) {
@@ -207,7 +207,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	}
 
 	public void addConstraint(Constraint constraint, int index) {
-		FeatureUtils.addConstraint(model, constraint, index);
+		FeatureUtils.addConstraint(model, FeatureUtils.convert(constraint), index);
 	}
 
 	public List<Node> getPropositionalNodes() {
@@ -219,11 +219,11 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	}
 
 	public List<Constraint> getConstraints() {
-		return FeatureUtils.getConstraints(model);
+		return Functional.toList(Functional.retype(FeatureUtils.getConstraints(model), FeatureUtils.ICONSTRAINT_TO_CONSTRANT));
 	}
 
 	public int getConstraintIndex(Constraint constraint) {
-		return FeatureUtils.getConstraintIndex(model, constraint);
+		return FeatureUtils.getConstraintIndex(model, FeatureUtils.convert(constraint));
 	}
 
 	public void removePropositionalNode(Node node) {
@@ -231,7 +231,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	}
 
 	public void removeConstraint(Constraint constraint) {
-		FeatureUtils.removeConstraint(model, constraint);
+		FeatureUtils.removeConstraint(model, FeatureUtils.convert(constraint));
 	}
 
 	public void removeConstraint(int index) {

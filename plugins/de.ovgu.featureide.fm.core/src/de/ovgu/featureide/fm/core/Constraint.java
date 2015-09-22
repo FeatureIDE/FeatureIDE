@@ -37,9 +37,11 @@ import de.ovgu.featureide.fm.core.FeatureComparator;
 import de.ovgu.featureide.fm.core.IGraphicItem;
 import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.IGraphicItem.GraphicItem;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
  * Represents a propositional constraint below the feature diagram.
@@ -50,217 +52,116 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  */
 public class Constraint implements PropertyConstants, IGraphicItem {
 
-	private IFeatureModel featureModel;
-	private Node propNode;
-	private FMPoint location = new FMPoint(0, 0);
-	private boolean featureSelected = false;
-	private Collection<IFeature> containedFeatureList = new LinkedList<IFeature>();
-	private Collection<IFeature> falseOptionalFeatures = new LinkedList<IFeature>();
-	private ConstraintAttribute attribute = ConstraintAttribute.NORMAL;
-	private Collection<IFeature> deadFeatures = new LinkedList<IFeature>();
-
 	public Constraint(IFeatureModel featureModel, Node propNode) {
-		this.featureModel = featureModel;
-		this.propNode = propNode;
+		throw new UnsupportedOperationException("No longer supported");
 	}
 
-	IConstraint constraint;
+	public IConstraint constraint;
 	
 	public Constraint(IConstraint c) {
 		this.constraint = c;
 	}
 	
-	
-	
-	
-	
-
 	public void setLocation(FMPoint newLocation) {
-		location = newLocation;
+		FeatureUtils.setLocation(constraint, newLocation);
 	}
 
 	public FMPoint getLocation() {
-		return location;
+		return FeatureUtils.getLocation(constraint);
 	}
 
-	public IFeatureModel getFeatureModel() {
-		return featureModel;
+	public FeatureModel getFeatureModel() {
+		return FeatureUtils.convert(FeatureUtils.getFeatureModel(constraint));
 	}
 
-	public Collection<IFeature> getDeadFeatures(SatSolver solver, IFeatureModel fm, Collection<IFeature> fmDeadFeatures) {
-		final Collection<IFeature> deadFeatures;
-		final Node propNode = this.getNode();
-		final Comparator<IFeature> featComp = new FeatureComparator(true);
-		if (propNode != null) {
-			deadFeatures = fm.getAnalyser().getDeadFeatures(solver, propNode);
-		} else {
-			deadFeatures = new TreeSet<IFeature>(featComp);
-		}
-		final Collection<IFeature> deadFeaturesAfter = new TreeSet<IFeature>(featComp);
-
-		deadFeaturesAfter.addAll(fmDeadFeatures);
-		deadFeaturesAfter.retainAll(deadFeatures);
-		return deadFeaturesAfter;
+	public Collection<Feature> getDeadFeatures(SatSolver solver, FeatureModel fm, Collection<Feature> fmDeadFeatures) {
+		return Functional.retype(FeatureUtils.getDeadFeatures(constraint, solver, FeatureUtils.convert(fm), Functional.retype(fmDeadFeatures, FeatureUtils.FEATURE_TO_IFEATURE)),
+				FeatureUtils.IFEATURE_TO_FEATURE);
 	}
 
-	public Collection<IFeature> getDeadFeatures(IFeatureModel fm, Collection<IFeature> fmDeadFeatures) {
-		Collection<IFeature> deadFeaturesBefore = null;
-		Node propNode = this.getNode();
-		if (propNode != null) {
-			fm.removeConstraint(this);
-			deadFeaturesBefore = fm.getAnalyser().getDeadFeatures();
-			fm.addPropositionalNode(propNode);
-			fm.handleModelDataChanged();
-		}
-
-		Collection<IFeature> deadFeaturesAfter = new LinkedList<IFeature>();
-		for (IFeature f : fmDeadFeatures) {
-			IFeature feature = fm.getFeature(f.getName());
-			// XXX why can the given feature not be found?
-			if (feature != null && !deadFeaturesBefore.contains(feature)) {
-				deadFeaturesAfter.add(f);
-			}
-		}
-		return deadFeaturesAfter;
+	public Collection<Feature> getDeadFeatures(FeatureModel fm, Collection<Feature> fmDeadFeatures) {
+		return Functional.retype(FeatureUtils.getDeadFeatures(constraint, FeatureUtils.convert(fm), Functional.retype(fmDeadFeatures, FeatureUtils.FEATURE_TO_IFEATURE)),
+				FeatureUtils.IFEATURE_TO_FEATURE);
 	}
 
 	public void setConstraintAttribute(ConstraintAttribute attri, boolean fire) {
-		this.attribute = attri;
-		if (fire)
-			fire(new PropertyChangeEvent(this, ATTRIBUTE_CHANGED, Boolean.FALSE, Boolean.TRUE));
+		FeatureUtils.setConstraintAttribute(constraint, attri, fire);
 	}
 
 	public ConstraintAttribute getConstraintAttribute() {
-		return attribute;
+		return FeatureUtils.getConstraintAttribute(constraint);
 	}
 
 	public void setFeatureSelected(boolean selected) {
-		this.featureSelected = selected;
-		fire(new PropertyChangeEvent(this, CONSTRAINT_SELECTED, Boolean.FALSE, Boolean.TRUE));
+		FeatureUtils.setFeatureSelected(constraint, selected);
 	}
 
 	public boolean isFeatureSelected() {
-		return featureSelected;
+		return FeatureUtils.isFeatureSelected(constraint);
 	}
 
 	public Node getNode() {
-		return propNode;
+		return FeatureUtils.getNode(constraint);
 	}
 
-	/**
-	 * Sets the <code>containedFeatureList</code> given by <code>propNode</code>.
-	 */
 	public void setContainedFeatures() {
-		containedFeatureList.clear();
-		for (String featureName : propNode.getContainedFeatures()) {
-			containedFeatureList.add(featureModel.getFeature(featureName));
-		}
+		FeatureUtils.setContainedFeatures(constraint);
 	}
 
-	/**
-	 * 
-	 * @return All {@link IFeature}s contained at this {@link Constraint}.
-	 */
-	public Collection<IFeature> getContainedFeatures() {
-		if (containedFeatureList.isEmpty()) {
-			setContainedFeatures();
-		}
-		return containedFeatureList;
+	public Collection<Feature> getContainedFeatures() {
+		return Functional.retype(FeatureUtils.getContainedFeatures(constraint),
+				FeatureUtils.IFEATURE_TO_FEATURE);
 	}
 
-	public boolean setFalseOptionalFeatures(IFeatureModel clone, Collection<IFeature> fmFalseOptionals) {
-		falseOptionalFeatures.clear();
-		falseOptionalFeatures.addAll(clone.getAnalyser().getFalseOptionalFeatures(fmFalseOptionals));
-		fmFalseOptionals.removeAll(falseOptionalFeatures);
-		return !falseOptionalFeatures.isEmpty();
+	public boolean setFalseOptionalFeatures(FeatureModel clone, Collection<Feature> fmFalseOptionals) {
+		return FeatureUtils.setFalseOptionalFeatures(constraint, FeatureUtils.convert(clone), Functional.retype(fmFalseOptionals, FeatureUtils.FEATURE_TO_IFEATURE));
 	}
 
 	public boolean setFalseOptionalFeatures() {
-		falseOptionalFeatures.clear();
-		boolean found = false;
-		IFeatureModel clonedModel = featureModel.clone();
-		clonedModel.removeConstraint(this);
-		Collection<IFeature> foFeatures = clonedModel.getAnalyser().getFalseOptionalFeatures();
-		for (IFeature feature : featureModel.getAnalyser().getFalseOptionalFeatures()) {
-			if (!foFeatures.contains(clonedModel.getFeature(feature.getName())) && !falseOptionalFeatures.contains(feature)) {
-				falseOptionalFeatures.add(feature);
-				found = true;
-			}
-		}
-		return found;
+		return FeatureUtils.setFalseOptionalFeatures(constraint);
 	}
 
-	public Collection<IFeature> getFalseOptional() {
-		return falseOptionalFeatures;
+	public Collection<Feature> getFalseOptional() {
+		return Functional.retype(FeatureUtils.getFalseOptional(constraint), FeatureUtils.IFEATURE_TO_FEATURE);
 	}
-
-	private Collection<PropertyChangeListener> listenerList = new LinkedList<PropertyChangeListener>();
 
 	public void addListener(PropertyChangeListener listener) {
-		if (!listenerList.contains(listener))
-			listenerList.add(listener);
+		FeatureUtils.addListener(constraint, listener);
 	}
 
 	public void removeListener(PropertyChangeListener listener) {
-		listenerList.remove(listener);
+		FeatureUtils.removeListener(constraint, listener);
 	}
 
 	public void fire(PropertyChangeEvent event) {
-		for (PropertyChangeListener listener : listenerList)
-			listener.propertyChange(event);
+		FeatureUtils.fire(constraint, event);
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (!(obj instanceof Constraint))
-			return false;
-
-		Constraint other = (Constraint) obj;
-		return propNode.equals(other.propNode);
+		return FeatureUtils.equals(constraint, obj);
 	}
 
 	@Override
 	public String toString() {
-		return propNode.toString(NodeWriter.textualSymbols);
+		return FeatureUtils.toString(constraint);
 	}
-
-	/**
-	 * 
-	 * @return true if constraint has hidden features
-	 */
 
 	public boolean hasHiddenFeatures() {
-		for (IFeature f : getContainedFeatures()) {
-			if (f.isHidden() || f.hasHiddenParent()) {
-				return true;
-			}
-		}
-		return false;
+		return FeatureUtils.hasHiddenFeatures(constraint);
 	}
 
-	/**
-	 * Set the dead features of this constraint
-	 * 
-	 * @param deadFeatures
-	 */
-	public void setDeadFeatures(Collection<IFeature> deadFeatures) {
-		this.deadFeatures = deadFeatures;
+	public void setDeadFeatures(Collection<Feature> deadFeatures) {
+		FeatureUtils.setDeadFeatures(constraint, Functional.retype(deadFeatures, FeatureUtils.FEATURE_TO_IFEATURE));
 	}
 
-	/**
-	 * Gets the dead features of this constraint without new calculation
-	 * 
-	 * @return The dead features
-	 */
-	public Collection<IFeature> getDeadFeatures() {
-		return deadFeatures;
+	public Collection<Feature> getDeadFeatures() {
+		return Functional.retype(FeatureUtils.getDeadFeatures(constraint), FeatureUtils.IFEATURE_TO_FEATURE);
 	}
 	
 	@Override
 	public GraphicItem getItemType() {
-		return GraphicItem.Constraint;
+		return FeatureUtils.getItemType(constraint);
 	}
 
 }

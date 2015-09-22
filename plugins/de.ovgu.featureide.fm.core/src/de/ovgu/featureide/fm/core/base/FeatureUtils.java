@@ -27,12 +27,14 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -40,12 +42,15 @@ import javax.annotation.Nonnull;
 import org.eclipse.core.resources.IProject;
 import org.prop4j.Node;
 import org.prop4j.NodeWriter;
+import org.prop4j.SatSolver;
 
 import de.ovgu.featureide.fm.core.ColorList;
 import de.ovgu.featureide.fm.core.ColorschemeTable;
+import de.ovgu.featureide.fm.core.ConstraintAttribute;
 import de.ovgu.featureide.fm.core.FMComposerManager;
 import de.ovgu.featureide.fm.core.FMPoint;
 import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.FeatureComparator;
 import de.ovgu.featureide.fm.core.FeatureConnection;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.FeatureModelLayout;
@@ -76,6 +81,10 @@ public abstract class FeatureUtils {
 	
 	public static final de.ovgu.featureide.fm.core.Constraint convert(IConstraint c) {
 		return new de.ovgu.featureide.fm.core.Constraint(c);
+	}
+	
+	public static final IConstraint convert(de.ovgu.featureide.fm.core.Constraint c) {
+		return c.constraint;
 	}
 
 	public static final de.ovgu.featureide.fm.core.FeatureModel convert(IFeatureModel fm) {
@@ -145,10 +154,26 @@ public abstract class FeatureUtils {
 		};
 	};
 
-	public static final IFunction<Constraint, IConstraint> CONSTRAINT_TO_ICONSTRANT = new IFunction<Constraint, IConstraint>() {
+	public static final IFunction<de.ovgu.featureide.fm.core.Constraint, IConstraint> CONSTRAINT_TO_ICONSTRANT = new IFunction<de.ovgu.featureide.fm.core.Constraint, IConstraint>() {
 
 		@Override
-		public IConstraint invoke(Constraint t) {
+		public IConstraint invoke(de.ovgu.featureide.fm.core.Constraint t) {
+			return convert(t);
+		};
+	};
+
+	public static final IFunction<Feature, IFeature> FEATURE_TO_IFEATURE = new IFunction<Feature, IFeature>() {
+
+		@Override
+		public IFeature invoke(Feature t) {
+			return convert(t);
+		};
+	};
+
+	public static final IFunction<IConstraint, de.ovgu.featureide.fm.core.Constraint> ICONSTRAINT_TO_CONSTRANT = new IFunction<IConstraint, de.ovgu.featureide.fm.core.Constraint>() {
+
+		@Override
+		public de.ovgu.featureide.fm.core.Constraint invoke(IConstraint t) {
 			return convert(t);
 		};
 	};
@@ -913,5 +938,144 @@ public abstract class FeatureUtils {
 
 	public static final GraphicItem getItemType(IFeatureModel featureModel) {
 		return featureModel.getGraphicRepresenation().getItemType();
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	public static final void setLocation(IConstraint constraint, FMPoint newLocation) {
+		constraint.getGraphicRepresenation().setLocation(newLocation);
+	}
+
+	public static final FMPoint getLocation(IConstraint constraint) {
+		return constraint.getGraphicRepresenation().getLocation();
+	}
+
+	public static final IFeatureModel getFeatureModel(IConstraint constraint) {
+		return constraint.getFeatureModel();
+	}
+
+	public static final Collection<IFeature> getDeadFeatures(IConstraint constraint, SatSolver solver, IFeatureModel fm, Collection<IFeature> fmDeadFeatures) {
+		return Functional.toList(constraint.getDeadFeatures(solver, fm, fmDeadFeatures));
+	}
+
+	public static final Collection<IFeature> getDeadFeatures(IConstraint constraint, IFeatureModel fm, Collection<IFeature> fmDeadFeatures) {
+		Collection<IFeature> deadFeaturesBefore = null;
+		final Node propNode = constraint.getNode();
+		if (propNode != null) {
+			fm.removeConstraint(constraint);
+			deadFeaturesBefore = fm.getAnalyser().getDeadFeatures();
+			fm.addConstraint(new Constraint(fm, propNode));
+			fm.handleModelDataChanged();
+		}
+
+		final Collection<IFeature> deadFeaturesAfter = new LinkedList<IFeature>();
+		for (final IFeature f : fmDeadFeatures) {
+			final IFeature feature = fm.getFeature(f.getName());
+			// XXX why can the given feature not be found?
+			if (feature != null && !deadFeaturesBefore.contains(feature)) {
+				deadFeaturesAfter.add(f);
+			}
+		}
+		return deadFeaturesAfter;
+	}
+
+	public static final void setConstraintAttribute(IConstraint constraint, ConstraintAttribute attri, boolean fire) {
+		constraint.setConstraintAttribute(attri, fire);
+	}
+
+	public static final ConstraintAttribute getConstraintAttribute(IConstraint constraint) {
+		return constraint.getConstraintAttribute();
+	}
+
+	public static final void setFeatureSelected(IConstraint constraint, boolean selected) {
+		constraint.setFeatureSelected(selected);
+	}
+
+	public static final boolean isFeatureSelected(IConstraint constraint) {
+		return constraint.isFeatureSelected();
+	}
+
+	public static final Node getNode(IConstraint constraint) {
+		return constraint.getNode();
+	}
+
+	public static final void setContainedFeatures(IConstraint constraint) {
+		constraint.setContainedFeatures();
+	}
+
+	public static final Collection<IFeature> getContainedFeatures(IConstraint constraint) {
+		return constraint.getContainedFeatures();
+	}
+
+	public static final boolean setFalseOptionalFeatures(IConstraint constraint, IFeatureModel clone, Collection<IFeature> fmFalseOptionals) {
+		return constraint.setFalseOptionalFeatures(clone, fmFalseOptionals);
+	}
+
+	public static final boolean setFalseOptionalFeatures(IConstraint constraint) {
+		boolean found = false;
+		
+		final Collection<IFeature> falseOptionalFeatures = new ArrayList<>();
+		final IFeatureModel featureModel = constraint.getFeatureModel();
+		final IFeatureModel clonedModel = FeatureUtils.clone(constraint.getFeatureModel());
+		clonedModel.removeConstraint(constraint);
+		final Collection<IFeature> foFeatures = clonedModel.getAnalyser().getFalseOptionalFeatures();
+		for (IFeature feature : featureModel.getAnalyser().getFalseOptionalFeatures()) {
+			if (!foFeatures.contains(clonedModel.getFeature(feature.getName())) && !falseOptionalFeatures.contains(feature)) {
+				falseOptionalFeatures.add(feature);
+				found = true;
+			}
+		}
+		return found;
+	}
+
+	public static final Collection<IFeature> getFalseOptional(IConstraint constraint) {
+		return constraint.getFalseOptional();
+	}
+
+	public static final void addListener(IConstraint constraint, PropertyChangeListener listener) {
+		constraint.addListener(listener);
+	}
+
+	public static final void removeListener(IConstraint constraint, PropertyChangeListener listener) {
+		constraint.removeListener(listener);
+	}
+
+	public static final void fire(IConstraint constraint, PropertyChangeEvent event) {
+		constraint.fireEvent(event);
+	}
+
+	public static final boolean equals(IConstraint constraint, Object obj) {
+		return constraint.equals(obj);
+	}
+
+	public static final String toString(IConstraint constraint) {
+		return constraint.toString();
+	}
+
+	public static final boolean hasHiddenFeatures(IConstraint constraint) {
+		return constraint.hasHiddenFeatures();
+	}
+
+	public static final void setDeadFeatures(IConstraint constraint, Collection<IFeature> deadFeatures) {
+		constraint.setDeadFeatures(deadFeatures);
+	}
+
+	public static final Collection<IFeature> getDeadFeatures(IConstraint constraint) {
+		return constraint.getDeadFeatures();
+	}
+	
+	public static final GraphicItem getItemType(IConstraint constraint) {
+		return constraint.getGraphicRepresenation().getItemType();
 	}
 }

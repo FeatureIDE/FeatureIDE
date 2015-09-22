@@ -26,9 +26,11 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.filter.base.IFilter;
 
 /**
@@ -361,6 +363,16 @@ public abstract class Functional {
 			@Override
 			public Iterator<T> iterator() {
 				return col.iterator();
+			}
+		};
+	}
+
+	public static <T> Iterable<T> toIterator(final Collection<T> collection) {
+		return new Iterable<T>() {
+
+			@Override
+			public Iterator<T> iterator() {
+				return collection.iterator();
 			}
 		};
 	}
