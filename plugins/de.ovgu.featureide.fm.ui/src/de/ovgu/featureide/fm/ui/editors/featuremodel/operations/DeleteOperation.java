@@ -39,10 +39,12 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.gef.EditPart;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
@@ -89,17 +91,53 @@ public class DeleteOperation extends AbstractFeatureModelOperation implements GU
 		 * The key of the Map is the feature which could be replaced by their equivalents given at the
 		 * corresponding List.
 		 */
-		Map<Feature, List<Feature>> removalMap = new HashMap<Feature, List<Feature>>();
-		List<Feature> alreadyDeleted = new LinkedList<Feature>();
+		Map<Feature, List<Feature>> removalMap = new HashMap<>();
+		List<Feature> alreadyDeleted = new LinkedList<>();
+		List<Feature> commonAncestorList = null;
 
 		for (Object element : getSelection().toArray()) {
 			if (removeConstraint(element)) {
 				continue;
 			}
-			removeFeature(element, removalMap, alreadyDeleted);
+			Feature parent = removeFeature(element, removalMap, alreadyDeleted);
+			
+			if (commonAncestorList == null) {
+				commonAncestorList = new LinkedList<>();
+				while (parent != null) {
+					commonAncestorList.add(0, parent);
+					parent = parent.getParent();
+				}
+			} else if (parent != null) {
+				LinkedList<Feature> parentList = new LinkedList<>();
+				while (parent != null) {
+					parentList.addFirst(parent);
+					parent = parent.getParent();
+				}
+				final Iterator<Feature> iterator1 = parentList.iterator();				
+				final Iterator<Feature> iterator2 = commonAncestorList.iterator();
+				int i = 0;
+				while (iterator1.hasNext() && iterator2.hasNext()) {
+					if (!iterator1.next().equals(iterator2.next())) {
+						break;
+					}
+					i++;
+				}
+				commonAncestorList = commonAncestorList.subList(0, i);
+			}
 		}
 
 		removeContainedFeatures(removalMap, alreadyDeleted);
+
+		if (viewer instanceof GraphicalViewerImpl) {
+			final GraphicalViewerImpl viewer2 = (GraphicalViewerImpl) viewer;
+			final Feature parent = (commonAncestorList != null && !commonAncestorList.isEmpty()) 
+					? commonAncestorList.get(commonAncestorList.size() - 1) : null;
+			final Object editPart = viewer2.getEditPartRegistry().get(parent != null ? parent : featureModel.getRoot());
+			if (editPart instanceof FeatureEditPart) {
+				viewer2.setSelection(new StructuredSelection(editPart));
+				viewer2.reveal((EditPart) editPart);
+			}
+		}
 	}
 
 	private IStructuredSelection getSelection() {
@@ -136,7 +174,7 @@ public class DeleteOperation extends AbstractFeatureModelOperation implements GU
 	 * @param removalMap A map with the features and their equivalents.
 	 * @param alreadyDeleted A List of features which are already deleted.
 	 */
-	private void removeFeature(Object element, Map<Feature, List<Feature>> removalMap, List<Feature> alreadyDeleted) {
+	private Feature removeFeature(Object element, Map<Feature, List<Feature>> removalMap, List<Feature> alreadyDeleted) {
 		Feature feature = null;
 		if (element instanceof Feature) {
 			feature = ((Feature) element);
@@ -144,6 +182,7 @@ public class DeleteOperation extends AbstractFeatureModelOperation implements GU
 			feature = ((FeatureEditPart) element).getFeature();
 		}
 		if (feature != null) {
+			final Feature parent = feature.getParent();
 			if (feature.getRelevantConstraints().isEmpty()) {
 				// feature can be removed because it has no relevant constraint
 				executeOperation(new FeatureDeleteOperation(featureModel, feature));
@@ -159,7 +198,9 @@ public class DeleteOperation extends AbstractFeatureModelOperation implements GU
 				}
 				removalMap.put(feature, equivalent);
 			}
+			return parent;
 		}
+		return null;
 	}
 
 	/**
