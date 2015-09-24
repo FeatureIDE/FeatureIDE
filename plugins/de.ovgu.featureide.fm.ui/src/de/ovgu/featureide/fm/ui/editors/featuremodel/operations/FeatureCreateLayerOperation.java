@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_LAYER;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DEFAULT_FEATURE_LAYER_CAPTION;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IAdaptable;
@@ -47,14 +48,13 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayou
  */
 public class FeatureCreateLayerOperation extends AbstractFeatureModelOperation {
 
-	private static final String LABEL = CREATE_LAYER;
 	private Feature feature;
 	private Object viewer;
 	private Feature newFeature;
 	private Object diagramEditor;
 
 	public FeatureCreateLayerOperation(Feature feature, Object viewer, FeatureModel featureModel, Object diagramEditor) {
-		super(featureModel, LABEL);
+		super(featureModel, CREATE_LAYER);
 		this.feature = feature;
 		this.viewer = viewer;
 		this.diagramEditor = diagramEditor;
@@ -70,10 +70,10 @@ public class FeatureCreateLayerOperation extends AbstractFeatureModelOperation {
 	protected void redo() {
 		int number = 0;
 
-		while (featureModel.getFeatureNames().contains("NewLayer" + ++number))
+		while (featureModel.getFeatureNames().contains(DEFAULT_FEATURE_LAYER_CAPTION + ++number))
 			;
 
-		newFeature = new Feature(featureModel, "NewLayer" + number);
+		newFeature = new Feature(featureModel, DEFAULT_FEATURE_LAYER_CAPTION + number);
 		featureModel.addFeature(newFeature);
 		feature = featureModel.getFeature(feature.getName());
 		feature.addChild(newFeature);
