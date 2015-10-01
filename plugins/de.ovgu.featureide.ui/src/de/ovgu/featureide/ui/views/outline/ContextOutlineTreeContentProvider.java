@@ -69,6 +69,8 @@ public class ContextOutlineTreeContentProvider implements ITreeContentProvider {
 			String classname;
 			if (filename.endsWith(".java")) {
 				classname = filename.substring(0, filename.length() - ".java".length());
+			} else if(filename.endsWith(".h")){
+				classname = filename.substring(0, filename.length() - ".h".length());
 			} else {
 				classname = "";
 			}

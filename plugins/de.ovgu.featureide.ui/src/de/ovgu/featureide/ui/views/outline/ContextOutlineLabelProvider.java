@@ -63,6 +63,7 @@ import de.ovgu.featureide.ui.views.collaboration.outline.OutlineLabelProvider;
  * Provides labels and images for Collaboration outline
  * 
  * @author Sebastian Krieter
+ * @author Reimar Schröter
  */
 public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 
@@ -237,7 +238,13 @@ public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 				final String fullName = parent.getFullName();
 				final String fileName = (fullName.startsWith(".")) ? fullName.substring(1) : fullName.replace('.', '/');
 
-				final IFile iFile = model.getFeature(signatures.getFeatureName(featureID)).getRole(fileName + ".java").getFile();
+				final IFile iFile;
+				if(featureProject.getComposerID().equals("de.ovgu.featureide.composer.featurecpp")){
+					iFile = model.getFeature(signatures.getFeatureName(featureID)).getRole(fileName + ".h").getFile();	
+				}else{
+					iFile = model.getFeature(signatures.getFeatureName(featureID)).getRole(fileName + ".java").getFile();	
+				}
+				
 
 				if (iFile.isAccessible()) {
 					final IWorkbench workbench = PlatformUI.getWorkbench();

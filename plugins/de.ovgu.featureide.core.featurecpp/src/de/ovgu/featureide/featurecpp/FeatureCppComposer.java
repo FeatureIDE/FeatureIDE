@@ -39,13 +39,20 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 
+
+
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
+import de.ovgu.featureide.core.fstmodel.FSTClass;
+import de.ovgu.featureide.core.fstmodel.FSTMethod;
+import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.featurecpp.model.FeatureCppModelBuilder;
 import de.ovgu.featureide.featurecpp.wrapper.FeatureCppWrapper;
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.job.AStoppableJob;
 
 /**
  * A FeatureIDE extension to compose FeatureC++ files.
@@ -145,7 +152,31 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 		}
 		featureCpp.compose(config);
 		buildFSTModel();
+		
+		FeatureCPPSignatureSetter setter = new FeatureCPPSignatureSetter();
+		setSigsJob(setter);
 	}
+	
+	private void setSigsJob(final FeatureCPPSignatureSetter signatureSetter) {
+		AStoppableJob job = null;
+		
+		job = new AStoppableJob("Create Signatures of " + featureProject.getProjectName() + " using the FSTModel") {
+			@Override
+			protected boolean work() {
+				try {
+					signatureSetter.setParameters(featureProject);
+					return true;
+				} catch (Exception e) {
+					FMCorePlugin.getDefault().logError(e);
+					return false;
+				}
+			}
+		};
+		job.addJobFinishedListener(signatureSetter);
+		job.schedule();
+	}
+	
+
 
 	private static final LinkedHashSet<String> EXTENSIONS = createExtensions(); 
 	
@@ -272,7 +303,7 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 					file.create(source, true, null);
 				}
 			} catch (CoreException e) {
-				FeatureCppCorePlugin.getDefault().logError(e);
+				FeatureCppCorePlugin.getDefault().logError(e);	
 			}
 			featureCppModelWrapper.compose(file);
 			try {
