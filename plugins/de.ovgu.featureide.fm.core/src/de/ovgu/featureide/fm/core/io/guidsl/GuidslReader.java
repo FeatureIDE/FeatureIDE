@@ -178,7 +178,7 @@ public class GuidslReader extends AbstractFeatureModelReader {
 		}
 
 		for(int i=0; i<comments.size(); i++)
-			featureModel.getProperty().addComment(comments.get(i));
+			FeatureUtils.addComment(featureModel, comments.get(i));
 
 
 		Prods prods = ((MainModel) root).getProds();
@@ -217,20 +217,20 @@ public class GuidslReader extends AbstractFeatureModelReader {
 						if (ch.equals(" ") || ch.equals("{")){
 							String featName = line.substring(0,line.indexOf('{')-1);
 							if (featureModel.getFeature(featName) != null)
-								featureModel.getFeature(featName).getStructure().setHidden(true);
+								FeatureUtils.setHidden(featureModel.getFeature(featName), true);
 							else 
 								throw new UnsupportedModelException(THE_FEATURE_ + featName + "' does not occur in the feature model!", 0);
 						}
 						else{
 							// SAVE OTHER ANNOTATIONS - Write to the comment session
 							annLine.add(counter+i);
-							featureModel.getProperty().addComment(line);							
+							FeatureUtils.addComment(featureModel, line);							
 						}
 					}
 					else{
 						// SAVE OTHER ANNOTATIONS - Write to the comment session
 						annLine.add(counter+i);
-						featureModel.getProperty().addComment(line);
+						FeatureUtils.addComment(featureModel, line);
 
 					}
 				}
