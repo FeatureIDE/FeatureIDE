@@ -25,9 +25,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import de.ovgu.featureide.fm.core.FeatureConnection;
 import de.ovgu.featureide.fm.core.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -331,7 +333,8 @@ public class FeatureStructure implements IFeatureStructure, PropertyConstants {
 
 	@Override
 	public void removeChild(IFeatureStructure child) {
-		children.remove(child);
+		if(!children.remove(child))
+			throw new NoSuchElementException();
 		child.setParent(null);
 		fireChildrenChanged();
 	}
@@ -383,7 +386,7 @@ public class FeatureStructure implements IFeatureStructure, PropertyConstants {
 
 	@Override
 	public void setChildren(List<IFeatureStructure> children) {	// Changed type LinkedList to List, Marcus Pinnecke 30.08.15
-		children.clear();
+		this.children.clear();
 		for (final IFeatureStructure child : children) {
 			addNewChild(child);
 		}
@@ -451,6 +454,17 @@ public class FeatureStructure implements IFeatureStructure, PropertyConstants {
 	@Override
 	public void setRelevantConstraints(List<IConstraint> constraints) {
 		partOfConstraints = constraints;
+	}
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder("FeatureStructure=(");
+		FeatureUtils.print(getFeature(), sb);
+		sb.append(")");
+		return sb.toString();
 	}
 
 }

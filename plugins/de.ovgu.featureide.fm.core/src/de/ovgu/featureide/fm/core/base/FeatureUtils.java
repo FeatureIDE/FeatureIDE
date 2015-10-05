@@ -78,11 +78,11 @@ public abstract class FeatureUtils {
 			return t.getName();
 		}
 	};
-	
+
 	public static final de.ovgu.featureide.fm.core.Constraint convert(IConstraint c) {
 		return new de.ovgu.featureide.fm.core.Constraint(c);
 	}
-	
+
 	public static final IConstraint convert(de.ovgu.featureide.fm.core.Constraint c) {
 		return c.constraint;
 	}
@@ -281,7 +281,7 @@ public abstract class FeatureUtils {
 			public IConstraint invoke(Constraint t) {
 				return t;
 			}
-			
+
 		})));
 	}
 
@@ -946,20 +946,7 @@ public abstract class FeatureUtils {
 	public static final GraphicItem getItemType(IFeatureModel featureModel) {
 		return featureModel.getGraphicRepresenation().getItemType();
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+
 	public static final void setLocation(IConstraint constraint, FMPoint newLocation) {
 		constraint.getGraphicRepresenation().setLocation(newLocation);
 	}
@@ -1031,7 +1018,7 @@ public abstract class FeatureUtils {
 
 	public static final boolean setFalseOptionalFeatures(IConstraint constraint) {
 		boolean found = false;
-		
+
 		final Collection<IFeature> falseOptionalFeatures = new ArrayList<>();
 		final IFeatureModel featureModel = constraint.getFeatureModel();
 		final IFeatureModel clonedModel = FeatureUtils.clone(constraint.getFeatureModel());
@@ -1081,7 +1068,7 @@ public abstract class FeatureUtils {
 	public static final Collection<IFeature> getDeadFeatures(IConstraint constraint) {
 		return constraint.getDeadFeatures();
 	}
-	
+
 	public static final GraphicItem getItemType(IConstraint constraint) {
 		return constraint.getGraphicRepresenation().getItemType();
 	}
@@ -1096,5 +1083,23 @@ public abstract class FeatureUtils {
 
 	public static int getChildIndex(IFeature feature, IFeature child) {
 		return feature.getStructure().getChildIndex(child.getStructure());
+	}
+
+	public static void print(IFeature feature, StringBuilder string) {
+		string.append(feature.getName());
+		string.append(", mandatory=" + FeatureUtils.isMandatory(feature));
+		final List<IFeatureStructure> struct = feature.getStructure().getChildren();
+		boolean isLeaf = struct.isEmpty();
+		if (!isLeaf) {
+			final String prop = FeatureUtils.isOr(feature) ? " or" : FeatureUtils.isAlternative(feature) ? " alt" : " and";
+			string.append(" " + prop);
+			string.append("[");
+			for (int i = 0; i < struct.size(); i++) {
+				print(struct.get(i).getFeature(), string);
+				if (i + 1 < struct.size())
+					string.append(", ");
+			}
+			string.append("]");
+		}
 	}
 }

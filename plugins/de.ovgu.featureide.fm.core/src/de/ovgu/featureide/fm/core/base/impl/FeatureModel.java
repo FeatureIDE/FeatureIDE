@@ -28,7 +28,7 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.core.resources.IProject;
@@ -40,6 +40,7 @@ import de.ovgu.featureide.fm.core.FeatureModelLayout;
 import de.ovgu.featureide.fm.core.IFMComposerExtension;
 import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.RenamingsManager;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -47,7 +48,6 @@ import de.ovgu.featureide.fm.core.base.IFeatureModelLayout;
 import de.ovgu.featureide.fm.core.base.IFeatureModelProperty;
 import de.ovgu.featureide.fm.core.base.IFeatureModelStructure;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.core.base.IGraphicalConstraint;
 import de.ovgu.featureide.fm.core.base.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.core.filter.ConcreteFeatureFilter;
 import de.ovgu.featureide.fm.core.functional.Functional;
@@ -499,11 +499,24 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("FeatureModel(Structure=[");
-		print(getStructure().getRoot().getFeature(), sb);
-		sb.append("], Constraints=[");
-		print(getConstraints(), sb);
+		StringBuilder sb = new StringBuilder("FeatureModel(");
+		if (getStructure().getRoot() != null) {
+			sb.append("Structure=[");
+			FeatureUtils.print(getStructure().getRoot().getFeature(), sb);
+			sb.append("], Constraints=[");
+			print(getConstraints(), sb);
+			sb.append("], ");
+		} else {
+			sb.append("Feature model without root feature.");
+		}
+		StringBuilder features = new StringBuilder();
+		String[] feat =  featureTable.keySet().toArray(new String[featureTable.keySet().size()]);
+		for (int i = 0; i < feat.length; i++) {
+			features.append(feat[i]);
+			if (i + 1 < feat.length)
+				features.append(", ");
+		}
+		sb.append("Features=[" + (features.length() > 0 ? features.toString() : ""));
 		sb.append("])");
 		return sb.toString();
 	}
@@ -518,19 +531,5 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 		}
 	}
 
-	private void print(IFeature feature, StringBuilder string) {
-		string.append(feature.getName());
-
-		final List<IFeatureStructure> struct = feature.getStructure().getChildren();
-		boolean isLeaf = struct.isEmpty();
-		if (!isLeaf) {
-			string.append(" [");
-			for (int i = 0; i < struct.size(); i++) {
-				print(struct.get(i).getFeature(), string);
-				if (i + 1 < struct.size())
-					string.append(", ");
-			}
-			string.append("]");
-		}
-	}
+	
 }

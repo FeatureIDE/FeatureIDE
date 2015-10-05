@@ -326,13 +326,13 @@ public class GuidslReader extends AbstractFeatureModelReader {
 			}
 			else if (feature.getName().equals(child.getFeature().getName() + EMPTY___)) {
 				feature.getStructure().removeChild(child);
-				if (feature == featureModel.getStructure().getRoot())
+				if (feature.equals(featureModel.getStructure().getRoot().getFeature()))
 					featureModel.getStructure().replaceRoot(child);
 				else
 					featureModel.deleteFeatureFromTable(feature);
 				feature = child.getFeature();
 			}
-			else if (feature != featureModel.getStructure().getRoot() && feature.getName().equals(EMPTY___ + child.getFeature().getName())) {
+			else if (!feature.equals(featureModel.getStructure().getRoot().getFeature()) && feature.getName().equals(EMPTY___ + child.getFeature().getName())) {
 				feature.getStructure().removeChild(child);
 				featureModel.deleteFeatureFromTable(feature);
 				feature = child.getFeature();

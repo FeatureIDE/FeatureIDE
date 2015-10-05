@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 import de.ovgu.featureide.fm.core.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureProperty;
@@ -122,9 +123,15 @@ public class Feature implements IFeature, PropertyConstants {
 		return name.toString();
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
 	@Override
 	public int hashCode() {
-		return name.hashCode();
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		return result;
 	}
 
 	@Override
@@ -145,7 +152,11 @@ public class Feature implements IFeature, PropertyConstants {
 
 	@Override
 	public String toString() {
-		return name.toString();
+		StringBuilder sb = new StringBuilder("name=" + name);
+		sb.append(", Structure=[");
+		FeatureUtils.print(this, sb);
+		sb.append("]");
+		return "Feature(" + sb.toString() + ")";
 	}
 
 	@Override
@@ -163,4 +174,25 @@ public class Feature implements IFeature, PropertyConstants {
 		throw new UnsupportedOperationException("No implemented");
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (obj instanceof IFeatureStructure) {
+			return equals(((IFeatureStructure)obj).getFeature());
+		} else if (getClass() != obj.getClass())
+			return false;
+		Feature other = (Feature) obj;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		return true;
+	}
 }
