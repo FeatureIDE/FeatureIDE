@@ -28,9 +28,11 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.core.resources.IProject;
+import org.prop4j.NodeWriter;
 
 import de.ovgu.featureide.fm.core.FMComposerManager;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
@@ -85,13 +87,13 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	protected final RenamingsManager renamingsManager = new RenamingsManager(this);
 
 	protected final IFeatureModelStructure structure;
-	
+
 	protected final IGraphicalFeatureModel graphicalFeatureModel;
-	
+
 	protected final IFeatureModelLayout modelLayout;
 
 	protected Object undoContext = null;
-	
+
 	public FeatureModel() {
 		featureOrderList = new LinkedList<String>();
 		featureOrderUserDefined = false;
@@ -108,11 +110,11 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 
 		property = oldFeatureModel.getProperty().clone(this);
 		structure = createStructure();
-		graphicalFeatureModel = oldFeatureModel.getGraphicRepresenation();	// TODO: Marcus XXX clone here?
+		graphicalFeatureModel = oldFeatureModel.getGraphicRepresenation(); // TODO: Marcus XXX clone here?
 		modelLayout = oldFeatureModel.getLayout();
 
 		if (newRoot == null) {
-			structure.setRoot(structure.getRoot().cloneSubtree(this));
+			structure.setRoot(oldFeatureModel.getStructure().getRoot().cloneSubtree(this));// structure.getRoot().cloneSubtree(this));
 			for (final IConstraint constraint : oldFeatureModel.constraints) {
 				constraints.add(constraint.clone(this));
 			}
@@ -124,20 +126,21 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 				}
 			}
 		}
+		//		}
 	}
-	
+
 	protected IFeatureModelProperty createProperty() {
 		return new FeatureModelProperty(this);
 	}
-	
+
 	protected IFeatureModelStructure createStructure() {
 		return new FeatureModelStructure(this);
 	}
-	
+
 	protected IGraphicalFeatureModel createGraphicalFeatureModel() {
 		return new GraphicalFeatureModel(this);
 	}
-	
+
 	private IFeatureModelLayout createFeatureModelLayout() {
 		return new FeatureModelLayout();
 	}
@@ -494,4 +497,40 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 		throw new UnsupportedOperationException("Not implemented yet");
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("FeatureModel(Structure=[");
+		print(getStructure().getRoot().getFeature(), sb);
+		sb.append("], Constraints=[");
+		print(getConstraints(), sb);
+		sb.append("])");
+		return sb.toString();
+	}
+
+	private void print(List<IConstraint> constraints, StringBuilder sb) {
+		for (int i = 0; i < constraints.size(); i++) {
+			sb.append("[");
+			sb.append(NodeWriter.nodeToString(constraints.get(i).getNode()));
+			sb.append("]");
+			if (i + 1 < constraints.size())
+				sb.append(", ");
+		}
+	}
+
+	private void print(IFeature feature, StringBuilder string) {
+		string.append(feature.getName());
+
+		final List<IFeatureStructure> struct = feature.getStructure().getChildren();
+		boolean isLeaf = struct.isEmpty();
+		if (!isLeaf) {
+			string.append(" [");
+			for (int i = 0; i < struct.size(); i++) {
+				print(struct.get(i).getFeature(), string);
+				if (i + 1 < struct.size())
+					string.append(", ");
+			}
+			string.append("]");
+		}
+	}
 }

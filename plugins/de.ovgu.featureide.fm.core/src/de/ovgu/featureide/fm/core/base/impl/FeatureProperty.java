@@ -51,7 +51,7 @@ public class FeatureProperty implements IFeatureProperty, PropertyConstants {
 
 	public FeatureProperty(IFeature correspondingFeature) {
 		this.correspondingFeature = correspondingFeature;
-		description = null;
+		description = new String("");
 		status = FeatureStatus.NORMAL;
 	}
 

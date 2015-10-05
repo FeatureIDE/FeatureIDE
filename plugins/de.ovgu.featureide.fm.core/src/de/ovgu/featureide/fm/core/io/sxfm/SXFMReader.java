@@ -236,7 +236,7 @@ public class SXFMReader extends AbstractFeatureModelReader {
 //					relativeIndent = countIndent - lastFeat.getIndentation();
 					
 					if (!lastFeat.getStructure().isRoot()){
-						lastFeat = (FeatureIndent) lastFeat.getStructure().getParent();
+						lastFeat = (FeatureIndent) lastFeat.getStructure().getParent().getFeature();
 						relativeIndent = countIndent - lastFeat.getIndentation();
 					}
 				}
@@ -559,7 +559,7 @@ public class SXFMReader extends AbstractFeatureModelReader {
 		}
 		scan .close();
 		org.prop4j.Node propNode = buildPropNode(elements);
-		featureModel.getConstraints().add(new Constraint(featureModel, propNode));
+		featureModel.addConstraint(new Constraint(featureModel, propNode));
     }
     
     /**
