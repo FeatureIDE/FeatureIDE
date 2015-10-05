@@ -76,7 +76,7 @@ public class GuidslWriter extends AbstractFeatureModelWriter {
 		if(hasHiddenFeatures()){
 			out.append("##\r\n\r\n");
 			for (IFeature feat : featureModel.getFeatures())
-				if (feat.getStructure().isHidden()) out.append(feat.toString() +  " { hidden } \r\n");
+				if (feat.getStructure().isHidden()) out.append(feat.getName() +  " { hidden } \r\n");
 		}
 
 		return out.toString();

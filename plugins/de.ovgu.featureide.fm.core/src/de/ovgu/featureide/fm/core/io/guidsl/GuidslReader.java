@@ -64,7 +64,15 @@ import guidsl.TermName;
 import guidsl.Var;
 import guidsl.VarStmt;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -105,14 +113,13 @@ public class GuidslReader extends AbstractFeatureModelReader {
 	private static Object lock = new Object();
 
 	private List<Integer> annLine = new LinkedList<Integer>();
-	
+
 	private boolean noAbstractFeatures = false;
-	
-	public List<Integer> getAnnLine(){
+
+	public List<Integer> getAnnLine() {
 		return Collections.unmodifiableList(annLine);
 	}
-		
-	
+
 	/**
 	 * Creates a new reader and sets the feature model to store the data.
 	 * 
@@ -122,35 +129,57 @@ public class GuidslReader extends AbstractFeatureModelReader {
 		setFeatureModel(featureModel);
 	}
 
-	@Override
-	protected void parseInputStream(InputStream inputStream)
-	throws UnsupportedModelException {
-
-		warnings.clear();
-		try {
-			synchronized (lock) {
-				Parser myParser = Parser.getInstance(inputStream);
-				Model root = (Model) myParser.parseAll();
-				readModelData(root);
-			}
-			featureModel.handleModelDataLoaded();
+	private static String toString(InputStream inputStream) throws IOException {
+		BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+		StringBuilder sb = new StringBuilder();
+		String newLine = System.getProperty("line.separator");
+		String currentLine;
+		while ((currentLine = reader.readLine()) != null) {
+			sb.append(currentLine);
+			sb.append(newLine);
 		}
-		catch (ParseException e) {
-			int line = e.currentToken.next.beginLine;
-			throw new UnsupportedModelException(e.getMessage(), line);
+		return sb.toString();
+	}
+
+	@Override
+	protected void parseInputStream(InputStream inputStream) throws UnsupportedModelException {
+
+		try {
+			final String content = toString(inputStream);
+			final InputStream inputStreamFromContent = new ByteArrayInputStream(content.getBytes(StandardCharsets.UTF_8));
+
+			warnings.clear();
+			try {
+				synchronized (lock) {
+					Parser myParser = Parser.getInstance(inputStreamFromContent);
+					Model root = (Model) myParser.parseAll();
+					readModelData(root);
+				}
+				featureModel.handleModelDataLoaded();
+			} catch (ParseException e) {
+				int line = e.currentToken.next.beginLine;
+				List<String> linesList = new ArrayList<String>(Arrays.asList(content.split("\n")));
+				linesList.add(line, "^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+				StringBuilder sb = new StringBuilder();
+				for(String s : linesList)
+					sb.append(s + "\n");
+				throw new UnsupportedModelException(e.getMessage() + "\nContent:\n" + sb.toString(), line);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
 	// converts a string with "\n" to a list of lines
-	private List<String> stringToList(String str){
+	private List<String> stringToList(String str) {
 		List<String> result = new LinkedList<String>();
-		while(str.contains("\n")){
+		while (str.contains("\n")) {
 			int ind = str.indexOf('\n');
-			if (ind>0)
-				result.add(str.substring(0,ind-1));
+			if (ind > 0)
+				result.add(str.substring(0, ind - 1));
 			str = str.substring(ind + 1);
 		}
-		if (str.length()>0)
+		if (str.length() > 0)
 			result.add(str);
 		return result;
 	}
@@ -158,7 +187,7 @@ public class GuidslReader extends AbstractFeatureModelReader {
 	private void readModelData(Model root) throws UnsupportedModelException {
 
 		featureModel.reset();
-		String guidsl =  root.toString();
+		String guidsl = root.toString();
 
 		noAbstractFeatures = (guidsl.startsWith("//NoAbstractFeatures"));
 
@@ -167,26 +196,25 @@ public class GuidslReader extends AbstractFeatureModelReader {
 			guidsl = guidsl.substring(20);
 
 		List<String> comments = new LinkedList<String>();
-		while (guidsl.contains("//"))
-		{
+		while (guidsl.contains("//")) {
 			guidsl = guidsl.substring(guidsl.indexOf("//"));
 			int index = guidsl.indexOf('\n');
 			if (index > 0)
-				comments.add(guidsl.substring(2,index-1));
-			else comments.add(guidsl.substring(2,guidsl.length()-1));
+				comments.add(guidsl.substring(2, index - 1));
+			else
+				comments.add(guidsl.substring(2, guidsl.length() - 1));
 			guidsl = guidsl.substring(guidsl.indexOf("//") + 2);
 		}
 
-		for(int i=0; i<comments.size(); i++)
+		for (int i = 0; i < comments.size(); i++)
 			FeatureUtils.addComment(featureModel, comments.get(i));
-
 
 		Prods prods = ((MainModel) root).getProds();
 		AstListNode astListNode = (AstListNode) prods.arg[0];
-		
+
 		readGProductionRoot((GProduction) astListNode.arg[0]);
 		astListNode = (AstListNode) astListNode.right;
-		
+
 		while (astListNode != null) {
 			readGProduction((GProduction) astListNode.arg[0]);
 			astListNode = (AstListNode) astListNode.right;
@@ -200,36 +228,33 @@ public class GuidslReader extends AbstractFeatureModelReader {
 		if (varOptNode.arg.length > 0 && varOptNode.arg[0] != null)
 			readVarStmt((VarStmt) varOptNode.arg[0]);
 
-
 		// Reading hidden features and other annotations
 		int ind = root.toString().indexOf("##");
-		if (ind >= 0){	
-			String annotations = root.toString().substring(ind+3);
-			int counter = root.toString().substring(0,root.toString().indexOf("##")).split("\n").length+2;
+		if (ind >= 0) {
+			String annotations = root.toString().substring(ind + 3);
+			int counter = root.toString().substring(0, root.toString().indexOf("##")).split("\n").length + 2;
 			List<String> list = stringToList(annotations);
-			for(int i=0; i<list.size(); i++){
+			for (int i = 0; i < list.size(); i++) {
 				String line = list.get(i);
-				if(line.contains("{")){
+				if (line.contains("{")) {
 					String tempLine = line.substring(line.indexOf('{')).toLowerCase(Locale.ENGLISH);
-					if(tempLine.contains(HIDDEN)){
+					if (tempLine.contains(HIDDEN)) {
 						int ix = tempLine.indexOf(HIDDEN);
-						String ch = tempLine.substring(ix-1,ix);
-						if (ch.equals(" ") || ch.equals("{")){
-							String featName = line.substring(0,line.indexOf('{')-1);
+						String ch = tempLine.substring(ix - 1, ix);
+						if (ch.equals(" ") || ch.equals("{")) {
+							String featName = line.substring(0, line.indexOf('{') - 1);
 							if (featureModel.getFeature(featName) != null)
 								FeatureUtils.setHidden(featureModel.getFeature(featName), true);
-							else 
+							else
 								throw new UnsupportedModelException(THE_FEATURE_ + featName + "' does not occur in the feature model!", 0);
-						}
-						else{
+						} else {
 							// SAVE OTHER ANNOTATIONS - Write to the comment session
-							annLine.add(counter+i);
-							FeatureUtils.addComment(featureModel, line);							
+							annLine.add(counter + i);
+							FeatureUtils.addComment(featureModel, line);
 						}
-					}
-					else{
+					} else {
 						// SAVE OTHER ANNOTATIONS - Write to the comment session
-						annLine.add(counter+i);
+						annLine.add(counter + i);
 						FeatureUtils.addComment(featureModel, line);
 
 					}
@@ -239,7 +264,7 @@ public class GuidslReader extends AbstractFeatureModelReader {
 
 		featureModel.handleModelDataLoaded();
 	}
-	
+
 	private void readGProduction(GProduction gProduction, IFeature feature) throws UnsupportedModelException {
 		feature.getStructure().setAND(false);
 		Pats pats = gProduction.getPats();
@@ -252,16 +277,17 @@ public class GuidslReader extends AbstractFeatureModelReader {
 		} while (astListNode != null);
 		simplify(feature);
 	}
-	
+
 	private void readGProduction(GProduction gProduction) throws UnsupportedModelException {
 		final String name = gProduction.getIDENTIFIER().name;
 		final IFeature feature = featureModel.getFeature(gProduction.getIDENTIFIER().name);
 		if (feature == null) {
-			throw new UnsupportedModelException(THE_COMPOUND_FEATURE_ + name + "' have to occur on a right side of a rule before using it on a left side!", gProduction.getIDENTIFIER().lineNum());
+			throw new UnsupportedModelException(THE_COMPOUND_FEATURE_ + name + "' have to occur on a right side of a rule before using it on a left side!",
+					gProduction.getIDENTIFIER().lineNum());
 		}
 		readGProduction(gProduction, feature);
 	}
-	
+
 	private void readGProductionRoot(GProduction gProduction) throws UnsupportedModelException {
 		final IFeature root = FeatureModelFactory.getInstance().createFeature(featureModel, gProduction.getIDENTIFIER().name);
 		featureModel.addFeature(root);
@@ -311,7 +337,8 @@ public class GuidslReader extends AbstractFeatureModelReader {
 	private IFeature createFeature(AstToken token) throws UnsupportedModelException {
 		IFeature feature = FeatureModelFactory.getInstance().createFeature(featureModel, token.name);
 		if (!featureModel.addFeature(feature))
-			throw new UnsupportedModelException(THE_FEATURE_ + feature.getName() + "' occurs again on a right side of a rule and that's not allowed!", token.lineNum());
+			throw new UnsupportedModelException(THE_FEATURE_ + feature.getName() + "' occurs again on a right side of a rule and that's not allowed!",
+					token.lineNum());
 		return feature;
 	}
 
@@ -323,16 +350,14 @@ public class GuidslReader extends AbstractFeatureModelReader {
 				feature.getStructure().setChildren(child.getChildren());
 				feature.getStructure().setAND(child.isAnd());
 				featureModel.deleteFeatureFromTable(child.getFeature());
-			}
-			else if (feature.getName().equals(child.getFeature().getName() + EMPTY___)) {
+			} else if (feature.getName().equals(child.getFeature().getName() + EMPTY___)) {
 				feature.getStructure().removeChild(child);
 				if (feature.equals(featureModel.getStructure().getRoot().getFeature()))
 					featureModel.getStructure().replaceRoot(child);
 				else
 					featureModel.deleteFeatureFromTable(feature);
 				feature = child.getFeature();
-			}
-			else if (!feature.equals(featureModel.getStructure().getRoot().getFeature()) && feature.getName().equals(EMPTY___ + child.getFeature().getName())) {
+			} else if (!feature.equals(featureModel.getStructure().getRoot().getFeature()) && feature.getName().equals(EMPTY___ + child.getFeature().getName())) {
 				feature.getStructure().removeChild(child);
 				featureModel.deleteFeatureFromTable(feature);
 				feature = child.getFeature();
@@ -367,7 +392,7 @@ public class GuidslReader extends AbstractFeatureModelReader {
 			line = token.lineNum();
 			String var = token.name;
 			if (featureModel.getFeature(var) == null)
-				throw new UnsupportedModelException(THE_FEATURE_ + var + "' does not occur in the grammar!", token.lineNum());	
+				throw new UnsupportedModelException(THE_FEATURE_ + var + "' does not occur in the grammar!", token.lineNum());
 			//return new Literal(featureModel.getFeature(var));
 			return new Literal(var);
 		}
@@ -409,18 +434,17 @@ public class GuidslReader extends AbstractFeatureModelReader {
 		//TODO #31: reading annotations not yet implemented
 	}
 
-	public Node readPropositionalString(String propString, IFeatureModel featureModel) throws UnsupportedModelException{
+	public Node readPropositionalString(String propString, IFeatureModel featureModel) throws UnsupportedModelException {
 		//String featureString = new FeatureModelWriter(featureModel).writeToString();
-		StringBuilder featureString= new StringBuilder(
-				new GuidslWriter(featureModel).writeToString());		
+		StringBuilder featureString = new StringBuilder(new GuidslWriter(featureModel).writeToString());
 
-		if( featureModel.getConstraintCount()== 0)
+		if (featureModel.getConstraintCount() == 0)
 			featureString.append("%%\r\n");
 		featureString.append(propString);
 		readFromString(featureString.toString());
 		List<Node> propNodes = Functional.toList(FeatureUtils.getPropositionalNodes(getFeatureModel().getConstraints()));
 
-		return propNodes.get(propNodes.size()-1);
+		return propNodes.get(propNodes.size() - 1);
 	}
 
 	@SuppressWarnings("unused")
