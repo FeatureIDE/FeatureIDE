@@ -25,9 +25,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 import de.ovgu.featureide.core.signature.ProjectSignatures;
-import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
+import de.ovgu.featureide.core.signature.ProjectSignatures.SignatureIterator;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiClassSignature;
+import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
 
 /**
  * TODO description
@@ -53,18 +54,26 @@ public class TypeSignatureMatcher extends SignatureMatcher {
 		final Set<AbstractSignature> result = new HashSet<>();
 		result.add(selectedSignature);
 		
-		for (String className : ((FujiClassSignature) selectedSignature).getSubClassesList()) {
-			if (!classes.containsKey(className))
-				continue;
-
-			final AbstractClassSignature classSignature = classes.get(className);
-
-			if (!result.contains(classSignature)) {
-				result.add(classSignature);
-			}
-		}
+		FujiMethodSignature constructor = getConstructor();
+		if (constructor != null)
+			result.add(constructor);
 		
 		return result;
+	}
+
+	private FujiMethodSignature getConstructor() {
+		final SignatureIterator iter = signatures.iterator();
+		while (iter.hasNext()) {
+			final AbstractSignature signature = iter.next();
+			
+			if (!(signature instanceof FujiMethodSignature)) continue;
+			final FujiMethodSignature methodSignature = (FujiMethodSignature) signature;
+			
+			if (methodSignature.isConstructor() && methodSignature.getFullName().equals(selectedSignature.getFullName()+"." + selectedSignature.getName())) {
+				return methodSignature;
+			}
+		}
+		return null;
 	}
 
 }

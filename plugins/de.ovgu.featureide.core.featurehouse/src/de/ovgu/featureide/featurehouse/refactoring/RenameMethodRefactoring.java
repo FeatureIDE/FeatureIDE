@@ -39,12 +39,12 @@ import org.eclipse.jdt.internal.ui.viewsupport.BasicElementLabels;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.signature.base.AFeatureData;
 import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
+import de.ovgu.featureide.core.signature.base.FOPFeatureData;
 import de.ovgu.featureide.featurehouse.refactoring.matcher.MethodSignatureMatcher;
 import de.ovgu.featureide.featurehouse.refactoring.matcher.SignatureMatcher;
-import de.ovgu.featureide.featurehouse.refactoring.visitors.IASTVisitor;
-import de.ovgu.featureide.featurehouse.refactoring.visitors.MethodVisitor;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
 
 /**
@@ -62,12 +62,6 @@ public class RenameMethodRefactoring extends RenameRefactoring<FujiMethodSignatu
 	@Override
 	public String getName() {
 		return RefactoringCoreMessages.RenameMethodProcessor_change_name;
-	}
-
-
-	@Override
-	protected IASTVisitor getASTVisitor(final RefactoringSignature refactoringSignature, final String newName) {
-		return new MethodVisitor(refactoringSignature, newName);
 	}
 
 	@Override
@@ -128,26 +122,24 @@ public class RenameMethodRefactoring extends RenameRefactoring<FujiMethodSignatu
 		}
 		
 		for (FujiMethodSignature methodSignature : result) {
-			if (RefactoringUtil.hasSameParameters(methodSignature, renamingElement)) {
-				String message;
-				if (RefactoringUtil.isVirtual(renamingElement)) {
-					message = Messages.format(RefactoringCoreMessages.RenameVirtualMethodRefactoring_hierarchy_declares1,
-							new String[] { BasicElementLabels.getJavaElementName(methodSignature.getName()) });
-				} else {
-					message = Messages.format(RefactoringCoreMessages.RenamePrivateMethodRefactoring_hierarchy_defines, 
-							new String[] { methodSignature.getParent().getFullName(), BasicElementLabels.getJavaElementName(newName) });
+			final FOPFeatureData[] featureData = (FOPFeatureData[]) methodSignature.getFeatureData();
+			for (AFeatureData aFeatureData : featureData) {
+				final String file = aFeatureData.getAbsoluteFilePath();
+				
+				for (AFeatureData renamingFeatureData : renamingElement.getFeatureData()) {
+					if (RefactoringUtil.hasSameParameters(methodSignature, renamingElement)) {
+						String message = Messages.format(RefactoringCoreMessages.RenamePrivateMethodRefactoring_hierarchy_defines, new String[] {
+								getFullFilePath(file), BasicElementLabels.getJavaElementName(newName) });
+						if (file.equals(renamingFeatureData.getAbsoluteFilePath()))
+							refactoringStatus.addError(message);
+						else
+							refactoringStatus.addWarning(message);
+					} else {
+						String message = Messages.format(RefactoringCoreMessages.RenamePrivateMethodRefactoring_hierarchy_defines2, new String[] {
+								getFullFilePath(file), BasicElementLabels.getJavaElementName(newName) });
+						refactoringStatus.addWarning(message);
+					}
 				}
-				refactoringStatus.addError(message);
-			} else {
-				String message;
-				if (RefactoringUtil.isVirtual(renamingElement)) {
-					message = Messages.format(RefactoringCoreMessages.RenameVirtualMethodRefactoring_hierarchy_declares2,
-							new String[] { BasicElementLabels.getJavaElementName(methodSignature.getName()) });
-				} else {
-					message = Messages.format(RefactoringCoreMessages.RenamePrivateMethodRefactoring_hierarchy_defines2, 
-							new String[] { methodSignature.getParent().getFullName(), BasicElementLabels.getJavaElementName(newName) });
-				}
-				refactoringStatus.addWarning(message);
 			}
 		}
 	}

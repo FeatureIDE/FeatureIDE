@@ -40,8 +40,6 @@ import de.ovgu.featureide.core.signature.base.AbstractMethodSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.core.signature.base.FOPFeatureData;
 import de.ovgu.featureide.featurehouse.refactoring.matcher.SignatureMatcher;
-import de.ovgu.featureide.featurehouse.refactoring.visitors.IASTVisitor;
-import de.ovgu.featureide.featurehouse.refactoring.visitors.TypeVisitor;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiClassSignature;
 
 /**
@@ -59,11 +57,6 @@ public class RenameTypeRefactoring extends RenameRefactoring<FujiClassSignature>
 	@Override
 	public String getName() {
 		return RefactoringCoreMessages.RenameTypeProcessor_change_name;
-	}
-
-	@Override
-	protected IASTVisitor getASTVisitor(final RefactoringSignature refactoringSignature, final String newName) {
-		return new TypeVisitor(refactoringSignature, newName);
 	}
 
 	@Override

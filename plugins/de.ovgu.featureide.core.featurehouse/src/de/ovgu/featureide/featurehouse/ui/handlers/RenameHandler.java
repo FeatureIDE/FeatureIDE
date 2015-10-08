@@ -4,25 +4,26 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.internal.corext.refactoring.structure.PullUpRefactoringProcessor;
 import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ITreeSelection;
+import org.eclipse.ltk.core.refactoring.resource.RenameResourceChange;
+import org.eclipse.ltk.ui.refactoring.RefactoringWizard;
 import org.eclipse.ltk.ui.refactoring.RefactoringWizardOpenOperation;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.ui.ide.ResourceUtil;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
+import de.ovgu.featureide.featurehouse.ExtendedFujiSignaturesJob;
 import de.ovgu.featureide.featurehouse.refactoring.FujiSelector;
 import de.ovgu.featureide.featurehouse.refactoring.RenameFieldRefactoring;
 import de.ovgu.featureide.featurehouse.refactoring.RenameLocalVariableRefactoring;
@@ -98,8 +99,19 @@ public class RenameHandler extends ASelectionHandler {
 			int column = sel.getOffset() - lineOffset;
 
 			final String file = ((ICompilationUnit) elem).getResource().getRawLocation().toOSString();
-
-			FujiSelector selector = new FujiSelector(getFeatureProject(), file);
+			
+			IFeatureProject featureProject = getFeatureProject();
+			ExtendedFujiSignaturesJob efsj = new ExtendedFujiSignaturesJob(featureProject);
+			try {
+				efsj.schedule();
+				efsj.join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			
+			//PullUpRefactoringProcessor
+						
+			FujiSelector selector = new FujiSelector(featureProject, file);
 			AbstractSignature signature = selector.getSelectedSignature(sel.getStartLine() + 1, column);
 			if (signature != null)
 				singleAction(signature);

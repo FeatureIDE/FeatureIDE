@@ -21,14 +21,10 @@
 package de.ovgu.featureide.featurehouse.refactoring.matcher;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import de.ovgu.featureide.core.signature.ProjectSignatures;
-import de.ovgu.featureide.core.signature.base.AFeatureData;
-import de.ovgu.featureide.core.signature.base.AbstractMethodSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
-import de.ovgu.featureide.core.signature.base.FOPFeatureData;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiFieldSignature;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiLocalVariableSignature;
 
@@ -54,37 +50,9 @@ public class LocalVariableSignatureMatcher extends SignatureMatcher {
 		final Set<AbstractSignature> result = new HashSet<>();
 
 		FujiLocalVariableSignature localSig = (FujiLocalVariableSignature) selectedElement;
-
-		final AbstractMethodSignature declaringMethod = localSig.getDeclaringMethod();
-		if (declaringMethod.isConstructor()) {
-
-			final AbstractMethodSignature realDeclaringMethod = getRealDeclaringMethod(localSig, declaringMethod);
-			final AFeatureData firstFeatureData = localSig.getFirstFeatureData();
-			final FOPFeatureData newFopData = new FOPFeatureData(firstFeatureData.getID(), 0, 0);
-			newFopData.setConstraint(firstFeatureData.getConstraint());
-			newFopData.setAbsoluteFilePath(firstFeatureData.getAbsoluteFilePath());
-			newFopData.addInvokedSignature(realDeclaringMethod);
-
-			localSig.setFeatureData(new FOPFeatureData[]{newFopData});
-		}
 		result.add(localSig);
 
 		return result;
 	}
-
-	private AbstractMethodSignature getRealDeclaringMethod(FujiLocalVariableSignature localSig, final AbstractMethodSignature declaringMethod) {
-		final String parentName = localSig.getParent().getFullName();
-		if (classes.containsKey(parentName)){
-			Iterator<AbstractMethodSignature> iterator = classes.get(parentName).getMethods().iterator();
-			while(iterator.hasNext()){
-				AbstractMethodSignature next = iterator.next();
-				if (next.equals(declaringMethod)) 
-					return next;
-			}
-		}
-		return null;
-	}
-		
-		
-
+	
 }

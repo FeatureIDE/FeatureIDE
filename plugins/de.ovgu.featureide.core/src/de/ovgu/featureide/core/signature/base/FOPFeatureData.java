@@ -35,10 +35,9 @@ public class FOPFeatureData extends AFeatureData {
 	
 	private ArrayList<AbstractSignature> calledSignatures;
 	private ArrayList<String> usedNonPrimitveTypes;
-	private ArrayList<AbstractSignature> invokedSignatures;
 	
-	public FOPFeatureData(int id, int startLineNumber, int endLineNumber) {
-		super(id, startLineNumber, endLineNumber);
+	public FOPFeatureData(int id, SignaturePosition sigPosition) {
+		super(id, sigPosition);
 		this.calledSignatures = null;
 		this.usesExternalMethods = false;
 		this.usesOriginal = false;
@@ -85,15 +84,4 @@ public class FOPFeatureData extends AFeatureData {
 		}
 	}
 	
-	public List<AbstractSignature> getInvokedSignatures() {
-		return invokedSignatures != null ? Collections.unmodifiableList(invokedSignatures) : Collections.<AbstractSignature>emptyList();
-	}
-	
-	public void addInvokedSignature(AbstractSignature signature) {
-		if (this.invokedSignatures == null) {
-			this.invokedSignatures = new ArrayList<AbstractSignature>();
-		}
-		if (!this.invokedSignatures.contains(signature)) 
-			this.invokedSignatures.add(signature);
-	}
 }

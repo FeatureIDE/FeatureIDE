@@ -37,8 +37,6 @@ import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 import de.ovgu.featureide.core.signature.base.AbstractFieldSignature;
 import de.ovgu.featureide.core.signature.base.FOPFeatureData;
 import de.ovgu.featureide.featurehouse.refactoring.matcher.SignatureMatcher;
-import de.ovgu.featureide.featurehouse.refactoring.visitors.FieldVisitor;
-import de.ovgu.featureide.featurehouse.refactoring.visitors.IASTVisitor;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiFieldSignature;
 
 /**
@@ -56,11 +54,6 @@ public class RenameFieldRefactoring extends RenameRefactoring<FujiFieldSignature
 	@Override
 	public String getName() {
 		return RefactoringCoreMessages.RenameFieldRefactoring_name;
-	}
-
-	@Override
-	protected IASTVisitor getASTVisitor(final RefactoringSignature refactoringSignature, final String newName) {
-		return new FieldVisitor(refactoringSignature, newName);
 	}
 
 	@Override

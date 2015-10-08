@@ -20,14 +20,11 @@
  */
 package de.ovgu.featureide.featurehouse.refactoring;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
+import de.ovgu.featureide.core.signature.base.SignaturePosition;
 
 /**
  * TODO description
@@ -37,15 +34,14 @@ import de.ovgu.featureide.core.signature.base.AbstractSignature;
 public class RefactoringSignature {
 	private AbstractSignature declaration;
 	
-	private AbstractSignature invocationDeclaration;
-	
-	private Map<AbstractSignature, Set<AbstractSignature>> invocations = new HashMap<>();
-	
 	private final String absolutePath;
+	
+	private final Set<SignaturePosition> positions;
 	
 	public RefactoringSignature(final String absolutePath, final AbstractSignature declaration) {
 		this.absolutePath = absolutePath;
 		this.declaration = declaration;
+		this.positions = new HashSet<>();
 	}
 	
 	public String getAbsolutePathToFile() {
@@ -56,31 +52,17 @@ public class RefactoringSignature {
 		return declaration;
 	}
 	
-	public void setDeclaration(AbstractSignature declaration) {
-		this.declaration = declaration;
-	}
-
-	public Map<AbstractSignature, Set<AbstractSignature>> getInvocations() {
-		return invocations;
-	}
-
-	public void addInvocation(final AbstractSignature invocation, final AbstractSignature invokedSignature) {
-		
-		Set<AbstractSignature> invokedSignatures;
-		if (this.invocations.containsKey(invocation)) {
-			invokedSignatures = invocations.get(invocation);
-		}
-		else {
-			invokedSignatures = new HashSet<>();
-			this.invocations.put(invocation, invokedSignatures);
-		}
-		
-		invokedSignatures.add(invokedSignature);
+	public void addPosition(final SignaturePosition position) {
+		positions.add(position);
 	}
 	
+	public Set<SignaturePosition> getPositions() {
+		return positions;
+	}
+
 	@Override
 	public String toString() {
-		return "File: " + absolutePath + "; declaration: " + declaration + "; invocations: " + invocations;
+		return "File: " + absolutePath + "; declaration: " + declaration;
 	}
 
 }

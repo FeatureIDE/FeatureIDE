@@ -44,19 +44,19 @@ public class FeatureDataConstructor {
 		this.dataType = dataType;
 	}
 	
-	public AFeatureData create(Node constraint, int startLineNumber, int endLineNumber) {
+	public AFeatureData create(Node constraint, SignaturePosition position) {
 		final AFeatureData data;
 		switch (dataType) {
 		case TYPE_FOP:
 			if (constraint instanceof Literal) {
-				data = new FOPFeatureData(sigs.getFeatureID(((Literal) constraint).var.toString()), startLineNumber, endLineNumber);
+				data = new FOPFeatureData(sigs.getFeatureID(((Literal) constraint).var.toString()), position);
 			} else {
-				data = new FOPFeatureData(-1, startLineNumber, endLineNumber);
+				data = new FOPFeatureData(-1, position);
 			}
 			data.setConstraint(constraint);
 			break;
 		case TYPE_PP:
-			data = new PreprocessorFeatureData(startLineNumber, endLineNumber);
+			data = new PreprocessorFeatureData(position);
 			data.setConstraint(constraint);
 			break;
 		default:
@@ -65,15 +65,15 @@ public class FeatureDataConstructor {
 		return data;
 	}
 	
-	public AFeatureData create(int id, int startLineNumber, int endLineNumber) {
+	public AFeatureData create(int id, SignaturePosition position) {
 		final AFeatureData data;
 		switch (dataType) {
 		case TYPE_FOP:
-			data = new FOPFeatureData(id, startLineNumber, endLineNumber);
+			data = new FOPFeatureData(id, position);
 			data.setConstraint(new Literal(sigs.getFeatureName(id)));
 			break;
 		case TYPE_PP:
-			data = new PreprocessorFeatureData(startLineNumber, endLineNumber);
+			data = new PreprocessorFeatureData(position);
 			data.setConstraint(new Literal(sigs.getFeatureName(id)));
 			break;
 		default:

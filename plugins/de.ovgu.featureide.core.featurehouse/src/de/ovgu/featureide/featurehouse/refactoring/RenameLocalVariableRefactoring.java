@@ -32,8 +32,6 @@ import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.featurehouse.refactoring.matcher.SignatureMatcher;
-import de.ovgu.featureide.featurehouse.refactoring.visitors.IASTVisitor;
-import de.ovgu.featureide.featurehouse.refactoring.visitors.LocalVariableVisitor;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiLocalVariableSignature;
 
 /**
@@ -53,12 +51,6 @@ public class RenameLocalVariableRefactoring extends RenameRefactoring<FujiLocalV
 		return RefactoringCoreMessages.RenameTempRefactoring_rename;
 	}
 
-	@Override
-	protected IASTVisitor getASTVisitor(final RefactoringSignature refactoringSignature, final String newName) {
-		return new LocalVariableVisitor(refactoringSignature, newName);
-	}
-
-//	RenameLocalVariableProcessor
 	@Override
 	protected void checkPreConditions(final SignatureMatcher matcher, final RefactoringStatus refactoringStatus) throws JavaModelException, CoreException {
 

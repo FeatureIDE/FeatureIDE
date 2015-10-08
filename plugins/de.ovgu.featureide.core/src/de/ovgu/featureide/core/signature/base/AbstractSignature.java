@@ -21,6 +21,8 @@
 package de.ovgu.featureide.core.signature.base;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.prop4j.Node;
 import org.prop4j.Or;
@@ -59,6 +61,8 @@ public abstract class AbstractSignature implements IConstrainedObject {
 	
 	protected final boolean staticSignature;
 	
+	protected final Set<ExtendedSignature> invocationSignatures;
+	
 	protected AbstractSignature(AbstractClassSignature parent, String name, String modifierString, String type) {
 		this.parent = parent;
 		this.name = name;
@@ -93,6 +97,7 @@ public abstract class AbstractSignature implements IConstrainedObject {
 		} else {
 			this.type = type;
 		}
+		this.invocationSignatures = new HashSet<ExtendedSignature>();
 	}
 	
 	protected void setFullName(String perfixName) {
@@ -259,5 +264,17 @@ public abstract class AbstractSignature implements IConstrainedObject {
 		}		
 		
 		return new Or(constraints).toCNF();
+	}
+	
+	public void addInvocationSignature(ExtendedSignature signature)
+	{
+		invocationSignatures.add(signature);
+	}
+
+	/**
+	 * @return the invocationSignatures
+	 */
+	public Set<ExtendedSignature> getInvocationSignatures() {
+		return invocationSignatures;
 	}
 }
