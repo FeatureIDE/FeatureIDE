@@ -32,11 +32,7 @@ import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.junit.Test;
 
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
-import de.ovgu.featureide.featurehouse.refactoring.RenameMethodRefactoring;
-import de.ovgu.featureide.featurehouse.refactoring.RenameRefactoring;
-import de.ovgu.featureide.featurehouse.refactoring.RenameTypeRefactoring;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiClassSignature;
-import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
 
 /**
  * TODO description
