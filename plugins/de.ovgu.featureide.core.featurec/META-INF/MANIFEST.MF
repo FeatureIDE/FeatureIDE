@@ -11,7 +11,8 @@ Require-Bundle: org.eclipse.ui;bundle-version="3.104.0",
  de.ovgu.featureide.core;bundle-version="2.7.4",
  de.ovgu.featureide.ui;bundle-version="2.7.4",
  de.ovgu.featureide.fm.ui;bundle-version="2.7.4",
- de.ovgu.featureide.fm.core;bundle-version="2.7.4"
+ de.ovgu.featureide.fm.core;bundle-version="2.7.4",
+ de.ovgu.featureide.core.featurehouse;bundle-version="2.7.4"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Import-Package: org.eclipse.core.expressions,
