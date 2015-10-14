@@ -5,10 +5,10 @@
          point="de.ovgu.featureide.core.composers">
       <composer
             class="de.ovgu.featureide.featurec.FeatureCComposer"
-            description="de.ovgu.featureide.core.featurec.composer1"
+            description="Feature-oriented programming for C code containing pre-processor annotations."
             id="de.ovgu.featureide.composer.featurec"
             name="FeatureC"
-            nature="de.ovgu.featureide.core.featurec.composer1">
+            nature="FeatureIDE_Core.featureCNature">
       </composer>
    </extension>
 
