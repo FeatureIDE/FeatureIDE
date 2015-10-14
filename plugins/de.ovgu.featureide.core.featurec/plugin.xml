@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="de.ovgu.featureide.core.composers">
+      <composer
+            class="de.ovgu.featureide.featurec.FeatureCComposer"
+            description="de.ovgu.featureide.core.featurec.composer1"
+            id="de.ovgu.featureide.composer.featurec"
+            name="FeatureC"
+            nature="de.ovgu.featureide.core.featurec.composer1">
+      </composer>
+   </extension>
+
+</plugin>
