@@ -142,7 +142,7 @@ public abstract class AStoppableJob extends AbstractJob implements IStoppableJob
 	private void stopInnerThread() {
 		try {
 		if (innerThread.isAlive()) {
-			innerThread.join();
+			innerThread.stop();
 		}
 		} catch (Exception e) {
 			e.printStackTrace();

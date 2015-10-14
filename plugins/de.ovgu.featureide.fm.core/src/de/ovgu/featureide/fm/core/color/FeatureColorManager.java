@@ -282,12 +282,12 @@ public class FeatureColorManager {
 	
 	private static IProject getProject(FeatureModel featureModel) {
 		File file = featureModel.xxxGetSourceFile();
-		IWorkspace workspace= ResourcesPlugin.getWorkspace(); 
-		IPath location= Path.fromOSString(file.getAbsolutePath()); 
-		IFile iFile= workspace.getRoot().getFileForLocation(location);
+		IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IPath location = Path.fromOSString(file.getAbsolutePath());
+		IFile iFile = workspace.getRoot().getFileForLocation(location);
 		try {
 			return iFile.getProject();
-		} catch (NullPointerException e){
+		} catch (NullPointerException e) {
 			FMCorePlugin.getDefault().logWarning(location.toOSString());
 			throw e;
 		}
