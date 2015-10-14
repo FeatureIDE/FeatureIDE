@@ -128,7 +128,7 @@ public class RenameTypeRefactoring extends RenameRefactoring<FujiClassSignature>
 				result.addError(Messages.format(
 						RefactoringCoreMessages.RenameTypeRefactoring_imported,
 						new Object[] { BasicElementLabels.getJavaElementName(newName),
-								BasicElementLabels.getPathLabel(getFile(renamingElement.getFirstFeatureData().getAbsoluteFilePath()).getFullPath(), false) }));
+								BasicElementLabels.getPathLabel(RefactoringUtil.getFile(renamingElement.getFirstFeatureData().getAbsoluteFilePath()).getFullPath(), false) }));
 			}
 		}
 		

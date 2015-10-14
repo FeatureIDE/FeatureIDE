@@ -216,34 +216,15 @@ public abstract class RenameRefactoring<T extends AbstractSignature> extends Ref
 		}
 		return null;
 	}
-
-	protected IFile getFile(final String relativePath) {
-//		final IPath projectPath = ResourcesPlugin.getWorkspace().getRoot().getProject(featureProject.getProjectName()).getFullPath();
-//		
-//		int index = relativePath.lastIndexOf(projectPath.toString());
-//		String path = relativePath.substring(index);
-//		
-//		final IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(path));
-//		return file;
-		return ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(Path.fromOSString(relativePath));
-	}
 	
 	protected String getFullFilePath(final String relativePath) {
-		String fileName = getFile(relativePath).getFullPath().toString();
+		String fileName = RefactoringUtil.getFile(relativePath).getFullPath().toString();
 		if (fileName.startsWith("/"))
 			fileName = fileName.substring(1);
 		return fileName;
 	}
 	
-	protected ICompilationUnit getCompilationUnit(final String relativePath)
-	{
-		final IFile file = getFile(relativePath);
-		
-		if ((file == null) || ((file != null) && !file.isAccessible()))
-			return null;
 
-		return JavaCore.createCompilationUnitFrom(file);
-	}
 
 	@Override
 	public final Change createChange(IProgressMonitor pm) throws CoreException, OperationCanceledException {
@@ -265,12 +246,13 @@ public abstract class RenameRefactoring<T extends AbstractSignature> extends Ref
 		if (refactoringSig.getPositions().isEmpty())
 			return status;
 		
-		IFile ifile = getFile(refactoringSig.getAbsolutePathToFile());
+		IFile ifile = RefactoringUtil.getFile(refactoringSig.getAbsolutePathToFile());
 		
 		IDocumentProvider provider = new TextFileDocumentProvider();
 		try {
 			provider.connect(ifile);
 			final IDocument doc = provider.getDocument(ifile);
+			
 			
 			for (SignaturePosition position : refactoringSig.getPositions()) {
 				int offset = doc.getLineOffset(position.getStartRow() - 1) + position.getIdentifierStart() - 1;
@@ -318,7 +300,7 @@ public abstract class RenameRefactoring<T extends AbstractSignature> extends Ref
 	}
 	
 	private RefactoringStatus existCompilationUnitNewName(final String file){
-		IPath renamedResourcePath= getFile(file).getParent().getFullPath();
+		IPath renamedResourcePath= RefactoringUtil.getFile(file).getParent().getFullPath();
 		if (Checks.resourceExists(renamedResourcePath.append(newName + ".java")))
 			return RefactoringStatus.createFatalErrorStatus(Messages.format(RefactoringCoreMessages.Checks_cu_name_used, BasicElementLabels.getResourceName(newName)));
 		else
@@ -354,7 +336,7 @@ public abstract class RenameRefactoring<T extends AbstractSignature> extends Ref
 	}
 
 	private RefactoringStatus checkNewPathValidity(final String file) {
-		ICompilationUnit unit = getCompilationUnit(file);
+		ICompilationUnit unit = RefactoringUtil.getCompilationUnit(file);
 		IContainer c = unit.getResource().getParent();
 
 		String notRename= RefactoringCoreMessages.RenameTypeRefactoring_will_not_rename;

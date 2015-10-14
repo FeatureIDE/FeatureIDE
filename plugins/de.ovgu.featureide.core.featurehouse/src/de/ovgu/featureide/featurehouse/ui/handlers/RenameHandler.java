@@ -1,30 +1,7 @@
 package de.ovgu.featureide.featurehouse.ui.handlers;
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.resources.IFile;
-import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.internal.corext.refactoring.structure.PullUpRefactoringProcessor;
-import org.eclipse.jdt.ui.JavaUI;
-import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.ITextSelection;
-import org.eclipse.ltk.core.refactoring.resource.RenameResourceChange;
-import org.eclipse.ltk.ui.refactoring.RefactoringWizard;
 import org.eclipse.ltk.ui.refactoring.RefactoringWizardOpenOperation;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.ide.ResourceUtil;
-import org.eclipse.ui.texteditor.ITextEditor;
 
-import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.signature.base.AbstractSignature;
-import de.ovgu.featureide.featurehouse.ExtendedFujiSignaturesJob;
-import de.ovgu.featureide.featurehouse.refactoring.FujiSelector;
 import de.ovgu.featureide.featurehouse.refactoring.RenameFieldRefactoring;
 import de.ovgu.featureide.featurehouse.refactoring.RenameLocalVariableRefactoring;
 import de.ovgu.featureide.featurehouse.refactoring.RenameMethodRefactoring;
@@ -35,13 +12,12 @@ import de.ovgu.featureide.featurehouse.signature.fuji.FujiClassSignature;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiFieldSignature;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiLocalVariableSignature;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
-import de.ovgu.featureide.fm.ui.handlers.base.ASelectionHandler;
 
 
-public class RenameHandler extends ASelectionHandler {
+public class RenameHandler extends RefactoringHandler {
 
 	@Override
-	protected void singleAction(Object element) 
+	protected void singleAction(Object element, String file) 
 	{
 		try {
 			IFeatureProject featureProject = getFeatureProject();
@@ -71,62 +47,4 @@ public class RenameHandler extends ASelectionHandler {
 		} catch (InterruptedException e) {
 		}
 	}
-
-	protected Shell getShell() 
-	{
-		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-		if (window == null) return null;
-		return window.getShell();
-	}
-	
-	@Override
-	public final Object execute(ExecutionEvent event) throws ExecutionException {
-		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-		ITextEditor editor = (ITextEditor) page.getActiveEditor();
-
-		IJavaElement elem = JavaUI.getEditorInputJavaElement(editor.getEditorInput());
-		if (elem instanceof ICompilationUnit) {
-			ITextSelection sel = (ITextSelection) editor.getSelectionProvider().getSelection();
-
-			IDocument document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
-
-			int lineOffset = 0;
-			try {
-				lineOffset = document.getLineOffset(sel.getStartLine());
-			} catch (BadLocationException e1) {
-				e1.printStackTrace();
-			}
-			int column = sel.getOffset() - lineOffset;
-
-			final String file = ((ICompilationUnit) elem).getResource().getRawLocation().toOSString();
-			
-			IFeatureProject featureProject = getFeatureProject();
-			ExtendedFujiSignaturesJob efsj = new ExtendedFujiSignaturesJob(featureProject);
-			try {
-				efsj.schedule();
-				efsj.join();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			
-			//PullUpRefactoringProcessor
-						
-			FujiSelector selector = new FujiSelector(featureProject, file);
-			AbstractSignature signature = selector.getSelectedSignature(sel.getStartLine() + 1, column);
-			if (signature != null)
-				singleAction(signature);
-		}
-		
-		return null;
-	}
-	
-	protected IFeatureProject getFeatureProject()
-	{
-		IEditorInput fileEditorInput = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor().getEditorInput();
-		final IFile file = ResourceUtil.getFile(fileEditorInput);
-		if (file == null) return null;
-		
-		return CorePlugin.getFeatureProject(file);
-	}
-
 }

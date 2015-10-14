@@ -25,13 +25,22 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 
+import de.ovgu.featureide.core.signature.ProjectSignatures;
+import de.ovgu.featureide.core.signature.ProjectSignatures.SignatureIterator;
+import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 import de.ovgu.featureide.core.signature.base.AbstractMethodSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiClassSignature;
@@ -105,6 +114,10 @@ public class RefactoringUtil {
 		return parameterTypes1.equals(parameterTypes2);
 	}
 	
+	public static boolean hasSameReturnType(final FujiMethodSignature signature1, final FujiMethodSignature signature2) {
+		return signature1.getReturnType().equals(signature2.getReturnType());
+	}
+	
 	/**
 	 * Returns <code>true</code> if the method could be a virtual method,
 	 * i.e. if it is not a constructor, is private, or is static.
@@ -120,6 +133,37 @@ public class RefactoringUtil {
 		if (method.isStatic())
 			return false;
 		return true;
+	}
+	
+	public static Map<String, AbstractClassSignature> getClasses(final ProjectSignatures signatures) {
+		final Map<String, AbstractClassSignature> classes = new HashMap<>();
+
+		final SignatureIterator iter = signatures.iterator();
+		while (iter.hasNext()) {
+			final AbstractSignature signature = iter.next();
+			if (signature instanceof AbstractClassSignature) {
+				String fullName = signature.getFullName();
+				if (fullName.startsWith("."))
+					fullName = fullName.substring(1);
+				classes.put(fullName, (AbstractClassSignature) signature);
+			}
+		}
+
+		return classes;
+	}
+	
+	public static IFile getFile(final String relativePath) {
+		return ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(Path.fromOSString(relativePath));
+	}
+	
+	public static ICompilationUnit getCompilationUnit(final String relativePath)
+	{
+		final IFile file = RefactoringUtil.getFile(relativePath);
+		
+		if ((file == null) || ((file != null) && !file.isAccessible()))
+			return null;
+
+		return JavaCore.createCompilationUnitFrom(file);
 	}
 
 }

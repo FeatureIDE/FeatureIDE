@@ -30,12 +30,17 @@ public class SignaturePosition {
 	private final int startRow;
 	private final int endRow;
 	
+	private final int startColumn;
+	private final int endColumn;
+	
 	private final int identifierStart;
 	private final int identifierEnd;
 	
-	public SignaturePosition(int startRow, int endRow, int identifierStart, int identifierEnd){
+	public SignaturePosition(int startRow, int endRow, int startColumn, int endColumn, int identifierStart, int identifierEnd){
 		this.startRow = startRow;
 		this.endRow = endRow;
+		this.startColumn = startColumn;
+		this.endColumn = endColumn;
 		this.identifierStart = identifierStart;
 		this.identifierEnd = identifierEnd;
 	}
@@ -72,6 +77,14 @@ public class SignaturePosition {
 		SignaturePosition position = (SignaturePosition) obj;
 		return this.startRow == position.getStartRow() && this.endRow == position.getEndRow() &&
 				this.identifierStart == position.getIdentifierStart() && this.identifierEnd == position.identifierEnd; 
+	}
+
+	public int getStartColumn() {
+		return startColumn;
+	}
+
+	public int getEndColumn() {
+		return endColumn;
 	}
 	
 }

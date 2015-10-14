@@ -200,7 +200,7 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 		this(featureProject, true);
 	}
 
-	private AbstractSignature addFeatureID(AbstractSignature sig, int featureID, int startRow, int endRow, int identifierStart, int identifierEnd,
+	private AbstractSignature addFeatureID(AbstractSignature sig, int featureID, int start, int end, int identifierStart, int identifierEnd,
 			String absoluteFilePath) {
 		SignatureReference sigRef = signatureSet.get(sig);
 		if (sigRef == null) {
@@ -208,7 +208,8 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 			signatureSet.put(sig, sigRef);
 			signatureTable.put(sig.getFullName(), sig);
 		}
-		SignaturePosition position = new SignaturePosition(startRow, endRow, identifierStart, identifierEnd);
+		
+		SignaturePosition position = getSignaturePosition(start, end, identifierStart, identifierEnd);
 		sigRef.addID((FOPFeatureData) featureDataConstructor.create(featureID, position));
 		sigRef.setAbsoluteFilePath(featureID, absoluteFilePath);
 		return sigRef.getSig();
@@ -333,8 +334,7 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 					int featureID = projectSignatures.getFeatureID(featurename);
 
 					FujiClassSignature curClassSig = (FujiClassSignature) addFeatureID(new FujiClassSignature(parent, name, modifierString, typeString, pckg,
-							typeDecl, importList), featureID, Symbol.getLine(typeDecl.getStart()), Symbol.getLine(typeDecl.getEnd()),
-							Symbol.getColumn(typeDecl.IDstart), Symbol.getColumn(typeDecl.IDend), absoluteFilePath);
+							typeDecl, importList), featureID, typeDecl.getStart(), typeDecl.getEnd(), typeDecl.IDstart, typeDecl.IDend, absoluteFilePath);
 
 					for (ImportDecl importDecl : importList) {
 						curClassSig.addImport(importDecl.toString());
@@ -378,8 +378,7 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 							featureID = projectSignatures.getFeatureID(featurename);
 
 							AbstractSignature methAbs = addFeatureID(new FujiMethodSignature(curClassSig, name, modifierString, type, false, parameterList,
-									exceptionList), featureID, Symbol.getLine(method.getStart()), Symbol.getLine(method.getEnd()),
-									Symbol.getColumn(method.IDstart), Symbol.getColumn(method.IDend), absoluteFilePath);
+									exceptionList), featureID, method.getStart(), method.getEnd(), method.IDstart, method.IDend, absoluteFilePath);
 							findMethodAccesses(method, methAbs, featureID, absoluteFilePath);
 							curClassSig.addMethod((FujiMethodSignature) methAbs);
 						} else if (bodyDecl instanceof FieldDeclaration) {
@@ -393,8 +392,7 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 							featureID = projectSignatures.getFeatureID(featurename);
 
 							AbstractSignature afield = addFeatureID(new FujiFieldSignature(curClassSig, name, modifierString, type), featureID,
-									Symbol.getLine(field.getStart()), Symbol.getLine(field.getEnd()), Symbol.getColumn(field.IDstart),
-									Symbol.getColumn(field.IDend), absoluteFilePath);
+									field.getStart(), field.getEnd(), field.IDstart, field.IDend, absoluteFilePath);
 
 							findMethodAccesses(field, afield, featureID, absoluteFilePath);
 							curClassSig.addField((FujiFieldSignature) afield);
@@ -413,8 +411,8 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 								featureID = projectSignatures.getFeatureID(featurename);
 
 								AbstractSignature constrAbs = addFeatureID(new FujiMethodSignature(curClassSig, name, modifierString, type, true,
-										parameterList, exceptionList), featureID, Symbol.getLine(constructor.getStart()), Symbol.getLine(constructor.getEnd()),
-										Symbol.getColumn(constructor.IDstart), Symbol.getColumn(constructor.IDend), absoluteFilePath);
+										parameterList, exceptionList), featureID, constructor.getStart(), constructor.getEnd(),
+										constructor.IDstart, constructor.IDend, absoluteFilePath);
 								findMethodAccesses(constructor, constrAbs, featureID, absoluteFilePath);
 								curClassSig.addMethod((FujiMethodSignature) constrAbs);
 							}
@@ -646,8 +644,7 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 		if (stmt instanceof MethodAccess) {
 			MethodAccess methodAccess = (MethodAccess) stmt;
 			if ("original".equals(methodAccess.name())) {
-				SignaturePosition position = new SignaturePosition(Symbol.getLine(methodAccess.getStart()), Symbol.getLine(methodAccess.getEnd()), 
-						Symbol.getColumn(methodAccess.IDstart), Symbol.getColumn(methodAccess.IDend));
+				SignaturePosition position = getSignaturePosition(methodAccess.getStart(), methodAccess.getEnd(), methodAccess.IDstart, methodAccess.IDend);
 				originalList.add(new ExtendedSignature(methAbs, featureID, position));
 			} else {
 				putAccess(((MethodAccess) stmt).decl(), methAbs, featureID, methodAccess.getStart(), methodAccess.getEnd(), methodAccess.IDstart, methodAccess.IDend);
@@ -677,29 +674,25 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 					SignatureReference sigRef = signatureSet.get(new FujiLocalVariableSignature(methAbs.getParent(), (AbstractMethodSignature) methAbs, varDecl.name(), varDecl.getModifiers()
 							.toString(), varDecl.type()));
 					
-					SignaturePosition position = new SignaturePosition(Symbol.getLine(variableAccess.getStart()), Symbol.getLine(variableAccess.getEnd()), 
-							Symbol.getColumn(variableAccess.IDstart), Symbol.getColumn(variableAccess.IDend));
+					SignaturePosition position = getSignaturePosition(varDecl.getStart(), varDecl.getEnd(), varDecl.IDstart, varDecl.IDend);
 					sigRef.sig.addInvocationSignature(new ExtendedSignature(methAbs, featureID, position));
 				} else if (varAcess instanceof ParameterDeclaration) {
 					ParameterDeclaration varDecl = (ParameterDeclaration) varAcess;
 					SignatureReference sigRef = signatureSet.get(new FujiLocalVariableSignature(methAbs.getParent(), (AbstractMethodSignature) methAbs, varDecl.name(), varDecl.getModifiers()
 							.toString(), varDecl.type()));
 					
-					SignaturePosition position = new SignaturePosition(Symbol.getLine(variableAccess.getStart()), Symbol.getLine(variableAccess.getEnd()), 
-							Symbol.getColumn(variableAccess.IDstart), Symbol.getColumn(variableAccess.IDend));
+					SignaturePosition position = getSignaturePosition(varDecl.getStart(), varDecl.getEnd(), varDecl.IDstart, varDecl.IDend);
 					sigRef.sig.addInvocationSignature(new ExtendedSignature(methAbs, featureID, position));
 				}
 			}
 		} else if (stmt instanceof VariableDeclaration) {
 			VariableDeclaration varDecl = (VariableDeclaration) stmt;
 			addFeatureID(new FujiLocalVariableSignature(methAbs.getParent(), (AbstractMethodSignature) methAbs, varDecl.name(), varDecl.getModifiers()
-					.toString(), varDecl.type()), featureID, Symbol.getLine(varDecl.getStart()), Symbol.getLine(varDecl.getEnd()),
-					Symbol.getColumn(varDecl.IDstart), Symbol.getColumn(varDecl.IDend), absoluteFilePath);
+					.toString(), varDecl.type()), featureID, varDecl.getStart(), varDecl.getEnd(), varDecl.IDstart, varDecl.IDend, absoluteFilePath);
 		} else if (stmt instanceof ParameterDeclaration) {
 			ParameterDeclaration varDecl = (ParameterDeclaration) stmt;
 			addFeatureID(new FujiLocalVariableSignature(methAbs.getParent(), (AbstractMethodSignature) methAbs, varDecl.name(), varDecl.getModifiers()
-					.toString(), varDecl.type()), featureID, Symbol.getLine(varDecl.getStart()), Symbol.getLine(varDecl.getEnd()),
-					Symbol.getColumn(varDecl.IDstart), Symbol.getColumn(varDecl.IDend), absoluteFilePath);
+					.toString(), varDecl.type()), featureID, varDecl.getStart(), varDecl.getEnd(), varDecl.IDstart, varDecl.IDend, absoluteFilePath);
 		} else if (stmt instanceof TypeAccess) {
 			TypeAccess typeAccess = (TypeAccess) stmt;
 			TypeDecl typeDecl = typeAccess.type();
@@ -721,8 +714,7 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 					if (classDecl.fullName().equals("java.lang.Object")) 
 						continue;
 						
-					SignaturePosition position = new SignaturePosition(Symbol.getLine(typeAccess.getStart()), Symbol.getLine(typeAccess.getEnd()), 
-							Symbol.getColumn(typeAccess.IDstart), Symbol.getColumn(typeAccess.IDend));
+					SignaturePosition position = getSignaturePosition(typeAccess.getStart(), typeAccess.getEnd(), typeAccess.IDstart, typeAccess.IDend);
 					nonPrimitveTypesTable.put(new ExtendedSignature(methAbs, featureID, position), classDecl);
 					break;
 				}
@@ -734,14 +726,18 @@ public class ExtendedFujiSignaturesJob extends AStoppableJob {
 		}
 	}
 
-	private void putAccess(ASTNode<?> typeDecl, AbstractSignature methAbs, int featureID, int startRow, int endRow, int identifierStart, int identifierEnd) {
+	private SignaturePosition getSignaturePosition(final int start, final int end,  final int identifierStart, final int identifierEnd) {
+		return new SignaturePosition(Symbol.getLine(start), Symbol.getLine(end), Symbol.getColumn(start), Symbol.getColumn(end),
+				Symbol.getColumn(identifierStart), Symbol.getColumn(identifierEnd));
+	}
+
+	private void putAccess(ASTNode<?> typeDecl, AbstractSignature methAbs, int featureID, int start, int end, int identifierStart, int identifierEnd) {
 		java.util.List<ExtendedSignature> signatureList = bodyMap.get(typeDecl);
 		if (signatureList == null) {
 			signatureList = new LinkedList<ExtendedSignature>();
 			bodyMap.put(typeDecl, signatureList);
 		}
-		SignaturePosition position = new SignaturePosition(Symbol.getLine(startRow), Symbol.getLine(endRow), 
-				Symbol.getColumn(identifierStart), Symbol.getColumn(identifierEnd));
+		SignaturePosition position = getSignaturePosition(start, end, identifierStart, identifierEnd);
 		
 		signatureList.add(new ExtendedSignature(methAbs, featureID, position));
 	}

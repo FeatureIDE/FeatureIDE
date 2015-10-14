@@ -163,8 +163,8 @@ public class FujiSignaturesCreator {
 									modifierString, typeString, pckg, typeDecl,
 									importList),
 									projectSignatures.getFeatureID(featurename), 
-									Symbol.getLine(typeDecl.getStart()), Symbol.getLine(typeDecl.getEnd()), 
-									Symbol.getColumn(typeDecl.IDstart), Symbol.getColumn(typeDecl.IDend), absoluteFilePath);
+									typeDecl.getStart(), typeDecl.getEnd(), typeDecl.IDstart, typeDecl.IDend, 
+									absoluteFilePath);
 					for (ImportDecl importDecl : importList) {
 						curClassSig.addImport(importDecl.toString());
 					}
@@ -188,8 +188,7 @@ public class FujiSignaturesCreator {
 									name, modifierString, type, false,
 									parameterList, exceptionList),
 									projectSignatures.getFeatureID(featurename), 
-									Symbol.getLine(method.getStart()), Symbol.getLine(method.getEnd()), 
-									Symbol.getColumn(method.IDstart), Symbol.getColumn(method.IDend), 
+									method.getStart(), method.getEnd(), method.IDstart, method.IDend, 
 									absoluteFilePath);
 
 						} else if (bodyDecl instanceof FieldDeclaration) {
@@ -203,8 +202,7 @@ public class FujiSignaturesCreator {
 							addFeatureID(new FujiFieldSignature(curClassSig,
 									name, modifierString, type),
 									projectSignatures.getFeatureID(featurename), 
-									Symbol.getLine(field.getStart()), Symbol.getLine(field.getEnd()), 
-									Symbol.getColumn(field.IDstart), Symbol.getColumn(field.IDend), 
+									field.getStart(), field.getEnd(), field.IDstart, field.IDend, 
 									absoluteFilePath);
 
 						} else if (bodyDecl instanceof ConstructorDecl) {
@@ -226,8 +224,7 @@ public class FujiSignaturesCreator {
 										type, true, parameterList,
 										exceptionList),
 										projectSignatures.getFeatureID(featurename), 
-										Symbol.getLine(constructor.getStart()), Symbol.getLine(constructor.getEnd()), 
-										Symbol.getColumn(constructor.IDstart), Symbol.getColumn(constructor.IDend), 
+										constructor.getStart(), constructor.getEnd(), constructor.IDstart, constructor.IDend, 
 										absoluteFilePath);
 							}
 							
@@ -260,14 +257,15 @@ public class FujiSignaturesCreator {
 		return projectSignatures;
 	}
 	
-	private AbstractSignature addFeatureID(AbstractSignature sig, int featureID, int startRow, int endRow, int identifierStart, int identifierEnd, String absoluteFilePath) {
+	private AbstractSignature addFeatureID(AbstractSignature sig, int featureID, int start, int end, int identifierStart, int identifierEnd, String absoluteFilePath) {
 		SignatureReference sigRef = signatureSet.get(sig);
 		if (sigRef == null) {
 			sigRef = new SignatureReference(sig);
 			signatureSet.put(sig, sigRef);
 			signatureTable.put(sig.getFullName(), sig);
 		}
-		SignaturePosition position = new SignaturePosition(startRow, endRow, identifierStart, identifierEnd);
+		SignaturePosition position = new SignaturePosition(Symbol.getLine(start), Symbol.getLine(end), Symbol.getColumn(start), Symbol.getColumn(end),
+				Symbol.getColumn(identifierStart), Symbol.getColumn(identifierEnd));
 		sigRef.addID((FOPFeatureData) featureDataConstructor.create(featureID, position));
 		sigRef.setAbsoluteFilePath(featureID, absoluteFilePath);
 		return sigRef.getSig();

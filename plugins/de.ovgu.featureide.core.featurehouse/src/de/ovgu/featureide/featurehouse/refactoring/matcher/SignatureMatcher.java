@@ -60,7 +60,7 @@ public abstract class SignatureMatcher {
 	}
 	
 	public void findMatchedSignatures(){
-		classes = getClasses();
+		classes = RefactoringUtil.getClasses(signatures);
 		matchedSignatures = getNamedMatchedSignatures(selectedElement.getName());
 		newNameMatchedSignatures = getNamedMatchedSignatures(newName); 
 		selectedSignature = selectSignature();
@@ -82,23 +82,6 @@ public abstract class SignatureMatcher {
 			}
 		}
 		return null;
-	}
-	
-	public Map<String, AbstractClassSignature> getClasses() {
-		final Map<String, AbstractClassSignature> classes = new HashMap<>();
-
-		final SignatureIterator iter = signatures.iterator();
-		while (iter.hasNext()) {
-			final AbstractSignature signature = iter.next();
-			if (signature instanceof AbstractClassSignature) {
-				String fullName = signature.getFullName();
-				if (fullName.startsWith("."))
-					fullName = fullName.substring(1);
-				classes.put(fullName, (AbstractClassSignature) signature);
-			}
-		}
-
-		return classes;
 	}
 	
 	protected Set<AbstractSignature> getNamedMatchedSignatures(final String name) {
