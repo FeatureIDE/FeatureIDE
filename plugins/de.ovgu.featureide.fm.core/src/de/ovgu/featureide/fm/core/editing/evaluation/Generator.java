@@ -123,7 +123,7 @@ public abstract class Generator {
 				if (random.nextBoolean() && random.nextBoolean())
 					node = new Not(node);
 			}
-			fm.getConstraints().add(new Constraint(fm, node));
+			fm.addConstraint(new Constraint(fm, node));
 			try {
 				if (!valid || fm.getAnalyser().isValid()) {
 					i++;
@@ -135,7 +135,7 @@ public abstract class Generator {
 				}
 			} catch (TimeoutException e) {
 				FMCorePlugin.getDefault().logError(e);
-				fm.getConstraints().add(new Constraint(fm, node));
+				fm.addConstraint(new Constraint(fm, node));
 			}
 		}		
 	}
@@ -158,7 +158,7 @@ public abstract class Generator {
 						LinkedList<Node> nodes = new LinkedList<Node>();
 						for (IFeatureStructure child : feature.getStructure().getChildren())
 							nodes.add(new Literal(child.getFeature().getName()));
-						fm.getConstraints().add(new Constraint(fm, new AtMost(1,nodes).toCNF()));
+						fm.addConstraint(new Constraint(fm, new AtMost(1,nodes).toCNF()));
 						break;
 					}
 			}
@@ -168,7 +168,7 @@ public abstract class Generator {
 					IFeatureStructure parent = feature.getStructure().getParent();
 					if (parent != null && parent.isAnd() && !parent.isFirstChild(feature.getStructure()) && feature.getStructure().isMandatory()) {
 						feature.getStructure().setMandatory(false);
-						fm.getConstraints().add(new Constraint(fm, new Implies(new Literal(parent.getFeature().getName()),new Literal(feature.getName()))));
+						fm.addConstraint(new Constraint(fm, new Implies(new Literal(parent.getFeature().getName()),new Literal(feature.getName()))));
 						break;
 					}
 				}
@@ -266,7 +266,7 @@ public abstract class Generator {
 					IFeatureStructure parent = feature.getStructure().getParent();
 					if (parent != null && parent.isAnd() && !parent.isFirstChild(feature.getStructure()) && feature.getStructure().isMandatory()) {
 						feature.getStructure().setMandatory(false);
-						fm.getConstraints().add(new Constraint(fm, new Implies(new Literal(parent.getFeature().getName()),new Literal(feature.getName()))));
+						fm.addConstraint(new Constraint(fm, new Implies(new Literal(parent.getFeature().getName()),new Literal(feature.getName()))));
 						break;
 					}
 				}

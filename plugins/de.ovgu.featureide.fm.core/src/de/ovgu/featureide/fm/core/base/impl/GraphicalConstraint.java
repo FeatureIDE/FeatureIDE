@@ -36,7 +36,6 @@ import de.ovgu.featureide.fm.core.base.IGraphicalConstraint;
 public class GraphicalConstraint implements IGraphicalConstraint, PropertyConstants {
 
 	protected final IConstraint correspondingConstraint;
-	protected boolean featureSelected = false;
 
 	protected FMPoint location = new FMPoint(0, 0);
 
@@ -61,13 +60,12 @@ public class GraphicalConstraint implements IGraphicalConstraint, PropertyConsta
 
 	@Override
 	public boolean isFeatureSelected() {
-		return featureSelected;
+		return correspondingConstraint.isFeatureSelected();
 	}
 
 	@Override
 	public void setFeatureSelected(boolean selected) {
-		featureSelected = selected;
-		correspondingConstraint.fireEvent(new PropertyChangeEvent(this, CONSTRAINT_SELECTED, Boolean.FALSE, Boolean.TRUE));
+		correspondingConstraint.setFeatureSelected(selected); 
 	}
 
 	@Override

@@ -25,7 +25,10 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.ovgu.featureide.fm.core.ConstraintAttribute;
 import de.ovgu.featureide.fm.core.FeatureStatus;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelStructure;
@@ -207,35 +210,58 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 	public void setRoot(IFeatureStructure root) {
 		rootFeature = root;
 	}
+	
+	private boolean existsFeatureWithStatus(FeatureStatus status) {
+		for (final IFeature f : correspondingFeatureModel.getFeatureTable().values()) {
+			if (f.getProperty().getFeatureStatus() == status) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	@Override
 	public boolean hasFalseOptionalFeatures() {
-		throw new UnsupportedOperationException ("Not implemented");
+		return existsFeatureWithStatus(FeatureStatus.FALSE_OPTIONAL);
 	}
 
 	@Override
 	public boolean hasUnsatisfiableConstraints() {
-		throw new UnsupportedOperationException("No implemented");
+		return existsConstraintWithAttribute(ConstraintAttribute.UNSATISFIABLE);
 	}
 
 	@Override
 	public boolean hasTautologyConstraints() {
-		throw new UnsupportedOperationException("No implemented");
+		return existsConstraintWithAttribute(ConstraintAttribute.TAUTOLOGY);
 	}
 
 	@Override
 	public boolean hasDeadConstraints() {
-		throw new UnsupportedOperationException("No implemented");
+		for (IConstraint c : getFeatureModel().getConstraints()) {
+			if (c.getConstraintAttribute() == ConstraintAttribute.DEAD || !c.getDeadFeatures().isEmpty()) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
 	public boolean hasVoidModelConstraints() {
-		throw new UnsupportedOperationException("No implemented");
+		return existsConstraintWithAttribute(ConstraintAttribute.VOID_MODEL);
+	}
+
+	private boolean existsConstraintWithAttribute(ConstraintAttribute attribute) {
+		for (IConstraint c : getFeatureModel().getConstraints()) {
+			if (c.getConstraintAttribute() == attribute) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
 	public boolean hasRedundantConstraints() {
-		throw new UnsupportedOperationException("No implemented");
+		return existsConstraintWithAttribute(ConstraintAttribute.REDUNDANT);
 	}
 
 }

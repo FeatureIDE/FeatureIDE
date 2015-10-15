@@ -36,7 +36,7 @@ import de.ovgu.featureide.fm.core.base.IGraphicalFeature;
  */
 public class GraphicalFeature implements IGraphicalFeature, PropertyConstants {
 
-	protected ColorList colorList = new ColorList(getFeature());
+	protected ColorList colorList;
 
 	protected boolean constraintSelected;
 	protected IFeature correspondingFeature;
@@ -45,6 +45,7 @@ public class GraphicalFeature implements IGraphicalFeature, PropertyConstants {
 
 	public GraphicalFeature(IFeature correspondingFeature) {
 		this.correspondingFeature = correspondingFeature;
+		colorList = new ColorList(correspondingFeature);
 	}
 
 	@Override

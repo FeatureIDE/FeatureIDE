@@ -50,23 +50,34 @@ public class Feature implements IFeature, PropertyConstants {
 
 	protected final IFeatureProperty property;
 	protected final IFeatureStructure structure;
+	protected IGraphicalFeature graphicalRepresentation;
+	private boolean constraintSelected;
 
 	protected Feature(Feature oldFeature, IFeatureModel featureModel, IFeatureStructure newFeatrureStructure) {
 		this.featureModel = featureModel != null ? featureModel : oldFeature.featureModel;
 		name = new String(oldFeature.name.toString());
+		graphicalRepresentation = oldFeature.graphicalRepresentation;
+		constraintSelected = oldFeature.constraintSelected;
 
 		property = oldFeature.property.clone(this);
 		structure = newFeatrureStructure != null ? newFeatrureStructure : oldFeature.structure;
+		
 	}
 
 	public Feature(IFeatureModel featureModel, CharSequence name) {
 		this.featureModel = featureModel;
 		this.name = name;
-
+		this.constraintSelected = false;
+		
 		property = createProperty();
 		structure = createStructure();
+		graphicalRepresentation = createGraphicalRepresentation();
 	}
 	
+	protected IGraphicalFeature createGraphicalRepresentation() {
+		return new GraphicalFeature(this);
+	}
+
 	protected IFeatureProperty createProperty() {
 		return new FeatureProperty(this);
 	}
@@ -161,17 +172,17 @@ public class Feature implements IFeature, PropertyConstants {
 
 	@Override
 	public IGraphicalFeature getGraphicRepresenation() {
-		throw new UnsupportedOperationException("Not implemented yet");
+		return graphicalRepresentation;
 	}
 
 	@Override
 	public boolean isConstraintSelected() {
-		throw new UnsupportedOperationException("No implemented");
+		return constraintSelected;
 	}
 
 	@Override
 	public void setConstraintSelected(boolean b) {
-		throw new UnsupportedOperationException("No implemented");
+		constraintSelected = b;
 	}
 
 	/* (non-Javadoc)

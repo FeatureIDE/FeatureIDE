@@ -702,19 +702,19 @@ public abstract class FeatureUtils {
 	}
 
 	public static final void addPropositionalNode(IFeatureModel featureModel, Node node) {
-		featureModel.getConstraints().add(new Constraint(featureModel, node));
+		featureModel.addConstraint(new Constraint(featureModel, node));
 	}
 
 	public static final void addConstraint(IFeatureModel featureModel, IConstraint constraint) {
-		featureModel.getConstraints().add(constraint);
+		featureModel.addConstraint(constraint);
 	}
 
 	public static final void addPropositionalNode(IFeatureModel featureModel, Node node, int index) {
-		featureModel.getConstraints().add(index, new Constraint(featureModel, node));
+		featureModel.addConstraint(new Constraint(featureModel, node), index);
 	}
 
 	public static final void addConstraint(IFeatureModel featureModel, IConstraint constraint, int index) {
-		featureModel.getConstraints().add(index, constraint);
+		featureModel.addConstraint(constraint, index);
 	}
 
 	public static final Iterable<Node> getPropositionalNodes(IFeatureModel featureModel) {

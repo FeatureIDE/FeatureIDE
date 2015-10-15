@@ -74,5 +74,7 @@ public interface IConstraint {
 	boolean isFeatureSelected();
 
 	void setFeatureSelected(boolean b);
+	
+	String getDisplayName();
 
 }

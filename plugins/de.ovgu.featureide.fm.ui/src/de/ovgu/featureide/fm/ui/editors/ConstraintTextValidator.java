@@ -154,7 +154,7 @@ public final class ConstraintTextValidator {
 		for (IFeature feature : model.getFeatures()) {
 			if (input.contains(feature.getName())) {
 				//if (feature.getFeatureStatus() != FeatureStatus.FALSE_OPTIONAL) {
-				clonedModel.getConstraints().add(new Constraint(clonedModel, propNode));
+				clonedModel.addConstraint(new Constraint(clonedModel, propNode));
 				clonedModel.getAnalyser().analyzeFeatureModel(null);
 				if (clonedModel.getFeature(feature.getName()).getProperty().getFeatureStatus() == FeatureStatus.FALSE_OPTIONAL && !list.contains(feature))
 					list.add(feature);
@@ -540,7 +540,7 @@ public final class ConstraintTextValidator {
 			if (constraint != null) {
 				clonedModel.removeConstraint(constraint);
 			}
-			clonedModel.getConstraints().add(new Constraint(clonedModel, propNode));
+			clonedModel.addConstraint(new Constraint(clonedModel, propNode));
 			clonedModel.handleModelDataChanged();
 		}
 

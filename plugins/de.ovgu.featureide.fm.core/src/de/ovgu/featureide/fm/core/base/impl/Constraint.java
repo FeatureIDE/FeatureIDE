@@ -56,17 +56,24 @@ public class Constraint implements IConstraint, PropertyConstants {
 	protected final Collection<IFeature> falseOptionalFeatures = new LinkedList<>();
 	protected final IFeatureModel featureModel;
 	protected final Collection<PropertyChangeListener> listenerList = new LinkedList<>();
+	
+	protected IGraphicalConstraint graphicalRepresentation;
 
 	protected final Node propNode;
+	boolean featureSelected;
 
 	protected Constraint(Constraint oldConstraint, IFeatureModel featureModel) {
 		this.featureModel = featureModel;
 		propNode = oldConstraint.propNode;
+		this.featureSelected = oldConstraint.featureSelected;
+		this.graphicalRepresentation = oldConstraint.graphicalRepresentation;
 	}
 
 	public Constraint(IFeatureModel featureModel, Node propNode) {
 		this.featureModel = featureModel;
 		this.propNode = propNode;
+		this.featureSelected = false;
+		this.graphicalRepresentation = new GraphicalConstraint(this);
 	}
 
 	@Override
@@ -184,6 +191,11 @@ public class Constraint implements IConstraint, PropertyConstants {
 	public Node getNode() {
 		return propNode;
 	}
+	
+	@Override
+	public String getDisplayName() {
+		return propNode.toString();
+	}
 
 	@Override
 	public boolean hasHiddenFeatures() {
@@ -236,17 +248,18 @@ public class Constraint implements IConstraint, PropertyConstants {
 
 	@Override
 	public IGraphicalConstraint getGraphicRepresenation() {
-		throw new UnsupportedOperationException("No implemented");
+		return graphicalRepresentation;
 	}
 
 	@Override
 	public boolean isFeatureSelected() {
-		throw new UnsupportedOperationException("No implemented");
+		return featureSelected; 
 	}
 
 	@Override
 	public void setFeatureSelected(boolean b) {
-		throw new UnsupportedOperationException("No implemented");
+		featureSelected = b;
+		fireEvent(new PropertyChangeEvent(this, CONSTRAINT_SELECTED, Boolean.FALSE, Boolean.TRUE));
 	}
 
 

@@ -25,12 +25,15 @@ import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.TreeItem;
 
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.ui.views.outline.FmLabelProvider;
 
 /**
  * Wrapper for the feature-model label provider
  * 
- * @author Reimar Schröter
+ * @author Reimar Schroeter
  */
 public class FMOutlineLabelProviderWrapper extends OutlineLabelProvider {
 
@@ -43,7 +46,11 @@ public class FMOutlineLabelProviderWrapper extends OutlineLabelProvider {
 
 	@Override
 	public String getText(Object element) {
-		return prov.getText(element);
+		if (element instanceof IFeature) {
+			return prov.getText(((IFeature)element).getName());
+		} else if (element instanceof IConstraint) {
+			return prov.getText(((IConstraint)element).getDisplayName());
+		} else return prov.getText(element);
 	}
 
 	@Override

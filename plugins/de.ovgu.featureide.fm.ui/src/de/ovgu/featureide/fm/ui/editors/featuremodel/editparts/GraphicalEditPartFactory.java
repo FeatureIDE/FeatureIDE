@@ -23,7 +23,13 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.editparts;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPartFactory;
 
+import de.ovgu.featureide.fm.core.FeatureConnection;
 import de.ovgu.featureide.fm.core.IGraphicItem;
+import de.ovgu.featureide.fm.core.IGraphicItem.GraphicItem;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.Legend;
 
 /**
  * Creates edit parts for given models.
@@ -33,20 +39,33 @@ import de.ovgu.featureide.fm.core.IGraphicItem;
 public class GraphicalEditPartFactory implements EditPartFactory {
 
 	public EditPart createEditPart(EditPart context, Object model) {
-		switch (((IGraphicItem) model).getItemType()) {
-		case Connection:
-			return new ConnectionEditPart(model);
-		case Constraint:
-			return new ConstraintEditPart(model);
-		case Feature:
-			return new FeatureEditPart(model);
-		case Legend:
-			return new LegendEditPart(model);
-		case Model:
+		if (model instanceof IFeature) {
+			return new FeatureEditPart(((IFeature) model));
+		} else if (model instanceof IFeatureModel) {
 			return new ModelEditPart(model);
-		default:
-			return null;
-		}
+		} else if (model instanceof FeatureConnection) {
+			return new ConnectionEditPart(model); 
+		} else if (model instanceof IConstraint) {
+			return new ConstraintEditPart(model);
+		} else if (model instanceof Legend) {
+			return new LegendEditPart(model);
+		} else throw new UnsupportedOperationException("Not implememented for " + model.getClass());
+//		GraphicItem item = (model instanceof IFeature) ? (((IFeature) model).getGraphicRepresenation().getItemType()) : (((IFeatureModel) model)
+//				.getGraphicRepresenation().getItemType());
+//		switch (item) {
+//		case Connection:
+//			return new ConnectionEditPart(model);
+//		case Constraint:
+//			
+//		case Feature:
+//			
+//		case Legend:
+//			return new LegendEditPart(model);
+//		case Model:
+//			return new ModelEditPart(model);
+//		default:
+//			return null;
+//		}
 	}
 
 }

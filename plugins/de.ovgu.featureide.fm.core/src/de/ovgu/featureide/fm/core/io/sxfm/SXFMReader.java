@@ -416,10 +416,10 @@ public class SXFMReader extends AbstractFeatureModelReader {
 					INVALID, line);
     		int f = children.size();
     		node = buildMinConstr(FeatureUtils.convertToFeatureList(children), f - start + 1, feat.getName());
-    		featureModel.getConstraints().add(new Constraint(featureModel, node));
+    		featureModel.addConstraint(new Constraint(featureModel, node));
     		if ((start > 0) && (end < f)) {
     			node = buildMaxConstr(FeatureUtils.convertToFeatureList(children), end + 1);
-    			featureModel.getConstraints().add(new Constraint(featureModel, node));
+    			featureModel.addConstraint(new Constraint(featureModel, node));
     		}
     	}
     }

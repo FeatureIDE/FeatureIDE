@@ -62,7 +62,7 @@ public class FmTreeContentProvider implements ITreeContentProvider {
 		Object[] elements;
 		if (fModel != null && fModel.getStructure().getRoot() != null) {
 			elements = new Object[2];
-			elements[0] = fModel.getStructure().getRoot();
+			elements[0] = fModel.getStructure().getRoot().getFeature();
 			elements[1] = CONSTRAINTS;
 			return elements;
 		}

@@ -653,7 +653,7 @@ public class ConstraintDialog implements GUIDefaults {
 				clonedModel.removeConstraint(constraint);
 			}
 			deadFeaturesBefore = clonedModel.getAnalyser().getDeadFeatures();
-			clonedModel.getConstraints().add(new Constraint(clonedModel, (propNode)));
+			clonedModel.addConstraint(new Constraint(clonedModel, (propNode)));
 			clonedModel.handleModelDataChanged();
 		}
 
