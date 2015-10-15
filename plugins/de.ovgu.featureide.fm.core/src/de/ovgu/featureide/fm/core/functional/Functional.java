@@ -114,7 +114,6 @@ public abstract class Functional {
 		}
 	};
 
-
 	/**
 	 * Implements an iterable iterator that invokes a user-defined {@link Functional.IFunction Function} <i>f</i> of type <b>T</b> and <b>U</b> on
 	 * each
@@ -201,7 +200,7 @@ public abstract class Functional {
 			this.collectionIterator = it.iterator();
 			this.filter = filter;
 		}
-		
+
 		@Override
 		public boolean hasNext() {
 			while (collectionIterator.hasNext()) {
@@ -270,8 +269,7 @@ public abstract class Functional {
 	}
 
 	/**
-	 * Converts the iterator of type <b>T</b> into an iterator of type <b>String</b> by invoking <code>toString()</code> on each element.
-	 * <br/>
+	 * Converts the iterator of type <b>T</b> into an iterator of type <b>String</b> by invoking <code>toString()</code> on each element. <br/>
 	 * It is guaranteed to not remove any element from the iterator. <br/>
 	 * <br/>
 	 * This is a <b>non-blocking</b> operation.
@@ -306,7 +304,7 @@ public abstract class Functional {
 		}
 		return Collections.unmodifiableList(retval);
 	}
-	
+
 	/**
 	 * Converts the iterator <i>i</i> of type <b>T</b> into an set of type <b>T</b> by adding each element of <i>i</i> to the result set. <br/>
 	 * <br/>
@@ -345,12 +343,12 @@ public abstract class Functional {
 	public static <T> Collection<String> mapToStringList(final Iterable<T> source) {
 		return retype(source, new ToStringFunction<T>());
 	}
-	
+
 	public static <T> Collection<CharSequence> mapToCharSequenceList(final Iterable<T> source) {
 		return retype(source, new ToCharSequenceFunction<T>());
 	}
 
-	public static <T,R> Collection<R> retype(Iterable<T> source, Functional.IFunction<T, R> convertFunction) {
+	public static <T, R> Collection<R> retype(Iterable<T> source, Functional.IFunction<T, R> convertFunction) {
 		return toList(map(source, convertFunction));
 	}
 
@@ -376,6 +374,32 @@ public abstract class Functional {
 			}
 		};
 	}
-	
+
+	public static <T, R> R join(final Iterable<T> source, final R delimiter, final IProvider<R> newInstanceOfR, final IFunction<T, R> convert,
+			final IBinaryFunction<R, R, R> concat) {
+		R result = newInstanceOfR.invoke();
+		final List<T> list = toList(source);
+		for (int i = 0; i < list.size(); i++) {
+			result = concat.invoke(result, convert.invoke(list.get(i)));
+			if (i + 1 < list.size())
+				result = concat.invoke(result, delimiter);
+		}
+		return result;
+	}
+
+	public static <T> String join(final Iterable<T> source, final String delimiter, final IFunction<T, String> convert) {
+		return join(source, delimiter, new IProvider<String>() {
+			@Override
+			public String invoke() {
+				return "";
+			}
+		}, convert, new IBinaryFunction<String, String, String>() {
+			@Override
+			public String invoke(String t, String u) {
+				return t + u;
+			}
+
+		});
+	}
 
 }

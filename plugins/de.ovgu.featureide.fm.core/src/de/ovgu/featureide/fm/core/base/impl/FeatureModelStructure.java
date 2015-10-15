@@ -42,6 +42,43 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
  */
 public class FeatureModelStructure implements IFeatureModelStructure {
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((rootFeature == null) ? 0 : rootFeature.hashCode());
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		FeatureModelStructure other = (FeatureModelStructure) obj;
+		if (correspondingFeatureModel == null) {
+			if (other.correspondingFeatureModel != null)
+				return false;
+		} 
+		//else if (!correspondingFeatureModel.equals(other.correspondingFeatureModel))
+		//	return false;
+		if (rootFeature == null) {
+			if (other.rootFeature != null)
+				return false;
+		} else if (!rootFeature.equals(other.rootFeature))
+			return false;
+		return true;
+	}
+
 	protected final IFeatureModel correspondingFeatureModel;
 
 	protected IFeatureStructure rootFeature;

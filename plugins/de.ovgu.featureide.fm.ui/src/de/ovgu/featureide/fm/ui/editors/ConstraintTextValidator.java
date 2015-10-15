@@ -93,7 +93,7 @@ public final class ConstraintTextValidator {
 				clonedModel.removeConstraint(constraint);
 			}
 			deadFeaturesBefore = clonedModel.getAnalyser().getDeadFeatures();
-			clonedModel.getConstraints().add(new Constraint(clonedModel, propNode));
+			clonedModel.addConstraint(new Constraint(clonedModel, propNode));
 			clonedModel.handleModelDataChanged();
 		}
 
@@ -129,7 +129,7 @@ public final class ConstraintTextValidator {
 				isNewLine = true;
 			}
 			if (count < 90) {
-				featureString.append(l);
+				featureString.append(l.getName());
 				if (featureCount < deadFeatures.size() - 1)
 					featureString.append(", ");
 				featureCount++;
@@ -166,9 +166,9 @@ public final class ConstraintTextValidator {
 	}
 
 	private String getFalseOptionalString(List<IFeature> list) {
-		String listString = list.toString();
+		String listString = Functional.join(list, ",", FeatureUtils.GET_FEATURE_NAME);
 		String featureString = "Constraint causes the following features to be false optional: " + '\n';
-		return featureString + listString.substring(1, listString.length() - 1);
+		return featureString + listString;
 	}
 
 	/**
@@ -184,7 +184,7 @@ public final class ConstraintTextValidator {
 		}
 		IFeatureModel clonedModel = featureModel.clone(null);
 		Node propNode = new NodeReader().stringToNode(constraint, Functional.toList(FeatureUtils.extractFeatureNames(clonedModel.getFeatures())));
-		clonedModel.getConstraints().add(new Constraint(clonedModel, propNode));
+		clonedModel.addConstraint(new Constraint(clonedModel, propNode));
 		if (new ModelComparator(20000).compare(featureModel, clonedModel) == Comparison.REFACTORING) {
 			return true;
 		}

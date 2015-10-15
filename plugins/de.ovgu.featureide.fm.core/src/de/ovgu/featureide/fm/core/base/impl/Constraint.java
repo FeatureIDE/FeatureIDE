@@ -80,7 +80,6 @@ public class Constraint implements IConstraint, PropertyConstants {
 	public int hashCode() { // Marcus: required for Constraints.remove(Constraint), e.g. Generator.java:124
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((featureModel == null) ? 0 : featureModel.hashCode());
 		result = prime * result + ((propNode == null) ? 0 : propNode.hashCode());
 		return result;
 	}
@@ -97,8 +96,9 @@ public class Constraint implements IConstraint, PropertyConstants {
 		if (featureModel == null) {
 			if (other.featureModel != null)
 				return false;
-		} else if (!featureModel.equals(other.featureModel))
-			return false;
+		} 
+		//else if (!featureModel.equals(other.featureModel))
+		//	return false;
 		if (propNode == null) {
 			if (other.propNode != null)
 				return false;

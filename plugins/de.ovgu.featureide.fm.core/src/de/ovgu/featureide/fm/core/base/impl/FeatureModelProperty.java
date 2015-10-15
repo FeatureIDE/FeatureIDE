@@ -36,6 +36,52 @@ import de.ovgu.featureide.fm.core.base.IFeatureModelProperty;
  */
 public class FeatureModelProperty implements IFeatureModelProperty {
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((annotations == null) ? 0 : annotations.hashCode());
+		result = prime * result + ((comments == null) ? 0 : comments.hashCode());
+		result = prime * result + (featureOrderInXML ? 1231 : 1237);
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		FeatureModelProperty other = (FeatureModelProperty) obj;
+		if (annotations == null) {
+			if (other.annotations != null)
+				return false;
+		} else if (!annotations.equals(other.annotations))
+			return false;
+		if (comments == null) {
+			if (other.comments != null)
+				return false;
+		} else if (!comments.equals(other.comments))
+			return false;
+		if (correspondingFeatureModel == null) {
+			if (other.correspondingFeatureModel != null)
+				return false;
+		} 
+//		else if (!correspondingFeatureModel.equals(other.correspondingFeatureModel))
+//			return false;
+		if (featureOrderInXML != other.featureOrderInXML)
+			return false;
+		return true;
+	}
+
 	/**
 	 * Saves the annotations from the model file as they were read,
 	 * because they were not yet used.

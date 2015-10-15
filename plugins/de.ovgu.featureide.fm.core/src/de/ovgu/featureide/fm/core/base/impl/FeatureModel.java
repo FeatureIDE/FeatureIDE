@@ -64,6 +64,49 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  */
 public class FeatureModel implements IFeatureModel, PropertyConstants {
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((constraints == null) ? 0 : constraints.hashCode());
+		result = prime * result + ((property == null) ? 0 : property.hashCode());
+		result = prime * result + ((structure == null) ? 0 : structure.hashCode());
+		return result;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		FeatureModel other = (FeatureModel) obj;
+		if (constraints == null) {
+			if (other.constraints != null)
+				return false;
+		} else if (!constraints.equals(other.constraints))
+			return false;
+		if (property == null) {
+			if (other.property != null)
+				return false;
+		} else if (!property.equals(other.property))
+			return false;
+		if (structure == null) {
+			if (other.structure != null)
+				return false;
+		} else if (!structure.equals(other.structure))
+			return false;
+		return true;
+	}
+
 	protected final FeatureModelAnalyzer analyser = createAnalyser();
 	protected final List<IConstraint> constraints = new LinkedList<>();
 
