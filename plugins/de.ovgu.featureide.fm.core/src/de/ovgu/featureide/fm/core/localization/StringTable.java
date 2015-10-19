@@ -463,7 +463,8 @@ public class StringTable {
 	public static final String RENAME_FEATURE = "Rename Feature";
 	public static final String SET_FEATURE_ABSTRACT = "Set Feature Abstract";
 	public static final String SET_FEATURE_CONCRETE = "Set Feature Concrete";
-	public static final String SET_FEATURE_NOT_HIDDEN = "Set Feature Not-Hidden";
+	public static final String DEFAULT_FEATURE_LAYER_CAPTION = "NewFeature";
+    public static final String SET_FEATURE_NOT_HIDDEN = "Set Feature Not-Hidden";
 	public static final String SET_FEATURE_HIDDEN = "Set Feature Hidden";
 	public static final String SET_FEATURE_MANDATORY = "Set Feature Mandatory";
 	public static final String SET_FEATURE_OPTIONAL = "Set Feature Optional";

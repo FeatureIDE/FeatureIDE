@@ -45,6 +45,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.draw2d.ConnectionLayer;
 import org.eclipse.gef.DefaultEditDomain;
 import org.eclipse.gef.EditDomain;
+import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPartViewer;
 import org.eclipse.gef.GraphicalViewer;
 import org.eclipse.gef.KeyHandler;
@@ -62,6 +63,9 @@ import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
@@ -540,7 +544,29 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	}
 
 	public void reload() {
+		Object model = null;
+		final EditPartViewer editPartViewer = getContents().getViewer();
+		if (editPartViewer != null) {
+			final ISelection selection = editPartViewer.getSelection();
+			if (selection instanceof IStructuredSelection) {
+				final IStructuredSelection iStructuredSelection = (IStructuredSelection) selection;
+				if (iStructuredSelection.size() == 1) {
+					final Object firstElement = iStructuredSelection.getFirstElement();
+					if (firstElement instanceof EditPart) {
+						model = ((EditPart) firstElement).getModel();
+					}
+				}
+			}
+		}
+
 		setContents(getFeatureModel());
+
+		if (model != null) {
+			final Object element = editPartViewer.getEditPartRegistry().get(model);
+			if (element != null) {
+				editPartViewer.setSelection(new StructuredSelection(element));
+			}
+		}
 	}
 
 	public void refresh() {

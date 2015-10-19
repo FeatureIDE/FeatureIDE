@@ -82,7 +82,6 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -110,11 +109,9 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTConfiguration;
-import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.listeners.ICurrentBuildListener;
 import de.ovgu.featureide.fm.core.AWaitingJob;
-import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.job.AStoppableJob;
 import de.ovgu.featureide.fm.ui.GraphicsExporter;
@@ -127,7 +124,6 @@ import de.ovgu.featureide.ui.views.collaboration.action.FilterAction;
 import de.ovgu.featureide.ui.views.collaboration.action.SetColorAction;
 import de.ovgu.featureide.ui.views.collaboration.action.ShowFieldsMethodsAction;
 import de.ovgu.featureide.ui.views.collaboration.action.ShowUnselectedAction;
-import de.ovgu.featureide.ui.views.collaboration.editparts.CollaborationEditPart;
 import de.ovgu.featureide.ui.views.collaboration.editparts.GraphicalEditPartFactory;
 import de.ovgu.featureide.ui.views.collaboration.figures.RoleFigure;
 import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModelBuilder;
@@ -178,7 +174,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	private ShowUnselectedAction showUnselectedAction;
 	private Point cursorPosition;
 	private CollaborationViewSearch search;
-	private MenuManager colorSubMenu;
 	
 	/*
 	 * the following codefragments which are commented out, create the submenu of the colorscheme
@@ -497,7 +492,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		control.setMenu(menu);
 		getSite().registerContextMenu(menuMgr, viewer);
 
-		colorSubMenu = new MenuManager("Color");
 	}
 
 	private void fillContextMenu(IMenuManager menuMgr) {
@@ -531,70 +525,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 				}
 			}
 			menuMgr.add(methodsFieldsSubMenu);
-		}
-
-		Object selection = ((IStructuredSelection) viewer.getSelection()).getFirstElement();
-		if (selection instanceof CollaborationEditPart) {
-			FSTFeature coll = ((CollaborationEditPart) selection).getCollaborationModel();
-			if (!(coll instanceof FSTConfiguration)) {
-				FeatureModel fm = featureProject.getFeatureModel();
-//				ColorschemeTable colorschemeTable = fm.getColorschemeTable();
-//				List<String> csNames = colorschemeTable.getColorschemeNames();
-//
-//				ProfileManager.Project projet = ProfileManager.getProject(fm.xxxGetEclipseProjectPath(), PlugInProfileSerializer.FEATURE_PROJECT_SERIALIZER);
-//				final String curColorSchemeName = ProfileManager.getProject(fm.xxxGetEclipseProjectPath(), PlugInProfileSerializer.FEATURE_PROJECT_SERIALIZER).getActiveProfile().getName();
-//				
-//				MenuManager colorSchemeSubMenu = null;
-//
-//				if (curColorSchemeName != null) {
-//					colorSchemeSubMenu = new MenuManager(curColorSchemeName);
-//				} else {
-//					colorSchemeSubMenu = new MenuManager(NO_COLORSCHEME_SELECTED);
-//				}
-//
-//				int count = 0;
-//				for (String name : projet.getProfileNames()) {
-//					SetColorSchemeAction setCSAction = new SetColorSchemeAction(name, viewer, this, ++count, name);
-//					if (name.equals(curColorSchemeName)) {
-//						setCSAction.setChecked(true);
-//					}
-//					colorSchemeSubMenu.add(setCSAction);
-//				}
-//
-//				colorSchemeSubMenu.add(new Separator());
-//				colorSchemeSubMenu.add(addColorSchemeAction);
-//				
-//				colorSchemeSubMenu.add(renameColorSchemeAction);
-//				colorSchemeSubMenu.add(deleteColorSchemeAction);
-//				renameColorSchemeAction.setEnabled(!curColorSchemeName.equals("Default"));
-//				deleteColorSchemeAction.setEnabled(!curColorSchemeName.equals("Default"));
-				
-				colorSubMenu.removeAll();
-				//colorSubMenu.add(colorSchemeSubMenu);
-				colorSubMenu.add(new Separator());
-
-				//boolean enableColorActions = colorschemeTable.getSelectedColorscheme() > 0;
-//				for (int i = 0; i < setColorActions.length; i++) {
-//					//setColorActions[i].setEnabled(enableColorActions);
-//					setColorActions[i].setChecked(false);
-//					colorSubMenu.add(setColorActions[i]);
-//				}
-
-				
-//				int color = fm.getFeature(coll.getName()).getColorList().getColor();
-//				if (ColorList.isValidColor(color)) {
-//					setColorActions[color].setChecked(true);
-//				}
-//				ProfileManager.Project.Profile profile =  ProfileManager.getProject(fm.xxxGetEclipseProjectPath(), PlugInProfileSerializer.FEATURE_PROJECT_SERIALIZER).getActiveProfile();
-//				Color color = profile.getColor(coll.getName());
-//				int colorIndex = ProfileManager.toColorIndex(color);
-//				if (ColorList.isValidColor(ProfileManager.toColorIndex(color))) {
-//					setColorActions[colorIndex].setChecked(true);
-//				}
-//				
-//
-				menuMgr.add(colorSubMenu);
-			}
 		}
 
 		menuMgr.add(new Separator());
@@ -638,10 +568,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		for (int i = 0; i < setColorActions.length; i++) {
 			setColorActions[i] = new SetColorAction(viewer, this, i);
 		}
-
-//		addColorSchemeAction = new AddColorSchemeAction("&Add Colorscheme", viewer, this);
-//		renameColorSchemeAction = new RenameColorSchemeAction("&Rename Selected Colorscheme", viewer, this);
-//		deleteColorSchemeAction = new DeleteColorSchemeAction("&Delete Selected Colorscheme", viewer, this);
 	}
 
 	private boolean deselectAll() {
@@ -865,12 +791,11 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		return false;
 	}
 
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public Object getAdapter(Class adapter) {
 		if (GraphicalViewer.class.equals(adapter) || ViewPart.class.equals(adapter))
 			return viewer;
-
 		return super.getAdapter(adapter);
 	}
 

@@ -73,7 +73,6 @@ public class CollaborationViewSearch {
 		protected void configureShell(Shell newShell) {
 			super.configureShell(newShell);
 			newShell.setText(this.title);
-
 		}
 
 		@Override
@@ -82,6 +81,8 @@ public class CollaborationViewSearch {
 			container.setLayout(new FillLayout());
 			this.searchTextBox = new Text(container, SWT.SEARCH | SWT.SINGLE | SWT.ICON_SEARCH);
 			this.searchTextBox.setBounds(500, 500, 200, 50);
+			this.searchTextBox.setText(searchText);
+			this.searchTextBox.setSelection(searchText.length());
 			return container;
 		}
 
@@ -160,16 +161,18 @@ public class CollaborationViewSearch {
 		attachedViewerParent.setKeyHandler(new KeyHandler() {
 
 			@Override
-			public boolean keyReleased(KeyEvent event) {
+			public boolean keyPressed(KeyEvent event) {
+				if (event.keyCode == SWT.ESC) {
+					uncolorOldLabels();
+				} else if (event.keyCode >= BEGIN_OF_VALID_ASCII_CHARS && event.keyCode <= END_OF_VALID_ASCII_CHARS) {
+					if (searchDialog == null) {
+						searchDialog = new SearchDialog(PlatformUI.getWorkbench().getDisplay().getActiveShell(), searchBoxText);
+					}
 
-				if (searchDialog == null) {
-					searchDialog = new SearchDialog(PlatformUI.getWorkbench().getDisplay().getActiveShell(), searchBoxText);
-				}
-				if (event.keyCode != SWT.ESC && event.keyCode >= BEGIN_OF_VALID_ASCII_CHARS && event.keyCode <= END_OF_VALID_ASCII_CHARS) {
-
+					searchDialog.searchText = Character.toString(event.character);
 					searchDialog.open();
 					String searchText = searchDialog.getSearchText();
-					if (!searchText.equals("")) {
+					if (!searchText.isEmpty()) {
 						uncolorOldLabels();
 						matchedLabels.clear();
 						for (Label label : extractedLabels) {
@@ -180,10 +183,6 @@ public class CollaborationViewSearch {
 							}
 						}
 					}
-
-				} else if (event.keyCode == SWT.ESC) {
-					uncolorOldLabels();
-
 				}
 				return true;
 			}
