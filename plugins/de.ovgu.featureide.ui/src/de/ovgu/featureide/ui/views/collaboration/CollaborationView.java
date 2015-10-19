@@ -37,7 +37,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.HIDE_PARAMETER
 import static de.ovgu.featureide.fm.core.localization.StringTable.METHODS_WITHOUT_REFINEMENTS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.METHODS_WITH_REFINEMENTS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.MODEL_LOADING_ERROR;
-import static de.ovgu.featureide.fm.core.localization.StringTable.NO_COLORSCHEME_SELECTED;
 import static de.ovgu.featureide.fm.core.localization.StringTable.OPEN_A_FILE_FROM_A_FEATUREIDE_PROJECT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PRIVATE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PROTECTED;
@@ -52,12 +51,9 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SHOW_NESTED_CL
 import static de.ovgu.featureide.fm.core.localization.StringTable.SHOW_UNSELECTED_FEATURES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATE_COLLABORATION_VIEW;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Vector;
 
 import org.eclipse.core.resources.IFile;
@@ -86,8 +82,8 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
@@ -113,31 +109,21 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTConfiguration;
-import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.listeners.ICurrentBuildListener;
 import de.ovgu.featureide.fm.core.AWaitingJob;
-import de.ovgu.featureide.fm.core.ColorList;
-import de.ovgu.featureide.fm.core.ColorschemeTable;
-import de.ovgu.featureide.fm.core.PropertyConstants;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.job.AStoppableJob;
 import de.ovgu.featureide.fm.ui.GraphicsExporter;
 import de.ovgu.featureide.ui.UIPlugin;
-import de.ovgu.featureide.ui.editors.annotation.ColorPalette;
-import de.ovgu.featureide.ui.views.collaboration.action.AddColorSchemeAction;
 import de.ovgu.featureide.ui.views.collaboration.action.AddRoleAction;
 import de.ovgu.featureide.ui.views.collaboration.action.DeleteAction;
-import de.ovgu.featureide.ui.views.collaboration.action.DeleteColorSchemeAction;
 import de.ovgu.featureide.ui.views.collaboration.action.ExportAsImageImpl;
 import de.ovgu.featureide.ui.views.collaboration.action.ExportAsXmlImpl;
 import de.ovgu.featureide.ui.views.collaboration.action.FilterAction;
-import de.ovgu.featureide.ui.views.collaboration.action.RenameColorSchemeAction;
 import de.ovgu.featureide.ui.views.collaboration.action.SetColorAction;
-import de.ovgu.featureide.ui.views.collaboration.action.SetColorSchemeAction;
 import de.ovgu.featureide.ui.views.collaboration.action.ShowFieldsMethodsAction;
 import de.ovgu.featureide.ui.views.collaboration.action.ShowUnselectedAction;
-import de.ovgu.featureide.ui.views.collaboration.editparts.CollaborationEditPart;
 import de.ovgu.featureide.ui.views.collaboration.editparts.GraphicalEditPartFactory;
 import de.ovgu.featureide.ui.views.collaboration.figures.RoleFigure;
 import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModelBuilder;
@@ -188,10 +174,13 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	private ShowUnselectedAction showUnselectedAction;
 	private Point cursorPosition;
 	private CollaborationViewSearch search;
-	private MenuManager colorSubMenu;
-	private AddColorSchemeAction addColorSchemeAction;
-	private RenameColorSchemeAction renameColorSchemeAction;
-	private DeleteColorSchemeAction deleteColorSchemeAction;
+	
+	/*
+	 * the following codefragments which are commented out, create the submenu of the colorscheme
+	 */
+//	private AddColorSchemeAction addColorSchemeAction;
+//	private RenameColorSchemeAction renameColorSchemeAction;
+//	private DeleteColorSchemeAction deleteColorSchemeAction;
 	private ExportAsImageImpl exportAsImage;
 	private ExportAsXmlImpl exportAsXML;
 
@@ -447,16 +436,14 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 
 			if (featureProject != null) {
 				// case: it's a FeatureIDE project
-				featureProject.getFeatureModel().addListener(new PropertyChangeListener() {
-					@Override
-					public void propertyChange(PropertyChangeEvent event) {
-						if (PropertyConstants.MODEL_DATA_LOADED.equals(event.getPropertyName())) {
-							readColorsFromFile();
-						}
-					}
-				});
-
-				readColorsFromFile();
+//				featureProject.getFeatureModel().addListener(new PropertyChangeListener() {
+//					@Override
+//					public void propertyChange(PropertyChangeEvent event) {
+//						if (PropertyConstants.MODEL_DATA_LOADED.equals(event.getPropertyName())) {
+//							readColorsFromFile();
+//						}
+//					}
+//				});
 
 				if (CorePlugin.getDefault().getConfigurationExtensions().contains(inputFile.getFileExtension())) {
 					// case: open configuration editor
@@ -505,7 +492,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		control.setMenu(menu);
 		getSite().registerContextMenu(menuMgr, viewer);
 
-		colorSubMenu = new MenuManager("Color");
 	}
 
 	private void fillContextMenu(IMenuManager menuMgr) {
@@ -539,56 +525,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 				}
 			}
 			menuMgr.add(methodsFieldsSubMenu);
-		}
-
-		Object selection = ((IStructuredSelection) viewer.getSelection()).getFirstElement();
-		if (selection instanceof CollaborationEditPart) {
-			FSTFeature coll = ((CollaborationEditPart) selection).getCollaborationModel();
-			if (!(coll instanceof FSTConfiguration)) {
-				IFeatureModel fm = featureProject.getFeatureModel();
-				ColorschemeTable colorschemeTable = fm.getGraphicRepresenation().getColorschemeTable();
-				List<String> csNames = colorschemeTable.getColorschemeNames();
-
-				String curColorSchemeName = colorschemeTable.getSelectedColorschemeName();
-				MenuManager colorSchemeSubMenu = null;
-
-				if (curColorSchemeName != null) {
-					colorSchemeSubMenu = new MenuManager(curColorSchemeName);
-				} else {
-					colorSchemeSubMenu = new MenuManager(NO_COLORSCHEME_SELECTED);
-				}
-
-				int count = 0;
-				for (String name : csNames) {
-					SetColorSchemeAction setCSAction = new SetColorSchemeAction(name, viewer, this, ++count);
-					if (count == colorschemeTable.getSelectedColorscheme()) {
-						setCSAction.setChecked(true);
-					}
-					colorSchemeSubMenu.add(setCSAction);
-				}
-
-				colorSchemeSubMenu.add(new Separator());
-				colorSchemeSubMenu.add(addColorSchemeAction);
-				colorSchemeSubMenu.add(renameColorSchemeAction);
-				colorSchemeSubMenu.add(deleteColorSchemeAction);
-				colorSubMenu.removeAll();
-				colorSubMenu.add(colorSchemeSubMenu);
-				colorSubMenu.add(new Separator());
-
-				boolean enableColorActions = colorschemeTable.getSelectedColorscheme() > 0;
-				for (int i = 0; i < setColorActions.length; i++) {
-					setColorActions[i].setEnabled(enableColorActions);
-					setColorActions[i].setChecked(false);
-					colorSubMenu.add(setColorActions[i]);
-				}
-
-				int color = fm.getFeature(coll.getName()).getGraphicRepresenation().getColorList().getColor();
-				if (ColorList.isValidColor(color)) {
-					setColorActions[color].setChecked(true);
-				}
-
-				menuMgr.add(colorSubMenu);
-			}
 		}
 
 		menuMgr.add(new Separator());
@@ -632,10 +568,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		for (int i = 0; i < setColorActions.length; i++) {
 			setColorActions[i] = new SetColorAction(viewer, this, i);
 		}
-
-		addColorSchemeAction = new AddColorSchemeAction("&Add Colorscheme", viewer, this);
-		renameColorSchemeAction = new RenameColorSchemeAction("&Rename Selected Colorscheme", viewer, this);
-		deleteColorSchemeAction = new DeleteColorSchemeAction("&Delete Selected Colorscheme", viewer, this);
 	}
 
 	private boolean deselectAll() {
@@ -685,8 +617,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		Collections.sort(images, new ImageComarator());
 
 		Image finalImage = new Image(images.get(0).getDevice(), images.get(0).getBounds());
-		ImageData data = null;
-		org.eclipse.swt.graphics.GC gc = new org.eclipse.swt.graphics.GC(finalImage);
+		GC gc = new GC(finalImage);
 		int x = 0;
 		int y = 0;
 
@@ -704,8 +635,8 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 					finalImage.getBounds().width / 2, finalImage.getBounds().height / 2);
 
 		}
-		data = finalImage.getImageData();
-		data.transparentPixel = finalImage.getImageData().palette.getPixel(new RGB(255, 255, 255));
+		ImageData data = finalImage.getImageData();
+		data.transparentPixel = data.palette.getPixel(new RGB(255, 255, 255));
 		gc.dispose();
 
 		return new Image(images.get(0).getDevice(), data);
@@ -860,12 +791,11 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		return false;
 	}
 
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public Object getAdapter(Class adapter) {
 		if (GraphicalViewer.class.equals(adapter) || ViewPart.class.equals(adapter))
 			return viewer;
-
 		return super.getAdapter(adapter);
 	}
 
@@ -890,13 +820,4 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	public void refreshAll() {
 		refreshButton.run();
 	}
-
-	public void saveColorsToFile() {
-		featureProject.getFeatureModel().getGraphicRepresenation().getColorschemeTable().saveColorsToFile(featureProject.getProject());
-	}
-
-	private void readColorsFromFile() {
-		featureProject.getFeatureModel().getGraphicRepresenation().getColorschemeTable().readColorsFromFile(featureProject.getProject());
-	}
-
 }

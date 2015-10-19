@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.core.base.impl;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Hashtable;
@@ -116,6 +117,7 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	protected final IFeatureModelLayout modelLayout;
 
 	protected Object undoContext = null;
+	private File sourceFile;
 
 	public FeatureModel() {
 		featureOrderList = new LinkedList<String>();
@@ -135,6 +137,8 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 		structure = createStructure();
 		graphicalFeatureModel = oldFeatureModel.getGraphicRepresenation(); // TODO: Marcus XXX clone here?
 		modelLayout = oldFeatureModel.getLayout();
+		
+		this.sourceFile = oldFeatureModel.sourceFile;
 
 		if (newRoot == null) {
 			structure.setRoot(oldFeatureModel.getStructure().getRoot().cloneSubtree(this));// structure.getRoot().cloneSubtree(this));
@@ -556,6 +560,16 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 			if (i + 1 < constraints.size())
 				sb.append(", ");
 		}
+	}
+
+	@Override
+	public void xxxSetSourceFile(File file) {
+		this.sourceFile = file;
+	}
+
+	@Override
+	public File xxxGetSourceFile() {
+		return this.sourceFile;
 	}
 
 }

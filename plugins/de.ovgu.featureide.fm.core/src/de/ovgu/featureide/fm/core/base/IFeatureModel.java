@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.core.base;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.List;
@@ -53,7 +54,7 @@ public interface IFeatureModel extends Cloneable {
 	void addListener(PropertyChangeListener listener);
 
 	IFeatureModel clone(IFeature newRoot);
-	
+
 	IFeatureModel clone(IFeatureModel oldFeatureModel, boolean complete);
 
 	void createDefaultValues(CharSequence projectName);
@@ -71,7 +72,7 @@ public interface IFeatureModel extends Cloneable {
 	int getConstraintIndex(IConstraint constraint);
 
 	List<IConstraint> getConstraints();
-	
+
 	IFeature getFeature(CharSequence name);
 
 	Collection<String> getFeatureOrderList();
@@ -115,11 +116,11 @@ public interface IFeatureModel extends Cloneable {
 	void setFeatureOrderUserDefined(boolean featureOrderUserDefined);
 
 	void setFeatureTable(final Hashtable<String, IFeature> featureTable);
-	
-	IGraphicalFeatureModel getGraphicRepresenation();  // Added, Marcus Pinnecke 31.08.15
+
+	IGraphicalFeatureModel getGraphicRepresenation(); // Added, Marcus Pinnecke 31.08.15
 
 	Map<String, IFeature> getFeatureTable(); // Added, Marcus Pinnecke 31.08.15
-	
+
 	IFeatureModelLayout getLayout(); // Added, Marcus Pinnecke 13.09.15
 
 	IFeatureModel clone();
@@ -143,5 +144,13 @@ public interface IFeatureModel extends Cloneable {
 	void setUndoContext(Object undoContext);
 
 	void setFeatureOrderListItem(int i, String newName);
-	
+
+	// TODO: Remove this
+	// This is a hack actually used to determine the project of a feature model for coloring
+	void xxxSetSourceFile(File file);
+
+	// TODO: Remove this
+	// This is a hack actually used to determine the project of a feature model for coloring
+	File xxxGetSourceFile();
+
 }

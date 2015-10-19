@@ -40,6 +40,7 @@ import de.ovgu.featureide.core.signature.ProjectSignatures.SignatureIterator;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.core.signature.base.PreprocessorFeatureData;
 import de.ovgu.featureide.core.signature.filter.IFilter;
+import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.munge.MungePreprocessor;
 import de.ovgu.featureide.munge.signatures.MungeSignatureBuilder;
 
@@ -98,7 +99,7 @@ public class MungeModelBuilder extends PPModelBuilder {
 			}
 		}
 		if (sb.length() > 0) {
-			final Node constraint = new NodeReader().stringToNode(sb.toString(), featureNames);
+			final Node constraint = new NodeReader().stringToNode(sb.toString(), Functional.toList(featureNames));
 			for (; curSignatureIndex < sigLineNumber.size(); curSignatureIndex++) {
 				if (sigLineNumber.get(curSignatureIndex) >= startLine) {
 					if (sigLineNumber.get(curSignatureIndex) <= endline) {

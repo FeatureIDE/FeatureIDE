@@ -1075,6 +1075,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 	@Override
 	public void postCompile(IResourceDelta delta, final IFile file) {
 		super.postCompile(delta, file);
+		
 		try {
 			if (!file.getWorkspace().isTreeLocked()) {
 				file.refreshLocal(IResource.DEPTH_ZERO, null);
@@ -1082,6 +1083,9 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			if (errorPropagation == null) {
 				errorPropagation = ErrorPropagation.createErrorPropagation(file);
 			}
+			if (delta == null) {
+				errorPropagation.force = true;
+			}			
 			if (errorPropagation != null) {
 				errorPropagation.addFile(file);
 			}
@@ -1267,4 +1271,9 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		}
 		return super.getComposerObjectInstance(c);
 	}
+	@Override
+	public boolean needColor() {
+		return true;
+	}
+
 }

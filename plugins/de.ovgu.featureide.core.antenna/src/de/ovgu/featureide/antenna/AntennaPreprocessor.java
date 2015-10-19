@@ -476,6 +476,11 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	public boolean hasFeatureFolder() {
 		return false;
 	}
+	
+	@Override
+	public boolean hasSourceFolder() {
+		return false;
+	}
 
 	@Override
 	public void copyNotComposedFiles(Configuration config, IFolder destination) {

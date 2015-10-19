@@ -647,7 +647,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public LinkedList<Feature> getChildren() {
-		return new LinkedList<>(Functional.toList(Functional.retype(FeatureUtils.getChildren(feature), FeatureUtils.IFEATURE_TO_FEATURE)));
+		return new LinkedList<>(Functional.toList(Functional.map(FeatureUtils.getChildren(feature), FeatureUtils.IFEATURE_TO_FEATURE)));
 	}
 
 	/**
@@ -664,7 +664,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public void setChildren(LinkedList<Feature> children) {
-		FeatureUtils.setChildren(feature, Functional.retype(children, FeatureUtils.FEATURE_TO_IFEATURE));
+		FeatureUtils.setChildren(feature, Functional.map(children, FeatureUtils.FEATURE_TO_IFEATURE));
 	}
 
 	/**

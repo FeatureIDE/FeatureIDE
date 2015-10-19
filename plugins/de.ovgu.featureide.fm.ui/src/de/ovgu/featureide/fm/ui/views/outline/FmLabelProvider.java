@@ -20,15 +20,22 @@
  */
 package de.ovgu.featureide.fm.ui.views.outline;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.IFontProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.TreeItem;
 import org.prop4j.NodeWriter;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.color.ColorPalette;
+import de.ovgu.featureide.fm.core.color.FeatureColor;
+import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 
 /**
@@ -38,7 +45,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
  * @author Jan Wedding
  * @author Melanie Pflaume
  */
-public class FmLabelProvider implements ILabelProvider,IFontProvider, GUIDefaults {
+public class FmLabelProvider implements ILabelProvider, IFontProvider, GUIDefaults, IColorProvider {
 
 	/*
 	 * (non-Javadoc)
@@ -83,6 +90,10 @@ public class FmLabelProvider implements ILabelProvider,IFontProvider, GUIDefault
 	public void removeListener(ILabelProviderListener listener) {
 	}
 
+	public void colorizeItems(TreeItem[] treeItems, IFile file) {
+
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -95,11 +106,9 @@ public class FmLabelProvider implements ILabelProvider,IFontProvider, GUIDefault
 				return null; // TODO: Add here icon for feature model
 			if (((IFeature) element).getStructure().getParent().isAlternative()) {
 				return IMG_XOR;
-			}
-			else if (((IFeature) element).getStructure().getParent().isOr()) {
+			} else if (((IFeature) element).getStructure().getParent().isOr()) {
 				return IMG_OR;
-			}
-			else if (((IFeature) element).getStructure().isMandatory()) {
+			} else if (((IFeature) element).getStructure().isMandatory()) {
 				return IMG_MANDATORY;
 			} else {
 				return IMG_OPTIONAL;
@@ -108,9 +117,9 @@ public class FmLabelProvider implements ILabelProvider,IFontProvider, GUIDefault
 			return null; // TODO: Add here icon for "constraint" node
 		} else if (element instanceof IConstraint) {
 			return null; // TODO: Add here icon for CONSTRAINT_ELEMENT node
-		} else return null;
+		} else
+			return null;
 	}
-	
 
 	/*
 	 * (non-Javadoc)
@@ -125,11 +134,9 @@ public class FmLabelProvider implements ILabelProvider,IFontProvider, GUIDefault
 			return ((IConstraint) element).getNode().toString(NodeWriter.logicalSymbols);
 		else if (element instanceof FmOutlineGroupStateStorage)
 			return "";
-	
+
 		return element.toString();
 	}
-
-
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jface.viewers.IFontProvider#getFont(java.lang.Object)
@@ -137,5 +144,27 @@ public class FmLabelProvider implements ILabelProvider,IFontProvider, GUIDefault
 	@Override
 	public Font getFont(Object element) {
 		return DEFAULT_FONT;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.IColorProvider#getForeground(java.lang.Object)
+	 */
+	@Override
+	public Color getForeground(Object element) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Color getBackground(Object element) {
+		Color col = null;
+
+		if (element instanceof IFeature) {
+			IFeature feature = (IFeature) element;
+			FeatureColor color = FeatureColorManager.getColor(feature);
+			if (color != FeatureColor.NO_COLOR) {
+				col = new Color(null, ColorPalette.getRGB(color.getValue(), 0.5f));
+			}
+		}
+		return col;
 	}
 }

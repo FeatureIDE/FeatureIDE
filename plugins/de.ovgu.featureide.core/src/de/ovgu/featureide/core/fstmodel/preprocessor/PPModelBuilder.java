@@ -37,11 +37,9 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.preprocessor.PPComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
-import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
-import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
  * Build the FSTModel for preprocessor projects.
@@ -53,7 +51,7 @@ public class PPModelBuilder {
 	protected final IFeatureProject featureProject;
 
 	protected FSTModel model;
-	protected List<String> featureNames = Collections.emptyList();
+	protected Iterable<String> featureNames = Collections.emptyList();
 	
 	public PPModelBuilder(IFeatureProject featureProject) {
 		model = new FSTModel(featureProject);
@@ -64,12 +62,9 @@ public class PPModelBuilder {
 	public void buildModel() {
 		model.reset();
 		
-		featureNames = FeatureUtils.extractConcreteFeaturesAsStringList(featureProject.getFeatureModel());
-		System.err.println("buildModel(): featureNames: " + featureNames);
+		featureNames = FeatureUtils.getConcreteFeatureNames(featureProject.getFeatureModel());
 		for (String featureName : featureNames) {
-			FSTFeature fstFeature = model.addFeature(featureName);
-			IFeature feature = featureProject.getFeatureModel().getFeature(featureName);
-			fstFeature.setColor(feature.getGraphicRepresenation().getColorList().getColor());
+			model.addFeature(featureName);
 		}
 		try {
 			buildModel(featureProject.getSourceFolder(), "");
@@ -99,7 +94,6 @@ public class PPModelBuilder {
 				boolean classAdded = false;
 				for (String feature : featureNames) {
 					if (containsFeature(text, feature)) {
-						System.err.println("buildModel2 :" + feature + " - " + className);
 						model.addRole(feature, className, currentFile);
 						classAdded = true;
 					}

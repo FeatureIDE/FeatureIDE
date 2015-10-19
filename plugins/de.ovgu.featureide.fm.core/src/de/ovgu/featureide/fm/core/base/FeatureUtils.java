@@ -119,7 +119,7 @@ public abstract class FeatureUtils {
 		}
 	};
 
-	private static final IFunction<IConstraint, Node> CONSTRAINT_TO_NODE = new IFunction<IConstraint, Node>() {
+	public static final IFunction<IConstraint, Node> CONSTRAINT_TO_NODE = new IFunction<IConstraint, Node>() {
 
 		@Override
 		public Node invoke(IConstraint t) {

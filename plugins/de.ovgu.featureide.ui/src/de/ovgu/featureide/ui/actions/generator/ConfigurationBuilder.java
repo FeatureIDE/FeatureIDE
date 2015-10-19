@@ -40,11 +40,6 @@ import java.util.concurrent.TimeoutException;
 
 import javax.annotation.CheckForNull;
 
-import no.sintef.ict.splcatool.CoveringArray;
-import no.sintef.ict.splcatool.CoveringArrayCASA;
-import no.sintef.ict.splcatool.CoveringArrayGenerationException;
-import no.sintef.ict.splcatool.GUIDSL;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -66,7 +61,6 @@ import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.SatSolver;
 
-import splar.core.fm.FeatureModelException;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -80,6 +74,11 @@ import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.job.AStoppableJob;
 import de.ovgu.featureide.ui.UIPlugin;
+import no.sintef.ict.splcatool.CoveringArray;
+import no.sintef.ict.splcatool.CoveringArrayCASA;
+import no.sintef.ict.splcatool.CoveringArrayGenerationException;
+import no.sintef.ict.splcatool.GUIDSL;
+import splar.core.fm.FeatureModelException;
 
 /**
  * Builds all valid or current configurations for a selected feature project.

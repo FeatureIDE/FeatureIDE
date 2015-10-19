@@ -39,10 +39,12 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.gef.EditPart;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
@@ -89,17 +91,53 @@ public class DeleteOperation extends AbstractFeatureModelOperation implements GU
 		 * The key of the Map is the feature which could be replaced by their equivalents given at the
 		 * corresponding List.
 		 */
-		Map<IFeature, List<IFeature>> removalMap = new HashMap<IFeature, List<IFeature>>();
-		List<IFeature> alreadyDeleted = new LinkedList<IFeature>();
+		Map<IFeature, List<IFeature>> removalMap = new HashMap<>();
+		List<IFeature> alreadyDeleted = new LinkedList<>();
+		List<IFeature> commonAncestorList = null;
 
 		for (Object element : getSelection().toArray()) {
 			if (removeConstraint(element)) {
 				continue;
 			}
-			removeFeature(element, removalMap, alreadyDeleted);
+			IFeature parent = removeFeature(element, removalMap, alreadyDeleted);
+			
+			if (commonAncestorList == null) {
+				commonAncestorList = new LinkedList<>();
+				while (parent != null) {
+					commonAncestorList.add(0, parent);
+					parent = parent.getStructure().getParent().getFeature();
+				}
+			} else if (parent != null) {
+				LinkedList<IFeature> parentList = new LinkedList<>();
+				while (parent != null) {
+					parentList.addFirst(parent);
+					parent = parent.getStructure().getParent().getFeature();
+				}
+				final Iterator<IFeature> iterator1 = parentList.iterator();				
+				final Iterator<IFeature> iterator2 = commonAncestorList.iterator();
+				int i = 0;
+				while (iterator1.hasNext() && iterator2.hasNext()) {
+					if (!iterator1.next().equals(iterator2.next())) {
+						break;
+					}
+					i++;
+				}
+				commonAncestorList = commonAncestorList.subList(0, i);
+			}
 		}
 
 		removeContainedFeatures(removalMap, alreadyDeleted);
+
+		if (viewer instanceof GraphicalViewerImpl) {
+			final GraphicalViewerImpl viewer2 = (GraphicalViewerImpl) viewer;
+			final IFeature parent = (commonAncestorList != null && !commonAncestorList.isEmpty()) 
+					? commonAncestorList.get(commonAncestorList.size() - 1) : null;
+			final Object editPart = viewer2.getEditPartRegistry().get(parent != null ? parent : featureModel.getStructure().getRoot());
+			if (editPart instanceof FeatureEditPart) {
+				viewer2.setSelection(new StructuredSelection(editPart));
+				viewer2.reveal((EditPart) editPart);
+			}
+		}
 	}
 
 	private IStructuredSelection getSelection() {
@@ -111,7 +149,7 @@ public class DeleteOperation extends AbstractFeatureModelOperation implements GU
 	}
 
 	/**
-	 * If the given element is a {@link IConstraint} it will be removed instantly.
+	 * If the given element is a {@link Constraint} it will be removed instantly.
 	 * 
 	 * @param element The constraint to remove.
 	 * @return <code>true</code> if the given element was a constraint.
@@ -130,13 +168,13 @@ public class DeleteOperation extends AbstractFeatureModelOperation implements GU
 	}
 
 	/**
-	 * Tries to remove the given {@link IFeature} else there will be an dialog for exception handling.
+	 * Tries to remove the given {@link Feature} else there will be an dialog for exception handling.
 	 * 
 	 * @param element The feature to remove.
 	 * @param removalMap A map with the features and their equivalents.
 	 * @param alreadyDeleted A List of features which are already deleted.
 	 */
-	private void removeFeature(Object element, Map<IFeature, List<IFeature>> removalMap, List<IFeature> alreadyDeleted) {
+	private IFeature removeFeature(Object element, Map<IFeature, List<IFeature>> removalMap, List<IFeature> alreadyDeleted) {
 		IFeature feature = null;
 		if (element instanceof IFeature) {
 			feature = ((IFeature) element);
@@ -144,6 +182,7 @@ public class DeleteOperation extends AbstractFeatureModelOperation implements GU
 			feature = ((FeatureEditPart) element).getFeature();
 		}
 		if (feature != null) {
+			final IFeature parent = feature.getStructure().getParent().getFeature();
 			if (feature.getStructure().getRelevantConstraints().isEmpty()) {
 				// feature can be removed because it has no relevant constraint
 				executeOperation(new FeatureDeleteOperation(featureModel, feature));
@@ -159,7 +198,9 @@ public class DeleteOperation extends AbstractFeatureModelOperation implements GU
 				}
 				removalMap.put(feature, equivalent);
 			}
+			return parent;
 		}
+		return null;
 	}
 
 	/**
@@ -175,7 +216,7 @@ public class DeleteOperation extends AbstractFeatureModelOperation implements GU
 	}
 
 	/**
-	 * Exception handling if the {@link IFeature} to remove is contained in {@link IConstraint}s.<br>
+	 * Exception handling if the {@link Feature} to remove is contained in {@link Constraint}s.<br>
 	 * If the feature could be removed a {@link DeleteOperationAlternativeDialog} will be opened to
 	 * select the features to replace with.<br>
 	 * If the feature has no equivalent an error message will be displayed.
@@ -211,7 +252,7 @@ public class DeleteOperation extends AbstractFeatureModelOperation implements GU
 	}
 
 	/**
-	 * Opens an error dialog displaying the {@link IFeature}s which could not be replaced by alternatives.
+	 * Opens an error dialog displaying the {@link Feature}s which could not be replaced by alternatives.
 	 * 
 	 * @param notDeletable The not deletable features
 	 */

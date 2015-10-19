@@ -21,7 +21,9 @@
 package de.ovgu.featureide.ui.views.collaboration.outline;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.TreeItem;
 
@@ -35,7 +37,7 @@ import de.ovgu.featureide.fm.ui.views.outline.FmLabelProvider;
  * 
  * @author Reimar Schroeter
  */
-public class FMOutlineLabelProviderWrapper extends OutlineLabelProvider {
+public class FMOutlineLabelProviderWrapper extends OutlineLabelProvider implements IColorProvider{
 
 	private final FmLabelProvider prov = new FmLabelProvider();
 
@@ -75,6 +77,7 @@ public class FMOutlineLabelProviderWrapper extends OutlineLabelProvider {
 
 	@Override
 	public void colorizeItems(TreeItem[] treeItems, IFile file) {
+	//	prov.colorizeItems(treeItems, file);
 	}
 
 	@Override
@@ -113,6 +116,25 @@ public class FMOutlineLabelProviderWrapper extends OutlineLabelProvider {
 	 */
 	@Override
 	public void init() {
+	}
+
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.IColorProvider#getForeground(java.lang.Object)
+	 */
+	@Override
+	public Color getForeground(Object element) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.IColorProvider#getBackground(java.lang.Object)
+	 */
+	@Override
+	public Color getBackground(Object element) {
+		
+		return prov.getBackground(element);
 	}
 
 }

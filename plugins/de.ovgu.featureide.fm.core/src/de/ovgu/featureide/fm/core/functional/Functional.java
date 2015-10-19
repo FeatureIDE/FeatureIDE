@@ -342,15 +342,11 @@ public abstract class Functional {
 	 * @since 2.7.5
 	 */
 	public static <T> Collection<String> mapToStringList(final Iterable<T> source) {
-		return toList(retype(source, new ToStringFunction<T>()));
+		return toList(map(source, new ToStringFunction<T>()));
 	}
 
 	public static <T> Collection<CharSequence> mapToCharSequenceList(final Iterable<T> source) {
-		return toList(retype(source, new ToCharSequenceFunction<T>()));
-	}
-
-	public static <T, R> Iterable<R> retype(Iterable<T> source, Functional.IFunction<T, R> convertFunction) {
-		return map(source, convertFunction);
+		return toList(map(source, new ToCharSequenceFunction<T>()));
 	}
 
 	public static <T> Iterable<T> toIterator(Enumeration<T> enumeration) {

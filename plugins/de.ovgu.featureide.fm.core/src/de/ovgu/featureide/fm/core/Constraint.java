@@ -75,15 +75,15 @@ public class Constraint implements PropertyConstants, IGraphicItem {
 	}
 
 	public Collection<Feature> getDeadFeatures(SatSolver solver, FeatureModel fm, Collection<Feature> fmDeadFeatures) {
-		return Functional.toList(Functional.retype(
+		return Functional.toList(Functional.map(
 				FeatureUtils.getDeadFeatures(constraint, solver, FeatureUtils.convert(fm),
-						Functional.toList(Functional.retype(fmDeadFeatures, FeatureUtils.FEATURE_TO_IFEATURE))), FeatureUtils.IFEATURE_TO_FEATURE));
+						Functional.toList(Functional.map(fmDeadFeatures, FeatureUtils.FEATURE_TO_IFEATURE))), FeatureUtils.IFEATURE_TO_FEATURE));
 	}
 
 	public Collection<Feature> getDeadFeatures(FeatureModel fm, Collection<Feature> fmDeadFeatures) {
-		return Functional.toList(Functional.retype(
+		return Functional.toList(Functional.map(
 				FeatureUtils.getDeadFeatures(constraint, FeatureUtils.convert(fm),
-						Functional.toList(Functional.retype(fmDeadFeatures, FeatureUtils.FEATURE_TO_IFEATURE))), FeatureUtils.IFEATURE_TO_FEATURE));
+						Functional.toList(Functional.map(fmDeadFeatures, FeatureUtils.FEATURE_TO_IFEATURE))), FeatureUtils.IFEATURE_TO_FEATURE));
 	}
 
 	public void setConstraintAttribute(ConstraintAttribute attri, boolean fire) {
@@ -111,12 +111,12 @@ public class Constraint implements PropertyConstants, IGraphicItem {
 	}
 
 	public Collection<Feature> getContainedFeatures() {
-		return Functional.toList(Functional.retype(FeatureUtils.getContainedFeatures(constraint), FeatureUtils.IFEATURE_TO_FEATURE));
+		return Functional.toList(Functional.map(FeatureUtils.getContainedFeatures(constraint), FeatureUtils.IFEATURE_TO_FEATURE));
 	}
 
 	public boolean setFalseOptionalFeatures(FeatureModel clone, Collection<Feature> fmFalseOptionals) {
 		return FeatureUtils.setFalseOptionalFeatures(constraint, FeatureUtils.convert(clone),
-				Functional.toList(Functional.retype(fmFalseOptionals, FeatureUtils.FEATURE_TO_IFEATURE)));
+				Functional.toList(Functional.map(fmFalseOptionals, FeatureUtils.FEATURE_TO_IFEATURE)));
 	}
 
 	public boolean setFalseOptionalFeatures() {
@@ -124,7 +124,7 @@ public class Constraint implements PropertyConstants, IGraphicItem {
 	}
 
 	public Collection<Feature> getFalseOptional() {
-		return Functional.toList(Functional.retype(FeatureUtils.getFalseOptional(constraint), FeatureUtils.IFEATURE_TO_FEATURE));
+		return Functional.toList(Functional.map(FeatureUtils.getFalseOptional(constraint), FeatureUtils.IFEATURE_TO_FEATURE));
 	}
 
 	public void addListener(PropertyChangeListener listener) {
@@ -154,11 +154,11 @@ public class Constraint implements PropertyConstants, IGraphicItem {
 	}
 
 	public void setDeadFeatures(Collection<Feature> deadFeatures) {
-		FeatureUtils.setDeadFeatures(constraint, Functional.toList(Functional.retype(deadFeatures, FeatureUtils.FEATURE_TO_IFEATURE)));
+		FeatureUtils.setDeadFeatures(constraint, Functional.toList(Functional.map(deadFeatures, FeatureUtils.FEATURE_TO_IFEATURE)));
 	}
 
 	public Collection<Feature> getDeadFeatures() {
-		return Functional.toList(Functional.retype(FeatureUtils.getDeadFeatures(constraint), FeatureUtils.IFEATURE_TO_FEATURE));
+		return Functional.toList(Functional.map(FeatureUtils.getDeadFeatures(constraint), FeatureUtils.IFEATURE_TO_FEATURE));
 	}
 
 	@Override

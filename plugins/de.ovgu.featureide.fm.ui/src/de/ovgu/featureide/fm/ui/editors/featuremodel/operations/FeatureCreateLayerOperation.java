@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_LAYER;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DEFAULT_FEATURE_LAYER_CAPTION;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IAdaptable;
@@ -35,8 +36,7 @@ import org.eclipse.jface.viewers.TextCellEditor;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
-import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.core.base.impl.Feature;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureCellEditorLocator;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureLabelEditManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
@@ -50,14 +50,13 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayou
  */
 public class FeatureCreateLayerOperation extends AbstractFeatureModelOperation {
 
-	private static final String LABEL = CREATE_LAYER;
 	private IFeature feature;
 	private Object viewer;
 	private IFeature newFeature;
 	private Object diagramEditor;
 
 	public FeatureCreateLayerOperation(IFeature feature, Object viewer, IFeatureModel featureModel, Object diagramEditor) {
-		super(featureModel, LABEL);
+		super(featureModel, CREATE_LAYER);
 		this.feature = feature;
 		this.viewer = viewer;
 		this.diagramEditor = diagramEditor;
@@ -73,10 +72,10 @@ public class FeatureCreateLayerOperation extends AbstractFeatureModelOperation {
 	protected void redo() {
 		int number = 0;
 
-		while (Functional.toList(FeatureUtils.extractFeatureNames(featureModel.getFeatures())).contains("NewLayer" + ++number))
+		while (FeatureUtils.getFeatureNames(featureModel).contains(DEFAULT_FEATURE_LAYER_CAPTION + ++number))
 			;
 
-		newFeature = FeatureModelFactory.getInstance().createFeature(featureModel, "NewLayer" + number);
+		newFeature = new Feature(featureModel, DEFAULT_FEATURE_LAYER_CAPTION + number);
 		featureModel.addFeature(newFeature);
 		feature = featureModel.getFeature(feature.getName());
 		feature.getStructure().addChild(newFeature.getStructure());

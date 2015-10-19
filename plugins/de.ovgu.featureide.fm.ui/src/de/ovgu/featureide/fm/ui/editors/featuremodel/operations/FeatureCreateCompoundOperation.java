@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_COMPOUND;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DEFAULT_FEATURE_LAYER_CAPTION;
 
 import java.util.LinkedList;
 
@@ -38,7 +39,7 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.impl.Feature;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureCellEditorLocator;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureLabelEditManager;
@@ -53,8 +54,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayou
  */
 public class FeatureCreateCompoundOperation extends AbstractFeatureModelOperation {
 
-	private static final String LABEL = CREATE_COMPOUND;
-	IFeature newCompound;
+	private IFeature newCompound;
 	private IFeature parent;
 	private Object viewer;
 	private LinkedList<IFeature> selectedFeatures;
@@ -64,7 +64,7 @@ public class FeatureCreateCompoundOperation extends AbstractFeatureModelOperatio
 	 * @param label
 	 */
 	public FeatureCreateCompoundOperation(Object viewer, IFeature parent, IFeatureModel featureModel, LinkedList<IFeature> selectedFeatures, Object diagramEditor) {
-		super(featureModel, LABEL);
+		super(featureModel, CREATE_COMPOUND);
 		this.viewer = viewer;
 		this.parent = parent;
 		this.selectedFeatures = new LinkedList<IFeature>();
@@ -75,9 +75,9 @@ public class FeatureCreateCompoundOperation extends AbstractFeatureModelOperatio
 	@Override
 	public IStatus execute(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
 		int number = 0;
-		while (Functional.toList(FeatureUtils.extractFeatureNames(featureModel.getFeatures())).contains("NewCompound" + ++number))
+		while (FeatureUtils.getFeatureNames(featureModel).contains(DEFAULT_FEATURE_LAYER_CAPTION + ++number))
 			;
-		newCompound = FeatureModelFactory.getInstance().createFeature(featureModel, "NewCompound" + number);
+		newCompound = new Feature(featureModel, DEFAULT_FEATURE_LAYER_CAPTION + number);
 		if (parent != null) {
 			newCompound.getStructure().setAND(true);
 			newCompound.getStructure().setMultiple(parent.getStructure().isMultiple());
@@ -112,18 +112,18 @@ public class FeatureCreateCompoundOperation extends AbstractFeatureModelOperatio
 	@Override
 	protected void redo() {
 		if (parent != null) {
-			LinkedList<IFeatureStructure> newChildren = new LinkedList<IFeatureStructure>();
-			for (IFeatureStructure feature : parent.getStructure().getChildren()) {
-				if (selectedFeatures.contains(feature)) {
+			LinkedList<IFeature> newChildren = new LinkedList<IFeature>();
+			for (IFeatureStructure featureStructure : parent.getStructure().getChildren()) {
+				if (selectedFeatures.contains(featureStructure)) {
 					if (!newCompound.getStructure().hasChildren())
-						newChildren.add(newCompound.getStructure());
-					feature.setMandatory(false);
-					newCompound.getStructure().addChild(feature);
+						newChildren.add(newCompound);
+					featureStructure.setMandatory(false);
+					newCompound.getStructure().addChild(featureStructure);
 				} else {
-					newChildren.add(feature);
+					newChildren.add(featureStructure.getFeature());
 				}
 			}
-			parent.getStructure().setChildren(newChildren);
+			parent.getStructure().setChildren(Functional.toList(Functional.map(newChildren, FeatureUtils.FEATURE_TO_STRUCTURE)));
 			featureModel.addFeature(newCompound);
 		} else {
 			newCompound.getStructure().addChild(featureModel.getStructure().getRoot());

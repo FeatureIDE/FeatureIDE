@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.core;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,10 +36,10 @@ import org.eclipse.core.runtime.IPath;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
@@ -83,10 +84,11 @@ public class RenamingsManager {
 		// update the feature order list
 		for (int i = 0;i < featureOrderList.size();i++) {
 			if (featureOrderList.get(i).equals(oldName)) {
-				model.setFeatureOrderListItem(i, newName);
+				featureOrderList.set(i, newName);
 				break;
 			}
 		}
+		FeatureColorManager.renameFeature(model, oldName, newName);
 		return true;
 	}
 	
@@ -114,10 +116,6 @@ public class RenamingsManager {
 					moveFolder(renaming.oldName, renaming.newName);
 				}
 			}
-		}
-		if (model.getGraphicRepresenation().getColorschemeTable().getColorFile(project).exists()) {
-			model.getGraphicRepresenation().getColorschemeTable().readColorsFromFile(project);
-			model.getGraphicRepresenation().getColorschemeTable().saveColorsToFile(project);
 		}
 		renamings.clear();
 	}
@@ -209,7 +207,7 @@ public class RenamingsManager {
 	}
 
 	public Set<String> getOldFeatureNames() {
-		HashSet<String> names = new HashSet<String>(Functional.mapToStringList(model.getFeatureTable().keySet()));
+		HashSet<String> names = new HashSet<String>(model.getFeatureTable().keySet());
 		for (Renaming renaming : renamings) {
 			names.remove(renaming.newName);
 			names.add(renaming.oldName);

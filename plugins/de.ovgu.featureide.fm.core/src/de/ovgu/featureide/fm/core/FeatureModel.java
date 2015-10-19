@@ -132,7 +132,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	}
 
 	public Collection<Feature> getFeatures() {
-		return Functional.toList(Functional.retype(FeatureUtils.getFeatures(model), FeatureUtils.IFEATURE_TO_FEATURE));
+		return Functional.toList(Functional.map(FeatureUtils.getFeatures(model), FeatureUtils.IFEATURE_TO_FEATURE));
 	}
 
 	@CheckForNull
@@ -142,7 +142,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 
 	@Nonnull
 	public Collection<Feature> getConcreteFeatures() {
-		return Functional.toList(Functional.retype(FeatureUtils.getConcreteFeatures(model), FeatureUtils.IFEATURE_TO_FEATURE));
+		return Functional.toList(Functional.map(FeatureUtils.getConcreteFeatures(model), FeatureUtils.IFEATURE_TO_FEATURE));
 	}
 
 	@Nonnull
@@ -151,7 +151,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	}
 
 	public Collection<Feature> getFeaturesPreorder() {
-		return Functional.toList(Functional.retype(FeatureUtils.getFeaturesPreorder(model), FeatureUtils.IFEATURE_TO_FEATURE));
+		return Functional.toList(Functional.map(FeatureUtils.getFeaturesPreorder(model), FeatureUtils.IFEATURE_TO_FEATURE));
 	}
 
 	public List<String> getFeatureNamesPreorder() {
@@ -192,7 +192,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	}
 
 	public void setConstraints(final LinkedList<Constraint> constraints) {
-		FeatureUtils.setConstraints(model, Functional.retype(Functional.toIterator(constraints), FeatureUtils.CONSTRAINT_TO_ICONSTRANT));
+		FeatureUtils.setConstraints(model, Functional.map(Functional.toIterator(constraints), FeatureUtils.CONSTRAINT_TO_ICONSTRANT));
 	}
 
 	public void addPropositionalNode(Node node) {
@@ -220,7 +220,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	}
 
 	public List<Constraint> getConstraints() {
-		return Functional.toList(Functional.retype(FeatureUtils.getConstraints(model), FeatureUtils.ICONSTRAINT_TO_CONSTRANT));
+		return Functional.toList(Functional.map(FeatureUtils.getConstraints(model), FeatureUtils.ICONSTRAINT_TO_CONSTRANT));
 	}
 
 	public int getConstraintIndex(Constraint constraint) {

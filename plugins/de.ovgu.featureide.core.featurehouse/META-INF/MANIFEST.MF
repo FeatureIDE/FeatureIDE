@@ -21,7 +21,8 @@ Bundle-Vendor: University of Magdeburg
 Import-Package: org.eclipse.core.expressions,
  org.eclipse.jdt.internal.core,
  org.eclipse.jdt.internal.ui.packageview
-Export-Package: de.ovgu.featureide.featurehouse,
+Export-Package: cide.features,
+ de.ovgu.featureide.featurehouse,
  de.ovgu.featureide.featurehouse.errorpropagation,
  de.ovgu.featureide.featurehouse.meta,
  de.ovgu.featureide.featurehouse.meta.featuremodel,

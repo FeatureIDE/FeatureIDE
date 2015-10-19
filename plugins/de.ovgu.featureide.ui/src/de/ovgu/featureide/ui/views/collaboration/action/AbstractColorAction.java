@@ -39,6 +39,10 @@ public abstract class AbstractColorAction extends Action {
 	private GraphicalViewerImpl viewer;
 	protected CollaborationView collaborationView;
 	protected int index;
+	
+	public AbstractColorAction(String text){
+		this.setText(text);
+	}
 
 	public AbstractColorAction(String text, GraphicalViewerImpl view, CollaborationView collaborationView, int index) {
 		super(text);
@@ -64,7 +68,6 @@ public abstract class AbstractColorAction extends Action {
 				IFeatureModel fm = collaborationView.getFeatureProject().getFeatureModel();
 				
 				boolean refresh = action(fm, coll.getName());
-				collaborationView.saveColorsToFile();
 				
 				if (refresh) {	
 					collaborationView.refreshAll();
