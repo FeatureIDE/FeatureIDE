@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Set;
 
 import de.ovgu.featureide.fm.core.Constraint;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.filter.base.IFilter;
 
 /**
@@ -341,15 +342,15 @@ public abstract class Functional {
 	 * @since 2.7.5
 	 */
 	public static <T> Collection<String> mapToStringList(final Iterable<T> source) {
-		return retype(source, new ToStringFunction<T>());
+		return toList(retype(source, new ToStringFunction<T>()));
 	}
 
 	public static <T> Collection<CharSequence> mapToCharSequenceList(final Iterable<T> source) {
-		return retype(source, new ToCharSequenceFunction<T>());
+		return toList(retype(source, new ToCharSequenceFunction<T>()));
 	}
 
-	public static <T, R> Collection<R> retype(Iterable<T> source, Functional.IFunction<T, R> convertFunction) {
-		return toList(map(source, convertFunction));
+	public static <T, R> Iterable<R> retype(Iterable<T> source, Functional.IFunction<T, R> convertFunction) {
+		return map(source, convertFunction);
 	}
 
 	public static <T> Iterable<T> toIterator(Enumeration<T> enumeration) {
@@ -400,6 +401,12 @@ public abstract class Functional {
 			}
 
 		});
+	}
+
+	public static <T, U> boolean equals(final Iterable<T> lhs, final Iterable<T> rhs, final IFunction<T,U> map) {
+		final Set<U> left = Functional.toSet(Functional.map(lhs, map));
+		final Set<U> right = Functional.toSet(Functional.map(rhs, map));
+		return left.equals(right);
 	}
 
 }

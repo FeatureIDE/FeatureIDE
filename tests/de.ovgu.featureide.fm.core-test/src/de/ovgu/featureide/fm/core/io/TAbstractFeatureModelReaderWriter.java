@@ -35,6 +35,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -117,7 +118,7 @@ public abstract class TAbstractFeatureModelReaderWriter {
 
 	@Test
 	public void testFeatureNames() throws FileNotFoundException, UnsupportedModelException {
-		assertEquals(failureMessage, Functional.toSet(Functional.mapToString(origFm.getFeatures())), Functional.toSet(Functional.mapToString(newFm.getFeatures())));
+		assertEquals(failureMessage, Functional.equals(origFm.getFeatures(), newFm.getFeatures(), FeatureUtils.GET_FEATURE_NAME));
 	}
 
 	@Test

@@ -132,7 +132,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	}
 
 	public Collection<Feature> getFeatures() {
-		return Functional.retype(FeatureUtils.getFeatures(model), FeatureUtils.IFEATURE_TO_FEATURE);
+		return Functional.toList(Functional.retype(FeatureUtils.getFeatures(model), FeatureUtils.IFEATURE_TO_FEATURE));
 	}
 
 	@CheckForNull
@@ -142,7 +142,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 
 	@Nonnull
 	public Collection<Feature> getConcreteFeatures() {
-		return Functional.retype(FeatureUtils.getConcreteFeatures(model), FeatureUtils.IFEATURE_TO_FEATURE);
+		return Functional.toList(Functional.retype(FeatureUtils.getConcreteFeatures(model), FeatureUtils.IFEATURE_TO_FEATURE));
 	}
 
 	@Nonnull
@@ -151,7 +151,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	}
 
 	public Collection<Feature> getFeaturesPreorder() {
-		return Functional.retype(FeatureUtils.getFeaturesPreorder(model), FeatureUtils.IFEATURE_TO_FEATURE);
+		return Functional.toList(Functional.retype(FeatureUtils.getFeaturesPreorder(model), FeatureUtils.IFEATURE_TO_FEATURE));
 	}
 
 	public List<String> getFeatureNamesPreorder() {

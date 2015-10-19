@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.ui.editors;
 
 import java.beans.PropertyChangeEvent;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -56,7 +57,7 @@ public class FeatureUIHelper {
 	private static final WeakHashMap<IConstraint, Point> constraintLocation = new WeakHashMap<>();
 	private static final WeakHashMap<IConstraint, Dimension> constraintSize = new WeakHashMap<>();
 	private static final WeakHashMap<IFeatureModel, Dimension> legendSize = new WeakHashMap<>();
-	private static final WeakHashMap<IFeatureModel, LegendFigure> legendFigure = new WeakHashMap<>();
+	private static final Map<IFeatureModel, LegendFigure> legendFigure = new HashMap<>();
 
 	/**
 	 * Necessary for correct manual drag-and-drop movement while zoomed.

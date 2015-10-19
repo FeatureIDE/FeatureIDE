@@ -32,7 +32,7 @@ import de.ovgu.featureide.fm.core.IGraphicItem;
 public interface IGraphicalFeatureModel extends IGraphicItem {
 
 	ColorschemeTable getColorschemeTable();
-
+	
 	IFeatureModel getFeatureModel();
 
 	FeatureModelLayout getLayout();

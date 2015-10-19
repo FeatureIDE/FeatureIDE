@@ -43,24 +43,22 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
  */
 public class FeatureStructure implements IFeatureStructure, PropertyConstants {
 
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + (and ? 1231 : 1237);
 		result = prime * result + ((children == null) ? 0 : children.hashCode());
-		result = prime * result + (concrete ? 1231 : 1237);
 		result = prime * result + ((correspondingFeature == null) ? 0 : correspondingFeature.hashCode());
-		result = prime * result + (hidden ? 1231 : 1237);
-		result = prime * result + (mandatory ? 1231 : 1237);
-		result = prime * result + (multiple ? 1231 : 1237);
-		result = prime * result + ((parentConnection == null) ? 0 : parentConnection.hashCode());
-		result = prime * result + ((partOfConstraints == null) ? 0 : partOfConstraints.hashCode());
-		result = prime * result + ((sourceConnections == null) ? 0 : sourceConnections.hashCode());
-		result = prime * result + ((targetConnections == null) ? 0 : targetConnections.hashCode());
 		return result;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -70,51 +68,15 @@ public class FeatureStructure implements IFeatureStructure, PropertyConstants {
 		if (getClass() != obj.getClass())
 			return false;
 		FeatureStructure other = (FeatureStructure) obj;
-		if (and != other.and)
-			return false;
 		if (children == null) {
 			if (other.children != null)
 				return false;
 		} else if (!children.equals(other.children))
 			return false;
-		if (concrete != other.concrete)
-			return false;
 		if (correspondingFeature == null) {
 			if (other.correspondingFeature != null)
 				return false;
 		} else if (!correspondingFeature.equals(other.correspondingFeature))
-			return false;
-		if (hidden != other.hidden)
-			return false;
-		if (mandatory != other.mandatory)
-			return false;
-		if (multiple != other.multiple)
-			return false;
-		if (parent == null) {
-			if (other.parent != null)
-				return false;
-		}
-//		} else if (!parent.equals(other.parent))
-//			return false;
-		if (parentConnection == null) {
-			if (other.parentConnection != null)
-				return false;
-		} else if (!parentConnection.equals(other.parentConnection))
-			return false;
-		if (partOfConstraints == null) {
-			if (other.partOfConstraints != null)
-				return false;
-		} else if (!partOfConstraints.equals(other.partOfConstraints))
-			return false;
-		if (sourceConnections == null) {
-			if (other.sourceConnections != null)
-				return false;
-		} else if (!sourceConnections.equals(other.sourceConnections))
-			return false;
-		if (targetConnections == null) {
-			if (other.targetConnections != null)
-				return false;
-		} else if (!targetConnections.equals(other.targetConnections))
 			return false;
 		return true;
 	}

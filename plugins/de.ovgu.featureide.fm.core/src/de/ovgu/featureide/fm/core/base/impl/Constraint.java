@@ -93,12 +93,6 @@ public class Constraint implements IConstraint, PropertyConstants {
 		if (getClass() != obj.getClass())
 			return false;
 		Constraint other = (Constraint) obj;
-		if (featureModel == null) {
-			if (other.featureModel != null)
-				return false;
-		} 
-		//else if (!featureModel.equals(other.featureModel))
-		//	return false;
 		if (propNode == null) {
 			if (other.propNode != null)
 				return false;

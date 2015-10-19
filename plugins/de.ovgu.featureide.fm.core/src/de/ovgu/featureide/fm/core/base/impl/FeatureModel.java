@@ -64,22 +64,11 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  */
 public class FeatureModel implements IFeatureModel, PropertyConstants {
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((constraints == null) ? 0 : constraints.hashCode());
-		result = prime * result + ((property == null) ? 0 : property.hashCode());
-		result = prime * result + ((structure == null) ? 0 : structure.hashCode());
-		return result;
+		return toString().hashCode();		
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -89,22 +78,13 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 		if (getClass() != obj.getClass())
 			return false;
 		FeatureModel other = (FeatureModel) obj;
-		if (constraints == null) {
-			if (other.constraints != null)
-				return false;
-		} else if (!constraints.equals(other.constraints))
-			return false;
-		if (property == null) {
-			if (other.property != null)
-				return false;
-		} else if (!property.equals(other.property))
-			return false;
 		if (structure == null) {
-			if (other.structure != null)
+			if (other.structure != null) {
 				return false;
-		} else if (!structure.equals(other.structure))
-			return false;
-		return true;
+			}
+		} else
+			return this.toString().equals(obj.toString());
+		return false;
 	}
 
 	protected final FeatureModelAnalyzer analyser = createAnalyser();
@@ -542,6 +522,10 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 
 	@Override
 	public String toString() {
+		// ! DO NOT CHANGE THIS !
+		// The method call is required for hashCode and equals and might damage some
+		// behavior if after a changes two not identical models are represented with
+		// the same string
 		StringBuilder sb = new StringBuilder("FeatureModel(");
 		if (getStructure().getRoot() != null) {
 			sb.append("Structure=[");
@@ -553,7 +537,7 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 			sb.append("Feature model without root feature.");
 		}
 		StringBuilder features = new StringBuilder();
-		String[] feat =  featureTable.keySet().toArray(new String[featureTable.keySet().size()]);
+		String[] feat = featureTable.keySet().toArray(new String[featureTable.keySet().size()]);
 		for (int i = 0; i < feat.length; i++) {
 			features.append(feat[i]);
 			if (i + 1 < feat.length)
@@ -574,5 +558,4 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 		}
 	}
 
-	
 }
