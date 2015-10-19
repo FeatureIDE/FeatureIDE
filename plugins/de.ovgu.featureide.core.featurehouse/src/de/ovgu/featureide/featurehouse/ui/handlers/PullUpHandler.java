@@ -21,8 +21,8 @@ public class PullUpHandler extends RefactoringHandler {
 			if (element instanceof FujiLocalVariableSignature)
 				return;
 			
-			PullUpRefactoring pulUp = new PullUpMethodRefactoring((FujiMethodSignature) element, featureProject, file); 
-			PullUpRefactoringWizard refactoringWizard = new PullUpRefactoringWizard(pulUp);
+			PullUpRefactoring pullUp = new PullUpMethodRefactoring((FujiMethodSignature) element, featureProject, file); 
+			PullUpRefactoringWizard refactoringWizard = new PullUpRefactoringWizard(pullUp);
 			RefactoringWizardOpenOperation op = new RefactoringWizardOpenOperation(refactoringWizard);
 			op.run(getShell(), "PullUp-Refactoring");
 		} catch (InterruptedException e) {

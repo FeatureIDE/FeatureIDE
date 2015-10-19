@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -73,6 +74,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.PlatformUI;
 
+import de.ovgu.featureide.core.signature.base.AFeatureData;
 import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
@@ -168,7 +170,7 @@ public class PullUpMemberPage extends UserInputWizardPage {
 		result.put(actionLabels[actionIndex], new Integer(actionIndex));
 	}
 
-	protected AbstractClassSignature[] fCandidateTypes = {};
+	protected List<ExtendedPullUpSignature> fCandidateTypes;
 
 	private Button fDeselectAllButton;
 
@@ -412,14 +414,14 @@ public class PullUpMemberPage extends UserInputWizardPage {
 
 		fSuperTypesCombo = new Combo(parent, SWT.READ_ONLY);
 		SWTUtil.setDefaultVisibleItemCount(fSuperTypesCombo);
-		if (fCandidateTypes.length > 0) {
-			for (int i = 0; i < fCandidateTypes.length; i++) {
-				final String comboLabel = fCandidateTypes[i].getName();
-				fSuperTypesCombo.add(comboLabel);
-			}
-			fSuperTypesCombo.select(fCandidateTypes.length - 1);
-			fSuperTypesCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		if (fCandidateTypes.size() == 0) return;
+		
+		for (ExtendedPullUpSignature extSignature : fCandidateTypes) {
+			final String comboLabel = extSignature.getSignature().getName() + " - " + refactoring.getProjectSignatures().getFeatureName(extSignature.getFeatureId());
+			fSuperTypesCombo.add(comboLabel);
 		}
+		fSuperTypesCombo.select(fCandidateTypes.size() - 1);
+		fSuperTypesCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 	}
 
 	protected void createSuperTypeControl(final Composite parent) {
@@ -488,10 +490,10 @@ public class PullUpMemberPage extends UserInputWizardPage {
 		return code;
 	}
 
-	public AbstractClassSignature getDestinationType() {
+	public ExtendedPullUpSignature getDestinationType() {
 		final int index = fSuperTypesCombo.getSelectionIndex();
 		if (index >= 0)
-			return fCandidateTypes[index];
+			return fCandidateTypes.get(index);
 		return null;
 	}
 
@@ -588,7 +590,7 @@ public class PullUpMemberPage extends UserInputWizardPage {
 
 	private void initializeRefactoring() {
 		refactoring.setPullUpSignatures(getMembersForAction(PULL_UP_ACTION));
-		final AbstractClassSignature destination = getDestinationType();
+		final ExtendedPullUpSignature destination = getDestinationType();
 		if (destination != null)
 			refactoring.setDestinationType(destination);
 	}

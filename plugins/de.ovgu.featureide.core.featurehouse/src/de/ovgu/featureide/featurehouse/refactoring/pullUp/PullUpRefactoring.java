@@ -36,6 +36,7 @@ import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
+import de.ovgu.featureide.core.signature.base.AFeatureData;
 import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.featurehouse.refactoring.RefactoringUtil;
@@ -51,20 +52,22 @@ public abstract class PullUpRefactoring<T extends AbstractSignature> extends Ref
 	protected final IFeatureProject featureProject;
 	protected final T selectedElement;
 	protected final String file;
-	protected AbstractClassSignature destinationType;
+	protected ExtendedPullUpSignature destinationType;
 	protected AbstractSignature[] pullUpSignatures;
+	protected Set<ExtendedPullUpSignature> deletedMethods; 
 	
 	public PullUpRefactoring(T selection, IFeatureProject featureProject, String file) {
 		this.selectedElement = selection;
 		this.featureProject = featureProject;
 		this.file = file;
+		this.deletedMethods = new HashSet<>();
 	}
 	
 	public abstract FujiMethodSignature[] getPullableElements();
 	
-	public AbstractClassSignature[] getCandidateTypes(final RefactoringStatus status) {
+	public List<ExtendedPullUpSignature> getCandidateTypes(final RefactoringStatus status) {
 	
-		final Set<AbstractClassSignature> result = new HashSet<>();
+		final List<ExtendedPullUpSignature> result = new ArrayList<>();
 		final AbstractClassSignature clazz = selectedElement.getParent();
 		final Set<String> superClasses = clazz.getExtendList();
 		
@@ -74,18 +77,22 @@ public abstract class PullUpRefactoring<T extends AbstractSignature> extends Ref
 		final Map<String, AbstractClassSignature> classes = RefactoringUtil.getClasses(featureProject.getProjectSignatures());
 	
 		for (String superClass : superClasses) {
-			if (classes.containsKey(superClass))
-				result.add(classes.get(superClass));
+			if (classes.containsKey(superClass)){
+				AbstractClassSignature classSig = classes.get(superClass);
+				for (AFeatureData featureData : classSig.getFeatureData()) {
+					result.add(new ExtendedPullUpSignature(classSig, featureData.getID()));
+				}
+			}
 		}
 
-		return result.toArray(new AbstractClassSignature[result.size()]);
+		return result;
 	}
 
-	public void setDestinationType(AbstractClassSignature destination) {
+	public void setDestinationType(ExtendedPullUpSignature destination) {
 		this.destinationType = destination;
 	}
 	
-	public AbstractClassSignature getDestinationType() {
+	public ExtendedPullUpSignature getDestinationType() {
 		return destinationType;
 	}
 
@@ -101,11 +108,15 @@ public abstract class PullUpRefactoring<T extends AbstractSignature> extends Ref
 		return featureProject.getProjectSignatures();
 	}
 
-	/**
-	 * @return the file
-	 */
 	public String getFile() {
 		return file;
 	}
 
+	public void setDeletedMethods(Set<ExtendedPullUpSignature> checkedMethods) {
+		deletedMethods.addAll(checkedMethods);		
+	}
+
+	public Set<ExtendedPullUpSignature> getDeletedMethods() {
+		return deletedMethods;
+	}
 }

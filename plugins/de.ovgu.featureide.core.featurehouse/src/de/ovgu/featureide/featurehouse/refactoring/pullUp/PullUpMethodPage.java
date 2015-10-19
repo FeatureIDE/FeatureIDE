@@ -18,6 +18,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.corext.refactoring.RefactoringCoreMessages;
+import org.eclipse.jdt.internal.corext.refactoring.util.JavaElementUtil;
 import org.eclipse.jdt.internal.corext.util.Messages;
 import org.eclipse.jdt.internal.corext.util.Strings;
 import org.eclipse.jdt.internal.ui.IJavaHelpContextIds;
@@ -60,25 +61,23 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.text.edits.DeleteEdit;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
 import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
-import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.core.signature.base.AFeatureData;
 import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
+import de.ovgu.featureide.core.signature.base.AbstractMethodSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.core.signature.base.SignaturePosition;
 import de.ovgu.featureide.featurehouse.refactoring.RefactoringUtil;
 import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.ui.views.outline.ContextOutlineLabelProvider;
 
 
 @SuppressWarnings("restriction")
 public class PullUpMethodPage extends UserInputWizardPage {
-	
-	
 	
 	private static class PullUpHierarchyContentProvider implements ITreeContentProvider {
 
@@ -95,8 +94,8 @@ public class PullUpMethodPage extends UserInputWizardPage {
 			Set<Object> elements = new HashSet<>();
 			if (parentElement instanceof Feature)
 				elements.addAll(getChildrenForFeature((Feature) parentElement));
-			else if (parentElement instanceof ExtendedSignature)
-				elements.addAll(((ExtendedSignature) parentElement).getChildren());
+			else if (parentElement instanceof ExtendedPullUpSignature)
+				elements.addAll(((ExtendedPullUpSignature) parentElement).getChildren());
 			
 			return elements.toArray();
 		}
@@ -110,8 +109,8 @@ public class PullUpMethodPage extends UserInputWizardPage {
 		}
 
 		public Object getParent(final Object element) {
-			if (element instanceof ExtendedSignature)
-				return ((ExtendedSignature) element).getParent();
+			if (element instanceof ExtendedPullUpSignature)
+				return ((ExtendedPullUpSignature) element).getParent();
 				
 			return null;
 		}
@@ -124,7 +123,7 @@ public class PullUpMethodPage extends UserInputWizardPage {
 			hierarchies = (Set<FeatureSignatureHierarchy>) newInput;
 		}
 		
-		private Set<ExtendedSignature> getChildrenForFeature(Feature feature)
+		private Set<ExtendedPullUpSignature> getChildrenForFeature(Feature feature)
 		{
 			for (FeatureSignatureHierarchy hierarchy : hierarchies) {
 				if (feature.equals(hierarchy.getFeature()))
@@ -170,7 +169,7 @@ public class PullUpMethodPage extends UserInputWizardPage {
 	public void checkPulledUp() {
 		uncheckAll();
 		fTreeViewer.setCheckedElements(refactoring.getPullUpSignatures());
-		final AbstractClassSignature parent= refactoring.getDestinationType();
+		final ExtendedPullUpSignature parent = refactoring.getDestinationType();
 		fTreeViewer.setChecked(parent, true);
 //		checkAllParents(parent);
 	}
@@ -308,17 +307,19 @@ public class PullUpMethodPage extends UserInputWizardPage {
 		fChangedSettings= true;
 	}
 
-	private IMethod[] getCheckedMethods() {
+	private Set<ExtendedPullUpSignature> getCheckedMethods() {
 		final Object[] checked= fTreeViewer.getCheckedElements();
-		final List<IMethod> members= new ArrayList<IMethod>(checked.length);
+		final Set<ExtendedPullUpSignature> members = new HashSet<>();
 		for (int i= 0; i < checked.length; i++) {
-			if (checked[i] instanceof IMethod)
-				members.add((IMethod) checked[i]);
+			if (checked[i] instanceof ExtendedPullUpSignature && ((ExtendedPullUpSignature) checked[i]).getSignature() instanceof AbstractMethodSignature)
+			{
+				members.add((ExtendedPullUpSignature) checked[i]);
+			}
 		}
-		return members.toArray(new IMethod[members.size()]);
+		return members;
 	}
 
-	private ExtendedSignature getFirstSelectedSourceReference(final SelectionChangedEvent event) {
+	private ExtendedPullUpSignature getFirstSelectedSourceReference(final SelectionChangedEvent event) {
 		final ISelection s= event.getSelection();
 		if (!(s instanceof IStructuredSelection))
 			return null;
@@ -326,28 +327,24 @@ public class PullUpMethodPage extends UserInputWizardPage {
 		if (ss.size() != 1)
 			return null;
 		final Object first= ss.getFirstElement();
-		if (!(first instanceof ExtendedSignature))
+		if (!(first instanceof ExtendedPullUpSignature))
 			return null;
-		return (ExtendedSignature) first;
+		return (ExtendedPullUpSignature) first;
 	}
 
 	@Override
 	public IWizardPage getNextPage() {
-//		initializeRefactoring();
+		initializeRefactoring();
 		return super.getNextPage();
 	}
-
-//	private String getSupertypeSignature() {
-//		return JavaElementUtil.createSignature(fProcessor.getDestinationType());
-//	}
 
 	private ITypeHierarchy getTreeInput() {
 		return (ITypeHierarchy) fTreeViewer.getInput();
 	}
 
-//	private void initializeRefactoring() {
-//		fProcessor.setDeletedMethods(getCheckedMethods());
-//	}
+	private void initializeRefactoring() {
+		refactoring.setDeletedMethods(getCheckedMethods());
+	}
 
 	private void initializeTreeViewer() {
 		try {
@@ -385,7 +382,7 @@ public class PullUpMethodPage extends UserInputWizardPage {
 
 	@Override
 	protected boolean performFinish() {
-//		initializeRefactoring();
+		initializeRefactoring();
 		return super.performFinish();
 	}
 
@@ -403,12 +400,12 @@ public class PullUpMethodPage extends UserInputWizardPage {
 		}
 	}
 
-//	private void setHierarchyLabelText() {
-//		final String message= Messages.format(RefactoringMessages.PullUpInputPage_subtypes, getSupertypeSignature());
-//		fTypeHierarchyLabel.setText(message);
-//	}
+	private void setHierarchyLabelText() {
+		final String message= Messages.format(RefactoringMessages.PullUpInputPage_subtypes, refactoring.getDestinationType().getSignature().getFullName());
+		fTypeHierarchyLabel.setText(message);
+	}
 
-	private void setSourceViewerContents(ExtendedSignature signature) {
+	private void setSourceViewerContents(ExtendedPullUpSignature signature) {
 		String content = null;
 		if (signature != null) {
 			
@@ -458,12 +455,12 @@ public class PullUpMethodPage extends UserInputWizardPage {
 		if (visible && fChangedSettings) {
 			fChangedSettings= false;
 			initializeTreeViewer();
-//			setHierarchyLabelText();
+			setHierarchyLabelText();
 		}
 		super.setVisible(visible);
 	}
 
-	private void showInSourceViewer(final ExtendedSignature selected) throws JavaModelException {
+	private void showInSourceViewer(final ExtendedPullUpSignature selected) throws JavaModelException {
 		if (selected == null)
 			setSourceViewerContents(null);
 		else
@@ -484,10 +481,10 @@ public class PullUpMethodPage extends UserInputWizardPage {
 	}
 
 	private void updateSelectionLabel() {
-		IMethod[] methods= getCheckedMethods();
-		int checkedMethodsCount= methods.length;
-		String text= checkedMethodsCount == 1 ? Messages.format(RefactoringMessages.PullUpInputPage_hierarchyLabal_singular, JavaElementLabels.getElementLabel(methods[0],
-				JavaElementLabels.M_PARAMETER_TYPES)) : Messages.format(RefactoringMessages.PullUpInputPage_hierarchyLabal_plural, String.valueOf(checkedMethodsCount));
+		Set<ExtendedPullUpSignature> methods= getCheckedMethods();
+		int checkedMethodsCount= methods.size();
+		String text= checkedMethodsCount == 1 ? Messages.format(RefactoringMessages.PullUpInputPage_hierarchyLabal_singular, new PullUpHierarchyLabelProvider().getText(methods.iterator().next().getSignature())) : 
+			Messages.format(RefactoringMessages.PullUpInputPage_hierarchyLabal_plural, String.valueOf(checkedMethodsCount));
 		fSelectionLabel.setText(text);
 
 	}

@@ -36,7 +36,7 @@ public class FeatureSignatureHierarchy {
 	
 	private final int featureId;
 	
-	private final Set<ExtendedSignature> children;
+	private final Set<ExtendedPullUpSignature> children;
 
 
 	public FeatureSignatureHierarchy(final Feature feature, final int featureId) {
@@ -53,11 +53,11 @@ public class FeatureSignatureHierarchy {
 		return featureId;
 	}
 
-	public Set<ExtendedSignature> getChildren() {
+	public Set<ExtendedPullUpSignature> getChildren() {
 		return children;
 	}
 	
-	public void addChild(ExtendedSignature extendSignature) {
+	public void addChild(ExtendedPullUpSignature extendSignature) {
 		this.children.add(extendSignature);
 	}
 

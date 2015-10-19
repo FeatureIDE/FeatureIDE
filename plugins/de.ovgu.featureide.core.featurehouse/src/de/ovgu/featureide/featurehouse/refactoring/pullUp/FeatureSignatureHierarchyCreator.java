@@ -48,9 +48,9 @@ public class FeatureSignatureHierarchyCreator {
 	private final ProjectSignatures projectSignatures;
 	private final AbstractSignature[] pullUpSignatures;
 	
-	public FeatureSignatureHierarchyCreator(final AbstractClassSignature destinationType, 
+	public FeatureSignatureHierarchyCreator(final ExtendedPullUpSignature destinationType, 
 			final ProjectSignatures projectSignatures, AbstractSignature[] abstractSignatures) {
-		this.destinationType = destinationType;
+		this.destinationType = (AbstractClassSignature) destinationType.getSignature();
 		this.projectSignatures = projectSignatures;
 		this.pullUpSignatures = abstractSignatures;
 	}
@@ -70,8 +70,8 @@ public class FeatureSignatureHierarchyCreator {
 		
 		final Map<String, AbstractClassSignature> classes = RefactoringUtil.getClasses(projectSignatures);
 		for (AbstractClassSignature classSig : classes.values()) {
-			if (isCorrectFeatureIdAndPackage(classSig, featureId, destinationType.getPackage())){
-				ExtendedSignature extendSignature = new ExtendedSignature(classSig, featureId);
+			if (isCorrectFeatureIdAndPackage(classSig, featureId, destinationType.getPackage()) && classSig.getExtendList().size() == 0){
+				ExtendedPullUpSignature extendSignature = new ExtendedPullUpSignature(classSig, featureId);
 				hierarchy.addChild(extendSignature);
 				addSubClassesAndMembers(extendSignature, classes, destinationType.getPackage());
 			}
@@ -84,7 +84,7 @@ public class FeatureSignatureHierarchyCreator {
 		return projectSignatures.getFeatureModel().getFeature(featureName);
 	}
 	
-	private void addSubClassesAndMembers(final ExtendedSignature parentExtendSignature, 
+	private void addSubClassesAndMembers(final ExtendedPullUpSignature parentExtendSignature, 
 			final Map<String, AbstractClassSignature> classes, String pkg) {
 		
 		if (!(parentExtendSignature.getSignature() instanceof AbstractClassSignature)) return;
@@ -96,7 +96,7 @@ public class FeatureSignatureHierarchyCreator {
 			final int featureId = parentExtendSignature.getFeatureId();
 			if (isCorrectFeatureIdAndPackage(subclassSig, featureId, pkg))
 			{
-				ExtendedSignature childExtendSignature = new ExtendedSignature(subclassSig, featureId);
+				ExtendedPullUpSignature childExtendSignature = new ExtendedPullUpSignature(subclassSig, featureId);
 				childExtendSignature.setParent(parentExtendSignature);
 				parentExtendSignature.addChild(childExtendSignature);
 				addSubClassesAndMembers(childExtendSignature, classes, pkg);
@@ -107,7 +107,7 @@ public class FeatureSignatureHierarchyCreator {
 		addFields(parentExtendSignature);
 	}
 
-	private void addMethods(ExtendedSignature parentExtendSignature) {
+	private void addMethods(ExtendedPullUpSignature parentExtendSignature) {
 		
 		if (!(parentExtendSignature.getSignature() instanceof AbstractClassSignature)) return;
 	
@@ -126,7 +126,7 @@ public class FeatureSignatureHierarchyCreator {
 						RefactoringUtil.hasSameParameters((FujiMethodSignature) pullUpMember, (FujiMethodSignature) method) && 
 						RefactoringUtil.hasSameReturnType((FujiMethodSignature) pullUpMember, (FujiMethodSignature) method)) 
 					{
-						final ExtendedSignature childExtendSignature = new ExtendedSignature(method, featureId);
+						final ExtendedPullUpSignature childExtendSignature = new ExtendedPullUpSignature(method, featureId);
 						childExtendSignature.setParent(parentExtendSignature);
 						parentExtendSignature.addChild(childExtendSignature);
 					}
@@ -136,7 +136,7 @@ public class FeatureSignatureHierarchyCreator {
 	}
 	
 	
-	private void addFields(ExtendedSignature parentExtendSignature) {
+	private void addFields(ExtendedPullUpSignature parentExtendSignature) {
 		
 		if (!(parentExtendSignature.getSignature() instanceof AbstractClassSignature)) return;
 	
@@ -152,7 +152,7 @@ public class FeatureSignatureHierarchyCreator {
 				for (AFeatureData featureData : field.getFeatureData()) {
 					if (featureData.hasID(featureId) && RefactoringUtil.hasSameName(field, pullUpMember))
 					{
-						final ExtendedSignature childExtendSignature = new ExtendedSignature(field, featureId);
+						final ExtendedPullUpSignature childExtendSignature = new ExtendedPullUpSignature(field, featureId);
 						childExtendSignature.setParent(parentExtendSignature);
 						parentExtendSignature.addChild(childExtendSignature);
 					}

@@ -30,35 +30,35 @@ import de.ovgu.featureide.core.signature.base.AbstractSignature;
  * 
  * @author steffen
  */
-public class ExtendedSignature {
+public class ExtendedPullUpSignature {
 
 	private final AbstractSignature signature;
 	
 	private final int featureId;
 	
-	private final Set<ExtendedSignature> children;
+	private final Set<ExtendedPullUpSignature> children;
 	
-	private ExtendedSignature parent;
+	private ExtendedPullUpSignature parent;
 	
-	public ExtendedSignature(final AbstractSignature signature, final int featureId) {
+	public ExtendedPullUpSignature(final AbstractSignature signature, final int featureId) {
 		this.signature = signature;
 		this.featureId = featureId;
 		this.children = new HashSet<>();
 	}
 
-	public Set<ExtendedSignature> getChildren() {
+	public Set<ExtendedPullUpSignature> getChildren() {
 		return children;
 	}
 
-	public void addChild(ExtendedSignature child) {
+	public void addChild(ExtendedPullUpSignature child) {
 		this.children.add(child);
 	}
 
-	public ExtendedSignature getParent() {
+	public ExtendedPullUpSignature getParent() {
 		return parent;
 	}
 
-	public void setParent(ExtendedSignature parent) {
+	public void setParent(ExtendedPullUpSignature parent) {
 		this.parent = parent;
 	}
 

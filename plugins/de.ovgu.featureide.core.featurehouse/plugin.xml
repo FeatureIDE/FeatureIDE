@@ -148,6 +148,18 @@
            </visibleWhen>
            -->
         </command>
+        <command
+              commandId="de.ovgu.featureide.core.featurehouse.ui.commands.refactoring.pullUp"
+              id="de.ovgu.featureide.core.featurehouse.ui.action.refactoring.pullup"
+              label="Pull Up..."
+              style="push">
+           <visibleWhen
+                 checkEnabled="false">
+              <test
+                    property="de.ovgu.featureide.core.featurehouse.properties.rename">
+              </test>
+           </visibleWhen>
+        </command>
      <!--</menu>-->
   </menuContribution>
   <menuContribution
@@ -157,6 +169,17 @@
            commandId="de.ovgu.featureide.core.featurehouse.ui.commands.refactoring.rename"
            id="de.ovgu.featureide.core.featurehouse.ui.action.refactoring.rename"
            label="Rename..."
+           style="push">
+        <visibleWhen
+              checkEnabled="false">
+           <test
+                 property="de.ovgu.featureide.core.featurehouse.properties.rename">
+           </test>
+        </visibleWhen>
+     </command>
+     <command
+           commandId="de.ovgu.featureide.core.featurehouse.ui.commands.refactoring.pullUp"
+           label="Pull Up..."
            style="push">
         <visibleWhen
               checkEnabled="false">
@@ -193,6 +216,10 @@
         id="de.ovgu.featureide.core.featurehouse.ui.commands.refactoring.rename"
         name="Rename">
   </command>
+  <command
+        id="de.ovgu.featureide.core.featurehouse.ui.commands.refactoring.pullUp"
+        name="PullUp">
+  </command>
 	</extension>
 	<extension
 			point="org.eclipse.ui.handlers">
@@ -211,6 +238,10 @@
   <handler
         class="de.ovgu.featureide.featurehouse.ui.handlers.RenameHandler"
         commandId="de.ovgu.featureide.core.featurehouse.ui.commands.refactoring.rename">
+  </handler>
+  <handler
+        class="de.ovgu.featureide.featurehouse.ui.handlers.PullUpHandler"
+        commandId="de.ovgu.featureide.core.featurehouse.ui.commands.refactoring.pullUp">
   </handler>
 	</extension>
 	<extension

@@ -60,9 +60,9 @@ public class PullUpHierarchyLabelProvider implements ILabelProvider {
 		if (element instanceof Feature) {
 			return GUIDefaults.IMAGE_FEATURE;
 		}
-		else if (element instanceof ExtendedSignature)
+		else if (element instanceof ExtendedPullUpSignature)
 		{
-			AbstractSignature extendSignature = ((ExtendedSignature) element).getSignature();
+			AbstractSignature extendSignature = ((ExtendedPullUpSignature) element).getSignature();
 			if (extendSignature instanceof AbstractMethodSignature) {
 				switch (((AbstractMethodSignature) extendSignature).getVisibilty()) {
 				case AbstractSignature.VISIBILITY_DEFAULT:
@@ -98,9 +98,9 @@ public class PullUpHierarchyLabelProvider implements ILabelProvider {
 		if (element instanceof Feature) {
 			return ((Feature) element).getDisplayName();
 		} 
-		else if (element instanceof ExtendedSignature)
+		else if (element instanceof ExtendedPullUpSignature)
 		{
-			AbstractSignature extendSignature = ((ExtendedSignature) element).getSignature();
+			AbstractSignature extendSignature = ((ExtendedPullUpSignature) element).getSignature();
 			if (extendSignature instanceof AbstractMethodSignature) {
 				final AbstractMethodSignature method = (AbstractMethodSignature) extendSignature;
 				final StringBuilder sb = new StringBuilder();
