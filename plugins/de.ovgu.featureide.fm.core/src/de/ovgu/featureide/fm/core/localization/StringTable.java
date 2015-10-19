@@ -686,7 +686,6 @@ public class StringTable {
 	public static final String CANT_CONNECT_TO_DIFFERENT_DOCUMENT_ = "Can't connect to different document.";
 	public static final String CANT_DISCONNECT_FROM_DIFFERENT_DOCUMENT_ = "Can't disconnect from different document.";
 	public static final String OPENED = "opened ";
-	public static final String ACTIVATED = "activated ";
 	public static final String TOTOP = "toTop ";
 	public static final String VISIBLE = "visible ";
 	public static final String DOCUMENTATION_WIZARD = "Documentation Wizard";

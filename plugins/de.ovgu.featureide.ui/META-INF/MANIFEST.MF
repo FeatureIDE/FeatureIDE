@@ -102,4 +102,6 @@ Import-Package: org.eclipse.jdt.core,
  org.eclipse.jface.text.source,
  org.eclipse.platform.internal,
  org.eclipse.ui.editors.text,
- org.eclipse.ui.texteditor
+ org.eclipse.ui.texteditor,
+ org.junit.runner,
+ org.junit.runner.notification

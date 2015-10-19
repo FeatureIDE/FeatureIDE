@@ -29,7 +29,6 @@ import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
-
 /**
  * Represents a feature at the {@link FSTModel}.<br>
  * Contains {@link FSTRole}s with their corresponding {@link FSTClass}.
