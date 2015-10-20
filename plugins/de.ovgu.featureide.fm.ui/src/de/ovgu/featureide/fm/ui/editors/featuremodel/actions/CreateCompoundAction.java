@@ -39,6 +39,7 @@ import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
@@ -118,10 +119,16 @@ public class CreateCompoundAction extends Action {
 			else
 				feature = (IFeature) editPart;
 
-			if (selectedFeatures.isEmpty())
-				parent = feature.getStructure().getParent().getFeature();
-			else if (parent != feature.getStructure().getParent())
-				return false;
+			IFeatureStructure structureParent = feature.getStructure().getParent();
+			if (structureParent != null) {
+				IFeature featureParent = structureParent.getFeature();
+				if (selectedFeatures.isEmpty()) {
+					parent = featureParent;
+				} else if (parent != featureParent) {
+					return false;
+				}
+			}
+			
 			selectedFeatures.add(feature);
 		}
 		return !selectedFeatures.isEmpty();
