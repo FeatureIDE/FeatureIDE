@@ -27,7 +27,6 @@ import java.util.List;
 
 import de.ovgu.featureide.fm.core.ConstraintAttribute;
 import de.ovgu.featureide.fm.core.FeatureStatus;
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -42,9 +41,6 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
  */
 public class FeatureModelStructure implements IFeatureModelStructure {
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -53,9 +49,6 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 		return result;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -68,7 +61,7 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 		if (correspondingFeatureModel == null) {
 			if (other.correspondingFeatureModel != null)
 				return false;
-		} 
+		}
 		//else if (!correspondingFeatureModel.equals(other.correspondingFeatureModel))
 		//	return false;
 		if (rootFeature == null) {
@@ -198,7 +191,7 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 	@Override
 	public boolean hasOptionalFeatures() {
 		for (final IFeature f : correspondingFeatureModel.getFeatures()) {
-			if (!f.equals(rootFeature) && f.getStructure().getParent().isAnd() && !f.getStructure().isMandatory()) {
+			if (!f.equals(rootFeature) && f.getStructure().getParent() != null && f.getStructure().getParent().isAnd() && !f.getStructure().isMandatory()) {
 				return true;
 			}
 		}
@@ -247,7 +240,7 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 	public void setRoot(IFeatureStructure root) {
 		rootFeature = root;
 	}
-	
+
 	private boolean existsFeatureWithStatus(FeatureStatus status) {
 		for (final IFeature f : correspondingFeatureModel.getFeatureTable().values()) {
 			if (f.getProperty().getFeatureStatus() == status) {
