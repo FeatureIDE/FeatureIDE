@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core.base;
 
 import de.ovgu.featureide.fm.core.ColorList;
+import de.ovgu.featureide.fm.core.FMDimension;
 import de.ovgu.featureide.fm.core.FMPoint;
 import de.ovgu.featureide.fm.core.IGraphicItem;
 
@@ -37,10 +38,14 @@ public interface IGraphicalFeature extends IGraphicItem {
 
 	FMPoint getLocation();
 
+	FMDimension getSize();
+
 	boolean isConstraintSelected();
 
 	void setConstraintSelected(boolean selection);
 
 	void setNewLocation(FMPoint newLocation);
+
+	void setSize(FMDimension size);
 
 }

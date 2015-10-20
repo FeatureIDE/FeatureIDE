@@ -32,7 +32,6 @@ import org.eclipse.core.resources.IProject;
 
 import de.ovgu.featureide.fm.core.FMComposerManager;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
-import de.ovgu.featureide.fm.core.FeatureModelLayout;
 import de.ovgu.featureide.fm.core.IFMComposerExtension;
 import de.ovgu.featureide.fm.core.RenamingsManager;
 
@@ -44,6 +43,8 @@ import de.ovgu.featureide.fm.core.RenamingsManager;
  * @author Marcus Pinnecke
  */
 public interface IFeatureModel extends Cloneable {
+	
+	long getId();
 
 	void addConstraint(IConstraint constraint);
 

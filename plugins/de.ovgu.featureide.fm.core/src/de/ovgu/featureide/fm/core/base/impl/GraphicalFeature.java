@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.core.base.impl;
 import java.beans.PropertyChangeEvent;
 
 import de.ovgu.featureide.fm.core.ColorList;
+import de.ovgu.featureide.fm.core.FMDimension;
 import de.ovgu.featureide.fm.core.FMPoint;
 import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -41,7 +42,8 @@ public class GraphicalFeature implements IGraphicalFeature, PropertyConstants {
 	protected boolean constraintSelected;
 	protected IFeature correspondingFeature;
 
-	protected FMPoint location = new FMPoint(0, 0);;
+	protected FMPoint location = new FMPoint(0, 0);
+	protected FMDimension dimension = new FMDimension(10, 10);
 
 	public GraphicalFeature(IFeature correspondingFeature) {
 		this.correspondingFeature = correspondingFeature;
@@ -83,4 +85,15 @@ public class GraphicalFeature implements IGraphicalFeature, PropertyConstants {
 	public void setNewLocation(FMPoint newLocation) {
 		location = newLocation;
 	}
+
+	@Override
+	public FMDimension getSize() {
+		return dimension;
+	}
+
+	@Override
+	public void setSize(FMDimension size) {
+		this.dimension = size;
+	}
+
 }

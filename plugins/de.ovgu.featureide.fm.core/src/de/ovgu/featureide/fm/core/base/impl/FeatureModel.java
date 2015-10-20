@@ -29,7 +29,6 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.core.resources.IProject;
@@ -64,29 +63,14 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  * 
  */
 public class FeatureModel implements IFeatureModel, PropertyConstants {
-
-	@Override
-	public int hashCode() {
-		return toString().hashCode();		
+	
+	private static long NEXT_ID = 0;
+	
+	protected static final synchronized long getNextId() {
+		return NEXT_ID++;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		FeatureModel other = (FeatureModel) obj;
-		if (structure == null) {
-			if (other.structure != null) {
-				return false;
-			}
-		} else
-			return this.toString().equals(obj.toString());
-		return false;
-	}
+	private final long id;
 
 	protected final FeatureModelAnalyzer analyser = createAnalyser();
 	protected final List<IConstraint> constraints = new LinkedList<>();
@@ -120,6 +104,7 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	private File sourceFile;
 
 	public FeatureModel() {
+		id = getNextId();
 		featureOrderList = new LinkedList<String>();
 		featureOrderUserDefined = false;
 
@@ -130,6 +115,7 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	}
 
 	protected FeatureModel(FeatureModel oldFeatureModel, IFeature newRoot) {
+		id = oldFeatureModel.getId();
 		featureOrderList = new LinkedList<String>(oldFeatureModel.featureOrderList);
 		featureOrderUserDefined = oldFeatureModel.featureOrderUserDefined;
 
@@ -137,7 +123,7 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 		structure = createStructure();
 		graphicalFeatureModel = oldFeatureModel.getGraphicRepresenation(); // TODO: Marcus XXX clone here?
 		modelLayout = oldFeatureModel.getLayout();
-		
+
 		this.sourceFile = oldFeatureModel.sourceFile;
 
 		if (newRoot == null) {
@@ -165,7 +151,7 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	}
 
 	protected IGraphicalFeatureModel createGraphicalFeatureModel() {
-		return new GraphicalFeatureModel(this);
+		return GraphicMap.getInstance().getGraphicRepresentation(this);
 	}
 
 	private IFeatureModelLayout createFeatureModelLayout() {
@@ -570,6 +556,47 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	@Override
 	public File xxxGetSourceFile() {
 		return this.sourceFile;
+	}
+
+//	@Override
+//	public int hashCode() {
+//		return toString().hashCode();
+//	}
+//
+//	@Override
+//	public boolean equals(Object obj) {
+//		if (this == obj)
+//			return true;
+//		if (obj == null || getClass() != obj.getClass())
+//			return false;
+//		FeatureModel other = (FeatureModel) obj;
+//		if (structure == null) {
+//			if (other.structure != null) {
+//				return false;
+//			}
+//		} else
+//			return this.toString().equals(obj.toString());
+//		return false;
+//	}
+
+	@Override
+	public long getId() {
+		return id;
+	}
+	
+	@Override
+	public int hashCode() {
+		return (int) (37 * id);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null || getClass() != obj.getClass())
+			return false;
+		FeatureModel other = (FeatureModel) obj;
+		return id == other.id;
 	}
 
 }

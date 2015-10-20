@@ -47,6 +47,14 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  * @author Stefan Krueger
  */
 public class Constraint implements IConstraint, PropertyConstants {
+	
+	private static long NEXT_ID = 0;
+	
+	protected static final synchronized long getNextId() {
+		return NEXT_ID++;
+	}
+
+	private final long id;
 
 	protected ConstraintAttribute attribute = ConstraintAttribute.NORMAL;
 
@@ -64,41 +72,18 @@ public class Constraint implements IConstraint, PropertyConstants {
 
 	protected Constraint(Constraint oldConstraint, IFeatureModel featureModel) {
 		this.featureModel = featureModel;
-		propNode = oldConstraint.propNode;
+		this.id = oldConstraint.id;
+		this.propNode = oldConstraint.propNode;
 		this.featureSelected = oldConstraint.featureSelected;
-		this.graphicalRepresentation = oldConstraint.graphicalRepresentation;
+		this.graphicalRepresentation = GraphicMap.getInstance().getGraphicRepresentation(this);
 	}
 
 	public Constraint(IFeatureModel featureModel, Node propNode) {
 		this.featureModel = featureModel;
+		this.id = getNextId();
 		this.propNode = propNode;
 		this.featureSelected = false;
-		this.graphicalRepresentation = new GraphicalConstraint(this);
-	}
-
-	@Override
-	public int hashCode() { // Marcus: required for Constraints.remove(Constraint), e.g. Generator.java:124
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((propNode == null) ? 0 : propNode.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {		// Marcus: required for Constraints.remove(Constraint), e.g. Generator.java:124
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Constraint other = (Constraint) obj;
-		if (propNode == null) {
-			if (other.propNode != null)
-				return false;
-		} else if (!propNode.equals(other.propNode))
-			return false;
-		return true;
+		this.graphicalRepresentation = GraphicMap.getInstance().getGraphicRepresentation(this);
 	}
 
 	@Override
@@ -255,6 +240,39 @@ public class Constraint implements IConstraint, PropertyConstants {
 		featureSelected = b;
 		fireEvent(new PropertyChangeEvent(this, CONSTRAINT_SELECTED, Boolean.FALSE, Boolean.TRUE));
 	}
+	
 
+//	@Override
+//	public int hashCode() { // Marcus: required for Constraints.remove(Constraint), e.g. Generator.java:124
+////		final int prime = 31;
+////		int result = 1;
+////		result = prime * result + ((propNode == null) ? 0 : propNode.hashCode());
+//		return ((propNode == null) ? 0 : propNode.hashCode());
+//	}
+//
+//	@Override
+//	public boolean equals(Object obj) {		// Marcus: required for Constraints.remove(Constraint), e.g. Generator.java:124
+//		if (this == obj)
+//			return true;
+//		if (obj == null || getClass() != obj.getClass())
+//			return false;
+//		Constraint other = (Constraint) obj;
+//		return (propNode != null && propNode.equals(other.propNode));
+//	}
+	
+	@Override
+	public int hashCode() {
+		return (int) (37 * id);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null || getClass() != obj.getClass())
+			return false;
+		Constraint other = (Constraint) obj;
+		return id == other.id;
+	}
 
 }

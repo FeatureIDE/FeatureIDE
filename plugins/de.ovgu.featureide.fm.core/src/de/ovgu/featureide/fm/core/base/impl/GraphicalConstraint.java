@@ -20,8 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
-import java.beans.PropertyChangeEvent;
-
+import de.ovgu.featureide.fm.core.FMDimension;
 import de.ovgu.featureide.fm.core.FMPoint;
 import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.base.IConstraint;
@@ -38,6 +37,7 @@ public class GraphicalConstraint implements IGraphicalConstraint, PropertyConsta
 	protected final IConstraint correspondingConstraint;
 
 	protected FMPoint location = new FMPoint(0, 0);
+	protected FMDimension dimension = new FMDimension(10, 10);
 
 	public GraphicalConstraint(IConstraint correspondingConstraint) {
 		this.correspondingConstraint = correspondingConstraint;
@@ -65,12 +65,22 @@ public class GraphicalConstraint implements IGraphicalConstraint, PropertyConsta
 
 	@Override
 	public void setFeatureSelected(boolean selected) {
-		correspondingConstraint.setFeatureSelected(selected); 
+		correspondingConstraint.setFeatureSelected(selected);
 	}
 
 	@Override
 	public void setLocation(FMPoint newLocation) {
 		location = newLocation;
+	}
+
+	@Override
+	public FMDimension getSize() {
+		return dimension;
+	}
+
+	@Override
+	public void setSize(FMDimension size) {
+		this.dimension = size;
 	}
 
 }

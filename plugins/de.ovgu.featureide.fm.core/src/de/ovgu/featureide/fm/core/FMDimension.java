@@ -18,43 +18,29 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.base;
-
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+package de.ovgu.featureide.fm.core;
 
 /**
- * Interface for a class that represents a feature.</br>
- * Can be instantiated via {@link IFeatureModelFactory}.
+ * Saves width and height for an element in the feature model diagram.
  * 
  * @author Sebastian Krieter
  */
-public interface IFeature extends PropertyChangeListener {
+public class FMDimension {
 
-	void addListener(PropertyChangeListener listener);
+	public int width;
+	public int height;
 
-	IFeature clone(IFeatureModel newFeatureModel, IFeatureStructure newStructure);
+	public FMDimension(int x, int y) {
+		this.width = x;
+		this.height = y;
+	}
 
-	void fireEvent(PropertyChangeEvent event);
+	public int getWidth() {
+		return width;
+	}
 
-	IFeatureModel getFeatureModel();
-
-	IFeatureProperty getProperty();
-
-	IFeatureStructure getStructure();
-
-	long getId();
-
-	String getName();
-
-	void removeListener(PropertyChangeListener listener);
-
-	void setName(CharSequence name);
-	
-	IGraphicalFeature getGraphicRepresenation(); // Added, Marcus Pinnecke 31.08.15
-
-	boolean isConstraintSelected();
-
-	void setConstraintSelected(boolean b);
+	public int getHeight() {
+		return height;
+	}
 
 }

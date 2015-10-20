@@ -120,6 +120,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.RunMan
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.TautologyContraintsCalculationsAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors.ColorSelectedFeatureAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.GraphicalEditPartFactory;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutManager;
 import de.ovgu.featureide.fm.ui.editors.keyhandler.FeatureDiagramEditorKeyHandler;
@@ -247,8 +248,11 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			 * @param delta
 			 */
 			private void moveLegend(IFeatureModel fm, int delta) {
-				org.eclipse.draw2d.geometry.Point location = FeatureUIHelper.getLegendFigure(fm).getLocation();
-				FeatureUIHelper.getLegendFigure(fm).setLocation(new org.eclipse.draw2d.geometry.Point(location.x + delta, location.y));
+				LegendFigure legendFigure = FeatureUIHelper.getLegendFigure(fm);
+				if (legendFigure != null) {
+					org.eclipse.draw2d.geometry.Point location = legendFigure.getLocation();
+					legendFigure.setLocation(new org.eclipse.draw2d.geometry.Point(location.x + delta, location.y));
+				}
 			}
 
 			@Override

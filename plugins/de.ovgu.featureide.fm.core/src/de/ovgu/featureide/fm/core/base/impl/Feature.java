@@ -22,7 +22,6 @@ package de.ovgu.featureide.fm.core.base.impl;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Collection;
 import java.util.LinkedList;
 
 import de.ovgu.featureide.fm.core.PropertyConstants;
@@ -42,6 +41,14 @@ import de.ovgu.featureide.fm.core.base.IGraphicalFeature;
  * 
  */
 public class Feature implements IFeature, PropertyConstants {
+	
+	private static long NEXT_ID = 0;
+	
+	protected static final synchronized long getNextId() {
+		return NEXT_ID++;
+	}
+
+	private final long id;
 
 	protected IFeatureModel featureModel;
 	protected LinkedList<PropertyChangeListener> listenerList = new LinkedList<PropertyChangeListener>();
@@ -55,33 +62,35 @@ public class Feature implements IFeature, PropertyConstants {
 
 	protected Feature(Feature oldFeature, IFeatureModel featureModel, IFeatureStructure newFeatrureStructure) {
 		this.featureModel = featureModel != null ? featureModel : oldFeature.featureModel;
+		this.id = oldFeature.id;
 		name = new String(oldFeature.name.toString());
 		graphicalRepresentation = oldFeature.graphicalRepresentation;
 		constraintSelected = oldFeature.constraintSelected;
 
 		property = oldFeature.property.clone(this);
 		structure = newFeatrureStructure != null ? newFeatrureStructure : oldFeature.structure;
-		
+
 	}
 
 	public Feature(IFeatureModel featureModel, CharSequence name) {
+		this.id = getNextId();
 		this.featureModel = featureModel;
 		this.name = name;
 		this.constraintSelected = false;
-		
+
 		property = createProperty();
 		structure = createStructure();
 		graphicalRepresentation = createGraphicalRepresentation();
 	}
-	
+
 	protected IGraphicalFeature createGraphicalRepresentation() {
-		return new GraphicalFeature(this);
+		return GraphicMap.getInstance().getGraphicRepresentation(this);
 	}
 
 	protected IFeatureProperty createProperty() {
 		return new FeatureProperty(this);
 	}
-	
+
 	protected IFeatureStructure createStructure() {
 		return new FeatureStructure(this);
 	}
@@ -105,10 +114,6 @@ public class Feature implements IFeature, PropertyConstants {
 		}
 	}
 
-	protected void fireNameChanged() {
-		fireEvent(new PropertyChangeEvent(this, NAME_CHANGED, Boolean.FALSE, Boolean.TRUE));
-	}
-
 	@Override
 	public IFeatureModel getFeatureModel() {
 		return featureModel;
@@ -125,24 +130,13 @@ public class Feature implements IFeature, PropertyConstants {
 	}
 
 	@Override
-	public int getId() {
-		return 0;
+	public long getId() {
+		return id;
 	}
 
 	@Override
 	public String getName() {
 		return name.toString();
-	}
-
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		return result;
 	}
 
 	@Override
@@ -157,8 +151,9 @@ public class Feature implements IFeature, PropertyConstants {
 
 	@Override
 	public void setName(CharSequence name) {
+		final CharSequence oldName = this.name;
 		this.name = name;
-		fireNameChanged();
+		fireEvent(new PropertyChangeEvent(this, NAME_CHANGED, oldName, name));
 	}
 
 	@Override
@@ -185,25 +180,37 @@ public class Feature implements IFeature, PropertyConstants {
 		constraintSelected = b;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
+//	@Override
+//	public int hashCode() {
+//		//		final int prime = 31;
+//		//		int result = 1;
+//		//		result = prime * result + ((name == null) ? 0 : name.hashCode());
+//		return (name == null) ? 0 : name.hashCode();
+//	}
+//
+//	@Override
+//	public boolean equals(Object obj) {
+//		if (this == obj)
+//			return true;
+//		if (obj == null || getClass() != obj.getClass())
+//			return false;
+//		Feature other = (Feature) obj;
+//		return (name != null && name.equals(other.name));
+//	}
+
+	@Override
+	public int hashCode() {
+		return (int) (37 * id);
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (obj == null)
-			return false;
-		if (obj instanceof IFeatureStructure) {
-			return equals(((IFeatureStructure)obj).getFeature());
-		} else if (getClass() != obj.getClass())
+		if (obj == null || getClass() != obj.getClass())
 			return false;
 		Feature other = (Feature) obj;
-		if (name == null) {
-			if (other.name != null)
-				return false;
-		} else if (!name.equals(other.name))
-			return false;
-		return true;
+		return id == other.id;
 	}
+
 }
