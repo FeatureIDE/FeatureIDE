@@ -36,7 +36,7 @@ public class ExtendedFeature extends Feature {
 	private String externalModelName = null;
 	private boolean newDefined = false;
 
-	public ExtendedFeature(IFeatureModel featureModel, CharSequence name) {
+	public ExtendedFeature(IFeatureModel featureModel, String name) {
 		super(featureModel, name);
 	}
 

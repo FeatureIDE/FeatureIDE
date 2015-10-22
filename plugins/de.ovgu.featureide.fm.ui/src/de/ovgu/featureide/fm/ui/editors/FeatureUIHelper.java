@@ -290,7 +290,7 @@ public class FeatureUIHelper {
 		if (newLocation == null) {
 			return;
 		}
-		feature.setNewLocation(toFMPoint(newLocation));
+		feature.setLocation(toFMPoint(newLocation));
 		fireLocationChanged(feature, oldLocation, newLocation);
 	}
 
@@ -313,7 +313,7 @@ public class FeatureUIHelper {
 	public static Rectangle getBounds(IGraphicalFeature feature) {
 		if (getLocation(feature) == null || getSize(feature) == null) {
 			// UIHelper not set up correctly, refresh the feature model
-			feature.getFeature().getFeatureModel().handleModelDataChanged();
+			feature.getElement().getFeatureModel().handleModelDataChanged();
 		}
 		return new Rectangle(getLocation(feature), getSize(feature));
 	}
@@ -321,7 +321,7 @@ public class FeatureUIHelper {
 	public static Rectangle getBounds(IGraphicalConstraint constraint) {
 		if (getLocation(constraint) == null || getSize(constraint) == null) {
 			// UIHelper not set up correctly, refresh the feature model
-			constraint.getConstraint().getFeatureModel().handleModelDataChanged();
+			constraint.getElement().getFeatureModel().handleModelDataChanged();
 		}
 		return new Rectangle(getLocation(constraint), getSize(constraint));
 	}
@@ -329,7 +329,7 @@ public class FeatureUIHelper {
 	public static List<ConnectionEditPart> getConnections(IGraphicalFeature feature, EditPartViewer viewer) {
 		final List<ConnectionEditPart> editPartList = new LinkedList<ConnectionEditPart>();
 		final Map<?, ?> registry = viewer.getEditPartRegistry();
-		for (FeatureConnection connection : feature.getFeature().getStructure().getTargetConnections()) {
+		for (FeatureConnection connection : feature.getElement().getStructure().getTargetConnections()) {
 			final Object connectionEditPart = registry.get(connection);
 			if (connectionEditPart instanceof ConnectionEditPart) {
 				editPartList.add((ConnectionEditPart) connectionEditPart);
@@ -347,7 +347,7 @@ public class FeatureUIHelper {
 	}
 
 	public static Point getSourceLocation(IGraphicalFeature feature) {
-		IFeature parentFeature = feature.getFeature();
+		IFeature parentFeature = feature.getElement();
 		boolean parentFeatureHidden = false;
 		while (!parentFeature.getStructure().isRoot()) {
 			parentFeature = parentFeature.getStructure().getParent().getFeature();
@@ -355,21 +355,21 @@ public class FeatureUIHelper {
 				parentFeatureHidden = true;
 			}
 		}
-		if ((feature.getFeature().getStructure().isHidden() || parentFeatureHidden)
-				&& !feature.getFeature().getFeatureModel().getGraphicRepresenation().getLayout().showHiddenFeatures()) {
-			return getTargetLocation(feature.getFeature().getStructure().getParent().getFeature());
+		if ((feature.getElement().getStructure().isHidden() || parentFeatureHidden)
+				&& !feature.getElement().getFeatureModel().getGraphicRepresenation().getLayout().showHiddenFeatures()) {
+			return getTargetLocation(feature.getElement().getStructure().getParent().getFeature());
 		}
 
-		return getSourceLocation(getBounds(feature), feature.getFeature().getFeatureModel());
+		return getSourceLocation(getBounds(feature), feature.getElement().getFeatureModel());
 	}
 
 	public static Point getSourceLocation(IGraphicalFeature feature, Point newLocation) {
-		return getSourceLocation(new Rectangle(newLocation, getSize(feature)), feature.getFeature().getFeatureModel());
+		return getSourceLocation(new Rectangle(newLocation, getSize(feature)), feature.getElement().getFeatureModel());
 	}
 
 	public static Point getTargetLocation(IGraphicalFeature feature) {
 		Rectangle bounds = getBounds(feature);
-		if (feature.getFeature().getFeatureModel().getGraphicRepresenation().getLayout().verticalLayout()) {
+		if (feature.getElement().getFeatureModel().getGraphicRepresenation().getLayout().verticalLayout()) {
 			return new Point(bounds.getRight().x, (bounds.bottom() + bounds.getTop().y) / 2);
 		}
 
@@ -412,12 +412,12 @@ public class FeatureUIHelper {
 
 	private static void fireLocationChanged(IGraphicalFeature feature, Point oldLocation, Point newLocation) {
 		PropertyChangeEvent event = new PropertyChangeEvent(feature, PropertyConstants.LOCATION_CHANGED, oldLocation, newLocation);
-		feature.getFeature().fireEvent(event);
+		feature.getElement().fireEvent(event);
 	}
 
 	private static void fireLocationChanged(IGraphicalConstraint constraint, Point oldLocation, Point newLocation) {
 		PropertyChangeEvent event = new PropertyChangeEvent(constraint, PropertyConstants.LOCATION_CHANGED, oldLocation, newLocation);
-		constraint.getConstraint().fireEvent(event);
+		constraint.getElement().fireEvent(event);
 	}
 
 	public static void setLegendFigure(IGraphicalFeatureModel featureModel, LegendFigure figure) {

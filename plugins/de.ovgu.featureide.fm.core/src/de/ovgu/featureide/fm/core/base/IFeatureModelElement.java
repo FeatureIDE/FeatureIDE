@@ -20,21 +20,26 @@
  */
 package de.ovgu.featureide.fm.core.base;
 
-import de.ovgu.featureide.fm.core.ColorList;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 /**
- * Graphical representation of a feature.
+ * Interface for a class that represents a feature model element.
  * 
  * @author Sebastian Krieter
  */
-public interface IGraphicalFeature extends IGraphicalElement {
+public interface IFeatureModelElement extends PropertyChangeListener {
 
-	ColorList getColorList();
+	void addListener(PropertyChangeListener listener);
 
-	IFeature getElement();
+	void fireEvent(PropertyChangeEvent event);
 
-	boolean isConstraintSelected();
+	IFeatureModel getFeatureModel();
 
-	void setConstraintSelected(boolean selection);
+	void removeListener(PropertyChangeListener listener);
+
+	long getId();
+	
+	IGraphicalElement getGraphicRepresenation();
 
 }

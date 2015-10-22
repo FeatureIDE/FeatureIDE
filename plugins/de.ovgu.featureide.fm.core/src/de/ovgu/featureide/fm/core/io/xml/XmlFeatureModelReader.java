@@ -224,7 +224,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 			f.getStructure().setMandatory(mandatory);
 			f.getStructure().setHidden(hidden);
 			if (featureLocation != null) {
-				f.getGraphicRepresenation().setNewLocation(featureLocation);
+				f.getGraphicRepresenation().setLocation(featureLocation);
 			}
 			featureModel.addFeature(f);
 			if (parent == null) {

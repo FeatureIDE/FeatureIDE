@@ -33,7 +33,7 @@ public interface IFeatureModelFactory {
 	
 	IConstraint createConstraint(IFeatureModel featureModel, Node propNode);
 
-	IFeature createFeature(IFeatureModel featureModel, CharSequence name);
+	IFeature createFeature(IFeatureModel featureModel, String name);
 
 	IFeatureModel createFeatureModel();
 

@@ -54,7 +54,7 @@ public class ExtendedFeatureModelFactory implements IFeatureModelFactory {
 	}
 
 	@Override
-	public ExtendedFeature createFeature(IFeatureModel featureModel, CharSequence name) {
+	public ExtendedFeature createFeature(IFeatureModel featureModel, String name) {
 		return new ExtendedFeature(featureModel, name);
 	}
 

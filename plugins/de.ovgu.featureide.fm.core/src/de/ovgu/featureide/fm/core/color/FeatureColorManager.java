@@ -281,7 +281,7 @@ public class FeatureColorManager {
 	}
 	
 	private static IProject getProject(IFeatureModel featureModel) {
-		File file = featureModel.xxxGetSourceFile();
+		File file = featureModel.getSourceFile();
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		IPath location = Path.fromOSString(file.getAbsolutePath());
 		IFile iFile = workspace.getRoot().getFileForLocation(location);

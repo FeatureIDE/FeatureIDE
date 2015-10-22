@@ -18,23 +18,31 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.base;
+package de.ovgu.featureide.fm.core.base.impl;
 
-import de.ovgu.featureide.fm.core.ColorList;
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
- * Graphical representation of a feature.
+ * TODO description
  * 
  * @author Sebastian Krieter
  */
-public interface IGraphicalFeature extends IGraphicalElement {
+public class ModelFileIdMap {
 
-	ColorList getColorList();
+	private static final Map<String, Long> map = new HashMap<>();
 
-	IFeature getElement();
-
-	boolean isConstraintSelected();
-
-	void setConstraintSelected(boolean selection);
+	public static synchronized long getModelId(IFeatureModel featureModel, File modelFile) {
+		String fileLocation = modelFile.toPath().toAbsolutePath().toString();
+		Long id = map.get(fileLocation);
+		if (id == null) {
+			id = featureModel.getId();
+			map.put(fileLocation, id);
+		}
+		return id;
+	}
 
 }

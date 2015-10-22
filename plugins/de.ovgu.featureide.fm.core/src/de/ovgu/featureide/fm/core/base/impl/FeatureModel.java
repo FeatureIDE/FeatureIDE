@@ -70,7 +70,13 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 		return NEXT_ID++;
 	}
 
-	private final long id;
+	private long id;
+
+	private long nextElementId = 0;
+	
+	public final synchronized long getNextElementId() {
+		return nextElementId++;
+	}
 
 	protected final FeatureModelAnalyzer analyser = createAnalyser();
 	protected final List<IConstraint> constraints = new LinkedList<>();
@@ -549,12 +555,15 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	}
 
 	@Override
-	public void xxxSetSourceFile(File file) {
+	public void setSourceFile(File file) {
 		this.sourceFile = file;
+		if (file != null) {
+			id = ModelFileIdMap.getModelId(this, file);
+		}
 	}
 
 	@Override
-	public File xxxGetSourceFile() {
+	public File getSourceFile() {
 		return this.sourceFile;
 	}
 

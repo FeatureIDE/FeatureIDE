@@ -44,7 +44,7 @@ public class GraphicalConstraint implements IGraphicalConstraint, PropertyConsta
 	}
 
 	@Override
-	public IConstraint getConstraint() {
+	public IConstraint getElement() {
 		return correspondingConstraint;
 	}
 
