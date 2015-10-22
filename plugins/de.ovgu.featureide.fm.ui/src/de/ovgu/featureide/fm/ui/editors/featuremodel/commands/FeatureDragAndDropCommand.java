@@ -30,6 +30,7 @@ import org.eclipse.ui.PlatformUI;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
@@ -72,7 +73,8 @@ public class FeatureDragAndDropCommand extends Command {
 		this.hasAutoLayout = featureModel.getGraphicRepresenation().getLayout().hasFeaturesAutoLayout();
 		this.hasVerticalLayout = FeatureUIHelper.hasVerticalLayout(featureModel);
 		this.editPart = editPart;
-		oldParent = feature.getStructure().getParent().getFeature();
+		IFeatureStructure structureParent = feature.getStructure().getParent();
+		oldParent = (structureParent != null) ? structureParent.getFeature() : null;
 		oldIndex = oldParent != null ? oldParent.getStructure().getChildIndex(feature.getStructure()) : 0;
 	}
 
