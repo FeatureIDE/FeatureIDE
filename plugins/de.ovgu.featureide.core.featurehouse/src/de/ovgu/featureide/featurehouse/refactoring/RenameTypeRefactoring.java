@@ -22,6 +22,7 @@ package de.ovgu.featureide.featurehouse.refactoring;
 
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
@@ -50,8 +51,8 @@ import de.ovgu.featureide.featurehouse.signature.fuji.FujiClassSignature;
 @SuppressWarnings("restriction")
 public class RenameTypeRefactoring extends RenameRefactoring<FujiClassSignature> {
 
-	public RenameTypeRefactoring(FujiClassSignature selection, IFeatureProject featureProject) {
-		super(selection, featureProject);
+	public RenameTypeRefactoring(FujiClassSignature selection, IFeatureProject featureProject, String file) {
+		super(selection, featureProject, file);
 	}
 
 	@Override

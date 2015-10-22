@@ -118,7 +118,7 @@ public class RenameMethodRefactoringTest extends RenameRefactoringTest{
 	@Override
 	protected RenameRefactoring<FujiMethodSignature> getRefactoring(final String fullSigName) {
 		FujiMethodSignature method = (FujiMethodSignature) getNamedSignature(fullSigName);
-		return new RenameMethodRefactoring(method, featureProject);
+		return new RenameMethodRefactoring(method, featureProject, null);
 	}
 
 }

@@ -57,8 +57,11 @@ public class FujiSelector {
 			
 			for (ExtendedSignature invokedSig : signature.getInvocationSignatures()) {
 				for (AFeatureData invokedFeatureData : invokedSig.getSig().getFeatureData()) {
-					if (isSignatureSelected(invokedFeatureData, invokedSig.getPosition(), line, column))
+					if (invokedFeatureData.getID() == invokedSig.getFeatureID() && 
+						isSignatureSelected(invokedFeatureData, invokedSig.getPosition(), line, column))
+					{
 						return signature;
+					}
 				} 
 			} 
 		}

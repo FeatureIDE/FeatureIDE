@@ -28,7 +28,6 @@ import java.util.Set;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -83,12 +82,15 @@ public abstract class RenameRefactoring<T extends AbstractSignature> extends Ref
 	private final IFeatureProject featureProject;
 	protected final T renamingElement;
 	protected String newName;
+	protected final String file;
 	private List<Change> changes;
+	
 
-	public RenameRefactoring(T selection, IFeatureProject featureProject) {
+	public RenameRefactoring(T selection, IFeatureProject featureProject, String file) {
 		this.renamingElement = selection;
 		this.featureProject = featureProject;
 		this.newName = renamingElement.getName();
+		this.file = file;
 	}
 
 	public void setNewName(String newName) {

@@ -29,15 +29,15 @@ public class RenameHandler extends RefactoringHandler {
 				FujiMethodSignature method = (FujiMethodSignature) element;
 
 				if (method.isConstructor())
-					refactoring = new RenameTypeRefactoring((FujiClassSignature)method.getParent(), featureProject);
+					refactoring = new RenameTypeRefactoring((FujiClassSignature)method.getParent(), featureProject, file);
 				else
-					refactoring = new RenameMethodRefactoring(method, featureProject);
+					refactoring = new RenameMethodRefactoring(method, featureProject,file);
 			} else if (element instanceof FujiClassSignature){
-				refactoring = new RenameTypeRefactoring((FujiClassSignature) element, featureProject);
+				refactoring = new RenameTypeRefactoring((FujiClassSignature) element, featureProject,file);
 			} else if (element instanceof FujiFieldSignature){
-				refactoring = new RenameFieldRefactoring((FujiFieldSignature) element, featureProject);
+				refactoring = new RenameFieldRefactoring((FujiFieldSignature) element, featureProject,file);
 			} else if (element instanceof FujiLocalVariableSignature){
-				refactoring = new RenameLocalVariableRefactoring((FujiLocalVariableSignature) element, featureProject);
+				refactoring = new RenameLocalVariableRefactoring((FujiLocalVariableSignature) element, featureProject,file);
 			} else
 				return;
 

@@ -28,9 +28,13 @@ import org.eclipse.jdt.core.JavaConventions;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.corext.refactoring.Checks;
 import org.eclipse.jdt.internal.corext.refactoring.RefactoringCoreMessages;
+import org.eclipse.jdt.internal.corext.util.Messages;
+import org.eclipse.jdt.internal.ui.viewsupport.BasicElementLabels;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.signature.base.AFeatureData;
+import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.featurehouse.refactoring.matcher.SignatureMatcher;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiLocalVariableSignature;
 
@@ -42,8 +46,8 @@ import de.ovgu.featureide.featurehouse.signature.fuji.FujiLocalVariableSignature
 @SuppressWarnings("restriction")
 public class RenameLocalVariableRefactoring extends RenameRefactoring<FujiLocalVariableSignature> {
 
-	public RenameLocalVariableRefactoring(FujiLocalVariableSignature selection, IFeatureProject featureProject) {
-		super(selection, featureProject);
+	public RenameLocalVariableRefactoring(FujiLocalVariableSignature selection, IFeatureProject featureProject, String file) {
+		super(selection, featureProject, file);
 	}
 
 	@Override
@@ -57,28 +61,28 @@ public class RenameLocalVariableRefactoring extends RenameRefactoring<FujiLocalV
 		super.checkPreConditions(matcher, refactoringStatus);
 		if (refactoringStatus.hasFatalError()) return;
 		
-//		refactoringStatus.merge(checkNameCollision(matcher));
+		refactoringStatus.merge(checkNameCollision(matcher));
 	}
 	
-//	private RefactoringStatus checkNameCollision(SignatureMatcher matcher) {
-//		
-//		RefactoringStatus status = new RefactoringStatus();
-//		final FOPFeatureData fopFeatureData = (FOPFeatureData) matcher.getSelectedSignature().getFirstFeatureData();
-//		final AbstractSignature invokedSignature = fopFeatureData.getInvokedSignatures().get(0);
-//		
-//		if (invokedSignature == null) return status;
-//		
-//		for (AbstractSignature newMatchedSignature : matcher.getMatchedSignaturesForNewName()) {
-//			for (FOPFeatureData newFopFeatureData : (FOPFeatureData[]) newMatchedSignature.getFeatureData()) {
-//				for (AbstractSignature newInvokedSignature : newFopFeatureData.getInvokedSignatures()) {
-//					if (newInvokedSignature.equals(invokedSignature)) {
-//						status.addError(Messages.format(RefactoringCoreMessages.RefactoringAnalyzeUtil_name_collision, BasicElementLabels.getJavaElementName(newName)));
-//					}
-//				}
-//			}
-//		}
-//		return status;
-//	}
+	private RefactoringStatus checkNameCollision(SignatureMatcher matcher) {
+		
+		RefactoringStatus status = new RefactoringStatus();
+
+		for (AbstractSignature newMatchedSignature : matcher.getMatchedSignaturesForNewName()) {
+			
+			if (!(newMatchedSignature instanceof FujiLocalVariableSignature)) continue;
+			
+			for (AFeatureData featureData : newMatchedSignature.getFeatureData()) {
+				
+				if (featureData.getAbsoluteFilePath().equals(file) && 
+						renamingElement.getDeclaringMethod().equals(((FujiLocalVariableSignature) newMatchedSignature).getDeclaringMethod()))
+				{
+					status.addError(Messages.format(RefactoringCoreMessages.RefactoringAnalyzeUtil_name_collision, BasicElementLabels.getJavaElementName(newName)));
+				}
+			}
+		}
+		return status;
+	}
 
 	@Override
 	public RefactoringStatus checkNewElementName(String newName) throws CoreException {

@@ -55,8 +55,8 @@ import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
 @SuppressWarnings("restriction")
 public class RenameMethodRefactoring extends RenameRefactoring<FujiMethodSignature> {
 
-	public RenameMethodRefactoring(FujiMethodSignature method, IFeatureProject featureProject) {
-		super(method, featureProject);
+	public RenameMethodRefactoring(FujiMethodSignature method, IFeatureProject featureProject, String file) {
+		super(method, featureProject, file);
 	}
 
 	@Override

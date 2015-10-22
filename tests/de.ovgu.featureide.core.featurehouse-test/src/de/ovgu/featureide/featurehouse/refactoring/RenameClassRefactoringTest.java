@@ -81,7 +81,7 @@ public class RenameClassRefactoringTest extends RenameRefactoringTest{
 	@Override
 	protected RenameRefactoring<?> getRefactoring(String fullSigName) {
 		FujiClassSignature clazz = (FujiClassSignature) getNamedSignature(fullSigName);
-		return new RenameTypeRefactoring(clazz, featureProject);
+		return new RenameTypeRefactoring(clazz, featureProject, null);
 	}
 
 }

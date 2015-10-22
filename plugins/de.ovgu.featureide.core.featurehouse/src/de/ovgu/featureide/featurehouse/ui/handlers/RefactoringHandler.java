@@ -25,7 +25,6 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.internal.ui.preferences.formatter.SnippetPreview;
 import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
