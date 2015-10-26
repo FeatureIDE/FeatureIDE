@@ -271,7 +271,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	 * <code>true</code> or <code>false</code>.<br />
 	 * <br />
 	 * 
-	 * Check in three steps:
+	 * Check in steps:
 	 * <ol>
 	 * <li>just the given line</li>
 	 * <li>the given line and the feature model</li>
@@ -285,7 +285,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	 * @param res
 	 *            file containing the given expression
 	 */
-	protected void doThreeStepExpressionCheck(Node ppExpression, int lineNumber, IFile res) {
+	protected void checkExpressions(Node ppExpression, int lineNumber, IFile res) {
 		if (ppExpression == null) {
 			return;
 		}
@@ -304,8 +304,36 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 
 				And nestedExpressionsAnd = new And(nestedExpressions);
 
-				isContradictionOrTautology(nestedExpressionsAnd.clone(), true, lineNumber, res);
+				result = isContradictionOrTautology(nestedExpressionsAnd.clone(), true, lineNumber, res);
+				if (result == SAT_NONE && expressionStack.size() > 1) {
+					nestedExpressions = new Node[expressionStack.size() - 1];
+					int index = 0;
+					for (Node expression : expressionStack) {
+						if (index == expressionStack.size() - 1) {
+							break;
+						}
+						nestedExpressions[index++] = expression;
+					}
+					nestedExpressionsAnd = new And(nestedExpressions);
+					checkRedundancy(ppExpression, nestedExpressionsAnd, lineNumber, res);
+				}
 			}
+		}
+	}
+
+	/**
+	 * Checks whether the expression is superfluous in the given context.
+	 * 
+	 */
+	private void checkRedundancy(Node nestedExpression, Node expression, int lineNumber, IFile res) {
+		Node node = new And(new And(featureModel.clone(), expression.clone()), new Not(nestedExpression.clone()));
+		SatSolver solver = new SatSolver(node, 1000);
+		try {
+			if (!solver.isSatisfiable()) {
+				setMarkersOnContradictionOrTautology(SAT_TAUTOLOGY, lineNumber, res);
+			}
+		} catch (TimeoutException e) {
+
 		}
 	}
 
