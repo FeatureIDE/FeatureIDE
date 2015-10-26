@@ -561,6 +561,12 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		}
 	}
 	
+	public final void fireEvent(PropertyChangeEvent event) {
+		for (PropertyChangeListener listener : listenerList) {
+			listener.propertyChange(event);
+		}
+	}
+	
 	@Override
 	public FeatureModel clone() {
 		final FeatureModel clone = new FeatureModel();
