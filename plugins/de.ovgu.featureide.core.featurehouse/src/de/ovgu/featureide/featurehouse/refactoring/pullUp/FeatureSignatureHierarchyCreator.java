@@ -66,7 +66,7 @@ public class FeatureSignatureHierarchyCreator {
 	
 	private FeatureSignatureHierarchy createFeatureHierarchy(final int featureId) {
 		final String featureName = projectSignatures.getFeatureName(featureId);
-		FeatureSignatureHierarchy hierarchy = new FeatureSignatureHierarchy(getFeatureName(featureName),featureId);
+		FeatureSignatureHierarchy hierarchy = new FeatureSignatureHierarchy(getFeature(featureName),featureId);
 		
 		final Map<String, AbstractClassSignature> classes = RefactoringUtil.getClasses(projectSignatures);
 		for (AbstractClassSignature classSig : classes.values()) {
@@ -80,7 +80,7 @@ public class FeatureSignatureHierarchyCreator {
 		return hierarchy;
 	}
 	
-	private Feature getFeatureName(String featureName){
+	private Feature getFeature(String featureName){
 		return projectSignatures.getFeatureModel().getFeature(featureName);
 	}
 	

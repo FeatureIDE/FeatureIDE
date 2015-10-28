@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="lib" path="lib/pmd-core-5.2.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/pmd-java-5.2.2.jar"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="lib" path="lib/FeatureHouse.jar"/>
 	<classpathentry kind="lib" path="lib/fuji.jar" sourcepath="lib/fuji.jar"/>

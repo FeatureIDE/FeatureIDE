@@ -67,47 +67,6 @@ public abstract class RefactoringHandler extends ASelectionHandler {
 	protected abstract void singleAction(Object element, String file);
 	
 	
-	@Override
-	public final Object execute(ExecutionEvent event) throws ExecutionException {
-		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-		ITextEditor editor = (ITextEditor) page.getActiveEditor();
-
-		IJavaElement elem = JavaUI.getEditorInputJavaElement(editor.getEditorInput());
-		if (elem instanceof ICompilationUnit) {
-			ITextSelection sel = (ITextSelection) editor.getSelectionProvider().getSelection();
-
-			IDocument document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
-
-			int lineOffset = 0;
-			try {
-				lineOffset = document.getLineOffset(sel.getStartLine());
-			} catch (BadLocationException e1) {
-				e1.printStackTrace();
-			}
-			int column = sel.getOffset() - lineOffset;
-
-			final String file = ((ICompilationUnit) elem).getResource().getRawLocation().toOSString();
-			
-			IFeatureProject featureProject = getFeatureProject();
-			ExtendedFujiSignaturesJob efsj = new ExtendedFujiSignaturesJob(featureProject);
-			try {
-				efsj.schedule();
-				efsj.join();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			
-			//PullUpRefactoringProcessor
-						
-			FujiSelector selector = new FujiSelector(featureProject, file);
-			AbstractSignature signature = selector.getSelectedSignature(sel.getStartLine() + 1, column);
-			if (signature != null)
-				singleAction(signature, file);
-		}
-		
-		return null;
-	}
-	
 	protected IFeatureProject getFeatureProject()
 	{
 		IEditorInput fileEditorInput = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor().getEditorInput();
@@ -115,5 +74,15 @@ public abstract class RefactoringHandler extends ASelectionHandler {
 		if (file == null) return null;
 		
 		return CorePlugin.getFeatureProject(file);
+	}
+	
+	protected void createSignatures(IFeatureProject featureProject) {
+		ExtendedFujiSignaturesJob efsj = new ExtendedFujiSignaturesJob(featureProject);
+		try {
+			efsj.schedule();
+			efsj.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 }

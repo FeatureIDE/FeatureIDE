@@ -1,12 +1,20 @@
 package de.ovgu.featureide.featurehouse.ui.handlers;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.ltk.ui.refactoring.RefactoringWizardOpenOperation;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.texteditor.ITextEditor;
 
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.featurehouse.refactoring.pullUp.PullUpMethodRefactoring;
+import de.ovgu.featureide.core.signature.base.AbstractSignature;
+import de.ovgu.featureide.featurehouse.refactoring.FujiSelector;
 import de.ovgu.featureide.featurehouse.refactoring.pullUp.PullUpRefactoring;
 import de.ovgu.featureide.featurehouse.refactoring.pullUp.PullUpRefactoringWizard;
-import de.ovgu.featureide.featurehouse.signature.fuji.FujiLocalVariableSignature;
-import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
+import de.ovgu.featureide.featurehouse.signature.fuji.FujiClassSignature;
 
 
 public class PullUpHandler extends RefactoringHandler {
@@ -18,14 +26,36 @@ public class PullUpHandler extends RefactoringHandler {
 			if (featureProject == null)
 				return;
 
-			if (element instanceof FujiLocalVariableSignature)
-				return;
 			
-			PullUpRefactoring pullUp = new PullUpMethodRefactoring((FujiMethodSignature) element, featureProject, file); 
+			PullUpRefactoring pullUp = new PullUpRefactoring((FujiClassSignature) element, featureProject, file); 
 			PullUpRefactoringWizard refactoringWizard = new PullUpRefactoringWizard(pullUp);
 			RefactoringWizardOpenOperation op = new RefactoringWizardOpenOperation(refactoringWizard);
 			op.run(getShell(), "PullUp-Refactoring");
 		} catch (InterruptedException e) {
 		}
 	}
+	
+	@Override
+	public final Object execute(ExecutionEvent event) throws ExecutionException {
+		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+		ITextEditor editor = (ITextEditor) page.getActiveEditor();
+
+		IJavaElement elem = JavaUI.getEditorInputJavaElement(editor.getEditorInput());
+		if (elem instanceof ICompilationUnit) {
+			final String file = ((ICompilationUnit) elem).getResource().getRawLocation().toOSString();
+			
+			IFeatureProject featureProject = getFeatureProject();
+			createSignatures(featureProject);
+			
+			FujiSelector selector = new FujiSelector(featureProject, file);
+			AbstractSignature signature = selector.getSelectedClassSignature();
+			if (signature != null)
+				singleAction(signature, file);
+		}
+		
+		return null;
+	}
+
+
+	
 }

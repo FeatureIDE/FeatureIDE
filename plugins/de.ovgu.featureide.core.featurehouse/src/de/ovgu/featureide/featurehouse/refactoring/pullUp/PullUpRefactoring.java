@@ -20,87 +20,126 @@
  */
 package de.ovgu.featureide.featurehouse.refactoring.pullUp;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.internal.corext.refactoring.RefactoringCoreMessages;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.ltk.core.refactoring.Change;
+import org.eclipse.ltk.core.refactoring.CompositeChange;
 import org.eclipse.ltk.core.refactoring.Refactoring;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
+import org.eclipse.ltk.core.refactoring.TextFileChange;
+import org.eclipse.text.edits.DeleteEdit;
+import org.eclipse.text.edits.InsertEdit;
+import org.eclipse.text.edits.MultiTextEdit;
+import org.eclipse.ui.editors.text.TextFileDocumentProvider;
+import org.eclipse.ui.texteditor.IDocumentProvider;
 
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.core.signature.base.AFeatureData;
 import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
+import de.ovgu.featureide.core.signature.base.AbstractMethodSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
+import de.ovgu.featureide.core.signature.base.SignaturePosition;
 import de.ovgu.featureide.featurehouse.refactoring.RefactoringUtil;
-import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
+import de.ovgu.featureide.fm.core.Feature;
 
 /**
  * TODO description
  * 
  * @author steffen
  */
-public abstract class PullUpRefactoring<T extends AbstractSignature> extends Refactoring {
+public class PullUpRefactoring extends Refactoring {
 
 	protected final IFeatureProject featureProject;
-	protected final T selectedElement;
+	protected final AbstractClassSignature selectedElement;
 	protected final String file;
-	protected ExtendedPullUpSignature destinationType;
-	protected AbstractSignature[] pullUpSignatures;
-	protected Set<ExtendedPullUpSignature> deletedMethods; 
+	protected Feature destinationFeature;
+	protected Set<ExtendedPullUpSignature> pullUpSignatures;
+	protected Set<ExtendedPullUpSignature> deletableSignatures;
 	
-	public PullUpRefactoring(T selection, IFeatureProject featureProject, String file) {
+	private List<Change> changes;
+
+	@Override
+	public String getName() {
+		return "PullUp";
+	}
+	
+	public PullUpRefactoring(AbstractClassSignature selection, IFeatureProject featureProject, String file) {
 		this.selectedElement = selection;
 		this.featureProject = featureProject;
 		this.file = file;
-		this.deletedMethods = new HashSet<>();
 	}
 	
-	public abstract FujiMethodSignature[] getPullableElements();
-	
-	public List<ExtendedPullUpSignature> getCandidateTypes(final RefactoringStatus status) {
-	
-		final List<ExtendedPullUpSignature> result = new ArrayList<>();
-		final AbstractClassSignature clazz = selectedElement.getParent();
-		final Set<String> superClasses = clazz.getExtendList();
+	public List<Feature> getCandidateTypes(final RefactoringStatus status) {
 		
-		if (superClasses.size() == 0) //$NON-NLS-1$
-			status.addFatalError(RefactoringCoreMessages.PullUPRefactoring_not_java_lang_object);
+		final List<Feature> features = new ArrayList<>();
 		
-		final Map<String, AbstractClassSignature> classes = RefactoringUtil.getClasses(featureProject.getProjectSignatures());
-	
-		for (String superClass : superClasses) {
-			if (classes.containsKey(superClass)){
-				AbstractClassSignature classSig = classes.get(superClass);
-				for (AFeatureData featureData : classSig.getFeatureData()) {
-					result.add(new ExtendedPullUpSignature(classSig, featureData.getID()));
-				}
-			}
+		final AFeatureData featureData = getFeatureDataForFile(selectedElement, file);
+		if (featureData == null) return null;
+		
+		final ProjectSignatures projectSignatures = featureProject.getProjectSignatures();
+		final String featureName = projectSignatures.getFeatureName(featureData.getID());
+		final Feature feature = projectSignatures.getFeatureModel().getFeature(featureName);
+		if (feature == null) return null; 
+		
+		Feature parentFeature = feature.getParent();
+		
+		while(parentFeature != null)
+		{
+			if (parentFeature.isConcrete()) features.add(0, parentFeature);
+			parentFeature = parentFeature.getParent();
 		}
-
-		return result;
-	}
-
-	public void setDestinationType(ExtendedPullUpSignature destination) {
-		this.destinationType = destination;
+		return features;
 	}
 	
-	public ExtendedPullUpSignature getDestinationType() {
-		return destinationType;
+
+	protected AFeatureData getFeatureDataForFile(final AbstractSignature signature, final String file){
+		for (AFeatureData featureData : signature.getFeatureData()) {
+			if (featureData.getAbsoluteFilePath().equals(file)) return featureData;
+		}
+		return null;
+	}
+	
+	protected AFeatureData getFeatureDataForId(final AbstractSignature signature, final int featureId){
+		for (AFeatureData featureData : signature.getFeatureData()) {
+			if (featureData.getID() == featureId) return featureData;
+		}
+		return null;
 	}
 
-	public void setPullUpSignatures(AbstractSignature[] pullUpSignatures) {
+	public void setDestinationFeature(Feature destinationFeature) {
+		this.destinationFeature = destinationFeature;
+	}
+	
+	public Feature getDestinationFeature() {
+		return destinationFeature;
+	}
+
+	public void setPullUpSignatures(Set<ExtendedPullUpSignature> pullUpSignatures) {
 		this.pullUpSignatures = pullUpSignatures;	
 	}
 
-	public AbstractSignature[] getPullUpSignatures() {
+	public Set<ExtendedPullUpSignature> getPullUpSignatures() {
 		return pullUpSignatures;
 	}
 	
@@ -112,11 +151,220 @@ public abstract class PullUpRefactoring<T extends AbstractSignature> extends Ref
 		return file;
 	}
 
-	public void setDeletedMethods(Set<ExtendedPullUpSignature> checkedMethods) {
-		deletedMethods.addAll(checkedMethods);		
+	public IFeatureProject getFeatureProject() {
+		return featureProject;
 	}
 
-	public Set<ExtendedPullUpSignature> getDeletedMethods() {
-		return deletedMethods;
+	public AbstractClassSignature getSelectedElement() {
+		return selectedElement;
 	}
+
+	public Set<ExtendedPullUpSignature> getDeletableSignatures() {
+		return deletableSignatures;
+	}
+
+	public void setDeletableSignatures(Set<ExtendedPullUpSignature> deletableSignatures) {
+		this.deletableSignatures = deletableSignatures;
+	}
+	
+	public Set<ExtendedPullUpSignature> getPullableElements() {
+		final Set<ExtendedPullUpSignature> result = new HashSet<>();
+		final Set<AbstractMethodSignature> methods = selectedElement.getMethods();
+		for (AbstractMethodSignature abstractMethodSignature : methods) {
+			for (AFeatureData featureData : abstractMethodSignature.getFeatureData()) {
+				if (featureData.getAbsoluteFilePath().equals(file)) {
+					result.add(new ExtendedPullUpSignature(abstractMethodSignature, featureData.getID()));
+					break;
+				}
+			}
+		}
+		return result;
+	}
+
+	@Override
+	public RefactoringStatus checkInitialConditions(IProgressMonitor pm) throws CoreException, OperationCanceledException {	
+		RefactoringStatus status = new RefactoringStatus();
+		return status;
+	}
+	
+
+	@Override
+	public RefactoringStatus checkFinalConditions(IProgressMonitor pm) throws CoreException, OperationCanceledException {
+		final RefactoringStatus refactoringStatus = new RefactoringStatus();
+
+		try {
+			pm.beginTask("Checking preconditions...", 2);
+
+			changes = new ArrayList<Change>();
+			refactoringStatus.merge(createInsertChanges());
+			refactoringStatus.merge(createDeleteChanges());
+
+		} finally {
+			pm.done();
+		}
+		return refactoringStatus;
+	}
+
+	@Override
+	public Change createChange(IProgressMonitor pm) throws CoreException, OperationCanceledException {
+		try {
+			pm.beginTask("Creating change...", 1);
+
+			return new CompositeChange(getName(), changes.toArray(new Change[changes.size()]));
+		} finally {
+			pm.done();
+		}
+	}
+	
+	private RefactoringStatus createInsertChanges() {
+
+		RefactoringStatus status = new RefactoringStatus();
+		MultiTextEdit multiEdit = new MultiTextEdit();
+		
+		if (pullUpSignatures.size() == 0)
+			return status;
+		
+		IFile pullUpFile = RefactoringUtil.getFile(file);
+		
+		IFolder featureFolder = featureProject.getSourceFolder().getFolder(destinationFeature.getName());
+		IFile destinationFile = createNewFileIfNotExist(featureFolder, file.substring(file.lastIndexOf("/") +1));
+		
+		IDocumentProvider pullUpProvider = new TextFileDocumentProvider();
+		IDocumentProvider destinationProvider = new TextFileDocumentProvider();
+		try {
+			pullUpProvider.connect(pullUpFile);
+			destinationProvider.connect(destinationFile);
+			final IDocument pullUpDoc = pullUpProvider.getDocument(pullUpFile);
+			final IDocument destinationDoc = destinationProvider.getDocument(destinationFile);
+			
+			for (ExtendedPullUpSignature signature : pullUpSignatures) {
+				final AFeatureData featureData = getFeatureDataForFile(signature.getSignature(), file);
+				
+				if (featureData == null) continue;
+				
+				SignaturePosition position = featureData.getSigPosition();
+				
+				int startOffset = pullUpDoc.getLineOffset(position.getStartRow() - 1) ;
+				int endOffset = pullUpDoc.getLineOffset(position.getEndRow() - 1) + position.getEndColumn();
+				String content = "\n" + pullUpDoc.get(startOffset, endOffset-startOffset) + "\n";
+				
+				final AFeatureData destinationFeatureData = getFeatureDataForFile(signature.getSignature().getParent(), destinationFile.getRawLocation().toOSString());
+
+				int line = destinationDoc.getNumberOfLines() - 1;
+				if (destinationFeatureData != null)
+					line = destinationFeatureData.getSigPosition().getEndRow()-1;
+				
+				multiEdit.addChild(new InsertEdit(destinationDoc.getLineOffset(line), content));
+			}
+		} catch (CoreException e) {
+			e.printStackTrace();
+		} catch (BadLocationException e) {
+			e.printStackTrace();
+		}
+		
+		TextFileChange change = new TextFileChange(JavaCore.removeJavaLikeExtension(destinationFile.getName()), destinationFile);
+		change.initializeValidationData(null);
+		change.setTextType("java");
+		change.setEdit(multiEdit);
+		changes.add(change);
+		return status;
+	}
+	
+	private IFile createNewFileIfNotExist(IFolder featureFolder, String fileName) {
+
+		IFile destinationFile = featureFolder.getFile(fileName);
+		
+		if (destinationFile.exists()) 
+			return destinationFile;
+		
+		return createNewFeatureFile(featureFolder, fileName);
+	}
+
+	private IFile createNewFeatureFile(IFolder featureFolder, String fileName) {
+		
+		IFile destinationFile = null;
+		try {
+			final IComposerExtensionClass composer = featureProject.getComposer();
+			final String template = getJavaTemplate(composer);
+			final String featureName = destinationFeature.getName();
+			final String className = fileName.substring(0, fileName.lastIndexOf("."));
+			
+			String contents = composer.replaceSourceContentMarker(template, false, selectedElement.getPackage());
+			contents = contents.replaceAll(IComposerExtensionClass.CLASS_NAME_PATTERN, className);
+			contents = contents.replaceAll(IComposerExtensionClass.FEATUE_PATTER, featureName);
+			InputStream stream = new ByteArrayInputStream(contents.getBytes(Charset.availableCharsets().get("UTF-8")));
+			
+			destinationFile = featureFolder.getFile(fileName);
+			destinationFile.create(stream, true, new NullProgressMonitor());
+			stream.close();
+		} catch (IOException | CoreException e) {
+			
+		}
+		return destinationFile;
+	}
+
+	private String getJavaTemplate(IComposerExtensionClass composer) {
+		for (String[] template :  composer.getTemplates()) {
+			if (template[0].equals("Java")) 
+				return template[2];
+			
+		}
+		return null;
+	}
+	
+	private RefactoringStatus createDeleteChanges() {
+
+		RefactoringStatus status = new RefactoringStatus();
+		MultiTextEdit multiEdit;
+		
+		if (deletableSignatures.size() == 0)
+			return status;
+		
+		Map<IFile, MultiTextEdit> textEdits = new HashMap<>();
+		
+		for (ExtendedPullUpSignature signature : deletableSignatures) {
+			
+			final AFeatureData featureData = getFeatureDataForId(signature.getSignature(), signature.getFeatureId());
+			if (featureData == null) continue;
+			
+			IFile pullUpFile = RefactoringUtil.getFile(featureData.getAbsoluteFilePath());
+			
+			if (textEdits.containsKey(pullUpFile))
+				multiEdit = textEdits.get(pullUpFile);
+			else
+			{
+				 multiEdit = new MultiTextEdit();
+				 textEdits.put(pullUpFile, multiEdit);
+			}
+
+			IDocumentProvider pullUpProvider = new TextFileDocumentProvider();
+			try {
+				pullUpProvider.connect(pullUpFile);
+				final IDocument pullUpDoc = pullUpProvider.getDocument(pullUpFile);
+				
+				SignaturePosition position = featureData.getSigPosition();
+				
+				int startOffset = pullUpDoc.getLineOffset(position.getStartRow() - 1) ;
+				int endOffset = pullUpDoc.getLineOffset(position.getEndRow() - 1) + position.getEndColumn();
+				
+				multiEdit.addChild(new DeleteEdit(startOffset, endOffset - startOffset + 1));
+			} catch (CoreException e) {
+				e.printStackTrace();
+			} catch (BadLocationException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		for (Entry<IFile, MultiTextEdit> entry : textEdits.entrySet()) {
+			TextFileChange change = new TextFileChange(JavaCore.removeJavaLikeExtension(entry.getKey().getName()), entry.getKey());
+			change.initializeValidationData(null);
+			change.setTextType("java");
+			change.setEdit(entry.getValue());
+			changes.add(change);
+		}
+		
+		
+		return status;
+	}
+	
 }

@@ -22,41 +22,30 @@ package de.ovgu.featureide.featurehouse.refactoring.pullUp;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jdt.internal.corext.refactoring.structure.IMemberActionInfo;
 import org.eclipse.jdt.internal.corext.util.Messages;
 import org.eclipse.jdt.internal.ui.IJavaHelpContextIds;
 import org.eclipse.jdt.internal.ui.refactoring.RefactoringMessages;
 import org.eclipse.jdt.internal.ui.util.ExceptionHandler;
 import org.eclipse.jdt.internal.ui.util.SWTUtil;
-import org.eclipse.jdt.internal.ui.util.TableLayoutComposite;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
-import org.eclipse.jface.viewers.CheckboxTableViewer;
-import org.eclipse.jface.viewers.ColumnWeightData;
-import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.ICheckStateListener;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TableLayout;
-import org.eclipse.jface.window.Window;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.ui.refactoring.UserInputWizardPage;
@@ -69,16 +58,17 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeColumn;
+import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
 
-import de.ovgu.featureide.core.signature.base.AFeatureData;
-import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
-import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
-import de.ovgu.featureide.ui.views.outline.ContextOutlineLabelProvider;
+import de.ovgu.featureide.fm.core.Feature;
 
 /**
  * Wizard page for pull up refactoring wizards which allows to specify the
@@ -88,44 +78,51 @@ import de.ovgu.featureide.ui.views.outline.ContextOutlineLabelProvider;
  */
 @SuppressWarnings("restriction")
 public class PullUpMemberPage extends UserInputWizardPage {
+	
+	private static class PullUpHierarchyContentProvider implements ITreeContentProvider {
 
-	private class MemberActionInfo implements IMemberActionInfo {
-
-		private static final int NO_ACTION = 2;
-
-		private int action;
-
-		private final AbstractSignature signature;
-
-		public MemberActionInfo(final AbstractSignature signature, final int action) {
-			this.signature = signature;
-			this.action = action;
+		private final Map<AbstractSignature, List<Feature>> clonedSignatures;
+		
+		public void dispose() {
+		}
+		
+		public PullUpHierarchyContentProvider(Map<AbstractSignature, List<Feature>> clonedSignatures){
+			this.clonedSignatures = clonedSignatures;
 		}
 
-		public int getAction() {
-			return action;
+		public Object[] getChildren(final Object parentElement) {
+			
+			Set<Object> elements = new HashSet<>();
+			if (parentElement instanceof ExtendedPullUpSignature) {
+				final AbstractSignature signature = ((ExtendedPullUpSignature) parentElement).getSignature();
+				if (clonedSignatures.containsKey(signature))
+					elements.addAll(clonedSignatures.get(signature));
+			}
+			return elements.toArray();
 		}
 
-		public String getActionLabel() {
-			return getPullUpActionLabel();
+		public Object[] getElements(final Object inputElement) {
+			return ((Set<?>) inputElement).toArray();
 		}
 
-		public AbstractSignature getSignature() {
-			return signature;
+		public Object getParent(final Object element) {
+//			if (element instanceof Feature)
+//				return ((ExtendedPullUpSignature) element).getParent();
+				
+			return null;
 		}
-
-		public boolean isActive() {
-			return getAction() != NO_ACTION;
+		
+		public boolean hasChildren(final Object element) {
+			return getChildren(element).length > 0;
 		}
-
-		public void setAction(int pullUpAction) {
-			this.action = pullUpAction;
+		
+		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {
 		}
 	}
+	
+	private static class PullUpMemberLabelProvider extends LabelProvider implements ITableLabelProvider {
 
-	private static class MemberActionInfoLabelProvider extends LabelProvider implements ITableLabelProvider {
-
-		private final ILabelProvider fLabelProvider = new ContextOutlineLabelProvider();
+		private final ILabelProvider fLabelProvider= new PullUpHierarchyLabelProvider();
 
 		@Override
 		public void dispose() {
@@ -134,28 +131,24 @@ public class PullUpMemberPage extends UserInputWizardPage {
 		}
 
 		public Image getColumnImage(final Object element, final int columnIndex) {
-			final MemberActionInfo info = (MemberActionInfo) element;
 			switch (columnIndex) {
-			case MEMBER_COLUMN:
-				return fLabelProvider.getImage(info.getSignature());
-			case ACTION_COLUMN:
-				return null;
-			default:
-				Assert.isTrue(false);
-				return null;
+				case MEMBER_COLUMN:
+					return fLabelProvider.getImage(element);
+				case ACTION_COLUMN:
+				default:
+					return null;
 			}
 		}
 
 		public String getColumnText(final Object element, final int columnIndex) {
-			final MemberActionInfo info = (MemberActionInfo) element;
 			switch (columnIndex) {
-			case MEMBER_COLUMN:
-				return fLabelProvider.getText(info.getSignature());
-			case ACTION_COLUMN:
-				return info.getActionLabel();
-			default:
-				Assert.isTrue(false);
-				return null;
+				case MEMBER_COLUMN:
+					return fLabelProvider.getText(element);
+				case ACTION_COLUMN:
+					if (element instanceof Feature)
+						return "Clone";
+				default:
+					return null;
 			}
 		}
 	}
@@ -166,63 +159,37 @@ public class PullUpMemberPage extends UserInputWizardPage {
 
 	protected static final int PULL_UP_ACTION = 0;
 
-	private static void putToStringMapping(final Map<String, Integer> result, final String[] actionLabels, final int actionIndex) {
-		result.put(actionLabels[actionIndex], new Integer(actionIndex));
-	}
-
-	protected List<ExtendedPullUpSignature> fCandidateTypes;
+	protected List<Feature> fCandidateTypes;
 
 	private Button fDeselectAllButton;
 
 	private Button fSelectAllButton;
+	
+//	private Button checkCloneCodesButton;
 
 	private Label fStatusLine;
 
 	private Label fLabel;
 
-	protected final PullUpMethodPage fSuccessorPage;
-
 	private Combo fSuperTypesCombo;
 
-	private CheckboxTableViewer fTableViewer;
-
-	protected final String[] METHOD_LABELS;
-
-	protected final String[] TYPE_LABELS;
+	private ContainerCheckedTreeViewer fTableViewer;
 
 	private final PullUpRefactoring refactoring;
 
-	public PullUpMemberPage(final String name, final PullUpMethodPage page, PullUpRefactoring refactoring) {
+	public PullUpMemberPage(final String name, PullUpRefactoring refactoring) {
 		super(name);
-		fSuccessorPage = page;
 		this.refactoring = refactoring;
 		setDescription(RefactoringMessages.PullUpInputPage1_page_message);
-		METHOD_LABELS = new String[1];
-		METHOD_LABELS[PULL_UP_ACTION] = RefactoringMessages.PullUpInputPage1_pull_up;
-
-		TYPE_LABELS = new String[1];
-		TYPE_LABELS[PULL_UP_ACTION] = RefactoringMessages.PullUpInputPage1_pull_up;
 	}
 
 	public PullUpRefactoring getPullUpMethodRefactoring() {
 		return refactoring;
 	}
 
-	private boolean areAllMembersMarkedAsPullUp() {
-		return getMembersForAction(PULL_UP_ACTION).length == getTableInput().length;
-	}
-
-	protected boolean areAllMembersMarkedAsWithNoAction() {
-		return getMembersForAction(MemberActionInfo.NO_ACTION).length == getTableInput().length;
-	}
-
-	private MemberActionInfo[] asMemberActionInfos() {
-		final List<FujiMethodSignature> toPullUp = Arrays.asList(refactoring.getPullableElements());
-		final MemberActionInfo[] result = new MemberActionInfo[toPullUp.size()];
-		for (int i = 0; i < toPullUp.size(); i++) {
-			result[i] = new MemberActionInfo(toPullUp.get(i), PULL_UP_ACTION);
-		}
-		return result;
+	private boolean allMembersChecked() {
+		final int count = fTableViewer.getTree().getItemCount();
+		return getCheckedElements().size() == count;
 	}
 
 	@Override
@@ -231,7 +198,7 @@ public class PullUpMemberPage extends UserInputWizardPage {
 	}
 
 	protected void checkPageCompletionStatus(final boolean displayErrors) {
-		if (areAllMembersMarkedAsWithNoAction()) {
+		if (getCheckedElements().size() == 0) {
 			if (displayErrors)
 				setErrorMessage(getNoMembersMessage());
 			setPageComplete(false);
@@ -239,12 +206,6 @@ public class PullUpMemberPage extends UserInputWizardPage {
 			setErrorMessage(null);
 			setPageComplete(true);
 		}
-		fSuccessorPage.fireSettingsChanged();
-	}
-
-	private void checkPullUp(final AbstractSignature[] elements, final boolean displayErrors) {
-		setActionForMembers(elements, PULL_UP_ACTION);
-		updateWizardPage(null, displayErrors);
 	}
 
 	private void createButtonComposite(final Composite parent) {
@@ -264,8 +225,7 @@ public class PullUpMemberPage extends UserInputWizardPage {
 
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
-				final AbstractSignature[] members = getMembers();
-				setActionForMembers(members, PULL_UP_ACTION);
+				setAllMembersChecked(true); 
 				updateWizardPage(null, true);
 			}
 		});
@@ -279,8 +239,7 @@ public class PullUpMemberPage extends UserInputWizardPage {
 
 			@Override
 			public void widgetSelected(final SelectionEvent event) {
-				final AbstractSignature[] members = getMembers();
-				setActionForMembers(members, MemberActionInfo.NO_ACTION);
+				setAllMembersChecked(false); 
 				updateWizardPage(null, true);
 			}
 		});
@@ -305,32 +264,34 @@ public class PullUpMemberPage extends UserInputWizardPage {
 	}
 
 	private void createMemberTable(final Composite parent) {
-		final TableLayoutComposite layouter = new TableLayoutComposite(parent, SWT.NONE);
-		layouter.addColumnData(new ColumnWeightData(60, true));
-		layouter.addColumnData(new ColumnWeightData(40, true));
-
-		final Table table = new Table(layouter, SWT.H_SCROLL | SWT.V_SCROLL | SWT.MULTI | SWT.BORDER | SWT.FULL_SELECTION | SWT.CHECK);
-		table.setHeaderVisible(true);
-		table.setLinesVisible(true);
-
-		final GridData gd = new GridData(GridData.FILL_BOTH);
-		gd.heightHint = SWTUtil.getTableHeightHint(table, getTableRowCount());
-		gd.widthHint = convertWidthInCharsToPixels(30);
-		layouter.setLayoutData(gd);
-
-		final TableLayout tableLayout = new TableLayout();
-		table.setLayout(tableLayout);
-
-		final TableColumn column0 = new TableColumn(table, SWT.NONE);
+		final Tree tree= new Tree(parent, SWT.CHECK | SWT.BORDER | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL);
+		tree.setLayoutData(new GridData(GridData.FILL_BOTH));
+		tree.setHeaderVisible(true);
+		tree.setLinesVisible(true);
+		
+//		tree.addListener(SWT.Selection, new Listener() {
+//			   public void handleEvent(Event event) {
+//			       if (event.detail == SWT.CHECK && event.item.getData() instanceof Feature){
+//			          ((TreeItem)event.item).setChecked(true);
+//			          ((TreeItem)event.item).setGrayed(true);
+//			       } 
+//			   }
+//			});
+		
+		final TreeColumn column0 = new TreeColumn(tree, SWT.NONE);
+		column0.setWidth(240);
 		column0.setText(RefactoringMessages.PullUpInputPage1_Member);
+		final TreeColumn column1 = new TreeColumn(tree, SWT.NONE);
+		column1.setWidth(160);
+//		column1.setText(RefactoringMessages.PullUpInputPage1_Action);
 
-		final TableColumn column1 = new TableColumn(table, SWT.NONE);
-		column1.setText(RefactoringMessages.PullUpInputPage1_Action);
-
-		fTableViewer = new PullPushCheckboxTableViewer(table);
+		fTableViewer = new ContainerCheckedTreeViewer(tree);
 		fTableViewer.setUseHashlookup(true);
-		fTableViewer.setContentProvider(new ArrayContentProvider());
-		fTableViewer.setLabelProvider(new MemberActionInfoLabelProvider());
+		final CloneSignatureMatcher cloneSignatureMatcher = new CloneSignatureMatcher(refactoring.getProjectSignatures(),refactoring.getFeatureProject(), refactoring.getSelectedElement(), refactoring.getFile());
+		
+		fTableViewer.setContentProvider(new PullUpHierarchyContentProvider(cloneSignatureMatcher.getMatchedClonedSignatures()));
+		fTableViewer.setLabelProvider(new PullUpMemberLabelProvider());
+		fTableViewer.setInput(refactoring.getPullableElements());
 		fTableViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 
 			public void selectionChanged(final SelectionChangedEvent event) {
@@ -340,25 +301,15 @@ public class PullUpMemberPage extends UserInputWizardPage {
 		fTableViewer.addCheckStateListener(new ICheckStateListener() {
 
 			public void checkStateChanged(final CheckStateChangedEvent event) {
-				final boolean checked = event.getChecked();
-				final MemberActionInfo info = (MemberActionInfo) event.getElement();
-				if (checked)
-					info.setAction(PULL_UP_ACTION);
-				else
-					info.setAction(MemberActionInfo.NO_ACTION);
 				updateWizardPage(null, true);
 			}
 		});
-		fTableViewer.addDoubleClickListener(new IDoubleClickListener() {
-
-			public void doubleClick(final DoubleClickEvent event) {
-				editSelectedMembers();
-			}
-		});
-
-		setTableInput();
-		checkPullUp(refactoring.getPullableElements(), false);
-		//		setupCellEditors(table);
+		
+//		fTableViewer.expandAll();
+		
+//		checkPullUp(refactoring.getPullableElements(), false);
+		
+		updateWizardPage(null, true);
 	}
 
 	protected void createMemberTableComposite(final Composite parent) {
@@ -400,13 +351,6 @@ public class PullUpMemberPage extends UserInputWizardPage {
 		fStatusLine.setLayoutData(data);
 	}
 
-	// String -> Integer
-	private Map<String, Integer> createStringMappingForSelectedMembers() {
-		final Map<String, Integer> result = new HashMap<String, Integer>();
-		putToStringMapping(result, METHOD_LABELS, PULL_UP_ACTION);
-		return result;
-	}
-
 	private void createSuperTypeCombo(Composite parent) {
 		final Label label = new Label(parent, SWT.NONE);
 		label.setText(RefactoringMessages.PullUpInputPage1_Select_destination);
@@ -416,10 +360,10 @@ public class PullUpMemberPage extends UserInputWizardPage {
 		SWTUtil.setDefaultVisibleItemCount(fSuperTypesCombo);
 		if (fCandidateTypes.size() == 0) return;
 		
-		for (ExtendedPullUpSignature extSignature : fCandidateTypes) {
-			final String comboLabel = extSignature.getSignature().getName() + " - " + refactoring.getProjectSignatures().getFeatureName(extSignature.getFeatureId());
-			fSuperTypesCombo.add(comboLabel);
+		for (Feature feature : fCandidateTypes) {
+			fSuperTypesCombo.add(feature.getName());
 		}
+		
 		fSuperTypesCombo.select(fCandidateTypes.size() - 1);
 		fSuperTypesCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 	}
@@ -445,111 +389,18 @@ public class PullUpMemberPage extends UserInputWizardPage {
 		super.dispose();
 	}
 
-	private void editSelectedMembers() {
-		final ISelection preserved = fTableViewer.getSelection();
-		try {
-			MemberActionInfo[] selectedMembers = getSelectedMembers();
-			final String shellTitle = RefactoringMessages.PullUpInputPage1_Edit_members;
-			final String labelText = selectedMembers.length == 1 ? Messages.format(RefactoringMessages.PullUpInputPage1_Mark_selected_members_singular,
-					(new MemberActionInfoLabelProvider()).getColumnText(selectedMembers[0], MEMBER_COLUMN)) : Messages.format(
-					RefactoringMessages.PullUpInputPage1_Mark_selected_members_plural, String.valueOf(selectedMembers.length));
-			final Map<String, Integer> stringMapping = createStringMappingForSelectedMembers();
-			final String[] keys = stringMapping.keySet().toArray(new String[stringMapping.keySet().size()]);
-			Arrays.sort(keys);
-			final int initialSelectionIndex = getInitialSelectionIndexForEditDialog(stringMapping, keys);
-			final ComboSelectionDialog dialog = new ComboSelectionDialog(getShell(), shellTitle, labelText, keys, initialSelectionIndex);
-			dialog.setBlockOnOpen(true);
-			if (dialog.open() == Window.CANCEL)
-				return;
-		} finally {
-			updateWizardPage(preserved, true);
-		}
-	}
-
-	private MemberActionInfo[] getActiveInfos() {
-		final MemberActionInfo[] infos = getTableInput();
-		final List<MemberActionInfo> result = new ArrayList<MemberActionInfo>(infos.length);
-		for (int i = 0; i < infos.length; i++) {
-			final MemberActionInfo info = infos[i];
-			if (info.isActive())
-				result.add(info);
-		}
-		return result.toArray(new MemberActionInfo[result.size()]);
-	}
-
-	private int getCommonActionCodeForSelectedInfos() {
-		final MemberActionInfo[] infos = getSelectedMembers();
-		if (infos.length == 0)
-			return -1;
-
-		final int code = infos[0].getAction();
-		for (int i = 0; i < infos.length; i++) {
-			if (code != infos[i].getAction())
-				return -1;
-		}
-		return code;
-	}
-
-	public ExtendedPullUpSignature getDestinationType() {
+	public Feature getDestinationType() {
 		final int index = fSuperTypesCombo.getSelectionIndex();
 		if (index >= 0)
 			return fCandidateTypes.get(index);
 		return null;
 	}
 
-	private int getInitialSelectionIndexForEditDialog(final Map<String, Integer> stringMapping, final String[] keys) {
-		final int commonActionCode = getCommonActionCodeForSelectedInfos();
-		if (commonActionCode == -1)
-			return 0;
-		for (final Iterator<String> iter = stringMapping.keySet().iterator(); iter.hasNext();) {
-			final String key = iter.next();
-			final int action = stringMapping.get(key).intValue();
-			if (commonActionCode == action) {
-				for (int i = 0; i < keys.length; i++) {
-					if (key.equals(keys[i]))
-						return i;
-				}
-				Assert.isTrue(false);
-			}
-		}
-		return 0;
-	}
-
-	private AbstractSignature[] getMembers() {
-		final MemberActionInfo[] infos = getTableInput();
-		final List<AbstractSignature> result = new ArrayList<AbstractSignature>(infos.length);
-		for (int index = 0; index < infos.length; index++) {
-			result.add(infos[index].getSignature());
-		}
-		return result.toArray(new AbstractSignature[result.size()]);
-	}
-
-	private AbstractSignature[] getMembersForAction(final int action) {
-		List<AbstractSignature> result = new ArrayList<AbstractSignature>();
-		getMembersForAction(action, false, result);
-		return result.toArray(new AbstractSignature[result.size()]);
-	}
-
-	private AbstractSignature[] getMethodsForAction(final int action) {
-		List<AbstractSignature> result = new ArrayList<AbstractSignature>();
-		getMembersForAction(action, true, result);
-		return result.toArray(new AbstractSignature[result.size()]);
-	}
-
-	private void getMembersForAction(int action, boolean onlyMethods, List<AbstractSignature> result) {
-		final MemberActionInfo[] infos = getTableInput();
-		for (int index = 0; index < infos.length; index++) {
-			MemberActionInfo info = infos[index];
-			if (info.getAction() == action)
-				result.add(info.getSignature());
-		}
-	}
-
 	@Override
 	public IWizardPage getNextPage() {
 		initializeRefactoring();
-		if (getMethodsForAction(PULL_UP_ACTION).length == 0)
-			return computeSuccessorPage();
+//		if (getMethodsForAction(PULL_UP_ACTION).length == 0)
+//			return computeSuccessorPage();
 		return super.getNextPage();
 	}
 
@@ -565,54 +416,65 @@ public class PullUpMemberPage extends UserInputWizardPage {
 		return RefactoringMessages.PullUpInputPage1_label_use_destination;
 	}
 
-	private MemberActionInfo[] getSelectedMembers() {
-		Assert.isTrue(fTableViewer.getSelection() instanceof IStructuredSelection);
-		final IStructuredSelection structured = (IStructuredSelection) fTableViewer.getSelection();
-		final List<?> result = structured.toList();
-		return result.toArray(new MemberActionInfo[result.size()]);
-	}
-
-	private MemberActionInfo[] getTableInput() {
-		return (MemberActionInfo[]) fTableViewer.getInput();
-	}
-
 	protected int getTableRowCount() {
 		return 10;
 	}
 
 	protected void initializeEnablement() {
-		MemberActionInfo[] infos = asMemberActionInfos();
-		final boolean enabled = infos.length > 0;
-		fTableViewer.getTable().setEnabled(enabled);
-		fStatusLine.setEnabled(enabled);
-		fLabel.setEnabled(enabled);
+		fTableViewer.getTree().setEnabled(true);
+		fStatusLine.setEnabled(true);
+		fLabel.setEnabled(true);
 	}
 
 	private void initializeRefactoring() {
-		refactoring.setPullUpSignatures(getMembersForAction(PULL_UP_ACTION));
-		final ExtendedPullUpSignature destination = getDestinationType();
+		refactoring.setPullUpSignatures(getPullUpMembers());
+		refactoring.setDeletableSignatures(getDeletableMembers());
+		final Feature destination = getDestinationType();
 		if (destination != null)
-			refactoring.setDestinationType(destination);
+			refactoring.setDestinationFeature(destination);
+	}
+
+	private Set<ExtendedPullUpSignature> getPullUpMembers() {
+		Set<ExtendedPullUpSignature> members = new HashSet<>();
+	
+		fTableViewer.expandAll();
+		List<TreeItem> checkedItems = getCheckedElements();
+		for (TreeItem treeItem : checkedItems) {
+			members.add((ExtendedPullUpSignature) treeItem.getData());
+		}
+		
+		return members;
+	}
+
+	private Set<ExtendedPullUpSignature> getDeletableMembers() {
+		Set<ExtendedPullUpSignature> members = new HashSet<>();
+		
+		fTableViewer.expandAll();
+		List<TreeItem> checkedItems = getCheckedElements();
+		for (TreeItem treeItem : checkedItems) {
+			
+			final ExtendedPullUpSignature extSignature = (ExtendedPullUpSignature) treeItem.getData();
+			if (treeItem.getItemCount() > 0)
+			{
+				for (TreeItem childItem : treeItem.getItems()) {
+					final Feature feature = (Feature) childItem.getData();
+					final int featureID = refactoring.getProjectSignatures().getFeatureID(feature.getName());
+					members.add(new ExtendedPullUpSignature(extSignature.getSignature(),  featureID));
+				}
+			}
+			else
+			{
+				members.add(extSignature);
+			}
+		}
+		
+		return members;
 	}
 
 	@Override
 	protected boolean performFinish() {
 		initializeRefactoring();
 		return super.performFinish();
-	}
-
-	private void setActionForMembers(final AbstractSignature[] members, final int action) {
-		final MemberActionInfo[] infos = getTableInput();
-		for (int i = 0; i < members.length; i++) {
-			for (int j = 0; j < infos.length; j++) {
-				if (infos[j].getSignature().equals(members[i]))
-					infos[j].setAction(action);
-			}
-		}
-	}
-
-	private void setTableInput() {
-		fTableViewer.setInput(asMemberActionInfos());
 	}
 
 	@Override
@@ -622,7 +484,7 @@ public class PullUpMemberPage extends UserInputWizardPage {
 			try {
 				//refactoring.resetEnvironment();
 			} finally {
-				fTableViewer.setSelection(new StructuredSelection(getActiveInfos()), true);
+//				fTableViewer.setSelection(new StructuredSelection(getActiveInfos()), true);
 				fTableViewer.getControl().setFocus();
 			}
 		}
@@ -630,20 +492,28 @@ public class PullUpMemberPage extends UserInputWizardPage {
 
 	private void updateButtonEnablement(final ISelection selection) {
 		if (fSelectAllButton != null)
-			fSelectAllButton.setEnabled(!areAllMembersMarkedAsPullUp());
+			fSelectAllButton.setEnabled(!allMembersChecked());
 		if (fDeselectAllButton != null)
-			fDeselectAllButton.setEnabled(!areAllMembersMarkedAsWithNoAction());
+			fDeselectAllButton.setEnabled(allMembersChecked());
 	}
 
 	private void updateStatusLine() {
 		if (fStatusLine == null)
 			return;
-		Object[] selectedMembers = fTableViewer.getCheckedElements();
-		final int selected = selectedMembers.length;
-		final String msg = selected == 1 ? Messages.format(RefactoringMessages.PullUpInputPage1_status_line_singular,
-				(new MemberActionInfoLabelProvider()).getColumnText(selectedMembers[0], MEMBER_COLUMN)) : Messages.format(
-				RefactoringMessages.PullUpInputPage1_status_line_plural, String.valueOf(selected));
+		
+		List<TreeItem> checkedItems = getCheckedElements();
+		final String msg = checkedItems.size() == 1 ? Messages.format(RefactoringMessages.PullUpInputPage1_status_line_singular,
+				(new PullUpMemberLabelProvider()).getColumnText(checkedItems.get(0).getData(), MEMBER_COLUMN)) : Messages.format(
+				RefactoringMessages.PullUpInputPage1_status_line_plural, String.valueOf(checkedItems.size()));
 		fStatusLine.setText(msg);
+	}
+
+	private List<TreeItem> getCheckedElements() {
+		List<TreeItem> checkedItems = new ArrayList<>();
+		for (TreeItem treeItem : fTableViewer.getTree().getItems()) {
+			if (treeItem.getChecked()) checkedItems.add(treeItem);
+		}
+		return checkedItems;
 	}
 
 	private void updateWizardPage(final ISelection selection, final boolean displayErrors) {
@@ -655,5 +525,14 @@ public class PullUpMemberPage extends UserInputWizardPage {
 		checkPageCompletionStatus(displayErrors);
 		updateButtonEnablement(fTableViewer.getSelection());
 		updateStatusLine();
+	}
+
+	private void setAllMembersChecked(final boolean checked) {
+		for (TreeItem item : fTableViewer.getTree().getItems()) {
+			for (TreeItem childItem : item.getItems()) {
+				childItem.setChecked(checked);
+			}
+			item.setChecked(checked);
+		}
 	}
 }

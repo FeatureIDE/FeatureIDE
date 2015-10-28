@@ -20,12 +20,15 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.filebuffers,
  org.eclipse.ui.editors,
  org.eclipse.jface.text,
- org.eclipse.jface
+ org.eclipse.jface,
+ de.ovgu.featureide.Cloneanalysis;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ClassPath: lib/FeatureHouse.jar,
  lib/fuji.jar,
- .
+ .,
+ lib/pmd-core-5.2.2.jar,
+ lib/pmd-java-5.2.2.jar
 Bundle-Vendor: University of Magdeburg
 Import-Package: org.eclipse.core.expressions,
  org.eclipse.jdt.core.refactoring,

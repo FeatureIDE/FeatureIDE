@@ -34,6 +34,7 @@ import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.signature.base.AFeatureData;
+import de.ovgu.featureide.core.signature.base.AbstractMethodSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.featurehouse.refactoring.matcher.SignatureMatcher;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiLocalVariableSignature;
@@ -66,16 +67,17 @@ public class RenameLocalVariableRefactoring extends RenameRefactoring<FujiLocalV
 	
 	private RefactoringStatus checkNameCollision(SignatureMatcher matcher) {
 		
-		RefactoringStatus status = new RefactoringStatus();
+		RefactoringStatus status = new RefactoringStatus();		
 
+		final AbstractMethodSignature declaringMethod = renamingElement.getDeclaringMethod();
 		for (AbstractSignature newMatchedSignature : matcher.getMatchedSignaturesForNewName()) {
 			
 			if (!(newMatchedSignature instanceof FujiLocalVariableSignature)) continue;
 			
 			for (AFeatureData featureData : newMatchedSignature.getFeatureData()) {
 				
-				if (featureData.getAbsoluteFilePath().equals(file) && 
-						renamingElement.getDeclaringMethod().equals(((FujiLocalVariableSignature) newMatchedSignature).getDeclaringMethod()))
+				if ((featureData.getAbsoluteFilePath().equals(file) || declaringMethod.isConstructor()) && 
+						declaringMethod.equals(((FujiLocalVariableSignature) newMatchedSignature).getDeclaringMethod()))
 				{
 					status.addError(Messages.format(RefactoringCoreMessages.RefactoringAnalyzeUtil_name_collision, BasicElementLabels.getJavaElementName(newName)));
 				}

@@ -45,6 +45,7 @@ import de.ovgu.featureide.core.signature.base.AbstractMethodSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiClassSignature;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
+import de.ovgu.featureide.fm.core.Feature;
 
 /**
  * TODO description
@@ -164,6 +165,12 @@ public class RefactoringUtil {
 			return null;
 
 		return JavaCore.createCompilationUnitFrom(file);
+	}
+	
+	public static Feature getFeatureForId(ProjectSignatures projectSignatures, int featureId)
+	{
+		final String featureName = projectSignatures.getFeatureName(featureId);
+		return projectSignatures.getFeatureModel().getFeature(featureName);
 	}
 
 }

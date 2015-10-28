@@ -28,6 +28,7 @@ import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.core.signature.base.ExtendedSignature;
 import de.ovgu.featureide.core.signature.base.FOPFeatureData;
 import de.ovgu.featureide.core.signature.base.SignaturePosition;
+import de.ovgu.featureide.featurehouse.signature.fuji.FujiClassSignature;
 
 /**
  * TODO description
@@ -64,6 +65,24 @@ public class FujiSelector {
 					}
 				} 
 			} 
+		}
+		
+		return null;
+	}
+	
+	public AbstractSignature getSelectedClassSignature(){
+		
+		final SignatureIterator iter = projectSignatures.iterator();
+		while (iter.hasNext()) {
+			final AbstractSignature signature = iter.next();
+			
+			if (!(signature instanceof FujiClassSignature)) continue;
+			
+			for (FOPFeatureData featureData : (FOPFeatureData[]) signature.getFeatureData()) {
+				if (featureData.getAbsoluteFilePath().equals(file) )
+					return signature;
+			}
+			
 		}
 		
 		return null;

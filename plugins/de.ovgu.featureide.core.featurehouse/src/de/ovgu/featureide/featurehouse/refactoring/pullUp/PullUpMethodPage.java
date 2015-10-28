@@ -169,8 +169,8 @@ public class PullUpMethodPage extends UserInputWizardPage {
 	public void checkPulledUp() {
 		uncheckAll();
 		fTreeViewer.setCheckedElements(refactoring.getPullUpSignatures());
-		final ExtendedPullUpSignature parent = refactoring.getDestinationType();
-		fTreeViewer.setChecked(parent, true);
+//		final ExtendedPullUpSignature parent = refactoring.getDestinationType();
+//		fTreeViewer.setChecked(parent, true);
 //		checkAllParents(parent);
 	}
 
@@ -279,6 +279,7 @@ public class PullUpMethodPage extends UserInputWizardPage {
 	private void createTreeViewer(final Composite composite) {
 		final Tree tree= new Tree(composite, SWT.CHECK | SWT.BORDER | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL);
 		tree.setLayoutData(new GridData(GridData.FILL_BOTH));
+		
 		fTreeViewer= new ContainerCheckedTreeViewer(tree);
 		fTreeViewer.setLabelProvider(new PullUpHierarchyLabelProvider());
 		fTreeViewer.setUseHashlookup(true);
@@ -370,8 +371,8 @@ public class PullUpMethodPage extends UserInputWizardPage {
 			pm.beginTask(RefactoringCoreMessages.PullUpRefactoring_checking, 2);
 			removeAllTreeViewFilters();
 			fTreeViewer.setContentProvider(new PullUpHierarchyContentProvider());
-			fTreeViewer.setInput(new FeatureSignatureHierarchyCreator(refactoring.getDestinationType(), 
-					refactoring.getProjectSignatures(), refactoring.getPullUpSignatures()).createFeatureHierarchies());
+//			fTreeViewer.setInput(new FeatureSignatureHierarchyCreator(refactoring.getDestinationType(), 
+//					refactoring.getProjectSignatures(), refactoring.getPullUpSignatures()).createFeatureHierarchies());
 			precheckElements(fTreeViewer);
 			fTreeViewer.expandAll();
 			updateSelectionLabel();
@@ -401,8 +402,8 @@ public class PullUpMethodPage extends UserInputWizardPage {
 	}
 
 	private void setHierarchyLabelText() {
-		final String message= Messages.format(RefactoringMessages.PullUpInputPage_subtypes, refactoring.getDestinationType().getSignature().getFullName());
-		fTypeHierarchyLabel.setText(message);
+//		final String message= Messages.format(RefactoringMessages.PullUpInputPage_subtypes, refactoring.getDestinationType().getSignature().getFullName());
+//		fTypeHierarchyLabel.setText(message);
 	}
 
 	private void setSourceViewerContents(ExtendedPullUpSignature signature) {
