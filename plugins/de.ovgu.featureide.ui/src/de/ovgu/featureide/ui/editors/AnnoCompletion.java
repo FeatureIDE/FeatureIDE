@@ -35,11 +35,13 @@ import org.eclipse.jdt.ui.text.java.JavaContentAssistInvocationContext;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.ui.UIPlugin;
 
 /**
  * Context Completion
@@ -49,6 +51,11 @@ import de.ovgu.featureide.core.IFeatureProject;
 @SuppressWarnings("restriction")
 public class AnnoCompletion implements IJavaCompletionProposalComputer {
 	
+	/**
+	 * 
+	 */
+	private static final Image FEATURE_ICON = UIPlugin.getImage("FeatureIconSmall.ico");
+
 	public AnnoCompletion() {
 	}
 
@@ -123,6 +130,7 @@ public class AnnoCompletion implements IJavaCompletionProposalComputer {
 		for (CompletionProposal prop : completionProp) {
 
 			LazyJavaCompletionProposal curFeature = new LazyJavaCompletionProposal(prop, context);
+			curFeature.setImage(FEATURE_ICON);
 			//			curFeature.setReplacementLength(prop.getCompletion().length - prefix.length());
 			curFeature.setReplacementString(new String(prop.getCompletion()).replace(prefix, ""));
 			curFeature.setReplacementOffset(context.getInvocationOffset());

@@ -673,14 +673,14 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 			setFieldsMethodsActions[i].setChecked(isChecked[i]);
 		}
 
-//		toolbarManager.add(showAccessModifiers);
-//		toolbarManager.add(fieldsWithRefinementsButton);
-//		toolbarManager.add(fieldsWithoutRefinementsButton);
-//		toolbarManager.add(methodsWithRefinementsButton);
-//		toolbarManager.add(methodsWithoutRefinementsButton);
-//		toolbarManager.add(showContracsButton);
-//		toolbarManager.add(showInvariantsButton);
-//		toolbarManager.add(showNestedClassesButton);
+		toolbarManager.add(showAccessModifiers);
+		toolbarManager.add(fieldsWithRefinementsButton);
+		toolbarManager.add(fieldsWithoutRefinementsButton);
+		toolbarManager.add(methodsWithRefinementsButton);
+		toolbarManager.add(methodsWithoutRefinementsButton);
+		toolbarManager.add(showContracsButton);
+		toolbarManager.add(showInvariantsButton);
+		toolbarManager.add(showNestedClassesButton);
 
 		reloadImage();
 
