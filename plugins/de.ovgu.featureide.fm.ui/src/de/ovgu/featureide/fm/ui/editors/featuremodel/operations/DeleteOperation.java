@@ -53,6 +53,7 @@ import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureDependencies;
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.Features;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.DeleteOperationAlternativeDialog;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
@@ -101,29 +102,7 @@ public class DeleteOperation extends AbstractFeatureModelOperation implements GU
 			}
 			Feature parent = removeFeature(element, removalMap, alreadyDeleted);
 			
-			if (commonAncestorList == null) {
-				commonAncestorList = new LinkedList<>();
-				while (parent != null) {
-					commonAncestorList.add(0, parent);
-					parent = parent.getParent();
-				}
-			} else if (parent != null) {
-				LinkedList<Feature> parentList = new LinkedList<>();
-				while (parent != null) {
-					parentList.addFirst(parent);
-					parent = parent.getParent();
-				}
-				final Iterator<Feature> iterator1 = parentList.iterator();				
-				final Iterator<Feature> iterator2 = commonAncestorList.iterator();
-				int i = 0;
-				while (iterator1.hasNext() && iterator2.hasNext()) {
-					if (!iterator1.next().equals(iterator2.next())) {
-						break;
-					}
-					i++;
-				}
-				commonAncestorList = commonAncestorList.subList(0, i);
-			}
+			commonAncestorList = Features.getCommonAncestor(commonAncestorList, parent);
 		}
 
 		removeContainedFeatures(removalMap, alreadyDeleted);
