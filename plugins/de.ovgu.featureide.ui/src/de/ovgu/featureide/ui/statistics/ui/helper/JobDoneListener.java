@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.ui.statistics.ui.helper;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.REFRESH_STATISTICS_VIEW;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -44,8 +46,6 @@ import de.ovgu.featureide.ui.statistics.ui.helper.jobs.TreeJob;
  */
 public class JobDoneListener implements IJobChangeListener {
 
-	private static final String REFRESH_STATISTICS_VIEW = "Refresh statistics view";
-	
 	protected static JobDoneListener instance = new JobDoneListener();
 	private List<ITreeJob> runningJobs = new LinkedList<ITreeJob>();
 	protected List<TreeViewer> views = new LinkedList<TreeViewer>();

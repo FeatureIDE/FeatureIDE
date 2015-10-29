@@ -20,6 +20,16 @@
  */
 package de.ovgu.featureide.fm.core.io.xml;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.ABSTRACT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATIONS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.COMMENTS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.HIDDEN;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IS_NO_VALID_FEATURE_NAME;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IS_NO_VALID_INTEGER_VALUE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.MANDATORY;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NOT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.WRONG_SYNTAX;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -89,7 +99,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 			parseFeatureOrder(e.getElementsByTagName(FEATURE_ORDER));	
 		}
 		if (featureModel.getRoot() == null) {
-			throw new UnsupportedModelException("Wrong Syntax", 1);
+			throw new UnsupportedModelException(WRONG_SYNTAX, 1);
 		}
 		featureModel.handleModelDataLoaded();
 	}
@@ -182,7 +192,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 							featureLocation = new FMPoint(Integer.parseInt (subStringX),
 										Integer.parseInt (subStringY));
 						} catch (NumberFormatException error) {
-							throwError(error.getMessage() + "is no valid Integer Value", e);
+							throwError(error.getMessage() + IS_NO_VALID_INTEGER_VALUE, e);
 						}
 					} else {
 						throwError("Unknown feature attribute: " + attributeName, e);
@@ -194,7 +204,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 				throwError("Duplicate entry for feature: " + name, e);
 			}
 			if (!featureModel.getFMComposerExtension().isValidFeatureName(name)) {
-				throwError(name + " is no valid feature name", e);
+				throwError(name + IS_NO_VALID_FEATURE_NAME, e);
 			}
 			Feature f = new Feature(featureModel, name);
 			f.setMandatory(true);
@@ -249,7 +259,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 									c.setLocation(new FMPoint(Integer.parseInt (subStringX),
 												Integer.parseInt (subStringY)));
 								} catch (NumberFormatException error) {
-									throwError(error.getMessage() + "is no valid Integer Value", child);
+									throwError(error.getMessage() + IS_NO_VALID_INTEGER_VALUE, child);
 								}
 							} else {
 								throwError("Unknown constraint attribute: " + attributeName, node);

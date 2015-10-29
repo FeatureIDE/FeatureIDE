@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.core.mpl;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.EMPTY___;
+import static de.ovgu.featureide.fm.core.localization.StringTable.INTERFACES;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.ByteArrayInputStream;
@@ -102,7 +105,7 @@ public class MPLPlugin extends AbstractCorePlugin {
 			project.setDescription(description, null);
 
 			// create directories for MPL
-			IFolder mplFolder = project.getFolder("Interfaces");
+			IFolder mplFolder = project.getFolder(INTERFACES);
 			if (!mplFolder.exists())
 				mplFolder.create(true, true, null);
 			
@@ -230,7 +233,7 @@ public class MPLPlugin extends AbstractCorePlugin {
 	}
 	
 	private static String constructInterfaceProjectName(String featureProjektName) {
-		return "_" + featureProjektName + "_Interfaces";
+		return EMPTY___ + featureProjektName + "_Interfaces";
 	}
 	
 	public void setupMultiFeatureProject(Collection<IFeatureProject> featureProjects) {

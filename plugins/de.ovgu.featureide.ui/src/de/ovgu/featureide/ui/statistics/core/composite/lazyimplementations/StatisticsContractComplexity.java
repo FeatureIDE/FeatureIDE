@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.PROJECT_BASED__;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -144,11 +146,11 @@ public class StatisticsContractComplexity extends LazyParent {
 					contractRefinementRealNameMap.put(REFINEMENT_COMPOSING_MECHANISM_MAPPING.get(refinement.trim()), contractRefinementMap.get(refinement));
 				}
 			} else {
-				// contractRefinementRealNameMap.put("Project based - " +
+				// contractRefinementRealNameMap.put(PROJECT_BASED__ +
 				// contractComposition, contractRefinementMap.get(""));
 				for (String refinement : contractRefinementMap.keySet()) {
-					contractRefinementRealNameMap.put("Project based - " + contractComposition, contractRefinementMap.get(refinement)
-							+ (contractRefinementRealNameMap.containsKey("Project based - " + contractComposition) ? contractRefinementRealNameMap.get("Project based - " + contractComposition) : 0));
+					contractRefinementRealNameMap.put(PROJECT_BASED__ + contractComposition, contractRefinementMap.get(refinement)
+							+ (contractRefinementRealNameMap.containsKey(PROJECT_BASED__ + contractComposition) ? contractRefinementRealNameMap.get(PROJECT_BASED__ + contractComposition) : 0));
 				}
 			}
 			addChild(new HashMapNode(METHOD_CONTRACT_REFINEMENT, null, contractRefinementRealNameMap));

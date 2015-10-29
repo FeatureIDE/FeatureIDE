@@ -20,6 +20,11 @@
  */
 package de.ovgu.featureide.fm.ui.handlers.base;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.FILE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NOT_FOUND;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SPECIFIED_FILE_WASNT_FOUND;
+import static de.ovgu.featureide.fm.core.localization.StringTable.XML;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 
@@ -73,7 +78,7 @@ public abstract class AbstractImportHandler extends AFileHandler {
 					if (inputFile.exists()) {
 						break;
 					}
-					MessageDialog.openInformation(new Shell(), "File " + "not Found", "Specified file wasn't found");
+					MessageDialog.openInformation(new Shell(), FILE + NOT_FOUND, SPECIFIED_FILE_WASNT_FOUND);
 				}
 
 				final FeatureModel fm = createFeatureModel();
@@ -95,7 +100,7 @@ public abstract class AbstractImportHandler extends AFileHandler {
 
 	protected void setFilter(FileDialog fileDialog) {
 		fileDialog.setFilterExtensions(new String[] { "*.xml" });
-		fileDialog.setFilterNames(new String[] { "XML" });
+		fileDialog.setFilterNames(new String[] { XML });
 	}
 
 	protected FeatureModel createFeatureModel() {

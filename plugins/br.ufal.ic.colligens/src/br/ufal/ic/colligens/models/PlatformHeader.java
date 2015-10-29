@@ -1,5 +1,7 @@
 package br.ufal.ic.colligens.models;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.GENERATING_PLATFORM;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -37,7 +39,7 @@ public class PlatformHeader extends AbstractHeader {
 
 		listFiles = filesAllProject();
 
-		monitorbeginTask("Generating platform", listFiles.size());
+		monitorbeginTask(GENERATING_PLATFORM, listFiles.size());
 
 		IIncludeReference includes[] = null;
 		try {
@@ -124,7 +126,7 @@ public class PlatformHeader extends AbstractHeader {
 							}
 							errorLine = "";
 							while ((line = error.readLine()) != null) {
-								// if (line.contains("fatal error")) {
+								// if (line.contains(FATAL_ERROR)) {
 								errorLine = errorLine + line + "\n";
 								// break;
 								// }

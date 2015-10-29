@@ -20,6 +20,11 @@
  */
 package de.ovgu.featureide.ui.wizards;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CONTAINER_DOES_NOT_EXIST_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CREATING;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NEW_CONFIGURATION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.OPENING_FILE_FOR_EDITING___;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -78,7 +83,7 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 	public void addPages() {
 		page = new NewConfigurationFilePage(configFolder);
 		addPage(page);
-		this.setWindowTitle("New Configuration");
+		this.setWindowTitle(NEW_CONFIGURATION);
 	}
 
 	/**
@@ -120,9 +125,9 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 
 	private void doFinish(IContainer container, String fileName, IProgressMonitor monitor) throws CoreException {
 		// create a sample file
-		monitor.beginTask("Creating " + fileName, 2);
+		monitor.beginTask(CREATING + fileName, 2);
 		if (!container.exists()) {
-			throwCoreException("Container does not exist.");
+			throwCoreException(CONTAINER_DOES_NOT_EXIST_);
 		}
 
 		final IFile file = container.getFile(new Path(fileName));
@@ -135,7 +140,7 @@ public class NewConfigurationFileWizard extends Wizard implements INewWizard {
 		} catch (IOException e) {
 		}
 		monitor.worked(1);
-		monitor.setTaskName("Opening file for editing...");
+		monitor.setTaskName(OPENING_FILE_FOR_EDITING___);
 		getShell().getDisplay().asyncExec(new Runnable() {
 			public void run() {
 				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();

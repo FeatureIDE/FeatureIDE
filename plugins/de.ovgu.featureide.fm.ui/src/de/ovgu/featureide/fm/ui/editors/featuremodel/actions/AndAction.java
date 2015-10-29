@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.AND;
+
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.ui.PlatformUI;
@@ -40,7 +42,7 @@ public class AndAction extends SingleSelectionAction {
 	private final FeatureModel featureModel;
 
 	public AndAction(Object viewer, FeatureModel featureModel) {
-		super("And", viewer);
+		super(AND, viewer);
 		this.featureModel = featureModel;
 	}
 

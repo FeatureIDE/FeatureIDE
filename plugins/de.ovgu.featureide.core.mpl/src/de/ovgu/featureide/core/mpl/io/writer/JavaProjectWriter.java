@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.core.mpl.io.writer;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CREATED_JAVA_PROJECT;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -84,7 +86,7 @@ public class JavaProjectWriter extends AbstractWriter {
 							MPLPlugin.getDefault().logError(e);
 						} 
 					}
-					MPLPlugin.getDefault().logInfo("Created Java Project");
+					MPLPlugin.getDefault().logInfo(CREATED_JAVA_PROJECT);
 				}
 			}
 		}		

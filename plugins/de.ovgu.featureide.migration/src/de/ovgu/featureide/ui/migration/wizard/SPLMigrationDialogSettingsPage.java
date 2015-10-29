@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.ui.migration.wizard;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.IMPORT_PRODUCTS_INTO_A_SIMPLE_SOFTWARE_PRODUCT_LINE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.MIGRATION_IS_CURRENTLY_NOT_SUPPORTED_FOR_THE_SELECTED_COMPOSER__PLEASE_CHOOSE_ANOTHER_ONE;
+
 import org.eclipse.swt.widgets.Composite;
 
 import de.ovgu.featureide.ui.wizards.NewFeatureProjectPage;
@@ -38,7 +41,7 @@ public class SPLMigrationDialogSettingsPage extends NewFeatureProjectPage
 	public SPLMigrationDialogSettingsPage()
 	{
 		super();
-		setDescription("Import products into a simple Software Product Line");
+		setDescription(IMPORT_PRODUCTS_INTO_A_SIMPLE_SOFTWARE_PRODUCT_LINE);
 	}
 
 	@Override
@@ -71,7 +74,7 @@ public class SPLMigrationDialogSettingsPage extends NewFeatureProjectPage
 		final boolean composerSupported = getCompositionTool().supportsMigration();
 		
 		if(!composerSupported)
-			updateStatus("Migration is currently not supported for the selected Composer. Please choose another one");
+			updateStatus(MIGRATION_IS_CURRENTLY_NOT_SUPPORTED_FOR_THE_SELECTED_COMPOSER__PLEASE_CHOOSE_ANOTHER_ONE);
 		else
 			setErrorMessage(null);
 		

@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATING;
+import static de.ovgu.featureide.fm.core.localization.StringTable.MORE_THAN;
+
 import org.eclipse.core.runtime.jobs.Job;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -60,7 +63,7 @@ public class ConfigParentNode extends LazyParent {
 		 *            for the job.
 		 */
 		public void calculate(final long timeout, final int priority) {
-			Job job = new StoppableTreeJob("Calculating " + this.description, this) {
+			Job job = new StoppableTreeJob(CALCULATING + this.description, this) {
 				private String calculateConfigs() {
 					boolean ignoreAbstract = description.equals(DESC_CONFIGS);
 					if (!ignoreAbstract && innerModel.getAnalyser().countConcreteFeatures() == 0) {
@@ -71,7 +74,7 @@ public class ConfigParentNode extends LazyParent {
 
 					final long number = new Configuration(innerModel, false, ignoreAbstract).number(timeout);
 					
-					return ((number < 0) ? "more than " + (-number - 1) : String.valueOf(number));
+					return ((number < 0) ? MORE_THAN + (-number - 1) : String.valueOf(number));
 				}
 
 				@Override

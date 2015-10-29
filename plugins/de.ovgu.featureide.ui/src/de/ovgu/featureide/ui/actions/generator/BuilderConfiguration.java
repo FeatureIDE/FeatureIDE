@@ -75,7 +75,11 @@ public class BuilderConfiguration extends Configuration {
 			return zeros + number;
 		}
 		return name;
-
+	}
+	
+	@Override
+	public String toString() {
+		return getName();
 	}
 
 }

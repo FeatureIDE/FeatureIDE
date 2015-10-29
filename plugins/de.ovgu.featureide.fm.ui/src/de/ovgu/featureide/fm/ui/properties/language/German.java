@@ -20,6 +20,20 @@
  */
 package de.ovgu.featureide.fm.ui.properties.language;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.ABSTRAKT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ALTERNATIVE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT_IST_TAUTOLOGIE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FALSCH_OPTIONALES_FEATURE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.GEERBT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.GERMAN;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IMPORTIERT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.KONKRET;
+import static de.ovgu.featureide.fm.core.localization.StringTable.OBLIGATORISCH;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ODER;
+import static de.ovgu.featureide.fm.core.localization.StringTable.REDUNDANTES_CONSTRAINT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.UNBESTIMMBAR_VERSTECKTES_FEATURE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.VERSTECKT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.VON_INTERFACE;
 /**
  * Class implementing the extension point <code>"de.ovgu.featureide.fm.core.language"</code>
  * 
@@ -29,25 +43,24 @@ package de.ovgu.featureide.fm.ui.properties.language;
  */
 public class German implements ILanguage {
 
-	public static final String NAME = "German";
+	public static final String NAME = GERMAN;
 
 	private static final String LEGEND = "Legende:";
-	private static final String MANDATORY = "Obligatorisch";
-	private static final String ABSTRACT = "Abstrakt";
-	private static final String IMPORTED = "Importiert";
-	private static final String INHERITED = "Geerbt";
-	private static final String INTERFACED = "von Interface";
-	private static final String CONCRETE = "Konkret";
-	private static final String HIDDEN = "Versteckt";
+	private static final String MANDATORY = OBLIGATORISCH;
+	private static final String ABSTRACT = ABSTRAKT;
+	private static final String IMPORTED = IMPORTIERT;
+	private static final String INHERITED = GEERBT;
+	private static final String INTERFACED = VON_INTERFACE;
+	private static final String CONCRETE = KONKRET;
+	private static final String HIDDEN = VERSTECKT;
 	private static final String DEAD = "Unw�hlbar";
-	private static final String FALSE_OPTIONAL = "Falsch-optionales Feature";
-	private static final String ALTERNATIVE = "Alternative";
-	private static final String OR = "Oder";
+	private static final String FALSE_OPTIONAL = FALSCH_OPTIONALES_FEATURE;
+	private static final String OR = ODER;
 	private static final String OPTIONAL = "Optional";
-	private static final String INDETHIDDEN = "Unbestimmbar verstecktes Feature";
-	private static final String REDUNDANT = "Redundantes Constraint";
+	private static final String INDETHIDDEN = UNBESTIMMBAR_VERSTECKTES_FEATURE;
+	private static final String REDUNDANT = REDUNDANTES_CONSTRAINT;
 	private static final String UNSATISFIABLE_CONST = "Unerf�llbares Constraint";
-	private static final String TAUTOLOGY_CONST = "Constraint ist Tautologie";
+	private static final String TAUTOLOGY_CONST = CONSTRAINT_IST_TAUTOLOGIE;
 	private static final String VOID_MODEL_CONST = "Constraint macht Produktlinie unerf�llbar";
 
 	@Override

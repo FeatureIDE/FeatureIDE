@@ -20,6 +20,15 @@
  */
 package de.ovgu.featureide.featurehouse.meta;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.ASSIGNABLE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CLASS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ENSURES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE_STUBS_GENERATED_AND_PROVEN_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE_STUB_GENERATOR_FOR;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IS_NOT_COMPLETE_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.PLEASE_INSTALL_KEY_FOR_AN_AUTO_START_OF_THE_THEOREM_PROVER_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.REQUIRES;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -129,7 +138,7 @@ public class FeatureStubsGenerator {
 
 						final int lastIndexOf = fileText.lastIndexOf("}");
 						if (lastIndexOf < 0) {
-							FeatureHouseCorePlugin.getDefault().logError("Class " + file.getAbsolutePath() + " is not complete.", null);
+							FeatureHouseCorePlugin.getDefault().logError(CLASS + file.getAbsolutePath() + IS_NOT_COMPLETE_, null);
 							return;
 						}
 						StringBuilder fileTextSB = new StringBuilder(fileText.substring(0, lastIndexOf));
@@ -212,7 +221,7 @@ public class FeatureStubsGenerator {
 		keyWrapper = KeYWrapper.createGUIListener(this, signatures, features);
 
 		if (keyWrapper == null) {
-			FeatureHouseCorePlugin.getDefault().logInfo("Please install KeY for an auto-start of the theorem prover.");
+			FeatureHouseCorePlugin.getDefault().logInfo(PLEASE_INSTALL_KEY_FOR_AN_AUTO_START_OF_THE_THEOREM_PROVER_);
 			while (!features.isEmpty()) {
 				nextElement(signatures, features);
 			}
@@ -227,7 +236,7 @@ public class FeatureStubsGenerator {
 			while (!(fstFeat = features.removeFirst()).hasMethodContracts()) {};
 			createFeatureStub(fstFeat, signatures); 
 		} else {
-			FeatureHouseCorePlugin.getDefault().logInfo("Feature Stubs generated and proven.");
+			FeatureHouseCorePlugin.getDefault().logInfo(FEATURE_STUBS_GENERATED_AND_PROVEN_);
 		}
 	}
 	
@@ -326,7 +335,7 @@ public class FeatureStubsGenerator {
 		String tmpText = fileTextSB.substring(0, indexOfBody);
 		int indexOfStartOfContract = tmpText.lastIndexOf("/*@");
 		String contractBody = "";
-		while (!(contractBody.contains("ensures") || contractBody.contains("requires") || contractBody.contains("assignable"))) {
+		while (!(contractBody.contains(ENSURES) || contractBody.contains(REQUIRES) || contractBody.contains(ASSIGNABLE))) {
 			if (!contractBody.isEmpty()) {
 				indexOfStartOfContract = fileTextSB.substring(0, fileTextSB.indexOf(contractBody) - 2).lastIndexOf("/*@");
 			}
@@ -340,12 +349,12 @@ public class FeatureStubsGenerator {
 		String [] contracts = contractBody.split("\n");
 		for (int i = 0; i < contracts.length; i++) {
 			String line = contracts[i].replace("@", "").trim();
-			if (line.startsWith("requires")) {
+			if (line.startsWith(REQUIRES)) {
 				i = aggregateClauses(requires, contracts, i, line);
-			} else if (line.startsWith("ensures")) {
+			} else if (line.startsWith(ENSURES)) {
 				i = aggregateClauses(ensures, contracts, i, line);
-			} else if (line.startsWith("assignable")) {
-				assignable.append(line.replace("assignable", ""));
+			} else if (line.startsWith(ASSIGNABLE)) {
+				assignable.append(line.replace(ASSIGNABLE, ""));
 			}
 		}
 		String tmpFileText = fileTextSB.substring(0, indexOfStartOfContract) + "/*@\n"
@@ -409,6 +418,6 @@ public class FeatureStubsGenerator {
 
 	@Override
 	public String toString() {
-		return "Feature Stub Generator for " + this.featureProject.getProjectName() + "."; 
+		return FEATURE_STUB_GENERATOR_FOR + this.featureProject.getProjectName() + "."; 
 	}
 }

@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.core.mpl.job;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD_FEATURE_INTERFACES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.BUILT_FEATURE_INTERFACES;
+
 import java.util.List;
 
 import org.eclipse.core.resources.IFolder;
@@ -55,7 +58,7 @@ public class PrintFeatureInterfacesJob extends AProjectJob<PrintFeatureInterface
 	}
 	
 	protected PrintFeatureInterfacesJob(Arguments arguments) {
-		super("Build Feature Interfaces", arguments);
+		super(BUILD_FEATURE_INTERFACES, arguments);
 	}
 	
 	@Override
@@ -102,7 +105,7 @@ public class PrintFeatureInterfacesJob extends AProjectJob<PrintFeatureInterface
 		}
 		IOConstants.writeToFile(interfaceProject.getProjectReference().getFile("SPL_Statistic.txt"), 
 				projectSignatures.getStatisticsString());
-		MPLPlugin.getDefault().logInfo("Built Feature Interfaces");
+		MPLPlugin.getDefault().logInfo(BUILT_FEATURE_INTERFACES);
 		
 		return true;
 	}

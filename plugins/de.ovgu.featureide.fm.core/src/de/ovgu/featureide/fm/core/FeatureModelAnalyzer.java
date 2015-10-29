@@ -20,9 +20,18 @@
  */
 package de.ovgu.featureide.fm.core;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.ANALYZE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ANALYZE_FEATURES_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE_INDETRMINATE_HIDDEN_FEATURES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE_INDETRMINATE_HIDDEN_FEATURES_FOR;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FIND_REDUNDANT_CONSTRAINTS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.GET_DEAD_FEATURES_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.GET_FALSE_OPTIONAL_FEATURES_;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -72,8 +81,8 @@ public class FeatureModelAnalyzer {
 
 	private static final String FALSE = "False";
 
-	private final List<Feature> cachedDeadFeatures = new ArrayList<>();
-	private final List<Feature> cachedCoreFeatures = new ArrayList<>();
+	private List<Feature> cachedDeadFeatures = Collections.emptyList();
+	private List<Feature> cachedCoreFeatures = Collections.emptyList();
 	
 	private final Collection<Feature> chachedFalseOptionalFeatures = new LinkedList<Feature>();
 	
@@ -233,7 +242,7 @@ public class FeatureModelAnalyzer {
 	 * featureSets are present)) is a tautology.
 	 * 
 	 * Here is an example for a truth table of
-	 * "at most one the featureSets are present" for three feature sets A, B and
+	 * AT_MOST_ONE_THE_FEATURESETS_ARE_PRESENT for three feature sets A, B and
 	 * C:
 	 * 
 	 * A B C result ------------------------ T T T F T T F F T F T F T F F T F T
@@ -410,18 +419,21 @@ public class FeatureModelAnalyzer {
 	 */
 	public List<Feature> getDeadFeatures(SatSolver solver, Node propNode) {
 		solver.addClauses(propNode.clone().toCNF());
-		cachedDeadFeatures.clear();
+		final ArrayList<Feature> deadFeatures = new ArrayList<>();
+		deadFeatures.clear();
 		
 		for (Literal e : solver.knownValues(SatSolver.ValueType.FALSE)) {
 			final String var = e.var.toString();
 			if (!FALSE.equals(var) && !TRUE.equals(var)) {
 				final Feature feature = fm.getFeature(var);
 				if (feature != null) {
-					cachedDeadFeatures.add(feature);
+					deadFeatures.add(feature);
 				}
 			}
 		}
-		return cachedDeadFeatures;
+		
+		cachedDeadFeatures = deadFeatures;
+		return getCachedDeadFeatures();
 	}
 	
 	public List<Feature> getCoreFeatures() {
@@ -449,9 +461,8 @@ public class FeatureModelAnalyzer {
 	}
 	
 	private List<List<Feature>> analyzeFeatures(long timeout, SatSolver.ValueType vt, Object... selectedFeatures) {
-		final ArrayList<List<Feature>> result = new ArrayList<>(2);
-		result.add(cachedCoreFeatures);
-		result.add(cachedDeadFeatures);
+		final ArrayList<Feature> coreFeatures = new ArrayList<>();
+		final ArrayList<Feature> deadFeatures = new ArrayList<>();
 		
 		Node formula = NodeCreator.createNodes(fm);
 		if (selectedFeatures.length > 0) {
@@ -459,22 +470,27 @@ public class FeatureModelAnalyzer {
 		}
 		final SatSolver solver = new SatSolver(formula, timeout);
 
-		cachedCoreFeatures.clear();
-		cachedDeadFeatures.clear();
-		
 		for (Literal literal : solver.knownValues(vt)) {
 			final String var = literal.var.toString();
 			if (!FALSE.equals(var) && !TRUE.equals(var)) {
 				final Feature feature = fm.getFeature(var);
 				if (feature != null) {
 					if (literal.positive) {
-						cachedCoreFeatures.add(feature);
+						coreFeatures.add(feature);
 					} else {
-						cachedDeadFeatures.add(feature);
+						deadFeatures.add(feature);
 					}
 				}
 			}
 		}
+
+		cachedCoreFeatures = coreFeatures;
+		cachedDeadFeatures = deadFeatures;
+
+		final ArrayList<List<Feature>> result = new ArrayList<>(2);
+		result.add(getCachedCoreFeatures());
+		result.add(getCachedDeadFeatures());
+		
 		return result;
 	}
 	
@@ -538,7 +554,7 @@ public class FeatureModelAnalyzer {
 
 	private void beginTask(int totalWork) {
 		if (monitor != null) {
-			monitor.beginTask("Analyze", totalWork);
+			monitor.beginTask(ANALYZE, totalWork);
 		}
 	}
 
@@ -548,7 +564,7 @@ public class FeatureModelAnalyzer {
 		clone.constraints.clear();
 		SatSolver solver = new SatSolver(NodeCreator.createNodes(clone), 1000);
 	
-		Collection<Feature> fmDeadFeatures = getCachedDeadFeatures();
+		Collection<Feature> fmDeadFeatures = new ArrayList<>(getCachedDeadFeatures());
 		Collection<Feature> fmFalseOptionals = getCachedFalseOptionalFeatures();
 		try {
 			if (!cachedValidity) { 
@@ -602,7 +618,7 @@ public class FeatureModelAnalyzer {
 			 * Add the NEW introduces errors/warnings to the constraint;
 			 */
 			if (calculateRedundantConstraints || calculateTautologyConstraints) {
-				setSubTask("Find redundant constraints");
+				setSubTask(FIND_REDUNDANT_CONSTRAINTS);
 				/** Remove redundant constraints for further analysis **/
 				for (Constraint constraint : fm.getConstraints()) {
 					if (canceled()) {
@@ -674,6 +690,7 @@ public class FeatureModelAnalyzer {
 				if (!fmDeadFeatures.isEmpty()) {
 					Collection<Feature> deadFeatures = constraint.getDeadFeatures(solver, clone, fmDeadFeatures);
 					if (!deadFeatures.isEmpty()) {
+						fmDeadFeatures.removeAll(deadFeatures);
 						constraint.setDeadFeatures(deadFeatures);
 						constraint.setConstraintAttribute(ConstraintAttribute.DEAD, false);
 						changedAttributes.put(constraint, ConstraintAttribute.DEAD);
@@ -723,7 +740,7 @@ public class FeatureModelAnalyzer {
 
 	public void updateFeatures(Map<Object, Object> oldAttributes,
 			Map<Object, Object> changedAttributes) {
-		setSubTask("Analyze features.");
+		setSubTask(ANALYZE_FEATURES_);
 		for (Feature bone : fm.getFeatures()) {
 			oldAttributes.put(bone, bone.getFeatureStatus());
 			
@@ -748,7 +765,7 @@ public class FeatureModelAnalyzer {
 			/**
 			 * here the saved dead features at the feature model are calculated and set
 			 */
-			setSubTask("Get Dead Features.");
+			setSubTask(GET_DEAD_FEATURES_);
 			for (Feature deadFeature : getDeadFeatures()) {
 				if (oldAttributes.get(deadFeature) != FeatureStatus.DEAD) {
 					changedAttributes.put(deadFeature, FeatureStatus.DEAD);
@@ -766,7 +783,7 @@ public class FeatureModelAnalyzer {
 
 		try {
 			if (cachedValidity) {
-				setSubTask("Get False Optional Features.");
+				setSubTask(GET_FALSE_OPTIONAL_FEATURES_);
 				getFalseOptionalFeature(oldAttributes, changedAttributes);
 				worked(1);
 			}
@@ -784,10 +801,10 @@ public class FeatureModelAnalyzer {
 		if (!fm.hasHidden()) {
 			return;
 		}			
-		setSubTask("calculate indetrminate hidden features");
+		setSubTask(CALCULATE_INDETRMINATE_HIDDEN_FEATURES);
 		/**
 		 * First every relevant constraint of every hidden feature is checked if its form equals 
-		 * "hidden feature" <=> A
+		 * HIDDEN_FEATURE <=> A
 		 * where A is an expression containing only non hidden features
 		 * If there is a constraint of that kind for a hidden feature it is added to a list. 
 		 */
@@ -833,7 +850,7 @@ public class FeatureModelAnalyzer {
 			if (canceled()) {
 				return;
 			}
-			setSubTask("calculate indetrminate hidden features for " + feature.getName());
+			setSubTask(CALCULATE_INDETRMINATE_HIDDEN_FEATURES_FOR + feature.getName());
 			if (!list.contains(feature)) {
 				Collection<Feature> set = featureDependencies.getImpliedFeatures(feature);
 				boolean noHidden = false;
@@ -954,10 +971,14 @@ public class FeatureModelAnalyzer {
 		cancel = value;
 	}
 
-	public Collection<Feature> getCachedDeadFeatures() {
-		return cachedDeadFeatures;
+	public List<Feature> getCachedDeadFeatures() {
+		return Collections.unmodifiableList(cachedDeadFeatures);
 	}
-	
+
+	public List<Feature> getCachedCoreFeatures() {
+		return Collections.unmodifiableList(cachedCoreFeatures);
+	}
+
 	public boolean getAttributeFlag(Attribute attribute) {
 		return attributeFlags[attribute.ordinal()];
 	}
@@ -969,4 +990,5 @@ public class FeatureModelAnalyzer {
 	public void resetAttributeFlags() {
 		Arrays.fill(attributeFlags, false);
 	}
+
 }

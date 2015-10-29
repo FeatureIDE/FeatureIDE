@@ -28,7 +28,9 @@ import org.eclipse.swt.graphics.RGB;
 
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.ui.editors.annotation.ColorPalette;
+import de.ovgu.featureide.fm.core.color.ColorPalette;
+import de.ovgu.featureide.fm.core.color.FeatureColor;
+import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
 
 /**
@@ -120,13 +122,9 @@ public class SetColorAction extends AbstractColorAction {
 
 	@Override
 	protected boolean action(FeatureModel fm, String collName) {
-		Feature feat = fm.getFeature(collName);
-		if (feat != null) {
-			if (feat.getColorList().getColor() != index) {
-				feat.getColorList().setColor(index);
-			} else {
-				feat.getColorList().removeColor();
-			}
+		Feature feature = fm.getFeature(collName);
+		if (feature != null) {
+			FeatureColorManager.setColor(feature, FeatureColor.getColor(index));
 			return true;
 		}
 		return false;

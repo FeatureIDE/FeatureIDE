@@ -20,6 +20,14 @@
  */
 package de.ovgu.featureide.fm.core.io.xml;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.ABSTRACT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATIONS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.COMMENTS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.HIDDEN;
+import static de.ovgu.featureide.fm.core.localization.StringTable.MANDATORY;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NOT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.YES;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
@@ -218,14 +226,22 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter implements
     		return;
     	}
 
-    	Element op; 
-    	if (node instanceof Literal){
-    		op = doc.createElement(VAR);
-    		xmlNode.appendChild(op);
-    		Text text = doc.createTextNode(node.toString());
-    		op.appendChild(text);
-    		return;
-    	}
+    	Element op;
+		if (node instanceof Literal) {
+			Literal literal = (Literal) node;
+			if (literal.positive) {
+				op = doc.createElement(VAR);
+				xmlNode.appendChild(op);
+				op.appendChild(doc.createTextNode(node.toString()));
+			} else {
+				op = doc.createElement(NOT);
+				xmlNode.appendChild(op);
+				literal = literal.clone();
+				literal.positive = true;
+				createPropositionalConstraints(doc, op, literal);
+			}
+			return;
+		}
     	
     	if (node instanceof And){
     		op = doc.createElement(CONJ);
@@ -330,7 +346,7 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter implements
 		}
 		
 		transfo.setOutputProperty(OutputKeys.METHOD, "xml");
-		transfo.setOutputProperty(OutputKeys.INDENT, "yes");
+		transfo.setOutputProperty(OutputKeys.INDENT, YES);
 		StreamResult result = new StreamResult(new StringWriter());
 		DOMSource source = new DOMSource(doc);
 		try {

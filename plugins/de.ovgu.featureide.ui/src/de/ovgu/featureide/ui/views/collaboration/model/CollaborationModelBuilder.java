@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.model;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.NO_CONFIGURATION;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Collection;
@@ -271,7 +273,7 @@ public class CollaborationModelBuilder {
 		IFile config = project.getCurrentConfiguration(); 
 		final FSTConfiguration c;
 		if (config == null) {
-			c = new FSTConfiguration("No configuration ", configuration, false);
+			c = new FSTConfiguration(NO_CONFIGURATION, configuration, false);
 		} else if (configuration == null || configuration.equals(config)) {
 			c = new FSTConfiguration(config.getName().split("[.]")[0] + " ", configuration, true);
 		} else {

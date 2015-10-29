@@ -1,5 +1,7 @@
 package br.ufal.ic.colligens.controllers.invalidconfigurations;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.ERROR;
+
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
@@ -18,7 +20,7 @@ class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
 				return ((FileProxy) obj).getFileName()
 						+ " ("
 						+ ((FileProxy) obj).getLogs().size()
-						+ " error"
+						+ ERROR
 						+ ((((FileProxy) obj).getLogs().size() == 1) ? "" : "s")
 						+ ")";
 			if (obj instanceof Log)

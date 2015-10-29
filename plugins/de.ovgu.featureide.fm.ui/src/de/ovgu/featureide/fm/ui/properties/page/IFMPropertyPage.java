@@ -20,6 +20,18 @@
  */
 package de.ovgu.featureide.fm.ui.properties.page;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.COLORS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CUSTOM_BORDER_COLOR;
+import static de.ovgu.featureide.fm.core.localization.StringTable.EXTENSIONS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.HORIZONTALLY_SPACE_BETWEEN_TWO_FEATURES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.LEGEND;
+import static de.ovgu.featureide.fm.core.localization.StringTable.MINIMUM_HORIZONTALLY_DISTANCE_TO_BORDER;
+import static de.ovgu.featureide.fm.core.localization.StringTable.MINIMUM_VERTICALLY_DISTANCE_TO_BORDER;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SETS_THE_BACKGROUND_COLOR_OF_THE_LEGEND;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SETS_THE_BORDER_COLOR_OF_THE_LEGEND;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SPACES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SPACE_BETWEEN_THE_MODEL_AND_THE_FIRST_CONSTRAINT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.VERTICALLY_SPACE_BETWEEN_TWO_FEATURES;
 /**
  * This interface provides all labels, tool tips and some values used at the {@link FMPropertyPage}
  * 
@@ -32,21 +44,21 @@ public interface IFMPropertyPage {
 	 * legend group elements: *
 	 **************************************************************/
 	/* legend group labels: */
-	static final String LEGEND_GROUP_TEXT = "Legend";
+	static final String LEGEND_GROUP_TEXT = LEGEND;
 	static final String LEGEND_HIDE_LABEL = "Hide legend:";
 	static final String LEGEND_LANGUAGE_LABEL = "Language:";
 	static final String LEGEND_BORDER_LABEL = "Border color:";
 	static final String LEGEND_BACKGROUND_LABEL = "Background color:";
 
 	/* legend group tool tips: */
-	static final String LEGEND_BACKGROUND__TIP = "Sets the background color of the legend";
-	static final String LEGEND_BORDER_TIP = "Sets the border color of the legend";
+	static final String LEGEND_BACKGROUND__TIP = SETS_THE_BACKGROUND_COLOR_OF_THE_LEGEND;
+	static final String LEGEND_BORDER_TIP = SETS_THE_BORDER_COLOR_OF_THE_LEGEND;
 
 	/**************************************************************
 	 * spaces group elements: *
 	 **************************************************************/
 	/* spaces group labels: */
-	static final String SPACES_GROUP_TEXT = "Spaces";
+	static final String SPACES_GROUP_TEXT = SPACES;
 	static final String SPACES_MARGIN_X = "Border distance horizontally:";
 	static final String SPACES_MARGIN_Y = "Border distance vertically:";
 	static final String SPACES_FEATURE_X = "Feature space horizontally:";
@@ -54,11 +66,11 @@ public interface IFMPropertyPage {
 	static final String SPACES_CONSTRAINT = "Constaint space:";
 
 	/* spaces group tool tips: */
-	static final String SPACES_TIP_MARGIN_X = "Minimum horizontally distance to border";
-	static final String SPACES_TIP_MARGIN_Y = "Minimum vertically distance to border";
-	static final String SPACES_TIP_FEATURE_X = "Horizontally space between two features";
-	static final String SPACES_TIP_FEATURE_Y = "Vertically space between two features";
-	static final String SPACES_TIP_CONSTRIANT = "Space between the model and the first constraint";
+	static final String SPACES_TIP_MARGIN_X = MINIMUM_HORIZONTALLY_DISTANCE_TO_BORDER;
+	static final String SPACES_TIP_MARGIN_Y = MINIMUM_VERTICALLY_DISTANCE_TO_BORDER;
+	static final String SPACES_TIP_FEATURE_X = HORIZONTALLY_SPACE_BETWEEN_TWO_FEATURES;
+	static final String SPACES_TIP_FEATURE_Y = VERTICALLY_SPACE_BETWEEN_TWO_FEATURES;
+	static final String SPACES_TIP_CONSTRIANT = SPACE_BETWEEN_THE_MODEL_AND_THE_FIRST_CONSTRAINT;
 
 	/*
 	 *  with this values adjusting the shown spaces, 
@@ -71,7 +83,7 @@ public interface IFMPropertyPage {
 	 * color group elements: *
 	 **************************************************************/
 	/* color group labels: */
-	static final String COLOR_GROUP_TEXT = "Colors";
+	static final String COLOR_GROUP_TEXT = COLORS;
 	static final String COLOR_DIAGRAM_LABEL = "Diagram background:";
 	static final String COLOR_CONCRETE_LABEL = "Concrete feature color:";
 	static final String COLOR_ABSTRACT_LABEL = "Abstract feature color:";
@@ -80,7 +92,7 @@ public interface IFMPropertyPage {
 	static final String COLOR_CONSTRAINT = "Constraint color:";
 	static final String COLOR_WARNING = "Warning color:";
 	static final String COLOR_CONNECTION = "Connection color:";
-	static final String HIDE_BORDER_COLOR = "Custom border color";
+	static final String HIDE_BORDER_COLOR = CUSTOM_BORDER_COLOR;
 	static final String COLOR_BORDER = "Feature border color:";
 
 	/* color group tool tips: */
@@ -99,5 +111,5 @@ public interface IFMPropertyPage {
 	 * extensions group elements: *
 	 **************************************************************/
 	/* extensions group labels: */
-	static final String EXTENSIONS_GROUP_TEXT = "Extensions";
+	static final String EXTENSIONS_GROUP_TEXT = EXTENSIONS;
 }

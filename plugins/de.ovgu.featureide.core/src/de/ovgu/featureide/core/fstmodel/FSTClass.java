@@ -39,6 +39,7 @@ public class FSTClass {
 	private final HashMap<String, FSTRole> roles = new HashMap<String, FSTRole>();
 	private final String name;
 	private LinkedList<String> invariants;
+	public boolean hasComposedLines = false;
 
 	public FSTClass(String name) {
 		this.name = name;

@@ -20,16 +20,22 @@
  */
 package de.ovgu.featureide.fm.ui.views.outline;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.IFontProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
-import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.TreeItem;
 import org.prop4j.NodeWriter;
 
 import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.color.ColorPalette;
+import de.ovgu.featureide.fm.core.color.FeatureColor;
+import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 
 /**
@@ -39,7 +45,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
  * @author Jan Wedding
  * @author Melanie Pflaume
  */
-public class FmLabelProvider implements ILabelProvider, IFontProvider, GUIDefaults {
+public class FmLabelProvider implements ILabelProvider, IFontProvider, GUIDefaults, IColorProvider {
 
 	/*
 	 * (non-Javadoc)
@@ -84,6 +90,10 @@ public class FmLabelProvider implements ILabelProvider, IFontProvider, GUIDefaul
 	public void removeListener(ILabelProviderListener listener) {
 	}
 
+	public void colorizeItems(TreeItem[] treeItems, IFile file) {
+
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -93,38 +103,22 @@ public class FmLabelProvider implements ILabelProvider, IFontProvider, GUIDefaul
 	public Image getImage(Object element) {
 		if (element instanceof Feature) {
 			if ((((Feature) element).isRoot()))
-				return null;
-			if (((Feature) element).getParent().isAlternative() || ((Feature) element).getParent().isOr())
-				return null;
-			if (((Feature) element).isMandatory()) {
-
-				Image image = IMG_MANDATORY;
-				Image reDraw = new Image(image.getDevice(), image.getImageData().width, image.getImageData().height);
-				GC gc = new GC(reDraw);
-				gc.drawImage(image, 0, 0, image.getImageData().width, image.getImageData().height, 3, 3, image.getImageData().width,
-						image.getImageData().height);
-				gc.dispose();
-
-				return reDraw;
-			} else {
-				Image image = IMG_OPTIONAL;
-				Image reDraw = new Image(image.getDevice(), image.getImageData().width, image.getImageData().height);
-				GC gc = new GC(reDraw);
-				gc.drawImage(image, 0, 0, image.getImageData().width, image.getImageData().height, 3, 3, image.getImageData().width,
-						image.getImageData().height);
-				gc.dispose();
-
-				return reDraw;
-			}
-		} else if (element instanceof FmOutlineGroupStateStorage) {
-			if (((FmOutlineGroupStateStorage) element).isOrGroup()) {
-				return IMG_OR;
-			} else {
+				return null; // TODO: Add here icon for feature model
+			if (((Feature) element).getParent().isAlternative()) {
 				return IMG_XOR;
+			} else if (((Feature) element).getParent().isOr()) {
+				return IMG_OR;
+			} else if (((Feature) element).isMandatory()) {
+				return IMG_MANDATORY;
+			} else {
+				return IMG_OPTIONAL;
 			}
-		} else {
+		} else if (element instanceof String) {
+			return null; // TODO: Add here icon for "constraint" node
+		} else if (element instanceof Constraint) {
+			return null; // TODO: Add here icon for CONSTRAINT_ELEMENT node
+		} else
 			return null;
-		}
 	}
 
 	/*
@@ -150,5 +144,27 @@ public class FmLabelProvider implements ILabelProvider, IFontProvider, GUIDefaul
 	@Override
 	public Font getFont(Object element) {
 		return DEFAULT_FONT;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.jface.viewers.IColorProvider#getForeground(java.lang.Object)
+	 */
+	@Override
+	public Color getForeground(Object element) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Color getBackground(Object element) {
+		Color col = null;
+
+		if (element instanceof Feature) {
+			Feature feature = (Feature) element;
+			FeatureColor color = FeatureColorManager.getColor(feature);
+			if (color != FeatureColor.NO_COLOR) {
+				col = new Color(null, ColorPalette.getRGB(color.getValue(), 0.5f));
+			}
+		}
+		return col;
 	}
 }

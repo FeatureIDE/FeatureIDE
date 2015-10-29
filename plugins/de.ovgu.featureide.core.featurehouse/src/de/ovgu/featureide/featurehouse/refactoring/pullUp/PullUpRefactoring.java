@@ -21,6 +21,7 @@
 package de.ovgu.featureide.featurehouse.refactoring.pullUp;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -57,10 +58,10 @@ import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.core.signature.base.AFeatureData;
 import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
-import de.ovgu.featureide.core.signature.base.AbstractMethodSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.core.signature.base.SignaturePosition;
 import de.ovgu.featureide.featurehouse.refactoring.RefactoringUtil;
+import de.ovgu.featureide.featurehouse.signature.fuji.FujiClassSignature;
 import de.ovgu.featureide.fm.core.Feature;
 
 /**
@@ -169,16 +170,25 @@ public class PullUpRefactoring extends Refactoring {
 	
 	public Set<ExtendedPullUpSignature> getPullableElements() {
 		final Set<ExtendedPullUpSignature> result = new HashSet<>();
-		final Set<AbstractMethodSignature> methods = selectedElement.getMethods();
-		for (AbstractMethodSignature abstractMethodSignature : methods) {
-			for (AFeatureData featureData : abstractMethodSignature.getFeatureData()) {
-				if (featureData.getAbsoluteFilePath().equals(file)) {
-					result.add(new ExtendedPullUpSignature(abstractMethodSignature, featureData.getID()));
-					break;
-				}
+		addPullableSignature(result, selectedElement);
+		addPullableSignatures(result, selectedElement.getMethods());
+		addPullableSignatures(result, selectedElement.getFields());
+		return result;
+	}
+
+	private void addPullableSignatures(final Set<ExtendedPullUpSignature> result, final Set<? extends AbstractSignature> signatures) {
+		for (AbstractSignature abstractSignature : signatures) {
+			addPullableSignature(result, abstractSignature);
+		}
+	}
+
+	private void addPullableSignature(final Set<ExtendedPullUpSignature> result, AbstractSignature abstractSignature) {
+		for (AFeatureData featureData : abstractSignature.getFeatureData()) {
+			if (featureData.getAbsoluteFilePath().equals(file)) {
+				result.add(new ExtendedPullUpSignature(abstractSignature, featureData.getID()));
+				break;
 			}
 		}
-		return result;
 	}
 
 	@Override
@@ -196,6 +206,14 @@ public class PullUpRefactoring extends Refactoring {
 			pm.beginTask("Checking preconditions...", 2);
 
 			changes = new ArrayList<Change>();
+			
+			refactoringStatus.merge(createNewDestinationFileIfNotExist());
+			if (refactoringStatus.hasError()) return refactoringStatus;
+			
+			refactoringStatus.merge(checkIfPullUpSignaturesExistInFeature());
+			if (refactoringStatus.hasError()) return refactoringStatus;
+			
+			
 			refactoringStatus.merge(createInsertChanges());
 			refactoringStatus.merge(createDeleteChanges());
 
@@ -203,6 +221,30 @@ public class PullUpRefactoring extends Refactoring {
 			pm.done();
 		}
 		return refactoringStatus;
+	}
+
+	private boolean existClassInDestinationFeature() {
+		
+		return false;
+	}
+
+	private RefactoringStatus checkIfPullUpSignaturesExistInFeature() {
+		
+//		final Set<AbstractSignature> matchedSignatures = RefactoringUtil.getIncludedMatchingSignaturesForFile(selectedElement, absoluteFileString);
+		
+//		for (ExtendedPullUpSignature extendedPullUpSignature : pullUpSignatures) {
+//			destinationFeature
+//		}
+		
+		return null;
+	}
+
+	private void getClassSignatureForDestinationFile() {
+		
+		for (AFeatureData featureData : selectedElement.getFeatureData()) {
+			
+		}
+		
 	}
 
 	@Override
@@ -226,8 +268,7 @@ public class PullUpRefactoring extends Refactoring {
 		
 		IFile pullUpFile = RefactoringUtil.getFile(file);
 		
-		IFolder featureFolder = featureProject.getSourceFolder().getFolder(destinationFeature.getName());
-		IFile destinationFile = createNewFileIfNotExist(featureFolder, file.substring(file.lastIndexOf("/") +1));
+		IFile destinationFile = getDestinationFile();
 		
 		IDocumentProvider pullUpProvider = new TextFileDocumentProvider();
 		IDocumentProvider destinationProvider = new TextFileDocumentProvider();
@@ -237,8 +278,8 @@ public class PullUpRefactoring extends Refactoring {
 			final IDocument pullUpDoc = pullUpProvider.getDocument(pullUpFile);
 			final IDocument destinationDoc = destinationProvider.getDocument(destinationFile);
 			
-			for (ExtendedPullUpSignature signature : pullUpSignatures) {
-				final AFeatureData featureData = getFeatureDataForFile(signature.getSignature(), file);
+			for (ExtendedPullUpSignature extendedSignature : pullUpSignatures) {
+				final AFeatureData featureData = getFeatureDataForFile(extendedSignature.getSignature(), file);
 				
 				if (featureData == null) continue;
 				
@@ -248,7 +289,13 @@ public class PullUpRefactoring extends Refactoring {
 				int endOffset = pullUpDoc.getLineOffset(position.getEndRow() - 1) + position.getEndColumn();
 				String content = "\n" + pullUpDoc.get(startOffset, endOffset-startOffset) + "\n";
 				
-				final AFeatureData destinationFeatureData = getFeatureDataForFile(signature.getSignature().getParent(), destinationFile.getRawLocation().toOSString());
+				AbstractSignature parent;
+				if (extendedSignature.getSignature() instanceof FujiClassSignature)
+					parent = extendedSignature.getSignature();
+				else
+					parent = extendedSignature.getSignature().getParent();
+					
+				final AFeatureData destinationFeatureData = getFeatureDataForFile(parent, destinationFile.getRawLocation().toOSString());
 
 				int line = destinationDoc.getNumberOfLines() - 1;
 				if (destinationFeatureData != null)
@@ -270,23 +317,23 @@ public class PullUpRefactoring extends Refactoring {
 		return status;
 	}
 	
-	private IFile createNewFileIfNotExist(IFolder featureFolder, String fileName) {
-
-		IFile destinationFile = featureFolder.getFile(fileName);
+	private RefactoringStatus createNewDestinationFileIfNotExist() {
+		
+		IFile destinationFile = getDestinationFile();
 		
 		if (destinationFile.exists()) 
-			return destinationFile;
+			return new RefactoringStatus();
 		
-		return createNewFeatureFile(featureFolder, fileName);
+		return createNewFeatureFile();
 	}
 
-	private IFile createNewFeatureFile(IFolder featureFolder, String fileName) {
-		
-		IFile destinationFile = null;
+	private RefactoringStatus createNewFeatureFile() {
+		RefactoringStatus status = new RefactoringStatus();
 		try {
 			final IComposerExtensionClass composer = featureProject.getComposer();
 			final String template = getJavaTemplate(composer);
 			final String featureName = destinationFeature.getName();
+			final String fileName = getDestinationFileName();
 			final String className = fileName.substring(0, fileName.lastIndexOf("."));
 			
 			String contents = composer.replaceSourceContentMarker(template, false, selectedElement.getPackage());
@@ -294,13 +341,25 @@ public class PullUpRefactoring extends Refactoring {
 			contents = contents.replaceAll(IComposerExtensionClass.FEATUE_PATTER, featureName);
 			InputStream stream = new ByteArrayInputStream(contents.getBytes(Charset.availableCharsets().get("UTF-8")));
 			
-			destinationFile = featureFolder.getFile(fileName);
+			IFile destinationFile = getDestinationFile();
 			destinationFile.create(stream, true, new NullProgressMonitor());
 			stream.close();
 		} catch (IOException | CoreException e) {
-			
+			status.addError(e.getMessage());
 		}
-		return destinationFile;
+		return status;
+	}
+
+	private IFile getDestinationFile() {
+		final IFolder featureFolder = featureProject.getSourceFolder().getFolder(destinationFeature.getName());
+		final String fileName = getDestinationFileName();
+		
+		String pack = selectedElement.getPackage().replaceAll("\\.",File.separator) + File.separator;
+		return featureFolder.getFile(pack + fileName);
+	}
+
+	private String getDestinationFileName() {
+		return file.substring(file.lastIndexOf(File.separator) +1);
 	}
 
 	private String getJavaTemplate(IComposerExtensionClass composer) {

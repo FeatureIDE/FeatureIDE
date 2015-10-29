@@ -20,6 +20,42 @@
  */
 package de.ovgu.featureide.ui.statistics.core;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.ATOMIC_SETS_OF_THE_FEATURE_MODEL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE_STATISTICS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE___DETAILS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.GENERATION_TOOL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.LINES_OF_CODE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.METHOD_CONTRACTS_IN_FEATURES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.METHOD_CONTRACT_REFINEMENTS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NUMBER_OF_ABSTRACT_FEATURES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NUMBER_OF_CLASSES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NUMBER_OF_CLASSES_WITH_CLASS_INVARIANTS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NUMBER_OF_CLASSES_WITH_METHOD_CONTRACTS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NUMBER_OF_CLASS_INVARIANTS_IN_PROJECT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NUMBER_OF_COMPOUND_FEATURES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NUMBER_OF_CONCRETE_FEATURES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NUMBER_OF_CONFIGURATIONS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NUMBER_OF_CONSTRAINTS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NUMBER_OF_FEATURES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NUMBER_OF_FEATURES_IN_CONSTRAINTS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NUMBER_OF_FIELDS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NUMBER_OF_HIDDEN_FEATURES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NUMBER_OF_METHODS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NUMBER_OF_METHODS_WITH_METHOD_CONTRACTS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NUMBER_OF_METHOD_CONTRACTS_IN_PROJECT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NUMBER_OF_NESTED_CLASSES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NUMBER_OF_PROGRAM_VARIANTS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NUMBER_OF_ROLES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NUMBER_OF_TERMINAL_FEATURES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NUMBER_OF_UNIQUE_FIELDS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NUMBER_OF_UNIQUE_METHODS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.PLEASE_OPEN_A_FILE_FROM_A_FEATUREIDE_PROJECT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RELATIVE_NUMBER_OF_FEATURES_IN_CONSTRAINTS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.STATISTICS_OF_PRODUCT_LINE_IMPLEMENTATION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.STATISTICS_OF_PRODUCT_LINE_SPECIFICATION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.TIMEOUT_STRING;
+import static de.ovgu.featureide.fm.core.localization.StringTable.VALID_CONFIGURATIONS_OF_THE_FEATURE_MODEL;
+
 import java.util.HashMap;
 
 import org.eclipse.jface.viewers.TreeViewer;
@@ -38,48 +74,45 @@ import de.ovgu.featureide.ui.statistics.core.composite.Parent;
  */
 public interface StatisticsIds {
 	
-	public static final String OPEN_FILE = "Please open a file from a FeatureIDE project";
-	public static final String PRODUCT_LINE_IMPLEMENTATION = "Statistics of product-line implementation";
-	public static final String CONTRACT_COMPLEXITY = "Statistics of product-line specification";
-	public static final String VALID_CONFIGURATIONS = "Valid configurations of the feature model";
-	public static final String ATOMIC_SETS = "Atomic sets of the feature model";
-	public static final String NUMBER_OF_FEATURE = "Feature statistics";
-	public static final String STATISTICS_OF_THE_FEATURE_MODEL = "Statistics of the feature model";
-	public static final String PROJECT_NAME = "Project Name";
-
+	public static final String OPEN_FILE = PLEASE_OPEN_A_FILE_FROM_A_FEATUREIDE_PROJECT;
+	public static final String PRODUCT_LINE_IMPLEMENTATION = STATISTICS_OF_PRODUCT_LINE_IMPLEMENTATION;
+	public static final String CONTRACT_COMPLEXITY = STATISTICS_OF_PRODUCT_LINE_SPECIFICATION;
+	public static final String VALID_CONFIGURATIONS = VALID_CONFIGURATIONS_OF_THE_FEATURE_MODEL;
+	public static final String ATOMIC_SETS = ATOMIC_SETS_OF_THE_FEATURE_MODEL;
+	public static final String NUMBER_OF_FEATURE = FEATURE_STATISTICS;
 	public static final String SEPARATOR = ": ";
 	public static final String CLASS_SEPARATOR = "$";
-	public static final String NUMBER_FEATURES = "Number of features";
-	public static final String NUMBER_CONCRETE = "Number of concrete features";
-	public static final String NUMBER_ABSTRACT = "Number of abstract features";
-	public static final String NUMBER_TERMINAL = "Number of terminal features";
-	public static final String NUMBER_COMPOUND = "Number of compound features";
-	public static final String NUMBER_HIDDEN = "Number of hidden features";
-	public static final String NUMBER_CONSTRAINTS = "Number of constraints";
-	public static final String NUMBER_CONSTRAINT_FEATURES = "Number of features in constraints";
-	public static final String CONSTRAINT_RATIO = "Relative number of features in constraints";
+	public static final String NUMBER_FEATURES = NUMBER_OF_FEATURES;
+	public static final String NUMBER_CONCRETE = NUMBER_OF_CONCRETE_FEATURES;
+	public static final String NUMBER_ABSTRACT = NUMBER_OF_ABSTRACT_FEATURES;
+	public static final String NUMBER_TERMINAL = NUMBER_OF_TERMINAL_FEATURES;
+	public static final String NUMBER_COMPOUND = NUMBER_OF_COMPOUND_FEATURES;
+	public static final String NUMBER_HIDDEN = NUMBER_OF_HIDDEN_FEATURES;
+	public static final String NUMBER_CONSTRAINTS = NUMBER_OF_CONSTRAINTS;
+	public static final String NUMBER_CONSTRAINT_FEATURES = NUMBER_OF_FEATURES_IN_CONSTRAINTS;
+	public static final String CONSTRAINT_RATIO = RELATIVE_NUMBER_OF_FEATURES_IN_CONSTRAINTS;
 	public static final String MODEL_VOID = "Feature model is valid (not void)";
-	public static final String MODEL_TIMEOUT = MODEL_VOID + "timeout";
-	public static final String DESC_COMPOSER_NAME = "Generation Tool";
-	public static final String DESC_CONFIGS = "Number of configurations";
-	public static final String DESC_VARIANTS = "Number of program variants";
-	public static final String DESC_FEATURE_COMPLEXITY = "Feature - Details";
-	public static final String NUMBER_ROLE = "Number of roles";
-	public static final String NUMBER_CLASS = "Number of classes";
-	public static final String NUMBER_CLASS_NESTED = "Number of nested classes";
-	public static final String NUMBER_METHOD = "Number of methods";
-	public static final String NUMBER_FIELD = "Number of fields";
-	public static final String NUMBER_METHOD_U = "Number of unique methods";
-	public static final String NUMBER_FIELD_U = "Number of unique fields";
-	public static final String NUMBER_OF_CODELINES = "Lines of code";
+	public static final String MODEL_TIMEOUT = MODEL_VOID + TIMEOUT_STRING;
+	public static final String DESC_COMPOSER_NAME = GENERATION_TOOL;
+	public static final String DESC_CONFIGS = NUMBER_OF_CONFIGURATIONS;
+	public static final String DESC_VARIANTS = NUMBER_OF_PROGRAM_VARIANTS;
+	public static final String DESC_FEATURE_COMPLEXITY = FEATURE___DETAILS;
+	public static final String NUMBER_ROLE = NUMBER_OF_ROLES;
+	public static final String NUMBER_CLASS = NUMBER_OF_CLASSES;
+	public static final String NUMBER_CLASS_NESTED = NUMBER_OF_NESTED_CLASSES;
+	public static final String NUMBER_METHOD = NUMBER_OF_METHODS;
+	public static final String NUMBER_FIELD = NUMBER_OF_FIELDS;
+	public static final String NUMBER_METHOD_U = NUMBER_OF_UNIQUE_METHODS;
+	public static final String NUMBER_FIELD_U = NUMBER_OF_UNIQUE_FIELDS;
+	public static final String NUMBER_OF_CODELINES = LINES_OF_CODE;
 	
-	public static final String NUMBER_PROJECT_METHOD_CONTRACT = "Number of method contracts in project";
-	public static final String NUMBER_PROJECT_INVARIANT = "Number of class invariants in project";
-	public static final String NUMBER_CLASS_METHOD_CONTRACT = "Number of classes with method contracts";
-	public static final String NUMBER_CLASS_INVARIANT = "Number of classes with class invariants";
-	public static final String NUMBER_METHOD_METHOD_CONTRACT = "Number of methods with method contracts";
-	public static final String METHOD_CONTRACT_REFINEMENT = "Method contract refinements";
-	public static final String METHOD_CONTRACTS_FEATURE = "Method contracts in features";
+	public static final String NUMBER_PROJECT_METHOD_CONTRACT = NUMBER_OF_METHOD_CONTRACTS_IN_PROJECT;
+	public static final String NUMBER_PROJECT_INVARIANT = NUMBER_OF_CLASS_INVARIANTS_IN_PROJECT;
+	public static final String NUMBER_CLASS_METHOD_CONTRACT = NUMBER_OF_CLASSES_WITH_METHOD_CONTRACTS;
+	public static final String NUMBER_CLASS_INVARIANT = NUMBER_OF_CLASSES_WITH_CLASS_INVARIANTS;
+	public static final String NUMBER_METHOD_METHOD_CONTRACT = NUMBER_OF_METHODS_WITH_METHOD_CONTRACTS;
+	public static final String METHOD_CONTRACT_REFINEMENT = METHOD_CONTRACT_REFINEMENTS;
+	public static final String METHOD_CONTRACTS_FEATURE = METHOD_CONTRACTS_IN_FEATURES;
 	
 	public static final HashMap<String, String> REFINEMENT_COMPOSING_MECHANISM_MAPPING = new HashMap<String, String>(){
 		private static final long serialVersionUID = 1L;

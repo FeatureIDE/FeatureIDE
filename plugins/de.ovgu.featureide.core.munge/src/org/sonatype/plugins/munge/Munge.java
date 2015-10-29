@@ -20,6 +20,16 @@
  */
 package org.sonatype.plugins.munge;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.BAD_COMMAND;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CANNOT_FIND_INPUT_FILE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CANNOT_WRITE_TO_FILE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.INVALID_PREPROCESSOR_STATEMENT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IS_NOT_A_DIRECTORY_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NO_SOURCE_FILES_SPECIFIED_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NO_SUBSTITUTION_STRING_SPECIFIED_FOR__S_PARAMETER;
+import static de.ovgu.featureide.fm.core.localization.StringTable.PROPAGATE_SYNTAX_MARKERS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.UNMATCHED_END_OR_ELSE_STATEMENT;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -218,7 +228,7 @@ public class Munge {
     }
 
     public void addMarker(final String text, final IFile file, final int line) {
-        Job job = new Job("Propagate syntax markers") {
+        Job job = new Job(PROPAGATE_SYNTAX_MARKERS) {
             @Override
                 public IStatus run(IProgressMonitor monitor) {
                     try {
@@ -274,7 +284,7 @@ public class Munge {
             try {
                 in = new BufferedReader( new FileReader(inName) );
             } catch (FileNotFoundException fnf) {
-                MungeCorePlugin.getDefault().logWarning("Cannot find input file " + inName);
+                MungeCorePlugin.getDefault().logWarning(CANNOT_FIND_INPUT_FILE + inName);
                 errors++;
                 return;
             }
@@ -286,7 +296,7 @@ public class Munge {
             try {
                 out = new PrintWriter( new FileWriter(outName) );
             } catch (IOException ioe) {
-                MungeCorePlugin.getDefault().logError("Cannot write to file " + outName, ioe);
+                MungeCorePlugin.getDefault().logError(CANNOT_WRITE_TO_FILE + outName, ioe);
                 errors++;
             }
         }
@@ -381,7 +391,7 @@ public class Munge {
                     } else {
                         String symbol = st.nextToken();
                         if (!st.nextToken().equals("]")) {
-                            error("invalid preprocessor statement");
+                            error(INVALID_PREPROCESSOR_STATEMENT);
                         }
                         foundTag = true;
 
@@ -403,15 +413,15 @@ public class Munge {
                                 cmd_end();
                                 break;
                             default:
-                                throw new InternalError("bad command");
+                                throw new InternalError(BAD_COMMAND);
                         }
                     }
                 }
             }
         } catch (NoSuchElementException nse) {
-            error("invalid preprocessor statement");
+            error(INVALID_PREPROCESSOR_STATEMENT);
         } catch (EmptyStackException ese) {
-            error("unmatched end or else statement");
+            error(UNMATCHED_END_OR_ELSE_STATEMENT);
         }
 
         if (foundTag) {
@@ -546,7 +556,7 @@ public class Munge {
 
             else if (args[iArg].equals("-s")) {
                 if (iArg == args.length) {
-                    usage("no substitution string specified for -s parameter");
+                    usage(NO_SUBSTITUTION_STRING_SPECIFIED_FOR__S_PARAMETER);
                 }
 
                 // Parse and store <old_text>=<new_text> parameter.
@@ -584,7 +594,7 @@ public class Munge {
                     outFiles[i] = outFile.getAbsolutePath();
                 }
                 if( i == 0 ) {
-                    usage("No source files specified.");
+                    usage(NO_SOURCE_FILES_SPECIFIED_);
                 }
             } else {            
                 inFiles[0] = args[iArg++];
@@ -592,7 +602,7 @@ public class Munge {
                     outFiles[0] = args[iArg++];
                 } 
                 if( iArg < args.length ) {
-                    usage(args[args.length-1] + " is not a directory.");
+                    usage(args[args.length-1] + IS_NOT_A_DIRECTORY_);
                 }                
             }
         }

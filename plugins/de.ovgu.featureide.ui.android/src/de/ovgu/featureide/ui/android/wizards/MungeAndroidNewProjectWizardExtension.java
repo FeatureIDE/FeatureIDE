@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.ui.android.wizards;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.THE_ANDROID_DEVELOPMENT_TOOLS_MUST_BE_INSTALLED_TO_CREATE_AN_ANDROID_PROJECT_;
+
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
@@ -111,7 +113,7 @@ public class MungeAndroidNewProjectWizardExtension extends DefaultNewFeatureProj
 			}
 		} else {
 			IStatus status = new Status(IStatus.ERROR, UIPlugin.PLUGIN_ID,
-					"The Android Development Tools must be installed to create an Android project.");
+					THE_ANDROID_DEVELOPMENT_TOOLS_MUST_BE_INSTALLED_TO_CREATE_AN_ANDROID_PROJECT_);
 			StatusManager.getManager().handle(status, StatusManager.SHOW);
 			return false;
 		}

@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE_CONSTRAINT_ERRORS;
+
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 
@@ -34,7 +36,7 @@ public class ConstrainsCalculationsAction extends Action {
 	private final FeatureModel featureModel;
 
 	public ConstrainsCalculationsAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
-		super("Calculate Constraint Errors");
+		super(CALCULATE_CONSTRAINT_ERRORS);
 		this.featureModel = featureModel;
 		setChecked(featureModel.getAnalyser().calculateConstraints);
 	}

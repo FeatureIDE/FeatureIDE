@@ -20,12 +20,40 @@
  */
 package de.ovgu.featureide.ui.views.collaboration;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ADD_NEW_CLASS_ROLE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD_COLLABORATIONMODEL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CHANGE_FILTER_FOR_ACCESS_MODIFIERS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DEFAULT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DESELECT_ALL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.EXPORT_AS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.EXPORT_AS_IMAGE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.EXPORT_AS_XML;
+import static de.ovgu.featureide.fm.core.localization.StringTable.EXPORT_AS___;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FIELDS_WITHOUT_REFINEMENTS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FIELDS_WITH_REFINEMENTS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FILTER;
+import static de.ovgu.featureide.fm.core.localization.StringTable.HIDE_PARAMETER_TYPES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.METHODS_WITHOUT_REFINEMENTS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.METHODS_WITH_REFINEMENTS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.MODEL_LOADING_ERROR;
+import static de.ovgu.featureide.fm.core.localization.StringTable.OPEN_A_FILE_FROM_A_FEATUREIDE_PROJECT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.PRIVATE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.PROTECTED;
+import static de.ovgu.featureide.fm.core.localization.StringTable.PUBLIC;
+import static de.ovgu.featureide.fm.core.localization.StringTable.REFRESH_COLLABORATION_VIEW;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SEARCH_IN_COLLABORATION_DIAGRAM;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SELECT_ALL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SHOW_CLASS_INVARIANTS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SHOW_FIELDS_AND_METHODS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SHOW_METHOD_CONTRACTS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SHOW_NESTED_CLASSES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SHOW_UNSELECTED_FEATURES;
+import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATE_COLLABORATION_VIEW;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Vector;
 
 import org.eclipse.core.resources.IFile;
@@ -54,8 +82,8 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
@@ -81,31 +109,21 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTConfiguration;
-import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.listeners.ICurrentBuildListener;
 import de.ovgu.featureide.fm.core.AWaitingJob;
-import de.ovgu.featureide.fm.core.ColorList;
-import de.ovgu.featureide.fm.core.ColorschemeTable;
-import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.PropertyConstants;
+import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.job.AStoppableJob;
 import de.ovgu.featureide.fm.ui.GraphicsExporter;
 import de.ovgu.featureide.ui.UIPlugin;
-import de.ovgu.featureide.ui.editors.annotation.ColorPalette;
-import de.ovgu.featureide.ui.views.collaboration.action.AddColorSchemeAction;
 import de.ovgu.featureide.ui.views.collaboration.action.AddRoleAction;
 import de.ovgu.featureide.ui.views.collaboration.action.DeleteAction;
-import de.ovgu.featureide.ui.views.collaboration.action.DeleteColorSchemeAction;
 import de.ovgu.featureide.ui.views.collaboration.action.ExportAsImageImpl;
 import de.ovgu.featureide.ui.views.collaboration.action.ExportAsXmlImpl;
 import de.ovgu.featureide.ui.views.collaboration.action.FilterAction;
-import de.ovgu.featureide.ui.views.collaboration.action.RenameColorSchemeAction;
 import de.ovgu.featureide.ui.views.collaboration.action.SetColorAction;
-import de.ovgu.featureide.ui.views.collaboration.action.SetColorSchemeAction;
 import de.ovgu.featureide.ui.views.collaboration.action.ShowFieldsMethodsAction;
 import de.ovgu.featureide.ui.views.collaboration.action.ShowUnselectedAction;
-import de.ovgu.featureide.ui.views.collaboration.editparts.CollaborationEditPart;
 import de.ovgu.featureide.ui.views.collaboration.editparts.GraphicalEditPartFactory;
 import de.ovgu.featureide.ui.views.collaboration.figures.RoleFigure;
 import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModelBuilder;
@@ -125,23 +143,21 @@ import de.ovgu.featureide.ui.views.collaboration.model.CollaborationModelBuilder
 
 public class CollaborationView extends ViewPart implements GUIDefaults, ICurrentBuildListener, ISaveablePart {
 
-	private static final String UPDATE_COLLABORATION_VIEW = "Update Collaboration View";
-
 	public static final String ID = UIPlugin.PLUGIN_ID + ".views.collaboration.Collaboration";
 
-	private static final String OPEN_MESSAGE = "Open a file from a FeatureIDE project";
+	private static final String OPEN_MESSAGE = OPEN_A_FILE_FROM_A_FEATUREIDE_PROJECT;
 
-	private static final String ADD_LABEL = "Add new Class / Role";
-	private static final String FILTER_LABEL = "Filter";
-	private static final String DELETE_LABEL = "Delete";
-	private static final String UNSELECTED_LABEL = "Show unselected features";
-	private static final String EXPORT_AS_LABEL = "Export As";
+	private static final String ADD_LABEL = ADD_NEW_CLASS_ROLE;
+	private static final String FILTER_LABEL = FILTER;
+	private static final String DELETE_LABEL = DELETE;
+	private static final String UNSELECTED_LABEL = SHOW_UNSELECTED_FEATURES;
+	private static final String EXPORT_AS_LABEL = EXPORT_AS;
 
-	private static final String REFRESH_TOOL_TIP_LABEL = "Build collaborationmodel";
+	private static final String REFRESH_TOOL_TIP_LABEL = BUILD_COLLABORATIONMODEL;
 
-	private static final String[] FIELD_METHOD_LABEL_NAMES = { "Fields with Refinements", "Fields without Refinements", "Methods with Refinements",
-			"Methods without Refinements", "Show Method Contracts", "Show Class Invariants", "Show Nested Classes", "Hide Parameters/Types", "Public",
-			"Protected", "Default", "Private", "Select All", "Deselect All", };
+	private static final String[] FIELD_METHOD_LABEL_NAMES = { FIELDS_WITH_REFINEMENTS, FIELDS_WITHOUT_REFINEMENTS, METHODS_WITH_REFINEMENTS,
+			METHODS_WITHOUT_REFINEMENTS, SHOW_METHOD_CONTRACTS, SHOW_CLASS_INVARIANTS, SHOW_NESTED_CLASSES, HIDE_PARAMETER_TYPES, PUBLIC,
+			PROTECTED, DEFAULT, PRIVATE, SELECT_ALL, DESELECT_ALL };
 
 	private static final Image[] FIELD_METHOD_IMAGES = { IMAGE_FIELDS_REFINEMENTS, IMAGE_FIELDS_WITHOUT_REFINEMENTS, IMAGE_METHODS_REFINEMENTS,
 			IMAGE_METHODS_WITHOUT_REFINEMENTS, IMAGE_AT_CONTRACT, IMAGE_AT_INVARIANT, IMAGE_NESTED_CLASS, null, IMAGE_METHODE_PUBLIC, IMAGE_METHODE_PROTECTED,
@@ -158,10 +174,13 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	private ShowUnselectedAction showUnselectedAction;
 	private Point cursorPosition;
 	private CollaborationViewSearch search;
-	private MenuManager colorSubMenu;
-	private AddColorSchemeAction addColorSchemeAction;
-	private RenameColorSchemeAction renameColorSchemeAction;
-	private DeleteColorSchemeAction deleteColorSchemeAction;
+	
+	/*
+	 * the following codefragments which are commented out, create the submenu of the colorscheme
+	 */
+//	private AddColorSchemeAction addColorSchemeAction;
+//	private RenameColorSchemeAction renameColorSchemeAction;
+//	private DeleteColorSchemeAction deleteColorSchemeAction;
 	private ExportAsImageImpl exportAsImage;
 	private ExportAsXmlImpl exportAsXML;
 
@@ -317,7 +336,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 			select = ShowFieldsMethodsAction.DESELECT_ALL_METHOD_ACCESS;
 		}
 		showAccessModifiers = new ShowFieldsMethodsAction("", null, this, select, Action.AS_DROP_DOWN_MENU);
-		showAccessModifiers.setToolTipText("Change filter for access modifiers");
+		showAccessModifiers.setToolTipText(CHANGE_FILTER_FOR_ACCESS_MODIFIERS);
 		showAccessModifiers.setMenuCreator(new IMenuCreator() {
 
 			Menu fMenu = null;
@@ -337,12 +356,12 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 					contributionItem.fill(fMenu, -1);
 				}
 
-				ShowFieldsMethodsAction selectAll = new ShowFieldsMethodsAction("Select all", IMAGE_SELECT_ALL_MODIFIERS, CollaborationView.this,
+				ShowFieldsMethodsAction selectAll = new ShowFieldsMethodsAction(SELECT_ALL, IMAGE_SELECT_ALL_MODIFIERS, CollaborationView.this,
 						ShowFieldsMethodsAction.SELECT_ALL_METHOD_ACCESS);
 				ActionContributionItem contributionItem = new ActionContributionItem(selectAll);
 				contributionItem.fill(fMenu, -1);
 
-				ShowFieldsMethodsAction deselectAll = new ShowFieldsMethodsAction("Deselect all", IMAGE_MODIFIERS_NONE, CollaborationView.this,
+				ShowFieldsMethodsAction deselectAll = new ShowFieldsMethodsAction(DESELECT_ALL, IMAGE_MODIFIERS_NONE, CollaborationView.this,
 						ShowFieldsMethodsAction.DESELECT_ALL_METHOD_ACCESS);
 				ActionContributionItem deselectAllConteribution = new ActionContributionItem(deselectAll);
 				deselectAllConteribution.fill(fMenu, -1);
@@ -361,7 +380,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		contributeToActionBars();
 
 		CollaborationViewSearch.Builder builder = new CollaborationViewSearch.Builder();
-		search = builder.setAttachedViewerParent(viewer).setSearchBoxText("Search in Collaboration Diagram").setFindResultsColor(ROLE_BACKGROUND_SELECTED)
+		search = builder.setAttachedViewerParent(viewer).setSearchBoxText(SEARCH_IN_COLLABORATION_DIAGRAM).setFindResultsColor(ROLE_BACKGROUND_SELECTED)
 				.setNoSearchResultsColor(ROLE_BACKGROUND_UNSELECTED).create();
 
 	}
@@ -417,16 +436,14 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 
 			if (featureProject != null) {
 				// case: it's a FeatureIDE project
-				featureProject.getFeatureModel().addListener(new PropertyChangeListener() {
-					@Override
-					public void propertyChange(PropertyChangeEvent event) {
-						if (PropertyConstants.MODEL_DATA_LOADED.equals(event.getPropertyName())) {
-							readColorsFromFile();
-						}
-					}
-				});
-
-				readColorsFromFile();
+//				featureProject.getFeatureModel().addListener(new PropertyChangeListener() {
+//					@Override
+//					public void propertyChange(PropertyChangeEvent event) {
+//						if (PropertyConstants.MODEL_DATA_LOADED.equals(event.getPropertyName())) {
+//							readColorsFromFile();
+//						}
+//					}
+//				});
 
 				if (CorePlugin.getDefault().getConfigurationExtensions().contains(inputFile.getFileExtension())) {
 					// case: open configuration editor
@@ -475,7 +492,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		control.setMenu(menu);
 		getSite().registerContextMenu(menuMgr, viewer);
 
-		colorSubMenu = new MenuManager("Color");
 	}
 
 	private void fillContextMenu(IMenuManager menuMgr) {
@@ -497,7 +513,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		menuMgr.add(delAction);
 
 		if (featureProject.getComposer().showContextFieldsAndMethods()) {
-			MenuManager methodsFieldsSubMenu = new MenuManager("Show Fields and Methods");
+			MenuManager methodsFieldsSubMenu = new MenuManager(SHOW_FIELDS_AND_METHODS);
 
 			for (int i = 0; i < setFieldsMethodsActions.length; i++) {
 				methodsFieldsSubMenu.add(setFieldsMethodsActions[i]);
@@ -509,56 +525,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 				}
 			}
 			menuMgr.add(methodsFieldsSubMenu);
-		}
-
-		Object selection = ((IStructuredSelection) viewer.getSelection()).getFirstElement();
-		if (selection instanceof CollaborationEditPart) {
-			FSTFeature coll = ((CollaborationEditPart) selection).getCollaborationModel();
-			if (!(coll instanceof FSTConfiguration)) {
-				FeatureModel fm = featureProject.getFeatureModel();
-				ColorschemeTable colorschemeTable = fm.getColorschemeTable();
-				List<String> csNames = colorschemeTable.getColorschemeNames();
-
-				String curColorSchemeName = colorschemeTable.getSelectedColorschemeName();
-				MenuManager colorSchemeSubMenu = null;
-
-				if (curColorSchemeName != null) {
-					colorSchemeSubMenu = new MenuManager(curColorSchemeName);
-				} else {
-					colorSchemeSubMenu = new MenuManager("No Colorscheme Selected");
-				}
-
-				int count = 0;
-				for (String name : csNames) {
-					SetColorSchemeAction setCSAction = new SetColorSchemeAction(name, viewer, this, ++count);
-					if (count == colorschemeTable.getSelectedColorscheme()) {
-						setCSAction.setChecked(true);
-					}
-					colorSchemeSubMenu.add(setCSAction);
-				}
-
-				colorSchemeSubMenu.add(new Separator());
-				colorSchemeSubMenu.add(addColorSchemeAction);
-				colorSchemeSubMenu.add(renameColorSchemeAction);
-				colorSchemeSubMenu.add(deleteColorSchemeAction);
-				colorSubMenu.removeAll();
-				colorSubMenu.add(colorSchemeSubMenu);
-				colorSubMenu.add(new Separator());
-
-				boolean enableColorActions = colorschemeTable.getSelectedColorscheme() > 0;
-				for (int i = 0; i < setColorActions.length; i++) {
-					setColorActions[i].setEnabled(enableColorActions);
-					setColorActions[i].setChecked(false);
-					colorSubMenu.add(setColorActions[i]);
-				}
-
-				int color = fm.getFeature(coll.getName()).getColorList().getColor();
-				if (ColorList.isValidColor(color)) {
-					setColorActions[color].setChecked(true);
-				}
-
-				menuMgr.add(colorSubMenu);
-			}
 		}
 
 		menuMgr.add(new Separator());
@@ -602,10 +568,6 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		for (int i = 0; i < setColorActions.length; i++) {
 			setColorActions[i] = new SetColorAction(viewer, this, i);
 		}
-
-		addColorSchemeAction = new AddColorSchemeAction("&Add Colorscheme", viewer, this);
-		renameColorSchemeAction = new RenameColorSchemeAction("&Rename Selected Colorscheme", viewer, this);
-		deleteColorSchemeAction = new DeleteColorSchemeAction("&Delete Selected Colorscheme", viewer, this);
 	}
 
 	private boolean deselectAll() {
@@ -655,8 +617,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		Collections.sort(images, new ImageComarator());
 
 		Image finalImage = new Image(images.get(0).getDevice(), images.get(0).getBounds());
-		ImageData data = null;
-		org.eclipse.swt.graphics.GC gc = new org.eclipse.swt.graphics.GC(finalImage);
+		GC gc = new GC(finalImage);
 		int x = 0;
 		int y = 0;
 
@@ -674,8 +635,8 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 					finalImage.getBounds().width / 2, finalImage.getBounds().height / 2);
 
 		}
-		data = finalImage.getImageData();
-		data.transparentPixel = finalImage.getImageData().palette.getPixel(new RGB(255, 255, 255));
+		ImageData data = finalImage.getImageData();
+		data.transparentPixel = data.palette.getPixel(new RGB(255, 255, 255));
 		gc.dispose();
 
 		return new Image(images.get(0).getDevice(), data);
@@ -728,12 +689,12 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		refreshButton.setToolTipText(REFRESH_TOOL_TIP_LABEL);
 		refreshButton.setImageDescriptor(ImageDescriptor.createFromImage(REFESH_TAB_IMAGE));
 
-		exportAsImage = new ExportAsImageImpl("Export as image", viewer);
+		exportAsImage = new ExportAsImageImpl(EXPORT_AS_IMAGE, viewer);
 		exportAsImage.setImageDescriptor(ImageDescriptor.createFromImage(IMAGE_EXPORT_IMAGE_ICON));
-		exportAsXML = new ExportAsXmlImpl("Export as XML", viewer);
+		exportAsXML = new ExportAsXmlImpl(EXPORT_AS_XML, viewer);
 		exportAsXML.setImageDescriptor(ImageDescriptor.createFromImage(IMAGE_EXPORT_XML_ICON));
 
-		Action exportAsToolbarIcon = new Action("Export as...", Action.AS_DROP_DOWN_MENU) {
+		Action exportAsToolbarIcon = new Action(EXPORT_AS___, Action.AS_DROP_DOWN_MENU) {
 			public void run() {
 
 			}
@@ -772,7 +733,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		refreshButton = new Action() {
 			public void run() {
 				disableToolbarFilterItems();
-				Job refreshJob = new AStoppableJob("Refresh Collaboration View") {
+				Job refreshJob = new AStoppableJob(REFRESH_COLLABORATION_VIEW) {
 					@Override
 					protected boolean work() throws Exception {
 						if (!refreshButton.isEnabled())
@@ -830,12 +791,11 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		return false;
 	}
 
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public Object getAdapter(Class adapter) {
 		if (GraphicalViewer.class.equals(adapter) || ViewPart.class.equals(adapter))
 			return viewer;
-
 		return super.getAdapter(adapter);
 	}
 
@@ -845,7 +805,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		final FSTModel model = builder.buildCollaborationModel(featureProject);
 
 		if (model == null) {
-			UIPlugin.getDefault().logWarning("model loading error");
+			UIPlugin.getDefault().logWarning(MODEL_LOADING_ERROR);
 			return;
 		}
 		Display.getDefault().syncExec(new Runnable() {
@@ -860,13 +820,4 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 	public void refreshAll() {
 		refreshButton.run();
 	}
-
-	public void saveColorsToFile() {
-		featureProject.getFeatureModel().getColorschemeTable().saveColorsToFile(featureProject.getProject());
-	}
-
-	private void readColorsFromFile() {
-		featureProject.getFeatureModel().getColorschemeTable().readColorsFromFile(featureProject.getProject());
-	}
-
 }

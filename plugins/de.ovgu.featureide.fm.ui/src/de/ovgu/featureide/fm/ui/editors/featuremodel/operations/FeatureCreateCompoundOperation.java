@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_COMPOUND;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DEFAULT_FEATURE_LAYER_CAPTION;
+
 import java.util.LinkedList;
 
 import org.eclipse.core.commands.ExecutionException;
@@ -47,8 +50,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayou
  */
 public class FeatureCreateCompoundOperation extends AbstractFeatureModelOperation {
 
-	private static final String LABEL = "Create Compound";
-	Feature newCompound;
+	private Feature newCompound;
 	private Feature parent;
 	private Object viewer;
 	private LinkedList<Feature> selectedFeatures;
@@ -58,7 +60,7 @@ public class FeatureCreateCompoundOperation extends AbstractFeatureModelOperatio
 	 * @param label
 	 */
 	public FeatureCreateCompoundOperation(Object viewer, Feature parent, FeatureModel featureModel, LinkedList<Feature> selectedFeatures, Object diagramEditor) {
-		super(featureModel, LABEL);
+		super(featureModel, CREATE_COMPOUND);
 		this.viewer = viewer;
 		this.parent = parent;
 		this.selectedFeatures = new LinkedList<Feature>();
@@ -69,9 +71,9 @@ public class FeatureCreateCompoundOperation extends AbstractFeatureModelOperatio
 	@Override
 	public IStatus execute(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
 		int number = 0;
-		while (featureModel.getFeatureNames().contains("NewCompound" + ++number))
+		while (featureModel.getFeatureNames().contains(DEFAULT_FEATURE_LAYER_CAPTION + ++number))
 			;
-		newCompound = new Feature(featureModel, "NewCompound" + number);
+		newCompound = new Feature(featureModel, DEFAULT_FEATURE_LAYER_CAPTION + number);
 		if (parent != null) {
 			newCompound.setAND(true);
 			newCompound.setMultiple(parent.isMultiple());

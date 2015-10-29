@@ -20,9 +20,12 @@
  */
 package de.ovgu.featureide.ui.wizards;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.RENAME_COLORSCHEME;
+
 import org.eclipse.jface.wizard.Wizard;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
@@ -45,7 +48,7 @@ public class RenameColorSchemeWizard extends Wizard {
 	public RenameColorSchemeWizard(FeatureModel featureModel) {
 		super();
 		this.featureModel = featureModel;
-		setWindowTitle("Rename Colorscheme");
+		setWindowTitle(RENAME_COLORSCHEME);
 	}
 
 	/**
@@ -63,7 +66,7 @@ public class RenameColorSchemeWizard extends Wizard {
 	public boolean performFinish() {
 		final String csName = page.getColorSchemeName();
 		if (csName != null && !csName.isEmpty()) {
-			featureModel.getColorschemeTable().renameColorscheme(csName);
+			FeatureColorManager.renameColorScheme(featureModel, csName);
 			return true;
 		}
 		return false;

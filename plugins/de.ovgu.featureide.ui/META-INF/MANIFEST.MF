@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: FeatureIDE UI Plug-In
 Bundle-SymbolicName: de.ovgu.featureide.ui;singleton:=true
-Bundle-Version: 2.7.3.qualifier
+Bundle-Version: 2.7.4.qualifier
 Bundle-Activator: de.ovgu.featureide.ui.UIPlugin
 Bundle-Localization: 
 Require-Bundle: org.eclipse.ui,
@@ -15,10 +15,13 @@ Require-Bundle: org.eclipse.ui,
  de.ovgu.featureide.fm.core,
  de.ovgu.featureide.fm.ui,
  de.ovgu.featureide.core,
- org.eclipse.core.expressions
+ org.eclipse.core.expressions,
+ org.eclipse.jdt.launching,
+ org.eclipse.swt
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: lib/SPLACAT.jar,
  lib/commons-math-2.2.jar,
+ lib/FeatureIDEAnnotations.jar,
  .
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: University of Magdeburg
@@ -90,9 +93,15 @@ Import-Package: org.eclipse.jdt.core,
  org.eclipse.jdt.core.compiler.batch,
  org.eclipse.jdt.internal.core,
  org.eclipse.jdt.internal.ui.javaeditor,
+ org.eclipse.jdt.junit,
+ org.eclipse.jdt.junit.launcher,
+ org.eclipse.jdt.junit.model,
+ org.eclipse.jdt.launching,
  org.eclipse.jface.text,
  org.eclipse.jface.text.contentassist,
  org.eclipse.jface.text.source,
  org.eclipse.platform.internal,
  org.eclipse.ui.editors.text,
- org.eclipse.ui.texteditor
+ org.eclipse.ui.texteditor,
+ org.junit.runner,
+ org.junit.runner.notification

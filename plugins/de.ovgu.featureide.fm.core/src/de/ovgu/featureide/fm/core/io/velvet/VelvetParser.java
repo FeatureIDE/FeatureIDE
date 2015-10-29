@@ -1,24 +1,4 @@
-/* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
- *
- * This file is part of FeatureIDE.
- * 
- * FeatureIDE is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- * 
- * FeatureIDE is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public License
- * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
- *
- * See http://featureide.cs.ovgu.de/ for further information.
- */
-// $ANTLR 3.4 Velvet.g 2014-11-23 20:46:35
+// $ANTLR 3.4 Velvet.g 2015-09-20 21:45:06
 
 package de.ovgu.featureide.fm.core.io.velvet;
 
@@ -421,7 +401,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
             // AST REWRITE
-            // elements: instanceImports, definitions, conceptBaseExt, interfaceImports, CONCEPT, ID
+            // elements: ID, definitions, conceptBaseExt, interfaceImports, CONCEPT, instanceImports
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -583,7 +563,7 @@ public TreeAdaptor getTreeAdaptor() {
             stream_definitions.add(definitions19.getTree());
 
             // AST REWRITE
-            // elements: ID, conceptBaseExt, CINTERFACE, definitions
+            // elements: CINTERFACE, definitions, ID, conceptBaseExt
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -866,7 +846,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
             // AST REWRITE
-            // elements: ID, name, IMPORTINSTANCE
+            // elements: name, ID, IMPORTINSTANCE
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -885,10 +865,10 @@ public TreeAdaptor getTreeAdaptor() {
                 stream_IMPORTINSTANCE.nextNode()
                 , root_1);
 
-                if ( !(stream_ID.hasNext()||stream_name.hasNext()) ) {
+                if ( !(stream_name.hasNext()||stream_ID.hasNext()) ) {
                     throw new RewriteEarlyExitException();
                 }
-                while ( stream_ID.hasNext()||stream_name.hasNext() ) {
+                while ( stream_name.hasNext()||stream_ID.hasNext() ) {
                     adaptor.addChild(root_1, 
                     stream_ID.nextNode()
                     );
@@ -896,8 +876,8 @@ public TreeAdaptor getTreeAdaptor() {
                     adaptor.addChild(root_1, stream_name.nextTree());
 
                 }
-                stream_ID.reset();
                 stream_name.reset();
+                stream_ID.reset();
 
                 adaptor.addChild(root_0, root_1);
                 }
@@ -1022,7 +1002,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
             // AST REWRITE
-            // elements: IMPORTINTERFACE, name, ID
+            // elements: name, IMPORTINTERFACE, ID
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -1895,7 +1875,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
             // AST REWRITE
-            // elements: MANDATORY, name, FEATURE, definitions, ABSTRACT
+            // elements: ABSTRACT, MANDATORY, name, definitions, FEATURE
             // token labels: 
             // rule labels: retval
             // token list labels: 
@@ -2920,7 +2900,7 @@ public TreeAdaptor getTreeAdaptor() {
 
 
             // AST REWRITE
-            // elements: boolAttribute, intAttribute, floatAttribute, stringAttribute
+            // elements: floatAttribute, boolAttribute, stringAttribute, intAttribute
             // token labels: 
             // rule labels: retval
             // token list labels: 

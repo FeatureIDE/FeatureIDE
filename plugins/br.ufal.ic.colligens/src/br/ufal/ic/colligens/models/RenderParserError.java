@@ -26,7 +26,7 @@ public class RenderParserError implements
 					featureExpr.toString(), "", msg);
 			fileProxie.getLogs().add(log);
 		}
-		// System.out.println("parser error " + fileProxie.getLogs().size());
+		// System.out.println(PARSER_ERROR + fileProxie.getLogs().size());
 		return null;
 	}
 

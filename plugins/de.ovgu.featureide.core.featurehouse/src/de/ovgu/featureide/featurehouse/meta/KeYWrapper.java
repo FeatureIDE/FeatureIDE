@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.featurehouse.meta;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.KEY_COULD_NOT_BE_STARTED_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -42,7 +45,7 @@ import de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin;
  * @author Stefan Krueger
  * @author Sebastian Krieter
  */
-@SuppressWarnings("restriction")
+@SuppressWarnings(RESTRICTION)
 public class KeYWrapper {
 
 	private static final boolean isKeYLoaded;
@@ -119,11 +122,11 @@ public class KeYWrapper {
 				Method addGuiListener = keYMediatorClass.getMethod("addGUIListener", guilClass);
 				addGuiListener.invoke(getMediator.invoke(ui), guiL);
 			} else {
-				FeatureHouseCorePlugin.getDefault().logError("KeY could not be started.", null);
+				FeatureHouseCorePlugin.getDefault().logError(KEY_COULD_NOT_BE_STARTED_, null);
 			}
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException
 				| InstantiationException e) {
-			FeatureHouseCorePlugin.getDefault().logError("KeY could not be started.", e);
+			FeatureHouseCorePlugin.getDefault().logError(KEY_COULD_NOT_BE_STARTED_, e);
 		}
 	}
 

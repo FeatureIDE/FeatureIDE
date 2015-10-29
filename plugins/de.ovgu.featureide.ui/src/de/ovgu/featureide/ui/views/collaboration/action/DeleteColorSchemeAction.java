@@ -25,6 +25,7 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
 
 /**
@@ -45,7 +46,7 @@ public class DeleteColorSchemeAction extends AbstractColorAction {
 	 */
 	@Override
 	protected boolean action(FeatureModel fm, String collName) {
-		fm.getColorschemeTable().removeColorscheme();
+		FeatureColorManager.removeCurrentColorScheme(fm);
 		return true;
 	}
 	

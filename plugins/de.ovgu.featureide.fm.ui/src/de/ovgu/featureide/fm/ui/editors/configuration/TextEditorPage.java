@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.configuration;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.SOURCE;
+
 import java.beans.PropertyChangeEvent;
 
 import org.eclipse.jface.text.IDocument;
@@ -39,7 +41,7 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
 public class TextEditorPage extends TextEditor implements IConfigurationEditorPage {
 
 	private static final String ID = FMUIPlugin.PLUGIN_ID + "TextEditorPage";
-	private static final String PAGE_TEXT = "Source";
+	private static final String PAGE_TEXT = SOURCE;
 
 	private int index;
 

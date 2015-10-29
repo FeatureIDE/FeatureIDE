@@ -52,7 +52,7 @@ public class JavaErrorPropagation extends ErrorPropagation {
 	private static final String RAW_TYPE = "raw type";
 	private static final String GENERIC_TYPE = "generic type";
 	private static final String TYPE_SAFETY = "Type safety";
-	// private static final String IMPORT = "The import";
+	// private static final String IMPORT = THE_IMPORT;
 
 	private static final String TASK = "org.eclipse.jdt.core.task";
 	private List<String> layerNames = null;

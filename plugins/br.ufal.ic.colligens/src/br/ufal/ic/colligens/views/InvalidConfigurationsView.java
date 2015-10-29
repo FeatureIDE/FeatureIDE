@@ -1,5 +1,7 @@
 package br.ufal.ic.colligens.views;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.INVALID_CONFIGURATIONS___COLLIGENS;
+
 import java.util.List;
 
 import org.eclipse.swt.widgets.Composite;
@@ -17,7 +19,7 @@ public class InvalidConfigurationsView extends ViewPart {
 	public InvalidConfigurationsView() {
 		viewController = InvalidConfigurationsViewController.getInstance();
 		viewController.setView(this);
-		this.setTitleToolTip("Invalid Configurations - Colligens");
+		this.setTitleToolTip(INVALID_CONFIGURATIONS___COLLIGENS);
 	}
 
 	@Override

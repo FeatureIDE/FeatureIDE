@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.core.builder;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.JAVA;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
+
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -59,7 +62,7 @@ import de.ovgu.featureide.fm.core.configuration.ConfigurationWriter;
  * 
  * @author Jens Meinicke
  */
-@SuppressWarnings("restriction")
+@SuppressWarnings(RESTRICTION)
 public abstract class ComposerExtensionClass implements IComposerExtensionClass {
 
 	public static final IPath JRE_CONTAINER = new Path("org.eclipse.jdt.launching.JRE_CONTAINER");
@@ -67,7 +70,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 
 	protected static final String JAVA_NATURE = "org.eclipse.jdt.core.javanature";
 	protected final static String[] JAVA_TEMPLATE = new String[] {
-			"Java",
+			JAVA,
 			"java",
 			PACKAGE_PATTERN + "/**" + NEWLINE + " * TODO description" + NEWLINE + " */" + NEWLINE + "public class " + CLASS_NAME_PATTERN + " {" + NEWLINE
 					+ NEWLINE + "}" };

@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.configuration;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.ADVANCED_CONFIGURATION;
+
 import java.util.HashMap;
 
 import org.eclipse.swt.SWT;
@@ -53,7 +55,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
  * @author Marcus Pinnecke
  */
 public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage implements GUIDefaults {
-	private static final String PAGE_TEXT = "Advanced Configuration";
+	private static final String PAGE_TEXT = ADVANCED_CONFIGURATION;
 	private static final String ID = FMUIPlugin.PLUGIN_ID + "AdvancedConfigurationPage";
 
 	private static HashMap<String, Image> combinedImages = new HashMap<String, Image>();

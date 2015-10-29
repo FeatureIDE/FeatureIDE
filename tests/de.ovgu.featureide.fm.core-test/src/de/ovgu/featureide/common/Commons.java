@@ -1,8 +1,13 @@
 package de.ovgu.featureide.common;
 
 import java.io.File;
+import java.io.FileFilter;
+import java.io.FileNotFoundException;
 import java.util.List;
 
+import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
  * Copyright (C) 2005-2013  FeatureIDE team, University of Magdeburg, Germany
@@ -31,6 +36,35 @@ import java.util.List;
 public class Commons {
 
 	/**
+	 * File filter that accepts files which extension is equal to the extension.
+	 * 
+	 * @author Marcus Pinnecke
+	 */
+	public static class FileFilterByExtension implements FileFilter {
+
+		final String fileExtension;
+
+		/**
+		 * File filter that accepts files which extension is equal to the given extension.
+		 * 
+		 * @param fileExtension file extension that should be accepted (e.g., "xml")
+		 */
+		public FileFilterByExtension(final String fileExtension) {
+			assert (fileExtension != null && !fileExtension.isEmpty());
+
+			this.fileExtension = fileExtension;
+		}
+
+		@Override
+		public boolean accept(final File pathname) {
+			return pathname.getName().endsWith("." + fileExtension);
+		}
+	};
+
+	public static final String FEATURE_MODEL_BENCHMARK_PATH_REMOTE = "/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.core-test/src/benchmarkFeatureModels/";
+	public static final String FEATURE_MODEL_BENCHMARK_PATH_LOCAL_CLASS_PATH = "benchmarkFeatureModels";
+
+	/**
 	 * Returns a file reference to <code>remotePath</code> via a absolute path on TeamCity build server or
 	 * the file reference to <code>localClassPath</code> which should be inside the class path. The return
 	 * value could be <code>null</code> if no such file exists on both places.
@@ -42,6 +76,68 @@ public class Commons {
 	public static final File getFile(final String remotePath, final String localClassPath) {
 		final File folder = new File(remotePath);
 		return folder.canRead() ? folder : new File(ClassLoader.getSystemResource(localClassPath).getPath());
+	}
+
+	/**
+	 * Loads a feature model from the file <code>featureModelXmlFilename</code> from a given <code>remotePath</code>, or if <code>remotePath</code> is not
+	 * available, from <code>localClassPath</code>. The search for the file excludes files that don't have the same file extension as
+	 * <code>featureModelXmlFilename</code>.
+	 * 
+	 * @param featureModelXmlFilename Feature model file, e.g., "model.xml"
+	 * @param remotePath Directory in which the model is located, e.g., "/myremote_server_path/models"
+	 * @param localClassPath Alternative resource path in class path to look for the feature model file, if remote path is not available (in local mode for
+	 *            instance).
+	 * @return Feature model loaded from the given file
+	 */
+	public final static FeatureModel loadFeatureModelFromFile(final String featureModelXmlFilename, final String remotePath, final String localClassPath) {
+		return loadFeatureModelFromFile(featureModelXmlFilename, new FileFilterByExtension(extractFileExtension(featureModelXmlFilename)), remotePath,
+				localClassPath);
+	}
+
+	/**
+	 * Extracts the file extension of the given file <b>filename</b> or empty string, if no file extension is available. 
+	 * The extension does not include the leading ".".
+	 * 
+	 * @param filename file name
+	 * @return File extension or empty string
+	 */
+	public static String extractFileExtension(String filename) {
+		final int position = filename.lastIndexOf('.');
+		if (position > 0) {
+			return filename.substring(position + 1);
+		} else
+			return "";
+	}
+
+	/**
+	 * Loads a feature model from the file <code>featureModelXmlFilename</code> from a given <code>remotePath</code>, or if <code>remotePath</code> is not
+	 * available, from <code>localClassPath</code>. The search for the file excludes files that have the extension specified with <b>filter</b>.
+	 * <code>featureModelXmlFilename</code>.
+	 * 
+	 * @see {@link #loadFeatureModelFromFile(String, String, String) load model with extension equal to featureModelXmlFilename}
+	 * @param featureModelXmlFilename Feature model file, e.g., "model.xml"
+	 * @param remotePath Directory in which the model is located, e.g., "/myremote_server_path/models"
+	 * @param localClassPath Alternative resource path in class path to look for the feature model file, if remote path is not available (in local mode for
+	 *            instance).
+	 * @return Feature model loaded from the given file
+	 */
+	public final static FeatureModel loadFeatureModelFromFile(final String featureModelXmlFilename, final FileFilter filter, final String remotePath,
+			final String localClassPath) {
+		FeatureModel fm = new FeatureModel();
+		File modelFileFolder = getFile(remotePath, localClassPath);
+		for (File f : modelFileFolder.listFiles(filter)) {
+			if (f.getName().equals(featureModelXmlFilename)) {
+				try {
+					new XmlFeatureModelReader(fm).readFromFile(f);
+					break;
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				} catch (UnsupportedModelException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return fm;
 	}
 
 	public final static <T> String join(T delimiter, List<T> list) {

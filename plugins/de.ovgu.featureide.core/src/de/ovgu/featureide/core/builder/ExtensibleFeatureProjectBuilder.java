@@ -20,6 +20,10 @@
  */
 package de.ovgu.featureide.core.builder;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.NO_COMPOSITION_TOOL_FOUND_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.UNABLE_TO_GET_PROJECT_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.UNABLE_TO_MAKE_FEATURE_PROJECT_;
+
 import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
@@ -59,19 +63,19 @@ public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 			return true;
 
 		if (getProject() == null) {
-			CorePlugin.getDefault().logWarning("Unable to get project.");
+			CorePlugin.getDefault().logWarning(UNABLE_TO_GET_PROJECT_);
 			return false;
 		}
 		featureProject = CorePlugin.getFeatureProject(getProject());
 		if (featureProject == null) {
-			CorePlugin.getDefault().logWarning("Unable to make feature project.");
+			CorePlugin.getDefault().logWarning(UNABLE_TO_MAKE_FEATURE_PROJECT_);
 			return false;
 		}
 
 		final IStatus status = CorePlugin.getDefault().isComposable(getProject());
 		
 		if (!status.isOK() || (composerExtension = featureProject.getComposer()) == null) {
-			CorePlugin.getDefault().logWarning("No composition tool found.");
+			CorePlugin.getDefault().logWarning(NO_COMPOSITION_TOOL_FOUND_);
 			featureProject.createBuilderMarker(featureProject.getProject(), status.getMessage(), 0, IMarker.SEVERITY_ERROR);
 			return false;
 		}

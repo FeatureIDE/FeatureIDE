@@ -20,7 +20,9 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.outline;
 
-import java.util.Arrays;
+import static de.ovgu.featureide.fm.core.localization.StringTable.COLLABORATION_MODEL_NOT_FOUND;
+import static de.ovgu.featureide.fm.core.localization.StringTable.NO_FILE_FOUND;
+
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -50,10 +52,10 @@ import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
  * 
  * @author Jan Wedding
  * @author Melanie Pflaume
- * @author Stefan Krüger
+ * @author Stefan Krï¿½ger
  * @author Florian Proksch
  * @author Dominic Labsch
- * @author Daniel Püsche
+ * @author Daniel Pï¿½sche
  */
 public class CollaborationOutlineTreeContentProvider implements ITreeContentProvider {
 
@@ -78,7 +80,7 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 	@Override
 	public Object[] getElements(Object inputElement) {
 		if (inputElement == null || !(inputElement instanceof IFile)) {
-			return new String[] { "no file found" };
+			return new String[] { NO_FILE_FOUND };
 		}
 
 		final IFile file = (IFile) inputElement;
@@ -95,7 +97,7 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 				}
 			}
 		}
-		return new String[] { "Collaboration model not found" };
+		return new String[] { COLLABORATION_MODEL_NOT_FOUND };
 	}
 
 	@Override
@@ -113,7 +115,12 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 				invariants.addAll(role.getClassFragment().getInvariants());
 				methods.addAll(role.getMethods());
 				fields.addAll(role.getFields());
-				directives.addAll(role.getDirectives());
+				TreeSet<FSTDirective> roleDirectives = role.getDirectives();
+				for (FSTDirective directive : roleDirectives) {
+					if (directive.getParent() == null) {
+						directives.add(directive);
+					}
+				}
 				innerClasses.addAll(role.getInnerClasses());
 			}
 
@@ -188,7 +195,6 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 			return filter(roleList.toArray());
 		} else if (parentElement instanceof FSTDirective) {
 			FSTDirective[] directiveArray = ((FSTDirective) parentElement).getChildren().clone();
-			Arrays.sort(directiveArray);
 			return filter(directiveArray);
 		} else if (parentElement instanceof FSTClassFragment) {
 			final TreeSet<FSTMethod> methods = new TreeSet<FSTMethod>();

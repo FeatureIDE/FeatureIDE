@@ -22,10 +22,10 @@ package de.ovgu.featureide.featurehouse.refactoring.pullUp;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import net.sourceforge.pmd.cpd.Match;
@@ -56,105 +56,110 @@ public class CloneSignatureMatcher {
 
 	private final ProjectSignatures projectSignatures;
 	private final IFeatureProject featureProject;
-	private final AbstractClassSignature signature;
-	
+	private final AbstractClassSignature classSignature;
 	private final String absoluteFileString;
-	
+	private final Map<AbstractSignature, List<Feature>> clonedSignatures = new HashMap<>();
+
 	public CloneSignatureMatcher(ProjectSignatures projectSignatures, IFeatureProject featureProject,
 			AbstractClassSignature signature, String absoluteFileString) {
 		this.projectSignatures = projectSignatures;
 		this.featureProject = featureProject;
-		this.signature = signature;
+		this.classSignature = signature;
 		this.absoluteFileString = absoluteFileString;
 	}
 	
-	public Map<AbstractSignature, List<Feature>> getMatchedClonedSignatures()
+	public void computeClonedSignatures()
 	{
 		final IPath absoluteFilePath = Path.fromOSString(absoluteFileString);
 
-		final Map<AbstractSignature, List<Feature>> filteredClonedSignatures = new HashMap<>();
 		final CloneAnalysisResults<VariantAwareClone> cloneResults = getCloneResults(absoluteFilePath.toFile().getName());
+		
+		final Set<AbstractSignature> matchedSignatures = RefactoringUtil.getIncludedMatchingSignaturesForFile(classSignature, absoluteFileString);
 		
 		for (VariantAwareClone clone : cloneResults.getClones()) {
 			
-			final Set<AbstractSignature> clonedSignatures = getClonedSignatures(absoluteFilePath, clone);
-			
-			addFilteredClonedSignatures(filteredClonedSignatures, clone, clonedSignatures);
+			for (AbstractSignature method : matchedSignatures) {
+				addClonedSignatures(method, clone);
+			} 
 		}
 		
-		return  filteredClonedSignatures;
-	}
-
-	private void addFilteredClonedSignatures(final Map<AbstractSignature, List<Feature>> filteredClonedSignatures, 
-			final VariantAwareClone clone, final Set<AbstractSignature> clonedSignatures) {
-
-		for (AbstractSignature abstractSignature : clonedSignatures) {
-			
-			final List<Feature> features;
-			if (filteredClonedSignatures.containsKey(abstractSignature))
-				features = filteredClonedSignatures.get(abstractSignature);
-			else
-			{
-				features = new ArrayList<>();
-				filteredClonedSignatures.put(abstractSignature, features);
-			}
-				
-			addFeatures(clone, abstractSignature, features);
+		for (Entry<AbstractSignature, List<Feature>> entry : clonedSignatures.entrySet()) {
+			Feature feature = getFeatureForSignature(entry.getKey());
+			if (!entry.getValue().contains(feature)) clonedSignatures.remove(entry.getKey());
 		}
-	}
-
-	private void addFeatures(final VariantAwareClone clone, AbstractSignature abstractSignature, final List<Feature> features) {
-		for (AFeatureData featureData : abstractSignature.getFeatureData()) {
-			IPath absFile = Path.fromOSString(featureData.getAbsoluteFilePath());
-			if (clone.getDistinctFiles().contains(absFile))
-			{
-				features.add(RefactoringUtil.getFeatureForId(projectSignatures, featureData.getID()));
-			}
-		}
-	}
-
-	private Set<AbstractSignature> getClonedSignatures(final IPath absoluteFilePath, final VariantAwareClone clone) {
-		final Set<AbstractSignature> clonedSignatures = new HashSet<>();
-		
-		for (CloneOccurence cloneOccurence : clone.getOccurences()) {
-			if (!cloneOccurence.getFile().equals(absoluteFilePath)) continue;
-
-			clonedSignatures.addAll(getClonedSignatures(signature.getMethods(), cloneOccurence));
-			clonedSignatures.addAll(getClonedSignatures(signature.getFields(), cloneOccurence));
-			clonedSignatures.addAll(getClonedSignatures(signature.getMemberClasses(), cloneOccurence));
-		}
-		
-		return clonedSignatures;
-	}
-		
-	private Set<AbstractSignature> getClonedSignatures(final Set<? extends AbstractSignature> signatures, final CloneOccurence cloneOccurence) {
-		final Set<AbstractSignature> clonedSignatures = new HashSet<>();
-		
-		final int startRow = cloneOccurence.getStartIndex();
-		final int endRow = startRow + cloneOccurence.getClone().getLineCount();
-
-		for (AbstractSignature sig : signatures) {
-			 if (isClonedSignature(sig, startRow, endRow)) clonedSignatures.add(sig); 
-		}
-		
-		return clonedSignatures;
 	}
 	
-	private boolean isClonedSignature(final AbstractSignature signature, final int startRow, final int endRow)
-	{
+	private Feature getFeatureForSignature(AbstractSignature signature){
 		for (AFeatureData featureData : signature.getFeatureData()) {
-			final SignaturePosition position = featureData.getSigPosition();
-			if (featureData.getAbsoluteFilePath().equals(absoluteFileString) && (position.getStartRow() >= startRow) && (position.getEndRow() <= endRow)) 
-				return true;
+			if (featureData.getAbsoluteFilePath().equals(absoluteFileString)) 
+				return RefactoringUtil.getFeatureForId(projectSignatures, featureData.getID());
 		}
+		return null;
+	}
+
+
+
+	private Map<IPath, AFeatureData> getIncludesFileForSignature(AbstractSignature sig) {
+		Map<IPath, AFeatureData> includesFiles = new HashMap<>();
+		for (AFeatureData featureData : sig.getFeatureData()) {
+			includesFiles.put(Path.fromOSString(featureData.getAbsoluteFilePath()), featureData);
+		}
+		
+		return includesFiles;
+	}
+
+	private void addClonedSignatures(final AbstractSignature signature, final VariantAwareClone clone) {
+		
+		final Map<IPath, AFeatureData> includedFiles = getIncludesFileForSignature(signature);
+
+		for (CloneOccurence cloneOccurence : clone.getOccurences()) {
+			
+			if (!includedFiles.containsKey(cloneOccurence.getFile()) ) continue;
+			
+			final AFeatureData featureData = includedFiles.get(cloneOccurence.getFile());
+			final Feature feature = RefactoringUtil.getFeatureForId(projectSignatures, featureData.getID());
+
+			if (clonedSignatures.containsKey(signature) && clonedSignatures.get(signature).contains(feature)) continue;
+
+			final int startRow = cloneOccurence.getStartIndex();
+			final int endRow = startRow + cloneOccurence.getClone().getLineCount();
+			
+			if (isClonedSignature(featureData, startRow, endRow))
+			{
+				addFeatureForSignature(signature, feature);
+			}	
+		}
+	}
+	
+	private void addFeatureForSignature(final AbstractSignature signature, final Feature feature) {
+		final List<Feature> features;
+		if (clonedSignatures.containsKey(signature))
+			features = clonedSignatures.get(signature);
+		else
+		{
+			features = new ArrayList<>();
+			clonedSignatures.put(signature, features);
+		}
+		
+		features.add(feature);
+	}
+	
+	private boolean isClonedSignature(final AFeatureData featureData, final int startRow, final int endRow)
+	{
+		final SignaturePosition position = featureData.getSigPosition();
+		if ((position.getStartRow() >= startRow) && (position.getEndRow() <= endRow)) 
+				return true;
 		
 		return false;
 	}
-
 	
 	private CloneAnalysisResults<VariantAwareClone> getCloneResults(String filteredName){
 		CPDCloneAnalysis analysis = new CPDCloneAnalysis(filteredName);
 		final Iterator<Match> cpdResults = analysis.analyze(featureProject.getProject());
 		return CPDResultConverter.convertMatchesToReadableResults(cpdResults);
+	}
+	
+	public Map<AbstractSignature, List<Feature>> getClonedSignatures() {
+		return clonedSignatures;
 	}
 }

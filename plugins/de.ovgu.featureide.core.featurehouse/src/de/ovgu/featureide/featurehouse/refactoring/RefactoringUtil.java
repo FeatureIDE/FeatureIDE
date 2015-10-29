@@ -26,8 +26,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -40,6 +42,7 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 
 import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.core.signature.ProjectSignatures.SignatureIterator;
+import de.ovgu.featureide.core.signature.base.AFeatureData;
 import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 import de.ovgu.featureide.core.signature.base.AbstractMethodSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
@@ -172,5 +175,34 @@ public class RefactoringUtil {
 		final String featureName = projectSignatures.getFeatureName(featureId);
 		return projectSignatures.getFeatureModel().getFeature(featureName);
 	}
+	
+	private static Set<AbstractSignature> getMatchedSignaturesForClass(Set<? extends AbstractSignature> signatures, String matchingFile) {
+		Set<AbstractSignature> matchedSignatures  = new HashSet<>();
+		for (AbstractSignature signature : signatures) {
+			matchedSignatures.addAll(getMatchedSignature(signature, matchingFile));
+		}
+		return matchedSignatures;
+	}
 
+	private static Set<AbstractSignature> getMatchedSignature(AbstractSignature signature, String matchingFile) {
+		Set<AbstractSignature> matchedSignatures  = new HashSet<>();
+		for (AFeatureData featureData : signature.getFeatureData()) {
+			if (featureData.getAbsoluteFilePath().equals(matchingFile)) 
+			{
+				matchedSignatures.add(signature);
+				break;
+			}
+		}
+		return matchedSignatures;
+	}
+	
+	public static Set<AbstractSignature> getIncludedMatchingSignaturesForFile(AbstractClassSignature classSignature, String matchingFile)
+	{
+	    Set<AbstractSignature> matchedSignatures = getMatchedSignaturesForClass(classSignature.getMethods(), matchingFile);
+		matchedSignatures.addAll(getMatchedSignaturesForClass(classSignature.getFields(), matchingFile));
+		matchedSignatures.addAll(getMatchedSignature(classSignature, matchingFile));
+		
+		return matchedSignatures;
+	}
+ 
 }

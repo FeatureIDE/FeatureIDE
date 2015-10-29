@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURES;
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -176,7 +178,7 @@ public class StatisticsProgramSizeNew extends LazyParent {
 							e.printStackTrace();
 						}
 
-						String feat = (file.getFullPath().toString().substring(file.getFullPath().toString().indexOf("features") + 9, file.getFullPath()
+						String feat = (file.getFullPath().toString().substring(file.getFullPath().toString().indexOf(FEATURES) + 9, file.getFullPath()
 								.toString().length() - 1)).split("/")[0];
 
 						if (!featureExtensionLOCList.containsKey(file.getFileExtension() + "#" + feat)) {

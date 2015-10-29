@@ -20,8 +20,11 @@
  */
 package de.ovgu.featureide.fm.core;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.EMPTY_FEATURE_MODEL;
+
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Hashtable;
@@ -89,8 +92,6 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	
 	private Object undoContext;
 	
-	private ColorschemeTable colorschemeTable;
-
 	private FMComposerManager fmComposerManager;
 	
 	public FeatureModel() {
@@ -102,7 +103,6 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		
 		this.comments = new LinkedList<String>();
 		this.annotations = new LinkedList<String>();
-		this.colorschemeTable = new ColorschemeTable(this);
 		this.layout = new FeatureModelLayout();
 	}
 
@@ -116,12 +116,10 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		if (complete) {
 			this.annotations = new LinkedList<String>(oldFeatureModel.annotations);
 			this.comments = new LinkedList<String>(oldFeatureModel.comments);
-			this.colorschemeTable = oldFeatureModel.colorschemeTable.clone(this);
 			this.layout = oldFeatureModel.layout.clone();
 		} else {
 			this.annotations = null;
 			this.comments = null;
-			this.colorschemeTable = new EmptyColorschemeTable();
 			this.layout = null;
 		}
 		
@@ -150,10 +148,6 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
     public FeatureModelLayout getLayout() {
 		return layout;
     }
-
-	public ColorschemeTable getColorschemeTable() {
-		return colorschemeTable;
-	}
 	
 	@Override
 	public FMComposerManager getFMComposerManager(final IProject project) {
@@ -195,7 +189,6 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		if (annotations != null) {
 			annotations.clear();
 		}
-		colorschemeTable.reset();
 		featureOrderList.clear();
 	}
 	
@@ -568,6 +561,12 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		}
 	}
 	
+	public final void fireEvent(PropertyChangeEvent event) {
+		for (PropertyChangeListener listener : listenerList) {
+			listener.propertyChange(event);
+		}
+	}
+	
 	@Override
 	public FeatureModel clone() {
 		final FeatureModel clone = new FeatureModel();
@@ -582,7 +581,6 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 		clone.constraints.addAll(constraints);
 		clone.annotations.addAll(annotations);
 		clone.comments.addAll(comments);
-		clone.colorschemeTable = colorschemeTable.clone(clone);
 		return clone;
 	}
 	
@@ -827,7 +825,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 				x +=c.toString() + " ";
 			}
 		} catch (Exception e) {
-			return "Empty Feature Model";
+			return EMPTY_FEATURE_MODEL;
 		}
 		return x;
 	}
@@ -885,5 +883,25 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	public GraphicItem getItemType() {
 		return GraphicItem.Model;
 	}
+	
+	/**
+	 * TODO: REMOVE THIS, THIS IS A HACK
+	 */
+	File sourceFile;
 
+	/**
+	 * TODO: REMOVE THIS, THIS IS A HACK
+	 */
+	public void xxxSetSourceFile(File file) {
+		sourceFile = file;
+	}
+
+	
+	/**
+	 * TODO: REMOVE THIS, THIS IS A HACK
+	 */
+	public File xxxGetSourceFile() {
+		return sourceFile;
+	}
+	
 }

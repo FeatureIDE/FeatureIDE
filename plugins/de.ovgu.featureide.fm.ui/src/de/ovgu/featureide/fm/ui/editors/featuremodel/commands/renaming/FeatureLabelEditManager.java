@@ -20,6 +20,10 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.INVALID_NAME;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IT_IS_NOT_RECOMMENDED_TO_CHANGE_UPPER_AND_LOWER_CASE__YOU_CURRENTLY_TRY_TO_RENAME;
+import static de.ovgu.featureide.fm.core.localization.StringTable.THIS_NAME_IS_ALREADY_USED_FOR_ANOTHER_FEATURE_;
+
 import org.eclipse.gef.tools.DirectEditManager;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ICellEditorListener;
@@ -65,13 +69,13 @@ public class FeatureLabelEditManager extends DirectEditManager implements GUIDef
 				String value = (String) cellEditor.getValue();
 				if (!value.equals(oldValue)) {
 					if (value.equalsIgnoreCase(oldValue)) {
-						createTooltip("It is not recommended to change upper and lower case. You currently try to rename " + oldValue + " to " + value + ".",
+						createTooltip(IT_IS_NOT_RECOMMENDED_TO_CHANGE_UPPER_AND_LOWER_CASE__YOU_CURRENTLY_TRY_TO_RENAME + oldValue + " to " + value + ".",
 								SWT.ICON_WARNING);
 						// TODO #455 wrong usage of extension
 					} else if ((!featureModel.getFMComposerExtension().isValidFeatureName(value))) {
 						createTooltip(featureModel.getFMComposerExtension().getErroMessage(), SWT.ICON_ERROR);
 					} else if (featureModel.getFeatureNames().contains(value)) {
-						createTooltip("This name is already used for another feature.", SWT.ICON_ERROR);
+						createTooltip(THIS_NAME_IS_ALREADY_USED_FOR_ANOTHER_FEATURE_, SWT.ICON_ERROR);
 					}
 				}
 			}
@@ -88,7 +92,7 @@ public class FeatureLabelEditManager extends DirectEditManager implements GUIDef
 				tooltip = new ToolTip(control.getShell(), SWT.BALLOON | icon);
 				tooltip.setAutoHide(false);
 				tooltip.setLocation(control.toDisplay(control.getSize().x / 2, control.getSize().y + 5));
-				tooltip.setText("Invalid Name");
+				tooltip.setText(INVALID_NAME);
 				tooltip.setMessage(message);
 				tooltip.setVisible(true);
 			}

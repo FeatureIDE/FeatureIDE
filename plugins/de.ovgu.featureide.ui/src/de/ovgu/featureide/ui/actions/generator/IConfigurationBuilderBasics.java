@@ -20,6 +20,17 @@
  */
 package de.ovgu.featureide.ui.actions.generator;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD_ALL_CURRENT_CONFIGURATIONS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD_ALL_VALID_CONFIGURATIONS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD_INTEGRATION_CONFIGURATIONS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.COUNT_CONFIGURATIONS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.HAS_BEEN_DEPRECATED;
+import static de.ovgu.featureide.fm.core.localization.StringTable.PRODUCTS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.REDUNDANT_CAST_TO;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SERIALIZABLE_CLASS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.THE_IMPORT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.VARIANT;
+
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.QualifiedName;
@@ -37,19 +48,9 @@ import de.ovgu.featureide.core.CorePlugin;
  */
 public interface IConfigurationBuilderBasics {
 	
-	enum BuildType {ALL_VALID, ALL_CURRENT, T_WISE};
+	enum BuildType {ALL_VALID, ALL_CURRENT, T_WISE, INTEGRATION};
 	enum BuildOrder {DEFAULT, DIFFERENCE, INTERACTION};
 	enum TWise {ICPL, CHVATAL, CASA}
-	
-	/**
-	 * Basics for the dialogs.
-	 */
-	String MESSAGE_TITLE_VALID = "Build all valid configurations";
-	String MESSAGE_TITLE_CURRENT = "Build all current configurations";
-	String MESSAGE_TITLE_T = "Build T-Wise configurations";
-	String MESSAGE_CURRENT = "Builds all current configurations";
-	String MESSAGE_START = "Build all valid program variants.";
-	String TOGGLE_MESSAGE = "Create a new project for each variant";
 	
 	/** Saves the toggle state whether new projects should be generated for each configuration. **/
 	QualifiedName TOGGLE_STATE = new QualifiedName(IConfigurationBuilderBasics.class.getName() + "#CreateNewProject", 
@@ -60,8 +61,8 @@ public interface IConfigurationBuilderBasics {
 			IConfigurationBuilderBasics.class.getName() + "#Generate");
 	QualifiedName ORDER = new QualifiedName(IConfigurationBuilderBasics.class.getName() + "#Order", 
 			IConfigurationBuilderBasics.class.getName() + "#Order");
-	QualifiedName BUFFER = new QualifiedName(IConfigurationBuilderBasics.class.getName() + "#Buffer", 
-			IConfigurationBuilderBasics.class.getName() + "#Buffer");
+	QualifiedName TEST = new QualifiedName(IConfigurationBuilderBasics.class.getName() + "#Test", 
+			IConfigurationBuilderBasics.class.getName() + "#Test");
 	String TRUE = "true";
 	String FALSE = "false";
 	
@@ -70,38 +71,31 @@ public interface IConfigurationBuilderBasics {
 	/**
 	 * Basics for the ConfigurationBuilder.
 	 */
-	String JOB_TITLE = "Build all valid configurations";
-	String JOB_TITLE_CURRENT = "Build all current configurations";
+	String JOB_TITLE = BUILD_ALL_VALID_CONFIGURATIONS;
+	String JOB_TITLE_CURRENT = BUILD_ALL_CURRENT_CONFIGURATIONS;
 	String JOB_TITLE_T_WISE = "Build t-wise configurations";
+	String JOB_TITLE_MODULE = BUILD_INTEGRATION_CONFIGURATIONS;
 	
-	String JOB_TITLE_COUNT_CONFIGURATIONS = "Count configurations";
+	String JOB_TITLE_COUNT_CONFIGURATIONS = COUNT_CONFIGURATIONS;
 	
-	String CONFIGURATION_NAME = "Variant";
-	String FOLDER_NAME = "products";
+	String CONFIGURATION_NAME = VARIANT;
+	String FOLDER_NAME = PRODUCTS;
 	String FOLDER_NAME_CURRENT = "currentproducts";
 	String TEMPORARY_BIN_FOLDER = ".tmpBin";
 	
 	String PROBLEM_MARKER = CorePlugin.PLUGIN_ID + ".variantMarker";
-	String CANNOT_FIND_SYMBOL = "cannot find symbol";
 	String ERROR_IGNOR_RAW_TYPE = "raw type";
-	String ERROR_IGNOR_SERIIZABLE = "serializable class";
-	String ERROR_IGNOR_CAST = "redundant cast to";
-	String ERROR_IGNOR_DEPRECATION = "has been deprecated";
-	String ERROR_IGNOR_UNUSED_IMPORT = "The import";
+	String ERROR_IGNOR_SERIIZABLE = SERIALIZABLE_CLASS;
+	String ERROR_IGNOR_CAST = REDUNDANT_CAST_TO;
+	String ERROR_IGNOR_DEPRECATION = HAS_BEEN_DEPRECATED;
+	String ERROR_IGNOR_UNUSED_IMPORT = THE_IMPORT;
 	
 	Pattern errorMessagePattern = Pattern.compile("(.+):(\\d+):(.+)");
 	
 	String SEPARATOR_VARIANT = "_v.";
 	String SEPARATOR_CONFIGURATION = "_c.";
 	String SEPARATOR_T_WISE = "_t.";
-	
-	String T_WISE_CONFIGURATIONS = "T-Wise configurations";
-	String ALL_CURRENT_CONFIGURATIONS = "All current configurations";
-	String ALL_VALID_CONFIGURATIONS = "All valid configurations";
-	
-	String INTERACTIONS = "Interactions";
-	String DIFFERENCE = "Difference";
-	String DEFAULT = "Default";
+	String SEPARATOR_INTEGRATION = "_i.";
 	
 	/**
 	 * Basics for the SPLCATool.
@@ -109,7 +103,5 @@ public interface IConfigurationBuilderBasics {
 	int CHVATAL_MAX = 4;
 	int ICPL_MAX = 3;
 	int CASA_MAX = 6;
-	String CHVATAL = "Chvatal"; 
 	String ICPL = "ICPL (fastest)";
-	String CASA = "CASA";
 }

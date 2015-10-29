@@ -17,4 +17,5 @@ Import-Package: de.ovgu.featureide.core,
  de.ovgu.featureide.fm.core,
  de.ovgu.featureide.fm.core.io,
  de.ovgu.featureide.fm.core.io.xml,
+ de.ovgu.featureide.fm.core.localization,
  de.ovgu.featureide.ui.wizards

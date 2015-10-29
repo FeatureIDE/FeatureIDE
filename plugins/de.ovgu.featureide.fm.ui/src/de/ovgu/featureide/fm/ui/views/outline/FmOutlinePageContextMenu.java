@@ -20,6 +20,13 @@
  */
 package de.ovgu.featureide.fm.ui.views.outline;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.COLLAPSE_ALL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINTS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_FEATURE_BELOW;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.EXPAND_ALL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RENAME;
+
 import org.eclipse.core.commands.operations.ObjectUndoContext;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPartViewer;
@@ -152,7 +159,7 @@ public class FmOutlinePageContextMenu {
 				viewer.collapseAll();
 			}
 		};
-		collapseAllAction.setToolTipText("Collapse All");
+		collapseAllAction.setToolTipText(COLLAPSE_ALL);
 		collapseAllAction.setImageDescriptor(IMG_COLLAPSE);
 
 		expandAllAction = new Action() {
@@ -160,7 +167,7 @@ public class FmOutlinePageContextMenu {
 				viewer.expandAll();
 			}
 		};
-		expandAllAction.setToolTipText("Expand All");
+		expandAllAction.setToolTipText(EXPAND_ALL);
 		expandAllAction.setImageDescriptor(IMG_EXPAND);
 
 		dblClickListener = new IDoubleClickListener() {
@@ -239,14 +246,14 @@ public class FmOutlinePageContextMenu {
 
 			manager.add(cAction);
 
-			clAction.setText("Create Feature Below");
+			clAction.setText(CREATE_FEATURE_BELOW);
 			manager.add(clAction);
 
 			reAction.setChecked(false);
-			reAction.setText("Rename");
+			reAction.setText(RENAME);
 			manager.add(reAction);
 
-			dAction.setText("Delete");
+			dAction.setText(DELETE);
 			manager.add(dAction);
 
 			manager.add(dAAction);
@@ -270,11 +277,11 @@ public class FmOutlinePageContextMenu {
 			manager.add(ccAction);
 			manager.add(ecAction);
 
-			dAction.setText("Delete");
+			dAction.setText(DELETE);
 			manager.add(dAction);
 		}
 		if (sel instanceof String)
-			if (sel.equals("Constraints"))
+			if (sel.equals(CONSTRAINTS))
 				manager.add(ccAction);
 	}
 

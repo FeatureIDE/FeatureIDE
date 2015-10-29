@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.SHOW_HIDDEN_FEATURES;
+
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
@@ -41,7 +43,7 @@ public class ShowHiddenFeaturesAction extends Action {
 	private final FeatureModel featureModel;
 
 	public ShowHiddenFeaturesAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
-		super("Show Hidden Features");
+		super(SHOW_HIDDEN_FEATURES);
 		this.featureModel = featureModel;
 
 	}

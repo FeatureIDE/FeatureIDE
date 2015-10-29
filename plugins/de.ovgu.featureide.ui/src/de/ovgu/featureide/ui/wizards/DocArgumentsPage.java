@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.ui.wizards;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.JAVADOC_OPTIONS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SPECIFY_OPTIONS_FOR_JAVADOC_TOOL;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -44,8 +47,8 @@ public class DocArgumentsPage extends AbstractWizardPage {
 	private String options;
 
 	public DocArgumentsPage() {
-		super("JavaDoc Options");
-		setDescription("Specify Options for JavaDoc Tool");
+		super(JAVADOC_OPTIONS);
+		setDescription(SPECIFY_OPTIONS_FOR_JAVADOC_TOOL);
 		this.options = "";
 	}
 

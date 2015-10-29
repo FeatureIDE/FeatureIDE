@@ -20,6 +20,10 @@
  */
 package de.ovgu.featureide.core.builder.preprocessor;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.IS_DEFINED_AS_ABSTRACT_IN_THE_FEATURE_MODEL__ONLY_CONCRETE_FEATURES_SHOULD_BE_REFERENCED_IN_PREPROCESSOR_DIRECTIVES_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IS_NOT_DEFINED_IN_THE_FEATURE_MODEL_AND_COMMA__THUS_COMMA__ALWAYS_ASSUMED_TO_BE_FALSE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.PREPROCESSOR;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -67,8 +71,8 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	static final int SAT_TAUTOLOGY = 2;
 	protected static final String MESSAGE_DEAD_CODE = ": This expression is a contradiction and causes a dead code block.";
 	protected static final String MESSAGE_ALWAYS_TRUE = ": This expression is a tautology and causes a superfluous code block.";
-	protected static final String MESSAGE_ABSTRACT = " is defined as abstract in the feature model. Only concrete features should be referenced in preprocessor directives.";
-	protected static final String MESSAGE_NOT_DEFINED = " is not defined in the feature model and, thus, always assumed to be false";
+	protected static final String MESSAGE_ABSTRACT = IS_DEFINED_AS_ABSTRACT_IN_THE_FEATURE_MODEL__ONLY_CONCRETE_FEATURES_SHOULD_BE_REFERENCED_IN_PREPROCESSOR_DIRECTIVES_;
+	protected static final String MESSAGE_NOT_DEFINED = IS_NOT_DEFINED_IN_THE_FEATURE_MODEL_AND_COMMA__THUS_COMMA__ALWAYS_ASSUMED_TO_BE_FALSE;
 
 	/**
 	 * Feature model node generated in {@link #performFullBuild(IFile)} and used
@@ -80,7 +84,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	 * Preprocessor name used for messages in build markers (must set in
 	 * subclass).
 	 */
-	protected String pluginName = "Preprocessor";
+	protected String pluginName = PREPROCESSOR;
 
 	/**
 	 * List of activated features. List will be generated in
@@ -267,7 +271,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	 * <code>true</code> or <code>false</code>.<br />
 	 * <br />
 	 * 
-	 * Check in three steps:
+	 * Check in steps:
 	 * <ol>
 	 * <li>just the given line</li>
 	 * <li>the given line and the feature model</li>
@@ -281,7 +285,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 	 * @param res
 	 *            file containing the given expression
 	 */
-	protected void doThreeStepExpressionCheck(Node ppExpression, int lineNumber, IFile res) {
+	protected void checkExpressions(Node ppExpression, int lineNumber, IFile res) {
 		if (ppExpression == null) {
 			return;
 		}
@@ -300,8 +304,36 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 
 				And nestedExpressionsAnd = new And(nestedExpressions);
 
-				isContradictionOrTautology(nestedExpressionsAnd.clone(), true, lineNumber, res);
+				result = isContradictionOrTautology(nestedExpressionsAnd.clone(), true, lineNumber, res);
+				if (result == SAT_NONE && expressionStack.size() > 1) {
+					nestedExpressions = new Node[expressionStack.size() - 1];
+					int index = 0;
+					for (Node expression : expressionStack) {
+						if (index == expressionStack.size() - 1) {
+							break;
+						}
+						nestedExpressions[index++] = expression;
+					}
+					nestedExpressionsAnd = new And(nestedExpressions);
+					checkRedundancy(ppExpression, nestedExpressionsAnd, lineNumber, res);
+				}
 			}
+		}
+	}
+
+	/**
+	 * Checks whether the expression is superfluous in the given context.
+	 * 
+	 */
+	private void checkRedundancy(Node nestedExpression, Node expression, int lineNumber, IFile res) {
+		Node node = new And(new And(featureModel.clone(), expression.clone()), new Not(nestedExpression.clone()));
+		SatSolver solver = new SatSolver(node, 1000);
+		try {
+			if (!solver.isSatisfiable()) {
+				setMarkersOnContradictionOrTautology(SAT_TAUTOLOGY, lineNumber, res);
+			}
+		} catch (TimeoutException e) {
+
 		}
 	}
 

@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.ahead.wrapper;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.JAK;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -103,7 +105,7 @@ public class AheadBuildErrorEvent {
 		int javaLine = this.line;
 		
 		String javaName = javaFile.getName();
-		String jakName = javaName.substring(0, javaName.lastIndexOf('.')) + ".jak"; 
+		String jakName = javaName.substring(0, javaName.lastIndexOf('.')) + JAK; 
 		IFile composedJakFile = ((IFolder) javaFile.getParent()).getFile(jakName);
 
 		javaFile.refreshLocal(IResource.DEPTH_ZERO, null);
@@ -252,7 +254,7 @@ public class AheadBuildErrorEvent {
 		if (newFile.exists())
 			return newFile;
 		
-//		AheadCorePlugin.getDefault().logWarning("Was not able to locate an error in the source jak file '" + filename + "'");
+//		AheadCorePlugin.getDefault().logWarning(WAS_NOT_ABLE_TO_LOCATE_AN_ERROR_IN_THE_SOURCE_JAK_FILE_ + filename + "'");
 		return null;
 	}
 

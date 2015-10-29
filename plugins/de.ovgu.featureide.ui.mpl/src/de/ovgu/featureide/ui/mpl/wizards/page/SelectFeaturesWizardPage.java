@@ -20,6 +20,11 @@
  */
 package de.ovgu.featureide.ui.mpl.wizards.page;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.HERE_YOU_SELECT_THE_FEATURES_FOR_THE_NEW_INTERFACE_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.PLEASE_SELECT_A_PROJECT_IN_THE_PREVIOUS_PAGE_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SELECT_AT_LEAST_ONE_FEATURE_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SELECT_FEATURES;
+
 import java.util.HashSet;
 
 import org.eclipse.swt.SWT;
@@ -50,9 +55,9 @@ public class SelectFeaturesWizardPage extends AbstractWizardPage {
 	private HashSet<String> featureNames = new HashSet<String>();
 	
 	public SelectFeaturesWizardPage() {
-		super("Select Features");
-		setTitle("Select Features");
-		setDescription("Here you select the features for the new interface.");
+		super(SELECT_FEATURES);
+		setTitle(SELECT_FEATURES);
+		setDescription(HERE_YOU_SELECT_THE_FEATURES_FOR_THE_NEW_INTERFACE_);
 	}
 
 	@Override
@@ -151,7 +156,7 @@ public class SelectFeaturesWizardPage extends AbstractWizardPage {
 			if (featureProject != null) {
 				addFeaturesToTree(((IFeatureProject)featureProject).getFeatureModel().getRoot());
 			} else {
-				setErrorMessage("Please select a Project in the previous page.");
+				setErrorMessage(PLEASE_SELECT_A_PROJECT_IN_THE_PREVIOUS_PAGE_);
 				setPageComplete(false);
 			}
 		}
@@ -203,7 +208,7 @@ public class SelectFeaturesWizardPage extends AbstractWizardPage {
 	@Override
 	protected String checkPage() {
 		if (featureNames.isEmpty()) {
-			return "Select at least one feature.";
+			return SELECT_AT_LEAST_ONE_FEATURE_;
 		}
 		return null;
 	}

@@ -110,47 +110,54 @@
      <menu
            label="Refactoring">
            -->
+        <menu
+              label="FeatureHouse-Refactoring">
+           <command
+                 commandId="de.ovgu.featureide.core.featurehouse.ui.commands.refactoring.rename"
+                 id="de.ovgu.featureide.core.featurehouse.ui.action.refactoring.rename"
+                 label="Rename..."
+                 style="push">
+              <visibleWhen
+                    checkEnabled="false">
+                 <test
+                       property="de.ovgu.featureide.core.featurehouse.properties.rename">
+                 </test>
+              </visibleWhen>
+           </command>
+           <command
+                 commandId="de.ovgu.featureide.core.featurehouse.ui.commands.refactoring.pullUp"
+                 id="de.ovgu.featureide.core.featurehouse.ui.action.refactoring.pullup"
+                 label="Pull Up..."
+                 style="push">
+              <visibleWhen
+                    checkEnabled="false">
+                 <test
+                       property="de.ovgu.featureide.core.featurehouse.properties.rename">
+                 </test>
+              </visibleWhen>
+           </command>
+        </menu>
+     <!--</menu>-->
+  </menuContribution>
+  <menuContribution
+        allPopups="false"
+        locationURI="popup:de.ovgu.featureide.ui.views.collaboration.outline.CollaborationOutline">
+     <menu
+           label="FeatureHouse-Refactoring">
         <command
               commandId="de.ovgu.featureide.core.featurehouse.ui.commands.refactoring.rename"
               id="de.ovgu.featureide.core.featurehouse.ui.action.refactoring.rename"
               label="Rename..."
               style="push">
-              
            <visibleWhen
                  checkEnabled="false">
-            
-         <test
-               property="de.ovgu.featureide.core.featurehouse.properties.rename">
-         </test>
-					
-				
+              <test
+                    property="de.ovgu.featureide.core.featurehouse.properties.rename">
+              </test>
            </visibleWhen>
-           
-              <!--
-           <visibleWhen
-                 checkEnabled="false">
-                 
-              <with
-                    variable="activeMenuSelection">
-                 <iterate
-                       ifEmpty="false"
-                       operator="or">
-                    <adapt
-                          type="org.eclipse.core.resources.IFile">
-                       <test
-                             property="org.eclipse.core.resources.name"
-                             value="*.java">
-                       </test>
-                    </adapt>
-                 </iterate>
-              </with>
-              
-           </visibleWhen>
-           -->
         </command>
         <command
               commandId="de.ovgu.featureide.core.featurehouse.ui.commands.refactoring.pullUp"
-              id="de.ovgu.featureide.core.featurehouse.ui.action.refactoring.pullup"
               label="Pull Up..."
               style="push">
            <visibleWhen
@@ -160,34 +167,7 @@
               </test>
            </visibleWhen>
         </command>
-     <!--</menu>-->
-  </menuContribution>
-  <menuContribution
-        allPopups="false"
-        locationURI="popup:de.ovgu.featureide.ui.views.collaboration.outline.CollaborationOutline">
-     <command
-           commandId="de.ovgu.featureide.core.featurehouse.ui.commands.refactoring.rename"
-           id="de.ovgu.featureide.core.featurehouse.ui.action.refactoring.rename"
-           label="Rename..."
-           style="push">
-        <visibleWhen
-              checkEnabled="false">
-           <test
-                 property="de.ovgu.featureide.core.featurehouse.properties.rename">
-           </test>
-        </visibleWhen>
-     </command>
-     <command
-           commandId="de.ovgu.featureide.core.featurehouse.ui.commands.refactoring.pullUp"
-           label="Pull Up..."
-           style="push">
-        <visibleWhen
-              checkEnabled="false">
-           <test
-                 property="de.ovgu.featureide.core.featurehouse.properties.rename">
-           </test>
-        </visibleWhen>
-     </command>
+     </menu>
   </menuContribution>
 	</extension>
 	<extension

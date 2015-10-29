@@ -24,11 +24,11 @@ public abstract class DefaultCloneAnalyzerAdapter<Tool> implements ICloneAnalyze
 {
 	protected Tool analysisTool;
 	
-	private final DefaultFilenameFilter filter;
+	private final FilenameFilter filter;
 
-	protected DefaultCloneAnalyzerAdapter(final DefaultFilenameFilter filter)
+	protected DefaultCloneAnalyzerAdapter(final FilenameFilter filter)
 	{
-		this.filter = new DefaultFilenameFilter();
+		this.filter = filter;
 	}
 
 	/**

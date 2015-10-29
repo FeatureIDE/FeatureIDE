@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.fm.core;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.PRINTED_OUTPUT_FILE_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.READING_MODEL_FILE___;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -106,7 +109,7 @@ public class FMCorePlugin extends AbstractCorePlugin {
 	}
 
 	public void analyzeModel(IFile file) {
-		logInfo("Reading Model File...");
+		logInfo(READING_MODEL_FILE___);
 		final IContainer outputDir = file.getParent();
 		if (outputDir == null || !(outputDir instanceof IFolder)) {
 			return;
@@ -188,7 +191,7 @@ public class FMCorePlugin extends AbstractCorePlugin {
 			} else {
 				outputFile.create(inputStream, true, null);
 			}
-			logInfo("Printed Output File.");
+			logInfo(PRINTED_OUTPUT_FILE_);
 		} catch (Exception e) {
 			logError(e);
 		}

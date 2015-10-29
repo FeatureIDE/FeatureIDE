@@ -20,6 +20,18 @@
  */
 package de.ovgu.featureide.migration.impl;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.ALREADY_EXISTS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.BECAUSE_IT_ALREADY_EXISTS_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CANNOT_CREATE_PROJECT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CREATING_FOLDER_AT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CREATION_OF_FOLDER;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DOES_NOT_EXIST_AFTER_CREATION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FOLDER;
+import static de.ovgu.featureide.fm.core.localization.StringTable.IN_PROJECT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.MODEL_XML_DOES_NOT_EXIST;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ONLY_EXPECTED__FILES_AND_CONTAINERS_TO_COPY;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SUCCESSFUL;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -79,7 +91,7 @@ public class SPLMigrationUtils
 					if (!copyFile.exists())
 						member.copy(copyFile.getFullPath(), true, null);
 				} else
-					assert false : "Only expected  Files and Containers to copy";
+					assert false : ONLY_EXPECTED__FILES_AND_CONTAINERS_TO_COPY;
 		}
 	}
 
@@ -100,22 +112,22 @@ public class SPLMigrationUtils
 		if (newFolder.exists())
 		{
 			assert false : "Trying to create an already existing folder: " + path;
-			System.out.println("Folder " + path + " already exists");
+			System.out.println(FOLDER + path + ALREADY_EXISTS);
 			return;
 		}
 		try
 		{
 			newFolder.create(true, true, null);
 			project.refreshLocal(IProject.DEPTH_INFINITE, null);
-			System.out.println("Creation of Folder " + path + " successful");
+			System.out.println(CREATION_OF_FOLDER + path + SUCCESSFUL);
 		} catch (CoreException e)
 		{
-			System.out.println("Creation of Folder " + path + " lead to CoreException:"
+			System.out.println(CREATION_OF_FOLDER + path + " lead to CoreException:"
 					+ e.getMessage());
 			e.printStackTrace();
 		}
 		if (!newFolder.exists())
-			System.out.println("Folder " + path + " does not exist after creation");
+			System.out.println(FOLDER + path + DOES_NOT_EXIST_AFTER_CREATION);
 
 	}
 
@@ -133,7 +145,7 @@ public class SPLMigrationUtils
 	public static void createFolderInProject(IProject project, String path)
 	{
 		IPath newPath = new Path(path);
-		System.out.println("Creating Folder at " + path + " in project " + project.getName());
+		System.out.println(CREATING_FOLDER_AT + path + IN_PROJECT + project.getName());
 		createFolderInProject(project, newPath);
 	}
 
@@ -147,8 +159,8 @@ public class SPLMigrationUtils
 	{
 		IProject newProject = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
 		if (newProject.exists())
-			throw new IllegalArgumentException("Cannot create project " + projectName
-					+ " because it already exists.");
+			throw new IllegalArgumentException(CANNOT_CREATE_PROJECT + projectName
+					+ BECAUSE_IT_ALREADY_EXISTS_);
 
 		try
 		{
@@ -198,7 +210,7 @@ public class SPLMigrationUtils
 				new XmlFeatureModelWriter(featureModel));
 		IFile featureModelFile = featureProject.getFile("model.xml");
 
-		assert featureModelFile.exists() : "model.xml does not exist";
+		assert featureModelFile.exists() : MODEL_XML_DOES_NOT_EXIST;
 
 		try
 		{

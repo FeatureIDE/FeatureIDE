@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.ui.migration.wizard;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.IMPORT_PRODUCTS_INTO_A_SIMPLE_SOFTWARE_PRODUCT_LINE;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
@@ -65,7 +67,7 @@ public class SPLMigrationWizard extends Wizard implements INewWizard
 	@Override
 	public void addPages()
 	{
-		setWindowTitle("Import products into a simple Software Product Line");
+		setWindowTitle(IMPORT_PRODUCTS_INTO_A_SIMPLE_SOFTWARE_PRODUCT_LINE);
 
 		namePage = new SPLMigrationDialogNamePage();
 		projectPage = new SPLMigrationDialogSettingsPage();

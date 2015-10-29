@@ -1,15 +1,28 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-	<featureModel>
+	<featureModel chosenLayoutAlgorithm="1">
 		<struct>
-			<and abstract="true" mandatory="true" name="HelloWorld">
+			<and mandatory="true" name="HelloWorld">
 				<feature mandatory="true" name="Hello"/>
-				<alt abstract="true" name="Feature">
+				<alt name="Feature">
 					<feature mandatory="true" name="Beautiful"/>
 					<feature mandatory="true" name="Wonderful"/>
 				</alt>
 				<feature mandatory="true" name="World"/>
+				<feature name="Commom"/>
 			</and>
 		</struct>
-		<constraints/>
+		<constraints>
+			<rule>
+				<imp>
+					<disj>
+						<var>Beautiful</var>
+						<var>Wonderful</var>
+					</disj>
+					<var>Commom</var>
+				</imp>
+			</rule>
+		</constraints>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
 		<comments/>
+		<featureOrder userDefined="false"/>
 	</featureModel>

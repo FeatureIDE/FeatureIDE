@@ -20,11 +20,16 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.outline;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CLASS_IS_NULL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DEFAULT_OUTLINE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.FILE_IS_NULL;
+
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.TreeItem;
@@ -43,6 +48,8 @@ import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.core.fstmodel.IRoleElement;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
+import de.ovgu.featureide.fm.core.color.ColorPalette;
+import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
 
@@ -204,7 +211,7 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 	}
 
 	public String getLabelProvName() {
-		return "Default Outline";
+		return DEFAULT_OUTLINE;
 	}
 
 	@Override
@@ -222,11 +229,11 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 					// get old Font and simply make it bold
 					treeItems[i].setFont(new Font(treeItems[i].getDisplay(), treeItems[i].getFont().getFontData()[0].getName(), treeItems[i].getFont()
 							.getFontData()[0].getHeight(), SWT.BOLD));
-
 				} else {
 					treeItems[i].setFont(new Font(treeItems[i].getDisplay(), treeItems[i].getFont().getFontData()[0].getName(), treeItems[i].getFont()
 							.getFontData()[0].getHeight(), SWT.NORMAL));
 				}
+				setForeground(treeItems[i], file);
 			}
 			if (treeItems[i].getItems().length > 0) {
 				colorizeItems(treeItems[i].getItems(), file);
@@ -240,11 +247,11 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 	 */
 	private boolean hasSameClass(FSTClass Class, IFile oldFile, IFile currentFile) {
 		if (Class == null) {
-			UIPlugin.getDefault().logWarning("class is null");
+			UIPlugin.getDefault().logWarning(CLASS_IS_NULL);
 			return false;
 		}
 		if (currentFile == null) {
-			UIPlugin.getDefault().logWarning("file is null");
+			UIPlugin.getDefault().logWarning(FILE_IS_NULL);
 			return false;
 		}
 		if (!currentFile.getProject().equals(oldFile.getProject())) {
@@ -291,12 +298,20 @@ public class CollaborationOutlineLabelProvider extends OutlineLabelProvider impl
 	}
 
 	public void setForeground(TreeItem item, IFile iFile) {
-		if (item.getData() instanceof FSTDirective) {
+		final Object data = item.getData();
+		if (data instanceof FSTDirective) {
 			item.setForeground(viewer.getControl().getDisplay().getSystemColor(SWT.DEFAULT));
+			int colorID = ((FSTDirective) data).getColor();
+			if (colorID != FeatureColor.NO_COLOR.getValue()) {
+				item.setBackground(new Color(null, ColorPalette.getRGB(colorID, 0.5f)));
+			}
+		} else if (data instanceof FSTRole) {
+			int colorID = ((FSTRole) data).getFeature().getColor();
+			if (colorID != FeatureColor.NO_COLOR.getValue()) {
+				item.setBackground(new Color(null, ColorPalette.getRGB(colorID, 0.5f)));
+			}
 		} else {
-
-			final IRoleElement element = (IRoleElement) item.getData();
-
+			final IRoleElement element = (IRoleElement) data;
 			for (FSTRole role : element.getRole().getFSTClass().getRoles()) {
 				if (role.getFile().equals(iFile)
 						&& ((element instanceof FSTMethod && role.getAllMethods().contains(element))

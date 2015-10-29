@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE_REDUNDANT_CONSTRAINTS;
+
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 
@@ -35,7 +37,7 @@ public class RedundantConstrainsCalculationsAction extends Action {
 	private final FeatureModel featureModel;
 
 	public RedundantConstrainsCalculationsAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
-		super("Calculate Redundant Constraints");
+		super(CALCULATE_REDUNDANT_CONSTRAINTS);
 		this.featureModel = featureModel;
 		setChecked(featureModel.getAnalyser().calculateRedundantConstraints);
 	}

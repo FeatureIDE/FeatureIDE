@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.ui.wizards;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.ADD_FEATUREIDE_NATURE;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -58,7 +60,7 @@ public class ConversionWizard extends Wizard implements INewWizard {
 	@Override
 	public void addPages() {
 		// addPage(new ConversionPage(selection));
-		setWindowTitle("Add FeatureIDE Nature");
+		setWindowTitle(ADD_FEATUREIDE_NATURE);
 		addPage(page);
 		super.addPages();
 	}

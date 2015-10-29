@@ -1,5 +1,7 @@
 package br.ufal.ic.colligens.views;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.INVALID_PRODUCTS___COLLIGENS;
+
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
 
@@ -15,7 +17,7 @@ public class InvalidProductView extends ViewPart {
 	public InvalidProductView() {
 		controller = InvalidProductsViewController.getInstance();
 		controller.setView(this);
-		this.setTitleToolTip("Invalid Products - Colligens");
+		this.setTitleToolTip(INVALID_PRODUCTS___COLLIGENS);
 	}
 
 	@Override

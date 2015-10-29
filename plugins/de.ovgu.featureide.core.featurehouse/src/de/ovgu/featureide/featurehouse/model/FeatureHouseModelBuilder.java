@@ -180,11 +180,15 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 			return;
 		}
 		currentRole = model.addRole(currentFeature.getName(), model.getAbsoluteClassName(currentFile), currentFile);
+		//create directives?? class added ppmodelbuilder
 		classFragmentStack.clear();
 		classFragmentStack.push(currentRole.getClassFragment());
 	}
 
 	private boolean canCompose() {
+		if (currentFile == null) {
+			return false;
+		}
 		return FeatureHouseComposer.EXTENSIONS.contains(currentFile.getFileExtension()) && currentFile.exists();
 	}
 

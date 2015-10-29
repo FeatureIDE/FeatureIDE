@@ -20,6 +20,10 @@
  */
 package de.ovgu.featureide.ui.perspective;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.DEPRECATION;
+import static de.ovgu.featureide.fm.core.localization.StringTable.LEFT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RIGHT;
+
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
@@ -44,7 +48,7 @@ public class PerspectiveFactory implements IPerspectiveFactory {
 	
 	public static final String ID = UIPlugin.PLUGIN_ID + ".FeatureIDEperspective";
 	
-	@SuppressWarnings("deprecation")
+	@SuppressWarnings(DEPRECATION)
 	public void createInitialLayout(IPageLayout layout) {
 		String editorArea = layout.getEditorArea();
 		
@@ -55,9 +59,9 @@ public class PerspectiveFactory implements IPerspectiveFactory {
 		layout.addNewWizardShortcut("org.eclipse.ui.wizards.new.file");
 		layout.addNewWizardShortcut("org.eclipse.ui.wizards.new.folder");
 		
-		IFolderLayout left = layout.createFolder("left", IPageLayout.LEFT, (float) 0.23, editorArea);
+		IFolderLayout left = layout.createFolder(LEFT, IPageLayout.LEFT, (float) 0.23, editorArea);
 		IFolderLayout down = layout.createFolder("down", IPageLayout.BOTTOM, (float) 0.80, editorArea);
-		IFolderLayout right = layout.createFolder("right", IPageLayout.RIGHT, (float) 0.75, editorArea);
+		IFolderLayout right = layout.createFolder(RIGHT, IPageLayout.RIGHT, (float) 0.75, editorArea);
 		
 		down.addView(CollaborationView.ID);
 		down.addView(FeatureModelEditView.ID);

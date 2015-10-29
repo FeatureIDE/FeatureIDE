@@ -1,8 +1,9 @@
 package de.ovgu.featureide.cloneanalysis.pmd;
 
 import java.io.File;
+import java.io.FilenameFilter;
 
-public class FilteredFilenameFilter extends DefaultFilenameFilter {
+public class FilteredFilenameFilter implements FilenameFilter {
 	
 	private final String filteredFilename;
 	public FilteredFilenameFilter(String fileName) {
@@ -12,7 +13,9 @@ public class FilteredFilenameFilter extends DefaultFilenameFilter {
 	@Override
 	public boolean accept(File dir, String name)
 	{
-		if (!super.accept(dir, name)) return false;
-		return name.equals(filteredFilename);
+		if (name.equals(filteredFilename) || new File(dir, name).isDirectory())
+			return true;
+		
+		return false;
 	}
 }

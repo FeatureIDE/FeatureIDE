@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.configuration;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CAN_NOT_READ__ORDER_FILE;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.LinkedList;
@@ -64,7 +66,7 @@ public class FeatureOrderReader {
 			}
 			scanner.close();
 		} catch (FileNotFoundException e) {
-			FMCorePlugin.getDefault().logInfo("Can not read .order file");
+			FMCorePlugin.getDefault().logInfo(CAN_NOT_READ__ORDER_FILE);
 		}
 
 		return list;

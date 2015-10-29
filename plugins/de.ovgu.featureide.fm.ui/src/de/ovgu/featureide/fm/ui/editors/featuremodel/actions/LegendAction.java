@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.HIDE_LEGEND;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SHOW_LEGEND;
+
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
@@ -44,9 +47,9 @@ public class LegendAction extends Action {
 		super();
 		this.featureModel = featureModel;
 		if (!FMPropertyManager.isLegendHidden()) {
-			this.setText("Hide Legend");
+			this.setText(HIDE_LEGEND);
 		} else {
-			this.setText("Show Legend");
+			this.setText(SHOW_LEGEND);
 		}
 
 	}
@@ -66,9 +69,9 @@ public class LegendAction extends Action {
 
 	public void refresh() {
 		if (!FMPropertyManager.isLegendHidden()) {
-			this.setText("Hide Legend");
+			this.setText(HIDE_LEGEND);
 		} else {
-			this.setText("Show Legend");
+			this.setText(SHOW_LEGEND);
 		}
 	}
 }

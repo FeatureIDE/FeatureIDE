@@ -22,7 +22,9 @@ package de.ovgu.featureide.featurehouse.refactoring.pullUp;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -58,9 +60,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
@@ -69,6 +69,7 @@ import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
 
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 
 /**
  * Wizard page for pull up refactoring wizards which allows to specify the
@@ -287,9 +288,19 @@ public class PullUpMemberPage extends UserInputWizardPage {
 
 		fTableViewer = new ContainerCheckedTreeViewer(tree);
 		fTableViewer.setUseHashlookup(true);
-		final CloneSignatureMatcher cloneSignatureMatcher = new CloneSignatureMatcher(refactoring.getProjectSignatures(),refactoring.getFeatureProject(), refactoring.getSelectedElement(), refactoring.getFile());
+		final CloneSignatureMatcher cloneSignatureMatcher = new CloneSignatureMatcher(refactoring.getProjectSignatures(), refactoring.getFeatureProject(),
+				refactoring.getSelectedElement(), refactoring.getFile());
+		cloneSignatureMatcher.computeClonedSignatures();
+
+		FeatureModelAnalyzer analyzer = refactoring.getFeatureProject().getFeatureModel().getAnalyser();
 		
-		fTableViewer.setContentProvider(new PullUpHierarchyContentProvider(cloneSignatureMatcher.getMatchedClonedSignatures()));
+		for (List<Feature> features : cloneSignatureMatcher.getClonedSignatures().values())
+		{
+			 final Collection<String> commonFeatures = analyzer.commonFeatures(1000, features);
+			 System.out.println(commonFeatures);
+		}
+		
+		fTableViewer.setContentProvider(new PullUpHierarchyContentProvider(cloneSignatureMatcher.getClonedSignatures()));
 		fTableViewer.setLabelProvider(new PullUpMemberLabelProvider());
 		fTableViewer.setInput(refactoring.getPullableElements());
 		fTableViewer.addSelectionChangedListener(new ISelectionChangedListener() {
@@ -305,7 +316,7 @@ public class PullUpMemberPage extends UserInputWizardPage {
 			}
 		});
 		
-//		fTableViewer.expandAll();
+		fTableViewer.expandAll();
 		
 //		checkPullUp(refactoring.getPullableElements(), false);
 		

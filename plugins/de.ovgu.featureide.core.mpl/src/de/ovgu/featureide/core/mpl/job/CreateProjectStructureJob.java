@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.core.mpl.job;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.LOADING_PROJECT_SIGNATURE;
 import de.ovgu.featureide.core.mpl.InterfaceProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.signature.ProjectSignatures.SignatureIterator;
@@ -49,7 +50,7 @@ public abstract class CreateProjectStructureJob extends AProjectJob<CreateProjec
 	}
 
 	protected CreateProjectStructureJob(Arguments arguments) {
-		super("Loading Project Signature", arguments);
+		super(LOADING_PROJECT_SIGNATURE, arguments);
 	}
 	
 	@Override

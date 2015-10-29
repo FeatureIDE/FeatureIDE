@@ -20,6 +20,11 @@
  */
 package de.ovgu.featureide.ui.migration.wizard;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.A_PROJECT_WITH_THIS_NAME_ALREADY_EXISTS_IN_THE_WORKSPACE__PLEASE_CHANGE_THE_NAME_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.GIVE_A_NAME_FOR_THE_NEW_SOFTWARE_PRODUCT_LINE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.GIVE_A_NAME_FOR_THE_SOFTWARE_PRODUCT_LINE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.PROJECT_NAME;
+
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -42,9 +47,9 @@ public class SPLMigrationDialogNamePage extends WizardPage
 	
 	public SPLMigrationDialogNamePage()
 	{
-		super("Give a name for the Software Product Line");
-		setTitle("Project Name");
-		setDescription("Give a name for the Software Product Line");
+		super(GIVE_A_NAME_FOR_THE_SOFTWARE_PRODUCT_LINE);
+		setTitle(PROJECT_NAME);
+		setDescription(GIVE_A_NAME_FOR_THE_SOFTWARE_PRODUCT_LINE);
 	}
 
 	@Override
@@ -63,7 +68,7 @@ public class SPLMigrationDialogNamePage extends WizardPage
 	    nameGroup.setLayout(gridLayout);
 	    nameGroup.setLayoutData(gridDataFill);
 	    
-	    String tooltip = "Give a name for the new Software Product Line";
+	    String tooltip = GIVE_A_NAME_FOR_THE_NEW_SOFTWARE_PRODUCT_LINE;
 		
 	    Label newProductNameLabel = new Label(nameGroup, SWT.NULL);
 		newProductNameLabel.setText("&Project Name:");
@@ -92,7 +97,7 @@ public class SPLMigrationDialogNamePage extends WizardPage
 	protected void onNameChange()
 	{
 		if(ResourcesPlugin.getWorkspace().getRoot().getProject(getProjectName()).exists())
-			setErrorMessage("A project with this name already exists in the workspace. Please change the name.");
+			setErrorMessage(A_PROJECT_WITH_THIS_NAME_ALREADY_EXISTS_IN_THE_WORKSPACE__PLEASE_CHANGE_THE_NAME_);
 		else
 			setErrorMessage(null);
 	}

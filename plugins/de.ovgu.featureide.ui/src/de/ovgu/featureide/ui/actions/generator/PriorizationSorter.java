@@ -20,13 +20,18 @@
  */
 package de.ovgu.featureide.ui.actions.generator;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_CONFIGS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.EMPTY___;
+import static de.ovgu.featureide.fm.core.localization.StringTable.OF;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SORT_CONFIGURATIONS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.WE_SHOULDNT_GET_HERE_COMMA___HERE_IS_WRONG;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
@@ -49,13 +54,14 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 
 	public PriorizationSorter(FeatureModel featureModel) {
 		super(featureModel);
+		super.sorted = false;
 		this.featureModel = featureModel;
 	}
 	
 	private int configurationCounter = 1;
 
 	@Override
-	public int sort(final IProgressMonitor monitor) {
+	protected int sort(final IProgressMonitor monitor) {
 		if (configurations.isEmpty()) {
 			return 0;
 		}
@@ -66,7 +72,7 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 		configurations.clear();
 		final List<List<String>> sortedConfigs = sortConfigs(configs, monitor);
 		for (final List<String> solution : sortedConfigs) {
-			System.out.println("Create configs " + configurationCounter + " of " + sortedConfigs.size());
+			System.out.println(CREATE_CONFIGS + configurationCounter + OF + sortedConfigs.size());
 			configurations.add(createConfiguration(solution, configurationCounter++));
 		}
 		return configurations.size();
@@ -81,9 +87,9 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 	}
 
 	protected List<List<String>> sortConfigs(List<List<String>> configs, IProgressMonitor monitor) {
-//		LOGGER.logInfo("Start sorting configurations by difference");
+//		LOGGER.logInfo(START_SORTING_CONFIGURATIONS_BY_DIFFERENCE);
 //		final long time = System.currentTimeMillis();
-		monitor.beginTask("Sort configurations" , configs.size());
+		monitor.beginTask(SORT_CONFIGURATIONS , configs.size());
 	
 		// bring the first product with maximum number of optional feature.\
 		allconfigs.addAll(configs);
@@ -96,34 +102,8 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 			monitor.worked(1);
 		}
 		
-//		LOGGER.logInfo(System.currentTimeMillis() - time + "ms to sort all configs");
+//		LOGGER.logInfo(System.currentTimeMillis() - time + MS_TO_SORT_ALL_CONFIGS);
 		return allsortedconfigs;
-	}
-	
-	
-
-	@Override
-	public synchronized BuilderConfiguration getConfiguration(boolean sort) {
-		if (sort) {
-			if (allsortedconfigs.isEmpty()) {
-				return createConfiguration(allyesconfig(), configurationCounter++);
-			} else if (!allconfigs.isEmpty()){
-				return createConfiguration(selectConfig(), configurationCounter++);
-			} else {
-				return null;
-			}
-		} else {
-			return super.getConfiguration(sort);
-		}
-	}
-	
-	@Override
-	public synchronized void addConfiguration(BuilderConfiguration configuration, boolean sort) {
-		if (sort) {
-			allconfigs.add(new ArrayList<String>(configuration.getSelectedFeatureNames()));
-		} else {
-			super.addConfiguration(configuration, sort);
-		}
 	}
 	
 	@Override
@@ -145,7 +125,7 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 				int xHashCode = allConfig.get(i).hashCode();
 				int yHashCode = allConfig.get(j).hashCode();
 				
-				mapKey = xHashCode + "_" + yHashCode;
+				mapKey = xHashCode + EMPTY___ + yHashCode;
 
 				if(configsDistancesResult.get(mapKey) == null) // not added before
 				{
@@ -199,8 +179,8 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 				xHashCode = x.hashCode();
 				yHashCode = y.hashCode();
 				
-				mapKeyXY = xHashCode + "_" + yHashCode;
-				mapKeyYX = yHashCode + "_" + xHashCode;
+				mapKeyXY = xHashCode + EMPTY___ + yHashCode;
+				mapKeyYX = yHashCode + EMPTY___ + xHashCode;
 				double tempDistanceLocal = 0.0;
 				if(configsDistancesResult.get(mapKeyXY) != null)
 				{
@@ -212,7 +192,7 @@ public class PriorizationSorter extends AbstractConfigurationSorter {
 				}
 				else
 				{
-					System.out.println("we shouldn't get here,  here is wrong");
+					System.out.println(WE_SHOULDNT_GET_HERE_COMMA___HERE_IS_WRONG);
 				}
 				if(tempDistanceLocal>tempDistance){
 					tempDistance=tempDistanceLocal;

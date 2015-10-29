@@ -20,6 +20,10 @@
  */
 package de.ovgu.featureide.fm.core.io.sxfm;
 
+import static de.ovgu.featureide.fm.core.localization.StringTable.CANT_DETERMINE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CONNECTIONTYPE_OF_ROOTFEATURE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.YES;
+
 import java.io.StringWriter;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -36,7 +40,7 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.prop4j.Literal;
+import org.prop4j.And;
 import org.prop4j.NodeWriter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -94,8 +98,8 @@ public class SXFMWriter extends AbstractFeatureModelWriter {
 			FMCorePlugin.getDefault().logError(e);
 		}
 		transfo.setOutputProperty(OutputKeys.METHOD, "xml");
-		transfo.setOutputProperty(OutputKeys.INDENT, "yes");
-		transfo.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+		transfo.setOutputProperty(OutputKeys.INDENT, YES);
+		transfo.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, YES);
 		StreamResult result = new StreamResult(new StringWriter());
 		DOMSource source = new DOMSource(doc);
 		try {
@@ -172,8 +176,8 @@ public class SXFMWriter extends AbstractFeatureModelWriter {
     		nod.appendChild(textNode);
     		newIndent = indent + "\t\t";
     		nextAndMode = false;
-    	} else throw new IllegalStateException ("Can't determine " +
-				"Connectiontype of Rootfeature");
+    	} else throw new IllegalStateException (CANT_DETERMINE +
+				CONNECTIONTYPE_OF_ROOTFEATURE);
     	
     	Iterator<Feature> i = children.iterator();
     	while (i.hasNext()) {
@@ -200,12 +204,12 @@ public class SXFMWriter extends AbstractFeatureModelWriter {
 		for (org.prop4j.Node node : featureModel.getPropositionalNodes()) {
 			// avoid use of parenthesis from the beginning
 			org.prop4j.Node cnf = node.clone().toCNF();
-			if (cnf instanceof Literal) {
-				i = crteateConstraint(doc, propConstr, i, cnf);
-			} else {
+			if (cnf instanceof And) {
 				for (org.prop4j.Node child : cnf.getChildren()) {
 					i = crteateConstraint(doc, propConstr, i, child);
 				}
+			} else {
+				i = crteateConstraint(doc, propConstr, i, cnf);
 			}
 		}
 	}
