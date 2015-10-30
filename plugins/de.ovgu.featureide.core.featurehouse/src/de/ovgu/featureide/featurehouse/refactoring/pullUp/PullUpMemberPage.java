@@ -20,25 +20,20 @@
  */
 package de.ovgu.featureide.featurehouse.refactoring.pullUp;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.internal.corext.util.Messages;
 import org.eclipse.jdt.internal.ui.IJavaHelpContextIds;
 import org.eclipse.jdt.internal.ui.refactoring.RefactoringMessages;
-import org.eclipse.jdt.internal.ui.util.ExceptionHandler;
 import org.eclipse.jdt.internal.ui.util.SWTUtil;
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
+import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
@@ -49,7 +44,6 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.wizard.IWizardPage;
-import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.ui.refactoring.UserInputWizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -60,16 +54,19 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
 
+import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
+import de.ovgu.featureide.fm.core.Features;
+import de.ovgu.featureide.ui.views.outline.ContextOutlineLabelProvider;
 
 /**
  * Wizard page for pull up refactoring wizards which allows to specify the
@@ -82,34 +79,29 @@ public class PullUpMemberPage extends UserInputWizardPage {
 	
 	private static class PullUpHierarchyContentProvider implements ITreeContentProvider {
 
-		private final Map<AbstractSignature, List<Feature>> clonedSignatures;
+		private Map<AbstractSignature, List<Feature>> clonedSignatures;
 		
 		public void dispose() {
 		}
 		
-		public PullUpHierarchyContentProvider(Map<AbstractSignature, List<Feature>> clonedSignatures){
-			this.clonedSignatures = clonedSignatures;
+		public PullUpHierarchyContentProvider(){
 		}
 
 		public Object[] getChildren(final Object parentElement) {
 			
 			Set<Object> elements = new HashSet<>();
-			if (parentElement instanceof ExtendedPullUpSignature) {
-				final AbstractSignature signature = ((ExtendedPullUpSignature) parentElement).getSignature();
-				if (clonedSignatures.containsKey(signature))
-					elements.addAll(clonedSignatures.get(signature));
+			if (parentElement instanceof AbstractSignature) {
+				if (clonedSignatures.containsKey(parentElement))
+					elements.addAll(clonedSignatures.get(parentElement));
 			}
 			return elements.toArray();
 		}
 
 		public Object[] getElements(final Object inputElement) {
-			return ((Set<?>) inputElement).toArray();
+			return clonedSignatures.keySet().toArray();
 		}
 
 		public Object getParent(final Object element) {
-//			if (element instanceof Feature)
-//				return ((ExtendedPullUpSignature) element).getParent();
-				
 			return null;
 		}
 		
@@ -118,12 +110,13 @@ public class PullUpMemberPage extends UserInputWizardPage {
 		}
 		
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {
+			this.clonedSignatures = (Map<AbstractSignature, List<Feature>> ) newInput;
 		}
 	}
 	
 	private static class PullUpMemberLabelProvider extends LabelProvider implements ITableLabelProvider {
 
-		private final ILabelProvider fLabelProvider= new PullUpHierarchyLabelProvider();
+		private final ILabelProvider fLabelProvider= new ContextOutlineLabelProvider();
 
 		@Override
 		public void dispose() {
@@ -158,30 +151,24 @@ public class PullUpMemberPage extends UserInputWizardPage {
 
 	private static final int MEMBER_COLUMN = 0;
 
-	protected static final int PULL_UP_ACTION = 0;
-
-	protected List<Feature> fCandidateTypes;
-
 	private Button fDeselectAllButton;
 
 	private Button fSelectAllButton;
-	
-//	private Button checkCloneCodesButton;
 
 	private Label fStatusLine;
 
 	private Label fLabel;
 
-	private Combo fSuperTypesCombo;
+	private Combo parentFeatureCombo;
 
-	private ContainerCheckedTreeViewer fTableViewer;
+	private CheckboxTreeViewer fTableViewer;
 
 	private final PullUpRefactoring refactoring;
 
 	public PullUpMemberPage(final String name, PullUpRefactoring refactoring) {
 		super(name);
 		this.refactoring = refactoring;
-		setDescription(RefactoringMessages.PullUpInputPage1_page_message);
+		setDescription("Select the destination feature and the members to pull up.");
 	}
 
 	public PullUpRefactoring getPullUpMethodRefactoring() {
@@ -252,7 +239,7 @@ public class PullUpMemberPage extends UserInputWizardPage {
 		layout.numColumns = 2;
 		composite.setLayout(layout);
 
-		createSuperTypeControl(composite);
+		createParentFeatureCombo(composite);
 		createSpacer(composite);
 		createMemberTableLabel(composite);
 		createMemberTableComposite(composite);
@@ -270,14 +257,21 @@ public class PullUpMemberPage extends UserInputWizardPage {
 		tree.setHeaderVisible(true);
 		tree.setLinesVisible(true);
 		
-//		tree.addListener(SWT.Selection, new Listener() {
-//			   public void handleEvent(Event event) {
+		tree.addListener(SWT.Selection, new Listener() {
+			   public void handleEvent(Event event) {
 //			       if (event.detail == SWT.CHECK && event.item.getData() instanceof Feature){
 //			          ((TreeItem)event.item).setChecked(true);
 //			          ((TreeItem)event.item).setGrayed(true);
 //			       } 
-//			   }
-//			});
+			       
+			       final Object item = event.item.getData();
+			       final TreeItem treeItem = (TreeItem)event.item;
+			       if (item instanceof Feature) 
+						checkSignature(treeItem);
+			       else 
+						checkChildren(treeItem);
+			   }
+			});
 		
 		final TreeColumn column0 = new TreeColumn(tree, SWT.NONE);
 		column0.setWidth(240);
@@ -286,23 +280,17 @@ public class PullUpMemberPage extends UserInputWizardPage {
 		column1.setWidth(160);
 //		column1.setText(RefactoringMessages.PullUpInputPage1_Action);
 
-		fTableViewer = new ContainerCheckedTreeViewer(tree);
+		fTableViewer = new CheckboxTreeViewer(tree);
 		fTableViewer.setUseHashlookup(true);
-		final CloneSignatureMatcher cloneSignatureMatcher = new CloneSignatureMatcher(refactoring.getProjectSignatures(), refactoring.getFeatureProject(),
-				refactoring.getSelectedElement(), refactoring.getFile());
-		cloneSignatureMatcher.computeClonedSignatures();
-
-		FeatureModelAnalyzer analyzer = refactoring.getFeatureProject().getFeatureModel().getAnalyser();
 		
-		for (List<Feature> features : cloneSignatureMatcher.getClonedSignatures().values())
-		{
-			 final Collection<String> commonFeatures = analyzer.commonFeatures(1000, features);
-			 System.out.println(commonFeatures);
+		final Map<AbstractSignature, List<Feature>> signatures = refactoring.getClonedSignatures();
+		for (AbstractSignature signature : refactoring.getPullableElements()) {
+			if (!signatures.containsKey(signature)) signatures.put(signature, Collections.<Feature> emptyList());
 		}
 		
-		fTableViewer.setContentProvider(new PullUpHierarchyContentProvider(cloneSignatureMatcher.getClonedSignatures()));
+		fTableViewer.setContentProvider(new PullUpHierarchyContentProvider());
 		fTableViewer.setLabelProvider(new PullUpMemberLabelProvider());
-		fTableViewer.setInput(refactoring.getPullableElements());
+		fTableViewer.setInput(signatures);
 		fTableViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 
 			public void selectionChanged(final SelectionChangedEvent event) {
@@ -313,16 +301,81 @@ public class PullUpMemberPage extends UserInputWizardPage {
 
 			public void checkStateChanged(final CheckStateChangedEvent event) {
 				updateWizardPage(null, true);
+				fillParentFeatureComboBox(getSelectedPullUpFeatures());
 			}
 		});
 		
 		fTableViewer.expandAll();
-		
-//		checkPullUp(refactoring.getPullableElements(), false);
-		
 		updateWizardPage(null, true);
 	}
+	
+	private void checkSignature(TreeItem checkedItem) {
+		
+		TreeItem parentItem = getParent(checkedItem);
+		if (parentItem == null) return;
+		
+		boolean isCheckItemClassSignature = parentItem.getData() instanceof AbstractClassSignature;
 
+		for (TreeItem item : fTableViewer.getTree().getItems()) {
+			
+			if (parentItem.equals(item))
+				parentItem.setChecked(checkedItem.getChecked() || atLeastOneChildrenChecked(item));
+			else
+				uncheckedItems(isCheckItemClassSignature, item);
+		}
+	}
+
+	private void uncheckedItems(boolean isCheckItemClassSignature, TreeItem item) {
+		if (isCheckItemClassSignature)
+		{
+			item.setChecked(false);
+			checkAllChildren(false, item);
+		}
+		else if (item.getData() instanceof AbstractClassSignature)
+		{
+			item.setChecked(false);
+			checkAllChildren(false, item);
+		}
+	}
+	
+	private boolean atLeastOneChildrenChecked(TreeItem item)
+	{
+		for (TreeItem childItem : item.getItems()) {
+			if (childItem.getChecked()) return true; 
+		}
+		
+		return false;
+	}
+	
+	private TreeItem getParent(TreeItem item)
+	{
+		for (TreeItem parentItem : fTableViewer.getTree().getItems()) {
+			
+			for (TreeItem childItem : parentItem.getItems()) {
+				if (item.equals(childItem)) return parentItem;
+			}
+		}
+		
+		return null;
+	}
+	
+	private void checkChildren(TreeItem checkedItem) {
+		boolean isCheckItemClassSignature = checkedItem.getData() instanceof AbstractClassSignature;
+		for (TreeItem item : fTableViewer.getTree().getItems()) {
+			
+			if (item.equals(checkedItem))
+				checkAllChildren(item.getChecked(), item);
+			else
+				uncheckedItems(isCheckItemClassSignature, item);
+		}
+	}
+	
+	private void checkAllChildren(boolean check, TreeItem item){
+		for (TreeItem childItem : item.getItems()) {
+			childItem.setChecked(check);			
+		}
+	}
+	
 	protected void createMemberTableComposite(final Composite parent) {
 		final Composite composite = new Composite(parent, SWT.NONE);
 		final GridData data = new GridData(GridData.FILL_BOTH);
@@ -362,37 +415,35 @@ public class PullUpMemberPage extends UserInputWizardPage {
 		fStatusLine.setLayoutData(data);
 	}
 
-	private void createSuperTypeCombo(Composite parent) {
+	private void createParentFeatureCombo(Composite parent) {
 		final Label label = new Label(parent, SWT.NONE);
-		label.setText(RefactoringMessages.PullUpInputPage1_Select_destination);
+		label.setText("&Select destination feature:");
 		label.setLayoutData(new GridData());
 
-		fSuperTypesCombo = new Combo(parent, SWT.READ_ONLY);
-		SWTUtil.setDefaultVisibleItemCount(fSuperTypesCombo);
-		if (fCandidateTypes.size() == 0) return;
+		parentFeatureCombo = new Combo(parent, SWT.READ_ONLY);
+		SWTUtil.setDefaultVisibleItemCount(parentFeatureCombo);
+		parentFeatureCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		
-		for (Feature feature : fCandidateTypes) {
-			fSuperTypesCombo.add(feature.getName());
+		final ArrayList<Feature> features = new ArrayList<>();
+		features.add(refactoring.getSourceFeature());
+		fillParentFeatureComboBox(features);
+	}
+	
+	private void fillParentFeatureComboBox(List<Feature> features)
+	{
+		final List<Feature> commonAncestors = Features.getCommonAncestors(features);
+		
+		parentFeatureCombo.removeAll();
+		if (features == null || features.size() == 0) return;
+		
+		for (Feature feature : commonAncestors) {
+			if (feature.equals(refactoring.getSourceFeature())) continue;
+			parentFeatureCombo.add(feature.getName());
 		}
 		
-		fSuperTypesCombo.select(fCandidateTypes.size() - 1);
-		fSuperTypesCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		parentFeatureCombo.select(parentFeatureCombo.getItemCount() - 1);
 	}
 
-	protected void createSuperTypeControl(final Composite parent) {
-		try {
-			PlatformUI.getWorkbench().getActiveWorkbenchWindow().run(true, false, new IRunnableWithProgress() {
-				public void run(final IProgressMonitor monitor) throws InvocationTargetException {
-					fCandidateTypes = refactoring.getCandidateTypes(new RefactoringStatus());
-				}
-			});
-			createSuperTypeCombo(parent);
-		} catch (InvocationTargetException exception) {
-			ExceptionHandler.handle(exception, getShell(), RefactoringMessages.PullUpInputPage_pull_Up, RefactoringMessages.PullUpInputPage_exception);
-		} catch (InterruptedException exception) {
-			Assert.isTrue(false);
-		}
-	}
 
 	@Override
 	public void dispose() {
@@ -400,11 +451,12 @@ public class PullUpMemberPage extends UserInputWizardPage {
 		super.dispose();
 	}
 
-	public Feature getDestinationType() {
-		final int index = fSuperTypesCombo.getSelectionIndex();
-		if (index >= 0)
-			return fCandidateTypes.get(index);
-		return null;
+	public Feature getDestinationFeature() {
+		final String featureName = parentFeatureCombo.getText();
+		if (featureName.isEmpty())
+			return null;
+		
+		return refactoring.getFeatureProject().getFeatureModel().getFeature(featureName);
 	}
 
 	@Override
@@ -416,15 +468,11 @@ public class PullUpMemberPage extends UserInputWizardPage {
 	}
 
 	protected String getNoMembersMessage() {
-		return RefactoringMessages.PullUpInputPage1_Select_members_to_pull_up;
+		return "No members selected to pull up";
 	}
 
 	protected String getPullUpActionLabel() {
 		return RefactoringMessages.PullUpInputPage1_pull_up;
-	}
-
-	protected String getReplaceButtonLabel() {
-		return RefactoringMessages.PullUpInputPage1_label_use_destination;
 	}
 
 	protected int getTableRowCount() {
@@ -438,44 +486,63 @@ public class PullUpMemberPage extends UserInputWizardPage {
 	}
 
 	private void initializeRefactoring() {
-		refactoring.setPullUpSignatures(getPullUpMembers());
-		refactoring.setDeletableSignatures(getDeletableMembers());
-		final Feature destination = getDestinationType();
+		final Feature destination = getDestinationFeature();
 		if (destination != null)
 			refactoring.setDestinationFeature(destination);
+		refactoring.setPullUpSignatures(getPullUpMembers(destination));
+		refactoring.setDeletableSignatures(getDeletableMembers(destination));
 	}
 
-	private Set<ExtendedPullUpSignature> getPullUpMembers() {
+	private Set<ExtendedPullUpSignature> getPullUpMembers(final Feature destinationFeature) {
 		Set<ExtendedPullUpSignature> members = new HashSet<>();
 	
 		fTableViewer.expandAll();
 		List<TreeItem> checkedItems = getCheckedElements();
+		boolean existSignatureInDestinationFeature = false;
 		for (TreeItem treeItem : checkedItems) {
-			members.add((ExtendedPullUpSignature) treeItem.getData());
+			
+			existSignatureInDestinationFeature = false;
+			for (TreeItem childItem : treeItem.getItems()) {
+				if (childItem.getData().equals(destinationFeature)) 
+				{
+					existSignatureInDestinationFeature = true;
+					break;
+				}
+			}
+			if (!existSignatureInDestinationFeature)
+			{
+				final int featureID = refactoring.getProjectSignatures().getFeatureID(refactoring.getSourceFeature().getName());
+				members.add(new ExtendedPullUpSignature( (AbstractSignature) treeItem.getData(), featureID));
+			}
 		}
 		
 		return members;
 	}
 
-	private Set<ExtendedPullUpSignature> getDeletableMembers() {
+	private Set<ExtendedPullUpSignature> getDeletableMembers(final Feature destinationFeature) {
 		Set<ExtendedPullUpSignature> members = new HashSet<>();
 		
 		fTableViewer.expandAll();
 		List<TreeItem> checkedItems = getCheckedElements();
 		for (TreeItem treeItem : checkedItems) {
 			
-			final ExtendedPullUpSignature extSignature = (ExtendedPullUpSignature) treeItem.getData();
+			final AbstractSignature signature = (AbstractSignature) treeItem.getData();
 			if (treeItem.getItemCount() > 0)
 			{
 				for (TreeItem childItem : treeItem.getItems()) {
+					if (!childItem.getChecked()) continue;
+						
 					final Feature feature = (Feature) childItem.getData();
+					if (feature.equals(destinationFeature)) continue;
+					
 					final int featureID = refactoring.getProjectSignatures().getFeatureID(feature.getName());
-					members.add(new ExtendedPullUpSignature(extSignature.getSignature(),  featureID));
+					members.add(new ExtendedPullUpSignature(signature, featureID));
 				}
 			}
 			else
 			{
-				members.add(extSignature);
+				final int featureID = refactoring.getProjectSignatures().getFeatureID(refactoring.getSourceFeature().getName());
+				members.add(new ExtendedPullUpSignature( (AbstractSignature) treeItem.getData(), featureID));
 			}
 		}
 		
@@ -528,7 +595,6 @@ public class PullUpMemberPage extends UserInputWizardPage {
 	}
 
 	private void updateWizardPage(final ISelection selection, final boolean displayErrors) {
-		fTableViewer.refresh();
 		if (selection != null) {
 			fTableViewer.getControl().setFocus();
 			fTableViewer.setSelection(selection);
@@ -546,4 +612,17 @@ public class PullUpMemberPage extends UserInputWizardPage {
 			item.setChecked(checked);
 		}
 	}
+	
+	private List<Feature> getSelectedPullUpFeatures(){
+		List<Feature> features = new ArrayList<>();
+		features.add(refactoring.getSourceFeature());
+		for (TreeItem item : fTableViewer.getTree().getItems()) {
+			for (TreeItem childItem : item.getItems()) {
+				Feature feature = (Feature) childItem.getData();
+				if (childItem.getChecked() && !features.contains(feature)) features.add(feature);
+			}
+		}
+		return features;
+	}
+	
 }

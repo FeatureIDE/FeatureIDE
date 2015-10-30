@@ -102,7 +102,7 @@ public class DeleteOperation extends AbstractFeatureModelOperation implements GU
 			}
 			Feature parent = removeFeature(element, removalMap, alreadyDeleted);
 			
-			commonAncestorList = Features.getCommonAncestor(commonAncestorList, parent);
+			commonAncestorList = Features.getCommonAncestors(commonAncestorList, parent);
 		}
 
 		removeContainedFeatures(removalMap, alreadyDeleted);
