@@ -41,15 +41,15 @@ public final class Features {
 		return result;
 	}
 
-	public static Feature getCommonAncestor(Collection<Feature> features) {
+	public static List<Feature> getCommonAncestors(Collection<Feature> features) {
 		List<Feature> commonAncestorList = null;
 		for (Feature feature : features) {
-			commonAncestorList = Features.getCommonAncestor(commonAncestorList, feature.getParent());
+			commonAncestorList = Features.getCommonAncestors(commonAncestorList, feature);
 		}
-		return commonAncestorList.get(commonAncestorList.size() - 1);
+		return commonAncestorList;
 	}
 
-	public static List<Feature> getCommonAncestor(List<Feature> commonAncestorList, Feature parent) {
+	public static List<Feature> getCommonAncestors(List<Feature> commonAncestorList, Feature parent) {
 		if (commonAncestorList == null) {
 			commonAncestorList = new LinkedList<>();
 			while (parent != null) {

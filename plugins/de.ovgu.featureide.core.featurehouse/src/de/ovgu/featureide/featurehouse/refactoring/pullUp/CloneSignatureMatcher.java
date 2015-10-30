@@ -22,6 +22,7 @@ package de.ovgu.featureide.featurehouse.refactoring.pullUp;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -60,15 +61,14 @@ public class CloneSignatureMatcher {
 	private final String absoluteFileString;
 	private final Map<AbstractSignature, List<Feature>> clonedSignatures = new HashMap<>();
 
-	public CloneSignatureMatcher(ProjectSignatures projectSignatures, IFeatureProject featureProject,
-			AbstractClassSignature signature, String absoluteFileString) {
-		this.projectSignatures = projectSignatures;
+	public CloneSignatureMatcher(IFeatureProject featureProject, AbstractClassSignature signature, String absoluteFileString) {
+		this.projectSignatures = featureProject.getProjectSignatures();
 		this.featureProject = featureProject;
 		this.classSignature = signature;
 		this.absoluteFileString = absoluteFileString;
 	}
 	
-	public void computeClonedSignatures()
+	public Map<AbstractSignature, List<Feature>> computeClonedSignatures()
 	{
 		final IPath absoluteFilePath = Path.fromOSString(absoluteFileString);
 
@@ -83,10 +83,17 @@ public class CloneSignatureMatcher {
 			} 
 		}
 		
+		Set<AbstractSignature> removableSignatures = new HashSet<>();
 		for (Entry<AbstractSignature, List<Feature>> entry : clonedSignatures.entrySet()) {
 			Feature feature = getFeatureForSignature(entry.getKey());
-			if (!entry.getValue().contains(feature)) clonedSignatures.remove(entry.getKey());
+			if (!entry.getValue().contains(feature) || entry.getValue().size() < 2) removableSignatures.add(entry.getKey());
 		}
+		
+		for (AbstractSignature abstractSignature : removableSignatures) {
+			clonedSignatures.remove(abstractSignature);
+		}
+		
+		return clonedSignatures;
 	}
 	
 	private Feature getFeatureForSignature(AbstractSignature signature){

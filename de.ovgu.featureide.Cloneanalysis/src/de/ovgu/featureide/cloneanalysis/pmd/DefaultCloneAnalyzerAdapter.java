@@ -127,7 +127,7 @@ public abstract class DefaultCloneAnalyzerAdapter<Tool> implements ICloneAnalyze
 
 		config.setLanguage(LanguageFactory.createLanguage("java"));
 		config.setDebug(false);
-		config.setMinimumTileSize(30);
+		config.setMinimumTileSize(10);
 		config.setRendererName("xml");
 
 		return config;

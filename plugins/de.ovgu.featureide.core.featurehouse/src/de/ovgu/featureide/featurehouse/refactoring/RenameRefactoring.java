@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.featurehouse.refactoring;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -221,7 +222,7 @@ public abstract class RenameRefactoring<T extends AbstractSignature> extends Ref
 	
 	protected String getFullFilePath(final String relativePath) {
 		String fileName = RefactoringUtil.getFile(relativePath).getFullPath().toString();
-		if (fileName.startsWith("/"))
+		if (fileName.startsWith(File.separator))
 			fileName = fileName.substring(1);
 		return fileName;
 	}
@@ -275,7 +276,7 @@ public abstract class RenameRefactoring<T extends AbstractSignature> extends Ref
 		changes.add(change);
 		
 		if (willRenameCU(refactoringSig, status)) {
-			String filePath = "/" + ifile.getProject().getName() + "/" + ifile.getProjectRelativePath();
+			String filePath = File.separator + ifile.getProject().getName() + File.separator + ifile.getProjectRelativePath();
 			RenameResourceChange resourceChange = new RenameResourceChange(new Path(filePath), newName + ".java");
 			resourceChange.initializeValidationData(null);
 			changes.add(resourceChange);
