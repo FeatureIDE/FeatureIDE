@@ -25,15 +25,14 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.AUTO_LAYOUT_CO
 import java.util.LinkedList;
 
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AutoLayoutConstraintOperation;
 
 /**
@@ -44,10 +43,10 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AutoLayoutConstr
  */
 public class AutoLayoutConstraintAction extends Action {
 
-	private final IFeatureModel featureModel;
+	private final IGraphicalFeatureModel featureModel;
 	private LinkedList<LinkedList<Point>> oldPos = new LinkedList<LinkedList<Point>>();
 
-	public AutoLayoutConstraintAction(GraphicalViewerImpl viewer, IFeatureModel featureModel) {
+	public AutoLayoutConstraintAction(GraphicalViewerImpl viewer, IGraphicalFeatureModel featureModel) {
 		super(AUTO_LAYOUT_CONSTRAINTS);
 		this.featureModel = featureModel;
 	}
@@ -55,13 +54,14 @@ public class AutoLayoutConstraintAction extends Action {
 	@Override
 	public void run() {
 		LinkedList<Point> newList = new LinkedList<Point>();
-		for (int i = 0; i < featureModel.getConstraintCount(); i++) {
+		for (int i = 0; i < featureModel.getConstraints().size(); i++) {
 			newList.add(FeatureUIHelper.getLocation(featureModel.getConstraints().get(i)).getCopy());
 		}
 		int counter = oldPos.size();
 		oldPos.add(newList);
 		AutoLayoutConstraintOperation op = new AutoLayoutConstraintOperation(featureModel, oldPos, counter);
-		op.addContext((IUndoContext) featureModel.getUndoContext());
+		//TODO _interfaces Removed Code
+//		op.addContext((IUndoContext) featureModel.getUndoContext());
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);

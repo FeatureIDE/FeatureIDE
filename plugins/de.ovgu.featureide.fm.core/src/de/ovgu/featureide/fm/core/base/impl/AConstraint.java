@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
-import java.beans.PropertyChangeEvent;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.LinkedList;
@@ -34,7 +33,7 @@ import de.ovgu.featureide.fm.core.FeatureComparator;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.IGraphicalConstraint;
+import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
@@ -53,23 +52,23 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 
 	protected final Collection<IFeature> falseOptionalFeatures = new LinkedList<>();
 
-	protected IGraphicalConstraint graphicalRepresentation;
+//	protected IGraphicalConstraint graphicalRepresentation;
 
-	protected final Node propNode;
+	protected Node propNode;
 	boolean featureSelected;
 
 	protected AConstraint(AConstraint oldConstraint, IFeatureModel featureModel) {
 		super(oldConstraint, featureModel);
 		this.propNode = oldConstraint.propNode;
 		this.featureSelected = oldConstraint.featureSelected;
-		this.graphicalRepresentation = GraphicMap.getInstance().getGraphicRepresentation(this);
+//		this.graphicalRepresentation = GraphicMap.getInstance().getGraphicRepresentation(this);
 	}
 
 	public AConstraint(IFeatureModel featureModel, Node propNode) {
 		super(featureModel);
 		this.propNode = propNode;
 		this.featureSelected = false;
-		this.graphicalRepresentation = GraphicMap.getInstance().getGraphicRepresentation(this);
+//		this.graphicalRepresentation = GraphicMap.getInstance().getGraphicRepresentation(this);
 	}
 
 	@Override
@@ -125,11 +124,6 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 	}
 
 	@Override
-	public IFeatureModel getFeatureModel() {
-		return featureModel;
-	}
-
-	@Override
 	public Node getNode() {
 		return propNode;
 	}
@@ -153,7 +147,7 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 	public void setConstraintAttribute(ConstraintAttribute attri, boolean fire) {
 		attribute = attri;
 		if (fire) {
-			fireEvent(new PropertyChangeEvent(this, ATTRIBUTE_CHANGED, Boolean.FALSE, Boolean.TRUE));
+			fireEvent(new FeatureModelEvent(this, ATTRIBUTE_CHANGED, Boolean.FALSE, Boolean.TRUE));
 		}
 	}
 
@@ -182,10 +176,10 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 		return !falseOptionalFeatures.isEmpty();
 	}
 
-	@Override
-	public IGraphicalConstraint getGraphicRepresenation() {
-		return graphicalRepresentation;
-	}
+//	@Override
+//	public IGraphicalConstraint getGraphicRepresenation() {
+//		return graphicalRepresentation;
+//	}
 
 	@Override
 	public boolean isFeatureSelected() {
@@ -195,7 +189,11 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 	@Override
 	public void setFeatureSelected(boolean b) {
 		featureSelected = b;
-		fireEvent(new PropertyChangeEvent(this, CONSTRAINT_SELECTED, Boolean.FALSE, Boolean.TRUE));
+		fireEvent(new FeatureModelEvent(this, CONSTRAINT_SELECTED, Boolean.FALSE, Boolean.TRUE));
+	}
+
+	public void setNode(Node node) {
+		this.propNode = node;
 	}
 
 }

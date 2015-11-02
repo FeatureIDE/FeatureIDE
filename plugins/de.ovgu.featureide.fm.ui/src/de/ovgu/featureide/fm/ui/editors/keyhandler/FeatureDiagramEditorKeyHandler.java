@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.keyhandler;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 
 import org.eclipse.gef.KeyHandler;
@@ -32,10 +30,12 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.events.KeyEvent;
 
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.IFeatureModelListener;
+import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
 
@@ -52,15 +52,15 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
  * @author Guenter Ulreich
  * @author Andy Koch
  */
-public class FeatureDiagramEditorKeyHandler extends KeyHandler implements PropertyChangeListener {
+public class FeatureDiagramEditorKeyHandler extends KeyHandler implements IFeatureModelListener {
 
 	private static final long timeoutThreshold = 1000;
-	private final IFeatureModel featureModel;
+	private final IGraphicalFeatureModel featureModel;
 	private final GraphicalViewerKeyHandler gvKeyHandler;
 	private final KeyHandler alternativeKeyHandler;
 	private final FeatureDiagramEditor viewer;
 
-	private final ArrayList<String> featureList = new ArrayList<String>();
+	private final ArrayList<String> featureList = new ArrayList<>();
 
 	private int curIndex;
 	private String curSearchString;
@@ -70,7 +70,7 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements Proper
 	 * alternativeKeyHandler handles the KeyEvents, if the
 	 * GraphicalViewerKeyHandler is active for auto-layout
 	 */
-	public FeatureDiagramEditorKeyHandler(FeatureDiagramEditor view, IFeatureModel featureModel) {
+	public FeatureDiagramEditorKeyHandler(FeatureDiagramEditor view, IGraphicalFeatureModel featureModel) {
 		super();
 
 		this.featureModel = featureModel;
@@ -83,7 +83,7 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements Proper
 		this.lastTime = 0;
 
 		resetFeatureList();
-		featureModel.addListener(this);
+		featureModel.getFeatureModel().addListener(this);
 	}
 
 	@Override
@@ -98,7 +98,7 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements Proper
 	@Override
 	public boolean keyPressed(KeyEvent e) {
 		if (Character.isISOControl(e.character)) {
-			if (featureModel.getGraphicRepresenation().getLayout().hasFeaturesAutoLayout()) {
+			if (featureModel.getLayout().hasFeaturesAutoLayout()) {
 				return gvKeyHandler.keyPressed(e);
 			} else {
 				return super.keyPressed(e);
@@ -122,7 +122,7 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements Proper
 		final int foundIndex = search();
 		if (foundIndex >= 0) {
 			// select the new feature
-			final IFeature curFeature = featureModel.getFeature(featureList.get(foundIndex));
+			final IFeature curFeature = featureModel.getFeatureModel().getFeature(featureList.get(foundIndex));
 			if (curFeature != null) {
 				FeatureEditPart part = (FeatureEditPart) viewer.getEditPartRegistry().get(curFeature);
 				viewer.setSelection(new StructuredSelection(part));
@@ -135,7 +135,7 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements Proper
 	}
 
 	@Override
-	public void propertyChange(PropertyChangeEvent event) {
+	public void propertyChange(FeatureModelEvent event) {
 		resetFeatureList();
 	}
 
@@ -150,7 +150,12 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements Proper
 
 	private void resetFeatureList() {
 		featureList.clear();
-		featureList.addAll(FeatureUtils.getFeatureNamesPreorder(featureModel));
+		featureList.addAll(Functional.toList(Functional.map(featureModel.getFeatureModel().getFeatures(), new Functional.IFunction<IFeature, String>() {
+			@Override
+			public String invoke(IFeature t) {
+				return t.getName();
+			}
+		})));
 		curSearchString = "";
 		curIndex = 0;
 	}
@@ -173,7 +178,7 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements Proper
 			final String featureName;
 
 			if (element instanceof FeatureEditPart) {
-				featureName = ((FeatureEditPart) element).getFeature().getName();
+				featureName = ((FeatureEditPart) element).getFeature().getObject().getName();
 			} else if (element instanceof IFeature) {
 				featureName = ((IFeature) element).getName();
 			} else {

@@ -26,12 +26,9 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import de.ovgu.featureide.fm.core.Constraint;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.filter.base.IFilter;
 
 /**
@@ -195,10 +192,14 @@ public abstract class Functional {
 		 * @since 2.7.5
 		 */
 		public FilterIterator(Iterable<T> it, IFilter<U> filter) {
+			this(it.iterator(), filter);
+		}
+		
+		public FilterIterator(Iterator<T> it, IFilter<U> filter) {
 			assert (it != null);
 			assert (filter != null);
 
-			this.collectionIterator = it.iterator();
+			this.collectionIterator = it;
 			this.filter = filter;
 		}
 
@@ -247,6 +248,10 @@ public abstract class Functional {
 	 * @since 2.7.5
 	 */
 	public static <U, T extends U> Iterable<T> filter(final Iterable<T> source, final IFilter<U> predicate) {
+		return new FilterIterator<U, T>(source, predicate);
+	}
+	
+	public static <U, T extends U> Iterable<T> filter(final Iterator<T> source, final IFilter<U> predicate) {
 		return new FilterIterator<U, T>(source, predicate);
 	}
 
@@ -303,7 +308,7 @@ public abstract class Functional {
 		for (T t : source) {
 			retval.add(t);
 		}
-		return Collections.unmodifiableList(retval);
+		return retval;
 	}
 
 	/**

@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.base;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.Collection;
 import java.util.Hashtable;
@@ -34,6 +32,7 @@ import de.ovgu.featureide.fm.core.FMComposerManager;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.IFMComposerExtension;
 import de.ovgu.featureide.fm.core.RenamingsManager;
+import de.ovgu.featureide.fm.core.base.event.IEventManager;
 
 /**
  * Interface for a class that represents a feature model.</br>
@@ -42,7 +41,7 @@ import de.ovgu.featureide.fm.core.RenamingsManager;
  * @author Sebastian Krieter
  * @author Marcus Pinnecke
  */
-public interface IFeatureModel extends Cloneable {
+public interface IFeatureModel extends Cloneable, IEventManager {
 	
 	long getId();
 
@@ -51,8 +50,6 @@ public interface IFeatureModel extends Cloneable {
 	void addConstraint(IConstraint constraint, int index);
 
 	boolean addFeature(IFeature feature);
-
-	void addListener(PropertyChangeListener listener);
 
 	IFeatureModel clone(IFeature newRoot);
 
@@ -63,8 +60,6 @@ public interface IFeatureModel extends Cloneable {
 	boolean deleteFeature(IFeature feature);
 
 	void deleteFeatureFromTable(IFeature feature);
-
-	void fireEvent(PropertyChangeEvent event);
 
 	FeatureModelAnalyzer getAnalyser();
 
@@ -104,8 +99,6 @@ public interface IFeatureModel extends Cloneable {
 
 	void removeConstraint(int index);
 
-	void removeListener(PropertyChangeListener listener);
-
 	void replaceConstraint(IConstraint constraint, int index);
 
 	void reset();
@@ -118,11 +111,7 @@ public interface IFeatureModel extends Cloneable {
 
 	void setFeatureTable(final Hashtable<String, IFeature> featureTable);
 
-	IGraphicalFeatureModel getGraphicRepresenation(); // Added, Marcus Pinnecke 31.08.15
-
 	Map<String, IFeature> getFeatureTable(); // Added, Marcus Pinnecke 31.08.15
-
-	IFeatureModelLayout getLayout(); // Added, Marcus Pinnecke 13.09.15
 
 	IFeatureModel clone();
 

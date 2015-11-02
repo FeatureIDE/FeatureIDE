@@ -18,9 +18,9 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core;
+package de.ovgu.featureide.fm.ui.editors.featuremodel.layouts;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModelLayout;
+import org.eclipse.draw2d.geometry.Point;
 
 /**
  * Encapsulates layout functionality for the feature model.
@@ -31,7 +31,7 @@ public class FeatureModelLayout implements IFeatureModelLayout {
 	private boolean autoLayoutLegend;
 	private boolean showHiddenFeatures;
 	private boolean hasVerticalLayout;
-	private FMPoint legendPos;
+	private Point legendPos;
 
 	private int selectedLayoutAlgorithm;
 	
@@ -39,7 +39,7 @@ public class FeatureModelLayout implements IFeatureModelLayout {
 		this.autoLayoutLegend = true;
 		this.showHiddenFeatures = true;
 		this.hasVerticalLayout = true;
-		this.legendPos = new FMPoint(0, 0);
+		this.legendPos = new Point(0, 0);
 		this.selectedLayoutAlgorithm = 1;
 	}
 	
@@ -47,7 +47,7 @@ public class FeatureModelLayout implements IFeatureModelLayout {
 		this.autoLayoutLegend = featureModelLayout.autoLayoutLegend;
 		this.showHiddenFeatures = featureModelLayout.showHiddenFeatures;
 		this.hasVerticalLayout = featureModelLayout.hasVerticalLayout;
-		this.legendPos = new FMPoint(featureModelLayout.legendPos.getX(), featureModelLayout.legendPos.getY());
+		this.legendPos = featureModelLayout.legendPos.getCopy();
 		this.selectedLayoutAlgorithm = featureModelLayout.selectedLayoutAlgorithm;
 	}
 
@@ -82,13 +82,13 @@ public class FeatureModelLayout implements IFeatureModelLayout {
 	}
 
 	@Override
-	public FMPoint getLegendPos() {
+	public Point getLegendPos() {
 		return legendPos;
 	}
 
 	@Override
 	public void setLegendPos(int x, int y) {
-		this.legendPos = new FMPoint(x, y);
+		this.legendPos = new Point(x, y);
 	}
 
 	@Override

@@ -36,11 +36,12 @@ import org.eclipse.jface.viewers.TextCellEditor;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.core.base.impl.Feature;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureCellEditorLocator;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureLabelEditManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
 
 /**
  * Operation with functionality to create a layer feature. Enables
@@ -79,8 +80,10 @@ public class FeatureCreateLayerOperation extends AbstractFeatureModelOperation {
 		featureModel.addFeature(newFeature);
 		feature = featureModel.getFeature(feature.getName());
 		feature.getStructure().addChild(newFeature.getStructure());
-		FeatureDiagramLayoutHelper.initializeLayerFeaturePosition(featureModel, newFeature, feature);
 
+		//TODO _interfaces Romved Code
+//		FeatureDiagramLayoutHelper.initializeLayerFeaturePosition(featureModel, newFeature, feature);
+		featureModel.fireEvent(new FeatureModelEvent(newFeature, PropertyConstants.FEATURE_ADD, null, null));
 		/*
 		 * the model must be refreshed here else the new feature will not be found
 		 */

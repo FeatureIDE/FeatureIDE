@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.base;
 
+import java.io.File;
+
 import org.prop4j.Node;
 
 /**
@@ -29,18 +31,14 @@ import org.prop4j.Node;
  */
 public interface IFeatureModelFactory {
 
-	CharSequence getId();
-	
+	String getId();
+
 	IConstraint createConstraint(IFeatureModel featureModel, Node propNode);
 
 	IFeature createFeature(IFeatureModel featureModel, String name);
 
 	IFeatureModel createFeatureModel();
 
-	IGraphicalConstraint createGraphicalRepresentation(IConstraint constraint);
-
-	IGraphicalFeature createGraphicalRepresentation(IFeature feature);
-
-	IGraphicalFeatureModel createGraphicalRepresentation(IFeatureModel featureModel);
+	IFeatureModel loadFeatureModel(File file);
 
 }

@@ -28,7 +28,7 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
 
 /**
@@ -38,7 +38,8 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
  */
 public class LegendLayoutAction extends Action {
 
-	private IFeatureModel featureModel;
+	private IGraphicalFeatureModel featureModel;
+
 	private ISelectionChangedListener listener = new ISelectionChangedListener() {
 		public void selectionChanged(SelectionChangedEvent event) {
 			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
@@ -46,7 +47,7 @@ public class LegendLayoutAction extends Action {
 		}
 	};
 
-	public LegendLayoutAction(GraphicalViewerImpl viewer, IFeatureModel featuremodel) {
+	public LegendLayoutAction(GraphicalViewerImpl viewer, IGraphicalFeatureModel featuremodel) {
 		super(AUTO_LAYOUT_LEGEND);
 		this.featureModel = featuremodel;
 		this.setEnabled(false);
@@ -67,19 +68,19 @@ public class LegendLayoutAction extends Action {
 	@Override
 	public void run() {
 		super.run();
-		if (featureModel.getGraphicRepresenation().getLayout().hasLegendAutoLayout()) {
-			featureModel.getGraphicRepresenation().getLayout().setLegendAutoLayout(false);
+		if (featureModel.getLayout().hasLegendAutoLayout()) {
+			featureModel.getLayout().setLegendAutoLayout(false);
 			this.setChecked(false);
 		} else {
-			featureModel.getGraphicRepresenation().getLayout().setLegendAutoLayout(true);
+			featureModel.getLayout().setLegendAutoLayout(true);
 			this.setChecked(true);
-			featureModel.handleModelDataChanged();
+			featureModel.getFeatureModel().handleModelDataChanged();
 		}
 
 	}
 
 	public void refresh() {
-		if (featureModel.getGraphicRepresenation().getLayout().hasLegendAutoLayout()) {
+		if (featureModel.getLayout().hasLegendAutoLayout()) {
 			this.setChecked(true);
 		} else {
 			this.setChecked(false);

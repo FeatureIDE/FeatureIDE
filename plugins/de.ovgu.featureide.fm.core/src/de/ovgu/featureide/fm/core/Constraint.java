@@ -23,24 +23,14 @@ package de.ovgu.featureide.fm.core;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.TreeSet;
 
 import org.prop4j.Node;
-import org.prop4j.NodeWriter;
 import org.prop4j.SatSolver;
 
-import de.ovgu.featureide.fm.core.ConstraintAttribute;
-import de.ovgu.featureide.fm.core.FMPoint;
-import de.ovgu.featureide.fm.core.FeatureComparator;
-import de.ovgu.featureide.fm.core.IGraphicItem;
-import de.ovgu.featureide.fm.core.PropertyConstants;
-import de.ovgu.featureide.fm.core.IGraphicItem.GraphicItem;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
-import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**

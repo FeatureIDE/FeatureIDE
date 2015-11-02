@@ -24,8 +24,8 @@ import org.eclipse.draw2d.AbstractConnectionAnchor;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.geometry.Point;
 
-import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 
 /**
  * Used to get the point where all connections from child features end.
@@ -34,9 +34,9 @@ import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
  */
 public class TargetAnchor extends AbstractConnectionAnchor {
 
-	private IFeature model;
+	private IGraphicalFeature model;
 
-	public TargetAnchor(IFigure owner, IFeature model) {
+	public TargetAnchor(IFigure owner, IGraphicalFeature model) {
 		super(owner);
 		this.model = model;
 	}

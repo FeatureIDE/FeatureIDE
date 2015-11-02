@@ -20,9 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Hashtable;
@@ -35,20 +34,20 @@ import org.eclipse.core.resources.IProject;
 import org.prop4j.NodeWriter;
 
 import de.ovgu.featureide.fm.core.FMComposerManager;
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
-import de.ovgu.featureide.fm.core.FeatureModelLayout;
 import de.ovgu.featureide.fm.core.IFMComposerExtension;
-import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.RenamingsManager;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.IFeatureModelLayout;
 import de.ovgu.featureide.fm.core.base.IFeatureModelProperty;
 import de.ovgu.featureide.fm.core.base.IFeatureModelStructure;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.core.base.IGraphicalFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.IFeatureModelListener;
+import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.core.filter.ConcreteFeatureFilter;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
@@ -63,9 +62,9 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  * 
  */
 public class FeatureModel implements IFeatureModel, PropertyConstants {
-	
+
 	private static long NEXT_ID = 0;
-	
+
 	protected static final synchronized long getNextId() {
 		return NEXT_ID++;
 	}
@@ -73,7 +72,7 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	private long id;
 
 	private long nextElementId = 0;
-	
+
 	public final synchronized long getNextElementId() {
 		return nextElementId++;
 	}
@@ -94,17 +93,13 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 
 	protected FMComposerManager fmComposerManager = null;
 
-	protected final List<PropertyChangeListener> listenerList = new LinkedList<>();
+	protected final ArrayList<IFeatureModelListener> listenerList = new ArrayList<>();
 
 	protected final IFeatureModelProperty property;
 
 	protected final RenamingsManager renamingsManager = new RenamingsManager(this);
 
 	protected final IFeatureModelStructure structure;
-
-	protected final IGraphicalFeatureModel graphicalFeatureModel;
-
-	protected final IFeatureModelLayout modelLayout;
 
 	protected Object undoContext = null;
 	private File sourceFile;
@@ -116,8 +111,6 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 
 		property = createProperty();
 		structure = createStructure();
-		graphicalFeatureModel = createGraphicalFeatureModel();
-		modelLayout = createFeatureModelLayout();
 	}
 
 	protected FeatureModel(FeatureModel oldFeatureModel, IFeature newRoot) {
@@ -127,8 +120,6 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 
 		property = oldFeatureModel.getProperty().clone(this);
 		structure = createStructure();
-		graphicalFeatureModel = oldFeatureModel.getGraphicRepresenation(); // TODO: Marcus XXX clone here?
-		modelLayout = oldFeatureModel.getLayout();
 
 		this.sourceFile = oldFeatureModel.sourceFile;
 
@@ -145,7 +136,6 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 				}
 			}
 		}
-		//		}
 	}
 
 	protected IFeatureModelProperty createProperty() {
@@ -154,14 +144,6 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 
 	protected IFeatureModelStructure createStructure() {
 		return new FeatureModelStructure(this);
-	}
-
-	protected IGraphicalFeatureModel createGraphicalFeatureModel() {
-		return GraphicMap.getInstance().getGraphicRepresentation(this);
-	}
-
-	private IFeatureModelLayout createFeatureModelLayout() {
-		return new FeatureModelLayout();
 	}
 
 	@Override
@@ -185,7 +167,7 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	}
 
 	@Override
-	public void addListener(PropertyChangeListener listener) {
+	public void addListener(IFeatureModelListener listener) {
 		if (!listenerList.contains(listener)) {
 			listenerList.add(listener);
 		}
@@ -263,14 +245,29 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	}
 
 	@Override
-	public void fireEvent(PropertyChangeEvent event) {
-		for (final PropertyChangeListener listener : listenerList) {
-			listener.propertyChange(event);
+	public void fireEvent(FeatureModelEvent event) {
+		if (event.isPersistent() || event.getEditor() == null) {
+			for (final IFeatureModelListener listener : listenerList) {
+				try {
+					listener.propertyChange(event);
+				} catch (Exception e) {
+					FMCorePlugin.getDefault().logError(e);
+				}
+			}
+		} else {
+			final int listenerIndex = listenerList.indexOf(event.getEditor());
+			if (listenerIndex >= 0) {
+				try {
+					listenerList.get(listenerIndex).propertyChange(event);
+				} catch (Exception e) {
+					FMCorePlugin.getDefault().logError(e);
+				}
+			}
 		}
 	}
 
 	protected void fireEvent(final String action) {
-		fireEvent(new PropertyChangeEvent(this, action, Boolean.FALSE, Boolean.TRUE));
+		fireEvent(new FeatureModelEvent(this, action, Boolean.FALSE, Boolean.TRUE));
 	}
 
 	@Override
@@ -402,7 +399,7 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	}
 
 	@Override
-	public void removeListener(PropertyChangeListener listener) {
+	public void removeListener(IFeatureModelListener listener) {
 		listenerList.remove(listener);
 	}
 
@@ -452,18 +449,8 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	}
 
 	@Override
-	public IGraphicalFeatureModel getGraphicRepresenation() {
-		return graphicalFeatureModel;
-	}
-
-	@Override
 	public Map<String, IFeature> getFeatureTable() {
 		return featureTable;
-	}
-
-	@Override
-	public IFeatureModelLayout getLayout() {
-		return modelLayout;
 	}
 
 	@Override
@@ -518,10 +505,6 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 
 	@Override
 	public String toString() {
-		// ! DO NOT CHANGE THIS !
-		// The method call is required for hashCode and equals and might damage some
-		// behavior if after a changes two not identical models are represented with
-		// the same string
 		StringBuilder sb = new StringBuilder("FeatureModel(");
 		if (getStructure().getRoot() != null) {
 			sb.append("Structure=[");
@@ -567,32 +550,11 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 		return this.sourceFile;
 	}
 
-//	@Override
-//	public int hashCode() {
-//		return toString().hashCode();
-//	}
-//
-//	@Override
-//	public boolean equals(Object obj) {
-//		if (this == obj)
-//			return true;
-//		if (obj == null || getClass() != obj.getClass())
-//			return false;
-//		FeatureModel other = (FeatureModel) obj;
-//		if (structure == null) {
-//			if (other.structure != null) {
-//				return false;
-//			}
-//		} else
-//			return this.toString().equals(obj.toString());
-//		return false;
-//	}
-
 	@Override
 	public long getId() {
 		return id;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return (int) (37 * id);

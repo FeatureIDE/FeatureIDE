@@ -609,7 +609,7 @@ public class ConstraintDialog implements GUIDefaults {
 			int index = 0;
 			for (IConstraint c : featureModel.getConstraints()) {
 				if (c == constraint) {
-					op = new ConstraintEditOperation(propNode, featureModel, index);
+					op = new ConstraintEditOperation(constraint, propNode);
 					break;
 				}
 				index++;

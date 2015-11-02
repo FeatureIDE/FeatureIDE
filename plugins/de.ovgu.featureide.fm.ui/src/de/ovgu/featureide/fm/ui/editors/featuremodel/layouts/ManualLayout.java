@@ -20,10 +20,10 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.layouts;
 
-import de.ovgu.featureide.fm.core.base.IConstraint;
-import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
  * Layouts the features at the feature diagram using their saved Positions.
@@ -40,12 +40,12 @@ public class ManualLayout extends FeatureDiagramLayoutManager {
 		super();
 	}
 
-	public void layoutFeatureModel(IFeatureModel featureModel) {
-		for (IFeature feature : featureModel.getFeatures()) {
-			FeatureUIHelper.setLocation(feature, feature.getGraphicRepresenation().getLocation());
+	public void layoutFeatureModel(IGraphicalFeatureModel featureModel) {
+		for (IGraphicalFeature feature : featureModel.getFeatures()) {
+			FeatureUIHelper.setLocation(feature, feature.getLocation());
 		}
-		for (IConstraint constraint : featureModel.getConstraints()) {
-			FeatureUIHelper.setLocation(constraint, constraint.getGraphicRepresenation().getLocation());
+		for (IGraphicalConstraint constraint : featureModel.getConstraints()) {
+			FeatureUIHelper.setLocation(constraint, constraint.getLocation());
 		}
 	}
 }

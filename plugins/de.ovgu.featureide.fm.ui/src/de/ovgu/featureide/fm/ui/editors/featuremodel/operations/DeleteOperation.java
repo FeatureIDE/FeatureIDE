@@ -53,6 +53,8 @@ import de.ovgu.featureide.fm.core.FeatureDependencies;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.Constraint;
+import de.ovgu.featureide.fm.core.base.impl.Feature;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.DeleteOperationAlternativeDialog;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
@@ -68,12 +70,11 @@ import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePage;
  */
 public class DeleteOperation extends AbstractFeatureModelOperation implements GUIDefaults {
 
-	private static final String LABEL = DELETE;
 	private Object viewer;
 	private Deque<AbstractFeatureModelOperation> operations = new LinkedList<AbstractFeatureModelOperation>();
 
 	public DeleteOperation(Object viewer, IFeatureModel featureModel) {
-		super(featureModel, LABEL);
+		super(featureModel, DELETE);
 		this.viewer = viewer;
 	}
 
@@ -156,7 +157,7 @@ public class DeleteOperation extends AbstractFeatureModelOperation implements GU
 	 */
 	private boolean removeConstraint(Object element) {
 		if (element instanceof ConstraintEditPart) {
-			IConstraint constraint = ((ConstraintEditPart) element).getConstraintModel();
+			IConstraint constraint = ((ConstraintEditPart) element).getConstraintModel().getObject();
 			executeOperation(new ConstraintDeleteOperation(constraint, featureModel));
 			return true;
 		} else if (element instanceof IConstraint) {
@@ -179,7 +180,7 @@ public class DeleteOperation extends AbstractFeatureModelOperation implements GU
 		if (element instanceof IFeature) {
 			feature = ((IFeature) element);
 		} else if (element instanceof FeatureEditPart) {
-			feature = ((FeatureEditPart) element).getFeature();
+			feature = ((FeatureEditPart) element).getFeature().getObject();
 		}
 		if (feature != null) {
 			final IFeature parent = feature.getStructure().getParent().getFeature();

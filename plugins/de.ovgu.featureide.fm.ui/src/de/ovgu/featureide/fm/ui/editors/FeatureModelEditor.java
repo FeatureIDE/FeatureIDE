@@ -80,13 +80,14 @@ import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.FeatureModelFile;
-import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
-import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
 import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
+import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
 import de.ovgu.featureide.fm.core.io.ModelIOFactory;
 import de.ovgu.featureide.fm.core.io.ModelWarning;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
@@ -117,7 +118,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 
 	FeatureModelFile fmFile;
 	boolean isPageModified = false;
-	AbstractFeatureModelWriter featureModelWriter;
+	IFeatureModelWriter featureModelWriter;
 
 	private AbstractFeatureModelReader featureModelReader;
 	private IFile file;
@@ -399,7 +400,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 		} else {
 			diagramEditor.getControl().getDisplay().asyncExec(new Runnable() {
 				public void run() {
-					diagramEditor.setContents(featureModel);
+					diagramEditor.setContents(diagramEditor.getGraphicalFeatureModel());
 					pageChange(getDiagramEditorIndex());
 					readModel();
 				}
@@ -458,8 +459,9 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 
 		readModel();
 
-		FeatureUIHelper.showHiddenFeatures(featureModel.getGraphicRepresenation().getLayout().showHiddenFeatures(), featureModel);
-		FeatureUIHelper.setVerticalLayoutBounds(featureModel.getGraphicRepresenation().getLayout().verticalLayout(), featureModel);
+// TODO _Interfaces Removed Code
+//		FeatureUIHelper.showHiddenFeatures(featureModel.getGraphicRepresenation().getLayout().showHiddenFeatures(), featureModel);
+//		FeatureUIHelper.setVerticalLayoutBounds(featureModel.getGraphicRepresenation().getLayout().verticalLayout(), featureModel);
 
 		getExtensions();
 
@@ -718,7 +720,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 						try {
 							final IFile editorFile = (IFile) editorRef.getEditorInput().getAdapter(IFile.class);
 							if (editorFile.getProject().equals(project)) {
-								((ConfigurationEditor) editorRef.getEditor(true)).propertyChange(new PropertyChangeEvent(file,
+								((ConfigurationEditor) editorRef.getEditor(true)).propertyChange(new FeatureModelEvent(file,
 										PropertyConstants.MODEL_DATA_CHANGED, null, null));
 							}
 						} catch (PartInitException e) {

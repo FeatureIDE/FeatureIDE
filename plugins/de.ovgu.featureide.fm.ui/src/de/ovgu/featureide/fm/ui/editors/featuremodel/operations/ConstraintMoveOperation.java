@@ -21,12 +21,10 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.MOVE_CONSTRAINT;
-
-import org.eclipse.draw2d.geometry.Point;
-
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 
 /**
  * Operation with functionality to move Constraints. Provides undo/redo
@@ -36,38 +34,30 @@ import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
  */
 public class ConstraintMoveOperation extends AbstractFeatureModelOperation {
 
-	private static final String LABEL = MOVE_CONSTRAINT;
-
 	private IConstraint constraint;
 	private int index;
 
 	private int oldIndex;
 
-	private Point newPos;
-	private Point oldPos;
-
-	public ConstraintMoveOperation(IConstraint constraint, IFeatureModel featureModel, int newIndex, int oldIndex, boolean isLastPos, Point newPos, Point oldPos) {
-
-		super(featureModel, LABEL);
+	public ConstraintMoveOperation(IConstraint constraint, IFeatureModel featureModel, int newIndex, int oldIndex) {
+		super(featureModel, MOVE_CONSTRAINT);
 		this.constraint = constraint;
 		this.index = newIndex;
 		this.oldIndex = oldIndex;
-		this.newPos = newPos;
-		this.oldPos = oldPos;
 	}
 
 	@Override
 	protected void redo() {
 		featureModel.removeConstraint(constraint);
 		featureModel.addConstraint(constraint, index);
-		FeatureUIHelper.setLocation(featureModel.getConstraints().get(index), newPos);
+		featureModel.fireEvent(new FeatureModelEvent(constraint, PropertyConstants.CONSTRAINT_MOVE, oldIndex, index));
 	}
 
 	@Override
 	protected void undo() {
 		featureModel.removeConstraint(constraint);
 		featureModel.addConstraint(constraint, oldIndex);
-		FeatureUIHelper.setLocation(featureModel.getConstraints().get(index), oldPos);
+		featureModel.fireEvent(new FeatureModelEvent(constraint, PropertyConstants.CONSTRAINT_MOVE, index, oldIndex));
 	}
 
 }

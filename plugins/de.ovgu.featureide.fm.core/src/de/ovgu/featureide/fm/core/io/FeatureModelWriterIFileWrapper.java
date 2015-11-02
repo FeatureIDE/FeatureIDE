@@ -39,9 +39,9 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  */
 public class FeatureModelWriterIFileWrapper extends AbstractFeatureModelWriter {
 
-	private AbstractFeatureModelWriter writer;
+	private IFeatureModelWriter writer;
 
-	public FeatureModelWriterIFileWrapper(AbstractFeatureModelWriter writer) {
+	public FeatureModelWriterIFileWrapper(IFeatureModelWriter writer) {
 		this.writer = writer;
 	}
 

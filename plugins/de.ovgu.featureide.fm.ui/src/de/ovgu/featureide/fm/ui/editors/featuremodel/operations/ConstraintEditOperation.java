@@ -24,9 +24,9 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.EDIT_CONSTRAIN
 
 import org.prop4j.Node;
 
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 
 /**
  * Operation with functionality to edit a constraint. Enables undo/redo
@@ -36,30 +36,27 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayou
  */
 public class ConstraintEditOperation extends AbstractFeatureModelOperation {
 
-	private static final String LABEL = EDIT_CONSTRAINT;
-	private Node propNode;
-	private int index;
-	private Node oldPropNode;
+	private IConstraint constraint;
+	private Node newNode;
+	private Node oldNode;
 
-	public ConstraintEditOperation(Node propNode, IFeatureModel featuremodel, int index) {
-		super(featuremodel, LABEL);
-		this.propNode = propNode;
-		this.index = index;
+	public ConstraintEditOperation(IConstraint constraint, Node propNode) {
+		super(constraint.getFeatureModel(), EDIT_CONSTRAINT);
+		this.newNode = propNode;
+		this.oldNode = constraint.getNode();
+		this.constraint = constraint;
 	}
 
 	@Override
 	protected void redo() {
-		oldPropNode = featureModel.getConstraints().get(index).getNode();
-		FeatureUtils.replacePropNode(featureModel, index, propNode);
-		FeatureDiagramLayoutHelper.initializeConstraintPosition(featureModel, index);
+		constraint.setNode(newNode);
+		featureModel.fireEvent(new FeatureModelEvent(constraint, PropertyConstants.CONSTRAINT_MODIFY, oldNode, newNode));
 	}
 
 	@Override
 	protected void undo() {
-		FeatureUtils.replacePropNode(featureModel, index, oldPropNode);
-		//initialize constraint position in manual layout
-		if (!featureModel.getGraphicRepresenation().getLayout().hasFeaturesAutoLayout())
-			FeatureDiagramLayoutHelper.initializeConstraintPosition(featureModel, index);
+		constraint.setNode(oldNode);
+		featureModel.fireEvent(new FeatureModelEvent(constraint, PropertyConstants.CONSTRAINT_MODIFY, newNode, oldNode));
 	}
 
 }

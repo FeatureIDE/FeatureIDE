@@ -49,14 +49,6 @@ public interface IFeatureModelWriter {
 	 * Saves a feature model to a file.
 	 * 
 	 * @param file
-	 * @throws CoreException
-	 */
-//	public abstract void writeToFile(IFile file) throws CoreException;
-	
-	/**
-	 * Saves a feature model to a file.
-	 * 
-	 * @param file
 	 * @throws org.eclipse.core.runtime.CoreException
 	 */
 	public abstract void writeToFile(File file);

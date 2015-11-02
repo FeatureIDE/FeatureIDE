@@ -39,12 +39,13 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.core.base.impl.Feature;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureCellEditorLocator;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureLabelEditManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
 
 /**
  * Operation with functionality to create a compound feature. Enables undo/redo
@@ -114,7 +115,7 @@ public class FeatureCreateCompoundOperation extends AbstractFeatureModelOperatio
 		if (parent != null) {
 			LinkedList<IFeature> newChildren = new LinkedList<IFeature>();
 			for (IFeatureStructure featureStructure : parent.getStructure().getChildren()) {
-				if (selectedFeatures.contains(featureStructure)) {
+				if (selectedFeatures.contains(featureStructure.getFeature())) {
 					if (!newCompound.getStructure().hasChildren())
 						newChildren.add(newCompound);
 					featureStructure.setMandatory(false);
@@ -133,7 +134,9 @@ public class FeatureCreateCompoundOperation extends AbstractFeatureModelOperatio
 
 		//		newCompound = featureModel.getFeature(newCompound.getName());
 
-		FeatureDiagramLayoutHelper.initializeCompoundFeaturePosition(featureModel, selectedFeatures, newCompound);
+		//TODO _interfaces Romved Code
+//		FeatureDiagramLayoutHelper.initializeCompoundFeaturePosition(featureModel, selectedFeatures, newCompound);
+		featureModel.fireEvent(new FeatureModelEvent(newCompound, PropertyConstants.FEATURE_ADD, null, null));
 	}
 
 	@Override

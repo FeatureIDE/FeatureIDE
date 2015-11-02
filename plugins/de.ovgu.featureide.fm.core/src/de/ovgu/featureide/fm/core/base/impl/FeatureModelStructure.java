@@ -191,7 +191,7 @@ public class FeatureModelStructure implements IFeatureModelStructure {
 	@Override
 	public boolean hasOptionalFeatures() {
 		for (final IFeature f : correspondingFeatureModel.getFeatures()) {
-			if (!f.equals(rootFeature) && f.getStructure().getParent() != null && f.getStructure().getParent().isAnd() && !f.getStructure().isMandatory()) {
+			if (!f.equals(rootFeature.getFeature()) && f.getStructure().getParent() != null && f.getStructure().getParent().isAnd() && !f.getStructure().isMandatory()) {
 				return true;
 			}
 		}

@@ -69,7 +69,6 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.HiddenAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.MandatoryAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.OrAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.RenameAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ReverseOrderAction;
 
 /**
  * Context Menu for Outline view of FeatureModels
@@ -97,7 +96,7 @@ public class FmOutlinePageContextMenu {
 	private OrAction oAction;
 	private AndAction andAction;
 	private AlternativeAction altAction;
-	private ReverseOrderAction roAction;
+//	private ReverseOrderAction roAction;
 	private Action collapseAllAction;
 	private Action expandAllAction;
 	public IDoubleClickListener dblClickListener;
@@ -150,7 +149,8 @@ public class FmOutlinePageContextMenu {
 		clAction = new CreateLayerAction(viewer, fInput, fTextEditor.diagramEditor);
 		reAction = new RenameAction(viewer, fInput, fTextEditor.diagramEditor);
 		oAction = new OrAction(viewer, fInput);
-		roAction = new ReverseOrderAction(viewer, fInput);
+		//TODO _interfaces Removed Code
+//		roAction = new ReverseOrderAction(viewer, fInput);
 		andAction = new AndAction(viewer, fInput);
 		altAction = new AlternativeAction(viewer, fInput);
 
@@ -240,7 +240,8 @@ public class FmOutlinePageContextMenu {
 			manager.add(oAction);
 			manager.add(altAction);
 			manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-			manager.add(roAction);
+			//TODO _interfaces Removed Code
+//			manager.add(roAction);
 		}
 		if (sel instanceof IFeature) {
 
@@ -271,7 +272,8 @@ public class FmOutlinePageContextMenu {
 			manager.add(aAction);
 			manager.add(hAction);
 			manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-			manager.add(roAction);
+			//TODO _interfaces Removed Code
+//			manager.add(roAction);
 		}
 		if (sel instanceof IConstraint) {
 			manager.add(ccAction);

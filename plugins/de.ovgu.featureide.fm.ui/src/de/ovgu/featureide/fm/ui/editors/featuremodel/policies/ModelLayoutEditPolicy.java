@@ -30,12 +30,10 @@ import org.eclipse.gef.editpolicies.LayoutEditPolicy;
 import org.eclipse.gef.requests.ChangeBoundsRequest;
 import org.eclipse.gef.requests.CreateRequest;
 
-import de.ovgu.featureide.fm.core.base.IConstraint;
-import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
-import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.ConstraintDragAndDropCommand;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.FeatureDragAndDropCommand;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.LegendDragAndDropCommand;
@@ -50,11 +48,11 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
  */
 public class ModelLayoutEditPolicy extends LayoutEditPolicy {
 
-	private final IFeatureModel featureModel;
+	private final IGraphicalFeatureModel featureModel;
 
 	private Command cmd;
 
-	public ModelLayoutEditPolicy(IFeatureModel featureModel) {
+	public ModelLayoutEditPolicy(IGraphicalFeatureModel featureModel) {
 		super();
 		this.featureModel = featureModel;
 	}
@@ -64,14 +62,15 @@ public class ModelLayoutEditPolicy extends LayoutEditPolicy {
 		if (child instanceof ConstraintEditPart) {
 			return new ConstraintMoveEditPolicy((ConstraintEditPart) child, this);
 		} else if (child instanceof FeatureEditPart) {
-			if (featureModel instanceof ExtendedFeatureModel) {
-				IFeature feature = ((FeatureEditPart) child).getFeature();
-				if (feature instanceof ExtendedFeature && ((ExtendedFeature) feature).isFromExtern()) {
-					if (feature.getFeatureModel().getGraphicRepresenation().getLayout().getLayoutAlgorithm() != 0) {
-						return null;
-					}
-				}
-			}
+// TODO _Interface : Removed Code
+//			if (featureModel instanceof ExtendedFeatureModel) {
+//				IFeature feature = ((FeatureEditPart) child).getFeature();
+//				if (feature instanceof ExtendedFeature && ((ExtendedFeature) feature).isFromExtern()) {
+//					if (feature.getFeatureModel().getGraphicRepresenation().getLayout().getLayoutAlgorithm() != 0) {
+//						return null;
+//					}
+//				}
+//			}
 			return new FeatureMoveEditPolicy((FeatureEditPart) child, this);
 		} else if (child instanceof LegendEditPart) {
 			return new LegendMoveEditPolicy();
@@ -88,17 +87,18 @@ public class ModelLayoutEditPolicy extends LayoutEditPolicy {
 			if (r.getEditParts().size() != 1) {
 				return null;
 			}
+			
 			Object editPart = r.getEditParts().get(0);
 			if (editPart instanceof FeatureEditPart) {
 				FeatureEditPart featureEditPart = (FeatureEditPart) editPart;
-				IFeature feature = featureEditPart.getFeature();
+				IGraphicalFeature feature = featureEditPart.getFeature();
 				Rectangle bounds = FeatureUIHelper.getBounds(feature);
 				bounds = bounds.getTranslated(r.getMoveDelta().getScaled(1 / FeatureUIHelper.getZoomFactor()));
 				cmd = new FeatureDragAndDropCommand(featureModel, feature, bounds.getLocation(), featureEditPart);
 			} else if (editPart instanceof ConstraintEditPart) {
-				IConstraint constraint = ((ConstraintEditPart) editPart).getConstraintModel();
+				IGraphicalConstraint constraint = ((ConstraintEditPart) editPart).getConstraintModel();
 
-				if (featureModel.getGraphicRepresenation().getLayout().hasFeaturesAutoLayout()) {
+				if (featureModel.getLayout().hasFeaturesAutoLayout()) {
 					Point point = r.getLocation().getCopy();
 					getHostFigure().translateToRelative(point);
 					cmd = new ConstraintDragAndDropCommand(featureModel, constraint, point);

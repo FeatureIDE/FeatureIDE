@@ -40,8 +40,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SYNCHRONIZE_FE
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_FEATURE_MODULE_IS_EMPTY__YOU_EITHER_SHOULD_IMPLEMENT_IT_COMMA__MARK_THE_FEATURE_AS_ABSTRACT_COMMA__OR_REMOVE_THE_FEATURE_FROM_THE_FEATURE_MODEL_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.THIS_ANNOTATION_IS_NOT_SUPPORTED_YET___MOVED_TO_THE_COMMENT_SECTION_;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -89,10 +87,12 @@ import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.FeatureModelFile;
-import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.IFeatureModelListener;
+import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
@@ -125,11 +125,11 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 	private static final String FEATURE_MODULE_MARKER = "de.ovgu.featureide.core.featureModuleMarker";
 
-	public class FeatureModelChangeListner implements PropertyChangeListener {
+	public class FeatureModelChangeListner implements IFeatureModelListener {
 		/**
 		 * listens to changed feature names
 		 */
-		public void propertyChange(PropertyChangeEvent evt) {
+		public void propertyChange(FeatureModelEvent evt) {
 
 			if (PropertyConstants.FEATURE_NAME_CHANGED.equals(evt.getPropertyName())) {
 				String oldName = (String) evt.getOldValue();

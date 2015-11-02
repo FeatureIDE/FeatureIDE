@@ -18,32 +18,37 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core;
+package de.ovgu.featureide.fm.ui.editors;
 
+import java.util.List;
+
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.impl.Tree;
+import de.ovgu.featureide.fm.ui.ColorList;
 
 /**
- * Provides constants for <code>PropertyChangeListener</code>.
+ * Graphical representation of a feature.
  * 
- * @author Thomas Thuem
- * 
+ * @author Sebastian Krieter
  */
-public interface PropertyConstants {
+public interface IGraphicalFeature extends IGraphicalElement {
 
-	String MODEL_DATA_LOADED = "MODEL_DATA_LOADED";
-	String REDRAW_DIAGRAM = "REDRAW_DIAGRAM";
-	String MODEL_DATA_CHANGED = "MODEL_DATA_CHANGED";
-	String MODEL_LAYOUT_CHANGED = "MODEL_LAYOUT_CHANGED";
-	String LEGEND_LAYOUT_CHANGED = "LEGEND_LAYOUT_CHANGED";
-	String REFRESH_ACTIONS = "REFRESH_ACTIONS";
-	String NAME_CHANGED = "NAME_CHANGED";
-	String LOCATION_CHANGED = "LOCATION_CHANGED";
-	String COLOR_CHANGED = "COLOR_CHANGED";
-	String MANDATORY_CHANGED = "MANDATORY_CHANGED";
-	String HIDDEN_CHANGED = "HIDDEN_CHANGED";
-	String PARENT_CHANGED = "PARENT_CHANGED";
-	String CHILDREN_CHANGED = "CHILDREN_CHANGED";
-	String FEATURE_NAME_CHANGED = "NAME_CHANGED";
-	String ATTRIBUTE_CHANGED = "ATTRIBUTE_CHANGED";
-	String CONSTRAINT_SELECTED = "CONSTRAINT_SELECTED";
+	ColorList getColorList();
+
+	IFeature getObject();
+	
+	Tree<IGraphicalFeature> getTree();
+
+	boolean isConstraintSelected();
+
+	void setConstraintSelected(boolean selection);
+	
+	void addTargetConnection(FeatureConnection connection);
+	
+	List<FeatureConnection> getSourceConnections();
+
+	List<FeatureConnection> getTargetConnections();
+	
+	boolean removeTargetConnection(FeatureConnection connection);
 
 }

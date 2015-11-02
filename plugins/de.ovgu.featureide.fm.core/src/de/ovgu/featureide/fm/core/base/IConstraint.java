@@ -48,6 +48,8 @@ public interface IConstraint extends IFeatureModelElement {
 	Collection<IFeature> getFalseOptional();
 
 	Node getNode();
+	
+	void setNode(Node node);
 
 	boolean hasHiddenFeatures();
 
@@ -64,7 +66,5 @@ public interface IConstraint extends IFeatureModelElement {
 	void setFeatureSelected(boolean b);
 	
 	String getDisplayName();
-	
-	IGraphicalConstraint getGraphicRepresenation();
 
 }

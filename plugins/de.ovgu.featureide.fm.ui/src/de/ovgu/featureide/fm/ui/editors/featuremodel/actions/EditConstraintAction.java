@@ -62,7 +62,7 @@ public class EditConstraintAction extends AbstractConstraintEditorAction {
 		while (iter.hasNext()) {
 			Object editPart = iter.next();
 			if (editPart instanceof ConstraintEditPart) {
-				constraint = ((ConstraintEditPart) editPart).getConstraintModel();
+				constraint = ((ConstraintEditPart) editPart).getConstraintModel().getObject();
 				return true;
 			}
 			if (editPart instanceof IConstraint) {

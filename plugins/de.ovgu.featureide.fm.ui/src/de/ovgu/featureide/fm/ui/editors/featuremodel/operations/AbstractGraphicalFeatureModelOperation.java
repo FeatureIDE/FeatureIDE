@@ -18,20 +18,21 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.base;
+package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
- * Graphical representation of a constraint.
  * 
  * @author Sebastian Krieter
  */
-public interface IGraphicalConstraint extends IGraphicalElement {
+public abstract class AbstractGraphicalFeatureModelOperation extends AbstractFeatureModelOperation {
 
-	IConstraint getElement();
+	protected IGraphicalFeatureModel graphicalFeatureModel;
 
-	boolean isFeatureSelected();
-
-	void setFeatureSelected(boolean selected);
+	public AbstractGraphicalFeatureModelOperation(IGraphicalFeatureModel graphicalFeatureModel, String label) {
+		super(graphicalFeatureModel.getFeatureModel(), label);
+		this.graphicalFeatureModel = graphicalFeatureModel;
+	}
 
 }

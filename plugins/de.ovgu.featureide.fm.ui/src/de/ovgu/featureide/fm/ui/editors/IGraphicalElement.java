@@ -18,12 +18,14 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.base;
+package de.ovgu.featureide.fm.ui.editors;
 
-import de.ovgu.featureide.fm.core.FMDimension;
-import de.ovgu.featureide.fm.core.FMPoint;
+import org.eclipse.draw2d.geometry.Dimension;
+import org.eclipse.draw2d.geometry.Point;
+
 import de.ovgu.featureide.fm.core.IGraphicItem;
-import de.ovgu.featureide.fm.core.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
+import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 
 /**
  * Graphical representation of a constraint.
@@ -32,14 +34,16 @@ import de.ovgu.featureide.fm.core.PropertyConstants;
  */
 public interface IGraphicalElement extends IGraphicItem, PropertyConstants {
 
-	IFeatureModelElement getElement();
+	IFeatureModelElement getObject();
+	
+	IGraphicalFeatureModel getGraphicalModel();
 
-	FMPoint getLocation();
+	Point getLocation();
 
-	FMDimension getSize();
+	Dimension getSize();
 
-	void setLocation(FMPoint newLocation);
+	void setLocation(Point newLocation);
 
-	void setSize(FMDimension size);
+	void setSize(Dimension size);
 
 }

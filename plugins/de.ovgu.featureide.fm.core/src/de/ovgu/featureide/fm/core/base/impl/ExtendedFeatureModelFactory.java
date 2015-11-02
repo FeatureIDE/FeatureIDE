@@ -20,11 +20,11 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
+import java.io.File;
+
 import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.base.IConstraint;
-import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 
@@ -64,18 +64,8 @@ public class ExtendedFeatureModelFactory implements IFeatureModelFactory {
 	}
 
 	@Override
-	public GraphicalConstraint createGraphicalRepresentation(IConstraint constraint) {
-		return new GraphicalConstraint(constraint);
-	}
-
-	@Override
-	public GraphicalFeature createGraphicalRepresentation(IFeature feature) {
-		return new GraphicalFeature(feature);
-	}
-
-	@Override
-	public GraphicalFeatureModel createGraphicalRepresentation(IFeatureModel featureModel) {
-		return new GraphicalFeatureModel(featureModel);
+	public IFeatureModel loadFeatureModel(File file) {
+		return null;
 	}
 
 }

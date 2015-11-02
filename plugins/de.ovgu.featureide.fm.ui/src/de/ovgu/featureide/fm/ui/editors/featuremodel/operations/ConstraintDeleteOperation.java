@@ -23,7 +23,8 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE_CONSTRAINT;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
+import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 
 /**
  * Operation to delete a constraint.
@@ -31,14 +32,12 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayou
  * @author Fabian Benduhn
  */
 public class ConstraintDeleteOperation extends AbstractFeatureModelOperation {
-
-	private static final String LABEL = DELETE_CONSTRAINT;
 	private IConstraint constraint;
 
 	private int index;
 
 	public ConstraintDeleteOperation(IConstraint constraint, IFeatureModel featureModel) {
-		super(featureModel, LABEL);
+		super(featureModel, DELETE_CONSTRAINT);
 		this.constraint = constraint;
 	}
 
@@ -46,14 +45,13 @@ public class ConstraintDeleteOperation extends AbstractFeatureModelOperation {
 	protected void redo() {
 		index = featureModel.getConstraintIndex(constraint);
 		featureModel.removeConstraint(constraint);
+		featureModel.fireEvent(new FeatureModelEvent(constraint, PropertyConstants.CONSTRAINT_DELETE, null, null));
 	}
 
 	@Override
 	protected void undo() {
 		featureModel.addConstraint(constraint, index);
-		//initialize constraint position in manual layout
-		if (!featureModel.getGraphicRepresenation().getLayout().hasFeaturesAutoLayout())
-			FeatureDiagramLayoutHelper.initializeConstraintPosition(featureModel, featureModel.getConstraintCount() - 1);
+		featureModel.fireEvent(new FeatureModelEvent(constraint, PropertyConstants.CONSTRAINT_ADD, null, null));
 	}
 
 }

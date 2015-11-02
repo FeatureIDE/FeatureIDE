@@ -20,20 +20,18 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
-import java.beans.PropertyChangeEvent;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import de.ovgu.featureide.fm.core.FeatureConnection;
-import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 
 /**
  * All structural information of an {@link IFeatureModel}.
@@ -42,44 +40,6 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
  * 
  */
 public class FeatureStructure implements IFeatureStructure, PropertyConstants {
-
-
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((children == null) ? 0 : children.hashCode());
-		result = prime * result + ((correspondingFeature == null) ? 0 : correspondingFeature.hashCode());
-		return result;
-	}
-
-	/* (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		FeatureStructure other = (FeatureStructure) obj;
-		if (children == null) {
-			if (other.children != null)
-				return false;
-		} else if (!children.equals(other.children))
-			return false;
-		if (correspondingFeature == null) {
-			if (other.correspondingFeature != null)
-				return false;
-		} else if (!correspondingFeature.equals(other.correspondingFeature))
-			return false;
-		return true;
-	}
 
 	protected boolean and;
 
@@ -93,11 +53,8 @@ public class FeatureStructure implements IFeatureStructure, PropertyConstants {
 	protected boolean multiple;
 
 	protected IFeatureStructure parent = null;
-	protected final FeatureConnection parentConnection;
 	protected List<IConstraint> partOfConstraints = new LinkedList<>();
-	protected final LinkedList<FeatureConnection> sourceConnections = new LinkedList<FeatureConnection>();
-	protected final LinkedList<FeatureConnection> targetConnections = new LinkedList<FeatureConnection>();
-
+	
 	protected FeatureStructure(FeatureStructure oldStructure, IFeatureModel newFeatureModel) {
 		if (newFeatureModel != null) {
 			correspondingFeature = oldStructure.correspondingFeature.clone(newFeatureModel, this);
@@ -112,9 +69,6 @@ public class FeatureStructure implements IFeatureStructure, PropertyConstants {
 		multiple = oldStructure.multiple;
 		hidden = oldStructure.hidden;
 
-		parentConnection = new FeatureConnection(correspondingFeature);
-		sourceConnections.add(parentConnection);
-
 		for (final IFeatureStructure child : oldStructure.children) {
 			addNewChild(child.cloneSubtree(newFeatureModel));
 		}
@@ -128,9 +82,6 @@ public class FeatureStructure implements IFeatureStructure, PropertyConstants {
 		and = true;
 		multiple = false;
 		hidden = false;
-
-		parentConnection = new FeatureConnection(this.correspondingFeature);
-		sourceConnections.add(parentConnection);
 	}
 
 	@Override
@@ -149,11 +100,6 @@ public class FeatureStructure implements IFeatureStructure, PropertyConstants {
 	protected void addNewChild(IFeatureStructure newChild) {
 		children.add(newChild);
 		newChild.setParent(this);
-	}
-
-	@Override
-	public void addTargetConnection(FeatureConnection connection) {
-		targetConnections.add(connection);
 	}
 
 	@Override
@@ -183,17 +129,17 @@ public class FeatureStructure implements IFeatureStructure, PropertyConstants {
 	}
 
 	protected void fireChildrenChanged() {
-		final PropertyChangeEvent event = new PropertyChangeEvent(this, CHILDREN_CHANGED, Boolean.FALSE, Boolean.TRUE);
+		final FeatureModelEvent event = new FeatureModelEvent(this, CHILDREN_CHANGED, Boolean.FALSE, Boolean.TRUE);
 		correspondingFeature.fireEvent(event);
 	}
 
 	protected void fireHiddenChanged() {
-		final PropertyChangeEvent event = new PropertyChangeEvent(this, HIDDEN_CHANGED, Boolean.FALSE, Boolean.TRUE);
+		final FeatureModelEvent event = new FeatureModelEvent(this, HIDDEN_CHANGED, Boolean.FALSE, Boolean.TRUE);
 		correspondingFeature.fireEvent(event);
 	}
 
 	protected void fireMandatoryChanged() {
-		final PropertyChangeEvent event = new PropertyChangeEvent(this, MANDATORY_CHANGED, Boolean.FALSE, Boolean.TRUE);
+		final FeatureModelEvent event = new FeatureModelEvent(this, MANDATORY_CHANGED, Boolean.FALSE, Boolean.TRUE);
 		correspondingFeature.fireEvent(event);
 	}
 
@@ -241,16 +187,6 @@ public class FeatureStructure implements IFeatureStructure, PropertyConstants {
 	@Override
 	public Collection<IConstraint> getRelevantConstraints() {
 		return partOfConstraints;
-	}
-
-	@Override
-	public List<FeatureConnection> getSourceConnections() {
-		return parent == null ? Collections.<FeatureConnection> emptyList() : sourceConnections;
-	}
-
-	@Override
-	public List<FeatureConnection> getTargetConnections() {
-		return targetConnections;
 	}
 
 	@Override
@@ -386,11 +322,6 @@ public class FeatureStructure implements IFeatureStructure, PropertyConstants {
 	}
 
 	@Override
-	public boolean removeTargetConnection(FeatureConnection connection) {
-		return targetConnections.remove(connection);
-	}
-
-	@Override
 	public void replaceChild(IFeatureStructure oldChild, IFeatureStructure newChild) {
 		final int index = children.indexOf(oldChild);
 		children.set(index, newChild);
@@ -460,19 +391,7 @@ public class FeatureStructure implements IFeatureStructure, PropertyConstants {
 		if (newParent == parent) {
 			return;
 		}
-
-		// delete old parent connection (if existing)
-		if (parent != null) {
-			parent.removeTargetConnection(parentConnection);
-			parentConnection.setTarget(null);
-		}
-
-		// update the target
 		parent = newParent;
-		if (newParent != null) {
-			parentConnection.setTarget(newParent.getFeature());
-			newParent.addTargetConnection(parentConnection);
-		}
 	}
 
 	@Override
@@ -494,9 +413,6 @@ public class FeatureStructure implements IFeatureStructure, PropertyConstants {
 		partOfConstraints = constraints;
 	}
 	
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder("FeatureStructure=(");

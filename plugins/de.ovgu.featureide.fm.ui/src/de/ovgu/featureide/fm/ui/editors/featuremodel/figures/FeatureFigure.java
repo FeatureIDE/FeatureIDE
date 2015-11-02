@@ -44,13 +44,15 @@ import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer.Attribute;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
+import de.ovgu.featureide.fm.core.base.impl.Feature;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramExtension;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.anchors.SourceAnchor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.anchors.TargetAnchor;
@@ -70,7 +72,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 	private final ConnectionAnchor sourceAnchor;
 	private final ConnectionAnchor targetAnchor;
 
-	private IFeature feature;
+	private IGraphicalFeature feature;
 
 	private static GridLayout gl = new GridLayout();
 
@@ -83,7 +85,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 	private static String INDETERMINATE_HIDDEN = IS_HIDDEN_AND_INDETERMINATE;
 	private static String VOID = FEATURE_MODEL_IS_VOID;
 
-	public FeatureFigure(IFeature feature, IFeatureModel featureModel) {
+	public FeatureFigure(IGraphicalFeature feature, IGraphicalFeatureModel featureModel) {
 		super();
 		this.feature = feature;
 
@@ -93,7 +95,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 				enforceLabelSize();
 			}
 		});
-
+	
 		sourceAnchor = new SourceAnchor(this, feature);
 		targetAnchor = new TargetAnchor(this, feature);
 
@@ -104,7 +106,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 
 		label.setLocation(new Point(FEATURE_INSETS.left, FEATURE_INSETS.top));
 
-		setName(feature.getName());
+		setName(feature.getObject().getName());
 
 		setProperties();
 
@@ -118,7 +120,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 			setLocation(FeatureUIHelper.getLocation(feature));
 		}
 
-		if (isHidden(feature)) {
+		if (!featureModel.getLayout().showHiddenFeatures() && feature.getObject().getStructure().hasHiddenParent()) {
 			setSize(new Dimension(0, 0));
 		}
 	}
@@ -133,16 +135,14 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		}
 	}
 
-	private boolean isHidden(IFeature feature) {
-		return !feature.getFeatureModel().getLayout().showHiddenFeatures() && feature.getStructure().hasHiddenParent();
-	}
-
 	public void setProperties() {
 		final StringBuilder toolTip = new StringBuilder();
 
 		label.setForegroundColor(FMPropertyManager.getFeatureForgroundColor());
 		setBackgroundColor(FMPropertyManager.getConcreteFeatureBackgroundColor());
 		setBorder(FMPropertyManager.getFeatureBorder(feature.isConstraintSelected()));
+		
+		IFeature feature = this.feature.getObject();
 
 		final FeatureModelAnalyzer analyser = feature.getFeatureModel().getAnalyser();
 		if (!FeatureColorManager.getCurrentColorScheme(feature).isDefault()) {
@@ -292,7 +292,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 	/**
 	 * @return The {@link Feature} represented by this {@link FeatureFigure}
 	 */
-	public IFeature getFeature() {
+	public IGraphicalFeature getFeature() {
 		return feature;
 	}
 }

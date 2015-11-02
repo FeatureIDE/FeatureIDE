@@ -18,29 +18,13 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core;
+package de.ovgu.featureide.fm.core.base.event;
 
 /**
- * Saves width and height for an element in the feature model diagram.
+ * Listens for a {@link FeatureModelEvent}.
  * 
  * @author Sebastian Krieter
  */
-public class FMDimension {
-
-	public int width;
-	public int height;
-
-	public FMDimension(int x, int y) {
-		this.width = x;
-		this.height = y;
-	}
-
-	public int getWidth() {
-		return width;
-	}
-
-	public int getHeight() {
-		return height;
-	}
-
+public interface IFeatureModelListener {
+	void propertyChange(FeatureModelEvent event);
 }

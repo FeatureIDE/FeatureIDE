@@ -21,18 +21,15 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.commands;
 
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.ObjectUndoContext;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.gef.commands.Command;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
-import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureMoveOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureOperationData;
@@ -45,17 +42,17 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureOperation
  */
 public class FeatureDragAndDropCommand extends Command {
 
-	private final IFeatureModel featureModel;
+	private final IGraphicalFeatureModel featureModel;
 
-	private final IFeature feature;
+	private final IGraphicalFeature feature;
 
 	private final Point newLocation;
 
-	private final IFeature oldParent;
+	private final IGraphicalFeature oldParent;
 
 	private final int oldIndex;
 
-	private IFeature newParent;
+	private IGraphicalFeature newParent;
 
 	private int newIndex;
 
@@ -65,17 +62,16 @@ public class FeatureDragAndDropCommand extends Command {
 
 	private FeatureEditPart editPart;
 
-	public FeatureDragAndDropCommand(IFeatureModel featureModel, IFeature feature, Point newLocation, FeatureEditPart editPart) {
-		super("Moving " + feature.getName());
+	public FeatureDragAndDropCommand(IGraphicalFeatureModel featureModel, IGraphicalFeature feature, Point newLocation, FeatureEditPart editPart) {
+		super("Moving " + feature.getObject().getName());
 		this.featureModel = featureModel;
 		this.feature = feature;
 		this.newLocation = newLocation;
-		this.hasAutoLayout = featureModel.getGraphicRepresenation().getLayout().hasFeaturesAutoLayout();
+		this.hasAutoLayout = featureModel.getLayout().hasFeaturesAutoLayout();
 		this.hasVerticalLayout = FeatureUIHelper.hasVerticalLayout(featureModel);
 		this.editPart = editPart;
-		IFeatureStructure structureParent = feature.getStructure().getParent();
-		oldParent = (structureParent != null) ? structureParent.getFeature() : null;
-		oldIndex = oldParent != null ? oldParent.getStructure().getChildIndex(feature.getStructure()) : 0;
+		oldParent = feature.getTree().getParentObject();
+		oldIndex = oldParent != null ? oldParent.getTree().getChildren().indexOf(feature.getTree()) : 0;
 	}
 
 	@Override
@@ -86,7 +82,7 @@ public class FeatureDragAndDropCommand extends Command {
 				return false;
 			}
 			Point referencePoint = FeatureUIHelper.getSourceLocation(feature, newLocation);
-			IFeature next = calculateNext(featureModel.getStructure().getRoot().getFeature(), referencePoint);
+			IGraphicalFeature next = calculateNext(featureModel.getFeatures().getObject(), referencePoint);
 
 			// calculate new parent (if exists)
 			if (!calculateNewParentAndIndex(next))
@@ -101,7 +97,7 @@ public class FeatureDragAndDropCommand extends Command {
 				return false;
 
 			// not accept moves to children positions
-			return feature != newParent && !feature.getStructure().isAncestorOf(newParent.getStructure());
+			return feature != newParent && !feature.getTree().isAncestorOf(newParent.getTree());
 		}
 		return true;
 	}
@@ -109,8 +105,9 @@ public class FeatureDragAndDropCommand extends Command {
 	@Override
 	public void execute() {
 		FeatureOperationData data = new FeatureOperationData(feature, oldParent, newParent, newIndex, oldIndex);
-		FeatureMoveOperation op = new FeatureMoveOperation(data, featureModel, newLocation, FeatureUIHelper.getLocation(feature).getCopy(), feature);
-		op.addContext((ObjectUndoContext) featureModel.getUndoContext());
+		FeatureMoveOperation op = new FeatureMoveOperation(data, editPart.getViewer(), newLocation, FeatureUIHelper.getLocation(feature).getCopy(), feature.getObject());
+		//TODO _interfaces Removed Code
+		//		op.addContext((ObjectUndoContext) featureModel.getUndoContext());
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
@@ -120,7 +117,7 @@ public class FeatureDragAndDropCommand extends Command {
 		}
 	}
 
-	private boolean calculateNewParentAndIndex(IFeature next) {
+	private boolean calculateNewParentAndIndex(IGraphicalFeature next) {
 		Point location = FeatureUIHelper.getSourceLocation(feature, newLocation);
 		Point nextLocation = FeatureUIHelper.getTargetLocation(next);
 		Dimension d = location.getDifference(nextLocation);
@@ -129,7 +126,7 @@ public class FeatureDragAndDropCommand extends Command {
 				// insert below
 				newParent = next;
 				newIndex = 0;
-				for (IFeature child : FeatureUtils.convertToFeatureList(next.getStructure().getChildren())) {
+				for (IGraphicalFeature child : next.getTree().getChildrenObjects()) {
 					Dimension cd = FeatureUIHelper.getSourceLocation(child).getDifference(nextLocation);
 					if (d.width / (double) d.height <= cd.width / (double) cd.height)
 						break;
@@ -138,19 +135,19 @@ public class FeatureDragAndDropCommand extends Command {
 				}
 			} else {
 				// insert left or right
-				if (next.getStructure().isRoot()) {
+				if (next.getTree().isRoot()) {
 					// do not accept because root has no parent
 					return false;
 				} else {
-					newParent = next.getStructure().getParent().getFeature();
+					newParent = next.getTree().getParentObject();
 					if (d.width < 0)
-						newIndex = newParent.getStructure().getChildIndex(next.getStructure());
+						newIndex = newParent.getTree().getChildren().indexOf(next.getTree());
 					else
-						newIndex = newParent.getStructure().getChildIndex(next.getStructure()) + 1;
+						newIndex = newParent.getTree().getChildren().indexOf(next.getTree()) + 1;
 				}
 			}
 
-			if (newParent == oldParent && oldParent.getStructure().getChildIndex(feature.getStructure()) < newIndex)
+			if (newParent == oldParent && oldParent.getTree().getChildren().indexOf(feature.getTree()) < newIndex)
 				newIndex--;
 
 			return true;
@@ -159,7 +156,7 @@ public class FeatureDragAndDropCommand extends Command {
 				// insert below
 				newParent = next;
 				newIndex = 0;
-				for (IFeature child : FeatureUtils.convertToFeatureList(next.getStructure().getChildren())) {
+				for (IGraphicalFeature child : next.getTree().getChildrenObjects()) {
 					Dimension cd = FeatureUIHelper.getSourceLocation(child).getDifference(nextLocation);
 					if (d.height / (double) d.width <= cd.height / (double) cd.width)
 						break;
@@ -168,19 +165,19 @@ public class FeatureDragAndDropCommand extends Command {
 				}
 			} else {
 				// insert left or right
-				if (next.getStructure().isRoot()) {
+				if (next.getTree().isRoot()) {
 					// do not accept because root has no parent
 					return false;
 				} else {
-					newParent = next.getStructure().getParent().getFeature();
+					newParent = next.getTree().getParentObject();
 					if (d.height < 0)
-						newIndex = newParent.getStructure().getChildIndex(next.getStructure());
+						newIndex = newParent.getTree().getChildren().indexOf(next.getTree());
 					else
-						newIndex = newParent.getStructure().getChildIndex(next.getStructure()) + 1;
+						newIndex = newParent.getTree().getChildren().indexOf(next.getTree()) + 1;
 				}
 			}
 
-			if (newParent == oldParent && oldParent.getStructure().getChildIndex(feature.getStructure()) < newIndex)
+			if (newParent == oldParent && oldParent.getTree().getChildren().indexOf(feature.getTree()) < newIndex)
 				newIndex--;
 
 			return true;
@@ -188,13 +185,13 @@ public class FeatureDragAndDropCommand extends Command {
 
 	}
 
-	public static IFeature calculateNext(IFeature feature, Point referencePoint) {
+	public static IGraphicalFeature calculateNext(IGraphicalFeature feature, Point referencePoint) {
 		if (feature == null)
 			return null;
-		IFeature next = feature;
+		IGraphicalFeature next = feature;
 		double distance = FeatureUIHelper.getTargetLocation(next).getDistance(referencePoint);
-		for (IFeature child : FeatureUtils.convertToFeatureList(feature.getStructure().getChildren())) {
-			IFeature childsNext = calculateNext(child, referencePoint);
+		for (IGraphicalFeature child : feature.getTree().getChildrenObjects()) {
+			IGraphicalFeature childsNext = calculateNext(child, referencePoint);
 			double newDistance = FeatureUIHelper.getTargetLocation(childsNext).getDistance(referencePoint);
 			if (newDistance > 0 && newDistance < distance) {
 				next = childsNext;
@@ -204,12 +201,11 @@ public class FeatureDragAndDropCommand extends Command {
 		return next;
 	}
 
-	public IFeature getFeature() {
+	public IGraphicalFeature getFeature() {
 		return feature;
 	}
 
-	public IFeature getNewParent() {
-
+	public IGraphicalFeature getNewParent() {
 		return newParent;
 	}
 

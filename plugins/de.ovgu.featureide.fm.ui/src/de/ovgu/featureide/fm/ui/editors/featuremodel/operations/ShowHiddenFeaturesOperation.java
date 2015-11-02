@@ -21,8 +21,8 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.SHOW_HIDDEN_FEATURES;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
  * Specifies whether hidden features are shown.
@@ -30,19 +30,16 @@ import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
  * @author David Halm
  * @author Patrick Sulkowski
  */
-public class ShowHiddenFeaturesOperation extends AbstractFeatureModelOperation {
+public class ShowHiddenFeaturesOperation extends AbstractGraphicalFeatureModelOperation {
 
-	private IFeatureModel featureModel;
-
-	public ShowHiddenFeaturesOperation(IFeatureModel featureModel) {
+	public ShowHiddenFeaturesOperation(IGraphicalFeatureModel featureModel) {
 		super(featureModel, SHOW_HIDDEN_FEATURES);
-		this.featureModel = featureModel;
 	}
 
 	@Override
 	public void redo() {
-		featureModel.getGraphicRepresenation().getLayout().showHiddenFeatures(!featureModel.getGraphicRepresenation().getLayout().showHiddenFeatures());
-		FeatureUIHelper.showHiddenFeatures(featureModel.getGraphicRepresenation().getLayout().showHiddenFeatures(), featureModel);
+		graphicalFeatureModel.getLayout().showHiddenFeatures(!graphicalFeatureModel.getLayout().showHiddenFeatures());
+		FeatureUIHelper.showHiddenFeatures(graphicalFeatureModel.getLayout().showHiddenFeatures(), graphicalFeatureModel);
 	}
 
 	@Override

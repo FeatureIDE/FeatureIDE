@@ -20,16 +20,17 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.layouts;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 
-import de.ovgu.featureide.fm.core.base.IConstraint;
-import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.filter.base.IFilter;
+import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
@@ -38,16 +39,23 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * @author Thomas Thuem
  */
 abstract public class FeatureDiagramLayoutManager {
+	
+	protected static final class HiddenFilter implements IFilter<IGraphicalFeature> {
+		@Override
+		public boolean isValid(IGraphicalFeature object) {
+			return !object.getObject().getStructure().isHidden();
+		}
+	}
 
 	protected int controlWidth = 10;
 	protected int controlHeight = 10;
 	protected boolean showHidden;
 
-	public void layout(IFeatureModel featureModel) {
-		showHidden = featureModel.getGraphicRepresenation().getLayout().showHiddenFeatures();
+	public void layout(IGraphicalFeatureModel featureModel) {
+		showHidden = featureModel.getLayout().showHiddenFeatures();
 		FeatureUIHelper.showHiddenFeatures(showHidden, featureModel);
 		layoutFeatureModel(featureModel);
-		if (!FMPropertyManager.isLegendHidden() && featureModel.getGraphicRepresenation().getLayout().hasLegendAutoLayout()) {
+		if (!FMPropertyManager.isLegendHidden() && featureModel.getLayout().hasLegendAutoLayout()) {
 			layoutLegend(featureModel, showHidden);
 		}
 		layoutHidden(featureModel);
@@ -56,28 +64,28 @@ abstract public class FeatureDiagramLayoutManager {
 	/**
 	 * check if feature (or any parent) is hidden
 	 */
-	boolean isHidden(IFeature feature) {
+	boolean isHidden(IGraphicalFeature feature) {
 		if (showHidden)
 			return false;
-		if (!feature.getStructure().isRoot())
-			return (feature.getStructure().isHidden() || isHidden(feature.getStructure().getParent().getFeature()));
+		if (!feature.getObject().getStructure().isRoot())
+			return (feature.getObject().getStructure().isHidden() || isHidden(feature.getTree().getParentObject()));
 		else
-			return feature.getStructure().isHidden();
+			return feature.getObject().getStructure().isHidden();
 	}
 
 	/**
 	 * the location of hidden features is set to (0,0) temporary
 	 * (not the position that is saved in model.xml)
 	 */
-	void layoutHidden(IFeatureModel featureModel) {
-		for (IFeature feature : featureModel.getFeatures()) {
-			if (isHidden(feature) && !feature.getStructure().isRoot()) {
+	void layoutHidden(IGraphicalFeatureModel featureModel) {
+		for (IGraphicalFeature feature : featureModel.getFeatures()) {
+			if (isHidden(feature) && !feature.getObject().getStructure().isRoot()) {
 				FeatureUIHelper.setTemporaryLocation(feature, new Point(0, 0));
 			}
 		}
 	}
 
-	abstract public void layoutFeatureModel(IFeatureModel featureModel);
+	abstract public void layoutFeatureModel(IGraphicalFeatureModel featureModel);
 
 	public void setControlSize(int width, int height) {
 		this.controlWidth = width;
@@ -87,10 +95,10 @@ abstract public class FeatureDiagramLayoutManager {
 	/**
 	 * method to center the layout on the screen (horizontal only)
 	 */
-	void centerLayoutX(IFeatureModel featureModel) {
+	void centerLayoutX(IGraphicalFeatureModel featureModel) {
 		int mostRightFeatureX = Integer.MIN_VALUE;
 		int mostLeftFeatureX = Integer.MAX_VALUE;
-		for (IFeature feature : featureModel.getFeatures()) {
+		for (IGraphicalFeature feature : featureModel.getFeatures()) {
 			int tempX = FeatureUIHelper.getLocation(feature).x;
 			int tempXOffset = FeatureUIHelper.getSize(feature).width;
 			if (mostRightFeatureX < tempX + tempXOffset)
@@ -100,16 +108,16 @@ abstract public class FeatureDiagramLayoutManager {
 		}
 		int width = mostRightFeatureX - mostLeftFeatureX;
 		int offset = mostRightFeatureX - ((controlWidth - width) / 2);
-		for (IFeature feature : featureModel.getFeatures()) {
+		for (IGraphicalFeature feature : featureModel.getFeatures()) {
 			FeatureUIHelper.setLocation(feature, new Point(FeatureUIHelper.getLocation(feature).getCopy().x + offset, FeatureUIHelper.getLocation(feature)
 					.getCopy().y));
 		}
 	}
 
-	void layout(int yoffset, List<IConstraint> constraints) {
+	void layout(int yoffset, List<IGraphicalConstraint> constraints) {
 		int y = yoffset + FMPropertyManager.getConstraintSpace();
 		boolean depthFirst = this instanceof DepthFirstLayout;
-		for (IConstraint constraint : constraints) {
+		for (IGraphicalConstraint constraint : constraints) {
 			Dimension size = FeatureUIHelper.getSize(constraint);
 			int x = depthFirst ? 2 * FMPropertyManager.getFeatureSpaceX() : (controlWidth - size.width) >> 1;
 			FeatureUIHelper.setLocation(constraint, new Point(x, y));
@@ -120,7 +128,7 @@ abstract public class FeatureDiagramLayoutManager {
 	/**
 	 * sets the position of the legend
 	 */
-	private static void layoutLegend(IFeatureModel featureModel, boolean showHidden) {
+	private static void layoutLegend(IGraphicalFeatureModel featureModel, boolean showHidden) {
 		final Point min = new Point(Integer.MAX_VALUE, Integer.MAX_VALUE);
 		final Point max = new Point(Integer.MIN_VALUE, Integer.MIN_VALUE);
 
@@ -128,8 +136,8 @@ abstract public class FeatureDiagramLayoutManager {
 		 * update lowest, highest, most left, most right coordinates
 		 * for features
 		 */
-		Collection<IFeature> nonHidden = LayoutableFeature.convertFeatures(featureModel.getFeatures(), showHidden);
-		for (IFeature feature : nonHidden) {
+		Iterable<IGraphicalFeature> nonHidden = showHidden ? featureModel.getFeatures() : Functional.filter(featureModel.getFeatures(), new HiddenFilter());
+		for (IGraphicalFeature feature : nonHidden) {
 			Point temp = FeatureUIHelper.getLocation(feature);
 			if (null == temp)
 				continue;
@@ -149,7 +157,7 @@ abstract public class FeatureDiagramLayoutManager {
 		 * update lowest, highest, most left, most right coordinates
 		 * for constraints
 		 */
-		for (IConstraint constraint : featureModel.getConstraints()) {
+		for (IGraphicalConstraint constraint : featureModel.getConstraints()) {
 			Point temp = FeatureUIHelper.getLocation(constraint);
 			if (null == temp)
 				continue;
@@ -177,7 +185,7 @@ abstract public class FeatureDiagramLayoutManager {
 		/*
 		 * check if features would intersect with the legend on the edges
 		 */
-		for (IFeature feature : nonHidden) {
+		for (IGraphicalFeature feature : nonHidden) {
 			final Point tempLocation = FeatureUIHelper.getLocation(feature);
 			if (null != tempLocation) {
 				final Dimension tempSize = FeatureUIHelper.getSize(feature);
@@ -201,7 +209,7 @@ abstract public class FeatureDiagramLayoutManager {
 		 * check if constraints would intersect with the legend on the edges
 		 */
 		if (topRight || topLeft || botLeft || botRight) {
-			for (IConstraint constraint : featureModel.getConstraints()) {
+			for (IGraphicalConstraint constraint : featureModel.getConstraints()) {
 				Point tempLocation = FeatureUIHelper.getLocation(constraint);
 				if (null == tempLocation)
 					continue;
@@ -225,15 +233,15 @@ abstract public class FeatureDiagramLayoutManager {
 		 * set the legend position
 		 */
 		if (topRight) {
-			featureModel.getGraphicRepresenation().getLayout().setLegendPos(max.x - legendSize.width, min.y);
+			featureModel.getLayout().setLegendPos(max.x - legendSize.width, min.y);
 		} else if (topLeft) {
-			featureModel.getGraphicRepresenation().getLayout().setLegendPos(min.x, min.y);
+			featureModel.getLayout().setLegendPos(min.x, min.y);
 		} else if (botLeft) {
-			featureModel.getGraphicRepresenation().getLayout().setLegendPos(min.x, max.y - legendSize.height);
+			featureModel.getLayout().setLegendPos(min.x, max.y - legendSize.height);
 		} else if (botRight) {
-			featureModel.getGraphicRepresenation().getLayout().setLegendPos(max.x - legendSize.width, max.y - legendSize.height);
+			featureModel.getLayout().setLegendPos(max.x - legendSize.width, max.y - legendSize.height);
 		} else {
-			featureModel.getGraphicRepresenation().getLayout().setLegendPos(max.x + FMPropertyManager.getFeatureSpaceX(), min.y);
+			featureModel.getLayout().setLegendPos(max.x + FMPropertyManager.getFeatureSpaceX(), min.y);
 		}
 	}
 }

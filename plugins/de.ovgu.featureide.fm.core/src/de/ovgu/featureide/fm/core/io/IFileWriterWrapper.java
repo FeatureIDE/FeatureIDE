@@ -18,23 +18,45 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.base;
+package de.ovgu.featureide.fm.core.io;
 
-import de.ovgu.featureide.fm.core.ColorList;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.InputStream;
+import java.nio.charset.Charset;
+
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
 
 /**
- * Graphical representation of a feature.
  * 
  * @author Sebastian Krieter
  */
-public interface IGraphicalFeature extends IGraphicalElement {
+public class IFileWriterWrapper<T> extends AbstractObjectWriter<T> {
 
-	ColorList getColorList();
+	private AbstractObjectWriter<T> writer;
 
-	IFeature getElement();
+	public IFileWriterWrapper(AbstractObjectWriter<T> writer) {
+		this.writer = writer;
+		setObject(writer.getObject());
+	}
 
-	boolean isConstraintSelected();
+	public void writeToFile(File file) {
+		writer.writeToFile(file);
+	}
 
-	void setConstraintSelected(boolean selection);
+	@Override
+	public String writeToString() {
+		return writer.writeToString();
+	}
 
+	public void writeToFile(IFile file) throws CoreException {
+		InputStream source = new ByteArrayInputStream(writeToString().getBytes(
+				Charset.availableCharsets().get("UTF-8")));
+		if (file.exists()) {
+			file.setContents(source, false, true, null);
+		} else {
+			file.create(source, false, null);
+		}
+	}
 }

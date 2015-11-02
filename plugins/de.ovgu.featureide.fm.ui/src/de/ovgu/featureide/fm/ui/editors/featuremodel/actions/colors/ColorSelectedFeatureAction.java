@@ -35,10 +35,9 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Shell;
 
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 
 /**
@@ -51,7 +50,7 @@ public class ColorSelectedFeatureAction extends Action {
 
 	private static ImageDescriptor colorImage = FMUIPlugin.getDefault().getImageDescriptor("icons/FeatureColorIcon.gif");
 	
-	protected ArrayList<IFeature> featureList = new ArrayList<IFeature>();
+	protected ArrayList<IGraphicalFeature> featureList = new ArrayList<>();
 	final protected Shell shell = new Shell();
 	TreeViewer viewer;
 
@@ -96,7 +95,7 @@ public class ColorSelectedFeatureAction extends Action {
 				Object editPart = editPartArray[i];
 				if (editPart instanceof FeatureEditPart) {
 					FeatureEditPart editP = (FeatureEditPart) editPart;
-					IFeature feature = editP.getFeature();
+					IGraphicalFeature feature = editP.getFeature();
 					if (!featureList.contains(feature))
 						featureList.add(feature);
 				}
@@ -109,11 +108,13 @@ public class ColorSelectedFeatureAction extends Action {
 
 	public void run() {
 
-		ColorSelectedFeatureDialog dialog = new ColorSelectedFeatureDialog(shell, this.featureList);
-		int returnstat = dialog.open();
+		//TODO _interfaces Removed Code
+//		ColorSelectedFeatureDialog dialog = new ColorSelectedFeatureDialog(shell, this.featureList);
+//		int returnstat = dialog.open();
+		int returnstat = 0;
 
 		if (!featureList.isEmpty() && Window.OK == returnstat) {
-			featureList.get(0).getFeatureModel().handleModelDataChanged();
+			featureList.get(0).getGraphicalModel().getFeatureModel().handleModelDataChanged();
 		}
 	}
 	

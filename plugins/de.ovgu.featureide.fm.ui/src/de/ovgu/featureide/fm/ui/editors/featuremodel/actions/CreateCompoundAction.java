@@ -115,7 +115,7 @@ public class CreateCompoundAction extends Action {
 			IFeature feature;
 
 			if (editPart instanceof FeatureEditPart)
-				feature = ((FeatureEditPart) editPart).getFeature();
+				feature = ((FeatureEditPart) editPart).getFeature().getObject();
 			else
 				feature = (IFeature) editPart;
 

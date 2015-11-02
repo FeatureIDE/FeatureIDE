@@ -20,26 +20,21 @@
  */
 package de.ovgu.featureide.fm.core.base;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import de.ovgu.featureide.fm.core.base.event.IEventManager;
 
 /**
  * Interface for a class that represents a feature model element.
  * 
  * @author Sebastian Krieter
  */
-public interface IFeatureModelElement extends PropertyChangeListener {
-
-	void addListener(PropertyChangeListener listener);
-
-	void fireEvent(PropertyChangeEvent event);
+public interface IFeatureModelElement extends IEventManager {
 
 	IFeatureModel getFeatureModel();
 
-	void removeListener(PropertyChangeListener listener);
-
-	long getId();
+	long getInternalId();
 	
-	IGraphicalElement getGraphicRepresenation();
-
+	String getName();
+	
+	void setName(String name);
+	
 }

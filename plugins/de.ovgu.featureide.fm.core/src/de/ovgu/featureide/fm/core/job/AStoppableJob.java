@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.job;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.DEPRECATION;
-
 import org.eclipse.core.runtime.jobs.Job;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;

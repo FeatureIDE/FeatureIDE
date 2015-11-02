@@ -39,6 +39,7 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 import de.ovgu.featureide.fm.ui.properties.language.ILanguage;
@@ -140,7 +141,8 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		return true;
 	}
 
-	public LegendFigure(IFeatureModel featureModel, Point pos) {
+	public LegendFigure(IGraphicalFeatureModel graphicalFeatureModel, Point pos) {
+		final IFeatureModel featureModel = graphicalFeatureModel.getFeatureModel();
 		final FeatureModelAnalyzer analyser = featureModel.getAnalyser();
 
 		mandatory = featureModel.getStructure().hasMandatoryFeatures();
@@ -152,7 +154,7 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		hidden = featureModel.getStructure().hasHidden();
 		dead = analyser.getAttributeFlag(Attribute.Dead);
 		
-		showHidden = featureModel.getGraphicRepresenation().getLayout().showHiddenFeatures();
+		showHidden = graphicalFeatureModel.getLayout().showHiddenFeatures();
 		falseoptional = featureModel.getStructure().hasFalseOptionalFeatures();
 		indetHidden = featureModel.getStructure().hasIndetHidden();
 
@@ -174,8 +176,8 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		setLayoutManager(layout);
 		setBorder(FMPropertyManager.getLegendBorder());
 		setLegendSize();
-		FeatureUIHelper.setLegendSize(featureModel, this.getSize());
-		FeatureUIHelper.setLegendFigure(featureModel, this);
+		FeatureUIHelper.setLegendSize(graphicalFeatureModel, this.getSize());
+		FeatureUIHelper.setLegendFigure(graphicalFeatureModel, this);
 		createRows();
 		setForegroundColor(FMPropertyManager.getLegendForgroundColor());
 		setBackgroundColor(FMPropertyManager.getLegendBackgroundColor());

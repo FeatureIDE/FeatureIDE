@@ -21,15 +21,14 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.commands;
 
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.gef.commands.Command;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.base.IConstraint;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ConstraintMoveOperation;
 
 /**
@@ -43,19 +42,19 @@ public class ConstraintDragAndDropCommand extends Command {
 	private int maxRight;
 	private int maxUp;
 	private int maxDown;
-	private IFeatureModel featureModel;
-	private IConstraint constraint;
+	private IGraphicalFeatureModel featureModel;
+	private IGraphicalConstraint constraint;
 	private Point newLocation;
 	private boolean hasAutoLayout;
 	boolean isLastPos;
 
-	public ConstraintDragAndDropCommand(IFeatureModel featureModel, IConstraint constraint, Point newLocation) {
+	public ConstraintDragAndDropCommand(IGraphicalFeatureModel featureModel, IGraphicalConstraint constraint, Point newLocation) {
 		// super("Moving " + constraint.getNode().toString());
 		this.featureModel = featureModel;
 		this.constraint = constraint;
 		this.newLocation = newLocation;
 		isLastPos = false;
-		this.hasAutoLayout = featureModel.getGraphicRepresenation().getLayout().hasFeaturesAutoLayout();
+		this.hasAutoLayout = featureModel.getLayout().hasFeaturesAutoLayout();
 	}
 
 	public boolean canExecute() {
@@ -77,9 +76,11 @@ public class ConstraintDragAndDropCommand extends Command {
 		if (hasAutoLayout && (index == oldIndex))
 			return;
 
-		ConstraintMoveOperation op = new ConstraintMoveOperation(constraint, featureModel, index, oldIndex, isLastPos, newLocation, FeatureUIHelper
-				.getLocation(constraint).getCopy());
-		op.addContext((IUndoContext) featureModel.getUndoContext());
+		ConstraintMoveOperation op = new ConstraintMoveOperation(constraint.getObject(), featureModel.getFeatureModel(), index, oldIndex);
+//TODO _interfaces Removed Code
+//		, newLocation, FeatureUIHelper
+//		.getLocation(constraint).getCopy()
+//		op.addContext((IUndoContext) featureModel.getUndoContext());
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
@@ -94,7 +95,7 @@ public class ConstraintDragAndDropCommand extends Command {
 	 */
 	private int calculateNewIndex() {
 
-		for (IConstraint c : featureModel.getConstraints()) {
+		for (IGraphicalConstraint c : featureModel.getConstraints()) {
 			if ((FeatureUIHelper.getLocation(c).y + 17) > newLocation.y) {
 				isLastPos = false;
 
@@ -110,7 +111,7 @@ public class ConstraintDragAndDropCommand extends Command {
 	public void setMaxValues() {
 		maxLeft = FeatureUIHelper.getLocation(constraint).x;
 		maxUp = FeatureUIHelper.getLocation(constraint).y;
-		for (IConstraint c : featureModel.getConstraints()) {
+		for (IGraphicalConstraint c : featureModel.getConstraints()) {
 
 			if (FeatureUIHelper.getLocation(c).x < maxLeft) {
 				maxLeft = FeatureUIHelper.getLocation(c).x;

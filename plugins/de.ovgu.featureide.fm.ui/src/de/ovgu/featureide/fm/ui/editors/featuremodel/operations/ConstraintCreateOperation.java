@@ -26,8 +26,9 @@ import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
 
 /**
  * Operation with functionality to create a new constraint. Enables undo/redo
@@ -36,7 +37,6 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayou
  * @author Fabian Benduhn
  */
 public class ConstraintCreateOperation extends AbstractFeatureModelOperation {
-	private final static String LABEL = CREATE_CONSTRAINT;
 	private IConstraint constraint;
 
 	/**
@@ -46,22 +46,20 @@ public class ConstraintCreateOperation extends AbstractFeatureModelOperation {
 	 *            model that will be used to add the constraint
 	 */
 	public ConstraintCreateOperation(Node node, IFeatureModel featureModel) {
-		super(featureModel, LABEL);
+		super(featureModel, CREATE_CONSTRAINT);
 		constraint = FeatureModelFactory.getInstance().createConstraint(featureModel, node);
 	}
 
 	@Override
 	protected void redo() {
 		featureModel.addConstraint(constraint);
-
-		//initialize constraint position in manual layout
-		if (!featureModel.getGraphicRepresenation().getLayout().hasFeaturesAutoLayout())
-			FeatureDiagramLayoutHelper.initializeConstraintPosition(featureModel, featureModel.getConstraintCount() - 1);
+		featureModel.fireEvent(new FeatureModelEvent(constraint, PropertyConstants.CONSTRAINT_ADD, null, null));
 	}
 
 	@Override
 	protected void undo() {
 		featureModel.removeConstraint(constraint);
+		featureModel.fireEvent(new FeatureModelEvent(constraint, PropertyConstants.CONSTRAINT_DELETE, null, null));
 	}
 
 }

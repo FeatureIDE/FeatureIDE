@@ -32,6 +32,7 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
@@ -769,7 +770,8 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public List<FeatureConnection> getSourceConnections() {
-		return Functional.toList(FeatureUtils.getSourceConnections(feature));
+//		return Functional.toList(FeatureUtils.getSourceConnections(feature));
+		return null;
 	}
 
 	/**
@@ -786,7 +788,8 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public List<FeatureConnection> getTargetConnections() {
-		return Functional.toList(FeatureUtils.getTargetConnections(feature));
+//		return Functional.toList(FeatureUtils.getTargetConnections(feature));
+		return null;
 	}
 
 	/**
@@ -803,7 +806,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public void addTargetConnection(FeatureConnection connection) {
-		FeatureUtils.addTargetConnection(feature, connection);
+//		FeatureUtils.addTargetConnection(feature, connection);
 	}
 
 	/**
@@ -820,7 +823,8 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public boolean removeTargetConnection(FeatureConnection connection) {
-		return FeatureUtils.removeTargetConnection(feature, connection);
+//		return FeatureUtils.removeTargetConnection(feature, connection);
+		return false;
 	}
 
 	/**
@@ -1183,7 +1187,8 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public ColorList getColorList() {
-		return FeatureUtils.getColorList(feature);
+//		return FeatureUtils.getColorList(feature);
+		return null;
 	}
 
 	/**

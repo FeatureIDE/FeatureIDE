@@ -18,13 +18,14 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core;
+package de.ovgu.featureide.fm.ui;
 
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /** 
  * Holds the color scheme names for a {@link IFeatureModel}.
@@ -93,7 +94,7 @@ public class EmptyColorschemeTable extends ColorschemeTable {
 	}
 
 	@Override
-	public ColorschemeTable clone(IFeatureModel fm) {
+	public ColorschemeTable clone(IGraphicalFeatureModel fm) {
 		return new EmptyColorschemeTable();
 	}
 	

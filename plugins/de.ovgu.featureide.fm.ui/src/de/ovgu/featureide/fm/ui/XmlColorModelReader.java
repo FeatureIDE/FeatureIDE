@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.io.xml;
+package de.ovgu.featureide.fm.ui;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.COLOR;
 import static de.ovgu.featureide.fm.core.localization.StringTable.COLORSCHEME;
@@ -37,11 +37,10 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
-import de.ovgu.featureide.fm.core.ColorList;
-import de.ovgu.featureide.fm.core.ColorschemeTable;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 
 /**
  * Parses the color model from XML to the feature model
@@ -63,7 +62,9 @@ public class XmlColorModelReader extends XmlFeatureModelReader {
 			// mode: 0 = start; 1 = feature; 2 = colorSchemes; 3 = features;
 			int mode = 0;
 
-			ColorschemeTable colorschemeTable = featureModel.getGraphicRepresenation().getColorschemeTable();
+			//TODO _interfaces Removed Code
+			ColorschemeTable colorschemeTable = null;
+//			featureModel.getGraphicRepresenation().getColorschemeTable();
 			ColorList colors = null;
 			
 			colorschemeTable.clearBeforeLoading();
@@ -107,7 +108,8 @@ public class XmlColorModelReader extends XmlFeatureModelReader {
 						if (attribute.getName().getLocalPart().equals("name")) {
 							IFeature feat = featureModel.getFeature(featureModel.getRenamingsManager().getNewName(attribute.getValue()));
 							if (feat != null) {
-								colors = feat.getGraphicRepresenation().getColorList();
+								//TODO _interfaces Removed Code
+//								colors = feat.getGraphicRepresenation().getColorList();
 								mode = 1;
 							}
 						}

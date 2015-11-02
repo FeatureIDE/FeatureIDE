@@ -22,8 +22,6 @@ package de.ovgu.featureide.fm.ui.editors.configuration;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.SELECT_THE_CORRESPONDING_FEATUREMODEL_;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -61,8 +59,10 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.MultiPageEditorPart;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.IFeatureModelListener;
+import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
@@ -87,7 +87,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
  * @author Jens Meinicke
  * @author Hannes Smurawsky
  */
-public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefaults, PropertyConstants, PropertyChangeListener, IResourceChangeListener,
+public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefaults, PropertyConstants, IFeatureModelListener, IResourceChangeListener,
 		IConfigurationEditor {
 
 	public static final String ID = FMUIPlugin.PLUGIN_ID + ".editors.configuration.ConfigurationEditor";
@@ -331,7 +331,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	}
 
 	@Override
-	public void propertyChange(final PropertyChangeEvent evt) {
+	public void propertyChange(final FeatureModelEvent evt) {
 		if (!PropertyConstants.MODEL_DATA_CHANGED.equals(evt.getPropertyName())) {
 			return;
 		}

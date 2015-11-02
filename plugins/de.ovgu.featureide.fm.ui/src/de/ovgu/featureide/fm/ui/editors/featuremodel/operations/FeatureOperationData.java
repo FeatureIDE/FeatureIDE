@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 
 /**
  * Contains all information needed to execute commands that move features
@@ -29,13 +29,13 @@ import de.ovgu.featureide.fm.core.base.IFeature;
  */
 public class FeatureOperationData {
 
-	private IFeature oldParent;
-	private IFeature feature;
-	private IFeature newParent;
+	private IGraphicalFeature oldParent;
+	private IGraphicalFeature feature;
+	private IGraphicalFeature newParent;
 	private int newIndex;
 	private int oldIndex;
 
-	public FeatureOperationData(IFeature feature, IFeature oldParent, IFeature newParent, int newIndex, int oldIndex) {
+	public FeatureOperationData(IGraphicalFeature feature, IGraphicalFeature oldParent, IGraphicalFeature newParent, int newIndex, int oldIndex) {
 		this.feature = feature;
 		this.newIndex = newIndex;
 		this.newParent = newParent;
@@ -47,7 +47,7 @@ public class FeatureOperationData {
 	/**
 	 * @return the oldParent
 	 */
-	public IFeature getOldParent() {
+	public IGraphicalFeature getOldParent() {
 		return oldParent;
 	}
 
@@ -55,14 +55,14 @@ public class FeatureOperationData {
 	 * @param oldParent
 	 *            the oldParent to set
 	 */
-	public void setOldParent(IFeature oldParent) {
+	public void setOldParent(IGraphicalFeature oldParent) {
 		this.oldParent = oldParent;
 	}
 
 	/**
 	 * @return the feature
 	 */
-	public IFeature getFeature() {
+	public IGraphicalFeature getFeature() {
 		return feature;
 	}
 
@@ -70,14 +70,14 @@ public class FeatureOperationData {
 	 * @param feature
 	 *            the feature to set
 	 */
-	public void setFeature(IFeature feature) {
+	public void setFeature(IGraphicalFeature feature) {
 		this.feature = feature;
 	}
 
 	/**
 	 * @return the newParent
 	 */
-	public IFeature getNewParent() {
+	public IGraphicalFeature getNewParent() {
 		return newParent;
 	}
 
@@ -85,7 +85,7 @@ public class FeatureOperationData {
 	 * @param newParent
 	 *            the newParent to set
 	 */
-	public void setNewParent(IFeature newParent) {
+	public void setNewParent(IGraphicalFeature newParent) {
 		this.newParent = newParent;
 	}
 

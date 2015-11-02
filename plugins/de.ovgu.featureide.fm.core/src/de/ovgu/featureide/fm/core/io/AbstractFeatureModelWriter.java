@@ -20,54 +20,25 @@
  */
 package de.ovgu.featureide.fm.core.io;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.charset.Charset;
-
-import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
- * Default writer to be extended for each feature model format.
+ * Default reader to be extended for each feature model format.
  * 
- * If IFile support is needed, the {@link FeatureModelWriterIFileWrapper} has to be used.
+ * If IFile support is needed, the {@link FeatureModelReaderIFileWrapper} has to be used.
  * 
  * @author Thomas Thuem
  */
-public abstract class AbstractFeatureModelWriter implements IFeatureModelWriter {
+public abstract class AbstractFeatureModelWriter extends AbstractObjectWriter<IFeatureModel> implements IFeatureModelWriter {
 
-	/**
-	 * the feature model to write out
-	 */
-	protected IFeatureModel featureModel;
-	
-	public void setFeatureModel(IFeatureModel featureModel) {
-		this.featureModel = featureModel;
-	}
-	
+	@Override
 	public IFeatureModel getFeatureModel() {
-		return featureModel;
+		return getObject();
 	}
-	
-	public void writeToFile(File file) {
-		FileOutputStream output = null;
-		try {
-			if (!file.exists()) file.createNewFile();
-			output = new FileOutputStream(file);
-			output.write(writeToString().getBytes(Charset.availableCharsets().get("UTF-8")));
-			output.flush();
-		} catch (IOException e) {
-			FMCorePlugin.getDefault().logError(e);
-		} finally {
-			try {
-				if (output != null) { 
-					output.close();
-				}
-			} catch (IOException e) {
-				FMCorePlugin.getDefault().logError(e);
-			}
-		}
+
+	@Override
+	public void setFeatureModel(IFeatureModel featureModel) {
+		setObject(featureModel);
 	}
-	
+
 }

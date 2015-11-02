@@ -37,7 +37,6 @@ public class LegendHideOperation extends AbstractFeatureModelOperation {
 	 */
 	public LegendHideOperation(IFeatureModel featureModel) {
 		super(featureModel, LABEL);
-		this.featureModel = featureModel;
 	}
 
 	@Override

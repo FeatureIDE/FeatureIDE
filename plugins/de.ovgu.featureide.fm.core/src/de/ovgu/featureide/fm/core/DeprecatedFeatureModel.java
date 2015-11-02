@@ -32,7 +32,6 @@ import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.IFeatureModelLayout;
 
 /**
  * Contains all deprecated functionality of {@link IFeatureModel}.
@@ -161,7 +160,8 @@ abstract class DeprecatedFeatureModel {
 	 */
 	@Deprecated
 	public FMPoint getLegendPos() {
-	    return getLayout().getLegendPos();
+//	    return getLayout().getLegendPos();
+		return null;
 	}
 
 	/**
@@ -169,7 +169,7 @@ abstract class DeprecatedFeatureModel {
 	 */
 	@Deprecated
 	public void setLegendPos(int x, int y) {
-	    getLayout().setLegendPos(x, y);
+//	    getLayout().setLegendPos(x, y);
 	}
 
 	/**
@@ -177,7 +177,7 @@ abstract class DeprecatedFeatureModel {
 	 */
 	@Deprecated
 	public void setLegendAutoLayout(boolean b) {
-	    getLayout().setLegendAutoLayout(b);
+//	    getLayout().setLegendAutoLayout(b);
 	}
 
 	/**
@@ -185,7 +185,8 @@ abstract class DeprecatedFeatureModel {
 	 */
 	@Deprecated
 	public boolean hasLegendAutoLayout() {
-	    return getLayout().hasLegendAutoLayout();
+//	    return getLayout().hasLegendAutoLayout();
+		return false;
 	}
 
 	/**
@@ -193,7 +194,8 @@ abstract class DeprecatedFeatureModel {
 	 */
 	@Deprecated
 	public boolean hasFeaturesAutoLayout() {
-	    return getLayout().hasFeaturesAutoLayout();
+//	    return getLayout().hasFeaturesAutoLayout();
+		return false;
 	}
 
 	/**
@@ -201,7 +203,8 @@ abstract class DeprecatedFeatureModel {
 	 */
 	@Deprecated
 	public boolean showHiddenFeatures() {
-	    return getLayout().showHiddenFeatures();
+//	    return getLayout().showHiddenFeatures();
+		return false;
 	}
 
 	/**
@@ -209,7 +212,7 @@ abstract class DeprecatedFeatureModel {
 	 */
 	@Deprecated
 	public void showHiddenFeatures(boolean b) {
-	    getLayout().showHiddenFeatures(b);
+//	    getLayout().showHiddenFeatures(b);
 	}
 
 	/**
@@ -217,7 +220,8 @@ abstract class DeprecatedFeatureModel {
 	 */
 	@Deprecated
 	public boolean verticalLayout() {
-	    return getLayout().verticalLayout();
+//	    return getLayout().verticalLayout();
+		return false;
 	}
 
 	/**
@@ -225,7 +229,7 @@ abstract class DeprecatedFeatureModel {
 	 */
 	@Deprecated
 	public void verticalLayout(boolean b) {
-	    getLayout().verticalLayout(b);
+//	    getLayout().verticalLayout(b);
 	}
 	
 	@Deprecated
@@ -238,7 +242,7 @@ abstract class DeprecatedFeatureModel {
 	 */
 	@Deprecated
 	public void setLayout(int newLayoutAlgorithm) {
-	    getLayout().setLayout(newLayoutAlgorithm);
+//	    getLayout().setLayout(newLayoutAlgorithm);
 	}
 
 	/**
@@ -246,7 +250,8 @@ abstract class DeprecatedFeatureModel {
 	 */
 	@Deprecated
 	public int getLayoutAlgorithm() {
-	    return getLayout().getLayoutAlgorithm();
+//	    return getLayout().getLayoutAlgorithm();
+		return 0;
 	}
 	
 	/**

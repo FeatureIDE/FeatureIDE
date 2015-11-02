@@ -30,6 +30,7 @@ import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ShowHiddenFeaturesOperation;
 
 /**
@@ -40,9 +41,9 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ShowHiddenFeatur
  */
 public class ShowHiddenFeaturesAction extends Action {
 
-	private final IFeatureModel featureModel;
+	private final IGraphicalFeatureModel featureModel;
 
-	public ShowHiddenFeaturesAction(GraphicalViewerImpl viewer, IFeatureModel featureModel) {
+	public ShowHiddenFeaturesAction(GraphicalViewerImpl viewer, IGraphicalFeatureModel featureModel) {
 		super(SHOW_HIDDEN_FEATURES);
 		this.featureModel = featureModel;
 
@@ -51,7 +52,8 @@ public class ShowHiddenFeaturesAction extends Action {
 	@Override
 	public void run() {
 		ShowHiddenFeaturesOperation op = new ShowHiddenFeaturesOperation(featureModel);
-		op.addContext((IUndoContext) featureModel.getUndoContext());
+		//TODO _interfaces Removed Code
+//		op.addContext((IUndoContext) featureModel.getUndoContext());
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);

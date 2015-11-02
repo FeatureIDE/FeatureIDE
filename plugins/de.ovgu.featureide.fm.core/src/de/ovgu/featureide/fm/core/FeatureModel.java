@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.core;
 
+import static de.ovgu.featureide.fm.core.base.FeatureUtils.convert;
+
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
 import java.util.HashMap;
@@ -38,10 +40,8 @@ import org.prop4j.Node;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.IFeatureModelLayout;
+import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.core.functional.Functional;
-import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
-import static de.ovgu.featureide.fm.core.base.FeatureUtils.*;
 
 /**
  * The model representation of the feature tree that notifies listeners of
@@ -79,11 +79,13 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 
 	@Override
 	public IFeatureModelLayout getLayout() {
-		return model.getLayout();
+//		return model.getLayout();
+		return null;
 	}
 
 	public ColorschemeTable getColorschemeTable() {
-		return model.getGraphicRepresenation().getColorschemeTable();
+//		return model.getGraphicRepresenation().getColorschemeTable();
+		return null;
 	}
 
 	@Override

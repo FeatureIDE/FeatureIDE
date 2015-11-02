@@ -134,9 +134,10 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 	 * Refreshes registered models.
 	 */
 	public static void updateEditors() {
-		for (IFeatureModel model : featureModels) {
-			model.getGraphicRepresenation().redrawDiagram();
-		}
+		//TODO _interfaces Removed Code
+//		for (IFeatureModel model : featureModels) {
+//			model.getGraphicRepresenation().redrawDiagram();
+//		}
 	}
 
 	public static void setHideLegend(boolean value) {

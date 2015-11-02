@@ -20,14 +20,12 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
-import java.beans.PropertyChangeEvent;
-
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureProperty;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.core.base.IGraphicalFeature;
+import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
 
 /**
  * Partial implementation of the {@link IFeature} interface.
@@ -40,15 +38,9 @@ public abstract class AFeature extends AFeatureModelElement implements IFeature 
 	protected final IFeatureProperty property;
 	protected final IFeatureStructure structure;
 
-	protected String name;
-
-	protected IGraphicalFeature graphicalRepresentation;
-
 	protected AFeature(AFeature oldFeature, IFeatureModel featureModel, IFeatureStructure newFeatrureStructure) {
 		super(oldFeature, featureModel);
-		name = new String(oldFeature.name.toString());
 
-		graphicalRepresentation = oldFeature.graphicalRepresentation;
 		property = oldFeature.property.clone(this);
 		structure = newFeatrureStructure != null ? newFeatrureStructure : oldFeature.structure;
 	}
@@ -57,13 +49,8 @@ public abstract class AFeature extends AFeatureModelElement implements IFeature 
 		super(featureModel);
 		this.name = name;
 
-		graphicalRepresentation = createGraphicalRepresentation();
 		property = createProperty();
 		structure = createStructure();
-	}
-
-	protected IGraphicalFeature createGraphicalRepresentation() {
-		return GraphicMap.getInstance().getGraphicRepresentation(this);
 	}
 
 	protected IFeatureProperty createProperty() {
@@ -72,11 +59,6 @@ public abstract class AFeature extends AFeatureModelElement implements IFeature 
 
 	protected IFeatureStructure createStructure() {
 		return new FeatureStructure(this);
-	}
-
-	@Override
-	public IGraphicalFeature getGraphicRepresenation() {
-		return graphicalRepresentation;
 	}
 
 	@Override
@@ -96,9 +78,9 @@ public abstract class AFeature extends AFeatureModelElement implements IFeature 
 
 	@Override
 	public void setName(String name) {
-		this.name = name;
-		final CharSequence oldName = this.name;
-		fireEvent(new PropertyChangeEvent(this, NAME_CHANGED, oldName, name));
+		final String oldName = this.name;
+		super.setName(name);
+		fireEvent(new FeatureModelEvent(this, NAME_CHANGED, oldName, name));
 	}
 
 	@Override
