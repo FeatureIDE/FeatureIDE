@@ -25,6 +25,9 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.CONNECTIONTYPE
 import static de.ovgu.featureide.fm.core.localization.StringTable.YES;
 
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -41,7 +44,9 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.prop4j.And;
+import org.prop4j.Literal;
 import org.prop4j.NodeWriter;
+import org.prop4j.Or;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -57,9 +62,9 @@ import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
  * @author Fabian Wielgorz
  */
 public class SXFMWriter extends AbstractFeatureModelWriter {
-	
-	private final static String[] symbols =  new String[] {"~", " and ", " or ", "", "", ", ", "", "", ""};
-	
+
+	private final static String[] symbols = new String[] { "~", " and ", " or ", "", "", ", ", "", "", "" };
+
 	/**
 	 * Creates a new writer and sets the feature model to write out.
 	 * 
@@ -68,26 +73,26 @@ public class SXFMWriter extends AbstractFeatureModelWriter {
 	public SXFMWriter(FeatureModel featureModel) {
 		setFeatureModel(featureModel);
 	}
-	
+
 	//@Override
 	public String writeToString() {
 		//Create Empty DOM Document
-    	DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setNamespaceAware(true);
-        dbf.setIgnoringComments(true);
-        dbf.setIgnoringElementContentWhitespace(false);
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		dbf.setNamespaceAware(true);
+		dbf.setIgnoringComments(true);
+		dbf.setIgnoringElementContentWhitespace(false);
 		dbf.setCoalescing(false);
 		dbf.setExpandEntityReferences(false);
 		DocumentBuilder db = null;
 		try {
-		    db = dbf.newDocumentBuilder();
+			db = dbf.newDocumentBuilder();
 		} catch (ParserConfigurationException pce) {
-		    FMCorePlugin.getDefault().logError(pce);
+			FMCorePlugin.getDefault().logError(pce);
 		}
 		Document doc = db.newDocument();
 		//Create the Xml Representation
 		createXmlDoc(doc);
-		
+
 		//Transform the Xml Representation into a String
 		Transformer transfo = null;
 		try {
@@ -109,91 +114,91 @@ public class SXFMWriter extends AbstractFeatureModelWriter {
 		}
 		return result.getWriter().toString();
 	}
-	
+
 	/**
-     * Creates the DOM Document Representation from the feature model fmodel
-     * by using createXmlDocRec
-     * @param doc Document where the feature model is put
-     */
-    private void createXmlDoc(Document doc) {
-    	Element elem = doc.createElement("feature_model");
-        elem.setAttribute("name", "FeatureIDE model");
-        doc.appendChild(elem);
-        Node featTree = doc.createElement("feature_tree");
-        elem.appendChild(featTree);
-        featTree.appendChild(doc.createTextNode("\n"));
-        createXmlDocRec(doc, featTree, featureModel.getRoot(), false, "");
-        createPropositionalConstraints(doc, elem);
-    }
-	
-    
-    /**
-     * Creates the DOM Document Representation from the feature model fmodel
-     * by recursively building the Nodes
-     * @param doc Document where the feature model is put
-     * @param nod Current Node in the Document Tree
-     * @param feat Current Feature in the feature model Tree
-     * @param andMode true if the connection between the current feature and 
-     * its parent is of the type "and", false otherwise
-     * @param indent indentation of the parent feature
-     */
-    private void createXmlDocRec(Document doc, Node nod, Feature feat, 
-    		boolean andMode, String indent) {
-    	String newIndent;
-    	Node textNode;
-    	LinkedList<Feature> children;
-    	boolean nextAndMode = false;
-    	if (feat == null) return;
-    	String fName = feat.getName();
-    	if (feat.isRoot()) {
-    		textNode = doc.createTextNode(":r " + fName + "(" + fName + ")\n");
-    		newIndent = "\t";
-    	} else if (andMode) {
-    		if (feat.isMandatory()) {
-        		textNode = doc.createTextNode(indent + ":m " + fName + "(" + 
-        									  fName + ")\n") ;
-        	} else {
-        		textNode = doc.createTextNode(indent + ":o " + fName + "(" + 
-        									  fName + ")\n") ;
-        	}
-    	} else {
-    		textNode = doc.createTextNode(indent + ": " + fName + "(" + 
-    									  fName + ")\n");
-    	}
-    	nod.appendChild(textNode);
-    	children = feat.getChildren();
-    	if (children.isEmpty()) return;
-    	if (feat.isAnd()) {
-    		nextAndMode = true;
-    		newIndent = indent + "\t";
-    	} else if (feat.isOr()) {
-    		textNode = doc.createTextNode(indent + "\t:g [1,*]\n");
-    		nod.appendChild(textNode);
-    		newIndent = indent + "\t\t";
-    		nextAndMode = false;
-    	} else if (feat.isAlternative()) {
-    		textNode = doc.createTextNode(indent + "\t:g [1,1]\n");
-    		nod.appendChild(textNode);
-    		newIndent = indent + "\t\t";
-    		nextAndMode = false;
-    	} else throw new IllegalStateException (CANT_DETERMINE +
-				CONNECTIONTYPE_OF_ROOTFEATURE);
-    	
-    	Iterator<Feature> i = children.iterator();
-    	while (i.hasNext()) {
-    		createXmlDocRec(doc, nod , i.next(), nextAndMode, newIndent);
-    	}
-    }
-    
-    /**
-     * Inserts the tags concerning propositional constraints into the DOM 
-     * document representation
-     * @param doc
-     * @param FeatMod Parent node for the propositional nodes
-     */
-    private void createPropositionalConstraints(Document doc, Node FeatMod) {
-    	// add a node for constraints in any case
-    	Node propConstr = doc.createElement("constraints");
+	 * Creates the DOM Document Representation from the feature model fmodel
+	 * by using createXmlDocRec
+	 * 
+	 * @param doc Document where the feature model is put
+	 */
+	private void createXmlDoc(Document doc) {
+		Element elem = doc.createElement("feature_model");
+		elem.setAttribute("name", "FeatureIDE model");
+		doc.appendChild(elem);
+		Node featTree = doc.createElement("feature_tree");
+		elem.appendChild(featTree);
+		featTree.appendChild(doc.createTextNode("\n"));
+		createXmlDocRec(doc, featTree, featureModel.getRoot(), false, "");
+		createPropositionalConstraints(doc, elem);
+	}
+
+	/**
+	 * Creates the DOM Document Representation from the feature model fmodel
+	 * by recursively building the Nodes
+	 * 
+	 * @param doc Document where the feature model is put
+	 * @param nod Current Node in the Document Tree
+	 * @param feat Current Feature in the feature model Tree
+	 * @param andMode true if the connection between the current feature and
+	 *            its parent is of the type "and", false otherwise
+	 * @param indent indentation of the parent feature
+	 */
+	private void createXmlDocRec(Document doc, Node nod, Feature feat, boolean andMode, String indent) {
+		String newIndent;
+		Node textNode;
+		LinkedList<Feature> children;
+		boolean nextAndMode = false;
+		if (feat == null)
+			return;
+		String fName = feat.getName();
+		if (feat.isRoot()) {
+			textNode = doc.createTextNode(":r " + fName + "(" + fName + ")\n");
+			newIndent = "\t";
+		} else if (andMode) {
+			if (feat.isMandatory()) {
+				textNode = doc.createTextNode(indent + ":m " + fName + "(" + fName + ")\n");
+			} else {
+				textNode = doc.createTextNode(indent + ":o " + fName + "(" + fName + ")\n");
+			}
+		} else {
+			textNode = doc.createTextNode(indent + ": " + fName + "(" + fName + ")\n");
+		}
+		nod.appendChild(textNode);
+		children = feat.getChildren();
+		if (children.isEmpty())
+			return;
+		if (feat.isAnd()) {
+			nextAndMode = true;
+			newIndent = indent + "\t";
+		} else if (feat.isOr()) {
+			textNode = doc.createTextNode(indent + "\t:g [1,*]\n");
+			nod.appendChild(textNode);
+			newIndent = indent + "\t\t";
+			nextAndMode = false;
+		} else if (feat.isAlternative()) {
+			textNode = doc.createTextNode(indent + "\t:g [1,1]\n");
+			nod.appendChild(textNode);
+			newIndent = indent + "\t\t";
+			nextAndMode = false;
+		} else
+			throw new IllegalStateException(CANT_DETERMINE + CONNECTIONTYPE_OF_ROOTFEATURE);
+
+		Iterator<Feature> i = children.iterator();
+		while (i.hasNext()) {
+			createXmlDocRec(doc, nod, i.next(), nextAndMode, newIndent);
+		}
+	}
+
+	/**
+	 * Inserts the tags concerning propositional constraints into the DOM
+	 * document representation
+	 * 
+	 * @param doc
+	 * @param FeatMod Parent node for the propositional nodes
+	 */
+	private void createPropositionalConstraints(Document doc, Node FeatMod) {
+		// add a node for constraints in any case
+		Node propConstr = doc.createElement("constraints");
 		FeatMod.appendChild(propConstr);
 		Node newNode = doc.createTextNode("\n");
 		propConstr.appendChild(newNode);
@@ -203,62 +208,93 @@ public class SXFMWriter extends AbstractFeatureModelWriter {
 		int i = 1;
 		for (org.prop4j.Node node : featureModel.getPropositionalNodes()) {
 			// avoid use of parenthesis from the beginning
-			org.prop4j.Node cnf = node.clone().toCNF();
+			//			org.prop4j.Node cnf = node.clone().toCNF();
+
+			org.prop4j.Node cnf = node.toCNF();
+
+			final ArrayList<org.prop4j.Node> literalList = new ArrayList<>();
 			if (cnf instanceof And) {
 				for (org.prop4j.Node child : cnf.getChildren()) {
-					i = crteateConstraint(doc, propConstr, i, child);
+					if (child instanceof Or) {
+						literalList.addAll(Arrays.asList(child.getChildren()));
+					} else {
+						literalList.add(child);
+					}
 				}
+			} else if (cnf instanceof Or) {
+				literalList.addAll(Arrays.asList(cnf.getChildren()));
 			} else {
-				i = crteateConstraint(doc, propConstr, i, cnf);
+				literalList.add(cnf);
+			}
+
+			final HashSet<org.prop4j.Node> literalSet = new HashSet<>(literalList.size());
+			boolean invalid = false;
+			for (org.prop4j.Node literal : literalList) {
+				final Literal negativeliteral = ((Literal) literal).clone();
+				negativeliteral.flip();
+
+				if (literalSet.contains(negativeliteral)) {
+					invalid = true;
+				} else {
+					literalSet.add(literal);
+				}
+			}
+
+			if (!invalid) {
+				if (cnf instanceof And) {
+					for (org.prop4j.Node child : cnf.getChildren()) {
+						i = createConstraint(doc, propConstr, i, child);
+					}
+				} else {
+					i = createConstraint(doc, propConstr, i, cnf);
+				}
 			}
 		}
 	}
 
-	private int crteateConstraint(Document doc, Node propConstr, int i,
-			org.prop4j.Node node) {
+	private int createConstraint(Document doc, Node propConstr, int i, org.prop4j.Node node) {
 		Node newNode;
-		String nodeString = NodeWriter.nodeToString(node, symbols, false);
+		String nodeString = NodeWriter.nodeToString(node, symbols, true);
 		// remove the external parenthesis
 		if ((nodeString.startsWith("(")) && (nodeString.endsWith(")"))) {
 			nodeString = nodeString.substring(1, nodeString.length() - 1);
 		}
 		// replace the space before a variable
-		nodeString = nodeString.replace("~ ","~");
-		newNode = doc.createTextNode("C" + i + ":" + nodeString + "\n");			
+		nodeString = nodeString.replace("~ ", "~");
+		newNode = doc.createTextNode("C" + i + ":" + nodeString + "\n");
 		propConstr.appendChild(newNode);
-		i++;
-		return i;
+		return ++i;
 	}
-    
-//    /**
-//     * Adding Brackets around negated Literals
-//     * @param original String describing propositional constraint
-//     * @return
-//     */
-//    private String addBrackets (String original) {
-//    	StringBuilder result = new StringBuilder();
-//    	String newLine = original.replace("(", " ( ");
-//		newLine = newLine.replace(")", " ) ");
-//		newLine = newLine.replace("~", " ~ ");
-//    	Scanner scan = new Scanner(newLine);		
-//		while (scan.hasNext()) {
-//			String token = scan.next();
-//			if ((token.equals("~")) && scan.hasNext()) {
-//				String token2 = scan.next();
-//				if (!token2.equals("(")) {
-//					result.append("( ~");
-//					result.append(token2);
-//					result.append(" )");
-//				} else {
-//					result.append("( ~(");					
-//				}
-//			} else {
-//				result.append(token);
-//			}
-//			result.append(" ");
-//		}
-//		scan.close();
-//    	return result.toString();
-//    }
-    
+
+	//    /**
+	//     * Adding Brackets around negated Literals
+	//     * @param original String describing propositional constraint
+	//     * @return
+	//     */
+	//    private String addBrackets (String original) {
+	//    	StringBuilder result = new StringBuilder();
+	//    	String newLine = original.replace("(", " ( ");
+	//		newLine = newLine.replace(")", " ) ");
+	//		newLine = newLine.replace("~", " ~ ");
+	//    	Scanner scan = new Scanner(newLine);		
+	//		while (scan.hasNext()) {
+	//			String token = scan.next();
+	//			if ((token.equals("~")) && scan.hasNext()) {
+	//				String token2 = scan.next();
+	//				if (!token2.equals("(")) {
+	//					result.append("( ~");
+	//					result.append(token2);
+	//					result.append(" )");
+	//				} else {
+	//					result.append("( ~(");					
+	//				}
+	//			} else {
+	//				result.append(token);
+	//			}
+	//			result.append(" ");
+	//		}
+	//		scan.close();
+	//    	return result.toString();
+	//    }
+
 }
