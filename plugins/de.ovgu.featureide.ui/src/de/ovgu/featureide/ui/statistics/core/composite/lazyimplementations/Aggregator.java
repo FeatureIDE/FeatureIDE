@@ -23,9 +23,13 @@ package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DIRECTIVES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NUMBER_OF;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
@@ -52,7 +56,7 @@ public class Aggregator {
 	private Integer maxNesting = 0;
 	private Integer minNesting = null;
 	private List<Integer> listOfNestings = new LinkedList<Integer>();
-
+	private Map<String,Set<String>> class_to_directives = new HashMap();
 	private int curNestingCount = 0;
 
 	/**
@@ -132,23 +136,34 @@ public class Aggregator {
 	 * @param fstModel
 	 */
 	public void initializeDirectiveCount(FSTModel fstModel) {
+		int sumDirectives = 0;
+		
 		for (FSTFeature feat : fstModel.getFeatures()) {
-			for (FSTRole role : feat.getRoles()) {
+			for (FSTRole role : feat.getRoles()) {		
+				Set<String> directives = new HashSet();
 				for (FSTDirective dir : role.getDirectives()) {
-					directiveCount.add(dir);
-					if (maxNesting < nestingCount) {
-						maxNesting = nestingCount;
-					}
-					if (minNesting == null) {
-						minNesting = nestingCount;
-					} else if (minNesting > nestingCount) {
-						minNesting = nestingCount;
-					}
-					listOfNestings.add(nestingCount);
-					nestingCount = 0;
+					String identifier = role.getFSTClass().getName() + dir.getExpression() + dir.getEndLine();
+					directives.add(identifier);
+//					directiveCount.add(dir);
+//					if (maxNesting < nestingCount) {
+//						maxNesting = nestingCount;
+//					}
+//					if (minNesting == null) {
+//						minNesting = nestingCount;
+//					} else if (minNesting > nestingCount) {
+//						minNesting = nestingCount;
+//					}
+//					listOfNestings.add(nestingCount);
+//					nestingCount = 0;
 				}
+				Set<String> tmp = this.class_to_directives.getOrDefault(role.getFSTClass().getName(), new HashSet());
+				tmp.addAll(directives);
+				this.class_to_directives.put(role.getFSTClass().getName(), tmp);
 			}
+				
 		}
+		
+		int i = 0;
 	}
 
 	private void mapToChild(Parent parent, DirectiveMap count) {
@@ -158,17 +173,35 @@ public class Aggregator {
 			}
 		}
 	}
-
+	
+//	public int getDirectiveCount(){
+//		int sum = 0;
+//		for(Set s : this.class_to_directives.values())
+//			sum += s.size();
+//		
+//		return sum;
+//	}
+	
 	public DirectiveMap getDirectiveCount() {
 		return directiveCount;
 	}
 
 	public Integer getMinimumSum() {
-		return minimumSum;
+		int minSum = Integer.MAX_VALUE;
+		for(Set s : this.class_to_directives.values()){
+			minSum = minSum > s.size() ? s.size() : minSum;
+		}
+		
+		return minSum;
 	}
 
 	public Integer getMaximumSum() {
-		return maximumSum;
+		int maxSum = Integer.MIN_VALUE;
+		for(Set s : this.class_to_directives.values()){
+			maxSum = maxSum < s.size() ? s.size() : maxSum;
+		}
+		
+		return maxSum;
 	}
 
 	public Integer getMaxNesting() {
