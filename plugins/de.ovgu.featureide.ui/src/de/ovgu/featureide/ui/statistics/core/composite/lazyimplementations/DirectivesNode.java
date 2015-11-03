@@ -71,22 +71,29 @@ public class DirectivesNode extends LazyParent {
 		Parent project = new Parent(PROJECT_STATISTICS);
 		Integer maxNesting = 0;
 		String maxNestingClass = null;
-
-		project.addChild(new LazyParent(NUMBER_OF_DIRECTIVES) {
-			@Override
-			protected void initChildren() {
-				new Aggregator().processAll(fstModel, this);
-			}
-		});
-
+		
 		final Aggregator aggProject = new Aggregator();
+		aggProject.processAll(fstModel);
+		
+		Parent directives = new Parent(NUMBER_OF_DIRECTIVES);
+		directives.setValue(aggProject.getDirectiveCount());
+		project.addChild(directives);
+		
+//		project.addChild(new LazyParent(NUMBER_OF_DIRECTIVES) {
+//			@Override
+//			protected void initChildren() {
+//				new Aggregator().processAll(fstModel);
+//			}
+//		});
+
+		
 		for (FSTClass clazz : fstModel.getClasses()) {
 			String className = clazz.getName();
 			final int pIndex = className.lastIndexOf('/');
 			className = ((pIndex > 0) ? className.substring(0, pIndex + 1).replace('/', '.') : "(default package).") + className.substring(pIndex + 1);
 
 			final Parent classNode = new Parent(className);
-			aggProject.process(clazz.getRoles(), classNode);
+			classNode.setValue(aggProject.getDirectiveCountForClass(className));
 			internClasses.addChild(classNode);
 
 			if (!clazz.getRoles().isEmpty()) {
@@ -118,7 +125,7 @@ public class DirectivesNode extends LazyParent {
 
 				Aggregator aggregator = new Aggregator();
 
-				aggregator.initializeDirectiveCount(fstModel);
+				//aggregator.initializeDirectiveCount(fstModel);
 
 				List<Integer> list = aggregator.getListOfNestings();
 				double average = 0.0;
