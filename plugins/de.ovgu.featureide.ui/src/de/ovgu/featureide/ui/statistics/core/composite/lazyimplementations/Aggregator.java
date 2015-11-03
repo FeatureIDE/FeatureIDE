@@ -23,6 +23,7 @@ package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DIRECTIVES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NUMBER_OF;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -140,22 +141,33 @@ public class Aggregator {
 	}
 	
 
-	public Integer getMinimumSum() {
+	public Map.Entry getMinimumNumberOfDirectives() {
 		int minSum = Integer.MAX_VALUE;
-		for(Set s : this.class_to_directives.values()){
-			minSum = minSum > s.size() ? s.size() : minSum;
+		String className = "";
+		
+		for(Map.Entry<String,Set<String>> entry : this.class_to_directives.entrySet()){
+			if(minSum > entry.getValue().size()){
+				minSum =entry.getValue().size();
+				className = entry.getKey();
+			} 
 		}
 		
-		return minSum;
+		return new AbstractMap.SimpleEntry<String,Integer>(className, minSum);
 	}
 
-	public Integer getMaximumSum() {
-		int maxSum = Integer.MIN_VALUE;
-		for(Set s : this.class_to_directives.values()){
-			maxSum = maxSum < s.size() ? s.size() : maxSum;
-		}
+	public Map.Entry getMaximumNumberOfDirectives() {
 		
-		return maxSum;
+		int maxSum = Integer.MIN_VALUE;
+		String className = "";
+		
+		for(Map.Entry<String,Set<String>> entry : this.class_to_directives.entrySet()){
+			if(maxSum < entry.getValue().size()){
+				maxSum = entry.getValue().size();
+				className = entry.getKey();
+			} 
+		}
+		return new AbstractMap.SimpleEntry<String,Integer>(className, maxSum);
+		
 	}
 	
 	public Integer getDirectiveCountForClass(String className){

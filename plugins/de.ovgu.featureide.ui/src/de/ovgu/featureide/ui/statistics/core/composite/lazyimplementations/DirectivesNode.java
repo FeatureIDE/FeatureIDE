@@ -33,6 +33,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.NUMBER_OF_DIRE
 import static de.ovgu.featureide.fm.core.localization.StringTable.PROJECT_STATISTICS;
 
 import java.util.List;
+import java.util.Map;
 
 import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
@@ -67,7 +68,7 @@ public class DirectivesNode extends LazyParent {
 
 	@Override
 	protected void initChildren() {
-		final Parent internClasses = new Parent("Classes");
+		
 		Parent project = new Parent(PROJECT_STATISTICS);
 		Integer maxNesting = 0;
 		String maxNestingClass = null;
@@ -75,18 +76,25 @@ public class DirectivesNode extends LazyParent {
 		final Aggregator aggProject = new Aggregator();
 		aggProject.processAll(fstModel);
 		
+		// Project statistics
+		// Number of Directives Node
 		Parent directives = new Parent(NUMBER_OF_DIRECTIVES);
 		directives.setValue(aggProject.getDirectiveCount());
 		project.addChild(directives);
 		
-//		project.addChild(new LazyParent(NUMBER_OF_DIRECTIVES) {
-//			@Override
-//			protected void initChildren() {
-//				new Aggregator().processAll(fstModel);
-//			}
-//		});
+		// Directives per class
+		final Parent internClasses = new Parent("Classes");
+		final Map.Entry<String,Integer> maximumSum = aggProject.getMaximumNumberOfDirectives();
+		final Map.Entry<String,Integer> minimumSum = aggProject.getMinimumNumberOfDirectives();
 
+		final Parent directivesPerClass = new Parent(DIRECTIVES_PER_CLASS);
+		directivesPerClass.addChild(new Parent("Maximum number of directives: " + maximumSum.getValue() + IN_CLASS + maximumSum.getKey()));
+		directivesPerClass.addChild(new Parent("Minimum number of directives: " + minimumSum.getValue() + IN_CLASS + minimumSum.getKey()));
+		directivesPerClass.addChild(new Parent(AVERAGE_NUMBER_OF_DIRECTIVES_PER_CLASS, getAverage(internClasses)));
+		project.addChild(directivesPerClass);
 		
+
+		// Class Statistics Node
 		for (FSTClass clazz : fstModel.getClasses()) {
 			String className = clazz.getName();
 			final int pIndex = className.lastIndexOf('/');
@@ -107,16 +115,7 @@ public class DirectivesNode extends LazyParent {
 			}
 		}
 
-		final Integer maximumSum = aggProject.getMaximumSum();
-		final Integer minimumSum = aggProject.getMinimumSum();
-
-		final Parent directivesPerClass = new Parent(DIRECTIVES_PER_CLASS);
-		directivesPerClass.addChild(new Parent("Maximum number of directives: " + maximumSum + IN_CLASS
-				+ searchClass(internClasses.getChildren(), maximumSum)));
-		directivesPerClass.addChild(new Parent("Minimum number of directives: " + minimumSum + IN_CLASS
-				+ searchClass(internClasses.getChildren(), minimumSum)));
-		directivesPerClass.addChild(new Parent(AVERAGE_NUMBER_OF_DIRECTIVES_PER_CLASS, getAverage(internClasses)));
-		project.addChild(directivesPerClass);
+		
 
 		project.addChild(new LazyParent(FEATURES_PER_DIRECTIVE) {
 
