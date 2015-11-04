@@ -70,9 +70,6 @@ public class DirectivesNode extends LazyParent {
 	protected void initChildren() {
 		
 		Parent project = new Parent(PROJECT_STATISTICS);
-		Integer maxNesting = 0;
-		String maxNestingClass = null;
-		
 		final Aggregator aggProject = new Aggregator();
 		aggProject.processAll(fstModel);
 		
@@ -137,32 +134,32 @@ public class DirectivesNode extends LazyParent {
 //				
 //			}
 //		});
-		
+		final Map.Entry<String,Integer> maxNesting = aggProject.getMaxNesting();
 		// 1.1.4 Maximum nesting of directives: 
-		project.addChild(new Parent("Maximum nesting of directives: " + maxNesting + IN_CLASS + maxNestingClass));
+		project.addChild(new Parent("Maximum nesting of directives: " + maxNesting.getValue() + IN_CLASS + maxNesting.getKey())) ;// TODO: String extrahieren?
 
 		addChild(project);
 		
-		// 
-		for (FSTClass clazz : fstModel.getClasses()) {
-			String className = clazz.getName();
-			final int pIndex = className.lastIndexOf('/');
-			className = ((pIndex > 0) ? className.substring(0, pIndex + 1).replace('/', '.') : "(default package).") + className.substring(pIndex + 1);
-
-			final Parent classNode = new Parent(className);
-			classNode.setValue(aggProject.getDirectiveCountForClass(className));
-			internClasses.addChild(classNode);
-
-			if (!clazz.getRoles().isEmpty()) {
-				final Integer currentNesting = aggProject.getMaxNesting();
-				classNode.addChild(new Parent(MAXIMUM_NESTING_OF_DIRECTIVES, currentNesting));
-				if (currentNesting > maxNesting) {
-					maxNesting = currentNesting;
-					maxNestingClass = className;
-				}
-				// aggProject.setMaxNesting(0); // TODO: WHATT??
-			}
-		}
+//		// 
+//		for (FSTClass clazz : fstModel.getClasses()) {
+//			String className = clazz.getName();
+//			final int pIndex = className.lastIndexOf('/');
+//			className = ((pIndex > 0) ? className.substring(0, pIndex + 1).replace('/', '.') : "(default package).") + className.substring(pIndex + 1);
+//
+//			final Parent classNode = new Parent(className);
+//			classNode.setValue(aggProject.getDirectiveCountForClass(className));
+//			internClasses.addChild(classNode);
+//
+//			if (!clazz.getRoles().isEmpty()) {
+//				final Integer currentNesting = aggProject.getMaxNesting();
+//				classNode.addChild(new Parent(MAXIMUM_NESTING_OF_DIRECTIVES, currentNesting));
+//				if (currentNesting > maxNesting) {
+//					maxNesting = currentNesting;
+//					maxNestingClass = className;
+//				}
+//				// aggProject.setMaxNesting(0); // TODO: WHATT??
+//			}
+//		}
 
 		
 		// 1.2 Class Statistics Node
@@ -173,7 +170,9 @@ public class DirectivesNode extends LazyParent {
 					String className = c.getName();
 					final int pIndex = className.lastIndexOf('/');
 					className = ((pIndex > 0) ? className.substring(0, pIndex + 1).replace('/', '.') : "(default package).") + className.substring(pIndex + 1);
-					addChild(new Parent(className, aggProject.getDirectiveCountForClass(c.getName())));
+					Parent p = new Parent(className, aggProject.getDirectiveCountForClass(c.getName()));
+					p.addChild(new Parent(MAXIMUM_NESTING_OF_DIRECTIVES, aggProject.getNestingCountForClass(c.getName())));
+					addChild(p);
 				}
 			}
 		};
