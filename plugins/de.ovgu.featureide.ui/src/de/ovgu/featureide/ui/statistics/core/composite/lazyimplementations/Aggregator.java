@@ -20,25 +20,17 @@
  */
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.DIRECTIVES;
-import static de.ovgu.featureide.fm.core.localization.StringTable.NUMBER_OF;
-
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
-import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirectiveCommand;
-import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 
 /**
  * Evaluates minimum- and maximum- values for a set of directives.
@@ -72,12 +64,6 @@ public class Aggregator {
 		
 	}
 	
-	//private Integer minimumSum;
-	//private Integer maximumSum = 0;
-	private Integer nestingCount = 0;
-	private Integer maxNestingCount = 0;
-	private int featureCount;
-	private Integer maxNesting = 0;
 	private Integer minNesting = 0;
 	private List<Integer> nestings = new ArrayList<Integer>();
 	private Map<String, AggregatorResult> class_to_directives = new HashMap<String,AggregatorResult>();
@@ -93,16 +79,12 @@ public class Aggregator {
 		initializeDirectiveCount(fstModel);
 	}
 
+	/**
+	 * Traversing the parent of a directive to calculate the nesting depth 
+	 * 
+	 * @param dir
+	 */
 	private void calculateNestingCount(FSTDirective dir){
-//		nestingCount++;
-//		
-//		for(FSTDirective child : dir.getChildren()){
-//			calculateNestingCount(child);
-//		}
-//		if(nestingCount > maxNesting){
-//			maxNesting = nestingCount;
-//			nestingCount--;
-//		}
 		int level = 1;
 		FSTDirective tmp = dir;
 		while(tmp.getParent() != null){
@@ -121,7 +103,6 @@ public class Aggregator {
 	 * @param fstModel
 	 */
 	private void initializeDirectiveCount(FSTModel fstModel) {
-		this.featureCount = fstModel.getFeatures().size();
 		for (FSTFeature feat : fstModel.getFeatures()) {
 			for (FSTRole role : feat.getRoles()) {	
 				this.nestings.clear();
@@ -144,7 +125,6 @@ public class Aggregator {
 				}
 				result.setNesting(Collections.max(this.nestings));
 				result.setDirectives(directives);
-				System.out.println(role.getFSTClass().getName() + " "+ result.getNesting());
 				this.class_to_directives.put(role.getFSTClass().getName(), result);
 			}
 		}
@@ -159,7 +139,6 @@ public class Aggregator {
 		
 		return sum;
 	}
-	
 
 	public Map.Entry<String,Integer> getMinimumNumberOfDirectives() {
 		int minSum = Integer.MAX_VALUE;
@@ -245,26 +224,6 @@ public class Aggregator {
 		val = val /10;
 		
 		return val ;
-	}
-
-	/**
-	 * @return
-	 */
-	public Integer getAverageNumberOfNestings() {
-		//List<Integer> list = aggregator.getListOfNestings();
-//		double average = 0.0;
-//		for (Integer i : list) {
-//			average += i;
-//		}
-//		if (list.size() != 0) {
-//			average /= list.size();
-//			average *= 10;
-//			long rounded = Math.round(average);
-//			average = ((double) rounded) / 10;
-//		} else {
-//			average = 0.0;
-//		}
-		return 10000;
 	}
 
 	/**
