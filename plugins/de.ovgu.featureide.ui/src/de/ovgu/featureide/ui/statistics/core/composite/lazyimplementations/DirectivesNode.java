@@ -104,12 +104,12 @@ public class DirectivesNode extends LazyParent {
 		
 		final Map.Entry<String,Integer> maximumNumberOfFeatures = aggProject.getMaxNumberOfFeatures();
 		final Map.Entry<String,Integer> minimumNumberOfFeatures = aggProject.getMinNumberOfFeatures();
-		final Integer averageNumberOfFeatures = aggProject.getAverageNumberOfFeatures();
+		final Double averageNumberOfFeatures = aggProject.getAverageNumberOfFeatures();
 		
 		// 1.1.3.1 Maximum number of features per directive:
-		featuresPerDirectives.addChild(new Parent(MAXIMUM_FEATURES_PER_DIRECTIVE, maximumNumberOfFeatures.getValue()));
+		featuresPerDirectives.addChild(new Parent(MAXIMUM_FEATURES_PER_DIRECTIVE, maximumNumberOfFeatures.getValue() + IN_CLASS + maximumNumberOfFeatures.getKey()));
 		// 1.1.3.2 Maximum number of features per directive:
-		featuresPerDirectives.addChild(new Parent(MINIMUM_FEATURES_PER_DIRECTIVE, minimumNumberOfFeatures.getValue()));
+		featuresPerDirectives.addChild(new Parent(MINIMUM_FEATURES_PER_DIRECTIVE, minimumNumberOfFeatures.getValue() + IN_CLASS + minimumNumberOfFeatures.getKey()));
 		// 1.1.3.3 Average number of features per directives:
 		featuresPerDirectives.addChild(new Parent(AVERAGE_FEATURES_PER_DIRECTIVE, averageNumberOfFeatures));
 
@@ -169,14 +169,15 @@ public class DirectivesNode extends LazyParent {
 		Parent classes = new AbstractSortModeNode(CLASS_STATISTICS) {
 			@Override
 			protected void initChildren() {
-				for (Parent child : internClasses.getChildren()) {
-					addChild(child);
+				for(FSTClass c : fstModel.getClasses()){
+					String className = c.getName();
+					final int pIndex = className.lastIndexOf('/');
+					className = ((pIndex > 0) ? className.substring(0, pIndex + 1).replace('/', '.') : "(default package).") + className.substring(pIndex + 1);
+					addChild(new Parent(className, aggProject.getDirectiveCountForClass(c.getName())));
 				}
 			}
 		};
 		
-		
-
 		addChild(classes);
 	}
 

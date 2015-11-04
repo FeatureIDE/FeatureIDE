@@ -55,13 +55,10 @@ public class Aggregator {
 	//private Integer minimumSum;
 	//private Integer maximumSum = 0;
 	//private Integer nestingCount = 0;
+	private int featureCount;
 	private Integer maxNesting = 0;
 	private Integer minNesting = 0;
-	private Map<String, Set<String>> class_to_directives = new HashMap<String,Set<String>>();
-	private Map<String, Map<String, Integer>> class_to_number_of_features = new HashMap<String, Map<String, Integer>>();
-	//private int curNestingCount = 0;
-
-	
+	private Map<String, Map<String, Integer>> class_to_directives = new HashMap<String,Map<String, Integer>>();
 
 //	/**
 //	 * Processes one set of directives and adds the result to the given parent.
@@ -102,63 +99,43 @@ public class Aggregator {
 	 * @param fstModel
 	 */
 	private void initializeDirectiveCount(FSTModel fstModel) {
-		int sumDirectives = 0;
-		
+		this.featureCount = fstModel.getFeatures().size();
 		for (FSTFeature feat : fstModel.getFeatures()) {
 			for (FSTRole role : feat.getRoles()) {		
-				Set<String> directives = new HashSet<String>();
-				Map<String, Integer> tmp_count = this.class_to_number_of_features.get(role.getFSTClass().getName());
-				if(tmp_count == null)
-					tmp_count = new HashMap<String, Integer>();
+				Map<String, Integer> directives = this.class_to_directives.get(role.getFSTClass().getName());
+				if(directives == null)
+					directives = new HashMap<String, Integer>();
 				
 				for (FSTDirective dir : role.getDirectives()) {
 					String identifier = role.getFSTClass().getName() + dir.getExpression() + dir.getEndLine();
-					directives.add(identifier);
 					
 					System.out.println(identifier);
 					
-					if (tmp_count.containsKey(identifier)){
-						int amount = tmp_count.get(identifier);
-						tmp_count.put(identifier, amount + 1);
+					if (directives.containsKey(identifier)){
+						int amount = directives.get(identifier);
+						directives.put(identifier, amount + 1);
 					}
 					else
-						tmp_count.put(identifier, 1);
-						
-					
-//					directiveCount.add(dir);
-//					if (maxNesting < nestingCount) {
-//						maxNesting = nestingCount;
-//					}
-//					if (minNesting == null) {
-//						minNesting = nestingCount;
-//					} else if (minNesting > nestingCount) {
-//						minNesting = nestingCount;
-//					}
-//					listOfNestings.add(nestingCount);
-//					nestingCount = 0;
+						directives.put(identifier, 1);
 				}
 				
-				Set<String> tmp = this.class_to_directives.get(role.getFSTClass().getName());
-				if(tmp == null)
-					tmp = new HashSet<String>();
+//				Set<String> tmp = this.class_to_directives.get(role.getFSTClass().getName());
+//				if(tmp == null)
+//					tmp = new HashSet<String>();
+//				
+//				tmp.addAll(directives);
+				this.class_to_directives.put(role.getFSTClass().getName(), directives);
 				
-				tmp.addAll(directives);
-				this.class_to_directives.put(role.getFSTClass().getName(), tmp);
-				
-				//tmp_count.putAll(tmp_count);
-				this.class_to_number_of_features.put(role.getFSTClass().getName(), tmp_count);
 			}
 		}
 		int i = 0;
 		System.out.println(i);
 	}
 	
-	
-		
 	public int getDirectiveCount(){
 		int sum = 0;
-		for(Set<String> s : this.class_to_directives.values())
-			sum += s.size();
+		for(Map<String,Integer> values : this.class_to_directives.values())
+			sum += values.size();
 		
 		return sum;
 	}
@@ -168,7 +145,7 @@ public class Aggregator {
 		int minSum = Integer.MAX_VALUE;
 		String className = "";
 		
-		for(Map.Entry<String,Set<String>> entry : this.class_to_directives.entrySet()){
+		for(Map.Entry<String,Map<String,Integer>> entry : this.class_to_directives.entrySet()){
 			if(minSum > entry.getValue().size()){
 				minSum =entry.getValue().size();
 				className = entry.getKey();
@@ -183,7 +160,7 @@ public class Aggregator {
 		int maxSum = Integer.MIN_VALUE;
 		String className = "";
 		
-		for(Map.Entry<String,Set<String>> entry : this.class_to_directives.entrySet()){
+		for(Map.Entry<String,Map<String,Integer>> entry : this.class_to_directives.entrySet()){
 			if(maxSum < entry.getValue().size()){
 				maxSum = entry.getValue().size();
 				className = entry.getKey();
@@ -195,7 +172,7 @@ public class Aggregator {
 	
 	public Integer getDirectiveCountForClass(String className){
 		//return class_to_directives.getOrDefault(className, new HashSet()).size();
-		Set<String> ret_val = class_to_directives.get(className);
+		Map<String,Integer> ret_val = class_to_directives.get(className);
 		if(ret_val != null)
 			return ret_val.size();
 		else
@@ -263,13 +240,13 @@ public class Aggregator {
 		int maxNumber = Integer.MIN_VALUE;
 		String className = "";
 		
-		for(Map.Entry<String, Map<String, Integer>> entry : this.class_to_number_of_features.entrySet())
+		for(Map.Entry<String, Map<String, Integer>> entry : this.class_to_directives.entrySet())
 		{
 			for(Map.Entry<String, Integer> innerentry : entry.getValue().entrySet())
 			{
 				if(maxNumber < innerentry.getValue()){
 					maxNumber = innerentry.getValue();
-					className = innerentry.getKey();
+					className = entry.getKey();
 				} 
 			}
 		}
@@ -283,13 +260,14 @@ public class Aggregator {
 		int maxNumber = Integer.MAX_VALUE;
 		String className = "";
 		
-		for(Map.Entry<String, Map<String, Integer>> entry : this.class_to_number_of_features.entrySet())
+		for(Map.Entry<String, Map<String, Integer>> entry : this.class_to_directives.entrySet())
 		{
+			
 			for(Map.Entry<String, Integer> innerentry : entry.getValue().entrySet())
 			{
 				if(maxNumber > innerentry.getValue()){
 					maxNumber = innerentry.getValue();
-					className = innerentry.getKey();
+					className = entry.getKey();
 				} 
 			}
 		}
@@ -299,28 +277,25 @@ public class Aggregator {
 	/**
 	 * @return
 	 */
-	public Integer getAverageNumberOfFeatures() {
-		// TODO Auto-generated method stub
-		return 52;
+	public Double getAverageNumberOfFeatures() {
+		
+		int sumFeaturePerDirectives = 0;
+		for(Map.Entry<String, Map<String, Integer>> entry : this.class_to_directives.entrySet())
+		{
+			
+			for(Map.Entry<String, Integer> innerentry : entry.getValue().entrySet())
+			{
+				sumFeaturePerDirectives += innerentry.getValue();
+			}
+		}
+		
+		double val = (double)sumFeaturePerDirectives / (double) this.featureCount;
+		
+		val = val*10;
+		val = (double)((int) val);
+		val = val /10;
+		
+		return val ;
 	}
 
-//	private void handleExtremes(DirectiveMap newInput) {
-//		Integer sum = sum(newInput);
-//		if (sum != 0) {
-//			if (minimumSum == null) {
-//				minimumSum = sum;
-//			} else {
-//				minimumSum = sum < minimumSum ? sum : minimumSum;
-//			}
-//			maximumSum = sum > maximumSum ? sum : maximumSum;
-//		}
-//	}
-
-//	private Integer sum(DirectiveMap newInput) {
-//		Integer sum = 0;
-//		for (Integer value : newInput.values()) {
-//			sum += value;
-//		}
-//		return sum;
-//	}
 }
