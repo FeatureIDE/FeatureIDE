@@ -76,25 +76,74 @@ public class DirectivesNode extends LazyParent {
 		final Aggregator aggProject = new Aggregator();
 		aggProject.processAll(fstModel);
 		
-		// Project statistics
-		// Number of Directives Node
+		// 1.1 Project statistics
+		// 1.1.1 Number of Directives Node
 		Parent directives = new Parent(NUMBER_OF_DIRECTIVES);
 		directives.setValue(aggProject.getDirectiveCount());
 		project.addChild(directives);
 		
-		// Directives per class
-		final Parent internClasses = new Parent("Classes");
+		// 1.1.2 Directives per class
+		final Parent internClasses = new Parent("Classes"); // TODO: String extrahieren?
 		final Map.Entry<String,Integer> maximumSum = aggProject.getMaximumNumberOfDirectives();
 		final Map.Entry<String,Integer> minimumSum = aggProject.getMinimumNumberOfDirectives();
+		final Double averageSum = aggProject.getAverageNumberOfDirectives();
 
 		final Parent directivesPerClass = new Parent(DIRECTIVES_PER_CLASS);
-		directivesPerClass.addChild(new Parent("Maximum number of directives: " + maximumSum.getValue() + IN_CLASS + maximumSum.getKey()));
-		directivesPerClass.addChild(new Parent("Minimum number of directives: " + minimumSum.getValue() + IN_CLASS + minimumSum.getKey()));
-		directivesPerClass.addChild(new Parent(AVERAGE_NUMBER_OF_DIRECTIVES_PER_CLASS, getAverage(internClasses)));
+		// 1.1.2.1 Maximum number of directives:
+		directivesPerClass.addChild(new Parent("Maximum number of directives: " + maximumSum.getValue() + IN_CLASS + maximumSum.getKey())); // TODO: String extrahieren?
+		// 1.1.2.2 Minimum number of directives:
+		directivesPerClass.addChild(new Parent("Minimum number of directives: " + minimumSum.getValue() + IN_CLASS + minimumSum.getKey())); // TODO: String extrahieren?
+		// 1.1.2.3 Average number of directives per class:
+		directivesPerClass.addChild(new Parent(AVERAGE_NUMBER_OF_DIRECTIVES_PER_CLASS, averageSum));
 		project.addChild(directivesPerClass);
 		
 
-		// Class Statistics Node
+		// 1.1.3 Directives per class
+		final Parent featuresPerDirectives = new Parent(FEATURES_PER_DIRECTIVE);
+		project.addChild(featuresPerDirectives);
+		
+		final Map.Entry<String,Integer> maximumNumberOfFeatures = aggProject.getMaxNumberOfFeatures();
+		final Map.Entry<String,Integer> minimumNumberOfFeatures = aggProject.getMinNumberOfFeatures();
+		final Integer averageNumberOfFeatures = aggProject.getAverageNumberOfFeatures();
+		
+		// 1.1.3.1 Maximum number of features per directive:
+		featuresPerDirectives.addChild(new Parent(MAXIMUM_FEATURES_PER_DIRECTIVE, maximumNumberOfFeatures.getValue()));
+		// 1.1.3.2 Maximum number of features per directive:
+		featuresPerDirectives.addChild(new Parent(MINIMUM_FEATURES_PER_DIRECTIVE, minimumNumberOfFeatures.getValue()));
+		// 1.1.3.3 Average number of features per directives:
+		featuresPerDirectives.addChild(new Parent(AVERAGE_FEATURES_PER_DIRECTIVE, averageNumberOfFeatures));
+
+//			@Override
+//			protected void initChildren() {
+//
+//				Aggregator aggregator = new Aggregator();
+//
+//				//aggregator.initializeDirectiveCount(fstModel);
+//
+//				List<Integer> list = aggregator.getListOfNestings();
+//				double average = 0.0;
+//				for (Integer i : list) {
+//					average += i;
+//				}
+//				if (list.size() != 0) {
+//					average /= list.size();
+//					average *= 10;
+//					long rounded = Math.round(average);
+//					average = ((double) rounded) / 10;
+//				} else {
+//					average = 0.0;
+//				}
+//
+//				
+//			}
+//		});
+		
+		// 1.1.4 Maximum nesting of directives: 
+		project.addChild(new Parent("Maximum nesting of directives: " + maxNesting + IN_CLASS + maxNestingClass));
+
+		addChild(project);
+		
+		// 
 		for (FSTClass clazz : fstModel.getClasses()) {
 			String className = clazz.getName();
 			final int pIndex = className.lastIndexOf('/');
@@ -111,44 +160,12 @@ public class DirectivesNode extends LazyParent {
 					maxNesting = currentNesting;
 					maxNestingClass = className;
 				}
-				aggProject.setMaxNesting(0);
+				// aggProject.setMaxNesting(0); // TODO: WHATT??
 			}
 		}
 
 		
-
-		project.addChild(new LazyParent(FEATURES_PER_DIRECTIVE) {
-
-			@Override
-			protected void initChildren() {
-
-				Aggregator aggregator = new Aggregator();
-
-				//aggregator.initializeDirectiveCount(fstModel);
-
-				List<Integer> list = aggregator.getListOfNestings();
-				double average = 0.0;
-				for (Integer i : list) {
-					average += i;
-				}
-				if (list.size() != 0) {
-					average /= list.size();
-					average *= 10;
-					long rounded = Math.round(average);
-					average = ((double) rounded) / 10;
-				} else {
-					average = 0.0;
-				}
-
-				addChild(new Parent(MAXIMUM_FEATURES_PER_DIRECTIVE, aggregator.getMaxNesting()));
-				addChild(new Parent(MINIMUM_FEATURES_PER_DIRECTIVE, aggregator.getMinNesting()));
-				addChild(new Parent(AVERAGE_FEATURES_PER_DIRECTIVE, average));
-			}
-		});
-		project.addChild(new Parent("Maximum nesting of directives: " + maxNesting + IN_CLASS + maxNestingClass));
-
-		addChild(project);
-
+		// 1.2 Class Statistics Node
 		Parent classes = new AbstractSortModeNode(CLASS_STATISTICS) {
 			@Override
 			protected void initChildren() {
@@ -157,40 +174,42 @@ public class DirectivesNode extends LazyParent {
 				}
 			}
 		};
+		
+		
 
 		addChild(classes);
 	}
 
-	private String searchClass(Parent[] data, Integer input) {
-		for (Parent p : data) {
-			if (p.getValue().equals(input)) {
-				String className = p.getDescription();
-				return className;
-			}
-		}
-		return null;
-	}
+//	private String searchClass(Parent[] data, Integer input) {
+//		for (Parent p : data) {
+//			if (p.getValue().equals(input)) {
+//				String className = p.getDescription();
+//				return className;
+//			}
+//		}
+//		return null;
+//	}
 
-	private Double getAverage(Parent parent) {
-		if (parent.hasChildren()) {
-			Integer numberOfDirectives = 0;
-			for (Parent child : parent.getChildren()) {
-				numberOfDirectives += (Integer) child.getValue();
-			}
-
-			Integer numberOfChildren = parent.getChildren().length;
-
-			double average = numberOfDirectives;
-
-			average /= (double) numberOfChildren;
-			average *= 10;
-			long rounded = Math.round(average);
-			average = ((double) rounded) / 10;
-
-			return average;
-		}
-
-		return 0.0;
-	}
+//	private Double getAverage(Parent parent) {
+//		if (parent.hasChildren()) {
+//			Integer numberOfDirectives = 0;
+//			for (Parent child : parent.getChildren()) {
+//				numberOfDirectives += (Integer) child.getValue();
+//			}
+//
+//			Integer numberOfChildren = parent.getChildren().length;
+//
+//			double average = numberOfDirectives;
+//
+//			average /= (double) numberOfChildren;
+//			average *= 10;
+//			long rounded = Math.round(average);
+//			average = ((double) rounded) / 10;
+//
+//			return average;
+//		}
+//
+//		return 0.0;
+//	}
 
 }
