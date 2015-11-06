@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.base;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.Collection;
 
 import org.prop4j.Node;
@@ -35,13 +33,9 @@ import de.ovgu.featureide.fm.core.ConstraintAttribute;
  * 
  * @author Sebastian Krieter
  */
-public interface IConstraint {
-
-	void addListener(PropertyChangeListener listener);
+public interface IConstraint extends IFeatureModelElement {
 
 	IConstraint clone(IFeatureModel newFeatureModel);
-
-	void fireEvent(PropertyChangeEvent event);
 
 	ConstraintAttribute getConstraintAttribute();
 
@@ -53,13 +47,9 @@ public interface IConstraint {
 
 	Collection<IFeature> getFalseOptional();
 
-	IFeatureModel getFeatureModel();
-
 	Node getNode();
 
 	boolean hasHiddenFeatures();
-
-	void removeListener(PropertyChangeListener listener);
 
 	void setConstraintAttribute(ConstraintAttribute attri, boolean fire);
 
@@ -68,13 +58,13 @@ public interface IConstraint {
 	void setDeadFeatures(Iterable<IFeature> deadFeatures);
 
 	boolean setFalseOptionalFeatures(IFeatureModel clone, Collection<IFeature> fmFalseOptionals);
-	
-	IGraphicalConstraint getGraphicRepresenation(); // Added, Marcus Pinnecke 31.08.15
 
 	boolean isFeatureSelected();
 
 	void setFeatureSelected(boolean b);
 	
 	String getDisplayName();
+	
+	IGraphicalConstraint getGraphicRepresenation();
 
 }

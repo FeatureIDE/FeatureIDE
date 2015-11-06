@@ -20,29 +20,18 @@
  */
 package de.ovgu.featureide.fm.core.base;
 
-import de.ovgu.featureide.fm.core.FMDimension;
-import de.ovgu.featureide.fm.core.FMPoint;
-import de.ovgu.featureide.fm.core.IGraphicItem;
 
 /**
  * Graphical representation of a constraint.
  * 
  * @author Sebastian Krieter
  */
-public interface IGraphicalConstraint extends IGraphicItem {
+public interface IGraphicalConstraint extends IGraphicalElement {
 
-	IConstraint getConstraint();
-
-	FMPoint getLocation();
-
-	FMDimension getSize();
+	IConstraint getElement();
 
 	boolean isFeatureSelected();
 
 	void setFeatureSelected(boolean selected);
-
-	void setLocation(FMPoint newLocation);
-
-	void setSize(FMDimension size);
 
 }

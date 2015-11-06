@@ -20,23 +20,19 @@
  */
 package de.ovgu.featureide.fm.core.base;
 
-import static de.ovgu.featureide.fm.core.base.FeatureUtils.convert;
 import static de.ovgu.featureide.fm.core.functional.Functional.filter;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
-import java.util.TreeSet;
 
-import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 import org.eclipse.core.resources.IProject;
@@ -50,15 +46,13 @@ import de.ovgu.featureide.fm.core.ConstraintAttribute;
 import de.ovgu.featureide.fm.core.FMComposerManager;
 import de.ovgu.featureide.fm.core.FMPoint;
 import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureComparator;
 import de.ovgu.featureide.fm.core.FeatureConnection;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
-import de.ovgu.featureide.fm.core.FeatureModelLayout;
 import de.ovgu.featureide.fm.core.FeatureStatus;
 import de.ovgu.featureide.fm.core.IFMComposerExtension;
+import de.ovgu.featureide.fm.core.IGraphicItem.GraphicItem;
 import de.ovgu.featureide.fm.core.Operator;
 import de.ovgu.featureide.fm.core.RenamingsManager;
-import de.ovgu.featureide.fm.core.IGraphicItem.GraphicItem;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
 import de.ovgu.featureide.fm.core.filter.ConcreteFeatureFilter;
 import de.ovgu.featureide.fm.core.functional.Functional;
@@ -133,15 +127,6 @@ public abstract class FeatureUtils {
 		@Override
 		public String invoke(CharSequence t) {
 			return t.toString();
-		}
-
-	};
-
-	private static final IFunction<String, CharSequence> STRING_TO_CHARSEQUENCE = new IFunction<String, CharSequence>() {
-
-		@Override
-		public CharSequence invoke(String t) {
-			return t;
 		}
 
 	};
@@ -312,7 +297,7 @@ public abstract class FeatureUtils {
 	}
 
 	public static final void setNewLocation(IFeature feature, FMPoint newLocation) {
-		feature.getGraphicRepresenation().setNewLocation(newLocation);
+		feature.getGraphicRepresenation().setLocation(newLocation);
 	}
 
 	public static final FMPoint getLocation(IFeature feature) {
@@ -411,7 +396,7 @@ public abstract class FeatureUtils {
 		return feature.getName();
 	}
 
-	public static final void setName(IFeature feature, CharSequence name) {
+	public static final void setName(IFeature feature, String name) {
 		feature.setName(name);
 	}
 

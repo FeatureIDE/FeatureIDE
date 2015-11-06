@@ -54,7 +54,7 @@ public class DefaultFeatureModelFactory implements IFeatureModelFactory {
 	}
 
 	@Override
-	public Feature createFeature(IFeatureModel featureModel, CharSequence name) {
+	public Feature createFeature(IFeatureModel featureModel, String name) {
 		return new Feature(featureModel, name);
 	}
 

@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.List;
 
 import de.ovgu.featureide.fm.core.FeatureConnection;
-import de.ovgu.featureide.fm.core.base.impl.Constraint;
 
 /**
  * Manages all structural information of a feature.</br>

@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.base;
 
-import java.util.List;
 
 /**
  * Manages all additional properties of a feature model.

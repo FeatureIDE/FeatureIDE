@@ -146,12 +146,10 @@ public interface IFeatureModel extends Cloneable {
 
 	void setFeatureOrderListItem(int i, String newName);
 
-	// TODO: Remove this
-	// This is a hack actually used to determine the project of a feature model for coloring
-	void xxxSetSourceFile(File file);
+	void setSourceFile(File file);
 
-	// TODO: Remove this
-	// This is a hack actually used to determine the project of a feature model for coloring
-	File xxxGetSourceFile();
+	File getSourceFile();
+
+	long getNextElementId();
 
 }

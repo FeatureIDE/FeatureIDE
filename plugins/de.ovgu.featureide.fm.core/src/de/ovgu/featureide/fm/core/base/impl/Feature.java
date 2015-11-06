@@ -20,17 +20,10 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.LinkedList;
-
-import de.ovgu.featureide.fm.core.PropertyConstants;
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureProperty;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.core.base.IGraphicalFeature;
 
 /**
  * Provides all properties of a feature. This includes its connections to parent
@@ -40,51 +33,18 @@ import de.ovgu.featureide.fm.core.base.IGraphicalFeature;
  * @author Sebastian Krieter
  * 
  */
-public class Feature implements IFeature, PropertyConstants {
-	
-	private static long NEXT_ID = 0;
-	
-	protected static final synchronized long getNextId() {
-		return NEXT_ID++;
-	}
+public class Feature extends AFeature {
 
-	private final long id;
-
-	protected IFeatureModel featureModel;
-	protected LinkedList<PropertyChangeListener> listenerList = new LinkedList<PropertyChangeListener>();
-
-	protected CharSequence name;
-
-	protected final IFeatureProperty property;
-	protected final IFeatureStructure structure;
-	protected IGraphicalFeature graphicalRepresentation;
 	private boolean constraintSelected;
 
 	protected Feature(Feature oldFeature, IFeatureModel featureModel, IFeatureStructure newFeatrureStructure) {
-		this.featureModel = featureModel != null ? featureModel : oldFeature.featureModel;
-		this.id = oldFeature.id;
-		name = new String(oldFeature.name.toString());
-		graphicalRepresentation = oldFeature.graphicalRepresentation;
+		super(oldFeature, featureModel, newFeatrureStructure);
 		constraintSelected = oldFeature.constraintSelected;
-
-		property = oldFeature.property.clone(this);
-		structure = newFeatrureStructure != null ? newFeatrureStructure : oldFeature.structure;
-
 	}
 
-	public Feature(IFeatureModel featureModel, CharSequence name) {
-		this.id = getNextId();
-		this.featureModel = featureModel;
-		this.name = name;
+	public Feature(IFeatureModel featureModel, String name) {
+		super(featureModel, name);
 		this.constraintSelected = false;
-
-		property = createProperty();
-		structure = createStructure();
-		graphicalRepresentation = createGraphicalRepresentation();
-	}
-
-	protected IGraphicalFeature createGraphicalRepresentation() {
-		return GraphicMap.getInstance().getGraphicRepresentation(this);
 	}
 
 	protected IFeatureProperty createProperty() {
@@ -96,78 +56,8 @@ public class Feature implements IFeature, PropertyConstants {
 	}
 
 	@Override
-	public void addListener(PropertyChangeListener listener) {
-		if (!listenerList.contains(listener)) {
-			listenerList.add(listener);
-		}
-	}
-
-	@Override
 	public IFeature clone(IFeatureModel newFeatureModel, IFeatureStructure newStructure) {
 		return new Feature(this, newFeatureModel, newStructure);
-	}
-
-	@Override
-	public void fireEvent(PropertyChangeEvent event) {
-		for (final PropertyChangeListener listener : listenerList) {
-			listener.propertyChange(event);
-		}
-	}
-
-	@Override
-	public IFeatureModel getFeatureModel() {
-		return featureModel;
-	}
-
-	@Override
-	public IFeatureProperty getProperty() {
-		return property;
-	}
-
-	@Override
-	public IFeatureStructure getStructure() {
-		return structure;
-	}
-
-	@Override
-	public long getId() {
-		return id;
-	}
-
-	@Override
-	public String getName() {
-		return name.toString();
-	}
-
-	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-
-	}
-
-	@Override
-	public void removeListener(PropertyChangeListener listener) {
-		listenerList.remove(listener);
-	}
-
-	@Override
-	public void setName(CharSequence name) {
-		final CharSequence oldName = this.name;
-		this.name = name;
-		fireEvent(new PropertyChangeEvent(this, NAME_CHANGED, oldName, name));
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder("name=" + name);
-		sb.append(", Structure=[");
-		FeatureUtils.print(this, sb);
-		sb.append("]");
-		return "Feature(" + sb.toString() + ")";
-	}
-
-	@Override
-	public IGraphicalFeature getGraphicRepresenation() {
-		return graphicalRepresentation;
 	}
 
 	@Override
@@ -178,39 +68,6 @@ public class Feature implements IFeature, PropertyConstants {
 	@Override
 	public void setConstraintSelected(boolean b) {
 		constraintSelected = b;
-	}
-
-//	@Override
-//	public int hashCode() {
-//		//		final int prime = 31;
-//		//		int result = 1;
-//		//		result = prime * result + ((name == null) ? 0 : name.hashCode());
-//		return (name == null) ? 0 : name.hashCode();
-//	}
-//
-//	@Override
-//	public boolean equals(Object obj) {
-//		if (this == obj)
-//			return true;
-//		if (obj == null || getClass() != obj.getClass())
-//			return false;
-//		Feature other = (Feature) obj;
-//		return (name != null && name.equals(other.name));
-//	}
-
-	@Override
-	public int hashCode() {
-		return (int) (37 * id);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null || getClass() != obj.getClass())
-			return false;
-		Feature other = (Feature) obj;
-		return id == other.id;
 	}
 
 }
