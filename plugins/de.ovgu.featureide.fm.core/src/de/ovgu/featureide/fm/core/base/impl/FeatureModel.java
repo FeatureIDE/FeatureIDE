@@ -78,9 +78,9 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 		return nextElementId++;
 	}
 
-	protected final FeatureModelAnalyzer analyser = createAnalyser();
+	protected final FeatureModelAnalyzer analyser;
 	protected final List<IConstraint> constraints = new LinkedList<>();
-
+	
 	/**
 	 * A list containing the feature names in their specified order will be
 	 * initialized in XmlFeatureModelReader.
@@ -118,6 +118,8 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 		structure = createStructure();
 		graphicalFeatureModel = createGraphicalFeatureModel();
 		modelLayout = createFeatureModelLayout();
+		
+		analyser = createAnalyser();
 	}
 
 	protected FeatureModel(FeatureModel oldFeatureModel, IFeature newRoot) {
@@ -145,7 +147,7 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 				}
 			}
 		}
-		//		}
+		analyser = createAnalyser();
 	}
 
 	protected IFeatureModelProperty createProperty() {

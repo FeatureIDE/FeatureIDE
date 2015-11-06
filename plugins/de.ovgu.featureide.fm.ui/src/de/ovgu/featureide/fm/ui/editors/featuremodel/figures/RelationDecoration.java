@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.draw2d.Ellipse;

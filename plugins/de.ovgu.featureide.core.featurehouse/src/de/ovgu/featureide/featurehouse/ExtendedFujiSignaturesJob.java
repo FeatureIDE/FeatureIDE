@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.featurehouse;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.FUJI_SIGNATURES_LOADED_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.LOADING_SIGNATURES_FOR;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NO_FSTMODEL_PROVIDED_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
@@ -76,14 +75,7 @@ import de.ovgu.featureide.core.signature.base.FeatureDataConstructor;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiClassSignature;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiFieldSignature;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
-import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.job.AStoppableJob;
-import fuji.Composition;
-import fuji.Main;
-import fuji.SPLStructure;
 
 /**
  * Loads the signatures from Fuji.

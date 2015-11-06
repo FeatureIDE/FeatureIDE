@@ -24,8 +24,6 @@ import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPartFactory;
 
 import de.ovgu.featureide.fm.core.FeatureConnection;
-import de.ovgu.featureide.fm.core.IGraphicItem;
-import de.ovgu.featureide.fm.core.IGraphicItem.GraphicItem;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;

@@ -22,7 +22,6 @@ package de.ovgu.featureide.featurehouse;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
@@ -58,10 +57,10 @@ import org.prop4j.Node;
 import org.prop4j.NodeWriter;
 import org.sat4j.specs.TimeoutException;
 
-import AST.Problem;
 import AST.Program;
 import cide.gparser.ParseException;
 import cide.gparser.TokenMgrError;
+
 import composer.CmdLineInterpreter;
 import composer.CompositionException;
 import composer.FSTGenComposer;
@@ -69,6 +68,7 @@ import composer.FSTGenComposerExtension;
 import composer.ICompositionErrorListener;
 import composer.IParseErrorListener;
 import composer.rules.meta.FeatureModelInfo;
+
 import de.ovgu.cide.fstgen.ast.FSTNode;
 import de.ovgu.cide.fstgen.ast.FSTTerminal;
 import de.ovgu.featureide.core.IFeatureProject;
@@ -92,15 +92,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
-import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.job.AStoppableJob;
-import fuji.CompilerWarningException;
-import fuji.Composition;
-import fuji.CompositionErrorException;
-import fuji.FeatureDirNotFoundException;
-import fuji.Main;
-import fuji.SemanticErrorException;
-import fuji.SyntacticErrorException;
 
 /**
  * Composes files using FeatureHouse.

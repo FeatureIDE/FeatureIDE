@@ -23,7 +23,6 @@ package de.ovgu.featureide.featurehouse.errorpropagation;
 import java.io.FileNotFoundException;
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Scanner;
 
 import org.eclipse.core.resources.IFile;
@@ -37,7 +36,6 @@ import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.functional.Functional;

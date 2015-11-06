@@ -102,6 +102,7 @@ import org.prop4j.Node;
 import org.prop4j.NodeReader;
 
 import de.ovgu.featureide.fm.core.Constraints;
+import de.ovgu.featureide.fm.core.Operator;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -109,7 +110,6 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
-import de.ovgu.featureide.fm.core.Operator;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.ConstraintTextValidator.ValidationMessage;
 import de.ovgu.featureide.fm.ui.editors.ConstraintTextValidator.ValidationResult;

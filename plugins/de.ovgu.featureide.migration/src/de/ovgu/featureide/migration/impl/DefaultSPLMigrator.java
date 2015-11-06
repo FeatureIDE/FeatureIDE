@@ -22,13 +22,13 @@ package de.ovgu.featureide.migration.impl;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.CLASSPATH_OF_PROJECT_TO_MIGRATE_IS_NULL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DESTINATIONFOLDER_NOT_ACCESSIBLE_OR_WRONG_PATH;
+import static de.ovgu.featureide.fm.core.localization.StringTable.INTERNAL_ASSERT_MESSAGE_PROJECT_IS_NULL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.IS_NOT_OPEN_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.JAVA_PROJECTS_COULD_NOT_BE_CREATED;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NO_PROJECTS_WERE_SELECTED_FOR_MIGRATION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PROJECT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PROJECT_PROPERTIES_COULD_NOT_BE_COPIED_COMMA__BECAUSE_IT_DOES_NOT_EXIST_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
-import static de.ovgu.featureide.fm.core.localization.StringTable.INTERNAL_ASSERT_MESSAGE_PROJECT_IS_NULL;
 
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -52,7 +52,6 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionBase;
-import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
 import de.ovgu.featureide.fm.ui.handlers.base.SelectionWrapper;

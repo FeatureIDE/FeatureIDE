@@ -29,6 +29,7 @@ import org.prop4j.Node;
 import org.prop4j.NodeWriter;
 
 import composer.rules.meta.FeatureModelInfo;
+
 import de.ovgu.cide.fstgen.ast.FSTNode;
 import de.ovgu.cide.fstgen.ast.FSTNonTerminal;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
@@ -39,7 +40,6 @@ import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.configuration.SelectionNotPossibleException;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
-import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
  * Representation of the feature model. 

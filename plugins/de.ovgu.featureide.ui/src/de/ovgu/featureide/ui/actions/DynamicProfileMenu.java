@@ -22,7 +22,6 @@ import org.eclipse.ui.internal.Workbench;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.color.ColorScheme;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;

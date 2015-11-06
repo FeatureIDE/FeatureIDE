@@ -23,7 +23,6 @@ package de.ovgu.featureide.fm.ui.views.outline;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINTS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NO_DATA_TO_DISPLAY_AVAILABLE_;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;

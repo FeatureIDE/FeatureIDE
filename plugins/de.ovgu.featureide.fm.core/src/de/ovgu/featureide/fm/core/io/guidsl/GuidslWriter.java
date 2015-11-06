@@ -22,7 +22,6 @@ package de.ovgu.featureide.fm.core.io.guidsl;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.EMPTY___;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import org.prop4j.Node;
