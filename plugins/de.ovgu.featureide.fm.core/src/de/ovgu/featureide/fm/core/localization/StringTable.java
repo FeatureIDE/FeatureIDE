@@ -68,6 +68,7 @@ public class StringTable {
 	public static final String COULD_NOT_SET_PERSISTANT_PROPERTY = "Could not set persistant property";
 	public static final String ERROR_WHILE_CREATING_FEATURE_MODEL = "Error while creating feature model";
 	public static final String NO_RESOURCE_GIVEN_WHILE_GETTING_THE_PROJECT_DATA = "No resource given while getting the project data";
+	public static final String CONFIG = "config";	
 	public static final String EQUATION = "equation";
 	public static final String EXPRESSION = "expression";
 	public static final String ADD_PROJECT = "Add Project";

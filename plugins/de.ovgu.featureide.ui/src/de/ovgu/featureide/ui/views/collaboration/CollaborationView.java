@@ -536,11 +536,11 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 
 	public void disableToolbarFilterItems() {
 		boolean value = false;
-
-		if (featureProject != null && featureProject.getComposer().showContextFieldsAndMethods()) {
-			value = true;
-		} else {
-			value = false;
+		if (featureProject != null) {
+			IComposerExtensionClass composer = featureProject.getComposer();
+			if (composer != null) {
+				value = composer.showContextFieldsAndMethods();
+			}
 		}
 
 		fieldsWithRefinementsButton.setEnabled(value);

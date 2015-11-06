@@ -127,6 +127,9 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 			IPath path = cu.getPath();
 			IFile myfile = root.getFile(path);
 			IFeatureProject featureProject = CorePlugin.getFeatureProject(myfile);
+			if (featureProject == null) {
+				return superImage;
+			}
 			FSTModel model = featureProject.getFSTModel();
 			IComposerExtensionClass composer = featureProject.getComposer();
 			if (model.getClasses().isEmpty()) {

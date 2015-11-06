@@ -985,7 +985,7 @@
 	<extension
 			point="org.eclipse.jdt.ui.javaCompletionProposalComputer"
 			id="ContextViewCompletion"
-			name="ContextViewCompletion">
+			name="Context-View Completion">
 		<javaCompletionProposalComputer
 				activate="false"
 				categoryID="org.eclipse.jdt.ui.ContextViewCompletion"
@@ -996,6 +996,22 @@
 		</javaCompletionProposalComputer>
 		<proposalCategory
 				id="ContextViewCompletion"
+				name="tes"
+				icon="icons/featureide.gif"/>
+	</extension>
+	<extension
+			point="org.eclipse.jdt.ui.javaCompletionProposalComputer"
+			id="FeatureCompletion"
+			name="Feature Completion">
+		<javaCompletionProposalComputer
+				activate="false"
+				categoryID="org.eclipse.jdt.ui.ContextViewCompletion"
+				categoryId="de.ovgu.featureide.ui.AnnoCompletion"
+				class="de.ovgu.featureide.ui.editors.AnnoCompletion">
+			<partition type="__java_singleline_comment"/>
+		</javaCompletionProposalComputer>
+		<proposalCategory
+				id="FeatureCompletion"
 				name="tes"
 				icon="icons/featureide.gif"/>
 	</extension>

@@ -76,15 +76,6 @@ public interface IFeatureProject extends IBuilderMarkerHandler {
 
 	void dispose();
 
-	/**
-	 * Renames the feature folder or creates a new one if the old folder
-	 * doesn't exists.
-	 * 
-	 * @param oldName the current name of the feature folder
-	 * @param newName the future name of the feature folder
-	 */
-	void renameFeature(String oldName, String newName);
-
 	String getProjectName();
 
 	/**

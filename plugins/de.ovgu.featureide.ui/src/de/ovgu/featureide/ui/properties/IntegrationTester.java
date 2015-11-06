@@ -22,7 +22,7 @@ public class IntegrationTester extends PropertyTester {
 		if (receiver instanceof IFolder) {
 			IFolder selectedFolder = (IFolder)receiver;
 			IFeatureProject featureProject = CorePlugin.getFeatureProject(selectedFolder);
-			if (featureProject.getComposer().hasFeatureFolder()) {
+			if (featureProject != null && featureProject.getComposer().hasFeatureFolder()) {
 				IFolder sourceFolder = featureProject.getSourceFolder();
 				try {
 					for (IResource featureFolder : sourceFolder.members()) {

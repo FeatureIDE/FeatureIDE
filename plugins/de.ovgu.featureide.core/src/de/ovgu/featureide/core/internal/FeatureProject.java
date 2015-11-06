@@ -44,6 +44,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -64,6 +65,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -98,10 +100,12 @@ import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
+import de.ovgu.featureide.fm.core.configuration.ConfigurationWriter;
 import de.ovgu.featureide.fm.core.configuration.FeatureIDEFormat;
 import de.ovgu.featureide.fm.core.configuration.FeatureOrderReader;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
+import de.ovgu.featureide.fm.core.io.FeatureModelFile2;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
 import de.ovgu.featureide.fm.core.io.ModelIOFactory;
@@ -135,8 +139,8 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 				String oldName = (String) evt.getOldValue();
 				String newName = (String) evt.getNewValue();
 
-				FeatureProject.this.renameFeature(oldName, newName);
-				LOGGER.fireFeatureFolderChanged(FeatureProject.this.getSourceFolder());
+				FeatureProject.this.renameFeature((IFeatureModel) evt.getSource(), oldName, newName);
+//				LOGGER.fireFeatureFolderChanged(FeatureProject.this.getSourceFolder());
 			}
 		}
 	}
@@ -184,6 +188,8 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	
 	//TODO: Implement possibility to change this path
 	private final String featureStubPath = "featurestub";
+	
+	private boolean configurationUpdate = false;
 
 	
 	public String getFeaturestubPath() {
@@ -335,6 +341,8 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 		featureModel.addListener(new FeatureModelChangeListner());
 		modelReader = new FeatureModelReaderIFileWrapper(tmpModelReader);
+		
+		FeatureModelFile2.getInstance(modelFile.getResource()).getFeatureModel().addListener(new FeatureModelChangeListner());
 
 		// initialize project structure
 		try {
@@ -541,18 +549,55 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		}
 	}
 
-	public void renameFeature(String oldName, String newName) {
-		try {
-			IFolder folder = sourceFolder.getFolder(oldName);
-			if (!folder.exists()) {
-				createFeatureFolder(newName);
-			} else {
-				IPath newPath = sourceFolder.getFolder(newName).getFullPath();
-				folder.move(newPath, false, null);
-				LOGGER.fireFeatureFolderChanged(folder);
+	private void renameFeature(final IFeatureModel model, String oldName, String newName) {
+		final IComposerExtensionClass composer = getComposer();
+		if (!model.getFMComposerManager(getProject()).performRenaming(oldName, newName, project) && composer.hasFeatureFolder()) {
+			try {
+				sourceFolder.refreshLocal(IResource.DEPTH_ONE, null);
+				IFolder folder = sourceFolder.getFolder(oldName);
+				if (folder.isAccessible()) {
+					IPath newPath = sourceFolder.getFolder(newName).getFullPath();
+					folder.move(newPath, true, null);
+					folder.refreshLocal(IResource.DEPTH_ZERO, null);
+					LOGGER.fireFeatureFolderChanged(folder);
+				}
+			} catch (CoreException e) {
+				LOGGER.logError(e);
+				modelFile.createModelMarker(e.getMessage(), IMarker.SEVERITY_WARNING, 0);
 			}
-		} catch (CoreException e) {
-			modelFile.createModelMarker(e.getMessage(), IMarker.SEVERITY_WARNING, 0);
+		}
+		if (configFolder != null) {
+			if (configFolder.isAccessible()) {
+				try {
+					configFolder.refreshLocal(IResource.DEPTH_ONE, null);
+					configurationUpdate = true;
+					configFolder.accept(new IResourceVisitor() {
+						private final String suffix = "." + composer.getConfigurationExtension();
+						private final Configuration config = new Configuration(model, Configuration.PARAM_LAZY);
+						private final ConfigurationReader reader = new ConfigurationReader(config);
+						private final ConfigurationWriter writer = new ConfigurationWriter(config);
+						
+						@Override
+						public boolean visit(IResource resource) throws CoreException {
+							final String name = resource.getName();
+							if (resource instanceof IFile && name.endsWith(suffix)) {
+								final IFile configFile = (IFile) resource;
+								try {
+									reader.readFromFile(configFile);
+									writer.saveToFile(configFile);
+								} catch (IOException e) {
+									LOGGER.logError(e);
+								}
+							}
+							return true;
+						}
+					}, IResource.DEPTH_ONE, IResource.NONE);
+				} catch (CoreException e) {
+					LOGGER.logError(e);
+				} finally {
+					configurationUpdate = false;
+				}
+			}
 		}
 	}
 
@@ -862,7 +907,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 					}
 				}
 			}
-			if (!changedConfigs.isEmpty()) {
+			if (!configurationUpdate && !changedConfigs.isEmpty()) {
 				LOGGER.fireConfigurationChanged(this);
 				checkConfigurations(changedConfigs);
 			}
@@ -990,7 +1035,9 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 					final IComposerExtensionClass composerExtension = getComposer();
 					if (composerExtension.isInitialized()) {
 						composerExtension.postModelChanged();
-						checkConfigurations(getAllConfigurations());
+						if (!configurationUpdate) {
+							checkConfigurations(getAllConfigurations());
+						}
 						checkFeatureCoverage();
 						return Status.OK_STATUS;
 					}
