@@ -63,12 +63,18 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 			if (featureProject == null) {
 				return superImage;
 			}
-			FSTModel model = featureProject.getFSTModel();
-			if (model.getClasses().isEmpty()) {
-				featureProject.getComposer().buildFSTModel();
-				model = featureProject.getFSTModel();
-			}
 			IComposerExtensionClass composer = featureProject.getComposer();
+			if (composer == null) {
+				return superImage;
+			}
+			FSTModel model = featureProject.getFSTModel();
+			if (model == null || model.getClasses().isEmpty()) {
+				composer.buildFSTModel();
+				model = featureProject.getFSTModel();
+				if (model == null) {
+					return superImage;
+				}
+			}
 			getPackageColors(folder, elementColors, model, !composer.hasFeatureFolder() && !composer.hasSourceFolder());
 			return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.PACKAGE, new ArrayList<Integer>(elementColors), superImage);
 		}
@@ -80,6 +86,9 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 				return superImage;
 			}
 			IComposerExtensionClass composer = featureProject.getComposer();
+			if (composer == null){
+				return superImage;
+			}
 			FSTModel model = featureProject.getFSTModel();
 			if (model == null || model.getClasses().isEmpty()) {
 				featureProject.getComposer().buildFSTModel();
@@ -123,18 +132,22 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 		// returns the image for composed files
 		if (element instanceof org.eclipse.jdt.internal.core.CompilationUnit) {
 			CompilationUnit cu = (CompilationUnit) element;
-			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-			IPath path = cu.getPath();
-			IFile myfile = root.getFile(path);
+			IFile myfile =(IFile) cu.getResource();
 			IFeatureProject featureProject = CorePlugin.getFeatureProject(myfile);
 			if (featureProject == null) {
 				return superImage;
 			}
 			FSTModel model = featureProject.getFSTModel();
 			IComposerExtensionClass composer = featureProject.getComposer();
-			if (model.getClasses().isEmpty()) {
+			if (composer == null) {
+				return superImage;
+			}
+			if (model == null || model.getClasses().isEmpty()) {
 				composer.buildFSTModel();
 				model = featureProject.getFSTModel();
+				if (model == null) {
+					return superImage;
+				}
 			}
 			getColors(elementColors, myfile, model, !composer.hasFeatureFolder() && !composer.hasSourceFolder());
 			return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.JAVA_FILE, new ArrayList<Integer>(elementColors), superImage);
@@ -254,11 +267,14 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 			if (featureProject == null) {
 				return null;
 			}
-			String mytest = frag.getElementName();
-			if (mytest.isEmpty()) {
+			if (featureProject.getComposer() == null) {
+				return null;
+			}
+			String elementName = frag.getElementName();
+			if (elementName.isEmpty()) {
 				return SPACE_STRING + "(default package)";
 			}
-			return SPACE_STRING + mytest;
+			return SPACE_STRING + elementName;
 		}
 
 		//text for Folders
@@ -266,6 +282,9 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 			IFeatureProject featureProject = CorePlugin.getFeatureProject((IResource) element);
 			if (featureProject != null) {
 				IComposerExtensionClass composer = featureProject.getComposer();
+				if (composer == null) {
+					return null;
+				}
 				if (composer.hasFeatureFolder()) {
 					if (element instanceof IFolder) {
 						IFolder folder = (IFolder) element;
@@ -274,12 +293,10 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 							return "  " + folder.getName();
 						}
 					}
-				} else {
-					if (element instanceof IResource) {
-						IResource res = (IResource) element;
-						if (isInBuildFolder(res) || isInSourceFolder(res)) {
-							return SPACE_STRING + res.getName();
-						}
+				} else if (element instanceof IResource) {
+					IResource res = (IResource) element;
+					if (isInBuildFolder(res) || isInSourceFolder(res)) {
+						return SPACE_STRING + res.getName();
 					}
 				}
 			}
@@ -290,10 +307,14 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 		if (element instanceof org.eclipse.jdt.internal.core.CompilationUnit) {
 
 			CompilationUnit cu = (CompilationUnit) element;
-
-			IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-			IPath path = cu.getPath();
-			IFile myfile = root.getFile(path);
+			IResource myfile = cu.getResource();
+			IFeatureProject featureProject = CorePlugin.getFeatureProject(myfile);
+			if (featureProject == null) {
+				return null;
+			}
+			if (featureProject.getComposer() == null) {
+				return null;
+			}
 			return SPACE_STRING + myfile.getName();
 
 		}
