@@ -54,7 +54,7 @@ public class FeatureMoveOperation extends AbstractFeatureModelOperation {
 	}
 
 	public void newInnerOrder(Point newPos) {
-		FeatureUIHelper.setLocation(feature, newPos);
+		FeatureUIHelper.setLocation(feature.getGraphicRepresenation(), newPos);
 		if (!data.getFeature().getStructure().isRoot()) {
 			data.getOldParent().getStructure().removeChild(data.getFeature().getStructure());
 			LinkedList<IFeature> featureList = new LinkedList<IFeature>(FeatureUtils.convertToFeatureList(data.getOldParent().getStructure().getChildren()));
@@ -64,13 +64,13 @@ public class FeatureMoveOperation extends AbstractFeatureModelOperation {
 
 			while (data.getOldParent().getStructure().hasChildren()) {
 				if (counter == counter2) {
-					if (FeatureUIHelper.hasVerticalLayout(featureModel)) {
-						if (FeatureUIHelper.getLocation(featureList.get(counter)).y > newPos.y) {
+					if (FeatureUIHelper.hasVerticalLayout(featureModel.getGraphicRepresenation())) {
+						if (FeatureUIHelper.getLocation(featureList.get(counter).getGraphicRepresenation()).y > newPos.y) {
 							newFeatureList.add(data.getFeature());
 							counter = Integer.MIN_VALUE;
 						}
 					} else {
-						if (FeatureUIHelper.getLocation(featureList.get(counter)).x > newPos.x) {
+						if (FeatureUIHelper.getLocation(featureList.get(counter).getGraphicRepresenation()).x > newPos.x) {
 							newFeatureList.add(data.getFeature());
 							counter = Integer.MIN_VALUE;
 						}

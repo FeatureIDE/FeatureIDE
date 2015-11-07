@@ -178,8 +178,8 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 				parentHidden = true;
 
 		}
-		if ((target.getStructure().isAnd() || OR_CIRCLES) && !(source.getStructure().isHidden() && !FeatureUIHelper.showHiddenFeatures(getFeatureModel())))
-			if (!(parentHidden && !FeatureUIHelper.showHiddenFeatures(getFeatureModel())))
+		if ((target.getStructure().isAnd() || OR_CIRCLES) && !(source.getStructure().isHidden() && !FeatureUIHelper.showHiddenFeatures(getFeatureModel().getGraphicRepresenation())))
+			if (!(parentHidden && !FeatureUIHelper.showHiddenFeatures(getFeatureModel().getGraphicRepresenation())))
 				sourceDecoration = new CircleDecoration(source.getStructure().isMandatory());
 
 		PolylineConnection connection = (PolylineConnection) getConnectionFigure();
@@ -192,7 +192,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		RotatableDecoration targetDecoration = null;
 		if (target.getStructure().getChildrenCount() > 1 || HALF_ARC) {
 			IFeature source = connectionModel.getSource();
-			if (FeatureUIHelper.hasVerticalLayout(getFeatureModel())) {
+			if (FeatureUIHelper.hasVerticalLayout(getFeatureModel().getGraphicRepresenation())) {
 				if (!target.getStructure().isAnd() && (target.getStructure().getChildIndex(source.getStructure()) == (target.getStructure().getChildrenCount() - 1)))
 					targetDecoration = new RelationDecoration(target.getStructure().isMultiple(), target.getStructure().getFirstChild().getFeature(), FeatureUtils.convertToFeatureList(target.getStructure().getChildren()));
 			} else {

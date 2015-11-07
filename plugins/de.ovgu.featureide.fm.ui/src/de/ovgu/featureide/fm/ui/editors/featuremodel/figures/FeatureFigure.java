@@ -109,13 +109,13 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		setProperties();
 
 		enforceLabelSize();
-		FeatureUIHelper.setSize(feature, getSize());
+		FeatureUIHelper.setSize(feature.getGraphicRepresenation(), getSize());
 
 		add(label, label.getBounds());
 		setOpaque(true);
 
-		if (FeatureUIHelper.getLocation(feature) != null) {
-			setLocation(FeatureUIHelper.getLocation(feature));
+		if (FeatureUIHelper.getLocation(feature.getGraphicRepresenation()) != null) {
+			setLocation(FeatureUIHelper.getLocation(feature.getGraphicRepresenation()));
 		}
 
 		if (isHidden(feature)) {

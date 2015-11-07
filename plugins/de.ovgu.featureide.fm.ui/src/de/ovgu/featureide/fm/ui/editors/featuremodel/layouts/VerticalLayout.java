@@ -51,7 +51,7 @@ public class VerticalLayout extends FeatureDiagramLayoutManager {
 	private int height;
 
 	public void layoutFeatureModel(IFeatureModel featureModel) {
-		heightStep = FeatureUIHelper.getSize(featureModel.getStructure().getRoot().getFeature()).height + featureSpaceY;
+		heightStep = FeatureUIHelper.getSize(featureModel.getStructure().getRoot().getFeature().getGraphicRepresenation()).height + featureSpaceY;
 		height = FMPropertyManager.getLayoutMarginX() - heightStep;
 
 		calculateLevelWidth(featureModel.getStructure().getRoot().getFeature());
@@ -67,7 +67,7 @@ public class VerticalLayout extends FeatureDiagramLayoutManager {
 		final List<IFeature> children = FeatureUtils.convertToFeatureList(parent.getStructure().getChildren());
 		if (children.isEmpty()) {
 			height += heightStep;
-			FeatureUIHelper.setLocation(parent, new Point(levelWidth.get(level), height));
+			FeatureUIHelper.setLocation(parent.getGraphicRepresenation(), new Point(levelWidth.get(level), height));
 			return height;
 		} else {
 			final Iterator<IFeature> it = children.iterator();
@@ -78,7 +78,7 @@ public class VerticalLayout extends FeatureDiagramLayoutManager {
 			}
 
 			final int yPos = (min + max) >> 1;
-			FeatureUIHelper.setLocation(parent, new Point(levelWidth.get(level), yPos));
+			FeatureUIHelper.setLocation(parent.getGraphicRepresenation(), new Point(levelWidth.get(level), yPos));
 			return yPos;
 		}
 	}
@@ -95,7 +95,7 @@ public class VerticalLayout extends FeatureDiagramLayoutManager {
 	}
 
 	private void calculateLevelWidth(IFeature parent, int level) {
-		final int parentWidth = FeatureUIHelper.getSize(parent).width;
+		final int parentWidth = FeatureUIHelper.getSize(parent.getGraphicRepresenation()).width;
 		if (level >= levelWidth.size()) {
 			levelWidth.add(parentWidth);
 		} else if (levelWidth.get(level) < parentWidth) {

@@ -199,7 +199,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 			}
 		} else if (NAME_CHANGED.equals(prop)) {
 			getFeatureFigure().setName(getFeature().getProperty().getDisplayName());
-			FeatureUIHelper.setSize(getFeature(), getFeatureFigure().getSize());
+			FeatureUIHelper.setSize(getFeature().getGraphicRepresenation(), getFeatureFigure().getSize());
 		} else if (ATTRIBUTE_CHANGED.equals(prop)) {
 			getFeatureFigure().setProperties();
 		}

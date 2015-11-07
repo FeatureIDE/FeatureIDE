@@ -42,7 +42,7 @@ public class TargetAnchor extends AbstractConnectionAnchor {
 	}
 
 	public Point getLocation(Point reference) {
-		Point ref = FeatureUIHelper.getTargetLocation(model);
+		Point ref = FeatureUIHelper.getTargetLocation(model.getGraphicRepresenation());
 		getOwner().translateToAbsolute(ref);
 		return ref;
 

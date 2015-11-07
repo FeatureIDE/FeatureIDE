@@ -68,7 +68,7 @@ public class VerticalLayout2 extends FeatureDiagramLayoutManager {
 		while (!featureList.isEmpty()) {
 			int height = 2 * FMPropertyManager.getLayoutMarginX() - FMPropertyManager.getFeatureSpaceX();
 			for (LayoutableFeature feat : featureList) {
-				height += FeatureUIHelper.getSize(feat.getFeature()).height + FMPropertyManager.getFeatureSpaceX();
+				height += FeatureUIHelper.getSize(feat.getFeature().getGraphicRepresenation()).height + FMPropertyManager.getFeatureSpaceX();
 			}
 			this.yoffset = controlHeight / 2 - height / 2;
 
@@ -77,11 +77,11 @@ public class VerticalLayout2 extends FeatureDiagramLayoutManager {
 			int levelSize = featureList.size();
 			for (int i = 0; i < levelSize; i++) {
 				LayoutableFeature feat = featureList.removeFirst();
-				if (FeatureUIHelper.getSize(feat.getFeature()).width > maxFeatWidth) {
-					maxFeatWidth = FeatureUIHelper.getSize(feat.getFeature()).width;
+				if (FeatureUIHelper.getSize(feat.getFeature().getGraphicRepresenation()).width > maxFeatWidth) {
+					maxFeatWidth = FeatureUIHelper.getSize(feat.getFeature().getGraphicRepresenation()).width;
 				}
-				FeatureUIHelper.setLocation(feat.getFeature(), new Point(this.xoffset, this.yoffset));
-				this.yoffset += FeatureUIHelper.getSize(feat.getFeature()).height + FMPropertyManager.getFeatureSpaceX();
+				FeatureUIHelper.setLocation(feat.getFeature().getGraphicRepresenation(), new Point(this.xoffset, this.yoffset));
+				this.yoffset += FeatureUIHelper.getSize(feat.getFeature().getGraphicRepresenation()).height + FMPropertyManager.getFeatureSpaceX();
 				if (i < (levelSize / 2)) {
 					this.xoffset += 10;
 				} else if (i == (levelSize / 2)) {

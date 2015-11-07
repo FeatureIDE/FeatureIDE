@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.layouts;
 import org.eclipse.draw2d.geometry.Point;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
@@ -52,14 +53,15 @@ public class DepthFirstLayout extends FeatureDiagramLayoutManager {
 	}
 
 	private int depthFirstLayout(LayoutableFeature feature, int level, int x) {
-		FeatureUIHelper.setLocation(feature.getFeature(), new Point(x, FMPropertyManager.getLayoutMarginY() + level * FMPropertyManager.getFeatureSpaceY()));
+		final IGraphicalFeature gf = feature.getFeature().getGraphicRepresenation();
+		FeatureUIHelper.setLocation(gf, new Point(x, FMPropertyManager.getLayoutMarginY() + level * FMPropertyManager.getFeatureSpaceY()));
 		int newX = x;
 		if (yoffset < FMPropertyManager.getLayoutMarginY() + level * FMPropertyManager.getFeatureSpaceY())
 			yoffset = FMPropertyManager.getLayoutMarginY() + level * FMPropertyManager.getFeatureSpaceY();
 		for (LayoutableFeature child : feature.getChildren()) {
 			newX = depthFirstLayout(child, level + 1, newX);
 		}
-		return Math.max(newX, x + FeatureUIHelper.getSize(feature.getFeature()).width + FMPropertyManager.getFeatureSpaceX());
+		return Math.max(newX, x + FeatureUIHelper.getSize(gf).width + FMPropertyManager.getFeatureSpaceX());
 	}
 
 }

@@ -31,6 +31,7 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IGraphicalFeature;
+import de.ovgu.featureide.fm.core.base.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
@@ -102,7 +103,7 @@ public class FeatureDiagramLayoutHelper {
 	public static void initializeCompoundFeaturePosition(IFeatureModel featureModel, LinkedList<IFeature> selectedFeatures, IFeature newCompound) {
 		Point initPos = new Point(0, 0);
 		int xAcc = 0;
-		for (IFeature feature : selectedFeatures) {
+		for (final IGraphicalFeature feature : FeatureUtils.getGraphicalRepresentationsOfFeatures(selectedFeatures)) {
 			if (initPos.y < FeatureUIHelper.getLocation(feature).y) {
 				initPos.y = FeatureUIHelper.getLocation(feature).y;
 			}
@@ -112,11 +113,11 @@ public class FeatureDiagramLayoutHelper {
 		if (newCompound.getStructure().isRoot()) {
 			initPos.y = (initPos.y - FMPropertyManager.getFeatureSpaceY());
 		} else {
-			IFeature parent = newCompound.getStructure().getParent().getFeature();
+			final IGraphicalFeature parent = newCompound.getStructure().getParent().getFeature().getGraphicRepresenation();
 			initPos.y = (initPos.y + FeatureUIHelper.getLocation(parent).y) / 2;
 			initPos.x = (initPos.x + FeatureUIHelper.getLocation(parent).x) / 2;
 		}
-		FeatureUIHelper.setLocation(newCompound, initPos);
+		FeatureUIHelper.setLocation(newCompound.getGraphicRepresenation(), initPos);
 
 	}
 
@@ -125,26 +126,31 @@ public class FeatureDiagramLayoutHelper {
 	 * needed for manual layout
 	 */
 	public static void initializeLayerFeaturePosition(IFeatureModel featureModel, IFeature newLayer, IFeature feature) {
-		if (!FeatureUIHelper.hasVerticalLayout(featureModel)) {
-			Point initPos = FeatureUIHelper.getLocation(newLayer.getStructure().getParent().getFeature()).getCopy();
+		final IGraphicalFeatureModel gfm = featureModel.getGraphicRepresenation();
+		
+		
+		if (!FeatureUIHelper.hasVerticalLayout(gfm)) {
+			Point initPos = FeatureUIHelper.getLocation(newLayer.getStructure().getParent().getFeature().getGraphicRepresenation()).getCopy();
 			if (feature.getStructure().getChildrenCount() > 1) {
-				IFeature lastChild = feature.getStructure().getChildren().get(feature.getStructure().getChildIndex(newLayer.getStructure()) - 1).getFeature();
-				initPos.x = FeatureUIHelper.getLocation(lastChild).x + FeatureUIHelper.getSize(lastChild).width + FMPropertyManager.getFeatureSpaceX();
-				initPos.y = FeatureUIHelper.getLocation(lastChild).y;
+				final IFeature lastChild = feature.getStructure().getChildren().get(feature.getStructure().getChildIndex(newLayer.getStructure()) - 1).getFeature();
+				final IGraphicalFeature gf = lastChild.getGraphicRepresenation();
+				initPos.x = FeatureUIHelper.getLocation(gf).x + FeatureUIHelper.getSize(gf).width + FMPropertyManager.getFeatureSpaceX();
+				initPos.y = FeatureUIHelper.getLocation(gf).y;
 			} else {
 				initPos.y += FMPropertyManager.getFeatureSpaceY();
 			}
-			FeatureUIHelper.setLocation(newLayer, initPos);
+			FeatureUIHelper.setLocation(newLayer.getGraphicRepresenation(), initPos);
 		} else {
-			Point initPos = FeatureUIHelper.getLocation(newLayer.getStructure().getParent().getFeature()).getCopy();
+			Point initPos = FeatureUIHelper.getLocation(newLayer.getStructure().getParent().getFeature().getGraphicRepresenation()).getCopy();
 			if (feature.getStructure().getChildrenCount() > 1) {
-				IFeature lastChild = feature.getStructure().getChildren().get(feature.getStructure().getChildIndex(newLayer.getStructure()) - 1).getFeature();
-				initPos.y = FeatureUIHelper.getLocation(lastChild).y + FeatureUIHelper.getSize(lastChild).height + FMPropertyManager.getFeatureSpaceX();
-				initPos.x = FeatureUIHelper.getLocation(lastChild).x;
+				final IFeature lastChild = feature.getStructure().getChildren().get(feature.getStructure().getChildIndex(newLayer.getStructure()) - 1).getFeature();
+				final IGraphicalFeature gf = lastChild.getGraphicRepresenation();
+				initPos.y = FeatureUIHelper.getLocation(gf).y + FeatureUIHelper.getSize(gf).height + FMPropertyManager.getFeatureSpaceX();
+				initPos.x = FeatureUIHelper.getLocation(gf).x;
 			} else {
-				initPos.x += FeatureUIHelper.getSize(newLayer.getStructure().getParent().getFeature()).width + FMPropertyManager.getFeatureSpaceY();
+				initPos.x += FeatureUIHelper.getSize(newLayer.getStructure().getParent().getFeature().getGraphicRepresenation()).width + FMPropertyManager.getFeatureSpaceY();
 			}
-			FeatureUIHelper.setLocation(newLayer, initPos);
+			FeatureUIHelper.setLocation(newLayer.getGraphicRepresenation(), initPos);
 		}
 	}
 
@@ -153,32 +159,33 @@ public class FeatureDiagramLayoutHelper {
 	 * 
 	 */
 	public static FeatureDiagramLayoutManager getLayoutManager(int layoutAlgorithm, IFeatureModel featureModel) {
+		final IGraphicalFeatureModel gfm = featureModel.getGraphicRepresenation();
 		switch (layoutAlgorithm) {
 		case 0:
 			return new ManualLayout();
 		case 1:
-			FeatureUIHelper.setVerticalLayoutBounds(false, featureModel);
-			featureModel.getGraphicRepresenation().getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout(featureModel));
+			FeatureUIHelper.setVerticalLayoutBounds(false, gfm);
+			featureModel.getGraphicRepresenation().getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout(gfm));
 			return new LevelOrderLayout();
 		case 2:
-			FeatureUIHelper.setVerticalLayoutBounds(false, featureModel);
-			featureModel.getGraphicRepresenation().getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout(featureModel));
+			FeatureUIHelper.setVerticalLayoutBounds(false, gfm);
+			featureModel.getGraphicRepresenation().getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout(gfm));
 			return new BreadthFirstLayout();
 		case 3:
-			FeatureUIHelper.setVerticalLayoutBounds(false, featureModel);
-			featureModel.getGraphicRepresenation().getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout(featureModel));
+			FeatureUIHelper.setVerticalLayoutBounds(false, gfm);
+			featureModel.getGraphicRepresenation().getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout(gfm));
 			return new DepthFirstLayout();
 		case 4:
-			FeatureUIHelper.setVerticalLayoutBounds(true, featureModel);
-			featureModel.getGraphicRepresenation().getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout(featureModel));
+			FeatureUIHelper.setVerticalLayoutBounds(true, gfm);
+			featureModel.getGraphicRepresenation().getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout(gfm));
 			return new VerticalLayout();
 		case 5:
-			FeatureUIHelper.setVerticalLayoutBounds(true, featureModel);
-			featureModel.getGraphicRepresenation().getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout(featureModel));
+			FeatureUIHelper.setVerticalLayoutBounds(true, gfm);
+			featureModel.getGraphicRepresenation().getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout(gfm));
 			return new VerticalLayout2();
 		default:
-			FeatureUIHelper.setVerticalLayoutBounds(false, featureModel);
-			featureModel.getGraphicRepresenation().getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout(featureModel));
+			FeatureUIHelper.setVerticalLayoutBounds(false, gfm);
+			featureModel.getGraphicRepresenation().getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout(gfm));
 			return new LevelOrderLayout();
 		}
 

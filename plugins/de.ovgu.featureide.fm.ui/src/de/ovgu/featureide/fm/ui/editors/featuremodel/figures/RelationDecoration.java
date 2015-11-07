@@ -64,7 +64,7 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 		setSize(diameter, diameter >> 1);
 		if (lastChild != null) {
 			featureModel = lastChild.getFeatureModel();
-			this.vertical = FeatureUIHelper.hasVerticalLayout(featureModel);
+			this.vertical = FeatureUIHelper.hasVerticalLayout(featureModel.getGraphicRepresenation());
 		}
 	}
 
@@ -105,7 +105,7 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 					IFeature temp;
 					temp = this.lastChild;
 					this.lastChild = children.get(i);
-					if (!(this.lastChild.getStructure().isHidden() && !FeatureUIHelper.showHiddenFeatures(featureModel))) {
+					if (!(this.lastChild.getStructure().isHidden() && !FeatureUIHelper.showHiddenFeatures(featureModel.getGraphicRepresenation()))) {
 						double angle2 = HALF_ARC ? 360 : calculateAngle(center, getFeatureLocation());
 						double angle1 = HALF_ARC ? 180 : calculateAngle(center, getFeatureLocation());
 						if (angle2 > 450 && !vertical) {
@@ -167,7 +167,7 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 					IFeature temp;
 					temp = this.lastChild;
 					this.lastChild = children.get(i);
-					if (!(this.lastChild.getStructure().isHidden() && !FeatureUIHelper.showHiddenFeatures(featureModel))) {
+					if (!(this.lastChild.getStructure().isHidden() && !FeatureUIHelper.showHiddenFeatures(featureModel.getGraphicRepresenation()))) {
 						double angle2 = HALF_ARC ? 360 : calculateAngle(r.getCenter(), getFeatureLocation());
 						double angle1 = HALF_ARC ? 180 : calculateAngle(r.getCenter(), getFeatureLocation());
 						if (angle2 > 450 && !vertical) {
@@ -188,7 +188,7 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 				highestAngle2 = HALF_ARC ? 360 : calculateAngle(r.getCenter(), getFeatureLocation());
 			}
 			r.shrink(7, 7);
-			r.y += FeatureUIHelper.getSize(lastChild.getStructure().getParent().getFeature()).height / 2;
+			r.y += FeatureUIHelper.getSize(lastChild.getStructure().getParent().getFeature().getGraphicRepresenation()).height / 2;
 			if (vertical) {
 				r.shrink(2, 2);
 				if (highestAngle2 < 270)
@@ -207,7 +207,7 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 	}
 
 	protected Point getFeatureLocation() {
-		return FeatureUIHelper.getSourceLocation(lastChild);
+		return FeatureUIHelper.getSourceLocation(lastChild.getGraphicRepresenation());
 	}
 
 	protected int getTargetAnchorDiameter() {

@@ -138,7 +138,7 @@ public class ConstraintDragAndDropCommand extends Command {
 	public Point getLeftPoint() {
 		int index = calculateNewIndex();
 
-		Point p = new Point(FeatureUIHelper.getLocation(constraint).x - 5, FeatureUIHelper.getLocation(featureModel.getConstraints().get(index)).y);
+		Point p = new Point(FeatureUIHelper.getLocation(constraint.getGraphicRepresenation()).x - 5, FeatureUIHelper.getLocation(featureModel.getConstraints().get(index).getGraphicRepresenation()).y);
 		if (isLastPos) {
 			p.y = p.y + 17;
 
@@ -149,8 +149,8 @@ public class ConstraintDragAndDropCommand extends Command {
 
 	public Point getRightPoint() {
 
-		Point p = new Point(FeatureUIHelper.getLocation(constraint).x + FeatureUIHelper.getSize(constraint).width + 5, FeatureUIHelper.getLocation(featureModel
-				.getConstraints().get(calculateNewIndex())).y);
+		Point p = new Point(FeatureUIHelper.getLocation(constraint.getGraphicRepresenation()).x + FeatureUIHelper.getSize(constraint.getGraphicRepresenation()).width + 5, FeatureUIHelper.getLocation(featureModel
+				.getConstraints().get(calculateNewIndex()).getGraphicRepresenation()).y);
 		if (isLastPos) {
 			p.y = p.y + 17;
 

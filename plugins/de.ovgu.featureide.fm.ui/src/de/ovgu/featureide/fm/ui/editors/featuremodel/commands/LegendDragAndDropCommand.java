@@ -72,7 +72,7 @@ public class LegendDragAndDropCommand extends Command {
 				return false;
 			}
 
-			final List<ConnectionEditPart> connectionList = FeatureUIHelper.getConnections(f, legendEditPart.getViewer());
+			final List<ConnectionEditPart> connectionList = FeatureUIHelper.getConnections(f.getGraphicRepresenation(), legendEditPart.getViewer());
 			for (ConnectionEditPart connectionEditPart : connectionList) {
 				if (connectionEditPart.getConnectionFigure().getPoints().intersects(newBounds)) {
 					return false;

@@ -223,12 +223,12 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 				if (fm == null)
 					return;
 
-				org.eclipse.draw2d.geometry.Point oldLoc = FeatureUIHelper.getLocation(fm.getStructure().getRoot().getFeature());
+				org.eclipse.draw2d.geometry.Point oldLoc = FeatureUIHelper.getLocation(fm.getStructure().getRoot().getFeature().getGraphicRepresenation());
 				if (oldLoc == null)
 					return;
 				internRefresh(true);
 
-				org.eclipse.draw2d.geometry.Point newLoc = FeatureUIHelper.getLocation(fm.getStructure().getRoot().getFeature());
+				org.eclipse.draw2d.geometry.Point newLoc = FeatureUIHelper.getLocation(fm.getStructure().getRoot().getFeature().getGraphicRepresenation());
 				if (newLoc == null)
 					return;
 				int difX = newLoc.x - oldLoc.x;

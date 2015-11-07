@@ -30,6 +30,7 @@ import org.eclipse.draw2d.geometry.Point;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IGraphicalFeature;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 
@@ -52,17 +53,18 @@ public class ModelReverseOrderOperation extends AbstractFeatureModelOperation {
 		final IFeature root = featureModel.getStructure().getRoot().getFeature();
 		reverse(root);
 		if (!featureModel.getGraphicRepresenation().getLayout().hasFeaturesAutoLayout()) {
-			Point mid = FeatureUIHelper.getLocation(root).getCopy();
-			mid.x += FeatureUIHelper.getSize(root).width / 2;
-			mid.y += FeatureUIHelper.getSize(root).height / 2;
-			mirrorFeaturePositions(root, mid, FeatureUIHelper.hasVerticalLayout(featureModel));
+			final IGraphicalFeature gf = root.getGraphicRepresenation();
+			Point mid = FeatureUIHelper.getLocation(gf).getCopy();
+			mid.x += FeatureUIHelper.getSize(gf).width / 2;
+			mid.y += FeatureUIHelper.getSize(gf).height / 2;
+			mirrorFeaturePositions(root, mid, FeatureUIHelper.hasVerticalLayout(featureModel.getGraphicRepresenation()));
 		}
 	}
 
 	private void mirrorFeaturePositions(IFeature feature, Point mid, boolean vertical) {
 		if (!feature.getStructure().isRoot()) {
-			Point featureMid = FeatureUIHelper.getLocation(feature).getCopy();
-			Dimension size = FeatureUIHelper.getSize(feature).getCopy();
+			Point featureMid = FeatureUIHelper.getLocation(feature.getGraphicRepresenation()).getCopy();
+			Dimension size = FeatureUIHelper.getSize(feature.getGraphicRepresenation()).getCopy();
 
 			if (vertical) {
 				featureMid.y += size.height / 2;
@@ -74,7 +76,7 @@ public class ModelReverseOrderOperation extends AbstractFeatureModelOperation {
 				featureMid.x -= size.width / 2;
 			}
 
-			FeatureUIHelper.setLocation(feature, featureMid);
+			FeatureUIHelper.setLocation(feature.getGraphicRepresenation(), featureMid);
 		}
 		if (feature.getStructure().hasChildren()) {
 			for (IFeature child : FeatureUtils.convertToFeatureList(feature.getStructure().getChildren()))

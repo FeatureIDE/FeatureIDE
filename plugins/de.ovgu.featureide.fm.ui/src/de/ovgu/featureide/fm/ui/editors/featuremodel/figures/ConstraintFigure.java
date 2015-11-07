@@ -88,13 +88,13 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 
 		setText(getConstraintText(constraint));
 
-		FeatureUIHelper.setSize(constraint, getSize());
+		FeatureUIHelper.setSize(constraint.getGraphicRepresenation(), getSize());
 
 		add(label);
 		setOpaque(true);
 
-		if (FeatureUIHelper.getLocation(constraint) != null)
-			setLocation(FeatureUIHelper.getLocation(constraint));
+		if (FeatureUIHelper.getLocation(constraint.getGraphicRepresenation()) != null)
+			setLocation(FeatureUIHelper.getLocation(constraint.getGraphicRepresenation()));
 
 		init();
 	}

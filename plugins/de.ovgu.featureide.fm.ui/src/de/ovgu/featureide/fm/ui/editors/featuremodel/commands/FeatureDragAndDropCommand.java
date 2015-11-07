@@ -71,7 +71,7 @@ public class FeatureDragAndDropCommand extends Command {
 		this.feature = feature;
 		this.newLocation = newLocation;
 		this.hasAutoLayout = featureModel.getGraphicRepresenation().getLayout().hasFeaturesAutoLayout();
-		this.hasVerticalLayout = FeatureUIHelper.hasVerticalLayout(featureModel);
+		this.hasVerticalLayout = FeatureUIHelper.hasVerticalLayout(featureModel.getGraphicRepresenation());
 		this.editPart = editPart;
 		IFeatureStructure structureParent = feature.getStructure().getParent();
 		oldParent = (structureParent != null) ? structureParent.getFeature() : null;
@@ -85,7 +85,7 @@ public class FeatureDragAndDropCommand extends Command {
 			if (editPart.getSelected() != 2) {
 				return false;
 			}
-			Point referencePoint = FeatureUIHelper.getSourceLocation(feature, newLocation);
+			Point referencePoint = FeatureUIHelper.getSourceLocation(feature.getGraphicRepresenation(), newLocation);
 			IFeature next = calculateNext(featureModel.getStructure().getRoot().getFeature(), referencePoint);
 
 			// calculate new parent (if exists)
@@ -109,7 +109,7 @@ public class FeatureDragAndDropCommand extends Command {
 	@Override
 	public void execute() {
 		FeatureOperationData data = new FeatureOperationData(feature, oldParent, newParent, newIndex, oldIndex);
-		FeatureMoveOperation op = new FeatureMoveOperation(data, featureModel, newLocation, FeatureUIHelper.getLocation(feature).getCopy(), feature);
+		FeatureMoveOperation op = new FeatureMoveOperation(data, featureModel, newLocation, FeatureUIHelper.getLocation(feature.getGraphicRepresenation()).getCopy(), feature);
 		op.addContext((ObjectUndoContext) featureModel.getUndoContext());
 
 		try {
@@ -121,8 +121,8 @@ public class FeatureDragAndDropCommand extends Command {
 	}
 
 	private boolean calculateNewParentAndIndex(IFeature next) {
-		Point location = FeatureUIHelper.getSourceLocation(feature, newLocation);
-		Point nextLocation = FeatureUIHelper.getTargetLocation(next);
+		Point location = FeatureUIHelper.getSourceLocation(feature.getGraphicRepresenation(), newLocation);
+		Point nextLocation = FeatureUIHelper.getTargetLocation(next.getGraphicRepresenation());
 		Dimension d = location.getDifference(nextLocation);
 		if (!hasVerticalLayout) {
 			if (d.height > 0) {
@@ -130,7 +130,7 @@ public class FeatureDragAndDropCommand extends Command {
 				newParent = next;
 				newIndex = 0;
 				for (IFeature child : FeatureUtils.convertToFeatureList(next.getStructure().getChildren())) {
-					Dimension cd = FeatureUIHelper.getSourceLocation(child).getDifference(nextLocation);
+					Dimension cd = FeatureUIHelper.getSourceLocation(child.getGraphicRepresenation()).getDifference(nextLocation);
 					if (d.width / (double) d.height <= cd.width / (double) cd.height)
 						break;
 					else
@@ -160,7 +160,7 @@ public class FeatureDragAndDropCommand extends Command {
 				newParent = next;
 				newIndex = 0;
 				for (IFeature child : FeatureUtils.convertToFeatureList(next.getStructure().getChildren())) {
-					Dimension cd = FeatureUIHelper.getSourceLocation(child).getDifference(nextLocation);
+					Dimension cd = FeatureUIHelper.getSourceLocation(child.getGraphicRepresenation()).getDifference(nextLocation);
 					if (d.height / (double) d.width <= cd.height / (double) cd.width)
 						break;
 					else
@@ -192,10 +192,10 @@ public class FeatureDragAndDropCommand extends Command {
 		if (feature == null)
 			return null;
 		IFeature next = feature;
-		double distance = FeatureUIHelper.getTargetLocation(next).getDistance(referencePoint);
+		double distance = FeatureUIHelper.getTargetLocation(next.getGraphicRepresenation()).getDistance(referencePoint);
 		for (IFeature child : FeatureUtils.convertToFeatureList(feature.getStructure().getChildren())) {
 			IFeature childsNext = calculateNext(child, referencePoint);
-			double newDistance = FeatureUIHelper.getTargetLocation(childsNext).getDistance(referencePoint);
+			double newDistance = FeatureUIHelper.getTargetLocation(childsNext.getGraphicRepresenation()).getDistance(referencePoint);
 			if (newDistance > 0 && newDistance < distance) {
 				next = childsNext;
 				distance = newDistance;

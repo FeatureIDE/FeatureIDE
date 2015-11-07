@@ -71,7 +71,7 @@ public class FeatureMoveEditPolicy extends NonResizableEditPolicy implements GUI
 		r.setForegroundColor(ColorConstants.white);
 		r.setBounds(getInitialFeedbackBounds());
 
-		s = FeatureUIHelper.getSourceLocation(editPart.getFeature());
+		s = FeatureUIHelper.getSourceLocation(editPart.getFeature().getGraphicRepresenation());
 		Point s2 = s.getCopy();
 		getHostFigure().translateToAbsolute(s2);
 
@@ -110,7 +110,7 @@ public class FeatureMoveEditPolicy extends NonResizableEditPolicy implements GUI
 			cmd = (FeatureDragAndDropCommand) superPolicy.getConstraintCommand();
 			Point location;
 			if (cmd != null && cmd.getNewParent() != null) {
-				location = FeatureUIHelper.getTargetLocation(cmd.getNewParent());
+				location = FeatureUIHelper.getTargetLocation(cmd.getNewParent().getGraphicRepresenation());
 				getHostFigure().translateToAbsolute(location);
 				c.setForegroundColor(cmd.canExecute() ? NEW_CONNECTION_FOREGROUND : VOID_CONNECTION_FOREGROUND);
 			} else
