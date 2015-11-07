@@ -42,10 +42,10 @@ public class ManualLayout extends FeatureDiagramLayoutManager {
 
 	public void layoutFeatureModel(IFeatureModel featureModel) {
 		for (IFeature feature : featureModel.getFeatures()) {
-			FeatureUIHelper.setLocation(feature, feature.getGraphicRepresenation().getLocation());
+			FeatureUIHelper.setLocation(feature.getGraphicRepresenation(), feature.getGraphicRepresenation().getLocation());
 		}
 		for (IConstraint constraint : featureModel.getConstraints()) {
-			FeatureUIHelper.setLocation(constraint, constraint.getGraphicRepresenation().getLocation());
+			FeatureUIHelper.setLocation(constraint.getGraphicRepresenation(), constraint.getGraphicRepresenation().getLocation());
 		}
 	}
 }

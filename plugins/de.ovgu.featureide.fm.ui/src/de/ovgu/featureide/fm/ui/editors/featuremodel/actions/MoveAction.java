@@ -159,19 +159,19 @@ public class MoveAction extends Action {
 	private void moveFigure(Object element, boolean doStop) {
 		if ((element instanceof FeatureEditPart) || (element instanceof IFeature)) {
 			IFeature feature = element instanceof FeatureEditPart ? ((FeatureEditPart) element).getFeature() : (IFeature) element;
-			final Point newPos = FeatureUIHelper.getLocation(feature).translate(deltaPos);
+			final Point newPos = FeatureUIHelper.getLocation(feature.getGraphicRepresenation()).translate(deltaPos);
 
 			if (doStop) {
 				this.endPositions.put(element, newPos);
 			}
 
-			FeatureUIHelper.setLocation(feature, newPos);
+			FeatureUIHelper.setLocation(feature.getGraphicRepresenation(), newPos);
 		} else if ((element instanceof ConstraintEditPart) || (element instanceof IConstraint)) {
 			IConstraint constraint = element instanceof ConstraintEditPart ? ((ConstraintEditPart) element).getConstraintModel() : (IConstraint) element;
-			final Point newPos = FeatureUIHelper.getLocation(constraint).translate(deltaPos);
-			FeatureUIHelper.setLocation(constraint, newPos);
+			final Point newPos = FeatureUIHelper.getLocation(constraint.getGraphicRepresenation()).translate(deltaPos);
+			FeatureUIHelper.setLocation(constraint.getGraphicRepresenation(), newPos);
 		} else if ((element instanceof LegendEditPart) || (element instanceof LegendFigure) || (element instanceof Legend)) {
-			LegendFigure legendFigure = FeatureUIHelper.getLegendFigure(featureModel);
+			LegendFigure legendFigure = FeatureUIHelper.getLegendFigure(featureModel.getGraphicRepresenation());
 			final Point newPos = legendFigure.getLocation().translate(deltaPos);
 			legendFigure.setLocation(newPos);
 			featureModel.getGraphicRepresenation().getLayout().setLegendPos(newPos.x(), newPos.y());

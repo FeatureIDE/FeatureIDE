@@ -102,8 +102,8 @@ public class ConquererFMWriter extends AbstractFeatureModelWriter {
 		
 		require = new HashMap<String, Set<String>>();
 		exclude = new HashMap<String, Set<String>>();
-    	List<Node> furtherNodes = new LinkedList<Node>();
-    	List<Node> nodes = Functional.toList(FeatureUtils.getPropositionalNodes(featureModel.getConstraints()));
+    	final List<Node> furtherNodes = new LinkedList<Node>();
+    	final List<Node> nodes = Functional.toList(FeatureUtils.getPropositionalNodes(featureModel.getConstraints()));
     	Node[] nodeArray = nodes.toArray(new Node[nodes.size()]);
     	Node node = new And(nodeArray);
     	if (node.getChildren().length > 0) {

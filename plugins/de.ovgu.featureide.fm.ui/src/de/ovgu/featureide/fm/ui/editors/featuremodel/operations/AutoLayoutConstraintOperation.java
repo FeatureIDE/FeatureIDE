@@ -65,26 +65,26 @@ public class AutoLayoutConstraintOperation extends AbstractFeatureModelOperation
 			featureList.addAll(Functional.toList(featureModel.getFeatures()));
 
 			for (int i = 0; i < featureList.size(); i++) {
-				if (y < FeatureUIHelper.getLocation(featureList.get(i)).y) {
-					y = FeatureUIHelper.getLocation(featureList.get(i)).y;
+				if (y < FeatureUIHelper.getLocation(featureList.get(i).getGraphicRepresenation()).y) {
+					y = FeatureUIHelper.getLocation(featureList.get(i).getGraphicRepresenation()).y;
 				}
-				if (minX > FeatureUIHelper.getLocation(featureList.get(i)).x) {
-					minX = FeatureUIHelper.getLocation(featureList.get(i)).x;
+				if (minX > FeatureUIHelper.getLocation(featureList.get(i).getGraphicRepresenation()).x) {
+					minX = FeatureUIHelper.getLocation(featureList.get(i).getGraphicRepresenation()).x;
 				}
-				if (maxX < FeatureUIHelper.getLocation(featureList.get(i)).x) {
-					maxX = FeatureUIHelper.getLocation(featureList.get(i)).x + FeatureUIHelper.getSize(featureList.get(i)).width;
+				if (maxX < FeatureUIHelper.getLocation(featureList.get(i).getGraphicRepresenation()).x) {
+					maxX = FeatureUIHelper.getLocation(featureList.get(i).getGraphicRepresenation()).x + FeatureUIHelper.getSize(featureList.get(i).getGraphicRepresenation()).width;
 				}
 			}
 			final IConstraint constraint = constraintList.get(0);
-			newPos.x = (minX + maxX) / 2 - FeatureUIHelper.getSize(constraint).width / 2;
+			newPos.x = (minX + maxX) / 2 - FeatureUIHelper.getSize(constraint.getGraphicRepresenation()).width / 2;
 			newPos.y = y + FMPropertyManager.getConstraintSpace();
-			FeatureUIHelper.setLocation(constraint, newPos);
+			FeatureUIHelper.setLocation(constraint.getGraphicRepresenation(), newPos);
 		}
 		for (int i = 1; i < constraintList.size(); i++) {
 			Point newPos = new Point();
-			newPos.x = (minX + maxX) / 2 - FeatureUIHelper.getSize(constraintList.get(i)).width / 2;
-			newPos.y = FeatureUIHelper.getLocation(constraintList.get(i - 1)).y + FMPropertyManager.getConstraintSpace();
-			FeatureUIHelper.setLocation(constraintList.get(i), newPos);
+			newPos.x = (minX + maxX) / 2 - FeatureUIHelper.getSize(constraintList.get(i).getGraphicRepresenation()).width / 2;
+			newPos.y = FeatureUIHelper.getLocation(constraintList.get(i - 1).getGraphicRepresenation()).y + FMPropertyManager.getConstraintSpace();
+			FeatureUIHelper.setLocation(constraintList.get(i).getGraphicRepresenation(), newPos);
 		}
 	}
 
@@ -92,10 +92,10 @@ public class AutoLayoutConstraintOperation extends AbstractFeatureModelOperation
 	protected void undo() {
 		List<IConstraint> constraintList = featureModel.getConstraints();
 		if (!constraintList.isEmpty() && (!(oldPos == null) && !oldPos.isEmpty())) {
-			FeatureUIHelper.setLocation(constraintList.get(0), oldPos.get(counter).get(0));
+			FeatureUIHelper.setLocation(constraintList.get(0).getGraphicRepresenation(), oldPos.get(counter).get(0));
 		}
 		for (int i = 1; i < constraintList.size(); i++) {
-			FeatureUIHelper.setLocation(featureModel.getConstraints().get(i), oldPos.get(counter).get(i));
+			FeatureUIHelper.setLocation(featureModel.getConstraints().get(i).getGraphicRepresenation(), oldPos.get(counter).get(i));
 		}
 	}
 

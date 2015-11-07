@@ -26,8 +26,10 @@ import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.gef.commands.Command;
 import org.eclipse.ui.PlatformUI;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ConstraintMoveOperation;
@@ -78,7 +80,7 @@ public class ConstraintDragAndDropCommand extends Command {
 			return;
 
 		ConstraintMoveOperation op = new ConstraintMoveOperation(constraint, featureModel, index, oldIndex, isLastPos, newLocation, FeatureUIHelper
-				.getLocation(constraint).getCopy());
+				.getLocation(constraint.getGraphicRepresenation()).getCopy());
 		op.addContext((IUndoContext) featureModel.getUndoContext());
 
 		try {
@@ -95,7 +97,7 @@ public class ConstraintDragAndDropCommand extends Command {
 	private int calculateNewIndex() {
 
 		for (IConstraint c : featureModel.getConstraints()) {
-			if ((FeatureUIHelper.getLocation(c).y + 17) > newLocation.y) {
+			if ((FeatureUIHelper.getLocation(c.getGraphicRepresenation()).y + 17) > newLocation.y) {
 				isLastPos = false;
 
 				return featureModel.getConstraints().indexOf(c);
@@ -108,9 +110,9 @@ public class ConstraintDragAndDropCommand extends Command {
 	}
 
 	public void setMaxValues() {
-		maxLeft = FeatureUIHelper.getLocation(constraint).x;
-		maxUp = FeatureUIHelper.getLocation(constraint).y;
-		for (IConstraint c : featureModel.getConstraints()) {
+		maxLeft = FeatureUIHelper.getLocation(constraint.getGraphicRepresenation()).x;
+		maxUp = FeatureUIHelper.getLocation(constraint.getGraphicRepresenation()).y;
+		for (IGraphicalConstraint c : FeatureUtils.getGraphicalRepresentationsOfConstraints(featureModel.getConstraints())) {
 
 			if (FeatureUIHelper.getLocation(c).x < maxLeft) {
 				maxLeft = FeatureUIHelper.getLocation(c).x;

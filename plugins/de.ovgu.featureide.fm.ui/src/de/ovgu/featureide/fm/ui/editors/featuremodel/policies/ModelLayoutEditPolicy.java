@@ -92,7 +92,7 @@ public class ModelLayoutEditPolicy extends LayoutEditPolicy {
 			if (editPart instanceof FeatureEditPart) {
 				FeatureEditPart featureEditPart = (FeatureEditPart) editPart;
 				IFeature feature = featureEditPart.getFeature();
-				Rectangle bounds = FeatureUIHelper.getBounds(feature);
+				Rectangle bounds = FeatureUIHelper.getBounds(feature.getGraphicRepresenation());
 				bounds = bounds.getTranslated(r.getMoveDelta().getScaled(1 / FeatureUIHelper.getZoomFactor()));
 				cmd = new FeatureDragAndDropCommand(featureModel, feature, bounds.getLocation(), featureEditPart);
 			} else if (editPart instanceof ConstraintEditPart) {
@@ -103,7 +103,7 @@ public class ModelLayoutEditPolicy extends LayoutEditPolicy {
 					getHostFigure().translateToRelative(point);
 					cmd = new ConstraintDragAndDropCommand(featureModel, constraint, point);
 				} else {
-					Rectangle bounds = FeatureUIHelper.getBounds(constraint);
+					Rectangle bounds = FeatureUIHelper.getBounds(constraint.getGraphicRepresenation());
 					bounds = bounds.getTranslated(r.getMoveDelta().getScaled(1 / FeatureUIHelper.getZoomFactor()));
 					cmd = new ConstraintDragAndDropCommand(featureModel, constraint, bounds.getLocation());
 				}

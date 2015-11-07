@@ -56,7 +56,7 @@ public class AutoLayoutConstraintAction extends Action {
 	public void run() {
 		LinkedList<Point> newList = new LinkedList<Point>();
 		for (int i = 0; i < featureModel.getConstraintCount(); i++) {
-			newList.add(FeatureUIHelper.getLocation(featureModel.getConstraints().get(i)).getCopy());
+			newList.add(FeatureUIHelper.getLocation(featureModel.getConstraints().get(i).getGraphicRepresenation()).getCopy());
 		}
 		int counter = oldPos.size();
 		oldPos.add(newList);

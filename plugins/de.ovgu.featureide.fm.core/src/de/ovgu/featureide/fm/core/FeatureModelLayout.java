@@ -27,7 +27,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModelLayout;
  * 
  * @author soenke
  */
-public class FeatureModelLayout implements IFeatureModelLayout {
+public class FeatureModelLayout implements IFeatureModelLayout, Cloneable {
 	private boolean autoLayoutLegend;
 	private boolean showHiddenFeatures;
 	private boolean hasVerticalLayout;

@@ -68,7 +68,7 @@ public class LegendDragAndDropCommand extends Command {
 
 		// check if legend intersects with a feature
 		for (IFeature f : model.getFeatures()) {
-			if (newBounds.intersects(FeatureUIHelper.getBounds(f))) {
+			if (newBounds.intersects(FeatureUIHelper.getBounds(f.getGraphicRepresenation()))) {
 				return false;
 			}
 
@@ -82,7 +82,7 @@ public class LegendDragAndDropCommand extends Command {
 
 		// check if legend intersects with a constraint
 		for (IConstraint c : model.getConstraints()) {
-			if (newBounds.intersects(FeatureUIHelper.getBounds(c))) {
+			if (newBounds.intersects(FeatureUIHelper.getBounds(c.getGraphicRepresenation()))) {
 				return false;
 			}
 		}

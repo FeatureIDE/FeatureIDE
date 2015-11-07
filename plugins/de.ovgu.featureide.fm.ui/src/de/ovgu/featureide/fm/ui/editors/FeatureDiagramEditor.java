@@ -248,7 +248,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			 * @param delta
 			 */
 			private void moveLegend(IFeatureModel fm, int delta) {
-				LegendFigure legendFigure = FeatureUIHelper.getLegendFigure(fm);
+				LegendFigure legendFigure = FeatureUIHelper.getLegendFigure(fm.getGraphicRepresenation());
 				if (legendFigure != null) {
 					org.eclipse.draw2d.geometry.Point location = legendFigure.getLocation();
 					legendFigure.setLocation(new org.eclipse.draw2d.geometry.Point(location.x + delta, location.y));

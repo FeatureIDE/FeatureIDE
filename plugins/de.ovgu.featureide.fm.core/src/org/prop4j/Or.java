@@ -29,7 +29,7 @@ import java.util.List;
  * 
  * @author Thomas Thuem
  */
-public class Or extends Node {
+public class Or extends Node implements Cloneable {
 
 	public Or(Object ...children) {
 		setChildren(children);

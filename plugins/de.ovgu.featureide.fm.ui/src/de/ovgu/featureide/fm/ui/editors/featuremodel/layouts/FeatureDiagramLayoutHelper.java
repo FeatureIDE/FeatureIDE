@@ -26,9 +26,11 @@ import java.util.LinkedList;
 
 import org.eclipse.draw2d.geometry.Point;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
@@ -72,7 +74,7 @@ public class FeatureDiagramLayoutHelper {
 		int leftX = Integer.MAX_VALUE;
 		int rightX = Integer.MIN_VALUE;
 		if (featureModel.getConstraintCount() == 1) {
-			for (IFeature feature : featureModel.getFeatures()) {
+			for (IGraphicalFeature feature : FeatureUtils.getGraphicalRepresentationsOfFeatures(featureModel.getFeatures())) {
 				if (FeatureUIHelper.getLocation(feature).y > newLocation.y) {
 					newLocation.y = FeatureUIHelper.getLocation(feature).y;
 				}
@@ -87,10 +89,10 @@ public class FeatureDiagramLayoutHelper {
 			newLocation.y += FMPropertyManager.getFeatureSpaceY();
 		} else {
 			IConstraint lastConstraint = featureModel.getConstraints().get(featureModel.getConstraintCount() - 2);
-			newLocation = FeatureUIHelper.getLocation(lastConstraint).getCopy();
+			newLocation = FeatureUIHelper.getLocation(lastConstraint.getGraphicRepresenation()).getCopy();
 			newLocation.y += FMPropertyManager.getConstraintSpace();
 		}
-		FeatureUIHelper.setLocation(constraint, newLocation);
+		FeatureUIHelper.setLocation(constraint.getGraphicRepresenation(), newLocation);
 	}
 
 	/**

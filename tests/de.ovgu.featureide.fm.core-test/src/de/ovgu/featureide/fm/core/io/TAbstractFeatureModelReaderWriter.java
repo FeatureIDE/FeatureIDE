@@ -42,7 +42,6 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
 import de.ovgu.featureide.fm.core.editing.Comparison;
 import de.ovgu.featureide.fm.core.editing.ModelComparator;
-import de.ovgu.featureide.fm.core.filter.base.Filter;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 
@@ -89,7 +88,11 @@ public abstract class TAbstractFeatureModelReaderWriter {
 			MODEL_FILE_FOLDER = new File(ClassLoader.getSystemResource("testFeatureModels").getPath());
 		}
 		Collection<Object[]> params = new ArrayList<Object[]>();
-		for (File f : MODEL_FILE_FOLDER.listFiles(getFileFilter(".xml"))) {
+		final FileFilter fileFilter = getFileFilter(".xml");
+		if (fileFilter == null)
+			throw new RuntimeException();
+		
+		for (File f : MODEL_FILE_FOLDER.listFiles(fileFilter)) {
 			Object[] models = new Object[2];
 
 			IFeatureModel fm = FeatureModelFactory.getInstance().createFeatureModel();

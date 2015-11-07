@@ -29,7 +29,7 @@ import java.util.List;
  * 
  * @author Thomas Thuem
  */
-public class Not extends Node {
+public class Not extends Node implements Cloneable {
 	
 	public Not(Object child) {
 		children = new Node[] { getNode(child) };

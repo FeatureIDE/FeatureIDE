@@ -62,7 +62,7 @@ public class FMPrintAction extends PrintAction {
 
 		Collection<IFeature> features = Functional.toList(featureModel.getFeatures());
 		Iterator<IFeature> featureIter = features.iterator();
-		Point minP = FeatureUIHelper.getLocation(featureIter.next()).getCopy();
+		Point minP = FeatureUIHelper.getLocation(featureIter.next().getGraphicRepresenation()).getCopy();
 
 		move(featureModel, layout, features, featureIter, minP);
 		//print
@@ -75,7 +75,7 @@ public class FMPrintAction extends PrintAction {
 		layout.setLayout(0);
 		while (featureIter.hasNext()) {
 			IFeature f = featureIter.next();
-			Point p = FeatureUIHelper.getLocation(f);
+			Point p = FeatureUIHelper.getLocation(f.getGraphicRepresenation());
 			if (p.x < minP.x)
 				minP.x = p.x;
 			if (p.y < minP.y)
@@ -98,21 +98,21 @@ public class FMPrintAction extends PrintAction {
 	private void moveLegend(IFeatureModel featureModel, FeatureModelLayout layout, Point minP) {
 		FMPoint legendPos = layout.getLegendPos();
 		Point newLegendPos = new Point(legendPos.x - minP.x, legendPos.y - minP.y);
-		FeatureUIHelper.getLegendFigure(featureModel).setLocation(newLegendPos);
+		FeatureUIHelper.getLegendFigure(featureModel.getGraphicRepresenation()).setLocation(newLegendPos);
 		layout.setLegendPos(newLegendPos.x, newLegendPos.y);
 	}
 
 	private void moveConstraints(IFeatureModel featureModel, Point minP) {
 		for (IConstraint c : featureModel.getConstraints()) {
-			Point newPoint = new Point(FeatureUIHelper.getLocation(c).getCopy().x - minP.x, FeatureUIHelper.getLocation(c).getCopy().y - minP.y);
-			FeatureUIHelper.setLocation(c, newPoint);
+			Point newPoint = new Point(FeatureUIHelper.getLocation(c.getGraphicRepresenation()).getCopy().x - minP.x, FeatureUIHelper.getLocation(c.getGraphicRepresenation()).getCopy().y - minP.y);
+			FeatureUIHelper.setLocation(c.getGraphicRepresenation(), newPoint);
 		}
 	}
 
 	private void moveFeatures(Collection<IFeature> features, Point minP) {
 		for (IFeature f : features) {
-			Point newPoint = new Point(FeatureUIHelper.getLocation(f).getCopy().x - minP.x, FeatureUIHelper.getLocation(f).getCopy().y - minP.y);
-			FeatureUIHelper.setLocation(f, newPoint);
+			Point newPoint = new Point(FeatureUIHelper.getLocation(f.getGraphicRepresenation()).getCopy().x - minP.x, FeatureUIHelper.getLocation(f.getGraphicRepresenation()).getCopy().y - minP.y);
+			FeatureUIHelper.setLocation(f.getGraphicRepresenation(), newPoint);
 		}
 	}
 
