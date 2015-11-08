@@ -509,11 +509,6 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	}
 
 	@Override
-	public void setConstraintSelected(boolean b) {
-		throw new UnsupportedOperationException("Not implemented yet");
-	}
-
-	@Override
 	public void setFeatureOrderListItem(int i, String newName) {
 		throw new UnsupportedOperationException("Not implemented yet");
 	}

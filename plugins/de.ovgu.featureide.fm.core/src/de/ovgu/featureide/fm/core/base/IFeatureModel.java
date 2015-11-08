@@ -140,8 +140,6 @@ public interface IFeatureModel extends Cloneable {
 
 	void refreshContextMenu();
 
-	void setConstraintSelected(boolean b);
-
 	void setUndoContext(Object undoContext);
 
 	void setFeatureOrderListItem(int i, String newName);
