@@ -103,11 +103,12 @@ public abstract class AFeature extends AFeatureModelElement implements IFeature 
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder("name=" + name);
-		sb.append(", Structure=[");
-		FeatureUtils.print(this, sb);
-		sb.append("]");
-		return "Feature(" + sb.toString() + ")";
+//		StringBuilder sb = new StringBuilder("name=" + name);
+//		sb.append(", Structure=[");
+//		FeatureUtils.print(this, sb);
+//		sb.append("]");
+//		return "Feature(" + sb.toString() + ")";
+		return getName();
 	}
 
 }
