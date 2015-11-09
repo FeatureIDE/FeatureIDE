@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -36,8 +37,11 @@ import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.editing.cnf.CNFSolver;
+import de.ovgu.featureide.fm.core.editing.cnf.CNFSolver2;
 import de.ovgu.featureide.fm.core.editing.cnf.Clause;
+import de.ovgu.featureide.fm.core.editing.cnf.ICNFSolver;
 import de.ovgu.featureide.fm.core.editing.cnf.UnkownLiteralException;
+import de.ovgu.featureide.fm.core.editing.remove.DeprecatedFeatureMap.DeprecatedFeature;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.WorkMonitor;
 
@@ -61,6 +65,7 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 
 	// list for all new construct clauses
 	private Set<DeprecatedClause> newClauseSet;
+//	private List<DeprecatedClause> origClauseList;
 
 	private DeprecatedFeatureMap map;
 
@@ -85,8 +90,19 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 			retainedFeatures.add((String) literal.var);
 		}
 	}
+	
+
+	private String[] featureNameArray = null;
+//	private HashSet<Integer> featureIDSet = null;
+	private HashMap<Object, Integer> idMap = null;
+	private boolean[] removedFeatures = null;
+	private	ICNFSolver solver = null;
 
 	public Node execute(WorkMonitor workMonitor) throws TimeoutException, UnkownLiteralException {
+		
+		/* 
+		 * Collect all features in the prop node and remove TRUE and FALSE
+		 */
 		final HashSet<String> retainedFeatures = new HashSet<>();
 		if (fmNode instanceof And) {
 			for (Node andChild : fmNode.getChildren()) {
@@ -105,8 +121,42 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 		} else {
 			addLiteral(retainedFeatures, fmNode);
 		}
-		retainedFeatures.removeAll(features);
+		
+		removedFeatures = new boolean[retainedFeatures.size() + 1];
+//		Arrays.fill(removedFeatures, false);
 
+		featureNameArray = new String[retainedFeatures.size() + 1];
+		idMap = new HashMap<>(retainedFeatures.size() << 1);
+		{
+			int id = 1;
+			for (String name : features) {
+				idMap.put(name, id);
+				featureNameArray[id] = name;
+				id++;
+			}
+
+			retainedFeatures.removeAll(features);
+			
+			for (String name : retainedFeatures) {
+				idMap.put(name, id);
+				featureNameArray[id] = name;
+				id++;
+			}
+		}
+		
+//		if (!retainedFeatures.containsAll(features)) {
+//			throw new RuntimeException();
+//		}		
+		
+//		featureIDSet = new HashSet<>(features.size() << 1);
+//		for (String name : features) {
+//			featureIDSet.add(idMap.get(name));
+//		}
+		
+
+		/*
+		 * CNF with more than one clause
+		 */
 		if (fmNode instanceof And) {
 			final Node[] andChildren = fmNode.getChildren();
 
@@ -115,7 +165,7 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 
 			newClauseSet = new HashSet<>(andChildren.length);
 
-			map = new DeprecatedFeatureMap(features);
+			map = new DeprecatedFeatureMap(features, idMap);
 
 			// fill first two lists
 			for (int i = 0; i < andChildren.length; i++) {
@@ -148,7 +198,7 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 							}
 						}
 					}
-
+					
 					if (valid) {
 						if (absoluteValueCount > 0) {
 							if (children.length == absoluteValueCount) {
@@ -161,10 +211,10 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 								if (literal != null) {
 									newChildren[k++] = literal;
 								}
-							}
-							curClause = DeprecatedClause.createClause(map, newChildren);
+							}							
+							curClause = DeprecatedClause.createClause(map, convert(newChildren));
 						} else {
-							curClause = DeprecatedClause.createClause(map, children);
+							curClause = DeprecatedClause.createClause(map, convert(children));
 						}
 					} else {
 						curClause = null;
@@ -182,89 +232,178 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 						}
 						curClause = null;
 					} else {
-						curClause = DeprecatedClause.createClause(map, literal);
+						curClause = DeprecatedClause.createClause(map, convert(new Literal[] {literal}));
 					}
 				}
 
 				addNewClause(curClause);
 			}
-			final CNFSolver solver = new CNFSolver(fmNode);
+
+//			origClauseList = new ArrayList<>(newClauseSet);
+			createSolver();
+			
+			
+//			int i2 = 0;
+//			for (int i = relevantClauseList.size() - 1; i >= i2; i--) {
+//				final int[] orChildren = relevantClauseList.get(i).getLiterals();
+//
+//				int retainIndex = 0;
+//				for (int j = 0; j < orChildren.length; j++) {
+//					final int literal = orChildren[j];
+//					if (!featureIDSet.contains(Math.abs(literal))) {
+//						retainIndex++;
+//					}
+//				}
+//				
+//				final int[] literalList = new int[retainIndex];
+//				retainIndex = -1;
+//				
+//				for (int j = 0; j < orChildren.length; j++) {
+//					final int literal = orChildren[j];
+//					if (!featureIDSet.contains(Math.abs(literal))) {
+//						literalList[++retainIndex] = -literal;
+//					}
+//				}
+//
+//				// test for generalizability
+//				
+//				if (!solver.isSatisfiable(literalList)) {
+//					int[] retainLiterals = new int[retainIndex + 1];
+//					System.arraycopy(literalList, 0, retainLiterals, 0, retainLiterals.length);
+//					for (int j = 0; j < retainLiterals.length; j++) {
+//						retainLiterals[j] = -retainLiterals[j];
+//					}
+//
+//					addNewClause(DeprecatedClause.createClause(map, retainLiterals));
+//
+//					// try to combine with other clauses
+//					Collections.swap(relevantClauseList, i, i2);
+//					i2++;
+//				}
+//			}
+//			
+//			final List<DeprecatedClause> subList2 = relevantClauseList.subList(0, i2);
+//			relevantClauseSet.removeAll(subList2);
+//			for (DeprecatedClause clause : subList2) {
+//				clause.delete(map);
+//			}
+//			subList2.clear();
 
 			workMonitor.setMaxAbsoluteWork(map.size() + 1);
 
 			while (!map.isEmpty()) {
-				final String curFeature = map.next().getFeature();
-				if (curFeature == null) {
-					relevantClauseList.clear();
-					relevantClauseSet.clear();
-					break;
-				}
-				if (workMonitor.step()) {
-					return null;
-				}
-
-				// ... create list of clauses that contain this feature
+				final DeprecatedFeature next = map.next();
+				final String curFeature = next.getFeature();
+//				if (curFeature == null) {
+//					relevantClauseList.clear();
+//					relevantClauseSet.clear();
+//					System.out.println("stop");
+//					break;
+//				}
+				//TODO EVAL
+//				if (workMonitor.step()) {
+//					return null;
+//				}
+//				if (next.getClauseCount() > 100) {
+//					System.out.println(next.getClauseCount());
+//					createSolver();
+//				}
+//				final int curFeatureID = idMap.remove(curFeature);
+				final int curFeatureID = idMap.get(curFeature);
 				int relevantIndex = 0;
+				
+				
+				if (next.getClauseCount() > 1000) {
+					createOrgSolver();
+					for (int i = relevantClauseList.size() - 1; i >= relevantIndex; i--) {
+						final DeprecatedClause mainClause = relevantClauseList.get(i);
+						if (remove(mainClause)) {
+							Collections.swap(relevantClauseList, i, relevantIndex);
+							relevantIndex++;
+							i++;
+						} else {
+							solver.addClause(mainClause);
+						}
+					}
+
+					final List<DeprecatedClause> subList = relevantClauseList.subList(0, relevantIndex);
+					relevantClauseSet.removeAll(subList);
+					for (DeprecatedClause clause : subList) {
+						clause.delete(map);
+					}
+					subList.clear();
+					relevantIndex = 0;
+				}
+				
+				// ... create list of clauses that contain this feature
 				final byte[] clauseStates = new byte[relevantClauseList.size()];
 				for (int i = 0; i < relevantClauseList.size(); i++) {
 					final Clause clause = relevantClauseList.get(i);
 
-					Literal curLiteral = null;
-					for (Node clauseChildren : clause.getLiterals()) {
-						final Literal literal = (Literal) clauseChildren;
-						if (literal.var.equals(curFeature)) {
-							if (curLiteral == null) {
-								curLiteral = literal;
-								clauseStates[relevantIndex] = (byte) (curLiteral.positive ? 1 : 2);
-								Collections.swap(relevantClauseList, i, relevantIndex++);
-							} else if (literal.positive != curLiteral.positive) {
-								clauseStates[relevantIndex - 1] = -1;
+//					int curLiteral = 0;
+					for (int literal : clause.getLiterals()) {
+//						final Literal literal = (Literal) clauseChild;
+						
+						if (Math.abs(literal) == curFeatureID) {
+//							if (curLiteral == 0) {
+//								curLiteral = literal;
+								clauseStates[relevantIndex] = (byte) (literal > 0 ? 1 : 2);
+								Collections.swap(relevantClauseList, i, relevantIndex);
+								relevantIndex++;
 								break;
-							}
+								//TODO
+//							} else if (literal != curLiteral) {
+//								clauseStates[relevantIndex - 1] = -1;
+//								System.out.println("Yeah!");
+//								break;
+//							}
 						}
 					}
 				}
 				
 				// ... combine relevant clauses if possible
-				for (int i = relevantIndex - 1; i >= 0; i--) {					
-					if (clauseStates[i] < 1) {
-						continue;
-					}
-
-					final Literal[] orChildren = relevantClauseList.get(i).getLiterals();
-
-					if (orChildren.length < 2) {
-						continue;
-					}
-
-					final Literal[] literalList = new Literal[orChildren.length];
-					int removeIndex = orChildren.length;
-					int retainIndex = -1;
-
-					for (int j = 0; j < orChildren.length; j++) {
-						final Literal literal = orChildren[j].clone();
-						if (literal.var.equals(curFeature)) {
-							literalList[--removeIndex] = literal;
-						} else {
-							literal.flip();
-							literalList[++retainIndex] = literal;
-						}
-					}
-
-					// test for generalizability
-					if (!solver.isSatisfiable(literalList)) {
-						Literal[] retainLiterals = new Literal[retainIndex + 1];
-						System.arraycopy(literalList, 0, retainLiterals, 0, retainLiterals.length);
-						for (Literal retainedLiteral : retainLiterals) {
-							retainedLiteral.flip();
-						}
-
-						addNewClause(DeprecatedClause.createClause(map, retainLiterals));
-
-						// try to combine with other clauses
-						clauseStates[i] = -1;
-					}
-				}
+//				for (int i = relevantIndex - 1; i >= 0; i--) {
+//					if (clauseStates[i] < 1) {
+//						continue;
+//					}
+//
+//					final int[] orChildren = relevantClauseList.get(i).getLiterals();
+//
+//					if (orChildren.length < 2) {
+//						continue;
+//					}
+//
+////					final Literal[] literalList = new Literal[orChildren.length];
+//					final int[] literalList = new int[orChildren.length];
+//
+//					int removeIndex = orChildren.length;
+//					int retainIndex = -1;
+//					
+//					for (int j = 0; j < orChildren.length; j++) {
+//						final int literal = orChildren[j];
+//						if (Math.abs(literal) == curFeatureID) {
+//							literalList[--removeIndex] = literal;
+//						} else {
+//							literalList[++retainIndex] = -literal;
+//						}
+//					}
+//
+//					// test for generalizability
+//					
+//					if (!solver.isSatisfiable(literalList)) {
+//						int[] retainLiterals = new int[retainIndex + 1];
+////						System.arraycopy(literalList, 0, retainLiterals, 0, retainLiterals.length);
+//						for (int j = 0; j < retainLiterals.length; j++) {
+//							retainLiterals[j] = -literalList[j];
+//						}
+//
+//						addNewClause(DeprecatedClause.createClause(map, retainLiterals));
+//
+//						// try to combine with other clauses
+//						clauseStates[i] = -1;
+//					}
+//				}
+//				if (!map.isEmpty()) {
 				for (int i = relevantIndex - 1; i >= 0; i--) {
 					final boolean positive;
 					switch (clauseStates[i]) {
@@ -279,28 +418,81 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 					default:
 						continue;
 					}
-					final Literal[] orChildren = relevantClauseList.get(i).getLiterals();
+					final int[] orChildren = relevantClauseList.get(i).getLiterals();
 						{
 						for (int j = i - 1; j >= 0; j--) {
 							if ((positive && clauseStates[j] == 2) || (!positive && clauseStates[j] == 1)) {
-								final Node[] children2 = relevantClauseList.get(j).getLiterals();
-								final Literal[] newChildren = new Literal[orChildren.length + children2.length];
+								final int[] children2 = relevantClauseList.get(j).getLiterals();
+								final int[] newChildren = new int[orChildren.length + children2.length];
 	
 								System.arraycopy(orChildren, 0, newChildren, 0, orChildren.length);
 								System.arraycopy(children2, 0, newChildren, orChildren.length, children2.length);
 	
-								addNewClause(DeprecatedClause.createClause(map, newChildren, curFeature));
+								addNewClause(DeprecatedClause.createClause(map, newChildren, curFeatureID));
 							}
 						}
 					}
 				}
+//				}
+				
+//				if (relevantClauseList.size() - relevantIndex > 2000) {
+//					int origIndex = relevantIndex;
+//					for (int i = relevantClauseList.size() - 1; i >= relevantIndex; i--) {
+//						final DeprecatedClause mainClause = relevantClauseList.get(i);
+//						for (int j = i - 1; j >= relevantIndex; j--) {
+//							final DeprecatedClause subClause = relevantClauseList.get(j);
+//							final Clause contained = Clause.contained(mainClause, subClause);
+//							if (contained != null) {
+//								if (subClause == contained) {
+//									Collections.swap(relevantClauseList, j, relevantIndex);
+//									relevantIndex++;
+//								} else {
+//									Collections.swap(relevantClauseList, i, relevantIndex);
+//									relevantIndex++;
+//									i++;
+//									break;
+//								}
+//							}
+//						}
+//					}
+//					if (origIndex < relevantIndex) {
+//						System.out.println("Removed1 - " + (relevantIndex - origIndex));
+//						origIndex = relevantIndex;
+//					}
+
+//					createOrgSolver();
+//					for (int i = relevantClauseList.size() - 1; i >= relevantIndex; i--) {
+//						final DeprecatedClause mainClause = relevantClauseList.get(i);
+//						if (remove(mainClause)) {
+//							Collections.swap(relevantClauseList, i, relevantIndex);
+//							relevantIndex++;
+//							i++;
+//						} else {
+//							solver.addClause(mainClause);
+//						}
+//					}
+//
+//					if (origIndex < relevantIndex) {
+//						System.out.println("Removed2 - " + (relevantIndex - origIndex));
+//					}
+//				}
+				
+				// TODO bring to top
 				final List<DeprecatedClause> subList = relevantClauseList.subList(0, relevantIndex);
 				relevantClauseSet.removeAll(subList);
 				for (DeprecatedClause clause : subList) {
 					clause.delete(map);
 				}
 				subList.clear();
-				if (map.getGlobalMixedClauseCount() == 0) {
+				
+//				idMap.remove(curFeature);
+				removedFeatures[curFeatureID] = true;
+				
+				final int globalMixedClauseCount = map.getGlobalMixedClauseCount();
+//				if (globalMixedClauseCount > 1000) {
+//					System.out.println(globalMixedClauseCount);
+//				}
+				if (globalMixedClauseCount == 0) {
 					break;
 				}
 			}
@@ -332,7 +524,14 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 			}
 			int j = 0;
 			for (Clause newClause : newClauseSet) {
-				newClauses[j++] = new Or(Node.clone(newClause.getLiterals()));
+				final int[] newClauseLiterals = newClause.getLiterals();
+				final Literal[] literals = new Literal[newClauseLiterals.length];
+				int i = literals.length;
+				for (int k = 0; k < literals.length ; k++) {
+					final int child = newClauseLiterals[k];
+					literals[--i] = new Literal(featureNameArray[Math.abs(child)], child > 0);
+				}
+				newClauses[j++] = new Or(literals);
 			}
 
 			workMonitor.step();
@@ -351,6 +550,43 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 		}
 	}
 
+//	private void createSolver() {
+//		if (solver != null) {
+//			solver.reset();
+//		}
+//		final List<Clause> clauseList = new ArrayList<>(relevantClauseList.size() + origClauseList.size());
+//		clauseList.addAll(relevantClauseList); 
+//		clauseList.addAll(origClauseList);
+//		solver = new CNFSolver(clauseList, idMap, removedFeatures);
+//	}
+	
+	private void createSolver() {
+		if (solver != null) {
+			solver.reset();
+		}
+		final List<Clause> clauseList = new ArrayList<>(relevantClauseList.size() + newClauseSet.size());
+		clauseList.addAll(relevantClauseList); 
+		clauseList.addAll(newClauseSet);
+		solver = new CNFSolver(clauseList, idMap.size());
+	}
+	
+	private void createOrgSolver() {
+		if (solver != null) {
+			solver.reset();
+		}
+		final List<DeprecatedClause> clauseList = new ArrayList<>(newClauseSet);
+		solver = new CNFSolver2(clauseList, removedFeatures);
+	}
+
+	private int[] convert(Literal[] newChildren) {
+		final int[] literals = new int[newChildren.length];
+		for (int j = 0; j < newChildren.length; j++) {
+			final Literal child = newChildren[j];
+			literals[j] = child.positive ? idMap.get(child.var) : -idMap.get(child.var);
+		}
+		return literals;
+	}
+	
 	private void addNewClause(final DeprecatedClause curClause) {
 		if (curClause != null) {
 			if (curClause.getRelevance() == 0) {
@@ -358,13 +594,91 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 					curClause.delete(map);
 				}
 			} else {
+				
 				if (relevantClauseSet.add(curClause)) {
 					relevantClauseList.add(curClause);
 				} else {
 					curClause.delete(map);
 				}
+				
+//				if (solver == null) {
+//					if (relevantClauseSet.add(curClause)) {
+//						relevantClauseList.add(curClause);
+//					} else {
+//						curClause.delete(map);
+//					}
+//				} else {
+//					final int[] literals = curClause.getLiterals();
+//					final int[] literals2 = new int[literals.length];
+//					for (int i = 0; i < literals.length; i++) {
+//						literals2[i] = -literals[i];
+//					}
+//					boolean add = !relevantClauseSet.contains(curClause);
+//					try {
+//						add = !relevantClauseSet.contains(curClause) && !solver.isSatisfiable(literals2);
+//					} catch (TimeoutException | UnkownLiteralException e) {
+//						e.printStackTrace();
+//					}
+//					if (add) {
+//						relevantClauseSet.add(curClause);
+//						relevantClauseList.add(curClause);
+//					} else {
+//						curClause.delete(map);
+//					}
+//				}
+				
+//				if (solver == null) {
+//					relevantClauseList.add(curClause);
+//				} else {
+//					final int[] literals = curClause.getLiterals();
+//					final int[] literals2 = new int[literals.length];
+//					for (int i = 0; i < literals.length; i++) {
+//						literals2[i] = -literals[i];
+//					}
+//					boolean add = false;
+//					try {
+//						add = !solver.isSatisfiable(literals2);
+//					} catch (TimeoutException | UnkownLiteralException e) {
+//						e.printStackTrace();
+//					}
+//					if (add) {
+//						relevantClauseList.add(curClause);
+//					} else {
+//						curClause.delete(map);
+//					}
+//				}
 			}
 		}
+	}
+//	
+//	private int test(DeprecatedClause subClause, int relevantIndex) {
+//		for (int i = relevantClauseList.size() - 1; i >= relevantIndex; i--) {
+//			final DeprecatedClause mainClause = relevantClauseList.get(i);
+//			final Clause contained = Clause.contained(mainClause, subClause);
+//			if (contained != null) {
+//				if (subClause == contained) {
+//					return -1;
+//				} else {
+//					return i;
+//				}
+//			}
+//		}
+//		return -2;
+//	}
+	
+	private boolean remove(DeprecatedClause curClause) {
+		final int[] literals = curClause.getLiterals();
+		final int[] literals2 = new int[literals.length];
+		for (int i = 0; i < literals.length; i++) {
+			literals2[i] = -literals[i];
+		}
+		boolean remove = false;
+		try {
+			remove = !solver.isSatisfiable(literals2);
+		} catch (TimeoutException | UnkownLiteralException e) {
+			e.printStackTrace();
+		}
+		return remove;
 	}
 
 }

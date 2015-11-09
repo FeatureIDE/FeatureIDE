@@ -24,12 +24,15 @@ package de.ovgu.featureide.ui.interfacegen;
  * @author Sebastian Krieter
  */
 public class ProgressTimer {
-	
+
 	private boolean running = false;
+	private boolean verbose = true;
 
 	private long startTime;
 
 	private long curTime = 0;
+
+	private long lastTime = -1;
 
 	public void start() {
 		startTime = System.nanoTime();
@@ -37,23 +40,46 @@ public class ProgressTimer {
 		running = true;
 	}
 
-	public void stop() {
-		final double timeDiff = Math.floor((System.nanoTime() - startTime) / 1000000.0) / 1000.0;
-		System.out.println(" -> " + timeDiff + "s");
+	public long stop() {
+		lastTime = System.nanoTime() - startTime;
+
+		if (verbose) {
+			final double timeDiff = Math.floor(lastTime / 1000000.0) / 1000.0;
+			System.out.println(" -> " + timeDiff + "s");
+		}
+
 		running = false;
+		return lastTime;
 	}
 
-	public void split() {
+	public long split() {
 		final long startTime = curTime;
 		curTime = System.nanoTime();
 
-		final double timeDiff = Math.floor((curTime - startTime) / 1000000.0) / 1000.0;
+		lastTime = System.nanoTime() - startTime;
 
-		System.out.println(" -> " + timeDiff + "s");
+		if (verbose) {
+			final double timeDiff = Math.floor(lastTime / 1000000.0) / 1000.0;
+			System.out.println(" -> " + timeDiff + "s");
+		}
+
+		return lastTime;
 	}
 
 	public final boolean isRunning() {
 		return running;
+	}
+
+	public long getLastTime() {
+		return lastTime;
+	}
+
+	public boolean isVerbose() {
+		return verbose;
+	}
+
+	public void setVerbose(boolean verbose) {
+		this.verbose = verbose;
 	}
 
 }

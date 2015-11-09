@@ -25,12 +25,34 @@ package de.ovgu.featureide.ui.interfacegen;
  */
 public class ProgressLogger {
 
+	private static final boolean verbose = false;
+
 	private final ProgressTimer timer = new ProgressTimer();
-	
+
+	public void print(String message) {
+		System.out.print(message);
+	}
+
+	public void println(String message) {
+		System.out.println(message);
+	}
+
+	public void verbosePrint(String message) {
+		if (verbose) {
+			print(message);
+		}
+	}
+
+	public void verbosePrintln(String message) {
+		if (verbose) {
+			println(message);
+		}
+	}
+
 	public void log(String message) {
 		log(message, false);
 	}
-	
+
 	public void log(String message, boolean linebreak) {
 		if (timer.isRunning()) {
 			timer.split();
@@ -43,17 +65,25 @@ public class ProgressLogger {
 			System.out.print(message);
 		}
 	}
-	
+
 	public void stop() {
 		timer.stop();
 	}
-	
+
 	public void finish() {
 		timer.split();
 		System.out.println();
 		System.out.println(" > Done!");
 		System.out.print("Global Time");
 		timer.stop();
+	}
+
+	public ProgressTimer getTimer() {
+		return timer;
+	}
+
+	public boolean isVerbose() {
+		return verbose;
 	}
 
 }

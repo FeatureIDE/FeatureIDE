@@ -22,8 +22,6 @@ package de.ovgu.featureide.fm.core.editing.remove;
 
 import java.util.HashSet;
 
-import org.prop4j.Literal;
-
 import de.ovgu.featureide.fm.core.editing.cnf.Clause;
 import de.ovgu.featureide.fm.core.editing.remove.DeprecatedFeatureMap.DeprecatedFeature;
 
@@ -36,14 +34,13 @@ public class DeprecatedClause extends Clause {
 
 	private int relevance;
 
-	public static DeprecatedClause createClause(DeprecatedFeatureMap map, Literal[] newLiterals, String curFeature) {
-		final HashSet<Literal> literalSet = new HashSet<>(newLiterals.length << 1);
-		for (Literal literal : newLiterals) {
-			if (!curFeature.equals(literal.var)) {
-				final Literal negativeliteral = literal.clone();
-				negativeliteral.flip();
-
-				if (literalSet.contains(negativeliteral)) {
+	public static DeprecatedClause createClause(DeprecatedFeatureMap map, int[] newLiterals, int curFeature) {
+		final HashSet<Integer> literalSet = new HashSet<>(newLiterals.length << 1);
+		for (int literal : newLiterals) {
+			if (curFeature != Math.abs(literal)) {
+//				final Literal negativeliteral = literal.clone();
+//				negativeliteral.flip();
+				if (literalSet.contains(-literal)) {
 					return null;
 				} else {
 					literalSet.add(literal);
@@ -51,49 +48,128 @@ public class DeprecatedClause extends Clause {
 			}
 		}
 
-		final DeprecatedClause clause = new DeprecatedClause(literalSet.toArray(new Literal[0]));
+		int[] newLiterals2 = new int[literalSet.size()];
+		int i = 0;
+		for (int l : literalSet) {
+			newLiterals2[i++] = l;
+		}
+		final DeprecatedClause clause = new DeprecatedClause(newLiterals2);
 		clause.computeRelevance(map);
 		return clause;
 	}
 
-	public static DeprecatedClause createClause(DeprecatedFeatureMap map, Literal[] newLiterals) {
-		final HashSet<Literal> literalSet = new HashSet<>(newLiterals.length << 1);
-		for (Literal literal : newLiterals) {
-			final Literal negativeliteral = literal.clone();
-			negativeliteral.flip();
-
-			if (literalSet.contains(negativeliteral)) {
+	public static DeprecatedClause createClause(DeprecatedFeatureMap map, int[] newLiterals) {
+		final HashSet<Integer> literalSet = new HashSet<>(newLiterals.length << 1);
+		for (int literal : newLiterals) {
+//			final Literal negativeliteral = literal.clone();
+//			negativeliteral.flip();
+//
+//			if (literalSet.contains(negativeliteral)) {
+//				return null;
+//			} else {
+//				literalSet.add(literal);
+//			}
+			if (literalSet.contains(-literal)) {
 				return null;
 			} else {
 				literalSet.add(literal);
 			}
 		}
-
-		final DeprecatedClause clause = new DeprecatedClause(literalSet.toArray(new Literal[0]));
+		
+		int[] newLiterals2 = new int[literalSet.size()];
+		int i = 0;
+		for (int lit : literalSet) {
+			newLiterals2[i++] = lit;
+		}
+		final DeprecatedClause clause = new DeprecatedClause(newLiterals2);
+//		final DeprecatedClause clause = new DeprecatedClause(literalSet.toArray(new Literal[0]));
 		clause.computeRelevance(map);
 		return clause;
 	}
 
-	public static DeprecatedClause createClause(DeprecatedFeatureMap map, Literal newLiteral) {
-		final DeprecatedClause clause = new DeprecatedClause(new Literal[] { newLiteral });
-		final DeprecatedFeature df = map.get(newLiteral.var);
+	public static DeprecatedClause createClause(DeprecatedFeatureMap map, int newLiteral) {
+		final DeprecatedClause clause = new DeprecatedClause(new int[] { newLiteral });
+		final DeprecatedFeature df = map.get(Math.abs(newLiteral));
 		if (df != null) {
 			clause.relevance++;
 		}
 		return clause;
 	}
+	
+//	public static DeprecatedClause createClause(DeprecatedFeatureMap map, Literal[] newLiterals, String curFeature) {
+//		Arrays.sort(newLiterals);
+//		ArrayList<Literal> l1 = new ArrayList<>(newLiterals.length);
+//		int i = -1;
+//		for (Literal literal : newLiterals) {
+//			if (!curFeature.equals(literal.var)) {
+//				if (i > -1) {
+//					final Literal lastLiteral = l1.get(i);
+//					if (lastLiteral.var.equals(literal.var)) {
+//						if (lastLiteral.positive != literal.positive) {
+//							return null;
+//						}
+//					} else {
+//						l1.add(literal);
+//						i++;
+//					}
+//				} else {
+//					l1.add(literal);
+//					i++;
+//				}
+//			}
+//		}
+//
+//		final DeprecatedClause clause = new DeprecatedClause(l1.toArray(new Literal[0]));
+//		clause.computeRelevance(map);
+//		return clause;
+//	}
+//
+//	public static DeprecatedClause createClause(DeprecatedFeatureMap map, Literal[] newLiterals) {
+//		Arrays.sort(newLiterals);
+//		ArrayList<Literal> l1 = new ArrayList<>(newLiterals.length);
+//		int i = -1;
+//		for (Literal literal : newLiterals) {
+//			if (i > -1) {
+//				final Literal lastLiteral = l1.get(i);
+//				if (lastLiteral.var.equals(literal.var)) {
+//					if (lastLiteral.positive != literal.positive) {
+//						return null;
+//					}
+//				} else {
+//					l1.add(literal);
+//					i++;
+//				}
+//			} else {
+//				l1.add(literal);
+//				i++;
+//			}
+//		}
+//		
+//		final DeprecatedClause clause = new DeprecatedClause(l1.toArray(new Literal[0]));
+//		clause.computeRelevance(map);
+//		return clause;
+//	}
+//
+//	public static DeprecatedClause createClause(DeprecatedFeatureMap map, Literal newLiteral) {
+//		final DeprecatedClause clause = new DeprecatedClause(new Literal[] { newLiteral });
+//		final DeprecatedFeature df = map.get(newLiteral.var);
+//		if (df != null) {
+//			clause.relevance++;
+//		}
+//		return clause;
+//	}
 
-	private DeprecatedClause(Literal[] literals) {
+	private DeprecatedClause(int[] literals) {
 		super(literals);
 		this.relevance = 0;
 	}
 
 	private void computeRelevance(DeprecatedFeatureMap map) {
-		for (Literal literal : literals) {
-			final DeprecatedFeature df = map.get(literal.var);
+		for (int literal : literals) {
+			final DeprecatedFeature df = map.get(Math.abs(literal));
 			if (df != null) {
 				relevance++;
-				if (literal.positive) {
+				if (literal > 0) {
 					df.incPositive();
 				} else {
 					df.incNegative();
@@ -107,10 +183,10 @@ public class DeprecatedClause extends Clause {
 
 	public void delete(DeprecatedFeatureMap map) {
 		if (literals != null && literals.length > 1) {
-			for (Literal literal : literals) {
-				final DeprecatedFeature df = map.get(literal.var);
+			for (int literal : literals) {
+				final DeprecatedFeature df = map.get(Math.abs(literal));
 				if (df != null) {
-					if (literal.positive) {
+					if (literal > 0) {
 						df.decPositive();
 					} else {
 						df.decNegative();

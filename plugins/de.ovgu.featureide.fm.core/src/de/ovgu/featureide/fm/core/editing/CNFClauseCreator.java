@@ -53,75 +53,75 @@ public class CNFClauseCreator implements INodeCreator<List<Clause>> {
 	}
 
 	public List<Clause> createStructuralNodes(FeatureModel featureModel) {
-		final Feature root = featureModel.getRoot();
-		if (root != null) {
-			final List<Clause> clauses = new ArrayList<>(featureModel.getNumberOfFeatures());
-
-			clauses.add(new Clause(getVariable(root, true)));
-
-			final Collection<Feature> features = featureModel.getFeatures();
-			for (Feature feature : features) {
-				for (Feature child : feature.getChildren()) {
-					clauses.add(new Clause(getVariable(feature, true), getVariable(child, false)));
-				}
-
-				if (feature.isAnd()) {
-					for (Feature child : feature.getChildren()) {
-						if (child.isMandatory()) {
-							clauses.add(new Clause(getVariable(child, true), getVariable(feature, false)));
-						}
-					}
-				} else if (feature.isOr()) {
-					final Literal[] orLiterals = new Literal[feature.getChildrenCount() + 1];
-					int i = 0;
-					for (Feature child : feature.getChildren()) {
-						orLiterals[i++] = getVariable(child, true);
-					}
-					orLiterals[i] = getVariable(feature, false);
-					clauses.add(new Clause(orLiterals));
-				} else if (feature.isAlternative()) {
-					final Literal[] alternativeLiterals = new Literal[feature.getChildrenCount() + 1];
-					int i = 0;
-					for (Feature child : feature.getChildren()) {
-						alternativeLiterals[i++] = getVariable(child, true);
-					}
-					alternativeLiterals[i] = getVariable(feature, false);
-					clauses.add(new Clause(alternativeLiterals));
-
-					for (Feature child1 : feature.getChildren()) {
-						for (Feature child2 : feature.getChildren()) {
-							clauses.add(new Clause(getVariable(child1, false), getVariable(child2, false)));
-						}
-					}
-				}
-			}
-
-			return clauses;
-		}
+//		final Feature root = featureModel.getRoot();
+//		if (root != null) {
+//			final List<Clause> clauses = new ArrayList<>(featureModel.getNumberOfFeatures());
+//
+//			clauses.add(new Clause(getVariable(root, true)));
+//
+//			final Collection<Feature> features = featureModel.getFeatures();
+//			for (Feature feature : features) {
+//				for (Feature child : feature.getChildren()) {
+//					clauses.add(new Clause(getVariable(feature, true), getVariable(child, false)));
+//				}
+//
+//				if (feature.isAnd()) {
+//					for (Feature child : feature.getChildren()) {
+//						if (child.isMandatory()) {
+//							clauses.add(new Clause(getVariable(child, true), getVariable(feature, false)));
+//						}
+//					}
+//				} else if (feature.isOr()) {
+//					final Literal[] orLiterals = new Literal[feature.getChildrenCount() + 1];
+//					int i = 0;
+//					for (Feature child : feature.getChildren()) {
+//						orLiterals[i++] = getVariable(child, true);
+//					}
+//					orLiterals[i] = getVariable(feature, false);
+//					clauses.add(new Clause(orLiterals));
+//				} else if (feature.isAlternative()) {
+//					final Literal[] alternativeLiterals = new Literal[feature.getChildrenCount() + 1];
+//					int i = 0;
+//					for (Feature child : feature.getChildren()) {
+//						alternativeLiterals[i++] = getVariable(child, true);
+//					}
+//					alternativeLiterals[i] = getVariable(feature, false);
+//					clauses.add(new Clause(alternativeLiterals));
+//
+//					for (Feature child1 : feature.getChildren()) {
+//						for (Feature child2 : feature.getChildren()) {
+//							clauses.add(new Clause(getVariable(child1, false), getVariable(child2, false)));
+//						}
+//					}
+//				}
+//			}
+//
+//			return clauses;
+//		}
 		return Collections.emptyList();
 	}
 
 	public List<Clause> createConstraintNodes(FeatureModel featureModel) {
 		final List<Clause> clauses = new ArrayList<>(featureModel.getConstraints().size());
 
-		for (Constraint constraint : featureModel.getConstraints()) {
-			final Node cnfNode = constraint.getNode().clone().toCNF();
-			if (cnfNode instanceof And) {
-				for (Node andChild : cnfNode.getChildren()) {
-					if (andChild instanceof Or) {
-						final Node[] orChildren = andChild.getChildren();
-						clauses.add(new Clause(Arrays.copyOf(orChildren, orChildren.length, Literal[].class)));
-					} else {
-						clauses.add(new Clause((Literal) andChild));
-					}
-				}
-			} else if (cnfNode instanceof Or) {
-				final Node[] orChildren = cnfNode.getChildren();
-				clauses.add(new Clause(Arrays.copyOf(orChildren, orChildren.length, Literal[].class)));
-			} else {
-				clauses.add(new Clause((Literal) cnfNode));
-			}
-		}
+//		for (Constraint constraint : featureModel.getConstraints()) {
+//			final Node cnfNode = constraint.getNode().clone().toCNF();
+//			if (cnfNode instanceof And) {
+//				for (Node andChild : cnfNode.getChildren()) {
+//					if (andChild instanceof Or) {
+//						final Node[] orChildren = andChild.getChildren();
+//						clauses.add(new Clause(Arrays.copyOf(orChildren, orChildren.length, Literal[].class)));
+//					} else {
+//						clauses.add(new Clause((Literal) andChild));
+//					}
+//				}
+//			} else if (cnfNode instanceof Or) {
+//				final Node[] orChildren = cnfNode.getChildren();
+//				clauses.add(new Clause(Arrays.copyOf(orChildren, orChildren.length, Literal[].class)));
+//			} else {
+//				clauses.add(new Clause((Literal) cnfNode));
+//			}
+//		}
 		return clauses;
 	}
 
