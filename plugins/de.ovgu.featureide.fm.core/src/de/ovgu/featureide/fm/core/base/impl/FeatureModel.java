@@ -605,4 +605,9 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 		return id == other.id;
 	}
 
+	@Override
+	public void setConstraint(int index, Constraint constraint) {
+		constraints.set(index, constraint);
+	}
+
 }

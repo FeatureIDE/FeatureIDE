@@ -47,6 +47,9 @@ public abstract class AFeatureModelElement implements IFeatureModelElement, Prop
 	}
 
 	public AFeatureModelElement(IFeatureModel featureModel) {
+		if (featureModel == null) {
+			throw new RuntimeException();
+		}
 		this.id = featureModel.getNextElementId();
 		this.featureModel = featureModel;
 	}

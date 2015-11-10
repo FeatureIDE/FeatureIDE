@@ -34,6 +34,7 @@ import de.ovgu.featureide.fm.core.FMComposerManager;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.IFMComposerExtension;
 import de.ovgu.featureide.fm.core.RenamingsManager;
+import de.ovgu.featureide.fm.core.base.impl.Constraint;
 
 /**
  * Interface for a class that represents a feature model.</br>
@@ -149,5 +150,7 @@ public interface IFeatureModel extends Cloneable {
 	File getSourceFile();
 
 	long getNextElementId();
+
+	void setConstraint(int index, Constraint constraint);
 
 }

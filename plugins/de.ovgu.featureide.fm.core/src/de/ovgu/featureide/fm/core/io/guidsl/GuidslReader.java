@@ -355,7 +355,7 @@ public class GuidslReader extends AbstractFeatureModelReader {
 					warnings.add(new ModelWarning(CONSTRAINT_IS_NOT_SATISFIABLE_, line));
 			} catch (Exception e) {
 			}
-			featureModel.getConstraints().add(new Constraint(featureModel, node));
+			featureModel.addConstraint(new Constraint(featureModel, node));
 			astListNode = (AstListNode) astListNode.right;
 		} while (astListNode != null);
 	}

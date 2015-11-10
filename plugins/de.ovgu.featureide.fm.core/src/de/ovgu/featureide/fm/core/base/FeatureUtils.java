@@ -263,7 +263,7 @@ public abstract class FeatureUtils {
 	}
 
 	public static void replacePropNode(IFeatureModel featureModel, int index, Node propNode) {
-		featureModel.getConstraints().set(index, new Constraint(featureModel, propNode));
+		featureModel.setConstraint(index, new Constraint(featureModel, propNode));
 	}
 
 	public static void setRelevantConstraints(IFeature bone) {
