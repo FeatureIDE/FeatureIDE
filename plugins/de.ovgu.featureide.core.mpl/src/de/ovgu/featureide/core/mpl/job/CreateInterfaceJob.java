@@ -42,9 +42,9 @@ import org.prop4j.Or;
 import org.prop4j.SatSolver;
 import org.sat4j.specs.TimeoutException;
 
-import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.fm.core.Constraint;
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
@@ -141,7 +141,7 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 		workMonitor.setMaxAbsoluteWork(2);
 		ArrayList<String> removeFeatures = new ArrayList<>(m.getFeatureNames());
 		removeFeatures.removeAll(selectedFeatureNames);
-		Node cnf = (selectedFeatureNames.size() > 1) ? CorePlugin.removeFeatures(m, removeFeatures) : new Literal(m.getRoot().getName());
+		Node cnf = (selectedFeatureNames.size() > 1) ? FMCorePlugin.removeFeatures(m, removeFeatures) : new Literal(m.getRoot().getName());
 		workMonitor.worked();
 
 		// Calculate Model
