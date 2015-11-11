@@ -21,7 +21,6 @@
 package de.ovgu.featureide.fm.core.editing.cnf;
 
 import java.util.Arrays;
-import java.util.Comparator;
 
 /**
  * Clause of a CNF.
@@ -30,50 +29,24 @@ import java.util.Comparator;
  */
 public class Clause {
 
-//	private static final class LiteralComparator implements Comparator<Literal> {
-//		@Override
-//		public int compare(Literal arg0, Literal arg1) {
-//			if (arg0.positive == arg1.positive) {
-//				if (arg0.var == arg1.var) {
-//					return 0;
-//				} else if (arg0.var == NodeCreator.varTrue || arg0.var == NodeCreator.varFalse) {
-//					return (arg0.var == NodeCreator.varTrue || arg1.var != NodeCreator.varTrue) ? -1 : 1;
-//				} else if (arg1.var == NodeCreator.varTrue || arg1.var == NodeCreator.varFalse) {
-//					return 1;
-//				} else {
-//					return ((String) arg0.var).compareTo((String) arg1.var);
-//				}
-//			} else if (arg0.positive) {
-//				return -1;
-//			} else {
-//				return 1;
-//			}
-//		}
-//	}
-	
-//	private static final class LiteralComparator implements Comparator<Integer> {
-//		@Override
-//		public int compare(Integer arg0, Integer arg1) {
-//			return Math.abs(arg0) - Math.abs(arg1);
-//		}
-//	}
-
-//	private static final LiteralComparator literalComparator = new LiteralComparator();
-
-//	protected Literal[] literals;
 	protected int[] literals;
 
 	public Clause(int... literals) {
 		this.literals = literals;
-		
 		Arrays.sort(this.literals);
-		
-//		Arrays.sort(this.literals, literalComparator);
-		
 	}
 
 	public int[] getLiterals() {
 		return literals;
+	}
+	
+	public boolean contains(int literalID) {
+		for (int curLiteralID : literals) {
+			if (Math.abs(curLiteralID) == literalID) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	@Override
@@ -85,17 +58,16 @@ public class Clause {
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-//		if (obj == null || getClass() != obj.getClass())
-//			return false;
+		if (obj == null || getClass() != obj.getClass())
+			return false;
 		return Arrays.equals(literals, ((Clause) obj).literals);
 	}
 
-//	@Override
-//	public String toString() {
-//		return "Clause [literals=" + Arrays.toString(literals) + "]";
-//	}
-//	
-	
+	@Override
+	public String toString() {
+		return "Clause [literals=" + Arrays.toString(literals) + "]";
+	}
+
 	/**
 	 * Checks whether one clause contains the other one or vice-versa.
 	 * 

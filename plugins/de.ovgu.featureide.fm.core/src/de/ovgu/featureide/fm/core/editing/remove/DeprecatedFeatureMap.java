@@ -21,7 +21,7 @@
 package de.ovgu.featureide.fm.core.editing.remove;
 
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Maps feature names to a corresponding feature.
@@ -90,82 +90,14 @@ public class DeprecatedFeatureMap {
 			return feature + ": " + getClauseCount();
 		}
 	}
-	
-//	static class DummyDeprecatedFeature extends DeprecatedFeature {
-//
-//		public DummyDeprecatedFeature(String feature) {
-//			super(feature);
-//		}
-//
-//		private final String feature;
-//
-//		private long positiveCount;
-//		private long negativeCount;
-//
-//		public DeprecatedFeature(String feature) {
-//			this.feature = feature;
-//			positiveCount = 0;
-//			negativeCount = 0;
-//		}
-//
-//		public String getFeature() {
-//			return feature;
-//		}
-//
-//		@Override
-//		public int compareTo(DeprecatedFeature arg0) {
-//			return (int) Math.signum(arg0.getClauseCount() - this.getClauseCount());
-//		}
-//
-//		public long getClauseCount() {
-//			try {
-//				return Math.multiplyExact(positiveCount, negativeCount);
-//			} catch (ArithmeticException e) {
-//				return Long.MAX_VALUE;
-//			}
-//		}
-//
-//		public void incPositive() {
-//			positiveCount++;
-//		}
-//
-//		public void incNegative() {
-//			negativeCount++;
-//		}
-//
-//		public void decPositive() {
-//			positiveCount--;
-//		}
-//
-//		public void decNegative() {
-//			negativeCount--;
-//		}
-//
-//		@Override
-//		public boolean equals(Object arg0) {
-//			return (arg0 instanceof DeprecatedFeature) && feature.equals(((DeprecatedFeature) arg0).feature);
-//		}
-//
-//		@Override
-//		public int hashCode() {
-//			return feature.hashCode();
-//		}
-//
-//		@Override
-//		public String toString() {
-//			return feature + ": " + getClauseCount();
-//		}
-//	}
 
 	private final DeprecatedFeature[] map;
-//	private final HashMap<Object, Integer> idMap;
 	private final int maxIndex;
 	private int curIndex = 0;
 
 	private int globalMixedClauseCount = 0;
 
-	public DeprecatedFeatureMap(Collection<String> features, HashMap<Object, Integer> idMap) {
-//		this.idMap = idMap;
+	public DeprecatedFeatureMap(Collection<String> features, Map<Object, Integer> idMap) {
 		this.maxIndex = features.size();
 		map = new DeprecatedFeature[idMap.size() + 1];
 		for (String curFeature : features) {
@@ -174,60 +106,27 @@ public class DeprecatedFeatureMap {
 	}
 
 	public DeprecatedFeature next() {
-//		final Collection<DeprecatedFeature> values = map.values();
-
-		DeprecatedFeature smallestFeature = null;
-
-//		System.out.println();
-//		System.out.println("------");
-//		if (!values.isEmpty()) {
-		if (!isEmpty()) {
-			smallestFeature = map[1];
-			int minIndex = 1;
-			for (int i = 2; i < map.length; i++) {
-				final DeprecatedFeature next = map[i];
-				if (smallestFeature == null || (next != null && next.compareTo(smallestFeature) > 0)) {
-					smallestFeature = next;
-					minIndex = i;
-				}
-			}
-//			map[minIndex] = map[curIndex];
-			map[minIndex] = null;
-			curIndex++;
-			return smallestFeature;
-//			final Iterator<DeprecatedFeature> it = map.iterator();
-//			smallestFeature = it.next();
-////			System.out.println(smallestFeature.getClauseCount());
-//			while (it.hasNext()) {
-//				final DeprecatedFeature next = it.next();
-//				if (next.compareTo(smallestFeature) > 0) {
-//					smallestFeature = next;
-//				}
-////				System.out.println(next.getClauseCount());
-//			}
-////			System.out.println("------");
-//			final DeprecatedFeature remove = map.remove(smallestFeature.getFeature());
-//			System.out.println(remove.getClauseCount());
-//			System.out.println();
-//			return remove;
+		if (isEmpty()) {
+			return null;
 		}
-//		System.out.println("------");
-//		System.out.println("no more features");
-//		System.out.println();
-		return new DeprecatedFeature(null);
+		DeprecatedFeature smallestFeature = map[1];
+		int minIndex = 1;
+		for (int i = 2; i < map.length; i++) {
+			final DeprecatedFeature next = map[i];
+			if (smallestFeature == null || (next != null && next.compareTo(smallestFeature) > 0)) {
+				smallestFeature = next;
+				minIndex = i;
+			}
+		}
+		map[minIndex] = null;
+		curIndex++;
+		return smallestFeature;
 	}
 
 	public boolean isEmpty() {
-//		for (int i = 0; i < array.length; i++) {
-//			
-//		}
 		return maxIndex == curIndex;
 	}
 
-//	public DeprecatedFeature get(Object var) {
-//		return map[idMap.get(var) - 1];
-//	}
-	
 	public DeprecatedFeature get(int var) {
 		return map[var];
 	}

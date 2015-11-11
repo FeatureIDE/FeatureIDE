@@ -26,8 +26,8 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Display;
 
-import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.ui.wizards.WizardConstants;
 import de.ovgu.featureide.ui.handlers.base.AFeatureProjectHandler;
 import de.ovgu.featureide.ui.wizards.NewInterfaceWizard;
@@ -40,7 +40,7 @@ public class NewInterfaceHandler extends AFeatureProjectHandler {
 		NewInterfaceWizard wizard = new NewInterfaceWizard("New Interfaces");
 		WizardDialog dialog = new WizardDialog(Display.getCurrent().getActiveShell(), wizard);
 		if (dialog.open() == Dialog.OK) {
-			CorePlugin.getDefault().removeFeatures(project.getProject(), (IFeatureProject) wizard.getData(WizardConstants.KEY_OUT_PROJECT),
+			FMCorePlugin.getDefault().removeFeatures(project.getProject(), ((IFeatureProject) wizard.getData(WizardConstants.KEY_OUT_PROJECT)).getFeatureModel(),
 					(Collection<String>) wizard.getData(WizardConstants.KEY_OUT_FEATURES));
 
 		}

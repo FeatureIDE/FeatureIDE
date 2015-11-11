@@ -29,16 +29,16 @@ import java.util.Map;
  * @author Thomas Thuem
  */
 public class Literal extends Node {
-	
+
 	public Object var;
-	
+
 	public boolean positive;
 
 	public Literal(Object var, boolean positive) {
 		this.var = var;
 		this.positive = positive;
 	}
-	
+
 	public Literal(Object var) {
 		this.var = var;
 		positive = true;
@@ -58,15 +58,15 @@ public class Literal extends Node {
 		//nothing to do with children
 		return this;
 	}
-	
+
 	@Override
 	protected Node clausify() {
 		//nothing to do
 		return this;
 	}
-	
+
 	@Override
-	public void simplify() { 
+	public void simplify() {
 		//nothing to do (recursive calls reached lowest node)
 	}
 

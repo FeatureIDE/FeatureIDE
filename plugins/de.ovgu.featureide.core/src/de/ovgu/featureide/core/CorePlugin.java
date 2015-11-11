@@ -36,11 +36,9 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.REMOVED;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -68,9 +66,6 @@ import org.eclipse.jdt.core.CompletionProposal;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.Signature;
 import org.osgi.framework.BundleContext;
-import org.prop4j.Literal;
-import org.prop4j.Node;
-import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.core.builder.ComposerExtensionManager;
 import de.ovgu.featureide.core.builder.ExtensibleFeatureProjectBuilder;
@@ -99,10 +94,7 @@ import de.ovgu.featureide.core.signature.documentation.VariantMerger;
 import de.ovgu.featureide.core.signature.filter.ContextFilter;
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
-import de.ovgu.featureide.fm.core.editing.cnf.UnkownLiteralException;
 import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 
@@ -792,83 +784,6 @@ public class CorePlugin extends AbstractCorePlugin {
 		final PrintDocumentationJob.Arguments args = new PrintDocumentationJob.Arguments("Docu_SPL", options.split("\\s+"), new SPLMerger(), null);
 
 		FMCorePlugin.getDefault().startJobs(pl, args, true);
-	}
-
-	public void removeFeatures(IProject project, IFeatureProject data, Collection<String> features) {
-		try {
-			removeFeatures(data.getFeatureModel(), features);
-		} catch (TimeoutException | UnkownLiteralException e) {
-			CorePlugin.getDefault().logError(e);
-		}
-	}
-
-	public static Node removeFeatures(FeatureModel featureModel, Collection<String> removeFeatures) throws TimeoutException, UnkownLiteralException {
-		final AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(featureModel, removeFeatures);
-		nodeCreator.setCnfType(AdvancedNodeCreator.CNFType.Regular);
-		return nodeCreator.createNodes();
-	}
-
-	public static List<String> splitFeatureModel(FeatureModel featureModel, int level, int limit) {
-		final ArrayList<String> rootNames = new ArrayList<>();
-		final Feature root = featureModel.getRoot();
-		if (root != null) {
-			split_rec(root, rootNames, 0, level, limit);
-		}
-		return rootNames;
-	}
-
-	private static void split_rec(Feature root, ArrayList<String> rootNames, int level, int x, int y) {
-		final int featureLimit = y;
-		final int levelLimit = x;
-		final LinkedList<Feature> children = root.getChildren();
-		for (Feature feature : children) {
-			final int c = countChildren(feature);
-			if (c > 0) {
-				if (c > featureLimit && level < levelLimit) {
-					split_rec(feature, rootNames, level + 1, x, y);
-				} else {
-					rootNames.add(feature.getName());
-				}
-			} else {
-				rootNames.add(feature.getName());
-			}
-		}
-	}
-
-	private static int countChildren(Feature root) {
-		final LinkedList<Feature> children = root.getChildren();
-		int count = children.size();
-		for (Feature feature : children) {
-			count += countChildren(feature);
-		}
-		return count;
-	}
-
-	public static List<List<String>> mergeAtomicSets(List<List<List<Literal>>> atomicSetLists) {
-		final HashMap<String, Collection<String>> atomicSetMap = new HashMap<>();
-		for (List<List<Literal>> atomicSetList : atomicSetLists) {
-			for (List<Literal> atomicSet : atomicSetList) {
-				final HashSet<String> newSet = new HashSet<>();
-				for (Literal literal : atomicSet) {
-					newSet.add(literal.var.toString());
-				}
-				for (Literal literal : atomicSet) {
-					final Collection<String> oldSet = atomicSetMap.get(literal.var.toString());
-					if (oldSet != null) {
-						newSet.addAll(oldSet);
-					}
-				}
-				for (String featureName : newSet) {
-					atomicSetMap.put(featureName, newSet);
-				}
-			}
-		}
-		final HashSet<Collection<String>> mergedAtomicSetsSet = new HashSet<>(atomicSetMap.values());
-		final List<List<String>> mergedAtomicSets = new ArrayList<>(mergedAtomicSetsSet.size() + 1);
-		for (Collection<String> atomicSet : mergedAtomicSetsSet) {
-			mergedAtomicSets.add(new ArrayList<>(atomicSet));
-		}
-		return mergedAtomicSets;
 	}
 
 }

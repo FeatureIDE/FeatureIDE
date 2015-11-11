@@ -30,7 +30,7 @@ import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.SatSolver;
 
-import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.CNFType;
@@ -51,7 +51,7 @@ public class AtomicSetSplitAnaylsis extends AbstractAtomicSetAnalysis {
 	}
 
 	public List<String> computeAtomicSets() {
-		rootFeatures = CorePlugin.splitFeatureModel(completeModel, level, limit);
+		rootFeatures = FMCorePlugin.splitFeatureModel(completeModel, level, limit);
 
 		final AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator();
 		nodeCreator.setCnfType(CNFType.Regular);

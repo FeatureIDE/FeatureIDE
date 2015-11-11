@@ -33,7 +33,7 @@ import java.util.Random;
 import org.junit.Test;
 import org.prop4j.Node;
 
-import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.editing.cnf.ModelComparator;
@@ -121,7 +121,7 @@ public class InterfaceTester {
 
 						if (verbose)
 							System.out.println("\tCreating Node1...");
-						Node fmNode1 = CorePlugin.removeFeatures(fm, features);
+						Node fmNode1 = FMCorePlugin.removeFeatures(fm, features);
 						if (verbose)
 							System.out.println("\tCreating Node2...");
 						final Node fmNode2 = NodeCreator.createNodes(fm, features).toCNF();

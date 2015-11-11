@@ -35,6 +35,7 @@ import org.prop4j.SatSolver;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.fm.core.Constraint;
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.conf.worker.RemoveThread;
@@ -90,7 +91,7 @@ public class CompositionalAnaylsisTester {
 	public void computeAtomicSets(int x) {		
 		System.out.print("Computing root features...");
 		
-		rootFeatures = CorePlugin.splitFeatureModel(completeModel, 10, 300);		
+		rootFeatures = FMCorePlugin.splitFeatureModel(completeModel, 10, 300);		
 		
 		curTime = split(curTime);		
 		System.out.print("Creating sub models...");
@@ -151,7 +152,7 @@ public class CompositionalAnaylsisTester {
 		curTime = split(curTime);
 		System.out.print("Merging atomic sets...");
 
-		final List<List<String>> mergeAtomicSets = CorePlugin.mergeAtomicSets(atomicSetLists);
+		final List<List<String>> mergeAtomicSets = FMCorePlugin.mergeAtomicSets(atomicSetLists);
 		
 		curTime = split(curTime);
 		System.out.println();

@@ -36,10 +36,9 @@ public class DeprecatedClause extends Clause {
 
 	public static DeprecatedClause createClause(DeprecatedFeatureMap map, int[] newLiterals, int curFeature) {
 		final HashSet<Integer> literalSet = new HashSet<>(newLiterals.length << 1);
+
 		for (int literal : newLiterals) {
 			if (curFeature != Math.abs(literal)) {
-//				final Literal negativeliteral = literal.clone();
-//				negativeliteral.flip();
 				if (literalSet.contains(-literal)) {
 					return null;
 				} else {
@@ -48,41 +47,30 @@ public class DeprecatedClause extends Clause {
 			}
 		}
 
-		int[] newLiterals2 = new int[literalSet.size()];
-		int i = 0;
-		for (int l : literalSet) {
-			newLiterals2[i++] = l;
-		}
-		final DeprecatedClause clause = new DeprecatedClause(newLiterals2);
-		clause.computeRelevance(map);
-		return clause;
+		return getClauseFromSet(map, literalSet);
 	}
 
 	public static DeprecatedClause createClause(DeprecatedFeatureMap map, int[] newLiterals) {
 		final HashSet<Integer> literalSet = new HashSet<>(newLiterals.length << 1);
+
 		for (int literal : newLiterals) {
-//			final Literal negativeliteral = literal.clone();
-//			negativeliteral.flip();
-//
-//			if (literalSet.contains(negativeliteral)) {
-//				return null;
-//			} else {
-//				literalSet.add(literal);
-//			}
 			if (literalSet.contains(-literal)) {
 				return null;
 			} else {
 				literalSet.add(literal);
 			}
 		}
-		
-		int[] newLiterals2 = new int[literalSet.size()];
+
+		return getClauseFromSet(map, literalSet);
+	}
+
+	private static DeprecatedClause getClauseFromSet(DeprecatedFeatureMap map, final HashSet<Integer> literalSet) {
+		int[] newLiterals = new int[literalSet.size()];
 		int i = 0;
 		for (int lit : literalSet) {
-			newLiterals2[i++] = lit;
+			newLiterals[i++] = lit;
 		}
-		final DeprecatedClause clause = new DeprecatedClause(newLiterals2);
-//		final DeprecatedClause clause = new DeprecatedClause(literalSet.toArray(new Literal[0]));
+		final DeprecatedClause clause = new DeprecatedClause(newLiterals);
 		clause.computeRelevance(map);
 		return clause;
 	}
@@ -95,69 +83,6 @@ public class DeprecatedClause extends Clause {
 		}
 		return clause;
 	}
-	
-//	public static DeprecatedClause createClause(DeprecatedFeatureMap map, Literal[] newLiterals, String curFeature) {
-//		Arrays.sort(newLiterals);
-//		ArrayList<Literal> l1 = new ArrayList<>(newLiterals.length);
-//		int i = -1;
-//		for (Literal literal : newLiterals) {
-//			if (!curFeature.equals(literal.var)) {
-//				if (i > -1) {
-//					final Literal lastLiteral = l1.get(i);
-//					if (lastLiteral.var.equals(literal.var)) {
-//						if (lastLiteral.positive != literal.positive) {
-//							return null;
-//						}
-//					} else {
-//						l1.add(literal);
-//						i++;
-//					}
-//				} else {
-//					l1.add(literal);
-//					i++;
-//				}
-//			}
-//		}
-//
-//		final DeprecatedClause clause = new DeprecatedClause(l1.toArray(new Literal[0]));
-//		clause.computeRelevance(map);
-//		return clause;
-//	}
-//
-//	public static DeprecatedClause createClause(DeprecatedFeatureMap map, Literal[] newLiterals) {
-//		Arrays.sort(newLiterals);
-//		ArrayList<Literal> l1 = new ArrayList<>(newLiterals.length);
-//		int i = -1;
-//		for (Literal literal : newLiterals) {
-//			if (i > -1) {
-//				final Literal lastLiteral = l1.get(i);
-//				if (lastLiteral.var.equals(literal.var)) {
-//					if (lastLiteral.positive != literal.positive) {
-//						return null;
-//					}
-//				} else {
-//					l1.add(literal);
-//					i++;
-//				}
-//			} else {
-//				l1.add(literal);
-//				i++;
-//			}
-//		}
-//		
-//		final DeprecatedClause clause = new DeprecatedClause(l1.toArray(new Literal[0]));
-//		clause.computeRelevance(map);
-//		return clause;
-//	}
-//
-//	public static DeprecatedClause createClause(DeprecatedFeatureMap map, Literal newLiteral) {
-//		final DeprecatedClause clause = new DeprecatedClause(new Literal[] { newLiteral });
-//		final DeprecatedFeature df = map.get(newLiteral.var);
-//		if (df != null) {
-//			clause.relevance++;
-//		}
-//		return clause;
-//	}
 
 	private DeprecatedClause(int[] literals) {
 		super(literals);
@@ -199,7 +124,7 @@ public class DeprecatedClause extends Clause {
 			literals = null;
 		}
 	}
-	
+
 	public int getRelevance() {
 		return relevance;
 	}

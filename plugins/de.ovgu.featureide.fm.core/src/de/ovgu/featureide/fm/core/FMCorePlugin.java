@@ -26,7 +26,11 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.READING_MODEL_
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.resources.IContainer;
@@ -34,8 +38,13 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.osgi.framework.BundleContext;
+import org.prop4j.Literal;
+import org.prop4j.Node;
+import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.ExtendedFeatureModel.UsedModel;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
+import de.ovgu.featureide.fm.core.editing.cnf.UnkownLiteralException;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.ModelIOFactory;
 import de.ovgu.featureide.fm.core.job.IJob;
@@ -195,5 +204,82 @@ public class FMCorePlugin extends AbstractCorePlugin {
 		} catch (Exception e) {
 			logError(e);
 		}
+	}
+	
+	public void removeFeatures(IProject project, FeatureModel data, Collection<String> features) {
+		try {
+			removeFeatures(data, features);
+		} catch (TimeoutException | UnkownLiteralException e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+	}
+
+	public static Node removeFeatures(FeatureModel featureModel, Collection<String> removeFeatures) throws TimeoutException, UnkownLiteralException {
+		final AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(featureModel, removeFeatures);
+		nodeCreator.setCnfType(AdvancedNodeCreator.CNFType.Regular);
+		return nodeCreator.createNodes();
+	}
+
+	public static List<String> splitFeatureModel(FeatureModel featureModel, int level, int limit) {
+		final ArrayList<String> rootNames = new ArrayList<>();
+		final Feature root = featureModel.getRoot();
+		if (root != null) {
+			split_rec(root, rootNames, 0, level, limit);
+		}
+		return rootNames;
+	}
+
+	private static void split_rec(Feature root, ArrayList<String> rootNames, int level, int x, int y) {
+		final int featureLimit = y;
+		final int levelLimit = x;
+		final LinkedList<Feature> children = root.getChildren();
+		for (Feature feature : children) {
+			final int c = countChildren(feature);
+			if (c > 0) {
+				if (c > featureLimit && level < levelLimit) {
+					split_rec(feature, rootNames, level + 1, x, y);
+				} else {
+					rootNames.add(feature.getName());
+				}
+			} else {
+				rootNames.add(feature.getName());
+			}
+		}
+	}
+
+	private static int countChildren(Feature root) {
+		final LinkedList<Feature> children = root.getChildren();
+		int count = children.size();
+		for (Feature feature : children) {
+			count += countChildren(feature);
+		}
+		return count;
+	}
+
+	public static List<List<String>> mergeAtomicSets(List<List<List<Literal>>> atomicSetLists) {
+		final HashMap<String, Collection<String>> atomicSetMap = new HashMap<>();
+		for (List<List<Literal>> atomicSetList : atomicSetLists) {
+			for (List<Literal> atomicSet : atomicSetList) {
+				final HashSet<String> newSet = new HashSet<>();
+				for (Literal literal : atomicSet) {
+					newSet.add(literal.var.toString());
+				}
+				for (Literal literal : atomicSet) {
+					final Collection<String> oldSet = atomicSetMap.get(literal.var.toString());
+					if (oldSet != null) {
+						newSet.addAll(oldSet);
+					}
+				}
+				for (String featureName : newSet) {
+					atomicSetMap.put(featureName, newSet);
+				}
+			}
+		}
+		final HashSet<Collection<String>> mergedAtomicSetsSet = new HashSet<>(atomicSetMap.values());
+		final List<List<String>> mergedAtomicSets = new ArrayList<>(mergedAtomicSetsSet.size() + 1);
+		for (Collection<String> atomicSet : mergedAtomicSetsSet) {
+			mergedAtomicSets.add(new ArrayList<>(atomicSet));
+		}
+		return mergedAtomicSets;
 	}
 }
