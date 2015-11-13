@@ -60,9 +60,12 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 	private final boolean includeBooleanValues;
 	private final boolean regularCNF;
 
+	private final List<DeprecatedClause> newRelevantClauseList = new ArrayList<>();
+
 	private List<DeprecatedClause> relevantClauseList;
 	private Set<DeprecatedClause> relevantClauseSet;
 	private Set<DeprecatedClause> newClauseSet;
+	private List<DeprecatedClause> orgClauseList;
 	private Set<String> retainedFeatures;
 	private Map<Object, Integer> idMap;
 
@@ -72,6 +75,9 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 	private ICNFSolver solver;
 
 	private DeprecatedFeatureMap map;
+
+	int relevantPosIndex = 0;
+	int relevantNegIndex = 0;
 
 	public FeatureRemover(Node cnf, Collection<String> features) {
 		this(cnf, features, true, false);
@@ -126,21 +132,20 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 
 		featureNameArray = new String[retainedFeatures.size() + 1];
 		idMap = new HashMap<>(retainedFeatures.size() << 1);
-		{
-			int id = 1;
-			for (String name : features) {
-				idMap.put(name, id);
-				featureNameArray[id] = name;
-				id++;
-			}
 
-			retainedFeatures.removeAll(features);
+		int id = 1;
+		for (String name : features) {
+			idMap.put(name, id);
+			featureNameArray[id] = name;
+			id++;
+		}
 
-			for (String name : retainedFeatures) {
-				idMap.put(name, id);
-				featureNameArray[id] = name;
-				id++;
-			}
+		retainedFeatures.removeAll(features);
+
+		for (String name : retainedFeatures) {
+			idMap.put(name, id);
+			featureNameArray[id] = name;
+			id++;
 		}
 	}
 
@@ -183,6 +188,8 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 
 		// fill sets
 		createClauseList(andChildren);
+		relevantClauseList.addAll(newRelevantClauseList);
+		newRelevantClauseList.clear();
 
 		createSolver();
 
@@ -192,7 +199,9 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 		final double globalFactor = 1.5;
 
 		final int maxClauseCountLimit = (int) Math.floor(globalFactor * relevantClauseList.size());
-		int relevantIndex = 0;
+
+		relevantPosIndex = 0;
+		relevantNegIndex = relevantClauseList.size();
 
 		while (!map.isEmpty()) {
 			if (workMonitor.step()) {
@@ -203,23 +212,21 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 			final int curFeatureID = idMap.get(curFeature);
 
 			final long estimatedClauseCount = next.getClauseCount();
-			final int curClauseCountLimit = (int) Math.floor(localFactor * (relevantClauseList.size() - relevantIndex));
+			final int curClauseCountLimit = (int) Math.floor(localFactor * ((relevantNegIndex - relevantPosIndex) + newRelevantClauseList.size()));
 
 			if ((estimatedClauseCount > maxClauseCountLimit) || (estimatedClauseCount > curClauseCountLimit)) {
-				//			if ((next.getClauseCount() > 1000)) {
-//				relevantIndex = detectRedundantConstraintsSimple(relevantIndex);
-				relevantIndex = detectRedundantConstraintsComplex(relevantIndex);
+				//				relevantIndex = detectRedundantConstraintsSimple(relevantIndex);
+				detectRedundantConstraintsComplex();
 			}
 
-			removeOldClauses(relevantIndex);
+			removeOldClauses();
 
 			// ... create list of clauses that contain this feature
-			final byte[] clauseStates = new byte[relevantClauseList.size()];
-			relevantIndex = sortRelevantList(curFeatureID, clauseStates);
+			sortRelevantList(curFeatureID);
 
 			// Remove variable
-			//generalize(curFeatureID, relevantIndex, clauseStates);
-			resolution(curFeatureID, relevantIndex, clauseStates);
+			//			generalize(curFeatureID);
+			resolution(curFeatureID);
 
 			idMap.remove(curFeature);
 			removedFeatures[curFeatureID] = true;
@@ -250,138 +257,152 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 		removedFeatures = null;
 	}
 
-	private int detectRedundantConstraintsComplex(int relevantIndex) {
+	private void detectRedundantConstraintsComplex() {
 		createOrgSolver();
-		for (int i = relevantClauseList.size() - 1; i >= relevantIndex; i--) {
+		for (int i = relevantPosIndex; i < relevantNegIndex; i++) {
 			final DeprecatedClause mainClause = relevantClauseList.get(i);
 			if (remove(mainClause)) {
-				Collections.swap(relevantClauseList, i, relevantIndex);
-				relevantIndex++;
-				i++;
+				relevantNegIndex--;
+				Collections.swap(relevantClauseList, i, relevantNegIndex);
+				i--;
 			} else {
 				solver.addClause(mainClause);
 			}
 		}
-		return relevantIndex;
-	}
 
-	private int detectRedundantConstraintsSimple(int relevantIndex) {
-		for (int i = relevantClauseList.size() - 1; i >= relevantIndex; i--) {
-			final DeprecatedClause mainClause = relevantClauseList.get(i);
-			for (int j = i - 1; j >= relevantIndex; j--) {
-				final DeprecatedClause subClause = relevantClauseList.get(j);
-				final Clause contained = Clause.contained(mainClause, subClause);
-				if (contained != null) {
-					if (subClause == contained) {
-						Collections.swap(relevantClauseList, j, relevantIndex);
-						relevantIndex++;
-					} else {
-						Collections.swap(relevantClauseList, i, relevantIndex);
-						relevantIndex++;
-						i++;
-						break;
-					}
-				}
+		int tempIndex = 0;
+		int i = 0;
+		for (DeprecatedClause mainClause : newRelevantClauseList) {
+			if (remove(mainClause)) {
+				Collections.swap(newRelevantClauseList, i, tempIndex);
+				tempIndex++;
+			} else {
+				solver.addClause(mainClause);
 			}
+			i++;
 		}
-		return relevantIndex;
+		newRelevantClauseList.subList(0, tempIndex).clear();
 	}
 
-	private void removeOldClauses(int relevantIndex) {
-		final List<DeprecatedClause> subList = relevantClauseList.subList(0, relevantIndex);
-		relevantClauseSet.removeAll(subList);
-		for (DeprecatedClause clause : subList) {
-			clause.delete(map);
+	//	private int detectRedundantConstraintsSimple(int relevantIndex) {
+	//		for (int i = relevantClauseList.size() - 1; i >= relevantIndex; i--) {
+	//			final DeprecatedClause mainClause = relevantClauseList.get(i);
+	//			for (int j = i - 1; j >= relevantIndex; j--) {
+	//				final DeprecatedClause subClause = relevantClauseList.get(j);
+	//				final Clause contained = Clause.contained(mainClause, subClause);
+	//				if (contained != null) {
+	//					if (subClause == contained) {
+	//						Collections.swap(relevantClauseList, j, relevantIndex);
+	//						relevantIndex++;
+	//					} else {
+	//						Collections.swap(relevantClauseList, i, relevantIndex);
+	//						relevantIndex++;
+	//						i++;
+	//						break;
+	//					}
+	//				}
+	//			}
+	//		}
+	//		return relevantIndex;
+	//	}
+
+	private void removeOldClauses() {
+		final List<DeprecatedClause> subList = relevantClauseList.subList(relevantPosIndex, relevantNegIndex);
+		for (int i = 0; i < relevantPosIndex; i++) {
+			relevantClauseList.get(i).delete(map);
 		}
-		subList.clear();
+		for (int i = relevantNegIndex; i < relevantClauseList.size(); i++) {
+			relevantClauseList.get(i).delete(map);
+		}
+		relevantClauseSet.removeAll(relevantClauseList.subList(0, relevantPosIndex));
+		if (relevantNegIndex < relevantClauseList.size()) {
+			relevantClauseSet.removeAll(relevantClauseList.subList(relevantNegIndex, relevantClauseList.size()));
+		}
+		ArrayList<DeprecatedClause> tempRelevantClauseList = new ArrayList<>(subList.size() + newRelevantClauseList.size());
+		tempRelevantClauseList.addAll(subList);
+		tempRelevantClauseList.addAll(newRelevantClauseList);
+		newRelevantClauseList.clear();
+		relevantClauseList.clear();
+
+		relevantClauseList = tempRelevantClauseList;
 	}
 
-	private int sortRelevantList(int curFeatureID, byte[] clauseStates) {
-		int relevantIndex = 0;
-		for (int i = 0; i < relevantClauseList.size(); i++) {
+	private void sortRelevantList(int curFeatureID) {
+		relevantPosIndex = 0;
+		relevantNegIndex = relevantClauseList.size();
+		for (int i = 0; i < relevantNegIndex; i++) {
 			final Clause clause = relevantClauseList.get(i);
 			for (int literal : clause.getLiterals()) {
 				if (Math.abs(literal) == curFeatureID) {
-					clauseStates[relevantIndex] = (byte) (literal > 0 ? 1 : 2);
-					Collections.swap(relevantClauseList, i, relevantIndex);
-					relevantIndex++;
+					if (literal > 0) {
+						Collections.swap(relevantClauseList, i, relevantPosIndex);
+						relevantPosIndex++;
+					} else {
+						relevantNegIndex--;
+						Collections.swap(relevantClauseList, i, relevantNegIndex);
+						i--;
+					}
 					break;
 				}
 			}
 		}
-		return relevantIndex;
 	}
 
-	private void resolution(final int curFeatureID, int relevantIndex, final byte[] clauseStates) {
-		for (int i = relevantIndex - 1; i >= 0; i--) {
-			final boolean positive;
-			switch (clauseStates[i]) {
-			case 1:
-				positive = true;
-				break;
-			case 2:
-				positive = false;
-				break;
-			case -1:
-			case 0:
-			default:
-				continue;
-			}
+	private void resolution(final int curFeatureID) {
+		for (int i = 0; i < relevantPosIndex; i++) {
 			final int[] orChildren = relevantClauseList.get(i).getLiterals();
-			{
-				for (int j = i - 1; j >= 0; j--) {
-					if ((positive && clauseStates[j] == 2) || (!positive && clauseStates[j] == 1)) {
-						final int[] children2 = relevantClauseList.get(j).getLiterals();
-						final int[] newChildren = new int[orChildren.length + children2.length];
+			for (int j = relevantNegIndex; j < relevantClauseList.size(); j++) {
+				final int[] children2 = relevantClauseList.get(j).getLiterals();
+				final int[] newChildren = new int[orChildren.length + children2.length];
 
-						System.arraycopy(orChildren, 0, newChildren, 0, orChildren.length);
-						System.arraycopy(children2, 0, newChildren, orChildren.length, children2.length);
+				System.arraycopy(orChildren, 0, newChildren, 0, orChildren.length);
+				System.arraycopy(children2, 0, newChildren, orChildren.length, children2.length);
 
-						addNewClause(DeprecatedClause.createClause(map, newChildren, curFeatureID));
-					}
-				}
+				addNewClause(DeprecatedClause.createClause(map, newChildren, curFeatureID));
 			}
 		}
 	}
 
-	private void generalize(final int curFeatureID, int relevantIndex, final byte[] clauseStates) throws TimeoutException, UnkownLiteralException {
-		for (int i = relevantIndex - 1; i >= 0; i--) {
-			if (clauseStates[i] < 1) {
-				continue;
-			}
-
-			final int[] orChildren = relevantClauseList.get(i).getLiterals();
-
-			if (orChildren.length < 2) {
-				continue;
-			}
-
-			final int[] literalList = new int[orChildren.length];
-
-			int removeIndex = orChildren.length;
-			int retainIndex = -1;
-
-			for (int j = 0; j < orChildren.length; j++) {
-				final int literal = orChildren[j];
-				if (Math.abs(literal) == curFeatureID) {
-					literalList[--removeIndex] = literal;
-				} else {
-					literalList[++retainIndex] = -literal;
-				}
-			}
-
-			if (!solver.isSatisfiable(literalList)) {
-				int[] retainLiterals = new int[retainIndex + 1];
-				for (int j = 0; j < retainLiterals.length; j++) {
-					retainLiterals[j] = -literalList[j];
-				}
-
-				addNewClause(DeprecatedClause.createClause(map, retainLiterals));
-
-				clauseStates[i] = -1;
-			}
-		}
-	}
+	//	private void generalize(final int curFeatureID) throws TimeoutException, UnkownLiteralException {
+	//
+	//		for (int i = 0; i < relevantPosIndex; i++) {
+	//			
+	//		}
+	//		for (int i = relevantNegIndex; i < relevantClauseList.size(); i++) {
+	//
+	//			final int[] orChildren = relevantClauseList.get(i).getLiterals();
+	//
+	//			if (orChildren.length < 2) {
+	//				continue;
+	//			}
+	//
+	//			final int[] literalList = new int[orChildren.length];
+	//
+	//			int removeIndex = orChildren.length;
+	//			int retainIndex = -1;
+	//
+	//			for (int j = 0; j < orChildren.length; j++) {
+	//				final int literal = orChildren[j];
+	//				if (Math.abs(literal) == curFeatureID) {
+	//					literalList[--removeIndex] = literal;
+	//				} else {
+	//					literalList[++retainIndex] = -literal;
+	//				}
+	//			}
+	//
+	//			if (!solver.isSatisfiable(literalList)) {
+	//				int[] retainLiterals = new int[retainIndex + 1];
+	//				for (int j = 0; j < retainLiterals.length; j++) {
+	//					retainLiterals[j] = -literalList[j];
+	//				}
+	//
+	//				addNewClause(DeprecatedClause.createClause(map, retainLiterals));
+	//				
+	//				//TODO
+	//				
+	//			}
+	//		}
+	//	}
 
 	private void createClauseList(final Node[] andChildren) {
 		for (int i = 0; i < andChildren.length; i++) {
@@ -454,11 +475,30 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 
 			addNewClause(curClause);
 		}
-		// origClauseList = new ArrayList<>(newClauseSet);
+		orgClauseList = new ArrayList<>(newClauseSet);
+	}
+
+	private void removeRedundantConstraintsComplex() {
+		if (solver != null) {
+			solver.reset();
+		}
+		solver = new CNFSolver(orgClauseList, retainedFeatures.size());
+		newClauseSet.removeAll(orgClauseList);
+
+		for (DeprecatedClause mainClause : newClauseSet) {
+			if (!remove(mainClause)) {
+				solver.addClause(mainClause);
+				orgClauseList.add(mainClause);
+			}
+		}
 	}
 
 	private Node[] createNewClauseList() {
-		final int newClauseSize = newClauseSet.size();
+//		removeRedundantConstraintsComplex();
+//		Collection<DeprecatedClause> clauses = orgClauseList;
+		Collection<DeprecatedClause> clauses = newClauseSet;
+
+		final int newClauseSize = clauses.size();
 		final Node[] newClauses;
 		if (includeBooleanValues) {
 			newClauses = new Node[newClauseSize + 3];
@@ -483,7 +523,7 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 			newClauses = new Node[newClauseSize];
 		}
 		int j = 0;
-		for (Clause newClause : newClauseSet) {
+		for (Clause newClause : clauses) {
 			final int[] newClauseLiterals = newClause.getLiterals();
 			final Literal[] literals = new Literal[newClauseLiterals.length];
 			int i = literals.length;
@@ -510,8 +550,7 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 		if (solver != null) {
 			solver.reset();
 		}
-		final List<DeprecatedClause> clauseList = new ArrayList<>(newClauseSet);
-		solver = new CNFSolver2(clauseList, removedFeatures);
+		solver = new CNFSolver2(newClauseSet, removedFeatures);
 	}
 
 	private int[] convert(Literal[] newChildren) {
@@ -531,7 +570,7 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 				}
 			} else {
 				if (relevantClauseSet.add(curClause)) {
-					relevantClauseList.add(curClause);
+					newRelevantClauseList.add(curClause);
 				} else {
 					curClause.delete(map);
 				}
