@@ -23,7 +23,6 @@ package de.ovgu.featureide.fm.core.editing.remove;
 import java.util.HashSet;
 
 import de.ovgu.featureide.fm.core.editing.cnf.Clause;
-import de.ovgu.featureide.fm.core.editing.remove.DeprecatedFeatureMap.DeprecatedFeature;
 
 /**
  * Used by {@link FeatureRemover}.
@@ -38,6 +37,32 @@ public class DeprecatedClause extends Clause {
 		final HashSet<Integer> literalSet = new HashSet<>(newLiterals.length << 1);
 
 		for (int literal : newLiterals) {
+			if (curFeature != Math.abs(literal)) {
+				if (literalSet.contains(-literal)) {
+					return null;
+				} else {
+					literalSet.add(literal);
+				}
+			}
+		}
+
+		return getClauseFromSet(map, literalSet);
+	}
+	
+	public static DeprecatedClause createClause(DeprecatedFeatureMap map, int[] newLiterals1, int[] newLiterals2, int curFeature) {
+		final HashSet<Integer> literalSet = new HashSet<>((newLiterals1.length + newLiterals2.length) << 1);
+
+		for (int literal : newLiterals1) {
+			if (curFeature != Math.abs(literal)) {
+				if (literalSet.contains(-literal)) {
+					return null;
+				} else {
+					literalSet.add(literal);
+				}
+			}
+		}
+		
+		for (int literal : newLiterals2) {
 			if (curFeature != Math.abs(literal)) {
 				if (literalSet.contains(-literal)) {
 					return null;
@@ -77,8 +102,12 @@ public class DeprecatedClause extends Clause {
 
 	public static DeprecatedClause createClause(DeprecatedFeatureMap map, int newLiteral) {
 		final DeprecatedClause clause = new DeprecatedClause(new int[] { newLiteral });
-		final DeprecatedFeature df = map.get(Math.abs(newLiteral));
-		if (df != null) {
+//		final DeprecatedFeature df = map.get(Math.abs(newLiteral));
+//		if (df != null) {
+//			clause.relevance++;
+//		}
+		final int abslit = Math.abs(newLiteral);
+		if (map.relevant(abslit)) {
 			clause.relevance++;
 		}
 		return clause;
@@ -91,13 +120,23 @@ public class DeprecatedClause extends Clause {
 
 	private void computeRelevance(DeprecatedFeatureMap map) {
 		for (int literal : literals) {
-			final DeprecatedFeature df = map.get(Math.abs(literal));
-			if (df != null) {
+//			final DeprecatedFeature df = map.get(Math.abs(literal));
+//			if (df != null) {
+//				relevance++;
+//				if (literal > 0) {
+//					df.incPositive();
+//				} else {
+//					df.incNegative();
+//				}
+//			}
+			
+			final int abslit = Math.abs(literal);
+			if (map.relevant(abslit)) {
 				relevance++;
 				if (literal > 0) {
-					df.incPositive();
+					map.incPositive(abslit);
 				} else {
-					df.incNegative();
+					map.incNegative(abslit);
 				}
 			}
 		}
@@ -109,12 +148,21 @@ public class DeprecatedClause extends Clause {
 	public void delete(DeprecatedFeatureMap map) {
 		if (literals != null && literals.length > 1) {
 			for (int literal : literals) {
-				final DeprecatedFeature df = map.get(Math.abs(literal));
-				if (df != null) {
+//				final DeprecatedFeature df = map.get(Math.abs(literal));
+//				if (df != null) {
+//					if (literal > 0) {
+//						df.decPositive();
+//					} else {
+//						df.decNegative();
+//					}
+//				}
+				
+				final int abslit = Math.abs(literal);
+				if (map.relevant(abslit)) {
 					if (literal > 0) {
-						df.decPositive();
+						map.decPositive(abslit);
 					} else {
-						df.decNegative();
+						map.decNegative(abslit);
 					}
 				}
 			}

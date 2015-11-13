@@ -26,7 +26,7 @@ import de.ovgu.featureide.fm.core.editing.remove.DeprecatedClause;
 
 public interface ICNFSolver {
 
-	boolean isSatisfiable(int[] literals) throws TimeoutException, UnkownLiteralException;
+	boolean isSatisfiable(int[] literals) throws TimeoutException;
 
 	void reset();
 

@@ -42,7 +42,6 @@ import de.ovgu.featureide.fm.core.editing.cnf.CNFSolver2;
 import de.ovgu.featureide.fm.core.editing.cnf.Clause;
 import de.ovgu.featureide.fm.core.editing.cnf.ICNFSolver;
 import de.ovgu.featureide.fm.core.editing.cnf.UnkownLiteralException;
-import de.ovgu.featureide.fm.core.editing.remove.DeprecatedFeatureMap.DeprecatedFeature;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.WorkMonitor;
 
@@ -62,10 +61,10 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 
 	private final List<DeprecatedClause> newRelevantClauseList = new ArrayList<>();
 
+//	private List<DeprecatedClause> orgClauseList;
 	private List<DeprecatedClause> relevantClauseList;
 	private Set<DeprecatedClause> relevantClauseSet;
 	private Set<DeprecatedClause> newClauseSet;
-	private List<DeprecatedClause> orgClauseList;
 	private Set<String> retainedFeatures;
 	private Map<Object, Integer> idMap;
 
@@ -184,7 +183,7 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 		relevantClauseList = new ArrayList<>(andChildren.length);
 		relevantClauseSet = new HashSet<>(andChildren.length << 1);
 		newClauseSet = new HashSet<>(andChildren.length << 1);
-		map = new DeprecatedFeatureMap(features, idMap);
+		map = new DeprecatedFeatureMap(features);
 
 		// fill sets
 		createClauseList(andChildren);
@@ -193,10 +192,10 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 
 		createSolver();
 
-		workMonitor.setMaxAbsoluteWork(map.size() + 1);
+//		workMonitor.setMaxAbsoluteWork(map.size() + 1);
 
 		final double localFactor = 1.2;
-		final double globalFactor = 1.5;
+		final double globalFactor = 2.0;
 
 		final int maxClauseCountLimit = (int) Math.floor(globalFactor * relevantClauseList.size());
 
@@ -207,11 +206,14 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 			if (workMonitor.step()) {
 				return null;
 			}
-			final DeprecatedFeature next = map.next();
-			final String curFeature = next.getFeature();
-			final int curFeatureID = idMap.get(curFeature);
+			final int curFeatureID = map.next();
+//			final DeprecatedFeature next = map.next();
+//			final String curFeature = next.getFeature();
+//			final int curFeatureID = idMap.get(curFeature);
+//			final int curFeatureID = next.getFeatureID();
 
-			final long estimatedClauseCount = next.getClauseCount();
+//			final long estimatedClauseCount = next.getClauseCount();
+			final long estimatedClauseCount = map.getLastClauseCount();
 			final int curClauseCountLimit = (int) Math.floor(localFactor * ((relevantNegIndex - relevantPosIndex) + newRelevantClauseList.size()));
 
 			if ((estimatedClauseCount > maxClauseCountLimit) || (estimatedClauseCount > curClauseCountLimit)) {
@@ -228,7 +230,8 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 			//			generalize(curFeatureID);
 			resolution(curFeatureID);
 
-			idMap.remove(curFeature);
+//			idMap.remove(curFeature);
+//			idMap.remove(curFeatureID);
 			removedFeatures[curFeatureID] = true;
 
 			final int globalMixedClauseCount = map.getGlobalMixedClauseCount();
@@ -307,7 +310,6 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 	//	}
 
 	private void removeOldClauses() {
-		final List<DeprecatedClause> subList = relevantClauseList.subList(relevantPosIndex, relevantNegIndex);
 		for (int i = 0; i < relevantPosIndex; i++) {
 			relevantClauseList.get(i).delete(map);
 		}
@@ -318,12 +320,13 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 		if (relevantNegIndex < relevantClauseList.size()) {
 			relevantClauseSet.removeAll(relevantClauseList.subList(relevantNegIndex, relevantClauseList.size()));
 		}
-		ArrayList<DeprecatedClause> tempRelevantClauseList = new ArrayList<>(subList.size() + newRelevantClauseList.size());
+		final List<DeprecatedClause> subList = relevantClauseList.subList(relevantPosIndex, relevantNegIndex);
+		final ArrayList<DeprecatedClause> tempRelevantClauseList = new ArrayList<>(subList.size() + newRelevantClauseList.size());
 		tempRelevantClauseList.addAll(subList);
 		tempRelevantClauseList.addAll(newRelevantClauseList);
-		newRelevantClauseList.clear();
 		relevantClauseList.clear();
-
+		newRelevantClauseList.clear();
+		
 		relevantClauseList = tempRelevantClauseList;
 	}
 
@@ -354,11 +357,12 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 			for (int j = relevantNegIndex; j < relevantClauseList.size(); j++) {
 				final int[] children2 = relevantClauseList.get(j).getLiterals();
 				final int[] newChildren = new int[orChildren.length + children2.length];
-
+//
 				System.arraycopy(orChildren, 0, newChildren, 0, orChildren.length);
 				System.arraycopy(children2, 0, newChildren, orChildren.length, children2.length);
 
 				addNewClause(DeprecatedClause.createClause(map, newChildren, curFeatureID));
+//				addNewClause(DeprecatedClause.createClause(map, orChildren, children2, curFeatureID));
 			}
 		}
 	}
@@ -475,28 +479,28 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 
 			addNewClause(curClause);
 		}
-		orgClauseList = new ArrayList<>(newClauseSet);
+//		orgClauseList = new ArrayList<>(newClauseSet);
 	}
 
-	private void removeRedundantConstraintsComplex() {
-		if (solver != null) {
-			solver.reset();
-		}
-		solver = new CNFSolver(orgClauseList, retainedFeatures.size());
-		newClauseSet.removeAll(orgClauseList);
-
-		for (DeprecatedClause mainClause : newClauseSet) {
-			if (!remove(mainClause)) {
-				solver.addClause(mainClause);
-				orgClauseList.add(mainClause);
-			}
-		}
-	}
+//	private void removeRedundantConstraintsComplex() {
+//		if (solver != null) {
+//			solver.reset();
+//		}
+//		solver = new CNFSolver(orgClauseList, retainedFeatures.size());
+//		newClauseSet.removeAll(orgClauseList);
+//
+//		for (DeprecatedClause mainClause : newClauseSet) {
+//			if (!remove(mainClause)) {
+//				solver.addClause(mainClause);
+//				orgClauseList.add(mainClause);
+//			}
+//		}
+//	}
 
 	private Node[] createNewClauseList() {
 //		removeRedundantConstraintsComplex();
-//		Collection<DeprecatedClause> clauses = orgClauseList;
-		Collection<DeprecatedClause> clauses = newClauseSet;
+//		final Collection<DeprecatedClause> clauses = orgClauseList;
+		final Collection<DeprecatedClause> clauses = newClauseSet;
 
 		final int newClauseSize = clauses.size();
 		final Node[] newClauses;
@@ -587,7 +591,7 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 		boolean remove = false;
 		try {
 			remove = !solver.isSatisfiable(literals2);
-		} catch (TimeoutException | UnkownLiteralException e) {
+		} catch (TimeoutException e) {
 			e.printStackTrace();
 		}
 		return remove;
