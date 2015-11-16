@@ -32,11 +32,13 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.wizard.IWizardPage;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
 import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
 
 import de.ovgu.featureide.core.wizardextension.DefaultNewFeatureProjectWizardExtension;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.ui.UIPlugin;
 
@@ -53,6 +55,7 @@ import de.ovgu.featureide.ui.UIPlugin;
  */
 public class NewFeatureProjectWizard extends BasicNewProjectResourceWizard {
 
+	private final static Image colorImage = FMUIPlugin.getDefault().getImageDescriptor("icons/FeatureIconSmall.ico").createImage();
 	public static final String ID = UIPlugin.PLUGIN_ID + ".FeatureProjectWizard";
 	
 	protected NewFeatureProjectPage page;
@@ -62,6 +65,7 @@ public class NewFeatureProjectWizard extends BasicNewProjectResourceWizard {
 	public void addPages() {
 		setWindowTitle(NEW_FEATUREIDE_PROJECT);
 		page = new NewFeatureProjectPage();
+		getShell().setImage(colorImage);
 		addPage(page);
 		super.addPages();
 	}

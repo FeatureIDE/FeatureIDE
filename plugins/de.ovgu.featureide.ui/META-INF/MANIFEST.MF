@@ -16,7 +16,8 @@ Require-Bundle: org.eclipse.ui,
  de.ovgu.featureide.fm.ui,
  de.ovgu.featureide.core,
  org.eclipse.core.expressions,
- org.eclipse.jdt.launching
+ org.eclipse.jdt.launching,
+ org.eclipse.swt
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: lib/SPLACAT.jar,
  lib/commons-math-2.2.jar,
@@ -101,4 +102,6 @@ Import-Package: org.eclipse.jdt.core,
  org.eclipse.jface.text.source,
  org.eclipse.platform.internal,
  org.eclipse.ui.editors.text,
- org.eclipse.ui.texteditor
+ org.eclipse.ui.texteditor,
+ org.junit.runner,
+ org.junit.runner.notification

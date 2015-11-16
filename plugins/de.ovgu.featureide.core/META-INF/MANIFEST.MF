@@ -37,5 +37,10 @@ Bundle-ClassPath: lib/tools.jar,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: University of Magdeburg
-Import-Package: org.eclipse.jdt.internal.core,
+Import-Package: de.ovgu.featureide.fm.ui,
+ org.eclipse.jdt.internal.core,
+ org.eclipse.jface.text,
+ org.eclipse.jface.text.source,
+ org.eclipse.ui.part,
+ org.eclipse.ui.texteditor,
  org.eclipse.ui.wizards.newresource

@@ -422,7 +422,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 			if (!conditionIsSet)
 				expressionStack.push(ppExpression);
 
-			doThreeStepExpressionCheck(ppExpression, lineNumber, res);
+			checkExpressions(ppExpression, lineNumber, res);
 		} else {
 			// if generating of expression failed, generate expression "true"
 			if (!conditionIsSet)
@@ -474,6 +474,11 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 
 	@Override
 	public boolean hasFeatureFolder() {
+		return false;
+	}
+	
+	@Override
+	public boolean hasSourceFolder() {
 		return false;
 	}
 

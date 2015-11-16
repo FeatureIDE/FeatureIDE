@@ -41,17 +41,16 @@ public class AddColorSchemeAction extends AbstractColorAction {
 		setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
 				.getImageDescriptor(ISharedImages.IMG_OBJ_ADD));
 	}
-
+	
+	
 	@Override
 	protected boolean action(FeatureModel fm, String collName) {
-		NewColorSchemeWizard wizard = new NewColorSchemeWizard(fm);
+		NewColorSchemeWizard wizard = new NewColorSchemeWizard(fm, collaborationView);
 
 		WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
 		dialog.create();
-		if (dialog.open() == WizardDialog.OK && 
-				fm.getColorschemeTable().getSelectedColorscheme() == fm.getColorschemeTable().size()) {
-			return true;
-		}
+		dialog.open();
+
 		return false;
 	}
 	

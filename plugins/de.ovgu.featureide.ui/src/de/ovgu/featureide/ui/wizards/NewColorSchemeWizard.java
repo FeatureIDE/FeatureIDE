@@ -24,9 +24,10 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.NEW_COLORSCHEM
 
 import org.eclipse.jface.wizard.Wizard;
 
-import de.ovgu.featureide.fm.core.ColorschemeTable;
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.ui.UIPlugin;
+import de.ovgu.featureide.ui.views.collaboration.CollaborationView;
 
 /**
  * A wizard for adding a new color scheme.
@@ -41,8 +42,8 @@ public class NewColorSchemeWizard extends Wizard {
 	public NewColorSchemePage page;
 	
 	private FeatureModel featureModel;
-
-	public NewColorSchemeWizard(FeatureModel featureModel) {
+	
+	public NewColorSchemeWizard(FeatureModel featureModel, CollaborationView collaborationView) {
 		super();
 		setWindowTitle(NEW_COLORSCHEME);
 		this.featureModel = featureModel;
@@ -55,11 +56,10 @@ public class NewColorSchemeWizard extends Wizard {
 
 	public boolean performFinish() {
 		final String csName = page.getColorSchemeName();
-		if (csName != null && !csName.isEmpty()) {
-			ColorschemeTable colorschemeTable = featureModel.getColorschemeTable();
-			colorschemeTable.addColorscheme(csName);
+		if (csName != null && !csName.isEmpty() && !FeatureColorManager.hasColorScheme(featureModel, csName)) {
+			FeatureColorManager.newColorScheme(featureModel, csName);
 			if (page.isCurColorScheme()) {
-				colorschemeTable.setSelectedColorscheme(colorschemeTable.size());
+				FeatureColorManager.setActive(featureModel, csName);
 			}
 			return true;
 		} else {

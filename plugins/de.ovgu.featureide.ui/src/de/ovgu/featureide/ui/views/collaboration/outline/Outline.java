@@ -640,7 +640,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 	}
 	
 	private boolean refreshContent(IFile oldFile, IFile currentFile) {
-		if (CorePlugin.getFeatureProject(currentFile) == null) {
+		if (currentFile == null || CorePlugin.getFeatureProject(currentFile) == null) {
 			sortMethods.setEnabled(false);
 			hideAllFields.setEnabled(false);
 			hideAllMethods.setEnabled(false);

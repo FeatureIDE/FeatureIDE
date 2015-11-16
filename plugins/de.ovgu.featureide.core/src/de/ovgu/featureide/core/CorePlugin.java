@@ -24,6 +24,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.ADD_PROJECT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.AND_COMPOSER_TO_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CHANGE_OLD_NATURE_TO_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.COULD_NOT_SET_PERSISTANT_PROPERTY;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CONFIG;
 import static de.ovgu.featureide.fm.core.localization.StringTable.EQUATION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ERROR_WHILE_CREATING_FEATURE_MODEL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.EXPRESSION;
@@ -617,7 +618,7 @@ public class CorePlugin extends AbstractCorePlugin {
 	 */
 	public LinkedList<String> getConfigurationExtensions() {
 		LinkedList<String> extensions = new LinkedList<String>();
-		extensions.add("config");
+		extensions.add(CONFIG);
 		extensions.add(EQUATION);
 		extensions.add(EXPRESSION);
 		return extensions;

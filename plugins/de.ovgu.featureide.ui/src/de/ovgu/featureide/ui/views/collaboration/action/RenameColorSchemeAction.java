@@ -51,7 +51,8 @@ public class RenameColorSchemeAction extends AbstractColorAction {
 
 		WizardDialog dialog = new WizardDialog(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), wizard);
 		dialog.create();
-		dialog.open();
+		if (dialog.open() == WizardDialog.OK)
+			collaborationView.refresh();
 		
 		return false;
 	}

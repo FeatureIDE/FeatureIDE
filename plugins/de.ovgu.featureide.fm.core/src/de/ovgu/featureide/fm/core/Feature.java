@@ -57,8 +57,6 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 
 	private boolean constraintSelected;
 
-	private ColorList colorList;
-
 	private List<Constraint> partOfConstraints = new LinkedList<Constraint>();
 
 	private FeatureStatus status;
@@ -99,14 +97,12 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 		this.multiple = false;
 		this.hidden = false;
 		this.constraintSelected = false;
-		this.colorList = new ColorList(this);
 		this.status = FeatureStatus.NORMAL;
 		this.location = new FMPoint(0, 0);
 		this.description = null;
 		this.parent = null;
 		
 		sourceConnections.add(parentConnection);
-		colorList = new ColorList(this);
 	}
 	
 	protected Feature(Feature feature, FeatureModel featureModel, boolean complete) {
@@ -123,10 +119,8 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 		this.description = feature.description;
 		
 		if (complete) {
-			this.colorList = feature.colorList.clone(this);
 			this.location = new FMPoint(feature.location.getX(), feature.location.getY());
 		} else {
-			this.colorList = null;
 			this.location = null;
 		}
 		
@@ -665,10 +659,6 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 		} else {
 			return toString();
 		}
-	}
-
-	public ColorList getColorList() {
-		return colorList;
 	}
 	
 	@Override

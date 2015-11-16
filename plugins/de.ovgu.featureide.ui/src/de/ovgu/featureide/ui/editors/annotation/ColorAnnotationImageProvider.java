@@ -28,6 +28,9 @@ import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.ui.texteditor.IAnnotationImageProvider;
 
+import de.ovgu.featureide.fm.core.color.ColorPalette;
+
+
 /**
  * Image for the annotations shown in the vertical ruler
  * 

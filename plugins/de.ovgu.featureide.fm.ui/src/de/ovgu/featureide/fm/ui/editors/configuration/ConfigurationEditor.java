@@ -104,8 +104,6 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 
 	public AdvancedConfigurationPage advancedConfigurationPage;
 
-	private TextEditorPage sourceEditorPage;
-
 	private final JobSynchronizer configJobManager = new JobSynchronizer();
 
 	@Nonnull
@@ -127,7 +125,9 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	 */
 	File modelFile;
 
-	private LinkedList<IConfigurationEditorPage> extensionPages = new LinkedList<IConfigurationEditorPage>();
+	private final LinkedList<IConfigurationEditorPage> extensionPages = new LinkedList<>();
+
+	private final LinkedList<IConfigurationEditorPage> internalPages = new LinkedList<>();
 
 	/**
 	 * @return the extensionPages
@@ -406,9 +406,11 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 
 	@Override
 	protected void createPages() {
-		configurationPage = (ConfigurationPage) initPage(new ConfigurationPage());
-		advancedConfigurationPage = (AdvancedConfigurationPage) initPage(new AdvancedConfigurationPage());
-		sourceEditorPage = (TextEditorPage) initPage(new TextEditorPage());
+		if (modelFile != null) {
+			internalPages.add(initPage(new ConfigurationPage()));
+			internalPages.add(initPage(new AdvancedConfigurationPage()));
+		}
+		internalPages.add(initPage(new TextEditorPage()));
 
 		for (IConfigurationEditorPage page : extensionPages) {
 			initPage(page).propertyChange(null);
@@ -444,13 +446,12 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	}
 
 	private IConfigurationEditorPage getPage(int pageIndex) {
-		if (pageIndex == sourceEditorPage.getIndex()) {
-			return sourceEditorPage;
-		} else if (pageIndex == configurationPage.getIndex()) {
-			return configurationPage;
-		} else if (pageIndex == advancedConfigurationPage.getIndex()) {
-			return advancedConfigurationPage;
-		} else if (pageIndex >= 0) {
+		if (pageIndex >= 0) {
+			for (IConfigurationEditorPage internalPage : internalPages) {
+				if (internalPage.getIndex() == pageIndex) {
+					return internalPage;
+				}
+			}
 			for (IConfigurationEditorPage page : extensionPages) {
 				if (page.getIndex() == pageIndex) {
 					return page;
@@ -462,20 +463,23 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 
 	@Override
 	public void doSave(IProgressMonitor monitor) {
-		try {
-			ConfigurationWriter writer = new ConfigurationWriter(configuration);
-			writer.saveToFile(file);
-			writer.saveToFile(internalFile);
-			firePropertyChange(IEditorPart.PROP_DIRTY);
-		} catch (CoreException e) {
-			FMUIPlugin.getDefault().logError(e);
+		if (modelFile != null) {
+			try {
+				ConfigurationWriter writer = new ConfigurationWriter(configuration);
+				writer.saveToFile(file);
+				writer.saveToFile(internalFile);
+				firePropertyChange(IEditorPart.PROP_DIRTY);
+			} catch (CoreException e) {
+				FMUIPlugin.getDefault().logError(e);
+			}
 		}
-		advancedConfigurationPage.doSave(monitor);
-		configurationPage.doSave(monitor);
+
+		for (IConfigurationEditorPage internalPage : internalPages) {
+			internalPage.doSave(monitor);
+		}
 		for (IConfigurationEditorPage page : extensionPages) {
 			page.doSave(monitor);
 		}
-		sourceEditorPage.doSave(monitor);
 	}
 
 	@Override
