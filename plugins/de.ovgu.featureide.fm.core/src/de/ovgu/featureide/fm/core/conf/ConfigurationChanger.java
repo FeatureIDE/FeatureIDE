@@ -34,7 +34,6 @@ import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.conf.nodes.Expression;
 import de.ovgu.featureide.fm.core.conf.nodes.Variable;
 import de.ovgu.featureide.fm.core.conf.nodes.VariableConfiguration;
 import de.ovgu.featureide.fm.core.conf.worker.GraphCalcThread;
@@ -48,7 +47,7 @@ import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.WorkMonitor;
 
 /**
- * TODO description
+ * Updates a configuration by using a feature graph.
  * 
  * @author Sebastian Krieter
  */
@@ -81,7 +80,10 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 		public Void execute(WorkMonitor monitor) {
 			if (!initialized) {
 				lastComputedValues = new byte[variableConfiguration.size()];
-				Arrays.fill(lastComputedValues, (byte) Variable.UNDEFINED);
+				int i = 0;
+				for (Variable variable : variableConfiguration) {
+					lastComputedValues[i++] = (byte) variable.getAutomaticValue();
+				}
 				node = AdvancedNodeCreator.createCNF(featureModel);
 				calcThread = new GraphCalcThread(featureGraph.getFeatureArray(), ConfigurationChanger.this, node);
 				initialized = true;
@@ -146,122 +148,162 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 		@Override
 		public List<String> execute(WorkMonitor monitor) {
 			final byte[] featureToCompute = new byte[variableConfiguration.size()];
+			boolean undefined = false;
+			final List<Literal> knownLiterals = new ArrayList<>();
 			for (int index = 0; index < lastComputedValues.length; index++) {
+
 				final int oldValue = lastComputedValues[index];
 				final int newValue = variableConfiguration.getVariable(index).getValue();
+
 				if (newValue != oldValue) {
+
 					lastComputedValues[index] = (byte) newValue;
+					featureToCompute[index] = Variable.UNDEFINED;
+
+					if (newValue == Variable.UNDEFINED) {
+						undefined = true;
+					} else {
+						knownLiterals.add(new Literal(featureGraph.getFeatureArray()[index], newValue == Variable.TRUE));
+					}
 
 					for (int i = 0; i < featureGraph.getSize(); i++) {
 						if (i != index) {
-							final int curValue = variableConfiguration.getVariable(i).getAutomaticValue();
 							if (newValue != Variable.UNDEFINED) {
-								if (curValue == Variable.UNDEFINED) {
-									final byte edgeValue = featureGraph.getValue(index, i, newValue == Variable.TRUE);
-									switch (edgeValue) {
-									case AFeatureGraph.VALUE_0:
-										setNewValue(i, Variable.FALSE, false);
-										featureToCompute[i] = 0;
-										break;
-									case AFeatureGraph.VALUE_1:
-										setNewValue(i, Variable.TRUE, false);
-										featureToCompute[i] = 0;
-										break;
-									case AFeatureGraph.VALUE_0Q:
-										featureToCompute[i] = 1;
-										break;
-									case AFeatureGraph.VALUE_1Q:
-										featureToCompute[i] = 2;
-										break;
-									case AFeatureGraph.VALUE_10Q:
+								final byte edgeValue = featureGraph.getValue(index, i, newValue == Variable.TRUE);
+								switch (edgeValue) {
+								case AFeatureGraph.VALUE_0:
+									featureToCompute[i] = -Variable.FALSE;
+									break;
+								case AFeatureGraph.VALUE_1:
+									featureToCompute[i] = -Variable.TRUE;
+									break;
+								case AFeatureGraph.VALUE_0Q:
+									featureToCompute[i] = Variable.FALSE;
+									break;
+								case AFeatureGraph.VALUE_1Q:
+									featureToCompute[i] = Variable.TRUE;
+									break;
+								case AFeatureGraph.VALUE_10Q:
+									featureToCompute[i] = 3;
+									break;
+								case AFeatureGraph.VALUE_NONE:
+									if (oldValue != Variable.UNDEFINED
+											&& featureGraph.getValue(index, i, oldValue == Variable.TRUE) != AFeatureGraph.VALUE_NONE) {
 										featureToCompute[i] = 3;
-										break;
-									case AFeatureGraph.VALUE_NONE:
-										if (oldValue != Variable.UNDEFINED
-												&& featureGraph.getValue(index, i, oldValue == Variable.TRUE) != AFeatureGraph.VALUE_NONE) {
-											featureToCompute[i] = 3;
-										}
-										break;
-									default:
-										continue;
 									}
+									break;
+								default:
+									continue;
 								}
 							} else {
-								if (curValue != Variable.UNDEFINED) {
-									if (featureGraph.getValue(index, i, oldValue == Variable.TRUE) != AFeatureGraph.VALUE_NONE) {
-										featureToCompute[i] = 3;
-									}
+								if (featureGraph.getValue(index, i, oldValue == Variable.TRUE) != AFeatureGraph.VALUE_NONE) {
+									featureToCompute[i] = 3;
 								}
 							}
 						}
 					}
 				}
 			}
+
+			for (int index = 0; index < lastComputedValues.length; index++) {
+				final byte b = featureToCompute[index];
+				if (b < 0) {
+					setNewValue(index, -b, false);
+				}
+			}
+
 			final List<CalcObject> compList = new ArrayList<>();
 
 			// TODO Recursion for found values
 			for (int i = 0; i < featureToCompute.length; i++) {
 				final byte computeFeature = featureToCompute[i];
-				if (computeFeature > 0) {
+				if (computeFeature > Variable.UNDEFINED) {
 					final ValueType valueType;
 					switch (computeFeature) {
-					case 1:
+					case Variable.FALSE:
 						valueType = ValueType.FALSE;
 						break;
-					case 2:
+					case Variable.TRUE:
 						valueType = ValueType.TRUE;
 						break;
 					default:
 						valueType = ValueType.ALL;
 						break;
 					}
-					final LinkedList<Expression> varExpList = featureGraph.getExpListAr().get(i);
-					if (varExpList == null || varExpList.isEmpty()) {
-						compList.add(new CalcObject(i, valueType));
-						continue;
-					}
 
-					final int oldManualValue = variableConfiguration.getVariable(i).getManualValue();
-					int newAutomaticValue = Variable.UNDEFINED;
+					final Variable variable = variableConfiguration.getVariable(i);
 
-					for (Expression expression : varExpList) {
-						if (oldManualValue != Variable.TRUE && testExpression(expression, i, Variable.TRUE)) {
-							newAutomaticValue = Variable.FALSE;
-							break;
+					if (undefined) {
+						if (variable.getAutomaticValue() != Variable.UNDEFINED) {
+							compList.add(new CalcObject(i, valueType));
 						}
-						if (oldManualValue != Variable.FALSE && testExpression(expression, i, Variable.FALSE)) {
-							newAutomaticValue = Variable.TRUE;
-							break;
-						}
-					}
-
-					variableConfiguration.setVariable(i, oldManualValue, true);
-					if (newAutomaticValue != Variable.UNDEFINED) {
-						setNewValue(i, newAutomaticValue, false);
-						featureToCompute[i] = 0;
 					} else {
-						compList.add(new CalcObject(i, valueType));
+						if (variable.getAutomaticValue() == Variable.UNDEFINED) {
+							compList.add(new CalcObject(i, valueType));
+						}
 					}
+
+					//					final LinkedList<Expression> varExpList = featureGraph.getExpListAr().get(i);
+					//					if (varExpList == null || varExpList.isEmpty()) {
+					//						compList.add(new CalcObject(i, valueType));
+					//						continue;
+					//					}
+					//
+					//					final int oldManualValue = variableConfiguration.getVariable(i).getManualValue();
+					//					int newAutomaticValue = Variable.UNDEFINED;
+					//
+					//					for (Expression expression : varExpList) {
+					//						if (oldManualValue != Variable.TRUE && testExpression(expression, i, Variable.TRUE)) {
+					//							newAutomaticValue = Variable.FALSE;
+					//							break;
+					//						}
+					//						if (oldManualValue != Variable.FALSE && testExpression(expression, i, Variable.FALSE)) {
+					//							newAutomaticValue = Variable.TRUE;
+					//							break;
+					//						}
+					//					}
+					//
+					//					variableConfiguration.setVariable(i, oldManualValue, true);
+					//					if (newAutomaticValue != Variable.UNDEFINED) {
+					//						featureToCompute[i] = (byte) -newAutomaticValue;
+					//						setNewValue(index, newAutomaticValue, false);
+					//					} else {
+					//						compList.add(new CalcObject(i, valueType));
+					//					}
 				}
 			}
 
 			if (!compList.isEmpty()) {
-				final List<Literal> knownLiterals = new ArrayList<>();
-
 				int i = 0;
-				for (Variable var : variableConfiguration) {
-					// TODO only if undefined
-					switch (var.getManualValue()) {
-					case Variable.TRUE:
-						knownLiterals.add(new Literal(featureGraph.getFeatureArray()[i], true));
-						break;
-					case Variable.FALSE:
-						knownLiterals.add(new Literal(featureGraph.getFeatureArray()[i], false));
-						break;
-					default:
-						break;
+				if (undefined) {
+					knownLiterals.clear();
+					for (Variable var : variableConfiguration) {
+						switch (var.getManualValue()) {
+						case Variable.TRUE:
+							knownLiterals.add(new Literal(featureGraph.getFeatureArray()[i], true));
+							break;
+						case Variable.FALSE:
+							knownLiterals.add(new Literal(featureGraph.getFeatureArray()[i], false));
+							break;
+						default:
+							break;
+						}
+						i++;
 					}
-					i++;
+				} else {
+					for (Variable var : variableConfiguration) {
+						switch (var.getAutomaticValue()) {
+						case Variable.TRUE:
+							knownLiterals.add(new Literal(featureGraph.getFeatureArray()[i], true));
+							break;
+						case Variable.FALSE:
+							knownLiterals.add(new Literal(featureGraph.getFeatureArray()[i], false));
+							break;
+						default:
+							break;
+						}
+						i++;
+					}
 				}
 
 				calcThread.setKnownLiterals(knownLiterals);
@@ -362,27 +404,12 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 		return satSolver1.isSatisfiable(literals);
 	}
 
-	private boolean testExpression(Expression expression, int index, int value) {
-		variableConfiguration.setVariable(index, value, true);
-		expression.updateValue();
-		return (expression.getValue() == Variable.FALSE);
-	}
-
 	public void setNewValue(int index, int value, boolean manual) {
-		if (!manual) {
-			lastComputedValues[index] = (byte) value;
-		}
-
-		//		addChangedFeature(featureGraph.featureArray[index] + ": " + (value == Variable.UNDEFINED ? "UNDEFINED" : (value == Variable.TRUE)));		
-		if (value != Variable.UNDEFINED && variableConfiguration.getVariable(index).getValue() == Variable.UNDEFINED) {
-			addChangedFeature(featureGraph.getFeatureArray()[index] + ": " + (value == Variable.TRUE));
-		}
-
 		variableConfiguration.setVariable(index, value, manual);
-	}
 
-	private synchronized void addChangedFeature(String featureString) {
-		changedFeatures.add(featureString);
+		if (!manual) {
+			lastComputedValues[index] = (byte) variableConfiguration.getVariable(index).getValue();
+		}
 	}
 
 	public IFeatureGraph getFeatureGraph() {

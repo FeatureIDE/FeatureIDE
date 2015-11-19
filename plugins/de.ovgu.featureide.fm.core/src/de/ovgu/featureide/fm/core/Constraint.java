@@ -201,22 +201,6 @@ public class Constraint implements PropertyConstants, IGraphicItem {
 	}
 
 	@Override
-	public int hashCode() {
-		return propNode.hashCode();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (!(obj instanceof Constraint))
-			return false;
-
-		Constraint other = (Constraint) obj;
-		return propNode.equals(other.propNode);
-	}
-
-	@Override
 	public String toString() {
 		return propNode.toString(NodeWriter.textualSymbols);
 	}
@@ -252,7 +236,7 @@ public class Constraint implements PropertyConstants, IGraphicItem {
 	public Collection<Feature> getDeadFeatures() {
 		return deadFeatures;
 	}
-	
+
 	@Override
 	public GraphicItem getItemType() {
 		return GraphicItem.Constraint;

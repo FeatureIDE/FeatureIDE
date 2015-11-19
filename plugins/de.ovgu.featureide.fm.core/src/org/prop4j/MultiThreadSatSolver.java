@@ -206,18 +206,32 @@ public class MultiThreadSatSolver {
 			final int x = model[varIndex];
 			if (x != 0) {
 				final Solver solver = solvers[solverIndex];
+
+				final int containsAt = solver.backbone.containsAt(x);
+				final boolean isContained = containsAt >= 0;
+				if (isContained) {
+					solver.backbone.set(containsAt, 0);
+				}
+
 				solver.backbone.push(-x);
 				try {
 					if (solver.isSatisfiable()) {
 						solver.backbone.pop();
 						updateModel(solver.solver.model(), varIndex);
 					} else {
-						solver.backbone.pop().push(x);
+						solver.backbone.pop();
+						if (!isContained) {
+							solver.backbone.push(x);
+						}
 						return (byte) Math.signum(x);
 					}
 				} catch (TimeoutException e) {
 					FMCorePlugin.getDefault().logError(e);
 					solver.backbone.pop();
+				} finally {
+					if (isContained) {
+						solver.backbone.set(containsAt, x);
+					}
 				}
 			}
 		}

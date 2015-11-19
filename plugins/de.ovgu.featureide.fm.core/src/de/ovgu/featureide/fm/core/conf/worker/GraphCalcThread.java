@@ -55,6 +55,12 @@ public class GraphCalcThread extends AWorkerThread<GraphCalcThread.CalcObject> {
 			this.id = id;
 			this.valueTye = valueTye;
 		}
+
+		@Override
+		public String toString() {
+			return Integer.toString(id);
+		}
+
 	}
 
 	private static class SharedObjects {
