@@ -46,7 +46,7 @@ public abstract class AFeatureModelElement implements IFeatureModelElement, Prop
 	protected AFeatureModelElement(AFeatureModelElement oldElement, IFeatureModel featureModel) {
 		this.featureModel = featureModel != null ? featureModel : oldElement.featureModel;
 		this.id = oldElement.id;
-		name = new String(oldElement.name);
+		name = (oldElement.name == null) ? null : new String(oldElement.name);
 	}
 
 	public AFeatureModelElement(IFeatureModel featureModel) {
