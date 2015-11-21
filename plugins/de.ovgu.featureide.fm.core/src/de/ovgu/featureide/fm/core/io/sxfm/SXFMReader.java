@@ -65,6 +65,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
 import de.ovgu.featureide.fm.core.base.impl.Feature;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
@@ -208,7 +209,8 @@ public class SXFMReader extends AbstractFeatureModelReader {
      */
     private void buildFeatureTree(BufferedReader reader) throws UnsupportedModelException {
     	try {
-    		FeatureIndent lastFeat = new FeatureIndent(null, -1);
+    		IFeatureModel model = FeatureModelFactory.getInstance().createFeatureModel();
+    		FeatureIndent lastFeat = new FeatureIndent(model, -1);
     		// List of Features with arbitrary cardinalities
     		LinkedList<FeatCardinality> arbCardGroupFeats = new LinkedList<FeatCardinality>();
     		String lineText = reader.readLine();
