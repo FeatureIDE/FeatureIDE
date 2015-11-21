@@ -28,6 +28,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureProperty;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.IGraphicalFeature;
+import de.ovgu.featureide.fm.core.base.IPropertyContainer;
 
 /**
  * Partial implementation of the {@link IFeature} interface.
@@ -39,6 +40,7 @@ public abstract class AFeature extends AFeatureModelElement implements IFeature 
 
 	protected final IFeatureProperty property;
 	protected final IFeatureStructure structure;
+	protected final IPropertyContainer propertyContainer;
 
 	protected String name;
 
@@ -51,6 +53,8 @@ public abstract class AFeature extends AFeatureModelElement implements IFeature 
 		graphicalRepresentation = oldFeature.graphicalRepresentation;
 		property = oldFeature.property.clone(this);
 		structure = newFeatrureStructure != null ? newFeatrureStructure : oldFeature.structure;
+		propertyContainer = createPropertyContainer();
+		propertyContainer.setEntrySet(oldFeature.getCustomProperties().entrySet());
 	}
 
 	public AFeature(IFeatureModel featureModel, String name) {
@@ -60,6 +64,11 @@ public abstract class AFeature extends AFeatureModelElement implements IFeature 
 		graphicalRepresentation = createGraphicalRepresentation();
 		property = createProperty();
 		structure = createStructure();
+		propertyContainer = createPropertyContainer();
+	}
+
+	protected IPropertyContainer createPropertyContainer() {
+		return new MapPropertyContainer();
 	}
 
 	protected IGraphicalFeature createGraphicalRepresentation() {
@@ -99,6 +108,11 @@ public abstract class AFeature extends AFeatureModelElement implements IFeature 
 		this.name = name;
 		final CharSequence oldName = this.name;
 		fireEvent(new PropertyChangeEvent(this, NAME_CHANGED, oldName, name));
+	}	
+
+	@Override
+	public IPropertyContainer getCustomProperties() {
+		return propertyContainer;
 	}
 
 	@Override

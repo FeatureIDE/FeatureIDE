@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.base;
 
-import java.util.Collection;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
@@ -47,84 +46,98 @@ public interface IPropertyContainer {
 			super("The container \"\" does not contain a property with the given key:" + key);
 		}
 	}
+	
+	public static class Entry<K,T,V> {
+		
+		@Override
+		public String toString() {
+			return "Entry [key=" + key + ", type=" + type + ", value=" + value + "]";
+		}
 
-	/**
-	 * Defines the behavior for {@link IPropertyContainer#setProperty(String, Class, Object, KeyConflictPolicy,ValueProtection)} when a key-name conflict
-	 * occurs.
-	 * Either the value associated with a given key <i>k</i> is updated or changes are be discarded. Alternatively, an exception can be thrown indicating a
-	 * conflict.
-	 * An exception will be thrown in any case, if the value to be overwritten behind <i>k</i> is protected and <code>FORCE_OVERWRITE_OLD_VALUE</code> is not
-	 * used.
-	 * <br/>
-	 * <br/>
-	 * Whenever an exception will be automatically thrown by using <code>OVERWRITE_OLD_VALUE</code> instead of <code>FORCE_OVERWRITE_OLD_VALUE</code> depends on
-	 * the value {@link IPropertyContainer.ValueProtection} attribute assigned the the value to be overwritten that was specified at it's creation during
-	 * {@link IPropertyContainer#setProperty(String, Class, Object, KeyConflictPolicy,ValueProtection)} call.
-	 * 
-	 * @see ValueProtection
-	 * @see IPropertyContainer#setProperty(String, Class, Object, KeyConflictPolicy,ValueProtection)
-	 * 
-	 * @author Marcus Pinnecke
-	 * @since 3.0
-	 */
-	public static enum KeyConflictPolicy {
-		OVERWRITE_OLD_VALUE, FORCE_OVERWRITE_OLD_VALUE, KEEP_OLD_VALUE, THROW_EXCEPTION
-	}
+		K key;
+		T type;
+		V value;
+		
+		public Entry(K key, T type, V value) {
+			this.key = key;
+			this.type = type;
+			this.value = value;
+		}
+		
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ((key == null) ? 0 : key.hashCode());
+			return result;
+		}
 
-	/**
-	 * Defines the value protection level for conflicting writes if
-	 * {@link IPropertyContainer#setProperty(String, Class, Object, KeyConflictPolicy,ValueProtection)} is called on the related key.
-	 * Storing a values behind a key can be either temporary (which will not be saved to disc) or persistent (which will be saved to disc as soon as possible).
-	 * Moreover, a property can be either with normal (overwritable) protection level or with read only protection level (which cannot be changed unless
-	 * <code>FORCE_OVERWRITE_OLD_VALUE</code> of {@link IPropertyContainer.KeyConflictPolicy} is used).
-	 * <br/>
-	 * <br/>
-	 * The protection level is per-object key centric. This means, the protection level of a value <i>v</i> behind a key <i>k</i> of a object <i>f</i> does
-	 * not influence the protection level of another but identical value <i>v'</i> behind another key <i>k'</i> of any other object <i>f'</i> (including
-	 * <i>f</i>)
-	 * 
-	 * @see KeyConflictPolicy
-	 * @see IPropertyContainer#setProperty(String, Class, Object, KeyConflictPolicy,ValueProtection)
-	 * 
-	 * @author Marcus Pinnecke
-	 * @since 3.0
-	 */
-	public static enum ValueProtection {
-		NORMAL_TEMPORARY, READ_ONLY_TEMPORARY, NORMAL_PERSISTENT, READ_ONLY_PERSISTENT
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			@SuppressWarnings("unchecked")
+			Entry<K,T,V> other = (Entry<K,T,V>) obj;
+			if (key == null) {
+				if (other.key != null)
+					return false;
+			} else if (!key.equals(other.key))
+				return false;
+			return true;
+		}
+
+		public K getKey() {
+			return key;
+		}
+		
+		public T getType() {
+			return type;
+		}
+		
+		public V getValue() {
+			return value;
+		}
 	}
+	
+	enum Type {BYTE, SHORT, INT, LONG, FLOAT, DOUBLE, BOOLEAN, CHAR, STRING}
 
 	/**
 	 * Reads a per-object user-defined property identified by a custom <code>key</code>, and returns the stored value if a value was assigned by calling
-	 * {@link IPropertyContainer#setProperty(String, Class, Object)} earlier. Properties are stored persistently if {@link ValueProtection#NORMAL_PERSISTENT} or
+	 * {@link IPropertyContainer#set(String, Class, Object)} earlier. Properties are stored persistently if {@link ValueProtection#NORMAL_PERSISTENT} or
 	 * {@link ValueProtection#READ_ONLY_PERSISTENT} was used when calling
 	 * {@link IPropertyContainer#setProperty(String, Class, Object, KeyConflictPolicy, ValueProtection)} or temporarily. The latest (maybe volatile) state will
-	 * be taken into account, depending on the call of {@link IPropertyContainer#removeProperty(String)}. If no value was assigned (the
+	 * be taken into account, depending on the call of {@link IPropertyContainer#remove(String)}. If no value was assigned (the
 	 * <code>key is unknown</code>), the
 	 * <code>defaultValue</code> will be returned.
 	 * 
 	 * @author Marcus Pinnecke
 	 * @since 3.0
 	 * 
-	 * @see IPropertyContainer#getProperty(String, Class)
-	 * @see IPropertyContainer#hasProperty(String)
-	 * @see IPropertyContainer#removeProperty(String)
+	 * @see IPropertyContainer#get(String, Class)
+	 * @see IPropertyContainer#has(String)
+	 * @see IPropertyContainer#remove(String)
 	 * 
 	 * @param key property name (case insensitive)
-	 * @param type type of returning value
 	 * @param defaultValue value to return if no property is set
 	 * @return value associated with <code>key</code> if set, <code>defaultValue</code> otherwise
 	 */
-	<T> T getProperty(final String key, final Class<T> type, final T defaultValue);
+	<T> T get(final String key, final T defaultValue);
+	
+	Type getDataType(final String key) throws NoSuchPropertyException;
 
 	/**
 	 * Reads a per-object user-defined property identified by a custom <code>key</code>, and returns the stored value if a value was assigned by calling
-	 * {@link IPropertyContainer#setProperty(String, Class, Object)} earlier. Properties are stored persistently such that an assignment will be alive as long
-	 * as it was not removed by calling {@link IPropertyContainer#removeProperty(String)}. If no value was assigned (the <code>key is unknown</code>), a
+	 * {@link IPropertyContainer#set(String, Class, Object)} earlier. Properties are stored persistently such that an assignment will be alive as long
+	 * as it was not removed by calling {@link IPropertyContainer#remove(String)}. If no value was assigned (the <code>key is unknown</code>), a
 	 * <code>NoSuchPropertyException</code> will be thrown.
 	 * 
 	 * @see IPropertyContainer#getProperty(String, Class, Object)
-	 * @see IPropertyContainer#hasProperty(String)
-	 * @see IPropertyContainer#removeProperty(String)
+	 * @see IPropertyContainer#has(String)
+	 * @see IPropertyContainer#remove(String)
 	 * 
 	 * @author Marcus Pinnecke
 	 * @since 3.0
@@ -134,12 +147,12 @@ public interface IPropertyContainer {
 	 * @param defaultValue value to return if no property is set
 	 * @return value associated with <code>key</code> if set. If <code>key</code> is not known, throws <code>NoSuchPropertyException</code>.
 	 */
-	<T> T getProperty(final String key, final Class<T> type) throws NoSuchPropertyException;
+	<T> T get(final String key) throws NoSuchPropertyException;
 
 	/**
 	 * Checks if this object contains a property associated with the given <code>key</code>. Returns <code>true</code> if at some point earlier
-	 * {@link IPropertyContainer#setProperty(String, Class, Object)} was called with the corresponding <code>key</code>. Properties are stored persistently such
-	 * that an assignment will be alive as long as it was not removed by calling {@link IPropertyContainer#removeProperty(String)}, and, hence, <code>key</code>
+	 * {@link IPropertyContainer#set(String, Class, Object)} was called with the corresponding <code>key</code>. Properties are stored persistently such
+	 * that an assignment will be alive as long as it was not removed by calling {@link IPropertyContainer#remove(String)}, and, hence, <code>key</code>
 	 * will be alive. If no property is associated to <code>key</code> the method will return <code>false</code>.
 	 * 
 	 * @author Marcus Pinnecke
@@ -148,34 +161,8 @@ public interface IPropertyContainer {
 	 * @param key property name (case insensitive)
 	 * @return <b>true</b> if the object contains a property associated to <code>key</code>, <b>false</b> otherwise.
 	 */
-	boolean hasProperty(final String key);
+	boolean has(final String key);
 
-	/**
-	 * Checks if the property associated with <code>key</code> has the value protection level <code>attribute</code>.
-	 * 
-	 * @author Marcus Pinnecke
-	 * @since 3.0
-	 * 
-	 * @param key property name (case insensitive)
-	 * @param attribute protection level
-	 * @return <b>true</b> when matching <code>attribute</code>, <b>false</b> otherwise
-	 * @throws NoSuchPropertyException when this object does not contain a property with name <code>key</code>
-	 */
-	boolean hasPropertyAttribute(final String key, final ValueProtection attribute) throws NoSuchPropertyException;
-
-	/**
-	 * Returns the value protection level for the property associated with <code>key</code> or throws <code>NoSuchPropertyException</code>
-	 * when <code>key</code> is unknown.
-	 * 
-	 * @author Marcus Pinnecke
-	 * @since 3.0
-	 * 
-	 * @param key property name (case insensitive)
-	 * @return protection level
-	 * @throws NoSuchPropertyException when <code>key</code> is not assigned to any property for this object
-	 */
-	ValueProtection getPropertyAttribute(final String key) throws NoSuchPropertyException;
-	
 	/**
 	 * Returns a distinct collection of each assigned key for this object in (possible empty) set. Since keys are case-insensitive
 	 * it depends on the implementation if the user-defined strings once passed as keys are changed in some way, e.g., by
@@ -183,43 +170,45 @@ public interface IPropertyContainer {
 	 * 
 	 * @return all keys of properties assigned to this object
 	 */
-	Set<String> getPropertyKeySet();
+	Set<String> keySet();
+	
+	Set<Entry<String,Type,Object>> entrySet();
+	
+	/**
+	 * Removes the content of this container and stores the entries <code>entries</code> into this one. The entries are copied,
+	 * such that <code>entries != this.getPropertyEntries()</code> afterwards, which also holds for any entry inside <code>entries</code>.
+	 * @param entries Entries to import
+	 */
+	void setEntrySet(final Set<Entry<String,Type,Object>> entries);
+	
 
 	/**
 	 * Removes a per-object user-defined property identified by a custom <code>key</code> and value assigned by calling
-	 * {@link IPropertyContainer#setProperty(String, Class, Object)} earlier. Properties are stored persistently such
+	 * {@link IPropertyContainer#set(String, Class, Object)} earlier. Properties are stored persistently such
 	 * that an assignment will be alive as long as it this method does not remove the property. If this object does not contain any
 	 * property associated to <code>key</code>, a <code>NoSuchPropertyException</code> will be thrown.
 	 * 
 	 * @author Marcus Pinnecke
 	 * @since 3.0
 	 * 
-	 * @see IPropertyContainer#hasProperty(String)
+	 * @see IPropertyContainer#has(String)
 	 * @see IPropertyContainer#setProperty(String)
 	 * 
 	 * @param key property name (case insensitive)
 	 * @throws NoSuchPropertyException
 	 */
-	void removeProperty(final String key) throws NoSuchPropertyException;
+	void remove(final String key) throws NoSuchPropertyException;
 
 	/**
 	 * Sets a per-object user-defined property consisting of a <code>values</code> associated with a user-defined <code>key</code>. If <code>key</code> is
-	 * already set, the behavior of this method depends on the <code>KeyConflictPolicy</code>. If it is possible to store the value, the
-	 * <code>ValueProtection</code>
-	 * attribute controls how other calls of {@link IPropertyContainer#setProperty(String, Class, Object, KeyConflictPolicy, ValueProtection)} will behave when
-	 * a conflicting write on the same <code>key</code> is performed. In general, a property can be protected from changes using
-	 * {@link IPropertyContainer.ValueProtection#READ_ONLY_PERSISTENT} or {@link IPropertyContainer.ValueProtection#READ_ONLY_TEMPORARY} which only can be
-	 * ignored
-	 * by the next call of {@link IPropertyContainer#setProperty(String, Class, Object, KeyConflictPolicy, ValueProtection)} with
-	 * {@link IPropertyContainer.KeyConflictPolicy#FORCE_OVERWRITE_OLD_VALUE} permission.
+	 * already set, the behavior of this method depends on the <code>KeyConflictPolicy</code>. 
 	 * <br/>
 	 * <br/>
 	 * Properties are stored persistently such that an assignment will be alive as long as it was not removed by calling
-	 * {@link IPropertyContainer#removeProperty(String)}, or
-	 * temporarily such that their state fall back to the last persistent state.
+	 * {@link IPropertyContainer#remove(String)}.
 	 * <br/>
 	 * <br/>
-	 * To receive the value behind a <code>key</code>, call {@link IPropertyContainer#getProperty(String, Class)}.
+	 * To receive the value behind a <code>key</code>, call {@link IPropertyContainer#get(String, Class)}.
 	 * 
 	 * @author Marcus Pinnecke
 	 * @since 3.0
@@ -227,10 +216,7 @@ public interface IPropertyContainer {
 	 * @param key property name (case insensitive)
 	 * @param type type of value to be stored
 	 * @param value value to be stored
-	 * @param keyConflictPolicy controls the behavior of this method for conflicting key writes
-	 * @param valueProtectionAttribute controls the protection level for conflicting key writes of other methods
 	 */
-	<T> void setProperty(final String key, final Class<T> type, final T value, final KeyConflictPolicy keyConflictPolicy,
-			final ValueProtection valueProtectionAttribute);
+	<T> void set(final String key, final Type type, final T value);
 
 }

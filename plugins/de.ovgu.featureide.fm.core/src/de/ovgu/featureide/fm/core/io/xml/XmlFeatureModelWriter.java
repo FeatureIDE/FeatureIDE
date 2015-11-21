@@ -35,6 +35,7 @@ import java.io.StringWriter;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -57,12 +58,18 @@ import org.prop4j.Not;
 import org.prop4j.Or;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IPropertyContainer;
+import de.ovgu.featureide.fm.core.base.IPropertyContainer.Entry;
+import de.ovgu.featureide.fm.core.base.IPropertyContainer.Type;
+import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
 
 /**
@@ -91,6 +98,7 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter implements
     protected void createXmlDoc(Document doc) {
         Element root = doc.createElement(FEATURE_MODEL);
     	Element struct = doc.createElement(STRUCT);
+    	Element properties = doc.createElement(PROPERTIES);
     	Element constraints = doc.createElement(CONSTRAINTS);
     	Element calculations = doc.createElement(CALCULATIONS);
     	Element comments = doc.createElement(COMMENTS);
@@ -105,6 +113,9 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter implements
     	}
     	
     	doc.appendChild(root);
+    	root.appendChild(properties);
+    	createXmlPropertiesPart(doc, properties, featureModel);
+    	
     	root.appendChild(struct);
     	createXmlDocRec(doc, struct, featureModel.getStructure().getRoot().getFeature());
     	
@@ -154,7 +165,40 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter implements
     	}
     }
    
-    /**
+    private void createXmlPropertiesPart(Document doc, Element propertiesNode, IFeatureModel featureModel) {
+		
+    	if (featureModel == null || propertiesNode == null) throw new RuntimeException();
+    	
+    	// Store per-feature properties
+    	for(final IFeature feature : featureModel.getFeatures()) {
+    		final String featureName = feature.getName();
+    		final Set<Entry<String, Type, Object>> propertyEntries = feature.getCustomProperties().entrySet();
+    		if (!propertyEntries.isEmpty())
+    			propertiesNode.appendChild(createFeaturePropertyContainerNode(doc, featureName, propertyEntries));
+    	}
+    	
+    	// TODO: Add here other property container, e.g., feature model
+    	// ...
+	}
+
+	private Node createFeaturePropertyContainerNode(Document doc, String featureName, Set<Entry<String, Type, Object>> propertyEntries) {
+		final Element result = doc.createElement(FEATURE);
+		result.setAttribute(NAME, featureName);
+		for (final Entry<String, Type, Object> entry : propertyEntries) {
+			result.appendChild(createPropertyEntriesNode(doc, entry));
+		}
+		return result;
+	}
+
+	private Node createPropertyEntriesNode(Document doc, Entry<String, Type, Object> entry) {
+		final Element propertyElement = doc.createElement(XmlPropertyLoader.PROPERTY);
+		propertyElement.setAttribute(XmlPropertyLoader.KEY, entry.getKey());
+		propertyElement.setAttribute(XmlPropertyLoader.VALUE, entry.getValue().toString());
+		propertyElement.setAttribute(XmlPropertyLoader.TYPE, entry.getType().toString());
+		return propertyElement;
+	}
+
+	/**
      * Creates document based on feature model step by step
      * @param doc document to write
      * @param node parent node
