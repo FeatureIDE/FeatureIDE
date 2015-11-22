@@ -74,8 +74,6 @@ public class XmlPropertyLoader {
 				final String featureName = featureNode.getAttribute(NAME);
 				final Set<IPropertyContainer.Entry<String, IPropertyContainer.Type, Object>> propertyEntries = parsePropertyEntries(featureNode);
 				featureProperties.put(featureName, propertyEntries);
-				for(Entry<String, IPropertyContainer.Type, Object> e : propertyEntries)
-					System.out.println(featureName + ": " + e.getKey() + "=" + e.getValue() + " (" + e.getType() + ")");
 			}
 			
 		}
