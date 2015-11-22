@@ -719,7 +719,7 @@ public class StringTable {
 	public static final String LOC_BY_FEATURE = "LOC by feature";
 	public static final String PROJECT_BASED__ = "Project based - ";
 	public static final String CALCULATE = "Calculate ";
-	public static final String REFRESH_STATISTICS_VIEW = "Refresh statistics view";
+	public static final String REFRESH_STATISTICS_VIEW = "Refreshing statistics view";
 	public static final String CHOOSE_WISELY = "choose wisely";
 	public static final String EXPORT_STATISTICS_INTO_CSV = "Export statistics into CSV file";
 	public static final String SHOW_ERRORDIALOG = "show errordialog";
