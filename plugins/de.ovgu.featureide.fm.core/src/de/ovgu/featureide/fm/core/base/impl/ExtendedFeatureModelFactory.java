@@ -29,7 +29,6 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 
 /**
- * 
  * @author Sebastian Krieter
  */
 public class ExtendedFeatureModelFactory implements IFeatureModelFactory {

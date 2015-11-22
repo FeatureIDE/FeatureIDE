@@ -35,6 +35,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureCreateLay
  * Creates a new feature as a child of the currently selected feature.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class CreateLayerAction extends SingleSelectionAction {
 

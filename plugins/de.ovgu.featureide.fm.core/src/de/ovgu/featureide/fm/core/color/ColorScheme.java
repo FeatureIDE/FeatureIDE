@@ -29,6 +29,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
  * Saves colors for features.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class ColorScheme {
 	

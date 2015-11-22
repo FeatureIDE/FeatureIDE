@@ -35,6 +35,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
  * Switches auto-layout function for the feature model legend.
  * 
  * @author Fabian Benduhn
+ * @author Marcus Pinnecke
  */
 public class LegendLayoutAction extends Action {
 

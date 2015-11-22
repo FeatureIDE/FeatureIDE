@@ -26,6 +26,7 @@ import java.util.List;
  * A variable or negated variable.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class Literal extends Node implements Cloneable {
 	

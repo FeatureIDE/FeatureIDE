@@ -35,6 +35,7 @@ import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
  * 
  * @author Jan Wedding
  * @author Melanie Pflaume
+ * @author Marcus Pinnecke
  */
 /*
  * TODO #404 fix bug: tree minimizes after selecting the editor page

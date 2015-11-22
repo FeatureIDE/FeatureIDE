@@ -49,6 +49,7 @@ import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
  * 
  * @author Tom Brosch
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class ExtensibleFeatureProjectBuilder extends IncrementalProjectBuilder {
 

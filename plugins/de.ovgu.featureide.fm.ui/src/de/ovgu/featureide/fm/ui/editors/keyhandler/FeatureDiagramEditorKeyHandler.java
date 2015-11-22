@@ -51,6 +51,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
  * 
  * @author Guenter Ulreich
  * @author Andy Koch
+ * @author Marcus Pinnecke
  */
 public class FeatureDiagramEditorKeyHandler extends KeyHandler implements PropertyChangeListener {
 

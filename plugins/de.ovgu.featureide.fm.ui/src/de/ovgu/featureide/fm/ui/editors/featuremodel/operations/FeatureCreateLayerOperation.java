@@ -47,6 +47,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayou
  * undo/redo functionality.
  * 
  * @author Fabian Benduhn
+ * @author Marcus Pinnecke
  */
 public class FeatureCreateLayerOperation extends AbstractFeatureModelOperation {
 

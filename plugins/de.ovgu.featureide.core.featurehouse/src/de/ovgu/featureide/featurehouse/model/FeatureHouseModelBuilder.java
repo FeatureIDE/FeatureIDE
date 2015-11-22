@@ -51,6 +51,7 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
  * parsing the FeatureHouse internal FSTModel.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class FeatureHouseModelBuilder implements FHNodeTypes {
 

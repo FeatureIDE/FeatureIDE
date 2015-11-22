@@ -35,6 +35,7 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  * Operation to delete a feature from the model.
  * 
  * @author Fabian Benduhn
+ * @author Marcus Pinnecke
  */
 public class FeatureDeleteOperation extends AbstractFeatureModelOperation {
 

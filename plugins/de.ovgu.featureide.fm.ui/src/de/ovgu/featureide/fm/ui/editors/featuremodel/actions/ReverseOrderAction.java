@@ -35,6 +35,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ModelReverseOrde
  * Changes the order of children for every feature.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke
  */
 public class ReverseOrderAction extends Action {
 

@@ -27,6 +27,7 @@ import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
  * Interface for all jobs.
  * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public interface IJob {
 	

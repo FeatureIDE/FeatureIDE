@@ -30,6 +30,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  * Parses a feature model from a given file or string.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public interface IFeatureModelReader {
 	

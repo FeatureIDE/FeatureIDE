@@ -1,5 +1,8 @@
 package de.ovgu.featureide.fm.core.localization;
 
+/**
+ * @author Marcus Pinnecke
+ */
 public class StringTable {
 	public static final String THE_REQUIRED_BUNDLE = "The required bundle ";
 	public static final String IS_NOT_INSTALLED_ = " is not installed.";

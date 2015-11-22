@@ -32,6 +32,7 @@ import de.ovgu.featureide.fm.ui.handlers.base.AbstractExportHandler;
  * 
  * @author Fabian Wielgorz
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke
  */
 public class ExportSXFMHandler extends AbstractExportHandler {
 

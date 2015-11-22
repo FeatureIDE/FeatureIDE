@@ -64,6 +64,7 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  * The color is chosen in the dialog.
  * 
  * @author Christian Elzholz, Marcus Schmelz
+ * @author Marcus Pinnecke
  */
 public class SetFeatureColorDialog extends Dialog {
 

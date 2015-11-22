@@ -41,6 +41,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
  * 
  * @author Cyrill Meyer
  * @author Eric Schubert
+ * @author Marcus Pinnecke
  */
 public class SelectionAction extends Action {
 

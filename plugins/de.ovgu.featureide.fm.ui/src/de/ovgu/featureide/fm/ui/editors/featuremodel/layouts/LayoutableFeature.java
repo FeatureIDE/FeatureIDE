@@ -33,6 +33,7 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  * A feature representation for layout.
  * 
  * @author Patrick Sulkowski
+ * @author Marcus Pinnecke
  */
 public class LayoutableFeature {
 

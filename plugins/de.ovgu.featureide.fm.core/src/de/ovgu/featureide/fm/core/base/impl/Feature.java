@@ -32,7 +32,7 @@ import de.ovgu.featureide.fm.core.base.IPropertyContainer;
  * 
  * @author Thomas Thuem
  * @author Sebastian Krieter
- * 
+ * @author Marcus Pinnecke 
  */
 public class Feature extends AFeature {
 

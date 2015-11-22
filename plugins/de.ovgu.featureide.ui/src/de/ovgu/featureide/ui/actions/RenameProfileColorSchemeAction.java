@@ -37,6 +37,7 @@ import de.ovgu.featureide.ui.wizards.RenameColorSchemeWizard;
  * 
  * @author Jonas Weigt
  * @author Christian Harnisch
+ * @author Marcus Pinnecke
  */
 public class RenameProfileColorSchemeAction extends Action {
 

@@ -45,6 +45,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
  * with the selected features in the feature diagram.
  * 
  * @author Christian Elzholz, Marcus Schmelz
+ * @author Marcus Pinnecke
  */
 public class SetFeatureColorAction extends Action {
 

@@ -61,6 +61,7 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * source decoration dependent on the mandatory property.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke
  */
 public class ConnectionEditPart extends AbstractConnectionEditPart implements GUIDefaults, PropertyConstants, PropertyChangeListener {
 

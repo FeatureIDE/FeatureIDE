@@ -41,6 +41,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AutoLayoutConstr
  * 
  * @author David Halm
  * @author Patrick Sulkowski
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class AutoLayoutConstraintAction extends Action {
 

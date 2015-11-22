@@ -27,9 +27,8 @@ import java.util.Map;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
- * TODO description
- * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class ModelFileIdMap {
 

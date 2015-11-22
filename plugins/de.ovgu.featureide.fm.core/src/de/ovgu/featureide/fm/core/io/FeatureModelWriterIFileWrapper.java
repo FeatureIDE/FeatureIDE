@@ -36,6 +36,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  * {@link AbstractFeatureModelWriter} are needed
  * 
  * @author S�nke Holthusen
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class FeatureModelWriterIFileWrapper extends AbstractFeatureModelWriter {
 

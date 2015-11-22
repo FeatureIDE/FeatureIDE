@@ -30,6 +30,7 @@ import de.ovgu.featureide.fm.core.base.IGraphicalConstraint;
  * Graphical representation of an {@link IConstraint} instance.
  * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke
  * 
  */
 public class GraphicalConstraint implements IGraphicalConstraint, PropertyConstants {

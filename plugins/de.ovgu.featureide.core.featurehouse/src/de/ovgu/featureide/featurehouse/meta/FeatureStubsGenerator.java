@@ -66,6 +66,7 @@ import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
  * Generates Feature Stubs
  * 
  * @author Stefan Krueger
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class FeatureStubsGenerator {
 

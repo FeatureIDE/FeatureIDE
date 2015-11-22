@@ -33,6 +33,7 @@ import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
  * functionality.
  * 
  * @author Fabian Benduhn
+ * @author Marcus Pinnecke
  */
 public class ConstraintMoveOperation extends AbstractFeatureModelOperation {
 

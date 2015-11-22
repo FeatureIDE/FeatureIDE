@@ -46,6 +46,7 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
  * A class to evaluate the performance of the comparison of feature models.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class Evaluation {
 	

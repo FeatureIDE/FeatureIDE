@@ -41,6 +41,7 @@ import de.ovgu.featureide.ui.UIPlugin;
  * Sorts Configurations by interactions they cover.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke
  */
 public class InteractionSorter extends AbstractConfigurationSorter {
 	

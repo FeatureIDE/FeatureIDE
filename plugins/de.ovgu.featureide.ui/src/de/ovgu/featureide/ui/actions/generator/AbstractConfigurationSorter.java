@@ -33,6 +33,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  * Default implementation, does nothing.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke
  */
 public class AbstractConfigurationSorter {
 	

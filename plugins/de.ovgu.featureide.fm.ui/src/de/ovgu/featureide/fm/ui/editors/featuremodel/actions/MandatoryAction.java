@@ -32,6 +32,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureSetMandat
  * Turns a feature in an And-group into a mandatory feature.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke
  */
 public class MandatoryAction extends SingleSelectionAction {
 

@@ -61,6 +61,7 @@ import de.ovgu.featureide.fm.core.configuration.ConfigurationWriter;
  * Abstract class for FeatureIDE composer extensions with default values.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke (Feature Interface)
  */
 @SuppressWarnings(RESTRICTION)
 public abstract class ComposerExtensionClass implements IComposerExtensionClass {

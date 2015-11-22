@@ -56,7 +56,7 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
  * the FeatureHouse composer in {@link VariantsToFeatureHouseSPLMigrator}.
  * 
  * @author Konstantin Tonscheidt
- * 
+ * @author Marcus Pinnecke
  */
 public class SPLMigrationUtils
 {

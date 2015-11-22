@@ -50,6 +50,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
  * 
  * @author Guenter Ulreich
  * @author Andy Koch
+ * @author Marcus Pinnecke
  */
 public class MoveAction extends Action {
 	public static final int stepwidth = 2;

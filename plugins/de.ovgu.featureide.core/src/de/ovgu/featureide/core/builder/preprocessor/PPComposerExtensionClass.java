@@ -62,6 +62,7 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  * 
  * @author Christoph Giesel
  * @author Marcus Kamieth
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 

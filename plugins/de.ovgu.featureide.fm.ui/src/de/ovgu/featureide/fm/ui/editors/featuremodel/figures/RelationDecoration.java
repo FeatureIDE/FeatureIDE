@@ -39,6 +39,7 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * A decoration for a feature connection that indicates its group type.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke
  */
 public class RelationDecoration extends Ellipse implements RotatableDecoration, GUIDefaults {
 

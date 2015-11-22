@@ -30,6 +30,7 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  * Defines the content of the feature model class specific for KeY.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class FeatureModelKeY implements IFeatureModelClass {
 

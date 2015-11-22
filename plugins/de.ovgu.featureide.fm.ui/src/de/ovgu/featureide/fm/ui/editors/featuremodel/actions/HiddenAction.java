@@ -30,6 +30,8 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureSetHidden
 
 /**
  * Action to mark a feature as hidden.
+ * 
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class HiddenAction extends SingleSelectionAction {
 

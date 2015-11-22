@@ -37,6 +37,7 @@ import de.ovgu.featureide.ui.wizards.NewColorSchemeWizard;
  * 
  * @author Jonas Weigt
  * @author Christian Harnisch
+ * @author Marcus Pinnecke
  */
 public class AddProfileColorSchemeAction extends Action {
 

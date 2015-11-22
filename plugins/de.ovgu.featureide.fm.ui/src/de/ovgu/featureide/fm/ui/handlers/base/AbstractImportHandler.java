@@ -57,6 +57,7 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  * 
  * @author Fabian Benduhn
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke
  */
 public abstract class AbstractImportHandler extends AFileHandler {
 	private IFeatureModelReader modelReader;

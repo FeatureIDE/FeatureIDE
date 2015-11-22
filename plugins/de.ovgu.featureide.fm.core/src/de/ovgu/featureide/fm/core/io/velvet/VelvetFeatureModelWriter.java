@@ -38,6 +38,7 @@ import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
  * Writes the feature model to a string in velvet syntax.
  * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class VelvetFeatureModelWriter extends AbstractFeatureModelWriter {
 

@@ -25,9 +25,8 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 
 /**
- * TODO description
- * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke
  */
 public class SourceChangeOperation extends AbstractFeatureModelOperation {
 

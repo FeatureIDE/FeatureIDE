@@ -35,6 +35,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
  * (cnf).
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public abstract class Node {
 

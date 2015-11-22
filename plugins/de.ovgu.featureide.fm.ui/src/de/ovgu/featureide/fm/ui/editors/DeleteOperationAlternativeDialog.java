@@ -74,6 +74,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureDeleteOpe
  * 
  * @author Florian Proksch
  * @author Stefan Krueger
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class DeleteOperationAlternativeDialog implements GUIDefaults {
 	Shell shell;

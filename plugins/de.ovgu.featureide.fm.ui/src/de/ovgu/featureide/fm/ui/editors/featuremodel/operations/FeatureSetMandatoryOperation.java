@@ -30,6 +30,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  * undo/redo functionality.
  * 
  * @author Fabian Benduhn
+ * @author Marcus Pinnecke
  */
 public class FeatureSetMandatoryOperation extends AbstractFeatureModelOperation {
 

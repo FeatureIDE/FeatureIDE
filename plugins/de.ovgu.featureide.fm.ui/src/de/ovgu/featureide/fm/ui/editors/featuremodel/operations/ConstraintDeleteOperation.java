@@ -29,6 +29,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayou
  * Operation to delete a constraint.
  * 
  * @author Fabian Benduhn
+ * @author Marcus Pinnecke
  */
 public class ConstraintDeleteOperation extends AbstractFeatureModelOperation {
 

@@ -32,6 +32,7 @@ import de.ovgu.featureide.fm.core.base.IGraphicalFeatureModel;
  * Graphical representation of an {@link IFeatureModel} instance.
  * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke 
  * 
  */
 public class GraphicalFeatureModel implements IGraphicalFeatureModel, PropertyConstants {

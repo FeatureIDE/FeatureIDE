@@ -34,6 +34,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  * If IFile support is needed, the {@link FeatureModelWriterIFileWrapper} has to be used.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public abstract class AbstractFeatureModelWriter implements IFeatureModelWriter {
 

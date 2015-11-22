@@ -49,6 +49,7 @@ import de.ovgu.featureide.fm.ui.properties.page.FMPropertyPage;
  * 
  * @see FMPropertyPage
  * @author Jens Meinicke
+ * @author Marcus Pinnecke
  */
 @CheckReturnValue
 public class FMPropertyManager extends FMPropertyManagerDefaults implements GUIDefaults {

@@ -32,10 +32,10 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
- * 
  * An action to activate/deactivate automated calculations on changes to the feature model.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke
  */
 public class AutomatedCalculationsAction extends Action {
 

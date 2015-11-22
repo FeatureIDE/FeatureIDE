@@ -35,6 +35,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  * Otherwise only the classes extending {@link AbstractFeatureModelReader} are needed
  * 
  * @author Sönke Holthusen
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class FeatureModelReaderIFileWrapper extends AbstractFeatureModelReader {
 	private AbstractFeatureModelReader reader;

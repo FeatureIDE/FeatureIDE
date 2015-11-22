@@ -132,6 +132,7 @@ import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePage;
  * diagrams and cross-tree constraints.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GUIDefaults, PropertyConstants, PropertyChangeListener, IFeatureModelEditorPage {
 

@@ -50,6 +50,7 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * A figure to view a cross-tree constraint below the feature diagram.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke
  */
 public class ConstraintFigure extends Figure implements GUIDefaults {
 

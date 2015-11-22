@@ -70,6 +70,7 @@ import de.ovgu.featureide.munge.model.MungeModelBuilder;
  * Munge: a purposely-simple Java preprocessor.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class MungePreprocessor extends PPComposerExtensionClass {
 

@@ -39,6 +39,7 @@ import de.ovgu.featureide.fm.core.job.IJob;
  * It is possible to wait for a sequence to finish.
  * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public final class JobSequence implements IJob {
 	private static final ConcurrentHashMap<IJob, JobSequence> sequenceMap = new ConcurrentHashMap<>();

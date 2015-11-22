@@ -43,6 +43,7 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  * @author Thomas Thuem
  * @author Florian Proksch
  * @author Stefan Krueger
+ * @author Marcus Pinnecke
  */
 public abstract class AConstraint extends AFeatureModelElement implements IConstraint {
 

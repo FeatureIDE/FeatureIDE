@@ -37,7 +37,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
  * All structural information of one {@link IFeature} instance.
  * 
  * @author Sebastian Krieter
- * 
+ * @author Marcus Pinnecke
  */
 public class FeatureModelStructure implements IFeatureModelStructure {
 

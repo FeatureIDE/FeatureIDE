@@ -32,6 +32,7 @@ import de.ovgu.featureide.fm.core.ConstraintAttribute;
  * Can be instantiated via {@link IFeatureModelFactory}.
  * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke
  */
 public interface IConstraint extends IFeatureModelElement {
 

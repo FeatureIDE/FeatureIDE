@@ -74,6 +74,7 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
  * 
  * @author Fabian Wielgorz
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class SXFMReader extends AbstractFeatureModelReader {
 	

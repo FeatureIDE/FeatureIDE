@@ -53,6 +53,7 @@ import de.ovgu.featureide.fm.ui.handlers.base.SelectionWrapper;
  * A Wizard to create a new Feature Model file.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke
  */
 // TOOD add copy of an other model file
 public class NewFeatureModelWizard extends Wizard implements INewWizard {

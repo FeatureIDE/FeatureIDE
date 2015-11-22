@@ -94,6 +94,7 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
  * Parses the feature models in the GUIDSL format (grammar).
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class GuidslReader extends AbstractFeatureModelReader {
 

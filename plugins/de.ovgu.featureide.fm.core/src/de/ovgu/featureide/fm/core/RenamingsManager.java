@@ -42,6 +42,7 @@ import de.ovgu.featureide.fm.core.io.FeatureModelFile2;
  * Handles feature renamings.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class RenamingsManager {
 	/**

@@ -60,6 +60,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GEFImageWriter;
  * CollaborationDiagram)
  * 
  * @author Guenter Ulreich
+ * @author Marcus Pinnecke (Feature Interface)
  */
 @SuppressWarnings(RESTRICTION)
 public class GraphicsExporter {

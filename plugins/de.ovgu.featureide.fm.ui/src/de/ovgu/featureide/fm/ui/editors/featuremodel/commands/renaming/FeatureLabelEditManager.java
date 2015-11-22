@@ -44,6 +44,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
  * @author Thomas Thuem
  * @author Florian Proksch
  * @author Stefan Krueger
+ * @author Marcus Pinnecke
  */
 public class FeatureLabelEditManager extends DirectEditManager implements GUIDefaults {
 

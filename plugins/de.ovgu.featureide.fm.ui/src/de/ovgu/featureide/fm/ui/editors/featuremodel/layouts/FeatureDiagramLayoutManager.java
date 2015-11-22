@@ -39,6 +39,7 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * Calculates locations for all features in the feature diagram.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke
  */
 abstract public class FeatureDiagramLayoutManager {
 

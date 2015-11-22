@@ -28,6 +28,7 @@ import java.util.List;
  * A constraint that is true iff the child node is false.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class Not extends Node implements Cloneable {
 	

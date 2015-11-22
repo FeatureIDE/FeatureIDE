@@ -59,6 +59,7 @@ import de.ovgu.featureide.fm.core.job.util.JobArguments;
  * Builds different statistics from the {@link ProjectSignatures}.
  * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke (Feature Interface)
  */
 @SuppressWarnings("unused")
 public class PrintStatisticsJob extends AProjectJob<PrintStatisticsJob.Arguments> {

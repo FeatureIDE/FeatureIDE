@@ -36,6 +36,7 @@ import de.ovgu.featureide.fm.core.color.FeatureColorManager;
  * 
  * @author Jonas Weigt
  * @author Christian Harnisch
+ * @author Marcus Pinnecke
  */
 public class DeleteProfileColorSchemeAction extends Action {
 

@@ -33,6 +33,7 @@ import de.ovgu.featureide.fm.ui.handlers.base.AbstractImportHandler;
  * Reads a velvet feature model.
  * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke
  */
 public class ImportVelvetHandler extends AbstractImportHandler {
 	@Override

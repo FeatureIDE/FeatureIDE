@@ -37,6 +37,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.DeleteAllOperati
  * 
  * @author Jan Wedding
  * @author Melanie Pflaume
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class DeleteAllAction extends SingleSelectionAction {
 

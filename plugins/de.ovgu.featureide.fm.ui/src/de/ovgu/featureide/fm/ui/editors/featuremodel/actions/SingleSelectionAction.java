@@ -42,6 +42,7 @@ import de.ovgu.featureide.fm.ui.views.outline.FmOutlineGroupStateStorage;
  * selected.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke
  */
 public abstract class SingleSelectionAction extends Action implements PropertyChangeListener, PropertyConstants {
 

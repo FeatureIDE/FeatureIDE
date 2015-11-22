@@ -28,6 +28,7 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
  * Abstract eclipse job which can be stopped.
  * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public abstract class AStoppableJob extends AbstractJob implements IStoppableJob {
 	

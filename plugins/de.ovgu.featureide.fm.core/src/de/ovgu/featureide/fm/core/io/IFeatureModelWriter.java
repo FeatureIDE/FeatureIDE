@@ -28,6 +28,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  * Writes a feature model to a file or string.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public interface IFeatureModelWriter {
 

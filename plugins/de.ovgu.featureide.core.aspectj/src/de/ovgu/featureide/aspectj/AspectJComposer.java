@@ -72,6 +72,7 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
  * Excludes unselected aspects form buildpath.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke (Feature Interface)
  */
 // implement buildconfiguration
 @SuppressWarnings(RESTRICTION)

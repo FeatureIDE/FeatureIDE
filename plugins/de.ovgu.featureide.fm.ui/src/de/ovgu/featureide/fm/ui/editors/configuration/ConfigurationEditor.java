@@ -86,6 +86,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
  * @author Christian Becker
  * @author Jens Meinicke
  * @author Hannes Smurawsky
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefaults, PropertyConstants, PropertyChangeListener, IResourceChangeListener,
 		IConfigurationEditor {

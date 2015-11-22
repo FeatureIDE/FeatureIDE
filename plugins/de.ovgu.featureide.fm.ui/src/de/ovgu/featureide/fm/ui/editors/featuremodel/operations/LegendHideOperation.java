@@ -27,6 +27,7 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * Operation to hide/show the feature model legend.
  * 
  * @author Fabian Benduhn
+ * @author Marcus Pinnecke
  */
 public class LegendHideOperation extends AbstractFeatureModelOperation {
 

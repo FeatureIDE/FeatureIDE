@@ -49,6 +49,7 @@ import de.ovgu.featureide.munge.signatures.MungeSignatureBuilder;
  * 
  * @author Jens Meinicke
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class MungeModelBuilder extends PPModelBuilder {
 

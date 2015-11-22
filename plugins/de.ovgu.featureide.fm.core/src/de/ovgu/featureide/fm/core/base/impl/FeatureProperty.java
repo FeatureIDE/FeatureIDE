@@ -33,7 +33,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureProperty;
  * All additional properties of an {@link IFeature}.
  * 
  * @author Sebastian Krieter
- * 
+ * @author Marcus Pinnecke * 
  */
 public class FeatureProperty implements IFeatureProperty, PropertyConstants {
 

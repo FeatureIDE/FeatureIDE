@@ -50,6 +50,7 @@ import de.ovgu.featureide.fm.ui.properties.language.ILanguage;
  * @author Fabian Benduhn
  * @author Florian Proksch
  * @author Stefan Krueger
+ * @author Marcus Pinnecke
  */
 public class LegendFigure extends Figure implements GUIDefaults {
 

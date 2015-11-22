@@ -42,6 +42,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.LegendMoveOperat
  * Command to move the feature model legend using drag and drop
  * 
  * @author Fabian Benduhn
+ * @author Marcus Pinnecke
  */
 public class LegendDragAndDropCommand extends Command {
 

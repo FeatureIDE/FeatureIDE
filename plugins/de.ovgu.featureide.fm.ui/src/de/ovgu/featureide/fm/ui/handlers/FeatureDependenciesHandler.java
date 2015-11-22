@@ -51,6 +51,7 @@ import de.ovgu.featureide.fm.ui.handlers.base.AFileHandler;
  * calculates and shows dependencies between features in a MessageBox
  * 
  * @author Fabian Benduhn
+ * @author Marcus Pinnecke
  */
 public class FeatureDependenciesHandler extends AFileHandler {
 

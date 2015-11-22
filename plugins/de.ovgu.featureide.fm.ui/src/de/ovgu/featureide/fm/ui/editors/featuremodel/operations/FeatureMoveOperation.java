@@ -36,6 +36,7 @@ import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
  * Operation with functionality to move features. Provides redo/undo support.
  * 
  * @author Fabian Benduhn
+ * @author Marcus Pinnecke
  */
 public class FeatureMoveOperation extends AbstractFeatureModelOperation {
 

@@ -76,6 +76,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.ReverseOrderAction;
  * 
  * @author Jan Wedding
  * @author Melanie Pflaume
+ * @author Marcus Pinnecke
  */
 public class FmOutlinePageContextMenu {
 

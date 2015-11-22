@@ -24,6 +24,8 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
  * A representation of a selectable feature for the configuration process.
+ * 
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class SelectableFeature extends TreeElement {
 

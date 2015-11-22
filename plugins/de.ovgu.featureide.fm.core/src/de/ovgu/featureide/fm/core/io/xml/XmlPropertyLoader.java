@@ -37,8 +37,6 @@ import de.ovgu.featureide.fm.core.base.IPropertyContainer.Type;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
 /**
- * TODO description
- * 
  * @author Marcus Pinnecke
  */
 public class XmlPropertyLoader {

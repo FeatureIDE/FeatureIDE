@@ -67,6 +67,7 @@ import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePage;
  * Operation with functionality to delete multiple elements from the {@link FeatureModelEditor} and the {@link FmOutlinePage}. Enables Undo/Redo.
  * 
  * @author Fabian Benduhn
+ * @author Marcus Pinnecke
  */
 public class DeleteOperation extends AbstractFeatureModelOperation implements GUIDefaults {
 

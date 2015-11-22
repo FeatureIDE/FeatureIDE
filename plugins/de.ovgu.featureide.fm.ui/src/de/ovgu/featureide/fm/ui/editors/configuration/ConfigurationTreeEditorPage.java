@@ -80,7 +80,7 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  * Basic class with some default methods for configuration editor pages.
  * 
  * @author Jens Meinicke
- * @author Marcus Pinnecke
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public abstract class ConfigurationTreeEditorPage extends EditorPart implements IConfigurationEditorPage {
 	protected static final Color gray = new Color(null, 140, 140, 140);

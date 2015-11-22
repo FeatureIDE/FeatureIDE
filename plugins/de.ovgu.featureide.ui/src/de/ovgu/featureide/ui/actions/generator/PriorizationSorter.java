@@ -43,6 +43,7 @@ import de.ovgu.featureide.fm.core.configuration.Selection;
  * TODO description
  * 
  * @author Mustafa Alhajjaj
+ * @author Marcus Pinnecke
  */
 public class PriorizationSorter extends AbstractConfigurationSorter {
 	private final List<List<String>> allconfigs = new ArrayList<List<String>>();

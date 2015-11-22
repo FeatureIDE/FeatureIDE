@@ -31,6 +31,7 @@ import de.ovgu.featureide.fm.ui.handlers.base.AbstractExportHandler;
  * Writes the content of a feature model xml file to a velvet model file.
  * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke
  */
 public class ExportVelvetHandler extends AbstractExportHandler {
 

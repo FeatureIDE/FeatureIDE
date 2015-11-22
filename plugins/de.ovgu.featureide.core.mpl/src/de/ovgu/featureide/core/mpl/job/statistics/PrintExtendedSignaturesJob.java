@@ -44,6 +44,7 @@ import de.ovgu.featureide.fm.core.job.util.JobArguments;
  * Builds extended signatures for different constraints.
  * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke (Feature Interface)
  */
 @SuppressWarnings("unused")
 public class PrintExtendedSignaturesJob extends AProjectJob<PrintExtendedSignaturesJob.Arguments> {

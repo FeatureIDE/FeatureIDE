@@ -37,6 +37,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ShowHiddenFeatur
  * 
  * @author David Halm
  * @author Patrick Sulkowski
+ * @author Marcus Pinnecke
  */
 public class ShowHiddenFeaturesAction extends Action {
 

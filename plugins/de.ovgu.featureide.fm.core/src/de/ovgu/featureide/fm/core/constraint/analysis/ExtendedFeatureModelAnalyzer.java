@@ -33,6 +33,7 @@ import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
  * Checks the {@link ExtendedFeatureModel} for validation.
  * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class ExtendedFeatureModelAnalyzer extends FeatureModelAnalyzer  {
 

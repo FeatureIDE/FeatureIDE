@@ -44,6 +44,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
  * 
  * @author Jan Wedding
  * @author Melanie Pflaume
+ * @author Marcus Pinnecke
  */
 public class FmLabelProvider implements ILabelProvider, IFontProvider, GUIDefaults, IColorProvider {
 

@@ -79,6 +79,7 @@ import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
  * @author Dariusz Krolikowski
  * @author Maik Lampe
  * @author Jens Meinicke
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class XmlFeatureModelWriter extends AbstractFeatureModelWriter implements XMLFeatureModelTags {
 

@@ -56,6 +56,7 @@ import de.ovgu.featureide.fm.ui.handlers.base.AFileHandler;
  * Exports the conjunctive normal form of the feature model.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke
  */
 public class ExportCNFHandler extends AFileHandler {
 

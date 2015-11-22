@@ -32,6 +32,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.FeatureRenamingCom
  * Allows to rename features at the feature diagram.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke
  */
 public class FeatureDirectEditPolicy extends DirectEditPolicy {
 

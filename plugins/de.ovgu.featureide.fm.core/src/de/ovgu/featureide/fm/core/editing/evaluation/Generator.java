@@ -47,6 +47,7 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  * A generator for feature models.
  * 
  * @author Thomas Th�m
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public abstract class Generator {
 	

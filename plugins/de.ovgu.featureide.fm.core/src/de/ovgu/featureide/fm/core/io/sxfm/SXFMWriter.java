@@ -57,6 +57,7 @@ import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
  * Prints feature models in the SXFM format.
  * 
  * @author Fabian Wielgorz
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class SXFMWriter extends AbstractFeatureModelWriter {
 	

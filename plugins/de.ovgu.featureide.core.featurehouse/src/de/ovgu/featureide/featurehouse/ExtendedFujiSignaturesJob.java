@@ -31,6 +31,7 @@ import de.ovgu.featureide.fm.core.job.AStoppableJob;
  * Loads the signatures from Fuji.
  * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke
  */
 //@SuppressWarnings(RESTRICTION)
 public class ExtendedFujiSignaturesJob extends AStoppableJob {

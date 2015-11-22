@@ -34,6 +34,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  * 
  * @author Christian Becker
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class CreateConstraintAction extends AbstractConstraintEditorAction {
 

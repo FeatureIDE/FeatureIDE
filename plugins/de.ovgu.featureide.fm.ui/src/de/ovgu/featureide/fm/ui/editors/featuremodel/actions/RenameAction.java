@@ -29,6 +29,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
  * Renames a particular feature at the feature diagram.
  * 
  * @author Tom Brosch
+ * @author Marcus Pinnecke
  */
 public class RenameAction extends SingleSelectionAction {
 

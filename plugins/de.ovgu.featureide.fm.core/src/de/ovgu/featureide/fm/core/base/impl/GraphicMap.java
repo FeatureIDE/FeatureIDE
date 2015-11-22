@@ -30,8 +30,6 @@ import de.ovgu.featureide.fm.core.base.IGraphicalFeature;
 import de.ovgu.featureide.fm.core.base.IGraphicalFeatureModel;
 
 /**
- * TODO description
- * 
  * @author Sebastian Krieter
  */
 public class GraphicMap {

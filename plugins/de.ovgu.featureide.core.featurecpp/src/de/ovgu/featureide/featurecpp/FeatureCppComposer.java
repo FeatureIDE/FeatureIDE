@@ -53,6 +53,7 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
  * 
  * @author Tom Brosch
  * @author Jens Meinicke
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class FeatureCppComposer extends ComposerExtensionClass {
 	private static final String PLUGIN_ID = "org.eclipse.cdt";

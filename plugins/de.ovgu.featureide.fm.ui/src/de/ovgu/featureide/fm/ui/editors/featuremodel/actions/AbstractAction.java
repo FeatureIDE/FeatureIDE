@@ -30,6 +30,8 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureSetAbstra
 
 /**
  * Action to mark a feature as abstract.
+ * 
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class AbstractAction extends SingleSelectionAction {
 

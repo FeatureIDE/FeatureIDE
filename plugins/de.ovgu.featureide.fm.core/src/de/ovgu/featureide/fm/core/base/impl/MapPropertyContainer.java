@@ -27,6 +27,9 @@ import java.util.Set;
 
 import de.ovgu.featureide.fm.core.base.IPropertyContainer;
 
+/**
+ * @author Marcus Pinnecke
+ */
 public class MapPropertyContainer implements IPropertyContainer {
 
 	public static Object copyObject(Type type, Object value) {

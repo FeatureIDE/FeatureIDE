@@ -26,6 +26,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
  * Holds information for the GroupStates of features in outline views
  * 
  * @author Jan Wedding
+ * @author Marcus Pinnecke
  */
 public class FmOutlineGroupStateStorage {
 	private IFeature feature;

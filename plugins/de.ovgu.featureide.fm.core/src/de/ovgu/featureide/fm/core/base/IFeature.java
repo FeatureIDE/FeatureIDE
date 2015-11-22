@@ -26,6 +26,7 @@ package de.ovgu.featureide.fm.core.base;
  * Can be instantiated via {@link IFeatureModelFactory}.
  * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke
  */
 public interface IFeature extends IFeatureModelElement {
 

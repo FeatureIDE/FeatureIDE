@@ -30,6 +30,7 @@ import de.ovgu.featureide.fm.core.FeatureConnection;
  * Intended for tree structures (features are represented by tree nodes).
  * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke 
  */
 public interface IFeatureStructure {
 

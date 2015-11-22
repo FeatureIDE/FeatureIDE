@@ -52,6 +52,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
  * stored persistently.
  * 
  * @author Christian Kaestner
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class FeatureUIHelper {
 

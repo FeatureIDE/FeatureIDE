@@ -45,6 +45,7 @@ import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
  * Propagates errors for <code>FeatureHouse</code> Java files.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class JavaErrorPropagation extends ErrorPropagation {
 

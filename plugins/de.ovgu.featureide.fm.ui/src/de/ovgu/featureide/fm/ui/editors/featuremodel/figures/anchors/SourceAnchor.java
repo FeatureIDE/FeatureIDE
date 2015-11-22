@@ -31,6 +31,7 @@ import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
  * Used by the connection to get the position of the small circle.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke
  */
 public class SourceAnchor extends AbstractConnectionAnchor {
 

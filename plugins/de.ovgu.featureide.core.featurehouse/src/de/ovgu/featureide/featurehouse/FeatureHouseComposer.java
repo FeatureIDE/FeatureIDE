@@ -98,6 +98,7 @@ import de.ovgu.featureide.fm.core.job.AStoppableJob;
  * Composes files using FeatureHouse.
  * 
  * @author Tom Brosch
+ * @author Marcus Pinnecke (Feature Interface)
  */
 // TODO set "Composition errors" like *.png could not be composed with *.png
 @SuppressWarnings("restriction")

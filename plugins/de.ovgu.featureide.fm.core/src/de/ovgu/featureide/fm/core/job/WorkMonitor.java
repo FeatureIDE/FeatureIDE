@@ -31,6 +31,7 @@ import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
  * Can be used to check for cancel request, display job progress, and calling intermediate functions.
  * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public final class WorkMonitor {
 	private static final int maxRelativeWork = 100;

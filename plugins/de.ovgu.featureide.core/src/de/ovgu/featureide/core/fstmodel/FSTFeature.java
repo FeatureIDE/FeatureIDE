@@ -34,6 +34,7 @@ import de.ovgu.featureide.fm.core.color.FeatureColorManager;
  * Contains {@link FSTRole}s with their corresponding {@link FSTClass}.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class FSTFeature {
 

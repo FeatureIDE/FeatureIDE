@@ -27,6 +27,9 @@ import org.prop4j.NodeWriter;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 
+/**
+ * @author Marcus Pinnecke
+ */
 public final class Constraints {
 
 	/**

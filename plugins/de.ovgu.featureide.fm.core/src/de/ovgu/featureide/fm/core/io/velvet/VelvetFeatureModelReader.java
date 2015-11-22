@@ -88,6 +88,7 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
  * 
  * @author Sebastian Krieter
  * @author Matthias Strauss
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 	

@@ -57,8 +57,8 @@ import de.ovgu.featureide.fm.core.job.util.JobArguments;
 import de.ovgu.featureide.fm.core.job.util.JobSequence;
 
 /**
- * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class MPLBuildProjectJob extends AProjectJob<MPLBuildProjectJob.Arguments> {
 

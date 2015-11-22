@@ -31,7 +31,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
  * parent. It is necessary because every figure in GEF needs a associated model.
  * 
  * @author Thomas Thuem
- *
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class FeatureConnection implements PropertyConstants, IGraphicItem {
 	

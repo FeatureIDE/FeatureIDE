@@ -39,6 +39,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ConstraintMoveOp
  * 
  * @author Fabian Benduhn
  * @author David Broneske
+ * @author Marcus Pinnecke
  */
 public class ConstraintDragAndDropCommand extends Command {
 	private int maxLeft;

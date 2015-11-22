@@ -35,10 +35,11 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
- * TODO A PrintAction for the FeatureModelEditor that temporarily moves the
+ * A PrintAction for the FeatureModelEditor that temporarily moves the
  * feature diagram to the top-left corner
  * 
  * @author Fabian Benduhn
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class FMPrintAction extends PrintAction {
 

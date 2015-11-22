@@ -26,6 +26,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
  * Contains all information needed to execute commands that move features
  * 
  * @author Fabian Benduhn
+ * @author Marcus Pinnecke
  */
 public class FeatureOperationData {
 

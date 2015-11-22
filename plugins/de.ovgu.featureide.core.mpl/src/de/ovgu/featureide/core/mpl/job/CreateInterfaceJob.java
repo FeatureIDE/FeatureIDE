@@ -57,6 +57,7 @@ import de.ovgu.featureide.fm.core.job.util.JobArguments;
  * Create mpl interfaces.
  * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments> {
 	

@@ -60,6 +60,7 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  * 
  * @author Jens Meinicke
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public abstract class ErrorPropagation {
 

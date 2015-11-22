@@ -50,6 +50,7 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  * models and their associated rules in the internal model to apply analysis.
  * 
  * @author Sebastian Henneberg
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class Translator {
 

@@ -70,6 +70,7 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  * @author Soenke Holthusen
  * @author Florian Proksch
  * @author Stefan Krueger
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class FeatureModelAnalyzer {
 

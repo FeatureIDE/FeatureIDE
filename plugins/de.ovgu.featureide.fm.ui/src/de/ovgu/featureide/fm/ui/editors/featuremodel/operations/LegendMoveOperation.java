@@ -38,6 +38,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
  * Operation to move the Legend. Provides undo/redo functionality.
  * 
  * @author Fabian Benduhn
+ * @author Marcus Pinnecke
  */
 public class LegendMoveOperation extends AbstractFeatureModelOperation {
 

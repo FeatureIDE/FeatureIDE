@@ -48,6 +48,7 @@ import de.ovgu.featureide.ui.UIPlugin;
  * Context Completion
  * 
  * @author Reimar Schr�ter
+ * @author Marcus Pinnecke
  */
 @SuppressWarnings("restriction")
 public class AnnoCompletion implements IJavaCompletionProposalComputer {

@@ -49,6 +49,7 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  * representing the valid feature combinations.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class NodeCreator {
 

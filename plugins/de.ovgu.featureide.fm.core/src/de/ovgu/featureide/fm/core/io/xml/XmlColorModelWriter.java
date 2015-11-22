@@ -40,6 +40,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  * Prints the colorschemes for the feature model in XML format.
  * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class XmlColorModelWriter extends XmlFeatureModelWriter {
 	

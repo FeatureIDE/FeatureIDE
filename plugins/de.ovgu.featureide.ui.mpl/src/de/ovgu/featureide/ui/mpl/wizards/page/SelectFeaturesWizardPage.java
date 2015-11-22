@@ -49,6 +49,7 @@ import de.ovgu.featureide.fm.ui.wizards.WizardConstants;
  * 
  * @author Christoph Giesel
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke
  */
 public class SelectFeaturesWizardPage extends AbstractWizardPage {
 	

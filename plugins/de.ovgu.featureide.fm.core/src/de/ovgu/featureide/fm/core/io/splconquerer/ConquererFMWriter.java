@@ -76,6 +76,7 @@ import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
  * @author Dariusz Krolikowski
  * @author Maik Lampe
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class ConquererFMWriter extends AbstractFeatureModelWriter {
 	

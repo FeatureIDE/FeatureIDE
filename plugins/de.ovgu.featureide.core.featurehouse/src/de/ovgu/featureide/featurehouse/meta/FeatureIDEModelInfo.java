@@ -46,6 +46,7 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
  * This class is accessed by FeatureHouse to get information about the feature model.
  * 
  * @author Matthias Praast
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class FeatureIDEModelInfo implements FeatureModelInfo {
 	

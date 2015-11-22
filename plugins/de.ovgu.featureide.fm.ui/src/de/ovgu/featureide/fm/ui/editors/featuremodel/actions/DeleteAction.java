@@ -50,6 +50,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.DeleteOperation;
  * 
  * @author Thomas Thuem
  * @author Christian Becker
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class DeleteAction extends Action {
 

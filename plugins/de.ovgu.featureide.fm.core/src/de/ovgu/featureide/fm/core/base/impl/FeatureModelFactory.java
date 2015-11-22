@@ -23,8 +23,8 @@ package de.ovgu.featureide.fm.core.base.impl;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 
 /**
- * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke
  */
 public abstract class FeatureModelFactory implements IFeatureModelFactory {
 	

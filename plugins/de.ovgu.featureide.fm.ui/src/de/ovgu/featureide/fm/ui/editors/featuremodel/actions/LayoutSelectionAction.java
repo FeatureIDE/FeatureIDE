@@ -33,6 +33,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.LayoutSelectionO
 
 /**
  * Action to select the layout for the feature model.
+ * @author Marcus Pinnecke (Feature interface)
  */
 public class LayoutSelectionAction extends Action {
 

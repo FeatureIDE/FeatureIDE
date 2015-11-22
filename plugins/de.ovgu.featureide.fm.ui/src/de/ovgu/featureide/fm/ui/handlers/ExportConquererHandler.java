@@ -33,6 +33,7 @@ import de.ovgu.featureide.fm.ui.handlers.base.AbstractExportHandler;
  * @author Fabian Wielgorz
  * @author Thomas Thuem
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke
  */
 public class ExportConquererHandler extends AbstractExportHandler {
 

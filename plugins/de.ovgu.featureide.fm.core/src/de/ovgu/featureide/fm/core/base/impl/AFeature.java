@@ -34,7 +34,7 @@ import de.ovgu.featureide.fm.core.base.IPropertyContainer;
  * Partial implementation of the {@link IFeature} interface.
  * 
  * @author Sebastian Krieter
- * 
+ * @author Marcus Pinnecke
  */
 public abstract class AFeature extends AFeatureModelElement implements IFeature {
 

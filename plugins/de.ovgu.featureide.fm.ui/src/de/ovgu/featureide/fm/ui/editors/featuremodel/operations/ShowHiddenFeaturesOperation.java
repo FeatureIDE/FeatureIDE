@@ -29,6 +29,7 @@ import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
  * 
  * @author David Halm
  * @author Patrick Sulkowski
+ * @author Marcus Pinnecke
  */
 public class ShowHiddenFeaturesOperation extends AbstractFeatureModelOperation {
 

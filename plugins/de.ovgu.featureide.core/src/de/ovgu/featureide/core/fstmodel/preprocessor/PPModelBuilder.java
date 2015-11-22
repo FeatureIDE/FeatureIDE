@@ -45,6 +45,7 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
  * Build the FSTModel for preprocessor projects.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class PPModelBuilder {
 

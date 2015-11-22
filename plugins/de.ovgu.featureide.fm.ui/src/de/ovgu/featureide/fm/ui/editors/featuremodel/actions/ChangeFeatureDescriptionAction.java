@@ -29,7 +29,7 @@ import de.ovgu.featureide.fm.ui.editors.ChangeFeatureDescriptionDialog;
 /**
  * Opens dialog to change the description of a feature
  * 
- * 
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class ChangeFeatureDescriptionAction extends SingleSelectionAction {
 

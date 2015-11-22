@@ -30,6 +30,7 @@ import de.ovgu.featureide.fm.ui.handlers.base.AbstractImportHandler;
  * 
  * @author Fabian Wielgorz
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke
  */
 public class ImportSXFMHandler extends AbstractImportHandler {
 	@Override

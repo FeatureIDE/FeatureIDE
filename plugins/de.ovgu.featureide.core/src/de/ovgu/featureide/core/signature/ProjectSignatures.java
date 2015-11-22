@@ -41,6 +41,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  * Holds the signature information for a whole java project.
  * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class ProjectSignatures implements Iterable<AbstractSignature> {
 	

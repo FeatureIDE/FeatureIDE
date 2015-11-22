@@ -27,6 +27,7 @@ import java.util.List;
  * true.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class Implies extends Node implements Cloneable {
 	

@@ -30,6 +30,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  * functionality.
  * 
  * @author Fabian Benduhn
+ * @author Marcus Pinnecke
  */
 public class FeatureSetHiddenOperation extends AbstractFeatureModelOperation {
 

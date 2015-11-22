@@ -26,6 +26,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
  * The color scheme that cannot hold any colors.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class DefaultColorScheme extends ColorScheme {
 

@@ -40,6 +40,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  * 
  * @author Jan Wedding
  * @author Melanie Pflaume
+ * @author Marcus Pinnecke
  */
 public class FmTreeContentProvider implements ITreeContentProvider {
 

@@ -32,6 +32,7 @@ import de.ovgu.featureide.ui.UIPlugin;
  * 
  * @author Jonas Weigt
  * @author Christian Harnisch
+ * @author Marcus Pinnecke
  */
 
 @SuppressWarnings({ "restriction" })

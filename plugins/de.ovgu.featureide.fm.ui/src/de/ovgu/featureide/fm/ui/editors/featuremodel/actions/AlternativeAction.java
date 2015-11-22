@@ -34,6 +34,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureChangeGro
  * Turns a group type into an Alternative-group.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class AlternativeAction extends SingleSelectionAction {
 

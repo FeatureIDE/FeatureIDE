@@ -33,6 +33,7 @@ import de.ovgu.featureide.fm.ui.handlers.base.AbstractExportHandler;
  * Exports feature model to GUIDSL format.
  * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke
  */
 public class ExportGUIDSLHandler extends AbstractExportHandler {
 

@@ -38,6 +38,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  * Generates a class representing the variability encoding of the feature model.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class FeatureModelClassGenerator {
 	

@@ -67,6 +67,7 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  * 
  * @author Christian Becker
  * @author Jens Meinicke
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class FeatureOrderEditor extends FeatureModelEditorPage {
 

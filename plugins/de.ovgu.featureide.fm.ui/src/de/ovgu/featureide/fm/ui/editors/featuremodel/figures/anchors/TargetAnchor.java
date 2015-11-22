@@ -31,6 +31,7 @@ import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
  * Used to get the point where all connections from child features end.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke
  */
 public class TargetAnchor extends AbstractConnectionAnchor {
 

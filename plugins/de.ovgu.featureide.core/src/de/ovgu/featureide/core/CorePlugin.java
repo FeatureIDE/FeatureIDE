@@ -107,6 +107,7 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
  * @author Marcus Leich
  * @author Tom Brosch
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class CorePlugin extends AbstractCorePlugin {
 

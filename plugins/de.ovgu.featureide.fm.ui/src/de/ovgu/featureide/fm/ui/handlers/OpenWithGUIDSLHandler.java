@@ -51,6 +51,7 @@ import de.ovgu.featureide.fm.ui.handlers.base.AFileHandler;
  * Opens the currently selected feature model with GUIDSL.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke
  */
 @SuppressWarnings(RESTRICTION)
 public class OpenWithGUIDSLHandler extends AFileHandler {

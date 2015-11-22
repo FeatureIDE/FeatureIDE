@@ -42,6 +42,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureOperation
  * drag and drop.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke
  */
 public class FeatureDragAndDropCommand extends Command {
 

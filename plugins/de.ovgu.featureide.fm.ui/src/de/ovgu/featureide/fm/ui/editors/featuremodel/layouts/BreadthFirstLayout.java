@@ -33,6 +33,7 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * Layouts the features at the feature diagram using a breadth first search.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke
  */
 public class BreadthFirstLayout extends FeatureDiagramLayoutManager {
 

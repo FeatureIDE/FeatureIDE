@@ -76,6 +76,7 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
  * 
  * @author Christoph Giesel
  * @author Marcus Kamieth
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class AntennaPreprocessor extends PPComposerExtensionClass {
 

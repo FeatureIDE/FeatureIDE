@@ -59,6 +59,7 @@ import de.ovgu.featureide.fm.ui.handlers.base.AFileHandler;
  * Exports the feature model in DIMACS CNF format.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke
  */
 public class ExportDIMACSHandler extends AFileHandler {
 

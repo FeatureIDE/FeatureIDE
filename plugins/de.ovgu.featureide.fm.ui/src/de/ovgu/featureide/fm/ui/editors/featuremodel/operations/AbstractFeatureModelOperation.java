@@ -34,6 +34,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  * It provides standard handling and refreshing of the model.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke
  */
 public abstract class AbstractFeatureModelOperation extends AbstractOperation {
 

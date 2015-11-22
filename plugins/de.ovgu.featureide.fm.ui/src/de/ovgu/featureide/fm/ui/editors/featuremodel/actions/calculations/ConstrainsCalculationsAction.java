@@ -28,8 +28,8 @@ import org.eclipse.jface.action.Action;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
- * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke
  */
 public class ConstrainsCalculationsAction extends Action {
 

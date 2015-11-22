@@ -43,6 +43,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SourceChangeOper
  * Displays the source.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class FeatureModelTextEditorPage extends TextEditor implements IFeatureModelEditorPage {
 

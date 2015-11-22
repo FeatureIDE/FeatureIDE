@@ -34,6 +34,7 @@ import de.ovgu.featureide.ui.projectExplorer.DrawImageForProjectExplorer.Explore
  * Label provider for projectExplorer - sets an image and a text before the files, folders and packages
  * 
  * @author Jonas Weigt
+ * @author Marcus Pinnecke
  */
 @SuppressWarnings("restriction")
 public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {

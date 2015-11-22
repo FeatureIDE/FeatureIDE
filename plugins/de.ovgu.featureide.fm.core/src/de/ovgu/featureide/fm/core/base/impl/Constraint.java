@@ -31,6 +31,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  * @author Thomas Thuem
  * @author Florian Proksch
  * @author Stefan Krueger
+ * @author Marcus Pinnecke
  */
 public class Constraint extends AConstraint {
 

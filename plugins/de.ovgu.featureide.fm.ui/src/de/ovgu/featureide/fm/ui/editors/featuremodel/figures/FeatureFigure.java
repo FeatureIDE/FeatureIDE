@@ -60,6 +60,7 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * A figure that represents a feature with its name.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke
  */
 public class FeatureFigure extends Figure implements GUIDefaults {
 

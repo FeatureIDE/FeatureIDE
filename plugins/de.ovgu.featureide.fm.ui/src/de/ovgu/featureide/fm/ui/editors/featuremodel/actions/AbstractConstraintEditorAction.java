@@ -37,6 +37,7 @@ import de.ovgu.featureide.fm.ui.editors.ConstraintDialog;
  * 
  * @author Christian Becker
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public abstract class AbstractConstraintEditorAction extends Action {
 

@@ -122,6 +122,7 @@ import de.ovgu.featureide.fm.core.job.IJob;
  * @author Marcus Leich
  * @author Thomas Thuem
  * @author Tom Brosch
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class FeatureProject extends BuilderMarkerHandler implements IFeatureProject, IResourceChangeListener {
 

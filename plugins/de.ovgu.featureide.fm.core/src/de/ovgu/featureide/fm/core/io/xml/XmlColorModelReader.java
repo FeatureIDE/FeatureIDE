@@ -47,6 +47,7 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
  * Parses the color model from XML to the feature model
  * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class XmlColorModelReader extends XmlFeatureModelReader {
 

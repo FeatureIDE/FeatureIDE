@@ -37,6 +37,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureRenamingO
  * Renames a currently selected feature.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke
  */
 public class FeatureRenamingCommand extends Command {
 

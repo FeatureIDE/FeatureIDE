@@ -82,6 +82,7 @@ import de.ovgu.featureide.fm.ui.views.featuremodeleditview.ViewLabelProvider;
  * the current editing version is compared to the last saved model.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke
  */
 public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 

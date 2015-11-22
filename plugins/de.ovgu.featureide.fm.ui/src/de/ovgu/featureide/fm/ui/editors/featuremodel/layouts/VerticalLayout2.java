@@ -35,6 +35,7 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * 
  * @author David Halm
  * @author Patrick Sulkowski
+ * @author Marcus Pinnecke
  */
 public class VerticalLayout2 extends FeatureDiagramLayoutManager {
 

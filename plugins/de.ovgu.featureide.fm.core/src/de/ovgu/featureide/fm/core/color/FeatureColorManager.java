@@ -50,6 +50,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  * Manages colors assigned to features.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class FeatureColorManager {
 	

@@ -31,7 +31,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModelProperty;
  * All additional properties of one {@link IFeature} instance.
  * 
  * @author Sebastian Krieter
- * 
+ * @author Marcus Pinnecke
  */
 public class FeatureModelProperty implements IFeatureModelProperty {
 

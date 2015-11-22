@@ -26,6 +26,8 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayou
 
 /**
  * Operation to select the layout for the feature model editor.
+ * 
+ * @author Marcus Pinnecke (Feature interface)
  */
 public class LayoutSelectionOperation extends AbstractFeatureModelOperation {
 

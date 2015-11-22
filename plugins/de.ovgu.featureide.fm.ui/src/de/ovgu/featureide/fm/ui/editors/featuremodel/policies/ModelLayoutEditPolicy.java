@@ -47,6 +47,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
  * Allows features to be moved onto the feature model diagram.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke
  */
 public class ModelLayoutEditPolicy extends LayoutEditPolicy {
 

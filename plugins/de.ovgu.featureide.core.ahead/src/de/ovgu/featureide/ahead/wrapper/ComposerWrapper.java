@@ -65,6 +65,7 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
  * 
  * @author Tom Brosch
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  * 
  */
 public class ComposerWrapper {

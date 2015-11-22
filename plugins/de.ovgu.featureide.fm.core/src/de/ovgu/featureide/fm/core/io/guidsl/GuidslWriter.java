@@ -36,6 +36,7 @@ import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
  * Writes a feature model in the GUIDSL format (grammar).
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class GuidslWriter extends AbstractFeatureModelWriter {
 

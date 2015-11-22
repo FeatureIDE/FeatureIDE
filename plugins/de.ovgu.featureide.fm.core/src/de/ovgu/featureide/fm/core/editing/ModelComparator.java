@@ -44,6 +44,7 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
  * classification of the edit that transforms one model into the second model.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class ModelComparator {
 

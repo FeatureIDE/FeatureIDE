@@ -39,6 +39,7 @@ import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
  * Enables undo/redo functionality.
  * 
  * @author Fabian Benduhn
+ * @author Marcus Pinnecke
  */
 public class ModelReverseOrderOperation extends AbstractFeatureModelOperation {
 

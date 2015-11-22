@@ -57,6 +57,9 @@ import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
 import de.ovgu.featureide.fm.ui.handlers.base.SelectionWrapper;
 import de.ovgu.featureide.ui.migration.wizard.SPLMigrationDialogSettingsPage;
 
+/**
+ * @author Marcus Pinnecke (Feature interface)
+ */
 @SuppressWarnings(RESTRICTION)
 public abstract class DefaultSPLMigrator implements ISPLMigrator {
 	public static final String PROJECT_PROPERTIES_FILE_NAME = "project.properties";

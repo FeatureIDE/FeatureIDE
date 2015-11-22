@@ -38,6 +38,7 @@ import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
  * Calculates added or deleted products for a feature model edit.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class ExampleCalculator {
 	

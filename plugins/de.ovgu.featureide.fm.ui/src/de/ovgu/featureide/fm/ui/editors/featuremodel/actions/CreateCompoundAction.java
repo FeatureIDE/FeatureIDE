@@ -49,6 +49,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureCreateCom
  * Creates a new feature with the currently selected features as children.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class CreateCompoundAction extends Action {
 

@@ -40,6 +40,7 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
  * 
  * @author Sebastian Krieter
  * @author Reimar Schroeter
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class InterfaceProject {
 	private final IProject projectReference;

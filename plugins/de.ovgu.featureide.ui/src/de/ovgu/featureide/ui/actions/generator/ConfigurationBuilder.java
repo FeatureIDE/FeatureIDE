@@ -85,6 +85,7 @@ import de.ovgu.featureide.ui.UIPlugin;
  * Builds all valid or current configurations for a selected feature project.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke
  */
 @SuppressWarnings(RESTRICTION)
 public class ConfigurationBuilder implements IConfigurationBuilderBasics {

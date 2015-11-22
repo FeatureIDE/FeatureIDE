@@ -67,6 +67,7 @@ import de.ovgu.featureide.fm.core.io.xml.XmlPropertyLoader.PropertiesParser;
  * Parses a FeatureModel from XML
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke
  */
 public class XmlFeatureModelReader extends AbstractFeatureModelReader implements XMLFeatureModelTags {
 

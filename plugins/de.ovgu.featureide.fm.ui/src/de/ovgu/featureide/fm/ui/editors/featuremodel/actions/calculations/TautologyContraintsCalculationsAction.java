@@ -28,9 +28,8 @@ import org.eclipse.jface.action.Action;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
- * TODO description
- * 
  * @author Stefan Krueger
+ * @author Marcus Pinnecke
  */
 public class TautologyContraintsCalculationsAction extends Action {
 

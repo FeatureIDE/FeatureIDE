@@ -43,6 +43,7 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  * user-defined order (if specified).
  * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class DefaultFormat extends ConfigurationFormat {
 

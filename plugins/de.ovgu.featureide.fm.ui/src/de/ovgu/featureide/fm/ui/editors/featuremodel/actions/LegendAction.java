@@ -38,6 +38,7 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * Shows/hides the legend when executed.
  * 
  * @author Fabian Benduhn
+ * @author Marcus Pinnecke
  */
 public class LegendAction extends Action {
 

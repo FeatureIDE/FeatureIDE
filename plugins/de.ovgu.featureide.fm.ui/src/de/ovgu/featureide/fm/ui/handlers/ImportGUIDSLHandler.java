@@ -33,6 +33,7 @@ import de.ovgu.featureide.fm.ui.handlers.base.AbstractImportHandler;
  * @author Dariusz Krolikowski
  * @author Maik Lampe
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke
  */
 public class ImportGUIDSLHandler extends AbstractImportHandler {
 
