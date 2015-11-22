@@ -118,7 +118,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.Featur
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.RedundantConstrainsCalculationsAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.RunManualCalculationsAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.TautologyContraintsCalculationsAction;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors.ColorSelectedFeatureAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors.SetFeatureColorAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.GraphicalEditPartFactory;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
@@ -149,7 +149,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	private DeleteAllAction deleteAllAction;
 	private MandatoryAction mandatoryAction;
 	private AbstractAction abstractAction;
-	private ColorSelectedFeatureAction colorSelectedFeatureAction;
+	private SetFeatureColorAction colorSelectedFeatureAction;
 	private HiddenAction hiddenAction;
 	private AndAction andAction;
 	private OrAction orAction;
@@ -279,7 +279,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		createCompoundAction = new CreateCompoundAction(this, featureModel, null);
 		deleteAction = new DeleteAction(this, featureModel);
 
-		colorSelectedFeatureAction = new ColorSelectedFeatureAction(this, featureModelEditor.getModelFile().getProject());
+		colorSelectedFeatureAction = new SetFeatureColorAction(this, featureModelEditor.getModelFile().getProject());
 
 		deleteAllAction = new DeleteAllAction(this, featureModel);
 		mandatoryAction = new MandatoryAction(this, featureModel);

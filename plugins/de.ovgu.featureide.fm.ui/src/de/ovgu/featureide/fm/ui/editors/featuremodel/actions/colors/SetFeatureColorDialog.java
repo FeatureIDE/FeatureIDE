@@ -49,10 +49,14 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
+import static de.ovgu.featureide.fm.core.functional.Functional.*;
+import static de.ovgu.featureide.fm.core.base.FeatureUtils.*;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
@@ -61,7 +65,7 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  * 
  * @author Christian Elzholz, Marcus Schmelz
  */
-public class ColorSelectedFeatureDialog extends Dialog {
+public class SetFeatureColorDialog extends Dialog {
 
 	private final static Image colorImage = FMUIPlugin.getDefault().getImageDescriptor("icons/FeatureColorIcon.gif").createImage();
 	
@@ -75,7 +79,7 @@ public class ColorSelectedFeatureDialog extends Dialog {
 	 * @param parentShell
 	 * @param featurelist
 	 */
-	protected ColorSelectedFeatureDialog(Shell parentShell, List<IFeature> featurelist) {
+	protected SetFeatureColorDialog(Shell parentShell, List<IFeature> featurelist) {
 		super(parentShell);
 		this.featureList = featurelist;
 		setShellStyle(SWT.DIALOG_TRIM | SWT.MIN | SWT.RESIZE);
@@ -189,32 +193,43 @@ public class ColorSelectedFeatureDialog extends Dialog {
 			}
 
 			private void findSiblings() {
+				final ArrayList<IFeature> affectedFeatures = new ArrayList<>();
 				for (int j = 0; j < featureListBuffer.size(); j++) {
 					if (!featureListBuffer.get(j).getStructure().isRoot()) {
-						for (int k = 0; k < featureListBuffer.get(j).getStructure().getParent().getChildren().size(); k++) {
-							if (!featureListBuffer.contains(featureListBuffer.get(j).getStructure().getParent().getChildren().get(k)))
-								featureListBuffer.add(featureListBuffer.get(j).getStructure().getParent().getChildren().get(k).getFeature());
-						}
+						final IFeatureStructure parent = featureListBuffer.get(j).getStructure().getParent();
+						affectedFeatures.addAll(toList(map(parent.getChildren(), STRUCTURE_TO_FEATURE)));
 					}
 				}
+				featureListBuffer = affectedFeatures;
 			}
 
 			private void findAllChildren() {
+				final ArrayList<IFeature> affectedFeatures = new ArrayList<>();
 				for (int j = 0; j < featureListBuffer.size(); j++) {
-					for (int k = 0; k < featureListBuffer.get(j).getStructure().getChildren().size(); k++) {
-						if (!featureListBuffer.contains(featureListBuffer.get(j).getStructure().getChildren().get(k)))
-							featureListBuffer.add(featureListBuffer.get(j).getStructure().getChildren().get(k).getFeature());
-					}
+					affectedFeatures.addAll(findAllChildren(featureListBuffer.get(j)));
 				}
+				featureListBuffer = affectedFeatures;
+			}
+			
+			private ArrayList<IFeature> findAllChildren(IFeature item) {
+				final ArrayList<IFeature> affectedFeatures = new ArrayList<>();
+				final List<IFeature> children = findChildren(item);
+				affectedFeatures.addAll(children);
+				for (int j = 0; j < children.size(); j++)
+					affectedFeatures.addAll(findAllChildren(children.get(j)));
+				return affectedFeatures;
+			}
+			
+			private List<IFeature> findChildren(IFeature parent) {
+				return toList(map(parent.getStructure().getChildren(), STRUCTURE_TO_FEATURE));
 			}
 
 			private void findDirectChildren() {
-				for (int j = 0; j < featureList.size(); j++) {
-					for (int k = 0; k < featureListBuffer.get(j).getStructure().getChildren().size(); k++) {
-						if (!featureListBuffer.contains(featureListBuffer.get(j).getStructure().getChildren().get(k)))
-							featureListBuffer.add(featureListBuffer.get(j).getStructure().getChildren().get(k).getFeature());
-					}
+				final ArrayList<IFeature> affectedFeatures = new ArrayList<>();
+				for (int j = 0; j < featureListBuffer.size(); j++) {
+					affectedFeatures.addAll(findChildren(featureListBuffer.get(j)));
 				}
+				featureListBuffer = affectedFeatures;
 			}
 
 		

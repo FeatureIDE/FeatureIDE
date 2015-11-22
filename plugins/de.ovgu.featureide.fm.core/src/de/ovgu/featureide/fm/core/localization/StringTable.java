@@ -983,10 +983,10 @@ public class StringTable {
 	public static final String COLORATION = "Feature Color";
 	public static final String MAGENTA = "magenta";
 	public static final String PURPLE = "purple";
-	public static final String SELECTED_FEATURE = "Selected Feature";
-	public static final String SELECTED_FEATURE_DIRECT_CHILDREN = "Selected Feature and all direct Children";
-	public static final String SELECTED_FEATURE_ALL_CHILDREN = "Selected Feature and all Children";
-	public static final String SELECTED_FEATURE_SIBLINGS = "Selected Feature and all Siblings";
+	public static final String SELECTED_FEATURE = "Current Selection";
+	public static final String SELECTED_FEATURE_DIRECT_CHILDREN = "Children (first level)";
+	public static final String SELECTED_FEATURE_ALL_CHILDREN = "Children (all)";
+	public static final String SELECTED_FEATURE_SIBLINGS = "Current selection and all siblings";
 	public static final String COLORATION_DIALOG = "Set Feature Colors";
 	public static final String CHOOSE_COLOR_ = "Choose Color:";
 	public static final String CHOOSE_ACTION_ = "Choose Action:";
