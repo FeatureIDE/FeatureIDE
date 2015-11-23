@@ -132,7 +132,16 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 	private RedoActionHandler redoAction;
 
 	public boolean checkModel(String source) {
-		return readModel(source);
+		fmFile.deleteAllModelMarkers();
+		final List<ModelWarning> warnings = DefaultFeatureModelFactory.getInstance().loadFeatureModel(ModelIOFactory.getNewFeatureModel(ioType), source);
+		createModelFileMarkers(warnings);
+		
+		for (ModelWarning modelWarning : warnings) {
+			if (modelWarning.severity == IMarker.SEVERITY_ERROR) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	@Override
@@ -221,11 +230,6 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 	public IFeatureModel getOriginalFeatureModel() {
 		final IFeatureModel originalFeatureModel = ModelIOFactory.getNewFeatureModel(ioType);
 		DefaultFeatureModelFactory.getInstance().loadFeatureModel(originalFeatureModel, getModelFile().getLocation().toFile());
-//		try {
-//			new FeatureModelReaderIFileWrapper(ModelIOFactory.getModelReader(originalFeatureModel, ioType)).readFromFile(fmFile.getModelFile());
-//		} catch (Exception e) {
-//			FMUIPlugin.getDefault().logError(e);
-//		}
 		return originalFeatureModel;
 	}
 
@@ -390,7 +394,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 				public void run() {
 					diagramEditor.setContents(diagramEditor.getGraphicalFeatureModel());
 					pageChange(getDiagramEditorIndex());
-					readModel();
+					diagramEditor.refresh();
 				}
 			});
 		}
@@ -627,32 +631,12 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 		fmFile.deleteAllModelMarkers();
 		final List<ModelWarning> warnings = DefaultFeatureModelFactory.getInstance().loadFeatureModel(featureModel, getModelFile().getLocation().toFile());
 		createModelFileMarkers(warnings);
-//		try {
-//			fmFile.deleteAllModelMarkers();
-////			new FeatureModelReaderIFileWrapper(featureModelReader).readFromFile(file);
-//			createModelFileMarkers(loadFeatureModel);
-//		} catch (UnsupportedModelException e) {
-//			fmFile.createModelMarker(e.getMessage(), IMarker.SEVERITY_ERROR, e.lineNumber);
-//		} catch (FileNotFoundException e) {
-//			FMUIPlugin.getDefault().logError(e);
-//		}
 	}
 
-	public boolean readModel(String newSource) {
-
+	public void readModel(String newSource) {
 		fmFile.deleteAllModelMarkers();
-		final List<ModelWarning> loadFeatureModel = DefaultFeatureModelFactory.getInstance().loadFeatureModel(featureModel, newSource);
-		createModelFileMarkers(loadFeatureModel);
-		
-//		fmFile.deleteAllModelMarkers();
-//		try {
-//			modelReader.readFromString(newSource);
-//			createModelFileMarkers(modelReader);
-//		} catch (UnsupportedModelException e) {
-//			fmFile.createModelMarker(e.getMessage(), IMarker.SEVERITY_ERROR, e.lineNumber);
-//			return false;
-//		}
-		return true;
+		final List<ModelWarning> warnings = DefaultFeatureModelFactory.getInstance().loadFeatureModel(featureModel, newSource);
+		createModelFileMarkers(warnings);
 	}
 
 	private boolean saveEditors() {

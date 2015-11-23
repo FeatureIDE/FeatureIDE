@@ -22,8 +22,6 @@ package de.ovgu.featureide.fm.ui.editors.elements;
 
 import java.util.List;
 
-import org.eclipse.core.commands.operations.ObjectUndoContext;
-
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
@@ -126,6 +124,14 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel, PropertyCo
 			}
 		}
 		return null;
+	}
+	
+	@Override
+	public String toString() {
+		if (featureTree != null) {
+			return "Graphical feature-model tree:\n" + featureTree.toString();
+		}
+		return super.toString();
 	}
 
 }

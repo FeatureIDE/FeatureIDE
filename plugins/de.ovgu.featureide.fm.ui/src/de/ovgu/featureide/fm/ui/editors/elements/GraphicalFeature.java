@@ -154,4 +154,9 @@ public class GraphicalFeature implements IGraphicalFeature {
 		return targetConnections.remove(connection);
 	}
 
+	@Override
+	public String toString() {
+		return correspondingFeature.toString();
+	}
+
 }

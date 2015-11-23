@@ -40,6 +40,8 @@ public class ModelTree<M, E> implements Iterable<E> {
 
 	public static interface TreeIterator<E> extends Iterator<E>, Iterable<E> {
 		void removeSubtree();
+
+		int getCurrentLevel();
 	}
 
 	private static abstract class AbstractTreeIterator<M, E> implements TreeIterator<E> {
@@ -112,6 +114,16 @@ public class ModelTree<M, E> implements Iterable<E> {
 			return this;
 		}
 
+		public int getCurrentLevel() {
+			int level = -1;
+			ModelTree<M, E> tempParent = next;
+			while (tempParent != null) {
+				tempParent = tempParent.getParent();
+				level++;
+			}
+			return level;
+		}
+
 	}
 
 	private static final class PreOrderIterator<M, E> extends AbstractTreeIterator<M, E> {
@@ -136,7 +148,7 @@ public class ModelTree<M, E> implements Iterable<E> {
 
 		public ModelTree<M, E> getNext() {
 			final ModelTree<M, E> next = iteratorList.removeFirst();
-			iteratorList.addAll(0, next.children);
+			iteratorList.addAll(next.children);
 			return next;
 		}
 
@@ -245,14 +257,14 @@ public class ModelTree<M, E> implements Iterable<E> {
 	public boolean isRoot() {
 		return parent == null;
 	}
-	
+
 	public void reverse() {
 		for (ModelTree<M, E> child : children) {
 			child.reverse();
 		}
 		Collections.reverse(children);
 	}
-	
+
 	public boolean isAncestorOf(ModelTree<?, ?> tree) {
 		if (this == tree) {
 			return true;
@@ -265,6 +277,20 @@ public class ModelTree<M, E> implements Iterable<E> {
 			curParent = curParent.parent;
 		}
 		return false;
+	}
+
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder();
+		for (TreeIterator<E> it = this.iterator(); it.hasNext();) {
+			final E element = it.next();
+			for (int i = 0; i < it.getCurrentLevel(); i++) {
+				sb.append('\t');
+			}
+			sb.append(element.toString());
+			sb.append('\n');
+		}
+		return sb.toString();
 	}
 
 }
