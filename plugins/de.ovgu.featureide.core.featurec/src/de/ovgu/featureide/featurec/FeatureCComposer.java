@@ -38,9 +38,12 @@ public class FeatureCComposer extends ComposerExtensionClass {
 		composer = new FeatureHouseComposer();
 	}
 
+	
+	
 	@Override
 	public void performFullBuild(IFile config) {
-		//composer.performFullBuild(config);
+		composer.initialize(CorePlugin.getDefault().getFeatureProject(config));
+		composer.performFullBuild(config);
 		
 		FeatureModel model = CorePlugin.getDefault().getFeatureProject(config).getFeatureModel();
 		Configuration cfg = new Configuration(model);
@@ -52,7 +55,7 @@ public class FeatureCComposer extends ComposerExtensionClass {
 		}
 		
 		IResource mappings = config.getProject().findMember(MAPPINGS_FILENAME);
-		if(mappings.isAccessible() && mappings instanceof IFile){
+		if(mappings != null && mappings.isAccessible() && mappings instanceof IFile){
 			try {
 				List<String> content_lines = Files.readAllLines(Paths.get(mappings.getLocation().toOSString()));
 				for(String line : content_lines){
