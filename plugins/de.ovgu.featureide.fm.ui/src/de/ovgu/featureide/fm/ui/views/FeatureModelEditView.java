@@ -72,6 +72,8 @@ import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GEFImageWriter;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.GraphicalEditPartFactory;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutManager;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.LevelOrderLayout;
 import de.ovgu.featureide.fm.ui.views.featuremodeleditview.ViewContentProvider;
 import de.ovgu.featureide.fm.ui.views.featuremodeleditview.ViewLabelProvider;
 
@@ -265,11 +267,11 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 			featureModelEditor = (FeatureModelEditor) activeEditor;
 			featureModelEditor.getFeatureModel().addListener(modelListener);
 
-			if (evaluation == null && featureModelEditor.getGrammarFile().getResource().getProject().getName().startsWith("EvaluationTest")) {
+			if (evaluation == null && featureModelEditor.getModelFile().getProject().getName().startsWith("EvaluationTest")) {
 				evaluation = new Job("Evaluation Test") {
 					@Override
 					protected IStatus run(IProgressMonitor monitor) {
-						Evaluation.evaluate(featureModelEditor.getGrammarFile().getResource().getProject());
+						Evaluation.evaluate(featureModelEditor.getModelFile().getProject());
 						return Status.OK_STATUS;
 					}
 				};
@@ -279,7 +281,7 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 					@Override
 					public IStatus runInUIThread(IProgressMonitor monitor) {
 						try {
-							convertModelToBitmapTest(featureModelEditor.getGrammarFile().getResource().getProject().getFolder("models"));
+							convertModelToBitmapTest(featureModelEditor.getModelFile().getProject().getFolder("models"));
 						} catch (Exception e) {
 							FMUIPlugin.getDefault().logError(e);
 						}
@@ -318,8 +320,8 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 						graphicalViewer.setRootEditPart(rootEditPart);
 						graphicalViewer.setContents(featureModel);
 						//TODO _interfaces Removed Code
-//						FeatureDiagramLayoutManager layoutManager = new LevelOrderLayout();
-//						layoutManager.layout(featureModel);
+						FeatureDiagramLayoutManager layoutManager = new LevelOrderLayout();
+						layoutManager.layout(featureModelEditor.diagramEditor.getGraphicalFeatureModel());
 						GEFImageWriter.writeToFile(graphicalViewer, file);
 					}
 				};

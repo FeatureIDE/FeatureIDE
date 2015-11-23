@@ -74,6 +74,8 @@ public class ConstraintEditPart extends AbstractGraphicalEditPart implements Pro
 			try {
 				for (IFeature containedFeature : getConstraintModel().getObject().getContainedFeatures()) {
 					containedFeature.setConstraintSelected(true);
+					// TODO _Feature interfaces removed code
+//					containedFeature.getFeatureModel().setConstraintSelected(true);
 				}
 			} catch (NullPointerException e) {
 				FMCorePlugin.getDefault().reportBug(320);

@@ -88,7 +88,7 @@ import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.FeatureModelFile;
+import de.ovgu.featureide.fm.core.ModelMarkerHandler;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -182,7 +182,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 	private final IProject project;
 
-	private final FeatureModelFile modelFile;
+	private final ModelMarkerHandler<IFile> modelFile;
 
 	private IComposerExtensionClass composerExtension = null;
 	
@@ -330,11 +330,11 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		AbstractFeatureModelReader tmpModelReader;
 
 		if (project.getFile("mpl.velvet").exists()) {
-			modelFile = new FeatureModelFile(project.getFile("mpl.velvet"));
+			modelFile = new ModelMarkerHandler<>(project.getFile("mpl.velvet"));
 			featureModel = new ExtendedFeatureModel();
 			tmpModelReader = ModelIOFactory.getModelReader(featureModel, ModelIOFactory.TYPE_VELVET);
 		} else {
-			modelFile = new FeatureModelFile(project.getFile("model.xml"));
+			modelFile = new ModelMarkerHandler<>(project.getFile("model.xml"));
 			featureModel = FeatureModelFactory.getInstance().createFeatureModel();
 			tmpModelReader = ModelIOFactory.getModelReader(featureModel, ModelIOFactory.TYPE_XML);
 		}
@@ -342,7 +342,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		featureModel.addListener(new FeatureModelChangeListner());
 		modelReader = new FeatureModelReaderIFileWrapper(tmpModelReader);
 		
-		FeatureModelFile2.getInstance(modelFile.getResource()).getFeatureModel().addListener(new FeatureModelChangeListner());
+		FeatureModelFile2.getInstance(modelFile.getModelFile()).getFeatureModel().addListener(new FeatureModelChangeListner());
 
 		// initialize project structure
 		try {
@@ -373,7 +373,16 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		fstModel = null;
 		// loading model data and listen to changes in the model file
 		addModelListener();
-		loadModel();
+		Job job = new Job(LOAD_MODEL) {
+			protected IStatus run(IProgressMonitor monitor) {
+				if (loadModel()) {
+					return Status.OK_STATUS;
+				}
+				return Status.CANCEL_STATUS;
+			}
+		};
+		job.setPriority(Job.INTERACTIVE);
+		job.schedule();
 
 		// make the composer ID a builder argument
 		setComposerID(getComposerID());
@@ -391,7 +400,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		// XXX MPL: hack for importing mpl projects
 		if (featureModel instanceof ExtendedFeatureModel) {
 			try {
-				modelFile.getResource().touch(null);
+				modelFile.getModelFile().touch(null);
 			} catch (CoreException e) {
 				LOGGER.logError(e);
 			}
@@ -413,7 +422,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		guidslToXML();
 
 		try {
-			modelReader.readFromFile(modelFile.getResource());
+			modelReader.readFromFile(modelFile.getModelFile());
 			getComposer();
 			if (composerExtension != null && composerExtension.createFolderForFeatures()) {
 				createAndDeleteFeatureFolders();
@@ -426,7 +435,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		} catch (UnsupportedModelException e) {
 			modelFile.createModelMarker(e.getMessage(), IMarker.SEVERITY_ERROR, e.lineNumber);
 		} catch (CoreException e) {
-			LOGGER.logError(ERROR_WHILE_LOADING_FEATURE_MODEL_FROM + modelFile.getResource(), e);
+			LOGGER.logError(ERROR_WHILE_LOADING_FEATURE_MODEL_FROM + modelFile.getModelFile(), e);
 		}
 		return false;
 	}
@@ -451,7 +460,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			// XmlFeatureModelWriter modelWriter = new
 			// XmlFeatureModelWriter(featureModel);
 			FeatureModelWriterIFileWrapper modelWriter = new FeatureModelWriterIFileWrapper(new XmlFeatureModelWriter(featureModel));
-			modelWriter.writeToFile(modelFile.getResource());
+			modelWriter.writeToFile(modelFile.getModelFile());
 		}
 		/*
 		 * TODO delete .order file in 2013 delete
@@ -482,7 +491,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 				fmWriter.writeToFile(file);
 
 				if (!guidslReader.getAnnLine().isEmpty()) {
-					FeatureModelFile modelFile = new FeatureModelFile(project.getFile("model.m"));
+					ModelMarkerHandler<IFile> modelFile = new ModelMarkerHandler<>(project.getFile("model.m"));
 					for (int i = 0; i < guidslReader.getAnnLine().size(); i++)
 						modelFile.createModelMarker(THIS_ANNOTATION_IS_NOT_SUPPORTED_YET___MOVED_TO_THE_COMMENT_SECTION_,
 								IMarker.SEVERITY_WARNING, guidslReader.getAnnLine().get(i));
@@ -750,7 +759,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	}
 
 	public IFile getModelFile() {
-		return modelFile.getResource();
+		return modelFile.getModelFile();
 	}
 	
 	public String[] getJavaClassPath() {
@@ -882,7 +891,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			}
 		}
 
-		IPath modelPath = modelFile.getResource().getFullPath();
+		IPath modelPath = modelFile.getModelFile().getFullPath();
 		if (checkModelChange(event.getDelta().findMember(modelPath)))
 			return;
 

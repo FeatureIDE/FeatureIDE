@@ -110,7 +110,6 @@ public class FeatureDragAndDropCommand extends Command {
 		//TODO _interfaces Removed Code
 		op.addContext((ObjectUndoContext) featureModel.getFeatureModel().getUndoContext());
 
-
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (ExecutionException e) {

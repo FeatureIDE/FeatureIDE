@@ -71,7 +71,8 @@ abstract public class AbstractCorePlugin extends Plugin {
 	 *            A message that should be written to the eclipse log file
 	 */
 	public void logInfo(String message) {
-		log(IStatus.INFO, message, new Exception());
+		log(IStatus.INFO, message, null);
+//		log(IStatus.INFO, message, new Exception());
 	}
 
 	/**
@@ -82,7 +83,8 @@ abstract public class AbstractCorePlugin extends Plugin {
 	 *            A message that should be written to the eclipse log file
 	 */
 	public void logWarning(String message) {
-		log(IStatus.WARNING, message, new Exception());
+		log(IStatus.WARNING, message, null);
+//		log(IStatus.WARNING, message, new Exception());
 	}
 
 	/**

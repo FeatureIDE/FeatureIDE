@@ -21,12 +21,14 @@
 package de.ovgu.featureide.fm.core.base.impl;
 
 import java.io.File;
+import java.util.List;
 
 import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
+import de.ovgu.featureide.fm.core.io.ModelWarning;
 
 /**
  * 
@@ -64,7 +66,12 @@ public class ExtendedFeatureModelFactory implements IFeatureModelFactory {
 	}
 
 	@Override
-	public IFeatureModel loadFeatureModel(File file) {
+	public List<ModelWarning> loadFeatureModel(IFeatureModel featureModel, File file) {
+		return null;
+	}
+
+	@Override
+	public List<ModelWarning> loadFeatureModel(IFeatureModel featureModel, String content) {
 		return null;
 	}
 

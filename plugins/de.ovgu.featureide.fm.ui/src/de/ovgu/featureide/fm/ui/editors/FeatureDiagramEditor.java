@@ -52,6 +52,7 @@ import org.eclipse.gef.LayerConstants;
 import org.eclipse.gef.commands.CommandStack;
 import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
 import org.eclipse.gef.editparts.ZoomManager;
+import org.eclipse.gef.tools.DirectEditManager;
 import org.eclipse.gef.ui.actions.GEFActionConstants;
 import org.eclipse.gef.ui.actions.ZoomInAction;
 import org.eclipse.gef.ui.actions.ZoomOutAction;
@@ -64,6 +65,7 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
@@ -120,6 +122,9 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.Redund
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.RunManualCalculationsAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.calculations.TautologyContraintsCalculationsAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors.SetFeatureColorAction;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureCellEditorLocator;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureLabelEditManager;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.GraphicalEditPartFactory;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
@@ -279,8 +284,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	public void createActions() {
 		IFeatureModel featureModel = getFeatureModel();
 
-		createLayerAction = new CreateLayerAction(this, featureModel, null);
-		createCompoundAction = new CreateCompoundAction(this, featureModel, null);
+		createLayerAction = new CreateLayerAction(this, featureModel);
+		createCompoundAction = new CreateCompoundAction(this, featureModel);
 		deleteAction = new DeleteAction(this, featureModel);
 
 		colorSelectedFeatureAction = new SetFeatureColorAction(this, featureModelEditor.getModelFile().getProject());
@@ -568,7 +573,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		}
 
 		graphicalFeatureModel = GraphicMap.getInstance().constructModel(getFeatureModel());
-		setContents(getGraphicalFeatureModel());
+		setContents(graphicalFeatureModel);
 
 		if (model != null) {
 			final Object element = editPartViewer.getEditPartRegistry().get(model);
@@ -733,24 +738,55 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	}
 
 	public void propertyChange(FeatureModelEvent event) {
-		String prop = event.getPropertyName();
-		if (MODEL_DATA_CHANGED.equals(prop)) {
+		final String prop = event.getPropertyName();
+		
+		switch (prop) {
+		case FEATURE_ADD:
 			reload();
 			refresh();
 			featureModelEditor.setPageModified(true);
-		} else if (MODEL_DATA_LOADED.equals(prop)) {
+
+			final IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature((IFeature) event.getSource());
+
+			final FeatureEditPart part = (FeatureEditPart) getEditPartRegistry().get(graphicalFeature);
+			if (part != null) {
+				// select the new feature
+				setSelection(new StructuredSelection(part));
+				part.getViewer().reveal(part);
+
+				// open the renaming command
+				DirectEditManager manager = new FeatureLabelEditManager(part, TextCellEditor.class, new FeatureCellEditorLocator(part.getFeatureFigure()),
+						getFeatureModel());
+				manager.show();
+			}
+			break;
+		case STRUCTURE_CHANGED:
+			reload();
 			refresh();
-		} else if (MODEL_LAYOUT_CHANGED.equals(prop)) {
 			featureModelEditor.setPageModified(true);
-		} else if (REDRAW_DIAGRAM.equals(prop)) {
+			break;
+		case MODEL_DATA_CHANGED:
+			reload();
+			refresh();
+			featureModelEditor.setPageModified(true);
+			break;
+		case MODEL_DATA_LOADED:
+			refresh();
+			break;
+		case MODEL_LAYOUT_CHANGED:
+			featureModelEditor.setPageModified(true);
+			break;
+		case REDRAW_DIAGRAM:
 			getControl().setBackground(FMPropertyManager.getDiagramBackgroundColor());
 			reload();
 			refreshGraphics(null);
-		} else if (REFRESH_ACTIONS.equals(prop)) {
+			break;
+		case REFRESH_ACTIONS:
 			// additional actions can be refreshed here
 			// legendAction.refresh();
 			legendLayoutAction.refresh();
-		} else if (LEGEND_LAYOUT_CHANGED.equals(prop)) {
+			break;
+		case LEGEND_LAYOUT_CHANGED:
 			legendLayoutAction.refresh();
 		}
 

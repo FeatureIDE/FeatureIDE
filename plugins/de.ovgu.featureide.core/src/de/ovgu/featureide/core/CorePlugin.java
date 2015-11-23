@@ -122,15 +122,15 @@ public class CorePlugin extends AbstractCorePlugin {
 
 	private LinkedList<IProjectListener> projectListeners = new LinkedList<IProjectListener>();
 
-	private LinkedList<ICurrentConfigurationListener> currentConfigurationListeners = new LinkedList<ICurrentConfigurationListener>();
+	private LinkedList<ICurrentConfigurationListener> currentConfigurationListeners = new LinkedList<>();
 
-	private LinkedList<IConfigurationChangedListener> configurationChangedListeners = new LinkedList<IConfigurationChangedListener>();
+	private LinkedList<IConfigurationChangedListener> configurationChangedListeners = new LinkedList<>();
 
-	private LinkedList<IFeatureFolderListener> featureFolderListeners = new LinkedList<IFeatureFolderListener>();
+	private LinkedList<IFeatureFolderListener> featureFolderListeners = new LinkedList<>();
 
-	private LinkedList<ICurrentBuildListener> currentBuildListeners = new LinkedList<ICurrentBuildListener>();
+	private LinkedList<ICurrentBuildListener> currentBuildListeners = new LinkedList<>();
 
-	private LinkedList<IProject> projectsToAdd = new LinkedList<IProject>();
+	private LinkedList<IProject> projectsToAdd = new LinkedList<>();
 
 	private Job job = null;
 
@@ -152,8 +152,6 @@ public class CorePlugin extends AbstractCorePlugin {
 		plugin = this;
 
 		featureProjectMap = new HashMap<IProject, IFeatureProject>();
-		listener = new ProjectChangeListener();
-		ResourcesPlugin.getWorkspace().addResourceChangeListener(listener);
 		for (final IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
 			try {
 				if (project.isOpen()) {
@@ -164,13 +162,16 @@ public class CorePlugin extends AbstractCorePlugin {
 							changeOldNature(project, e.getAttribute("ID"));
 						}
 					}
-					if (project.hasNature(FeatureProjectNature.NATURE_ID))
+					if (project.hasNature(FeatureProjectNature.NATURE_ID)) {
 						addProject(project);
+					}
 				}
 			} catch (Exception e) {
 				CorePlugin.getDefault().logError(e);
 			}
 		}
+		listener = new ProjectChangeListener();
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(listener);
 
 	}
 

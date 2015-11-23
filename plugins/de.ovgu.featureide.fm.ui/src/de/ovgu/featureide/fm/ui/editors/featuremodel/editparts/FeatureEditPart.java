@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.draw2d.ConnectionAnchor;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.geometry.Point;
@@ -121,7 +122,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 
 			FeatureSetMandatoryOperation op = new FeatureSetMandatoryOperation(feature, featureModel.getFeatureModel());
 //TODO _interfaces Removed Code
-//			op.addContext((IUndoContext) featureModel.getUndoContext());
+			op.addContext((IUndoContext) featureModel.getFeatureModel().getUndoContext());
 			try {
 				PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 			} catch (ExecutionException e) {

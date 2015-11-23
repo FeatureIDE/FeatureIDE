@@ -319,6 +319,9 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	@Override
 	public FMComposerManager getFMComposerManager(IProject project) {
 		if (fmComposerManager == null) {
+			if (project == null) {
+				return new FMComposerManager(project);
+			}
 			fmComposerManager = new FMComposerManager(project);
 		}
 		return fmComposerManager;
@@ -344,6 +347,7 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 		return structure;
 	}
 
+	@Override
 	public Object getUndoContext() {
 		return undoContext;
 	}
@@ -447,6 +451,7 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 		this.featureTable.putAll(featureTable);
 	}
 
+	@Override
 	public void setUndoContext(Object undoContext) {
 		this.undoContext = undoContext;
 	}
@@ -456,46 +461,51 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 		return featureTable;
 	}
 
-	@Override
-	public IFeatureModel clone(IFeatureModel oldFeatureModel, boolean complete) {
-		throw new UnsupportedOperationException("Not implemented yet");
-	}
-
-	@Override
-	public IFeatureModel clone() {
-		throw new UnsupportedOperationException("Not implemented yet");
-	}
-
-	@Override
-	public IFeatureModel deepClone() {
-		throw new UnsupportedOperationException("Not implemented yet");
-	}
-
-	@Override
-	public IFeatureModel deepClone(boolean complete) {
-		throw new UnsupportedOperationException("Not implemented yet");
-	}
-
-	@Override
-	public Object getUndoContext(Object undoContext) {
-		throw new UnsupportedOperationException("Not implemented yet");
-	}
-
-	@Override
-	public boolean isFeatureOrderInXML() {
-		throw new UnsupportedOperationException("Not implemented yet");
-	}
-
-	@Override
-	public Object setFeatureOrderInXML(IFeatureModel featureModel, boolean featureOrderInXML) {
-		throw new UnsupportedOperationException("Not implemented yet");
-	}
-
-	@Override
-	public void refreshContextMenu() {
-		throw new UnsupportedOperationException("Not implemented yet");
-	}
-
+//	@Override
+//	public IFeatureModel clone(IFeatureModel oldFeatureModel, boolean complete) {
+//		throw new UnsupportedOperationException("Not implemented yet");
+//	}
+//
+//	@Override
+//	public IFeatureModel clone() {
+//		throw new UnsupportedOperationException("Not implemented yet");
+//	}
+//
+//	@Override
+//	public IFeatureModel deepClone() {
+//		throw new UnsupportedOperationException("Not implemented yet");
+//	}
+//
+//	@Override
+//	public IFeatureModel deepClone(boolean complete) {
+//		throw new UnsupportedOperationException("Not implemented yet");
+//	}
+//
+//	@Override
+//	public Object getUndoContext(Object undoContext) {
+//		throw new UnsupportedOperationException("Not implemented yet");
+//	}
+//
+//	@Override
+//	public boolean isFeatureOrderInXML() {
+//		throw new UnsupportedOperationException("Not implemented yet");
+//	}
+//
+//	@Override
+//	public Object setFeatureOrderInXML(IFeatureModel featureModel, boolean featureOrderInXML) {
+//		throw new UnsupportedOperationException("Not implemented yet");
+//	}
+//
+//	@Override
+//	public void refreshContextMenu() {
+//		throw new UnsupportedOperationException("Not implemented yet");
+//	}
+//
+//	@Override
+//	public void setConstraintSelected(boolean b) {
+//		throw new UnsupportedOperationException("Not implemented yet");
+//	}
+//
 	@Override
 	public void setFeatureOrderListItem(int i, String newName) {
 		throw new UnsupportedOperationException("Not implemented yet");
@@ -571,6 +581,10 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	@Override
 	public void setConstraint(int index, Constraint constraint) {
 		constraints.set(index, constraint);
+	}
+
+	public FeatureModel clone() {
+		return new FeatureModel(this, null);
 	}
 
 }

@@ -22,7 +22,10 @@ package de.ovgu.featureide.fm.core.base.impl;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.eclipse.core.resources.IMarker;
 import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
@@ -30,6 +33,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.ModelIOFactory;
+import de.ovgu.featureide.fm.core.io.ModelWarning;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
 /**
@@ -68,15 +72,32 @@ public class DefaultFeatureModelFactory implements IFeatureModelFactory {
 	}
 
 	@Override
-	public IFeatureModel loadFeatureModel(File file) {
-		FeatureModel featureModel = createFeatureModel();
+	public List<ModelWarning> loadFeatureModel(IFeatureModel featureModel, File file) {
+		featureModel.setSourceFile(file);
 		AbstractFeatureModelReader reader = ModelIOFactory.getModelReader(featureModel, ModelIOFactory.getTypeByFileName(file.getName()));
 		try {
 			reader.readFromFile(file);
-		} catch (FileNotFoundException | UnsupportedModelException e) {
+		} catch (FileNotFoundException e) {
 			e.printStackTrace();
+		} catch (UnsupportedModelException e) {
+			List<ModelWarning> w = new ArrayList<>();
+			w.add(new ModelWarning(e.getMessage(), e.lineNumber, IMarker.SEVERITY_ERROR));
+			return w;
 		}
-		return null;
+		return reader.getWarnings();
+	}
+	
+	@Override
+	public List<ModelWarning> loadFeatureModel(IFeatureModel featureModel, String content) {
+		AbstractFeatureModelReader reader = ModelIOFactory.getModelReader(featureModel, ModelIOFactory.TYPE_XML);
+		try {
+			reader.readFromString(content);
+		} catch (UnsupportedModelException e) {
+			List<ModelWarning> w = new ArrayList<>();
+			w.add(new ModelWarning(e.getMessage(), e.lineNumber, IMarker.SEVERITY_ERROR));
+			return w;
+		}
+		return reader.getWarnings();
 	}
 
 }

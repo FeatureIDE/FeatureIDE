@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 import static de.ovgu.featureide.fm.core.localization.StringTable.REVERSE_FEATURE_ORDER;
 
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.PlatformUI;
 
@@ -51,7 +52,7 @@ public class ReverseOrderAction extends Action {
 
 		ModelReverseOrderOperation op = new ModelReverseOrderOperation(featureModel);
 		//TODO _interfaces Removed Code
-//		op.addContext((IUndoContext) featureModel.getUndoContext());
+		op.addContext((IUndoContext) featureModel.getFeatureModel().getUndoContext());
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);

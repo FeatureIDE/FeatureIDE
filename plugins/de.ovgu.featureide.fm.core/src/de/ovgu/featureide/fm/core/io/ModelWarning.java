@@ -20,12 +20,16 @@
  */
 package de.ovgu.featureide.fm.core.io;
 
+import org.eclipse.core.resources.IMarker;
+
 /**
  * Saves a warning with a line number where it occurred.
  * 
  * @author Thomas Thuem
  */
 public class ModelWarning {
+	
+	public final int severity;
 
 	public final String message;
 
@@ -34,6 +38,13 @@ public class ModelWarning {
 	public ModelWarning(String message, int line) {
 		this.message = message;
 		this.line = line;
+		this.severity = IMarker.SEVERITY_WARNING;
+	}
+	
+	public ModelWarning(String message, int line, int severity) {
+		this.message = message;
+		this.line = line;
+		this.severity = severity;
 	}
 
 }
