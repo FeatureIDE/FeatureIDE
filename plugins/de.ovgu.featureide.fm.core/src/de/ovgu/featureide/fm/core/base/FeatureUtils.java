@@ -165,6 +165,22 @@ public abstract class FeatureUtils {
 		};
 	};
 
+//	private static final IFunction<IFeature, IGraphicalFeature> FEATURE_TO_IGRAPHICALFEATURE = new IFunction<IFeature, IGraphicalFeature>() {
+//
+//		@Override
+//		public IGraphicalFeature invoke(IFeature t) {
+//			return t.getGraphicRepresenation();
+//		};
+//	};
+//
+//	private static final IFunction<IConstraint, IGraphicalConstraint> CONSTRAINT_TO_IGRAPHICALCONSTRAINT = new IFunction<IConstraint, IGraphicalConstraint>() {
+//
+//		@Override
+//		public IGraphicalConstraint invoke(IConstraint t) {
+//			return t.getGraphicRepresenation();
+//		};
+//	};
+
 	/**
 	 * Extracts all concrete features from an object that yields features. Basically, an invocation of this method on <b>features</b> will return an iterable
 	 * object that
@@ -249,7 +265,7 @@ public abstract class FeatureUtils {
 	}
 
 	public static void replacePropNode(IFeatureModel featureModel, int index, Node propNode) {
-		featureModel.getConstraints().set(index, new Constraint(featureModel, propNode));
+		featureModel.setConstraint(index, new Constraint(featureModel, propNode));
 	}
 
 	public static void setRelevantConstraints(IFeature bone) {
@@ -566,9 +582,13 @@ public abstract class FeatureUtils {
 //		return feature.getGraphicRepresenation().getColorList();
 		return null;
 	}
-
+	
 	public static final int hashCode(IFeature feature) {
 		return feature.hashCode();
+	}
+
+	public static final int hashCode(IConstraint constraint) {
+		return constraint.hashCode();
 	}
 
 	public static final GraphicItem getItemType(IFeature feature) {
@@ -1100,4 +1120,12 @@ public abstract class FeatureUtils {
 			string.append("]");
 		}
 	}
+
+//	public static Iterable<IGraphicalFeature> getGraphicalRepresentationsOfFeatures(Iterable<IFeature> features) {
+//		return Functional.map(features, FEATURE_TO_IGRAPHICALFEATURE);
+//	}
+//	
+//	public static Iterable<IGraphicalConstraint> getGraphicalRepresentationsOfConstraints(Iterable<IConstraint> constraints) {
+//		return Functional.map(constraints, CONSTRAINT_TO_IGRAPHICALCONSTRAINT);
+//	}
 }

@@ -32,6 +32,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.WRONG_SYNTAX;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -58,6 +59,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import de.ovgu.featureide.fm.core.io.xml.XmlPropertyLoader.PropertiesParser;
 
 /**
  * Parses a FeatureModel from XML
@@ -90,18 +92,40 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 			FMCorePlugin.getDefault().logError(e);
 		}
 		doc.getDocumentElement().normalize();
+		
+		final Collection<PropertiesParser> customProperties = new ArrayList<>();
+		
 		for (Element e : getElements(doc.getElementsByTagName(FEATURE_MODEL))) {
 			setFeatureModelAttributes(e);
 			parseStruct(e.getElementsByTagName(STRUCT));
 			parseConstraints(e.getElementsByTagName(CONSTRAINTS));
 			parseCalculations(e.getElementsByTagName(CALCULATIONS));
 			parseComments(e.getElementsByTagName(COMMENTS));
-			parseFeatureOrder(e.getElementsByTagName(FEATURE_ORDER));	
+			parseFeatureOrder(e.getElementsByTagName(FEATURE_ORDER));
+			
+			XmlPropertyLoader propertyLoader = new XmlPropertyLoader(e.getElementsByTagName(PROPERTIES));
+			customProperties.addAll(propertyLoader.parseProperties());
 		}
 		if (featureModel.getStructure().getRoot() == null) {
 			throw new UnsupportedModelException(WRONG_SYNTAX, 1);
 		}
+		
+		importCustomProperties(customProperties, featureModel);
+		
 		featureModel.handleModelDataLoaded();
+	}
+
+	private void importCustomProperties(Collection<PropertiesParser> customProperties, IFeatureModel featureModel) {
+		for (PropertiesParser parser : customProperties) {
+			switch (parser.getType()) {
+			case FEATURE_PROPERTIES_PARSER: {
+				for(String featureName : parser.getIdentifier()) {
+					featureModel.getFeature(featureName).getCustomProperties().setEntrySet(parser.getPropertyEntries(featureName));
+				}
+			} break;
+			default: throw new UnsupportedOperationException("Unkown property container parser type " + parser.getType());
+			}
+		}
 	}
 
 	/**
@@ -202,6 +226,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 
 				}
 			}
+			
 			if (featureModel.getFeature(name) != null) {
 				throwError("Duplicate entry for feature: " + name, e);
 			}

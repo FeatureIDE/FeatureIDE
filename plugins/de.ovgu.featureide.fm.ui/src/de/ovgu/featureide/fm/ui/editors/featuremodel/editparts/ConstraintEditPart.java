@@ -73,7 +73,7 @@ public class ConstraintEditPart extends AbstractGraphicalEditPart implements Pro
 		} else if (request.getType() == RequestConstants.REQ_SELECTION) {
 			try {
 				for (IFeature containedFeature : getConstraintModel().getObject().getContainedFeatures()) {
-					containedFeature.getFeatureModel().setConstraintSelected(true);
+					containedFeature.setConstraintSelected(true);
 				}
 			} catch (NullPointerException e) {
 				FMCorePlugin.getDefault().reportBug(320);

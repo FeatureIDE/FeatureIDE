@@ -33,6 +33,7 @@ import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.IFMComposerExtension;
 import de.ovgu.featureide.fm.core.RenamingsManager;
 import de.ovgu.featureide.fm.core.base.event.IEventManager;
+import de.ovgu.featureide.fm.core.base.impl.Constraint;
 
 /**
  * Interface for a class that represents a feature model.</br>
@@ -129,8 +130,6 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 
 	void refreshContextMenu();
 
-	void setConstraintSelected(boolean b);
-
 	void setUndoContext(Object undoContext);
 
 	void setFeatureOrderListItem(int i, String newName);
@@ -140,5 +139,7 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	File getSourceFile();
 
 	long getNextElementId();
+
+	void setConstraint(int index, Constraint constraint);
 
 }

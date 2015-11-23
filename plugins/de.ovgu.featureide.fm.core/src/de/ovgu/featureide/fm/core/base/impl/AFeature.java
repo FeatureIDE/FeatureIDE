@@ -20,11 +20,11 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureProperty;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.base.IPropertyContainer;
 import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
 
 /**
@@ -37,12 +37,15 @@ public abstract class AFeature extends AFeatureModelElement implements IFeature 
 
 	protected final IFeatureProperty property;
 	protected final IFeatureStructure structure;
+	protected final IPropertyContainer propertyContainer;
 
 	protected AFeature(AFeature oldFeature, IFeatureModel featureModel, IFeatureStructure newFeatrureStructure) {
 		super(oldFeature, featureModel);
 
 		property = oldFeature.property.clone(this);
 		structure = newFeatrureStructure != null ? newFeatrureStructure : oldFeature.structure;
+		propertyContainer = createPropertyContainer();
+		propertyContainer.setEntrySet(oldFeature.getCustomProperties().entrySet());
 	}
 
 	public AFeature(IFeatureModel featureModel, String name) {
@@ -51,6 +54,11 @@ public abstract class AFeature extends AFeatureModelElement implements IFeature 
 
 		property = createProperty();
 		structure = createStructure();
+		propertyContainer = createPropertyContainer();
+	}
+
+	protected IPropertyContainer createPropertyContainer() {
+		return new MapPropertyContainer();
 	}
 
 	protected IFeatureProperty createProperty() {
@@ -81,15 +89,21 @@ public abstract class AFeature extends AFeatureModelElement implements IFeature 
 		final String oldName = this.name;
 		super.setName(name);
 		fireEvent(new FeatureModelEvent(this, NAME_CHANGED, oldName, name));
+	}	
+
+	@Override
+	public IPropertyContainer getCustomProperties() {
+		return propertyContainer;
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder("name=" + name);
-		sb.append(", Structure=[");
-		FeatureUtils.print(this, sb);
-		sb.append("]");
-		return "Feature(" + sb.toString() + ")";
+//		StringBuilder sb = new StringBuilder("name=" + name);
+//		sb.append(", Structure=[");
+//		FeatureUtils.print(this, sb);
+//		sb.append("]");
+//		return "Feature(" + sb.toString() + ")";
+		return getName();
 	}
 
 }

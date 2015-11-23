@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.core;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,19 +27,17 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.core.io.FeatureModelFile2;
 
 /**
  * Handles feature renamings.
@@ -53,7 +50,6 @@ public class RenamingsManager {
 	 */
 	private final List<Renaming> renamings = new LinkedList<Renaming>();
 	private final IFeatureModel model;
-	private IFolder sourceFolder;
 	
 	/* *****************************************************************
 	 * 
@@ -84,7 +80,7 @@ public class RenamingsManager {
 		// update the feature order list
 		for (int i = 0;i < featureOrderList.size();i++) {
 			if (featureOrderList.get(i).equals(oldName)) {
-				featureOrderList.set(i, newName);
+				model.setFeatureOrderListItem(i, newName);
 				break;
 			}
 		}
@@ -107,59 +103,13 @@ public class RenamingsManager {
 	};
 
 	public void performRenamings(IFile file) {
-		IProject project = ((IResource) file.getAdapter(IFile.class)).getProject();
-		String sourceName = model.getFMComposerManager(project).getProjectSourcePath();
-		if (!sourceName.isEmpty()) {
-			sourceFolder = project.getFolder(sourceName);
-			for (Renaming renaming : renamings) {
-				if (!performComposerRenamings(renaming.oldName, renaming.newName, project)) {
-					moveFolder(renaming.oldName, renaming.newName);
-				}
-			}
+		final IFeatureModel projectModel = FeatureModelFile2.getInstance(file).getFeatureModel();
+		for (Renaming renaming : renamings) {
+			final FeatureModelEvent event = new FeatureModelEvent(model, PropertyConstants.FEATURE_NAME_CHANGED, renaming.oldName, renaming.newName);
+			projectModel.fireEvent(event);
+			model.fireEvent(event);
 		}
 		renamings.clear();
-	}
-
-	private boolean performComposerRenamings(final String oldName,
-			final String newName, final IProject project) {
-		return model.getFMComposerManager(project).performRenaming(oldName,	newName, project);
-	}
-
-	private void moveFolder(String oldName, String newName) {
-		try {
-			IFolder folder = sourceFolder.getFolder(oldName);
-			if (folder.exists()) {
-				if (!sourceFolder.getFolder(newName).exists()) {
-					IPath newPath = sourceFolder.getFolder(newName)
-							.getFullPath();
-					folder.move(newPath, true, null);
-				} else {
-					move(folder, oldName, newName);
-				}
-			}
-		} catch (CoreException e) {
-			FMCorePlugin.getDefault().logError(e);
-		}
-	}
-
-	private void move(IFolder folder, String oldName, String newName)
-			throws CoreException {
-		for (IResource res : folder.members()) {
-			if (res instanceof IFile) {
-				IFile newfile = sourceFolder.getFolder(newName).getFile(
-						res.getName());
-				if (!newfile.exists()) {
-					res.move(newfile.getRawLocation(), true, null);
-				}
-			}
-			if (res instanceof IFolder) {
-				IFolder newfile = sourceFolder.getFolder(newName).getFolder(
-						res.getName());
-				if (!newfile.exists()) {
-					res.move(newfile.getRawLocation(), true, null);
-				}
-			}
-		}
 	}
 
 	private void renameVariables(Node node, String oldName, String newName) {

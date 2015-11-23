@@ -46,7 +46,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
  * 
  * @author Christian Elzholz, Marcus Schmelz
  */
-public class ColorSelectedFeatureAction extends Action {
+public class SetFeatureColorAction extends Action {
 
 	private static ImageDescriptor colorImage = FMUIPlugin.getDefault().getImageDescriptor("icons/FeatureColorIcon.gif");
 	
@@ -59,9 +59,9 @@ public class ColorSelectedFeatureAction extends Action {
 			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
 			updateFeatureList(selection);
 			if (featureList.isEmpty()) {
-				ColorSelectedFeatureAction.this.setEnabled(false);
+				SetFeatureColorAction.this.setEnabled(false);
 			} else {
-				ColorSelectedFeatureAction.this.setEnabled(true);
+				SetFeatureColorAction.this.setEnabled(true);
 			}
 		}
 
@@ -71,7 +71,7 @@ public class ColorSelectedFeatureAction extends Action {
 	 * @param viewer
 	 * @param project
 	 */
-	public ColorSelectedFeatureAction(FeatureDiagramEditor viewer, IProject project) {
+	public SetFeatureColorAction(FeatureDiagramEditor viewer, IProject project) {
 		super(COLORATION);
 		if (viewer instanceof GraphicalViewerImpl) {
 			((GraphicalViewerImpl) viewer).addSelectionChangedListener(listener);
@@ -108,10 +108,8 @@ public class ColorSelectedFeatureAction extends Action {
 
 	public void run() {
 
-		//TODO _interfaces Removed Code
-//		ColorSelectedFeatureDialog dialog = new ColorSelectedFeatureDialog(shell, this.featureList);
-//		int returnstat = dialog.open();
-		int returnstat = 0;
+		SetFeatureColorDialog dialog = new SetFeatureColorDialog(shell, this.featureList);
+		int returnstat = dialog.open();
 
 		if (!featureList.isEmpty() && Window.OK == returnstat) {
 			featureList.get(0).getGraphicalModel().getFeatureModel().handleModelDataChanged();

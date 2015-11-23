@@ -61,7 +61,7 @@ public class FeatureNode extends LazyParent implements IToolTip {
 	private final IFeature feat;
 
 	public FeatureNode(final IFeature feat, boolean expand) {
-		super(feat.toString());
+		super(feat.getName());
 		this.feat = feat;
 		this.expand = expand;
 		this.tooltip = buildToolTip();

@@ -22,13 +22,17 @@ package de.ovgu.featureide.fm.core;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import de.ovgu.featureide.fm.core.base.IFeature;
+
 public final class Features {
-	
+
 	public static final String FEATURE_SUFFIX = "(Feature)";
-	
+
 	public static final Collection<String> extractOperatorNamesFromFeatuers(final Set<String> features) {
 		List<String> result = new ArrayList<>();
 		for (String feature : features) {
@@ -37,6 +41,41 @@ public final class Features {
 				result.add(str);
 		}
 		return result;
+	}
+
+	public static IFeature getCommonAncestor(Collection<IFeature> features) {
+		List<IFeature> commonAncestorList = null;
+		for (IFeature feature : features) {
+			commonAncestorList = Features.getCommonAncestor(commonAncestorList, feature.getStructure().getParent().getFeature());
+		}
+		return commonAncestorList.get(commonAncestorList.size() - 1);
+	}
+
+	public static List<IFeature> getCommonAncestor(List<IFeature> commonAncestorList, IFeature parent) {
+		if (commonAncestorList == null) {
+			commonAncestorList = new LinkedList<>();
+			while (parent != null) {
+				commonAncestorList.add(0, parent);
+				parent = parent.getStructure().getParent().getFeature();
+			}
+		} else if (parent != null) {
+			LinkedList<IFeature> parentList = new LinkedList<>();
+			while (parent != null) {
+				parentList.addFirst(parent);
+				parent = parent.getStructure().getParent().getFeature();
+			}
+			final Iterator<IFeature> iterator1 = parentList.iterator();
+			final Iterator<IFeature> iterator2 = commonAncestorList.iterator();
+			int i = 0;
+			while (iterator1.hasNext() && iterator2.hasNext()) {
+				if (!iterator1.next().equals(iterator2.next())) {
+					break;
+				}
+				i++;
+			}
+			commonAncestorList = commonAncestorList.subList(0, i);
+		}
+		return commonAncestorList;
 	}
 
 }

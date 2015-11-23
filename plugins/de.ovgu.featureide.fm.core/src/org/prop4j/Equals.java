@@ -27,7 +27,7 @@ import java.util.List;
  * 
  * @author Thomas Thuem
  */
-public class Equals extends Node {
+public class Equals extends Node implements Cloneable {
 	
 	public Equals(Object leftChild, Object rightChild) {
 		setChildren(leftChild, rightChild);

@@ -28,7 +28,7 @@ import java.util.List;
  * 
  * @author Thomas Thuem
  */
-public class Implies extends Node {
+public class Implies extends Node implements Cloneable {
 	
 	public Implies(Object leftChild, Object rightChild) {
 		setChildren(leftChild, rightChild);
@@ -40,6 +40,13 @@ public class Implies extends Node {
 		if (list.contains(getClass()))
 			return new Or(new Not(children[0]), children[1]);
 		return this;
+	}
+	
+	@Override
+	public int hashCode() {
+		// TODO: This is equivalent not to implement hashCode() at all, and was added for legacy code reasons. 
+		// Please note: implementing "equals" without custom hashCode should be avoided
+		return super.hashCode();	
 	}
 	
 	@Override

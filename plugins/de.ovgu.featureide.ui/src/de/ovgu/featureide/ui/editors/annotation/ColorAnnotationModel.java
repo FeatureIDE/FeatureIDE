@@ -400,6 +400,9 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 			if (isInBuildFolder((IFolder) file.getParent())) {
 				/* annotations for generated files */
 				FSTClass clazz = model.getClass(model.getAbsoluteClassName(file));
+				if (clazz == null) {
+					return;
+				}
 				if (!clazz.hasComposedLines) {
 					clazz.hasComposedLines = true;
 					composer.postCompile(null, file);

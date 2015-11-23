@@ -68,6 +68,7 @@ public class StringTable {
 	public static final String COULD_NOT_SET_PERSISTANT_PROPERTY = "Could not set persistant property";
 	public static final String ERROR_WHILE_CREATING_FEATURE_MODEL = "Error while creating feature model";
 	public static final String NO_RESOURCE_GIVEN_WHILE_GETTING_THE_PROJECT_DATA = "No resource given while getting the project data";
+	public static final String CONFIG = "config";	
 	public static final String EQUATION = "equation";
 	public static final String EXPRESSION = "expression";
 	public static final String ADD_PROJECT = "Add Project";
@@ -718,7 +719,7 @@ public class StringTable {
 	public static final String LOC_BY_FEATURE = "LOC by feature";
 	public static final String PROJECT_BASED__ = "Project based - ";
 	public static final String CALCULATE = "Calculate ";
-	public static final String REFRESH_STATISTICS_VIEW = "Refresh statistics view";
+	public static final String REFRESH_STATISTICS_VIEW = "Refreshing statistics view";
 	public static final String CHOOSE_WISELY = "choose wisely";
 	public static final String EXPORT_STATISTICS_INTO_CSV = "Export statistics into CSV file";
 	public static final String SHOW_ERRORDIALOG = "show errordialog";
@@ -982,10 +983,10 @@ public class StringTable {
 	public static final String COLORATION = "Feature Color";
 	public static final String MAGENTA = "magenta";
 	public static final String PURPLE = "purple";
-	public static final String SELECTED_FEATURE = "Selected Feature";
-	public static final String SELECTED_FEATURE_DIRECT_CHILDREN = "Selected Feature and all direct Children";
-	public static final String SELECTED_FEATURE_ALL_CHILDREN = "Selected Feature and all Children";
-	public static final String SELECTED_FEATURE_SIBLINGS = "Selected Feature and all Siblings";
+	public static final String SELECTED_FEATURE = "Current Selection";
+	public static final String SELECTED_FEATURE_DIRECT_CHILDREN = "Children (first level)";
+	public static final String SELECTED_FEATURE_ALL_CHILDREN = "Children (all)";
+	public static final String SELECTED_FEATURE_SIBLINGS = "Current selection and all siblings";
 	public static final String COLORATION_DIALOG = "Set Feature Colors";
 	public static final String CHOOSE_COLOR_ = "Choose Color:";
 	public static final String CHOOSE_ACTION_ = "Choose Action:";

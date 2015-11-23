@@ -32,6 +32,8 @@ public interface IFeature extends IFeatureModelElement {
 	IFeature clone(IFeatureModel newFeatureModel, IFeatureStructure newStructure);
 
 	IFeatureProperty getProperty();
+	
+	IPropertyContainer getCustomProperties();
 
 	IFeatureStructure getStructure();
 

@@ -52,7 +52,7 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  * @author Stefan Krueger
  * 
  */
-public class FeatureModel extends DeprecatedFeatureModel implements PropertyConstants, IGraphicItem {
+public class FeatureModel extends DeprecatedFeatureModel implements PropertyConstants, IGraphicItem, Cloneable {
 
 	public IFeatureModel model;
 

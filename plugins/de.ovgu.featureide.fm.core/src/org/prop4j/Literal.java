@@ -27,7 +27,7 @@ import java.util.List;
  * 
  * @author Thomas Thuem
  */
-public class Literal extends Node {
+public class Literal extends Node implements Cloneable {
 	
 	public Object var;
 	
@@ -67,6 +67,13 @@ public class Literal extends Node {
 	@Override
 	public Literal clone() {
 		return new Literal(var, positive);
+	}
+	
+	@Override
+	public int hashCode() {
+		// TODO: This is equivalent not to implement hashCode() at all, and was added for legacy code reasons. 
+		// Please note: implementing "equals" without custom hashCode should be avoided
+		return super.hashCode();	
 	}
 
 	@Override

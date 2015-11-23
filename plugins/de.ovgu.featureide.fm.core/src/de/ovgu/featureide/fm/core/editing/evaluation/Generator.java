@@ -393,7 +393,7 @@ public abstract class Generator {
 						parent.removeChild(feature.getStructure());
 						IFeatureStructure newParent = parent;
 						for (IFeature compound : randomizedList)
-							if (compound != parent && compound.getStructure().hasChildren())
+							if (!compound.equals(parent.getFeature()) && compound.getStructure().hasChildren())
 								newParent = compound.getStructure();
 						newParent.addChild(feature.getStructure());
 						break;

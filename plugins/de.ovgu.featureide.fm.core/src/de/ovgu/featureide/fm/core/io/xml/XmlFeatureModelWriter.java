@@ -30,6 +30,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.NOT;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.prop4j.And;
 import org.prop4j.AtMost;
@@ -40,11 +41,14 @@ import org.prop4j.Not;
 import org.prop4j.Or;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.Text;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IPropertyContainer.Entry;
+import de.ovgu.featureide.fm.core.base.IPropertyContainer.Type;
 import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
 
 /**
@@ -64,6 +68,7 @@ public class XmlFeatureModelWriter extends AbstractXMLFeatureModelWriter<IFeatur
 	protected void createXmlDoc(Document doc) {
 		Element root = doc.createElement(FEATURE_MODEL);
 		Element struct = doc.createElement(STRUCT);
+    	Element properties = doc.createElement(PROPERTIES);
 		Element constraints = doc.createElement(CONSTRAINTS);
 		Element calculations = doc.createElement(CALCULATIONS);
 		Element comments = doc.createElement(COMMENTS);
@@ -78,6 +83,9 @@ public class XmlFeatureModelWriter extends AbstractXMLFeatureModelWriter<IFeatur
 		//		}
 
 		doc.appendChild(root);
+    	root.appendChild(properties);
+    	createXmlPropertiesPart(doc, properties, object);
+    	
 		root.appendChild(struct);
 		createXmlDocRec(doc, struct, object.getStructure().getRoot().getFeature());
 
@@ -92,7 +100,7 @@ public class XmlFeatureModelWriter extends AbstractXMLFeatureModelWriter<IFeatur
 
 			constraints.appendChild(rule);
 			createPropositionalConstraints(doc, rule, object.getConstraints().get(i).getNode());
-		}
+    	}
 
 		root.appendChild(calculations);
 		calculations.setAttribute(CALCULATE_AUTO, "" + object.getAnalyser().runCalculationAutomatically);
@@ -101,38 +109,70 @@ public class XmlFeatureModelWriter extends AbstractXMLFeatureModelWriter<IFeatur
 		calculations.setAttribute(CALCULATE_REDUNDANT, "" + object.getAnalyser().calculateRedundantConstraints);
 		calculations.setAttribute(CALCULATE_TAUTOLOGY, "" + object.getAnalyser().calculateTautologyConstraints);
 
-		root.appendChild(comments);
-		for (String comment : object.getProperty().getComments()) {
-			Element c = doc.createElement(C);
-			comments.appendChild(c);
-			Text text = doc.createTextNode(comment);
-			c.appendChild(text);
+    	root.appendChild(comments);
+    	for(String comment : object.getProperty().getComments()){
+        	Element c = doc.createElement(C);
+        	comments.appendChild(c);        	
+        	Text text = doc.createTextNode(comment);
+        	c.appendChild(text);
+        }
+    	order.setAttribute(USER_DEFINED, Boolean.toString(object.isFeatureOrderUserDefined()));
+    	root.appendChild(order);
+    	
+    	if (object.isFeatureOrderUserDefined()) {
+	    	Collection<String> featureOrderList = object.getFeatureOrderList();
+	    	
+	    	if (featureOrderList.isEmpty())
+	    		featureOrderList = FeatureUtils.extractConcreteFeaturesAsStringList(object);
+	    	
+	    	for(String featureName : featureOrderList){
+	    		Element feature = doc.createElement(FEATURE);
+	    		feature.setAttribute(NAME, featureName);
+	    		order.appendChild(feature);
+	    	}
+    	}
+    }
+   
+    private void createXmlPropertiesPart(Document doc, Element propertiesNode, IFeatureModel featureModel) {
+		
+    	if (featureModel == null || propertiesNode == null) throw new RuntimeException();
+    	
+    	// Store per-feature properties
+    	for(final IFeature feature : featureModel.getFeatures()) {
+    		final String featureName = feature.getName();
+    		final Set<Entry<String, Type, Object>> propertyEntries = feature.getCustomProperties().entrySet();
+    		if (!propertyEntries.isEmpty())
+    			propertiesNode.appendChild(createFeaturePropertyContainerNode(doc, featureName, propertyEntries));
+    	}
+    	
+    	// TODO: Add here other property container, e.g., feature model
+    	// ...
+	}
+
+	private Node createFeaturePropertyContainerNode(Document doc, String featureName, Set<Entry<String, Type, Object>> propertyEntries) {
+		final Element result = doc.createElement(FEATURE);
+		result.setAttribute(NAME, featureName);
+		for (final Entry<String, Type, Object> entry : propertyEntries) {
+			result.appendChild(createPropertyEntriesNode(doc, entry));
 		}
-		order.setAttribute(USER_DEFINED, Boolean.toString(object.isFeatureOrderUserDefined()));
-		root.appendChild(order);
+		return result;
+	}
 
-		if (object.isFeatureOrderUserDefined()) {
-			Collection<String> featureOrderList = object.getFeatureOrderList();
-
-			if (featureOrderList.isEmpty())
-				featureOrderList = FeatureUtils.extractConcreteFeaturesAsStringList(object);
-
-			for (String featureName : featureOrderList) {
-				Element feature = doc.createElement(FEATURE);
-				feature.setAttribute(NAME, featureName);
-				order.appendChild(feature);
-			}
-		}
+	private Node createPropertyEntriesNode(Document doc, Entry<String, Type, Object> entry) {
+		final Element propertyElement = doc.createElement(XmlPropertyLoader.PROPERTY);
+		propertyElement.setAttribute(XmlPropertyLoader.KEY, entry.getKey());
+		propertyElement.setAttribute(XmlPropertyLoader.VALUE, entry.getValue().toString());
+		propertyElement.setAttribute(XmlPropertyLoader.TYPE, entry.getType().toString());
+		return propertyElement;
 	}
 
 	/**
-	 * Creates document based on feature model step by step
-	 * 
-	 * @param doc document to write
-	 * @param node parent node
-	 * @param feat current feature
-	 */
-	private void createXmlDocRec(Document doc, Element node, IFeature feat) {
+     * Creates document based on feature model step by step
+     * @param doc document to write
+     * @param node parent node
+     * @param feat current feature
+     */
+    private void createXmlDocRec(Document doc, Element node, IFeature feat) {
 
 		if (feat == null)
 			return;

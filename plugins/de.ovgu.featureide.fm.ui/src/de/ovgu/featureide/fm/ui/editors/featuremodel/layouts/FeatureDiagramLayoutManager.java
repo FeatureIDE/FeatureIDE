@@ -39,7 +39,7 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * @author Thomas Thuem
  */
 abstract public class FeatureDiagramLayoutManager {
-	
+
 	protected static final class HiddenFilter implements IFilter<IGraphicalFeature> {
 		@Override
 		public boolean isValid(IGraphicalFeature object) {
@@ -109,8 +109,8 @@ abstract public class FeatureDiagramLayoutManager {
 		int width = mostRightFeatureX - mostLeftFeatureX;
 		int offset = mostRightFeatureX - ((controlWidth - width) / 2);
 		for (IGraphicalFeature feature : featureModel.getFeatures()) {
-			FeatureUIHelper.setLocation(feature, new Point(FeatureUIHelper.getLocation(feature).getCopy().x + offset, FeatureUIHelper.getLocation(feature)
-					.getCopy().y));
+			FeatureUIHelper.setLocation(feature,
+					new Point(FeatureUIHelper.getLocation(feature).getCopy().x + offset, FeatureUIHelper.getLocation(feature).getCopy().y));
 		}
 	}
 

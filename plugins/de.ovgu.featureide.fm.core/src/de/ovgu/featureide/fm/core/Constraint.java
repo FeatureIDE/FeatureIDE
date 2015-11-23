@@ -128,7 +128,12 @@ public class Constraint implements PropertyConstants, IGraphicItem {
 	public void fire(PropertyChangeEvent event) {
 		FeatureUtils.fire(constraint, event);
 	}
-
+	
+	@Override
+	public int hashCode() {
+		return FeatureUtils.hashCode(constraint);
+	};
+	
 	@Override
 	public boolean equals(Object obj) {
 		return FeatureUtils.equals(constraint, obj);

@@ -94,7 +94,7 @@ public class ConquererFMWriter extends AbstractFeatureModelWriter {
 	 * Creates XML-Document
 	 * @param doc document to write
 	 */
-    private void createXmlDoc(Document doc) {
+	private void createXmlDoc(Document doc) {
         Element plm = doc.createElement("plm");
     	doc.appendChild(plm);
 		plm.setAttribute("name", object.getStructure().getRoot().getFeature().getName());
@@ -102,8 +102,8 @@ public class ConquererFMWriter extends AbstractFeatureModelWriter {
 		
 		require = new HashMap<String, Set<String>>();
 		exclude = new HashMap<String, Set<String>>();
-    	List<Node> furtherNodes = new LinkedList<Node>();
-    	List<Node> nodes = Functional.toList(FeatureUtils.getPropositionalNodes(object.getConstraints()));
+    	final List<Node> furtherNodes = new LinkedList<Node>();
+		final List<Node> nodes = Functional.toList(FeatureUtils.getPropositionalNodes(object.getConstraints()));
     	Node[] nodeArray = nodes.toArray(new Node[nodes.size()]);
     	Node node = new And(nodeArray);
     	if (node.getChildren().length > 0) {

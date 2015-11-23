@@ -43,7 +43,6 @@ import de.ovgu.featureide.fm.core.constraint.FeatureAttributeMap;
 import de.ovgu.featureide.fm.core.constraint.Reference;
 import de.ovgu.featureide.fm.core.constraint.RelationOperator;
 import de.ovgu.featureide.fm.core.constraint.WeightedTerm;
-import de.ovgu.featureide.fm.core.filter.base.Filter;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**

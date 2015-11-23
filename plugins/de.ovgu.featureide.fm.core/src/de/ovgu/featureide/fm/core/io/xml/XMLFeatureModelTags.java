@@ -29,6 +29,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.TAUTOLOGY;
  * @author Jens Meinicke
  */
 public interface XMLFeatureModelTags {
+	static final String PROPERTIES = "properties";
 	static final String FEATURE_MODEL = "featureModel";
 	static final String STRUCT = "struct";
 	static final String FEATURE_ORDER = "featureOrder";

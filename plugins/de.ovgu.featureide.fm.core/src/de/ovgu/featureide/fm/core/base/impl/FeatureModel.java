@@ -77,9 +77,9 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 		return nextElementId++;
 	}
 
-	protected final FeatureModelAnalyzer analyser = createAnalyser();
+	protected final FeatureModelAnalyzer analyser;
 	protected final List<IConstraint> constraints = new LinkedList<>();
-
+	
 	/**
 	 * A list containing the feature names in their specified order will be
 	 * initialized in XmlFeatureModelReader.
@@ -111,6 +111,8 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 
 		property = createProperty();
 		structure = createStructure();
+
+		analyser = createAnalyser();
 	}
 
 	protected FeatureModel(FeatureModel oldFeatureModel, IFeature newRoot) {
@@ -136,6 +138,7 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 				}
 			}
 		}
+		analyser = createAnalyser();
 	}
 
 	protected IFeatureModelProperty createProperty() {
@@ -494,11 +497,6 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	}
 
 	@Override
-	public void setConstraintSelected(boolean b) {
-		throw new UnsupportedOperationException("Not implemented yet");
-	}
-
-	@Override
 	public void setFeatureOrderListItem(int i, String newName) {
 		throw new UnsupportedOperationException("Not implemented yet");
 	}
@@ -568,6 +566,11 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 			return false;
 		FeatureModel other = (FeatureModel) obj;
 		return id == other.id;
+	}
+
+	@Override
+	public void setConstraint(int index, Constraint constraint) {
+		constraints.set(index, constraint);
 	}
 
 }

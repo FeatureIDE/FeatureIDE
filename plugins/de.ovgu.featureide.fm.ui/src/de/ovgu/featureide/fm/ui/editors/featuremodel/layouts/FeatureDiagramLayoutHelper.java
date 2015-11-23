@@ -111,7 +111,7 @@ public class FeatureDiagramLayoutHelper {
 		if (newCompound.getObject().getStructure().isRoot()) {
 			initPos.y = (initPos.y - FMPropertyManager.getFeatureSpaceY());
 		} else {
-			IGraphicalFeature parent = newCompound.getTree().getParentObject();
+			final IGraphicalFeature parent = newCompound.getTree().getParentObject();
 			initPos.y = (initPos.y + FeatureUIHelper.getLocation(parent).y) / 2;
 			initPos.x = (initPos.x + FeatureUIHelper.getLocation(parent).x) / 2;
 		}

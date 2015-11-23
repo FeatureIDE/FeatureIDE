@@ -50,6 +50,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.FeatureDependencies;
+import de.ovgu.featureide.fm.core.Features;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -102,29 +104,7 @@ public class DeleteOperation extends AbstractFeatureModelOperation implements GU
 			}
 			IFeature parent = removeFeature(element, removalMap, alreadyDeleted);
 			
-			if (commonAncestorList == null) {
-				commonAncestorList = new LinkedList<>();
-				while (parent != null) {
-					commonAncestorList.add(0, parent);
-					parent = parent.getStructure().getParent().getFeature();
-				}
-			} else if (parent != null) {
-				LinkedList<IFeature> parentList = new LinkedList<>();
-				while (parent != null) {
-					parentList.addFirst(parent);
-					parent = parent.getStructure().getParent().getFeature();
-				}
-				final Iterator<IFeature> iterator1 = parentList.iterator();				
-				final Iterator<IFeature> iterator2 = commonAncestorList.iterator();
-				int i = 0;
-				while (iterator1.hasNext() && iterator2.hasNext()) {
-					if (!iterator1.next().equals(iterator2.next())) {
-						break;
-					}
-					i++;
-				}
-				commonAncestorList = commonAncestorList.subList(0, i);
-			}
+			commonAncestorList = Features.getCommonAncestor(commonAncestorList, parent);
 		}
 
 		removeContainedFeatures(removalMap, alreadyDeleted);
@@ -184,7 +164,7 @@ public class DeleteOperation extends AbstractFeatureModelOperation implements GU
 		}
 		if (feature != null) {
 			final IFeature parent = feature.getStructure().getParent().getFeature();
-			if (feature.getStructure().getRelevantConstraints().isEmpty()) {
+			if (FeatureUtils.getRelevantConstraints(feature).isEmpty()) {
 				// feature can be removed because it has no relevant constraint
 				executeOperation(new FeatureDeleteOperation(featureModel, feature));
 				alreadyDeleted.add(feature);

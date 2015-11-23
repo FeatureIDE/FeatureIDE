@@ -25,7 +25,6 @@ import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
-import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
@@ -128,6 +127,9 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 			IPath path = cu.getPath();
 			IFile myfile = root.getFile(path);
 			IFeatureProject featureProject = CorePlugin.getFeatureProject(myfile);
+			if (featureProject == null) {
+				return superImage;
+			}
 			FSTModel model = featureProject.getFSTModel();
 			IComposerExtensionClass composer = featureProject.getComposer();
 			if (model.getClasses().isEmpty()) {

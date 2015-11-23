@@ -186,7 +186,11 @@ public class FeatureColorManager {
 		}
 		try {
 			for (IResource res : profileFolder.members()) {
-				if (res instanceof IFile && res.getFileExtension().equals("profile")) {
+				final String ext = res.getFileExtension();
+				if (ext == null)
+					throw new RuntimeException("Unexpected null reference");
+				
+				if (res instanceof IFile && ext.equals("profile")) {
 					readColors(newEntry, res);
 				}
 			}
@@ -204,6 +208,8 @@ public class FeatureColorManager {
 			ColorScheme newCs = new ColorScheme(name);
 			newEntry.put(newCs.getName(), newCs);
 			String line = in.readLine();
+			if (line == null)
+				throw new RuntimeException("Unexpected null reference");
 			if (line.equals("true")) {
 				setActive(res.getProject(), name, false);
 			}
