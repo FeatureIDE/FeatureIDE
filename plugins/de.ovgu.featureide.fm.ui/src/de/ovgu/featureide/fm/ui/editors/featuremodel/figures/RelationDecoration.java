@@ -90,8 +90,8 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 		if (!fill)
 			return;
 
-		double highestAngle1 = Integer.MAX_VALUE;
-		double highestAngle2 = Integer.MIN_VALUE;
+		double highestAngle1 = 360;
+		double highestAngle2 = 0;
 
 		Rectangle r = calculateRectangle();
 
@@ -103,9 +103,9 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 		} else {
 
 			if (children != null) {
-				IGraphicalFeature temp = null;
-				for (IGraphicalFeature lastChild : children) {
-					this.lastChild = lastChild;
+				for (IGraphicalFeature curChild : children) {
+					IGraphicalFeature temp = this.lastChild;
+					this.lastChild = curChild;
 					if (!(this.lastChild.getObject().getStructure().isHidden() && !FeatureUIHelper.showHiddenFeatures(featureModel))) {
 						double angle2 = HALF_ARC ? 360 : calculateAngle(center, getFeatureLocation());
 						double angle1 = HALF_ARC ? 180 : calculateAngle(center, getFeatureLocation());
@@ -122,7 +122,6 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 							}
 						}
 					}
-					temp = this.lastChild;
 				}
 			} else {
 				highestAngle2 = HALF_ARC ? 360 : calculateAngle(center, getFeatureLocation());
@@ -139,10 +138,10 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 			} else {
 				if (highestAngle1 > 360)
 					graphics.fillArc(r, 180, 180);
-				//				if(highestAngle2>450)
-				graphics.fillArc(r, (int) highestAngle1, (int) (highestAngle2 - highestAngle1));
-				//				else
-				//					graphics.fillArc(r,(int) highestAngle1, (int)(highestAngle2 - highestAngle1));
+//				if (highestAngle2 > 450)
+					graphics.fillArc(r, (int) highestAngle1, (int) (highestAngle2 - highestAngle1));
+//				else
+//					graphics.fillArc(r, (int) highestAngle1, (int) (highestAngle2 - highestAngle1));
 			}
 		}
 	}
@@ -154,8 +153,8 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 
 		Rectangle r = calculateRectangle();
 
-		double highestAngle1 = Integer.MAX_VALUE;
-		double highestAngle2 = Integer.MIN_VALUE;
+		double highestAngle1 = 360;
+		double highestAngle2 = 0;
 
 		if (this instanceof LegendRelationDecoration) {
 			highestAngle2 = HALF_ARC ? 360 : calculateAngle(r.getCenter(), getFeatureLocation());
@@ -164,9 +163,9 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 		} else {
 
 			if (children != null) {
-				IGraphicalFeature temp = null;
-				for (IGraphicalFeature lastChild : children) {
-					this.lastChild = lastChild;
+				for (IGraphicalFeature curChild : children) {
+					IGraphicalFeature temp = this.lastChild;
+					this.lastChild = curChild;
 					if (!(this.lastChild.getObject().getStructure().isHidden() && !FeatureUIHelper.showHiddenFeatures(featureModel))) {
 						double angle2 = HALF_ARC ? 360 : calculateAngle(r.getCenter(), getFeatureLocation());
 						double angle1 = HALF_ARC ? 180 : calculateAngle(r.getCenter(), getFeatureLocation());
@@ -183,7 +182,6 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 
 						}
 					}
-					temp = this.lastChild;
 				}
 			} else {
 				highestAngle2 = HALF_ARC ? 360 : calculateAngle(r.getCenter(), getFeatureLocation());
