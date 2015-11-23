@@ -77,11 +77,11 @@ public abstract class AbstractFeatureModelOperation extends AbstractOperation {
 		featureModel.fireEvent(new FeatureModelEvent(featureModel, editor, false, eventId, null, null));
 	}
 
-	protected String getEventId() {
+	protected final String getEventId() {
 		return eventId;
 	}
 
-	protected void setEventId(String eventId) {
+	protected final void setEventId(String eventId) {
 		this.eventId = eventId;
 	}
 

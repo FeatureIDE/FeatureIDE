@@ -817,14 +817,14 @@ public abstract class FeatureUtils {
 	public static final IFeatureModel clone(IFeatureModel featureModel) {
 		return featureModel.clone();
 	}
-
-	public static final IFeatureModel deepClone(IFeatureModel featureModel) {
-		return featureModel.deepClone();
-	}
-
-	public static final IFeatureModel deepClone(IFeatureModel featureModel, boolean complete) {
-		return featureModel.deepClone(complete);
-	}
+//
+//	public static final IFeatureModel deepClone(IFeatureModel featureModel) {
+//		return featureModel.deepClone();
+//	}
+//
+//	public static final IFeatureModel deepClone(IFeatureModel featureModel, boolean complete) {
+//		return featureModel.deepClone(complete);
+//	}
 
 	public static final boolean hasMandatoryFeatures(IFeatureModel featureModel) {
 		return featureModel.getStructure().hasMandatoryFeatures();
@@ -894,13 +894,13 @@ public abstract class FeatureUtils {
 		return featureModel.getStructure().hasFalseOptionalFeatures();
 	}
 
-	public static final void setUndoContext(IFeatureModel featureModel, Object undoContext) {
-		featureModel.getUndoContext(undoContext);
-	}
-
-	public static final Object getUndoContext(IFeatureModel featureModel) {
-		return featureModel.getUndoContext();
-	}
+//	public static final void setUndoContext(IFeatureModel featureModel, Object undoContext) {
+//		featureModel.getUndoContext(undoContext);
+//	}
+//
+//	public static final Object getUndoContext(IFeatureModel featureModel) {
+//		return featureModel.getUndoContext();
+//	}
 
 	public static final Collection<String> getFeatureOrderList(IFeatureModel featureModel) {
 		return featureModel.getFeatureOrderList();
@@ -918,13 +918,13 @@ public abstract class FeatureUtils {
 		featureModel.setFeatureOrderUserDefined(featureOrderUserDefined);
 	}
 
-	public static final boolean isFeatureOrderInXML(IFeatureModel featureModel) {
-		return featureModel.isFeatureOrderInXML();
-	}
-
-	public static final void setFeatureOrderInXML(IFeatureModel featureModel, boolean featureOrderInXML) {
-		featureModel.setFeatureOrderInXML(featureModel, featureOrderInXML);
-	}
+//	public static final boolean isFeatureOrderInXML(IFeatureModel featureModel) {
+//		return featureModel.isFeatureOrderInXML();
+//	}
+//
+//	public static final void setFeatureOrderInXML(IFeatureModel featureModel, boolean featureOrderInXML) {
+//		featureModel.setFeatureOrderInXML(featureModel, featureOrderInXML);
+//	}
 
 	public static final String toString(IFeatureModel featureModel) {
 		return featureModel.toString();

@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.ui.editors;
 import java.util.List;
 
 import de.ovgu.featureide.fm.core.IGraphicItem;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.Tree;
 import de.ovgu.featureide.fm.ui.ColorschemeTable;
@@ -56,5 +57,7 @@ public interface IGraphicalFeatureModel extends IGraphicItem {
 	List<IGraphicalConstraint> getConstraints();
 
 	void setConstraintList(List<IGraphicalConstraint> constraintList);
+
+	IGraphicalFeature getGraphicalFeature(IFeature newFeature);
 
 }

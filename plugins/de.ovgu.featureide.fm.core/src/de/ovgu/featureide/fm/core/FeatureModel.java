@@ -65,7 +65,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	}
 
 	protected FeatureModel(FeatureModel oldFeatureModel, boolean complete) {
-		this.model = oldFeatureModel.model.clone(oldFeatureModel.model, complete);
+		this.model = oldFeatureModel.model.clone();
 	}
 
 	protected FeatureModelAnalyzer createAnalyser() {
@@ -299,15 +299,15 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 
 	@Override
 	public FeatureModel clone() {
-		return new FeatureModel(FeatureUtils.clone(model));
+		return (FeatureModel) model.clone();
 	}
 
 	public FeatureModel deepClone() {
-		return new FeatureModel(FeatureUtils.deepClone(model));
+		return (FeatureModel) model.clone();
 	}
 
 	public FeatureModel deepClone(boolean complete) {
-		return new FeatureModel(FeatureUtils.deepClone(model, complete));
+		return (FeatureModel) model.clone();
 	}
 
 	public boolean hasMandatoryFeatures() {
@@ -379,11 +379,12 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	}
 
 	public void setUndoContext(Object undoContext) {
-		FeatureUtils.setUndoContext(model, undoContext);
+//		FeatureUtils.setUndoContext(model, undoContext);
 	}
 
 	public Object getUndoContext() {
-		return FeatureUtils.getUndoContext(model);
+//		return FeatureUtils.getUndoContext(model);
+		return null;
 	}
 
 	public List<String> getFeatureOrderList() {
@@ -403,11 +404,12 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	}
 
 	public boolean isFeatureOrderInXML() {
-		return FeatureUtils.isFeatureOrderInXML(model);
+//		return FeatureUtils.isFeatureOrderInXML(model);
+		return false;
 	}
 
 	public void setFeatureOrderInXML(boolean featureOrderInXML) {
-		FeatureUtils.setFeatureOrderInXML(model, featureOrderInXML);
+//		FeatureUtils.setFeatureOrderInXML(model, featureOrderInXML);
 	}
 
 	@Override

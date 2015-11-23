@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.commands;
 
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.operations.ObjectUndoContext;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.gef.commands.Command;
@@ -107,7 +108,7 @@ public class FeatureDragAndDropCommand extends Command {
 		FeatureOperationData data = new FeatureOperationData(feature, oldParent, newParent, newIndex, oldIndex);
 		FeatureMoveOperation op = new FeatureMoveOperation(data, editPart.getViewer(), newLocation, FeatureUIHelper.getLocation(feature).getCopy(), feature.getObject());
 		//TODO _interfaces Removed Code
-		//		op.addContext((ObjectUndoContext) featureModel.getUndoContext());
+		op.addContext((ObjectUndoContext) featureModel.getFeatureModel().getUndoContext());
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);

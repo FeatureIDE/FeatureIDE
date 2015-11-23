@@ -26,6 +26,7 @@ import org.eclipse.draw2d.geometry.Point;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
@@ -47,6 +48,7 @@ public class FeatureMoveOperation extends AbstractFeatureModelOperation {
 		this.oldPos = oldPos;
 		this.feature = feature;
 		setEditor(editor);
+		setEventId(PropertyConstants.STRUCTURE_CHANGED);
 	}
 
 //	public void newInnerOrder(Point newPos) {

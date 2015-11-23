@@ -25,6 +25,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.AUTO_LAYOUT_CO
 import java.util.LinkedList;
 
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
@@ -61,7 +62,7 @@ public class AutoLayoutConstraintAction extends Action {
 		oldPos.add(newList);
 		AutoLayoutConstraintOperation op = new AutoLayoutConstraintOperation(featureModel, oldPos, counter);
 		//TODO _interfaces Removed Code
-//		op.addContext((IUndoContext) featureModel.getUndoContext());
+		op.addContext((IUndoContext) featureModel.getFeatureModel().getUndoContext());
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);

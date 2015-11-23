@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.base.event;
 
-
 /**
  * Provides constants for <code>IFeatureModelListener</code>.
  * 
@@ -45,6 +44,7 @@ public interface PropertyConstants {
 	String ATTRIBUTE_CHANGED = "ATTRIBUTE_CHANGED";
 	String CONSTRAINT_SELECTED = "CONSTRAINT_SELECTED";
 
+	String STRUCTURE_CHANGED = "STRUCTURE_CHANGED";
 
 	String FEATURE_ADD = "FEATURE_ADD";
 	String FEATURE_DELETE = "FEATURE_DELETE";

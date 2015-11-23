@@ -22,6 +22,9 @@ package de.ovgu.featureide.fm.ui.editors.elements;
 
 import java.util.List;
 
+import org.eclipse.core.commands.operations.ObjectUndoContext;
+
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
 import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
@@ -113,6 +116,16 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel, PropertyCo
 
 	public void setConstraintList(List<IGraphicalConstraint> constraintList) {
 		this.constraintList = constraintList;
+	}
+
+	@Override
+	public IGraphicalFeature getGraphicalFeature(IFeature newFeature) {
+		for (IGraphicalFeature graphicalFeature : featureTree) {
+			if (graphicalFeature.getObject().equals(newFeature)) {
+				return graphicalFeature;
+			}
+		}
+		return null;
 	}
 
 }

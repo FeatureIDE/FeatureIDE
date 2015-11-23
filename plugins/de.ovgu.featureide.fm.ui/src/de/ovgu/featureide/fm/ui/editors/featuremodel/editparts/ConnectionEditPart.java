@@ -225,7 +225,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 	@Override
 	public void activate() {
 		//TODO _interfaces Removed Code
-//		getConnectionModel().addListener(this);
+		getConnectionModel().addListener(this);
 //		getConnectionModel().getSource().addListener(this);
 		super.activate();
 	}
@@ -234,7 +234,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 	public void deactivate() {
 		super.deactivate();
 		//TODO _interfaces Removed Code
-//		getConnectionModel().removeListener(this);
+		getConnectionModel().removeListener(this);
 //		getConnectionModel().getSource().removeListener(this);
 	}
 
@@ -256,14 +256,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 	private boolean connectsExternFeatures() {
 		FeatureConnection featureConnection = getConnectionModel();
 		final IFeature source = featureConnection.getSource().getObject();
-		IFeature target = null;
-		try {
-//		final IFeature 
-		target = featureConnection.getTarget().getObject();
-		} catch (Exception e) {
-			System.out.println();
-			System.out.println();
-		}
+		final IFeature target = featureConnection.getTarget().getObject();
 		return (source instanceof ExtendedFeature && ((ExtendedFeature) source).isFromExtern()
 				&& target instanceof ExtendedFeature && ((ExtendedFeature) target).isFromExtern());
 	}

@@ -53,7 +53,7 @@ public class ShowHiddenFeaturesAction extends Action {
 	public void run() {
 		ShowHiddenFeaturesOperation op = new ShowHiddenFeaturesOperation(featureModel);
 		//TODO _interfaces Removed Code
-//		op.addContext((IUndoContext) featureModel.getUndoContext());
+		op.addContext((IUndoContext) featureModel.getFeatureModel().getUndoContext());
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);

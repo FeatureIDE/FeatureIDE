@@ -28,10 +28,6 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.gef.tools.DirectEditManager;
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
-import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TextCellEditor;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -39,28 +35,23 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
 import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.core.base.impl.Feature;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureCellEditorLocator;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureLabelEditManager;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 
 /**
  * Operation with functionality to create a layer feature. Enables
  * undo/redo functionality.
  * 
  * @author Fabian Benduhn
+ * @author Sebastian Krieter
  */
 public class FeatureCreateLayerOperation extends AbstractFeatureModelOperation {
 
 	private IFeature feature;
-	private Object viewer;
 	private IFeature newFeature;
-	private Object diagramEditor;
 
-	public FeatureCreateLayerOperation(IFeature feature, Object viewer, IFeatureModel featureModel, Object diagramEditor) {
+	public FeatureCreateLayerOperation(IFeature feature, IFeatureModel featureModel) {
 		super(featureModel, CREATE_LAYER);
 		this.feature = feature;
-		this.viewer = viewer;
-		this.diagramEditor = diagramEditor;
+		setEventId(PropertyConstants.FEATURE_ADD);
 	}
 
 	@Override
@@ -71,39 +62,20 @@ public class FeatureCreateLayerOperation extends AbstractFeatureModelOperation {
 
 	@Override
 	protected void redo() {
-		int number = 0;
+		int number = 1;
 
-		while (FeatureUtils.getFeatureNames(featureModel).contains(DEFAULT_FEATURE_LAYER_CAPTION + ++number))
-			;
+		while (FeatureUtils.getFeatureNames(featureModel).contains(DEFAULT_FEATURE_LAYER_CAPTION + number)) {
+			number++;
+		}
 
 		newFeature = new Feature(featureModel, DEFAULT_FEATURE_LAYER_CAPTION + number);
 		featureModel.addFeature(newFeature);
 		feature = featureModel.getFeature(feature.getName());
 		feature.getStructure().addChild(newFeature.getStructure());
 
-		//TODO _interfaces Romved Code
-//		FeatureDiagramLayoutHelper.initializeLayerFeaturePosition(featureModel, newFeature, feature);
+		//TODO _interfaces Removed Code
+//		FeatureDiagramLayoutHelper.initializeLayerFeaturePosition(((FeatureDiagramEditor) diagramEditor).getGraphicalFeatureModel(), newFeature, feature);
 		featureModel.fireEvent(new FeatureModelEvent(newFeature, PropertyConstants.FEATURE_ADD, null, null));
-		/*
-		 * the model must be refreshed here else the new feature will not be found
-		 */
-		featureModel.handleModelDataChanged();
-
-		// select the new feature
-		FeatureEditPart part;
-		if (viewer instanceof GraphicalViewerImpl) {
-			part = (FeatureEditPart) ((GraphicalViewerImpl) viewer).getEditPartRegistry().get(newFeature);
-			((GraphicalViewerImpl) viewer).setSelection(new StructuredSelection(part));
-		} else {
-			part = (FeatureEditPart) ((GraphicalViewerImpl) diagramEditor).getEditPartRegistry().get(newFeature);
-			((GraphicalViewerImpl) diagramEditor).setSelection(new StructuredSelection(part));
-		}
-
-		part.getViewer().reveal(part);
-
-		// open the renaming command
-		DirectEditManager manager = new FeatureLabelEditManager(part, TextCellEditor.class, new FeatureCellEditorLocator(part.getFeatureFigure()), featureModel);
-		manager.show();
 	}
 
 	@Override

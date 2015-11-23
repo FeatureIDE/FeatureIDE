@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureProperty;
@@ -85,11 +84,12 @@ public abstract class AFeature extends AFeatureModelElement implements IFeature 
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder("name=" + name);
-		sb.append(", Structure=[");
-		FeatureUtils.print(this, sb);
-		sb.append("]");
-		return "Feature(" + sb.toString() + ")";
+		return name;
+//		StringBuilder sb = new StringBuilder("name=" + name);
+//		sb.append(", Structure=[");
+//		FeatureUtils.print(this, sb);
+//		sb.append("]");
+//		return "Feature(" + sb.toString() + ")";
 	}
 
 }

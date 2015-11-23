@@ -145,8 +145,8 @@ public class FmOutlinePageContextMenu {
 		dAAction = new DeleteAllAction(viewer, fInput);
 		ccAction = new CreateConstraintAction(viewer, fInput);
 		ecAction = new EditConstraintAction(viewer, fInput);
-		cAction = new CreateCompoundAction(viewer, fInput, fTextEditor.diagramEditor);
-		clAction = new CreateLayerAction(viewer, fInput, fTextEditor.diagramEditor);
+		cAction = new CreateCompoundAction(viewer, fInput);
+		clAction = new CreateLayerAction(viewer, fInput);
 		reAction = new RenameAction(viewer, fInput, fTextEditor.diagramEditor);
 		oAction = new OrAction(viewer, fInput);
 		//TODO _interfaces Removed Code

@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.commands;
 
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.gef.commands.Command;
 import org.eclipse.ui.PlatformUI;
@@ -80,7 +81,7 @@ public class ConstraintDragAndDropCommand extends Command {
 //TODO _interfaces Removed Code
 //		, newLocation, FeatureUIHelper
 //		.getLocation(constraint).getCopy()
-//		op.addContext((IUndoContext) featureModel.getUndoContext());
+		op.addContext((IUndoContext) featureModel.getFeatureModel().getUndoContext());
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
