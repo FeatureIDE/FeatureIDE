@@ -24,6 +24,9 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE_HOTSPO
 import static de.ovgu.featureide.fm.core.localization.StringTable.HOTSPOT_START_ANALYSIS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.HOTSPOT_THRESHOLD;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
@@ -33,7 +36,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 
+import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.HotSpotResult;
 import de.ovgu.featureide.fm.core.IHotSpotAnalyzer;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
@@ -57,6 +64,26 @@ public class FeatureHotspotAnalysisPage extends FeatureModelEditorPage {
 		model.removeConstraint(0);
 		this.featureModelEditor = new FeatureModelEditor();
 		this.featureModelEditor.featureModel = model;
+		
+		analyzer = new IHotSpotAnalyzer() {			
+			@Override
+			public Set<HotSpotResult> analyze(IFeatureModel fm) {
+				Set<HotSpotResult> results = new HashSet<HotSpotResult>(); 
+				for(IFeature feature : fm.getFeatures()){
+					HotSpotResult rs = new HotSpotResult();
+					rs.setFeatureName(feature.getName());
+					for(IConstraint constr : fm.getConstraints()){
+						if(constr.getContainedFeatures().contains(feature))
+							rs.setMetricValue(rs.getMetricValue() + 1);
+					}
+					results.add(rs);
+				}
+				return results;
+			}
+		};
+		
+		Set<HotSpotResult> result = analyzer.analyze(this.model);
+		System.out.println(result);
 	}
 
 	@Override
