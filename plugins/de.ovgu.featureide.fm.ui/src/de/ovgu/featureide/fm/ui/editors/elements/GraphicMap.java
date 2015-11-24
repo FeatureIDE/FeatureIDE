@@ -37,7 +37,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
- * TODO description
+ * Constructs and updates the graphical feature model.
  * 
  * @author Sebastian Krieter
  */
@@ -45,7 +45,7 @@ public final class GraphicMap {
 
 	private static final GraphicMap INSTANCE = new GraphicMap();
 
-	private HashMap<IFeatureModel, IGraphicalFeatureModel> modelMap = new HashMap<>();
+	private HashMap<IFeatureModel, GraphicalFeatureModel> modelMap = new HashMap<>();
 
 	public static GraphicMap getInstance() {
 		return INSTANCE;
@@ -55,9 +55,8 @@ public final class GraphicMap {
 	};
 
 	public IGraphicalFeatureModel constructModel(IFeatureModel featureModel) {
-		IGraphicalFeatureModel graphicalItem = modelMap.get(featureModel);
-		boolean firstModel = graphicalItem == null;
-		if (!firstModel) {
+		GraphicalFeatureModel graphicalItem = modelMap.get(featureModel);
+		if (graphicalItem != null) {
 			final Tree<IGraphicalFeature> features = graphicalItem.getFeatures();
 			final List<IGraphicalConstraint> constraints = graphicalItem.getConstraints();
 			final HashMap<IFeatureModelElement, IGraphicalElement> map = new HashMap<>((int) ((constraints.size() + features.getNumberOfNodes()) * 1.5));
@@ -68,16 +67,18 @@ public final class GraphicMap {
 				map.put(constraint.getObject(), constraint);
 			}
 
-			graphicalItem = newModel(featureModel);
+			graphicalItem = new GraphicalFeatureModel(graphicalItem);
+			newModel(graphicalItem);
 
 			for (IGraphicalFeature feature : graphicalItem.getFeatures()) {
-				feature.copyValue(map.get(feature.getObject()));
+				feature.copyValues(map.get(feature.getObject()));
 			}
 			for (IGraphicalConstraint constraint : graphicalItem.getConstraints()) {
-				constraint.copyValue(map.get(constraint.getObject()));
+				constraint.copyValues(map.get(constraint.getObject()));
 			}
 		} else {
-			graphicalItem = newModel(featureModel);
+			graphicalItem = new GraphicalFeatureModel(featureModel);
+			newModel(graphicalItem);
 		}
 
 		modelMap.put(featureModel, graphicalItem);
@@ -85,13 +86,8 @@ public final class GraphicMap {
 		return graphicalItem;
 	}
 
-	/**
-	 * @param featureModel
-	 * @return
-	 */
-	private IGraphicalFeatureModel newModel(IFeatureModel featureModel) {
-		IGraphicalFeatureModel graphicalItem;
-		graphicalItem = new GraphicalFeatureModel(featureModel);
+	private IGraphicalFeatureModel newModel(IGraphicalFeatureModel graphicalItem) {
+		final IFeatureModel featureModel = graphicalItem.getFeatureModel();
 
 		final ArrayList<IGraphicalConstraint> constraintList = new ArrayList<>(featureModel.getConstraints().size());
 		for (IConstraint constraint : featureModel.getConstraints()) {
@@ -123,32 +119,5 @@ public final class GraphicMap {
 			travers(subTree, featureStructure.getFeature(), graphicalItem);
 		}
 	}
-
-	//	public IGraphicalFeature getGraphicRepresentation(IFeature feature) {
-	//		IGraphicalFeature graphicalItem = featureMap.get(feature);
-	//		if (graphicalItem == null) {
-	//			graphicalItem = DefaultFeatureModelFactory.getInstance().createGraphicalRepresentation(feature);
-	//			featureMap.put(feature, graphicalItem);
-	//		}
-	//		return graphicalItem;
-	//	}
-	//
-	//	public IGraphicalConstraint getGraphicRepresentation(IConstraint constraint) {
-	//		IGraphicalConstraint graphicalItem = constraintMap.get(constraint);
-	//		if (graphicalItem == null) {
-	//			graphicalItem = DefaultFeatureModelFactory.getInstance().createGraphicalRepresentation(constraint);
-	//			constraintMap.put(constraint, graphicalItem);
-	//		}
-	//		return graphicalItem;
-	//	}
-	//
-	//	public IGraphicalFeatureModel getGraphicRepresentation(IFeatureModel featureModel) {
-	//		IGraphicalFeatureModel graphicalItem = modelMap.get(featureModel);
-	//		if (graphicalItem == null) {
-	//			graphicalItem = DefaultFeatureModelFactory.getInstance().createGraphicalRepresentation(featureModel);
-	//			modelMap.put(featureModel, graphicalItem);
-	//		}
-	//		return graphicalItem;
-	//	}
 
 }

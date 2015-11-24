@@ -95,7 +95,7 @@ public class GraphicalConstraint implements IGraphicalConstraint, PropertyConsta
 	}
 
 	@Override
-	public void copyValue(IGraphicalElement element) {
+	public void copyValues(IGraphicalElement element) {
 		if (element instanceof GraphicalConstraint) {
 			final GraphicalConstraint oldFeature = (GraphicalConstraint) element;
 

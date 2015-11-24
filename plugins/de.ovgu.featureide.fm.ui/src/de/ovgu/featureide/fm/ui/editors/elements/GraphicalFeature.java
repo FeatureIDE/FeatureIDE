@@ -166,7 +166,7 @@ public class GraphicalFeature implements IGraphicalFeature {
 	}
 
 	@Override
-	public void copyValue(IGraphicalElement element) {
+	public void copyValues(IGraphicalElement element) {
 		if (element instanceof GraphicalFeature) {
 			final GraphicalFeature oldFeature = (GraphicalFeature) element;
 

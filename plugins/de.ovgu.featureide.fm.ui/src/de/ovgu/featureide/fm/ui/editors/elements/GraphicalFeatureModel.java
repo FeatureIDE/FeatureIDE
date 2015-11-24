@@ -42,19 +42,27 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
  */
 public class GraphicalFeatureModel implements IGraphicalFeatureModel, PropertyConstants {
 
-	protected final ColorschemeTable colorschemeTable;
-
 	protected final IFeatureModel correspondingFeatureModel;
+	
+	protected final ColorschemeTable colorschemeTable;
+	protected final FeatureModelLayout layout;
 
 	protected Tree<IGraphicalFeature> featureTree = null;
 	protected List<IGraphicalConstraint> constraintList = null;
 
-	protected final FeatureModelLayout layout;
 
 	public GraphicalFeatureModel(IFeatureModel correspondingFeatureModel) {
 		this.correspondingFeatureModel = correspondingFeatureModel;
 		layout = new FeatureModelLayout();
 		colorschemeTable = new ColorschemeTable(this);
+	}
+	
+	public GraphicalFeatureModel(GraphicalFeatureModel oldModel) {
+		this.correspondingFeatureModel = oldModel.correspondingFeatureModel;
+		
+		colorschemeTable = oldModel.colorschemeTable;
+		constraintList = oldModel.constraintList;
+		layout = oldModel.layout;
 	}
 
 	protected void fireEvent(final String action) {

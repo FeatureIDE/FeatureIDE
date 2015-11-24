@@ -48,6 +48,6 @@ public interface IGraphicalElement extends IGraphicItem, PropertyConstants {
 
 	String getGraphicType();
 	
-	void copyValue(IGraphicalElement element);
+	void copyValues(IGraphicalElement element);
 
 }
