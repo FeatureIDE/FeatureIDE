@@ -25,9 +25,14 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.HOTSPOT_START_
 import static de.ovgu.featureide.fm.core.localization.StringTable.HOTSPOT_THRESHOLD;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.Stack;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -39,6 +44,7 @@ import org.eclipse.swt.widgets.Spinner;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.HotSpotResult;
 import de.ovgu.featureide.fm.core.IHotSpotAnalyzer;
+import de.ovgu.featureide.fm.core.IHotSpotResultInterpreter;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -82,8 +88,7 @@ public class FeatureHotspotAnalysisPage extends FeatureModelEditorPage {
 			}
 		};
 		
-		Set<HotSpotResult> result = analyzer.analyze(this.model);
-		System.out.println(result);
+		
 	}
 
 	@Override
@@ -99,7 +104,7 @@ public class FeatureHotspotAnalysisPage extends FeatureModelEditorPage {
 	@Override
 	public void createPartControl(Composite parent) {
 		super.createPartControl(parent);
-
+		
 		// parent composite
 		GridLayout gridLayout = new GridLayout(1, false);
 		gridLayout.verticalSpacing = 4;
@@ -150,6 +155,7 @@ public class FeatureHotspotAnalysisPage extends FeatureModelEditorPage {
 		startAnalysisButton.setText(HOTSPOT_START_ANALYSIS);
 		startAnalysisButton.setLayoutData(gridData);
 		
+		
 		gridData = new GridData();
 		gridData.horizontalAlignment = SWT.FILL;
 		gridData.grabExcessHorizontalSpace = true;
@@ -163,21 +169,45 @@ public class FeatureHotspotAnalysisPage extends FeatureModelEditorPage {
 		gridData = new GridData();
 		gridData.horizontalAlignment = SWT.FILL;
 		gridData.verticalAlignment = SWT.FILL;
-		gridData.grabExcessHorizontalSpace = true;
+		//gridData.grabExcessHorizontalSpace = true;
 		gridData.grabExcessVerticalSpace = true;
 		final Composite compositeBottom = new Composite(parent, SWT.BORDER);
-		
-		compositeBottom.setLayout(new FillLayout());
-		compositeBottom.setLayoutData(gridData);
-		
-		final FeatureDiagramEditor editor = new FeatureDiagramEditor(featureModelEditor, compositeBottom);
-		editor.getControl().getDisplay().asyncExec(new Runnable() {
-			public void run() {
-				editor.setContents(editor.getGraphicalFeatureModel());
-				//pageChange(getDiagramEditorIndex());
-				editor.refresh();
+		startAnalysisButton.addSelectionListener(new SelectionListener() {
+			
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				Set<HotSpotResult> result = analyzer.analyze(FeatureHotspotAnalysisPage.this.model);
+				IHotSpotResultInterpreter<Color> interpreter = new ColorMetricHotSpotInterpreter(Integer.valueOf(thresholdSpinner.getText()).intValue());
+				/*for(HotSpotResult hsr : result)*/
+				for(int i = 0; i < Integer.valueOf(thresholdSpinner.getText()).intValue();i++){
+					HotSpotResult hsr = new HotSpotResult();
+					hsr.setMetricValue(i);
+					Color c = interpreter.interpret(hsr);
+					Label l = new Label(compositeBottom,SWT.NONE);
+					l.setText(c.toString());
+					l.setBackground(c);
+				}
+				compositeBottom.pack();
+			}
+			
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+				
 			}
 		});
+		compositeBottom.setLayout(new FillLayout(GridData.FILL_VERTICAL));
+		compositeBottom.setLayoutData(gridData);
+		
+		
+		
+//		final FeatureDiagramEditor editor = new FeatureDiagramEditor(featureModelEditor, compositeBottom);
+//		editor.getControl().getDisplay().asyncExec(new Runnable() {
+//			public void run() {
+//				editor.setContents(editor.getGraphicalFeatureModel());
+//				//pageChange(getDiagramEditorIndex());
+//				editor.refresh();
+//			}
+//		});
 	}
 
 }
