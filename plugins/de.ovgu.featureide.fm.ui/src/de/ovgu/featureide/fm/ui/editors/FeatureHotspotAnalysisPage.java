@@ -21,8 +21,8 @@
 package de.ovgu.featureide.fm.ui.editors;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE_HOTSPOT_ANALYSIS;
-import static de.ovgu.featureide.fm.core.localization.StringTable.HOTSPOT_THRESHOLD;
 import static de.ovgu.featureide.fm.core.localization.StringTable.HOTSPOT_START_ANALYSIS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.HOTSPOT_THRESHOLD;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
@@ -31,10 +31,10 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Slider;
 import org.eclipse.swt.widgets.Spinner;
-import org.eclipse.swt.widgets.Text;
 
+import de.ovgu.featureide.fm.core.IHotSpotAnalyzer;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
@@ -49,9 +49,14 @@ public class FeatureHotspotAnalysisPage extends FeatureModelEditorPage {
 	private static final String PAGE_TEXT = FEATURE_HOTSPOT_ANALYSIS;
 	private Spinner thresholdSpinner;
 	private Button startAnalysisButton;
-
+	private IFeatureModel model;
+	private IHotSpotAnalyzer analyzer;
+	
 	public FeatureHotspotAnalysisPage(FeatureModelEditor featureModelEditor) {
-		this.featureModelEditor = featureModelEditor;
+		model = featureModelEditor.getFeatureModel().clone();
+		model.removeConstraint(0);
+		this.featureModelEditor = new FeatureModelEditor();
+		this.featureModelEditor.featureModel = model;
 	}
 
 	@Override
