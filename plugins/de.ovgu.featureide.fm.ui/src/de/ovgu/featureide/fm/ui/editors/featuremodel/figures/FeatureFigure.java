@@ -28,6 +28,10 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.IS_FALSE_OPTIO
 import static de.ovgu.featureide.fm.core.localization.StringTable.IS_HIDDEN_AND_INDETERMINATE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ROOT;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.eclipse.draw2d.ConnectionAnchor;
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.FreeformLayout;
@@ -44,6 +48,7 @@ import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer.Attribute;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IPropertyContainer;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.core.base.impl.Feature;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
@@ -248,13 +253,45 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		furtherInfos.setFont(DEFAULT_FONT);
 		toolTipContent.add(featureName);
 		toolTipContent.add(furtherInfos);
+		appendCustomProperties(toolTipContent);
 
 		// call of the FeatureDiagramExtensions
 		for (FeatureDiagramExtension extension : FeatureDiagramExtension.getExtensions()) {
 			toolTipContent = extension.extendFeatureFigureToolTip(toolTipContent, this);
 		}
-
+		
 		setToolTip(toolTipContent);
+	}
+
+	private void appendCustomProperties(Figure toolTipContent) {
+		StringBuilder sb = new StringBuilder();
+		final IPropertyContainer props = feature.getObject().getCustomProperties();
+		final List<String> keys = new ArrayList<>(props.keySet());
+		Collections.sort(keys);
+		if (!keys.isEmpty()) {
+			int size = props.keySet().size();
+			int maxKeyLength = 0;
+			for (int i = 0; i < size; i++)
+				maxKeyLength = Math.max(maxKeyLength, keys.get(i).length());
+			
+			for(int i = 0; i < size; i++) {
+				final String key = keys.get(i);
+				sb.append(String.format("  %1$-" + maxKeyLength + "s", key));
+				sb.append("\t=\t");
+				sb.append(props.get(key));
+				if (i + 1 < size)
+					sb.append("\n");
+			}
+			
+			Label propertiesInfo = new Label("\nCustom Properties");
+			propertiesInfo.setFont(DEFAULT_FONT_BOLD);
+			Label properties = new Label(sb.toString());
+			properties.setFont(DEFAULT_FONT);
+			
+			
+			toolTipContent.add(propertiesInfo);
+			toolTipContent.add(properties);
+		}
 	}
 
 	public ConnectionAnchor getSourceAnchor() {
