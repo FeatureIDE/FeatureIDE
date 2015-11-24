@@ -21,7 +21,6 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.SHOW_HIDDEN_FEATURES;
-import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
@@ -39,7 +38,6 @@ public class ShowHiddenFeaturesOperation extends AbstractGraphicalFeatureModelOp
 	@Override
 	public void redo() {
 		graphicalFeatureModel.getLayout().showHiddenFeatures(!graphicalFeatureModel.getLayout().showHiddenFeatures());
-		FeatureUIHelper.showHiddenFeatures(graphicalFeatureModel.getLayout().showHiddenFeatures(), graphicalFeatureModel);
 	}
 
 	@Override

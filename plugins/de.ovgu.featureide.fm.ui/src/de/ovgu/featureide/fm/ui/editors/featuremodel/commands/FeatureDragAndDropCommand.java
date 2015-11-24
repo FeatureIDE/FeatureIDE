@@ -98,7 +98,11 @@ public class FeatureDragAndDropCommand extends Command {
 				return false;
 
 			// not accept moves to children positions
-			return feature != newParent && !feature.getTree().isAncestorOf(newParent.getTree());
+			if (feature == newParent)
+				return false;
+
+			if (newParent.getTree().isAncestorOf(feature.getTree()))
+				return false;
 		}
 		return true;
 	}

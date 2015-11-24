@@ -77,7 +77,6 @@ public class ModelReverseOrderOperation extends AbstractGraphicalFeatureModelOpe
 				mirrorFeaturePositions(child, mid, vertical);
 			}
 		}
-
 	}
 
 	@Override
