@@ -321,6 +321,9 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	@Override
 	public FMComposerManager getFMComposerManager(IProject project) {
 		if (fmComposerManager == null) {
+			if (project == null) {
+				return new FMComposerManager(project);
+			}
 			fmComposerManager = new FMComposerManager(project);
 		}
 		return fmComposerManager;
@@ -423,6 +426,8 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 		featureOrderList.clear();
 
 		property.reset();
+		
+		nextElementId = 0;
 	}
 
 	@Override
@@ -490,7 +495,7 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 
 	@Override
 	public Object getUndoContext(Object undoContext) {
-		throw new UnsupportedOperationException("Not implemented yet");
+		return undoContext;
 	}
 
 	@Override
@@ -592,7 +597,11 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	
 	@Override
 	public int hashCode() {
-		return (int) (37 * id);
+		if (sourceFile == null) {
+			return (int) (37 * id);
+		} else {
+			return sourceFile.hashCode();
+		}
 	}
 
 	@Override
@@ -602,7 +611,11 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 		if (obj == null || getClass() != obj.getClass())
 			return false;
 		FeatureModel other = (FeatureModel) obj;
-		return id == other.id;
+		if (sourceFile == null) {
+			return other.sourceFile == null && id == other.id;
+		} else {
+			return sourceFile.equals(other.sourceFile);
+		}
 	}
 
 	@Override

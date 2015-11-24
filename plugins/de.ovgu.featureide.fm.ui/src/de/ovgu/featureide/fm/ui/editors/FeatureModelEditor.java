@@ -402,7 +402,9 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 				public void run() {
 					diagramEditor.setContents(featureModel);
 					pageChange(getDiagramEditorIndex());
-					readModel();
+					diagramEditor.refresh();
+					diagramEditor.reload();
+					diagramEditor.refresh();
 				}
 			});
 		}
