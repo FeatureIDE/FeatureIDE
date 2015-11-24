@@ -32,71 +32,88 @@ import de.ovgu.featureide.fm.core.IHotSpotResultInterpreter;
  * @author Christopher Kruczek
  * @author Andy Kenner
  */
-public class ColorMetricHotSpotInterpreter implements IHotSpotResultInterpreter<Color>{
+public class ColorMetricHotSpotInterpreter implements IHotSpotResultInterpreter<Color> {
 
 	private static final Display display = Display.getCurrent();
-	private static final Color[] scalaColor = new Color[]
-	{
-		// clear green
-		new Color(display,0,150,0),
-		// Yellow
-		new Color(display,255,255,0),
-		// Red
-		new Color(display,255,0,0),
-	};
+	private static final Color[] scalaColor = new Color[] {
+			// clear green
+			new Color(display, 0, 150, 0),
+			// Yellow
+			new Color(display, 255, 255, 0),
+			// Red
+			new Color(display, 255, 0, 0), };
 	private Color[] scale;
 	private int maxRange;
 
-	
 	public ColorMetricHotSpotInterpreter(int maxRange) {
 		this.maxRange = maxRange;
 		this.init();
 	}
-	
+
 	private void init() {
-		this.scale = new Color[this.maxRange];
-		this.scale[0] = ColorMetricHotSpotInterpreter.scalaColor[0];
-		int substracter = (maxRange/2) % 2 == 0 ? 1 : 0;
-		int stepWidth =  (maxRange/2) - 1;
-		
-		double rChange = (ColorMetricHotSpotInterpreter.scalaColor[1].getRed() - ColorMetricHotSpotInterpreter.scalaColor[0].getRed()) / stepWidth;
-	    double gChange = (ColorMetricHotSpotInterpreter.scalaColor[1].getGreen() - ColorMetricHotSpotInterpreter.scalaColor[0].getGreen()) / stepWidth;
-	    double bChange = (ColorMetricHotSpotInterpreter.scalaColor[1].getBlue() - ColorMetricHotSpotInterpreter.scalaColor[0].getBlue()) / stepWidth;	
-	    
-	    for (int i = 1; i <= stepWidth; i++)
-	    {
-	        double b = ColorMetricHotSpotInterpreter.scalaColor[0].getBlue() + (bChange * i);
-	        double g = ColorMetricHotSpotInterpreter.scalaColor[0].getGreen() + (gChange * i);
-	        double r = ColorMetricHotSpotInterpreter.scalaColor[0].getRed() + (rChange * i);
-	        this.scale[i] = new Color(display,(int)r,(int)g,(int)b);
-	    }
-	    
-	    this.scale[(maxRange/2)] = ColorMetricHotSpotInterpreter.scalaColor[1];
-	    
-	    stepWidth = (maxRange - ((maxRange / 2))) - 2;
-	    
-	    
-	    rChange = (ColorMetricHotSpotInterpreter.scalaColor[2].getRed() - ColorMetricHotSpotInterpreter.scalaColor[1].getRed()) / stepWidth;
-	    gChange = (ColorMetricHotSpotInterpreter.scalaColor[2].getGreen() - ColorMetricHotSpotInterpreter.scalaColor[1].getGreen()) / stepWidth;
-	    bChange = (ColorMetricHotSpotInterpreter.scalaColor[2].getBlue() - ColorMetricHotSpotInterpreter.scalaColor[1].getBlue()) / stepWidth;	
-	    
-	    for (int i = 1; i <= stepWidth; i++)
-	    {
-	    	double b = ColorMetricHotSpotInterpreter.scalaColor[1].getBlue() + (bChange * i);
-	        double g = ColorMetricHotSpotInterpreter.scalaColor[1].getGreen() + (gChange * i);
-	        double r = ColorMetricHotSpotInterpreter.scalaColor[1].getRed() + (rChange * i);
-	        this.scale[i + maxRange/2] = new Color(display,(int)r,(int)g,(int)b);
-	    }
-		
-		this.scale[maxRange - 1] = ColorMetricHotSpotInterpreter.scalaColor[2];
+
+		if (maxRange < 3) {
+			 if(maxRange < 1) {
+				 System.out.println("SHIT");
+				 return;
+			 }
+			 
+			this.scale = new Color[this.maxRange];
+			if (maxRange == 1) 
+			{
+				this.scale[0] = ColorMetricHotSpotInterpreter.scalaColor[2];
+			} 
+			else if (maxRange == 2)
+			{
+				this.scale[0] = ColorMetricHotSpotInterpreter.scalaColor[0];
+				this.scale[1] = ColorMetricHotSpotInterpreter.scalaColor[2];
+			}
+		}
+
+		else {
+
+			this.scale = new Color[this.maxRange];
+			this.scale[0] = ColorMetricHotSpotInterpreter.scalaColor[0];
+			//int substracter = (maxRange/2) % 2 == 0 ? 1 : 0;
+			int stepWidth = (maxRange / 2) - 1;
+
+			double rChange = (ColorMetricHotSpotInterpreter.scalaColor[1].getRed() - ColorMetricHotSpotInterpreter.scalaColor[0].getRed()) / (stepWidth + 1);
+			double gChange = (ColorMetricHotSpotInterpreter.scalaColor[1].getGreen() - ColorMetricHotSpotInterpreter.scalaColor[0].getGreen())
+					/ (stepWidth + 1);
+			double bChange = (ColorMetricHotSpotInterpreter.scalaColor[1].getBlue() - ColorMetricHotSpotInterpreter.scalaColor[0].getBlue()) / (stepWidth + 1);
+
+			for (int i = 1; i <= stepWidth; i++) {
+				double b = ColorMetricHotSpotInterpreter.scalaColor[0].getBlue() + (bChange * i);
+				double g = ColorMetricHotSpotInterpreter.scalaColor[0].getGreen() + (gChange * i);
+				double r = ColorMetricHotSpotInterpreter.scalaColor[0].getRed() + (rChange * i);
+				this.scale[i] = new Color(display, (int) r, (int) g, (int) b);
+			}
+
+			this.scale[(maxRange / 2)] = ColorMetricHotSpotInterpreter.scalaColor[1];
+
+			stepWidth = (maxRange - ((maxRange / 2))) - 2;
+
+			rChange = (ColorMetricHotSpotInterpreter.scalaColor[2].getRed() - ColorMetricHotSpotInterpreter.scalaColor[1].getRed()) / (stepWidth + 1);
+			gChange = (ColorMetricHotSpotInterpreter.scalaColor[2].getGreen() - ColorMetricHotSpotInterpreter.scalaColor[1].getGreen()) / (stepWidth + 1);
+			bChange = (ColorMetricHotSpotInterpreter.scalaColor[2].getBlue() - ColorMetricHotSpotInterpreter.scalaColor[1].getBlue()) / (stepWidth + 1);
+
+			for (int i = 1; i <= stepWidth; i++) {
+				double b = ColorMetricHotSpotInterpreter.scalaColor[1].getBlue() + (bChange * i);
+				double g = ColorMetricHotSpotInterpreter.scalaColor[1].getGreen() + (gChange * i);
+				double r = ColorMetricHotSpotInterpreter.scalaColor[1].getRed() + (rChange * i);
+				this.scale[i + maxRange / 2] = new Color(display, (int) r, (int) g, (int) b);
+			}
+
+			this.scale[maxRange - 1] = ColorMetricHotSpotInterpreter.scalaColor[2];
+		}
 	}
 
 	@Override
 	public Color interpret(HotSpotResult result) {
-		if(result.getMetricValue() >= maxRange)
+		if (result.getMetricValue() >= maxRange)
 			return scale[maxRange - 1];
-			
-		return scale[(int)result.getMetricValue()];
+
+		return scale[(int) result.getMetricValue()];
 	}
 
 }
