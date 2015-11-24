@@ -82,7 +82,6 @@ public class SetFeatureColorDialog extends Dialog {
 		super(parentShell);
 		this.featureList = featurelist;
 		setShellStyle(SWT.DIALOG_TRIM | SWT.MIN | SWT.RESIZE);
-		setDefaultImage(colorImage);
 	}
 
 	/**
@@ -94,6 +93,7 @@ public class SetFeatureColorDialog extends Dialog {
 		newShell.setMinimumSize(new Point(500, 500));
 		super.configureShell(newShell);
 		newShell.setText(COLORATION_DIALOG);
+		newShell.setImage(colorImage);
 	}
 
 	protected Point getInitialSize() {
