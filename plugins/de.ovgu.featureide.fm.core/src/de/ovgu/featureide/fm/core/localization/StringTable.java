@@ -481,6 +481,7 @@ public class StringTable {
 	public static final String SAVE_RESOURCES = "Save Resources";
 	public static final String SOME_MODIFIED_RESOURCES_MUST_BE_SAVED_BEFORE_SAVING_THE_FEATUREMODEL_ = "Some modified resources must be saved before saving the featuremodel.";
 	public static final String FEATURE_ORDER = "Feature Order";
+	public static final String FEATURE_HOTSPOT_ANALYSIS= "Hot-Spot Analysis";
 	public static final String USER_DEFINED_FEATURE_ORDER = "User-defined feature order";
 	public static final String UP = "Up";
 	public static final String DOWN = "Down";
