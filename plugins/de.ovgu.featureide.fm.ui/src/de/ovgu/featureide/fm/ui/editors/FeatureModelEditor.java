@@ -106,6 +106,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 
 	public FeatureDiagramEditor diagramEditor;
 	public FeatureOrderEditor featureOrderEditor;
+	private FeatureHotspotAnalysisPage featureHotspotEditor;
 	public FeatureModelTextEditorPage textEditor;
 
 	public LinkedList<IFeatureModelEditorPage> extensionPages = new LinkedList<IFeatureModelEditorPage>();
@@ -385,6 +386,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 		createFeatureOrderPage();
 		createExtensionPages();
 		createSourcePage();
+		createFeatureHotspotPage();
 		currentPageIndex = 0;
 		// if there are errors in the model file, go to source page
 		if (!checkModel(textEditor.getCurrentContent())) {
@@ -556,6 +558,17 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 			featureOrderEditor.setIndex(addPage(featureOrderEditor, getEditorInput()));
 			setPageText(featureOrderEditor.getIndex(), featureOrderEditor.getPageText());
 			featureOrderEditor.initEditor();
+		} catch (PartInitException e) {
+			FMUIPlugin.getDefault().logError(e);
+		}
+	}
+	
+	private void createFeatureHotspotPage(){
+		featureHotspotEditor = new FeatureHotspotAnalysisPage(this);
+		try {
+			featureHotspotEditor.setIndex(addPage(featureHotspotEditor, getEditorInput()));
+			setPageText(featureHotspotEditor.getIndex(), featureHotspotEditor.getPageText());
+			featureHotspotEditor.initEditor();
 		} catch (PartInitException e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
