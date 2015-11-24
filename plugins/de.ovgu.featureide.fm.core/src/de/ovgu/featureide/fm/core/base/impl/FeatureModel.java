@@ -436,8 +436,8 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	@Override
 	public void setFeatureOrderList(List<String> featureOrderList) {
 		this.featureOrderList.clear();
-		for (CharSequence cs : featureOrderList)
-			this.featureOrderList.add(cs.toString());
+		for (String cs : featureOrderList)
+			this.featureOrderList.add(cs);
 	}
 
 	@Override
@@ -508,7 +508,7 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 //
 	@Override
 	public void setFeatureOrderListItem(int i, String newName) {
-		throw new UnsupportedOperationException("Not implemented yet");
+//		this.featureOrderList.set(i, newName);
 	}
 
 	@Override

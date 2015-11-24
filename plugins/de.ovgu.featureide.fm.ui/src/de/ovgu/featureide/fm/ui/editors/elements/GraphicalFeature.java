@@ -29,9 +29,10 @@ import org.eclipse.draw2d.geometry.Point;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
-import de.ovgu.featureide.fm.core.base.impl.Tree;
+import de.ovgu.featureide.fm.core.base.util.tree.Tree;
 import de.ovgu.featureide.fm.ui.ColorList;
 import de.ovgu.featureide.fm.ui.editors.FeatureConnection;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalElement;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
@@ -157,6 +158,23 @@ public class GraphicalFeature implements IGraphicalFeature {
 	@Override
 	public String toString() {
 		return correspondingFeature.toString();
+	}
+
+	@Override
+	public String getGraphicType() {
+		return null;
+	}
+
+	@Override
+	public void copyValue(IGraphicalElement element) {
+		if (element instanceof GraphicalFeature) {
+			final GraphicalFeature oldFeature = (GraphicalFeature) element;
+
+			colorList = oldFeature.colorList;
+			constraintSelected = oldFeature.constraintSelected;
+			location = oldFeature.location;
+			dimension = oldFeature.dimension;
+		}
 	}
 
 }

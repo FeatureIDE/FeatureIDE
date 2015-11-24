@@ -26,6 +26,7 @@ import org.eclipse.draw2d.geometry.Point;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalElement;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
@@ -91,6 +92,21 @@ public class GraphicalConstraint implements IGraphicalConstraint, PropertyConsta
 	@Override
 	public IGraphicalFeatureModel getGraphicalModel() {
 		return graphicalFeatureModel;
+	}
+
+	@Override
+	public void copyValue(IGraphicalElement element) {
+		if (element instanceof GraphicalConstraint) {
+			final GraphicalConstraint oldFeature = (GraphicalConstraint) element;
+
+			location = oldFeature.location;
+			dimension = oldFeature.dimension;
+		}
+	}
+
+	@Override
+	public String getGraphicType() {
+		return null;
 	}
 
 }

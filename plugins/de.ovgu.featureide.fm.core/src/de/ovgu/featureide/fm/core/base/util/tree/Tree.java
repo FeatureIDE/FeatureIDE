@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.base.impl;
+package de.ovgu.featureide.fm.core.base.util.tree;
 
 
 /**

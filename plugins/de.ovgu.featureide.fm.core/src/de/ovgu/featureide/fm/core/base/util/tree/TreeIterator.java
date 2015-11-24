@@ -18,36 +18,19 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.ui.editors;
+package de.ovgu.featureide.fm.core.base.util.tree;
 
-import org.eclipse.draw2d.geometry.Dimension;
-import org.eclipse.draw2d.geometry.Point;
-
-import de.ovgu.featureide.fm.core.IGraphicItem;
-import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
-import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
+import java.util.Iterator;
 
 /**
- * Graphical representation of a constraint.
+ * TODO description
  * 
- * @author Sebastian Krieter
+ * @author skrieter
  */
-public interface IGraphicalElement extends IGraphicItem, PropertyConstants {
+public interface TreeIterator<E> extends Iterator<E>, Iterable<E> {
 
-	IFeatureModelElement getObject();
-	
-	IGraphicalFeatureModel getGraphicalModel();
+	void removeSubtree();
 
-	Point getLocation();
-
-	Dimension getSize();
-
-	void setLocation(Point newLocation);
-
-	void setSize(Dimension size);
-
-	String getGraphicType();
-	
-	void copyValue(IGraphicalElement element);
+	int getCurrentLevel();
 
 }

@@ -18,36 +18,26 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.ui.editors;
+package de.ovgu.featureide.fm.core.base.util.tree;
 
-import org.eclipse.draw2d.geometry.Dimension;
-import org.eclipse.draw2d.geometry.Point;
-
-import de.ovgu.featureide.fm.core.IGraphicItem;
-import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
-import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
+import java.util.Collections;
 
 /**
- * Graphical representation of a constraint.
+ * Tree element.
  * 
  * @author Sebastian Krieter
+ * 
  */
-public interface IGraphicalElement extends IGraphicItem, PropertyConstants {
+public final class TreeOperations {
 
-	IFeatureModelElement getObject();
-	
-	IGraphicalFeatureModel getGraphicalModel();
+	private TreeOperations() {
+	}
 
-	Point getLocation();
-
-	Dimension getSize();
-
-	void setLocation(Point newLocation);
-
-	void setSize(Dimension size);
-
-	String getGraphicType();
-	
-	void copyValue(IGraphicalElement element);
+	public static void reverse(ModelTree<?, ?> tree) {
+		for (ModelTree<?, ?> child : tree.children) {
+			reverse(child);
+		}
+		Collections.reverse(tree.children);
+	}
 
 }

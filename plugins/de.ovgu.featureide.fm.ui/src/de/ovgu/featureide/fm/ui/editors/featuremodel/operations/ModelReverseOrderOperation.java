@@ -25,6 +25,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.REVERSE_LAYOUT
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 
+import de.ovgu.featureide.fm.core.base.util.tree.TreeOperations;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -47,7 +48,7 @@ public class ModelReverseOrderOperation extends AbstractGraphicalFeatureModelOpe
 	@Override
 	protected void redo() {
 		final IGraphicalFeature root = graphicalFeatureModel.getFeatures().getObject();
-		root.getTree().reverse();
+		TreeOperations.reverse(root.getTree());
 		if (!graphicalFeatureModel.getLayout().hasFeaturesAutoLayout()) {
 			Point mid = FeatureUIHelper.getLocation(root).getCopy();
 			mid.x += FeatureUIHelper.getSize(root).width / 2;

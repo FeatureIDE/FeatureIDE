@@ -18,15 +18,12 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.base.impl;
+package de.ovgu.featureide.fm.core.base.util.tree;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.NoSuchElementException;
 
 import de.ovgu.featureide.fm.core.functional.Functional;
 
@@ -37,94 +34,6 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  * 
  */
 public class ModelTree<M, E> implements Iterable<E> {
-
-	public static interface TreeIterator<E> extends Iterator<E>, Iterable<E> {
-		void removeSubtree();
-
-		int getCurrentLevel();
-	}
-
-	private static abstract class AbstractTreeIterator<M, E> implements TreeIterator<E> {
-
-		protected LinkedList<ModelTree<M, E>> iteratorList = new LinkedList<>();
-
-		protected ModelTree<M, E> next = null;
-
-		private AbstractTreeIterator(ModelTree<M, E> root) {
-			iteratorList.add(root);
-		}
-
-		@Override
-		public boolean hasNext() {
-			return !iteratorList.isEmpty();
-		}
-
-		@Override
-		public E next() {
-			if (iteratorList.isEmpty()) {
-				throw new NoSuchElementException();
-			}
-			next = getNext();
-			return next.object;
-		}
-
-		protected abstract ModelTree<M, E> getNext();
-
-		@Override
-		public void remove() {
-			if (next != null) {
-				if (next.parent == null) {
-					next.object = null;
-				} else {
-					ListIterator<ModelTree<M, E>> listIterator = next.parent.children.listIterator();
-					int i = 0;
-					while (listIterator.hasNext()) {
-						ModelTree<M, E> n = listIterator.next();
-						if (n == next) {
-							listIterator.remove();
-							break;
-						}
-						i++;
-					}
-					next.parent.children.addAll(i, next.children);
-				}
-				next = null;
-			} else {
-				throw new IllegalStateException();
-			}
-		}
-
-		@Override
-		public void removeSubtree() {
-			if (next != null) {
-				if (next.parent == null) {
-					next.object = null;
-					next.children.clear();
-				} else {
-					next.parent.children.remove(next);
-				}
-				next = null;
-			} else {
-				throw new IllegalStateException();
-			}
-		}
-
-		@Override
-		public Iterator<E> iterator() {
-			return this;
-		}
-
-		public int getCurrentLevel() {
-			int level = -1;
-			ModelTree<M, E> tempParent = next;
-			while (tempParent != null) {
-				tempParent = tempParent.getParent();
-				level++;
-			}
-			return level;
-		}
-
-	}
 
 	private static final class PreOrderIterator<M, E> extends AbstractTreeIterator<M, E> {
 
@@ -254,15 +163,20 @@ public class ModelTree<M, E> implements Iterable<E> {
 		return children.size();
 	}
 
-	public boolean isRoot() {
-		return parent == null;
+	public int getNumberOfNodes() {
+		int count = 0;
+		final LinkedList<ModelTree<M, E>> countList = new LinkedList<>();
+		countList.add(this);
+		do {
+			final ModelTree<M, E> next = countList.removeFirst();
+			countList.addAll(0, next.children);
+			count++;
+		} while(!countList.isEmpty());
+		return count;
 	}
 
-	public void reverse() {
-		for (ModelTree<M, E> child : children) {
-			child.reverse();
-		}
-		Collections.reverse(children);
+	public boolean isRoot() {
+		return parent == null;
 	}
 
 	public boolean isAncestorOf(ModelTree<?, ?> tree) {

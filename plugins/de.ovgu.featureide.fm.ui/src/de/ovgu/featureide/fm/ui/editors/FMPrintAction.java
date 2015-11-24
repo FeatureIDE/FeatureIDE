@@ -26,7 +26,7 @@ import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.gef.ui.actions.PrintAction;
 import org.eclipse.ui.IWorkbenchPart;
 
-import de.ovgu.featureide.fm.core.base.impl.Tree;
+import de.ovgu.featureide.fm.core.base.util.tree.Tree;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
 
 /**

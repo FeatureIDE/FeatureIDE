@@ -23,7 +23,7 @@ package de.ovgu.featureide.fm.ui.editors;
 import java.util.List;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.impl.Tree;
+import de.ovgu.featureide.fm.core.base.util.tree.Tree;
 import de.ovgu.featureide.fm.ui.ColorList;
 
 /**
