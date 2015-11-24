@@ -54,6 +54,7 @@ public class ColorMetricHotSpotInterpreter implements IHotSpotResultInterpreter<
 
 		if (maxRange < 3) {
 			 if(maxRange < 1) {
+				 /*TODO*/
 				 System.out.println("SHIT");
 				 return;
 			 }

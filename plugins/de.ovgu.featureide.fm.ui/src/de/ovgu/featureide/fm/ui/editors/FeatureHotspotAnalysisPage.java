@@ -38,6 +38,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 
@@ -144,6 +145,7 @@ public class FeatureHotspotAnalysisPage extends FeatureModelEditorPage {
 		thresholdSpinner = new Spinner(compositeTop, SWT.HORIZONTAL);
 		thresholdSpinner.setMaximum(80);
 		thresholdSpinner.setIncrement(1);
+		thresholdSpinner.setSelection(5);
 		thresholdSpinner.setLayoutData(gridData);
 		
 		// analysis button
@@ -178,13 +180,16 @@ public class FeatureHotspotAnalysisPage extends FeatureModelEditorPage {
 			public void widgetSelected(SelectionEvent e) {
 				Set<HotSpotResult> result = analyzer.analyze(FeatureHotspotAnalysisPage.this.model);
 				IHotSpotResultInterpreter<Color> interpreter = new ColorMetricHotSpotInterpreter(Integer.valueOf(thresholdSpinner.getText()).intValue());
-				/*for(HotSpotResult hsr : result)*/
-				for(int i = 0; i < Integer.valueOf(thresholdSpinner.getText()).intValue();i++){
-					HotSpotResult hsr = new HotSpotResult();
-					hsr.setMetricValue(i);
+				for (Control control : compositeBottom.getChildren()) {
+			        control.dispose();
+			    }
+				for(HotSpotResult hsr : result)
+				/*for(int i = 0; i < Integer.valueOf(thresholdSpinner.getText()).intValue();i++)*/{
+					//HotSpotResult hsr = new HotSpotResult();
+					//hsr.setMetricValue(i);
 					Color c = interpreter.interpret(hsr);
 					Label l = new Label(compositeBottom,SWT.NONE);
-					l.setText(c.toString());
+					l.setText(/*c.toString() + " " + */hsr.getFeatureName());
 					l.setBackground(c);
 				}
 				compositeBottom.pack();
