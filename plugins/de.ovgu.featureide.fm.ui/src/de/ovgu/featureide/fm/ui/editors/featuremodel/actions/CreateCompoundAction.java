@@ -57,13 +57,9 @@ public class CreateCompoundAction extends Action {
 
 	private final IFeatureModel featureModel;
 
-	private Object viewer;
-
 	private IFeature parent = null;
 
 	private LinkedList<IFeature> selectedFeatures = new LinkedList<IFeature>();
-
-	private Object diagramEditor;
 
 	private static ImageDescriptor createImage = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ADD);
 
@@ -74,11 +70,9 @@ public class CreateCompoundAction extends Action {
 		}
 	};
 
-	public CreateCompoundAction(Object viewer, IFeatureModel featureModel, Object diagramEditor) {
+	public CreateCompoundAction(Object viewer, IFeatureModel featureModel) {
 		super(CREATE_FEATURE_ABOVE, createImage);
-		this.viewer = viewer;
 		this.featureModel = featureModel;
-		this.diagramEditor = diagramEditor;
 
 		setEnabled(false);
 		if (viewer instanceof GraphicalViewerImpl) {
@@ -90,7 +84,7 @@ public class CreateCompoundAction extends Action {
 
 	@Override
 	public void run() {
-		FeatureCreateCompoundOperation op = new FeatureCreateCompoundOperation(viewer, parent, featureModel, selectedFeatures, diagramEditor);
+		FeatureCreateCompoundOperation op = new FeatureCreateCompoundOperation(parent, featureModel, selectedFeatures);
 		op.addContext((IUndoContext) featureModel.getUndoContext());
 
 		try {
@@ -116,7 +110,7 @@ public class CreateCompoundAction extends Action {
 			IFeature feature;
 
 			if (editPart instanceof FeatureEditPart)
-				feature = ((FeatureEditPart) editPart).getFeature();
+				feature = ((FeatureEditPart) editPart).getFeature().getObject();
 			else
 				feature = (IFeature) editPart;
 

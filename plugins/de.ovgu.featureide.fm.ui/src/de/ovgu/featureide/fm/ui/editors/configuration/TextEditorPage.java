@@ -22,13 +22,12 @@ package de.ovgu.featureide.fm.ui.editors.configuration;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.SOURCE;
 
-import java.beans.PropertyChangeEvent;
-
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationWriter;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -73,7 +72,7 @@ public class TextEditorPage extends TextEditor implements IConfigurationEditorPa
 	}
 
 	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
+	public void propertyChange(FeatureModelEvent evt) {
 		refresh();
 	}
 

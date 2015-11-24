@@ -22,17 +22,12 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.REVERSE_LAYOUT_ORDER;
 
-import java.util.LinkedList;
-
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
-import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.IGraphicalFeature;
-import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
  * Operation with functionality to reverse the feature model layout order.
@@ -41,31 +36,30 @@ import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
  * @author Fabian Benduhn
  * @author Marcus Pinnecke
  */
-public class ModelReverseOrderOperation extends AbstractFeatureModelOperation {
+public class ModelReverseOrderOperation extends AbstractGraphicalFeatureModelOperation {
 
 	private static final String LABEL = REVERSE_LAYOUT_ORDER;
 
-	public ModelReverseOrderOperation(IFeatureModel featureModel) {
+	public ModelReverseOrderOperation(IGraphicalFeatureModel featureModel) {
 		super(featureModel, LABEL);
 	}
 
 	@Override
 	protected void redo() {
-		final IFeature root = featureModel.getStructure().getRoot().getFeature();
-		reverse(root);
-		if (!featureModel.getGraphicRepresenation().getLayout().hasFeaturesAutoLayout()) {
-			final IGraphicalFeature gf = root.getGraphicRepresenation();
-			Point mid = FeatureUIHelper.getLocation(gf).getCopy();
-			mid.x += FeatureUIHelper.getSize(gf).width / 2;
-			mid.y += FeatureUIHelper.getSize(gf).height / 2;
-			mirrorFeaturePositions(root, mid, FeatureUIHelper.hasVerticalLayout(featureModel.getGraphicRepresenation()));
+		final IGraphicalFeature root = graphicalFeatureModel.getFeatures().getObject();
+		root.getTree().reverse();
+		if (!graphicalFeatureModel.getLayout().hasFeaturesAutoLayout()) {
+			Point mid = FeatureUIHelper.getLocation(root).getCopy();
+			mid.x += FeatureUIHelper.getSize(root).width / 2;
+			mid.y += FeatureUIHelper.getSize(root).height / 2;
+			mirrorFeaturePositions(root, mid, FeatureUIHelper.hasVerticalLayout(graphicalFeatureModel));
 		}
 	}
 
-	private void mirrorFeaturePositions(IFeature feature, Point mid, boolean vertical) {
-		if (!feature.getStructure().isRoot()) {
-			Point featureMid = FeatureUIHelper.getLocation(feature.getGraphicRepresenation()).getCopy();
-			Dimension size = FeatureUIHelper.getSize(feature.getGraphicRepresenation()).getCopy();
+	private void mirrorFeaturePositions(IGraphicalFeature feature, Point mid, boolean vertical) {
+		if (!feature.getTree().isRoot()) {
+			Point featureMid = FeatureUIHelper.getLocation(feature).getCopy();
+			Dimension size = FeatureUIHelper.getSize(feature).getCopy();
 
 			if (vertical) {
 				featureMid.y += size.height / 2;
@@ -77,21 +71,13 @@ public class ModelReverseOrderOperation extends AbstractFeatureModelOperation {
 				featureMid.x -= size.width / 2;
 			}
 
-			FeatureUIHelper.setLocation(feature.getGraphicRepresenation(), featureMid);
+			FeatureUIHelper.setLocation(feature, featureMid);
 		}
-		if (feature.getStructure().hasChildren()) {
-			for (IFeature child : FeatureUtils.convertToFeatureList(feature.getStructure().getChildren()))
+		if (feature.getTree().hasChildren()) {
+			for (IGraphicalFeature child : feature.getTree().getChildrenObjects()) {
 				mirrorFeaturePositions(child, mid, vertical);
+			}
 		}
-
-	}
-
-	private void reverse(IFeature feature) {
-		LinkedList<IFeature> children = new LinkedList<>(Functional.toList(FeatureUtils.convertToFeatureList(feature.getStructure().getChildren())));
-		for (int i = 0; i < children.size() - 1; i++)
-			children.add(i, children.removeLast());
-		for (IFeature child : FeatureUtils.convertToFeatureList(feature.getStructure().getChildren()))
-			reverse(child);
 	}
 
 	@Override

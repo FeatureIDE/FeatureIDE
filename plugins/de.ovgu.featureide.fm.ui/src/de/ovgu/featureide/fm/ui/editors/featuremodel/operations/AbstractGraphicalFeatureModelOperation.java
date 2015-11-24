@@ -18,31 +18,23 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.base;
+package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import de.ovgu.featureide.fm.core.ColorschemeTable;
-import de.ovgu.featureide.fm.core.FeatureModelLayout;
-import de.ovgu.featureide.fm.core.IGraphicItem;
+import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
- * Graphical representation of a feature model.
  * 
  * @author Sebastian Krieter
  */
-public interface IGraphicalFeatureModel extends IGraphicItem {
+public abstract class AbstractGraphicalFeatureModelOperation extends AbstractFeatureModelOperation {
 
-	ColorschemeTable getColorschemeTable();
-	
-	IFeatureModel getFeatureModel();
+	protected IGraphicalFeatureModel graphicalFeatureModel;
 
-	FeatureModelLayout getLayout();
-
-	void handleLegendLayoutChanged();
-
-	void handleModelLayoutChanged();
-
-	void redrawDiagram();
-
-	void refreshContextMenu();
+	public AbstractGraphicalFeatureModelOperation(IGraphicalFeatureModel graphicalFeatureModel, String label) {
+		super(graphicalFeatureModel.getFeatureModel(), label);
+		this.graphicalFeatureModel = graphicalFeatureModel;
+		setEventId(PropertyConstants.MODEL_DATA_LOADED);
+	}
 
 }

@@ -20,16 +20,16 @@
  */
 package de.ovgu.featureide.fm.ui.editors.configuration;
 
-import java.beans.PropertyChangeEvent;
-
 import org.eclipse.ui.IEditorPart;
+
+import de.ovgu.featureide.fm.core.base.event.IFeatureModelListener;
 
 /**
  * Basic interface for all pages at configuration editor.
  * 
  * @author Jens Meinicke
  */
-public interface IConfigurationEditorPage extends IEditorPart {
+public interface IConfigurationEditorPage extends IEditorPart, IFeatureModelListener {
 
 	/**
 	 * 
@@ -56,12 +56,6 @@ public interface IConfigurationEditorPage extends IEditorPart {
 	 * @return The Name of this page.
 	 */
 	public String getPageText();
-
-	/**
-	 * Called after this page has been added to the editor.
-	 * Called if the file has been changed.
-	 */
-	public void propertyChange(PropertyChangeEvent evt);
 
 	/**
 	 * Called if the tab has been changed from this page.

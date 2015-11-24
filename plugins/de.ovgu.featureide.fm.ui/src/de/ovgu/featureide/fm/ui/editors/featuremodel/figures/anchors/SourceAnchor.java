@@ -24,8 +24,8 @@ import org.eclipse.draw2d.AbstractConnectionAnchor;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.geometry.Point;
 
-import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 
 /**
  * Used by the connection to get the position of the small circle.
@@ -35,15 +35,15 @@ import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
  */
 public class SourceAnchor extends AbstractConnectionAnchor {
 
-	private IFeature model;
+	private IGraphicalFeature model;
 
-	public SourceAnchor(IFigure owner, IFeature model) {
+	public SourceAnchor(IFigure owner, IGraphicalFeature model) {
 		super(owner);
 		this.model = model;
 	}
 
 	public Point getLocation(Point reference) {
-		Point ref = FeatureUIHelper.getSourceLocation(model.getGraphicRepresenation());
+		Point ref = FeatureUIHelper.getSourceLocation(model);
 		getOwner().translateToAbsolute(ref);
 		return ref;
 	}

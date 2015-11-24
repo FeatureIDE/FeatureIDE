@@ -18,11 +18,10 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.io.xml;
+package de.ovgu.featureide.fm.ui;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.COLOR;
 import static de.ovgu.featureide.fm.core.localization.StringTable.COLORSCHEME;
-import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.INDEX;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SCHEME;
 
@@ -31,10 +30,9 @@ import java.util.List;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import de.ovgu.featureide.fm.core.ColorList;
-import de.ovgu.featureide.fm.core.ColorschemeTable;
-import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.xml.AbstractXMLFeatureModelWriter;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
  * Prints the colorschemes for the feature model in XML format.
@@ -42,9 +40,9 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  * @author Sebastian Krieter
  * @author Marcus Pinnecke (Feature Interface)
  */
-public class XmlColorModelWriter extends XmlFeatureModelWriter {
+public class XmlColorModelWriter extends AbstractXMLFeatureModelWriter<IGraphicalFeatureModel> {
 	
-	public XmlColorModelWriter(IFeatureModel featureModel) {
+	public XmlColorModelWriter(IGraphicalFeatureModel featureModel) {
 		super(featureModel);
 	}
 	
@@ -58,7 +56,7 @@ public class XmlColorModelWriter extends XmlFeatureModelWriter {
     	Element colorSchemesRoot = doc.createElement("colorSchemes");
     	Element featuresRoot = doc.createElement(FEATURES);
 
-    	ColorschemeTable colorschemeTable = featureModel.getGraphicRepresenation().getColorschemeTable();
+    	ColorschemeTable colorschemeTable = object.getColorschemeTable();
     	List<String> csNames = colorschemeTable.getColorschemeNames();
     	for (String name : csNames) {
     		Element colorSchemesElement = doc.createElement(COLORSCHEME);
@@ -71,8 +69,8 @@ public class XmlColorModelWriter extends XmlFeatureModelWriter {
     	
     	root.appendChild(colorSchemesRoot);
     	
-		for (IFeature feat : featureModel.getFeatures()) {
-			ColorList colors = feat.getGraphicRepresenation().getColorList();
+		for (IGraphicalFeature feat : object.getFeatures()) {
+			ColorList colors = feat.getColorList();
 
 			boolean noColor = true;
 			Element featuresElement = null;
@@ -81,7 +79,7 @@ public class XmlColorModelWriter extends XmlFeatureModelWriter {
 				if (colors.hasColor(i)) {
 					if (noColor) {
 						featuresElement = doc.createElement("feature");
-						featuresElement.setAttribute("name", feat.getName());
+						featuresElement.setAttribute("name", feat.getObject().getName());
 						noColor = false;
 					}
 					Element colorElement = doc.createElement(COLOR);

@@ -26,12 +26,10 @@ import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.gef.commands.Command;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
-import de.ovgu.featureide.fm.core.base.IConstraint;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ConstraintMoveOperation;
 
 /**
@@ -46,19 +44,19 @@ public class ConstraintDragAndDropCommand extends Command {
 	private int maxRight;
 	private int maxUp;
 	private int maxDown;
-	private IFeatureModel featureModel;
-	private IConstraint constraint;
+	private IGraphicalFeatureModel featureModel;
+	private IGraphicalConstraint constraint;
 	private Point newLocation;
 	private boolean hasAutoLayout;
 	boolean isLastPos;
 
-	public ConstraintDragAndDropCommand(IFeatureModel featureModel, IConstraint constraint, Point newLocation) {
+	public ConstraintDragAndDropCommand(IGraphicalFeatureModel featureModel, IGraphicalConstraint constraint, Point newLocation) {
 		// super("Moving " + constraint.getNode().toString());
 		this.featureModel = featureModel;
 		this.constraint = constraint;
 		this.newLocation = newLocation;
 		isLastPos = false;
-		this.hasAutoLayout = featureModel.getGraphicRepresenation().getLayout().hasFeaturesAutoLayout();
+		this.hasAutoLayout = featureModel.getLayout().hasFeaturesAutoLayout();
 	}
 
 	public boolean canExecute() {
@@ -80,9 +78,12 @@ public class ConstraintDragAndDropCommand extends Command {
 		if (hasAutoLayout && (index == oldIndex))
 			return;
 
-		ConstraintMoveOperation op = new ConstraintMoveOperation(constraint, featureModel, index, oldIndex, isLastPos, newLocation, FeatureUIHelper
-				.getLocation(constraint.getGraphicRepresenation()).getCopy());
-		op.addContext((IUndoContext) featureModel.getUndoContext());
+
+		ConstraintMoveOperation op = new ConstraintMoveOperation(constraint.getObject(), featureModel.getFeatureModel(), index, oldIndex);
+//TODO _interfaces Removed Code
+//		, newLocation, FeatureUIHelper
+//		.getLocation(constraint).getCopy()
+		op.addContext((IUndoContext) featureModel.getFeatureModel().getUndoContext());
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
@@ -96,9 +97,8 @@ public class ConstraintDragAndDropCommand extends Command {
 	 * 
 	 */
 	private int calculateNewIndex() {
-
-		for (IConstraint c : featureModel.getConstraints()) {
-			if ((FeatureUIHelper.getLocation(c.getGraphicRepresenation()).y + 17) > newLocation.y) {
+		for (IGraphicalConstraint c : featureModel.getConstraints()) {
+			if ((FeatureUIHelper.getLocation(c).y + 17) > newLocation.y) {
 				isLastPos = false;
 
 				return featureModel.getConstraints().indexOf(c);
@@ -111,9 +111,9 @@ public class ConstraintDragAndDropCommand extends Command {
 	}
 
 	public void setMaxValues() {
-		maxLeft = FeatureUIHelper.getLocation(constraint.getGraphicRepresenation()).x;
-		maxUp = FeatureUIHelper.getLocation(constraint.getGraphicRepresenation()).y;
-		for (IGraphicalConstraint c : FeatureUtils.getGraphicalRepresentationsOfConstraints(featureModel.getConstraints())) {
+		maxLeft = FeatureUIHelper.getLocation(constraint).x;
+		maxUp = FeatureUIHelper.getLocation(constraint).y;
+		for (IGraphicalConstraint c : featureModel.getConstraints()) {
 
 			if (FeatureUIHelper.getLocation(c).x < maxLeft) {
 				maxLeft = FeatureUIHelper.getLocation(c).x;
@@ -139,7 +139,7 @@ public class ConstraintDragAndDropCommand extends Command {
 	public Point getLeftPoint() {
 		int index = calculateNewIndex();
 
-		Point p = new Point(FeatureUIHelper.getLocation(constraint.getGraphicRepresenation()).x - 5, FeatureUIHelper.getLocation(featureModel.getConstraints().get(index).getGraphicRepresenation()).y);
+		Point p = new Point(FeatureUIHelper.getLocation(constraint).x - 5, FeatureUIHelper.getLocation(featureModel.getConstraints().get(index)).y);
 		if (isLastPos) {
 			p.y = p.y + 17;
 
@@ -150,8 +150,8 @@ public class ConstraintDragAndDropCommand extends Command {
 
 	public Point getRightPoint() {
 
-		Point p = new Point(FeatureUIHelper.getLocation(constraint.getGraphicRepresenation()).x + FeatureUIHelper.getSize(constraint.getGraphicRepresenation()).width + 5, FeatureUIHelper.getLocation(featureModel
-				.getConstraints().get(calculateNewIndex()).getGraphicRepresenation()).y);
+		Point p = new Point(FeatureUIHelper.getLocation(constraint).x + FeatureUIHelper.getSize(constraint).width + 5, FeatureUIHelper.getLocation(featureModel
+				.getConstraints().get(calculateNewIndex())).y);
 		if (isLastPos) {
 			p.y = p.y + 17;
 

@@ -28,11 +28,11 @@ import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gef.commands.Command;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.base.IConstraint;
-import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConnectionEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
@@ -46,11 +46,11 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.LegendMoveOperat
  */
 public class LegendDragAndDropCommand extends Command {
 
-	private final IFeatureModel model;
+	private final IGraphicalFeatureModel model;
 	private final LegendEditPart legendEditPart;
 	private Point newLocation;
 
-	public LegendDragAndDropCommand(IFeatureModel model, LegendEditPart legendEditPart, Point moveDelta) {
+	public LegendDragAndDropCommand(IGraphicalFeatureModel model, LegendEditPart legendEditPart, Point moveDelta) {
 		this.legendEditPart = legendEditPart;
 		this.model = model;
 
@@ -68,12 +68,12 @@ public class LegendDragAndDropCommand extends Command {
 		Rectangle newBounds = new Rectangle(newLocation, legendEditPart.getFigure().getSize());
 
 		// check if legend intersects with a feature
-		for (IFeature f : model.getFeatures()) {
-			if (newBounds.intersects(FeatureUIHelper.getBounds(f.getGraphicRepresenation()))) {
+		for (IGraphicalFeature f : model.getFeatures()) {
+			if (newBounds.intersects(FeatureUIHelper.getBounds(f))) {
 				return false;
 			}
 
-			final List<ConnectionEditPart> connectionList = FeatureUIHelper.getConnections(f.getGraphicRepresenation(), legendEditPart.getViewer());
+			final List<ConnectionEditPart> connectionList = FeatureUIHelper.getConnections(f, legendEditPart.getViewer());
 			for (ConnectionEditPart connectionEditPart : connectionList) {
 				if (connectionEditPart.getConnectionFigure().getPoints().intersects(newBounds)) {
 					return false;
@@ -82,8 +82,8 @@ public class LegendDragAndDropCommand extends Command {
 		}
 
 		// check if legend intersects with a constraint
-		for (IConstraint c : model.getConstraints()) {
-			if (newBounds.intersects(FeatureUIHelper.getBounds(c.getGraphicRepresenation()))) {
+		for (IGraphicalConstraint c : model.getConstraints()) {
+			if (newBounds.intersects(FeatureUIHelper.getBounds(c))) {
 				return false;
 			}
 		}
@@ -99,7 +99,8 @@ public class LegendDragAndDropCommand extends Command {
 		}
 
 		LegendMoveOperation op = new LegendMoveOperation(model, newLocation, legendFigure);
-		op.addContext((IUndoContext) model.getUndoContext());
+		//TODO _interfaces Removed Code
+		op.addContext((IUndoContext) model.getFeatureModel().getUndoContext());
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);

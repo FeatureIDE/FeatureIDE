@@ -66,11 +66,11 @@ public class VelvetFeatureModelWriter extends AbstractFeatureModelWriter {
 
 	@Override
 	public String writeToString() {
-		if (featureModel instanceof ExtendedFeatureModel) {
-			extFeatureModel = (ExtendedFeatureModel) featureModel;
+		if (object instanceof ExtendedFeatureModel) {
+			extFeatureModel = (ExtendedFeatureModel) object;
 			isInterface = isInterface || extFeatureModel.isInterface();
 		}
-		IFeatureStructure root = featureModel.getStructure().getRoot();
+		IFeatureStructure root = object.getStructure().getRoot();
 		sb.delete(0, sb.length());
 
 		if (isInterface) {
@@ -135,7 +135,7 @@ public class VelvetFeatureModelWriter extends AbstractFeatureModelWriter {
 				writeNewDefined(child, 1);
 			}
 			
-			for (IConstraint constraint : featureModel.getConstraints()) {
+			for (IConstraint constraint : object.getConstraints()) {
 				if (((ExtendedConstraint) constraint).getType() == ExtendedFeature.TYPE_INTERN) {
 					sb.append("\tconstraint ");
 					sb.append(constraint.getNode().toString(SYMBOLS));
@@ -146,7 +146,7 @@ public class VelvetFeatureModelWriter extends AbstractFeatureModelWriter {
 		} else {
 			writeFeatureGroup(root, 1);
 			
-			for (IConstraint constraint : featureModel.getConstraints()) {
+			for (IConstraint constraint : object.getConstraints()) {
 				sb.append("\tconstraint ");
 				sb.append(constraint.getNode().toString(SYMBOLS));
 				sb.append(";");

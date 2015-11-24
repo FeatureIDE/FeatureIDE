@@ -20,14 +20,13 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
-import java.beans.PropertyChangeEvent;
-
 import javax.annotation.CheckForNull;
 
 import de.ovgu.featureide.fm.core.FeatureStatus;
-import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureProperty;
+import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 
 /**
  * All additional properties of an {@link IFeature}.
@@ -103,7 +102,7 @@ public class FeatureProperty implements IFeatureProperty, PropertyConstants {
 	public void setFeatureStatus(FeatureStatus stat, boolean fire) {
 		this.status = stat;
 		if (fire) {
-			correspondingFeature.fireEvent(new PropertyChangeEvent(this, ATTRIBUTE_CHANGED, Boolean.FALSE, Boolean.TRUE));
+			correspondingFeature.fireEvent(new FeatureModelEvent(this, ATTRIBUTE_CHANGED, Boolean.FALSE, Boolean.TRUE));
 		}
 	}
 

@@ -18,28 +18,46 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.base;
+package de.ovgu.featureide.fm.ui.editors;
 
-import de.ovgu.featureide.fm.core.FMDimension;
-import de.ovgu.featureide.fm.core.FMPoint;
+import java.util.List;
+
 import de.ovgu.featureide.fm.core.IGraphicItem;
-import de.ovgu.featureide.fm.core.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.Tree;
+import de.ovgu.featureide.fm.ui.ColorschemeTable;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
 
 /**
- * Graphical representation of a constraint.
+ * Graphical representation of a feature model.
  * 
  * @author Sebastian Krieter
  */
-public interface IGraphicalElement extends IGraphicItem, PropertyConstants {
+public interface IGraphicalFeatureModel extends IGraphicItem {
 
-	IFeatureModelElement getElement();
+	ColorschemeTable getColorschemeTable();
+	
+	IFeatureModel getFeatureModel();
 
-	FMPoint getLocation();
+	FeatureModelLayout getLayout();
 
-	FMDimension getSize();
+	void handleLegendLayoutChanged();
 
-	void setLocation(FMPoint newLocation);
+	void handleModelLayoutChanged();
 
-	void setSize(FMDimension size);
+	void redrawDiagram();
+
+	void refreshContextMenu();
+	
+	Tree<IGraphicalFeature> getFeatures();
+
+	void setFeatureTree(Tree<IGraphicalFeature> featureTree);
+
+	List<IGraphicalConstraint> getConstraints();
+
+	void setConstraintList(List<IGraphicalConstraint> constraintList);
+
+	IGraphicalFeature getGraphicalFeature(IFeature newFeature);
 
 }

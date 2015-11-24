@@ -44,7 +44,7 @@ public abstract class ModelIOFactory {
 		return getModelReader(getNewFeatureModel(type), type);
 	}
 	
-	public static AbstractFeatureModelWriter getModelWriter(int type) {
+	public static IFeatureModelWriter getModelWriter(int type) {
 		return getModelWriter(getNewFeatureModel(type), type);
 	}
 	
@@ -61,7 +61,7 @@ public abstract class ModelIOFactory {
 		}
 	}
 	
-	public static AbstractFeatureModelWriter getModelWriter(IFeatureModel featureModel, int type) {
+	public static IFeatureModelWriter getModelWriter(IFeatureModel featureModel, int type) {
 		switch (type) {
 		case TYPE_XML:
 			return new XmlFeatureModelWriter(featureModel);

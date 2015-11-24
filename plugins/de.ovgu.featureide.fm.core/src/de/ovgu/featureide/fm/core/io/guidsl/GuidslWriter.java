@@ -50,7 +50,7 @@ public class GuidslWriter extends AbstractFeatureModelWriter {
 	}
 	
 	private boolean hasHiddenFeatures(){
-		for(IFeature feat : featureModel.getFeatures())
+		for(IFeature feat : object.getFeatures())
 			if (feat.getStructure().isHidden()) return true;
 		return false;
 	}
@@ -75,7 +75,7 @@ public class GuidslWriter extends AbstractFeatureModelWriter {
 		// write hidden features
 		if(hasHiddenFeatures()){
 			out.append("##\r\n\r\n");
-			for (IFeature feat : featureModel.getFeatures())
+			for (IFeature feat : object.getFeatures())
 				if (feat.getStructure().isHidden()) out.append(feat.getName() +  " { hidden } \r\n");
 		}
 
@@ -83,12 +83,12 @@ public class GuidslWriter extends AbstractFeatureModelWriter {
 	}
 	
 	private void writeComments(StringBuilder out) {
-		for (String comment : featureModel.getProperty().getComments())
+		for (String comment : object.getProperty().getComments())
 			out.append("//" + comment + "\n");
 	}
 
 	private void writeGrammarDefinition(StringBuilder out) {
-		IFeature root = featureModel.getStructure().getRoot().getFeature();
+		IFeature root = object.getStructure().getRoot().getFeature();
 		if (root != null) {
 			if (root.getStructure().isOr()) {
 				out.append(root.getName());
@@ -98,17 +98,17 @@ public class GuidslWriter extends AbstractFeatureModelWriter {
 				out.append(root.getName());
 				out.append(" ;\r\n\r\n");
 			}
-			writeRule(featureModel.getStructure().getRoot().getFeature(), out);
+			writeRule(object.getStructure().getRoot().getFeature(), out);
 		}
 		else
 			out.append("\r\n");
 	}
 
 	private void writePropositionalConstraints(StringBuilder out) {
-		if (featureModel.getConstraints().isEmpty())
+		if (object.getConstraints().isEmpty())
 			return;
 		out.append("%%\r\n\r\n");
-		for (Node node : FeatureUtils.getPropositionalNodes(featureModel.getConstraints()))
+		for (Node node : FeatureUtils.getPropositionalNodes(object.getConstraints()))
 			out.append(node.toString(NodeWriter.textualSymbols) + " ;\r\n");
 		out.append("\r\n");
 	}
@@ -211,7 +211,7 @@ public class GuidslWriter extends AbstractFeatureModelWriter {
 	 * @return true, if the feature model has at least one abstract feature
 	 */
 	public boolean hasAbstractFeatures() {
-		return hasAbstractFeaturesRec(featureModel.getStructure().getRoot().getFeature());
+		return hasAbstractFeaturesRec(object.getStructure().getRoot().getFeature());
 	}
 	
 	private boolean hasAbstractFeaturesRec(IFeature mainFeature){
@@ -228,7 +228,7 @@ public class GuidslWriter extends AbstractFeatureModelWriter {
 	}
 	
 	public boolean hasConcreteCompounds() {
-		return hasConcreteCompoundsRec(featureModel.getStructure().getRoot().getFeature());
+		return hasConcreteCompoundsRec(object.getStructure().getRoot().getFeature());
 	}
 	
 	private boolean hasConcreteCompoundsRec(IFeature mainFeature){

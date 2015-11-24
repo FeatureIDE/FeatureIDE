@@ -192,6 +192,7 @@ public class InteractionSorter extends AbstractConfigurationSorter {
 			this.selectedFeatures = selectedFeatures;
 			this.unselectedFeatures = unselectedFeatures;
 			
+			//TODO _Sebastian Revise Hash Function
 			int hash = 0;
 			for (final String feature : selectedFeatures) {
 				hash = hash * 3 + feature.hashCode();

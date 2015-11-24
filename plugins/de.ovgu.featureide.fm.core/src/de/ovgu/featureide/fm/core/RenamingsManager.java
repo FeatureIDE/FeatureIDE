@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.core;
 
-import java.beans.PropertyChangeEvent;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,6 +33,8 @@ import org.prop4j.Node;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.FeatureModelFile2;
@@ -105,7 +106,7 @@ public class RenamingsManager {
 	public void performRenamings(IFile file) {
 		final IFeatureModel projectModel = FeatureModelFile2.getInstance(file).getFeatureModel();
 		for (Renaming renaming : renamings) {
-			final PropertyChangeEvent event = new PropertyChangeEvent(model, PropertyConstants.FEATURE_NAME_CHANGED, renaming.oldName, renaming.newName);
+			final FeatureModelEvent event = new FeatureModelEvent(model, PropertyConstants.FEATURE_NAME_CHANGED, renaming.oldName, renaming.newName);
 			projectModel.fireEvent(event);
 			model.fireEvent(event);
 		}

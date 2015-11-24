@@ -32,8 +32,8 @@ import org.eclipse.draw2d.MarginBorder;
 import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.Legend;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.policies.ModelLayoutEditPolicy;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
@@ -54,8 +54,8 @@ public class ModelEditPart extends AbstractGraphicalEditPart {
 		setModel(featureModel);
 	}
 
-	public IFeatureModel getFeatureModel() {
-		return (IFeatureModel) getModel();
+	public IGraphicalFeatureModel getFeatureModel() {
+		return (IGraphicalFeatureModel) getModel();
 	}
 
 	protected IFigure createFigure() {
@@ -72,12 +72,12 @@ public class ModelEditPart extends AbstractGraphicalEditPart {
 
 	@Override
 	protected List<Object> getModelChildren() {
-		final IFeatureModel fm = getFeatureModel();
+		final IGraphicalFeatureModel fm = getFeatureModel();
 
 		final List<?> constraints = fm.getConstraints();
 		final Collection<?> features = Functional.toList(fm.getFeatures());
 
-		final ArrayList<Object> list = new ArrayList<Object>(constraints.size() + features.size() + 1);
+		final ArrayList<Object> list = new ArrayList<>(constraints.size() + features.size() + 1);
 
 		list.addAll(features);
 		list.addAll(constraints);

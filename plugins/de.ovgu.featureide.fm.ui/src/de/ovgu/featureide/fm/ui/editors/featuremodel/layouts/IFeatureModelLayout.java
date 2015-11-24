@@ -18,28 +18,34 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core;
+package de.ovgu.featureide.fm.ui.editors.featuremodel.layouts;
 
-import org.eclipse.core.resources.IFile;
+import org.eclipse.draw2d.geometry.Point;
 
-/**
- * encapsulates a grammar file. handles markers and such
- * 
- * (could already be done on the CORE level)
- * 
- * @author Christian Kaestner
- */
-public class FeatureModelFile extends ModelMarkerHandler {
+public interface IFeatureModelLayout {
 
-	private IFile file;
+	public void setLegendAutoLayout(boolean b);
 
-	public FeatureModelFile(IFile file) {
-		super(file);
-		this.file=file;
-	}
+	public boolean hasLegendAutoLayout();
 
-	public IFile getResource() {
-		return file;
-	}
+	public boolean showHiddenFeatures();
 
+	public void showHiddenFeatures(boolean b);
+
+	public boolean verticalLayout();
+
+	public void verticalLayout(boolean b);
+
+	public Point getLegendPos();
+
+	public void setLegendPos(int x, int y);
+
+	public void setLayout(int newLayoutAlgorithm);
+
+	public int getLayoutAlgorithm();
+
+	public boolean hasFeaturesAutoLayout();
+	
+	public FeatureModelLayout clone();
+	
 }

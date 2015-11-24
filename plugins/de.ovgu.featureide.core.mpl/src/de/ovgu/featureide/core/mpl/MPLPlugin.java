@@ -23,8 +23,6 @@ package de.ovgu.featureide.core.mpl;
 import static de.ovgu.featureide.fm.core.localization.StringTable.EMPTY___;
 import static de.ovgu.featureide.fm.core.localization.StringTable.INTERFACES;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Collection;
@@ -55,7 +53,9 @@ import de.ovgu.featureide.core.mpl.job.statistics.PrintExtendedSignaturesJob;
 import de.ovgu.featureide.core.mpl.job.statistics.PrintStatisticsJob;
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.IFeatureModelListener;
+import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.core.io.IOConstants;
 
 /** 
@@ -191,9 +191,9 @@ public class MPLPlugin extends AbstractCorePlugin {
 		final InterfaceProject interfaceProject = new InterfaceProject(project, curFeatureProject);
 		
 		projectMap.put(project.getName(), interfaceProject);
-		interfaceProject.getFeatureModel().addListener(new PropertyChangeListener() {
+		interfaceProject.getFeatureModel().addListener(new IFeatureModelListener() {
 			@Override
-			public void propertyChange(PropertyChangeEvent evt) {
+			public void propertyChange(FeatureModelEvent evt) {
 				if (PropertyConstants.MODEL_DATA_CHANGED.equals(evt.getPropertyName())) {
 //					interfaceProject.loadSignatures(true);
 				} else if (PropertyConstants.MODEL_LAYOUT_CHANGED.equals(evt.getPropertyName())) {

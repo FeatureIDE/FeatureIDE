@@ -20,18 +20,18 @@
  */
 package de.ovgu.featureide.fm.ui.editors;
 
-import java.beans.PropertyChangeEvent;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+
+import de.ovgu.featureide.fm.core.base.event.IFeatureModelListener;
 
 /**
  * Basic interface for all pages at feature model editor.
  * 
  * @author Jens Meinicke
  */
-public interface IFeatureModelEditorPage {
+public interface IFeatureModelEditorPage extends IFeatureModelListener {
 
 	/**
 	 * 
@@ -81,13 +81,6 @@ public interface IFeatureModelEditorPage {
 	 * @param monitor
 	 */
 	void doSave(IProgressMonitor monitor);
-
-	/**
-	 * Called if the file has been changed.
-	 * 
-	 * @param event
-	 */
-	void propertyChange(PropertyChangeEvent event);
 
 	/**
 	 * Called if this page is about to change to another page.

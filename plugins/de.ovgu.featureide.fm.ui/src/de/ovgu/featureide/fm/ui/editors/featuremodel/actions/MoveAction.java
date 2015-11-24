@@ -32,11 +32,12 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.Legend;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
@@ -69,7 +70,7 @@ public class MoveAction extends Action {
 	private boolean isLegendMoving;
 
 	private final GraphicalViewerImpl viewer;
-	private final IFeatureModel featureModel;
+	private final IGraphicalFeatureModel featureModel;
 
 	private final HashMap<Object, Point> endPositions = new HashMap<Object, Point>();
 
@@ -93,7 +94,7 @@ public class MoveAction extends Action {
 	 *            the according GraphicalViewerImpl
 	 * @param direction
 	 */
-	public MoveAction(Object viewer, IFeatureModel featureModel, Object graphicalViewer, int direction) {
+	public MoveAction(Object viewer, IGraphicalFeatureModel featureModel, Object graphicalViewer, int direction) {
 		super(MOVING);
 		this.setId(ID);
 		if (viewer instanceof GraphicalViewerImpl) {
@@ -159,33 +160,33 @@ public class MoveAction extends Action {
 	 */
 	private void moveFigure(Object element, boolean doStop) {
 		if ((element instanceof FeatureEditPart) || (element instanceof IFeature)) {
-			IFeature feature = element instanceof FeatureEditPart ? ((FeatureEditPart) element).getFeature() : (IFeature) element;
-			final Point newPos = FeatureUIHelper.getLocation(feature.getGraphicRepresenation()).translate(deltaPos);
+			IGraphicalFeature feature = element instanceof FeatureEditPart ? ((FeatureEditPart) element).getFeature() : (IGraphicalFeature) element;
+			final Point newPos = FeatureUIHelper.getLocation(feature).translate(deltaPos);
 
 			if (doStop) {
 				this.endPositions.put(element, newPos);
 			}
 
-			FeatureUIHelper.setLocation(feature.getGraphicRepresenation(), newPos);
+			FeatureUIHelper.setLocation(feature, newPos);
 		} else if ((element instanceof ConstraintEditPart) || (element instanceof IConstraint)) {
-			IConstraint constraint = element instanceof ConstraintEditPart ? ((ConstraintEditPart) element).getConstraintModel() : (IConstraint) element;
-			final Point newPos = FeatureUIHelper.getLocation(constraint.getGraphicRepresenation()).translate(deltaPos);
-			FeatureUIHelper.setLocation(constraint.getGraphicRepresenation(), newPos);
+			IGraphicalConstraint constraint = element instanceof ConstraintEditPart ? ((ConstraintEditPart) element).getConstraintModel() : (IGraphicalConstraint) element;
+			final Point newPos = FeatureUIHelper.getLocation(constraint).translate(deltaPos);
+			FeatureUIHelper.setLocation(constraint, newPos);
 		} else if ((element instanceof LegendEditPart) || (element instanceof LegendFigure) || (element instanceof Legend)) {
-			LegendFigure legendFigure = FeatureUIHelper.getLegendFigure(featureModel.getGraphicRepresenation());
+			LegendFigure legendFigure = FeatureUIHelper.getLegendFigure(featureModel);
 			final Point newPos = legendFigure.getLocation().translate(deltaPos);
 			legendFigure.setLocation(newPos);
-			featureModel.getGraphicRepresenation().getLayout().setLegendPos(newPos.x(), newPos.y());
-			featureModel.getGraphicRepresenation().getLayout().setLegendAutoLayout(false);
-			FeatureUtils.handleLegendLayoutChanged(featureModel);
+			featureModel.getLayout().setLegendPos(newPos.x(), newPos.y());
+			featureModel.getLayout().setLegendAutoLayout(false);
+			featureModel.handleLegendLayoutChanged();
 			this.isLegendMoving = true;
 		}
 	}
 
 	private void stop() {
 		this.doMove(true);
-		if (!isLegendMoving && featureModel.getGraphicRepresenation().getLayout().hasLegendAutoLayout())
-			featureModel.handleModelDataChanged();
+		if (!isLegendMoving && featureModel.getLayout().hasLegendAutoLayout())
+			featureModel.getFeatureModel().handleModelDataChanged();
 
 		this.init();
 	}
@@ -196,7 +197,7 @@ public class MoveAction extends Action {
 	 * @return true if rules are not infringed
 	 */
 	private boolean isMovingAllowed() {
-		return !featureModel.getGraphicRepresenation().getLayout().hasFeaturesAutoLayout();
+		return !featureModel.getLayout().hasFeaturesAutoLayout();
 	}
 
 	/**

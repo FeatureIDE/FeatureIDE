@@ -23,8 +23,6 @@ package de.ovgu.featureide.fm.core.base;
 import java.util.Collection;
 import java.util.List;
 
-import de.ovgu.featureide.fm.core.FeatureConnection;
-
 /**
  * Manages all structural information of a feature.</br>
  * Intended for tree structures (features are represented by tree nodes).
@@ -37,8 +35,6 @@ public interface IFeatureStructure {
 	void addChild(IFeatureStructure newChild);
 
 	void addChildAtPosition(int index, IFeatureStructure newChild);
-
-	void addTargetConnection(FeatureConnection connection);
 
 	void changeToAlternative();
 
@@ -63,10 +59,6 @@ public interface IFeatureStructure {
 	IFeatureStructure getParent();
 
 	Collection<IConstraint> getRelevantConstraints();
-
-	List<FeatureConnection> getSourceConnections();
-
-	List<FeatureConnection> getTargetConnections();
 
 	boolean hasChildren();
 
@@ -103,8 +95,6 @@ public interface IFeatureStructure {
 	void removeChild(IFeatureStructure child);
 
 	IFeatureStructure removeLastChild();
-
-	boolean removeTargetConnection(FeatureConnection connection);
 
 	void replaceChild(IFeatureStructure oldChild, IFeatureStructure newChild);
 

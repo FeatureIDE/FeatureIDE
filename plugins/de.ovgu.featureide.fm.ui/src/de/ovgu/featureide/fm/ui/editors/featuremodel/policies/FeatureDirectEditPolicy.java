@@ -24,8 +24,8 @@ import org.eclipse.gef.commands.Command;
 import org.eclipse.gef.editpolicies.DirectEditPolicy;
 import org.eclipse.gef.requests.DirectEditRequest;
 
-import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.FeatureRenamingCommand;
 
 /**
@@ -36,11 +36,11 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.FeatureRenamingCom
  */
 public class FeatureDirectEditPolicy extends DirectEditPolicy {
 
-	private final IFeatureModel featureModel;
+	private final IGraphicalFeatureModel featureModel;
 
-	private final IFeature feature;
+	private final IGraphicalFeature feature;
 
-	public FeatureDirectEditPolicy(IFeatureModel featureModel, IFeature feature) {
+	public FeatureDirectEditPolicy(IGraphicalFeatureModel featureModel, IGraphicalFeature feature) {
 		this.featureModel = featureModel;
 		this.feature = feature;
 	}
@@ -48,7 +48,7 @@ public class FeatureDirectEditPolicy extends DirectEditPolicy {
 	@Override
 	protected Command getDirectEditCommand(DirectEditRequest request) {
 		String newName = (String) request.getCellEditor().getValue();
-		return new FeatureRenamingCommand(featureModel, feature.getName().toString(), newName);
+		return new FeatureRenamingCommand(featureModel.getFeatureModel(), feature.getObject().getName().toString(), newName);
 	}
 
 	@Override

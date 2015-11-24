@@ -38,14 +38,8 @@ public interface IFeature extends IFeatureModelElement {
 
 	IFeatureStructure getStructure();
 
-	String getName();
-
-	void setName(String name);
-
 	boolean isConstraintSelected();
 
 	void setConstraintSelected(boolean b);
-	
-	IGraphicalFeature getGraphicRepresenation();
 
 }

@@ -18,13 +18,15 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.base.impl;
+package de.ovgu.featureide.fm.ui.editors.elements;
 
-import de.ovgu.featureide.fm.core.FMDimension;
-import de.ovgu.featureide.fm.core.FMPoint;
-import de.ovgu.featureide.fm.core.PropertyConstants;
+import org.eclipse.draw2d.geometry.Dimension;
+import org.eclipse.draw2d.geometry.Point;
+
 import de.ovgu.featureide.fm.core.base.IConstraint;
-import de.ovgu.featureide.fm.core.base.IGraphicalConstraint;
+import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
  * Graphical representation of an {@link IConstraint} instance.
@@ -36,16 +38,18 @@ import de.ovgu.featureide.fm.core.base.IGraphicalConstraint;
 public class GraphicalConstraint implements IGraphicalConstraint, PropertyConstants {
 
 	protected final IConstraint correspondingConstraint;
+	protected final IGraphicalFeatureModel graphicalFeatureModel;
 
-	protected FMPoint location = new FMPoint(0, 0);
-	protected FMDimension dimension = new FMDimension(10, 10);
+	protected Point location = new Point(0, 0);
+	protected Dimension dimension = new Dimension(10, 10);
 
-	public GraphicalConstraint(IConstraint correspondingConstraint) {
+	public GraphicalConstraint(IConstraint correspondingConstraint, IGraphicalFeatureModel graphicalFeatureModel) {
 		this.correspondingConstraint = correspondingConstraint;
+		this.graphicalFeatureModel = graphicalFeatureModel;
 	}
 
 	@Override
-	public IConstraint getElement() {
+	public IConstraint getObject() {
 		return correspondingConstraint;
 	}
 
@@ -55,7 +59,7 @@ public class GraphicalConstraint implements IGraphicalConstraint, PropertyConsta
 	}
 
 	@Override
-	public FMPoint getLocation() {
+	public Point getLocation() {
 		return location;
 	}
 
@@ -70,18 +74,23 @@ public class GraphicalConstraint implements IGraphicalConstraint, PropertyConsta
 	}
 
 	@Override
-	public void setLocation(FMPoint newLocation) {
+	public void setLocation(Point newLocation) {
 		location = newLocation;
 	}
 
 	@Override
-	public FMDimension getSize() {
+	public Dimension getSize() {
 		return dimension;
 	}
 
 	@Override
-	public void setSize(FMDimension size) {
+	public void setSize(Dimension size) {
 		this.dimension = size;
+	}
+
+	@Override
+	public IGraphicalFeatureModel getGraphicalModel() {
+		return graphicalFeatureModel;
 	}
 
 }

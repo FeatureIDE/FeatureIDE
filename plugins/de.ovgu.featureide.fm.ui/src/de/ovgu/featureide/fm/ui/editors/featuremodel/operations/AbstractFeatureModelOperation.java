@@ -28,17 +28,22 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 
 /**
  * This operation should be used as superclass for all operations on the feature model.
  * It provides standard handling and refreshing of the model.
  * 
  * @author Jens Meinicke
- * @author Marcus Pinnecke
+ * @author Sebastian Krieter
  */
 public abstract class AbstractFeatureModelOperation extends AbstractOperation {
 
-	IFeatureModel featureModel;
+	protected final IFeatureModel featureModel;
+
+	private String eventId = PropertyConstants.MODEL_DATA_CHANGED;
+	private Object editor = null;
 
 	public AbstractFeatureModelOperation(IFeatureModel featureModel, String label) {
 		super(label);
@@ -53,7 +58,7 @@ public abstract class AbstractFeatureModelOperation extends AbstractOperation {
 	@Override
 	public IStatus redo(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
 		redo();
-		featureModel.handleModelDataChanged();
+		fireEvent();
 		return Status.OK_STATUS;
 	}
 
@@ -62,10 +67,30 @@ public abstract class AbstractFeatureModelOperation extends AbstractOperation {
 	@Override
 	public IStatus undo(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
 		undo();
-		featureModel.handleModelDataChanged();
+		fireEvent();
 		return Status.OK_STATUS;
 	}
 
 	protected abstract void undo();
+
+	private void fireEvent() {
+		featureModel.fireEvent(new FeatureModelEvent(featureModel, editor, false, eventId, null, null));
+	}
+
+	protected final String getEventId() {
+		return eventId;
+	}
+
+	protected final void setEventId(String eventId) {
+		this.eventId = eventId;
+	}
+
+	public Object getEditor() {
+		return editor;
+	}
+
+	public void setEditor(Object editor) {
+		this.editor = editor;
+	}
 
 }

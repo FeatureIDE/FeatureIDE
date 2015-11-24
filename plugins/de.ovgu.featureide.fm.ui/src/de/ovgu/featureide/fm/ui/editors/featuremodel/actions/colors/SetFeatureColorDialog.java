@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions.colors;
 
+import static de.ovgu.featureide.fm.core.functional.Functional.toList;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CHOOSE_ACTION_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CHOOSE_COLOR_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.COLORATION_DIALOG;
@@ -49,15 +50,12 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
-import static de.ovgu.featureide.fm.core.functional.Functional.*;
-import static de.ovgu.featureide.fm.core.base.FeatureUtils.*;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 
 /**
  * Sets the color of the features in the feature diagram.
@@ -71,8 +69,8 @@ public class SetFeatureColorDialog extends Dialog {
 	private final static Image colorImage = FMUIPlugin.getDefault().getImageDescriptor("icons/FeatureColorIcon.gif").createImage();
 	
 	private static final Color WHITE = new Color(null, 255, 255, 255);
-	final protected List<IFeature> featureList;
-	protected ArrayList<IFeature> featureListBuffer = new ArrayList<IFeature>();
+	final protected List<IGraphicalFeature> featureList;
+	protected ArrayList<IGraphicalFeature> featureListBuffer = new ArrayList<>();
 	private FeatureColor newColor = FeatureColor.NO_COLOR;
 	private Combo colorDropDownMenu;
 
@@ -80,7 +78,7 @@ public class SetFeatureColorDialog extends Dialog {
 	 * @param parentShell
 	 * @param featurelist
 	 */
-	protected SetFeatureColorDialog(Shell parentShell, List<IFeature> featurelist) {
+	protected SetFeatureColorDialog(Shell parentShell, List<IGraphicalFeature> featurelist) {
 		super(parentShell);
 		this.featureList = featurelist;
 		setShellStyle(SWT.DIALOG_TRIM | SWT.MIN | SWT.RESIZE);
@@ -194,39 +192,38 @@ public class SetFeatureColorDialog extends Dialog {
 			}
 
 			private void findSiblings() {
-				final ArrayList<IFeature> affectedFeatures = new ArrayList<>();
+				final ArrayList<IGraphicalFeature> affectedFeatures = new ArrayList<>();
 				for (int j = 0; j < featureListBuffer.size(); j++) {
-					if (!featureListBuffer.get(j).getStructure().isRoot()) {
-						final IFeatureStructure parent = featureListBuffer.get(j).getStructure().getParent();
-						affectedFeatures.addAll(toList(map(parent.getChildren(), STRUCTURE_TO_FEATURE)));
+					if (!featureListBuffer.get(j).getTree().isRoot()) {
+						affectedFeatures.addAll(toList(featureListBuffer.get(j).getTree().getParent().getChildrenObjects()));
 					}
 				}
 				featureListBuffer = affectedFeatures;
 			}
 
 			private void findAllChildren() {
-				final ArrayList<IFeature> affectedFeatures = new ArrayList<>();
+				final ArrayList<IGraphicalFeature> affectedFeatures = new ArrayList<>();
 				for (int j = 0; j < featureListBuffer.size(); j++) {
 					affectedFeatures.addAll(findAllChildren(featureListBuffer.get(j)));
 				}
 				featureListBuffer = affectedFeatures;
 			}
 			
-			private ArrayList<IFeature> findAllChildren(IFeature item) {
-				final ArrayList<IFeature> affectedFeatures = new ArrayList<>();
-				final List<IFeature> children = findChildren(item);
+			private ArrayList<IGraphicalFeature> findAllChildren(IGraphicalFeature item) {
+				final ArrayList<IGraphicalFeature> affectedFeatures = new ArrayList<>();
+				final List<IGraphicalFeature> children = findChildren(item);
 				affectedFeatures.addAll(children);
 				for (int j = 0; j < children.size(); j++)
 					affectedFeatures.addAll(findAllChildren(children.get(j)));
 				return affectedFeatures;
 			}
 			
-			private List<IFeature> findChildren(IFeature parent) {
-				return toList(map(parent.getStructure().getChildren(), STRUCTURE_TO_FEATURE));
+			private List<IGraphicalFeature> findChildren(IGraphicalFeature parent) {
+				return toList(parent.getTree().getChildrenObjects());
 			}
 
 			private void findDirectChildren() {
-				final ArrayList<IFeature> affectedFeatures = new ArrayList<>();
+				final ArrayList<IGraphicalFeature> affectedFeatures = new ArrayList<>();
 				for (int j = 0; j < featureListBuffer.size(); j++) {
 					affectedFeatures.addAll(findChildren(featureListBuffer.get(j)));
 				}
@@ -263,7 +260,7 @@ public class SetFeatureColorDialog extends Dialog {
 	private void colorPreview(final Table featureTable) {
 		for (int i = 0; i < featureListBuffer.size(); i++) {
 			TableItem item = new TableItem(featureTable, SWT.NONE);
-			item.setText(featureListBuffer.get(i).getName());
+			item.setText(featureListBuffer.get(i).getObject().getName());
 			FeatureColor color = FeatureColor.getColor(colorDropDownMenu.getText()); 
 			if (color != FeatureColor.NO_COLOR) {
 				item.setBackground(new Color(null, ColorPalette.getRGB(color.getValue(), 0.4f)));
@@ -283,7 +280,7 @@ public class SetFeatureColorDialog extends Dialog {
 
 	protected void okPressed() {
 		for (int i = 0; i < featureListBuffer.size(); i++) {
-			final IFeature feature = featureListBuffer.get(i);
+			final IFeature feature = featureListBuffer.get(i).getObject();
 			FeatureColorManager.setColor(feature, newColor);
 		}
 		super.okPressed();

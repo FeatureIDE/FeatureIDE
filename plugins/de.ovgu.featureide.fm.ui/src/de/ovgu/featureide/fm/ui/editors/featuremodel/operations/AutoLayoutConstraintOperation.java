@@ -27,11 +27,11 @@ import java.util.List;
 
 import org.eclipse.draw2d.geometry.Point;
 
-import de.ovgu.featureide.fm.core.base.IConstraint;
-import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
@@ -41,12 +41,12 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * @author Patrick Sulkowski
  * @author Marcus Pinnecke
  */
-public class AutoLayoutConstraintOperation extends AbstractFeatureModelOperation {
+public class AutoLayoutConstraintOperation extends AbstractGraphicalFeatureModelOperation {
 
 	private int counter;
 	private LinkedList<LinkedList<Point>> oldPos = new LinkedList<LinkedList<Point>>();
 
-	public AutoLayoutConstraintOperation(IFeatureModel featureModel, LinkedList<LinkedList<Point>> oldPos, int counter) {
+	public AutoLayoutConstraintOperation(IGraphicalFeatureModel featureModel, LinkedList<LinkedList<Point>> oldPos, int counter) {
 		super(featureModel, AUTO_LAYOUT_CONSTRAINTS);
 		this.counter = counter;
 		if (!(oldPos == null) && !oldPos.isEmpty())
@@ -55,48 +55,48 @@ public class AutoLayoutConstraintOperation extends AbstractFeatureModelOperation
 
 	@Override
 	protected void redo() {
-		List<IConstraint> constraintList = featureModel.getConstraints();
+		List<IGraphicalConstraint> constraintList = graphicalFeatureModel.getConstraints();
 		int minX = Integer.MAX_VALUE;
 		int maxX = 0;
 		if (!constraintList.isEmpty()) {
 			Point newPos = new Point();
 			int y = 0;
 
-			LinkedList<IFeature> featureList = new LinkedList<IFeature>();
-			featureList.addAll(Functional.toList(featureModel.getFeatures()));
+			LinkedList<IGraphicalFeature> featureList = new LinkedList<>();
+			featureList.addAll(Functional.toList(graphicalFeatureModel.getFeatures()));
 
 			for (int i = 0; i < featureList.size(); i++) {
-				if (y < FeatureUIHelper.getLocation(featureList.get(i).getGraphicRepresenation()).y) {
-					y = FeatureUIHelper.getLocation(featureList.get(i).getGraphicRepresenation()).y;
+				if (y < FeatureUIHelper.getLocation(featureList.get(i)).y) {
+					y = FeatureUIHelper.getLocation(featureList.get(i)).y;
 				}
-				if (minX > FeatureUIHelper.getLocation(featureList.get(i).getGraphicRepresenation()).x) {
-					minX = FeatureUIHelper.getLocation(featureList.get(i).getGraphicRepresenation()).x;
+				if (minX > FeatureUIHelper.getLocation(featureList.get(i)).x) {
+					minX = FeatureUIHelper.getLocation(featureList.get(i)).x;
 				}
-				if (maxX < FeatureUIHelper.getLocation(featureList.get(i).getGraphicRepresenation()).x) {
-					maxX = FeatureUIHelper.getLocation(featureList.get(i).getGraphicRepresenation()).x + FeatureUIHelper.getSize(featureList.get(i).getGraphicRepresenation()).width;
+				if (maxX < FeatureUIHelper.getLocation(featureList.get(i)).x) {
+					maxX = FeatureUIHelper.getLocation(featureList.get(i)).x + FeatureUIHelper.getSize(featureList.get(i)).width;
 				}
 			}
-			final IConstraint constraint = constraintList.get(0);
-			newPos.x = (minX + maxX) / 2 - FeatureUIHelper.getSize(constraint.getGraphicRepresenation()).width / 2;
+			final IGraphicalConstraint constraint = constraintList.get(0);
+			newPos.x = (minX + maxX) / 2 - FeatureUIHelper.getSize(constraint).width / 2;
 			newPos.y = y + FMPropertyManager.getConstraintSpace();
-			FeatureUIHelper.setLocation(constraint.getGraphicRepresenation(), newPos);
+			FeatureUIHelper.setLocation(constraint, newPos);
 		}
 		for (int i = 1; i < constraintList.size(); i++) {
 			Point newPos = new Point();
-			newPos.x = (minX + maxX) / 2 - FeatureUIHelper.getSize(constraintList.get(i).getGraphicRepresenation()).width / 2;
-			newPos.y = FeatureUIHelper.getLocation(constraintList.get(i - 1).getGraphicRepresenation()).y + FMPropertyManager.getConstraintSpace();
-			FeatureUIHelper.setLocation(constraintList.get(i).getGraphicRepresenation(), newPos);
+			newPos.x = (minX + maxX) / 2 - FeatureUIHelper.getSize(constraintList.get(i)).width / 2;
+			newPos.y = FeatureUIHelper.getLocation(constraintList.get(i - 1)).y + FMPropertyManager.getConstraintSpace();
+			FeatureUIHelper.setLocation(constraintList.get(i), newPos);
 		}
 	}
 
 	@Override
 	protected void undo() {
-		List<IConstraint> constraintList = featureModel.getConstraints();
+		List<IGraphicalConstraint> constraintList = graphicalFeatureModel.getConstraints();
 		if (!constraintList.isEmpty() && (!(oldPos == null) && !oldPos.isEmpty())) {
-			FeatureUIHelper.setLocation(constraintList.get(0).getGraphicRepresenation(), oldPos.get(counter).get(0));
+			FeatureUIHelper.setLocation(constraintList.get(0), oldPos.get(counter).get(0));
 		}
 		for (int i = 1; i < constraintList.size(); i++) {
-			FeatureUIHelper.setLocation(featureModel.getConstraints().get(i).getGraphicRepresenation(), oldPos.get(counter).get(i));
+			FeatureUIHelper.setLocation(graphicalFeatureModel.getConstraints().get(i), oldPos.get(counter).get(i));
 		}
 	}
 

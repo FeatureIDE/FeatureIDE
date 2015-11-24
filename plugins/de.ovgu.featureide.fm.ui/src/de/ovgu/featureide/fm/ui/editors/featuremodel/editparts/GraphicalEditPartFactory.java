@@ -23,10 +23,10 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.editparts;
 import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPartFactory;
 
-import de.ovgu.featureide.fm.core.FeatureConnection;
-import de.ovgu.featureide.fm.core.base.IConstraint;
-import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.ui.editors.FeatureConnection;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.Legend;
 
 /**
@@ -38,13 +38,13 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.Legend;
 public class GraphicalEditPartFactory implements EditPartFactory {
 
 	public EditPart createEditPart(EditPart context, Object model) {
-		if (model instanceof IFeature) {
-			return new FeatureEditPart(((IFeature) model));
-		} else if (model instanceof IFeatureModel) {
+		if (model instanceof IGraphicalFeature) {
+			return new FeatureEditPart(model);
+		} else if (model instanceof IGraphicalFeatureModel) {
 			return new ModelEditPart(model);
 		} else if (model instanceof FeatureConnection) {
 			return new ConnectionEditPart(model); 
-		} else if (model instanceof IConstraint) {
+		} else if (model instanceof IGraphicalConstraint) {
 			return new ConstraintEditPart(model);
 		} else if (model instanceof Legend) {
 			return new LegendEditPart(model);

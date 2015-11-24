@@ -33,7 +33,6 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  */
 public class FeatureChangeGroupTypeOperation extends AbstractFeatureModelOperation {
 
-	private static final String LABEL = CHANGE_GROUP_TYPE;
 	public static final int ALTERNATIVE = 0;
 	public static final int AND = 1;
 	public static final int OR = 2;
@@ -47,7 +46,7 @@ public class FeatureChangeGroupTypeOperation extends AbstractFeatureModelOperati
 	 * executed
 	 */
 	public FeatureChangeGroupTypeOperation(int groupType, IFeature feature, IFeatureModel featureModel) {
-		super(featureModel, LABEL);
+		super(featureModel, CHANGE_GROUP_TYPE);
 		this.groupType = groupType;
 		this.oldGroupType = getGroupType(feature);
 		this.feature = feature;

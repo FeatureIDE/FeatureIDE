@@ -45,18 +45,15 @@ public class CreateLayerAction extends SingleSelectionAction {
 
 	private final IFeatureModel featureModel;
 
-	private Object diagramEditor;
-
-	public CreateLayerAction(Object viewer, IFeatureModel featureModel, Object diagramEditor) {
+	public CreateLayerAction(Object viewer, IFeatureModel featureModel) {
 		super("Create Feature Below (Ins)", viewer);
 		setImageDescriptor(createImage);
 		this.featureModel = featureModel;
-		this.diagramEditor = diagramEditor;
 	}
 
 	@Override
 	public void run() {
-		FeatureCreateLayerOperation op = new FeatureCreateLayerOperation(feature, viewer, featureModel, diagramEditor);
+		FeatureCreateLayerOperation op = new FeatureCreateLayerOperation(feature, featureModel);
 		op.addContext((IUndoContext) featureModel.getUndoContext());
 
 		try {

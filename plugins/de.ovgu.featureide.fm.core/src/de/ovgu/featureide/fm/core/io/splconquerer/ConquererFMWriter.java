@@ -95,16 +95,16 @@ public class ConquererFMWriter extends AbstractFeatureModelWriter {
 	 * Creates XML-Document
 	 * @param doc document to write
 	 */
-    private void createXmlDoc(Document doc) {
+	private void createXmlDoc(Document doc) {
         Element plm = doc.createElement("plm");
     	doc.appendChild(plm);
-		plm.setAttribute("name", featureModel.getStructure().getRoot().getFeature().getName());
+		plm.setAttribute("name", object.getStructure().getRoot().getFeature().getName());
 		plm.setAttribute("canReuseInstance", "true");
 		
 		require = new HashMap<String, Set<String>>();
 		exclude = new HashMap<String, Set<String>>();
     	final List<Node> furtherNodes = new LinkedList<Node>();
-    	final List<Node> nodes = Functional.toList(FeatureUtils.getPropositionalNodes(featureModel.getConstraints()));
+		final List<Node> nodes = Functional.toList(FeatureUtils.getPropositionalNodes(object.getConstraints()));
     	Node[] nodeArray = nodes.toArray(new Node[nodes.size()]);
     	Node node = new And(nodeArray);
     	if (node.getChildren().length > 0) {
@@ -147,7 +147,7 @@ public class ConquererFMWriter extends AbstractFeatureModelWriter {
     	}
 
     	initializeIDs();
-       	generateSubtree(doc, plm, featureModel.getStructure().getRoot().getFeature());
+       	generateSubtree(doc, plm, object.getStructure().getRoot().getFeature());
     	
     	plm.appendChild(doc.createElement("properties"));
 
@@ -362,7 +362,7 @@ public class ConquererFMWriter extends AbstractFeatureModelWriter {
     
     private void initializeIDs() {
     	ids = new HashMap<String, Integer>();
-    	initializeIDs(featureModel.getStructure().getRoot().getFeature());
+    	initializeIDs(object.getStructure().getRoot().getFeature());
     }
     
     private void initializeIDs(IFeature feature) {

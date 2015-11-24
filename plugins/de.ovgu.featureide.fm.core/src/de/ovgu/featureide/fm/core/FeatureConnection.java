@@ -20,100 +20,11 @@
  */
 package de.ovgu.featureide.fm.core;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.LinkedList;
-
-import de.ovgu.featureide.fm.core.base.IFeature;
-
 /**
- * An instance of this class represents a connection between a feature and its
- * parent. It is necessary because every figure in GEF needs a associated model.
+ * Only used for legacy purposes.
  * 
- * @author Thomas Thuem
- * @author Marcus Pinnecke (Feature Interface)
+ * @author Sebastian Krieter
  */
-public class FeatureConnection implements PropertyConstants, IGraphicItem {
-	
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((source == null) ? 0 : source.hashCode());
-		result = prime * result + ((target == null) ? 0 : target.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		FeatureConnection other = (FeatureConnection) obj;
-		if (source == null) {
-			if (other.source != null)
-				return false;
-		} else if (!source.equals(other.source))
-			return false;
-		if (target == null) {
-			if (other.target != null)
-				return false;
-		} else if (!target.equals(other.target))
-			return false;
-		return true;
-	}
-
-	private IFeature source;
-	
-	private IFeature target;
-	
-	public FeatureConnection(IFeature source) {
-		this.source = source;
-	}
-	
-	public IFeature getSource() {
-		return (IFeature) source;
-	}
-	
-	public IFeature getTarget() {
-		return (IFeature) target;
-	}
-	
-	public void setTarget(IFeature target) {
-		if (this.target == target)
-			return;
-		this.target = target;
-		fireParentChanged();
-	}
-
-	private LinkedList<PropertyChangeListener> listenerList = new LinkedList<PropertyChangeListener>();
-	
-	public void addListener(PropertyChangeListener listener) {
-		if (!listenerList.contains(listener))
-			listenerList.add(listener);
-	}
-	
-	public void removeListener(PropertyChangeListener listener) {
-		listenerList.remove(listener);
-	}
-	
-	private void fireParentChanged() {
-		PropertyChangeEvent event = new PropertyChangeEvent(this, PARENT_CHANGED, Boolean.FALSE, Boolean.TRUE);
-		for (PropertyChangeListener listener : listenerList)
-			listener.propertyChange(event);
-	}
-	
-	@Override
-	public String toString() {
-		return source + " - " + target;
-	}
-	
-	@Override
-	public GraphicItem getItemType() {
-		return GraphicItem.Connection;
-	}
+public class FeatureConnection {
 
 }

@@ -30,21 +30,15 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.gef.tools.DirectEditManager;
-import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
-import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TextCellEditor;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.core.base.impl.Feature;
 import de.ovgu.featureide.fm.core.functional.Functional;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureCellEditorLocator;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureLabelEditManager;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
 
 /**
  * Operation with functionality to create a compound feature. Enables undo/redo
@@ -57,20 +51,16 @@ public class FeatureCreateCompoundOperation extends AbstractFeatureModelOperatio
 
 	private IFeature newCompound;
 	private IFeature parent;
-	private Object viewer;
 	private LinkedList<IFeature> selectedFeatures;
-	private Object diagramEditor;
 
 	/**
 	 * @param label
 	 */
-	public FeatureCreateCompoundOperation(Object viewer, IFeature parent, IFeatureModel featureModel, LinkedList<IFeature> selectedFeatures, Object diagramEditor) {
+	public FeatureCreateCompoundOperation(IFeature parent, IFeatureModel featureModel, LinkedList<IFeature> selectedFeatures) {
 		super(featureModel, CREATE_COMPOUND);
-		this.viewer = viewer;
 		this.parent = parent;
 		this.selectedFeatures = new LinkedList<IFeature>();
 		this.selectedFeatures.addAll(selectedFeatures);
-		this.diagramEditor = diagramEditor;
 	}
 
 	@Override
@@ -83,30 +73,8 @@ public class FeatureCreateCompoundOperation extends AbstractFeatureModelOperatio
 			newCompound.getStructure().setAND(true);
 			newCompound.getStructure().setMultiple(parent.getStructure().isMultiple());
 		}
-		redo(monitor, info);
-
-		// select the new feature
-		FeatureEditPart part;
-		if (viewer instanceof GraphicalViewerImpl) {
-			part = (FeatureEditPart) ((GraphicalViewerImpl) viewer).getEditPartRegistry().get(newCompound);
-		} else {
-			part = (FeatureEditPart) ((GraphicalViewerImpl) diagramEditor).getEditPartRegistry().get(newCompound);
-		}
-
-		if (part != null) {
-			if (viewer instanceof GraphicalViewerImpl) {
-				((GraphicalViewerImpl) viewer).setSelection(new StructuredSelection(part));
-			} else {
-				((GraphicalViewerImpl) diagramEditor).setSelection(new StructuredSelection(part));
-			}
-
-			part.getViewer().reveal(part);
-
-			// open the renaming command
-			DirectEditManager manager = new FeatureLabelEditManager(part, TextCellEditor.class, new FeatureCellEditorLocator(part.getFeatureFigure()),
-					featureModel);
-			manager.show();
-		}
+		redo();
+		
 		return Status.OK_STATUS;
 	}
 
@@ -115,7 +83,7 @@ public class FeatureCreateCompoundOperation extends AbstractFeatureModelOperatio
 		if (parent != null) {
 			LinkedList<IFeature> newChildren = new LinkedList<IFeature>();
 			for (IFeatureStructure featureStructure : parent.getStructure().getChildren()) {
-				if (selectedFeatures.contains(featureStructure)) {
+				if (selectedFeatures.contains(featureStructure.getFeature())) {
 					if (!newCompound.getStructure().hasChildren())
 						newChildren.add(newCompound);
 					featureStructure.setMandatory(false);
@@ -134,7 +102,9 @@ public class FeatureCreateCompoundOperation extends AbstractFeatureModelOperatio
 
 		//		newCompound = featureModel.getFeature(newCompound.getName());
 
-		FeatureDiagramLayoutHelper.initializeCompoundFeaturePosition(featureModel, selectedFeatures, newCompound);
+		//TODO _interfaces Removed Code
+//		FeatureDiagramLayoutHelper.initializeCompoundFeaturePosition(featureModel, selectedFeatures, newCompound);
+		featureModel.fireEvent(new FeatureModelEvent(newCompound, PropertyConstants.FEATURE_ADD, null, null));
 	}
 
 	@Override

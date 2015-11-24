@@ -20,7 +20,12 @@
  */
 package de.ovgu.featureide.fm.core.base;
 
+import java.io.File;
+import java.util.List;
+
 import org.prop4j.Node;
+
+import de.ovgu.featureide.fm.core.io.ModelWarning;
 
 /**
  * Factory to create or copy instance of {@link IFeature}, {@link IFeatureModel}, and {@link IConstraint}.
@@ -29,18 +34,16 @@ import org.prop4j.Node;
  */
 public interface IFeatureModelFactory {
 
-	CharSequence getId();
-	
+	String getId();
+
 	IConstraint createConstraint(IFeatureModel featureModel, Node propNode);
 
 	IFeature createFeature(IFeatureModel featureModel, String name);
 
 	IFeatureModel createFeatureModel();
 
-	IGraphicalConstraint createGraphicalRepresentation(IConstraint constraint);
+	List<ModelWarning> loadFeatureModel(IFeatureModel featureModel, File file);
 
-	IGraphicalFeature createGraphicalRepresentation(IFeature feature);
-
-	IGraphicalFeatureModel createGraphicalRepresentation(IFeatureModel featureModel);
+	List<ModelWarning> loadFeatureModel(IFeatureModel featureModel, String content);
 
 }

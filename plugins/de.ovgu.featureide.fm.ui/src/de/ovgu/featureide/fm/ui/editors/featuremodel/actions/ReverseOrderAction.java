@@ -27,8 +27,8 @@ import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ModelReverseOrderOperation;
 
 /**
@@ -41,9 +41,9 @@ public class ReverseOrderAction extends Action {
 
 	public static final String ID = "de.ovgu.featureide.reverseorder";
 
-	private final IFeatureModel featureModel;
+	private final IGraphicalFeatureModel featureModel;
 
-	public ReverseOrderAction(Object viewer, IFeatureModel featureModel) {
+	public ReverseOrderAction(Object viewer, IGraphicalFeatureModel featureModel) {
 		super(REVERSE_FEATURE_ORDER);
 		this.featureModel = featureModel;
 	}
@@ -52,7 +52,8 @@ public class ReverseOrderAction extends Action {
 	public void run() {
 
 		ModelReverseOrderOperation op = new ModelReverseOrderOperation(featureModel);
-		op.addContext((IUndoContext) featureModel.getUndoContext());
+		//TODO _interfaces Removed Code
+		op.addContext((IUndoContext) featureModel.getFeatureModel().getUndoContext());
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);

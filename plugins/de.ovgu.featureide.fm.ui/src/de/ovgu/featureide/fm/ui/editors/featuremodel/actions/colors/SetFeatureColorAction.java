@@ -35,9 +35,9 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Shell;
 
-import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 
 /**
@@ -51,7 +51,7 @@ public class SetFeatureColorAction extends Action {
 
 	private static ImageDescriptor colorImage = FMUIPlugin.getDefault().getImageDescriptor("icons/FeatureColorIcon.gif");
 	
-	protected ArrayList<IFeature> featureList = new ArrayList<IFeature>();
+	protected ArrayList<IGraphicalFeature> featureList = new ArrayList<>();
 	final protected Shell shell = new Shell();
 	TreeViewer viewer;
 
@@ -96,7 +96,7 @@ public class SetFeatureColorAction extends Action {
 				Object editPart = editPartArray[i];
 				if (editPart instanceof FeatureEditPart) {
 					FeatureEditPart editP = (FeatureEditPart) editPart;
-					IFeature feature = editP.getFeature();
+					IGraphicalFeature feature = editP.getFeature();
 					if (!featureList.contains(feature))
 						featureList.add(feature);
 				}
@@ -113,7 +113,7 @@ public class SetFeatureColorAction extends Action {
 		int returnstat = dialog.open();
 
 		if (!featureList.isEmpty() && Window.OK == returnstat) {
-			featureList.get(0).getFeatureModel().handleModelDataChanged();
+			featureList.get(0).getGraphicalModel().getFeatureModel().handleModelDataChanged();
 		}
 	}
 	

@@ -18,35 +18,22 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.base;
+package de.ovgu.featureide.fm.ui.editors;
 
-import de.ovgu.featureide.fm.core.FMPoint;
-import de.ovgu.featureide.fm.core.FeatureModelLayout;
+import de.ovgu.featureide.fm.core.base.IConstraint;
 
-public interface IFeatureModelLayout {
 
-	public void setLegendAutoLayout(boolean b);
+/**
+ * Graphical representation of a constraint.
+ * 
+ * @author Sebastian Krieter
+ */
+public interface IGraphicalConstraint extends IGraphicalElement {
 
-	public boolean hasLegendAutoLayout();
+	IConstraint getObject();
 
-	public boolean showHiddenFeatures();
+	boolean isFeatureSelected();
 
-	public void showHiddenFeatures(boolean b);
+	void setFeatureSelected(boolean selected);
 
-	public boolean verticalLayout();
-
-	public void verticalLayout(boolean b);
-
-	public FMPoint getLegendPos();
-
-	public void setLegendPos(int x, int y);
-
-	public void setLayout(int newLayoutAlgorithm);
-
-	public int getLayoutAlgorithm();
-
-	public boolean hasFeaturesAutoLayout();
-	
-	public FeatureModelLayout clone();
-	
 }

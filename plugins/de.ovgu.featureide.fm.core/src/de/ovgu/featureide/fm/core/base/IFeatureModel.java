@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.base;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.Collection;
 import java.util.Hashtable;
@@ -34,6 +32,7 @@ import de.ovgu.featureide.fm.core.FMComposerManager;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.IFMComposerExtension;
 import de.ovgu.featureide.fm.core.RenamingsManager;
+import de.ovgu.featureide.fm.core.base.event.IEventManager;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
 
 /**
@@ -43,7 +42,7 @@ import de.ovgu.featureide.fm.core.base.impl.Constraint;
  * @author Sebastian Krieter
  * @author Marcus Pinnecke
  */
-public interface IFeatureModel extends Cloneable {
+public interface IFeatureModel extends Cloneable, IEventManager {
 	
 	long getId();
 
@@ -53,19 +52,15 @@ public interface IFeatureModel extends Cloneable {
 
 	boolean addFeature(IFeature feature);
 
-	void addListener(PropertyChangeListener listener);
-
 	IFeatureModel clone(IFeature newRoot);
 
-	IFeatureModel clone(IFeatureModel oldFeatureModel, boolean complete);
+//	IFeatureModel clone(IFeatureModel oldFeatureModel, boolean complete);
 
 	void createDefaultValues(CharSequence projectName);
 
 	boolean deleteFeature(IFeature feature);
 
 	void deleteFeatureFromTable(IFeature feature);
-
-	void fireEvent(PropertyChangeEvent event);
 
 	FeatureModelAnalyzer getAnalyser();
 
@@ -105,8 +100,6 @@ public interface IFeatureModel extends Cloneable {
 
 	void removeConstraint(int index);
 
-	void removeListener(PropertyChangeListener listener);
-
 	void replaceConstraint(IConstraint constraint, int index);
 
 	void reset();
@@ -119,27 +112,25 @@ public interface IFeatureModel extends Cloneable {
 
 	void setFeatureTable(final Hashtable<String, IFeature> featureTable);
 
-	IGraphicalFeatureModel getGraphicRepresenation(); // Added, Marcus Pinnecke 31.08.15
-
 	Map<String, IFeature> getFeatureTable(); // Added, Marcus Pinnecke 31.08.15
 
-	IFeatureModelLayout getLayout(); // Added, Marcus Pinnecke 13.09.15
-
 	IFeatureModel clone();
+//
+//	IFeatureModel deepClone();
+//
+//	IFeatureModel deepClone(boolean complete);
 
-	IFeatureModel deepClone();
-
-	IFeatureModel deepClone(boolean complete);
-
-	Object getUndoContext(Object undoContext);
+//	Object getUndoContext(Object undoContext);
 
 	Object getUndoContext();
 
-	boolean isFeatureOrderInXML();
+//	boolean isFeatureOrderInXML();
 
-	Object setFeatureOrderInXML(IFeatureModel featureModel, boolean featureOrderInXML);
+//	Object setFeatureOrderInXML(IFeatureModel featureModel, boolean featureOrderInXML);
 
-	void refreshContextMenu();
+//	void refreshContextMenu();
+
+//	void setConstraintSelected(boolean b);
 
 	void setUndoContext(Object undoContext);
 

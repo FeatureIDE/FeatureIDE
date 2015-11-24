@@ -23,9 +23,6 @@ package de.ovgu.featureide.ui.statistics.ui;
 import static de.ovgu.featureide.fm.core.localization.StringTable.REFRESH_VIEW;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATING_FEATURESTATISTICSVIEW;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -44,7 +41,9 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.ide.ResourceUtil;
 import org.eclipse.ui.part.ViewPart;
 
-import de.ovgu.featureide.fm.core.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.IFeatureModelListener;
+import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -150,8 +149,8 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 	/**
 	 * Listener that refreshes the view every time the model has been edited.
 	 */
-	private PropertyChangeListener modelListener = new PropertyChangeListener() {
-		public void propertyChange(PropertyChangeEvent evt) {
+	private IFeatureModelListener modelListener = new IFeatureModelListener() {
+		public void propertyChange(FeatureModelEvent evt) {
 			if (!PropertyConstants.MODEL_LAYOUT_CHANGED.equals(evt.getPropertyName()))
 				refresh(false);
 		}

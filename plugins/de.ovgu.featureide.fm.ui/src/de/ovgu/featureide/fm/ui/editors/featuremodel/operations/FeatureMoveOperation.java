@@ -22,15 +22,12 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.MOVE_FEATURE;
 
-import java.util.LinkedList;
-
 import org.eclipse.draw2d.geometry.Point;
 
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 
 /**
  * Operation with functionality to move features. Provides redo/undo support.
@@ -40,89 +37,92 @@ import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
  */
 public class FeatureMoveOperation extends AbstractFeatureModelOperation {
 
-	private static final String LABEL = MOVE_FEATURE;
 	private FeatureOperationData data;
 	private Point newPos;
 	private Point oldPos;
 	private IFeature feature;
 
-	public FeatureMoveOperation(FeatureOperationData data, IFeatureModel featureModel, Point newPos, Point oldPos, IFeature feature) {
-		super(featureModel, LABEL);
+	public FeatureMoveOperation(FeatureOperationData data, Object editor, Point newPos, Point oldPos, IFeature feature) {
+		super(feature.getFeatureModel(), MOVE_FEATURE);
 		this.data = data;
 		this.newPos = newPos;
 		this.oldPos = oldPos;
 		this.feature = feature;
+		setEditor(editor);
+		setEventId(PropertyConstants.STRUCTURE_CHANGED);
 	}
 
-	public void newInnerOrder(Point newPos) {
-		FeatureUIHelper.setLocation(feature.getGraphicRepresenation(), newPos);
-		if (!data.getFeature().getStructure().isRoot()) {
-			data.getOldParent().getStructure().removeChild(data.getFeature().getStructure());
-			LinkedList<IFeature> featureList = new LinkedList<IFeature>(FeatureUtils.convertToFeatureList(data.getOldParent().getStructure().getChildren()));
-			LinkedList<IFeature> newFeatureList = new LinkedList<IFeature>();
-			int counter2 = 0;
-			int counter = 0;
-
-			while (data.getOldParent().getStructure().hasChildren()) {
-				if (counter == counter2) {
-					if (FeatureUIHelper.hasVerticalLayout(featureModel.getGraphicRepresenation())) {
-						if (FeatureUIHelper.getLocation(featureList.get(counter).getGraphicRepresenation()).y > newPos.y) {
-							newFeatureList.add(data.getFeature());
-							counter = Integer.MIN_VALUE;
-						}
-					} else {
-						if (FeatureUIHelper.getLocation(featureList.get(counter).getGraphicRepresenation()).x > newPos.x) {
-							newFeatureList.add(data.getFeature());
-							counter = Integer.MIN_VALUE;
-						}
-					}
-				}
-
-				data.getOldParent().getStructure().removeChild(featureList.get(counter2).getStructure());
-				newFeatureList.add(featureList.get(counter2));
-				counter2++;
-				counter++;
-			}
-
-			if (!newFeatureList.contains(data.getFeature())) {
-				newFeatureList.add(data.getFeature());
-			}
-
-			for (int i = 0; i < counter2 + 1; i++) {
-				data.getOldParent().getStructure().addChildAtPosition(i, newFeatureList.get(i).getStructure());
-			}
-		}
-
-	}
+//	public void newInnerOrder(Point newPos) {
+//		FeatureUIHelper.setLocation(feature, newPos);
+//		if (!data.getFeature().getTree().isRoot()) {
+//			data.getOldParent().getStructure().removeChild(data.getFeature().getStructure());
+//			LinkedList<IFeature> featureList = new LinkedList<IFeature>(FeatureUtils.convertToFeatureList(data.getOldParent().getStructure().getChildren()));
+//			LinkedList<IFeature> newFeatureList = new LinkedList<IFeature>();
+//			int counter2 = 0;
+//			int counter = 0;
+//
+//			while (data.getOldParent().getStructure().hasChildren()) {
+//				if (counter == counter2) {
+//					if (FeatureUIHelper.hasVerticalLayout(featureModel)) {
+//						if (FeatureUIHelper.getLocation(featureList.get(counter)).y > newPos.y) {
+//							newFeatureList.add(data.getFeature());
+//							counter = Integer.MIN_VALUE;
+//						}
+//					} else {
+//						if (FeatureUIHelper.getLocation(featureList.get(counter)).x > newPos.x) {
+//							newFeatureList.add(data.getFeature());
+//							counter = Integer.MIN_VALUE;
+//						}
+//					}
+//				}
+//
+//				data.getOldParent().getStructure().removeChild(featureList.get(counter2).getStructure());
+//				newFeatureList.add(featureList.get(counter2));
+//				counter2++;
+//				counter++;
+//			}
+//
+//			if (!newFeatureList.contains(data.getFeature())) {
+//				newFeatureList.add(data.getFeature());
+//			}
+//
+//			for (int i = 0; i < counter2 + 1; i++) {
+//				data.getOldParent().getStructure().addChildAtPosition(i, newFeatureList.get(i).getStructure());
+//			}
+//		}
+//
+//	}
 
 	@Override
 	protected void redo() {
-		if (!featureModel.getGraphicRepresenation().getLayout().hasFeaturesAutoLayout()) {
-			newInnerOrder(newPos);
-		} else {
+//		if (!featureModel.getGraphicRepresenation().getLayout().hasFeaturesAutoLayout()) {
+//			newInnerOrder(newPos);
+//		} else {
 			try {
-				data.getOldParent().getStructure().removeChild(data.getFeature().getStructure());
-				data.getNewParent().getStructure().addChildAtPosition(data.getNewIndex(), data.getFeature().getStructure());
+				data.getOldParent().getObject().getStructure().removeChild(data.getFeature().getObject().getStructure());
+				data.getNewParent().getObject().getStructure().addChildAtPosition(data.getNewIndex(), data.getFeature().getObject().getStructure());
 			} catch (Exception e) {
 				FMUIPlugin.getDefault().logError(e);
 			}
-		}
+//		}
 	}
 
 	@Override
 	protected void undo() {
-		if (!featureModel.getGraphicRepresenation().getLayout().hasFeaturesAutoLayout()) {
-			newInnerOrder(oldPos);
-		} else {
+//		if (!featureModel.getGraphicRepresenation().getLayout().hasFeaturesAutoLayout()) {
+//			newInnerOrder(oldPos);
+//		} else {
 			try {
-				data.getNewParent().getStructure().removeChild(data.getFeature().getStructure());
+				final IFeatureStructure structure2 = data.getFeature().getObject().getStructure();
+				data.getNewParent().getObject().getStructure().removeChild(structure2);
 				if (data.getOldParent() != null) {
-					data.getOldParent().getStructure().addChildAtPosition(data.getOldIndex(), data.getFeature().getStructure());
+					final IFeatureStructure structure = data.getOldParent().getObject().getStructure();
+					structure.addChildAtPosition(data.getOldIndex(), structure2);
 				}
 			} catch (Exception e) {
 				FMUIPlugin.getDefault().logError(e);
 			}
-		}
+//		}
 	}
 
 }

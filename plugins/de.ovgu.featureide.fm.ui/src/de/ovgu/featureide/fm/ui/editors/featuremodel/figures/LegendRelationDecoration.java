@@ -32,7 +32,7 @@ public class LegendRelationDecoration extends RelationDecoration {
 	private Point point;
 
 	public LegendRelationDecoration(boolean fill, Point point) {
-		super(fill, null, null);
+		super(fill, null);
 		this.point = point;
 	}
 

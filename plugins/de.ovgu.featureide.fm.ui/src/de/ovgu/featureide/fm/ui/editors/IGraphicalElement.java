@@ -18,20 +18,32 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.base;
+package de.ovgu.featureide.fm.ui.editors;
 
+import org.eclipse.draw2d.geometry.Dimension;
+import org.eclipse.draw2d.geometry.Point;
+
+import de.ovgu.featureide.fm.core.IGraphicItem;
+import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
+import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 
 /**
  * Graphical representation of a constraint.
  * 
  * @author Sebastian Krieter
  */
-public interface IGraphicalConstraint extends IGraphicalElement {
+public interface IGraphicalElement extends IGraphicItem, PropertyConstants {
 
-	IConstraint getElement();
+	IFeatureModelElement getObject();
+	
+	IGraphicalFeatureModel getGraphicalModel();
 
-	boolean isFeatureSelected();
+	Point getLocation();
 
-	void setFeatureSelected(boolean selected);
+	Dimension getSize();
+
+	void setLocation(Point newLocation);
+
+	void setSize(Dimension size);
 
 }

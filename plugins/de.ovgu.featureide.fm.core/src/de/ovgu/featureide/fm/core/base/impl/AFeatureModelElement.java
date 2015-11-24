@@ -20,13 +20,13 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.LinkedList;
 
-import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
+import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.IFeatureModelListener;
+import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 
 /**
  * Partial implementation of feature and constraint.
@@ -38,12 +38,15 @@ public abstract class AFeatureModelElement implements IFeatureModelElement, Prop
 	
 	protected final long id;
 
+	protected String name;
+
 	protected final IFeatureModel featureModel;
-	protected final LinkedList<PropertyChangeListener> listenerList = new LinkedList<>();
+	protected final LinkedList<IFeatureModelListener> listenerList = new LinkedList<>();
 	
 	protected AFeatureModelElement(AFeatureModelElement oldElement, IFeatureModel featureModel) {
 		this.featureModel = featureModel != null ? featureModel : oldElement.featureModel;
 		this.id = oldElement.id;
+		name = (oldElement.name == null) ? null : new String(oldElement.name);
 	}
 
 	public AFeatureModelElement(IFeatureModel featureModel) {
@@ -52,6 +55,7 @@ public abstract class AFeatureModelElement implements IFeatureModelElement, Prop
 		}
 		this.id = featureModel.getNextElementId();
 		this.featureModel = featureModel;
+		this.name = null;
 	}
 
 	@Override
@@ -60,30 +64,35 @@ public abstract class AFeatureModelElement implements IFeatureModelElement, Prop
 	}
 
 	@Override
-	public final long getId() {
+	public final long getInternalId() {
 		return id;
-	}
-
-	@Override
-	public void propertyChange(PropertyChangeEvent evt) {
-
 	}
 	
 	@Override
-	public final void addListener(PropertyChangeListener listener) {
+	public String getName() {
+		return name;
+	}
+
+	@Override
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	@Override
+	public final void addListener(IFeatureModelListener listener) {
 		if (!listenerList.contains(listener)) {
 			listenerList.add(listener);
 		}
 	}
 
 	@Override
-	public final void removeListener(PropertyChangeListener listener) {
+	public final void removeListener(IFeatureModelListener listener) {
 		listenerList.remove(listener);
 	}
 
 	@Override
-	public final void fireEvent(PropertyChangeEvent event) {
-		for (final PropertyChangeListener listener : listenerList) {
+	public final void fireEvent(FeatureModelEvent event) {
+		for (final IFeatureModelListener listener : listenerList) {
 			listener.propertyChange(event);
 		}
 	}

@@ -38,13 +38,13 @@ public class LegendHideOperation extends AbstractFeatureModelOperation {
 	 */
 	public LegendHideOperation(IFeatureModel featureModel) {
 		super(featureModel, LABEL);
-		this.featureModel = featureModel;
 	}
 
 	@Override
 	protected void redo() {
 		FMPropertyManager.setHideLegend(!FMPropertyManager.isLegendHidden());
-		featureModel.refreshContextMenu();
+		// TODO _call listeners
+//		featureModel.refreshContextMenu();
 	}
 
 	@Override

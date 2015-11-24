@@ -125,7 +125,7 @@ public class SXFMWriter extends AbstractFeatureModelWriter {
         Node featTree = doc.createElement("feature_tree");
         elem.appendChild(featTree);
         featTree.appendChild(doc.createTextNode("\n"));
-        createXmlDocRec(doc, featTree, featureModel.getStructure().getRoot().getFeature(), false, "");
+        createXmlDocRec(doc, featTree, object.getStructure().getRoot().getFeature(), false, "");
         createPropositionalConstraints(doc, elem);
     }
 	
@@ -200,11 +200,11 @@ public class SXFMWriter extends AbstractFeatureModelWriter {
 		FeatMod.appendChild(propConstr);
 		Node newNode = doc.createTextNode("\n");
 		propConstr.appendChild(newNode);
-		if (featureModel.getConstraints().isEmpty())
+		if (object.getConstraints().isEmpty())
 			return;
 		// as before
 		int i = 1;
-		for (org.prop4j.Node node : FeatureUtils.getPropositionalNodes(featureModel.getConstraints())) {
+		for (org.prop4j.Node node : FeatureUtils.getPropositionalNodes(object.getConstraints())) {
 			// avoid use of parenthesis from the beginning
 			org.prop4j.Node cnf = node.clone().toCNF();
 			if (cnf instanceof And) {

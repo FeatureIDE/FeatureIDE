@@ -25,6 +25,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.READING_MODEL_
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.List;
@@ -66,6 +67,20 @@ public class FMCorePlugin extends AbstractCorePlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+//		PrintStream out = System.out;
+//		System.setOut(new PrintStream(out) {
+//
+//			@Override
+//			public void println(String x) {
+//				super.println(x);
+//			}
+//
+//			@Override
+//			public void println(Object x) {
+//				super.println(x);
+//			}
+//			
+//		});
 	}
 	
 	public void stop(BundleContext context) throws Exception {

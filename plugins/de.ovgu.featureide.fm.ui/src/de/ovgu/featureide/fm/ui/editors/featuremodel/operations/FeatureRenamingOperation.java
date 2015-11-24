@@ -32,12 +32,11 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  */
 public class FeatureRenamingOperation extends AbstractFeatureModelOperation {
 
-	private static final String LABEL = RENAME_FEATURE;
 	private String oldName;
 	private String newName;
 
 	public FeatureRenamingOperation(IFeatureModel featureModel, String oldName, String newName) {
-		super(featureModel, LABEL);
+		super(featureModel, RENAME_FEATURE);
 		this.oldName = oldName;
 		this.newName = newName;
 	}

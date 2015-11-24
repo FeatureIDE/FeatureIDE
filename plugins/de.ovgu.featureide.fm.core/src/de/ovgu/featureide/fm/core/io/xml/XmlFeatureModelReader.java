@@ -25,7 +25,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATIONS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.COMMENTS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.HIDDEN;
 import static de.ovgu.featureide.fm.core.localization.StringTable.IS_NO_VALID_FEATURE_NAME;
-import static de.ovgu.featureide.fm.core.localization.StringTable.IS_NO_VALID_INTEGER_VALUE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.MANDATORY;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NOT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.WRONG_SYNTAX;
@@ -54,7 +53,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.FMPoint;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -79,8 +77,9 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 	protected synchronized void parseInputStream(final InputStream inputStream)
 			throws UnsupportedModelException {
 		featureModel.reset();
-		featureModel.getGraphicRepresenation().getLayout().showHiddenFeatures(true);
-		featureModel.getGraphicRepresenation().getLayout().verticalLayout(false);
+// TODO _interfaces Removed Code
+//		featureModel.getGraphicRepresenation().getLayout().showHiddenFeatures(true);
+//		featureModel.getGraphicRepresenation().getLayout().verticalLayout(false);
 		Document  doc = null;
 		try {
 			doc = PositionalXMLReader.readXML(inputStream);
@@ -150,23 +149,24 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 	 * Adds attributes to the feature model
 	 */
 	private void setFeatureModelAttributes(Element eElement) {
-		String algorithm = eElement.getAttribute(CHOSEN_LAYOUT_ALGORITHM);
-		if (!algorithm.equals("")) {
-			featureModel.getGraphicRepresenation().getLayout().setLayout(
-					Integer.parseInt(algorithm));
-		}
-		String layout = eElement.getAttribute(HORIZONTAL_LAYOUT);
-		if (layout.equals(TRUE)) {
-			featureModel.getGraphicRepresenation().getLayout().verticalLayout(false);
-		} else if (layout.equals(FALSE)) {
-			featureModel.getGraphicRepresenation().getLayout().verticalLayout(true);
-		}
-		String showHidden = eElement.getAttribute(SHOW_HIDDEN_FEATURES);
-		if (showHidden.equals(TRUE)) {
-			featureModel.getGraphicRepresenation().getLayout().showHiddenFeatures(true);
-		} else if (showHidden.equals(FALSE)) {
-			featureModel.getGraphicRepresenation().getLayout().showHiddenFeatures(false);
-		}
+		// TODO _interfaces Legacy Code
+//		String algorithm = eElement.getAttribute(CHOSEN_LAYOUT_ALGORITHM);
+//		if (!algorithm.equals("")) {
+//			featureModel.getGraphicRepresenation().getLayout().setLayout(
+//					Integer.parseInt(algorithm));
+//		}
+//		String layout = eElement.getAttribute(HORIZONTAL_LAYOUT);
+//		if (layout.equals(TRUE)) {
+//			featureModel.getGraphicRepresenation().getLayout().verticalLayout(false);
+//		} else if (layout.equals(FALSE)) {
+//			featureModel.getGraphicRepresenation().getLayout().verticalLayout(true);
+//		}
+//		String showHidden = eElement.getAttribute(SHOW_HIDDEN_FEATURES);
+//		if (showHidden.equals(TRUE)) {
+//			featureModel.getGraphicRepresenation().getLayout().showHiddenFeatures(true);
+//		} else if (showHidden.equals(FALSE)) {
+//			featureModel.getGraphicRepresenation().getLayout().showHiddenFeatures(false);
+//		}
 	}
 
 	/**
@@ -196,7 +196,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 			boolean _abstract = false;
 			boolean hidden = false;
 			String name = "";
-			FMPoint featureLocation = null;
+//			FMPoint featureLocation = null;
 			if (e.hasAttributes()) {
 				NamedNodeMap nodeMap = e.getAttributes();
 				for (int i = 0; i < nodeMap.getLength(); i++) {
@@ -212,14 +212,15 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 					} else if (attributeName.equals(HIDDEN)) {
 						hidden = attributeValue.equals(TRUE);
 					} else if (attributeName.equals(COORDINATES)) {
-						String subStringX = attributeValue.substring(0, attributeValue.indexOf(", "));
-						String subStringY = attributeValue.substring(attributeValue.indexOf(", ")+2);
-						try {
-							featureLocation = new FMPoint(Integer.parseInt (subStringX),
-										Integer.parseInt (subStringY));
-						} catch (NumberFormatException error) {
-							throwError(error.getMessage() + IS_NO_VALID_INTEGER_VALUE, e);
-						}
+// TODO _interfaces Legacy Code
+//						String subStringX = attributeValue.substring(0, attributeValue.indexOf(", "));
+//						String subStringY = attributeValue.substring(attributeValue.indexOf(", ")+2);
+//						try {
+//							featureLocation = new FMPoint(Integer.parseInt (subStringX),
+//										Integer.parseInt (subStringY));
+//						} catch (NumberFormatException error) {
+//							throwError(error.getMessage() + IS_NO_VALID_INTEGER_VALUE, e);
+//						}
 					} else {
 						throwError("Unknown feature attribute: " + attributeName, e);
 					}
@@ -249,9 +250,10 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 			f.getStructure().setAbstract(_abstract);
 			f.getStructure().setMandatory(mandatory);
 			f.getStructure().setHidden(hidden);
-			if (featureLocation != null) {
-				f.getGraphicRepresenation().setLocation(featureLocation);
-			}
+			// TODO _interfaces Removed Code
+//			if (featureLocation != null) {
+//				f.getGraphicRepresenation().setLocation(featureLocation);
+//			}
 			featureModel.addFeature(f);
 			if (parent == null) {
 				featureModel.getStructure().setRoot(f.getStructure());
@@ -278,16 +280,17 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 						for (int i = 0; i < nodeMap.getLength(); i++) {
 							org.w3c.dom.Node node = nodeMap.item(i);
 							String attributeName = node.getNodeName();
-							String attributeValue = node.getNodeValue();
+//							String attributeValue = node.getNodeValue();
 							if (attributeName.equals(COORDINATES)) {
-								String subStringX = attributeValue.substring(0, attributeValue.indexOf(", "));
-								String subStringY = attributeValue.substring(attributeValue.indexOf(", ")+2);
-								try {
-									c.getGraphicRepresenation().setLocation(new FMPoint(Integer.parseInt (subStringX),
-												Integer.parseInt (subStringY)));
-								} catch (NumberFormatException error) {
-									throwError(error.getMessage() + IS_NO_VALID_INTEGER_VALUE, child);
-								}
+// TODO _interfaces Legacy Code
+//								String subStringX = attributeValue.substring(0, attributeValue.indexOf(", "));
+//								String subStringY = attributeValue.substring(attributeValue.indexOf(", ")+2);
+//								try {
+//									c.getGraphicRepresenation().setLocation(new FMPoint(Integer.parseInt (subStringX),
+//												Integer.parseInt (subStringY)));
+//								} catch (NumberFormatException error) {
+//									throwError(error.getMessage() + IS_NO_VALID_INTEGER_VALUE, child);
+//								}
 							} else {
 								throwError("Unknown constraint attribute: " + attributeName, node);
 							}

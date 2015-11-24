@@ -18,15 +18,20 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.base.impl;
+package de.ovgu.featureide.fm.ui.editors.elements;
 
-import java.beans.PropertyChangeEvent;
+import java.util.List;
 
-import de.ovgu.featureide.fm.core.ColorschemeTable;
-import de.ovgu.featureide.fm.core.FeatureModelLayout;
-import de.ovgu.featureide.fm.core.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.IGraphicalFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.impl.Tree;
+import de.ovgu.featureide.fm.ui.ColorschemeTable;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
 
 /**
  * Graphical representation of an {@link IFeatureModel} instance.
@@ -41,16 +46,19 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel, PropertyCo
 
 	protected final IFeatureModel correspondingFeatureModel;
 
+	protected Tree<IGraphicalFeature> featureTree = null;
+	protected List<IGraphicalConstraint> constraintList = null;
+
 	protected final FeatureModelLayout layout;
 
 	public GraphicalFeatureModel(IFeatureModel correspondingFeatureModel) {
 		this.correspondingFeatureModel = correspondingFeatureModel;
 		layout = new FeatureModelLayout();
-		colorschemeTable = new ColorschemeTable(correspondingFeatureModel);
+		colorschemeTable = new ColorschemeTable(this);
 	}
 
 	protected void fireEvent(final String action) {
-		correspondingFeatureModel.fireEvent(new PropertyChangeEvent(this, action, Boolean.FALSE, Boolean.TRUE));
+		correspondingFeatureModel.fireEvent(new FeatureModelEvent(this, action, Boolean.FALSE, Boolean.TRUE));
 	}
 
 	@Override
@@ -91,6 +99,40 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel, PropertyCo
 	@Override
 	public void refreshContextMenu() {
 		fireEvent(REFRESH_ACTIONS);
+	}
+
+	public Tree<IGraphicalFeature> getFeatures() {
+		return featureTree;
+	}
+
+	public void setFeatureTree(Tree<IGraphicalFeature> featureTree) {
+		this.featureTree = featureTree;
+	}
+
+	public List<IGraphicalConstraint> getConstraints() {
+		return constraintList;
+	}
+
+	public void setConstraintList(List<IGraphicalConstraint> constraintList) {
+		this.constraintList = constraintList;
+	}
+
+	@Override
+	public IGraphicalFeature getGraphicalFeature(IFeature newFeature) {
+		for (IGraphicalFeature graphicalFeature : featureTree) {
+			if (graphicalFeature.getObject().equals(newFeature)) {
+				return graphicalFeature;
+			}
+		}
+		return null;
+	}
+	
+	@Override
+	public String toString() {
+		if (featureTree != null) {
+			return "Graphical feature-model tree:\n" + featureTree.toString();
+		}
+		return super.toString();
 	}
 
 }

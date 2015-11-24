@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.editparts;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.List;
 import java.util.Map;
 
@@ -39,13 +37,17 @@ import org.eclipse.gef.tools.DirectEditManager;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.FeatureConnection;
-import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.IFeatureModelListener;
+import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.FeatureConnection;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureCellEditorLocator;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureLabelEditManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.FeatureFigure;
@@ -59,7 +61,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.policies.FeatureDirectEditP
  * @author Thomas Thuem
  * @author Marcus Pinnecke
  */
-public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEditPart, PropertyConstants, PropertyChangeListener {
+public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEditPart, PropertyConstants, IFeatureModelListener {
 
 	private ConnectionAnchor sourceAnchor = null;
 	private ConnectionAnchor targetAnchor = null;
@@ -69,8 +71,8 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 		setModel(feature);
 	}
 
-	public IFeature getFeature() {
-		return (IFeature) getModel();
+	public IGraphicalFeature getFeature() {
+		return (IGraphicalFeature) getModel();
 	}
 
 	public FeatureFigure getFeatureFigure() {
@@ -79,8 +81,8 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 
 	@Override
 	protected IFigure createFigure() {
-		final IFeature f = getFeature();
-		final FeatureFigure featureFigure = new FeatureFigure(f, f.getFeatureModel());
+		final IGraphicalFeature f = getFeature();
+		final FeatureFigure featureFigure = new FeatureFigure(f, f.getGraphicalModel());
 		sourceAnchor = featureFigure.getSourceAnchor();
 		targetAnchor = featureFigure.getTargetAnchor();
 		return featureFigure;
@@ -88,26 +90,26 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 
 	@Override
 	protected void createEditPolicies() {
-		final IFeature f = getFeature();
-		installEditPolicy(EditPolicy.DIRECT_EDIT_ROLE, new FeatureDirectEditPolicy(f.getFeatureModel(), f));
+		final IGraphicalFeature f = getFeature();
+		installEditPolicy(EditPolicy.DIRECT_EDIT_ROLE, new FeatureDirectEditPolicy(f.getGraphicalModel(), f));
 	}
 
 	private DirectEditManager manager;
 
 	public void showRenameManager() {
 		if (manager == null) {
-			final IFeature f = getFeature();
-			manager = new FeatureLabelEditManager(this, TextCellEditor.class, new FeatureCellEditorLocator(getFeatureFigure()), f.getFeatureModel());
+			final IGraphicalFeature f = getFeature();
+			manager = new FeatureLabelEditManager(this, TextCellEditor.class, new FeatureCellEditorLocator(getFeatureFigure()), f.getGraphicalModel().getFeatureModel());
 		}
 		manager.show();
 	}
 
 	@Override
 	public void performRequest(Request request) {
-		IFeature feature = getFeature();
-		IFeatureModel featureModel = ((ModelEditPart) this.getParent()).getFeatureModel();
+		IFeature feature = getFeature().getObject();
+		IGraphicalFeatureModel featureModel = ((ModelEditPart) this.getParent()).getFeatureModel();
 
-		for (IConstraint constraint : featureModel.getConstraints()) {
+		for (IGraphicalConstraint constraint : featureModel.getConstraints()) {
 			if (constraint.isFeatureSelected())
 				constraint.setFeatureSelected(false);
 		}
@@ -119,8 +121,9 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 				return;
 			}
 
-			FeatureSetMandatoryOperation op = new FeatureSetMandatoryOperation(feature, featureModel);
-			op.addContext((IUndoContext) featureModel.getUndoContext());
+			FeatureSetMandatoryOperation op = new FeatureSetMandatoryOperation(feature, featureModel.getFeatureModel());
+//TODO _interfaces Removed Code
+			op.addContext((IUndoContext) featureModel.getFeatureModel().getUndoContext());
 			try {
 				PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 			} catch (ExecutionException e) {
@@ -128,7 +131,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 
 			}
 
-			featureModel.handleModelDataChanged();
+			featureModel.getFeatureModel().handleModelDataChanged();
 		} else if (request.getType() == RequestConstants.REQ_SELECTION) {
 			for (IConstraint partOf : feature.getStructure().getRelevantConstraints()) {
 				partOf.setFeatureSelected(true);
@@ -138,12 +141,12 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 
 	@Override
 	protected List<FeatureConnection> getModelSourceConnections() {
-		return ((IFeature) getModel()).getStructure().getSourceConnections();
+		return getFeature().getSourceConnections();
 	}
 
 	@Override
 	protected List<FeatureConnection> getModelTargetConnections() {
-		return ((IFeature) getModel()).getStructure().getTargetConnections();
+		return getFeature().getTargetConnections();
 	}
 
 	public ConnectionAnchor getSourceConnectionAnchor(org.eclipse.gef.ConnectionEditPart connection) {
@@ -164,21 +167,21 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 
 	@Override
 	public void activate() {
-		getFeature().addListener(this);
+		getFeature().getObject().addListener(this);
 		super.activate();
 	}
 
 	@Override
 	public void deactivate() {
 		super.deactivate();
-		getFeature().removeListener(this);
+		getFeature().getObject().removeListener(this);
 	}
 
-	public void propertyChange(PropertyChangeEvent event) {
+	public void propertyChange(FeatureModelEvent event) {
 		String prop = event.getPropertyName();
 		if (LOCATION_CHANGED.equals(prop)) {
 			getFeatureFigure().setLocation((Point) event.getNewValue());
-			for (FeatureConnection connection : getFeature().getStructure().getTargetConnections()) {
+			for (FeatureConnection connection : getFeature().getTargetConnections()) {
 				Map<?, ?> registry = getViewer().getEditPartRegistry();
 				ConnectionEditPart connectionEditPart = (ConnectionEditPart) registry.get(connection);
 				if (connectionEditPart != null) {
@@ -189,7 +192,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 			}
 		} else if (CHILDREN_CHANGED.equals(prop)) {
 			getFeatureFigure().setProperties();
-			for (FeatureConnection connection : getFeature().getStructure().getTargetConnections()) {
+			for (FeatureConnection connection : getFeature().getTargetConnections()) {
 				Map<?, ?> registry = getViewer().getEditPartRegistry();
 				ConnectionEditPart connectionEditPart = (ConnectionEditPart) registry.get(connection);
 				if (connectionEditPart != null) {
@@ -199,8 +202,8 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 				}
 			}
 		} else if (NAME_CHANGED.equals(prop)) {
-			getFeatureFigure().setName(getFeature().getProperty().getDisplayName());
-			FeatureUIHelper.setSize(getFeature().getGraphicRepresenation(), getFeatureFigure().getSize());
+			getFeatureFigure().setName(getFeature().getObject().getProperty().getDisplayName());
+			FeatureUIHelper.setSize(getFeature(), getFeatureFigure().getSize());
 		} else if (ATTRIBUTE_CHANGED.equals(prop)) {
 			getFeatureFigure().setProperties();
 		}

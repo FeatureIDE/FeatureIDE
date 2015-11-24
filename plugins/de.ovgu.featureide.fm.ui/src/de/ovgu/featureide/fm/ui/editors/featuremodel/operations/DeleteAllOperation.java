@@ -54,14 +54,13 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
  */
 public class DeleteAllOperation extends AbstractFeatureModelOperation implements GUIDefaults {
 
-	private static final String LABEL = DELETE_INCLUDING_SUBFEATURES;
 	private IFeature feature;
 	private LinkedList<IFeature> featureList;
 	private LinkedList<IFeature> containedFeatureList;
 	private Deque<AbstractFeatureModelOperation> operations = new LinkedList<AbstractFeatureModelOperation>();
 
 	public DeleteAllOperation(IFeatureModel featureModel, IFeature parent) {
-		super(featureModel, LABEL);
+		super(featureModel, DELETE_INCLUDING_SUBFEATURES);
 		this.feature = parent;
 	}
 
@@ -82,8 +81,8 @@ public class DeleteAllOperation extends AbstractFeatureModelOperation implements
 			}
 		} else {
 			final String containedFeatures = containedFeatureList.toString();
-			MessageDialog dialog = new MessageDialog(new Shell(), DELETE_ERROR, FEATURE_SYMBOL, "The following features are contained in constraints:"
-					+ '\n' + containedFeatures.substring(1, containedFeatures.length() - 1) + '\n' + '\n'
+			MessageDialog dialog = new MessageDialog(new Shell(), DELETE_ERROR, FEATURE_SYMBOL, "The following features are contained in constraints:" + '\n'
+					+ containedFeatures.substring(1, containedFeatures.length() - 1) + '\n' + '\n'
 					+ UNABLE_TO_DELETE_THIS_FEATURES_UNTIL_ALL_RELEVANT_CONSTRAINTS_ARE_REMOVED_, MessageDialog.ERROR,
 					new String[] { IDialogConstants.OK_LABEL }, 0);
 

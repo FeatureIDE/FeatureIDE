@@ -21,25 +21,10 @@
 package de.ovgu.featureide.fm.core;
 
 /**
- * A simple point; saves a X and a Y coordinate at the feature model diagram.
+ * Only used for legacy purposes.
  * 
- * @author Soenke Holthusen
+ * @author Sebastian Krieter
  */
 public class FMPoint {
-	public int x;
-	public int y;
-
-	public FMPoint(int x, int y) {
-		this.x = x;
-		this.y = y;
-	}
-
-	public int getX() {
-		return x;
-	}
-
-	public int getY() {
-		return y;
-	}
 
 }

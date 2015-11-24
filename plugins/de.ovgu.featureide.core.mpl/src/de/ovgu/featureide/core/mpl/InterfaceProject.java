@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.core.mpl;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.Collection;
 
 import org.eclipse.core.resources.IProject;
@@ -30,9 +28,11 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.mpl.io.FileLoader;
 import de.ovgu.featureide.core.mpl.signature.ViewTag;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
-import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.IFeatureModelListener;
+import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 
 /**
@@ -70,7 +70,7 @@ public class InterfaceProject {
 		this(projectReference, null);
 	}
 	
-	private class FeaturePropertyChangeListener implements PropertyChangeListener {
+	private class FeaturePropertyChangeListener implements IFeatureModelListener {
 		private final int id;
 		
 		public FeaturePropertyChangeListener(int id) {
@@ -78,7 +78,7 @@ public class InterfaceProject {
 		}
 		
 		@Override
-		public void propertyChange(PropertyChangeEvent event) {
+		public void propertyChange(FeatureModelEvent event) {
 			String prop = event.getPropertyName();
 			if (PropertyConstants.LOCATION_CHANGED.equals(prop)) {
 				
