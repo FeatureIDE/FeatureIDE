@@ -1,4 +1,4 @@
-#/* FeatureIDE - A Framework for Feature-Oriented Software Development
+/* FeatureIDE - A Framework for Feature-Oriented Software Development
  * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.

@@ -33,7 +33,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.Legend;
  * Creates edit parts for given models.
  * 
  * @author Thomas Thuem
- * @author Marcus Pinnecke
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class GraphicalEditPartFactory implements EditPartFactory {
 

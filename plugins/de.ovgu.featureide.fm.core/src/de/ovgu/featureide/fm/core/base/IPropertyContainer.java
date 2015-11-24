@@ -43,7 +43,7 @@ public interface IPropertyContainer {
 		private static final long serialVersionUID = 6923332230285211910L;
 
 		public NoSuchPropertyException(String key) {
-			super("The container \"\" does not contain a property with the given key:" + key);
+			super("The container does not contain a property with the given key:" + key);
 		}
 	}
 	
