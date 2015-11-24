@@ -708,6 +708,8 @@ public class StringTable {
 	public static final String MAXIMUM_FEATURES_PER_DIRECTIVE = "Maximum number of features per directive";
 	public static final String MINIMUM_FEATURES_PER_DIRECTIVE = "Minimum number of features per directive";
 	public static final String AVERAGE_FEATURES_PER_DIRECTIVE = "Average number of features per directive";
+	public static final String MAXIMUM_NUMBER_OF_DIRECTIVES = "Maximum number of directives: ";
+	public static final String MINIMUM_NUMBER_OF_DIRECTIVES = "Minimum number of directives: ";
 	public static final String CLASS_STATISTICS = "Class statistics";
 	public static final String HIDDEN_BY_ANCESTOR = "hidden by ancestor";
 	public static final String HAS_CHILD_FEATURES = "has child-features";
