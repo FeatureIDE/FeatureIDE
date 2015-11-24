@@ -568,6 +568,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 		try {
 			featureHotspotEditor.setIndex(addPage(featureHotspotEditor, getEditorInput()));
 			setPageText(featureHotspotEditor.getIndex(), featureHotspotEditor.getPageText());
+			
 			featureHotspotEditor.initEditor();
 		} catch (PartInitException e) {
 			FMUIPlugin.getDefault().logError(e);
@@ -608,6 +609,10 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 	private int getOrderEditorIndex() {
 		return featureOrderEditor.getIndex();
 	}
+	
+	private int getHotspotEditorIndex(){
+		return featureHotspotEditor.getIndex();
+	}
 
 	/**
 	 * Gets the corresponding page for the given index.
@@ -625,6 +630,9 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 		}
 		if (index == getTextEditorIndex()) {
 			return textEditor;
+		}
+		if (index == getHotspotEditorIndex()) {
+			return featureHotspotEditor;
 		}
 
 		for (IFeatureModelEditorPage page : extensionPages) {

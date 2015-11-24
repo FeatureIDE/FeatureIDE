@@ -992,6 +992,6 @@ public class StringTable {
 	public static final String CHOOSE_COLOR_ = "Choose Color:";
 	public static final String CHOOSE_ACTION_ = "Choose Action:";
 	public static final String FEATURES_ = "Features:";
-	public static final String HOTSPOT_THRESHOLD = "Maximum Constraint Threshold";
+	public static final String HOTSPOT_THRESHOLD = "Maximum Constraint Threshold:";
 	public static final String HOTSPOT_START_ANALYSIS= "Analyse";
 }

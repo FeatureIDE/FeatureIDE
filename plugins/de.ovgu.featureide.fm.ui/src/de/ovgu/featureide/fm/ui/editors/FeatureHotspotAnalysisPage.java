@@ -81,7 +81,8 @@ public class FeatureHotspotAnalysisPage extends FeatureModelEditorPage {
 		gridData.grabExcessHorizontalSpace = true;
 		gridData.grabExcessVerticalSpace = false;
 		gridData.verticalAlignment = SWT.TOP;
-		gridLayout = new GridLayout(1, false);
+		
+		gridLayout = new GridLayout(4, false);
 		gridLayout.marginHeight = 0;
 		gridLayout.marginWidth = 0;
 		gridLayout.marginLeft = 4;
@@ -98,17 +99,34 @@ public class FeatureHotspotAnalysisPage extends FeatureModelEditorPage {
 		infoLabel.setText(HOTSPOT_THRESHOLD);
 		infoLabel.setLayoutData(gridData);
 		
-		// input field
+		// spinner
+		gridData = new GridData();
+		gridData.horizontalAlignment = SWT.FILL;
+		gridData.grabExcessHorizontalSpace = false;
+		gridData.verticalAlignment = SWT.CENTER;
 		thresholdSpinner = new Spinner(compositeTop, SWT.HORIZONTAL);
 		thresholdSpinner.setMaximum(80);
 		thresholdSpinner.setIncrement(1);
 		thresholdSpinner.setLayoutData(gridData);
 		
 		// analysis button
+		gridData = new GridData();
+		gridData.horizontalAlignment = SWT.FILL;
+		gridData.grabExcessHorizontalSpace = false;
+		gridData.verticalAlignment = SWT.CENTER;
 		startAnalysisButton = new Button(compositeTop, SWT.PUSH);
 		startAnalysisButton.setText(HOTSPOT_START_ANALYSIS);
 		startAnalysisButton.setLayoutData(gridData);
-
+		
+		gridData = new GridData();
+		gridData.horizontalAlignment = SWT.FILL;
+		gridData.grabExcessHorizontalSpace = true;
+		gridData.verticalAlignment = SWT.CENTER;
+		Label spacerLabel = new Label(compositeTop, SWT.NONE);
+		spacerLabel.setText("");
+		spacerLabel.setLayoutData(gridData);
+		
+		
 		// 2. sub composite
 		gridData = new GridData();
 		gridData.horizontalAlignment = SWT.FILL;
@@ -116,9 +134,18 @@ public class FeatureHotspotAnalysisPage extends FeatureModelEditorPage {
 		gridData.grabExcessHorizontalSpace = true;
 		gridData.grabExcessVerticalSpace = true;
 		final Composite compositeBottom = new Composite(parent, SWT.BORDER);
+		
 		compositeBottom.setLayout(new FillLayout());
 		compositeBottom.setLayoutData(gridData);
-
+		
+		final FeatureDiagramEditor editor = new FeatureDiagramEditor(featureModelEditor, compositeBottom);
+		editor.getControl().getDisplay().asyncExec(new Runnable() {
+			public void run() {
+				editor.setContents(editor.getGraphicalFeatureModel());
+				//pageChange(getDiagramEditorIndex());
+				editor.refresh();
+			}
+		});
 	}
 
 }
