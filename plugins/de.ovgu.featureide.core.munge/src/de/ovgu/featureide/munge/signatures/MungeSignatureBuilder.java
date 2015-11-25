@@ -163,8 +163,9 @@ public abstract class MungeSignatureBuilder {
 				}
 				AbstractClassSignature uniqueSig = (AbstractClassSignature) map.get(sig);
 				if (uniqueSig == null) {
-					map.put(sig, sig);
-					uniqueSig = sig;
+					visit((TypeDeclaration)astnode);
+//					map.put(sig, sig);
+//					uniqueSig = sig;
 				}
 				return uniqueSig;
 			}
