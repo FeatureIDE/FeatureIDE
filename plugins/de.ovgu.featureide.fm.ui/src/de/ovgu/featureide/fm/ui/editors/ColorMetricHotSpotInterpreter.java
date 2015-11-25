@@ -44,8 +44,11 @@ public class ColorMetricHotSpotInterpreter implements IHotSpotResultInterpreter<
 			new Color(display, 255, 0, 0), };
 	private Color[] scale;
 	private int maxRange;
+	private final int MAX_RANGE = 510;
 
 	public ColorMetricHotSpotInterpreter(int maxRange) {
+		if(maxRange > MAX_RANGE)
+			maxRange = MAX_RANGE;
 		this.maxRange = maxRange;
 		this.init();
 	}
