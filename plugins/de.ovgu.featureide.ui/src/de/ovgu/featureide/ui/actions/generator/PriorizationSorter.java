@@ -40,7 +40,7 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 
 /**
- * TODO description
+ * Sorts configurations before they are generated based on their difference. 
  * 
  * @author Mustafa Alhajjaj
  */

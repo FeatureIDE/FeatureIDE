@@ -23,7 +23,7 @@ package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations.gene
 import java.util.HashMap;
 
 /**
- * TODO description
+ * Node in the statistics view to show lines of code. 
  * 
  * @author Schleicher Miro
  */
@@ -32,40 +32,35 @@ public class HashMapNodeTwoStrings extends AbstractSortModeNode {
 	private HashMap<String, Integer> featureExtensionLOCList = new HashMap<String, Integer>();
 	private HashMap<String, Integer> count = new HashMap<String, Integer>();
 	private int side;
-	
+
 	public HashMapNodeTwoStrings(String description, int side, HashMap<String, Integer> extList) {
 		super(description);
 		featureExtensionLOCList = extList;
 		this.side = side;
 	}
 
-	
 	@Override
 	protected void initChildren() {
-		
-		for (String name : featureExtensionLOCList.keySet()) 
-		{
-			if(side == 1) {
-				if(!count.containsKey(name.split("#")[0])) {
+		for (String name : featureExtensionLOCList.keySet()) {
+			if (side == 1) {
+				if (!count.containsKey(name.split("#")[0])) {
 					count.put(name.split("#")[0], featureExtensionLOCList.get(name));
 				} else {
 					count.put(name.split("#")[0], count.get(name.split("#")[0]) + featureExtensionLOCList.get(name));
-				}		
-			} else if( side == 2) {
-				if(!count.containsKey(name.split("#")[1])) {
+				}
+			} else if (side == 2) {
+				if (!count.containsKey(name.split("#")[1])) {
 					count.put(name.split("#")[1], featureExtensionLOCList.get(name));
 				} else {
 					count.put(name.split("#")[1], count.get(name.split("#")[1]) + featureExtensionLOCList.get(name));
-				}	
+				}
 			}
 		}
-		
-		for (String name : count.keySet()) 
-		{
+
+		for (String name : count.keySet()) {
 			addChild(new HashMapNodeTwoStringsSub(name, count.get(name), featureExtensionLOCList, side));
 		}
-		
-		
+
 	}
 
 }

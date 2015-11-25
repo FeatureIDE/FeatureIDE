@@ -21,12 +21,12 @@
 package de.ovgu.featureide.ui.views.collaboration.outline;
 
 /**
- * TODO description
+ * Interface to filter the content of the CollaborationOutline.
  * 
  * @author Dominic Labsch	
  * @author Daniel Püsche
  */
-public interface IFilter {
+public interface ICollaborationOutlineFilter {
 
 	public Object[] filter(Object[] obj);
 		

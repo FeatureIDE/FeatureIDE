@@ -21,20 +21,14 @@
 package de.ovgu.featureide.core.fstmodel;
 
 /**
- * TODO description
+ * Function entry at the {@link FSTModel} for AsmetaL.
  * 
  * @author Florian Proksch
  */
 public class FSTAstemaLFunction extends FSTField {
 
-	/**
-	 * @param name
-	 * @param type
-	 * @param modifiers
-	 */
 	public FSTAstemaLFunction(String name, String type, String modifiers) {
 		super(name, type, modifiers);
-		// TODO Auto-generated constructor stub
 	}
 
 	public FSTAstemaLFunction(String fieldName, String typeName, String modifiers,
