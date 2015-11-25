@@ -47,9 +47,10 @@ public class ColorMetricHotSpotInterpreter implements IHotSpotResultInterpreter<
 	private final int MAX_RANGE = 510;
 
 	public ColorMetricHotSpotInterpreter(int maxRange) {
-		if(maxRange > MAX_RANGE)
-			maxRange = MAX_RANGE;
-		this.maxRange = maxRange;
+		this.maxRange = maxRange + 1;
+		
+		if(this.maxRange > MAX_RANGE)			
+			this.maxRange = MAX_RANGE;
 		this.init();
 	}
 
@@ -78,7 +79,6 @@ public class ColorMetricHotSpotInterpreter implements IHotSpotResultInterpreter<
 
 			this.scale = new Color[this.maxRange];
 			this.scale[0] = ColorMetricHotSpotInterpreter.scalaColor[0];
-			//int substracter = (maxRange/2) % 2 == 0 ? 1 : 0;
 			int stepWidth = (maxRange / 2) - 1;
 
 			double rChange = (ColorMetricHotSpotInterpreter.scalaColor[1].getRed() - ColorMetricHotSpotInterpreter.scalaColor[0].getRed()) / (stepWidth + 1);

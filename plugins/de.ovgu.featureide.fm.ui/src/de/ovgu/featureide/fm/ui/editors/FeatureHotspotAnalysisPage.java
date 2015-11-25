@@ -24,12 +24,16 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE_HOTSPO
 import static de.ovgu.featureide.fm.core.localization.StringTable.HOTSPOT_START_ANALYSIS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.HOTSPOT_THRESHOLD;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.awt.SWT_AWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
@@ -41,6 +45,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.HotSpotResult;
@@ -88,8 +95,6 @@ public class FeatureHotspotAnalysisPage extends FeatureModelEditorPage {
 				return results;
 			}
 		};
-		
-		
 	}
 
 	@Override
@@ -171,28 +176,39 @@ public class FeatureHotspotAnalysisPage extends FeatureModelEditorPage {
 		gridData = new GridData();
 		gridData.horizontalAlignment = SWT.FILL;
 		gridData.verticalAlignment = SWT.FILL;
-		//gridData.grabExcessHorizontalSpace = true;
-		//gridData.grabExcessVerticalSpace = true;
-		final Composite compositeBottom = new Composite(parent, SWT.BORDER);
+		gridData.grabExcessHorizontalSpace = gridData.grabExcessVerticalSpace = true;
+		final ScrolledComposite compositeBottom = new ScrolledComposite(parent, SWT.BORDER);
+		final Table tbl = createTableBaseLayout(compositeBottom);
+		
+		compositeBottom.setContent(tbl);
+		compositeBottom.setExpandHorizontal(true);
+		compositeBottom.setExpandVertical(true);
+		compositeBottom.setAlwaysShowScrollBars(true);
+		
 		startAnalysisButton.addSelectionListener(new SelectionListener() {
 			
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				Set<HotSpotResult> result = analyzer.analyze(FeatureHotspotAnalysisPage.this.model);
+				List<HotSpotResult> sortedResult = new ArrayList<HotSpotResult>(result);
+				Collections.sort(sortedResult);
+				
 				IHotSpotResultInterpreter<Color> interpreter = new ColorMetricHotSpotInterpreter(Integer.valueOf(thresholdSpinner.getText()).intValue());
-				for (Control control : compositeBottom.getChildren()) {
-			        control.dispose();
-			    }
-				for(HotSpotResult hsr : result)
-				/*for(int i = 0; i < Integer.valueOf(thresholdSpinner.getText()).intValue();i++)*/{
-					//HotSpotResult hsr = new HotSpotResult();
-					//hsr.setMetricValue(i);
+
+				tbl.clearAll();
+				
+				for(HotSpotResult hsr : sortedResult){
 					Color c = interpreter.interpret(hsr);
-					Label l = new Label(compositeBottom,SWT.NONE);
-					l.setText(/*c.toString() + " " + */hsr.getFeatureName());
-					l.setBackground(c);
+					TableItem item = new TableItem (tbl, SWT.NONE);
+					item.setText (0, hsr.getFeatureName());
+					item.setText (1, Double.toString(hsr.getMetricValue()));
+					item.setText (2, c.toString());
+					item.setBackground(c);
 				}
-				compositeBottom.pack();
+				for (int i=0; i < tbl.getColumnCount(); i++) {
+					tbl.getColumn(i).pack();
+				}
+				tbl.pack();
 			}
 			
 			@Override
@@ -200,9 +216,8 @@ public class FeatureHotspotAnalysisPage extends FeatureModelEditorPage {
 				
 			}
 		});
-		compositeBottom.setLayout(new FillLayout(GridData.FILL_VERTICAL));
-		compositeBottom.setLayoutData(gridData);
 		
+		compositeBottom.setLayoutData(gridData);
 //		gridData = new GridData();
 //		gridData.horizontalAlignment = SWT.FILL;
 //		gridData.verticalAlignment = SWT.FILL;
@@ -220,6 +235,25 @@ public class FeatureHotspotAnalysisPage extends FeatureModelEditorPage {
 //				editor.refresh();
 //			}
 //		});
+	}
+
+	private Table createTableBaseLayout(Composite parent){
+		Table tbl = new Table(parent,SWT.BORDER | SWT.V_SCROLL);
+		String titles[] = {"Feature Name","Metric Result","RGB Value"};
+		tbl.setLinesVisible (true);
+		tbl.setHeaderVisible (true);
+		GridData gd = new GridData(SWT.FILL,SWT.TOP,true,false);
+		for(int i =0; i < titles.length; i++){
+			TableColumn col = new TableColumn(tbl, SWT.NONE);
+			col.setWidth(150);
+			col.setText(titles[i]);
+		}
+		tbl.setLayoutData(gd);
+		return tbl;
+	}
+	
+	private void createAnalysisResultView(Composite compositeBottom) {
+		
 	}
 
 }
