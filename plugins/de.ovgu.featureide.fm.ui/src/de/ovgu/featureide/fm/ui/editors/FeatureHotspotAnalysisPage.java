@@ -172,7 +172,7 @@ public class FeatureHotspotAnalysisPage extends FeatureModelEditorPage {
 		gridData.horizontalAlignment = SWT.FILL;
 		gridData.verticalAlignment = SWT.FILL;
 		//gridData.grabExcessHorizontalSpace = true;
-		gridData.grabExcessVerticalSpace = true;
+		//gridData.grabExcessVerticalSpace = true;
 		final Composite compositeBottom = new Composite(parent, SWT.BORDER);
 		startAnalysisButton.addSelectionListener(new SelectionListener() {
 			
@@ -203,9 +203,16 @@ public class FeatureHotspotAnalysisPage extends FeatureModelEditorPage {
 		compositeBottom.setLayout(new FillLayout(GridData.FILL_VERTICAL));
 		compositeBottom.setLayoutData(gridData);
 		
+//		gridData = new GridData();
+//		gridData.horizontalAlignment = SWT.FILL;
+//		gridData.verticalAlignment = SWT.FILL;
+//		//gridData.grabExcessHorizontalSpace = true;
+//		gridData.grabExcessVerticalSpace = true;
 		
+		//final Composite compositeBottomFMInner = new Composite(compositeBottom, SWT.BORDER);
+		//compositeBottomFMInner.setLayoutData(gridData);
 		
-//		final FeatureDiagramEditor editor = new FeatureDiagramEditor(featureModelEditor, compositeBottom);
+//		final FeatureDiagramEditor editor = new FeatureDiagramEditor(featureModelEditor, compositeBottomFMInner);
 //		editor.getControl().getDisplay().asyncExec(new Runnable() {
 //			public void run() {
 //				editor.setContents(editor.getGraphicalFeatureModel());
