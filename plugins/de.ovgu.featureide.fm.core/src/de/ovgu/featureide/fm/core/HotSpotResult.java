@@ -26,7 +26,7 @@ package de.ovgu.featureide.fm.core;
  * @author Christopher Kruczek
  * @author Andy Kenner
  */
-public class HotSpotResult {
+public class HotSpotResult implements Comparable<HotSpotResult> {
 	private String featureName;
 	private double metricValue;
 	
@@ -52,6 +52,17 @@ public class HotSpotResult {
 					
 		HotSpotResult result = (HotSpotResult)arg0;
 		return result.getFeatureName().equals(this.featureName);
+	}
+	
+	@Override
+	public int compareTo(HotSpotResult arg0) {
+		if(arg0 == null)
+			return 0;
+		
+		if(this.metricValue == arg0.getMetricValue())
+			return arg0.getFeatureName().compareTo(this.featureName) * (-1);
+		
+		return Double.compare(arg0.getMetricValue(), this.metricValue);
 	}
 	
 }
