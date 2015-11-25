@@ -56,6 +56,8 @@ import de.ovgu.featureide.fm.core.IHotSpotResultInterpreter;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.AFeature;
+import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
@@ -204,6 +206,7 @@ public class FeatureHotspotAnalysisPage extends FeatureModelEditorPage {
 					item.setText (1, Double.toString(hsr.getMetricValue()));
 					item.setText (2, c.toString());
 					item.setBackground(c);
+					FeatureColorManager.setColor(model.getFeature(hsr.getFeatureName()), c);
 				}
 				for (int i=0; i < tbl.getColumnCount(); i++) {
 					tbl.getColumn(i).pack();

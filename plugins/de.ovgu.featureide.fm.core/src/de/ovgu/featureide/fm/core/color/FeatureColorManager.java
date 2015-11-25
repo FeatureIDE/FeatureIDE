@@ -41,6 +41,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.swt.graphics.Color;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -77,7 +78,13 @@ public class FeatureColorManager {
 		getCurrentColorScheme(feature).setColor(feature, color);
 		writeColors(getProject(feature), getCurrentColorScheme(feature));
 	}
-
+	
+	
+	public static void setColor(IFeature feature, Color rgb){
+		ColorScheme scheme = getCurrentColorScheme(feature);
+		scheme.setColor(feature, rgb);
+		writeColors(getProject(feature), scheme);
+	}
 	/**
 	 * Checks whether the current scheme is the default scheme without colors.
 	 */
