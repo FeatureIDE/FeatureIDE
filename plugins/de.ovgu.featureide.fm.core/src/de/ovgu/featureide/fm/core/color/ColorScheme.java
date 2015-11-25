@@ -23,6 +23,8 @@ package de.ovgu.featureide.fm.core.color;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.swt.graphics.Color;
+
 import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
@@ -83,6 +85,30 @@ public class ColorScheme {
 	 */
 	public void setColor(IFeature feature, FeatureColor color) {
 		setColor(feature.getName(), color);
+	}
+	
+	public void setColor(IFeature feature, Color color){
+		int r = color.getRed();
+		int g = color.getGreen();
+		int b = color.getBlue();
+		
+		if(r == 255){
+			setColor(feature.getName(),FeatureColor.Red);
+			return;
+		}
+			
+		if(r > 0 && g > 150){
+			setColor(feature.getName(),FeatureColor.Yellow);
+			return;
+		}
+			
+		if(g == 150){
+			setColor(feature.getName(),FeatureColor.Dark_Green);
+			return;
+		}
+			
+			
+			
 	}
 	
 	/**
