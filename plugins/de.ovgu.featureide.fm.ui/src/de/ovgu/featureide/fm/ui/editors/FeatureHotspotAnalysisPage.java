@@ -143,7 +143,7 @@ public class FeatureHotspotAnalysisPage extends FeatureModelEditorPage {
 		gridData.grabExcessHorizontalSpace = false;
 		gridData.verticalAlignment = SWT.CENTER;
 		thresholdSpinner = new Spinner(compositeTop, SWT.HORIZONTAL);
-		thresholdSpinner.setMaximum(80);
+		thresholdSpinner.setMaximum(model.getConstraintCount());
 		thresholdSpinner.setIncrement(1);
 		thresholdSpinner.setSelection(5);
 		thresholdSpinner.setLayoutData(gridData);
