@@ -236,7 +236,6 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	private final IJob configurationChecker = new AStoppableJob(CHECKING_CONFIGURATIONS_FOR_UNUSED_FEATURES) {
 
 		protected boolean work() {
-			setCancelingTimeout(100);
 			final IFolder folder = configFolder;
 			deleteConfigurationMarkers(folder, IResource.DEPTH_ZERO);
 			workMonitor.setMaxAbsoluteWork(7);
@@ -277,11 +276,6 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			if (workMonitor.checkCancel()) {
 				return true;
 			}
-			try {
-				folder.refreshLocal(IResource.DEPTH_ZERO, null);
-			} catch (CoreException e) {
-				LOGGER.logError(e);
-			}
 			workMonitor.worked();
 			return true;
 		}
@@ -297,7 +291,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			for (String feature : features) {
 				message.append(feature);
 				message.append(", ");
-				if (addedFeatures++ >= 25) {
+				if (addedFeatures++ >= 10) {
 					message.append("...");
 					break;
 				}

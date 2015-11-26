@@ -39,13 +39,13 @@ import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.job.WorkMonitor;
 
 /**
- * Creates configurations where false optional features are unused.
+ * Creates configurations for missing configurations.
  * 
  * @author Jens Meinicke
  */
-public class QuickFixFalseOptionalFeatures extends QuickFixMissingConfigurations {
+class QuickFixUnusedFeatures extends QuickFixMissingConfigurations {
 
-	public QuickFixFalseOptionalFeatures(final IMarker marker) {
+	public QuickFixUnusedFeatures(final IMarker marker) {
 		super(marker);
 	}
 
@@ -59,7 +59,7 @@ public class QuickFixFalseOptionalFeatures extends QuickFixMissingConfigurations
 					monitor2.setMonitor(monitor);
 					monitor2.begin("Cover unused features");
 					monitor2.createSubTask("collect unused features");
-					final Collection<String> unusedFeatures = project.getFalseOptionalConfigurationFeatures();
+					final Collection<String> unusedFeatures = project.getUnusedConfigurationFeatures();
 					monitor2.createSubTask("create configurations");
 					monitor2.setMaxAbsoluteWork(unusedFeatures.size());
 					createConfigurations(unusedFeatures, monitor2, false);
@@ -75,7 +75,7 @@ public class QuickFixFalseOptionalFeatures extends QuickFixMissingConfigurations
 		final List<Configuration> confs = new LinkedList<Configuration>();
 		try {
 			Configuration configuration = new Configuration(featureModel, false);
-			List<List<String>> solutions = configuration.coverFeatures(unusedFeatures, monitor, false);
+			List<List<String>> solutions = configuration.coverFeatures(unusedFeatures, monitor, true);
 			for (List<String> solution : solutions) {
 				configuration = new Configuration(featureModel, false);
 				for (String feature : solution) {
@@ -89,6 +89,7 @@ public class QuickFixFalseOptionalFeatures extends QuickFixMissingConfigurations
 					final ConfigurationWriter writer = new ConfigurationWriter(configuration);
 					writer.saveToFile(getConfigurationFile(project.getConfigFolder()));
 				}
+
 			}
 
 		} catch (TimeoutException | CoreException e1) {
