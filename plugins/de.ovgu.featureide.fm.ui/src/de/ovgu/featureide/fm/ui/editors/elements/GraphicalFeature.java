@@ -30,7 +30,6 @@ import org.eclipse.draw2d.geometry.Point;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
 import de.ovgu.featureide.fm.core.base.util.tree.Tree;
-import de.ovgu.featureide.fm.ui.ColorList;
 import de.ovgu.featureide.fm.ui.editors.FeatureConnection;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalElement;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
@@ -47,8 +46,6 @@ public class GraphicalFeature implements IGraphicalFeature {
 	protected final LinkedList<FeatureConnection> sourceConnections = new LinkedList<FeatureConnection>();
 	protected final LinkedList<FeatureConnection> targetConnections = new LinkedList<FeatureConnection>();
 
-	protected ColorList colorList;
-
 	protected boolean constraintSelected;
 	protected IFeature correspondingFeature;
 	protected final IGraphicalFeatureModel graphicalFeatureModel;
@@ -61,14 +58,8 @@ public class GraphicalFeature implements IGraphicalFeature {
 	public GraphicalFeature(IFeature correspondingFeature, IGraphicalFeatureModel graphicalFeatureModel) {
 		this.correspondingFeature = correspondingFeature;
 		this.graphicalFeatureModel = graphicalFeatureModel;
-		colorList = new ColorList(this);
 
 		sourceConnections.add(new FeatureConnection(this));
-	}
-
-	@Override
-	public ColorList getColorList() {
-		return colorList;
 	}
 
 	@Override
@@ -170,7 +161,6 @@ public class GraphicalFeature implements IGraphicalFeature {
 		if (element instanceof GraphicalFeature) {
 			final GraphicalFeature oldFeature = (GraphicalFeature) element;
 
-			colorList = oldFeature.colorList;
 			constraintSelected = oldFeature.constraintSelected;
 			location = oldFeature.location;
 			dimension = oldFeature.dimension;

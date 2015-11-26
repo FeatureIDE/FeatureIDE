@@ -2,56 +2,48 @@
  * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
- * 
+ *
  * FeatureIDE is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * FeatureIDE is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
-
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
-import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
+package de.ovgu.featureide.fm.core.io;
 
 /**
- * Operation to hide/show the feature model legend.
- * 
- * @author Fabian Benduhn
- * @author Marcus Pinnecke
+ * Handler to properly write / read objects.
+ *
+ * @author Sebastian Krieter
  */
-public class LegendHideOperation extends AbstractFeatureModelOperation {
+public abstract class AFormatHandler<T> implements IPersistentHandler {
 
-	private static final String LABEL = "Show/Hide Legend";
+	protected T object;
 
 	/**
-	 * @param label
+	 * Creates a new handler and sets the object to write / read.
+	 *
+	 * @param object the structure to write
 	 */
-	public LegendHideOperation(IFeatureModel featureModel) {
-		super(featureModel, LABEL);
+	public AFormatHandler(T object) {
+		setObject(object);
 	}
 
-	@Override
-	protected FeatureModelEvent internalRedo() {
-		FMPropertyManager.setHideLegend(!FMPropertyManager.isLegendHidden());
-		// TODO _call listeners
-//		featureModel.refreshContextMenu();
-		return null;
+	public T getObject() {
+		return object;
 	}
 
-	@Override
-	protected FeatureModelEvent internalUndo() {
-		return internalRedo();
+	public void setObject(T object) {
+		this.object = object;
 	}
 
 }

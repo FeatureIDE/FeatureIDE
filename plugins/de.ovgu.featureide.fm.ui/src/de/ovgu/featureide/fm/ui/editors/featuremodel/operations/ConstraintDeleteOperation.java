@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE_CONSTRAINT;
+
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
@@ -43,16 +44,16 @@ public class ConstraintDeleteOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	protected void redo() {
+	protected FeatureModelEvent internalRedo() {
 		index = featureModel.getConstraintIndex(constraint);
 		featureModel.removeConstraint(constraint);
-		featureModel.fireEvent(new FeatureModelEvent(constraint, PropertyConstants.CONSTRAINT_DELETE, null, null));
+		return new FeatureModelEvent(featureModel, PropertyConstants.CONSTRAINT_DELETE, constraint, null);
 	}
 
 	@Override
-	protected void undo() {
+	protected FeatureModelEvent internalUndo() {
 		featureModel.addConstraint(constraint, index);
-		featureModel.fireEvent(new FeatureModelEvent(constraint, PropertyConstants.CONSTRAINT_ADD, null, null));
+		return new FeatureModelEvent(featureModel, PropertyConstants.CONSTRAINT_ADD, null, constraint);
 	}
 
 }

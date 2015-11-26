@@ -56,12 +56,12 @@ public class FeatureCreateLayerOperation extends AbstractFeatureModelOperation {
 
 	@Override
 	public IStatus redo(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
-		redo();
+		internalRedo();
 		return Status.OK_STATUS;
 	}
 
 	@Override
-	protected void redo() {
+	protected FeatureModelEvent internalRedo() {
 		int number = 1;
 
 		while (FeatureUtils.getFeatureNames(featureModel).contains(DEFAULT_FEATURE_LAYER_CAPTION + number)) {
@@ -75,12 +75,13 @@ public class FeatureCreateLayerOperation extends AbstractFeatureModelOperation {
 
 		//TODO _interfaces Removed Code
 //		FeatureDiagramLayoutHelper.initializeLayerFeaturePosition(((FeatureDiagramEditor) diagramEditor).getGraphicalFeatureModel(), newFeature, feature);
-		featureModel.fireEvent(new FeatureModelEvent(newFeature, PropertyConstants.FEATURE_ADD, null, null));
+		return new FeatureModelEvent(featureModel, PropertyConstants.FEATURE_ADD, null, newFeature);
 	}
 
 	@Override
-	protected void undo() {
+	protected FeatureModelEvent internalUndo() {
 		newFeature = featureModel.getFeature(newFeature.getName());
 		featureModel.deleteFeature(newFeature);
+		return new FeatureModelEvent(featureModel, PropertyConstants.FEATURE_DELETE, newFeature, null);
 	}
 }

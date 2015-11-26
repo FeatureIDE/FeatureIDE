@@ -33,6 +33,8 @@ import org.eclipse.swt.graphics.Color;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIBasics;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.properties.language.English;
@@ -135,10 +137,9 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 	 * Refreshes registered models.
 	 */
 	public static void updateEditors() {
-		//TODO _interfaces Removed Code
-//		for (IFeatureModel model : featureModels) {
-//			model.getGraphicRepresenation().redrawDiagram();
-//		}
+		for (IFeatureModel model : featureModels) {
+			model.fireEvent(new FeatureModelEvent(model, PropertyConstants.MODEL_DATA_LOADED));
+		}
 	}
 
 	public static void setHideLegend(boolean value) {

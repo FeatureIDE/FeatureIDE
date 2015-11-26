@@ -25,6 +25,8 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.REVERSE_LAYOUT
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 
+import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.core.base.util.tree.TreeOperations;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
@@ -43,10 +45,11 @@ public class ModelReverseOrderOperation extends AbstractGraphicalFeatureModelOpe
 
 	public ModelReverseOrderOperation(IGraphicalFeatureModel featureModel) {
 		super(featureModel, LABEL);
+		setEventId(PropertyConstants.MODEL_DATA_LOADED);
 	}
 
 	@Override
-	protected void redo() {
+	protected FeatureModelEvent internalRedo() {
 		final IGraphicalFeature root = graphicalFeatureModel.getFeatures().getObject();
 		TreeOperations.reverse(root.getTree());
 		if (!graphicalFeatureModel.getLayout().hasFeaturesAutoLayout()) {
@@ -55,6 +58,7 @@ public class ModelReverseOrderOperation extends AbstractGraphicalFeatureModelOpe
 			mid.y += FeatureUIHelper.getSize(root).height / 2;
 			mirrorFeaturePositions(root, mid, FeatureUIHelper.hasVerticalLayout(graphicalFeatureModel));
 		}
+		return null;
 	}
 
 	private void mirrorFeaturePositions(IGraphicalFeature feature, Point mid, boolean vertical) {
@@ -82,8 +86,8 @@ public class ModelReverseOrderOperation extends AbstractGraphicalFeatureModelOpe
 	}
 
 	@Override
-	protected void undo() {
-		redo();
+	protected FeatureModelEvent internalUndo() {
+		return internalRedo();
 	}
 
 }

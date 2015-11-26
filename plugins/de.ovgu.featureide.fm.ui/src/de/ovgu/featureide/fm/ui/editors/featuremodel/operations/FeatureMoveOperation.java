@@ -26,8 +26,8 @@ import org.eclipse.draw2d.geometry.Point;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
 import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 
 /**
@@ -92,37 +92,31 @@ public class FeatureMoveOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	protected void redo() {
+	protected FeatureModelEvent internalRedo() {
 		if (!data.getFeature().getGraphicalModel().getLayout().hasFeaturesAutoLayout()) {
 			newInnerOrder(newPos);
 			setEventId(PropertyConstants.MODEL_DATA_LOADED);
 		} else {
-			try {
-				data.getOldParent().getObject().getStructure().removeChild(data.getFeature().getObject().getStructure());
-				data.getNewParent().getObject().getStructure().addChildAtPosition(data.getNewIndex(), data.getFeature().getObject().getStructure());
-			} catch (Exception e) {
-				FMUIPlugin.getDefault().logError(e);
-			}
+			data.getOldParent().getObject().getStructure().removeChild(data.getFeature().getObject().getStructure());
+			data.getNewParent().getObject().getStructure().addChildAtPosition(data.getNewIndex(), data.getFeature().getObject().getStructure());
 		}
+		return null;
 	}
 
 	@Override
-	protected void undo() {
+	protected FeatureModelEvent internalUndo() {
 		if (!data.getFeature().getGraphicalModel().getLayout().hasFeaturesAutoLayout()) {
 			newInnerOrder(oldPos);
 			setEventId(PropertyConstants.MODEL_DATA_LOADED);
 		} else {
-			try {
-				final IFeatureStructure structure2 = data.getFeature().getObject().getStructure();
-				data.getNewParent().getObject().getStructure().removeChild(structure2);
-				if (data.getOldParent() != null) {
-					final IFeatureStructure structure = data.getOldParent().getObject().getStructure();
-					structure.addChildAtPosition(data.getOldIndex(), structure2);
-				}
-			} catch (Exception e) {
-				FMUIPlugin.getDefault().logError(e);
+			final IFeatureStructure structure2 = data.getFeature().getObject().getStructure();
+			data.getNewParent().getObject().getStructure().removeChild(structure2);
+			if (data.getOldParent() != null) {
+				final IFeatureStructure structure = data.getOldParent().getObject().getStructure();
+				structure.addChildAtPosition(data.getOldIndex(), structure2);
 			}
 		}
+		return null;
 	}
 
 }

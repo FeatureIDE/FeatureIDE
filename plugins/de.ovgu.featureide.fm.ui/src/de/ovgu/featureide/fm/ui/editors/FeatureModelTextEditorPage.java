@@ -150,6 +150,8 @@ public class FeatureModelTextEditorPage extends TextEditor implements IFeatureMo
 		final String newText = getCurrentContent();
 		if (!oldText.equals(newText)) {
 			final IFeatureModel fm = featureModelEditor.featureModel;
+			
+			//TODO _interfaces replace text with DocumentEvent (delta)
 			SourceChangeOperation op = new SourceChangeOperation(fm, featureModelEditor, newText, oldText);
 
 			op.addContext((IUndoContext) fm.getUndoContext());
@@ -158,7 +160,6 @@ public class FeatureModelTextEditorPage extends TextEditor implements IFeatureMo
 			} catch (ExecutionException e) {
 				FMUIPlugin.getDefault().logError(e);
 			}
-			oldText = newText;
 		}
 	}
 

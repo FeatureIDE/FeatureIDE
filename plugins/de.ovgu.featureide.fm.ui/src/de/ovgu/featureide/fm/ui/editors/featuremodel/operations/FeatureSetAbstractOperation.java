@@ -22,8 +22,10 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_ABSTRACT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_CONCRETE;
+
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
 
 /**
  * Operation with functionality to set a Feature abstract/concrete. Enables
@@ -63,12 +65,13 @@ public class FeatureSetAbstractOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	protected void redo() {
+	protected FeatureModelEvent internalRedo() {
 		feature.getStructure().setAbstract(!feature.getStructure().isAbstract());
+		return null;
 	}
 
 	@Override
-	protected void undo() {
-		redo();
+	protected FeatureModelEvent internalUndo() {
+		return internalRedo();
 	}
 }

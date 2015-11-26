@@ -21,7 +21,9 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.SOURCE_CHANGE;
+
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 
 /**
@@ -48,13 +50,15 @@ public class SourceChangeOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	protected void redo() {
+	protected FeatureModelEvent internalRedo() {
 		featureModelEditor.readModel(newText);
+		return null;
 	}
 
 	@Override
-	protected void undo() {
+	protected FeatureModelEvent internalUndo() {
 		featureModelEditor.readModel(oldText);
+		return null;
 	}
 
 }

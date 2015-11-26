@@ -155,6 +155,8 @@ public class FeatureDiagramLayoutHelper {
 	public static FeatureDiagramLayoutManager getLayoutManager(int layoutAlgorithm, IGraphicalFeatureModel featureModel) {
 		switch (layoutAlgorithm) {
 		case 0:
+			FeatureUIHelper.setVerticalLayoutBounds(false, featureModel);
+			featureModel.getLayout().verticalLayout(FeatureUIHelper.hasVerticalLayout(featureModel));
 			return new ManualLayout();
 		case 1:
 			FeatureUIHelper.setVerticalLayoutBounds(false, featureModel);

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2013  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -16,36 +16,23 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
- * See http://featureide.cs.ovgu.de/ for further information.
+ * See http://www.fosd.de/featureide/ for further information.
  */
-package de.ovgu.featureide.fm.ui.editors;
+package de.ovgu.featureide.fm.core.io;
 
 import java.util.List;
 
-import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.util.tree.Tree;
-
 /**
- * Graphical representation of a feature.
+ * Interface for saving and loading data.
  * 
  * @author Sebastian Krieter
  */
-public interface IGraphicalFeature extends IGraphicalElement {
+public interface IPersistentHandler {
 
-	IFeature getObject();
-	
-	Tree<IGraphicalFeature> getTree();
+	List<ModelWarning> read(CharSequence source);
 
-	boolean isConstraintSelected();
+	String write();
 
-	void setConstraintSelected(boolean selection);
-	
-	void addTargetConnection(FeatureConnection connection);
-	
-	List<FeatureConnection> getSourceConnections();
-
-	List<FeatureConnection> getTargetConnections();
-	
-	boolean removeTargetConnection(FeatureConnection connection);
+	String getSuffix();
 
 }

@@ -30,7 +30,7 @@ import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.DeleteAllOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureTreeDeleteOperation;
 
 /**
  * Action to delete a single feature including its sub features
@@ -59,7 +59,7 @@ public class DeleteAllAction extends SingleSelectionAction {
 
 	@Override
 	public void run() {
-		DeleteAllOperation op = new DeleteAllOperation(featureModel, feature);
+		FeatureTreeDeleteOperation op = new FeatureTreeDeleteOperation(featureModel, feature);
 
 		op.addContext((IUndoContext) featureModel.getUndoContext());
 

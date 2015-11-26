@@ -26,7 +26,6 @@ import de.ovgu.featureide.fm.core.IGraphicItem;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.util.tree.Tree;
-import de.ovgu.featureide.fm.ui.ColorschemeTable;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
 
 /**
@@ -36,8 +35,6 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
  */
 public interface IGraphicalFeatureModel extends IGraphicItem {
 
-	ColorschemeTable getColorschemeTable();
-	
 	IFeatureModel getFeatureModel();
 
 	FeatureModelLayout getLayout();

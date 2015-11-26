@@ -73,13 +73,13 @@ public class FeatureCreateCompoundOperation extends AbstractFeatureModelOperatio
 			newCompound.getStructure().setAND(true);
 			newCompound.getStructure().setMultiple(parent.getStructure().isMultiple());
 		}
-		redo();
+		internalRedo();
 		
 		return Status.OK_STATUS;
 	}
 
 	@Override
-	protected void redo() {
+	protected FeatureModelEvent internalRedo() {
 		if (parent != null) {
 			LinkedList<IFeature> newChildren = new LinkedList<IFeature>();
 			for (IFeatureStructure featureStructure : parent.getStructure().getChildren()) {
@@ -104,16 +104,17 @@ public class FeatureCreateCompoundOperation extends AbstractFeatureModelOperatio
 
 		//TODO _interfaces Removed Code
 //		FeatureDiagramLayoutHelper.initializeCompoundFeaturePosition(featureModel, selectedFeatures, newCompound);
-		featureModel.fireEvent(new FeatureModelEvent(newCompound, PropertyConstants.FEATURE_ADD, null, null));
+		return new FeatureModelEvent(featureModel, PropertyConstants.FEATURE_ADD, null, newCompound);
 	}
 
 	@Override
-	protected void undo() {
+	protected FeatureModelEvent internalUndo() {
 		if (parent == null) {
 			featureModel.getStructure().replaceRoot(featureModel.getStructure().getRoot().removeLastChild());
 		} else {
 			featureModel.deleteFeature(featureModel.getFeature(newCompound.getName()));
 		}
+		return new FeatureModelEvent(featureModel, PropertyConstants.FEATURE_DELETE, newCompound, null);
 	}
 
 }

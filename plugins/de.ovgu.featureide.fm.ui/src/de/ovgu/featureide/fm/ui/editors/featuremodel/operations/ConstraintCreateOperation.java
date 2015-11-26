@@ -52,15 +52,15 @@ public class ConstraintCreateOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	protected void redo() {
+	protected FeatureModelEvent internalRedo() {
 		featureModel.addConstraint(constraint);
-		featureModel.fireEvent(new FeatureModelEvent(constraint, PropertyConstants.CONSTRAINT_ADD, null, null));
+		return new FeatureModelEvent(featureModel, PropertyConstants.CONSTRAINT_ADD, null, constraint);
 	}
 
 	@Override
-	protected void undo() {
+	protected FeatureModelEvent internalUndo() {
 		featureModel.removeConstraint(constraint);
-		featureModel.fireEvent(new FeatureModelEvent(constraint, PropertyConstants.CONSTRAINT_DELETE, null, null));
+		return new FeatureModelEvent(featureModel, PropertyConstants.CONSTRAINT_DELETE, constraint, null);
 	}
 
 }

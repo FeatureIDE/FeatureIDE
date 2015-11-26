@@ -21,6 +21,8 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.SET;
+
+import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
 
@@ -41,13 +43,15 @@ public class LayoutSelectionOperation extends AbstractGraphicalFeatureModelOpera
 	}
 
 	@Override
-	protected void redo() {
+	protected FeatureModelEvent internalRedo() {
 		graphicalFeatureModel.getLayout().setLayout(newSelectedLayoutAlgorithm);
+		return null;
 	}
 
 	@Override
-	protected void undo() {
+	protected FeatureModelEvent internalUndo() {
 		graphicalFeatureModel.getLayout().setLayout(oldSelectedLayoutAlgorithm);
+		return null;
 	}
 
 }

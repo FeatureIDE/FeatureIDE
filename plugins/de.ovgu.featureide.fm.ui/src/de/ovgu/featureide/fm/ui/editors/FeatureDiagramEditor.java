@@ -89,6 +89,7 @@ import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.job.AStoppableJob;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.elements.GraphicMap;
+import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeatureModelHandler;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AlternativeAction;
@@ -147,7 +148,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 
 	private FeatureModelEditor featureModelEditor;
 	private ZoomManager zoomManager;
-	
+
 	private IGraphicalFeatureModel graphicalFeatureModel;
 
 	private ScalableFreeformRootEditPart rootEditPart;
@@ -206,7 +207,9 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		super();
 		this.featureModelEditor = featureModelEditor;
 		graphicalFeatureModel = GraphicMap.getInstance().constructModel(getFeatureModel());
-//		graphicalFeatureModel.getFeatureModel().addListener(this);
+		featureModelEditor.fmManager.addHandler(new GraphicalFeatureModelHandler(graphicalFeatureModel));
+		featureModelEditor.fmManager.read();
+		//		graphicalFeatureModel.getFeatureModel().addListener(this);
 
 		createControl(container);
 		initializeGraphicalViewer();
@@ -409,7 +412,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		// only allow coloration if the active profile is not the default profile
 		if (FeatureColorManager.isDefault(getFeatureModel())) {
 			colorSelectedFeatureAction.setEnabled(false);
-		} 
+		}
 		if (mplModel) {
 			menu.add(subMenuLayout);
 			menu.add(subMenuNameType);
@@ -436,7 +439,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			menu.add(reverseOrderAction);
 			menu.add(legendAction);
 			menu.add(new Separator());
-			menu.add(colorSelectedFeatureAction);		
+			menu.add(colorSelectedFeatureAction);
 			menu.add(new Separator());
 		} else if (editConstraintAction.isEnabled() && !connectionSelected) {
 			menu.add(createConstraintAction);
@@ -455,7 +458,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			menu.add(new Separator());
 			menu.add(reverseOrderAction);
 			menu.add(legendAction);
-			
 		}
 		menu.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 		if (featureModelEditor.getFeatureModel().getStructure().hasHidden()) {
@@ -740,14 +742,17 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 
 	public void propertyChange(FeatureModelEvent event) {
 		final String prop = event.getPropertyName();
-		
+		if (event.getSource() instanceof IFeatureModel) {
+			boolean sameSource = featureModelEditor.getFeatureModel() == event.getSource();
+		}
+
 		switch (prop) {
 		case FEATURE_ADD:
 			reload();
 			refresh();
 			featureModelEditor.setPageModified(true);
 
-			final IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature((IFeature) event.getSource());
+			final IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature((IFeature) event.getNewValue());
 
 			final FeatureEditPart part = (FeatureEditPart) getEditPartRegistry().get(graphicalFeature);
 			if (part != null) {
@@ -756,10 +761,13 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 				part.getViewer().reveal(part);
 
 				// open the renaming command
-				DirectEditManager manager = new FeatureLabelEditManager(part, TextCellEditor.class, new FeatureCellEditorLocator(part.getFeatureFigure()),
-						getFeatureModel());
-				manager.show();
+				new FeatureLabelEditManager(part, TextCellEditor.class, new FeatureCellEditorLocator(part.getFeatureFigure()), getFeatureModel()).show();
 			}
+			break;
+		case FEATURE_DELETE:
+			reload();
+			refresh();
+			featureModelEditor.setPageModified(true);
 			break;
 		case STRUCTURE_CHANGED:
 			reload();
@@ -795,47 +803,47 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			page.propertyChange(event);
 		}
 	}
-	
-//	public void newInnerOrder(Point newPos) {
-//	FeatureUIHelper.setLocation(feature, newPos);
-//	if (!data.getFeature().getStructure().isRoot()) {
-//		data.getOldParent().getStructure().removeChild(data.getFeature().getStructure());
-//		LinkedList<IFeature> featureList = new LinkedList<IFeature>(FeatureUtils.convertToFeatureList(data.getOldParent().getStructure().getChildren()));
-//		LinkedList<IFeature> newFeatureList = new LinkedList<IFeature>();
-//		int counter2 = 0;
-//		int counter = 0;
-//
-//		while (data.getOldParent().getStructure().hasChildren()) {
-//			if (counter == counter2) {
-//				if (FeatureUIHelper.hasVerticalLayout(featureModel)) {
-//					if (FeatureUIHelper.getLocation(featureList.get(counter)).y > newPos.y) {
-//						newFeatureList.add(data.getFeature());
-//						counter = Integer.MIN_VALUE;
-//					}
-//				} else {
-//					if (FeatureUIHelper.getLocation(featureList.get(counter)).x > newPos.x) {
-//						newFeatureList.add(data.getFeature());
-//						counter = Integer.MIN_VALUE;
-//					}
-//				}
-//			}
-//
-//			data.getOldParent().getStructure().removeChild(featureList.get(counter2).getStructure());
-//			newFeatureList.add(featureList.get(counter2));
-//			counter2++;
-//			counter++;
-//		}
-//
-//		if (!newFeatureList.contains(data.getFeature())) {
-//			newFeatureList.add(data.getFeature());
-//		}
-//
-//		for (int i = 0; i < counter2 + 1; i++) {
-//			data.getOldParent().getStructure().addChildAtPosition(i, newFeatureList.get(i).getStructure());
-//		}
-//	}
-//
-//}
+
+	//	public void newInnerOrder(Point newPos) {
+	//	FeatureUIHelper.setLocation(feature, newPos);
+	//	if (!data.getFeature().getStructure().isRoot()) {
+	//		data.getOldParent().getStructure().removeChild(data.getFeature().getStructure());
+	//		LinkedList<IFeature> featureList = new LinkedList<IFeature>(FeatureUtils.convertToFeatureList(data.getOldParent().getStructure().getChildren()));
+	//		LinkedList<IFeature> newFeatureList = new LinkedList<IFeature>();
+	//		int counter2 = 0;
+	//		int counter = 0;
+	//
+	//		while (data.getOldParent().getStructure().hasChildren()) {
+	//			if (counter == counter2) {
+	//				if (FeatureUIHelper.hasVerticalLayout(featureModel)) {
+	//					if (FeatureUIHelper.getLocation(featureList.get(counter)).y > newPos.y) {
+	//						newFeatureList.add(data.getFeature());
+	//						counter = Integer.MIN_VALUE;
+	//					}
+	//				} else {
+	//					if (FeatureUIHelper.getLocation(featureList.get(counter)).x > newPos.x) {
+	//						newFeatureList.add(data.getFeature());
+	//						counter = Integer.MIN_VALUE;
+	//					}
+	//				}
+	//			}
+	//
+	//			data.getOldParent().getStructure().removeChild(featureList.get(counter2).getStructure());
+	//			newFeatureList.add(featureList.get(counter2));
+	//			counter2++;
+	//			counter++;
+	//		}
+	//
+	//		if (!newFeatureList.contains(data.getFeature())) {
+	//			newFeatureList.add(data.getFeature());
+	//		}
+	//
+	//		for (int i = 0; i < counter2 + 1; i++) {
+	//			data.getOldParent().getStructure().addChildAtPosition(i, newFeatureList.get(i).getStructure());
+	//		}
+	//	}
+	//
+	//}
 
 	public void setIndex(int index) {
 		this.index = index;

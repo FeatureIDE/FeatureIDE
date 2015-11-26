@@ -55,6 +55,7 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
 import de.ovgu.featureide.fm.core.base.impl.Feature;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -71,12 +72,12 @@ import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePage;
  * @author Fabian Benduhn
  * @author Marcus Pinnecke
  */
-public class DeleteOperation extends AbstractFeatureModelOperation implements GUIDefaults {
+public class ElementDeleteOperation extends AbstractFeatureModelOperation implements GUIDefaults {
 
 	private Object viewer;
 	private Deque<AbstractFeatureModelOperation> operations = new LinkedList<AbstractFeatureModelOperation>();
 
-	public DeleteOperation(Object viewer, IFeatureModel featureModel) {
+	public ElementDeleteOperation(Object viewer, IFeatureModel featureModel) {
 		super(featureModel, DELETE);
 		this.viewer = viewer;
 	}
@@ -259,23 +260,25 @@ public class DeleteOperation extends AbstractFeatureModelOperation implements GU
 	}
 
 	@Override
-	protected void redo() {
+	protected FeatureModelEvent internalRedo() {
 		for (Iterator<AbstractFeatureModelOperation> it = operations.iterator(); it.hasNext();) {
 			AbstractFeatureModelOperation operation = it.next();
 			if (operation.canRedo()) {
 				operation.redo();
 			}
 		}
+		return null;
 	}
 
 	@Override
-	protected void undo() {
+	protected FeatureModelEvent internalUndo() {
 		for (Iterator<AbstractFeatureModelOperation> it = operations.descendingIterator(); it.hasNext();) {
 			AbstractFeatureModelOperation operation = it.next();
 			if (operation.canUndo()) {
 				operation.undo();
 			}
 		}
+		return null;
 	}
 
 }

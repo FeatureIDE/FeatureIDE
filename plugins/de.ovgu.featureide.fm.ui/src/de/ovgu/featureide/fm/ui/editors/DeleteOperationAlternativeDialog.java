@@ -66,7 +66,7 @@ import org.eclipse.swt.widgets.Table;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.DeleteOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ElementDeleteOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureDeleteOperation;
 
 /**
@@ -85,7 +85,7 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 	Table featureTable;
 	Map<IFeature, List<IFeature>> featureMap;
 
-	private DeleteOperation parent;
+	private ElementDeleteOperation parent;
 
 	/**
 	 * Opens a dialog to choose alternative features the given feature should be replaced with.
@@ -94,7 +94,7 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 	 * @param featureMap
 	 * @param deleteOperation
 	 */
-	public DeleteOperationAlternativeDialog(IFeatureModel featureModel, Map<IFeature, List<IFeature>> featureMap, DeleteOperation parent) {
+	public DeleteOperationAlternativeDialog(IFeatureModel featureModel, Map<IFeature, List<IFeature>> featureMap, ElementDeleteOperation parent) {
 		this.featureMap = featureMap;
 		this.featureModel = featureModel;
 		this.parent = parent;

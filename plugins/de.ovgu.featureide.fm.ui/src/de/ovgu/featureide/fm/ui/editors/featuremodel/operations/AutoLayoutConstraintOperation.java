@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.eclipse.draw2d.geometry.Point;
 
+import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
@@ -54,7 +55,7 @@ public class AutoLayoutConstraintOperation extends AbstractGraphicalFeatureModel
 	}
 
 	@Override
-	protected void redo() {
+	protected FeatureModelEvent internalRedo() {
 		List<IGraphicalConstraint> constraintList = graphicalFeatureModel.getConstraints();
 		int minX = Integer.MAX_VALUE;
 		int maxX = 0;
@@ -87,10 +88,11 @@ public class AutoLayoutConstraintOperation extends AbstractGraphicalFeatureModel
 			newPos.y = FeatureUIHelper.getLocation(constraintList.get(i - 1)).y + FMPropertyManager.getConstraintSpace();
 			FeatureUIHelper.setLocation(constraintList.get(i), newPos);
 		}
+		return null;
 	}
 
 	@Override
-	protected void undo() {
+	protected FeatureModelEvent internalUndo() {
 		List<IGraphicalConstraint> constraintList = graphicalFeatureModel.getConstraints();
 		if (!constraintList.isEmpty() && (!(oldPos == null) && !oldPos.isEmpty())) {
 			FeatureUIHelper.setLocation(constraintList.get(0), oldPos.get(counter).get(0));
@@ -98,6 +100,7 @@ public class AutoLayoutConstraintOperation extends AbstractGraphicalFeatureModel
 		for (int i = 1; i < constraintList.size(); i++) {
 			FeatureUIHelper.setLocation(graphicalFeatureModel.getConstraints().get(i), oldPos.get(counter).get(i));
 		}
+		return null;
 	}
 
 }

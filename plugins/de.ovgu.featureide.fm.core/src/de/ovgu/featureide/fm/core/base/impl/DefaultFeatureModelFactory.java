@@ -48,9 +48,6 @@ public class DefaultFeatureModelFactory implements IFeatureModelFactory {
 		return new DefaultFeatureModelFactory();
 	}
 
-	private DefaultFeatureModelFactory() {
-	}
-
 	@Override
 	public String getId() {
 		return ID;
@@ -86,7 +83,7 @@ public class DefaultFeatureModelFactory implements IFeatureModelFactory {
 		}
 		return reader.getWarnings();
 	}
-	
+
 	@Override
 	public List<ModelWarning> loadFeatureModel(IFeatureModel featureModel, String content) {
 		AbstractFeatureModelReader reader = ModelIOFactory.getModelReader(featureModel, ModelIOFactory.TYPE_XML);

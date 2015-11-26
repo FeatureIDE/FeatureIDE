@@ -27,7 +27,6 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
 import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.core.base.util.tree.Tree;
-import de.ovgu.featureide.fm.ui.ColorschemeTable;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -37,41 +36,32 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
  * Graphical representation of an {@link IFeatureModel} instance.
  * 
  * @author Sebastian Krieter
- * @author Marcus Pinnecke 
+ * @author Marcus Pinnecke
  * 
  */
 public class GraphicalFeatureModel implements IGraphicalFeatureModel, PropertyConstants {
 
 	protected final IFeatureModel correspondingFeatureModel;
-	
-	protected final ColorschemeTable colorschemeTable;
+
 	protected final FeatureModelLayout layout;
 
 	protected Tree<IGraphicalFeature> featureTree = null;
 	protected List<IGraphicalConstraint> constraintList = null;
 
-
 	public GraphicalFeatureModel(IFeatureModel correspondingFeatureModel) {
 		this.correspondingFeatureModel = correspondingFeatureModel;
 		layout = new FeatureModelLayout();
-		colorschemeTable = new ColorschemeTable(this);
 	}
-	
+
 	public GraphicalFeatureModel(GraphicalFeatureModel oldModel) {
 		this.correspondingFeatureModel = oldModel.correspondingFeatureModel;
-		
-		colorschemeTable = oldModel.colorschemeTable;
+
 		constraintList = oldModel.constraintList;
 		layout = oldModel.layout;
 	}
 
 	protected void fireEvent(final String action) {
 		correspondingFeatureModel.fireEvent(new FeatureModelEvent(this, action, Boolean.FALSE, Boolean.TRUE));
-	}
-
-	@Override
-	public ColorschemeTable getColorschemeTable() {
-		return colorschemeTable;
 	}
 
 	@Override
@@ -134,7 +124,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel, PropertyCo
 		}
 		return null;
 	}
-	
+
 	@Override
 	public String toString() {
 		if (featureTree != null) {

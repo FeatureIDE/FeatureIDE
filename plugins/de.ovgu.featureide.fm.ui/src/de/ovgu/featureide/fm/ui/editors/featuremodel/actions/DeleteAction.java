@@ -42,7 +42,7 @@ import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.DeleteOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ElementDeleteOperation;
 
 /**
  * Deletes the selected features and moves their unselected children upwards.
@@ -82,7 +82,7 @@ public class DeleteAction extends Action {
 
 	@Override
 	public void run() {
-		DeleteOperation op = new DeleteOperation(viewer, featureModel);
+		ElementDeleteOperation op = new ElementDeleteOperation(viewer, featureModel);
 		op.addContext((IUndoContext) featureModel.getUndoContext());
 
 		try {

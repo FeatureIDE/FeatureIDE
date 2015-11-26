@@ -22,8 +22,10 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_MANDATORY;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_OPTIONAL;
+
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
 
 /**
  * Operation with functionality to set a Feature mandatory/concrete. Enables
@@ -57,13 +59,14 @@ public class FeatureSetMandatoryOperation extends AbstractFeatureModelOperation 
 	}
 
 	@Override
-	protected void redo() {
+	protected FeatureModelEvent internalRedo() {
 		feature.getStructure().setMandatory(!feature.getStructure().isMandatory());
+		return null;
 	}
 
 	@Override
-	protected void undo() {
-		redo();
+	protected FeatureModelEvent internalUndo() {
+		return internalRedo();
 	}
 
 }

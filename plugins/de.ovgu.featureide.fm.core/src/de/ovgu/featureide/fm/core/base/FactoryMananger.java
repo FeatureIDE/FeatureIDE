@@ -18,40 +18,26 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
+package de.ovgu.featureide.fm.core.base;
 
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
-import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
+import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
 
 /**
- * Operation to hide/show the feature model legend.
+ * TODO description
  * 
- * @author Fabian Benduhn
- * @author Marcus Pinnecke
+ * @author Sebastian Krieter
  */
-public class LegendHideOperation extends AbstractFeatureModelOperation {
+public final class FactoryMananger {
 
-	private static final String LABEL = "Show/Hide Legend";
-
-	/**
-	 * @param label
-	 */
-	public LegendHideOperation(IFeatureModel featureModel) {
-		super(featureModel, LABEL);
+	private FactoryMananger() {
+	}
+	
+	public static IFeatureModelFactory getFactory(String id) {
+		return new DefaultFeatureModelFactory();
 	}
 
-	@Override
-	protected FeatureModelEvent internalRedo() {
-		FMPropertyManager.setHideLegend(!FMPropertyManager.isLegendHidden());
-		// TODO _call listeners
-//		featureModel.refreshContextMenu();
-		return null;
-	}
-
-	@Override
-	protected FeatureModelEvent internalUndo() {
-		return internalRedo();
+	public static IFeatureModelFactory getFactory() {
+		return getFactory(null);
 	}
 
 }

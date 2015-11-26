@@ -26,14 +26,18 @@ package de.ovgu.featureide.fm.core.base.event;
  * @author Sebastian Krieter
  */
 public class FeatureModelEvent {
-	
+
 	private final Object source;
 	private final Object editor;
 	private final boolean persistent;
 	private final String propertyName;
 	private final Object oldValue;
 	private final Object newValue;
-	
+
+	public FeatureModelEvent(Object source, String propertyName) {
+		this(source, null, false, propertyName, null, null);
+	}
+
 	public FeatureModelEvent(Object source, String propertyName, Object oldValue, Object newValue) {
 		this(source, null, false, propertyName, oldValue, newValue);
 	}
@@ -70,5 +74,5 @@ public class FeatureModelEvent {
 	public Object getNewValue() {
 		return newValue;
 	}
-	
+
 }

@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
 import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
@@ -57,24 +58,43 @@ public abstract class AbstractFeatureModelOperation extends AbstractOperation {
 
 	@Override
 	public IStatus redo(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
-		redo();
-		fireEvent();
+		try {
+			fireEvent(internalRedo());
+		} catch (Exception e) {
+			FMCorePlugin.getDefault().logError(e);
+			throw new ExecutionException(e.getMessage());
+		}
 		return Status.OK_STATUS;
 	}
 
-	protected abstract void redo();
+	protected abstract FeatureModelEvent internalRedo();
+
+	public void redo() {
+		internalRedo();
+	}
 
 	@Override
 	public IStatus undo(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
-		undo();
-		fireEvent();
+		try {
+			fireEvent(internalUndo());
+		} catch (Exception e) {
+			FMCorePlugin.getDefault().logError(e);
+			throw new ExecutionException(e.getMessage());
+		}
 		return Status.OK_STATUS;
 	}
 
-	protected abstract void undo();
+	protected abstract FeatureModelEvent internalUndo();
 
-	private void fireEvent() {
-		featureModel.fireEvent(new FeatureModelEvent(featureModel, editor, false, eventId, null, null));
+	public void undo() {
+		internalUndo();
+	}
+
+	private void fireEvent(FeatureModelEvent event) {
+		if (event == null) {
+			event = new FeatureModelEvent(featureModel, editor, false, eventId, null, null);
+		}
+		featureModel.fireEvent(event);
 	}
 
 	protected final String getEventId() {
