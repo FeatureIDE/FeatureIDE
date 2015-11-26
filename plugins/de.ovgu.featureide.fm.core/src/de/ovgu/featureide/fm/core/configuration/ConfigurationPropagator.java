@@ -352,7 +352,7 @@ public class ConfigurationPropagator {
 			}
 		}
 		for (SelectableFeature selectableFeature : featureList) {
-			selectableFeature.setRecommended(Selection.UNSELECTED);
+			selectableFeature.setRecommended(Selection.UNDEFINED);
 		}
 
 		if (workMonitor.checkCancel()) {
@@ -402,8 +402,8 @@ public class ConfigurationPropagator {
 							selectableFeature.setRecommended(Selection.SELECTED);
 						}
 
-						workMonitor.invoke(selectableFeature);
 					}
+					workMonitor.invoke(selectableFeature);
 					c++;
 				}
 			}

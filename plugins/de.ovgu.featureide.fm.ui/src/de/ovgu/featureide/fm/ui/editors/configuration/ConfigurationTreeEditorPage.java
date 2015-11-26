@@ -97,6 +97,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	protected IConfigurationEditor configurationEditor = null;
 
 	protected boolean dirty = false;
+	protected boolean autoExpand = true;
 
 	protected Tree tree;
 
@@ -128,7 +129,8 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
-		refreshPage();
+		//TODO
+//		refreshPage();
 	}
 
 	protected final void refreshPage() {
@@ -266,6 +268,23 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		compositeBottom.setLayoutData(gridData);
 
 		createUITree(compositeBottom);
+		
+		tree.addListener(SWT.PaintItem, new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				if (event.item instanceof TreeItem) {
+					TreeItem item = (TreeItem) event.item;
+					if (item.getData() instanceof SelectableFeature) {
+						SelectableFeature selectableFeature = (SelectableFeature) item.getData();
+						Feature feature = selectableFeature.getFeature();
+						FeatureColor color = FeatureColorManager.getColor(feature);
+						if (color != FeatureColor.NO_COLOR) {
+							item.setBackground(new Color(null, ColorPalette.getRGB(color.getValue(), 0.5f)));
+						}
+					}
+				}
+			}
+		});
 	}
 
 	protected final HashMap<SelectableFeature, TreeItem> itemMap = new HashMap<SelectableFeature, TreeItem>();
@@ -384,6 +403,8 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 				computeTree(false);
 				//				updateInfoLabel();
 			} else {
+				item.setForeground(null);
+				item.setFont(treeItemStandardFont);
 				refreshItem(item, feature);
 				if (configurationEditor.getConfiguration().canBeValid()) {
 					invalidFeatures.clear();
@@ -400,24 +421,14 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		if (errorMessage(tree)) {
 			final Configuration configuration = configurationEditor.getConfiguration();
 			tree.removeAll();
-			tree.addListener(SWT.PaintItem, new Listener() {
 
-				@Override
-				public void handleEvent(Event event) {
-					if (event.item instanceof TreeItem) {
-						TreeItem item = (TreeItem) event.item;
-						if (item.getData() instanceof SelectableFeature) {
-							SelectableFeature selectableFeature = (SelectableFeature) item.getData();
-							Feature feature = selectableFeature.getFeature();
-							FeatureColor color = FeatureColorManager.getColor(feature);
-							if (color != FeatureColor.NO_COLOR) {
-								item.setBackground(new Color(null, ColorPalette.getRGB(color.getValue(), 0.5f)));
-							}
-						}
-					}
-				}
-			});
 			final TreeItem root = new TreeItem(tree, 0);
+			if (autoExpand) {
+				root.setExpanded(true);
+			}
+
+			root.setFont(treeItemStandardFont);
+			root.setForeground(null);
 
 			root.setText(configuration.getRoot().getName());
 			root.setData(configuration.getRoot());
@@ -431,6 +442,33 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 					return null;
 				}
 			});
+		}
+	}
+
+	private void expand(Display display) {
+		if (autoExpand) {
+			display.asyncExec(new Runnable() {
+				@Override
+				public void run() {
+					final TreeItem root = tree.getItem(0);
+					if (root != null) {
+						root.setExpanded(true);
+						expand(root);
+					}
+				}
+			});
+		}
+	}
+
+	private void expand(TreeItem root) {
+		TreeItem[] items = root.getItems();
+		for (TreeItem treeItem : items) {
+			if (treeItem.getGrayed() || treeItem.getChecked()) {
+				treeItem.setExpanded(true);
+				expand(treeItem);
+			} else {
+				treeItem.setExpanded(false);
+			}
 		}
 	}
 
@@ -482,21 +520,19 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 					currentDisplay.asyncExec(new Runnable() {
 						@Override
 						public void run() {
-							if (feature.getAutomatic() == Selection.UNDEFINED) {
-								switch (feature.getRecommended()) {
-								case SELECTED:
-									item.setFont(treeItemSpecialFont);
-									item.setForeground(green);
-									break;
-								case UNSELECTED:
-									item.setFont(treeItemSpecialFont);
-									item.setForeground(blue);
-									break;
-								case UNDEFINED:
-									item.setFont(treeItemStandardFont);
-									item.setForeground(null);
-									break;
-								}
+							switch (feature.getRecommended()) {
+							case SELECTED:
+								item.setFont(treeItemSpecialFont);
+								item.setForeground(green);
+								break;
+							case UNSELECTED:
+								item.setFont(treeItemSpecialFont);
+								item.setForeground(blue);
+								break;
+							case UNDEFINED:
+								item.setFont(treeItemStandardFont);
+								item.setForeground(null);
+								break;
 							}
 						}
 					});
@@ -554,11 +590,11 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 		final IConfigJob<?> updateJob = computeFeatures(redundantManual, currentDisplay);
 		updateJob.addJobFinishedListener(new JobFinishListener() {
-
 			@Override
 			public void jobFinished(IJob finishedJob, boolean success) {
 				if (success) {
 					updateInfoLabel(currentDisplay);
+					expand(currentDisplay);
 					configurationEditor.getConfigJobManager().startJob(computeColoring(currentDisplay));
 				}
 			}
