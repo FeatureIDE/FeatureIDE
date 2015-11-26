@@ -32,6 +32,7 @@ import org.prop4j.Node;
 import org.prop4j.NodeReader;
 
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirectiveCommand;
 import de.ovgu.featureide.core.fstmodel.preprocessor.PPModelBuilder;
@@ -58,14 +59,23 @@ public class MungeModelBuilder extends PPModelBuilder {
 		}
 	}
 
-	private ProjectSignatures signatures = MungeSignatureBuilder.build(featureProject);
-
+	private ProjectSignatures signatures; //= MungeSignatureBuilder.build(featureProject);
+	private MungePreprocessor mungePreprocessor;
+	
+	
 	public MungeModelBuilder(IFeatureProject featureProject) {
 		super(featureProject);
 		
-		signatures = MungeSignatureBuilder.build(featureProject);
-		signatures.sort(new SignatureComparator());
-		model.setProjectSignatures(signatures);
+		final IComposerExtensionClass composer = featureProject.getComposer();
+
+		if (MungePreprocessor.COMPOSER_ID.equals(composer.getId())) {
+			mungePreprocessor = (MungePreprocessor) composer;
+			if(mungePreprocessor.getCreateSignature()){
+				signatures = MungeSignatureBuilder.build(featureProject);
+				signatures.sort(new SignatureComparator());
+				model.setProjectSignatures(signatures);		
+			}
+		}
 	}
 
 	@Override
@@ -129,23 +139,34 @@ public class MungeModelBuilder extends PPModelBuilder {
 		} else {
 			fileName = tempFileName;
 		}
-		final SignatureIterator sigIt = signatures.iterator();
-		sigIt.addFilter(new IFilter<AbstractSignature>() {
-			@Override
-			public boolean isValid(AbstractSignature object) {
-				String sigName = object.getFullName();
-				if (sigName.startsWith(".")) {
-					sigName = sigName.substring(1);
-				}
-				return sigName.replace('.', '/').startsWith(fileName);
+		
+		SignatureIterator sigIt = null;
+		ArrayList<Integer> sigLineNumber = null;
+		if(mungePreprocessor.getCreateSignature()){
+			if(signatures == null){
+				signatures = MungeSignatureBuilder.build(featureProject);
+				signatures.sort(new SignatureComparator());
+				model.setProjectSignatures(signatures);		
 			}
-			
-		});
-		ArrayList<Integer> sigLineNumber = new ArrayList<>();
-		for (;sigIt.hasNext();) {
-			sigLineNumber.add(sigIt.next().getFirstFeatureData().getStartLineNumber());
+			sigIt = signatures.iterator();
+			sigIt.addFilter(new IFilter<AbstractSignature>() {
+				@Override
+				public boolean isValid(AbstractSignature object) {
+					String sigName = object.getFullName();
+					if (sigName.startsWith(".")) {
+						sigName = sigName.substring(1);
+					}
+					return sigName.replace('.', '/').startsWith(fileName);
+				}
+				
+			});
+			sigLineNumber = new ArrayList<>();
+			for (;sigIt.hasNext();) {
+				sigLineNumber.add(sigIt.next().getFirstFeatureData().getStartLineNumber());
+			}
+			sigIt.reset();
 		}
-		sigIt.reset();
+		
 		curSignatureIndex = 0;
 		final Iterator<String> linesIt = lines.iterator();
 		
@@ -184,10 +205,14 @@ public class MungeModelBuilder extends PPModelBuilder {
 							command = (directivesStack.peek().getCommand() == FSTDirectiveCommand.IF)
 									? FSTDirectiveCommand.ELSE
 									: FSTDirectiveCommand.ELSE_NOT;
-							updateSignatures(directivesStack, lineCount, sigIt, sigLineNumber);
+							if(mungePreprocessor.getCreateSignature()){
+								updateSignatures(directivesStack, lineCount, sigIt, sigLineNumber);
+							}
 							directivesStack.pop();
 						} else if (singleElement.equals("end")) {
-							updateSignatures(directivesStack, lineCount, sigIt, sigLineNumber);
+							if(mungePreprocessor.getCreateSignature()){
+								updateSignatures(directivesStack, lineCount, sigIt, sigLineNumber);
+							}
 							directivesStack.pop().setEndLine(lineCount, m.end(0)+MungePreprocessor.COMMENT_END.length());
 							continue;
 						} else {

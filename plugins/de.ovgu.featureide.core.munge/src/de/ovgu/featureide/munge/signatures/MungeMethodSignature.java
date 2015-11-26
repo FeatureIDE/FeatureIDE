@@ -38,7 +38,6 @@ import de.ovgu.featureide.core.signature.base.AbstractMethodSignature;
  */
 public class MungeMethodSignature extends AbstractMethodSignature {
 
-//	protected Type t;
 	protected List<SingleVariableDeclaration> p = new LinkedList<>();
 	
 
