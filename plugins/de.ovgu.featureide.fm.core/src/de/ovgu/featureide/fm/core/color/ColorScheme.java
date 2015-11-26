@@ -92,7 +92,7 @@ public class ColorScheme {
 		int g = color.getGreen();
 		int b = color.getBlue();
 		
-		if(r == 255){
+		if(r == 255 && g == 0){
 			setColor(feature.getName(),FeatureColor.Red);
 			return;
 		}
