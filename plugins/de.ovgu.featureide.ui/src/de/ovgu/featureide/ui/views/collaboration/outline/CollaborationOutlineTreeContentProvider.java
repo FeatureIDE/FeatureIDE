@@ -224,21 +224,21 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 		return filter(obj);
 	}
 
-	private final Set<IFilter> filters = new HashSet<>();
+	private final Set<ICollaborationOutlineFilter> filters = new HashSet<>();
 
 	//add filter to filter set
-	public void addFilter(IFilter filter) {
+	public void addFilter(ICollaborationOutlineFilter filter) {
 		filters.add(filter);
 	}
 
 	//remove filter from filter set
-	public void removeFilter(IFilter filter) {
+	public void removeFilter(ICollaborationOutlineFilter filter) {
 		filters.remove(filter);
 	}
 
 	//apply all filters from filter set
 	private Object[] filter(Object[] obj) {
-		for (IFilter filter : filters) {
+		for (ICollaborationOutlineFilter filter : filters) {
 			obj = filter.filter(obj);
 		}
 		return obj;

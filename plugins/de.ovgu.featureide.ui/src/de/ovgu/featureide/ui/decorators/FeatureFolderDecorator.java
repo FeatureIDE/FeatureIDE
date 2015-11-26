@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.ui.decorators;
 
+import java.net.URL;
 import java.util.LinkedList;
 
 import org.eclipse.core.resources.IFolder;
@@ -31,46 +32,55 @@ import org.eclipse.jface.viewers.LabelProviderChangedEvent;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.listeners.IFeatureFolderListener;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
- * TODO description / is this class used?
- * 
+ * Adds the delete icon to feature folder if the folder corresponds to an abstract feature.
  */
 public class FeatureFolderDecorator implements ILightweightLabelDecorator, IFeatureFolderListener {
-	
-	private static final ImageDescriptor OVERLAY = UIPlugin.getDefault().getImageDescriptor("deleted.gif");
+
+	private static final ImageDescriptor OVERLAY;
+
+	static {
+		URL url = UIPlugin.getDefault().getBundle().getEntry("/icons/deleted.gif");
+		OVERLAY = ImageDescriptor.createFromURL(url);
+	}
 
 	private final LinkedList<ILabelProviderListener> listenerList = new LinkedList<ILabelProviderListener>();
-	
+
 	public FeatureFolderDecorator() {
-		de.ovgu.featureide.core.CorePlugin.getDefault().addFeatureFolderListener(this);
+		CorePlugin.getDefault().addFeatureFolderListener(this);
 	}
-	
+
 	public void dispose() {
-		de.ovgu.featureide.core.CorePlugin.getDefault().removeFeatureFolderListener(this);
+		CorePlugin.getDefault().removeFeatureFolderListener(this);
 	}
 
 	public void decorate(Object element, IDecoration decoration) {
-		IFolder folder = (IFolder) element;
+		final IFolder folder = (IFolder) element;
 
 		//decorate only files in our projects
-		IFeatureProject featureProject = CorePlugin.getFeatureProject(folder);
-		if (featureProject == null || featureProject.getSourceFolder() == null || 
-				!featureProject.getSourceFolder().equals(folder.getParent())) {
+		final IFeatureProject featureProject = CorePlugin.getFeatureProject(folder);
+		if (featureProject == null) {
 			return;
 		}
-		
-		//handle only not-in-use folders
-		final Feature feature = featureProject.getFeatureModel().getFeature(folder.getName());
-		if (feature == null || feature.isConcrete()) {
+		final IComposerExtensionClass composer = featureProject.getComposer();
+		if (composer == null || !composer.hasFeatureFolder()) {
+			return;
+		}
+		if (!featureProject.getSourceFolder().equals(folder.getParent())) {
 			return;
 		}
 
-		//decorate non-empty not-in-use folders
-		decoration.addOverlay(OVERLAY, IDecoration.TOP_LEFT);
+		//handle only not-in-use folders
+		final Feature feature = featureProject.getFeatureModel().getFeature(folder.getName());
+		if (feature == null || feature.isAbstract()) {
+			//decorate not-in-use folders
+			decoration.addOverlay(OVERLAY, IDecoration.TOP_LEFT);
+		}
 	}
 
 	public void addListener(ILabelProviderListener listener) {
@@ -85,10 +95,10 @@ public class FeatureFolderDecorator implements ILightweightLabelDecorator, IFeat
 	public boolean isLabelProperty(Object element, String property) {
 		return false;
 	}
-	
+
 	public void featureFolderChanged(IFolder folder) {
 		LabelProviderChangedEvent event = new LabelProviderChangedEvent(this, folder);
-		for (ILabelProviderListener listener : listenerList) 
+		for (ILabelProviderListener listener : listenerList)
 			listener.labelProviderChanged(event);
 	}
 

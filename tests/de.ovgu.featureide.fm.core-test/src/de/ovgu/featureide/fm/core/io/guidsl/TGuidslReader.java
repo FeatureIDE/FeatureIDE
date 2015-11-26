@@ -30,7 +30,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
 /**
- * TODO description
+ * Test class of the {@link GuidslReader}.
  *  
  * @author Fabian Benduhn
  */

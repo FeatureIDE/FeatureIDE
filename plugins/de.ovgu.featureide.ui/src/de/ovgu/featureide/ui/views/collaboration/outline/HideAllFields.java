@@ -27,12 +27,12 @@ import de.ovgu.featureide.core.fstmodel.RoleElement;
 
 /**
  * 
+ * Filter to hide fields in the collaboration outline.
+ * 
  * @author Dominic Labsch	
  * @author Daniel Püsche
  */
-
-
-public class HideAllFields implements IFilter {
+public class HideAllFields implements ICollaborationOutlineFilter {
 
 
 	@Override

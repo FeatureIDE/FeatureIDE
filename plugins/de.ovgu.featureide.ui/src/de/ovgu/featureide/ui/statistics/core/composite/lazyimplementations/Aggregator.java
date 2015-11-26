@@ -128,8 +128,6 @@ public class Aggregator {
 				this.class_to_directives.put(role.getFSTClass().getName(), result);
 			}
 		}
-		int i = 0;
-		System.out.println(i);
 	}
 	
 	public int getDirectiveCount(){

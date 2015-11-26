@@ -28,7 +28,8 @@ import org.eclipse.jface.action.Action;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
 /**
- * TODO description
+ * Action to specify feature model analysis.<br>
+ * Enables / disables checks for redundant constraints.
  * 
  * @author Jens Meinicke
  */
