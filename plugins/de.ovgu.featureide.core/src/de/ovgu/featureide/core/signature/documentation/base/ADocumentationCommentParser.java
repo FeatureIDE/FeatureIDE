@@ -34,7 +34,7 @@ import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.core.signature.documentation.base.SignatureCommentPair.Comment;
 
 /**
- * Abstract merger for modul-comment.
+ * Abstract merger for module-comment.
  * 
  * @author Sebastian Krieter
  */

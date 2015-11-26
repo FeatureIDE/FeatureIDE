@@ -57,7 +57,7 @@ import de.ovgu.featureide.core.signature.base.FeatureDataConstructor;
 import de.ovgu.featureide.core.signature.base.PreprocessorFeatureData;
 
 /**
- * TODO description
+ * Collects all signatures in a Munge project.
  * 
  * @author Sebastian Krieter
  */

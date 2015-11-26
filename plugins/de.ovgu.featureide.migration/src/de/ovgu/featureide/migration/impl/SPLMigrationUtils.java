@@ -49,6 +49,7 @@ import org.eclipse.core.runtime.Path;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
+import de.ovgu.featureide.ui.migration.plugin.SPLMigrationPlugin;
 
 /**
  * This class implements methods that might be useful in Migrating a Set of
@@ -217,8 +218,7 @@ public class SPLMigrationUtils
 			fmWriter.writeToFile(featureModelFile);
 		} catch (CoreException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			SPLMigrationPlugin.getDefault().logError(e);
 		}
 	}
 

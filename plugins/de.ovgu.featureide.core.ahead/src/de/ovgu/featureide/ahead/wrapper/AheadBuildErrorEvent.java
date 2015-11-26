@@ -193,15 +193,7 @@ public class AheadBuildErrorEvent {
 		}
 		return line;
 	}
-	
-	/**
-	 * TODO description/rename
-	 * @param composedJakLine 
-	 * @param jakContent 
-	 * @return
-	 * @throws IOException 
-	 * @throws CoreException 
-	 */
+
 	public int setSourceLine(int composedJakLine, int line, String jakContent) {
 		int jakLine = composedJakLine - line + 1;
 		try {

@@ -21,7 +21,7 @@
 package de.ovgu.featureide.core.builder;
 
 /**
- * TODO description
+ * Tagging interface. Is used for dynamic casting in {@link IComposerExtensionBase}, similar to Eclipse' {@code IAdaptable}.
  * 
  * @author Sebastian Krieter
  */

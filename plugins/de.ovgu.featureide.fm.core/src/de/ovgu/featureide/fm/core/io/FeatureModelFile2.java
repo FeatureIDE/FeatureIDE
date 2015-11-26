@@ -29,7 +29,7 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.FeatureModel;
 
 /**
- * TODO description
+ * Ensures that the same {@code FeatureModel} instance is used when loading a model file.
  * 
  * @author Sebastian Krieter
  */

@@ -35,7 +35,7 @@ import de.ovgu.featureide.fm.core.job.AStoppableJob;
 import de.ovgu.featureide.fm.core.job.IStoppableJob;
 
 /**
- * TODO description
+ * Constructs a separate {@link IConfigJob} for every long running functionality of a {@code ConfigurationPropagator}.
  * 
  * @author Sebastian Krieter
  */
