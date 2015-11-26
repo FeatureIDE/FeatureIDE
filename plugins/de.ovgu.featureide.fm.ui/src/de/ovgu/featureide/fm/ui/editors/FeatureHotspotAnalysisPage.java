@@ -29,34 +29,28 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.Stack;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.HotSpotResult;
 import de.ovgu.featureide.fm.core.IHotSpotAnalyzer;
 import de.ovgu.featureide.fm.core.IHotSpotResultInterpreter;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.AFeature;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
@@ -173,7 +167,6 @@ public class FeatureHotspotAnalysisPage extends FeatureModelEditorPage {
 		spacerLabel.setText("");
 		spacerLabel.setLayoutData(gridData);
 		
-		
 		// 2. sub composite
 		gridData = new GridData();
 		gridData.horizontalAlignment = SWT.FILL;
@@ -181,6 +174,7 @@ public class FeatureHotspotAnalysisPage extends FeatureModelEditorPage {
 		gridData.grabExcessHorizontalSpace = gridData.grabExcessVerticalSpace = true;
 		final ScrolledComposite compositeBottom = new ScrolledComposite(parent, SWT.BORDER);
 		final Table tbl = createTableBaseLayout(compositeBottom);
+		tbl.setVisible(false);
 		
 		compositeBottom.setContent(tbl);
 		compositeBottom.setExpandHorizontal(true);
@@ -196,8 +190,9 @@ public class FeatureHotspotAnalysisPage extends FeatureModelEditorPage {
 				Collections.sort(sortedResult);
 				
 				IHotSpotResultInterpreter<Color> interpreter = new ColorMetricHotSpotInterpreter(Integer.valueOf(thresholdSpinner.getText()).intValue());
-
-				tbl.clearAll();
+				
+				tbl.setVisible(false);
+				tbl.removeAll();
 				
 				for(HotSpotResult hsr : sortedResult){
 					Color c = interpreter.interpret(hsr);
@@ -211,6 +206,7 @@ public class FeatureHotspotAnalysisPage extends FeatureModelEditorPage {
 				for (int i=0; i < tbl.getColumnCount(); i++) {
 					tbl.getColumn(i).pack();
 				}
+				tbl.setVisible(true);
 				tbl.pack();
 			}
 			
