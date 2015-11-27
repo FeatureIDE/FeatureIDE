@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -38,9 +37,10 @@ import org.junit.runners.Parameterized.Parameters;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
+import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
-
 
 /**
  * Creates configurations where false optional features are unused.
@@ -49,30 +49,26 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
  */
 @RunWith(Parameterized.class)
 public class QuickFixFalseOptionalFeaturesTest {
-	
+
 	QuickFixFalseOptionalFeatures quickFix = new QuickFixFalseOptionalFeatures(null);
-	
-	protected static File MODEL_FILE_FOLDER = new
-			 File("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.ui-test/src/models/");
+
+	protected static File MODEL_FILE_FOLDER = new File("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.ui-test/src/models/");
 
 	protected String failureMessage;
 
 	private final FeatureModel fm;
 
-	public QuickFixFalseOptionalFeaturesTest(FeatureModel fm, String s)
-			throws UnsupportedModelException {
+	public QuickFixFalseOptionalFeaturesTest(FeatureModel fm, String s) throws UnsupportedModelException {
 		this.fm = fm;
 		this.failureMessage = "(" + s + ")";
 
 	}
 
 	@Parameters
-	public static Collection<Object[]> getModels()
-			throws FileNotFoundException, UnsupportedModelException {
+	public static Collection<Object[]> getModels() throws FileNotFoundException, UnsupportedModelException {
 		//first tries the location on build server, if this fails tries to use local location
-		if (!MODEL_FILE_FOLDER.canRead()){
-			MODEL_FILE_FOLDER = new File(ClassLoader.getSystemResource(
-			"models").getPath());
+		if (!MODEL_FILE_FOLDER.canRead()) {
+			MODEL_FILE_FOLDER = new File(ClassLoader.getSystemResource("models").getPath());
 		}
 		Collection<Object[]> params = new ArrayList<Object[]>();
 		for (final File f : MODEL_FILE_FOLDER.listFiles(getFileFilter(".xml"))) {
@@ -104,27 +100,31 @@ public class QuickFixFalseOptionalFeaturesTest {
 		};
 		return filter;
 	}
-	
+
 	@Test(timeout = 20000)
 	public void createConfigurationsTest() {
 		final Collection<Feature> concrete = fm.getConcreteFeatures();
 		final Collection<Feature> core = fm.getAnalyser().getCoreFeatures();
+		final Collection<Feature> dead = fm.getAnalyser().getDeadFeatures();
 		final Collection<String> falseOptionalFeatures = new LinkedList<String>();
-		
+
 		for (Feature feature : concrete) {
-			if (!core.contains(feature)) {
+			if (!core.contains(feature) && !dead.contains(feature)) {
 				falseOptionalFeatures.add(feature.getName());
 			}
 		}
-		
+
 		final Collection<String> falseOptionalFeaturesTest = new ArrayList<String>(falseOptionalFeatures);
-		final Collection<Configuration> confs = quickFix.createConfigurations(falseOptionalFeatures, fm, new NullProgressMonitor());
+		final Collection<Configuration> confs = quickFix.createConfigurations(falseOptionalFeatures, fm);
+
 		for (final Configuration conf : confs) {
-			for (final Feature feature : conf.getUnSelectedFeatures()) {
-				falseOptionalFeaturesTest.remove(feature.getName());
+			for (final SelectableFeature feature : conf.getFeatures()) {
+				if (feature.getSelection() != Selection.SELECTED) {
+
+					falseOptionalFeaturesTest.remove(feature.getName());
+				}
 			}
 		}
-		
 		assertTrue(failureMessage, falseOptionalFeaturesTest.isEmpty());
 	}
 }
