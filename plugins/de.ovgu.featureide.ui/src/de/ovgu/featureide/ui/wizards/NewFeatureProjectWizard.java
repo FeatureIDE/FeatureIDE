@@ -33,6 +33,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
 import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
@@ -65,7 +66,10 @@ public class NewFeatureProjectWizard extends BasicNewProjectResourceWizard {
 	public void addPages() {
 		setWindowTitle(NEW_FEATUREIDE_PROJECT);
 		page = new NewFeatureProjectPage();
-		getShell().setImage(colorImage);
+		Shell shell = getShell();
+		if (shell != null) {
+			shell.setImage(colorImage);
+		}
 		addPage(page);
 		super.addPages();
 	}
