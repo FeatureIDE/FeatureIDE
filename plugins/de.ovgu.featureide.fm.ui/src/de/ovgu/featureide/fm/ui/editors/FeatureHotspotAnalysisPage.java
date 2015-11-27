@@ -71,7 +71,7 @@ public class FeatureHotspotAnalysisPage extends FeatureModelEditorPage {
 	
 	public FeatureHotspotAnalysisPage(FeatureModelEditor featureModelEditor) {
 		model = featureModelEditor.getFeatureModel().clone();
-		model.removeConstraint(0);
+		
 		this.featureModelEditor = new FeatureModelEditor();
 		this.featureModelEditor.featureModel = model;
 		
