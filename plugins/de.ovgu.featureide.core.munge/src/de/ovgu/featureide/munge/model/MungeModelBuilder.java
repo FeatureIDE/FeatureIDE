@@ -38,6 +38,7 @@ import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirectiveCommand;
 import de.ovgu.featureide.core.fstmodel.preprocessor.PPModelBuilder;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.core.signature.ProjectSignatures.SignatureIterator;
+import de.ovgu.featureide.core.signature.base.AFeatureData;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.core.signature.base.PreprocessorFeatureData;
 import de.ovgu.featureide.core.signature.filter.IFilter;
@@ -65,6 +66,10 @@ public class MungeModelBuilder extends PPModelBuilder {
 	
 	public MungeModelBuilder(IFeatureProject featureProject) {
 		super(featureProject);
+		refreshSignature(featureProject);
+	}
+	
+	private void refreshSignature(IFeatureProject featureProject) {
 		
 		final IComposerExtensionClass composer = featureProject.getComposer();
 
@@ -73,9 +78,12 @@ public class MungeModelBuilder extends PPModelBuilder {
 			if(mungePreprocessor.getCreateSignature()){
 				signatures = MungeSignatureBuilder.build(featureProject);
 				signatures.sort(new SignatureComparator());
-				model.setProjectSignatures(signatures);		
+				modelOutline.setProjectSignatures(signatures);
+				model.setExtendedFst(modelOutline);
+			} else {
+				model.setExtendedFst(null);
 			}
-		}
+		} 
 	}
 
 	@Override
@@ -140,6 +148,7 @@ public class MungeModelBuilder extends PPModelBuilder {
 			fileName = tempFileName;
 		}
 		
+		refreshSignature(featureProject);
 		SignatureIterator sigIt = null;
 		ArrayList<Integer> sigLineNumber = null;
 		if(mungePreprocessor.getCreateSignature()){
@@ -245,6 +254,48 @@ public class MungeModelBuilder extends PPModelBuilder {
 			}
 			lineCount++;
 		}
+		if(mungePreprocessor.getCreateSignature()){
+			sigIt.reset();
+			updateDirectives(directivesList, sigIt);
+		}
 		return directivesList;
+	}
+
+	private void updateDirectives(LinkedList<FSTDirective> directivesList, SignatureIterator sigIt) {
+		for (FSTDirective fstDirective : directivesList) {
+			updateDirectives(fstDirective.getChildrenList(), sigIt);
+			sigIt.reset();
+		}
+		for (FSTDirective fstDirective : directivesList) {
+			int startLine = fstDirective.getStartLine();
+			startLine++;
+			int endLine = fstDirective.getEndLine();
+			endLine++;
+			while (sigIt.hasNext()) {
+				AbstractSignature next = sigIt.next();
+				AFeatureData[] featureData = next.getFeatureData();
+				int startLineSig = featureData[0].getStartLineNumber();
+				int endLineSig = featureData[0].getEndLineNumber();
+				if (startLineSig < startLine && endLineSig > endLine) {
+					fstDirective.addSig_insideOf(next);
+				}
+
+				if (startLineSig >= startLine && endLineSig <= endLine) {
+					//if a children has the method already included, do nothing
+					FSTDirective[] children = fstDirective.getChildren();
+					boolean alreadIncluded = false;
+					for (FSTDirective fstDirective2 : children) {
+						if(fstDirective2.getIncludedSig() != null && fstDirective2.getIncludedSig().contains(next)){
+							alreadIncluded = true;
+							break;
+						}
+					}
+					if (!alreadIncluded) {
+						fstDirective.addSig_included(next);
+					}
+				}
+			}
+			sigIt.reset();
+		}
 	}
 }

@@ -50,6 +50,16 @@ public class MungeMethodSignature extends AbstractMethodSignature {
 			parameterTypes.add(parameterDeclaration.getType().toString());
 		}
 	}
+	
+	public MungeMethodSignature(AbstractClassSignature parent,
+			String name, int modifiers, Type returnType, List<?> parameters, boolean isConstructor, int startLine, int endLine) {
+		super(parent, name, Modifier.toString(modifiers), returnType.toString(), new LinkedList<String>(), isConstructor, startLine, endLine);
+		for (Object parameter : parameters) {
+			final SingleVariableDeclaration parameterDeclaration = (SingleVariableDeclaration) parameter;
+			p.add(parameterDeclaration);
+			parameterTypes.add(parameterDeclaration.getType().toString());
+		}
+	}
 
 	@Override
 	public String toString() {

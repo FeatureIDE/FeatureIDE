@@ -18,15 +18,36 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.core.signature.base;
+package de.ovgu.featureide.ui.views.collaboration.outline;
 
-public abstract class AbstractFieldSignature extends AbstractSignature {
+import org.eclipse.core.resources.IFile;
+import org.eclipse.swt.widgets.TreeItem;
 
-	protected AbstractFieldSignature(AbstractClassSignature parent, String name, String modifiers, String type) {
-		super(parent, name, modifiers, type);
+import de.ovgu.featureide.core.fstmodel.FSTClass;
+
+/**
+ * Provides labels and images for Collaboration outline
+ * 
+ * @author Reimar Schröter
+ */
+public class MungeOutlineLabelProvider extends CollaborationOutlineLabelProvider {
+
+
+	@Override
+	public String getText(Object element) {
+		if (element instanceof FSTClass) {
+			FSTClass fstclass = (FSTClass) element;
+			return fstclass.getName();
+		}else{
+			return super.getText(element);
+		}
 	}
 
-	public AbstractFieldSignature(AbstractClassSignature parent, String name, String modifiers, String type, int line) {
-		super(parent, name, modifiers, type, line, line);
+	public String getLabelProvName() {
+		return "Extended Outline";
+	}
+	
+	public void setForeground(TreeItem item, IFile iFile) {
+		return;
 	}
 }

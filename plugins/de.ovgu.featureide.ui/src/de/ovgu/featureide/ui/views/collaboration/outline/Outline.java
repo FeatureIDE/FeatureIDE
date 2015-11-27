@@ -229,6 +229,8 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 					FSTMethod meth = ((FSTMethod) selection);
 					fileAlreadyOpen = meth.getFile().getName().equals(iFile.getName()) && (getMethodLine(iFile, meth) > 0);
 					r = meth.getRole();
+					if (meth.getLine() != -1)
+						scrollToLine(active_editor, meth.getLine());
 				} else if (selection instanceof FSTField) {
 					FSTField field = ((FSTField) selection);
 					fileAlreadyOpen = field.getFile().getName().equals(iFile.getName()) && (getFieldLine(iFile, field) > 0);
@@ -498,6 +500,8 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 		addContentProv(new CollaborationOutlineTreeContentProvider(), new CollaborationOutlineLabelProvider());
 		addContentProv(new FmTreeContentProvider(), new FMOutlineLabelProviderWrapper());
 		addContentProv(new ContextOutlineTreeContentProvider(), new ContextOutlineLabelProvider());
+		
+		addContentProv(new MungeExtendedContentProvider(), new MungeOutlineLabelProvider());
 
 		checkForExtensions();
 

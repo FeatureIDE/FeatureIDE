@@ -38,6 +38,11 @@ public class MungeFieldSignature extends AbstractFieldSignature {
 			int modifiers, Type returnType) {
 		super(parent, name, Modifier.toString(modifiers), returnType.toString());
 	}
+	
+	public MungeFieldSignature(AbstractClassSignature parent, String name,
+			int modifiers, Type returnType, int line) {
+		super(parent, name, Modifier.toString(modifiers), returnType.toString(), line);
+	}
 
 	@Override
 	public String toString() {
