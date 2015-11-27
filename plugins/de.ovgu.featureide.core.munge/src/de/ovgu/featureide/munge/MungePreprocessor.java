@@ -603,5 +603,9 @@ public class MungePreprocessor extends PPComposerExtensionClass {
 		}
 	}
 
+	@Override
+	public boolean canGeneratInParallelJobs() {
+		return false;// TODO munge seems to have parallelization problems 
+	}
 
 }
