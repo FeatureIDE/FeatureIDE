@@ -425,6 +425,7 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 		featureOrderList.clear();
 
 		property.reset();
+		nextElementId = 0;
 	}
 
 	@Override

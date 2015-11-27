@@ -113,7 +113,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 		
 		importCustomProperties(customProperties, featureModel);
 		
-		featureModel.handleModelDataLoaded();
+		//featureModel.handleModelDataLoaded();
 	}
 
 	private void importCustomProperties(Collection<PropertiesParser> customProperties, IFeatureModel featureModel) {

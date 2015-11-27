@@ -44,7 +44,7 @@ public abstract class AbstractFeatureModelOperation extends AbstractOperation {
 	protected final IFeatureModel featureModel;
 
 	private String eventId = PropertyConstants.MODEL_DATA_CHANGED;
-	private Object editor = null;
+	protected Object editor = null;
 
 	public AbstractFeatureModelOperation(IFeatureModel featureModel, String label) {
 		super(label);
