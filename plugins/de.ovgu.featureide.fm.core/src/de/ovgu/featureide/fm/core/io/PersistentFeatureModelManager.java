@@ -58,11 +58,11 @@ public class PersistentFeatureModelManager {
 
 	private final String fileName;
 
-	public static PersistentFeatureModelManager load(String path) {
-		return load(path, null);
+	public static PersistentFeatureModelManager getInstance(String path) {
+		return getInstance(path, null);
 	}
 
-	public static PersistentFeatureModelManager load(String path, IFeatureModel model) {
+	public static PersistentFeatureModelManager getInstance(String path, IFeatureModel model) {
 		final Path p = Paths.get(path).toAbsolutePath();
 		final String absolutePath = p.toString();
 		PersistentFeatureModelManager persistentFeatureModelManager = map.get(absolutePath);
@@ -97,8 +97,8 @@ public class PersistentFeatureModelManager {
 		extraHandlers.add(handler);
 	}
 
-	public void removeHandler(IPersistentHandler handler) {
-		extraHandlers.remove(handler);
+	private Path getExtraPath(IPersistentHandler iPersistentFormat) {
+		return extraFolder.resolve(fileName + "." + iPersistentFormat.getSuffix());
 	}
 
 	public IFeatureModel getFeatureModel() {
@@ -109,15 +109,25 @@ public class PersistentFeatureModelManager {
 		return lastExceptions;
 	}
 
-	public boolean save() {
-		lastExceptions.clear();
+	private void internalRead() throws Exception {
 		try {
-			internalSave();
+			read(modelHandler, modelPath);
 		} catch (Exception e) {
 			lastExceptions.add(e);
 			FMCorePlugin.getDefault().logError(e);
+			return;
 		}
-		return lastExceptions.isEmpty();
+
+		if (Files.exists(extraFolder)) {
+			for (final IPersistentHandler iPersistentFormat : extraHandlers) {
+				try {
+					read(iPersistentFormat);
+				} catch (final Exception e) {
+					lastExceptions.add(e);
+					FMCorePlugin.getDefault().logError(e);
+				}
+			}
+		}
 	}
 
 	private void internalSave() throws Exception {
@@ -135,21 +145,12 @@ public class PersistentFeatureModelManager {
 
 		for (IPersistentHandler iPersistentFormat : extraHandlers) {
 			try {
-				save(iPersistentFormat, extraFolder, fileName);
+				save(iPersistentFormat);
 			} catch (Exception e) {
 				lastExceptions.add(e);
 				FMCorePlugin.getDefault().logError(e);
 			}
 		}
-	}
-
-	public static void save(IPersistentHandler iPersistentFormat, Path file) throws Exception {
-		final byte[] content = iPersistentFormat.write().getBytes(Charset.availableCharsets().get("UTF-8"));
-		Files.write(file, content, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
-	}
-
-	public static void save(IPersistentHandler iPersistentFormat, Path folder, String fileName) throws Exception {
-		save(iPersistentFormat, folder.resolve(fileName + "." + iPersistentFormat.getSuffix()));
 	}
 
 	public boolean read() {
@@ -163,34 +164,39 @@ public class PersistentFeatureModelManager {
 		return lastExceptions.isEmpty();
 	}
 
-	private void internalRead() throws Exception {
+	public void read(IPersistentHandler iPersistentFormat) throws Exception {
+		final String content = new String(Files.readAllBytes(getExtraPath(iPersistentFormat)), Charset.availableCharsets().get("UTF-8"));
+		iPersistentFormat.read(content);
+	}
+
+	private void read(IPersistentHandler iPersistentFormat, Path file) throws Exception {
+		final String content = new String(Files.readAllBytes(file), Charset.availableCharsets().get("UTF-8"));
+		iPersistentFormat.read(content);
+	}
+
+	public void removeHandler(IPersistentHandler handler) {
+		extraHandlers.remove(handler);
+	}
+
+	public boolean save() {
+		lastExceptions.clear();
 		try {
-			read(modelHandler, modelPath);
+			internalSave();
 		} catch (Exception e) {
 			lastExceptions.add(e);
 			FMCorePlugin.getDefault().logError(e);
-			return;
 		}
-
-		if (Files.exists(extraFolder)) {
-			for (IPersistentHandler iPersistentFormat : extraHandlers) {
-				try {
-					read(iPersistentFormat, getExtraPath(iPersistentFormat, extraFolder, fileName));
-				} catch (Exception e) {
-					lastExceptions.add(e);
-					FMCorePlugin.getDefault().logError(e);
-				}
-			}
-		}
+		return lastExceptions.isEmpty();
 	}
 
-	public static Path getExtraPath(IPersistentHandler iPersistentFormat, Path extraFolder, String fileName) {
-		return extraFolder.resolve(fileName + "." + iPersistentFormat.getSuffix());
+	public void save(IPersistentHandler iPersistentFormat) throws Exception {
+		final byte[] content = iPersistentFormat.write().getBytes(Charset.availableCharsets().get("UTF-8"));
+		Files.write(getExtraPath(iPersistentFormat), content, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
 	}
 
-	public static void read(IPersistentHandler iPersistentFormat, Path file) throws Exception {
-		String content = new String(Files.readAllBytes(file), Charset.availableCharsets().get("UTF-8"));
-		iPersistentFormat.read(content);
+	private void save(IPersistentHandler iPersistentFormat, Path file) throws Exception {
+		final byte[] content = iPersistentFormat.write().getBytes(Charset.availableCharsets().get("UTF-8"));
+		Files.write(file, content, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
 	}
 
 }

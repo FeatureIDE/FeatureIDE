@@ -52,7 +52,6 @@ import org.eclipse.gef.LayerConstants;
 import org.eclipse.gef.commands.CommandStack;
 import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
 import org.eclipse.gef.editparts.ZoomManager;
-import org.eclipse.gef.tools.DirectEditManager;
 import org.eclipse.gef.ui.actions.GEFActionConstants;
 import org.eclipse.gef.ui.actions.ZoomInAction;
 import org.eclipse.gef.ui.actions.ZoomOutAction;
@@ -207,8 +206,14 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		super();
 		this.featureModelEditor = featureModelEditor;
 		graphicalFeatureModel = GraphicMap.getInstance().constructModel(getFeatureModel());
-		featureModelEditor.fmManager.addHandler(new GraphicalFeatureModelHandler(graphicalFeatureModel));
-		featureModelEditor.fmManager.read();
+
+		GraphicalFeatureModelHandler handler = new GraphicalFeatureModelHandler(graphicalFeatureModel);
+		featureModelEditor.fmManager.addHandler(handler);
+		try {
+			featureModelEditor.fmManager.read(handler);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		//		graphicalFeatureModel.getFeatureModel().addListener(this);
 
 		createControl(container);
