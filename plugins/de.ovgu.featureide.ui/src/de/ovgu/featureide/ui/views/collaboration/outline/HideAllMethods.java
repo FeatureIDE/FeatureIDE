@@ -26,10 +26,12 @@ import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.RoleElement;
 
 /**
+ * Filter to hide methods in the collaboration outline.
+ * 
   * @author Dominic Labsch
   * @author Daniel P�sche
  */
-public class HideAllMethods implements IFilter {
+public class HideAllMethods implements ICollaborationOutlineFilter {
 
 	@Override
 	public Object[] filter(Object[] obj) {

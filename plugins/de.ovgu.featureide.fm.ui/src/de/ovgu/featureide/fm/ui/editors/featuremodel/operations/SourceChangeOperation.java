@@ -21,11 +21,14 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.SOURCE_CHANGE;
+
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
+import de.ovgu.featureide.fm.ui.editors.FeatureModelTextEditorPage;
 
 /**
- * TODO description
+ * Encapsulates a change in the source tab ({@link FeatureModelTextEditorPage}) of the {@link FeatureModelEditor}.</br>
+ * Is used for undo / redo support.
  * 
  * @author Sebastian Krieter
  */

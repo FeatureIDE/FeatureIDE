@@ -47,6 +47,7 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.prop4j.And;
@@ -61,6 +62,7 @@ import de.ovgu.featureide.core.builder.IComposerObject;
 import de.ovgu.featureide.core.builder.preprocessor.PPComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.core.signature.documentation.base.ADocumentationCommentParser;
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.munge.documentation.DocumentationCommentParser;
@@ -76,7 +78,13 @@ public class MungePreprocessor extends PPComposerExtensionClass {
 	protected MungeModelBuilder mungeModelBuilder;
 	public static final String COMMENT_START = "/*";
 	public static final String COMMENT_END = "*/";
-
+	
+	public static final String COMPOSER_ID = "de.ovgu.featureide.preprocessor.munge"; 
+	
+	private static final QualifiedName CREATE_SIGNATURE = new QualifiedName(MungePreprocessor.class.getName() + "#Signature", MungePreprocessor.class.getName() + "#Signature");
+	private static final String TRUE = "true";
+	private static final String FALSE = "false";
+	
 	/** all allowed instructions in munge as regular expression */
 	public static final String OPERATORS = "(if(_not)?|else|end)\\[(.+?)\\]";
 
@@ -561,6 +569,43 @@ public class MungePreprocessor extends PPComposerExtensionClass {
 			MungeCorePlugin.getDefault().logError(e);
 		}
 	}
+	
+	public void setCreateSignature(boolean signature) {
+		setProperty(CREATE_SIGNATURE, signature);
 
+		if (signature) {
+			final IFile currentConfiguration = featureProject.getCurrentConfiguration();
+			if (currentConfiguration != null) {
+				performFullBuild(currentConfiguration);
+			}
+		}
+	}
+	
+	public boolean getCreateSignature(){
+		return getPropertyBoolean(CREATE_SIGNATURE);
+	}
+	
+	
+	private boolean getPropertyBoolean(QualifiedName qname) {
+		try {
+			return TRUE.equals(featureProject.getProject().getPersistentProperty(qname));
+		} catch (CoreException e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+		return false;
+	}
+	
+	private void setProperty(QualifiedName qname, boolean value) {
+		try {
+			featureProject.getProject().setPersistentProperty(qname, value ? TRUE : FALSE);
+		} catch (CoreException e) {
+			FMCorePlugin.getDefault().logError(e);
+		}
+	}
+
+	@Override
+	public boolean canGeneratInParallelJobs() {
+		return false;// TODO munge seems to have parallelization problems 
+	}
 
 }

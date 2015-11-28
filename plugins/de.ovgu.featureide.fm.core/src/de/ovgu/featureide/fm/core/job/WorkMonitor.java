@@ -34,11 +34,11 @@ import de.ovgu.featureide.fm.core.FunctionalInterfaces.IFunction;
  */
 public final class WorkMonitor {
 	private static final int maxRelativeWork = 100;
-	
+
 	private IProgressMonitor monitor;
 	private IFunction<Object, Void> intermediateFunction;
 	private int relativeWorkDone = 0, absoluteWorkDone = 0, maxAbsoluteWork = 1;
-	
+
 	public WorkMonitor() {
 		setIntermediateFunction(null);
 		setMonitor(null);
@@ -59,7 +59,7 @@ public final class WorkMonitor {
 	public void setMaxAbsoluteWork(int maxAbsoluteWork) {
 		this.maxAbsoluteWork = maxAbsoluteWork;
 	}
-	
+
 	/**
 	 * Increases the monitor's progress.
 	 */
@@ -68,19 +68,19 @@ public final class WorkMonitor {
 		monitor.worked(nworked - relativeWorkDone);
 		relativeWorkDone = nworked;
 	}
-	
-	void begin(String taskName) {
-		monitor.beginTask(taskName, maxRelativeWork);		
+
+	public void begin(String taskName) {
+		monitor.beginTask(taskName, maxRelativeWork);
 	}
-	
-	void done() {
+
+	public void done() {
 		monitor.done();
 	}
-	
+
 	public void createSubTask(String name) {
 		this.monitor.subTask(name);
 	}
-	
+
 	public IProgressMonitor getMonitor() {
 		return monitor;
 	}
@@ -92,7 +92,7 @@ public final class WorkMonitor {
 	public void setIntermediateFunction(IFunction<Object, Void> intermediateFunction) {
 		this.intermediateFunction = (intermediateFunction != null) ? intermediateFunction : new FunctionalInterfaces.NullFunction<Object, Void>();
 	}
-	
+
 	public void invoke(Object t) {
 		intermediateFunction.invoke(t);
 	}

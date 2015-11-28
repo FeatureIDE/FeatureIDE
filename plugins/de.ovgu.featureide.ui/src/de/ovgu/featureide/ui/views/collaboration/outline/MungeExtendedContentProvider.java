@@ -20,9 +20,9 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.outline;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.COLLABORATION_MODEL_NOT_FOUND;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NO_FILE_FOUND;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -32,7 +32,9 @@ import java.util.TreeSet;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerSorter;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
@@ -45,7 +47,9 @@ import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.core.fstmodel.IRoleElement;
+import de.ovgu.featureide.core.fstmodel.RoleElement;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
+import de.ovgu.featureide.core.fstmodel.preprocessor.FSTModelForPP;
 
 /**
  * Provides the content for the collaboration outline.
@@ -56,12 +60,14 @@ import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
  * @author Florian Proksch
  * @author Dominic Labsch
  * @author Daniel Pï¿½sche
+ * @author Reimar Schröter
  */
-public class CollaborationOutlineTreeContentProvider implements ITreeContentProvider {
+public class MungeExtendedContentProvider implements ITreeContentProvider {
 
 	protected FSTModel model;
 
-	public CollaborationOutlineTreeContentProvider() {
+	public MungeExtendedContentProvider() {
+		
 	}
 
 	@Override
@@ -73,7 +79,33 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 		if (newInput != null && (newInput instanceof IFile)) {
 			IFeatureProject featureProject = CorePlugin.getFeatureProject((IFile) newInput);
 			if (featureProject != null)
-				model = featureProject.getFSTModel();// builder.buildCollaborationModel(featureProject);
+				model = featureProject.getFSTModel();
+			
+			if(viewer instanceof StructuredViewer){
+				((StructuredViewer) viewer).setSorter(new ViewerSorter(){
+					/* (non-Javadoc)
+					 * @see org.eclipse.jface.viewers.ViewerComparator#compare(org.eclipse.jface.viewers.Viewer, java.lang.Object, java.lang.Object)
+					 */
+					@Override
+					public int compare(Viewer viewer, Object o1, Object o2) {
+						int startLineO1 = getLine(o1);
+						int startLineO2 = getLine(o2);
+						
+						return startLineO1 - startLineO2;
+					}
+
+					private int getLine(Object o1) {
+						int startLineO1 = -1;
+						
+						if(o1 instanceof FSTDirective){
+							startLineO1 = ((FSTDirective) o1).getStartLine();
+						} else if(o1 instanceof RoleElement<?>){
+							startLineO1 = ((RoleElement<?>) o1).getLine();
+						}
+						return startLineO1;
+					}
+				});
+			}
 		}
 	}
 
@@ -88,7 +120,11 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 
 		if (featureProject != null) {
 			model = featureProject.getFSTModel();
-
+			
+			if(model instanceof FSTModelForPP){
+				model = ((FSTModelForPP) model).getExtendedFst();
+			} 
+			
 			if (model != null) {
 				FSTClass c = model.getClass(model.getAbsoluteClassName(file));
 				
@@ -97,7 +133,7 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 				}
 			}
 		}
-		return new String[] { COLLABORATION_MODEL_NOT_FOUND };
+		return new String[] { "Create signature is not enabled" };
 	}
 
 	@Override
@@ -113,7 +149,10 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 
 			for (FSTRole role : ((FSTClass) parentElement).getRoles()) {
 				invariants.addAll(role.getClassFragment().getInvariants());
-				methods.addAll(role.getMethods());
+				for (FSTMethod fstMethod : role.getMethods()) {
+					if(fstMethod.getParent() instanceof FSTClassFragment)
+						methods.add(fstMethod);	
+				}
 				fields.addAll(role.getFields());
 				TreeSet<FSTDirective> roleDirectives = role.getDirectives();
 				for (FSTDirective directive : roleDirectives) {
@@ -135,39 +174,58 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 			return filter(obj);
 		} else if (parentElement instanceof FSTMethod) {
 			// get all the roles that belong to a method
-			List<FSTRole> roleList = new LinkedList<FSTRole>();
 
-			for (FSTRole role : ((FSTMethod) parentElement).getRole().getFSTClass().getRoles()) {
-				for (FSTMethod m : role.getAllMethods()) {
-					if (// m.isOwn(role.file) &&
-						// ((FSTMethod)parentElement).isOwn(role.file) &&
-					m.getFullName().equals(((FSTMethod) parentElement).getFullName())) {
-						if (m.hasContract()) {
-							roleList.add(new FSTContractedRole(role.getFile(), role.getFeature(), role.getFSTClass()));
-						} else {
-							roleList.add(role);
+				Set<FSTRole> roleList = new HashSet<FSTRole>();
+				Set<FSTMethod> methods = new HashSet<FSTMethod>();
+				for (FSTRole role : ((FSTMethod) parentElement).getRole().getFSTClass().getRoles()) {
+					for (FSTMethod m : role.getAllMethods()) {
+						if (// m.isOwn(role.file) &&
+							// ((FSTMethod)parentElement).isOwn(role.file) &&
+						m.getFullName().equals(((FSTMethod) parentElement).getFullName())) {
+							if (m.hasContract()) {
+								roleList.add(new FSTContractedRole(role.getFile(), role.getFeature(), role.getFSTClass()));
+							} else {
+								roleList.add(role);
+							}
+							methods.add(m);
+							break;
 						}
-						break;
 					}
 				}
-			}
 
-			List<String> featureOrder = CorePlugin.getFeatureProject(((FSTMethod) parentElement).getRole().getFile()).getFeatureModel().getFeatureOrderList();
+ 				List<String> featureOrder = CorePlugin.getFeatureProject(((FSTMethod) parentElement).getRole().getFile()).getFeatureModel().getFeatureOrderList();
 
-			obj = new FSTRole[roleList.size()];
-			int index = 0;
-			for (String featureName : featureOrder) {
-
-				for (Iterator<FSTRole> it = roleList.iterator(); it.hasNext();) {
-					FSTRole next = it.next();
-					if (next.getFeature().getName().equals(featureName)) {
-						obj[index++] = next;
-						it.remove();
-						break;
+				if (((FSTMethod) parentElement).getFSTDirectives().size() == 0) {
+					obj = new FSTRole[roleList.size()];
+					int index = 0;
+					for (String featureName : featureOrder) {
+	
+						for (Iterator<FSTRole> it = roleList.iterator(); it.hasNext();) {
+							FSTRole next = it.next();
+							if (next.getFeature().getName().equals(featureName)) {
+								obj[index++] = next;
+								it.remove();
+								break;
+							}
+						}
 					}
-
+				}else{
+					List<FSTDirective> dirs = new ArrayList<>();
+					for (FSTRole role : roleList) {
+						if(role.getMethods().contains(parentElement)){
+							//equals works correct?
+							for (FSTMethod method : role.getMethods()) {
+								if(method.equals(parentElement)){
+									dirs.addAll(method.getFSTDirectives());
+									break;
+								}
+							}
+						}
+					}
+					return dirs.toArray();
 				}
-			}
+
+
 		} else if (parentElement instanceof FSTInvariant) {
 			// get all the roles that belong to an invariant
 			LinkedList<FSTRole> roleList = new LinkedList<FSTRole>();
@@ -194,8 +252,7 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 			}
 			return filter(roleList.toArray());
 		} else if (parentElement instanceof FSTDirective) {
-			FSTDirective[] directiveArray = ((FSTDirective) parentElement).getChildren().clone();
-			return filter(directiveArray);
+			return ((FSTDirective) parentElement).getRoleElementChildren();
 		} else if (parentElement instanceof FSTClassFragment) {
 			final TreeSet<FSTMethod> methods = new TreeSet<FSTMethod>();
 			final TreeSet<FSTField> fields = new TreeSet<FSTField>();
@@ -261,26 +318,26 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 			return false;
 		}
 
-		if (element instanceof FSTMethod)
-			return true;
-
+		if (element instanceof FSTMethod){
+			FSTMethod fstMethod = (FSTMethod) element;
+			FSTRole role = fstMethod.getRole();
+			return role.getMethods().contains(element) || !fstMethod.getFSTDirectives().isEmpty();
+		}
 		if (element instanceof FSTField)
-			return true;
+			return false;
 
 		if (element instanceof FSTInvariant)
 
 			return true;
 
-		if (element instanceof FSTDirective) {
-			return ((FSTDirective) element).getChildren().length != 0;
-
+		if (element instanceof FSTDirective) {	
+			return ((FSTDirective) element).getRoleElementChildren().length != 0;
 		}
 		if (element instanceof FSTClassFragment) {
 			FSTClassFragment innerClass = (FSTClassFragment) element;
 			if (!innerClass.getMethods().isEmpty() || !innerClass.getFields().isEmpty() || !innerClass.getInnerClasses().isEmpty()) {
 				return true;
 			}
-
 		}
 
 		return false;

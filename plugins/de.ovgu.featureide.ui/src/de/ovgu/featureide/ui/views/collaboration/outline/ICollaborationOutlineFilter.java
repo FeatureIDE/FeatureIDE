@@ -20,36 +20,14 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.outline;
 
-import java.util.LinkedList;
-
-import de.ovgu.featureide.core.fstmodel.FSTField;
-import de.ovgu.featureide.core.fstmodel.RoleElement;
-
 /**
- * 
- * Filter to hide fields in the collaboration outline.
+ * Interface to filter the content of the CollaborationOutline.
  * 
  * @author Dominic Labsch	
  * @author Daniel Püsche
  */
-public class HideAllFields implements ICollaborationOutlineFilter {
+public interface ICollaborationOutlineFilter {
 
-
-	@Override
-	public Object[] filter(Object[] obj) {
-		LinkedList<Object> resultList = new LinkedList<Object>();
-
-		if (obj.length > 0 && obj[0] instanceof RoleElement) {
-			for (int i = 0; i < obj.length; i++) {
-				if (!(obj[i] instanceof FSTField)) {
-					resultList.add(obj[i]);
-				}
-			}
-		}else{
-			return obj;
-		}
-		return resultList.toArray();
-
-	}
-
+	public Object[] filter(Object[] obj);
+		
 }

@@ -25,7 +25,8 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * TODO description
+ * Extends the abstract {@link AFeatureData} class.
+ * Stores additional information for signatures in an FOP project.
  * 
  * @author Sebastian Krieter
  */

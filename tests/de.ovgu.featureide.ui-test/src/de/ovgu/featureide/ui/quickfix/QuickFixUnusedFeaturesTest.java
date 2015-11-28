@@ -48,9 +48,9 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
  * @author Jens Meinicke
  */
 @RunWith(Parameterized.class)
-public class QuickFixFalseOptionalFeaturesTest {
+public class QuickFixUnusedFeaturesTest {
 
-	QuickFixFalseOptionalFeatures quickFix = new QuickFixFalseOptionalFeatures(null);
+	QuickFixUnusedFeatures quickFix = new QuickFixUnusedFeatures(null);
 
 	protected static File MODEL_FILE_FOLDER = new File("/home/itidbrun/TeamCity/buildAgent/work/featureide/tests/de.ovgu.featureide.fm.ui-test/src/models/");
 
@@ -58,7 +58,7 @@ public class QuickFixFalseOptionalFeaturesTest {
 
 	private final FeatureModel fm;
 
-	public QuickFixFalseOptionalFeaturesTest(FeatureModel fm, String s) throws UnsupportedModelException {
+	public QuickFixUnusedFeaturesTest(FeatureModel fm, String s) throws UnsupportedModelException {
 		this.fm = fm;
 		this.failureMessage = "(" + s + ")";
 
@@ -101,7 +101,7 @@ public class QuickFixFalseOptionalFeaturesTest {
 		return filter;
 	}
 
-	@Test(timeout = 20000)
+	@Test
 	public void createConfigurationsTest() {
 		final Collection<Feature> concrete = fm.getConcreteFeatures();
 		final Collection<Feature> core = fm.getAnalyser().getCoreFeatures();
@@ -116,11 +116,9 @@ public class QuickFixFalseOptionalFeaturesTest {
 
 		final Collection<String> falseOptionalFeaturesTest = new ArrayList<String>(falseOptionalFeatures);
 		final Collection<Configuration> confs = quickFix.createConfigurations(falseOptionalFeatures, fm);
-
 		for (final Configuration conf : confs) {
 			for (final SelectableFeature feature : conf.getFeatures()) {
-				if (feature.getSelection() != Selection.SELECTED) {
-
+				if (feature.getSelection() == Selection.SELECTED) {
 					falseOptionalFeaturesTest.remove(feature.getName());
 				}
 			}

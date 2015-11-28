@@ -36,7 +36,7 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 
 /**
- * TODO description
+ * Test class for the {@link ConfigurationReader}.
  * 
  * @author Stefan Krueger
  * @author Florian Proksch

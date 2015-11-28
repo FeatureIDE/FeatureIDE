@@ -20,14 +20,34 @@
  */
 package de.ovgu.featureide.ui.views.collaboration.outline;
 
-/**
- * TODO description
- * 
- * @author Dominic Labsch	
- * @author Daniel Püsche
- */
-public interface IFilter {
+import org.eclipse.core.resources.IFile;
+import org.eclipse.swt.widgets.TreeItem;
 
-	public Object[] filter(Object[] obj);
-		
+import de.ovgu.featureide.core.fstmodel.FSTClass;
+
+/**
+ * Provides labels and images for Collaboration outline
+ * 
+ * @author Reimar Schröter
+ */
+public class MungeOutlineLabelProvider extends CollaborationOutlineLabelProvider {
+
+
+	@Override
+	public String getText(Object element) {
+		if (element instanceof FSTClass) {
+			FSTClass fstclass = (FSTClass) element;
+			return fstclass.getName();
+		}else{
+			return super.getText(element);
+		}
+	}
+
+	public String getLabelProvName() {
+		return "Extended Outline";
+	}
+	
+	public void setForeground(TreeItem item, IFile iFile) {
+		return;
+	}
 }

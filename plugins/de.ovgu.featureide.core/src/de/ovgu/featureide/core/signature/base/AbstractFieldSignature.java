@@ -26,4 +26,7 @@ public abstract class AbstractFieldSignature extends AbstractSignature {
 		super(parent, name, modifiers, type);
 	}
 
+	public AbstractFieldSignature(AbstractClassSignature parent, String name, String modifiers, String type, int line) {
+		super(parent, name, modifiers, type, line, line);
+	}
 }

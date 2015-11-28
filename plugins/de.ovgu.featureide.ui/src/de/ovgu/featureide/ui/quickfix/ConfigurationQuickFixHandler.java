@@ -38,7 +38,7 @@ public class ConfigurationQuickFixHandler implements IMarkerResolutionGenerator 
     	if (marker.getResource() instanceof IFolder) {
 			final String message = marker.getAttribute(IMarker.MESSAGE, "");
 			if (message.startsWith(IFeatureProject.MARKER_UNUSED)) {
-				return new IMarkerResolution[] {new QuickFixMissingFeatures(marker)};
+				return new IMarkerResolution[] {new QuickFixUnusedFeatures(marker)};
 			} else if (message.startsWith(IFeatureProject.MARKER_FALSE_OPTIONAL)) {
 				return new IMarkerResolution[] {new QuickFixFalseOptionalFeatures(marker)};
 			}
