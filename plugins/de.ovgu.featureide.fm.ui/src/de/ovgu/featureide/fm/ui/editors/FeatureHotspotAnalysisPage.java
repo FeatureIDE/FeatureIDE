@@ -109,7 +109,7 @@ public class FeatureHotspotAnalysisPage extends FeatureModelEditorPage {
 			@Override
 			public Set<HotSpotResult> analyze(IFeatureModel fm) {
 				Node nodes = NodeCreator.createNodes(fm.clone(null)).toCNF();
-				System.out.println(nodes.toString());
+				//System.out.println(nodes.toString());
 				Set<HotSpotResult> results = new HashSet<HotSpotResult>();
 				for (Node n : nodes.getChildren()) {
 
