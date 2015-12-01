@@ -55,6 +55,11 @@ public class HotSpotResult implements Comparable<HotSpotResult> {
 	}
 	
 	@Override
+	public int hashCode() {
+		return this.featureName.hashCode();
+	}
+	
+	@Override
 	public int compareTo(HotSpotResult arg0) {
 		if(arg0 == null)
 			return 0;
