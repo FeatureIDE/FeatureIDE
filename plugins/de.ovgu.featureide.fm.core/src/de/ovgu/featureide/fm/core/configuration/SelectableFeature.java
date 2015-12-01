@@ -33,6 +33,9 @@ public class SelectableFeature extends TreeElement {
 	
 	private Selection recommended = Selection.UNDEFINED;
 
+	private int recommendationValue = -1;
+	private int recommendationGroup = -1;
+
 	private final Feature feature;
 
 	private final Configuration configuration;
@@ -101,6 +104,22 @@ public class SelectableFeature extends TreeElement {
 	
 	public void setRecommended(Selection recommended) {
 		this.recommended = recommended;
+	}
+
+	public int getRecommendationValue() {
+		return recommendationValue;
+	}
+
+	public void setRecommendationValue(int recommendationValue) {
+		this.recommendationValue = recommendationValue;
+	}
+
+	public int getRecommendationGroup() {
+		return recommendationGroup;
+	}
+
+	public void setRecommendationGroup(int recommendationGroup) {
+		this.recommendationGroup = recommendationGroup;
 	}
 
 }

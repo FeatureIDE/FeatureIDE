@@ -353,6 +353,7 @@ public class ConfigurationPropagator {
 		}
 		for (SelectableFeature selectableFeature : featureList) {
 			selectableFeature.setRecommended(Selection.UNDEFINED);
+			selectableFeature.setRecommendationGroup(-1);
 		}
 
 		if (workMonitor.checkCancel()) {
@@ -362,6 +363,8 @@ public class ConfigurationPropagator {
 		final Node[] clauses = rootNodeWithoutHidden.getChildren();
 		final HashMap<Object, Literal> literalMap = new HashMap<Object, Literal>();
 		workMonitor.setMaxAbsoluteWork(clauses.length);
+		int unsatClauseCount = 0;
+
 		for (int i = 0; i < clauses.length; i++) {
 			if (workMonitor.checkCancel()) {
 				return;
@@ -388,6 +391,7 @@ public class ConfigurationPropagator {
 				}
 			}
 			if (!satisfied) {
+				unsatClauseCount++;
 				int c = 0;
 				for (SelectableFeature selectableFeature : featureList) {
 					if (literalMap.containsKey(selectableFeature.getFeature().getName()) && !results[c]) {
@@ -396,10 +400,12 @@ public class ConfigurationPropagator {
 						switch (selectableFeature.getManual()) {
 						case SELECTED:
 							selectableFeature.setRecommended(Selection.UNSELECTED);
+							selectableFeature.setRecommendationGroup(unsatClauseCount);
 							break;
 						case UNSELECTED:
 						case UNDEFINED:
 							selectableFeature.setRecommended(Selection.SELECTED);
+							selectableFeature.setRecommendationGroup(unsatClauseCount);
 						}
 
 					}

@@ -35,12 +35,17 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.VALID_COMMA_;
 import java.beans.PropertyChangeEvent;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -49,6 +54,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IEditorInput;
@@ -83,6 +90,7 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  * @author Marcus Pinnecke
  */
 public abstract class ConfigurationTreeEditorPage extends EditorPart implements IConfigurationEditorPage {
+	
 	protected static final Color gray = new Color(null, 140, 140, 140);
 	protected static final Color green = new Color(null, 0, 140, 0);
 	protected static final Color blue = new Color(null, 0, 0, 200);
@@ -90,6 +98,12 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 	protected static final Font treeItemStandardFont = new Font(null, ARIAL, 8, SWT.NORMAL);
 	protected static final Font treeItemSpecialFont = new Font(null, ARIAL, 8, SWT.BOLD);
+	
+	private static final Image EXPAND_IMAGE = FMUIPlugin.getDefault().getImageDescriptor("icons/expand.gif").createImage();
+	private static final Image COLLAPSE_IMAGE = FMUIPlugin.getDefault().getImageDescriptor("icons/collapse.gif").createImage();
+	private static final Image AUTOEXPAND_IMAGE = FMUIPlugin.getDefault().getImageDescriptor("icons/tree.png").createImage();
+	private static final Image NEXT_IMAGE = FMUIPlugin.getDefault().getImageDescriptor("icons/arrow_down.png").createImage();
+	private static final Image PREVIOUS_IMAGE = FMUIPlugin.getDefault().getImageDescriptor("icons/arrow_up.png").createImage();
 
 	private final HashSet<SelectableFeature> invalidFeatures = new HashSet<SelectableFeature>();
 	protected final HashSet<SelectableFeature> updateFeatures = new HashSet<SelectableFeature>();
@@ -98,6 +112,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 	protected boolean dirty = false;
 	protected boolean autoExpand = true;
+	protected int curGroup = 0;
 
 	protected Tree tree;
 
@@ -130,7 +145,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	@Override
 	public void propertyChange(PropertyChangeEvent evt) {
 		//TODO
-//		refreshPage();
+		//		refreshPage();
 	}
 
 	protected final void refreshPage() {
@@ -198,7 +213,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		gridData.grabExcessHorizontalSpace = true;
 		gridData.grabExcessVerticalSpace = false;
 		gridData.verticalAlignment = SWT.TOP;
-		gridLayout = new GridLayout(1, false);
+		gridLayout = new GridLayout(2, false);
 		gridLayout.marginHeight = 0;
 		gridLayout.marginWidth = 0;
 		gridLayout.marginLeft = 4;
@@ -257,6 +272,101 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		//			public void widgetDefaultSelected(SelectionEvent e) {}
 		//		});
 
+		gridData = new GridData();
+		gridData.horizontalAlignment = SWT.RIGHT;
+		gridData.verticalAlignment = SWT.CENTER;
+		gridData.grabExcessHorizontalSpace = true;
+		ToolBar toolbar = new ToolBar(compositeTop, SWT.FLAT | SWT.WRAP | SWT.RIGHT);
+		toolbar.setLayoutData(gridData);
+
+		ToolItem item = new ToolItem(toolbar, SWT.PUSH);
+		item.setImage(EXPAND_IMAGE);
+		item.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				walkTree(new IBinaryFunction<TreeItem, SelectableFeature, Void>() {
+					@Override
+					public Void invoke(TreeItem item, SelectableFeature feature) {
+						item.setExpanded(true);
+						return null;
+					}
+				}, new FunctionalInterfaces.NullFunction<Void, Void>());
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+		});
+
+		item = new ToolItem(toolbar, SWT.PUSH);
+		item.setImage(COLLAPSE_IMAGE);
+		item.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				walkTree(new IBinaryFunction<TreeItem, SelectableFeature, Void>() {
+					@Override
+					public Void invoke(TreeItem item, SelectableFeature feature) {
+						item.setExpanded(false);
+						return null;
+					}
+				}, new IFunction<Void, Void>() {
+					@Override
+					public Void invoke(Void t) {
+						final TreeItem root = tree.getItem(0);
+						if (root != null) {
+							root.setExpanded(true);
+						}
+						return null;
+					}
+				});
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+		});
+
+		item = new ToolItem(toolbar, SWT.PUSH);
+		item.setImage(NEXT_IMAGE);
+		item.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				specialExpand(++curGroup);
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+		});
+		
+		item = new ToolItem(toolbar, SWT.PUSH);
+		item.setImage(PREVIOUS_IMAGE);
+		item.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				specialExpand(--curGroup);
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+		});
+
+		item = new ToolItem(toolbar, SWT.CHECK);
+		item.setImage(AUTOEXPAND_IMAGE);
+		item.setSelection(autoExpand);
+		item.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				autoExpand = !autoExpand;
+				expand();
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+		});
+
 		// 2. sub composite
 		gridData = new GridData();
 		gridData.horizontalAlignment = SWT.FILL;
@@ -268,7 +378,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		compositeBottom.setLayoutData(gridData);
 
 		createUITree(compositeBottom);
-		
+
 		tree.addListener(SWT.PaintItem, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
@@ -444,30 +554,83 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			});
 		}
 	}
+	
+	private void specialExpand(int group) {
+		final LinkedList<TreeItem> groupItems = new LinkedList<>();
+		final TreeItem root = tree.getItem(0);
+		if (root != null) {
+			searchGroupRec(root, group, groupItems);
+			
+			if (!groupItems.isEmpty()) {
+				collapseRec(root);
+				for (TreeItem treeItem : groupItems) {
+					TreeItem parent = treeItem.getParentItem();
+					while (parent != null) {
+						parent.setExpanded(true);
+						parent = parent.getParentItem();
+					}
+				}
+				tree.showItem(groupItems.getLast());
+				tree.showItem(groupItems.getFirst());
+			}
+		}
+	}
+	
+	private void searchGroupRec(TreeItem root, int group, LinkedList<TreeItem> groupItems) {
+		final Object data = root.getData();
+		if (data instanceof SelectableFeature) {
+			final SelectableFeature feature = (SelectableFeature) data;
+			if (feature.getRecommendationGroup() == group) {
+				groupItems.add(root);
+			}
+		}
+		
+		final TreeItem[] items = root.getItems();
+		for (TreeItem treeItem : items) {
+			searchGroupRec(treeItem, group, groupItems);
+		}
+	}
 
+	private void collapseRec(TreeItem root) {
+		root.setExpanded(false);
+
+		final TreeItem[] items = root.getItems();
+		for (TreeItem treeItem : items) {
+			collapseRec(treeItem);
+		}
+	}
+	
 	private void expand(Display display) {
 		if (autoExpand) {
 			display.asyncExec(new Runnable() {
 				@Override
 				public void run() {
-					final TreeItem root = tree.getItem(0);
-					if (root != null) {
-						root.setExpanded(true);
-						expand(root);
-					}
+					expand();
 				}
 			});
 		}
 	}
 
-	private void expand(TreeItem root) {
+	private void expand() {
+		final TreeItem root = tree.getItem(0);
+		if (root != null) {
+			root.setExpanded(true);
+			expandRec(root);
+		}
+	}
+
+	private void expandRec(TreeItem root) {
 		TreeItem[] items = root.getItems();
 		for (TreeItem treeItem : items) {
-			if (treeItem.getGrayed() || treeItem.getChecked()) {
-				treeItem.setExpanded(true);
-				expand(treeItem);
-			} else {
-				treeItem.setExpanded(false);
+			final Object data = treeItem.getData();
+			if (data instanceof SelectableFeature) {
+				final SelectableFeature feature = (SelectableFeature) data;
+				if (feature.getSelection() == Selection.UNDEFINED) {
+					treeItem.setExpanded(false);
+				} else {
+					treeItem.setExpanded(true);
+					expandRec(treeItem);
+				}
 			}
 		}
 	}
@@ -479,6 +642,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	protected void refreshItem(TreeItem item, SelectableFeature feature) {
 		item.setBackground(null);
 		item.setFont(treeItemStandardFont);
+		item.setText(feature.getName());
 		switch (feature.getAutomatic()) {
 		case SELECTED:
 			item.setGrayed(true);
@@ -506,8 +670,40 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		if (!configurationEditor.isAutoSelectFeatures() || configurationEditor.getConfiguration().isValid()) {
 			return null;
 		}
-		final List<SelectableFeature> featureList = configurationEditor.getConfiguration().getManualFeatures();
-		final IConfigJob<?> job = configurationEditor.getConfiguration().getPropagator().getJobWrapper().leadToValidConfiguration(featureList);
+		final List<SelectableFeature> automaticFeatureList = new LinkedList<>();
+		final List<SelectableFeature> manualFeatureList = new LinkedList<>();
+		for (SelectableFeature selectableFeature : configurationEditor.getConfiguration().getFeatures()) {
+			if (!selectableFeature.getFeature().hasHiddenParent()) {
+				if (selectableFeature.getAutomatic() == Selection.UNDEFINED && !selectableFeature.getFeature().hasHiddenParent()) {
+					manualFeatureList.add(selectableFeature);
+				} else {
+					automaticFeatureList.add(selectableFeature);
+				}
+			}
+		}
+
+		// TODO recommender system
+		Random r = new Random();
+		for (SelectableFeature selectableFeature : manualFeatureList) {
+			selectableFeature.setRecommendationValue(r.nextInt(101));
+		}
+
+		curGroup = 0;
+		currentDisplay.syncExec(new Runnable() {
+			@Override
+			public void run() {
+				for (SelectableFeature selectableFeature : automaticFeatureList) {
+					selectableFeature.setRecommendationValue(-1);
+					selectableFeature.setRecommendationGroup(-1);
+					final TreeItem item = itemMap.get(selectableFeature);
+					if (item != null) {
+						refreshItem(item, selectableFeature);
+					}
+				}
+			}
+		});
+
+		final IConfigJob<?> job = configurationEditor.getConfiguration().getPropagator().getJobWrapper().leadToValidConfiguration(manualFeatureList);
 		job.setIntermediateFunction(new IFunction<Object, Void>() {
 			@Override
 			public Void invoke(Object t) {
@@ -524,16 +720,48 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 							case SELECTED:
 								item.setFont(treeItemSpecialFont);
 								item.setForeground(green);
+								item.setText(getValueText(feature) + " " + feature.getName());
 								break;
 							case UNSELECTED:
 								item.setFont(treeItemSpecialFont);
 								item.setForeground(blue);
+								item.setText(getValueText(feature) + " " + feature.getName());
 								break;
 							case UNDEFINED:
 								item.setFont(treeItemStandardFont);
 								item.setForeground(null);
+								item.setText(feature.getName());
 								break;
 							}
+						}
+
+						private String getValueText(SelectableFeature feature) {
+							final int value = feature.getRecommendationValue();
+							final int group = feature.getRecommendationGroup();
+							final StringBuilder sb = new StringBuilder();
+
+							sb.append("(");
+							sb.append(group);
+							sb.append(") ");
+
+							// sb.append(value);
+							if (value < 0) {
+								sb.append("_____");
+							} else if (value < 20) {
+								sb.append("+____");
+							} else if (value < 40) {
+								sb.append("++___ ");
+							} else if (value < 60) {
+								sb.append("+++__");
+							} else if (value < 80) {
+								sb.append("++++_");
+							} else {
+								sb.append("+++++");
+							}
+
+							sb.append(" ");
+
+							return sb.toString();
 						}
 					});
 				}
