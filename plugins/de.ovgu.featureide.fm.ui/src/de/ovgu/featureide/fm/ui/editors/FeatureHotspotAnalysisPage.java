@@ -29,6 +29,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -38,12 +40,15 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.HotSpotResult;
 import de.ovgu.featureide.fm.core.IHotSpotAnalyzer;
@@ -52,6 +57,7 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
+import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
@@ -66,31 +72,94 @@ public class FeatureHotspotAnalysisPage extends FeatureModelEditorPage {
 	private static final String PAGE_TEXT = FEATURE_HOTSPOT_ANALYSIS;
 	private Spinner thresholdSpinner;
 	private Button startAnalysisButton;
+	private Combo analyzerSelectionCombo;
+	private static final int SPINNER_MAX = 1000;
+	private static final int SPINNER_DEFAULT = 5;
+
 	private IFeatureModel model;
 	private IHotSpotAnalyzer analyzer;
-	
+
+	private List<IHotSpotAnalyzer> analyzerList;
+
 	public FeatureHotspotAnalysisPage(FeatureModelEditor featureModelEditor) {
 		model = featureModelEditor.getFeatureModel().clone();
-		
+
 		this.featureModelEditor = new FeatureModelEditor();
 		this.featureModelEditor.featureModel = model;
-		
-		analyzer = new IHotSpotAnalyzer() {			
+		this.analyzerList = new ArrayList<IHotSpotAnalyzer>();
+
+		analyzerList.add(new IHotSpotAnalyzer() {
 			@Override
 			public Set<HotSpotResult> analyze(IFeatureModel fm) {
-				Set<HotSpotResult> results = new HashSet<HotSpotResult>(); 
-				for(IFeature feature : fm.getFeatures()){
+				Set<HotSpotResult> results = new HashSet<HotSpotResult>();
+				for (IFeature feature : fm.getFeatures()) {
 					HotSpotResult rs = new HotSpotResult();
 					rs.setFeatureName(feature.getName());
-					for(IConstraint constr : fm.getConstraints()){
-						if(constr.getContainedFeatures().contains(feature))
+					for (IConstraint constr : fm.getConstraints()) {
+						if (constr.getContainedFeatures().contains(feature))
 							rs.setMetricValue(rs.getMetricValue() + 1);
 					}
 					results.add(rs);
 				}
 				return results;
 			}
-		};
+		});
+
+		analyzerList.add(new IHotSpotAnalyzer() {
+			@Override
+			public Set<HotSpotResult> analyze(IFeatureModel fm) {
+				Node nodes = NodeCreator.createNodes(fm.clone(null)).toCNF();
+				System.out.println(nodes.toString());
+				Set<HotSpotResult> results = new HashSet<HotSpotResult>();
+				for (Node n : nodes.getChildren()) {
+
+					//Node tautology = new Not(n.clone());					
+					//SatSolver sat = new SatSolver(tautology, 1000);
+					//try {
+						//if (sat.isSatisfiable()) {
+							String nodeString = n.toString();
+							for (IFeature f : fm.getFeatures()) {
+								HotSpotResult rs = getHotSpotResultForFeature(f.getName(), results);
+								rs.setFeatureName(f.getName());
+								rs.setMetricValue(countOccurences(f.getName(), nodeString) + rs.getMetricValue());
+								results.add(rs);
+							}
+
+//						}
+//						else
+//							System.out.println("HUHU");
+//					} catch (TimeoutException e) {
+//						e.printStackTrace();
+//					}
+
+				}
+				return results;
+			}
+			
+			private HotSpotResult getHotSpotResultForFeature(String featureName,Set<HotSpotResult> results){
+				HotSpotResult rs = new HotSpotResult();
+				for(HotSpotResult res : results){
+					if(res.getFeatureName().equals(featureName)){
+						rs = res;
+						break;
+					}
+						
+				}
+				return rs;
+			}
+		});
+
+	}
+
+	private int countOccurences(String needle, String source) {
+		String pattern = "\\b"+needle+"\\b";
+        Pattern p= Pattern.compile(pattern);
+        Matcher m= p.matcher(source);
+        int count = 0;
+        while(m.find())
+        	count++;
+        
+        return count;
 	}
 
 	@Override
@@ -196,37 +265,46 @@ public class FeatureHotspotAnalysisPage extends FeatureModelEditorPage {
 			
 			@Override
 			public void widgetSelected(SelectionEvent e) {
+				int index = analyzerSelectionCombo.getSelectionIndex();
+				if (index >= analyzerList.size()) {
+					MessageBox msg = new MessageBox(compositeBottom.getShell(), SWT.ERROR | SWT.OK | SWT.ICON_ERROR);
+					msg.setMessage("Selected analyzer temporary not available!");
+					msg.open();
+					return;
+				}
+				analyzer = analyzerList.get(index);
+
 				Set<HotSpotResult> result = analyzer.analyze(FeatureHotspotAnalysisPage.this.model);
 				List<HotSpotResult> sortedResult = new ArrayList<HotSpotResult>(result);
 				Collections.sort(sortedResult);
-				
-				IHotSpotResultInterpreter<Color> interpreter = new ColorMetricHotSpotInterpreter(Integer.valueOf(thresholdSpinner.getText()).intValue());
-				
+
+				IHotSpotResultInterpreter<Color> interpreter = new ColorMetricHotSpotInterpreter((int) Double.parseDouble((thresholdSpinner.getText())));
+
 				tbl.setVisible(false);
 				tbl.removeAll();
-				
-				for(HotSpotResult hsr : sortedResult){
+
+				for (HotSpotResult hsr : sortedResult) {
 					Color c = interpreter.interpret(hsr);
-					TableItem item = new TableItem (tbl, SWT.NONE);
-					item.setText (0, hsr.getFeatureName());
-					item.setText (1, Double.toString(hsr.getMetricValue()));
-					item.setText (2, c.toString());
+					TableItem item = new TableItem(tbl, SWT.NONE);
+					item.setText(0, hsr.getFeatureName());
+					item.setText(1, Double.toString(hsr.getMetricValue()));
+					item.setText(2, c.toString());
 					item.setBackground(c);
 					FeatureColorManager.setColor(model.getFeature(hsr.getFeatureName()), c);
 				}
-				for (int i=0; i < tbl.getColumnCount(); i++) {
+				for (int i = 0; i < tbl.getColumnCount(); i++) {
 					tbl.getColumn(i).pack();
 				}
 				tbl.setVisible(true);
 				tbl.pack();
 			}
-			
+
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
-				
+
 			}
 		});
-		
+
 		compositeBottom.setLayoutData(gridData);
 //		gridData = new GridData();
 //		gridData.horizontalAlignment = SWT.FILL;
