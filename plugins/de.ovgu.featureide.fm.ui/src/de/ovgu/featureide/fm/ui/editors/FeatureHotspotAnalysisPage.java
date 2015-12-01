@@ -120,8 +120,8 @@ public class FeatureHotspotAnalysisPage extends FeatureModelEditorPage {
 		gridData.grabExcessHorizontalSpace = true;
 		gridData.grabExcessVerticalSpace = false;
 		gridData.verticalAlignment = SWT.TOP;
-		
-		gridLayout = new GridLayout(4, false);
+
+		gridLayout = new GridLayout(5, false);
 		gridLayout.marginHeight = 0;
 		gridLayout.marginWidth = 0;
 		gridLayout.marginLeft = 4;
@@ -144,11 +144,22 @@ public class FeatureHotspotAnalysisPage extends FeatureModelEditorPage {
 		gridData.grabExcessHorizontalSpace = false;
 		gridData.verticalAlignment = SWT.CENTER;
 		thresholdSpinner = new Spinner(compositeTop, SWT.HORIZONTAL);
-		thresholdSpinner.setMaximum(model.getConstraintCount());
+		thresholdSpinner.setDigits(2);
+		thresholdSpinner.setMaximum((int) (SPINNER_MAX * Math.pow(10, thresholdSpinner.getDigits())));
 		thresholdSpinner.setIncrement(1);
-		thresholdSpinner.setSelection(5);
+		thresholdSpinner.setSelection((int) (SPINNER_DEFAULT * Math.pow(10, thresholdSpinner.getDigits())));
 		thresholdSpinner.setLayoutData(gridData);
-		
+
+		//combobox
+		gridData = new GridData();
+		gridData.horizontalAlignment = SWT.FILL;
+		gridData.grabExcessHorizontalSpace = false;
+		gridData.verticalAlignment = SWT.CENTER;
+		analyzerSelectionCombo = new Combo(compositeTop, SWT.NONE);
+		analyzerSelectionCombo.setItems(new String[] { "Constrained Based", "Model Based" });
+		analyzerSelectionCombo.select(0);
+		analyzerSelectionCombo.setLayoutData(gridData);
+
 		// analysis button
 		gridData = new GridData();
 		gridData.horizontalAlignment = SWT.FILL;
