@@ -2,7 +2,7 @@
 <feature
       id="de.ovgu.featureide.featurehouse"
       label="FeatureIDE extension for FeatureHouse (optional)"
-      version="2.7.4.qualifier"
+      version="2.7.5.qualifier"
       provider-name="University of Magdeburg">
 
    <description url="http://www.fosd.de/featureide/">
@@ -197,28 +197,28 @@ Library.
          id="de.ovgu.featureide.core.featurehouse"
          download-size="0"
          install-size="0"
-         version="2.7.4.qualifier"
+         version="2.7.5.qualifier"
          unpack="false"/>
 
    <plugin
          id="de.ovgu.featureide.core.mpl"
          download-size="0"
          install-size="0"
-         version="2.7.4.qualifier"
+         version="2.7.5.qualifier"
          unpack="false"/>
 
    <plugin
          id="de.ovgu.featureide.ui.mpl"
          download-size="0"
          install-size="0"
-         version="2.7.4.qualifier"
+         version="2.7.5.qualifier"
          unpack="false"/>
 
    <plugin
          id="de.ovgu.featureide.core.conversion.ahead_featurehouse"
          download-size="0"
          install-size="0"
-         version="2.7.4.qualifier"
+         version="2.7.5.qualifier"
          unpack="false"/>
 
 </feature>
