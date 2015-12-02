@@ -114,7 +114,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 
 	public FeatureModel featureModel = new FeatureModel();
 
-	private IConfiguration configuration = null;
+	protected IConfiguration configuration = null;
 
 	private int currentPageIndex = -1;
 
