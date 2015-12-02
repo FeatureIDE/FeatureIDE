@@ -222,8 +222,6 @@ Library.
       <import plugin="de.ovgu.featureide.fm.ui"/>
       <import plugin="org.eclipse.core.filesystem"/>
       <import plugin="org.eclipse.ui.intro"/>
-      <import feature="de.ovgu.featureide.featuremodeling" version="2.3.6.qualifier"/>
-      <import plugin="de.ovgu.featureide.core.ahead" version="2.3.1" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.forms"/>
    </requires>
 
