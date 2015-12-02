@@ -217,7 +217,7 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 			final int curClauseCountLimit = (int) Math.floor(localFactor * ((relevantNegIndex - relevantPosIndex) + newRelevantClauseList.size()));
 
 			if ((estimatedClauseCount > maxClauseCountLimit) || (estimatedClauseCount > curClauseCountLimit)) {
-				//				relevantIndex = detectRedundantConstraintsSimple(relevantIndex);
+				detectRedundantConstraintsSimple();
 				detectRedundantConstraintsComplex();
 			}
 
@@ -283,30 +283,79 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 			}
 			i++;
 		}
-		newRelevantClauseList.subList(0, tempIndex).clear();
+		final List<DeprecatedClause> subList = newRelevantClauseList.subList(0, tempIndex);
+		for (DeprecatedClause deprecatedClause : subList) {
+			deprecatedClause.delete(map);
+		}
+		subList.clear();
 	}
 
-	//	private int detectRedundantConstraintsSimple(int relevantIndex) {
-	//		for (int i = relevantClauseList.size() - 1; i >= relevantIndex; i--) {
-	//			final DeprecatedClause mainClause = relevantClauseList.get(i);
-	//			for (int j = i - 1; j >= relevantIndex; j--) {
-	//				final DeprecatedClause subClause = relevantClauseList.get(j);
-	//				final Clause contained = Clause.contained(mainClause, subClause);
-	//				if (contained != null) {
-	//					if (subClause == contained) {
-	//						Collections.swap(relevantClauseList, j, relevantIndex);
-	//						relevantIndex++;
-	//					} else {
-	//						Collections.swap(relevantClauseList, i, relevantIndex);
-	//						relevantIndex++;
-	//						i++;
-	//						break;
-	//					}
-	//				}
-	//			}
-	//		}
-	//		return relevantIndex;
-	//	}
+	private void detectRedundantConstraintsSimple() {
+		for (int i = relevantPosIndex; i < relevantNegIndex; i++) {
+			final DeprecatedClause mainClause = relevantClauseList.get(i);
+			for (int j = i + 1; j < relevantNegIndex; j++) {
+				final DeprecatedClause subClause = relevantClauseList.get(j);
+				final Clause contained = Clause.contained(mainClause, subClause);
+				if (contained != null) {
+					if (subClause == contained) {
+						Collections.swap(relevantClauseList, j, --relevantNegIndex);
+						j--;
+					} else {
+						Collections.swap(relevantClauseList, i, --relevantNegIndex);
+						i--;
+						break;
+					}
+				}
+			}
+		}
+
+		int tempIndex = newRelevantClauseList.size();
+		if (tempIndex > 0) {
+			for (int i = 0; i < tempIndex; i++) {
+				final DeprecatedClause mainClause = newRelevantClauseList.get(i);
+				for (int j = i + 1; j < tempIndex; j++) {
+					final DeprecatedClause subClause = newRelevantClauseList.get(j);
+					final Clause contained = Clause.contained(mainClause, subClause);
+					if (contained != null) {
+						if (subClause == contained) {
+							Collections.swap(newRelevantClauseList, j, --tempIndex);
+							j--;
+						} else {
+							Collections.swap(newRelevantClauseList, i, --tempIndex);
+							i--;
+							break;
+						}
+					}
+				}
+			}
+
+			for (int i = relevantPosIndex; i < relevantNegIndex; i++) {
+				final DeprecatedClause mainClause = relevantClauseList.get(i);
+				for (int j = 0; j < tempIndex; j++) {
+					final DeprecatedClause subClause = newRelevantClauseList.get(j);
+					final Clause contained = Clause.contained(mainClause, subClause);
+					if (contained != null) {
+						if (subClause == contained) {
+							Collections.swap(newRelevantClauseList, j, --tempIndex);
+							j--;
+						} else {
+							Collections.swap(relevantClauseList, i, --relevantNegIndex);
+							i--;
+							break;
+						}
+					}
+				}
+			}
+
+			if (tempIndex < newRelevantClauseList.size()) {
+				final List<DeprecatedClause> subList = newRelevantClauseList.subList(tempIndex, newRelevantClauseList.size());
+				for (DeprecatedClause deprecatedClause : subList) {
+					deprecatedClause.delete(map);
+				}
+				subList.clear();
+			}
+		}
+	}
 
 	private void removeOldClauses() {
 		for (int i = 0; i < relevantPosIndex; i++) {

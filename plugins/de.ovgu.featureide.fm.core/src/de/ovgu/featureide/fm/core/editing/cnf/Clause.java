@@ -29,17 +29,29 @@ import java.util.Arrays;
  */
 public class Clause {
 
-	protected int[] literals;
+	private static final int HASHSIZE = 64;
+
+	protected final int[] literals;
+
+	private final long hashValue;
 
 	public Clause(int... literals) {
 		this.literals = literals;
 		Arrays.sort(this.literals);
+
+		//		final long smallestLiteral = literals[0];
+		int literalHash = 0;
+		for (int literal : literals) {
+			literalHash |= (1 << (literal % HASHSIZE));
+		}
+		//		hashValue = (smallestLiteral << HASHSIZE) | literalHash;
+		hashValue = literalHash;
 	}
 
 	public int[] getLiterals() {
 		return literals;
 	}
-	
+
 	public boolean contains(int literalID) {
 		for (int curLiteralID : literals) {
 			if (Math.abs(curLiteralID) == literalID) {
@@ -76,7 +88,7 @@ public class Clause {
 	 * 
 	 * @return the larger clause (can then be removed from formula)
 	 */
-	public static Clause contained(Clause clause1, Clause clause2) {
+	public static Clause contained2(Clause clause1, Clause clause2) {
 		final int[] literals1 = clause1.literals;
 		final int[] literals2 = clause2.literals;
 		int index1 = 0;
@@ -113,6 +125,68 @@ public class Clause {
 		default:
 			return null;
 		}
+	}
+
+	/**
+	 * Checks whether one clause contains the other one or vice-versa.
+	 * 
+	 * @param clause1 first clause
+	 * @param clause2 second clause
+	 * 
+	 * @return the larger clause (can then be removed from formula)
+	 */
+	public static Clause contained(Clause clause1, Clause clause2) {
+		final int[] literals1 = clause1.literals;
+		final int[] literals2 = clause2.literals;
+
+		if (literals1.length == literals2.length) {
+			return (Arrays.equals(literals1, literals2)) ? clause1 : null;
+		} else {
+			final long combinedHash = clause1.hashValue & clause2.hashValue;
+			if (literals1.length < literals2.length) {
+				if (combinedHash == clause1.hashValue) {
+					int index1 = 0;
+					int index2 = 0;
+					while (index1 < literals1.length && index2 < literals2.length) {
+						final int diff = literals1[index1] - literals2[index2];
+						if (diff < 0) {
+							return null;
+						} else if (diff > 0) {
+							index2++;
+						} else {
+							index1++;
+							index2++;
+						}
+					}
+
+					return index1 < literals1.length ? null : clause2;
+				}
+			} else {
+				if (combinedHash == clause2.hashValue) {
+					int index1 = 0;
+					int index2 = 0;
+					while (index1 < literals1.length && index2 < literals2.length) {
+						final int diff = literals1[index1] - literals2[index2];
+						if (diff < 0) {
+							index1++;
+						} else if (diff > 0) {
+							return null;
+						} else {
+							index1++;
+							index2++;
+						}
+					}
+
+					return index2 < literals2.length ? null : clause1;
+				}
+			}
+
+		}
+		return null;
+	}
+
+	public long hashValue() {
+		return hashValue;
 	}
 
 }
