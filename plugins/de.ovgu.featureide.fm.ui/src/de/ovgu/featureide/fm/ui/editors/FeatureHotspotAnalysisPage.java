@@ -25,12 +25,13 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.HOTSPOT_START_
 import static de.ovgu.featureide.fm.core.localization.StringTable.HOTSPOT_THRESHOLD;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -48,6 +49,8 @@ import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.prop4j.Implies;
+import org.prop4j.Literal;
 import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.HotSpotResult;
@@ -90,7 +93,7 @@ public class FeatureHotspotAnalysisPage extends FeatureModelEditorPage {
 
 		analyzerList.add(new IHotSpotAnalyzer() {
 			@Override
-			public Set<HotSpotResult> analyze(IFeatureModel fm) {
+			public Collection<HotSpotResult> analyze(IFeatureModel fm) {
 				Set<HotSpotResult> results = new HashSet<HotSpotResult>();
 				for (IFeature feature : fm.getFeatures()) {
 					HotSpotResult rs = new HotSpotResult();
@@ -107,59 +110,53 @@ public class FeatureHotspotAnalysisPage extends FeatureModelEditorPage {
 
 		analyzerList.add(new IHotSpotAnalyzer() {
 			@Override
-			public Set<HotSpotResult> analyze(IFeatureModel fm) {
+			public Collection<HotSpotResult> analyze(IFeatureModel fm) {
 				Node nodes = NodeCreator.createNodes(fm.clone(null)).toCNF();
-				//System.out.println(nodes.toString());
+				Map<IFeature, HotSpotResult> results = new HashMap<IFeature, HotSpotResult>();
+				for (IFeature feature : fm.getFeatures()) {
+					HotSpotResult rs = new HotSpotResult();
+					rs.setFeatureName(feature.getName());
+					results.put(feature, rs);
+					for (Node n : nodes.getChildren()) {
+						if (n.getContainedFeatures().contains(feature.getName())) {
+							rs.setMetricValue(rs.getMetricValue() + 1);							
+						}
+					}
+
+				}
+				return results.values();
+			}
+		});
+		
+		analyzerList.add(new IHotSpotAnalyzer() {
+			@Override
+			public Collection<HotSpotResult> analyze(IFeatureModel fm) {
 				Set<HotSpotResult> results = new HashSet<HotSpotResult>();
-				for (Node n : nodes.getChildren()) {
-
-					//Node tautology = new Not(n.clone());					
-					//SatSolver sat = new SatSolver(tautology, 1000);
-					//try {
-						//if (sat.isSatisfiable()) {
-							String nodeString = n.toString();
-							for (IFeature f : fm.getFeatures()) {
-								HotSpotResult rs = getHotSpotResultForFeature(f.getName(), results);
-								rs.setFeatureName(f.getName());
-								rs.setMetricValue(countOccurences(f.getName(), nodeString) + rs.getMetricValue());
-								results.add(rs);
+				for (IFeature feature : fm.getFeatures()) {
+					HotSpotResult rs = new HotSpotResult();
+					rs.setFeatureName(feature.getName());
+					for (IConstraint constr : fm.getConstraints()) {
+						if (constr.getContainedFeatures().contains(feature)) {
+							if (constr.getNode() instanceof Implies) {
+								Implies implies = (Implies) constr.getNode();
+								Literal left = (Literal) implies.getChildren()[0];
+								List<String> right = implies.getChildren()[1].getContainedFeatures();
+								if (left.var.equals(feature.getName())) {
+									rs.setMetricValue(rs.getMetricValue() + right.size());										
+								} else {
+									rs.setMetricValue(rs.getMetricValue() + 1);										
+								}
 							}
-
-//						}
-//						else
-//							System.out.println("HUHU");
-//					} catch (TimeoutException e) {
-//						e.printStackTrace();
-//					}
-
+						}
+					}
+					
+					int nrOfChildren = feature.getStructure().getChildrenCount();
+					rs.setMetricValue(rs.getMetricValue() + nrOfChildren);			
+					results.add(rs);
 				}
 				return results;
 			}
-			
-			private HotSpotResult getHotSpotResultForFeature(String featureName,Set<HotSpotResult> results){
-				HotSpotResult rs = new HotSpotResult();
-				for(HotSpotResult res : results){
-					if(res.getFeatureName().equals(featureName)){
-						rs = res;
-						break;
-					}
-						
-				}
-				return rs;
-			}
 		});
-
-	}
-
-	private int countOccurences(String needle, String source) {
-		String pattern = "\\b"+needle+"\\b";
-        Pattern p= Pattern.compile(pattern);
-        Matcher m= p.matcher(source);
-        int count = 0;
-        while(m.find())
-        	count++;
-        
-        return count;
 	}
 
 	@Override
@@ -213,7 +210,7 @@ public class FeatureHotspotAnalysisPage extends FeatureModelEditorPage {
 		gridData.grabExcessHorizontalSpace = false;
 		gridData.verticalAlignment = SWT.CENTER;
 		thresholdSpinner = new Spinner(compositeTop, SWT.HORIZONTAL);
-		thresholdSpinner.setDigits(2);
+		thresholdSpinner.setDigits(0);
 		thresholdSpinner.setMaximum((int) (SPINNER_MAX * Math.pow(10, thresholdSpinner.getDigits())));
 		thresholdSpinner.setIncrement(1);
 		thresholdSpinner.setSelection((int) (SPINNER_DEFAULT * Math.pow(10, thresholdSpinner.getDigits())));
@@ -225,7 +222,7 @@ public class FeatureHotspotAnalysisPage extends FeatureModelEditorPage {
 		gridData.grabExcessHorizontalSpace = false;
 		gridData.verticalAlignment = SWT.CENTER;
 		analyzerSelectionCombo = new Combo(compositeTop, SWT.NONE);
-		analyzerSelectionCombo.setItems(new String[] { "Constrained Based", "Model Based" });
+		analyzerSelectionCombo.setItems(new String[] { "Constraint Based", "Model Based", "Contraint 2"});
 		analyzerSelectionCombo.select(0);
 		analyzerSelectionCombo.setLayoutData(gridData);
 
@@ -274,7 +271,7 @@ public class FeatureHotspotAnalysisPage extends FeatureModelEditorPage {
 				}
 				analyzer = analyzerList.get(index);
 
-				Set<HotSpotResult> result = analyzer.analyze(FeatureHotspotAnalysisPage.this.model);
+				Collection<HotSpotResult> result = analyzer.analyze(FeatureHotspotAnalysisPage.this.model);
 				List<HotSpotResult> sortedResult = new ArrayList<HotSpotResult>(result);
 				Collections.sort(sortedResult);
 
@@ -284,6 +281,9 @@ public class FeatureHotspotAnalysisPage extends FeatureModelEditorPage {
 				tbl.removeAll();
 
 				for (HotSpotResult hsr : sortedResult) {
+					if (hsr.getMetricValue() == 0) {
+						break;
+					}
 					Color c = interpreter.interpret(hsr);
 					TableItem item = new TableItem(tbl, SWT.NONE);
 					item.setText(0, hsr.getFeatureName());
@@ -338,10 +338,6 @@ public class FeatureHotspotAnalysisPage extends FeatureModelEditorPage {
 		}
 		tbl.setLayoutData(gd);
 		return tbl;
-	}
-	
-	private void createAnalysisResultView(Composite compositeBottom) {
-		
 	}
 
 }

@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.core;
 
-import java.util.Set;
+import java.util.Collection;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
@@ -32,5 +32,5 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  * @author Andy Kenner
  */
 public interface IHotSpotAnalyzer {
-	Set<HotSpotResult> analyze(IFeatureModel fm);
+	Collection<HotSpotResult> analyze(IFeatureModel fm);
 }
