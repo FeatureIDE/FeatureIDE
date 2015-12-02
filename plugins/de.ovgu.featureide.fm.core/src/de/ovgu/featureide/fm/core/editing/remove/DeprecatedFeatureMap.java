@@ -20,9 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.editing.remove;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Map;
 
 /**
  * Maps feature names to a corresponding feature.
@@ -30,121 +28,15 @@ import java.util.Map;
  * @author Sebastian Krieter
  */
 public class DeprecatedFeatureMap {
-
-//	static class DeprecatedFeature implements Comparable<DeprecatedFeature> {
-////		private final String feature;
-//		private final int featureID;
-//
-//		private long positiveCount;
-//		private long negativeCount;
-//
-//		public DeprecatedFeature(int featureID) {
-////			this.feature = feature;
-//			this.featureID = featureID;
-//			positiveCount = 0;
-//			negativeCount = 0;
-//		}
-//
-////		public String getFeature() {
-////			return feature;
-////		}
-//
-//		@Override
-//		public int compareTo(DeprecatedFeature arg0) {
-//			return (int) Math.signum(arg0.getClauseCount() - this.getClauseCount());
-//		}
-//
-//		public long getClauseCount() {
-//			try {
-//				return Math.multiplyExact(positiveCount, negativeCount);
-//			} catch (ArithmeticException e) {
-//				return Long.MAX_VALUE;
-//			}
-//		}
-//
-//		public void incPositive() {
-//			positiveCount++;
-//		}
-//
-//		public void incNegative() {
-//			negativeCount++;
-//		}
-//
-//		public void decPositive() {
-//			positiveCount--;
-//		}
-//
-//		public void decNegative() {
-//			negativeCount--;
-//		}
-//
-//		@Override
-//		public boolean equals(Object arg0) {
-//			return featureID == ((DeprecatedFeature) arg0).featureID;
-////			return (arg0 instanceof DeprecatedFeature) && feature.equals(((DeprecatedFeature) arg0).feature);
-//		}
-//
-//		@Override
-//		public int hashCode() {
-//			return Integer.hashCode(featureID);
-//		}
-//
-////		@Override
-////		public String toString() {
-////			return feature + ": " + getClauseCount();
-////		}
-//
-//		public int getFeatureID() {
-//			return featureID;
-//		}
-//	}
 	
 	private final long[] positiveCounts;
 	private final long[] negativeCounts;
 
-//	private final DeprecatedFeature[] map;
 	private final int maxIndex;
 	private int curIndex = 0;
 
 	private int globalMixedClauseCount = 0;
 	private long lastClauseCount = 0;
-
-//	public DeprecatedFeatureMap(Collection<String> features, Map<Object, Integer> idMap) {
-//		this.maxIndex = features.size();
-//		map = new DeprecatedFeature[idMap.size() + 1];
-////		for (String curFeature : features) {
-//		for (int i = 1; i < maxIndex + 1; i++) {
-////			Integer id = idMap.get(curFeature);
-////			map[id] = new DeprecatedFeature(curFeature);
-//			map[i] = new DeprecatedFeature(i);
-//		}
-//	}
-//
-//	public DeprecatedFeature next() {
-////		if (isEmpty()) {
-////			return null;
-////		}
-//		DeprecatedFeature smallestFeature = map[1];
-//		int minIndex = 1;
-//		for (int i = 2; i < map.length; i++) {
-//			final DeprecatedFeature next = map[i];
-//			if (smallestFeature == null || (next != null && next.compareTo(smallestFeature) > 0)) {
-//				smallestFeature = next;
-//				minIndex = i;
-//			}
-//		}
-//		map[minIndex] = null;
-//		curIndex++;
-//		return smallestFeature;
-//	}
-//
-//	public boolean isEmpty() {
-//		return maxIndex == curIndex;
-//	}
-//
-//	public DeprecatedFeature get(int var) {
-//		return map[var];
-//	}
 	
 	public DeprecatedFeatureMap(Collection<String> features) {
 		this.maxIndex = features.size();
@@ -209,10 +101,6 @@ public class DeprecatedFeatureMap {
 		return maxIndex == curIndex;
 	}
 
-//	public DeprecatedFeature get(int var) {
-//		return map[var];
-//	}
-
 	public int getGlobalMixedClauseCount() {
 		return globalMixedClauseCount;
 	}
@@ -229,8 +117,8 @@ public class DeprecatedFeatureMap {
 		return abslit < positiveCounts.length; // && positiveCounts[abslit] >= 0;
 	}
 
-//	public int size() {
-//		return maxIndex - curIndex;
-//	}
+	public int size() {
+		return maxIndex - curIndex;
+	}
 
 }

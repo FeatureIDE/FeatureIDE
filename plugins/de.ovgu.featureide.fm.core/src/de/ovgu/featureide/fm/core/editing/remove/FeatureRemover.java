@@ -61,10 +61,10 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 
 	private final List<DeprecatedClause> newRelevantClauseList = new ArrayList<>();
 
-//	private List<DeprecatedClause> orgClauseList;
 	private List<DeprecatedClause> relevantClauseList;
 	private Set<DeprecatedClause> relevantClauseSet;
 	private Set<DeprecatedClause> newClauseSet;
+	private List<DeprecatedClause> orgClauseList;
 	private Set<String> retainedFeatures;
 	private Map<Object, Integer> idMap;
 
@@ -192,10 +192,10 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 
 		createSolver();
 
-//		workMonitor.setMaxAbsoluteWork(map.size() + 1);
+		workMonitor.setMaxAbsoluteWork(map.size() + 1);
 
 		final double localFactor = 1.2;
-		final double globalFactor = 2.0;
+		final double globalFactor = 1.5;
 
 		final int maxClauseCountLimit = (int) Math.floor(globalFactor * relevantClauseList.size());
 
@@ -230,8 +230,7 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 			//			generalize(curFeatureID);
 			resolution(curFeatureID);
 
-//			idMap.remove(curFeature);
-//			idMap.remove(curFeatureID);
+			idMap.remove(curFeature);
 			removedFeatures[curFeatureID] = true;
 
 			final int globalMixedClauseCount = map.getGlobalMixedClauseCount();
@@ -324,9 +323,9 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 		final ArrayList<DeprecatedClause> tempRelevantClauseList = new ArrayList<>(subList.size() + newRelevantClauseList.size());
 		tempRelevantClauseList.addAll(subList);
 		tempRelevantClauseList.addAll(newRelevantClauseList);
-		relevantClauseList.clear();
 		newRelevantClauseList.clear();
-		
+		relevantClauseList.clear();
+
 		relevantClauseList = tempRelevantClauseList;
 	}
 
@@ -357,12 +356,11 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 			for (int j = relevantNegIndex; j < relevantClauseList.size(); j++) {
 				final int[] children2 = relevantClauseList.get(j).getLiterals();
 				final int[] newChildren = new int[orChildren.length + children2.length];
-//
+
 				System.arraycopy(orChildren, 0, newChildren, 0, orChildren.length);
 				System.arraycopy(children2, 0, newChildren, orChildren.length, children2.length);
 
 				addNewClause(DeprecatedClause.createClause(map, newChildren, curFeatureID));
-//				addNewClause(DeprecatedClause.createClause(map, orChildren, children2, curFeatureID));
 			}
 		}
 	}
@@ -482,24 +480,23 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 //		orgClauseList = new ArrayList<>(newClauseSet);
 	}
 
-//	private void removeRedundantConstraintsComplex() {
-//		if (solver != null) {
-//			solver.reset();
-//		}
-//		solver = new CNFSolver(orgClauseList, retainedFeatures.size());
-//		newClauseSet.removeAll(orgClauseList);
-//
-//		for (DeprecatedClause mainClause : newClauseSet) {
-//			if (!remove(mainClause)) {
-//				solver.addClause(mainClause);
-//				orgClauseList.add(mainClause);
-//			}
-//		}
-//	}
+	private void removeRedundantConstraintsComplex() {
+		if (solver != null) {
+			solver.reset();
+		}
+		solver = new CNFSolver(orgClauseList, retainedFeatures.size());
+		newClauseSet.removeAll(orgClauseList);
+
+		for (DeprecatedClause mainClause : newClauseSet) {
+			if (!remove(mainClause)) {
+				solver.addClause(mainClause);
+				orgClauseList.add(mainClause);
+			}
+		}
+	}
 
 	private Node[] createNewClauseList() {
 //		removeRedundantConstraintsComplex();
-//		final Collection<DeprecatedClause> clauses = orgClauseList;
 		final Collection<DeprecatedClause> clauses = newClauseSet;
 
 		final int newClauseSize = clauses.size();

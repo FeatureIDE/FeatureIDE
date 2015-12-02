@@ -102,10 +102,6 @@ public class DeprecatedClause extends Clause {
 
 	public static DeprecatedClause createClause(DeprecatedFeatureMap map, int newLiteral) {
 		final DeprecatedClause clause = new DeprecatedClause(new int[] { newLiteral });
-//		final DeprecatedFeature df = map.get(Math.abs(newLiteral));
-//		if (df != null) {
-//			clause.relevance++;
-//		}
 		final int abslit = Math.abs(newLiteral);
 		if (map.relevant(abslit)) {
 			clause.relevance++;
@@ -120,16 +116,6 @@ public class DeprecatedClause extends Clause {
 
 	private void computeRelevance(DeprecatedFeatureMap map) {
 		for (int literal : literals) {
-//			final DeprecatedFeature df = map.get(Math.abs(literal));
-//			if (df != null) {
-//				relevance++;
-//				if (literal > 0) {
-//					df.incPositive();
-//				} else {
-//					df.incNegative();
-//				}
-//			}
-			
 			final int abslit = Math.abs(literal);
 			if (map.relevant(abslit)) {
 				relevance++;
@@ -147,16 +133,7 @@ public class DeprecatedClause extends Clause {
 
 	public void delete(DeprecatedFeatureMap map) {
 		if (literals != null && literals.length > 1) {
-			for (int literal : literals) {
-//				final DeprecatedFeature df = map.get(Math.abs(literal));
-//				if (df != null) {
-//					if (literal > 0) {
-//						df.decPositive();
-//					} else {
-//						df.decNegative();
-//					}
-//				}
-				
+			for (int literal : literals) {			
 				final int abslit = Math.abs(literal);
 				if (map.relevant(abslit)) {
 					if (literal > 0) {
