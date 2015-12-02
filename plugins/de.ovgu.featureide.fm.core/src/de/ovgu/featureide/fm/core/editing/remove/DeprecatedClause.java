@@ -121,7 +121,6 @@ public class DeprecatedClause extends Clause {
 			if (relevance > 0 && relevance < literals.length) {
 				map.decGlobalMixedClauseCount();
 			}
-			literals = null;
 		}
 	}
 
