@@ -90,25 +90,22 @@ public class ColorScheme {
 	public void setColor(IFeature feature, Color color){
 		int r = color.getRed();
 		int g = color.getGreen();
-		int b = color.getBlue();
 		
-		if(r == 255 && g == 0){
+		if(r == 255 && g < 90){
 			setColor(feature.getName(),FeatureColor.Red);
 			return;
 		}
-			
-		if(r > 0 && g > 150){
+		if(r == 255 && g < 190){
+			setColor(feature.getName(),FeatureColor.Orange);
+			return;
+		}	
+		if(r > 190 && g > 210){
 			setColor(feature.getName(),FeatureColor.Yellow);
 			return;
 		}
-			
-		if(g == 150){
-			setColor(feature.getName(),FeatureColor.Dark_Green);
-			return;
-		}
-			
-			
-			
+		
+		setColor(feature.getName(),FeatureColor.Dark_Green);
+		return;	
 	}
 	
 	/**

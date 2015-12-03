@@ -32,5 +32,8 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  * @author Andy Kenner
  */
 public interface IHotSpotAnalyzer {
+	
+	String getName();
+	
 	Collection<HotSpotResult> analyze(IFeatureModel fm);
 }

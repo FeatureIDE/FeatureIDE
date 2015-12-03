@@ -73,11 +73,13 @@ public class FeatureHotspotAnalysisPage extends FeatureModelEditorPage {
 
 	private static final String ID = FMUIPlugin.PLUGIN_ID + ".editors.FeatureHotSpotAnalysis";
 	private static final String PAGE_TEXT = FEATURE_HOTSPOT_ANALYSIS;
+	private static final boolean SHOW_RGB_BALUE = false;
+	private static final int SPINNER_MAX = 1000;
+	private static final int SPINNER_DEFAULT = 5;
+	
 	private Spinner thresholdSpinner;
 	private Button startAnalysisButton;
 	private Combo analyzerSelectionCombo;
-	private static final int SPINNER_MAX = 1000;
-	private static final int SPINNER_DEFAULT = 5;
 
 	private IFeatureModel model;
 	private IHotSpotAnalyzer analyzer;
@@ -91,72 +93,9 @@ public class FeatureHotspotAnalysisPage extends FeatureModelEditorPage {
 		this.featureModelEditor.featureModel = model;
 		this.analyzerList = new ArrayList<IHotSpotAnalyzer>();
 
-		analyzerList.add(new IHotSpotAnalyzer() {
-			@Override
-			public Collection<HotSpotResult> analyze(IFeatureModel fm) {
-				Set<HotSpotResult> results = new HashSet<HotSpotResult>();
-				for (IFeature feature : fm.getFeatures()) {
-					HotSpotResult rs = new HotSpotResult();
-					rs.setFeatureName(feature.getName());
-					for (IConstraint constr : fm.getConstraints()) {
-						if (constr.getContainedFeatures().contains(feature))
-							rs.setMetricValue(rs.getMetricValue() + 1);
-					}
-					results.add(rs);
-				}
-				return results;
-			}
-		});
-
-		analyzerList.add(new IHotSpotAnalyzer() {
-			@Override
-			public Collection<HotSpotResult> analyze(IFeatureModel fm) {
-				Node nodes = NodeCreator.createNodes(fm.clone(null)).toCNF();
-				Map<IFeature, HotSpotResult> results = new HashMap<IFeature, HotSpotResult>();
-				for (IFeature feature : fm.getFeatures()) {
-					HotSpotResult rs = new HotSpotResult();
-					rs.setFeatureName(feature.getName());
-					results.put(feature, rs);
-					for (Node n : nodes.getChildren()) {
-						if (n.getContainedFeatures().contains(feature.getName())) {
-							rs.setMetricValue(rs.getMetricValue() + 1);							
-						}
-					}
-
-				}
-				return results.values();
-			}
-		});
-		
-		analyzerList.add(new IHotSpotAnalyzer() {
-			@Override
-			public Collection<HotSpotResult> analyze(IFeatureModel fm) {
-				Set<HotSpotResult> results = new HashSet<HotSpotResult>();
-				for (IFeature feature : fm.getFeatures()) {
-					HotSpotResult rs = new HotSpotResult();
-					rs.setFeatureName(feature.getName());
-					for (IConstraint constr : fm.getConstraints()) {
-						if (constr.getContainedFeatures().contains(feature)) {
-							if (constr.getNode() instanceof Implies) {
-								Implies implies = (Implies) constr.getNode();
-								Literal left = (Literal) implies.getChildren()[0];
-								List<String> right = implies.getChildren()[1].getContainedFeatures();
-								if (left.var.equals(feature.getName())) {
-									rs.setMetricValue(rs.getMetricValue() + right.size());										
-								} else {
-									rs.setMetricValue(rs.getMetricValue() + 1);										
-								}
-							}
-						}
-					}
-					
-					int nrOfChildren = feature.getStructure().getChildrenCount();
-					rs.setMetricValue(rs.getMetricValue() + nrOfChildren);			
-					results.add(rs);
-				}
-				return results;
-			}
-		});
+		analyzerList.add(new ConstraintBasedAnalyzer());
+		analyzerList.add(new ConstraintBasedAnalysis2());
+		analyzerList.add(new CNFBasedAnalyzer());
 	}
 
 	@Override
@@ -222,7 +161,12 @@ public class FeatureHotspotAnalysisPage extends FeatureModelEditorPage {
 		gridData.grabExcessHorizontalSpace = false;
 		gridData.verticalAlignment = SWT.CENTER;
 		analyzerSelectionCombo = new Combo(compositeTop, SWT.NONE);
-		analyzerSelectionCombo.setItems(new String[] { "Constraint Based", "Model Based", "Contraint 2"});
+		final String[] analyzerNames = new String[analyzerList.size()];
+		int index = 0;
+		for (IHotSpotAnalyzer analyzer : analyzerList) {
+			analyzerNames [index++] = analyzer.getName();
+		}
+		analyzerSelectionCombo.setItems(analyzerNames);
 		analyzerSelectionCombo.select(0);
 		analyzerSelectionCombo.setLayoutData(gridData);
 
@@ -281,14 +225,13 @@ public class FeatureHotspotAnalysisPage extends FeatureModelEditorPage {
 				tbl.removeAll();
 
 				for (HotSpotResult hsr : sortedResult) {
-					if (hsr.getMetricValue() == 0) {
-						break;
-					}
 					Color c = interpreter.interpret(hsr);
 					TableItem item = new TableItem(tbl, SWT.NONE);
 					item.setText(0, hsr.getFeatureName());
 					item.setText(1, Double.toString(hsr.getMetricValue()));
-					item.setText(2, c.toString());
+					if (SHOW_RGB_BALUE) {
+						item.setText(2, c.toString());
+					}
 					item.setBackground(c);
 					FeatureColorManager.setColor(model.getFeature(hsr.getFeatureName()), c, false);
 				}
@@ -328,17 +271,103 @@ public class FeatureHotspotAnalysisPage extends FeatureModelEditorPage {
 
 	private Table createTableBaseLayout(Composite parent){
 		Table tbl = new Table(parent,SWT.BORDER | SWT.V_SCROLL);
-		String titles[] = {"Feature Name","Metric Result","RGB Value"};
+		List<String> titles = new ArrayList<>(3);
+		titles.add("Feature Name");
+		titles.add("Metric Result");
+		if (SHOW_RGB_BALUE) {
+			titles.add("RGB Value");
+		}
 		tbl.setLinesVisible (true);
 		tbl.setHeaderVisible (true);
 		GridData gd = new GridData(SWT.FILL,SWT.TOP,true,false);
-		for(int i =0; i < titles.length; i++){
+		for(String title : titles){
 			TableColumn col = new TableColumn(tbl, SWT.NONE);
 			col.setWidth(150);
-			col.setText(titles[i]);
+			col.setText(title);
 		}
 		tbl.setLayoutData(gd);
 		return tbl;
 	}
 
+	private static final class ConstraintBasedAnalyzer implements IHotSpotAnalyzer {
+		@Override
+		public Collection<HotSpotResult> analyze(IFeatureModel fm) {
+			Set<HotSpotResult> results = new HashSet<HotSpotResult>();
+			for (IFeature feature : fm.getFeatures()) {
+				HotSpotResult rs = new HotSpotResult();
+				rs.setFeatureName(feature.getName());
+				for (IConstraint constr : fm.getConstraints()) {
+					if (constr.getContainedFeatures().contains(feature))
+						rs.setMetricValue(rs.getMetricValue() + 1);
+				}
+				results.add(rs);
+			}
+			return results;
+		}
+
+		@Override
+		public String getName() {
+			return "Constraint-Based";
+		}
+	}
+
+	private static final class ConstraintBasedAnalysis2 implements IHotSpotAnalyzer {
+		@Override
+		public Collection<HotSpotResult> analyze(IFeatureModel fm) {
+			Set<HotSpotResult> results = new HashSet<HotSpotResult>();
+			for (IFeature feature : fm.getFeatures()) {
+				HotSpotResult rs = new HotSpotResult();
+				rs.setFeatureName(feature.getName());
+				for (IConstraint constr : fm.getConstraints()) {
+					if (constr.getContainedFeatures().contains(feature)) {
+						if (constr.getNode() instanceof Implies) {
+							Implies implies = (Implies) constr.getNode();
+							Literal left = (Literal) implies.getChildren()[0];
+							List<String> right = implies.getChildren()[1].getContainedFeatures();
+							if (left.var.equals(feature.getName())) {
+								rs.setMetricValue(rs.getMetricValue() + right.size());										
+							} else {
+								rs.setMetricValue(rs.getMetricValue() + 1);										
+							}
+						}
+					}
+				}
+				
+				int nrOfChildren = feature.getStructure().getChildrenCount();
+				rs.setMetricValue(rs.getMetricValue() + nrOfChildren);			
+				results.add(rs);
+			}
+			return results;
+		}
+
+		@Override
+		public String getName() {
+			return "Constraint-Based 2";
+		}
+	}
+	
+	private static final class CNFBasedAnalyzer implements IHotSpotAnalyzer {
+		@Override
+		public Collection<HotSpotResult> analyze(IFeatureModel fm) {
+			Node nodes = NodeCreator.createNodes(fm.clone(null)).toCNF();
+			Map<IFeature, HotSpotResult> results = new HashMap<IFeature, HotSpotResult>();
+			for (IFeature feature : fm.getFeatures()) {
+				HotSpotResult rs = new HotSpotResult();
+				rs.setFeatureName(feature.getName());
+				results.put(feature, rs);
+				for (Node n : nodes.getChildren()) {
+					if (n.getContainedFeatures().contains(feature.getName())) {
+						rs.setMetricValue(rs.getMetricValue() + 1);							
+					}
+				}
+
+			}
+			return results.values();
+		}
+
+		@Override
+		public String getName() {
+			return "CNF-Based";
+		}
+	}
 }
