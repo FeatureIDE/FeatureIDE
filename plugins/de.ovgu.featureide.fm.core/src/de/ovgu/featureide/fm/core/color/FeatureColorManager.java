@@ -80,10 +80,12 @@ public class FeatureColorManager {
 	}
 	
 	
-	public static void setColor(IFeature feature, Color rgb){
+	public static void setColor(IFeature feature, Color rgb, boolean write){
 		ColorScheme scheme = getCurrentColorScheme(feature);
 		scheme.setColor(feature, rgb);
-		writeColors(getProject(feature), scheme);
+		if (write) {
+			writeColors(getProject(feature), scheme);
+		}
 	}
 	/**
 	 * Checks whether the current scheme is the default scheme without colors.
@@ -145,6 +147,10 @@ public class FeatureColorManager {
 	 */
 	public static ColorScheme getCurrentColorScheme(IFeatureModel featureModel) {
 		IProject project = getProject(featureModel);
+		return getCurrentColorScheme(project);
+	}
+		
+	public static ColorScheme getCurrentColorScheme(IProject project) {
 		if (project == null) {
 			// bad workaround 
 			return new DefaultColorScheme();
@@ -235,6 +241,14 @@ public class FeatureColorManager {
 		} catch (IOException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
+	}
+	
+	public static void writeColors(IFeatureModel model) {
+		writeColors(getProject(model));
+	}
+	
+	public static void writeColors(IProject project) {
+		writeColors(project, getCurrentColorScheme(project));
 	}
 	
 	/**

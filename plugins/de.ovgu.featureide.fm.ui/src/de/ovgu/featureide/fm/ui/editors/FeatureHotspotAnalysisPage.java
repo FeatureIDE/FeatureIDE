@@ -290,8 +290,9 @@ public class FeatureHotspotAnalysisPage extends FeatureModelEditorPage {
 					item.setText(1, Double.toString(hsr.getMetricValue()));
 					item.setText(2, c.toString());
 					item.setBackground(c);
-					FeatureColorManager.setColor(model.getFeature(hsr.getFeatureName()), c);
+					FeatureColorManager.setColor(model.getFeature(hsr.getFeatureName()), c, false);
 				}
+				FeatureColorManager.writeColors(model);
 				for (int i = 0; i < tbl.getColumnCount(); i++) {
 					tbl.getColumn(i).pack();
 				}
