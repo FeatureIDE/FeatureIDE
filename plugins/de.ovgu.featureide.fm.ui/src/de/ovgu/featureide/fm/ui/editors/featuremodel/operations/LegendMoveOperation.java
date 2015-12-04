@@ -60,7 +60,7 @@ public class LegendMoveOperation extends AbstractGraphicalFeatureModelOperation 
 	}
 
 	@Override
-	protected FeatureModelEvent internalRedo() {
+	protected FeatureModelEvent operation() {
 		FeatureUIHelper.getLegendFigure(graphicalFeatureModel).setLocation(newLocation);
 		final FeatureModelLayout layout = graphicalFeatureModel.getLayout();
 		layout.setLegendPos(newLocation.x, newLocation.y);
@@ -70,7 +70,7 @@ public class LegendMoveOperation extends AbstractGraphicalFeatureModelOperation 
 	}
 
 	@Override
-	protected FeatureModelEvent internalUndo() {
+	protected FeatureModelEvent inverseOperation() {
 		FeatureUIHelper.getLegendFigure(graphicalFeatureModel).setLocation(oldLocation);
 		final FeatureModelLayout layout = graphicalFeatureModel.getLayout();
 		layout.setLegendPos(oldLocation.x, oldLocation.y);

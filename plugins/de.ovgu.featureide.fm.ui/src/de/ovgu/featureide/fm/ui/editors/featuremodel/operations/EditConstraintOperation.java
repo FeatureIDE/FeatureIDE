@@ -49,13 +49,13 @@ public class EditConstraintOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	protected FeatureModelEvent internalRedo() {
+	protected FeatureModelEvent operation() {
 		constraint.setNode(newNode);
 		return new FeatureModelEvent(constraint, PropertyConstants.CONSTRAINT_MODIFY, oldNode, newNode);
 	}
 
 	@Override
-	protected FeatureModelEvent internalUndo() {
+	protected FeatureModelEvent inverseOperation() {
 		constraint.setNode(oldNode);
 		return new FeatureModelEvent(constraint, PropertyConstants.CONSTRAINT_MODIFY, newNode, oldNode);
 	}

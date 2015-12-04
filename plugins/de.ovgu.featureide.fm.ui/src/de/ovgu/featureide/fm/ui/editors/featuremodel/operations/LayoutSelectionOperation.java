@@ -43,13 +43,13 @@ public class LayoutSelectionOperation extends AbstractGraphicalFeatureModelOpera
 	}
 
 	@Override
-	protected FeatureModelEvent internalRedo() {
+	protected FeatureModelEvent operation() {
 		graphicalFeatureModel.getLayout().setLayout(newSelectedLayoutAlgorithm);
 		return null;
 	}
 
 	@Override
-	protected FeatureModelEvent internalUndo() {
+	protected FeatureModelEvent inverseOperation() {
 		graphicalFeatureModel.getLayout().setLayout(oldSelectedLayoutAlgorithm);
 		return null;
 	}

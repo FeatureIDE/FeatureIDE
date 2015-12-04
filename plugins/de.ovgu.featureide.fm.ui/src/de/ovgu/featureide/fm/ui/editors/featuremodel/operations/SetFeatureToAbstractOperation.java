@@ -65,13 +65,13 @@ public class SetFeatureToAbstractOperation extends AbstractFeatureModelOperation
 	}
 
 	@Override
-	protected FeatureModelEvent internalRedo() {
+	protected FeatureModelEvent operation() {
 		feature.getStructure().setAbstract(!feature.getStructure().isAbstract());
 		return null;
 	}
 
 	@Override
-	protected FeatureModelEvent internalUndo() {
-		return internalRedo();
+	protected FeatureModelEvent inverseOperation() {
+		return operation();
 	}
 }

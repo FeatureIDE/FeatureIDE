@@ -94,7 +94,7 @@ public class MoveElementsOperation extends AbstractFeatureModelOperation impleme
 	}
 
 	@Override
-	protected FeatureModelEvent internalRedo() {
+	protected FeatureModelEvent operation() {
 		for (Iterator<AbstractFeatureModelOperation> it = operations.iterator(); it.hasNext();) {
 			AbstractFeatureModelOperation operation = it.next();
 			if (operation.canRedo()) {
@@ -105,7 +105,7 @@ public class MoveElementsOperation extends AbstractFeatureModelOperation impleme
 	}
 
 	@Override
-	protected FeatureModelEvent internalUndo() {
+	protected FeatureModelEvent inverseOperation() {
 		for (Iterator<AbstractFeatureModelOperation> it = operations.descendingIterator(); it.hasNext();) {
 			AbstractFeatureModelOperation operation = it.next();
 			if (operation.canUndo()) {

@@ -261,7 +261,7 @@ public class ElementDeleteOperation extends AbstractFeatureModelOperation implem
 	}
 
 	@Override
-	protected FeatureModelEvent internalRedo() {
+	protected FeatureModelEvent operation() {
 		for (Iterator<AbstractFeatureModelOperation> it = operations.iterator(); it.hasNext();) {
 			AbstractFeatureModelOperation operation = it.next();
 			if (operation.canRedo()) {
@@ -272,7 +272,7 @@ public class ElementDeleteOperation extends AbstractFeatureModelOperation implem
 	}
 
 	@Override
-	protected FeatureModelEvent internalUndo() {
+	protected FeatureModelEvent inverseOperation() {
 		for (Iterator<AbstractFeatureModelOperation> it = operations.descendingIterator(); it.hasNext();) {
 			AbstractFeatureModelOperation operation = it.next();
 			if (operation.canUndo()) {

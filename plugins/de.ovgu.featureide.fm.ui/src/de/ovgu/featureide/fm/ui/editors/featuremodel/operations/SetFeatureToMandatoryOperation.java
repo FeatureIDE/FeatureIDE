@@ -59,14 +59,14 @@ public class SetFeatureToMandatoryOperation extends AbstractFeatureModelOperatio
 	}
 
 	@Override
-	protected FeatureModelEvent internalRedo() {
+	protected FeatureModelEvent operation() {
 		feature.getStructure().setMandatory(!feature.getStructure().isMandatory());
 		return null;
 	}
 
 	@Override
-	protected FeatureModelEvent internalUndo() {
-		return internalRedo();
+	protected FeatureModelEvent inverseOperation() {
+		return operation();
 	}
 
 }

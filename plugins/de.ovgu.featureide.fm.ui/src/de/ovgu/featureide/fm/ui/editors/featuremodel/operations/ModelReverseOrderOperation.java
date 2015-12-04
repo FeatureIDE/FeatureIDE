@@ -49,7 +49,7 @@ public class ModelReverseOrderOperation extends AbstractGraphicalFeatureModelOpe
 	}
 
 	@Override
-	protected FeatureModelEvent internalRedo() {
+	protected FeatureModelEvent operation() {
 		final IGraphicalFeature root = graphicalFeatureModel.getFeatures().getObject();
 		TreeOperations.reverse(root.getTree());
 		if (!graphicalFeatureModel.getLayout().hasFeaturesAutoLayout()) {
@@ -86,8 +86,8 @@ public class ModelReverseOrderOperation extends AbstractGraphicalFeatureModelOpe
 	}
 
 	@Override
-	protected FeatureModelEvent internalUndo() {
-		return internalRedo();
+	protected FeatureModelEvent inverseOperation() {
+		return operation();
 	}
 
 }

@@ -42,7 +42,7 @@ public class HideLegendOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	protected FeatureModelEvent internalRedo() {
+	protected FeatureModelEvent operation() {
 		FMPropertyManager.setHideLegend(!FMPropertyManager.isLegendHidden());
 		// TODO _call listeners
 //		featureModel.refreshContextMenu();
@@ -50,8 +50,8 @@ public class HideLegendOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	protected FeatureModelEvent internalUndo() {
-		return internalRedo();
+	protected FeatureModelEvent inverseOperation() {
+		return operation();
 	}
 
 }

@@ -55,7 +55,7 @@ public class ChangeFeatureGroupTypeOperation extends AbstractFeatureModelOperati
 	}
 
 	@Override
-	protected FeatureModelEvent internalRedo() {
+	protected FeatureModelEvent operation() {
 		if (groupType == ALTERNATIVE) {
 			feature.getStructure().changeToAlternative();
 		} else if (groupType == OR) {
@@ -67,7 +67,7 @@ public class ChangeFeatureGroupTypeOperation extends AbstractFeatureModelOperati
 	}
 
 	@Override
-	protected FeatureModelEvent internalUndo() {
+	protected FeatureModelEvent inverseOperation() {
 		if (oldGroupType == ALTERNATIVE) {
 			feature.getStructure().changeToAlternative();
 		} else if (oldGroupType == AND) {

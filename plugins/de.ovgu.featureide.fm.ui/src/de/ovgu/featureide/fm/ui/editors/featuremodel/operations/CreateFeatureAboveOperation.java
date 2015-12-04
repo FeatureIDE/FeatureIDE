@@ -73,13 +73,13 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 			newCompound.getStructure().setMultiple(parent.isMultiple());
 		}
 		
-		fireEvent(internalRedo());
+		fireEvent(operation());
 		
 		return Status.OK_STATUS;
 	}
 
 	@Override
-	protected FeatureModelEvent internalRedo() {
+	protected FeatureModelEvent operation() {
 		
 			IFeatureStructure parent = selectedFeature.getStructure().getParent();
 			if (parent != null) {
@@ -105,7 +105,7 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	protected FeatureModelEvent internalUndo() {
+	protected FeatureModelEvent inverseOperation() {
 		
 			IFeatureStructure parent = selectedFeature.getStructure().getParent();
 			if (parent != null) {

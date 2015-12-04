@@ -56,7 +56,7 @@ public class MoveFeatureOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	protected FeatureModelEvent internalRedo() {
+	protected FeatureModelEvent operation() {
 		if (!data.getFeature().getGraphicalModel().getLayout().hasFeaturesAutoLayout()) {
 			newInnerOrder(newPos);
 			setEventId(PropertyConstants.MODEL_DATA_LOADED);
@@ -68,7 +68,7 @@ public class MoveFeatureOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	protected FeatureModelEvent internalUndo() {
+	protected FeatureModelEvent inverseOperation() {
 		if (!data.getFeature().getGraphicalModel().getLayout().hasFeaturesAutoLayout()) {
 			newInnerOrder(oldPos);
 			setEventId(PropertyConstants.MODEL_DATA_LOADED);

@@ -39,14 +39,14 @@ public class ShowHiddenFeaturesOperation extends AbstractGraphicalFeatureModelOp
 	}
 
 	@Override
-	public FeatureModelEvent internalRedo() {
+	public FeatureModelEvent operation() {
 		graphicalFeatureModel.getLayout().showHiddenFeatures(!graphicalFeatureModel.getLayout().showHiddenFeatures());
 		return null;
 	}
 
 	@Override
-	public FeatureModelEvent internalUndo() {
-		return internalRedo();
+	public FeatureModelEvent inverseOperation() {
+		return operation();
 	}
 
 }

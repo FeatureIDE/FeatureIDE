@@ -49,7 +49,7 @@ public class MoveConstraintOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	protected FeatureModelEvent internalRedo() {
+	protected FeatureModelEvent operation() {
 		featureModel.removeConstraint(constraint);
 		featureModel.addConstraint(constraint, index);
 		return new FeatureModelEvent(constraint, PropertyConstants.CONSTRAINT_MOVE, oldIndex, index);
@@ -57,7 +57,7 @@ public class MoveConstraintOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	protected FeatureModelEvent internalUndo() {
+	protected FeatureModelEvent inverseOperation() {
 		featureModel.removeConstraint(constraint);
 		featureModel.addConstraint(constraint, oldIndex);
 		return new FeatureModelEvent(constraint, PropertyConstants.CONSTRAINT_MOVE, index, oldIndex);

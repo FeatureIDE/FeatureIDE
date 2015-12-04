@@ -56,12 +56,12 @@ public class CreateFeatureBelowOperation extends AbstractFeatureModelOperation {
 
 	@Override
 	public IStatus redo(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
-		fireEvent(internalRedo());
+		fireEvent(operation());
 		return Status.OK_STATUS;
 	}
 
 	@Override
-	protected FeatureModelEvent internalRedo() {
+	protected FeatureModelEvent operation() {
 		int number = 1;
 
 		while (FeatureUtils.getFeatureNames(featureModel).contains(DEFAULT_FEATURE_LAYER_CAPTION + number)) {
@@ -79,7 +79,7 @@ public class CreateFeatureBelowOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	protected FeatureModelEvent internalUndo() {
+	protected FeatureModelEvent inverseOperation() {
 		newFeature = featureModel.getFeature(newFeature.getName());
 		featureModel.deleteFeature(newFeature);
 		return new FeatureModelEvent(featureModel, PropertyConstants.FEATURE_DELETE, newFeature, null);

@@ -60,7 +60,7 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	protected FeatureModelEvent internalRedo() {
+	protected FeatureModelEvent operation() {
 		feature = featureModel.getFeature(feature.getName().toString());
 		oldParent = feature.getStructure().getParent().getFeature();
 		if (oldParent != null) {
@@ -101,7 +101,7 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	protected FeatureModelEvent internalUndo() {
+	protected FeatureModelEvent inverseOperation() {
 		try {
 			if (!deleted) {
 				return null;

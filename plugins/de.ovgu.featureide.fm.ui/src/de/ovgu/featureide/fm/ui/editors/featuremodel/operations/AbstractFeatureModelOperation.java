@@ -61,7 +61,7 @@ public abstract class AbstractFeatureModelOperation extends AbstractOperation {
 	@Override
 	public IStatus redo(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
 		try {
-			fireEvent(internalRedo());
+			fireEvent(operation());
 		} catch (Exception e) {
 			FMCorePlugin.getDefault().logError(e);
 			throw new ExecutionException(e.getMessage());
@@ -69,16 +69,16 @@ public abstract class AbstractFeatureModelOperation extends AbstractOperation {
 		return Status.OK_STATUS;
 	}
 
-	protected abstract FeatureModelEvent internalRedo();
+	protected abstract FeatureModelEvent operation();
 
 	public void redo() {
-		fireEvent(internalRedo());
+		fireEvent(operation());
 	}
 
 	@Override
 	public IStatus undo(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
 		try {
-			fireEvent(internalUndo());
+			fireEvent(inverseOperation());
 		} catch (Exception e) {
 			FMCorePlugin.getDefault().logError(e);
 			throw new ExecutionException(e.getMessage());
@@ -86,10 +86,10 @@ public abstract class AbstractFeatureModelOperation extends AbstractOperation {
 		return Status.OK_STATUS;
 	}
 
-	protected abstract FeatureModelEvent internalUndo();
+	protected abstract FeatureModelEvent inverseOperation();
 
 	public void undo() {
-		internalUndo();
+		inverseOperation();
 	}
 
 	final protected void fireEvent(FeatureModelEvent event) {

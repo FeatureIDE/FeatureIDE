@@ -51,13 +51,13 @@ public class SourceChangedOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	protected FeatureModelEvent internalRedo() {
+	protected FeatureModelEvent operation() {
 		featureModelEditor.readModel(newText);
 		return new FeatureModelEvent(featureModel, editor, false, PropertyConstants.MODEL_DATA_CHANGED, null, null);
 	}
 
 	@Override
-	protected FeatureModelEvent internalUndo() {
+	protected FeatureModelEvent inverseOperation() {
 		featureModelEditor.readModel(oldText);
 		return new FeatureModelEvent(featureModel, editor, false, PropertyConstants.MODEL_DATA_CHANGED, null, null);
 	}

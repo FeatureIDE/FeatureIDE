@@ -46,13 +46,13 @@ public class RenameFeatureOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	protected FeatureModelEvent internalRedo() {
+	protected FeatureModelEvent operation() {
 		featureModel.getRenamingsManager().renameFeature(oldName, newName);
 		return null;
 	}
 
 	@Override
-	protected FeatureModelEvent internalUndo() {
+	protected FeatureModelEvent inverseOperation() {
 		featureModel.getRenamingsManager().renameFeature(newName, oldName);
 		return null;
 	}

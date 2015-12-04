@@ -54,14 +54,14 @@ public class SetFeatureToHiddenOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	protected FeatureModelEvent internalRedo() {
+	protected FeatureModelEvent operation() {
 		feature.getStructure().setHidden(!feature.getStructure().isHidden());
 		return null;
 	}
 
 	@Override
-	protected FeatureModelEvent internalUndo() {
-		return internalRedo();
+	protected FeatureModelEvent inverseOperation() {
+		return operation();
 	}
 
 }

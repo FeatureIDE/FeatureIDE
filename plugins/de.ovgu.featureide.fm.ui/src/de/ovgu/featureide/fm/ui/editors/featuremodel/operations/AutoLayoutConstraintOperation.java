@@ -55,7 +55,7 @@ public class AutoLayoutConstraintOperation extends AbstractGraphicalFeatureModel
 	}
 
 	@Override
-	protected FeatureModelEvent internalRedo() {
+	protected FeatureModelEvent operation() {
 		List<IGraphicalConstraint> constraintList = graphicalFeatureModel.getConstraints();
 		int minX = Integer.MAX_VALUE;
 		int maxX = 0;
@@ -92,7 +92,7 @@ public class AutoLayoutConstraintOperation extends AbstractGraphicalFeatureModel
 	}
 
 	@Override
-	protected FeatureModelEvent internalUndo() {
+	protected FeatureModelEvent inverseOperation() {
 		List<IGraphicalConstraint> constraintList = graphicalFeatureModel.getConstraints();
 		if (!constraintList.isEmpty() && (!(oldPos == null) && !oldPos.isEmpty())) {
 			FeatureUIHelper.setLocation(constraintList.get(0), oldPos.get(counter).get(0));
