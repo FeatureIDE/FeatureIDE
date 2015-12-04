@@ -40,7 +40,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
@@ -66,7 +66,7 @@ public abstract class Generator {
 	}
 	
 	public static IFeatureModel generateFeatureDiagram(Random random, int numberOfFeatures) {
-		IFeatureModel fm = FeatureModelFactory.getInstance().createFeatureModel();
+		IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
 		List<IFeature> leaves = new LinkedList<IFeature>();
 		leaves.add(fm.getFeature("C1"));
 		int count = 1;
@@ -77,7 +77,7 @@ public abstract class Generator {
 			int childrenCount = random.nextInt(maxChildren) + 1;
 			childrenCount = Math.min(childrenCount, numberOfFeatures - count);
 			for (int i = 1; i <= childrenCount; i++) {
-				IFeature child = FeatureModelFactory.getInstance().createFeature(fm, "C" + (count + i));
+				IFeature child = FMFactoryManager.getFactory().createFeature(fm, "C" + (count + i));
 				fm.addFeature(child);
 				parent.getStructure().addChild(child.getStructure());
 				leaves.add(child);
@@ -240,7 +240,7 @@ public abstract class Generator {
 						int j = 1;
 						IFeature child;
 						do {
-							child = FeatureModelFactory.getInstance().createFeature(fm, "C" + j++);
+							child = FMFactoryManager.getFactory().createFeature(fm, "C" + j++);
 						} while (!fm.addFeature(child));
 						feature.getStructure().addChild(child.getStructure());
 						break;
@@ -294,7 +294,7 @@ public abstract class Generator {
 						int j = 1;
 						IFeature child;
 						do {
-							child = FeatureModelFactory.getInstance().createFeature(fm, "C" + j++);
+							child = FMFactoryManager.getFactory().createFeature(fm, "C" + j++);
 						} while (!fm.addFeature(child));
 						child.getStructure().setMandatory(false);
 						feature.getStructure().addChild(child.getStructure());
@@ -347,7 +347,7 @@ public abstract class Generator {
 							int j = 1;
 							IFeature child;
 							do {
-								child = FeatureModelFactory.getInstance().createFeature(fm, "C" + j++);
+								child = FMFactoryManager.getFactory().createFeature(fm, "C" + j++);
 							} while (!fm.addFeature(child));
 							feature.getStructure().addChild(child.getStructure());
 							break;

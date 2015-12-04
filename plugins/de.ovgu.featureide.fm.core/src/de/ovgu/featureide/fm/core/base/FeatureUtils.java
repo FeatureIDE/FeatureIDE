@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 import org.eclipse.core.resources.IProject;
@@ -427,8 +428,15 @@ public abstract class FeatureUtils {
 		feature.getStructure().setParent(newParent.getStructure());
 	}
 
+	@CheckForNull
 	public static final IFeature getParent(IFeature feature) {
-		return feature.getStructure().getParent().getFeature();
+		if (feature != null) {
+			IFeatureStructure parent = feature.getStructure().getParent();
+			if (parent != null) { 
+				return parent.getFeature();
+			}
+		}
+		return null;
 	}
 
 	public static final boolean isRoot(IFeature feature) {

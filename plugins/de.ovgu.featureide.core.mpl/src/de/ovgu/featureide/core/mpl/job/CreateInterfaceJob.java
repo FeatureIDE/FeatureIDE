@@ -47,7 +47,7 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelWriter;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
@@ -144,7 +144,7 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
         m.reset();
         
         // set new abstract root
-        IFeature nroot = FeatureModelFactory.getInstance().createFeature(m, "nroot");
+        IFeature nroot = FMFactoryManager.getFactory().createFeature(m, "nroot");
         nroot.getStructure().setAbstract(true);
         nroot.getStructure().setAnd();
         nroot.getStructure().addChild(root.getStructure());
@@ -185,7 +185,7 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
         		SatSolver modelSatSolver = new SatSolver(new And(NodeCreator.createNodes(m), notChild), 1000);
         		try {
 					if (modelSatSolver.isSatisfiable()) {
-						m.addConstraint(FeatureModelFactory.getInstance().createConstraint(m, child));
+						m.addConstraint(FMFactoryManager.getFactory().createConstraint(m, child));
 					}
 				} catch (TimeoutException e) {
 					MPLPlugin.getDefault().logError(e);
@@ -334,7 +334,7 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
             	    			child.getStructure().setMandatory(false);
             				}
         				} else {
-            				IFeature pseudoAlternative = FeatureModelFactory.getInstance().createFeature(curFeature.getFeatureModel(), MARK2);
+            				IFeature pseudoAlternative = FMFactoryManager.getFactory().createFeature(curFeature.getFeatureModel(), MARK2);
             				pseudoAlternative.getStructure().setMandatory(false);
             				pseudoAlternative.getStructure().setAlternative();
             				for (IFeature child : list) {

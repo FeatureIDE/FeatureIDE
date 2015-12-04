@@ -28,7 +28,7 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
 import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 
 /**
  * Operation with functionality to create a new constraint. Enables undo/redo
@@ -48,7 +48,7 @@ public class CreateConstraintOperation extends AbstractFeatureModelOperation {
 	 */
 	public CreateConstraintOperation(Node node, IFeatureModel featureModel) {
 		super(featureModel, CREATE_CONSTRAINT);
-		constraint = FeatureModelFactory.getInstance().createConstraint(featureModel, node);
+		constraint = FMFactoryManager.getFactory().createConstraint(featureModel, node);
 	}
 
 	@Override

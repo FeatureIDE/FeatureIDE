@@ -34,7 +34,7 @@ import org.junit.Test;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 
@@ -102,7 +102,7 @@ public class TFeatureModelAnalyzer {
 	}
 	
 	private final IFeatureModel init(String name) {
-		IFeatureModel fm = FeatureModelFactory.getInstance().createFeatureModel();
+		IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
 		for (File f : MODEL_FILE_FOLDER.listFiles(filter)) {
 			if (f.getName().equals(name)) {
 				try {

@@ -56,7 +56,7 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlPropertyLoader.PropertiesParser;
@@ -234,7 +234,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 			if (!featureModel.getFMComposerExtension().isValidFeatureName(name)) {
 				throwError(name + IS_NO_VALID_FEATURE_NAME, e);
 			}
-			IFeature f = FeatureModelFactory.getInstance().createFeature(featureModel, name);
+			IFeature f = FMFactoryManager.getFactory().createFeature(featureModel, name);
 			f.getStructure().setMandatory(true);
 			if (nodeName.equals(AND)) {
 				f.getStructure().setAnd();
@@ -274,7 +274,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 			for (Element child: getElements(e.getChildNodes())) {
 				String nodeName = child.getNodeName();
 				if (nodeName.equals(RULE)) {
-					IConstraint c = FeatureModelFactory.getInstance().createConstraint(featureModel, parseConstraints2(child.getChildNodes()).getFirst());
+					IConstraint c = FMFactoryManager.getFactory().createConstraint(featureModel, parseConstraints2(child.getChildNodes()).getFirst());
 					if (child.hasAttributes()) {
 						NamedNodeMap nodeMap = child.getAttributes();
 						for (int i = 0; i < nodeMap.getLength(); i++) {

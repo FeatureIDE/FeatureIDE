@@ -57,7 +57,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IPropertyContainer.Entry;
 import de.ovgu.featureide.fm.core.base.IPropertyContainer.Type;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.AXMLHandler;
 import de.ovgu.featureide.fm.core.io.ModelWarning;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
@@ -379,7 +379,7 @@ public class XmlFeatureModelHandler extends AXMLHandler<IFeatureModel> {
 			for (final Element child : getElements(e.getChildNodes())) {
 				final String nodeName = child.getNodeName();
 				if (nodeName.equals(RULE)) {
-					final IConstraint c = FeatureModelFactory.getInstance().createConstraint(object, parseConstraints2(child.getChildNodes()).getFirst());
+					final IConstraint c = FMFactoryManager.getFactory().createConstraint(object, parseConstraints2(child.getChildNodes()).getFirst());
 					if (child.hasAttributes()) {
 						final NamedNodeMap nodeMap = child.getAttributes();
 						for (int i = 0; i < nodeMap.getLength(); i++) {
@@ -516,7 +516,7 @@ public class XmlFeatureModelHandler extends AXMLHandler<IFeatureModel> {
 			if (!object.getFMComposerExtension().isValidFeatureName(name)) {
 				throwError(name + IS_NO_VALID_FEATURE_NAME, e);
 			}
-			final IFeature f = FeatureModelFactory.getInstance().createFeature(object, name);
+			final IFeature f = FMFactoryManager.getFactory().createFeature(object, name);
 			f.getStructure().setMandatory(true);
 			if (nodeName.equals(AND)) {
 				f.getStructure().setAnd();

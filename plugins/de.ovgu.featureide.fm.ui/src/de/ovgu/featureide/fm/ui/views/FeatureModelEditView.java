@@ -62,7 +62,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
 import de.ovgu.featureide.fm.core.base.event.IFeatureModelListener;
 import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.evaluation.Evaluation;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
@@ -294,7 +294,7 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 							if (res instanceof IFile && res.getName().endsWith(".m")) {
 								IFile fmFile = (IFile) res;
 								try {
-									IFeatureModel fm = FeatureModelFactory.getInstance().createFeatureModel();
+									IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
 
 									FeatureModelReaderIFileWrapper reader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(fm));
 									reader.readFromFile(fmFile);

@@ -47,6 +47,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -70,6 +71,10 @@ public class SXFMWriter extends AbstractFeatureModelWriter {
 	 */
 	public SXFMWriter(IFeatureModel featureModel) {
 		setFeatureModel(featureModel);
+	}
+	
+	public SXFMWriter(FeatureModel featureModel) {
+		this(FeatureUtils.convert(featureModel));
 	}
 	
 	//@Override

@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.base;
 
+import javax.annotation.Nonnull;
 
 /**
  * Interface for a class that represents a feature.</br>
@@ -36,6 +37,7 @@ public interface IFeature extends IFeatureModelElement {
 	
 	IPropertyContainer getCustomProperties();
 
+	@Nonnull
 	IFeatureStructure getStructure();
 
 	boolean isConstraintSelected();

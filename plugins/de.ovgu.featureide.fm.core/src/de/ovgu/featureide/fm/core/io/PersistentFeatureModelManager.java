@@ -33,8 +33,8 @@ import java.util.List;
 import java.util.Map;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.base.FactoryMananger;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelHandler;
 
 /**
@@ -68,7 +68,7 @@ public class PersistentFeatureModelManager {
 		PersistentFeatureModelManager persistentFeatureModelManager = map.get(absolutePath);
 		if (persistentFeatureModelManager == null) {
 			if (model == null) {
-				model = FactoryMananger.getFactory().createFeatureModel();
+				model = FMFactoryManager.getFactory().createFeatureModel();
 			}
 			model.setSourceFile(new File(absolutePath));
 			persistentFeatureModelManager = new PersistentFeatureModelManager(model, absolutePath);
@@ -165,13 +165,14 @@ public class PersistentFeatureModelManager {
 	}
 
 	public void read(IPersistentHandler iPersistentFormat) throws Exception {
-		final String content = new String(Files.readAllBytes(getExtraPath(iPersistentFormat)), Charset.availableCharsets().get("UTF-8"));
-		iPersistentFormat.read(content);
+		read(iPersistentFormat, getExtraPath(iPersistentFormat));
 	}
 
-	private void read(IPersistentHandler iPersistentFormat, Path file) throws Exception {
-		final String content = new String(Files.readAllBytes(file), Charset.availableCharsets().get("UTF-8"));
-		iPersistentFormat.read(content);
+	private void read(IPersistentHandler iPersistentFormat, Path path) throws Exception {
+		if (path.toFile().exists()) {
+			final String content = new String(Files.readAllBytes(path), Charset.availableCharsets().get("UTF-8"));
+			iPersistentFormat.read(content);
+		}
 	}
 
 	public void removeHandler(IPersistentHandler handler) {

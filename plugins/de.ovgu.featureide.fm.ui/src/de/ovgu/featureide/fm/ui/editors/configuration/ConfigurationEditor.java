@@ -64,7 +64,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
 import de.ovgu.featureide.fm.core.base.event.IFeatureModelListener;
 import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagatorJobWrapper.IConfigJob;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
@@ -102,7 +102,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	public IFile file;
 	private IFile internalFile;
 
-	public IFeatureModel featureModel = FeatureModelFactory.getInstance().createFeatureModel();
+	public IFeatureModel featureModel = FMFactoryManager.getFactory().createFeatureModel();
 
 	public Configuration configuration;
 
