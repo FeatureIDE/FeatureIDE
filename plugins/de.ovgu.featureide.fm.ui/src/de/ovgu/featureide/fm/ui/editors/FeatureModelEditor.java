@@ -134,7 +134,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 
 	public boolean checkModel(String source) {
 		fmFile.deleteAllModelMarkers();
-		final List<ModelWarning> warnings = DefaultFeatureModelFactory.getInstance().loadFeatureModel(ModelIOFactory.getNewFeatureModel(ioType), source);
+		final List<ModelWarning> warnings = modelHandler.read(source);
 		createModelFileMarkers(warnings);
 		
 		for (ModelWarning modelWarning : warnings) {
