@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.core;
 
+import static de.ovgu.featureide.fm.core.functional.Functional.map;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ANALYZE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ANALYZE_FEATURES_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE_INDETRMINATE_HIDDEN_FEATURES;
@@ -62,7 +63,7 @@ import de.ovgu.featureide.fm.core.editing.Comparison;
 import de.ovgu.featureide.fm.core.editing.ModelComparator;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.functional.Functional;
-
+import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
 /**
  * A collection of methods for working with {@link IFeatureModel} will replace
  * the corresponding methods in {@link IFeatureModel}
@@ -376,15 +377,17 @@ public class FeatureModelAnalyzer {
 		return new SatSolver(finalFormula, 1000).isSatisfiable();
 	}
 
-	public Node conjunct(Collection<IFeature> b) {
-		Iterator<IFeature> iterator = b.iterator();
-		Node result = new Literal(NodeCreator.getVariable(iterator.next(), fm));
-		while (iterator.hasNext())
-			result = new And(result, new Literal(NodeCreator.getVariable(
-					iterator.next(), fm)));
+	public Node conjunct(final Collection<IFeature> b) {
+		return new And(map(b, new IFunction<IFeature, Literal>() {
 
-		return result;
+			@Override
+			public Literal invoke(IFeature t) {
+				return new Literal(NodeCreator.getVariable(t, fm));
+			}
+
+		}), fm);
 	}
+	
 	
 	public Node disjunct(Collection<IFeature> b) {
 		Iterator<IFeature> iterator = b.iterator();
