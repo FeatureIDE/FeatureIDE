@@ -299,7 +299,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 
 	@Override
 	public FeatureModel clone() {
-		return (FeatureModel) model.clone();
+		return new FeatureModel(model.clone());
 	}
 
 	public FeatureModel deepClone() {
