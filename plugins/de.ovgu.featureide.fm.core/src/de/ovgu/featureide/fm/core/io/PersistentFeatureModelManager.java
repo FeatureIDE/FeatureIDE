@@ -35,7 +35,7 @@ import java.util.Map;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelHandler;
+import de.ovgu.featureide.fm.core.io.velvet.VelvetModelHandler;
 
 /**
  * TODO description
@@ -58,28 +58,37 @@ public class PersistentFeatureModelManager {
 
 	private final String fileName;
 
-	public static PersistentFeatureModelManager getInstance(String path) {
-		return getInstance(path, null);
+	public static PersistentFeatureModelManager getInstance(String path, AFormatHandler<IFeatureModel> modelHandler) {
+		return getInstance(path, null, modelHandler); 
 	}
 
-	public static PersistentFeatureModelManager getInstance(String path, IFeatureModel model) {
+	public static PersistentFeatureModelManager getInstance(String path, IFeatureModel model, AFormatHandler<IFeatureModel> modelHandler) {
 		final Path p = Paths.get(path).toAbsolutePath();
 		final String absolutePath = p.toString();
+		
 		PersistentFeatureModelManager persistentFeatureModelManager = map.get(absolutePath);
+		
 		if (persistentFeatureModelManager == null) {
 			if (model == null) {
-				model = FMFactoryManager.getFactory().createFeatureModel();
+				if(! (modelHandler instanceof VelvetModelHandler)){
+					model = FMFactoryManager.getFactory().createFeatureModel();
+				}else{
+					model = FMFactoryManager.getFactory("de.ovgu.featureide.fm.core.ExtendedFeatureModelFactory").createFeatureModel();
+				}
+				modelHandler.setObject(model);
 			}
 			model.setSourceFile(new File(absolutePath));
-			persistentFeatureModelManager = new PersistentFeatureModelManager(model, absolutePath);
+			persistentFeatureModelManager = new PersistentFeatureModelManager(model, absolutePath, modelHandler);
 		}
+		
 		return persistentFeatureModelManager;
 	}
 
-	private PersistentFeatureModelManager(IFeatureModel featureModel, String absolutePath) {
-		this.featureModel = featureModel;
-		this.modelHandler = new XmlFeatureModelHandler(featureModel);
 
+	private PersistentFeatureModelManager(IFeatureModel featureModel, String absolutePath, AFormatHandler<IFeatureModel> modelHandler) {
+		this.modelHandler = modelHandler;
+		this.featureModel = featureModel;
+		
 		final File modelFile = featureModel.getSourceFile();
 		if (modelFile == null) {
 			throw new NullPointerException("No source file specified");
@@ -199,5 +208,7 @@ public class PersistentFeatureModelManager {
 		final byte[] content = iPersistentFormat.write().getBytes(Charset.availableCharsets().get("UTF-8"));
 		Files.write(file, content, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
 	}
+	
+
 
 }

@@ -86,6 +86,8 @@ import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
 import de.ovgu.featureide.fm.core.io.ModelIOFactory;
 import de.ovgu.featureide.fm.core.io.ModelWarning;
 import de.ovgu.featureide.fm.core.io.PersistentFeatureModelManager;
+import de.ovgu.featureide.fm.core.io.velvet.VelvetModelHandler;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelHandler;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.GraphicsExporter;
 import de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor;
@@ -451,7 +453,11 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 //		featureModelReader = ModelIOFactory.getModelReader(featureModel, ioType);
 //		featureModelWriter = ModelIOFactory.getModelWriter(featureModel, ioType);
 		
-		fmManager = PersistentFeatureModelManager.getInstance(fmFile.getModelFile().getLocation().toOSString());
+		if(fmFile.getModelFile().getFileExtension().equals("xml")){
+			fmManager = PersistentFeatureModelManager.getInstance(fmFile.getModelFile().getLocation().toOSString(), new XmlFeatureModelHandler(featureModel));
+		} else if (fmFile.getModelFile().getFileExtension().equals("velvet")){
+			fmManager = PersistentFeatureModelManager.getInstance(fmFile.getModelFile().getLocation().toOSString(), new VelvetModelHandler(featureModel));
+		}
 		featureModel = fmManager.getFeatureModel();
 
 //		if (input instanceof FileEditorInput) {

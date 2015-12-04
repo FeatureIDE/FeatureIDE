@@ -201,28 +201,28 @@ public abstract class AXMLHandler<T> extends AFormatHandler<T> implements XMLFea
 
 	@Override
 	public List<ModelWarning> read(CharSequence source) {
-		final List<ModelWarning> warnings = new LinkedList<>();
+		
 
 		try {
 			final Document doc = readXML(source);
 			doc.getDocumentElement().normalize();
-			readDocument(doc, warnings);
+			readDocument(doc, lastWarnings);
 		} catch (SAXException e) {
 			FMCorePlugin.getDefault().logError(e);
 			//TODO add line information, if any
-			warnings.add(new ModelWarning(e.getMessage(), 0, IMarker.SEVERITY_ERROR));
+			lastWarnings.add(new ModelWarning(e.getMessage(), 0, IMarker.SEVERITY_ERROR));
 		} catch (UnsupportedModelException e) {
 			FMCorePlugin.getDefault().logError(e);
-			warnings.add(new ModelWarning(e.getMessage(), e.lineNumber, IMarker.SEVERITY_ERROR));
+			lastWarnings.add(new ModelWarning(e.getMessage(), e.lineNumber, IMarker.SEVERITY_ERROR));
 		} catch (IOException | ParserConfigurationException e) {
 			FMCorePlugin.getDefault().logError(e);
-			warnings.add(new ModelWarning(e.getMessage(), 0, IMarker.SEVERITY_ERROR));
+			lastWarnings.add(new ModelWarning(e.getMessage(), 0, IMarker.SEVERITY_ERROR));
 		} catch (Exception e) {
 			FMCorePlugin.getDefault().logError(e);
-			warnings.add(new ModelWarning(e.getMessage(), 0, IMarker.SEVERITY_ERROR));
+			lastWarnings.add(new ModelWarning(e.getMessage(), 0, IMarker.SEVERITY_ERROR));
 		}
 
-		return warnings;
+		return lastWarnings;
 	}
 
 	@Override

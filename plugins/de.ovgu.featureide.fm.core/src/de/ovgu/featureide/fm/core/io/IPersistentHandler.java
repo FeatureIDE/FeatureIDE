@@ -30,6 +30,8 @@ import java.util.List;
 public interface IPersistentHandler {
 
 	List<ModelWarning> read(CharSequence source);
+	
+	List<ModelWarning> getLastWarnings();
 
 	String write();
 
