@@ -29,14 +29,14 @@ import org.prop4j.NodeWriter;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 
 public class ConstraintToStringTest {
 	
 	@Test
 	public void testIffQuoteToString() {
-		IFeatureModel fm = FeatureModelFactory.getInstance().createFeatureModel();
-		IConstraint c = FeatureModelFactory.getInstance().createConstraint(fm, new Equals(new Literal("A"), new Literal("implies")));
+		IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
+		IConstraint c = FMFactoryManager.getFactory().createConstraint(fm, new Equals(new Literal("A"), new Literal("implies")));
 		final String s = Constraints.autoQuote(c);
 		
 		Assert.assertEquals("A iff \"implies\"", s);
@@ -44,42 +44,42 @@ public class ConstraintToStringTest {
 	
 	@Test
 	public void testStandardToString() {
-		IFeatureModel fm = FeatureModelFactory.getInstance().createFeatureModel();
-		IConstraint c = FeatureModelFactory.getInstance().createConstraint(fm, new Implies(new Literal("A"), new Literal("implies")));
+		IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
+		IConstraint c = FMFactoryManager.getFactory().createConstraint(fm, new Implies(new Literal("A"), new Literal("implies")));
 		Assert.assertEquals("A implies implies", c.getNode().toString(NodeWriter.textualSymbols));
 	}
 	
 	@Test
 	public void testAutoQuoteToString() {
-		IFeatureModel fm = FeatureModelFactory.getInstance().createFeatureModel();
-		IConstraint c = FeatureModelFactory.getInstance().createConstraint(fm, new Implies(new Literal("A"), new Literal("implies")));
+		IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
+		IConstraint c = FMFactoryManager.getFactory().createConstraint(fm, new Implies(new Literal("A"), new Literal("implies")));
 		Assert.assertEquals("A implies \"implies\"", Constraints.autoQuote(c));
 	}
 	
 	@Test
 	public void testAutoQuoteToString2() {
-		IFeatureModel fm = FeatureModelFactory.getInstance().createFeatureModel();
-		IConstraint c = FeatureModelFactory.getInstance().createConstraint(fm, new Implies(new Literal("A B"), new Literal("implies")));
+		IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
+		IConstraint c = FMFactoryManager.getFactory().createConstraint(fm, new Implies(new Literal("A B"), new Literal("implies")));
 		Assert.assertEquals("\"A B\" implies \"implies\"", Constraints.autoQuote(c));
 	}
 	
 	@Test
 	public void testAutoQuoteToString3() {
-		IFeatureModel fm = FeatureModelFactory.getInstance().createFeatureModel();
-		IConstraint c = FeatureModelFactory.getInstance().createConstraint(fm, new Implies(new Literal("    A B    "), new Literal("implies")));
+		IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
+		IConstraint c = FMFactoryManager.getFactory().createConstraint(fm, new Implies(new Literal("    A B    "), new Literal("implies")));
 		Assert.assertEquals("\"    A B    \" implies \"implies\"", Constraints.autoQuote(c));
 	}
 	
 	@Test
 	public void testAutoQuoteToString4() {
-		IFeatureModel fm = FeatureModelFactory.getInstance().createFeatureModel();
-		IConstraint c = FeatureModelFactory.getInstance().createConstraint(fm, new Implies(new Literal("    A B    "), new Literal(" a b ")));
+		IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
+		IConstraint c = FMFactoryManager.getFactory().createConstraint(fm, new Implies(new Literal("    A B    "), new Literal(" a b ")));
 		Assert.assertEquals("\"    A B    \" implies \" a b \"", Constraints.autoQuote(c));
 	}
 	
 	@Test
 	public void testAutoQuoteToString5() {
-		IConstraint c = FeatureModelFactory.getInstance().createConstraint(FeatureModelFactory.getInstance().createFeatureModel(), new Implies(new Literal("a"), new Literal("b")));
+		IConstraint c = FMFactoryManager.getFactory().createConstraint(FMFactoryManager.getFactory().createFeatureModel(), new Implies(new Literal("a"), new Literal("b")));
 		Assert.assertEquals("a implies b", Constraints.autoQuote(c));
 	}
 	

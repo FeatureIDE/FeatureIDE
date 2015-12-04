@@ -32,7 +32,7 @@ import org.junit.Test;
 
 import de.ovgu.featureide.core.featuremodeling.FeatureModelingFMExtension;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 
@@ -71,7 +71,7 @@ protected static File MODEL_FILE_FOLDER = getFolder();
 	
 	
 	private final IFeatureModel init(String name) {
-		IFeatureModel fm = FeatureModelFactory.getInstance().createFeatureModel();
+		IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
 		FeatureModelingFMExtension comp = new FeatureModelingFMExtension();
 		fm.getFMComposerManager(null).setComposerID("de.ovgu.featureide.core.FeatureModeling", comp);
 		for (File f : MODEL_FILE_FOLDER.listFiles(filter)) {

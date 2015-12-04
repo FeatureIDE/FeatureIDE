@@ -34,7 +34,7 @@ import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.Comparison;
 import de.ovgu.featureide.fm.core.editing.ModelComparator;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
@@ -118,7 +118,7 @@ public class Evaluation {
 						System.out.println(file);
 						IFeatureModel fm1;
 						if (file.exists()) {
-							fm1 = FeatureModelFactory.getInstance().createFeatureModel();
+							fm1 = FMFactoryManager.getFactory().createFeatureModel();
 							reader.setFeatureModel(fm1);
 							reader.readFromFile(file);
 						}
@@ -146,7 +146,7 @@ public class Evaluation {
 
 									IFeatureModel fm2;
 									if (file2.exists()) {
-										fm2 = FeatureModelFactory.getInstance().createFeatureModel();
+										fm2 = FMFactoryManager.getFactory().createFeatureModel();
 										reader.setFeatureModel(fm2);
 										reader.readFromFile(file2);
 									}
@@ -216,7 +216,7 @@ public class Evaluation {
 							folder.create(false, false, null);
 						writer.writeToFile(file);
 						
-						IFeatureModel fmout = FeatureModelFactory.getInstance().createFeatureModel();
+						IFeatureModel fmout = FMFactoryManager.getFactory().createFeatureModel();
 						//IFeatureModelReader reader = new XmlFeatureModelReader(fmout,project);
 						FeatureModelReaderIFileWrapper reader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(fmout));
 						reader.readFromFile(file);
@@ -244,7 +244,7 @@ public class Evaluation {
 					//open feature model
 					IFolder folder = project.getFolder(size + "");
 					IFile file = folder.getFile(size + "-" + id + ".m");
-					IFeatureModel fm = FeatureModelFactory.getInstance().createFeatureModel();
+					IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
 					//IFeatureModelReader reader = new XmlFeatureModelReader(fm,project);
 					FeatureModelReaderIFileWrapper reader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(fm));
 					//check if it is valid

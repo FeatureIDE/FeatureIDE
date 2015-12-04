@@ -18,26 +18,41 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.base;
+package de.ovgu.featureide.fm.core.base.impl;
 
-import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 
 /**
- * TODO description
+ * Returns custom factories to create {@link IFeatureModel}, {@link IFeature}, and {@link IConstraint} instances.
  * 
  * @author Sebastian Krieter
  */
-public final class FactoryMananger {
+public final class FMFactoryManager {
 
-	private FactoryMananger() {
+	private FMFactoryManager() {
 	}
-	
-	public static IFeatureModelFactory getFactory(String id) {
-		return new DefaultFeatureModelFactory();
+
+	private final static IFeatureModelFactory[] factoryArray;
+	static {
+		factoryArray = new IFeatureModelFactory[2];
+		factoryArray[0] = DefaultFeatureModelFactory.getInstance();
+		factoryArray[1] = ExtendedFeatureModelFactory.getInstance();
 	}
 
 	public static IFeatureModelFactory getFactory() {
-		return getFactory(null);
+		return DefaultFeatureModelFactory.getInstance();
+	}
+
+	public static IFeatureModelFactory getFactory(String id) {
+		for (IFeatureModelFactory factory : factoryArray) {
+			if (factory.getId().equals(id)) {
+				return factory;
+			}
+		}
+		throw new RuntimeException("No factory found for ID " + id);
 	}
 
 }

@@ -33,8 +33,8 @@ import java.util.List;
 import java.util.Map;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.base.FactoryMananger;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelHandler;
 
 /**
@@ -68,7 +68,7 @@ public class PersistentFeatureModelManager {
 		PersistentFeatureModelManager persistentFeatureModelManager = map.get(absolutePath);
 		if (persistentFeatureModelManager == null) {
 			if (model == null) {
-				model = FactoryMananger.getFactory().createFeatureModel();
+				model = FMFactoryManager.getFactory().createFeatureModel();
 			}
 			model.setSourceFile(new File(absolutePath));
 			persistentFeatureModelManager = new PersistentFeatureModelManager(model, absolutePath);

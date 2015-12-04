@@ -44,7 +44,7 @@ import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.FileEditorInput;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
 import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
@@ -106,7 +106,7 @@ public abstract class AbstractImportHandler extends AFileHandler {
 	}
 
 	protected IFeatureModel createFeatureModel() {
-		return FeatureModelFactory.getInstance().createFeatureModel();
+		return FMFactoryManager.getFactory().createFeatureModel();
 	}
 
 	/**
