@@ -52,7 +52,10 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 		//returns the image for packages
 		if (element instanceof PackageFragment) {
 			PackageFragment frag = (PackageFragment) element;
-			IFolder folder = (IFolder) frag.getResource();
+			IResource fragmentRes = frag.getResource();
+			if (!(fragmentRes instanceof IFolder)) {
+				return superImage;
+			}
 			IResource res = frag.getParent().getResource();
 			if (res == null) {
 				return superImage;
@@ -73,7 +76,8 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 					return superImage;
 				}
 			}
-			getPackageColors(folder, elementColors, model, !composer.hasFeatureFolder() && !composer.hasSourceFolder());
+			
+			getPackageColors((IFolder) fragmentRes, elementColors, model, !composer.hasFeatureFolder() && !composer.hasSourceFolder());
 			return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.PACKAGE, new ArrayList<Integer>(elementColors), superImage);
 		}
 
@@ -257,11 +261,11 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 		//text for Packages
 		if (element instanceof PackageFragment) {
 			PackageFragment frag = (PackageFragment) element;
-			IResource resource = frag.getParent().getResource();
-			if (resource == null) {
+			IResource parent = frag.getParent().getResource();
+			if (parent == null) {
 				return null;
 			}
-			IFeatureProject featureProject = CorePlugin.getFeatureProject(resource);
+			IFeatureProject featureProject = CorePlugin.getFeatureProject(parent);
 			if (featureProject == null) {
 				return null;
 			}
@@ -271,6 +275,9 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 			String elementName = frag.getElementName();
 			if (elementName.isEmpty()) {
 				return SPACE_STRING + "(default package)";
+			}
+			if (!isInBuildFolder(frag.getResource()) && !isInSourceFolder(frag.getResource())) {
+				return null;
 			}
 			return SPACE_STRING + elementName;
 		}
