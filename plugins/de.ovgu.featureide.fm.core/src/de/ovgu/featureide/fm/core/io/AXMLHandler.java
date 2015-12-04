@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -59,14 +60,16 @@ import de.ovgu.featureide.fm.core.io.xml.XMLFeatureModelTags;
 
 /**
  * Prints a feature model in XML format.
- *
+ * 
  * @author Sebastian Krieter
  */
 public abstract class AXMLHandler<T> extends AFormatHandler<T> implements XMLFeatureModelTags {
 
 	private static final String SUFFIX = "xml";
 
-	final static String LINE_NUMBER_KEY_NAME = "lineNumber";
+	private static final String LINE_NUMBER_KEY_NAME = "lineNumber";
+
+	private List<ModelWarning> lastWarnings = Collections.emptyList();
 
 	public static Document readXML(CharSequence source) throws IOException, SAXException, ParserConfigurationException {
 		final Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
@@ -142,7 +145,7 @@ public abstract class AXMLHandler<T> extends AFormatHandler<T> implements XMLFea
 
 	/**
 	 * Inserts indentations into the text
-	 *
+	 * 
 	 * @param text
 	 * @return
 	 */
@@ -187,7 +190,7 @@ public abstract class AXMLHandler<T> extends AFormatHandler<T> implements XMLFea
 
 	/**
 	 * Creates a new writer and sets the feature model to write out.
-	 *
+	 * 
 	 * @param object the structure to write
 	 */
 	public AXMLHandler(T object) {
@@ -201,8 +204,7 @@ public abstract class AXMLHandler<T> extends AFormatHandler<T> implements XMLFea
 
 	@Override
 	public List<ModelWarning> read(CharSequence source) {
-		
-
+		lastWarnings = new LinkedList<>();
 		try {
 			final Document doc = readXML(source);
 			doc.getDocumentElement().normalize();
@@ -267,9 +269,14 @@ public abstract class AXMLHandler<T> extends AFormatHandler<T> implements XMLFea
 		return prettyPrint(result.getWriter().toString());
 	}
 
+	@Override
+	public List<ModelWarning> getLastWarnings() {
+		return lastWarnings;
+	}
+
 	/**
 	 * Reads an XML-Document.
-	 *
+	 * 
 	 * @param doc document to read
 	 * @param warnings list of warnings / errors that occur during read
 	 */
@@ -277,7 +284,7 @@ public abstract class AXMLHandler<T> extends AFormatHandler<T> implements XMLFea
 
 	/**
 	 * Writes an XML-Document.
-	 *
+	 * 
 	 * @param doc document to write
 	 */
 	protected abstract void writeDocument(Document doc);

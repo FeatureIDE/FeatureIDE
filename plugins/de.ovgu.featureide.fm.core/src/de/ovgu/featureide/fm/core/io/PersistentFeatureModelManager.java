@@ -59,36 +59,35 @@ public class PersistentFeatureModelManager {
 	private final String fileName;
 
 	public static PersistentFeatureModelManager getInstance(String path, AFormatHandler<IFeatureModel> modelHandler) {
-		return getInstance(path, null, modelHandler); 
+		return getInstance(path, null, modelHandler);
 	}
 
 	public static PersistentFeatureModelManager getInstance(String path, IFeatureModel model, AFormatHandler<IFeatureModel> modelHandler) {
 		final Path p = Paths.get(path).toAbsolutePath();
 		final String absolutePath = p.toString();
-		
+
 		PersistentFeatureModelManager persistentFeatureModelManager = map.get(absolutePath);
-		
+
 		if (persistentFeatureModelManager == null) {
 			if (model == null) {
-				if(! (modelHandler instanceof VelvetModelHandler)){
-					model = FMFactoryManager.getFactory().createFeatureModel();
-				}else{
+				if (modelHandler instanceof VelvetModelHandler) {
 					model = FMFactoryManager.getFactory("de.ovgu.featureide.fm.core.ExtendedFeatureModelFactory").createFeatureModel();
+				} else {
+					model = FMFactoryManager.getFactory().createFeatureModel();
 				}
 				modelHandler.setObject(model);
 			}
 			model.setSourceFile(new File(absolutePath));
 			persistentFeatureModelManager = new PersistentFeatureModelManager(model, absolutePath, modelHandler);
 		}
-		
+
 		return persistentFeatureModelManager;
 	}
-
 
 	private PersistentFeatureModelManager(IFeatureModel featureModel, String absolutePath, AFormatHandler<IFeatureModel> modelHandler) {
 		this.modelHandler = modelHandler;
 		this.featureModel = featureModel;
-		
+
 		final File modelFile = featureModel.getSourceFile();
 		if (modelFile == null) {
 			throw new NullPointerException("No source file specified");
@@ -208,7 +207,5 @@ public class PersistentFeatureModelManager {
 		final byte[] content = iPersistentFormat.write().getBytes(Charset.availableCharsets().get("UTF-8"));
 		Files.write(file, content, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
 	}
-	
-
 
 }

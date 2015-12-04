@@ -36,6 +36,8 @@ import de.ovgu.featureide.fm.core.io.ModelWarning;
  * @author Sebastian Krieter
  */
 public class FeatureOrderHandler extends AFormatHandler<IFeatureModel> {
+	
+	private List<ModelWarning> lastWarnings = Collections.emptyList();
 
 	public FeatureOrderHandler(IFeatureModel object) {
 		super(object);
@@ -71,6 +73,11 @@ public class FeatureOrderHandler extends AFormatHandler<IFeatureModel> {
 	@Override
 	public String getSuffix() {
 		return "order";
+	}
+
+	@Override
+	public List<ModelWarning> getLastWarnings() {
+		return lastWarnings;
 	}
 
 }

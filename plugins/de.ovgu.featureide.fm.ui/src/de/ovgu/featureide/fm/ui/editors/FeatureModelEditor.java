@@ -82,7 +82,8 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
 import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
-import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.io.AFormatHandler;
 import de.ovgu.featureide.fm.core.io.ModelIOFactory;
 import de.ovgu.featureide.fm.core.io.ModelWarning;
 import de.ovgu.featureide.fm.core.io.PersistentFeatureModelManager;
@@ -115,8 +116,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 
 	ModelMarkerHandler<IFile> fmFile;
 	boolean isPageModified = false;
-	IFeatureModelWriter featureModelWriter;
 	PersistentFeatureModelManager fmManager;
+	AFormatHandler<IFeatureModel> modelHandler;
 
 	private boolean closeEditor;
 
@@ -168,11 +169,6 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 			// textEditor.updateDiagram();
 			textEditor.doSave(monitor);
 		} else {
-//			try {
-//				new FeatureModelWriterIFileWrapper(featureModelWriter).writeToFile(getModelFile());
-//			} catch (CoreException e) {
-//				FMUIPlugin.getDefault().logError(e);
-//			}
 			fmManager.save();
 		}
 
@@ -185,7 +181,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 
 	@Override
 	public void doSaveAs() {
-		GraphicsExporter.exportAs(featureModel, diagramEditor, featureModelWriter);
+		GraphicsExporter.exportAs(featureModel, diagramEditor);
 	}
 
 	@SuppressWarnings({ "rawtypes" })
@@ -430,7 +426,6 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 
 	@Override
 	protected void setInput(IEditorInput input) {
-//		file = (IFile) input.getAdapter(IFile.class);
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(this);
 		fmFile = new ModelMarkerHandler<>((IFile) input.getAdapter(IFile.class));
 		setPartName(getModelFile().getProject().getName() + MODEL);
@@ -442,30 +437,21 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 			FMUIPlugin.getDefault().logWarning(UNKNOWN_FILE_EXTENSION_);
 		}
 
-//		featureModel = ModelIOFactory.getNewFeatureModel(ioType);
-		// originalFeatureModel = ModelIOFactory.getNewFeatureModel(ioType);
-		
-
-//		fmFile.deleteAllModelMarkers();
-//		final List<ModelWarning> loadFeatureModel = DefaultFeatureModelFactory.getInstance().loadFeatureModel(featureModel, getModelFile().getLocation().toFile());
-//		createModelFileMarkers(loadFeatureModel);
-
-//		featureModelReader = ModelIOFactory.getModelReader(featureModel, ioType);
-//		featureModelWriter = ModelIOFactory.getModelWriter(featureModel, ioType);
-		
-		if(fmFile.getModelFile().getFileExtension().equals("xml")){
-			fmManager = PersistentFeatureModelManager.getInstance(fmFile.getModelFile().getLocation().toOSString(), new XmlFeatureModelHandler(featureModel));
-		} else if (fmFile.getModelFile().getFileExtension().equals("velvet")){
-			fmManager = PersistentFeatureModelManager.getInstance(fmFile.getModelFile().getLocation().toOSString(), new VelvetModelHandler(featureModel));
+		if ("xml".equals(fmFile.getModelFile().getFileExtension())) {
+			modelHandler = new XmlFeatureModelHandler(featureModel);
+		} else if ("velvet".equals(fmFile.getModelFile().getFileExtension())) {
+			modelHandler = new VelvetModelHandler(featureModel);
+		} else {
+			modelHandler = null;
 		}
-		featureModel = fmManager.getFeatureModel();
 
-//		if (input instanceof FileEditorInput) {
-//			IFile file = ((FileEditorInput) input).getFile();
-//			featureModelReader.setFile(file.getLocation().toFile());
-//		}
-
-		readModel();
+		if (modelHandler != null) {
+			fmManager = PersistentFeatureModelManager.getInstance(fmFile.getModelFile().getLocation().toOSString(), modelHandler);
+			featureModel = fmManager.getFeatureModel();
+			readModel();
+		} else {
+			featureModel = FMFactoryManager.getFactory().createFeatureModel();
+		}
 
 // TODO _Interfaces Removed Code
 //		FeatureUIHelper.showHiddenFeatures(featureModel.getGraphicRepresenation().getLayout().showHiddenFeatures(), featureModel);
@@ -639,15 +625,15 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 	}
 
 	private void readModel() {
-//		fmFile.deleteAllModelMarkers();
-//		final List<ModelWarning> warnings = DefaultFeatureModelFactory.getInstance().loadFeatureModel(featureModel, getModelFile().getLocation().toFile());
-//		createModelFileMarkers(warnings);
 		fmManager.read();
+		fmFile.deleteAllModelMarkers();
+		createModelFileMarkers(modelHandler.getLastWarnings());
+
 	}
 
 	public void readModel(String newSource) {
 		fmFile.deleteAllModelMarkers();
-		final List<ModelWarning> warnings = DefaultFeatureModelFactory.getInstance().loadFeatureModel(featureModel, newSource);
+		final List<ModelWarning> warnings = modelHandler.read(newSource);
 		createModelFileMarkers(warnings);
 	}
 

@@ -96,26 +96,22 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
  * @author Reimar Schroeter
  */
 public class VelvetModelHandler extends AFormatHandler<IFeatureModel> {
+	
+	private List<ModelWarning> lastWarnings = Collections.emptyList();
+
+	protected IFeatureModel featureModel;
+
+	protected File featureModelFile;
+	
 	public VelvetModelHandler(IFeatureModel object) {
 		super(object);
 	}
-
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.io.IPersistentHandler#write()
-	 */
+	
 	@Override
 	public String write() {
 		return null;
 	}
 
-	protected IFeatureModel featureModel;
-
-	protected File featureModelFile;
-
-	//TODO
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.io.IPersistentHandler#read(java.lang.CharSequence)
-	 */
 	@Override
 	public List<ModelWarning> read(CharSequence source) {
 		extFeatureModel = (ExtendedFeatureModel) object;
@@ -567,8 +563,8 @@ public class VelvetModelHandler extends AFormatHandler<IFeatureModel> {
 					}
 
 					for (final FeatureAttribute<Integer> attr : attributes) {
-						weightedTerms.add(createTerm(attr.getValue(), relationOperator != null, minus,
-								new Reference(attr.getFeatureName(), ReferenceType.FEATURE, attributeName)));
+						weightedTerms.add(createTerm(attr.getValue(), relationOperator != null, minus, new Reference(attr.getFeatureName(),
+								ReferenceType.FEATURE, attributeName)));
 					}
 
 					break;
@@ -1064,8 +1060,9 @@ public class VelvetModelHandler extends AFormatHandler<IFeatureModel> {
 		if (modelMarkerHandler != null) {
 			modelMarkerHandler.createModelMarker(message, org.eclipse.core.resources.IMarker.SEVERITY_WARNING, curNode.getLine());
 		}
-		FMCorePlugin.getDefault().logWarning(message + " (at line " + curNode.getLine()
-				+ ((featureModelFile != null) ? IN_FILE + featureModelFile.getName() : "") + ": \"" + curNode.getText() + "\")");
+		FMCorePlugin.getDefault().logWarning(
+				message + " (at line " + curNode.getLine() + ((featureModelFile != null) ? IN_FILE + featureModelFile.getName() : "") + ": \""
+						+ curNode.getText() + "\")");
 	}
 
 	private Tree checkTree(Tree root) throws RecognitionException {
@@ -1091,12 +1088,14 @@ public class VelvetModelHandler extends AFormatHandler<IFeatureModel> {
 		throw e;
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.io.IPersistentHandler#getSuffix()
-	 */
 	@Override
 	public String getSuffix() {
 		return "velvet";
+	}
+
+	@Override
+	public List<ModelWarning> getLastWarnings() {
+		return lastWarnings;
 	}
 
 }

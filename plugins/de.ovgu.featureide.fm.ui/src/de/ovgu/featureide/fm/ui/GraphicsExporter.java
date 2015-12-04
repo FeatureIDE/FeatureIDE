@@ -48,7 +48,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.osgi.framework.Bundle;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslWriter;
 import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelWriter;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
@@ -65,7 +64,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GEFImageWriter;
 @SuppressWarnings(RESTRICTION)
 public class GraphicsExporter {
 
-	public static boolean exportAs(IFeatureModel featureModel, FeatureDiagramEditor diagramEditor, IFeatureModelWriter featureModelWriter) {
+	public static boolean exportAs(IFeatureModel featureModel, FeatureDiagramEditor diagramEditor) {
 		boolean succ = false;
 		File file = null;
 		FileDialog fileDialog = new FileDialog(new Shell(), SWT.SAVE);

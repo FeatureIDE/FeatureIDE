@@ -352,7 +352,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		featurelist.removeAll();
 
 		if (featureModelEditor.featureModel != null && featureModelEditor.featureModel.getStructure().getRoot() != null) {
-			for (String featureName : FeatureUtils.extractConcreteFeaturesAsStringList(featureModelEditor.featureModel)) {
+			for (String featureName : featureModelEditor.featureModel.getFeatureOrderList()) {
 				featurelist.add(featureName);
 			}
 		}
@@ -366,7 +366,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	private boolean updateFeatureList() {
 		boolean changed = false;
 		if (featureModelEditor.featureModel != null && featureModelEditor.featureModel.getStructure().getRoot() != null) {
-			HashSet<String> featureSet = new HashSet<String>(Functional.toList(FeatureUtils.extractConcreteFeaturesAsStringList(featureModelEditor.featureModel)));
+			HashSet<String> featureSet = new HashSet<String>(featureModelEditor.featureModel.getFeatureOrderList());
 
 			int itemcount = featurelist.getItemCount();
 			for (int i = 0; i < itemcount; i++) {

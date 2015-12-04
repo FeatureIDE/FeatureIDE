@@ -20,23 +20,19 @@
  */
 package de.ovgu.featureide.fm.core.io;
 
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * Handler to properly write / read objects.
- *
+ * 
  * @author Sebastian Krieter
  */
 public abstract class AFormatHandler<T> implements IPersistentHandler {
 
 	protected T object;
-	
-	final List<ModelWarning> lastWarnings = new LinkedList<>();
 
 	/**
 	 * Creates a new handler and sets the object to write / read.
-	 *
+	 * 
 	 * @param object the structure to write
 	 */
 	public AFormatHandler(T object) {
@@ -49,10 +45,6 @@ public abstract class AFormatHandler<T> implements IPersistentHandler {
 
 	public void setObject(T object) {
 		this.object = object;
-	}
-	
-	public List<ModelWarning> getLastWarnings(){
-		return lastWarnings;
 	}
 
 }
