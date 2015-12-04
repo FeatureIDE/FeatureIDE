@@ -20,46 +20,41 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.SOURCE_CHANGE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RENAME_FEATURE;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
 import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
-import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 
 /**
- * @author Sebastian Krieter
+ * Operation with functionality to rename features. Provides undo/redo
+ * functionality.
+ * 
+ * @author Fabian Benduhn
  * @author Marcus Pinnecke
  */
-public class SourceChangeOperation extends AbstractFeatureModelOperation {
+public class RenameFeatureOperation extends AbstractFeatureModelOperation {
 
-	private final FeatureModelEditor featureModelEditor;
-	private final String newText, oldText;
+	private String oldName;
+	private String newName;
 
-	/**
-	 * @param featureModel
-	 * @param label
-	 * @param featureModelEditor
-	 * @param newText
-	 * @param oldText
-	 */
-	public SourceChangeOperation(IFeatureModel featureModel, FeatureModelEditor featureModelEditor, String newText, String oldText) {
-		super(featureModel, SOURCE_CHANGE);
-		this.featureModelEditor = featureModelEditor;
-		this.newText = newText;
-		this.oldText = oldText;
+	public RenameFeatureOperation(IFeatureModel featureModel, String oldName, String newName) {
+		super(featureModel, RENAME_FEATURE);
+		this.oldName = oldName;
+		this.newName = newName;
+		setEventId(PropertyConstants.FEATURE_NAME_CHANGED);
 	}
 
 	@Override
 	protected FeatureModelEvent internalRedo() {
-		featureModelEditor.readModel(newText);
-		return new FeatureModelEvent(featureModel, editor, false, PropertyConstants.MODEL_DATA_CHANGED, null, null);
+		featureModel.getRenamingsManager().renameFeature(oldName, newName);
+		return null;
 	}
 
 	@Override
 	protected FeatureModelEvent internalUndo() {
-		featureModelEditor.readModel(oldText);
-		return new FeatureModelEvent(featureModel, editor, false, PropertyConstants.MODEL_DATA_CHANGED, null, null);
+		featureModel.getRenamingsManager().renameFeature(newName, oldName);
+		return null;
 	}
 
 }

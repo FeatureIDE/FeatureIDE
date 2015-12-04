@@ -769,17 +769,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 				new FeatureLabelEditManager(part, TextCellEditor.class, new FeatureCellEditorLocator(part.getFeatureFigure()), getFeatureModel()).show();
 			}
 			break;
-		case FEATURE_DELETE:
-			reload();
-			refresh();
-			featureModelEditor.setPageModified(true);
-			break;
-		case STRUCTURE_CHANGED:
-			reload();
-			refresh();
-			featureModelEditor.setPageModified(true);
-			break;
-		case MODEL_DATA_CHANGED:
+		case MODEL_DATA_CHANGED: case STRUCTURE_CHANGED: case CONSTRAINT_ADD: case CONSTRAINT_DELETE: case CONSTRAINT_MODIFY: case CONSTRAINT_MOVE: case FEATURE_DELETE:
 			reload();
 			refresh();
 			featureModelEditor.setPageModified(true);

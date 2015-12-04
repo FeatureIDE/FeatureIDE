@@ -20,58 +20,40 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_ABSTRACT;
-import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_CONCRETE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE_CONSTRAINT;
 
-import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 
 /**
- * Operation with functionality to set a Feature abstract/concrete. Enables
- * undo/redo functionality.
+ * Operation to delete a constraint.
  * 
  * @author Fabian Benduhn
  * @author Marcus Pinnecke
  */
-public class FeatureSetAbstractOperation extends AbstractFeatureModelOperation {
+public class DeleteConstraintOperation extends AbstractFeatureModelOperation {
+	private IConstraint constraint;
 
-	private static final String LABEL_ABSTRACT = SET_FEATURE_ABSTRACT;
-	private static final String LABEL_CONCRETE = SET_FEATURE_CONCRETE;
+	private int index;
 
-	private IFeature feature;
-
-	/**
-	 * @param label
-	 *            Description of this operation to be used in the menu
-	 * @param feature
-	 *            feature on which this operation will be executed
-	 * 
-	 */
-	public FeatureSetAbstractOperation(IFeature feature, IFeatureModel featureModel) {
-		super(featureModel, getLabel(feature));
-		this.feature = feature;
-	}
-
-	/**
-	 * @param feature
-	 * @return String to be used in undo/redo menu
-	 */
-	private static String getLabel(IFeature feature) {
-		if (feature.getStructure().isAbstract())
-			return LABEL_CONCRETE;
-		else
-			return LABEL_ABSTRACT;
+	public DeleteConstraintOperation(IConstraint constraint, IFeatureModel featureModel) {
+		super(featureModel, DELETE_CONSTRAINT);
+		this.constraint = constraint;
 	}
 
 	@Override
 	protected FeatureModelEvent internalRedo() {
-		feature.getStructure().setAbstract(!feature.getStructure().isAbstract());
-		return null;
+		index = featureModel.getConstraintIndex(constraint);
+		featureModel.removeConstraint(constraint);
+		return new FeatureModelEvent(featureModel, PropertyConstants.CONSTRAINT_DELETE, constraint, null);
 	}
 
 	@Override
 	protected FeatureModelEvent internalUndo() {
-		return internalRedo();
+		featureModel.addConstraint(constraint, index);
+		return new FeatureModelEvent(featureModel, PropertyConstants.CONSTRAINT_ADD, null, constraint);
 	}
+
 }

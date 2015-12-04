@@ -31,7 +31,7 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureRenamingOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.RenameFeatureOperation;
 
 /**
  * Renames a currently selected feature.
@@ -65,8 +65,7 @@ public class FeatureRenamingCommand extends Command {
 
 	@Override
 	public void execute() {
-		FeatureRenamingOperation op = new FeatureRenamingOperation(featureModel, oldName, newName);
-		op.addContext((IUndoContext) featureModel.getUndoContext());
+		RenameFeatureOperation op = new RenameFeatureOperation(featureModel, oldName, newName);
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);

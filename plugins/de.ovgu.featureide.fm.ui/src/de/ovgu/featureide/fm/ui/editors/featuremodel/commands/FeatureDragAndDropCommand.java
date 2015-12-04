@@ -32,7 +32,7 @@ import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureMoveOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.MoveFeatureOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureOperationData;
 
 /**
@@ -111,9 +111,8 @@ public class FeatureDragAndDropCommand extends Command {
 	@Override
 	public void execute() {
 		FeatureOperationData data = new FeatureOperationData(feature, oldParent, newParent, newIndex, oldIndex);
-		FeatureMoveOperation op = new FeatureMoveOperation(data, editPart.getViewer(), newLocation, FeatureUIHelper.getLocation(feature).getCopy(), feature.getObject());
+		MoveFeatureOperation op = new MoveFeatureOperation(data, editPart.getViewer(), newLocation, FeatureUIHelper.getLocation(feature).getCopy(), feature.getObject());
 		//TODO _interfaces Removed Code
-		op.addContext((ObjectUndoContext) featureModel.getFeatureModel().getUndoContext());
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);

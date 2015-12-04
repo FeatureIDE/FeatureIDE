@@ -30,14 +30,14 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * @author Fabian Benduhn
  * @author Marcus Pinnecke
  */
-public class LegendHideOperation extends AbstractFeatureModelOperation {
+public class HideLegendOperation extends AbstractFeatureModelOperation {
 
 	private static final String LABEL = "Show/Hide Legend";
 
 	/**
 	 * @param label
 	 */
-	public LegendHideOperation(IFeatureModel featureModel) {
+	public HideLegendOperation(IFeatureModel featureModel) {
 		super(featureModel, LABEL);
 	}
 

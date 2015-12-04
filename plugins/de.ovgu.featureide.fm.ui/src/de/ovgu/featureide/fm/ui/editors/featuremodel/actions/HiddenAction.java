@@ -26,7 +26,7 @@ import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureSetHiddenOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToHiddenOperation;
 
 /**
  * Action to mark a feature as hidden.
@@ -47,8 +47,7 @@ public class HiddenAction extends SingleSelectionAction {
 	@Override
 	public void run() {
 		setChecked(feature.getStructure().isHidden());
-		FeatureSetHiddenOperation op = new FeatureSetHiddenOperation(feature, featureModel);
-		op.addContext((IUndoContext) featureModel.getUndoContext());
+		SetFeatureToHiddenOperation op = new SetFeatureToHiddenOperation(feature, featureModel);
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);

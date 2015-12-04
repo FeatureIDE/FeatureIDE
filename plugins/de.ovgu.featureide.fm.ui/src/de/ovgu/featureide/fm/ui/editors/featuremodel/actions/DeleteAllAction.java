@@ -61,8 +61,6 @@ public class DeleteAllAction extends SingleSelectionAction {
 	public void run() {
 		FeatureTreeDeleteOperation op = new FeatureTreeDeleteOperation(featureModel, feature);
 
-		op.addContext((IUndoContext) featureModel.getUndoContext());
-
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (ExecutionException e) {

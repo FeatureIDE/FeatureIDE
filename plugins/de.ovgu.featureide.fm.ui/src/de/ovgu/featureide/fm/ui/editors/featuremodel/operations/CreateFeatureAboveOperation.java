@@ -47,20 +47,17 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  * @author Fabian Benduhn
  * @author Marcus Pinnecke
  */
-public class FeatureCreateCompoundOperation extends AbstractFeatureModelOperation {
+public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 
 	private IFeature newCompound;
-	private IFeature parent;
-	private LinkedList<IFeature> selectedFeatures;
+	IFeature selectedFeature;
 
 	/**
 	 * @param label
 	 */
-	public FeatureCreateCompoundOperation(IFeature parent, IFeatureModel featureModel, LinkedList<IFeature> selectedFeatures) {
+	public CreateFeatureAboveOperation(IFeatureModel featureModel, IFeature selectedFeature) {
 		super(featureModel, CREATE_COMPOUND);
-		this.parent = parent;
-		this.selectedFeatures = new LinkedList<IFeature>();
-		this.selectedFeatures.addAll(selectedFeatures);
+		this.selectedFeature = selectedFeature;
 	}
 
 	@Override
@@ -69,52 +66,54 @@ public class FeatureCreateCompoundOperation extends AbstractFeatureModelOperatio
 		while (FeatureUtils.getFeatureNames(featureModel).contains(DEFAULT_FEATURE_LAYER_CAPTION + ++number))
 			;
 		newCompound = new Feature(featureModel, DEFAULT_FEATURE_LAYER_CAPTION + number);
+
+		IFeatureStructure parent = selectedFeature.getStructure().getParent();
 		if (parent != null) {
 			newCompound.getStructure().setAND(true);
-			newCompound.getStructure().setMultiple(parent.getStructure().isMultiple());
+			newCompound.getStructure().setMultiple(parent.isMultiple());
 		}
-		internalRedo();
+		
+		fireEvent(internalRedo());
 		
 		return Status.OK_STATUS;
 	}
 
 	@Override
 	protected FeatureModelEvent internalRedo() {
-		if (parent != null) {
-			LinkedList<IFeature> newChildren = new LinkedList<IFeature>();
-			for (IFeatureStructure featureStructure : parent.getStructure().getChildren()) {
-				if (selectedFeatures.contains(featureStructure.getFeature())) {
-					if (!newCompound.getStructure().hasChildren())
-						newChildren.add(newCompound);
-					featureStructure.setMandatory(false);
-					newCompound.getStructure().addChild(featureStructure);
-				} else {
-					newChildren.add(featureStructure.getFeature());
+		
+			IFeatureStructure parent = selectedFeature.getStructure().getParent();
+			if (parent != null) {
+				LinkedList<IFeature> newChildren = new LinkedList<IFeature>();
+				for (IFeatureStructure featureStructure : parent.getChildren()) {
+					if (selectedFeature.equals(featureStructure.getFeature())) {
+						if (!newCompound.getStructure().hasChildren())
+							newChildren.add(newCompound);
+						featureStructure.setMandatory(false);
+						newCompound.getStructure().addChild(featureStructure);
+					} else {
+						newChildren.add(featureStructure.getFeature());
+					}
 				}
+				parent.setChildren(Functional.toList(Functional.map(newChildren, FeatureUtils.FEATURE_TO_STRUCTURE)));
+				featureModel.addFeature(newCompound);
+			} else {
+				newCompound.getStructure().addChild(featureModel.getStructure().getRoot());
+				featureModel.addFeature(newCompound);
+				featureModel.getStructure().setRoot(newCompound.getStructure());
 			}
-			parent.getStructure().setChildren(Functional.toList(Functional.map(newChildren, FeatureUtils.FEATURE_TO_STRUCTURE)));
-			featureModel.addFeature(newCompound);
-		} else {
-			newCompound.getStructure().addChild(featureModel.getStructure().getRoot());
-			featureModel.addFeature(newCompound);
-			featureModel.getStructure().setRoot(newCompound.getStructure());
-		}
-
-		//		newCompound = featureModel.getFeature(newCompound.getName());
-
-		//TODO _interfaces Removed Code
-//		FeatureDiagramLayoutHelper.initializeCompoundFeaturePosition(featureModel, selectedFeatures, newCompound);
-		return new FeatureModelEvent(featureModel, PropertyConstants.FEATURE_ADD, null, newCompound);
+			return new FeatureModelEvent(featureModel, PropertyConstants.FEATURE_ADD, null, newCompound);
 	}
 
 	@Override
 	protected FeatureModelEvent internalUndo() {
-		if (parent == null) {
-			featureModel.getStructure().replaceRoot(featureModel.getStructure().getRoot().removeLastChild());
-		} else {
-			featureModel.deleteFeature(featureModel.getFeature(newCompound.getName()));
-		}
-		return new FeatureModelEvent(featureModel, PropertyConstants.FEATURE_DELETE, newCompound, null);
+		
+			IFeatureStructure parent = selectedFeature.getStructure().getParent();
+			if (parent != null) {
+				featureModel.getStructure().replaceRoot(featureModel.getStructure().getRoot().removeLastChild());
+			} else {
+				featureModel.deleteFeature(featureModel.getFeature(newCompound.getName()));
+			}
+			return new FeatureModelEvent(featureModel, PropertyConstants.FEATURE_DELETE, newCompound, null);
 	}
 
 }

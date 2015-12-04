@@ -54,7 +54,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.CircleDecoration;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.RelationDecoration;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureChangeGroupTypeOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ChangeFeatureGroupTypeOperation;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
@@ -129,15 +129,14 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		int groupType;
 
 		if (feature.getStructure().isAlternative()) {
-			groupType = FeatureChangeGroupTypeOperation.AND;
+			groupType = ChangeFeatureGroupTypeOperation.AND;
 		} else if (feature.getStructure().isAnd()) {
-			groupType = FeatureChangeGroupTypeOperation.OR;
+			groupType = ChangeFeatureGroupTypeOperation.OR;
 		} else {
-			groupType = FeatureChangeGroupTypeOperation.ALTERNATIVE;
+			groupType = ChangeFeatureGroupTypeOperation.ALTERNATIVE;
 		}
 
-		FeatureChangeGroupTypeOperation op = new FeatureChangeGroupTypeOperation(groupType, feature, featureModel);
-		op.addContext((IUndoContext) featureModel.getUndoContext());
+		ChangeFeatureGroupTypeOperation op = new ChangeFeatureGroupTypeOperation(groupType, feature, featureModel);
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);

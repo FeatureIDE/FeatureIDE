@@ -29,7 +29,7 @@ import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureCreateLayerOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateFeatureBelowOperation;
 
 /**
  * Creates a new feature as a child of the currently selected feature.
@@ -53,8 +53,7 @@ public class CreateLayerAction extends SingleSelectionAction {
 
 	@Override
 	public void run() {
-		FeatureCreateLayerOperation op = new FeatureCreateLayerOperation(feature, featureModel);
-		op.addContext((IUndoContext) featureModel.getUndoContext());
+		CreateFeatureBelowOperation op = new CreateFeatureBelowOperation(feature, featureModel);
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);

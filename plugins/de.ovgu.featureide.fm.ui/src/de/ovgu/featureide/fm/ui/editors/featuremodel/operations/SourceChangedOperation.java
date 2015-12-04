@@ -20,47 +20,46 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_CONSTRAINT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SOURCE_CHANGE;
 
-import org.prop4j.Node;
-
-import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
 import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
+import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 
 /**
- * Operation with functionality to create a new constraint. Enables undo/redo
- * functionality.
- * 
- * @author Fabian Benduhn
+ * @author Sebastian Krieter
  * @author Marcus Pinnecke
  */
-public class ConstraintCreateOperation extends AbstractFeatureModelOperation {
-	private IConstraint constraint;
+public class SourceChangedOperation extends AbstractFeatureModelOperation {
+
+	private final FeatureModelEditor featureModelEditor;
+	private final String newText, oldText;
 
 	/**
-	 * @param node
-	 *            the node representing the constraint to be added
 	 * @param featureModel
-	 *            model that will be used to add the constraint
+	 * @param label
+	 * @param featureModelEditor
+	 * @param newText
+	 * @param oldText
 	 */
-	public ConstraintCreateOperation(Node node, IFeatureModel featureModel) {
-		super(featureModel, CREATE_CONSTRAINT);
-		constraint = FeatureModelFactory.getInstance().createConstraint(featureModel, node);
+	public SourceChangedOperation(IFeatureModel featureModel, FeatureModelEditor featureModelEditor, String newText, String oldText) {
+		super(featureModel, SOURCE_CHANGE);
+		this.featureModelEditor = featureModelEditor;
+		this.newText = newText;
+		this.oldText = oldText;
 	}
 
 	@Override
 	protected FeatureModelEvent internalRedo() {
-		featureModel.addConstraint(constraint);
-		return new FeatureModelEvent(featureModel, PropertyConstants.CONSTRAINT_ADD, null, constraint);
+		featureModelEditor.readModel(newText);
+		return new FeatureModelEvent(featureModel, editor, false, PropertyConstants.MODEL_DATA_CHANGED, null, null);
 	}
 
 	@Override
 	protected FeatureModelEvent internalUndo() {
-		featureModel.removeConstraint(constraint);
-		return new FeatureModelEvent(featureModel, PropertyConstants.CONSTRAINT_DELETE, constraint, null);
+		featureModelEditor.readModel(oldText);
+		return new FeatureModelEvent(featureModel, editor, false, PropertyConstants.MODEL_DATA_CHANGED, null, null);
 	}
 
 }

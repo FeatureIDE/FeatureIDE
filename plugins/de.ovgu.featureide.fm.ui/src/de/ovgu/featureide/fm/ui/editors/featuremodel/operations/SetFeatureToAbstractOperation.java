@@ -20,48 +20,58 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.MOVE_CONSTRAINT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_ABSTRACT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_CONCRETE;
 
-import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
-import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 
 /**
- * Operation with functionality to move Constraints. Provides undo/redo
- * functionality.
+ * Operation with functionality to set a Feature abstract/concrete. Enables
+ * undo/redo functionality.
  * 
  * @author Fabian Benduhn
  * @author Marcus Pinnecke
  */
-public class ConstraintMoveOperation extends AbstractFeatureModelOperation {
+public class SetFeatureToAbstractOperation extends AbstractFeatureModelOperation {
 
-	private IConstraint constraint;
-	private int index;
+	private static final String LABEL_ABSTRACT = SET_FEATURE_ABSTRACT;
+	private static final String LABEL_CONCRETE = SET_FEATURE_CONCRETE;
 
-	private int oldIndex;
+	private IFeature feature;
 
-	public ConstraintMoveOperation(IConstraint constraint, IFeatureModel featureModel, int newIndex, int oldIndex) {
-		super(featureModel, MOVE_CONSTRAINT);
-		this.constraint = constraint;
-		this.index = newIndex;
-		this.oldIndex = oldIndex;
+	/**
+	 * @param label
+	 *            Description of this operation to be used in the menu
+	 * @param feature
+	 *            feature on which this operation will be executed
+	 * 
+	 */
+	public SetFeatureToAbstractOperation(IFeature feature, IFeatureModel featureModel) {
+		super(featureModel, getLabel(feature));
+		this.feature = feature;
+	}
+
+	/**
+	 * @param feature
+	 * @return String to be used in undo/redo menu
+	 */
+	private static String getLabel(IFeature feature) {
+		if (feature.getStructure().isAbstract())
+			return LABEL_CONCRETE;
+		else
+			return LABEL_ABSTRACT;
 	}
 
 	@Override
 	protected FeatureModelEvent internalRedo() {
-		featureModel.removeConstraint(constraint);
-		featureModel.addConstraint(constraint, index);
-		return new FeatureModelEvent(constraint, PropertyConstants.CONSTRAINT_MOVE, oldIndex, index);
-//		FeatureUIHelper.setLocation(featureModel.getConstraints().get(index).getGraphicRepresenation(), newPos);
+		feature.getStructure().setAbstract(!feature.getStructure().isAbstract());
+		return null;
 	}
 
 	@Override
 	protected FeatureModelEvent internalUndo() {
-		featureModel.removeConstraint(constraint);
-		featureModel.addConstraint(constraint, oldIndex);
-		return new FeatureModelEvent(constraint, PropertyConstants.CONSTRAINT_MOVE, index, oldIndex);
-//		FeatureUIHelper.setLocation(featureModel.getConstraints().get(index).getGraphicRepresenation(), oldPos);
+		return internalRedo();
 	}
-
 }

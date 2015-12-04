@@ -26,7 +26,7 @@ import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureSetAbstractOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToAbstractOperation;
 
 /**
  * Action to mark a feature as abstract.
@@ -51,8 +51,7 @@ public class AbstractAction extends SingleSelectionAction {
 	public void run() {
 
 		setChecked(feature.getStructure().isAbstract());
-		FeatureSetAbstractOperation op = new FeatureSetAbstractOperation(feature, featureModel);
-		op.addContext(undoContext);
+		SetFeatureToAbstractOperation op = new SetFeatureToAbstractOperation(feature, featureModel);
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);

@@ -30,7 +30,7 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ConstraintMoveOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.MoveConstraintOperation;
 
 /**
  * Executed command when dragging and dropping constraints
@@ -79,7 +79,7 @@ public class ConstraintDragAndDropCommand extends Command {
 			return;
 
 
-		ConstraintMoveOperation op = new ConstraintMoveOperation(constraint.getObject(), featureModel.getFeatureModel(), index, oldIndex);
+		MoveConstraintOperation op = new MoveConstraintOperation(constraint.getObject(), featureModel.getFeatureModel(), index, oldIndex);
 //TODO _interfaces Removed Code
 //		, newLocation, FeatureUIHelper
 //		.getLocation(constraint).getCopy()

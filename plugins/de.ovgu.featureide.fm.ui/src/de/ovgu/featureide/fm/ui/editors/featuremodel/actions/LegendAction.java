@@ -31,7 +31,7 @@ import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.LegendHideOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.HideLegendOperation;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
@@ -57,8 +57,7 @@ public class LegendAction extends Action {
 
 	@Override
 	public void run() {
-		LegendHideOperation op = new LegendHideOperation(featureModel);
-		op.addContext((IUndoContext) featureModel.getUndoContext());
+		HideLegendOperation op = new HideLegendOperation(featureModel);
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);

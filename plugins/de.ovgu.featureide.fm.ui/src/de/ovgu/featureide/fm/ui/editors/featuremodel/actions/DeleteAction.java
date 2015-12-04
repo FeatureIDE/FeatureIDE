@@ -83,7 +83,6 @@ public class DeleteAction extends Action {
 	@Override
 	public void run() {
 		ElementDeleteOperation op = new ElementDeleteOperation(viewer, featureModel);
-		op.addContext((IUndoContext) featureModel.getUndoContext());
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);

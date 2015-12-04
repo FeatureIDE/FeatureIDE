@@ -26,7 +26,7 @@ import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureSetMandatoryOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToMandatoryOperation;
 
 /**
  * Turns a feature in an And-group into a mandatory feature.
@@ -48,8 +48,7 @@ public class MandatoryAction extends SingleSelectionAction {
 	@Override
 	public void run() {
 		setChecked(feature.getStructure().isMandatory());
-		FeatureSetMandatoryOperation op = new FeatureSetMandatoryOperation(feature, featureModel);
-		op.addContext((IUndoContext) featureModel.getUndoContext());
+		SetFeatureToMandatoryOperation op = new SetFeatureToMandatoryOperation(feature, featureModel);
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);

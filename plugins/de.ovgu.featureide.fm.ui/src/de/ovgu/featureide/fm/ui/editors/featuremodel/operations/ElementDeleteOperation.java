@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -140,11 +141,11 @@ public class ElementDeleteOperation extends AbstractFeatureModelOperation implem
 	private boolean removeConstraint(Object element) {
 		if (element instanceof ConstraintEditPart) {
 			IConstraint constraint = ((ConstraintEditPart) element).getConstraintModel().getObject();
-			executeOperation(new ConstraintDeleteOperation(constraint, featureModel));
+			executeOperation(new DeleteConstraintOperation(constraint, featureModel));
 			return true;
 		} else if (element instanceof IConstraint) {
 			IConstraint constraint = ((IConstraint) element);
-			executeOperation(new ConstraintDeleteOperation(constraint, featureModel));
+			executeOperation(new DeleteConstraintOperation(constraint, featureModel));
 			return true;
 		}
 		return false;
@@ -168,7 +169,7 @@ public class ElementDeleteOperation extends AbstractFeatureModelOperation implem
 			final IFeature parent = feature.getStructure().getParent().getFeature();
 			if (FeatureUtils.getRelevantConstraints(feature).isEmpty()) {
 				// feature can be removed because it has no relevant constraint
-				executeOperation(new FeatureDeleteOperation(featureModel, feature));
+				executeOperation(new DeleteFeatureOperation(featureModel, feature));
 				alreadyDeleted.add(feature);
 			} else {
 				// check for all equivalent features

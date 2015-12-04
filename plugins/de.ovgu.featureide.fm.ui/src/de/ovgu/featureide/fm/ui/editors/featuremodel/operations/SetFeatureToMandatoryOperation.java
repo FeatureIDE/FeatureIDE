@@ -20,41 +20,53 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.RENAME_FEATURE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_MANDATORY;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_OPTIONAL;
 
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
-import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 
 /**
- * Operation with functionality to rename features. Provides undo/redo
- * functionality.
+ * Operation with functionality to set a Feature mandatory/concrete. Enables
+ * undo/redo functionality.
  * 
  * @author Fabian Benduhn
  * @author Marcus Pinnecke
  */
-public class FeatureRenamingOperation extends AbstractFeatureModelOperation {
+public class SetFeatureToMandatoryOperation extends AbstractFeatureModelOperation {
 
-	private String oldName;
-	private String newName;
+	private static final String LABEL_MANDATORY = SET_FEATURE_MANDATORY;
+	private static final String LABEL_OPTIONAL = SET_FEATURE_OPTIONAL;
+	private IFeature feature;
 
-	public FeatureRenamingOperation(IFeatureModel featureModel, String oldName, String newName) {
-		super(featureModel, RENAME_FEATURE);
-		this.oldName = oldName;
-		this.newName = newName;
-		setEventId(PropertyConstants.FEATURE_NAME_CHANGED);
+	/**
+	 */
+	public SetFeatureToMandatoryOperation(IFeature feature, IFeatureModel featureModel) {
+		super(featureModel, getLabel(feature));
+		this.feature = feature;
+	}
+
+	/**
+	 * @param feature
+	 * @return
+	 */
+	private static String getLabel(IFeature feature) {
+		if (feature.getStructure().isMandatory())
+			return LABEL_OPTIONAL;
+		else
+			return LABEL_MANDATORY;
 	}
 
 	@Override
 	protected FeatureModelEvent internalRedo() {
-		featureModel.getRenamingsManager().renameFeature(oldName, newName);
+		feature.getStructure().setMandatory(!feature.getStructure().isMandatory());
 		return null;
 	}
 
 	@Override
 	protected FeatureModelEvent internalUndo() {
-		featureModel.getRenamingsManager().renameFeature(newName, oldName);
-		return null;
+		return internalRedo();
 	}
 
 }

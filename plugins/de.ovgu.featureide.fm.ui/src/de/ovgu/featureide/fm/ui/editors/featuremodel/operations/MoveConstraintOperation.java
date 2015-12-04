@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE_CONSTRAINT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.MOVE_CONSTRAINT;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -28,32 +28,40 @@ import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
 import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 
 /**
- * Operation to delete a constraint.
+ * Operation with functionality to move Constraints. Provides undo/redo
+ * functionality.
  * 
  * @author Fabian Benduhn
  * @author Marcus Pinnecke
  */
-public class ConstraintDeleteOperation extends AbstractFeatureModelOperation {
-	private IConstraint constraint;
+public class MoveConstraintOperation extends AbstractFeatureModelOperation {
 
+	private IConstraint constraint;
 	private int index;
 
-	public ConstraintDeleteOperation(IConstraint constraint, IFeatureModel featureModel) {
-		super(featureModel, DELETE_CONSTRAINT);
+	private int oldIndex;
+
+	public MoveConstraintOperation(IConstraint constraint, IFeatureModel featureModel, int newIndex, int oldIndex) {
+		super(featureModel, MOVE_CONSTRAINT);
 		this.constraint = constraint;
+		this.index = newIndex;
+		this.oldIndex = oldIndex;
 	}
 
 	@Override
 	protected FeatureModelEvent internalRedo() {
-		index = featureModel.getConstraintIndex(constraint);
 		featureModel.removeConstraint(constraint);
-		return new FeatureModelEvent(featureModel, PropertyConstants.CONSTRAINT_DELETE, constraint, null);
+		featureModel.addConstraint(constraint, index);
+		return new FeatureModelEvent(constraint, PropertyConstants.CONSTRAINT_MOVE, oldIndex, index);
+//		FeatureUIHelper.setLocation(featureModel.getConstraints().get(index).getGraphicRepresenation(), newPos);
 	}
 
 	@Override
 	protected FeatureModelEvent internalUndo() {
-		featureModel.addConstraint(constraint, index);
-		return new FeatureModelEvent(featureModel, PropertyConstants.CONSTRAINT_ADD, null, constraint);
+		featureModel.removeConstraint(constraint);
+		featureModel.addConstraint(constraint, oldIndex);
+		return new FeatureModelEvent(constraint, PropertyConstants.CONSTRAINT_MOVE, index, oldIndex);
+//		FeatureUIHelper.setLocation(featureModel.getConstraints().get(index).getGraphicRepresenation(), oldPos);
 	}
 
 }

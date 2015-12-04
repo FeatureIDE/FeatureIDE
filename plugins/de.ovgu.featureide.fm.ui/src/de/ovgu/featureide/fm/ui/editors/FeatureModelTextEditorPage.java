@@ -36,7 +36,7 @@ import org.eclipse.ui.editors.text.TextEditor;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SourceChangeOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SourceChangedOperation;
 
 /**
  * Displays the source.
@@ -152,7 +152,7 @@ public class FeatureModelTextEditorPage extends TextEditor implements IFeatureMo
 			final IFeatureModel fm = featureModelEditor.featureModel;
 			
 			//TODO _interfaces replace text with DocumentEvent (delta)
-			SourceChangeOperation op = new SourceChangeOperation(fm, featureModelEditor, newText, oldText);
+			SourceChangedOperation op = new SourceChangedOperation(fm, featureModelEditor, newText, oldText);
 
 			op.addContext((IUndoContext) fm.getUndoContext());
 			try {

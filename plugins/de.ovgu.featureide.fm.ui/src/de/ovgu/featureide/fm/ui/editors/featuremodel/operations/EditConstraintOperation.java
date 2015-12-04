@@ -35,13 +35,13 @@ import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
  * @author Fabian Benduhn
  * @author Marcus Pinnecke
  */
-public class ConstraintEditOperation extends AbstractFeatureModelOperation {
+public class EditConstraintOperation extends AbstractFeatureModelOperation {
 
 	private IConstraint constraint;
 	private Node newNode;
 	private Node oldNode;
 
-	public ConstraintEditOperation(IConstraint constraint, Node propNode) {
+	public EditConstraintOperation(IConstraint constraint, Node propNode) {
 		super(constraint.getFeatureModel(), EDIT_CONSTRAINT);
 		this.newNode = propNode;
 		this.oldNode = constraint.getNode();

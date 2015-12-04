@@ -20,47 +20,42 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_MANDATORY;
-import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_OPTIONAL;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_HIDDEN;
+import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_NOT_HIDDEN;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
 
 /**
- * Operation with functionality to set a Feature mandatory/concrete. Enables
- * undo/redo functionality.
+ * Operation with functionality to set a Feature hidden. Enables undo/redo
+ * functionality.
  * 
  * @author Fabian Benduhn
  * @author Marcus Pinnecke
  */
-public class FeatureSetMandatoryOperation extends AbstractFeatureModelOperation {
+public class SetFeatureToHiddenOperation extends AbstractFeatureModelOperation {
 
-	private static final String LABEL_MANDATORY = SET_FEATURE_MANDATORY;
-	private static final String LABEL_OPTIONAL = SET_FEATURE_OPTIONAL;
+	private static final String LABEL_NOT_HIDDEN = SET_FEATURE_NOT_HIDDEN;
+	private static final String LABEL_HIDDEN = SET_FEATURE_HIDDEN;
 	private IFeature feature;
 
-	/**
-	 */
-	public FeatureSetMandatoryOperation(IFeature feature, IFeatureModel featureModel) {
+	public SetFeatureToHiddenOperation(IFeature feature, IFeatureModel featureModel) {
 		super(featureModel, getLabel(feature));
 		this.feature = feature;
 	}
 
-	/**
-	 * @param feature
-	 * @return
-	 */
 	private static String getLabel(IFeature feature) {
-		if (feature.getStructure().isMandatory())
-			return LABEL_OPTIONAL;
-		else
-			return LABEL_MANDATORY;
+		if (feature.getStructure().isHidden()) {
+			return LABEL_NOT_HIDDEN;
+		} else {
+			return LABEL_HIDDEN;
+		}
 	}
 
 	@Override
 	protected FeatureModelEvent internalRedo() {
-		feature.getStructure().setMandatory(!feature.getStructure().isMandatory());
+		feature.getStructure().setHidden(!feature.getStructure().isHidden());
 		return null;
 	}
 

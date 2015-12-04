@@ -255,7 +255,7 @@ public abstract class FeatureUtils {
 		StringBuilder relevant = new StringBuilder();
 		for (IConstraint constraint : constraints) {
 			for (IFeature f : constraint.getContainedFeatures()) {
-				if (f.getName().equals(feature.getName())) {
+				if (f != null && f.getName().equals(feature.getName())) {
 					relevant.append((relevant.length() == 0 ? " " : "\n ") + constraint.getNode().toString(NodeWriter.logicalSymbols) + " ");
 					break;
 				}

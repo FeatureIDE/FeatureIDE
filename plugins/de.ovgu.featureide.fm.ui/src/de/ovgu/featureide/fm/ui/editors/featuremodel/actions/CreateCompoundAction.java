@@ -43,7 +43,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureCreateCompoundOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateFeatureAboveOperation;
 
 /**
  * Creates a new feature with the currently selected features as children.
@@ -84,8 +84,9 @@ public class CreateCompoundAction extends Action {
 
 	@Override
 	public void run() {
-		FeatureCreateCompoundOperation op = new FeatureCreateCompoundOperation(parent, featureModel, selectedFeatures);
-		op.addContext((IUndoContext) featureModel.getUndoContext());
+		if (selectedFeatures.size() != 1)
+			throw new RuntimeException("Create compound operator for multiple selected features is not supported.");
+		CreateFeatureAboveOperation op = new CreateFeatureAboveOperation(featureModel, selectedFeatures.get(0));
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);

@@ -38,7 +38,7 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  * @author Fabian Benduhn
  * @author Marcus Pinnecke
  */
-public class FeatureDeleteOperation extends AbstractFeatureModelOperation {
+public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 
 	private IFeature feature;
 	private IFeature oldParent;
@@ -47,13 +47,13 @@ public class FeatureDeleteOperation extends AbstractFeatureModelOperation {
 	private boolean deleted = false;
 	private IFeature replacement;
 
-	public FeatureDeleteOperation(IFeatureModel featureModel, IFeature feature) {
+	public DeleteFeatureOperation(IFeatureModel featureModel, IFeature feature) {
 		super(featureModel, DELETE);
 		this.feature = feature;
 		this.replacement = null;
 	}
 
-	public FeatureDeleteOperation(IFeatureModel featureModel, IFeature feature, IFeature replacement) {
+	public DeleteFeatureOperation(IFeatureModel featureModel, IFeature feature, IFeature replacement) {
 		super(featureModel, DELETE);
 		this.feature = feature;
 		this.replacement = replacement;

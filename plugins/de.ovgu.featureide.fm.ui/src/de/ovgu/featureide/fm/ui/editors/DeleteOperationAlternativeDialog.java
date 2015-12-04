@@ -67,7 +67,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ElementDeleteOperation;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureDeleteOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.DeleteFeatureOperation;
 
 /**
  * Provides a dialog for choosing an alternative {@link IFeature} for the Feature to delete.
@@ -366,7 +366,7 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 
 		for (int i = 0; i < alternativefeatureTable.getSelectionCount(); i++) {
 			toBeDeleted = (IFeature) (alternativefeatureTable.getSelection()[i]).getData();
-			parent.executeOperation(new FeatureDeleteOperation(featureModel, toBeDeleted, alternative));
+			parent.executeOperation(new DeleteFeatureOperation(featureModel, toBeDeleted, alternative));
 			delFeatures.add(toBeDeleted);
 		}
 

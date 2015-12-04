@@ -76,7 +76,7 @@ public class FeatureTreeDeleteOperation extends AbstractFeatureModelOperation im
 
 		if (containedFeatureList.isEmpty()) {
 			for (IFeature feat : featureList) {
-				AbstractFeatureModelOperation op = new FeatureDeleteOperation(featureModel, feat);
+				AbstractFeatureModelOperation op = new DeleteFeatureOperation(featureModel, feat);
 				executeOperation(op);
 				operations.add(op);
 			}

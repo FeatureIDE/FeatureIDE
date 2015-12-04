@@ -20,48 +20,47 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_HIDDEN;
-import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_NOT_HIDDEN;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_CONSTRAINT;
 
-import de.ovgu.featureide.fm.core.base.IFeature;
+import org.prop4j.Node;
+
+import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
 
 /**
- * Operation with functionality to set a Feature hidden. Enables undo/redo
+ * Operation with functionality to create a new constraint. Enables undo/redo
  * functionality.
  * 
  * @author Fabian Benduhn
  * @author Marcus Pinnecke
  */
-public class FeatureSetHiddenOperation extends AbstractFeatureModelOperation {
+public class CreateConstraintOperation extends AbstractFeatureModelOperation {
+	private IConstraint constraint;
 
-	private static final String LABEL_NOT_HIDDEN = SET_FEATURE_NOT_HIDDEN;
-	private static final String LABEL_HIDDEN = SET_FEATURE_HIDDEN;
-	private IFeature feature;
-
-	public FeatureSetHiddenOperation(IFeature feature, IFeatureModel featureModel) {
-		super(featureModel, getLabel(feature));
-		this.feature = feature;
-	}
-
-	private static String getLabel(IFeature feature) {
-		if (feature.getStructure().isHidden()) {
-			return LABEL_NOT_HIDDEN;
-		} else {
-			return LABEL_HIDDEN;
-		}
+	/**
+	 * @param node
+	 *            the node representing the constraint to be added
+	 * @param featureModel
+	 *            model that will be used to add the constraint
+	 */
+	public CreateConstraintOperation(Node node, IFeatureModel featureModel) {
+		super(featureModel, CREATE_CONSTRAINT);
+		constraint = FeatureModelFactory.getInstance().createConstraint(featureModel, node);
 	}
 
 	@Override
 	protected FeatureModelEvent internalRedo() {
-		feature.getStructure().setHidden(!feature.getStructure().isHidden());
-		return null;
+		featureModel.addConstraint(constraint);
+		return new FeatureModelEvent(featureModel, PropertyConstants.CONSTRAINT_ADD, null, constraint);
 	}
 
 	@Override
 	protected FeatureModelEvent internalUndo() {
-		return internalRedo();
+		featureModel.removeConstraint(constraint);
+		return new FeatureModelEvent(featureModel, PropertyConstants.CONSTRAINT_DELETE, constraint, null);
 	}
 
 }

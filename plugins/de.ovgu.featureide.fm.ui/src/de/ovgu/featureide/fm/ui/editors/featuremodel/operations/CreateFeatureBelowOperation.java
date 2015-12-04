@@ -43,12 +43,12 @@ import de.ovgu.featureide.fm.core.base.impl.Feature;
  * @author Fabian Benduhn
  * @author Sebastian Krieter
  */
-public class FeatureCreateLayerOperation extends AbstractFeatureModelOperation {
+public class CreateFeatureBelowOperation extends AbstractFeatureModelOperation {
 
 	private IFeature feature;
 	private IFeature newFeature;
 
-	public FeatureCreateLayerOperation(IFeature feature, IFeatureModel featureModel) {
+	public CreateFeatureBelowOperation(IFeature feature, IFeatureModel featureModel) {
 		super(featureModel, CREATE_LAYER);
 		this.feature = feature;
 		setEventId(PropertyConstants.FEATURE_ADD);
@@ -56,7 +56,7 @@ public class FeatureCreateLayerOperation extends AbstractFeatureModelOperation {
 
 	@Override
 	public IStatus redo(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
-		internalRedo();
+		fireEvent(internalRedo());
 		return Status.OK_STATUS;
 	}
 

@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.AbstractOperation;
+import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -49,6 +50,7 @@ public abstract class AbstractFeatureModelOperation extends AbstractOperation {
 	public AbstractFeatureModelOperation(IFeatureModel featureModel, String label) {
 		super(label);
 		this.featureModel = featureModel;
+		addContext((IUndoContext) featureModel.getUndoContext());
 	}
 
 	@Override
@@ -70,7 +72,7 @@ public abstract class AbstractFeatureModelOperation extends AbstractOperation {
 	protected abstract FeatureModelEvent internalRedo();
 
 	public void redo() {
-		internalRedo();
+		fireEvent(internalRedo());
 	}
 
 	@Override
@@ -90,7 +92,7 @@ public abstract class AbstractFeatureModelOperation extends AbstractOperation {
 		internalUndo();
 	}
 
-	private void fireEvent(FeatureModelEvent event) {
+	final protected void fireEvent(FeatureModelEvent event) {
 		if (event == null) {
 			event = new FeatureModelEvent(featureModel, editor, false, eventId, null, null);
 		}

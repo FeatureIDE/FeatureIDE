@@ -53,12 +53,12 @@ import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePage;
  * @author Marcus Pinnecke
  * @author Sebastian Krieter
  */
-public class ElementMoveOperation extends AbstractFeatureModelOperation implements GUIDefaults {
+public class MoveElementsOperation extends AbstractFeatureModelOperation implements GUIDefaults {
 
 	private Object viewer;
 	private Deque<AbstractFeatureModelOperation> operations = new LinkedList<AbstractFeatureModelOperation>();
 
-	public ElementMoveOperation(Object viewer, IFeatureModel featureModel) {
+	public MoveElementsOperation(Object viewer, IFeatureModel featureModel) {
 		super(featureModel, DELETE);
 		this.viewer = viewer;
 	}
