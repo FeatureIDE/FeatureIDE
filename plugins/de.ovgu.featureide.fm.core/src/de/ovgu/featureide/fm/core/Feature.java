@@ -32,6 +32,11 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureProperty;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.base.IPropertyContainer;
+import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.IFeatureModelListener;
 import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
@@ -43,7 +48,7 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  * @author Marcus Pinnecke (Feature Interface)
  * 
  */
-public class Feature implements PropertyConstants, PropertyChangeListener, IGraphicItem {
+public class Feature implements PropertyConstants, PropertyChangeListener, IGraphicItem, IFeature {
 
 	public final IFeature feature;
 
@@ -1226,5 +1231,45 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	@Override
 	public GraphicItem getItemType() {
 		return FeatureUtils.getItemType(feature);
+	}
+	
+	@Override
+	public long getInternalId() {
+		return feature.getInternalId();
+	}
+
+	@Override
+	public void addListener(IFeatureModelListener listener) {
+		feature.addListener(listener);
+	}
+
+	@Override
+	public void fireEvent(FeatureModelEvent event) {
+		feature.fireEvent(event);
+	}
+
+	@Override
+	public void removeListener(IFeatureModelListener listener) {
+		feature.removeListener(listener);
+	}
+
+	@Override
+	public IFeature clone(IFeatureModel newFeatureModel, IFeatureStructure newStructure) {
+		return feature.clone(newFeatureModel, newStructure);
+	}
+
+	@Override
+	public IFeatureProperty getProperty() {
+		return feature.getProperty();
+	}
+
+	@Override
+	public IPropertyContainer getCustomProperties() {
+		return feature.getCustomProperties();
+	}
+
+	@Override
+	public IFeatureStructure getStructure() {
+		return feature.getStructure();
 	}
 }
