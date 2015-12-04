@@ -712,9 +712,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 
 	public void setLayout() {
 
-		FeatureDiagramLayoutManager layoutManager;
-
-		layoutManager = FeatureDiagramLayoutHelper.getLayoutManager(graphicalFeatureModel.getLayout().getLayoutAlgorithm(), graphicalFeatureModel);
+		FeatureDiagramLayoutManager layoutManager = FeatureDiagramLayoutHelper.getLayoutManager(graphicalFeatureModel.getLayout().getLayoutAlgorithm(), graphicalFeatureModel);
 
 		int previousLayout = graphicalFeatureModel.getLayout().getLayoutAlgorithm();
 
@@ -724,9 +722,10 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			}
 		}
 
-		Point size = getControl().getSize();
-
-		layoutManager.setControlSize(size.x, size.y);
+		if (getControl() != null) {
+			Point size = getControl().getSize();
+			layoutManager.setControlSize(size.x, size.y);
+		}
 		layoutManager.layout(graphicalFeatureModel);
 
 	}
