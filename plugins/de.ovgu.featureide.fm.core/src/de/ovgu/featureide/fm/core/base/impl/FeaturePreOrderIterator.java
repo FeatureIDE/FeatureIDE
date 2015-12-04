@@ -46,7 +46,7 @@ public class FeaturePreOrderIterator implements Iterator<IFeature> {
 
 	@Override
 	public boolean hasNext() {
-		return featureStructureList.isEmpty();
+		return !featureStructureList.isEmpty();
 	}
 
 	@Override
