@@ -663,9 +663,6 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 
 		});
 		updateProjects.start();
-		if (projectsList != null) {
-			projectsList.refresh(false);
-		}
 	}
 
 	private void selectAllElementsWithoutWarningsOrErrors() {
