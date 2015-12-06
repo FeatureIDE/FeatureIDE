@@ -54,8 +54,6 @@ public class CollaborationViewSearch {
 	private Color noSearchResultsColor;
 	private List<Label> extractedLabels;
 	private List<Label> matchedLabels;
-	private final int BEGIN_OF_VALID_ASCII_CHARS = 48;
-	private final int END_OF_VALID_ASCII_CHARS = 125;
 
 	private class SearchDialog extends org.eclipse.jface.dialogs.Dialog {
 		private Text searchTextBox;
@@ -81,7 +79,6 @@ public class CollaborationViewSearch {
 			container.setLayout(new FillLayout());
 			this.searchTextBox = new Text(container, SWT.SEARCH | SWT.SINGLE | SWT.ICON_SEARCH);
 			this.searchTextBox.setBounds(500, 500, 200, 50);
-			this.searchTextBox.setText(searchText);
 			this.searchTextBox.setSelection(searchText.length());
 			return container;
 		}
@@ -164,11 +161,10 @@ public class CollaborationViewSearch {
 			public boolean keyPressed(KeyEvent event) {
 				if (event.keyCode == SWT.ESC) {
 					uncolorOldLabels();
-				} else if (event.keyCode >= BEGIN_OF_VALID_ASCII_CHARS && event.keyCode <= END_OF_VALID_ASCII_CHARS) {
+				} else if (((event.stateMask & SWT.CTRL) == SWT.CTRL) && (event.keyCode == 'f')) {
 					if (searchDialog == null) {
 						searchDialog = new SearchDialog(PlatformUI.getWorkbench().getDisplay().getActiveShell(), searchBoxText);
 					}
-
 					searchDialog.searchText = Character.toString(event.character);
 					searchDialog.open();
 					String searchText = searchDialog.getSearchText();
@@ -184,6 +180,7 @@ public class CollaborationViewSearch {
 						}
 					}
 				}
+
 				return true;
 			}
 		});
