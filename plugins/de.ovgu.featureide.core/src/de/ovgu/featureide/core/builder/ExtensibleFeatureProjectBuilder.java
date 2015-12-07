@@ -22,7 +22,6 @@ package de.ovgu.featureide.core.builder;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.NO_COMPOSITION_TOOL_FOUND_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UNABLE_TO_GET_PROJECT_;
-import static de.ovgu.featureide.fm.core.localization.StringTable.UNABLE_TO_MAKE_FEATURE_PROJECT_;
 
 import java.util.Map;
 

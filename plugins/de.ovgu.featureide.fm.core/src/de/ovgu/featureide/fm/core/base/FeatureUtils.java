@@ -651,7 +651,11 @@ public abstract class FeatureUtils {
 	}
 
 	public static final IFeature getRoot(IFeatureModel featureModel) {
-		return featureModel.getStructure().getRoot().getFeature();
+		IFeatureStructure root = featureModel.getStructure().getRoot();
+		if (root != null) {
+			return root.getFeature();
+		}
+		return null;
 	}
 
 	public static final void setFeatureTable(IFeatureModel featureModel, final Hashtable<String, IFeature> featureTable) {

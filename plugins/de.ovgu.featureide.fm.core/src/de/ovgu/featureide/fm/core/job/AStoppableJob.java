@@ -54,7 +54,7 @@ public abstract class AStoppableJob extends AbstractJob implements IStoppableJob
 				success = AStoppableJob.this.work();
 			} catch (Exception e) {
 				success = false;
-				e.printStackTrace();
+				FMCorePlugin.getDefault().logError(e);
 			}
 		}
 	}

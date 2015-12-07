@@ -33,7 +33,6 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  * Default implementation, does nothing.
  * 
  * @author Jens Meinicke
- * @author Marcus Pinnecke
  */
 public class AbstractConfigurationSorter {
 	
@@ -69,7 +68,7 @@ public class AbstractConfigurationSorter {
 		if (!sorted  || configurations.isEmpty()) {
 			return null;
 		}
-		return configurations.remove();
+		return configurations.pop();
 	}
 	
 	public int getBufferSize() {

@@ -31,6 +31,7 @@ import java.util.Set;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
@@ -142,7 +143,7 @@ public class Configuration implements Cloneable {
 	}
 
 	private SelectableFeature initRoot() {
-		final IFeature featureRoot = featureModel.getStructure().getRoot().getFeature();
+		final IFeature featureRoot = FeatureUtils.getRoot(featureModel);
 		final SelectableFeature root = new SelectableFeature(this, featureRoot);
 		
 		if (featureRoot != null) {

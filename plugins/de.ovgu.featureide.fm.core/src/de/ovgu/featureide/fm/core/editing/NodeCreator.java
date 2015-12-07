@@ -38,6 +38,7 @@ import org.prop4j.Node;
 import org.prop4j.Not;
 import org.prop4j.Or;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -68,7 +69,7 @@ public class NodeCreator {
 	}
 
 	public static Node createNodes(IFeatureModel featureModel, Map<Object, Node> replacingMap) {
-		IFeature root = featureModel.getStructure().getRoot().getFeature();
+		IFeature root = FeatureUtils.getRoot(featureModel);
 		LinkedList<Node> nodes = new LinkedList<Node>();
 		if (root != null) {
 			nodes.add(new Literal(getVariable(root.getName(), featureModel)));
@@ -85,7 +86,7 @@ public class NodeCreator {
 	}
 
 	public static Node createNodes(IFeatureModel featureModel, Map<Object, Node> replacingMap, Set<String> removeFeatures) {
-		IFeature root = featureModel.getStructure().getRoot().getFeature();
+		IFeature root = FeatureUtils.getRoot(featureModel);
 		LinkedList<Node> nodes = new LinkedList<Node>();
 		if (root != null) {
 			nodes.add(new Literal(getVariable(root.getName(), featureModel)));

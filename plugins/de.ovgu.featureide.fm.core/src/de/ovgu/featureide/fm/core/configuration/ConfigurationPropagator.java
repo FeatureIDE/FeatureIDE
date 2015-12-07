@@ -72,10 +72,14 @@ public class ConfigurationPropagator {
 		
 		@Override
 		public void run() {
-			if (featureSet != null) {
-				buildNode = NodeCreator.createNodes(featureModel, featureSet).toCNF();
-			} else {
-				buildNode = NodeCreator.createNodes(featureModel, ignoreAbstractFeatures).toCNF();
+			try {
+				if (featureSet != null) {
+					buildNode = NodeCreator.createNodes(featureModel, featureSet).toCNF();
+				} else {
+					buildNode = NodeCreator.createNodes(featureModel, ignoreAbstractFeatures).toCNF();
+				}
+			} catch (Exception e) {
+				FMCorePlugin.getDefault().logError(e);
 			}
 		}
 	}

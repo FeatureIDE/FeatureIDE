@@ -53,6 +53,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -107,7 +108,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 			XmlPropertyLoader propertyLoader = new XmlPropertyLoader(e.getElementsByTagName(PROPERTIES));
 			customProperties.addAll(propertyLoader.parseProperties());
 		}
-		if (featureModel.getStructure().getRoot() == null) {
+		if (FeatureUtils.getRoot(featureModel) == null) {
 			throw new UnsupportedModelException(WRONG_SYNTAX, 1);
 		}
 		
