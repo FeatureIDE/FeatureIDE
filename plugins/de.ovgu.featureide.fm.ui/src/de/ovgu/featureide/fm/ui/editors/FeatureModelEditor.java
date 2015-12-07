@@ -448,6 +448,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 		if (modelHandler != null) {
 			fmManager = PersistentFeatureModelManager.getInstance(fmFile.getModelFile().getLocation().toOSString(), modelHandler);
 			featureModel = fmManager.getFeatureModel();
+			modelHandler.setObject(featureModel);
 			readModel();
 		} else {
 			featureModel = FMFactoryManager.getFactory().createFeatureModel();
