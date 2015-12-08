@@ -25,7 +25,6 @@ import java.beans.PropertyChangeListener;
 import java.util.LinkedList;
 
 import de.ovgu.featureide.fm.core.IGraphicItem;
-import de.ovgu.featureide.fm.core.IGraphicItem.GraphicItem;
 import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 
 /**

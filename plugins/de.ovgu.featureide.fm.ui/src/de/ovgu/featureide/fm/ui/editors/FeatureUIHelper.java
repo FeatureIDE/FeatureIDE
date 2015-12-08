@@ -32,7 +32,7 @@ import org.eclipse.gef.EditPartViewer;
 import org.eclipse.gef.editparts.ZoomListener;
 import org.eclipse.gef.editparts.ZoomManager;
 
-import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
 import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConnectionEditPart;
@@ -340,11 +340,11 @@ public class FeatureUIHelper {
 	}
 
 	public static Point getSourceLocation(IGraphicalFeature feature) {
-		IFeature parentFeature = feature.getObject();
+		IFeatureStructure parentFeature = feature.getObject().getStructure();
 		boolean parentFeatureHidden = false;
-		while (!parentFeature.getStructure().isRoot()) {
-			parentFeature = parentFeature.getStructure().getParent().getFeature();
-			if (parentFeature.getStructure().isHidden()) {
+		while (!parentFeature.isRoot()) {
+			parentFeature = parentFeature.getParent();
+			if (parentFeature.isHidden()) {
 				parentFeatureHidden = true;
 			}
 		}

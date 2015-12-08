@@ -139,11 +139,11 @@ public class AspectJComposer extends ComposerExtensionClass {
 		LinkedList<String> selectedFeatures = new LinkedList<String>();
 		unSelectedFeatures = new LinkedList<String>();
 		for (IFeature feature : configuration.getSelectedFeatures()) {
-			selectedFeatures.add(feature.getName().toString());
+			selectedFeatures.add(feature.getName());
 		}
 		for (IFeature feature : FeatureUtils.extractConcreteFeatures(featureProject.getFeatureModel())) {
 			if (!selectedFeatures.contains(feature.getName())) {
-				unSelectedFeatures.add(feature.getName().toString());
+				unSelectedFeatures.add(feature.getName());
 			}
 		}
 

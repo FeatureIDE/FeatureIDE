@@ -463,7 +463,7 @@ public class ConfigurationPropagator {
 		for (SelectableFeature selectableFeature : configuration.features) {
 			final IFeature f = selectableFeature.getFeature();
 			if ((abstractFeatures && f.getStructure().isAbstract()) || (hiddenFeatures && f.getStructure().hasHiddenParent())) {
-				resultSet.add(f.getName().toString());
+				resultSet.add(f.getName());
 			}
 		}
 		return resultSet;

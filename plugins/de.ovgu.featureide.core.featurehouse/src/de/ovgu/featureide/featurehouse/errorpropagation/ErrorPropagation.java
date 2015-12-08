@@ -347,7 +347,7 @@ public abstract class ErrorPropagation {
 		for (String confFeature : configurationFeatures) {
 			for (IFeature feature : features) {
 				if (feature.getName().equals(confFeature)) {
-					list.add(feature.getName().toString());
+					list.add(feature.getName());
 				}
 			}
 		}

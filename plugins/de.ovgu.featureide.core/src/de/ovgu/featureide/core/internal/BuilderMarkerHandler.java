@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.core.internal;
 
+import org.eclipse.core.internal.resources.MarkerInfo;
+import org.eclipse.core.internal.resources.Workspace;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -34,6 +36,7 @@ import de.ovgu.featureide.core.IBuilderMarkerHandler;
  * @author Thomas Thuem
  * 
  */
+@SuppressWarnings("restriction")
 public class BuilderMarkerHandler implements IBuilderMarkerHandler {
 
 	private static final String BUILDER_MARKER = CorePlugin.PLUGIN_ID
@@ -131,9 +134,14 @@ public class BuilderMarkerHandler implements IBuilderMarkerHandler {
 		}
 		try {
 			IMarker marker = resource.createMarker(CONFIGURATION_MARKER);
-			marker.setAttribute(IMarker.MESSAGE, message);
-			marker.setAttribute(IMarker.SEVERITY, severity);
-			marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
+			MarkerInfo info = ((Workspace)resource.getWorkspace()).getMarkerManager().findMarkerInfo(resource, marker.getId());
+			if (marker.exists()&& info == null) {
+				marker.setAttribute(IMarker.MESSAGE, message);
+				marker.setAttribute(IMarker.SEVERITY, severity);
+				marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
+			} else {
+				System.err.println(info);
+			}
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}

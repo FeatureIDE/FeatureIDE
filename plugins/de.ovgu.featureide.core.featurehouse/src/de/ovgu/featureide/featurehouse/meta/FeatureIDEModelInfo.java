@@ -29,7 +29,6 @@ import org.prop4j.Node;
 import org.prop4j.NodeWriter;
 
 import composer.rules.meta.FeatureModelInfo;
-
 import de.ovgu.cide.fstgen.ast.FSTNode;
 import de.ovgu.cide.fstgen.ast.FSTNonTerminal;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
@@ -96,7 +95,7 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 			Configuration newConfig = new Configuration(featureModel);
 			coreFeatureNames = new LinkedList<String>();
 			for (IFeature feature : newConfig.getSelectedFeatures())
-				coreFeatureNames.add(feature.getName().toString());
+				coreFeatureNames.add(feature.getName());
 		}
 		
 		return coreFeatureNames.contains(featureName);

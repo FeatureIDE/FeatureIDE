@@ -117,7 +117,7 @@ public class QuickFixFalseOptionalFeaturesTest {
 		
 		for (IFeature feature : concrete) {
 			if (!core.contains(feature)) {
-				falseOptionalFeatures.add(feature.getName().toString());
+				falseOptionalFeatures.add(feature.getName());
 			}
 		}
 		

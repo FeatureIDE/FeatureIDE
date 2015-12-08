@@ -576,7 +576,7 @@ public abstract class FeatureUtils {
 
 	public static final String toString(IFeature feature, boolean writeMarks) {
 		if (writeMarks) {
-			final String featureName = feature.getName().toString();
+			final String featureName = feature.getName();
 			if (featureName.contains(" ") || Operator.isOperatorName(featureName)) {
 				return "\"" + feature.getName() + "\"";
 			}

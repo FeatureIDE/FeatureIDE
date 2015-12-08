@@ -330,7 +330,7 @@ public class Translator {
 		bfsStack.add(fm.getFeature(featureName).getStructure());
 		while (!bfsStack.isEmpty()) {
 			IFeatureStructure feature = bfsStack.poll();
-			result.add(feature.getFeature().getName().toString());
+			result.add(feature.getFeature().getName());
 			for (IFeatureStructure childFeature : feature.getChildren()) {
 				bfsStack.add(childFeature);
 			}

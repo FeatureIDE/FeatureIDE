@@ -70,7 +70,7 @@ public class SelectableFeature extends TreeElement {
 		if (automatic == Selection.UNDEFINED || manual == Selection.UNDEFINED || manual == automatic) {
 			this.automatic = automatic;
 		} else {
-			throw new AutomaticalSelectionNotPossibleException(feature.getName().toString(), automatic);
+			throw new AutomaticalSelectionNotPossibleException(feature.getName(), automatic);
 		}
 	}
 
@@ -78,7 +78,7 @@ public class SelectableFeature extends TreeElement {
 		if (name != null) {
 			return name;
 		}
-		return feature == null ? null : feature.getName().toString();
+		return feature == null ? null : feature.getName();
 	}
 
 	public IFeature getFeature() {

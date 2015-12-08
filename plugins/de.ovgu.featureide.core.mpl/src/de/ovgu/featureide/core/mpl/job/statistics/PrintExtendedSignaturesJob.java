@@ -75,7 +75,7 @@ public class PrintExtendedSignaturesJob extends AProjectJob<PrintExtendedSignatu
 		LinkedList<String> allConcreteFeatures = new LinkedList<String>();
 		for (IFeature feature : FeatureUtils.extractConcreteFeatures(interfaceProject.getFeatureModel())) {
 			if (!feature.getStructure().isHidden()) {
-				allConcreteFeatures.add(feature.getName().toString());
+				allConcreteFeatures.add(feature.getName());
 			}
 		}
 		workMonitor.setMaxAbsoluteWork(allConcreteFeatures.size() + 1);

@@ -47,7 +47,7 @@ public final class Features {
 	public static IFeature getCommonAncestor(Collection<IFeature> features) {
 		List<IFeature> commonAncestorList = null;
 		for (IFeature feature : features) {
-			commonAncestorList = Features.getCommonAncestor(commonAncestorList, feature.getStructure().getParent().getFeature());
+			commonAncestorList = Features.getCommonAncestor(commonAncestorList, FeatureUtils.getParent(feature));
 		}
 		return commonAncestorList.get(commonAncestorList.size() - 1);
 	}

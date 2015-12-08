@@ -35,7 +35,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -166,7 +165,7 @@ public class ElementDeleteOperation extends AbstractFeatureModelOperation implem
 			feature = ((FeatureEditPart) element).getFeature().getObject();
 		}
 		if (feature != null) {
-			final IFeature parent = feature.getStructure().getParent().getFeature();
+			final IFeature parent = FeatureUtils.getParent(feature);
 			if (FeatureUtils.getRelevantConstraints(feature).isEmpty()) {
 				// feature can be removed because it has no relevant constraint
 				executeOperation(new DeleteFeatureOperation(featureModel, feature));

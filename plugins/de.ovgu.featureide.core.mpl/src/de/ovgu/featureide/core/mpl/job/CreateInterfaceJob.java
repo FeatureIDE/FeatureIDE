@@ -154,7 +154,7 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
     	cut(nroot);
         do {
         	changed = false;
-            merge(nroot, GROUP_NO);
+            merge(nroot.getStructure(), GROUP_NO);
         } while (changed);
         
         int count = 0;
@@ -205,43 +205,46 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 
 	private boolean changed = false;
 	
-	private static int getGroup(IFeature f) {
+	private static int getGroup(IFeatureStructure f) {
 		if (f == null) {
 			return GROUP_NO;
-		} else if (f.getStructure().isAnd()) {
+		} else if (f.isAnd()) {
 			return GROUP_AND;
-		} else if (f.getStructure().isOr()) {
+		} else if (f.isOr()) {
 			return GROUP_OR;
 		} else {
 			return GROUP_ALT;
 		}
 	}
 	
-	private void merge(IFeature curFeature, int parentGroup) {
-        if (!curFeature.getStructure().hasChildren()) {
+	
+	
+	
+	private void merge(IFeatureStructure curFeature, int parentGroup) {
+        if (!curFeature.hasChildren()) {
         	return;
         }
         int curFeatureGroup = getGroup(curFeature);
-		LinkedList<IFeature> list = new LinkedList<IFeature>(FeatureUtils.convertToFeatureList(curFeature.getStructure().getChildren()));
-        for (IFeature child : list) {
+		List<IFeatureStructure> list = curFeature.getChildren();
+        for (IFeatureStructure child : list) {
             merge(child, curFeatureGroup);
 	        curFeatureGroup = getGroup(curFeature);
 		}
         
-		if (curFeature.getName().equals(MARK1)) {
+		if (curFeature.getFeature().getName().equals(MARK1)) {
 			if (parentGroup == curFeatureGroup) {
 				deleteFeature(curFeature);
 			} else {
 				switch (parentGroup) {
 				case GROUP_AND:
-					IFeature parent = curFeature.getStructure().getParent().getFeature();
-					if (parent.getStructure().getChildrenCount() == 1) {
+					IFeatureStructure parent = curFeature.getParent();
+					if (parent.getChildrenCount() == 1) {
 						switch (curFeatureGroup) {
 						case GROUP_OR:
-							parent.getStructure().setOr();
+							parent.setOr();
 							break;
 						case GROUP_ALT:
-							parent.getStructure().setAlternative();
+							parent.setAlternative();
 							break;
 						}
 						deleteFeature(curFeature);
@@ -250,8 +253,8 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 				case GROUP_OR:
 					if (curFeatureGroup == GROUP_AND) {
 						boolean allOptional = true;
-						for (IFeature child : list) {
-							if (child.getStructure().isMandatory()) {
+						for (IFeatureStructure child : list) {
+							if (child.isMandatory()) {
 								allOptional = false;
 								break;
 							}
@@ -271,21 +274,22 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 		}
     }
 	
-	private void deleteFeature(IFeature curFeature) {
-		IFeature parent = curFeature.getStructure().getParent().getFeature();
-        List<IFeatureStructure> list = curFeature.getStructure().getChildren();
-		parent.getStructure().removeChild(curFeature.getStructure());
+	private void deleteFeature(IFeatureStructure curFeature) {
+		IFeatureStructure parent = curFeature.getParent();
+        List<IFeatureStructure> children = curFeature.getChildren();
+		parent.removeChild(curFeature);
 		changed = true;
-		for (IFeatureStructure child : list) {
-			parent.getStructure().addChild(child);
+		for (IFeatureStructure child : children) {
+			parent.addChild(child);
 		}
-		list.clear();
+		children.clear();// XXX code smell
 	}
 	
-	private static boolean cut(IFeature curFeature) {
+	private static boolean cut(final IFeature curFeature) {
+		final IFeatureStructure structure = curFeature.getStructure();
         boolean notSelected = curFeature.getName().equals(MARK1);
         
-		List<IFeature> list = FeatureUtils.convertToFeatureList(curFeature.getStructure().getChildren());
+		List<IFeature> list = FeatureUtils.convertToFeatureList(structure.getChildren());
         if (list.isEmpty()) {
         	return notSelected;
         } else {
@@ -309,18 +313,18 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
                 }
             }
 			if (list.isEmpty()) {
-    			curFeature.getStructure().setAnd();
+    			structure.setAnd();
 				return notSelected;
     		} else {
-    			switch (getGroup(curFeature)) {
+    			switch (getGroup(structure)) {
     			case GROUP_OR:
     				if (removeCount > 0) {
-    					curFeature.getStructure().setAnd();
+    					structure.setAnd();
         				for (IFeature child : list) {
         	    			child.getStructure().setMandatory(false);
         				}
     				} else if (list.size() == 1) {
-    					curFeature.getStructure().setAnd();
+    					structure.setAnd();
         				for (IFeature child : list) {
         	    			child.getStructure().setMandatory(true);
         				}
@@ -329,7 +333,7 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
     			case GROUP_ALT:
     				if (removeCount > 0) {
     					if (list.size() == 1) {
-        					curFeature.getStructure().setAnd();
+        					structure.setAnd();
             				for (IFeature child : list) {
             	    			child.getStructure().setMandatory(false);
             				}
@@ -341,11 +345,11 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
             					pseudoAlternative.getStructure().addChild(child.getStructure());
             				}
             				list.clear();
-            				curFeature.getStructure().setAnd();
-            				curFeature.getStructure().addChild(pseudoAlternative.getStructure());
+            				structure.setAnd();
+            				structure.addChild(pseudoAlternative.getStructure());
         				}
     				} else if (list.size() == 1) {
-    					curFeature.getStructure().setAnd();
+    					structure.setAnd();
         				for (IFeature child : list) {
         	    			child.getStructure().setMandatory(true);
         				}

@@ -35,6 +35,7 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  * @author Patrick Sulkowski
  * @author Marcus Pinnecke
  */
+// TODO unused? 
 public class LayoutableFeature {
 
 	private boolean showHidden;
@@ -106,10 +107,11 @@ public class LayoutableFeature {
 	public static boolean isHidden(IFeature feature, boolean showHidden) {
 		if (showHidden)
 			return false;
-		if (!feature.getStructure().isRoot())
-			return (feature.getStructure().isHidden() || isHidden(feature.getStructure().getParent().getFeature(), showHidden));
+		final IFeatureStructure structure = feature.getStructure();
+		if (!structure.isRoot())
+			return (structure.isHidden() || isHidden(FeatureUtils.getParent(feature), showHidden));
 		else
-			return feature.getStructure().isHidden();
+			return structure.isHidden();
 	}
 
 }

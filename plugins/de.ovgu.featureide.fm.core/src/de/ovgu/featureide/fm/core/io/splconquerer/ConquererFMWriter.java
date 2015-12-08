@@ -185,7 +185,7 @@ public class ConquererFMWriter extends AbstractFeatureModelWriter {
         	element.appendChild(parentElement);
         	Element id = doc.createElement("id");
         	parentElement.appendChild(id);
-        	id.appendChild(doc.createTextNode(getID(feature.getStructure().getParent().getFeature().getName())));
+        	id.appendChild(doc.createTextNode(getID(FeatureUtils.getParent(feature).getName())));
     	}
     	
     	Element constraints = doc.createElement("constraints");

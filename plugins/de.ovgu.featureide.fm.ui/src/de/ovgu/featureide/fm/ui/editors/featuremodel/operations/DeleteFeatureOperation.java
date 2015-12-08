@@ -61,8 +61,8 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 
 	@Override
 	protected FeatureModelEvent operation() {
-		feature = featureModel.getFeature(feature.getName().toString());
-		oldParent = feature.getStructure().getParent().getFeature();
+		feature = featureModel.getFeature(feature.getName());
+		oldParent = FeatureUtils.getParent(feature);
 		if (oldParent != null) {
 			oldIndex = oldParent.getStructure().getChildIndex(feature.getStructure());
 		}
@@ -70,13 +70,13 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 		oldChildren.addAll(Functional.toList(FeatureUtils.convertToFeatureList(feature.getStructure().getChildren())));
 
 		if (oldParent != null) {
-			oldParent = featureModel.getFeature(oldParent.getName().toString());
+			oldParent = featureModel.getFeature(oldParent.getName());
 		}
 		LinkedList<IFeature> oldChildrenCopy = new LinkedList<IFeature>();
 
 		for (IFeature f : oldChildren) {
 			if (!f.getName().equals(feature.getName())) {
-				IFeature oldChild = featureModel.getFeature(f.getName().toString());
+				IFeature oldChild = featureModel.getFeature(f.getName());
 				oldChildrenCopy.add(oldChild);
 			}
 		}
@@ -108,13 +108,13 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 			}
 
 			if (oldParent != null) {
-				oldParent = featureModel.getFeature(oldParent.getName().toString());
+				oldParent = featureModel.getFeature(oldParent.getName());
 			}
 			LinkedList<IFeature> oldChildrenCopy = new LinkedList<IFeature>();
 
 			for (IFeature f : oldChildren) {
 				if (!f.getName().equals(feature.getName())) {
-					IFeature child = featureModel.getFeature(f.getName().toString());
+					IFeature child = featureModel.getFeature(f.getName());
 					if (child != null && child.getStructure().getParent() != null) {
 						child.getStructure().getParent().removeChild(child.getStructure());
 					}
@@ -148,6 +148,6 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 
 	@Override
 	public boolean canUndo() {
-		return oldParent == null || featureModel.getFeature(oldParent.getName().toString()) != null;
+		return oldParent == null || featureModel.getFeature(oldParent.getName()) != null;
 	}
 }

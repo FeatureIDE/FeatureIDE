@@ -573,7 +573,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		// dead features should not be composed
 		LinkedList<String> deadFeatures = new LinkedList<String>();
 		for (IFeature deadFeature : featureModel.getAnalyser().getDeadFeatures()) {
-			deadFeatures.add(deadFeature.getName().toString());
+			deadFeatures.add(deadFeature.getName());
 		}
 
 		String[] features = new String[featureOrderList.size()];

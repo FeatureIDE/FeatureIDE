@@ -58,6 +58,7 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.Comparison;
 import de.ovgu.featureide.fm.core.editing.ModelComparator;
@@ -911,9 +912,10 @@ public class FeatureModelAnalyzer {
 		Collection<IFeature> falseOptionalFeatures = new LinkedList<>();
 		for (IFeature feature : fm.getFeatures()) {
 			try {
-				if (!feature.getStructure().isMandatory() && !feature.getStructure().isRoot()) {
+				final IFeatureStructure structure = feature.getStructure();
+				if (!structure.isMandatory() && !structure.isRoot()) {
 					SatSolver satsolver = new SatSolver(new Not(new Implies(
-							new And(new Literal(feature.getStructure().getParent().getFeature().getName()),
+							new And(new Literal(FeatureUtils.getParent(feature).getName()),
 									NodeCreator.createNodes(fm.clone(null))),
 							new Literal(feature.getName()))), 1000);
 					if (!satsolver.isSatisfiable()) {
@@ -931,9 +933,10 @@ public class FeatureModelAnalyzer {
 		Collection<IFeature> falseOptionalFeatures = new LinkedList<>();
 		for (IFeature feature : fmFalseOptionals) {
 			try {
-				if (!feature.getStructure().isMandatory() && !feature.getStructure().isRoot()) {
+				final IFeatureStructure structure = feature.getStructure();
+				if (!structure.isMandatory() && !structure.isRoot()) {
 					SatSolver satsolver = new SatSolver(new Not(new Implies(
-							new And(new Literal(feature.getStructure().getParent().getFeature().getName()),
+							new And(new Literal(FeatureUtils.getParent(feature).getName()),
 									NodeCreator.createNodes(fm.clone(null))),
 							new Literal(feature.getName()))), 1000);
 					if (!satsolver.isSatisfiable()) {
@@ -958,7 +961,8 @@ public class FeatureModelAnalyzer {
 	public int countHiddenFeatures() {
 		int number = 0;
 		for (IFeature feature : fm.getFeatures()) {
-			if (feature.getStructure().isHidden() || feature.getStructure().hasHiddenParent()) {
+			final IFeatureStructure structure = feature.getStructure();
+			if (structure.isHidden() || structure.hasHiddenParent()) {
 				number++;
 			}
 		}

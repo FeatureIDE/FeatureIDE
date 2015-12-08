@@ -53,7 +53,6 @@ import java.util.Locale;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.AbstractOperation;
-import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.bindings.keys.ParseException;
 import org.eclipse.jface.fieldassist.ContentProposalAdapter;
@@ -606,13 +605,11 @@ public class ConstraintDialog implements GUIDefaults {
 
 		AbstractOperation op = null;
 		if (constraint != null && featureModel.getConstraints().contains(constraint)) {
-			int index = 0;
 			for (IConstraint c : featureModel.getConstraints()) {
 				if (c == constraint) {
 					op = new EditConstraintOperation(constraint, propNode);
 					break;
 				}
-				index++;
 			}
 		}
 		if (op == null) {

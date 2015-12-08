@@ -41,7 +41,7 @@ public class ExtendedFeatureProperty extends FeatureProperty {
 
 	@Override
 	public String getDisplayName() {
-		final String name = correspondingFeature.getName().toString();
+		final String name = correspondingFeature.getName();
 		switch (Preferences.getDefaultFeatureNameScheme()) {
 			case Preferences.SCHEME_SHORT:
 				int separatorIndex = name.lastIndexOf(".");
