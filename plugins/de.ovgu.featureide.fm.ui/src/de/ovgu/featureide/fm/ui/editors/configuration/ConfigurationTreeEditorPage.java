@@ -37,7 +37,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.SWT;
@@ -75,6 +74,7 @@ import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.ConfigurationMatrix;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagatorJobWrapper.IConfigJob;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
@@ -90,7 +90,7 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  * @author Marcus Pinnecke
  */
 public abstract class ConfigurationTreeEditorPage extends EditorPart implements IConfigurationEditorPage {
-	
+
 	protected static final Color gray = new Color(null, 140, 140, 140);
 	protected static final Color green = new Color(null, 0, 140, 0);
 	protected static final Color blue = new Color(null, 0, 0, 200);
@@ -98,7 +98,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 	protected static final Font treeItemStandardFont = new Font(null, ARIAL, 8, SWT.NORMAL);
 	protected static final Font treeItemSpecialFont = new Font(null, ARIAL, 8, SWT.BOLD);
-	
+
 	private static final Image EXPAND_IMAGE = FMUIPlugin.getDefault().getImageDescriptor("icons/expand.gif").createImage();
 	private static final Image COLLAPSE_IMAGE = FMUIPlugin.getDefault().getImageDescriptor("icons/collapse.gif").createImage();
 	private static final Image AUTOEXPAND_IMAGE = FMUIPlugin.getDefault().getImageDescriptor("icons/tree.png").createImage();
@@ -111,7 +111,16 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	protected IConfigurationEditor configurationEditor = null;
 
 	protected boolean dirty = false;
-	protected boolean autoExpand = true;
+
+	/**
+	 * Display only items whose direct parents are selected.
+	 */
+	protected boolean autoExpand1 = true;
+
+	/**
+	 * Display only items of the current color group.
+	 */
+	protected boolean autoExpand2 = false;
 	protected int curGroup = 0;
 
 	protected Tree tree;
@@ -119,6 +128,8 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	private int index;
 
 	private Label infoLabel;
+
+	private ToolItem autoExpandToolItem1, autoExpandToolItem2;
 
 	//	private Button autoSelectButton;
 
@@ -338,7 +349,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 		});
-		
+
 		item = new ToolItem(toolbar, SWT.PUSH);
 		item.setImage(PREVIOUS_IMAGE);
 		item.addSelectionListener(new SelectionListener() {
@@ -352,13 +363,37 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			}
 		});
 
-		item = new ToolItem(toolbar, SWT.CHECK);
-		item.setImage(AUTOEXPAND_IMAGE);
-		item.setSelection(autoExpand);
-		item.addSelectionListener(new SelectionListener() {
+		autoExpandToolItem2 = new ToolItem(toolbar, SWT.CHECK);
+		autoExpandToolItem2.setImage(AUTOEXPAND_IMAGE);
+		autoExpandToolItem2.setSelection(autoExpand2);
+
+		autoExpandToolItem1 = new ToolItem(toolbar, SWT.CHECK);
+		autoExpandToolItem1.setImage(AUTOEXPAND_IMAGE);
+		autoExpandToolItem1.setSelection(autoExpand1);
+
+		autoExpandToolItem2.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				autoExpand = !autoExpand;
+				autoExpand2 = !autoExpand2;
+				autoExpand1 = false;
+				autoExpandToolItem1.setSelection(false);
+				if (autoExpand2) {
+					curGroup = 1;
+					specialExpand(curGroup);
+				}
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+		});
+
+		autoExpandToolItem1.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				autoExpand1 = !autoExpand1;
+				autoExpand2 = false;
+				autoExpandToolItem2.setSelection(false);
 				expand();
 			}
 
@@ -533,7 +568,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			tree.removeAll();
 
 			final TreeItem root = new TreeItem(tree, 0);
-			if (autoExpand) {
+			if (autoExpand1) {
 				root.setExpanded(true);
 			}
 
@@ -554,13 +589,13 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			});
 		}
 	}
-	
+
 	private void specialExpand(int group) {
 		final LinkedList<TreeItem> groupItems = new LinkedList<>();
 		final TreeItem root = tree.getItem(0);
 		if (root != null) {
 			searchGroupRec(root, group, groupItems);
-			
+
 			if (!groupItems.isEmpty()) {
 				collapseRec(root);
 				for (TreeItem treeItem : groupItems) {
@@ -575,7 +610,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			}
 		}
 	}
-	
+
 	private void searchGroupRec(TreeItem root, int group, LinkedList<TreeItem> groupItems) {
 		final Object data = root.getData();
 		if (data instanceof SelectableFeature) {
@@ -584,7 +619,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 				groupItems.add(root);
 			}
 		}
-		
+
 		final TreeItem[] items = root.getItems();
 		for (TreeItem treeItem : items) {
 			searchGroupRec(treeItem, group, groupItems);
@@ -599,9 +634,9 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			collapseRec(treeItem);
 		}
 	}
-	
+
 	private void expand(Display display) {
-		if (autoExpand) {
+		if (autoExpand1) {
 			display.asyncExec(new Runnable() {
 				@Override
 				public void run() {
@@ -682,10 +717,14 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			}
 		}
 
-		// TODO recommender system
-		Random r = new Random();
-		for (SelectableFeature selectableFeature : manualFeatureList) {
-			selectableFeature.setRecommendationValue(r.nextInt(101));
+		final ConfigurationMatrix configurationMatrix = ((ConfigurationEditor) configurationEditor).getConfigurationMatrix();
+		configurationMatrix.calcRec(configurationEditor.getConfiguration());
+		final double[] rec = configurationMatrix.getRec();
+		if (rec != null) {
+			int i = 0;
+			for (SelectableFeature selectableFeature : configurationEditor.getConfiguration().getFeatures()) {
+				selectableFeature.setRecommendationValue((int) Math.floor(rec[i++] * 100));
+			}
 		}
 
 		curGroup = 0;
@@ -768,6 +807,20 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 				return null;
 			}
 		});
+		if (autoExpand2) {
+			job.addJobFinishedListener(new JobFinishListener() {
+				@Override
+				public void jobFinished(IJob finishedJob, boolean success) {
+					currentDisplay.asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							curGroup = 1;
+							specialExpand(curGroup);
+						}
+					});
+				}
+			});
+		}
 		return job;
 	}
 

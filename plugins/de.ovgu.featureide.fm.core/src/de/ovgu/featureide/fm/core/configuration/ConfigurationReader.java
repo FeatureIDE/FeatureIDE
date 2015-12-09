@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -79,6 +81,21 @@ public class ConfigurationReader {
 		return false;
 	}
 
+	public boolean readFromFile(Path file) throws IOException {
+		if (Files.exists(file)) {
+			final Path pathFileName = file.getFileName();
+			if (pathFileName != null) {
+				final String fileName = pathFileName.toString();
+
+				final int extensionIndex = fileName.lastIndexOf(".");
+				final String extension = (extensionIndex > -1) ? fileName.substring(extensionIndex + 1) : null;
+
+				return readFromInputStream(new FileInputStream(file.toFile()), ConfigurationFormat.getFormatByExtension(extension));
+			}
+		}
+		return false;
+	}
+
 	public boolean readFromString(String text) {
 		InputStream inputStream = new ByteArrayInputStream(text.getBytes(Charset.availableCharsets().get("UTF-8")));
 		return readFromInputStream(inputStream, new DefaultFormat());
@@ -122,6 +139,10 @@ public class ConfigurationReader {
 
 	public List<Warning> getWarnings() {
 		return Collections.unmodifiableList(warnings);
+	}
+
+	public Configuration getConfiguration() {
+		return configuration;
 	}
 
 }

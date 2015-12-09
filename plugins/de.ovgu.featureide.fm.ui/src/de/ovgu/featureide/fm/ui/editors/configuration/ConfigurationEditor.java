@@ -26,12 +26,12 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -65,6 +65,7 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.PropertyConstants;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.ConfigurationMatrix;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagatorJobWrapper.IConfigJob;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationWriter;
@@ -96,7 +97,6 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 
 	private final ConfigJobManager configJobManager = new ConfigJobManager();
 
-	@Nonnull
 	public IFile file;
 	private IFile internalFile;
 
@@ -563,4 +563,11 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	public void setAutoSelectFeatures(boolean autoSelectFeatures) {
 		this.autoSelectFeatures = autoSelectFeatures;
 	}
+
+	public ConfigurationMatrix getConfigurationMatrix() {
+		ConfigurationMatrix matrix = new ConfigurationMatrix(featureModel, Paths.get(file.getParent().getLocationURI()));
+		matrix.readConfigurations(file.getName());
+		return matrix;
+	}
+
 }
