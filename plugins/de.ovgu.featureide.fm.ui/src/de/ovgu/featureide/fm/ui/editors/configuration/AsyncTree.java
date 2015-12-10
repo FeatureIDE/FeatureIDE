@@ -128,17 +128,18 @@ public class AsyncTree extends Thread {
 	private final HashMap<SelectableFeature, TreeItem> itemMap;
 
 	private final FunctionalInterfaces.IFunction<Void, Void> callbackIfDone;
+	private final Object countLock = new Object();
 	private Integer count = 0;
 
 	public void inc() {
-		synchronized (count) {
+		synchronized (countLock) {
 			++count;
 		}
 	}
 
 	public void dec() {
 		boolean done;
-		synchronized (count) {
+		synchronized (countLock) {
 			done = --count == 0;
 		}
 		if (done) {

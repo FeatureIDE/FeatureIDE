@@ -99,11 +99,16 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	protected static final Font treeItemStandardFont = new Font(null, ARIAL, 8, SWT.NORMAL);
 	protected static final Font treeItemSpecialFont = new Font(null, ARIAL, 8, SWT.BOLD);
 
-	private static final Image EXPAND_IMAGE = FMUIPlugin.getDefault().getImageDescriptor("icons/expand.gif").createImage();
-	private static final Image COLLAPSE_IMAGE = FMUIPlugin.getDefault().getImageDescriptor("icons/collapse.gif").createImage();
-	private static final Image AUTOEXPAND_IMAGE = FMUIPlugin.getDefault().getImageDescriptor("icons/tree.png").createImage();
-	private static final Image NEXT_IMAGE = FMUIPlugin.getDefault().getImageDescriptor("icons/arrow_down.png").createImage();
-	private static final Image PREVIOUS_IMAGE = FMUIPlugin.getDefault().getImageDescriptor("icons/arrow_up.png").createImage();
+	private static final Image IMAGE_EXPAND = FMUIPlugin.getDefault().getImageDescriptor("icons/expand.gif").createImage();
+	private static final Image IMAGE_COLLAPSE = FMUIPlugin.getDefault().getImageDescriptor("icons/collapse.gif").createImage();
+	private static final Image IMAGE_AUTOEXPAND_LEVEL = FMUIPlugin.getDefault().getImageDescriptor("icons/tree01.png").createImage();
+	private static final Image IMAGE_AUTOEXPAND_GROUP = FMUIPlugin.getDefault().getImageDescriptor("icons/tree02.png").createImage();
+	private static final Image IMAGE_NEXT = FMUIPlugin.getDefault().getImageDescriptor("icons/arrow_down.png").createImage();
+	private static final Image IMAGE_PREVIOUS = FMUIPlugin.getDefault().getImageDescriptor("icons/arrow_up.png").createImage();
+
+	private static final int AUTOEXPAND_NO = 0;
+	private static final int AUTOEXPAND_LEVEL = 1;
+	private static final int AUTOEXPAND_GROUP = 2;
 
 	private final HashSet<SelectableFeature> invalidFeatures = new HashSet<SelectableFeature>();
 	protected final HashSet<SelectableFeature> updateFeatures = new HashSet<SelectableFeature>();
@@ -113,14 +118,12 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	protected boolean dirty = false;
 
 	/**
-	 * Display only items whose direct parents are selected.
+	 * 0 = No automatic expand.
+	 * 1 = Display only items whose direct parents are selected.
+	 * 2 = Display only items of the current color group.
 	 */
-	protected boolean autoExpand1 = true;
+	protected int autoExpand = AUTOEXPAND_LEVEL;
 
-	/**
-	 * Display only items of the current color group.
-	 */
-	protected boolean autoExpand2 = false;
 	protected int curGroup = 0;
 
 	protected Tree tree;
@@ -129,7 +132,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 	private Label infoLabel;
 
-	private ToolItem autoExpandToolItem1, autoExpandToolItem2;
+	private ToolItem autoExpandLevelToolItem, autoExpandGroupToolItem;
 
 	//	private Button autoSelectButton;
 
@@ -291,7 +294,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		toolbar.setLayoutData(gridData);
 
 		ToolItem item = new ToolItem(toolbar, SWT.PUSH);
-		item.setImage(EXPAND_IMAGE);
+		item.setImage(IMAGE_EXPAND);
 		item.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -310,7 +313,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		});
 
 		item = new ToolItem(toolbar, SWT.PUSH);
-		item.setImage(COLLAPSE_IMAGE);
+		item.setImage(IMAGE_COLLAPSE);
 		item.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -338,11 +341,13 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		});
 
 		item = new ToolItem(toolbar, SWT.PUSH);
-		item.setImage(NEXT_IMAGE);
+		item.setImage(IMAGE_NEXT);
 		item.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				specialExpand(++curGroup);
+				if (!specialExpand(++curGroup)) {
+					curGroup--;
+				}
 			}
 
 			@Override
@@ -351,11 +356,16 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		});
 
 		item = new ToolItem(toolbar, SWT.PUSH);
-		item.setImage(PREVIOUS_IMAGE);
+		item.setImage(IMAGE_PREVIOUS);
 		item.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				specialExpand(--curGroup);
+				if (curGroup <= 1) {
+					curGroup = 1;
+				} else {
+					curGroup--;
+				}
+				specialExpand(curGroup);
 			}
 
 			@Override
@@ -363,21 +373,22 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			}
 		});
 
-		autoExpandToolItem2 = new ToolItem(toolbar, SWT.CHECK);
-		autoExpandToolItem2.setImage(AUTOEXPAND_IMAGE);
-		autoExpandToolItem2.setSelection(autoExpand2);
+		autoExpandGroupToolItem = new ToolItem(toolbar, SWT.CHECK);
+		autoExpandGroupToolItem.setImage(IMAGE_AUTOEXPAND_GROUP);
+		autoExpandGroupToolItem.setSelection(autoExpand == AUTOEXPAND_GROUP);
 
-		autoExpandToolItem1 = new ToolItem(toolbar, SWT.CHECK);
-		autoExpandToolItem1.setImage(AUTOEXPAND_IMAGE);
-		autoExpandToolItem1.setSelection(autoExpand1);
+		autoExpandLevelToolItem = new ToolItem(toolbar, SWT.CHECK);
+		autoExpandLevelToolItem.setImage(IMAGE_AUTOEXPAND_LEVEL);
+		autoExpandLevelToolItem.setSelection(autoExpand == AUTOEXPAND_LEVEL);
 
-		autoExpandToolItem2.addSelectionListener(new SelectionListener() {
+		autoExpandGroupToolItem.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				autoExpand2 = !autoExpand2;
-				autoExpand1 = false;
-				autoExpandToolItem1.setSelection(false);
-				if (autoExpand2) {
+				if (autoExpand == AUTOEXPAND_GROUP) {
+					autoExpand = AUTOEXPAND_NO;
+				} else {
+					autoExpand = AUTOEXPAND_GROUP;
+					autoExpandLevelToolItem.setSelection(false);
 					curGroup = 1;
 					specialExpand(curGroup);
 				}
@@ -388,13 +399,16 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			}
 		});
 
-		autoExpandToolItem1.addSelectionListener(new SelectionListener() {
+		autoExpandLevelToolItem.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				autoExpand1 = !autoExpand1;
-				autoExpand2 = false;
-				autoExpandToolItem2.setSelection(false);
-				expand();
+				if (autoExpand == AUTOEXPAND_LEVEL) {
+					autoExpand = AUTOEXPAND_NO;
+				} else {
+					autoExpand = AUTOEXPAND_LEVEL;
+					autoExpandGroupToolItem.setSelection(false);
+					expand();
+				}
 			}
 
 			@Override
@@ -568,7 +582,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			tree.removeAll();
 
 			final TreeItem root = new TreeItem(tree, 0);
-			if (autoExpand1) {
+			if (autoExpand == AUTOEXPAND_LEVEL) {
 				root.setExpanded(true);
 			}
 
@@ -590,7 +604,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		}
 	}
 
-	private void specialExpand(int group) {
+	private boolean specialExpand(int group) {
 		final LinkedList<TreeItem> groupItems = new LinkedList<>();
 		final TreeItem root = tree.getItem(0);
 		if (root != null) {
@@ -607,8 +621,10 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 				}
 				tree.showItem(groupItems.getLast());
 				tree.showItem(groupItems.getFirst());
+				return true;
 			}
 		}
+		return false;
 	}
 
 	private void searchGroupRec(TreeItem root, int group, LinkedList<TreeItem> groupItems) {
@@ -636,7 +652,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	}
 
 	private void expand(Display display) {
-		if (autoExpand1) {
+		if (autoExpand == AUTOEXPAND_LEVEL) {
 			display.asyncExec(new Runnable() {
 				@Override
 				public void run() {
@@ -807,7 +823,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 				return null;
 			}
 		});
-		if (autoExpand2) {
+		if (autoExpand == AUTOEXPAND_GROUP) {
 			job.addJobFinishedListener(new JobFinishListener() {
 				@Override
 				public void jobFinished(IJob finishedJob, boolean success) {
