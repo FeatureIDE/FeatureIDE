@@ -83,7 +83,7 @@ public class CNFSolver2 implements ICNFSolver {
 		return solver;
 	}
 
-	public boolean isSatisfiable(int[] literals) throws TimeoutException, UnkownLiteralException {
+	public boolean isSatisfiable(int[] literals) throws TimeoutException {
 		final int[] unitClauses = new int[literals.length];
 		System.arraycopy(literals, 0, unitClauses, 0, unitClauses.length);
 
