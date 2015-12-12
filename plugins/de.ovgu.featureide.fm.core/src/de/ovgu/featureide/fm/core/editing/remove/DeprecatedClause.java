@@ -23,7 +23,6 @@ package de.ovgu.featureide.fm.core.editing.remove;
 import java.util.HashSet;
 
 import de.ovgu.featureide.fm.core.editing.cnf.Clause;
-import de.ovgu.featureide.fm.core.editing.remove.DeprecatedFeatureMap.DeprecatedFeature;
 
 /**
  * Used by {@link FeatureRemover}.
@@ -34,7 +33,7 @@ public class DeprecatedClause extends Clause {
 
 	private int relevance;
 
-	public static DeprecatedClause createClause(DeprecatedFeatureMap map, int[] newLiterals, int curFeature) {
+	public static DeprecatedClause createClause(int[] newLiterals, int curFeature) {
 		final HashSet<Integer> literalSet = new HashSet<>(newLiterals.length << 1);
 
 		for (int literal : newLiterals) {
@@ -47,10 +46,10 @@ public class DeprecatedClause extends Clause {
 			}
 		}
 
-		return getClauseFromSet(map, literalSet);
+		return getClauseFromSet(literalSet);
 	}
 
-	public static DeprecatedClause createClause(DeprecatedFeatureMap map, int[] newLiterals) {
+	public static DeprecatedClause createClause(int[] newLiterals) {
 		final HashSet<Integer> literalSet = new HashSet<>(newLiterals.length << 1);
 
 		for (int literal : newLiterals) {
@@ -61,23 +60,21 @@ public class DeprecatedClause extends Clause {
 			}
 		}
 
-		return getClauseFromSet(map, literalSet);
+		return getClauseFromSet(literalSet);
 	}
 
-	private static DeprecatedClause getClauseFromSet(DeprecatedFeatureMap map, final HashSet<Integer> literalSet) {
+	private static DeprecatedClause getClauseFromSet(final HashSet<Integer> literalSet) {
 		int[] newLiterals = new int[literalSet.size()];
 		int i = 0;
 		for (int lit : literalSet) {
 			newLiterals[i++] = lit;
 		}
-		final DeprecatedClause clause = new DeprecatedClause(newLiterals);
-		clause.computeRelevance(map);
-		return clause;
+		return new DeprecatedClause(newLiterals);
 	}
 
-	public static DeprecatedClause createClause(DeprecatedFeatureMap map, int newLiteral) {
+	public static DeprecatedClause createClause(DeprecatedFeature[] map, int newLiteral) {
 		final DeprecatedClause clause = new DeprecatedClause(new int[] { newLiteral });
-		final DeprecatedFeature df = map.get(Math.abs(newLiteral));
+		final DeprecatedFeature df = map[Math.abs(newLiteral)];
 		if (df != null) {
 			clause.relevance++;
 		}
@@ -89,9 +86,9 @@ public class DeprecatedClause extends Clause {
 		this.relevance = 0;
 	}
 
-	private void computeRelevance(DeprecatedFeatureMap map) {
+	boolean computeRelevance(DeprecatedFeature[] map) {
 		for (int literal : literals) {
-			final DeprecatedFeature df = map.get(Math.abs(literal));
+			final DeprecatedFeature df = map[Math.abs(literal)];
 			if (df != null) {
 				relevance++;
 				if (literal > 0) {
@@ -101,15 +98,13 @@ public class DeprecatedClause extends Clause {
 				}
 			}
 		}
-		if (relevance > 0 && relevance < literals.length) {
-			map.incGlobalMixedClauseCount();
-		}
+		return (relevance > 0 && relevance < literals.length);
 	}
 
-	public void delete(DeprecatedFeatureMap map) {
+	public boolean delete(DeprecatedFeature[] map) {
 		if (literals != null && literals.length > 1) {
 			for (int literal : literals) {
-				final DeprecatedFeature df = map.get(Math.abs(literal));
+				final DeprecatedFeature df = map[Math.abs(literal)];
 				if (df != null) {
 					if (literal > 0) {
 						df.decPositive();
@@ -118,10 +113,9 @@ public class DeprecatedClause extends Clause {
 					}
 				}
 			}
-			if (relevance > 0 && relevance < literals.length) {
-				map.decGlobalMixedClauseCount();
-			}
+			return (relevance > 0 && relevance < literals.length);
 		}
+		return false;
 	}
 
 	public int getRelevance() {

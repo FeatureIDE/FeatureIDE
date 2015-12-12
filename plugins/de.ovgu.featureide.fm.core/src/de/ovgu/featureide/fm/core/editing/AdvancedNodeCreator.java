@@ -238,7 +238,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		System.arraycopy(andChildren2, 0, nodeArray, andChildren1.length, andChildren2.length);
 
 		if (excludedFeatureNames != null && !excludedFeatureNames.isEmpty()) {
-			return LongRunningWrapper.runMethod(new FeatureRemover(new And(nodeArray), excludedFeatureNames, includeBooleanValues));
+			return LongRunningWrapper.runMethod(new FeatureRemover(new And(nodeArray), excludedFeatureNames, includeBooleanValues, cnfType == CNFType.Regular));
 		} else {
 			return new And(nodeArray);
 		}
