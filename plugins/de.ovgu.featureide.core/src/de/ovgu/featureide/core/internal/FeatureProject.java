@@ -105,12 +105,11 @@ import de.ovgu.featureide.fm.core.configuration.FeatureIDEFormat;
 import de.ovgu.featureide.fm.core.configuration.FeatureOrderReader;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
-import de.ovgu.featureide.fm.core.io.FeatureModelFile2;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
-import de.ovgu.featureide.fm.core.io.ModelIOFactory;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslReader;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 import de.ovgu.featureide.fm.core.job.AJob;
 import de.ovgu.featureide.fm.core.job.AStoppableJob;
@@ -151,7 +150,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	 */
 	private final IFeatureModel featureModel;
 
-	private FeatureModelReaderIFileWrapper modelReader;
+//	private FeatureModelReaderIFileWrapper modelReader;
 
 	private FSTModel fstModel;
 
@@ -330,20 +329,26 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 		AbstractFeatureModelReader tmpModelReader;
 
+		final FeatureModelManager.IOType ioType;
 		if (project.getFile("mpl.velvet").exists()) {
 			modelFile = new ModelMarkerHandler<>(project.getFile("mpl.velvet"));
-			featureModel = new ExtendedFeatureModel();
-			tmpModelReader = ModelIOFactory.getModelReader(featureModel, ModelIOFactory.TYPE_VELVET);
+			ioType = FeatureModelManager.IOType.VELVET;
+//			featureModel = new ExtendedFeatureModel();
+//			tmpModelReader = ModelIOFactory.getModelReader(featureModel, ModelIOFactory.TYPE_VELVET);
 		} else {
 			modelFile = new ModelMarkerHandler<>(project.getFile("model.xml"));
-			featureModel = FMFactoryManager.getFactory().createFeatureModel();
-			tmpModelReader = ModelIOFactory.getModelReader(featureModel, ModelIOFactory.TYPE_XML);
+			ioType = FeatureModelManager.IOType.XML_FIDE;
+//			featureModel = FMFactoryManager.getFactory().createFeatureModel();
+//			tmpModelReader = ModelIOFactory.getModelReader(featureModel, ModelIOFactory.TYPE_XML);
 		}
 
-		featureModel.addListener(new FeatureModelChangeListner());
-		modelReader = new FeatureModelReaderIFileWrapper(tmpModelReader);
+		final FeatureModelManager instance = FeatureModelManager.getInstance(modelFile.getModelFile().getLocation().toString(), ioType);
+		featureModel = instance.getObject();
 		
-		FeatureModelFile2.getInstance(modelFile.getModelFile()).getFeatureModel().addListener(new FeatureModelChangeListner());
+		featureModel.addListener(new FeatureModelChangeListner());
+//		modelReader = new FeatureModelReaderIFileWrapper(tmpModelReader);
+		
+//		FeatureModelFile2.getInstance(modelFile.getModelFile()).getFeatureModel().addListener(new FeatureModelChangeListner());
 
 		// initialize project structure
 		try {
@@ -423,7 +428,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		guidslToXML();
 
 		try {
-			modelReader.readFromFile(modelFile.getModelFile());
+//			modelReader.readFromFile(modelFile.getModelFile());
 			getComposer();
 			if (composerExtension != null && composerExtension.createFolderForFeatures()) {
 				createAndDeleteFeatureFolders();
@@ -431,10 +436,10 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			}
 			readFeatureOrder();
 			return true;
-		} catch (FileNotFoundException e) {
-			modelFile.createModelMarker(e.getMessage(), IMarker.SEVERITY_ERROR, 0);
-		} catch (UnsupportedModelException e) {
-			modelFile.createModelMarker(e.getMessage(), IMarker.SEVERITY_ERROR, e.lineNumber);
+//		} catch (FileNotFoundException e) {
+//			modelFile.createModelMarker(e.getMessage(), IMarker.SEVERITY_ERROR, 0);
+//		} catch (UnsupportedModelException e) {
+//			modelFile.createModelMarker(e.getMessage(), IMarker.SEVERITY_ERROR, e.lineNumber);
 		} catch (CoreException e) {
 			LOGGER.logError(ERROR_WHILE_LOADING_FEATURE_MODEL_FROM + modelFile.getModelFile(), e);
 		}

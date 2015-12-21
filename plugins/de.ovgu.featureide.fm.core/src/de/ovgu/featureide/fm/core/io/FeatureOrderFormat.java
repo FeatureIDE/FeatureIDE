@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.ui.editors;
+package de.ovgu.featureide.fm.core.io;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -27,31 +27,23 @@ import java.util.List;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.io.AFormatHandler;
-import de.ovgu.featureide.fm.core.io.ModelWarning;
 
 /**
  * Reads / Writes a feature order file.
  * 
  * @author Sebastian Krieter
  */
-public class FeatureOrderHandler extends AFormatHandler<IFeatureModel> {
+public class FeatureOrderFormat implements IPersistentFormat<IFeatureModel> {
 	
-	private List<ModelWarning> lastWarnings = Collections.emptyList();
-
-	public FeatureOrderHandler(IFeatureModel object) {
-		super(object);
-	}
-
 	@Override
-	public List<ModelWarning> read(CharSequence source) {
+	public List<Problem> read(IFeatureModel object, CharSequence source) {
 		String[] lines = source.toString().split("[\n|\r]+");
 		object.setFeatureOrderList(Arrays.asList(lines));
 		return Collections.emptyList();
 	}
 
 	@Override
-	public String write() {
+	public String write(IFeatureModel object) {
 		final String newLine = System.getProperty("line.separator");
 		final StringBuilder sb = new StringBuilder();
 
@@ -76,8 +68,13 @@ public class FeatureOrderHandler extends AFormatHandler<IFeatureModel> {
 	}
 
 	@Override
-	public List<ModelWarning> getLastWarnings() {
-		return lastWarnings;
+	public FeatureOrderFormat getInstance() {
+		return this;
+	}
+
+	@Override
+	public String getFactoryID() {
+		return null;
 	}
 
 }

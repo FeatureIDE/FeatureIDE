@@ -18,23 +18,32 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
+package de.ovgu.featureide.fm.core.io.manager;
 
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
-import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
+import java.util.List;
+
+import org.eclipse.core.resources.IResourceChangeListener;
+
+import de.ovgu.featureide.fm.core.base.event.IEventManager;
+import de.ovgu.featureide.fm.core.io.Problem;
 
 /**
+ * Responsible to load and save all information for a feature model instance.
  * 
  * @author Sebastian Krieter
  */
-public abstract class AbstractGraphicalFeatureModelOperation extends AbstractFeatureModelOperation {
+public interface IFileManager extends IEventManager, IResourceChangeListener {
 
-	protected IGraphicalFeatureModel graphicalFeatureModel;
+	String getAbsolutePath();
 
-	public AbstractGraphicalFeatureModelOperation(IGraphicalFeatureModel graphicalFeatureModel, String label) {
-		super(graphicalFeatureModel.getFeatureModel(), label);
-		this.graphicalFeatureModel = graphicalFeatureModel;
-		setEventId(FeatureModelEvent.MODEL_DATA_LOADED);
-	}
+	List<Problem> getLastProblems();
+
+	void init();
+
+	boolean read();
+
+	boolean save();
+
+	void dispose();
 
 }

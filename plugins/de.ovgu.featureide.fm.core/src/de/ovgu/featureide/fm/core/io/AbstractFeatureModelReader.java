@@ -51,7 +51,7 @@ public abstract class AbstractFeatureModelReader implements IFeatureModelReader 
 	/**
 	 * warnings occurred while parsing
 	 */
-	protected LinkedList<ModelWarning> warnings = new LinkedList<ModelWarning>();
+	protected LinkedList<Problem> warnings = new LinkedList<Problem>();
 	
 	/**
 	 * The source of the textual representation of the feature model.<br/><br/>
@@ -118,7 +118,7 @@ public abstract class AbstractFeatureModelReader implements IFeatureModelReader 
 		parseInputStream(inputStream);
 	}
 	
-	public List<ModelWarning> getWarnings() {
+	public List<Problem> getWarnings() {
 		return warnings;
 	}
 

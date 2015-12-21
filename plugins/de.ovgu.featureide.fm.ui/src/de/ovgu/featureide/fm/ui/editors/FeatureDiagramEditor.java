@@ -85,10 +85,11 @@ import de.ovgu.featureide.fm.core.base.event.IFeatureModelListener;
 import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
+import de.ovgu.featureide.fm.core.io.manager.FileManagerMap;
 import de.ovgu.featureide.fm.core.job.AStoppableJob;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.elements.GraphicMap;
-import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeatureModelHandler;
+import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeatureModelManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AbstractAction;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.actions.AlternativeAction;
@@ -148,7 +149,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	private FeatureModelEditor featureModelEditor;
 	private ZoomManager zoomManager;
 
-	private IGraphicalFeatureModel graphicalFeatureModel;
+	private IGraphicalFeatureModel graphicalFeatureModel = null;
 
 	private ScalableFreeformRootEditPart rootEditPart;
 
@@ -205,16 +206,30 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 	public FeatureDiagramEditor(FeatureModelEditor featureModelEditor, Composite container) {
 		super();
 		this.featureModelEditor = featureModelEditor;
-		graphicalFeatureModel = GraphicMap.getInstance().constructModel(getFeatureModel());
 
-		GraphicalFeatureModelHandler handler = new GraphicalFeatureModelHandler(graphicalFeatureModel);
-		featureModelEditor.fmManager.addHandler(handler);
-		try {
-			featureModelEditor.fmManager.read(handler);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		//		graphicalFeatureModel.getFeatureModel().addListener(this);
+		final IPersistentFormat<IGraphicalFeatureModel> format = GraphicalFeatureModelManager.getFormat(GraphicalFeatureModelManager.IOType.XML_FIDE);
+		final String extraPath = FileManagerMap.constructExtraPath(featureModelEditor.fmManager.getAbsolutePath(), format);
+		final IFeatureModel featureModel = getFeatureModel();
+		final GraphicalFeatureModelManager manager = GraphicalFeatureModelManager.getInstance(extraPath, format, featureModel);
+		featureModelEditor.fmManager.addListener(new IFeatureModelListener() {
+			@Override
+			public void propertyChange(FeatureModelEvent event) {
+				if (FeatureModelEvent.MODEL_DATA_SAVED.equals(event.getPropertyName())) {
+					manager.save();
+				}
+			}
+		});
+		manager.addListener(new IFeatureModelListener() {
+			@Override
+			public void propertyChange(FeatureModelEvent event) {
+				switch (event.getPropertyName()) {
+				case FeatureModelEvent.MODEL_DATA_LOADED:
+					graphicalFeatureModel = manager.editObject();
+					break;
+				}
+			}
+		});
+		graphicalFeatureModel = manager.editObject();
 
 		createControl(container);
 		initializeGraphicalViewer();
@@ -238,8 +253,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 				// checks for null are necessary because we cannot prevent this
 				// method may be called before the model is loaded correctly
 				// (including positions in FeatureUIHelper)
-//				if (fm == null)
-//					return;
+				//				if (fm == null)
+				//					return;
 
 				org.eclipse.draw2d.geometry.Point oldLoc = FeatureUIHelper.getLocation(graphicalFeatureModel.getFeatures().getObject());
 				if (oldLoc == null)
@@ -566,21 +581,25 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 
 	public void reload() {
 		Object model = null;
-		final EditPartViewer editPartViewer = getContents().getViewer();
-		if (editPartViewer != null) {
-			final ISelection selection = editPartViewer.getSelection();
-			if (selection instanceof IStructuredSelection) {
-				final IStructuredSelection iStructuredSelection = (IStructuredSelection) selection;
-				if (iStructuredSelection.size() == 1) {
-					final Object firstElement = iStructuredSelection.getFirstElement();
-					if (firstElement instanceof EditPart) {
-						model = ((EditPart) firstElement).getModel();
+		EditPartViewer editPartViewer = null;
+		final EditPart contents = getContents();
+		if (contents != null) {
+			editPartViewer = contents.getViewer();
+			if (editPartViewer != null) {
+				final ISelection selection = editPartViewer.getSelection();
+				if (selection instanceof IStructuredSelection) {
+					final IStructuredSelection iStructuredSelection = (IStructuredSelection) selection;
+					if (iStructuredSelection.size() == 1) {
+						final Object firstElement = iStructuredSelection.getFirstElement();
+						if (firstElement instanceof EditPart) {
+							model = ((EditPart) firstElement).getModel();
+						}
 					}
 				}
 			}
 		}
 
-		graphicalFeatureModel = GraphicMap.getInstance().constructModel(getFeatureModel());
+		graphicalFeatureModel.update();
 		setContents(graphicalFeatureModel);
 
 		if (model != null) {
@@ -712,7 +731,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 
 	public void setLayout() {
 
-		FeatureDiagramLayoutManager layoutManager = FeatureDiagramLayoutHelper.getLayoutManager(graphicalFeatureModel.getLayout().getLayoutAlgorithm(), graphicalFeatureModel);
+		FeatureDiagramLayoutManager layoutManager = FeatureDiagramLayoutHelper.getLayoutManager(graphicalFeatureModel.getLayout().getLayoutAlgorithm(),
+				graphicalFeatureModel);
 
 		int previousLayout = graphicalFeatureModel.getLayout().getLayoutAlgorithm();
 
@@ -751,7 +771,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		}
 
 		switch (prop) {
-		case FEATURE_ADD:
+		case FeatureModelEvent.FEATURE_ADD:
 			reload();
 			refresh();
 			featureModelEditor.setPageModified(true);
@@ -768,15 +788,21 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 				new FeatureLabelEditManager(part, TextCellEditor.class, new FeatureCellEditorLocator(part.getFeatureFigure()), getFeatureModel()).show();
 			}
 			break;
-		case MODEL_DATA_CHANGED: case STRUCTURE_CHANGED: case CONSTRAINT_ADD: case CONSTRAINT_DELETE: case CONSTRAINT_MODIFY: case CONSTRAINT_MOVE: case FEATURE_DELETE:
+		case FeatureModelEvent.MODEL_DATA_CHANGED:
+		case FeatureModelEvent.STRUCTURE_CHANGED:
+		case FeatureModelEvent.CONSTRAINT_ADD:
+		case FeatureModelEvent.CONSTRAINT_DELETE:
+		case FeatureModelEvent.CONSTRAINT_MODIFY:
+		case FeatureModelEvent.CONSTRAINT_MOVE:
+		case FeatureModelEvent.FEATURE_DELETE:
 			reload();
 			refresh();
 			featureModelEditor.setPageModified(true);
 			break;
-		case MODEL_DATA_LOADED:
+		case FeatureModelEvent.MODEL_DATA_LOADED:
 			refresh();
 			break;
-		case MODEL_LAYOUT_CHANGED:
+		case FeatureModelEvent.MODEL_LAYOUT_CHANGED:
 			featureModelEditor.setPageModified(true);
 			break;
 		case REDRAW_DIAGRAM:
@@ -789,7 +815,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			// legendAction.refresh();
 			legendLayoutAction.refresh();
 			break;
-		case LEGEND_LAYOUT_CHANGED:
+		case FeatureModelEvent.LEGEND_LAYOUT_CHANGED:
 			legendLayoutAction.refresh();
 		}
 

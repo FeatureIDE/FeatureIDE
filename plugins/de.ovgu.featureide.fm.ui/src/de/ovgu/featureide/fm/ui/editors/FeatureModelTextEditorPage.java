@@ -75,7 +75,7 @@ public class FeatureModelTextEditorPage extends TextEditor implements IFeatureMo
 	 * Updates the text editor from diagram.
 	 */
 	private void updateTextEditor() {
-		final String text = featureModelEditor.modelHandler.write();
+		final String text = featureModelEditor.fmManager.getFormat().getInstance().write(featureModelEditor.featureModel);
 		final IDocument document = getDocumentProvider().getDocument(getEditorInput());
 		if (!document.get().equals(text)) {
 			document.set(text);

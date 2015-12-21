@@ -27,6 +27,20 @@ package de.ovgu.featureide.fm.core.base.event;
  */
 public class FeatureModelEvent {
 
+	public static final String CONSTRAINT_MOVE = "CONSTRAINT_MOVE";
+	public static final String CONSTRAINT_MODIFY = "CONSTRAINT_MODIFY";
+	public static final String CONSTRAINT_DELETE = "CONSTRAINT_DELETE";
+	public static final String CONSTRAINT_ADD = "CONSTRAINT_ADD";
+	public static final String FEATURE_MODIFY = "FEATURE_MODIFY";
+	public static final String FEATURE_DELETE = "FEATURE_DELETE";
+	public static final String FEATURE_ADD = "FEATURE_ADD";
+	public static final String STRUCTURE_CHANGED = "STRUCTURE_CHANGED";
+	public static final String LEGEND_LAYOUT_CHANGED = "LEGEND_LAYOUT_CHANGED";
+	public static final String MODEL_LAYOUT_CHANGED = "MODEL_LAYOUT_CHANGED";
+	public static final String MODEL_DATA_CHANGED = "MODEL_DATA_CHANGED";
+	public static final String MODEL_DATA_SAVED  = "MODEL_DATA_SAVED";
+	public static final String MODEL_DATA_LOADED = "MODEL_DATA_LOADED";
+
 	private final Object source;
 	private final Object editor;
 	private final boolean persistent;

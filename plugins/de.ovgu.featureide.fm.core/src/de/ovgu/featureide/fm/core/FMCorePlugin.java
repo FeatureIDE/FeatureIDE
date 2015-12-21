@@ -43,6 +43,8 @@ import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel.UsedModel;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.ModelIOFactory;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager.IOType;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.IProjectJob;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
@@ -134,15 +136,18 @@ public class FMCorePlugin extends AbstractCorePlugin {
 			return;
 		}
 
-		final int modelType = ModelIOFactory.getTypeByFileName(file.getName());
-		if (modelType == ModelIOFactory.TYPE_UNKNOWN) {
+		final IOType modelType = FeatureModelManager.getTypeByFileName(file.getName());
+//		final int modelType = ModelIOFactory.getTypeByFileName(file.getName());
+		if (modelType == null) {
 			return;
 		}
-		final IFeatureModel fm = ModelIOFactory.getNewFeatureModel(modelType);
-		final AbstractFeatureModelReader reader = ModelIOFactory.getModelReader(fm, modelType);
+		
+		final FeatureModelManager instance = FeatureModelManager.getInstance(file.getLocation().toString(), modelType);
+		final IFeatureModel fm = instance.getObject();
+//		final AbstractFeatureModelReader reader = ModelIOFactory.getModelReader(fm, modelType);
 
 		try {
-			reader.readFromFile(file.getLocation().toFile());
+//			reader.readFromFile(file.getLocation().toFile());
 			FeatureModelAnalyzer fma = new FeatureModelAnalyzer(fm);
 			fma.analyzeFeatureModel(null);
 

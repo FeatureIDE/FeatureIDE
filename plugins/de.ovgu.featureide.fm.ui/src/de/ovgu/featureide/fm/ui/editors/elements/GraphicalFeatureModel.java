@@ -20,14 +20,21 @@
  */
 package de.ovgu.featureide.fm.ui.editors.elements;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
+import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
 import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.core.base.util.tree.Tree;
+import de.ovgu.featureide.fm.ui.editors.FeatureConnection;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalElement;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
@@ -53,7 +60,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel, PropertyCo
 		layout = new FeatureModelLayout();
 	}
 
-	public GraphicalFeatureModel(GraphicalFeatureModel oldModel) {
+	private GraphicalFeatureModel(GraphicalFeatureModel oldModel) {
 		this.correspondingFeatureModel = oldModel.correspondingFeatureModel;
 
 		constraintList = oldModel.constraintList;
@@ -81,12 +88,12 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel, PropertyCo
 
 	@Override
 	public void handleLegendLayoutChanged() {
-		fireEvent(LEGEND_LAYOUT_CHANGED);
+		fireEvent(FeatureModelEvent.LEGEND_LAYOUT_CHANGED);
 	}
 
 	@Override
 	public void handleModelLayoutChanged() {
-		fireEvent(MODEL_LAYOUT_CHANGED);
+		fireEvent(FeatureModelEvent.MODEL_LAYOUT_CHANGED);
 	}
 
 	@Override
@@ -131,6 +138,76 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel, PropertyCo
 			return "Graphical feature-model tree:\n" + featureTree.toString();
 		}
 		return super.toString();
+	}
+
+	public void update() {
+		final HashMap<IFeatureModelElement, IGraphicalElement> map = createElementMap();
+
+		init();
+
+		update(map, this);
+	}
+
+	public GraphicalFeatureModel clone() {
+		final HashMap<IFeatureModelElement, IGraphicalElement> map = createElementMap();
+
+		final GraphicalFeatureModel copy = new GraphicalFeatureModel(this);
+		copy.init();
+
+		update(map, copy);
+		return copy;
+	}
+
+	private void update(final HashMap<IFeatureModelElement, IGraphicalElement> map, final GraphicalFeatureModel model) {
+		for (IGraphicalFeature feature : model.featureTree) {
+			feature.copyValues(map.get(feature.getObject()));
+		}
+		for (IGraphicalConstraint constraint : model.constraintList) {
+			constraint.copyValues(map.get(constraint.getObject()));
+		}
+	}
+
+	private HashMap<IFeatureModelElement, IGraphicalElement> createElementMap() {
+		final HashMap<IFeatureModelElement, IGraphicalElement> map = new HashMap<>((int) ((constraintList.size() + featureTree.getNumberOfNodes()) * 1.5));
+		for (IGraphicalFeature feature : featureTree) {
+			map.put(feature.getObject(), feature);
+		}
+		for (IGraphicalConstraint constraint : constraintList) {
+			map.put(constraint.getObject(), constraint);
+		}
+		return map;
+	}
+
+	public void init() {
+		final ArrayList<IGraphicalConstraint> constraintList = new ArrayList<>(correspondingFeatureModel.getConstraints().size());
+		for (IConstraint constraint : correspondingFeatureModel.getConstraints()) {
+			final IGraphicalConstraint graphicalFeature = new GraphicalConstraint(constraint, this);
+			constraintList.add(graphicalFeature);
+		}
+
+		final IFeature rootFeature = correspondingFeatureModel.getStructure().getRoot().getFeature();
+
+		final IGraphicalFeature graphicalFeature = new GraphicalFeature(rootFeature, this);
+
+		final Tree<IGraphicalFeature> rootTree = graphicalFeature.getTree();
+		for (IFeatureStructure featureStructure : rootFeature.getStructure().getChildren()) {
+			traverse(rootTree, featureStructure.getFeature(), this);
+		}
+		graphicalFeature.getSourceConnections().clear();
+
+		this.constraintList = constraintList;
+		this.featureTree = rootTree;
+	}
+
+	private static void traverse(Tree<IGraphicalFeature> rootTree, IFeature feature, IGraphicalFeatureModel graphicalItem) {
+		final IGraphicalFeature graphicalFeature = new GraphicalFeature(feature, graphicalItem);
+		Tree<IGraphicalFeature> subTree = graphicalFeature.getTree();
+		rootTree.addSubTree(subTree);
+		final FeatureConnection connection = graphicalFeature.getSourceConnections().get(0);
+		rootTree.getObject().addTargetConnection(connection);
+		for (IFeatureStructure featureStructure : feature.getStructure().getChildren()) {
+			traverse(subTree, featureStructure.getFeature(), graphicalItem);
+		}
 	}
 
 }

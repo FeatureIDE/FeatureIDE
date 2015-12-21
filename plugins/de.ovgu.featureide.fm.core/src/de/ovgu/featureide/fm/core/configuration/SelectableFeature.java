@@ -78,7 +78,7 @@ public class SelectableFeature extends TreeElement {
 		if (name != null) {
 			return name;
 		}
-		return feature == null ? null : feature.getName();
+		return feature == null ? "" : feature.getName();
 	}
 
 	public IFeature getFeature() {

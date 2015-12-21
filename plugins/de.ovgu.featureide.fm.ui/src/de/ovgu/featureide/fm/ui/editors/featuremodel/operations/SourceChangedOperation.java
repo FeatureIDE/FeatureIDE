@@ -21,10 +21,8 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.SOURCE_CHANGE;
-
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
-import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 
 /**
@@ -53,13 +51,13 @@ public class SourceChangedOperation extends AbstractFeatureModelOperation {
 	@Override
 	protected FeatureModelEvent operation() {
 		featureModelEditor.readModel(newText);
-		return new FeatureModelEvent(featureModel, editor, false, PropertyConstants.MODEL_DATA_CHANGED, null, null);
+		return new FeatureModelEvent(featureModel, editor, false, FeatureModelEvent.MODEL_DATA_CHANGED, null, null);
 	}
 
 	@Override
 	protected FeatureModelEvent inverseOperation() {
 		featureModelEditor.readModel(oldText);
-		return new FeatureModelEvent(featureModel, editor, false, PropertyConstants.MODEL_DATA_CHANGED, null, null);
+		return new FeatureModelEvent(featureModel, editor, false, FeatureModelEvent.MODEL_DATA_CHANGED, null, null);
 	}
 
 }

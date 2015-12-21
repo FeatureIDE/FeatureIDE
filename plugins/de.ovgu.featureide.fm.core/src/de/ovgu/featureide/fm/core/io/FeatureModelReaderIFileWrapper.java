@@ -81,7 +81,7 @@ public class FeatureModelReaderIFileWrapper extends AbstractFeatureModelReader {
 		reader.readFromFile(file);
 	}
 
-	public List<ModelWarning> getWarnings() {
+	public List<Problem> getWarnings() {
 		return reader.getWarnings();
 	}
 

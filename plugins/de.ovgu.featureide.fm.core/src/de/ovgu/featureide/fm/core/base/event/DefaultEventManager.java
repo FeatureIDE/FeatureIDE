@@ -58,7 +58,7 @@ public class DefaultEventManager implements IEventManager, IFeatureModelListener
 	protected void callListener(FeatureModelEvent event, final IFeatureModelListener listener) {
 		try {
 			listener.propertyChange(event);
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
 	}

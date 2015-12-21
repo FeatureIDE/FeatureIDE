@@ -43,7 +43,6 @@ import org.eclipse.ui.part.ViewPart;
 
 import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
 import de.ovgu.featureide.fm.core.base.event.IFeatureModelListener;
-import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -151,7 +150,7 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 	 */
 	private IFeatureModelListener modelListener = new IFeatureModelListener() {
 		public void propertyChange(FeatureModelEvent evt) {
-			if (!PropertyConstants.MODEL_LAYOUT_CHANGED.equals(evt.getPropertyName()))
+			if (!FeatureModelEvent.MODEL_LAYOUT_CHANGED.equals(evt.getPropertyName()))
 				refresh(false);
 		}
 

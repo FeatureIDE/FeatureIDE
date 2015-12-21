@@ -23,7 +23,6 @@ package de.ovgu.featureide.fm.ui.editors.configuration;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SELECT_THE_CORRESPONDING_FEATUREMODEL_;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -33,6 +32,7 @@ import javax.annotation.Nonnull;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
@@ -70,9 +70,9 @@ import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagatorJobWrappe
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationWriter;
 import de.ovgu.featureide.fm.core.configuration.FeatureIDEFormat;
-import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
-import de.ovgu.featureide.fm.core.io.ModelIOFactory;
-import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import de.ovgu.featureide.fm.core.io.Problem;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager.IOType;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.WorkMonitor;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
@@ -111,6 +111,8 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	private boolean closeEditor;
 
 	private boolean autoSelectFeatures = false;
+	
+	public boolean invalidFeatureModel = true;
 
 	/**
 	 * The file of the corresponding feature model.
@@ -333,7 +335,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 
 	@Override
 	public void propertyChange(final FeatureModelEvent evt) {
-		if (!PropertyConstants.MODEL_DATA_CHANGED.equals(evt.getPropertyName())) {
+		if (!FeatureModelEvent.MODEL_DATA_CHANGED.equals(evt.getPropertyName())) {
 			return;
 		}
 
@@ -364,17 +366,29 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	 * Reads the featureModel from the modelFile.
 	 */
 	private void readFeatureModel() {
-		final int fileType = ModelIOFactory.getTypeByFileName(modelFile.getName());
-
-		featureModel = ModelIOFactory.getNewFeatureModel(fileType);
-		featureModel.initFMComposerExtension(file.getProject());
-
-		final AbstractFeatureModelReader reader = ModelIOFactory.getModelReader(featureModel, fileType);
-		try {
-			reader.readFromFile(modelFile);
-		} catch (FileNotFoundException | UnsupportedModelException e) {
-			FMUIPlugin.getDefault().logError(e);
+		
+		final IOType modelType = FeatureModelManager.getTypeByFileName(modelFile.getName());
+		if (modelType == null) {
+			invalidFeatureModel = true;
+			return;
 		}
+		final FeatureModelManager instance = FeatureModelManager.getInstance(modelFile.getAbsolutePath(), modelType);
+		featureModel = instance.getObject();
+
+		invalidFeatureModel = Problem.checkSeverity(instance.getLastProblems(), IMarker.SEVERITY_ERROR);
+		
+		
+//		final int fileType = ModelIOFactory.getTypeByFileName(modelFile.getName());
+//
+//		featureModel = ModelIOFactory.getNewFeatureModel(fileType);
+//		featureModel.initFMComposerExtension(file.getProject());
+//
+//		final AbstractFeatureModelReader reader = ModelIOFactory.getModelReader(featureModel, fileType);
+//		try {
+//			reader.readFromFile(modelFile);
+//		} catch (FileNotFoundException | UnsupportedModelException e) {
+//			FMUIPlugin.getDefault().logError(e);
+//		}
 	}
 
 	@Override
@@ -564,5 +578,10 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 
 	public void setAutoSelectFeatures(boolean autoSelectFeatures) {
 		this.autoSelectFeatures = autoSelectFeatures;
+	}
+
+	@Override
+	public boolean hasValidFeatureModel() {
+		return !invalidFeatureModel;
 	}
 }

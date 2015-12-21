@@ -2,6 +2,7 @@
 <?eclipse version="3.2"?>
 <plugin>
    <extension-point id="FMComposer" name="fmComposer" schema="schema/fmComposer.exsd"/>
+   <extension-point id="FMFactory" name="fmFactory" schema="schema/fmFactory.exsd"/>
    <extension
       id="de.ovgu.featureide.fm.core.featureModelMarker"
       name="Feature Model Marker"

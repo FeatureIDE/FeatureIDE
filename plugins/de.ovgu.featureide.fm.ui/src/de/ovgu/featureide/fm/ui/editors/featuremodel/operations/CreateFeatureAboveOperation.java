@@ -36,7 +36,6 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
-import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.core.base.impl.Feature;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
@@ -101,7 +100,7 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 				featureModel.addFeature(newCompound);
 				featureModel.getStructure().setRoot(newCompound.getStructure());
 			}
-			return new FeatureModelEvent(featureModel, PropertyConstants.FEATURE_ADD, null, newCompound);
+			return new FeatureModelEvent(featureModel, FeatureModelEvent.FEATURE_ADD, null, newCompound);
 	}
 
 	@Override
@@ -113,7 +112,7 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 			} else {
 				featureModel.deleteFeature(featureModel.getFeature(newCompound.getName()));
 			}
-			return new FeatureModelEvent(featureModel, PropertyConstants.FEATURE_DELETE, newCompound, null);
+			return new FeatureModelEvent(featureModel, FeatureModelEvent.FEATURE_DELETE, newCompound, null);
 	}
 
 }

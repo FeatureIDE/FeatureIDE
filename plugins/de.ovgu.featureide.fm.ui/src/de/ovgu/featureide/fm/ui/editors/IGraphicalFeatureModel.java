@@ -33,7 +33,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
  * 
  * @author Sebastian Krieter
  */
-public interface IGraphicalFeatureModel extends IGraphicItem {
+public interface IGraphicalFeatureModel extends IGraphicItem, Cloneable {
 
 	IFeatureModel getFeatureModel();
 
@@ -56,5 +56,11 @@ public interface IGraphicalFeatureModel extends IGraphicItem {
 	void setConstraintList(List<IGraphicalConstraint> constraintList);
 
 	IGraphicalFeature getGraphicalFeature(IFeature newFeature);
+	
+	void update();
+	
+	IGraphicalFeatureModel clone();
+	
+	void init();
 
 }

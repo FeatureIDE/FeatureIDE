@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2013  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -16,25 +16,15 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
- * See http://www.fosd.de/featureide/ for further information.
+ * See http://featureide.cs.ovgu.de/ for further information.
  */
 package de.ovgu.featureide.fm.core.io;
 
-import java.util.List;
-
 /**
- * Interface for saving and loading data.
+ * Represents the format of a feature model file.
  * 
  * @author Sebastian Krieter
  */
-public interface IPersistentHandler {
-
-	List<ModelWarning> read(CharSequence source);
-	
-	List<ModelWarning> getLastWarnings();
-
-	String write();
-
-	String getSuffix();
-
+public enum IOType {
+	UNKNOWN, XML_FIDE, VELVET, VELVET_IMPORT;
 }

@@ -34,7 +34,6 @@ import org.eclipse.swt.graphics.Color;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
-import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIBasics;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.properties.language.English;
@@ -138,7 +137,7 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 	 */
 	public static void updateEditors() {
 		for (IFeatureModel model : featureModels) {
-			model.fireEvent(new FeatureModelEvent(model, PropertyConstants.MODEL_DATA_LOADED));
+			model.fireEvent(new FeatureModelEvent(model, FeatureModelEvent.MODEL_DATA_LOADED));
 		}
 	}
 

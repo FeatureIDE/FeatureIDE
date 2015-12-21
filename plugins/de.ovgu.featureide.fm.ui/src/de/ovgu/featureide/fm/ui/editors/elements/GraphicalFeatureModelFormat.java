@@ -29,8 +29,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.NodeList;
 
-import de.ovgu.featureide.fm.core.io.AXMLHandler;
-import de.ovgu.featureide.fm.core.io.ModelWarning;
+import de.ovgu.featureide.fm.core.io.Problem;
+import de.ovgu.featureide.fm.core.io.xml.AXMLFormat;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -40,14 +40,10 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  * 
  * @author Sebastian Krieter
  */
-public class GraphicalFeatureModelHandler extends AXMLHandler<IGraphicalFeatureModel> {
-
-	public GraphicalFeatureModelHandler(IGraphicalFeatureModel object) {
-		super(object);
-	}
+public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureModel> {
 
 	@Override
-	protected void readDocument(Document doc, List<ModelWarning> warnings) {
+	protected void readDocument(Document doc, List<Problem> warnings) {
 		for (Element e : getElements(doc.getElementsByTagName("layout"))) {
 			setFeatureModelAttributes(e);
 			parseStruct(e.getElementsByTagName(STRUCT));
@@ -201,6 +197,16 @@ public class GraphicalFeatureModelHandler extends AXMLHandler<IGraphicalFeatureM
 				constraints.appendChild(rule);
 			}
 		}
+	}
+
+	@Override
+	public GraphicalFeatureModelFormat getInstance() {
+		return new GraphicalFeatureModelFormat();
+	}
+
+	@Override
+	public String getFactoryID() {
+		return null;
 	}
 
 }

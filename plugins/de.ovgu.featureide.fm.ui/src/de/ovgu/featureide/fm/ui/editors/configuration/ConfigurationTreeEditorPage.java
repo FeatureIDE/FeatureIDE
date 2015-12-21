@@ -211,7 +211,9 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		gridData.verticalAlignment = SWT.CENTER;
 		infoLabel = new Label(compositeTop, SWT.NONE);
 		infoLabel.setLayoutData(gridData);
-		updateInfoLabel(Display.getCurrent());
+		if (configurationEditor.hasValidFeatureModel()) {
+			updateInfoLabel(Display.getCurrent());
+		}
 
 		// autoselect button 
 		//		gridData = new GridData();
@@ -321,14 +323,18 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		return this;
 	}
 
-	protected boolean errorMessage(Tree tree) {
+	protected boolean errorMessage() {
+		if (!configurationEditor.hasValidFeatureModel()) {
+			displayError(THE_GIVEN_FEATURE_MODEL + " is invalid.");
+			return false;
+		}
 		if (configurationEditor.getConfiguration() == null) {
 			if (configurationEditor.getModelFile() == null) {
-				displayError(tree, THERE_IS_NO_FEATURE_MODEL_CORRESPONDING_TO_THIS_CONFIGURATION_COMMA__REOPEN_THE_EDITOR_AND_SELECT_ONE_);
+				displayError(THERE_IS_NO_FEATURE_MODEL_CORRESPONDING_TO_THIS_CONFIGURATION_COMMA__REOPEN_THE_EDITOR_AND_SELECT_ONE_);
 			} else if (!configurationEditor.getModelFile().exists()) {
-				displayError(tree, THE_GIVEN_FEATURE_MODEL + configurationEditor.getModelFile().getPath() + DOES_NOT_EXIST_);
+				displayError(THE_GIVEN_FEATURE_MODEL + configurationEditor.getModelFile().getPath() + DOES_NOT_EXIST_);
 			} else {
-				displayError(tree, AN_UNKNOWN_ERROR_OCCURRED_);
+				displayError(AN_UNKNOWN_ERROR_OCCURRED_);
 			}
 			return false;
 		} else {
@@ -336,7 +342,6 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			try {
 				if (!analyzer.isValid()) {
 					displayError(
-							tree,
 							THE_FEATURE_MODEL_FOR_THIS_PROJECT_IS_VOID_COMMA__I_E__COMMA__THERE_IS_NO_VALID_CONFIGURATION__YOU_NEED_TO_CORRECT_THE_FEATURE_MODEL_BEFORE_YOU_CAN_CREATE_OR_EDIT_CONFIGURATIONS_);
 					return false;
 				}
@@ -347,7 +352,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		return true;
 	}
 
-	private void displayError(Tree tree, String message) {
+	private void displayError(String message) {
 		tree.removeAll();
 		TreeItem item = new TreeItem(tree, 1);
 		item.setText(message);
@@ -397,7 +402,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 	protected void updateTree() {
 		itemMap.clear();
-		if (errorMessage(tree)) {
+		if (errorMessage()) {
 			final Configuration configuration = configurationEditor.getConfiguration();
 			tree.removeAll();
 			tree.addListener(SWT.PaintItem, new Listener() {

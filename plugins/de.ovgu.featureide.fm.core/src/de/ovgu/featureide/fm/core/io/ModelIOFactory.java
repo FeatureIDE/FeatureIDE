@@ -33,21 +33,17 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
  * @author Marcus Pinnecke (Feature Interface)
  */
 public abstract class ModelIOFactory {
-	
-	public static final int
-		TYPE_UNKNOWN = -1,
-		TYPE_XML = 0,
-		TYPE_VELVET = 1,
-		TYPE_VELVET_IMPORT = 2;
-	
+
+	public static final int TYPE_UNKNOWN = -1, TYPE_XML = 0, TYPE_VELVET = 1, TYPE_VELVET_IMPORT = 2;
+
 	public static AbstractFeatureModelReader getModelReader(int type) {
 		return getModelReader(getNewFeatureModel(type), type);
 	}
-	
+
 	public static IFeatureModelWriter getModelWriter(int type) {
 		return getModelWriter(getNewFeatureModel(type), type);
 	}
-	
+
 	public static AbstractFeatureModelReader getModelReader(IFeatureModel featureModel, int type) {
 		switch (type) {
 		case TYPE_XML:
@@ -60,7 +56,7 @@ public abstract class ModelIOFactory {
 			return null;
 		}
 	}
-	
+
 	public static IFeatureModelWriter getModelWriter(IFeatureModel featureModel, int type) {
 		switch (type) {
 		case TYPE_XML:
@@ -73,7 +69,7 @@ public abstract class ModelIOFactory {
 			return null;
 		}
 	}
-	
+
 	public static int getTypeByFileName(String fileName) {
 		if (fileName.endsWith(".xml")) {
 			return TYPE_XML;
@@ -82,7 +78,7 @@ public abstract class ModelIOFactory {
 		}
 		return TYPE_UNKNOWN;
 	}
-	
+
 	public static IFeatureModel getNewFeatureModel(int type) {
 		switch (type) {
 		case TYPE_XML:
@@ -95,5 +91,5 @@ public abstract class ModelIOFactory {
 			return null;
 		}
 	}
-			
+
 }

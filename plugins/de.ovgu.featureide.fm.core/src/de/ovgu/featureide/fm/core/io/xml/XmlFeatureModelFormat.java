@@ -41,7 +41,6 @@ import org.prop4j.AtMost;
 import org.prop4j.Equals;
 import org.prop4j.Implies;
 import org.prop4j.Literal;
-//import org.prop4j.Node;
 import org.prop4j.Not;
 import org.prop4j.Or;
 import org.w3c.dom.Document;
@@ -57,27 +56,28 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IPropertyContainer.Entry;
 import de.ovgu.featureide.fm.core.base.IPropertyContainer.Type;
+import de.ovgu.featureide.fm.core.base.impl.DefaultFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.io.AXMLHandler;
-import de.ovgu.featureide.fm.core.io.ModelWarning;
+import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlPropertyLoader.PropertiesParser;
 
 /**
  * Parses a FeatureModel from XML
- *
+ * 
  * @author Jens Meinicke
  * @author Marcus Pinnecke
  * @author Sebastian Krieter
  */
-public class XmlFeatureModelHandler extends AXMLHandler<IFeatureModel> {
+public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> {
 
-	public XmlFeatureModelHandler(IFeatureModel object) {
-		super(object);
+	@Override
+	public String getFactoryID() {
+		return DefaultFeatureModelFactory.ID;
 	}
 
 	@Override
-	protected void readDocument(Document doc, List<ModelWarning> warnings) throws UnsupportedModelException {
+	protected void readDocument(Document doc, List<Problem> warnings) throws UnsupportedModelException {
 		object.reset();
 		final Collection<PropertiesParser> customProperties = new ArrayList<>();
 
@@ -178,7 +178,7 @@ public class XmlFeatureModelHandler extends AXMLHandler<IFeatureModel> {
 	/**
 	 * Inserts the tags concerning propositional constraints into the DOM
 	 * document representation
-	 *
+	 * 
 	 * @param doc
 	 * @param FeatMod Parent node for the propositional nodes
 	 */
@@ -236,7 +236,7 @@ public class XmlFeatureModelHandler extends AXMLHandler<IFeatureModel> {
 
 	/**
 	 * Creates document based on feature model step by step
-	 *
+	 * 
 	 * @param doc document to write
 	 * @param node parent node
 	 * @param feat current feature
@@ -556,7 +556,7 @@ public class XmlFeatureModelHandler extends AXMLHandler<IFeatureModel> {
 
 	/**
 	 * Throws an error that will be used for error markers
-	 *
+	 * 
 	 * @param message The error message
 	 * @param tempNode The node that causes the error. this node is used for positioning.
 	 */
@@ -582,6 +582,11 @@ public class XmlFeatureModelHandler extends AXMLHandler<IFeatureModel> {
 		}
 
 		node.appendChild(fnod);
+	}
+
+	@Override
+	public XmlFeatureModelFormat getInstance() {
+		return new XmlFeatureModelFormat();
 	}
 
 }

@@ -27,6 +27,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.IS_ALREADY_USE
 import static de.ovgu.featureide.fm.core.localization.StringTable.NO_SUCH_ATTRIBUTE_DEFINED_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_PARENT_MODEL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_VARIABLE_NAME;
+import static de.ovgu.featureide.fm.core.localization.StringTable.USE;
 import static java.lang.String.format;
 
 import java.io.ByteArrayInputStream;
@@ -83,10 +84,10 @@ import de.ovgu.featureide.fm.core.constraint.Reference;
 import de.ovgu.featureide.fm.core.constraint.ReferenceType;
 import de.ovgu.featureide.fm.core.constraint.RelationOperator;
 import de.ovgu.featureide.fm.core.constraint.WeightedTerm;
-import de.ovgu.featureide.fm.core.io.AFormatHandler;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.ModelIOFactory;
-import de.ovgu.featureide.fm.core.io.ModelWarning;
+import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
 /**
@@ -95,25 +96,224 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
  * @author Marcus Pinnecke (Feature Interface)
  * @author Reimar Schroeter
  */
-public class VelvetModelHandler extends AFormatHandler<IFeatureModel> {
-	
-	private List<ModelWarning> lastWarnings = Collections.emptyList();
-
-	protected IFeatureModel featureModel;
+public class VelvetFeatureModelFormat implements IPersistentFormat<IFeatureModel> {
 
 	protected File featureModelFile;
-	
-	public VelvetModelHandler(IFeatureModel object) {
-		super(object);
-	}
-	
+
+	private static final String[] SYMBOLS = { "!", "&&", "||", "->", "<->", ", ", "choose", "atleast", "atmost" };
+	private static final String NEWLINE = System.getProperty("line.separator", "\n");
+	private final StringBuilder sb = new StringBuilder();
+
+	/**
+	 * If true an interface will be created. Otherwise it is named CONCEPT
+	 */
+	private boolean isInterface = false;
+
+	//private ExtendedFeatureModel extFeatureModel = null;
+	//private final HashSet<String> usedVariables = new HashSet<String>();
+
 	@Override
-	public String write() {
-		return null;
+	public String getFactoryID() {
+		return ExtendedFeatureModelFactory.ID;
 	}
 
 	@Override
-	public List<ModelWarning> read(CharSequence source) {
+	public String write(IFeatureModel object) {
+		if (object instanceof ExtendedFeatureModel) {
+			extFeatureModel = (ExtendedFeatureModel) object;
+			isInterface = isInterface || extFeatureModel.isInterface();
+		}
+		IFeatureStructure root = object.getStructure().getRoot();
+		sb.delete(0, sb.length());
+
+		if (isInterface) {
+			sb.append("cinterface ");
+		} else {
+			sb.append("concept ");
+		}
+		sb.append(root.getFeature().getName());
+		if (extFeatureModel != null) {
+			usedVariables.clear();
+			LinkedList<ExtendedFeatureModel.UsedModel> inheritedModels = new LinkedList<ExtendedFeatureModel.UsedModel>();
+			LinkedList<ExtendedFeatureModel.UsedModel> instanceModels = new LinkedList<ExtendedFeatureModel.UsedModel>();
+			LinkedList<ExtendedFeatureModel.UsedModel> interfaceModels = new LinkedList<ExtendedFeatureModel.UsedModel>();
+			for (UsedModel usedModel : extFeatureModel.getExternalModels().values()) {
+				switch (usedModel.getType()) {
+				case ExtendedFeature.TYPE_INHERITED:
+					inheritedModels.add(usedModel);
+					break;
+				case ExtendedFeature.TYPE_INSTANCE:
+					instanceModels.add(usedModel);
+					break;
+				case ExtendedFeature.TYPE_INTERFACE:
+					interfaceModels.add(usedModel);
+					break;
+				}
+			}
+
+			if (!inheritedModels.isEmpty()) {
+				sb.append(" : ");
+				sb.append(inheritedModels.removeFirst().getModelName());
+				for (UsedModel usedModel : inheritedModels) {
+					sb.append(", ");
+					sb.append(usedModel.getModelName());
+				}
+			}
+
+			if (!instanceModels.isEmpty()) {
+				sb.append(NEWLINE);
+				sb.append("\tinstance ");
+				sb.append(instanceModels.removeFirst());
+				for (UsedModel usedModel : instanceModels) {
+					sb.append(", ");
+					sb.append(usedModel);
+				}
+			}
+
+			if (!interfaceModels.isEmpty()) {
+				sb.append(NEWLINE);
+				sb.append("\tinterface ");
+				sb.append(interfaceModels.removeFirst());
+				for (UsedModel usedModel : interfaceModels) {
+					sb.append(", ");
+					sb.append(usedModel);
+				}
+			}
+		}
+		sb.append(" {");
+		sb.append(NEWLINE);
+
+		if (extFeatureModel != null && !isInterface) {
+			for (IFeatureStructure child : root.getChildren()) {
+				writeNewDefined(child, 1);
+			}
+
+			for (IConstraint constraint : object.getConstraints()) {
+				if (((ExtendedConstraint) constraint).getType() == ExtendedFeature.TYPE_INTERN) {
+					sb.append("\tconstraint ");
+					sb.append(constraint.getNode().toString(SYMBOLS));
+					sb.append(";");
+					sb.append(NEWLINE);
+				}
+			}
+		} else {
+			writeFeatureGroup(root, 1);
+
+			for (IConstraint constraint : object.getConstraints()) {
+				sb.append("\tconstraint ");
+				sb.append(constraint.getNode().toString(SYMBOLS));
+				sb.append(";");
+				sb.append(NEWLINE);
+			}
+		}
+
+		sb.append("}");
+
+		return sb.toString();
+	}
+
+	private void writeFeatureGroup(IFeatureStructure root, int depth) {
+		if (root.isAnd()) {
+			for (IFeatureStructure feature : root.getChildren()) {
+				writeFeature(feature, depth + 1);
+			}
+		} else if (root.isOr()) {
+			writeTab(depth + 1);
+			sb.append("someOf {");
+			sb.append(NEWLINE);
+			for (IFeatureStructure feature : root.getChildren()) {
+				writeFeature(feature, depth + 2);
+			}
+			writeTab(depth + 1);
+			sb.append("}");
+			sb.append(NEWLINE);
+		} else if (root.isAlternative()) {
+			writeTab(depth + 1);
+			sb.append("oneOf {");
+			sb.append(NEWLINE);
+			for (IFeatureStructure f : root.getChildren()) {
+				writeFeature(f, depth + 2);
+			}
+			writeTab(depth + 1);
+			sb.append("}");
+			sb.append(NEWLINE);
+		}
+	}
+
+	private void writeFeature(IFeatureStructure feature, int depth) {
+		writeTab(depth);
+		if (feature.isAbstract()) {
+			sb.append("abstract ");
+		}
+		if (feature.isMandatory() && (feature.getParent() == null || feature.getParent().isAnd())) {
+			sb.append("mandatory ");
+		}
+		sb.append("feature ");
+		sb.append(feature.getFeature().getName());
+		final String description = feature.getFeature().getProperty().getDescription();
+		final boolean hasDescription = description != null && !description.isEmpty();
+
+		if (feature.getChildrenCount() == 0 && !hasDescription) {
+			sb.append(";");
+		} else {
+			sb.append(" {");
+			sb.append(NEWLINE);
+			if (hasDescription) {
+				writeTab(depth + 1);
+				sb.append("description \"");
+				sb.append(description.replace("\"", "\\\""));
+				sb.append("\";");
+				sb.append(NEWLINE);
+			}
+
+			writeFeatureGroup(feature, depth);
+
+			writeTab(depth);
+			sb.append("}");
+		}
+		sb.append(NEWLINE);
+	}
+
+	private void writeNewDefined(IFeatureStructure child2, int depth) {
+		if (child2 instanceof ExtendedFeature) {
+			final ExtendedFeature extFeature = (ExtendedFeature) child2;
+
+			if (extFeature.getType() == ExtendedFeature.TYPE_INSTANCE || extFeature.getType() == ExtendedFeature.TYPE_INTERFACE) {
+				if (usedVariables.add(extFeature.getExternalModelName())) {
+					IFeatureStructure parent = child2.getParent();
+					writeTab(depth);
+					if (!parent.isRoot()) {
+						sb.append("feature ");
+						sb.append(parent.getFeature().getName());
+						sb.append(" {");
+						sb.append(NEWLINE);
+						writeTab(depth + 1);
+					}
+					sb.append(USE);
+					sb.append(extFeature.getExternalModelName());
+					sb.append(";");
+					sb.append(NEWLINE);
+					if (!parent.isRoot()) {
+						writeTab(depth);
+						sb.append("}");
+						sb.append(NEWLINE);
+					}
+				}
+			}
+		}
+		for (IFeatureStructure child : child2.getChildren()) {
+			writeNewDefined(child, depth);
+		}
+	}
+
+	private void writeTab(int times) {
+		for (int i = 0; i < times; i++) {
+			sb.append('\t');
+		}
+	}
+
+	@Override
+	public List<Problem> read(IFeatureModel object, CharSequence source) {
 		extFeatureModel = (ExtendedFeatureModel) object;
 		if (extFeatureModel != null) {
 			featureModelFile = extFeatureModel.getSourceFile();
@@ -1094,8 +1294,8 @@ public class VelvetModelHandler extends AFormatHandler<IFeatureModel> {
 	}
 
 	@Override
-	public List<ModelWarning> getLastWarnings() {
-		return lastWarnings;
+	public VelvetFeatureModelFormat getInstance() {
+		return new VelvetFeatureModelFormat();
 	}
 
 }

@@ -81,7 +81,7 @@ public interface IFeatureModelReader {
 	 * 
 	 * @return
 	 */
-	public List<ModelWarning> getWarnings();
+	public List<Problem> getWarnings();
 
 	/**
 	 * Set the source file of the textual representation of the feature model.

@@ -20,31 +20,57 @@
  */
 package de.ovgu.featureide.fm.core.io;
 
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Handler to properly write / read objects.
  * 
  * @author Sebastian Krieter
  */
-public abstract class AFormatHandler<T> implements IPersistentHandler {
+public class FormatHandler<T> {
 
-	protected T object;
+	private final IPersistentFormat<T> format;
 
-	/**
-	 * Creates a new handler and sets the object to write / read.
-	 * 
-	 * @param object the structure to write
-	 */
-	public AFormatHandler(T object) {
-		setObject(object);
+	private List<Problem> lastWarnings = null;
+
+	private T object;
+
+	public FormatHandler(IPersistentFormat<T> format) {
+		this(format, null);
+	}
+
+	public FormatHandler(IPersistentFormat<T> format, T object) {
+		this.format = format;
+		this.object = object;
+	}
+
+	public List<Problem> getLastWarnings() {
+		return lastWarnings != null ? lastWarnings : Collections.<Problem> emptyList();
 	}
 
 	public T getObject() {
 		return object;
 	}
 
+	public List<Problem> read(CharSequence source) {
+		return lastWarnings = createFormat().read(object, source);
+	}
+
 	public void setObject(T object) {
 		this.object = object;
+	}
+
+	public String write() {
+		return createFormat().write(object);
+	}
+
+	protected IPersistentFormat<T> createFormat() {
+		return format.getInstance();
+	}
+	
+	public IPersistentFormat<T> getFormat() {
+		return format;
 	}
 
 }

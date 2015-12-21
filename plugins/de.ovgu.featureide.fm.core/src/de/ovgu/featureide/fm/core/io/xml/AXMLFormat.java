@@ -18,7 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.io;
+package de.ovgu.featureide.fm.core.io.xml;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.YES;
 
@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -56,20 +55,22 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.io.xml.XMLFeatureModelTags;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
+import de.ovgu.featureide.fm.core.io.Problem;
+import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
 /**
  * Prints a feature model in XML format.
  * 
  * @author Sebastian Krieter
  */
-public abstract class AXMLHandler<T> extends AFormatHandler<T> implements XMLFeatureModelTags {
+public abstract class AXMLFormat<T> implements IPersistentFormat<T>, XMLFeatureModelTags {
 
 	private static final String SUFFIX = "xml";
 
 	private static final String LINE_NUMBER_KEY_NAME = "lineNumber";
 
-	private List<ModelWarning> lastWarnings = Collections.emptyList();
+	protected T object;
 
 	public static Document readXML(CharSequence source) throws IOException, SAXException, ParserConfigurationException {
 		final Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
@@ -188,23 +189,15 @@ public abstract class AXMLHandler<T> extends AFormatHandler<T> implements XMLFea
 		return result.toString();
 	}
 
-	/**
-	 * Creates a new writer and sets the feature model to write out.
-	 * 
-	 * @param object the structure to write
-	 */
-	public AXMLHandler(T object) {
-		super(object);
-	}
-
 	@Override
 	public String getSuffix() {
 		return SUFFIX;
 	}
 
 	@Override
-	public List<ModelWarning> read(CharSequence source) {
-		lastWarnings = new LinkedList<>();
+	public List<Problem> read(T object, CharSequence source) {
+		this.object = object;
+		final List<Problem> lastWarnings = new LinkedList<>();
 		try {
 			final Document doc = readXML(source);
 			doc.getDocumentElement().normalize();
@@ -212,23 +205,24 @@ public abstract class AXMLHandler<T> extends AFormatHandler<T> implements XMLFea
 		} catch (SAXException e) {
 			FMCorePlugin.getDefault().logError(e);
 			//TODO add line information, if any
-			lastWarnings.add(new ModelWarning(e.getMessage(), 0, IMarker.SEVERITY_ERROR));
+			lastWarnings.add(new Problem(e.getMessage(), 0, IMarker.SEVERITY_ERROR));
 		} catch (UnsupportedModelException e) {
 			FMCorePlugin.getDefault().logError(e);
-			lastWarnings.add(new ModelWarning(e.getMessage(), e.lineNumber, IMarker.SEVERITY_ERROR));
+			lastWarnings.add(new Problem(e.getMessage(), e.lineNumber, IMarker.SEVERITY_ERROR));
 		} catch (IOException | ParserConfigurationException e) {
 			FMCorePlugin.getDefault().logError(e);
-			lastWarnings.add(new ModelWarning(e.getMessage(), 0, IMarker.SEVERITY_ERROR));
+			lastWarnings.add(new Problem(e.getMessage(), 0, IMarker.SEVERITY_ERROR));
 		} catch (Exception e) {
 			FMCorePlugin.getDefault().logError(e);
-			lastWarnings.add(new ModelWarning(e.getMessage(), 0, IMarker.SEVERITY_ERROR));
+			lastWarnings.add(new Problem(e.getMessage(), 0, IMarker.SEVERITY_ERROR));
 		}
 
 		return lastWarnings;
 	}
 
 	@Override
-	public String write() {
+	public String write(T object) {
+		this.object = object;
 		//Create Empty DOM Document
 		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 		dbf.setNamespaceAware(true);
@@ -269,18 +263,13 @@ public abstract class AXMLHandler<T> extends AFormatHandler<T> implements XMLFea
 		return prettyPrint(result.getWriter().toString());
 	}
 
-	@Override
-	public List<ModelWarning> getLastWarnings() {
-		return lastWarnings;
-	}
-
 	/**
 	 * Reads an XML-Document.
 	 * 
 	 * @param doc document to read
 	 * @param warnings list of warnings / errors that occur during read
 	 */
-	protected abstract void readDocument(Document doc, List<ModelWarning> warnings) throws UnsupportedModelException;
+	protected abstract void readDocument(Document doc, List<Problem> warnings) throws UnsupportedModelException;
 
 	/**
 	 * Writes an XML-Document.

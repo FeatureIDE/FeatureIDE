@@ -126,10 +126,12 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 		this.sourceFile = oldFeatureModel.sourceFile;
 
 		if (newRoot == null) {
-			structure.setRoot(oldFeatureModel.getStructure().getRoot().cloneSubtree(this));// structure.getRoot().cloneSubtree(this));
+			final IFeatureStructure root = oldFeatureModel.getStructure().getRoot();
+			if (root != null) {
+			structure.setRoot(root.cloneSubtree(this));// structure.getRoot().cloneSubtree(this));
 			for (final IConstraint constraint : oldFeatureModel.constraints) {
 				constraints.add(constraint.clone(this));
-			}
+			}}
 		} else {
 			structure.setRoot(newRoot.getStructure().cloneSubtree(this));
 			for (final IConstraint constraint : oldFeatureModel.constraints) {
@@ -375,12 +377,12 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 
 	@Override
 	public void handleModelDataChanged() {
-		fireEvent(MODEL_DATA_CHANGED);
+		fireEvent(FeatureModelEvent.MODEL_DATA_CHANGED);
 	}
 
 	@Override
 	public void handleModelDataLoaded() {
-		fireEvent(MODEL_DATA_LOADED);
+		fireEvent(FeatureModelEvent.MODEL_DATA_LOADED);
 
 	}
 

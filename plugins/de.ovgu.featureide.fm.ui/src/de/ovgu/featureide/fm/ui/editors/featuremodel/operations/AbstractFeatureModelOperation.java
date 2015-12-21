@@ -31,7 +31,6 @@ import org.eclipse.core.runtime.Status;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
-import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 
 /**
  * This operation should be used as superclass for all operations on the feature model.
@@ -44,7 +43,7 @@ public abstract class AbstractFeatureModelOperation extends AbstractOperation {
 
 	protected final IFeatureModel featureModel;
 
-	private String eventId = PropertyConstants.MODEL_DATA_CHANGED;
+	private String eventId = FeatureModelEvent.MODEL_DATA_CHANGED;
 	protected Object editor = null;
 
 	public AbstractFeatureModelOperation(IFeatureModel featureModel, String label) {

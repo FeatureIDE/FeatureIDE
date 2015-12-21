@@ -55,7 +55,6 @@ import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
 import de.ovgu.featureide.fm.core.base.event.IFeatureModelListener;
-import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.core.io.IOConstants;
 
 /** 
@@ -194,9 +193,9 @@ public class MPLPlugin extends AbstractCorePlugin {
 		interfaceProject.getFeatureModel().addListener(new IFeatureModelListener() {
 			@Override
 			public void propertyChange(FeatureModelEvent evt) {
-				if (PropertyConstants.MODEL_DATA_CHANGED.equals(evt.getPropertyName())) {
+				if (FeatureModelEvent.MODEL_DATA_CHANGED.equals(evt.getPropertyName())) {
 //					interfaceProject.loadSignatures(true);
-				} else if (PropertyConstants.MODEL_LAYOUT_CHANGED.equals(evt.getPropertyName())) {
+				} else if (FeatureModelEvent.MODEL_LAYOUT_CHANGED.equals(evt.getPropertyName())) {
 //					interfaceProject.loadSignatures(true);
 				}
 			}

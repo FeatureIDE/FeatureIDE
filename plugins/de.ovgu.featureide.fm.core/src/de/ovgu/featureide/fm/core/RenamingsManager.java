@@ -38,6 +38,8 @@ import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.FeatureModelFile2;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.FileManagerMap;
 
 /**
  * Handles feature renamings.
@@ -104,7 +106,13 @@ public class RenamingsManager {
 	};
 
 	public void performRenamings(IFile file) {
-		final IFeatureModel projectModel = FeatureModelFile2.getInstance(file).getFeatureModel();
+		final FeatureModelManager instance = FileManagerMap.<IFeatureModel, FeatureModelManager>getInstance(file.getLocation().toString());
+		if (instance == null) {
+			return;
+		}
+		instance.init();
+		final IFeatureModel projectModel = instance.getObject();
+//		final IFeatureModel projectModel = FeatureModelFile2.getInstance(file).getFeatureModel();
 		for (Renaming renaming : renamings) {
 			final FeatureModelEvent event = new FeatureModelEvent(model, PropertyConstants.FEATURE_NAME_CHANGED, renaming.oldName, renaming.newName);
 			projectModel.fireEvent(event);
