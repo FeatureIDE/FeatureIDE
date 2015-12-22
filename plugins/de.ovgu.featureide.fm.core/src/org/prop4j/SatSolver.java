@@ -24,6 +24,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.EXPRESSION_IS_
 import static de.ovgu.featureide.fm.core.localization.StringTable.ONLY;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -42,6 +43,7 @@ import org.sat4j.tools.ModelIterator;
 import org.sat4j.tools.SolutionCounter;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.job.WorkMonitor;
 
 /**
  * A solver that computes if a given propositional node is satisfiable and
@@ -50,16 +52,16 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
  * @author Thomas Thuem
  */
 public class SatSolver {
-	
+
 	public static enum ValueType {
 		ALL(0), TRUE(1), FALSE(-1);
-		
+
 		private final int factor;
 
 		private ValueType(int factor) {
 			this.factor = factor;
 		}
-		
+
 	}
 
 	protected boolean contradiction = false;
@@ -98,16 +100,16 @@ public class SatSolver {
 		solver.newVar(varToInt.size());
 		addClauses(node);
 	}
-	
+
 	public void setTimeout(long timeout) {
 		solver.setTimeoutMs(timeout);
 	}
-	
+
 	/**
 	 * Adds clauses to the SatSolver. Assumes that the given node is in CNF.
 	 * 
-	 * @param root 
-	 * 		the new clauses (e.g. AND or OR node)
+	 * @param root
+	 *            the new clauses (e.g. AND or OR node)
 	 */
 	public void addClauses(Node root) {
 		if (contradiction) {
@@ -164,7 +166,7 @@ public class SatSolver {
 		value *= ((Literal) node).positive ? 1 : -1;
 		return value;
 	}
-	
+
 	private boolean test() {
 		try {
 			contradiction = contradiction || !solver.isSatisfiable();
@@ -174,11 +176,11 @@ public class SatSolver {
 		}
 		return !contradiction;
 	}
-	
+
 	public List<Literal> knownValues(Literal... tempNodes) {
 		return knownValues(ValueType.ALL, tempNodes);
 	}
-	
+
 	public List<Literal> knownValues(ValueType vt, Literal... tempNodes) {
 		if (!contradiction) {
 			final IVecInt backbone = new VecInt();
@@ -223,7 +225,7 @@ public class SatSolver {
 						}
 					}
 				}
-				
+
 				for (int i = 0; i < tempNodes.length; i++) {
 					backbone.delete(i);
 				}
@@ -258,7 +260,7 @@ public class SatSolver {
 					done[j] = 2;
 					final ArrayList<Literal> setList = new ArrayList<>();
 					setList.add(new Literal(intToVar.get(Math.abs(y))));
-					
+
 					backbone.push(y);
 					for (int i = 0; i < model.length; i++) {
 						if (done[i] < 2) {
@@ -300,7 +302,7 @@ public class SatSolver {
 
 	private List<Literal> convertToNodes(final IVecInt backbone) {
 		final ArrayList<Literal> list = new ArrayList<Literal>(backbone.size());
-		
+
 		final IteratorInt iter = backbone.iterator();
 		while (iter.hasNext()) {
 			final int value = iter.next();
@@ -469,8 +471,7 @@ public class SatSolver {
 		return out.toString();
 	}
 
-	public LinkedList<List<String>> getSolutionFeatures(int number)
-			throws TimeoutException {
+	public LinkedList<List<String>> getSolutionFeatures(int number) throws TimeoutException {
 		final LinkedList<List<String>> solutionList = new LinkedList<List<String>>();
 
 		if (!contradiction) {
@@ -525,4 +526,43 @@ public class SatSolver {
 		}
 		return out.toString();
 	}
+
+	/**
+	 * Creates one solutions to cover the given features.
+	 * 
+	 * @param features The features that should be covered. 
+	 * @param selection true is the features should be selected, false otherwise.
+	 */
+	public List<String> coverFeatures(Collection<String> features, boolean selection, WorkMonitor monitor) throws TimeoutException {
+		final VecInt vector = new VecInt();
+		List<String> coveredFeatures = new LinkedList<>();
+		for (final String feature : features) {
+			Integer integer = (selection ? 1 : -1) * varToInt.get(feature);
+			vector.push(integer);
+			if (solver.isSatisfiable(vector)) {
+				monitor.worked();
+				coveredFeatures.add(feature);
+			} else {
+				vector.pop().push(-integer);
+			}
+		}
+		features.removeAll(coveredFeatures);
+		if (coveredFeatures.isEmpty()) {
+			throw new RuntimeException("Something went wrong! No features are covered.");
+		}
+		if (!solver.isSatisfiable(vector)) {
+			throw new RuntimeException("Unexpected solver exception");
+		}
+
+		int[] model = solver.model();
+		List<String> featureList = new ArrayList<String>(model.length);
+		for (int var : model) {
+			if (var > 0) {
+				featureList.add(intToVar.get(var).toString().intern());
+			}
+		}
+
+		return featureList;
+	}
+
 }

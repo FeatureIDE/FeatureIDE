@@ -28,6 +28,9 @@ import org.eclipse.jface.action.Action;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
+ * Action to specify feature model analysis.<br>
+ * Enables / disables checks for tautologies in constraints.
+ * 
  * @author Stefan Krueger
  * @author Marcus Pinnecke
  */
@@ -47,7 +50,6 @@ public class TautologyContraintsCalculationsAction extends Action {
 			featureModel.getAnalyser().calculateTautologyConstraints = false;
 		} else {
 			featureModel.getAnalyser().calculateTautologyConstraints = true;
-			//featureModel.getAnalyser().calculateRedundantConstraints = true;
 			featureModel.getAnalyser().calculateFeatures = true;
 			featureModel.getAnalyser().calculateConstraints = true;
 		}

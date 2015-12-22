@@ -21,21 +21,14 @@
 package de.ovgu.featureide.core.fstmodel;
 
 /**
- * TODO description
+ * Domain entry at the {@link FSTModel} for AsmetaL.
  * 
  * @author Florian Proksch
  */
 public class FSTAsmetaLDomain extends FSTField {
 
-	/**
-	 * @param name
-	 * @param type
-	 * @param modifiers
-	 */	
-	
 	public FSTAsmetaLDomain(String name, String type, String modifiers) {
 		super(name, type, modifiers);
-		// TODO Auto-generated constructor stub
 	}
 	
 	public FSTAsmetaLDomain(String fieldName, String typeName, String modifiers,

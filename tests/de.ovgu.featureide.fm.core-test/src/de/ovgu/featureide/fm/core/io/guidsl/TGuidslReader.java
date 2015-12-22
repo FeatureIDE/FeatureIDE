@@ -31,7 +31,7 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
 /**
- * TODO description
+ * Test class of the {@link GuidslReader}.
  *  
  * @author Fabian Benduhn
  */

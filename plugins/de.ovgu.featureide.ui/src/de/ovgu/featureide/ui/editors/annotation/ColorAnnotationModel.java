@@ -57,6 +57,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
+import de.ovgu.featureide.core.builder.IComposerExtensionClass.Mechanism;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTField;
@@ -254,7 +255,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 		}
 		if (createNew) {
 			annotatedPositions = new HashMap<Integer, Position>(docLines);
-			if (project.getComposerID().equals("de.ovgu.featureide.composer.featurehouse")) {//our FeatureHouseComposerAnnotations
+			if (project.getComposer().getGenerationMechanism() == Mechanism.FEATURE_ORIENTED_PROGRAMMING) {
 				try {
 					createFOPAnnotations();
 
@@ -266,7 +267,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 				createAnnotations();
 			}
 		} else {
-			if (project.getComposerID().equals("de.ovgu.featureide.composer.featurehouse")) {//ourFeatureHouseComposerAnnotations
+			if (project.getComposerID().equals("de.ovgu.featureide.composer.featurehouse")) {
 				try {
 					createFOPAnnotations();
 				} catch (BadLocationException e) {

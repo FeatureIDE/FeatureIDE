@@ -152,7 +152,6 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 		}
 	}
 
-	// TODO revide code clone from Munge
 	@Override
 	public void postCompile(IResourceDelta delta, final IFile file) {
 		if (isSourceFile(file.getParent())) {
@@ -166,7 +165,11 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 					IMarker[] marker = file.findMarkers(null, false, IResource.DEPTH_ZERO);
 					if (marker.length != 0) {
 						for (IMarker m : marker) {
-							IFile sourceFile = findSourceFile(file, featureProject.getSourceFolder());
+							IFile sourceFile = findSourceFile(file, featureProject.getBuildFolder());
+							if (sourceFile == null) {
+								AntennaCorePlugin.getDefault()
+										.logWarning("Source file for " + file + " not found for project " + featureProject.getProjectName());
+							}
 							if (!hasMarker(m, sourceFile)) {
 								IMarker newMarker = sourceFile.createMarker(CorePlugin.PLUGIN_ID + ".builderProblemMarker");
 								newMarker.setAttribute(IMarker.LINE_NUMBER, m.getAttribute(IMarker.LINE_NUMBER));
@@ -200,7 +203,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 				}
 				return false;
 			}
-			
+
 			private IFile findSourceFile(IFile file, IFolder folder) throws CoreException {
 				for (IResource res : folder.members()) {
 					if (res instanceof IFolder) {
@@ -224,7 +227,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	 * Checks whether the file is contained in the source folder.
 	 */
 	private boolean isSourceFile(IContainer parent) {
-		if (parent.equals(featureProject.getSourceFolder())) {
+		if (parent.equals(featureProject.getBuildFolder())) {
 			return true;
 		}
 		if (parent instanceof IFolder) {
@@ -477,7 +480,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	public boolean hasFeatureFolder() {
 		return false;
 	}
-	
+
 	@Override
 	public boolean hasSourceFolder() {
 		return false;
@@ -557,8 +560,8 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	/**
 	 * Customized build for buildConfiguration().
 	 */
-	private void preprocessSourceFiles(IFolder sourceFolder, Preprocessor preprocessor, String congurationName) throws CoreException, FileNotFoundException,
-			IOException {
+	private void preprocessSourceFiles(IFolder sourceFolder, Preprocessor preprocessor, String congurationName)
+			throws CoreException, FileNotFoundException, IOException {
 		for (final IResource res : sourceFolder.members()) {
 			if (res instanceof IFolder) {
 				// for folders do recursively 
@@ -622,14 +625,14 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 	public void postProcess(IFolder folder) {
 		try {
 			for (final IResource res : folder.members()) {
-				if (res instanceof IFolder) { 
+				if (res instanceof IFolder) {
 					postProcess((IFolder) res);
 				} else if (res instanceof IFile) {
 					if (res.getFileExtension().equals(getConfigurationExtension())) {
 						continue;
 					}
 					try (final FileInputStream inputStream = new FileInputStream(new File(res.getLocationURI()));
-						final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, Charset.availableCharsets().get("UTF-8")))) {
+							final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, Charset.availableCharsets().get("UTF-8")))) {
 						String line = null;
 						final StringBuilder content = new StringBuilder();
 						boolean hasAnnotations = false;
@@ -642,7 +645,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 							}
 						}
 						if (hasAnnotations) {
-							setFileContent((IFile)res, content);
+							setFileContent((IFile) res, content);
 						}
 					} catch (IOException e) {
 						AntennaCorePlugin.getDefault().logError(e);
@@ -656,6 +659,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 
 	/**
 	 * Sets the files new content.
+	 * 
 	 * @param file The file
 	 * @param content The new content to set
 	 */

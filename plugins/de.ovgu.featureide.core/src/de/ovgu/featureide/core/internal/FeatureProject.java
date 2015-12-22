@@ -185,13 +185,12 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	private final ModelMarkerHandler<IFile> modelFile;
 
 	private IComposerExtensionClass composerExtension = null;
-	
+
 	//TODO: Implement possibility to change this path
 	private final String featureStubPath = "featurestub";
-	
+
 	private boolean configurationUpdate = false;
 
-	
 	public String getFeaturestubPath() {
 		return featureStubPath;
 	}
@@ -235,11 +234,10 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			return true;
 		}
 	};
-	
+
 	private final IJob configurationChecker = new AStoppableJob(CHECKING_CONFIGURATIONS_FOR_UNUSED_FEATURES) {
-		
+
 		protected boolean work() {
-			setCancelingTimeout(100);
 			final IFolder folder = configFolder;
 			deleteConfigurationMarkers(folder, IResource.DEPTH_ZERO);
 			workMonitor.setMaxAbsoluteWork(7);
@@ -273,22 +271,17 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 				return true;
 			}
 			if (!falseOptionalFeatures.isEmpty()) {
-				createConfigurationMarker(folder, MARKER_FALSE_OPTIONAL + falseOptionalFeatures.size() + " features are optional but used in all configurations: "
-						+ createShortMessage(falseOptionalFeatures), -1, IMarker.SEVERITY_WARNING);
+				createConfigurationMarker(folder, MARKER_FALSE_OPTIONAL + falseOptionalFeatures.size()
+						+ " features are optional but used in all configurations: " + createShortMessage(falseOptionalFeatures), -1, IMarker.SEVERITY_WARNING);
 			}
 			next(REFESH_CONFIGURATION_FOLER);
 			if (workMonitor.checkCancel()) {
 				return true;
 			}
-			try {
-				folder.refreshLocal(IResource.DEPTH_ZERO, null);
-			} catch (CoreException e) {
-				LOGGER.logError(e);
-			}
 			workMonitor.worked();
 			return true;
 		}
-		
+
 		private void next(String subTaskName) {
 			workMonitor.worked();
 			workMonitor.createSubTask(subTaskName);
@@ -300,12 +293,12 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			for (String feature : features) {
 				message.append(feature);
 				message.append(", ");
-				if (addedFeatures++ >= 25) {
+				if (addedFeatures++ >= 10) {
 					message.append("...");
 					break;
 				}
 			}
-			
+
 			return message.toString();
 		}
 	};
@@ -346,9 +339,10 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		featureModel = instance.getObject();
 		
 		featureModel.addListener(new FeatureModelChangeListner());
-//		modelReader = new FeatureModelReaderIFileWrapper(tmpModelReader);
-		
-//		FeatureModelFile2.getInstance(modelFile.getModelFile()).getFeatureModel().addListener(new FeatureModelChangeListner());
+
+		modelReader = new FeatureModelReaderIFileWrapper(tmpModelReader);
+
+		FeatureModelFile2.getInstance(modelFile.getResource()).getFeatureModel().addListener(new FeatureModelChangeListner());
 
 		// initialize project structure
 		try {
@@ -398,8 +392,8 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		IComposerExtensionClass composer = getComposer();
 		if (composer != null) {
 			if (sourceFolder != null) {
-				composer.addCompiler(getProject(), sourceFolder.getProjectRelativePath().toOSString(), configFolder
-						.getProjectRelativePath().toOSString(), buildFolder.getProjectRelativePath().toOSString());
+				composer.addCompiler(getProject(), sourceFolder.getProjectRelativePath().toOSString(), configFolder.getProjectRelativePath().toOSString(),
+						buildFolder.getProjectRelativePath().toOSString());
 			}
 		}
 
@@ -499,8 +493,8 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 				if (!guidslReader.getAnnLine().isEmpty()) {
 					ModelMarkerHandler<IFile> modelFile = new ModelMarkerHandler<>(project.getFile("model.m"));
 					for (int i = 0; i < guidslReader.getAnnLine().size(); i++)
-						modelFile.createModelMarker(THIS_ANNOTATION_IS_NOT_SUPPORTED_YET___MOVED_TO_THE_COMMENT_SECTION_,
-								IMarker.SEVERITY_WARNING, guidslReader.getAnnLine().get(i));
+						modelFile.createModelMarker(THIS_ANNOTATION_IS_NOT_SUPPORTED_YET___MOVED_TO_THE_COMMENT_SECTION_, IMarker.SEVERITY_WARNING,
+								guidslReader.getAnnLine().get(i));
 				}
 
 			} catch (FileNotFoundException e) {
@@ -591,7 +585,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 						private final Configuration config = new Configuration(model, Configuration.PARAM_LAZY);
 						private final ConfigurationReader reader = new ConfigurationReader(config);
 						private final ConfigurationWriter writer = new ConfigurationWriter(config);
-						
+
 						@Override
 						public boolean visit(IResource resource) throws CoreException {
 							final String name = resource.getName();
@@ -655,7 +649,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		setCurrentConfiguration(config);
 		return config;
 	}
-	
+
 	public void setCurrentConfiguration(IFile file) {
 		currentConfiguration = file;
 
@@ -687,52 +681,56 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		job.setPriority(Job.BUILD);
 		job.schedule();
 	}
-	
+
 	@CheckForNull
 	public String getBuildPath() {
 		return buildFolder != null ? buildFolder.getRawLocation().toOSString() : null;
 	}
-	
+
 	public IFolder getBinFolder() {
 		return binFolder;
 	}
-	
+
 	public IFolder getLibFolder() {
 		return libFolder;
 	}
-	
+
 	public IFolder getBuildFolder() {
 		return buildFolder;
 	}
-	
+
 	public IFolder getConfigFolder() {
 		return configFolder;
 	}
-	
+
 	public IFolder getSourceFolder() {
-		return sourceFolder;
+		if (composerExtension.hasSourceFolder()) {
+			return sourceFolder;
+		} else {
+			return buildFolder;
+		}
 	}
-	
+
 	public String getBinPath() {
 		return binFolder.getRawLocation().toOSString();
 	}
-	
+
 	public String getConfigPath() {
 		return configFolder.getRawLocation().toOSString();
 	}
-	
+
 	public String getSourcePath() {
 		return sourceFolder == null ? null : sourceFolder.getRawLocation().toOSString();
 	}
-	
+
 	public String getFeatureName(IResource resource) {
 		return getFolderName(resource, sourceFolder);
 	}
-	
+
 	public String getConfigName(IResource resource) {
 		return getFolderName(resource, buildFolder);
 	}
-	
+
 	public String getFolderName(IResource resource, IFolder folder) {
 		// check whether resource belongs to this project
 		if (resource.getProject() != project)
@@ -744,18 +742,18 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		}
 		return null;
 	}
-	
+
 	public IProject getProject() {
 		return project;
 	}
-	
+
 	public ProjectSignatures getProjectSignatures() {
 		if (fstModel != null) {
 			return fstModel.getProjectSignatures();
 		}
 		return null;
 	}
-	
+
 	public FSTModel getFSTModel() {
 		return fstModel;
 	}
@@ -767,7 +765,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	public IFile getModelFile() {
 		return modelFile.getModelFile();
 	}
-	
+
 	public String[] getJavaClassPath() {
 		ArrayList<String> cp = new ArrayList<String>();
 		cp.add(".");
@@ -789,7 +787,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 		return cp.toArray(new String[cp.size()]);
 	}
-	
+
 	public String[] getAdditionalJavaClassPath() {
 		ArrayList<String> cp = new ArrayList<String>();
 		String classPath = null;
@@ -891,8 +889,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		if (sourceFolder != null && event.getDelta().findMember(sourceFolder.getFullPath()) != null) {
 
 			// set markers, only if event is not fired from changes to markers
-			if (event.findMarkerDeltas(FEATURE_MODULE_MARKER, false).length == 0 && composerExtension != null
-					&& composerExtension.createFolderForFeatures()) {
+			if (event.findMarkerDeltas(FEATURE_MODULE_MARKER, false).length == 0 && composerExtension != null && composerExtension.createFolderForFeatures()) {
 				setAllFeatureModuleMarkers();
 			}
 		}
@@ -1005,7 +1002,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 				checkBuildFolder(folder);
 				return true;
 			}
-			
+
 			private void checkBuildFolder(final IFolder folder) throws CoreException {
 				if (folder.isAccessible()) {
 					for (IResource res : folder.members()) {
@@ -1043,7 +1040,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	private boolean checkModelChange(IResourceDelta delta) {
 		if (delta == null || (delta.getFlags() & IResourceDelta.CONTENT) == 0)
 			return false;
-		
+
 		Job job = new Job(LOAD_MODEL) {
 			protected IStatus run(IProgressMonitor monitor) {
 				if (loadModel()) {
@@ -1070,7 +1067,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			return;
 		}
 
-		Job job = new AStoppableJob(CHECKING_CONFIGURATIONS, Job.LONG) {	
+		Job job = new AStoppableJob(CHECKING_CONFIGURATIONS, Job.LONG) {
 			@Override
 			protected boolean work() throws Exception {
 				workMonitor.setMaxAbsoluteWork(2 * files.size());
@@ -1128,7 +1125,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		return getFalseOptionalConfigurationFeatures(getSelectionMatrix(), (List<String>) getOptionalConcreteFeatures());
 	}
 
-	public Collection<String> getFalseOptionalConfigurationFeatures(boolean[][] selections,final List<String> concreteFeatures) {
+	public Collection<String> getFalseOptionalConfigurationFeatures(boolean[][] selections, final List<String> concreteFeatures) {
 		return checkValidSelections(selections, false, concreteFeatures);
 	}
 
@@ -1163,15 +1160,14 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	private boolean[][] getSelectionMatrix() {
 		return getSelectionMatrix(getOptionalConcreteFeatures());
 	}
-	
+
 	private boolean[][] getSelectionMatrix(final Collection<String> concreteFeatures) {
 		final List<IFile> configurations = getAllConfigurations();
-		 
 
 		final boolean[][] selections = new boolean[configurations.size()][concreteFeatures.size()];
 		final Configuration configuration = new Configuration(featureModel, Configuration.PARAM_IGNOREABSTRACT);
 		final ConfigurationReader reader = new ConfigurationReader(configuration);
-		
+
 		int row = 0;
 		for (IFile confFile : configurations) {
 			final boolean[] currentRow = selections[row++];
@@ -1180,7 +1176,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			} catch (Exception e) {
 				FMCorePlugin.getDefault().logError(e);
 			}
-			
+
 			int column = 0;
 			for (String feature : concreteFeatures) {
 				currentRow[column++] = configuration.getSelectablefeature(feature).getSelection() == Selection.SELECTED;
@@ -1326,7 +1322,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			LOGGER.logError(e);
 		}
 	}
-	
+
 	public void setComposerID(String composerID) {
 		try {
 			project.setPersistentProperty(composerConfigID, composerID);
@@ -1433,8 +1429,8 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		}
 	}
 
-	private static final QualifiedName META_PRODUCT_GENERATION = new QualifiedName(FeatureProject.class.getName()
-			+ "#MetaProductGeneration", FeatureProject.class.getName() + "#MetaProductGeneration");
+	private static final QualifiedName META_PRODUCT_GENERATION = new QualifiedName(FeatureProject.class.getName() + "#MetaProductGeneration",
+			FeatureProject.class.getName() + "#MetaProductGeneration");
 
 	public String getMetaProductGeneration() {
 		String metaProductGeneration = null;
@@ -1461,7 +1457,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	public String toString() {
 		return project.getName();
 	}
-	
+
 	public String getCompositionMechanism() {
 		String compositionMechanism = null;
 		try {
@@ -1474,7 +1470,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		}
 		return compositionMechanism;
 	}
-	
+
 	public void setCompositionMechanism(String compositionMechanism) {
 		try {
 			project.setPersistentProperty(compositionMechanismConfigID, compositionMechanism);
@@ -1482,16 +1478,16 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			LOGGER.logError(e);
 		}
 	}
-	
+
 	@Override
 	public IFile getInternalConfigurationFile() {
 		return getInternalConfigurationFile(currentConfiguration);
 	}
-	
+
 	@Override
 	public IFile getInternalConfigurationFile(IFile configurationFile) {
 		String fileName = configurationFile.getName();
-		
+
 		final String extension = configurationFile.getFileExtension();
 		if (extension != null) {
 			fileName = "." + fileName.substring(0, fileName.length() - (extension.length())) + FeatureIDEFormat.EXTENSION;
@@ -1499,7 +1495,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			fileName = "." + fileName + "." + FeatureIDEFormat.EXTENSION;
 		}
 		IFile internalFile = configurationFile.getParent().getFile(Path.fromOSString(fileName));
-		
+
 		return (internalFile.isAccessible()) ? internalFile : null;
 	}
 }

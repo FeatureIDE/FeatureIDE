@@ -48,45 +48,19 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
  */
 public class FmLabelProvider implements ILabelProvider, IFontProvider, GUIDefaults, IColorProvider {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.viewers.IBaseLabelProvider#addListener(org.eclipse.
-	 * jface.viewers.ILabelProviderListener)
-	 */
 	@Override
 	public void addListener(ILabelProviderListener listener) {
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#dispose()
-	 */
 	@Override
 	public void dispose() {
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.viewers.IBaseLabelProvider#isLabelProperty(java.lang
-	 * .Object, java.lang.String)
-	 */
 	@Override
 	public boolean isLabelProperty(Object element, String property) {
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.viewers.IBaseLabelProvider#removeListener(org.eclipse
-	 * .jface.viewers.ILabelProviderListener)
-	 */
 	@Override
 	public void removeListener(ILabelProviderListener listener) {
 	}
@@ -95,11 +69,6 @@ public class FmLabelProvider implements ILabelProvider, IFontProvider, GUIDefaul
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.viewers.ILabelProvider#getImage(java.lang.Object)
-	 */
 	@Override
 	public Image getImage(Object element) {
 		if (element instanceof IFeature) {
@@ -122,11 +91,6 @@ public class FmLabelProvider implements ILabelProvider, IFontProvider, GUIDefaul
 			return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
-	 */
 	@Override
 	public String getText(Object element) {
 		if (element instanceof IFeature)
@@ -139,20 +103,13 @@ public class FmLabelProvider implements ILabelProvider, IFontProvider, GUIDefaul
 		return element.toString();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.IFontProvider#getFont(java.lang.Object)
-	 */
 	@Override
 	public Font getFont(Object element) {
 		return DEFAULT_FONT;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.IColorProvider#getForeground(java.lang.Object)
-	 */
 	@Override
 	public Color getForeground(Object element) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -168,4 +125,5 @@ public class FmLabelProvider implements ILabelProvider, IFontProvider, GUIDefaul
 		}
 		return col;
 	}
+
 }

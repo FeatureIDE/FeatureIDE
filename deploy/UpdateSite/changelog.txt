@@ -7,6 +7,14 @@ https://github.com/tthuem/FeatureIDE/issues/milestones
 
 Here, is a list of high-level enhancements.
 
+Release 2.7.5 (December 2015)
+* Support for coloring features in project explorer, feature diagram, configuration, outline, collaboration diagram, and for generated files
+* Fixed wrong statistics for preprocessors
+* New functionality in outline for preprocessor Munge
+* Improved consistency of nomenclature used in menus
+* Improved short cuts of feature model editor
+* Fixed several bugs and null pointers
+
 Release 2.7.4 (June 2015)
 * Improved outline with support for further langauges (Haskell, C#), nested classes, and with new filters
 * Improved collaboration diagram with support for nested classes, new filters, and toolbar buttons

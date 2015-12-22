@@ -28,6 +28,9 @@ import org.eclipse.jface.action.Action;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
+ * Action to specify feature model analysis.<br>
+ * A manual call of the feature model analysis.
+ * 
  * @author Jens Meinicke
  * @author Marcus Pinnecke
  */

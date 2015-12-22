@@ -29,6 +29,8 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
+ * Ensures that the same {@code FeatureModel} instance is used when loading a model file.
+ * 
  * @author Sebastian Krieter
  * @author Marcus Pinnecke (Feature Interface)
  */
