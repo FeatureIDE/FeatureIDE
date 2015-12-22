@@ -28,6 +28,8 @@ import java.util.Collection;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ui.IMarkerResolution;
 
 import de.ovgu.featureide.core.CorePlugin;
@@ -81,6 +83,19 @@ public abstract class QuickFixMissingConfigurations implements IMarkerResolution
 			configurationNr++;
 		}
 		return newConfig;
+	}
+	
+	protected void writeConfigurations(final Collection<Configuration> confs) {
+		try {
+			configurationNr = 0;
+			for (final Configuration c : confs) {
+				final ConfigurationWriter writer = new ConfigurationWriter(c);
+				writer.saveToFile(getConfigurationFile(project.getConfigFolder()));
+			}
+			project.getConfigFolder().refreshLocal(IResource.DEPTH_ONE, null);
+		} catch (CoreException e) {
+			LOGGER.logError(e);
+		}
 	}
 
 	private String getConfigurationName(final int number) {
