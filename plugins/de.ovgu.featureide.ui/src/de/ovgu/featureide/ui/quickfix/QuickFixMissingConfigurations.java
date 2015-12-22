@@ -48,6 +48,7 @@ import de.ovgu.featureide.fm.core.configuration.ConfigurationWriter;
 public abstract class QuickFixMissingConfigurations implements IMarkerResolution {
 
 	private static final String PREFIX = CONFIGURATION;
+	private static final AbstractCorePlugin LOGGER = FMCorePlugin.getDefault();
 
 	protected final IFeatureProject project;
 	protected IFeatureModel featureModel;
