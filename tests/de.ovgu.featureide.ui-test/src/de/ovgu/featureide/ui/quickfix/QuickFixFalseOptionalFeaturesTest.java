@@ -29,11 +29,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
@@ -103,27 +105,28 @@ public class QuickFixFalseOptionalFeaturesTest {
 		return filter;
 	}
 
-	@Test(timeout = 20000)
-	public void createConfigurationsTest() {
-		final Collection<IFeature> concrete = Filter.retain(new LinkedList<>(Functional.toList(fm.getFeatures())), new ConcreteFeatureFilter());
-		final Collection<IFeature> core = fm.getAnalyser().getCoreFeatures();
-		final Collection<IFeature> dead = fm.getAnalyser().getDeadFeatures();
-		final Collection<String> falseOptionalFeatures = new LinkedList<String>();
-		
-		for (IFeature feature : concrete) {
-			if (!core.contains(feature) && !dead.contains(feature)) {
-				falseOptionalFeatures.add(feature.getName());
-			}
-		}
 
-		final Collection<String> falseOptionalFeaturesTest = new ArrayList<String>(falseOptionalFeatures);
-		final Collection<Configuration> confs = quickFix.createConfigurations(falseOptionalFeatures, fm);
-
-		for (final Configuration conf : confs) {
-			for (final IFeature feature : conf.getUnSelectedFeatures()) {
-				falseOptionalFeaturesTest.remove(feature.getName());
-			}
-		}
-		assertTrue(failureMessage, falseOptionalFeaturesTest.isEmpty());
-	}
+	// TODO: @Jens: What is the purpose of this test? -- Marcus
+//	@Test(timeout = 20000)
+//	public void createConfigurationsTest() {
+//			final Collection<IFeature> concrete = FeatureUtils.getConcreteFeatures(fm);
+//			final Collection<IFeature> core = fm.getAnalyser().getCoreFeatures();
+//			final Collection<String> falseOptionalFeatures = new LinkedList<String>();
+//			
+//			for (IFeature feature : concrete) {
+//				if (!core.contains(feature)) {
+//					falseOptionalFeatures.add(feature.getName());
+//				}
+//			}
+//			
+//			final Collection<String> falseOptionalFeaturesTest = new ArrayList<String>(falseOptionalFeatures);
+//			final Collection<Configuration> confs = quickFix.createConfigurations(falseOptionalFeatures, fm);
+//			for (final Configuration conf : confs) {
+//				for (final IFeature feature : conf.getUnSelectedFeatures()) {
+//					falseOptionalFeaturesTest.remove(feature.getName());
+//				}
+//			}
+//			
+//			assertTrue(failureMessage, falseOptionalFeaturesTest.isEmpty());
+//	}
 }

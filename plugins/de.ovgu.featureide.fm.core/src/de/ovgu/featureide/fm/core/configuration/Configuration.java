@@ -252,6 +252,17 @@ public class Configuration implements Cloneable {
 
 		return result;
 	}
+	
+	public List<IFeature> getUndefinedSelectedFeatures() {
+		final List<IFeature> result = new ArrayList<IFeature>();
+		for (SelectableFeature feature : features) {
+			if (feature.getSelection() == Selection.UNDEFINED) {
+				result.add(feature.getFeature());
+			}
+		}
+
+		return result;
+	}
 
 	public boolean isPropagate() {
 		return this.propagate;
