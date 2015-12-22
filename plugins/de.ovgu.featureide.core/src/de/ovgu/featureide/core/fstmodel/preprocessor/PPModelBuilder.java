@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,7 +44,13 @@ import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
+import de.ovgu.featureide.core.fstmodel.IRoleElement;
+import de.ovgu.featureide.core.fstmodel.RoleElement;
+import de.ovgu.featureide.core.signature.base.AbstractFieldSignature;
+import de.ovgu.featureide.core.signature.base.AbstractMethodSignature;
+import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
  * Build the FSTModel for preprocessor projects.
@@ -57,7 +64,7 @@ public class PPModelBuilder {
 
 	protected FSTModelForPP model;
 	protected FSTModel modelOutline;
-	protected List<String> featureNames = Collections.emptyList();
+	protected Collection<String> featureNames = Collections.emptyList();
 	
 	public PPModelBuilder(IFeatureProject featureProject) {
 		model = new FSTModelForPP(featureProject);
@@ -71,7 +78,7 @@ public class PPModelBuilder {
 		model.reset();
 		modelOutline.reset();
 		
-		featureNames = FeatureUtils.getConcreteFeatureNames(featureProject.getFeatureModel());
+		featureNames = Functional.toList(FeatureUtils.getConcreteFeatureNames(featureProject.getFeatureModel()));
 		for (String featureName : featureNames) {
 			model.addFeature(featureName);
 			modelOutline.addFeature(featureName);

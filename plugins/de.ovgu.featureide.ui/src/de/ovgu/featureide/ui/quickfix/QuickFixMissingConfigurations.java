@@ -48,7 +48,7 @@ public abstract class QuickFixMissingConfigurations implements IMarkerResolution
 	private static final String PREFIX = CONFIGURATION;
 
 	protected final IFeatureProject project;
-	protected final IFeatureModel featureModel;
+	protected IFeatureModel featureModel;
 	private int configurationNr = 0;
 
 	public String getLabel() {

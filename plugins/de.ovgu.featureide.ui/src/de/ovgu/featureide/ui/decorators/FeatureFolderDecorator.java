@@ -35,6 +35,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.listeners.IFeatureFolderListener;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.impl.Feature;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
@@ -77,8 +78,8 @@ public class FeatureFolderDecorator implements ILightweightLabelDecorator, IFeat
 		}
 
 		//handle only not-in-use folders
-		final Feature feature = featureProject.getFeatureModel().getFeature(folder.getName());
-		if (feature == null || feature.isAbstract()) {
+		final IFeature feature = featureProject.getFeatureModel().getFeature(folder.getName());
+		if (feature == null || feature.getStructure().isAbstract()) {
 			//decorate not-in-use folders
 			decoration.addOverlay(OVERLAY, IDecoration.TOP_LEFT);
 		}

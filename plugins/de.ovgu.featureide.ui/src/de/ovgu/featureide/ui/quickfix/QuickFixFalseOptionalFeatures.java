@@ -34,6 +34,7 @@ import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationWriter;
 import de.ovgu.featureide.fm.core.configuration.Selection;
@@ -71,24 +72,8 @@ public class QuickFixFalseOptionalFeatures extends QuickFixMissingConfigurations
 		};
 		job.schedule();
 	}
-<<<<<<< HEAD
-	
-	private List<Configuration> createConfigurations(final Collection<String> falseOptionalFeatures, final IProgressMonitor monitor) {
-		return createConfigurations(falseOptionalFeatures, featureModel, monitor);
-	}
-		
-	List<Configuration> createConfigurations(final Collection<String> falseOptionalFeatures, IFeatureModel featureModel, final IProgressMonitor monitor) {
-		if (monitor != null) {
-			monitor.beginTask(CREATE_CONFIGURATIONS, falseOptionalFeatures.size());
-		}
-		for (IFeature dead : featureModel.getAnalyser().getDeadFeatures()) {
-			falseOptionalFeatures.remove(dead.getName());
-		}
-		
-=======
 
 	private List<Configuration> createConfigurations(final Collection<String> unusedFeatures, final WorkMonitor monitor, boolean collect) {
->>>>>>> master
 		final List<Configuration> confs = new LinkedList<Configuration>();
 		try {
 			Configuration configuration = new Configuration(featureModel, false);
@@ -122,7 +107,7 @@ public class QuickFixFalseOptionalFeatures extends QuickFixMissingConfigurations
 	 * @param fm
 	 * @return
 	 */
-	public Collection<Configuration> createConfigurations(Collection<String> falseOptionalFeatures, FeatureModel fm) {
+	public Collection<Configuration> createConfigurations(Collection<String> falseOptionalFeatures, IFeatureModel fm) {
 		this.featureModel = fm;
 		return createConfigurations(falseOptionalFeatures, new WorkMonitor(), true);
 	}

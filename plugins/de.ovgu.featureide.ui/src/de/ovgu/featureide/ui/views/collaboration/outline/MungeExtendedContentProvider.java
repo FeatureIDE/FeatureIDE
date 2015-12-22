@@ -23,6 +23,7 @@ package de.ovgu.featureide.ui.views.collaboration.outline;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NO_FILE_FOUND;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -60,7 +61,7 @@ import de.ovgu.featureide.core.fstmodel.preprocessor.FSTModelForPP;
  * @author Florian Proksch
  * @author Dominic Labsch
  * @author Daniel Pï¿½sche
- * @author Reimar Schröter
+ * @author Reimar Schrï¿½ter
  */
 public class MungeExtendedContentProvider implements ITreeContentProvider {
 
@@ -193,7 +194,7 @@ public class MungeExtendedContentProvider implements ITreeContentProvider {
 					}
 				}
 
- 				List<String> featureOrder = CorePlugin.getFeatureProject(((FSTMethod) parentElement).getRole().getFile()).getFeatureModel().getFeatureOrderList();
+ 				Collection<String> featureOrder = CorePlugin.getFeatureProject(((FSTMethod) parentElement).getRole().getFile()).getFeatureModel().getFeatureOrderList();
 
 				if (((FSTMethod) parentElement).getFSTDirectives().size() == 0) {
 					obj = new FSTRole[roleList.size()];

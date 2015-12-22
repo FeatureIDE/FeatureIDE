@@ -33,6 +33,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationWriter;
 import de.ovgu.featureide.fm.core.configuration.Selection;
@@ -106,7 +107,7 @@ class QuickFixUnusedFeatures extends QuickFixMissingConfigurations {
 	 * @param fm
 	 * @return
 	 */
-	public Collection<Configuration> createConfigurations(Collection<String> falseOptionalFeatures, FeatureModel fm) {
+	public Collection<Configuration> createConfigurations(Collection<String> falseOptionalFeatures, IFeatureModel fm) {
 		this.featureModel = fm;
 		return createConfigurations(falseOptionalFeatures, new WorkMonitor(), true);
 	}

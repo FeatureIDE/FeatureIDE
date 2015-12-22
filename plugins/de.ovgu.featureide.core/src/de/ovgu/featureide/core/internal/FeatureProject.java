@@ -105,6 +105,7 @@ import de.ovgu.featureide.fm.core.configuration.FeatureIDEFormat;
 import de.ovgu.featureide.fm.core.configuration.FeatureOrderReader;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
+import de.ovgu.featureide.fm.core.io.FeatureModelFile2;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
@@ -302,6 +303,8 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			return message.toString();
 		}
 	};
+
+	private FeatureModelReaderIFileWrapper modelReader;
 
 	/**
 	 * Creating a new ProjectData includes creating folders if they don't exist,

@@ -34,8 +34,10 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
@@ -74,7 +76,7 @@ public class QuickFixUnusedFeaturesTest {
 		for (final File f : MODEL_FILE_FOLDER.listFiles(getFileFilter(".xml"))) {
 			Object[] models = new Object[2];
 
-			FeatureModel fm = new FeatureModel() {
+			IFeatureModel fm = new FeatureModel() {
 				// display file name at JUnit view
 				public String toString() {
 					return f.getName();
@@ -103,12 +105,12 @@ public class QuickFixUnusedFeaturesTest {
 
 	@Test
 	public void createConfigurationsTest() {
-		final Collection<Feature> concrete = fm.getConcreteFeatures();
-		final Collection<Feature> core = fm.getAnalyser().getCoreFeatures();
-		final Collection<Feature> dead = fm.getAnalyser().getDeadFeatures();
+		final Collection<IFeature> concrete = FeatureUtils.getConcreteFeatures(fm);
+		final Collection<IFeature> core = fm.getAnalyser().getCoreFeatures();
+		final Collection<IFeature> dead = fm.getAnalyser().getDeadFeatures();
 		final Collection<String> falseOptionalFeatures = new LinkedList<String>();
 
-		for (Feature feature : concrete) {
+		for (IFeature feature : concrete) {
 			if (!core.contains(feature) && !dead.contains(feature)) {
 				falseOptionalFeatures.add(feature.getName());
 			}

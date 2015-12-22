@@ -39,6 +39,7 @@ import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Preferences;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
@@ -611,7 +612,7 @@ public class ConfigurationPropagator {
 		}
 		final List<Node> children = new ArrayList<Node>(configuration.features.size());
 		for (SelectableFeature feature : configuration.features) {
-			if (feature.getSelection() != Selection.UNDEFINED && (configuration.ignoreAbstractFeatures || feature.getFeature().isConcrete())) {
+			if (feature.getSelection() != Selection.UNDEFINED && (configuration.ignoreAbstractFeatures || FeatureUtils.isConcrete(feature.getFeature()))) {
 				children.add(new Literal(feature.getFeature().getName(), feature.getSelection() == Selection.SELECTED));
 			}
 		}
