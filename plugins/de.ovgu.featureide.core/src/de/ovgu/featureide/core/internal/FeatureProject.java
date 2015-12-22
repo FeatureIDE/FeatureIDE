@@ -323,7 +323,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			LOGGER.logError(e);
 		}
 
-		AbstractFeatureModelReader tmpModelReader;
+		AbstractFeatureModelReader tmpModelReader = null;
 
 		final FeatureModelManager.IOType ioType;
 		if (project.getFile("mpl.velvet").exists()) {
@@ -345,7 +345,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 		modelReader = new FeatureModelReaderIFileWrapper(tmpModelReader);
 
-		FeatureModelFile2.getInstance(modelFile.getResource()).getFeatureModel().addListener(new FeatureModelChangeListner());
+		FeatureModelFile2.getInstance(modelFile.getModelFile()).getFeatureModel().addListener(new FeatureModelChangeListner());
 
 		// initialize project structure
 		try {

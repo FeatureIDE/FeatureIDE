@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.core;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -43,7 +44,7 @@ public class ModelMarkerHandler<T extends IResource> implements IModelMarkerHand
 	public T getModelFile() {
 		return modelFile;
 	}
-
+	
 	@Override
 	public void createModelMarker(String message, int severity, int lineNumber) {
 		try {
