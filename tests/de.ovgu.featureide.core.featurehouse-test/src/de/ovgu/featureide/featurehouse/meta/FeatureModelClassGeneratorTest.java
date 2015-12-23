@@ -107,6 +107,7 @@ public class FeatureModelClassGeneratorTest {
 	
 	private final IFeatureModel init(String name) {
 		IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
+		
 		for (File f : MODEL_FILE_FOLDER.listFiles(filter)) {
 			if (f.getName().equals(name)) {
 				try {
