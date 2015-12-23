@@ -73,6 +73,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 	public XmlFeatureModelReader(IFeatureModel featureModel) {
 		setFeatureModel(featureModel);
 	}
+	
 
 	@Override
 	protected synchronized void parseInputStream(final InputStream inputStream)
