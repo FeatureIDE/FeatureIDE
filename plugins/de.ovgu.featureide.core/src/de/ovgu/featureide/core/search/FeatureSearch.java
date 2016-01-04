@@ -24,6 +24,8 @@ import java.util.Collection;
 
 import org.eclipse.core.resources.IProject;
 
+import de.ovgu.featureide.core.CorePlugin;
+import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.internal.FeatureProject;
@@ -49,9 +51,15 @@ public class FeatureSearch extends Search {
 	public boolean performSearch() {
 		for(int i = 0; i < projects.length; i++){
 			try {
-				FeatureProject proj = new FeatureProject(projects[i]);
-				FSTModel model = new FSTModel(proj);
-				//empty??
+				IFeatureProject proj = CorePlugin.getFeatureProject(projects[i]);
+				if (proj == null) {
+					continue;
+				}
+				FSTModel model = proj.getFSTModel();
+				if (model == null) {
+					proj.getComposer().buildFSTModel();
+					model = proj.getFSTModel();
+				}
 				Collection<FSTFeature> features = model.getFeatures();
 				for (FSTFeature feature: features){
 					//case sensitive, exact comparison
