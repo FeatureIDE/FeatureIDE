@@ -20,18 +20,27 @@
  */
 package de.ovgu.featureide.ui.quickfix;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
+import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 
@@ -94,28 +103,28 @@ public class QuickFixFalseOptionalFeaturesTest {
 		return filter;
 	}
 
-
-	// TODO: @Jens: What is the purpose of this test? -- Marcus
-//	@Test(timeout = 20000)
-//	public void createConfigurationsTest() {
-//			final Collection<IFeature> concrete = FeatureUtils.getConcreteFeatures(fm);
-//			final Collection<IFeature> core = fm.getAnalyser().getCoreFeatures();
-//			final Collection<String> falseOptionalFeatures = new LinkedList<String>();
-//			
-//			for (IFeature feature : concrete) {
-//				if (!core.contains(feature)) {
-//					falseOptionalFeatures.add(feature.getName());
-//				}
-//			}
-//			
-//			final Collection<String> falseOptionalFeaturesTest = new ArrayList<String>(falseOptionalFeatures);
-//			final Collection<Configuration> confs = quickFix.createConfigurations(falseOptionalFeatures, fm);
-//			for (final Configuration conf : confs) {
-//				for (final IFeature feature : conf.getUnSelectedFeatures()) {
-//					falseOptionalFeaturesTest.remove(feature.getName());
-//				}
-//			}
-//			
-//			assertTrue(failureMessage, falseOptionalFeaturesTest.isEmpty());
-//	}
+	@Test(timeout = 20000)
+	public void createConfigurationsTest() {
+			final Collection<IFeature> concrete = FeatureUtils.getConcreteFeatures(fm);
+			final Collection<IFeature> core = fm.getAnalyser().getCoreFeatures();
+			final Collection<String> falseOptionalFeatures = new LinkedList<String>();
+			
+			for (IFeature feature : concrete) {
+				if (!core.contains(feature)) {
+					falseOptionalFeatures.add(feature.getName());
+				}
+			}
+			
+			final Collection<String> falseOptionalFeaturesTest = new ArrayList<String>(falseOptionalFeatures);
+			final Collection<Configuration> confs = quickFix.createConfigurations(falseOptionalFeatures, fm);
+			for (final Configuration conf : confs) {
+				for (final SelectableFeature feature : conf.getFeatures()) {
+					if (feature.getSelection() == Selection.UNDEFINED || feature.getSelection() == Selection.UNSELECTED) {
+						falseOptionalFeaturesTest.remove(feature.getName());
+					}
+				}
+			}
+			
+			assertTrue(failureMessage, falseOptionalFeaturesTest.isEmpty());
+	}
 }
