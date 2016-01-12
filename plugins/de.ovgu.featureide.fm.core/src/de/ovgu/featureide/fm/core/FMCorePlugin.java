@@ -25,7 +25,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.READING_MODEL_
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.List;
@@ -41,8 +40,6 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel.UsedModel;
-import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
-import de.ovgu.featureide.fm.core.io.ModelIOFactory;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager.IOType;
 import de.ovgu.featureide.fm.core.job.IJob;

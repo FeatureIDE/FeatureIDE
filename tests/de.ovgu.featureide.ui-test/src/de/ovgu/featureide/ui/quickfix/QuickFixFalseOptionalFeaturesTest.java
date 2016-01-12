@@ -20,29 +20,18 @@
  */
 package de.ovgu.featureide.ui.quickfix;
 
-import static org.junit.Assert.assertTrue;
-
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
-import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
-import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.filter.ConcreteFeatureFilter;
-import de.ovgu.featureide.fm.core.filter.base.Filter;
-import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 

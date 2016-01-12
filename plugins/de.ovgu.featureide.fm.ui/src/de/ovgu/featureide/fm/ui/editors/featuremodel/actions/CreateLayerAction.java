@@ -21,7 +21,6 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.ISharedImages;

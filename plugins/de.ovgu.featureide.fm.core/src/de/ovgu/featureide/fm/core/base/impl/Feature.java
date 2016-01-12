@@ -24,7 +24,6 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureProperty;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.core.base.IPropertyContainer;
 
 /**
  * Provides all properties of a feature. This includes its connections to parent

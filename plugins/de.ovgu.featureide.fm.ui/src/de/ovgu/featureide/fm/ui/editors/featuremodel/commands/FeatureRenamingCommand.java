@@ -23,7 +23,6 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.commands;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RENAMING_FEATURE;
 
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.gef.commands.Command;
 import org.eclipse.ui.PlatformUI;
 

@@ -21,7 +21,6 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;

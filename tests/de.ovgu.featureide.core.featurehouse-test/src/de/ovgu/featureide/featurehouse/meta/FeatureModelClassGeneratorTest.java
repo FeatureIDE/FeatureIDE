@@ -20,18 +20,7 @@
  */
 package de.ovgu.featureide.featurehouse.meta;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileNotFoundException;
-
-import org.junit.Test;
-
-import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.featurehouse.meta.featuremodel.FeatureModelClassGenerator;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 
 /**
  * Test for {@link FeatureModelClassGenerator}.

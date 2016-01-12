@@ -21,7 +21,6 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.commands;
 
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.ObjectUndoContext;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.gef.commands.Command;
@@ -32,8 +31,8 @@ import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.MoveFeatureOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureOperationData;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.MoveFeatureOperation;
 
 /**
  * This command allows the user to move features at the feature diagram using

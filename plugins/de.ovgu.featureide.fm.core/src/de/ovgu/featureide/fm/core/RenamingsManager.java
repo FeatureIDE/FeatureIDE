@@ -37,7 +37,6 @@ import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
 import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.functional.Functional;
-import de.ovgu.featureide.fm.core.io.FeatureModelFile2;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.FileManagerMap;
 

@@ -24,7 +24,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.HIDE_LEGEND;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SHOW_LEGEND;
 
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.PlatformUI;

@@ -35,7 +35,6 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.listeners.IFeatureFolderListener;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.impl.Feature;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
