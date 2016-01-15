@@ -34,7 +34,8 @@ public class SelectableFeature extends TreeElement {
 	private Selection recommended = Selection.UNDEFINED;
 
 	private int recommendationValue = -1;
-	private int recommendationGroup = -1;
+	private int openClauseAbsolute = -1;
+	private int openClauseRelative = -2;
 
 	private final Feature feature;
 
@@ -114,12 +115,20 @@ public class SelectableFeature extends TreeElement {
 		this.recommendationValue = recommendationValue;
 	}
 
-	public int getRecommendationGroup() {
-		return recommendationGroup;
+	public int getOpenClauseAbsolute() {
+		return openClauseAbsolute;
 	}
 
-	public void setRecommendationGroup(int recommendationGroup) {
-		this.recommendationGroup = recommendationGroup;
+	public void setOpenClauseAbsolute(int openClauseAbsolute) {
+		this.openClauseAbsolute = openClauseAbsolute;
+	}
+
+	public int getOpenClauseRelative() {
+		return openClauseRelative;
+	}
+
+	public void setOpenClauseRelative(int openClauseRelative) {
+		this.openClauseRelative = openClauseRelative;
 	}
 
 }

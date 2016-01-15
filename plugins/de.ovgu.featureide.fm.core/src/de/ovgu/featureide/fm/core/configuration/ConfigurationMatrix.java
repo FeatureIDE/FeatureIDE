@@ -59,19 +59,7 @@ public class ConfigurationMatrix {
 				return false;
 			}
 			final String fileNameString = fileName.toString();
-			if (!fileNameString.endsWith(".config")) {
-				return false;
-			}
-			if (fileNameString.equals(excludeFile)) {
-				return false;
-			}
-			if (!Files.isReadable(configPath)) {
-				return false;
-			}
-			if (!Files.isRegularFile(configPath)) {
-				return false;
-			}
-			return true;
+			return fileNameString.endsWith(".config") && !fileNameString.equals(excludeFile) && Files.isReadable(configPath) && Files.isRegularFile(configPath);
 		}
 	}
 
