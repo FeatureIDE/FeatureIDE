@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.core.configuration;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -232,6 +233,89 @@ public class ConfigurationPropagator {
 		}
 		return false;
 	}
+	
+	public List<Node> findOpenClauses(List<SelectableFeature> featureList, WorkMonitor workMonitor) {
+		if (rootNode == null) {
+			return Collections.emptyList();
+		}
+		final boolean[] results = new boolean[featureList.size()];
+		final List<Node> openClauses = new ArrayList<>();
+		
+		final Map<String, Boolean> featureMap = new HashMap<String, Boolean>(configuration.features.size() << 1);
+		for (SelectableFeature selectableFeature : configuration.features) {
+			final IFeature feature = selectableFeature.getFeature();
+			if ((configuration.ignoreAbstractFeatures || feature.getStructure().isConcrete()) && !feature.getStructure().hasHiddenParent()) {
+				featureMap.put(feature.getName(), selectableFeature.getSelection() == Selection.SELECTED);
+			}
+		}
+		
+		for (SelectableFeature selectableFeature : featureList) {
+			selectableFeature.setRecommended(Selection.UNDEFINED);
+			selectableFeature.setOpenClauseAbsolute(-1);
+			selectableFeature.setOpenClauseRelative(-2);
+		}
+
+		final Node[] clauses = rootNodeWithoutHidden.getChildren();
+		final HashMap<Object, Literal> literalMap = new HashMap<Object, Literal>();
+		workMonitor.setMaxAbsoluteWork(clauses.length);
+
+		for (int i = 0; i < clauses.length; i++) {
+			if (workMonitor.checkCancel()) {
+				return Collections.emptyList();
+			}
+			final Node clause = clauses[i];
+			literalMap.clear();
+			if (clause instanceof Literal) {
+				final Literal literal = (Literal) clause;
+				literalMap.put(literal.var, literal);
+			} else {
+				final Node[] orLiterals = clause.getChildren();
+				for (int j = 0; j < orLiterals.length; j++) {
+					final Literal literal = (Literal) orLiterals[j];
+					literalMap.put(literal.var, literal);
+				}
+			}
+
+			boolean satisfied = false;
+			for (Literal literal : literalMap.values()) {
+				final Boolean selected = featureMap.get(literal.var);
+				if (selected != null && selected == literal.positive) {
+					satisfied = true;
+					break;
+				}
+			}
+			
+			if (!satisfied) {
+				int c = 0;
+				boolean newLiterals = false;
+				for (SelectableFeature selectableFeature : featureList) {
+					if (literalMap.containsKey(selectableFeature.getFeature().getName()) && !results[c]) {
+						results[c] = true;
+
+						switch (selectableFeature.getManual()) {
+						case SELECTED:
+							selectableFeature.setRecommended(Selection.UNSELECTED);
+							selectableFeature.setOpenClauseAbsolute(i);
+							selectableFeature.setOpenClauseRelative(openClauses.size());
+							break;
+						case UNSELECTED:
+						case UNDEFINED:
+							selectableFeature.setRecommended(Selection.SELECTED);
+							selectableFeature.setOpenClauseAbsolute(i);
+							selectableFeature.setOpenClauseRelative(openClauses.size());
+						}
+						newLiterals = true;
+					}
+					c++;
+				}
+				if (newLiterals) {
+					openClauses.add(clause);
+				}
+			}
+			workMonitor.worked();
+		}
+		return openClauses;
+	}
 
 	public void leadToValidConfiguration(List<SelectableFeature> featureList, WorkMonitor workMonitor) {
 		if (Preferences.defaultCompletion == Preferences.COMPLETION_ONE_CLICK && featureList.size() > FEATURE_LIMIT_FOR_DEFAULT_COMPLETION) {
@@ -361,7 +445,8 @@ public class ConfigurationPropagator {
 			}
 		}
 		for (SelectableFeature selectableFeature : featureList) {
-			selectableFeature.setRecommended(Selection.UNSELECTED);
+			selectableFeature.setRecommended(Selection.UNDEFINED);
+			selectableFeature.setOpenClauseAbsolute(-1);
 		}
 
 		if (workMonitor.checkCancel()) {
@@ -371,6 +456,7 @@ public class ConfigurationPropagator {
 		final Node[] clauses = rootNodeWithoutHidden.getChildren();
 		final HashMap<Object, Literal> literalMap = new HashMap<Object, Literal>();
 		workMonitor.setMaxAbsoluteWork(clauses.length);
+
 		for (int i = 0; i < clauses.length; i++) {
 			if (workMonitor.checkCancel()) {
 				return;
@@ -405,14 +491,16 @@ public class ConfigurationPropagator {
 						switch (selectableFeature.getManual()) {
 						case SELECTED:
 							selectableFeature.setRecommended(Selection.UNSELECTED);
+							selectableFeature.setOpenClauseAbsolute(i);
 							break;
 						case UNSELECTED:
 						case UNDEFINED:
 							selectableFeature.setRecommended(Selection.SELECTED);
+							selectableFeature.setOpenClauseAbsolute(i);
 						}
 
-						workMonitor.invoke(selectableFeature);
 					}
+					workMonitor.invoke(selectableFeature);
 					c++;
 				}
 			}

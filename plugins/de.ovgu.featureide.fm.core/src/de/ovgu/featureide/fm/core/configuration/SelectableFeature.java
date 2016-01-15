@@ -37,6 +37,10 @@ public class SelectableFeature extends TreeElement {
 
 	private final IFeature feature;
 
+	private int recommendationValue = -1;
+	private int openClauseAbsolute = -1;
+	private int openClauseRelative = -2;
+
 	private final Configuration configuration;
 
 	private String name;
@@ -103,6 +107,30 @@ public class SelectableFeature extends TreeElement {
 	
 	public void setRecommended(Selection recommended) {
 		this.recommended = recommended;
+	}
+
+	public int getRecommendationValue() {
+		return recommendationValue;
+	}
+
+	public void setRecommendationValue(int recommendationValue) {
+		this.recommendationValue = recommendationValue;
+	}
+
+	public int getOpenClauseAbsolute() {
+		return openClauseAbsolute;
+	}
+
+	public void setOpenClauseAbsolute(int openClauseAbsolute) {
+		this.openClauseAbsolute = openClauseAbsolute;
+	}
+
+	public int getOpenClauseRelative() {
+		return openClauseRelative;
+	}
+
+	public void setOpenClauseRelative(int openClauseRelative) {
+		this.openClauseRelative = openClauseRelative;
 	}
 
 }

@@ -201,7 +201,7 @@ public class Configuration implements Cloneable {
 	}
 
 	public List<SelectableFeature> getManualFeatures() {
-		final List<SelectableFeature> featureList = new LinkedList<SelectableFeature>();
+		final List<SelectableFeature> featureList = new LinkedList<>();
 		for (SelectableFeature selectableFeature : features) {
 			if (selectableFeature.getAutomatic() == Selection.UNDEFINED && !selectableFeature.getFeature().getStructure().hasHiddenParent()) {
 				featureList.add(selectableFeature);

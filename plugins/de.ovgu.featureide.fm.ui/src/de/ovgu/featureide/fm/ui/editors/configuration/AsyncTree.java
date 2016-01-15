@@ -45,6 +45,8 @@ public class AsyncTree extends Thread {
 		private final TreeItem parent;
 		private final TreeElement[] children;
 
+		private final boolean expand = false;
+
 		public Builder(TreeItem parent, TreeElement[] children) {
 			inc();
 			this.parent = parent;
@@ -68,6 +70,10 @@ public class AsyncTree extends Thread {
 						}
 						childNode.setText(currentFeature.getFeature().getProperty().getDisplayName());
 						childNode.setData(currentFeature);
+
+						childNode.setFont(ConfigurationTreeEditorPage.treeItemStandardFont);
+						childNode.setForeground(null);
+
 						itemMap.put(currentFeature, childNode);
 						if (currentFeature.hasChildren()) {
 							runnableList.add(new Builder(childNode, currentFeature.getChildren()));
@@ -75,11 +81,13 @@ public class AsyncTree extends Thread {
 					}
 				}
 			}
-			try {
-				parent.setExpanded(true);
-			} catch (Exception e) {
-				AsyncTree.this.interrupt();
-				return;
+			if (expand) {
+				try {
+					parent.setExpanded(true);
+				} catch (Exception e) {
+					AsyncTree.this.interrupt();
+					return;
+				}
 			}
 			dec();
 		}
@@ -120,17 +128,18 @@ public class AsyncTree extends Thread {
 	private final HashMap<SelectableFeature, TreeItem> itemMap;
 
 	private final Functional.IFunction<Void, Void> callbackIfDone;
+	private final Object countLock = new Object();
 	private Integer count = 0;
 
 	public void inc() {
-		synchronized (count) {
+		synchronized (countLock) {
 			++count;
 		}
 	}
 
 	public void dec() {
 		boolean done;
-		synchronized (count) {
+		synchronized (countLock) {
 			done = --count == 0;
 		}
 		if (done) {
