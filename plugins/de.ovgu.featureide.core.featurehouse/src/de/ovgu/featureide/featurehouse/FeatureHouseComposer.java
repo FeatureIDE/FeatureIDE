@@ -343,7 +343,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 
 	public void performFullBuild(IFile config) {
 		assert (featureProject != null) : "Invalid project given";
-		final String configPath = config.getRawLocation().toOSString();
+		final String configPath = createTemporaryConfigrationsFile(config).getRawLocation().toOSString();
 		final String basePath = featureProject.getSourcePath();
 		final String outputPath = featureProject.getBuildPath();
 
@@ -1096,7 +1096,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		final String configPath;
 		IFile currentConfiguration = featureProject.getCurrentConfiguration();
 		if (currentConfiguration != null) {
-			configPath = currentConfiguration.getRawLocation().toOSString();
+			configPath = createTemporaryConfigrationsFile(currentConfiguration).getRawLocation().toOSString();
 		} else {
 			configPath = featureProject.getProject().getFile(".project").getRawLocation().toOSString();
 		}
@@ -1139,7 +1139,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		FSTGenComposer composer = new FSTGenComposer(false);
 		composer.addParseErrorListener(createParseErrorListener());
 		composer.addCompositionErrorListener(createCompositionErrorListener());
-		composer.run(getArguments(configurationFile.getRawLocation().toOSString(), featureProject.getSourcePath(), folder.getParent().getLocation().toOSString(), getContractParameter()));
+		composer.run(getArguments(createTemporaryConfigrationsFile(configurationFile).getRawLocation().toOSString(), featureProject.getSourcePath(), folder.getParent().getLocation().toOSString(), getContractParameter()));
 		if (errorPropagation != null && errorPropagation.job != null) {
 			/*
 			 * Waiting for the propagation job to finish, because the

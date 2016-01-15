@@ -23,6 +23,7 @@ package de.ovgu.featureide.core.builder;
 import static de.ovgu.featureide.fm.core.localization.StringTable.JAVA;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -55,6 +56,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationWriter;
 
 /**
@@ -70,11 +72,8 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	public static final String NEWLINE = System.getProperty("line.separator", "\n");
 
 	protected static final String JAVA_NATURE = "org.eclipse.jdt.core.javanature";
-	protected final static String[] JAVA_TEMPLATE = new String[] {
-			JAVA,
-			"java",
-			PACKAGE_PATTERN + "/**" + NEWLINE + " * TODO description" + NEWLINE + " */" + NEWLINE + "public class " + CLASS_NAME_PATTERN + " {" + NEWLINE
-					+ NEWLINE + "}" };
+	protected final static String[] JAVA_TEMPLATE = new String[] { JAVA, "java", PACKAGE_PATTERN + "/**" + NEWLINE + " * TODO description" + NEWLINE + " */"
+			+ NEWLINE + "public class " + CLASS_NAME_PATTERN + " {" + NEWLINE + NEWLINE + "}" };
 
 	protected IFeatureProject featureProject = null;
 
@@ -96,7 +95,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	void setComposerExtension(IComposerExtension composerExtensionProxy) {
 		this.composerExtensionProxy = composerExtensionProxy;
 	}
-	
+
 	public boolean initialize(IFeatureProject project) {
 		assert (project != null) : "Invalid project given";
 		featureProject = project;
@@ -235,15 +234,17 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	 * @return The entry with the new source path
 	 */
 	public IClasspathEntry setSourceEntry(String buildPath, IClasspathEntry e) {
-		return new ClasspathEntry(e.getContentKind(), e.getEntryKind(), new Path(buildPath), e.getInclusionPatterns(), e.getExclusionPatterns(), e.getSourceAttachmentPath(), e.getSourceAttachmentRootPath(), null, e.isExported(),
-				e.getAccessRules(), e.combineAccessRules(), e.getExtraAttributes());
+		return new ClasspathEntry(e.getContentKind(), e.getEntryKind(), new Path(buildPath), e.getInclusionPatterns(), e.getExclusionPatterns(),
+				e.getSourceAttachmentPath(), e.getSourceAttachmentRootPath(), null, e.isExported(), e.getAccessRules(), e.combineAccessRules(),
+				e.getExtraAttributes());
 	}
 
 	/**
 	 * @return A default JRE container entry
 	 */
 	public IClasspathEntry getContainerEntry() {
-		return new ClasspathEntry(IPackageFragmentRoot.K_SOURCE, IClasspathEntry.CPE_CONTAINER, JRE_CONTAINER, new IPath[0], new IPath[0], null, null, null, false, null, false, new IClasspathAttribute[0]);
+		return new ClasspathEntry(IPackageFragmentRoot.K_SOURCE, IClasspathEntry.CPE_CONTAINER, JRE_CONTAINER, new IPath[0], new IPath[0], null, null, null,
+				false, null, false, new IClasspathAttribute[0]);
 	}
 
 	/**
@@ -252,7 +253,8 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	 * @return A default source entry with the given path
 	 */
 	public IClasspathEntry getSourceEntry(String path) {
-		return new ClasspathEntry(IPackageFragmentRoot.K_SOURCE, IClasspathEntry.CPE_SOURCE, new Path(path), new IPath[0], new IPath[0], null, null, null, false, null, false, new IClasspathAttribute[0]);
+		return new ClasspathEntry(IPackageFragmentRoot.K_SOURCE, IClasspathEntry.CPE_SOURCE, new Path(path), new IPath[0], new IPath[0], null, null, null,
+				false, null, false, new IClasspathAttribute[0]);
 	}
 
 	private void addNature(IProject project) {
@@ -399,14 +401,59 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	public boolean supportsMigration() {
 		return false;
 	}
-	
+
 	@Override
 	public IStatus isComposable() {
 		return Status.OK_STATUS;
 	}
-	
+
 	@Override
-	public <T extends IComposerObject> T getComposerObjectInstance(Class<T> c)  {
+	public <T extends IComposerObject> T getComposerObjectInstance(Class<T> c) {
 		return null;
+	}
+
+	/**
+	 * Creates a temporary configuration that can be used by the composition tool with the old configuration format.
+	 * 
+	 * @param config The configuration file to read from.
+	 * @return The temporary configuration file.
+	 */
+	public IFile createTemporaryConfigrationsFile(IFile config) {
+		String configName = config.getName();
+		if (configName.contains(".")) {
+			configName = configName.substring(0, configName.lastIndexOf('.'));
+		}
+		configName = configName + '.' + getConfigurationExtension();
+		CorePlugin.getDefault().logInfo("create config " + configName);
+		final IFolder folder = config.getProject().getFolder(".tempconf");
+		try {
+			if (!folder.exists()) {
+				folder.create(true, true, null);
+			} else {
+				for (IResource member : folder.members()) {
+					if (!member.getName().equals(configName)) {
+						member.delete(true, null);
+					}
+				}
+			}
+		} catch (CoreException e) {
+			CorePlugin.getDefault().logError(e);
+		}
+
+		final IFile tempConfigurationFile = folder.getFile(new Path(configName));
+
+		try {
+			Configuration configuration = new Configuration(featureProject.getFeatureModel());
+			boolean success = new ConfigurationReader(configuration).readFromFile(config);
+			if (!success) {
+				CorePlugin.getDefault().logWarning("failed to read " + config);
+				return null;
+			}
+			new ConfigurationWriter(configuration).saveToFile(tempConfigurationFile);
+		} catch (CoreException | IOException e) {
+			CorePlugin.getDefault().logError(e);
+		}
+
+		return tempConfigurationFile;
 	}
 }
