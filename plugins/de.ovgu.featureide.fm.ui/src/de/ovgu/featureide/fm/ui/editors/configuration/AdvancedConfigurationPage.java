@@ -241,7 +241,7 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 		final Object data = item.getData();
 		if (data instanceof SelectableFeature) {
 			final SelectableFeature feature = (SelectableFeature) item.getData();
-			final String relConst = FeatureUtils.getRelevantConstraintsString(feature.getFeature(), feature.getFeature().getFeatureModel().getConstraints());
+			final String relConst = FeatureUtils.getRelevantConstraintsString(feature.getFeature());
 			final String describ = feature.getFeature().getProperty().getDescription();
 			final StringBuilder sb = new StringBuilder();
 

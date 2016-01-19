@@ -63,7 +63,9 @@ import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
 /**
  * @author Marcus Pinnecke
  */
-public abstract class FeatureUtils {
+public final class FeatureUtils {
+	
+	private FeatureUtils() {}
 
 	public static final ConcreteFeatureFilter CONCRETE_FEATURE_FILTER = new ConcreteFeatureFilter();
 
@@ -252,6 +254,10 @@ public abstract class FeatureUtils {
 		return Functional.toList(Functional.map(constraints, CONSTRAINT_TO_NODE));
 	}
 
+	public static final String getRelevantConstraintsString(IFeature feature) {
+		return FeatureUtils.getRelevantConstraintsString(feature, feature.getFeatureModel().getConstraints());
+	}
+	
 	public static String getRelevantConstraintsString(IFeature feature, Collection<IConstraint> constraints) {
 		StringBuilder relevant = new StringBuilder();
 		for (IConstraint constraint : constraints) {
@@ -386,10 +392,6 @@ public abstract class FeatureUtils {
 
 	public static final Collection<IConstraint> getRelevantConstraints(IFeature feature) {
 		return feature.getStructure().getRelevantConstraints();
-	}
-
-	public static final String getRelevantConstraintsString(IFeature feature) {
-		return FeatureUtils.getRelevantConstraintsString(feature, feature.getFeatureModel().getConstraints());
 	}
 
 	public static final FeatureStatus getFeatureStatus(IFeature feature) {
