@@ -120,7 +120,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 	
 	private final boolean velvetImport;
 	
-	private ModelMarkerHandler modelMarkerHandler;
+	private ModelMarkerHandler<IResource> modelMarkerHandler;
 	private ExtendedFeatureModel extFeatureModel;
 	private String extFeatureModelName;
 	private boolean localSearch = false;
@@ -485,7 +485,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 //		extFeatureModel.getLayout().showHiddenFeatures(true);
 //		extFeatureModel.getLayout().verticalLayout(false);
 		if (getProject() != null) {
-			modelMarkerHandler = new ModelMarkerHandler(getProject().getFile(getFile().getName()));
+			modelMarkerHandler = new ModelMarkerHandler<IResource>(getProject().getFile(getFile().getName()));
 			modelMarkerHandler.deleteAllModelMarkers();
 		}
 

@@ -172,7 +172,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 		GraphicsExporter.exportAs(featureModel, diagramEditor);
 	}
 
-	@SuppressWarnings({ "rawtypes" })
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public Object getAdapter(Class adapter) {
 		if (IContentOutlinePage.class.equals(adapter)) {
