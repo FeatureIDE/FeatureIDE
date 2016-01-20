@@ -139,7 +139,7 @@ public abstract class AFileManager<T> implements IFileManager, IEventManager, IR
 				saveFlag = true;
 			}
 			final byte[] content = format.getInstance().write(variableObject).getBytes(Charset.availableCharsets().get("UTF-8"));
-			Files.write(path, content, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+			Files.write(path, content, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
 
 			synchronized (syncObject) {
 				persistentObject = variableObject;
