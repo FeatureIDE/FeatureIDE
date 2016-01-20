@@ -72,7 +72,7 @@ public class FeatureCppWrapper {
 	private final static String EXE_MAC_OS_X 	= "fc++v0.8MacOSX";
 	private final static String EXE_WINDOWS 	= "fc++v0.7WIN.exe";
 	
-	private ModelMarkerHandler modelMarkerHandler;
+	private ModelMarkerHandler<IResource> modelMarkerHandler;
 	
 	final String featureCppExecutableName;
 
@@ -133,7 +133,7 @@ public class FeatureCppWrapper {
 		}
 		buildFolder = build.getRawLocation().toOSString();
 		buildDirectory = build;
-		modelMarkerHandler = new ModelMarkerHandler(build.getProject());
+		modelMarkerHandler = new ModelMarkerHandler<IResource>(build.getProject());
 		return true;
 	}
 
