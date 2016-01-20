@@ -40,11 +40,14 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -53,6 +56,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Tree;
@@ -67,6 +71,7 @@ import org.prop4j.Node;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
@@ -142,6 +147,17 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	private Label infoLabel;
 
 	private ToolItem autoExpandLevelToolItem, autoExpandGroupToolItem;
+	
+	protected final HashMap<SelectableFeature, TreeItem> itemMap = new HashMap<SelectableFeature, TreeItem>();
+	
+	/**
+	 * The item the toolTip belongs to.
+	 */
+	protected TreeItem tipItem;
+	/**
+	 * A tooltip the displays information about the current feature.
+	 */
+	protected Shell toolTip;
 
 	public void setDirty() {
 		dirty = true;
@@ -419,9 +435,31 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 				}
 			}
 		});
-	}
+		tree.addMouseMoveListener(new MouseMoveListener() {
+			@Override
+			public void mouseMove(MouseEvent e) {
+				final TreeItem item = tree.getItem(new Point(e.x, e.y));
+				boolean changed = false;
+				if (item == null || item != tipItem) {
+					tipItem = item;
+					changed = true;
+				}
 
-	protected final HashMap<SelectableFeature, TreeItem> itemMap = new HashMap<SelectableFeature, TreeItem>();
+				if (toolTip == null) {
+					if (item != null) {
+						createTooltip(item, e);
+					}
+				} else {
+					if (item == null) {
+						disposeTooltip();
+					} else if (changed) {
+						disposeTooltip();
+						createTooltip(item, e);
+					}
+				}
+			}
+		});
+	}
 
 	protected abstract void createUITree(Composite parent);
 
@@ -972,6 +1010,67 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	public void found(TreeItem searchResult) {
 		tree.showItem(searchResult);
 		tree.setSelection(searchResult);
+	}
+
+	protected void createTooltip(TreeItem item, MouseEvent e) {
+		final Object data = item.getData();
+		if (data instanceof SelectableFeature) {
+			final SelectableFeature feature = (SelectableFeature) item.getData();
+			final String relConst = FeatureUtils.getRelevantConstraintsString(feature.getFeature());
+			final String describ = feature.getFeature().getProperty().getDescription();
+			final StringBuilder sb = new StringBuilder();
+	
+			if (!describ.isEmpty()) {
+				sb.append("Description:\n");
+				sb.append(describ);
+			}
+			if (!relConst.isEmpty()) {
+				if (sb.length() > 0) {
+					sb.append("\n\n");
+				}
+				sb.append("Constraints:\n");
+				sb.append(relConst);
+			}
+			if (sb.length() > 0) {
+				tipItem = item;
+				toolTip = new Shell(tree.getShell(), SWT.ON_TOP | SWT.TOOL);
+				toolTip.addMouseMoveListener(new MouseMoveListener() {
+					/**
+					 * Close the tooltip if the focus to this editor is lost
+					 */
+					@Override
+					public void mouseMove(MouseEvent e) {
+						toolTip.dispose();
+					}
+					
+				});
+				FillLayout fillLayout = new FillLayout();
+				fillLayout.marginHeight = 1;
+				fillLayout.marginWidth = 1;
+				toolTip.setLayout(fillLayout);
+				Label label = new Label(toolTip, SWT.NONE);
+				label.setForeground(toolTip.getDisplay().getSystemColor(SWT.COLOR_INFO_FOREGROUND));
+				label.setBackground(toolTip.getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+				label.setText(sb.toString());
+				Point size = toolTip.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+				Point pt = tree.toDisplay(e.x, e.y);
+				toolTip.setBounds(pt.x, pt.y + 26, size.x, size.y);
+				toolTip.setVisible(true);
+			}
+		}
+	}
+
+	@Override
+	public void dispose() {
+		disposeTooltip();
+		super.dispose();
+	}
+
+	protected void disposeTooltip() {
+		if (toolTip != null) {
+			toolTip.dispose();
+			toolTip = null;
+		}
 	}
 
 }

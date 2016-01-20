@@ -29,19 +29,14 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
-import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
@@ -188,81 +183,6 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 			public void keyReleased(KeyEvent e) {
 			}
 		});
-		tree.addMouseMoveListener(new MouseMoveListener() {
-			@Override
-			public void mouseMove(MouseEvent e) {
-				final TreeItem item = tree.getItem(new Point(e.x, e.y));
-				boolean changed = false;
-				if (item == null || item != tipItem) {
-					tipItem = item;
-					changed = true;
-				}
-
-				if (tip == null) {
-					if (item != null) {
-						createTooltip(item, e);
-					}
-				} else {
-					if (item == null) {
-						disposeTooltip();
-					} else if (changed) {
-						disposeTooltip();
-						createTooltip(item, e);
-					}
-				}
-			}
-		});
-	}
-
-	private TreeItem tipItem;
-	private Shell tip;
-
-	private void createTooltip(TreeItem item, MouseEvent e) {
-		final Object data = item.getData();
-		if (data instanceof SelectableFeature) {
-			final SelectableFeature feature = (SelectableFeature) item.getData();
-			final String relConst = FeatureUtils.getRelevantConstraintsString(feature.getFeature());
-			final String describ = feature.getFeature().getProperty().getDescription();
-			final StringBuilder sb = new StringBuilder();
-
-			if (!describ.isEmpty()) {
-				sb.append("Description:\n");
-				sb.append(describ);
-			}
-			if (!relConst.isEmpty()) {
-				if (sb.length() > 0) {
-					sb.append("\n\n");
-				}
-				sb.append("Constraints:\n");
-				sb.append(relConst);
-			}
-			if (sb.length() > 0) {
-				tipItem = item;
-				tip = new Shell(tree.getShell(), SWT.ON_TOP | SWT.TOOL);
-				tip.addMouseMoveListener(new MouseMoveListener() {
-					/**
-					 * Close the tooltip if the focus to this editor is lost
-					 */
-					@Override
-					public void mouseMove(MouseEvent e) {
-						tip.dispose();
-					}
-					
-				});
-				FillLayout fillLayout = new FillLayout();
-				fillLayout.marginHeight = 1;
-				fillLayout.marginWidth = 1;
-				tip.setLayout(fillLayout);
-				Label label = new Label(tip, SWT.NONE);
-				label.setForeground(tip.getDisplay().getSystemColor(SWT.COLOR_INFO_FOREGROUND));
-				label.setBackground(tip.getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
-				label.setText(sb.toString());
-				Point size = tip.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-				Point pt = tree.toDisplay(e.x, e.y);
-				tip.setBounds(pt.x, pt.y + 26, size.x, size.y);
-				tip.setVisible(true);
-			}
-		}
 	}
 
 	protected void refreshItem(TreeItem item, SelectableFeature feature) {
@@ -315,19 +235,6 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 			if (!dirty) {
 				setDirty();
 			}
-		}
-	}
-	
-	@Override
-	public void dispose() {
-		disposeTooltip();
-		super.dispose();
-	}
-	
-	private void disposeTooltip() {
-		if (tip != null) {
-			tip.dispose();
-			tip = null;
 		}
 	}
 }
