@@ -192,46 +192,32 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 			@Override
 			public void mouseMove(MouseEvent e) {
 				final TreeItem item = tree.getItem(new Point(e.x, e.y));
-				long currentTime = System.currentTimeMillis();
 				boolean changed = false;
 				if (item == null || item != tipItem) {
-					//					time = currentTime;
 					tipItem = item;
 					changed = true;
 				}
 
 				if (tip == null) {
 					if (item != null) {
-						createTooltip(item, e, currentTime);
+						createTooltip(item, e);
 					}
 				} else {
 					if (item == null) {
 						disposeTooltip();
 					} else if (changed) {
 						disposeTooltip();
-						createTooltip(item, e, currentTime);
+						createTooltip(item, e);
 					}
 				}
 			}
 		});
 	}
 
-	private TreeItem tipItem = null;
-	private Shell tip = null;
+	private TreeItem tipItem;
+	private Shell tip;
 
-	//	private long time = 0;
-
-	private void disposeTooltip() {
-		if (tip != null) {
-			tip.dispose();
-			tip = null;
-		}
-	}
-
-	private void createTooltip(TreeItem item, MouseEvent e, long currentTime) {
-		//		if (time + 500 > currentTime) {
-		//			return;
-		//		}
+	private void createTooltip(TreeItem item, MouseEvent e) {
 		final Object data = item.getData();
 		if (data instanceof SelectableFeature) {
 			final SelectableFeature feature = (SelectableFeature) item.getData();
@@ -239,7 +225,7 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 			final String describ = feature.getFeature().getProperty().getDescription();
 			final StringBuilder sb = new StringBuilder();
 
-			if (describ != null) {
+			if (!describ.isEmpty()) {
 				sb.append("Description:\n");
 				sb.append(describ);
 			}
@@ -253,6 +239,16 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 			if (sb.length() > 0) {
 				tipItem = item;
 				tip = new Shell(tree.getShell(), SWT.ON_TOP | SWT.TOOL);
+				tip.addMouseMoveListener(new MouseMoveListener() {
+					/**
+					 * Close the tooltip if the focus to this editor is lost
+					 */
+					@Override
+					public void mouseMove(MouseEvent e) {
+						tip.dispose();
+					}
+					
+				});
 				FillLayout fillLayout = new FillLayout();
 				fillLayout.marginHeight = 1;
 				fillLayout.marginWidth = 1;
@@ -319,6 +315,19 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 			if (!dirty) {
 				setDirty();
 			}
+		}
+	}
+	
+	@Override
+	public void dispose() {
+		disposeTooltip();
+		super.dispose();
+	}
+	
+	private void disposeTooltip() {
+		if (tip != null) {
+			tip.dispose();
+			tip = null;
 		}
 	}
 }

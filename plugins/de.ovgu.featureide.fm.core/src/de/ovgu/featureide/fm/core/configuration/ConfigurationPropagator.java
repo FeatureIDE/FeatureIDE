@@ -49,7 +49,7 @@ import de.ovgu.featureide.fm.core.job.WorkMonitor;
 /**
  * Represents a configuration and provides operations for the configuration process.
  * 
- * @author Marcus Pinnecke (Feature Interface)
+ * @author Sebastian Krieter
  */
 public class ConfigurationPropagator {
 
