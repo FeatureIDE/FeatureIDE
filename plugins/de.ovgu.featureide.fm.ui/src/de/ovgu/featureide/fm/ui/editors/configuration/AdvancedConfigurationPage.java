@@ -51,7 +51,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 /**
  * Displays the tree for advanced configuration selection at the configuration editor.
  * 
- * @author Jens MeOinicke
+ * @author Jens Meinicke
  * @author Hannes Smurawsky
  * @author Marcus Pinnecke
  */
@@ -66,7 +66,7 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 
 		final Image image1 = getConnectionImage(feature);
 		final Image image2 = getSelectionImage(selFeature, selection);
-
+		
 		final ImageData imageData1 = image1.getImageData();
 		final ImageData imageData2 = image2.getImageData();
 
@@ -74,18 +74,12 @@ public class AdvancedConfigurationPage extends ConfigurationTreeEditorPage imple
 
 		final Image combinedImage = combinedImages.get(imageString);
 		if (combinedImage == null) {
-			final int distance = 5;
-			final Image mergeImage = new Image(image1.getDevice(), imageData2.width * 2 + distance, imageData1.height);
+			final int distance = 3;
+			final Image mergeImage = new Image(image1.getDevice(), imageData1.width + distance + imageData2.width, imageData1.height);
 
 			final GC gc = new GC(mergeImage);
-
-			if (image1.equals(IMG_MANDATORY) || image1.equals(IMG_OPTIONAL)) {
-				gc.drawImage(image1, 0, 0, imageData1.width, imageData1.height, 3, 3, imageData1.width, imageData1.height);
-			} else {
-				gc.drawImage(image1, 0, 0, imageData1.width, imageData1.height, 0, 0, imageData1.width, imageData1.height);
-			}
+			gc.drawImage(image1, 0, 0, imageData1.width, imageData1.height, 0, 0, imageData1.width, imageData1.height);
 			gc.drawImage(image2, 0, 0, imageData2.width, imageData2.height, imageData1.width + distance, 0, imageData2.width, imageData2.height);
-
 			gc.dispose();
 
 			if (feature.getStructure().isRoot()) {
