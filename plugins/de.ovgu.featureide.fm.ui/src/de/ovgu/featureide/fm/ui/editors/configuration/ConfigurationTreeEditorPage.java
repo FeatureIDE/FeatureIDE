@@ -48,6 +48,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -56,6 +57,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
@@ -89,6 +92,7 @@ import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.configuration.IConfigurationEditor.EXPAND_ALGORITHM;
 import de.ovgu.featureide.fm.ui.utils.ISearchable;
 import de.ovgu.featureide.fm.ui.utils.SearchField;
 import de.ovgu.featureide.fm.ui.utils.UITreeIterator;
@@ -97,9 +101,24 @@ import de.ovgu.featureide.fm.ui.utils.UITreeIterator;
  * Basic class with some default methods for configuration editor pages.
  * 
  * @author Jens Meinicke
- * @author Marcus Pinnecke (Feature Interface)
  */
 public abstract class ConfigurationTreeEditorPage extends EditorPart implements IConfigurationEditorPage, ISearchable<TreeItem> {
+
+	private static final String EXPAND_DIRECT_CHILDREN_TOOL_TIP = "Expands The Direct Children Of The Selected Feature";
+	private static final String EXPAND_DIRECT_CHILDREN = "Expand Direct Children";
+	
+	private static final String SHOWS_NEXT_OPEN_CLAUSE_AND_EXPANDS_ALL_SELECTIONS_TOOL_TIP = "Shows Next Open Clause And Expands All Selections";
+	private static final String SHOW_NEXT_OPEN_CLAUSE_AND_EXPAND_ALL_SELECTIONS = "Show Next Open Clause And Expand All Selections";
+	
+	private static final String SHOW_PREVIOUS_OPEN_CLAUSE = "Show Previous Open Clause";
+	private static final String SHOW_NEXT_OPEN_CLAUSE = "Show Next Open Clause";
+	private static final String SHOW_NEXT_OPEN_CLAUSE_TOOL_TIP = "Automatically Shows Next Open Clause";
+	
+	private static final String EXPAND_ALL_SELECTIONS_TOOL_TIP = "Expands All Items With Selections";
+	private static final String EXPAND_ALL_SELECTIONS = "Expand All Selections";
+
+	private static final String NO_AUTOMATIC_EXPAND_TOOL_TIP = "Does Not Expand Automatically";
+	private static final String NO_AUTOMATIC_EXPAND = "No Automatic Expand";
 
 	protected static final Color gray = new Color(null, 140, 140, 140);
 	protected static final Color green = new Color(null, 0, 140, 0);
@@ -111,13 +130,9 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 	private static final Image IMAGE_EXPAND = FMUIPlugin.getDefault().getImageDescriptor("icons/expand.gif").createImage();
 	private static final Image IMAGE_COLLAPSE = FMUIPlugin.getDefault().getImageDescriptor("icons/collapse.gif").createImage();
-	private static final Image IMAGE_AUTOEXPAND_LEVEL = FMUIPlugin.getDefault().getImageDescriptor("icons/tree01.png").createImage();
 	private static final Image IMAGE_AUTOEXPAND_GROUP = FMUIPlugin.getDefault().getImageDescriptor("icons/tree02.png").createImage();
 	private static final Image IMAGE_NEXT = FMUIPlugin.getDefault().getImageDescriptor("icons/arrow_down.png").createImage();
 	private static final Image IMAGE_PREVIOUS = FMUIPlugin.getDefault().getImageDescriptor("icons/arrow_up.png").createImage();
-
-	private static final int AUTOEXPAND_LEVEL = 1;
-	private static final int AUTOEXPAND_GROUP = 2;
 
 	private final HashSet<SelectableFeature> invalidFeatures = new HashSet<SelectableFeature>();
 	protected final HashSet<SelectableFeature> updateFeatures = new HashSet<SelectableFeature>();
@@ -125,14 +140,6 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	protected IConfigurationEditor configurationEditor = null;
 
 	protected boolean dirty = false;
-
-	/**
-	 * 0 = No automatic expand.
-	 * 1 = Display only items whose direct parents are selected. (Expands selected features)
-	 * 2 = Display only items of the current color group.
-	 * 3 = Display items whose direct parents are selected and items of the current color group.
-	 */
-	protected int autoExpand = AUTOEXPAND_LEVEL;
 
 	protected int curGroup = 0;
 	protected int curSearchIndex = 0;
@@ -146,8 +153,6 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 	private Label infoLabel;
 
-	private ToolItem autoExpandLevelToolItem, autoExpandGroupToolItem;
-	
 	protected final HashMap<SelectableFeature, TreeItem> itemMap = new HashMap<SelectableFeature, TreeItem>();
 	
 	/**
@@ -158,6 +163,8 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	 * A tooltip the displays information about the current feature.
 	 */
 	protected Shell toolTip;
+	private Menu menu;
+	private ToolItem dropDownMenu;
 
 	public void setDirty() {
 		dirty = true;
@@ -275,7 +282,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		gridData.horizontalAlignment = SWT.RIGHT;
 		gridData.verticalAlignment = SWT.CENTER;
 		gridData.grabExcessHorizontalSpace = false;
-		ToolBar toolbar = new ToolBar(compositeTop, SWT.FLAT | SWT.WRAP | SWT.RIGHT);
+		final ToolBar toolbar = new ToolBar(compositeTop, SWT.FLAT | SWT.WRAP | SWT.RIGHT);
 		toolbar.setLayoutData(gridData);
 
 		new ToolItem(toolbar, SWT.SEPARATOR);
@@ -328,23 +335,37 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			public void widgetDefaultSelected(SelectionEvent e) {
 			}
 		});
-
-		autoExpandLevelToolItem = new ToolItem(toolbar, SWT.CHECK);
-		autoExpandLevelToolItem.setImage(IMAGE_AUTOEXPAND_LEVEL);
-		autoExpandLevelToolItem.setSelection(autoExpand == AUTOEXPAND_LEVEL);
-		autoExpandLevelToolItem.setToolTipText("Expand Levelwise");
-
+		
+		dropDownMenu = new ToolItem(toolbar, SWT.DROP_DOWN);
+	    dropDownMenu.setImage(IMAGE_AUTOEXPAND_GROUP);
+	    dropDownMenu.setToolTipText("Choose Expand Algorithm");
+	    
+	    menu = new Menu(toolbar.getShell(), SWT.POP_UP);
+	    dropDownMenu.addSelectionListener(new SelectionListener() {
+			
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				Rectangle bounds = dropDownMenu.getBounds();
+				Point point = toolbar.toDisplay(bounds.x, bounds.y + bounds.height);
+				menu.setLocation(point);
+				menu.setVisible(true);
+			}
+			
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {}
+		});
+	    
 		new ToolItem(toolbar, SWT.SEPARATOR);
 
 		item = new ToolItem(toolbar, SWT.PUSH);
 		item.setImage(IMAGE_NEXT);
-		item.setToolTipText("Show Next Open Clause");
+		item.setToolTipText(SHOW_NEXT_OPEN_CLAUSE);
 		item.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (curGroup < maxGroup) {
 					curGroup++;
-					autoExpandManual();
+					expandToOpenClause();
 				}
 			}
 
@@ -355,16 +376,16 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 		item = new ToolItem(toolbar, SWT.PUSH);
 		item.setImage(IMAGE_PREVIOUS);
-		item.setToolTipText("Show Previous Open Clause");
+		item.setToolTipText(SHOW_PREVIOUS_OPEN_CLAUSE);
 		item.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (curGroup < 1) {
 					curGroup = 1;
-					autoExpandManual();
+					expandToOpenClause();
 				} else if (curGroup > 1) {
 					curGroup--;
-					autoExpandManual();
+					expandToOpenClause();
 				}
 			}
 
@@ -373,40 +394,12 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			}
 		});
 
-		autoExpandGroupToolItem = new ToolItem(toolbar, SWT.CHECK);
-		autoExpandGroupToolItem.setImage(IMAGE_AUTOEXPAND_GROUP);
-		autoExpandGroupToolItem.setSelection(autoExpand == AUTOEXPAND_GROUP);
-		autoExpandGroupToolItem.setToolTipText("Automatically Show Next Open Clause");
-
-		autoExpandGroupToolItem.addSelectionListener(new SelectionListener() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				autoExpand ^= AUTOEXPAND_GROUP;
-				if ((autoExpand & AUTOEXPAND_GROUP) > 0) {
-					curGroup = 1;
-					autoExpand();
-				}
-			}
-
-			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-		});
-
-		autoExpandLevelToolItem.addSelectionListener(new SelectionListener() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				autoExpand ^= AUTOEXPAND_LEVEL;
-				if ((autoExpand & AUTOEXPAND_LEVEL) > 0) {
-					autoExpand();
-				}
-			}
-
-			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
-			}
-		});
-
+		createMenu(NO_AUTOMATIC_EXPAND, NO_AUTOMATIC_EXPAND_TOOL_TIP, EXPAND_ALGORITHM.DEFUALT).setSelection(true);
+		createMenu(EXPAND_ALL_SELECTIONS, EXPAND_ALL_SELECTIONS_TOOL_TIP, EXPAND_ALGORITHM.OPEN_CLAUSE);
+		createMenu(SHOW_NEXT_OPEN_CLAUSE, SHOW_NEXT_OPEN_CLAUSE_TOOL_TIP, EXPAND_ALGORITHM.PARENT);
+		createMenu(SHOW_NEXT_OPEN_CLAUSE_AND_EXPAND_ALL_SELECTIONS, SHOWS_NEXT_OPEN_CLAUSE_AND_EXPANDS_ALL_SELECTIONS_TOOL_TIP, EXPAND_ALGORITHM.PARENT_CLAUSE);
+		createMenu(EXPAND_DIRECT_CHILDREN, EXPAND_DIRECT_CHILDREN_TOOL_TIP, EXPAND_ALGORITHM.CHILDREN);
+	
 		// 2. sub composite
 		gridData = new GridData();
 		gridData.horizontalAlignment = SWT.FILL;
@@ -459,6 +452,29 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 				}
 			}
 		});
+	}
+
+	private MenuItem createMenu(String text, String toolTipText, final EXPAND_ALGORITHM algorithm) {
+		MenuItem menuItem = new MenuItem(menu, SWT.RADIO);
+		menuItem.setText(text);
+		menuItem.setToolTipText(toolTipText);
+		menuItem.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				if (configurationEditor.getExpandAlgorithm() != algorithm) {
+					configurationEditor.setExpandAlgorithm(algorithm);
+					curGroup = 1;
+					autoExpand();
+				} else {
+					configurationEditor.setExpandAlgorithm(EXPAND_ALGORITHM.DEFUALT);
+				}
+			}
+
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
+		});
+		return menuItem;
 	}
 
 	protected abstract void createUITree(Composite parent);
@@ -561,12 +577,21 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			switch (feature.getManual()) {
 			case SELECTED:
 				set(feature, (select) ? Selection.UNDEFINED : Selection.UNSELECTED);
+				if (configurationEditor.getExpandAlgorithm() == EXPAND_ALGORITHM.CHILDREN) {
+					item.setExpanded(false);
+				}
 				break;
 			case UNSELECTED:
 				set(feature, (select) ? Selection.SELECTED : Selection.UNDEFINED);
+				if (configurationEditor.getExpandAlgorithm() == EXPAND_ALGORITHM.CHILDREN) {
+					item.setExpanded(select);
+				}
 				break;
 			case UNDEFINED:
 				set(feature, (select) ? Selection.SELECTED : Selection.UNSELECTED);
+				if (configurationEditor.getExpandAlgorithm() == EXPAND_ALGORITHM.CHILDREN) {
+					item.setExpanded(select);
+				}
 				break;
 			default:
 				set(feature, Selection.UNDEFINED);
@@ -597,10 +622,8 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			tree.removeAll();
 
 			final TreeItem root = new TreeItem(tree, 0);
-			if (autoExpand == AUTOEXPAND_LEVEL) {
-				root.setExpanded(true);
-			}
-
+			root.setExpanded(true);
+			
 			root.setFont(treeItemStandardFont);
 			root.setForeground(null);
 
@@ -628,23 +651,40 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		});
 	}
 
-	private void autoExpandManual() {
-		if ((autoExpand & AUTOEXPAND_LEVEL) > 0) {
+	/**
+	 * Manually expands the tree to show the next open clause.
+	 */
+	private void expandToOpenClause() {
+		switch (configurationEditor.getExpandAlgorithm()) {
+		case PARENT_CLAUSE:
 			levelExpand();
 			groupExpand(false);
-		} else {
+			break;
+		default:
 			groupExpand(true);
+			break;
 		}
 	}
 
+	/**
+	 * Applies the selected expand algorithm.
+	 */
 	private void autoExpand() {
-		if (autoExpand == (AUTOEXPAND_LEVEL | AUTOEXPAND_GROUP)) {
+		switch (configurationEditor.getExpandAlgorithm()) {
+		case DEFUALT:
+			break;
+		case CHILDREN:
+			break;
+		case OPEN_CLAUSE:
+			groupExpand(true);
+		case PARENT:
+			levelExpand();
+		case PARENT_CLAUSE:
 			levelExpand();
 			groupExpand(false);
-		} else if (autoExpand == AUTOEXPAND_LEVEL) {
-			levelExpand();
-		} else if (autoExpand == AUTOEXPAND_GROUP) {
-			groupExpand(true);
+			break;
+		default:
+			throw new RuntimeException("case " + configurationEditor.getExpandAlgorithm() + " not supported!");
 		}
 	}
 
@@ -668,6 +708,8 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 				tree.showItem(groupItems.getLast());
 				tree.showItem(groupItems.getFirst());
 				return true;
+			} else {
+				levelExpand();
 			}
 		}
 		return false;
@@ -759,7 +801,8 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 				selectableFeature.setOpenClauseAbsolute(-1);
 				selectableFeature.setOpenClauseRelative(-2);
 			}
-			if ((autoExpand & AUTOEXPAND_GROUP) > 0) {
+			if (configurationEditor.getExpandAlgorithm() == EXPAND_ALGORITHM.OPEN_CLAUSE || 
+				configurationEditor.getExpandAlgorithm() == EXPAND_ALGORITHM.PARENT_CLAUSE) {
 				autoExpand(currentDisplay);
 			}
 			return null;
@@ -887,7 +930,8 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 				}
 			}
 		});
-		if ((autoExpand & AUTOEXPAND_GROUP) > 0) {
+		if (configurationEditor.getExpandAlgorithm() == EXPAND_ALGORITHM.OPEN_CLAUSE || 
+				configurationEditor.getExpandAlgorithm() == EXPAND_ALGORITHM.PARENT_CLAUSE) {
 			job.addJobFinishedListener(new JobFinishListener() {
 				@Override
 				public void jobFinished(IJob finishedJob, boolean success) {

@@ -155,6 +155,17 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		public void partActivated(IWorkbenchPart part) {
 		}
 	};
+	
+	private EXPAND_ALGORITHM currentExpandAlgorithm = EXPAND_ALGORITHM.DEFUALT;
+	
+	@Override
+	public EXPAND_ALGORITHM getExpandAlgorithm() {
+		return currentExpandAlgorithm;
+	}
+	
+	public void setExpandAlgorithm(EXPAND_ALGORITHM expandAlgorithm) {
+		this.currentExpandAlgorithm = expandAlgorithm;
+	}
 
 	@Override
 	protected void setInput(IEditorInput input) {
