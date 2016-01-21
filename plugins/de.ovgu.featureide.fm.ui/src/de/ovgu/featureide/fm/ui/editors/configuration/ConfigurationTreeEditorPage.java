@@ -357,7 +357,13 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			public void widgetDefaultSelected(SelectionEvent e) {}
 		});
 	    
-		new ToolItem(toolbar, SWT.SEPARATOR);
+	    createMenu(NO_AUTOMATIC_EXPAND, NO_AUTOMATIC_EXPAND_TOOL_TIP, EXPAND_ALGORITHM.DEFUALT).setSelection(true);
+	    createMenu(EXPAND_ALL_SELECTIONS, EXPAND_ALL_SELECTIONS_TOOL_TIP, EXPAND_ALGORITHM.PARENT);
+	    createMenu(SHOW_NEXT_OPEN_CLAUSE, SHOW_NEXT_OPEN_CLAUSE_TOOL_TIP, EXPAND_ALGORITHM.OPEN_CLAUSE);
+	    createMenu(SHOW_NEXT_OPEN_CLAUSE_AND_EXPAND_ALL_SELECTIONS, SHOWS_NEXT_OPEN_CLAUSE_AND_EXPANDS_ALL_SELECTIONS_TOOL_TIP, EXPAND_ALGORITHM.PARENT_CLAUSE);
+	    createMenu(EXPAND_DIRECT_CHILDREN, EXPAND_DIRECT_CHILDREN_TOOL_TIP, EXPAND_ALGORITHM.CHILDREN);
+		
+	    new ToolItem(toolbar, SWT.SEPARATOR);
 
 		item = new ToolItem(toolbar, SWT.PUSH);
 		item.setImage(IMAGE_NEXT);
@@ -367,6 +373,9 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			public void widgetSelected(SelectionEvent e) {
 				if (curGroup < maxGroup) {
 					curGroup++;
+					expandToOpenClause();
+				} else {
+					curGroup = maxGroup;
 					expandToOpenClause();
 				}
 			}
@@ -382,7 +391,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		item.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if (curGroup < 0) {
+				if (curGroup <= 0) {
 					curGroup = 0;
 					expandToOpenClause();
 				} else if (curGroup > 0) {
@@ -396,12 +405,6 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			}
 		});
 
-		createMenu(NO_AUTOMATIC_EXPAND, NO_AUTOMATIC_EXPAND_TOOL_TIP, EXPAND_ALGORITHM.DEFUALT).setSelection(true);
-		createMenu(EXPAND_ALL_SELECTIONS, EXPAND_ALL_SELECTIONS_TOOL_TIP, EXPAND_ALGORITHM.PARENT);
-		createMenu(SHOW_NEXT_OPEN_CLAUSE, SHOW_NEXT_OPEN_CLAUSE_TOOL_TIP, EXPAND_ALGORITHM.OPEN_CLAUSE);
-		createMenu(SHOW_NEXT_OPEN_CLAUSE_AND_EXPAND_ALL_SELECTIONS, SHOWS_NEXT_OPEN_CLAUSE_AND_EXPANDS_ALL_SELECTIONS_TOOL_TIP, EXPAND_ALGORITHM.PARENT_CLAUSE);
-		createMenu(EXPAND_DIRECT_CHILDREN, EXPAND_DIRECT_CHILDREN_TOOL_TIP, EXPAND_ALGORITHM.CHILDREN);
-	
 		// 2. sub composite
 		gridData = new GridData();
 		gridData.horizontalAlignment = SWT.FILL;
