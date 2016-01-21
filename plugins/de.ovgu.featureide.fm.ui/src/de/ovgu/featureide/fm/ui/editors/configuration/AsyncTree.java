@@ -106,13 +106,10 @@ public class AsyncTree extends Thread {
 
 		@Override
 		public void run() {
+			perNodeFunction.invoke(item, (SelectableFeature) item.getData());
 			final TreeItem[] children = item.getItems();
 			for (int i = 0; i < children.length; i++) {
 				final TreeItem childNode = children[i];
-				final Object data = childNode.getData();
-				final SelectableFeature feature = (SelectableFeature) data;
-				perNodeFunction.invoke(childNode, feature);
-
 				if (childNode.getItemCount() > 0) {
 					runnableList.add(new Traverser(childNode, perNodeFunction));
 				}

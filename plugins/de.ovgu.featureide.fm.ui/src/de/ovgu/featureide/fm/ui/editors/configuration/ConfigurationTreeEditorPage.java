@@ -1014,7 +1014,6 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		walkTree(new IBinaryFunction<TreeItem, SelectableFeature, Void>() {
 			@Override
 			public Void invoke(TreeItem item, SelectableFeature feature) {
-				//				lockItem(item);
 				updateFeatures.add(feature);
 				return null;
 			}
@@ -1026,7 +1025,12 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			}
 		});
 	}
-
+	
+	/**
+	 * Applies the given functions to the tree.
+	 * @param perNodeFunction The function that is applied to all nodes of the tree. 
+	 * @param callbackIfDone A functions that executed once after the tree is completely traversed has finished.
+	 */
 	protected final void walkTree(final Functional.IBinaryFunction<TreeItem, SelectableFeature, Void> perNodeFunction,
 			final Functional.IFunction<Void, Void> callbackIfDone) {
 		AsyncTree.traverse(itemMap, tree.getItem(0), perNodeFunction, callbackIfDone);
