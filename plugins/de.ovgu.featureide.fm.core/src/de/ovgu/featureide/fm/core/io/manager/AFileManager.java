@@ -20,18 +20,17 @@
  */
 package de.ovgu.featureide.fm.core.io.manager;
 
+import java.io.ByteArrayInputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.annotation.CheckForNull;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
@@ -141,6 +140,9 @@ public abstract class AFileManager<T> implements IFileManager, IEventManager, IR
 		return lastProblems.isEmpty();
 	}
 
+	/**
+	 * TODO description
+	 */
 	protected void persist() {
 		synchronized (syncObject) {
 			persistentObject = copyObject(variableObject);
@@ -154,12 +156,10 @@ public abstract class AFileManager<T> implements IFileManager, IEventManager, IR
 		try {
 			synchronized (syncObject) {
 				saveFlag = true;
-				final byte[] content = format.getInstance().write(variableObject).getBytes(Charset.availableCharsets().get("UTF-8"));
-				Files.write(path, content, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
 			}
+			final byte[] content = format.getInstance().write(variableObject).getBytes(Charset.availableCharsets().get("UTF-8"));
 			final IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(eclipseFile);
-			file.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
-
+			file.setContents(new ByteArrayInputStream(content), true, true, null);
 			persist();
 
 			fireEvent(new FeatureIDEEvent(variableObject, FeatureIDEEvent.MODEL_DATA_SAVED));
