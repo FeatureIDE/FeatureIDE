@@ -19,14 +19,14 @@ public class SearchInterface extends DialogPage implements ISearchPage {
 
 	private Text txt;
 	private ISearchPageContainer fContainer;
-	private Button chckbox_outline;
-	private Button chckbox_config;
-	private Button chckbox_filesystem;  
+	private Button radiobox_outline;
+	private Button radiobox_config;
+	private Button radiobox_filesystem;  
 	private final int CHECKED = 6;
 	private boolean checked[];
-	private Button chckbox_featureModel;
-	private Button chckbox_preprocessor;
-	private Button chckbox_collaborationDiagram;
+	private Button radiobox_featureModel;
+	private Button radiobox_preprocessor;
+	private Button radiobox_collaborationDiagram;
 	
 	public SearchInterface() {
 	}
@@ -57,31 +57,31 @@ public class SearchInterface extends DialogPage implements ISearchPage {
 		lbl_searchFor.setLayoutData(new GridData(SWT.LEFT,SWT.CENTER,false,false,1,1));
 		lbl_searchFor.setText("Search for:");
 		
-		//create row layout for checkboxes
+		//create row layout for radioboxes
 		Composite row_1 = new Composite(parent, SWT.NONE);
         row_1.setLayout(new GridLayout(3, true));
         
         row_1.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
         
-		chckbox_outline = new Button(parent, SWT.CHECK);
-		chckbox_outline.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-		chckbox_outline.setText("Outline");
+		radiobox_outline = new Button(parent, SWT.RADIO);
+		radiobox_outline.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+		radiobox_outline.setText("Outline");
 		
-		chckbox_config = new Button(parent,SWT.CHECK);
-		chckbox_config.setText("Configurationseditor");
-		chckbox_config.setLayoutData(new GridData(SWT.FILL, SWT.END, true, false));
+		radiobox_config = new Button(parent,SWT.RADIO);
+		radiobox_config.setText("Configurationseditor");
+		radiobox_config.setLayoutData(new GridData(SWT.FILL, SWT.END, true, false));
 		
-		chckbox_featureModel = new Button(parent, SWT.CHECK);
-		chckbox_featureModel.setText("Feature Model");
+		radiobox_featureModel = new Button(parent, SWT.RADIO);
+		radiobox_featureModel.setText("Feature Model");
 		
-		chckbox_preprocessor = new Button(parent, SWT.CHECK);
-		chckbox_preprocessor.setText("Files (?)");
+		radiobox_preprocessor = new Button(parent, SWT.RADIO);
+		radiobox_preprocessor.setText("Files");
 		
-		chckbox_filesystem = new Button(parent, SWT.CHECK);
-		chckbox_filesystem.setText("File System");
+		radiobox_filesystem = new Button(parent, SWT.RADIO);
+		radiobox_filesystem.setText("File System");
 		
-		chckbox_collaborationDiagram = new Button(parent, SWT.CHECK);
-		chckbox_collaborationDiagram.setText("Collaboration Diagram");
+		radiobox_collaborationDiagram = new Button(parent, SWT.RADIO);
+		radiobox_collaborationDiagram.setText("Collaboration Diagram");
 		
 		setControl(root);
 
@@ -99,27 +99,27 @@ public class SearchInterface extends DialogPage implements ISearchPage {
 		//count the amount of selections
 		int selections = 0;
 		checked = new boolean[CHECKED];
-		if (chckbox_outline.getSelection()){
+		if (radiobox_outline.getSelection()){
 			checked[0] = true;
 			selections++;
 		}
-		if (chckbox_config.getSelection()){
+		if (radiobox_config.getSelection()){
 			checked[1] = true;
 			selections++;
 		}
-		if (chckbox_filesystem.getSelection()){
+		if (radiobox_filesystem.getSelection()){
 			checked[2] = true;
 			selections++;
 		}
-		if (chckbox_featureModel.getSelection()){
+		if (radiobox_featureModel.getSelection()){
 			checked[3] = true;
 			selections++;
 		}
-		if (chckbox_preprocessor.getSelection()){
+		if (radiobox_preprocessor.getSelection()){
 			checked[4] = true;
 			selections++;
 		}
-		if (chckbox_collaborationDiagram.getSelection()){
+		if (radiobox_collaborationDiagram.getSelection()){
 			checked[5] = true;
 			selections++;
 		}

@@ -22,6 +22,8 @@ package de.ovgu.featureide.core.search;
 
 import java.io.File;
 
+import org.eclipse.core.resources.IFile;
+
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
 
 /**
@@ -35,6 +37,7 @@ public class Result {
 	private FSTFeature feature;
 	private boolean isFile;
 	private boolean isFeature;
+	private IFile f;
 	
 	public Result(boolean isFile, boolean isFeature){
 		this.isFeature = isFeature;
@@ -77,5 +80,19 @@ public class Result {
 	 */
 	public boolean isFeature() {
 		return isFeature;
+	}
+
+	/**
+	 * @return the f
+	 */
+	public IFile getIFile() {
+		return f;
+	}
+
+	/**
+	 * @param f the f to set
+	 */
+	public void setIFile(IFile f) {
+		this.f = f;
 	}
 }

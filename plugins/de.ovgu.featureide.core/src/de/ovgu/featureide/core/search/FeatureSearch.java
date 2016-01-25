@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.core.search;
 
+import java.io.File;
 import java.util.Collection;
 
 import org.eclipse.core.resources.IProject;
@@ -28,7 +29,6 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
-import de.ovgu.featureide.core.internal.FeatureProject;
 
 /**
  * 
@@ -60,20 +60,22 @@ public class FeatureSearch extends Search {
 					proj.getComposer().buildFSTModel();
 					model = proj.getFSTModel();
 				}
+				if (model == null)
+					continue;
 				Collection<FSTFeature> features = model.getFeatures();
 				for (FSTFeature feature: features){
-					//case sensitive, exact comparison
-					//features is always empty?!
-					if(feature.getName().equals(filter)){
+					if(feature.getName().matches(regex)){
 						Result entry = new Result(false,true);
 						entry.setFeature(feature);
+						
+						File f = proj.getModelFile().getRawLocation().makeAbsolute().toFile();
+						entry.setFile(f);
+						
 						result.addResult(entry);
 					}
 				}
 			} catch (Exception e) {
-				//TODO catch error
 				e.printStackTrace();
-				//continue;
 			}
 		}
 		return true;
