@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
-import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 
 import de.ovgu.featureide.fm.core.FeatureStatus;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -38,19 +38,18 @@ public class FeatureProperty implements IFeatureProperty, PropertyConstants {
 
 	protected final IFeature correspondingFeature;
 
-	protected CharSequence description;
+	protected String description;
 	protected FeatureStatus status;
 
 	public FeatureProperty(FeatureProperty oldProperty, IFeature correspondingFeature) {
 		this.correspondingFeature = correspondingFeature != null ? correspondingFeature : oldProperty.correspondingFeature;
-
-		description = new String(oldProperty.description.toString());
+		description = oldProperty.description.toString();
 		status = oldProperty.status;
 	}
 
 	public FeatureProperty(IFeature correspondingFeature) {
 		this.correspondingFeature = correspondingFeature;
-		description = new String("");
+		description = "";
 		status = FeatureStatus.NORMAL;
 	}
 
@@ -64,9 +63,9 @@ public class FeatureProperty implements IFeatureProperty, PropertyConstants {
 	 * @return The description of the Feature.
 	 */
 	@Override
-	@CheckForNull
+	@Nonnull
 	public String getDescription() {
-		return description.toString();
+		return description;
 	}
 
 	@Override
@@ -85,8 +84,8 @@ public class FeatureProperty implements IFeatureProperty, PropertyConstants {
 	}
 
 	@Override
-	public void setDescription(CharSequence description) {
-		this.description = description;
+	public void setDescription(@Nonnull final CharSequence description) {
+		this.description = description.toString();
 	}
 
 	@Override

@@ -352,7 +352,7 @@ public class VelvetFeatureModelFormat implements IPersistentFormat<IFeatureModel
 	//TODO
 	private final boolean velvetImport = false;
 
-	private ModelMarkerHandler modelMarkerHandler;
+	private ModelMarkerHandler<IResource> modelMarkerHandler;
 	private ExtendedFeatureModel extFeatureModel;
 	private String extFeatureModelName;
 	private boolean localSearch = false;
@@ -703,7 +703,7 @@ public class VelvetFeatureModelFormat implements IPersistentFormat<IFeatureModel
 		//		extFeatureModel.getLayout().showHiddenFeatures(true);
 		//		extFeatureModel.getLayout().verticalLayout(false);
 		if (getProject() != null) {
-			modelMarkerHandler = new ModelMarkerHandler(getProject().getFile(featureModelFile.getName()));
+			modelMarkerHandler = new ModelMarkerHandler<IResource>(getProject().getFile(featureModelFile.getName()));
 			modelMarkerHandler.deleteAllModelMarkers();
 		}
 

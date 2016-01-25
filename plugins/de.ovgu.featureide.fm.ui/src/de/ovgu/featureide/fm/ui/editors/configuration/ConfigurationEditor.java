@@ -81,7 +81,6 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
  * @author Christian Becker
  * @author Jens Meinicke
  * @author Hannes Smurawsky
- * @author Marcus Pinnecke (Feature Interface)
  */
 public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefaults, PropertyConstants, IEventListener, IResourceChangeListener,
 		IConfigurationEditor {
@@ -149,6 +148,17 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		public void partActivated(IWorkbenchPart part) {
 		}
 	};
+	
+	private EXPAND_ALGORITHM currentExpandAlgorithm = EXPAND_ALGORITHM.DEFUALT;
+	
+	@Override
+	public EXPAND_ALGORITHM getExpandAlgorithm() {
+		return currentExpandAlgorithm;
+	}
+	
+	public void setExpandAlgorithm(EXPAND_ALGORITHM expandAlgorithm) {
+		this.currentExpandAlgorithm = expandAlgorithm;
+	}
 
 	@Override
 	protected void setInput(IEditorInput input) {

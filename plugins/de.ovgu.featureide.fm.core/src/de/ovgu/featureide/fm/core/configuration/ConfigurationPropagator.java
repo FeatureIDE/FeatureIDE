@@ -49,7 +49,7 @@ import de.ovgu.featureide.fm.core.job.WorkMonitor;
 /**
  * Represents a configuration and provides operations for the configuration process.
  * 
- * @author Marcus Pinnecke (Feature Interface)
+ * @author Sebastian Krieter
  */
 public class ConfigurationPropagator {
 
@@ -256,8 +256,7 @@ public class ConfigurationPropagator {
 		
 		for (SelectableFeature selectableFeature : featureList) {
 			selectableFeature.setRecommended(Selection.UNDEFINED);
-			selectableFeature.setOpenClauseAbsolute(-1);
-			selectableFeature.setOpenClauseRelative(-2);
+			selectableFeature.clearOpenClauses();
 		}
 
 		final Node[] clauses = rootNodeWithoutHidden.getChildren();
@@ -300,14 +299,12 @@ public class ConfigurationPropagator {
 						switch (selectableFeature.getManual()) {
 						case SELECTED:
 							selectableFeature.setRecommended(Selection.UNSELECTED);
-							selectableFeature.setOpenClauseAbsolute(i);
-							selectableFeature.setOpenClauseRelative(openClauses.size());
+							selectableFeature.addOpenClause(openClauses.size(), clauses[i]);
 							break;
 						case UNSELECTED:
 						case UNDEFINED:
 							selectableFeature.setRecommended(Selection.SELECTED);
-							selectableFeature.setOpenClauseAbsolute(i);
-							selectableFeature.setOpenClauseRelative(openClauses.size());
+							selectableFeature.addOpenClause(openClauses.size(), clauses[i]);
 						}
 						newLiterals = true;
 					}
@@ -451,7 +448,7 @@ public class ConfigurationPropagator {
 		}
 		for (SelectableFeature selectableFeature : featureList) {
 			selectableFeature.setRecommended(Selection.UNDEFINED);
-			selectableFeature.setOpenClauseAbsolute(-1);
+			selectableFeature.clearOpenClauses();
 		}
 
 		if (workMonitor.checkCancel()) {
@@ -496,12 +493,12 @@ public class ConfigurationPropagator {
 						switch (selectableFeature.getManual()) {
 						case SELECTED:
 							selectableFeature.setRecommended(Selection.UNSELECTED);
-							selectableFeature.setOpenClauseAbsolute(i);
+							selectableFeature.addOpenClause(i, clause);
 							break;
 						case UNSELECTED:
 						case UNDEFINED:
 							selectableFeature.setRecommended(Selection.SELECTED);
-							selectableFeature.setOpenClauseAbsolute(i);
+							selectableFeature.addOpenClause(i, clause);
 						}
 
 					}

@@ -155,7 +155,7 @@ public abstract class AFileManager<T> implements IFileManager, IEventManager, IR
 			synchronized (syncObject) {
 				saveFlag = true;
 				final byte[] content = format.getInstance().write(variableObject).getBytes(Charset.availableCharsets().get("UTF-8"));
-				Files.write(path, content, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+				Files.write(path, content, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
 			}
 			final IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(eclipseFile);
 			file.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);

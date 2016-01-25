@@ -20,6 +20,16 @@
  */
 package de.ovgu.featureide.fm.core.configuration;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+
+import javax.annotation.Nonnull;
+
+import org.prop4j.Node;
+
 import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
@@ -38,8 +48,7 @@ public class SelectableFeature extends TreeElement {
 	private final IFeature feature;
 
 	private int recommendationValue = -1;
-	private int openClauseAbsolute = -1;
-	private int openClauseRelative = -2;
+	private Map<Integer, Node> openClauses = null;
 
 	private final Configuration configuration;
 
@@ -117,20 +126,30 @@ public class SelectableFeature extends TreeElement {
 		this.recommendationValue = recommendationValue;
 	}
 
-	public int getOpenClauseAbsolute() {
-		return openClauseAbsolute;
+	@Nonnull
+	public Collection<Node> getOpenClauses() {
+		if (openClauses == null) {
+			return Collections.emptyList();
+		}
+		return openClauses.values();
 	}
 
-	public void setOpenClauseAbsolute(int openClauseAbsolute) {
-		this.openClauseAbsolute = openClauseAbsolute;
+	public void addOpenClause(int index, Node openClause) {
+		if (openClauses == null) {
+			openClauses = new TreeMap<>();
+		}
+		openClauses.put(index, openClause);
+	}
+	
+	public void clearOpenClauses() {
+		openClauses = null;
 	}
 
-	public int getOpenClauseRelative() {
-		return openClauseRelative;
+	@Nonnull
+	public Set<Integer> getOpenClauseIndexes() {
+		if (openClauses != null) {
+			return openClauses.keySet();
+		}
+		return Collections.emptySet();
 	}
-
-	public void setOpenClauseRelative(int openClauseRelative) {
-		this.openClauseRelative = openClauseRelative;
-	}
-
 }

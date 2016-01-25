@@ -42,4 +42,9 @@ public interface IConfigurationEditor {
 	
 	boolean hasValidFeatureModel();
 
+	enum EXPAND_ALGORITHM {
+		DEFUALT, OPEN_CLAUSE, PARENT, CHILDREN, PARENT_CLAUSE
+	}
+	EXPAND_ALGORITHM getExpandAlgorithm();
+	void setExpandAlgorithm(EXPAND_ALGORITHM expandAlgorithm);
 }

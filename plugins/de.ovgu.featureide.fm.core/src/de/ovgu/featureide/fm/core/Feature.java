@@ -419,7 +419,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public String getRelevantConstraintsString() {
-		return FeatureUtils.getRelevantConstraintsString(feature, feature.getFeatureModel().getConstraints());
+		return FeatureUtils.getRelevantConstraintsString(feature);
 	}
 
 	/**
