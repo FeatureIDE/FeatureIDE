@@ -29,9 +29,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
-import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
-import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
@@ -92,14 +90,17 @@ public class ConfigurationPage extends ConfigurationTreeEditorPage {
 		return PAGE_TEXT;
 	}
 
-	@Override
-	public void pageChangeTo(int index) {
-		final Configuration configuration = configurationEditor.getConfiguration();
-		for (SelectableFeature feature : configuration.getFeatures()) {
-			if (feature.getAutomatic() == Selection.UNDEFINED && feature.getManual() == Selection.UNSELECTED) {
-				configuration.setManual(feature, Selection.UNDEFINED);
-			}
-		}
-		super.pageChangeTo(index);
-	}
+	// TODO
+//	@Override
+//	public void pageChangeTo(int index) {
+//		if (configurationEditor.hasValidFeatureModel()) {
+//			final Configuration configuration = configurationEditor.getConfiguration();
+//			for (SelectableFeature feature : configuration.getFeatures()) {
+//				if (feature.getAutomatic() == Selection.UNDEFINED && feature.getManual() == Selection.UNSELECTED) {
+//					configuration.setManual(feature, Selection.UNDEFINED);
+//				}
+//			}
+//		}
+//		super.pageChangeTo(index);
+//	}
 }

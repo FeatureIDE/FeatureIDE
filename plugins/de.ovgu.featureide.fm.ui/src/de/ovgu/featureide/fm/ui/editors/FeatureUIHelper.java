@@ -33,7 +33,7 @@ import org.eclipse.gef.editparts.ZoomListener;
 import org.eclipse.gef.editparts.ZoomManager;
 
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConnectionEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
@@ -404,12 +404,12 @@ public class FeatureUIHelper {
 	}
 
 	private static void fireLocationChanged(IGraphicalFeature feature, Point oldLocation, Point newLocation) {
-		FeatureModelEvent event = new FeatureModelEvent(feature, PropertyConstants.LOCATION_CHANGED, oldLocation, newLocation);
+		FeatureIDEEvent event = new FeatureIDEEvent(feature, PropertyConstants.LOCATION_CHANGED, oldLocation, newLocation);
 		feature.getObject().fireEvent(event);
 	}
 
 	private static void fireLocationChanged(IGraphicalConstraint constraint, Point oldLocation, Point newLocation) {
-		FeatureModelEvent event = new FeatureModelEvent(constraint, PropertyConstants.LOCATION_CHANGED, oldLocation, newLocation);
+		FeatureIDEEvent event = new FeatureIDEEvent(constraint, PropertyConstants.LOCATION_CHANGED, oldLocation, newLocation);
 		constraint.getObject().fireEvent(event);
 	}
 

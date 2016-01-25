@@ -32,7 +32,7 @@ import org.eclipse.core.runtime.Status;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.impl.Feature;
 
 /**
@@ -50,7 +50,7 @@ public class CreateFeatureBelowOperation extends AbstractFeatureModelOperation {
 	public CreateFeatureBelowOperation(IFeature feature, IFeatureModel featureModel) {
 		super(featureModel, CREATE_LAYER);
 		this.feature = feature;
-		setEventId(FeatureModelEvent.FEATURE_ADD);
+		setEventId(FeatureIDEEvent.FEATURE_ADD);
 	}
 
 	@Override
@@ -60,7 +60,7 @@ public class CreateFeatureBelowOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	protected FeatureModelEvent operation() {
+	protected FeatureIDEEvent operation() {
 		int number = 1;
 
 		while (FeatureUtils.getFeatureNames(featureModel).contains(DEFAULT_FEATURE_LAYER_CAPTION + number)) {
@@ -73,14 +73,14 @@ public class CreateFeatureBelowOperation extends AbstractFeatureModelOperation {
 		feature.getStructure().addChild(newFeature.getStructure());
 
 		//TODO _interfaces Removed Code
-//		FeatureDiagramLayoutHelper.initializeLayerFeaturePosition(((FeatureDiagramEditor) diagramEditor).getGraphicalFeatureModel(), newFeature, feature);
-		return new FeatureModelEvent(featureModel, FeatureModelEvent.FEATURE_ADD, null, newFeature);
+		//		FeatureDiagramLayoutHelper.initializeLayerFeaturePosition(((FeatureDiagramEditor) diagramEditor).getGraphicalFeatureModel(), newFeature, feature);
+		return new FeatureIDEEvent(featureModel, FeatureIDEEvent.FEATURE_ADD, null, newFeature);
 	}
 
 	@Override
-	protected FeatureModelEvent inverseOperation() {
+	protected FeatureIDEEvent inverseOperation() {
 		newFeature = featureModel.getFeature(newFeature.getName());
 		featureModel.deleteFeature(newFeature);
-		return new FeatureModelEvent(featureModel, FeatureModelEvent.FEATURE_DELETE, newFeature, null);
+		return new FeatureIDEEvent(featureModel, FeatureIDEEvent.FEATURE_DELETE, newFeature, null);
 	}
 }

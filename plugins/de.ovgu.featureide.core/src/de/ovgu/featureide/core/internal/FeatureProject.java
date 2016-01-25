@@ -42,7 +42,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.THIS_ANNOTATIO
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -92,25 +92,26 @@ import de.ovgu.featureide.fm.core.ModelMarkerHandler;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
-import de.ovgu.featureide.fm.core.base.event.IFeatureModelListener;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
-import de.ovgu.featureide.fm.core.configuration.ConfigurationWriter;
 import de.ovgu.featureide.fm.core.configuration.FeatureIDEFormat;
 import de.ovgu.featureide.fm.core.configuration.FeatureOrderReader;
 import de.ovgu.featureide.fm.core.configuration.Selection;
-import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
-import de.ovgu.featureide.fm.core.io.FeatureModelFile2;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
+import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslReader;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.FileReader;
+import de.ovgu.featureide.fm.core.io.manager.FileWriter;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 import de.ovgu.featureide.fm.core.job.AJob;
 import de.ovgu.featureide.fm.core.job.AStoppableJob;
@@ -130,11 +131,11 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 	private static final String FEATURE_MODULE_MARKER = "de.ovgu.featureide.core.featureModuleMarker";
 
-	public class FeatureModelChangeListner implements IFeatureModelListener {
+	public class FeatureModelChangeListner implements IEventListener {
 		/**
 		 * listens to changed feature names
 		 */
-		public void propertyChange(FeatureModelEvent evt) {
+		public void propertyChange(FeatureIDEEvent evt) {
 
 			if (PropertyConstants.FEATURE_NAME_CHANGED.equals(evt.getPropertyName())) {
 				String oldName = (String) evt.getOldValue();
@@ -149,7 +150,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	/**
 	 * the model representation of the model file
 	 */
-	private final IFeatureModel featureModel;
+	private final FeatureModelManager featureModelManager;
 
 //	private FeatureModelReaderIFileWrapper modelReader;
 
@@ -210,7 +211,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		protected boolean work() {
 			try {
 				final IFolder folder = sourceFolder;
-				final IFeatureModel model = featureModel;
+				final IFeatureModel model = featureModelManager.getObject();
 				// prevent warnings, if the user has just created a project
 				// without any source files
 				// TODO This could be removed because the user could use the
@@ -304,8 +305,6 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		}
 	};
 
-	private FeatureModelReaderIFileWrapper modelReader;
-
 	/**
 	 * Creating a new ProjectData includes creating folders if they don't exist,
 	 * registering workspace listeners and initialization of the wrapper object.
@@ -323,29 +322,14 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			LOGGER.logError(e);
 		}
 
-		AbstractFeatureModelReader tmpModelReader = null;
-
-		final FeatureModelManager.IOType ioType;
 		if (project.getFile("mpl.velvet").exists()) {
 			modelFile = new ModelMarkerHandler<>(project.getFile("mpl.velvet"));
-			ioType = FeatureModelManager.IOType.VELVET;
-//			featureModel = new ExtendedFeatureModel();
-//			tmpModelReader = ModelIOFactory.getModelReader(featureModel, ModelIOFactory.TYPE_VELVET);
 		} else {
 			modelFile = new ModelMarkerHandler<>(project.getFile("model.xml"));
-			ioType = FeatureModelManager.IOType.XML_FIDE;
-//			featureModel = FMFactoryManager.getFactory().createFeatureModel();
-//			tmpModelReader = ModelIOFactory.getModelReader(featureModel, ModelIOFactory.TYPE_XML);
 		}
-
-		final FeatureModelManager instance = FeatureModelManager.getInstance(modelFile.getModelFile().getLocation().toString(), ioType);
-		featureModel = instance.getObject();
 		
-		featureModel.addListener(new FeatureModelChangeListner());
-
-		modelReader = new FeatureModelReaderIFileWrapper(tmpModelReader);
-
-		FeatureModelFile2.getInstance(modelFile.getModelFile()).getFeatureModel().addListener(new FeatureModelChangeListner());
+		featureModelManager = FeatureModelManager.getInstance(modelFile.getModelFile());
+		featureModelManager.addListener(new FeatureModelChangeListner());
 
 		// initialize project structure
 		try {
@@ -401,7 +385,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		}
 
 		// XXX MPL: hack for importing mpl projects
-		if (featureModel instanceof ExtendedFeatureModel) {
+		if (getFeatureModel() instanceof ExtendedFeatureModel) {
 			try {
 				modelFile.getModelFile().touch(null);
 			} catch (CoreException e) {
@@ -451,6 +435,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	 */
 	private void readFeatureOrder() throws CoreException {
 		IFile orderFile = project.getFile(".order");
+		final IFeatureModel featureModel = featureModelManager.getObject();
 		if (featureModel.getFeatureOrderList().isEmpty() && !featureModel.getProperty().isFeatureOrderInXML() && orderFile.exists()) {
 
 			FeatureOrderReader reader = new FeatureOrderReader(orderFile);
@@ -512,6 +497,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 	private void createAndDeleteFeatureFolders() throws CoreException {
 		sourceFolder.refreshLocal(IResource.DEPTH_ONE, null);
+		final IFeatureModel featureModel = featureModelManager.getObject();
 		// create folders for all layers
 		if (featureModel instanceof ExtendedFeatureModel) {
 			for (IFeature feature : featureModel.getFeatures()) {
@@ -586,20 +572,20 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 					configFolder.accept(new IResourceVisitor() {
 						private final String suffix = "." + composer.getConfigurationExtension();
 						private final Configuration config = new Configuration(model, Configuration.PARAM_LAZY);
-						private final ConfigurationReader reader = new ConfigurationReader(config);
-						private final ConfigurationWriter writer = new ConfigurationWriter(config);
+						final FileReader<Configuration> r = new FileReader<>(config);
+						final FileWriter<Configuration> w = new FileWriter<>(config);
 
 						@Override
 						public boolean visit(IResource resource) throws CoreException {
 							final String name = resource.getName();
 							if (resource instanceof IFile && name.endsWith(suffix)) {
-								final IFile configFile = (IFile) resource;
-								try {
-									reader.readFromFile(configFile);
-									writer.saveToFile(configFile);
-								} catch (IOException e) {
-									LOGGER.logError(e);
-								}
+								//TODO _test renaming
+								final IPersistentFormat<Configuration> format = ConfigurationManager.getFormat(resource.getName());
+								final java.nio.file.Path path = Paths.get(resource.getLocationURI());
+								r.setFormat(format);
+								w.setFormat(format);
+								r.setPath(path);
+								w.setPath(path);
 							}
 							return true;
 						}
@@ -762,7 +748,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	}
 	
 	public IFeatureModel getFeatureModel() {
-		return featureModel;
+		return featureModelManager.getObject();
 	}
 
 	public IFile getModelFile() {
@@ -1074,8 +1060,9 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			@Override
 			protected boolean work() throws Exception {
 				workMonitor.setMaxAbsoluteWork(2 * files.size());
-				final Configuration config = new Configuration(featureModel, false, false);
-				final ConfigurationReader reader = new ConfigurationReader(config);
+				final Configuration config = new Configuration(featureModelManager.getObject(), false, false);
+				final FileReader<Configuration> reader = new FileReader<>();
+				reader.setObject(config);
 				try {
 					workMonitor.getMonitor().subTask(DELETE_CONFIGURATION_MARKERS);
 					for (IFile file : files) {
@@ -1091,7 +1078,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 							return false;
 						}
 						workMonitor.getMonitor().subTask(CHECK_VALIDITY_OF + file.getName());
-						reader.readFromFile(file);
+						reader.read(Paths.get(file.getLocationURI()), ConfigurationManager.getFormat(file.getName()));
 						if (!config.isValid()) {
 							String name = file.getName();
 							name = name.substring(0, name.lastIndexOf('.'));
@@ -1100,8 +1087,8 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 						}
 						// create warnings (e.g., for features that are not available anymore)
-						for (ConfigurationReader.Warning warning : reader.getWarnings()) {
-							createConfigurationMarker(file, warning.getMessage(), warning.getPosition(), IMarker.SEVERITY_WARNING);
+						for (Problem warning : reader.getLastProblems()) {
+							createConfigurationMarker(file, warning.getMessage(), warning.getLine(), IMarker.SEVERITY_WARNING);
 						}
 						workMonitor.worked();
 					}
@@ -1168,14 +1155,14 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		final List<IFile> configurations = getAllConfigurations();
 
 		final boolean[][] selections = new boolean[configurations.size()][concreteFeatures.size()];
-		final Configuration configuration = new Configuration(featureModel, Configuration.PARAM_IGNOREABSTRACT);
-		final ConfigurationReader reader = new ConfigurationReader(configuration);
+		final Configuration configuration = new Configuration(featureModelManager.getObject(), Configuration.PARAM_IGNOREABSTRACT);
+		final FileReader<Configuration> reader = new FileReader<>(configuration);
 
 		int row = 0;
-		for (IFile confFile : configurations) {
+		for (IFile file : configurations) {
 			final boolean[] currentRow = selections[row++];
 			try {
-				reader.readFromFile(confFile);
+				reader.read(Paths.get(file.getLocationURI()), ConfigurationManager.getFormat(file.getName()));
 			} catch (Exception e) {
 				FMCorePlugin.getDefault().logError(e);
 			}
@@ -1189,6 +1176,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	}
 
 	private Collection<String> getOptionalConcreteFeatures() {
+		final IFeatureModel featureModel = featureModelManager.getObject();
 		final Collection<String> concreteFeatures = FeatureUtils.extractConcreteFeaturesAsStringList(featureModel);
 		List<List<IFeature>> deadCoreList = featureModel.getAnalyser().analyzeFeatures();
 		for (final IFeature feature : deadCoreList.get(0)) {
@@ -1500,5 +1488,10 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		IFile internalFile = configurationFile.getParent().getFile(Path.fromOSString(fileName));
 
 		return (internalFile.isAccessible()) ? internalFile : null;
+	}
+
+	@Override
+	public FeatureModelManager getFeatureModelManager() {
+		return featureModelManager;
 	}
 }

@@ -45,8 +45,8 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelProperty;
 import de.ovgu.featureide.fm.core.base.IFeatureModelStructure;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
-import de.ovgu.featureide.fm.core.base.event.IFeatureModelListener;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.core.filter.ConcreteFeatureFilter;
 import de.ovgu.featureide.fm.core.functional.Functional;
@@ -93,7 +93,7 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 
 	protected FMComposerManager fmComposerManager = null;
 
-	protected final ArrayList<IFeatureModelListener> listenerList = new ArrayList<>();
+	protected final ArrayList<IEventListener> listenerList = new ArrayList<>();
 
 	protected final IFeatureModelProperty property;
 
@@ -172,7 +172,7 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	}
 
 	@Override
-	public void addListener(IFeatureModelListener listener) {
+	public void addListener(IEventListener listener) {
 		if (!listenerList.contains(listener)) {
 			listenerList.add(listener);
 		}
@@ -250,9 +250,9 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	}
 
 	@Override
-	public void fireEvent(FeatureModelEvent event) {
+	public void fireEvent(FeatureIDEEvent event) {
 		if (event.isPersistent() || event.getEditor() == null) {
-			for (final IFeatureModelListener listener : listenerList) {
+			for (final IEventListener listener : listenerList) {
 				try {
 					listener.propertyChange(event);
 				} catch (Exception e) {
@@ -272,7 +272,7 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	}
 
 	protected void fireEvent(final String action) {
-		fireEvent(new FeatureModelEvent(this, action, Boolean.FALSE, Boolean.TRUE));
+		fireEvent(new FeatureIDEEvent(this, action, Boolean.FALSE, Boolean.TRUE));
 	}
 
 	@Override
@@ -377,12 +377,12 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 
 	@Override
 	public void handleModelDataChanged() {
-		fireEvent(FeatureModelEvent.MODEL_DATA_CHANGED);
+		fireEvent(FeatureIDEEvent.MODEL_DATA_CHANGED);
 	}
 
 	@Override
 	public void handleModelDataLoaded() {
-		fireEvent(FeatureModelEvent.MODEL_DATA_LOADED);
+		fireEvent(FeatureIDEEvent.MODEL_DATA_LOADED);
 
 	}
 
@@ -408,7 +408,7 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 	}
 
 	@Override
-	public void removeListener(IFeatureModelListener listener) {
+	public void removeListener(IEventListener listener) {
 		listenerList.remove(listener);
 	}
 

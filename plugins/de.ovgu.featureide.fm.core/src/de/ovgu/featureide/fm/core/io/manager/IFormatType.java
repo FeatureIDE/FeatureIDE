@@ -18,23 +18,19 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
+package de.ovgu.featureide.fm.core.io.manager;
 
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 
 /**
+ * TODO description
  * 
  * @author Sebastian Krieter
  */
-public abstract class AbstractGraphicalFeatureModelOperation extends AbstractFeatureModelOperation {
+public interface IFormatType<T> {
 
-	protected IGraphicalFeatureModel graphicalFeatureModel;
+	String getSuffix();
 
-	public AbstractGraphicalFeatureModelOperation(IGraphicalFeatureModel graphicalFeatureModel, String label) {
-		super(graphicalFeatureModel.getFeatureModel(), label);
-		this.graphicalFeatureModel = graphicalFeatureModel;
-		setEventId(FeatureIDEEvent.MODEL_DATA_LOADED);
-	}
+	Class<? extends IPersistentFormat<T>> getFormat();
 
 }

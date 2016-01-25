@@ -31,8 +31,8 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.events.KeyEvent;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
-import de.ovgu.featureide.fm.core.base.event.IFeatureModelListener;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -53,7 +53,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
  * @author Andy Koch
  * @author Marcus Pinnecke
  */
-public class FeatureDiagramEditorKeyHandler extends KeyHandler implements IFeatureModelListener {
+public class FeatureDiagramEditorKeyHandler extends KeyHandler implements IEventListener {
 
 	private static final long timeoutThreshold = 1000;
 	private final IGraphicalFeatureModel featureModel;
@@ -136,7 +136,7 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements IFeatu
 	}
 
 	@Override
-	public void propertyChange(FeatureModelEvent event) {
+	public void propertyChange(FeatureIDEEvent event) {
 		resetFeatureList();
 	}
 

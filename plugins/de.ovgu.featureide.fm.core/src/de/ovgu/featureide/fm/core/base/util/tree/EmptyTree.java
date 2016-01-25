@@ -18,23 +18,55 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
+package de.ovgu.featureide.fm.core.base.util.tree;
 
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
+import java.util.Iterator;
+
 
 /**
+ * Tree element.
  * 
  * @author Sebastian Krieter
+ * 
  */
-public abstract class AbstractGraphicalFeatureModelOperation extends AbstractFeatureModelOperation {
+public class EmptyTree<E> extends Tree<E> {
 
-	protected IGraphicalFeatureModel graphicalFeatureModel;
+	public EmptyTree() {
+		super(null);
+	}
 
-	public AbstractGraphicalFeatureModelOperation(IGraphicalFeatureModel graphicalFeatureModel, String label) {
-		super(graphicalFeatureModel.getFeatureModel(), label);
-		this.graphicalFeatureModel = graphicalFeatureModel;
-		setEventId(FeatureIDEEvent.MODEL_DATA_LOADED);
+	@Override
+	public TreeIterator<E> iterator() {
+		return new TreeIterator<E>() {
+
+			@Override
+			public boolean hasNext() {
+				return false;
+			}
+
+			@Override
+			public E next() {
+				return null;
+			}
+
+			@Override
+			public void remove() {				
+			}
+
+			@Override
+			public Iterator<E> iterator() {
+				return this;
+			}
+
+			@Override
+			public void removeSubtree() {
+			}
+
+			@Override
+			public int getCurrentLevel() {
+				return 0;
+			}
+		};
 	}
 
 }

@@ -29,8 +29,8 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
-import de.ovgu.featureide.fm.core.base.event.IFeatureModelListener;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConnectionEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
@@ -43,7 +43,7 @@ import de.ovgu.featureide.fm.ui.views.outline.FmOutlineGroupStateStorage;
  * @author Thomas Thuem
  * @author Marcus Pinnecke
  */
-public abstract class SingleSelectionAction extends Action implements IFeatureModelListener, PropertyConstants {
+public abstract class SingleSelectionAction extends Action implements IEventListener, PropertyConstants {
 
 	private ISelectionChangedListener listener = new ISelectionChangedListener() {
 		public void selectionChanged(SelectionChangedEvent event) {
@@ -131,7 +131,7 @@ public abstract class SingleSelectionAction extends Action implements IFeatureMo
 
 	protected abstract void updateProperties();
 
-	public void propertyChange(FeatureModelEvent event) {
+	public void propertyChange(FeatureIDEEvent event) {
 		String prop = event.getPropertyName();
 		if (CHILDREN_CHANGED.equals(prop) || MANDATORY_CHANGED.equals(prop) || PARENT_CHANGED.equals(prop) || HIDDEN_CHANGED.equals(prop)
 				|| COLOR_CHANGED.equals(prop)) {

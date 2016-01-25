@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.ui.editors.elements;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -29,8 +30,9 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.util.tree.EmptyTree;
 import de.ovgu.featureide.fm.core.base.util.tree.Tree;
 import de.ovgu.featureide.fm.ui.editors.FeatureConnection;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
@@ -68,7 +70,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel, PropertyCo
 	}
 
 	protected void fireEvent(final String action) {
-		correspondingFeatureModel.fireEvent(new FeatureModelEvent(this, action, Boolean.FALSE, Boolean.TRUE));
+		correspondingFeatureModel.fireEvent(new FeatureIDEEvent(this, action, Boolean.FALSE, Boolean.TRUE));
 	}
 
 	@Override
@@ -88,12 +90,12 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel, PropertyCo
 
 	@Override
 	public void handleLegendLayoutChanged() {
-		fireEvent(FeatureModelEvent.LEGEND_LAYOUT_CHANGED);
+		fireEvent(FeatureIDEEvent.LEGEND_LAYOUT_CHANGED);
 	}
 
 	@Override
 	public void handleModelLayoutChanged() {
-		fireEvent(FeatureModelEvent.MODEL_LAYOUT_CHANGED);
+		fireEvent(FeatureIDEEvent.MODEL_LAYOUT_CHANGED);
 	}
 
 	@Override
@@ -179,24 +181,26 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel, PropertyCo
 	}
 
 	public void init() {
-		final ArrayList<IGraphicalConstraint> constraintList = new ArrayList<>(correspondingFeatureModel.getConstraints().size());
-		for (IConstraint constraint : correspondingFeatureModel.getConstraints()) {
-			final IGraphicalConstraint graphicalFeature = new GraphicalConstraint(constraint, this);
-			constraintList.add(graphicalFeature);
+		final IFeatureStructure root = correspondingFeatureModel.getStructure().getRoot();
+		if (root != null) {
+			final ArrayList<IGraphicalConstraint> constraintList = new ArrayList<>(correspondingFeatureModel.getConstraints().size());
+			for (IConstraint constraint : correspondingFeatureModel.getConstraints()) {
+				final IGraphicalConstraint graphicalFeature = new GraphicalConstraint(constraint, this);
+				constraintList.add(graphicalFeature);
+			}
+			final IFeature rootFeature = root.getFeature();
+			final IGraphicalFeature graphicalFeature = new GraphicalFeature(rootFeature, this);
+			final Tree<IGraphicalFeature> rootTree = graphicalFeature.getTree();
+			for (IFeatureStructure featureStructure : rootFeature.getStructure().getChildren()) {
+				traverse(rootTree, featureStructure.getFeature(), this);
+			}
+			graphicalFeature.getSourceConnections().clear();
+			this.constraintList = constraintList;
+			this.featureTree = rootTree;
+		} else {
+			this.constraintList = Collections.emptyList();
+			this.featureTree = new EmptyTree<>();
 		}
-
-		final IFeature rootFeature = correspondingFeatureModel.getStructure().getRoot().getFeature();
-
-		final IGraphicalFeature graphicalFeature = new GraphicalFeature(rootFeature, this);
-
-		final Tree<IGraphicalFeature> rootTree = graphicalFeature.getTree();
-		for (IFeatureStructure featureStructure : rootFeature.getStructure().getChildren()) {
-			traverse(rootTree, featureStructure.getFeature(), this);
-		}
-		graphicalFeature.getSourceConnections().clear();
-
-		this.constraintList = constraintList;
-		this.featureTree = rootTree;
 	}
 
 	private static void traverse(Tree<IGraphicalFeature> rootTree, IFeature feature, IGraphicalFeatureModel graphicalItem) {

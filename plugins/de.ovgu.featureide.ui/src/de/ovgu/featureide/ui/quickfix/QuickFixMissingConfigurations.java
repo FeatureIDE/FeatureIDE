@@ -23,6 +23,7 @@ package de.ovgu.featureide.ui.quickfix;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CONFIGURATION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_MISSING_CONFIGURATIONS_;
 
+import java.nio.file.Paths;
 import java.util.Collection;
 
 import org.eclipse.core.resources.IFile;
@@ -38,7 +39,8 @@ import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.ConfigurationWriter;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
+import de.ovgu.featureide.fm.core.io.manager.FileWriter;
 
 /**
  * Default implementation for quick fix of missing configurations.
@@ -87,11 +89,14 @@ public abstract class QuickFixMissingConfigurations implements IMarkerResolution
 	}
 	
 	protected void writeConfigurations(final Collection<Configuration> confs) {
+		final FileWriter<Configuration> writer = new FileWriter<>(ConfigurationManager.getDefaultFormat());
 		try {
 			configurationNr = 0;
-			for (final Configuration c : confs) {
-				final ConfigurationWriter writer = new ConfigurationWriter(c);
-				writer.saveToFile(getConfigurationFile(project.getConfigFolder()));
+			for (final Configuration c : confs) {				
+				final IFile configurationFile = getConfigurationFile(project.getConfigFolder());
+				writer.setObject(c);
+				writer.setPath(Paths.get(configurationFile.getLocationURI()));
+				writer.save();
 			}
 			project.getConfigFolder().refreshLocal(IResource.DEPTH_ONE, null);
 		} catch (CoreException e) {

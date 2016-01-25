@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE;
-
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -30,33 +28,25 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
-import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePage;
 
-/**
- * Operation with functionality to move multiple elements from the {@link FeatureModelEditor} and the {@link FmOutlinePage}. Enables Undo/Redo.
- * 
- * @author Fabian Benduhn
- * @author Marcus Pinnecke
- * @author Sebastian Krieter
- */
-public class MoveElementsOperation extends AbstractFeatureModelOperation implements GUIDefaults {
+public abstract class MultiFeatureModelOperation extends AbstractFeatureModelOperation {
 
-	private Deque<AbstractFeatureModelOperation> operations = new LinkedList<AbstractFeatureModelOperation>();
+	protected final Deque<AbstractFeatureModelOperation> operations = new LinkedList<>();
 
-	public MoveElementsOperation(IFeatureModel featureModel) {
-		super(featureModel, DELETE);
+	public MultiFeatureModelOperation(IFeatureModel featureModel, String name) {
+		super(featureModel, name);
 	}
 
-//	@Override
-//	public IStatus execute(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
-//		return Status.OK_STATUS;
-//	}
+	@Override
+	public IStatus execute(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
+		createSingleOperations();
+		return super.execute(monitor, info);
+	}
+
+	protected abstract void createSingleOperations();
 
 	@Override
 	protected FeatureIDEEvent operation() {
@@ -78,6 +68,10 @@ public class MoveElementsOperation extends AbstractFeatureModelOperation impleme
 			}
 		}
 		return null;
+	}
+
+	public void addOperation(AbstractFeatureModelOperation operation) {
+		operations.add(operation);
 	}
 
 }

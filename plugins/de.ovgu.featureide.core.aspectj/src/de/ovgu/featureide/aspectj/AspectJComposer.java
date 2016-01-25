@@ -26,7 +26,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_REQUIRED_BUNDLE;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -64,8 +63,9 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
+import de.ovgu.featureide.fm.core.io.manager.FileReader;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 
 /**
@@ -127,15 +127,9 @@ public class AspectJComposer extends ComposerExtensionClass {
 			return;
 
 		Configuration configuration = new Configuration(featureProject.getFeatureModel());
-		ConfigurationReader reader = new ConfigurationReader(configuration);
+		FileReader<Configuration> reader = new FileReader<>(configPath, configuration, ConfigurationManager.getFormat(configPath));
+		reader.read();
 
-		try {
-			reader.readFromFile(config);
-		} catch (CoreException e) {
-			AspectJCorePlugin.getDefault().logError(e);
-		} catch (IOException e) {
-			AspectJCorePlugin.getDefault().logError(e);
-		}
 		LinkedList<String> selectedFeatures = new LinkedList<String>();
 		unSelectedFeatures = new LinkedList<String>();
 		for (IFeature feature : configuration.getSelectedFeatures()) {

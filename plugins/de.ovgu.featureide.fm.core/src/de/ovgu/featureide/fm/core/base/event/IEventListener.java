@@ -21,10 +21,12 @@
 package de.ovgu.featureide.fm.core.base.event;
 
 /**
- * Listens for a {@link FeatureModelEvent}.
+ * Listens for a {@link FeatureIDEEvent}.
  * 
  * @author Sebastian Krieter
  */
-public interface IFeatureModelListener {
-	void propertyChange(FeatureModelEvent event);
+public interface IEventListener {
+
+	void propertyChange(FeatureIDEEvent event);
+
 }

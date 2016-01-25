@@ -28,7 +28,7 @@ import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.util.tree.Tree;
 import de.ovgu.featureide.fm.ui.editors.FeatureConnection;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalElement;
@@ -85,7 +85,7 @@ public class GraphicalFeature implements IGraphicalFeature {
 	@Override
 	public void setConstraintSelected(boolean selection) {
 		constraintSelected = selection;
-		correspondingFeature.fireEvent(new FeatureModelEvent(this, ATTRIBUTE_CHANGED, Boolean.FALSE, Boolean.TRUE));
+		correspondingFeature.fireEvent(new FeatureIDEEvent(this, ATTRIBUTE_CHANGED, Boolean.FALSE, Boolean.TRUE));
 	}
 
 	@Override

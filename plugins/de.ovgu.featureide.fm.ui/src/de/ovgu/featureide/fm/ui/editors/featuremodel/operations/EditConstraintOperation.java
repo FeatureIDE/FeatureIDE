@@ -25,7 +25,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.EDIT_CONSTRAIN
 import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 
 /**
  * Operation with functionality to edit a constraint. Enables undo/redo
@@ -48,15 +48,15 @@ public class EditConstraintOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	protected FeatureModelEvent operation() {
+	protected FeatureIDEEvent operation() {
 		constraint.setNode(newNode);
-		return new FeatureModelEvent(constraint, FeatureModelEvent.CONSTRAINT_MODIFY, oldNode, newNode);
+		return new FeatureIDEEvent(constraint, FeatureIDEEvent.CONSTRAINT_MODIFY, oldNode, newNode);
 	}
 
 	@Override
-	protected FeatureModelEvent inverseOperation() {
+	protected FeatureIDEEvent inverseOperation() {
 		constraint.setNode(oldNode);
-		return new FeatureModelEvent(constraint, FeatureModelEvent.CONSTRAINT_MODIFY, newNode, oldNode);
+		return new FeatureIDEEvent(constraint, FeatureIDEEvent.CONSTRAINT_MODIFY, newNode, oldNode);
 	}
 
 }

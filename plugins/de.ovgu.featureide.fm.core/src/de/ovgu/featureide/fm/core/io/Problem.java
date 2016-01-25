@@ -26,6 +26,7 @@ import org.eclipse.core.resources.IMarker;
  * Saves a warning with a line number where it occurred.
  * 
  * @author Thomas Thuem
+ * @author Sebastian Krieter
  */
 public class Problem {
 
@@ -74,6 +75,18 @@ public class Problem {
 			}
 		}
 		return false;
+	}
+
+	public int getSeverity() {
+		return severity;
+	}
+
+	public String getMessage() {
+		return message;
+	}
+
+	public int getLine() {
+		return line;
 	}
 
 }

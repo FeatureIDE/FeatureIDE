@@ -20,9 +20,10 @@ import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.featurehouse.FeatureHouseComposer;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
+import de.ovgu.featureide.fm.core.io.manager.FileReader;
 
 public class FeatureCComposer extends ComposerExtensionClass {
 
@@ -42,12 +43,8 @@ public class FeatureCComposer extends ComposerExtensionClass {
 		IFeatureModel model = CorePlugin.getFeatureProject(config)
 				.getFeatureModel();
 		Configuration cfg = new Configuration(model);
-		ConfigurationReader cr = new ConfigurationReader(cfg);
-		try {
-			cr.readFromFile(config);
-		} catch (CoreException | IOException e) {
-			e.printStackTrace();
-		}
+		final FileReader<Configuration> reader = new FileReader<>(Paths.get(config.getLocationURI()), cfg, ConfigurationManager.getFormat(config.getName()));
+		reader.read();
 
 		IResource mappings = config.getProject().findMember(MAPPINGS_FILENAME);
 		if (mappings != null && mappings.isAccessible()

@@ -28,26 +28,51 @@ import java.nio.file.StandardOpenOption;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.annotation.CheckForNull;
+
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.event.DefaultEventManager;
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.event.IEventManager;
-import de.ovgu.featureide.fm.core.base.event.IFeatureModelListener;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
 
 /**
- * Responsible to load and save all information from / to a file.
+ * Responsible to load and save all information from / to a file.</br>
+ * To get an instance use the {@link FileManagerMap}.
  * 
  * @author Sebastian Krieter
  */
 public abstract class AFileManager<T> implements IFileManager, IEventManager, IResourceChangeListener {
+
+	@CheckForNull
+	protected final static <R> IPersistentFormat<R> getFormat(String fileName, IFormatType<R>[] formatTypes) {
+		if (fileName != null && !fileName.isEmpty()) {
+			final String ext = fileName.substring(fileName.lastIndexOf('.') + 1);
+			for (IFormatType<R> type : formatTypes) {
+				if (ext.equals(type.getSuffix())) {
+					try {
+						return type.getFormat().newInstance();
+					} catch (InstantiationException | IllegalAccessException e) {
+						FMCorePlugin.getDefault().logError(e);
+						throw new RuntimeException();
+					}
+				}
+			}
+		}
+		return null;
+	}
 
 	private final IEventManager eventManager = new DefaultEventManager();
 
@@ -71,23 +96,16 @@ public abstract class AFileManager<T> implements IFileManager, IEventManager, IR
 		return format;
 	}
 
-	protected AFileManager(String absolutePath, IPersistentFormat<T> format) {
+	protected AFileManager(T object, String absolutePath, IPersistentFormat<T> format) {
 		this.format = format;
 		this.absolutePath = absolutePath;
 		path = Paths.get(absolutePath);
 
-		persistentObject = null;
-		variableObject = null;
+		variableObject = object;
+		persistentObject = copyObject(variableObject);
 
-		eclipseFile = new org.eclipse.core.runtime.Path(absolutePath);
+		eclipseFile = new org.eclipse.core.runtime.Path(absolutePath).makeRelativeTo(ResourcesPlugin.getWorkspace().getRoot().getLocation());
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(this, IResourceChangeEvent.POST_CHANGE);
-	}
-
-	public void init() {
-		if (persistentObject == null && !read()) {
-			persistentObject = createNewObject();
-			variableObject = copyObject(persistentObject);
-		}
 	}
 
 	public T getObject() {
@@ -108,27 +126,26 @@ public abstract class AFileManager<T> implements IFileManager, IEventManager, IR
 		}
 		lastProblems.clear();
 		try {
-			final T newObject = createNewObject();
-
 			final String content = new String(Files.readAllBytes(path), Charset.availableCharsets().get("UTF-8"));
-			List<Problem> problemList = format.getInstance().read(newObject, content);
+			List<Problem> problemList = format.getInstance().read(variableObject, content);
 			if (problemList != null) {
 				lastProblems.addAll(problemList);
 			}
 
-			synchronized (syncObject) {
-				persistentObject = newObject;
-				variableObject = copyObject(newObject);
-			}
+			persist();
 
-			fireEvent(new FeatureModelEvent(persistentObject, FeatureModelEvent.MODEL_DATA_LOADED));
+			fireEvent(new FeatureIDEEvent(persistentObject, FeatureIDEEvent.MODEL_DATA_LOADED));
 		} catch (Exception e) {
 			handleException(e);
 		}
 		return lastProblems.isEmpty();
 	}
 
-	protected abstract T createNewObject();
+	protected void persist() {
+		synchronized (syncObject) {
+			persistentObject = copyObject(variableObject);
+		}
+	}
 
 	protected abstract T copyObject(T oldObject);
 
@@ -137,16 +154,15 @@ public abstract class AFileManager<T> implements IFileManager, IEventManager, IR
 		try {
 			synchronized (syncObject) {
 				saveFlag = true;
+				final byte[] content = format.getInstance().write(variableObject).getBytes(Charset.availableCharsets().get("UTF-8"));
+				Files.write(path, content, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
 			}
-			final byte[] content = format.getInstance().write(variableObject).getBytes(Charset.availableCharsets().get("UTF-8"));
-			Files.write(path, content, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+			final IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(eclipseFile);
+			file.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
 
-			synchronized (syncObject) {
-				persistentObject = variableObject;
-				variableObject = copyObject(persistentObject);
-			}
+			persist();
 
-			fireEvent(new FeatureModelEvent(persistentObject, FeatureModelEvent.MODEL_DATA_SAVED));
+			fireEvent(new FeatureIDEEvent(variableObject, FeatureIDEEvent.MODEL_DATA_SAVED));
 		} catch (Exception e) {
 			handleException(e);
 		}
@@ -159,29 +175,45 @@ public abstract class AFileManager<T> implements IFileManager, IEventManager, IR
 	}
 
 	@Override
-	public void addListener(IFeatureModelListener listener) {
+	public void addListener(IEventListener listener) {
 		eventManager.addListener(listener);
 	}
 
 	@Override
-	public void fireEvent(FeatureModelEvent event) {
+	public void fireEvent(FeatureIDEEvent event) {
 		eventManager.fireEvent(event);
 	}
 
 	@Override
-	public void removeListener(IFeatureModelListener listener) {
+	public void removeListener(IEventListener listener) {
 		eventManager.removeListener(listener);
 	}
 
 	@Override
 	public void resourceChanged(IResourceChangeEvent event) {
-		final IResourceDelta member = event.getDelta().findMember(eclipseFile);
-		if (member != null) {
-			synchronized (syncObject) {
-				if (saveFlag) {
-					saveFlag = false;
-				} else {
-					read();
+		if (event.getType() == IResourceChangeEvent.POST_CHANGE) {
+			final IResourceDelta delta = event.getDelta();
+			if (delta != null) {
+				final IResourceDelta deltaMember = delta.findMember(eclipseFile);
+				if (deltaMember != null) {
+					final IResourceDeltaVisitor visitor = new IResourceDeltaVisitor() {
+						public boolean visit(IResourceDelta delta) {
+							if (delta.getKind() == IResourceDelta.CHANGED && (delta.getFlags() & IResourceDelta.CONTENT) != 0) {
+								synchronized (syncObject) {
+									if (saveFlag) {
+										saveFlag = false;
+									} else {
+										read();
+									}
+								}
+							}
+							return true;
+						}
+					};
+					try {
+						deltaMember.accept(visitor);
+					} catch (CoreException e) {
+					}
 				}
 			}
 		}

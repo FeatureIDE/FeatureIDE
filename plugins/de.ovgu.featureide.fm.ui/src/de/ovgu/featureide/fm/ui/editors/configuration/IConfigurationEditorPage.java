@@ -22,14 +22,14 @@ package de.ovgu.featureide.fm.ui.editors.configuration;
 
 import org.eclipse.ui.IEditorPart;
 
-import de.ovgu.featureide.fm.core.base.event.IFeatureModelListener;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
 
 /**
  * Basic interface for all pages at configuration editor.
  * 
  * @author Jens Meinicke
  */
-public interface IConfigurationEditorPage extends IEditorPart, IFeatureModelListener {
+public interface IConfigurationEditorPage extends IEditorPart, IEventListener {
 
 	/**
 	 * 
@@ -75,4 +75,13 @@ public interface IConfigurationEditorPage extends IEditorPart, IFeatureModelList
 	 * @return This page. You can also call a constructor.
 	 */
 	public IConfigurationEditorPage getPage();
+
+	/**
+	 * Called if this page is about to change to another page.
+	 * 
+	 * @param newPageIndex
+	 * 
+	 * @return {@code true} if the user is allowed to change the page
+	 */
+	public boolean allowPageChange(int newPageIndex);
 }

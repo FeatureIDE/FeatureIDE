@@ -90,14 +90,12 @@ public class Configuration implements Cloneable {
 		this.propagate = false;
 		this.root = initRoot();
 
-		for (SelectableFeature f : configuration.features) {
-			try {
-				setManual(f.getName(), (f.getManual()));
-			} catch (FeatureNotFoundException e) {
+		for (SelectableFeature oldFeature : configuration.features) {
+			final SelectableFeature newFeature = table.get(oldFeature.getName());
+			if (newFeature != null) {
+				newFeature.setManual(oldFeature.getManual());
 			}
 		}
-
-		loadPropagator(configuration.propagate);
 	}
 	
 	public Configuration(IFeatureModel featureModel) {
@@ -124,13 +122,12 @@ public class Configuration implements Cloneable {
 	public Configuration(IFeatureModel featureModel, int options) {
 		this.featureModel = featureModel;
 		this.ignoreAbstractFeatures = (options & PARAM_IGNOREABSTRACT) != 0;
+		this.propagate = (options & PARAM_PROPAGATE) != 0;
 		this.propagator = new ConfigurationPropagator(this);
 		this.root = initRoot();
 
-		if ((options & PARAM_LAZY) != 0) {
-			this.propagate = (options & PARAM_PROPAGATE) != 0;
-		} else {
-			loadPropagator((options & PARAM_PROPAGATE) != 0);
+		if ((options & PARAM_LAZY) == 0) {
+			loadPropagator();
 		}
 	}
 
@@ -160,9 +157,8 @@ public class Configuration implements Cloneable {
 		return root;
 	}
 
-	private void loadPropagator(boolean propagate) {
-		this.propagator.load(new WorkMonitor());
-		this.propagate = propagate;
+	public void loadPropagator() {
+		propagator.load(new WorkMonitor());
 		update(false, null);
 	}
 
@@ -385,6 +381,7 @@ public class Configuration implements Cloneable {
 				return (Configuration) super.clone();
 			} catch (CloneNotSupportedException e) {
 				FMCorePlugin.getDefault().logError(e);
+				throw new RuntimeException("Cloning is not supported for " + this.getClass());
 			}
 		}
 		return new Configuration(this);
@@ -399,6 +396,10 @@ public class Configuration implements Cloneable {
 	public List<List<String>> coverFeatures(Collection<String> features, WorkMonitor monitor, boolean selection) throws TimeoutException {
 		return propagator.coverFeatures(features, selection, monitor);
 
+	}
+
+	public boolean isIgnoreAbstractFeatures() {
+		return ignoreAbstractFeatures;
 	}
 
 }

@@ -107,8 +107,10 @@ public class ConfigurationPropagator {
 
 	ConfigurationPropagator(ConfigurationPropagator propagator, Configuration configuration) {
 		this.configuration = configuration;
-		this.rootNode = propagator.rootNode.clone();
-		this.rootNodeWithoutHidden = propagator.rootNodeWithoutHidden.clone();
+		if (propagator.isLoaded()) {
+			this.rootNode = propagator.rootNode.clone();
+			this.rootNodeWithoutHidden = propagator.rootNodeWithoutHidden.clone();
+		}
 	}
 
 	ConfigurationPropagator(ConfigurationPropagator propagator) {
@@ -117,6 +119,10 @@ public class ConfigurationPropagator {
 
 	public ConfigurationPropagatorJobWrapper getJobWrapper() {
 		return jobWrapper;
+	}
+	
+	public boolean isLoaded() {
+		return rootNode != null;
 	}
 
 	public void load(WorkMonitor workMonitor) {
@@ -215,7 +221,6 @@ public class ConfigurationPropagator {
 		final List<Node> children = new ArrayList<Node>();
 
 		for (SelectableFeature feature : configuration.features) {
-
 			if (feature.getSelection() != Selection.UNDEFINED
 					&& (configuration.ignoreAbstractFeatures || feature.getFeature().getStructure().isConcrete())) {
 				children.add(new Literal(feature.getFeature().getName(), feature.getSelection() == Selection.SELECTED));
@@ -563,6 +568,74 @@ public class ConfigurationPropagator {
 			}
 		}
 		return resultSet;
+	}
+
+	public void resolve(WorkMonitor workMonitor) {
+		if (rootNode == null) {
+			return;
+		}
+
+		configuration.resetAutomaticValues();
+
+		final List<SelectableFeature> oldManualSelected = new ArrayList<>();
+		for (SelectableFeature feature : configuration.features) {
+			if (feature.getManual() != Selection.UNDEFINED) {
+				oldManualSelected.add(feature);
+			}
+		}
+
+		workMonitor.setMaxAbsoluteWork(oldManualSelected.size() + configuration.features.size() + 1);
+
+		final SatSolver manualSolver = new SatSolver(rootNode, ConfigurationPropagator.TIMEOUT);
+
+		workMonitor.worked();
+
+		final LinkedList<Node> newManualSelected = new LinkedList<>();
+		for (Iterator<SelectableFeature> iterator = oldManualSelected.iterator(); iterator.hasNext();) {
+			final SelectableFeature next = iterator.next();
+			final Literal l = new Literal(next.getFeature().getName(), next.getManual() == Selection.SELECTED);
+			newManualSelected.addFirst(l);
+
+			boolean satisfiable = false;
+			try {
+				satisfiable = manualSolver.isSatisfiable(newManualSelected);
+			} catch (TimeoutException e) {
+			}
+			if (!satisfiable) {
+				next.setManual(Selection.UNDEFINED);
+				iterator.remove();
+				newManualSelected.removeFirst();
+			}
+			workMonitor.worked();
+		}
+
+		final Node[] nodeArray = createNodeArray(newManualSelected, rootNode);
+		final SatSolver automaticSolver = new SatSolver(new And(nodeArray), ConfigurationPropagator.TIMEOUT);
+
+		final ListIterator<SelectableFeature> it = configuration.features.listIterator();
+		while (it.hasNext()) {
+			final SelectableFeature feature = it.next();
+			if (feature.getManual() == Selection.UNDEFINED) {
+				Literal l = new Literal(feature.getFeature().getName(), true);
+				try {
+					if (!automaticSolver.isSatisfiable(l)) {
+						feature.setAutomatic(Selection.UNSELECTED);
+					} else {
+						l = new Literal(feature.getFeature().getName(), false);
+						if (!automaticSolver.isSatisfiable(l)) {
+							feature.setAutomatic(Selection.SELECTED);
+						} else {
+							feature.setAutomatic(Selection.UNDEFINED);
+						}
+					}
+				} catch (TimeoutException e) {
+					FMCorePlugin.getDefault().logError(e);
+				}
+			}
+			workMonitor.invoke(feature);
+			workMonitor.worked();
+		}
+
 	}
 
 	public void update(boolean redundantManual, String startFeatureName, WorkMonitor workMonitor) {

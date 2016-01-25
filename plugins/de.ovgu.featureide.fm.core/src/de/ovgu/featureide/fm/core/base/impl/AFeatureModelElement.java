@@ -24,8 +24,8 @@ import java.util.LinkedList;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
-import de.ovgu.featureide.fm.core.base.event.IFeatureModelListener;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 
 /**
@@ -41,7 +41,7 @@ public abstract class AFeatureModelElement implements IFeatureModelElement, Prop
 	protected String name;
 
 	protected final IFeatureModel featureModel;
-	protected final LinkedList<IFeatureModelListener> listenerList = new LinkedList<>();
+	protected final LinkedList<IEventListener> listenerList = new LinkedList<>();
 	
 	protected AFeatureModelElement(AFeatureModelElement oldElement, IFeatureModel featureModel) {
 		this.featureModel = featureModel != null ? featureModel : oldElement.featureModel;
@@ -79,20 +79,20 @@ public abstract class AFeatureModelElement implements IFeatureModelElement, Prop
 	}
 	
 	@Override
-	public final void addListener(IFeatureModelListener listener) {
+	public final void addListener(IEventListener listener) {
 		if (!listenerList.contains(listener)) {
 			listenerList.add(listener);
 		}
 	}
 
 	@Override
-	public final void removeListener(IFeatureModelListener listener) {
+	public final void removeListener(IEventListener listener) {
 		listenerList.remove(listener);
 	}
 
 	@Override
-	public final void fireEvent(FeatureModelEvent event) {
-		for (final IFeatureModelListener listener : listenerList) {
+	public final void fireEvent(FeatureIDEEvent event) {
+		for (final IEventListener listener : listenerList) {
 			listener.propertyChange(event);
 		}
 	}

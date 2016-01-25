@@ -32,6 +32,7 @@ import java.util.List;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.manager.FileReader;
 
 /**
  * Reads all configuration file from a certain folder and saves their content in form of a selection matrix.
@@ -91,15 +92,16 @@ public class ConfigurationMatrix {
 
 	private void readConfigurations(Filter<? super Path> filter) {
 		final Configuration c = new Configuration(featureModel);
-		final ConfigurationReader r = new ConfigurationReader(c);
+		FileReader<Configuration> r = new FileReader<>(c);
 
 		read = false;
 		configurationMatrix.clear();
 
 		try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(path, filter)) {
 			for (Path configPath : directoryStream) {
-				r.readFromFile(configPath);
-				addConfig(r.getConfiguration());
+				r.setPath(configPath);
+				r.read();
+				addConfig(c);
 			}
 		} catch (IOException e) {
 			FMCorePlugin.getDefault().logError(e);

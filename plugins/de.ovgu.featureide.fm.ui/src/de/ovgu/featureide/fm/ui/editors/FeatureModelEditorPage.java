@@ -28,7 +28,7 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
 
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 
 /**
  * Basic class with some default methods for feature model editor pages.
@@ -121,7 +121,7 @@ public abstract class FeatureModelEditorPage extends EditorPart implements IFeat
 	}
 
 	@Override
-	public void propertyChange(FeatureModelEvent event) {
+	public void propertyChange(FeatureIDEEvent event) {
 
 	}
 

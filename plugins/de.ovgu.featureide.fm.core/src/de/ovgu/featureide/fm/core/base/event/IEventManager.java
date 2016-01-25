@@ -21,16 +21,16 @@
 package de.ovgu.featureide.fm.core.base.event;
 
 /**
- * Broadcasts {@link FeatureModelEvent FeatureModelEvents} to the corresponding {@link IFeatureModelListener IFeatureModelListeners}.
+ * Broadcasts {@link FeatureIDEEvent Events} to the corresponding {@link IEventListener IFeatureModelListeners}.
  * 
  * @author Sebastian Krieter
  */
 public interface IEventManager {
 
-	void addListener(IFeatureModelListener listener);
+	void addListener(IEventListener listener);
 
-	void fireEvent(FeatureModelEvent event);
+	void fireEvent(FeatureIDEEvent event);
 
-	void removeListener(IFeatureModelListener listener);
+	void removeListener(IEventListener listener);
 
 }

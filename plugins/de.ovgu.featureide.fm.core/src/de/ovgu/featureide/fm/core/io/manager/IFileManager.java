@@ -38,8 +38,6 @@ public interface IFileManager extends IEventManager, IResourceChangeListener {
 
 	List<Problem> getLastProblems();
 
-	void init();
-
 	boolean read();
 
 	boolean save();

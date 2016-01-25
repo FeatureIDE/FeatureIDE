@@ -30,8 +30,8 @@ import org.eclipse.gef.editpolicies.NonResizableEditPolicy;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
-import de.ovgu.featureide.fm.core.base.event.IFeatureModelListener;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.ui.editors.ConstraintDialog;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
@@ -43,7 +43,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.ConstraintFigure;
  * @author Thomas Thuem
  * @author Marcus Pinnecke
  */
-public class ConstraintEditPart extends AbstractGraphicalEditPart implements PropertyConstants, IFeatureModelListener {
+public class ConstraintEditPart extends AbstractGraphicalEditPart implements PropertyConstants, IEventListener {
 
 	ConstraintEditPart(Object constraint) {
 		super();
@@ -97,7 +97,7 @@ public class ConstraintEditPart extends AbstractGraphicalEditPart implements Pro
 	}
 
 	@Override
-	public void propertyChange(FeatureModelEvent event) {
+	public void propertyChange(FeatureIDEEvent event) {
 		String prop = event.getPropertyName();
 		if (LOCATION_CHANGED.equals(prop)) {
 			getConstraintFigure().setLocation((Point) event.getNewValue());

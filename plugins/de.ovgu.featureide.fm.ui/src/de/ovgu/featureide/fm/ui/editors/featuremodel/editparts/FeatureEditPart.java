@@ -38,8 +38,8 @@ import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
-import de.ovgu.featureide.fm.core.base.event.IFeatureModelListener;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureConnection;
@@ -60,7 +60,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.policies.FeatureDirectEditP
  * @author Thomas Thuem
  * @author Marcus Pinnecke
  */
-public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEditPart, PropertyConstants, IFeatureModelListener {
+public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEditPart, PropertyConstants, IEventListener {
 
 	private ConnectionAnchor sourceAnchor = null;
 	private ConnectionAnchor targetAnchor = null;
@@ -175,7 +175,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 		getFeature().getObject().removeListener(this);
 	}
 
-	public void propertyChange(FeatureModelEvent event) {
+	public void propertyChange(FeatureIDEEvent event) {
 		String prop = event.getPropertyName();
 		if (LOCATION_CHANGED.equals(prop)) {
 			getFeatureFigure().setLocation((Point) event.getNewValue());

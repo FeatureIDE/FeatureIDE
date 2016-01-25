@@ -68,7 +68,7 @@ import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
@@ -132,7 +132,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	protected int curGroup = 0;
 	protected int curSearchIndex = 0;
 	protected int maxGroup = 0;
-	protected boolean useGroups = false;
+	protected boolean useGroups = true;
 	protected boolean useRecommendation = false;
 
 	protected Tree tree;
@@ -164,9 +164,12 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	}
 
 	@Override
-	public void propertyChange(FeatureModelEvent evt) {
-		// TODO is a refresh necessary?
-		// refreshPage();
+	public void propertyChange(FeatureIDEEvent evt) {
+		if (evt == null || !FeatureIDEEvent.MODEL_DATA_SAVED.equals(evt.getPropertyName())) {
+			return;
+		}
+		refreshPage();
+		setDirty();
 	}
 
 	protected final void refreshPage() {
@@ -492,8 +495,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 			final FeatureModelAnalyzer analyzer = configurationEditor.getConfiguration().getFeatureModel().getAnalyser();
 			try {
 				if (!analyzer.isValid()) {
-					displayError(
-							THE_FEATURE_MODEL_FOR_THIS_PROJECT_IS_VOID_COMMA__I_E__COMMA__THERE_IS_NO_VALID_CONFIGURATION__YOU_NEED_TO_CORRECT_THE_FEATURE_MODEL_BEFORE_YOU_CAN_CREATE_OR_EDIT_CONFIGURATIONS_);
+					displayError(THE_FEATURE_MODEL_FOR_THIS_PROJECT_IS_VOID_COMMA__I_E__COMMA__THERE_IS_NO_VALID_CONFIGURATION__YOU_NEED_TO_CORRECT_THE_FEATURE_MODEL_BEFORE_YOU_CAN_CREATE_OR_EDIT_CONFIGURATIONS_);
 					return false;
 				}
 			} catch (TimeoutException e) {
@@ -912,32 +914,34 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		updateInfoLabel(null);
 
 		final IConfigJob<?> updateJob = computeFeatures(redundantManual, currentDisplay);
-		updateJob.addJobFinishedListener(new JobFinishListener() {
-			@Override
-			public void jobFinished(IJob finishedJob, boolean success) {
-				if (success) {
-					updateInfoLabel(currentDisplay);
-					autoExpand(currentDisplay);
-					configurationEditor.getConfigJobManager().startJob(computeColoring(currentDisplay));
+		if (updateJob != null) {
+			updateJob.addJobFinishedListener(new JobFinishListener() {
+				@Override
+				public void jobFinished(IJob finishedJob, boolean success) {
+					if (success) {
+						updateInfoLabel(currentDisplay);
+						autoExpand(currentDisplay);
+						configurationEditor.getConfigJobManager().startJob(computeColoring(currentDisplay));
+					}
 				}
-			}
-		});
+			});
 
-		updateFeatures.clear();
-		walkTree(new IBinaryFunction<TreeItem, SelectableFeature, Void>() {
-			@Override
-			public Void invoke(TreeItem item, SelectableFeature feature) {
-				//				lockItem(item);
-				updateFeatures.add(feature);
-				return null;
-			}
-		}, new IFunction<Void, Void>() {
-			@Override
-			public Void invoke(Void t) {
-				configurationEditor.getConfigJobManager().startJob(updateJob);
-				return null;
-			}
-		});
+			updateFeatures.clear();
+			walkTree(new IBinaryFunction<TreeItem, SelectableFeature, Void>() {
+				@Override
+				public Void invoke(TreeItem item, SelectableFeature feature) {
+					//				lockItem(item);
+					updateFeatures.add(feature);
+					return null;
+				}
+			}, new IFunction<Void, Void>() {
+				@Override
+				public Void invoke(Void t) {
+					configurationEditor.getConfigJobManager().startJob(updateJob);
+					return null;
+				}
+			});
+		}
 	}
 
 	protected final void walkTree(final Functional.IBinaryFunction<TreeItem, SelectableFeature, Void> perNodeFunction,
@@ -972,6 +976,11 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	public void found(TreeItem searchResult) {
 		tree.showItem(searchResult);
 		tree.setSelection(searchResult);
+	}
+
+	@Override
+	public boolean allowPageChange(int newPageIndex) {
+		return true;
 	}
 
 }

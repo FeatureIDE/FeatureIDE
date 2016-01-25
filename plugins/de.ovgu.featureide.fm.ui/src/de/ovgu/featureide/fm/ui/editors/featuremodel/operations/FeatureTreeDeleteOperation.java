@@ -25,25 +25,16 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE_INCLUDI
 import static de.ovgu.featureide.fm.core.localization.StringTable.UNABLE_TO_DELETE_THIS_FEATURES_UNTIL_ALL_RELEVANT_CONSTRAINTS_ARE_REMOVED_;
 
 import java.util.Deque;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
-import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 
 /**
@@ -53,12 +44,11 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
  * @author Melanie Pflaume
  * @author Marcus Pinnecke
  */
-public class FeatureTreeDeleteOperation extends AbstractFeatureModelOperation implements GUIDefaults {
+public class FeatureTreeDeleteOperation extends MultiFeatureModelOperation implements GUIDefaults {
 
 	private IFeature feature;
 	private LinkedList<IFeature> featureList;
 	private LinkedList<IFeature> containedFeatureList;
-	private Deque<AbstractFeatureModelOperation> operations = new LinkedList<AbstractFeatureModelOperation>();
 
 	public FeatureTreeDeleteOperation(IFeatureModel featureModel, IFeature parent) {
 		super(featureModel, DELETE_INCLUDING_SUBFEATURES);
@@ -66,8 +56,7 @@ public class FeatureTreeDeleteOperation extends AbstractFeatureModelOperation im
 	}
 
 	@Override
-	public IStatus execute(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
-
+	protected void createSingleOperations() {
 		featureList = new LinkedList<IFeature>();
 		containedFeatureList = new LinkedList<IFeature>();
 		LinkedList<IFeature> list = new LinkedList<IFeature>();
@@ -77,7 +66,6 @@ public class FeatureTreeDeleteOperation extends AbstractFeatureModelOperation im
 		if (containedFeatureList.isEmpty()) {
 			for (IFeature feat : featureList) {
 				AbstractFeatureModelOperation op = new DeleteFeatureOperation(featureModel, feat);
-				executeOperation(op);
 				operations.add(op);
 			}
 		} else {
@@ -89,38 +77,6 @@ public class FeatureTreeDeleteOperation extends AbstractFeatureModelOperation im
 
 			dialog.open();
 		}
-		return Status.OK_STATUS;
-	}
-
-	private void executeOperation(AbstractFeatureModelOperation op) {
-		try {
-			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
-		} catch (ExecutionException e) {
-			FMUIPlugin.getDefault().logError(e);
-
-		}
-	}
-
-	@Override
-	protected FeatureModelEvent operation() {
-		for (Iterator<AbstractFeatureModelOperation> it = operations.iterator(); it.hasNext();) {
-			AbstractFeatureModelOperation operation = it.next();
-			if (operation.canRedo()) {
-				operation.redo();
-			}
-		}
-		return null;
-	}
-
-	@Override
-	protected FeatureModelEvent inverseOperation() {
-		for (Iterator<AbstractFeatureModelOperation> it = operations.descendingIterator(); it.hasNext();) {
-			AbstractFeatureModelOperation operation = it.next();
-			if (operation.canUndo()) {
-				operation.undo();
-			}
-		}
-		return null;
 	}
 
 	/**
@@ -140,4 +96,5 @@ public class FeatureTreeDeleteOperation extends AbstractFeatureModelOperation im
 			featureList.add(feat);
 		}
 	}
+
 }

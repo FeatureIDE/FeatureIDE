@@ -63,12 +63,13 @@ import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
 /**
  * @author Marcus Pinnecke
  */
-public abstract class FeatureUtils {
+public final class FeatureUtils {
+	
+	private FeatureUtils() {}
 
 	public static final ConcreteFeatureFilter CONCRETE_FEATURE_FILTER = new ConcreteFeatureFilter();
 
 	public static final IFunction<IFeature, String> GET_FEATURE_NAME = new IFunction<IFeature, String>() {
-
 		@Override
 		public String invoke(IFeature t) {
 			return t.getName();

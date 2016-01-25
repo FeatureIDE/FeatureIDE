@@ -44,8 +44,8 @@ import org.eclipse.ui.ide.ResourceUtil;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.ViewPart;
 
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
-import de.ovgu.featureide.fm.core.base.event.IFeatureModelListener;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -151,10 +151,11 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 	/**
 	 * Listener that refreshes the view every time the model has been edited.
 	 */
-	private IFeatureModelListener modelListener = new IFeatureModelListener() {
-		public void propertyChange(FeatureModelEvent evt) {
-			if (!FeatureModelEvent.MODEL_LAYOUT_CHANGED.equals(evt.getPropertyName()))
+	private IEventListener modelListener = new IEventListener() {
+		public void propertyChange(FeatureIDEEvent evt) {
+			if (!FeatureIDEEvent.MODEL_LAYOUT_CHANGED.equals(evt.getPropertyName())){
 				refresh(false);
+			}
 		}
 
 	};

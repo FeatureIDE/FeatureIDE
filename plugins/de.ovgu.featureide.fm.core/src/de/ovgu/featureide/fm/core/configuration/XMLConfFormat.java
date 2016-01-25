@@ -20,26 +20,42 @@
  */
 package de.ovgu.featureide.fm.core.configuration;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.util.List;
 
+import org.w3c.dom.Document;
+
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
+import de.ovgu.featureide.fm.core.io.Problem;
+import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import de.ovgu.featureide.fm.core.io.xml.AXMLFormat;
+import de.ovgu.featureide.fm.core.localization.StringTable;
+
 /**
- * Abstract class for reading and writing a configuration in a certain format.
+ * Extended configuration format for FeatureIDE projects in XML structure.
  * 
  * @author Sebastian Krieter
  */
-public abstract class ConfigurationFormat {
-	protected static final String NEWLINE = System.getProperty("line.separator", "\n");
+public class XMLConfFormat extends AXMLFormat<Configuration> {
+	public static final String EXTENSION = StringTable.CONF;
 
-	public static ConfigurationFormat getFormatByExtension(String fileExtension) {
-		if (FeatureIDEFormat.EXTENSION.equals(fileExtension)) {
-			return new FeatureIDEFormat();
-		} else {
-			return new DefaultFormat();
-		}
+	@Override
+	public IPersistentFormat<Configuration> getInstance() {
+		return null;
 	}
 
-	public abstract List<ConfigurationReader.Warning> read(BufferedReader reader, Configuration configuration) throws IOException;
-	public abstract String write(Configuration configuration);
+	@Override
+	public String getFactoryID() {
+		return null;
+	}
+
+	@Override
+	protected void readDocument(Document doc, List<Problem> warnings) throws UnsupportedModelException {
+
+	}
+
+	@Override
+	protected void writeDocument(Document doc) {
+
+	}
+
 }

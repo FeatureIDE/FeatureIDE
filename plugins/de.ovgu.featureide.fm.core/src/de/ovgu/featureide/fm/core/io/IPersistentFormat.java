@@ -34,9 +34,9 @@ public interface IPersistentFormat<T> {
 	String write(T object);
 
 	String getSuffix();
-	
+
 	IPersistentFormat<T> getInstance();
-	
+
 	String getFactoryID();
 
 }

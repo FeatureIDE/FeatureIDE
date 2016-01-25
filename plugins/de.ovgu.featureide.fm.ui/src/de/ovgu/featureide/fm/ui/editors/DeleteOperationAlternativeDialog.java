@@ -366,7 +366,7 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 
 		for (int i = 0; i < alternativefeatureTable.getSelectionCount(); i++) {
 			toBeDeleted = (IFeature) (alternativefeatureTable.getSelection()[i]).getData();
-			parent.executeOperation(new DeleteFeatureOperation(featureModel, toBeDeleted, alternative));
+			parent.addOperation(new DeleteFeatureOperation(featureModel, toBeDeleted, alternative));
 			delFeatures.add(toBeDeleted);
 		}
 

@@ -171,7 +171,7 @@ public class FeatureModelAnalyzer {
 	}
 
 	public boolean isValid() throws TimeoutException {
-		Node root = NodeCreator.createNodes(fm.clone(null));
+		Node root = NodeCreator.createNodes(fm);
 		return new SatSolver(root, 1000).isSatisfiable();
 	}
 

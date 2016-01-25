@@ -30,7 +30,7 @@ import org.eclipse.core.runtime.Status;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 
 /**
  * This operation should be used as superclass for all operations on the feature model.
@@ -43,13 +43,26 @@ public abstract class AbstractFeatureModelOperation extends AbstractOperation {
 
 	protected final IFeatureModel featureModel;
 
-	private String eventId = FeatureModelEvent.MODEL_DATA_CHANGED;
 	protected Object editor = null;
+
+	protected boolean executed = false;
+
+	private String eventId = FeatureIDEEvent.MODEL_DATA_CHANGED;
 
 	public AbstractFeatureModelOperation(IFeatureModel featureModel, String label) {
 		super(label);
 		this.featureModel = featureModel;
 		addContext((IUndoContext) featureModel.getUndoContext());
+	}
+
+	@Override
+	public boolean canRedo() {
+		return !executed;
+	}
+
+	@Override
+	public boolean canUndo() {
+		return executed;
 	}
 
 	@Override
@@ -60,7 +73,7 @@ public abstract class AbstractFeatureModelOperation extends AbstractOperation {
 	@Override
 	public IStatus redo(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
 		try {
-			fireEvent(operation());
+			redo();
 		} catch (Exception e) {
 			FMCorePlugin.getDefault().logError(e);
 			throw new ExecutionException(e.getMessage());
@@ -68,16 +81,17 @@ public abstract class AbstractFeatureModelOperation extends AbstractOperation {
 		return Status.OK_STATUS;
 	}
 
-	protected abstract FeatureModelEvent operation();
+	protected abstract FeatureIDEEvent operation();
 
 	public void redo() {
 		fireEvent(operation());
+		executed = true;
 	}
 
 	@Override
 	public IStatus undo(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
 		try {
-			fireEvent(inverseOperation());
+			undo();
 		} catch (Exception e) {
 			FMCorePlugin.getDefault().logError(e);
 			throw new ExecutionException(e.getMessage());
@@ -85,15 +99,16 @@ public abstract class AbstractFeatureModelOperation extends AbstractOperation {
 		return Status.OK_STATUS;
 	}
 
-	protected abstract FeatureModelEvent inverseOperation();
+	protected abstract FeatureIDEEvent inverseOperation();
 
 	public void undo() {
-		inverseOperation();
+		fireEvent(inverseOperation());
+		executed = false;
 	}
 
-	final protected void fireEvent(FeatureModelEvent event) {
+	final protected void fireEvent(FeatureIDEEvent event) {
 		if (event == null) {
-			event = new FeatureModelEvent(featureModel, editor, false, eventId, null, null);
+			event = new FeatureIDEEvent(featureModel, editor, false, eventId, null, null);
 		}
 		featureModel.fireEvent(event);
 	}

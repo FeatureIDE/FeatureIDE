@@ -26,7 +26,7 @@ import org.eclipse.draw2d.geometry.Point;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 
 /**
@@ -47,7 +47,7 @@ public class MoveFeatureOperation extends AbstractFeatureModelOperation {
 		this.newPos = newPos;
 		this.oldPos = oldPos;
 		setEditor(editor);
-		setEventId(FeatureModelEvent.STRUCTURE_CHANGED);
+		setEventId(FeatureIDEEvent.STRUCTURE_CHANGED);
 	}
 
 	public void newInnerOrder(Point newPos) {
@@ -55,10 +55,10 @@ public class MoveFeatureOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	protected FeatureModelEvent operation() {
+	protected FeatureIDEEvent operation() {
 		if (!data.getFeature().getGraphicalModel().getLayout().hasFeaturesAutoLayout()) {
 			newInnerOrder(newPos);
-			setEventId(FeatureModelEvent.MODEL_DATA_LOADED);
+			setEventId(FeatureIDEEvent.MODEL_DATA_LOADED);
 		} else {
 			data.getOldParent().getObject().getStructure().removeChild(data.getFeature().getObject().getStructure());
 			data.getNewParent().getObject().getStructure().addChildAtPosition(data.getNewIndex(), data.getFeature().getObject().getStructure());
@@ -67,10 +67,10 @@ public class MoveFeatureOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	protected FeatureModelEvent inverseOperation() {
+	protected FeatureIDEEvent inverseOperation() {
 		if (!data.getFeature().getGraphicalModel().getLayout().hasFeaturesAutoLayout()) {
 			newInnerOrder(oldPos);
-			setEventId(FeatureModelEvent.MODEL_DATA_LOADED);
+			setEventId(FeatureIDEEvent.MODEL_DATA_LOADED);
 		} else {
 			final IFeatureStructure structure2 = data.getFeature().getObject().getStructure();
 			data.getNewParent().getObject().getStructure().removeChild(structure2);

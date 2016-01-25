@@ -35,7 +35,7 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.impl.Feature;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
@@ -71,48 +71,46 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 			newCompound.getStructure().setAND(true);
 			newCompound.getStructure().setMultiple(parent.isMultiple());
 		}
-		
+
 		fireEvent(operation());
-		
+
 		return Status.OK_STATUS;
 	}
 
 	@Override
-	protected FeatureModelEvent operation() {
-		
-			IFeatureStructure parent = selectedFeature.getStructure().getParent();
-			if (parent != null) {
-				LinkedList<IFeature> newChildren = new LinkedList<IFeature>();
-				for (IFeatureStructure featureStructure : parent.getChildren()) {
-					if (selectedFeature.equals(featureStructure.getFeature())) {
-						if (!newCompound.getStructure().hasChildren())
-							newChildren.add(newCompound);
-						featureStructure.setMandatory(false);
-						newCompound.getStructure().addChild(featureStructure);
-					} else {
-						newChildren.add(featureStructure.getFeature());
-					}
+	protected FeatureIDEEvent operation() {
+		IFeatureStructure parent = selectedFeature.getStructure().getParent();
+		if (parent != null) {
+			LinkedList<IFeature> newChildren = new LinkedList<IFeature>();
+			for (IFeatureStructure featureStructure : parent.getChildren()) {
+				if (selectedFeature.equals(featureStructure.getFeature())) {
+					if (!newCompound.getStructure().hasChildren())
+						newChildren.add(newCompound);
+					featureStructure.setMandatory(false);
+					newCompound.getStructure().addChild(featureStructure);
+				} else {
+					newChildren.add(featureStructure.getFeature());
 				}
-				parent.setChildren(Functional.toList(Functional.map(newChildren, FeatureUtils.FEATURE_TO_STRUCTURE)));
-				featureModel.addFeature(newCompound);
-			} else {
-				newCompound.getStructure().addChild(featureModel.getStructure().getRoot());
-				featureModel.addFeature(newCompound);
-				featureModel.getStructure().setRoot(newCompound.getStructure());
 			}
-			return new FeatureModelEvent(featureModel, FeatureModelEvent.FEATURE_ADD, null, newCompound);
+			parent.setChildren(Functional.toList(Functional.map(newChildren, FeatureUtils.FEATURE_TO_STRUCTURE)));
+			featureModel.addFeature(newCompound);
+		} else {
+			newCompound.getStructure().addChild(featureModel.getStructure().getRoot());
+			featureModel.addFeature(newCompound);
+			featureModel.getStructure().setRoot(newCompound.getStructure());
+		}
+		return new FeatureIDEEvent(featureModel, FeatureIDEEvent.FEATURE_ADD, null, newCompound);
 	}
 
 	@Override
-	protected FeatureModelEvent inverseOperation() {
-		
-			IFeatureStructure parent = selectedFeature.getStructure().getParent();
-			if (parent != null) {
-				featureModel.getStructure().replaceRoot(featureModel.getStructure().getRoot().removeLastChild());
-			} else {
-				featureModel.deleteFeature(featureModel.getFeature(newCompound.getName()));
-			}
-			return new FeatureModelEvent(featureModel, FeatureModelEvent.FEATURE_DELETE, newCompound, null);
+	protected FeatureIDEEvent inverseOperation() {
+		IFeatureStructure parent = selectedFeature.getStructure().getParent();
+		if (parent != null) {
+			featureModel.getStructure().replaceRoot(featureModel.getStructure().getRoot().removeLastChild());
+		} else {
+			featureModel.deleteFeature(featureModel.getFeature(newCompound.getName()));
+		}
+		return new FeatureIDEEvent(featureModel, FeatureIDEEvent.FEATURE_DELETE, newCompound, null);
 	}
 
 }

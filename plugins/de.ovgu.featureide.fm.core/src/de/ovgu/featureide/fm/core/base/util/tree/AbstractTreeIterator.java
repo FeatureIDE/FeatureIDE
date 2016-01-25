@@ -26,7 +26,7 @@ import java.util.ListIterator;
 import java.util.NoSuchElementException;
 
 /**
- * TODO description
+ * Iterates through a tree.
  * 
  * @author skrieter
  */

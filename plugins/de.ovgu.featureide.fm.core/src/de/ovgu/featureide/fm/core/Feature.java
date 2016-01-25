@@ -35,8 +35,8 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureProperty;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.IPropertyContainer;
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
-import de.ovgu.featureide.fm.core.base.event.IFeatureModelListener;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
@@ -1239,17 +1239,17 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	}
 
 	@Override
-	public void addListener(IFeatureModelListener listener) {
+	public void addListener(IEventListener listener) {
 		feature.addListener(listener);
 	}
 
 	@Override
-	public void fireEvent(FeatureModelEvent event) {
+	public void fireEvent(FeatureIDEEvent event) {
 		feature.fireEvent(event);
 	}
 
 	@Override
-	public void removeListener(IFeatureModelListener listener) {
+	public void removeListener(IEventListener listener) {
 		feature.removeListener(listener);
 	}
 

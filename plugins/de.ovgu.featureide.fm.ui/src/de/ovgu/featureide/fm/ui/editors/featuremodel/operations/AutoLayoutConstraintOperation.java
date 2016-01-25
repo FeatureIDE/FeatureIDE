@@ -27,7 +27,7 @@ import java.util.List;
 
 import org.eclipse.draw2d.geometry.Point;
 
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
@@ -55,7 +55,7 @@ public class AutoLayoutConstraintOperation extends AbstractGraphicalFeatureModel
 	}
 
 	@Override
-	protected FeatureModelEvent operation() {
+	protected FeatureIDEEvent operation() {
 		List<IGraphicalConstraint> constraintList = graphicalFeatureModel.getConstraints();
 		int minX = Integer.MAX_VALUE;
 		int maxX = 0;
@@ -92,7 +92,7 @@ public class AutoLayoutConstraintOperation extends AbstractGraphicalFeatureModel
 	}
 
 	@Override
-	protected FeatureModelEvent inverseOperation() {
+	protected FeatureIDEEvent inverseOperation() {
 		List<IGraphicalConstraint> constraintList = graphicalFeatureModel.getConstraints();
 		if (!constraintList.isEmpty() && (!(oldPos == null) && !oldPos.isEmpty())) {
 			FeatureUIHelper.setLocation(constraintList.get(0), oldPos.get(counter).get(0));

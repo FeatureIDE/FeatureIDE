@@ -20,12 +20,13 @@
  */
 package de.ovgu.featureide.ui.quickfix;
 
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -34,8 +35,9 @@ import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.ConfigurationWriter;
 import de.ovgu.featureide.fm.core.configuration.Selection;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
+import de.ovgu.featureide.fm.core.io.manager.FileWriter;
 import de.ovgu.featureide.fm.core.job.WorkMonitor;
 
 /**
@@ -73,8 +75,9 @@ public class QuickFixFalseOptionalFeatures extends QuickFixMissingConfigurations
 
 	private List<Configuration> createConfigurations(final Collection<String> unusedFeatures, final WorkMonitor monitor, boolean collect) {
 		final List<Configuration> confs = new LinkedList<Configuration>();
+		final FileWriter<Configuration> writer = new FileWriter<>(ConfigurationManager.getDefaultFormat());
+		Configuration configuration = new Configuration(featureModel, false);
 		try {
-			Configuration configuration = new Configuration(featureModel, false);
 			List<List<String>> solutions = configuration.coverFeatures(unusedFeatures, monitor, false);
 			for (List<String> solution : solutions) {
 				configuration = new Configuration(featureModel, false);
@@ -86,12 +89,13 @@ public class QuickFixFalseOptionalFeatures extends QuickFixMissingConfigurations
 				if (collect) {
 					confs.add(configuration);
 				} else {
-					final ConfigurationWriter writer = new ConfigurationWriter(configuration);
-					writer.saveToFile(getConfigurationFile(project.getConfigFolder()));
+					final IFile configurationFile = getConfigurationFile(project.getConfigFolder());
+					writer.setObject(configuration);
+					writer.setPath(Paths.get(configurationFile.getLocationURI()));
+					writer.save();
 				}
 			}
-
-		} catch (TimeoutException | CoreException e1) {
+		} catch (TimeoutException e1) {
 			e1.printStackTrace();
 		}
 

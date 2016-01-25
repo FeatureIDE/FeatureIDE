@@ -32,7 +32,7 @@ import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
+import de.ovgu.featureide.fm.core.configuration.DefaultFormat;
 
 /**
  * Calculates added or deleted products for a feature model edit.
@@ -109,9 +109,10 @@ public class ExampleCalculator {
 			exampleSolver = null;
 			return nextExample();
 		}
-		Configuration configuration = new Configuration(fm, false);
-		ConfigurationReader reader = new ConfigurationReader(configuration);
-		reader.readFromString(solution);
+		final Configuration configuration = new Configuration(fm, false);
+		final DefaultFormat format = new DefaultFormat();
+
+		format.read(configuration, solution);
 		lastSolution = solution;
 		return configuration;
 	}

@@ -28,7 +28,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.draw2d.geometry.Point;
 
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
@@ -60,7 +60,7 @@ public class LegendMoveOperation extends AbstractGraphicalFeatureModelOperation 
 	}
 
 	@Override
-	protected FeatureModelEvent operation() {
+	protected FeatureIDEEvent operation() {
 		FeatureUIHelper.getLegendFigure(graphicalFeatureModel).setLocation(newLocation);
 		final FeatureModelLayout layout = graphicalFeatureModel.getLayout();
 		layout.setLegendPos(newLocation.x, newLocation.y);
@@ -70,7 +70,7 @@ public class LegendMoveOperation extends AbstractGraphicalFeatureModelOperation 
 	}
 
 	@Override
-	protected FeatureModelEvent inverseOperation() {
+	protected FeatureIDEEvent inverseOperation() {
 		FeatureUIHelper.getLegendFigure(graphicalFeatureModel).setLocation(oldLocation);
 		final FeatureModelLayout layout = graphicalFeatureModel.getLayout();
 		layout.setLegendPos(oldLocation.x, oldLocation.y);

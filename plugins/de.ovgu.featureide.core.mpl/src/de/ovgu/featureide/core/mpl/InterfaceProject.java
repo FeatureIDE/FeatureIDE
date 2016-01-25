@@ -30,8 +30,8 @@ import de.ovgu.featureide.core.mpl.signature.ViewTag;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
-import de.ovgu.featureide.fm.core.base.event.IFeatureModelListener;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 
@@ -70,7 +70,7 @@ public class InterfaceProject {
 		this(projectReference, null);
 	}
 	
-	private class FeaturePropertyChangeListener implements IFeatureModelListener {
+	private class FeaturePropertyChangeListener implements IEventListener {
 		private final int id;
 		
 		public FeaturePropertyChangeListener(int id) {
@@ -78,7 +78,7 @@ public class InterfaceProject {
 		}
 		
 		@Override
-		public void propertyChange(FeatureModelEvent event) {
+		public void propertyChange(FeatureIDEEvent event) {
 			String prop = event.getPropertyName();
 			if (PropertyConstants.LOCATION_CHANGED.equals(prop)) {
 				

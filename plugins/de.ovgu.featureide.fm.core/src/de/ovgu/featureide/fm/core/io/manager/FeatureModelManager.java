@@ -20,7 +20,11 @@
  */
 package de.ovgu.featureide.fm.core.io.manager;
 
+import java.io.File;
+
 import javax.annotation.CheckForNull;
+
+import org.eclipse.core.resources.IResource;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
@@ -35,55 +39,55 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
  */
 public class FeatureModelManager extends AFileManager<IFeatureModel> {
 
-	public enum IOType {
-		XML_FIDE(0), VELVET(1), VELVET_IMPORT(2);
+	private static enum FormatType implements IFormatType<IFeatureModel> {
+		XML_FIDE("xml", XmlFeatureModelFormat.class),
+		VELVET("velvet", VelvetFeatureModelFormat.class),
+		FIDECONF("velvet", VelvetFeatureModelFormat.class);
 
-		private final int index;
+		private final String suffix;
+		private final Class<? extends IPersistentFormat<IFeatureModel>> format;
 
-		private IOType(int index) {
-			this.index = index;
+		private FormatType(String suffix, Class<? extends IPersistentFormat<IFeatureModel>> format) {
+			this.suffix = suffix;
+			this.format = format;
 		}
 
-		public int getIndex() {
-			return index;
+		@Override
+		public String getSuffix() {
+			return suffix;
 		}
+
+		@Override
+		public Class<? extends IPersistentFormat<IFeatureModel>> getFormat() {
+			return format;
+		}
+	}
+
+	public static FeatureModelManager getInstance(IResource modelFile) {
+		final String path = modelFile.getLocation().toString();
+		FeatureModelManager featureModelManager = FileManagerMap.<IFeatureModel, FeatureModelManager>getInstance(path);
+		if (featureModelManager == null) {
+			final IPersistentFormat<IFeatureModel> format = FeatureModelManager.getFormat(path);
+			IFeatureModel featureModel = FMFactoryManager.getFactory(format.getFactoryID()).createFeatureModel();
+			featureModelManager = FeatureModelManager.getInstance(featureModel, path, format);
+		}
+		return featureModelManager;
 	}
 
 	@CheckForNull
-	public static IOType getTypeByFileName(String fileName) {
-		if (fileName.endsWith(".xml")) {
-			return IOType.XML_FIDE;
-		} else if (fileName.endsWith(".velvet")) {
-			return IOType.VELVET;
-		}
-		return null;
+	public static IPersistentFormat<IFeatureModel> getFormat(String fileName) {
+		return AFileManager.<IFeatureModel>getFormat(fileName, FormatType.values());
 	}
 
-	public static IPersistentFormat<IFeatureModel> getFormat(IOType ioType) {
-		switch (ioType) {
-		case VELVET:
-			return new VelvetFeatureModelFormat();
-		case VELVET_IMPORT:
-			return new VelvetFeatureModelFormat();
-		case XML_FIDE:
-			return new XmlFeatureModelFormat();
-		default:
-			return null;
-		}
-	}
-
-	public static FeatureModelManager getInstance(String absolutePath, IOType ioType) {
-		return getInstance(absolutePath, getFormat(ioType));
-	}
-
-	public static FeatureModelManager getInstance(String absolutePath, IPersistentFormat<IFeatureModel> format) {
-		final FeatureModelManager instance = FileManagerMap.getInstance(absolutePath, format, FeatureModelManager.class);
-		instance.init();
+	public static FeatureModelManager getInstance(IFeatureModel model, String absolutePath, IPersistentFormat<IFeatureModel> format) {
+		final FeatureModelManager instance = FileManagerMap.getInstance(model, absolutePath, format, FeatureModelManager.class, IFeatureModel.class);
+		model.setSourceFile(new File(absolutePath));
+		instance.read();
 		return instance;
 	}
 
-	protected FeatureModelManager(String absolutePath, IPersistentFormat<IFeatureModel> modelHandler) {
-		super(absolutePath, modelHandler);
+	protected FeatureModelManager(IFeatureModel model, String absolutePath, IPersistentFormat<IFeatureModel> modelHandler) {
+		super(model, absolutePath, modelHandler);
 	}
 
 	@Override
@@ -91,11 +95,14 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> {
 		return oldObject.clone();
 	}
 
-	@Override
-	protected IFeatureModel createNewObject() {
-		final IFeatureModel model = FMFactoryManager.getFactory(getFormat().getFactoryID()).createFeatureModel();
-		model.setSourceFile(path.toFile());
-		return model;
+	private Object undoContext = null;
+
+	public Object getUndoContext() {
+		return undoContext;
+	}
+
+	public void setUndoContext(Object undoContext) {
+		this.undoContext = undoContext;
 	}
 
 }

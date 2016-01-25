@@ -53,8 +53,8 @@ import de.ovgu.featureide.core.mpl.job.statistics.PrintExtendedSignaturesJob;
 import de.ovgu.featureide.core.mpl.job.statistics.PrintStatisticsJob;
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
-import de.ovgu.featureide.fm.core.base.event.IFeatureModelListener;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.io.IOConstants;
 
 /** 
@@ -190,12 +190,12 @@ public class MPLPlugin extends AbstractCorePlugin {
 		final InterfaceProject interfaceProject = new InterfaceProject(project, curFeatureProject);
 		
 		projectMap.put(project.getName(), interfaceProject);
-		interfaceProject.getFeatureModel().addListener(new IFeatureModelListener() {
+		interfaceProject.getFeatureModel().addListener(new IEventListener() {
 			@Override
-			public void propertyChange(FeatureModelEvent evt) {
-				if (FeatureModelEvent.MODEL_DATA_CHANGED.equals(evt.getPropertyName())) {
+			public void propertyChange(FeatureIDEEvent evt) {
+				if (FeatureIDEEvent.MODEL_DATA_CHANGED.equals(evt.getPropertyName())) {
 //					interfaceProject.loadSignatures(true);
-				} else if (FeatureModelEvent.MODEL_LAYOUT_CHANGED.equals(evt.getPropertyName())) {
+				} else if (FeatureIDEEvent.MODEL_LAYOUT_CHANGED.equals(evt.getPropertyName())) {
 //					interfaceProject.loadSignatures(true);
 				}
 			}

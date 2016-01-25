@@ -26,7 +26,7 @@ import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 
 /**
@@ -51,15 +51,15 @@ public class CreateConstraintOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	protected FeatureModelEvent operation() {
+	protected FeatureIDEEvent operation() {
 		featureModel.addConstraint(constraint);
-		return new FeatureModelEvent(featureModel, FeatureModelEvent.CONSTRAINT_ADD, null, constraint);
+		return new FeatureIDEEvent(featureModel, FeatureIDEEvent.CONSTRAINT_ADD, null, constraint);
 	}
 
 	@Override
-	protected FeatureModelEvent inverseOperation() {
+	protected FeatureIDEEvent inverseOperation() {
 		featureModel.removeConstraint(constraint);
-		return new FeatureModelEvent(featureModel, FeatureModelEvent.CONSTRAINT_DELETE, constraint, null);
+		return new FeatureIDEEvent(featureModel, FeatureIDEEvent.CONSTRAINT_DELETE, constraint, null);
 	}
 
 }

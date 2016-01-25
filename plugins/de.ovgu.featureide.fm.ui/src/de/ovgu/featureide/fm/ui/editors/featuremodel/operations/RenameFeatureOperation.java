@@ -23,7 +23,7 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RENAME_FEATURE;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 
 /**
@@ -46,13 +46,13 @@ public class RenameFeatureOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	protected FeatureModelEvent operation() {
+	protected FeatureIDEEvent operation() {
 		featureModel.getRenamingsManager().renameFeature(oldName, newName);
 		return null;
 	}
 
 	@Override
-	protected FeatureModelEvent inverseOperation() {
+	protected FeatureIDEEvent inverseOperation() {
 		featureModel.getRenamingsManager().renameFeature(newName, oldName);
 		return null;
 	}

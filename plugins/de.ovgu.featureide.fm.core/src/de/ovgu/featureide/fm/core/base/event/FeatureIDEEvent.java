@@ -25,7 +25,7 @@ package de.ovgu.featureide.fm.core.base.event;
  * 
  * @author Sebastian Krieter
  */
-public class FeatureModelEvent {
+public class FeatureIDEEvent {
 
 	public static final String CONSTRAINT_MOVE = "CONSTRAINT_MOVE";
 	public static final String CONSTRAINT_MODIFY = "CONSTRAINT_MODIFY";
@@ -48,15 +48,15 @@ public class FeatureModelEvent {
 	private final Object oldValue;
 	private final Object newValue;
 
-	public FeatureModelEvent(Object source, String propertyName) {
+	public FeatureIDEEvent(Object source, String propertyName) {
 		this(source, null, false, propertyName, null, null);
 	}
 
-	public FeatureModelEvent(Object source, String propertyName, Object oldValue, Object newValue) {
+	public FeatureIDEEvent(Object source, String propertyName, Object oldValue, Object newValue) {
 		this(source, null, false, propertyName, oldValue, newValue);
 	}
 
-	public FeatureModelEvent(Object source, Object editor, boolean persistent, String propertyName, Object oldValue, Object newValue) {
+	public FeatureIDEEvent(Object source, Object editor, boolean persistent, String propertyName, Object oldValue, Object newValue) {
 		this.source = source;
 		this.editor = editor;
 		this.persistent = persistent;
