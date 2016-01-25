@@ -65,33 +65,31 @@ public abstract class AbstractImportHandler extends AFileHandler {
 	@Override
 	protected final void singleAction(IFile outputFile) {
 		try {
-			if (MessageDialog.openQuestion(new Shell(), "Warning!", "This will override the current model irrepealable! Proceed?")) {
-				final FileDialog fileDialog = new FileDialog(new Shell(), SWT.OPEN);
-				fileDialog.setOverwrite(false);
-				setFilter(fileDialog);
+			final FileDialog fileDialog = new FileDialog(new Shell(), SWT.OPEN);
+			fileDialog.setOverwrite(false);
+			setFilter(fileDialog);
 
-				File inputFile;
-				while (true) {
-					final String filepath = fileDialog.open();
-					if (filepath == null) {
-						return;
-					}
-					inputFile = new File(filepath);
-					if (inputFile.exists()) {
-						break;
-					}
-					MessageDialog.openInformation(new Shell(), FILE + NOT_FOUND, SPECIFIED_FILE_WASNT_FOUND);
+			File inputFile;
+			while (true) {
+				final String filepath = fileDialog.open();
+				if (filepath == null) {
+					return;
 				}
-
-				final IFeatureModel fm = createFeatureModel();
-				modelReader = setModelReader(fm);
-				modelReader.readFromFile(inputFile);
-
-				final FeatureModelWriterIFileWrapper fmWriter = new FeatureModelWriterIFileWrapper(new XmlFeatureModelWriter(fm));
-				fmWriter.writeToFile(outputFile);
-				outputFile.refreshLocal(IResource.DEPTH_ZERO, null);
-				openFileInEditor(outputFile);
+				inputFile = new File(filepath);
+				if (inputFile.exists()) {
+					break;
+				}
+				MessageDialog.openInformation(new Shell(), FILE + NOT_FOUND, SPECIFIED_FILE_WASNT_FOUND);
 			}
+
+			final IFeatureModel fm = createFeatureModel();
+			modelReader = setModelReader(fm);
+			modelReader.readFromFile(inputFile);
+
+			final FeatureModelWriterIFileWrapper fmWriter = new FeatureModelWriterIFileWrapper(new XmlFeatureModelWriter(fm));
+			fmWriter.writeToFile(outputFile);
+			outputFile.refreshLocal(IResource.DEPTH_ZERO, null);
+			openFileInEditor(outputFile);
 		} catch (FileNotFoundException | CoreException e) {
 			FMUIPlugin.getDefault().logError(e);
 		} catch (UnsupportedModelException e) {
