@@ -319,7 +319,7 @@ public class MungePreprocessor extends PPComposerExtensionClass {
 
 						ifelseCountStack.push(ifelseCountStack.pop() + 1);
 						expressionStack.push(ppExpression);
-						doThreeStepExpressionCheck(ppExpression, lineNumber, res);
+						checkExpressions(ppExpression, lineNumber, res);
 					}
 
 				} else if (singleElement.equals("end")) {
@@ -434,7 +434,7 @@ public class MungePreprocessor extends PPComposerExtensionClass {
 
 	@Override
 	public boolean hasFeatureFolder() {
-		return true;
+		return false;
 	}
 
 	@Override

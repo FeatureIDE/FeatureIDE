@@ -180,6 +180,7 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 			return;
 		}
 		currentRole = model.addRole(currentFeature.getName(), model.getAbsoluteClassName(currentFile), currentFile);
+		//create directives?? class added ppmodelbuilder
 		classFragmentStack.clear();
 		classFragmentStack.push(currentRole.getClassFragment());
 	}

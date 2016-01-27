@@ -27,8 +27,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.AbstractCollection;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Scanner;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -50,6 +53,7 @@ import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
 
+
 /**
  * Propagates error markers for composed files to sources files.
  * 
@@ -64,13 +68,15 @@ public abstract class ErrorPropagation {
 	 * A list containing composed files. These files will be checked for
 	 * propagation.
 	 */
-	private final LinkedList<IFile> composedFiles = new LinkedList<IFile>();
+	private final Set<IFile> composedFiles = Collections.newSetFromMap(new ConcurrentHashMap<IFile, Boolean>());
 
 	/**
 	 * The main background job calling the corresponding error propagation class
 	 * for each file.
 	 */
 	public final Job job;
+
+	public boolean force = false; //FOP Composed Lines
 
 	/**
 	 * Propagates error markers for composed files to sources files.<br>
@@ -97,6 +103,7 @@ public abstract class ErrorPropagation {
 			@Override
 			public IStatus run(IProgressMonitor monitor) {
 				propagateMarkers(monitor);
+				force = false;
 				return Status.OK_STATUS;
 			}
 		};
@@ -104,20 +111,16 @@ public abstract class ErrorPropagation {
 	}
 
 	private void addComposedFile(IFile file) {
-		synchronized (composedFiles) {
-			if (!composedFiles.contains(file)) {
-				composedFiles.add(file);
-			}
-		}
+		composedFiles.add(file);
 	}
 
 	private IFile removeComposedFile() {
-		synchronized (composedFiles) {
-			if (composedFiles.isEmpty()) {
-				return null;
-			}
-			return composedFiles.remove();
+		if (composedFiles.isEmpty()) {
+			return null;
 		}
+		IFile file = composedFiles.iterator().next();
+		composedFiles.remove(file);
+		return file;
 	}
 
 	/**
@@ -128,6 +131,9 @@ public abstract class ErrorPropagation {
 	 *            The composed file
 	 */
 	public void addFile(IFile sourceFile) {
+		if (composedFiles.contains(sourceFile)) {
+			return;
+		}
 
 		final String fileExtension = sourceFile.getFileExtension();
 		if (fileExtension == null) {
@@ -156,17 +162,15 @@ public abstract class ErrorPropagation {
 		}
 		monitor.beginTask(PROPAGATE_MARKERS_FOR, IProgressMonitor.UNKNOWN);
 
-		IFile file = removeComposedFile();
-		while (file != null) {
+		IFile file;
+		while ((file = removeComposedFile()) != null) {
 			if (monitor.isCanceled()) {
+				composedFiles.clear();
 				break;
 			}
 			monitor.subTask(file.getName());
-
 			propagateMarkers(file);
 			monitor.worked(1);
-
-			file = removeComposedFile();
 		}
 		monitor.done();
 	}
@@ -181,7 +185,7 @@ public abstract class ErrorPropagation {
 		}
 		try {
 			IMarker[] markers = file.findMarkers(null, true, IResource.DEPTH_INFINITE);
-			if (markers.length != 0) {
+			if (force  || markers.length != 0) {
 				LinkedList<IMarker> marker = new LinkedList<IMarker>();
 				for (IMarker m : markers) {
 					String message = m.getAttribute(IMarker.MESSAGE, null);
@@ -191,7 +195,7 @@ public abstract class ErrorPropagation {
 						marker.add(m);
 					}
 				}
-				if (!marker.isEmpty()) {
+				if (force || !marker.isEmpty()) {
 					propagateMarkers(marker, file);
 				}
 			}

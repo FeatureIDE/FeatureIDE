@@ -46,7 +46,9 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IEditorInput;
@@ -57,11 +59,15 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
 import org.sat4j.specs.TimeoutException;
 
+import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.FunctionalInterfaces;
 import de.ovgu.featureide.fm.core.FunctionalInterfaces.IBinaryFunction;
 import de.ovgu.featureide.fm.core.FunctionalInterfaces.IConsumer;
 import de.ovgu.featureide.fm.core.FunctionalInterfaces.IFunction;
+import de.ovgu.featureide.fm.core.color.ColorPalette;
+import de.ovgu.featureide.fm.core.color.FeatureColor;
+import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.configuration.IConfiguration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
@@ -69,6 +75,7 @@ import de.ovgu.featureide.fm.core.configuration.TreeElement;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.IStoppableJob;
 import de.ovgu.featureide.fm.core.job.LongRunningJob;
+import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -88,7 +95,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	protected static final Font treeItemStandardFont = new Font(null, ARIAL, 8, SWT.NORMAL);
 	protected static final Font treeItemSpecialFont = new Font(null, ARIAL, 8, SWT.BOLD);
 
-//	private final HashSet<SelectableFeature> invalidFeatures = new HashSet<SelectableFeature>();
+	//	private final HashSet<SelectableFeature> invalidFeatures = new HashSet<SelectableFeature>();
 	protected final HashSet<SelectableFeature> updateFeatures = new HashSet<SelectableFeature>();
 
 	protected IConfigurationEditor configurationEditor = null;
@@ -296,10 +303,10 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 						sb.append(number);
 					}
 					sb.append(POSSIBLE_CONFIGURATIONS);
-					
-//					if (number == 0 && !configurationEditor.isAutoSelectFeatures()) {
-//						sb.append(" - Autoselect not possible!");
-//					}
+
+					//					if (number == 0 && !configurationEditor.isAutoSelectFeatures()) {
+					//						sb.append(" - Autoselect not possible!");
+					//					}
 				}
 
 				display.asyncExec(new Runnable() {
@@ -402,7 +409,25 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		if (errorMessage(tree)) {
 			final IConfiguration configuration = configurationEditor.getConfiguration();
 			tree.removeAll();
+			tree.addListener(SWT.PaintItem, new Listener() {
+
+				@Override
+				public void handleEvent(Event event) {
+					if (event.item instanceof TreeItem) {
+						TreeItem item = (TreeItem) event.item;
+						if (item.getData() instanceof SelectableFeature) {
+							SelectableFeature selectableFeature = (SelectableFeature) item.getData();
+							Feature feature = selectableFeature.getFeature();
+							FeatureColor color = FeatureColorManager.getColor(feature);
+							if (color != FeatureColor.NO_COLOR) {
+								item.setBackground(new Color(null, ColorPalette.getRGB(color.getValue(), 0.5f)));
+							}
+						}
+					}
+				}
+			});
 			final TreeItem root = new TreeItem(tree, 0);
+
 			root.setText(configuration.getRoot().getName());
 			root.setData(configuration.getRoot());
 			itemMap.put(configuration.getRoot(), root);
@@ -498,8 +523,9 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 		}
 		final TreeItem topItem = tree.getTopItem();
 		SelectableFeature feature = (SelectableFeature) (topItem.getData());
-		final LongRunningJob<List<String>> job = LongRunningWrapper.createJob("",
-				configurationEditor.getConfiguration().getPropagator().update(redundantManual, feature.getFeature().getName()));
+		final LongRunningMethod<List<String>> update = configurationEditor.getConfiguration().getPropagator()
+				.update(redundantManual, feature.getFeature().getName());
+		final LongRunningJob<List<String>> job = LongRunningWrapper.createJob("", update);
 		job.setIntermediateFunction(new IConsumer<Object>() {
 			@Override
 			public void invoke(Object t) {
@@ -538,32 +564,33 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 
 		final IStoppableJob updateJob = computeFeatures(redundantManual, currentDisplay);
 
-		updateJob.addJobFinishedListener(new JobFinishListener() {
-
-			@Override
-			public void jobFinished(IJob finishedJob, boolean success) {
-				if (success) {
-					updateInfoLabel(currentDisplay);
-					configurationEditor.getConfigJobManager().startJob(computeColoring(currentDisplay), true);
+		if (updateJob != null) {
+			updateJob.addJobFinishedListener(new JobFinishListener() {
+				@Override
+				public void jobFinished(IJob finishedJob, boolean success) {
+					if (success) {
+						updateInfoLabel(currentDisplay);
+						configurationEditor.getConfigJobManager().startJob(computeColoring(currentDisplay), true);
+					}
 				}
-			}
-		});
+			});
 
-		updateFeatures.clear();
-		walkTree(new IBinaryFunction<TreeItem, SelectableFeature, Void>() {
-			@Override
-			public Void invoke(TreeItem item, SelectableFeature feature) {
-				//				lockItem(item);
-				updateFeatures.add(feature);
-				return null;
-			}
-		}, new IFunction<Void, Void>() {
-			@Override
-			public Void invoke(Void t) {
-				configurationEditor.getConfigJobManager().startJob(updateJob, true);
-				return null;
-			}
-		});
+			updateFeatures.clear();
+			walkTree(new IBinaryFunction<TreeItem, SelectableFeature, Void>() {
+				@Override
+				public Void invoke(TreeItem item, SelectableFeature feature) {
+					//				lockItem(item);
+					updateFeatures.add(feature);
+					return null;
+				}
+			}, new IFunction<Void, Void>() {
+				@Override
+				public Void invoke(Void t) {
+					configurationEditor.getConfigJobManager().startJob(updateJob, true);
+					return null;
+				}
+			});
+		}
 	}
 
 	protected final void walkTree(final FunctionalInterfaces.IBinaryFunction<TreeItem, SelectableFeature, Void> perNodeFunction,

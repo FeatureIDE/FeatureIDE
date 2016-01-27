@@ -984,7 +984,7 @@
 	<extension
 			point="org.eclipse.jdt.ui.javaCompletionProposalComputer"
 			id="ContextViewCompletion"
-			name="ContextViewCompletion">
+			name="Context-View Completion">
 		<javaCompletionProposalComputer
 				activate="false"
 				categoryID="org.eclipse.jdt.ui.ContextViewCompletion"
@@ -995,6 +995,22 @@
 		</javaCompletionProposalComputer>
 		<proposalCategory
 				id="ContextViewCompletion"
+				name="tes"
+				icon="icons/featureide.gif"/>
+	</extension>
+	<extension
+			point="org.eclipse.jdt.ui.javaCompletionProposalComputer"
+			id="FeatureCompletion"
+			name="Feature Completion">
+		<javaCompletionProposalComputer
+				activate="false"
+				categoryID="org.eclipse.jdt.ui.ContextViewCompletion"
+				categoryId="de.ovgu.featureide.ui.AnnoCompletion"
+				class="de.ovgu.featureide.ui.editors.AnnoCompletion">
+			<partition type="__java_singleline_comment"/>
+		</javaCompletionProposalComputer>
+		<proposalCategory
+				id="FeatureCompletion"
 				name="tes"
 				icon="icons/featureide.gif"/>
 	</extension>
@@ -1137,6 +1153,16 @@
 					</reference>
 				</visibleWhen>
 			</command>
+   <dynamic
+         class="de.ovgu.featureide.ui.actions.DynamicProfileMenu"
+         id="de.ovgu.featureide.ui.ProfileSchemeMenu">
+      <visibleWhen
+            checkEnabled="false">
+         <reference
+               definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
+         </reference>
+      </visibleWhen>
+   </dynamic>
 		</menuContribution>
 
 		<menuContribution
@@ -1179,11 +1205,11 @@
 				allPopups="false"
 				locationURI="popup:#CompilationUnitEditorContext?after=additions">
 			<command
-					commandId="de.ovgu.featureide.ui.commands.enableHighlighting"
-					icon="icons/FeatureIconSmall.ico"
-					id="de.ovgu.featureide.fm.ui.actions.enableHighlighting"
-					label="Enable Editor Highlighting"
-					style="toggle">
+         commandId="de.ovgu.featureide.ui.commands.enableHighlighting"
+         icon="icons/FeatureColorIcon.gif"
+         id="de.ovgu.featureide.fm.ui.actions.enableHighlighting"
+         label="Enable Editor Highlighting"
+         style="toggle">
 			</command>
 		</menuContribution>
 	</extension>
@@ -1238,6 +1264,10 @@
 				id="de.ovgu.featureide.ui.mpl.commands.javadoc.statistic"
 				name="Create documentation statistics">
 		</command>
+  <command
+        id="de.ovgu.featureide.fm.ui.colorscheme"
+        name="Colorscheme">
+  </command>
 	</extension>
 	<extension
 			point="org.eclipse.ui.handlers">
@@ -1372,4 +1402,41 @@
 				type="org.eclipse.core.resources.IFolder">
 		</propertyTester>
 	</extension>
+ <extension
+       point="org.eclipse.ui.navigator.viewer">
+    <viewerContentBinding
+          viewerId="org.eclipse.ui.navigator.ProjectExplorer">
+       <includes>
+          <contentExtension
+                pattern="de.ovgu.featureide.ui.contentID">
+          </contentExtension>
+       </includes>
+    </viewerContentBinding>
+ </extension>
+ <extension
+       point="org.eclipse.ui.navigator.navigatorContent">
+    <navigatorContent
+          contentProvider="de.ovgu.featureide.ui.projectExplorer.NullContentProvider"
+          icon="icons/FeatureIconSmall.ico"
+          id="de.ovgu.featureide.ui.contentID"
+          labelProvider="de.ovgu.featureide.ui.projectExplorer.ProjectExplorerLabelProvider"
+          name="FeatureIDEProjectExplorer"
+          priority="highest">
+       <triggerPoints>
+          <or>
+             <instanceof
+                   value="org.eclipse.core.resources.IFile">
+             </instanceof>
+             <instanceof
+                   value="org.eclipse.core.resources.IFolder">
+             </instanceof>
+             <instanceof
+                   value="java.lang.Object">
+             </instanceof>
+          </or>
+       </triggerPoints>
+    </navigatorContent>
+ </extension>
+	
+	
 </plugin>

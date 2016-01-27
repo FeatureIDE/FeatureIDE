@@ -120,10 +120,14 @@ public class MatrixFeatureGraph extends AFeatureGraph {
 	}
 
 	@Override
-	public int countNeighbors(String from, boolean selected, boolean subtractReal) {
-		final int fromIndex = featureMap.get(from);
+	public int countNeighbors(String from, boolean selected, boolean strongConnectionsOnly) {
+		Integer integer = featureMap.get(from);
+		if (integer == null) {
+			return -1;
+		}
+		final int fromIndex = integer;
 
-		final byte countEdge = selected ? (subtractReal ? (EDGE_10 | EDGE_11) : MASK_0_CLEAR) : (subtractReal ? (EDGE_00 | EDGE_01) : MASK_1_CLEAR);
+		final byte countEdge = selected ? (strongConnectionsOnly ? (EDGE_10 | EDGE_11) : MASK_0_CLEAR) : (strongConnectionsOnly ? (EDGE_00 | EDGE_01) : MASK_1_CLEAR);
 
 		int count = 0;
 		for (int i = (fromIndex * size), end = i + size; i < end; i++) {

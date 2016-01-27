@@ -377,7 +377,7 @@ public class CPPComposer extends PPComposerExtensionClass {
 			if (negative)
 				ppExpression = new Not(ppExpression.clone());
 
-			doThreeStepExpressionCheck(ppExpression, lineNumber, res);
+			checkExpressions(ppExpression, lineNumber, res);
 
 		}
 	}

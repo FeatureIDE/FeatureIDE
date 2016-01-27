@@ -82,6 +82,14 @@ public class ConfigurationFG implements IConfiguration {
 
 		this.root = initRoot();
 
+		for (String featureName : featureGraph.getCoreFeatures()) {
+			setAutomatic(featureName, Selection.SELECTED);
+		}
+
+		for (String featureName : featureGraph.getDeadFeatures()) {
+			setAutomatic(featureName, Selection.UNSELECTED);
+		}
+
 		if ((options & PARAM_LAZY) != 0) {
 			this.propagate = (options & PARAM_PROPAGATE) != 0;
 		} else {
@@ -297,7 +305,6 @@ public class ConfigurationFG implements IConfiguration {
 		final int featureIndex = featureGraph.getFeatureIndex(feature.getName());
 		if (featureIndex >= 0) {
 			variableConfiguration.setVariable(featureIndex, selection.getValue(), true);
-			update(false, null);
 		}
 	}
 
