@@ -95,14 +95,4 @@ public class FeatureModelManager extends AFileManager<IFeatureModel> {
 		return oldObject.clone();
 	}
 
-	private Object undoContext = null;
-
-	public Object getUndoContext() {
-		return undoContext;
-	}
-
-	public void setUndoContext(Object undoContext) {
-		this.undoContext = undoContext;
-	}
-
 }

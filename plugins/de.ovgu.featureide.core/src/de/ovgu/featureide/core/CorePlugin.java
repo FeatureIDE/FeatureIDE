@@ -614,10 +614,10 @@ public class CorePlugin extends AbstractCorePlugin {
 	 */
 	public LinkedList<String> getConfigurationExtensions() {
 		LinkedList<String> extensions = new LinkedList<String>();
-		extensions.add(CONF);
 		extensions.add(CONFIG);
 		extensions.add(EQUATION);
 		extensions.add(EXPRESSION);
+		extensions.add(CONF);
 		return extensions;
 	}
 

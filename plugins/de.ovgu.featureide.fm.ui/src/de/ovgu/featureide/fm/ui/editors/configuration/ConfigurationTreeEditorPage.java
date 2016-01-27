@@ -153,7 +153,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 	protected int curGroup = 0;
 	protected int curSearchIndex = 0;
 	protected int maxGroup = 0;
-	protected boolean useGroups = true;
+	protected boolean useGroups = false;
 	protected boolean useRecommendation = false;
 
 	protected Tree tree;

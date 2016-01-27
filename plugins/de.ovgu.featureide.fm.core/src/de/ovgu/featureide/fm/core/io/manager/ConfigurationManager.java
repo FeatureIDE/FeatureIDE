@@ -36,7 +36,7 @@ import de.ovgu.featureide.fm.core.localization.StringTable;
 public class ConfigurationManager extends AFileManager<Configuration> {
 
 	public static enum FormatType implements IFormatType<Configuration> {
-		XML_FIDE(StringTable.CONF, null), CONFIG(StringTable.CONFIG, DefaultFormat.class), FIDECONF(StringTable.FIDECONF, FeatureIDEFormat.class);
+		XML_FIDE(StringTable.CONF, DefaultFormat.class), CONFIG(StringTable.CONFIG, DefaultFormat.class), FIDECONF(StringTable.FIDECONF, FeatureIDEFormat.class);
 
 		private final String suffix;
 		private final Class<? extends IPersistentFormat<Configuration>> format;

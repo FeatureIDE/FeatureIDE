@@ -45,8 +45,6 @@ public class AsyncTree extends Thread {
 		private final TreeItem parent;
 		private final TreeElement[] children;
 
-		private final boolean expand = false;
-
 		public Builder(TreeItem parent, TreeElement[] children) {
 			inc();
 			this.parent = parent;
@@ -81,13 +79,11 @@ public class AsyncTree extends Thread {
 					}
 				}
 			}
-			if (expand) {
-				try {
-					parent.setExpanded(true);
-				} catch (Exception e) {
-					AsyncTree.this.interrupt();
-					return;
-				}
+			try {
+				parent.setExpanded(true);
+			} catch (Exception e) {
+				AsyncTree.this.interrupt();
+				return;
 			}
 			dec();
 		}
