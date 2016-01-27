@@ -68,6 +68,7 @@ import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagatorJobWrappe
 import de.ovgu.featureide.fm.core.io.Problem;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.FileManagerMap;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.WorkMonitor;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
@@ -225,7 +226,14 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		
 		final Configuration c = new Configuration(featureModelManager.getObject(), Configuration.PARAM_LAZY | Configuration.PARAM_IGNOREABSTRACT | Configuration.PARAM_PROPAGATE);
 
-		configurationManager = ConfigurationManager.getInstance(c, file.getLocation().toOSString());
+		configurationManager = FileManagerMap.<Configuration, ConfigurationManager>getInstance(file.getLocation().toOSString());
+		if (configurationManager != null) {
+			configurationManager.setConfiguration(c);
+			configurationManager.read();
+		} else {
+			configurationManager = ConfigurationManager.getInstance(c, file.getLocation().toOSString());
+		}
+		
 		final List<Problem> lastProblems = configurationManager.getLastProblems();
 		createModelFileMarkers(lastProblems);
 
