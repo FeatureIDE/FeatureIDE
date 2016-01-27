@@ -768,12 +768,13 @@ public final class FeatureUtils {
 	public static final void removePropositionalNode(IFeatureModel featureModel, Node node) {
 		List<IConstraint> constraints = featureModel.getConstraints();
 		int index = -1;
-		for (int i = 0; i < constraints.size(); i++)
+		for (int i = 0; i < constraints.size(); i++) {
 			if (constraints.get(i).getNode().equals(node)) {
 				index = i;
 				break;
 			}
-		tryRemoveConstraint(featureModel, constraints, index);
+		}
+		tryRemoveConstraint(featureModel, new LinkedList<>(constraints), index);
 	}
 
 	public static final void removeConstraint(IFeatureModel featureModel, IConstraint constraint) {

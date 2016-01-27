@@ -515,13 +515,13 @@ public class LegendFigure extends Figure implements GUIDefaults {
 
 		PolylineConnection p = new PolylineConnection();
 		p.setForegroundColor(FMPropertyManager.getConnectionForgroundColor());
-		p.setSourceDecoration(new CircleDecoration(mandatory));
-
+		final CircleDecoration circleDecoration = new CircleDecoration(mandatory);
+		p.setSourceDecoration(circleDecoration);
 		Point source = new Point(MANDATORY_PADDING, ROW_HEIGHT * row - LIFT + SYMBOL_SIZE / 2);
-
 		Point target = new Point(MANDATORY_PADDING + SYMBOL_SIZE / 2, row * ROW_HEIGHT - LIFT);
 
 		p.setEndpoints(source, target);
+		p.setBounds(new Rectangle(getBounds()).shrink(-1, -1));
 		String toolTipText;
 		if (mandatory)
 			toolTipText = MANDATORY_TOOLTIP;

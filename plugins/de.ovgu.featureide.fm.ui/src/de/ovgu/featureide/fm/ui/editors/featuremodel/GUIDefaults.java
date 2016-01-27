@@ -45,10 +45,6 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  */
 public interface GUIDefaults {
 
-	public static final boolean HALF_ARC = false;
-
-	public static final boolean OR_CIRCLES = false;
-
 	//general settings
 
 	/**
@@ -102,7 +98,8 @@ public interface GUIDefaults {
 	public static final Color DECORATOR_BACKGROUND = DIAGRAM_BACKGROUND;
 	public static final int SOURCE_ANCHOR_DIAMETER = 9;
 
-	public static final int TARGET_ANCHOR_DIAMETER = HALF_ARC ? 20 : 40;
+	public static final int TARGET_ANCHOR_DIAMETER = 25;
+	public static final int TARGET_ANCHOR_DIAMETER_VERTICAL = 38;
 
 	//cross-tree constraints
 

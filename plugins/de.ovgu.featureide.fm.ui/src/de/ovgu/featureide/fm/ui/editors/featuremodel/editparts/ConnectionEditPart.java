@@ -146,10 +146,6 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		featureModel.handleModelDataChanged();
 	}
 
-//	private IFeatureModel getFeatureModel() {
-//		return getConnectionModel().getTarget().getFeatureModel();
-//	}
-
 	@Override
 	protected void refreshVisuals() {
 		refreshParent();
@@ -178,7 +174,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 				parentHidden = true;
 
 		}
-		if ((target.getStructure().isAnd() || OR_CIRCLES) && !(source.getStructure().isHidden() && !FeatureUIHelper.showHiddenFeatures(getConnectionModel().getTarget().getGraphicalModel())))
+		if ((target.getStructure().isAnd()) && !(source.getStructure().isHidden() && !FeatureUIHelper.showHiddenFeatures(getConnectionModel().getTarget().getGraphicalModel())))
 			if (!(parentHidden && !FeatureUIHelper.showHiddenFeatures(getConnectionModel().getTarget().getGraphicalModel())))
 				sourceDecoration = new CircleDecoration(source.getStructure().isMandatory());
 
@@ -190,7 +186,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		FeatureConnection connectionModel = getConnectionModel();
 		IGraphicalFeature target = connectionModel.getTarget();
 		RotatableDecoration targetDecoration = null;
-		if (target.getTree().getNumberOfChildren() > 1 || HALF_ARC) {
+		if (target.getTree().getNumberOfChildren() > 1) {
 			IGraphicalFeature source = connectionModel.getSource();
 			final IFeatureStructure structure = target.getObject().getStructure();
 			if (FeatureUIHelper.hasVerticalLayout(target.getGraphicalModel())) {

@@ -159,7 +159,11 @@ public abstract class AFileManager<T> implements IFileManager, IEventManager, IR
 			}
 			final byte[] content = format.getInstance().write(variableObject).getBytes(Charset.availableCharsets().get("UTF-8"));
 			final IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(eclipseFile);
-			file.setContents(new ByteArrayInputStream(content), true, true, null);
+			if (!file.exists()) {
+				file.create(new ByteArrayInputStream(content), true, null);
+			} else {
+				file.setContents(new ByteArrayInputStream(content), true, true, null);
+			}
 			persist();
 
 			fireEvent(new FeatureIDEEvent(variableObject, FeatureIDEEvent.MODEL_DATA_SAVED));
