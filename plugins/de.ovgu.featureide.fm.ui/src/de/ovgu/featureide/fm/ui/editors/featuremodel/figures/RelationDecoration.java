@@ -121,7 +121,7 @@ public class RelationDecoration extends Shape implements RotatableDecoration, GU
 			}
 		}
 		if (fill) {
-			fillArc(graphics, r, (int) minAngle, (int)(maxAngle - minAngle));
+			Draw2dHelper.fillArc(graphics, r, (int) minAngle, (int)(maxAngle - minAngle));
 		} else {
 			graphics.drawArc(r, (int) minAngle, (int) (maxAngle - minAngle));
 		}
@@ -140,14 +140,6 @@ public class RelationDecoration extends Shape implements RotatableDecoration, GU
 		int dx = referencePoint.x - point.x;
 		int dy = referencePoint.y - point.y;
 		return 360 - Math.round(Math.atan2(dy, dx) / Math.PI * 180);
-	}
-	
-	/**
-	 * Draws a filled circle inside the rectangle.<br>
-	 * The method fillArc in draw2d is broken.
-	 */
-	private static void fillArc(Graphics graphics, Rectangle bounds, int offset, int length) {
-		graphics.fillArc(bounds.x, bounds.y, bounds.width + 1, bounds.height + 1, offset, length);
 	}
 
 }

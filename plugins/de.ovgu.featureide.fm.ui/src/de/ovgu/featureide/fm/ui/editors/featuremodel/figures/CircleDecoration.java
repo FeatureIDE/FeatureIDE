@@ -60,11 +60,11 @@ public class CircleDecoration extends Shape implements RotatableDecoration, GUID
 		final Rectangle bounds = new Rectangle(getBounds());
 		bounds.shrink(1, 1);
 		graphics.setBackgroundColor(FMPropertyManager.getDecoratorForgroundColor());
-		fillArc(graphics, bounds);
+		Draw2dHelper.fillCircle(graphics, bounds);
 		if (!filled) {
 			bounds.shrink(1, 1);
 			graphics.setBackgroundColor(FMPropertyManager.getDecoratorBackgroundColor());
-			fillArc(graphics, bounds);
+			Draw2dHelper.fillCircle(graphics, bounds);
 		}
 	}
 
@@ -74,11 +74,5 @@ public class CircleDecoration extends Shape implements RotatableDecoration, GUID
 	@Override
 	public void setReferencePoint(Point arg0) {}
 
-	/**
-	 * Draws a filled circle inside the rectangle.<br>
-	 * The method fillArc in draw2d is broken.
-	 */
-	private static void fillArc(Graphics graphics, Rectangle bounds) {
-		graphics.fillArc(bounds.x, bounds.y, bounds.width + 1, bounds.height + 1, 0, 360);
-	}
+
 }
