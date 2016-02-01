@@ -142,7 +142,6 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 	}
 
 	public void setProperties() {
-		System.out.println("FeatureFigure.setProperties()");
 		final StringBuilder toolTip = new StringBuilder();
 
 		label.setForegroundColor(FMPropertyManager.getFeatureForgroundColor());

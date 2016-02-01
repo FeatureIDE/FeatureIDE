@@ -778,14 +778,15 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		return null;
 	}
 
+	// TODO revise this method
 	public void propertyChange(FeatureIDEEvent event) {
 		final EventType prop = event.getEventType();
-		System.out.println(prop);
 		if (event.getSource() instanceof IFeatureModel) {
 			boolean sameSource = featureModelEditor.getFeatureModel() == event.getSource();
 		}
 
 		switch (prop) {
+		case FEATURE_NAME_CHANGED:// TODO revise this case (only positions need to be updated)
 		case FEATURE_ADD:
 			reload();
 			refresh();
@@ -808,7 +809,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		case ATTRIBUTE_CHANGED:
 			featureModelEditor.setPageModified(true);
 			break;
-			
 		case MODEL_DATA_CHANGED:
 		case CONSTRAINT_MOVE:
 			refresh();

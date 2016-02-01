@@ -91,7 +91,6 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 	@Override
 	protected IFigure createFigure() {
 		PolylineConnection figure = new PolylineConnection();
-		System.out.println("ConnectionEditPart.createFigure()");
 		figure.setForegroundColor(FMPropertyManager.getConnectionForgroundColor());
 		FeatureConnection featureConnection = getConnectionModel();
 		if (featureConnection.getSource() instanceof ExtendedFeature && ((ExtendedFeature) featureConnection.getSource()).isFromExtern()
@@ -163,7 +162,6 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 
 
 	public void refreshSourceDecoration() {
-		System.out.println("ConnectionEditPart.refreshSourceDecoration()");
 		IFeature source = getConnectionModel().getSource().getObject();
 		IFeature sourceParent = getConnectionModel().getSource().getObject();
 		IFeature target = getConnectionModel().getTarget().getObject();
@@ -208,7 +206,6 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 	}
 
 	public void refreshTargetDecoration() {
-		System.out.println("ConnectionEditPart.refreshTargetDecoration()");
 		FeatureConnection connectionModel = getConnectionModel();
 		IGraphicalFeature target = connectionModel.getTarget();
 		RotatableDecoration targetDecoration = null;
