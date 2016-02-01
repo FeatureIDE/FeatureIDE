@@ -24,7 +24,6 @@ import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
-import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalElement;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -36,7 +35,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  * @author Marcus Pinnecke
  * 
  */
-public class GraphicalConstraint implements IGraphicalConstraint, PropertyConstants {
+public class GraphicalConstraint implements IGraphicalConstraint {
 
 	protected final IConstraint correspondingConstraint;
 	protected final IGraphicalFeatureModel graphicalFeatureModel;

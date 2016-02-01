@@ -79,6 +79,7 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.ModelMarkerHandler;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.Problem;
@@ -138,6 +139,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 		FMPropertyManager.unregisterEditor(featureModel);
 		if (diagramEditor != null) {
 			diagramEditor.dispose();
+			featureModel.removeListener(diagramEditor);
 		}
 		super.dispose();
 	}
@@ -423,8 +425,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 		fmManager.addListener(new IEventListener() {
 			@Override
 			public void propertyChange(FeatureIDEEvent event) {
-				switch (event.getPropertyName()) {
-				case FeatureIDEEvent.MODEL_DATA_LOADED:
+				switch (event.getEventType()) {
+				case MODEL_DATA_LOADED:
 					featureModel = fmManager.editObject();
 					break;
 				}
@@ -682,7 +684,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 							final IFile editorFile = (IFile) editorRef.getEditorInput().getAdapter(IFile.class);
 							if (editorFile.getProject().equals(project)) {
 								((ConfigurationEditor) editorRef.getEditor(true)).propertyChange(new FeatureIDEEvent(getModelFile(),
-										FeatureIDEEvent.MODEL_DATA_CHANGED, null, null));
+										EventType.MODEL_DATA_CHANGED, null, null));
 							}
 						} catch (PartInitException e) {
 							FMCorePlugin.getDefault().logError(e);

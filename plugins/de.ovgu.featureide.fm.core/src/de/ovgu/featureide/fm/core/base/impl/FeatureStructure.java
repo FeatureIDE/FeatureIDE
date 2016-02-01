@@ -31,7 +31,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 
 /**
  * All structural information of an {@link IFeatureModel}.
@@ -39,7 +39,7 @@ import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
  * @author Sebastian Krieter
  * @author Marcus Pinnecke  
  */
-public class FeatureStructure implements IFeatureStructure, PropertyConstants {
+public class FeatureStructure implements IFeatureStructure {
 
 	protected boolean and;
 
@@ -129,17 +129,17 @@ public class FeatureStructure implements IFeatureStructure, PropertyConstants {
 	}
 
 	protected void fireChildrenChanged() {
-		final FeatureIDEEvent event = new FeatureIDEEvent(this, CHILDREN_CHANGED, Boolean.FALSE, Boolean.TRUE);
+		final FeatureIDEEvent event = new FeatureIDEEvent(this, EventType.CHILDREN_CHANGED, Boolean.FALSE, Boolean.TRUE);
 		correspondingFeature.fireEvent(event);
 	}
 
 	protected void fireHiddenChanged() {
-		final FeatureIDEEvent event = new FeatureIDEEvent(this, HIDDEN_CHANGED, Boolean.FALSE, Boolean.TRUE);
+		final FeatureIDEEvent event = new FeatureIDEEvent(this, EventType.HIDDEN_CHANGED, Boolean.FALSE, Boolean.TRUE);
 		correspondingFeature.fireEvent(event);
 	}
 
 	protected void fireMandatoryChanged() {
-		final FeatureIDEEvent event = new FeatureIDEEvent(this, MANDATORY_CHANGED, Boolean.FALSE, Boolean.TRUE);
+		final FeatureIDEEvent event = new FeatureIDEEvent(this, EventType.MANDATORY_CHANGED, Boolean.FALSE, Boolean.TRUE);
 		correspondingFeature.fireEvent(event);
 	}
 

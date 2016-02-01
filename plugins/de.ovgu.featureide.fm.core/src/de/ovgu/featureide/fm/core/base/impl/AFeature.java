@@ -26,6 +26,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureProperty;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.IPropertyContainer;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 
 /**
  * Partial implementation of the {@link IFeature} interface.
@@ -88,7 +89,7 @@ public abstract class AFeature extends AFeatureModelElement implements IFeature 
 	public void setName(String name) {
 		final String oldName = this.name;
 		super.setName(name);
-		fireEvent(new FeatureIDEEvent(this, NAME_CHANGED, oldName, name));
+		fireEvent(new FeatureIDEEvent(this, EventType.NAME_CHANGED, oldName, name));
 	}	
 
 	@Override

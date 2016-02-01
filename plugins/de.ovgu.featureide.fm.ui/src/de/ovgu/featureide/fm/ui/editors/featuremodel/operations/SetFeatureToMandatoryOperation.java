@@ -26,6 +26,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_OP
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 
 /**
  * Operation with functionality to set a Feature mandatory/concrete. Enables
@@ -60,8 +61,9 @@ public class SetFeatureToMandatoryOperation extends AbstractFeatureModelOperatio
 
 	@Override
 	protected FeatureIDEEvent operation() {
-		feature.getStructure().setMandatory(!feature.getStructure().isMandatory());
-		return null;
+		final boolean isMandatory = feature.getStructure().isMandatory();
+		feature.getStructure().setMandatory(!isMandatory);
+		return new FeatureIDEEvent(feature, null, false, EventType.MANDATORY_CHANGED, isMandatory, !isMandatory);
 	}
 
 	@Override

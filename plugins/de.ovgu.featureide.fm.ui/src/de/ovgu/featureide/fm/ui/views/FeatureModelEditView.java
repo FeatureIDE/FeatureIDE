@@ -60,6 +60,7 @@ import org.eclipse.ui.progress.UIJob;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.evaluation.Evaluation;
@@ -169,7 +170,7 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 
 	private IEventListener modelListener = new IEventListener() {
 		public void propertyChange(FeatureIDEEvent evt) {
-			if (!FeatureIDEEvent.MODEL_LAYOUT_CHANGED.equals(evt.getPropertyName()))
+			if (!EventType.MODEL_LAYOUT_CHANGED.equals(evt.getEventType()))
 				refresh();
 		}
 	};

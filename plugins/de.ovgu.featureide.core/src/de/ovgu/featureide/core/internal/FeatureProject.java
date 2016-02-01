@@ -93,8 +93,8 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
-import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
@@ -137,7 +137,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		 */
 		public void propertyChange(FeatureIDEEvent evt) {
 
-			if (PropertyConstants.FEATURE_NAME_CHANGED.equals(evt.getPropertyName())) {
+			if (EventType.FEATURE_NAME_CHANGED == evt.getEventType()) {
 				String oldName = (String) evt.getOldValue();
 				String newName = (String) evt.getNewValue();
 

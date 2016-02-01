@@ -42,6 +42,7 @@ import org.eclipse.core.runtime.IPath;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.event.DefaultEventManager;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.event.IEventManager;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
@@ -133,7 +134,7 @@ public abstract class AFileManager<T> implements IFileManager, IEventManager, IR
 
 			persist();
 
-			fireEvent(new FeatureIDEEvent(persistentObject, FeatureIDEEvent.MODEL_DATA_LOADED));
+			fireEvent(new FeatureIDEEvent(persistentObject, EventType.MODEL_DATA_LOADED));
 		} catch (Exception e) {
 			handleException(e);
 		}
@@ -166,7 +167,7 @@ public abstract class AFileManager<T> implements IFileManager, IEventManager, IR
 			}
 			persist();
 
-			fireEvent(new FeatureIDEEvent(variableObject, FeatureIDEEvent.MODEL_DATA_SAVED));
+			fireEvent(new FeatureIDEEvent(variableObject, EventType.MODEL_DATA_SAVED));
 		} catch (Exception e) {
 			handleException(e);
 		}

@@ -26,6 +26,7 @@ import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.util.tree.TreeOperations;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
@@ -44,7 +45,7 @@ public class ModelReverseOrderOperation extends AbstractGraphicalFeatureModelOpe
 
 	public ModelReverseOrderOperation(IGraphicalFeatureModel featureModel) {
 		super(featureModel, LABEL);
-		setEventId(FeatureIDEEvent.MODEL_DATA_LOADED);
+		setEventId(EventType.MODEL_DATA_LOADED);
 	}
 
 	@Override

@@ -25,7 +25,7 @@ import java.beans.PropertyChangeListener;
 import java.util.LinkedList;
 
 import de.ovgu.featureide.fm.core.IGraphicItem;
-import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 
 /**
  * An instance of this class represents a connection between a feature and its
@@ -34,7 +34,7 @@ import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
  * @author Thomas Thuem
  *
  */
-public class FeatureConnection implements PropertyConstants, IGraphicItem {
+public class FeatureConnection implements IGraphicItem {
 	
 	@Override
 	public int hashCode() {
@@ -102,7 +102,7 @@ public class FeatureConnection implements PropertyConstants, IGraphicItem {
 	}
 	
 	private void fireParentChanged() {
-		PropertyChangeEvent event = new PropertyChangeEvent(this, PARENT_CHANGED, Boolean.FALSE, Boolean.TRUE);
+		PropertyChangeEvent event = new PropertyChangeEvent(this, EventType.PARENT_CHANGED.toString(), Boolean.FALSE, Boolean.TRUE);
 		for (PropertyChangeListener listener : listenerList)
 			listener.propertyChange(event);
 	}

@@ -46,8 +46,8 @@ import de.ovgu.featureide.fm.core.base.IFeatureModelProperty;
 import de.ovgu.featureide.fm.core.base.IFeatureModelStructure;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
-import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.core.filter.ConcreteFeatureFilter;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
@@ -61,7 +61,7 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  * @author Marcus Pinnecke
  * 
  */
-public class FeatureModel implements IFeatureModel, PropertyConstants {
+public class FeatureModel implements IFeatureModel {
 
 	private static long NEXT_ID = 0;
 
@@ -271,7 +271,7 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 		}
 	}
 
-	protected void fireEvent(final String action) {
+	protected void fireEvent(final EventType action) {
 		fireEvent(new FeatureIDEEvent(this, action, Boolean.FALSE, Boolean.TRUE));
 	}
 
@@ -377,12 +377,12 @@ public class FeatureModel implements IFeatureModel, PropertyConstants {
 
 	@Override
 	public void handleModelDataChanged() {
-		fireEvent(FeatureIDEEvent.MODEL_DATA_CHANGED);
+		fireEvent(EventType.MODEL_DATA_CHANGED);
 	}
 
 	@Override
 	public void handleModelDataLoaded() {
-		fireEvent(FeatureIDEEvent.MODEL_DATA_LOADED);
+		fireEvent(EventType.MODEL_DATA_LOADED);
 
 	}
 

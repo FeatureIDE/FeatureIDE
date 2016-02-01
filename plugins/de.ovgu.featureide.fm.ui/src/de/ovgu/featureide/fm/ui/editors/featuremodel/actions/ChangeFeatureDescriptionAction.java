@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CHANGE_DESCRIPTION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE_DESCRIPTION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PLEASE_ENTER_A_DESCRIPTION_FOR_FEATURE_;
+
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.ChangeFeatureDescriptionDialog;
 

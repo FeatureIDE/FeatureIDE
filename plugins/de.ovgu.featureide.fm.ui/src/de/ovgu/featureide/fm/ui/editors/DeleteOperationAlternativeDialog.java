@@ -66,8 +66,8 @@ import org.eclipse.swt.widgets.Table;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ElementDeleteOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.DeleteFeatureOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ElementDeleteOperation;
 
 /**
  * Provides a dialog for choosing an alternative {@link IFeature} for the Feature to delete.

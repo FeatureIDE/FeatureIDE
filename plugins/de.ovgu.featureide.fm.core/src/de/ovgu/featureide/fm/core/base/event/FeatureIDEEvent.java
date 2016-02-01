@@ -27,40 +27,54 @@ package de.ovgu.featureide.fm.core.base.event;
  */
 public class FeatureIDEEvent {
 
-	public static final String CONSTRAINT_MOVE = "CONSTRAINT_MOVE";
-	public static final String CONSTRAINT_MODIFY = "CONSTRAINT_MODIFY";
-	public static final String CONSTRAINT_DELETE = "CONSTRAINT_DELETE";
-	public static final String CONSTRAINT_ADD = "CONSTRAINT_ADD";
-	public static final String FEATURE_MODIFY = "FEATURE_MODIFY";
-	public static final String FEATURE_DELETE = "FEATURE_DELETE";
-	public static final String FEATURE_ADD = "FEATURE_ADD";
-	public static final String STRUCTURE_CHANGED = "STRUCTURE_CHANGED";
-	public static final String LEGEND_LAYOUT_CHANGED = "LEGEND_LAYOUT_CHANGED";
-	public static final String MODEL_LAYOUT_CHANGED = "MODEL_LAYOUT_CHANGED";
-	public static final String MODEL_DATA_CHANGED = "MODEL_DATA_CHANGED";
-	public static final String MODEL_DATA_SAVED  = "MODEL_DATA_SAVED";
-	public static final String MODEL_DATA_LOADED = "MODEL_DATA_LOADED";
-
+	public enum EventType {
+		CONSTRAINT_MOVE,
+		CONSTRAINT_MODIFY,
+		CONSTRAINT_DELETE,
+		CONSTRAINT_ADD,
+		CONSTRAINT_SELECTED,
+		FEATURE_MODIFY,
+		FEATURE_DELETE,
+		FEATURE_ADD,
+		FEATURE_NAME_CHANGED,
+		COLOR_CHANGED,
+		HIDDEN_CHANGED,
+		LOCATION_CHANGED,
+		NAME_CHANGED,
+		ATTRIBUTE_CHANGED,
+		CHILDREN_CHANGED,
+		PARENT_CHANGED,
+		MANDATORY_CHANGED,
+		STRUCTURE_CHANGED,
+		LEGEND_LAYOUT_CHANGED,
+		MODEL_LAYOUT_CHANGED,
+		MODEL_DATA_CHANGED,
+		MODEL_DATA_SAVED,
+		MODEL_DATA_LOADED,
+		REDRAW_DIAGRAM,
+		REFRESH_ACTIONS,
+	}
+	
 	private final Object source;
 	private final Object editor;
 	private final boolean persistent;
-	private final String propertyName;
+	private final EventType eventType;
 	private final Object oldValue;
 	private final Object newValue;
 
-	public FeatureIDEEvent(Object source, String propertyName) {
-		this(source, null, false, propertyName, null, null);
+	public FeatureIDEEvent(Object source, EventType eventType) {
+		this(source, null, false, eventType, null, null);
 	}
 
-	public FeatureIDEEvent(Object source, String propertyName, Object oldValue, Object newValue) {
-		this(source, null, false, propertyName, oldValue, newValue);
+	public FeatureIDEEvent(Object source, EventType eventType, Object oldValue, Object newValue) {
+		this(source, null, false, eventType, oldValue, newValue);
 	}
 
-	public FeatureIDEEvent(Object source, Object editor, boolean persistent, String propertyName, Object oldValue, Object newValue) {
+	public FeatureIDEEvent(Object source, Object editor, boolean persistent, EventType eventType, Object oldValue, Object newValue) {
 		this.source = source;
 		this.editor = editor;
 		this.persistent = persistent;
-		this.propertyName = propertyName;
+		this.eventType = eventType;
 		this.oldValue = oldValue;
 		this.newValue = newValue;
 	}
@@ -77,8 +91,8 @@ public class FeatureIDEEvent {
 		return persistent;
 	}
 
-	public String getPropertyName() {
-		return propertyName;
+	public EventType getEventType() {
+		return eventType;
 	}
 
 	public Object getOldValue() {

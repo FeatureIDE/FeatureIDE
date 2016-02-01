@@ -34,7 +34,7 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
@@ -112,7 +112,7 @@ public class RenamingsManager {
 		instance.read();
 		final IFeatureModel projectModel = instance.getObject();
 		for (Renaming renaming : renamings) {
-			final FeatureIDEEvent event = new FeatureIDEEvent(model, PropertyConstants.FEATURE_NAME_CHANGED, renaming.oldName, renaming.newName);
+			final FeatureIDEEvent event = new FeatureIDEEvent(model, EventType.FEATURE_NAME_CHANGED, renaming.oldName, renaming.newName);
 			projectModel.fireEvent(event);
 			model.fireEvent(event);
 		}

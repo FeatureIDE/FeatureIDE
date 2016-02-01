@@ -26,7 +26,6 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
-import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 
 /**
  * Partial implementation of feature and constraint.
@@ -34,7 +33,7 @@ import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
  * @author Sebastian Krieter
  * 
  */
-public abstract class AFeatureModelElement implements IFeatureModelElement, PropertyConstants {
+public abstract class AFeatureModelElement implements IFeatureModelElement {
 	
 	protected final long id;
 

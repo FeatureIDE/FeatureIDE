@@ -31,7 +31,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.util.tree.EmptyTree;
 import de.ovgu.featureide.fm.core.base.util.tree.Tree;
 import de.ovgu.featureide.fm.ui.editors.FeatureConnection;
@@ -48,7 +48,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
  * @author Marcus Pinnecke
  * 
  */
-public class GraphicalFeatureModel implements IGraphicalFeatureModel, PropertyConstants {
+public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
 	protected final IFeatureModel correspondingFeatureModel;
 
@@ -69,7 +69,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel, PropertyCo
 		layout = oldModel.layout;
 	}
 
-	protected void fireEvent(final String action) {
+	protected void fireEvent(final EventType action) {
 		correspondingFeatureModel.fireEvent(new FeatureIDEEvent(this, action, Boolean.FALSE, Boolean.TRUE));
 	}
 
@@ -90,22 +90,22 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel, PropertyCo
 
 	@Override
 	public void handleLegendLayoutChanged() {
-		fireEvent(FeatureIDEEvent.LEGEND_LAYOUT_CHANGED);
+		fireEvent(EventType.LEGEND_LAYOUT_CHANGED);
 	}
 
 	@Override
 	public void handleModelLayoutChanged() {
-		fireEvent(FeatureIDEEvent.MODEL_LAYOUT_CHANGED);
+		fireEvent(EventType.MODEL_LAYOUT_CHANGED);
 	}
 
 	@Override
 	public void redrawDiagram() {
-		fireEvent(REDRAW_DIAGRAM);
+		fireEvent(EventType.REDRAW_DIAGRAM);
 	}
 
 	@Override
 	public void refreshContextMenu() {
-		fireEvent(REFRESH_ACTIONS);
+		fireEvent(EventType.REFRESH_ACTIONS);
 	}
 
 	public Tree<IGraphicalFeature> getFeatures() {

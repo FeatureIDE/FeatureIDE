@@ -40,7 +40,6 @@ import org.prop4j.Node;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
@@ -52,7 +51,7 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  * @author Stefan Krueger
  * 
  */
-public class FeatureModel extends DeprecatedFeatureModel implements PropertyConstants, IGraphicItem, Cloneable {
+public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem, Cloneable {
 
 	public IFeatureModel model;
 

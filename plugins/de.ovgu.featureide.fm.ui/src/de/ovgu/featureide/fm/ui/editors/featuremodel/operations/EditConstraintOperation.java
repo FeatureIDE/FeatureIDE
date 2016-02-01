@@ -26,6 +26,7 @@ import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 
 /**
  * Operation with functionality to edit a constraint. Enables undo/redo
@@ -50,13 +51,13 @@ public class EditConstraintOperation extends AbstractFeatureModelOperation {
 	@Override
 	protected FeatureIDEEvent operation() {
 		constraint.setNode(newNode);
-		return new FeatureIDEEvent(constraint, FeatureIDEEvent.CONSTRAINT_MODIFY, oldNode, newNode);
+		return new FeatureIDEEvent(constraint, EventType.CONSTRAINT_MODIFY, oldNode, newNode);
 	}
 
 	@Override
 	protected FeatureIDEEvent inverseOperation() {
 		constraint.setNode(oldNode);
-		return new FeatureIDEEvent(constraint, FeatureIDEEvent.CONSTRAINT_MODIFY, newNode, oldNode);
+		return new FeatureIDEEvent(constraint, EventType.CONSTRAINT_MODIFY, newNode, oldNode);
 	}
 
 }

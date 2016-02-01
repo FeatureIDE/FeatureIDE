@@ -37,7 +37,6 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.IPropertyContainer;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
-import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
@@ -48,7 +47,7 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  * @author Marcus Pinnecke (Feature Interface)
  * 
  */
-public class Feature implements PropertyConstants, PropertyChangeListener, IGraphicItem, IFeature {
+public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 
 	public final IFeature feature;
 

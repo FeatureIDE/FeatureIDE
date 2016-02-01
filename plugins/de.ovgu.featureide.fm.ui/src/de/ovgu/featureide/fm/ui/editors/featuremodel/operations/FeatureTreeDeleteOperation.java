@@ -24,7 +24,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE_ERROR;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE_INCLUDING_SUBFEATURES;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UNABLE_TO_DELETE_THIS_FEATURES_UNTIL_ALL_RELEVANT_CONSTRAINTS_ARE_REMOVED_;
 
-import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 

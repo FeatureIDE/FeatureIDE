@@ -24,7 +24,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.RENAME_FEATURE
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 
 /**
  * Operation with functionality to rename features. Provides undo/redo
@@ -42,7 +42,7 @@ public class RenameFeatureOperation extends AbstractFeatureModelOperation {
 		super(featureModel, RENAME_FEATURE);
 		this.oldName = oldName;
 		this.newName = newName;
-		setEventId(PropertyConstants.FEATURE_NAME_CHANGED);
+		setEventId(EventType.FEATURE_NAME_CHANGED);
 	}
 
 	@Override

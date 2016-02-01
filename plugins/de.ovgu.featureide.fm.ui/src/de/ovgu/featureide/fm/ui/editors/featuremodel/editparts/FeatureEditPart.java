@@ -39,8 +39,8 @@ import org.eclipse.ui.PlatformUI;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
-import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureConnection;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
@@ -60,7 +60,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.policies.FeatureDirectEditP
  * @author Thomas Thuem
  * @author Marcus Pinnecke
  */
-public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEditPart, PropertyConstants, IEventListener {
+public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEditPart, IEventListener {
 
 	private ConnectionAnchor sourceAnchor = null;
 	private ConnectionAnchor targetAnchor = null;
@@ -128,8 +128,6 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 				FMUIPlugin.getDefault().logError(e);
 
 			}
-
-			featureModel.getFeatureModel().handleModelDataChanged();
 		} else if (request.getType() == RequestConstants.REQ_SELECTION) {
 			for (IConstraint partOf : feature.getStructure().getRelevantConstraints()) {
 				partOf.setFeatureSelected(true);
@@ -176,34 +174,41 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 	}
 
 	public void propertyChange(FeatureIDEEvent event) {
-		String prop = event.getPropertyName();
-		if (LOCATION_CHANGED.equals(prop)) {
-			getFeatureFigure().setLocation((Point) event.getNewValue());
+		EventType prop = event.getEventType();
+		if (EventType.LOCATION_CHANGED.equals(prop)) {
+			if (!event.getOldValue().equals(event.getNewValue())) {
+				getFeatureFigure().setLocation((Point) event.getNewValue());
+			}
 			for (FeatureConnection connection : getFeature().getTargetConnections()) {
 				Map<?, ?> registry = getViewer().getEditPartRegistry();
 				ConnectionEditPart connectionEditPart = (ConnectionEditPart) registry.get(connection);
 				if (connectionEditPart != null) {
 					connectionEditPart.refreshSourceDecoration();
 					connectionEditPart.refreshTargetDecoration();
-					connectionEditPart.refreshToolTip();
+//					connectionEditPart.refreshToolTip();
 				}
 			}
-		} else if (CHILDREN_CHANGED.equals(prop)) {
+		} else if (EventType.CHILDREN_CHANGED.equals(prop)) {
 			getFeatureFigure().setProperties();
 			for (FeatureConnection connection : getFeature().getTargetConnections()) {
 				Map<?, ?> registry = getViewer().getEditPartRegistry();
 				ConnectionEditPart connectionEditPart = (ConnectionEditPart) registry.get(connection);
 				if (connectionEditPart != null) {
 					connectionEditPart.refreshSourceDecoration();
-					connectionEditPart.refreshTargetDecoration();
+//					connectionEditPart.refreshTargetDecoration();
 					connectionEditPart.refreshToolTip();
 				}
 			}
-		} else if (NAME_CHANGED.equals(prop)) {
+		} else if (EventType.NAME_CHANGED.equals(prop)) {
 			getFeatureFigure().setName(getFeature().getObject().getProperty().getDisplayName());
 			FeatureUIHelper.setSize(getFeature(), getFeatureFigure().getSize());
-		} else if (ATTRIBUTE_CHANGED.equals(prop)) {
+		} else if (EventType.ATTRIBUTE_CHANGED.equals(prop)) {
 			getFeatureFigure().setProperties();
+		} else if (EventType.MANDATORY_CHANGED.equals(prop)) {
+			for (FeatureConnection connection : getFeature().getSourceConnections()) {
+				Map<?, ?> registry = getViewer().getEditPartRegistry();
+				ConnectionEditPart connectionEditPart = (ConnectionEditPart) registry.get(connection);
+				connectionEditPart.refreshSourceDecoration();}
 		}
 	}
 

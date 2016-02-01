@@ -33,6 +33,7 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.impl.Feature;
 
 /**
@@ -50,7 +51,7 @@ public class CreateFeatureBelowOperation extends AbstractFeatureModelOperation {
 	public CreateFeatureBelowOperation(IFeature feature, IFeatureModel featureModel) {
 		super(featureModel, CREATE_LAYER);
 		this.feature = feature;
-		setEventId(FeatureIDEEvent.FEATURE_ADD);
+		setEventId(EventType.FEATURE_ADD);
 	}
 
 	@Override
@@ -74,13 +75,13 @@ public class CreateFeatureBelowOperation extends AbstractFeatureModelOperation {
 
 		//TODO _interfaces Removed Code
 		//		FeatureDiagramLayoutHelper.initializeLayerFeaturePosition(((FeatureDiagramEditor) diagramEditor).getGraphicalFeatureModel(), newFeature, feature);
-		return new FeatureIDEEvent(featureModel, FeatureIDEEvent.FEATURE_ADD, null, newFeature);
+		return new FeatureIDEEvent(featureModel, EventType.FEATURE_ADD, null, newFeature);
 	}
 
 	@Override
 	protected FeatureIDEEvent inverseOperation() {
 		newFeature = featureModel.getFeature(newFeature.getName());
 		featureModel.deleteFeature(newFeature);
-		return new FeatureIDEEvent(featureModel, FeatureIDEEvent.FEATURE_DELETE, newFeature, null);
+		return new FeatureIDEEvent(featureModel, EventType.FEATURE_DELETE, newFeature, null);
 	}
 }

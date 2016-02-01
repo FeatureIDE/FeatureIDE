@@ -34,6 +34,7 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
@@ -148,7 +149,7 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 	public void setConstraintAttribute(ConstraintAttribute attri, boolean fire) {
 		attribute = attri;
 		if (fire) {
-			fireEvent(new FeatureIDEEvent(this, ATTRIBUTE_CHANGED, Boolean.FALSE, Boolean.TRUE));
+			fireEvent(new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED, Boolean.FALSE, Boolean.TRUE));
 		}
 	}
 
@@ -190,7 +191,7 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 	@Override
 	public void setFeatureSelected(boolean b) {
 		featureSelected = b;
-		fireEvent(new FeatureIDEEvent(this, CONSTRAINT_SELECTED, Boolean.FALSE, Boolean.TRUE));
+		fireEvent(new FeatureIDEEvent(this, EventType.CONSTRAINT_SELECTED, Boolean.FALSE, Boolean.TRUE));
 	}
 
 	public void setNode(Node node) {

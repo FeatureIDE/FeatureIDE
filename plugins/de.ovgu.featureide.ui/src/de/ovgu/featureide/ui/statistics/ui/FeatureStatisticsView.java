@@ -45,6 +45,7 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.ViewPart;
 
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
@@ -153,7 +154,7 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 	 */
 	private IEventListener modelListener = new IEventListener() {
 		public void propertyChange(FeatureIDEEvent evt) {
-			if (!FeatureIDEEvent.MODEL_LAYOUT_CHANGED.equals(evt.getPropertyName())){
+			if (EventType.MODEL_LAYOUT_CHANGED != evt.getEventType()){
 				refresh(false);
 			}
 		}

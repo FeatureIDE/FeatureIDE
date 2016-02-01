@@ -29,6 +29,7 @@ import org.eclipse.draw2d.geometry.Point;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.util.tree.Tree;
 import de.ovgu.featureide.fm.ui.editors.FeatureConnection;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalElement;
@@ -43,6 +44,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  */
 public class GraphicalFeature implements IGraphicalFeature {
 
+	// XXX there is only one source/parent, why do we use a list
 	protected final LinkedList<FeatureConnection> sourceConnections = new LinkedList<FeatureConnection>();
 	protected final LinkedList<FeatureConnection> targetConnections = new LinkedList<FeatureConnection>();
 
@@ -85,7 +87,7 @@ public class GraphicalFeature implements IGraphicalFeature {
 	@Override
 	public void setConstraintSelected(boolean selection) {
 		constraintSelected = selection;
-		correspondingFeature.fireEvent(new FeatureIDEEvent(this, ATTRIBUTE_CHANGED, Boolean.FALSE, Boolean.TRUE));
+		correspondingFeature.fireEvent(new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED, Boolean.FALSE, Boolean.TRUE));
 	}
 
 	@Override

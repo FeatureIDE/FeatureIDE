@@ -30,7 +30,6 @@ import org.prop4j.SatSolver;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
@@ -40,7 +39,7 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  * @author Florian Proksch
  * @author Stefan Krueger
  */
-public class Constraint implements PropertyConstants, IGraphicItem {
+public class Constraint implements IGraphicItem {
 
 	public Constraint(IFeatureModel featureModel, Node propNode) {
 		throw new UnsupportedOperationException("No longer supported");

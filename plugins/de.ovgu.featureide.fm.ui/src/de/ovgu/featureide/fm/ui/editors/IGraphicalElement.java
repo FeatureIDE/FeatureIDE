@@ -25,14 +25,13 @@ import org.eclipse.draw2d.geometry.Point;
 
 import de.ovgu.featureide.fm.core.IGraphicItem;
 import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
-import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 
 /**
  * Graphical representation of a constraint.
  * 
  * @author Sebastian Krieter
  */
-public interface IGraphicalElement extends IGraphicItem, PropertyConstants {
+public interface IGraphicalElement extends IGraphicItem {
 
 	IFeatureModelElement getObject();
 	

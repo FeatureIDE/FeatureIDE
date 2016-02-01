@@ -31,8 +31,8 @@ import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
-import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 
 /**
@@ -79,14 +79,14 @@ public class InterfaceProject {
 		
 		@Override
 		public void propertyChange(FeatureIDEEvent event) {
-			String prop = event.getPropertyName();
-			if (PropertyConstants.LOCATION_CHANGED.equals(prop)) {
+			EventType prop = event.getEventType();
+			if (EventType.LOCATION_CHANGED == prop) {
 				
-			} else if (PropertyConstants.CHILDREN_CHANGED.equals(prop)) {
+			} else if (EventType.CHILDREN_CHANGED == prop) {
 				
-			} else if (PropertyConstants.NAME_CHANGED.equals(prop)) {
+			} else if (EventType.NAME_CHANGED.equals(prop)) {
 				featureNames[id] = ((IFeature)event.getSource()).getName();
-			} else if (PropertyConstants.ATTRIBUTE_CHANGED.equals(prop)) {
+			} else if (EventType.ATTRIBUTE_CHANGED.equals(prop)) {
 				
 			}
 		}

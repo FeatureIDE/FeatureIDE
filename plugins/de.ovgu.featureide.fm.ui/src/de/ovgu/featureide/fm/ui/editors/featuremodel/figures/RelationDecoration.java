@@ -52,6 +52,7 @@ public class RelationDecoration extends Shape implements RotatableDecoration, GU
 
 	public RelationDecoration(final boolean fill, final IGraphicalFeature lastChild) {
 		super();
+		
 		this.fill = fill;
 		this.lastChild = lastChild;
 		if (lastChild == null) {

@@ -21,9 +21,11 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.MOVE_CONSTRAINT;
+
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 
 /**
  * Operation with functionality to move Constraints. Provides undo/redo
@@ -50,7 +52,7 @@ public class MoveConstraintOperation extends AbstractFeatureModelOperation {
 	protected FeatureIDEEvent operation() {
 		featureModel.removeConstraint(constraint);
 		featureModel.addConstraint(constraint, index);
-		return new FeatureIDEEvent(constraint, FeatureIDEEvent.CONSTRAINT_MOVE, oldIndex, index);
+		return new FeatureIDEEvent(constraint, EventType.CONSTRAINT_MOVE, oldIndex, index);
 //		FeatureUIHelper.setLocation(featureModel.getConstraints().get(index).getGraphicRepresenation(), newPos);
 	}
 
@@ -58,7 +60,7 @@ public class MoveConstraintOperation extends AbstractFeatureModelOperation {
 	protected FeatureIDEEvent inverseOperation() {
 		featureModel.removeConstraint(constraint);
 		featureModel.addConstraint(constraint, oldIndex);
-		return new FeatureIDEEvent(constraint, FeatureIDEEvent.CONSTRAINT_MOVE, index, oldIndex);
+		return new FeatureIDEEvent(constraint, EventType.CONSTRAINT_MOVE, index, oldIndex);
 //		FeatureUIHelper.setLocation(featureModel.getConstraints().get(index).getGraphicRepresenation(), oldPos);
 	}
 

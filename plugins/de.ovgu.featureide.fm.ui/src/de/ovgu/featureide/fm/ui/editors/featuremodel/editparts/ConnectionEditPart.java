@@ -43,7 +43,7 @@ import org.eclipse.ui.PlatformUI;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureConnection;
@@ -63,7 +63,7 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * @author Thomas Thuem
  * @author Marcus Pinnecke
  */
-public class ConnectionEditPart extends AbstractConnectionEditPart implements GUIDefaults, PropertyConstants, PropertyChangeListener {
+public class ConnectionEditPart extends AbstractConnectionEditPart implements GUIDefaults, PropertyChangeListener {
 
 	private static final DirectEditPolicy ROLE_DIRECT_EDIT_POLICY = new DirectEditPolicy() {
 		@Override
@@ -90,8 +90,8 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 	@Override
 	protected IFigure createFigure() {
 		PolylineConnection figure = new PolylineConnection();
+		System.out.println("ConnectionEditPart.createFigure()");
 		figure.setForegroundColor(FMPropertyManager.getConnectionForgroundColor());
-
 		FeatureConnection featureConnection = getConnectionModel();
 		if (featureConnection.getSource() instanceof ExtendedFeature && ((ExtendedFeature) featureConnection.getSource()).isFromExtern()
 				&& featureConnection.getTarget() instanceof ExtendedFeature && ((ExtendedFeature) featureConnection.getTarget()).isFromExtern()) {
@@ -143,7 +143,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 			FMUIPlugin.getDefault().logError(e);
 		}
 
-		featureModel.handleModelDataChanged();
+//		featureModel.handleModelDataChanged();
 	}
 
 	@Override
@@ -160,7 +160,9 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		setTarget(newEditPart);
 	}
 
+
 	public void refreshSourceDecoration() {
+		System.out.println("ConnectionEditPart.refreshSourceDecoration()");
 		IFeature source = getConnectionModel().getSource().getObject();
 		IFeature sourceParent = getConnectionModel().getSource().getObject();
 		IFeature target = getConnectionModel().getTarget().getObject();
@@ -174,12 +176,29 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 				parentHidden = true;
 
 		}
-		if ((target.getStructure().isAnd()) && !(source.getStructure().isHidden() && !FeatureUIHelper.showHiddenFeatures(getConnectionModel().getTarget().getGraphicalModel())))
-			if (!(parentHidden && !FeatureUIHelper.showHiddenFeatures(getConnectionModel().getTarget().getGraphicalModel())))
-				sourceDecoration = new CircleDecoration(source.getStructure().isMandatory());
-
+		if ((target.getStructure().isAnd()) && !(source.getStructure().isHidden() && !FeatureUIHelper.showHiddenFeatures(getConnectionModel().getTarget().getGraphicalModel()))) {
+			if (!(parentHidden && !FeatureUIHelper.showHiddenFeatures(getConnectionModel().getTarget().getGraphicalModel()))) {
+				sourceDecoration = getSourceDecoration(source.getStructure().isMandatory());
+			}
+		}
 		PolylineConnection connection = (PolylineConnection) getConnectionFigure();
 		connection.setSourceDecoration(sourceDecoration);
+	}
+	
+	private CircleDecoration circleDecorationMandatory = null;
+	private CircleDecoration circleDecorationFalse = null;
+	private CircleDecoration getSourceDecoration(boolean mandatory) {
+		if (mandatory) {
+			if (circleDecorationMandatory == null) {
+				circleDecorationMandatory = new CircleDecoration(true);
+			}
+			return circleDecorationMandatory;
+		} else {
+			if (circleDecorationFalse == null) {
+				circleDecorationFalse = new CircleDecoration(false);
+			}
+			return circleDecorationFalse;
+		}
 	}
 
 	public void refreshTargetDecoration() {
@@ -188,19 +207,28 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		RotatableDecoration targetDecoration = null;
 		if (target.getTree().getNumberOfChildren() > 1) {
 			IGraphicalFeature source = connectionModel.getSource();
+			final IGraphicalFeature object = target.getTree().getChildren().get(0).getObject();
 			final IFeatureStructure structure = target.getObject().getStructure();
+			if (structure.isAnd()) {
+				PolylineConnection connection = (PolylineConnection) getConnectionFigure();
+				connection.setTargetDecoration(targetDecoration);
+				return;
+			}
 			if (FeatureUIHelper.hasVerticalLayout(target.getGraphicalModel())) {
-				if (!structure.isAnd() && (structure.getChildIndex(source.getObject().getStructure()) == (structure.getChildrenCount() - 1))) {
-					targetDecoration = new RelationDecoration(structure.isMultiple(), target.getTree().getChildren().get(0).getObject());
+				if (structure.isFirstChild(source.getObject().getStructure())) {
+					targetDecoration = new RelationDecoration(structure.isMultiple(), object);
+					PolylineConnection connection = (PolylineConnection) getConnectionFigure();
+					connection.setTargetDecoration(targetDecoration);
 				}
 			} else {
-				if (!structure.isAnd() && structure.isFirstChild(source.getObject().getStructure()))
+				if (structure.isFirstChild(source.getObject().getStructure())) {
 					targetDecoration = new RelationDecoration(structure.isMultiple(), target.getTree().getChildren().get(target.getTree().getNumberOfChildren() - 1).getObject());
+					PolylineConnection connection = (PolylineConnection) getConnectionFigure();
+					connection.setTargetDecoration(targetDecoration);
+				}
 			}
 		}
 
-		PolylineConnection connection = (PolylineConnection) getConnectionFigure();
-		connection.setTargetDecoration(targetDecoration);
 	}
 
 	public void refreshToolTip() {
@@ -235,9 +263,9 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 
 	public void propertyChange(PropertyChangeEvent event) {
 		String prop = event.getPropertyName();
-		if (PARENT_CHANGED.equals(prop)) {
+		if (EventType.PARENT_CHANGED.toString().equals(prop)) {
 			refreshParent();
-		} else if (MANDATORY_CHANGED.equals(prop)) {
+		} else if (EventType.MANDATORY_CHANGED.toString().equals(prop)) {
 			refreshSourceDecoration();
 		}
 	}
