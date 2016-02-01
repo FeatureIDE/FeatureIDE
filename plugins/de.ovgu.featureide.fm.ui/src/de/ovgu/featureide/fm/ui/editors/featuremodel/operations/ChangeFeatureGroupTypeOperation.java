@@ -25,6 +25,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.CHANGE_GROUP_T
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 
 /**
  * Operation with functionality to change group types. Enables undo/redo
@@ -63,7 +64,7 @@ public class ChangeFeatureGroupTypeOperation extends AbstractFeatureModelOperati
 		} else {
 			feature.getStructure().changeToAnd();
 		}
-		return null;
+		return new FeatureIDEEvent(feature, null, true, EventType.CHILDREN_CHANGED, null, null);
 	}
 
 	@Override

@@ -803,6 +803,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 				new FeatureLabelEditManager(part, TextCellEditor.class, new FeatureCellEditorLocator(part.getFeatureFigure()), getFeatureModel()).show();
 			}
 			break;
+		case CHILDREN_CHANGED:
 		case MANDATORY_CHANGED:
 //			graphicalFeature = graphicalFeatureModel.getGraphicalFeature((IFeature) event.getSource());
 //			FeatureUIHelper.fireMandatoryChanged(graphicalFeature);

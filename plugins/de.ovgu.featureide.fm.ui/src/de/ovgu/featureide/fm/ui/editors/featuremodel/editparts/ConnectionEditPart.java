@@ -25,6 +25,7 @@ import java.beans.PropertyChangeListener;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.draw2d.Figure;
+import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.GridLayout;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Label;
@@ -169,7 +170,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 
 		boolean parentHidden = false;
 
-		RotatableDecoration sourceDecoration = null;
+		RotatableDecoration sourceDecoration = clearDecoration;
 		while (!sourceParent.getStructure().isRoot()) {
 			sourceParent = sourceParent.getStructure().getParent().getFeature();
 			if (sourceParent.getStructure().isHidden())
@@ -184,7 +185,12 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		PolylineConnection connection = (PolylineConnection) getConnectionFigure();
 		connection.setSourceDecoration(sourceDecoration);
 	}
-	
+	private final CircleDecoration clearDecoration = new CircleDecoration(true) {
+		@Override
+		protected void fillShape(Graphics graphics) {
+			
+		}
+	};;
 	private CircleDecoration circleDecorationMandatory = null;
 	private CircleDecoration circleDecorationFalse = null;
 	private CircleDecoration getSourceDecoration(boolean mandatory) {
@@ -202,6 +208,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 	}
 
 	public void refreshTargetDecoration() {
+		System.out.println("ConnectionEditPart.refreshTargetDecoration()");
 		FeatureConnection connectionModel = getConnectionModel();
 		IGraphicalFeature target = connectionModel.getTarget();
 		RotatableDecoration targetDecoration = null;
@@ -219,12 +226,14 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 					targetDecoration = new RelationDecoration(structure.isMultiple(), object);
 					PolylineConnection connection = (PolylineConnection) getConnectionFigure();
 					connection.setTargetDecoration(targetDecoration);
+					return;
 				}
 			} else {
 				if (structure.isFirstChild(source.getObject().getStructure())) {
 					targetDecoration = new RelationDecoration(structure.isMultiple(), target.getTree().getChildren().get(target.getTree().getNumberOfChildren() - 1).getObject());
 					PolylineConnection connection = (PolylineConnection) getConnectionFigure();
 					connection.setTargetDecoration(targetDecoration);
+					return;
 				}
 			}
 		}

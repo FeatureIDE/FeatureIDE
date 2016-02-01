@@ -185,18 +185,21 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 				if (connectionEditPart != null) {
 					connectionEditPart.refreshSourceDecoration();
 					connectionEditPart.refreshTargetDecoration();
-//					connectionEditPart.refreshToolTip();
 				}
 			}
 		} else if (EventType.CHILDREN_CHANGED.equals(prop)) {
 			getFeatureFigure().setProperties();
+			boolean targetUpdated = false;
 			for (FeatureConnection connection : getFeature().getTargetConnections()) {
 				Map<?, ?> registry = getViewer().getEditPartRegistry();
 				ConnectionEditPart connectionEditPart = (ConnectionEditPart) registry.get(connection);
 				if (connectionEditPart != null) {
 					connectionEditPart.refreshSourceDecoration();
-//					connectionEditPart.refreshTargetDecoration();
-					connectionEditPart.refreshToolTip();
+					if (!targetUpdated) {
+						connectionEditPart.refreshTargetDecoration();
+						connectionEditPart.refreshToolTip();
+						targetUpdated = true;
+					}
 				}
 			}
 		} else if (EventType.NAME_CHANGED.equals(prop)) {

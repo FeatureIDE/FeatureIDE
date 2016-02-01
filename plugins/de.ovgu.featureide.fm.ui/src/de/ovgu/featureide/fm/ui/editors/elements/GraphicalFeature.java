@@ -44,7 +44,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  */
 public class GraphicalFeature implements IGraphicalFeature {
 
-	// XXX there is only one source/parent, why do we use a list
+	// TODO there is only one source/parent, why do we use a list
 	protected final LinkedList<FeatureConnection> sourceConnections = new LinkedList<FeatureConnection>();
 	protected final LinkedList<FeatureConnection> targetConnections = new LinkedList<FeatureConnection>();
 
