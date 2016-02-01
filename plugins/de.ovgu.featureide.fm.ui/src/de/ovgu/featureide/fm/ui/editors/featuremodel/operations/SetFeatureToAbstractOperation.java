@@ -26,6 +26,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_CO
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 
 /**
  * Operation with functionality to set a Feature abstract/concrete. Enables
@@ -67,7 +68,7 @@ public class SetFeatureToAbstractOperation extends AbstractFeatureModelOperation
 	@Override
 	protected FeatureIDEEvent operation() {
 		feature.getStructure().setAbstract(!feature.getStructure().isAbstract());
-		return null;
+		return new FeatureIDEEvent(feature, EventType.ATTRIBUTE_CHANGED);
 	}
 
 	@Override

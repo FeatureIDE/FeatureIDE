@@ -128,6 +128,11 @@ public class FeatureStructure implements IFeatureStructure {
 		return new FeatureStructure(this, newFeatureModel);
 	}
 
+	protected void fireAttributeChanged() {
+		final FeatureIDEEvent event = new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED);
+		correspondingFeature.fireEvent(event);
+	}
+	
 	protected void fireChildrenChanged() {
 		final FeatureIDEEvent event = new FeatureIDEEvent(this, EventType.CHILDREN_CHANGED, Boolean.FALSE, Boolean.TRUE);
 		correspondingFeature.fireEvent(event);
@@ -333,7 +338,7 @@ public class FeatureStructure implements IFeatureStructure {
 	@Override
 	public void setAbstract(boolean value) {
 		concrete = !value;
-		fireChildrenChanged();
+		fireAttributeChanged();
 	}
 
 	@Override
