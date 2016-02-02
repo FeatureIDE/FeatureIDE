@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="de.ovgu.featureide.core.composers">
+      <composer
+            class="de.ovgu.featureide.featuremake.FeatureMakeComposer"
+            description="Transformation feature configuration to Makefile user defines"
+            id="de.ovgu.featureide.composer.featuremake"
+            name="FeatureMake"
+            nature="FeatureIDE_Core.featureMakeNature">
+      </composer>
+   </extension>
+   <extension
+         point="de.ovgu.featureide.core.wizard">
+      <newProjectWizard
+            class="de.ovgu.featureide.core.wizardextension.DefaultNewFeatureProjectWizardExtension"
+            composerid="de.ovgu.featureide.composer.featuremake"
+            id="de.ovgu.featureide.core.featurec.newProjectWizard"
+            name="FeatureMakeNewProjectWizard">
+      </newProjectWizard>
+   </extension>
+
+</plugin>
