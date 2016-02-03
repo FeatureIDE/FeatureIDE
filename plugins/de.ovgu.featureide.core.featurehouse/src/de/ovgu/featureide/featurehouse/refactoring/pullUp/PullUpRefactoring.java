@@ -20,11 +20,10 @@
  */
 package de.ovgu.featureide.featurehouse.refactoring.pullUp;
 
-import java.io.ByteArrayInputStream;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,24 +34,28 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.internal.corext.refactoring.nls.changes.CreateTextFileChange;
 import org.eclipse.jdt.internal.corext.util.Messages;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.CompositeChange;
 import org.eclipse.ltk.core.refactoring.Refactoring;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ltk.core.refactoring.TextFileChange;
+import org.eclipse.ltk.core.refactoring.resource.DeleteResourceChange;
 import org.eclipse.ltk.core.refactoring.resource.MoveResourceChange;
 import org.eclipse.text.edits.DeleteEdit;
 import org.eclipse.text.edits.InsertEdit;
 import org.eclipse.text.edits.MultiTextEdit;
+import org.eclipse.text.edits.ReplaceEdit;
+import org.eclipse.text.edits.TextEdit;
 import org.eclipse.ui.editors.text.TextFileDocumentProvider;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 
@@ -82,7 +85,7 @@ public class PullUpRefactoring extends Refactoring {
 	private final AbstractClassSignature selectedElement;
 	private final String file;
 	private final Feature sourceFeature;
-	private final Map<AbstractSignature, List<Feature>> clonedSignatures;
+	private final Map<AbstractSignature, List<ClonedFeatures>> clonedSignatures;
 	private Feature destinationFeature;
 	private Set<ExtendedPullUpSignature> pullUpSignatures;
 	private Set<ExtendedPullUpSignature> deletableSignatures;
@@ -93,7 +96,7 @@ public class PullUpRefactoring extends Refactoring {
 	
 	@Override
 	public String getName() {
-		return "PullUp";
+		return "Pull Up to Parent-Feature";
 	}
 	
 	public PullUpRefactoring(AbstractClassSignature selection, IFeatureProject featureProject, String file) {
@@ -171,7 +174,7 @@ public class PullUpRefactoring extends Refactoring {
 		this.deletableSignatures = deletableSignatures;
 	}
 	
-	public Map<AbstractSignature, List<Feature>> getClonedSignatures() {
+	public Map<AbstractSignature, List<ClonedFeatures>> getClonedSignatures() {
 		return clonedSignatures;
 	}
 	
@@ -302,8 +305,11 @@ public class PullUpRefactoring extends Refactoring {
 	private boolean isCodeClone(final AbstractSignature signature){
 		
 		if (!clonedSignatures.containsKey(signature)) return false;
-
-		return !clonedSignatures.get(signature).contains(destinationFeature);
+		for (ClonedFeatures clonedFeatures : clonedSignatures.get(signature)) {
+			if (!clonedFeatures.getFeatures().contains(destinationFeature)) return true;
+		}
+		
+		return false;
 	}
 	
 	@Override
@@ -311,7 +317,6 @@ public class PullUpRefactoring extends Refactoring {
 		try {
 			pm.beginTask("Creating change...", 1);
 
-//			createNewDestinationFileIfNotExist();
 			return new CompositeChange(getName(), changes.toArray(new Change[changes.size()]));
 		} finally {
 			pm.done();
@@ -328,7 +333,8 @@ public class PullUpRefactoring extends Refactoring {
 		
 		IFile pullUpFile = RefactoringUtil.getFile(file);
 		
-		IFile destinationFile = getDestinationFile();
+		IFile destinationFile = createNewDestinationFileIfNotExist();
+		
 		
 		IDocumentProvider pullUpProvider = new TextFileDocumentProvider();
 		IDocumentProvider destinationProvider = new TextFileDocumentProvider();
@@ -358,23 +364,32 @@ public class PullUpRefactoring extends Refactoring {
 				}
 				else
 				{
-					if (!destinationFile.exists())
-					{
-						String content = getNewFeatureFileContent();
-						
-						CreateTextFileChange createChange = new CreateTextFileChange(destinationFile.getFullPath(), content, pullUpFile.getCharset(), "java");
-						changes.add(createChange);
-						destinationDoc.set(getNewFeatureFileContent());
-					}
-					
 					parent = signature.getParent();
 					final AFeatureData destinationFeatureData = getFeatureDataForFile(parent, destinationFile.getRawLocation().toOSString());
 				
 					SignaturePosition position = featureData.getSigPosition();
-				
-					int startOffset = pullUpDoc.getLineOffset(position.getStartRow() - 1) ;
-					int endOffset = pullUpDoc.getLineOffset(position.getEndRow() - 1) + position.getEndColumn();
-					String content = pullUpDoc.get(startOffset, endOffset-startOffset) + "\n";
+					
+					int startOffset = pullUpDoc.getLineOffset(position.getStartRow() - 1);
+					int endOffset = pullUpDoc.getLineOffset(position.getEndRow() - 1);
+					String content = "";
+					if (signature instanceof FujiFieldSignature)
+					{
+//						content += "\t";
+//						for (String modifier : signature.getModifiers()) {
+//							content += modifier + " ";
+//						}
+//						
+//						((FujiFieldSignature)signature).getFullModifiersAndReturnTypes();
+						
+//						content += signature.getType() + " " + signature.getName() +";\n";
+						
+						content += ((FujiFieldSignature) signature).getFullFieldDeclaration() + "\n";
+					}
+					else
+					{
+						endOffset += position.getEndColumn();
+						content = pullUpDoc.get(startOffset, endOffset-startOffset) + "\n";
+					}
 				
 					int line = destinationDoc.getNumberOfLines() - 1;
 					if (destinationFeatureData != null)
@@ -400,28 +415,55 @@ public class PullUpRefactoring extends Refactoring {
 		return status;
 	}
 
-	private void createNewDestinationFileIfNotExist() {
+	private IFile createNewDestinationFileIfNotExist() {
+		final IFolder featureFolder = featureProject.getSourceFolder().getFolder(destinationFeature.getName());
 		
-		IFile destinationFile = getDestinationFile();
-		
-		if (destinationFile.exists()) 
-			return;
-		
-		createNewFeatureFile();
-	}
-
-	private void createNewFeatureFile() {
-		IFile destinationFile =  null;
-		try {
-			String content = getNewFeatureFileContent();
-			InputStream stream = new ByteArrayInputStream(content.getBytes(Charset.availableCharsets().get("UTF-8")));
+		final String fileName = getDestinationFileName();
+		String pack = "";
+		if (!selectedElement.getPackage().startsWith("."))
+			pack = File.separator;
 			
-			destinationFile = getDestinationFile();
-			destinationFile.create(stream, true, new NullProgressMonitor());
-			stream.close();
-		} catch (IOException | CoreException e) {
+		pack = pack + selectedElement.getPackage().replaceAll("\\.",File.separator);
+		File folder = new  File(featureFolder.getRawLocation().toOSString() + pack);
+		if (!folder.exists()) 
+			folder.mkdirs();
+		
+		try {
+			featureProject.getSourceFolder().getFolder(featureFolder.getRawLocation().toOSString() + pack).refreshLocal(IResource.DEPTH_ONE, null);
+		} catch (CoreException e) {
 			e.printStackTrace();
 		}
+		
+		File destinationFile = new File(folder + File.separator+ fileName);
+		if (!destinationFile.exists())
+				destinationFile = createNewFeatureFile(destinationFile);
+		
+		return RefactoringUtil.getFile(destinationFile.getAbsolutePath());
+	}
+
+	private File createNewFeatureFile(File destinationFile) {
+		try {
+			String content = getNewFeatureFileContent();
+			destinationFile.createNewFile();
+			
+			BufferedWriter writer = new BufferedWriter(new FileWriter(destinationFile,true));
+			writer.write(content);
+			writer.close();
+			
+			try {
+				RefactoringUtil.getFile(destinationFile.getAbsolutePath()).refreshLocal(IResource.DEPTH_ONE, null);
+			} catch (CoreException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+//			IProject project = featureProject.getProject();
+//			project.refreshLocal(IResource.DEPTH_INFINITE, null);
+			
+			return destinationFile;
+		} catch (IOException e) {
+			e.printStackTrace();
+		} 
+		return null;
 	}
 
 	private String getNewFeatureFileContent() {
@@ -431,18 +473,35 @@ public class PullUpRefactoring extends Refactoring {
 		final String fileName = getDestinationFileName();
 		final String className = fileName.substring(0, fileName.lastIndexOf("."));
 		
+		String classPattern = className;
+		classPattern += getExtends(selectedElement.getExtendList(), " extends ");
+		classPattern += getExtends(selectedElement.getImplementList(), " implements ");
+		
 		String contents = composer.replaceSourceContentMarker(template, false, selectedElement.getPackage());
-		contents = contents.replaceAll(IComposerExtensionClass.CLASS_NAME_PATTERN, className);
+		contents = contents.replaceAll(IComposerExtensionClass.CLASS_NAME_PATTERN, classPattern);
 		contents = contents.replaceAll(IComposerExtensionClass.FEATUE_PATTER, featureName);
 		return contents;
 	}
+	
+	private String getExtends(HashSet<String> extendlist, String keyword) {
+		String result = "";
+		if (extendlist.size() > 0)
+			result += keyword;
+		
+		String allExtends = "";
+		for (String extend : extendlist) {
+			if (!allExtends.isEmpty())
+				allExtends += ", ";
+			allExtends += extend;
+		}
+		
+		result += allExtends;
+		
+		return result;
+	}
 
 	private IFile getDestinationFile() {
-		final IFolder featureFolder = featureProject.getSourceFolder().getFolder(destinationFeature.getName());
-		final String fileName = getDestinationFileName();
-		
-		String pack = selectedElement.getPackage().replaceAll("\\.",File.separator) + File.separator;
-		return featureFolder.getFile(pack + fileName);
+		return createNewDestinationFileIfNotExist();
 	}
 
 	private String getDestinationFileName() {
@@ -469,10 +528,13 @@ public class PullUpRefactoring extends Refactoring {
 		Map<IFile, MultiTextEdit> textEdits = new HashMap<>();
 		
 		int destinationFeatureId  = featureProject.getProjectSignatures().getFeatureID(destinationFeature.getName());
-		for (ExtendedPullUpSignature signature : deletableSignatures) {
-			if (destinationFeatureId == signature.getFeatureId()) continue;
+		for (ExtendedPullUpSignature extendedSignature : deletableSignatures) {
+			final int featureId = extendedSignature.getFeatureId();
+			if (destinationFeatureId == featureId) continue;
 			
-			final AFeatureData featureData = getFeatureDataForId(signature.getSignature(), signature.getFeatureId());
+			final AbstractSignature signature = extendedSignature.getSignature();
+			final boolean isClassSignature = signature instanceof FujiClassSignature;
+			final AFeatureData featureData = getFeatureDataForId(signature, featureId);
 			if (featureData == null) continue;
 			
 			IFile pullUpFile = RefactoringUtil.getFile(featureData.getAbsoluteFilePath());
@@ -487,16 +549,71 @@ public class PullUpRefactoring extends Refactoring {
 				pullUpProvider.connect(pullUpFile);
 				final IDocument pullUpDoc = pullUpProvider.getDocument(pullUpFile);
 
-				final String featureName = featureProject.getProjectSignatures().getFeatureName(signature.getFeatureId());
-				if (signature.getSignature() instanceof FujiClassSignature && featureName.equals(sourceFeature.getName()))  continue;
+				final String featureName = featureProject.getProjectSignatures().getFeatureName(featureId);
+				if (isClassSignature)
+				{
+					if (featureName.equals(sourceFeature.getName())) continue;
+					
+					DeleteResourceChange deleteChange = new DeleteResourceChange(pullUpFile.getFullPath(), true);
+					changes.add(deleteChange);
+				}
+				else
+				{
+					textEdits.put(pullUpFile, multiEdit);
+					SignaturePosition position = featureData.getSigPosition();
+			
+					int startOffset = pullUpDoc.getLineOffset(position.getStartRow() - 1) ;
+					int endOffset = pullUpDoc.getLineOffset(position.getEndRow() - 1) + position.getEndColumn();
+					
+					if (signature instanceof FujiFieldSignature)
+					{
+						int line = pullUpDoc.getLineOfOffset(startOffset);
+						int length = pullUpDoc.getLineLength(line) - 1;
+						String content = pullUpDoc.get(startOffset, length);
+						
+						final Set<AbstractSignature> fieldSignaturesOfLine = getFieldSignaturesOfLine(featureData);
+						final Set<AbstractSignature> matchedFieldSignatures = getMatchedSignatureForLine(featureData, signature);
+						
+						if (matchedFieldSignatures.size() == 1 || (fieldSignaturesOfLine.size() == matchedFieldSignatures.size() && fieldSignaturesOfLine.containsAll(matchedFieldSignatures))) 
+						{
+							DeleteEdit deleteEdit = new DeleteEdit(startOffset, length);
+							if (!coversEdit(multiEdit, deleteEdit)) 
+								multiEdit.addChild(deleteEdit);
+						}
+						else
+						{
+							for (AbstractSignature fieldSignature : fieldSignaturesOfLine) {
+								final AFeatureData fieldFeatureData = getFeatureDataForId(fieldSignature, featureId);
+								final SignaturePosition sigPosition = fieldFeatureData.getSigPosition();
+								final int startColumn = sigPosition.getIdentifierStart();
+								int offset = pullUpDoc.getLineOffset(sigPosition.getStartRow() - 1);
 							
-				textEdits.put(pullUpFile, multiEdit);
-				SignaturePosition position = featureData.getSigPosition();
-			
-				int startOffset = pullUpDoc.getLineOffset(position.getStartRow() - 1) ;
-				int endOffset = pullUpDoc.getLineOffset(position.getEndRow() - 1) + position.getEndColumn();
-			
-				multiEdit.addChild(new DeleteEdit(startOffset, endOffset - startOffset));
+								int replaceLength = sigPosition.getIdentifierEnd() - startColumn + 1;
+								
+								int separatorAfter = content.indexOf(",",startColumn);
+								int separatorBefore = content.lastIndexOf(",",startColumn);
+								if (separatorAfter > 0) 
+								{
+									offset += startColumn - 1;
+									replaceLength += separatorAfter - sigPosition.getIdentifierEnd() +1;
+								}
+								else if (separatorBefore > 0)
+								{
+									offset += separatorBefore;
+									replaceLength += startColumn - separatorBefore - 1;
+								}
+								
+								multiEdit.addChild(new ReplaceEdit(offset, replaceLength, ""));
+							}
+						}
+//						addEditChild(multiEdit, startOffset, endOffset);
+					}
+					else
+					{ 
+						int length = endOffset - startOffset;
+						multiEdit.addChild(new DeleteEdit(startOffset, length));
+					}
+				}
 				
 			} catch (CoreException e) {
 				e.printStackTrace();
@@ -516,4 +633,77 @@ public class PullUpRefactoring extends Refactoring {
 		return status;
 	}
 	
+	private boolean coversEdit(MultiTextEdit multiEdit, DeleteEdit deleteEdit) {
+		for (TextEdit textEdit : multiEdit.getChildren()) {
+			if (textEdit.covers(deleteEdit))
+				return true;
+		}
+		return false;
+	}
+
+	private Set<AbstractSignature> getMatchedSignatureForLine(AFeatureData featureData, AbstractSignature signature) {
+		Set<AbstractSignature> matchedSignaturesForClass = RefactoringUtil.getMatchedSignaturesForClass(signature.getParent().getFields(), featureData.getAbsoluteFilePath());
+		Set<AbstractSignature> result = new HashSet<>();
+		
+		for (AbstractSignature abstractSignature : matchedSignaturesForClass) {
+			final AFeatureData featureData2 = getFeatureDataForId(abstractSignature, featureData.getID());
+			if (featureData.getID() == featureData2.getID())
+			{
+				final AFeatureData extFeatureData = getFeatureDataForId(abstractSignature, featureData2.getID());
+				if (extFeatureData.getSigPosition().getStartRow() == featureData.getSigPosition().getStartRow() && 
+					extFeatureData.getSigPosition().getEndRow() == featureData.getSigPosition().getEndRow())
+				{
+					result.add(abstractSignature);
+				}
+			}
+
+		}
+		
+		return result;
+	}
+
+	private Set<AbstractSignature> getFieldSignaturesOfLine(AFeatureData featureData) {
+		
+		Set<AbstractSignature> result = new HashSet<>();
+		for (ExtendedPullUpSignature extSignature : deletableSignatures) {
+			
+			final int featureId = extSignature.getFeatureId();
+			final AbstractSignature signature = extSignature.getSignature();
+			if (featureId == featureData.getID() && signature instanceof FujiFieldSignature)
+			{
+				final AFeatureData extFeatureData = getFeatureDataForId(signature, featureId);
+				if (extFeatureData.getSigPosition().getStartRow() == featureData.getSigPosition().getStartRow() && 
+					extFeatureData.getSigPosition().getEndRow() == featureData.getSigPosition().getEndRow())
+				{
+					result.add(extSignature.getSignature());
+				}
+			}
+		}
+		return result;
+	}
+
+	private void addEditChild(final MultiTextEdit multiEdit, final int startOffset, final int endOffset){
+		
+		for (TextEdit deleteEdit : multiEdit.getChildren()) {
+			
+			TextEdit createdEdit = null;
+			
+			if (startOffset >= deleteEdit.getOffset() && endOffset > deleteEdit.getExclusiveEnd())
+				createdEdit = new DeleteEdit(deleteEdit.getOffset(), endOffset - startOffset);
+			else if (startOffset < deleteEdit.getOffset() && endOffset <= deleteEdit.getExclusiveEnd())
+				createdEdit = new DeleteEdit(startOffset, deleteEdit.getLength());
+			else if (startOffset < deleteEdit.getOffset() && endOffset > deleteEdit.getExclusiveEnd())
+				createdEdit = new DeleteEdit(startOffset, endOffset - startOffset);
+			
+			if (createdEdit != null){
+				multiEdit.removeChild(deleteEdit);
+				multiEdit.addChild(createdEdit);
+				return;
+			}
+		}
+		
+		multiEdit.addChild(new DeleteEdit(startOffset, endOffset - startOffset));
+	}
 }
+
+

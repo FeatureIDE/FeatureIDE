@@ -22,9 +22,11 @@ package de.ovgu.featureide.featurehouse.refactoring.pullUp;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.jdt.internal.corext.util.Messages;
@@ -61,9 +63,13 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.PlatformUI;
+import org.prop4j.Implies;
+import org.prop4j.Node;
 
 import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
+import de.ovgu.featureide.featurehouse.refactoring.RenameRefactoring;
+import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.Features;
 import de.ovgu.featureide.ui.views.outline.ContextOutlineLabelProvider;
@@ -79,22 +85,29 @@ public class PullUpMemberPage extends UserInputWizardPage {
 	
 	private static class PullUpHierarchyContentProvider implements ITreeContentProvider {
 
-		private Map<AbstractSignature, List<Feature>> clonedSignatures;
+		private Map<AbstractSignature, List<ClonedFeatures>> clonedSignatures;
+		private final Feature sourceFeature;
 		
 		public void dispose() {
 		}
 		
-		public PullUpHierarchyContentProvider(){
+		public PullUpHierarchyContentProvider(Feature feature){
+			sourceFeature = feature;
 		}
 
 		public Object[] getChildren(final Object parentElement) {
 			
 			Set<Object> elements = new HashSet<>();
-			if (parentElement instanceof AbstractSignature) {
-				if (clonedSignatures.containsKey(parentElement))
-					elements.addAll(clonedSignatures.get(parentElement));
+			if ((parentElement instanceof AbstractSignature) && (clonedSignatures.containsKey(parentElement))){
+				for (ClonedFeatures clonedFeatures : clonedSignatures.get(parentElement)) {
+					if (clonedFeatures.getFeatures().contains(sourceFeature)){
+						elements.addAll(clonedFeatures.getFeatures());
+						break;
+					}
+				}
 			}
 			return elements.toArray();
+			
 		}
 
 		public Object[] getElements(final Object inputElement) {
@@ -110,7 +123,7 @@ public class PullUpMemberPage extends UserInputWizardPage {
 		}
 		
 		public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {
-			this.clonedSignatures = (Map<AbstractSignature, List<Feature>> ) newInput;
+			this.clonedSignatures = (Map<AbstractSignature, List<ClonedFeatures>> ) newInput;
 		}
 	}
 	
@@ -165,9 +178,11 @@ public class PullUpMemberPage extends UserInputWizardPage {
 
 	private final PullUpRefactoring refactoring;
 
-	public PullUpMemberPage(final String name, PullUpRefactoring refactoring) {
-		super(name);
-		this.refactoring = refactoring;
+	private static final String PAGE_NAME= "PullUpMemberPage";
+	
+	public PullUpMemberPage(PullUpRefactoringWizard wizard) {
+		super(PAGE_NAME);
+		this.refactoring = (PullUpRefactoring) wizard.getRefactoring();;
 		setDescription("Select the destination feature and the members to pull up.");
 	}
 
@@ -283,12 +298,12 @@ public class PullUpMemberPage extends UserInputWizardPage {
 		fTableViewer = new CheckboxTreeViewer(tree);
 		fTableViewer.setUseHashlookup(true);
 		
-		final Map<AbstractSignature, List<Feature>> signatures = refactoring.getClonedSignatures();
+		final Map<AbstractSignature, List<ClonedFeatures>> signatures = refactoring.getClonedSignatures();
 		for (AbstractSignature signature : refactoring.getPullableElements()) {
-			if (!signatures.containsKey(signature)) signatures.put(signature, Collections.<Feature> emptyList());
+			if (!signatures.containsKey(signature)) signatures.put(signature, Collections.<ClonedFeatures> emptyList());
 		}
 		
-		fTableViewer.setContentProvider(new PullUpHierarchyContentProvider());
+		fTableViewer.setContentProvider(new PullUpHierarchyContentProvider(refactoring.getSourceFeature()));
 		fTableViewer.setLabelProvider(new PullUpMemberLabelProvider());
 		fTableViewer.setInput(signatures);
 		fTableViewer.addSelectionChangedListener(new ISelectionChangedListener() {
@@ -302,6 +317,10 @@ public class PullUpMemberPage extends UserInputWizardPage {
 			public void checkStateChanged(final CheckStateChangedEvent event) {
 				updateWizardPage(null, true);
 				fillParentFeatureComboBox(getSelectedPullUpFeatures());
+				
+				final int itemCount = parentFeatureCombo.getItemCount();
+				if (itemCount > 1)
+					parentFeatureCombo.select(itemCount - 1);
 			}
 		});
 		
@@ -429,19 +448,89 @@ public class PullUpMemberPage extends UserInputWizardPage {
 		fillParentFeatureComboBox(features);
 	}
 	
+	private Feature determineDestinationFeature(final List<String> allFeatures) {
+		final Map<String, List<String>> implies = getImplies();
+
+		for (Entry<String, List<String>> implied : implies.entrySet()) {
+			
+			final List<String> impliedFeatures = implied.getValue();
+			if (impliedFeatures.size() == allFeatures.size() && impliedFeatures.containsAll(allFeatures))
+				return refactoring.getFeatureProject().getFeatureModel().getFeature(implied.getKey());
+		} 
+		return null;
+	}
+	
+	private List<String>  getFeaturesNames(final List<Feature> features) {
+		List<String> allFeatures = new ArrayList<>();
+		for (Feature feature : features) {
+			allFeatures.add(feature.getName());
+		}
+		return allFeatures;
+	}
+	
+	private Map<String, List<String>> getImplies() {
+		final Map<String, List<String>> implies = new HashMap<>();
+		final List<Constraint> constraints = refactoring.getFeatureProject().getFeatureModel().getConstraints();
+		
+		for (Constraint constraint : constraints) {
+			if (!(constraint.getNode() instanceof Implies)) continue;
+			
+			final Node[] children = constraint.getNode().getChildren();
+			if (children.length != 2) continue;
+			
+			final String left = children[0].toString();
+			final String right = children[1].toString();
+			
+			List<String> features = getImpliesFeatures(implies, right);
+			features.add(left);
+		}
+		return implies; 
+	}
+
+	private List<String> getImpliesFeatures(final Map<String, List<String>> implies, final String right) {
+		List<String> features;
+		if (implies.containsKey(right))
+			features = implies.get(right);
+		else
+		{
+			features = new ArrayList<>();
+			implies.put(right, features);
+		}
+		return features;
+	}
+	
 	private void fillParentFeatureComboBox(List<Feature> features)
 	{
 		final List<Feature> commonAncestors = Features.getCommonAncestors(features);
 		
 		parentFeatureCombo.removeAll();
-		if (features == null || features.size() == 0) return;
-		
+
 		for (Feature feature : commonAncestors) {
 			if (feature.equals(refactoring.getSourceFeature())) continue;
 			parentFeatureCombo.add(feature.getName());
 		}
+
+
 		
-		parentFeatureCombo.select(parentFeatureCombo.getItemCount() - 1);
+//		parentFeatureCombo.removeAll();
+//		for (String feature : getImplies().keySet()) {
+//				parentFeatureCombo.add(feature);
+//		}
+		
+//		final Feature feature = determineDestinationFeature(getFeaturesNames(features));
+//		if (feature != null)
+//		{
+//			parentFeatureCombo.add(feature.getName());
+//		
+//		if (features == null || features.size() == 0) return;
+//		
+//		for (Feature feature : commonAncestors) {
+//			if (feature.equals(refactoring.getSourceFeature())) continue;
+//			parentFeatureCombo.add(feature.getName());
+//		}
+		
+//		parentFeatureCombo.select(parentFeatureCombo.getItemCount() - 1);
+//		}
 	}
 
 

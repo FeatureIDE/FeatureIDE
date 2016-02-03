@@ -200,7 +200,7 @@ public class FujiSignaturesCreator {
 
 							featurename = getFeatureName(bodyDecl);
 							addFeatureID(new FujiFieldSignature(curClassSig,
-									name, modifierString, type),
+									name, modifierString, type, field),
 									projectSignatures.getFeatureID(featurename), 
 									field.getStart(), field.getEnd(), field.IDstart, field.IDend, 
 									absoluteFilePath);

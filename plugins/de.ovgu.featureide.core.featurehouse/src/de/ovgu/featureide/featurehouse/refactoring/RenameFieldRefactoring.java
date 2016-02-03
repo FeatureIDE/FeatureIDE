@@ -35,6 +35,7 @@ import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 import de.ovgu.featureide.core.signature.base.AbstractFieldSignature;
+import de.ovgu.featureide.core.signature.base.FOPFeatureData;
 import de.ovgu.featureide.featurehouse.refactoring.matcher.SignatureMatcher;
 import de.ovgu.featureide.featurehouse.signature.fuji.FujiFieldSignature;
 
@@ -120,11 +121,11 @@ public class RenameFieldRefactoring extends RenameRefactoring<FujiFieldSignature
 	private AbstractFieldSignature existField(final AbstractClassSignature parent) {
 		for (AbstractFieldSignature field : parent.getFields()) {
 			if (field.getName().equals(newName)) {
-//				final FOPFeatureData[] featureData = (FOPFeatureData[]) field.getFeatureData();
-//				for (int i = 0; i < featureData.length; i++) {
-//					if (featureData[i].getAbsoluteFilePath().equals(renamingElement.getFirstFeatureData().getAbsoluteFilePath()))
+				final FOPFeatureData[] featureData = (FOPFeatureData[]) field.getFeatureData();
+				for (int i = 0; i < featureData.length; i++) {
+					if (featureData[i].getAbsoluteFilePath().equals(file))
 						return field;
-//				}
+				}
 			}
 		}
 		return null;

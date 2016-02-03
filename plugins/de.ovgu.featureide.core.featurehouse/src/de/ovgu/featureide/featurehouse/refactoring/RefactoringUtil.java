@@ -176,7 +176,7 @@ public class RefactoringUtil {
 		return projectSignatures.getFeatureModel().getFeature(featureName);
 	}
 	
-	private static Set<AbstractSignature> getMatchedSignaturesForClass(Set<? extends AbstractSignature> signatures, String matchingFile) {
+	public static Set<AbstractSignature> getMatchedSignaturesForClass(Set<? extends AbstractSignature> signatures, String matchingFile) {
 		Set<AbstractSignature> matchedSignatures  = new HashSet<>();
 		for (AbstractSignature signature : signatures) {
 			matchedSignatures.addAll(getMatchedSignature(signature, matchingFile));

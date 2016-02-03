@@ -127,7 +127,7 @@
            <command
                  commandId="de.ovgu.featureide.core.featurehouse.ui.commands.refactoring.pullUp"
                  id="de.ovgu.featureide.core.featurehouse.ui.action.refactoring.pullup"
-                 label="Pull Up..."
+                 label="Pull Up To Parent Feature..."
                  style="push">
               <visibleWhen
                     checkEnabled="false">
@@ -158,13 +158,56 @@
         </command>
         <command
               commandId="de.ovgu.featureide.core.featurehouse.ui.commands.refactoring.pullUp"
-              label="Pull Up..."
+              label="Pull Up To Parent-Feature..."
               style="push">
            <visibleWhen
                  checkEnabled="false">
               <test
                     property="de.ovgu.featureide.core.featurehouse.properties.rename">
               </test>
+           </visibleWhen>
+        </command>
+     </menu>
+  </menuContribution>
+  <menuContribution
+        locationURI="popup:de.ovgu.featureide.fm.ui.menus.popupMenu">
+     <menu
+           label="FeatureHouse-Refactoring">
+        <visibleWhen
+              checkEnabled="false">
+           <with
+                 variable="activeMenuSelection">
+              <iterate
+                    ifEmpty="false"
+                    operator="or">
+                 <test
+                       args="de.ovgu.featureide.composer.featurehouse"
+                       property="de.ovgu.featureide.fm.ui.properties.composer">
+                 </test>
+              </iterate>
+           </with>
+        </visibleWhen>
+        <command
+              commandId="de.ovgu.featureide.core.featurehouse.ui.commands.refactoring.pullUpAllClonedMembers"
+              label="PullUp cloned Members"
+              style="push">
+           <visibleWhen
+                 checkEnabled="false">
+              <with
+                    variable="activeMenuSelection">
+                 <and>
+                    <count
+                          value="1">
+                    </count>
+                    <reference
+                          definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
+                    </reference>
+                    <test
+                          args="de.ovgu.featureide.core.featurehouse.ui.commands.fuji"
+                          property="de.ovgu.featureide.core.featurehouse.properties.toggle.fuji">
+                    </test>
+                 </and>
+              </with>
            </visibleWhen>
         </command>
      </menu>

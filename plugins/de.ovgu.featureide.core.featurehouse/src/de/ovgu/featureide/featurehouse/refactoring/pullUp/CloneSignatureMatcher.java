@@ -46,6 +46,7 @@ import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.core.signature.base.SignaturePosition;
 import de.ovgu.featureide.featurehouse.refactoring.RefactoringUtil;
+import de.ovgu.featureide.featurehouse.signature.fuji.FujiMethodSignature;
 import de.ovgu.featureide.fm.core.Feature;
 
 /**
@@ -59,7 +60,7 @@ public class CloneSignatureMatcher {
 	private final IFeatureProject featureProject;
 	private final AbstractClassSignature classSignature;
 	private final String absoluteFileString;
-	private final Map<AbstractSignature, List<Feature>> clonedSignatures = new HashMap<>();
+	private final Map<AbstractSignature, List<ClonedFeatures>> clonedSignatures = new HashMap<>();
 
 	public CloneSignatureMatcher(IFeatureProject featureProject, AbstractClassSignature signature, String absoluteFileString) {
 		this.projectSignatures = featureProject.getProjectSignatures();
@@ -68,13 +69,14 @@ public class CloneSignatureMatcher {
 		this.absoluteFileString = absoluteFileString;
 	}
 	
-	public Map<AbstractSignature, List<Feature>> computeClonedSignatures()
+	public Map<AbstractSignature, List<ClonedFeatures>> computeClonedSignatures()
 	{
 		final IPath absoluteFilePath = Path.fromOSString(absoluteFileString);
 
 		final CloneAnalysisResults<VariantAwareClone> cloneResults = getCloneResults(absoluteFilePath.toFile().getName());
 		
 		final Set<AbstractSignature> matchedSignatures = RefactoringUtil.getIncludedMatchingSignaturesForFile(classSignature, absoluteFileString);
+//		removeConstructors(matchedSignatures);
 		
 		for (VariantAwareClone clone : cloneResults.getClones()) {
 			
@@ -84,9 +86,19 @@ public class CloneSignatureMatcher {
 		}
 		
 		Set<AbstractSignature> removableSignatures = new HashSet<>();
-		for (Entry<AbstractSignature, List<Feature>> entry : clonedSignatures.entrySet()) {
+		for (Entry<AbstractSignature, List<ClonedFeatures>> entry : clonedSignatures.entrySet()) {
+			
 			Feature feature = getFeatureForSignature(entry.getKey());
-			if (!entry.getValue().contains(feature) || entry.getValue().size() < 2) removableSignatures.add(entry.getKey());
+			Set<ClonedFeatures> removableClonedFeatures = new HashSet<>();
+			for (ClonedFeatures clonedFeatures : entry.getValue()) {
+				if (!clonedFeatures.getFeatures().contains(feature) || clonedFeatures.getFeatures().size() < 2) removableClonedFeatures.add(clonedFeatures);
+			} 
+			
+			for (ClonedFeatures clonedFeatures : removableClonedFeatures) {
+				entry.getValue().remove(clonedFeatures);
+			}
+			
+			if (entry.getValue().isEmpty()) removableSignatures.add(entry.getKey());
 		}
 		
 		for (AbstractSignature abstractSignature : removableSignatures) {
@@ -96,6 +108,17 @@ public class CloneSignatureMatcher {
 		return clonedSignatures;
 	}
 	
+	private void removeConstructors(Set<AbstractSignature> matchedSignatures) {
+
+		Set<AbstractSignature> removableConstructors = new HashSet<>();
+		for (AbstractSignature signature : matchedSignatures) {
+			if ((signature instanceof FujiMethodSignature) && ((FujiMethodSignature) signature).isConstructor())
+				removableConstructors.add(signature);
+		}
+		
+		matchedSignatures.removeAll(removableConstructors);
+	}
+
 	private Feature getFeatureForSignature(AbstractSignature signature){
 		for (AFeatureData featureData : signature.getFeatureData()) {
 			if (featureData.getAbsoluteFilePath().equals(absoluteFileString)) 
@@ -118,6 +141,8 @@ public class CloneSignatureMatcher {
 	private void addClonedSignatures(final AbstractSignature signature, final VariantAwareClone clone) {
 		
 		final Map<IPath, AFeatureData> includedFiles = getIncludesFileForSignature(signature);
+		
+		ClonedFeatures clonedFeatures = new ClonedFeatures();
 
 		for (CloneOccurence cloneOccurence : clone.getOccurences()) {
 			
@@ -126,20 +151,21 @@ public class CloneSignatureMatcher {
 			final AFeatureData featureData = includedFiles.get(cloneOccurence.getFile());
 			final Feature feature = RefactoringUtil.getFeatureForId(projectSignatures, featureData.getID());
 
-			if (clonedSignatures.containsKey(signature) && clonedSignatures.get(signature).contains(feature)) continue;
-
 			final int startRow = cloneOccurence.getStartIndex();
-			final int endRow = startRow + cloneOccurence.getClone().getLineCount();
+			final int endRow = startRow + cloneOccurence.getClone().getLineCount() - 1;
 			
 			if (isClonedSignature(featureData, startRow, endRow))
 			{
-				addFeatureForSignature(signature, feature);
+				clonedFeatures.addFeature(feature);
 			}	
 		}
+		
+		if (!clonedFeatures.getFeatures().isEmpty())
+			addFeatureForSignature(signature, clonedFeatures);
 	}
 	
-	private void addFeatureForSignature(final AbstractSignature signature, final Feature feature) {
-		final List<Feature> features;
+	private void addFeatureForSignature(final AbstractSignature signature, final ClonedFeatures clonedFeatures) {
+		final List<ClonedFeatures> features;
 		if (clonedSignatures.containsKey(signature))
 			features = clonedSignatures.get(signature);
 		else
@@ -148,7 +174,31 @@ public class CloneSignatureMatcher {
 			clonedSignatures.put(signature, features);
 		}
 		
-		features.add(feature);
+		addClonedFeatures(features, clonedFeatures);
+//		if (!features.contains(clonedFeatures))
+//			features.add(clonedFeatures);
+	}
+	
+	private void addClonedFeatures(final List<ClonedFeatures> list, final ClonedFeatures clonedfeatures)
+	{
+		for (ClonedFeatures features : list) {
+			
+			final Set<Feature> listFeatures1 = features.getFeatures();
+			final Set<Feature> listFeatures2 = clonedfeatures.getFeatures();
+			
+			if (listFeatures1.size() == listFeatures2.size() && listFeatures1.containsAll(listFeatures2)) return;
+			
+			if (listFeatures1.size() > listFeatures2.size() && listFeatures1.containsAll(listFeatures2)) return;
+			
+			if (listFeatures1.size() < listFeatures2.size() && listFeatures2.containsAll(listFeatures1)) 
+			{
+				list.remove(features);
+				list.add(clonedfeatures);
+				return;
+			}
+		}
+		
+		list.add(clonedfeatures);
 	}
 	
 	private boolean isClonedSignature(final AFeatureData featureData, final int startRow, final int endRow)
@@ -166,7 +216,7 @@ public class CloneSignatureMatcher {
 		return CPDResultConverter.convertMatchesToReadableResults(cpdResults);
 	}
 	
-	public Map<AbstractSignature, List<Feature>> getClonedSignatures() {
+	public Map<AbstractSignature, List<ClonedFeatures>> getClonedSignatures() {
 		return clonedSignatures;
 	}
 }

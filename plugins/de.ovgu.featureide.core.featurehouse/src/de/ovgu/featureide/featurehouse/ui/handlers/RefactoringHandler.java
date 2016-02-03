@@ -65,7 +65,7 @@ public abstract class RefactoringHandler extends ASelectionHandler {
 	}
 	
 	protected void createSignatures(IFeatureProject featureProject) {
-		ExtendedFujiSignaturesJob efsj = new ExtendedFujiSignaturesJob(featureProject);
+		ExtendedFujiSignaturesJob efsj = new ExtendedFujiSignaturesJob(featureProject, true, false);
 		try {
 			efsj.schedule();
 			efsj.join();

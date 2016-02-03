@@ -318,11 +318,12 @@ public abstract class RenameRefactoring<T extends AbstractSignature> extends Ref
 	}
 	
 	protected RefactoringStatus checkIfCuBroken() throws JavaModelException{
-//		ICompilationUnit cu = getCompilationUnit(renamingElement.getFirstFeatureData().getAbsoluteFilePath());
-//		if (cu == null)
-//			return RefactoringStatus.createFatalErrorStatus(RefactoringCoreMessages.Checks_cu_not_created);
-//		else if (! cu.isStructureKnown())
-//			return RefactoringStatus.createFatalErrorStatus(RefactoringCoreMessages.Checks_cu_not_parsed);
+		ICompilationUnit cu = RefactoringUtil.getCompilationUnit(file);
+		if (cu == null)
+			return RefactoringStatus.createFatalErrorStatus(RefactoringCoreMessages.Checks_cu_not_created);
+		else if (! cu.isStructureKnown())
+			return RefactoringStatus.createFatalErrorStatus(RefactoringCoreMessages.Checks_cu_not_parsed);
+		
 		return new RefactoringStatus();
 	}
 	

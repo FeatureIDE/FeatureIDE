@@ -26,7 +26,6 @@ public class PullUpHandler extends RefactoringHandler {
 			if (featureProject == null)
 				return;
 
-			
 			PullUpRefactoring pullUp = new PullUpRefactoring((FujiClassSignature) element, featureProject, file); 
 			PullUpRefactoringWizard refactoringWizard = new PullUpRefactoringWizard(pullUp);
 			RefactoringWizardOpenOperation op = new RefactoringWizardOpenOperation(refactoringWizard);
