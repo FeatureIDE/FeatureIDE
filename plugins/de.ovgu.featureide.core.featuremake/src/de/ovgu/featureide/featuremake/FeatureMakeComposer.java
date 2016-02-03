@@ -8,6 +8,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.ui.console.ConsolePlugin;
+import org.eclipse.ui.console.IConsole;
+import org.eclipse.ui.console.IConsoleManager;
+import org.eclipse.ui.console.MessageConsole;
+import org.eclipse.ui.console.MessageConsoleStream;
+
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
@@ -63,12 +69,16 @@ public class FeatureMakeComposer extends ComposerExtensionClass {
 		try {
 			final Process process = processBuilder.start();
 			new Thread() {
-		        public void run() {
+		        @Override
+				public void run() {
 		            BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
-		            String line = null; 
+		            String line = null;
+		            MessageConsole console = findConsole("Console");
+		            MessageConsoleStream out = console.newMessageStream();
+		            
 		            try {
 		                while ((line = input.readLine()) != null) {
-		                    System.out.println(line);
+		                	out.println(line);
 		                }
 		            } catch (IOException e) {
 		                e.printStackTrace();
@@ -80,7 +90,21 @@ public class FeatureMakeComposer extends ComposerExtensionClass {
 			e.printStackTrace();
 		}
 	}
-
+	
+	private MessageConsole findConsole(String name){
+		ConsolePlugin plugin = ConsolePlugin.getDefault();
+		IConsoleManager conMan = plugin.getConsoleManager();
+		IConsole[] existing = conMan.getConsoles();
+		for (int i = 0; i < existing.length; i++)
+			if (name.equals(existing[i].getName()))
+				return (MessageConsole) existing[i];
+		
+		//no console found, so create a new one
+		MessageConsole myConsole = new MessageConsole(name, null);
+		conMan.addConsoles(new IConsole[]{myConsole});
+		return myConsole;
+	}
+	
 	@Override
 	public Mechanism getGenerationMechanism() {
 		return IComposerExtensionClass.Mechanism.PREPROCESSOR;
