@@ -443,7 +443,7 @@ public class MungePreprocessor extends PPComposerExtensionClass {
 
 	@Override
 	public boolean hasFeatureFolder() {
-		return false;
+		return true;
 	}
 
 	@Override
