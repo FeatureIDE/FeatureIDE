@@ -121,7 +121,6 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 			}
 
 			SetFeatureToMandatoryOperation op = new SetFeatureToMandatoryOperation(feature, featureModel.getFeatureModel());
-//TODO _interfaces Removed Code
 			try {
 				PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 			} catch (ExecutionException e) {
@@ -179,15 +178,31 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 			if (!event.getOldValue().equals(event.getNewValue())) {
 				getFeatureFigure().setLocation((Point) event.getNewValue());
 			}
+			getFeatureFigure().setProperties();
+			for (FeatureConnection connection : getFeature().getSourceConnections()) {
+				IGraphicalFeature target = connection.getTarget();
+				final IGraphicalFeature newTarget = getFeature().getTree().getParentObject();
+				if (!target.equals(newTarget)) {
+					connection.setTarget(newTarget);
+					Map<?, ?> registry = getViewer().getEditPartRegistry();
+					ConnectionEditPart connectionEditPart = (ConnectionEditPart) registry.get(connection);
+					if (connectionEditPart != null) {
+						connectionEditPart.refreshParent();
+						connectionEditPart.refreshSourceDecoration();
+						connectionEditPart.refreshTargetDecoration();
+					}
+				}
+			}
 			for (FeatureConnection connection : getFeature().getTargetConnections()) {
 				Map<?, ?> registry = getViewer().getEditPartRegistry();
 				ConnectionEditPart connectionEditPart = (ConnectionEditPart) registry.get(connection);
 				if (connectionEditPart != null) {
+					connectionEditPart.refresh();
 					connectionEditPart.refreshSourceDecoration();
 					connectionEditPart.refreshTargetDecoration();
 				}
 			}
-		} else if (EventType.CHILDREN_CHANGED.equals(prop)) {
+		} else if (EventType.GROUP_TYPE_CHANGED.equals(prop)) {
 			getFeatureFigure().setProperties();
 			boolean targetUpdated = false;
 			for (FeatureConnection connection : getFeature().getTargetConnections()) {
@@ -201,6 +216,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 						targetUpdated = true;
 					}
 				}
+				
 			}
 		} else if (EventType.NAME_CHANGED.equals(prop)) {
 			getFeatureFigure().setName(getFeature().getObject().getProperty().getDisplayName());

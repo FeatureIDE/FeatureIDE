@@ -22,13 +22,17 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.MOVE_FEATURE;
 
+import java.util.List;
+
 import org.eclipse.draw2d.geometry.Point;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.ui.editors.FeatureConnection;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 
 /**
  * Operation with functionality to move features. Provides redo/undo support.
@@ -57,14 +61,29 @@ public class MoveFeatureOperation extends AbstractFeatureModelOperation {
 
 	@Override
 	protected FeatureIDEEvent operation() {
-		if (!data.getFeature().getGraphicalModel().getLayout().hasFeaturesAutoLayout()) {
+		final IGraphicalFeature feature = data.getFeature();
+		if (feature.getGraphicalModel().getLayout().hasFeaturesAutoLayout()) {
+			final IGraphicalFeature oldParent = data.getOldParent();
+			final IFeatureStructure featureStructure = feature.getObject().getStructure();
+			oldParent.getObject().getStructure().removeChild(featureStructure);
+			oldParent.getTree().removeSubTree(feature.getTree());
+			
+			final IGraphicalFeature newParent = data.getNewParent();
+			FeatureConnection connection = feature.getSourceConnections().get(0);
+			if (oldParent != newParent) {
+				final List<FeatureConnection> sourceConnections = oldParent.getTargetConnections();
+				sourceConnections.remove(connection);
+				connection.setTarget(newParent);
+				newParent.addTargetConnection(connection);
+			}
+			
+			newParent.getObject().getStructure().addChildAtPosition(data.getNewIndex(), featureStructure);
+			newParent.getTree().addSubTreeAtIndex(data.getNewIndex(), feature.getTree());
+		} else {
 			newInnerOrder(newPos);
 			setEventId(EventType.MODEL_DATA_LOADED);
-		} else {
-			data.getOldParent().getObject().getStructure().removeChild(data.getFeature().getObject().getStructure());
-			data.getNewParent().getObject().getStructure().addChildAtPosition(data.getNewIndex(), data.getFeature().getObject().getStructure());
 		}
-		return null;
+		return new FeatureIDEEvent(feature, EventType.LOCATION_CHANGED);
 	}
 
 	@Override

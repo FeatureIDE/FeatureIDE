@@ -786,9 +786,9 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		}
 
 		switch (prop) {
-		case FEATURE_NAME_CHANGED:// TODO revise this case (only positions need to be updated)
 		case FEATURE_ADD:
 			reload();
+		case FEATURE_NAME_CHANGED:// TODO revise this case (only positions need to be updated)
 			refresh();
 			featureModelEditor.setPageModified(true);
 
@@ -804,17 +804,19 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 				new FeatureLabelEditManager(part, TextCellEditor.class, new FeatureCellEditorLocator(part.getFeatureFigure()), getFeatureModel()).show();
 			}
 			break;
-		case CHILDREN_CHANGED:
+		case GROUP_TYPE_CHANGED:
 		case MANDATORY_CHANGED:
 		case ATTRIBUTE_CHANGED:
 			featureModelEditor.setPageModified(true);
 			break;
-		case MODEL_DATA_CHANGED:
+		
 		case CONSTRAINT_MOVE:
-			refresh();
+		case LOCATION_CHANGED:
+			internRefresh(true);
 			featureModelEditor.setPageModified(true);
 			break;
 		case STRUCTURE_CHANGED:
+		case MODEL_DATA_CHANGED:
 		case CONSTRAINT_ADD:
 		case CONSTRAINT_DELETE:
 		case CONSTRAINT_MODIFY:

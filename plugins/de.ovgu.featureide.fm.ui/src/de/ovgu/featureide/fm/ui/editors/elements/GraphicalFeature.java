@@ -92,7 +92,11 @@ public class GraphicalFeature implements IGraphicalFeature {
 
 	@Override
 	public void setLocation(Point newLocation) {
-		location = newLocation;
+		if (!location.equals(newLocation)) {
+			final FeatureIDEEvent event = new FeatureIDEEvent(this, EventType.LOCATION_CHANGED, location, newLocation);
+			location = newLocation;
+			correspondingFeature.fireEvent(event);
+		}
 	}
 
 	@Override

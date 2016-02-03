@@ -82,7 +82,7 @@ public class InterfaceProject {
 			EventType prop = event.getEventType();
 			if (EventType.LOCATION_CHANGED == prop) {
 				
-			} else if (EventType.CHILDREN_CHANGED == prop) {
+			} else if (EventType.GROUP_TYPE_CHANGED == prop) {
 				
 			} else if (EventType.NAME_CHANGED.equals(prop)) {
 				featureNames[id] = ((IFeature)event.getSource()).getName();

@@ -118,6 +118,7 @@ public abstract class AbstractFeatureModelOperation extends AbstractOperation {
 		return eventId;
 	}
 
+	@Deprecated// TODO remove
 	protected final void setEventId(EventType eventId) {
 		this.eventId = eventId;
 	}

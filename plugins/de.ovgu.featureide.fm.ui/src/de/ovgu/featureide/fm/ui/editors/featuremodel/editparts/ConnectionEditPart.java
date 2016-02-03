@@ -213,26 +213,21 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 			IGraphicalFeature source = connectionModel.getSource();
 			final IGraphicalFeature object = target.getTree().getChildren().get(0).getObject();
 			final IFeatureStructure structure = target.getObject().getStructure();
+			final PolylineConnection connection = (PolylineConnection) getConnectionFigure();
 			if (structure.isAnd()) {
-				PolylineConnection connection = (PolylineConnection) getConnectionFigure();
 				connection.setTargetDecoration(targetDecoration);
 				return;
 			}
 			if (FeatureUIHelper.hasVerticalLayout(target.getGraphicalModel())) {
 				if (structure.isFirstChild(source.getObject().getStructure())) {
 					targetDecoration = new RelationDecoration(structure.isMultiple(), object);
-					PolylineConnection connection = (PolylineConnection) getConnectionFigure();
-					connection.setTargetDecoration(targetDecoration);
-					return;
 				}
 			} else {
 				if (structure.isFirstChild(source.getObject().getStructure())) {
 					targetDecoration = new RelationDecoration(structure.isMultiple(), target.getTree().getChildren().get(target.getTree().getNumberOfChildren() - 1).getObject());
-					PolylineConnection connection = (PolylineConnection) getConnectionFigure();
-					connection.setTargetDecoration(targetDecoration);
-					return;
 				}
 			}
+			connection.setTargetDecoration(targetDecoration);	
 		}
 
 	}

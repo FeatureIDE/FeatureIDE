@@ -33,7 +33,6 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.Legend;
  * Creates edit parts for given models.
  * 
  * @author Thomas Thuem
- * @author Marcus Pinnecke (Feature Interface)
  */
 public class GraphicalEditPartFactory implements EditPartFactory {
 
@@ -48,23 +47,10 @@ public class GraphicalEditPartFactory implements EditPartFactory {
 			return new ConstraintEditPart(model);
 		} else if (model instanceof Legend) {
 			return new LegendEditPart(model);
-		} else throw new UnsupportedOperationException("Not implememented for " + model.getClass());
-//		GraphicItem item = (model instanceof IFeature) ? (((IFeature) model).getGraphicRepresenation().getItemType()) : (((IFeatureModel) model)
-//				.getGraphicRepresenation().getItemType());
-//		switch (item) {
-//		case Connection:
-//			return new ConnectionEditPart(model);
-//		case Constraint:
-//			
-//		case Feature:
-//			
-//		case Legend:
-//			return new LegendEditPart(model);
-//		case Model:
-//			return new ModelEditPart(model);
-//		default:
-//			return null;
-//		}
+		} else {
+			throw new UnsupportedOperationException("Not implememented for " + model.getClass());
+		}
+
 	}
 
 }

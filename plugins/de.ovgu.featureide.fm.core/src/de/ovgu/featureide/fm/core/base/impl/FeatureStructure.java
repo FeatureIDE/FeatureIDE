@@ -92,9 +92,12 @@ public class FeatureStructure implements IFeatureStructure {
 
 	@Override
 	public void addChildAtPosition(int index, IFeatureStructure newChild) {
-		children.add(index, newChild);
+		if (index > children.size()) {
+			children.add(newChild);
+		} else {
+			children.add(index, newChild);
+		}
 		newChild.setParent(this);
-		fireChildrenChanged();
 	}
 
 	protected void addNewChild(IFeatureStructure newChild) {
@@ -134,7 +137,7 @@ public class FeatureStructure implements IFeatureStructure {
 	}
 	
 	protected void fireChildrenChanged() {
-		final FeatureIDEEvent event = new FeatureIDEEvent(this, EventType.CHILDREN_CHANGED, Boolean.FALSE, Boolean.TRUE);
+		final FeatureIDEEvent event = new FeatureIDEEvent(this, EventType.GROUP_TYPE_CHANGED, Boolean.FALSE, Boolean.TRUE);
 		correspondingFeature.fireEvent(event);
 	}
 
@@ -315,7 +318,7 @@ public class FeatureStructure implements IFeatureStructure {
 		if(!children.remove(child))
 			throw new NoSuchElementException();
 		child.setParent(null);
-		fireChildrenChanged();
+//		fireChildrenChanged();
 	}
 
 	@Override
