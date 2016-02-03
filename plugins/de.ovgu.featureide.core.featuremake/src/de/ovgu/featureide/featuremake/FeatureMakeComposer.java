@@ -17,7 +17,9 @@ import org.eclipse.ui.console.MessageConsoleStream;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
@@ -50,13 +52,17 @@ public class FeatureMakeComposer extends ComposerExtensionClass {
 		Configuration cfg = new Configuration(model);
 		final FileReader<Configuration> reader = new FileReader<>(Paths.get(config.getLocationURI()), cfg, ConfigurationManager.getFormat(config.getName()));
 		reader.read();
+		
 		List<String> args = new ArrayList<String>();
 		args.add("make");
 		args.add("-B");
 		StringBuilder sb = new StringBuilder();
 		sb.append("USERDEFS=");
 		for (SelectableFeature sbf : cfg.getFeatures()) {
-			if (sbf.getSelection() == Selection.SELECTED) {
+			IFeature feature = sbf.getFeature();
+			IFeatureStructure structure = feature.getStructure();
+			
+			if (sbf.getSelection() == Selection.SELECTED && structure.isConcrete()) {
 				sb.append("-D").append(sbf.getName()).append(" ");
 			}
 		}
