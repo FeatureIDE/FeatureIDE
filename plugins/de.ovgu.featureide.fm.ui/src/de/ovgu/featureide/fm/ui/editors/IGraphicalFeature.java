@@ -22,6 +22,9 @@ package de.ovgu.featureide.fm.ui.editors;
 
 import java.util.List;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.util.tree.Tree;
 
@@ -42,10 +45,11 @@ public interface IGraphicalFeature extends IGraphicalElement {
 	
 	void addTargetConnection(FeatureConnection connection);
 	
-	List<FeatureConnection> getSourceConnections();
+	@CheckForNull
+	FeatureConnection getSourceConnection();
+	@Nonnull
+	List<FeatureConnection> getSourceConnectionAsList();
 
 	List<FeatureConnection> getTargetConnections();
-	
-	boolean removeTargetConnection(FeatureConnection connection);
 
 }

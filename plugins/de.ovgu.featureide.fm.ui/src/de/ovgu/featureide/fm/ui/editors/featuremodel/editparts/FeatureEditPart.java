@@ -136,7 +136,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 
 	@Override
 	protected List<FeatureConnection> getModelSourceConnections() {
-		return getFeature().getSourceConnections();
+		return getFeature().getSourceConnectionAsList();
 	}
 
 	@Override
@@ -179,13 +179,14 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 				getFeatureFigure().setLocation((Point) event.getNewValue());
 			}
 			getFeatureFigure().setProperties();
-			for (FeatureConnection connection : getFeature().getSourceConnections()) {
-				IGraphicalFeature target = connection.getTarget();
+			final FeatureConnection sourceConnection = getFeature().getSourceConnection();
+			if (sourceConnection != null) {
+				IGraphicalFeature target = sourceConnection.getTarget();
 				final IGraphicalFeature newTarget = getFeature().getTree().getParentObject();
 				if (!target.equals(newTarget)) {
-					connection.setTarget(newTarget);
+					sourceConnection.setTarget(newTarget);
 					Map<?, ?> registry = getViewer().getEditPartRegistry();
-					ConnectionEditPart connectionEditPart = (ConnectionEditPart) registry.get(connection);
+					ConnectionEditPart connectionEditPart = (ConnectionEditPart) registry.get(sourceConnection);
 					if (connectionEditPart != null) {
 						connectionEditPart.refreshParent();
 						connectionEditPart.refreshSourceDecoration();
@@ -193,6 +194,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 					}
 				}
 			}
+			
 			for (FeatureConnection connection : getFeature().getTargetConnections()) {
 				Map<?, ?> registry = getViewer().getEditPartRegistry();
 				ConnectionEditPart connectionEditPart = (ConnectionEditPart) registry.get(connection);
@@ -224,10 +226,10 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 		} else if (EventType.ATTRIBUTE_CHANGED.equals(prop)) {
 			getFeatureFigure().setProperties();
 		} else if (EventType.MANDATORY_CHANGED.equals(prop)) {
-			for (FeatureConnection connection : getFeature().getSourceConnections()) {
-				Map<?, ?> registry = getViewer().getEditPartRegistry();
-				ConnectionEditPart connectionEditPart = (ConnectionEditPart) registry.get(connection);
-				connectionEditPart.refreshSourceDecoration();}
+			FeatureConnection connection = getFeature().getSourceConnection();
+			Map<?, ?> registry = getViewer().getEditPartRegistry();
+			ConnectionEditPart connectionEditPart = (ConnectionEditPart) registry.get(connection);
+			connectionEditPart.refreshSourceDecoration();
 		}
 	}
 

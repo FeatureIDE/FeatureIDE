@@ -31,6 +31,8 @@ import de.ovgu.featureide.fm.core.functional.Functional;
 /**
  * Tree element.
  * 
+ * TODO remove this class as it seems to be redundant to the feature structure and needs to be updated all the time.S
+ * 
  * @author Sebastian Krieter
  * 
  */

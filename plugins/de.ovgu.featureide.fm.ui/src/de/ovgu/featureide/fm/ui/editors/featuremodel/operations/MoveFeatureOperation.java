@@ -22,15 +22,12 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.MOVE_FEATURE;
 
-import java.util.List;
-
 import org.eclipse.draw2d.geometry.Point;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
-import de.ovgu.featureide.fm.ui.editors.FeatureConnection;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 
@@ -69,14 +66,6 @@ public class MoveFeatureOperation extends AbstractFeatureModelOperation {
 			oldParent.getTree().removeSubTree(feature.getTree());
 			
 			final IGraphicalFeature newParent = data.getNewParent();
-			FeatureConnection connection = feature.getSourceConnections().get(0);
-			if (oldParent != newParent) {
-				final List<FeatureConnection> sourceConnections = oldParent.getTargetConnections();
-				sourceConnections.remove(connection);
-				connection.setTarget(newParent);
-				newParent.addTargetConnection(connection);
-			}
-			
 			newParent.getObject().getStructure().addChildAtPosition(data.getNewIndex(), featureStructure);
 			newParent.getTree().addSubTreeAtIndex(data.getNewIndex(), feature.getTree());
 		} else {

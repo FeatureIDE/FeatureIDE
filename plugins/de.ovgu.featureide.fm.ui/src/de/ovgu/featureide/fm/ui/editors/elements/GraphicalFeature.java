@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors.elements;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,40 +44,39 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  * 
  */
 public class GraphicalFeature implements IGraphicalFeature {
-
-	// TODO there is only one source/parent, why do we use a list
-	protected final LinkedList<FeatureConnection> sourceConnections = new LinkedList<FeatureConnection>();
-	protected final LinkedList<FeatureConnection> targetConnections = new LinkedList<FeatureConnection>();
+	
+	protected final FeatureConnection sourceConnection;
 
 	protected boolean constraintSelected;
-	protected IFeature correspondingFeature;
+	
+	protected IFeature feature;
+	
 	protected final IGraphicalFeatureModel graphicalFeatureModel;
 
 	protected Tree<IGraphicalFeature> tree = new Tree<IGraphicalFeature>(this);
 
 	protected Point location = new Point(0, 0);
+	
 	protected Dimension dimension = new Dimension(10, 10);
 
 	public GraphicalFeature(IFeature correspondingFeature, IGraphicalFeatureModel graphicalFeatureModel) {
-		this.correspondingFeature = correspondingFeature;
 		this.graphicalFeatureModel = graphicalFeatureModel;
-
-		sourceConnections.add(new FeatureConnection(this));
+		this.feature = correspondingFeature;
+		if (!correspondingFeature.getStructure().isRoot()) {
+			sourceConnection = new FeatureConnection(this);
+		} else {
+			sourceConnection = null;
+		}
 	}
 
 	@Override
 	public IFeature getObject() {
-		return correspondingFeature;
+		return feature;
 	}
 
 	@Override
 	public GraphicItem getItemType() {
 		return GraphicItem.Feature;
-	}
-
-	@Override
-	public Point getLocation() {
-		return location;
 	}
 
 	@Override
@@ -87,15 +87,20 @@ public class GraphicalFeature implements IGraphicalFeature {
 	@Override
 	public void setConstraintSelected(boolean selection) {
 		constraintSelected = selection;
-		correspondingFeature.fireEvent(new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED, Boolean.FALSE, Boolean.TRUE));
+		feature.fireEvent(new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED, Boolean.FALSE, Boolean.TRUE));
 	}
 
+	@Override
+	public Point getLocation() {
+		return location;
+	}
+	
 	@Override
 	public void setLocation(Point newLocation) {
 		if (!location.equals(newLocation)) {
 			final FeatureIDEEvent event = new FeatureIDEEvent(this, EventType.LOCATION_CHANGED, location, newLocation);
 			location = newLocation;
-			correspondingFeature.fireEvent(event);
+			feature.fireEvent(event);
 		}
 	}
 
@@ -121,45 +126,46 @@ public class GraphicalFeature implements IGraphicalFeature {
 
 	@Override
 	public void addTargetConnection(FeatureConnection connection) {
-		targetConnections.add(connection);
-		connection.setTarget(this);
+		
 	}
 
-	//	// delete old parent connection (if existing)
-	//			if (parent != null) {
-	//				parent.removeTargetConnection(parentConnection);
-	//				parentConnection.setTarget(null);
-	//			}
-	//
-	//			// update the target
-	//			if (newParent != null) {
-	//				parentConnection.setTarget(newParent.getFeature());
-	//				newParent.addTargetConnection(parentConnection);
-	//			}
+	@Override
+	public FeatureConnection getSourceConnection() {
+		if (sourceConnection != null) {
+			sourceConnection.setTarget(getTree().getParentObject());// XXX necessary?
+		}
+		return sourceConnection;
+	}
 
 	@Override
-	public List<FeatureConnection> getSourceConnections() {
-		return sourceConnections == null ? Collections.<FeatureConnection> emptyList() : sourceConnections;
+	public List<FeatureConnection> getSourceConnectionAsList() {
+		final List<FeatureConnection> list;
+		if (sourceConnection == null) {
+			list = Collections.emptyList();
+		} else {
+			 list = new ArrayList<>(1);
+			 list.add(getSourceConnection());
+		}
+		return Collections.unmodifiableList(list);
 	}
 
 	@Override
 	public List<FeatureConnection> getTargetConnections() {
-		return targetConnections;
-	}
-
-	@Override
-	public boolean removeTargetConnection(FeatureConnection connection) {
-		return targetConnections.remove(connection);
+		final List<FeatureConnection> targetConnections = new LinkedList<>();
+		for (IGraphicalFeature child : getTree().getChildrenObjects()) {
+			targetConnections.add(child.getSourceConnection());
+		}
+		return Collections.unmodifiableList(targetConnections);
 	}
 
 	@Override
 	public String toString() {
-		return correspondingFeature.toString();
+		return feature.toString();
 	}
 
 	@Override
 	public String getGraphicType() {
-		return null;
+		return "";
 	}
 
 	@Override

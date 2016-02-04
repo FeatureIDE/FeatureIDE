@@ -194,7 +194,6 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 			for (IFeatureStructure featureStructure : rootFeature.getStructure().getChildren()) {
 				traverse(rootTree, featureStructure.getFeature(), this);
 			}
-			graphicalFeature.getSourceConnections().clear();
 			this.constraintList = constraintList;
 			this.featureTree = rootTree;
 		} else {
@@ -207,7 +206,7 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 		final IGraphicalFeature graphicalFeature = new GraphicalFeature(feature, graphicalItem);
 		Tree<IGraphicalFeature> subTree = graphicalFeature.getTree();
 		rootTree.addSubTree(subTree);
-		final FeatureConnection connection = graphicalFeature.getSourceConnections().get(0);
+		final FeatureConnection connection = graphicalFeature.getSourceConnection();
 		rootTree.getObject().addTargetConnection(connection);
 		for (IFeatureStructure featureStructure : feature.getStructure().getChildren()) {
 			traverse(subTree, featureStructure.getFeature(), graphicalItem);
