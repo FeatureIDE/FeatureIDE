@@ -788,21 +788,27 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		switch (prop) {
 		case FEATURE_ADD:
 			reload();
-		case FEATURE_NAME_CHANGED:// TODO revise this case (only positions need to be updated)
-			refresh();
+			internRefresh(true);
 			featureModelEditor.setPageModified(true);
 
-			IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature((IFeature) event.getNewValue());
+			IGraphicalFeature newFeature = graphicalFeatureModel.getGraphicalFeature((IFeature) event.getNewValue());
 
+			final FeatureEditPart newEditPart = (FeatureEditPart) getEditPartRegistry().get(newFeature);
+			if (newEditPart != null) {
+				select(newEditPart);
+				// open the renaming command
+				new FeatureLabelEditManager(newEditPart, TextCellEditor.class, new FeatureCellEditorLocator(newEditPart.getFeatureFigure()), getFeatureModel()).show();
+			}
+			break;
+		case FEATURE_NAME_CHANGED:
+			internRefresh(true);
+			final IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(graphicalFeatureModel.getFeatureModel().getFeature((String)event.getNewValue()));
 			final FeatureEditPart part = (FeatureEditPart) getEditPartRegistry().get(graphicalFeature);
 			if (part != null) {
-				// select the new feature
-				setSelection(new StructuredSelection(part));
-				part.getViewer().reveal(part);
-
-				// open the renaming command
-				new FeatureLabelEditManager(part, TextCellEditor.class, new FeatureCellEditorLocator(part.getFeatureFigure()), getFeatureModel()).show();
+				deselectAll();
+				select(part);
 			}
+			featureModelEditor.setPageModified(true);
 			break;
 		case GROUP_TYPE_CHANGED:
 		case MANDATORY_CHANGED:

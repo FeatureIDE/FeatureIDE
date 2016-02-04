@@ -40,7 +40,6 @@ public class FeatureIDEEvent {
 		COLOR_CHANGED,
 		HIDDEN_CHANGED,
 		LOCATION_CHANGED,
-		NAME_CHANGED,
 		ATTRIBUTE_CHANGED,
 		GROUP_TYPE_CHANGED,
 		PARENT_CHANGED,
@@ -103,4 +102,11 @@ public class FeatureIDEEvent {
 		return newValue;
 	}
 
+	@Override
+	public String toString() {
+		return "FeatureIDEEvent [source=" + source + ", eventType=" + eventType + ", editor=" + editor + ", persistent=" + persistent + ", oldValue=" + oldValue
+				+ ", newValue=" + newValue + "]";
+	}
+
+	
 }

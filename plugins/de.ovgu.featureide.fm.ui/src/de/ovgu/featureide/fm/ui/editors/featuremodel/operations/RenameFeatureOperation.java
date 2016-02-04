@@ -48,7 +48,7 @@ public class RenameFeatureOperation extends AbstractFeatureModelOperation {
 	@Override
 	protected FeatureIDEEvent operation() {
 		featureModel.getRenamingsManager().renameFeature(oldName, newName);
-		return new FeatureIDEEvent(featureModel, EventType.FEATURE_NAME_CHANGED);
+		return new FeatureIDEEvent(featureModel, EventType.FEATURE_NAME_CHANGED, oldName, newName);
 	}
 
 	@Override
