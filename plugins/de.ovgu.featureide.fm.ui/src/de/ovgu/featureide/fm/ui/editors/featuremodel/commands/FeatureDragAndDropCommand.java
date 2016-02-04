@@ -83,7 +83,7 @@ public class FeatureDragAndDropCommand extends Command {
 				return false;
 			}
 			Point referencePoint = FeatureUIHelper.getSourceLocation(feature, newLocation);
-			IGraphicalFeature next = calculateNext(featureModel.getFeatures().getObject(), referencePoint);
+			IGraphicalFeature next = calculateNext(referencePoint);
 
 			// calculate new parent (if exists)
 			if (!calculateNewParentAndIndex(next))
@@ -189,17 +189,18 @@ public class FeatureDragAndDropCommand extends Command {
 
 	}
 
-	public static IGraphicalFeature calculateNext(IGraphicalFeature feature, Point referencePoint) {
-		if (feature == null)
-			return null;
-		IGraphicalFeature next = feature;
-		double distance = FeatureUIHelper.getTargetLocation(next).getDistance(referencePoint);
-		for (IGraphicalFeature child : feature.getTree().getChildrenObjects()) {
-			IGraphicalFeature childsNext = calculateNext(child, referencePoint);
-			double newDistance = FeatureUIHelper.getTargetLocation(childsNext).getDistance(referencePoint);
-			if (newDistance > 0 && newDistance < distance) {
-				next = childsNext;
-				distance = newDistance;
+	public IGraphicalFeature calculateNext(final Point referencePoint) {
+		IGraphicalFeature next = null;
+		int distance = Integer.MAX_VALUE;
+		for (IGraphicalFeature child : featureModel.getFeatures()) {
+			final Point targetLocation = FeatureUIHelper.getTargetLocation(child);
+			if ( hasVerticalLayout && targetLocation.x < referencePoint.x ||
+				!hasVerticalLayout && targetLocation.y < referencePoint.y) {
+				int newDistance = (int) targetLocation.getDistance(referencePoint);
+				if (newDistance > 0 && newDistance < distance) {
+					next = child;
+					distance = newDistance;
+				}
 			}
 		}
 		return next;

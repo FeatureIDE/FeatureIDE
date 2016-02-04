@@ -58,9 +58,9 @@ public class FeatureUIHelper {
 
 	private static Point getSourceLocation(Rectangle bounds, IGraphicalFeatureModel featureModel) {
 		if (featureModel.getLayout().verticalLayout()) {
-			return new Point(bounds.getLeft().x, (bounds.bottom() + bounds.getTop().y) / 2);
+			return bounds.getLeft();
 		} else {
-			return new Point(bounds.getCenter().x, bounds.y);
+			return bounds.getTop();
 		}
 	}
 
@@ -205,12 +205,11 @@ public class FeatureUIHelper {
 	}
 
 	public static Point getTargetLocation(IGraphicalFeature feature) {
-		Rectangle bounds = getBounds(feature);
+		final Rectangle bounds = getBounds(feature);
 		if (feature.getGraphicalModel().getLayout().verticalLayout()) {
-			return new Point(bounds.getRight().x, (bounds.bottom() + bounds.getTop().y) / 2);
+			return bounds.getRight();
 		}
-
-		return new Point(bounds.getCenter().x, bounds.bottom() - 1);
+		return bounds.getBottom();
 
 	}
 
