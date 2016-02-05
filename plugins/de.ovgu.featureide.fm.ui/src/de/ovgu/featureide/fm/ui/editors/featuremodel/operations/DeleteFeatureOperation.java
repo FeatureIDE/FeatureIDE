@@ -29,6 +29,7 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
@@ -97,7 +98,7 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 				}
 			}
 		}
-		return null;
+		return new FeatureIDEEvent(feature, EventType.FEATURE_DELETE);
 	}
 
 	@Override
@@ -132,7 +133,7 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 			}
 			featureModel.addFeature(feature);
 
-			//Replace Featurename in Constraints
+			//Replace feature name in Constraints
 			if (replacement != null) {
 				for (IConstraint c : featureModel.getConstraints()) {
 					if (c.getContainedFeatures().contains(replacement)) {
@@ -143,7 +144,7 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 		} catch (Exception e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
-		return null;
+		return new FeatureIDEEvent(feature, EventType.FEATURE_ADD);
 	}
 
 	@Override

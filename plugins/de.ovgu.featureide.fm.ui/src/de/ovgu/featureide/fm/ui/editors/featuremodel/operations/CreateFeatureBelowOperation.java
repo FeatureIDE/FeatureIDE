@@ -23,12 +23,6 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_LAYER;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DEFAULT_FEATURE_LAYER_CAPTION;
 
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -55,12 +49,6 @@ public class CreateFeatureBelowOperation extends AbstractFeatureModelOperation {
 	}
 
 	@Override
-	public IStatus redo(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
-		fireEvent(operation());
-		return Status.OK_STATUS;
-	}
-
-	@Override
 	protected FeatureIDEEvent operation() {
 		int number = 1;
 
@@ -73,8 +61,6 @@ public class CreateFeatureBelowOperation extends AbstractFeatureModelOperation {
 		feature = featureModel.getFeature(feature.getName());
 		feature.getStructure().addChild(newFeature.getStructure());
 
-		//TODO _interfaces Removed Code
-		//		FeatureDiagramLayoutHelper.initializeLayerFeaturePosition(((FeatureDiagramEditor) diagramEditor).getGraphicalFeatureModel(), newFeature, feature);
 		return new FeatureIDEEvent(featureModel, EventType.FEATURE_ADD, null, newFeature);
 	}
 

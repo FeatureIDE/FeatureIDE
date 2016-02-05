@@ -77,14 +77,15 @@ public class FeatureDragAndDropCommand extends Command {
 
 	@Override
 	public boolean canExecute() {
-
 		if (hasAutoLayout) {
 			if (editPart.getSelected() != 2) {
 				return false;
 			}
 			Point referencePoint = FeatureUIHelper.getSourceLocation(feature, newLocation);
 			IGraphicalFeature next = calculateNext(referencePoint);
-
+			if (next == null) {
+				return false;
+			}
 			// calculate new parent (if exists)
 			if (!calculateNewParentAndIndex(next))
 				return false;
