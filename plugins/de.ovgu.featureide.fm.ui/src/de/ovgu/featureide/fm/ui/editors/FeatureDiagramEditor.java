@@ -849,6 +849,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			break;
 		case LEGEND_LAYOUT_CHANGED:
 			legendLayoutAction.refresh();
+		default:
+			break;
 		}
 
 		for (IFeatureModelEditorPage page : featureModelEditor.extensionPages) {

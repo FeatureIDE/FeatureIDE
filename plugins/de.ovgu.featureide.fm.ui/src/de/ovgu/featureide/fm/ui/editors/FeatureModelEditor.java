@@ -429,6 +429,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IResource
 				case MODEL_DATA_LOADED:
 					featureModel = fmManager.editObject();
 					break;
+				default:
+					break;
 				}
 			}
 		});
