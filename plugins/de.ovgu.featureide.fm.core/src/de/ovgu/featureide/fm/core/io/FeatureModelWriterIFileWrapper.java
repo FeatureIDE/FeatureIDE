@@ -69,7 +69,7 @@ public class FeatureModelWriterIFileWrapper extends AbstractFeatureModelWriter {
 		if (file.exists()) {
 			file.setContents(source, false, true, null);
 		} else {
-			file.create(source, true, null);
+			file.create(source, false, null);
 		}
 	}
 }
