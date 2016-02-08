@@ -32,6 +32,7 @@ import java.util.List;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FileReader;
 
 /**
@@ -92,15 +93,14 @@ public class ConfigurationMatrix {
 
 	private void readConfigurations(Filter<? super Path> filter) {
 		final Configuration c = new Configuration(featureModel);
-		FileReader<Configuration> r = new FileReader<>(c);
+		final FileReader<Configuration> r = new FileReader<>(c);
 
 		read = false;
 		configurationMatrix.clear();
 
 		try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(path, filter)) {
 			for (Path configPath : directoryStream) {
-				r.setPath(configPath);
-				r.read();
+				r.read(configPath, ConfigurationManager.getFormat(configPath.toString()));
 				addConfig(c);
 			}
 		} catch (IOException e) {
