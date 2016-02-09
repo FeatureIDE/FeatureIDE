@@ -20,13 +20,13 @@
  */
 package de.ovgu.featureide.fm.ui.editors;
 
+import java.util.Collection;
 import java.util.Iterator;
 
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.gef.ui.actions.PrintAction;
 import org.eclipse.ui.IWorkbenchPart;
 
-import de.ovgu.featureide.fm.core.base.util.tree.Tree;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
 
 /**
@@ -56,7 +56,7 @@ public class FMPrintAction extends PrintAction {
 		FeatureModelLayout layout = featureModel.getLayout();
 		int layoutOld = layout.getLayoutAlgorithm();
 
-		Tree<IGraphicalFeature> features = featureModel.getFeatures();
+		Collection<IGraphicalFeature> features = featureModel.getFeatures();
 		Iterator<IGraphicalFeature> featureIter = features.iterator();
 		Point minP = FeatureUIHelper.getLocation(featureIter.next()).getCopy();
 
@@ -67,7 +67,7 @@ public class FMPrintAction extends PrintAction {
 		return;
 	}
 
-	private void move(IGraphicalFeatureModel featureModel, FeatureModelLayout layout, Tree<IGraphicalFeature> features, Iterator<IGraphicalFeature> featureIter, Point minP) {
+	private void move(IGraphicalFeatureModel featureModel, FeatureModelLayout layout, Collection<IGraphicalFeature> features, Iterator<IGraphicalFeature> featureIter, Point minP) {
 		layout.setLayout(0);
 		while (featureIter.hasNext()) {
 			IGraphicalFeature f = featureIter.next();
@@ -83,7 +83,7 @@ public class FMPrintAction extends PrintAction {
 		moveLegend(featureModel, layout, minP);
 	}
 
-	private void moveBack(IGraphicalFeatureModel featureModel, FeatureModelLayout layout, int layoutOld, Tree<IGraphicalFeature> features, Point minP) {
+	private void moveBack(IGraphicalFeatureModel featureModel, FeatureModelLayout layout, int layoutOld, Collection<IGraphicalFeature> features, Point minP) {
 		Point minPneg = new Point(-minP.x, -minP.y);
 		moveFeatures(features, minPneg);
 		moveConstraints(featureModel, minPneg);
@@ -105,7 +105,7 @@ public class FMPrintAction extends PrintAction {
 		}
 	}
 
-	private void moveFeatures(Tree<IGraphicalFeature> features, Point minP) {
+	private void moveFeatures(Collection<IGraphicalFeature> features, Point minP) {
 		for (IGraphicalFeature f : features) {
 			Point newPoint = new Point(FeatureUIHelper.getLocation(f).getCopy().x - minP.x, FeatureUIHelper.getLocation(f).getCopy().y - minP.y);
 			FeatureUIHelper.setLocation(f, newPoint);

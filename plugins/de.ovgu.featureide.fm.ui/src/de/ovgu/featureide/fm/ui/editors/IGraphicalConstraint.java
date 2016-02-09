@@ -36,4 +36,5 @@ public interface IGraphicalConstraint extends IGraphicalElement {
 
 	void setFeatureSelected(boolean selected);
 
+	IGraphicalConstraint clone();
 }

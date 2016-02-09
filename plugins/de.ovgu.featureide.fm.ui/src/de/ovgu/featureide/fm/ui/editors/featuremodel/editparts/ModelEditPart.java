@@ -29,6 +29,7 @@ import org.eclipse.draw2d.FreeformLayer;
 import org.eclipse.draw2d.FreeformLayout;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.MarginBorder;
+import org.eclipse.gef.EditPart;
 import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 
@@ -89,4 +90,11 @@ public class ModelEditPart extends AbstractGraphicalEditPart {
 		return list;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.eclipse.gef.editparts.AbstractEditPart#createChild(java.lang.Object)
+	 */
+	@Override
+	public EditPart createChild(Object model) {
+		return super.createChild(model);
+	}
 }

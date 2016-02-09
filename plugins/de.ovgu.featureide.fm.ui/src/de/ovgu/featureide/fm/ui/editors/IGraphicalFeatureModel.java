@@ -20,12 +20,12 @@
  */
 package de.ovgu.featureide.fm.ui.editors;
 
+import java.util.Collection;
 import java.util.List;
 
 import de.ovgu.featureide.fm.core.IGraphicItem;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.util.tree.Tree;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
 
 /**
@@ -47,18 +47,14 @@ public interface IGraphicalFeatureModel extends IGraphicItem, Cloneable {
 
 	void refreshContextMenu();
 	
-	Tree<IGraphicalFeature> getFeatures();
-
-	void setFeatureTree(Tree<IGraphicalFeature> featureTree);
+	Collection<IGraphicalFeature> getFeatures();
 
 	List<IGraphicalConstraint> getConstraints();
 
 	void setConstraintList(List<IGraphicalConstraint> constraintList);
 
 	IGraphicalFeature getGraphicalFeature(IFeature newFeature);
-	
-	void update();
-	
+		
 	IGraphicalFeatureModel clone();
 	
 	void init();

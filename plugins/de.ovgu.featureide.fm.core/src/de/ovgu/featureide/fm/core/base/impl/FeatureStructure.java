@@ -245,12 +245,13 @@ public class FeatureStructure implements IFeatureStructure {
 	}
 
 	@Override
-	public boolean isAncestorOf(IFeatureStructure next) {
-		while (next.getParent() != null) {
-			if (next.getParent() == getParent()) {
+	public boolean isAncestorOf(IFeatureStructure parent) {
+		IFeatureStructure currParent = getParent();
+		while (currParent != null) {
+			if (parent == currParent) {
 				return true;
 			}
-			next = next.getParent();
+			currParent = currParent.getParent();
 		}
 		return false;
 	}
@@ -318,7 +319,7 @@ public class FeatureStructure implements IFeatureStructure {
 		if(!children.remove(child))
 			throw new NoSuchElementException();
 		child.setParent(null);
-//		fireChildrenChanged();
+		fireChildrenChanged();
 	}
 
 	@Override

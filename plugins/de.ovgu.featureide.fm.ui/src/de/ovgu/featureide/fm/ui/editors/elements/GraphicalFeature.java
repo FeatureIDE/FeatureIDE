@@ -29,11 +29,11 @@ import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
-import de.ovgu.featureide.fm.core.base.util.tree.Tree;
 import de.ovgu.featureide.fm.ui.editors.FeatureConnection;
-import de.ovgu.featureide.fm.ui.editors.IGraphicalElement;
+import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
@@ -53,8 +53,6 @@ public class GraphicalFeature implements IGraphicalFeature {
 	
 	protected final IGraphicalFeatureModel graphicalFeatureModel;
 
-	protected Tree<IGraphicalFeature> tree = new Tree<IGraphicalFeature>(this);
-
 	protected Point location = new Point(0, 0);
 	
 	protected Dimension dimension = new Dimension(10, 10);
@@ -67,6 +65,15 @@ public class GraphicalFeature implements IGraphicalFeature {
 		} else {
 			sourceConnection = null;
 		}
+	}
+
+	public GraphicalFeature(GraphicalFeature graphicalFeature) {
+		constraintSelected = graphicalFeature.constraintSelected;
+		location = graphicalFeature.location;
+		dimension = graphicalFeature.dimension;
+		feature = graphicalFeature.feature;
+		graphicalFeatureModel = graphicalFeature.graphicalFeatureModel;
+		sourceConnection = graphicalFeature.sourceConnection;
 	}
 
 	@Override
@@ -115,11 +122,6 @@ public class GraphicalFeature implements IGraphicalFeature {
 	}
 
 	@Override
-	public Tree<IGraphicalFeature> getTree() {
-		return tree;
-	}
-
-	@Override
 	public IGraphicalFeatureModel getGraphicalModel() {
 		return graphicalFeatureModel;
 	}
@@ -132,7 +134,7 @@ public class GraphicalFeature implements IGraphicalFeature {
 	@Override
 	public FeatureConnection getSourceConnection() {
 		if (sourceConnection != null) {
-			sourceConnection.setTarget(getTree().getParentObject());// XXX necessary?
+			sourceConnection.setTarget(FeatureUIHelper.getGraphicalParent(feature, graphicalFeatureModel));
 		}
 		return sourceConnection;
 	}
@@ -152,8 +154,8 @@ public class GraphicalFeature implements IGraphicalFeature {
 	@Override
 	public List<FeatureConnection> getTargetConnections() {
 		final List<FeatureConnection> targetConnections = new LinkedList<>();
-		for (IGraphicalFeature child : getTree().getChildrenObjects()) {
-			targetConnections.add(child.getSourceConnection());
+		for (IFeatureStructure child : feature.getStructure().getChildren()) {
+			targetConnections.add(FeatureUIHelper.getGraphicalFeature(child, graphicalFeatureModel).getSourceConnection());
 		}
 		return Collections.unmodifiableList(targetConnections);
 	}
@@ -167,16 +169,39 @@ public class GraphicalFeature implements IGraphicalFeature {
 	public String getGraphicType() {
 		return "";
 	}
+	
+	public GraphicalFeature clone() {
+		return new GraphicalFeature(this);
+	}
 
 	@Override
-	public void copyValues(IGraphicalElement element) {
-		if (element instanceof GraphicalFeature) {
-			final GraphicalFeature oldFeature = (GraphicalFeature) element;
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((feature == null) ? 0 : feature.hashCode());
+		return result;
+	}
 
-			constraintSelected = oldFeature.constraintSelected;
-			location = oldFeature.location;
-			dimension = oldFeature.dimension;
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
 		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof GraphicalFeature)) {
+			return false;
+		}
+		GraphicalFeature other = (GraphicalFeature) obj;
+		if (feature == null) {
+			if (other.feature != null) {
+				return false;
+			}
+		} else if (!feature.equals(other.feature)) {
+			return false;
+		}
+		return true;
 	}
 
 }

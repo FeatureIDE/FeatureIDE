@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.editparts;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.List;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.draw2d.Figure;
@@ -209,9 +210,10 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		FeatureConnection connectionModel = getConnectionModel();
 		IGraphicalFeature target = connectionModel.getTarget();
 		RotatableDecoration targetDecoration = null;
-		if (target.getTree().getNumberOfChildren() > 1) {
+		if (target.getObject().getStructure().getChildrenCount() > 1) {
 			IGraphicalFeature source = connectionModel.getSource();
-			final IGraphicalFeature object = target.getTree().getChildren().get(0).getObject();
+			final List<IGraphicalFeature> graphicalChildren = FeatureUIHelper.getGraphicalChildren(target);
+			final IGraphicalFeature object = graphicalChildren.get(0);
 			final IFeatureStructure structure = target.getObject().getStructure();
 			final PolylineConnection connection = (PolylineConnection) getConnectionFigure();
 			if (structure.isAnd()) {
@@ -224,7 +226,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 				}
 			} else {
 				if (structure.isFirstChild(source.getObject().getStructure())) {
-					targetDecoration = new RelationDecoration(structure.isMultiple(), target.getTree().getChildren().get(target.getTree().getNumberOfChildren() - 1).getObject());
+					targetDecoration = new RelationDecoration(structure.isMultiple(), graphicalChildren.get(graphicalChildren.size() - 1));
 				}
 			}
 			connection.setTargetDecoration(targetDecoration);	
@@ -248,18 +250,16 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 
 	@Override
 	public void activate() {
-		//TODO _interfaces Removed Code
 		getConnectionModel().addListener(this);
-//		getConnectionModel().getSource().addListener(this);
+		getFigure().setVisible(true);
 		super.activate();
 	}
 
 	@Override
 	public void deactivate() {
 		super.deactivate();
-		//TODO _interfaces Removed Code
 		getConnectionModel().removeListener(this);
-//		getConnectionModel().getSource().removeListener(this);
+		getFigure().setVisible(false);
 	}
 
 	public void propertyChange(PropertyChangeEvent event) {

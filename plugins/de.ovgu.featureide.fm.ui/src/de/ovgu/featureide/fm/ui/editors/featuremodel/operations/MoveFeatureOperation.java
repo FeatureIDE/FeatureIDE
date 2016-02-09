@@ -63,11 +63,9 @@ public class MoveFeatureOperation extends AbstractFeatureModelOperation {
 			final IGraphicalFeature oldParent = data.getOldParent();
 			final IFeatureStructure featureStructure = feature.getObject().getStructure();
 			oldParent.getObject().getStructure().removeChild(featureStructure);
-			oldParent.getTree().removeSubTree(feature.getTree());
 			
 			final IGraphicalFeature newParent = data.getNewParent();
 			newParent.getObject().getStructure().addChildAtPosition(data.getNewIndex(), featureStructure);
-			newParent.getTree().addSubTreeAtIndex(data.getNewIndex(), feature.getTree());
 		} else {
 			newInnerOrder(newPos);
 			setEventId(EventType.MODEL_DATA_LOADED);

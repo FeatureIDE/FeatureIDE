@@ -93,7 +93,7 @@ public class FileWriter<T> {
 		lastProblems.clear();
 		try {
 			final byte[] content = format.getInstance().write(object).getBytes(Charset.availableCharsets().get("UTF-8"));
-			Files.write(path, content, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+			Files.write(path, content, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
 		} catch (Exception e) {
 			handleException(e);
 		}

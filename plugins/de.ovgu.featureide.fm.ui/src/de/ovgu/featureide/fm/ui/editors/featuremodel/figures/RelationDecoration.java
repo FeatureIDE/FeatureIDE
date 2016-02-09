@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
 
+import java.util.List;
+
 import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.RotatableDecoration;
 import org.eclipse.draw2d.Shape;
@@ -27,7 +29,6 @@ import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.graphics.Color;
 
-import de.ovgu.featureide.fm.core.base.util.tree.Tree;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -46,7 +47,7 @@ public class RelationDecoration extends Shape implements RotatableDecoration, GU
 	private Point referencePoint;
 
 	private IGraphicalFeature lastChild;
-	private Tree<IGraphicalFeature> children;
+	private List<IGraphicalFeature> children;
 
 	private IGraphicalFeatureModel featureModel;
 
@@ -58,7 +59,7 @@ public class RelationDecoration extends Shape implements RotatableDecoration, GU
 		if (lastChild == null) {
 			children = null;
 		} else {
-			children = (Tree<IGraphicalFeature>) lastChild.getTree().getParent();
+			children = FeatureUIHelper.getGraphicalSiblings(lastChild);
 		}
 		final Color decoratorForgroundColor = FMPropertyManager.getDecoratorForgroundColor();
 		setForegroundColor(decoratorForgroundColor);
@@ -103,8 +104,8 @@ public class RelationDecoration extends Shape implements RotatableDecoration, GU
 			maxAngle = calculateAngle(center, getFeatureLocation());
 			minAngle = calculateAngle(center, referencePoint);
 		} else {
-			if (children != null && children.getNumberOfChildren() > 1) {
-				for (final IGraphicalFeature curChild : children.getChildrenObjects()) {
+			if (children != null && children.size() > 1) {
+				for (final IGraphicalFeature curChild : children) {
 					lastChild = curChild;
 					if (!(lastChild.getObject().getStructure().isHidden() && !FeatureUIHelper.showHiddenFeatures(featureModel))) {
 						final Point featureLocation = FeatureUIHelper.getSourceLocation(curChild);

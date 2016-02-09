@@ -98,7 +98,7 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 				}
 			}
 		}
-		return new FeatureIDEEvent(feature, EventType.FEATURE_DELETE);
+		return new FeatureIDEEvent(featureModel, EventType.FEATURE_DELETE, feature, null);
 	}
 
 	@Override
@@ -144,7 +144,7 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 		} catch (Exception e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
-		return new FeatureIDEEvent(feature, EventType.FEATURE_ADD);
+		return new FeatureIDEEvent(featureModel, EventType.FEATURE_ADD, null, feature);
 	}
 
 	@Override

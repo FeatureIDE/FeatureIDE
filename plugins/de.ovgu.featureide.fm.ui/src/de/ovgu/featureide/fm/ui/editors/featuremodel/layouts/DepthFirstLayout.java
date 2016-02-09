@@ -47,7 +47,7 @@ public class DepthFirstLayout extends FeatureDiagramLayoutManager {
 	@Override
 	public void layoutFeatureModel(IGraphicalFeatureModel featureModel) {
 		yoffset = 0;
-		IGraphicalFeature root = featureModel.getFeatures().getObject();
+		IGraphicalFeature root = FeatureUIHelper.getGraphicalRootFeature(featureModel);
 		depthFirstLayout(root, 0, FMPropertyManager.getLayoutMarginX());
 		yoffset = yoffset + FMPropertyManager.getFeatureSpaceX();
 		layout(yoffset, featureModel.getConstraints());
@@ -61,7 +61,7 @@ public class DepthFirstLayout extends FeatureDiagramLayoutManager {
 		int newX = x;
 		if (yoffset < FMPropertyManager.getLayoutMarginY() + level * FMPropertyManager.getFeatureSpaceY())
 			yoffset = FMPropertyManager.getLayoutMarginY() + level * FMPropertyManager.getFeatureSpaceY();
-		for (IGraphicalFeature child : feature.getTree().getChildrenObjects()) {
+		for (IGraphicalFeature child : FeatureUIHelper.getGraphicalChildren(feature)) {
 			newX = depthFirstLayout(child, level + 1, newX);
 		}
 		return Math.max(newX, x + FeatureUIHelper.getSize(feature).width + FMPropertyManager.getFeatureSpaceX());

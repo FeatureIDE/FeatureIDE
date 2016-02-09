@@ -90,7 +90,7 @@ public abstract class FileManagerMap {
 	 * @return
 	 */
 	public static boolean hasInstance(String path) {
-		return map.containsKey(path);
+		return map.containsKey(constructAbsolutePath(path));
 	}
 
 	/**

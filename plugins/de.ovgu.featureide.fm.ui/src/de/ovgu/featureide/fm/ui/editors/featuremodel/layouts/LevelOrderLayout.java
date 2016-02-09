@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.layouts;
 
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
@@ -51,7 +52,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 
 	@Override
 	public void layoutFeatureModel(IGraphicalFeatureModel featureModel) {
-		IGraphicalFeature root = featureModel.getFeatures().getObject();
+		IGraphicalFeature root = FeatureUIHelper.getGraphicalRootFeature(featureModel);
 		layout(root);
 		layout(featureDiagramBottom, featureModel.getConstraints());
 	}
@@ -79,7 +80,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 
 	private void layoutLevelInX(LinkedList<IGraphicalFeature> level) {
 		for (IGraphicalFeature feature : level)
-			if (feature.getTree().hasChildren()) {
+			if (feature.getObject().getStructure().hasChildren()) {
 				centerAboveChildren(feature);
 			}
 
@@ -94,7 +95,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 	private int layoutFeatureInX(LinkedList<IGraphicalFeature> level, int j, int moveWidth, IGraphicalFeature lastFeature) {
 		IGraphicalFeature feature = level.get(j);
 		boolean firstCompound = true;
-		if (!feature.getTree().hasChildren())
+		if (!feature.getObject().getStructure().hasChildren())
 			nextToLeftSibling(feature, lastFeature);
 		else {
 			if (lastFeature != null)
@@ -107,7 +108,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 				firstCompound = false;
 				boolean compoundSibling = false;
 				for (int k = j - 1; k >= 0; k--)
-					if (level.get(k).getTree().hasChildren())
+					if (level.get(k).getObject().getStructure().hasChildren())
 						compoundSibling = true;
 				if (!compoundSibling)
 					for (int k = j - 1; k >= 0; k--)
@@ -124,11 +125,11 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 		boolean right = true;
 		for (int k = j - 1; k >= 0; k--) {
 			IGraphicalFeature sibling = level.get(k);
-			if (sibling.getTree().getParentObject() != feature.getTree().getParentObject()) {
+			if (sibling.getObject().getStructure().getParent() != feature.getObject().getStructure().getParent()) {
 				l = k + 1;
 				break;
 			}
-			if (sibling.getTree().hasChildren()) {
+			if (sibling.getObject().getStructure().hasChildren()) {
 				l = k + 1;
 				right = false;
 				space = FeatureUIHelper.getBounds(feature).x - FeatureUIHelper.getBounds(sibling).right() - width;
@@ -157,7 +158,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 			levels.add(level);
 			LinkedList<IGraphicalFeature> newLevel = new LinkedList<IGraphicalFeature>();
 			for (IGraphicalFeature feature : level) {
-				for (IGraphicalFeature child : feature.getTree().getChildrenObjects()) {
+				for (IGraphicalFeature child : FeatureUIHelper.getGraphicalChildren(feature)) {
 					newLevel.add(child);
 				}
 			}
@@ -168,8 +169,9 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 	}
 
 	private void centerAboveChildren(IGraphicalFeature feature) {
-		int minX = FeatureUIHelper.getBounds(feature.getTree().getChildren().get(0).getObject()).x;
-		int maxX = FeatureUIHelper.getBounds(feature.getTree().getChildren().get(feature.getTree().getNumberOfChildren() - 1).getObject()).right();
+		final List<IGraphicalFeature> graphicalChildren = FeatureUIHelper.getGraphicalChildren(feature);
+		int minX = FeatureUIHelper.getBounds(graphicalChildren.get(0)).x;
+		int maxX = FeatureUIHelper.getBounds(graphicalChildren.get(graphicalChildren.size() - 1)).right();
 		Point location = FeatureUIHelper.getLocation(feature);
 		int x = (maxX + minX) / 2 - FeatureUIHelper.getSize(feature).width / 2;
 		FeatureUIHelper.setLocation(feature, new Point(x, location.y));
@@ -190,7 +192,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 	private void moveTree(IGraphicalFeature root, int deltaX) {
 		Point location = FeatureUIHelper.getLocation(root);
 		FeatureUIHelper.setLocation(root, new Point(location.x + deltaX, location.y));
-		for (IGraphicalFeature child : root.getTree().getChildrenObjects())
+		for (IGraphicalFeature child : FeatureUIHelper.getGraphicalChildren(root))
 			moveTree(child, deltaX);
 	}
 

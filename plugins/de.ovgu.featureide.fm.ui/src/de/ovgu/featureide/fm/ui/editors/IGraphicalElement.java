@@ -46,7 +46,5 @@ public interface IGraphicalElement extends IGraphicItem {
 	void setSize(Dimension size);
 
 	String getGraphicType();
-	
-	void copyValues(IGraphicalElement element);
 
 }

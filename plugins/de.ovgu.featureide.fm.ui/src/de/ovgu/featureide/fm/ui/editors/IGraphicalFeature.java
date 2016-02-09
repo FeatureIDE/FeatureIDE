@@ -26,7 +26,6 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.util.tree.Tree;
 
 /**
  * Graphical representation of a feature.
@@ -36,8 +35,6 @@ import de.ovgu.featureide.fm.core.base.util.tree.Tree;
 public interface IGraphicalFeature extends IGraphicalElement {
 
 	IFeature getObject();
-	
-	Tree<IGraphicalFeature> getTree();
 
 	boolean isConstraintSelected();
 
@@ -51,5 +48,7 @@ public interface IGraphicalFeature extends IGraphicalElement {
 	List<FeatureConnection> getSourceConnectionAsList();
 
 	List<FeatureConnection> getTargetConnections();
+
+	IGraphicalFeature clone();
 
 }

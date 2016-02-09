@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.layouts;
 import static de.ovgu.featureide.fm.core.localization.StringTable.MANUAL_LAYOUT;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import org.eclipse.draw2d.geometry.Point;
 
@@ -112,7 +113,7 @@ public class FeatureDiagramLayoutHelper {
 		if (newCompound.getObject().getStructure().isRoot()) {
 			initPos.y = (initPos.y - FMPropertyManager.getFeatureSpaceY());
 		} else {
-			final IGraphicalFeature parent = newCompound.getTree().getParentObject();
+			final IGraphicalFeature parent = FeatureUIHelper.getGraphicalParent(newCompound);
 			initPos.y = (initPos.y + FeatureUIHelper.getLocation(parent).y) / 2;
 			initPos.x = (initPos.x + FeatureUIHelper.getLocation(parent).x) / 2;
 		}
@@ -125,10 +126,11 @@ public class FeatureDiagramLayoutHelper {
 	 * needed for manual layout
 	 */
 	public static void initializeLayerFeaturePosition(IGraphicalFeatureModel featureModel, IGraphicalFeature newLayer, IGraphicalFeature feature) {
+		final List<IGraphicalFeature> graphicalChildren = FeatureUIHelper.getGraphicalChildren(feature);
 		if (!FeatureUIHelper.hasVerticalLayout(featureModel)) {
-			Point initPos = FeatureUIHelper.getLocation(newLayer.getTree().getParentObject()).getCopy();
-			if (feature.getTree().getChildren().size() > 1) {
-				IGraphicalFeature lastChild = feature.getTree().getChildren().get(feature.getTree().getChildren().indexOf(newLayer.getTree()) - 1).getObject();
+			Point initPos = FeatureUIHelper.getLocation(FeatureUIHelper.getGraphicalParent(newLayer)).getCopy();
+			if (feature.getObject().getStructure().getChildrenCount() > 1) {
+				IGraphicalFeature lastChild = graphicalChildren.get(graphicalChildren.indexOf(newLayer) - 1);
 				initPos.x = FeatureUIHelper.getLocation(lastChild).x + FeatureUIHelper.getSize(lastChild).width + FMPropertyManager.getFeatureSpaceX();
 				initPos.y = FeatureUIHelper.getLocation(lastChild).y;
 			} else {
@@ -136,13 +138,13 @@ public class FeatureDiagramLayoutHelper {
 			}
 			FeatureUIHelper.setLocation(newLayer, initPos);
 		} else {
-			Point initPos = FeatureUIHelper.getLocation(newLayer.getTree().getParentObject()).getCopy();
-			if (feature.getTree().getChildren().size() > 1) {
-				IGraphicalFeature lastChild = feature.getTree().getChildren().get(feature.getTree().getChildren().indexOf(newLayer.getTree()) - 1).getObject();
+			Point initPos = FeatureUIHelper.getLocation(FeatureUIHelper.getGraphicalParent(newLayer)).getCopy();
+			if (graphicalChildren.size() > 1) {
+				IGraphicalFeature lastChild = graphicalChildren.get(graphicalChildren.indexOf(newLayer) - 1);
 				initPos.y = FeatureUIHelper.getLocation(lastChild).y + FeatureUIHelper.getSize(lastChild).height + FMPropertyManager.getFeatureSpaceX();
 				initPos.x = FeatureUIHelper.getLocation(lastChild).x;
 			} else {
-				initPos.x += FeatureUIHelper.getSize(newLayer.getTree().getParentObject()).width + FMPropertyManager.getFeatureSpaceY();
+				initPos.x += FeatureUIHelper.getSize(FeatureUIHelper.getGraphicalParent(newLayer)).width + FMPropertyManager.getFeatureSpaceY();
 			}
 			FeatureUIHelper.setLocation(newLayer, initPos);
 		}

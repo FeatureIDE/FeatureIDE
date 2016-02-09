@@ -55,7 +55,9 @@ import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
  * Sets the color of the features in the feature diagram.
@@ -193,9 +195,12 @@ public class SetFeatureColorDialog extends Dialog {
 
 			private void findSiblings() {
 				final ArrayList<IGraphicalFeature> affectedFeatures = new ArrayList<>();
-				for (int j = 0; j < featureListBuffer.size(); j++) {
-					if (!featureListBuffer.get(j).getTree().isRoot()) {
-						affectedFeatures.addAll(toList(featureListBuffer.get(j).getTree().getParent().getChildrenObjects()));
+				if (!featureListBuffer.isEmpty()) {
+					IGraphicalFeatureModel model = featureListBuffer.get(0).getGraphicalModel();
+					for (int j = 0; j < featureListBuffer.size(); j++) {
+						if (!featureListBuffer.get(j).getObject().getStructure().isRoot()) {
+							affectedFeatures.addAll(FeatureUIHelper.getGraphicalChildren(featureListBuffer.get(j).getObject().getStructure().getParent().getFeature(), model));
+						}
 					}
 				}
 				featureListBuffer = affectedFeatures;
@@ -219,7 +224,7 @@ public class SetFeatureColorDialog extends Dialog {
 			}
 			
 			private List<IGraphicalFeature> findChildren(IGraphicalFeature parent) {
-				return toList(parent.getTree().getChildrenObjects());
+				return toList(FeatureUIHelper.getGraphicalChildren(parent));
 			}
 
 			private void findDirectChildren() {

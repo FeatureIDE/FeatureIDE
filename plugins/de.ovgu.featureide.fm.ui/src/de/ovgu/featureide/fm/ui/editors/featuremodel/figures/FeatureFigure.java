@@ -36,12 +36,10 @@ import org.eclipse.draw2d.ConnectionAnchor;
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.FreeformLayout;
 import org.eclipse.draw2d.GridLayout;
-import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Label;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
-import org.eclipse.gef.editparts.ZoomListener;
 import org.eclipse.swt.graphics.Color;
 
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
@@ -94,13 +92,6 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 	public FeatureFigure(IGraphicalFeature feature, IGraphicalFeatureModel featureModel) {
 		super();
 		this.feature = feature;
-
-		FeatureUIHelper.getZoomManager().addZoomListener(new ZoomListener() {
-			@Override
-			public void zoomChanged(double arg0) {
-				enforceLabelSize();
-			}
-		});
 	
 		sourceAnchor = new SourceAnchor(this, feature);
 		targetAnchor = new TargetAnchor(this, feature);
@@ -116,7 +107,6 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 
 		setProperties();
 
-		enforceLabelSize();
 		FeatureUIHelper.setSize(feature, getSize());
 
 		add(label, label.getBounds());
@@ -128,16 +118,6 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 
 		if (!featureModel.getLayout().showHiddenFeatures() && feature.getObject().getStructure().hasHiddenParent()) {
 			setSize(new Dimension(0, 0));
-		}
-	}
-
-	/**
-	 * After resizing this method ensures that label text will not be cut
-	 * off(Issue #138)
-	 */
-	protected void enforceLabelSize() {
-		if (!getChildren().isEmpty()) {
-			setConstraint((IFigure) getChildren().get(0), label.getBounds().getExpanded(5, 0));
 		}
 	}
 

@@ -69,7 +69,7 @@ abstract public class FeatureDiagramLayoutManager {
 		if (showHidden)
 			return false;
 		if (!feature.getObject().getStructure().isRoot())
-			return (feature.getObject().getStructure().isHidden() || isHidden(feature.getTree().getParentObject()));
+			return (feature.getObject().getStructure().isHidden() || isHidden(FeatureUIHelper.getGraphicalParent(feature)));
 		else
 			return feature.getObject().getStructure().isHidden();
 	}

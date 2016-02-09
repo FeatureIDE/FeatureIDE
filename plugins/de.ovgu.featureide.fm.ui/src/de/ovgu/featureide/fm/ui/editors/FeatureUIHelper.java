@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +34,8 @@ import org.eclipse.gef.EditPartViewer;
 import org.eclipse.gef.editparts.ZoomListener;
 import org.eclipse.gef.editparts.ZoomManager;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
@@ -49,6 +53,52 @@ public class FeatureUIHelper {
 
 	private static final Map<IGraphicalFeatureModel, Dimension> legendSize = new WeakHashMap<>();
 	private static final Map<IGraphicalFeatureModel, LegendFigure> legendFigure = new WeakHashMap<>();
+		
+	public static boolean isAncestorOf(IGraphicalFeature feature, IGraphicalFeature parent) {
+		return FeatureUtils.isAncestorOf(feature.getObject(), parent.getObject());
+	}
+		
+	public static IGraphicalFeature getGraphicalRootFeature(IGraphicalFeatureModel model) {
+		return getGraphicalFeature(model.getFeatureModel().getStructure().getRoot(), model);
+	}
+	
+	public static IGraphicalFeature getGraphicalFeature(IFeatureStructure feature, IGraphicalFeatureModel model) {
+		return getGraphicalFeature(feature.getFeature(), model);
+	}
+	
+	public static IGraphicalFeature getGraphicalFeature(IFeature feature, IGraphicalFeatureModel model) {
+		return model.getGraphicalFeature(feature);
+	}
+	
+	public static IGraphicalFeature getGraphicalParent(IGraphicalFeature feature) {
+		return getGraphicalParent(feature.getObject(), feature.getGraphicalModel());
+	}
+	
+	public static IGraphicalFeature getGraphicalParent(IFeature feature, IGraphicalFeatureModel model) {
+		final IFeatureStructure structure = feature.getStructure();
+		return structure.isRoot() ? null : getGraphicalFeature(structure.getParent(), model);
+	}
+	
+	public static List<IGraphicalFeature> getGraphicalSiblings(final IGraphicalFeature feature) {
+		final IFeatureStructure structure = feature.getObject().getStructure();
+		if (structure.isRoot()) {
+			return Arrays.asList(getGraphicalFeature(structure, feature.getGraphicalModel()));
+		}
+		return getGraphicalChildren(structure.getParent().getFeature(), feature.getGraphicalModel());
+	}
+	
+	public static List<IGraphicalFeature> getGraphicalChildren(final IGraphicalFeature feature) {
+		return getGraphicalChildren(feature.getObject(), feature.getGraphicalModel());
+	}
+	
+	public static List<IGraphicalFeature> getGraphicalChildren(final IFeature feature, IGraphicalFeatureModel model) {
+		final List<IFeatureStructure> children = feature.getStructure().getChildren();
+		final List<IGraphicalFeature> graphicalChildren = new ArrayList<>(children.size());
+		for (final IFeatureStructure child : children) {
+			graphicalChildren.add(getGraphicalFeature(child, model));			
+		}
+		return graphicalChildren;		
+	}
 
 	/**
 	 * Necessary for correct manual drag-and-drop movement while zoomed.
@@ -194,7 +244,7 @@ public class FeatureUIHelper {
 		}
 		if ((feature.getObject().getStructure().isHidden() || parentFeatureHidden)
 				&& !feature.getGraphicalModel().getLayout().showHiddenFeatures()) {
-			return getTargetLocation(feature.getTree().getParentObject());
+			return getTargetLocation(getGraphicalParent(feature));
 		}
 
 		return getSourceLocation(getBounds(feature), feature.getGraphicalModel());
@@ -210,7 +260,6 @@ public class FeatureUIHelper {
 			return bounds.getRight();
 		}
 		return bounds.getBottom();
-
 	}
 
 	public static void setVerticalLayoutBounds(boolean isVerticalLayout, IGraphicalFeatureModel featureModel) {

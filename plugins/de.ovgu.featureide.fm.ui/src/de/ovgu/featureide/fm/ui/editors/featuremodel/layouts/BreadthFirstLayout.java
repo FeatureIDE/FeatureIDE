@@ -50,7 +50,7 @@ public class BreadthFirstLayout extends FeatureDiagramLayoutManager {
 	@Override
 	public void layoutFeatureModel(IGraphicalFeatureModel featureModel) {
 		yoffset = 0;
-		IGraphicalFeature root = featureModel.getFeatures().getObject();
+		IGraphicalFeature root = FeatureUIHelper.getGraphicalFeature(featureModel.getFeatureModel().getStructure().getRoot(), featureModel);
 		layout(root);
 		layout(yoffset, featureModel.getConstraints());
 	}
@@ -82,9 +82,9 @@ public class BreadthFirstLayout extends FeatureDiagramLayoutManager {
 				xoffset += FeatureUIHelper.getSize(feature).width + FMPropertyManager.getFeatureSpaceX();
 				//add the features children
 				if (showHidden) {
-					list.addAll(Functional.toList(feature.getTree().getChildrenObjects()));
+					list.addAll(FeatureUIHelper.getGraphicalChildren(feature));
 				} else {
-					list.addAll(Functional.toList(Functional.filter(feature.getTree().getChildrenObjects(), hiddenFilter)));
+					list.addAll(Functional.toList(Functional.filter(FeatureUIHelper.getGraphicalChildren(feature), hiddenFilter)));
 				}
 			}
 			yoffset += FMPropertyManager.getFeatureSpaceY();
