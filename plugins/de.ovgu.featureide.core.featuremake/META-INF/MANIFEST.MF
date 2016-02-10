@@ -14,7 +14,14 @@ Require-Bundle: org.eclipse.ui;bundle-version="3.104.0",
  de.ovgu.featureide.fm.core;bundle-version="2.7.4"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Import-Package: org.eclipse.cdt.core.resources,
+Import-Package: br.ufal.ic.colligens.activator,
+ br.ufal.ic.colligens.controllers,
+ br.ufal.ic.colligens.controllers.core,
+ br.ufal.ic.colligens.controllers.invalidconfigurations,
+ br.ufal.ic.colligens.controllers.invalidproducts,
+ br.ufal.ic.colligens.models,
+ br.ufal.ic.colligens.util,
+ org.eclipse.cdt.core.model,
  org.eclipse.core.expressions,
  org.eclipse.debug.ui.console,
  org.eclipse.jdt.internal.ui.packageview,
