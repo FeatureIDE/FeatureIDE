@@ -8,9 +8,12 @@ public class FeatureMakeCorePlugin extends AbstractCorePlugin {
 
 	public static final String PLUGIN_ID = "de.ovgu.featureide.composer.featuremake";
 	private static FeatureMakeCorePlugin plugin;
+
 	/*
 	 * (non-Javadoc)
-	 * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
+	 * 
+	 * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.
+	 * BundleContext)
 	 */
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
@@ -19,19 +22,21 @@ public class FeatureMakeCorePlugin extends AbstractCorePlugin {
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
+	 * 
+	 * @see
+	 * org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
 		super.stop(context);
 	}
-	
-	public static FeatureMakeCorePlugin getDefault(){
-		return  plugin;
+
+	public static FeatureMakeCorePlugin getDefault() {
+		return plugin;
 	}
 
 	@Override
-	public String getID() {		
+	public String getID() {
 		return PLUGIN_ID;
 	}
 
