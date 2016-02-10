@@ -92,8 +92,9 @@ public class FeatureMakeComposer extends PPComposerExtensionClass {
 
 	@Override
 	public boolean hasSourceFolder() {
-		return false;
+		return true;
 	}
+	
 
 	@Override
 	public boolean initialize(IFeatureProject project) {
@@ -136,7 +137,7 @@ public class FeatureMakeComposer extends PPComposerExtensionClass {
 		try {
 			if (!project.isAccessible() || project.hasNature(C_NATURE))
 				return;
-
+			
 			IProjectDescription description = project.getDescription();
 			String[] natures = description.getNatureIds();
 			String[] newNatures = new String[natures.length + 1];
@@ -514,7 +515,7 @@ public class FeatureMakeComposer extends PPComposerExtensionClass {
 
 	@Override
 	public boolean hasFeatureFolder() {
-		return false;
+		return true;
 	}
 
 	@Override
