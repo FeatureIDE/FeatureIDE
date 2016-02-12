@@ -186,13 +186,14 @@ public class FeatureMakeComposer extends PPComposerExtensionClass {
 				@Override
 				public void run() {
 					BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
-					  String line = null;
-					 MessageConsole console = findConsole("Console");
-					 MessageConsoleStream out = console.newMessageStream();		            
-					 try {
-				   		while ((line = input.readLine()) != null) {
-				  		         out.println(line);
-					   	 }
+					String line = null;
+					MessageConsole console = findConsole("Console");
+					console.clearConsole();
+					MessageConsoleStream out = console.newMessageStream();
+					try {
+						while ((line = input.readLine()) != null) {
+							out.println(line);
+						}
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
