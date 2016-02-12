@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
-import java.util.ArrayList;
-
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -33,9 +31,10 @@ import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
  * @author Sebastian Krieter
  */
 public final class FMFactoryManager {
-	
-	private static ArrayList<IFeatureModelFactory> cachedProviders = null;
-	
+
+	// TODO implement extension point
+//	private static ArrayList<IFeatureModelFactory> cachedProviders = null;
+//	
 //	private void loadProviders(String pluginID, String extensionPointID) {
 //		ArrayList<?> cachedProviders = new ArrayList<>();
 //		IExtension[] extensions = Platform.getExtensionRegistry().getExtensionPoint(pluginID, extensionPointID).getExtensions();

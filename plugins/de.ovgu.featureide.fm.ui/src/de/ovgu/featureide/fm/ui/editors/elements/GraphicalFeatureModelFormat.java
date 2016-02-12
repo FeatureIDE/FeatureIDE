@@ -79,7 +79,7 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 	private void parseFeatures(NodeList nodeList) {
 		Iterator<IGraphicalFeature> iterator = object.getFeatures().iterator();
 		for (Element e : getElements(nodeList)) {
-			String nodeName = e.getNodeName();
+//			String nodeName = e.getNodeName();
 			if (!iterator.hasNext()) {
 				break;
 			}
@@ -123,7 +123,7 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 	private void parseConstraint(NodeList nodeList) {
 		Iterator<IGraphicalConstraint> iterator = object.getConstraints().iterator();
 		for (Element e : getElements(nodeList)) {
-			String nodeName = e.getNodeName();
+//			String nodeName = e.getNodeName();
 			if (!iterator.hasNext()) {
 				break;
 			}

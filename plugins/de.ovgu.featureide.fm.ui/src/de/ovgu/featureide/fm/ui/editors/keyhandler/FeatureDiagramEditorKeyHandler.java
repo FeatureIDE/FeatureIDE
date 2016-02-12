@@ -126,7 +126,7 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements IEvent
 			// select the new feature
 			final IFeature curFeature = featureModel.getFeatureModel().getFeature(featureList.get(foundIndex));
 			if (curFeature != null) {
-				final Map editPartRegistry = viewer.getEditPartRegistry();
+				final Map<?, ?> editPartRegistry = viewer.getEditPartRegistry();
 				FeatureEditPart part = (FeatureEditPart) editPartRegistry.get(featureModel.getGraphicalFeature(curFeature));
 				if (part != null) {
 					viewer.setSelection(new StructuredSelection(part));

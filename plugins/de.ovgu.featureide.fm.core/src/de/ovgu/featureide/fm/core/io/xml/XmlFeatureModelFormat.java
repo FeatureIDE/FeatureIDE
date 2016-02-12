@@ -565,6 +565,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> {
 	}
 
 	// TODO implement
+	@SuppressWarnings("unused")
 	private void throwWarning(String message, org.w3c.dom.Node node) throws UnsupportedModelException {
 		throw new UnsupportedModelException(message, Integer.parseInt(node.getUserData(PositionalXMLReader.LINE_NUMBER_KEY_NAME).toString()));
 	}

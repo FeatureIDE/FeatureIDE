@@ -37,13 +37,10 @@ public class AbstractAction extends SingleSelectionAction {
 
 	public static final String ID = "de.ovgu.featureide.abstract";
 
-	private ObjectUndoContext undoContext;
-
 	private IFeatureModel featureModel;
 
 	public AbstractAction(Object viewer, IFeatureModel featureModel, ObjectUndoContext undoContext) {
 		super("Abstract", viewer);
-		this.undoContext = undoContext;
 		this.featureModel = featureModel;
 	}
 
