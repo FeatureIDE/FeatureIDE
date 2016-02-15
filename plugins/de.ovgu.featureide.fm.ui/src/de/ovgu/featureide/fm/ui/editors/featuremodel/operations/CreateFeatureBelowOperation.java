@@ -45,7 +45,6 @@ public class CreateFeatureBelowOperation extends AbstractFeatureModelOperation {
 	public CreateFeatureBelowOperation(IFeature feature, IFeatureModel featureModel) {
 		super(featureModel, CREATE_LAYER);
 		this.feature = feature;
-		setEventId(EventType.FEATURE_ADD);
 	}
 
 	@Override

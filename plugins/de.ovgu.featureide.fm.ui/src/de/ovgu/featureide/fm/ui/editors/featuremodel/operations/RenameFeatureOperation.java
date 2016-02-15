@@ -42,7 +42,6 @@ public class RenameFeatureOperation extends AbstractFeatureModelOperation {
 		super(featureModel, RENAME_FEATURE);
 		this.oldName = oldName;
 		this.newName = newName;
-		setEventId(EventType.FEATURE_NAME_CHANGED);
 	}
 
 	@Override
@@ -54,7 +53,7 @@ public class RenameFeatureOperation extends AbstractFeatureModelOperation {
 	@Override
 	protected FeatureIDEEvent inverseOperation() {
 		featureModel.getRenamingsManager().renameFeature(newName, oldName);
-		return null;
+		return new FeatureIDEEvent(featureModel, EventType.FEATURE_NAME_CHANGED, newName, oldName);
 	}
 
 }

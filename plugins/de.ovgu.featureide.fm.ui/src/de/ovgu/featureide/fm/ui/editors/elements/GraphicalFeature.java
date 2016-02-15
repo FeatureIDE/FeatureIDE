@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.elements;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -32,6 +30,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.ui.editors.FeatureConnection;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
@@ -44,27 +43,25 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  * 
  */
 public class GraphicalFeature implements IGraphicalFeature {
-	
+
 	protected final FeatureConnection sourceConnection;
 
 	protected boolean constraintSelected;
-	
+
 	protected IFeature feature;
-	
+
 	protected final IGraphicalFeatureModel graphicalFeatureModel;
 
 	protected Point location = new Point(0, 0);
-	
+
 	protected Dimension dimension = new Dimension(10, 10);
+
+	private IEventListener uiObject;
 
 	public GraphicalFeature(IFeature correspondingFeature, IGraphicalFeatureModel graphicalFeatureModel) {
 		this.graphicalFeatureModel = graphicalFeatureModel;
 		this.feature = correspondingFeature;
-		if (!correspondingFeature.getStructure().isRoot()) {
-			sourceConnection = new FeatureConnection(this);
-		} else {
-			sourceConnection = null;
-		}
+		sourceConnection = new FeatureConnection(this);
 	}
 
 	public GraphicalFeature(GraphicalFeature graphicalFeature) {
@@ -94,20 +91,18 @@ public class GraphicalFeature implements IGraphicalFeature {
 	@Override
 	public void setConstraintSelected(boolean selection) {
 		constraintSelected = selection;
-		feature.fireEvent(new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED, Boolean.FALSE, Boolean.TRUE));
 	}
 
 	@Override
 	public Point getLocation() {
 		return location;
 	}
-	
+
 	@Override
 	public void setLocation(Point newLocation) {
 		if (!location.equals(newLocation)) {
-			final FeatureIDEEvent event = new FeatureIDEEvent(this, EventType.LOCATION_CHANGED, location, newLocation);
 			location = newLocation;
-			feature.fireEvent(event);
+			update(FeatureIDEEvent.getDefault(EventType.LOCATION_CHANGED));
 		}
 	}
 
@@ -128,36 +123,37 @@ public class GraphicalFeature implements IGraphicalFeature {
 
 	@Override
 	public void addTargetConnection(FeatureConnection connection) {
-		
+
 	}
 
 	@Override
 	public FeatureConnection getSourceConnection() {
-		if (sourceConnection != null) {
-			sourceConnection.setTarget(FeatureUIHelper.getGraphicalParent(feature, graphicalFeatureModel));
+		if (feature.getStructure().isRoot()) {
+			return null;
 		}
+		sourceConnection.setTarget(FeatureUIHelper.getGraphicalParent(feature, graphicalFeatureModel));
 		return sourceConnection;
 	}
 
 	@Override
 	public List<FeatureConnection> getSourceConnectionAsList() {
 		final List<FeatureConnection> list;
-		if (sourceConnection == null) {
-			list = Collections.emptyList();
+		if (feature.getStructure().isRoot()) {
+			list = new LinkedList<>();
 		} else {
-			 list = new ArrayList<>(1);
-			 list.add(getSourceConnection());
+			list = new LinkedList<>();
+			list.add(getSourceConnection());
 		}
-		return Collections.unmodifiableList(list);
+		return (list);
 	}
-
+	
 	@Override
 	public List<FeatureConnection> getTargetConnections() {
 		final List<FeatureConnection> targetConnections = new LinkedList<>();
 		for (IFeatureStructure child : feature.getStructure().getChildren()) {
 			targetConnections.add(FeatureUIHelper.getGraphicalFeature(child, graphicalFeatureModel).getSourceConnection());
 		}
-		return Collections.unmodifiableList(targetConnections);
+		return targetConnections;
 	}
 
 	@Override
@@ -169,7 +165,7 @@ public class GraphicalFeature implements IGraphicalFeature {
 	public String getGraphicType() {
 		return "";
 	}
-	
+
 	public GraphicalFeature clone() {
 		return new GraphicalFeature(this);
 	}
@@ -202,6 +198,18 @@ public class GraphicalFeature implements IGraphicalFeature {
 			return false;
 		}
 		return true;
+	}
+	
+	@Override
+	public void update(FeatureIDEEvent event) {
+		if (uiObject != null) {
+			uiObject.propertyChange(event);
+		}
+	}
+
+	@Override
+	public void registerUIObject(IEventListener listener) {
+		this.uiObject = listener;
 	}
 
 }

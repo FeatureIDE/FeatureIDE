@@ -46,7 +46,6 @@ public class ModelReverseOrderOperation extends AbstractGraphicalFeatureModelOpe
 
 	public ModelReverseOrderOperation(IGraphicalFeatureModel featureModel) {
 		super(featureModel, LABEL);
-		setEventId(EventType.MODEL_DATA_LOADED);
 	}
 
 	@Override
@@ -59,7 +58,7 @@ public class ModelReverseOrderOperation extends AbstractGraphicalFeatureModelOpe
 			mid.y += FeatureUIHelper.getSize(root).height / 2;
 			mirrorFeaturePositions(root, mid, FeatureUIHelper.hasVerticalLayout(graphicalFeatureModel));
 		}
-		return null;
+		return new FeatureIDEEvent(null, EventType.LOCATION_CHANGED);
 	}
 
 	private void mirrorFeaturePositions(IGraphicalFeature feature, Point mid, boolean vertical) {

@@ -25,6 +25,8 @@ import org.eclipse.draw2d.geometry.Point;
 
 import de.ovgu.featureide.fm.core.IGraphicItem;
 import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
 
 /**
  * Graphical representation of a constraint.
@@ -46,5 +48,9 @@ public interface IGraphicalElement extends IGraphicItem {
 	void setSize(Dimension size);
 
 	String getGraphicType();
+
+	void update(FeatureIDEEvent event);
+	
+	void registerUIObject(IEventListener listener);
 
 }

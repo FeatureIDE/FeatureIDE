@@ -74,7 +74,7 @@ public class CreateFeatureAboveOperation extends AbstractFeatureModelOperation {
 			featureModel.addFeature(newCompound);
 			featureModel.getStructure().setRoot(newCompound.getStructure());
 		}
-		return new FeatureIDEEvent(featureModel, EventType.FEATURE_ADD_ABOVE, parent.getFeature(), newCompound);
+		return new FeatureIDEEvent(featureModel, EventType.FEATURE_ADD_ABOVE, parent != null ? parent.getFeature() : null, newCompound);
 	}
 
 	@Override

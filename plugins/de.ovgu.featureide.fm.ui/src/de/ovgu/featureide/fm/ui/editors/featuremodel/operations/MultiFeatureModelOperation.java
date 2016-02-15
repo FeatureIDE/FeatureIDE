@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.IStatus;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 
 public abstract class MultiFeatureModelOperation extends AbstractFeatureModelOperation {
 
@@ -56,7 +57,7 @@ public abstract class MultiFeatureModelOperation extends AbstractFeatureModelOpe
 				operation.redo();
 			}
 		}
-		return null;
+		return new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED);
 	}
 
 	@Override
@@ -67,7 +68,7 @@ public abstract class MultiFeatureModelOperation extends AbstractFeatureModelOpe
 				operation.undo();
 			}
 		}
-		return null;
+		return new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED);
 	}
 
 	public void addOperation(AbstractFeatureModelOperation operation) {

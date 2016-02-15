@@ -48,7 +48,7 @@ public class BreadthFirstLayout extends FeatureDiagramLayoutManager {
 	int yoffset;
 
 	@Override
-	public void layoutFeatureModel(IGraphicalFeatureModel featureModel) {
+	protected void layoutFeatureModel(IGraphicalFeatureModel featureModel) {
 		yoffset = 0;
 		IGraphicalFeature root = FeatureUIHelper.getGraphicalFeature(featureModel.getFeatureModel().getStructure().getRoot(), featureModel);
 		layout(root);
@@ -78,7 +78,7 @@ public class BreadthFirstLayout extends FeatureDiagramLayoutManager {
 			int levelSize = list.size();
 			for (int i = 0; i < levelSize; i++) {
 				IGraphicalFeature feature = list.removeFirst();
-				FeatureUIHelper.setLocation(feature, new Point(xoffset, yoffset));
+				setLocation(feature, new Point(xoffset, yoffset));
 				xoffset += FeatureUIHelper.getSize(feature).width + FMPropertyManager.getFeatureSpaceX();
 				//add the features children
 				if (showHidden) {

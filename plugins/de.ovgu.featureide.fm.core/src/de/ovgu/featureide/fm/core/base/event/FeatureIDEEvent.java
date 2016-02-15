@@ -52,7 +52,19 @@ public class FeatureIDEEvent {
 		MODEL_DATA_SAVED,
 		MODEL_DATA_LOADED,
 		REDRAW_DIAGRAM,
-		REFRESH_ACTIONS,
+		REFRESH_ACTIONS, 
+		CHILDREN_CHANGED,
+	}
+	
+	static FeatureIDEEvent[] defaultEvents = new FeatureIDEEvent[EventType.values().length];
+	static {
+		for (EventType e : EventType.values()) {
+			defaultEvents[e.ordinal()] = new FeatureIDEEvent(e);
+		}
+	}
+	
+	public static FeatureIDEEvent getDefault(final EventType e) {
+		return defaultEvents[e.ordinal()];
 	}
 	
 	private final Object source;
@@ -62,6 +74,10 @@ public class FeatureIDEEvent {
 	private final Object oldValue;
 	private final Object newValue;
 
+	private FeatureIDEEvent(EventType e) {
+		this(null, e);
+	}
+	
 	public FeatureIDEEvent(Object source, EventType eventType) {
 		this(source, null, false, eventType, null, null);
 	}

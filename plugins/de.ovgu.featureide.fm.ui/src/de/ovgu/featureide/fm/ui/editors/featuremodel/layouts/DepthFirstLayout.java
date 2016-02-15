@@ -45,7 +45,7 @@ public class DepthFirstLayout extends FeatureDiagramLayoutManager {
 	int yoffset;
 
 	@Override
-	public void layoutFeatureModel(IGraphicalFeatureModel featureModel) {
+	protected void layoutFeatureModel(IGraphicalFeatureModel featureModel) {
 		yoffset = 0;
 		IGraphicalFeature root = FeatureUIHelper.getGraphicalRootFeature(featureModel);
 		depthFirstLayout(root, 0, FMPropertyManager.getLayoutMarginX());

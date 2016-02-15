@@ -41,7 +41,7 @@ public class ManualLayout extends FeatureDiagramLayoutManager {
 		super();
 	}
 
-	public void layoutFeatureModel(IGraphicalFeatureModel featureModel) {
+	protected void layoutFeatureModel(IGraphicalFeatureModel featureModel) {
 		for (IGraphicalFeature feature : featureModel.getFeatures()) {
 			FeatureUIHelper.setLocation(feature, feature.getLocation());
 		}

@@ -98,7 +98,7 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 				}
 			}
 		}
-		return new FeatureIDEEvent(featureModel, EventType.FEATURE_DELETE, feature, null);
+		return new FeatureIDEEvent(feature, EventType.FEATURE_DELETE, oldParent, null);
 	}
 
 	@Override

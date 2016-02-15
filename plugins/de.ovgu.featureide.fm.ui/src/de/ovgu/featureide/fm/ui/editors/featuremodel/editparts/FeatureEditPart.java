@@ -20,13 +20,13 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.editparts;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.draw2d.ConnectionAnchor;
 import org.eclipse.draw2d.IFigure;
-import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.NodeEditPart;
 import org.eclipse.gef.Request;
@@ -142,7 +142,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 
 	@Override
 	protected List<FeatureConnection> getModelTargetConnections() {
-		return getFeature().getTargetConnections();
+		return Collections.<FeatureConnection> emptyList();// getFeature().getTargetConnections();
 	}
 
 	public ConnectionAnchor getSourceConnectionAnchor(org.eclipse.gef.ConnectionEditPart connection) {
@@ -163,7 +163,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 
 	@Override
 	public void activate() {
-		getFeature().getObject().addListener(this);
+		getFeature().registerUIObject(this);
 		getFeatureFigure().setVisible(true);
 		super.activate();
 	}
@@ -171,18 +171,27 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 	@Override
 	public void deactivate() {
 		super.deactivate();
-		getFeature().getObject().removeListener(this);
 		getFeatureFigure().setVisible(false);
 	}
 
+	@Override
 	public void propertyChange(FeatureIDEEvent event) {
-		EventType prop = event.getEventType();
-		if (EventType.LOCATION_CHANGED.equals(prop)) {
-			if (!event.getOldValue().equals(event.getNewValue())) {
-				getFeatureFigure().setLocation((Point) event.getNewValue());
+		final EventType prop = event.getEventType();
+		FeatureConnection sourceConnection;
+		switch (prop) {
+		case CHILDREN_CHANGED:
+			for (FeatureConnection connection : getFeature().getTargetConnections()) {
+				Map<?, ?> registry = getViewer().getEditPartRegistry();
+				ConnectionEditPart connectionEditPart = (ConnectionEditPart) registry.get(connection);
+				if (connectionEditPart != null) {
+					connectionEditPart.refresh();
+				}
 			}
+			break;
+		case LOCATION_CHANGED:
+			getFeatureFigure().setLocation(getFeature().getLocation());
 			getFeatureFigure().setProperties();
-			final FeatureConnection sourceConnection = getFeature().getSourceConnection();
+			sourceConnection = getFeature().getSourceConnection();
 			if (sourceConnection != null) {
 				IGraphicalFeature target = sourceConnection.getTarget();
 				final IGraphicalFeature newTarget = FeatureUIHelper.getGraphicalParent(getFeature());
@@ -191,9 +200,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 					Map<?, ?> registry = getViewer().getEditPartRegistry();
 					ConnectionEditPart connectionEditPart = (ConnectionEditPart) registry.get(sourceConnection);
 					if (connectionEditPart != null) {
-						connectionEditPart.refreshParent();
-						connectionEditPart.refreshSourceDecoration();
-						connectionEditPart.refreshTargetDecoration();
+						refresh();
 					}
 				}
 			}
@@ -203,36 +210,49 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 				ConnectionEditPart connectionEditPart = (ConnectionEditPart) registry.get(connection);
 				if (connectionEditPart != null) {
 					connectionEditPart.refresh();
-					connectionEditPart.refreshSourceDecoration();
-					connectionEditPart.refreshTargetDecoration();
 				}
 			}
-		} else if (EventType.GROUP_TYPE_CHANGED.equals(prop)) {
+			break;
+		case GROUP_TYPE_CHANGED:
 			getFeatureFigure().setProperties();
 			boolean targetUpdated = false;
-			for (FeatureConnection connection : getFeature().getTargetConnections()) {
-				Map<?, ?> registry = getViewer().getEditPartRegistry();
-				ConnectionEditPart connectionEditPart = (ConnectionEditPart) registry.get(connection);
-				if (connectionEditPart != null) {
-					connectionEditPart.refreshSourceDecoration();
-					if (!targetUpdated) {
-						connectionEditPart.refreshTargetDecoration();
-						connectionEditPart.refreshToolTip();
-						targetUpdated = true;
-					}
+			sourceConnection = getFeature().getSourceConnection();
+			Map<?, ?> registry = getViewer().getEditPartRegistry();
+			ConnectionEditPart connectionEditPart = (ConnectionEditPart) registry.get(sourceConnection);
+			if (connectionEditPart != null) {
+				connectionEditPart.refreshSourceDecoration();
+				if (!targetUpdated) {
+					connectionEditPart.refreshTargetDecoration();
+					connectionEditPart.refreshToolTip();
+					targetUpdated = true;
 				}
-
 			}
-		} else if (EventType.FEATURE_NAME_CHANGED.equals(prop)) {
+			break;
+		case FEATURE_NAME_CHANGED:
 			getFeatureFigure().setName(getFeature().getObject().getProperty().getDisplayName());
 			FeatureUIHelper.setSize(getFeature(), getFeatureFigure().getSize());
-		} else if (EventType.ATTRIBUTE_CHANGED.equals(prop)) {
+			break;
+		case ATTRIBUTE_CHANGED:
 			getFeatureFigure().setProperties();
-		} else if (EventType.MANDATORY_CHANGED.equals(prop)) {
-			FeatureConnection connection = getFeature().getSourceConnection();
-			Map<?, ?> registry = getViewer().getEditPartRegistry();
-			ConnectionEditPart connectionEditPart = (ConnectionEditPart) registry.get(connection);
+			break;
+		case MANDATORY_CHANGED:
+			sourceConnection = getFeature().getSourceConnection();
+			registry = getViewer().getEditPartRegistry();
+			connectionEditPart = (ConnectionEditPart) registry.get(sourceConnection);
 			connectionEditPart.refreshSourceDecoration();
+			break;
+		case FEATURE_DELETE:
+			deactivate();
+			break;
+		case PARENT_CHANGED:
+			sourceConnection = getFeature().getSourceConnection();
+			registry = getViewer().getEditPartRegistry();
+			connectionEditPart = (ConnectionEditPart) registry.get(sourceConnection);
+			connectionEditPart.refreshParent();			
+			break;
+		default:
+			System.out.println(prop + " not handled");
+			break;
 		}
 	}
 

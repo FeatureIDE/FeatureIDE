@@ -24,6 +24,8 @@ import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
@@ -41,6 +43,7 @@ public class GraphicalConstraint implements IGraphicalConstraint {
 
 	protected Point location = new Point(0, 0);
 	protected Dimension dimension = new Dimension(10, 10);
+	private IEventListener uiObject;
 
 	public GraphicalConstraint(GraphicalConstraint constraint) {
 		correspondingConstraint = constraint.correspondingConstraint;
@@ -48,7 +51,7 @@ public class GraphicalConstraint implements IGraphicalConstraint {
 		location = constraint.location;
 		dimension = constraint.dimension;
 	}
-	
+
 	public GraphicalConstraint(IConstraint correspondingConstraint, IGraphicalFeatureModel graphicalFeatureModel) {
 		this.correspondingConstraint = correspondingConstraint;
 		this.graphicalFeatureModel = graphicalFeatureModel;
@@ -107,5 +110,17 @@ public class GraphicalConstraint implements IGraphicalConstraint {
 	@Override
 	public GraphicalConstraint clone() {
 		return new GraphicalConstraint(this);
+	}
+
+	@Override
+	public void update(FeatureIDEEvent event) {
+		if (uiObject != null) {
+			uiObject.propertyChange(event);
+		}
+	}
+
+	@Override
+	public void registerUIObject(IEventListener listener) {
+		this.uiObject = listener;
 	}
 }

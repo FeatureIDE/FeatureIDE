@@ -31,6 +31,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SET_NAME_TYPE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATING_FEATURE_MODEL_ATTRIBUTES;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -737,16 +738,27 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		final EventType prop = event.getEventType();
 		switch (prop) {
 		case FEATURE_ADD_ABOVE:
-			final IGraphicalFeature parent = graphicalFeatureModel.getGraphicalFeature((IFeature) event.getOldValue());
-			final FeatureEditPart parentEditPart = (FeatureEditPart) getEditPartRegistry().get(parent);
-			parentEditPart.refresh();
+			IFeature oldParent = (IFeature) event.getOldValue();
+			if (oldParent != null) {
+				final IGraphicalFeature parent = graphicalFeatureModel.getGraphicalFeature(oldParent);
+				parent.update(FeatureIDEEvent.getDefault(EventType.FEATURE_ADD_ABOVE));
+			} else {
+				IGraphicalFeature child = FeatureUIHelper.getGraphicalChildren(((IFeature) event.getNewValue()), graphicalFeatureModel).get(0);
+				child.update(FeatureIDEEvent.getDefault(EventType.PARENT_CHANGED));
+			}
 		case FEATURE_ADD:
 			reload();
 			featureModelEditor.setPageModified(true);
-			
-			final IGraphicalFeature newFeature = graphicalFeatureModel.getGraphicalFeature((IFeature) event.getNewValue());
-			final FeatureEditPart newEditPart = (FeatureEditPart) getEditPartRegistry().get(newFeature);
+			IFeature newFeature = (IFeature) event.getNewValue();
+			if (newFeature.getStructure().hasChildren()) {
+				for (IGraphicalFeature child : FeatureUIHelper.getGraphicalChildren(newFeature, graphicalFeatureModel)) {
+					child.update(FeatureIDEEvent.getDefault(EventType.PARENT_CHANGED));
+				}
+			}
+			final IGraphicalFeature newGraphicalFeature = graphicalFeatureModel.getGraphicalFeature(newFeature);
+			final FeatureEditPart newEditPart = (FeatureEditPart) getEditPartRegistry().get(newGraphicalFeature);
 			if (newEditPart != null) {
+				refreshAll();
 				newEditPart.activate();
 				select(newEditPart);
 				// open the renaming command
@@ -756,21 +768,31 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			}
 			break;
 		case FEATURE_NAME_CHANGED:
-			internRefresh(true);
-			final IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(graphicalFeatureModel.getFeatureModel().getFeature((String)event.getNewValue()));
+			final String newValue = (String)event.getNewValue();
+			final IFeature feature = graphicalFeatureModel.getFeatureModel().getFeature(newValue);
+			final IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(feature);
+			graphicalFeature.update(event);
 			final FeatureEditPart part = (FeatureEditPart) getEditPartRegistry().get(graphicalFeature);
 			if (part != null) {
+				internRefresh(true);
 				deselectAll();
 				select(part);
 			}
 			featureModelEditor.setPageModified(true);
 			break;
-		case GROUP_TYPE_CHANGED:
 		case MANDATORY_CHANGED:
+			FeatureUIHelper.getGraphicalFeature((IFeature)event.getSource(), graphicalFeatureModel).update(event);
+			featureModelEditor.setPageModified(true);
+			break;
+		case GROUP_TYPE_CHANGED:
+			for (IGraphicalFeature f : FeatureUIHelper.getGraphicalChildren((IFeature)event.getSource(), graphicalFeatureModel)) {
+				f.update(event);
+			}
+			featureModelEditor.setPageModified(true);
+			break;
 		case ATTRIBUTE_CHANGED:
 			featureModelEditor.setPageModified(true);
 			break;
-		
 		case CONSTRAINT_MOVE:
 		case LOCATION_CHANGED:
 			internRefresh(true);
@@ -785,9 +807,9 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			featureModelEditor.setPageModified(true);
 			break;
 		case FEATURE_DELETE:
-			IGraphicalFeature oldFeature = graphicalFeatureModel.getGraphicalFeature((IFeature) event.getOldValue());
-			FeatureEditPart deletedFeature = (FeatureEditPart) getEditPartRegistry().get(oldFeature);
-			deletedFeature.deactivate();
+			IGraphicalFeature deletedFeature = graphicalFeatureModel.getGraphicalFeature((IFeature) event.getSource());
+			deletedFeature.update(event);
+			graphicalFeatureModel.getGraphicalFeature(((IFeature) event.getOldValue())).update(FeatureIDEEvent.getDefault(EventType.CHILDREN_CHANGED));
 			reload();
 			featureModelEditor.setPageModified(true);
 			break;
@@ -799,6 +821,8 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			fr.save();
 			break;
 		case MODEL_LAYOUT_CHANGED:
+			refresh();
+			refresh(graphicalFeatureModel.getFeatures(), true);
 			featureModelEditor.setPageModified(true);
 			break;
 		case REDRAW_DIAGRAM:
@@ -819,6 +843,19 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 
 		for (IFeatureModelEditorPage page : featureModelEditor.extensionPages) {
 			page.propertyChange(event);
+		}
+	}
+	
+	private void refreshAll() {
+		refresh(graphicalFeatureModel.getFeatures(), true);
+	}
+	
+	private void refresh(Collection<IGraphicalFeature> features, boolean checkModification) {
+		for (IGraphicalFeature f: features) {
+			if (!checkModification) { 
+				FeatureEditPart editPart = (FeatureEditPart) getEditPartRegistry().get(f);
+				editPart.refresh();
+			}
 		}
 	}
 

@@ -65,7 +65,7 @@ public class VerticalLayout extends FeatureDiagramLayoutManager {
 		final Iterable<? extends IGraphicalFeature> children = FeatureUIHelper.getGraphicalChildren(parent);
 		if (!children.iterator().hasNext()) {
 			height += heightStep;
-			FeatureUIHelper.setLocation(parent, new Point(levelWidth.get(level), height));
+			setLocation(parent, new Point(levelWidth.get(level), height));
 			return height;
 		} else {
 			final Iterator<? extends IGraphicalFeature> it = children.iterator();
@@ -76,7 +76,7 @@ public class VerticalLayout extends FeatureDiagramLayoutManager {
 			}
 
 			final int yPos = (min + max) >> 1;
-			FeatureUIHelper.setLocation(parent, new Point(levelWidth.get(level), yPos));
+			setLocation(parent, new Point(levelWidth.get(level), yPos));
 			return yPos;
 		}
 	}

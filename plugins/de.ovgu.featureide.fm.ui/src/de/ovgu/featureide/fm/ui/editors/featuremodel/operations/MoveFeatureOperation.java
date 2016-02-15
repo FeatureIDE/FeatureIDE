@@ -49,7 +49,6 @@ public class MoveFeatureOperation extends AbstractFeatureModelOperation {
 		this.newPos = newPos;
 		this.oldPos = oldPos;
 		setEditor(editor);
-		setEventId(EventType.STRUCTURE_CHANGED);
 	}
 
 	public void newInnerOrder(Point newPos) {
@@ -66,18 +65,21 @@ public class MoveFeatureOperation extends AbstractFeatureModelOperation {
 			
 			final IGraphicalFeature newParent = data.getNewParent();
 			newParent.getObject().getStructure().addChildAtPosition(data.getNewIndex(), featureStructure);
+			
+			if (oldParent != newParent) {
+				oldParent.update(FeatureIDEEvent.getDefault(EventType.CHILDREN_CHANGED));
+				newParent.update(FeatureIDEEvent.getDefault(EventType.CHILDREN_CHANGED));
+			}
 		} else {
 			newInnerOrder(newPos);
-			setEventId(EventType.MODEL_DATA_LOADED);
 		}
-		return new FeatureIDEEvent(feature, EventType.LOCATION_CHANGED);
+		return new FeatureIDEEvent(feature, EventType.STRUCTURE_CHANGED);
 	}
 
 	@Override
 	protected FeatureIDEEvent inverseOperation() {
 		if (!data.getFeature().getGraphicalModel().getLayout().hasFeaturesAutoLayout()) {
 			newInnerOrder(oldPos);
-			setEventId(EventType.MODEL_DATA_LOADED);
 		} else {
 			final IFeatureStructure structure2 = data.getFeature().getObject().getStructure();
 			data.getNewParent().getObject().getStructure().removeChild(structure2);
@@ -86,7 +88,7 @@ public class MoveFeatureOperation extends AbstractFeatureModelOperation {
 				structure.addChildAtPosition(data.getOldIndex(), structure2);
 			}
 		}
-		return null;
+		return new FeatureIDEEvent(data.getFeature().getGraphicalModel().getFeatureModel(), EventType.STRUCTURE_CHANGED);
 	}
 
 }

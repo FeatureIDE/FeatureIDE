@@ -20,12 +20,7 @@
  */
 package de.ovgu.featureide.fm.ui.editors;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.LinkedList;
-
 import de.ovgu.featureide.fm.core.IGraphicItem;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 
 /**
  * An instance of this class represents a connection between a feature and its
@@ -35,7 +30,6 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
  *
  */
 public class FeatureConnection implements IGraphicItem {
-	
 
 	private final IGraphicalFeature source;
 	private IGraphicalFeature target;
@@ -53,27 +47,7 @@ public class FeatureConnection implements IGraphicItem {
 	}
 	
 	public void setTarget(IGraphicalFeature target) {
-		if (this.target == target)
-			return;
 		this.target = target;
-		fireParentChanged();
-	}
-
-	private LinkedList<PropertyChangeListener> listenerList = new LinkedList<>();
-	
-	public void addListener(PropertyChangeListener listener) {
-		if (!listenerList.contains(listener))
-			listenerList.add(listener);
-	}
-	
-	public void removeListener(PropertyChangeListener listener) {
-		listenerList.remove(listener);
-	}
-	
-	private void fireParentChanged() {
-		PropertyChangeEvent event = new PropertyChangeEvent(this, EventType.PARENT_CHANGED.toString(), Boolean.FALSE, Boolean.TRUE);
-		for (PropertyChangeListener listener : listenerList)
-			listener.propertyChange(event);
 	}
 	
 	@Override

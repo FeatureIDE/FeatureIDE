@@ -283,6 +283,9 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 	}
 
 	public void setName(String newName) {
+		if (label.getText().equals(newName)) {
+			return;
+		}
 		label.setText(newName);
 
 		final Dimension labelSize = label.getPreferredSize();

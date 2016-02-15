@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
+import javax.annotation.Nonnull;
+
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.AbstractOperation;
 import org.eclipse.core.commands.operations.IUndoContext;
@@ -31,7 +33,6 @@ import org.eclipse.core.runtime.Status;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 
 /**
  * This operation should be used as superclass for all operations on the feature model.
@@ -47,8 +48,6 @@ public abstract class AbstractFeatureModelOperation extends AbstractOperation {
 	protected Object editor = null;
 
 	protected boolean executed = false;
-
-	private EventType eventId = EventType.MODEL_DATA_CHANGED;
 
 	public AbstractFeatureModelOperation(IFeatureModel featureModel, String label) {
 		super(label);
@@ -82,6 +81,7 @@ public abstract class AbstractFeatureModelOperation extends AbstractOperation {
 		return Status.OK_STATUS;
 	}
 
+	@Nonnull
 	protected abstract FeatureIDEEvent operation();
 
 	public void redo() {
@@ -107,20 +107,12 @@ public abstract class AbstractFeatureModelOperation extends AbstractOperation {
 		executed = false;
 	}
 
-	final protected void fireEvent(FeatureIDEEvent event) {
+	final protected void fireEvent(@Nonnull FeatureIDEEvent event) {
 		if (event == null) {
-			event = new FeatureIDEEvent(featureModel, editor, false, eventId, null, null);
+			System.out.println(getClass() + " operation() must retuan a FeatureIDEEvent");
+			event = new FeatureIDEEvent(featureModel, editor, false, null, null, null);
 		}
 		featureModel.fireEvent(event);
-	}
-
-	protected final EventType getEventId() {
-		return eventId;
-	}
-
-	@Deprecated// TODO remove
-	protected final void setEventId(EventType eventId) {
-		this.eventId = eventId;
 	}
 
 	public Object getEditor() {

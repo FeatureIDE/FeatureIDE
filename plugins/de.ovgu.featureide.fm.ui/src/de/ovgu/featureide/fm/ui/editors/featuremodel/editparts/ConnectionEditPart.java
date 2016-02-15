@@ -144,7 +144,6 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 			FMUIPlugin.getDefault().logError(e);
 		}
 
-//		featureModel.handleModelDataChanged();
 	}
 
 	@Override
@@ -169,7 +168,12 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 
 		boolean parentHidden = false;
 
-		RotatableDecoration sourceDecoration = clearDecoration;
+		RotatableDecoration sourceDecoration = new CircleDecoration(true) {
+			@Override
+			protected void fillShape(Graphics graphics) {
+				
+			}
+		};;
 		while (!sourceParent.getStructure().isRoot()) {
 			sourceParent = sourceParent.getStructure().getParent().getFeature();
 			if (sourceParent.getStructure().isHidden())
@@ -184,38 +188,29 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		PolylineConnection connection = (PolylineConnection) getConnectionFigure();
 		connection.setSourceDecoration(sourceDecoration);
 	}
-	private final CircleDecoration clearDecoration = new CircleDecoration(true) {
-		@Override
-		protected void fillShape(Graphics graphics) {
-			
-		}
-	};;
-	private CircleDecoration circleDecorationMandatory = null;
-	private CircleDecoration circleDecorationFalse = null;
-	private CircleDecoration getSourceDecoration(boolean mandatory) {
-		if (mandatory) {
-			if (circleDecorationMandatory == null) {
-				circleDecorationMandatory = new CircleDecoration(true);
+	
+	private static CircleDecoration createClearDecoration() {
+		return new CircleDecoration(true) {
+			@Override
+			protected void fillShape(Graphics graphics) {
+				
 			}
-			return circleDecorationMandatory;
-		} else {
-			if (circleDecorationFalse == null) {
-				circleDecorationFalse = new CircleDecoration(false);
-			}
-			return circleDecorationFalse;
-		}
+		};
+	}
+	private static CircleDecoration getSourceDecoration(boolean mandatory) {
+		return new CircleDecoration(mandatory);
 	}
 
 	public void refreshTargetDecoration() {
 		FeatureConnection connectionModel = getConnectionModel();
 		IGraphicalFeature target = connectionModel.getTarget();
-		RotatableDecoration targetDecoration = null;
+		RotatableDecoration targetDecoration = createClearDecoration();
+		final PolylineConnection connection = (PolylineConnection) getConnectionFigure();
 		if (target.getObject().getStructure().getChildrenCount() > 1) {
 			IGraphicalFeature source = connectionModel.getSource();
 			final List<IGraphicalFeature> graphicalChildren = FeatureUIHelper.getGraphicalChildren(target);
 			final IGraphicalFeature object = graphicalChildren.get(0);
 			final IFeatureStructure structure = target.getObject().getStructure();
-			final PolylineConnection connection = (PolylineConnection) getConnectionFigure();
 			if (structure.isAnd()) {
 				connection.setTargetDecoration(targetDecoration);
 				return;
@@ -227,9 +222,13 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 			} else {
 				if (structure.isFirstChild(source.getObject().getStructure())) {
 					targetDecoration = new RelationDecoration(structure.isMultiple(), graphicalChildren.get(graphicalChildren.size() - 1));
+				} else {
+					targetDecoration = createClearDecoration();
 				}
 			}
 			connection.setTargetDecoration(targetDecoration);	
+		} else {
+			connection.setTargetDecoration(createClearDecoration());
 		}
 
 	}
@@ -250,7 +249,6 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 
 	@Override
 	public void activate() {
-		getConnectionModel().addListener(this);
 		getFigure().setVisible(true);
 		super.activate();
 	}
@@ -258,7 +256,6 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 	@Override
 	public void deactivate() {
 		super.deactivate();
-		getConnectionModel().removeListener(this);
 		getFigure().setVisible(false);
 	}
 

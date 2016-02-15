@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
@@ -34,7 +33,6 @@ public abstract class AbstractGraphicalFeatureModelOperation extends AbstractFea
 	public AbstractGraphicalFeatureModelOperation(IGraphicalFeatureModel graphicalFeatureModel, String label) {
 		super(graphicalFeatureModel.getFeatureModel(), label);
 		this.graphicalFeatureModel = graphicalFeatureModel;
-		setEventId(EventType.MODEL_DATA_LOADED);
 	}
 
 }
