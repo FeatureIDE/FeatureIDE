@@ -90,7 +90,10 @@ public class GraphicalFeature implements IGraphicalFeature {
 
 	@Override
 	public void setConstraintSelected(boolean selection) {
-		constraintSelected = selection;
+		if (constraintSelected != selection) {
+			constraintSelected = selection;
+			update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
+		}
 	}
 
 	@Override

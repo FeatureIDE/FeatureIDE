@@ -110,8 +110,9 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 		IGraphicalFeatureModel featureModel = ((ModelEditPart) this.getParent()).getFeatureModel();
 
 		for (IGraphicalConstraint constraint : featureModel.getConstraints()) {
-			if (constraint.isFeatureSelected())
+			if (constraint.isFeatureSelected()) {
 				constraint.setFeatureSelected(false);
+			}
 		}
 
 		if (request.getType() == RequestConstants.REQ_DIRECT_EDIT) {
@@ -130,7 +131,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 			}
 		} else if (request.getType() == RequestConstants.REQ_SELECTION) {
 			for (IConstraint partOf : feature.getStructure().getRelevantConstraints()) {
-				partOf.setFeatureSelected(true);
+				featureModel.getGraphicalConstraint(partOf).setFeatureSelected(true);
 			}
 		}
 	}

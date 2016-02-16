@@ -61,10 +61,6 @@ public interface IConstraint extends IFeatureModelElement {
 	void setDeadFeatures(Iterable<IFeature> deadFeatures);
 
 	boolean setFalseOptionalFeatures(IFeatureModel clone, Collection<IFeature> fmFalseOptionals);
-
-	boolean isFeatureSelected();
-
-	void setFeatureSelected(boolean b);
 	
 	String getDisplayName();
 

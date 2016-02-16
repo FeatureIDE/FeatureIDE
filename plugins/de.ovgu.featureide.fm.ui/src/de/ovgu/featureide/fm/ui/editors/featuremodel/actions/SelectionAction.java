@@ -30,9 +30,9 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 
-import de.ovgu.featureide.fm.core.base.IConstraint;
-import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 
@@ -50,13 +50,13 @@ public class SelectionAction extends Action {
 			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
 
 			if (isSelectionValid(selection)) {
-				for (IFeature feature : model.getFeatures()) {
+				for (IGraphicalFeature feature : model.getFeatures()) {
 					if (feature.isConstraintSelected()) {
 						feature.setConstraintSelected(false);
 					}
 				}
 
-				for (IConstraint constraint : model.getConstraints()) {
+				for (IGraphicalConstraint constraint : model.getConstraints()) {
 					if (constraint.isFeatureSelected()) {
 						constraint.setFeatureSelected(false);
 					}
@@ -71,11 +71,11 @@ public class SelectionAction extends Action {
 		}
 	};
 
-	private IFeatureModel model;
+	private IGraphicalFeatureModel model;
 
-	public SelectionAction(GraphicalViewerImpl viewer, IFeatureModel featureModel) {
+	public SelectionAction(GraphicalViewerImpl viewer, IGraphicalFeatureModel graphicalFeatureModel) {
 		super(SELECTION);
-		this.model = featureModel;
+		this.model = graphicalFeatureModel;
 
 		viewer.addSelectionChangedListener(listener);
 	}

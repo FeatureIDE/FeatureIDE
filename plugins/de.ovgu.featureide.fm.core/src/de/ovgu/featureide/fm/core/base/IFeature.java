@@ -40,8 +40,4 @@ public interface IFeature extends IFeatureModelElement {
 	@Nonnull
 	IFeatureStructure getStructure();
 
-	boolean isConstraintSelected();
-
-	void setConstraintSelected(boolean b);
-
 }

@@ -385,7 +385,8 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 				public void run() {
 					diagramEditor.setContents(diagramEditor.getGraphicalFeatureModel());
 					pageChange(getDiagramEditorIndex());
-					diagramEditor.refresh();
+					diagramEditor.internRefresh(false);
+					diagramEditor.analyzeFeatureModel();
 				}
 			});
 		}

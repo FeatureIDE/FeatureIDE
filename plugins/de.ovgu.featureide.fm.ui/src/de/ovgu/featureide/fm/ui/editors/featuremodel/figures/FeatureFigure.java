@@ -149,7 +149,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		} else {
 			if (feature.getStructure().isRoot() && !analyser.valid()) {
 				setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
-				setBorder(FMPropertyManager.getDeadFeatureBorder(feature.isConstraintSelected()));
+				setBorder(FMPropertyManager.getDeadFeatureBorder(this.feature.isConstraintSelected()));
 				toolTip.append(VOID);
 			} else {
 				if (feature.getStructure().isConcrete()) {
@@ -162,7 +162,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 				}
 
 				if (feature.getStructure().hasHiddenParent()) {
-					setBorder(FMPropertyManager.getHiddenFeatureBorder(feature.isConstraintSelected()));
+					setBorder(FMPropertyManager.getHiddenFeatureBorder(this.feature.isConstraintSelected()));
 					label.setForegroundColor(HIDDEN_FOREGROUND);
 					toolTip.append(feature.getStructure().isHidden() ? HIDDEN : HIDDEN_PARENT);
 					analyser.setAttributeFlag(Attribute.Hidden, true);
@@ -174,20 +174,20 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 				case DEAD:
 					if (analyser.valid()) {
 						setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
-						setBorder(FMPropertyManager.getDeadFeatureBorder(feature.isConstraintSelected()));
+						setBorder(FMPropertyManager.getDeadFeatureBorder(this.feature.isConstraintSelected()));
 						toolTip.append(DEAD);
 						analyser.setAttributeFlag(Attribute.Dead, true);
 					}
 					break;
 				case FALSE_OPTIONAL:
 					setBackgroundColor(FMPropertyManager.getWarningColor());
-					setBorder(FMPropertyManager.getConcreteFeatureBorder(feature.isConstraintSelected()));
+					setBorder(FMPropertyManager.getConcreteFeatureBorder(this.feature.isConstraintSelected()));
 					toolTip.append(FALSE_OPTIONAL);
 					analyser.setAttributeFlag(Attribute.FalseOptional, true);
 					break;
 				case INDETERMINATE_HIDDEN:
 					setBackgroundColor(FMPropertyManager.getWarningColor());
-					setBorder(FMPropertyManager.getHiddenFeatureBorder(feature.isConstraintSelected()));
+					setBorder(FMPropertyManager.getHiddenFeatureBorder(this.feature.isConstraintSelected()));
 					toolTip.append(INDETERMINATE_HIDDEN);
 					analyser.setAttributeFlag(Attribute.IndetHidden, true);
 					break;

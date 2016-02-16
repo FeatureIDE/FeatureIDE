@@ -41,12 +41,14 @@ public class GraphicalConstraint implements IGraphicalConstraint {
 
 	protected final IConstraint correspondingConstraint;
 	protected final IGraphicalFeatureModel graphicalFeatureModel;
-
+	protected boolean featureSelected = false;
+	
 	protected Point location = new Point(0, 0);
 	protected Dimension dimension = new Dimension(10, 10);
 	private IEventListener uiObject;
 
 	public GraphicalConstraint(GraphicalConstraint constraint) {
+		featureSelected = constraint.featureSelected;
 		correspondingConstraint = constraint.correspondingConstraint;
 		graphicalFeatureModel = constraint.graphicalFeatureModel;
 		location = constraint.location;
@@ -75,12 +77,15 @@ public class GraphicalConstraint implements IGraphicalConstraint {
 
 	@Override
 	public boolean isFeatureSelected() {
-		return correspondingConstraint.isFeatureSelected();
+		return featureSelected;
 	}
 
 	@Override
 	public void setFeatureSelected(boolean selected) {
-		correspondingConstraint.setFeatureSelected(selected);
+		if (featureSelected != selected) {
+			featureSelected = selected;
+			update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
+		}
 	}
 
 	@Override

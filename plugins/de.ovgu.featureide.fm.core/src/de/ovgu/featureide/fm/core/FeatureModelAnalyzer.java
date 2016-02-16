@@ -541,6 +541,7 @@ public class FeatureModelAnalyzer {
 	 * So LinkedLists are much faster because the number of feature in the set is usually small (e.g. dead features)
 	 */
 	public HashMap<Object, Object> analyzeFeatureModel(IProgressMonitor monitor) {
+		resetAttributeFlags();
 		this.monitor = monitor;
 		if (calculateConstraints) {
 			beginTask(fm.getConstraintCount() + 2);
@@ -551,7 +552,7 @@ public class FeatureModelAnalyzer {
 		HashMap<Object, Object> changedAttributes = new HashMap<Object, Object>();
 
 		// put root always in so it will be refreshed (void/non-void)
-		changedAttributes.put(fm.getStructure().getRoot(), FeatureStatus.NORMAL);
+		changedAttributes.put(fm.getStructure().getRoot().getFeature(), FeatureStatus.NORMAL);
 		if (calculateFeatures) {
 			updateFeatures(oldAttributes, changedAttributes);
 		}
@@ -559,7 +560,6 @@ public class FeatureModelAnalyzer {
 			updateConstraints(oldAttributes, changedAttributes);
 		}
 		// put root always in so it will be refreshed (void/non-void)
-//		changedAttributes.put(fm.getRoot(), ConstraintAttribute.VOID_MODEL);
 		return changedAttributes;
 	}
 

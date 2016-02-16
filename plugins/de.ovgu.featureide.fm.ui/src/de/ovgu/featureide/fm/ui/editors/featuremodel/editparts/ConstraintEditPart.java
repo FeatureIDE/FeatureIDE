@@ -34,6 +34,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.ConstraintDialog;
+import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.ConstraintFigure;
 
@@ -69,12 +70,13 @@ public class ConstraintEditPart extends AbstractGraphicalEditPart implements IEv
 	}
 
 	public void performRequest(Request request) {
+		final IGraphicalConstraint constraintModel = getConstraintModel();
 		if (request.getType() == RequestConstants.REQ_OPEN) {
-			new ConstraintDialog(getConstraintModel().getObject().getFeatureModel(), getConstraintModel().getObject());
+			new ConstraintDialog(constraintModel.getObject().getFeatureModel(), constraintModel.getObject());
 		} else if (request.getType() == RequestConstants.REQ_SELECTION) {
 			try {
-				for (IFeature containedFeature : getConstraintModel().getObject().getContainedFeatures()) {
-					containedFeature.setConstraintSelected(true);
+				for (IFeature containedFeature : constraintModel.getObject().getContainedFeatures()) {
+					FeatureUIHelper.getGraphicalFeature(containedFeature, constraintModel.getGraphicalModel()).setConstraintSelected(true);
 				}
 			} catch (NullPointerException e) {
 				FMCorePlugin.getDefault().reportBug(320);

@@ -58,7 +58,7 @@ public class NameTypeSelectionOperation extends AbstractOperation {
 		oldNameType = Preferences.getDefaultFeatureNameScheme();
 		Preferences.setDefaultFeatureNameFormat(newNameType);
 		editor.reload();
-		editor.refresh();
+		editor.analyzeFeatureModel();
 		return Status.OK_STATUS;
 	}
 
@@ -69,7 +69,7 @@ public class NameTypeSelectionOperation extends AbstractOperation {
 			oldNameType = -1;
 		}
 		editor.reload();
-		editor.refresh();
+		editor.analyzeFeatureModel();
 		return Status.OK_STATUS;
 	}
 

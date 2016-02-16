@@ -83,14 +83,6 @@ public class Constraint implements IGraphicItem {
 		return FeatureUtils.getConstraintAttribute(constraint);
 	}
 
-	public void setFeatureSelected(boolean selected) {
-		FeatureUtils.setFeatureSelected(constraint, selected);
-	}
-
-	public boolean isFeatureSelected() {
-		return FeatureUtils.isFeatureSelected(constraint);
-	}
-
 	public Node getNode() {
 		return FeatureUtils.getNode(constraint);
 	}

@@ -35,16 +35,12 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
  */
 public class Feature extends AFeature {
 
-	private boolean constraintSelected;
-
 	protected Feature(Feature oldFeature, IFeatureModel featureModel, IFeatureStructure newFeatrureStructure) {
 		super(oldFeature, featureModel, newFeatrureStructure);
-		constraintSelected = oldFeature.constraintSelected;
 	}
 
 	public Feature(IFeatureModel featureModel, String name) {
 		super(featureModel, name);
-		this.constraintSelected = false;
 	}
 
 	protected IFeatureProperty createProperty() {
@@ -58,16 +54,6 @@ public class Feature extends AFeature {
 	@Override
 	public IFeature clone(IFeatureModel newFeatureModel, IFeatureStructure newStructure) {
 		return new Feature(this, newFeatureModel, newStructure);
-	}
-
-	@Override
-	public boolean isConstraintSelected() {
-		return constraintSelected;
-	}
-
-	@Override
-	public void setConstraintSelected(boolean b) {
-		constraintSelected = b;
 	}
 
 }

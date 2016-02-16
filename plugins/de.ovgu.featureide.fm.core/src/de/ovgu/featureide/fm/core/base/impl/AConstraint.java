@@ -173,18 +173,7 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 		fmFalseOptionals.removeAll(falseOptionalFeatures);
 		return !falseOptionalFeatures.isEmpty();
 	}
-
-	@Override
-	public boolean isFeatureSelected() {
-		return featureSelected;
-	}
-
-	@Override
-	public void setFeatureSelected(boolean b) {
-		featureSelected = b;
-		fireEvent(new FeatureIDEEvent(this, EventType.CONSTRAINT_SELECTED, Boolean.FALSE, Boolean.TRUE));
-	}
-
+	
 	public void setNode(Node node) {
 		this.propNode = node;
 	}
