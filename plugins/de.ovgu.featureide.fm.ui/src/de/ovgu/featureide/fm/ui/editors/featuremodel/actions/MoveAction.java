@@ -170,7 +170,7 @@ public class MoveAction extends Action {
 			FeatureUIHelper.setLocation(feature, newPos);
 		} else if ((element instanceof ConstraintEditPart) || (element instanceof IConstraint)) {
 			IGraphicalConstraint constraint = element instanceof ConstraintEditPart ? ((ConstraintEditPart) element).getConstraintModel() : (IGraphicalConstraint) element;
-			final Point newPos = FeatureUIHelper.getLocation(constraint).translate(deltaPos);
+			final Point newPos = constraint.getLocation().translate(deltaPos);
 			FeatureUIHelper.setLocation(constraint, newPos);
 		} else if ((element instanceof LegendEditPart) || (element instanceof LegendFigure) || (element instanceof Legend)) {
 			LegendFigure legendFigure = FeatureUIHelper.getLegendFigure(featureModel);

@@ -25,6 +25,7 @@ import org.eclipse.draw2d.geometry.Point;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -84,7 +85,10 @@ public class GraphicalConstraint implements IGraphicalConstraint {
 
 	@Override
 	public void setLocation(Point newLocation) {
-		location = newLocation;
+		if (!newLocation.equals(location)) {
+			location = newLocation;
+			update(FeatureIDEEvent.getDefault(EventType.CONSTRAINT_MOVE));
+		}
 	}
 
 	@Override

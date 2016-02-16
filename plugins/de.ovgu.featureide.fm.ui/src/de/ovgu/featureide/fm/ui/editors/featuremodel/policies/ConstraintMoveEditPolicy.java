@@ -33,7 +33,6 @@ import org.eclipse.draw2d.geometry.PrecisionRectangle;
 import org.eclipse.gef.editpolicies.NonResizableEditPolicy;
 import org.eclipse.gef.requests.ChangeBoundsRequest;
 
-import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.ConstraintDragAndDropCommand;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
 
@@ -73,7 +72,7 @@ public class ConstraintMoveEditPolicy extends NonResizableEditPolicy {
 		r.setForegroundColor(ColorConstants.white);
 		r.setBounds(getInitialFeedbackBounds());
 
-		Point s = FeatureUIHelper.getLocation(editPart.getConstraintModel()).getCopy();
+		Point s = editPart.getConstraintModel().getLocation().getCopy();
 		getHostFigure().translateToAbsolute(s);
 
 		c = new PolylineConnection();

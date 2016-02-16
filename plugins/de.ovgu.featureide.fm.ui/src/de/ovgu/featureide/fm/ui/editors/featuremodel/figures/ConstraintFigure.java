@@ -95,13 +95,14 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 		add(label);
 		setOpaque(true);
 
-		if (FeatureUIHelper.getLocation(constraint) != null)
-			setLocation(FeatureUIHelper.getLocation(constraint));
+		if (constraint.getLocation() != null)
+			setLocation(constraint.getLocation());
 
 		init();
 	}
 
 	private void init() {
+		setText(getConstraintText(constraint.getObject()));
 		setBorder(FMPropertyManager.getConstraintBorder(constraint.isFeatureSelected()));
 		setBackgroundColor(FMPropertyManager.getConstraintBackgroundColor());
 	}

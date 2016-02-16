@@ -100,7 +100,7 @@ public class FMPrintAction extends PrintAction {
 
 	private void moveConstraints(IGraphicalFeatureModel featureModel, Point minP) {
 		for (IGraphicalConstraint c : featureModel.getConstraints()) {
-			Point newPoint = new Point(FeatureUIHelper.getLocation(c).getCopy().x - minP.x, FeatureUIHelper.getLocation(c).getCopy().y - minP.y);
+			Point newPoint = new Point(c.getLocation().x - minP.x, c.getLocation().y - minP.y);
 			FeatureUIHelper.setLocation(c, newPoint);
 		}
 	}

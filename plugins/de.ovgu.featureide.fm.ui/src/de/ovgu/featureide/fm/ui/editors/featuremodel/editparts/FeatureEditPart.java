@@ -215,22 +215,18 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 			break;
 		case GROUP_TYPE_CHANGED:
 			getFeatureFigure().setProperties();
-			boolean targetUpdated = false;
 			sourceConnection = getFeature().getSourceConnection();
 			Map<?, ?> registry = getViewer().getEditPartRegistry();
 			ConnectionEditPart connectionEditPart = (ConnectionEditPart) registry.get(sourceConnection);
 			if (connectionEditPart != null) {
 				connectionEditPart.refreshSourceDecoration();
-				if (!targetUpdated) {
-					connectionEditPart.refreshTargetDecoration();
-					connectionEditPart.refreshToolTip();
-					targetUpdated = true;
-				}
+				connectionEditPart.refreshTargetDecoration();
+				connectionEditPart.refreshToolTip();
 			}
 			break;
 		case FEATURE_NAME_CHANGED:
 			getFeatureFigure().setName(getFeature().getObject().getProperty().getDisplayName());
-			FeatureUIHelper.setSize(getFeature(), getFeatureFigure().getSize());
+			getFeature().setSize(getFeatureFigure().getSize());
 			break;
 		case ATTRIBUTE_CHANGED:
 			getFeatureFigure().setProperties();
@@ -251,7 +247,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 			connectionEditPart.refreshParent();			
 			break;
 		default:
-			System.out.println(prop + " not handled");
+			FMUIPlugin.getDefault().logWarning(event + " @ " + getFeature() + " not handled.");
 			break;
 		}
 	}

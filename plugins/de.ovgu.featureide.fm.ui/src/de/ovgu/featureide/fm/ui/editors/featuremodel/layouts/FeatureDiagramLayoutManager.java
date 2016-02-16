@@ -127,9 +127,9 @@ abstract public class FeatureDiagramLayoutManager {
 		int y = yoffset + FMPropertyManager.getConstraintSpace();
 		boolean depthFirst = this instanceof DepthFirstLayout;
 		for (IGraphicalConstraint constraint : constraints) {
-			Dimension size = FeatureUIHelper.getSize(constraint);
+			Dimension size = constraint.getSize();
 			int x = depthFirst ? 2 * FMPropertyManager.getFeatureSpaceX() : (controlWidth - size.width) >> 1;
-			FeatureUIHelper.setLocation(constraint, new Point(x, y));
+			constraint.setLocation(new Point(x, y));
 			y += size.height;
 		}
 	}
@@ -167,7 +167,7 @@ abstract public class FeatureDiagramLayoutManager {
 		 * for constraints
 		 */
 		for (IGraphicalConstraint constraint : featureModel.getConstraints()) {
-			Point temp = FeatureUIHelper.getLocation(constraint);
+			Point temp = constraint.getLocation();
 			if (null == temp)
 				continue;
 			Dimension tempSize = FeatureUIHelper.getSize(constraint);
@@ -219,7 +219,7 @@ abstract public class FeatureDiagramLayoutManager {
 		 */
 		if (topRight || topLeft || botLeft || botRight) {
 			for (IGraphicalConstraint constraint : featureModel.getConstraints()) {
-				Point tempLocation = FeatureUIHelper.getLocation(constraint);
+				Point tempLocation = constraint.getLocation();
 				if (null == tempLocation)
 					continue;
 				Dimension tempSize = FeatureUIHelper.getSize(constraint);

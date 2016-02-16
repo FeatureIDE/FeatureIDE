@@ -32,7 +32,6 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AutoLayoutConstraintOperation;
 
@@ -57,7 +56,7 @@ public class AutoLayoutConstraintAction extends Action {
 	public void run() {
 		LinkedList<Point> newList = new LinkedList<Point>();
 		for (int i = 0; i < featureModel.getConstraints().size(); i++) {
-			newList.add(FeatureUIHelper.getLocation(featureModel.getConstraints().get(i)).getCopy());
+			newList.add(featureModel.getConstraints().get(i).getLocation());
 		}
 		int counter = oldPos.size();
 		oldPos.add(newList);

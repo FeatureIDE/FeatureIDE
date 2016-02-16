@@ -53,7 +53,6 @@ public class MoveConstraintOperation extends AbstractFeatureModelOperation {
 		featureModel.removeConstraint(constraint);
 		featureModel.addConstraint(constraint, index);
 		return new FeatureIDEEvent(constraint, EventType.CONSTRAINT_MOVE, oldIndex, index);
-//		FeatureUIHelper.setLocation(featureModel.getConstraints().get(index).getGraphicRepresenation(), newPos);
 	}
 
 	@Override
@@ -61,7 +60,6 @@ public class MoveConstraintOperation extends AbstractFeatureModelOperation {
 		featureModel.removeConstraint(constraint);
 		featureModel.addConstraint(constraint, oldIndex);
 		return new FeatureIDEEvent(constraint, EventType.CONSTRAINT_MOVE, index, oldIndex);
-//		FeatureUIHelper.setLocation(featureModel.getConstraints().get(index).getGraphicRepresenation(), oldPos);
 	}
 
 }

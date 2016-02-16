@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.List;
 
 import de.ovgu.featureide.fm.core.IGraphicItem;
+import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
@@ -49,11 +50,11 @@ public interface IGraphicalFeatureModel extends IGraphicItem, Cloneable {
 	
 	Collection<IGraphicalFeature> getFeatures();
 
-	List<IGraphicalConstraint> getConstraints();
-
-	void setConstraintList(List<IGraphicalConstraint> constraintList);
-
 	IGraphicalFeature getGraphicalFeature(IFeature newFeature);
+
+	List<IGraphicalConstraint> getConstraints();
+	
+	IGraphicalConstraint getGraphicalConstraint(IConstraint newFeature);
 		
 	IGraphicalFeatureModel clone();
 	

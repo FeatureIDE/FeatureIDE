@@ -90,7 +90,7 @@ public class FeatureDiagramLayoutHelper {
 			newLocation.y += FMPropertyManager.getFeatureSpaceY();
 		} else {
 			IGraphicalConstraint lastConstraint = featureModel.getConstraints().get(constraintCount - 2);
-			newLocation = FeatureUIHelper.getLocation(lastConstraint).getCopy();
+			newLocation = lastConstraint.getLocation().getCopy();
 			newLocation.y += FMPropertyManager.getConstraintSpace();
 		}
 		FeatureUIHelper.setLocation(constraint, newLocation);

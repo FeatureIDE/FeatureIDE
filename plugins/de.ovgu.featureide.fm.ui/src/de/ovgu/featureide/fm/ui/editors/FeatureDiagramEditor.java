@@ -140,7 +140,6 @@ import de.ovgu.featureide.fm.ui.views.outline.FmOutlinePage;
  * diagrams and cross-tree constraints.
  * 
  * @author Thomas Thuem
- * @author Marcus Pinnecke (Feature Interface)
  */
 public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GUIDefaults, IEventListener, IFeatureModelEditorPage {
 
@@ -733,7 +732,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		return null;
 	}
 
-	// TODO revise this method
 	public void propertyChange(FeatureIDEEvent event) {
 		final EventType prop = event.getEventType();
 		switch (prop) {
@@ -793,8 +791,18 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		case ATTRIBUTE_CHANGED:
 			featureModelEditor.setPageModified(true);
 			break;
-		case CONSTRAINT_MOVE:
 		case LOCATION_CHANGED:
+			internRefresh(true);
+			featureModelEditor.setPageModified(true);
+			break;
+		case CONSTRAINT_MOVE:
+			internRefresh(true);
+			featureModelEditor.setPageModified(true);
+			break;
+		case CONSTRAINT_MODIFY:
+			IConstraint c = (IConstraint) event.getSource();
+			final IGraphicalConstraint graphicalConstraint = graphicalFeatureModel.getGraphicalConstraint(c);
+			graphicalConstraint.update(event);
 			internRefresh(true);
 			featureModelEditor.setPageModified(true);
 			break;
@@ -802,7 +810,6 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		case CONSTRAINT_DELETE:
 		case STRUCTURE_CHANGED:
 		case MODEL_DATA_CHANGED:
-		case CONSTRAINT_MODIFY:
 			reload();
 			featureModelEditor.setPageModified(true);
 			break;

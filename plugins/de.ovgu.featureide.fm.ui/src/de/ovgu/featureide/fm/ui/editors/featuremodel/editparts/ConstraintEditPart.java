@@ -21,7 +21,6 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.editparts;
 
 import org.eclipse.draw2d.IFigure;
-import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.gef.EditPolicy;
 import org.eclipse.gef.Request;
 import org.eclipse.gef.RequestConstants;
@@ -33,6 +32,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.ConstraintDialog;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.ConstraintFigure;
@@ -75,8 +75,6 @@ public class ConstraintEditPart extends AbstractGraphicalEditPart implements IEv
 			try {
 				for (IFeature containedFeature : getConstraintModel().getObject().getContainedFeatures()) {
 					containedFeature.setConstraintSelected(true);
-					// TODO _Feature interfaces removed code
-//					containedFeature.getFeatureModel().setConstraintSelected(true);
 				}
 			} catch (NullPointerException e) {
 				FMCorePlugin.getDefault().reportBug(320);
@@ -86,23 +84,34 @@ public class ConstraintEditPart extends AbstractGraphicalEditPart implements IEv
 
 	@Override
 	public void activate() {
-		getConstraintModel().getObject().addListener(this);
+		getConstraintModel().registerUIObject(this);
 		super.activate();
 	}
 
 	@Override
 	public void deactivate() {
 		super.deactivate();
-		getConstraintModel().getObject().removeListener(this);
 	}
 
 	@Override
 	public void propertyChange(FeatureIDEEvent event) {
-		EventType prop = event.getEventType();
-		if (EventType.LOCATION_CHANGED.equals(prop)) {
-			getConstraintFigure().setLocation((Point) event.getNewValue());
-		} else if (EventType.ATTRIBUTE_CHANGED.equals(prop) || EventType.CONSTRAINT_SELECTED.equals(prop)) {
+		final EventType prop = event.getEventType();
+		switch (prop) {
+		case CONSTRAINT_MOVE:
+		case LOCATION_CHANGED:
+			getConstraintFigure().setLocation(getConstraintModel().getLocation());
+			break;
+		case CONSTRAINT_MODIFY:
 			getConstraintFigure().setConstraintProperties();
+			getConstraintModel().setSize(getConstraintFigure().getSize());
+			break;
+		case ATTRIBUTE_CHANGED:
+		case CONSTRAINT_SELECTED:
+			getConstraintFigure().setConstraintProperties();
+			break;
+		default:
+			FMUIPlugin.getDefault().logWarning(event + " @ " + getConstraintModel() + " not handled.");
+			break;
 		}
 	}
 

@@ -54,8 +54,6 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 
 	protected final Collection<IFeature> falseOptionalFeatures = new LinkedList<>();
 
-//	protected IGraphicalConstraint graphicalRepresentation;
-
 	protected Node propNode;
 	boolean featureSelected;
 
@@ -63,14 +61,12 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 		super(oldConstraint, featureModel);
 		this.propNode = oldConstraint.propNode;
 		this.featureSelected = oldConstraint.featureSelected;
-//		this.graphicalRepresentation = GraphicMap.getInstance().getGraphicRepresentation(this);
 	}
 
 	public AConstraint(IFeatureModel featureModel, Node propNode) {
 		super(featureModel);
 		this.propNode = propNode;
 		this.featureSelected = false;
-//		this.graphicalRepresentation = GraphicMap.getInstance().getGraphicRepresentation(this);
 	}
 
 	@Override
@@ -177,11 +173,6 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 		fmFalseOptionals.removeAll(falseOptionalFeatures);
 		return !falseOptionalFeatures.isEmpty();
 	}
-
-//	@Override
-//	public IGraphicalConstraint getGraphicRepresenation() {
-//		return graphicalRepresentation;
-//	}
 
 	@Override
 	public boolean isFeatureSelected() {

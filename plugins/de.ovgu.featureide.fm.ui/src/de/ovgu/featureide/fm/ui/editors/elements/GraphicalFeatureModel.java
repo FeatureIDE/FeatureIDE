@@ -20,12 +20,12 @@
  */
 package de.ovgu.featureide.fm.ui.editors.elements;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -51,13 +51,16 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	protected final FeatureModelLayout layout;
 
 	protected Map<IFeature, IGraphicalFeature> features;
-	protected List<IGraphicalConstraint> constraintList;
+	protected Map<IConstraint, IGraphicalConstraint> constraints;
 
 	public GraphicalFeatureModel(IFeatureModel correspondingFeatureModel) {
 		this.correspondingFeatureModel = correspondingFeatureModel;
 		layout = new FeatureModelLayout();
 	}
 
+	/**
+	 * Copy constructor
+	 */
 	protected GraphicalFeatureModel(GraphicalFeatureModel oldModel) {
 		this.correspondingFeatureModel = oldModel.correspondingFeatureModel;
 
@@ -66,9 +69,9 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 		for (IGraphicalFeature feature : oldModel.features.values()) {
 			features.put(feature.getObject(), feature.clone());
 		}
-		constraintList = new LinkedList<>();
-		for (IGraphicalConstraint constraint : oldModel.constraintList) {
-			constraintList.add(constraint.clone());
+		constraints = new HashMap<>((int) (correspondingFeatureModel.getConstraintCount() * 1.5));
+		for (Entry<IConstraint, IGraphicalConstraint> constraint : oldModel.constraints.entrySet()) {
+			constraints.put(constraint.getKey(), constraint.getValue().clone());
 		}
 	}
 
@@ -116,15 +119,6 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 		return features.values();
 	}
 
-	public List<IGraphicalConstraint> getConstraints() {
-		return constraintList;
-	}
-
-	
-	public void setConstraintList(List<IGraphicalConstraint> constraintList) {
-		this.constraintList = constraintList;
-	}
-
 	@Override
 	public IGraphicalFeature getGraphicalFeature(IFeature newFeature) {
 		IGraphicalFeature graphicalFeature = features.get(newFeature);
@@ -133,6 +127,25 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 			features.put(newFeature, graphicalFeature);
 		}
 		return graphicalFeature;
+	}
+	
+	@Override
+	public List<IGraphicalConstraint> getConstraints() {
+		final ArrayList<IGraphicalConstraint> constraintList = new ArrayList<>(correspondingFeatureModel.getConstraintCount());
+		for (IConstraint c: correspondingFeatureModel.getConstraints()) {
+			constraintList.add(getGraphicalConstraint(c));
+		}
+		return constraintList;
+	}
+
+	@Override
+	public IGraphicalConstraint getGraphicalConstraint(IConstraint constraint) {
+		IGraphicalConstraint graphicalConstraint = constraints.get(constraint);
+		if (graphicalConstraint == null) {
+			graphicalConstraint = new GraphicalConstraint(constraint, this);
+			constraints.put(constraint, graphicalConstraint);
+		}
+		return graphicalConstraint;
 	}
 
 	@Override
@@ -153,20 +166,18 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 	public void init() {
 		final IFeatureStructure root = correspondingFeatureModel.getStructure().getRoot();
 		if (root != null) {
-			constraintList = new LinkedList<>();
+			constraints = new HashMap<>((int) (correspondingFeatureModel.getConstraintCount() * 1.5));
 			for (IConstraint constraint : correspondingFeatureModel.getConstraints()) {
-				final IGraphicalConstraint graphicalFeature = new GraphicalConstraint(constraint, this);
-				constraintList.add(graphicalFeature);
+				constraints.put(constraint, new GraphicalConstraint(constraint, this));
 			}
-			features = new HashMap<>((int) (correspondingFeatureModel.getNumberOfFeatures() * 1.5));
 			
+			features = new HashMap<>((int) (correspondingFeatureModel.getNumberOfFeatures() * 1.5));
 			for (IFeature feature : correspondingFeatureModel.getFeatures()) {
-				final IGraphicalFeature graphicalRoot = new GraphicalFeature(feature, this);
-				features.put(feature, graphicalRoot);
+				features.put(feature, new GraphicalFeature(feature, this));
 			}
 		} else {
-			this.constraintList = Collections.emptyList();
-			this.features = new HashMap<>();
+			constraints = new HashMap<>();
+			features = new HashMap<>();
 		}
 	}
 

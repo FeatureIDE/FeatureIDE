@@ -37,8 +37,6 @@ import org.eclipse.gef.editparts.ZoomManager;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConnectionEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
 
@@ -168,31 +166,46 @@ public class FeatureUIHelper {
 		legendSize.put(featureModel, dim);
 	}
 
+	/**
+	 * Use {@link IGraphicalFeature#getLocation()}
+	 */
+	@Deprecated
 	public static Point getLocation(IGraphicalFeature feature) {
 		return feature.getLocation();
 	}
 
+	/**
+	 * Use {@link IGraphicalFeature#setLocation(Point)}
+	 */
+	@Deprecated
 	public static void setLocation(IGraphicalFeature feature, Point newLocation) {
 		Point oldLocation = getLocation(feature);
 		if (oldLocation.equals(newLocation)) {
 			return;
 		}
 		feature.setLocation(newLocation);
-		fireLocationChanged(feature, oldLocation, newLocation);
 	}
 
+	@Deprecated
 	public static void setTemporaryLocation(IGraphicalFeature feature, Point newLocation) {
 		Point oldLocation = getLocation(feature);
 		if (newLocation == null || newLocation.equals(oldLocation)) {
 			return;
 		}
-		fireLocationChanged(feature, oldLocation, newLocation);
 	}
 
+	/**
+	 * Use {@link IGraphicalFeature#getSize()}
+	 */
+	@Deprecated
 	public static Dimension getSize(IGraphicalFeature feature) {
 		return feature.getSize();
 	}
 
+	/**
+	 * Use {@link IGraphicalFeature#setSize(Dimension)}
+	 */
+	@Deprecated
 	public static void setSize(IGraphicalFeature feature, Dimension size) {
 		feature.setSize(size);
 	}
@@ -206,13 +219,17 @@ public class FeatureUIHelper {
 	}
 
 	public static Rectangle getBounds(IGraphicalConstraint constraint) {
-		if (getLocation(constraint) == null || getSize(constraint) == null) {
+		if (constraint.getLocation() == null || getSize(constraint) == null) {
 			// UIHelper not set up correctly, refresh the feature model
 			constraint.getObject().getFeatureModel().handleModelDataChanged();
 		}
-		return new Rectangle(getLocation(constraint), getSize(constraint));
+		return new Rectangle(constraint.getLocation(), getSize(constraint));
 	}
 
+	/**
+	 * should not be used here
+	 */
+	@Deprecated
 	public static List<ConnectionEditPart> getConnections(IGraphicalFeature feature, EditPartViewer viewer) {
 		final List<ConnectionEditPart> editPartList = new LinkedList<ConnectionEditPart>();
 		final Map<?, ?> registry = viewer.getEditPartRegistry();
@@ -270,35 +287,32 @@ public class FeatureUIHelper {
 		return featureModel.getLayout().verticalLayout();
 	}
 
+	/**
+	 * Use {@link IGraphicalConstraint#getSize()}
+	 */
+	@Deprecated
 	public static Dimension getSize(IGraphicalConstraint constraint) {
 		return constraint.getSize();
 	}
 
+	/**
+	 * Use {@link IGraphicalConstraint#setSize(Dimension)}
+	 */
+	@Deprecated
 	public static void setSize(IGraphicalConstraint constraint, Dimension size) {
 		constraint.setSize(size);
 	}
 
-	public static Point getLocation(IGraphicalConstraint constraint) {
-		return constraint.getLocation();
-	}
-
+	/**
+	 * Use {@link IGraphicalConstraint#setLocation(Point)}
+	 */
+	@Deprecated
 	public static void setLocation(IGraphicalConstraint constraint, Point newLocation) {
-		Point oldLocation = getLocation(constraint);
+		Point oldLocation = constraint.getLocation();
 		if (newLocation == null || newLocation.equals(oldLocation)) {
 			return;
 		}
 		constraint.setLocation(newLocation);
-		fireLocationChanged(constraint, oldLocation, newLocation);
-	}
-
-	private static void fireLocationChanged(IGraphicalFeature feature, Point oldLocation, Point newLocation) {
-//		FeatureIDEEvent event = new FeatureIDEEvent(feature, EventType.LOCATION_CHANGED, oldLocation, newLocation);
-//		feature.getObject().fireEvent(event);
-	}
-	
-	private static void fireLocationChanged(IGraphicalConstraint constraint, Point oldLocation, Point newLocation) {
-		FeatureIDEEvent event = new FeatureIDEEvent(constraint, EventType.LOCATION_CHANGED, oldLocation, newLocation);
-		constraint.getObject().fireEvent(event);
 	}
 
 	public static void setLegendFigure(IGraphicalFeatureModel featureModel, LegendFigure figure) {
