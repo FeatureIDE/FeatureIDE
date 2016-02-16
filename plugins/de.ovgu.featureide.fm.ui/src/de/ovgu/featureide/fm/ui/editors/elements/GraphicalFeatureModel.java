@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.ui.editors.elements;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -116,7 +117,11 @@ public class GraphicalFeatureModel implements IGraphicalFeatureModel {
 
 	@Override
 	public Collection<IGraphicalFeature> getFeatures() {
-		return features.values();
+		final ArrayList<IGraphicalFeature> featureList = new ArrayList<>(correspondingFeatureModel.getNumberOfFeatures());
+		for (IFeature f : correspondingFeatureModel.getFeatures()) {
+			featureList.add(getGraphicalFeature(f));
+		}
+		return Collections.unmodifiableCollection(featureList);
 	}
 
 	@Override

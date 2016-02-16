@@ -158,13 +158,18 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		IGraphicalFeature newModel = getConnectionModel().getTarget();
 		FeatureEditPart newEditPart = (FeatureEditPart) getViewer().getEditPartRegistry().get(newModel);
 		setTarget(newEditPart);
+		getFigure().setVisible(getTarget() != null);
 	}
 
 
 	public void refreshSourceDecoration() {
 		IFeature source = getConnectionModel().getSource().getObject();
 		IFeature sourceParent = getConnectionModel().getSource().getObject();
-		IFeature target = getConnectionModel().getTarget().getObject();
+		final IGraphicalFeature graphicalTarget = getConnectionModel().getTarget();
+		if (graphicalTarget == null) {
+			return;
+		}
+		IFeature target = graphicalTarget.getObject();
 
 		boolean parentHidden = false;
 
@@ -180,8 +185,8 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 				parentHidden = true;
 
 		}
-		if ((target.getStructure().isAnd()) && !(source.getStructure().isHidden() && !FeatureUIHelper.showHiddenFeatures(getConnectionModel().getTarget().getGraphicalModel()))) {
-			if (!(parentHidden && !FeatureUIHelper.showHiddenFeatures(getConnectionModel().getTarget().getGraphicalModel()))) {
+		if ((target.getStructure().isAnd()) && !(source.getStructure().isHidden() && !FeatureUIHelper.showHiddenFeatures(graphicalTarget.getGraphicalModel()))) {
+			if (!(parentHidden && !FeatureUIHelper.showHiddenFeatures(graphicalTarget.getGraphicalModel()))) {
 				sourceDecoration = getSourceDecoration(source.getStructure().isMandatory());
 			}
 		}
@@ -204,6 +209,9 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 	public void refreshTargetDecoration() {
 		FeatureConnection connectionModel = getConnectionModel();
 		IGraphicalFeature target = connectionModel.getTarget();
+		if (target == null) {
+			return;
+		}
 		RotatableDecoration targetDecoration = createClearDecoration();
 		final PolylineConnection connection = (PolylineConnection) getConnectionFigure();
 		if (target.getObject().getStructure().getChildrenCount() > 1) {
@@ -234,7 +242,11 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 	}
 
 	public void refreshToolTip() {
-		IFeature target = getConnectionModel().getTarget().getObject();
+		final IGraphicalFeature graphicalTarget = getConnectionModel().getTarget();
+		if (graphicalTarget == null) {
+			return;
+		}
+		IFeature target = graphicalTarget.getObject();
 		toolTipContent.removeAll();
 		toolTipContent.setLayoutManager(new GridLayout());
 		toolTipContent.add(new Label(" Connection type: \n" + (target.getStructure().isAnd() ? " And" : (target.getStructure().isMultiple() ? " Or" : " Alternative"))));
@@ -249,7 +261,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 
 	@Override
 	public void activate() {
-		getFigure().setVisible(true);
+		getFigure().setVisible(getTarget() != null);
 		super.activate();
 	}
 
@@ -277,7 +289,11 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 	private boolean connectsExternFeatures() {
 		FeatureConnection featureConnection = getConnectionModel();
 		final IFeature source = featureConnection.getSource().getObject();
-		final IFeature target = featureConnection.getTarget().getObject();
+		final IGraphicalFeature graphicalTarget = featureConnection.getTarget();
+		if (graphicalTarget == null) {
+			return false;
+		}
+		final IFeature target = graphicalTarget.getObject();
 		return (source instanceof ExtendedFeature && ((ExtendedFeature) source).isFromExtern()
 				&& target instanceof ExtendedFeature && ((ExtendedFeature) target).isFromExtern());
 	}

@@ -741,7 +741,10 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 				final IGraphicalFeature parent = graphicalFeatureModel.getGraphicalFeature(oldParent);
 				parent.update(FeatureIDEEvent.getDefault(EventType.FEATURE_ADD_ABOVE));
 			} else {
+				reload();
 				IGraphicalFeature child = FeatureUIHelper.getGraphicalChildren(((IFeature) event.getNewValue()), graphicalFeatureModel).get(0);
+				child.update(FeatureIDEEvent.getDefault(EventType.PARENT_CHANGED));
+				reload();
 				child.update(FeatureIDEEvent.getDefault(EventType.PARENT_CHANGED));
 			}
 		case FEATURE_ADD:
@@ -755,14 +758,14 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			}
 			final IGraphicalFeature newGraphicalFeature = graphicalFeatureModel.getGraphicalFeature(newFeature);
 			final FeatureEditPart newEditPart = (FeatureEditPart) getEditPartRegistry().get(newGraphicalFeature);
-			if (newEditPart != null) {
+			if (newEditPart != null) {// TODO move to FeatureEditPart
 				refreshAll();
 				newEditPart.activate();
 				select(newEditPart);
 				// open the renaming command
 				new FeatureLabelEditManager(newEditPart, TextCellEditor.class, new FeatureCellEditorLocator(newEditPart.getFeatureFigure()), getFeatureModel()).show();
 			} else {
-				FMUIPlugin.getDefault().logWarning("Edit part should not be null!");
+				FMUIPlugin.getDefault().logWarning("Edit part must not be null!");
 			}
 			break;
 		case FEATURE_NAME_CHANGED:
@@ -771,10 +774,12 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			final IGraphicalFeature graphicalFeature = graphicalFeatureModel.getGraphicalFeature(feature);
 			graphicalFeature.update(event);
 			final FeatureEditPart part = (FeatureEditPart) getEditPartRegistry().get(graphicalFeature);
-			if (part != null) {
+			if (part != null) {// TODO move to FeatureEditPart
 				internRefresh(true);
 				deselectAll();
 				select(part);
+			} else {
+				FMUIPlugin.getDefault().logWarning("Edit part must not be null!");
 			}
 			featureModelEditor.setPageModified(true);
 			break;
@@ -816,7 +821,12 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		case FEATURE_DELETE:
 			IGraphicalFeature deletedFeature = graphicalFeatureModel.getGraphicalFeature((IFeature) event.getSource());
 			deletedFeature.update(event);
-			graphicalFeatureModel.getGraphicalFeature(((IFeature) event.getOldValue())).update(FeatureIDEEvent.getDefault(EventType.CHILDREN_CHANGED));
+			oldParent = (IFeature) event.getOldValue();
+			if (oldParent == null) {
+				FeatureUIHelper.getGraphicalRootFeature(graphicalFeatureModel).update(FeatureIDEEvent.getDefault(EventType.PARENT_CHANGED));
+			} else {
+				graphicalFeatureModel.getGraphicalFeature(oldParent).update(FeatureIDEEvent.getDefault(EventType.CHILDREN_CHANGED));
+			}
 			reload();
 			featureModelEditor.setPageModified(true);
 			break;

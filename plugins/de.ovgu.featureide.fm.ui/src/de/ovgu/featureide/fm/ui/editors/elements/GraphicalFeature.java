@@ -128,9 +128,6 @@ public class GraphicalFeature implements IGraphicalFeature {
 
 	@Override
 	public FeatureConnection getSourceConnection() {
-		if (feature.getStructure().isRoot()) {
-			return null;
-		}
 		sourceConnection.setTarget(FeatureUIHelper.getGraphicalParent(feature, graphicalFeatureModel));
 		return sourceConnection;
 	}
@@ -138,12 +135,8 @@ public class GraphicalFeature implements IGraphicalFeature {
 	@Override
 	public List<FeatureConnection> getSourceConnectionAsList() {
 		final List<FeatureConnection> list;
-		if (feature.getStructure().isRoot()) {
-			list = new LinkedList<>();
-		} else {
-			list = new LinkedList<>();
-			list.add(getSourceConnection());
-		}
+		list = new LinkedList<>();
+		list.add(getSourceConnection());
 		return (list);
 	}
 	

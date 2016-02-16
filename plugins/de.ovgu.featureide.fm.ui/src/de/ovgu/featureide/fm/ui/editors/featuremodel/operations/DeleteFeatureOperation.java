@@ -83,7 +83,7 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 		}
 
 		oldChildren = oldChildrenCopy;
-		if (feature == featureModel.getStructure().getRoot()) {
+		if (feature.getStructure().isRoot()) {
 			featureModel.getStructure().replaceRoot(featureModel.getStructure().getRoot().removeLastChild());
 			deleted = true;
 		} else {

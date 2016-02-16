@@ -195,7 +195,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 			if (sourceConnection != null) {
 				IGraphicalFeature target = sourceConnection.getTarget();
 				final IGraphicalFeature newTarget = FeatureUIHelper.getGraphicalParent(getFeature());
-				if (!target.equals(newTarget)) {
+				if (!equals(newTarget, target)) {
 					sourceConnection.setTarget(newTarget);
 					Map<?, ?> registry = getViewer().getEditPartRegistry();
 					ConnectionEditPart connectionEditPart = (ConnectionEditPart) registry.get(sourceConnection);
@@ -250,6 +250,10 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 			FMUIPlugin.getDefault().logWarning(event + " @ " + getFeature() + " not handled.");
 			break;
 		}
+	}
+
+	private static boolean equals(final IGraphicalFeature newTarget, final IGraphicalFeature target) {
+		return newTarget == null ? target == null : newTarget.equals(target);
 	}
 
 }
