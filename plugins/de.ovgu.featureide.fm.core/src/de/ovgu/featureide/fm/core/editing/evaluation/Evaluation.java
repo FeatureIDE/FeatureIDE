@@ -124,7 +124,7 @@ public class Evaluation {
 						}
 						else {
 							if (!folder.exists())
-								folder.create(false, false, null);
+								folder.create(false, true, null);
 							fm1 = Generator.generateFeatureModel(id, size);
 							writer.setFeatureModel(fm1);
 							writer.writeToFile(file);
@@ -140,7 +140,7 @@ public class Evaluation {
 								try {
 									IFolder subfolder = folder.getFolder(editName[m].name());
 									if (!subfolder.exists())
-										subfolder.create(true, false, null);
+										subfolder.create(true, true, null);
 									IFile file2 = subfolder.getFile(size + "-" + id + "-" + edits + "-" + (seed+m) + ".m");
 									System.out.println("\t" + file2);
 
@@ -213,7 +213,7 @@ public class Evaluation {
 					boolean valid = false;
 					try {
 						if (!folder.exists())
-							folder.create(false, false, null);
+							folder.create(false, true, null);
 						writer.writeToFile(file);
 						
 						IFeatureModel fmout = FMFactoryManager.getFactory().createFeatureModel();

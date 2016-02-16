@@ -160,6 +160,9 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 
 	private boolean isJavaFile(final IFile file) {
 		final String fileExtension = file.getFileExtension();
+		if(fileExtension == null)
+			return false;
+		
 		return fileExtension.equals("java") || fileExtension.equals("jak");
 	}
 

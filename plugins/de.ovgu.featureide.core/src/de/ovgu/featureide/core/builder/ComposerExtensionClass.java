@@ -327,7 +327,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	public void buildConfiguration(IFolder folder, Configuration configuration, String configurationName) {
 		try {
 			if (!folder.exists()) {
-				folder.create(true, false, null);
+				folder.create(true, true, null);
 			}
 			final IPersistentFormat<Configuration> format = ConfigurationManager.getFormat(ConfigurationManager.FormatType.CONFIG);
 			IFile configurationFile = folder.getFile(configurationName + "." + format.getSuffix());

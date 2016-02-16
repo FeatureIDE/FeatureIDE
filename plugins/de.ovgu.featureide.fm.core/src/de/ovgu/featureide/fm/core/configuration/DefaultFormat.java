@@ -113,10 +113,10 @@ public class DefaultFormat implements IPersistentFormat<Configuration> {
 		} catch (IOException e) {
 			warnings.clear();
 			warnings.add(new Problem(e));
-			return warnings;
-		} finally {
 			configuration.setPropagate(orgPropagate);
+			return warnings;
 		}
+		configuration.setPropagate(orgPropagate);
 		configuration.update();
 		return warnings;
 	}
