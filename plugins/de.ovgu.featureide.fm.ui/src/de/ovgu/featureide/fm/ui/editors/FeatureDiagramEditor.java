@@ -641,9 +641,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 
 						analyzer = getFeatureModel().getAnalyser();
 						final HashMap<Object, Object> changedAttributes = analyzer.analyzeFeatureModel(new NullProgressMonitor());
-
 						refreshGraphics(changedAttributes);
-
 						return true;
 					}
 				};
@@ -862,6 +860,12 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			break;
 		case LEGEND_LAYOUT_CHANGED:
 			legendLayoutAction.refresh();
+			break;
+		case HIDDEN_CHANGED:
+			FeatureUIHelper.getGraphicalFeature((IFeature)event.getSource(), graphicalFeatureModel).update(event);
+			internRefresh(true);
+			analyzeFeatureModel();
+			featureModelEditor.setPageModified(true);
 			break;
 		default:
 			FMUIPlugin.getDefault().logWarning(prop + " not handled!");

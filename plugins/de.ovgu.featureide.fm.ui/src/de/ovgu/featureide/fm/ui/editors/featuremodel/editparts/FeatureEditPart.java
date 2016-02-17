@@ -247,8 +247,15 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 			connectionEditPart = (ConnectionEditPart) registry.get(sourceConnection);
 			connectionEditPart.refreshParent();			
 			break;
+		case HIDDEN_CHANGED:
+			getFeatureFigure().setProperties();
+			sourceConnection = getFeature().getSourceConnection();
+			registry = getViewer().getEditPartRegistry();
+			connectionEditPart = (ConnectionEditPart) registry.get(sourceConnection);
+			connectionEditPart.refreshSourceDecoration();
+			break;
 		default:
-			FMUIPlugin.getDefault().logWarning(event + " @ " + getFeature() + " not handled.");
+			FMUIPlugin.getDefault().logWarning(prop + " @ " + getFeature() + " not handled.");
 			break;
 		}
 	}

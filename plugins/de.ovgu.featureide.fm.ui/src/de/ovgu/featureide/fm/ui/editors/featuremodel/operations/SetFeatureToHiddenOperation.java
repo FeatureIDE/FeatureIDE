@@ -26,6 +26,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SET_FEATURE_NO
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 
 /**
  * Operation with functionality to set a Feature hidden. Enables undo/redo
@@ -56,7 +57,7 @@ public class SetFeatureToHiddenOperation extends AbstractFeatureModelOperation {
 	@Override
 	protected FeatureIDEEvent operation() {
 		feature.getStructure().setHidden(!feature.getStructure().isHidden());
-		return null;
+		return new FeatureIDEEvent(feature, EventType.HIDDEN_CHANGED);
 	}
 
 	@Override
