@@ -800,6 +800,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			analyzeFeatureModel();
 			break;
 		case ATTRIBUTE_CHANGED:
+			FeatureUIHelper.getGraphicalFeature((IFeature)event.getSource(), graphicalFeatureModel).update(event);
 			featureModelEditor.setPageModified(true);
 			break;
 		case LOCATION_CHANGED:
