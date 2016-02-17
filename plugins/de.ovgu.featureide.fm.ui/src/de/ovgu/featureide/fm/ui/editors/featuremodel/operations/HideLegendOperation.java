@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
@@ -44,9 +45,7 @@ public class HideLegendOperation extends AbstractFeatureModelOperation {
 	@Override
 	protected FeatureIDEEvent operation() {
 		FMPropertyManager.setHideLegend(!FMPropertyManager.isLegendHidden());
-		// TODO _call listeners
-//		featureModel.refreshContextMenu();
-		return null;
+		return FeatureIDEEvent.getDefault(EventType.LEGEND_LAYOUT_CHANGED);
 	}
 
 	@Override

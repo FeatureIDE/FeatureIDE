@@ -784,6 +784,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			} else {
 				FMUIPlugin.getDefault().logWarning("Edit part must not be null!");
 			}
+			reload();
 			featureModelEditor.setPageModified(true);
 			break;
 		case MANDATORY_CHANGED:
@@ -810,7 +811,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			featureModelEditor.setPageModified(true);
 			break;
 		case CONSTRAINT_MODIFY:
-			IConstraint c = (IConstraint) event.getSource();
+			final IConstraint c = (IConstraint) event.getSource();
 			final IGraphicalConstraint graphicalConstraint = graphicalFeatureModel.getGraphicalConstraint(c);
 			graphicalConstraint.update(event);
 			internRefresh(true);
@@ -845,7 +846,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			fr.save();
 			break;
 		case MODEL_LAYOUT_CHANGED:
-			refresh(graphicalFeatureModel.getFeatures(), true);
+			reload();
 			featureModelEditor.setPageModified(true);
 			break;
 		case REDRAW_DIAGRAM:
@@ -855,7 +856,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			break;
 		case REFRESH_ACTIONS:
 			// additional actions can be refreshed here
-			// legendAction.refresh();
+//			 legendAction.refresh();
 			legendLayoutAction.refresh();
 			break;
 		case LEGEND_LAYOUT_CHANGED:

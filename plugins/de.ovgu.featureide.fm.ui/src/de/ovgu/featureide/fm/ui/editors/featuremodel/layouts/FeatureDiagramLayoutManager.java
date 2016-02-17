@@ -56,16 +56,16 @@ abstract public class FeatureDiagramLayoutManager {
 	protected int controlHeight = 10;
 	protected boolean showHidden;
 	
-	public void layout(IGraphicalFeatureModel featureModel) {
+	public final void layout(IGraphicalFeatureModel featureModel) {
 		showHidden = featureModel.getLayout().showHiddenFeatures();
 		FeatureUIHelper.showHiddenFeatures(showHidden, featureModel);
 		layoutFeatureModel(featureModel);
-		if (!FMPropertyManager.isLegendHidden() && featureModel.getLayout().hasLegendAutoLayout()) {
-			layoutLegend(featureModel, showHidden);
-		}
 		layoutHidden(featureModel);
 		for (Entry<IGraphicalFeature, Point> entry: newLocations.entrySet()) {
 			FeatureUIHelper.setLocation(entry.getKey(), entry.getValue());
+		}
+		if (!FMPropertyManager.isLegendHidden() && featureModel.getLayout().hasLegendAutoLayout()) {
+			layoutLegend(featureModel, showHidden);
 		}
 		newLocations.clear();
 	}
@@ -147,19 +147,15 @@ abstract public class FeatureDiagramLayoutManager {
 		 */
 		Iterable<IGraphicalFeature> nonHidden = showHidden ? featureModel.getFeatures() : Functional.filter(featureModel.getFeatures(), new HiddenFilter());
 		for (IGraphicalFeature feature : nonHidden) {
-			Point temp = FeatureUIHelper.getLocation(feature);
-			if (null == temp)
-				continue;
-			Dimension tempSize = FeatureUIHelper.getSize(feature);
-
-			if (temp.x < min.x)
-				min.x = temp.x;
-			if (temp.y < min.y)
-				min.y = temp.y;
-			if ((temp.x + tempSize.width) > max.x)
-				max.x = temp.x + tempSize.width;
-			if (temp.y + tempSize.height > max.y)
-				max.y = temp.y + tempSize.height;
+			Rectangle position = FeatureUIHelper.getBounds(feature);
+			if (position.x < min.x)
+				min.x = position.x;
+			if (position.y < min.y)
+				min.y = position.y;
+			if ((position.x + position.width) > max.x)
+				max.x = position.right();
+			if (position.y + position.height > max.y)
+				max.y = position.bottom();
 		}
 
 		/*
@@ -167,18 +163,15 @@ abstract public class FeatureDiagramLayoutManager {
 		 * for constraints
 		 */
 		for (IGraphicalConstraint constraint : featureModel.getConstraints()) {
-			Point temp = constraint.getLocation();
-			if (null == temp)
-				continue;
-			Dimension tempSize = FeatureUIHelper.getSize(constraint);
-			if (temp.x < min.x)
-				min.x = temp.x;
-			if (temp.y < min.y)
-				min.y = temp.y;
-			if ((temp.x + tempSize.width) > max.x)
-				max.x = temp.x + tempSize.width;
-			if (temp.y + tempSize.height > max.y)
-				max.y = temp.y + tempSize.height;
+			Rectangle position = FeatureUIHelper.getBounds(constraint);
+			if (position.x < min.x)
+				min.x = position.x;
+			if (position.y < min.y)
+				min.y = position.y;
+			if ((position.x + position.width) > max.x)
+				max.x = position.right();
+			if (position.y + position.height > max.y)
+				max.y = position.bottom();
 		}
 
 		final Dimension legendSize = FeatureUIHelper.getLegendSize(featureModel);
