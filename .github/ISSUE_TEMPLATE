@@ -1,1 +1,7 @@
-
+- Eclipse Version [required]
+- FeatureIDE-Version [required]
+- FeatureIDE Composer you are using [optional]
+- Git branch [required if not on master branch, optional otherwise]
+- OS information [required]
+- Java runtime used to run eclipse [required]
+- Java compiler used to build the FeatureIDE plugin [required if custom build, optional otherwise]
