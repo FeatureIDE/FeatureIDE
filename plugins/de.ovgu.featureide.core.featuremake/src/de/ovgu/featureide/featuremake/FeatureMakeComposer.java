@@ -21,12 +21,21 @@ import java.util.Stack;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
+import org.eclipse.cdt.core.CCorePlugin;
+import org.eclipse.cdt.core.model.CoreModel;
+import org.eclipse.cdt.core.settings.model.ICProjectDescription;
+import org.eclipse.cdt.core.settings.model.ICProjectDescriptionManager;
+import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
+import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
+import org.eclipse.cdt.managedbuilder.core.ManagedCProjectNature;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -70,6 +79,8 @@ public class FeatureMakeComposer extends PPComposerExtensionClass {
 	private static final String PLUGIN_WARNING = THE_REQUIRED_BUNDLE + PLUGIN_CDT_ID + IS_NOT_INSTALLED_;
 	public static final String COMPOSER_ID = FeatureMakeCorePlugin.PLUGIN_ID + ".cppcomposer";
 	public static final String C_NATURE = "org.eclipse.cdt.core.cnature";
+	public static final String MANAGED_NATURE = "org.eclipse.cdt.managedbuilder.core.managedBuildNature";
+	public static final String SCANNER_NATURE = "org.eclipse.cdt.managedbuilder.core.ScannerConfigNature";
 	// public static final String CC_NATURE = "org.eclipse.cdt.core.ccnature";
 
 	/* pattern for replacing preprocessor commands like "//#if" */
@@ -101,9 +112,6 @@ public class FeatureMakeComposer extends PPComposerExtensionClass {
 		boolean supSuccess = super.initialize(project);
 		cppModelBuilder = new CPPModelBuilder(project);
 
-		// Start typeChef
-		// Setup the controller
-		// typeChef = new TypeChef();
 		prepareFullBuild(null);
 		annotationChecking();
 
@@ -140,11 +148,14 @@ public class FeatureMakeComposer extends PPComposerExtensionClass {
 			
 			IProjectDescription description = project.getDescription();
 			String[] natures = description.getNatureIds();
-			String[] newNatures = new String[natures.length + 1];
+			String[] newNatures = new String[natures.length + 3];
 			System.arraycopy(natures, 0, newNatures, 0, natures.length);
 			newNatures[natures.length] = C_NATURE;
+			newNatures[natures.length + 1] = MANAGED_NATURE;
+			newNatures[natures.length + 2] = SCANNER_NATURE;
 			description.setNatureIds(newNatures);
 			project.setDescription(description, null);
+			
 
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
@@ -155,17 +166,17 @@ public class FeatureMakeComposer extends PPComposerExtensionClass {
 	@Override
 	public void performFullBuild(IFile config) {
 
+		IProject project = config.getProject();
 		IFeatureModel model = CorePlugin.getFeatureProject(config).getFeatureModel();
 		Configuration cfg = new Configuration(model);
 		final FileReader<Configuration> reader = new FileReader<>(Paths.get(config.getLocationURI()), cfg,
 				ConfigurationManager.getFormat(config.getName()));
 		reader.read();
 		
-		List<String> args = new ArrayList<String>();
-		args.add("make");
-		args.add("-B");
+		IManagedBuildInfo info = ManagedBuildManager.getBuildInfo(project);		
 		StringBuilder sb = new StringBuilder();
-		sb.append("USERDEFS=");
+		sb.append("-B ");
+		sb.append(" USERDEFS=\"");
 		for (SelectableFeature sbf : cfg.getFeatures()) {
 			IFeature feature = sbf.getFeature();
 			IFeatureStructure structure = feature.getStructure();
@@ -174,55 +185,13 @@ public class FeatureMakeComposer extends PPComposerExtensionClass {
 				sb.append("-D").append(sbf.getName()).append(" ");
 			}
 		}
+		sb.append("\"");
 		String sourceDirectory = Paths.get(this.featureProject.getProject().getLocationURI()) + "/source/";
-		args.add(sb.toString());
-		args.add("-C" + sourceDirectory);
-		args.add("-fMakefile");
-		ProcessBuilder processBuilder = new ProcessBuilder(args);
-		processBuilder.redirectErrorStream(true);
-		try {
-			final Process process = processBuilder.start();
-			new Thread() {
-				@Override
-				public void run() {
-					BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
-					String line = null;
-					MessageConsole console = findConsole("Console");
-					console.clearConsole();
-					MessageConsoleStream out = console.newMessageStream();
-					try {
-						while ((line = input.readLine()) != null) {
-							out.println(line);
-						}
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-			}.start();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		/*
-		 * if (!isPluginInstalled(PLUGIN_CDT_ID)) {
-		 * generateWarning(PLUGIN_WARNING); }
-		 * 
-		 * if (!prepareFullBuild(config)) return; // // // Job job = new
-		 * Job("Analyzing!") { // @Override // protected IStatus
-		 * run(IProgressMonitor monitor) { // //this perfom a build using the
-		 * Feature configuration selected // IFolder buildFolder =
-		 * featureProject.getBuildFolder(); // // if
-		 * (buildFolder.getName().equals("src")) { // buildFolder = //
-		 * featureProject.getProject().getFolder(System.getProperty(
-		 * "file.separator") // + // "build"); // } //
-		 * runTypeChefAnalyzes(featureProject.getSourceFolder()); // //
-		 * if(continueCompilationFlag){ // runBuild(getActivatedFeatureArgs(),
-		 * featureProject.getSourceFolder(), // buildFolder); // } // return
-		 * Status.OK_STATUS; // } // }; // job.setPriority(Job.SHORT); //
-		 * job.schedule(); // // // // if (cppModelBuilder != null) {
-		 * cppModelBuilder.buildModel(); } annotationChecking();
-		 */
+		sb.append(" -C" + sourceDirectory);
+		sb.append(" -f Makefile");
+		info.getDefaultConfiguration().setBuildArguments(sb.toString());
+		ManagedBuildManager.setDefaultConfiguration(project, info.getDefaultConfiguration());	
+		 
 	}
 	
 	private MessageConsole findConsole(String name){
@@ -543,7 +512,6 @@ public class FeatureMakeComposer extends PPComposerExtensionClass {
 	 * Show variants with errors
 	 */
 	private synchronized void verifyVariantsWithProblems() {
-		System.out.println("akkkkkkk"); // TODO: remove
 		threadInExecId.remove(Thread.currentThread().getId());
 		if (threadInExecId.isEmpty()) {
 			final Display display = Display.getDefault();
