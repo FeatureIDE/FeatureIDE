@@ -18,7 +18,12 @@ import java.util.Stack;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
-import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
+import org.eclipse.cdt.core.model.CoreModel;
+import org.eclipse.cdt.core.settings.model.ICConfigurationDescription;
+import org.eclipse.cdt.core.settings.model.ICProjectDescription;
+import org.eclipse.cdt.core.settings.model.WriteAccessException;
+import org.eclipse.cdt.managedbuilder.core.IBuilder;
+import org.eclipse.cdt.managedbuilder.core.IConfiguration;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -34,10 +39,6 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.console.ConsolePlugin;
-import org.eclipse.ui.console.IConsole;
-import org.eclipse.ui.console.IConsoleManager;
-import org.eclipse.ui.console.MessageConsole;
 import org.prop4j.And;
 import org.prop4j.Node;
 import org.prop4j.Not;
@@ -70,8 +71,10 @@ public class FeatureMakeComposer extends PPComposerExtensionClass {
 	public static final String C_NATURE = "org.eclipse.cdt.core.cnature";
 	public static final String MANAGED_NATURE = "org.eclipse.cdt.managedbuilder.core.managedBuildNature";
 	public static final String SCANNER_NATURE = "org.eclipse.cdt.managedbuilder.core.ScannerConfigNature";
-	// public static final String CC_NATURE = "org.eclipse.cdt.core.ccnature";
-
+	private static final String FEATURE_MAKE_CONFIG_ID = FeatureMakeCorePlugin.PLUGIN_ID + ".configuration";
+	private static final String FEATURE_MAKE_CONFIG_NAME = "FeatureMake Configuration";
+	private ICConfigurationDescription buildConfigurationDescription;
+	private IConfiguration buildConfiguration;
 	/* pattern for replacing preprocessor commands like "//#if" */
 	static final Pattern replaceCommandPattern = Pattern.compile("#(.+?)\\s");
 
@@ -103,7 +106,8 @@ public class FeatureMakeComposer extends PPComposerExtensionClass {
 
 		prepareFullBuild(null);
 		annotationChecking();
-
+		createBuildConfiguration(project.getProject());
+		
 		if (supSuccess == false || cppModelBuilder == null) {
 			return false;
 		} else {
@@ -155,14 +159,15 @@ public class FeatureMakeComposer extends PPComposerExtensionClass {
 	@Override
 	public void performFullBuild(IFile config) {
 
+		prepareFullBuild(config);
 		IProject project = config.getProject();
 		IFeatureModel model = CorePlugin.getFeatureProject(config).getFeatureModel();
 		Configuration cfg = new Configuration(model);
-		final FileReader<Configuration> reader = new FileReader<>(Paths.get(config.getLocationURI()), cfg,
+		final FileReader<de.ovgu.featureide.fm.core.configuration.Configuration> reader = new FileReader<>(Paths.get(config.getLocationURI()), cfg,
 				ConfigurationManager.getFormat(config.getName()));
 		reader.read();
 		
-		IManagedBuildInfo info = ManagedBuildManager.getBuildInfo(project);		
+		
 		StringBuilder sb = new StringBuilder();
 		sb.append("-B ");
 		sb.append(" USERDEFS=\"");
@@ -178,9 +183,38 @@ public class FeatureMakeComposer extends PPComposerExtensionClass {
 		String sourceDirectory = Paths.get(this.featureProject.getProject().getLocationURI()) + "/source/";
 		sb.append(" -C" + sourceDirectory);
 		sb.append(" -f Makefile");
-		info.getDefaultConfiguration().setBuildArguments(sb.toString());
-		ManagedBuildManager.setDefaultConfiguration(project, info.getDefaultConfiguration());	
-		 
+		IBuilder builder = buildConfiguration.getEditableBuilder();
+		builder.setArguments(sb.toString());
+		try {
+			CoreModel.getDefault().setProjectDescription(project, buildConfigurationDescription.getProjectDescription());
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+		annotationChecking();
+	}
+	
+	private void createBuildConfiguration(IProject project){
+		ICProjectDescription projDesc = CoreModel.getDefault().getProjectDescriptionManager().getProjectDescription(project);
+		if(projDesc != null){
+			
+			buildConfigurationDescription = projDesc.getConfigurationById(FEATURE_MAKE_CONFIG_ID);
+			if(buildConfigurationDescription != null){
+				buildConfiguration = ManagedBuildManager.getConfigurationForDescription(buildConfigurationDescription);
+				return;
+			}	
+			
+			ICConfigurationDescription activeConfig = projDesc.getActiveConfiguration();
+			try {
+				buildConfigurationDescription = projDesc.createConfiguration(FEATURE_MAKE_CONFIG_ID, FEATURE_MAKE_CONFIG_NAME, activeConfig);
+				if(buildConfigurationDescription != null){
+					buildConfiguration = ManagedBuildManager.getConfigurationForDescription(buildConfigurationDescription);
+					CoreModel.getDefault().setProjectDescription(project, projDesc);
+				}
+			} catch (WriteAccessException | CoreException e) {
+				e.printStackTrace();
+			}
+			
+		}
 	}
 	
 	@Override
@@ -523,7 +557,7 @@ public class FeatureMakeComposer extends PPComposerExtensionClass {
 	}
 
 	@Override
-	public void buildConfiguration(IFolder folder, Configuration configuration, String congurationName) {
+	public void buildConfiguration(IFolder folder, de.ovgu.featureide.fm.core.configuration.Configuration  configuration, String congurationName) {
 		super.buildConfiguration(folder, configuration, congurationName);
 
 		List<String> myActivatedFeatures = new LinkedList<String>();
