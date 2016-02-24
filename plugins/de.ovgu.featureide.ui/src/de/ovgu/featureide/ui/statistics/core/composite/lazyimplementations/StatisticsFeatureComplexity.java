@@ -44,7 +44,7 @@ import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 public final class StatisticsFeatureComplexity extends LazyParent {
 
 	private static final double precision = 1000.0;
-	
+
 	private final IFeatureModel model;
 
 	public StatisticsFeatureComplexity(String description, IFeatureModel model) {
@@ -109,6 +109,12 @@ public final class StatisticsFeatureComplexity extends LazyParent {
 			addChild(new Parent(NUMBER_CONSTRAINT_FEATURES, constraintFeatures.size()));
 
 			addChild(new Parent(CONSTRAINT_RATIO, Math.floor((precision * constraintFeatures.size()) / model.getNumberOfFeatures()) / precision));
+
+			addChild(new CoreFeaturesParentNode(CORE_FEATURES, model));
+
+			addChild(new DeadFeaturesParentNode(DEAD_FEATURES, model));
+
+			addChild(new AtomicParentNode(ATOMIC_SETS, model));
 		}
 	}
 }

@@ -34,6 +34,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ui.progress.UIJob;
 
+import de.ovgu.featureide.ui.statistics.core.composite.LazyParent.StatisticTreeJob;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 import de.ovgu.featureide.ui.statistics.ui.helper.jobs.ITreeJob;
 import de.ovgu.featureide.ui.statistics.ui.helper.jobs.TreeJob;
@@ -94,15 +95,18 @@ public class JobDoneListener implements IJobChangeListener {
 				public IStatus runInUIThread(IProgressMonitor monitor) {
 					Job job = event.getJob();
 					if (job instanceof ITreeJob) {
-						ITreeJob treeJob = (ITreeJob) job;
+						final ITreeJob treeJob = (ITreeJob) job;
+						final boolean expand = (job instanceof StatisticTreeJob) && ((StatisticTreeJob)job).isExpand();
 						runningJobs.remove(treeJob);
-						Parent calc = treeJob.getCalculated();
+						final Parent calc = treeJob.getCalculated();
 						calc.startCalculating(false);
 						checkViews();
 						synchronized (views) {
 							for (TreeViewer view : views) {
 								view.refresh(calc);
-								view.expandToLevel(calc, 1);
+								if (expand) {
+									view.expandToLevel(calc, 1);
+								}
 							}
 						}
 					}

@@ -39,27 +39,46 @@ import de.ovgu.featureide.ui.statistics.ui.helper.jobs.TreeJob;
  * @author Patrick Haese
  */
 public abstract class LazyParent extends Parent {
+
+	public final class StatisticTreeJob extends TreeJob {
+		
+		private final boolean expand;
+
+		private StatisticTreeJob(String name, Parent calculated, boolean expand) {
+			super(name, calculated);
+			this.expand = expand;
+		}
+
+		@Override
+		public boolean work() {
+			initChildren();
+			return true;
+		}
+
+		@Override
+		protected void finalWork(boolean success) {
+			setCalculating(false);
+		}
+
+		public boolean isExpand() {
+			return expand;
+		}
+	}
+
 	protected boolean lazy = true;
+
+	@Override
+	public Parent[] getChildren() {
+		return calculateChidren(true);
+	}
 
 	/**
 	 * Starts a job, that calculates the children of this instance, and
 	 * registers it to the listener.
 	 */
-	@Override
-	public Parent[] getChildren() {
+	protected Parent[] calculateChidren(boolean expand) {
 		if (lazy) {
-			final TreeJob job = new TreeJob(CALCULATE + this.getClass().getName(), this) {
-				@Override
-				public boolean work() {
-					initChildren();
-					return true;
-				}
-
-				@Override
-				protected void finalWork(boolean success) {
-					setCalculating(false);
-				}
-			};
+			final TreeJob job = new StatisticTreeJob(CALCULATE + this.getClass().getName(), this, expand);
 			setPriority(job);
 			final JobDoneListener listener = JobDoneListener.getInstance();
 			if (listener != null) {

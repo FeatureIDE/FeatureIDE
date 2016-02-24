@@ -27,29 +27,27 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 
 /**
- * Displays all atomic sets of a feature model.
+ * Displays all core features of a feature model.
  * 
  * @author Sebastian Krieter
  */
-public class AtomicParentNode extends LazyParent {
+public class CoreFeaturesParentNode extends LazyParent {
 	private final IFeatureModel model;
 
-	public AtomicParentNode(String description, IFeatureModel model) {
-		super(description, "(expand to calculate)");
+	public CoreFeaturesParentNode(String description, IFeatureModel model) {
+		super(description, null);
 		this.model = model;
+		calculateChidren(false);
 	}
 
 	@Override
 	protected void initChildren() {
-		final List<List<IFeature>> atomicSets = model.getAnalyser().getAtomicSets();
+		List<IFeature> coreFeatures = model.getAnalyser().getCoreFeatures();
+		setValue(coreFeatures.size());
 
-		int i = 0;
-		for (List<IFeature> list : atomicSets) {
-			if (list.size() > 1) {
-				addChild(new FeatureListNode("Atomic Set #" + ++i, list, list.size(), false));
-			}
+		for (IFeature feature : coreFeatures) {
+			addChild(new FeatureNode(feature, true));
 		}
-		setValue(i);
 	}
 
 }

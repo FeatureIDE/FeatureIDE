@@ -27,29 +27,27 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 
 /**
- * Displays all atomic sets of a feature model.
+ * Displays all dead features of a feature model.
  * 
  * @author Sebastian Krieter
  */
-public class AtomicParentNode extends LazyParent {
+public class DeadFeaturesParentNode extends LazyParent {
 	private final IFeatureModel model;
 
-	public AtomicParentNode(String description, IFeatureModel model) {
-		super(description, "(expand to calculate)");
+	public DeadFeaturesParentNode(String description, IFeatureModel model) {
+		super(description, null);
 		this.model = model;
+		calculateChidren(false);
 	}
 
 	@Override
 	protected void initChildren() {
-		final List<List<IFeature>> atomicSets = model.getAnalyser().getAtomicSets();
+		List<IFeature> deadFeatures = model.getAnalyser().getDeadFeatures();
+		setValue(deadFeatures.size());
 
-		int i = 0;
-		for (List<IFeature> list : atomicSets) {
-			if (list.size() > 1) {
-				addChild(new FeatureListNode("Atomic Set #" + ++i, list, list.size(), false));
-			}
+		for (IFeature feature : deadFeatures) {
+			addChild(new FeatureNode(feature, true));
 		}
-		setValue(i);
 	}
 
 }
