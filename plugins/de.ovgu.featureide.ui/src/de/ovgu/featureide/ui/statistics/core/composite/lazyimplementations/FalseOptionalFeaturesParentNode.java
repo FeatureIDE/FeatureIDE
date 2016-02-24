@@ -27,14 +27,14 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 
 /**
- * Displays all dead features of a feature model.
+ * Displays all false-optional features of a feature model.
  * 
  * @author Sebastian Krieter
  */
-public class DeadFeaturesParentNode extends LazyParent {
+public class FalseOptionalFeaturesParentNode extends LazyParent {
 	private final IFeatureModel model;
 
-	public DeadFeaturesParentNode(String description, IFeatureModel model) {
+	public FalseOptionalFeaturesParentNode(String description, IFeatureModel model) {
 		super(description, null);
 		this.model = model;
 		calculateChidren(false);
@@ -42,11 +42,10 @@ public class DeadFeaturesParentNode extends LazyParent {
 
 	@Override
 	protected void initChildren() {
-		// TODO Performance: Dead and core features should be calculated together.
-		List<IFeature> deadFeatures = model.getAnalyser().getDeadFeatures();
-		setValue(deadFeatures.size());
+		List<IFeature> foFeatures = model.getAnalyser().getFalseOptionalFeatures();
+		setValue(foFeatures.size());
 
-		for (IFeature feature : deadFeatures) {
+		for (IFeature feature : foFeatures) {
 			addChild(new FeatureNode(feature, true));
 		}
 	}

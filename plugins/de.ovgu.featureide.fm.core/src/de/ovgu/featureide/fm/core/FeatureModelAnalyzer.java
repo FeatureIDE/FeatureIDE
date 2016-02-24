@@ -908,43 +908,21 @@ public class FeatureModelAnalyzer {
 		}
 	}
 	
-	public Collection<IFeature> getFalseOptionalFeatures() {
-		Collection<IFeature> falseOptionalFeatures = new LinkedList<>();
-		for (IFeature feature : fm.getFeatures()) {
-			try {
-				final IFeatureStructure structure = feature.getStructure();
-				if (!structure.isMandatory() && !structure.isRoot()) {
-					SatSolver satsolver = new SatSolver(new Not(new Implies(
-							new And(new Literal(FeatureUtils.getParent(feature).getName()),
-									NodeCreator.createNodes(fm.clone(null))),
-							new Literal(feature.getName()))), 1000);
-					if (!satsolver.isSatisfiable()) {
-						falseOptionalFeatures.add(feature);
-					}
-				}
-			} catch (TimeoutException e) {
-				FMCorePlugin.getDefault().logError(e);
-			}
-		}
-		return falseOptionalFeatures;
+	public List<IFeature> getFalseOptionalFeatures() {
+		return getFalseOptionalFeatures(fm.getFeatures());
 	}
-	
-	public Collection<IFeature> getFalseOptionalFeatures(Iterable<IFeature> fmFalseOptionals) {
-		Collection<IFeature> falseOptionalFeatures = new LinkedList<>();
+
+	public List<IFeature> getFalseOptionalFeatures(Iterable<IFeature> fmFalseOptionals) {
+		final List<IFeature> falseOptionalFeatures = new ArrayList<>();
+
+		final SatSolver solver = new SatSolver(NodeCreator.createNodes(fm), 1000);
 		for (IFeature feature : fmFalseOptionals) {
-			try {
-				final IFeatureStructure structure = feature.getStructure();
-				if (!structure.isMandatory() && !structure.isRoot()) {
-					SatSolver satsolver = new SatSolver(new Not(new Implies(
-							new And(new Literal(FeatureUtils.getParent(feature).getName()),
-									NodeCreator.createNodes(fm.clone(null))),
-							new Literal(feature.getName()))), 1000);
-					if (!satsolver.isSatisfiable()) {
-						falseOptionalFeatures.add(feature);
-					}
-				}
-			} catch (TimeoutException e) {
-				FMCorePlugin.getDefault().logError(e);
+			final IFeatureStructure structure = feature.getStructure();
+			final IFeature parent = FeatureUtils.getParent(feature);
+			if (!structure.isMandatory() && parent != null && solver.impliedValue(
+					new Literal(parent.getName()),
+					new Literal(feature.getName()))) {
+				falseOptionalFeatures.add(feature);
 			}
 		}
 		return falseOptionalFeatures;

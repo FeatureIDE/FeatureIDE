@@ -235,6 +235,20 @@ public class SatSolver {
 		return Collections.emptyList();
 	}
 
+	public boolean impliedValue(Literal leftNode, Literal rightNode) {
+		if (!contradiction) {
+			final IVecInt backbone = new VecInt();
+			backbone.push(varToInt.get(leftNode.var));
+			backbone.push(-varToInt.get(rightNode.var));
+			try {
+				return !solver.isSatisfiable(backbone);
+			} catch (TimeoutException e) {
+				FMCorePlugin.getDefault().logError(e);
+			}
+		}
+		return false;
+	}
+
 	public List<List<Literal>> atomicSets() {
 		if (test()) {
 			final List<List<Literal>> result = new ArrayList<>();

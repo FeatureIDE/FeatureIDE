@@ -81,6 +81,7 @@ public interface StatisticsIds {
 	public static final String ATOMIC_SETS = ATOMIC_SETS_OF_THE_FEATURE_MODEL;
 	public static final String CORE_FEATURES = "Number of core features";
 	public static final String DEAD_FEATURES = "Number of dead features";
+	public static final String FO_FEATURES = "Number of false-optional features";
 	public static final String NUMBER_OF_FEATURE = FEATURE_STATISTICS;
 	public static final String SEPARATOR = ": ";
 	public static final String CLASS_SEPARATOR = "$";

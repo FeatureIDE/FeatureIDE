@@ -114,6 +114,8 @@ public final class StatisticsFeatureComplexity extends LazyParent {
 
 			addChild(new DeadFeaturesParentNode(DEAD_FEATURES, model));
 
+			addChild(new FalseOptionalFeaturesParentNode(FO_FEATURES, model));
+
 			addChild(new AtomicParentNode(ATOMIC_SETS, model));
 		}
 	}
