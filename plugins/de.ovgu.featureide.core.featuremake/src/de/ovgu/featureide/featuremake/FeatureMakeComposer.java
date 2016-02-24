@@ -9,6 +9,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.THE_REQUIRED_B
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -18,12 +19,17 @@ import java.util.Stack;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
+import org.eclipse.cdt.core.CCorePlugin;
 import org.eclipse.cdt.core.model.CoreModel;
 import org.eclipse.cdt.core.settings.model.ICConfigurationDescription;
 import org.eclipse.cdt.core.settings.model.ICProjectDescription;
-import org.eclipse.cdt.core.settings.model.WriteAccessException;
+import org.eclipse.cdt.core.settings.model.ICProjectDescriptionManager;
+import org.eclipse.cdt.managedbuilder.core.BuildException;
 import org.eclipse.cdt.managedbuilder.core.IBuilder;
 import org.eclipse.cdt.managedbuilder.core.IConfiguration;
+import org.eclipse.cdt.managedbuilder.core.IManagedBuildInfo;
+import org.eclipse.cdt.managedbuilder.core.IManagedProject;
+import org.eclipse.cdt.managedbuilder.core.IProjectType;
 import org.eclipse.cdt.managedbuilder.core.ManagedBuildManager;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -73,7 +79,10 @@ public class FeatureMakeComposer extends PPComposerExtensionClass {
 	public static final String SCANNER_NATURE = "org.eclipse.cdt.managedbuilder.core.ScannerConfigNature";
 	private static final String FEATURE_MAKE_CONFIG_ID = FeatureMakeCorePlugin.PLUGIN_ID + ".configuration";
 	private static final String FEATURE_MAKE_CONFIG_NAME = "FeatureMake Configuration";
-	private ICConfigurationDescription buildConfigurationDescription;
+	private static final String DEFAULT_PROJECT_GNU_TYPE = "cdt.managedbuild.target.gnu.exe";
+	private static final String DEFAULT_TOOLCHAIN_DEBUG = "cdt.managedbuild.target.gnu.platform.exe.debug";
+	private static final String DEFAULT_TOOLCHAIN_RELEASE = "cdt.managedbuild.target.gnu.platform.exe.release";
+	
 	private IConfiguration buildConfiguration;
 	/* pattern for replacing preprocessor commands like "//#if" */
 	static final Pattern replaceCommandPattern = Pattern.compile("#(.+?)\\s");
@@ -106,7 +115,7 @@ public class FeatureMakeComposer extends PPComposerExtensionClass {
 
 		prepareFullBuild(null);
 		annotationChecking();
-		createBuildConfiguration(project.getProject());
+		createCdtProjectDescription(project.getProject());
 		
 		if (supSuccess == false || cppModelBuilder == null) {
 			return false;
@@ -140,13 +149,11 @@ public class FeatureMakeComposer extends PPComposerExtensionClass {
 				return;
 			
 			IProjectDescription description = project.getDescription();
-			String[] natures = description.getNatureIds();
-			String[] newNatures = new String[natures.length + 3];
-			System.arraycopy(natures, 0, newNatures, 0, natures.length);
-			newNatures[natures.length] = C_NATURE;
-			newNatures[natures.length + 1] = MANAGED_NATURE;
-			newNatures[natures.length + 2] = SCANNER_NATURE;
-			description.setNatureIds(newNatures);
+			List<String> natures = new ArrayList<String>(Arrays.asList(description.getNatureIds()));
+			natures.add(C_NATURE);
+			natures.add(MANAGED_NATURE);
+			natures.add(SCANNER_NATURE);
+			description.setNatureIds(natures.toArray(new String[natures.size()]));
 			project.setDescription(description, null);
 			
 
@@ -169,8 +176,7 @@ public class FeatureMakeComposer extends PPComposerExtensionClass {
 		
 		
 		StringBuilder sb = new StringBuilder();
-		sb.append("-B ");
-		sb.append(" USERDEFS=\"");
+		sb.append(" -B").append(" USERDEFS=\"");
 		for (SelectableFeature sbf : cfg.getFeatures()) {
 			IFeature feature = sbf.getFeature();
 			IFeatureStructure structure = feature.getStructure();
@@ -183,39 +189,90 @@ public class FeatureMakeComposer extends PPComposerExtensionClass {
 		String sourceDirectory = Paths.get(this.featureProject.getProject().getLocationURI()) + "/source/";
 		sb.append(" -C" + sourceDirectory);
 		sb.append(" -f Makefile");
-		IBuilder builder = buildConfiguration.getEditableBuilder();
-		builder.setArguments(sb.toString());
-		try {
-			CoreModel.getDefault().setProjectDescription(project, buildConfigurationDescription.getProjectDescription());
-		} catch (CoreException e) {
-			e.printStackTrace();
-		}
-		annotationChecking();
-	}
-	
-	private void createBuildConfiguration(IProject project){
-		ICProjectDescription projDesc = CoreModel.getDefault().getProjectDescriptionManager().getProjectDescription(project);
-		if(projDesc != null){
-			
-			buildConfigurationDescription = projDesc.getConfigurationById(FEATURE_MAKE_CONFIG_ID);
-			if(buildConfigurationDescription != null){
-				buildConfiguration = ManagedBuildManager.getConfigurationForDescription(buildConfigurationDescription);
-				return;
-			}	
-			
-			ICConfigurationDescription activeConfig = projDesc.getActiveConfiguration();
-			try {
-				buildConfigurationDescription = projDesc.createConfiguration(FEATURE_MAKE_CONFIG_ID, FEATURE_MAKE_CONFIG_NAME, activeConfig);
-				if(buildConfigurationDescription != null){
-					buildConfiguration = ManagedBuildManager.getConfigurationForDescription(buildConfigurationDescription);
-					CoreModel.getDefault().setProjectDescription(project, projDesc);
-				}
-			} catch (WriteAccessException | CoreException e) {
-				e.printStackTrace();
+		
+		if(buildConfiguration == null){
+			ICConfigurationDescription cfgDesc = CCorePlugin.getDefault().getProjectDescription(project, false).getConfigurationById(FEATURE_MAKE_CONFIG_ID);
+			buildConfiguration = ManagedBuildManager.getConfigurationForDescription(cfgDesc);
+			if(buildConfiguration != null){
+				buildConfiguration.setBuildArguments(sb.toString());	
 			}
 			
 		}
+		if(buildConfiguration != null){
+			buildConfiguration.setBuildArguments(sb.toString());
+			IBuilder builder = buildConfiguration.getEditableBuilder();
+			builder.setArguments(sb.toString());
+			try {
+				CoreModel.getDefault().setProjectDescription(project, ManagedBuildManager.getDescriptionForConfiguration(buildConfiguration).getProjectDescription());
+			} catch (CoreException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		annotationChecking();
 	}
+	
+	private void createCdtProjectDescription(IProject project){
+		
+		ICProjectDescription projDesc = null;		
+		ICProjectDescriptionManager manager = CoreModel.getDefault().getProjectDescriptionManager();
+		
+		try {
+			projDesc = manager.getProjectDescription(project, true);
+			if(projDesc == null){
+				IProject newProject = CCorePlugin.getDefault().createCProject(project.getDescription(), project, null,project.getName());
+				if(newProject != null && newProject.isAccessible()){
+					newProject.open(null);
+					
+					projDesc = CCorePlugin.getDefault().createProjectDescription(newProject, false);	
+					
+					IManagedBuildInfo info = ManagedBuildManager.createBuildInfo(newProject);					
+					IProjectType pt = ManagedBuildManager.getProjectType(DEFAULT_PROJECT_GNU_TYPE);
+					IManagedProject proj = ManagedBuildManager.createManagedProject(newProject, pt);
+					
+					info.setManagedProject(proj);
+					buildConfiguration = proj.createConfiguration(ManagedBuildManager.getExtensionConfiguration("cdt.managedbuild.config.gnu.exe.debug"),FEATURE_MAKE_CONFIG_ID);
+					buildConfiguration.setName(FEATURE_MAKE_CONFIG_NAME);
+					buildConfiguration.setManagedBuildOn(false);
+					buildConfiguration.setBuildCommand("make");
+					proj.createConfiguration(buildConfiguration, FEATURE_MAKE_CONFIG_ID);
+					info.setDefaultConfiguration(buildConfiguration);
+					projDesc.createConfiguration(FEATURE_MAKE_CONFIG_ID, buildConfiguration.getConfigurationData());
+				}
+			}	
+			
+		} catch (CoreException e1) {
+			e1.printStackTrace();
+		} catch (BuildException e) {
+			e.printStackTrace();
+		}
+	}
+	
+//	private void createBuildConfiguration(IProject project){
+//		
+//		ICProjectDescription projDesc = createCdtProjectDescription(project);
+//		
+//		if(projDesc != null){
+//			
+//			buildConfigurationDescription = projDesc.getConfigurationById(FEATURE_MAKE_CONFIG_ID);
+//			if(buildConfigurationDescription != null){
+//				buildConfiguration = ManagedBuildManager.getConfigurationForDescription(buildConfigurationDescription);
+//				return;
+//			}	
+//			
+//			ICConfigurationDescription activeConfig = projDesc.getConfigurationById(FEATURE_MAKE_CONFIG_ID);
+//			try {
+//				buildConfigurationDescription = projDesc.createConfiguration(FEATURE_MAKE_CONFIG_ID, FEATURE_MAKE_CONFIG_NAME, activeConfig);
+//				if(buildConfigurationDescription != null){
+//					buildConfiguration = ManagedBuildManager.getConfigurationForDescription(buildConfigurationDescription);
+//					CoreModel.getDefault().setProjectDescription(project, projDesc);
+//				}
+//			} catch (WriteAccessException | CoreException e) {
+//				e.printStackTrace();
+//			}
+//			
+//		}
+//	}
 	
 	@Override
 	public Mechanism getGenerationMechanism() {
