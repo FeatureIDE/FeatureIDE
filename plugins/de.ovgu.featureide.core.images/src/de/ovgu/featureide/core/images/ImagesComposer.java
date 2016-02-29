@@ -30,7 +30,7 @@ import de.ovgu.featureide.core.builder.ComposerExtensionClass;
  * @author Jabier Martinez
  *
  */
-public class ImagesComposerExtensionClass extends ComposerExtensionClass {
+public class ImagesComposer extends ComposerExtensionClass {
 
 	@Override
 	public Mechanism getGenerationMechanism() {
@@ -40,6 +40,7 @@ public class ImagesComposerExtensionClass extends ComposerExtensionClass {
 	@Override
 	public void performFullBuild(IFile config) {
 		try {
+			// Get the selected features and order them
 			List<IFolder> selectedFeatures = getSelectedFeatures(config);
 			List<IFolder> orderedFeatures = orderSelectedFeatures(selectedFeatures);
 
@@ -66,10 +67,10 @@ public class ImagesComposerExtensionClass extends ComposerExtensionClass {
 			// For each image, combine the related image files
 			for (Entry<String, List<File>> entry : imagesMap.entrySet()) {
 
+				// Get the images and calculate final size
 				List<BufferedImage> images = new ArrayList<BufferedImage>();
 				int maxWidth = 0;
 				int maxHeight = 0;
-
 				for (File imageFile : entry.getValue()) {
 					BufferedImage image = ImageIO.read(imageFile);
 					if (image.getWidth() > maxWidth) {
@@ -81,6 +82,7 @@ public class ImagesComposerExtensionClass extends ComposerExtensionClass {
 					images.add(image);
 				}
 
+				// Overlap the images
 				if (!images.isEmpty()) {
 					BufferedImage combined = new BufferedImage(maxWidth, maxHeight, BufferedImage.TYPE_INT_ARGB);
 					Graphics g = combined.getGraphics();

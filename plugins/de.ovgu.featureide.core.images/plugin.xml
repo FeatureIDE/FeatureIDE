@@ -4,7 +4,7 @@
    <extension
          point="de.ovgu.featureide.core.composers">
       <composer
-            class="de.ovgu.featureide.core.images.ImagesComposerExtensionClass"
+            class="de.ovgu.featureide.core.images.ImagesComposer"
             description="Images overlapping"
             id="de.ovgu.featureide.core.images.composer"
             name="Images Composer"
