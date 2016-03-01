@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Images Composer
+Bundle-SymbolicName: de.ovgu.featureide.core.images;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Require-Bundle: de.ovgu.featureide.core,
+ de.ovgu.featureide.fm.core,
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources
+Bundle-ActivationPolicy: lazy
+Bundle-Vendor: Jabier Martinez
+Bundle-Activator: de.ovgu.featureide.core.images.activator.ImagesCorePlugin
