@@ -415,4 +415,9 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	public <T extends IComposerObject> T getComposerObjectInstance(Class<T> c)  {
 		return null;
 	}
+	
+	@Override
+	public Mechanism getGenerationMechanism() {
+		return null;
+	}
 }
