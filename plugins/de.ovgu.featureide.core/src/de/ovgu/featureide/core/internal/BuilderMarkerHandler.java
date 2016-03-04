@@ -122,7 +122,7 @@ public class BuilderMarkerHandler implements IBuilderMarkerHandler {
 		try {
 			IMarker marker = resource.createMarker(CONFIGURATION_MARKER);
 			MarkerInfo info = ((Workspace)resource.getWorkspace()).getMarkerManager().findMarkerInfo(resource, marker.getId());
-			if (marker.exists()&& info == null) {
+			if (marker.exists() && info != null) {
 				marker.setAttribute(IMarker.MESSAGE, message);
 				marker.setAttribute(IMarker.SEVERITY, severity);
 				marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
