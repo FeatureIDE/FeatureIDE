@@ -68,8 +68,6 @@ public class FeatureIDEEvent {
 	}
 	
 	private final Object source;
-	private final Object editor;
-	private final boolean persistent;
 	private final EventType eventType;
 	private final Object oldValue;
 	private final Object newValue;
@@ -86,10 +84,9 @@ public class FeatureIDEEvent {
 		this(source, null, false, eventType, oldValue, newValue);
 	}
 
+	@Deprecated
 	public FeatureIDEEvent(Object source, Object editor, boolean persistent, EventType eventType, Object oldValue, Object newValue) {
 		this.source = source;
-		this.editor = editor;
-		this.persistent = persistent;
 		this.eventType = eventType;
 		this.oldValue = oldValue;
 		this.newValue = newValue;
@@ -99,12 +96,14 @@ public class FeatureIDEEvent {
 		return source;
 	}
 
+	@Deprecated
 	public Object getEditor() {
-		return editor;
+		return null;
 	}
 
+	@Deprecated
 	public boolean isPersistent() {
-		return persistent;
+		return false;
 	}
 
 	public EventType getEventType() {
@@ -121,7 +120,7 @@ public class FeatureIDEEvent {
 
 	@Override
 	public String toString() {
-		return "FeatureIDEEvent [source=" + source + ", eventType=" + eventType + ", editor=" + editor + ", persistent=" + persistent + ", oldValue=" + oldValue
+		return "FeatureIDEEvent [source=" + source + ", eventType=" + eventType + ", oldValue=" + oldValue
 				+ ", newValue=" + newValue + "]";
 	}
 
