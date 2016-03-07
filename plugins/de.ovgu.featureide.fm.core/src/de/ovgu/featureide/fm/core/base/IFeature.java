@@ -59,6 +59,9 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
  * {@link de.ovgu.featureide.fm.core.base.FeatureUtils FeatureUtils} helper class.
  * <br/>
  * <br/>
+ * <b>API notes</b>: The classes internal structure has heavily changed compared to older FeatureIDE version. A bridge to the old-fashioned handling is available in {@link de.ovgu.featureide.fm.core.base.FeatureUtils FeatureUtils} as static methods.
+ * <br/>
+ * <br/>
  * <b>Notes on equals method</b>: Any implementation have to provide a {@link Object#equals(Object)} implementation when the feature implementation should be
  * fully useable in the FeatureIDE system (and therefore, have to be an instance of {@link IFeatureModelElement}), which at least returns <b>true</b> when the
  * internal identifier of two features are the same, and otherwise <b>false</b>.
