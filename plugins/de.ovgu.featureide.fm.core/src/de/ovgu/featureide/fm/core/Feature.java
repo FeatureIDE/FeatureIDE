@@ -40,13 +40,19 @@ import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
- * Provides all properties of a feature. This includes its connections to parent
- * and child features.
+ * <b>This class is deprecated and only existing due to compatibility considerations</b>. Use {@link de.ovgu.featureide.fm.core.base.impl.Feature new Feature class} instead.
  * 
  * @author Thomas Thuem
  * @author Marcus Pinnecke (Feature Interface)
- * 
+ *
+ * @see IFeature Interface for features (<code>IFeature</code>)
+ * @see de.ovgu.featureide.fm.core.base.impl.Feature Default implementation of interface for features (<code>Feature</code>) since version 3.0 
+ * @see IConstraint Interface for feature constraints (<code>IConstraint</code>)
+ * @see IFeatureModel Interface for feature models (<code>IFeatureModel</code>)
+ * @see IFeatureProperty Interface for feature properties (<code>IFeatureProperty</code>)
+ * @see IFeatureStructure Interface for a feature's structure (<code>IFeatureStructure</code>)
  */
+@Deprecated
 public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 
 	public final IFeature feature;

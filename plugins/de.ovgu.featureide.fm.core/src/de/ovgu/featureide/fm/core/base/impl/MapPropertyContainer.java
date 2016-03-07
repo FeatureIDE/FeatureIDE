@@ -31,6 +31,14 @@ import de.ovgu.featureide.fm.core.base.IPropertyContainer;
  * @author Marcus Pinnecke
  */
 public class MapPropertyContainer implements IPropertyContainer {
+	
+	public MapPropertyContainer() {
+		
+	}
+
+	public MapPropertyContainer(IPropertyContainer other) {
+		setEntrySet(other.entrySet());
+	}
 
 	public static Object copyObject(Type type, Object value) {
 		switch (type) {

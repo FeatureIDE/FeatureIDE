@@ -54,8 +54,6 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 
 	IFeatureModel clone(IFeature newRoot);
 
-//	IFeatureModel clone(IFeatureModel oldFeatureModel, boolean complete);
-
 	void createDefaultValues(CharSequence projectName);
 
 	boolean deleteFeature(IFeature feature);
@@ -115,22 +113,8 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	Map<String, IFeature> getFeatureTable(); // Added, Marcus Pinnecke 31.08.15
 
 	IFeatureModel clone();
-//
-//	IFeatureModel deepClone();
-//
-//	IFeatureModel deepClone(boolean complete);
-
-//	Object getUndoContext(Object undoContext);
 
 	Object getUndoContext();
-
-//	boolean isFeatureOrderInXML();
-
-//	Object setFeatureOrderInXML(IFeatureModel featureModel, boolean featureOrderInXML);
-
-//	void refreshContextMenu();
-
-//	void setConstraintSelected(boolean b);
 
 	void setUndoContext(Object undoContext);
 
