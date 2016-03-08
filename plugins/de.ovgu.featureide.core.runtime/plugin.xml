@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="de.ovgu.featureide.core.composers">
+      <composer
+            class="de.ovgu.featureide.core.runtime.RuntimeComposer"
+            description="Composer for Runtime Variability"
+            id="de.ovgu.featureide.core.runtime.composer"
+            name="Runtime Composer"
+            nature="de.ovgu.featureide.core.runtime.composer">
+      </composer>
+   </extension>
+   <extension
+         point="de.ovgu.featureide.core.wizard">
+      <newProjectWizard
+            class="de.ovgu.featureide.core.wizardextension.DefaultNewFeatureProjectWizardExtension"
+            composerid="de.ovgu.featureide.core.runtime.composer"
+            id="de.ovgu.featureide.core.runtime.newProjectWizard"
+            name="Default">
+      </newProjectWizard>
+   </extension>
+
+</plugin>
