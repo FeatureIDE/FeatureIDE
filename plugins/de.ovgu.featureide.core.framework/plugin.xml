@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="de.ovgu.featureide.core.composers">
+      <composer
+            class="de.ovgu.featureide.core.framework.FrameworkComposer"
+            description="Framework overlapping"
+            id="de.ovgu.featureide.core.framework.composer"
+            name="Framework Composer"
+            nature="de.ovgu.featureide.core.framework.composer">
+      </composer>
+   </extension>
+   <extension
+         point="de.ovgu.featureide.core.wizard">
+      <newProjectWizard
+            class="de.ovgu.featureide.core.wizardextension.DefaultNewFeatureProjectWizardExtension"
+            composerid="de.ovgu.featureide.core.framework.composer"
+            id="de.ovgu.featureide.core.framework.newProjectWizard"
+            name="Default">
+      </newProjectWizard>
+   </extension>
+
+</plugin>
