@@ -252,7 +252,7 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * @param projectName the name for the root feature, if this feature model does not contain any features. Otherwise this parameter will be ignored. If
 	 *            <code>projectName</code> is an empty string, the string <code>"Root"</code> will be used for the potential new root feature. The parameter
 	 *            <code>projectName</code> is assumed to be <i>non-null</i>
-	 *            
+	 * 
 	 * @since 3.0
 	 */
 	void createDefaultValues(CharSequence projectName);
@@ -269,28 +269,69 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * <br/>
 	 * Removing a feature also removes this feature from the <i>feature table</i> and the <i>feature order list</i>. Both must be consistent with
 	 * {@link #getFeatureOrderList()} and {@link #getFeatureOrderList()}
+	 * <br/>
+	 * <br/>
+	 * <b>Note</b>If the structure should not be changed, use {@link #deleteFeatureFromTable(IFeature)}
 	 * 
 	 * @param feature the feature that should be removed. It is assumed to be <i>non-null</i>
 	 * @return <b>false</b> if <code>feature</code> is the models <i>root</i> feature, or if <code>feature</code> is not contained in this model. Otherwise
 	 *         <b>true</b>.
-	 *         
-	 * @since 3.0        
+	 * 
+	 * @since 3.0
 	 */
 	boolean deleteFeature(IFeature feature);
 
 	/**
-	 * Removes the feature <code>feature</code> from the <i>feature table</i>.
+	 * Removes the feature <code>feature</code> from the <i>feature table</i> by <code>feature</code>'s name with {@link IFeature#getName()}.
+	 * If the <i>feature table</i> does not contain a feature with such a name, there will be no changes.
+	 * <br/>
+	 * <br/>
+	 * This method only affects the collection of features stored in the feature model, but do not change the <i>structure</i> neither of <code>feature</code>
+	 * nor it's <i>parent</i> or <i>children</i>.
+	 * <br/>
+	 * <br/>
+	 * <b>Note</b> There is no equality check over the identifiers between the feature to be deleted and the feature contained in the collection, expect for
+	 * equality in their
+	 * names. To avoid confusion, this check should be done before calling this method.
+	 * <br/>
+	 * <b>Note</b> If the structure should be changed, use {@link #deleteFeature(IFeature)}
 	 * 
-	 * @param feature
+	 * @param feature the feature (the feature's name) which should be deleted from the <i>feature table</i>
 	 */
 	void deleteFeatureFromTable(IFeature feature);
 
+	/**
+	 * Returns an instance of {@link FeatureModelAnalyzer} which is bound to this feature model. Since analysis of feature models are computational expensive in
+	 * general, results for analysis are cached in the instance of a analyzer. When calling methods on the return value of this method, changes are indirectly
+	 * automatically stored in this feature model by object references.
+	 * 
+	 * @return The instance of {@link FeatureModelAnalyzer} bound to this feature model.
+	 */
 	FeatureModelAnalyzer getAnalyser();
 
+	/**
+	 * @return Returns the number of constraints contained in this feature model.
+	 */
 	int getConstraintCount();
 
+	/**
+	 * Returns the index of the first occurrence of <code>constraint</code> in the collection of constraints, or <b>-1</b> if <code>constraint</code> is not contained.
+	 * <br/>
+	 * <br/>
+	 * <b>Note</b>: 
+	 * @param constraint the element to be removed. It is assumed that this parameter is <i>non-null</i>
+	 * @throws NullPointerException - if <code>constraint</code> is null (optional)
+	 * @return the index of the first occurrence of <code>constraint</code> in the collection of constraints, or <b>-1</b> otherwise.
+	 */
 	int getConstraintIndex(IConstraint constraint);
 
+	/**
+	 * Returns the list of constraints stored in this feature model.
+	 * <br/>
+	 * <br/>
+	 * <b>Note</b>: The returned list should be <b>unmodifiable</b> to avoid external access to internal data
+	 * @return All constraints stored in this feature model.
+	 */
 	List<IConstraint> getConstraints();
 
 	IFeature getFeature(CharSequence name);
