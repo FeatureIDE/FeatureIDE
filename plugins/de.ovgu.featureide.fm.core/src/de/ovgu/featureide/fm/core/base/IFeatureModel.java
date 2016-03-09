@@ -35,40 +35,55 @@ import de.ovgu.featureide.fm.core.RenamingsManager;
 import de.ovgu.featureide.fm.core.base.event.IEventManager;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
 
 /**
- * The feature model interface represents any class that acts in the sense of a <i>feature model</i> in FeatureIDE. 
- * <br/><br/>
- * A feature model contains of a modifiable collection of 
+ * The feature model interface represents any class that acts in the sense of a <i>feature model</i> in FeatureIDE.
+ * <br/>
+ * <br/>
+ * A feature model contains of a modifiable collection of
  * <ul>
  * <li>{@link de.ovgu.featureide.fm.core.base.IFeature Features}, and</li>
  * <li>{@link de.ovgu.featureide.fm.core.base.IConstraint Constraints of features}</li>
  * </ul>
  * <br/>
  * Each <i>feature</i> in a feature model has a unique identifier and is related to other features over some expressions and relations which
- * forms the feature model (such as parent-children relation with implication expression from one feature to another). Additional to the 
- * structure of features (see {@link de.ovgu.featureide.fm.core.base.IFeature} and {@link de.ovgu.featureide.fm.core.base.IFeatureStructure} for more details) 
- * inside the feature models tree, features relationships can be further expressed using <i>constraints</i>. While the feature structure is bound to the 
- * actual feature model tree, constraints can be state restrictions and relations to arbitrary features inside the feature model. 
- * <br/><br/>
- * Features inside a feature model can by analyzed in order to determine feature properties which are implicated by the structure, the statements, and the constraints.
- * As a result of such an analysis, a set of <i>dead features</i> can be found for instance. For more information about analysis, see {@link de.ovgu.featureide.fm.core.FeatureModelAnalyzer FeatureModelAnalyzer}.
- * <br/><br/>
+ * forms the feature model (such as parent-children relation with implication expression from one feature to another). Additional to the
+ * structure of features (see {@link de.ovgu.featureide.fm.core.base.IFeature} and {@link de.ovgu.featureide.fm.core.base.IFeatureStructure} for more details)
+ * inside the feature models tree, features relationships can be further expressed using <i>constraints</i>. While the feature structure is bound to the
+ * actual feature model tree, constraints can be state restrictions and relations to arbitrary features inside the feature model.
+ * <br/>
+ * <br/>
+ * Features inside a feature model can by analyzed in order to determine feature properties which are implicated by the structure, the statements, and the
+ * constraints.
+ * As a result of such an analysis, a set of <i>dead features</i> can be found for instance. For more information about analysis, see
+ * {@link de.ovgu.featureide.fm.core.FeatureModelAnalyzer FeatureModelAnalyzer}.
+ * <br/>
+ * <br/>
  * Additional to the collection mentioned above, the feature model contains properties to express
  * <ul>
- * 	<li>Annotations</li>
- * 	<li>Comments</li>
- *  <li>Feature Orders</li>
+ * <li>Annotations</li>
+ * <li>Comments</li>
+ * <li>Feature Orders</li>
  * </ul>
  * <br/>
- * A feature model is moreover related to it's project, such that the <i>project's name</i> can be received, the related composer extension can be received, as well as certain 
- * event handling logic (such as model data change event handling) can be made.
- * <br/><br/>
- * Any feature model is intended to be instantiated by a corresponding factory, the implementation-specific {@link IFeatureModelFactory feature model factory}. 
- * <br/><br/>
- * FeatureIDE provides a default implementation {@link de.ovgu.featureide.fm.core.base.impl.FeatureModel FeatureModel} which is used for default use-cases and can be customized via inheritance of {@link de.ovgu.featureide.fm.core.base.impl.FeatureModel feature model} and a user-defined {@IFeatureModelFactory feature model factory}. 
- * Internally, a feature model is represented by an unique numeric identifier, which should be considered in the related {@link IFeatureModelFactory feature model factory} in order to avoid confusion with other models.
- * <br/><br/>
+ * A feature model is moreover related to it's project, such that the <i>project's name</i> can be received, the related composer extension can be received, as
+ * well as certain
+ * event handling logic (such as model data change event handling) can be made. Furthermore, each feature model is <i>required to has an own unique system-wide
+ * identifier</i> (at least during runtime). Any implementation of this interface has to provide the corresponding {@link #getId()} method and have to implement
+ * the management of identifiers among a set of feature models.
+ * <br/>
+ * <br/>
+ * Any feature model is intended to be instantiated by a corresponding factory, the implementation-specific {@link IFeatureModelFactory feature model factory}.
+ * <br/>
+ * <br/>
+ * FeatureIDE provides a default implementation {@link de.ovgu.featureide.fm.core.base.impl.FeatureModel FeatureModel} which is used for default use-cases and
+ * can be customized via inheritance of {@link de.ovgu.featureide.fm.core.base.impl.FeatureModel feature model} and a user-defined
+ * {@IFeatureModelFactory feature model factory}.
+ * Internally, a feature model is represented by an unique numeric identifier, which should be considered in the related {@link IFeatureModelFactory feature
+ * model factory} in order to avoid confusion with other models.
+ * <br/>
+ * <br/>
  * <b>Example</b><br/>
  * The following example demonstrate the creation of a new feature model using FeatureIDE's default <code>FeatureModel</code> implementation
  * {@link de.ovgu.featureide.fm.core.base.impl.FeatureModel FeatureModel}, and the corresponding default factory
@@ -79,26 +94,45 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
  * IFeatureModel model = FMFactoryManager.getFactory().createFeatureModel();
  * </pre>
  * </code>
- * A unified handling of certain <code>IFeature</code>, and <code>IFeatureModel</code> implementations (in terms of conviennent methods) can be achieved with the use of
+ * A unified handling of certain <code>IFeature</code>, and <code>IFeatureModel</code> implementations (in terms of conviennent methods) can be achieved with
+ * the use of
  * {@link de.ovgu.featureide.fm.core.base.FeatureUtils FeatureUtils} helper class.
  * <br/>
  * <br/>
- * <b>API notes</b>: The classes internal structure has heavily changed compared to older FeatureIDE version. A bridge to the old-fashioned handling is available in {@link de.ovgu.featureide.fm.core.base.FeatureUtils FeatureUtils} as static methods.
+ * <b>Caching notes</b>: A feature model implementation using the <code>IFeatureModel</code> interface has to provide a map of feature names to the
+ * corresponding feature objects, the <i>feature table</i>. This data structure is used in the {@link RenamingsManager} for instance. If the implementation
+ * utilizes this data structure for internal use, modifications to this data structure must be protected against concurrent accesses. The default
+ * implementations {@link FeatureModel} uses a <code>ConcurrentHashMap</code> for this purpose.
  * <br/>
  * <br/>
- * <b>Notes on thread safeness</b>: At least the management of <code>IFeature</code> identifiers (e.g., getting the next free id) have to be thread safe. 
+ * <b>API notes</b>: The classes internal structure has heavily changed compared to older FeatureIDE version. A bridge to the old-fashioned handling is
+ * available in {@link de.ovgu.featureide.fm.core.base.FeatureUtils FeatureUtils} as static methods.
  * <br/>
  * <br/>
- * <b>Compatibility Notes</b>: To provide compatibility to earlier versions of FeatureIDE, the <i>out-dated</i> class {@link de.ovgu.featureide.fm.core.FeatureModel
+ * <b>Notes on thread safeness</b>: At least the management of <code>IFeature</code> and </code>IFeatureModel</code> identifiers (e.g., getting the next free
+ * id) have to be thread safe. The reference default implementation for feature models is
+ * <code>
+ * <pre>
+ * private static long NEXT_ID = 0;
+ * 
+ * protected static final synchronized long getNextId() {
+ * 	return NEXT_ID++;
+ * }
+ * </pre>
+ * </code>
+ * <br/>
+ * <br/>
+ * <b>Compatibility Notes</b>: To provide compatibility to earlier versions of FeatureIDE, the <i>out-dated</i> class
+ * {@link de.ovgu.featureide.fm.core.FeatureModel
  * FeatureModel} is now a wrapper to an <code>IFeatureModel</code> instance (but incompatible to it) and make use of convert-functionalities inside
- *  {@link de.ovgu.featureide.fm.core.base.FeatureUtils FeatureUtils}.
+ * {@link de.ovgu.featureide.fm.core.base.FeatureUtils FeatureUtils}.
  * 
  * @see de.ovgu.featureide.fm.core.base.impl.FeatureModel Default implementation of <code>IFeatureModel</code> (as starting point for custom implementations)
  * 
  * @see IFeature Interface for features (<code>IFeature</code>)
  * @see IConstraint Interface for feature constraints (<code>IConstraint</code>)
  * @see IFeatureProperty Interface for feature properties (<code>IFeatureProperty</code>)
- * @see IFeatureStructure Interface for a feature's structure  (<code>IFeatureStructure</code>)
+ * @see IFeatureStructure Interface for a feature's structure (<code>IFeatureStructure</code>)
  * 
  * @see de.ovgu.featureide.fm.core.base.impl.Feature Default implementation for features (<code>Feature</code>)
  * @see de.ovgu.featureide.fm.core.base.impl.AConstraint Default implementation for feature constraints (<code>AConstraint</code>)
@@ -112,20 +146,143 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
  */
 public interface IFeatureModel extends Cloneable, IEventManager {
 
+	/**
+	 * Feature models are identified with their system-wide unique numeric
+	 * identifier. This methods returns the identifier of the current feature model.
+	 * Custom implementations might manage the feature model's identifier similar to
+	 * the default implementation:
+	 * <code>
+	 * <pre>
+	 * private static long NEXT_ID = 0;
+	 * 
+	 * protected static final synchronized long getNextId() {
+	 * 	return NEXT_ID++;
+	 * }
+	 * </pre>
+	 * </code>
+	 * The identifier has to be used for comparisons using {@link Object#equals(Object)}.
+	 * 
+	 * @return unique identifier
+	 * 
+	 * @since 3.0
+	 */
 	long getId();
 
+	/**
+	 * A constraint is an additional restriction on features in the feature model.
+	 * 
+	 * This methods adds the constraint <code>constraint</code> to the <i>end</i> of the existing collection. Please note that
+	 * <ul>
+	 * <li>the specification do not require a check if <code>constraint</code> is <i>null</i>.
+	 * However, for regular use, <code>constraint</code> is assumed to be <i>non-null</i></li>
+	 * <li>the specification do not require a check of duplicates. In FeatureIDE's default implementation,
+	 * the collection is managed using a <code>List</code>. For regular use case, this collection is assumed to be duplicate-free. Therefore, duplicates should
+	 * not be added.</li>
+	 * </ul>
+	 * 
+	 * To add a constraint at a specific position, use {@link #addConstraint(IConstraint, int)}
+	 * 
+	 * @param constraint The constraint to be added at the end of the existing collection
+	 * 
+	 * @since 3.0
+	 */
 	void addConstraint(IConstraint constraint);
 
+	/**
+	 * A constraint is an additional restriction on features in the feature model.
+	 * 
+	 * This methods adds the constraint <code>constraint</code> at the given <i>index</i> of the existing collection. Please note that
+	 * <ul>
+	 * <li>the specification do not require a check if <code>constraint</code> is <i>null</i>.
+	 * However, for regular use, <code>constraint</code> is assumed to be <i>non-null</i></li>
+	 * <li>the specification do not require a check of duplicates. In FeatureIDE's default implementation,
+	 * the collection is managed using a <code>List</code>. For regular use case, this collection is assumed to be duplicate-free. Therefore, duplicates should
+	 * not be added.</li>
+	 * </ul>
+	 * 
+	 * To add a constraint at a specific position, use {@link #addConstraint(IConstraint, int)}
+	 * 
+	 * @param constraint The constraint to be added at position <i>index</i> of the existing collection
+	 * @param index The position. It is assumed, that the index is valid. Otherwise a exception have to be thrown by the implementation.
+	 * 
+	 * @since 3.0
+	 */
 	void addConstraint(IConstraint constraint, int index);
 
+	/**
+	 * Add a new feature <code>feature</code> to this feature model. If the feature model not contains a feature with the name {@link IFeature#getName()} of
+	 * <code>feature</code>, the <code>feature</code> will be added and the method returns <b>true</b>. Otherwise, the feature is not added and the method
+	 * returns
+	 * <b>false</b>. Classes implementing <code>IFeatureModel</code> must provide consistency with the underlying <i>feature table</i> which is accessible by
+	 * {@link #getFeatureTable()}.
+	 * 
+	 * @param feature the feature to be added. <code>feature</code> is assumed to be <i>non-null</i>
+	 * @return <b>true</b> if the feature was added, otherwise <b>false</b>.
+	 * 
+	 * @since 3.0
+	 */
 	boolean addFeature(IFeature feature);
 
+	/**
+	 * Clones this feature model <code>f</code>, such that a new instance <code>f'</code> is created. The cloned feature model <code>f'</code> must satisfy the
+	 * following properties to contain the same information as <code>f</code>:
+	 * <ul>
+	 * <li>the identifiers of <code>f</code> and <code>f'</code> must be identical</li>
+	 * <li>the feature order list of <code>f</code> and <code>f'</code> must be equal, but the references must be different</li>
+	 * <li>the user defined feature order flag of <code>f</code> and <code>f'</code> must be identical</li>
+	 * <li>the feature models properties must be equal but with different references in <code>f</code> and <code>f'</code></li>
+	 * <li>the feature models constraints must be equal but with different references in <code>f</code> and <code>f'</code></li>
+	 * <li>the cloned feature model <code>f'</code> must contain the structure behind <code>newRoot</code> but with different references</li>
+	 * <li>the cloned feature model <code>f'</code>'s root feature must be <code>newRoot</code></li>
+	 * </ul>
+	 * Additionally, the following must hold <code>f != f'</code> and <code>f.equals(f')</code>.
+	 * 
+	 * @param newRoot the new root feature including the entire structure of <code>newRoot</code> for the cloned model
+	 * @return A new equal instance of this feature model with different references and <code>newRoot</code> as root feature
+	 * 
+	 * @since 3.0
+	 */
 	IFeatureModel clone(IFeature newRoot);
 
+	/**
+	 * Resets this feature model to the default values. The parameter <code>projectName</code> will be used as the new root features name if there are no
+	 * features in this model (the <i>feature table</i> is empty). Independent of this, a new feature called <code>Base</code> will be added as child of
+	 * the feature models root feature, and the feature models root feature will be set as <i>abstract feature</i>.
+	 * 
+	 * @param projectName the name for the root feature, if this feature model does not contain any features. Otherwise this parameter will be ignored. If
+	 *            <code>projectName</code> is an empty string, the string <code>"Root"</code> will be used for the potential new root feature. The parameter
+	 *            <code>projectName</code> is assumed to be <i>non-null</i>
+	 *            
+	 * @since 3.0
+	 */
 	void createDefaultValues(CharSequence projectName);
 
+	/**
+	 * Removes <code>feature</code> from this model. <code>feature</code> can not be removed, if it is the feature models <i>root</i> feature or if it is not
+	 * contained in this model. In both cases, the method returns <b>false</b>. Otherwise the method returns <b>true</b>.
+	 * <br/>
+	 * <br/>
+	 * Implementations of this method must ensure, that after removing <code>feature</code>, the feature's <i>parent feature</i> is changed to an <i>and</i> (
+	 * <i>or</i>, <i>alternative</i>) group if <code>feature</code> was an <i>and</i> (<i>or</i>, <i>alternative</i>) group. Additionally, removing
+	 * <code>feature</code> has to add the children of <code>feature</code> as children to the <i>parent feature</i>.
+	 * <br/>
+	 * <br/>
+	 * Removing a feature also removes this feature from the <i>feature table</i> and the <i>feature order list</i>. Both must be consistent with
+	 * {@link #getFeatureOrderList()} and {@link #getFeatureOrderList()}
+	 * 
+	 * @param feature the feature that should be removed. It is assumed to be <i>non-null</i>
+	 * @return <b>false</b> if <code>feature</code> is the models <i>root</i> feature, or if <code>feature</code> is not contained in this model. Otherwise
+	 *         <b>true</b>.
+	 *         
+	 * @since 3.0        
+	 */
 	boolean deleteFeature(IFeature feature);
 
+	/**
+	 * Removes the feature <code>feature</code> from the <i>feature table</i>.
+	 * 
+	 * @param feature
+	 */
 	void deleteFeatureFromTable(IFeature feature);
 
 	FeatureModelAnalyzer getAnalyser();
