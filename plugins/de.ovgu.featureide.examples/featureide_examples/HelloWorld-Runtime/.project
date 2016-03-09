@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>Images_Example</name>
-	<comment>
-	[description]
-	An illustrative example using images of a character.
-	[/description]
-	</comment>
+	<name>Runtime</name>
+	<comment></comment>
 	<projects>
 	</projects>
 	<buildSpec>
@@ -18,7 +14,7 @@
 				</dictionary>
 				<dictionary>
 					<key>composer</key>
-					<value>de.ovgu.featureide.core.composer.images</value>
+					<value>de.ovgu.featureide.core.composer.runtime</value>
 				</dictionary>
 				<dictionary>
 					<key>equations</key>
