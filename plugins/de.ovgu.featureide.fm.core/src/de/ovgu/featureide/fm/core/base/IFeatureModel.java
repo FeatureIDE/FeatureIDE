@@ -164,6 +164,8 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * 
 	 * @return unique identifier
 	 * 
+	 * @see #getNextElementId()
+	 * 
 	 * @since 3.0
 	 */
 	long getId();
@@ -183,6 +185,16 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * To add a constraint at a specific position, use {@link #addConstraint(IConstraint, int)}
 	 * 
 	 * @param constraint The constraint to be added at the end of the existing collection
+	 * 
+	 * @see #addConstraint(IConstraint, int)
+	 * @see #getConstraintCount()
+	 * @see #getConstraintIndex(IConstraint)
+	 * @see #getConstraints()
+	 * @see #removeConstraint(IConstraint)
+	 * @see #removeConstraint(int)
+	 * @see #setConstraint(int, Constraint)
+	 * @see #setConstraints(Iterable)
+	 * @see #replaceConstraint(IConstraint, int)
 	 * 
 	 * @since 3.0
 	 */
@@ -205,6 +217,16 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * @param constraint The constraint to be added at position <i>index</i> of the existing collection
 	 * @param index The position. It is assumed, that the index is valid. Otherwise a exception have to be thrown by the implementation.
 	 * 
+	 * @see #addConstraint(IConstraint)
+	 * @see #getConstraintCount()
+	 * @see #getConstraintIndex(IConstraint)
+	 * @see #getConstraints()
+	 * @see #removeConstraint(IConstraint)
+	 * @see #removeConstraint(int)
+	 * @see #setConstraint(int, Constraint)
+	 * @see #setConstraints(Iterable)
+	 * @see #replaceConstraint(IConstraint, int)
+	 * 
 	 * @since 3.0
 	 */
 	void addConstraint(IConstraint constraint, int index);
@@ -218,6 +240,12 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * 
 	 * @param feature the feature to be added. <code>feature</code> is assumed to be <i>non-null</i>
 	 * @return <b>true</b> if the feature was added, otherwise <b>false</b>.
+	 * 
+	 * @see #deleteFeature(IFeature)
+	 * @see #getFeature(CharSequence)
+	 * @see #getFeatures()
+	 * @see #getNumberOfFeatures()
+	 * @see #reset()
 	 * 
 	 * @since 3.0
 	 */
@@ -252,6 +280,8 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * @param projectName the name for the root feature, if this feature model does not contain any features. Otherwise this parameter will be ignored. If
 	 *            <code>projectName</code> is an empty string, the string <code>"Root"</code> will be used for the potential new root feature. The parameter
 	 *            <code>projectName</code> is assumed to be <i>non-null</i>
+	 *            
+	 * @see #reset()           
 	 * 
 	 * @since 3.0
 	 */
@@ -277,6 +307,12 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * @return <b>false</b> if <code>feature</code> is the models <i>root</i> feature, or if <code>feature</code> is not contained in this model. Otherwise
 	 *         <b>true</b>.
 	 * 
+	 * @see #addFeature(IFeature)
+	 * @see #getFeature(CharSequence)
+	 * @see #getFeatures()
+	 * @see #getNumberOfFeatures()
+	 * @see #reset()
+	 * 
 	 * @since 3.0
 	 */
 	boolean deleteFeature(IFeature feature);
@@ -296,7 +332,12 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * <br/>
 	 * <b>Note</b> If the structure should be changed, use {@link #deleteFeature(IFeature)}
 	 * 
+	 * @see #setFeatureTable(Hashtable)
+	 * @see #getFeatureTable()
+	 * 
 	 * @param feature the feature (the feature's name) which should be deleted from the <i>feature table</i>
+	 * 
+	 * @since 3.0
 	 */
 	void deleteFeatureFromTable(IFeature feature);
 
@@ -306,21 +347,50 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * automatically stored in this feature model by object references.
 	 * 
 	 * @return The instance of {@link FeatureModelAnalyzer} bound to this feature model.
+	 * 
+	 * @since 3.0
 	 */
 	FeatureModelAnalyzer getAnalyser();
 
 	/**
 	 * @return Returns the number of constraints contained in this feature model.
+	 * 
+	 * @see #addConstraint(IConstraint)
+	 * @see #addConstraint(IConstraint, int)
+	 * @see #getConstraintIndex(IConstraint)
+	 * @see #getConstraints()
+	 * @see #removeConstraint(IConstraint)
+	 * @see #removeConstraint(int)
+	 * @see #setConstraint(int, Constraint)
+	 * @see #setConstraints(Iterable)
+	 * @see #replaceConstraint(IConstraint, int)
+	 * 
+	 * @since 3.0
 	 */
 	int getConstraintCount();
 
 	/**
-	 * Returns the index of the first occurrence of <code>constraint</code> in the collection of constraints, or <b>-1</b> if <code>constraint</code> is not contained.
+	 * Returns the index of the first occurrence of <code>constraint</code> in the collection of constraints, or <b>-1</b> if <code>constraint</code> is not
+	 * contained.
 	 * <br/>
 	 * <br/>
-	 * <b>Note</b>: 
+	 * <b>Note</b>:
+	 * 
 	 * @param constraint the element to be removed. It is assumed that this parameter is <i>non-null</i>
 	 * @throws NullPointerException - if <code>constraint</code> is null (optional)
+	 * 
+	 * @see #addConstraint(IConstraint)
+	 * @see #addConstraint(IConstraint, int)
+	 * @see #getConstraintCount()
+	 * @see #getConstraints()
+	 * @see #removeConstraint(IConstraint)
+	 * @see #removeConstraint(int)
+	 * @see #setConstraint(int, Constraint)
+	 * @see #setConstraints(Iterable)
+	 * @see #replaceConstraint(IConstraint, int)
+	 * 
+	 * @since 3.0
+	 * 
 	 * @return the index of the first occurrence of <code>constraint</code> in the collection of constraints, or <b>-1</b> otherwise.
 	 */
 	int getConstraintIndex(IConstraint constraint);
@@ -330,68 +400,374 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * <br/>
 	 * <br/>
 	 * <b>Note</b>: The returned list should be <b>unmodifiable</b> to avoid external access to internal data
+	 * 
+	 * @see #addConstraint(IConstraint)
+	 * @see #addConstraint(IConstraint, int)
+	 * @see #getConstraintCount()
+	 * @see #getConstraintIndex(IConstraint)
+	 * @see #removeConstraint(IConstraint)
+	 * @see #removeConstraint(int)
+	 * @see #setConstraint(int, Constraint)
+	 * @see #setConstraints(Iterable)
+	 * @see #replaceConstraint(IConstraint, int)
+	 * 
+	 * @since 3.0
+	 * 
 	 * @return All constraints stored in this feature model.
 	 */
 	List<IConstraint> getConstraints();
 
+	/**
+	 * Returns the feature with the given <code>name</code> stored in this feature model, or <code>null</code> if no features can be found. The given
+	 * <code>name</code> is compared to the names of the contained features in a <i>case-sensitive</i> manner. Therefore <code>"FeatureA"</code> is unequal to
+	 * <code>featureA</code>.
+	 * 
+	 * @param name the name (case sensitive) of the feature which should be return. This parameter is assumed to be non-null.
+	 * 
+	 * @see #addFeature(IFeature)
+	 * @see #deleteFeature(IFeature)
+	 * @see #getFeatures()
+	 * @see #getNumberOfFeatures()
+	 * @see #reset()
+	 * 
+	 * @since 3.0
+	 * 
+	 * @return the associated feature, if there is a match to <code>name</code>, or <b>null</b> otherwise.
+	 */
 	IFeature getFeature(CharSequence name);
 
+	/**
+	 * Returns the ordered collection of feature names according to the given feature order. If an order is given, the method returns the corresponding list of
+	 * feature names according to their order. If no order is set, the method returns the names of features
+	 * according to a pre-order traversation of the root feature's structure. In both cases, the resulting collection is <b>unmodifiable</b>.
+	 * 
+	 * @see #setFeatureOrderList(List)
+	 * @see #setFeatureOrderListItem(int, String)
+	 * @see #setFeatureOrderUserDefined(boolean)
+	 * 
+	 * @since 3.0
+	 * 
+	 * @return an ordered list of feature names, either as a given order or in pre-order by traversing the root-feature.
+	 */
 	Collection<String> getFeatureOrderList();
 
+	/**
+	 * 
+	 * @see #addFeature(IFeature)
+	 * @see #deleteFeature(IFeature)
+	 * @see #getFeature(CharSequence)
+	 * @see #getNumberOfFeatures()
+	 * @see #reset()
+	 * 
+	 * @since 3.0
+	 * 
+	 * @return
+	 */
 	Iterable<IFeature> getFeatures();
 
+	/**
+	 * 
+	 * @since 3.0
+	 * 
+	 * @return
+	 */
 	IFMComposerExtension getFMComposerExtension();
 
+	/**
+	 * 
+	 * @since 3.0
+	 * 
+	 * @param project
+	 * @return
+	 */
 	FMComposerManager getFMComposerManager(final IProject project);
 
+	/**
+	 * 
+	 * @see #addFeature(IFeature)
+	 * @see #deleteFeature(IFeature)
+	 * @see #getFeature(CharSequence)
+	 * @see #getFeatures()
+	 * @see #reset()
+	 * 
+	 * @return
+	 */
 	int getNumberOfFeatures();
 
+	/**
+	 * 
+	 * 
+	 * 
+	 * @since 3.0
+	 * 
+	 * @return
+	 */
 	IFeatureModelProperty getProperty();
 
+	
+	/**
+	 * 
+	 * @since 3.0
+	 * 
+	 * @return
+	 */
 	RenamingsManager getRenamingsManager();
 
+	/**
+	 * 
+	 * @since 3.0
+	 * 
+	 * @return
+	 */
 	IFeatureModelStructure getStructure();
 
+	/**
+	 * 
+	 * @since 3.0
+	 */
 	void handleModelDataChanged();
 
+	/**
+	 * 
+	 * @since 3.0
+	 */
 	void handleModelDataLoaded();
 
+	/**
+	 * 
+	 * @since 3.0
+	 * 
+	 * @param project
+	 * @return
+	 */
 	IFMComposerExtension initFMComposerExtension(final IProject project);
 
+	/**
+	 * 
+	 * @since 3.0
+	 * 
+	 * @return
+	 */
 	boolean isFeatureOrderUserDefined();
 
+	/**
+	 * 
+	 * @see #addConstraint(IConstraint)
+	 * @see #addConstraint(IConstraint, int)
+	 * @see #getConstraintCount()
+	 * @see #getConstraintIndex(IConstraint)
+	 * @see #getConstraints()
+	 * @see #removeConstraint(int)
+	 * @see #setConstraint(int, Constraint)
+	 * @see #setConstraints(Iterable)
+	 * @see #replaceConstraint(IConstraint, int)
+	 * 
+	 * @since 3.0
+	 * 
+	 * @param constraint
+	 */
 	void removeConstraint(IConstraint constraint);
 
+	/**
+	 * 
+	 * @see #addConstraint(IConstraint)
+	 * @see #addConstraint(IConstraint, int)
+	 * @see #getConstraintCount()
+	 * @see #getConstraintIndex(IConstraint)
+	 * @see #getConstraints()
+	 * @see #removeConstraint(IConstraint)
+	 * @see #setConstraint(int, Constraint)
+	 * @see #setConstraints(Iterable)
+	 * @see #replaceConstraint(IConstraint, int)
+	 * 
+	 * @since 3.0
+	 * 
+	 * @param index
+	 */
 	void removeConstraint(int index);
 
+	/**
+	 * @see #addConstraint(IConstraint)
+	 * @see #addConstraint(IConstraint, int)
+	 * @see #getConstraintCount()
+	 * @see #getConstraintIndex(IConstraint)
+	 * @see #getConstraints()
+	 * @see #removeConstraint(IConstraint)
+	 * @see #removeConstraint(int)
+	 * @see #setConstraint(int, Constraint)
+	 * @see #setConstraints(Iterable)
+	 * 
+	 * @since 3.0
+	 * 
+	 * @param constraint
+	 * @param index
+	 */
 	void replaceConstraint(IConstraint constraint, int index);
 
+	/**
+	 * 
+	 * @see #deleteFeature(IFeature)
+	 * @see #removeConstraint(int)
+	 * @see #removeConstraint(IConstraint)
+	 * @see #createDefaultValues(CharSequence)
+	 * 
+	 * @since 3.0
+	 */
 	void reset();
 
+	/**
+	 * 
+	 * @see #addConstraint(IConstraint)
+	 * @see #addConstraint(IConstraint, int)
+	 * @see #getConstraintCount()
+	 * @see #getConstraintIndex(IConstraint)
+	 * @see #getConstraints()
+	 * @see #removeConstraint(IConstraint)
+	 * @see #removeConstraint(int)
+	 * @see #setConstraint(int, Constraint)
+	 * @see #replaceConstraint(IConstraint, int)
+	 * 
+	 * @param constraints
+	 * 
+	 * @since 3.0
+	 */
 	void setConstraints(final Iterable<IConstraint> constraints);
 
+	/**
+	 * 
+	 * @see #getFeatureOrderList()
+	 * @see #setFeatureOrderListItem(int, String)
+	 * @see #setFeatureOrderUserDefined(boolean)
+	 * 
+	 * @param featureOrderList
+	 * 
+	 * @since 3.0
+	 */
 	void setFeatureOrderList(final List<String> featureOrderList);
 
+	/**
+	 * 
+	 * @see #getFeatureOrderList()
+	 * @see #setFeatureOrderList(List)
+	 * @see #setFeatureOrderListItem(int, String)
+	 * 
+	 * @param featureOrderUserDefined
+	 * 
+	 * @since 3.0
+	 */
 	void setFeatureOrderUserDefined(boolean featureOrderUserDefined);
 
+	/**
+	 * 
+	 * @see #deleteFeatureFromTable(IFeature)
+	 * @see #getFeatureTable()
+	 * 
+	 * @param featureTable
+	 * 
+	 * @since 3.0
+	 */
 	void setFeatureTable(final Hashtable<String, IFeature> featureTable);
 
-	Map<String, IFeature> getFeatureTable(); // Added, Marcus Pinnecke 31.08.15
+	/**
+	 * 
+	 * @see #setFeatureTable(Hashtable)
+	 * @see #deleteFeatureFromTable(IFeature)
+	 * 
+	 * @return
+	 * 
+	 * @since 3.0
+	 */
+	Map<String, IFeature> getFeatureTable();
 
+	
+	/**
+	 * 
+	 * @since 3.0
+	 * 
+	 * @return
+	 */
 	IFeatureModel clone();
 
+	
+	/**
+	 * 
+	 * 
+	 * @since 3.0
+	 * 
+	 * @return
+	 */
 	Object getUndoContext();
 
+	
+	/**
+	 * 
+	 * 
+	 * @since 3.0
+	 * 
+	 * @param undoContext
+	 */
 	void setUndoContext(Object undoContext);
 
+	/**
+	 * 
+	 * @see #getFeatureOrderList()
+	 * @see #setFeatureOrderList(List)
+	 * @see #setFeatureOrderUserDefined(boolean)
+	 * 
+	 * @since 3.0
+	 * 
+	 * @param i
+	 * @param newName
+	 */
 	void setFeatureOrderListItem(int i, String newName);
 
+	/**
+	 * 
+	 * @see #getSourceFile()
+	 * 
+	 * @since 3.0
+	 * 
+	 * @param file
+	 */
 	void setSourceFile(File file);
 
+	/**
+	 * 
+	 * @see #setSourceFile(File)
+	 * 
+	 * @since 3.0
+	 * 
+	 * @return
+	 */
 	File getSourceFile();
 
+	/**
+	 * 
+	 * @see #getId()
+	 * 
+	 * @since 3.0
+	 * 
+	 * @return
+	 */
 	long getNextElementId();
 
+	/**
+	 * 
+	 * @see #addConstraint(IConstraint)
+	 * @see #addConstraint(IConstraint, int)
+	 * @see #getConstraintCount()
+	 * @see #getConstraintIndex(IConstraint)
+	 * @see #getConstraints()
+	 * @see #removeConstraint(IConstraint)
+	 * @see #removeConstraint(int)
+	 * @see #setConstraints(Iterable)
+	 * @see #replaceConstraint(IConstraint, int)
+	 * 
+	 * @since 3.0
+	 * 
+	 * @param index
+	 * @param constraint
+	 */
 	void setConstraint(int index, Constraint constraint);
 
 }
