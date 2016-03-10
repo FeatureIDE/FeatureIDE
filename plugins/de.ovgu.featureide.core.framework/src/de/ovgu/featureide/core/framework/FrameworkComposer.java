@@ -1,14 +1,7 @@
 package de.ovgu.featureide.core.framework;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -22,17 +15,15 @@ import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
-import org.osgi.framework.Bundle;
 
-import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.core.framework.activator.FrameworkCorePlugin;
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
@@ -46,8 +37,7 @@ import de.ovgu.featureide.fm.core.io.manager.FileReader;
  */
 public class FrameworkComposer extends ComposerExtensionClass {
 
-	private LinkedList<String> unSelectedFeatures; // TODO Needed?
-	LinkedList<String> selectedFeatures;
+	private LinkedList<String> selectedFeatures;
 
 	@Override
 	public Mechanism getGenerationMechanism() {
@@ -65,14 +55,8 @@ public class FrameworkComposer extends ComposerExtensionClass {
 		reader.read();
 
 		selectedFeatures = new LinkedList<String>();
-		unSelectedFeatures = new LinkedList<String>();
 		for (IFeature feature : configuration.getSelectedFeatures()) {
 			selectedFeatures.add(feature.getName());
-		}
-		for (IFeature feature : FeatureUtils.extractConcreteFeatures(featureProject.getFeatureModel())) {
-			if (!selectedFeatures.contains(feature.getName())) {
-				unSelectedFeatures.add(feature.getName());
-			}
 		}
 
 		IProject project = config.getProject();
@@ -132,13 +116,13 @@ public class FrameworkComposer extends ComposerExtensionClass {
 					}
 				}
 			} catch (CoreException e) {
-				CorePlugin.getDefault().logError(e);
+				FrameworkCorePlugin.getDefault().logError(e);
 			}
 
 			IClasspathEntry[] result = entries.toArray(new IClasspathEntry[0]);
 			javaProject.setRawClasspath(result, null);
 		} catch (JavaModelException e) {
-			CorePlugin.getDefault().logError(e);
+			FrameworkCorePlugin.getDefault().logError(e);
 		}
 	}
 
@@ -167,68 +151,92 @@ public class FrameworkComposer extends ComposerExtensionClass {
 			}
 
 		} catch (CoreException e) {
-			e.printStackTrace();
+			FrameworkCorePlugin.getDefault().logError(e);
 		}
 		return result;
-	}
-
-	/**
-	 * Copies needed files to project folder
-	 * 
-	 * @return <code>true</code> if files are created without a problem
-	 */
-	private boolean copyRequiredFiles() {
-		Bundle bundle = FrameworkCorePlugin.getDefault().getBundle();
-
-		/** Copy plugin loader **/
-		URL resource = bundle.getResource("resources/PluginLoader.java");
-		try {
-			resource = FileLocator.toFileURL(resource);
-
-			File targetFile = new File(
-					featureProject.getBuildPath().toString() + FileSystems.getDefault().getSeparator() + "loader"
-							+ FileSystems.getDefault().getSeparator() + "PluginLoader.java");
-
-			if (!targetFile.exists()) {
-				if (!targetFile.getParentFile().exists()) {
-					targetFile.getParentFile().mkdirs();
-				}
-				Path source = Paths.get(resource.toURI());
-				Path target = Paths.get(targetFile.toURI());
-				Files.copy(source, target, StandardCopyOption.REPLACE_EXISTING);
-			}
-
-		} catch (IOException | URISyntaxException e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		/** Create config file **/
-		try {
-			File targetFile = new File(
-					featureProject.getConfigFolder().toString() + FileSystems.getDefault().getSeparator() + "config");
-
-			if (!targetFile.exists()) {
-				Files.createFile(targetFile.toPath());
-			}
-
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
-		}
-
-		// TODO Refresh local
-
-		return true;
 	}
 
 	@Override
 	public boolean initialize(IFeatureProject project) {
 		if (super.initialize(project)) {
-			// TODO Abfangen vom richtigen Projekt?
-			copyRequiredFiles();
-			return true;
+			return copyRequiredFiles(project);
 		}
 		return false;
 	}
+
+	boolean isDone = false;
+
+	/**
+	 * Copies needed files to project folder<br>
+	 * <ul>
+	 * <li>Everytime called when a framework project does not contain
+	 * pluginLoader or config file</li>
+	 * </ul>
+	 * 
+	 * @param project
+	 * 
+	 * @return <code>true</code> if files are created without a problem
+	 */
+	private boolean copyRequiredFiles(IFeatureProject project) {
+
+		/** Copy plugin loader **/
+		InputStream inputStream = null;
+		try {
+			inputStream = FileLocator.openStream(FrameworkCorePlugin.getDefault().getBundle(),
+					new Path("resources/PluginLoader.java"), false);
+		} catch (IOException e) {
+			FrameworkCorePlugin.getDefault().logError(e);
+		}
+
+		IFolder folder = project.getProject().getFolder("src");
+		IFolder folderLoader = folder.getFolder("loader");
+		if (!folderLoader.exists()) {
+			try {
+				folderLoader.create(true, true, null);
+				System.out.println(folderLoader.exists());
+				folderLoader.refreshLocal(IResource.DEPTH_INFINITE, null);
+			} catch (CoreException e) {
+				FrameworkCorePlugin.getDefault().logError(e);
+			}
+		}
+		IFile file = folderLoader.getFile("PluginLoader.txt");
+		if (!file.exists()) {
+			try {
+				file.create(inputStream, true, null);
+			} catch (CoreException e) {
+				FrameworkCorePlugin.getDefault().logError(e);
+			}
+		}
+
+		/** Create config file **/
+		try {
+			inputStream = FileLocator.openStream(FrameworkCorePlugin.getDefault().getBundle(),
+					new Path("resources/config.txt"), false);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		file = folder.getFile("config.txt");
+		if (!file.exists()) {
+			try {
+				file.create(inputStream, true, null);
+			} catch (CoreException e) {
+				FrameworkCorePlugin.getDefault().logError(e);
+			}
+		}
+
+		try {
+			featureProject.getBuildFolder().refreshLocal(IResource.DEPTH_INFINITE, null);
+		} catch (CoreException e) {
+			FrameworkCorePlugin.getDefault().logError(e);
+		}
+
+		return true;
+
+	}
+
+	@Override
+	public boolean clean() {
+		return false;
+	}
+
 }
