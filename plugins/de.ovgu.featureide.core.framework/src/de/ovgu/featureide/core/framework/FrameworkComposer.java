@@ -193,7 +193,6 @@ public class FrameworkComposer extends ComposerExtensionClass {
 		if (!folderLoader.exists()) {
 			try {
 				folderLoader.create(true, true, null);
-				System.out.println(folderLoader.exists());
 				folderLoader.refreshLocal(IResource.DEPTH_INFINITE, null);
 			} catch (CoreException e) {
 				FrameworkCorePlugin.getDefault().logError(e);
