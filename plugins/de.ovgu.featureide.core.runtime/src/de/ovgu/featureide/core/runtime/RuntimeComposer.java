@@ -9,12 +9,17 @@ import java.io.PrintWriter;
 import java.net.URL;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
-import java.nio.file.LinkOption;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFileState;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ui.internal.util.BundleUtility;
 
@@ -37,7 +42,12 @@ import de.ovgu.featureide.fm.core.io.manager.FileReader;
  */
 @SuppressWarnings(RESTRICTION)
 public class RuntimeComposer extends ComposerExtensionClass {
-
+	
+	/**
+	 * Every time the project is built, the config will be read and written into runtime.properties.
+	 */
+	
+	
 	@Override
 	public void performFullBuild(IFile config) {
 		String dirProj = featureProject.getProject().getLocationURI().getPath().toString();
@@ -82,27 +92,43 @@ public class RuntimeComposer extends ComposerExtensionClass {
 		return false;
 	}
 
+	/**
+	 * When initialized, the PropertyManager class will be created within the runtime project, if it does not exists already.
+	 * The PropertyManager.java is located in de.ovgu.featureide.core.runtime/resources.
+	 */
 	@Override
 	public boolean initialize(IFeatureProject project) {
 
 		if (super.initialize(project)) {
-			URL url = BundleUtility.find(RuntimeCorePlugin.getDefault().getBundle(), "Resources/PropertyManager.txt");
+
+			final String propertyManager = "PropertyManager.java";
+
+			URL url = BundleUtility.find(RuntimeCorePlugin.getDefault().getBundle(),
+					"Resources" + FileSystems.getDefault().getSeparator() + propertyManager);
 			try {
 				url = FileLocator.toFileURL(url);
 			} catch (IOException e) {
 				RuntimeCorePlugin.getDefault().logError(e);
 			}
-
+			
+	
 			File fileSource = new File(url.getFile());
-			File fileDest = new File(project.getBuildPath().toString() + FileSystems.getDefault().getSeparator()
-					+ "PropertyManager.java");
+			File fileDest = new File(
+					project.getBuildPath()+ FileSystems.getDefault().getSeparator() + propertyManager);
 
-			if (Files.notExists(fileDest.toPath(), LinkOption.NOFOLLOW_LINKS)) {
+			if (Files.notExists(fileDest.toPath())) {
 
 				try {
+					
 					Files.copy(fileSource.toPath(), fileDest.toPath(), StandardCopyOption.REPLACE_EXISTING);
-				} catch (IOException e) {
+					IFile iFileDest = project.getBuildFolder().getFile(propertyManager);
+					project.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
+					iFileDest.setDerived(true);
+
+				} catch (IOException | CoreException e) {
+
 					RuntimeCorePlugin.getDefault().logError(e);
+					
 				}
 			}
 		}

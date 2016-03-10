@@ -20,5 +20,15 @@
             name="Default">
       </newProjectWizard>
    </extension>
-
+<extension point = "org.eclipse.debug.core.launchConfigurationTypes">
+   <launchConfigurationType
+         delegate="Del"
+         id="org.eclipse.jdt.launching.localJavaApplication"
+         modes="run, debug"
+         name="myname"
+         public="false"
+         sourceLocatorId="org.eclipse.jdt.launching.sourceLocator.JavaSourceLookupDirector"
+         sourcePathComputerId="org.eclipse.jdt.launching.sourceLookup.javaSourcePathComputer">
+   </launchConfigurationType>
+</extension>
 </plugin>
