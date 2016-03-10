@@ -5,6 +5,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.nio.file.FileSystems;
@@ -42,12 +43,12 @@ import de.ovgu.featureide.fm.core.io.manager.FileReader;
  */
 @SuppressWarnings(RESTRICTION)
 public class RuntimeComposer extends ComposerExtensionClass {
-	
+
 	/**
-	 * Every time the project is built, the config will be read and written into runtime.properties.
+	 * Every time the project is built, the config will be read and written into
+	 * runtime.properties.
 	 */
-	
-	
+
 	@Override
 	public void performFullBuild(IFile config) {
 		String dirProj = featureProject.getProject().getLocationURI().getPath().toString();
@@ -93,8 +94,9 @@ public class RuntimeComposer extends ComposerExtensionClass {
 	}
 
 	/**
-	 * When initialized, the PropertyManager class will be created within the runtime project, if it does not exists already.
-	 * The PropertyManager.java is located in de.ovgu.featureide.core.runtime/resources.
+	 * When initialized, the PropertyManager class will be created within the
+	 * runtime project, if it does not exists already. The PropertyManager.java
+	 * is located in de.ovgu.featureide.core.runtime/resources.
 	 */
 	@Override
 	public boolean initialize(IFeatureProject project) {
@@ -103,34 +105,28 @@ public class RuntimeComposer extends ComposerExtensionClass {
 
 			final String propertyManager = "PropertyManager.java";
 
-			URL url = BundleUtility.find(RuntimeCorePlugin.getDefault().getBundle(),
-					"Resources" + FileSystems.getDefault().getSeparator() + propertyManager);
+			InputStream inputStream = null;
+		
 			try {
-				url = FileLocator.toFileURL(url);
+				inputStream = FileLocator.openStream(RuntimeCorePlugin.getDefault().getBundle(),
+						new Path("Resources" + FileSystems.getDefault().getSeparator() + propertyManager), false);
 			} catch (IOException e) {
 				RuntimeCorePlugin.getDefault().logError(e);
 			}
-			
-	
-			File fileSource = new File(url.getFile());
-			File fileDest = new File(
-					project.getBuildPath()+ FileSystems.getDefault().getSeparator() + propertyManager);
 
-			if (Files.notExists(fileDest.toPath())) {
+			IFolder folderDest = project.getProject().getFolder("src");
+			IFile fileDest = folderDest.getFile(propertyManager);
 
+			if (!fileDest.exists()) {
 				try {
-					
-					Files.copy(fileSource.toPath(), fileDest.toPath(), StandardCopyOption.REPLACE_EXISTING);
-					IFile iFileDest = project.getBuildFolder().getFile(propertyManager);
-					project.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
-					iFileDest.setDerived(true);
-
-				} catch (IOException | CoreException e) {
-
+					fileDest.create(inputStream, true, null);
+					fileDest.setDerived(true,null);
+				} catch (CoreException e) {
 					RuntimeCorePlugin.getDefault().logError(e);
-					
 				}
+
 			}
+
 		}
 		return super.initialize(project);
 	}
