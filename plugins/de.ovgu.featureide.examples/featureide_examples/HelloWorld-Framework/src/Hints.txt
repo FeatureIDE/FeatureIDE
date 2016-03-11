@@ -19,3 +19,14 @@
 
 === FantasyWorld.jar ====================================
 >> FantasyWorld.java (implements Print)
+
+
+
+*** HINTS ***********************************************
+>> Usage
+*********************************************************
+
+>> Updates inside the default.config file update the classpath
+>> Classpath is responsible for visible jars
+
+>> config.txt file is responsible for searched classes 
