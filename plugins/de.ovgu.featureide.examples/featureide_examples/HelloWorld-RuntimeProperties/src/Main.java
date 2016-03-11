@@ -6,13 +6,6 @@ import java.util.Properties;
 public class Main {
 	public static void main(String[] args) throws IOException {
 
-		Properties prop = new Properties();
-
-		BufferedInputStream bis = new BufferedInputStream(new FileInputStream("runtime.properties"));
-
-		prop.load(bis);
-		bis.close();
-
 		
 		if (PropertyManager.getProperty("Hello")) {
 			System.out.print("Hello");
@@ -20,7 +13,6 @@ public class Main {
 
 		if (PropertyManager.getProperty("beautiful")) {
 			System.out.print(" beautiful");
-
 		}
 
 		if (PropertyManager.getProperty("wonderful")) {
@@ -29,7 +21,6 @@ public class Main {
 
 		if (PropertyManager.getProperty("World")) {
 			System.out.print(" World!");
-
 		}
 
 	}

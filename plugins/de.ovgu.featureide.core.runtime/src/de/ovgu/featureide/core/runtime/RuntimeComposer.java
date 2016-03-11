@@ -60,7 +60,7 @@ public class RuntimeComposer extends ComposerExtensionClass {
 		FileReader<Configuration> reader = new FileReader<>(configPath, configuration,
 				ConfigurationManager.getFormat(configPath));
 		reader.read();
-
+		
 		try (PrintWriter writer = new PrintWriter(new FileWriter(fileProp))) {
 			for (SelectableFeature f : configuration.getFeatures()) {
 				if (!f.getFeature().getStructure().isAbstract()) {

@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-   <extension
+	<extension
          point="de.ovgu.featureide.core.composers">
-      <composer
+		<composer
             class="de.ovgu.featureide.core.runtime.RuntimeComposer"
             description="Composer for Runtime Variability"
             id="de.ovgu.featureide.core.composer.runtime"
             name="Runtime Composer"
             nature="de.ovgu.featureide.core.composer.runtime">
-      </composer>
-   </extension>
-   <extension
+		</composer>
+	</extension>
+	<extension
          point="de.ovgu.featureide.core.wizard">
-      <newProjectWizard
+		<newProjectWizard
             class="de.ovgu.featureide.core.wizardextension.DefaultNewFeatureProjectWizardExtension"
             composerid="de.ovgu.featureide.core.composer.runtime"
             id="de.ovgu.featureide.core.runtime.newProjectWizard"
             name="Default">
-      </newProjectWizard>
-   </extension>
-<extension point = "org.eclipse.debug.core.launchConfigurationTypes">
+		</newProjectWizard>
+	</extension>
+	 <extension point = "org.eclipse.debug.core.launchConfigurationTypes">
    <launchConfigurationType
-         delegate="Del"
+         delegate="de.ovgu.featureide.core.runtime.RuntimeLaunchConfigurationDelegate"
          id="org.eclipse.jdt.launching.localJavaApplication"
          modes="run, debug"
-         name="myname"
+         name="Java Application"
          public="false"
          sourceLocatorId="org.eclipse.jdt.launching.sourceLocator.JavaSourceLookupDirector"
          sourcePathComputerId="org.eclipse.jdt.launching.sourceLookup.javaSourcePathComputer">
