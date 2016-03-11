@@ -309,7 +309,7 @@ public class FeatureModel implements IFeatureModel {
 	}
 
 	@Override
-	public Collection<IFeature> getFeatures() {
+	public Iterable<IFeature> getFeatures() {
 		return Collections.unmodifiableCollection(featureTable.values());
 	}
 

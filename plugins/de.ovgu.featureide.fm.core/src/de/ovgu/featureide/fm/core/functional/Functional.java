@@ -40,9 +40,24 @@ public abstract class Functional {
 
 	/**
 	 * Represents a function that takes one argument of type <b>T</b> and returns a result of type <b>R</b>.
+	 * <br/><br/>
+	 * <b>Example</b>
+	 * The following example shows a function which takes an integer and converts this integer to its string
+	 * representation (Java 1.8 syntax used).
+	 * <code>
+	 * <pre>
+	 * IFunction<Integer, String> toString = (integer) -> { integer.toString() };
+	 * String seven = toString(7); // seven.equals("7")
+	 * </pre>
+	 * </code>
+	 * 
+	 * @see Functional#map(Iterable, IFunction)
+	 * @see Functional#join(Iterable, String, IFunction)
+	 * @see Functional#join(Iterable, Object, IProvider, IFunction, IBinaryFunction)
+	 * @see Functional#equals(Object)
 	 * 
 	 * @author Marcus Pinnecke
-	 * @since 2.7.3
+	 * @since 3.0
 	 */
 	public static interface IFunction<T, R> {
 		R invoke(T t);
@@ -50,9 +65,24 @@ public abstract class Functional {
 
 	/**
 	 * Represents a function that takes two arguments of type <b>T</b> and <b>U</b>. It returns a result of type <b>R</b>.
+	 * <br/><br/>
+	 * <b>Example</b>
+	 * The following example shows a function which takes two integer and converts the sum of these to its string
+	 * representation (Java 1.8 syntax used).
+	 * <code>
+	 * <pre>
+	 * IBinaryFunction<Integer, Integer, String> toString = (a,b) -> { new Integer(a.intValue() + b.intValue()).toString() };
+	 * String seven = toString(2,5); // seven.equals("7")
+	 * </pre>
+	 * </code>
+	 * 
+	 * @see Functional#map(Iterable, IFunction)
+	 * @see Functional#join(Iterable, String, IFunction)
+	 * @see Functional#join(Iterable, Object, IProvider, IFunction, IBinaryFunction)
+	 * @see Functional#equals(Object)
 	 * 
 	 * @author Marcus Pinnecke
-	 * @since 2.7.3
+	 * @since 3.0
 	 */
 	public static interface IBinaryFunction<T, U, R> {
 		R invoke(T t, U u);
@@ -60,9 +90,23 @@ public abstract class Functional {
 
 	/**
 	 * Represents a function that takes one arguments of type <b>T</b> and returns a result of the same type.
+	 * <br/><br/>
+	 * <b>Example</b>
+	 * The following example shows a function which takes an integer and applied 2 times this integer (Java 1.8 syntax used).
+	 * <code>
+	 * <pre>
+	 * IdentityFunction<Integer> twoTimes = (integer) -> { integer.intValue() * 2 };
+	 * Integer value = twoTimes(7); // seven.equals("14")
+	 * </pre>
+	 * </code>
+	 * 
+	 * @see Functional#map(Iterable, IFunction)
+	 * @see Functional#join(Iterable, String, IFunction)
+	 * @see Functional#join(Iterable, Object, IProvider, IFunction, IBinaryFunction)
+	 * @see Functional#equals(Object)
 	 * 
 	 * @author Marcus Pinnecke
-	 * @since 2.7.3
+	 * @since 3.0
 	 */
 	public static class IdentityFunction<T> implements IFunction<T, T> {
 		@Override
@@ -75,7 +119,7 @@ public abstract class Functional {
 	 * Represents an operation that takes one arguments of type <b>T</b> and produces no result.
 	 * 
 	 * @author Marcus Pinnecke
-	 * @since 2.7.3
+	 * @since 3.0
 	 */
 	public static interface IConsumer<T> {
 		void invoke(T t);
@@ -85,7 +129,7 @@ public abstract class Functional {
 	 * Represents an operation that takes no arguments but produces a result of type <b>T</b>.
 	 * 
 	 * @author Marcus Pinnecke
-	 * @since 2.7.3
+	 * @since 3.0
 	 */
 	public static interface IProvider<T> {
 		T invoke();
@@ -120,7 +164,7 @@ public abstract class Functional {
 	 * collection of element is done in a lazy fashion. Furthermore, it is guaranteed no element from the iterator <i>i</i> is removed during this process.
 	 * 
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5
+	 * @since 3.0
 	 */
 	private static class MapIterator<U, T> implements Iterator<U>, Iterable<U> {
 
@@ -172,7 +216,7 @@ public abstract class Functional {
 	 * on the entire collection of element is done in a lazy fashion. Furthermore, it is guaranteed not to remove any element from the iterator <i>i</i>.
 	 * 
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5
+	 * @since 3.0
 	 */
 	private static class FilterIterator<U, T extends U> implements Iterator<T>, Iterable<T> {
 
@@ -189,12 +233,12 @@ public abstract class Functional {
 		 * on the entire collection of element is done in a lazy fashion. Furthermore, it is guaranteed not to remove any element from the iterator <i>i</i>.
 		 * 
 		 * @author Marcus Pinnecke
-		 * @since 2.7.5
+		 * @since 3.0
 		 */
 		public FilterIterator(Iterable<T> it, IFilter<U> filter) {
 			this(it.iterator(), filter);
 		}
-		
+
 		public FilterIterator(Iterator<T> it, IFilter<U> filter) {
 			assert (it != null);
 			assert (filter != null);
@@ -236,7 +280,9 @@ public abstract class Functional {
 	 * elements from <b>T</b> to <b>U</b>
 	 * using a user-defined {@link de.ovgu.featureide.fm.core.filter.base.IFilter Filter}.
 	 * This filtering is done in a lazy manner using iterator logic. Furthermore, it is guaranteed not to remove any element from the iterator <i>i</i>.
-	 * </br></br>It is assumed that <b>source</b> and </b>predicate</b> are non-null. <br/>
+	 * </br>
+	 * </br>
+	 * It is assumed that <b>source</b> and </b>predicate</b> are non-null. <br/>
 	 * <br/>
 	 * This is a <b>non-blocking</b> operation.
 	 * 
@@ -245,12 +291,12 @@ public abstract class Functional {
 	 * @return An iterable object that yields all qualified elements of </b>source</b>
 	 * 
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5
+	 * @since 3.0
 	 */
 	public static <U, T extends U> Iterable<T> filter(final Iterable<T> source, final IFilter<U> predicate) {
 		return new FilterIterator<U, T>(source, predicate);
 	}
-	
+
 	public static <U, T extends U> Iterable<T> filter(final Iterator<T> source, final IFilter<U> predicate) {
 		return new FilterIterator<U, T>(source, predicate);
 	}
@@ -259,7 +305,9 @@ public abstract class Functional {
 	 * Maps a user-defined {@link IFunction} that takes elements of type <b>T</b> and returns for each element a result of type <b>U</b> on each element of an
 	 * object named <b>source</b> that yields elements of type <b>T</b>.
 	 * This mapping process is done in a lazy manner using iterator logic. Furthermore, it is guaranteed not to remove any element from the iterator <i>i</i>.
-	 * </br></br>It is assumed that <b>source</b> and </b>function</b> are non-null. <br/>
+	 * </br>
+	 * </br>
+	 * It is assumed that <b>source</b> and </b>function</b> are non-null. <br/>
 	 * <br/>
 	 * This is a <b>non-blocking</b> operation.
 	 * 
@@ -268,7 +316,7 @@ public abstract class Functional {
 	 * @return An iterable object that yields all elements of <b>source</b> after applying <b>function</b>
 	 * 
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5
+	 * @since 3.0
 	 */
 	public static <U, T> Iterable<U> map(final Iterable<T> source, IFunction<T, U> function) {
 		return new MapIterator<U, T>(source, function);
@@ -284,7 +332,7 @@ public abstract class Functional {
 	 * @return An iterable object that yields all elements of <b>source</b> after invoking <code>toString</code> on them
 	 * 
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5
+	 * @since 3.0
 	 */
 	public static <T> Iterable<CharSequence> mapToString(final Iterable<T> source) {
 		return map(source, new ToCharSequenceFunction<T>());
@@ -301,7 +349,7 @@ public abstract class Functional {
 	 * @return A list of object that were yielded by <b>source</b>
 	 * 
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5
+	 * @since 3.0
 	 */
 	public static <T> List<T> toList(final Iterable<T> source) {
 		ArrayList<T> retval = new ArrayList<T>();
@@ -322,7 +370,7 @@ public abstract class Functional {
 	 * @return A list of object that were yielded by <b>source</b>
 	 * 
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5
+	 * @since 3.0
 	 */
 	public static <T> Set<T> toSet(final Iterable<T> source) {
 		HashSet<T> retval = new HashSet<T>();
@@ -333,7 +381,7 @@ public abstract class Functional {
 	}
 
 	/**
-	 * Converts the iterator <i>i</i> of type <b>T</b> into an list of <b>Strings</b> using {@link #mapToString(Iterable)} on <b>source</b> and finally
+	 * Converts the iterator <i>source</i> of type <b>T</b> into an list of <b>Strings</b> using {@link #mapToString(Iterable)} on <b>source</b> and finally
 	 * {@link #toList(Iterable)} on the result. <br/>
 	 * <br/>
 	 * It is guaranteed not to remove any element from the iterator. <br/>
@@ -344,16 +392,45 @@ public abstract class Functional {
 	 * @return A collection of strings that were yielded by <b>source</b>
 	 * 
 	 * @author Marcus Pinnecke
-	 * @since 2.7.5
+	 * @since 3.0
 	 */
 	public static <T> Collection<String> mapToStringList(final Iterable<T> source) {
 		return toList(map(source, new ToStringFunction<T>()));
 	}
 
+	/**
+	 * Converts the iterator <i>source</i> of type <b>T</b> into a collection of <b>CharSequence</b> using a binary function invoking {@link Object#toString()} on each
+	 * element in <b>source</b> and finally
+	 * {@link #toList(Iterable)} on the result. <br/>
+	 * <br/>
+	 * It is guaranteed not to remove any element from the iterator. <br/>
+	 * <br/>
+	 * This is a <b>blocking</b> operation.
+	 * 
+	 * @param source Source of elements
+	 * @return A collection of CharSequence that were yielded by <b>source</b>
+	 * 
+	 * @author Marcus Pinnecke
+	 * @since 3.0
+	 */
 	public static <T> Collection<CharSequence> mapToCharSequenceList(final Iterable<T> source) {
 		return toList(map(source, new ToCharSequenceFunction<T>()));
 	}
 
+	/**
+	 * Converts the enumeration <i>enumeration</i> of type <b>T</b> into an Iterable of <b>T</b>.
+	 * The enumeration is read into a intermediate collection which is then used to create the result value.
+	 * <br/>
+	 * It is guaranteed not to remove any element from the iterator. <br/>
+	 * <br/>
+	 * This is a <b>blocking</b> operation.
+	 * 
+	 * @param enumeration Enumeration of elements
+	 * @return An iterable of <b>T</b> that were yielded by <b>enumeration</b>
+	 * 
+	 * @author Marcus Pinnecke
+	 * @since 3.0
+	 */
 	public static <T> Iterable<T> toIterator(Enumeration<T> enumeration) {
 		final Collection<T> col = new ArrayList<T>();
 		while (enumeration.hasMoreElements())
@@ -367,6 +444,19 @@ public abstract class Functional {
 		};
 	}
 
+	/**
+	 * Converts the collection <i>collection</i> of type <b>T</b> into an Iterable of <b>T</b>.
+	 * <br/>
+	 * It is guaranteed not to remove any element from the iterator. <br/>
+	 * <br/>
+	 * <b>Note</b>: This is a <b>non-blocking</b> operation
+	 * 
+	 * @param Collection source
+	 * @return An iterable of <b>T</b> that were yielded by <b>collection</b>
+	 * 
+	 * @author Marcus Pinnecke
+	 * @since 3.0
+	 */
 	public static <T> Iterable<T> toIterator(final Collection<T> collection) {
 		return new Iterable<T>() {
 
@@ -377,6 +467,7 @@ public abstract class Functional {
 		};
 	}
 
+	
 	public static <T, R> R join(final Iterable<T> source, final R delimiter, final IProvider<R> newInstanceOfR, final IFunction<T, R> convert,
 			final IBinaryFunction<R, R, R> concat) {
 		R result = newInstanceOfR.invoke();
@@ -404,7 +495,7 @@ public abstract class Functional {
 		});
 	}
 
-	public static <T, U> boolean equals(final Iterable<T> lhs, final Iterable<T> rhs, final IFunction<T,U> map) {
+	public static <T, U> boolean equals(final Iterable<T> lhs, final Iterable<T> rhs, final IFunction<T, U> map) {
 		final Set<U> left = Functional.toSet(Functional.map(lhs, map));
 		final Set<U> right = Functional.toSet(Functional.map(rhs, map));
 		return left.equals(right);

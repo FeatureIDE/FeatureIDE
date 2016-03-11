@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.core.base;
 import java.io.File;
 import java.util.Collection;
 import java.util.Hashtable;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -36,6 +37,7 @@ import de.ovgu.featureide.fm.core.base.event.IEventManager;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
+import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
  * The feature model interface represents any class that acts in the sense of a <i>feature model</i> in FeatureIDE.
@@ -452,7 +454,38 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	Collection<String> getFeatureOrderList();
 
 	/**
+	 * Returns the a read-only iterable collection of features stored in this feature model.
+	 * This method is intend to provide the iteration-concept directly. <br/><br/>
+	 * <b>Example</b>
+	 * <code>
+	 * <pre>
+	 * for (IFeature feature : featureModel.getFeatures()) {
+	 * 		// ...
+	 * }
+	 * </pre>
+	 * </code>
+	 * If a list interface is required rather than the iterable counterpart, the utility class
+	 * {@link Functional} provides a set of useful methods. To convert the iterator directly into a
+	 * list, use {@link Functional#toList(Iterable)}. By using methods from the {@link Functional} utility class
+	 * the advantages of a functional-like programming style can be directly used. For instance, to convert
+	 * the collection of features inside a feature model into a set of feature names, the following
+	 * code snippet can be used:
+	 * <code>
+	 * <pre>
+	 * import static de.ovgu.featureide.fm.core.functional.Functional.*;
 	 * 
+	 * Set<String> featureNames = new HashSet<>(toList(mapToString(fm.getFeatures())))
+	 * </pre>
+	 * </code> 
+	 * If modification is required, use the related 
+	 * constructor for collection implementations, e.g., 
+	 * <br/>
+	 * <code><pre>List<IFeature> list = new LinkedList<IFeature>(Functional.toList(fm.getFeatures()));</pre></code>
+	 * <br/>
+	 * <b>Note</b>: Many operations of features in feature models runs over iteration. This method returns
+	 * an iterator rather than a collection for <i>lazy evaluation</i> purposes.
+	 * <br/>
+	 * @see Functional FeatureIDE functional helper class
 	 * @see #addFeature(IFeature)
 	 * @see #deleteFeature(IFeature)
 	 * @see #getFeature(CharSequence)
