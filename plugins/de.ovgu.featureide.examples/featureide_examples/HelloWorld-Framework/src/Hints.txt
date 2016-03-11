@@ -1,0 +1,21 @@
+*** HINTS ***********************************************
+>> Classes inside JARs
+*********************************************************
+
+
+=== Beautiful.jar =======================================
+>> Adjective.java
+>> Beautiful.java (extends Adjective, implements Print)
+
+=== Chaotic.jar =========================================
+>> Chaotic.java (implements Announce)
+
+=== Hello.jar ===========================================
+>> Hello.java (implements Print, Announce)
+>> Hi.java (implements Print)
+
+=== World.jar ===========================================
+>> World.java (implements Print)
+
+=== FantasyWorld.jar ====================================
+>> FantasyWorld.java (implements Print)
