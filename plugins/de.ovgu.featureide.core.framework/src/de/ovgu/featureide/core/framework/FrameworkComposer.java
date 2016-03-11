@@ -43,6 +43,11 @@ public class FrameworkComposer extends ComposerExtensionClass {
 	public Mechanism getGenerationMechanism() {
 		return null;
 	}
+	
+	@Override
+	public void copyNotComposedFiles(Configuration c, IFolder destination) {
+		/** Should do nothing, otherwise will copy jar files to src folder **/
+	}
 
 	@Override
 	public void performFullBuild(IFile config) {
@@ -198,7 +203,7 @@ public class FrameworkComposer extends ComposerExtensionClass {
 				FrameworkCorePlugin.getDefault().logError(e);
 			}
 		}
-		IFile file = folderLoader.getFile("PluginLoader.txt");
+		IFile file = folderLoader.getFile("PluginLoader.java");
 		if (!file.exists()) {
 			try {
 				file.create(inputStream, true, null);

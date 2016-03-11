@@ -3,6 +3,7 @@ package loader;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -22,7 +23,7 @@ public class PluginLoader {
 		// load content of config
 		List<String> features = null;
 		try {
-			features = Files.readAllLines(Paths.get("config.txt"), Charset.defaultCharset());
+			features = Files.readAllLines(Paths.get("src"+FileSystems.getDefault().getSeparator()+"config.txt"), Charset.defaultCharset());
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.out.println("Feature Exception");
