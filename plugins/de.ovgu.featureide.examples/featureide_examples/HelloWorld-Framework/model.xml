@@ -16,16 +16,21 @@
 						</description>
 					</feature>
 				</and>
-				<feature name="Beautiful">
+				<alt abstract="true" name="Adjective">
 					<description>
 						
 					</description>
-				</feature>
-				<feature name="Chaotic">
-					<description>
-						
-					</description>
-				</feature>
+					<feature mandatory="true" name="Beautiful">
+						<description>
+							
+						</description>
+					</feature>
+					<feature mandatory="true" name="Chaotic">
+						<description>
+							
+						</description>
+					</feature>
+				</alt>
 			</and>
 		</struct>
 		<constraints/>
