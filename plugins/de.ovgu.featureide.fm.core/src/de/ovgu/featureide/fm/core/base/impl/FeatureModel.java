@@ -414,6 +414,8 @@ public class FeatureModel implements IFeatureModel {
 
 	@Override
 	public void replaceConstraint(IConstraint constraint, int index) {
+		if (constraint == null)
+			throw new NullPointerException();
 		constraints.set(index, constraint);
 	}
 

@@ -33,7 +33,9 @@ import de.ovgu.featureide.fm.core.FMComposerManager;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.IFMComposerExtension;
 import de.ovgu.featureide.fm.core.RenamingsManager;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.IEventManager;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
@@ -282,8 +284,8 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * @param projectName the name for the root feature, if this feature model does not contain any features. Otherwise this parameter will be ignored. If
 	 *            <code>projectName</code> is an empty string, the string <code>"Root"</code> will be used for the potential new root feature. The parameter
 	 *            <code>projectName</code> is assumed to be <i>non-null</i>
-	 *            
-	 * @see #reset()           
+	 * 
+	 * @see #reset()
 	 * 
 	 * @since 3.0
 	 */
@@ -455,7 +457,8 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 
 	/**
 	 * Returns the a read-only iterable collection of features stored in this feature model.
-	 * This method is intend to provide the iteration-concept directly. <br/><br/>
+	 * This method is intend to provide the iteration-concept directly. <br/>
+	 * <br/>
 	 * <b>Example</b>
 	 * <code>
 	 * <pre>
@@ -476,15 +479,16 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * 
 	 * Set<String> featureNames = new HashSet<>(toList(mapToString(fm.getFeatures())))
 	 * </pre>
-	 * </code> 
-	 * If modification is required, use the related 
-	 * constructor for collection implementations, e.g., 
+	 * </code>
+	 * If modification is required, use the related
+	 * constructor for collection implementations, e.g.,
 	 * <br/>
 	 * <code><pre>List<IFeature> list = new LinkedList<IFeature>(Functional.toList(fm.getFeatures()));</pre></code>
 	 * <br/>
 	 * <b>Note</b>: Many operations of features in feature models runs over iteration. This method returns
 	 * an iterator rather than a collection for <i>lazy evaluation</i> purposes.
 	 * <br/>
+	 * 
 	 * @see Functional FeatureIDE functional helper class
 	 * @see #addFeature(IFeature)
 	 * @see #deleteFeature(IFeature)
@@ -499,23 +503,22 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	Iterable<IFeature> getFeatures();
 
 	/**
-	 * 
 	 * @since 3.0
 	 * 
-	 * @return
+	 * @return Returns the instance of {@link IFMComposerExtension} of the underlying {@link FMComposerManager} of this feature model.
 	 */
 	IFMComposerExtension getFMComposerExtension();
 
 	/**
-	 * 
 	 * @since 3.0
 	 * 
 	 * @param project
-	 * @return
+	 * @return Returns the instance of the underlying {@link FMComposerManager} of this feature model.
 	 */
 	FMComposerManager getFMComposerManager(final IProject project);
 
 	/**
+	 * Returns the number of features stored in this feature model. This call must be constistent with {@link IFeatureModel#getFeatureTable()} size.
 	 * 
 	 * @see #addFeature(IFeature)
 	 * @see #deleteFeature(IFeature)
@@ -523,67 +526,79 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * @see #getFeatures()
 	 * @see #reset()
 	 * 
-	 * @return
+	 * @since 3.0
+	 * 
+	 * @return number of feature stored in this model
 	 */
 	int getNumberOfFeatures();
 
 	/**
-	 * 
-	 * 
+	 * Returns the model properties attached to this feature model. These properties contain at least
+	 * <ul>
+	 * <li>Annotations</li>
+	 * <li>Comments</li>
+	 * <li>The feature order specification</li>
+	 * </ul>
+	 * The properties returned by this model is implementation specific and might contain additional properties (see {@link IFeatureModelProperty}).
 	 * 
 	 * @since 3.0
 	 * 
-	 * @return
+	 * @return feature model properties
 	 */
 	IFeatureModelProperty getProperty();
 
-	
 	/**
-	 * 
 	 * @since 3.0
 	 * 
-	 * @return
+	 * @return Returns an instance of {@link RenamingsManager} which is bound to this feature model.
 	 */
 	RenamingsManager getRenamingsManager();
 
 	/**
+	 * Returns the feature models {@link IFeatureModelStructure} instance. In this features can be received in preorder, and further structural properties can
+	 * be get. For instance, the structure holds information if alternative groups are contained, or the number of or-groups in total. For more information, see
+	 * {@link IFeatureModelStructure}.
 	 * 
 	 * @since 3.0
 	 * 
-	 * @return
+	 * @return This feature model's structure
 	 */
 	IFeatureModelStructure getStructure();
 
 	/**
+	 * Fires the the event {@link FeatureIDEEvent.EventType#MODEL_DATA_CHANGED} to listeners.
 	 * 
 	 * @since 3.0
 	 */
 	void handleModelDataChanged();
 
 	/**
+	 * Fires the the event {@link FeatureIDEEvent.EventType#MODEL_DATA_LOADED} to listeners.
 	 * 
 	 * @since 3.0
 	 */
 	void handleModelDataLoaded();
 
 	/**
-	 * 
 	 * @since 3.0
 	 * 
 	 * @param project
-	 * @return
+	 * @return Returns {@link #getFMComposerManager(IProject)} with the parameter <code>project</code>
 	 */
 	IFMComposerExtension initFMComposerExtension(final IProject project);
 
 	/**
-	 * 
 	 * @since 3.0
 	 * 
-	 * @return
+	 * @see #setFeatureOrderUserDefined(boolean)
+	 * 
+	 * @return Returns if a user defined order for features in this model is used.
 	 */
 	boolean isFeatureOrderUserDefined();
 
 	/**
+	 * Removes the first occurrence of <code>constraint</code> from the collection of constraints in this model,
+	 * if it is present. Otherwise there is no effect to this model.
 	 * 
 	 * @see #addConstraint(IConstraint)
 	 * @see #addConstraint(IConstraint, int)
@@ -597,11 +612,13 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * 
 	 * @since 3.0
 	 * 
-	 * @param constraint
+	 * @param constraint The constraint to be removed
 	 */
 	void removeConstraint(IConstraint constraint);
 
 	/**
+	 * Removes the constraint at the specified position <code>index</code> in this collection of constraints in this model.
+	 * When a constraint was removed, the remaining constraints to the right are shifted one position to the left.
 	 * 
 	 * @see #addConstraint(IConstraint)
 	 * @see #addConstraint(IConstraint, int)
@@ -613,13 +630,16 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * @see #setConstraints(Iterable)
 	 * @see #replaceConstraint(IConstraint, int)
 	 * 
+	 * @throws IndexOutOfBoundsException If the index is out of range
 	 * @since 3.0
 	 * 
-	 * @param index
+	 * @param index position of the constraint to be removed
 	 */
 	void removeConstraint(int index);
 
 	/**
+	 * Replaces the constraint <code>constraint</code> at the specified position <code>index</code> in the collection of constraints of this feature model.
+	 * 
 	 * @see #addConstraint(IConstraint)
 	 * @see #addConstraint(IConstraint, int)
 	 * @see #getConstraintCount()
@@ -630,15 +650,21 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * @see #setConstraint(int, Constraint)
 	 * @see #setConstraints(Iterable)
 	 * 
+	 * @throws NullPointerException if <code>constraint</code> is <b>null</b>
+	 * @throws IndexOutOfBoundsException if the index is out of range
+	 * 
 	 * @since 3.0
 	 * 
-	 * @param constraint
-	 * @param index
+	 * @param constraint constraint which should be stored at <code>index</code>
+	 * @param index position for replacement
 	 */
 	void replaceConstraint(IConstraint constraint, int index);
 
 	/**
-	 * 
+	 * Set the feature models structure root element to <b>null</b> and clears the collections of features and constraints. Moreover, the feature order list is
+	 * cleared and all properties. The next unique element identifier is also reseted to <b>0</b>, such that {@link IFeatureModel#getNextElementId()} will
+	 * return <b>0</b>.
+	 *
 	 * @see #deleteFeature(IFeature)
 	 * @see #removeConstraint(int)
 	 * @see #removeConstraint(IConstraint)
@@ -649,6 +675,8 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	void reset();
 
 	/**
+	 * Sets the collections of constraints to the ones yielded by <code>constraints</code>. Existing constraint in the collection will be removed before this
+	 * operation.
 	 * 
 	 * @see #addConstraint(IConstraint)
 	 * @see #addConstraint(IConstraint, int)
@@ -660,31 +688,37 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * @see #setConstraint(int, Constraint)
 	 * @see #replaceConstraint(IConstraint, int)
 	 * 
-	 * @param constraints
+	 * @param constraints Source of constraints which should be copied into this feature model
 	 * 
 	 * @since 3.0
 	 */
 	void setConstraints(final Iterable<IConstraint> constraints);
 
 	/**
+	 * Sets the list of feature names for ordering purposed to the content provided by <code>featureOrderList</code>. Existing ordering will be removed before
+	 * this operation is executed. There is no check if the feature names provided by <code>featureOrderList</code> actually reflects names of features stored
+	 * in this model. <br/>
+	 * <br/>
+	 * The order of strings provided in <code>featureOrderList</code> provide the order of feature names.
 	 * 
 	 * @see #getFeatureOrderList()
 	 * @see #setFeatureOrderListItem(int, String)
 	 * @see #setFeatureOrderUserDefined(boolean)
 	 * 
-	 * @param featureOrderList
+	 * @param featureOrderList the orderd list of feature names which provides the feature order. This parameter is assumed to be <i>non-null</i>
 	 * 
 	 * @since 3.0
 	 */
 	void setFeatureOrderList(final List<String> featureOrderList);
 
 	/**
+	 * Sets a flag that specificities if the feature order in this feature model user defined or not.
 	 * 
 	 * @see #getFeatureOrderList()
 	 * @see #setFeatureOrderList(List)
 	 * @see #setFeatureOrderListItem(int, String)
 	 * 
-	 * @param featureOrderUserDefined
+	 * @param featureOrderUserDefined flag to indicate user defined ordering
 	 * 
 	 * @since 3.0
 	 */
@@ -712,7 +746,6 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 */
 	Map<String, IFeature> getFeatureTable();
 
-	
 	/**
 	 * 
 	 * @since 3.0
@@ -721,7 +754,6 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 */
 	IFeatureModel clone();
 
-	
 	/**
 	 * 
 	 * 
@@ -731,7 +763,6 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 */
 	Object getUndoContext();
 
-	
 	/**
 	 * 
 	 * 

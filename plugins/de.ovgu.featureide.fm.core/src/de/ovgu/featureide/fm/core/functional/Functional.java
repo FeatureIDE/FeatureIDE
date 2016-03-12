@@ -566,7 +566,10 @@ public abstract class Functional {
 	 * @param newInstanceOfR Constructs a new instance of type <b>R</b> each time it is invoked
 	 * @param convert A function which converts an object of type <b>T</b> to type <b>R</b>
 	 * @param concat A binary function which takes two objects of type <b>T</b> and concats them to a single object using the delimiter <code>delimiter</code>.
-	 * @return
+	 * @return Joined version of <code>source</code> using <code>delimiter</code>
+	 * 
+	 * @author Marcus Pinnecke
+	 * @since 3.0
 	 */
 	public static <T, R> R join(final Iterable<T> source, final R delimiter, final IProvider<R> newInstanceOfR, final IFunction<T, R> convert,
 			final IBinaryFunction<R, R, R> concat) {
@@ -658,6 +661,9 @@ public abstract class Functional {
 	 * @param map Converts elements from <b>T</b> to <b>U</b>
 	 * @return <b>true</b> if the elements in <code>lhs</code> are also in <b>rhs</b> and vice versa, otherwise <b>false</b>.<br/><u><b>Note on duplicates</b></u>: Duplicates in both
 	 *         <code>lhs</code> and <code>rhs</code> are eliminated <u>before</u> the test of equality.
+	 *         
+	 * @author Marcus Pinnecke
+	 * @since 3.0
 	 */
 	public static <T, U> boolean equals(final Iterable<T> lhs, final Iterable<T> rhs, final IFunction<T, U> map) {
 		final Set<U> left = Functional.toSet(Functional.map(lhs, map));
