@@ -39,6 +39,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.FeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.ModelFileIdMap;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
@@ -725,54 +726,94 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	void setFeatureOrderUserDefined(boolean featureOrderUserDefined);
 
 	/**
+	 * Overwrites the contents of the <i>feature table</i> with the given <code>featureTable</code>.
+	 * The existing feature table will be cleared and each element in <code>featureTable</code> will
+	 * be inserted in the feature model's underlying feature table. There is no check, if the the
+	 * mapping of features names to features in <code>featureTable</code> is consistent. Moreover,
+	 * there is no check if the feature names in <code>featureTable</code> corresponds to the
+	 * feature names in this feature model. Therefore, overwriting the contents of the feature table
+	 * by this function might lead to unexpected behavior, when not used correctly.
 	 * 
 	 * @see #deleteFeatureFromTable(IFeature)
 	 * @see #getFeatureTable()
 	 * 
-	 * @param featureTable
+	 * @param featureTable New feature table for this feature model. This parameter is assumed to be <i>non-null</i>
 	 * 
 	 * @since 3.0
 	 */
 	void setFeatureTable(final Hashtable<String, IFeature> featureTable);
 
 	/**
-	 * 
 	 * @see #setFeatureTable(Hashtable)
 	 * @see #deleteFeatureFromTable(IFeature)
 	 * 
-	 * @return
+	 * @return Returns this feature model's underlying <i>feature table</i> as an <b>unmodifiable map</b>.
 	 * 
 	 * @since 3.0
 	 */
 	Map<String, IFeature> getFeatureTable();
 
 	/**
+	 * Clones this feature model <code>f</code> to a new instance of feature model <code>f'</code>, such that
+	 * <code>f != f'</code> and <code>f.equals(f')</code> holds. More in detail:
+	 * <ul>
+	 * <li>Both feature model's unique identifiers are equal</li>
+	 * <li>Both feature order lists are equal but their references aren't identical</li>
+	 * <li>Both feature order lists user defined order flag is equal</li>
+	 * <li>Both feature order lists property and structure are equal, but their references aren't identical</li>
+	 * <li>Both feature model's source files are equal but their references aren't identical</li>
+	 * <li>Both feature model's feature structure (including their constraints) are equal but their references aren't identical</li>
+	 * <li>The feature model <code>f'</code>' feature model analyzer instance is a <i>new</i> instance</li>
+	 * </ul>
 	 * 
 	 * @since 3.0
 	 * 
-	 * @return
+	 * @see #getId()
+	 * @see #getFeatureOrderList()
+	 * @see #isFeatureOrderUserDefined()
+	 * @see #getStructure()
+	 * @see #getProperty()
+	 * @see #getSourceFile()
+	 * @see #getStructure()
+	 * @see #getConstraints()
+	 * @see #getAnalyser()
+	 * @see #equals(Object)
+	 * 
+	 * @return cloned instance of this model, such that the new instance is equal to this feature model but their references aren't identical
 	 */
 	IFeatureModel clone();
 
 	/**
-	 * 
+	 * Returns the modifiable undo-context of this feature model. To undo-context enables undoing of actions
+	 * performed to this feature model, such as renaming or feature removing over the user interface. The
+	 * undo context is intended to work streamlessly with the eclipse framework used, e.g., in the {@link de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor
+	 * feature model diagram editor}.
 	 * 
 	 * @since 3.0
 	 * 
-	 * @return
+	 * @see #setUndoContext(Object)
+	 * 
+	 * @return undo-context of this feature model
 	 */
 	Object getUndoContext();
 
 	/**
-	 * 
+	 * Sets the modifiable undo-context of this feature model. To undo-context enables undoing of actions
+	 * performed to this feature model, such as renaming or feature removing over the user interface. The
+	 * undo context is intended to work streamlessly with the eclipse framework used, e.g., in the {@link de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor
+	 * feature model diagram editor}.
 	 * 
 	 * @since 3.0
+	 * 
+	 * @see #getUndoContext()
 	 * 
 	 * @param undoContext
 	 */
 	void setUndoContext(Object undoContext);
 
 	/**
+	 * Replaces the feature order item at the specified position <code>i</code> in this feature model's feature
+	 * order list with the specified element <code>newName</code>.
 	 * 
 	 * @see #getFeatureOrderList()
 	 * @see #setFeatureOrderList(List)
@@ -780,42 +821,81 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * 
 	 * @since 3.0
 	 * 
-	 * @param i
-	 * @param newName
+	 * @throws IndexOutOfBoundsException if the index is out of range
+	 * 
+	 * @param i  index of the element to replace
+	 * @param newName new name to be stored at the specified position
 	 */
 	void setFeatureOrderListItem(int i, String newName);
 
 	/**
+	 * Set the feature models source file to <code>file</code>. By definition, the feature model's
+	 * unique identifier is bidirectional mapped to the source files. Therefore, two feature model's
+	 * based on the same file must have to same unique identifier. The feature model's identifier will
+	 * not be changed, if <code>file</code> is <b>null</b>.
+	 * <br/><br/>
+	 * The default implementation provides this mechanism by using {@link ModelFileIdMap}, such that:
+	 * <code>
+	 * <pre>
+	 *	this.sourceFile = file;
+	 *	if (file != null) {
+	 *		id = ModelFileIdMap.getModelId(this, file);
+	 *	}
+	 * </pre>
+	 * </code> 
+	 * <b>Note</b>: The specification does not require to reload the content of this feature model, 
+	 * when the source file is changes. Hence, using this method only will affect the return value
+	 * of {@link #getSourceFile()} and perhaps {@link #getId()}. However, it is not intended to
+	 * notify listeners about this change.
 	 * 
 	 * @see #getSourceFile()
 	 * 
 	 * @since 3.0
 	 * 
-	 * @param file
+	 * @param file the source file of this model (might be <b>null</b>.
 	 */
 	void setSourceFile(File file);
 
 	/**
-	 * 
 	 * @see #setSourceFile(File)
 	 * 
 	 * @since 3.0
 	 * 
-	 * @return
+	 * @return Returns the feature models current source file, or <b>null</b> if no source file is specified.
 	 */
 	File getSourceFile();
 
 	/**
+	 * Feature models are identified with their system-wide unique numeric
+	 * identifier. This methods returns the <i>next</i> free identifier of the current feature model and
+	 * is a <b>state-full</b> operation, such that invoking the method twice will result in two other
+	 * numeric identifiers. 
+	 * <br/>
+	 * <br/>
+	 * The default implementations provides this by the following code snippet:
+	 * <code>
+	 * <pre>
+	 * private static long NEXT_ID = 0;
+	 * 
+	 * protected static final synchronized long getNextId() {
+	 * 	return NEXT_ID++;
+	 * }
+	 * </pre>
+	 * </code>
+	 * <b>Notes to thread-safe execution</b>: The management of receiving the next free identifier must
+	 * be thread-safe.
 	 * 
 	 * @see #getId()
 	 * 
 	 * @since 3.0
 	 * 
-	 * @return
+	 * @return the next free system-wide unique identifier for feature models
 	 */
 	long getNextElementId();
 
 	/**
+	 * Overwrites the constraint stored in this feature model at position <code>index</code> with the
+	 * constraint provided by the parameter <code>constraint</code>.  
 	 * 
 	 * @see #addConstraint(IConstraint)
 	 * @see #addConstraint(IConstraint, int)
@@ -829,8 +909,10 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * 
 	 * @since 3.0
 	 * 
-	 * @param index
-	 * @param constraint
+	 * @throws IndexOutOfBoundsException if the index is out of range 
+	 * 
+	 * @param index index of the constraint to replace
+	 * @param constraint constraint to be stored at the specified position
 	 */
 	void setConstraint(int index, Constraint constraint);
 
