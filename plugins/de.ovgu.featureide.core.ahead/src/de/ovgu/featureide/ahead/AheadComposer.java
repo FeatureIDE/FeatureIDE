@@ -434,8 +434,8 @@ public class AheadComposer extends ComposerExtensionClass {
 	}
 
 	@Override
-	public boolean hasCompositionMechanisms() {
-		return true;
+	public String[] getCompositionMechanisms() {
+		return new String[]{"Mixin", "Jampack"};
 	}
 
 	@Override
