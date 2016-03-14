@@ -20,8 +20,8 @@
             name="Default">
 		</newProjectWizard>
 	</extension>
-	 <extension point = "org.eclipse.debug.core.launchConfigurationTypes">
-   <launchConfigurationType
+	<extension point = "org.eclipse.debug.core.launchConfigurationTypes">
+		<launchConfigurationType
          delegate="de.ovgu.featureide.core.runtime.RuntimeLaunchConfigurationDelegate"
          id="org.eclipse.jdt.launching.localJavaApplication"
          modes="run, debug"
@@ -29,6 +29,6 @@
          public="false"
          sourceLocatorId="org.eclipse.jdt.launching.sourceLocator.JavaSourceLookupDirector"
          sourcePathComputerId="org.eclipse.jdt.launching.sourceLookup.javaSourcePathComputer">
-   </launchConfigurationType>
-</extension>
+		</launchConfigurationType>
+	</extension>
 </plugin>

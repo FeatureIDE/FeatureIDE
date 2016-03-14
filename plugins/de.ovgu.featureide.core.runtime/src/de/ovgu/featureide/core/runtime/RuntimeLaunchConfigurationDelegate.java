@@ -3,6 +3,7 @@ package de.ovgu.featureide.core.runtime;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
@@ -19,15 +20,25 @@ import de.ovgu.featureide.fm.core.io.manager.FileReader;
 
 public class RuntimeLaunchConfigurationDelegate implements ILaunchConfigurationDelegate {
 
+	private final static String id="de.ovgu.featureide.core.composer.runtime";
+	
 	public void launch(ILaunchConfiguration configuration, String mode, ILaunch launch, IProgressMonitor monitor)
 			throws CoreException {
+		
+		
 
 		ILaunchConfigurationWorkingCopy configCopy = configuration.getWorkingCopy();
+		IFeatureProject featureProject = null;
 
 		if (configCopy.getMappedResources().length == 1) {
-			IFeatureProject featureProject = CorePlugin
-					.getFeatureProject(configCopy.getMappedResources()[0].getProject());
+			featureProject = CorePlugin.getFeatureProject(configCopy.getMappedResources()[0]);
+			
+		}
 
+		if (featureProject != null && featureProject.getComposerID().equals(id)
+				&& RuntimeComposer.COMPOSITION_MECHANISMS[0].equals(featureProject.getCompositionMechanism())) {
+			System.out.println("Comp: " + featureProject.getCompositionMechanism());
+			
 			final Configuration c = new Configuration(featureProject.getFeatureModel());
 
 			String userDefinedArgs = configCopy.getAttribute(IJavaLaunchConfigurationConstants.ATTR_PROGRAM_ARGUMENTS,
@@ -54,7 +65,7 @@ public class RuntimeLaunchConfigurationDelegate implements ILaunchConfigurationD
 			configCopy.setAttribute(IJavaLaunchConfigurationConstants.ATTR_PROGRAM_ARGUMENTS, userDefinedArgs);
 
 			configuration = configCopy.doSave();
-			
+
 		} else {
 			new org.eclipse.jdt.launching.JavaLaunchDelegate().launch(configCopy, mode, launch, monitor);
 
