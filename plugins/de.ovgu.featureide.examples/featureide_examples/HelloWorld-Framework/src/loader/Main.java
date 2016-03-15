@@ -13,9 +13,9 @@ public class Main {
 		for(Print p : printingClasses){
 			p.print();
 		}
+		System.out.println();
 		for(Announce a : announcingClasses){
 			a.announce();
-			System.out.println(a.alertNumber());
 		}
 	}
 }

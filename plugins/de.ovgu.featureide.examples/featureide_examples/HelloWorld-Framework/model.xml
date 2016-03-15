@@ -2,21 +2,16 @@
 	<featureModel>
 		<properties/>
 		<struct>
-			<and abstract="true" mandatory="true" name="HelloWorldFramework">
+			<and abstract="true" mandatory="true" name="HelloWorld">
 				<description>
 					
 				</description>
-				<and name="Hello">
+				<feature name="Hello">
 					<description>
 						
 					</description>
-					<feature name="World">
-						<description>
-							
-						</description>
-					</feature>
-				</and>
-				<alt abstract="true" name="Adjective">
+				</feature>
+				<alt abstract="true" name="Feature">
 					<description>
 						
 					</description>
@@ -25,12 +20,17 @@
 							
 						</description>
 					</feature>
-					<feature mandatory="true" name="Chaotic">
+					<feature mandatory="true" name="Wonderful">
 						<description>
 							
 						</description>
 					</feature>
 				</alt>
+				<feature name="World">
+					<description>
+						
+					</description>
+				</feature>
 			</and>
 		</struct>
 		<constraints/>
