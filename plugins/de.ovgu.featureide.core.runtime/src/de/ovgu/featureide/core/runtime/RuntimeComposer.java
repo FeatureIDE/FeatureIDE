@@ -5,12 +5,31 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IMember;
+import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.search.IJavaSearchScope;
+import org.eclipse.jdt.core.search.SearchEngine;
+import org.eclipse.jdt.internal.corext.callhierarchy.CallHierarchy;
+import org.eclipse.jdt.internal.corext.callhierarchy.CallLocation;
+import org.eclipse.jdt.internal.corext.callhierarchy.MethodCall;
+import org.eclipse.jdt.internal.corext.callhierarchy.MethodWrapper;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
@@ -31,8 +50,29 @@ import de.ovgu.featureide.fm.core.io.manager.FileReader;
  * @author Kai Wolf
  *
  */
-
+@SuppressWarnings("restriction")
 public class RuntimeComposer extends ComposerExtensionClass {
+
+	private static class MethodLocation {
+
+		String strClass;
+		
+		CallLocation[] callLocations;
+
+		public MethodLocation(String strClass, CallLocation[] callLocations) {
+			this.callLocations = callLocations;
+			this.strClass = strClass;
+		}
+
+		public CallLocation[] getCallLocations() {
+			return callLocations;
+		}
+
+		public String getStrClass() {
+			return strClass;
+		}
+
+	}
 
 	static final String[] COMPOSITION_MECHANISMS = new String[] { "Run Configuration", "Properties" };
 
@@ -45,10 +85,71 @@ public class RuntimeComposer extends ComposerExtensionClass {
 	 * Every time the project is built, the config will be read and written into
 	 * runtime.properties.
 	 */
+	public static void getCallersOf(IMethod m) {
+
+		// CallHierarchy callHierarchy = CallHierarchy.getDefault();
+		CallHierarchy callHierarchy = new CallHierarchy();
+		IJavaSearchScope scope = SearchEngine.createWorkspaceScope();
+		callHierarchy.setSearchScope(scope);
+
+		IMember[] members = { m };
+		ArrayList<MethodCall> methodCalls = new ArrayList<MethodCall>();
+
+		MethodWrapper[] callerWrapper = callHierarchy.getCallerRoots(members);
+
+		ArrayList<MethodWrapper> callsWrapper = new ArrayList<MethodWrapper>();
+		for (int i = 0; i < callerWrapper.length; i++) {
+			callsWrapper.addAll(Arrays.asList(callerWrapper[i].getCalls(new NullProgressMonitor())));
+		}
+
+		for (int i = 0; i < callsWrapper.size(); i++) {
+			methodCalls.add(callsWrapper.get(i).getMethodCall());
+		}
+
+		ArrayList<MethodLocation> callList = new ArrayList<MethodLocation>();
+
+		MethodLocation methodLoc;
+
+		for (int i = 0; i < methodCalls.size(); i++) {
+
+			CallLocation[] callArray = new CallLocation[methodCalls.get(i).getCallLocations().size()];
+			methodCalls.get(i).getCallLocations().toArray(callArray);
+			methodLoc = new MethodLocation(methodCalls.get(i).getMember().getParent().getElementName(), callArray);
+			callList.add(methodLoc);
+
+		}
+
+		for (int i = 0; i < callList.size(); i++) {
+
+			for (int j = 0; j < callList.get(i).getCallLocations().length; j++) {
+
+				System.out.println("Klasse: " + callList.get(i).getStrClass() + " Line: "
+						+ callList.get(i).getCallLocations()[j].getLineNumber() + " Calltext: "
+						+ callList.get(i).getCallLocations()[j].getCallText());
+
+			}
+		}
+
+	}
+
 	@Override
 	public void performFullBuild(IFile config) {
 
 		IFile fileProp = featureProject.getProject().getFile("runtime.properties");
+
+		IJavaProject proj = JavaCore.create(featureProject.getProject());
+
+		try {
+
+			IType itype = proj.findType("PropertyManager");
+			IMethod method = itype.getMethods()[1];// itype.getMethod("getProperty",
+													// new String[] {"String"});
+
+			getCallersOf(method);
+
+		} catch (JavaModelException e1) {
+			e1.printStackTrace();
+		}
 
 		if (COMPOSITION_MECHANISMS[1].equals(featureProject.getCompositionMechanism())) {
 

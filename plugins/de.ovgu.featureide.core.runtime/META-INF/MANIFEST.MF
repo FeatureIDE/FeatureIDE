@@ -11,7 +11,10 @@ Require-Bundle: de.ovgu.featureide.core,
  org.eclipse.ui.workbench,
  org.eclipse.debug.core,
  org.eclipse.debug.ui,
- org.eclipse.jdt.launching
+ org.eclipse.jdt.launching,
+ org.eclipse.jdt.core
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: University of Magdeburg
 Bundle-Activator: de.ovgu.featureide.core.runtime.activator.RuntimeCorePlugin
+Import-Package: org.eclipse.jdt.core,
+ org.eclipse.jdt.internal.corext.callhierarchy
