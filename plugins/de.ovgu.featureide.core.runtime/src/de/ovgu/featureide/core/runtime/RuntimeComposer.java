@@ -23,7 +23,9 @@ import de.ovgu.featureide.fm.core.io.manager.FileReader;
 
 /**
  * 
- * RuntimeComposer creates .property-file from actual configuration.
+ * RuntimeComposer creates .property-file from actual configuration or writes
+ * arguments from .config file into the program arguments of Eclipse Run
+ * Configuration.
  * 
  * @author Matthias Quaas
  * @author Kai Wolf
@@ -32,13 +34,10 @@ import de.ovgu.featureide.fm.core.io.manager.FileReader;
 
 public class RuntimeComposer extends ComposerExtensionClass {
 
-	static final String[] COMPOSITION_MECHANISMS = new String[] { "Run Configuration","Properties" };
+	static final String[] COMPOSITION_MECHANISMS = new String[] { "Run Configuration", "Properties" };
 
 	@Override
-	
-	
 	public String[] getCompositionMechanisms() {
-
 		return COMPOSITION_MECHANISMS;
 	}
 
@@ -50,18 +49,16 @@ public class RuntimeComposer extends ComposerExtensionClass {
 	public void performFullBuild(IFile config) {
 
 		IFile fileProp = featureProject.getProject().getFile("runtime.properties");
-		
-		if (COMPOSITION_MECHANISMS[1].equals(featureProject.getCompositionMechanism())) {
-			
-			String configPath = config.getRawLocation().toOSString();
 
+		if (COMPOSITION_MECHANISMS[1].equals(featureProject.getCompositionMechanism())) {
+
+			String configPath = config.getRawLocation().toOSString();
 			final Configuration configuration = new Configuration(featureProject.getFeatureModel());
 			FileReader<Configuration> reader = new FileReader<>(configPath, configuration,
 					ConfigurationManager.getFormat(configPath));
 			reader.read();
 
 			String configString = "";
-
 			for (SelectableFeature f : configuration.getFeatures()) {
 				if (!f.getFeature().getStructure().isAbstract()) {
 					configString += f.getFeature().getName() + '=' + (f.getSelection() == Selection.SELECTED
@@ -70,15 +67,21 @@ public class RuntimeComposer extends ComposerExtensionClass {
 			}
 
 			configString = configString.substring(0, configString.lastIndexOf('\n'));
-
 			InputStream inputStream = new ByteArrayInputStream(configString.getBytes(StandardCharsets.UTF_8));
 
-			createFile(fileProp, inputStream);
+			if (fileProp.exists()) {
+				try {
+					fileProp.setContents(inputStream, IFile.FORCE, null);
+				} catch (CoreException e) {
+					RuntimeCorePlugin.getDefault().logError(e);
+				}
+			} else {
+				createFile(fileProp, inputStream);
+			}
 
 		} else {
 			deleteFile(fileProp);
 		}
-
 	}
 
 	@Override
@@ -101,7 +104,6 @@ public class RuntimeComposer extends ComposerExtensionClass {
 	}
 
 	private static void deleteFile(IFile file) {
-
 		if (file != null) {
 			try {
 				file.delete(true, null);
@@ -112,7 +114,6 @@ public class RuntimeComposer extends ComposerExtensionClass {
 	}
 
 	private static void createFile(IFile file, InputStream stream) {
-
 		if (file != null) {
 			try {
 				file.create(stream, true, null);
@@ -129,40 +130,30 @@ public class RuntimeComposer extends ComposerExtensionClass {
 	 */
 	@Override
 	public boolean initialize(IFeatureProject project) {
-
 		if (super.initialize(project)) {
-
 			final String propertyManager = "PropertyManager.java";
 			IFile filePropMan = featureProject.getBuildFolder().getFile(propertyManager);
 
 			if (COMPOSITION_MECHANISMS[1].equals(featureProject.getCompositionMechanism())) {
-
 				InputStream inputStream = null;
-
 				try {
 					inputStream = FileLocator.openStream(RuntimeCorePlugin.getDefault().getBundle(),
 							new Path("Resources" + FileSystems.getDefault().getSeparator() + propertyManager), false);
 				} catch (IOException e) {
 					RuntimeCorePlugin.getDefault().logError(e);
 				}
-
 				if (!filePropMan.exists()) {
-
 					createFile(filePropMan, inputStream);
 					try {
 						filePropMan.setDerived(true, null);
 					} catch (CoreException e) {
 						RuntimeCorePlugin.getDefault().logError(e);
 					}
-
 				}
-
 			} else {
 				deleteFile(filePropMan);
-
 			}
 		}
-
 		return super.initialize(project);
 	}
 

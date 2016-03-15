@@ -155,7 +155,7 @@ public class CorePlugin extends AbstractCorePlugin {
 
 		featureProjectMap = new HashMap<IProject, IFeatureProject>();
 		for (final IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
-			try {
+			try { 
 				if (project.isOpen()) {
 					// conversion for old projects
 					IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(COMPOSERS_ID);

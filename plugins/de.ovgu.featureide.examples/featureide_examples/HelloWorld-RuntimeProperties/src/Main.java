@@ -1,7 +1,4 @@
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Properties;
 
 public class Main {
 	public static void main(String[] args) throws IOException {
@@ -11,16 +8,16 @@ public class Main {
 			System.out.print("Hello");
 		}
 
-		if (PropertyManager.getProperty("beautiful")) {
+		if (PropertyManager.getProperty("Beautiful")) {
 			System.out.print(" beautiful");
 		}
 
-		if (PropertyManager.getProperty("wonderful")) {
+		if (PropertyManager.getProperty("Wonderful")) {
 			System.out.print(" wonderful");
 		}
 
 		if (PropertyManager.getProperty("World")) {
-			System.out.print(" World!");
+			System.out.println(" World!");
 		}
 
 	}
