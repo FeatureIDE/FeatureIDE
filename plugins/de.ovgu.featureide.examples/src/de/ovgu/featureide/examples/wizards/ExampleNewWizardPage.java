@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
+import java.nio.file.FileSystems;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -958,6 +959,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 			desc.setNatureIds(record.projectDescription.getNatureIds());
 			desc.setReferencedProjects(record.projectDescription.getReferencedProjects());
 			record.projectDescription = desc;
+			desc.setLocation(new Path(workspace.getRoot().getLocation() + record.getLocation()));
 		}
 
 		try {
@@ -1154,6 +1156,18 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 			performAlreadyExistsCheck();
 			performRequirementCheck();
 		}
+
+		/**
+		 * @return
+		 */
+		public String getLocation() {
+//			if(this.getProjectName().equals("Beautiful")){
+//				return FileSystems.getDefault().getSeparator() + "HelloWorld-Framework" + FileSystems.getDefault().getSeparator()+ "features" +FileSystems.getDefault().getSeparator() +"Beautiful";
+//			}
+			return FileSystems.getDefault().getSeparator() + this.getProjectName();
+		}
+
+
 
 		/**
 		 * @param file
