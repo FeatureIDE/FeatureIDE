@@ -5,9 +5,9 @@
          point="de.ovgu.featureide.core.composers">
       <composer
             class="de.ovgu.featureide.core.framework.FrameworkComposer"
-            description="Framework overlapping"
+            description="Use jars for plugin functionality"
             id="de.ovgu.featureide.core.composer.framework"
-            name="Framework Composer"
+            name="Framework"
             nature="de.ovgu.featureide.core.composer.framework">
       </composer>
    </extension>
