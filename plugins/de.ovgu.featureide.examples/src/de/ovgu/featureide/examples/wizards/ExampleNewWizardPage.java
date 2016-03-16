@@ -782,6 +782,13 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 			final File file = contents[i];
 			if (file.isFile() && IProjectDescription.DESCRIPTION_FILE_NAME.equals(file.getName())) {
 				final ProjectRecord newProject = new ProjectRecord(file);
+				ICommand[] buildSpec = newProject.projectDescription.getBuildSpec();
+				String composer = "";
+				for (ICommand command : buildSpec) {
+					if(command.getBuilderName().equals("de.ovgu.featureide.core.extensibleFeatureProjectBuilder")){
+						composer = command.getArguments().get("composer");
+					}
+				}
 				files.add(newProject);
 				if (newProject.containsNatureID("de.ovgu.featureide.core.mpl.MSPLNature")) {
 					if (file.getParentFile().isDirectory()) {
@@ -789,6 +796,19 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 						if (subdir != null) {
 							for (File file2 : subdir) {
 								if (ProjectRecord.SUB_PROJECTS_FOLDER.equals(file2.getName())) {
+									newProject.collectSubProjectFiles(file2, null, monitor);
+									break;
+								}
+							}
+						}						
+					}
+					
+				} else if(composer.equals("de.ovgu.featureide.core.composer.framework")){
+					if (file.getParentFile().isDirectory()) {
+						final File[] subdir = file.getParentFile().listFiles();
+						if (subdir != null) {
+							for (File file2 : subdir) {
+								if ("features".equals(file2.getName())) {
 									newProject.collectSubProjectFiles(file2, null, monitor);
 									break;
 								}
@@ -849,7 +869,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 							if (projectRecord.hasSubProjects()) {
 								Collection<ProjectRecord> subProj = projectRecord.getSubProjects();
 								for (ProjectRecord subPprojectRecord : subProj) {
-									if (!subPprojectRecord.hasWarnings())
+//									if (!subPprojectRecord.hasWarnings())
 										createExistingProject(subPprojectRecord, new SubProgressMonitor(monitor, 1));
 								}
 							}
@@ -1260,6 +1280,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 					return true;
 				}
 			}
+//			projectDescription.getBuildSpec()
 			return false;
 		}
 

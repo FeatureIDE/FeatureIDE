@@ -322,5 +322,4 @@ public class FrameworkComposer extends ComposerExtensionClass {
 	public boolean clean() {
 		return false;
 	}
-
 }
