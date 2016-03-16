@@ -13,4 +13,5 @@ Bundle-Vendor: Jabier Martinez
 Bundle-Activator: de.ovgu.featureide.core.framework.activator.FrameworkCorePlugin
 Import-Package: org.eclipse.jdt.core,
  org.eclipse.jdt.internal.core,
+ org.eclipse.jdt.launching,
  org.eclipse.ui.internal.util

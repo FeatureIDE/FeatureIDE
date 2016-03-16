@@ -1,19 +1,14 @@
 package de.ovgu.featureide.core.framework;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.nio.file.FileSystems;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.jar.JarOutputStream;
-import java.util.zip.ZipEntry;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -64,75 +59,47 @@ public class FrameworkComposer extends ComposerExtensionClass {
 	 * @return <code>false</code> if creation was not successful
 	 */
 	private boolean createJARs(IProject project) {
-		IFolder resources = project.getFolder("projects");
-		IFolder features = featureProject.getSourceFolder();
+		IFolder sourceCodeFolder = featureProject.getSourceFolder();
+		IFolder jarFolder = getJarFolder();
 
 		try {
-			for (IResource res : resources.members()) {
+			for (IResource res : sourceCodeFolder.members()) {
 				if (res instanceof IFolder && selectedFeatures.contains(res.getName())) {
+					/** Check if folder is project and contains correct info.xml file **/
+					if (!((IFolder) res).getFile(".project").exists()) {
+						continue;
+					}
 					String jarName = res.getName() + ".jar";
 					IFile infoFile = ((IFolder) res).getFile("info.xml");
 					if (!FrameworkValidator.validate(infoFile)) {
 						return false;
 					}
-
+					IFolder jarFeatureFolder = jarFolder.getFolder(res.getName());
+					if(!jarFeatureFolder.exists()){
+						jarFeatureFolder.create(true, true, null);
+					}
+					IFile oldJar = jarFeatureFolder.getFile(jarName);
+					if(oldJar.exists()){
+						oldJar.delete(false, null);
+					}
+					/** build jar **/
 					IFolder bin = ((IFolder) res).getFolder("bin");
-					final String path = features.getLocation()
-							.append(res.getName() + FileSystems.getDefault().getSeparator() + jarName).toString();
-					try (FileOutputStream fileStream = new FileOutputStream(path);
-							JarOutputStream jarStream = new JarOutputStream(fileStream)) {
-						addToJAR(jarStream, bin);
-						addFileToJAR(jarStream, infoFile, "");
+					final String path = jarFolder.getLocation().append(res.getName() + FileSystems.getDefault().getSeparator() + jarName).toString();
+					try (FileOutputStream fileStream = new FileOutputStream(path); JarOutputStream jarStream = new JarOutputStream(fileStream)) {
+						FrameworkJarCreator.addToJar(jarStream, bin);
+						FrameworkJarCreator.addFileToJar(jarStream, infoFile, "");
 					} catch (IOException e) {
 						FrameworkCorePlugin.getDefault().logError(e);
 						return false;
 					}
 				}
 			}
+			jarFolder.refreshLocal(IResource.DEPTH_INFINITE, null);
 		} catch (CoreException e) {
 			FrameworkCorePlugin.getDefault().logError(e);
 			return false;
 		}
 		return true;
-	}
-
-	private void addFileToJAR(JarOutputStream jarStream, IFile res, String path) throws IOException {
-		jarStream.putNextEntry(
-				new ZipEntry(path + res.getName()));
-		URL location = FileLocator.toFileURL(res.getLocationURI().toURL());
-		File file = new File(location.getPath());
-		try (BufferedInputStream in = new BufferedInputStream(new FileInputStream(file))) {
-			byte[] buffer = new byte[1024];
-			while (true) {
-				int count = in.read(buffer);
-				if (count == -1) {
-					break;
-				}
-				jarStream.write(buffer, 0, count);
-			}
-		}
-	}
-
-	private void addToJAR(JarOutputStream jarStream, IResource bin) throws CoreException, IOException {
-		if (bin instanceof IFolder) {
-			for (IResource member : ((IFolder) bin).members()) {
-				addToJAR(jarStream, member, "");
-			}
-		}
-	}
-
-	private void addToJAR(JarOutputStream jarStream, IResource res, String path) throws IOException, CoreException {
-		if (res instanceof IFolder) {
-			String path2 = path + res.getName()
-					+ FileSystems.getDefault().getSeparator();
-			jarStream.putNextEntry(new ZipEntry(path2));
-			for (IResource member : ((IFolder) res).members()) {
-				addToJAR(jarStream, member, path2);
-			}
-		}
-		else if (res instanceof IFile) {
-			addFileToJAR(jarStream, (IFile) res, path);
-		}
 	}
 
 	@Override
@@ -141,34 +108,25 @@ public class FrameworkComposer extends ComposerExtensionClass {
 		final String configPath = config.getRawLocation().toOSString();
 		Configuration configuration = new Configuration(featureProject.getFeatureModel());
 
-		FileReader<Configuration> reader = new FileReader<>(configPath, configuration,
-				ConfigurationManager.getFormat(configPath));
+		FileReader<Configuration> reader = new FileReader<>(configPath, configuration, ConfigurationManager.getFormat(configPath));
 		reader.read();
 
 		selectedFeatures = new LinkedList<String>();
 		for (IFeature feature : configuration.getSelectedFeatures()) {
-			selectedFeatures.add(feature.getName());
+			if (feature.getStructure().isConcrete()) {
+				selectedFeatures.add(feature.getName());
+			}
 		}
-
 		IProject project = config.getProject();
 		try {
 			project.deleteMarkers("de.ovgu.featureide.core.featureModuleMarker", true, IResource.DEPTH_ZERO);
 		} catch (CoreException e) {
 			FrameworkCorePlugin.getDefault().logError(e);
 		}
+		createSubprojects();
 		if (!createJARs(project)) {
 			FrameworkCorePlugin.getDefault().logWarning("JARs not build");
-			// try {
-			// IMarker marker =
-			// project.createMarker("de.ovgu.featureide.core.featureModuleMarker");
-			// marker.setAttribute(IMarker.MESSAGE, "A problem occured while
-			// building JARs");
-			// marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
-			// } catch (CoreException e) {
-			// FrameworkCorePlugin.getDefault().logError(e);
-			// }
 		}
-		;
 
 		setBuildpaths(project);
 
@@ -180,15 +138,46 @@ public class FrameworkComposer extends ComposerExtensionClass {
 		}
 	}
 
+	private void createSubprojects() {
+
+		for(String featureName : selectedFeatures){
+			IFolder features = featureProject.getSourceFolder();
+			IFolder subproject = features.getFolder(featureName);
+			if(!subproject.exists()){
+				try {
+					FrameworkProjectCreator.createSubprojectFolder(featureName, subproject);
+				} catch (CoreException e) {
+					FrameworkCorePlugin.getDefault().logError(e);
+				}
+			} else {
+				if(!subproject.getFile(".project").exists()){
+					try {
+						FrameworkProjectCreator.createSubprojectFolder(featureName, subproject);
+					} catch (CoreException e) {
+						FrameworkCorePlugin.getDefault().logError(e);
+					}
+				}
+			}
+		}
+	}
+
 	/**
-	 * Checks if library jar is inside template folder
+	 * Checks if library jar is inside jar folder
 	 * 
 	 * @param path
 	 * @return
 	 */
 	private boolean isFeatureLib(IPath path) {
-		IPath pluginFolder = featureProject.getSourceFolder().getFullPath();
+		IPath pluginFolder = getJarFolder().getFullPath();
 		return pluginFolder.isPrefixOf(path);
+	}
+
+	/**
+	 * 
+	 * @return Folder with jars
+	 */
+	private IFolder getJarFolder() {
+		return featureProject.getProject().getFolder("jars");
 	}
 
 	/**
@@ -216,7 +205,7 @@ public class FrameworkComposer extends ComposerExtensionClass {
 
 			/** add selected features **/
 			try {
-				for (IResource res : featureProject.getSourceFolder().members()) {
+				for (IResource res : getJarFolder().members()) {
 					String featureName = res.getName();
 					if (selectedFeatures.contains(featureName)) {
 						List<IPath> newEntries = createNewIPath(res);
@@ -293,55 +282,38 @@ public class FrameworkComposer extends ComposerExtensionClass {
 		/** Copy plugin loader **/
 		InputStream inputStream = null;
 		try {
-			inputStream = FileLocator.openStream(FrameworkCorePlugin.getDefault().getBundle(),
-					new Path("resources/PluginLoader.java"), false);
+			inputStream = FileLocator.openStream(FrameworkCorePlugin.getDefault().getBundle(), new Path("resources"+FileSystems.getDefault().getSeparator()+"PluginLoader.java"), false);
 		} catch (IOException e) {
 			FrameworkCorePlugin.getDefault().logError(e);
 		}
-
-		IFolder folder = project.getProject().getFolder("src");
-		IFolder folderLoader = folder.getFolder("loader");
-		if (!folderLoader.exists()) {
+		IFolder folder = featureProject.getBuildFolder();
+		IFolder loaderFolder = folder.getFolder("loader");
+		if (!loaderFolder.exists()) {
 			try {
-				folderLoader.create(true, true, null);
-				folderLoader.refreshLocal(IResource.DEPTH_INFINITE, null);
+				loaderFolder.create(true, true, null);
+				loaderFolder.refreshLocal(IResource.DEPTH_INFINITE, null);
 			} catch (CoreException e) {
 				FrameworkCorePlugin.getDefault().logError(e);
 			}
 		}
-		IFile file = folderLoader.getFile("PluginLoader.java");
-		if (!file.exists()) {
+		IFile pluginLoader = loaderFolder.getFile("PluginLoader.java");
+		if (!pluginLoader.exists()) {
 			try {
-				file.create(inputStream, true, null);
+				pluginLoader.create(inputStream, true, null);
 			} catch (CoreException e) {
 				FrameworkCorePlugin.getDefault().logError(e);
 			}
 		}
-
-		// /** Create config file **/
-		// try {
-		// inputStream =
-		// FileLocator.openStream(FrameworkCorePlugin.getDefault().getBundle(),
-		// new Path("resources/config.txt"), false);
-		// } catch (IOException e) {
-		// e.printStackTrace();
-		// }
-		// file = folder.getFile("config.txt");
-		// if (!file.exists()) {
-		// try {
-		// file.create(inputStream, true, null);
-		// } catch (CoreException e) {
-		// FrameworkCorePlugin.getDefault().logError(e);
-		// }
-		// }
-		//
-		// try {
-		// featureProject.getBuildFolder().refreshLocal(IResource.DEPTH_INFINITE,
-		// null);
-		// } catch (CoreException e) {
-		// FrameworkCorePlugin.getDefault().logError(e);
-		// }
-
+		/** Create jar folder **/
+		IFolder jarFolder = project.getProject().getFolder("jars");
+		if (!jarFolder.exists()) {
+			try {
+				jarFolder.create(true, true, null);
+				jarFolder.refreshLocal(IResource.DEPTH_INFINITE, null);
+			} catch (CoreException e) {
+				FrameworkCorePlugin.getDefault().logError(e);
+			}
+		}
 		return true;
 
 	}
