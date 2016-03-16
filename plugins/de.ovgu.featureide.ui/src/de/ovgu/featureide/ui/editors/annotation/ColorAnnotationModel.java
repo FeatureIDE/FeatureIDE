@@ -72,7 +72,7 @@ import de.ovgu.featureide.fm.core.color.FeatureColor;
 
 /**
  * Assigns color annotations to the editor.
- * 
+ * 	
  * @author Sebastian Krieter
  */
 public final class ColorAnnotationModel implements IAnnotationModel {

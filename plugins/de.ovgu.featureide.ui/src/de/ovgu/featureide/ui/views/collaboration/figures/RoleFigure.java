@@ -598,8 +598,8 @@ public class RoleFigure extends Figure implements GUIDefaults {
 		for (FSTDirective d : role.getDirectives()) {
 			String dependencyString = d.toDependencyString();
 			if (!duplicates.contains(dependencyString)) {
-				duplicates.add(dependencyString);
-				Label partLabel = new RoleFigureLabel(dependencyString, IMAGE_HASH, dependencyString);
+//				duplicates.add(dependencyString);
+				Label partLabel = new RoleFigureLabel(dependencyString, IMAGE_HASH, dependencyString, d);
 				addLabel(partLabel);
 			}
 			// TODO draw separationline between fields and methods

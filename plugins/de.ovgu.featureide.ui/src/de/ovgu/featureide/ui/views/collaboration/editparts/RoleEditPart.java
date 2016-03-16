@@ -49,6 +49,7 @@ import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTInvariant;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
+import de.ovgu.featureide.core.fstmodel.RoleElement;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.figures.RoleFigure;
@@ -210,7 +211,8 @@ public class RoleEditPart extends AbstractGraphicalEditPart {
 
 					TreeSet<FSTDirective> directives = this.getRoleModel().getDirectives();
 					for (FSTDirective fstDirective : directives) {
-						if (fstDirective.toDependencyString().equals(label.getElementName())) {
+						RoleElement<?> roleElement = label.getRoleElement();
+						if (fstDirective.equals(roleElement)) {
 							editor = openEditor(file);
 							if (editor != null) {
 								Outline.scrollToLine(editor, fstDirective.getStartLine(), fstDirective.getEndLine(), fstDirective.getStartOffset(),
