@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.core;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -105,16 +106,28 @@ public class RenamingsManager {
 	};
 
 	public void performRenamings(IFile file) {
-		final FeatureModelManager instance = FileManagerMap.<IFeatureModel, FeatureModelManager>getInstance(file.getLocation().toString());
+		final String location = file.getLocation().toString();
+		performRenamings(location);
+	}
+	
+	public void performRenamings(File file) {
+		final String location = file.getPath();
+		performRenamings(location);
+	}
+		
+	private void performRenamings(final String location) {
+		final FeatureModelManager instance = FileManagerMap.<IFeatureModel, FeatureModelManager>getInstance(location);
 		if (instance == null) {
 			return;
 		}
-		instance.read();
 		final IFeatureModel projectModel = instance.getObject();
 		for (Renaming renaming : renamings) {
+			// TODO check weather all these events are necessary 
 			final FeatureIDEEvent event = new FeatureIDEEvent(model, EventType.FEATURE_NAME_CHANGED, renaming.oldName, renaming.newName);
 			projectModel.fireEvent(event);
 			model.fireEvent(event);
+			// call to FMComposerExtension
+			instance.fireEvent(event);
 		}
 		renamings.clear();
 	}
