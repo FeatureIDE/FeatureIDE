@@ -165,7 +165,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 						IDocument document = provider.getDocument(input);
 						colormodel = new ColorAnnotationModel(document, file, project, editor);
 						modelex.addAnnotationModel(KEY, colormodel);
-
+//						colormodel.updateAnnotations(!editor.isDirty());
 						return true;
 					}
 				} else {
@@ -532,8 +532,8 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 				int overViewStartOffset = document.getLineOffset(startline);
 				int overViewLength = 0;
 				for (int line = startline; line <= endline; line++) {
-					if (line < endline || directive.getEndLength() > 0) {
 						int length = document.getLineLength(line);
+						if (line < endline || directive.getEndLength() > 0) {
 						int lineOffset = document.getLineOffset(line);
 
 						if (line == directive.getEndLine()) {

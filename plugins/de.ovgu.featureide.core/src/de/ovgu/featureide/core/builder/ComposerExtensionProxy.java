@@ -114,8 +114,8 @@ public class ComposerExtensionProxy implements IComposerExtension {
 	}
 
 	@Override
-	public boolean hasCompositionMechanisms() {
-		return defaultComposerExtensionClass.hasCompositionMechanisms();
+	public String[] getCompositionMechanisms() {
+		return defaultComposerExtensionClass.getCompositionMechanisms();
 	}
 
 	@Override

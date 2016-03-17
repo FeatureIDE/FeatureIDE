@@ -249,13 +249,26 @@ public class FSTDirective extends RoleElement<FSTDirective> {
 	 **/
 	@Override
 	public int compareTo(FSTDirective element) {
-
 		if (this == element) {
 			return 0;
 		} else {
 			// TODO Is the linenumber check enough?
 			return this.getStartLine() > element.getStartLine() ? 1 : -1;
 		}
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == this) {
+			return true;
+		}
+		if (obj instanceof FSTDirective) {
+			if (((FSTDirective) obj).getStartLine() == getStartLine() && 
+				((FSTDirective) obj).getEndLine() == getEndLine()) {
+				return super.equals(obj);
+			}
+		}
+		return false;
 	}
 
 	public void addSig_insideOf(AbstractSignature next) {
