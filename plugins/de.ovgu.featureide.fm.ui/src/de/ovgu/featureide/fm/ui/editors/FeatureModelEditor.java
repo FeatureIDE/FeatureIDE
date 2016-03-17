@@ -153,8 +153,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 		}
 
 		featureOrderEditor.doSave(monitor);
-		//TODO
-//		featureModel.getRenamingsManager().performRenamings(markerHandler.getModelFile());
+		featureModel.getRenamingsManager().performRenamings(featureModel.getSourceFile());
 		for (IFeatureModelEditorPage page : extensionPages) {
 			page.doSave(monitor);
 		}
