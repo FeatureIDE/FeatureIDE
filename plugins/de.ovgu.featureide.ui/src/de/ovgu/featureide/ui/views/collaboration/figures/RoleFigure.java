@@ -479,7 +479,11 @@ public class RoleFigure extends Figure implements GUIDefaults {
 	}
 
 	private String getClassName() {
-		return role.getClassFragment().getName().split("[.]")[0];
+		String name = role.getFile().getName();
+		if (name.contains("." + role.getFile().getFileExtension())) {
+			name = name.substring(0, name.lastIndexOf("."));
+		}
+		return name;
 	}
 	
 	// create label for nested class

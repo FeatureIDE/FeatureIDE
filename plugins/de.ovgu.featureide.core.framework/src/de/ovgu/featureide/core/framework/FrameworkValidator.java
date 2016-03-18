@@ -60,18 +60,20 @@ public class FrameworkValidator {
 		
 		if(doc == null) return false;
 		
+		boolean isNeededFile = false;
+		
 		NodeList firstStage = doc.getChildNodes();
 		for(int i=0; i<firstStage.getLength(); i++){
 			Node node = firstStage.item(i);
 			if(node.getNodeName().equals("plugin")){
+				isNeededFile = true;
 				NodeList secondStage = node.getChildNodes();
 				if(secondStage.getLength() == 0) return false;
 				for(int j=0; j<secondStage.getLength(); j++){
 					if(!secondStage.item(j).getNodeName().equals("interface")) return false;
 				}
-				return true;
 			}
 		}
-		return false;
+		return isNeededFile;
 	}
 }

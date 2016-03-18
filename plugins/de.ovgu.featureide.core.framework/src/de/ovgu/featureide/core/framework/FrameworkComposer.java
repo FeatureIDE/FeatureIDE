@@ -27,6 +27,9 @@ import org.eclipse.jdt.core.JavaModelException;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.core.framework.activator.FrameworkCorePlugin;
+import de.ovgu.featureide.core.fstmodel.FSTClass;
+import de.ovgu.featureide.core.fstmodel.FSTFeature;
+import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
@@ -39,6 +42,7 @@ import de.ovgu.featureide.fm.core.io.manager.FileReader;
  *
  */
 public class FrameworkComposer extends ComposerExtensionClass {
+	private FrameworkModelBuilder modelBuilder = null;
 
 	private LinkedList<String> selectedFeatures;
 
@@ -75,11 +79,11 @@ public class FrameworkComposer extends ComposerExtensionClass {
 						return false;
 					}
 					IFolder jarFeatureFolder = jarFolder.getFolder(res.getName());
-					if(!jarFeatureFolder.exists()){
+					if (!jarFeatureFolder.exists()) {
 						jarFeatureFolder.create(true, true, null);
 					}
 					IFile oldJar = jarFeatureFolder.getFile(jarName);
-					if(oldJar.exists()){
+					if (oldJar.exists()) {
 						oldJar.delete(false, null);
 					}
 					/** build jar **/
@@ -100,6 +104,21 @@ public class FrameworkComposer extends ComposerExtensionClass {
 			return false;
 		}
 		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.ComposerExtensionClass#buildFSTModel()
+	 */
+	@Override
+	public void buildFSTModel() {
+		try {
+			if (modelBuilder == null) {
+				modelBuilder = new FrameworkModelBuilder(featureProject);
+			}
+			modelBuilder.buildModel();
+		} catch (CoreException e) {
+			FrameworkCorePlugin.getDefault().logError(e);
+		}
 	}
 
 	@Override
@@ -129,6 +148,8 @@ public class FrameworkComposer extends ComposerExtensionClass {
 		}
 
 		setBuildpaths(project);
+		
+		buildFSTModel();
 
 		try {
 			project.refreshLocal(IResource.DEPTH_INFINITE, null);
@@ -140,17 +161,17 @@ public class FrameworkComposer extends ComposerExtensionClass {
 
 	private void createSubprojects() {
 
-		for(String featureName : selectedFeatures){
+		for (String featureName : selectedFeatures) {
 			IFolder features = featureProject.getSourceFolder();
 			IFolder subproject = features.getFolder(featureName);
-			if(!subproject.exists()){
+			if (!subproject.exists()) {
 				try {
 					FrameworkProjectCreator.createSubprojectFolder(featureName, subproject);
 				} catch (CoreException e) {
 					FrameworkCorePlugin.getDefault().logError(e);
 				}
 			} else {
-				if(!subproject.getFile(".project").exists()){
+				if (!subproject.getFile(".project").exists()) {
 					try {
 						FrameworkProjectCreator.createSubprojectFolder(featureName, subproject);
 					} catch (CoreException e) {
@@ -282,7 +303,8 @@ public class FrameworkComposer extends ComposerExtensionClass {
 		/** Copy plugin loader **/
 		InputStream inputStream = null;
 		try {
-			inputStream = FileLocator.openStream(FrameworkCorePlugin.getDefault().getBundle(), new Path("resources"+FileSystems.getDefault().getSeparator()+"PluginLoader.java"), false);
+			inputStream = FileLocator.openStream(FrameworkCorePlugin.getDefault().getBundle(),
+					new Path("resources" + FileSystems.getDefault().getSeparator() + "PluginLoader.java"), false);
 		} catch (IOException e) {
 			FrameworkCorePlugin.getDefault().logError(e);
 		}
