@@ -27,9 +27,6 @@ import org.eclipse.jdt.core.JavaModelException;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.core.framework.activator.FrameworkCorePlugin;
-import de.ovgu.featureide.core.fstmodel.FSTClass;
-import de.ovgu.featureide.core.fstmodel.FSTFeature;
-import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
@@ -263,7 +260,7 @@ public class FrameworkComposer extends ComposerExtensionClass {
 			}
 			for (IResource child : members) {
 				if (child instanceof IFile) {
-					if (child.getFileExtension().equals("jar")) {
+					if ("jar".equals(child.getFileExtension())) {
 						result.add(child.getFullPath());
 					}
 				} else if (child instanceof IFolder) {
@@ -284,8 +281,6 @@ public class FrameworkComposer extends ComposerExtensionClass {
 		}
 		return false;
 	}
-
-	boolean isDone = false;
 
 	/**
 	 * Copies needed files to project folder<br>
