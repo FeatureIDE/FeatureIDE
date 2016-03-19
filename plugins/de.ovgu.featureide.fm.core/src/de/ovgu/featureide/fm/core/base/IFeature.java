@@ -26,7 +26,8 @@ import de.ovgu.featureide.fm.core.base.impl.AFeature;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 
 /**
- * The feature interface represents any class that acts in the sense of a <i>feature</i> in FeatureIDE. A feature contains both
+ * The feature interface represents any class that acts in the sense of a <i>feature</i> in FeatureIDE. 
+ * A feature contains both
  * <ul>
  * <li>certain fixed properties (e.g., its name) which are available by the features implementation of {@link de.ovgu.featureide.fm.core.base.IFeatureProperty
  * IFeatureProperty}, and</li>
