@@ -172,6 +172,7 @@ public class FSTDirective extends RoleElement<FSTDirective> {
 			case ELSE_NOT: return "else";
 			case CONDITION: return "condition";
 			case DEFINE: return "define";
+			case CALL: return "call";
 			case UNDEFINE: return "undefine";
 			default: return "";
 			
