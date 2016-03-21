@@ -107,8 +107,18 @@ public interface IConstraint extends IFeatureModelElement {
 	 * <br/>
 	 * <b>Note:</b> the parameter <b>newFeatureModel</b> is intended to change the feature model context of the newly created, and affects members if this
 	 * constraint implements {@link IFeatureModelElement}.
+	 * <br/><br/>
+	 * <b>Notes on side effects and <code>null</code> references</b><br/>
+	 * Calling this method:
+	 * <ul>
+	 * <li>does <b>not</b> affect the <b>members</b> in this object.</li>
+	 * <li>does <b>not</b> affect the <b>parameter</b> <code>newFeatureModel</code>.</li>
+	 * <li>the parameter <code>newFeature</code> is expected to be <b>non-null</b></li>
+	 * <li>the returned <b>result</b> is guaranteed <b>non-null</b> and <b>modifiable</b></li>
+	 * </ul>
 	 * 
-	 * @param newFeatureModel
+	 * 
+	 * @param newFeatureModel a possible new context for this constraint
 	 * 
 	 * @see AConstraint Default implementation for constraints (extending implementation for <code>IFeatureModelElement</code>
 	 * @see IFeatureModelElement Feature model element interface
@@ -142,6 +152,14 @@ public interface IConstraint extends IFeatureModelElement {
 	 * <li>{@link de.ovgu.featureide.fm.core.ConstraintAttribute#VOID_MODEL voids the feature model}</li>
 	 * </ul>
 	 * 
+	 * <br/><br/>
+	 * <b>Notes on side effects and <code>null</code> references</b><br/>
+	 * Calling this method:
+	 * <ul>
+	 * <li>does <b>not</b> affect the <b>members</b> in this object.</li>
+	 * <li>the returned <b>result</b> is guaranteed <b>non-null</b> and <b>modifiable</b></li>
+	 * </ul>
+	 * 
 	 * @see ConstraintAttribute constraint attributes
 	 * 
 	 * @since 3.0
@@ -163,6 +181,14 @@ public interface IConstraint extends IFeatureModelElement {
 	 * is called automatically. The return collection might be out-dated until a new call to {@link IConstraint#setContainedFeatures()}
 	 * is done manually.
 	 * 
+	 * <br/><br/>
+	 * <b>Notes on side effects and <code>null</code> references</b><br/>
+	 * Calling this method:
+	 * <ul>
+	 * <li>does <b>affects</b> the <b>members</b> in this object.</li>
+	 * <li>the returned <b>result</b> is guaranteed <b>non-null</b> and <b>modifiable</b></li>
+	 * </ul>
+	 * 
 	 * @since 3.0
 	 * 
 	 * @see #setContainedFeatures()
@@ -180,10 +206,17 @@ public interface IConstraint extends IFeatureModelElement {
 	 * a call to {@link #setDeadFeatures(Iterable)} is required plus eventually a call to {@link #getDeadFeatures(SatSolver, IFeatureModel, Collection)}.
 	 * <br/>
 	 * <br/>
-	 * The return collection is <b>unmodifable</b>.
+	 * <b>Notes on side effects and <code>null</code> references</b><br/>
+	 * Calling this method:
+	 * <ul>
+	 * <li>does <b>not</b> affect the <b>members</b> in this object.</li>
+	 * <li>the returned <b>result</b> is guaranteed <b>non-null</b> and <b>unmodifiable</b></li>
+	 * </ul>
 	 * 
 	 * @see #setDeadFeatures(Iterable)
 	 * @see #getDeadFeatures(SatSolver, IFeatureModel, Collection)
+	 * 
+	 * 
 	 * 
 	 * @since 3.0
 	 * 
@@ -203,6 +236,17 @@ public interface IConstraint extends IFeatureModelElement {
 	 * <br/>
 	 * <b>Node on duplicate elements</b>: The calculated collection of <i>dead</i> features have not to contain duplicates.
 	 * 
+	 * <br/><br/>
+	 * <b>Notes on side effects and <code>null</code> references</b><br/>
+	 * Calling this method:
+	 * <ul>
+	 * <li>does <b>not</b> affect the <b>members</b> in this object.</li>
+	 * <li>might <b>affect</b> cache entries in the <b>parameter</b> <code>newFeatureModel</code>.</li>
+	*  <li>does <b>not</b> affect the <b>parameter</b> <code>execludeFeatures</code>.</li>
+	 * <li>the parameter are assumed to be <b>non-null</b></li>
+	 * <li>the returned <b>result</b> is guaranteed <b>non-null</b> and <b>modifiable</b></li>
+	 * </ul>
+	 * 
 	 * @since 3.0
 	 * 
 	 * @param solver a satisfaction solver
@@ -215,7 +259,7 @@ public interface IConstraint extends IFeatureModelElement {
 	Collection<IFeature> getDeadFeatures(SatSolver solver, IFeatureModel featureModel, Collection<IFeature> exlcudeFeatuers);
 
 	/**
-	 * Returns the parameter of the last {@link #setFalseOptionalFeatures(IFeatureModel, Collection) call, or <code>null</code> if
+	 * Returns the parameter of the last {@link #setFalseOptionalFeatures(IFeatureModel, Collection)} call, or <code>null</code> if
 	 * no such call happens before invoking this method.
 	 * <br/>
 	 * <br/>
@@ -223,7 +267,13 @@ public interface IConstraint extends IFeatureModelElement {
 	 * a call to {@link #setFalseOptionalFeatures(IFeatureModel, Collection)} is required.
 	 * <br/>
 	 * <br/>
-	 * The return collection is <b>modifable</b>.
+	 * <b>Notes on side effects and <code>null</code> references</b><br/>
+	 * Calling this method:
+	 * <ul>
+	 * <li>does <b>not</b> affect the <b>members</b> in this object.</li>
+	 * <li>the returned <b>result</b> is guaranteed <b>non-null</b> and <b>modifiable</b></li>
+	 * </ul>
+	 *
 	 * 
 	 * @see #setDeadFeatures(Iterable)
 	 * @see #getDeadFeatures(SatSolver, IFeatureModel, Collection)
@@ -237,12 +287,28 @@ public interface IConstraint extends IFeatureModelElement {
 	/**
 	 * @since 3.0
 	 * 
+	 * <br/><br/>
+	 * <b>Notes on side effects and <code>null</code> references</b><br/>
+	 * Calling this method:
+	 * <ul>
+	 * <li>does <b>not</b> affect the <b>members</b> in this object.</li>
+	 * <li>the returned <b>result</b> is guaranteed <b>non-null</b> and <b>modifiable</b></li>
+	 * </ul>
+	 * 
 	 * @return The underlying propositional formula node
 	 */
 	Node getNode();
 
 	/**
 	 * Overwrites the underlying propositional formula <code>node</code> for this constraint.
+	 * 
+	 * <br/><br/>
+	 * <b>Notes on side effects and <code>null</code> references</b><br/>
+	 * Calling this method:
+	 * <ul>
+	 * <li>does <b>affects</b> <b>members</b> in this object.</li>
+	 * <li>the parameter <code>node</code> is expected to be <b>non-null</b></li>
+	 * </ul>
 	 * 
 	 * @since 3.0
 	 * 
@@ -259,6 +325,13 @@ public interface IConstraint extends IFeatureModelElement {
 	 * set of contained features is <i>hidden</i>. If such a feature is found, the method returns <b>true</b>,
 	 * otherwise <b>false</b>.
 	 * 
+	 * <br/><br/>
+	 * <b>Notes on side effects and <code>null</code> references</b><br/>
+	 * Calling this method:
+	 * <ul>
+	 * <li>does <b>not</b> affect the <b>members</b> in this object.</li>
+	 * </ul>
+	 * 
 	 * @since 3.0
 	 * 
 	 * @return <b>true</b> if a feature (or a features parent) is marked as <i>hidden</i> and contained in the formula of this constraint
@@ -274,6 +347,15 @@ public interface IConstraint extends IFeatureModelElement {
 	 * known whenever a given constraint result in such effects (see {@link ConstraintAttribute}).
 	 * <br/><br/>
 	 * 
+	 * <br/><br/>
+	 * <b>Notes on side effects and <code>null</code> references</b><br/>
+	 * Calling this method:
+	 * <ul>
+	 * <li>does <b>affect</b> the <b>members</b> in this object.</li>
+	 * <li>does <b>not</b> affect the <b>parameters</b>.</li>
+	 * <li>the parameters are expected to be <b>non-null</b></li>
+	 * </ul>
+	 * 
 	 * @since 3.0
 	 * 
 	 * @param attribute The affect caused by this constraint
@@ -283,6 +365,14 @@ public interface IConstraint extends IFeatureModelElement {
 
 	/**
 	 * Calculates and caches the collection of contained features in this constraint.
+	 * 
+	 * <br/><br/>
+	 * <b>Notes on side effects and <code>null</code> references</b><br/>
+	 * Calling this method:
+	 * <ul>
+	 * <li>does <b>affect</b>  the <b>members</b> in this object.</li>
+	 * </ul>
+	 * 
 	 * @see #getContainedFeatures()
 	 * 
 	 * @since 3.0
@@ -292,6 +382,15 @@ public interface IConstraint extends IFeatureModelElement {
 	/**
 	 * Sets the collection of <i>dead</i> features caused by this constraint to the values stored
 	 * in <code>deadFeature</code>.
+	 * 
+	 * <br/><br/>
+	 * <b>Notes on side effects and <code>null</code> references</b><br/>
+	 * Calling this method:
+	 * <ul>
+	 * <li>does <b>affect</b> the <b>members</b> in this object.</li>
+	 * <li>does <b>not</b> affect the <b>parameter</b> <code>deadFeatures</code>.</li>
+	 * <li>the parameter <code>deadFeatures</code> is expected to be <b>non-null</b></li>
+	 * </ul>
 	 * 
 	 * @see #getDeadFeatures()
 	 * @see Functional#getEmptyIterable(Class) Setting an empty iterable
@@ -313,6 +412,15 @@ public interface IConstraint extends IFeatureModelElement {
 	 * entire set of <i>false optional</i> features while <code>collection</code> contains elements (as provided before
 	 * calling this method) minus the content of {@link #getFalseOptional()}.
 	 * 
+	 * <br/><br/>
+	 * <b>Notes on side effects and <code>null</code> references</b><br/>
+	 * Calling this method:
+	 * <ul>
+	 * <li>does <b>affect</b> the <b>members</b> in this object.</li>
+	 * <li>does <b>affect</b> the <b>parameter</b> <code>collection</code>.</li>
+	 * <li>the parameters are expected to be <b>non-null</b></li>
+	 * </ul>
+	 * 
 	 * @since 3.0
 	 * 
 	 * @param featureModel The context which is affected by this constraint
@@ -322,6 +430,15 @@ public interface IConstraint extends IFeatureModelElement {
 	boolean setFalseOptionalFeatures(IFeatureModel featureModel, Collection<IFeature> collection);
 
 	/**
+	 * String representation of the constraint's propositional formula.
+	 * <br/><br/>
+	 * <b>Notes on side effects and <code>null</code> references</b><br/>
+	 * Calling this method:
+	 * <ul>
+	 * <li>does <b>not</b> affect the <b>members</b> in this object.</li>
+	 * <li>the returned <b>result</b> is guaranteed <b>non-null</b> and <b>modifiable</b></li>
+	 * </ul>
+	 * 
 	 * @return String representation of the constraint's propositional formula.
 	 */
 	String getDisplayName();

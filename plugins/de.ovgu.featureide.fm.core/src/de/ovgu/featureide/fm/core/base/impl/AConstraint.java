@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
+import static  de.ovgu.featureide.fm.core.base.FeatureUtils.REQUIRE_NON_NULL;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -30,14 +31,18 @@ import java.util.TreeSet;
 import org.prop4j.Node;
 import org.prop4j.SatSolver;
 
+import com.google.common.base.Objects;
+
 import de.ovgu.featureide.fm.core.ConstraintAttribute;
 import de.ovgu.featureide.fm.core.FeatureComparator;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
  * Represents a propositional constraint below the feature diagram.
@@ -95,6 +100,7 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 
 	@Override
 	public Collection<IFeature> getDeadFeatures(SatSolver solver, IFeatureModel featureModel, Collection<IFeature> exlcudeFeatuers) {
+		
 		final Collection<IFeature> deadFeatures;
 		final Node propNode = getNode();
 		final Comparator<IFeature> featComp = new FeatureComparator(true);
