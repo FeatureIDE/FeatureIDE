@@ -148,8 +148,7 @@ public class FrameworkModelBuilder {
 		IFolder featureFolder = featureProject.getSourceFolder().getFolder(feature);
 		IFolder location = featureFolder.getFolder("src");
 
-		//TODO interface aufrufen, drüber rennen, MEthoden speichern
-		/** Save interface methods **/
+		/** Get interface methods **/
 		IFile interfaceFile = findFile(featureProject.getBuildFolder(), interfaceName);
 		String interfaceContent;
 		MyASTVisitor interfaceVisitor = null;
