@@ -25,6 +25,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -53,6 +54,8 @@ import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
+import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -137,11 +140,33 @@ public class FrameworkModelBuilder {
 
 	/**
 	 * @param feature
-	 * @param interfaceName 
+	 * @param interfaceName
 	 * @param implementingClass
 	 */
 	private void addRole(final String feature, final String interfaceName, final String implementingClass) {
-		IFile classFile = findFile(feature, implementingClass);
+
+		IFolder featureFolder = featureProject.getSourceFolder().getFolder(feature);
+		IFolder location = featureFolder.getFolder("src");
+
+		//TODO interface aufrufen, drüber rennen, MEthoden speichern
+		/** Save interface methods **/
+		IFile interfaceFile = findFile(featureProject.getBuildFolder(), interfaceName);
+		String interfaceContent;
+		MyASTVisitor interfaceVisitor = null;
+		try {
+			interfaceContent = fileToString(interfaceFile);
+			ASTParser intefaceParser = ASTParser.newParser(AST.JLS8);
+			intefaceParser.setSource(interfaceContent.toCharArray());
+			intefaceParser.setKind(ASTParser.K_COMPILATION_UNIT);
+
+			final CompilationUnit interfaceUnit = (CompilationUnit) intefaceParser.createAST(null);
+			interfaceVisitor = new MyASTVisitor(true);
+			interfaceUnit.accept(interfaceVisitor);
+		} catch (IOException e) {
+			FrameworkCorePlugin.getDefault().logError(e);
+		}
+
+		IFile classFile = findFile(location, implementingClass);
 		FSTRole role = model.addRole(feature, interfaceName, classFile);
 		IJavaProject project = JavaCore.create(featureProject.getProject());
 		try {
@@ -175,8 +200,18 @@ public class FrameworkModelBuilder {
 				for (String s : m.getParameterTypes()) {
 					parameterTypes.add(s);
 				}
-				
-				FSTMethod met = new FSTMethod(m.getElementName(), parameterTypes, Signature.toString(m.getReturnType()), getModifiers(m));
+
+				final boolean isRefinement = calculateRefinement(parameterTypes, interfaceVisitor.getMethodSignature(m));
+				FSTMethod met = new FSTMethod(m.getElementName(), parameterTypes, Signature.toString(m.getReturnType()), getModifiers(m)) {
+					/**
+					 * Returns true, if method is from interface or abstract class
+					 */
+					@Override
+					public boolean inRefinementGroup() {
+						//Return true if in interface
+						return isRefinement;
+					}
+				};
 				if (visitor.getData(m) != null) {
 					met.setLine(unit.getLineNumber(visitor.getData(m).getStartPosition()));
 					met.setEndLine(unit.getLineNumber((visitor.getData(m).getStartPosition() + visitor.getData(m).getLength())));
@@ -191,9 +226,31 @@ public class FrameworkModelBuilder {
 	}
 
 	/**
+	 * @param parameterTypes
+	 * @param methodSignature
+	 * @return
+	 */
+	private boolean calculateRefinement(List<String> parameterTypes, List<String> methodSignature) {
+		if(methodSignature == null) {
+			return false;
+		}
+		int i = 0;
+		for (String s : parameterTypes) {
+			if (!methodSignature.contains(s)) {
+				return false;
+			}
+			i++;
+		}
+		if (i != methodSignature.size()) {
+			return false;
+		}
+		return true;
+	}
+
+	/**
 	 * @param m - Method
 	 * @return String representation of method modifiers
-	 * @throws JavaModelException 
+	 * @throws JavaModelException
 	 */
 	private String getModifiers(IMethod m) throws JavaModelException {
 		StringBuilder b = new StringBuilder();
@@ -201,42 +258,37 @@ public class FrameworkModelBuilder {
 		if (Flags.isPublic(flags)) {
 			b.append("public ");
 		}
-		if (Flags.isPrivate(flags)){
+		if (Flags.isPrivate(flags)) {
 			b.append("private ");
 		}
-		if (Flags.isProtected(flags)){
+		if (Flags.isProtected(flags)) {
 			b.append("protected ");
 		}
-		if (Flags.isAbstract(flags)){
+		if (Flags.isAbstract(flags)) {
 			b.append("abstract ");
 		}
-		if (Flags.isStatic(flags)){
+		if (Flags.isStatic(flags)) {
 			b.append("static ");
 		}
 		return b.toString();
 	}
 
 	/**
-	 * Gives you the class inside the feature folder
+	 * Gives you the java file inside the given location
 	 * 
 	 * @param feature
 	 * @param implementingClass
 	 * @return class file as {@link IFile}
 	 */
-	private IFile findFile(String feature, String implementingClass) {
+	private IFile findFile(IFolder location, String implementingClass) {
 		String[] pathSegments = null;
 		if (implementingClass.contains(".")) {
 			pathSegments = implementingClass.split("[.]");
-
-			IFolder featureFolder = featureProject.getSourceFolder().getFolder(feature);
-			IFolder location = featureFolder.getFolder("src");
 			for (int i = 0; i < pathSegments.length - 1; i++) {
 				location = location.getFolder(pathSegments[i]);
 			}
 			return location.getFile(pathSegments[pathSegments.length - 1] + ".java");
 		} else {
-			IFolder featureFolder = featureProject.getSourceFolder().getFolder(feature);
-			IFolder location = featureFolder.getFolder("src");
 			return location.getFile(implementingClass + ".java");
 		}
 	}
@@ -305,23 +357,45 @@ public class FrameworkModelBuilder {
 
 	/**
 	 * 
-	 * ASTVisitor for getting method line and length
+	 * ASTVisitor iterating over java file
 	 * 
 	 * @author Daniel Hohmann
 	 */
 	private class MyASTVisitor extends ASTVisitor {
 		Map<String, Block> methods;
 		Map<String, Integer> fields;
+		Map<String, List<String>> interfaceMethods;
+		boolean iterateOverInterface;
 
 		MyASTVisitor() {
+			this(false);
+			
+		}
+
+		MyASTVisitor(boolean b) {
+			iterateOverInterface = b;
 			methods = new HashMap<>();
 			fields = new HashMap<>();
+			interfaceMethods = new HashMap<>();
 		}
 
 		@Override
 		public boolean visit(MethodDeclaration node) {
-			Block body = node.getBody();
-			methods.put(node.getName().getFullyQualifiedName(), body);
+			if (!iterateOverInterface) {
+				Block body = node.getBody();
+				methods.put(node.getName().getFullyQualifiedName(), body);
+				return false;
+			}
+			List<String> parameters = new ArrayList<>();
+			for (Object o : node.parameters()) {
+				SingleVariableDeclaration variable = (SingleVariableDeclaration) o;
+				String type = variable.getStructuralProperty(SingleVariableDeclaration.TYPE_PROPERTY).toString();
+				for (int i = 0; i < variable.getExtraDimensions(); i++) {
+					type += "[]";
+				}
+				parameters.add(type);
+			}
+			interfaceMethods.put(node.getName().getIdentifier(), parameters);
 			return false;
 		}
 
@@ -333,6 +407,7 @@ public class FrameworkModelBuilder {
 
 		/**
 		 * Getter for data for specified method
+		 * 
 		 * @param m - method
 		 * @return block of method
 		 */
@@ -342,11 +417,19 @@ public class FrameworkModelBuilder {
 
 		/**
 		 * Getter for data for specified field
+		 * 
 		 * @param f - field
 		 * @return line number as {@code Integer}
 		 */
 		public Integer getData(IField f) {
 			return fields.get(f.getElementName());
+		}
+
+		public List<String> getMethodSignature(IMethod m) {
+			if (!iterateOverInterface) {
+				return Collections.<String> emptyList();
+			}
+			return interfaceMethods.get(m.getElementName());
 		}
 	}
 
