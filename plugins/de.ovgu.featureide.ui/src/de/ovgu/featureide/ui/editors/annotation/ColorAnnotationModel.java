@@ -314,21 +314,15 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 			return;
 		}
 
-		int index = 0;
 		for (FSTFeature fstFeature : model.getFeatures()) {
 			for (FSTRole role : fstFeature.getRoles()) {
 				if (file.equals(role.getFile())) {
 					for (FSTDirective dir : role.getDirectives()) {
 						directiveMap.put(dir.getId(), dir);
-						index++;
+						validDirectiveList.add(dir);
 					}
 				}
 			}
-		}
-
-		for (int i = 0; i < index; i++) {
-			FSTDirective dir = directiveMap.get(i);
-			validDirectiveList.add(dir);
 		}
 	}
 
