@@ -1056,7 +1056,7 @@ public final class FeatureUtils {
 		return found;
 	}
 
-	public static final Collection<IFeature> getFalseOptional(IConstraint constraint) {
+	public static final Iterable<IFeature> getFalseOptional(IConstraint constraint) {
 		return constraint.getFalseOptional();
 	}
 

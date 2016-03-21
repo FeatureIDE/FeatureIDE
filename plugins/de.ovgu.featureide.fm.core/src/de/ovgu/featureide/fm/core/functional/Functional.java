@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.filter.base.IFilter;
 
 /**
@@ -669,6 +670,49 @@ public abstract class Functional {
 		final Set<U> left = Functional.toSet(Functional.map(lhs, map));
 		final Set<U> right = Functional.toSet(Functional.map(rhs, map));
 		return left.equals(right);
+	}
+	
+	/**
+	 * Returns an type-safe empty iterable of type <b>T</b> as convenience counterpart to {@link Collections#emptyIterator()} or
+	 * {@link Collections#emptyList()}.
+	 * <br/>
+	 * <br/>
+	 * The parameter <code>className</code> is required to infer the type of <b>T</b> at compile time.
+	 * <br/><br/>
+	 * <b>Example</b>
+	 * The following example shows how to create an empty iterable of type <code>IFeature</code>.
+	 * <code>
+	 * <pre>
+	 * Iterable<IFeature> it = Functional.getEmptyIterable(IFeature.class));
+	 * </pre>
+	 * </code>
+	 * 
+	 * @author Marcus Pinnecke
+	 * @since 3.0
+	 * 
+	 * @param <T> the infered type of the iterable, must be compatible to <code>className</code>
+	 * @param className the class name of the type <b>T</b>
+	 * 
+	 * @return Returns an empty type-safe iterable of type <b>T</b>
+	 */
+	public static <T> Iterable<T> getEmptyIterable(Class<? extends T> className) {
+		Collection<T> collection = new ArrayList<T>(0);
+		return collection;
+	}
+
+	/**
+	 * Checks whenever <code>iterable</code> is empty or not by calling <code>iterable.iterator().hasNext()</code>
+	 * 
+	 * @author Marcus Pinnecke
+	 * @since 3.0
+	 * 
+	 * @param <T> type of elements in <code>iterable</code>
+	 * @param iterable iterable collection of type <b>T</b>
+	 * 
+	 * @return <b>true</b> if <code>iterable</code> is empty, otherwise <b>false</b>
+	 */
+	public static <T> boolean isEmpty(Iterable<T> iterable) {
+		return iterable.iterator().hasNext();
 	}
 
 }

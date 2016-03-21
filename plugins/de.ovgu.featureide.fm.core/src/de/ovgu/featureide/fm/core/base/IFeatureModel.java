@@ -689,6 +689,8 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * @see #setConstraint(int, Constraint)
 	 * @see #replaceConstraint(IConstraint, int)
 	 * 
+	 * @see Functional#getEmptyIterable(Class) Setting an empty iterable
+	 * 
 	 * @param constraints Source of constraints which should be copied into this feature model
 	 * 
 	 * @since 3.0
