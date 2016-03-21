@@ -31,4 +31,13 @@
          sourcePathComputerId="org.eclipse.jdt.launching.sourceLookup.javaSourcePathComputer">
 		</launchConfigurationType>
 	</extension>
+ <extension
+       point="de.ovgu.featureide.fm.core.FMComposer">
+    <fmComposer
+          class="de.ovgu.featureide.core.runtime.RuntimeFMComposerExtension"
+          id="de.ovgu.featureide.core.runtime.fmcomposer"
+          composer="de.ovgu.featureide.core.composer.runtime"
+          name="RuntimeFMComposer">
+    </fmComposer>
+ </extension>
 </plugin>
