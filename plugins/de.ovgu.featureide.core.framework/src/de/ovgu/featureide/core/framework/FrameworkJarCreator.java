@@ -35,7 +35,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 
 /**
- * TODO Class for adding files or folders to jars
+ * Class for adding files or folders to jars
  * 
  * @author Daniel Hohmann
  */

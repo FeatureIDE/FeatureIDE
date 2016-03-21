@@ -20,10 +20,11 @@
  */
 package de.ovgu.featureide.core.framework;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,14 +38,21 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IField;
-import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
+import org.eclipse.jdt.core.dom.AST;
+import org.eclipse.jdt.core.dom.ASTParser;
+import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.Block;
+import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.FieldDeclaration;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -58,11 +66,9 @@ import de.ovgu.featureide.core.fstmodel.FSTField;
 import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
-import de.ovgu.featureide.core.fstmodel.RoleElement;
-import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 
 /**
- * TODO description
+ * Class for building FSTModel
  * 
  * @author Daniel Hohmann
  */
@@ -119,44 +125,95 @@ public class FrameworkModelBuilder {
 		/** add classes **/
 		for (String feature : featureMap.keySet()) {
 			model.addFeature(feature);
-			System.out.println(feature);
 			for (String interfaceName : featureMap.get(feature).keySet()) {
-				System.out.println(interfaceName);
 				model.addClass(new FSTClass(interfaceName));
 				List<String> implementingClasses = featureMap.get(feature).get(interfaceName);
 				for (String implementingClass : implementingClasses) {
-					IFile classFile = findFile(feature, implementingClass);
-					FSTRole role = model.addRole(feature, interfaceName, classFile);
-					IJavaProject project = JavaCore.create(featureProject.getProject());
-					try {
-						System.out.println(implementingClass);
-						IType classType = project.findType(implementingClass);
-						
-						/** Get fields **/
-						if(classType == null) {
-							FrameworkCorePlugin.getDefault().logWarning(implementingClass + " not found");
-							continue;
-						}
-						for(IField f : classType.getFields()){
-							role.getClassFragment().add(new FSTField(f.getElementName(), Signature.toString(f.getTypeSignature()), ""));
-						}
-						
-						/** Get methods **/
-						for(IMethod m : classType.getMethods()){
-							LinkedList<String> parameterTypes = new LinkedList<>();
-							for(String s: m.getParameterTypes()){
-								parameterTypes.add(s);
-							}
-							FSTMethod met = new FSTMethod(m.getElementName(), parameterTypes, Signature.toString(m.getReturnType()), "");
-							role.getClassFragment().add(met);
-						}
-						
-					} catch (JavaModelException e) {
-						FrameworkCorePlugin.getDefault().logError(e);
-					}
+					addRole(feature, interfaceName, implementingClass);
 				}
 			}
 		}
+	}
+
+	/**
+	 * @param feature
+	 * @param interfaceName 
+	 * @param implementingClass
+	 */
+	private void addRole(final String feature, final String interfaceName, final String implementingClass) {
+		IFile classFile = findFile(feature, implementingClass);
+		FSTRole role = model.addRole(feature, interfaceName, classFile);
+		IJavaProject project = JavaCore.create(featureProject.getProject());
+		try {
+			IType classType = project.findType(implementingClass);
+			/** ASTNodes **/
+			String fileContent = fileToString(classFile);
+			ASTParser parser = ASTParser.newParser(AST.JLS8);
+			parser.setSource(fileContent.toCharArray());
+			parser.setKind(ASTParser.K_COMPILATION_UNIT);
+
+			final CompilationUnit unit = (CompilationUnit) parser.createAST(null);
+			MyASTVisitor visitor = new MyASTVisitor();
+			unit.accept(visitor);
+
+			/** Get fields **/
+			if (classType == null) {
+				FrameworkCorePlugin.getDefault().logWarning(implementingClass + " not found");
+				return;
+			}
+			for (IField f : classType.getFields()) {
+				FSTField field = new FSTField(f.getElementName(), Signature.toString(f.getTypeSignature()), "");
+				if (visitor.getData(f) != null) {
+					field.setLine(unit.getLineNumber(visitor.getData(f).intValue()));
+				}
+				role.getClassFragment().add(field);
+			}
+
+			/** Get methods **/
+			for (IMethod m : classType.getMethods()) {
+				LinkedList<String> parameterTypes = new LinkedList<>();
+				for (String s : m.getParameterTypes()) {
+					parameterTypes.add(s);
+				}
+				
+				FSTMethod met = new FSTMethod(m.getElementName(), parameterTypes, Signature.toString(m.getReturnType()), getModifiers(m));
+				if (visitor.getData(m) != null) {
+					met.setLine(unit.getLineNumber(visitor.getData(m).getStartPosition()));
+					met.setEndLine(unit.getLineNumber((visitor.getData(m).getStartPosition() + visitor.getData(m).getLength())));
+				}
+				role.getClassFragment().add(met);
+
+			}
+
+		} catch (JavaModelException | IOException e) {
+			FrameworkCorePlugin.getDefault().logError(e);
+		}
+	}
+
+	/**
+	 * @param m - Method
+	 * @return String representation of method modifiers
+	 * @throws JavaModelException 
+	 */
+	private String getModifiers(IMethod m) throws JavaModelException {
+		StringBuilder b = new StringBuilder();
+		int flags = m.getFlags();
+		if (Flags.isPublic(flags)) {
+			b.append("public ");
+		}
+		if (Flags.isPrivate(flags)){
+			b.append("private ");
+		}
+		if (Flags.isProtected(flags)){
+			b.append("protected ");
+		}
+		if (Flags.isAbstract(flags)){
+			b.append("abstract ");
+		}
+		if (Flags.isStatic(flags)){
+			b.append("static ");
+		}
+		return b.toString();
 	}
 
 	/**
@@ -244,5 +301,80 @@ public class FrameworkModelBuilder {
 		}
 
 		return map;
+	}
+
+	/**
+	 * 
+	 * ASTVisitor for getting method line and length
+	 * 
+	 * @author Daniel Hohmann
+	 */
+	private class MyASTVisitor extends ASTVisitor {
+		Map<String, Block> methods;
+		Map<String, Integer> fields;
+
+		MyASTVisitor() {
+			methods = new HashMap<>();
+			fields = new HashMap<>();
+		}
+
+		@Override
+		public boolean visit(MethodDeclaration node) {
+			Block body = node.getBody();
+			methods.put(node.getName().getFullyQualifiedName(), body);
+			return false;
+		}
+
+		@Override
+		public boolean visit(FieldDeclaration node) {
+			fields.put(node.toString(), Integer.valueOf(node.getStartPosition() + node.getLength()));
+			return false;
+		}
+
+		/**
+		 * Getter for data for specified method
+		 * @param m - method
+		 * @return block of method
+		 */
+		public Block getData(IMethod m) {
+			return methods.get(m.getElementName());
+		}
+
+		/**
+		 * Getter for data for specified field
+		 * @param f - field
+		 * @return line number as {@code Integer}
+		 */
+		public Integer getData(IField f) {
+			return fields.get(f.getElementName());
+		}
+	}
+
+	/**
+	 * Iterates over a file and turns its content into a string
+	 * 
+	 * @param classFile
+	 * @return null, if classFile is {@code null}
+	 * @throws IOException
+	 */
+	private String fileToString(IFile classFile) throws IOException {
+		if (classFile == null) {
+			return null;
+		}
+		String filePath = classFile.getLocation().toOSString();
+		StringBuilder fileData = new StringBuilder(1000);
+		BufferedReader reader = new BufferedReader(new FileReader(filePath));
+
+		char[] buf = new char[10];
+		int numRead = 0;
+		while ((numRead = reader.read(buf)) != -1) {
+			String readData = String.valueOf(buf, 0, numRead);
+			fileData.append(readData);
+			buf = new char[1024];
+		}
+
+		reader.close();
+
+		return fileData.toString();
 	}
 }

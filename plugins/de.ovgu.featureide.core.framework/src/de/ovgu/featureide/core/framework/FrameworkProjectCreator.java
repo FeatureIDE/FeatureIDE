@@ -98,15 +98,16 @@ public class FrameworkProjectCreator {
 			entries.add(JavaCore.newLibraryEntry(element.getSystemLibraryPath(), null, null));
 		}
 		javaProject.setRawClasspath(entries.toArray(new IClasspathEntry[entries.size()]), null);
-
 		IFolder sourceFolder = project.getFolder("src");
 		sourceFolder.create(false, true, null);
 
 		IPackageFragmentRoot srcRoot = javaProject.getPackageFragmentRoot(sourceFolder);
 		IClasspathEntry[] oldEntries = javaProject.getRawClasspath();
-		IClasspathEntry[] newEntries = new IClasspathEntry[oldEntries.length + 1];
+		int oldLength = oldEntries.length;
+		IClasspathEntry[] newEntries = new IClasspathEntry[oldLength + 2];
 		System.arraycopy(oldEntries, 0, newEntries, 0, oldEntries.length);
-		newEntries[oldEntries.length] = JavaCore.newSourceEntry(srcRoot.getPath());
+		newEntries[oldLength] = JavaCore.newSourceEntry(srcRoot.getPath());
+		newEntries[oldLength+1] = JavaCore.newProjectEntry(destination.getProject().getFullPath());
 		javaProject.setRawClasspath(newEntries, null);
 
 		IFile infoXML = destination.getFile("info.xml");

@@ -156,6 +156,9 @@ public class FrameworkComposer extends ComposerExtensionClass {
 		}
 	}
 
+	/**
+	 * Creates sub-projects inside feature folder depending on selected features
+	 */
 	private void createSubprojects() {
 
 		for (String featureName : selectedFeatures) {
@@ -175,6 +178,11 @@ public class FrameworkComposer extends ComposerExtensionClass {
 						FrameworkCorePlugin.getDefault().logError(e);
 					}
 				}
+			}
+			try {
+				features.refreshLocal(IResource.DEPTH_INFINITE, null);
+			} catch (CoreException e) {
+				FrameworkCorePlugin.getDefault().logError(e);
 			}
 		}
 	}
