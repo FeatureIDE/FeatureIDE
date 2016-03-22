@@ -30,7 +30,7 @@ public class RuntimeLaunchConfigurationDelegate implements ILaunchConfigurationD
 		}
 
 		if (featureProject != null && featureProject.getComposerID().equals(COMPOSER_ID)
-				&& RuntimeComposer.COMPOSITION_MECHANISMS[0].equals(featureProject.getCompositionMechanism())) {
+				&& RuntimeComposer.RUN_CONFIGURATION.equals(featureProject.getCompositionMechanism())) {
 
 			final Configuration featureProjectConfig = new Configuration(featureProject.getFeatureModel());
 

@@ -14,16 +14,22 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 
-import de.ovgu.featureide.core.runtime.RuntimeComposer.FeatureLocation;
 import de.ovgu.featureide.core.runtime.activator.RuntimeCorePlugin;
 import de.ovgu.featureide.fm.core.FMComposerExtension;
 
+/**
+ * Class for handling renaming events of features within the model.
+ * 
+ * @author Kai Wolf
+ * @author Matthias Quaas
+ *
+ */
 public class RuntimeFMComposerExtension extends FMComposerExtension {
 
 	public RuntimeFMComposerExtension() {
 
 	}
-	
+
 	@Override
 	protected boolean isValidFeatureNameComposerSpecific(String s) {
 		return super.isValidFeatureNameComposerSpecific(s);
@@ -39,24 +45,30 @@ public class RuntimeFMComposerExtension extends FMComposerExtension {
 		return true;
 	}
 
+	/**
+	 * Actual handling of renaming.
+	 */
 	@Override
 	public boolean performRenaming(String oldName, String newName, IProject project) {
-		ArrayList<FeatureLocation> locations = new ArrayList<RuntimeComposer.FeatureLocation>();
-	
+
+		ArrayList<FeatureLocation> locations = new ArrayList<FeatureLocation>();
+		
+		//get FeatureLocation objects with the given oldName as feature name 
 		for (FeatureLocation loc : RuntimeComposer.featureLocs) {
 			if (loc.getFeatureName().equals(oldName)) {
 				locations.add(loc);
 			}
 		}
-
-		HashMap<String, String[]> readClassFiles = new HashMap<String, String[]>();
+		//only load and parse each class file once
+		HashMap<String, String[]> processedClassFiles = new HashMap<String, String[]>();
 
 		for (FeatureLocation loc : locations) {
-			String[] oldClassString=null;
-			String classPath = loc.getClassFile().getFullPath().toOSString();
+			String[] oldClassStringArray = null;
+			String classPath = loc.getOSPath();
 			int lineNumber = loc.getStartLineNum();
 
-			if (!readClassFiles.containsKey(classPath)) {
+			//if the class has not already been loaded, load it
+			if (!processedClassFiles.containsKey(classPath)) {
 
 				try {
 					IFile classFile = loc.getClassFile();
@@ -73,11 +85,9 @@ public class RuntimeFMComposerExtension extends FMComposerExtension {
 						inputStringBuilder.append('\n');
 						line = bufferedReader.readLine();
 					}
-					oldClassString = inputStringBuilder.toString().split("\\n");
-					readClassFiles.put(classPath, oldClassString);
+					oldClassStringArray = inputStringBuilder.toString().split("\\n");
+					processedClassFiles.put(classPath, oldClassStringArray);
 
-					oldClassString=replace(oldClassString, lineNumber, oldName, newName);
-				
 				} catch (UnsupportedEncodingException e) {
 					RuntimeCorePlugin.getDefault().logError(e);
 				} catch (IOException e) {
@@ -85,12 +95,16 @@ public class RuntimeFMComposerExtension extends FMComposerExtension {
 				} catch (CoreException e) {
 					RuntimeCorePlugin.getDefault().logError(e);
 				}
+			//else use the one in the map
 			} else {
-				oldClassString=replace(readClassFiles.get(classPath), lineNumber, oldName, newName);
+				oldClassStringArray = processedClassFiles.get(classPath);
 			}
-			
-			String newClassString = String.join("\n", oldClassString);
-			
+			oldClassStringArray[lineNumber - 1] = oldClassStringArray[lineNumber - 1].replace(
+					RuntimeComposer.GET_PROPERTY_METHOD + "(\"" + oldName + "\")",
+					RuntimeComposer.GET_PROPERTY_METHOD + "(\"" + newName + "\")");
+
+			String newClassString = String.join("\n", oldClassStringArray);
+
 			InputStream newClassStream = new ByteArrayInputStream(newClassString.getBytes(StandardCharsets.UTF_8));
 			try {
 				loc.getClassFile().setContents(newClassStream, IFile.FORCE, null);
@@ -102,12 +116,6 @@ public class RuntimeFMComposerExtension extends FMComposerExtension {
 
 		return true;
 
-	}
-
-	private String[] replace(String[] classString, int lineNumber, String oldName, String newName) {
-
-		classString[lineNumber-1] = classString[lineNumber-1].replace("getProperty(\""+oldName+"\")", "getProperty(\""+newName+"\")"); 
-		return classString;
 	}
 
 	@Override

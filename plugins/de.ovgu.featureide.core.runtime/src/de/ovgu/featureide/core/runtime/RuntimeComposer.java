@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Vector;
 
 import org.eclipse.core.resources.IFile;
@@ -32,11 +31,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
-import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.IfStatement;
-import org.eclipse.jdt.core.dom.MethodInvocation;
-import org.eclipse.jdt.core.dom.MethodRef;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.jdt.internal.corext.callhierarchy.CallHierarchy;
@@ -64,8 +59,8 @@ import de.ovgu.featureide.fm.core.io.manager.FileReader;
  * arguments from .config file into the program arguments of Eclipse Run
  * Configuration.
  * 
- * @author Matthias Quaas
  * @author Kai Wolf
+ * @author Matthias Quaas
  *
  */
 @SuppressWarnings("restriction")
@@ -73,151 +68,62 @@ public class RuntimeComposer extends ComposerExtensionClass {
 
 	public static final String RUN_CONFIGURATION = "Run Configuration";
 	public static final String PROPERTIES = "Properties";
-	private final String NOT_EXISTING_PROPERTY_MARKER = CorePlugin.PLUGIN_ID + ".builderProblemMarker";
+	public static final String NOT_EXISTING_PROPERTY_MARKER = CorePlugin.PLUGIN_ID + ".builderProblemMarker";
+	public static final String PROPERTY_MANAGER_CLASS = "PropertyManager";
+	public static final String PROPERTY_MANAGER_PACKAGE = "properties";
+	public static final String GET_PROPERTY_METHOD = "getProperty";
 	static final String[] COMPOSITION_MECHANISMS = new String[] { RUN_CONFIGURATION, PROPERTIES };
 	static ArrayList<FeatureLocation> featureLocs = new ArrayList<FeatureLocation>();
-
-	class FeatureLocation {
-
-		String featureName;
-		int startLineNum;
-		IFile classFile;
-		String className;
-		int endLineNum;
-		FeatureLocation parent;
-		boolean inConfig;
-		FSTDirectiveCommand cmd;
-
-		FeatureLocation(String featureName, int lineNumber, int endLineNum, IFile classFile, String className,
-				FSTDirectiveCommand cmd) {
-			this.featureName = featureName;
-			this.startLineNum = lineNumber;
-			this.classFile = classFile;
-			this.className = className;
-			this.endLineNum = endLineNum;
-			this.parent = null;
-			this.inConfig = false;
-			this.cmd = cmd;
-		}
-
-		public FSTDirectiveCommand getCmd() {
-			return cmd;
-		}
-
-		public String getFeatureName() {
-			return featureName;
-		}
-
-		public int getStartLineNum() {
-			return startLineNum;
-		}
-
-		public IFile getClassFile() {
-			return classFile;
-		}
-
-		public String getClassName() {
-			return className;
-		}
-
-		public int getEndLineNum() {
-			return endLineNum;
-		}
-
-		public FeatureLocation getParent() {
-			return parent;
-		}
-
-		public boolean isInConfig() {
-			return inConfig;
-		}
-
-		public void setFeatureName(String featureName) {
-			this.featureName = featureName;
-		}
-
-		public void setParent(FeatureLocation parent) {
-			this.parent = parent;
-		}
-
-		public void setInConfig(boolean existsInConfig) {
-			this.inConfig = existsInConfig;
-		}
-
-		public void setCmd(FSTDirectiveCommand cmd) {
-			this.cmd = cmd;
-		}
-
-		public String toString() {
-			return classFile.getFullPath().toOSString() + "_" + startLineNum + "_" + featureName;
-		}
-
-	}
 
 	@Override
 	public String[] getCompositionMechanisms() {
 		return COMPOSITION_MECHANISMS;
 	}
 
-	/**
-	 * Method to get all call locations of a method.
-	 * 
-	 * @param m
-	 *            Method for which the call hierarchy will be evaluated.
-	 * @return All call locations.
-	 */
-	private static ArrayList<CallLocation[]> getCallersOf(IMethod m) {
+	@Override
+	public boolean hasFeatureFolder() {
+		return false;
+	}
 
-		CallHierarchy callHierarchy = new CallHierarchy();
-		IJavaSearchScope scope = SearchEngine.createWorkspaceScope();
-		callHierarchy.setSearchScope(scope);
+	@Override
+	public boolean needColor() {
+		return true;
+	}
 
-		IMember[] members = { m };
-		ArrayList<MethodCall> methodCalls = new ArrayList<MethodCall>();
+	@Override
+	public boolean hasSourceFolder() {
+		return false;
+	}
 
-		MethodWrapper[] callerWrapper = callHierarchy.getCallerRoots(members);
-		ArrayList<MethodWrapper> callsWrapper = new ArrayList<MethodWrapper>();
-		for (int i = 0; i < callerWrapper.length; i++) {
-			callsWrapper.addAll(Arrays.asList(callerWrapper[i].getCalls(new NullProgressMonitor())));
-		}
+	@Override
+	public void postCompile(IResourceDelta delta, IFile buildFile) {
+	}
 
-		for (int i = 0; i < callsWrapper.size(); i++) {
-			methodCalls.add(callsWrapper.get(i).getMethodCall());
-		}
+	@Override
+	public boolean clean() {
+		return false;
+	}
 
-		ArrayList<CallLocation[]> callList = new ArrayList<CallLocation[]>();
-		for (int i = 0; i < methodCalls.size(); i++) {
-			CallLocation[] callArray = new CallLocation[methodCalls.get(i).getCallLocations().size()];
-			methodCalls.get(i).getCallLocations().toArray(callArray);
-			callList.add(callArray);
-		}
-		return callList;
+	@Override
+	public Mechanism getGenerationMechanism() {
+		return null;
+	}
 
+	@Override
+	public LinkedList<FSTDirective> buildModelDirectivesForFile(Vector<String> lines) {
+		return new LinkedList<>();
 	}
 
 	/**
 	 * Every time the project is built, the config will be read and written into
 	 * runtime.properties.
 	 */
-
-	private Configuration readConfig() {
-
-		final Configuration featureProjectConfig = new Configuration(featureProject.getFeatureModel());
-		String configPath = featureProject.getCurrentConfiguration().getRawLocation().toOSString();
-		FileReader<Configuration> reader = new FileReader<>(configPath, featureProjectConfig,
-				ConfigurationManager.getFormat(configPath));
-		reader.read();
-
-		return featureProjectConfig;
-
-	}
-
 	@Override
 	public void performFullBuild(IFile config) {
 
 		IFile fileProp = featureProject.getProject().getFile("runtime.properties");
 
-		if (COMPOSITION_MECHANISMS[1].equals(featureProject.getCompositionMechanism())) {
+		if (PROPERTIES.equals(featureProject.getCompositionMechanism())) {
 
 			buildFSTModel();
 
@@ -250,77 +156,285 @@ public class RuntimeComposer extends ComposerExtensionClass {
 		}
 	}
 
+	/**
+	 * Builds FST Model: - adds directives to the model representing each call
+	 * of the getProperty()-method - if feature in code does not exist it will
+	 * be marked
+	 */
 	@Override
 	public void buildFSTModel() {
 
-		if (COMPOSITION_MECHANISMS[1].equals(featureProject.getCompositionMechanism())) {
+		if (PROPERTIES.equals(featureProject.getCompositionMechanism())) {
 
-			final Configuration configuration = readConfig();
-
+			// get all current locations of getProperty-calls within the code
 			setFeatureLocations();
 
+			// map linking the call location within the code with its directive
 			HashMap<FeatureLocation, FSTDirective> directives = new HashMap<FeatureLocation, FSTDirective>();
 			FSTModel model = new FSTModel(featureProject);
 			int id = 0;
 			FSTRole role;
-			int endLineNum;
 
 			deleteMarkers();
 
 			for (FeatureLocation loc : featureLocs) {
-
-				for (SelectableFeature feature : configuration.getFeatures()) {
-					if (feature.getName().equals(loc.getFeatureName())) {
-						loc.setInConfig(true);
-						break;
-					}
-				}
 				if (loc.isInConfig()) {
+					// add directive to role and role to model
 					model.addRole(loc.getFeatureName(), loc.getClassName(), loc.getClassFile());
 					role = model.getRole(loc.getFeatureName(), loc.getClassName());
-					directives.put(loc, setFSTDirective(loc, role, id));
+					FSTDirective fstDirective = setFSTDirective(loc, id);
+					fstDirective.setRole(role);
+					role.add(fstDirective);
+					directives.put(loc, fstDirective);
 					id++;
 				} else {
-
 					try {
+						// marker if feature does not exist in current config
 						IMarker newMarker = loc.getClassFile().createMarker(NOT_EXISTING_PROPERTY_MARKER);
 
 						newMarker.setAttribute(IMarker.MESSAGE,
 								"Queried Feature '" + loc.getFeatureName() + "' does not exist!");
 						newMarker.setAttribute(IMarker.LINE_NUMBER, loc.getStartLineNum());
 						newMarker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
-
 					} catch (CoreException e) {
-
 						RuntimeCorePlugin.getDefault().logError(e);
 					}
-
 				}
 			}
-
-			setChilds(directives);
-			// FSTDirective[] bla = new
-			// FSTDirective[directives.values().size()];
-			// directives.values().toArray(bla);
+			// set parent-child-relationships
+			setDirectiveChilds(directives);
 
 			featureProject.setFSTModel(model);
 			super.buildFSTModel();
 		}
 	}
 
-	private void setChilds(HashMap<FeatureLocation, FSTDirective> directives) {
+	/**
+	 * Reads and returns current feature config.
+	 * 
+	 * @return
+	 */
+	private Configuration readConfig() {
+
+		final Configuration featureProjectConfig = new Configuration(featureProject.getFeatureModel());
+		String configPath = featureProject.getCurrentConfiguration().getRawLocation().toOSString();
+		FileReader<Configuration> reader = new FileReader<>(configPath, featureProjectConfig,
+				ConfigurationManager.getFormat(configPath));
+		reader.read();
+
+		return featureProjectConfig;
+
+	}
+
+	/**
+	 * Looks for callers of getProperty()-method and creates
+	 * FeatureLocation-object for each call.
+	 */
+
+	public void setFeatureLocations() {
+
+		featureLocs.clear();
+		IJavaProject proj = JavaCore.create(featureProject.getProject());
+		try {
+			IType itype = proj.findType(PROPERTY_MANAGER_PACKAGE + "." + PROPERTY_MANAGER_CLASS);
+			IMethod method = null;
+
+			for (IMethod m : itype.getMethods()) {
+				if (m.getElementName().equals(GET_PROPERTY_METHOD)) {
+					method = m;
+				}
+			}
+			ArrayList<CallLocation[]> callLocs = getCallersOf(method);
+
+			String featureName;
+			String className;
+			IFile classFile;
+			ICompilationUnit compilationUnit;
+			int startLineNum;
+			int endLineNum;
+			FSTDirectiveCommand cmd;
+			for (CallLocation[] callLoc : callLocs) {
+				for (int i = 0; i < callLoc.length; i++) {
+					// feature name = attribute of getProperty-call
+					featureName = callLoc[i].getCallText().split("\"")[1];
+					className = callLoc[i].getMember().getParent().getElementName();
+					classFile = (IFile) callLoc[i].getMember().getCompilationUnit().getCorrespondingResource();
+					compilationUnit = callLoc[i].getMember().getCompilationUnit();
+					startLineNum = callLoc[i].getLineNumber();
+					endLineNum = getEndOfIf(compilationUnit, startLineNum);
+					// if the call in the start line is within an if-statement,
+					// getEndOfIf() will return the end of the latter
+					cmd = endLineNum == 1 ? FSTDirectiveCommand.CALL : FSTDirectiveCommand.IF;
+					endLineNum = endLineNum == 1 ? startLineNum : endLineNum;
+
+					featureLocs
+							.add(new FeatureLocation(featureName, startLineNum, endLineNum, classFile, className, cmd));
+				}
+			}
+		} catch (JavaModelException e) {
+			RuntimeCorePlugin.getDefault().logError(e);
+		}
+		// sort all feature locations by 1) class (here represented by path
+		// string) and 2) its starting line
+		Collections.sort(featureLocs,
+				(a, b) -> a.getOSPath().compareTo(b.getOSPath()) == 0
+						? (a.getStartLineNum() < b.getStartLineNum() ? -1
+								: a.getStartLineNum() == b.getStartLineNum() ? 0 : 1)
+						: a.getOSPath().compareTo(b.getOSPath()));
+
+		final Configuration configuration = readConfig();
+
+		// check whether the feature corresponding with the
+		// FeatureLocation-object is in the current config
+		for (FeatureLocation loc : featureLocs) {
+			for (SelectableFeature feature : configuration.getFeatures()) {
+				if (feature.getName().equals(loc.getFeatureName())) {
+					loc.setInConfig(true);
+					break;
+				}
+			}
+		}
+		// get parent-child-relations for FeatureLocation-objects
+		for (int i = 1; i < featureLocs.size(); i++) {
+			FeatureLocation loc = featureLocs.get(i);
+			loc.setParent(getParentFeatureLocation(i));
+		}
+	}
+
+	/**
+	 * Method to get all call locations of a method.
+	 * 
+	 * @param m
+	 *            Method for which the call hierarchy will be evaluated.
+	 * @return All call locations.
+	 */
+
+	private ArrayList<CallLocation[]> getCallersOf(IMethod m) {
+
+		CallHierarchy callHierarchy = new CallHierarchy();
+		IJavaSearchScope scope = SearchEngine.createWorkspaceScope();
+		callHierarchy.setSearchScope(scope);
+
+		IMember[] members = { m };
+		ArrayList<MethodCall> methodCalls = new ArrayList<MethodCall>();
+
+		MethodWrapper[] callerWrapper = callHierarchy.getCallerRoots(members);
+		ArrayList<MethodWrapper> callsWrapper = new ArrayList<MethodWrapper>();
+		ArrayList<CallLocation[]> callList = new ArrayList<CallLocation[]>();
+
+		for (MethodWrapper mWrapper : callerWrapper) {
+			callsWrapper.addAll(Arrays.asList(mWrapper.getCalls(new NullProgressMonitor())));
+		}
+		for (MethodWrapper mWrapper : callsWrapper) {
+			methodCalls.add(mWrapper.getMethodCall());
+		}
+		for (MethodCall mCall : methodCalls) {
+			CallLocation[] callArray = new CallLocation[mCall.getCallLocations().size()];
+			mCall.getCallLocations().toArray(callArray);
+			callList.add(callArray);
+		}
+
+		return callList;
+
+	}
+
+	/**
+	 * Gets the end of an if-statement by parsing the class' AST.
+	 * 
+	 * @param compilationUnit
+	 * @param startLineNum
+	 *            Indicator for which if statement of the code the end is
+	 *            requested.
+	 * @return
+	 */
+	private int getEndOfIf(ICompilationUnit compilationUnit, int startLineNum) {
+
+		ASTParser parser = ASTParser.newParser(AST.JLS8);
+		parser.setSource(compilationUnit);
+		parser.setKind(ASTParser.K_COMPILATION_UNIT);
+		parser.setResolveBindings(true);
+
+		// without this suppress it would throw an error. (strangely not any
+		// longer?)
+		// @SuppressWarnings("unused")
+		ASTNode rootNode = parser.createAST(new NullProgressMonitor());
+		IfVisitor astVisitor = new IfVisitor(startLineNum, (CompilationUnit) rootNode);
+		rootNode.accept(astVisitor);
+
+		return ((CompilationUnit) rootNode).getLineNumber(astVisitor.getEndPosition());
+	}
+
+	/**
+	 * Looks for parent-child-relations between FeatureLocation-objects. Its
+	 * main aim is to locate nested if-statements.
+	 * 
+	 * @param startIndex
+	 *            Index within {@link featureLocs} indicating the concrete
+	 *            object.
+	 * @return Parent FeatureLocation-object, null if it has not got a parent.
+	 */
+
+	private FeatureLocation getParentFeatureLocation(int startIndex) {
+		FeatureLocation startLoc = featureLocs.get(startIndex);
+		FeatureLocation prvLoc = null;
+		String startClassPath = startLoc.getOSPath();
+		String prvClassPath;
+		// iterate backwards trough all call locations
+		// if the object's starting line is between the previous object's begin
+		// and end line it is its child.
+		for (int i = startIndex; i >= 1; i--) {
+			prvLoc = featureLocs.get(i - 1);
+			prvClassPath = prvLoc.getOSPath();
+
+			// do not set the previous location as parent if it is not in the
+			// current config
+			if (!prvLoc.isInConfig()) {
+				prvLoc = null;
+				continue;
+			}
+			// ensure the two FeatureLocation objects are located in the same
+			// class
+			else if (!startClassPath.equals(prvClassPath)) {
+				prvLoc = null;
+				break;
+			} else if (startLoc.getStartLineNum() > prvLoc.getStartLineNum()
+					&& startLoc.getEndLineNum() < prvLoc.getEndLineNum()) {
+				break;
+			}
+			// if the begin is reached but no parent is found prvLoc will be set
+			// to null again (after working with it)
+			else if ((i - 1) == 0) {
+				prvLoc = null;
+			}
+		}
+		return prvLoc;
+	}
+
+	/**
+	 * Sets the parent-child-relations within the FSTModel by adding children to
+	 * parent directives. To determine these relations the
+	 * parent-child-relations of the FeatureLocation-objects will be utilized.
+	 * 
+	 * @param directives
+	 *            Map linking FeatureLocation-objects with their FSTDirectives
+	 *            representing them in the FSTModel
+	 */
+	private void setDirectiveChilds(HashMap<FeatureLocation, FSTDirective> directives) {
 		FeatureLocation parent = null;
 		for (FeatureLocation loc : featureLocs) {
 			parent = loc.getParent();
+			// only add children to directives when they are in the current
+			// config
 			if (parent != null && loc.isInConfig()) {
 				FSTDirective directiveOfParent = directives.get(parent);
 				directiveOfParent.addChild(directives.get(loc));
 			}
 		}
-
 	}
 
 	private void deleteMarkers() {
+
+		// only delete markers once for each class
 		ArrayList<IFile> processedFiles = new ArrayList<IFile>();
 
 		for (FeatureLocation loc : featureLocs) {
@@ -331,302 +445,61 @@ public class RuntimeComposer extends ComposerExtensionClass {
 				} catch (CoreException e) {
 					RuntimeCorePlugin.getDefault().logError(e);
 				}
-
 			}
-
 		}
-
 	}
 
 	/**
-	 * Sets the directives which will be added to the FSTModel.
+	 * Creates the directive which will be added to the FSTModel and set its
+	 * properties.
 	 * 
-	 * @param featureName
-	 * @param className
-	 * @param startLineNum
-	 * @param role
+	 * @param loc
+	 *            FeatureLocation for which the directive needs to be added.
 	 * @param id
-	 * @return
+	 *            Internal id of the new directive
+	 * @return Returns created directive.
 	 */
-	private FSTDirective setFSTDirective(FeatureLocation loc, FSTRole role, int id) {
+	private FSTDirective setFSTDirective(FeatureLocation loc, int id) {
 
 		FSTDirective fstDirective = new FSTDirective();
 		fstDirective.setFeatureName(loc.getFeatureName());
 		fstDirective.setLine(loc.getStartLineNum());
-		fstDirective.setRole(role);
 		fstDirective.setExpression(loc.getFeatureName());
 		fstDirective.setStartLine(loc.getStartLineNum() - 1, 0);
 		fstDirective.setEndLine(loc.getEndLineNum(), 0);
 		fstDirective.setId(id);
 		fstDirective.setCommand(loc.getCmd());
-		
-
-		role.add(fstDirective);
 
 		return fstDirective;
 	}
 
-	public void setFeatureLocations() {
-
-		featureLocs.clear();
-		IJavaProject proj = JavaCore.create(featureProject.getProject());
-
-		try {
-			IType itype = proj.findType("properties.PropertyManager");
-			IMethod method = null;
-
-			for (IMethod m : itype.getMethods()) {
-				if (m.getElementName().equals("getProperty")) {
-					method = m;
-				}
-			}
-
-			ArrayList<CallLocation[]> callLocs = getCallersOf(method);
-
-			String featureName;
-			String className;
-			IFile classFile;
-			int startLineNum;
-			int endLineNum;
-
-			for (CallLocation[] callLoc : callLocs) {
-				for (int i = 0; i < callLoc.length; i++) {
-					featureName = callLoc[i].getCallText().split("\"")[1];
-					className = callLoc[i].getMember().getParent().getElementName();
-					classFile = (IFile) callLoc[i].getMember().getCompilationUnit().getCorrespondingResource();
-					ICompilationUnit compilationUnit = callLoc[i].getMember().getCompilationUnit();
-					startLineNum = callLoc[i].getLineNumber();
-					endLineNum = getEndOfIf(compilationUnit, startLineNum);
-
-					FSTDirectiveCommand cmd = endLineNum == 1 ? FSTDirectiveCommand.CALL : FSTDirectiveCommand.IF;
-					endLineNum = endLineNum == 1 ? startLineNum : endLineNum;
-
-					featureLocs
-							.add(new FeatureLocation(featureName, startLineNum, endLineNum, classFile, className, cmd));
-
-					// int endLineNum = ((CompilationUnit)
-					// rootNode).getLineNumber(astVisitor.getEndPosition());
-					// System.out.println("Start: " + startLineNum + " Name: " +
-					// featureName);
-					// System.out.println("Ende: " + endLineNum);
-				}
-			}
-		} catch (JavaModelException e) {
-			RuntimeCorePlugin.getDefault().logError(e);
-		}
-		// Collections.sort(featureLocs,
-		// (a, b) ->
-		// a.classFile.getFullPath().toOSString().compareTo(b.classFile.getFullPath().toOSString()));
-		// Collections.sort(featureLocs,
-		// (a, b) -> a.startLineNum < b.startLineNum ? -1 : a.startLineNum ==
-		// b.startLineNum ? 0 : 1);
-		Collections.sort(featureLocs, (a, b) -> a.toString().compareTo(b.toString()));
-		for (int i = 1; i < featureLocs.size(); i++) {
-			FeatureLocation loc = featureLocs.get(i);
-			loc.setParent(getParent(i));
-		}
-		for (FeatureLocation f : featureLocs) {
-			System.out.println("Klasse: " + f.getClassName());
-			System.out.println("Feature: " + f.getFeatureName());
-			System.out.println("Start: " + f.getStartLineNum());
-			System.out.println("Ende: " + f.getEndLineNum());
-			if (f.getParent() == null)
-				System.out.println("kein Parent");
-			else {
-				System.out.println("Parent Start: " + f.getParent().getStartLineNum());
-			}
-		}
-
-	}
-
-	private FeatureLocation getParent(int startIndex) {
-		String startClassPath = featureLocs.get(startIndex).getClassFile().getFullPath().toOSString();
-		String prvClassPath = featureLocs.get(startIndex - 1).getClassFile().getFullPath().toOSString();
-		FeatureLocation startLoc = featureLocs.get(startIndex);
-		FeatureLocation prvLoc = featureLocs.get(startIndex - 1);
-		if (startLoc.getStartLineNum() == 27) {
-			System.out.println("nhi");
-		}
-		for (int i = startIndex; i >= 1; i--) {
-			// startLoc = featureLocs.get(i);
-			prvLoc = featureLocs.get(i - 1);
-			prvClassPath = prvLoc.getClassFile().getFullPath().toOSString();
-			if (!startClassPath.equals(prvClassPath)) {
-				prvLoc = null;
-				break;
-			} else if (startLoc.getStartLineNum() > prvLoc.getStartLineNum()
-					&& startLoc.getEndLineNum() < prvLoc.getEndLineNum()) {
-				break;
-			} else if ((i - 1) == 0) {
-				prvLoc = null;
-			}
-		}
-		return prvLoc;
-	}
-
-	private int getEndOfIf(ICompilationUnit compilationUnit, int startLineNum) {
-
-		ASTParser parser = ASTParser.newParser(AST.JLS8);
-		parser.setSource(compilationUnit);
-		parser.setKind(ASTParser.K_COMPILATION_UNIT);
-		parser.setResolveBindings(true);
-
-		@SuppressWarnings("unused")
-		ASTNode rootNode = parser.createAST(new NullProgressMonitor());
-		IfVisitor astVisitor = new IfVisitor(startLineNum, (CompilationUnit) rootNode);
-		rootNode.accept(astVisitor);
-
-		return ((CompilationUnit) rootNode).getLineNumber(astVisitor.getEndPosition())
-				;
-	}
-
-	class IfVisitor extends ASTVisitor {
-
-		int endPosition;
-		int startLine;
-//		int elseLength;
-		// int parentStartLine;
-		CompilationUnit compilationUnit;
-
-		public IfVisitor(int startLine, CompilationUnit compilationUnit) {
-			super();
-			endPosition = 0;
-//			elseLength = 0;
-			this.startLine = startLine;
-			this.compilationUnit = compilationUnit;
-		}
-
-		public void endVisit(IfStatement node) {
-
-			if (compilationUnit.getLineNumber(node.getStartPosition()) == startLine) {
-//				endPosition = node.getStartPosition();
-				endPosition = node.getThenStatement().getStartPosition();
-				// elseLength= node.getElseStatement() == null? 0 :
-				// node.getElseStatement().getLength()-1;
-				// System.out.println("else "+elseLength);
-				endPosition += node.getThenStatement().getLength();
-				// parentStartLine =
-				// compilationUnit.getLineNumber(node.getParent().getStartPosition());
-			}
-
-			// System.out.println("Aktuelle Zeile: " +
-			// compilationUnit.getLineNumber(node.getStartPosition()));
-			// System.out.println("Parentline: " +
-			// compilationUnit.getLineNumber(node.getParent().getStartPosition()));
-
-			super.endVisit(node);
-
-		}
-
-		public void endVisit(MethodRef node) {
-			System.out.println("Aktuelle Zeile Method: " + compilationUnit.getLineNumber(node.getStartPosition()));
-			System.out.println(
-					"Parentline Method: " + compilationUnit.getLineNumber(node.getParent().getStartPosition()));
-			super.endVisit(node);
-		}
-
-		public void endVisit(MethodInvocation node) {
-			// if (node.getName().toString().equals("getProperty")) {
-			/*
-			 * System.out.println("Methodenname: " + node.getName());
-			 * System.out.println("Aktuelle Zeile Method: " +
-			 * compilationUnit.getLineNumber(node.getStartPosition()));
-			 * System.out.println( "Parentline Method: " +
-			 * compilationUnit.getLineNumber(node.getParent().getStartPosition()
-			 * ));
-			 */
-			// }
-			// parentStartLine=
-			// compilationUnit.getLineNumber(node.getParent().getStartPosition());
-			super.endVisit(node);
-
-		}
-
-		/*
-		 * public boolean visit(IfStatement unit) { if (offset == 0) { offset =
-		 * unit.getStartPosition(); offset += unit.getLength(); } return
-		 * super.visit(unit); }
-		 */
-
-		public int getEndPosition() {
-			return endPosition;
-
-		}
-
-	}
-
-	@Override
-	public boolean hasFeatureFolder() {
-		return false;
-	}
-
-	@Override
-	public boolean needColor() {
-		return true;
-	}
-
-	@Override
-	public boolean hasSourceFolder() {
-		return false;
-	}
-
-	@Override
-	public void postCompile(IResourceDelta delta, IFile buildFile) {
-	}
-
-	@Override
-	public boolean clean() {
-		return false;
-	}
-
-	private static void deleteFile(IFile file) {
-		if (file != null) {
-			try {
-				file.delete(true, null);
-			} catch (CoreException e) {
-				RuntimeCorePlugin.getDefault().logError(e);
-			}
-		}
-	}
-
-	private static void createFile(IFile file, InputStream stream) {
-		if (file != null) {
-			try {
-				file.create(stream, true, null);
-			} catch (CoreException e) {
-				RuntimeCorePlugin.getDefault().logError(e);
-			}
-		}
-	}
-
 	/**
 	 * When initialized, the PropertyManager class will be created within the
-	 * runtime project, if it does not exists already. The PropertyManager.java
+	 * runtime project, if it does not already exist. The PropertyManager.java
 	 * is located in de.ovgu.featureide.core.runtime/resources.
 	 */
 	@Override
 	public boolean initialize(IFeatureProject project) {
 		if (super.initialize(project)) {
-			final String propertyManager = "PropertyManager.java";
-			final String propertyPackage = "properties";
-			IFolder propFolder = featureProject.getBuildFolder().getFolder(propertyPackage);
+
+			IFolder propFolder = featureProject.getBuildFolder().getFolder(PROPERTY_MANAGER_PACKAGE);
 
 			try {
 				if (!propFolder.exists()) {
 					propFolder.create(true, true, new NullProgressMonitor());
 				}
 			} catch (CoreException e) {
-				System.out.println("hi");
 				RuntimeCorePlugin.getDefault().logError(e);
 			}
-			IFile filePropMan = propFolder.getFile(propertyManager);
+			IFile filePropMan = propFolder.getFile(PROPERTY_MANAGER_CLASS + ".java");
 
-			if (COMPOSITION_MECHANISMS[1].equals(featureProject.getCompositionMechanism())) {
+			if (PROPERTIES.equals(featureProject.getCompositionMechanism())) {
 				if (!filePropMan.exists()) {
 					InputStream inputStream = null;
 					try {
-						inputStream = FileLocator.openStream(RuntimeCorePlugin.getDefault().getBundle(),
-								new Path("Resources" + FileSystems.getDefault().getSeparator() + propertyManager),
+						inputStream = FileLocator.openStream(
+								RuntimeCorePlugin.getDefault().getBundle(), new Path("Resources"
+										+ FileSystems.getDefault().getSeparator() + PROPERTY_MANAGER_CLASS + ".java"),
 								false);
 					} catch (IOException e) {
 						RuntimeCorePlugin.getDefault().logError(e);
@@ -650,14 +523,24 @@ public class RuntimeComposer extends ComposerExtensionClass {
 		return super.initialize(project);
 	}
 
-	@Override
-	public Mechanism getGenerationMechanism() {
-		return null;
+	private void deleteFile(IFile file) {
+		if (file != null) {
+			try {
+				file.delete(true, null);
+			} catch (CoreException e) {
+				RuntimeCorePlugin.getDefault().logError(e);
+			}
+		}
 	}
 
-	@Override
-	public LinkedList<FSTDirective> buildModelDirectivesForFile(Vector<String> lines) {
-		return new LinkedList<>();
+	private void createFile(IFile file, InputStream stream) {
+		if (file != null) {
+			try {
+				file.create(stream, true, null);
+			} catch (CoreException e) {
+				RuntimeCorePlugin.getDefault().logError(e);
+			}
+		}
 	}
 
 }
