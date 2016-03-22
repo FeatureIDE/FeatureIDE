@@ -153,7 +153,7 @@ public class FrameworkModelBuilder {
 		MyASTVisitor interfaceVisitor = null;
 		try {
 			interfaceContent = fileToString(interfaceFile);
-			ASTParser intefaceParser = ASTParser.newParser(AST.JLS8);
+			ASTParser intefaceParser = ASTParser.newParser(AST.JLS4);
 			intefaceParser.setSource(interfaceContent.toCharArray());
 			intefaceParser.setKind(ASTParser.K_COMPILATION_UNIT);
 
@@ -171,7 +171,7 @@ public class FrameworkModelBuilder {
 			IType classType = project.findType(implementingClass);
 			/** ASTNodes **/
 			String fileContent = fileToString(classFile);
-			ASTParser parser = ASTParser.newParser(AST.JLS8);
+			ASTParser parser = ASTParser.newParser(AST.JLS4);
 			parser.setSource(fileContent.toCharArray());
 			parser.setKind(ASTParser.K_COMPILATION_UNIT);
 

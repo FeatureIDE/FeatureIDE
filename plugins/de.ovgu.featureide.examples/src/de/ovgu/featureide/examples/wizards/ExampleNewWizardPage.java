@@ -44,6 +44,7 @@ import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.nio.file.FileSystems;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -751,7 +752,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 	/**
 	 * Collect the list of .project files that are under directory into files.
 	 * 
-	 * @param files
+	 * @param projects
 	 * @param directory
 	 * @param directoriesVisited
 	 *            Set of canonical paths of directories, used as recursion guard
@@ -759,7 +760,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 	 *            The monitor to report to
 	 * @return boolean <code>true</code> if the operation was completed.
 	 */
-	private boolean collectProjectFilesFromDirectory(Collection<ProjectRecord> files, File directory, Set<String> directoriesVisited, IProgressMonitor monitor) {
+	private boolean collectProjectFilesFromDirectory(Collection<ProjectRecord> projects, File directory, Set<String> directoriesVisited, IProgressMonitor monitor) {
 		if (monitor.isCanceled()) {
 			return false;
 		}
@@ -779,47 +780,28 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 		}
 
 		// first look for project description files
+		ProjectRecord newProject = null;
 		for (int i = 0; i < contents.length; i++) {
 			final File file = contents[i];
 			if (file.isFile() && IProjectDescription.DESCRIPTION_FILE_NAME.equals(file.getName())) {
-				final ProjectRecord newProject = new ProjectRecord(file);
-				ICommand[] buildSpec = newProject.projectDescription.getBuildSpec();
-				String composer = "";
-				for (ICommand command : buildSpec) {
-					if(command.getBuilderName().equals("de.ovgu.featureide.core.extensibleFeatureProjectBuilder")){
-						composer = command.getArguments().get("composer");
-					}
-				}
-				files.add(newProject);
-				if (newProject.containsNatureID("de.ovgu.featureide.core.mpl.MSPLNature")) {
-					if (file.getParentFile().isDirectory()) {
-						final File[] subdir = file.getParentFile().listFiles();
-						if (subdir != null) {
-							for (File file2 : subdir) {
-								if (ProjectRecord.SUB_PROJECTS_FOLDER.equals(file2.getName())) {
-									newProject.collectSubProjectFiles(file2, null, monitor);
-									break;
-								}
-							}
-						}						
-					}
-					
-				} else if(composer.equals("de.ovgu.featureide.core.composer.framework")){
-					if (file.getParentFile().isDirectory()) {
-						final File[] subdir = file.getParentFile().listFiles();
-						if (subdir != null) {
-							for (File file2 : subdir) {
-								if ("features".equals(file2.getName())) {
-									newProject.collectSubProjectFiles(file2, null, monitor);
-									break;
-								}
-							}
-						}						
-					}
-				}
-				return true;
+				newProject = new ProjectRecord(file);
+				projects.add(newProject);
 			}
 		}
+		
+		//look for subprojects
+		if(newProject != null){
+			Collection<ProjectRecord> subProjects = new ArrayList<>(); 
+			for (int i = 0; i < contents.length; i++) {
+				if(contents[i].isDirectory() && newProject.SUB_PROJECTS_FOLDER.contains(contents[i].getName())){
+					collectProjectFilesFromDirectory(subProjects, contents[i], directoriesVisited, monitor);
+				}
+			}
+			newProject.setSubProjects(subProjects);
+			return true;
+		}
+		
+		
 		// no project description found, so recurse into sub-directories
 		for (int i = 0; i < contents.length; i++) {
 			final File file = contents[i];
@@ -832,11 +814,12 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 				} catch (IOException exception) {
 					exception.printStackTrace();
 				}
-				collectProjectFilesFromDirectory(files, contents[i], directoriesVisited, monitor);
+				collectProjectFilesFromDirectory(projects, contents[i], directoriesVisited, monitor);
 			}
 		}
 		return true;
 	}
+
 
 	/**
 	 * Retrieve all the projects in the current workspace.
@@ -922,7 +905,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 		if (record.projectDescription == null) {
 			// error case
 			record.projectDescription = workspace.newProjectDescription(projectName);
-			IPath locationPath = new Path(record.projectSystemFile.getAbsolutePath());
+			IPath locationPath = new Path(record.projectDescriptionFile.getAbsolutePath());
 
 			// If it is under the root use the default location
 			if (Platform.getLocation().isPrefixOf(locationPath)) {
@@ -976,14 +959,14 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 		if (importSource != null) {
 			List<File> filesToImport = ExampleStructureProvider.INSTANCE.getChildren(importSource);
 
-			if (record.hasSubProjects()) {
-				for (Iterator<File> it = filesToImport.iterator(); it.hasNext();) {
-					if (ProjectRecord.SUB_PROJECTS_FOLDER.equals(it.next().getName())) {
-						it.remove();
-						break;
-					}
-				}
-			}
+//			if (record.hasSubProjects()) {
+//				for (Iterator<File> it = filesToImport.iterator(); it.hasNext();) {
+////					if (ProjectRecord.SUB_PROJECTS_FOLDER.equals(it.next().getName())) {
+////						it.remove();
+////						break;
+////					}
+//				}
+//			}
 
 			ImportOperation operation = new ImportOperation(project.getFullPath(), importSource, ExampleStructureProvider.INSTANCE, this, filesToImport);
 			operation.setContext(getShell());
@@ -1124,11 +1107,14 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 	 * 
 	 */
 	private class ProjectRecord {
-		public static final String SUB_PROJECTS_FOLDER = "projects";
-		
-		private File projectSystemFile;
+		public final Set<String> SUB_PROJECTS_FOLDER = new HashSet<String>() {{
+		    add("projects");
+		    add("features");
+		}};
+		private File projectDescriptionFile;
 
-		private Collection<ProjectRecord> files;
+		private ProjectRecord parentProject;
+		private Collection<ProjectRecord> subProjects;
 
 		private Object projectArchiveFile;
 
@@ -1151,20 +1137,35 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 		 * @param file
 		 */
 		private ProjectRecord(File file) {
-			projectSystemFile = file;
+			projectDescriptionFile = file;
 			setProjectName();
 			performAlreadyExistsCheck();
 			performRequirementCheck();
 		}
 
 		/**
+		 * @param subProjects
+		 */
+		public void setSubProjects(Collection<ProjectRecord> subProjects) {
+			for (ProjectRecord projectRecord : subProjects) {
+				projectRecord.parentProject = this;
+			}
+			this.subProjects = subProjects;
+		}
+		
+		/**
 		 * @return
 		 */
 		public String getLocation() {
-//			if(this.getProjectName().equals("Beautiful")){
-//				return FileSystems.getDefault().getSeparator() + "HelloWorld-Framework" + FileSystems.getDefault().getSeparator()+ "features" +FileSystems.getDefault().getSeparator() +"Beautiful";
-//			}
-			return FileSystems.getDefault().getSeparator() + this.getProjectName();
+			if(parentProject == null){
+				return FileSystems.getDefault().getSeparator() + this.getProjectName();
+			}else{
+				java.nio.file.Path grandfather = parentProject.projectDescriptionFile.getParentFile().getParentFile().toPath();
+				java.nio.file.Path child = this.projectDescriptionFile.getParentFile().toPath();
+				java.nio.file.Path res = grandfather.relativize(child);
+
+				return FileSystems.getDefault().getSeparator() + res.toString();
+			}
 		}
 
 
@@ -1186,23 +1187,13 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 			performRequirementCheck();
 		}
 
-		/**
-		 * @param dir
-		 * @param object
-		 * @param monitor
-		 */
-		public void collectSubProjectFiles(File dir, Object object, IProgressMonitor monitor) {
-			files = new LinkedList<ProjectRecord>();
-			collectProjectFilesFromDirectory(files, dir, null, monitor);
-		}
-
 		public boolean hasSubProjects() {
-			return !(files == null || files.isEmpty());
+			return !(subProjects == null || subProjects.isEmpty());
 		}
 
 		@SuppressWarnings("unchecked")
 		public Collection<ProjectRecord> getSubProjects() {
-			return (files != null) ? files : Collections.EMPTY_LIST;
+			return (subProjects != null) ? subProjects : Collections.EMPTY_LIST;
 		}
 
 		/**
@@ -1231,7 +1222,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 
 				// If we don't have the project name try again
 				if (projectName == null) {
-					IPath path = new Path(projectSystemFile.getPath());
+					IPath path = new Path(projectDescriptionFile.getPath());
 					// if the file is in the default location, use the directory
 					// name as the project name
 					if (isDefaultLocation(path)) {
@@ -1286,16 +1277,6 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 		 */
 		public String getDescription() {
 			return comment == null ? "" : comment.getDescription();
-		}
-
-		public boolean containsNatureID(String id) {
-			for (String curID : projectDescription.getNatureIds()) {
-				if (curID.equals(id)) {
-					return true;
-				}
-			}
-//			projectDescription.getBuildSpec()
-			return false;
 		}
 
 		public boolean hasWarnings() {
