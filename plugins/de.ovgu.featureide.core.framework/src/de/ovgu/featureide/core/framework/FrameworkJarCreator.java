@@ -41,6 +41,13 @@ import org.eclipse.core.runtime.FileLocator;
  */
 public class FrameworkJarCreator {
 
+	/**
+	 * Adding given file to jar
+	 * @param jarStream
+	 * @param res - file
+	 * @param path - String representation for path inside jar
+	 * @throws IOException
+	 */
 	public static void addFileToJar(JarOutputStream jarStream, IFile res, String path) throws IOException {
 		jarStream.putNextEntry(new ZipEntry(path + res.getName()));
 		URL location = FileLocator.toFileURL(res.getLocationURI().toURL());
@@ -58,6 +65,13 @@ public class FrameworkJarCreator {
 		jarStream.closeEntry();
 	}
 
+	/**
+	 * recursive method caller
+	 * @param jarStream
+	 * @param bin
+	 * @throws CoreException
+	 * @throws IOException
+	 */
 	public static void addToJar(JarOutputStream jarStream, IResource bin) throws CoreException, IOException {
 		if (bin instanceof IFolder) {
 			for (IResource member : ((IFolder) bin).members()) {
@@ -66,6 +80,15 @@ public class FrameworkJarCreator {
 		}
 	}
 
+	/**
+	 * recursive method<br>
+	 * calls other methods depending on type (file or folder)
+	 * @param jarStream
+	 * @param res
+	 * @param path
+	 * @throws IOException
+	 * @throws CoreException
+	 */
 	public static void addToJar(JarOutputStream jarStream, IResource res, String path) throws IOException, CoreException {
 		if (res instanceof IFolder) {
 			String path2 = path + res.getName() + "/"; //Slash is needed for JAR creation -> DO NOT REPLACE WITH SYSTEM PROPERTIES

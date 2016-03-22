@@ -377,8 +377,14 @@ public class FrameworkModelBuilder {
 			fields = new HashMap<>();
 			interfaceMethods = new HashMap<>();
 		}
-
-		@Override
+		
+		/**
+		 * Visit methods depending on ast node structure
+		 * <ul>
+		 * <li>if structure is java structure, it will save body of method
+		 * <li>if structure is interface structure, it will save parameters
+		 * </ul>
+		 */
 		public boolean visit(MethodDeclaration node) {
 			if (!iterateOverInterface) {
 				Block body = node.getBody();
@@ -398,7 +404,9 @@ public class FrameworkModelBuilder {
 			return false;
 		}
 
-		@Override
+		/**
+		 * Visit Fields
+		 */
 		public boolean visit(FieldDeclaration node) {
 			fields.put(node.toString(), Integer.valueOf(node.getStartPosition() + node.getLength()));
 			return false;
@@ -424,6 +432,11 @@ public class FrameworkModelBuilder {
 			return fields.get(f.getElementName());
 		}
 
+		/**
+		 * Getter for method signature for method with same name
+		 * @param m
+		 * @return
+		 */
 		public List<String> getMethodSignature(IMethod m) {
 			if (!iterateOverInterface) {
 				return Collections.<String> emptyList();
