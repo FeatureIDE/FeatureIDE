@@ -38,6 +38,15 @@ public class FrameworkValidator {
 		return false;
 	}
 
+	/**
+	 * 
+	 * class for validating XML file depending on dtd file
+	 * <p>
+	 * {@code TODO missing implementation}
+	 * 
+	 * @author Daniel Hohmann
+	 */
+	@SuppressWarnings("unused")
 	private class XMLValidator {
 
 		boolean validateWithDTD(IFile file) throws ParserConfigurationException, SAXException, MalformedURLException, IOException {

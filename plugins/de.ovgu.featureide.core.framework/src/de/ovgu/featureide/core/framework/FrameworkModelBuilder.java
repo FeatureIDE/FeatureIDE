@@ -55,7 +55,6 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
-import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -355,6 +354,34 @@ public class FrameworkModelBuilder {
 	}
 
 	/**
+	 * Iterates over a file and turns its content into a string
+	 * 
+	 * @param classFile
+	 * @return null, if classFile is {@code null}
+	 * @throws IOException
+	 */
+	private String fileToString(IFile classFile) throws IOException {
+		if (classFile == null) {
+			return null;
+		}
+		String filePath = classFile.getLocation().toOSString();
+		StringBuilder fileData = new StringBuilder(1000);
+		BufferedReader reader = new BufferedReader(new FileReader(filePath));
+
+		char[] buf = new char[10];
+		int numRead = 0;
+		while ((numRead = reader.read(buf)) != -1) {
+			String readData = String.valueOf(buf, 0, numRead);
+			fileData.append(readData);
+			buf = new char[1024];
+		}
+
+		reader.close();
+
+		return fileData.toString();
+	}
+	
+	/**
 	 * 
 	 * ASTVisitor iterating over java file
 	 * 
@@ -366,11 +393,17 @@ public class FrameworkModelBuilder {
 		Map<String, List<String>> interfaceMethods;
 		boolean iterateOverInterface;
 
+		/**
+		 * Constructor for visitor iterating over class
+		 */
 		MyASTVisitor() {
 			this(false);
 			
 		}
-
+		/**
+		 * 
+		 * @param b - {@code true}, if visitor iterates over interface
+		 */
 		MyASTVisitor(boolean b) {
 			iterateOverInterface = b;
 			methods = new HashMap<>();
@@ -443,33 +476,5 @@ public class FrameworkModelBuilder {
 			}
 			return interfaceMethods.get(m.getElementName());
 		}
-	}
-
-	/**
-	 * Iterates over a file and turns its content into a string
-	 * 
-	 * @param classFile
-	 * @return null, if classFile is {@code null}
-	 * @throws IOException
-	 */
-	private String fileToString(IFile classFile) throws IOException {
-		if (classFile == null) {
-			return null;
-		}
-		String filePath = classFile.getLocation().toOSString();
-		StringBuilder fileData = new StringBuilder(1000);
-		BufferedReader reader = new BufferedReader(new FileReader(filePath));
-
-		char[] buf = new char[10];
-		int numRead = 0;
-		while ((numRead = reader.read(buf)) != -1) {
-			String readData = String.valueOf(buf, 0, numRead);
-			fileData.append(readData);
-			buf = new char[1024];
-		}
-
-		reader.close();
-
-		return fileData.toString();
 	}
 }
