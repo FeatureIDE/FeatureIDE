@@ -89,6 +89,7 @@ Export-Package:
    org.eclipse.swt.layout,
    de.ovgu.featureide.core.builder,
    de.ovgu.featureide.fm.core",
+ no.sintef.ict.splcatool,
  org.apache.commons.math;uses:="org.apache.commons.math.exception.util,org.apache.commons.math.exception"
 Import-Package: de.ovgu.featureide.fm.core,
  org.eclipse.jdt.core,

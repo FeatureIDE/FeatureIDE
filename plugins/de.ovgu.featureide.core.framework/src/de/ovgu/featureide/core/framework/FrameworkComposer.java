@@ -14,6 +14,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
@@ -342,6 +343,9 @@ public class FrameworkComposer extends ComposerExtensionClass {
 		return true;
 
 	}
+	
+	@Override
+	public void postCompile(IResourceDelta delta, IFile buildFile) {}
 
 	@Override
 	public boolean clean() {
