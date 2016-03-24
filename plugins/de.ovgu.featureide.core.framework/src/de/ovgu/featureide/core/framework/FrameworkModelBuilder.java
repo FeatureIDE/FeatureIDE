@@ -206,7 +206,6 @@ public class FrameworkModelBuilder {
 					 */
 					@Override
 					public boolean inRefinementGroup() {
-						//Return true if in interface
 						return isRefinement;
 					}
 				};
@@ -223,7 +222,7 @@ public class FrameworkModelBuilder {
 		}
 	}
 
-	/**
+	/** Calculates highlighting.
 	 * @param parameterTypes
 	 * @param methodSignature
 	 * @return
