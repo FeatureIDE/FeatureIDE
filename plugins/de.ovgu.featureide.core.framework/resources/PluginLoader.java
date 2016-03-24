@@ -54,6 +54,10 @@ public class PluginLoader {
 								listClasses.add(e.getTextContent());
 							}
 						}
+						List<String> containingList = map.get(interfaceName);
+						if(containingList != null){
+							listClasses.addAll(containingList);
+						}
 						map.put(interfaceName, listClasses);
 					}
 				}
