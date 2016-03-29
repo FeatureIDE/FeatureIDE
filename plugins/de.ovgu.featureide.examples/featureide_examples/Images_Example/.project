@@ -18,7 +18,7 @@
 				</dictionary>
 				<dictionary>
 					<key>composer</key>
-					<value>de.ovgu.featureide.core.composer.images</value>
+					<value>de.ovgu.featureide.core.images.composer</value>
 				</dictionary>
 				<dictionary>
 					<key>equations</key>
