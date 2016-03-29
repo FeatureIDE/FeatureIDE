@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Images Composer
 Bundle-SymbolicName: de.ovgu.featureide.core.images;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Require-Bundle: de.ovgu.featureide.core,
  de.ovgu.featureide.fm.core,
  org.eclipse.core.runtime,
