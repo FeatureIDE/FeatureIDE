@@ -1,21 +1,16 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Framework Composer
+Bundle-Name: FeatureIDE Framework Composer
 Bundle-SymbolicName: de.ovgu.featureide.core.framework;singleton:=true
 Bundle-Version: 2.7.5.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Require-Bundle: de.ovgu.featureide.core,
  de.ovgu.featureide.fm.core,
  org.eclipse.core.runtime,
- org.eclipse.core.resources
+ org.eclipse.core.resources,
+ org.eclipse.jdt.core,
+ org.eclipse.jdt.launching
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: University of Magdeburg
 Bundle-Activator: de.ovgu.featureide.core.framework.activator.FrameworkCorePlugin
-Import-Package: org.eclipse.jdt.core,
- org.eclipse.jdt.core.dom,
- org.eclipse.jdt.core.search,
- org.eclipse.jdt.internal.core,
- org.eclipse.jdt.internal.corext.callhierarchy,
- org.eclipse.jdt.launching,
- org.eclipse.ui.internal.util
 Bundle-ClassPath: .
