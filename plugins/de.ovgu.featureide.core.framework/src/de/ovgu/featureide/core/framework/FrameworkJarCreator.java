@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -43,6 +43,7 @@ public class FrameworkJarCreator {
 
 	/**
 	 * Adding given file to jar
+	 * 
 	 * @param jarStream
 	 * @param res - file
 	 * @param path - String representation for path inside jar
@@ -50,12 +51,12 @@ public class FrameworkJarCreator {
 	 */
 	public static void addFileToJar(JarOutputStream jarStream, IFile res, String path) throws IOException {
 		jarStream.putNextEntry(new ZipEntry(path + res.getName()));
-		URL location = FileLocator.toFileURL(res.getLocationURI().toURL());
-		File file = new File(location.getPath());
+		final URL location = FileLocator.toFileURL(res.getLocationURI().toURL());
+		final File file = new File(location.getPath());
 		try (BufferedInputStream in = new BufferedInputStream(new FileInputStream(file))) {
-			byte[] buffer = new byte[1024];
+			final byte[] buffer = new byte[1024];
 			while (true) {
-				int count = in.read(buffer);
+				final int count = in.read(buffer);
 				if (count == -1) {
 					break;
 				}
@@ -67,6 +68,7 @@ public class FrameworkJarCreator {
 
 	/**
 	 * recursive method caller
+	 * 
 	 * @param jarStream
 	 * @param bin
 	 * @throws CoreException
@@ -74,7 +76,7 @@ public class FrameworkJarCreator {
 	 */
 	public static void addToJar(JarOutputStream jarStream, IResource bin) throws CoreException, IOException {
 		if (bin instanceof IFolder) {
-			for (IResource member : ((IFolder) bin).members()) {
+			for (final IResource member : ((IFolder) bin).members()) {
 				addToJar(jarStream, member, "");
 			}
 		}
@@ -83,6 +85,7 @@ public class FrameworkJarCreator {
 	/**
 	 * recursive method<br>
 	 * calls other methods depending on type (file or folder)
+	 * 
 	 * @param jarStream
 	 * @param res
 	 * @param path
@@ -91,8 +94,8 @@ public class FrameworkJarCreator {
 	 */
 	public static void addToJar(JarOutputStream jarStream, IResource res, String path) throws IOException, CoreException {
 		if (res instanceof IFolder) {
-			String path2 = path + res.getName() + "/"; //Slash is needed for JAR creation -> DO NOT REPLACE WITH SYSTEM PROPERTIES
-			for (IResource member : ((IFolder) res).members()) {
+			final String path2 = path + res.getName() + "/"; //Slash is needed for JAR creation -> DO NOT REPLACE WITH SYSTEM PROPERTIES
+			for (final IResource member : ((IFolder) res).members()) {
 				addToJar(jarStream, member, path2);
 			}
 		} else if (res instanceof IFile) {

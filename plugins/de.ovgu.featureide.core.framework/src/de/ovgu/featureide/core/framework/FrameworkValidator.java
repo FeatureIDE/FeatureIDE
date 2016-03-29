@@ -1,3 +1,23 @@
+/* FeatureIDE - A Framework for Feature-Oriented Software Development
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ *
+ * This file is part of FeatureIDE.
+ * 
+ * FeatureIDE is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * FeatureIDE is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * See http://featureide.cs.ovgu.de/ for further information.
+ */
 package de.ovgu.featureide.core.framework;
 
 import java.io.IOException;
@@ -23,8 +43,9 @@ public class FrameworkValidator {
 	 */
 	public static boolean validate(IFile file) {
 
-		if (!file.exists())
+		if (!file.exists()) {
 			return false;
+		}
 		return true;
 	}
 
@@ -50,34 +71,34 @@ public class FrameworkValidator {
 	private class XMLValidator {
 
 		boolean validateWithDTD(IFile file) throws ParserConfigurationException, SAXException, MalformedURLException, IOException {
-			SAXParserFactory factory = SAXParserFactory.newInstance();
+			final SAXParserFactory factory = SAXParserFactory.newInstance();
 			factory.setValidating(true);
 			factory.setNamespaceAware(true);
 
-			SAXParser parser = factory.newSAXParser();
+			final SAXParser parser = factory.newSAXParser();
 
-			XMLReader reader = parser.getXMLReader();
-			
-			reader.setErrorHandler(new ErrorHandler(){
+			final XMLReader reader = parser.getXMLReader();
+
+			reader.setErrorHandler(new ErrorHandler() {
 
 				@Override
 				public void error(SAXParseException arg0) throws SAXException {
 					// TODO Auto-generated method stub
-					
+
 				}
 
 				@Override
 				public void fatalError(SAXParseException arg0) throws SAXException {
 					// TODO Auto-generated method stub
-					
+
 				}
 
 				@Override
 				public void warning(SAXParseException arg0) throws SAXException {
 					// TODO Auto-generated method stub
-					
+
 				}
-				
+
 			});
 			reader.parse(new InputSource(file.getLocationURI().toURL().openStream()));
 			return false;

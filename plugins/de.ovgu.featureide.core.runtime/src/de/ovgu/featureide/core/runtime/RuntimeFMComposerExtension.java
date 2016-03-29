@@ -1,3 +1,23 @@
+/* FeatureIDE - A Framework for Feature-Oriented Software Development
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ *
+ * This file is part of FeatureIDE.
+ * 
+ * FeatureIDE is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * FeatureIDE is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * See http://featureide.cs.ovgu.de/ for further information.
+ */
 package de.ovgu.featureide.core.runtime;
 
 import java.io.BufferedReader;
@@ -12,6 +32,7 @@ import java.util.HashMap;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.core.runtime.activator.RuntimeCorePlugin;
@@ -22,7 +43,7 @@ import de.ovgu.featureide.fm.core.FMComposerExtension;
  * 
  * @author Kai Wolf
  * @author Matthias Quaas
- *
+ * 
  */
 public class RuntimeFMComposerExtension extends FMComposerExtension {
 
@@ -31,8 +52,8 @@ public class RuntimeFMComposerExtension extends FMComposerExtension {
 	}
 
 	@Override
-	protected boolean isValidFeatureNameComposerSpecific(String s) {
-		return super.isValidFeatureNameComposerSpecific(s);
+	public String getErroMessage() {
+		return super.getErroMessage();
 	}
 
 	@Override
@@ -45,39 +66,46 @@ public class RuntimeFMComposerExtension extends FMComposerExtension {
 		return true;
 	}
 
+	@Override
+	protected boolean isValidFeatureNameComposerSpecific(final String s) {
+		return super.isValidFeatureNameComposerSpecific(s);
+	}
+
 	/**
 	 * Actual handling of renaming.
 	 */
 	@Override
-	public boolean performRenaming(String oldName, String newName, IProject project) {
+	public boolean performRenaming(final String oldName, final String newName,
+			final IProject project) {
 
-		ArrayList<FeatureLocation> locations = new ArrayList<FeatureLocation>();
-		
-		//get FeatureLocation objects with the given oldName as feature name 
-		for (FeatureLocation loc : RuntimeComposer.featureLocs) {
+		final ArrayList<FeatureLocation> locations = new ArrayList<FeatureLocation>();
+
+		// get FeatureLocation objects with the given oldName as feature name
+		for (final FeatureLocation loc : RuntimeComposer.featureLocs) {
 			if (loc.getFeatureName().equals(oldName)) {
 				locations.add(loc);
 			}
 		}
-		//only load and parse each class file once
-		HashMap<String, String[]> processedClassFiles = new HashMap<String, String[]>();
+		// only load and parse each class file once
+		final HashMap<String, String[]> processedClassFiles = new HashMap<String, String[]>();
 
-		for (FeatureLocation loc : locations) {
+		for (final FeatureLocation loc : locations) {
 			String[] oldClassStringArray = null;
-			String classPath = loc.getOSPath();
-			int lineNumber = loc.getStartLineNum();
+			final String classPath = loc.getOSPath();
+			final int lineNumber = loc.getStartLineNum();
 
-			//if the class has not already been loaded, load it
+			// if the class has not already been loaded, load it
 			if (!processedClassFiles.containsKey(classPath)) {
 
 				try {
-					IFile classFile = loc.getClassFile();
-					InputStream oldClassStream = classFile.getContents();
+					final IFile classFile = loc.getClassFile();
+					final InputStream oldClassStream = classFile.getContents();
 
-					StringBuilder inputStringBuilder = new StringBuilder();
+					final StringBuilder inputStringBuilder = new StringBuilder();
 					BufferedReader bufferedReader = null;
 
-					bufferedReader = new BufferedReader(new InputStreamReader(oldClassStream, "UTF-8"));
+					bufferedReader = new BufferedReader(new InputStreamReader(
+							oldClassStream, "UTF-8"));
 
 					String line = bufferedReader.readLine();
 					while (line != null) {
@@ -85,23 +113,26 @@ public class RuntimeFMComposerExtension extends FMComposerExtension {
 						inputStringBuilder.append('\n');
 						line = bufferedReader.readLine();
 					}
-					oldClassStringArray = inputStringBuilder.toString().split("\\n");
+					oldClassStringArray = inputStringBuilder.toString().split(
+							"\\n");
 					processedClassFiles.put(classPath, oldClassStringArray);
 
-				} catch (UnsupportedEncodingException e) {
+				} catch (final UnsupportedEncodingException e) {
 					RuntimeCorePlugin.getDefault().logError(e);
-				} catch (IOException e) {
+				} catch (final IOException e) {
 					RuntimeCorePlugin.getDefault().logError(e);
-				} catch (CoreException e) {
+				} catch (final CoreException e) {
 					RuntimeCorePlugin.getDefault().logError(e);
 				}
-			//else use the one in the map
+				// else use the one in the map
 			} else {
 				oldClassStringArray = processedClassFiles.get(classPath);
 			}
-			oldClassStringArray[lineNumber - 1] = oldClassStringArray[lineNumber - 1].replace(
-					RuntimeComposer.GET_PROPERTY_METHOD + "(\"" + oldName + "\")",
-					RuntimeComposer.GET_PROPERTY_METHOD + "(\"" + newName + "\")");
+			oldClassStringArray[lineNumber - 1] = oldClassStringArray[lineNumber - 1]
+					.replace(RuntimeComposer.GET_PROPERTY_METHOD + "(\""
+							+ oldName + "\")",
+							RuntimeComposer.GET_PROPERTY_METHOD + "(\""
+									+ newName + "\")");
 
 			final StringBuilder newClassString = new StringBuilder();
 			for (int i = 0; i < oldClassStringArray.length; i++) {
@@ -111,10 +142,12 @@ public class RuntimeFMComposerExtension extends FMComposerExtension {
 				newClassString.append(oldClassStringArray[i]);
 			}
 
-			InputStream newClassStream = new ByteArrayInputStream(newClassString.toString().getBytes(StandardCharsets.UTF_8));
+			final InputStream newClassStream = new ByteArrayInputStream(
+					newClassString.toString().getBytes(StandardCharsets.UTF_8));
 			try {
-				loc.getClassFile().setContents(newClassStream, IFile.FORCE, null);
-			} catch (CoreException e) {
+				loc.getClassFile().setContents(newClassStream, IResource.FORCE,
+						null);
+			} catch (final CoreException e) {
 				RuntimeCorePlugin.getDefault().logError(e);
 			}
 			loc.setFeatureName(newName);
@@ -122,11 +155,6 @@ public class RuntimeFMComposerExtension extends FMComposerExtension {
 
 		return true;
 
-	}
-
-	@Override
-	public String getErroMessage() {
-		return super.getErroMessage();
 	}
 
 }

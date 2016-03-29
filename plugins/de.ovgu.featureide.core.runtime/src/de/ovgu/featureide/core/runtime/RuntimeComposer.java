@@ -1,3 +1,23 @@
+/* FeatureIDE - A Framework for Feature-Oriented Software Development
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ *
+ * This file is part of FeatureIDE.
+ * 
+ * FeatureIDE is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * FeatureIDE is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * See http://featureide.cs.ovgu.de/ for further information.
+ */
 package de.ovgu.featureide.core.runtime;
 
 import java.io.ByteArrayInputStream;
@@ -62,100 +82,21 @@ import de.ovgu.featureide.fm.core.io.manager.FileReader;
  * 
  * @author Kai Wolf
  * @author Matthias Quaas
- *
+ * 
  */
 @SuppressWarnings("restriction")
 public class RuntimeComposer extends ComposerExtensionClass {
 
 	public static final String RUN_CONFIGURATION = "Run Configuration";
 	public static final String PROPERTIES = "Properties";
-	public static final String NOT_EXISTING_PROPERTY_MARKER = CorePlugin.PLUGIN_ID + ".builderProblemMarker";
+	public static final String NOT_EXISTING_PROPERTY_MARKER = CorePlugin.PLUGIN_ID
+			+ ".builderProblemMarker";
 	public static final String PROPERTY_MANAGER_CLASS = "PropertyManager";
 	public static final String PROPERTY_MANAGER_PACKAGE = "properties";
 	public static final String GET_PROPERTY_METHOD = "getProperty";
-	static final String[] COMPOSITION_MECHANISMS = new String[] { RUN_CONFIGURATION, PROPERTIES };
+	static final String[] COMPOSITION_MECHANISMS = new String[] {
+			RUN_CONFIGURATION, PROPERTIES };
 	static ArrayList<FeatureLocation> featureLocs = new ArrayList<FeatureLocation>();
-
-	@Override
-	public String[] getCompositionMechanisms() {
-		return COMPOSITION_MECHANISMS;
-	}
-
-	@Override
-	public boolean hasFeatureFolder() {
-		return false;
-	}
-
-	@Override
-	public boolean needColor() {
-		return true;
-	}
-
-	@Override
-	public boolean hasSourceFolder() {
-		return false;
-	}
-
-	@Override
-	public void postCompile(IResourceDelta delta, IFile buildFile) {
-	}
-
-	@Override
-	public boolean clean() {
-		return false;
-	}
-
-	@Override
-	public Mechanism getGenerationMechanism() {
-		return null;
-	}
-
-	@Override
-	public LinkedList<FSTDirective> buildModelDirectivesForFile(Vector<String> lines) {
-		return new LinkedList<>();
-	}
-
-	/**
-	 * Every time the project is built, the config will be read and written into
-	 * runtime.properties.
-	 */
-	@Override
-	public void performFullBuild(IFile config) {
-
-		IFile fileProp = featureProject.getProject().getFile("runtime.properties");
-
-		if (PROPERTIES.equals(featureProject.getCompositionMechanism())) {
-
-			buildFSTModel();
-
-			final Configuration configuration = readConfig();
-
-			String configString = "";
-			for (SelectableFeature f : configuration.getFeatures()) {
-				if (!f.getFeature().getStructure().isAbstract()) {
-					configString += f.getFeature().getName() + '=' + (f.getSelection() == Selection.SELECTED
-							? Boolean.TRUE.toString() : Boolean.FALSE.toString()) + "\n";
-				}
-			}
-			if (configString.contains("\n")) {
-				configString = configString.substring(0, configString.lastIndexOf('\n'));
-			}
-			InputStream inputStream = new ByteArrayInputStream(configString.getBytes(StandardCharsets.UTF_8));
-
-			if (fileProp.exists()) {
-				try {
-					fileProp.setContents(inputStream, IFile.FORCE, null);
-				} catch (CoreException e) {
-					RuntimeCorePlugin.getDefault().logError(e);
-				}
-			} else {
-				createFile(fileProp, inputStream);
-			}
-
-		} else {
-			deleteFile(fileProp);
-		}
-	}
 
 	/**
 	 * Builds FST Model: - adds directives to the model representing each call
@@ -171,19 +112,21 @@ public class RuntimeComposer extends ComposerExtensionClass {
 			setFeatureLocations();
 
 			// map linking the call location within the code with its directive
-			HashMap<FeatureLocation, FSTDirective> directives = new HashMap<FeatureLocation, FSTDirective>();
-			FSTModel model = new FSTModel(featureProject);
+			final HashMap<FeatureLocation, FSTDirective> directives = new HashMap<FeatureLocation, FSTDirective>();
+			final FSTModel model = new FSTModel(featureProject);
 			int id = 0;
 			FSTRole role;
 
 			deleteMarkers();
 
-			for (FeatureLocation loc : featureLocs) {
+			for (final FeatureLocation loc : featureLocs) {
 				if (loc.isInConfig()) {
 					// add directive to role and role to model
-					model.addRole(loc.getFeatureName(), loc.getClassName(), loc.getClassFile());
-					role = model.getRole(loc.getFeatureName(), loc.getClassName());
-					FSTDirective fstDirective = setFSTDirective(loc, id);
+					model.addRole(loc.getFeatureName(), loc.getClassName(),
+							loc.getClassFile());
+					role = model.getRole(loc.getFeatureName(),
+							loc.getClassName());
+					final FSTDirective fstDirective = setFSTDirective(loc, id);
 					fstDirective.setRole(role);
 					role.add(fstDirective);
 					directives.put(loc, fstDirective);
@@ -191,13 +134,17 @@ public class RuntimeComposer extends ComposerExtensionClass {
 				} else {
 					try {
 						// marker if feature does not exist in current config
-						IMarker newMarker = loc.getClassFile().createMarker(NOT_EXISTING_PROPERTY_MARKER);
+						final IMarker newMarker = loc.getClassFile()
+								.createMarker(NOT_EXISTING_PROPERTY_MARKER);
 
 						newMarker.setAttribute(IMarker.MESSAGE,
-								"Queried Feature '" + loc.getFeatureName() + "' does not exist!");
-						newMarker.setAttribute(IMarker.LINE_NUMBER, loc.getStartLineNum());
-						newMarker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_WARNING);
-					} catch (CoreException e) {
+								"Queried Feature '" + loc.getFeatureName()
+										+ "' does not exist!");
+						newMarker.setAttribute(IMarker.LINE_NUMBER,
+								loc.getStartLineNum());
+						newMarker.setAttribute(IMarker.SEVERITY,
+								IMarker.SEVERITY_WARNING);
+					} catch (final CoreException e) {
 						RuntimeCorePlugin.getDefault().logError(e);
 					}
 				}
@@ -210,99 +157,53 @@ public class RuntimeComposer extends ComposerExtensionClass {
 		}
 	}
 
-	/**
-	 * Reads and returns current feature config.
-	 * 
-	 * @return
-	 */
-	private Configuration readConfig() {
-
-		final Configuration featureProjectConfig = new Configuration(featureProject.getFeatureModel());
-		String configPath = featureProject.getCurrentConfiguration().getRawLocation().toOSString();
-		FileReader<Configuration> reader = new FileReader<>(configPath, featureProjectConfig,
-				ConfigurationManager.getFormat(configPath));
-		reader.read();
-
-		return featureProjectConfig;
-
+	@Override
+	public LinkedList<FSTDirective> buildModelDirectivesForFile(
+			final Vector<String> lines) {
+		return new LinkedList<>();
 	}
 
-	/**
-	 * Looks for callers of getProperty()-method and creates
-	 * FeatureLocation-object for each call.
-	 */
+	@Override
+	public boolean clean() {
+		return false;
+	}
 
-	public void setFeatureLocations() {
-
-		featureLocs.clear();
-		IJavaProject proj = JavaCore.create(featureProject.getProject());
-		try {
-			IType itype = proj.findType(PROPERTY_MANAGER_PACKAGE + "." + PROPERTY_MANAGER_CLASS);
-			IMethod method = null;
-
-			for (IMethod m : itype.getMethods()) {
-				if (m.getElementName().equals(GET_PROPERTY_METHOD)) {
-					method = m;
-				}
-			}
-			ArrayList<CallLocation[]> callLocs = getCallersOf(method);
-
-			String featureName;
-			String className;
-			IFile classFile;
-			ICompilationUnit compilationUnit;
-			int startLineNum;
-			int endLineNum;
-			FSTDirectiveCommand cmd;
-			for (CallLocation[] callLoc : callLocs) {
-				for (int i = 0; i < callLoc.length; i++) {
-					// feature name = attribute of getProperty-call
-					featureName = callLoc[i].getCallText().split("\"")[1];
-					className = callLoc[i].getMember().getParent().getElementName();
-					classFile = (IFile) callLoc[i].getMember().getCompilationUnit().getCorrespondingResource();
-					compilationUnit = callLoc[i].getMember().getCompilationUnit();
-					startLineNum = callLoc[i].getLineNumber();
-					endLineNum = getEndOfIf(compilationUnit, startLineNum);
-					// if the call in the start line is within an if-statement,
-					// getEndOfIf() will return the end of the latter
-					cmd = endLineNum == 1 ? FSTDirectiveCommand.CALL : FSTDirectiveCommand.IF;
-					endLineNum = endLineNum == 1 ? startLineNum : endLineNum;
-
-					featureLocs
-							.add(new FeatureLocation(featureName, startLineNum, endLineNum, classFile, className, cmd));
-				}
-			}
-		} catch (JavaModelException e) {
-			RuntimeCorePlugin.getDefault().logError(e);
-		}
-		// sort all feature locations by 1) class (here represented by path
-		// string) and 2) its starting line
-		Collections.sort(featureLocs, new Comparator<FeatureLocation>() {
-			@Override
-			public int compare(FeatureLocation a, FeatureLocation b) {
-				return a.getOSPath().compareTo(b.getOSPath()) == 0 ? (a
-						.getStartLineNum() < b.getStartLineNum() ? -1 : a
-						.getStartLineNum() == b.getStartLineNum() ? 0 : 1) : a
-						.getOSPath().compareTo(b.getOSPath());
-			}
-		});
-
-		final Configuration configuration = readConfig();
-
-		// check whether the feature corresponding with the
-		// FeatureLocation-object is in the current config
-		for (FeatureLocation loc : featureLocs) {
-			for (SelectableFeature feature : configuration.getFeatures()) {
-				if (feature.getName().equals(loc.getFeatureName())) {
-					loc.setInConfig(true);
-					break;
-				}
+	private void createFile(final IFile file, final InputStream stream) {
+		if (file != null) {
+			try {
+				file.create(stream, true, null);
+			} catch (final CoreException e) {
+				RuntimeCorePlugin.getDefault().logError(e);
 			}
 		}
-		// get parent-child-relations for FeatureLocation-objects
-		for (int i = 1; i < featureLocs.size(); i++) {
-			FeatureLocation loc = featureLocs.get(i);
-			loc.setParent(getParentFeatureLocation(i));
+	}
+
+	private void deleteFile(final IFile file) {
+		if (file != null) {
+			try {
+				file.delete(true, null);
+			} catch (final CoreException e) {
+				RuntimeCorePlugin.getDefault().logError(e);
+			}
+		}
+	}
+
+	private void deleteMarkers() {
+
+		// only delete markers once for each class
+		final ArrayList<IFile> processedFiles = new ArrayList<IFile>();
+
+		for (final FeatureLocation loc : featureLocs) {
+			if (!processedFiles.contains(loc.getClassFile())) {
+				processedFiles.add(loc.getClassFile());
+				try {
+					loc.getClassFile().deleteMarkers(
+							NOT_EXISTING_PROPERTY_MARKER, false,
+							IResource.DEPTH_ZERO);
+				} catch (final CoreException e) {
+					RuntimeCorePlugin.getDefault().logError(e);
+				}
+			}
 		}
 	}
 
@@ -314,33 +215,41 @@ public class RuntimeComposer extends ComposerExtensionClass {
 	 * @return All call locations.
 	 */
 
-	private ArrayList<CallLocation[]> getCallersOf(IMethod m) {
+	private ArrayList<CallLocation[]> getCallersOf(final IMethod m) {
 
-		CallHierarchy callHierarchy = new CallHierarchy();
-		IJavaSearchScope scope = SearchEngine.createWorkspaceScope();
+		final CallHierarchy callHierarchy = new CallHierarchy();
+		final IJavaSearchScope scope = SearchEngine.createWorkspaceScope();
 		callHierarchy.setSearchScope(scope);
 
-		IMember[] members = { m };
-		ArrayList<MethodCall> methodCalls = new ArrayList<MethodCall>();
+		final IMember[] members = { m };
+		final ArrayList<MethodCall> methodCalls = new ArrayList<MethodCall>();
 
-		MethodWrapper[] callerWrapper = callHierarchy.getCallerRoots(members);
-		ArrayList<MethodWrapper> callsWrapper = new ArrayList<MethodWrapper>();
-		ArrayList<CallLocation[]> callList = new ArrayList<CallLocation[]>();
+		final MethodWrapper[] callerWrapper = callHierarchy
+				.getCallerRoots(members);
+		final ArrayList<MethodWrapper> callsWrapper = new ArrayList<MethodWrapper>();
+		final ArrayList<CallLocation[]> callList = new ArrayList<CallLocation[]>();
 
-		for (MethodWrapper mWrapper : callerWrapper) {
-			callsWrapper.addAll(Arrays.asList(mWrapper.getCalls(new NullProgressMonitor())));
+		for (final MethodWrapper mWrapper : callerWrapper) {
+			callsWrapper.addAll(Arrays.asList(mWrapper
+					.getCalls(new NullProgressMonitor())));
 		}
-		for (MethodWrapper mWrapper : callsWrapper) {
+		for (final MethodWrapper mWrapper : callsWrapper) {
 			methodCalls.add(mWrapper.getMethodCall());
 		}
-		for (MethodCall mCall : methodCalls) {
-			CallLocation[] callArray = new CallLocation[mCall.getCallLocations().size()];
+		for (final MethodCall mCall : methodCalls) {
+			final CallLocation[] callArray = new CallLocation[mCall
+					.getCallLocations().size()];
 			mCall.getCallLocations().toArray(callArray);
 			callList.add(callArray);
 		}
 
 		return callList;
 
+	}
+
+	@Override
+	public String[] getCompositionMechanisms() {
+		return COMPOSITION_MECHANISMS;
 	}
 
 	/**
@@ -352,9 +261,10 @@ public class RuntimeComposer extends ComposerExtensionClass {
 	 *            requested.
 	 * @return
 	 */
-	private int getEndOfIf(ICompilationUnit compilationUnit, int startLineNum) {
+	private int getEndOfIf(final ICompilationUnit compilationUnit,
+			final int startLineNum) {
 
-		ASTParser parser = ASTParser.newParser(AST.JLS4);
+		final ASTParser parser = ASTParser.newParser(AST.JLS4);
 		parser.setSource(compilationUnit);
 		parser.setKind(ASTParser.K_COMPILATION_UNIT);
 		parser.setResolveBindings(true);
@@ -362,11 +272,18 @@ public class RuntimeComposer extends ComposerExtensionClass {
 		// without this suppress it would throw an error. (strangely not any
 		// longer?)
 		// @SuppressWarnings("unused")
-		ASTNode rootNode = parser.createAST(new NullProgressMonitor());
-		IfVisitor astVisitor = new IfVisitor(startLineNum, (CompilationUnit) rootNode);
+		final ASTNode rootNode = parser.createAST(new NullProgressMonitor());
+		final IfVisitor astVisitor = new IfVisitor(startLineNum,
+				(CompilationUnit) rootNode);
 		rootNode.accept(astVisitor);
 
-		return ((CompilationUnit) rootNode).getLineNumber(astVisitor.getEndPosition());
+		return ((CompilationUnit) rootNode).getLineNumber(astVisitor
+				.getEndPosition());
+	}
+
+	@Override
+	public Mechanism getGenerationMechanism() {
+		return null;
 	}
 
 	/**
@@ -379,10 +296,10 @@ public class RuntimeComposer extends ComposerExtensionClass {
 	 * @return Parent FeatureLocation-object, null if it has not got a parent.
 	 */
 
-	private FeatureLocation getParentFeatureLocation(int startIndex) {
-		FeatureLocation startLoc = featureLocs.get(startIndex);
+	private FeatureLocation getParentFeatureLocation(final int startIndex) {
+		final FeatureLocation startLoc = featureLocs.get(startIndex);
 		FeatureLocation prvLoc = null;
-		String startClassPath = startLoc.getOSPath();
+		final String startClassPath = startLoc.getOSPath();
 		String prvClassPath;
 		// iterate backwards trough all call locations
 		// if the object's starting line is between the previous object's begin
@@ -402,8 +319,8 @@ public class RuntimeComposer extends ComposerExtensionClass {
 			else if (!startClassPath.equals(prvClassPath)) {
 				prvLoc = null;
 				break;
-			} else if (startLoc.getStartLineNum() > prvLoc.getStartLineNum()
-					&& startLoc.getEndLineNum() < prvLoc.getEndLineNum()) {
+			} else if ((startLoc.getStartLineNum() > prvLoc.getStartLineNum())
+					&& (startLoc.getEndLineNum() < prvLoc.getEndLineNum())) {
 				break;
 			}
 			// if the begin is reached but no parent is found prvLoc will be set
@@ -415,6 +332,145 @@ public class RuntimeComposer extends ComposerExtensionClass {
 		return prvLoc;
 	}
 
+	@Override
+	public boolean hasFeatureFolder() {
+		return false;
+	}
+
+	@Override
+	public boolean hasSourceFolder() {
+		return false;
+	}
+
+	/**
+	 * When initialized, the PropertyManager class will be created within the
+	 * runtime project, if it does not already exist. The PropertyManager.java
+	 * is located in de.ovgu.featureide.core.runtime/resources.
+	 */
+	@Override
+	public boolean initialize(final IFeatureProject project) {
+		if (super.initialize(project)) {
+
+			final IFolder propFolder = featureProject.getBuildFolder()
+					.getFolder(PROPERTY_MANAGER_PACKAGE);
+
+			try {
+				if (!propFolder.exists()) {
+					propFolder.create(true, true, new NullProgressMonitor());
+				}
+			} catch (final CoreException e) {
+				RuntimeCorePlugin.getDefault().logError(e);
+			}
+			final IFile filePropMan = propFolder.getFile(PROPERTY_MANAGER_CLASS
+					+ ".java");
+
+			if (PROPERTIES.equals(featureProject.getCompositionMechanism())) {
+				if (!filePropMan.exists()) {
+					InputStream inputStream = null;
+					try {
+						inputStream = FileLocator.openStream(RuntimeCorePlugin
+								.getDefault().getBundle(), new Path("Resources"
+								+ FileSystems.getDefault().getSeparator()
+								+ PROPERTY_MANAGER_CLASS + ".java"), false);
+					} catch (final IOException e) {
+						RuntimeCorePlugin.getDefault().logError(e);
+					}
+					createFile(filePropMan, inputStream);
+					try {
+						filePropMan.setDerived(true, null);
+					} catch (final CoreException e) {
+						RuntimeCorePlugin.getDefault().logError(e);
+					}
+				}
+			} else {
+				deleteFile(filePropMan);
+				try {
+					propFolder.delete(true, null);
+				} catch (final CoreException e) {
+					RuntimeCorePlugin.getDefault().logError(e);
+				}
+			}
+		}
+		return super.initialize(project);
+	}
+
+	@Override
+	public boolean needColor() {
+		return true;
+	}
+
+	/**
+	 * Every time the project is built, the config will be read and written into
+	 * runtime.properties.
+	 */
+	@Override
+	public void performFullBuild(final IFile config) {
+
+		final IFile fileProp = featureProject.getProject().getFile(
+				"runtime.properties");
+
+		if (PROPERTIES.equals(featureProject.getCompositionMechanism())) {
+
+			buildFSTModel();
+
+			final Configuration configuration = readConfig();
+
+			String configString = "";
+			for (final SelectableFeature f : configuration.getFeatures()) {
+				if (!f.getFeature().getStructure().isAbstract()) {
+					configString += f.getFeature().getName()
+							+ '='
+							+ (f.getSelection() == Selection.SELECTED ? Boolean.TRUE
+									.toString() : Boolean.FALSE.toString())
+							+ "\n";
+				}
+			}
+			if (configString.contains("\n")) {
+				configString = configString.substring(0,
+						configString.lastIndexOf('\n'));
+			}
+			final InputStream inputStream = new ByteArrayInputStream(
+					configString.getBytes(StandardCharsets.UTF_8));
+
+			if (fileProp.exists()) {
+				try {
+					fileProp.setContents(inputStream, IResource.FORCE, null);
+				} catch (final CoreException e) {
+					RuntimeCorePlugin.getDefault().logError(e);
+				}
+			} else {
+				createFile(fileProp, inputStream);
+			}
+
+		} else {
+			deleteFile(fileProp);
+		}
+	}
+
+	@Override
+	public void postCompile(final IResourceDelta delta, final IFile buildFile) {
+	}
+
+	/**
+	 * Reads and returns current feature config.
+	 * 
+	 * @return
+	 */
+	private Configuration readConfig() {
+
+		final Configuration featureProjectConfig = new Configuration(
+				featureProject.getFeatureModel());
+		final String configPath = featureProject.getCurrentConfiguration()
+				.getRawLocation().toOSString();
+		final FileReader<Configuration> reader = new FileReader<>(configPath,
+				featureProjectConfig,
+				ConfigurationManager.getFormat(configPath));
+		reader.read();
+
+		return featureProjectConfig;
+
+	}
+
 	/**
 	 * Sets the parent-child-relations within the FSTModel by adding children to
 	 * parent directives. To determine these relations the
@@ -424,33 +480,101 @@ public class RuntimeComposer extends ComposerExtensionClass {
 	 *            Map linking FeatureLocation-objects with their FSTDirectives
 	 *            representing them in the FSTModel
 	 */
-	private void setDirectiveChilds(HashMap<FeatureLocation, FSTDirective> directives) {
+	private void setDirectiveChilds(
+			final HashMap<FeatureLocation, FSTDirective> directives) {
 		FeatureLocation parent = null;
-		for (FeatureLocation loc : featureLocs) {
+		for (final FeatureLocation loc : featureLocs) {
 			parent = loc.getParent();
 			// only add children to directives when they are in the current
 			// config
-			if (parent != null && loc.isInConfig()) {
-				FSTDirective directiveOfParent = directives.get(parent);
+			if ((parent != null) && loc.isInConfig()) {
+				final FSTDirective directiveOfParent = directives.get(parent);
 				directiveOfParent.addChild(directives.get(loc));
 			}
 		}
 	}
 
-	private void deleteMarkers() {
+	/**
+	 * Looks for callers of getProperty()-method and creates
+	 * FeatureLocation-object for each call.
+	 */
 
-		// only delete markers once for each class
-		ArrayList<IFile> processedFiles = new ArrayList<IFile>();
+	public void setFeatureLocations() {
 
-		for (FeatureLocation loc : featureLocs) {
-			if (!processedFiles.contains(loc.getClassFile())) {
-				processedFiles.add(loc.getClassFile());
-				try {
-					loc.getClassFile().deleteMarkers(NOT_EXISTING_PROPERTY_MARKER, false, IResource.DEPTH_ZERO);
-				} catch (CoreException e) {
-					RuntimeCorePlugin.getDefault().logError(e);
+		featureLocs.clear();
+		final IJavaProject proj = JavaCore.create(featureProject.getProject());
+		try {
+			final IType itype = proj.findType(PROPERTY_MANAGER_PACKAGE + "."
+					+ PROPERTY_MANAGER_CLASS);
+			IMethod method = null;
+
+			for (final IMethod m : itype.getMethods()) {
+				if (m.getElementName().equals(GET_PROPERTY_METHOD)) {
+					method = m;
 				}
 			}
+			final ArrayList<CallLocation[]> callLocs = getCallersOf(method);
+
+			String featureName;
+			String className;
+			IFile classFile;
+			ICompilationUnit compilationUnit;
+			int startLineNum;
+			int endLineNum;
+			FSTDirectiveCommand cmd;
+			for (final CallLocation[] callLoc : callLocs) {
+				for (final CallLocation element : callLoc) {
+					// feature name = attribute of getProperty-call
+					featureName = element.getCallText().split("\"")[1];
+					className = element.getMember().getParent()
+							.getElementName();
+					classFile = (IFile) element.getMember()
+							.getCompilationUnit().getCorrespondingResource();
+					compilationUnit = element.getMember().getCompilationUnit();
+					startLineNum = element.getLineNumber();
+					endLineNum = getEndOfIf(compilationUnit, startLineNum);
+					// if the call in the start line is within an if-statement,
+					// getEndOfIf() will return the end of the latter
+					cmd = endLineNum == 1 ? FSTDirectiveCommand.CALL
+							: FSTDirectiveCommand.IF;
+					endLineNum = endLineNum == 1 ? startLineNum : endLineNum;
+
+					featureLocs
+							.add(new FeatureLocation(featureName, startLineNum,
+									endLineNum, classFile, className, cmd));
+				}
+			}
+		} catch (final JavaModelException e) {
+			RuntimeCorePlugin.getDefault().logError(e);
+		}
+		// sort all feature locations by 1) class (here represented by path
+		// string) and 2) its starting line
+		Collections.sort(featureLocs, new Comparator<FeatureLocation>() {
+			@Override
+			public int compare(final FeatureLocation a, final FeatureLocation b) {
+				return a.getOSPath().compareTo(b.getOSPath()) == 0 ? (a
+						.getStartLineNum() < b.getStartLineNum() ? -1 : a
+						.getStartLineNum() == b.getStartLineNum() ? 0 : 1) : a
+						.getOSPath().compareTo(b.getOSPath());
+			}
+		});
+
+		final Configuration configuration = readConfig();
+
+		// check whether the feature corresponding with the
+		// FeatureLocation-object is in the current config
+		for (final FeatureLocation loc : featureLocs) {
+			for (final SelectableFeature feature : configuration.getFeatures()) {
+				if (feature.getName().equals(loc.getFeatureName())) {
+					loc.setInConfig(true);
+					break;
+				}
+			}
+		}
+		// get parent-child-relations for FeatureLocation-objects
+		for (int i = 1; i < featureLocs.size(); i++) {
+			final FeatureLocation loc = featureLocs.get(i);
+			loc.setParent(getParentFeatureLocation(i));
 		}
 	}
 
@@ -464,9 +588,9 @@ public class RuntimeComposer extends ComposerExtensionClass {
 	 *            Internal id of the new directive
 	 * @return Returns created directive.
 	 */
-	private FSTDirective setFSTDirective(FeatureLocation loc, int id) {
+	private FSTDirective setFSTDirective(final FeatureLocation loc, final int id) {
 
-		FSTDirective fstDirective = new FSTDirective();
+		final FSTDirective fstDirective = new FSTDirective();
 		fstDirective.setFeatureName(loc.getFeatureName());
 		fstDirective.setLine(loc.getStartLineNum());
 		fstDirective.setExpression(loc.getFeatureName());
@@ -476,76 +600,6 @@ public class RuntimeComposer extends ComposerExtensionClass {
 		fstDirective.setCommand(loc.getCmd());
 
 		return fstDirective;
-	}
-
-	/**
-	 * When initialized, the PropertyManager class will be created within the
-	 * runtime project, if it does not already exist. The PropertyManager.java
-	 * is located in de.ovgu.featureide.core.runtime/resources.
-	 */
-	@Override
-	public boolean initialize(IFeatureProject project) {
-		if (super.initialize(project)) {
-
-			IFolder propFolder = featureProject.getBuildFolder().getFolder(PROPERTY_MANAGER_PACKAGE);
-
-			try {
-				if (!propFolder.exists()) {
-					propFolder.create(true, true, new NullProgressMonitor());
-				}
-			} catch (CoreException e) {
-				RuntimeCorePlugin.getDefault().logError(e);
-			}
-			IFile filePropMan = propFolder.getFile(PROPERTY_MANAGER_CLASS + ".java");
-
-			if (PROPERTIES.equals(featureProject.getCompositionMechanism())) {
-				if (!filePropMan.exists()) {
-					InputStream inputStream = null;
-					try {
-						inputStream = FileLocator.openStream(
-								RuntimeCorePlugin.getDefault().getBundle(), new Path("Resources"
-										+ FileSystems.getDefault().getSeparator() + PROPERTY_MANAGER_CLASS + ".java"),
-								false);
-					} catch (IOException e) {
-						RuntimeCorePlugin.getDefault().logError(e);
-					}
-					createFile(filePropMan, inputStream);
-					try {
-						filePropMan.setDerived(true, null);
-					} catch (CoreException e) {
-						RuntimeCorePlugin.getDefault().logError(e);
-					}
-				}
-			} else {
-				deleteFile(filePropMan);
-				try {
-					propFolder.delete(true, null);
-				} catch (CoreException e) {
-					RuntimeCorePlugin.getDefault().logError(e);
-				}
-			}
-		}
-		return super.initialize(project);
-	}
-
-	private void deleteFile(IFile file) {
-		if (file != null) {
-			try {
-				file.delete(true, null);
-			} catch (CoreException e) {
-				RuntimeCorePlugin.getDefault().logError(e);
-			}
-		}
-	}
-
-	private void createFile(IFile file, InputStream stream) {
-		if (file != null) {
-			try {
-				file.create(stream, true, null);
-			} catch (CoreException e) {
-				RuntimeCorePlugin.getDefault().logError(e);
-			}
-		}
 	}
 
 }

@@ -1,3 +1,23 @@
+/* FeatureIDE - A Framework for Feature-Oriented Software Development
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ *
+ * This file is part of FeatureIDE.
+ * 
+ * FeatureIDE is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * FeatureIDE is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * See http://featureide.cs.ovgu.de/ for further information.
+ */
 package de.ovgu.featureide.core.runtime;
 
 import org.eclipse.jdt.core.dom.ASTVisitor;
@@ -9,7 +29,7 @@ import org.eclipse.jdt.core.dom.IfStatement;
  * line number matches the passed line number.
  * 
  * @author Matthias Quaas
- *
+ * 
  */
 class IfVisitor extends ASTVisitor {
 
@@ -17,14 +37,15 @@ class IfVisitor extends ASTVisitor {
 	int startLine;
 	CompilationUnit compilationUnit;
 
-	public IfVisitor(int startLine, CompilationUnit compilationUnit) {
+	public IfVisitor(final int startLine, final CompilationUnit compilationUnit) {
 		super();
 		endPosition = 0;
 		this.startLine = startLine;
 		this.compilationUnit = compilationUnit;
 	}
 
-	public void endVisit(IfStatement node) {
+	@Override
+	public void endVisit(final IfStatement node) {
 
 		if (compilationUnit.getLineNumber(node.getStartPosition()) == startLine) {
 			endPosition = node.getThenStatement().getStartPosition();
