@@ -44,7 +44,6 @@ import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.nio.file.FileSystems;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -171,7 +170,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 			// Save selected and expanded elements;
 			final Set<Object> checkedElements = new HashSet<>(Arrays.asList(getCheckedElements()));
 			final Set<Object> expandedElements = new HashSet<>(Arrays.asList(getExpandedElements()));
-			
+
 			getTree().setRedraw(false);
 
 			//update tree and load all elements regarding the filter
@@ -202,7 +201,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 					}
 				}
 			}
-			getTree().setRedraw(true);		
+			getTree().setRedraw(true);
 		}
 
 	}
@@ -259,8 +258,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 	private StyledText searchFeatureText;
 	private final ExampleProjectFilter searchFilter = new ExampleProjectFilter();
 
-	private static final String CHILD_WARNING = SELECTED_ONLY_FULLY_COMPATIBLE_PROJECTS_
-			+ "(Manual selection for projects with warnings is still possible).";
+	private static final String CHILD_WARNING = SELECTED_ONLY_FULLY_COMPATIBLE_PROJECTS_ + "(Manual selection for projects with warnings is still possible).";
 
 	private Thread updateProjects;
 
@@ -280,7 +278,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 
 		Composite workArea = new Composite(parent, SWT.NONE);
 		setControl(workArea);
-		
+
 		Label title = new Label(workArea, SWT.NONE);
 		title.setText("Choosable Examples:");
 
@@ -760,7 +758,8 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 	 *            The monitor to report to
 	 * @return boolean <code>true</code> if the operation was completed.
 	 */
-	private boolean collectProjectFilesFromDirectory(Collection<ProjectRecord> projects, File directory, Set<String> directoriesVisited, IProgressMonitor monitor) {
+	private boolean collectProjectFilesFromDirectory(Collection<ProjectRecord> projects, File directory, Set<String> directoriesVisited,
+			IProgressMonitor monitor) {
 		if (monitor.isCanceled()) {
 			return false;
 		}
@@ -788,20 +787,19 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 				projects.add(newProject);
 			}
 		}
-		
+
 		//look for subprojects
-		if(newProject != null){
-			Collection<ProjectRecord> subProjects = new ArrayList<>(); 
+		if (newProject != null) {
+			Collection<ProjectRecord> subProjects = new ArrayList<>();
 			for (int i = 0; i < contents.length; i++) {
-				if(contents[i].isDirectory() && newProject.SUB_PROJECTS_FOLDER.contains(contents[i].getName())){
+				if (contents[i].isDirectory() && newProject.SUB_PROJECTS_FOLDER.contains(contents[i].getName())) {
 					collectProjectFilesFromDirectory(subProjects, contents[i], directoriesVisited, monitor);
 				}
 			}
 			newProject.setSubProjects(subProjects);
 			return true;
 		}
-		
-		
+
 		// no project description found, so recurse into sub-directories
 		for (int i = 0; i < contents.length; i++) {
 			final File file = contents[i];
@@ -819,7 +817,6 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 		}
 		return true;
 	}
-
 
 	/**
 	 * Retrieve all the projects in the current workspace.
@@ -941,8 +938,11 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 			desc.setDynamicReferences(record.projectDescription.getDynamicReferences());
 			desc.setNatureIds(record.projectDescription.getNatureIds());
 			desc.setReferencedProjects(record.projectDescription.getReferencedProjects());
+			final String projectPath = record.getLocation();
+			if (!projectPath.substring(1).equals(projectName)) {
+				desc.setLocation(new Path(workspace.getRoot().getLocation() + projectPath));
+			}
 			record.projectDescription = desc;
-			desc.setLocation(new Path(workspace.getRoot().getLocation() + record.getLocation()));
 		}
 
 		try {
@@ -1107,10 +1107,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 	 * 
 	 */
 	private class ProjectRecord {
-		public final Set<String> SUB_PROJECTS_FOLDER = new HashSet<String>() {{
-		    add("projects");
-		    add("features");
-		}};
+		public final Set<String> SUB_PROJECTS_FOLDER = new HashSet<String>(Arrays.asList("projects", "features"));
 		private File projectDescriptionFile;
 
 		private ProjectRecord parentProject;
@@ -1152,14 +1149,14 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 			}
 			this.subProjects = subProjects;
 		}
-		
+
 		/**
 		 * @return
 		 */
 		public String getLocation() {
-			if(parentProject == null){
+			if (parentProject == null) {
 				return FileSystems.getDefault().getSeparator() + this.getProjectName();
-			}else{
+			} else {
 				java.nio.file.Path grandfather = parentProject.projectDescriptionFile.getParentFile().getParentFile().toPath();
 				java.nio.file.Path child = this.projectDescriptionFile.getParentFile().toPath();
 				java.nio.file.Path res = grandfather.relativize(child);
@@ -1167,8 +1164,6 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 				return FileSystems.getDefault().getSeparator() + res.toString();
 			}
 		}
-
-
 
 		/**
 		 * @param file
@@ -1335,7 +1330,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 		public String getProjectLabel() {
 			return projectName;
 		}
-		
+
 		@Override
 		public int hashCode() {
 			return projectName.hashCode();
