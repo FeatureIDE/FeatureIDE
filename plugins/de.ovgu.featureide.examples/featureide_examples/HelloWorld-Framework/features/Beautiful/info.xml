@@ -1,0 +1,5 @@
+<plugin>
+	<interface id="interfaces.Print">
+		<class>Beautiful</class>
+	</interface>
+</plugin>
