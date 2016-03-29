@@ -75,6 +75,7 @@ public class DeltaJGenerator implements IGenerator {
   @Inject
   private DeltaJConstraintsGenerator constraintsGenerator;
   
+  @Override
   public void doGenerate(final Resource resource, final IFileSystemAccess fsa) {
     TreeIterator<EObject> _allContents = resource.getAllContents();
     Iterable<EObject> _iterable = IteratorExtensions.<EObject>toIterable(_allContents);
@@ -216,6 +217,7 @@ public class DeltaJGenerator implements IGenerator {
   public String parameterList(final Method m) {
     EList<Parameter> _params = m.getParams();
     final Function1<Parameter, String> _function = new Function1<Parameter, String>() {
+      @Override
       public String apply(final Parameter p) {
         TypeForDeclaration _type = p.getType();
         String _typeRep = DeltaJGenerator.this.typeRep(_type);
@@ -554,6 +556,7 @@ public class DeltaJGenerator implements IGenerator {
   
   public String compileArgs(final List<Expression> args) {
     final Function1<Expression, Object> _function = new Function1<Expression, Object>() {
+      @Override
       public Object apply(final Expression arg) {
         return DeltaJGenerator.this.compileExp(arg);
       }
