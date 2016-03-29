@@ -103,9 +103,15 @@ public class RuntimeFMComposerExtension extends FMComposerExtension {
 					RuntimeComposer.GET_PROPERTY_METHOD + "(\"" + oldName + "\")",
 					RuntimeComposer.GET_PROPERTY_METHOD + "(\"" + newName + "\")");
 
-			String newClassString = String.join("\n", oldClassStringArray);
+			final StringBuilder newClassString = new StringBuilder();
+			for (int i = 0; i < oldClassStringArray.length; i++) {
+				if (i != 0) {
+					newClassString.append(System.lineSeparator());
+				}
+				newClassString.append(oldClassStringArray[i]);
+			}
 
-			InputStream newClassStream = new ByteArrayInputStream(newClassString.getBytes(StandardCharsets.UTF_8));
+			InputStream newClassStream = new ByteArrayInputStream(newClassString.toString().getBytes(StandardCharsets.UTF_8));
 			try {
 				loc.getClassFile().setContents(newClassStream, IFile.FORCE, null);
 			} catch (CoreException e) {

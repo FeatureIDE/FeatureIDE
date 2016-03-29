@@ -8,6 +8,7 @@ import java.nio.file.FileSystems;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Vector;
@@ -276,11 +277,15 @@ public class RuntimeComposer extends ComposerExtensionClass {
 		}
 		// sort all feature locations by 1) class (here represented by path
 		// string) and 2) its starting line
-		Collections.sort(featureLocs,
-				(a, b) -> a.getOSPath().compareTo(b.getOSPath()) == 0
-						? (a.getStartLineNum() < b.getStartLineNum() ? -1
-								: a.getStartLineNum() == b.getStartLineNum() ? 0 : 1)
-						: a.getOSPath().compareTo(b.getOSPath()));
+		Collections.sort(featureLocs, new Comparator<FeatureLocation>() {
+			@Override
+			public int compare(FeatureLocation a, FeatureLocation b) {
+				return a.getOSPath().compareTo(b.getOSPath()) == 0 ? (a
+						.getStartLineNum() < b.getStartLineNum() ? -1 : a
+						.getStartLineNum() == b.getStartLineNum() ? 0 : 1) : a
+						.getOSPath().compareTo(b.getOSPath());
+			}
+		});
 
 		final Configuration configuration = readConfig();
 
@@ -349,7 +354,7 @@ public class RuntimeComposer extends ComposerExtensionClass {
 	 */
 	private int getEndOfIf(ICompilationUnit compilationUnit, int startLineNum) {
 
-		ASTParser parser = ASTParser.newParser(AST.JLS8);
+		ASTParser parser = ASTParser.newParser(AST.JLS4);
 		parser.setSource(compilationUnit);
 		parser.setKind(ASTParser.K_COMPILATION_UNIT);
 		parser.setResolveBindings(true);
