@@ -1,0 +1,8 @@
+<plugin>
+	<interface id="interfaces.Print">
+		<class>Hello</class>
+	</interface>
+	<interface id="interfaces.Announce">
+		<class>announcement.Hello</class>
+	</interface>
+</plugin>

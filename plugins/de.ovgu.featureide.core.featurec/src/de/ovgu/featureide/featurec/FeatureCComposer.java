@@ -1,3 +1,23 @@
+/* FeatureIDE - A Framework for Feature-Oriented Software Development
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ *
+ * This file is part of FeatureIDE.
+ * 
+ * FeatureIDE is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * FeatureIDE is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * See http://featureide.cs.ovgu.de/ for further information.
+ */
 package de.ovgu.featureide.featurec;
 
 import java.io.ByteArrayInputStream;
@@ -27,7 +47,7 @@ import de.ovgu.featureide.fm.core.io.manager.FileReader;
 
 public class FeatureCComposer extends ComposerExtensionClass {
 
-	private FeatureHouseComposer composer;
+	private final FeatureHouseComposer composer;
 	private static final String MAPPINGS_FILENAME = ".autotools_mappings";
 	private static final Map<String, String> config_parameter = new HashMap<String, String>();
 
@@ -36,25 +56,33 @@ public class FeatureCComposer extends ComposerExtensionClass {
 	}
 
 	@Override
-	public void performFullBuild(IFile config) {
+	public Mechanism getGenerationMechanism() {
+		return composer.getGenerationMechanism();
+	}
+
+	@Override
+	public void performFullBuild(final IFile config) {
 		composer.initialize(CorePlugin.getFeatureProject(config));
 		composer.performFullBuild(config);
 
-		IFeatureModel model = CorePlugin.getFeatureProject(config)
+		final IFeatureModel model = CorePlugin.getFeatureProject(config)
 				.getFeatureModel();
-		Configuration cfg = new Configuration(model);
-		final FileReader<Configuration> reader = new FileReader<>(Paths.get(config.getLocationURI()), cfg, ConfigurationManager.getFormat(config.getName()));
+		final Configuration cfg = new Configuration(model);
+		final FileReader<Configuration> reader = new FileReader<>(
+				Paths.get(config.getLocationURI()), cfg,
+				ConfigurationManager.getFormat(config.getName()));
 		reader.read();
 
-		IResource mappings = config.getProject().findMember(MAPPINGS_FILENAME);
-		if (mappings != null && mappings.isAccessible()
-				&& mappings instanceof IFile) {
+		final IResource mappings = config.getProject().findMember(
+				MAPPINGS_FILENAME);
+		if ((mappings != null) && mappings.isAccessible()
+				&& (mappings instanceof IFile)) {
 			try {
-				List<String> content_lines = Files.readAllLines(Paths
+				final List<String> content_lines = Files.readAllLines(Paths
 						.get(mappings.getLocation().toOSString()), Charset
 						.availableCharsets().get("UTF-8"));
-				for (String line : content_lines) {
-					String[] key_value = line.split(";");
+				for (final String line : content_lines) {
+					final String[] key_value = line.split(";");
 					if (key_value.length == 2) {
 						config_parameter.put(key_value[0], key_value[1]);
 					} else {
@@ -64,13 +92,13 @@ public class FeatureCComposer extends ComposerExtensionClass {
 					}
 
 				}
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				e.printStackTrace();
 			}
 		}
 
-		StringBuilder sb = new StringBuilder();
-		for (SelectableFeature sbf : cfg.getFeatures()) {
+		final StringBuilder sb = new StringBuilder();
+		for (final SelectableFeature sbf : cfg.getFeatures()) {
 			if (sbf.getSelection() == Selection.SELECTED) {
 				String str = config_parameter.get(sbf.getName());
 				if (str == null) {
@@ -80,16 +108,16 @@ public class FeatureCComposer extends ComposerExtensionClass {
 				sb.append(str).append(" ");
 			}
 		}
-		IResource autotools_default = config.getProject().findMember(
+		final IResource autotools_default = config.getProject().findMember(
 				".autotools_default");
 		if (autotools_default.isAccessible()
-				&& autotools_default instanceof IFile) {
+				&& (autotools_default instanceof IFile)) {
 			try {
 				String content = new String(Files.readAllBytes(Paths
 						.get(autotools_default.getLocation().toOSString())));
 				content = content.replace("@@", sb.toString());
-				IFile auto_tools = (IFile) config.getProject().findMember(
-						".autotools");
+				final IFile auto_tools = (IFile) config.getProject()
+						.findMember(".autotools");
 				if (auto_tools.isAccessible()) {
 					try (InputStream inputStream = new ByteArrayInputStream(
 							content.getBytes("UTF-8"))) {
@@ -97,7 +125,7 @@ public class FeatureCComposer extends ComposerExtensionClass {
 								new NullProgressMonitor());
 						// auto_tools.refreshLocal(IResource.DEPTH_INFINITE,
 						// null);
-					} catch (CoreException e) {
+					} catch (final CoreException e) {
 						e.printStackTrace();
 					}
 
@@ -106,16 +134,11 @@ public class FeatureCComposer extends ComposerExtensionClass {
 							Charset.availableCharsets().get("UTF-8")));
 				}
 
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				e.printStackTrace();
 			}
 		}
 
-	}
-
-	@Override
-	public Mechanism getGenerationMechanism() {
-		return composer.getGenerationMechanism();
 	}
 
 }

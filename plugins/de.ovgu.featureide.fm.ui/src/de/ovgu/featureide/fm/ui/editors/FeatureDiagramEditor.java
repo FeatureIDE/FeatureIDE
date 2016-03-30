@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -732,6 +732,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		return null;
 	}
 
+	@SuppressWarnings("unchecked")
 	public void propertyChange(FeatureIDEEvent event) {
 		final EventType prop = event.getEventType();
 		switch (prop) {
@@ -866,6 +867,16 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			internRefresh(true);
 			analyzeFeatureModel();
 			featureModelEditor.setPageModified(true);
+			break;
+		case COLOR_CHANGED:
+			if (event.getSource() instanceof List) {
+				final List<IGraphicalFeature> features = (List<IGraphicalFeature>) event.getSource(); 
+				for (IGraphicalFeature gf : features) {
+					gf.update(FeatureIDEEvent.getDefault(EventType.COLOR_CHANGED));
+				}
+			} else {
+				FMUIPlugin.getDefault().logWarning(event + " contains wrong source type: " + event.getSource());
+			}
 			break;
 		default:
 			FMUIPlugin.getDefault().logWarning(prop + " not handled!");

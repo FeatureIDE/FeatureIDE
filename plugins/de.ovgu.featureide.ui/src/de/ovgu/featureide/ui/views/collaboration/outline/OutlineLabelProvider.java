@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -28,7 +28,7 @@ import org.eclipse.swt.widgets.TreeItem;
 /**
  * Label provider for each FeatureIDE outline
  * 
- * @author Reimar Schröter
+ * @author Reimar Schrï¿½ter
  */
 public abstract class OutlineLabelProvider implements ILabelProvider {
 	public static final int OUTLINE_NOT_AVAILABLE = -1;
