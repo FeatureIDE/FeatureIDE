@@ -87,6 +87,8 @@ import de.ovgu.featureide.fm.core.io.manager.FileReader;
 @SuppressWarnings("restriction")
 public class RuntimeComposer extends ComposerExtensionClass {
 
+	@SuppressWarnings("deprecation")
+	private static final int AST_Type = AST.JLS4;
 	public static final String RUN_CONFIGURATION = "Run Configuration";
 	public static final String PROPERTIES = "Properties";
 	public static final String NOT_EXISTING_PROPERTY_MARKER = CorePlugin.PLUGIN_ID
@@ -264,7 +266,7 @@ public class RuntimeComposer extends ComposerExtensionClass {
 	private int getEndOfIf(final ICompilationUnit compilationUnit,
 			final int startLineNum) {
 
-		final ASTParser parser = ASTParser.newParser(AST.JLS4);
+		final ASTParser parser = ASTParser.newParser(AST_Type);
 		parser.setSource(compilationUnit);
 		parser.setKind(ASTParser.K_COMPILATION_UNIT);
 		parser.setResolveBindings(true);

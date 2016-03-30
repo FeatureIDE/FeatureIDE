@@ -22,7 +22,6 @@ package de.ovgu.featureide.fm.core.base;
 
 import javax.annotation.Nonnull;
 
-import de.ovgu.featureide.fm.core.base.impl.AFeature;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 
 /**

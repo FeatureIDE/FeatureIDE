@@ -26,7 +26,6 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.IFeatureProperty;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.core.io.sxfm.SXFMReader;
 
 /**
  * Implementation of {@link AFeature} used as default implementation inside FeatureIDE.
