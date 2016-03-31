@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,7 +20,11 @@
  */
 package de.ovgu.featureide.core.fstmodel;
 
+import java.util.TreeSet;
+
 import org.eclipse.core.resources.IFile;
+
+import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 
 /**
  * Default implementation of {@link FSTMethod} and {@link FSTField}.
@@ -50,6 +54,17 @@ public abstract class RoleElement<T extends RoleElement<T>> implements Comparabl
 
 	protected IRoleElement parent;
 
+	private final TreeSet<FSTDirective> directives = new TreeSet<FSTDirective>();
+	
+	public void add(FSTDirective directive) {
+		directives.add(directive);
+		directive.setRole(role);
+	}
+	
+	public TreeSet<FSTDirective> getFSTDirectives() {
+		return directives;
+	}
+	
 	public RoleElement(String name, String type, String modifiers) {
 		this(name, type, modifiers, "", -1, -1);
 	}
@@ -113,6 +128,10 @@ public abstract class RoleElement<T extends RoleElement<T>> implements Comparabl
 
 	public void setLine(int lineNumber) {
 		this.beginLine = lineNumber;
+	}
+	
+	public void setEndLine(int lineNumber) {
+		this.endLine = lineNumber;
 	}
 
 	public int getEndLine() {

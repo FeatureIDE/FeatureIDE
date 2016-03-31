@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -72,7 +72,7 @@ import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel.UsedModel;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModelFactory;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.constraint.Equation;
 import de.ovgu.featureide.fm.core.constraint.FeatureAttribute;
 import de.ovgu.featureide.fm.core.constraint.Reference;
@@ -88,6 +88,7 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
  * 
  * @author Sebastian Krieter
  * @author Matthias Strauss
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 	
@@ -119,7 +120,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 	
 	private final boolean velvetImport;
 	
-	private ModelMarkerHandler modelMarkerHandler;
+	private ModelMarkerHandler<IResource> modelMarkerHandler;
 	private ExtendedFeatureModel extFeatureModel;
 	private String extFeatureModelName;
 	private boolean localSearch = false;
@@ -484,7 +485,7 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 //		extFeatureModel.getLayout().showHiddenFeatures(true);
 //		extFeatureModel.getLayout().verticalLayout(false);
 		if (getProject() != null) {
-			modelMarkerHandler = new ModelMarkerHandler(getProject().getFile(getFile().getName()));
+			modelMarkerHandler = new ModelMarkerHandler<IResource>(getProject().getFile(getFile().getName()));
 			modelMarkerHandler.deleteAllModelMarkers();
 		}
 
@@ -973,8 +974,8 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 				reportSyntaxError(curNode);
 			}
 		}
-		IFeatureModel mappingModel = FeatureModelFactory.getInstance().createFeatureModel();
-		IFeatureStructure rootFeature = FeatureModelFactory.getInstance().createFeature(mappingModel, "MPL").getStructure();
+		IFeatureModel mappingModel = FMFactoryManager.getFactory().createFeatureModel();
+		IFeatureStructure rootFeature = FMFactoryManager.getFactory().createFeature(mappingModel, "MPL").getStructure();
 		rootFeature.setAnd();
 		rootFeature.setAbstract(true);
 		rootFeature.setMandatory(true);
@@ -990,14 +991,14 @@ public class VelvetFeatureModelReader extends AbstractFeatureModelReader {
 		
 		for (Entry<String, UsedModel> parameter : extFeatureModel.getExternalModels().entrySet()) {
 			if (parameter.getValue().getType() == ExtendedFeature.TYPE_INTERFACE) {
-				IFeatureStructure parameterFeature = FeatureModelFactory.getInstance().createFeature(mappingModel, parameter.getKey()).getStructure();
+				IFeatureStructure parameterFeature = FMFactoryManager.getFactory().createFeature(mappingModel, parameter.getKey()).getStructure();
 				parameterFeature.setOr();
 				parameterFeature.setAbstract(true);
 				parameterFeature.setMandatory(true);
 				rootFeature.addChild(parameterFeature);
 				
 				for (String projectName : possibleProjects) {
-					IFeatureStructure projectFeature = FeatureModelFactory.getInstance().createFeature(mappingModel, parameterFeature.getFeature().getName() + "." + projectName).getStructure();
+					IFeatureStructure projectFeature = FMFactoryManager.getFactory().createFeature(mappingModel, parameterFeature.getFeature().getName() + "." + projectName).getStructure();
 					projectFeature.setAbstract(false);
 					projectFeature.setMandatory(false);
 					parameterFeature.addChild(projectFeature);

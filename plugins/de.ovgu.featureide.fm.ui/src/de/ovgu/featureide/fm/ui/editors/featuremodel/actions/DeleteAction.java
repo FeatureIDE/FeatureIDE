@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -24,7 +24,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -42,7 +41,7 @@ import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.DeleteOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ElementDeleteOperation;
 
 /**
  * Deletes the selected features and moves their unselected children upwards.
@@ -50,6 +49,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.DeleteOperation;
  * 
  * @author Thomas Thuem
  * @author Christian Becker
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class DeleteAction extends Action {
 
@@ -81,8 +81,7 @@ public class DeleteAction extends Action {
 
 	@Override
 	public void run() {
-		DeleteOperation op = new DeleteOperation(viewer, featureModel);
-		op.addContext((IUndoContext) featureModel.getUndoContext());
+		ElementDeleteOperation op = new ElementDeleteOperation(viewer, featureModel);
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);

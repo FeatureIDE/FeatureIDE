@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,12 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.base;
 
-import java.io.File;
-import java.util.List;
-
 import org.prop4j.Node;
-
-import de.ovgu.featureide.fm.core.io.ModelWarning;
 
 /**
  * Factory to create or copy instance of {@link IFeature}, {@link IFeatureModel}, and {@link IConstraint}.
@@ -41,9 +36,5 @@ public interface IFeatureModelFactory {
 	IFeature createFeature(IFeatureModel featureModel, String name);
 
 	IFeatureModel createFeatureModel();
-
-	List<ModelWarning> loadFeatureModel(IFeatureModel featureModel, File file);
-
-	List<ModelWarning> loadFeatureModel(IFeatureModel featureModel, String content);
 
 }

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -225,21 +225,21 @@ public class CollaborationOutlineTreeContentProvider implements ITreeContentProv
 		return filter(obj);
 	}
 
-	private final Set<IFilter> filters = new HashSet<>();
+	private final Set<ICollaborationOutlineFilter> filters = new HashSet<>();
 
 	//add filter to filter set
-	public void addFilter(IFilter filter) {
+	public void addFilter(ICollaborationOutlineFilter filter) {
 		filters.add(filter);
 	}
 
 	//remove filter from filter set
-	public void removeFilter(IFilter filter) {
+	public void removeFilter(ICollaborationOutlineFilter filter) {
 		filters.remove(filter);
 	}
 
 	//apply all filters from filter set
 	private Object[] filter(Object[] obj) {
-		for (IFilter filter : filters) {
+		for (ICollaborationOutlineFilter filter : filters) {
 			obj = filter.filter(obj);
 		}
 		return obj;

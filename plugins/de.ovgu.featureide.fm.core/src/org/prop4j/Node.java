@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -35,6 +35,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
  * (cnf).
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public abstract class Node {
 
@@ -139,20 +140,19 @@ public abstract class Node {
 
 	@Override
 	public boolean equals(Object object) {
-		if (!getClass().isInstance(object))
-			return false;
-		Node otherNode = (Node) object;
-		if (children.length != otherNode.children.length)
-			return false;
-		for (int i = 0; i < children.length; i++) {
-			boolean pairFound = false;
-			for (int j = 0; j < otherNode.children.length; j++)
-				if (pairFound = children[i].equals(otherNode.children[j]))
-					break;
-			if (!pairFound)
-				return false;
+		if (this == object) {
+			return true;
 		}
-		return true;
+		if (!getClass().isInstance(object)) {
+			return false;
+		}
+		Node otherNode = (Node) object;
+		if (children.length != otherNode.children.length) {
+			return false;
+		}
+		final List<Node> thisChildrenList = Arrays.asList(children);
+		final List<Node> otherChildrenList = Arrays.asList(otherNode.children);
+		return thisChildrenList.containsAll(otherChildrenList) && otherChildrenList.containsAll(thisChildrenList);
 	}
 
 	@Override

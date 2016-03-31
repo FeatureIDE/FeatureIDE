@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -59,6 +59,7 @@ import de.ovgu.featureide.fm.core.job.util.JobArguments;
  * Builds different statistics from the {@link ProjectSignatures}.
  * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke (Feature Interface)
  */
 @SuppressWarnings("unused")
 public class PrintStatisticsJob extends AProjectJob<PrintStatisticsJob.Arguments> {
@@ -168,7 +169,7 @@ public class PrintStatisticsJob extends AProjectJob<PrintStatisticsJob.Arguments
 		IFeatureModel fm = interfaceProject.getFeatureModel();
 		LinkedList<String> allConcreteFeatures = new LinkedList<String>();
 		for (IFeature feature : FeatureUtils.extractConcreteFeatures(fm)) {
-			allConcreteFeatures.add(feature.getName().toString());
+			allConcreteFeatures.add(feature.getName());
 		}
 		workMonitor.setMaxAbsoluteWork(allConcreteFeatures.size() + 1);
 		

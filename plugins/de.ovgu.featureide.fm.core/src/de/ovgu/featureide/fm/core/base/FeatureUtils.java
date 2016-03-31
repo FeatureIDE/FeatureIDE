@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 import org.eclipse.core.resources.IProject;
@@ -62,12 +63,13 @@ import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
 /**
  * @author Marcus Pinnecke
  */
-public abstract class FeatureUtils {
+public final class FeatureUtils {
+	
+	private FeatureUtils() {}
 
 	public static final ConcreteFeatureFilter CONCRETE_FEATURE_FILTER = new ConcreteFeatureFilter();
 
 	public static final IFunction<IFeature, String> GET_FEATURE_NAME = new IFunction<IFeature, String>() {
-
 		@Override
 		public String invoke(IFeature t) {
 			return t.getName();
@@ -251,11 +253,15 @@ public abstract class FeatureUtils {
 		return Functional.toList(Functional.map(constraints, CONSTRAINT_TO_NODE));
 	}
 
+	public static final String getRelevantConstraintsString(IFeature feature) {
+		return FeatureUtils.getRelevantConstraintsString(feature, feature.getFeatureModel().getConstraints());
+	}
+	
 	public static String getRelevantConstraintsString(IFeature feature, Collection<IConstraint> constraints) {
 		StringBuilder relevant = new StringBuilder();
 		for (IConstraint constraint : constraints) {
 			for (IFeature f : constraint.getContainedFeatures()) {
-				if (f.getName().equals(feature.getName())) {
+				if (f != null && f.getName().equals(feature.getName())) {
 					relevant.append((relevant.length() == 0 ? " " : "\n ") + constraint.getNode().toString(NodeWriter.logicalSymbols) + " ");
 					break;
 				}
@@ -273,7 +279,7 @@ public abstract class FeatureUtils {
 		for (IConstraint constraint : bone.getFeatureModel().getConstraints()) {
 			for (IFeature f : constraint.getContainedFeatures()) {
 				if (f.getName().equals(bone.getName())) {
-					constraintList.add(new Constraint(bone.getFeatureModel(), constraint.getNode()));
+					constraintList.add((Constraint) constraint.clone(bone.getFeatureModel()));
 					break;
 				}
 			}
@@ -387,10 +393,6 @@ public abstract class FeatureUtils {
 		return feature.getStructure().getRelevantConstraints();
 	}
 
-	public static final String getRelevantConstraintsString(IFeature feature) {
-		return FeatureUtils.getRelevantConstraintsString(feature, feature.getFeatureModel().getConstraints());
-	}
-
 	public static final FeatureStatus getFeatureStatus(IFeature feature) {
 		return feature.getProperty().getFeatureStatus();
 	}
@@ -427,8 +429,15 @@ public abstract class FeatureUtils {
 		feature.getStructure().setParent(newParent.getStructure());
 	}
 
+	@CheckForNull
 	public static final IFeature getParent(IFeature feature) {
-		return feature.getStructure().getParent().getFeature();
+		if (feature != null) {
+			IFeatureStructure parent = feature.getStructure().getParent();
+			if (parent != null) { 
+				return parent.getFeature();
+			}
+		}
+		return null;
 	}
 
 	public static final boolean isRoot(IFeature feature) {
@@ -568,7 +577,7 @@ public abstract class FeatureUtils {
 
 	public static final String toString(IFeature feature, boolean writeMarks) {
 		if (writeMarks) {
-			final String featureName = feature.getName().toString();
+			final String featureName = feature.getName();
 			if (featureName.contains(" ") || Operator.isOperatorName(featureName)) {
 				return "\"" + feature.getName() + "\"";
 			}
@@ -643,7 +652,11 @@ public abstract class FeatureUtils {
 	}
 
 	public static final IFeature getRoot(IFeatureModel featureModel) {
-		return featureModel.getStructure().getRoot().getFeature();
+		IFeatureStructure root = featureModel.getStructure().getRoot();
+		if (root != null) {
+			return root.getFeature();
+		}
+		return null;
 	}
 
 	public static final void setFeatureTable(IFeatureModel featureModel, final Hashtable<String, IFeature> featureTable) {
@@ -755,12 +768,13 @@ public abstract class FeatureUtils {
 	public static final void removePropositionalNode(IFeatureModel featureModel, Node node) {
 		List<IConstraint> constraints = featureModel.getConstraints();
 		int index = -1;
-		for (int i = 0; i < constraints.size(); i++)
+		for (int i = 0; i < constraints.size(); i++) {
 			if (constraints.get(i).getNode().equals(node)) {
 				index = i;
 				break;
 			}
-		tryRemoveConstraint(featureModel, constraints, index);
+		}
+		tryRemoveConstraint(featureModel, new LinkedList<>(constraints), index);
 	}
 
 	public static final void removeConstraint(IFeatureModel featureModel, IConstraint constraint) {
@@ -1007,14 +1021,6 @@ public abstract class FeatureUtils {
 
 	public static final ConstraintAttribute getConstraintAttribute(IConstraint constraint) {
 		return constraint.getConstraintAttribute();
-	}
-
-	public static final void setFeatureSelected(IConstraint constraint, boolean selected) {
-		constraint.setFeatureSelected(selected);
-	}
-
-	public static final boolean isFeatureSelected(IConstraint constraint) {
-		return constraint.isFeatureSelected();
 	}
 
 	public static final Node getNode(IConstraint constraint) {

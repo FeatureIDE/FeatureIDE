@@ -31,11 +31,13 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATING_CONFI
 import java.util.LinkedList;
 import java.util.List;
 
+import org.prop4j.Node;
+
 import de.ovgu.featureide.fm.core.job.AStoppableJob;
 import de.ovgu.featureide.fm.core.job.IStoppableJob;
 
 /**
- * TODO description
+ * Constructs a separate {@link IConfigJob} for every long running functionality of a {@code ConfigurationPropagator}.
  * 
  * @author Sebastian Krieter
  */
@@ -128,6 +130,16 @@ public class ConfigurationPropagatorJobWrapper {
 			@Override
 			protected boolean work() throws Exception {
 				result = propagator.canBeValid(workMonitor);
+				return true;
+			}
+		};
+	}
+	
+	public IConfigJob<?> findOpenClauses(final List<SelectableFeature> featureList) {
+		return new ConfigJob<List<Node>>(ConfigJob.ID_VALIDCONFIG) {
+			@Override
+			protected boolean work() throws Exception {
+				result = propagator.findOpenClauses(featureList, workMonitor);
 				return true;
 			}
 		};

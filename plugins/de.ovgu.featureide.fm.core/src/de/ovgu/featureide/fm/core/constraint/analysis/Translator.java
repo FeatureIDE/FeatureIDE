@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -50,6 +50,7 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  * models and their associated rules in the internal model to apply analysis.
  * 
  * @author Sebastian Henneberg
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class Translator {
 
@@ -329,7 +330,7 @@ public class Translator {
 		bfsStack.add(fm.getFeature(featureName).getStructure());
 		while (!bfsStack.isEmpty()) {
 			IFeatureStructure feature = bfsStack.poll();
-			result.add(feature.getFeature().getName().toString());
+			result.add(feature.getFeature().getName());
 			for (IFeatureStructure childFeature : feature.getChildren()) {
 				bfsStack.add(childFeature);
 			}

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -28,9 +28,11 @@ import org.eclipse.jface.action.Action;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
- * TODO description
+ * Action to specify feature model analysis.<br>
+ * Enables / disables checks for tautologies in constraints.
  * 
  * @author Stefan Krueger
+ * @author Marcus Pinnecke
  */
 public class TautologyContraintsCalculationsAction extends Action {
 
@@ -48,7 +50,6 @@ public class TautologyContraintsCalculationsAction extends Action {
 			featureModel.getAnalyser().calculateTautologyConstraints = false;
 		} else {
 			featureModel.getAnalyser().calculateTautologyConstraints = true;
-			//featureModel.getAnalyser().calculateRedundantConstraints = true;
 			featureModel.getAnalyser().calculateFeatures = true;
 			featureModel.getAnalyser().calculateConstraints = true;
 		}

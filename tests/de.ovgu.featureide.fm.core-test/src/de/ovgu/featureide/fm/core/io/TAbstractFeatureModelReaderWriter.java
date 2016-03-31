@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -39,7 +39,7 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.Comparison;
 import de.ovgu.featureide.fm.core.editing.ModelComparator;
 import de.ovgu.featureide.fm.core.functional.Functional;
@@ -95,7 +95,7 @@ public abstract class TAbstractFeatureModelReaderWriter {
 		for (File f : MODEL_FILE_FOLDER.listFiles(fileFilter)) {
 			Object[] models = new Object[2];
 
-			IFeatureModel fm = FeatureModelFactory.getInstance().createFeatureModel();
+			IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
 			XmlFeatureModelReader r = new XmlFeatureModelReader(fm);
 			r.readFromFile(f);
 			models[0] = fm;
@@ -255,7 +255,7 @@ public abstract class TAbstractFeatureModelReaderWriter {
 	}
 
 	private final IFeatureModel writeAndReadModel() throws UnsupportedModelException {
-		IFeatureModel newFm = FeatureModelFactory.getInstance().createFeatureModel();
+		IFeatureModel newFm = FMFactoryManager.getFactory().createFeatureModel();
 		IFeatureModelWriter writer = getWriter(origFm);
 		IFeatureModelReader reader = getReader(newFm);
 		reader.readFromString(writer.writeToString());

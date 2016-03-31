@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -47,6 +47,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -57,6 +58,7 @@ import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
  * Prints feature models in the SXFM format.
  * 
  * @author Fabian Wielgorz
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class SXFMWriter extends AbstractFeatureModelWriter {
 	
@@ -69,6 +71,10 @@ public class SXFMWriter extends AbstractFeatureModelWriter {
 	 */
 	public SXFMWriter(IFeatureModel featureModel) {
 		setFeatureModel(featureModel);
+	}
+	
+	public SXFMWriter(FeatureModel featureModel) {
+		this(FeatureUtils.convert(featureModel));
 	}
 	
 	//@Override

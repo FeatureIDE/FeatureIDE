@@ -21,6 +21,8 @@
 package de.ovgu.featureide.fm.core.configuration;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -38,6 +40,7 @@ import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Preferences;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
@@ -45,15 +48,17 @@ import de.ovgu.featureide.fm.core.job.WorkMonitor;
 
 /**
  * Represents a configuration and provides operations for the configuration process.
+ * 
+ * @author Sebastian Krieter
  */
 public class ConfigurationPropagator {
-	
+
 	private static class BuildThread extends Thread {
 		private final IFeatureModel featureModel;
 		private final Set<String> featureSet;
 		private final boolean ignoreAbstractFeatures;
 		private Node buildNode;
-		
+
 		public BuildThread(IFeatureModel featureModel, Set<String> featureSet) {
 			super();
 			this.featureModel = featureModel;
@@ -67,13 +72,17 @@ public class ConfigurationPropagator {
 			this.featureSet = null;
 			this.ignoreAbstractFeatures = ignoreAbstractFeatures;
 		}
-		
+
 		@Override
 		public void run() {
-			if (featureSet != null) {
-				buildNode = NodeCreator.createNodes(featureModel, featureSet).toCNF();
-			} else {
-				buildNode = NodeCreator.createNodes(featureModel, ignoreAbstractFeatures).toCNF();
+			try {
+				if (featureSet != null) {
+					buildNode = NodeCreator.createNodes(featureModel, featureSet).toCNF();
+				} else {
+					buildNode = NodeCreator.createNodes(featureModel, ignoreAbstractFeatures).toCNF();
+				}
+			} catch (Exception e) {
+				FMCorePlugin.getDefault().logError(e);
 			}
 		}
 	}
@@ -83,30 +92,37 @@ public class ConfigurationPropagator {
 	private static final int TIMEOUT = 1000;
 
 	private final ConfigurationPropagatorJobWrapper jobWrapper = new ConfigurationPropagatorJobWrapper(this);
-	
+
 	private Node rootNode = null, rootNodeWithoutHidden = null;
 	private final Configuration configuration;
 
 	/**
 	 * This method creates a clone of the given {@link ConfigurationPropagator}
+	 * 
 	 * @param configuration The configuration to clone
 	 */
 	ConfigurationPropagator(Configuration configuration) {
 		this.configuration = configuration;
 	}
-	
+
 	ConfigurationPropagator(ConfigurationPropagator propagator, Configuration configuration) {
 		this.configuration = configuration;
-		this.rootNode = propagator.rootNode.clone();
-		this.rootNodeWithoutHidden = propagator.rootNodeWithoutHidden.clone();
+		if (propagator.isLoaded()) {
+			this.rootNode = propagator.rootNode.clone();
+			this.rootNodeWithoutHidden = propagator.rootNodeWithoutHidden.clone();
+		}
 	}
-	
+
 	ConfigurationPropagator(ConfigurationPropagator propagator) {
 		this(propagator, propagator.configuration);
 	}
-	
+
 	public ConfigurationPropagatorJobWrapper getJobWrapper() {
 		return jobWrapper;
+	}
+	
+	public boolean isLoaded() {
+		return rootNode != null;
 	}
 
 	public void load(WorkMonitor workMonitor) {
@@ -118,10 +134,10 @@ public class ConfigurationPropagator {
 			// Build both cnfs simultaneously for better performance
 			BuildThread buildThread1 = new BuildThread(featureModel, getRemoveFeatures(!configuration.ignoreAbstractFeatures, true));
 			BuildThread buildThread2 = new BuildThread(featureModel, configuration.ignoreAbstractFeatures);
-			
+
 			buildThread1.start();
 			buildThread2.start();
-			
+
 			try {
 				buildThread2.join();
 				buildThread1.join();
@@ -144,11 +160,12 @@ public class ConfigurationPropagator {
 		final Node[] nodeArray = createNodeArray(createNodeList(), rootNode);
 		return new SatSolver(new And(nodeArray), TIMEOUT).getSolutionFeatures(max);
 	}
-	
+
 	/**
 	 * Checks that all manual and automatic selections are valid.<br>
 	 * Abstract features will <b>not</b> be ignored.
-	 * @return  {@code true} if the current selection is a valid configuration
+	 * 
+	 * @return {@code true} if the current selection is a valid configuration
 	 */
 	public boolean isValid(WorkMonitor workMonitor) {
 		if (rootNode == null) {
@@ -167,7 +184,7 @@ public class ConfigurationPropagator {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Ignores hidden features.
 	 * Use this, when propgate is disabled (hidden features are not updated).
@@ -196,24 +213,24 @@ public class ConfigurationPropagator {
 		}
 		return false;
 	}
-	
+
 	public boolean canBeValid(WorkMonitor workMonitor) {
 		if (rootNode == null) {
 			return false;
 		}
 		final List<Node> children = new ArrayList<Node>();
-		
+
 		for (SelectableFeature feature : configuration.features) {
 			if (feature.getSelection() != Selection.UNDEFINED
 					&& (configuration.ignoreAbstractFeatures || feature.getFeature().getStructure().isConcrete())) {
 				children.add(new Literal(feature.getFeature().getName(), feature.getSelection() == Selection.SELECTED));
 			}
 		}
-		
+
 		final Node[] allFeatures = new Node[children.size() + 1];
 		children.toArray(allFeatures);
 		allFeatures[children.size()] = rootNode.clone();
-		
+
 		try {
 			return new SatSolver(new And(allFeatures), TIMEOUT).isSatisfiable();
 		} catch (TimeoutException e) {
@@ -222,6 +239,86 @@ public class ConfigurationPropagator {
 		return false;
 	}
 	
+	public List<Node> findOpenClauses(List<SelectableFeature> featureList, WorkMonitor workMonitor) {
+		if (rootNode == null) {
+			return Collections.emptyList();
+		}
+		final boolean[] results = new boolean[featureList.size()];
+		final List<Node> openClauses = new ArrayList<>();
+		
+		final Map<String, Boolean> featureMap = new HashMap<String, Boolean>(configuration.features.size() << 1);
+		for (SelectableFeature selectableFeature : configuration.features) {
+			final IFeature feature = selectableFeature.getFeature();
+			if ((configuration.ignoreAbstractFeatures || feature.getStructure().isConcrete()) && !feature.getStructure().hasHiddenParent()) {
+				featureMap.put(feature.getName(), selectableFeature.getSelection() == Selection.SELECTED);
+			}
+		}
+		
+		for (SelectableFeature selectableFeature : featureList) {
+			selectableFeature.setRecommended(Selection.UNDEFINED);
+			selectableFeature.clearOpenClauses();
+		}
+
+		final Node[] clauses = rootNodeWithoutHidden.getChildren();
+		final HashMap<Object, Literal> literalMap = new HashMap<Object, Literal>();
+		workMonitor.setMaxAbsoluteWork(clauses.length);
+
+		for (int i = 0; i < clauses.length; i++) {
+			if (workMonitor.checkCancel()) {
+				return Collections.emptyList();
+			}
+			final Node clause = clauses[i];
+			literalMap.clear();
+			if (clause instanceof Literal) {
+				final Literal literal = (Literal) clause;
+				literalMap.put(literal.var, literal);
+			} else {
+				final Node[] orLiterals = clause.getChildren();
+				for (int j = 0; j < orLiterals.length; j++) {
+					final Literal literal = (Literal) orLiterals[j];
+					literalMap.put(literal.var, literal);
+				}
+			}
+
+			boolean satisfied = false;
+			for (Literal literal : literalMap.values()) {
+				final Boolean selected = featureMap.get(literal.var);
+				if (selected != null && selected == literal.positive) {
+					satisfied = true;
+					break;
+				}
+			}
+			
+			if (!satisfied) {
+				int c = 0;
+				boolean newLiterals = false;
+				for (SelectableFeature selectableFeature : featureList) {
+					if (literalMap.containsKey(selectableFeature.getFeature().getName()) && !results[c]) {
+						results[c] = true;
+
+						switch (selectableFeature.getManual()) {
+						case SELECTED:
+							selectableFeature.setRecommended(Selection.UNSELECTED);
+							selectableFeature.addOpenClause(openClauses.size(), clauses[i]);
+							break;
+						case UNSELECTED:
+						case UNDEFINED:
+							selectableFeature.setRecommended(Selection.SELECTED);
+							selectableFeature.addOpenClause(openClauses.size(), clauses[i]);
+						}
+						newLiterals = true;
+					}
+					c++;
+				}
+				if (newLiterals) {
+					openClauses.add(clause);
+				}
+			}
+			workMonitor.worked();
+		}
+		return openClauses;
+	}
+
 	public void leadToValidConfiguration(List<SelectableFeature> featureList, WorkMonitor workMonitor) {
 		if (Preferences.defaultCompletion == Preferences.COMPLETION_ONE_CLICK && featureList.size() > FEATURE_LIMIT_FOR_DEFAULT_COMPLETION) {
 			leadToValidConfiguration(featureList, Preferences.COMPLETION_OPEN_CLAUSES, workMonitor);
@@ -229,23 +326,23 @@ public class ConfigurationPropagator {
 			leadToValidConfiguration(featureList, Preferences.defaultCompletion, workMonitor);
 		}
 	}
-	
+
 	public void leadToValidConfiguration(List<SelectableFeature> featureList, int mode, WorkMonitor workMonitor) {
 		for (SelectableFeature feature : configuration.features) {
 			feature.setRecommended(Selection.UNDEFINED);
 		}
 		switch (mode) {
-			case Preferences.COMPLETION_ONE_CLICK:
-				leadToValidConfig1(featureList, workMonitor);
-				break;
-			case Preferences.COMPLETION_OPEN_CLAUSES:
-				leadToValidConfig2(featureList, workMonitor);
-				break;
-			case Preferences.COMPLETION_NONE:
-			default:
+		case Preferences.COMPLETION_ONE_CLICK:
+			leadToValidConfig1(featureList, workMonitor);
+			break;
+		case Preferences.COMPLETION_OPEN_CLAUSES:
+			leadToValidConfig2(featureList, workMonitor);
+			break;
+		case Preferences.COMPLETION_NONE:
+		default:
 		}
 	}
-	
+
 	private void leadToValidConfig1(List<SelectableFeature> featureList, WorkMonitor workMonitor) {
 		if (rootNode == null) {
 			return;
@@ -253,13 +350,12 @@ public class ConfigurationPropagator {
 		workMonitor.setMaxAbsoluteWork(featureList.size() + 1);
 		final Map<String, Literal> featureMap = new HashMap<String, Literal>(configuration.features.size() << 1);
 		final Map<String, Integer> featureToIndexMap = new HashMap<String, Integer>(featureList.size() << 1);
-		
+
 		for (SelectableFeature selectableFeature : configuration.features) {
 			final IFeature feature = selectableFeature.getFeature();
 			if ((configuration.ignoreAbstractFeatures || feature.getStructure().isConcrete()) && !feature.getStructure().hasHiddenParent()) {
 				final String featureName = feature.getName();
-				featureMap.put(featureName,
-					new Literal(featureName, selectableFeature.getSelection() == Selection.SELECTED));
+				featureMap.put(featureName, new Literal(featureName, selectableFeature.getSelection() == Selection.SELECTED));
 			}
 		}
 		if (workMonitor.checkCancel()) {
@@ -267,23 +363,23 @@ public class ConfigurationPropagator {
 		}
 
 		final Literal[] literals = new Literal[featureList.size()];
-		
+
 		int i = 0;
 		for (SelectableFeature feature : featureList) {
 			final String featureName = feature.getFeature().getName();
 			featureToIndexMap.put(featureName, i);
 			literals[i++] = featureMap.remove(featureName);
 		}
-		
+
 		final Node[] formula = new Node[featureMap.size() + 1];
 		formula[0] = rootNodeWithoutHidden.clone();
 		i = 1;
 		for (Literal literal : featureMap.values()) {
 			formula[i++] = literal;
 		}
-		
+
 		final SatSolver solver = new SatSolver(new And(formula), TIMEOUT);
-		
+
 		final boolean[] changedLiterals = new boolean[literals.length];
 		int j = 0;
 		workMonitor.worked();
@@ -293,9 +389,9 @@ public class ConfigurationPropagator {
 			}
 			final Literal l = literals[j++].clone();
 			l.positive = !l.positive;
-			
+
 			final List<Literal> knownValues = solver.knownValues(l);
-			
+
 			for (Literal literal : knownValues) {
 				Integer index = featureToIndexMap.get(literal.var);
 				if (index != null) {
@@ -312,17 +408,18 @@ public class ConfigurationPropagator {
 				FMCorePlugin.getDefault().logError(e);
 				result = false;
 			}
-			
+
 			for (int k = 0; k < literals.length; k++) {
 				final Literal knownL = literals[k];
 				knownL.positive = changedLiterals[k] ^ knownL.positive;
 				changedLiterals[k] = false;
 			}
-			
+
 			if (result) {
 				switch (feature.getManual()) {
 				case SELECTED:
-					feature.setRecommended(Selection.UNSELECTED); break;
+					feature.setRecommended(Selection.UNSELECTED);
+					break;
 				case UNSELECTED:
 				case UNDEFINED:
 					feature.setRecommended(Selection.SELECTED);
@@ -330,19 +427,19 @@ public class ConfigurationPropagator {
 			} else {
 				feature.setRecommended(Selection.UNDEFINED);
 			}
-			
+
 			workMonitor.invoke(feature);
 			workMonitor.worked();
 		}
 	}
-	
+
 	private void leadToValidConfig2(List<SelectableFeature> featureList, WorkMonitor workMonitor) {
 		final boolean[] results = new boolean[featureList.size()];
 		if (rootNode == null) {
 			return;
 		}
 		final Map<String, Boolean> featureMap = new HashMap<String, Boolean>(configuration.features.size() << 1);
-		
+
 		for (SelectableFeature selectableFeature : configuration.features) {
 			final IFeature feature = selectableFeature.getFeature();
 			if ((configuration.ignoreAbstractFeatures || feature.getStructure().isConcrete()) && !feature.getStructure().hasHiddenParent()) {
@@ -350,16 +447,18 @@ public class ConfigurationPropagator {
 			}
 		}
 		for (SelectableFeature selectableFeature : featureList) {
-			selectableFeature.setRecommended(Selection.UNSELECTED);
+			selectableFeature.setRecommended(Selection.UNDEFINED);
+			selectableFeature.clearOpenClauses();
 		}
-		
+
 		if (workMonitor.checkCancel()) {
 			return;
 		}
-		
+
 		final Node[] clauses = rootNodeWithoutHidden.getChildren();
 		final HashMap<Object, Literal> literalMap = new HashMap<Object, Literal>();
 		workMonitor.setMaxAbsoluteWork(clauses.length);
+
 		for (int i = 0; i < clauses.length; i++) {
 			if (workMonitor.checkCancel()) {
 				return;
@@ -376,7 +475,7 @@ public class ConfigurationPropagator {
 					literalMap.put(literal.var, literal);
 				}
 			}
-			
+
 			boolean satisfied = false;
 			for (Literal literal : literalMap.values()) {
 				Boolean selected = featureMap.get(literal.var);
@@ -390,48 +489,53 @@ public class ConfigurationPropagator {
 				for (SelectableFeature selectableFeature : featureList) {
 					if (literalMap.containsKey(selectableFeature.getFeature().getName()) && !results[c]) {
 						results[c] = true;
-						
+
 						switch (selectableFeature.getManual()) {
-							case SELECTED:
-								selectableFeature.setRecommended(Selection.UNSELECTED); break;
-							case UNSELECTED:
-							case UNDEFINED:
-								selectableFeature.setRecommended(Selection.SELECTED);
+						case SELECTED:
+							selectableFeature.setRecommended(Selection.UNSELECTED);
+							selectableFeature.addOpenClause(i, clause);
+							break;
+						case UNSELECTED:
+						case UNDEFINED:
+							selectableFeature.setRecommended(Selection.SELECTED);
+							selectableFeature.addOpenClause(i, clause);
 						}
-						
-						workMonitor.invoke(selectableFeature);
+
 					}
+					workMonitor.invoke(selectableFeature);
 					c++;
 				}
 			}
 			workMonitor.worked();
 		}
 	}
-	
+
 	/**
 	 * Counts the number of possible solutions.
+	 * 
 	 * @return a positive value equal to the number of solutions (if the method terminated in time)</br>
-	 * 	or a negative value (if a timeout occurred) that indicates that there are more solutions than the absolute value
+	 *         or a negative value (if a timeout occurred) that indicates that there are more solutions than the absolute value
 	 */
 	public long number(long timeout, WorkMonitor workMonitor) {
 		if (rootNode == null) {
 			return 0;
 		}
 		final List<Node> children = new ArrayList<Node>();
-		
+
 		for (SelectableFeature feature : configuration.features) {
+
 			if (feature.getSelection() != Selection.UNDEFINED 
 					&& (configuration.ignoreAbstractFeatures || feature.getFeature().getStructure().isConcrete())
 					&& !feature.getFeature().getStructure().hasHiddenParent()) {
 				children.add(new Literal(feature.getFeature().getName(), feature.getSelection() == Selection.SELECTED));
 			}
 		}
-		
+
 		final Node[] nodeArray = createNodeArray(children, rootNodeWithoutHidden);
 		return new SatSolver(new And(nodeArray), timeout).countSolutions();
 	}
-	
-	private Node[] createNodeArray(List<Node> literals, Node ...formula) {
+
+	private Node[] createNodeArray(List<Node> literals, Node... formula) {
 		final Node[] nodeArray = new Node[literals.size() + formula.length];
 		literals.toArray(nodeArray);
 		for (int i = 0; i < formula.length; i++) {
@@ -442,50 +546,122 @@ public class ConfigurationPropagator {
 
 	private List<Node> createNodeList() {
 		final List<Node> children = new ArrayList<Node>();
-		
+
 		for (SelectableFeature feature : configuration.features) {
 			if (feature.getSelection() != Selection.UNDEFINED) {
 				children.add(new Literal(feature.getFeature().getName(), feature.getSelection() == Selection.SELECTED));
 			}
 		}
-		
+
 		return children;
 	}
-	
+
 	private Set<String> getRemoveFeatures(boolean abstractFeatures, boolean hiddenFeatures) {
 		final Set<String> resultSet = new HashSet<String>();
 		for (SelectableFeature selectableFeature : configuration.features) {
 			final IFeature f = selectableFeature.getFeature();
 			if ((abstractFeatures && f.getStructure().isAbstract()) || (hiddenFeatures && f.getStructure().hasHiddenParent())) {
-				resultSet.add(f.getName().toString());
+				resultSet.add(f.getName());
 			}
 		}
 		return resultSet;
 	}
-	
+
+	public void resolve(WorkMonitor workMonitor) {
+		if (rootNode == null) {
+			return;
+		}
+
+		configuration.resetAutomaticValues();
+
+		final List<SelectableFeature> oldManualSelected = new ArrayList<>();
+		for (SelectableFeature feature : configuration.features) {
+			if (feature.getManual() != Selection.UNDEFINED) {
+				oldManualSelected.add(feature);
+			}
+		}
+
+		workMonitor.setMaxAbsoluteWork(oldManualSelected.size() + configuration.features.size() + 1);
+
+		final SatSolver manualSolver = new SatSolver(rootNode, ConfigurationPropagator.TIMEOUT);
+
+		workMonitor.worked();
+
+		final LinkedList<Node> newManualSelected = new LinkedList<>();
+		for (Iterator<SelectableFeature> iterator = oldManualSelected.iterator(); iterator.hasNext();) {
+			final SelectableFeature next = iterator.next();
+			final Literal l = new Literal(next.getFeature().getName(), next.getManual() == Selection.SELECTED);
+			newManualSelected.addFirst(l);
+
+			boolean satisfiable = false;
+			try {
+				satisfiable = manualSolver.isSatisfiable(newManualSelected);
+			} catch (TimeoutException e) {
+			}
+			if (!satisfiable) {
+				next.setManual(Selection.UNDEFINED);
+				iterator.remove();
+				newManualSelected.removeFirst();
+			}
+			workMonitor.worked();
+		}
+
+		final Node[] nodeArray = createNodeArray(newManualSelected, rootNode);
+		final SatSolver automaticSolver = new SatSolver(new And(nodeArray), ConfigurationPropagator.TIMEOUT);
+
+		final ListIterator<SelectableFeature> it = configuration.features.listIterator();
+		while (it.hasNext()) {
+			final SelectableFeature feature = it.next();
+			if (feature.getManual() == Selection.UNDEFINED) {
+				Literal l = new Literal(feature.getFeature().getName(), true);
+				try {
+					if (!automaticSolver.isSatisfiable(l)) {
+						feature.setAutomatic(Selection.UNSELECTED);
+					} else {
+						l = new Literal(feature.getFeature().getName(), false);
+						if (!automaticSolver.isSatisfiable(l)) {
+							feature.setAutomatic(Selection.SELECTED);
+						} else {
+							feature.setAutomatic(Selection.UNDEFINED);
+						}
+					}
+				} catch (TimeoutException e) {
+					FMCorePlugin.getDefault().logError(e);
+				}
+			}
+			workMonitor.invoke(feature);
+			workMonitor.worked();
+		}
+
+	}
+
 	public void update(boolean redundantManual, String startFeatureName, WorkMonitor workMonitor) {
 		if (rootNode == null) {
 			return;
 		}
 		workMonitor.setMaxAbsoluteWork(configuration.features.size() + 1);
-		
+
 		configuration.resetAutomaticValues();
-		
+
 		final SatSolver manualSolver = new SatSolver(rootNode, ConfigurationPropagator.TIMEOUT);
-		
+
 		final List<Node> manualSelected = (redundantManual) ? new LinkedList<Node>() : new ArrayList<Node>();
 		for (SelectableFeature feature : configuration.features) {
 			switch (feature.getManual()) {
-				case SELECTED: manualSelected.add(new Literal(feature.getFeature().getName(), true)); break;
-				case UNSELECTED: manualSelected.add(new Literal(feature.getFeature().getName(), false)); break;
-				default:
+			case SELECTED:
+				manualSelected.add(new Literal(feature.getFeature().getName(), true));
+				break;
+			case UNSELECTED:
+				manualSelected.add(new Literal(feature.getFeature().getName(), false));
+				break;
+			default:
 			}
 		}
-		
+
 		workMonitor.worked();
-		
+
 		final HashMap<SelectableFeature, Selection> possibleRedundantManual = new HashMap<SelectableFeature, Selection>();
-		
+
 		if (redundantManual) {
 			for (Iterator<Node> iterator = manualSelected.iterator(); iterator.hasNext();) {
 				final Literal l = (Literal) iterator.next();
@@ -504,16 +680,16 @@ public class ConfigurationPropagator {
 				}
 			}
 		}
-		
+
 		final Node[] nodeArray = createNodeArray(manualSelected, rootNode);
 		final SatSolver automaticSolver = new SatSolver(new And(nodeArray), ConfigurationPropagator.TIMEOUT);
-		
+
 		ListIterator<SelectableFeature> it = configuration.features.listIterator();
 		int index = -1;
 		if (startFeatureName != null) {
 			while (it.hasNext()) {
 				final SelectableFeature feature = it.next();
-				
+
 				if (startFeatureName.equals(feature.getFeature().getName())) {
 					it.previous();
 					index = it.nextIndex();
@@ -521,16 +697,18 @@ public class ConfigurationPropagator {
 				}
 			}
 		}
-		
+
 		if (index > 0) {
 			updateAllFeatures(automaticSolver, it, workMonitor, manualSelected, manualSolver, possibleRedundantManual);
-			updateAllFeatures(automaticSolver, configuration.features.subList(0, index).iterator(), workMonitor, manualSelected, manualSolver, possibleRedundantManual);
+			updateAllFeatures(automaticSolver, configuration.features.subList(0, index).iterator(), workMonitor, manualSelected, manualSolver,
+					possibleRedundantManual);
 		} else {
 			updateAllFeatures(automaticSolver, configuration.features.iterator(), workMonitor, manualSelected, manualSolver, possibleRedundantManual);
 		}
 	}
 
-	private void updateAllFeatures(final SatSolver automaticSolver, Iterator<SelectableFeature> it, WorkMonitor workMonitor, List<Node> manualSelected, SatSolver manualSolver, HashMap<SelectableFeature, Selection> possibleRedundantManual) {
+	private void updateAllFeatures(final SatSolver automaticSolver, Iterator<SelectableFeature> it, WorkMonitor workMonitor, List<Node> manualSelected,
+			SatSolver manualSolver, HashMap<SelectableFeature, Selection> possibleRedundantManual) {
 		final Node[] manualSelectedArray = createNodeArray(manualSelected);
 		int i = 0;
 		while (it.hasNext()) {
@@ -575,9 +753,41 @@ public class ConfigurationPropagator {
 			workMonitor.worked();
 		}
 	}
-	
+
 	ConfigurationPropagator clone(Configuration configuration) {
 		return new ConfigurationPropagator(this, configuration);
 	}
-	
+
+	/**
+	 * Creates solutions to cover the given features.
+	 * 
+	 * @param features The features that should be covered. 
+	 * @param selection true is the features should be selected, false otherwise.
+	 */
+	public List<List<String>> coverFeatures(final Collection<String> features, final boolean selection, WorkMonitor monitor) throws TimeoutException {
+		if (rootNode == null) {
+			return null;
+		}
+		final List<Node> children = new ArrayList<Node>(configuration.features.size());
+		for (SelectableFeature feature : configuration.features) {
+			if (feature.getSelection() != Selection.UNDEFINED && (configuration.ignoreAbstractFeatures || FeatureUtils.isConcrete(feature.getFeature()))) {
+				children.add(new Literal(feature.getFeature().getName(), feature.getSelection() == Selection.SELECTED));
+			}
+		}
+		final Node[] allFeatures = new Node[children.size() + 1];
+		children.toArray(allFeatures);
+		allFeatures[children.size()] = rootNode.clone();
+
+		SatSolver satSolver = new SatSolver(new And(allFeatures), TIMEOUT);
+		final List<List<String>> solutions = new LinkedList<>();
+		while (!features.isEmpty()) {
+			solutions.add(satSolver.coverFeatures(features, selection, monitor));
+			if (monitor.checkCancel()) {
+				break;
+			}
+			monitor.createSubTask(features.size() + " features to cover.");
+		}
+		return solutions;
+	}
+
 }

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -23,7 +23,6 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.commands;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RENAMING_FEATURE;
 
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.gef.commands.Command;
 import org.eclipse.ui.PlatformUI;
 
@@ -31,12 +30,13 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureRenamingOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.RenameFeatureOperation;
 
 /**
  * Renames a currently selected feature.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke
  */
 public class FeatureRenamingCommand extends Command {
 
@@ -64,8 +64,7 @@ public class FeatureRenamingCommand extends Command {
 
 	@Override
 	public void execute() {
-		FeatureRenamingOperation op = new FeatureRenamingOperation(featureModel, oldName, newName);
-		op.addContext((IUndoContext) featureModel.getUndoContext());
+		RenameFeatureOperation op = new RenameFeatureOperation(featureModel, oldName, newName);
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);

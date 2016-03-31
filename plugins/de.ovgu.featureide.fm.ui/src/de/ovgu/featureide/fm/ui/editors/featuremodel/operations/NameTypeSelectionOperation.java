@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -58,7 +58,7 @@ public class NameTypeSelectionOperation extends AbstractOperation {
 		oldNameType = Preferences.getDefaultFeatureNameScheme();
 		Preferences.setDefaultFeatureNameFormat(newNameType);
 		editor.reload();
-		editor.refresh();
+		editor.analyzeFeatureModel();
 		return Status.OK_STATUS;
 	}
 
@@ -69,7 +69,7 @@ public class NameTypeSelectionOperation extends AbstractOperation {
 			oldNameType = -1;
 		}
 		editor.reload();
-		editor.refresh();
+		editor.analyzeFeatureModel();
 		return Status.OK_STATUS;
 	}
 

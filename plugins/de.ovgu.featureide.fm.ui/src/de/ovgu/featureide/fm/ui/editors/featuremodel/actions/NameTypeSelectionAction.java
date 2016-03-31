@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -32,6 +32,8 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.NameTypeSelectio
 
 /**
  * Action to select the layout for the feature model.
+ * 
+ * @author Marcus Pinnecke (Feature interface)
  */
 public class NameTypeSelectionAction extends Action {
 

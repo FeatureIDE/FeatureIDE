@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -57,6 +57,7 @@ import org.eclipse.ui.texteditor.ITextEditor;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
+import de.ovgu.featureide.core.builder.IComposerExtensionClass.Mechanism;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTField;
@@ -71,7 +72,7 @@ import de.ovgu.featureide.fm.core.color.FeatureColor;
 
 /**
  * Assigns color annotations to the editor.
- * 
+ * 	
  * @author Sebastian Krieter
  */
 public final class ColorAnnotationModel implements IAnnotationModel {
@@ -164,7 +165,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 						IDocument document = provider.getDocument(input);
 						colormodel = new ColorAnnotationModel(document, file, project, editor);
 						modelex.addAnnotationModel(KEY, colormodel);
-
+//						colormodel.updateAnnotations(!editor.isDirty());
 						return true;
 					}
 				} else {
@@ -254,7 +255,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 		}
 		if (createNew) {
 			annotatedPositions = new HashMap<Integer, Position>(docLines);
-			if (project.getComposerID().equals("de.ovgu.featureide.composer.featurehouse")) {//our FeatureHouseComposerAnnotations
+			if (project.getComposer().getGenerationMechanism() == Mechanism.FEATURE_ORIENTED_PROGRAMMING) {
 				try {
 					createFOPAnnotations();
 
@@ -266,7 +267,7 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 				createAnnotations();
 			}
 		} else {
-			if (project.getComposerID().equals("de.ovgu.featureide.composer.featurehouse")) {//ourFeatureHouseComposerAnnotations
+			if (project.getComposerID().equals("de.ovgu.featureide.composer.featurehouse")) {
 				try {
 					createFOPAnnotations();
 				} catch (BadLocationException e) {
@@ -313,21 +314,15 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 			return;
 		}
 
-		int index = 0;
 		for (FSTFeature fstFeature : model.getFeatures()) {
 			for (FSTRole role : fstFeature.getRoles()) {
 				if (file.equals(role.getFile())) {
 					for (FSTDirective dir : role.getDirectives()) {
 						directiveMap.put(dir.getId(), dir);
-						index++;
+						validDirectiveList.add(dir);
 					}
 				}
 			}
-		}
-
-		for (int i = 0; i < index; i++) {
-			FSTDirective dir = directiveMap.get(i);
-			validDirectiveList.add(dir);
 		}
 	}
 
@@ -531,8 +526,8 @@ public final class ColorAnnotationModel implements IAnnotationModel {
 				int overViewStartOffset = document.getLineOffset(startline);
 				int overViewLength = 0;
 				for (int line = startline; line <= endline; line++) {
-					if (line < endline || directive.getEndLength() > 0) {
 						int length = document.getLineLength(line);
+						if (line < endline || directive.getEndLength() > 0) {
 						int lineOffset = document.getLineOffset(line);
 
 						if (line == directive.getEndLine()) {

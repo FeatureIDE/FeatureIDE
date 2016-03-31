@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -39,6 +39,7 @@ import de.ovgu.featureide.fm.core.job.IJob;
  * It is possible to wait for a sequence to finish.
  * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public final class JobSequence implements IJob {
 	private static final ConcurrentHashMap<IJob, JobSequence> sequenceMap = new ConcurrentHashMap<>();

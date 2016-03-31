@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -25,14 +25,15 @@ import org.eclipse.draw2d.geometry.Point;
 
 import de.ovgu.featureide.fm.core.IGraphicItem;
 import de.ovgu.featureide.fm.core.base.IFeatureModelElement;
-import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
 
 /**
  * Graphical representation of a constraint.
  * 
  * @author Sebastian Krieter
  */
-public interface IGraphicalElement extends IGraphicItem, PropertyConstants {
+public interface IGraphicalElement extends IGraphicItem {
 
 	IFeatureModelElement getObject();
 	
@@ -45,5 +46,11 @@ public interface IGraphicalElement extends IGraphicItem, PropertyConstants {
 	void setLocation(Point newLocation);
 
 	void setSize(Dimension size);
+
+	String getGraphicType();
+
+	void update(FeatureIDEEvent event);
+	
+	void registerUIObject(IEventListener listener);
 
 }

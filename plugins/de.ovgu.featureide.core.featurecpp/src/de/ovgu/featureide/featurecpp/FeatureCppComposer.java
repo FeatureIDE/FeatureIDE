@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -53,6 +53,7 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
  * 
  * @author Tom Brosch
  * @author Jens Meinicke
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class FeatureCppComposer extends ComposerExtensionClass {
 	private static final String PLUGIN_ID = "org.eclipse.cdt";

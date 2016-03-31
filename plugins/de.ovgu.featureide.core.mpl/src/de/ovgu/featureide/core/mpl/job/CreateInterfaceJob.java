@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -47,7 +47,7 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelWriter;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
@@ -57,6 +57,7 @@ import de.ovgu.featureide.fm.core.job.util.JobArguments;
  * Create mpl interfaces.
  * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments> {
 	
@@ -143,7 +144,7 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
         m.reset();
         
         // set new abstract root
-        IFeature nroot = FeatureModelFactory.getInstance().createFeature(m, "nroot");
+        IFeature nroot = FMFactoryManager.getFactory().createFeature(m, "nroot");
         nroot.getStructure().setAbstract(true);
         nroot.getStructure().setAnd();
         nroot.getStructure().addChild(root.getStructure());
@@ -153,7 +154,7 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
     	cut(nroot);
         do {
         	changed = false;
-            merge(nroot, GROUP_NO);
+            merge(nroot.getStructure(), GROUP_NO);
         } while (changed);
         
         int count = 0;
@@ -184,7 +185,7 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
         		SatSolver modelSatSolver = new SatSolver(new And(NodeCreator.createNodes(m), notChild), 1000);
         		try {
 					if (modelSatSolver.isSatisfiable()) {
-						m.addConstraint(FeatureModelFactory.getInstance().createConstraint(m, child));
+						m.addConstraint(FMFactoryManager.getFactory().createConstraint(m, child));
 					}
 				} catch (TimeoutException e) {
 					MPLPlugin.getDefault().logError(e);
@@ -204,43 +205,46 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 
 	private boolean changed = false;
 	
-	private static int getGroup(IFeature f) {
+	private static int getGroup(IFeatureStructure f) {
 		if (f == null) {
 			return GROUP_NO;
-		} else if (f.getStructure().isAnd()) {
+		} else if (f.isAnd()) {
 			return GROUP_AND;
-		} else if (f.getStructure().isOr()) {
+		} else if (f.isOr()) {
 			return GROUP_OR;
 		} else {
 			return GROUP_ALT;
 		}
 	}
 	
-	private void merge(IFeature curFeature, int parentGroup) {
-        if (!curFeature.getStructure().hasChildren()) {
+	
+	
+	
+	private void merge(IFeatureStructure curFeature, int parentGroup) {
+        if (!curFeature.hasChildren()) {
         	return;
         }
         int curFeatureGroup = getGroup(curFeature);
-		LinkedList<IFeature> list = new LinkedList<IFeature>(FeatureUtils.convertToFeatureList(curFeature.getStructure().getChildren()));
-        for (IFeature child : list) {
+		List<IFeatureStructure> list = curFeature.getChildren();
+        for (IFeatureStructure child : list) {
             merge(child, curFeatureGroup);
 	        curFeatureGroup = getGroup(curFeature);
 		}
         
-		if (curFeature.getName().equals(MARK1)) {
+		if (curFeature.getFeature().getName().equals(MARK1)) {
 			if (parentGroup == curFeatureGroup) {
 				deleteFeature(curFeature);
 			} else {
 				switch (parentGroup) {
 				case GROUP_AND:
-					IFeature parent = curFeature.getStructure().getParent().getFeature();
-					if (parent.getStructure().getChildrenCount() == 1) {
+					IFeatureStructure parent = curFeature.getParent();
+					if (parent.getChildrenCount() == 1) {
 						switch (curFeatureGroup) {
 						case GROUP_OR:
-							parent.getStructure().setOr();
+							parent.setOr();
 							break;
 						case GROUP_ALT:
-							parent.getStructure().setAlternative();
+							parent.setAlternative();
 							break;
 						}
 						deleteFeature(curFeature);
@@ -249,8 +253,8 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 				case GROUP_OR:
 					if (curFeatureGroup == GROUP_AND) {
 						boolean allOptional = true;
-						for (IFeature child : list) {
-							if (child.getStructure().isMandatory()) {
+						for (IFeatureStructure child : list) {
+							if (child.isMandatory()) {
 								allOptional = false;
 								break;
 							}
@@ -270,21 +274,22 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 		}
     }
 	
-	private void deleteFeature(IFeature curFeature) {
-		IFeature parent = curFeature.getStructure().getParent().getFeature();
-        List<IFeatureStructure> list = curFeature.getStructure().getChildren();
-		parent.getStructure().removeChild(curFeature.getStructure());
+	private void deleteFeature(IFeatureStructure curFeature) {
+		IFeatureStructure parent = curFeature.getParent();
+        List<IFeatureStructure> children = curFeature.getChildren();
+		parent.removeChild(curFeature);
 		changed = true;
-		for (IFeatureStructure child : list) {
-			parent.getStructure().addChild(child);
+		for (IFeatureStructure child : children) {
+			parent.addChild(child);
 		}
-		list.clear();
+		children.clear();// XXX code smell
 	}
 	
-	private static boolean cut(IFeature curFeature) {
+	private static boolean cut(final IFeature curFeature) {
+		final IFeatureStructure structure = curFeature.getStructure();
         boolean notSelected = curFeature.getName().equals(MARK1);
         
-		List<IFeature> list = FeatureUtils.convertToFeatureList(curFeature.getStructure().getChildren());
+		List<IFeature> list = FeatureUtils.convertToFeatureList(structure.getChildren());
         if (list.isEmpty()) {
         	return notSelected;
         } else {
@@ -308,18 +313,18 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
                 }
             }
 			if (list.isEmpty()) {
-    			curFeature.getStructure().setAnd();
+    			structure.setAnd();
 				return notSelected;
     		} else {
-    			switch (getGroup(curFeature)) {
+    			switch (getGroup(structure)) {
     			case GROUP_OR:
     				if (removeCount > 0) {
-    					curFeature.getStructure().setAnd();
+    					structure.setAnd();
         				for (IFeature child : list) {
         	    			child.getStructure().setMandatory(false);
         				}
     				} else if (list.size() == 1) {
-    					curFeature.getStructure().setAnd();
+    					structure.setAnd();
         				for (IFeature child : list) {
         	    			child.getStructure().setMandatory(true);
         				}
@@ -328,23 +333,23 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
     			case GROUP_ALT:
     				if (removeCount > 0) {
     					if (list.size() == 1) {
-        					curFeature.getStructure().setAnd();
+        					structure.setAnd();
             				for (IFeature child : list) {
             	    			child.getStructure().setMandatory(false);
             				}
         				} else {
-            				IFeature pseudoAlternative = FeatureModelFactory.getInstance().createFeature(curFeature.getFeatureModel(), MARK2);
+            				IFeature pseudoAlternative = FMFactoryManager.getFactory().createFeature(curFeature.getFeatureModel(), MARK2);
             				pseudoAlternative.getStructure().setMandatory(false);
             				pseudoAlternative.getStructure().setAlternative();
             				for (IFeature child : list) {
             					pseudoAlternative.getStructure().addChild(child.getStructure());
             				}
             				list.clear();
-            				curFeature.getStructure().setAnd();
-            				curFeature.getStructure().addChild(pseudoAlternative.getStructure());
+            				structure.setAnd();
+            				structure.addChild(pseudoAlternative.getStructure());
         				}
     				} else if (list.size() == 1) {
-    					curFeature.getStructure().setAnd();
+    					structure.setAnd();
         				for (IFeature child : list) {
         	    			child.getStructure().setMandatory(true);
         				}

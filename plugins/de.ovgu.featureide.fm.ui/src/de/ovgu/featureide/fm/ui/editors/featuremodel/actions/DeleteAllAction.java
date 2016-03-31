@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -23,20 +23,20 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE_INCLUDING_SUBFEATURES;
 
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.DeleteAllOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureTreeDeleteOperation;
 
 /**
  * Action to delete a single feature including its sub features
  * 
  * @author Jan Wedding
  * @author Melanie Pflaume
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class DeleteAllAction extends SingleSelectionAction {
 
@@ -58,9 +58,7 @@ public class DeleteAllAction extends SingleSelectionAction {
 
 	@Override
 	public void run() {
-		DeleteAllOperation op = new DeleteAllOperation(featureModel, feature);
-
-		op.addContext((IUndoContext) featureModel.getUndoContext());
+		FeatureTreeDeleteOperation op = new FeatureTreeDeleteOperation(featureModel, feature);
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -28,12 +28,13 @@ import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureChangeGroupTypeOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ChangeFeatureGroupTypeOperation;
 
 /**
  * Turns a group type into an And-group.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class AndAction extends SingleSelectionAction {
 
@@ -48,7 +49,7 @@ public class AndAction extends SingleSelectionAction {
 
 	@Override
 	public void run() {
-		FeatureChangeGroupTypeOperation op = new FeatureChangeGroupTypeOperation(FeatureChangeGroupTypeOperation.AND, feature, featureModel);
+		ChangeFeatureGroupTypeOperation op = new ChangeFeatureGroupTypeOperation(ChangeFeatureGroupTypeOperation.AND, feature, featureModel);
 		op.addContext((IUndoContext) featureModel.getUndoContext());
 
 		try {

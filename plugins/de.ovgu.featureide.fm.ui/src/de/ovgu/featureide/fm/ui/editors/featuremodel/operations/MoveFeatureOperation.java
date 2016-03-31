@@ -1,0 +1,94 @@
+/* FeatureIDE - A Framework for Feature-Oriented Software Development
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ *
+ * This file is part of FeatureIDE.
+ * 
+ * FeatureIDE is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * FeatureIDE is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * See http://featureide.cs.ovgu.de/ for further information.
+ */
+package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
+
+import static de.ovgu.featureide.fm.core.localization.StringTable.MOVE_FEATURE;
+
+import org.eclipse.draw2d.geometry.Point;
+
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
+
+/**
+ * Operation with functionality to move features. Provides redo/undo support.
+ * 
+ * @author Fabian Benduhn
+ * @author Marcus Pinnecke
+ */
+public class MoveFeatureOperation extends AbstractFeatureModelOperation {
+
+	private FeatureOperationData data;
+	private Point newPos;
+	private Point oldPos;
+
+	public MoveFeatureOperation(FeatureOperationData data, Object editor, Point newPos, Point oldPos, IFeature feature) {
+		super(feature.getFeatureModel(), MOVE_FEATURE);
+		this.data = data;
+		this.newPos = newPos;
+		this.oldPos = oldPos;
+		setEditor(editor);
+	}
+
+	public void newInnerOrder(Point newPos) {
+		FeatureUIHelper.setLocation(data.getFeature(), newPos);
+	}
+
+	@Override
+	protected FeatureIDEEvent operation() {
+		final IGraphicalFeature feature = data.getFeature();
+		if (feature.getGraphicalModel().getLayout().hasFeaturesAutoLayout()) {
+			final IGraphicalFeature oldParent = data.getOldParent();
+			final IFeatureStructure featureStructure = feature.getObject().getStructure();
+			oldParent.getObject().getStructure().removeChild(featureStructure);
+			
+			final IGraphicalFeature newParent = data.getNewParent();
+			newParent.getObject().getStructure().addChildAtPosition(data.getNewIndex(), featureStructure);
+			
+			if (oldParent != newParent) {
+				oldParent.update(FeatureIDEEvent.getDefault(EventType.CHILDREN_CHANGED));
+				newParent.update(FeatureIDEEvent.getDefault(EventType.CHILDREN_CHANGED));
+			}
+		} else {
+			newInnerOrder(newPos);
+		}
+		return new FeatureIDEEvent(feature, EventType.STRUCTURE_CHANGED);
+	}
+
+	@Override
+	protected FeatureIDEEvent inverseOperation() {
+		if (!data.getFeature().getGraphicalModel().getLayout().hasFeaturesAutoLayout()) {
+			newInnerOrder(oldPos);
+		} else {
+			final IFeatureStructure structure2 = data.getFeature().getObject().getStructure();
+			data.getNewParent().getObject().getStructure().removeChild(structure2);
+			if (data.getOldParent() != null) {
+				final IFeatureStructure structure = data.getOldParent().getObject().getStructure();
+				structure.addChildAtPosition(data.getOldIndex(), structure2);
+			}
+		}
+		return new FeatureIDEEvent(data.getFeature().getGraphicalModel().getFeatureModel(), EventType.STRUCTURE_CHANGED);
+	}
+
+}

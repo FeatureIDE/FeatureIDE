@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,10 +20,22 @@
  */
 package de.ovgu.featureide.fm.core.configuration;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+
+import javax.annotation.Nonnull;
+
+import org.prop4j.Node;
+
 import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
  * A representation of a selectable feature for the configuration process.
+ * 
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class SelectableFeature extends TreeElement {
 
@@ -34,6 +46,9 @@ public class SelectableFeature extends TreeElement {
 	private Selection recommended = Selection.UNDEFINED;
 
 	private final IFeature feature;
+
+	private int recommendationValue = -1;
+	private Map<Integer, Node> openClauses = null;
 
 	private final Configuration configuration;
 
@@ -68,7 +83,7 @@ public class SelectableFeature extends TreeElement {
 		if (automatic == Selection.UNDEFINED || manual == Selection.UNDEFINED || manual == automatic) {
 			this.automatic = automatic;
 		} else {
-			throw new AutomaticalSelectionNotPossibleException(feature.getName().toString(), automatic);
+			throw new AutomaticalSelectionNotPossibleException(feature.getName(), automatic);
 		}
 	}
 
@@ -76,7 +91,7 @@ public class SelectableFeature extends TreeElement {
 		if (name != null) {
 			return name;
 		}
-		return feature == null ? null : feature.getName().toString();
+		return feature == null ? "" : feature.getName();
 	}
 
 	public IFeature getFeature() {
@@ -103,4 +118,38 @@ public class SelectableFeature extends TreeElement {
 		this.recommended = recommended;
 	}
 
+	public int getRecommendationValue() {
+		return recommendationValue;
+	}
+
+	public void setRecommendationValue(int recommendationValue) {
+		this.recommendationValue = recommendationValue;
+	}
+
+	@Nonnull
+	public Collection<Node> getOpenClauses() {
+		if (openClauses == null) {
+			return Collections.emptyList();
+		}
+		return openClauses.values();
+	}
+
+	public void addOpenClause(int index, Node openClause) {
+		if (openClauses == null) {
+			openClauses = new TreeMap<>();
+		}
+		openClauses.put(index, openClause);
+	}
+	
+	public void clearOpenClauses() {
+		openClauses = null;
+	}
+
+	@Nonnull
+	public Set<Integer> getOpenClauseIndexes() {
+		if (openClauses != null) {
+			return openClauses.keySet();
+		}
+		return Collections.emptySet();
+	}
 }

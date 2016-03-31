@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -29,7 +29,6 @@ import org.prop4j.Node;
 import org.prop4j.NodeWriter;
 
 import composer.rules.meta.FeatureModelInfo;
-
 import de.ovgu.cide.fstgen.ast.FSTNode;
 import de.ovgu.cide.fstgen.ast.FSTNonTerminal;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
@@ -46,6 +45,7 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
  * This class is accessed by FeatureHouse to get information about the feature model.
  * 
  * @author Matthias Praast
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class FeatureIDEModelInfo implements FeatureModelInfo {
 	
@@ -95,7 +95,7 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 			Configuration newConfig = new Configuration(featureModel);
 			coreFeatureNames = new LinkedList<String>();
 			for (IFeature feature : newConfig.getSelectedFeatures())
-				coreFeatureNames.add(feature.getName().toString());
+				coreFeatureNames.add(feature.getName());
 		}
 		
 		return coreFeatureNames.contains(featureName);

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -25,7 +25,8 @@ import java.util.HashMap;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 
 /**
- * TODO description
+ * Node in the statistics view to show lines of code.<br>
+ * Creates each entry for features resp. file extenstions.
  * 
  * @author Schleicher Miro
  */

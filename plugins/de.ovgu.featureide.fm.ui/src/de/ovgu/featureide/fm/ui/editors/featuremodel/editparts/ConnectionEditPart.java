@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -22,10 +22,11 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.editparts;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.List;
 
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.draw2d.Figure;
+import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.GridLayout;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Label;
@@ -44,7 +45,7 @@ import org.eclipse.ui.PlatformUI;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureConnection;
@@ -54,7 +55,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.CircleDecoration;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.RelationDecoration;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureChangeGroupTypeOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ChangeFeatureGroupTypeOperation;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
@@ -62,8 +63,9 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * source decoration dependent on the mandatory property.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke
  */
-public class ConnectionEditPart extends AbstractConnectionEditPart implements GUIDefaults, PropertyConstants, PropertyChangeListener {
+public class ConnectionEditPart extends AbstractConnectionEditPart implements GUIDefaults, PropertyChangeListener {
 
 	private static final DirectEditPolicy ROLE_DIRECT_EDIT_POLICY = new DirectEditPolicy() {
 		@Override
@@ -91,7 +93,6 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 	protected IFigure createFigure() {
 		PolylineConnection figure = new PolylineConnection();
 		figure.setForegroundColor(FMPropertyManager.getConnectionForgroundColor());
-
 		FeatureConnection featureConnection = getConnectionModel();
 		if (featureConnection.getSource() instanceof ExtendedFeature && ((ExtendedFeature) featureConnection.getSource()).isFromExtern()
 				&& featureConnection.getTarget() instanceof ExtendedFeature && ((ExtendedFeature) featureConnection.getTarget()).isFromExtern()) {
@@ -128,15 +129,14 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		int groupType;
 
 		if (feature.getStructure().isAlternative()) {
-			groupType = FeatureChangeGroupTypeOperation.AND;
+			groupType = ChangeFeatureGroupTypeOperation.AND;
 		} else if (feature.getStructure().isAnd()) {
-			groupType = FeatureChangeGroupTypeOperation.OR;
+			groupType = ChangeFeatureGroupTypeOperation.OR;
 		} else {
-			groupType = FeatureChangeGroupTypeOperation.ALTERNATIVE;
+			groupType = ChangeFeatureGroupTypeOperation.ALTERNATIVE;
 		}
 
-		FeatureChangeGroupTypeOperation op = new FeatureChangeGroupTypeOperation(groupType, feature, featureModel);
-		op.addContext((IUndoContext) featureModel.getUndoContext());
+		ChangeFeatureGroupTypeOperation op = new ChangeFeatureGroupTypeOperation(groupType, feature, featureModel);
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
@@ -144,12 +144,7 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 			FMUIPlugin.getDefault().logError(e);
 		}
 
-		featureModel.handleModelDataChanged();
 	}
-
-//	private IFeatureModel getFeatureModel() {
-//		return getConnectionModel().getTarget().getFeatureModel();
-//	}
 
 	@Override
 	protected void refreshVisuals() {
@@ -163,53 +158,95 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 		IGraphicalFeature newModel = getConnectionModel().getTarget();
 		FeatureEditPart newEditPart = (FeatureEditPart) getViewer().getEditPartRegistry().get(newModel);
 		setTarget(newEditPart);
+		getFigure().setVisible(getTarget() != null);
 	}
+
 
 	public void refreshSourceDecoration() {
 		IFeature source = getConnectionModel().getSource().getObject();
 		IFeature sourceParent = getConnectionModel().getSource().getObject();
-		IFeature target = getConnectionModel().getTarget().getObject();
+		final IGraphicalFeature graphicalTarget = getConnectionModel().getTarget();
+		if (graphicalTarget == null) {
+			return;
+		}
+		IFeature target = graphicalTarget.getObject();
 
 		boolean parentHidden = false;
 
-		RotatableDecoration sourceDecoration = null;
+		RotatableDecoration sourceDecoration = new CircleDecoration(true) {
+			@Override
+			protected void fillShape(Graphics graphics) {
+				
+			}
+		};;
 		while (!sourceParent.getStructure().isRoot()) {
 			sourceParent = sourceParent.getStructure().getParent().getFeature();
 			if (sourceParent.getStructure().isHidden())
 				parentHidden = true;
 
 		}
-		if ((target.getStructure().isAnd() || OR_CIRCLES) && !(source.getStructure().isHidden() && !FeatureUIHelper.showHiddenFeatures(getConnectionModel().getTarget().getGraphicalModel())))
-			if (!(parentHidden && !FeatureUIHelper.showHiddenFeatures(getConnectionModel().getTarget().getGraphicalModel())))
-				sourceDecoration = new CircleDecoration(source.getStructure().isMandatory());
-
+		if ((target.getStructure().isAnd()) && !(source.getStructure().isHidden() && !FeatureUIHelper.showHiddenFeatures(graphicalTarget.getGraphicalModel()))) {
+			if (!(parentHidden && !FeatureUIHelper.showHiddenFeatures(graphicalTarget.getGraphicalModel()))) {
+				sourceDecoration = getSourceDecoration(source.getStructure().isMandatory());
+			}
+		}
 		PolylineConnection connection = (PolylineConnection) getConnectionFigure();
 		connection.setSourceDecoration(sourceDecoration);
+	}
+	
+	private static CircleDecoration createClearDecoration() {
+		return new CircleDecoration(true) {
+			@Override
+			protected void fillShape(Graphics graphics) {
+				
+			}
+		};
+	}
+	private static CircleDecoration getSourceDecoration(boolean mandatory) {
+		return new CircleDecoration(mandatory);
 	}
 
 	public void refreshTargetDecoration() {
 		FeatureConnection connectionModel = getConnectionModel();
 		IGraphicalFeature target = connectionModel.getTarget();
-		RotatableDecoration targetDecoration = null;
-		if (target.getTree().getNumberOfChildren() > 1 || HALF_ARC) {
+		if (target == null) {
+			return;
+		}
+		RotatableDecoration targetDecoration = createClearDecoration();
+		final PolylineConnection connection = (PolylineConnection) getConnectionFigure();
+		if (target.getObject().getStructure().getChildrenCount() > 1) {
 			IGraphicalFeature source = connectionModel.getSource();
+			final List<IGraphicalFeature> graphicalChildren = FeatureUIHelper.getGraphicalChildren(target);
+			final IGraphicalFeature object = graphicalChildren.get(0);
 			final IFeatureStructure structure = target.getObject().getStructure();
+			if (structure.isAnd()) {
+				connection.setTargetDecoration(targetDecoration);
+				return;
+			}
 			if (FeatureUIHelper.hasVerticalLayout(target.getGraphicalModel())) {
-				if (!structure.isAnd() && (structure.getChildIndex(source.getObject().getStructure()) == (structure.getChildrenCount() - 1))) {
-					targetDecoration = new RelationDecoration(structure.isMultiple(), target.getTree().getChildren().get(0).getObject());
+				if (structure.isFirstChild(source.getObject().getStructure())) {
+					targetDecoration = new RelationDecoration(structure.isMultiple(), object);
 				}
 			} else {
-				if (!structure.isAnd() && structure.isFirstChild(source.getObject().getStructure()))
-					targetDecoration = new RelationDecoration(structure.isMultiple(), target.getTree().getChildren().get(target.getTree().getNumberOfChildren() - 1).getObject());
+				if (structure.isFirstChild(source.getObject().getStructure())) {
+					targetDecoration = new RelationDecoration(structure.isMultiple(), graphicalChildren.get(graphicalChildren.size() - 1));
+				} else {
+					targetDecoration = createClearDecoration();
+				}
 			}
+			connection.setTargetDecoration(targetDecoration);	
+		} else {
+			connection.setTargetDecoration(createClearDecoration());
 		}
 
-		PolylineConnection connection = (PolylineConnection) getConnectionFigure();
-		connection.setTargetDecoration(targetDecoration);
 	}
 
 	public void refreshToolTip() {
-		IFeature target = getConnectionModel().getTarget().getObject();
+		final IGraphicalFeature graphicalTarget = getConnectionModel().getTarget();
+		if (graphicalTarget == null) {
+			return;
+		}
+		IFeature target = graphicalTarget.getObject();
 		toolTipContent.removeAll();
 		toolTipContent.setLayoutManager(new GridLayout());
 		toolTipContent.add(new Label(" Connection type: \n" + (target.getStructure().isAnd() ? " And" : (target.getStructure().isMultiple() ? " Or" : " Alternative"))));
@@ -224,25 +261,21 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 
 	@Override
 	public void activate() {
-		//TODO _interfaces Removed Code
-		getConnectionModel().addListener(this);
-//		getConnectionModel().getSource().addListener(this);
+		getFigure().setVisible(getTarget() != null);
 		super.activate();
 	}
 
 	@Override
 	public void deactivate() {
 		super.deactivate();
-		//TODO _interfaces Removed Code
-		getConnectionModel().removeListener(this);
-//		getConnectionModel().getSource().removeListener(this);
+		getFigure().setVisible(false);
 	}
 
 	public void propertyChange(PropertyChangeEvent event) {
 		String prop = event.getPropertyName();
-		if (PARENT_CHANGED.equals(prop)) {
+		if (EventType.PARENT_CHANGED.toString().equals(prop)) {
 			refreshParent();
-		} else if (MANDATORY_CHANGED.equals(prop)) {
+		} else if (EventType.MANDATORY_CHANGED.toString().equals(prop)) {
 			refreshSourceDecoration();
 		}
 	}
@@ -256,7 +289,11 @@ public class ConnectionEditPart extends AbstractConnectionEditPart implements GU
 	private boolean connectsExternFeatures() {
 		FeatureConnection featureConnection = getConnectionModel();
 		final IFeature source = featureConnection.getSource().getObject();
-		final IFeature target = featureConnection.getTarget().getObject();
+		final IGraphicalFeature graphicalTarget = featureConnection.getTarget();
+		if (graphicalTarget == null) {
+			return false;
+		}
+		final IFeature target = graphicalTarget.getObject();
 		return (source instanceof ExtendedFeature && ((ExtendedFeature) source).isFromExtern()
 				&& target instanceof ExtendedFeature && ((ExtendedFeature) target).isFromExtern());
 	}

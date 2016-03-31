@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,18 +20,13 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
-import java.io.File;
-import java.util.List;
-
 import org.prop4j.Node;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
-import de.ovgu.featureide.fm.core.io.ModelWarning;
 
 /**
- * 
  * @author Sebastian Krieter
  */
 public class ExtendedFeatureModelFactory implements IFeatureModelFactory {
@@ -63,16 +58,6 @@ public class ExtendedFeatureModelFactory implements IFeatureModelFactory {
 	@Override
 	public ExtendedFeatureModel createFeatureModel() {
 		return new ExtendedFeatureModel();
-	}
-
-	@Override
-	public List<ModelWarning> loadFeatureModel(IFeatureModel featureModel, File file) {
-		return null;
-	}
-
-	@Override
-	public List<ModelWarning> loadFeatureModel(IFeatureModel featureModel, String content) {
-		return null;
 	}
 
 }

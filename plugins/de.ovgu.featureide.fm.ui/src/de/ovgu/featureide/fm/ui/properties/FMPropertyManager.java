@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -33,6 +33,8 @@ import org.eclipse.swt.graphics.Color;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIBasics;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.properties.language.English;
@@ -49,6 +51,7 @@ import de.ovgu.featureide.fm.ui.properties.page.FMPropertyPage;
  * 
  * @see FMPropertyPage
  * @author Jens Meinicke
+ * @author Marcus Pinnecke
  */
 @CheckReturnValue
 public class FMPropertyManager extends FMPropertyManagerDefaults implements GUIDefaults {
@@ -134,10 +137,9 @@ public class FMPropertyManager extends FMPropertyManagerDefaults implements GUID
 	 * Refreshes registered models.
 	 */
 	public static void updateEditors() {
-		//TODO _interfaces Removed Code
-//		for (IFeatureModel model : featureModels) {
-//			model.getGraphicRepresenation().redrawDiagram();
-//		}
+		for (IFeatureModel model : featureModels) {
+			model.fireEvent(new FeatureIDEEvent(model, EventType.MODEL_DATA_LOADED));
+		}
 	}
 
 	public static void setHideLegend(boolean value) {

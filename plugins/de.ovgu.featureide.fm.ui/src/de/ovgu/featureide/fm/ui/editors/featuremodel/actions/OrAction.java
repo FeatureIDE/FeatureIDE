@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -28,12 +28,13 @@ import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureChangeGroupTypeOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ChangeFeatureGroupTypeOperation;
 
 /**
  * Turns a group type into an Or-group.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke
  */
 public class OrAction extends SingleSelectionAction {
 
@@ -48,7 +49,7 @@ public class OrAction extends SingleSelectionAction {
 
 	@Override
 	public void run() {
-		FeatureChangeGroupTypeOperation op = new FeatureChangeGroupTypeOperation(FeatureChangeGroupTypeOperation.OR, feature, featureModel);
+		ChangeFeatureGroupTypeOperation op = new ChangeFeatureGroupTypeOperation(ChangeFeatureGroupTypeOperation.OR, feature, featureModel);
 		op.addContext((IUndoContext) featureModel.getUndoContext());
 
 		try {

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -21,15 +21,16 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureSetHiddenOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToHiddenOperation;
 
 /**
  * Action to mark a feature as hidden.
+ * 
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class HiddenAction extends SingleSelectionAction {
 
@@ -45,8 +46,7 @@ public class HiddenAction extends SingleSelectionAction {
 	@Override
 	public void run() {
 		setChecked(feature.getStructure().isHidden());
-		FeatureSetHiddenOperation op = new FeatureSetHiddenOperation(feature, featureModel);
-		op.addContext((IUndoContext) featureModel.getUndoContext());
+		SetFeatureToHiddenOperation op = new SetFeatureToHiddenOperation(feature, featureModel);
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -32,6 +32,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.FeatureRenamingCom
  * Allows to rename features at the feature diagram.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke
  */
 public class FeatureDirectEditPolicy extends DirectEditPolicy {
 
@@ -47,7 +48,7 @@ public class FeatureDirectEditPolicy extends DirectEditPolicy {
 	@Override
 	protected Command getDirectEditCommand(DirectEditRequest request) {
 		String newName = (String) request.getCellEditor().getValue();
-		return new FeatureRenamingCommand(featureModel.getFeatureModel(), feature.getObject().getName().toString(), newName);
+		return new FeatureRenamingCommand(featureModel.getFeatureModel(), feature.getObject().getName(), newName);
 	}
 
 	@Override

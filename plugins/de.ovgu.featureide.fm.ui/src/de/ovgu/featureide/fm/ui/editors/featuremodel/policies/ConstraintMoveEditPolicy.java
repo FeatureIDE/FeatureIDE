@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -33,7 +33,6 @@ import org.eclipse.draw2d.geometry.PrecisionRectangle;
 import org.eclipse.gef.editpolicies.NonResizableEditPolicy;
 import org.eclipse.gef.requests.ChangeBoundsRequest;
 
-import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.ConstraintDragAndDropCommand;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPart;
 
@@ -42,6 +41,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPar
  * 
  * @author David Broneske
  * @author Fabian Benduhn
+ * @author Marcus Pinnecke
  */
 public class ConstraintMoveEditPolicy extends NonResizableEditPolicy {
 
@@ -72,7 +72,7 @@ public class ConstraintMoveEditPolicy extends NonResizableEditPolicy {
 		r.setForegroundColor(ColorConstants.white);
 		r.setBounds(getInitialFeedbackBounds());
 
-		Point s = FeatureUIHelper.getLocation(editPart.getConstraintModel()).getCopy();
+		Point s = editPart.getConstraintModel().getLocation().getCopy();
 		getHostFigure().translateToAbsolute(s);
 
 		c = new PolylineConnection();

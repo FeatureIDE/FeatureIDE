@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,20 +20,21 @@
  */
 package de.ovgu.featureide.fm.ui.editors;
 
+import java.util.Collection;
 import java.util.Iterator;
 
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.gef.ui.actions.PrintAction;
 import org.eclipse.ui.IWorkbenchPart;
 
-import de.ovgu.featureide.fm.core.base.impl.Tree;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
 
 /**
- * TODO A PrintAction for the FeatureModelEditor that temporarily moves the
+ * A PrintAction for the FeatureModelEditor that temporarily moves the
  * feature diagram to the top-left corner
  * 
  * @author Fabian Benduhn
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class FMPrintAction extends PrintAction {
 
@@ -55,7 +56,7 @@ public class FMPrintAction extends PrintAction {
 		FeatureModelLayout layout = featureModel.getLayout();
 		int layoutOld = layout.getLayoutAlgorithm();
 
-		Tree<IGraphicalFeature> features = featureModel.getFeatures();
+		Collection<IGraphicalFeature> features = featureModel.getFeatures();
 		Iterator<IGraphicalFeature> featureIter = features.iterator();
 		Point minP = FeatureUIHelper.getLocation(featureIter.next()).getCopy();
 
@@ -66,7 +67,7 @@ public class FMPrintAction extends PrintAction {
 		return;
 	}
 
-	private void move(IGraphicalFeatureModel featureModel, FeatureModelLayout layout, Tree<IGraphicalFeature> features, Iterator<IGraphicalFeature> featureIter, Point minP) {
+	private void move(IGraphicalFeatureModel featureModel, FeatureModelLayout layout, Collection<IGraphicalFeature> features, Iterator<IGraphicalFeature> featureIter, Point minP) {
 		layout.setLayout(0);
 		while (featureIter.hasNext()) {
 			IGraphicalFeature f = featureIter.next();
@@ -82,7 +83,7 @@ public class FMPrintAction extends PrintAction {
 		moveLegend(featureModel, layout, minP);
 	}
 
-	private void moveBack(IGraphicalFeatureModel featureModel, FeatureModelLayout layout, int layoutOld, Tree<IGraphicalFeature> features, Point minP) {
+	private void moveBack(IGraphicalFeatureModel featureModel, FeatureModelLayout layout, int layoutOld, Collection<IGraphicalFeature> features, Point minP) {
 		Point minPneg = new Point(-minP.x, -minP.y);
 		moveFeatures(features, minPneg);
 		moveConstraints(featureModel, minPneg);
@@ -99,12 +100,12 @@ public class FMPrintAction extends PrintAction {
 
 	private void moveConstraints(IGraphicalFeatureModel featureModel, Point minP) {
 		for (IGraphicalConstraint c : featureModel.getConstraints()) {
-			Point newPoint = new Point(FeatureUIHelper.getLocation(c).getCopy().x - minP.x, FeatureUIHelper.getLocation(c).getCopy().y - minP.y);
+			Point newPoint = new Point(c.getLocation().x - minP.x, c.getLocation().y - minP.y);
 			FeatureUIHelper.setLocation(c, newPoint);
 		}
 	}
 
-	private void moveFeatures(Tree<IGraphicalFeature> features, Point minP) {
+	private void moveFeatures(Collection<IGraphicalFeature> features, Point minP) {
 		for (IGraphicalFeature f : features) {
 			Point newPoint = new Point(FeatureUIHelper.getLocation(f).getCopy().x - minP.x, FeatureUIHelper.getLocation(f).getCopy().y - minP.y);
 			FeatureUIHelper.setLocation(f, newPoint);

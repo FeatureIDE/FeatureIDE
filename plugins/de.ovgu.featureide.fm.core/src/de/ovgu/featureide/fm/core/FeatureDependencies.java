@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -42,7 +42,7 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
  * Calculates dependencies of features
  * 
  * @author Soenke Holthusen
- * 
+ * @author Marcus Pinnecke (Feature Interface) * 
  */
 public class FeatureDependencies {
     private static final String LEGEND_TEXT = "X ALWAYS Y := If X is selected then Y is selected in every valid configuration."

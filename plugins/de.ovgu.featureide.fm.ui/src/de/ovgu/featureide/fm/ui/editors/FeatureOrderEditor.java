@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -37,9 +37,7 @@ import java.util.List;
 
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.QualifiedName;
@@ -49,15 +47,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.PartInitException;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
-import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
-import de.ovgu.featureide.fm.core.configuration.ConfigurationWriter;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
@@ -67,6 +58,7 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  * 
  * @author Christian Becker
  * @author Jens Meinicke
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class FeatureOrderEditor extends FeatureModelEditorPage {
 
@@ -87,7 +79,8 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	private Button defaultButton = null;
 	private Button activate = null;
 
-	private IFolder configFolder;
+	// TODO _interfaces: unnecessary with new configuration file format
+//	private IFolder configFolder;
 
 	/**
 	 * This flags is <code>true</code> if the composer supports a feature order
@@ -120,25 +113,27 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 			}
 
 
-			if (hasFeatureOrder && configFolder.exists()) {
-				try {
-					for (IResource res : configFolder.members()) {
-						updateConfigurationOrder(res);
-					}
-				} catch (CoreException e) {
-					FMUIPlugin.getDefault().logError(e);
-				}
-			}
+			// TODO _interfaces: unnecessary with new configuration file format
+//			if (hasFeatureOrder && configFolder.exists()) {
+//				try {
+//					for (IResource res : configFolder.members()) {
+//						updateConfigurationOrder(res);
+//					}
+//				} catch (CoreException e) {
+//					FMUIPlugin.getDefault().logError(e);
+//				}
+//			}
 			super.doSave(monitor);
 		}
 	}
 
-	@Override
-	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
-		super.init(site, input);
-		IProject project = ((IFile) input.getAdapter(IFile.class)).getProject();
-		configFolder = project.getFolder(getProjectConfigurationPath(project));
-	}
+	// TODO _interfaces: unnecessary with new configuration file format
+//	@Override
+//	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
+//		super.init(site, input);
+////		IProject project = ((IFile) input.getAdapter(IFile.class)).getProject();
+////		configFolder = project.getFolder(getProjectConfigurationPath(project));
+//	}
 
 	@Override
 	public void initEditor() {
@@ -351,7 +346,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		featurelist.removeAll();
 
 		if (featureModelEditor.featureModel != null && featureModelEditor.featureModel.getStructure().getRoot() != null) {
-			for (String featureName : FeatureUtils.extractConcreteFeaturesAsStringList(featureModelEditor.featureModel)) {
+			for (String featureName : featureModelEditor.featureModel.getFeatureOrderList()) {
 				featurelist.add(featureName);
 			}
 		}
@@ -365,7 +360,7 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 	private boolean updateFeatureList() {
 		boolean changed = false;
 		if (featureModelEditor.featureModel != null && featureModelEditor.featureModel.getStructure().getRoot() != null) {
-			HashSet<String> featureSet = new HashSet<String>(Functional.toList(FeatureUtils.extractConcreteFeaturesAsStringList(featureModelEditor.featureModel)));
+			HashSet<String> featureSet = new HashSet<String>(featureModelEditor.featureModel.getFeatureOrderList());
 
 			int itemcount = featurelist.getItemCount();
 			for (int i = 0; i < itemcount; i++) {
@@ -484,27 +479,29 @@ public class FeatureOrderEditor extends FeatureModelEditorPage {
 		return new LinkedList<String>();
 	}
 
-	/**
-	 * Renames the features of the given configuration file and <br>
-	 * synchronizes the order with the feature model.
-	 * 
-	 * @param resource
-	 *            The configuration file to update
-	 */
-	private void updateConfigurationOrder(IResource resource) {
-		if (!(resource instanceof IFile)) {
-			return;
-		}
-		final IFile res = (IFile) resource;
-		
-		final Configuration config = new Configuration(featureModelEditor.featureModel, Configuration.PARAM_LAZY);
-		try {
-			new ConfigurationReader(config).readFromFile(res);
-			new ConfigurationWriter(config).saveToFile(res);
-		} catch (CoreException | IOException e) {
-			FMCorePlugin.getDefault().logError(e);
-		}
-	}
+
+	// TODO _interfaces: unnecessary with new configuration file format
+//	/**
+//	 * Renames the features of the given configuration file and <br>
+//	 * synchronizes the order with the feature model.
+//	 * 
+//	 * @param resource
+//	 *            The configuration file to update
+//	 */
+//	private void updateConfigurationOrder(IResource resource) {
+//		if (!(resource instanceof IFile)) {
+//			return;
+//		}
+//		final IFile res = (IFile) resource;
+//		
+//		final Configuration config = new Configuration(featureModelEditor.featureModel, Configuration.PARAM_LAZY);
+//		try {
+//			new ConfigurationReader(config).readFromFile(res);
+//			new ConfigurationWriter(config).saveToFile(res);
+//		} catch (CoreException | IOException e) {
+//			FMCorePlugin.getDefault().logError(e);
+//		}
+//	}
 
 	private void enableUI(boolean selection) {
 		featurelist.setEnabled(selection);

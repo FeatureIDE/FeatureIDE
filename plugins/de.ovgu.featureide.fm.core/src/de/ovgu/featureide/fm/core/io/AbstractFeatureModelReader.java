@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -39,6 +39,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  * If IFile support is needed, the {@link FeatureModelReaderIFileWrapper} has to be used.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public abstract class AbstractFeatureModelReader implements IFeatureModelReader {
 
@@ -50,7 +51,7 @@ public abstract class AbstractFeatureModelReader implements IFeatureModelReader 
 	/**
 	 * warnings occurred while parsing
 	 */
-	protected LinkedList<ModelWarning> warnings = new LinkedList<ModelWarning>();
+	protected LinkedList<Problem> warnings = new LinkedList<Problem>();
 	
 	/**
 	 * The source of the textual representation of the feature model.<br/><br/>
@@ -117,7 +118,7 @@ public abstract class AbstractFeatureModelReader implements IFeatureModelReader 
 		parseInputStream(inputStream);
 	}
 	
-	public List<ModelWarning> getWarnings() {
+	public List<Problem> getWarnings() {
 		return warnings;
 	}
 

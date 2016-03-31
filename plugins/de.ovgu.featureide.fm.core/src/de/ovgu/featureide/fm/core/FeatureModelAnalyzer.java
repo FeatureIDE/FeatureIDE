@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.core;
 
+import static de.ovgu.featureide.fm.core.functional.Functional.map;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ANALYZE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ANALYZE_FEATURES_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE_INDETRMINATE_HIDDEN_FEATURES;
@@ -57,12 +58,13 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.Comparison;
 import de.ovgu.featureide.fm.core.editing.ModelComparator;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.functional.Functional;
-
+import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
 /**
  * A collection of methods for working with {@link IFeatureModel} will replace
  * the corresponding methods in {@link IFeatureModel}
@@ -70,6 +72,7 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  * @author Soenke Holthusen
  * @author Florian Proksch
  * @author Stefan Krueger
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class FeatureModelAnalyzer {
 
@@ -168,7 +171,7 @@ public class FeatureModelAnalyzer {
 	}
 
 	public boolean isValid() throws TimeoutException {
-		Node root = NodeCreator.createNodes(fm.clone(null));
+		Node root = NodeCreator.createNodes(fm);
 		return new SatSolver(root, 1000).isSatisfiable();
 	}
 
@@ -375,15 +378,17 @@ public class FeatureModelAnalyzer {
 		return new SatSolver(finalFormula, 1000).isSatisfiable();
 	}
 
-	public Node conjunct(Collection<IFeature> b) {
-		Iterator<IFeature> iterator = b.iterator();
-		Node result = new Literal(NodeCreator.getVariable(iterator.next(), fm));
-		while (iterator.hasNext())
-			result = new And(result, new Literal(NodeCreator.getVariable(
-					iterator.next(), fm)));
+	public Node conjunct(final Collection<IFeature> b) {
+		return new And(map(b, new IFunction<IFeature, Literal>() {
 
-		return result;
+			@Override
+			public Literal invoke(IFeature t) {
+				return new Literal(NodeCreator.getVariable(t, fm));
+			}
+
+		}), fm);
 	}
+	
 	
 	public Node disjunct(Collection<IFeature> b) {
 		Iterator<IFeature> iterator = b.iterator();
@@ -536,6 +541,7 @@ public class FeatureModelAnalyzer {
 	 * So LinkedLists are much faster because the number of feature in the set is usually small (e.g. dead features)
 	 */
 	public HashMap<Object, Object> analyzeFeatureModel(IProgressMonitor monitor) {
+		resetAttributeFlags();
 		this.monitor = monitor;
 		if (calculateConstraints) {
 			beginTask(fm.getConstraintCount() + 2);
@@ -546,7 +552,7 @@ public class FeatureModelAnalyzer {
 		HashMap<Object, Object> changedAttributes = new HashMap<Object, Object>();
 
 		// put root always in so it will be refreshed (void/non-void)
-		changedAttributes.put(fm.getStructure().getRoot(), FeatureStatus.NORMAL);
+		changedAttributes.put(fm.getStructure().getRoot().getFeature(), FeatureStatus.NORMAL);
 		if (calculateFeatures) {
 			updateFeatures(oldAttributes, changedAttributes);
 		}
@@ -554,7 +560,6 @@ public class FeatureModelAnalyzer {
 			updateConstraints(oldAttributes, changedAttributes);
 		}
 		// put root always in so it will be refreshed (void/non-void)
-//		changedAttributes.put(fm.getRoot(), ConstraintAttribute.VOID_MODEL);
 		return changedAttributes;
 	}
 
@@ -824,7 +829,7 @@ public class FeatureModelAnalyzer {
 					Node leftChild = children[0];
 					Node rightChild = children[1];
 					if (leftChild instanceof Literal && ((Literal) leftChild).var.equals(feature.getName())) {
-						IConstraint	rightConstraint = FeatureModelFactory.getInstance().createConstraint(fm, rightChild);
+						IConstraint	rightConstraint = FMFactoryManager.getFactory().createConstraint(fm, rightChild);
 						rightConstraint.setContainedFeatures();
 						if (!rightConstraint.hasHiddenFeatures()) {
 							list.add(feature);
@@ -832,7 +837,7 @@ public class FeatureModelAnalyzer {
 						}
 					}
 					if (rightChild instanceof Literal &&  ((Literal) rightChild).var.equals(feature.getName())) {
-						IConstraint  leftConstraint = FeatureModelFactory.getInstance().createConstraint(fm, leftChild);
+						IConstraint  leftConstraint = FMFactoryManager.getFactory().createConstraint(fm, leftChild);
 						leftConstraint.setContainedFeatures();
 						if (!leftConstraint.hasHiddenFeatures()) {
 							list.add(feature);
@@ -903,41 +908,21 @@ public class FeatureModelAnalyzer {
 		}
 	}
 	
-	public Collection<IFeature> getFalseOptionalFeatures() {
-		Collection<IFeature> falseOptionalFeatures = new LinkedList<>();
-		for (IFeature feature : fm.getFeatures()) {
-			try {
-				if (!feature.getStructure().isMandatory() && !feature.getStructure().isRoot()) {
-					SatSolver satsolver = new SatSolver(new Not(new Implies(
-							new And(new Literal(feature.getStructure().getParent().getFeature().getName()),
-									NodeCreator.createNodes(fm.clone(null))),
-							new Literal(feature.getName()))), 1000);
-					if (!satsolver.isSatisfiable()) {
-						falseOptionalFeatures.add(feature);
-					}
-				}
-			} catch (TimeoutException e) {
-				FMCorePlugin.getDefault().logError(e);
-			}
-		}
-		return falseOptionalFeatures;
+	public List<IFeature> getFalseOptionalFeatures() {
+		return getFalseOptionalFeatures(fm.getFeatures());
 	}
-	
-	public Collection<IFeature> getFalseOptionalFeatures(Iterable<IFeature> fmFalseOptionals) {
-		Collection<IFeature> falseOptionalFeatures = new LinkedList<>();
+
+	public List<IFeature> getFalseOptionalFeatures(Iterable<IFeature> fmFalseOptionals) {
+		final List<IFeature> falseOptionalFeatures = new ArrayList<>();
+
+		final SatSolver solver = new SatSolver(NodeCreator.createNodes(fm), 1000);
 		for (IFeature feature : fmFalseOptionals) {
-			try {
-				if (!feature.getStructure().isMandatory() && !feature.getStructure().isRoot()) {
-					SatSolver satsolver = new SatSolver(new Not(new Implies(
-							new And(new Literal(feature.getStructure().getParent().getFeature().getName()),
-									NodeCreator.createNodes(fm.clone(null))),
-							new Literal(feature.getName()))), 1000);
-					if (!satsolver.isSatisfiable()) {
-						falseOptionalFeatures.add(feature);
-					}
-				}
-			} catch (TimeoutException e) {
-				FMCorePlugin.getDefault().logError(e);
+			final IFeatureStructure structure = feature.getStructure();
+			final IFeature parent = FeatureUtils.getParent(feature);
+			if (!structure.isMandatory() && parent != null && solver.impliedValue(
+					new Literal(parent.getName()),
+					new Literal(feature.getName()))) {
+				falseOptionalFeatures.add(feature);
 			}
 		}
 		return falseOptionalFeatures;
@@ -954,7 +939,8 @@ public class FeatureModelAnalyzer {
 	public int countHiddenFeatures() {
 		int number = 0;
 		for (IFeature feature : fm.getFeatures()) {
-			if (feature.getStructure().isHidden() || feature.getStructure().hasHiddenParent()) {
+			final IFeatureStructure structure = feature.getStructure();
+			if (structure.isHidden() || structure.hasHiddenParent()) {
 				number++;
 			}
 		}

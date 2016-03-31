@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -45,6 +45,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
  * Allows features to be moved onto the feature model diagram.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke
  */
 public class ModelLayoutEditPolicy extends LayoutEditPolicy {
 

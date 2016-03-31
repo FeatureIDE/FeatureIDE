@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -44,10 +44,6 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * @author Thomas Thuem
  */
 public interface GUIDefaults {
-
-	public static final boolean HALF_ARC = false;
-
-	public static final boolean OR_CIRCLES = false;
 
 	//general settings
 
@@ -102,7 +98,8 @@ public interface GUIDefaults {
 	public static final Color DECORATOR_BACKGROUND = DIAGRAM_BACKGROUND;
 	public static final int SOURCE_ANCHOR_DIAMETER = 9;
 
-	public static final int TARGET_ANCHOR_DIAMETER = HALF_ARC ? 20 : 40;
+	public static final int TARGET_ANCHOR_DIAMETER = 25;
+	public static final int TARGET_ANCHOR_DIAMETER_VERTICAL = 38;
 
 	//cross-tree constraints
 

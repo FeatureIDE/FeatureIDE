@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -29,6 +29,13 @@ public abstract class AbstractMethodSignature extends AbstractSignature {
 	
 	protected AbstractMethodSignature(AbstractClassSignature parent, String name, String modifier, String type, List<String> parameterTypes, boolean isConstructor) {
 		super(parent, name, modifier, type);
+		this.isConstructor = isConstructor;
+		this.parameterTypes = parameterTypes;
+	}
+	
+	
+	protected AbstractMethodSignature(AbstractClassSignature parent, String name, String modifier, String type, List<String> parameterTypes, boolean isConstructor, int startLine, int endLine) {
+		super(parent, name, modifier, type, startLine, endLine);
 		this.isConstructor = isConstructor;
 		this.parameterTypes = parameterTypes;
 	}

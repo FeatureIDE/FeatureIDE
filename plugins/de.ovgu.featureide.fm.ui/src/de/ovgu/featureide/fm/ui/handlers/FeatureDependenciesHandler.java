@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -40,7 +40,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import de.ovgu.featureide.fm.core.FeatureDependencies;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
@@ -51,6 +51,7 @@ import de.ovgu.featureide.fm.ui.handlers.base.AFileHandler;
  * calculates and shows dependencies between features in a MessageBox
  * 
  * @author Fabian Benduhn
+ * @author Marcus Pinnecke
  */
 public class FeatureDependenciesHandler extends AFileHandler {
 
@@ -130,7 +131,7 @@ public class FeatureDependenciesHandler extends AFileHandler {
 	 * @throws FileNotFoundException
 	 */
 	private IFeatureModel readModel(IFile inputFile) {
-		IFeatureModel fm = FeatureModelFactory.getInstance().createFeatureModel();
+		IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
 		// XmlFeatureModelReader fmReader = new
 		// XmlFeatureModelReader(fm,inputFile.getProject());
 		FeatureModelReaderIFileWrapper fmReader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(fm));

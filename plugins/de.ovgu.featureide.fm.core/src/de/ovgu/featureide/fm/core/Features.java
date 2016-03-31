@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -27,6 +27,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 
 public final class Features {
@@ -46,7 +47,7 @@ public final class Features {
 	public static IFeature getCommonAncestor(Collection<IFeature> features) {
 		List<IFeature> commonAncestorList = null;
 		for (IFeature feature : features) {
-			commonAncestorList = Features.getCommonAncestor(commonAncestorList, feature.getStructure().getParent().getFeature());
+			commonAncestorList = Features.getCommonAncestor(commonAncestorList, FeatureUtils.getParent(feature));
 		}
 		return commonAncestorList.get(commonAncestorList.size() - 1);
 	}
@@ -56,13 +57,13 @@ public final class Features {
 			commonAncestorList = new LinkedList<>();
 			while (parent != null) {
 				commonAncestorList.add(0, parent);
-				parent = parent.getStructure().getParent().getFeature();
+				parent = FeatureUtils.getParent(parent);
 			}
 		} else if (parent != null) {
 			LinkedList<IFeature> parentList = new LinkedList<>();
 			while (parent != null) {
 				parentList.addFirst(parent);
-				parent = parent.getStructure().getParent().getFeature();
+				parent = FeatureUtils.getParent(parent);
 			}
 			final Iterator<IFeature> iterator1 = parentList.iterator();
 			final Iterator<IFeature> iterator2 = commonAncestorList.iterator();

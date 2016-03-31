@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -21,6 +21,9 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.SHOW_HIDDEN_FEATURES;
+
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
@@ -28,6 +31,7 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  * 
  * @author David Halm
  * @author Patrick Sulkowski
+ * @author Marcus Pinnecke
  */
 public class ShowHiddenFeaturesOperation extends AbstractGraphicalFeatureModelOperation {
 
@@ -36,13 +40,14 @@ public class ShowHiddenFeaturesOperation extends AbstractGraphicalFeatureModelOp
 	}
 
 	@Override
-	public void redo() {
+	public FeatureIDEEvent operation() {
 		graphicalFeatureModel.getLayout().showHiddenFeatures(!graphicalFeatureModel.getLayout().showHiddenFeatures());
+		return new FeatureIDEEvent(graphicalFeatureModel, EventType.MODEL_DATA_CHANGED);
 	}
 
 	@Override
-	public void undo() {
-		redo();
+	public FeatureIDEEvent inverseOperation() {
+		return operation();
 	}
 
 }

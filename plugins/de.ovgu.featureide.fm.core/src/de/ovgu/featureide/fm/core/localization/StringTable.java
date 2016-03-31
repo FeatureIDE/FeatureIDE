@@ -1,5 +1,8 @@
 package de.ovgu.featureide.fm.core.localization;
 
+/**
+ * @author Marcus Pinnecke
+ */
 public class StringTable {
 	public static final String THE_REQUIRED_BUNDLE = "The required bundle ";
 	public static final String IS_NOT_INSTALLED_ = " is not installed.";
@@ -68,7 +71,8 @@ public class StringTable {
 	public static final String COULD_NOT_SET_PERSISTANT_PROPERTY = "Could not set persistant property";
 	public static final String ERROR_WHILE_CREATING_FEATURE_MODEL = "Error while creating feature model";
 	public static final String NO_RESOURCE_GIVEN_WHILE_GETTING_THE_PROJECT_DATA = "No resource given while getting the project data";
-	public static final String CONFIG = "config";	
+	public static final String CONFIG = "config";
+	public static final String CONF = "conf";	
 	public static final String EQUATION = "equation";
 	public static final String EXPRESSION = "expression";
 	public static final String ADD_PROJECT = "Add Project";
@@ -709,6 +713,8 @@ public class StringTable {
 	public static final String MAXIMUM_FEATURES_PER_DIRECTIVE = "Maximum number of features per directive";
 	public static final String MINIMUM_FEATURES_PER_DIRECTIVE = "Minimum number of features per directive";
 	public static final String AVERAGE_FEATURES_PER_DIRECTIVE = "Average number of features per directive";
+	public static final String MAXIMUM_NUMBER_OF_DIRECTIVES = "Maximum number of directives: ";
+	public static final String MINIMUM_NUMBER_OF_DIRECTIVES = "Minimum number of directives: ";
 	public static final String CLASS_STATISTICS = "Class statistics";
 	public static final String HIDDEN_BY_ANCESTOR = "hidden by ancestor";
 	public static final String HAS_CHILD_FEATURES = "has child-features";
@@ -731,7 +737,7 @@ public class StringTable {
 	public static final String STATISTICS_OF_PRODUCT_LINE_IMPLEMENTATION = "Statistics of product-line implementation";
 	public static final String STATISTICS_OF_PRODUCT_LINE_SPECIFICATION = "Statistics of product-line specification";
 	public static final String VALID_CONFIGURATIONS_OF_THE_FEATURE_MODEL = "Valid configurations of the feature model";
-	public static final String ATOMIC_SETS_OF_THE_FEATURE_MODEL = "Atomic sets of the feature model";
+	public static final String ATOMIC_SETS_OF_THE_FEATURE_MODEL = "Number of atomic sets";
 	public static final String FEATURE_STATISTICS = "Feature statistics";
 	public static final String STATISTICS_OF_THE_FEATURE_MODEL = "Statistics of the feature model";
 	public static final String NUMBER_OF_FEATURES = "Number of features";
@@ -994,4 +1000,5 @@ public class StringTable {
 	public static final String FEATURES_ = "Features:";
 	public static final String HOTSPOT_THRESHOLD = "Maximum Constraint Threshold:";
 	public static final String HOTSPOT_START_ANALYSIS= "Analyse";
+	public static final String FIDECONF = "fideconf";
 }

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -26,4 +26,7 @@ public abstract class AbstractFieldSignature extends AbstractSignature {
 		super(parent, name, modifiers, type);
 	}
 
+	public AbstractFieldSignature(AbstractClassSignature parent, String name, String modifiers, String type, int line) {
+		super(parent, name, modifiers, type, line, line);
+	}
 }

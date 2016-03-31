@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -40,9 +40,10 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 
 /**
- * TODO description
+ * Sorts configurations before they are generated based on their difference. 
  * 
  * @author Mustafa Alhajjaj
+ * @author Marcus Pinnecke
  */
 public class PriorizationSorter extends AbstractConfigurationSorter {
 	private final List<List<String>> allconfigs = new ArrayList<List<String>>();

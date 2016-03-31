@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -43,7 +43,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -53,6 +53,7 @@ import de.ovgu.featureide.fm.ui.handlers.base.SelectionWrapper;
  * A Wizard to create a new Feature Model file.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke
  */
 // TOOD add copy of an other model file
 public class NewFeatureModelWizard extends Wizard implements INewWizard {
@@ -74,7 +75,7 @@ public class NewFeatureModelWizard extends Wizard implements INewWizard {
 				}
 			}
 			if (!foundParent) {
-				final IFeatureModel featureModel = FeatureModelFactory.getInstance().createFeatureModel();
+				final IFeatureModel featureModel = FMFactoryManager.getFactory().createFeatureModel();
 				featureModel.createDefaultValues("");
 				new XmlFeatureModelWriter(featureModel).writeToFile(fullFilePath.toFile());
 			}
@@ -112,7 +113,7 @@ public class NewFeatureModelWizard extends Wizard implements INewWizard {
 		if (parentProject.getLocation().isPrefixOf(fullFilePath)) {
 			final IFile file = parentProject.getFile(fullFilePath.makeRelativeTo(parentProject.getLocation()));
 
-			final IFeatureModel featureModel = FeatureModelFactory.getInstance().createFeatureModel();
+			final IFeatureModel featureModel = FMFactoryManager.getFactory().createFeatureModel();
 			featureModel.createDefaultValues("");
 			featureModel.initFMComposerExtension(file.getProject());
 			try {

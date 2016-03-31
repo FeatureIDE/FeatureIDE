@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -55,13 +55,16 @@ import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
  * Sets the color of the features in the feature diagram.
  * The color is chosen in the dialog.
  * 
  * @author Christian Elzholz, Marcus Schmelz
+ * @author Marcus Pinnecke
  */
 public class SetFeatureColorDialog extends Dialog {
 
@@ -81,7 +84,6 @@ public class SetFeatureColorDialog extends Dialog {
 		super(parentShell);
 		this.featureList = featurelist;
 		setShellStyle(SWT.DIALOG_TRIM | SWT.MIN | SWT.RESIZE);
-		setDefaultImage(colorImage);
 	}
 
 	/**
@@ -93,6 +95,7 @@ public class SetFeatureColorDialog extends Dialog {
 		newShell.setMinimumSize(new Point(500, 500));
 		super.configureShell(newShell);
 		newShell.setText(COLORATION_DIALOG);
+		newShell.setImage(colorImage);
 	}
 
 	protected Point getInitialSize() {
@@ -192,9 +195,12 @@ public class SetFeatureColorDialog extends Dialog {
 
 			private void findSiblings() {
 				final ArrayList<IGraphicalFeature> affectedFeatures = new ArrayList<>();
-				for (int j = 0; j < featureListBuffer.size(); j++) {
-					if (!featureListBuffer.get(j).getTree().isRoot()) {
-						affectedFeatures.addAll(toList(featureListBuffer.get(j).getTree().getParent().getChildrenObjects()));
+				if (!featureListBuffer.isEmpty()) {
+					IGraphicalFeatureModel model = featureListBuffer.get(0).getGraphicalModel();
+					for (int j = 0; j < featureListBuffer.size(); j++) {
+						if (!featureListBuffer.get(j).getObject().getStructure().isRoot()) {
+							affectedFeatures.addAll(FeatureUIHelper.getGraphicalChildren(featureListBuffer.get(j).getObject().getStructure().getParent().getFeature(), model));
+						}
 					}
 				}
 				featureListBuffer = affectedFeatures;
@@ -218,7 +224,7 @@ public class SetFeatureColorDialog extends Dialog {
 			}
 			
 			private List<IGraphicalFeature> findChildren(IGraphicalFeature parent) {
-				return toList(parent.getTree().getChildrenObjects());
+				return toList(FeatureUIHelper.getGraphicalChildren(parent));
 			}
 
 			private void findDirectChildren() {

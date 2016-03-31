@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.core.internal;
 
+import org.eclipse.core.internal.resources.MarkerInfo;
+import org.eclipse.core.internal.resources.Workspace;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -34,20 +36,18 @@ import de.ovgu.featureide.core.IBuilderMarkerHandler;
  * @author Thomas Thuem
  * 
  */
+@SuppressWarnings("restriction")
 public class BuilderMarkerHandler implements IBuilderMarkerHandler {
 
-	private static final String BUILDER_MARKER = CorePlugin.PLUGIN_ID
-			+ ".builderProblemMarker";
+	private static final String BUILDER_MARKER = CorePlugin.PLUGIN_ID + ".builderProblemMarker";
 
-	private static final String CONFIGURATION_MARKER = CorePlugin.PLUGIN_ID
-			+ ".configurationProblemMarker";
+	private static final String CONFIGURATION_MARKER = CorePlugin.PLUGIN_ID + ".configurationProblemMarker";
 
 	protected final IProject project;
-	
+
 	public BuilderMarkerHandler(IProject project) {
 		this.project = project;
 	}
-
 
 	/*
 	 * (non-Javadoc)
@@ -56,8 +56,7 @@ public class BuilderMarkerHandler implements IBuilderMarkerHandler {
 	 * de.ovgu.featureide.core.internal.IMarkerHandler#createBuilderMarker(org
 	 * .eclipse.core.resources.IResource, java.lang.String, int, int)
 	 */
-	public void createBuilderMarker(IResource resource, String message,
-			int lineNumber, int severity) {
+	public void createBuilderMarker(IResource resource, String message, int lineNumber, int severity) {
 		if (resource != null) {
 			// for creating and deleting markers a synchronized file is
 			// neccessary
@@ -83,16 +82,13 @@ public class BuilderMarkerHandler implements IBuilderMarkerHandler {
 		}
 	}
 
-	private void deleteIfExists(IResource resource, String message,
-			int lineNumber, int severity) {
+	private void deleteIfExists(IResource resource, String message, int lineNumber, int severity) {
 		try {
 			if (!resource.exists())
 				return;
-			IMarker[] markers = resource.findMarkers(BUILDER_MARKER, false,
-					IResource.DEPTH_ZERO);
+			IMarker[] markers = resource.findMarkers(BUILDER_MARKER, false, IResource.DEPTH_ZERO);
 			for (IMarker marker : markers) {
-				if (marker.getAttribute(IMarker.MESSAGE).equals(message)
-						&& (Integer) marker.getAttribute(IMarker.LINE_NUMBER) == lineNumber
+				if (marker.getAttribute(IMarker.MESSAGE).equals(message) && (Integer) marker.getAttribute(IMarker.LINE_NUMBER) == lineNumber
 						&& (Integer) marker.getAttribute(IMarker.SEVERITY) == severity) {
 					marker.delete();
 				}
@@ -119,21 +115,20 @@ public class BuilderMarkerHandler implements IBuilderMarkerHandler {
 		}
 	}
 
-	public void createConfigurationMarker(IResource resource, String message,
-			int lineNumber, int severity) {
-		try {
-			resource.refreshLocal(IResource.DEPTH_ZERO, null);
-		} catch (CoreException e) {
-			CorePlugin.getDefault().logError(e);
-		}
+	public void createConfigurationMarker(IResource resource, String message, int lineNumber, int severity) {
 		if (hasMarker(resource, message, lineNumber)) {
 			return;
 		}
 		try {
 			IMarker marker = resource.createMarker(CONFIGURATION_MARKER);
-			marker.setAttribute(IMarker.MESSAGE, message);
-			marker.setAttribute(IMarker.SEVERITY, severity);
-			marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
+			MarkerInfo info = ((Workspace)resource.getWorkspace()).getMarkerManager().findMarkerInfo(resource, marker.getId());
+			if (marker.exists() && info != null) {
+				marker.setAttribute(IMarker.MESSAGE, message);
+				marker.setAttribute(IMarker.SEVERITY, severity);
+				marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
+			} else {
+				System.err.println(info);
+			}
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
 		}
@@ -153,8 +148,7 @@ public class BuilderMarkerHandler implements IBuilderMarkerHandler {
 					if (m != null) {
 						final Object markerMessage = m.getAttribute(IMarker.MESSAGE);
 						final Object markerLine = m.getAttribute(IMarker.LINE_NUMBER);
-						if (markerMessage != null && markerMessage.equals(message) &&
-							markerLine != null && markerLine.equals(lineNumber)) {
+						if (markerMessage != null && markerMessage.equals(message) && markerLine != null && markerLine.equals(lineNumber)) {
 							return true;
 						}
 					}

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -30,9 +30,9 @@ import de.ovgu.featureide.core.mpl.signature.ViewTag;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
-import de.ovgu.featureide.fm.core.base.event.IFeatureModelListener;
-import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 
 /**
@@ -40,6 +40,7 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
  * 
  * @author Sebastian Krieter
  * @author Reimar Schroeter
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class InterfaceProject {
 	private final IProject projectReference;
@@ -69,7 +70,7 @@ public class InterfaceProject {
 		this(projectReference, null);
 	}
 	
-	private class FeaturePropertyChangeListener implements IFeatureModelListener {
+	private class FeaturePropertyChangeListener implements IEventListener {
 		private final int id;
 		
 		public FeaturePropertyChangeListener(int id) {
@@ -77,15 +78,15 @@ public class InterfaceProject {
 		}
 		
 		@Override
-		public void propertyChange(FeatureModelEvent event) {
-			String prop = event.getPropertyName();
-			if (PropertyConstants.LOCATION_CHANGED.equals(prop)) {
+		public void propertyChange(FeatureIDEEvent event) {
+			EventType prop = event.getEventType();
+			if (EventType.LOCATION_CHANGED == prop) {
 				
-			} else if (PropertyConstants.CHILDREN_CHANGED.equals(prop)) {
+			} else if (EventType.GROUP_TYPE_CHANGED == prop) {
 				
-			} else if (PropertyConstants.NAME_CHANGED.equals(prop)) {
+			} else if (EventType.FEATURE_NAME_CHANGED.equals(prop)) {
 				featureNames[id] = ((IFeature)event.getSource()).getName();
-			} else if (PropertyConstants.ATTRIBUTE_CHANGED.equals(prop)) {
+			} else if (EventType.ATTRIBUTE_CHANGED.equals(prop)) {
 				
 			}
 		}

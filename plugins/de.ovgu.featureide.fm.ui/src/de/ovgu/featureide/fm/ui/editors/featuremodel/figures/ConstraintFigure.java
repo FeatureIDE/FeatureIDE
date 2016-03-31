@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -51,6 +51,7 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * A figure to view a cross-tree constraint below the feature diagram.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke
  */
 public class ConstraintFigure extends Figure implements GUIDefaults {
 
@@ -94,13 +95,14 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 		add(label);
 		setOpaque(true);
 
-		if (FeatureUIHelper.getLocation(constraint) != null)
-			setLocation(FeatureUIHelper.getLocation(constraint));
+		if (constraint.getLocation() != null)
+			setLocation(constraint.getLocation());
 
 		init();
 	}
 
 	private void init() {
+		setText(getConstraintText(constraint.getObject()));
 		setBorder(FMPropertyManager.getConstraintBorder(constraint.isFeatureSelected()));
 		setBackgroundColor(FMPropertyManager.getConstraintBackgroundColor());
 	}

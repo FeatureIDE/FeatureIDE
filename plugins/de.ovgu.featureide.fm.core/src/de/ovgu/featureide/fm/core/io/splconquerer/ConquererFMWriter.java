@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -76,6 +76,7 @@ import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
  * @author Dariusz Krolikowski
  * @author Maik Lampe
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class ConquererFMWriter extends AbstractFeatureModelWriter {
 	
@@ -184,7 +185,7 @@ public class ConquererFMWriter extends AbstractFeatureModelWriter {
         	element.appendChild(parentElement);
         	Element id = doc.createElement("id");
         	parentElement.appendChild(id);
-        	id.appendChild(doc.createTextNode(getID(feature.getStructure().getParent().getFeature().getName())));
+        	id.appendChild(doc.createTextNode(getID(FeatureUtils.getParent(feature).getName())));
     	}
     	
     	Element constraints = doc.createElement("constraints");

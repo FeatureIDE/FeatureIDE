@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -53,10 +53,11 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlPropertyLoader.PropertiesParser;
@@ -65,12 +66,14 @@ import de.ovgu.featureide.fm.core.io.xml.XmlPropertyLoader.PropertiesParser;
  * Parses a FeatureModel from XML
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke
  */
 public class XmlFeatureModelReader extends AbstractFeatureModelReader implements XMLFeatureModelTags {
 
 	public XmlFeatureModelReader(IFeatureModel featureModel) {
 		setFeatureModel(featureModel);
 	}
+	
 
 	@Override
 	protected synchronized void parseInputStream(final InputStream inputStream)
@@ -106,13 +109,13 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 			XmlPropertyLoader propertyLoader = new XmlPropertyLoader(e.getElementsByTagName(PROPERTIES));
 			customProperties.addAll(propertyLoader.parseProperties());
 		}
-		if (featureModel.getStructure().getRoot() == null) {
+		if (FeatureUtils.getRoot(featureModel) == null) {
 			throw new UnsupportedModelException(WRONG_SYNTAX, 1);
 		}
 		
 		importCustomProperties(customProperties, featureModel);
 		
-		featureModel.handleModelDataLoaded();
+		//featureModel.handleModelDataLoaded();
 	}
 
 	private void importCustomProperties(Collection<PropertiesParser> customProperties, IFeatureModel featureModel) {
@@ -233,7 +236,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 			if (!featureModel.getFMComposerExtension().isValidFeatureName(name)) {
 				throwError(name + IS_NO_VALID_FEATURE_NAME, e);
 			}
-			IFeature f = FeatureModelFactory.getInstance().createFeature(featureModel, name);
+			IFeature f = FMFactoryManager.getFactory().createFeature(featureModel, name);
 			f.getStructure().setMandatory(true);
 			if (nodeName.equals(AND)) {
 				f.getStructure().setAnd();
@@ -273,7 +276,7 @@ public class XmlFeatureModelReader extends AbstractFeatureModelReader implements
 			for (Element child: getElements(e.getChildNodes())) {
 				String nodeName = child.getNodeName();
 				if (nodeName.equals(RULE)) {
-					IConstraint c = FeatureModelFactory.getInstance().createConstraint(featureModel, parseConstraints2(child.getChildNodes()).getFirst());
+					IConstraint c = FMFactoryManager.getFactory().createConstraint(featureModel, parseConstraints2(child.getChildNodes()).getFirst());
 					if (child.hasAttributes()) {
 						NamedNodeMap nodeMap = child.getAttributes();
 						for (int i = 0; i < nodeMap.getLength(); i++) {

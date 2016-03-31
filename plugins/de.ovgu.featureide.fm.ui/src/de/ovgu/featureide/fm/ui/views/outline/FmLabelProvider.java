@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -44,48 +44,23 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
  * 
  * @author Jan Wedding
  * @author Melanie Pflaume
+ * @author Marcus Pinnecke
  */
 public class FmLabelProvider implements ILabelProvider, IFontProvider, GUIDefaults, IColorProvider {
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.viewers.IBaseLabelProvider#addListener(org.eclipse.
-	 * jface.viewers.ILabelProviderListener)
-	 */
 	@Override
 	public void addListener(ILabelProviderListener listener) {
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.viewers.IBaseLabelProvider#dispose()
-	 */
 	@Override
 	public void dispose() {
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.viewers.IBaseLabelProvider#isLabelProperty(java.lang
-	 * .Object, java.lang.String)
-	 */
 	@Override
 	public boolean isLabelProperty(Object element, String property) {
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.eclipse.jface.viewers.IBaseLabelProvider#removeListener(org.eclipse
-	 * .jface.viewers.ILabelProviderListener)
-	 */
 	@Override
 	public void removeListener(ILabelProviderListener listener) {
 	}
@@ -94,11 +69,6 @@ public class FmLabelProvider implements ILabelProvider, IFontProvider, GUIDefaul
 
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.viewers.ILabelProvider#getImage(java.lang.Object)
-	 */
 	@Override
 	public Image getImage(Object element) {
 		if (element instanceof IFeature) {
@@ -121,11 +91,6 @@ public class FmLabelProvider implements ILabelProvider, IFontProvider, GUIDefaul
 			return null;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
-	 */
 	@Override
 	public String getText(Object element) {
 		if (element instanceof IFeature)
@@ -138,20 +103,13 @@ public class FmLabelProvider implements ILabelProvider, IFontProvider, GUIDefaul
 		return element.toString();
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.IFontProvider#getFont(java.lang.Object)
-	 */
 	@Override
 	public Font getFont(Object element) {
 		return DEFAULT_FONT;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.IColorProvider#getForeground(java.lang.Object)
-	 */
 	@Override
 	public Color getForeground(Object element) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -167,4 +125,5 @@ public class FmLabelProvider implements ILabelProvider, IFontProvider, GUIDefaul
 		}
 		return col;
 	}
+
 }

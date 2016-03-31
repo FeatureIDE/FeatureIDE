@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="de.ovgu.featureide.core.composers">
+      <composer
+            class="de.ovgu.featureide.featurec.FeatureCComposer"
+            description="Feature-oriented programming for C code containing pre-processor annotations."
+            id="de.ovgu.featureide.composer.featurec"
+            name="FeatureC"
+            nature="FeatureIDE_Core.featureCNature">
+      </composer>
+   </extension>
+   <extension
+         point="de.ovgu.featureide.core.wizard">
+      <newProjectWizard
+            class="de.ovgu.featureide.core.wizardextension.DefaultNewFeatureProjectWizardExtension"
+            composerid="de.ovgu.featureide.composer.featurec"
+            id="de.ovgu.featureide.core.featurec.newProjectWizard"
+            name="FeatureCNewProjectWizard">
+      </newProjectWizard>
+   </extension>
+
+</plugin>

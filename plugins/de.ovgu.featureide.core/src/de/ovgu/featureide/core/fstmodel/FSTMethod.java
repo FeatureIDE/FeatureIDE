@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -21,6 +21,9 @@
 package de.ovgu.featureide.core.fstmodel;
 
 import java.util.LinkedList;
+import java.util.TreeSet;
+
+import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 
 /**
  * Representation of a method at a role.
@@ -35,6 +38,16 @@ public class FSTMethod extends RoleElement<FSTMethod> {
 	private String contract;
 	private String compKey;
 	private int startLineOfContract;
+	private final TreeSet<FSTDirective> directives = new TreeSet<FSTDirective>();
+	
+	public void add(FSTDirective directive) {
+		directives.add(directive);
+		directive.setRole(super.role);
+	}
+	
+	public TreeSet<FSTDirective> getFSTDirectives() {
+		return directives;
+	}
 
 	public int getStartLineOfContract() {
 		return startLineOfContract;

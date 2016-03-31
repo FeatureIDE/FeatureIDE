@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -27,11 +27,11 @@ import org.junit.Test;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
 /**
- * TODO description
+ * Test class of the {@link GuidslReader}.
  *  
  * @author Fabian Benduhn
  */
@@ -45,7 +45,7 @@ public class TGuidslReader {
 	
 	@Test
 	public void testReaderAndGroupAllOptional() throws UnsupportedModelException {
-		IFeatureModel model = FeatureModelFactory.getInstance().createFeatureModel();
+		IFeatureModel model = FMFactoryManager.getFactory().createFeatureModel();
 		GuidslReader reader = new GuidslReader(model);
 
 		reader.readFromString(AND_GROUP_ALL_OPTIONAL);
@@ -57,7 +57,7 @@ public class TGuidslReader {
 
 	@Test
 	public void testReaderAndGroupAMandatory() throws UnsupportedModelException {
-		IFeatureModel model = FeatureModelFactory.getInstance().createFeatureModel();
+		IFeatureModel model = FMFactoryManager.getFactory().createFeatureModel();
 		GuidslReader reader = new GuidslReader(model);
 
 		reader.readFromString(AND_GROUP_A_MANDATORY);
@@ -70,7 +70,7 @@ public class TGuidslReader {
 
 	@Test
 	public void testReaderOrGroup() throws UnsupportedModelException {
-		IFeatureModel model = FeatureModelFactory.getInstance().createFeatureModel();
+		IFeatureModel model = FMFactoryManager.getFactory().createFeatureModel();
 		GuidslReader reader = new GuidslReader(model);
 
 		reader.readFromString(OR_GROUP);
@@ -82,7 +82,7 @@ public class TGuidslReader {
 
 	@Test
 	public void testReaderAlternativeGroup() throws UnsupportedModelException {
-		IFeatureModel model = FeatureModelFactory.getInstance().createFeatureModel();
+		IFeatureModel model = FMFactoryManager.getFactory().createFeatureModel();
 		GuidslReader reader = new GuidslReader(model);
 
 		reader.readFromString(ALTERNATIVE_GROUP);

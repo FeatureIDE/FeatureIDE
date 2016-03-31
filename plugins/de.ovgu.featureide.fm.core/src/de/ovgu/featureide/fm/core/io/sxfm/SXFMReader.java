@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -64,8 +64,8 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.base.impl.Feature;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
@@ -74,6 +74,7 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
  * 
  * @author Fabian Wielgorz
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class SXFMReader extends AbstractFeatureModelReader {
 	
@@ -209,7 +210,7 @@ public class SXFMReader extends AbstractFeatureModelReader {
      */
     private void buildFeatureTree(BufferedReader reader) throws UnsupportedModelException {
     	try {
-    		IFeatureModel model = FeatureModelFactory.getInstance().createFeatureModel();
+    		IFeatureModel model = FMFactoryManager.getFactory().createFeatureModel();
     		FeatureIndent lastFeat = new FeatureIndent(model, -1);
     		// List of Features with arbitrary cardinalities
     		LinkedList<FeatCardinality> arbCardGroupFeats = new LinkedList<FeatCardinality>();

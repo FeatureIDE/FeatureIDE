@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -27,12 +27,12 @@ import de.ovgu.featureide.core.fstmodel.RoleElement;
 
 /**
  * 
+ * Filter to hide fields in the collaboration outline.
+ * 
  * @author Dominic Labsch	
- * @author Daniel Püsche
+ * @author Daniel Pï¿½sche
  */
-
-
-public class HideAllFields implements IFilter {
+public class HideAllFields implements ICollaborationOutlineFilter {
 
 
 	@Override

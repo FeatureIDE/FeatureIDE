@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -23,6 +23,7 @@ package de.ovgu.featureide.core.builder;
 import static de.ovgu.featureide.fm.core.localization.StringTable.JAVA;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -55,12 +56,15 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.ConfigurationWriter;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
+import de.ovgu.featureide.fm.core.io.manager.FileWriter;
 
 /**
  * Abstract class for FeatureIDE composer extensions with default values.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke (Feature Interface)
  */
 @SuppressWarnings(RESTRICTION)
 public abstract class ComposerExtensionClass implements IComposerExtensionClass {
@@ -323,11 +327,14 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	public void buildConfiguration(IFolder folder, Configuration configuration, String configurationName) {
 		try {
 			if (!folder.exists()) {
-				folder.create(true, false, null);
+				folder.create(true, true, null);
 			}
-			IFile configurationFile = folder.getFile(configurationName + "." + getConfigurationExtension());
-			ConfigurationWriter writer = new ConfigurationWriter(configuration);
-			writer.saveToFile(configurationFile);
+			final IPersistentFormat<Configuration> format = ConfigurationManager.getFormat(ConfigurationManager.FormatType.CONFIG);
+			IFile configurationFile = folder.getFile(configurationName + "." + format.getSuffix());
+			final FileWriter<Configuration> writer = new FileWriter<>(format);
+			writer.setPath(Paths.get(configurationFile.getLocationURI()));
+			writer.setObject(configuration);
+			writer.save();
 			copyNotComposedFiles(configuration, folder);
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
@@ -366,8 +373,8 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 		return false;
 	}
 
-	public boolean hasCompositionMechanisms() {
-		return false;
+	public String[] getCompositionMechanisms() {
+		return new String[0];
 	}
 
 	public boolean createFolderForFeatures() {
@@ -406,6 +413,11 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	
 	@Override
 	public <T extends IComposerObject> T getComposerObjectInstance(Class<T> c)  {
+		return null;
+	}
+	
+	@Override
+	public Mechanism getGenerationMechanism() {
 		return null;
 	}
 }

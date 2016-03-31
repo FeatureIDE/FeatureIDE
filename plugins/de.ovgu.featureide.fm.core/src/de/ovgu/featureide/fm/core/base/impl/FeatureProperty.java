@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,37 +20,36 @@
  */
 package de.ovgu.featureide.fm.core.base.impl;
 
-import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 
 import de.ovgu.featureide.fm.core.FeatureStatus;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureProperty;
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
-import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 
 /**
  * All additional properties of an {@link IFeature}.
  * 
  * @author Sebastian Krieter
- * 
+ * @author Marcus Pinnecke * 
  */
-public class FeatureProperty implements IFeatureProperty, PropertyConstants {
+public class FeatureProperty implements IFeatureProperty {
 
 	protected final IFeature correspondingFeature;
 
-	protected CharSequence description;
+	protected String description;
 	protected FeatureStatus status;
 
 	public FeatureProperty(FeatureProperty oldProperty, IFeature correspondingFeature) {
 		this.correspondingFeature = correspondingFeature != null ? correspondingFeature : oldProperty.correspondingFeature;
-
-		description = new String(oldProperty.description.toString());
+		description = oldProperty.description.toString();
 		status = oldProperty.status;
 	}
 
 	public FeatureProperty(IFeature correspondingFeature) {
 		this.correspondingFeature = correspondingFeature;
-		description = new String("");
+		description = "";
 		status = FeatureStatus.NORMAL;
 	}
 
@@ -64,9 +63,9 @@ public class FeatureProperty implements IFeatureProperty, PropertyConstants {
 	 * @return The description of the Feature.
 	 */
 	@Override
-	@CheckForNull
+	@Nonnull
 	public String getDescription() {
-		return description.toString();
+		return description;
 	}
 
 	@Override
@@ -85,8 +84,8 @@ public class FeatureProperty implements IFeatureProperty, PropertyConstants {
 	}
 
 	@Override
-	public void setDescription(CharSequence description) {
-		this.description = description;
+	public void setDescription(@Nonnull final CharSequence description) {
+		this.description = description.toString();
 	}
 
 	@Override
@@ -102,7 +101,7 @@ public class FeatureProperty implements IFeatureProperty, PropertyConstants {
 	public void setFeatureStatus(FeatureStatus stat, boolean fire) {
 		this.status = stat;
 		if (fire) {
-			correspondingFeature.fireEvent(new FeatureModelEvent(this, ATTRIBUTE_CHANGED, Boolean.FALSE, Boolean.TRUE));
+			correspondingFeature.fireEvent(new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED, Boolean.FALSE, Boolean.TRUE));
 		}
 	}
 

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -34,7 +34,7 @@ import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.Comparison;
 import de.ovgu.featureide.fm.core.editing.ModelComparator;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
@@ -46,6 +46,7 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
  * A class to evaluate the performance of the comparison of feature models.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class Evaluation {
 	
@@ -117,13 +118,13 @@ public class Evaluation {
 						System.out.println(file);
 						IFeatureModel fm1;
 						if (file.exists()) {
-							fm1 = FeatureModelFactory.getInstance().createFeatureModel();
+							fm1 = FMFactoryManager.getFactory().createFeatureModel();
 							reader.setFeatureModel(fm1);
 							reader.readFromFile(file);
 						}
 						else {
 							if (!folder.exists())
-								folder.create(false, false, null);
+								folder.create(false, true, null);
 							fm1 = Generator.generateFeatureModel(id, size);
 							writer.setFeatureModel(fm1);
 							writer.writeToFile(file);
@@ -139,13 +140,13 @@ public class Evaluation {
 								try {
 									IFolder subfolder = folder.getFolder(editName[m].name());
 									if (!subfolder.exists())
-										subfolder.create(true, false, null);
+										subfolder.create(true, true, null);
 									IFile file2 = subfolder.getFile(size + "-" + id + "-" + edits + "-" + (seed+m) + ".m");
 									System.out.println("\t" + file2);
 
 									IFeatureModel fm2;
 									if (file2.exists()) {
-										fm2 = FeatureModelFactory.getInstance().createFeatureModel();
+										fm2 = FMFactoryManager.getFactory().createFeatureModel();
 										reader.setFeatureModel(fm2);
 										reader.readFromFile(file2);
 									}
@@ -212,10 +213,10 @@ public class Evaluation {
 					boolean valid = false;
 					try {
 						if (!folder.exists())
-							folder.create(false, false, null);
+							folder.create(false, true, null);
 						writer.writeToFile(file);
 						
-						IFeatureModel fmout = FeatureModelFactory.getInstance().createFeatureModel();
+						IFeatureModel fmout = FMFactoryManager.getFactory().createFeatureModel();
 						//IFeatureModelReader reader = new XmlFeatureModelReader(fmout,project);
 						FeatureModelReaderIFileWrapper reader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(fmout));
 						reader.readFromFile(file);
@@ -243,7 +244,7 @@ public class Evaluation {
 					//open feature model
 					IFolder folder = project.getFolder(size + "");
 					IFile file = folder.getFile(size + "-" + id + ".m");
-					IFeatureModel fm = FeatureModelFactory.getInstance().createFeatureModel();
+					IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
 					//IFeatureModelReader reader = new XmlFeatureModelReader(fm,project);
 					FeatureModelReaderIFileWrapper reader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(fm));
 					//check if it is valid

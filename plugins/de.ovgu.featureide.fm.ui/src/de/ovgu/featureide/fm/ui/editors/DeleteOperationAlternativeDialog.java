@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -66,14 +66,15 @@ import org.eclipse.swt.widgets.Table;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.DeleteOperation;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureDeleteOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.DeleteFeatureOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ElementDeleteOperation;
 
 /**
  * Provides a dialog for choosing an alternative {@link IFeature} for the Feature to delete.
  * 
  * @author Florian Proksch
  * @author Stefan Krueger
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class DeleteOperationAlternativeDialog implements GUIDefaults {
 	Shell shell;
@@ -84,7 +85,7 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 	Table featureTable;
 	Map<IFeature, List<IFeature>> featureMap;
 
-	private DeleteOperation parent;
+	private ElementDeleteOperation parent;
 
 	/**
 	 * Opens a dialog to choose alternative features the given feature should be replaced with.
@@ -93,7 +94,7 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 	 * @param featureMap
 	 * @param deleteOperation
 	 */
-	public DeleteOperationAlternativeDialog(IFeatureModel featureModel, Map<IFeature, List<IFeature>> featureMap, DeleteOperation parent) {
+	public DeleteOperationAlternativeDialog(IFeatureModel featureModel, Map<IFeature, List<IFeature>> featureMap, ElementDeleteOperation parent) {
 		this.featureMap = featureMap;
 		this.featureModel = featureModel;
 		this.parent = parent;
@@ -365,7 +366,7 @@ public class DeleteOperationAlternativeDialog implements GUIDefaults {
 
 		for (int i = 0; i < alternativefeatureTable.getSelectionCount(); i++) {
 			toBeDeleted = (IFeature) (alternativefeatureTable.getSelection()[i]).getData();
-			parent.executeOperation(new FeatureDeleteOperation(featureModel, toBeDeleted, alternative));
+			parent.addOperation(new DeleteFeatureOperation(featureModel, toBeDeleted, alternative));
 			delFeatures.add(toBeDeleted);
 		}
 

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -64,19 +64,19 @@ import de.ovgu.featureide.ui.UIPlugin;
  */
 @SuppressWarnings(RESTRICTION)
 public class Generator extends Job implements IConfigurationBuilderBasics {
-	
+
 	protected static final String JAVA_NATURE = "org.eclipse.jdt.core.javanature";
-	
+
 	/**
 	 * A counter that shows how many configurations are built by this job
 	 */
 	int generated = 0;
-	
+
 	/**
 	 * The builder containing this job
 	 */
 	ConfigurationBuilder builder;
-	
+
 	/**
 	 * The number of this job.
 	 */
@@ -89,11 +89,11 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 
 	private BuilderConfiguration configuration;
 
-	 /**
-	  * 
-	  * @param nr The number of the job
-	  * @param builder The {@link ConfigurationBuilder} containing the {@link Generator}
-	  */
+	/**
+	 * 
+	 * @param nr The number of the job
+	 * @param builder The {@link ConfigurationBuilder} containing the {@link Generator}
+	 */
 	public Generator(int nr, ConfigurationBuilder builder) {
 		super(nr == 0 ? GENERATOR : GENARATOR_NR_ + nr);
 		this.nr = nr;
@@ -101,7 +101,7 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 		if (!builder.createNewProjects) {
 			try {
 				if (builder.featureProject.getProject().hasNature(JAVA_NATURE)) {
-					compiler = new JavaCompiler(nr , this);
+					compiler = new JavaCompiler(nr, this);
 					testRunner = new TestRunner(compiler.tmp, builder.testResults, builder);
 				}
 			} catch (CoreException e) {
@@ -109,9 +109,10 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 			}
 		}
 	}
-	
+
 	/**
 	 * Generates the configurations of CongfigurationBuilder.configurations
+	 * 
 	 * @param monitor
 	 */
 	@Override
@@ -126,13 +127,14 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 					}
 					if (builder.sorter.getBufferSize() == 0) {
 						monitor.subTask("(Waiting)");
-						while (builder.sorter.getBufferSize() == 0) {
+						while (builder.sorter.getBufferSize() == 0 || !builder.sorter.sorted) {
 							/** the job waits for a new configuration to build **/
 							try {
-								// TODO this should be done with wait() and notify()
 								wait(1000);
-								if ((builder.sorter.getBufferSize() == 0 && builder.finish) || 
-										builder.cancelGeneratorJobs) {
+								if ((builder.sorter.getBufferSize() == 0 && builder.finish) || builder.cancelGeneratorJobs) {
+									return Status.OK_STATUS;
+								}
+								if (monitor.isCanceled()) {
 									return Status.OK_STATUS;
 								}
 							} catch (InterruptedException e) {
@@ -142,43 +144,40 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 					}
 				}
 				monitor.subTask("(Build)");
+				System.out.println("Generator.run()" + builder.getClass());
 				configuration = builder.getConfiguration();
 				if (configuration == null) {
 					continue;
 				}
-				
+				System.out.println("Generator.run()2");
 				String name = configuration.getName();
 				switch (builder.buildType) {
 				case ALL_CURRENT:
 					if (builder.createNewProjects) {
 						buildConfiguration(builder.featureProject.getProjectName() + SEPARATOR_CONFIGURATION + name, configuration);
 					} else {
-						builder.featureProject.getComposer().buildConfiguration(builder.folder.getFolder(name), 
-								configuration, name);
+						builder.featureProject.getComposer().buildConfiguration(builder.folder.getFolder(name), configuration, name);
 					}
 					break;
 				case INTEGRATION:
 					if (builder.createNewProjects) {
 						buildConfiguration(builder.featureProject.getProjectName() + SEPARATOR_INTEGRATION + name, configuration);
 					} else {
-						builder.featureProject.getComposer().buildConfiguration(builder.folder.getFolder(name), 
-								configuration, name);
+						builder.featureProject.getComposer().buildConfiguration(builder.folder.getFolder(name), configuration, name);
 					}
 					break;
 				case ALL_VALID:
 					if (builder.createNewProjects) {
 						buildConfiguration(builder.featureProject.getProjectName() + SEPARATOR_VARIANT + name, configuration);
 					} else {
-						builder.featureProject.getComposer().buildConfiguration(builder.folder.getFolder(name), 
-								configuration, name);
+						builder.featureProject.getComposer().buildConfiguration(builder.folder.getFolder(name), configuration, name);
 					}
 					break;
 				case T_WISE:
 					if (builder.createNewProjects) {
 						buildConfiguration(builder.featureProject.getProjectName() + SEPARATOR_T_WISE + name, configuration);
 					} else {
-						builder.featureProject.getComposer().buildConfiguration(builder.folder.getFolder(name), 
-								configuration, name);
+						builder.featureProject.getComposer().buildConfiguration(builder.folder.getFolder(name), configuration, name);
 					}
 					break;
 				}
@@ -190,7 +189,7 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 						testRunner.runTests(configuration);
 					}
 				}
-				
+
 				builder.builtConfigurations++;
 			}
 		} catch (Exception e) {
@@ -210,13 +209,14 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 
 	/**
 	 * Builds the configuration in a new project with the given name.
+	 * 
 	 * @param name The name of the new project
 	 */
 	void buildConfiguration(String name, Configuration configuration) {
 		IPath p2 = new Path("/" + name);
 		ConfigurationProject project = new ConfigurationProject(p2, (Workspace) builder.featureProject.getProject().getWorkspace());
 		try {
-			if (!project.exists()) { 
+			if (!project.exists()) {
 				project.create(null);
 			}
 			project.open(null);
@@ -231,14 +231,14 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 		} catch (CoreException e) {
 			UIPlugin.getDefault().logError(e);
 		}
-			
+
 		final IComposerExtensionClass composer = builder.featureProject.getComposer();
 		final IFolder sourceFolder = project.getFolder("src");
 		composer.buildConfiguration(sourceFolder, configuration, name);
 		if (composer instanceof PPComposerExtensionClass) {
-			((PPComposerExtensionClass)composer).postProcess(sourceFolder);
+			((PPComposerExtensionClass) composer).postProcess(sourceFolder);
 		}
-			
+
 		try {
 			IFile modelFile = builder.featureProject.getModelFile();
 			modelFile.copy(project.getFile(modelFile.getName()).getFullPath(), true, null);
@@ -250,6 +250,7 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 
 	/**
 	 * Sets the classpath entries for the newly created project
+	 * 
 	 * @param p The new project
 	 */
 	// TODO remove redundant calculations for each configuration
@@ -259,15 +260,14 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 		JavaProject newProject = new JavaProject(p, null);
 		try {
 			IClasspathEntry[] entries = baseProject.getRawClasspath().clone();
-			for (int i = 0;i < entries.length;i++) {
+			for (int i = 0; i < entries.length; i++) {
 				// set source entry to "src"
 				IClasspathEntry e = entries[i];
 				if (entries[i].getEntryKind() == IClasspathEntry.CPE_SOURCE) {
-					entries[i] = new ClasspathEntry(e.getContentKind(), e.getEntryKind(), 
-								new Path("src"), e.getInclusionPatterns(), e.getExclusionPatterns(), 
-								e.getSourceAttachmentPath(), e.getSourceAttachmentRootPath(), null, 
-								e.isExported(), e.getAccessRules(), e.combineAccessRules(), e.getExtraAttributes());
-				} else if (e.getEntryKind() == IClasspathEntry.CPE_LIBRARY){
+					entries[i] = new ClasspathEntry(e.getContentKind(), e.getEntryKind(), new Path("src"), e.getInclusionPatterns(), e.getExclusionPatterns(),
+							e.getSourceAttachmentPath(), e.getSourceAttachmentRootPath(), null, e.isExported(), e.getAccessRules(), e.combineAccessRules(),
+							e.getExtraAttributes());
+				} else if (e.getEntryKind() == IClasspathEntry.CPE_LIBRARY) {
 					// set the library entries and copy the libraries 
 					// which are direct at the old projects folder  
 					IPath path = e.getPath().removeFirstSegments(1);
@@ -285,10 +285,9 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 					if (!destination.exists()) {
 						file.copy(destination.getFullPath(), true, null);
 					}
-					entries[i] = new ClasspathEntry(e.getContentKind(), e.getEntryKind(), 
-							e.getPath().removeFirstSegments(1), e.getInclusionPatterns(), e.getExclusionPatterns(), 
-							e.getSourceAttachmentPath(), e.getSourceAttachmentRootPath(), null, 
-							e.isExported(), e.getAccessRules(), e.combineAccessRules(), e.getExtraAttributes());
+					entries[i] = new ClasspathEntry(e.getContentKind(), e.getEntryKind(), e.getPath().removeFirstSegments(1), e.getInclusionPatterns(),
+							e.getExclusionPatterns(), e.getSourceAttachmentPath(), e.getSourceAttachmentRootPath(), null, e.isExported(), e.getAccessRules(),
+							e.combineAccessRules(), e.getExtraAttributes());
 				}
 			}
 			newProject.setRawClasspath(entries, null);
@@ -301,13 +300,14 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 
 	/**
 	 * Creates all parent folders of the parent folder
+	 * 
 	 * @param parent The folder containing the library
 	 */
 	private void createLibFolder(IContainer parent) {
 		if (!parent.exists() && parent instanceof IFolder) {
 			createLibFolder(parent.getParent());
 			try {
-				((IFolder)parent).create(true, true, null);
+				((IFolder) parent).create(true, true, null);
 			} catch (CoreException e) {
 				UIPlugin.getDefault().logError(e);
 			}
@@ -316,15 +316,15 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 
 	/**
 	 * @param description
-	 * @param iProjectDescription 
+	 * @param iProjectDescription
 	 * @return
-	 * @throws CoreException 
+	 * @throws CoreException
 	 */
 	private void setDescription(IProject newProject) throws CoreException {
 		IProject project = builder.featureProject.getProject();
 		IProjectDescription newDescription = newProject.getDescription();
 		IProjectDescription oldDescription = project.getDescription();
-		
+
 		// remove FeatureIDE build commands
 		ICommand[] buildSpec = oldDescription.getBuildSpec();
 		ICommand[] commands = new ICommand[buildSpec.length - 1];
@@ -337,7 +337,7 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 			i++;
 		}
 		newDescription.setBuildSpec(commands);
-		
+
 		// remove the FeatureIDE nature
 		String[] natureIDs = oldDescription.getNatureIds();
 		String[] natures = new String[natureIDs.length - 1];
@@ -350,7 +350,7 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 			j++;
 		}
 		newDescription.setNatureIds(natures);
-		
+
 		newProject.setDescription(newDescription, null);
 	}
 }

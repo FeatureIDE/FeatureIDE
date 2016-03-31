@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -25,7 +25,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslReader;
@@ -59,7 +59,7 @@ public abstract class AbstractConfigurationTest {
 	abstract IFeatureModel loadModel();
 	
 	protected static IFeatureModel loadGUIDSL(String grammar) {
-		IFeatureModel fm = FeatureModelFactory.getInstance().createFeatureModel();
+		IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
 		IFeatureModelReader reader = new GuidslReader(fm);
 		try {
 			reader.readFromString(grammar);
@@ -84,7 +84,7 @@ public abstract class AbstractConfigurationTest {
 			xml += constraintsXml + "</constraints>";
 		}
 		xml += "</featureModel>";
-		IFeatureModel fm = FeatureModelFactory.getInstance().createFeatureModel();
+		IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
 		IFeatureModelReader reader = new XmlFeatureModelReader(fm);
 		try {
 			reader.readFromString(xml);

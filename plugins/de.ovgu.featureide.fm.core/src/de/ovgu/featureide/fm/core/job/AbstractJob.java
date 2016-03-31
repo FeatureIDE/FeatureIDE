@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -36,6 +36,7 @@ import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
  * Abstract eclipse job with support for {@link JobFinishListener}.
  * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke (Feature Interface)
  */
 abstract class AbstractJob extends Job implements IJob {
 	protected final WorkMonitor workMonitor = new WorkMonitor();

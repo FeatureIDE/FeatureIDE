@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,13 +20,19 @@
  */
 package de.ovgu.featureide.fm.core;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
+
+import java.util.Collection;
+import java.util.LinkedList;
 
 import org.junit.Test;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 
 /**
  * Tests for the {@link IFeatureModel}.
@@ -35,10 +41,11 @@ import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
  */
 public class TFeatureModel {
 
+	private static final IFeatureModelFactory factory = FMFactoryManager.getFactory();
 	@Test
     public void recordGetFeatureName(){
-        IFeatureModel fm = FeatureModelFactory.getInstance().createFeatureModel();
-        IFeature feature = FeatureModelFactory.getInstance().createFeature(fm, "test_root");
+        IFeatureModel fm = factory.createFeatureModel();
+        IFeature feature = factory.createFeature(fm, "test_root");
         fm.addFeature(feature);
         fm.getStructure().setRoot(feature.getStructure());
         IFeature root = fm.getFeature("test_root");
@@ -48,6 +55,39 @@ public class TFeatureModel {
         IFeature root2 = clonedModel.getFeature("test_root");
         
         assertSame(root2.getStructure(), clonedModel.getStructure().getRoot());
+	}
+	
+	@Test
+	public void getFeatureOrderListTest() {
+		IFeatureModel fm = factory.createFeatureModel();
+		final  Collection<String> expectedOrder = new LinkedList<String>();
+		Collection<String> actualOrder = fm.getFeatureOrderList();
+		assertEquals(expectedOrder, actualOrder);
+		
+		IFeature root = factory.createFeature(fm, "root");
+        fm.addFeature(root);
+        fm.getStructure().setRoot(root.getStructure());
+        expectedOrder.add(root.getName());
+        actualOrder = fm.getFeatureOrderList();
+        assertEquals(expectedOrder, actualOrder);
+        
+        IFeature A = factory.createFeature(fm, "A");
+        FeatureUtils.addChild(root, A);
+        expectedOrder.add(A.getName());
+        actualOrder = fm.getFeatureOrderList();
+        assertEquals(expectedOrder, actualOrder);
+        
+        IFeature B = factory.createFeature(fm, "B");
+        FeatureUtils.addChild(root, B);
+        expectedOrder.add(B.getName());
+        actualOrder = fm.getFeatureOrderList();
+        assertEquals(expectedOrder, actualOrder);
+        
+        IFeature C = factory.createFeature(fm, "C");
+        FeatureUtils.addChild(B, C);
+        expectedOrder.add(C.getName());
+        actualOrder = fm.getFeatureOrderList();
+        assertEquals(expectedOrder, actualOrder);
 	}
 	
 }

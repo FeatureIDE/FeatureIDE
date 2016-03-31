@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -49,11 +49,11 @@ public class VerticalLayout extends FeatureDiagramLayoutManager {
 	private int height;
 
 	public void layoutFeatureModel(IGraphicalFeatureModel featureModel) {
-		heightStep = FeatureUIHelper.getSize(featureModel.getFeatures().getObject()).height + featureSpaceY;
+		heightStep = FeatureUIHelper.getSize(FeatureUIHelper.getGraphicalRootFeature(featureModel)).height + featureSpaceY;
 		height = FMPropertyManager.getLayoutMarginX() - heightStep;
 
-		calculateLevelWidth(featureModel.getFeatures().getObject());
-		centerOther(featureModel.getFeatures().getObject(), 0);
+		calculateLevelWidth(FeatureUIHelper.getGraphicalRootFeature(featureModel));
+		centerOther(FeatureUIHelper.getGraphicalRootFeature(featureModel), 0);
 		layout(height, featureModel.getConstraints());
 	}
 
@@ -62,10 +62,10 @@ public class VerticalLayout extends FeatureDiagramLayoutManager {
 	 * (centered by their children's positions
 	 */
 	private int centerOther(IGraphicalFeature parent, int level) {
-		final Iterable<? extends IGraphicalFeature> children = parent.getTree().getChildrenObjects();
+		final Iterable<? extends IGraphicalFeature> children = FeatureUIHelper.getGraphicalChildren(parent);
 		if (!children.iterator().hasNext()) {
 			height += heightStep;
-			FeatureUIHelper.setLocation(parent, new Point(levelWidth.get(level), height));
+			setLocation(parent, new Point(levelWidth.get(level), height));
 			return height;
 		} else {
 			final Iterator<? extends IGraphicalFeature> it = children.iterator();
@@ -76,7 +76,7 @@ public class VerticalLayout extends FeatureDiagramLayoutManager {
 			}
 
 			final int yPos = (min + max) >> 1;
-			FeatureUIHelper.setLocation(parent, new Point(levelWidth.get(level), yPos));
+			setLocation(parent, new Point(levelWidth.get(level), yPos));
 			return yPos;
 		}
 	}
@@ -100,7 +100,7 @@ public class VerticalLayout extends FeatureDiagramLayoutManager {
 			levelWidth.set(level, parentWidth);
 		}
 
-		for (IGraphicalFeature feature : parent.getTree().getChildrenObjects()) {
+		for (IGraphicalFeature feature : FeatureUIHelper.getGraphicalChildren(parent)) {
 			calculateLevelWidth(feature, level + 1);
 		}
 	}

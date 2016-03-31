@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -53,9 +53,9 @@ import de.ovgu.featureide.core.mpl.job.statistics.PrintExtendedSignaturesJob;
 import de.ovgu.featureide.core.mpl.job.statistics.PrintStatisticsJob;
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
-import de.ovgu.featureide.fm.core.base.event.IFeatureModelListener;
-import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.io.IOConstants;
 
 /** 
@@ -191,12 +191,12 @@ public class MPLPlugin extends AbstractCorePlugin {
 		final InterfaceProject interfaceProject = new InterfaceProject(project, curFeatureProject);
 		
 		projectMap.put(project.getName(), interfaceProject);
-		interfaceProject.getFeatureModel().addListener(new IFeatureModelListener() {
+		interfaceProject.getFeatureModel().addListener(new IEventListener() {
 			@Override
-			public void propertyChange(FeatureModelEvent evt) {
-				if (PropertyConstants.MODEL_DATA_CHANGED.equals(evt.getPropertyName())) {
+			public void propertyChange(FeatureIDEEvent evt) {
+				if (EventType.MODEL_DATA_CHANGED == evt.getEventType()) {
 //					interfaceProject.loadSignatures(true);
-				} else if (PropertyConstants.MODEL_LAYOUT_CHANGED.equals(evt.getPropertyName())) {
+				} else if (EventType.MODEL_LAYOUT_CHANGED == evt.getEventType()) {
 //					interfaceProject.loadSignatures(true);
 				}
 			}

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.core.featuremodeling;
 
+import java.nio.file.Paths;
+
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -31,7 +33,9 @@ import org.eclipse.core.runtime.Path;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.ConfigurationWriter;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
+import de.ovgu.featureide.fm.core.io.manager.FileWriter;
 
 /**
  * 
@@ -79,11 +83,14 @@ public class FeatureModeling extends ComposerExtensionClass {
 		try {
 			IContainer parent = folder.getParent();
 			if (!parent.exists()) {
-				folder.create(true, false, null);
+				folder.create(true, true, null);
 			}
-			IFile configurationFile = parent.getFile(new Path(congurationName + "." + getConfigurationExtension()));
-			ConfigurationWriter writer = new ConfigurationWriter(configuration);
-			writer.saveToFile(configurationFile);
+			final IPersistentFormat<Configuration> format = ConfigurationManager.getFormat(ConfigurationManager.FormatType.CONFIG);
+			IFile configurationFile = parent.getFile(new Path(congurationName + "." + format.getSuffix()));
+			final FileWriter<Configuration> writer = new FileWriter<>(format);
+			writer.setPath(Paths.get(configurationFile.getLocationURI()));
+			writer.setObject(configuration);
+			writer.save();
 			copyNotComposedFiles(configuration, folder);
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);

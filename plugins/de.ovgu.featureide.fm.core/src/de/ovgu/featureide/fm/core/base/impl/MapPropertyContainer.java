@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -27,7 +27,18 @@ import java.util.Set;
 
 import de.ovgu.featureide.fm.core.base.IPropertyContainer;
 
+/**
+ * @author Marcus Pinnecke
+ */
 public class MapPropertyContainer implements IPropertyContainer {
+	
+	public MapPropertyContainer() {
+		
+	}
+
+	public MapPropertyContainer(IPropertyContainer other) {
+		setEntrySet(other.entrySet());
+	}
 
 	public static Object copyObject(Type type, Object value) {
 		switch (type) {
@@ -72,7 +83,7 @@ public class MapPropertyContainer implements IPropertyContainer {
 	public Type getDataType(String key) throws NoSuchPropertyException {
 		final String mapKey = makeKey(key);
 		if (!properties.containsKey(mapKey))
-			throw new NoSuchPropertyException(key);
+			throw new NoSuchPropertyException(mapKey);
 		else
 			return types.get(mapKey);
 	}
@@ -81,8 +92,9 @@ public class MapPropertyContainer implements IPropertyContainer {
 	@Override
 	public <T> T get(String key) throws NoSuchPropertyException {
 		final String mapKey = makeKey(key);
-		if (!properties.containsKey(mapKey))
-			throw new NoSuchPropertyException(key);
+		if (!properties.containsKey(mapKey)) {
+			throw new NoSuchPropertyException(mapKey);
+		}
 		else
 			return (T) properties.get(mapKey);
 	}
@@ -113,11 +125,12 @@ public class MapPropertyContainer implements IPropertyContainer {
 		types.clear();
 
 		for (final Entry<String, Type, Object> entry : entries) {
-			final String key = new String(entry.getKey());
+			final String key = makeKey(new String(entry.getKey()));
 			final Type type = entry.getType();
 			final Object obj = copyObject(type, entry.getValue());
 			properties.put(key, obj);
 			types.put(key, type);
+			System.out.println("key="+key + ",type="+type.toString()+", val="+obj);
 		}
 	}
 
@@ -125,7 +138,7 @@ public class MapPropertyContainer implements IPropertyContainer {
 	public void remove(String key) throws NoSuchPropertyException {
 		final String mapKey = makeKey(key);
 		if (!properties.containsKey(mapKey))
-			throw new NoSuchPropertyException(key);
+			throw new NoSuchPropertyException(mapKey);
 		properties.remove(mapKey);
 		types.remove(mapKey);
 	}
@@ -133,7 +146,7 @@ public class MapPropertyContainer implements IPropertyContainer {
 	@Override
 	public <T> void set(String key, Type type, T value) {
 		final String mapKey = makeKey(key);
-		properties.put(key, value);
+		properties.put(mapKey, value);
 		types.put(mapKey, type);
 	}
 

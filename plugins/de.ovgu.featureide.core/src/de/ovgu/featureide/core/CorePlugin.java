@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -25,6 +25,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.AND_COMPOSER_T
 import static de.ovgu.featureide.fm.core.localization.StringTable.CHANGE_OLD_NATURE_TO_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.COULD_NOT_SET_PERSISTANT_PROPERTY;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CONFIG;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CONF;
 import static de.ovgu.featureide.fm.core.localization.StringTable.EQUATION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ERROR_WHILE_CREATING_FEATURE_MODEL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.EXPRESSION;
@@ -96,7 +97,7 @@ import de.ovgu.featureide.core.signature.filter.ContextFilter;
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 
@@ -107,6 +108,7 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
  * @author Marcus Leich
  * @author Tom Brosch
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class CorePlugin extends AbstractCorePlugin {
 
@@ -153,7 +155,7 @@ public class CorePlugin extends AbstractCorePlugin {
 
 		featureProjectMap = new HashMap<IProject, IFeatureProject>();
 		for (final IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
-			try {
+			try { 
 				if (project.isOpen()) {
 					// conversion for old projects
 					IConfigurationElement[] config = Platform.getExtensionRegistry().getConfigurationElementsFor(COMPOSERS_ID);
@@ -552,7 +554,7 @@ public class CorePlugin extends AbstractCorePlugin {
 		createFolder(project, sourcePath);
 		createFolder(project, configPath);
 		createFolder(project, buildPath);
-		IFeatureModel featureModel = FeatureModelFactory.getInstance().createFeatureModel();
+		IFeatureModel featureModel = FMFactoryManager.getFactory().createFeatureModel();
 		featureModel.initFMComposerExtension(project);
 		featureModel.createDefaultValues(project.getName());
 		try {
@@ -615,6 +617,7 @@ public class CorePlugin extends AbstractCorePlugin {
 		extensions.add(CONFIG);
 		extensions.add(EQUATION);
 		extensions.add(EXPRESSION);
+		extensions.add(CONF);
 		return extensions;
 	}
 

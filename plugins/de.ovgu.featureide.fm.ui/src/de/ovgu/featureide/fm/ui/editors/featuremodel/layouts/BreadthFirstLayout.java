@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -34,6 +34,7 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * Layouts the features at the feature diagram using a breadth first search.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke
  */
 public class BreadthFirstLayout extends FeatureDiagramLayoutManager {
 
@@ -47,9 +48,9 @@ public class BreadthFirstLayout extends FeatureDiagramLayoutManager {
 	int yoffset;
 
 	@Override
-	public void layoutFeatureModel(IGraphicalFeatureModel featureModel) {
+	protected void layoutFeatureModel(IGraphicalFeatureModel featureModel) {
 		yoffset = 0;
-		IGraphicalFeature root = featureModel.getFeatures().getObject();
+		IGraphicalFeature root = FeatureUIHelper.getGraphicalFeature(featureModel.getFeatureModel().getStructure().getRoot(), featureModel);
 		layout(root);
 		layout(yoffset, featureModel.getConstraints());
 	}
@@ -77,13 +78,13 @@ public class BreadthFirstLayout extends FeatureDiagramLayoutManager {
 			int levelSize = list.size();
 			for (int i = 0; i < levelSize; i++) {
 				IGraphicalFeature feature = list.removeFirst();
-				FeatureUIHelper.setLocation(feature, new Point(xoffset, yoffset));
+				setLocation(feature, new Point(xoffset, yoffset));
 				xoffset += FeatureUIHelper.getSize(feature).width + FMPropertyManager.getFeatureSpaceX();
 				//add the features children
 				if (showHidden) {
-					list.addAll(Functional.toList(feature.getTree().getChildrenObjects()));
+					list.addAll(FeatureUIHelper.getGraphicalChildren(feature));
 				} else {
-					list.addAll(Functional.toList(Functional.filter(feature.getTree().getChildrenObjects(), hiddenFilter)));
+					list.addAll(Functional.toList(Functional.filter(FeatureUIHelper.getGraphicalChildren(feature), hiddenFilter)));
 				}
 			}
 			yoffset += FMPropertyManager.getFeatureSpaceY();

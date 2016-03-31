@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -26,7 +26,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -43,12 +42,13 @@ import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureCreateCompoundOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateFeatureAboveOperation;
 
 /**
  * Creates a new feature with the currently selected features as children.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class CreateCompoundAction extends Action {
 
@@ -83,8 +83,9 @@ public class CreateCompoundAction extends Action {
 
 	@Override
 	public void run() {
-		FeatureCreateCompoundOperation op = new FeatureCreateCompoundOperation(parent, featureModel, selectedFeatures);
-		op.addContext((IUndoContext) featureModel.getUndoContext());
+		if (selectedFeatures.size() != 1)
+			throw new RuntimeException("Create compound operator for multiple selected features is not supported.");
+		CreateFeatureAboveOperation op = new CreateFeatureAboveOperation(featureModel, selectedFeatures.get(0));
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);

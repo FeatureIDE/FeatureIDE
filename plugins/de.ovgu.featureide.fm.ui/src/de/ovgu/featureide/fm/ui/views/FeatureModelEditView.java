@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -59,10 +59,10 @@ import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.progress.UIJob;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
-import de.ovgu.featureide.fm.core.base.event.IFeatureModelListener;
-import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.evaluation.Evaluation;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
@@ -82,6 +82,7 @@ import de.ovgu.featureide.fm.ui.views.featuremodeleditview.ViewLabelProvider;
  * the current editing version is compared to the last saved model.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke
  */
 public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 
@@ -167,9 +168,9 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 
 	};
 
-	private IFeatureModelListener modelListener = new IFeatureModelListener() {
-		public void propertyChange(FeatureModelEvent evt) {
-			if (!PropertyConstants.MODEL_LAYOUT_CHANGED.equals(evt.getPropertyName()))
+	private IEventListener modelListener = new IEventListener() {
+		public void propertyChange(FeatureIDEEvent evt) {
+			if (!EventType.MODEL_LAYOUT_CHANGED.equals(evt.getEventType()))
 				refresh();
 		}
 	};
@@ -293,7 +294,7 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 							if (res instanceof IFile && res.getName().endsWith(".m")) {
 								IFile fmFile = (IFile) res;
 								try {
-									IFeatureModel fm = FeatureModelFactory.getInstance().createFeatureModel();
+									IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
 
 									FeatureModelReaderIFileWrapper reader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(fm));
 									reader.readFromFile(fmFile);

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -32,11 +32,14 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.wizard.IWizardPage;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
 import org.eclipse.ui.progress.UIJob;
 import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
 
 import de.ovgu.featureide.core.wizardextension.DefaultNewFeatureProjectWizardExtension;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.ui.UIPlugin;
 
@@ -53,6 +56,7 @@ import de.ovgu.featureide.ui.UIPlugin;
  */
 public class NewFeatureProjectWizard extends BasicNewProjectResourceWizard {
 
+	private final static Image colorImage = FMUIPlugin.getDefault().getImageDescriptor("icons/FeatureIconSmall.ico").createImage();
 	public static final String ID = UIPlugin.PLUGIN_ID + ".FeatureProjectWizard";
 	
 	protected NewFeatureProjectPage page;
@@ -62,6 +66,10 @@ public class NewFeatureProjectWizard extends BasicNewProjectResourceWizard {
 	public void addPages() {
 		setWindowTitle(NEW_FEATUREIDE_PROJECT);
 		page = new NewFeatureProjectPage();
+		Shell shell = getShell();
+		if (shell != null) {
+			shell.setImage(colorImage);
+		}
 		addPage(page);
 		super.addPages();
 	}

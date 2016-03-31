@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -53,7 +53,6 @@ import java.util.Locale;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.AbstractOperation;
-import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.bindings.keys.ParseException;
 import org.eclipse.jface.fieldassist.ContentProposalAdapter;
@@ -114,8 +113,8 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.ConstraintTextValidator.ValidationMessage;
 import de.ovgu.featureide.fm.ui.editors.ConstraintTextValidator.ValidationResult;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ConstraintCreateOperation;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ConstraintEditOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateConstraintOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.EditConstraintOperation;
 
 /**
  * A simple editor for propositional constraints written below the feature
@@ -606,19 +605,16 @@ public class ConstraintDialog implements GUIDefaults {
 
 		AbstractOperation op = null;
 		if (constraint != null && featureModel.getConstraints().contains(constraint)) {
-			int index = 0;
 			for (IConstraint c : featureModel.getConstraints()) {
 				if (c == constraint) {
-					op = new ConstraintEditOperation(constraint, propNode);
+					op = new EditConstraintOperation(constraint, propNode);
 					break;
 				}
-				index++;
 			}
 		}
 		if (op == null) {
-			op = new ConstraintCreateOperation(propNode, featureModel);
+			op = new CreateConstraintOperation(propNode, featureModel);
 		}
-		op.addContext((IUndoContext) featureModel.getUndoContext());
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (ExecutionException e) {

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -23,7 +23,8 @@ package de.ovgu.featureide.core.signature.base;
 import org.prop4j.Node;
 
 /**
- * TODO description
+ * Stores information about a {@link AbstractSignature} in a certain feature.</br>
+ * An instance of this class is stored in a signature instance for every feature that implements the signature.
  * 
  * @author Sebastian Krieter
  */

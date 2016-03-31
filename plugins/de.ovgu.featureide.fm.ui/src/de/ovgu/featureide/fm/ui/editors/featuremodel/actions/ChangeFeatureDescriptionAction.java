@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -23,13 +23,16 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CHANGE_DESCRIPTION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.FEATURE_DESCRIPTION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.PLEASE_ENTER_A_DESCRIPTION_FOR_FEATURE_;
+
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.ui.editors.ChangeFeatureDescriptionDialog;
 
 /**
  * Opens dialog to change the description of a feature
  * 
- * 
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class ChangeFeatureDescriptionAction extends SingleSelectionAction {
 
@@ -49,8 +52,11 @@ public class ChangeFeatureDescriptionAction extends SingleSelectionAction {
 		dialog.open();
 		String descriptemp = dialog.getValue();
 
-		feature.getProperty().setDescription(descriptemp);
-		feature.getFeatureModel().handleModelDataChanged();
+		if (!description.equals(descriptemp.trim())) {
+			feature.getProperty().setDescription(descriptemp);
+			feature.getFeatureModel().fireEvent(new FeatureIDEEvent(feature, EventType.ATTRIBUTE_CHANGED));
+		}
+		setChecked(false);
 	}
 
 	@Override

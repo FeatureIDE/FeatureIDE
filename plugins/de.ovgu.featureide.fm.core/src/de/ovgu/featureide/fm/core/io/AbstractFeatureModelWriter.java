@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -28,6 +28,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  * If IFile support is needed, the {@link FeatureModelReaderIFileWrapper} has to be used.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public abstract class AbstractFeatureModelWriter extends AbstractObjectWriter<IFeatureModel> implements IFeatureModelWriter {
 

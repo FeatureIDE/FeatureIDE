@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -26,7 +26,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_REQUIRED_BUNDLE;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -62,16 +61,18 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
+import de.ovgu.featureide.fm.core.io.manager.FileReader;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 
 /**
  * Excludes unselected aspects form buildpath.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke (Feature Interface)
  */
 // implement buildconfiguration
 @SuppressWarnings(RESTRICTION)
@@ -126,23 +127,17 @@ public class AspectJComposer extends ComposerExtensionClass {
 			return;
 
 		Configuration configuration = new Configuration(featureProject.getFeatureModel());
-		ConfigurationReader reader = new ConfigurationReader(configuration);
+		FileReader<Configuration> reader = new FileReader<>(configPath, configuration, ConfigurationManager.getFormat(configPath));
+		reader.read();
 
-		try {
-			reader.readFromFile(config);
-		} catch (CoreException e) {
-			AspectJCorePlugin.getDefault().logError(e);
-		} catch (IOException e) {
-			AspectJCorePlugin.getDefault().logError(e);
-		}
 		LinkedList<String> selectedFeatures = new LinkedList<String>();
 		unSelectedFeatures = new LinkedList<String>();
 		for (IFeature feature : configuration.getSelectedFeatures()) {
-			selectedFeatures.add(feature.getName().toString());
+			selectedFeatures.add(feature.getName());
 		}
 		for (IFeature feature : FeatureUtils.extractConcreteFeatures(featureProject.getFeatureModel())) {
 			if (!selectedFeatures.contains(feature.getName())) {
-				unSelectedFeatures.add(feature.getName().toString());
+				unSelectedFeatures.add(feature.getName());
 			}
 		}
 
@@ -276,7 +271,7 @@ public class AspectJComposer extends ComposerExtensionClass {
 			} else if (res instanceof IFile) {
 				String name = res.getName();
 				if (name.endsWith(".aj")) {
-					IFeature feature = FeatureModelFactory.getInstance().createFeature(featureModel, folders + name.split("[.]")[0]);
+					IFeature feature = FMFactoryManager.getFactory().createFeature(featureModel, folders + name.split("[.]")[0]);
 					featureModel.getStructure().getRoot().addChild(feature.getStructure());
 					hasAspects = true;
 				}

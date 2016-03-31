@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -27,6 +27,32 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.HIDDEN;
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_COMPOUND_FEATURE_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.THE_FEATURE_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UNSUPPORTED_TYPE_IN_GUIDSL_GRAMMAR;
+
+import java.io.InputStream;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+
+import org.prop4j.And;
+import org.prop4j.Choose;
+import org.prop4j.Equals;
+import org.prop4j.Implies;
+import org.prop4j.Literal;
+import org.prop4j.Node;
+import org.prop4j.Not;
+import org.prop4j.Or;
+import org.prop4j.SatSolver;
+
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.Constraint;
+import de.ovgu.featureide.fm.core.base.impl.Feature;
+import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
+import de.ovgu.featureide.fm.core.io.Problem;
+import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import guidsl.AstListNode;
 import guidsl.AstNode;
 import guidsl.AstOptNode;
@@ -64,36 +90,11 @@ import guidsl.TermName;
 import guidsl.Var;
 import guidsl.VarStmt;
 
-import java.io.InputStream;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-
-import org.prop4j.And;
-import org.prop4j.Choose;
-import org.prop4j.Equals;
-import org.prop4j.Implies;
-import org.prop4j.Literal;
-import org.prop4j.Node;
-import org.prop4j.Not;
-import org.prop4j.Or;
-import org.prop4j.SatSolver;
-
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
-import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.Constraint;
-import de.ovgu.featureide.fm.core.base.impl.Feature;
-import de.ovgu.featureide.fm.core.functional.Functional;
-import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
-import de.ovgu.featureide.fm.core.io.ModelWarning;
-import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-
 /**
  * Parses the feature models in the GUIDSL format (grammar).
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class GuidslReader extends AbstractFeatureModelReader {
 
@@ -350,9 +351,9 @@ public class GuidslReader extends AbstractFeatureModelReader {
 			Node node = exprToNode(((EStmt) astListNode.arg[0]).getExpr());
 			try {
 				if (!new SatSolver(new Not(node.clone()), 250).isSatisfiable())
-					warnings.add(new ModelWarning(CONSTRAINT_IS_A_TAUTOLOGY_, line));
+					warnings.add(new Problem(CONSTRAINT_IS_A_TAUTOLOGY_, line));
 				if (!new SatSolver(node.clone(), 250).isSatisfiable())
-					warnings.add(new ModelWarning(CONSTRAINT_IS_NOT_SATISFIABLE_, line));
+					warnings.add(new Problem(CONSTRAINT_IS_NOT_SATISFIABLE_, line));
 			} catch (Exception e) {
 			}
 			featureModel.addConstraint(new Constraint(featureModel, node));

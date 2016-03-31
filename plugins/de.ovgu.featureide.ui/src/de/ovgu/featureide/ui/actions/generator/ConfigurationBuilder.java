@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -32,6 +32,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SATSOLVER_COMP
 
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.security.KeyStore.Builder;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -74,10 +75,11 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
+import de.ovgu.featureide.fm.core.io.manager.FileReader;
 import de.ovgu.featureide.fm.core.job.AStoppableJob;
 import de.ovgu.featureide.ui.UIPlugin;
 
@@ -105,7 +107,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 * read configuration.
 	 */
 	private Configuration configuration;
-	private ConfigurationReader reader;
+	private FileReader<Configuration> reader;
 
 	/**
 	 * The count of found configurations.
@@ -446,7 +448,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		confs = 1;
 
 		configuration = new Configuration(featureModel, false, false);
-		reader = new ConfigurationReader(configuration);
+		reader = new FileReader<>(configuration);
 
 		// method is called to initialize composer extension if not yet
 		// initialized; so only delete if sure
@@ -640,7 +642,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 */
 	protected void buildTWiseConfigurations(IFeatureProject featureProject, IProgressMonitor monitor) {
 		configuration = new Configuration(featureModel, false);
-		reader = new ConfigurationReader(configuration);
+		reader = new FileReader<>(configuration);
 		monitor.beginTask(SAMPLING, 1);
 		runSPLCATool();
 		configurationNumber = sorter.sortConfigurations(monitor);
@@ -728,7 +730,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 					build(configuration, monitor);
 				}
 			}
-			sorter.sort(monitor);
+			sorter.sortConfigurations(monitor);
 		} catch (CoreException e) {
 			LOGGER.logError(e);
 		}
@@ -743,14 +745,8 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 * @param monitor
 	 */
 	private void build(IResource configuration, IProgressMonitor monitor) {
-		try {
-			reader.readFromFile((IFile) configuration);
-			addConfiguration(new BuilderConfiguration(this.configuration, configuration.getName().split("[.]")[0]));
-		} catch (CoreException e) {
-			LOGGER.logError(e);
-		} catch (IOException e) {
-			LOGGER.logError(e);
-		}
+		reader.read(Paths.get(configuration.getLocationURI()), ConfigurationManager.getFormat(configuration.getName()));
+		addConfiguration(new BuilderConfiguration(this.configuration, configuration.getName().split("[.]")[0]));
 	}
 
 	/**

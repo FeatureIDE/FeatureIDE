@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -21,7 +21,7 @@
 package de.ovgu.featureide.core.builder;
 
 /**
- * TODO description
+ * Tagging interface. Is used for dynamic casting in {@link IComposerExtensionBase}, similar to Eclipse' {@code IAdaptable}.
  * 
  * @author Sebastian Krieter
  */

@@ -6,6 +6,9 @@ import java.util.Set;
 
 import de.ovgu.featureide.fm.core.base.IPropertyContainer;
 
+/**
+ * @author Marcus Pinnecke
+ */
 public class UnmodifiablePropertyContainer implements IPropertyContainer {
 
 	private IPropertyContainer container;

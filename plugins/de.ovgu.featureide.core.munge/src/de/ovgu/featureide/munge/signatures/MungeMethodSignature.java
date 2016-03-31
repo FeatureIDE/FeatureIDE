@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -38,13 +38,22 @@ import de.ovgu.featureide.core.signature.base.AbstractMethodSignature;
  */
 public class MungeMethodSignature extends AbstractMethodSignature {
 
-//	protected Type t;
 	protected List<SingleVariableDeclaration> p = new LinkedList<>();
 	
 
 	public MungeMethodSignature(AbstractClassSignature parent,
 			String name, int modifiers, Type returnType, List<?> parameters, boolean isConstructor) {
 		super(parent, name, Modifier.toString(modifiers), returnType.toString(), new LinkedList<String>(), isConstructor);
+		for (Object parameter : parameters) {
+			final SingleVariableDeclaration parameterDeclaration = (SingleVariableDeclaration) parameter;
+			p.add(parameterDeclaration);
+			parameterTypes.add(parameterDeclaration.getType().toString());
+		}
+	}
+	
+	public MungeMethodSignature(AbstractClassSignature parent,
+			String name, int modifiers, Type returnType, List<?> parameters, boolean isConstructor, int startLine, int endLine) {
+		super(parent, name, Modifier.toString(modifiers), returnType.toString(), new LinkedList<String>(), isConstructor, startLine, endLine);
 		for (Object parameter : parameters) {
 			final SingleVariableDeclaration parameterDeclaration = (SingleVariableDeclaration) parameter;
 			p.add(parameterDeclaration);

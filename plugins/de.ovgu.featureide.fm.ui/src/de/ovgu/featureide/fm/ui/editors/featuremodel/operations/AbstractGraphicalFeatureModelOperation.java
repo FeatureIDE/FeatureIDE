@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
-import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
@@ -34,7 +33,6 @@ public abstract class AbstractGraphicalFeatureModelOperation extends AbstractFea
 	public AbstractGraphicalFeatureModelOperation(IGraphicalFeatureModel graphicalFeatureModel, String label) {
 		super(graphicalFeatureModel.getFeatureModel(), label);
 		this.graphicalFeatureModel = graphicalFeatureModel;
-		setEventId(PropertyConstants.MODEL_DATA_LOADED);
 	}
 
 }

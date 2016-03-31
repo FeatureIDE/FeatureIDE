@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -43,7 +43,7 @@ import org.prop4j.Node;
 import org.prop4j.NodeWriter;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
@@ -56,6 +56,7 @@ import de.ovgu.featureide.fm.ui.handlers.base.AFileHandler;
  * Exports the conjunctive normal form of the feature model.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke
  */
 public class ExportCNFHandler extends AFileHandler {
 
@@ -165,7 +166,7 @@ public class ExportCNFHandler extends AFileHandler {
 	 * @throws FileNotFoundException
 	 */
 	private IFeatureModel readModel(IFile inputFile) {
-		IFeatureModel fm = FeatureModelFactory.getInstance().createFeatureModel();
+		IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
 		FeatureModelReaderIFileWrapper fmReader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(fm));
 
 		try {

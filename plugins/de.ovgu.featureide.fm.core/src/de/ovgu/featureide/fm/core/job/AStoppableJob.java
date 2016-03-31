@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -28,6 +28,7 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
  * Abstract eclipse job which can be stopped.
  * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public abstract class AStoppableJob extends AbstractJob implements IStoppableJob {
 	
@@ -53,7 +54,7 @@ public abstract class AStoppableJob extends AbstractJob implements IStoppableJob
 				success = AStoppableJob.this.work();
 			} catch (Exception e) {
 				success = false;
-				e.printStackTrace();
+				FMCorePlugin.getDefault().logError(e);
 			}
 		}
 	}

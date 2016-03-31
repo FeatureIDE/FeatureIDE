@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -32,17 +32,28 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.IFeatureProperty;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.base.IPropertyContainer;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
- * Provides all properties of a feature. This includes its connections to parent
- * and child features.
+ * <b>This class is deprecated and only existing due to compatibility considerations</b>. Use {@link de.ovgu.featureide.fm.core.base.impl.Feature new Feature class} instead.
  * 
  * @author Thomas Thuem
- * 
+ * @author Marcus Pinnecke (Feature Interface)
+ *
+ * @see IFeature Interface for features (<code>IFeature</code>)
+ * @see de.ovgu.featureide.fm.core.base.impl.Feature Default implementation of interface for features (<code>Feature</code>) since version 3.0 
+ * @see IConstraint Interface for feature constraints (<code>IConstraint</code>)
+ * @see IFeatureModel Interface for feature models (<code>IFeatureModel</code>)
+ * @see IFeatureProperty Interface for feature properties (<code>IFeatureProperty</code>)
+ * @see IFeatureStructure Interface for a feature's structure (<code>IFeatureStructure</code>)
  */
-public class Feature implements PropertyConstants, PropertyChangeListener, IGraphicItem {
+@Deprecated
+public class Feature implements PropertyChangeListener, IGraphicItem, IFeature {
 
 	public final IFeature feature;
 
@@ -413,7 +424,7 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	 */
 	@Deprecated
 	public String getRelevantConstraintsString() {
-		return FeatureUtils.getRelevantConstraintsString(feature, feature.getFeatureModel().getConstraints());
+		return FeatureUtils.getRelevantConstraintsString(feature);
 	}
 
 	/**
@@ -1225,5 +1236,45 @@ public class Feature implements PropertyConstants, PropertyChangeListener, IGrap
 	@Override
 	public GraphicItem getItemType() {
 		return FeatureUtils.getItemType(feature);
+	}
+	
+	@Override
+	public long getInternalId() {
+		return feature.getInternalId();
+	}
+
+	@Override
+	public void addListener(IEventListener listener) {
+		feature.addListener(listener);
+	}
+
+	@Override
+	public void fireEvent(FeatureIDEEvent event) {
+		feature.fireEvent(event);
+	}
+
+	@Override
+	public void removeListener(IEventListener listener) {
+		feature.removeListener(listener);
+	}
+
+	@Override
+	public IFeature clone(IFeatureModel newFeatureModel, IFeatureStructure newStructure) {
+		return feature.clone(newFeatureModel, newStructure);
+	}
+
+	@Override
+	public IFeatureProperty getProperty() {
+		return feature.getProperty();
+	}
+
+	@Override
+	public IPropertyContainer getCustomProperties() {
+		return feature.getCustomProperties();
+	}
+
+	@Override
+	public IFeatureStructure getStructure() {
+		return feature.getStructure();
 	}
 }

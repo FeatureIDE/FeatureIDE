@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -23,16 +23,15 @@ package de.ovgu.featureide.fm.ui.editors.configuration;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SELECT_THE_CORRESPONDING_FEATUREMODEL_;
 
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
 
-import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
@@ -43,7 +42,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.swt.SWT;
@@ -59,20 +57,18 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.MultiPageEditorPart;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.ModelMarkerHandler;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.event.FeatureModelEvent;
-import de.ovgu.featureide.fm.core.base.event.IFeatureModelListener;
-import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
-import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.configuration.ConfigurationMatrix;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationPropagatorJobWrapper.IConfigJob;
-import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
-import de.ovgu.featureide.fm.core.configuration.ConfigurationWriter;
-import de.ovgu.featureide.fm.core.configuration.FeatureIDEFormat;
-import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
-import de.ovgu.featureide.fm.core.io.ModelIOFactory;
-import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import de.ovgu.featureide.fm.core.io.Problem;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.FileManagerMap;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.WorkMonitor;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
@@ -87,7 +83,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
  * @author Jens Meinicke
  * @author Hannes Smurawsky
  */
-public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefaults, PropertyConstants, IFeatureModelListener, IResourceChangeListener,
+public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefaults, IEventListener, IResourceChangeListener,
 		IConfigurationEditor {
 
 	public static final String ID = FMUIPlugin.PLUGIN_ID + ".editors.configuration.ConfigurationEditor";
@@ -97,19 +93,19 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 
 	private final ConfigJobManager configJobManager = new ConfigJobManager();
 
-	@Nonnull
 	public IFile file;
-	private IFile internalFile;
-
-	public IFeatureModel featureModel = FeatureModelFactory.getInstance().createFeatureModel();
-
-	public Configuration configuration;
+	ModelMarkerHandler<IFile> markerHandler;
+	
+	public FeatureModelManager featureModelManager;
+	public ConfigurationManager configurationManager;
 
 	private int currentPageIndex = -1;
 
 	private boolean closeEditor;
 
 	private boolean autoSelectFeatures = false;
+	
+	public boolean invalidFeatureModel = true;
 
 	/**
 	 * The file of the corresponding feature model.
@@ -136,8 +132,8 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		@Override
 		public void partClosed(IWorkbenchPart part) {
 			configJobManager.cancelAllJobs();
-			if (featureModel != null) {
-				featureModel.removeListener(ConfigurationEditor.this);
+			if (featureModelManager != null) {
+				featureModelManager.removeListener(ConfigurationEditor.this);
 			}
 		}
 
@@ -153,31 +149,34 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		public void partActivated(IWorkbenchPart part) {
 		}
 	};
+	
+	private EXPAND_ALGORITHM currentExpandAlgorithm = EXPAND_ALGORITHM.DEFUALT;
+	
+	@Override
+	public EXPAND_ALGORITHM getExpandAlgorithm() {
+		return currentExpandAlgorithm;
+	}
+	
+	public void setExpandAlgorithm(EXPAND_ALGORITHM expandAlgorithm) {
+		this.currentExpandAlgorithm = expandAlgorithm;
+	}
 
 	@Override
 	protected void setInput(IEditorInput input) {
 		file = (IFile) input.getAdapter(IFile.class);
-
-		String fileName = file.getName();
-		final String extension = file.getFileExtension();
-		if (extension != null) {
-			fileName = "." + fileName.substring(0, fileName.length() - (extension.length())) + FeatureIDEFormat.EXTENSION;
-		} else {
-			fileName = "." + fileName + "." + FeatureIDEFormat.EXTENSION;
-		}
-		internalFile = file.getParent().getFile(Path.fromOSString(fileName));
+		markerHandler = new ModelMarkerHandler<>(file);
 
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(this);
 		super.setInput(input);
 		getSite().getPage().addPartListener(iPartListener);
 		IProject project = file.getProject();
+		setPartName(file.getName());
 
 		// if mpl.velvet exists then it is a multi product line
 		IResource res = project.findMember("mpl.velvet");
-		boolean mappingModel = false;
 		if (res instanceof IFile) {
-			IContainer parentFolder = file.getParent();
-			mappingModel = parentFolder != null && "InterfaceMapping".equals(parentFolder.getName());
+//			final IContainer parentFolder = file.getParent();
+//			mappingModel = parentFolder != null && "InterfaceMapping".equals(parentFolder.getName());
 		} else {
 			res = project.findMember("model.xml");
 		}
@@ -213,41 +212,60 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 			}
 		}
 
-		readFeatureModel();
-		if (mappingModel) {
-			featureModel = ((ExtendedFeatureModel) featureModel).getMappingModel();
+		featureModelManager = FeatureModelManager.getInstance(res);
+		invalidFeatureModel = Problem.checkSeverity(featureModelManager.getLastProblems(), IMarker.SEVERITY_ERROR);
+		if (invalidFeatureModel) {
+			return;
 		}
+		
+		//TODO mapping model
+//		if (mappingModel) {
+//			featureModelManager = FeatureModelManager.getInstance(absolutePath, format);
+//			featureModel = ((ExtendedFeatureModel) featureModel).getMappingModel();
+//		}
+		
+		final Configuration c = new Configuration(featureModelManager.getObject(), Configuration.PARAM_LAZY | Configuration.PARAM_IGNOREABSTRACT | Configuration.PARAM_PROPAGATE);
 
-		configuration = new Configuration(featureModel, Configuration.PARAM_IGNOREABSTRACT | Configuration.PARAM_LAZY);
-		try {
-			ConfigurationReader reader = new ConfigurationReader(configuration);
-			if (!internalFile.exists() || !reader.readFromFile(internalFile)) {
-				reader.readFromFile(file);
-			}
-		} catch (Exception e) {
-			FMCorePlugin.getDefault().logError(e);
+		configurationManager = FileManagerMap.<Configuration, ConfigurationManager>getInstance(file.getLocation().toOSString());
+		if (configurationManager != null) {
+			configurationManager.setConfiguration(c);
+			configurationManager.read();
+		} else {
+			configurationManager = ConfigurationManager.getInstance(c, file.getLocation().toOSString());
 		}
+		
+		final List<Problem> lastProblems = configurationManager.getLastProblems();
+		createModelFileMarkers(lastProblems);
 
-		final Display currentDisplay = Display.getCurrent();
-		final IConfigJob<?> configJob = configuration.getPropagator().getJobWrapper().load();
-		configJob.addJobFinishedListener(new JobFinishListener() {
-			@Override
-			public void jobFinished(IJob finishedJob, boolean success) {
-				autoSelectFeatures = true;
-				currentDisplay.asyncExec(new Runnable() {
-					@Override
-					public void run() {
-						getPage(getActivePage()).propertyChange(null);
-					}
-				});
-			}
-		});
-		configJobManager.startJob(configJob);
-
-		setPartName(file.getName());
-		featureModel.addListener(this);
+		featureModelManager.addListener(this);
 		firePropertyChange(IEditorPart.PROP_DIRTY);
 		getExtensions();
+		
+		if (!Problem.checkSeverity(lastProblems, IMarker.SEVERITY_ERROR)) {
+			loadPropagator();
+		} else {
+			setActivePage(2);
+		}
+	}
+
+	public void loadPropagator() {
+		if (!configurationManager.editObject().getPropagator().isLoaded()) {
+			final Display currentDisplay = Display.getCurrent();
+			final IConfigJob<?> configJob = configurationManager.editObject().getPropagator().getJobWrapper().load();
+			configJob.addJobFinishedListener(new JobFinishListener() {
+				@Override
+				public void jobFinished(IJob finishedJob, boolean success) {
+					autoSelectFeatures = true;
+					currentDisplay.asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							getPage(getActivePage()).propertyChange(null);
+						}
+					});
+				}
+			});
+			configJobManager.startJob(configJob);
+		}
 	}
 
 	/**
@@ -331,48 +349,21 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	}
 
 	@Override
-	public void propertyChange(final FeatureModelEvent evt) {
-		if (!PropertyConstants.MODEL_DATA_CHANGED.equals(evt.getPropertyName())) {
+	public void propertyChange(final FeatureIDEEvent evt) {
+		if (!EventType.MODEL_DATA_SAVED.equals(evt.getEventType())) {
 			return;
 		}
 
-		final Object source = evt.getSource();
-		if (!(source instanceof IFile) || !((IFile) source).getLocation().toFile().equals(modelFile)) {
-			return;
-		}
-
-		setConfiguration();
+		final Configuration configuration = new Configuration(configurationManager.editObject(), featureModelManager.getObject());
+		configuration.loadPropagator();
+		configuration.getPropagator().resolve(new WorkMonitor());
+		
+		configurationManager.setConfiguration(configuration);
 
 		// Reinitialize the pages
 		final IConfigurationEditorPage currentPage = getPage(currentPageIndex);
 		if (currentPage != null) {
 			currentPage.propertyChange(evt);
-		}
-	}
-
-	private void setConfiguration() {
-		readFeatureModel();
-		configuration = new Configuration(configuration, featureModel);
-		configuration.getPropagator().update(false, null, new WorkMonitor());
-		if (!isDirty()) {
-			doSave(null);
-		}
-	}
-
-	/**
-	 * Reads the featureModel from the modelFile.
-	 */
-	private void readFeatureModel() {
-		final int fileType = ModelIOFactory.getTypeByFileName(modelFile.getName());
-
-		featureModel = ModelIOFactory.getNewFeatureModel(fileType);
-		featureModel.initFMComposerExtension(file.getProject());
-
-		final AbstractFeatureModelReader reader = ModelIOFactory.getModelReader(featureModel, fileType);
-		try {
-			reader.readFromFile(modelFile);
-		} catch (FileNotFoundException | UnsupportedModelException e) {
-			FMUIPlugin.getDefault().logError(e);
 		}
 	}
 
@@ -403,18 +394,23 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 
 	@Override
 	protected void pageChange(int newPageIndex) {
-		final IConfigurationEditorPage currentPage = getPage(currentPageIndex);
-		if (currentPage != null) {
-			currentPage.pageChangeFrom(newPageIndex);
+		if (newPageIndex != currentPageIndex) {
+			final IConfigurationEditorPage currentPage = getPage(currentPageIndex);
+			final IConfigurationEditorPage newPage = getPage(newPageIndex);
+			if (currentPage != null) {
+				if (currentPage.allowPageChange(newPageIndex)) {
+					currentPage.pageChangeFrom(newPageIndex);
+				} else {
+					setActivePage(currentPageIndex);
+					return;
+				}
+			}
+			if (newPage != null) {
+				newPage.pageChangeTo(newPageIndex);
+			}
+			currentPageIndex = newPageIndex;
+			super.pageChange(newPageIndex);
 		}
-
-		final IConfigurationEditorPage newPage = getPage(newPageIndex);
-		if (newPage != null) {
-			newPage.pageChangeTo(newPageIndex);
-		}
-
-		currentPageIndex = newPageIndex;
-		super.pageChange(newPageIndex);
 	}
 
 	private IConfigurationEditorPage getPage(int pageIndex) {
@@ -435,22 +431,19 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 
 	@Override
 	public void doSave(IProgressMonitor monitor) {
-		if (modelFile != null) {
-			try {
-				ConfigurationWriter writer = new ConfigurationWriter(configuration);
-				writer.saveToFile(file);
-				writer.saveToFile(internalFile);
-				firePropertyChange(IEditorPart.PROP_DIRTY);
-			} catch (CoreException e) {
-				FMUIPlugin.getDefault().logError(e);
+		if (modelFile != null) {			
+			final IConfigurationEditorPage currentPage = getPage(currentPageIndex);
+			if (currentPage != null && currentPage.getID() == TextEditorPage.ID) {
+				currentPage.doSave(monitor);
+			} else {
+				configurationManager.save();
+				for (IConfigurationEditorPage internalPage : internalPages) {
+					internalPage.doSave(monitor);
+				}
+				for (IConfigurationEditorPage page : extensionPages) {
+					page.doSave(monitor);
+				}
 			}
-		}
-
-		for (IConfigurationEditorPage internalPage : internalPages) {
-			internalPage.doSave(monitor);
-		}
-		for (IConfigurationEditorPage page : extensionPages) {
-			page.doSave(monitor);
 		}
 	}
 
@@ -540,7 +533,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 
 	@Override
 	public Configuration getConfiguration() {
-		return configuration;
+		return configurationManager.editObject();
 	}
 
 	@Override
@@ -564,4 +557,23 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	public void setAutoSelectFeatures(boolean autoSelectFeatures) {
 		this.autoSelectFeatures = autoSelectFeatures;
 	}
+
+	@Override
+	public boolean hasValidFeatureModel() {
+		return !invalidFeatureModel;
+	}
+
+	void createModelFileMarkers(List<Problem> warnings) {
+		markerHandler.deleteAllModelMarkers();
+		for (Problem warning : warnings) {
+			markerHandler.createModelMarker(warning.message, warning.severity, warning.line);
+		}
+	}
+
+	public ConfigurationMatrix getConfigurationMatrix() {
+		ConfigurationMatrix matrix = new ConfigurationMatrix(featureModelManager.getObject(), Paths.get(file.getParent().getLocationURI()));
+		matrix.readConfigurations(file.getName());
+		return matrix;
+	}
+
 }

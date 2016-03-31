@@ -695,7 +695,7 @@ public class CPPComposer extends PPComposerExtensionClass {
 		List<String> myActivatedFeatures = new LinkedList<String>();
 
 		for (IFeature feature : configuration.getSelectedFeatures()) {
-			myActivatedFeatures.add(feature.getName().toString());
+			myActivatedFeatures.add(feature.getName());
 		}
 
 		runBuild(getActivatedFeatureArgs(myActivatedFeatures),

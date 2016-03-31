@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -25,6 +25,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.BUILT_MPL_PROJ
 import static de.ovgu.featureide.fm.core.localization.StringTable.EMPTY___;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NO_MAPPING_FILE_SPECIFIED_;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -51,14 +52,16 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
+import de.ovgu.featureide.fm.core.io.manager.FileReader;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
 import de.ovgu.featureide.fm.core.job.util.JobSequence;
 
 /**
- * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class MPLBuildProjectJob extends AProjectJob<MPLBuildProjectJob.Arguments> {
 
@@ -197,7 +200,11 @@ public class MPLBuildProjectJob extends AProjectJob<MPLBuildProjectJob.Arguments
 				MPLPlugin.getDefault().logInfo(NO_MAPPING_FILE_SPECIFIED_);
 				return false;
 			}
-			new ConfigurationReader(mappedProjects).readFromFile(arguments.externalFeatureProject.getProject().getFile("InterfaceMapping/" + mappingFileName));
+			final IFile configFile = arguments.externalFeatureProject.getProject().getFile("InterfaceMapping/" + mappingFileName);
+			final FileReader<Configuration> reader = new FileReader<>();
+			reader.setObject(mappedProjects);
+			reader.setPath(Paths.get(configFile.getLocationURI()));
+			reader.setFormat(ConfigurationManager.getFormat(configFile.getName()));
 		} catch (Exception e) {
 			MPLPlugin.getDefault().logError(e);
 			return false;

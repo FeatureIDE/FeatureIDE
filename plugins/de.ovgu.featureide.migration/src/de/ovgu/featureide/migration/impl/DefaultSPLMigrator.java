@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -53,10 +53,13 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionBase;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.ui.handlers.base.SelectionWrapper;
 import de.ovgu.featureide.ui.migration.wizard.SPLMigrationDialogSettingsPage;
 
+/**
+ * @author Marcus Pinnecke (Feature interface)
+ */
 @SuppressWarnings(RESTRICTION)
 public abstract class DefaultSPLMigrator implements ISPLMigrator {
 	public static final String PROJECT_PROPERTIES_FILE_NAME = "project.properties";
@@ -291,12 +294,12 @@ public abstract class DefaultSPLMigrator implements ISPLMigrator {
 
 		featureModel.reset();
 
-		featureModel.getStructure().setRoot(FeatureModelFactory.getInstance().createFeature(featureModel, "Base").getStructure());
+		featureModel.getStructure().setRoot(FMFactoryManager.getFactory().createFeature(featureModel, "Base").getStructure());
 		featureModel.getStructure().getRoot().changeToAlternative();
 		featureModel.getStructure().getRoot().setAbstract(true);
 
 		for (IProject project : projects)
-			featureModel.getStructure().getRoot().addChild(FeatureModelFactory.getInstance().createFeature(featureModel, project.getName()).getStructure());
+			featureModel.getStructure().getRoot().addChild(FMFactoryManager.getFactory().createFeature(featureModel, project.getName()).getStructure());
 
 		return featureModel;
 	}

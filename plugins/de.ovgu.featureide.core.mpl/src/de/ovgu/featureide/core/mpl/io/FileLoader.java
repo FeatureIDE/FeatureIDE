@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,15 +20,19 @@
  */
 package de.ovgu.featureide.core.mpl.io;
 
+import java.nio.file.Paths;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 
 import de.ovgu.featureide.core.mpl.InterfaceProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.impl.FeatureModelFactory;
-import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.io.IOConstants;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
+import de.ovgu.featureide.fm.core.io.manager.FileReader;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 
 /**
@@ -40,11 +44,11 @@ public final class FileLoader {
 
 	public static void loadConfiguration(InterfaceProject interfaceProject) {
 		try {
-			ConfigurationReader configReader = new ConfigurationReader(interfaceProject.getConfiguration());
-			final IFile internalFile = interfaceProject.getFeatureProjectReference().getInternalConfigurationFile();
-			if (internalFile == null || !configReader.readFromFile(internalFile)) {
-				configReader.readFromFile(interfaceProject.getFeatureProjectReference().getCurrentConfiguration());
-			}
+			final IFile configFile = interfaceProject.getFeatureProjectReference().getCurrentConfiguration();
+			final FileReader<Configuration> reader = new FileReader<>();
+			reader.setObject(interfaceProject.getConfiguration());
+			reader.setPath(Paths.get(configFile.getLocationURI()));
+			reader.setFormat(ConfigurationManager.getFormat(configFile.getName()));
 		} catch (Exception e) {
 			MPLPlugin.getDefault().logError(e);
 		}
@@ -52,7 +56,7 @@ public final class FileLoader {
 
 	public static IFeatureModel loadFeatureModel(IProject project) {
 		try {
-			IFeatureModel featureModel = FeatureModelFactory.getInstance().createFeatureModel();
+			IFeatureModel featureModel = FMFactoryManager.getFactory().createFeatureModel();
 			XmlFeatureModelReader reader = new XmlFeatureModelReader(featureModel);
 			reader.readFromFile(project.getFile(IOConstants.FILENAME_MODEL).getLocation().toFile());
 			return featureModel;

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -65,6 +65,7 @@ import de.ovgu.featureide.fm.ui.views.FeatureModelEditView;
  * Calculates the edit category and provides as a content to the view.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke
  */
 public class ViewContentProvider implements IStructuredContentProvider, ITreeContentProvider, GUIDefaults {
 

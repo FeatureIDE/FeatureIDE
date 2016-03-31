@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -22,6 +22,9 @@ package de.ovgu.featureide.core.fstmodel.preprocessor;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,34 +40,48 @@ import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.preprocessor.PPComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
+import de.ovgu.featureide.core.fstmodel.FSTField;
+import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
+import de.ovgu.featureide.core.fstmodel.IRoleElement;
+import de.ovgu.featureide.core.fstmodel.RoleElement;
+import de.ovgu.featureide.core.signature.base.AbstractFieldSignature;
+import de.ovgu.featureide.core.signature.base.AbstractMethodSignature;
+import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
  * Build the FSTModel for preprocessor projects.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class PPModelBuilder {
 
 	protected final IFeatureProject featureProject;
 
-	protected FSTModel model;
-	protected Iterable<String> featureNames = Collections.emptyList();
+	protected FSTModelForPP model;
+	protected FSTModel modelOutline;
+	protected Collection<String> featureNames = Collections.emptyList();
 	
 	public PPModelBuilder(IFeatureProject featureProject) {
-		model = new FSTModel(featureProject);
+		model = new FSTModelForPP(featureProject);
+		modelOutline = new FSTModel(featureProject);
+		
 		featureProject.setFSTModel(model);
 		this.featureProject = featureProject;
 	}
 	
 	public void buildModel() {
 		model.reset();
+		modelOutline.reset();
 		
-		featureNames = FeatureUtils.getConcreteFeatureNames(featureProject.getFeatureModel());
+		featureNames = Functional.toList(FeatureUtils.getConcreteFeatureNames(featureProject.getFeatureModel()));
 		for (String featureName : featureNames) {
 			model.addFeature(featureName);
+			modelOutline.addFeature(featureName);
 		}
 		try {
 			buildModel(featureProject.getSourceFolder(), "");
@@ -100,6 +117,9 @@ public class PPModelBuilder {
 				}
 				if (classAdded) {
 					LinkedList<FSTDirective> directives = buildModelDirectivesForFile(lines);
+					addRoleElementsToDirectives(directives, currentFile, className);
+					addDirectivesToRoleElement(directives, currentFile, className);
+					
 					addDirectivesToModel(directives, currentFile, className);
 				} else {
 					// add class without annotations
@@ -117,6 +137,111 @@ public class PPModelBuilder {
 				addDirectivesToModel(d.getChildrenList(), res, className);
 			}
 			
+		}
+	}
+
+	private void addRoleElementsToDirectives(LinkedList<FSTDirective> directives, IFile res, String className) {
+		for (FSTDirective fstDirective : directives) {
+			List<AbstractSignature> addedSig = new ArrayList<>();
+			List<AbstractSignature> includedSig = fstDirective.getIncludedSig();
+			if (includedSig != null) {
+				for (AbstractSignature abstractSignature : includedSig) {
+					if (abstractSignature instanceof AbstractMethodSignature) { 
+						AbstractMethodSignature tmp = (AbstractMethodSignature) abstractSignature;
+						FSTMethod method = new FSTMethod(tmp.getName(), new LinkedList<>(tmp.getParameterTypes()), tmp.getReturnType(), tmp.getModifiers()[0]);
+						method.setLine(tmp.getStartLine());
+							
+						for (String featureName : fstDirective.getFeatureNames()) {
+							FSTRole role = model.addRole(featureName, className, res);
+							role.add(fstDirective);
+						}
+						fstDirective.addChild(method);
+						method.setRole(fstDirective.getRole());
+						
+						addedSig.add(abstractSignature);
+					} else if(abstractSignature instanceof AbstractFieldSignature){
+						AbstractFieldSignature tmp = (AbstractFieldSignature) abstractSignature;
+						FSTField field = new FSTField(tmp.getName(), tmp.getType(), tmp.getModifiers()[0]);
+						for (String featureName : fstDirective.getFeatureNames()) {
+							FSTRole role = model.addRole(featureName, className, res);
+							role.add(fstDirective);
+						}
+						fstDirective.addChild(field);
+						field.setRole(fstDirective.getRole());
+					}
+				}
+			}
+			FSTDirective[] children = fstDirective.getChildren();
+			if (children != null) {
+				for (FSTDirective roleChild : children) {
+					if (addedSig.isEmpty() || (roleChild.getInsideOfSig() != null && !roleChild.getInsideOfSig().containsAll(addedSig))) {
+						fstDirective.addChild((RoleElement<?>) roleChild);
+					}
+				}
+				addRoleElementsToDirectives(new LinkedList<FSTDirective>(Arrays.asList(children)), currentFile, className);
+			}
+			addedSig.clear();
+		}
+	}
+
+	private void addDirectivesToRoleElement(LinkedList<FSTDirective> list, IFile res, String className) {
+		for (FSTDirective d : list) {
+			for (String featureName : d.getFeatureNames()) {
+				FSTRole role = modelOutline.addRole(featureName, className, res);
+
+				List<AbstractSignature> sig = d.getInsideOfSig();
+				List<AbstractSignature> includedParentSig = new ArrayList<>();
+				FSTDirective parent = d.getParent();
+				if (parent != null) {
+					includedParentSig = parent.getIncludedSig();
+				}
+				boolean added = false;
+				if (sig != null) {
+					for (AbstractSignature abstractSignature : sig) {
+						if (includedParentSig.contains(abstractSignature)) {
+							RoleElement<?>[] roleElementChildren = parent.getRoleElementChildren();
+							for (RoleElement<?> roleElement : roleElementChildren) {
+								if(roleElement.getName().equals(abstractSignature.getName())){
+									if(roleElement instanceof FSTMethod){
+										((FSTMethod) roleElement).add(d);
+										roleElement.setLine(abstractSignature.getStartLine());
+										IRoleElement paren = roleElement.getParent();
+										role.getClassFragment().add(roleElement);
+										roleElement.setParent(paren);
+										added = true;
+									}
+								}
+							}
+						} else {
+
+							if (abstractSignature instanceof AbstractMethodSignature) {
+								AbstractMethodSignature tmp = (AbstractMethodSignature) abstractSignature;
+
+								for (FSTMethod method : role.getClassFragment().getMethods()) {
+									if (method.getName().equals(tmp.getName())) {
+										method.add(d);
+										method.setLine(tmp.getStartLine());
+										added = true;
+										break;
+									}
+								}
+
+								if (!added) {
+									FSTMethod method = new FSTMethod(tmp.getName(), new LinkedList<>(tmp.getParameterTypes()), tmp.getReturnType(), "tetw");
+									method.setLine(tmp.getStartLine());
+									role.getClassFragment().add(method);
+									method.add(d);
+									added = true;
+								}
+							}
+						}
+					}
+				}
+				if (!added) {
+					role.add(d);
+				}
+				addDirectivesToRoleElement(d.getChildrenList(), res, className);
+			}
 		}
 	}
 

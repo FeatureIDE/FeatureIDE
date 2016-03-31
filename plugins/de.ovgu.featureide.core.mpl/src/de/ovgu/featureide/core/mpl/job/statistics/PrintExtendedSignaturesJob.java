@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -44,6 +44,7 @@ import de.ovgu.featureide.fm.core.job.util.JobArguments;
  * Builds extended signatures for different constraints.
  * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke (Feature Interface)
  */
 @SuppressWarnings("unused")
 public class PrintExtendedSignaturesJob extends AProjectJob<PrintExtendedSignaturesJob.Arguments> {
@@ -74,7 +75,7 @@ public class PrintExtendedSignaturesJob extends AProjectJob<PrintExtendedSignatu
 		LinkedList<String> allConcreteFeatures = new LinkedList<String>();
 		for (IFeature feature : FeatureUtils.extractConcreteFeatures(interfaceProject.getFeatureModel())) {
 			if (!feature.getStructure().isHidden()) {
-				allConcreteFeatures.add(feature.getName().toString());
+				allConcreteFeatures.add(feature.getName());
 			}
 		}
 		workMonitor.setMaxAbsoluteWork(allConcreteFeatures.size() + 1);

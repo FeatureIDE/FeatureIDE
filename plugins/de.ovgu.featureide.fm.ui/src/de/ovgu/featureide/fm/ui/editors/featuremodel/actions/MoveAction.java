@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -51,6 +51,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
  * 
  * @author Guenter Ulreich
  * @author Andy Koch
+ * @author Marcus Pinnecke
  */
 public class MoveAction extends Action {
 	public static final int stepwidth = 2;
@@ -169,7 +170,7 @@ public class MoveAction extends Action {
 			FeatureUIHelper.setLocation(feature, newPos);
 		} else if ((element instanceof ConstraintEditPart) || (element instanceof IConstraint)) {
 			IGraphicalConstraint constraint = element instanceof ConstraintEditPart ? ((ConstraintEditPart) element).getConstraintModel() : (IGraphicalConstraint) element;
-			final Point newPos = FeatureUIHelper.getLocation(constraint).translate(deltaPos);
+			final Point newPos = constraint.getLocation().translate(deltaPos);
 			FeatureUIHelper.setLocation(constraint, newPos);
 		} else if ((element instanceof LegendEditPart) || (element instanceof LegendFigure) || (element instanceof Legend)) {
 			LegendFigure legendFigure = FeatureUIHelper.getLegendFigure(featureModel);

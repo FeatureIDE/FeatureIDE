@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -32,7 +32,6 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AutoLayoutConstraintOperation;
 
@@ -41,6 +40,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.AutoLayoutConstr
  * 
  * @author David Halm
  * @author Patrick Sulkowski
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class AutoLayoutConstraintAction extends Action {
 
@@ -56,7 +56,7 @@ public class AutoLayoutConstraintAction extends Action {
 	public void run() {
 		LinkedList<Point> newList = new LinkedList<Point>();
 		for (int i = 0; i < featureModel.getConstraints().size(); i++) {
-			newList.add(FeatureUIHelper.getLocation(featureModel.getConstraints().get(i)).getCopy());
+			newList.add(featureModel.getConstraints().get(i).getLocation());
 		}
 		int counter = oldPos.size();
 		oldPos.add(newList);

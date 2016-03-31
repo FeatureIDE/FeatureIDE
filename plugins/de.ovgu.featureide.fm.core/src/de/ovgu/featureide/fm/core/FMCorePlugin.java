@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -25,7 +25,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.READING_MODEL_
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.List;
@@ -41,8 +40,9 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel.UsedModel;
-import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
-import de.ovgu.featureide.fm.core.io.ModelIOFactory;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.FileManagerMap;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.IProjectJob;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
@@ -56,33 +56,19 @@ import de.ovgu.featureide.fm.core.job.util.JobSequence;
 public class FMCorePlugin extends AbstractCorePlugin {
 
 	public static final String PLUGIN_ID = "de.ovgu.featureide.fm.core";
-	
+
 	private static FMCorePlugin plugin;
-	
+
 	@Override
 	public String getID() {
 		return PLUGIN_ID;
 	}
-	
+
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
-//		PrintStream out = System.out;
-//		System.setOut(new PrintStream(out) {
-//
-//			@Override
-//			public void println(String x) {
-//				super.println(x);
-//			}
-//
-//			@Override
-//			public void println(Object x) {
-//				super.println(x);
-//			}
-//			
-//		});
 	}
-	
+
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
 		super.stop(context);
@@ -91,7 +77,7 @@ public class FMCorePlugin extends AbstractCorePlugin {
 	public static FMCorePlugin getDefault() {
 		return plugin;
 	}
-	
+
 	/**
 	 * Creates a {@link IProjectJob} for every project with the given arguments.
 	 * 
@@ -99,7 +85,7 @@ public class FMCorePlugin extends AbstractCorePlugin {
 	 * @param arguments the arguments for the job
 	 * @param autostart if {@code true} the jobs is started automatically.
 	 * @return the created job or a {@link JobSequence} if more than one project is given.
-	 * 	Returns {@code null} if {@code projects} is empty.
+	 *         Returns {@code null} if {@code projects} is empty.
 	 */
 	public IJob startJobs(List<IProject> projects, JobArguments arguments, boolean autostart) {
 		IJob ret;
@@ -134,85 +120,88 @@ public class FMCorePlugin extends AbstractCorePlugin {
 			return;
 		}
 
-		final int modelType = ModelIOFactory.getTypeByFileName(file.getName());
-		if (modelType == ModelIOFactory.TYPE_UNKNOWN) {
+		final IPersistentFormat<IFeatureModel> format = FeatureModelManager.getFormat(file.getName());
+		if (format == null) {
 			return;
 		}
-		final IFeatureModel fm = ModelIOFactory.getNewFeatureModel(modelType);
-		final AbstractFeatureModelReader reader = ModelIOFactory.getModelReader(fm, modelType);
 
-		try {
-			reader.readFromFile(file.getLocation().toFile());
-			FeatureModelAnalyzer fma = new FeatureModelAnalyzer(fm);
-			fma.analyzeFeatureModel(null);
+		final String path = file.getLocation().toString();
+		if (FileManagerMap.hasInstance(path)) {
+			final FeatureModelManager instance = FileManagerMap.<IFeatureModel, FeatureModelManager> getInstance(path);
+			final IFeatureModel fm = instance.getObject();
 
-			final StringBuilder sb = new StringBuilder();
-			sb.append("Number Features: ");
-			sb.append(fm.getNumberOfFeatures());
-			sb.append(" (");
-			sb.append(fma.countConcreteFeatures());
-			sb.append(")\n");
+			try {
+				FeatureModelAnalyzer fma = new FeatureModelAnalyzer(fm);
+				fma.analyzeFeatureModel(null);
 
-			if (fm instanceof ExtendedFeatureModel) {
-				ExtendedFeatureModel extFeatureModel = (ExtendedFeatureModel) fm;
-				int countInherited = 0;
-				int countInstances = 0;
-				for (UsedModel usedModel : extFeatureModel.getExternalModels().values()) {
-					switch (usedModel.getType()) {
-					case ExtendedFeature.TYPE_INHERITED:
-						countInherited++;
-						break;
-					case ExtendedFeature.TYPE_INSTANCE:
-						countInstances++;
-						break;
+				final StringBuilder sb = new StringBuilder();
+				sb.append("Number Features: ");
+				sb.append(fm.getNumberOfFeatures());
+				sb.append(" (");
+				sb.append(fma.countConcreteFeatures());
+				sb.append(")\n");
+
+				if (fm instanceof ExtendedFeatureModel) {
+					ExtendedFeatureModel extFeatureModel = (ExtendedFeatureModel) fm;
+					int countInherited = 0;
+					int countInstances = 0;
+					for (UsedModel usedModel : extFeatureModel.getExternalModels().values()) {
+						switch (usedModel.getType()) {
+						case ExtendedFeature.TYPE_INHERITED:
+							countInherited++;
+							break;
+						case ExtendedFeature.TYPE_INSTANCE:
+							countInstances++;
+							break;
+						}
 					}
+					sb.append("Number Instances: ");
+					sb.append(countInstances);
+					sb.append("\n");
+					sb.append("Number Inherited: ");
+					sb.append(countInherited);
+					sb.append("\n");
 				}
-				sb.append("Number Instances: ");
-				sb.append(countInstances);
+
+				final List<List<IFeature>> unnomralFeature = fma.analyzeFeatures();
+
+				Collection<IFeature> analyzedFeatures = unnomralFeature.get(0);
+				sb.append("Core Features (");
+				sb.append(analyzedFeatures.size());
+				sb.append("): ");
+				for (IFeature coreFeature : analyzedFeatures) {
+					sb.append(coreFeature.getName());
+					sb.append(", ");
+				}
+				analyzedFeatures = unnomralFeature.get(1);
+				sb.append("\nDead Features (");
+				sb.append(analyzedFeatures.size());
+				sb.append("): ");
+				for (IFeature deadFeature : analyzedFeatures) {
+					sb.append(deadFeature.getName());
+					sb.append(", ");
+				}
+				analyzedFeatures = fma.getFalseOptionalFeatures();
+				sb.append("\nFO Features (");
+				sb.append(analyzedFeatures.size());
+				sb.append("): ");
+				for (IFeature foFeature : analyzedFeatures) {
+					sb.append(foFeature.getName());
+					sb.append(", ");
+				}
 				sb.append("\n");
-				sb.append("Number Inherited: ");
-				sb.append(countInherited);
-				sb.append("\n");
-			}
 
-			final List<List<IFeature>> unnomralFeature = fma.analyzeFeatures();
-
-			Collection<IFeature> analyzedFeatures = unnomralFeature.get(0);
-			sb.append("Core Features (");
-			sb.append(analyzedFeatures.size());
-			sb.append("): ");
-			for (IFeature coreFeature : analyzedFeatures) {
-				sb.append(coreFeature.getName());
-				sb.append(", ");
+				final IFile outputFile = ((IFolder) outputDir).getFile(file.getName() + "_output.txt");
+				final InputStream inputStream = new ByteArrayInputStream(sb.toString().getBytes(Charset.defaultCharset()));
+				if (outputFile.isAccessible()) {
+					outputFile.setContents(inputStream, false, true, null);
+				} else {
+					outputFile.create(inputStream, true, null);
+				}
+				logInfo(PRINTED_OUTPUT_FILE_);
+			} catch (Exception e) {
+				logError(e);
 			}
-			analyzedFeatures = unnomralFeature.get(1);
-			sb.append("\nDead Features (");
-			sb.append(analyzedFeatures.size());
-			sb.append("): ");
-			for (IFeature deadFeature : analyzedFeatures) {
-				sb.append(deadFeature.getName());
-				sb.append(", ");
-			}
-			analyzedFeatures = fma.getFalseOptionalFeatures();
-			sb.append("\nFO Features (");
-			sb.append(analyzedFeatures.size());
-			sb.append("): ");
-			for (IFeature foFeature : analyzedFeatures) {
-				sb.append(foFeature.getName());
-				sb.append(", ");
-			}
-			sb.append("\n");
-
-			final IFile outputFile = ((IFolder) outputDir).getFile(file.getName() + "_output.txt");
-			final InputStream inputStream = new ByteArrayInputStream(sb.toString().getBytes(Charset.defaultCharset()));
-			if (outputFile.isAccessible()) {
-				outputFile.setContents(inputStream, false, true, null);
-			} else {
-				outputFile.create(inputStream, true, null);
-			}
-			logInfo(PRINTED_OUTPUT_FILE_);
-		} catch (Exception e) {
-			logError(e);
 		}
 	}
 }

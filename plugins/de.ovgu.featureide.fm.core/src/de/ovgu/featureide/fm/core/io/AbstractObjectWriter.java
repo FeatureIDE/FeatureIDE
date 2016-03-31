@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -40,35 +40,24 @@ public abstract class AbstractObjectWriter<T> {
 	 * the feature model to write out
 	 */
 	protected T object;
-	
+
 	public void setObject(T object) {
 		this.object = object;
 	}
-	
+
 	public T getObject() {
 		return object;
 	}
-	
+
 	public void writeToFile(File file) {
-		FileOutputStream output = null;
-		try {
-			if (!file.exists()) file.createNewFile();
-			output = new FileOutputStream(file);
+		try (FileOutputStream output = new FileOutputStream(file)) {
 			output.write(writeToString().getBytes(Charset.availableCharsets().get("UTF-8")));
 			output.flush();
 		} catch (IOException e) {
 			FMCorePlugin.getDefault().logError(e);
-		} finally {
-			try {
-				if (output != null) { 
-					output.close();
-				}
-			} catch (IOException e) {
-				FMCorePlugin.getDefault().logError(e);
-			}
 		}
 	}
 
 	protected abstract String writeToString();
-	
+
 }

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -30,6 +30,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
  * Parses a feature model from a given file or string.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public interface IFeatureModelReader {
 	
@@ -80,7 +81,7 @@ public interface IFeatureModelReader {
 	 * 
 	 * @return
 	 */
-	public List<ModelWarning> getWarnings();
+	public List<Problem> getWarnings();
 
 	/**
 	 * Set the source file of the textual representation of the feature model.

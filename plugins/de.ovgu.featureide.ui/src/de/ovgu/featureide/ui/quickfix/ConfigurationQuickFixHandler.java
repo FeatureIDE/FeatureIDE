@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -38,7 +38,7 @@ public class ConfigurationQuickFixHandler implements IMarkerResolutionGenerator 
     	if (marker.getResource() instanceof IFolder) {
 			final String message = marker.getAttribute(IMarker.MESSAGE, "");
 			if (message.startsWith(IFeatureProject.MARKER_UNUSED)) {
-				return new IMarkerResolution[] {new QuickFixMissingFeatures(marker)};
+				return new IMarkerResolution[] {new QuickFixUnusedFeatures(marker)};
 			} else if (message.startsWith(IFeatureProject.MARKER_FALSE_OPTIONAL)) {
 				return new IMarkerResolution[] {new QuickFixFalseOptionalFeatures(marker)};
 			}
