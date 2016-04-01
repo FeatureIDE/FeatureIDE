@@ -19,7 +19,7 @@
  * See http://featureide.cs.ovgu.de/ for further information.
  */
 package de.ovgu.featureide.fm.core.base;
-
+ 
 import java.io.File;
 import java.util.Collection;
 import java.util.Hashtable;
