@@ -42,11 +42,18 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.FileEditorInput;
+import org.prop4j.Node;
+import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.CNFType;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.ModelType;
+import de.ovgu.featureide.fm.core.editing.cnf.ModelComparator;
 import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
 import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
@@ -89,6 +96,29 @@ public abstract class AbstractImportHandler extends AFileHandler {
 				fmWriter.writeToFile(outputFile);
 				outputFile.refreshLocal(IResource.DEPTH_ZERO, null);
 				openFileInEditor(outputFile);
+				
+
+				System.out.println("Start Comparing...");
+				
+				final FeatureModel featureModel = new FeatureModel();
+				new XmlFeatureModelReader(featureModel).readFromFile(new File(outputFile.getLocationURI()));
+
+				AdvancedNodeCreator nc = new AdvancedNodeCreator();
+				nc.setCnfType(CNFType.Regular);
+				nc.setIncludeBooleanValues(false);
+				nc.setModelType(ModelType.All);
+				nc.setFeatureModel(featureModel);
+				final Node createNodes1 = nc.createNodes();
+				nc.setFeatureModel(fm);
+				final Node createNodes2 = nc.createNodes();
+				
+				try {
+					final boolean eq = ModelComparator.eq(createNodes1, createNodes2);
+					System.out.println("Compare Models: " + eq);
+				} catch (TimeoutException e) {
+					e.printStackTrace();
+				}
+				
 			}
 		} catch (FileNotFoundException | CoreException e) {
 			FMUIPlugin.getDefault().logError(e);

@@ -59,6 +59,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Text;
 
+import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
@@ -107,20 +108,17 @@ public class XmlFeatureModelWriter extends AbstractFeatureModelWriter implements
     	root.appendChild(struct);
     	createXmlDocRec(doc, struct, featureModel.getRoot());
     	
-    	root.appendChild(constraints);
-    	for(int i = 0; i < featureModel.getConstraints().size(); i++){
-        	Element rule;
-        	rule = doc.createElement(RULE);
-        	if(!featureModel.getLayout().hasFeaturesAutoLayout()){
-        		   rule.setAttribute(COORDINATES, 
-                   		""+featureModel.getConstraints().get(i).getLocation().x+"," 
-                   		+" "+featureModel.getConstraints().get(i).getLocation().y);
-        	}
-         
-           
-        	constraints.appendChild(rule);
-    		createPropositionalConstraints(doc, rule, featureModel.getConstraints().get(i).getNode());	
-    	}
+		root.appendChild(constraints);
+		for (Constraint constraint : featureModel.getConstraints()) {
+			Element rule;
+			rule = doc.createElement(RULE);
+			if (!featureModel.getLayout().hasFeaturesAutoLayout()) {
+				rule.setAttribute(COORDINATES, "" + constraint.getLocation().x + "," + " " + constraint.getLocation().y);
+			}
+
+			constraints.appendChild(rule);
+			createPropositionalConstraints(doc, rule, constraint.getNode());
+		}
     	
     	root.appendChild(calculations);
     	calculations.setAttribute(CALCULATE_AUTO, "" + featureModel.getAnalyser().runCalculationAutomatically);

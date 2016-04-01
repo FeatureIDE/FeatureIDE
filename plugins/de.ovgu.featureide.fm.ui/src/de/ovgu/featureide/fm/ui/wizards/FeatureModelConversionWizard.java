@@ -20,21 +20,48 @@
  */
 package de.ovgu.featureide.fm.ui.wizards;
 
+import org.eclipse.ui.INewWizard;
+
+import de.ovgu.featureide.fm.core.io.FMConverter.Format;
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
+
 /**
- * Keys for wizard arguments.
  * 
  * @author Sebastian Krieter
  */
-public abstract class WizardConstants {
-	public static final String KEY_OUT_FOLDER = "out_folder",
-			KEY_OUT_FEATURE = "out_feature",
-			KEY_OUT_DOCOPTIONS = "out_options",
-			KEY_OUT_CONFIGLIMIT = "out_configlimit",
-			KEY_OUT_VIEWLEVEL = "out_viewlevel",
-			KEY_OUT_VIEWNAME = "out_viewname",
-			KEY_OUT_PROJECT = "out_project",
-			KEY_OUT_FEATURES = "out_features",
-			KEY_IN_FOLDER = "in_folder",
-			KEY_OUT_INPUTFORMAT = "out_informat",
-			KEY_OUT_OUTPUTFORMAT = "out_outformat";
+public class FeatureModelConversionWizard extends AbstractWizard implements INewWizard {
+
+	public static final String ID = FMUIPlugin.PLUGIN_ID + ".wizzard.FeatureModelConversionWizzard";
+
+	public FeatureModelConversionWizard() {
+		super("Convert Feature Models");
+	}
+
+	@Override
+	public void addPages() {
+		addPage(new FeatureModelConversionPage());
+	}
+
+	public String getOutputFolder() {
+		return (String) getData(WizardConstants.KEY_OUT_FOLDER);
+	}
+
+	public Format getInputFormat() {
+		switch ((int)getData(WizardConstants.KEY_OUT_INPUTFORMAT)) {
+		case 0:
+			return Format.SXFM;
+		default:
+			return null;
+		}
+	}
+
+	public Format getOutputFormat() {
+		switch ((int)getData(WizardConstants.KEY_OUT_OUTPUTFORMAT)) {
+		case 0:
+			return Format.FIDE;
+		default:
+			return null;
+		}
+	}
+
 }

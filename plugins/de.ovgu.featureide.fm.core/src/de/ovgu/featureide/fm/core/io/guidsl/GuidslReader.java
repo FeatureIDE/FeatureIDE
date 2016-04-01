@@ -118,7 +118,7 @@ public class GuidslReader extends AbstractFeatureModelReader {
 	}
 
 	@Override
-	protected void parseInputStream(InputStream inputStream)
+	public void parseInputStream(InputStream inputStream)
 	throws UnsupportedModelException {
 
 		warnings.clear();

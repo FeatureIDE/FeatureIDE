@@ -62,10 +62,12 @@ public class DIMACSReader extends AbstractFeatureModelReader {
 		try (BufferedReader r = new BufferedReader(new InputStreamReader(inputStream))) {
 			String str = null;
 			while ((str = r.readLine()) != null) {
-				sb.add(str);
-				if (str.startsWith("p")) {
-					final String[] startLine = str.split("\\s");
-					names = new String[Integer.parseInt(startLine[2]) + 1];
+				if (!str.isEmpty()) {
+					sb.add(str);
+					if (str.startsWith("p")) {
+						final String[] startLine = str.split("\\s+");
+						names = new String[Integer.parseInt(startLine[2]) + 1];
+					}
 				}
 			}
 		} catch (IOException e) {
@@ -81,15 +83,16 @@ public class DIMACSReader extends AbstractFeatureModelReader {
 			final String line = sb.removeFirst();
 			if (line.startsWith("c")) {
 				final String[] commentLine = line.split("\\s");
-				final String name = commentLine[2];
-				names[Integer.parseInt(commentLine[1])] = name;
+				final String id = commentLine[1].trim();
+				final String name = commentLine[2].trim();
+				names[Integer.parseInt(id)] = name;
 			} else {
 				break;
 			}
 		}
 
 		final ArrayList<String> abstractNames = new ArrayList<>();
-		for (int i = 0; i < names.length; i++) {
+		for (int i = 1; i < names.length; i++) {
 			final String name = getName(i);
 			if (names[i] == null) {
 				abstractNames.add(name);

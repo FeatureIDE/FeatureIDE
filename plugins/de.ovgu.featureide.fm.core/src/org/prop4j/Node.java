@@ -319,20 +319,19 @@ public abstract class Node {
 
 	@Override
 	public boolean equals(Object object) {
-		if (!getClass().isInstance(object))
-			return false;
-		Node otherNode = (Node) object;
-		if (children.length != otherNode.children.length)
-			return false;
-		for (int i = 0; i < children.length; i++) {
-			boolean pairFound = false;
-			for (int j = 0; j < otherNode.children.length; j++)
-				if (pairFound = children[i].equals(otherNode.children[j]))
-					break;
-			if (!pairFound)
-				return false;
+		if (this == object) {
+			return true;
 		}
-		return true;
+		if (!getClass().isInstance(object)) {
+			return false;
+		}
+		Node otherNode = (Node) object;
+		if (children.length != otherNode.children.length) {
+			return false;
+		}
+		final List<Node> thisChildrenList = Arrays.asList(children);
+		final List<Node> otherChildrenList = Arrays.asList(otherNode.children);
+		return thisChildrenList.containsAll(otherChildrenList) && otherChildrenList.containsAll(thisChildrenList);
 	}
 
 	@Override
