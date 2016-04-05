@@ -851,6 +851,7 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	 * notify listeners about this change.
 	 * 
 	 * @see #getSourceFile()
+	 * @see ModelFileIdMap#getModelId(IFeatureModel, File)
 	 * 
 	 * @since 3.0
 	 * 

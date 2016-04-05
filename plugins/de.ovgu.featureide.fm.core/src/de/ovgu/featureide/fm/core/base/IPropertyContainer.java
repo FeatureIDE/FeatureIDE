@@ -24,7 +24,7 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 /**
- * Classes implementing <code>IPropertyContainer</code> act objects that can be enriched with arbitrary user-defined values
+ * Classes implementing <code>IPropertyContainer</code> act as objects that can be enriched with arbitrary user-defined values
  * by key-value mappings ("properties"). 
  * 
  * @author Marcus Pinencke

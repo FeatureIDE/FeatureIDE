@@ -23,8 +23,6 @@ package de.ovgu.featureide.fm.core.base;
 import de.ovgu.featureide.fm.core.base.event.IEventManager;
 
 /**
- * 
- * 
  * @author Sebastian Krieter
  */
 public interface IFeatureModelElement extends IEventManager {
