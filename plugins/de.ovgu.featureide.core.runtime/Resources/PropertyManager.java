@@ -22,10 +22,14 @@ public class PropertyManager {
 	}
 
 	static {
-		try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream("runtime.properties"))) {
-
-			property.load(bis);
-			bis.close();
+		try {
+			File file = new File(RUNTIME_PROPERTIES);
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+			try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(RUNTIME_PROPERTIES))) {
+				property.load(bis);
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
