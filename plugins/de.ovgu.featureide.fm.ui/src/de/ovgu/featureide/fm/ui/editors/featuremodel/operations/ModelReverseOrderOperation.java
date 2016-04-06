@@ -53,9 +53,9 @@ public class ModelReverseOrderOperation extends AbstractGraphicalFeatureModelOpe
 		final IGraphicalFeature root = FeatureUIHelper.getGraphicalRootFeature(graphicalFeatureModel);
 		Collections.reverse(FeatureUIHelper.getGraphicalChildren(root));
 		if (!graphicalFeatureModel.getLayout().hasFeaturesAutoLayout()) {
-			Point mid = FeatureUIHelper.getLocation(root).getCopy();
-			mid.x += FeatureUIHelper.getSize(root).width / 2;
-			mid.y += FeatureUIHelper.getSize(root).height / 2;
+			Point mid = root.getLocation().getCopy();
+			mid.x += root.getSize().width / 2;
+			mid.y += root.getSize().height / 2;
 			mirrorFeaturePositions(root, mid, FeatureUIHelper.hasVerticalLayout(graphicalFeatureModel));
 		}
 		return new FeatureIDEEvent(null, EventType.LOCATION_CHANGED);
@@ -63,8 +63,8 @@ public class ModelReverseOrderOperation extends AbstractGraphicalFeatureModelOpe
 
 	private void mirrorFeaturePositions(IGraphicalFeature feature, Point mid, boolean vertical) {
 		if (!feature.getObject().getStructure().isRoot()) {
-			Point featureMid = FeatureUIHelper.getLocation(feature).getCopy();
-			Dimension size = FeatureUIHelper.getSize(feature).getCopy();
+			Point featureMid = feature.getLocation().getCopy();
+			Dimension size = feature.getSize().getCopy();
 
 			if (vertical) {
 				featureMid.y += size.height / 2;
@@ -76,7 +76,7 @@ public class ModelReverseOrderOperation extends AbstractGraphicalFeatureModelOpe
 				featureMid.x -= size.width / 2;
 			}
 
-			FeatureUIHelper.setLocation(feature, featureMid);
+			feature.setLocation(featureMid);
 		}
 		if (feature.getObject().getStructure().hasChildren()) {
 			for (IGraphicalFeature child : FeatureUIHelper.getGraphicalChildren(feature)) {

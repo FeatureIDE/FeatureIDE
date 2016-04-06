@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.layouts;
 
-import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -43,10 +42,10 @@ public class ManualLayout extends FeatureDiagramLayoutManager {
 
 	protected void layoutFeatureModel(IGraphicalFeatureModel featureModel) {
 		for (IGraphicalFeature feature : featureModel.getFeatures()) {
-			FeatureUIHelper.setLocation(feature, feature.getLocation());
+			feature.setLocation(feature.getLocation());
 		}
 		for (IGraphicalConstraint constraint : featureModel.getConstraints()) {
-			FeatureUIHelper.setLocation(constraint, constraint.getLocation());
+			constraint.setLocation(constraint.getLocation());
 		}
 	}
 }

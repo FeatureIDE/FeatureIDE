@@ -112,7 +112,7 @@ public class FeatureDragAndDropCommand extends Command {
 	@Override
 	public void execute() {
 		FeatureOperationData data = new FeatureOperationData(feature, oldParent, newParent, newIndex, oldIndex);
-		MoveFeatureOperation op = new MoveFeatureOperation(data, editPart.getViewer(), newLocation, FeatureUIHelper.getLocation(feature).getCopy(), feature.getObject());
+		MoveFeatureOperation op = new MoveFeatureOperation(data, editPart.getViewer(), newLocation, feature.getLocation().getCopy(), feature.getObject());
 		//TODO _interfaces Removed Code
 
 		try {

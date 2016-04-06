@@ -166,64 +166,20 @@ public class FeatureUIHelper {
 		legendSize.put(featureModel, dim);
 	}
 
-	/**
-	 * Use {@link IGraphicalFeature#getLocation()}
-	 */
-	@Deprecated
-	public static Point getLocation(IGraphicalFeature feature) {
-		return feature.getLocation();
-	}
-
-	/**
-	 * Use {@link IGraphicalFeature#setLocation(Point)}
-	 */
-	@Deprecated
-	public static void setLocation(IGraphicalFeature feature, Point newLocation) {
-		Point oldLocation = getLocation(feature);
-		if (oldLocation.equals(newLocation)) {
-			return;
-		}
-		feature.setLocation(newLocation);
-	}
-
-	@Deprecated
-	public static void setTemporaryLocation(IGraphicalFeature feature, Point newLocation) {
-		Point oldLocation = getLocation(feature);
-		if (newLocation == null || newLocation.equals(oldLocation)) {
-			return;
-		}
-	}
-
-	/**
-	 * Use {@link IGraphicalFeature#getSize()}
-	 */
-	@Deprecated
-	public static Dimension getSize(IGraphicalFeature feature) {
-		return feature.getSize();
-	}
-
-	/**
-	 * Use {@link IGraphicalFeature#setSize(Dimension)}
-	 */
-	@Deprecated
-	public static void setSize(IGraphicalFeature feature, Dimension size) {
-		feature.setSize(size);
-	}
-
 	public static Rectangle getBounds(IGraphicalFeature feature) {
-		if (getLocation(feature) == null || getSize(feature) == null) {
+		if (feature.getLocation() == null || feature.getSize() == null) {
 			// UIHelper not set up correctly, refresh the feature model
 			feature.getObject().getFeatureModel().handleModelDataChanged();
 		}
-		return new Rectangle(getLocation(feature), getSize(feature));
+		return new Rectangle(feature.getLocation(), feature.getSize());
 	}
 
 	public static Rectangle getBounds(IGraphicalConstraint constraint) {
-		if (constraint.getLocation() == null || getSize(constraint) == null) {
+		if (constraint.getLocation() == null || constraint.getSize() == null) {
 			// UIHelper not set up correctly, refresh the feature model
 			constraint.getObject().getFeatureModel().handleModelDataChanged();
 		}
-		return new Rectangle(constraint.getLocation(), getSize(constraint));
+		return new Rectangle(constraint.getLocation(), constraint.getSize());
 	}
 
 	/**
@@ -247,7 +203,7 @@ public class FeatureUIHelper {
 	}
 
 	public static Point calculateReferencePoint(IGraphicalFeature feature, Point newLocation) {
-		return new Rectangle(newLocation, getSize(feature)).getCenter();
+		return new Rectangle(newLocation, feature.getSize()).getCenter();
 	}
 
 	public static Point getSourceLocation(IGraphicalFeature feature) {
@@ -268,7 +224,7 @@ public class FeatureUIHelper {
 	}
 
 	public static Point getSourceLocation(IGraphicalFeature feature, Point newLocation) {
-		return getSourceLocation(new Rectangle(newLocation, getSize(feature)), feature.getGraphicalModel());
+		return getSourceLocation(new Rectangle(newLocation, feature.getSize()), feature.getGraphicalModel());
 	}
 
 	public static Point getTargetLocation(IGraphicalFeature feature) {
@@ -285,34 +241,6 @@ public class FeatureUIHelper {
 
 	public static boolean hasVerticalLayout(IGraphicalFeatureModel featureModel) {
 		return featureModel.getLayout().verticalLayout();
-	}
-
-	/**
-	 * Use {@link IGraphicalConstraint#getSize()}
-	 */
-	@Deprecated
-	public static Dimension getSize(IGraphicalConstraint constraint) {
-		return constraint.getSize();
-	}
-
-	/**
-	 * Use {@link IGraphicalConstraint#setSize(Dimension)}
-	 */
-	@Deprecated
-	public static void setSize(IGraphicalConstraint constraint, Dimension size) {
-		constraint.setSize(size);
-	}
-
-	/**
-	 * Use {@link IGraphicalConstraint#setLocation(Point)}
-	 */
-	@Deprecated
-	public static void setLocation(IGraphicalConstraint constraint, Point newLocation) {
-		Point oldLocation = constraint.getLocation();
-		if (newLocation == null || newLocation.equals(oldLocation)) {
-			return;
-		}
-		constraint.setLocation(newLocation);
 	}
 
 	public static void setLegendFigure(IGraphicalFeatureModel featureModel, LegendFigure figure) {

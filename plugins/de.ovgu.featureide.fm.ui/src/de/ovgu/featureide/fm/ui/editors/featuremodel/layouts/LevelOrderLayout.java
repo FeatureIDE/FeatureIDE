@@ -135,7 +135,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 				space = getBounds(feature).x - getBounds(sibling).right() - width;
 				break;
 			}
-			width += FeatureUIHelper.getSize(sibling).width + FMPropertyManager.getFeatureSpaceX();
+			width += sibling.getSize().width + FMPropertyManager.getFeatureSpaceX();
 		}
 		if (right)
 			space = getBounds(feature).x - (getBounds(level.get(l)).x - FMPropertyManager.getFeatureSpaceX()) - width;
@@ -173,7 +173,7 @@ public class LevelOrderLayout extends FeatureDiagramLayoutManager {
 		int minX = getBounds(graphicalChildren.get(0)).x;
 		int maxX = getBounds(graphicalChildren.get(graphicalChildren.size() - 1)).right();
 		Point location = getLocation(feature);
-		int x = (maxX + minX) / 2 - FeatureUIHelper.getSize(feature).width / 2;
+		int x = (maxX + minX) / 2 - feature.getSize().width / 2;
 		setLocation(feature, new Point(x, location.y));
 	}
 
