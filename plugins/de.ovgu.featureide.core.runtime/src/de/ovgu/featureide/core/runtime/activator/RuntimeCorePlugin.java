@@ -21,13 +21,13 @@
 package de.ovgu.featureide.core.runtime.activator;
 
 import org.osgi.framework.BundleContext;
+
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 
-/**
- * Images plugin
- * 
- * @author Jabier Martinez
- *
+/** 
+ *	CorePlugin for the Runtime Composer Extension.
+ * @author Kai Wolf
+ * @author Matthias Quaas
  */
 public class RuntimeCorePlugin extends AbstractCorePlugin {
 

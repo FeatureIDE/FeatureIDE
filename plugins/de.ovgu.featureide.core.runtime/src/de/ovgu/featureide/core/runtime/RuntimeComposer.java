@@ -407,12 +407,13 @@ public class RuntimeComposer extends ComposerExtensionClass {
 	 */
 	@Override
 	public void performFullBuild(final IFile config) {
-
+		if (featureProject == null) {
+			return;
+		}
 		final IFile fileProp = featureProject.getProject().getFile(
 				"runtime.properties");
 
 		if (PROPERTIES.equals(featureProject.getCompositionMechanism())) {
-
 			buildFSTModel();
 
 			final Configuration configuration = readConfig();
@@ -602,6 +603,11 @@ public class RuntimeComposer extends ComposerExtensionClass {
 		fstDirective.setCommand(loc.getCmd());
 
 		return fstDirective;
+	}
+	
+	@Override
+	public void copyNotComposedFiles(Configuration c, IFolder destination) {
+		// nothing here
 	}
 
 }

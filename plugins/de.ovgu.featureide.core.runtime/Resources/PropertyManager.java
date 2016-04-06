@@ -1,6 +1,7 @@
 package properties;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
@@ -16,6 +17,7 @@ import java.util.Properties;
 
 public class PropertyManager {
 
+	private static final String RUNTIME_PROPERTIES = "runtime.properties";
 	private static Properties property = new Properties();
 
 	private PropertyManager() {
