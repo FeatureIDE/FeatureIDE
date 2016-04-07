@@ -28,7 +28,6 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
-import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 
 /**
@@ -52,7 +51,7 @@ public class MoveFeatureOperation extends AbstractFeatureModelOperation {
 	}
 
 	public void newInnerOrder(Point newPos) {
-		FeatureUIHelper.setLocation(data.getFeature(), newPos);
+		data.getFeature().setLocation(newPos);
 	}
 
 	@Override
@@ -62,10 +61,10 @@ public class MoveFeatureOperation extends AbstractFeatureModelOperation {
 			final IGraphicalFeature oldParent = data.getOldParent();
 			final IFeatureStructure featureStructure = feature.getObject().getStructure();
 			oldParent.getObject().getStructure().removeChild(featureStructure);
-			
+
 			final IGraphicalFeature newParent = data.getNewParent();
 			newParent.getObject().getStructure().addChildAtPosition(data.getNewIndex(), featureStructure);
-			
+
 			if (oldParent != newParent) {
 				oldParent.update(FeatureIDEEvent.getDefault(EventType.CHILDREN_CHANGED));
 				newParent.update(FeatureIDEEvent.getDefault(EventType.CHILDREN_CHANGED));

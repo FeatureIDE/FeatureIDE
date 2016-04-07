@@ -58,7 +58,7 @@ public class FMPrintAction extends PrintAction {
 
 		Collection<IGraphicalFeature> features = featureModel.getFeatures();
 		Iterator<IGraphicalFeature> featureIter = features.iterator();
-		Point minP = FeatureUIHelper.getLocation(featureIter.next()).getCopy();
+		Point minP = featureIter.next().getLocation().getCopy();
 
 		move(featureModel, layout, features, featureIter, minP);
 		//print
@@ -71,7 +71,7 @@ public class FMPrintAction extends PrintAction {
 		layout.setLayout(0);
 		while (featureIter.hasNext()) {
 			IGraphicalFeature f = featureIter.next();
-			Point p = FeatureUIHelper.getLocation(f);
+			Point p = f.getLocation();
 			if (p.x < minP.x)
 				minP.x = p.x;
 			if (p.y < minP.y)
@@ -101,14 +101,14 @@ public class FMPrintAction extends PrintAction {
 	private void moveConstraints(IGraphicalFeatureModel featureModel, Point minP) {
 		for (IGraphicalConstraint c : featureModel.getConstraints()) {
 			Point newPoint = new Point(c.getLocation().x - minP.x, c.getLocation().y - minP.y);
-			FeatureUIHelper.setLocation(c, newPoint);
+			c.setLocation(newPoint);
 		}
 	}
 
 	private void moveFeatures(Collection<IGraphicalFeature> features, Point minP) {
 		for (IGraphicalFeature f : features) {
-			Point newPoint = new Point(FeatureUIHelper.getLocation(f).getCopy().x - minP.x, FeatureUIHelper.getLocation(f).getCopy().y - minP.y);
-			FeatureUIHelper.setLocation(f, newPoint);
+			Point newPoint = new Point(f.getLocation().getCopy().x - minP.x, f.getLocation().getCopy().y - minP.y);
+			f.setLocation(newPoint);
 		}
 	}
 

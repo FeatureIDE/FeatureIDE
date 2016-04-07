@@ -41,7 +41,6 @@ import org.prop4j.NodeWriter;
 import de.ovgu.featureide.fm.core.ConstraintAttribute;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIBasics;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -90,7 +89,7 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 
 		setText(getConstraintText(constraint.getObject()));
 
-		FeatureUIHelper.setSize(constraint, getSize());
+		constraint.setSize(getSize());
 
 		add(label);
 		setOpaque(true);
@@ -112,7 +111,7 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 	 */
 	public void setConstraintProperties() {
 		init();
-		
+
 		IConstraint constraint = this.constraint.getObject();
 
 		ConstraintAttribute constraintAttribute = constraint.getConstraintAttribute();

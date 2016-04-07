@@ -57,14 +57,14 @@ public class DepthFirstLayout extends FeatureDiagramLayoutManager {
 		if (isHidden(feature)) {
 			return 0;
 		}
-		FeatureUIHelper.setLocation(feature, new Point(x, FMPropertyManager.getLayoutMarginY() + level * FMPropertyManager.getFeatureSpaceY()));
+		feature.setLocation(new Point(x, FMPropertyManager.getLayoutMarginY() + level * FMPropertyManager.getFeatureSpaceY()));
 		int newX = x;
 		if (yoffset < FMPropertyManager.getLayoutMarginY() + level * FMPropertyManager.getFeatureSpaceY())
 			yoffset = FMPropertyManager.getLayoutMarginY() + level * FMPropertyManager.getFeatureSpaceY();
 		for (IGraphicalFeature child : FeatureUIHelper.getGraphicalChildren(feature)) {
 			newX = depthFirstLayout(child, level + 1, newX);
 		}
-		return Math.max(newX, x + FeatureUIHelper.getSize(feature).width + FMPropertyManager.getFeatureSpaceX());
+		return Math.max(newX, x + feature.getSize().width + FMPropertyManager.getFeatureSpaceX());
 	}
 
 }
