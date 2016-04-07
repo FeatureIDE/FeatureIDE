@@ -1,9 +1,8 @@
-package loader;
-
 import java.util.List;
 
 import interfaces.Announce;
 import interfaces.Print;
+import loader.PluginLoader;
 
 public class Main {
 	public static void main(String[] args) throws InterruptedException {
