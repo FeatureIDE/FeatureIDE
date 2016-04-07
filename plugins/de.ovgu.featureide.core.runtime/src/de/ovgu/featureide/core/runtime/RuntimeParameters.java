@@ -85,7 +85,7 @@ import de.ovgu.featureide.fm.core.io.manager.FileReader;
  * 
  */
 @SuppressWarnings("restriction")
-public class RuntimeComposer extends ComposerExtensionClass {
+public class RuntimeParameters extends ComposerExtensionClass {
 
 	@SuppressWarnings("deprecation")
 	private static final int AST_Type = AST.JLS4;
@@ -95,7 +95,9 @@ public class RuntimeComposer extends ComposerExtensionClass {
 	public static final String PROPERTY_MANAGER_CLASS = "PropertyManager";
 	public static final String PROPERTY_MANAGER_PACKAGE = "properties";
 	public static final String GET_PROPERTY_METHOD = "getProperty";
-	static final String[] COMPOSITION_MECHANISMS = new String[] { RUN_CONFIGURATION, PROPERTIES };
+	public static final String[] COMPOSITION_MECHANISMS = new String[] { RUN_CONFIGURATION, PROPERTIES };
+	
+	// TODO this must not be static
 	static ArrayList<FeatureLocation> featureLocs = new ArrayList<FeatureLocation>();
 
 	/**

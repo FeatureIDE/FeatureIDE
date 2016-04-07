@@ -81,7 +81,7 @@ public class RuntimeFMComposerExtension extends FMComposerExtension {
 		final ArrayList<FeatureLocation> locations = new ArrayList<FeatureLocation>();
 
 		// get FeatureLocation objects with the given oldName as feature name
-		for (final FeatureLocation loc : RuntimeComposer.featureLocs) {
+		for (final FeatureLocation loc : RuntimeParameters.featureLocs) {
 			if (loc.getFeatureName().equals(oldName)) {
 				locations.add(loc);
 			}
@@ -129,9 +129,9 @@ public class RuntimeFMComposerExtension extends FMComposerExtension {
 				oldClassStringArray = processedClassFiles.get(classPath);
 			}
 			oldClassStringArray[lineNumber - 1] = oldClassStringArray[lineNumber - 1]
-					.replace(RuntimeComposer.GET_PROPERTY_METHOD + "(\""
+					.replace(RuntimeParameters.GET_PROPERTY_METHOD + "(\""
 							+ oldName + "\")",
-							RuntimeComposer.GET_PROPERTY_METHOD + "(\""
+							RuntimeParameters.GET_PROPERTY_METHOD + "(\""
 									+ newName + "\")");
 
 			final StringBuilder newClassString = new StringBuilder();

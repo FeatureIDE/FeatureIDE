@@ -25,7 +25,7 @@ import org.osgi.framework.BundleContext;
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 
 /**
- * CorePlugin for the Runtime Composer Extension.
+ * CorePlugin for the Runtime Parameters Extension.
  * 
  * @author Kai Wolf
  * @author Matthias Quaas

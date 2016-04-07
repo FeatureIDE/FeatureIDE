@@ -56,7 +56,7 @@ public class RuntimeLaunchConfigurationDelegate implements
 
 		if ((featureProject != null)
 				&& featureProject.getComposerID().equals(COMPOSER_ID)
-				&& RuntimeComposer.RUN_CONFIGURATION.equals(featureProject
+				&& RuntimeParameters.RUN_CONFIGURATION.equals(featureProject
 						.getCompositionMechanism())) {
 
 			final Configuration featureProjectConfig = new Configuration(
