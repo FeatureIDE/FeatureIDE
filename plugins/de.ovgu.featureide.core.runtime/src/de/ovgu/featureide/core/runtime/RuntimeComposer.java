@@ -333,19 +333,17 @@ public class RuntimeComposer extends ComposerExtensionClass {
 	@Override
 	public boolean initialize(final IFeatureProject project) {
 		if (super.initialize(project)) {
-
-			final IFolder propFolder = featureProject.getBuildFolder().getFolder(PROPERTY_MANAGER_PACKAGE);
-
-			try {
-				if (!propFolder.exists()) {
-					propFolder.create(true, true, new NullProgressMonitor());
-				}
-			} catch (final CoreException e) {
-				RuntimeCorePlugin.getDefault().logError(e);
-			}
-			final IFile filePropMan = propFolder.getFile(PROPERTY_MANAGER_CLASS + ".java");
-
 			if (PROPERTIES.equals(featureProject.getCompositionMechanism())) {
+				final IFolder propFolder = featureProject.getBuildFolder().getFolder(PROPERTY_MANAGER_PACKAGE);
+
+				try {
+					if (!propFolder.exists()) {
+						propFolder.create(true, true, new NullProgressMonitor());
+					}
+				} catch (final CoreException e) {
+					RuntimeCorePlugin.getDefault().logError(e);
+				}
+				final IFile filePropMan = propFolder.getFile(PROPERTY_MANAGER_CLASS + ".java");
 				if (!filePropMan.exists()) {
 					InputStream inputStream = null;
 					try {
@@ -362,6 +360,8 @@ public class RuntimeComposer extends ComposerExtensionClass {
 					}
 				}
 			} else {
+				final IFolder propFolder = featureProject.getBuildFolder().getFolder(PROPERTY_MANAGER_PACKAGE);
+				final IFile filePropMan = propFolder.getFile(PROPERTY_MANAGER_CLASS + ".java");
 				deleteFile(filePropMan);
 				try {
 					propFolder.delete(true, null);
@@ -387,8 +387,8 @@ public class RuntimeComposer extends ComposerExtensionClass {
 		if (featureProject == null) {
 			return;
 		}
-		final IFile fileProp = featureProject.getProject().getFile("runtime.properties");
 
+		final IFile fileProp = featureProject.getProject().getFile("runtime.properties");
 		if (PROPERTIES.equals(featureProject.getCompositionMechanism())) {
 			buildFSTModel();
 
@@ -568,5 +568,18 @@ public class RuntimeComposer extends ComposerExtensionClass {
 	public void copyNotComposedFiles(Configuration c, IFolder destination) {
 		// nothing here
 	}
+	
+	@Override
+	public ArrayList<String[]> getTemplates() {
+		final ArrayList<String[]> templates = new ArrayList<>(1);
+		templates.add(JAVA_TEMPLATE);
+		return templates;
+	}
+	
+	@Override
+	public boolean createFolderForFeatures() {
+		return false;
+	}
+	
 
 }
