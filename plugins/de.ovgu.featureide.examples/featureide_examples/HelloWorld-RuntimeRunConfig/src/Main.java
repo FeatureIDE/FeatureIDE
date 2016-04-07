@@ -5,9 +5,7 @@ import java.util.List;
 
 public class Main {
 	public static void main(String[] args) throws IOException {
-		
 		List<String> list = Arrays.asList(args);
-		
 		if(list.contains("Hello")){
 			System.out.print("Hello");			
 		}
@@ -23,8 +21,5 @@ public class Main {
 		if(list.contains("World")){
 			System.out.println(" World!");			
 		}
-		
-		//own program arguments in Run Configuration of Eclipse are considered, too.
-		
 	}
 }
