@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 package properties;
 
 import java.io.BufferedInputStream;
@@ -100,5 +99,4 @@ public class PropertyManager {
 
 	}
 
->>>>>>> 9af4a216cee231582cba08fb69fdb8867957afe1
 }
