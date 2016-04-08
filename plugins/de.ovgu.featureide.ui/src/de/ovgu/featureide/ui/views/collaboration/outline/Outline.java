@@ -465,8 +465,7 @@ public class Outline extends ViewPart implements ICurrentBuildListener, IPropert
 								}
 								fireSelectedAction();
 
-								//TODO test fix for #404
-//								update(file);
+								update(file);
 							}
 						} else {
 							selectedOutlineType = OutlineLabelProvider.OUTLINE_NOT_AVAILABLE;
