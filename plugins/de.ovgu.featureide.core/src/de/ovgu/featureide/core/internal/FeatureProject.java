@@ -140,9 +140,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			if (EventType.FEATURE_NAME_CHANGED == evt.getEventType()) {
 				String oldName = (String) evt.getOldValue();
 				String newName = (String) evt.getNewValue();
-
 				FeatureProject.this.renameFeature((IFeatureModel) evt.getSource(), oldName, newName);
-//				LOGGER.fireFeatureFolderChanged(FeatureProject.this.getSourceFolder());
 			}
 		}
 	}
@@ -579,17 +577,19 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 						public boolean visit(IResource resource) throws CoreException {
 							final String name = resource.getName();
 							if (resource instanceof IFile && name.endsWith(suffix)) {
-								//TODO _test renaming
 								final IPersistentFormat<Configuration> format = ConfigurationManager.getFormat(resource.getName());
 								final java.nio.file.Path path = Paths.get(resource.getLocationURI());
 								r.setFormat(format);
 								w.setFormat(format);
 								r.setPath(path);
 								w.setPath(path);
+								r.read();
+								w.save();
 							}
 							return true;
 						}
 					}, IResource.DEPTH_ONE, IResource.NONE);
+					configFolder.refreshLocal(IResource.DEPTH_ONE, null);
 				} catch (CoreException e) {
 					LOGGER.logError(e);
 				} finally {
