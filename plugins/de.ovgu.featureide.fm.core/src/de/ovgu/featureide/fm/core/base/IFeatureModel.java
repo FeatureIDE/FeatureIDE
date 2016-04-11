@@ -35,6 +35,7 @@ import de.ovgu.featureide.fm.core.RenamingsManager;
 import de.ovgu.featureide.fm.core.base.event.IEventManager;
 import de.ovgu.featureide.fm.core.base.impl.Constraint;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.base.querying.QueryEngine;
 
 /**
  * The feature model interface represents any class that acts in the sense of a <i>feature model</i> in FeatureIDE. 
@@ -195,5 +196,9 @@ public interface IFeatureModel extends Cloneable, IEventManager {
 	long getNextElementId();
 
 	void setConstraint(int index, Constraint constraint);
+	
+	default QueryEngine query() {
+		return new QueryEngine(this);
+	}
 
 }
