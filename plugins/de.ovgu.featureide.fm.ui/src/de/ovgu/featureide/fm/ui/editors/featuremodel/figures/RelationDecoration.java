@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.figures;
 
-import java.util.LinkedList;
-
 import org.eclipse.draw2d.Ellipse;
 import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.RotatableDecoration;
@@ -29,9 +27,9 @@ import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.graphics.Color;
 
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
@@ -39,6 +37,7 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * A decoration for a feature connection that indicates its group type.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke
  */
 public class RelationDecoration extends Ellipse implements RotatableDecoration, GUIDefaults {
 
@@ -46,24 +45,28 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 
 	private Point referencePoint;
 
-	private Feature lastChild;
-	private LinkedList<Feature> children;
+	private IGraphicalFeature lastChild;
+	private Iterable<? extends IGraphicalFeature> children;
 
 	private boolean vertical;
-	private FeatureModel featureModel;
+	private IGraphicalFeatureModel featureModel;
 
-	public RelationDecoration(boolean fill, Feature lastChild, LinkedList<Feature> children) {
+	public RelationDecoration(boolean fill, IGraphicalFeature lastChild) {
 		super();
 		this.fill = fill;
-		this.children = children;
 		this.lastChild = lastChild;
+		if (lastChild == null) {
+			this.children = null;
+		} else {
+			this.children = lastChild.getTree().getParent().getChildrenObjects();
+		}
 		final Color decoratorForgroundColor = FMPropertyManager.getDecoratorForgroundColor();
 		setForegroundColor(decoratorForgroundColor);
 		setBackgroundColor(decoratorForgroundColor);
 		final int diameter = getTargetAnchorDiameter();
 		setSize(diameter, diameter >> 1);
 		if (lastChild != null) {
-			featureModel = lastChild.getFeatureModel();
+			featureModel = lastChild.getGraphicalModel();
 			this.vertical = FeatureUIHelper.hasVerticalLayout(featureModel);
 		}
 	}
@@ -88,8 +91,8 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 		if (!fill)
 			return;
 
-		double highestAngle1 = Integer.MAX_VALUE;
-		double highestAngle2 = Integer.MIN_VALUE;
+		double highestAngle1 = 360;
+		double highestAngle2 = 0;
 
 		Rectangle r = calculateRectangle();
 
@@ -101,11 +104,10 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 		} else {
 
 			if (children != null) {
-				for (int i = 0; i < children.size(); i++) {
-					Feature temp;
-					temp = this.lastChild;
-					this.lastChild = children.get(i);
-					if (!(this.lastChild.isHidden() && !FeatureUIHelper.showHiddenFeatures(featureModel))) {
+				for (IGraphicalFeature curChild : children) {
+					IGraphicalFeature temp = this.lastChild;
+					this.lastChild = curChild;
+					if (!(this.lastChild.getObject().getStructure().isHidden() && !FeatureUIHelper.showHiddenFeatures(featureModel))) {
 						double angle2 = HALF_ARC ? 360 : calculateAngle(center, getFeatureLocation());
 						double angle1 = HALF_ARC ? 180 : calculateAngle(center, getFeatureLocation());
 						if (angle2 > 450 && !vertical) {
@@ -120,7 +122,6 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 								this.lastChild = temp;
 							}
 						}
-
 					}
 				}
 			} else {
@@ -138,10 +139,10 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 			} else {
 				if (highestAngle1 > 360)
 					graphics.fillArc(r, 180, 180);
-				//				if(highestAngle2>450)
-				graphics.fillArc(r, (int) highestAngle1, (int) (highestAngle2 - highestAngle1));
-				//				else
-				//					graphics.fillArc(r,(int) highestAngle1, (int)(highestAngle2 - highestAngle1));
+//				if (highestAngle2 > 450)
+					graphics.fillArc(r, (int) highestAngle1, (int) (highestAngle2 - highestAngle1));
+//				else
+//					graphics.fillArc(r, (int) highestAngle1, (int) (highestAngle2 - highestAngle1));
 			}
 		}
 	}
@@ -153,8 +154,8 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 
 		Rectangle r = calculateRectangle();
 
-		double highestAngle1 = Integer.MAX_VALUE;
-		double highestAngle2 = Integer.MIN_VALUE;
+		double highestAngle1 = 360;
+		double highestAngle2 = 0;
 
 		if (this instanceof LegendRelationDecoration) {
 			highestAngle2 = HALF_ARC ? 360 : calculateAngle(r.getCenter(), getFeatureLocation());
@@ -163,11 +164,10 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 		} else {
 
 			if (children != null) {
-				for (int i = 0; i < children.size(); i++) {
-					Feature temp;
-					temp = this.lastChild;
-					this.lastChild = children.get(i);
-					if (!(this.lastChild.isHidden() && !FeatureUIHelper.showHiddenFeatures(featureModel))) {
+				for (IGraphicalFeature curChild : children) {
+					IGraphicalFeature temp = this.lastChild;
+					this.lastChild = curChild;
+					if (!(this.lastChild.getObject().getStructure().isHidden() && !FeatureUIHelper.showHiddenFeatures(featureModel))) {
 						double angle2 = HALF_ARC ? 360 : calculateAngle(r.getCenter(), getFeatureLocation());
 						double angle1 = HALF_ARC ? 180 : calculateAngle(r.getCenter(), getFeatureLocation());
 						if (angle2 > 450 && !vertical) {
@@ -188,7 +188,7 @@ public class RelationDecoration extends Ellipse implements RotatableDecoration, 
 				highestAngle2 = HALF_ARC ? 360 : calculateAngle(r.getCenter(), getFeatureLocation());
 			}
 			r.shrink(7, 7);
-			r.y += FeatureUIHelper.getSize(lastChild.getParent()).height / 2;
+			r.y += FeatureUIHelper.getSize(lastChild.getTree().getParentObject()).height / 2;
 			if (vertical) {
 				r.shrink(2, 2);
 				if (highestAngle2 < 270)

@@ -24,7 +24,8 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslReader;
@@ -39,7 +40,7 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
  */
 public abstract class AbstractConfigurationTest {
 
-	public static FeatureModel fm; 
+	public static IFeatureModel fm; 
 
 	@Before
 	public void setModel(){
@@ -55,10 +56,10 @@ public abstract class AbstractConfigurationTest {
 	 * @return the FeatureModel used in this test class
 	 */
 	 
-	abstract FeatureModel loadModel();
+	abstract IFeatureModel loadModel();
 	
-	protected static FeatureModel loadGUIDSL(String grammar) {
-		FeatureModel fm = new FeatureModel();
+	protected static IFeatureModel loadGUIDSL(String grammar) {
+		IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
 		IFeatureModelReader reader = new GuidslReader(fm);
 		try {
 			reader.readFromString(grammar);
@@ -75,7 +76,7 @@ public abstract class AbstractConfigurationTest {
 	 *  	  
 	 * @return
 	 */
-	protected static FeatureModel loadXML(String fmXml,String constraintsXml) {
+	protected static IFeatureModel loadXML(String fmXml,String constraintsXml) {
 		String xml = "<featureModel><struct>" + fmXml;
 		xml += "</struct>";
 		if(constraintsXml!=null){	
@@ -83,7 +84,7 @@ public abstract class AbstractConfigurationTest {
 			xml += constraintsXml + "</constraints>";
 		}
 		xml += "</featureModel>";
-		FeatureModel fm = new FeatureModel();
+		IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
 		IFeatureModelReader reader = new XmlFeatureModelReader(fm);
 		try {
 			reader.readFromString(xml);
@@ -99,7 +100,7 @@ public abstract class AbstractConfigurationTest {
 	 *  	  
 	 * @return
 	 */
-	protected static FeatureModel loadXML(String fmXml) {
+	protected static IFeatureModel loadXML(String fmXml) {
 		return loadXML(fmXml,null);
 	}
 	/**

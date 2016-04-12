@@ -26,7 +26,7 @@ import org.eclipse.gef.editpolicies.XYLayoutEditPolicy;
 import org.eclipse.gef.requests.CreateRequest;
 
 /**
- * TODO description
+ * Layout policy for the collaboration diagram.
  * 
  * @author Constanze Adler
  */

@@ -31,7 +31,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.ToolTip;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 
@@ -42,12 +44,13 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
  * @author Thomas Thuem
  * @author Florian Proksch
  * @author Stefan Krueger
+ * @author Marcus Pinnecke
  */
 public class FeatureLabelEditManager extends DirectEditManager implements GUIDefaults {
 
-	private FeatureModel featureModel;
+	private IFeatureModel featureModel;
 
-	public FeatureLabelEditManager(FeatureEditPart editpart, Class<?> editorType, FeatureCellEditorLocator locator, FeatureModel featureModel) {
+	public FeatureLabelEditManager(FeatureEditPart editpart, Class<?> editorType, FeatureCellEditorLocator locator, IFeatureModel featureModel) {
 		super(editpart, editorType, locator);
 		this.featureModel = featureModel;
 	}
@@ -56,7 +59,7 @@ public class FeatureLabelEditManager extends DirectEditManager implements GUIDef
 	protected void initCellEditor() {
 		final CellEditor cellEditor = getCellEditor();
 		final Control control = cellEditor.getControl();
-		final String oldValue = ((FeatureEditPart) getEditPart()).getFeature().getName();
+		final String oldValue = ((FeatureEditPart) getEditPart()).getFeature().getObject().getName();
 
 		control.setFont(DEFAULT_FONT);
 		cellEditor.setValue(oldValue);
@@ -74,7 +77,7 @@ public class FeatureLabelEditManager extends DirectEditManager implements GUIDef
 						// TODO #455 wrong usage of extension
 					} else if ((!featureModel.getFMComposerExtension().isValidFeatureName(value))) {
 						createTooltip(featureModel.getFMComposerExtension().getErroMessage(), SWT.ICON_ERROR);
-					} else if (featureModel.getFeatureNames().contains(value)) {
+					} else if (Functional.toList(FeatureUtils.extractFeatureNames(featureModel.getFeatures())).contains(value)) {
 						createTooltip(THIS_NAME_IS_ALREADY_USED_FOR_ANOTHER_FEATURE_, SWT.ICON_ERROR);
 					}
 				}

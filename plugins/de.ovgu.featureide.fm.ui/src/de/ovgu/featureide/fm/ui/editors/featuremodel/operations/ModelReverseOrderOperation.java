@@ -22,43 +22,46 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.REVERSE_LAYOUT_ORDER;
 
-import java.util.LinkedList;
-
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.util.tree.TreeOperations;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
  * Operation with functionality to reverse the feature model layout order.
  * Enables undo/redo functionality.
  * 
  * @author Fabian Benduhn
+ * @author Marcus Pinnecke
  */
-public class ModelReverseOrderOperation extends AbstractFeatureModelOperation {
+public class ModelReverseOrderOperation extends AbstractGraphicalFeatureModelOperation {
 
 	private static final String LABEL = REVERSE_LAYOUT_ORDER;
 
-	public ModelReverseOrderOperation(FeatureModel featureModel) {
+	public ModelReverseOrderOperation(IGraphicalFeatureModel featureModel) {
 		super(featureModel, LABEL);
+		setEventId(FeatureIDEEvent.MODEL_DATA_LOADED);
 	}
 
 	@Override
-	protected void redo() {
-		final Feature root = featureModel.getRoot();
-		reverse(root);
-		if (!featureModel.getLayout().hasFeaturesAutoLayout()) {
+	protected FeatureIDEEvent operation() {
+		final IGraphicalFeature root = graphicalFeatureModel.getFeatures().getObject();
+		TreeOperations.reverse(root.getTree());
+		if (!graphicalFeatureModel.getLayout().hasFeaturesAutoLayout()) {
 			Point mid = FeatureUIHelper.getLocation(root).getCopy();
 			mid.x += FeatureUIHelper.getSize(root).width / 2;
 			mid.y += FeatureUIHelper.getSize(root).height / 2;
-			mirrorFeaturePositions(root, mid, FeatureUIHelper.hasVerticalLayout(featureModel));
+			mirrorFeaturePositions(root, mid, FeatureUIHelper.hasVerticalLayout(graphicalFeatureModel));
 		}
+		return null;
 	}
 
-	private void mirrorFeaturePositions(Feature feature, Point mid, boolean vertical) {
-		if (!feature.isRoot()) {
+	private void mirrorFeaturePositions(IGraphicalFeature feature, Point mid, boolean vertical) {
+		if (!feature.getTree().isRoot()) {
 			Point featureMid = FeatureUIHelper.getLocation(feature).getCopy();
 			Dimension size = FeatureUIHelper.getSize(feature).getCopy();
 
@@ -74,24 +77,16 @@ public class ModelReverseOrderOperation extends AbstractFeatureModelOperation {
 
 			FeatureUIHelper.setLocation(feature, featureMid);
 		}
-		if (feature.hasChildren()) {
-			for (Feature child : feature.getChildren())
+		if (feature.getTree().hasChildren()) {
+			for (IGraphicalFeature child : feature.getTree().getChildrenObjects()) {
 				mirrorFeaturePositions(child, mid, vertical);
+			}
 		}
-
-	}
-
-	private void reverse(Feature feature) {
-		LinkedList<Feature> children = feature.getChildren();
-		for (int i = 0; i < children.size() - 1; i++)
-			children.add(i, children.removeLast());
-		for (Feature child : feature.getChildren())
-			reverse(child);
 	}
 
 	@Override
-	protected void undo() {
-		redo();
+	protected FeatureIDEEvent inverseOperation() {
+		return operation();
 	}
 
 }

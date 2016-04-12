@@ -24,19 +24,28 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 
-import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
  * A feature representation for layout.
  * 
  * @author Patrick Sulkowski
+ * @author Marcus Pinnecke
  */
+// TODO unused? 
 public class LayoutableFeature {
 
 	private boolean showHidden;
-	private Feature feature;
+	private IFeature feature;
+	
+	public LayoutableFeature(IFeatureStructure featureStructure, boolean showHidden) {
+		this (featureStructure.getFeature(), showHidden);
+	}
 
-	public LayoutableFeature(Feature feature, boolean showHidden) {
+	public LayoutableFeature(IFeature feature, boolean showHidden) {
 		this.feature = feature;
 		this.showHidden = showHidden;
 	}
@@ -45,11 +54,11 @@ public class LayoutableFeature {
 
 		LinkedList<LayoutableFeature> children = new LinkedList<LayoutableFeature>();
 
-		for (Feature child : feature.getChildren()) {
+		for (IFeature child : FeatureUtils.convertToFeatureList(feature.getStructure().getChildren())) {
 			if (showHidden) {
 				children.add(new LayoutableFeature(child, showHidden));
 			} else {
-				if (!child.isHidden()) {
+				if (!child.getStructure().isHidden()) {
 					children.add(new LayoutableFeature(child, showHidden));
 				}
 			}
@@ -77,17 +86,17 @@ public class LayoutableFeature {
 		return !getChildren().isEmpty();
 	}
 
-	public Feature getFeature() {
+	public IFeature getFeature() {
 		return feature;
 	}
 
-	public static Collection<Feature> convertFeatures(Collection<Feature> features, boolean showHidden) {
+	public static Collection<IFeature> convertFeatures(Iterable<IFeature> features, boolean showHidden) {
 		if (showHidden) {
-			return features;
+			return Functional.toList(features);
 		} else {
-			final ArrayList<Feature> newFeatures = new ArrayList<Feature>();
-			for (Feature feature : features) {
-				if (feature.hasHiddenParent()) {
+			final ArrayList<IFeature> newFeatures = new ArrayList<IFeature>();
+			for (IFeature feature : features) {
+				if (feature.getStructure().hasHiddenParent()) {
 					newFeatures.add(feature);
 				}
 			}
@@ -95,13 +104,14 @@ public class LayoutableFeature {
 		}
 	}
 
-	public static boolean isHidden(Feature feature, boolean showHidden) {
+	public static boolean isHidden(IFeature feature, boolean showHidden) {
 		if (showHidden)
 			return false;
-		if (!feature.isRoot())
-			return (feature.isHidden() || isHidden(feature.getParent(), showHidden));
+		final IFeatureStructure structure = feature.getStructure();
+		if (!structure.isRoot())
+			return (structure.isHidden() || isHidden(FeatureUtils.getParent(feature), showHidden));
 		else
-			return feature.isHidden();
+			return structure.isHidden();
 	}
 
 }

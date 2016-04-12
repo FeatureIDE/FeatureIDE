@@ -28,7 +28,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.FunctionalInterfaces.IConsumer;
+import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
 import de.ovgu.featureide.fm.core.job.IJob;
 
 /**
@@ -38,6 +38,7 @@ import de.ovgu.featureide.fm.core.job.IJob;
  * It is possible to wait for a sequence to finish.
  * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public final class JobSequence implements IJob {
 

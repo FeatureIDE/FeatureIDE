@@ -20,6 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.conf;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -33,7 +35,7 @@ import org.prop4j.SatSolver.ValueType;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.conf.nodes.Variable;
 import de.ovgu.featureide.fm.core.conf.nodes.VariableConfiguration;
 import de.ovgu.featureide.fm.core.conf.worker.GraphCalcThread;
@@ -42,6 +44,8 @@ import de.ovgu.featureide.fm.core.configuration.IConfigurationPropagator;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
+import de.ovgu.featureide.fm.core.io.FeatureGraphFormat;
+import de.ovgu.featureide.fm.core.io.manager.FileReader;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.WorkMonitor;
@@ -53,43 +57,57 @@ import de.ovgu.featureide.fm.core.job.WorkMonitor;
  */
 public class ConfigurationChanger implements IConfigurationChanger, IConfigurationPropagator {
 
-	private final FeatureModel featureModel;
-	private final IFeatureGraph featureGraph;
-	private final VariableConfiguration variableConfiguration;
-	private final ConfigurationFG c;
-	private Node node;
+	public class AutoCompletionMethod implements LongRunningMethod<Void> {
 
-	private byte[] lastComputedValues;
-	private final List<String> changedFeatures = new ArrayList<>();
+		private final int type;
 
-	private GraphCalcThread calcThread;
-	private SatSolver satSolver1 = null;
+		public AutoCompletionMethod(int type) {
+			this.type = type;
+		}
 
-	private boolean initialized = false;
-
-	public ConfigurationChanger(FeatureModel featureModel, VariableConfiguration variableConfiguration, ConfigurationFG c) {
-		this.featureModel = featureModel;
-		this.featureGraph = featureModel.getFeatureGraph();
-		this.variableConfiguration = variableConfiguration;
-		this.c = c;
-		LongRunningWrapper.runMethod(load());
-	}
-
-	public class LoadMethod implements LongRunningMethod<Void> {
 		@Override
 		public Void execute(WorkMonitor monitor) {
-			if (!initialized) {
-				lastComputedValues = new byte[variableConfiguration.size()];
-				int i = 0;
-				for (Variable variable : variableConfiguration) {
-					lastComputedValues[i++] = (byte) variable.getAutomaticValue();
+			final UpdateHelper updateHelper = new UpdateHelper();
+			for (int index = 0; index < featureGraph.getSize(); index++) {
+				if (variableConfiguration.getVariable(index).getValue() != Variable.UNDEFINED) {
+					continue;
 				}
-				node = AdvancedNodeCreator.createCNF(featureModel);
-				calcThread = new GraphCalcThread(featureGraph.getFeatureArray(), ConfigurationChanger.this, node);
-				initialized = true;
+
+				final int newValue;
+				switch (type) {
+				case 0:
+					newValue = Variable.FALSE;
+					break;
+				case 2:
+					newValue = Math.random() < 0.5 ? Variable.FALSE : Variable.TRUE;
+					break;
+				case 1:
+				default:
+					newValue = Variable.TRUE;
+					break;
+				}
+				setNewValue(index, newValue, true);
+
+				updateHelper.init(index, newValue == Variable.TRUE);
+
+				for (int i = index + 1; i < featureGraph.getSize(); i++) {
+					updateHelper.updateVariable(i);
+				}
 			}
 			return null;
 		}
+	}
+	
+	// TODO implement
+	public class Resolve implements LongRunningMethod<Void> {
+		@Override
+		public Void execute(WorkMonitor workMonitor) throws Exception {
+			return null;
+		}
+	}
+
+	public Resolve resolve() {
+		return new Resolve();
 	}
 
 	public class CanBeValidMethod implements LongRunningMethod<Boolean> {
@@ -104,15 +122,10 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 		}
 	}
 
-	public class IsValidMethod implements LongRunningMethod<Boolean> {
+	public class CountSolutionsMethod implements LongRunningMethod<Long> {
 		@Override
-		public Boolean execute(WorkMonitor monitor) {
-			try {
-				return sat(getCurrentLiterals(false));
-			} catch (Exception e) {
-				FMCorePlugin.getDefault().logError(e);
-				return false;
-			}
+		public Long execute(WorkMonitor monitor) {
+			return new SatSolver(node, 1000, false).countSolutions(getCurrentLiterals(true));
 		}
 	}
 
@@ -130,16 +143,69 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 		}
 	}
 
-	public class CountSolutionsMethod implements LongRunningMethod<Long> {
+	public class IsValidMethod implements LongRunningMethod<Boolean> {
 		@Override
-		public Long execute(WorkMonitor monitor) {
-			return new SatSolver(node, 1000, false).countSolutions(getCurrentLiterals(true));
+		public Boolean execute(WorkMonitor monitor) {
+			try {
+				return sat(getCurrentLiterals(false));
+			} catch (Exception e) {
+				FMCorePlugin.getDefault().logError(e);
+				return false;
+			}
 		}
 	}
 
 	public class LeadToValidConfiguration implements LongRunningMethod<Void> {
 		@Override
 		public Void execute(WorkMonitor monitor) {
+			return null;
+		}
+	}
+
+	public class LoadMethod implements LongRunningMethod<Void> {
+		@Override
+		public Void execute(WorkMonitor monitor) {
+			if (!isLoaded()) {
+				lastComputedValues = new byte[variableConfiguration.size()];
+				int i = 0;
+				for (Variable variable : variableConfiguration) {
+					lastComputedValues[i++] = (byte) variable.getAutomaticValue();
+				}
+				node = AdvancedNodeCreator.createCNF(featureModel);
+				calcThread = new GraphCalcThread(featureGraph.getFeatureArray(), ConfigurationChanger.this, node);
+				initialized = true;
+			}
+			return null;
+		}
+	}
+
+	public class SimpleAutoCompletionMethod implements LongRunningMethod<Void> {
+
+		private final boolean positive;
+
+		public SimpleAutoCompletionMethod(boolean positive) {
+			this.positive = positive;
+		}
+
+		@Override
+		public Void execute(WorkMonitor monitor) {
+			if (satSolver1 == null) {
+				satSolver1 = new SatSolver(node, 1000, false);
+			}
+			List<String> featureNames = satSolver1.getSolution(positive);
+			for (String featureName : featureNames) {
+				int index = featureGraph.getFeatureIndex(featureName);
+				if (index >= 0) {
+					setNewValue(featureGraph.getFeatureIndex(featureName), Variable.TRUE, false);
+				}
+			}
+
+			for (int index = 0; index < featureGraph.getSize(); index++) {
+				if (variableConfiguration.getVariable(index).getValue() == Variable.UNDEFINED) {
+					setNewValue(index, Variable.FALSE, false);
+				}
+			}
+
 			return null;
 		}
 	}
@@ -344,104 +410,24 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 
 	}
 
-	@Override
-	public CanBeValidMethod canBeValid() {
-		return new CanBeValidMethod();
-	}
+	public class UpdateNextMethod implements LongRunningMethod<Void> {
+		@Override
+		public Void execute(WorkMonitor monitor) {
+			final UpdateHelper updateHelper = new UpdateHelper();
+			for (int index = 0; index < lastComputedValues.length; index++) {
+				final int newValue = variableConfiguration.getVariable(index).getValue();
+				if (newValue != lastComputedValues[index]) {
+					lastComputedValues[index] = (byte) newValue;
 
-	@Override
-	public IsValidMethod isValid() {
-		return new IsValidMethod();
-	}
+					updateHelper.init(index, newValue == Variable.TRUE);
 
-	@Override
-	public GetSolutionsMethod getSolutions(int max) throws TimeoutException {
-		return new GetSolutionsMethod(max);
-	}
-
-	@Override
-	public CountSolutionsMethod number(long timeout) {
-		return new CountSolutionsMethod();
-	}
-
-	@Override
-	public UpdateMethod update(boolean redundantManual, String startFeatureName) {
-		return new UpdateMethod();
-	}
-
-	public UpdateNextMethod updateNext() {
-		return new UpdateNextMethod();
-	}
-
-	public AutoCompletionMethod autoCompletion(int type) {
-		return new AutoCompletionMethod(type);
-	}
-
-	public SimpleAutoCompletionMethod simpleAutoCompletion(boolean positive) {
-		return new SimpleAutoCompletionMethod(positive);
-	}
-
-	@Override
-	public IsValidMethod isValidNoHidden() {
-		return new IsValidMethod();
-	}
-
-	private Literal[] getCurrentLiterals(boolean definedVariablesOnly) {
-		final Literal[] literals = new Literal[variableConfiguration.size(definedVariablesOnly)];
-		int i = 0;
-		for (Variable var : variableConfiguration) {
-			if (!definedVariablesOnly || var.getValue() != Variable.UNDEFINED) {
-				literals[i++] = new Literal(featureGraph.getFeatureArray()[var.getId()], var.getValue() == Variable.TRUE);
+					for (int i = (index + 1) % featureGraph.getSize(); i != index; i = (i + 1) % featureGraph.getSize()) {
+						updateHelper.updateVariable(i);
+					}
+				}
 			}
+			return null;
 		}
-		return literals;
-	}
-
-	private boolean sat(final Literal[] literals) throws TimeoutException {
-		if (satSolver1 == null) {
-			satSolver1 = new SatSolver(node, 1000, false);
-		}
-		return satSolver1.isSatisfiable(literals);
-	}
-
-	public void setNewValue(int index, int value, boolean manual) {
-		variableConfiguration.setVariable(index, value, manual);
-
-		if (!manual) {
-			lastComputedValues[index] = (byte) variableConfiguration.getVariable(index).getValue();
-		}
-	}
-
-	public IFeatureGraph getFeatureGraph() {
-		return featureGraph;
-	}
-
-	public VariableConfiguration getVariableConfiguration() {
-		return variableConfiguration;
-	}
-
-	public List<String> getChangedFeatures() {
-		return Collections.unmodifiableList(changedFeatures);
-	}
-
-	@Override
-	public LeadToValidConfiguration leadToValidConfiguration(List<SelectableFeature> featureList) {
-		return new LeadToValidConfiguration();
-	}
-
-	@Override
-	public LeadToValidConfiguration leadToValidConfiguration(List<SelectableFeature> featureList, int mode) {
-		return new LeadToValidConfiguration();
-	}
-
-	@Override
-	public LoadMethod load() {
-		return new LoadMethod();
-	}
-
-	@Override
-	public void reset() {
-		Arrays.fill(lastComputedValues, (byte) Variable.UNDEFINED);
 	}
 
 	private class UpdateHelper {
@@ -450,9 +436,9 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 
 		private boolean undefined = false;
 
-		private boolean variableValue = false;
-
 		private int variableIndex = 0;
+
+		private boolean variableValue = false;
 
 		public void init(int variableIndex, boolean variableValue) {
 			this.variableIndex = variableIndex;
@@ -475,6 +461,53 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 					break;
 				}
 			}
+		}
+
+		private boolean calc(int featureID) {
+			final Literal curLiteral = new Literal(featureGraph.getFeatureArray()[featureID], false);
+			knownLiterals[knownLiterals.length - 1] = curLiteral;
+			try {
+				if (!sat(knownLiterals)) {
+					setNewValue(featureID, Variable.TRUE, false);
+				} else {
+					curLiteral.flip();
+					if (!sat(knownLiterals)) {
+						setNewValue(featureID, Variable.FALSE, false);
+					}
+				}
+			} catch (TimeoutException e) {
+				FMCorePlugin.getDefault().logError(e);
+			}
+
+			return variableConfiguration.getVariable(featureID).getValue() == Variable.UNDEFINED;
+		}
+
+		private boolean calcNegative(int featureID) {
+			final Literal curLiteral = new Literal(featureGraph.getFeatureArray()[featureID], true);
+			knownLiterals[knownLiterals.length - 1] = curLiteral;
+			try {
+				if (!sat(knownLiterals)) {
+					setNewValue(featureID, Variable.FALSE, false);
+				}
+			} catch (TimeoutException e) {
+				FMCorePlugin.getDefault().logError(e);
+			}
+
+			return variableConfiguration.getVariable(featureID).getValue() == Variable.UNDEFINED;
+		}
+
+		private boolean calcPositive(int featureID) {
+			final Literal curLiteral = new Literal(featureGraph.getFeatureArray()[featureID], false);
+			knownLiterals[knownLiterals.length - 1] = curLiteral;
+			try {
+				if (!sat(knownLiterals)) {
+					setNewValue(featureID, Variable.TRUE, false);
+				}
+			} catch (TimeoutException e) {
+				FMCorePlugin.getDefault().logError(e);
+			}
+
+			return variableConfiguration.getVariable(featureID).getValue() == Variable.UNDEFINED;
 		}
 
 		private void updateVariable(int index) {
@@ -507,145 +540,147 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 				}
 			}
 		}
+	}
 
-		private boolean calc(int featureID) {
-			final Literal curLiteral = new Literal(featureGraph.getFeatureArray()[featureID], false);
-			knownLiterals[knownLiterals.length - 1] = curLiteral;
-			try {
-				if (!sat(knownLiterals)) {
-					setNewValue(featureID, Variable.TRUE, false);
-				} else {
-					curLiteral.flip();
-					if (!sat(knownLiterals)) {
-						setNewValue(featureID, Variable.FALSE, false);
-					}
-				}
-			} catch (TimeoutException e) {
-				FMCorePlugin.getDefault().logError(e);
-			}
+	private final ConfigurationFG c;
 
-			return variableConfiguration.getVariable(featureID).getValue() == Variable.UNDEFINED;
-		}
+	private GraphCalcThread calcThread;
 
-		private boolean calcPositive(int featureID) {
-			final Literal curLiteral = new Literal(featureGraph.getFeatureArray()[featureID], false);
-			knownLiterals[knownLiterals.length - 1] = curLiteral;
-			try {
-				if (!sat(knownLiterals)) {
-					setNewValue(featureID, Variable.TRUE, false);
-				}
-			} catch (TimeoutException e) {
-				FMCorePlugin.getDefault().logError(e);
-			}
+	private final List<String> changedFeatures = new ArrayList<>();
 
-			return variableConfiguration.getVariable(featureID).getValue() == Variable.UNDEFINED;
-		}
+	private final IFeatureGraph featureGraph;
 
-		private boolean calcNegative(int featureID) {
-			final Literal curLiteral = new Literal(featureGraph.getFeatureArray()[featureID], true);
-			knownLiterals[knownLiterals.length - 1] = curLiteral;
-			try {
-				if (!sat(knownLiterals)) {
-					setNewValue(featureID, Variable.FALSE, false);
-				}
-			} catch (TimeoutException e) {
-				FMCorePlugin.getDefault().logError(e);
-			}
+	private final IFeatureModel featureModel;
 
-			return variableConfiguration.getVariable(featureID).getValue() == Variable.UNDEFINED;
+	private boolean initialized = false;
+
+	private byte[] lastComputedValues;
+
+	private Node node;
+
+	private SatSolver satSolver1 = null;
+
+	private final VariableConfiguration variableConfiguration;
+
+	public ConfigurationChanger(IFeatureModel featureModel, VariableConfiguration variableConfiguration, ConfigurationFG c) {
+		this.featureModel = featureModel;
+		this.featureGraph = new MatrixFeatureGraph(featureModel);
+		final FeatureGraphFormat format = new FeatureGraphFormat();
+		final Path path = Paths.get("model." + format.getSuffix());
+		new FileReader<IFeatureGraph>().read(path, this.featureGraph, format);
+		this.variableConfiguration = variableConfiguration;
+		this.c = c;
+		LongRunningWrapper.runMethod(load());
+	}
+
+	public AutoCompletionMethod autoCompletion(int type) {
+		return new AutoCompletionMethod(type);
+	}
+
+	@Override
+	public CanBeValidMethod canBeValid() {
+		return new CanBeValidMethod();
+	}
+
+	@Override
+	public LongRunningMethod<List<Node>> findOpenClauses(List<SelectableFeature> featureList) {
+		return null;
+	}
+
+	public List<String> getChangedFeatures() {
+		return Collections.unmodifiableList(changedFeatures);
+	}
+
+	public IFeatureGraph getFeatureGraph() {
+		return featureGraph;
+	}
+
+	@Override
+	public GetSolutionsMethod getSolutions(int max) throws TimeoutException {
+		return new GetSolutionsMethod(max);
+	}
+
+	public VariableConfiguration getVariableConfiguration() {
+		return variableConfiguration;
+	}
+
+	@Override
+	public IsValidMethod isValid() {
+		return new IsValidMethod();
+	}
+
+	@Override
+	public IsValidMethod isValidNoHidden() {
+		return new IsValidMethod();
+	}
+
+	@Override
+	public LeadToValidConfiguration leadToValidConfiguration(List<SelectableFeature> featureList) {
+		return new LeadToValidConfiguration();
+	}
+
+	@Override
+	public LeadToValidConfiguration leadToValidConfiguration(List<SelectableFeature> featureList, int mode) {
+		return new LeadToValidConfiguration();
+	}
+
+	@Override
+	public LoadMethod load() {
+		return new LoadMethod();
+	}
+
+	@Override
+	public CountSolutionsMethod number(long timeout) {
+		return new CountSolutionsMethod();
+	}
+
+	@Override
+	public void reset() {
+		Arrays.fill(lastComputedValues, (byte) Variable.UNDEFINED);
+	}
+
+	public void setNewValue(int index, int value, boolean manual) {
+		variableConfiguration.setVariable(index, value, manual);
+
+		if (!manual) {
+			lastComputedValues[index] = (byte) variableConfiguration.getVariable(index).getValue();
 		}
 	}
 
-	public class UpdateNextMethod implements LongRunningMethod<Void> {
-		@Override
-		public Void execute(WorkMonitor monitor) {
-			final UpdateHelper updateHelper = new UpdateHelper();
-			for (int index = 0; index < lastComputedValues.length; index++) {
-				final int newValue = variableConfiguration.getVariable(index).getValue();
-				if (newValue != lastComputedValues[index]) {
-					lastComputedValues[index] = (byte) newValue;
-
-					updateHelper.init(index, newValue == Variable.TRUE);
-
-					for (int i = (index + 1) % featureGraph.getSize(); i != index; i = (i + 1) % featureGraph.getSize()) {
-						updateHelper.updateVariable(i);
-					}
-				}
-			}
-			return null;
-		}
+	public SimpleAutoCompletionMethod simpleAutoCompletion(boolean positive) {
+		return new SimpleAutoCompletionMethod(positive);
 	}
 
-	public class AutoCompletionMethod implements LongRunningMethod<Void> {
-
-		private final int type;
-
-		public AutoCompletionMethod(int type) {
-			this.type = type;
-		}
-
-		@Override
-		public Void execute(WorkMonitor monitor) {
-			final UpdateHelper updateHelper = new UpdateHelper();
-			for (int index = 0; index < featureGraph.getSize(); index++) {
-				if (variableConfiguration.getVariable(index).getValue() != Variable.UNDEFINED) {
-					continue;
-				}
-
-				final int newValue;
-				switch (type) {
-				case 0:
-					newValue = Variable.FALSE;
-					break;
-				case 2:
-					newValue = Math.random() < 0.5 ? Variable.FALSE : Variable.TRUE;
-					break;
-				case 1:
-				default:
-					newValue = Variable.TRUE;
-					break;
-				}
-				setNewValue(index, newValue, true);
-
-				updateHelper.init(index, newValue == Variable.TRUE);
-
-				for (int i = index + 1; i < featureGraph.getSize(); i++) {
-					updateHelper.updateVariable(i);
-				}
-			}
-			return null;
-		}
+	@Override
+	public UpdateMethod update(boolean redundantManual, String startFeatureName) {
+		return new UpdateMethod();
 	}
 
-	public class SimpleAutoCompletionMethod implements LongRunningMethod<Void> {
+	public UpdateNextMethod updateNext() {
+		return new UpdateNextMethod();
+	}
 
-		private final boolean positive;
-
-		public SimpleAutoCompletionMethod(boolean positive) {
-			this.positive = positive;
+	private Literal[] getCurrentLiterals(boolean definedVariablesOnly) {
+		final Literal[] literals = new Literal[variableConfiguration.size(definedVariablesOnly)];
+		int i = 0;
+		for (Variable var : variableConfiguration) {
+			if (!definedVariablesOnly || var.getValue() != Variable.UNDEFINED) {
+				literals[i++] = new Literal(featureGraph.getFeatureArray()[var.getId()], var.getValue() == Variable.TRUE);
+			}
 		}
+		return literals;
+	}
 
-		@Override
-		public Void execute(WorkMonitor monitor) {
-			if (satSolver1 == null) {
-				satSolver1 = new SatSolver(node, 1000, false);
-			}
-			List<String> featureNames = satSolver1.getSolution(positive);
-			for (String featureName : featureNames) {
-				int index = featureGraph.getFeatureIndex(featureName);
-				if (index >= 0) {
-					setNewValue(featureGraph.getFeatureIndex(featureName), Variable.TRUE, false);
-				}
-			}
-
-			for (int index = 0; index < featureGraph.getSize(); index++) {
-				if (variableConfiguration.getVariable(index).getValue() == Variable.UNDEFINED) {
-					setNewValue(index, Variable.FALSE, false);
-				}
-			}
-
-			return null;
+	private boolean sat(final Literal[] literals) throws TimeoutException {
+		if (satSolver1 == null) {
+			satSolver1 = new SatSolver(node, 1000, false);
 		}
+		return satSolver1.isSatisfiable(literals);
+	}
+
+	@Override
+	public boolean isLoaded() {
+		return initialized;
 	}
 
 }

@@ -24,7 +24,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 
 /**
@@ -36,16 +36,17 @@ import de.ovgu.featureide.fm.core.color.FeatureColorManager;
  * 
  * @author Jonas Weigt
  * @author Christian Harnisch
+ * @author Marcus Pinnecke
  */
 public class DeleteProfileColorSchemeAction extends Action {
 
-	private FeatureModel model;
+	private IFeatureModel model;
 	
 
 	/*
 	 * Constructor
 	 */
-	public DeleteProfileColorSchemeAction(String text, FeatureModel model) {
+	public DeleteProfileColorSchemeAction(String text, IFeatureModel model) {
 		super(text);
 		this.model = model;
 		setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_ETOOL_DELETE));

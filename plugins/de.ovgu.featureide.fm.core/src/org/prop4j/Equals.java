@@ -26,8 +26,9 @@ import java.util.List;
  * A constraint that is true iff both children have the same boolean value.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
-public class Equals extends Node {
+public class Equals extends Node implements Cloneable {
 	
 	public Equals(Object leftChild, Object rightChild) {
 		setChildren(leftChild, rightChild);

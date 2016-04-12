@@ -51,7 +51,8 @@ import de.ovgu.featureide.core.fstmodel.FSTMethod;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin;
-import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.functional.Functional;
 
 
 /**
@@ -59,6 +60,7 @@ import de.ovgu.featureide.fm.core.Feature;
  * 
  * @author Jens Meinicke
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public abstract class ErrorPropagation {
 
@@ -341,9 +343,9 @@ public abstract class ErrorPropagation {
 			return null;
 		}
 
-		Collection<Feature> features = featureProject.getFeatureModel().getFeatures();
+		Collection<IFeature> features = Functional.toList(featureProject.getFeatureModel().getFeatures());
 		for (String confFeature : configurationFeatures) {
-			for (Feature feature : features) {
+			for (IFeature feature : features) {
 				if (feature.getName().equals(confFeature)) {
 					list.add(feature.getName());
 				}

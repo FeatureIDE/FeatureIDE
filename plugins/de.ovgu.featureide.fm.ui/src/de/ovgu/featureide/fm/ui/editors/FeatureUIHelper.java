@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors;
 
-import java.beans.PropertyChangeEvent;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -33,12 +32,9 @@ import org.eclipse.gef.EditPartViewer;
 import org.eclipse.gef.editparts.ZoomListener;
 import org.eclipse.gef.editparts.ZoomManager;
 
-import de.ovgu.featureide.fm.core.Constraint;
-import de.ovgu.featureide.fm.core.FMPoint;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureConnection;
-import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConnectionEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
 
@@ -48,15 +44,12 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.LegendFigure;
  * stored persistently.
  * 
  * @author Christian Kaestner
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class FeatureUIHelper {
 
-	private static final WeakHashMap<Feature, Point> featureLocation = new WeakHashMap<>();
-	private static final WeakHashMap<Feature, Dimension> featureSize = new WeakHashMap<>();
-	private static final WeakHashMap<Constraint, Point> constraintLocation = new WeakHashMap<>();
-	private static final WeakHashMap<Constraint, Dimension> constraintSize = new WeakHashMap<>();
-	private static final WeakHashMap<FeatureModel, Dimension> legendSize = new WeakHashMap<>();
-	private static final WeakHashMap<FeatureModel, LegendFigure> legendFigure = new WeakHashMap<>();
+	private static final Map<IGraphicalFeatureModel, Dimension> legendSize = new WeakHashMap<>();
+	private static final Map<IGraphicalFeatureModel, LegendFigure> legendFigure = new WeakHashMap<>();
 
 	/**
 	 * Necessary for correct manual drag-and-drop movement while zoomed.
@@ -64,119 +57,142 @@ public class FeatureUIHelper {
 	private static double zoomFactor = 1.0;
 	private static ZoomManager zoomManager = null;
 
-	public static Dimension getLegendSize(FeatureModel featureModel) {
-		return legendSize.get(featureModel);
-	}
+//	@Deprecated
+//	public static Dimension getLegendSize(IFeatureModel featureModel) {
+//		return getLegendSize(featureModel.getGraphicRepresenation());
+//	}
+//
+//	@Deprecated
+//	public static boolean showHiddenFeatures(IFeatureModel featureModel) {
+//		return featureModel.getGraphicRepresenation().getLayout().showHiddenFeatures();
+//	}
+//
+//	@Deprecated
+//	public static void showHiddenFeatures(boolean show, IFeatureModel featureModel) {
+//		showHiddenFeatures(show, featureModel.getGraphicRepresenation());
+//	}
+//
+//	@Deprecated
+//	public static void setLegendSize(IFeatureModel featureModel, Dimension dim) {
+//		setLegendSize(featureModel.getGraphicRepresenation(), dim);
+//	}
+//
+//	@Deprecated
+//	public static Point getLocation(IFeature feature) {
+//		return getLocation(feature.getGraphicRepresenation());
+//	}
+//
+//	@Deprecated
+//	public static void setLocation(IFeature feature, FMPoint newLocation) {
+//		setLocation(feature.getGraphicRepresenation(), newLocation);
+//	}
+//
+//	@Deprecated
+//	public static void setLocation(IFeature feature, Point newLocation) {
+//		setLocation(feature.getGraphicRepresenation(), newLocation);
+//	}
+//
+//	@Deprecated
+//	public static void setTemporaryLocation(IFeature feature, Point newLocation) {
+//		setTemporaryLocation(feature.getGraphicRepresenation(), newLocation);
+//	}
+//
+//	@Deprecated
+//	public static Dimension getSize(IFeature feature) {
+//		return getSize(feature.getGraphicRepresenation());
+//	}
+//
+//	@Deprecated
+//	public static void setSize(IFeature feature, Dimension size) {
+//		setSize(feature.getGraphicRepresenation(), size);
+//	}
+//
+//	@Deprecated
+//	public static Rectangle getBounds(IFeature feature) {
+//		return getBounds(feature.getGraphicRepresenation());
+//	}
+//
+//	@Deprecated
+//	public static Rectangle getBounds(IConstraint constraint) {
+//		return getBounds(constraint.getGraphicRepresenation());
+//	}
+//
+//	@Deprecated
+//	public static List<ConnectionEditPart> getConnections(IFeature feature, EditPartViewer viewer) {
+//		return getConnections(feature.getGraphicRepresenation(), viewer);
+//	}
+//
+//	@Deprecated
+//	public static Point getReferencePoint(IFeature feature) {
+//		return getReferencePoint(feature.getGraphicRepresenation());
+//	}
+//
+//	@Deprecated
+//	public static Point calculateReferencePoint(IFeature feature, Point newLocation) {
+//		return calculateReferencePoint(feature.getGraphicRepresenation(), newLocation);
+//	}
+//
+//	@Deprecated
+//	public static Point getSourceLocation(IFeature feature) {
+//		return getSourceLocation(feature.getGraphicRepresenation());
+//	}
+//
+//	@Deprecated
+//	public static Point getSourceLocation(IFeature feature, Point newLocation) {
+//		return getSourceLocation(feature.getGraphicRepresenation(), newLocation);
+//	}
+//
+//	@Deprecated
+//	public static Point getTargetLocation(IFeature feature) {
+//		return getTargetLocation(feature.getGraphicRepresenation());
+//	}
+//
+//	@Deprecated
+//	public static void setVerticalLayoutBounds(boolean isVerticalLayout, IFeatureModel featureModel) {
+//		setVerticalLayoutBounds(isVerticalLayout, featureModel.getGraphicRepresenation());
+//	}
+//
+//	@Deprecated
+//	public static boolean hasVerticalLayout(IFeatureModel featureModel) {
+//		return hasVerticalLayout(featureModel.getGraphicRepresenation());
+//	}
+//
+//	@Deprecated
+//	public static Dimension getSize(IConstraint constraint) {
+//		return getSize(constraint.getGraphicRepresenation());
+//	}
+//
+//	@Deprecated
+//	public static void setSize(IConstraint constraint, Dimension size) {
+//		setSize(constraint.getGraphicRepresenation(), size);
+//	}
+//
+//	@Deprecated
+//	public static Point getLocation(IConstraint constraint) {
+//		return getLocation(constraint.getGraphicRepresenation());
+//	}
+//
+//	@Deprecated
+//	public static void setLocation(IConstraint constraint, FMPoint newLocation) {
+//		setLocation(constraint.getGraphicRepresenation(), newLocation);
+//	}
+//
+//	@Deprecated
+//	public static void setLocation(IConstraint constraint, Point newLocation) {
+//		setLocation(constraint.getGraphicRepresenation(), newLocation);
+//	}
+//
+//	@Deprecated
+//	public static void setLegendFigure(IFeatureModel featureModel, LegendFigure figure) {
+//		setLegendFigure(featureModel.getGraphicRepresenation(), figure);
+//	}
+//
+//	@Deprecated
+//	public static LegendFigure getLegendFigure(IFeatureModel featureModel) {
+//		return getLegendFigure(featureModel.getGraphicRepresenation());
+//	}
 
-	public static boolean showHiddenFeatures(FeatureModel featureModel) {
-		return featureModel.getLayout().showHiddenFeatures();
-	}
-
-	public static void showHiddenFeatures(boolean show, FeatureModel featureModel) {
-		featureModel.getLayout().showHiddenFeatures(show);
-	}
-
-	public static void setLegendSize(FeatureModel featureModel, Dimension dim) {
-		legendSize.put(featureModel, dim);
-	}
-
-	public static Point getLocation(Feature feature) {
-		return featureLocation.get(feature);
-	}
-
-	public static void setLocation(Feature feature, FMPoint newLocation) {
-		setLocation(feature, toPoint(newLocation));
-	}
-
-	public static void setLocation(Feature feature, Point newLocation) {
-		Point oldLocation = getLocation(feature);
-		feature.setNewLocation(toFMPoint(newLocation));
-		if (newLocation == null) {
-			return;
-		}
-		featureLocation.put(feature, newLocation);
-		fireLocationChanged(feature, oldLocation, newLocation);
-	}
-
-	public static void setTemporaryLocation(Feature feature, Point newLocation) {
-		Point oldLocation = getLocation(feature);
-		if (newLocation == null || newLocation.equals(oldLocation)) {
-			return;
-		}
-		featureLocation.put(feature, newLocation);
-		fireLocationChanged(feature, oldLocation, newLocation);
-	}
-
-	public static Dimension getSize(Feature feature) {
-		return featureSize.get(feature);
-	}
-
-	public static void setSize(Feature feature, Dimension size) {
-		featureSize.put(feature, size);
-	}
-
-	public static Rectangle getBounds(Feature feature) {
-		if (getLocation(feature) == null || getSize(feature) == null) {
-			// UIHelper not set up correctly, refresh the feature model
-			feature.getFeatureModel().handleModelDataChanged();
-		}
-		return new Rectangle(getLocation(feature), getSize(feature));
-	}
-
-	public static Rectangle getBounds(Constraint constraint) {
-		if (getLocation(constraint) == null || getSize(constraint) == null) {
-			// UIHelper not set up correctly, refresh the feature model
-			constraint.getFeatureModel().handleModelDataChanged();
-		}
-		return new Rectangle(getLocation(constraint), getSize(constraint));
-	}
-
-	public static List<ConnectionEditPart> getConnections(Feature feature, EditPartViewer viewer) {
-		final List<ConnectionEditPart> editPartList = new LinkedList<ConnectionEditPart>();
-		final Map<?, ?> registry = viewer.getEditPartRegistry();
-		for (FeatureConnection connection : feature.getTargetConnections()) {
-			final Object connectionEditPart = registry.get(connection);
-			if (connectionEditPart instanceof ConnectionEditPart) {
-				editPartList.add((ConnectionEditPart) connectionEditPart);
-			}
-		}
-		return editPartList;
-	}
-
-	private static void fireLocationChanged(Feature feature, Point oldLocation, Point newLocation) {
-		PropertyChangeEvent event = new PropertyChangeEvent(feature, PropertyConstants.LOCATION_CHANGED, oldLocation, newLocation);
-		feature.fire(event);
-	}
-
-	public static Point getReferencePoint(Feature feature) {
-		return getBounds(feature).getCenter();
-	}
-
-	public static Point calculateReferencePoint(Feature feature, Point newLocation) {
-		return new Rectangle(newLocation, getSize(feature)).getCenter();
-	}
-
-	public static Point getSourceLocation(Feature feature) {
-		Feature parentFeature = feature;
-		boolean parentFeatureHidden = false;
-		while (!parentFeature.isRoot()) {
-			parentFeature = parentFeature.getParent();
-			if (parentFeature.isHidden()) {
-				parentFeatureHidden = true;
-			}
-		}
-		if ((feature.isHidden() || parentFeatureHidden) && !feature.getFeatureModel().getLayout().showHiddenFeatures()) {
-			return getTargetLocation(feature.getParent());
-		}
-
-		return getSourceLocation(getBounds(feature), feature.getFeatureModel());
-	}
-
-	public static Point getSourceLocation(Feature feature, Point newLocation) {
-		return getSourceLocation(new Rectangle(newLocation, getSize(feature)), feature.getFeatureModel());
-	}
-
-	private static Point getSourceLocation(Rectangle bounds, FeatureModel featureModel) {
+	private static Point getSourceLocation(Rectangle bounds, IGraphicalFeatureModel featureModel) {
 		if (featureModel.getLayout().verticalLayout()) {
 			return new Point(bounds.getLeft().x, (bounds.bottom() + bounds.getTop().y) / 2);
 		} else {
@@ -184,70 +200,21 @@ public class FeatureUIHelper {
 		}
 	}
 
-	public static Point getTargetLocation(Feature feature) {
-		Rectangle bounds = getBounds(feature);
-		if (feature.getFeatureModel().getLayout().verticalLayout()) {
-			return new Point(bounds.getRight().x, (bounds.bottom() + bounds.getTop().y) / 2);
-		}
-
-		return new Point(bounds.getCenter().x, bounds.bottom() - 1);
-
-	}
-
-	public static void setVerticalLayoutBounds(boolean isVerticalLayout, FeatureModel featureModel) {
-		featureModel.getLayout().verticalLayout(isVerticalLayout);
-	}
-
-	public static boolean hasVerticalLayout(FeatureModel featureModel) {
-		return featureModel.getLayout().verticalLayout();
-	}
-
-	public static Dimension getSize(Constraint constraint) {
-		return constraintSize.get(constraint);
-	}
-
-	public static void setSize(Constraint constraint, Dimension size) {
-		constraintSize.put(constraint, size);
-	}
-
-	public static Point getLocation(Constraint constraint) {
-		return constraintLocation.get(constraint);
-	}
-
-	public static void setLocation(Constraint constraint, FMPoint newLocation) {
-		setLocation(constraint, toPoint(newLocation));
-	}
-
-	public static void setLocation(Constraint constraint, Point newLocation) {
-		Point oldLocation = getLocation(constraint);
-		if (newLocation == null || newLocation.equals(oldLocation)) {
-			return;
-		}
-		constraintLocation.put(constraint, newLocation);
-		fireLocationChanged(constraint, oldLocation, newLocation);
-		constraint.setLocation(toFMPoint(newLocation));
-	}
-
-	private static void fireLocationChanged(Constraint constraint, Point oldLocation, Point newLocation) {
-		PropertyChangeEvent event = new PropertyChangeEvent(constraint, PropertyConstants.LOCATION_CHANGED, oldLocation, newLocation);
-		constraint.fire(event);
-	}
-
-	public static void setLegendFigure(FeatureModel featureModel, LegendFigure figure) {
-		legendFigure.put(featureModel, figure);
-	}
-
-	public static LegendFigure getLegendFigure(FeatureModel featureModel) {
-		return legendFigure.get(featureModel);
-	}
-
-	public static Point toPoint(FMPoint point) {
-		return new Point(point.getX(), point.getY());
-	}
-
-	public static FMPoint toFMPoint(Point point) {
-		return new FMPoint(point.x, point.y);
-	}
+//	public static Dimension toDimension(FMDimension point) {
+//		return new Dimension(point.getWidth(), point.getHeight());
+//	}
+//
+//	public static FMDimension toFMDimension(Dimension dim) {
+//		return new FMDimension(dim.width(), dim.height());
+//	}
+//
+//	public static Point toPoint(FMPoint point) {
+//		return new Point(point.getX(), point.getY());
+//	}
+//
+//	public static FMPoint toFMPoint(Point point) {
+//		return new FMPoint(point.x, point.y);
+//	}
 
 	/**
 	 * @return the zoomFactor
@@ -286,4 +253,172 @@ public class FeatureUIHelper {
 	public static ZoomManager getZoomManager() {
 		return zoomManager;
 	}
+
+	public static Dimension getLegendSize(IGraphicalFeatureModel featureModel) {
+		return legendSize.get(featureModel);
+	}
+
+	public static boolean showHiddenFeatures(IGraphicalFeatureModel featureModel) {
+		return featureModel.getLayout().showHiddenFeatures();
+	}
+
+	public static void showHiddenFeatures(boolean show, IGraphicalFeatureModel featureModel) {
+		featureModel.getLayout().showHiddenFeatures(show);
+	}
+
+	public static void setLegendSize(IGraphicalFeatureModel featureModel, Dimension dim) {
+		legendSize.put(featureModel, dim);
+	}
+
+	public static Point getLocation(IGraphicalFeature feature) {
+		return feature.getLocation();
+	}
+
+//	public static void setLocation(IGraphicalFeature feature, FMPoint newLocation) {
+//		setLocation(feature, newLocation);
+//	}
+
+	public static void setLocation(IGraphicalFeature feature, Point newLocation) {
+		Point oldLocation = getLocation(feature);
+		if (newLocation == null) {
+			return;
+		}
+		feature.setLocation(newLocation);
+		fireLocationChanged(feature, oldLocation, newLocation);
+	}
+
+	public static void setTemporaryLocation(IGraphicalFeature feature, Point newLocation) {
+		Point oldLocation = getLocation(feature);
+		if (newLocation == null || newLocation.equals(oldLocation)) {
+			return;
+		}
+		fireLocationChanged(feature, oldLocation, newLocation);
+	}
+
+	public static Dimension getSize(IGraphicalFeature feature) {
+		return feature.getSize();
+	}
+
+	public static void setSize(IGraphicalFeature feature, Dimension size) {
+		feature.setSize(size);
+	}
+
+	public static Rectangle getBounds(IGraphicalFeature feature) {
+		if (getLocation(feature) == null || getSize(feature) == null) {
+			// UIHelper not set up correctly, refresh the feature model
+			feature.getObject().getFeatureModel().handleModelDataChanged();
+		}
+		return new Rectangle(getLocation(feature), getSize(feature));
+	}
+
+	public static Rectangle getBounds(IGraphicalConstraint constraint) {
+		if (getLocation(constraint) == null || getSize(constraint) == null) {
+			// UIHelper not set up correctly, refresh the feature model
+			constraint.getObject().getFeatureModel().handleModelDataChanged();
+		}
+		return new Rectangle(getLocation(constraint), getSize(constraint));
+	}
+
+	public static List<ConnectionEditPart> getConnections(IGraphicalFeature feature, EditPartViewer viewer) {
+		final List<ConnectionEditPart> editPartList = new LinkedList<ConnectionEditPart>();
+		final Map<?, ?> registry = viewer.getEditPartRegistry();
+		for (FeatureConnection connection : feature.getTargetConnections()) {
+			final Object connectionEditPart = registry.get(connection);
+			if (connectionEditPart instanceof ConnectionEditPart) {
+				editPartList.add((ConnectionEditPart) connectionEditPart);
+			}
+		}
+		return editPartList;
+	}
+
+	public static Point getReferencePoint(IGraphicalFeature feature) {
+		return getBounds(feature).getCenter();
+	}
+
+	public static Point calculateReferencePoint(IGraphicalFeature feature, Point newLocation) {
+		return new Rectangle(newLocation, getSize(feature)).getCenter();
+	}
+
+	public static Point getSourceLocation(IGraphicalFeature feature) {
+		IFeatureStructure parentFeature = feature.getObject().getStructure();
+		boolean parentFeatureHidden = false;
+		while (!parentFeature.isRoot()) {
+			parentFeature = parentFeature.getParent();
+			if (parentFeature.isHidden()) {
+				parentFeatureHidden = true;
+			}
+		}
+		if ((feature.getObject().getStructure().isHidden() || parentFeatureHidden)
+				&& !feature.getGraphicalModel().getLayout().showHiddenFeatures()) {
+			return getTargetLocation(feature.getTree().getParentObject());
+		}
+
+		return getSourceLocation(getBounds(feature), feature.getGraphicalModel());
+	}
+
+	public static Point getSourceLocation(IGraphicalFeature feature, Point newLocation) {
+		return getSourceLocation(new Rectangle(newLocation, getSize(feature)), feature.getGraphicalModel());
+	}
+
+	public static Point getTargetLocation(IGraphicalFeature feature) {
+		Rectangle bounds = getBounds(feature);
+		if (feature.getGraphicalModel().getLayout().verticalLayout()) {
+			return new Point(bounds.getRight().x, (bounds.bottom() + bounds.getTop().y) / 2);
+		}
+
+		return new Point(bounds.getCenter().x, bounds.bottom() - 1);
+
+	}
+
+	public static void setVerticalLayoutBounds(boolean isVerticalLayout, IGraphicalFeatureModel featureModel) {
+		featureModel.getLayout().verticalLayout(isVerticalLayout);
+	}
+
+	public static boolean hasVerticalLayout(IGraphicalFeatureModel featureModel) {
+		return featureModel.getLayout().verticalLayout();
+	}
+
+	public static Dimension getSize(IGraphicalConstraint constraint) {
+		return constraint.getSize();
+	}
+
+	public static void setSize(IGraphicalConstraint constraint, Dimension size) {
+		constraint.setSize(size);
+	}
+
+	public static Point getLocation(IGraphicalConstraint constraint) {
+		return constraint.getLocation();
+	}
+
+//	public static void setLocation(IGraphicalConstraint constraint, FMPoint newLocation) {
+//		setLocation(constraint, toPoint(newLocation));
+//	}
+
+	public static void setLocation(IGraphicalConstraint constraint, Point newLocation) {
+		Point oldLocation = getLocation(constraint);
+		if (newLocation == null || newLocation.equals(oldLocation)) {
+			return;
+		}
+		constraint.setLocation(newLocation);
+		fireLocationChanged(constraint, oldLocation, newLocation);
+	}
+
+	private static void fireLocationChanged(IGraphicalFeature feature, Point oldLocation, Point newLocation) {
+		FeatureIDEEvent event = new FeatureIDEEvent(feature, PropertyConstants.LOCATION_CHANGED, oldLocation, newLocation);
+		feature.getObject().fireEvent(event);
+	}
+
+	private static void fireLocationChanged(IGraphicalConstraint constraint, Point oldLocation, Point newLocation) {
+		FeatureIDEEvent event = new FeatureIDEEvent(constraint, PropertyConstants.LOCATION_CHANGED, oldLocation, newLocation);
+		constraint.getObject().fireEvent(event);
+	}
+
+	public static void setLegendFigure(IGraphicalFeatureModel featureModel, LegendFigure figure) {
+		legendFigure.put(featureModel, figure);
+	}
+
+	public static LegendFigure getLegendFigure(IGraphicalFeatureModel featureModel) {
+		return legendFigure.get(featureModel);
+	}
+
 }

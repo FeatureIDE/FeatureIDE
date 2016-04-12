@@ -24,26 +24,26 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.HIDE_LEGEND;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SHOW_LEGEND;
 
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.LegendHideOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.HideLegendOperation;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
  * Shows/hides the legend when executed.
  * 
  * @author Fabian Benduhn
+ * @author Marcus Pinnecke
  */
 public class LegendAction extends Action {
 
-	private final FeatureModel featureModel;
+	private final IFeatureModel featureModel;
 
-	public LegendAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
+	public LegendAction(GraphicalViewerImpl viewer, IFeatureModel featureModel) {
 		super();
 		this.featureModel = featureModel;
 		if (!FMPropertyManager.isLegendHidden()) {
@@ -56,8 +56,7 @@ public class LegendAction extends Action {
 
 	@Override
 	public void run() {
-		LegendHideOperation op = new LegendHideOperation(featureModel);
-		op.addContext((IUndoContext) featureModel.getUndoContext());
+		HideLegendOperation op = new HideLegendOperation(featureModel);
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);

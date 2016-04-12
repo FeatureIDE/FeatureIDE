@@ -20,13 +20,10 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.editparts;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.draw2d.ConnectionAnchor;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.geometry.Point;
@@ -39,17 +36,21 @@ import org.eclipse.gef.tools.DirectEditManager;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.Constraint;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureConnection;
-import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
+import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
+import de.ovgu.featureide.fm.ui.editors.FeatureConnection;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureCellEditorLocator;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.renaming.FeatureLabelEditManager;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.FeatureFigure;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureSetMandatoryOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.SetFeatureToMandatoryOperation;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.policies.FeatureDirectEditPolicy;
 
 /**
@@ -57,8 +58,9 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.policies.FeatureDirectEditP
  * the models of features can provide connection anchors.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke
  */
-public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEditPart, PropertyConstants, PropertyChangeListener {
+public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEditPart, PropertyConstants, IEventListener {
 
 	private ConnectionAnchor sourceAnchor = null;
 	private ConnectionAnchor targetAnchor = null;
@@ -68,8 +70,8 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 		setModel(feature);
 	}
 
-	public Feature getFeature() {
-		return (Feature) getModel();
+	public IGraphicalFeature getFeature() {
+		return (IGraphicalFeature) getModel();
 	}
 
 	public FeatureFigure getFeatureFigure() {
@@ -78,8 +80,8 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 
 	@Override
 	protected IFigure createFigure() {
-		final Feature f = getFeature();
-		final FeatureFigure featureFigure = new FeatureFigure(f, f.getFeatureModel());
+		final IGraphicalFeature f = getFeature();
+		final FeatureFigure featureFigure = new FeatureFigure(f, f.getGraphicalModel());
 		sourceAnchor = featureFigure.getSourceAnchor();
 		targetAnchor = featureFigure.getTargetAnchor();
 		return featureFigure;
@@ -87,26 +89,26 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 
 	@Override
 	protected void createEditPolicies() {
-		final Feature f = getFeature();
-		installEditPolicy(EditPolicy.DIRECT_EDIT_ROLE, new FeatureDirectEditPolicy(f.getFeatureModel(), f));
+		final IGraphicalFeature f = getFeature();
+		installEditPolicy(EditPolicy.DIRECT_EDIT_ROLE, new FeatureDirectEditPolicy(f.getGraphicalModel(), f));
 	}
 
 	private DirectEditManager manager;
 
 	public void showRenameManager() {
 		if (manager == null) {
-			final Feature f = getFeature();
-			manager = new FeatureLabelEditManager(this, TextCellEditor.class, new FeatureCellEditorLocator(getFeatureFigure()), f.getFeatureModel());
+			final IGraphicalFeature f = getFeature();
+			manager = new FeatureLabelEditManager(this, TextCellEditor.class, new FeatureCellEditorLocator(getFeatureFigure()), f.getGraphicalModel().getFeatureModel());
 		}
 		manager.show();
 	}
 
 	@Override
 	public void performRequest(Request request) {
-		Feature feature = getFeature();
-		FeatureModel featureModel = ((ModelEditPart) this.getParent()).getFeatureModel();
+		IFeature feature = getFeature().getObject();
+		IGraphicalFeatureModel featureModel = ((ModelEditPart) this.getParent()).getFeatureModel();
 
-		for (Constraint constraint : featureModel.getConstraints()) {
+		for (IGraphicalConstraint constraint : featureModel.getConstraints()) {
 			if (constraint.isFeatureSelected())
 				constraint.setFeatureSelected(false);
 		}
@@ -114,12 +116,12 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 		if (request.getType() == RequestConstants.REQ_DIRECT_EDIT) {
 			showRenameManager();
 		} else if (request.getType() == RequestConstants.REQ_OPEN) {
-			if (feature.isRoot() || !feature.getParent().isAnd()) {
+			if (feature.getStructure().isRoot() || !feature.getStructure().getParent().isAnd()) {
 				return;
 			}
 
-			FeatureSetMandatoryOperation op = new FeatureSetMandatoryOperation(feature, featureModel);
-			op.addContext((IUndoContext) featureModel.getUndoContext());
+			SetFeatureToMandatoryOperation op = new SetFeatureToMandatoryOperation(feature, featureModel.getFeatureModel());
+//TODO _interfaces Removed Code
 			try {
 				PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 			} catch (ExecutionException e) {
@@ -127,9 +129,9 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 
 			}
 
-			featureModel.handleModelDataChanged();
+			featureModel.getFeatureModel().handleModelDataChanged();
 		} else if (request.getType() == RequestConstants.REQ_SELECTION) {
-			for (Constraint partOf : feature.getRelevantConstraints()) {
+			for (IConstraint partOf : feature.getStructure().getRelevantConstraints()) {
 				partOf.setFeatureSelected(true);
 			}
 		}
@@ -137,12 +139,12 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 
 	@Override
 	protected List<FeatureConnection> getModelSourceConnections() {
-		return ((Feature) getModel()).getSourceConnections();
+		return getFeature().getSourceConnections();
 	}
 
 	@Override
 	protected List<FeatureConnection> getModelTargetConnections() {
-		return ((Feature) getModel()).getTargetConnections();
+		return getFeature().getTargetConnections();
 	}
 
 	public ConnectionAnchor getSourceConnectionAnchor(org.eclipse.gef.ConnectionEditPart connection) {
@@ -163,17 +165,17 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 
 	@Override
 	public void activate() {
-		getFeature().addListener(this);
+		getFeature().getObject().addListener(this);
 		super.activate();
 	}
 
 	@Override
 	public void deactivate() {
 		super.deactivate();
-		getFeature().removeListener(this);
+		getFeature().getObject().removeListener(this);
 	}
 
-	public void propertyChange(PropertyChangeEvent event) {
+	public void propertyChange(FeatureIDEEvent event) {
 		String prop = event.getPropertyName();
 		if (LOCATION_CHANGED.equals(prop)) {
 			getFeatureFigure().setLocation((Point) event.getNewValue());
@@ -198,7 +200,7 @@ public class FeatureEditPart extends AbstractGraphicalEditPart implements NodeEd
 				}
 			}
 		} else if (NAME_CHANGED.equals(prop)) {
-			getFeatureFigure().setName(getFeature().getDisplayName());
+			getFeatureFigure().setName(getFeature().getObject().getProperty().getDisplayName());
 			FeatureUIHelper.setSize(getFeature(), getFeatureFigure().getSize());
 		} else if (ATTRIBUTE_CHANGED.equals(prop)) {
 			getFeatureFigure().setProperties();

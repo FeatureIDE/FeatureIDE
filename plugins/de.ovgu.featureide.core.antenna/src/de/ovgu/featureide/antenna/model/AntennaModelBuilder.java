@@ -42,17 +42,16 @@ import de.ovgu.featureide.core.fstmodel.preprocessor.PPModelBuilder;
 public class AntennaModelBuilder extends PPModelBuilder {
 
 	public static final String OPERATORS = "[\\s!=<>\",;&\\^\\|\\(\\)]";
-	public static final String REGEX = "(//\\s*#.*" + OPERATORS + ")(%s)("
-			+ OPERATORS + ")";
-	
-	public static final String COMMANDS = "if|ifdef|ifndef|elif|elifdef|elifndef|else|condition|define|undefine|endif";
-	
-	Pattern patternCommands = Pattern.compile("//\\s*#("+COMMANDS+")");
+	public static final String REGEX = "(//\\s*#.*" + OPERATORS + ")(%s)(" + OPERATORS + ")";
+
+	public static final String COMMANDS = "ifdef|if|ifndef|elif|elifdef|elifndef|else|condition|define|undefine|endif";
+
+	Pattern patternCommands = Pattern.compile("//\\s*#(" + COMMANDS + ")");
 
 	public AntennaModelBuilder(IFeatureProject featureProject) {
 		super(featureProject);
 	}
-	
+
 	/**
 	 * returns true if the regular expression regex can be matched by a substring of text
 	 */
@@ -61,45 +60,45 @@ public class AntennaModelBuilder extends PPModelBuilder {
 		Matcher matcher = pattern.matcher(text);
 		return matcher.find();
 	}
-	
+
 	@Override
 	public LinkedList<FSTDirective> buildModelDirectivesForFile(Vector<String> lines) {
 		//for preprocessor outline
 		Stack<FSTDirective> directivesStack = new Stack<FSTDirective>();
 		LinkedList<FSTDirective> directivesList = new LinkedList<FSTDirective>();
 		int id = 0;
-		
+
 		for (int i = 0; i < lines.size(); i++) {
 			String line = lines.get(i);
-			
+
 			// if line is preprocessor directive
-			if (containsRegex(line,"//\\s*#")) {				
+			if (containsRegex(line, "//\\s*#")) {
 				FSTDirectiveCommand command = null;
-				
-				if(containsRegex(line,"//\\s*#if[ (]")){//1
+
+				if (containsRegex(line, "//\\s*#if[ (]")) {//1
 					command = FSTDirectiveCommand.IF;
-				}else if(containsRegex(line,"//\\s*#ifdef[ (]")){//2
+				} else if (containsRegex(line, "//\\s*#ifdef[ (]")) {//2
 					command = FSTDirectiveCommand.IFDEF;
-				}else if(containsRegex(line,"//\\s*#ifndef[ (]")){//3
+				} else if (containsRegex(line, "//\\s*#ifndef[ (]")) {//3
 					command = FSTDirectiveCommand.IFNDEF;
-				}else if(containsRegex(line,"//\\s*#elif[ (]")){//4
+				} else if (containsRegex(line, "//\\s*#elif[ (]")) {//4
 					command = FSTDirectiveCommand.ELIF;
-				}else if(containsRegex(line,"//\\s*#elifdef[ (]")){//5
+				} else if (containsRegex(line, "//\\s*#elifdef[ (]")) {//5
 					command = FSTDirectiveCommand.ELIFDEF;
-				}else if(containsRegex(line,"//\\s*#elifndef[ (]")){//6
+				} else if (containsRegex(line, "//\\s*#elifndef[ (]")) {//6
 					command = FSTDirectiveCommand.ELIFNDEF;
-				}else if(containsRegex(line,"//\\s*#else")){//7
+				} else if (containsRegex(line, "//\\s*#else")) {//7
 					command = FSTDirectiveCommand.ELSE;
-				}else if(containsRegex(line,"//\\s*#condition[ (]")){//8
+				} else if (containsRegex(line, "//\\s*#condition[ (]")) {//8
 					command = FSTDirectiveCommand.CONDITION;
-				}else if(containsRegex(line,"//\\s*#define[ (]")){//9
+				} else if (containsRegex(line, "//\\s*#define[ (]")) {//9
 					command = FSTDirectiveCommand.DEFINE;
-				}else if(containsRegex(line,"//\\s*#undefine[ (]")){//10
+				} else if (containsRegex(line, "//\\s*#undefine[ (]")) {//10
 					command = FSTDirectiveCommand.UNDEFINE;
-				}else if(!containsRegex(line,"//\\s*#endif")){//11
+				} else if (!containsRegex(line, "//\\s*#endif")) {//11
 					continue;
 				}
-				
+
 				if (command == null) {
 					if (!directivesStack.isEmpty()) {
 						directivesStack.peek().setEndLine(i, line.length());
@@ -112,41 +111,39 @@ public class AntennaModelBuilder extends PPModelBuilder {
 								break;
 							}
 						}
-					}						
+					}
 				} else {
 					FSTDirective directive = new FSTDirective();
-					
+
 					if (command == FSTDirectiveCommand.ELSE) {
 						if (!directivesStack.isEmpty()) {
 							directivesStack.peek().setEndLine(i, 0);
 							directive.setFeatureNames(directivesStack.peek().getFeatureNames());
 						}
-					} else if (command == FSTDirectiveCommand.ELIF || 
-						command == FSTDirectiveCommand.ELIFDEF ||
-						command == FSTDirectiveCommand.ELIFNDEF) {
+					} else if (command == FSTDirectiveCommand.ELIF || command == FSTDirectiveCommand.ELIFDEF || command == FSTDirectiveCommand.ELIFNDEF) {
 						if (!directivesStack.isEmpty()) {
 							directivesStack.peek().setEndLine(i, 0);
 						}
 					}
-					
-					directive.setCommand(command);		
+
+					directive.setCommand(command);
 
 					Matcher m = patternCommands.matcher(line);
 					line = m.replaceAll("").trim();
-					
+
 					if (directive.getFeatureNames() == null) {
 						directive.setFeatureNames(getFeatureNames(line));
 					}
 					directive.setExpression(line);
 					directive.setStartLine(i, 0);
 					directive.setId(id++);
-					
-					if(directivesStack.isEmpty()){
+
+					if (directivesStack.isEmpty()) {
 						directivesList.add(directive);
 					} else {
 						directivesStack.peek().addChild(directive);
-					}				
-					
+					}
+
 					if (command != FSTDirectiveCommand.DEFINE && command != FSTDirectiveCommand.UNDEFINE && command != FSTDirectiveCommand.CONDITION)
 						directivesStack.push(directive);
 				}
@@ -175,9 +172,9 @@ public class AntennaModelBuilder extends PPModelBuilder {
 		Matcher matcher = pattern.matcher(text);
 		return matcher.find();
 	}
-	
+
 	@Override
-	protected  List<String> getFeatureNames(String expression) {
+	protected List<String> getFeatureNames(String expression) {
 		String exp = expression.replaceAll("[()]", "");
 		exp = exp.replaceAll("&&", "");
 		exp = exp.replaceAll("\\|\\|", "");
@@ -190,5 +187,5 @@ public class AntennaModelBuilder extends PPModelBuilder {
 		}
 		return featureNameList;
 	}
-	
+
 }

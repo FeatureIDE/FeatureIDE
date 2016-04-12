@@ -28,17 +28,19 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.LegendEditPart;
 
 /**
  * Switches auto-layout function for the feature model legend.
  * 
  * @author Fabian Benduhn
+ * @author Marcus Pinnecke
  */
 public class LegendLayoutAction extends Action {
 
-	private FeatureModel featureModel;
+	private IGraphicalFeatureModel featureModel;
+
 	private ISelectionChangedListener listener = new ISelectionChangedListener() {
 		public void selectionChanged(SelectionChangedEvent event) {
 			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
@@ -46,7 +48,7 @@ public class LegendLayoutAction extends Action {
 		}
 	};
 
-	public LegendLayoutAction(GraphicalViewerImpl viewer, FeatureModel featuremodel) {
+	public LegendLayoutAction(GraphicalViewerImpl viewer, IGraphicalFeatureModel featuremodel) {
 		super(AUTO_LAYOUT_LEGEND);
 		this.featureModel = featuremodel;
 		this.setEnabled(false);
@@ -73,7 +75,7 @@ public class LegendLayoutAction extends Action {
 		} else {
 			featureModel.getLayout().setLegendAutoLayout(true);
 			this.setChecked(true);
-			featureModel.handleModelDataChanged();
+			featureModel.getFeatureModel().handleModelDataChanged();
 		}
 
 	}

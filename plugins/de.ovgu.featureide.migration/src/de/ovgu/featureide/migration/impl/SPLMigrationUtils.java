@@ -46,9 +46,10 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
+import de.ovgu.featureide.ui.migration.plugin.SPLMigrationPlugin;
 
 /**
  * This class implements methods that might be useful in Migrating a Set of
@@ -56,7 +57,7 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
  * the FeatureHouse composer in {@link VariantsToFeatureHouseSPLMigrator}.
  * 
  * @author Konstantin Tonscheidt
- * 
+ * @author Marcus Pinnecke
  */
 public class SPLMigrationUtils
 {
@@ -204,7 +205,7 @@ public class SPLMigrationUtils
 	 * @param featureModel
 	 */
 	public static void writeFeatureModelToDefaultFile(IProject featureProject,
-			FeatureModel featureModel)
+			IFeatureModel featureModel)
 	{
 		FeatureModelWriterIFileWrapper fmWriter = new FeatureModelWriterIFileWrapper(
 				new XmlFeatureModelWriter(featureModel));
@@ -217,8 +218,7 @@ public class SPLMigrationUtils
 			fmWriter.writeToFile(featureModelFile);
 		} catch (CoreException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			SPLMigrationPlugin.getDefault().logError(e);
 		}
 	}
 

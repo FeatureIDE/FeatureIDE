@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -61,6 +62,7 @@ import AST.Problem;
 import AST.Program;
 import cide.gparser.ParseException;
 import cide.gparser.TokenMgrError;
+
 import composer.CmdLineInterpreter;
 import composer.CompositionException;
 import composer.FSTGenComposer;
@@ -68,6 +70,7 @@ import composer.FSTGenComposerExtension;
 import composer.ICompositionErrorListener;
 import composer.IParseErrorListener;
 import composer.rules.meta.FeatureModelInfo;
+
 import de.ovgu.cide.fstgen.ast.FSTNode;
 import de.ovgu.cide.fstgen.ast.FSTTerminal;
 import de.ovgu.featureide.core.IFeatureProject;
@@ -85,8 +88,11 @@ import de.ovgu.featureide.featurehouse.meta.featuremodel.FeatureModelClassGenera
 import de.ovgu.featureide.featurehouse.model.FeatureHouseModelBuilder;
 import de.ovgu.featureide.featurehouse.signature.documentation.DocumentationCommentParser;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
@@ -103,6 +109,7 @@ import fuji.SyntacticErrorException;
  * Composes files using FeatureHouse.
  * 
  * @author Tom Brosch
+ * @author Marcus Pinnecke (Feature Interface)
  */
 // TODO set "Composition errors" like *.png could not be composed with *.png
 @SuppressWarnings("restriction")
@@ -421,15 +428,15 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 				}
 
 			} else {
-				final FeatureModel featureModel = featureProject.getFeatureModel();
+				final IFeatureModel featureModel = featureProject.getFeatureModel();
 				for (FSTClass c : fstModel.getClasses()) {
 					for (FSTRole r : c.getRoles()) {
-						Feature featureRole1 = featureModel.getFeature(r.getFeature().getName());
+						IFeature featureRole1 = featureModel.getFeature(r.getFeature().getName());
 						for (FSTMethod m : r.getClassFragment().getMethods()) {
-							final List<Feature> currentFeatureList = new LinkedList<Feature>();
-							final List<Feature> originalList = new LinkedList<Feature>();
+							final List<IFeature> currentFeatureList = new LinkedList<IFeature>();
+							final List<IFeature> originalList = new LinkedList<IFeature>();
 
-							currentFeatureList.add(new Feature(featureModel, r.getFeature().getName()));
+							currentFeatureList.add(FMFactoryManager.getFactory().createFeature(featureModel, r.getFeature().getName()));
 
 							for (final String feat : featureModel.getFeatureOrderList()) {
 								if (feat.equals(r.getFeature().getName())) {
@@ -439,7 +446,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 								if (rr == null) {
 									continue;
 								}
-								Feature featureRole2 = featureModel.getFeature(feat);
+								IFeature featureRole2 = featureModel.getFeature(feat);
 								for (FSTMethod mm : rr.getClassFragment().getMethods()) {
 
 									if (checkForOriginalInContract(m, mm)) {
@@ -447,21 +454,21 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 									}
 
 									if (checkForIllegitimateMethodRefinement(m, mm)) {
-										List<Feature> finalMethodList = new LinkedList<Feature>();
+										List<IFeature> finalMethodList = new LinkedList<IFeature>();
 										finalMethodList.add(featureRole2);
 										if (!featureModel.getAnalyser().checkIfFeatureCombinationNotPossible(featureRole1, finalMethodList))
 											setContractErrorMarker(m, "keyword \"\\final_method\" found but possibly later refinement.");
 									}
 
 									if (checkForIllegitimateContract(m, mm)) {
-										List<Feature> finalContractList = new LinkedList<Feature>();
+										List<IFeature> finalContractList = new LinkedList<IFeature>();
 										finalContractList.add(featureRole2);
-										if (mm.getCompKey().contains(FINAL_CONTRACT) && !featureModel.getAnalyser().checkIfFeatureCombinationNotPossible(new Feature(featureModel, r.getFeature().getName()), finalContractList))
+										if (mm.getCompKey().contains(FINAL_CONTRACT) && !featureModel.getAnalyser().checkIfFeatureCombinationNotPossible(FMFactoryManager.getFactory().createFeature(featureModel, r.getFeature().getName()), finalContractList))
 											setContractErrorMarker(m, "keyword \"\\final_contract\" found but possibly later contract refinement.");
 									}
 
 									if (checkForIllegitimaterefinement(m, mm)) {
-										LinkedList<Feature> treeDependencyList = new LinkedList<Feature>();
+										LinkedList<IFeature> treeDependencyList = new LinkedList<IFeature>();
 										treeDependencyList.add(featureRole2);
 										if (!featureModel.getAnalyser().checkIfFeatureCombinationNotPossible(featureRole1, treeDependencyList))
 											setContractErrorMarker(m, "Contract with composition keyword " + mm.getCompKey() + " possibily illegitimately redefined with keyword " + m.getCompKey() + ".");
@@ -563,11 +570,11 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		final FSTGenComposerExtension composerExtension = new FSTGenComposerExtension();
 		composer = composerExtension;
 		composerExtension.addCompositionErrorListener(compositionErrorListener);
-		FeatureModel featureModel = featureProject.getFeatureModel();
-		List<String> featureOrderList = featureModel.getFeatureOrderList();
+		IFeatureModel featureModel = featureProject.getFeatureModel();
+		Collection<String> featureOrderList = featureModel.getFeatureOrderList();
 		// dead features should not be composed
 		LinkedList<String> deadFeatures = new LinkedList<String>();
-		for (Feature deadFeature : featureModel.getAnalyser().getDeadFeatures()) {
+		for (IFeature deadFeature : featureModel.getAnalyser().getDeadFeatures()) {
 			deadFeatures.add(deadFeature.getName());
 		}
 
@@ -675,7 +682,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		}
 		fuji = new AStoppableJob("Type checking " + featureProject.getProjectName() + " with fuji") {
 			@Override
-			protected boolean work() {
+			protected boolean work() throws Exception {
 				try {
 					final Program ast = runFuji(featureProject);
 					signatureSetter.setFujiParameters(featureProject, ast);
@@ -703,10 +710,11 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 				"-typechecker", "-basedir", sourcePath };
 		Program ast = null;
 		try {
-			FeatureModel fm = featureProject.getFeatureModel();
+			IFeatureModel fm = featureProject.getFeatureModel();
 			fm.getAnalyser().setDependencies();
 
-			Main fuji = new Main(fujiOptions, fm, featureProject.getFeatureModel().getConcreteFeatureNames());
+			Main fuji = new Main(fujiOptions, new FeatureModel(fm), FeatureUtils.extractConcreteFeaturesAsStringList(featureProject.getFeatureModel()));
+			
 			Composition composition = fuji.getComposition(fuji);
 			ast = composition.composeAST();
 
@@ -735,21 +743,8 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			}
 		} catch (CompositionErrorException e) {
 			createFujiMarker(-1, e.getMessage(), featureProject.getSourceFolder(), IMarker.SEVERITY_ERROR, featureProject);
-		} catch (IllegalArgumentException e) {
-			LOGGER.logError(e);
-		} catch (org.apache.commons.cli.ParseException e) {
-			LOGGER.logError(e);
-		} catch (IOException e) {
-			LOGGER.logError(e);
-		} catch (FeatureDirNotFoundException e) {
-			LOGGER.logError(e);
-		} catch (SyntacticErrorException e) {
-			LOGGER.logError(e);
-		} catch (SemanticErrorException e) {
-			LOGGER.logError(e);
-		} catch (CompilerWarningException e) {
-			LOGGER.logError(e);
-		} catch (UnsupportedModelException e) {
+		} catch (IllegalArgumentException | org.apache.commons.cli.ParseException | IOException | FeatureDirNotFoundException | SyntacticErrorException | SemanticErrorException
+				| CompilerWarningException | UnsupportedModelException e) {
 			LOGGER.logError(e);
 		}
 
@@ -908,7 +903,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		final FSTGenComposerExtension composerExtension = new FSTGenComposerExtension();
 		composer = composerExtension;
 		composerExtension.addParseErrorListener(listener);
-		List<String> featureOrder = featureProject.getFeatureModel().getConcreteFeatureNames();
+		List<String> featureOrder = FeatureUtils.extractConcreteFeaturesAsStringList(featureProject.getFeatureModel());
 		String[] features = new String[featureOrder.size()];
 		int i = 0;
 		for (String f : featureOrder) {
@@ -1116,7 +1111,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		composer = composerExtension;
 		composerExtension.addParseErrorListener(listener);
 
-		List<String> featureOrderList = featureProject.getFeatureModel().getConcreteFeatureNames();
+		List<String> featureOrderList = FeatureUtils.extractConcreteFeaturesAsStringList(featureProject.getFeatureModel());
 		String[] features = new String[featureOrderList.size()];
 		int i = 0;
 		for (String f : featureOrderList) {

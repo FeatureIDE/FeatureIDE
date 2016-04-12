@@ -54,7 +54,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.builder.preprocessor.PPComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
-import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 
 /**
@@ -694,7 +694,7 @@ public class CPPComposer extends PPComposerExtensionClass {
 
 		List<String> myActivatedFeatures = new LinkedList<String>();
 
-		for (Feature feature : configuration.getSelectedFeatures()) {
+		for (IFeature feature : configuration.getSelectedFeatures()) {
 			myActivatedFeatures.add(feature.getName());
 		}
 

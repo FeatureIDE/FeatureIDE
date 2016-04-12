@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.filter;
 
-import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.filter.base.IFilter;
 
 /**
@@ -28,11 +28,11 @@ import de.ovgu.featureide.fm.core.filter.base.IFilter;
  * 
  * @author Sebastian Krieter
  */
-public class HiddenFeatureFilter implements IFilter<Feature> {
-	
+public class HiddenFeatureFilter implements IFilter<IFeature> {
+
 	@Override
-	public boolean isValid(Feature object) {
-		return object.hasHiddenParent();
+	public boolean isValid(IFeature object) {
+		return object.getStructure().hasHiddenParent();
 	}
 
 }

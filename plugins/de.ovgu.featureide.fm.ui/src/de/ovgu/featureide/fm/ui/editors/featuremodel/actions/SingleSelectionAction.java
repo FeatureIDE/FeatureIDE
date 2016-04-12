@@ -20,9 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
 import org.eclipse.gef.ui.parts.AbstractEditPartViewer;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
@@ -31,8 +28,10 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
+import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConnectionEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.views.outline.FmOutlineGroupStateStorage;
@@ -42,8 +41,9 @@ import de.ovgu.featureide.fm.ui.views.outline.FmOutlineGroupStateStorage;
  * selected.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke
  */
-public abstract class SingleSelectionAction extends Action implements PropertyChangeListener, PropertyConstants {
+public abstract class SingleSelectionAction extends Action implements IEventListener, PropertyConstants {
 
 	private ISelectionChangedListener listener = new ISelectionChangedListener() {
 		public void selectionChanged(SelectionChangedEvent event) {
@@ -54,7 +54,7 @@ public abstract class SingleSelectionAction extends Action implements PropertyCh
 
 	Object viewer;
 
-	protected Feature feature;
+	protected IFeature feature;
 
 	protected boolean connectionSelected;
 
@@ -71,7 +71,7 @@ public abstract class SingleSelectionAction extends Action implements PropertyCh
 	private boolean isOneFeatureSelected(IStructuredSelection selection) {
 		return selection.size() == 1
 				&& (selection.getFirstElement() instanceof FeatureEditPart || selection.getFirstElement() instanceof ConnectionEditPart
-						|| selection.getFirstElement() instanceof FmOutlineGroupStateStorage || selection.getFirstElement() instanceof Feature);
+						|| selection.getFirstElement() instanceof FmOutlineGroupStateStorage || selection.getFirstElement() instanceof IFeature);
 	}
 
 	public FeatureEditPart getSelectedFeatureEditPart(Object diagramEditor) {
@@ -80,7 +80,7 @@ public abstract class SingleSelectionAction extends Action implements PropertyCh
 			IStructuredSelection selection = (IStructuredSelection) ((AbstractEditPartViewer) viewer).getSelection();
 			part = selection.getFirstElement();
 		} else {
-			Feature selection = (Feature) ((IStructuredSelection) ((TreeViewer) viewer).getSelection()).getFirstElement();
+			IFeature selection = (IFeature) ((IStructuredSelection) ((TreeViewer) viewer).getSelection()).getFirstElement();
 			part = ((GraphicalViewerImpl) diagramEditor).getEditPartRegistry().get(selection);
 		}
 
@@ -92,14 +92,14 @@ public abstract class SingleSelectionAction extends Action implements PropertyCh
 			return (FeatureEditPart) part;
 	}
 
-	public Feature getSelectedFeature() {
+	public IFeature getSelectedFeature() {
 		IStructuredSelection selection;
 		if (viewer instanceof TreeViewer) {
 			selection = (IStructuredSelection) ((TreeViewer) viewer).getSelection();
 			if (selection.getFirstElement() instanceof FmOutlineGroupStateStorage)
 				return ((FmOutlineGroupStateStorage) selection.getFirstElement()).getFeature();
 			else
-				return (Feature) selection.getFirstElement();
+				return (IFeature) selection.getFirstElement();
 		} else {
 			selection = (IStructuredSelection) ((AbstractEditPartViewer) viewer).getSelection();
 		}
@@ -107,8 +107,8 @@ public abstract class SingleSelectionAction extends Action implements PropertyCh
 		Object part = selection.getFirstElement();
 		connectionSelected = part instanceof ConnectionEditPart;
 		if (connectionSelected)
-			return ((ConnectionEditPart) part).getConnectionModel().getTarget();
-		return ((FeatureEditPart) part).getFeature();
+			return ((ConnectionEditPart) part).getConnectionModel().getTarget().getObject();
+		return ((FeatureEditPart) part).getFeature().getObject();
 	}
 
 	private void selectionChanged(boolean oneSelected) {
@@ -131,7 +131,7 @@ public abstract class SingleSelectionAction extends Action implements PropertyCh
 
 	protected abstract void updateProperties();
 
-	public void propertyChange(PropertyChangeEvent event) {
+	public void propertyChange(FeatureIDEEvent event) {
 		String prop = event.getPropertyName();
 		if (CHILDREN_CHANGED.equals(prop) || MANDATORY_CHANGED.equals(prop) || PARENT_CHANGED.equals(prop) || HIDDEN_CHANGED.equals(prop)
 				|| COLOR_CHANGED.equals(prop)) {

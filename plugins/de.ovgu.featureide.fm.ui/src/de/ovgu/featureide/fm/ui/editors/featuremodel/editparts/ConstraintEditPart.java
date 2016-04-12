@@ -20,9 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.editparts;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.gef.EditPolicy;
@@ -31,27 +28,30 @@ import org.eclipse.gef.RequestConstants;
 import org.eclipse.gef.editparts.AbstractGraphicalEditPart;
 import org.eclipse.gef.editpolicies.NonResizableEditPolicy;
 
-import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
+import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.ui.editors.ConstraintDialog;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.ConstraintFigure;
 
 /**
  * An editpart to display cross-tree constraints below the feature diagram.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke
  */
-public class ConstraintEditPart extends AbstractGraphicalEditPart implements PropertyConstants, PropertyChangeListener {
+public class ConstraintEditPart extends AbstractGraphicalEditPart implements PropertyConstants, IEventListener {
 
 	ConstraintEditPart(Object constraint) {
 		super();
 		setModel(constraint);
 	}
 
-	public Constraint getConstraintModel() {
-		return (Constraint) getModel();
+	public IGraphicalConstraint getConstraintModel() {
+		return (IGraphicalConstraint) getModel();
 	}
 
 	public ConstraintFigure getConstraintFigure() {
@@ -70,11 +70,13 @@ public class ConstraintEditPart extends AbstractGraphicalEditPart implements Pro
 
 	public void performRequest(Request request) {
 		if (request.getType() == RequestConstants.REQ_OPEN) {
-			new ConstraintDialog(getConstraintModel().getFeatureModel(), getConstraintModel());
+			new ConstraintDialog(getConstraintModel().getObject().getFeatureModel(), getConstraintModel().getObject());
 		} else if (request.getType() == RequestConstants.REQ_SELECTION) {
 			try {
-				for (Feature containedFeature : getConstraintModel().getContainedFeatures()) {
+				for (IFeature containedFeature : getConstraintModel().getObject().getContainedFeatures()) {
 					containedFeature.setConstraintSelected(true);
+					// TODO _Feature interfaces removed code
+//					containedFeature.getFeatureModel().setConstraintSelected(true);
 				}
 			} catch (NullPointerException e) {
 				FMCorePlugin.getDefault().reportBug(320);
@@ -84,17 +86,18 @@ public class ConstraintEditPart extends AbstractGraphicalEditPart implements Pro
 
 	@Override
 	public void activate() {
-		getConstraintModel().addListener(this);
+		getConstraintModel().getObject().addListener(this);
 		super.activate();
 	}
 
 	@Override
 	public void deactivate() {
 		super.deactivate();
-		getConstraintModel().removeListener(this);
+		getConstraintModel().getObject().removeListener(this);
 	}
 
-	public void propertyChange(PropertyChangeEvent event) {
+	@Override
+	public void propertyChange(FeatureIDEEvent event) {
 		String prop = event.getPropertyName();
 		if (LOCATION_CHANGED.equals(prop)) {
 			getConstraintFigure().setLocation((Point) event.getNewValue());

@@ -22,11 +22,11 @@ package de.ovgu.featureide.core.mpl.io.writer;
 
 import org.eclipse.core.resources.IFile;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 
 /**
- * Writes a {@link FeatureModel} to a xml file.
+ * Writes a {@link IFeatureModel} to a xml file.
  * 
  * @author Sebastian Krieter
  */
@@ -36,7 +36,7 @@ public class FeatureModelWriter extends AbstractWriter {
 		super(null);
 	}
 	
-	public void writeModel(FeatureModel fm, IFile saveFile) {
+	public void writeModel(IFeatureModel fm, IFile saveFile) {
 		writeToFile(saveFile, new XmlFeatureModelWriter(fm).writeToString());
 	}
 

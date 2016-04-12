@@ -21,20 +21,20 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureCreateLayerOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateFeatureBelowOperation;
 
 /**
  * Creates a new feature as a child of the currently selected feature.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class CreateLayerAction extends SingleSelectionAction {
 
@@ -42,21 +42,17 @@ public class CreateLayerAction extends SingleSelectionAction {
 
 	private static ImageDescriptor createImage = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ADD);
 
-	private final FeatureModel featureModel;
+	private final IFeatureModel featureModel;
 
-	private Object diagramEditor;
-
-	public CreateLayerAction(Object viewer, FeatureModel featureModel, Object diagramEditor) {
+	public CreateLayerAction(Object viewer, IFeatureModel featureModel) {
 		super("Create Feature Below (Ins)", viewer);
 		setImageDescriptor(createImage);
 		this.featureModel = featureModel;
-		this.diagramEditor = diagramEditor;
 	}
 
 	@Override
 	public void run() {
-		FeatureCreateLayerOperation op = new FeatureCreateLayerOperation(feature, viewer, featureModel, diagramEditor);
-		op.addContext((IUndoContext) featureModel.getUndoContext());
+		CreateFeatureBelowOperation op = new CreateFeatureBelowOperation(feature, featureModel);
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);

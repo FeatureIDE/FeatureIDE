@@ -22,7 +22,8 @@ package de.ovgu.featureide.fm.core.conf;
 
 import java.util.Collection;
 
-import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 public class ListFeatureGraph extends AFeatureGraph {
 
@@ -30,8 +31,8 @@ public class ListFeatureGraph extends AFeatureGraph {
 
 	private final int[][] adjList;
 
-	public ListFeatureGraph(Collection<Feature> variantfeatures, Collection<Feature> coreFeatures, Collection<Feature> deadFeatures) {
-		super(variantfeatures, coreFeatures, deadFeatures);
+	public ListFeatureGraph(IFeatureModel featureModel, Collection<IFeature> variantfeatures, Collection<IFeature> coreFeatures, Collection<IFeature> deadFeatures) {
+		super(featureModel, variantfeatures, coreFeatures, deadFeatures);
 		adjList = new int[size][4];
 	}
 

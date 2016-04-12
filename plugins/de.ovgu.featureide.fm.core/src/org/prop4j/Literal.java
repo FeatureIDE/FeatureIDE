@@ -27,8 +27,9 @@ import java.util.Map;
  * A variable or negated variable.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
-public class Literal extends Node {
+public class Literal extends Node implements Cloneable {
 
 	public Object var;
 

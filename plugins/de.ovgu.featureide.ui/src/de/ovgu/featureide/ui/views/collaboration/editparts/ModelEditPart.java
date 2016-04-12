@@ -441,7 +441,7 @@ public class ModelEditPart extends AbstractGraphicalEditPart implements GUIDefau
 		FSTFeature feature = editPart.getRoleModel().getFeature();
 		List<UnderlayerFigure> ulFigures = new LinkedList<UnderlayerFigure>();
 		for (CollaborationEditPart part : collaborationEditPartList) {
-			if (feature.getName().contains(part.getModel().toString()) && feature.getRoles().equals(part.getCollaborationModel().getRoles())) {// TODO TEST: Hello, Hello1
+			if (feature.getName().contains(part.getModel().toString()) && feature.getRoles().equals(part.getCollaborationModel().getRoles())) {
 				 ulFigures.add((UnderlayerFigure) part.getFigure());
 			}
 		}

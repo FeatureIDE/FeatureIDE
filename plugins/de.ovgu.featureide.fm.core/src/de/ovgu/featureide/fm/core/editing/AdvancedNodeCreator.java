@@ -22,7 +22,6 @@ package de.ovgu.featureide.fm.core.editing;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -31,14 +30,15 @@ import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Or;
 
-import de.ovgu.featureide.fm.core.Constraint;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.editing.remove.FeatureRemover;
 import de.ovgu.featureide.fm.core.filter.AbstractFeatureFilter;
 import de.ovgu.featureide.fm.core.filter.HiddenFeatureFilter;
-import de.ovgu.featureide.fm.core.filter.base.Filter;
 import de.ovgu.featureide.fm.core.filter.base.IFilter;
+import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.WorkMonitor;
@@ -58,48 +58,48 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		All, OnlyConstraints, OnlyStructure
 	}
 
-	public static Node createCNF(FeatureModel featureModel) {
+	public static Node createCNF(IFeatureModel featureModel) {
 		AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(featureModel);
 		nodeCreator.setCnfType(CNFType.Compact);
 		return nodeCreator.createNodes();
 	}
 
-	public static Node createCNFWithoutAbstract(FeatureModel featureModel) {
+	public static Node createCNFWithoutAbstract(IFeatureModel featureModel) {
 		AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(featureModel, new AbstractFeatureFilter());
 		nodeCreator.setCnfType(CNFType.Compact);
 		return nodeCreator.createNodes();
 	}
 
-	public static Node createCNFWithoutHidden(FeatureModel featureModel) {
+	public static Node createCNFWithoutHidden(IFeatureModel featureModel) {
 		AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(featureModel, new HiddenFeatureFilter());
 		nodeCreator.setCnfType(CNFType.Compact);
 		return nodeCreator.createNodes();
 	}
 
-	public static Node createNodes(FeatureModel featureModel) {
+	public static Node createNodes(IFeatureModel featureModel) {
 		return new AdvancedNodeCreator(featureModel).createNodes();
 	}
 
-	public static Node createNodes(FeatureModel featureModel, Collection<String> excludedFeatureNames, CNFType cnfType, ModelType modelType,
+	public static Node createNodes(IFeatureModel featureModel, Collection<String> excludedFeatureNames, CNFType cnfType, ModelType modelType,
 			boolean includeBooleanValues) {
 		return new AdvancedNodeCreator(featureModel, excludedFeatureNames, cnfType, modelType, includeBooleanValues).createNodes();
 	}
 
-	public static Node createNodes(FeatureModel featureModel, IFilter<Feature> featureFilter, CNFType cnfType, ModelType modelType, boolean includeBooleanValues) {
+	public static Node createNodes(IFeatureModel featureModel, IFilter<IFeature> featureFilter, CNFType cnfType, ModelType modelType, boolean includeBooleanValues) {
 		return new AdvancedNodeCreator(featureModel, featureFilter, cnfType, modelType, includeBooleanValues).createNodes();
 	}
 
-	public static Node createNodesWithoutAbstract(FeatureModel featureModel) {
+	public static Node createNodesWithoutAbstract(IFeatureModel featureModel) {
 		AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(featureModel, new AbstractFeatureFilter());
 		return nodeCreator.createNodes();
 	}
 
-	public static Node createNodesWithoutHidden(FeatureModel featureModel) {
+	public static Node createNodesWithoutHidden(IFeatureModel featureModel) {
 		AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(featureModel, (new HiddenFeatureFilter()));
 		return nodeCreator.createNodes();
 	}
 
-	private static Literal getVariable(Feature feature, boolean positive) {
+	private static Literal getVariable(IFeature feature, boolean positive) {
 		final String oldName = feature.getFeatureModel().getRenamingsManager().getOldName(feature.getName());
 		return new Literal(oldName, positive);
 	}
@@ -116,26 +116,26 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	
 	private boolean optionalRoot = false;
 
-	private FeatureModel featureModel = null;
+	private IFeatureModel featureModel = null;
 
 	private Collection<String> excludedFeatureNames = null;
 
 	public AdvancedNodeCreator() {
 	}
 
-	public AdvancedNodeCreator(FeatureModel featureModel) {
+	public AdvancedNodeCreator(IFeatureModel featureModel) {
 		setFeatureModel(featureModel);
 	}
 
-	public AdvancedNodeCreator(FeatureModel featureModel, IFilter<Feature> featureFilter) {
+	public AdvancedNodeCreator(IFeatureModel featureModel, IFilter<IFeature> featureFilter) {
 		setFeatureModel(featureModel, featureFilter);
 	}
 
-	public AdvancedNodeCreator(FeatureModel featureModel, Collection<String> excludedFeatureNames) {
+	public AdvancedNodeCreator(IFeatureModel featureModel, Collection<String> excludedFeatureNames) {
 		setFeatureModel(featureModel, excludedFeatureNames);
 	}
 
-	public AdvancedNodeCreator(FeatureModel featureModel, Collection<String> excludedFeatureNames, CNFType cnfType, ModelType modelType,
+	public AdvancedNodeCreator(IFeatureModel featureModel, Collection<String> excludedFeatureNames, CNFType cnfType, ModelType modelType,
 			boolean includeBooleanValues) {
 		this.cnfType = cnfType;
 		this.modelType = modelType;
@@ -143,7 +143,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		setFeatureModel(featureModel, excludedFeatureNames);
 	}
 
-	public AdvancedNodeCreator(FeatureModel featureModel, IFilter<Feature> featureFilter, CNFType cnfType, ModelType modelType, boolean includeBooleanValues) {
+	public AdvancedNodeCreator(IFeatureModel featureModel, IFilter<IFeature> featureFilter, CNFType cnfType, ModelType modelType, boolean includeBooleanValues) {
 		this.cnfType = cnfType;
 		this.modelType = modelType;
 		this.includeBooleanValues = includeBooleanValues;
@@ -155,7 +155,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		boolean compact = true;
 		switch (cnfType) {
 		case None:
-			for (Constraint constraint : featureModel.getConstraints()) {
+			for (IConstraint constraint : featureModel.getConstraints()) {
 				clauses.add(constraint.getNode().clone());
 			}
 			break;
@@ -163,7 +163,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 			compact = false;
 		case Compact:
 		default:
-			for (Constraint constraint : featureModel.getConstraints()) {
+			for (IConstraint constraint : featureModel.getConstraints()) {
 				final Node cnfNode = Node.buildCNF(constraint.getNode());
 //				final Node cnfNode = constraint.getNode().toCNF();
 				if (cnfNode instanceof And) {
@@ -245,7 +245,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	}
 
 	private And createStructuralNodes() {
-		final Feature root = featureModel.getRoot();
+		final IFeature root = featureModel.getStructure().getRoot().getFeature();
 		if (root != null) {
 			final List<Node> clauses = new ArrayList<>(featureModel.getNumberOfFeatures());
 
@@ -262,41 +262,40 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 				}
 			}
 
-			final Collection<Feature> features = featureModel.getFeatures();
-			for (Feature feature : features) {
-				for (Feature child : feature.getChildren()) {
-					clauses.add(new Or(getVariable(feature, true), getVariable(child, false)));
+			final Iterable<IFeature> features = featureModel.getFeatures();
+			for (IFeature feature : features) {
+				for (IFeatureStructure child : feature.getStructure().getChildren()) {
+					clauses.add(new Or(getVariable(feature, true), getVariable(child.getFeature(), false)));
 				}
 
-				if (feature.isAnd()) {
-					for (Feature child : feature.getChildren()) {
+				if (feature.getStructure().isAnd()) {
+					for (IFeatureStructure child : feature.getStructure().getChildren()) {
 						if (child.isMandatory()) {
-							clauses.add(new Or(getVariable(child, true), getVariable(feature, false)));
+							clauses.add(new Or(getVariable(child.getFeature(), true), getVariable(feature, false)));
 						}
 					}
-				} else if (feature.isOr()) {
-					final Literal[] orLiterals = new Literal[feature.getChildrenCount() + 1];
+				} else if (feature.getStructure().isOr()) {
+					final Literal[] orLiterals = new Literal[feature.getStructure().getChildren().size() + 1];
 					int i = 0;
-					for (Feature child : feature.getChildren()) {
-						orLiterals[i++] = getVariable(child, true);
+					for (IFeatureStructure child : feature.getStructure().getChildren()) {
+						orLiterals[i++] = getVariable(child.getFeature(), true);
 					}
 					orLiterals[i] = getVariable(feature, false);
 					clauses.add(new Or(orLiterals));
-				} else if (feature.isAlternative()) {
-					final Literal[] alternativeLiterals = new Literal[feature.getChildrenCount() + 1];
+				} else if (feature.getStructure().isAlternative()) {
+					final Literal[] alternativeLiterals = new Literal[feature.getStructure().getChildrenCount() + 1];
 					int i = 0;
-					for (Feature child : feature.getChildren()) {
-						alternativeLiterals[i++] = getVariable(child, true);
+					for (IFeatureStructure child : feature.getStructure().getChildren()) {
+						alternativeLiterals[i++] = getVariable(child.getFeature(), true);
 					}
 					alternativeLiterals[i] = getVariable(feature, false);
 					clauses.add(new Or(alternativeLiterals));
-
-					for (ListIterator<Feature> it1 = feature.getChildren().listIterator(); it1.hasNext();) {
-						final Feature feature1 = (Feature) it1.next();
-						for (ListIterator<Feature> it2 = feature.getChildren().listIterator(it1.nextIndex()); it2.hasNext();) {
-							clauses.add(new Or(getVariable(feature1, false), getVariable((Feature) it2.next(), false)));
+					
+					for(ListIterator<IFeatureStructure> it1 = feature.getStructure().getChildren().listIterator(); it1.hasNext();){
+						final IFeatureStructure fs = it1.next();
+						for(ListIterator<IFeatureStructure> it2 = feature.getStructure().getChildren().listIterator(it1.nextIndex()); it2.hasNext();){
+							clauses.add(new Or(getVariable(fs.getFeature(), false), getVariable(((IFeatureStructure) it2.next()).getFeature(), false)));
 						}
-
 					}
 				}
 			}
@@ -319,7 +318,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		return excludedFeatureNames;
 	}
 
-	public FeatureModel getFeatureModel() {
+	public IFeatureModel getFeatureModel() {
 		return featureModel;
 	}
 
@@ -340,17 +339,17 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 		this.cnfType = cnfType;
 	}
 
-	public void setFeatureModel(FeatureModel featureModel) {
+	public void setFeatureModel(IFeatureModel featureModel) {
 		this.featureModel = featureModel;
 		this.excludedFeatureNames = null;
 	}
 
-	public void setFeatureModel(FeatureModel featureModel, IFilter<Feature> featureFilter) {
+	public void setFeatureModel(IFeatureModel featureModel, IFilter<IFeature> featureFilter) {
 		this.featureModel = featureModel;
-		this.excludedFeatureNames = Filter.toString(Filter.filter(new LinkedList<>(featureModel.getFeatures()), featureFilter));
+		this.excludedFeatureNames = Functional.mapToStringList(Functional.filter(featureModel.getFeatures(), featureFilter));
 	}
 
-	public void setFeatureModel(FeatureModel featureModel, Collection<String> excludedFeatureNames) {
+	public void setFeatureModel(IFeatureModel featureModel, Collection<String> excludedFeatureNames) {
 		this.featureModel = featureModel;
 		this.excludedFeatureNames = excludedFeatureNames;
 	}

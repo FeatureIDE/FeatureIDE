@@ -28,7 +28,7 @@ import org.junit.Test;
 import de.ovgu.featureide.core.featuremodeling.FeatureModelingFMExtension;
 
 /**
- * TODO description
+ * Test class for the {@link FMComposerExtension}.
  * 
  * @author Florian Proksch
  */

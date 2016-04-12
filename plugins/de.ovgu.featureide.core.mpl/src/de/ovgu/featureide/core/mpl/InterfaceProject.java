@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.core.mpl;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.Collection;
 
 import org.eclipse.core.resources.IProject;
@@ -30,8 +28,11 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.mpl.io.FileLoader;
 import de.ovgu.featureide.core.mpl.signature.ViewTag;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
+import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 
 /**
@@ -39,6 +40,7 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
  * 
  * @author Sebastian Krieter
  * @author Reimar Schroeter
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class InterfaceProject {
 	private final IProject projectReference;
@@ -54,7 +56,7 @@ public class InterfaceProject {
 	
 	private Configuration configuration;
 
-	private final FeatureModel featureModel;
+	private final IFeatureModel featureModel;
 	private String[] featureNames;
 	
 //	private IChainJob loadJob = null;
@@ -68,7 +70,7 @@ public class InterfaceProject {
 		this(projectReference, null);
 	}
 	
-	private class FeaturePropertyChangeListener implements PropertyChangeListener {
+	private class FeaturePropertyChangeListener implements IEventListener {
 		private final int id;
 		
 		public FeaturePropertyChangeListener(int id) {
@@ -76,15 +78,15 @@ public class InterfaceProject {
 		}
 		
 		@Override
-		public void propertyChange(PropertyChangeEvent event) {
+		public void propertyChange(FeatureIDEEvent event) {
 			String prop = event.getPropertyName();
-			if (Feature.LOCATION_CHANGED.equals(prop)) {
+			if (PropertyConstants.LOCATION_CHANGED.equals(prop)) {
 				
-			} else if (Feature.CHILDREN_CHANGED.equals(prop)) {
+			} else if (PropertyConstants.CHILDREN_CHANGED.equals(prop)) {
 				
-			} else if (Feature.NAME_CHANGED.equals(prop)) {
-				featureNames[id] = ((Feature)event.getSource()).getName();
-			} else if (Feature.ATTRIBUTE_CHANGED.equals(prop)) {
+			} else if (PropertyConstants.NAME_CHANGED.equals(prop)) {
+				featureNames[id] = ((IFeature)event.getSource()).getName();
+			} else if (PropertyConstants.ATTRIBUTE_CHANGED.equals(prop)) {
 				
 			}
 		}
@@ -123,8 +125,8 @@ public class InterfaceProject {
 			final String[] tempFeatureNames = new String[featureModel.getNumberOfFeatures()];
 			int count = 0;
 			
-			for (Feature feature : featureModel.getFeatures()) {
-				if (feature.isConcrete()) {
+			for (IFeature feature : featureModel.getFeatures()) {
+				if (feature.getStructure().isConcrete()) {
 					feature.addListener(new FeaturePropertyChangeListener(count));
 					tempFeatureNames[count++] = feature.getName();
 				}
@@ -189,7 +191,7 @@ public class InterfaceProject {
 		return featureProject;
 	}
 	
-	public FeatureModel getFeatureModel() {
+	public IFeatureModel getFeatureModel() {
 		return featureModel;
 	}
 	

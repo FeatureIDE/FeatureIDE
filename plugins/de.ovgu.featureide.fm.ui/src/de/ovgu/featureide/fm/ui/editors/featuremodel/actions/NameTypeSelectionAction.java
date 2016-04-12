@@ -24,21 +24,23 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.Preferences;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.NameTypeSelectionOperation;
 
 /**
  * Action to select the layout for the feature model.
+ * 
+ * @author Marcus Pinnecke (Feature interface)
  */
 public class NameTypeSelectionAction extends Action {
 
 	private final FeatureDiagramEditor editor;
 	private final int newNameType;
 
-	public NameTypeSelectionAction(FeatureDiagramEditor editor, FeatureModel featureModel, int newNameType) {
+	public NameTypeSelectionAction(FeatureDiagramEditor editor, IFeatureModel featureModel, int newNameType) {
 		super(Preferences.getNameTypeLabel(newNameType));
 		this.newNameType = newNameType;
 		this.editor = editor;

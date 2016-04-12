@@ -33,7 +33,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.Comparison;
 import de.ovgu.featureide.fm.core.editing.ModelComparator;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
@@ -45,6 +46,7 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
  * A class to evaluate the performance of the comparison of feature models.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class Evaluation {
 	
@@ -114,9 +116,9 @@ public class Evaluation {
 						IFolder folder = project.getFolder(size + "");
 						IFile file = folder.getFile(size + "-" + id + ".m");
 						System.out.println(file);
-						FeatureModel fm1;
+						IFeatureModel fm1;
 						if (file.exists()) {
-							fm1 = new FeatureModel();
+							fm1 = FMFactoryManager.getFactory().createFeatureModel();
 							reader.setFeatureModel(fm1);
 							reader.readFromFile(file);
 						}
@@ -142,9 +144,9 @@ public class Evaluation {
 									IFile file2 = subfolder.getFile(size + "-" + id + "-" + edits + "-" + (seed+m) + ".m");
 									System.out.println("\t" + file2);
 
-									FeatureModel fm2;
+									IFeatureModel fm2;
 									if (file2.exists()) {
-										fm2 = new FeatureModel();
+										fm2 = FMFactoryManager.getFactory().createFeatureModel();
 										reader.setFeatureModel(fm2);
 										reader.readFromFile(file2);
 									}
@@ -205,7 +207,7 @@ public class Evaluation {
 						continue;
 					}
 					
-					FeatureModel fm = Generator.generateFeatureModel(id, size);
+					IFeatureModel fm = Generator.generateFeatureModel(id, size);
 					//IFeatureModelWriter writer = new XmlFeatureModelWriter(fm);
 					FeatureModelWriterIFileWrapper writer = new FeatureModelWriterIFileWrapper(new XmlFeatureModelWriter(fm));
 					boolean valid = false;
@@ -214,7 +216,7 @@ public class Evaluation {
 							folder.create(false, false, null);
 						writer.writeToFile(file);
 						
-						FeatureModel fmout = new FeatureModel();
+						IFeatureModel fmout = FMFactoryManager.getFactory().createFeatureModel();
 						//IFeatureModelReader reader = new XmlFeatureModelReader(fmout,project);
 						FeatureModelReaderIFileWrapper reader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(fmout));
 						reader.readFromFile(file);
@@ -242,7 +244,7 @@ public class Evaluation {
 					//open feature model
 					IFolder folder = project.getFolder(size + "");
 					IFile file = folder.getFile(size + "-" + id + ".m");
-					FeatureModel fm = new FeatureModel();
+					IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
 					//IFeatureModelReader reader = new XmlFeatureModelReader(fm,project);
 					FeatureModelReaderIFileWrapper reader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(fm));
 					//check if it is valid

@@ -23,8 +23,6 @@ package de.ovgu.featureide.core.mpl;
 import static de.ovgu.featureide.fm.core.localization.StringTable.EMPTY___;
 import static de.ovgu.featureide.fm.core.localization.StringTable.INTERFACES;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Collection;
@@ -55,7 +53,8 @@ import de.ovgu.featureide.core.mpl.job.statistics.PrintExtendedSignaturesJob;
 import de.ovgu.featureide.core.mpl.job.statistics.PrintStatisticsJob;
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.io.IOConstants;
 
 /** 
@@ -191,12 +190,12 @@ public class MPLPlugin extends AbstractCorePlugin {
 		final InterfaceProject interfaceProject = new InterfaceProject(project, curFeatureProject);
 		
 		projectMap.put(project.getName(), interfaceProject);
-		interfaceProject.getFeatureModel().addListener(new PropertyChangeListener() {
+		interfaceProject.getFeatureModel().addListener(new IEventListener() {
 			@Override
-			public void propertyChange(PropertyChangeEvent evt) {
-				if (PropertyConstants.MODEL_DATA_CHANGED.equals(evt.getPropertyName())) {
+			public void propertyChange(FeatureIDEEvent evt) {
+				if (FeatureIDEEvent.MODEL_DATA_CHANGED.equals(evt.getPropertyName())) {
 //					interfaceProject.loadSignatures(true);
-				} else if (PropertyConstants.MODEL_LAYOUT_CHANGED.equals(evt.getPropertyName())) {
+				} else if (FeatureIDEEvent.MODEL_LAYOUT_CHANGED.equals(evt.getPropertyName())) {
 //					interfaceProject.loadSignatures(true);
 				}
 			}
@@ -314,10 +313,6 @@ public class MPLPlugin extends AbstractCorePlugin {
 	public void buildFeatureInterfaces(LinkedList<IProject> projects, String folder, String viewName, int viewLevel, int configLimit) {
 		FMCorePlugin.getDefault().startJobs(projects, new PrintFeatureInterfacesJob.Arguments(folder), true);
 	}
-	
-//	public void buildDocumentationStatistics(LinkedList<IProject> projects, String folder) {
-//		startJobs(projects, new PrintDocumentationStatisticsJob.Arguments(folder));
-//	}
 	
 	public void buildConfigurationInterfaces(LinkedList<IProject> projects, String viewName, int viewLevel, int configLimit) {
 		FMCorePlugin.getDefault().startJobs(projects, new PrintComparedInterfacesJob.Arguments(), true);

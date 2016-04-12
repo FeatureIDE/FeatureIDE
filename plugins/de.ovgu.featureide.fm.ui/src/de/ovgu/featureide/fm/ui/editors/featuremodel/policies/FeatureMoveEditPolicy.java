@@ -43,6 +43,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
  * figure.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke
  */
 public class FeatureMoveEditPolicy extends NonResizableEditPolicy implements GUIDefaults {
 

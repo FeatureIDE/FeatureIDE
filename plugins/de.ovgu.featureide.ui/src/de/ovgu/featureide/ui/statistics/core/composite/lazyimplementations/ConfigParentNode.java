@@ -25,7 +25,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.MORE_THAN;
 
 import org.eclipse.core.runtime.jobs.Job;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.ui.statistics.core.composite.LazyParent;
 import de.ovgu.featureide.ui.statistics.core.composite.Parent;
@@ -41,12 +41,12 @@ import de.ovgu.featureide.ui.statistics.ui.helper.jobs.StoppableTreeJob;
  */
 public class ConfigParentNode extends LazyParent {
 	
-	private final FeatureModel model;
+	private final IFeatureModel model;
 
 	public static class ConfigNode extends Parent {
-		private FeatureModel innerModel;
+		private IFeatureModel innerModel;
 
-		public ConfigNode(String description, FeatureModel innerModel) {
+		public ConfigNode(String description, IFeatureModel innerModel) {
 			super(description, "(double-click to calculate)");
 			this.innerModel = innerModel;
 		}
@@ -92,7 +92,7 @@ public class ConfigParentNode extends LazyParent {
 		}
 	}
 
-	public ConfigParentNode(String description, FeatureModel model) {
+	public ConfigParentNode(String description, IFeatureModel model) {
 		super(description);
 		this.model = model;
 	}

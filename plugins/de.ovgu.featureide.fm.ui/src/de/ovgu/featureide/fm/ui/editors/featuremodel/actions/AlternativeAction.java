@@ -26,29 +26,30 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureChangeGroupTypeOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ChangeFeatureGroupTypeOperation;
 
 /**
  * Turns a group type into an Alternative-group.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class AlternativeAction extends SingleSelectionAction {
 
 	public static final String ID = "de.ovgu.featureide.alternative";
 
-	private final FeatureModel featureModel;
+	private final IFeatureModel featureModel;
 
-	public AlternativeAction(Object viewer, FeatureModel featureModel) {
+	public AlternativeAction(Object viewer, IFeatureModel featureModel) {
 		super(ALTERNATIVE, viewer);
 		this.featureModel = featureModel;
 	}
 
 	@Override
 	public void run() {
-		FeatureChangeGroupTypeOperation op = new FeatureChangeGroupTypeOperation(FeatureChangeGroupTypeOperation.ALTERNATIVE, feature, featureModel);
+		ChangeFeatureGroupTypeOperation op = new ChangeFeatureGroupTypeOperation(ChangeFeatureGroupTypeOperation.ALTERNATIVE, feature, featureModel);
 		op.addContext((IUndoContext) featureModel.getUndoContext());
 
 		try {
@@ -62,8 +63,8 @@ public class AlternativeAction extends SingleSelectionAction {
 
 	@Override
 	protected void updateProperties() {
-		boolean alt = feature.isAlternative();
-		setEnabled(!alt && feature.hasChildren());
+		boolean alt = feature.getStructure().isAlternative();
+		setEnabled(!alt && feature.getStructure().hasChildren());
 		setChecked(alt);
 	}
 

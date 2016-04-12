@@ -32,12 +32,13 @@ import org.eclipse.core.runtime.CoreException;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
  * Generates a class representing the variability encoding of the feature model.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class FeatureModelClassGenerator {
 	
@@ -56,7 +57,7 @@ public class FeatureModelClassGenerator {
 	 * @param model
 	 * @param method
 	 */
-	public FeatureModelClassGenerator(FeatureModel featureModel, String method) {
+	public FeatureModelClassGenerator(IFeatureModel featureModel, String method) {
 		if (method.equals(IFeatureProject.META_MODEL_CHECKING_BDD_JAVA_JML)) {
 			featureModelClass = new FeatureModelJPFBDD(featureModel);
 		} else if (method.equals(IFeatureProject.META_THEOREM_PROVING)) {

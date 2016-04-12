@@ -25,23 +25,23 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.AUTOMATED_CALC
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 
-import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.ConstraintAttribute;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureStatus;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
- * 
  * An action to activate/deactivate automated calculations on changes to the feature model.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke
  */
 public class AutomatedCalculationsAction extends Action {
 
-	private final FeatureModel featureModel;
+	private final IFeatureModel featureModel;
 
-	public AutomatedCalculationsAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
+	public AutomatedCalculationsAction(GraphicalViewerImpl viewer, IFeatureModel featureModel) {
 		super(AUTOMATED_CALCULATIONS);
 		this.featureModel = featureModel;
 		setChecked(featureModel.getAnalyser().runCalculationAutomatically);
@@ -50,10 +50,10 @@ public class AutomatedCalculationsAction extends Action {
 	@Override
 	public void run() {
 		if (featureModel.getAnalyser().runCalculationAutomatically) {
-			for (Feature f : featureModel.getFeatures()) {
-				f.setFeatureStatus(FeatureStatus.NORMAL, false);
+			for (IFeature f : featureModel.getFeatures()) {
+				f.getProperty().setFeatureStatus(FeatureStatus.NORMAL, false);
 			}
-			for (Constraint c : featureModel.getConstraints()) {
+			for (IConstraint c : featureModel.getConstraints()) {
 				c.setConstraintAttribute(ConstraintAttribute.NORMAL, false);
 			}
 			featureModel.getAnalyser().runCalculationAutomatically = false;

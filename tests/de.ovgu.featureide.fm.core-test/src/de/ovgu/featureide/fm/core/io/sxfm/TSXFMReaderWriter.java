@@ -28,7 +28,8 @@ import org.prop4j.Node;
 import org.prop4j.Not;
 import org.prop4j.Or;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
 import de.ovgu.featureide.fm.core.io.TAbstractFeatureModelReaderWriter;
@@ -45,23 +46,17 @@ public class TSXFMReaderWriter extends TAbstractFeatureModelReaderWriter{
 	 * @param file
 	 * @throws UnsupportedModelException 
 	 */
-	public TSXFMReaderWriter(FeatureModel fm, String s) throws UnsupportedModelException {
+	public TSXFMReaderWriter(IFeatureModel fm, String s) throws UnsupportedModelException {
 		super(fm,s);
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.io.TAbstractFeatureModelReaderWriter#getWriter(de.ovgu.featureide.fm.core.FeatureModel)
-	 */
 	@Override
-	protected IFeatureModelWriter getWriter(FeatureModel fm) {
+	protected IFeatureModelWriter getWriter(IFeatureModel fm) {
 		return new SXFMWriter(fm);
 	}
 
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.fm.core.io.TAbstractFeatureModelReaderWriter#getReader(de.ovgu.featureide.fm.core.FeatureModel)
-	 */
 	@Override
-	protected IFeatureModelReader getReader(FeatureModel fm) {
+	protected IFeatureModelReader getReader(IFeatureModel fm) {
 		return new SXFMReader(fm);
 	}
 
@@ -73,7 +68,8 @@ public class TSXFMReaderWriter extends TAbstractFeatureModelReaderWriter{
 	
 	@Test
 	public void testPropNodes() {
-		for (Node n : newFm.getPropositionalNodes()) {
+		for (IConstraint constraint : newFm.getConstraints()) {
+			final Node n = constraint.getNode();
 			if (n instanceof Literal) {
 				// case: feature
 				continue;

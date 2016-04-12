@@ -23,6 +23,7 @@ package de.ovgu.featureide.core.job;
 import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD_DOCUMENTATION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.BUILT_DOCUMENTATION;
 
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -49,12 +50,13 @@ import de.ovgu.featureide.core.signature.documentation.base.DocumentationBuilder
 import de.ovgu.featureide.core.signature.filter.ConstraintFilter;
 import de.ovgu.featureide.core.signature.filter.FeatureFilter;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.filter.base.IFilter;
 import de.ovgu.featureide.fm.core.io.IOConstants;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
+import de.ovgu.featureide.fm.core.io.manager.FileReader;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
@@ -111,7 +113,11 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 					Configuration.PARAM_LAZY | Configuration.PARAM_IGNOREABSTRACT);
 			try {
 				final IFile file = featureProject.getCurrentConfiguration();
-				new ConfigurationReader(conf).readFromFile(file);
+				final FileReader<Configuration> reader = new FileReader<>();
+				reader.setPath(Paths.get(file.getLocationURI()));
+				reader.setFormat(ConfigurationManager.getFormat(file.getName()));
+				reader.setObject(conf);
+				reader.read();
 			} catch (Exception e) {
 				CorePlugin.getDefault().logError(e);
 				return false;

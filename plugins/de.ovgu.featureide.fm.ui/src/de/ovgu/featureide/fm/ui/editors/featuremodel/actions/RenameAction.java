@@ -22,20 +22,21 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 
 import org.eclipse.swt.SWT;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 
 /**
  * Renames a particular feature at the feature diagram.
  * 
  * @author Tom Brosch
+ * @author Marcus Pinnecke
  */
 public class RenameAction extends SingleSelectionAction {
 
 	public static final String ID = "de.ovgu.featureide.rename";
 	private Object diagramEditor;
 
-	public RenameAction(Object viewer, FeatureModel featureModel, Object graphicalViewer) {
+	public RenameAction(Object viewer, IFeatureModel featureModel, Object graphicalViewer) {
 		super("Rename (F2)", viewer);
 		this.setAccelerator(SWT.F2);
 		this.diagramEditor = graphicalViewer;

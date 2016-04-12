@@ -31,12 +31,13 @@ import java.io.InputStream;
 import org.junit.Test;
 
 import de.ovgu.featureide.core.featuremodeling.FeatureModelingFMExtension;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 
 /**
- * TODO description
+ * Test class for the {@link ConfigurationReader}.
  * 
  * @author Stefan Krueger
  * @author Florian Proksch
@@ -57,7 +58,7 @@ protected static File MODEL_FILE_FOLDER = getFolder();
 	String text = ""; 
 	InputStream a; // = new InputStream(text.getBytes(Charset.availableCharsets().get("UTF-8")));
 	
-	private FeatureModel FM_test_1 = init("test_5.xml");
+	private IFeatureModel FM_test_1 = init("test_5.xml");
 	
 	
 	private static File getFolder() { 
@@ -69,8 +70,8 @@ protected static File MODEL_FILE_FOLDER = getFolder();
 	}
 	
 	
-	private final FeatureModel init(String name) {
-		FeatureModel fm = new FeatureModel();
+	private final IFeatureModel init(String name) {
+		IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
 		FeatureModelingFMExtension comp = new FeatureModelingFMExtension();
 		fm.getFMComposerManager(null).setComposerID("de.ovgu.featureide.core.FeatureModeling", comp);
 		for (File f : MODEL_FILE_FOLDER.listFiles(filter)) {
@@ -92,9 +93,9 @@ protected static File MODEL_FILE_FOLDER = getFolder();
 	@Test
 	public void isValidConfiguration() 
 	{
-		Configuration c = new Configuration(FM_test_1, false);
-		ConfigurationReader r = new ConfigurationReader(c);
-		r.readFromString("C#");
+		final Configuration c = new Configuration(FM_test_1, false);
+		final DefaultFormat r = new DefaultFormat();
+		r.read(c, "C#");
 
 		assertFalse(c.isValid());
 	}
@@ -127,8 +128,8 @@ protected static File MODEL_FILE_FOLDER = getFolder();
 	public void isValidConfiguration4() 
 	{
 		Configuration c = new Configuration(FM_test_1, false);
-		ConfigurationReader r = new ConfigurationReader(c);
-		r.readFromString("C# \njute \n \"Bash   script   \"");
+		final DefaultFormat r = new DefaultFormat();
+		r.read(c, "C# \njute \n \"Bash   script   \"");
 		assertFalse(c.isValid());
 	}
 	
@@ -136,8 +137,8 @@ protected static File MODEL_FILE_FOLDER = getFolder();
 	public void isValidConfiguration5() 
 	{
 		Configuration c = new Configuration(FM_test_1, false);
-		ConfigurationReader r = new ConfigurationReader(c);
-		r.readFromString("C# \njute \n \"Bash   script   \" \"Python Ruby\"");
+		final DefaultFormat r = new DefaultFormat();
+		r.read(c, "C# \njute \n \"Bash   script   \" \"Python Ruby\"");
 		assertTrue(c.isValid());
 	}
 	
@@ -145,8 +146,8 @@ protected static File MODEL_FILE_FOLDER = getFolder();
 	public void isValidConfiguration6() 
 	{
 		Configuration c = new Configuration(FM_test_1, false);
-		ConfigurationReader r = new ConfigurationReader(c);
-		r.readFromString("C# \njute \n \"Bash   script   \" \n\"Python Ruby\" \n\"C++\"");
+		final DefaultFormat r = new DefaultFormat();
+		r.read(c, "C# \njute \n \"Bash   script   \" \n\"Python Ruby\" \n\"C++\"");
 		assertTrue(c.isValid());
 	}
 	
@@ -154,8 +155,8 @@ protected static File MODEL_FILE_FOLDER = getFolder();
 	public void isValidConfiguration7() 
 	{
 		Configuration c = new Configuration(FM_test_1, false);
-		ConfigurationReader r = new ConfigurationReader(c);
-		r.readFromString("C# \njute \n \"Bash   script    \n\"Python Ruby\" \n\"C++\"");
+		final DefaultFormat r = new DefaultFormat();
+		r.read(c, "C# \njute \n \"Bash   script    \n\"Python Ruby\" \n\"C++\"");
 		assertFalse(c.isValid());
 	}
 	
@@ -163,8 +164,8 @@ protected static File MODEL_FILE_FOLDER = getFolder();
 	public void isValidConfiguration8() 
 	{
 		Configuration c = new Configuration(FM_test_1, false);
-		ConfigurationReader r = new ConfigurationReader(c);
-		r.readFromString("C# \nj ute \n \"Bash   script    \"\n\"Python Ruby\" \n\"C++\"");
+		final DefaultFormat r = new DefaultFormat();
+		r.read(c, "C# \nj ute \n \"Bash   script    \"\n\"Python Ruby\" \n\"C++\"");
 		assertFalse(c.isValid());
 	}
 	
@@ -172,8 +173,8 @@ protected static File MODEL_FILE_FOLDER = getFolder();
 	public void isValidConfiguration9() 
 	{
 		Configuration c = new Configuration(FM_test_1, false);
-		ConfigurationReader r = new ConfigurationReader(c);
-		r.readFromString("C# \njute \n \"Bash   script   \" Python Ruby\" \n\"C++\"");
+		final DefaultFormat r = new DefaultFormat();
+		r.read(c, "C# \njute \n \"Bash   script   \" Python Ruby\" \n\"C++\"");
 		assertFalse(c.isValid());
 	}
 	
@@ -181,8 +182,8 @@ protected static File MODEL_FILE_FOLDER = getFolder();
 	public void isValidConfiguration10() 
 	{
 		Configuration c = new Configuration(FM_test_1, false);
-		ConfigurationReader r = new ConfigurationReader(c);
-		r.readFromString("jute \"Bash   script   \" \"Python C# Ruby\" \"C++\"");
+		final DefaultFormat r = new DefaultFormat();
+		r.read(c, "jute \"Bash   script   \" \"Python C# Ruby\" \"C++\"");
 		assertTrue(c.isValid());
 	}
 }

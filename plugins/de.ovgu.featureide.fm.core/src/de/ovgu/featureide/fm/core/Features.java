@@ -27,6 +27,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.IFeature;
+
 public final class Features {
 
 	public static final String FEATURE_SUFFIX = "(Feature)";
@@ -49,29 +52,29 @@ public final class Features {
 		return result;
 	}
 
-	public static Feature getCommonAncestor(Collection<Feature> features) {
-		List<Feature> commonAncestorList = null;
-		for (Feature feature : features) {
-			commonAncestorList = Features.getCommonAncestor(commonAncestorList, feature.getParent());
+	public static IFeature getCommonAncestor(Collection<IFeature> features) {
+		List<IFeature> commonAncestorList = null;
+		for (IFeature feature : features) {
+			commonAncestorList = Features.getCommonAncestor(commonAncestorList, FeatureUtils.getParent(feature));
 		}
 		return commonAncestorList.get(commonAncestorList.size() - 1);
 	}
 
-	public static List<Feature> getCommonAncestor(List<Feature> commonAncestorList, Feature parent) {
+	public static List<IFeature> getCommonAncestor(List<IFeature> commonAncestorList, IFeature parent) {
 		if (commonAncestorList == null) {
 			commonAncestorList = new LinkedList<>();
 			while (parent != null) {
 				commonAncestorList.add(0, parent);
-				parent = parent.getParent();
+				parent = FeatureUtils.getParent(parent);
 			}
 		} else if (parent != null) {
-			LinkedList<Feature> parentList = new LinkedList<>();
+			LinkedList<IFeature> parentList = new LinkedList<>();
 			while (parent != null) {
 				parentList.addFirst(parent);
-				parent = parent.getParent();
+				parent = FeatureUtils.getParent(parent);
 			}
-			final Iterator<Feature> iterator1 = parentList.iterator();
-			final Iterator<Feature> iterator2 = commonAncestorList.iterator();
+			final Iterator<IFeature> iterator1 = parentList.iterator();
+			final Iterator<IFeature> iterator2 = commonAncestorList.iterator();
 			int i = 0;
 			while (iterator1.hasNext() && iterator2.hasNext()) {
 				if (!iterator1.next().equals(iterator2.next())) {

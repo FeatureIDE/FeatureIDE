@@ -54,7 +54,7 @@ import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 import de.ovgu.featureide.core.signature.base.AbstractFieldSignature;
 import de.ovgu.featureide.core.signature.base.AbstractMethodSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
-import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.views.collaboration.GUIDefaults;
 import de.ovgu.featureide.ui.views.collaboration.outline.OutlineLabelProvider;
@@ -145,8 +145,8 @@ public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 			} else if (element instanceof AbstractClassSignature) {
 				return ((AbstractClassSignature) element).getName();
 			}
-		} else if (element instanceof Feature) {
-			return ((Feature) element).getDisplayName();
+		} else if (element instanceof IFeature) {
+			return ((IFeature) element).getProperty().getDisplayName();
 		}
 		return element.toString();
 	}
@@ -215,11 +215,11 @@ public class ContextOutlineLabelProvider extends OutlineLabelProvider {
 					final AbstractSignature sig = (AbstractSignature) selection;
 					final AFeatureData[] featureDataArray = sig.getFeatureData();
 					openEditor(sig, featureProject, featureDataArray[0].getID());
-				} else if (selection instanceof Feature) {
+				} else if (selection instanceof IFeature) {
 					final ProjectSignatures signatures = featureProject.getProjectSignatures();
 					if (signatures != null) {
 						final TreeItem decl = viewer.getTree().getSelection()[0].getParentItem();
-						openEditor((AbstractSignature) decl.getData(), featureProject, signatures.getFeatureID(((Feature) selection).getName()));
+						openEditor((AbstractSignature) decl.getData(), featureProject, signatures.getFeatureID(((IFeature) selection).getName()));
 					}
 				}
 			}

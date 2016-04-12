@@ -20,8 +20,9 @@
  */
 package de.ovgu.featureide.ui.migration.plugin;
 
-import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
+
+import de.ovgu.featureide.fm.ui.AbstractUIPlugin;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -65,6 +66,11 @@ public class SPLMigrationPlugin extends AbstractUIPlugin {
 	 */
 	public static SPLMigrationPlugin getDefault() {
 		return plugin;
+	}
+
+	@Override
+	public String getID() {
+		return PLUGIN_ID;
 	}
 
 }

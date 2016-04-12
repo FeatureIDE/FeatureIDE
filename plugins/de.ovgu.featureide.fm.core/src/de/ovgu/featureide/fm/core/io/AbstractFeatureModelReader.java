@@ -31,7 +31,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
  * Default reader to be extended for each feature model format.
@@ -39,18 +39,19 @@ import de.ovgu.featureide.fm.core.FeatureModel;
  * If IFile support is needed, the {@link FeatureModelReaderIFileWrapper} has to be used.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public abstract class AbstractFeatureModelReader implements IFeatureModelReader {
 
 	/**
 	 * the structure to store the parsed data
 	 */
-	protected FeatureModel featureModel;
+	protected IFeatureModel featureModel;
 	
 	/**
 	 * warnings occurred while parsing
 	 */
-	protected LinkedList<ModelWarning> warnings = new LinkedList<ModelWarning>();
+	protected LinkedList<Problem> warnings = new LinkedList<Problem>();
 	
 	/**
 	 * The source of the textual representation of the feature model.<br/><br/>
@@ -59,11 +60,11 @@ public abstract class AbstractFeatureModelReader implements IFeatureModelReader 
 	 */
 	protected File featureModelFile;
 	
-	public void setFeatureModel(FeatureModel featureModel) {
+	public void setFeatureModel(IFeatureModel featureModel) {
 		this.featureModel = featureModel;
 	}
 	
-	public FeatureModel getFeatureModel() {
+	public IFeatureModel getFeatureModel() {
 		return featureModel;
 	}
 
@@ -87,7 +88,7 @@ public abstract class AbstractFeatureModelReader implements IFeatureModelReader 
 			parseInputStream(inputStream);
 			// TODO: REMOVE THIS, THIS IS A HACK
 			// THIS IS A HACK
-			featureModel.xxxSetSourceFile(file);
+			featureModel.setSourceFile(file);
 			// END HACK
 		} finally {
 			if (inputStream != null) {
@@ -117,7 +118,7 @@ public abstract class AbstractFeatureModelReader implements IFeatureModelReader 
 		parseInputStream(inputStream);
 	}
 	
-	public List<ModelWarning> getWarnings() {
+	public List<Problem> getWarnings() {
 		return warnings;
 	}
 

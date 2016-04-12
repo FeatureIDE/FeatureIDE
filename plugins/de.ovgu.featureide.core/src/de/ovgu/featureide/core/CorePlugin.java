@@ -25,6 +25,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.AND_COMPOSER_T
 import static de.ovgu.featureide.fm.core.localization.StringTable.CHANGE_OLD_NATURE_TO_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.COULD_NOT_SET_PERSISTANT_PROPERTY;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CONFIG;
+import static de.ovgu.featureide.fm.core.localization.StringTable.CONF;
 import static de.ovgu.featureide.fm.core.localization.StringTable.EQUATION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ERROR_WHILE_CREATING_FEATURE_MODEL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.EXPRESSION;
@@ -42,6 +43,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeoutException;
 
 import javax.annotation.CheckForNull;
 
@@ -67,6 +69,7 @@ import org.eclipse.jdt.core.CompletionProposal;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.Signature;
 import org.osgi.framework.BundleContext;
+import org.prop4j.Node;
 
 import de.ovgu.featureide.core.builder.ComposerExtensionManager;
 import de.ovgu.featureide.core.builder.ExtensibleFeatureProjectBuilder;
@@ -95,7 +98,10 @@ import de.ovgu.featureide.core.signature.documentation.VariantMerger;
 import de.ovgu.featureide.core.signature.filter.ContextFilter;
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
+import de.ovgu.featureide.fm.core.editing.cnf.UnkownLiteralException;
 import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 
@@ -106,6 +112,7 @@ import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
  * @author Marcus Leich
  * @author Tom Brosch
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class CorePlugin extends AbstractCorePlugin {
 
@@ -121,15 +128,15 @@ public class CorePlugin extends AbstractCorePlugin {
 
 	private LinkedList<IProjectListener> projectListeners = new LinkedList<IProjectListener>();
 
-	private LinkedList<ICurrentConfigurationListener> currentConfigurationListeners = new LinkedList<ICurrentConfigurationListener>();
+	private LinkedList<ICurrentConfigurationListener> currentConfigurationListeners = new LinkedList<>();
 
-	private LinkedList<IConfigurationChangedListener> configurationChangedListeners = new LinkedList<IConfigurationChangedListener>();
+	private LinkedList<IConfigurationChangedListener> configurationChangedListeners = new LinkedList<>();
 
-	private LinkedList<IFeatureFolderListener> featureFolderListeners = new LinkedList<IFeatureFolderListener>();
+	private LinkedList<IFeatureFolderListener> featureFolderListeners = new LinkedList<>();
 
-	private LinkedList<ICurrentBuildListener> currentBuildListeners = new LinkedList<ICurrentBuildListener>();
+	private LinkedList<ICurrentBuildListener> currentBuildListeners = new LinkedList<>();
 
-	private LinkedList<IProject> projectsToAdd = new LinkedList<IProject>();
+	private LinkedList<IProject> projectsToAdd = new LinkedList<>();
 
 	private Job job = null;
 
@@ -151,8 +158,6 @@ public class CorePlugin extends AbstractCorePlugin {
 		plugin = this;
 
 		featureProjectMap = new HashMap<IProject, IFeatureProject>();
-		listener = new ProjectChangeListener();
-		ResourcesPlugin.getWorkspace().addResourceChangeListener(listener);
 		for (final IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
 			try {
 				if (project.isOpen()) {
@@ -163,13 +168,16 @@ public class CorePlugin extends AbstractCorePlugin {
 							changeOldNature(project, e.getAttribute("ID"));
 						}
 					}
-					if (project.hasNature(FeatureProjectNature.NATURE_ID))
+					if (project.hasNature(FeatureProjectNature.NATURE_ID)) {
 						addProject(project);
+					}
 				}
 			} catch (Exception e) {
 				CorePlugin.getDefault().logError(e);
 			}
 		}
+		listener = new ProjectChangeListener();
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(listener);
 
 	}
 
@@ -550,7 +558,7 @@ public class CorePlugin extends AbstractCorePlugin {
 		createFolder(project, sourcePath);
 		createFolder(project, configPath);
 		createFolder(project, buildPath);
-		FeatureModel featureModel = new FeatureModel();
+		IFeatureModel featureModel = FMFactoryManager.getFactory().createFeatureModel();
 		featureModel.initFMComposerExtension(project);
 		featureModel.createDefaultValues(project.getName());
 		try {
@@ -613,6 +621,7 @@ public class CorePlugin extends AbstractCorePlugin {
 		extensions.add(CONFIG);
 		extensions.add(EQUATION);
 		extensions.add(EXPRESSION);
+		extensions.add(CONF);
 		return extensions;
 	}
 
@@ -785,6 +794,12 @@ public class CorePlugin extends AbstractCorePlugin {
 		final PrintDocumentationJob.Arguments args = new PrintDocumentationJob.Arguments("Docu_SPL", options.split("\\s+"), new SPLMerger(), null);
 
 		FMCorePlugin.getDefault().startJobs(pl, args, true);
+	}
+	
+	public static Node removeFeatures(IFeatureModel featureModel, Collection<String> removeFeatures) throws TimeoutException, UnkownLiteralException {
+		final AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(featureModel, removeFeatures);
+		nodeCreator.setCnfType(AdvancedNodeCreator.CNFType.Regular);
+		return nodeCreator.createNodes();
 	}
 
 }

@@ -23,25 +23,25 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.actions;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DELETE_INCLUDING_SUBFEATURES;
 
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.DeleteAllOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureTreeDeleteOperation;
 
 /**
  * Action to delete a single feature including its sub features
  * 
  * @author Jan Wedding
  * @author Melanie Pflaume
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class DeleteAllAction extends SingleSelectionAction {
 
 	public static final String ID = "de.ovgu.featureide.deleteall";
-	private FeatureModel featureModel;
+	private IFeatureModel featureModel;
 	private static ImageDescriptor deleteImage = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_DELETE);
 
 	/**
@@ -49,7 +49,7 @@ public class DeleteAllAction extends SingleSelectionAction {
 	 * @param viewer
 	 * @param featureModel
 	 */
-	public DeleteAllAction(Object viewer, FeatureModel featureModel) {
+	public DeleteAllAction(Object viewer, IFeatureModel featureModel) {
 		super(DELETE_INCLUDING_SUBFEATURES, viewer);
 		this.featureModel = featureModel;
 		this.viewer = viewer;
@@ -58,9 +58,7 @@ public class DeleteAllAction extends SingleSelectionAction {
 
 	@Override
 	public void run() {
-		DeleteAllOperation op = new DeleteAllOperation(featureModel, feature);
-
-		op.addContext((IUndoContext) featureModel.getUndoContext());
+		FeatureTreeDeleteOperation op = new FeatureTreeDeleteOperation(featureModel, feature);
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
@@ -79,7 +77,7 @@ public class DeleteAllAction extends SingleSelectionAction {
 	 */
 	@Override
 	protected void updateProperties() {
-		setEnabled(!feature.isRoot() && feature.hasChildren());
+		setEnabled(!feature.getStructure().isRoot() && feature.getStructure().hasChildren());
 		setChecked(false);
 	}
 

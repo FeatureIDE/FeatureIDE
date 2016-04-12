@@ -57,7 +57,7 @@ import de.ovgu.featureide.core.signature.base.FeatureDataConstructor;
 import de.ovgu.featureide.core.signature.base.PreprocessorFeatureData;
 
 /**
- * TODO description
+ * Collects all signatures in a Munge project.
  * 
  * @author Sebastian Krieter
  */
@@ -132,19 +132,29 @@ public abstract class MungeSignatureBuilder {
 				this.curDeclaration = curDeclaration;
 				final Javadoc javadoc = curDeclaration.getJavadoc();
 				final int startPosition = (javadoc == null) ? curDeclaration.getStartPosition() : curDeclaration.getStartPosition() + javadoc.getLength();
-				curfeatureData = (PreprocessorFeatureData) featureDataConstructor.create(null, cu.getLineNumber(startPosition), cu.getLineNumber(curDeclaration.getStartPosition() + curDeclaration.getLength()));
+				curfeatureData = (PreprocessorFeatureData) featureDataConstructor.create(null, unit.getLineNumber(startPosition), unit.getLineNumber(curDeclaration.getStartPosition() + curDeclaration.getLength()));
 				curSignature.setFeatureData(curfeatureData);
 				map.put(curSignature, curSignature);
 			}
 			
 			@Override
+			public boolean visit(CompilationUnit unit){
+				this.unit = unit;
+				return true;
+			}
+			
+			CompilationUnit unit = null;
+			
+			@Override
 			public boolean visit(MethodDeclaration node) {
+				int pos = unit.getLineNumber(node.getBody().getStartPosition());
+				int end =  unit.getLineNumber(node.getBody().getStartPosition() + node.getBody().getLength());
 				final MungeMethodSignature methodSignature = new MungeMethodSignature(getParent(node.getParent()), 
 						node.getName().getIdentifier(), node.getModifiers(), node.getReturnType2(), node.parameters(), 
-						node.isConstructor());
+						node.isConstructor(), pos, end);
 				
 				attachFeatureData(methodSignature, node);
-
+				
 				if (node.getJavadoc() == null && lastCommentedMethod != null && lastCommentedMethod.getName().equals(node.getName())) {
 					curfeatureData.setComment(lastComment);
 				} else {
@@ -163,8 +173,7 @@ public abstract class MungeSignatureBuilder {
 				}
 				AbstractClassSignature uniqueSig = (AbstractClassSignature) map.get(sig);
 				if (uniqueSig == null) {
-					map.put(sig, sig);
-					uniqueSig = sig;
+					visit((TypeDeclaration)astnode);
 				}
 				return uniqueSig;
 			}

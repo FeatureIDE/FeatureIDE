@@ -22,14 +22,16 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.layouts;
 
 import org.eclipse.draw2d.geometry.Point;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
  * Layouts the features at the feature diagram using a depth first search.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke
  */
 public class DepthFirstLayout extends FeatureDiagramLayoutManager {
 
@@ -43,23 +45,26 @@ public class DepthFirstLayout extends FeatureDiagramLayoutManager {
 	int yoffset;
 
 	@Override
-	public void layoutFeatureModel(FeatureModel featureModel) {
+	public void layoutFeatureModel(IGraphicalFeatureModel featureModel) {
 		yoffset = 0;
-		LayoutableFeature root = new LayoutableFeature(featureModel.getRoot(), showHidden);
+		IGraphicalFeature root = featureModel.getFeatures().getObject();
 		depthFirstLayout(root, 0, FMPropertyManager.getLayoutMarginX());
 		yoffset = yoffset + FMPropertyManager.getFeatureSpaceX();
 		layout(yoffset, featureModel.getConstraints());
 	}
 
-	private int depthFirstLayout(LayoutableFeature feature, int level, int x) {
-		FeatureUIHelper.setLocation(feature.getFeature(), new Point(x, FMPropertyManager.getLayoutMarginY() + level * FMPropertyManager.getFeatureSpaceY()));
+	private int depthFirstLayout(IGraphicalFeature feature, int level, int x) {
+		if (isHidden(feature)) {
+			return 0;
+		}
+		FeatureUIHelper.setLocation(feature, new Point(x, FMPropertyManager.getLayoutMarginY() + level * FMPropertyManager.getFeatureSpaceY()));
 		int newX = x;
 		if (yoffset < FMPropertyManager.getLayoutMarginY() + level * FMPropertyManager.getFeatureSpaceY())
 			yoffset = FMPropertyManager.getLayoutMarginY() + level * FMPropertyManager.getFeatureSpaceY();
-		for (LayoutableFeature child : feature.getChildren()) {
+		for (IGraphicalFeature child : feature.getTree().getChildrenObjects()) {
 			newX = depthFirstLayout(child, level + 1, newX);
 		}
-		return Math.max(newX, x + FeatureUIHelper.getSize(feature.getFeature()).width + FMPropertyManager.getFeatureSpaceX());
+		return Math.max(newX, x + FeatureUIHelper.getSize(feature).width + FMPropertyManager.getFeatureSpaceX());
 	}
 
 }

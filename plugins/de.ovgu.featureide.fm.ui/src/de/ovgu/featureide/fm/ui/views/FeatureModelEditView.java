@@ -25,8 +25,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.DISABLE_AUTOMA
 import static de.ovgu.featureide.fm.core.localization.StringTable.START_CALCULATION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATING_FEATURE_MODEL_EDITS;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 
@@ -60,8 +58,10 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.progress.UIJob;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.evaluation.Evaluation;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
@@ -81,6 +81,7 @@ import de.ovgu.featureide.fm.ui.views.featuremodeleditview.ViewLabelProvider;
  * the current editing version is compared to the last saved model.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke
  */
 public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 
@@ -166,9 +167,9 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 
 	};
 
-	private PropertyChangeListener modelListener = new PropertyChangeListener() {
-		public void propertyChange(PropertyChangeEvent evt) {
-			if (!PropertyConstants.MODEL_LAYOUT_CHANGED.equals(evt.getPropertyName()))
+	private IEventListener modelListener = new IEventListener() {
+		public void propertyChange(FeatureIDEEvent evt) {
+			if (!FeatureIDEEvent.MODEL_LAYOUT_CHANGED.equals(evt.getPropertyName()))
 				refresh();
 		}
 	};
@@ -266,11 +267,11 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 			featureModelEditor = (FeatureModelEditor) activeEditor;
 			featureModelEditor.getFeatureModel().addListener(modelListener);
 
-			if (evaluation == null && featureModelEditor.getGrammarFile().getResource().getProject().getName().startsWith("EvaluationTest")) {
+			if (evaluation == null && featureModelEditor.getModelFile().getProject().getName().startsWith("EvaluationTest")) {
 				evaluation = new Job("Evaluation Test") {
 					@Override
 					protected IStatus run(IProgressMonitor monitor) {
-						Evaluation.evaluate(featureModelEditor.getGrammarFile().getResource().getProject());
+						Evaluation.evaluate(featureModelEditor.getModelFile().getProject());
 						return Status.OK_STATUS;
 					}
 				};
@@ -280,7 +281,7 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 					@Override
 					public IStatus runInUIThread(IProgressMonitor monitor) {
 						try {
-							convertModelToBitmapTest(featureModelEditor.getGrammarFile().getResource().getProject().getFolder("models"));
+							convertModelToBitmapTest(featureModelEditor.getModelFile().getProject().getFolder("models"));
 						} catch (Exception e) {
 							FMUIPlugin.getDefault().logError(e);
 						}
@@ -292,7 +293,7 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 							if (res instanceof IFile && res.getName().endsWith(".m")) {
 								IFile fmFile = (IFile) res;
 								try {
-									FeatureModel fm = new FeatureModel();
+									IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
 
 									FeatureModelReaderIFileWrapper reader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(fm));
 									reader.readFromFile(fmFile);
@@ -309,7 +310,7 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 						folder.refreshLocal(IResource.DEPTH_ONE, null);
 					}
 
-					private void createBitmap(FeatureModel featureModel, File file) {
+					private void createBitmap(IFeatureModel featureModel, File file) {
 						GraphicalViewerImpl graphicalViewer = new ScrollingGraphicalViewer();
 						graphicalViewer.createControl(viewer.getControl().getParent());
 						graphicalViewer.getControl().setBackground(DIAGRAM_BACKGROUND);
@@ -318,8 +319,9 @@ public class FeatureModelEditView extends ViewPart implements GUIDefaults {
 						((ConnectionLayer) rootEditPart.getLayer(LayerConstants.CONNECTION_LAYER)).setAntialias(SWT.ON);
 						graphicalViewer.setRootEditPart(rootEditPart);
 						graphicalViewer.setContents(featureModel);
+						//TODO _interfaces Removed Code
 						FeatureDiagramLayoutManager layoutManager = new LevelOrderLayout();
-						layoutManager.layout(featureModel);
+						layoutManager.layout(featureModelEditor.diagramEditor.getGraphicalFeatureModel());
 						GEFImageWriter.writeToFile(graphicalViewer, file);
 					}
 				};

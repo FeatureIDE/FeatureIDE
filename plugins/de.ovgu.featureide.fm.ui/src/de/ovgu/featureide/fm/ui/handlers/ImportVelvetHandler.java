@@ -24,7 +24,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.VELVET;
 
 import org.eclipse.swt.widgets.FileDialog;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.ModelIOFactory;
 import de.ovgu.featureide.fm.ui.handlers.base.AbstractImportHandler;
@@ -33,15 +33,16 @@ import de.ovgu.featureide.fm.ui.handlers.base.AbstractImportHandler;
  * Reads a velvet feature model.
  * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke
  */
 public class ImportVelvetHandler extends AbstractImportHandler {
 	@Override
-	protected IFeatureModelReader setModelReader(FeatureModel fm) {
+	protected IFeatureModelReader setModelReader(IFeatureModel fm) {
 		return ModelIOFactory.getModelReader(fm, ModelIOFactory.TYPE_VELVET_IMPORT);
 	}
 
 	@Override
-	protected FeatureModel createFeatureModel() {
+	protected IFeatureModel createFeatureModel() {
 		return ModelIOFactory.getNewFeatureModel(ModelIOFactory.TYPE_VELVET_IMPORT);
 	}
 

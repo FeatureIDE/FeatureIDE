@@ -44,12 +44,14 @@ import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.featurehouse.FeatureHouseComposer;
 import de.ovgu.featureide.featurehouse.FeatureHouseCorePlugin;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 
 /**
  * This builder builds the {@link FSTModel} for FeatureHouse projects, by
  * parsing the FeatureHouse internal FSTModel.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class FeatureHouseModelBuilder implements FHNodeTypes {
 
@@ -133,7 +135,7 @@ public class FeatureHouseModelBuilder implements FHNodeTypes {
 
 	private void addArbitraryFiles() {
 		IFolder folder = featureProject.getSourceFolder();
-		for (String feature : featureProject.getFeatureModel().getConcreteFeatureNames()) {
+		for (String feature : FeatureUtils.extractConcreteFeaturesAsStringList(featureProject.getFeatureModel())) {
 			IFolder featureFolder = folder.getFolder(feature);
 			if (featureFolder.isAccessible()) {
 				addArbitraryFiles(featureFolder, feature);

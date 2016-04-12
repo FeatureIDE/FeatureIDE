@@ -20,8 +20,10 @@
  */
 package de.ovgu.featureide.fm.core;
 
+import de.ovgu.featureide.fm.core.base.IConstraint;
+
 /**
- * Provides attributes of a {@link Constraint}.
+ * Provides attributes of a {@link IConstraint}.
  * 
  * @author Cyrill Meyer
  */

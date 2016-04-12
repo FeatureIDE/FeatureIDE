@@ -26,12 +26,13 @@ import java.util.HashMap;
 import org.eclipse.core.resources.IFile;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
- * TODO description
+ * Ensures that the same {@code FeatureModel} instance is used when loading a model file.
  * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class FeatureModelFile2 {
 	
@@ -47,14 +48,14 @@ public class FeatureModelFile2 {
 		return featureModelFile;
 	}
 	
-	private final FeatureModel featureModel;
+	private final IFeatureModel featureModel;
 	private final IFile modelFile;
 
 	private FeatureModelFile2(IFile modelFile) {
 		this.modelFile = modelFile;
 		
 		final int modelType = ModelIOFactory.getTypeByFileName(modelFile.getName());
-		final FeatureModel newFeatureModel = ModelIOFactory.getNewFeatureModel(modelType);
+		final IFeatureModel newFeatureModel = ModelIOFactory.getNewFeatureModel(modelType);
 		if (newFeatureModel != null) {
 			final FeatureModelReaderIFileWrapper modelReader = new FeatureModelReaderIFileWrapper(ModelIOFactory.getModelReader(newFeatureModel, modelType));
 			try {
@@ -64,11 +65,11 @@ public class FeatureModelFile2 {
 			}
 			featureModel = modelReader.getFeatureModel();
 		} else {
-			featureModel = new FeatureModel();
+			featureModel = new de.ovgu.featureide.fm.core.base.impl.FeatureModel();
 		}
 	}
 
-	public FeatureModel getFeatureModel() {
+	public IFeatureModel getFeatureModel() {
 		return featureModel;
 	}
 

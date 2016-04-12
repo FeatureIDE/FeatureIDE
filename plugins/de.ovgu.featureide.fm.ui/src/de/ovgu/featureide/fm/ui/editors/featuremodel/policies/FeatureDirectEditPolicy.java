@@ -24,22 +24,23 @@ import org.eclipse.gef.commands.Command;
 import org.eclipse.gef.editpolicies.DirectEditPolicy;
 import org.eclipse.gef.requests.DirectEditRequest;
 
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.commands.FeatureRenamingCommand;
 
 /**
  * Allows to rename features at the feature diagram.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke
  */
 public class FeatureDirectEditPolicy extends DirectEditPolicy {
 
-	private final FeatureModel featureModel;
+	private final IGraphicalFeatureModel featureModel;
 
-	private final Feature feature;
+	private final IGraphicalFeature feature;
 
-	public FeatureDirectEditPolicy(FeatureModel featureModel, Feature feature) {
+	public FeatureDirectEditPolicy(IGraphicalFeatureModel featureModel, IGraphicalFeature feature) {
 		this.featureModel = featureModel;
 		this.feature = feature;
 	}
@@ -47,7 +48,7 @@ public class FeatureDirectEditPolicy extends DirectEditPolicy {
 	@Override
 	protected Command getDirectEditCommand(DirectEditRequest request) {
 		String newName = (String) request.getCellEditor().getValue();
-		return new FeatureRenamingCommand(featureModel, feature.getName(), newName);
+		return new FeatureRenamingCommand(featureModel.getFeatureModel(), feature.getObject().getName(), newName);
 	}
 
 	@Override

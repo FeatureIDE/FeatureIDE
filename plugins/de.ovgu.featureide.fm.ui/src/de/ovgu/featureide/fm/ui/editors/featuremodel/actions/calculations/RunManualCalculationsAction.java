@@ -25,18 +25,20 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.RUN_MANUAL_CAL
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
- * TODO description
+ * Action to specify feature model analysis.<br>
+ * A manual call of the feature model analysis.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke
  */
 public class RunManualCalculationsAction extends Action {
 
-	private final FeatureModel featureModel;
+	private final IFeatureModel featureModel;
 
-	public RunManualCalculationsAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
+	public RunManualCalculationsAction(GraphicalViewerImpl viewer, IFeatureModel featureModel) {
 		super(RUN_MANUAL_CALCULATIONS);
 		this.featureModel = featureModel;
 	}

@@ -18,7 +18,8 @@ import java.util.Collection;
 
 import org.junit.Assert;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 //import org.junit.runner.RunWith;
 //import org.junit.runners.Parameterized;
@@ -87,7 +88,7 @@ public class Experiment_ConvertSPLOTmodels extends Experiment_SPLOTmodels{
 		
 		//
 		// read the same SPLOT file using the FeatureiDE reader
-		FeatureModel fm_original = new FeatureModel();		
+		IFeatureModel fm_original = FMFactoryManager.getFactory().createFeatureModel();		
 		SXFMReader reader = new SXFMReader(fm_original);
 		try {
 			reader.readFromFile(modelFileOrigin);

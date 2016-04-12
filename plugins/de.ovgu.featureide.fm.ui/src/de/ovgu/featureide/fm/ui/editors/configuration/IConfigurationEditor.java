@@ -24,11 +24,11 @@ import java.io.File;
 
 import org.eclipse.core.resources.IFile;
 
-import de.ovgu.featureide.fm.core.configuration.IConfiguration;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
 
 public interface IConfigurationEditor {
 
-	IConfiguration getConfiguration();
+	Configuration getConfiguration();
 
 	IFile getFile();
 
@@ -39,5 +39,15 @@ public interface IConfigurationEditor {
 	boolean isAutoSelectFeatures();
 
 	void setAutoSelectFeatures(boolean autoSelectFeatures);
+
+	boolean hasValidFeatureModel();
+
+	enum EXPAND_ALGORITHM {
+		DEFUALT, OPEN_CLAUSE, PARENT, CHILDREN, PARENT_CLAUSE
+	}
+
+	EXPAND_ALGORITHM getExpandAlgorithm();
+
+	void setExpandAlgorithm(EXPAND_ALGORITHM expandAlgorithm);
 
 }

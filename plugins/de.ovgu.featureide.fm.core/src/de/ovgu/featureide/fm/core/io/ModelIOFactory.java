@@ -20,34 +20,31 @@
  */
 package de.ovgu.featureide.fm.core.io;
 
-import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.velvet.VelvetFeatureModelWriter;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 
 /**
- * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public abstract class ModelIOFactory {
-	
-	public static final int
-		TYPE_UNKNOWN = -1,
-		TYPE_XML = 0,
-		TYPE_VELVET = 1,
-		TYPE_VELVET_IMPORT = 2;
-	
+
+	public static final int TYPE_UNKNOWN = -1, TYPE_XML = 0, TYPE_VELVET = 1, TYPE_VELVET_IMPORT = 2;
+
 	public static AbstractFeatureModelReader getModelReader(int type) {
 		return getModelReader(getNewFeatureModel(type), type);
 	}
-	
-	public static AbstractFeatureModelWriter getModelWriter(int type) {
+
+	public static IFeatureModelWriter getModelWriter(int type) {
 		return getModelWriter(getNewFeatureModel(type), type);
 	}
-	
-	public static AbstractFeatureModelReader getModelReader(FeatureModel featureModel, int type) {
+
+	public static AbstractFeatureModelReader getModelReader(IFeatureModel featureModel, int type) {
 		switch (type) {
 		case TYPE_XML:
 			return new XmlFeatureModelReader(featureModel);
@@ -59,8 +56,8 @@ public abstract class ModelIOFactory {
 			return null;
 		}
 	}
-	
-	public static AbstractFeatureModelWriter getModelWriter(FeatureModel featureModel, int type) {
+
+	public static IFeatureModelWriter getModelWriter(IFeatureModel featureModel, int type) {
 		switch (type) {
 		case TYPE_XML:
 			return new XmlFeatureModelWriter(featureModel);
@@ -72,7 +69,7 @@ public abstract class ModelIOFactory {
 			return null;
 		}
 	}
-	
+
 	public static int getTypeByFileName(String fileName) {
 		if (fileName.endsWith(".xml")) {
 			return TYPE_XML;
@@ -81,11 +78,11 @@ public abstract class ModelIOFactory {
 		}
 		return TYPE_UNKNOWN;
 	}
-	
-	public static FeatureModel getNewFeatureModel(int type) {
+
+	public static IFeatureModel getNewFeatureModel(int type) {
 		switch (type) {
 		case TYPE_XML:
-			return new FeatureModel();
+			return FMFactoryManager.getFactory().createFeatureModel();
 		case TYPE_VELVET:
 			return new ExtendedFeatureModel();
 		case TYPE_VELVET_IMPORT:
@@ -94,5 +91,5 @@ public abstract class ModelIOFactory {
 			return null;
 		}
 	}
-			
+
 }

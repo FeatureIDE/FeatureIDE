@@ -647,7 +647,6 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 							if (command.getArguments().containsKey("composer")) {
 								compID = command.getArguments().get("composer");
 								composer = compID.substring(compID.lastIndexOf(".") + 1);
-								System.out.println("command.getArgu: "+command.getArguments()+" compID: "+compID+" pr.projectDescri: "+pr.projectName);
 								if (!compTable.containsKey(composer)) {
 									compTable.put(composer, new LinkedList<ProjectRecord>());
 								}
@@ -664,9 +663,6 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 
 		});
 		updateProjects.start();
-		if (projectsList != null) {
-			projectsList.refresh(false);
-		}
 	}
 
 	private void selectAllElementsWithoutWarningsOrErrors() {

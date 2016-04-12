@@ -20,12 +20,13 @@
  */
 package de.ovgu.featureide.fm.core.color;
 
-import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
  * The color scheme that cannot hold any colors.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class DefaultColorScheme extends ColorScheme {
 
@@ -42,12 +43,12 @@ public class DefaultColorScheme extends ColorScheme {
 	}
 	
 	@Override
-	public void setColor(Feature feature, FeatureColor color) {
+	public void setColor(IFeature feature, FeatureColor color) {
 		throw new RuntimeException("setColor called on default color scheme");
 	}
 	
 	@Override
-	public FeatureColor getColor(Feature feature) {
+	public FeatureColor getColor(IFeature feature) {
 		return FeatureColor.NO_COLOR;
 	}
 	

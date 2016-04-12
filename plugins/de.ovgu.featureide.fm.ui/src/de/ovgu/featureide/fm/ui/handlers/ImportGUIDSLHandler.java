@@ -22,7 +22,7 @@ package de.ovgu.featureide.fm.ui.handlers;
 
 import org.eclipse.swt.widgets.FileDialog;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslReader;
 import de.ovgu.featureide.fm.ui.handlers.base.AbstractImportHandler;
@@ -33,11 +33,12 @@ import de.ovgu.featureide.fm.ui.handlers.base.AbstractImportHandler;
  * @author Dariusz Krolikowski
  * @author Maik Lampe
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke
  */
 public class ImportGUIDSLHandler extends AbstractImportHandler {
 
 	@Override
-	protected IFeatureModelReader setModelReader(FeatureModel fm) {
+	protected IFeatureModelReader setModelReader(IFeatureModel fm) {
 		return new GuidslReader(fm);
 	}
 

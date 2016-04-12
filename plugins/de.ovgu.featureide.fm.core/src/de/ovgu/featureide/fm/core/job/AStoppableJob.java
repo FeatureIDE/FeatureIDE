@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.job;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.DEPRECATION;
-
 import org.eclipse.core.runtime.jobs.Job;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
@@ -30,6 +28,7 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
  * Abstract eclipse job which can be stopped.
  * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public abstract class AStoppableJob extends AbstractJob implements IStoppableJob {
 	
@@ -55,7 +54,7 @@ public abstract class AStoppableJob extends AbstractJob implements IStoppableJob
 				success = AStoppableJob.this.work();
 			} catch (Exception e) {
 				success = false;
-				e.printStackTrace();
+				FMCorePlugin.getDefault().logError(e);
 			}
 		}
 	}
@@ -138,11 +137,10 @@ public abstract class AStoppableJob extends AbstractJob implements IStoppableJob
 	 */
 	protected abstract boolean work() throws Exception;
 
-	@SuppressWarnings(DEPRECATION)
 	private void stopInnerThread() {
 		try {
 		if (innerThread.isAlive()) {
-			innerThread.stop();
+			innerThread.join();
 		}
 		} catch (Exception e) {
 			e.printStackTrace();

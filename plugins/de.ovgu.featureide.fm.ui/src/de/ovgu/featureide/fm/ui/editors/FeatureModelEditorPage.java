@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui.editors;
 
-import java.beans.PropertyChangeEvent;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -29,6 +27,8 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.part.EditorPart;
+
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 
 /**
  * Basic class with some default methods for feature model editor pages.
@@ -121,7 +121,7 @@ public abstract class FeatureModelEditorPage extends EditorPart implements IFeat
 	}
 
 	@Override
-	public void propertyChange(PropertyChangeEvent event) {
+	public void propertyChange(FeatureIDEEvent event) {
 
 	}
 

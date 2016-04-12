@@ -29,13 +29,14 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.FunctionalInterfaces.IConsumer;
+import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 
 /**
  * Abstract eclipse job with support for {@link JobFinishListener}.
  * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke (Feature Interface)
  */
 abstract class AbstractJob extends Job implements IJob {
 	protected final WorkMonitor workMonitor = new WorkMonitor();

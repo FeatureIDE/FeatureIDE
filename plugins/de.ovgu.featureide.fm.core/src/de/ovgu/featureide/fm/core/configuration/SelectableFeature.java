@@ -20,10 +20,22 @@
  */
 package de.ovgu.featureide.fm.core.configuration;
 
-import de.ovgu.featureide.fm.core.Feature;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+
+import javax.annotation.Nonnull;
+
+import org.prop4j.Node;
+
+import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
  * A representation of a selectable feature for the configuration process.
+ * 
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class SelectableFeature extends TreeElement {
 
@@ -33,11 +45,14 @@ public class SelectableFeature extends TreeElement {
 
 	private Selection recommended = Selection.UNDEFINED;
 
-	private final Feature feature;
+	private final IFeature feature;
+
+	private int recommendationValue = -1;
+	private Map<Integer, Node> openClauses = null;
 
 	private String name;
 
-	public SelectableFeature(Feature feature) {
+	public SelectableFeature(IFeature feature) {
 		this.feature = feature;
 	}
 
@@ -73,10 +88,10 @@ public class SelectableFeature extends TreeElement {
 		if (name != null) {
 			return name;
 		}
-		return feature == null ? null : feature.getName();
+		return feature == null ? "" : feature.getName();
 	}
 
-	public Feature getFeature() {
+	public IFeature getFeature() {
 		return feature;
 	}
 
@@ -94,6 +109,41 @@ public class SelectableFeature extends TreeElement {
 
 	public void setRecommended(Selection recommended) {
 		this.recommended = recommended;
+	}
+
+	public int getRecommendationValue() {
+		return recommendationValue;
+	}
+
+	public void setRecommendationValue(int recommendationValue) {
+		this.recommendationValue = recommendationValue;
+	}
+
+	@Nonnull
+	public Collection<Node> getOpenClauses() {
+		if (openClauses == null) {
+			return Collections.emptyList();
+		}
+		return openClauses.values();
+	}
+
+	public void addOpenClause(int index, Node openClause) {
+		if (openClauses == null) {
+			openClauses = new TreeMap<>();
+		}
+		openClauses.put(index, openClause);
+	}
+
+	public void clearOpenClauses() {
+		openClauses = null;
+	}
+
+	@Nonnull
+	public Set<Integer> getOpenClauseIndexes() {
+		if (openClauses != null) {
+			return openClauses.keySet();
+		}
+		return Collections.emptySet();
 	}
 
 }

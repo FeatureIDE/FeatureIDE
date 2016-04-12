@@ -53,5 +53,7 @@ public interface IFeatureGraph extends Serializable {
 	String[] getCoreFeatures();
 
 	String[] getDeadFeatures();
+	
+	void copyValues(IFeatureGraph otherGraph);
 
 }

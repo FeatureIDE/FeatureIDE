@@ -28,8 +28,9 @@ import java.util.List;
  * A constraint that is true iff the child node is false.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
-public class Not extends Node {
+public class Not extends Node implements Cloneable {
 	
 	public Not(Object child) {
 		children = new Node[] { getNode(child) };

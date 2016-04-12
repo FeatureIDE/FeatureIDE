@@ -29,30 +29,48 @@ import java.util.Iterator;
  * Filters elements out of a collection based on a test from one or more {@link IFilter} instances.
  * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke
  * 
  * @see InverseFilter
  */
 public abstract class Filter {
 
 	/**
-	 * Removes all elements from the collection that do <b>not</b> pass the filter.
+	 * Removes all elements from the collection that pass the filter.
 	 * 
-	 * @param collection the collection
-	 * @param filter the filter
+	 * @param source the collection
+	 * @param predicate the filter
 	 */
-	public static <U, T extends U> Collection<T> filter(Collection<T> collection, IFilter<U> filter) {
-		if (collection != null && filter != null) {
-			for (Iterator<T> iterator = collection.iterator(); iterator.hasNext();) {
-				if (!filter.isValid(iterator.next())) {
+	public static <U, T extends U, V extends Iterable<T>> V remove(V source, IFilter<U> predicate) {
+		if (source != null && predicate != null) {
+			for (Iterator<T> iterator = source.iterator(); iterator.hasNext();) {
+				if (predicate.isValid(iterator.next())) {
 					iterator.remove();
 				}
 			}
 		}
-		return collection;
+		return source;
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static <T> Collection<T> filter(Collection<T> collection, Collection<IFilter<?>> filterList) {
+	/**
+	 * Removes all elements from the collection that do <b>not</b> pass the filter.
+	 * 
+	 * @param source the collection
+	 * @param predicate the filter
+	 */
+	public static <U, T extends U, V extends Iterable<T>> V retain(V source, IFilter<U> predicate) {
+		if (source != null && predicate != null) {
+			for (Iterator<T> iterator = source.iterator(); iterator.hasNext();) {
+				if (!predicate.isValid(iterator.next())) {
+					iterator.remove();
+				}
+			}
+		}
+		return source;
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" }) 
+	public static <T> Collection<T> filter(Collection<T> collection, Iterable<IFilter<?>> filterList) {
 		if (collection != null && filterList != null) {
 			for (IFilter filter : filterList) {
 				for (Iterator<T> iterator = collection.iterator(); iterator.hasNext();) {
@@ -63,6 +81,10 @@ public abstract class Filter {
 			}
 		}
 		return collection;
+	}
+	
+	public static <T> Collection<T> filter(Collection<T> collection, IFilter<?>... filterList) {
+		return filter(collection, filterList);
 	}
 
 	public static Collection<String> toString(Collection<?> collection) {

@@ -27,19 +27,20 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
  * Creates a new propositional constraint below the feature diagram.
  * 
  * @author Christian Becker
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class CreateConstraintAction extends AbstractConstraintEditorAction {
 
 	private static ImageDescriptor createImage = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ADD);
 
-	public CreateConstraintAction(Object viewer, FeatureModel featuremodel) {
+	public CreateConstraintAction(Object viewer, IFeatureModel featuremodel) {
 		super(viewer, featuremodel, CREATE_CONSTRAINT);
 		setImageDescriptor(createImage);
 	}

@@ -25,6 +25,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.BUILT_MPL_PROJ
 import static de.ovgu.featureide.fm.core.localization.StringTable.EMPTY___;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NO_MAPPING_FILE_SPECIFIED_;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -42,23 +43,25 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.mpl.builder.MSPLNature;
-import de.ovgu.featureide.fm.core.ExtendedFeature;
-import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
-import de.ovgu.featureide.fm.core.ExtendedFeatureModel.UsedModel;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
+import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel.UsedModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
+import de.ovgu.featureide.fm.core.io.manager.FileReader;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
 import de.ovgu.featureide.fm.core.job.util.JobSequence;
 
 /**
- * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class MPLBuildProjectJob extends AProjectJob<MPLBuildProjectJob.Arguments> {
 
@@ -139,7 +142,7 @@ public class MPLBuildProjectJob extends AProjectJob<MPLBuildProjectJob.Arguments
 	}
 	
 	private boolean buildMPLProject() {
-		final FeatureModel featureModel = arguments.externalFeatureProject.getFeatureModel();
+		final IFeatureModel featureModel = arguments.externalFeatureProject.getFeatureModel();
 		if (!(featureModel instanceof ExtendedFeatureModel)) {
 			return false;
 		}
@@ -197,7 +200,11 @@ public class MPLBuildProjectJob extends AProjectJob<MPLBuildProjectJob.Arguments
 				MPLPlugin.getDefault().logInfo(NO_MAPPING_FILE_SPECIFIED_);
 				return false;
 			}
-			new ConfigurationReader(mappedProjects).readFromFile(arguments.externalFeatureProject.getProject().getFile("InterfaceMapping/" + mappingFileName));
+			final IFile configFile = arguments.externalFeatureProject.getProject().getFile("InterfaceMapping/" + mappingFileName);
+			final FileReader<Configuration> reader = new FileReader<>();
+			reader.setObject(mappedProjects);
+			reader.setPath(Paths.get(configFile.getLocationURI()));
+			reader.setFormat(ConfigurationManager.getFormat(configFile.getName()));
 		} catch (Exception e) {
 			MPLPlugin.getDefault().logError(e);
 			return false;
@@ -205,8 +212,8 @@ public class MPLBuildProjectJob extends AProjectJob<MPLBuildProjectJob.Arguments
 		
 		// build other projects
 		// build interfaces
-		for (final Feature mappedProject : mappedProjects.getSelectedFeatures()) {
-			if (mappedProject.isConcrete()) {
+		for (final IFeature mappedProject : mappedProjects.getSelectedFeatures()) {
+			if (mappedProject.getStructure().isConcrete()) {
 				final int splittIndex = mappedProject.getName().lastIndexOf('.');
 				if (splittIndex == -1) {
 					// can this happen???
@@ -254,7 +261,7 @@ public class MPLBuildProjectJob extends AProjectJob<MPLBuildProjectJob.Arguments
 		if (varName != null) {
 			// Get partial configs 
 			// TODO MPL: config for other MPL projects may not working
-			FeatureModel fm = arguments.rootFeatureProject.getFeatureModel();
+			IFeatureModel fm = arguments.rootFeatureProject.getFeatureModel();
 			if (fm instanceof ExtendedFeatureModel) {
 				ExtendedFeatureModel efm = (ExtendedFeatureModel) fm;
 				UsedModel usedModel = efm.getExternalModel(varName);

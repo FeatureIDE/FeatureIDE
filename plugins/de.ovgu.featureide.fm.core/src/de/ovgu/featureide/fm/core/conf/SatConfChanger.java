@@ -27,8 +27,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.prop4j.Literal;
 
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.conf.nodes.Variable;
 import de.ovgu.featureide.fm.core.conf.nodes.VariableConfiguration;
 import de.ovgu.featureide.fm.core.conf.worker.SatCalcThread;
@@ -45,9 +45,9 @@ public class SatConfChanger implements IConfigurationChanger {
 	private final IFeatureGraph featureGraph;
 	private final VariableConfiguration variableConfiguration;
 	private final SatCalcThread calcThread;
-	private final FeatureModel featureModel;
+	private final IFeatureModel featureModel;
 
-	public SatConfChanger(FeatureModel featureModel, IFeatureGraph featureGraph, VariableConfiguration variableConfiguration) {
+	public SatConfChanger(IFeatureModel featureModel, IFeatureGraph featureGraph, VariableConfiguration variableConfiguration) {
 		this.featureModel = featureModel;
 		this.featureGraph = featureGraph;
 		this.variableConfiguration = variableConfiguration;
@@ -56,7 +56,7 @@ public class SatConfChanger implements IConfigurationChanger {
 
 	private final ConcurrentLinkedQueue<String> changedFeatures = new ConcurrentLinkedQueue<>();
 
-	private Feature f = null;
+	private IFeature f = null;
 	private int newValue = 0;
 
 	public class UpdateMethod implements LongRunningMethod<List<String>> {

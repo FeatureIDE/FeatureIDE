@@ -23,28 +23,30 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.commands;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RENAMING_FEATURE;
 
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.gef.commands.Command;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureRenamingOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.RenameFeatureOperation;
 
 /**
  * Renames a currently selected feature.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke
  */
 public class FeatureRenamingCommand extends Command {
 
-	private final FeatureModel featureModel;
+	private final IFeatureModel featureModel;
 
 	private final String oldName;
 
 	private final String newName;
 
-	public FeatureRenamingCommand(FeatureModel featureModel, String oldName, String newName) {
+	public FeatureRenamingCommand(IFeatureModel featureModel, String oldName, String newName) {
 		super(RENAMING_FEATURE + oldName);
 		this.featureModel = featureModel;
 		this.oldName = oldName;
@@ -55,15 +57,14 @@ public class FeatureRenamingCommand extends Command {
 	public boolean canExecute() {
 		if (newName == null)
 			return false;
-		if (featureModel.getFeatureNames().contains(newName))
+		if (Functional.toList(FeatureUtils.extractFeatureNames(featureModel.getFeatures())).contains(newName))
 			return false;
 		return featureModel.getFMComposerExtension().isValidFeatureName(newName);
 	}
 
 	@Override
 	public void execute() {
-		FeatureRenamingOperation op = new FeatureRenamingOperation(featureModel, oldName, newName);
-		op.addContext((IUndoContext) featureModel.getUndoContext());
+		RenameFeatureOperation op = new RenameFeatureOperation(featureModel, oldName, newName);
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);

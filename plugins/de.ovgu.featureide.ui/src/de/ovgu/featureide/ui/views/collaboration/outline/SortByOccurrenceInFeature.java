@@ -34,12 +34,12 @@ import de.ovgu.featureide.core.fstmodel.IRoleElement;
 import de.ovgu.featureide.core.fstmodel.RoleElement;
 
 /**
- * TODO description
+ * Filter to sort the entries in the collaboration outline by their orrurence in the file.
  * 
  * @author Dominic Labsch
  * @author Daniel Püsche
  */
-public class SortByOccurrenceInFeature implements IFilter {
+public class SortByOccurrenceInFeature implements ICollaborationOutlineFilter {
 	private IFile file;
 	private boolean enabled = false;
 

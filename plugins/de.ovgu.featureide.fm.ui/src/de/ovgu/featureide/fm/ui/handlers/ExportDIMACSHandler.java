@@ -44,8 +44,10 @@ import org.eclipse.ui.PlatformUI;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
@@ -57,12 +59,13 @@ import de.ovgu.featureide.fm.ui.handlers.base.AFileHandler;
  * Exports the feature model in DIMACS CNF format.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke
  */
 public class ExportDIMACSHandler extends AFileHandler {
 
 	@Override
 	protected void singleAction(final IFile inputFile) {
-		final FeatureModel model = readModel(inputFile);
+		final IFeatureModel model = readModel(inputFile);
 		Job job = new Job(EXPORT_TO_DIMACS) {
 			protected IStatus run(IProgressMonitor monitor) {
 				final String text = getCNF(model);
@@ -91,17 +94,18 @@ public class ExportDIMACSHandler extends AFileHandler {
 			 * @param model
 			 * @return
 			 */
-			private String getCNF(FeatureModel model) {
+			private String getCNF(IFeatureModel model) {
 				Node nodes = AdvancedNodeCreator.createCNF(model);
+
 				StringBuilder string = new StringBuilder();
 				Map<String, Integer> featureMap = new HashMap<String, Integer>();
 				int i = 1;
-				for (String name : model.getFeatureNames()) {
-					featureMap.put(name, i);
+				for (CharSequence name : FeatureUtils.extractFeatureNames(model.getFeatures())) {
+					featureMap.put(name.toString(), i);
 					string.append("c ");
 					string.append(i);
 					string.append(' ');
-					string.append(name);
+					string.append(name.toString());
 					string.append("\r\n");
 					i++;
 				}
@@ -211,8 +215,8 @@ public class ExportDIMACSHandler extends AFileHandler {
 	 * @throws UnsupportedModelException
 	 * @throws FileNotFoundException
 	 */
-	private FeatureModel readModel(IFile inputFile) {
-		FeatureModel fm = new FeatureModel();
+	private IFeatureModel readModel(IFile inputFile) {
+		IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
 		FeatureModelReaderIFileWrapper fmReader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(fm));
 
 		try {

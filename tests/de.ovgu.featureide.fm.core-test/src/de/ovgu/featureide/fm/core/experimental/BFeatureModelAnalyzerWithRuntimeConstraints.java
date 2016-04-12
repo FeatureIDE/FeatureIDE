@@ -23,13 +23,13 @@ package de.ovgu.featureide.fm.core.experimental;
 import java.util.HashMap;
 
 import de.ovgu.featureide.common.Commons;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.runtimetest.RuntimeTest;
 import de.ovgu.runtimetest.RuntimeTest.Annotations.Constraint;
 import de.ovgu.runtimetest.RuntimeTest.Annotations.WarmUp;
 
 /**
- * This is a benchmark for analyzes at the {@link FeatureModel}.
+ * This is a benchmark for analyzes at the {@link IFeatureModel}.
  * The test cases do not analyze the validity of the analyses.
  * 
  * All timeouts are set to around 4 times the measured times(with intel i5 @ 3,3 GHz)
@@ -237,7 +237,7 @@ public class BFeatureModelAnalyzerWithRuntimeConstraints extends RuntimeTest {
 		BUpdateFeatures(1000);
 	}
 
-	private static FeatureModel getFM(final int i) {
+	private static IFeatureModel getFM(final int i) {
 		switch (i) {
 		case 1:
 			return Commons.loadFeatureModelFromFile("berkeley_db_model.xml", Commons.FEATURE_MODEL_BENCHMARK_PATH_REMOTE, Commons.FEATURE_MODEL_BENCHMARK_PATH_LOCAL_CLASS_PATH);

@@ -30,14 +30,16 @@ import java.util.Set;
 
 import org.sat4j.specs.TimeoutException;
 
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.conf.nodes.Variable;
 import de.ovgu.featureide.fm.core.conf.nodes.VariableConfiguration;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.FeatureNotFoundException;
-import de.ovgu.featureide.fm.core.configuration.IConfiguration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
+import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.WorkMonitor;
 
@@ -46,7 +48,16 @@ import de.ovgu.featureide.fm.core.job.WorkMonitor;
  * 
  * @author Sebastian Krieter
  */
-public class ConfigurationFG implements IConfiguration {
+public class ConfigurationFG extends Configuration {
+
+	
+	private final class ToIFeature implements Functional.IFunction<IFeatureStructure, IFeature> {
+		@Override
+		public IFeature invoke(IFeatureStructure t) {
+			return t.getFeature();
+		}
+	}
+
 	public final static int PARAM_NONE = 0x00;
 	public final static int PARAM_IGNOREABSTRACT = 0x02;
 	public final static int PARAM_PROPAGATE = 0x04;
@@ -55,7 +66,6 @@ public class ConfigurationFG implements IConfiguration {
 	final ArrayList<SelectableFeature> features = new ArrayList<SelectableFeature>();
 	final Hashtable<String, SelectableFeature> table = new Hashtable<String, SelectableFeature>();
 
-	private final FeatureModel featureModel;
 	private final SelectableFeature root;
 	private boolean propagate = true;
 
@@ -72,10 +82,10 @@ public class ConfigurationFG implements IConfiguration {
 	 *            &nbsp;&nbsp;&nbsp;{@link #PARAM_LAZY},</br>
 	 *            &nbsp;&nbsp;&nbsp;{@link #PARAM_PROPAGATE}
 	 */
-	public ConfigurationFG(FeatureModel featureModel, int options) {
-		this.featureModel = featureModel;
+	public ConfigurationFG(IFeatureModel featureModel, IFeatureGraph featureGraph, int options) {
+		super(featureModel);
 
-		this.featureGraph = featureModel.getFeatureGraph();
+		this.featureGraph = featureGraph;
 
 		this.variableConfiguration = new VariableConfiguration(featureGraph.getSize());
 		this.propagator = new ConfigurationChanger(featureModel, variableConfiguration, this);
@@ -97,11 +107,11 @@ public class ConfigurationFG implements IConfiguration {
 		}
 	}
 
-	private void initFeatures(SelectableFeature sFeature, Feature feature) {
+	private void initFeatures(SelectableFeature sFeature, IFeature feature) {
 		if (sFeature != null && sFeature.getName() != null) {
 			features.add(sFeature);
 			table.put(sFeature.getName(), sFeature);
-			for (Feature child : feature.getChildren()) {
+			for (IFeature child : Functional.map(feature.getStructure().getChildren(), new ToIFeature())) {
 				SelectableFeature sChild = new SelectableFeature(child);
 				sFeature.addChild(sChild);
 				initFeatures(sChild, child);
@@ -110,7 +120,7 @@ public class ConfigurationFG implements IConfiguration {
 	}
 
 	private SelectableFeature initRoot() {
-		final Feature featureRoot = featureModel.getRoot();
+		final IFeature featureRoot = featureModel.getStructure().getRoot().getFeature();
 		final SelectableFeature root = new SelectableFeature(featureRoot);
 
 		if (featureRoot != null) {
@@ -153,7 +163,7 @@ public class ConfigurationFG implements IConfiguration {
 		return LongRunningWrapper.runMethod(propagator.canBeValid());
 	}
 
-	public FeatureModel getFeatureModel() {
+	public IFeatureModel getFeatureModel() {
 		return featureModel;
 	}
 
@@ -164,7 +174,7 @@ public class ConfigurationFG implements IConfiguration {
 	public List<SelectableFeature> getManualFeatures() {
 		final List<SelectableFeature> featureList = new LinkedList<SelectableFeature>();
 		for (SelectableFeature selectableFeature : features) {
-			if (selectableFeature.getAutomatic() == Selection.UNDEFINED && !selectableFeature.getFeature().hasHiddenParent()) {
+			if (selectableFeature.getAutomatic() == Selection.UNDEFINED && !selectableFeature.getFeature().getStructure().hasHiddenParent()) {
 				featureList.add(selectableFeature);
 			}
 		}
@@ -189,12 +199,12 @@ public class ConfigurationFG implements IConfiguration {
 		return result;
 	}
 
-	private Feature getFeature(int id) {
+	private IFeature getFeature(int id) {
 		return featureModel.getFeature(featureGraph.getFeatureArray()[id]);
 	}
 
-	public List<Feature> getSelectedFeatures() {
-		final List<Feature> featureList = new ArrayList<>(variableConfiguration.size(true) + featureGraph.getCoreFeatures().length);
+	public List<IFeature> getSelectedFeatures() {
+		final List<IFeature> featureList = new ArrayList<>(variableConfiguration.size(true) + featureGraph.getCoreFeatures().length);
 		for (Variable var : variableConfiguration) {
 			if (var.getValue() == Variable.TRUE) {
 				featureList.add(getFeature(var.getId()));
@@ -210,8 +220,8 @@ public class ConfigurationFG implements IConfiguration {
 		return LongRunningWrapper.runMethod(propagator.getSolutions(max));
 	}
 
-	public List<Feature> getUnSelectedFeatures() {
-		final List<Feature> featureList = new ArrayList<>(variableConfiguration.size(true) + featureGraph.getDeadFeatures().length);
+	public List<IFeature> getUnSelectedFeatures() {
+		final List<IFeature> featureList = new ArrayList<>(variableConfiguration.size(true) + featureGraph.getDeadFeatures().length);
 		for (Variable var : variableConfiguration) {
 			if (var.getValue() == Variable.FALSE) {
 				featureList.add(getFeature(var.getId()));
@@ -324,7 +334,7 @@ public class ConfigurationFG implements IConfiguration {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		for (SelectableFeature feature : features) {
-			if (feature.getSelection() == Selection.SELECTED && feature.getFeature().isConcrete()) {
+			if (feature.getSelection() == Selection.SELECTED && feature.getFeature().getStructure().isConcrete()) {
 				builder.append(feature.getFeature().getName());
 				builder.append("\n");
 			}

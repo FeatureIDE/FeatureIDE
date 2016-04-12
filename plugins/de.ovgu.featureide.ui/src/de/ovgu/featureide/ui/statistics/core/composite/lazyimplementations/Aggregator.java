@@ -20,99 +20,54 @@
  */
 package de.ovgu.featureide.ui.statistics.core.composite.lazyimplementations;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.DIRECTIVES;
-import static de.ovgu.featureide.fm.core.localization.StringTable.NUMBER_OF;
-
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import de.ovgu.featureide.core.fstmodel.FSTFeature;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirective;
-import de.ovgu.featureide.core.fstmodel.preprocessor.FSTDirectiveCommand;
-import de.ovgu.featureide.ui.statistics.core.composite.Parent;
 
 /**
  * Evaluates minimum- and maximum- values for a set of directives.
  * 
  * @see DirectivesNode
  * 
+ * @author Christopher Kruczek
+ * @author Andy Kenner
  * @author Dominik Hamann
  * @author Patrick Haese
+ * 
  */
 public class Aggregator {
-
-	private final DirectiveMap directiveCount = new DirectiveMap();
-
-	private Integer minimumSum;
-	private Integer maximumSum = 0;
-	private Integer nestingCount = 0;
-	private Integer maxNesting = 0;
-	private Integer minNesting = null;
-	private List<Integer> listOfNestings = new LinkedList<Integer>();
-
-	private int curNestingCount = 0;
-
-	/**
-	 * 
-	 * Convenience-class for evaluating sets of directives without having to use
-	 * the diamond-operator everytime. Also offers a method for counting the
-	 * directives.
-	 * 
-	 * @author Dominik Hamann
-	 * @author Haese Patrick
-	 */
-	class DirectiveMap extends HashMap<FSTDirectiveCommand, Integer> {
-
-		private static final long serialVersionUID = -1724069966296918497L;
-
-		/**
-		 * Counts directives by recursively checking them.
-		 * 
-		 * @param dir
-		 */
-		public void add(FSTDirective dir) {
-			nestingCount++;
-			FSTDirectiveCommand com = dir.getCommand();
-			put(com, containsKey(com) ? get(com) + 1 : 1);
-			if (dir.hasChildren()) {
-				for (FSTDirective child : dir.getChildrenList()) {
-					this.add(child);
-				}
-			} else {
-				if (curNestingCount < nestingCount) {
-					int temp = curNestingCount;
-					curNestingCount = nestingCount;
-					nestingCount -= temp;
-				}
-			}
+	
+	public static class AggregatorResult{
+		private int nesting;
+		private Map<String,Integer> directives = new HashMap<String, Integer>();
+		
+		public int getNesting() {
+			return nesting;
 		}
-	}
-
-	/**
-	 * Processes one set of directives and adds the result to the given parent.
-	 * 
-	 * @param roles
-	 * @param parent
-	 */
-	public void process(List<FSTRole> roles, Parent parent) {
-		DirectiveMap classcount = new DirectiveMap();
-		for (FSTRole role : roles) {
-			for (FSTDirective dir : role.getDirectives()) {
-				classcount.add(dir);
-				if (maxNesting < nestingCount) {
-					maxNesting = nestingCount;
-				}
-				nestingCount = 0;
-			}
+		public Map<String, Integer> getDirectives() {
+			return directives;
 		}
-		handleExtremes(classcount);
-		mapToChild(parent, classcount);
-		parent.setValue(sum(classcount));
+		public void setDirectives(Map<String, Integer> directives) {
+			this.directives = directives;
+		}
+		public void setNesting(int nesting) {
+			this.nesting = nesting;
+		}		
+		
 	}
-
+	
+	private Integer minNesting = 0;
+	private List<Integer> nestings = new ArrayList<Integer>();
+	private Map<String, AggregatorResult> class_to_directives = new HashMap<String,AggregatorResult>();
+	
 	/**
 	 * Counts and groups all directives in the project and adds the information
 	 * to the given node.
@@ -120,59 +75,128 @@ public class Aggregator {
 	 * @param fstModel
 	 * @param parent
 	 */
-	public void processAll(FSTModel fstModel, Parent parent) {
+	public void processAll(FSTModel fstModel) {
 		initializeDirectiveCount(fstModel);
-		mapToChild(parent, directiveCount);
-		parent.setValue(sum(directiveCount));
 	}
 
+	/**
+	 * Traversing the parent of a directive to calculate the nesting depth 
+	 * 
+	 * @param dir
+	 */
+	private void calculateNestingCount(FSTDirective dir){
+		int level = 1;
+		FSTDirective tmp = dir;
+		while(tmp.getParent() != null){
+			level++;
+			tmp = tmp.getParent();
+			
+		}
+		this.nestings.add(level);
+		
+		
+	}
+	
 	/**
 	 * Counts and groups all directives in the project.
 	 * 
 	 * @param fstModel
 	 */
-	public void initializeDirectiveCount(FSTModel fstModel) {
+	private void initializeDirectiveCount(FSTModel fstModel) {
 		for (FSTFeature feat : fstModel.getFeatures()) {
-			for (FSTRole role : feat.getRoles()) {
+			for (FSTRole role : feat.getRoles()) {	
+				this.nestings.clear();
+				AggregatorResult result = this.class_to_directives.get(role.getFSTClass().getName());
+				
+				if(result == null)
+					result = new AggregatorResult();
+				
+				Map<String,Integer> directives = result.getDirectives(); 
 				for (FSTDirective dir : role.getDirectives()) {
-					directiveCount.add(dir);
-					if (maxNesting < nestingCount) {
-						maxNesting = nestingCount;
+					calculateNestingCount(dir);
+					String identifier = role.getFSTClass().getName() + dir.getExpression() + dir.getEndLine();
+					
+					if (directives.containsKey(identifier)){
+						int amount = directives.get(identifier);
+						directives.put(identifier, amount + 1);
 					}
-					if (minNesting == null) {
-						minNesting = nestingCount;
-					} else if (minNesting > nestingCount) {
-						minNesting = nestingCount;
-					}
-					listOfNestings.add(nestingCount);
-					nestingCount = 0;
+					else
+						directives.put(identifier, 1);
 				}
+				result.setNesting(Collections.max(this.nestings));
+				result.setDirectives(directives);
+				this.class_to_directives.put(role.getFSTClass().getName(), result);
 			}
 		}
 	}
+	
+	public int getDirectiveCount(){
+		int sum = 0;
+		for(AggregatorResult values : this.class_to_directives.values())
+			sum += values.getDirectives().size();
+		
+		return sum;
+	}
 
-	private void mapToChild(Parent parent, DirectiveMap count) {
-		for (FSTDirectiveCommand com : FSTDirectiveCommand.values()) {
-			if (count.containsKey(com)) {
-				parent.addChild(new Parent(NUMBER_OF + com.toString() + DIRECTIVES, count.get(com)));
-			}
+	public Map.Entry<String,Integer> getMinimumNumberOfDirectives() {
+		int minSum = Integer.MAX_VALUE;
+		String className = "";
+		
+		for(Map.Entry<String,AggregatorResult> entry : this.class_to_directives.entrySet()){
+			if(minSum > entry.getValue().getDirectives().size()){
+				minSum =entry.getValue().getDirectives().size();
+				className = entry.getKey();
+			} 
 		}
+		
+		return new AbstractMap.SimpleEntry<String,Integer>(className, minSum);
 	}
 
-	public DirectiveMap getDirectiveCount() {
-		return directiveCount;
+	public Map.Entry<String,Integer> getMaximumNumberOfDirectives() {
+		
+		int maxSum = Integer.MIN_VALUE;
+		String className = "";
+		
+		for(Map.Entry<String,AggregatorResult> entry : this.class_to_directives.entrySet()){
+			if(maxSum < entry.getValue().getDirectives().size()){
+				maxSum = entry.getValue().getDirectives().size();
+				className = entry.getKey();
+			} 
+		}
+		return new AbstractMap.SimpleEntry<String,Integer>(className, maxSum);
+		
 	}
-
-	public Integer getMinimumSum() {
-		return minimumSum;
+	
+	public Integer getDirectiveCountForClass(String className){
+		
+		AggregatorResult ret_val = class_to_directives.get(className);
+		if(ret_val != null)
+			return ret_val.getDirectives().size();
+		else
+			return 0;
+				
 	}
-
-	public Integer getMaximumSum() {
-		return maximumSum;
+	
+	public Integer getNestingCountForClass(String className){
+		
+		AggregatorResult ret_val = class_to_directives.get(className);
+		if(ret_val != null)
+			return ret_val.getNesting();
+		else
+			return 0;
 	}
-
-	public Integer getMaxNesting() {
-		return maxNesting;
+	
+	public Map.Entry<String,Integer> getMaxNesting() {
+		int maxSum = Integer.MIN_VALUE;
+		String className = "";
+		
+		for(Map.Entry<String,AggregatorResult> entry : this.class_to_directives.entrySet()){
+			if(maxSum < entry.getValue().getNesting()){
+				maxSum = entry.getValue().getNesting();
+				className = entry.getKey();
+			} 
+		}
+		return new AbstractMap.SimpleEntry<String,Integer>(className, maxSum);
 	}
 
 	public Integer getMinNesting() {
@@ -180,30 +204,89 @@ public class Aggregator {
 	}
 
 	public List<Integer> getListOfNestings() {
-		return listOfNestings;
+		return new ArrayList<Integer>();
 	}
 
-	public void setMaxNesting(Integer maxNesting) {
-		this.maxNesting = maxNesting;
+	/**
+	 * @return
+	 */
+	public Double getAverageNumberOfDirectives() {
+		
+		int amount_classes = this.class_to_directives.size();
+		int amount_directives = this.getDirectiveCount();
+		
+		double val = (double)amount_directives / (double) amount_classes;
+		
+		val = val*10;
+		val = (double)((int) val);
+		val = val /10;
+		
+		return val ;
 	}
 
-	private void handleExtremes(DirectiveMap newInput) {
-		Integer sum = sum(newInput);
-		if (sum != 0) {
-			if (minimumSum == null) {
-				minimumSum = sum;
-			} else {
-				minimumSum = sum < minimumSum ? sum : minimumSum;
+	/**
+	 * @return
+	 */
+	public Map.Entry<String,Integer> getMaxNumberOfFeatures() {
+		int maxNumber = Integer.MIN_VALUE;
+		String className = "";
+		
+		for(Map.Entry<String, AggregatorResult> entry : this.class_to_directives.entrySet())
+		{
+			for(Map.Entry<String, Integer> innerentry : entry.getValue().getDirectives().entrySet())
+			{
+				if(maxNumber < innerentry.getValue()){
+					maxNumber = innerentry.getValue();
+					className = entry.getKey();
+				} 
 			}
-			maximumSum = sum > maximumSum ? sum : maximumSum;
 		}
+		return new AbstractMap.SimpleEntry<String,Integer>(className, maxNumber);
+	}
+	
+	/**
+	 * @return
+	 */
+	public Map.Entry<String,Integer> getMinNumberOfFeatures() {
+		int maxNumber = Integer.MAX_VALUE;
+		String className = "";
+		
+		for(Map.Entry<String, AggregatorResult> entry : this.class_to_directives.entrySet())
+		{
+			
+			for(Map.Entry<String, Integer> innerentry : entry.getValue().getDirectives().entrySet())
+			{
+				if(maxNumber > innerentry.getValue()){
+					maxNumber = innerentry.getValue();
+					className = entry.getKey();
+				} 
+			}
+		}
+		return new AbstractMap.SimpleEntry<String,Integer>(className, maxNumber);
 	}
 
-	private Integer sum(DirectiveMap newInput) {
-		Integer sum = 0;
-		for (Integer value : newInput.values()) {
-			sum += value;
+	/**
+	 * @return
+	 */
+	public Double getAverageNumberOfFeatures() {
+		
+		int sumFeaturePerDirectives = 0;
+		for(Map.Entry<String, AggregatorResult> entry : this.class_to_directives.entrySet())
+		{
+			
+			for(Map.Entry<String, Integer> innerentry : entry.getValue().getDirectives().entrySet())
+			{
+				sumFeaturePerDirectives += innerentry.getValue();
+			}
 		}
-		return sum;
+		
+		double val = (double)sumFeaturePerDirectives / (double) this.getDirectiveCount();
+		
+		val = val*10;
+		val = (double)((int) val);
+		val = val /10;
+		
+		return val ;
 	}
+
 }

@@ -25,17 +25,17 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE_CONS
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
- * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke
  */
 public class ConstrainsCalculationsAction extends Action {
 
-	private final FeatureModel featureModel;
+	private final IFeatureModel featureModel;
 
-	public ConstrainsCalculationsAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
+	public ConstrainsCalculationsAction(GraphicalViewerImpl viewer, IFeatureModel featureModel) {
 		super(CALCULATE_CONSTRAINT_ERRORS);
 		this.featureModel = featureModel;
 		setChecked(featureModel.getAnalyser().calculateConstraints);

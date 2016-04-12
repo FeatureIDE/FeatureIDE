@@ -25,9 +25,10 @@ import java.util.HashMap;
 import org.junit.Test;
 
 import de.ovgu.featureide.common.Commons;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
- * This is a benchmark for analyzes at the {@link FeatureModel}.
+ * This is a benchmark for analyzes at the {@link IFeatureModel}.
  * The test cases do not analyze the validity of the analyses.
  * 
  * All timeouts are set to around 4 times the measured times(with intel i5 @ 3,3 GHz)
@@ -234,7 +235,7 @@ public class BFeatureModelAnalyzer {
 		BUpdateFeatures(1000);
 	}
 	
-	private static FeatureModel getFM(final int i) {
+	private static IFeatureModel getFM(final int i) {
 		switch (i) {
 		case 1:
 			return Commons.loadFeatureModelFromFile("berkeley_db_model.xml", Commons.FEATURE_MODEL_BENCHMARK_PATH_REMOTE, Commons.FEATURE_MODEL_BENCHMARK_PATH_LOCAL_CLASS_PATH);

@@ -22,7 +22,7 @@ import de.ovgu.featureide.core.builder.IComposerExtensionClass;
 import de.ovgu.featureide.core.fstmodel.FSTClass;
 import de.ovgu.featureide.core.fstmodel.FSTModel;
 import de.ovgu.featureide.core.fstmodel.FSTRole;
-import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.ui.projectExplorer.DrawImageForProjectExplorer.ExplorerObject;
@@ -31,6 +31,7 @@ import de.ovgu.featureide.ui.projectExplorer.DrawImageForProjectExplorer.Explore
  * Label provider for projectExplorer - sets an image and a text before the files, folders and packages
  * 
  * @author Jonas Weigt
+ * @author Marcus Pinnecke
  */
 @SuppressWarnings("restriction")
 public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
@@ -51,7 +52,10 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 		//returns the image for packages
 		if (element instanceof PackageFragment) {
 			PackageFragment frag = (PackageFragment) element;
-			IFolder folder = (IFolder) frag.getResource();
+			IResource fragmentRes = frag.getResource();
+			if (!(fragmentRes instanceof IFolder)) {
+				return superImage;
+			}
 			IResource res = frag.getParent().getResource();
 			if (res == null) {
 				return superImage;
@@ -72,7 +76,8 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 					return superImage;
 				}
 			}
-			getPackageColors(folder, elementColors, model, !composer.hasFeatureFolder() && !composer.hasSourceFolder());
+			
+			getPackageColors((IFolder) fragmentRes, elementColors, model, !composer.hasFeatureFolder() && !composer.hasSourceFolder());
 			return DrawImageForProjectExplorer.drawExplorerImage(ExplorerObject.PACKAGE, new ArrayList<Integer>(elementColors), superImage);
 		}
 
@@ -164,7 +169,7 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 	 * @return color for featureFolders
 	 */
 	private void getFeatureFolderColors(IFolder folder, Set<Integer> myColors, IFeatureProject featureProject) {
-		Feature feature = featureProject.getFeatureModel().getFeature(folder.getName());
+		IFeature feature = featureProject.getFeatureModel().getFeature(folder.getName());
 		myColors.add(FeatureColorManager.getColor(feature).getValue());
 	}
 
@@ -256,11 +261,11 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 		//text for Packages
 		if (element instanceof PackageFragment) {
 			PackageFragment frag = (PackageFragment) element;
-			IResource resource = frag.getParent().getResource();
-			if (resource == null) {
+			IResource parent = frag.getParent().getResource();
+			if (parent == null) {
 				return null;
 			}
-			IFeatureProject featureProject = CorePlugin.getFeatureProject(resource);
+			IFeatureProject featureProject = CorePlugin.getFeatureProject(parent);
 			if (featureProject == null) {
 				return null;
 			}
@@ -270,6 +275,9 @@ public class ProjectExplorerLabelProvider extends PackageExplorerLabelProvider {
 			String elementName = frag.getElementName();
 			if (elementName.isEmpty()) {
 				return SPACE_STRING + "(default package)";
+			}
+			if (!isInBuildFolder(frag.getResource()) && !isInSourceFolder(frag.getResource())) {
+				return null;
 			}
 			return SPACE_STRING + elementName;
 		}

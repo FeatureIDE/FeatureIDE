@@ -28,6 +28,10 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.IS_FALSE_OPTIO
 import static de.ovgu.featureide.fm.core.localization.StringTable.IS_HIDDEN_AND_INDETERMINATE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ROOT;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.eclipse.draw2d.ConnectionAnchor;
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.FreeformLayout;
@@ -40,16 +44,20 @@ import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.gef.editparts.ZoomListener;
 import org.eclipse.swt.graphics.Color;
 
-import de.ovgu.featureide.fm.core.ExtendedFeature;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer.Attribute;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IPropertyContainer;
+import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
+import de.ovgu.featureide.fm.core.base.impl.Feature;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramExtension;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.anchors.SourceAnchor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.figures.anchors.TargetAnchor;
@@ -59,6 +67,7 @@ import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
  * A figure that represents a feature with its name.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke
  */
 public class FeatureFigure extends Figure implements GUIDefaults {
 
@@ -69,7 +78,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 	private final ConnectionAnchor sourceAnchor;
 	private final ConnectionAnchor targetAnchor;
 
-	private Feature feature;
+	private IGraphicalFeature feature;
 
 	private static GridLayout gl = new GridLayout();
 
@@ -82,7 +91,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 	private static String INDETERMINATE_HIDDEN = IS_HIDDEN_AND_INDETERMINATE;
 	private static String VOID = FEATURE_MODEL_IS_VOID;
 
-	public FeatureFigure(Feature feature, FeatureModel featureModel) {
+	public FeatureFigure(IGraphicalFeature feature, IGraphicalFeatureModel featureModel) {
 		super();
 		this.feature = feature;
 
@@ -92,7 +101,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 				enforceLabelSize();
 			}
 		});
-
+	
 		sourceAnchor = new SourceAnchor(this, feature);
 		targetAnchor = new TargetAnchor(this, feature);
 
@@ -103,7 +112,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 
 		label.setLocation(new Point(FEATURE_INSETS.left, FEATURE_INSETS.top));
 
-		setName(feature.getDisplayName());
+		setName(feature.getObject().getName());
 
 		setProperties();
 
@@ -117,7 +126,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 			setLocation(FeatureUIHelper.getLocation(feature));
 		}
 
-		if (isHidden(feature)) {
+		if (!featureModel.getLayout().showHiddenFeatures() && feature.getObject().getStructure().hasHiddenParent()) {
 			setSize(new Dimension(0, 0));
 		}
 	}
@@ -132,16 +141,14 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		}
 	}
 
-	private boolean isHidden(Feature feature) {
-		return !feature.getFeatureModel().getLayout().showHiddenFeatures() && feature.hasHiddenParent();
-	}
-
 	public void setProperties() {
 		final StringBuilder toolTip = new StringBuilder();
 
 		label.setForegroundColor(FMPropertyManager.getFeatureForgroundColor());
 		setBackgroundColor(FMPropertyManager.getConcreteFeatureBackgroundColor());
 		setBorder(FMPropertyManager.getFeatureBorder(feature.isConstraintSelected()));
+		
+		IFeature feature = this.feature.getObject();
 
 		final FeatureModelAnalyzer analyser = feature.getFeatureModel().getAnalyser();
 		if (!FeatureColorManager.getCurrentColorScheme(feature).isDefault()) {
@@ -150,7 +157,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 			if (color != FeatureColor.NO_COLOR) {
 				setBackgroundColor(new Color(null, ColorPalette.getRGB(color.getValue(), 0.5f)));
 			} else {
-				if (feature.isConcrete()) {
+				if (feature.getStructure().isConcrete()) {
 					toolTip.append(CONCRETE);
 					analyser.setAttributeFlag(Attribute.Concrete, true);
 				} else {
@@ -160,12 +167,12 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 				}
 			}
 		} else {
-			if (feature.isRoot() && !analyser.valid()) {
+			if (feature.getStructure().isRoot() && !analyser.valid()) {
 				setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
 				setBorder(FMPropertyManager.getDeadFeatureBorder(feature.isConstraintSelected()));
 				toolTip.append(VOID);
 			} else {
-				if (feature.isConcrete()) {
+				if (feature.getStructure().isConcrete()) {
 					toolTip.append(CONCRETE);
 					analyser.setAttributeFlag(Attribute.Concrete, true);
 				} else {
@@ -174,16 +181,16 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 					analyser.setAttributeFlag(Attribute.Abstract, true);
 				}
 
-				if (feature.hasHiddenParent()) {
+				if (feature.getStructure().hasHiddenParent()) {
 					setBorder(FMPropertyManager.getHiddenFeatureBorder(feature.isConstraintSelected()));
 					label.setForegroundColor(HIDDEN_FOREGROUND);
-					toolTip.append(feature.isHidden() ? HIDDEN : HIDDEN_PARENT);
+					toolTip.append(feature.getStructure().isHidden() ? HIDDEN : HIDDEN_PARENT);
 					analyser.setAttributeFlag(Attribute.Hidden, true);
 				}
 
-				toolTip.append(feature.isRoot() ? ROOT : FEATURE);
+				toolTip.append(feature.getStructure().isRoot() ? ROOT : FEATURE);
 
-				switch (feature.getFeatureStatus()) {
+				switch (feature.getProperty().getFeatureStatus()) {
 				case DEAD:
 					if (analyser.valid()) {
 						setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
@@ -226,13 +233,13 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 			}
 		}
 
-		final String description = feature.getDescription();
+		final String description = feature.getProperty().getDescription();
 		if (description != null && !description.trim().isEmpty()) {
 			toolTip.append("\n\nDescription:\n");
 			toolTip.append(description);
 		}
 
-		final String contraints = feature.getRelevantConstraintsString();
+		final String contraints = FeatureUtils.getRelevantConstraintsString(feature);
 		if (!contraints.isEmpty()) {
 			toolTip.append("\n\nConstraints:\n");
 			toolTip.append(contraints);
@@ -246,13 +253,45 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		furtherInfos.setFont(DEFAULT_FONT);
 		toolTipContent.add(featureName);
 		toolTipContent.add(furtherInfos);
+		appendCustomProperties(toolTipContent);
 
 		// call of the FeatureDiagramExtensions
 		for (FeatureDiagramExtension extension : FeatureDiagramExtension.getExtensions()) {
 			toolTipContent = extension.extendFeatureFigureToolTip(toolTipContent, this);
 		}
-
+		
 		setToolTip(toolTipContent);
+	}
+
+	private void appendCustomProperties(Figure toolTipContent) {
+		StringBuilder sb = new StringBuilder();
+		final IPropertyContainer props = feature.getObject().getCustomProperties();
+		final List<String> keys = new ArrayList<>(props.keySet());
+		Collections.sort(keys);
+		if (!keys.isEmpty()) {
+			int size = props.keySet().size();
+			int maxKeyLength = 0;
+			for (int i = 0; i < size; i++)
+				maxKeyLength = Math.max(maxKeyLength, keys.get(i).length());
+			
+			for(int i = 0; i < size; i++) {
+				final String key = keys.get(i);
+				sb.append(String.format("  %1$-" + maxKeyLength + "s", key));
+				sb.append("\t=\t");
+				sb.append(props.get(key));
+				if (i + 1 < size)
+					sb.append("\n");
+			}
+			
+			Label propertiesInfo = new Label("\nCustom Properties");
+			propertiesInfo.setFont(DEFAULT_FONT_BOLD);
+			Label properties = new Label(sb.toString());
+			properties.setFont(DEFAULT_FONT);
+			
+			
+			toolTipContent.add(propertiesInfo);
+			toolTipContent.add(properties);
+		}
 	}
 
 	public ConnectionAnchor getSourceAnchor() {
@@ -291,7 +330,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 	/**
 	 * @return The {@link Feature} represented by this {@link FeatureFigure}
 	 */
-	public Feature getFeature() {
+	public IGraphicalFeature getFeature() {
 		return feature;
 	}
 }

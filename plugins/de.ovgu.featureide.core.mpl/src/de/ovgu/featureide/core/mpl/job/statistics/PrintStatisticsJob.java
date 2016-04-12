@@ -45,8 +45,9 @@ import de.ovgu.featureide.core.signature.base.AbstractClassSignature;
 import de.ovgu.featureide.core.signature.base.AbstractSignature;
 import de.ovgu.featureide.core.signature.filter.ContextFilter;
 import de.ovgu.featureide.core.signature.filter.FeatureFilter;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.filter.base.IFilter;
@@ -58,6 +59,7 @@ import de.ovgu.featureide.fm.core.job.util.JobArguments;
  * Builds different statistics from the {@link ProjectSignatures}.
  * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke (Feature Interface)
  */
 @SuppressWarnings("unused")
 public class PrintStatisticsJob extends AProjectJob<PrintStatisticsJob.Arguments> {
@@ -164,9 +166,9 @@ public class PrintStatisticsJob extends AProjectJob<PrintStatisticsJob.Arguments
 		IFolder folder = this.project.getFolder(arguments.foldername);
 		IOConstants.clearFolder(folder);
 		
-		FeatureModel fm = interfaceProject.getFeatureModel();
+		IFeatureModel fm = interfaceProject.getFeatureModel();
 		LinkedList<String> allConcreteFeatures = new LinkedList<String>();
-		for (Feature feature : fm.getConcreteFeatures()) {
+		for (IFeature feature : FeatureUtils.extractConcreteFeatures(fm)) {
 			allConcreteFeatures.add(feature.getName());
 		}
 		workMonitor.setMaxAbsoluteWork(allConcreteFeatures.size() + 1);
@@ -279,8 +281,8 @@ public class PrintStatisticsJob extends AProjectJob<PrintStatisticsJob.Arguments
 			
 			int numFeatures = 0;
 			for (String name : featureList) {
-				Feature feature = conf.getFeatureModel().getFeature(name);
-				if (feature != null && feature.isConcrete()) {
+				IFeature feature = conf.getFeatureModel().getFeature(name);
+				if (feature != null && feature.getStructure().isConcrete()) {
 					numFeatures++;
 				}
 			}

@@ -32,10 +32,10 @@ import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Or;
 
-import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.remove.FeatureRemover;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
@@ -52,7 +52,7 @@ public class DIMACSReader extends AbstractFeatureModelReader {
 
 	private String[] names = null;
 
-	public DIMACSReader(final FeatureModel featureModel) {
+	public DIMACSReader(final IFeatureModel featureModel) {
 		setFeatureModel(featureModel);
 	}
 	
@@ -72,10 +72,11 @@ public class DIMACSReader extends AbstractFeatureModelReader {
 			FMCorePlugin.getDefault().logError(e);
 			return;
 		}
-		final Feature rootFeature = new Feature(featureModel);
-		rootFeature.setAbstract(true);
+		final IFeature rootFeature = FMFactoryManager.getFactory().createFeature(featureModel, ""); 
+				
+		rootFeature.getStructure().setAbstract(true);
 		featureModel.addFeature(rootFeature);
-		featureModel.setRoot(rootFeature);
+		featureModel.getStructure().setRoot(rootFeature.getStructure());
 
 		while (!sb.isEmpty()) {
 			final String line = sb.removeFirst();
@@ -94,9 +95,9 @@ public class DIMACSReader extends AbstractFeatureModelReader {
 			if (names[i] == null) {
 				abstractNames.add(name);
 			} else {
-				final Feature feature = new Feature(featureModel, name);
+				final IFeature feature = FMFactoryManager.getFactory().createFeature(featureModel, name); 
 				featureModel.addFeature(feature);
-				rootFeature.addChild(feature);
+				rootFeature.getStructure().addChild(feature.getStructure());
 			}
 		}
 
@@ -119,7 +120,7 @@ public class DIMACSReader extends AbstractFeatureModelReader {
 		workMonitor.setMonitor(new ConsoleProgressMonitor());
 		cnf = LongRunningWrapper.runMethod(new FeatureRemover(cnf, abstractNames, false), workMonitor);
 		for (Node clause : cnf.getChildren()) {
-			featureModel.addConstraint(new Constraint(featureModel, clause));
+			featureModel.addConstraint(FMFactoryManager.getFactory().createConstraint(featureModel, clause));
 		}
 		System.out.println("Done!");
 	}

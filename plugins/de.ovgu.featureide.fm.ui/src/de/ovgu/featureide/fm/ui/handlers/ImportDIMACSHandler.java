@@ -25,6 +25,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.DIMACS;
 import org.eclipse.swt.widgets.FileDialog;
 
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.dimacs.DIMACSReader;
 import de.ovgu.featureide.fm.ui.handlers.base.AbstractImportHandler;
@@ -36,7 +37,7 @@ import de.ovgu.featureide.fm.ui.handlers.base.AbstractImportHandler;
  */
 public class ImportDIMACSHandler extends AbstractImportHandler {
 	@Override
-	protected IFeatureModelReader setModelReader(FeatureModel fm) {
+	protected IFeatureModelReader setModelReader(IFeatureModel fm) {
 		return new DIMACSReader(fm);
 	}
 

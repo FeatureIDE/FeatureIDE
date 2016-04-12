@@ -25,9 +25,13 @@ package de.ovgu.featureide.fm.core.job;
  * Can be used to check for cancel request, display job progress, and calling intermediate functions.
  * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public final class WorkMonitor extends AWorkMonitor {
 
+	/**
+	 * Increases the monitor's progress.
+	 */
 	public void worked() {
 		internalWorked();
 	}

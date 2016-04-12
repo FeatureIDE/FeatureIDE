@@ -35,8 +35,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.TreeMap;
 
 import mixin.Mixin;
@@ -54,6 +54,7 @@ import de.ovgu.featureide.ahead.model.AbstractJakModelBuilder;
 import de.ovgu.featureide.ahead.model.JampackJakModelBuilder;
 import de.ovgu.featureide.ahead.model.MixinJakModelBuilder;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 
 /**
  * 
@@ -64,6 +65,7 @@ import de.ovgu.featureide.core.IFeatureProject;
  * 
  * @author Tom Brosch
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  * 
  */
 public class ComposerWrapper {
@@ -148,8 +150,7 @@ public class ComposerWrapper {
 			try {
 				if (featureFolder.exists())
 					featureFolder.accept(new FeatureVisitor(this));
-				else if (featureProject.getFeatureModel().getConcreteFeatureNames()
-						.contains(featureFolder.getName()))
+				else if (FeatureUtils.extractConcreteFeaturesAsStringList(featureProject.getFeatureModel()).contains(featureFolder.getName()))
 					featureProject.createBuilderMarker(featureProject
 							.getProject(), "Feature folder "
 							+ featureFolder.getName() + DOES_NOT_EXIST, 0,
@@ -209,12 +210,12 @@ public class ComposerWrapper {
 					featureProject.getProject().getLocation().toFile());
 			list = reader2.featureOrderRead();
 		}*/
-		List<String> featureOrderList = featureProject.getFeatureModel().getFeatureOrderList();
+		Collection<String> featureOrderList = featureProject.getFeatureModel().getFeatureOrderList();
 		for (IFolder folder : featureFolders) {
 			allFeatureFolders.add(folder);
 		}
 		if (featureOrderList == null || featureOrderList.isEmpty()) {	
-			for (String feature : featureProject.getFeatureModel().getConcreteFeatureNames()) {
+			for (String feature : FeatureUtils.extractConcreteFeaturesAsStringList(featureProject.getFeatureModel())) {
 				IFolder folder = featureProject.getSourceFolder().getFolder(feature);
 				if (!allFeatureFolders.contains(folder)) {
 					allFeatureFolders.add(folder);

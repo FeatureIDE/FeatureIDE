@@ -23,15 +23,14 @@ package de.ovgu.featureide.ui.actions.generator;
 import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD_CONFIGURATIONS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CASA;
 import static de.ovgu.featureide.fm.core.localization.StringTable.COUNTING___;
-import static de.ovgu.featureide.fm.core.localization.StringTable.FOR;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NOT_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.OF;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SAMPLING;
-import static de.ovgu.featureide.fm.core.localization.StringTable.SATSOLVER_COMPUTATION_TIMEOUT;
 
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.security.KeyStore.Builder;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -39,6 +38,11 @@ import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 import javax.annotation.CheckForNull;
+
+import no.sintef.ict.splcatool.CoveringArray;
+import no.sintef.ict.splcatool.CoveringArrayCASA;
+import no.sintef.ict.splcatool.CoveringArrayGenerationException;
+import no.sintef.ict.splcatool.GUIDSL;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -61,22 +65,22 @@ import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.SatSolver;
 
+import splar.core.fm.FeatureModelException;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
+import de.ovgu.featureide.fm.core.io.manager.FileReader;
 import de.ovgu.featureide.fm.core.job.AStoppableJob;
+import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.ui.UIPlugin;
-import no.sintef.ict.splcatool.CoveringArray;
-import no.sintef.ict.splcatool.CoveringArrayCASA;
-import no.sintef.ict.splcatool.CoveringArrayGenerationException;
-import no.sintef.ict.splcatool.GUIDSL;
-import splar.core.fm.FeatureModelException;
 
 /**
  * Builds all valid or current configurations for a selected feature project.
@@ -89,7 +93,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	private static final UIPlugin LOGGER = UIPlugin.getDefault();
 
 	IFeatureProject featureProject;
-	private FeatureModel featureModel;
+	private IFeatureModel featureModel;
 
 	/**
 	 * This is the place where all configurations should be generated if no new
@@ -102,7 +106,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 * read configuration.
 	 */
 	private Configuration configuration;
-	private ConfigurationReader reader;
+	private FileReader<Configuration> reader;
 
 	/**
 	 * The count of found configurations.
@@ -280,12 +284,11 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			break;
 		case ALL_VALID:
 			Job number = new AStoppableJob(JOB_TITLE_COUNT_CONFIGURATIONS) {
-
 				@Override
 				protected boolean work() {
 					configurationNumber = new Configuration(featureModel, false, false).number(1000000);
 					if (configurationNumber < 0) {
-						LOGGER.logWarning(SATSOLVER_COMPUTATION_TIMEOUT);
+						LOGGER.logWarning(StringTable.SATSOLVER_COMPUTATION_TIMEOUT);
 						configurationNumber = Integer.MAX_VALUE;
 					}
 
@@ -320,7 +323,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		default:
 			break;
 		}
-		jobName += FOR + featureProject.getProjectName();
+		jobName += StringTable.FOR + featureProject.getProjectName();
 		Job job = new Job(jobName) {
 			public IStatus run(IProgressMonitor monitor) {
 				try {
@@ -350,7 +353,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 
 					switch (buildType) {
 					case ALL_VALID:
-						buildAll(featureModel.getRoot(), monitor);
+						buildAll(featureModel.getStructure().getRoot().getFeature(), monitor);
 						break;
 					case ALL_CURRENT:
 						buildCurrentConfigurations(featureProject, monitor);
@@ -443,7 +446,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		confs = 1;
 
 		configuration = new Configuration(featureModel, false, false);
-		reader = new ConfigurationReader(configuration);
+		reader = new FileReader<>(configuration);
 
 		// method is called to initialize composer extension if not yet
 		// initialized; so only delete if sure
@@ -566,7 +569,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		}
 		
 
-		for (Feature coreFeature : featureModel.getAnalyser().getCoreFeatures()) {
+		for (IFeature coreFeature : featureModel.getAnalyser().getCoreFeatures()) {
 			if (coreFeature.getName().equals(featureName)) {
 				configurationNumber = 1;
 				return;
@@ -605,7 +608,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		boolean canDeselect = true;
 		while (canDeselect) {
 			canDeselect = false;
-			for (Feature feature : configuration.getSelectedFeatures()) {
+			for (IFeature feature : configuration.getSelectedFeatures()) {
 				if (feature.getName().equals(featureName)) {
 					continue;
 				}
@@ -637,7 +640,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 */
 	protected void buildTWiseConfigurations(IFeatureProject featureProject, IProgressMonitor monitor) {
 		configuration = new Configuration(featureModel, false);
-		reader = new ConfigurationReader(configuration);
+		reader = new FileReader<>(configuration);
 		monitor.beginTask(SAMPLING, 1);
 		runSPLCATool();
 		configurationNumber = sorter.sortConfigurations(monitor);
@@ -658,7 +661,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 				CoveringArrayCASA.CASA_PATH = path.toOSString();
 			}
 
-			ca = new GUIDSL(featureModel).getSXFM().getCNF().getCoveringArrayGenerator(algorithm, t);
+			ca = new GUIDSL(new FeatureModel(featureModel)).getSXFM().getCNF().getCoveringArrayGenerator(algorithm, t);
 			if (ca == null) {
 				return;
 			}
@@ -697,8 +700,8 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			for (final Integer i : solution) {
 				if (i > 0) {
 					String id = ca.getId(i);
-					final Feature feature = featureModel.getFeature(id);
-					if (feature != null && feature.isConcrete()) {
+					final IFeature feature = featureModel.getFeature(id);
+					if (feature != null && feature.getStructure().isConcrete()) {
 						convertedSolution.add(feature.getName());
 					}
 				}
@@ -725,7 +728,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 					build(configuration, monitor);
 				}
 			}
-			sorter.sort(monitor);
+			sorter.sortConfigurations(monitor);
 		} catch (CoreException e) {
 			LOGGER.logError(e);
 		}
@@ -740,14 +743,8 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 * @param monitor
 	 */
 	private void build(IResource configuration, IProgressMonitor monitor) {
-		try {
-			reader.readFromFile((IFile) configuration);
-			addConfiguration(new BuilderConfiguration(this.configuration, configuration.getName().split("[.]")[0]));
-		} catch (CoreException e) {
-			LOGGER.logError(e);
-		} catch (IOException e) {
-			LOGGER.logError(e);
-		}
+		reader.read(Paths.get(configuration.getLocationURI()), ConfigurationManager.getFormat(configuration.getName()));
+		addConfiguration(new BuilderConfiguration(this.configuration, configuration.getName().split("[.]")[0]));
 	}
 
 	/**
@@ -792,8 +789,8 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 *            The root feature of the feature model
 	 * @param monitor
 	 */
-	private void buildAll(Feature root, IProgressMonitor monitor) {
-		LinkedList<Feature> selectedFeatures2 = new LinkedList<Feature>();
+	private void buildAll(IFeature root, IProgressMonitor monitor) {
+		LinkedList<IFeature> selectedFeatures2 = new LinkedList<IFeature>();
 		selectedFeatures2.add(root);
 		rootNode = AdvancedNodeCreator.createCNFWithoutAbstract(featureModel);
 		children = new LinkedList<Node>();
@@ -801,7 +798,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		sorter.sortConfigurations(monitor);
 	}
 
-	private void build(Feature currentFeature, String selected, LinkedList<Feature> selectedFeatures2, IProgressMonitor monitor) {
+	private void build(IFeature currentFeature, String selected, LinkedList<IFeature> selectedFeatures2, IProgressMonitor monitor) {
 		if (monitor.isCanceled()) {
 			cancelGenerationJobs();
 			return;
@@ -851,8 +848,8 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 						selectedFeatures3.add(f);
 					}
 				}
-				for (Feature f : configuration.getSelectedFeatures()) {
-					if (f.isConcrete()) {
+				for (IFeature f : configuration.getSelectedFeatures()) {
+					if (f.getStructure().isConcrete()) {
 						if (!selectedFeatures3.contains(f.getName())) {
 							return;
 						}
@@ -902,11 +899,11 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			return;
 		}
 
-		if (currentFeature.isAnd()) {
+		if (currentFeature.getStructure().isAnd()) {
 			buildAnd(selected, selectedFeatures2, monitor);
-		} else if (currentFeature.isOr()) {
+		} else if (currentFeature.getStructure().isOr()) {
 			buildOr(selected, selectedFeatures2, monitor);
-		} else if (currentFeature.isAlternative()) {
+		} else if (currentFeature.getStructure().isAlternative()) {
 			buildAlternative(selected, selectedFeatures2, monitor);
 		}
 	}
@@ -928,18 +925,18 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		return "Built configurations: " + built + "/" + (configurationNumber == 0 ? COUNTING___ : configurationNumber) + "(" + buffer + " buffered)" + " Expected time: " + t;
 	}
 
-	private void buildAlternative(String selected, LinkedList<Feature> selectedFeatures2, IProgressMonitor monitor) {
-		Feature currentFeature = selectedFeatures2.getFirst();
+	private void buildAlternative(String selected, LinkedList<IFeature> selectedFeatures2, IProgressMonitor monitor) {
+		IFeature currentFeature = selectedFeatures2.getFirst();
 		selectedFeatures2.removeFirst();
-		LinkedList<Feature> selectedFeatures3 = new LinkedList<Feature>();
-		if (currentFeature.isConcrete()) {
+		LinkedList<IFeature> selectedFeatures3 = new LinkedList<IFeature>();
+		if (currentFeature.getStructure().isConcrete()) {
 			if ("".equals(selected)) {
 				selected = currentFeature.getName();
 			} else {
 				selected += " " + currentFeature.getName();
 			}
 		}
-		if (!currentFeature.hasChildren()) {
+		if (!currentFeature.getStructure().hasChildren()) {
 			if (selectedFeatures2.isEmpty()) {
 				currentFeature = null;
 			} else {
@@ -950,25 +947,25 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			return;
 		}
 		for (int i2 = 0; i2 < getChildren(currentFeature).size(); i2++) {
-			selectedFeatures3 = new LinkedList<Feature>();
+			selectedFeatures3 = new LinkedList<IFeature>();
 			selectedFeatures3.add(getChildren(currentFeature).get(i2));
 			selectedFeatures3.addAll(selectedFeatures2);
 			build(selectedFeatures3.isEmpty() ? null : selectedFeatures3.getFirst(), selected, selectedFeatures3, monitor);
 		}
 	}
 
-	private void buildOr(String selected, LinkedList<Feature> selectedFeatures2, IProgressMonitor monitor) {
-		Feature currentFeature = selectedFeatures2.getFirst();
+	private void buildOr(String selected, LinkedList<IFeature> selectedFeatures2, IProgressMonitor monitor) {
+		IFeature currentFeature = selectedFeatures2.getFirst();
 		selectedFeatures2.removeFirst();
-		LinkedList<Feature> selectedFeatures3 = new LinkedList<Feature>();
-		if (currentFeature.isConcrete()) {
+		LinkedList<IFeature> selectedFeatures3 = new LinkedList<IFeature>();
+		if (currentFeature.getStructure().isConcrete()) {
 			if ("".equals(selected)) {
 				selected = currentFeature.getName();
 			} else {
 				selected += " " + currentFeature.getName();
 			}
 		}
-		if (!currentFeature.hasChildren()) {
+		if (!currentFeature.getStructure().hasChildren()) {
 			if (selectedFeatures2.isEmpty()) {
 				currentFeature = null;
 			} else {
@@ -980,12 +977,12 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		}
 		int k2;
 		int i2 = 1;
-		if (getChildren(currentFeature).size() < currentFeature.getChildren().size()) {
+		if (getChildren(currentFeature).size() < currentFeature.getStructure().getChildren().size()) {
 			i2 = 0;
 		}
 		for (; i2 < (int) java.lang.Math.pow(2, getChildren(currentFeature).size()); i2++) {
 			k2 = i2;
-			selectedFeatures3 = new LinkedList<Feature>();
+			selectedFeatures3 = new LinkedList<IFeature>();
 			for (int j = 0; j < getChildren(currentFeature).size(); j++) {
 				if (k2 % 2 != 0) {
 					selectedFeatures3.add(getChildren(currentFeature).get(j));
@@ -997,17 +994,17 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		}
 	}
 
-	private void buildAnd(String selected, LinkedList<Feature> selectedFeatures2, IProgressMonitor monitor) {
-		Feature currentFeature = selectedFeatures2.removeFirst();
-		LinkedList<Feature> selectedFeatures3 = new LinkedList<Feature>();
-		if (currentFeature.isConcrete()) {
+	private void buildAnd(String selected, LinkedList<IFeature> selectedFeatures2, IProgressMonitor monitor) {
+		IFeature currentFeature = selectedFeatures2.removeFirst();
+		LinkedList<IFeature> selectedFeatures3 = new LinkedList<IFeature>();
+		if (currentFeature.getStructure().isConcrete()) {
 			if ("".equals(selected)) {
 				selected = currentFeature.getName();
 			} else {
 				selected += " " + currentFeature.getName();
 			}
 		}
-		if (!currentFeature.hasChildren()) {
+		if (!currentFeature.getStructure().hasChildren()) {
 			if (selectedFeatures2.isEmpty()) {
 				currentFeature = null;
 			} else {
@@ -1018,9 +1015,9 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			return;
 		}
 		int k2;
-		LinkedList<Feature> optionalFeatures = new LinkedList<Feature>();
-		for (Feature f : getChildren(currentFeature)) {
-			if (f.isMandatory()) {
+		LinkedList<IFeature> optionalFeatures = new LinkedList<IFeature>();
+		for (IFeature f : getChildren(currentFeature)) {
+			if (f.getStructure().isMandatory()) {
 				selectedFeatures2.add(f);
 			} else {
 				optionalFeatures.add(f);
@@ -1029,7 +1026,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 
 		for (int i2 = 0; i2 < (int) java.lang.Math.pow(2, optionalFeatures.size()); i2++) {
 			k2 = i2;
-			selectedFeatures3 = new LinkedList<Feature>();
+			selectedFeatures3 = new LinkedList<IFeature>();
 			for (int j = 0; j < optionalFeatures.size(); j++) {
 				if (k2 % 2 != 0) {
 					selectedFeatures3.add(optionalFeatures.get(j));
@@ -1050,10 +1047,11 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 *            The feature
 	 * @return The children
 	 */
-	private LinkedList<Feature> getChildren(Feature currentFeature) {
-		LinkedList<Feature> children = new LinkedList<Feature>();
-		for (Feature child : currentFeature.getChildren()) {
-			if (child.isConcrete() || hasLayerChild(child)) {
+	private LinkedList<IFeature> getChildren(IFeature currentFeature) {
+		LinkedList<IFeature> children = new LinkedList<IFeature>();
+		for (IFeatureStructure childStructure : currentFeature.getStructure().getChildren()) {
+			IFeature child = childStructure.getFeature();
+			if (child.getStructure().isConcrete() || hasLayerChild(child)) {
 				children.add(child);
 			}
 		}
@@ -1066,10 +1064,11 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 * @return <code>true</code> if the feature is a layer or if it has a child
 	 *         that is a layer
 	 */
-	private boolean hasLayerChild(Feature feature) {
-		if (feature.hasChildren()) {
-			for (Feature child : feature.getChildren()) {
-				if (child.isConcrete() || hasLayerChild(child)) {
+	private boolean hasLayerChild(IFeature feature) {
+		if (feature.getStructure().hasChildren()) {
+			for (IFeatureStructure childStructure : feature.getStructure().getChildren()) {
+				IFeature child = childStructure.getFeature();
+				if (child.getStructure().isConcrete() || hasLayerChild(child)) {
 					return true;
 				}
 			}

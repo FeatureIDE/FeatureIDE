@@ -26,7 +26,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -37,31 +36,29 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.FeatureEditPart;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.FeatureCreateCompoundOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateFeatureAboveOperation;
 
 /**
  * Creates a new feature with the currently selected features as children.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class CreateCompoundAction extends Action {
 
 	public static final String ID = "de.ovgu.featureide.createcompound";
 
-	private final FeatureModel featureModel;
+	private final IFeatureModel featureModel;
 
-	private Object viewer;
+	private IFeature parent = null;
 
-	private Feature parent = null;
-
-	private LinkedList<Feature> selectedFeatures = new LinkedList<Feature>();
-
-	private Object diagramEditor;
+	private LinkedList<IFeature> selectedFeatures = new LinkedList<IFeature>();
 
 	private static ImageDescriptor createImage = PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ADD);
 
@@ -72,11 +69,9 @@ public class CreateCompoundAction extends Action {
 		}
 	};
 
-	public CreateCompoundAction(Object viewer, FeatureModel featureModel, Object diagramEditor) {
+	public CreateCompoundAction(Object viewer, IFeatureModel featureModel) {
 		super(CREATE_FEATURE_ABOVE, createImage);
-		this.viewer = viewer;
 		this.featureModel = featureModel;
-		this.diagramEditor = diagramEditor;
 
 		setEnabled(false);
 		if (viewer instanceof GraphicalViewerImpl) {
@@ -88,8 +83,9 @@ public class CreateCompoundAction extends Action {
 
 	@Override
 	public void run() {
-		FeatureCreateCompoundOperation op = new FeatureCreateCompoundOperation(viewer, parent, featureModel, selectedFeatures, diagramEditor);
-		op.addContext((IUndoContext) featureModel.getUndoContext());
+		if (selectedFeatures.size() != 1)
+			throw new RuntimeException("Create compound operator for multiple selected features is not supported.");
+		CreateFeatureAboveOperation op = new CreateFeatureAboveOperation(featureModel, selectedFeatures.get(0));
 
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
@@ -109,19 +105,25 @@ public class CreateCompoundAction extends Action {
 		Iterator<?> iter = selection.iterator();
 		while (iter.hasNext()) {
 			Object editPart = iter.next();
-			if (!(editPart instanceof FeatureEditPart) && !(editPart instanceof Feature))
+			if (!(editPart instanceof FeatureEditPart) && !(editPart instanceof IFeature))
 				continue;
-			Feature feature;
+			IFeature feature;
 
 			if (editPart instanceof FeatureEditPart)
-				feature = ((FeatureEditPart) editPart).getFeature();
+				feature = ((FeatureEditPart) editPart).getFeature().getObject();
 			else
-				feature = (Feature) editPart;
+				feature = (IFeature) editPart;
 
-			if (selectedFeatures.isEmpty())
-				parent = feature.getParent();
-			else if (parent != feature.getParent())
-				return false;
+			IFeatureStructure structureParent = feature.getStructure().getParent();
+			if (structureParent != null) {
+				IFeature featureParent = structureParent.getFeature();
+				if (selectedFeatures.isEmpty()) {
+					parent = featureParent;
+				} else if (parent != featureParent) {
+					return false;
+				}
+			}
+			
 			selectedFeatures.add(feature);
 		}
 		return !selectedFeatures.isEmpty();

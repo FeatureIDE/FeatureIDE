@@ -21,7 +21,6 @@
 package de.ovgu.featureide.fm.core;
 
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 
@@ -31,28 +30,24 @@ import org.eclipse.core.runtime.CoreException;
  * @author Thomas Thuem
  * 
  */
-public class ModelMarkerHandler implements IModelMarkerHandler {
-	
+public class ModelMarkerHandler<T extends IResource> implements IModelMarkerHandler {
+
 	private static final String MODEL_MARKER = FMCorePlugin.PLUGIN_ID + ".featureModelMarker";
-	
-	public ModelMarkerHandler(IResource modelFile) {
+
+	private final T modelFile;
+
+	public ModelMarkerHandler(T modelFile) {
 		this.modelFile = modelFile;
-		this.project = modelFile.getProject();
 	}
 
-	protected final IResource modelFile;
-
-	protected final IProject project;
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see featureide.core.internal.IMarkerHandler#createModelMarker(java.lang.String,
-	 *      int)
-	 */
+	public T getModelFile() {
+		return modelFile;
+	}
+	
+	@Override
 	public void createModelMarker(String message, int severity, int lineNumber) {
 		try {
-			IResource resource = modelFile.exists() ? modelFile : project;
+			IResource resource = modelFile.exists() ? modelFile : modelFile.getProject();
 			for (IMarker m : resource.findMarkers(MODEL_MARKER, false, IResource.DEPTH_ZERO)) {
 				if (m.getAttribute(IMarker.MESSAGE, "").equals(message)) {
 					return;
@@ -69,38 +64,32 @@ public class ModelMarkerHandler implements IModelMarkerHandler {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see featureide.core.internal.IMarkerHandler#deleteAllModelMarkers()
-	 */
+	@Override
 	public void deleteAllModelMarkers() {
+		if (modelFile.getProject().isAccessible()) {
+			deleteMarkers(modelFile.getProject());
+		}
+		if (modelFile.exists()) {
+			deleteMarkers(modelFile);
+		}
+	}
+
+	private void deleteMarkers(IResource resource) {
 		try {
-			if (project.isAccessible())
-				project
-						.deleteMarkers(MODEL_MARKER, false,
-								IResource.DEPTH_ZERO);
-			if (modelFile.exists())
-				modelFile.deleteMarkers(MODEL_MARKER, false,
-						IResource.DEPTH_ZERO);
+			resource.deleteMarkers(MODEL_MARKER, false, IResource.DEPTH_ZERO);
 		} catch (CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see featureide.core.internal.IMarkerHandler#hasModelMarkers()
-	 */
+	@Override
 	public boolean hasModelMarkers() {
-		return hasModelMarkers(project) || hasModelMarkers(modelFile);
+		return hasModelMarkers(modelFile.getProject()) || hasModelMarkers(modelFile);
 	}
 
 	private boolean hasModelMarkers(IResource resource) {
 		try {
-			return resource.findMarkers(MODEL_MARKER, false,
-					IResource.DEPTH_ZERO).length > 0;
+			return resource.findMarkers(MODEL_MARKER, false, IResource.DEPTH_ZERO).length > 0;
 		} catch (CoreException e) {
 			FMCorePlugin.getDefault().logError(e);
 		}

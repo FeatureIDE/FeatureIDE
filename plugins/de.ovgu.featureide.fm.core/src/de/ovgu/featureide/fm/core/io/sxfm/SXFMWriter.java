@@ -52,14 +52,18 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
 
 /**
  * Prints feature models in the SXFM format.
  * 
  * @author Fabian Wielgorz
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class SXFMWriter extends AbstractFeatureModelWriter {
 
@@ -70,8 +74,12 @@ public class SXFMWriter extends AbstractFeatureModelWriter {
 	 * 
 	 * @param featureModel the structure to write
 	 */
-	public SXFMWriter(FeatureModel featureModel) {
+	public SXFMWriter(IFeatureModel featureModel) {
 		setFeatureModel(featureModel);
+	}
+	
+	public SXFMWriter(FeatureModel featureModel) {
+		this(FeatureUtils.convert(featureModel));
 	}
 
 	//@Override
@@ -122,15 +130,16 @@ public class SXFMWriter extends AbstractFeatureModelWriter {
 	 * @param doc Document where the feature model is put
 	 */
 	private void createXmlDoc(Document doc) {
-		Element elem = doc.createElement("feature_model");
-		elem.setAttribute("name", "FeatureIDE model");
-		doc.appendChild(elem);
-		Node featTree = doc.createElement("feature_tree");
-		elem.appendChild(featTree);
-		featTree.appendChild(doc.createTextNode("\n"));
-		createXmlDocRec(doc, featTree, featureModel.getRoot(), false, "");
-		createPropositionalConstraints(doc, elem);
-	}
+    	Element elem = doc.createElement("feature_model");
+        elem.setAttribute("name", "FeatureIDE model");
+        doc.appendChild(elem);
+        Node featTree = doc.createElement("feature_tree");
+        elem.appendChild(featTree);
+        featTree.appendChild(doc.createTextNode("\n"));
+        createXmlDocRec(doc, featTree, object.getStructure().getRoot().getFeature(), false, "");
+        createPropositionalConstraints(doc, elem);
+    }
+
 
 	/**
 	 * Creates the DOM Document Representation from the feature model fmodel
@@ -143,51 +152,53 @@ public class SXFMWriter extends AbstractFeatureModelWriter {
 	 *            its parent is of the type "and", false otherwise
 	 * @param indent indentation of the parent feature
 	 */
-	private void createXmlDocRec(Document doc, Node nod, Feature feat, boolean andMode, String indent) {
-		String newIndent;
-		Node textNode;
-		LinkedList<Feature> children;
-		boolean nextAndMode = false;
-		if (feat == null)
-			return;
-		String fName = feat.getName();
-		if (feat.isRoot()) {
-			textNode = doc.createTextNode(":r " + fName + "(" + fName + ")\n");
-			newIndent = "\t";
-		} else if (andMode) {
-			if (feat.isMandatory()) {
-				textNode = doc.createTextNode(indent + ":m " + fName + "(" + fName + ")\n");
-			} else {
-				textNode = doc.createTextNode(indent + ":o " + fName + "(" + fName + ")\n");
-			}
-		} else {
-			textNode = doc.createTextNode(indent + ": " + fName + "(" + fName + ")\n");
-		}
-		nod.appendChild(textNode);
-		children = feat.getChildren();
-		if (children.isEmpty())
-			return;
-		if (feat.isAnd()) {
-			nextAndMode = true;
-			newIndent = indent + "\t";
-		} else if (feat.isOr()) {
-			textNode = doc.createTextNode(indent + "\t:g [1,*]\n");
-			nod.appendChild(textNode);
-			newIndent = indent + "\t\t";
-			nextAndMode = false;
-		} else if (feat.isAlternative()) {
-			textNode = doc.createTextNode(indent + "\t:g [1,1]\n");
-			nod.appendChild(textNode);
-			newIndent = indent + "\t\t";
-			nextAndMode = false;
-		} else
-			throw new IllegalStateException(CANT_DETERMINE + CONNECTIONTYPE_OF_ROOTFEATURE);
-
-		Iterator<Feature> i = children.iterator();
-		while (i.hasNext()) {
-			createXmlDocRec(doc, nod, i.next(), nextAndMode, newIndent);
-		}
-	}
+    private void createXmlDocRec(Document doc, Node nod, IFeature feat, 
+    		boolean andMode, String indent) {
+    	String newIndent;
+    	Node textNode;
+    	LinkedList<IFeature> children;
+    	boolean nextAndMode = false;
+    	if (feat == null) return;
+    	String fName = feat.getName();
+    	if (feat.getStructure().isRoot()) {
+    		textNode = doc.createTextNode(":r " + fName + "(" + fName + ")\n");
+    		newIndent = "\t";
+    	} else if (andMode) {
+    		if (feat.getStructure().isMandatory()) {
+        		textNode = doc.createTextNode(indent + ":m " + fName + "(" + 
+        									  fName + ")\n") ;
+        	} else {
+        		textNode = doc.createTextNode(indent + ":o " + fName + "(" + 
+        									  fName + ")\n") ;
+        	}
+    	} else {
+    		textNode = doc.createTextNode(indent + ": " + fName + "(" + 
+    									  fName + ")\n");
+    	}
+    	nod.appendChild(textNode);
+    	children = new LinkedList<>(Functional.toList(FeatureUtils.convertToFeatureList(feat.getStructure().getChildren())));
+    	if (children.isEmpty()) return;
+    	if (feat.getStructure().isAnd()) {
+    		nextAndMode = true;
+    		newIndent = indent + "\t";
+    	} else if (feat.getStructure().isOr()) {
+    		textNode = doc.createTextNode(indent + "\t:g [1,*]\n");
+    		nod.appendChild(textNode);
+    		newIndent = indent + "\t\t";
+    		nextAndMode = false;
+    	} else if (feat.getStructure().isAlternative()) {
+    		textNode = doc.createTextNode(indent + "\t:g [1,1]\n");
+    		nod.appendChild(textNode);
+    		newIndent = indent + "\t\t";
+    		nextAndMode = false;
+    	} else throw new IllegalStateException (CANT_DETERMINE +
+				CONNECTIONTYPE_OF_ROOTFEATURE);
+    	
+    	Iterator<IFeature> i = children.iterator();
+    	while (i.hasNext()) {
+    		createXmlDocRec(doc, nod , i.next(), nextAndMode, newIndent);
+    	}
+    }
 
 	/**
 	 * Inserts the tags concerning propositional constraints into the DOM
@@ -202,11 +213,11 @@ public class SXFMWriter extends AbstractFeatureModelWriter {
 		FeatMod.appendChild(propConstr);
 		Node newNode = doc.createTextNode("\n");
 		propConstr.appendChild(newNode);
-		if (featureModel.getPropositionalNodes().isEmpty())
+		if (object.getConstraints().isEmpty())
 			return;
 		// as before
 		int i = 1;
-		for (org.prop4j.Node node : featureModel.getPropositionalNodes()) {
+		for (org.prop4j.Node node : FeatureUtils.getPropositionalNodes(object.getConstraints())) {
 			// avoid use of parenthesis from the beginning
 			//			org.prop4j.Node cnf = node.clone().toCNF();
 

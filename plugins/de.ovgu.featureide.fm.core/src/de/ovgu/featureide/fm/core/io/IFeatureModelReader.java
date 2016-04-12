@@ -24,12 +24,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.List;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
  * Parses a feature model from a given file or string.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public interface IFeatureModelReader {
 	
@@ -38,14 +39,14 @@ public interface IFeatureModelReader {
 	 * 
 	 * @return the model to fill
 	 */
-	public FeatureModel getFeatureModel();
+	public IFeatureModel getFeatureModel();
 	
 	/**
 	 * Sets the feature model where the read data is stored.
 	 * 
 	 * @param featureModel the model to fill
 	 */
-	public void setFeatureModel(FeatureModel featureModel);
+	public void setFeatureModel(IFeatureModel featureModel);
 
 	/**
 	 * Parses a specific feature model file.
@@ -80,7 +81,7 @@ public interface IFeatureModelReader {
 	 * 
 	 * @return
 	 */
-	public List<ModelWarning> getWarnings();
+	public List<Problem> getWarnings();
 
 	/**
 	 * Set the source file of the textual representation of the feature model.

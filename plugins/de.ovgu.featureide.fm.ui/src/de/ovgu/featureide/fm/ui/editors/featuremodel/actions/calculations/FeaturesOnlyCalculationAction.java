@@ -25,18 +25,20 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE_FEAT
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
- * TODO description
+ * Action to specify feature model analysis.<br>
+ * Only features will be analyzed and not constraints.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke
  */
 public class FeaturesOnlyCalculationAction extends Action {
 
-	private final FeatureModel featureModel;
+	private final IFeatureModel featureModel;
 
-	public FeaturesOnlyCalculationAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
+	public FeaturesOnlyCalculationAction(GraphicalViewerImpl viewer, IFeatureModel featureModel) {
 		super(CALCULATE_FEATURES);
 		this.featureModel = featureModel;
 		setChecked(featureModel.getAnalyser().calculateFeatures);

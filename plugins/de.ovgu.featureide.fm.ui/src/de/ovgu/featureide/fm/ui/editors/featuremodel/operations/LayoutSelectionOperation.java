@@ -21,31 +21,37 @@
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.SET;
-import de.ovgu.featureide.fm.core.FeatureModel;
+
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureDiagramLayoutHelper;
 
 /**
  * Operation to select the layout for the feature model editor.
+ * 
+ * @author Marcus Pinnecke (Feature interface)
  */
-public class LayoutSelectionOperation extends AbstractFeatureModelOperation {
+public class LayoutSelectionOperation extends AbstractGraphicalFeatureModelOperation {
 
 	private int newSelectedLayoutAlgorithm;
 	private int oldSelectedLayoutAlgorithm;
 
-	public LayoutSelectionOperation(FeatureModel featureModel, int newSelectedLayoutAlgorithm, int oldSelectedLayoutAlgorithm) {
+	public LayoutSelectionOperation(IGraphicalFeatureModel featureModel, int newSelectedLayoutAlgorithm, int oldSelectedLayoutAlgorithm) {
 		super(featureModel, SET + FeatureDiagramLayoutHelper.getLayoutLabel(newSelectedLayoutAlgorithm));
 		this.newSelectedLayoutAlgorithm = newSelectedLayoutAlgorithm;
 		this.oldSelectedLayoutAlgorithm = oldSelectedLayoutAlgorithm;
 	}
 
 	@Override
-	protected void redo() {
-		featureModel.getLayout().setLayout(newSelectedLayoutAlgorithm);
+	protected FeatureIDEEvent operation() {
+		graphicalFeatureModel.getLayout().setLayout(newSelectedLayoutAlgorithm);
+		return null;
 	}
 
 	@Override
-	protected void undo() {
-		featureModel.getLayout().setLayout(oldSelectedLayoutAlgorithm);
+	protected FeatureIDEEvent inverseOperation() {
+		graphicalFeatureModel.getLayout().setLayout(oldSelectedLayoutAlgorithm);
+		return null;
 	}
 
 }

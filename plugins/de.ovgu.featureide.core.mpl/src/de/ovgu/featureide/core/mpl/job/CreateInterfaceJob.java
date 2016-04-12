@@ -31,8 +31,8 @@ import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
 import org.prop4j.And;
@@ -42,33 +42,37 @@ import org.prop4j.Or;
 import org.prop4j.SatSolver;
 import org.sat4j.specs.TimeoutException;
 
+import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
-import de.ovgu.featureide.fm.core.Constraint;
-import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.cnf.UnkownLiteralException;
-import de.ovgu.featureide.fm.core.io.AbstractFeatureModelWriter;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.WorkMonitor;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
+import org.eclipse.core.resources.IFile;
+
 /**
  * Create mpl interfaces.
  * 
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke (Feature Interface)
  */
-public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments> implements LongRunningMethod<FeatureModel> {
-
+public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments> implements LongRunningMethod<IFeatureModel> {
+	
 	public static class Arguments extends JobArguments {
-		private final FeatureModel featuremodel;
+		private final IFeatureModel featuremodel;
 		private final Collection<String> featureNames;
 		private final String projectName;
 
-		public Arguments(String projectName, FeatureModel featuremodel, Collection<String> featureNames) {
+		public Arguments(String projectName, IFeatureModel featuremodel, Collection<String> featureNames) {
 			super(Arguments.class);
 			this.projectName = projectName;
 			this.featuremodel = featuremodel;
@@ -76,38 +80,38 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 		}
 	}
 
-	private FeatureModel newInterfaceModel = null;
-
+	private IFeatureModel newInterfaceModel = null;
+	
 	protected CreateInterfaceJob(Arguments arguments) {
 		super(CREATE_INTERFACE, arguments);
 	}
-
-	public FeatureModel getInterfaceModel() {
+	
+	public IFeatureModel getInterfaceModel() {
 		return newInterfaceModel;
 	}
-
+	
 	@Override
-	public FeatureModel execute(WorkMonitor monitor) throws Exception {
+	public IFeatureModel execute(WorkMonitor monitor) throws Exception {
 		return createInterface(arguments.featuremodel, arguments.featureNames);
 	}
-
+	
 	@Override
 	protected boolean work() {
+		newInterfaceModel = createInterface(arguments.featuremodel, arguments.featureNames);
+
+		if (project == null) {
+			return true;
+		}
+
+		String projectName = arguments.projectName;
+		String interfaceName = "I" + projectName;
+		newInterfaceModel.getStructure().getRoot().getFeature().setName(interfaceName);
+
+		XmlFeatureModelWriter modelWriter = new XmlFeatureModelWriter(newInterfaceModel);
+		String interfaceContent = modelWriter.writeToString();
+
 		try {
-			newInterfaceModel = createInterface(arguments.featuremodel, arguments.featureNames);
-
-			if (project == null) {
-				return true;
-			}
-
-			String projectName = arguments.projectName;
-			String interfaceName = "I" + projectName;
-			newInterfaceModel.getRoot().setName(interfaceName);
-
-			AbstractFeatureModelWriter modelWriter = new XmlFeatureModelWriter(newInterfaceModel);
-			String interfaceContent = modelWriter.writeToString();
-
-			// create interface
+		// create interface
 			IFolder mplFolder = project.getFolder(INTERFACES);
 			if (!mplFolder.exists())
 				mplFolder.create(true, true, null);
@@ -124,83 +128,94 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 				interfaceFile.setContents(interfaceContentStream, true, false, null);
 				interfaceContentStream.close();
 			}
-		} catch (CoreException | IOException | TimeoutException | UnkownLiteralException e) {
-			MPLPlugin.getDefault().logError(e);
+		}catch(CoreException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 		MPLPlugin.getDefault().logInfo(CREATED_INTERFACE_);
 		return true;
 	}
-
-	private FeatureModel createInterface(FeatureModel orgFeatureModel, Collection<String> selectedFeatureNames) throws TimeoutException, UnkownLiteralException {
+	
+	private IFeatureModel createInterface(IFeatureModel orgFeatureModel, Collection<String> selectedFeatureNames) {
 		// Calculate Constraints
-		FeatureModel m = orgFeatureModel.deepClone(false);
-		for (Feature feat : m.getFeatures()) {
-			feat.setAbstract(!selectedFeatureNames.contains(feat.getName()));
-		}
-
-		workMonitor.setMaxAbsoluteWork(2);
-		ArrayList<String> removeFeatures = new ArrayList<>(m.getFeatureNames());
+		IFeatureModel m = orgFeatureModel.clone();		
+		for (IFeature feat : m.getFeatures()) {
+			feat.getStructure().setAbstract(!selectedFeatureNames.contains(feat.getName()));
+        }
+		workMonitor.setMaxAbsoluteWork(3);
+		ArrayList<String> removeFeatures = new ArrayList<>(FeatureUtils.getFeatureNames(m));
 		removeFeatures.removeAll(selectedFeatureNames);
-		Node cnf = (selectedFeatureNames.size() > 1) ? FMCorePlugin.removeFeatures(m, removeFeatures) : new Literal(m.getRoot().getName());
-		workMonitor.worked();
-
-		// Calculate Model
-		m = orgFeatureModel.deepClone(false);
-
-		// mark features
-		for (Feature feat : m.getFeatures()) {
-			if (!selectedFeatureNames.contains(feat.getName())) {
-				feat.setName(MARK1);
-			}
+		Node cnf = null;
+		try {
+			cnf = (selectedFeatureNames.size() > 1) ? CorePlugin.removeFeatures(m, removeFeatures) : new Literal(m.getStructure().getRoot().getFeature().getName());
+		} catch (java.util.concurrent.TimeoutException e1) {
+			e1.printStackTrace();
+		} catch (UnkownLiteralException e1) {
+			e1.printStackTrace();
 		}
-
-		Feature root = m.getRoot();
-
-		m.setRoot(null);
-		m.reset();
-
-		// set new abstract root
-		Feature nroot = new Feature(m, "nroot");
-		nroot.setAbstract(true);
-		nroot.setAnd();
-		nroot.addChild(root);
-		root.setParent(nroot);
-
-		// merge tree
-		cut(nroot);
-		do {
-			changed = false;
-			merge(nroot, GROUP_NO);
-		} while (changed);
-
-		int count = 0;
-		Hashtable<String, Feature> featureTable = new Hashtable<String, Feature>();
-		LinkedList<Feature> featureStack = new LinkedList<Feature>();
-		featureStack.push(nroot);
-		while (!featureStack.isEmpty()) {
-			Feature curFeature = featureStack.pop();
-			for (Feature feature : curFeature.getChildren()) {
+		workMonitor.worked();
+	
+		m = orgFeatureModel.clone();
+		
+        // mark features
+        for (IFeature feat : m.getFeatures()) {
+            if (!selectedFeatureNames.contains(feat.getName())) {
+                feat.setName(MARK1);
+            }
+        }
+	
+        IFeature root = m.getStructure().getRoot().getFeature();
+        
+        m.getStructure().setRoot(null);
+        m.reset();
+        
+        // set new abstract root
+        IFeature nroot = FMFactoryManager.getFactory().createFeature(m, "nroot");
+        nroot.getStructure().setAbstract(true);
+        nroot.getStructure().setAnd();
+        nroot.getStructure().addChild(root.getStructure());
+        root.getStructure().setParent(nroot.getStructure());
+	
+        // merge tree
+    	cut(nroot);
+        do {
+        	changed = false;
+            merge(nroot.getStructure(), GROUP_NO);
+        } while (changed);
+        
+        int count = 0;
+        Hashtable<String, IFeature> featureTable = new Hashtable<String, IFeature>();
+        LinkedList<IFeature> featureStack = new LinkedList<IFeature>();
+        featureStack.push(nroot);
+        while (!featureStack.isEmpty()) {
+        	IFeature curFeature = featureStack.pop();
+        	for (IFeature feature : FeatureUtils.convertToFeatureList(curFeature.getStructure().getChildren())) {
 				featureStack.push(feature);
 			}
-			if (curFeature.getName().startsWith(MARK1)) {
-				curFeature.setName(root.getName() + "_Abstract_" + count++);
-				curFeature.setAbstract(true);
-			}
-			featureTable.put(curFeature.getName(), curFeature);
-		}
-		m.setFeatureTable(featureTable);
-		m.setRoot(nroot);
-
-		if (cnf instanceof And) {
-			final Node[] children = cnf.getChildren();
-			workMonitor.setMaxAbsoluteWork(children.length + 2);
+        	if (curFeature.getName().startsWith(MARK1)) {
+        		curFeature.setName("_Abstract_" + count++);
+        		curFeature.getStructure().setAbstract(true);
+        	}
+        	featureTable.put(curFeature.getName(), curFeature);
+        }
+        m.setFeatureTable(featureTable);
+        m.getStructure().setRoot(nroot.getStructure());
+        
+        if (cnf instanceof And) {
+        	final Node[] children = cnf.getChildren();
+        	workMonitor.setMaxAbsoluteWork(children.length + 2);
+					
 			final SatSolver modelSatSolver = new SatSolver(AdvancedNodeCreator.createCNF(m), 1000, false);
 			workMonitor.worked();
 			for (int i = 0; i < children.length; i++) {
 				final Node child = children[i];
+				
+				
+				
 				try {
 					if (checkOr(modelSatSolver, child)) {
-						m.addConstraint(new Constraint(m, child));
+						m.addConstraint(FMFactoryManager.getFactory().createConstraint(m, child));			
 					}
 				} catch (TimeoutException e) {
 					MPLPlugin.getDefault().logError(e);
@@ -238,14 +253,14 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 		}
 		return false;
 	}
-
+	
 	private static final String MARK1 = "?", MARK2 = "??";
 
 	private static final int GROUP_OR = 1, GROUP_AND = 2, GROUP_ALT = 3, GROUP_NO = 0;
-
+	
 	private boolean changed = false;
-
-	private static int getGroup(Feature f) {
+	
+	private static int getGroup(IFeatureStructure f) {
 		if (f == null) {
 			return GROUP_NO;
 		} else if (f.isAnd()) {
@@ -256,22 +271,25 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 			return GROUP_ALT;
 		}
 	}
-
-	private void merge(Feature curFeature, int parentGroup) {
-		if (!curFeature.hasChildren()) {
-			return;
+	private void merge(IFeatureStructure curFeature, int parentGroup) {
+	    if (!curFeature.hasChildren()) {
+	    	return;
+	    }
+	    int curFeatureGroup = getGroup(curFeature);
+		LinkedList<IFeatureStructure> list = new LinkedList<>(curFeature.getChildren());
+		try{
+	    for (IFeatureStructure child : list) {
+	        merge(child, curFeatureGroup);
+	        curFeatureGroup = getGroup(curFeature);
 		}
-		int curFeatureGroup = getGroup(curFeature);
-		LinkedList<Feature> list = new LinkedList<Feature>(curFeature.getChildren());
-		for (Feature child : list) {
-			merge(child, curFeatureGroup);
-			curFeatureGroup = getGroup(curFeature);
+		}catch(Exception e){
+			e.printStackTrace();
 		}
-
-		if (curFeature.getName().equals(MARK1)) {
+	    
+		if (curFeature.getFeature().getName().equals(MARK1)) {
 			if (parentGroup == curFeatureGroup) {
 				if (parentGroup == GROUP_AND && !curFeature.isMandatory()) {
-					for (Feature feature : curFeature.getChildren()) {
+					for (IFeatureStructure feature : curFeature.getChildren()) {
 						feature.setMandatory(false);
 					}
 				}
@@ -279,7 +297,7 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 			} else {
 				switch (parentGroup) {
 				case GROUP_AND:
-					Feature parent = curFeature.getParent();
+					IFeatureStructure parent = curFeature.getParent();
 					if (parent.getChildrenCount() == 1) {
 						switch (curFeatureGroup) {
 						case GROUP_OR:
@@ -295,7 +313,7 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 				case GROUP_OR:
 					if (curFeatureGroup == GROUP_AND) {
 						boolean allOptional = true;
-						for (Feature child : list) {
+						for (IFeatureStructure child : list) {
 							if (child.isMandatory()) {
 								allOptional = false;
 								break;
@@ -316,90 +334,92 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 		}
 	}
 
-	private void deleteFeature(Feature curFeature) {
-		Feature parent = curFeature.getParent();
-		LinkedList<Feature> list = curFeature.getChildren();
+	private void deleteFeature(IFeatureStructure curFeature) {
+		IFeatureStructure parent = curFeature.getParent();
+        List<IFeatureStructure> children = curFeature.getChildren();
 		parent.removeChild(curFeature);
 		changed = true;
-		for (Feature child : list) {
+		for (IFeatureStructure child : children) {
 			parent.addChild(child);
 		}
-		list.clear();
+		children.clear();// XXX code smell
 	}
-
-	private static boolean cut(Feature curFeature) {
-		boolean notSelected = curFeature.getName().equals(MARK1);
-
-		LinkedList<Feature> list = curFeature.getChildren();
-		if (list.isEmpty()) {
-			return notSelected;
-		} else {
-			boolean[] remove = new boolean[list.size()];
-			int removeCount = 0;
-
-			int i = 0;
-			for (Feature child : list) {
-				remove[i++] = cut(child);
+	
+	private static boolean cut(final IFeature curFeature) {
+		final IFeatureStructure structure = curFeature.getStructure();
+        boolean notSelected = curFeature.getName().equals(MARK1);
+        
+		List<IFeature> list = FeatureUtils.convertToFeatureList(structure.getChildren());
+        if (list.isEmpty()) {
+        	return notSelected;
+        } else {
+        	boolean[] remove = new boolean[list.size()];
+        	int removeCount = 0;
+        	
+    		int i = 0;
+    		for (IFeature child : list) {
+    			remove[i++] = cut(child);
 			}
-
-			// remove children
-			Iterator<Feature> it = list.iterator();
-			for (i = 0; i < remove.length; i++) {
-				Feature feat = it.next();
-				if (remove[i]) {
-					it.remove();
-					feat.setParent(null);
-					removeCount++;
-					// changed = true;
-				}
-			}
+            
+        	// remove children
+            Iterator<IFeature> it = list.iterator();
+    		for (i = 0; i < remove.length; i++) {
+                IFeature feat = it.next();
+                if (remove[i]) {
+                	it.remove();
+                	feat.getStructure().getParent().removeChild(feat.getStructure());
+                	feat.getStructure().setParent(null);
+                	removeCount++;
+//    				changed = true;
+                }
+            }
 			if (list.isEmpty()) {
-				curFeature.setAnd();
+    			structure.setAnd();
 				return notSelected;
-			} else {
-				switch (getGroup(curFeature)) {
-				case GROUP_OR:
-					if (removeCount > 0) {
-						curFeature.setAnd();
-						for (Feature child : list) {
-							child.setMandatory(false);
-						}
-					} else if (list.size() == 1) {
-						curFeature.setAnd();
-						for (Feature child : list) {
-							child.setMandatory(true);
-						}
-					}
-					break;
-				case GROUP_ALT:
-					if (removeCount > 0) {
-						if (list.size() == 1) {
-							curFeature.setAnd();
-							for (Feature child : list) {
-								child.setMandatory(false);
-							}
-						} else {
-							Feature pseudoAlternative = new Feature(curFeature.getFeatureModel(), MARK2);
-							pseudoAlternative.setMandatory(false);
-							pseudoAlternative.setAlternative();
-							for (Feature child : list) {
-								pseudoAlternative.addChild(child);
-							}
-							list.clear();
-							curFeature.setAnd();
-							curFeature.addChild(pseudoAlternative);
-						}
-					} else if (list.size() == 1) {
-						curFeature.setAnd();
-						for (Feature child : list) {
-							child.setMandatory(true);
-						}
-					}
-					break;
-				}
-			}
-		}
-		return false;
-	}
+    		} else {
+    			switch (getGroup(structure)) {
+    			case GROUP_OR:
+    				if (removeCount > 0) {
+    					structure.setAnd();
+        				for (IFeature child : list) {
+        	    			child.getStructure().setMandatory(false);
+        				}
+    				} else if (list.size() == 1) {
+    					structure.setAnd();
+        				for (IFeature child : list) {
+        	    			child.getStructure().setMandatory(true);
+        				}
+    				}
+    				break;
+    			case GROUP_ALT:
+    				if (removeCount > 0) {
+    					if (list.size() == 1) {
+        					structure.setAnd();
+            				for (IFeature child : list) {
+            	    			child.getStructure().setMandatory(false);
+            				}
+        				} else {
+            				IFeature pseudoAlternative = FMFactoryManager.getFactory().createFeature(curFeature.getFeatureModel(), MARK2);
+            				pseudoAlternative.getStructure().setMandatory(false);
+            				pseudoAlternative.getStructure().setAlternative();
+            				for (IFeature child : list) {
+            					pseudoAlternative.getStructure().addChild(child.getStructure());
+            				}
+            				list.clear();
+            				structure.setAnd();
+            				structure.addChild(pseudoAlternative.getStructure());
+        				}
+    				} else if (list.size() == 1) {
+    					structure.setAnd();
+        				for (IFeature child : list) {
+        	    			child.getStructure().setMandatory(true);
+        				}
+    				}
+    				break;
+    			}
+    		}
+        }
+        return false;
+    }
 
 }

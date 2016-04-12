@@ -34,13 +34,14 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
  * Sorts Configurations by interactions they cover.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke
  */
 public class InteractionSorter extends AbstractConfigurationSorter {
 	
@@ -54,7 +55,7 @@ public class InteractionSorter extends AbstractConfigurationSorter {
 	
 //	private final Set<Interaction> allCoveredInteractions = new HashSet<Interaction>();
 
-	public InteractionSorter(final int t, final FeatureModel featureModel, final boolean skippConfigurations) {
+	public InteractionSorter(final int t, final IFeatureModel featureModel, final boolean skippConfigurations) {
 		super(featureModel);
 		super.sorted = false;
 		this.t = t;
@@ -191,6 +192,7 @@ public class InteractionSorter extends AbstractConfigurationSorter {
 			this.selectedFeatures = selectedFeatures;
 			this.unselectedFeatures = unselectedFeatures;
 			
+			//TODO _Sebastian Revise Hash Function
 			int hash = 0;
 			for (final String feature : selectedFeatures) {
 				hash = hash * 3 + feature.hashCode();

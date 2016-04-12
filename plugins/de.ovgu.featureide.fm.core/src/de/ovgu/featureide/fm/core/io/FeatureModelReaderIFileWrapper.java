@@ -27,7 +27,7 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
  * This Wrapper makes it possible, to read feature models from IFiles, 
@@ -35,6 +35,7 @@ import de.ovgu.featureide.fm.core.FeatureModel;
  * Otherwise only the classes extending {@link AbstractFeatureModelReader} are needed
  * 
  * @author Sönke Holthusen
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class FeatureModelReaderIFileWrapper extends AbstractFeatureModelReader {
 	private AbstractFeatureModelReader reader;
@@ -43,11 +44,11 @@ public class FeatureModelReaderIFileWrapper extends AbstractFeatureModelReader {
 		this.reader = reader;
 	}
 
-	public void setFeatureModel(FeatureModel featureModel) {
+	public void setFeatureModel(IFeatureModel featureModel) {
 		reader.featureModel = featureModel;
 	}
 
-	public FeatureModel getFeatureModel() {
+	public IFeatureModel getFeatureModel() {
 		return reader.featureModel;
 	}
 
@@ -80,7 +81,7 @@ public class FeatureModelReaderIFileWrapper extends AbstractFeatureModelReader {
 		reader.readFromFile(file);
 	}
 
-	public List<ModelWarning> getWarnings() {
+	public List<Problem> getWarnings() {
 		return reader.getWarnings();
 	}
 

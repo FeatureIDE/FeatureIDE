@@ -34,6 +34,8 @@ import org.eclipse.swt.widgets.TreeItem;
 
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.ui.wizards.AbstractWizardPage;
 import de.ovgu.featureide.fm.ui.wizards.WizardConstants;
 
@@ -151,7 +153,7 @@ public class SelectFeaturesWizardPage extends AbstractWizardPage {
 			featureNames.clear();
 			Object featureProject = abstractWizard.getData(WizardConstants.KEY_OUT_PROJECT);
 			if (featureProject != null) {
-				addFeaturesToTree(((IFeatureProject) featureProject).getFeatureModel().getRoot());
+				addFeaturesToTree(((IFeatureProject) featureProject).getFeatureModel().getStructure().getRoot().getFeature());
 			} else {
 				setErrorMessage("Please select a Project in the previous page.");
 				setPageComplete(false);
@@ -166,13 +168,13 @@ public class SelectFeaturesWizardPage extends AbstractWizardPage {
 	 * @param root
 	 *            the feature to add
 	 */
-	private void addFeaturesToTree(Feature root) {
+	private void addFeaturesToTree(IFeature root) {
 		TreeItem item = new TreeItem(featuresTree, SWT.NORMAL);
 		item.setText(root.getName());
 		item.setData(root);
 
-		for (Feature feature : root.getChildren()) {
-			addFeaturesToTree(feature, item);
+		for (IFeatureStructure feature : root.getStructure().getChildren()) {
+			addFeaturesToTree(feature.getFeature(), item);
 		}
 		item.setExpanded(true);
 	}
@@ -185,14 +187,14 @@ public class SelectFeaturesWizardPage extends AbstractWizardPage {
 	 * @param parent
 	 *            the parent item to add the feature as a child
 	 */
-	private void addFeaturesToTree(Feature root, TreeItem parent) {
+	private void addFeaturesToTree(IFeature root, TreeItem parent) {
 		TreeItem item = new TreeItem(parent, SWT.NORMAL);
 		item.setText(root.getName());
 		item.setData(root);
 		item.setExpanded(true);
 
-		for (Feature feature : root.getChildren())
-			addFeaturesToTree(feature, item);
+		for (IFeatureStructure feature : root.getStructure().getChildren())
+			addFeaturesToTree(feature.getFeature(), item);
 
 		item.setExpanded(true);
 	}

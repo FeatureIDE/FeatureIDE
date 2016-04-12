@@ -22,7 +22,7 @@ package de.ovgu.featureide.fm.ui.handlers;
 
 import org.eclipse.swt.widgets.FileDialog;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.IFeatureModelWriter;
 import de.ovgu.featureide.fm.core.io.sxfm.SXFMWriter;
 import de.ovgu.featureide.fm.ui.handlers.base.AbstractExportHandler;
@@ -32,11 +32,12 @@ import de.ovgu.featureide.fm.ui.handlers.base.AbstractExportHandler;
  * 
  * @author Fabian Wielgorz
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke
  */
 public class ExportSXFMHandler extends AbstractExportHandler {
 
 	@Override
-	protected IFeatureModelWriter getFeatureModelWriter(FeatureModel fm) {
+	protected IFeatureModelWriter getFeatureModelWriter(IFeatureModel fm) {
 		return new SXFMWriter(fm);
 	}
 

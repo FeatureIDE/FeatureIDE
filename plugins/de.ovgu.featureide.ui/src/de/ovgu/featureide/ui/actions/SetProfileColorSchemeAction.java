@@ -22,7 +22,7 @@ package de.ovgu.featureide.ui.actions;
 
 import org.eclipse.jface.action.Action;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.color.DefaultColorScheme;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 
@@ -31,16 +31,17 @@ import de.ovgu.featureide.fm.core.color.FeatureColorManager;
  * 
  * @author Jonas Weigt
  * @author Christian Harnisch
+ * @author Marcus Pinnecke
  */
 
 public class SetProfileColorSchemeAction extends Action {
-	private FeatureModel model;
+	private IFeatureModel model;
 	private String newProfileColorSchemeName;
 
 	/*
 	 * Constructor
 	 */
-	public SetProfileColorSchemeAction(String text, int style, FeatureModel model) {
+	public SetProfileColorSchemeAction(String text, int style, IFeatureModel model) {
 		super(text, Action.AS_CHECK_BOX);
 		this.model = model;
 		this.newProfileColorSchemeName = text;

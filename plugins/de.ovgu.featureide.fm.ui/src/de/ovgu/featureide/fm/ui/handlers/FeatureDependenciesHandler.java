@@ -39,7 +39,8 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 
 import de.ovgu.featureide.fm.core.FeatureDependencies;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
@@ -50,12 +51,13 @@ import de.ovgu.featureide.fm.ui.handlers.base.AFileHandler;
  * calculates and shows dependencies between features in a MessageBox
  * 
  * @author Fabian Benduhn
+ * @author Marcus Pinnecke
  */
 public class FeatureDependenciesHandler extends AFileHandler {
 
 	@Override
 	protected void singleAction(final IFile inputFile) {
-		final FeatureModel mod = readModel(inputFile);
+		final IFeatureModel mod = readModel(inputFile);
 		Job job = new Job(CALCULATING_FEATURE_DEPENDENCIES) {
 			protected IStatus run(IProgressMonitor monitor) {
 				final String text = new FeatureDependencies(mod).toStringWithLegend();
@@ -128,8 +130,8 @@ public class FeatureDependenciesHandler extends AFileHandler {
 	 * @throws UnsupportedModelException
 	 * @throws FileNotFoundException
 	 */
-	private FeatureModel readModel(IFile inputFile) {
-		FeatureModel fm = new FeatureModel();
+	private IFeatureModel readModel(IFile inputFile) {
+		IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
 		// XmlFeatureModelReader fmReader = new
 		// XmlFeatureModelReader(fm,inputFile.getProject());
 		FeatureModelReaderIFileWrapper fmReader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(fm));

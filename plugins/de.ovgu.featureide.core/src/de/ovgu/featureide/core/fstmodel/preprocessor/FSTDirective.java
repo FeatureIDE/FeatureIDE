@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.core.fstmodel.preprocessor;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -28,6 +29,7 @@ import javax.annotation.Nonnull;
 
 import de.ovgu.featureide.core.fstmodel.FSTRole;
 import de.ovgu.featureide.core.fstmodel.RoleElement;
+import de.ovgu.featureide.core.signature.base.AbstractSignature;
 
 /**
  * Representation of a directive at a role.
@@ -40,6 +42,7 @@ public class FSTDirective extends RoleElement<FSTDirective> {
 	private List<String> featureNames = null;
 	private FSTDirectiveCommand command;
 	private LinkedList<FSTDirective> children = new LinkedList<FSTDirective>();
+	private LinkedList<RoleElement<?>> roleChildren = new LinkedList<RoleElement<?>>();
 	private @CheckForNull FSTDirective parent;
 	private int startLine;
 	private int startOffset;
@@ -47,6 +50,8 @@ public class FSTDirective extends RoleElement<FSTDirective> {
 	private int endLength;
 	private int id = -1;
 	private @CheckForNull FSTRole role;
+	private List<AbstractSignature> insideOfSig;
+	private List<AbstractSignature> includedSig;
 
 	public FSTDirective getParent() {
 		return parent;
@@ -252,5 +257,44 @@ public class FSTDirective extends RoleElement<FSTDirective> {
 			return this.getStartLine() > element.getStartLine() ? 1 : -1;
 		}
 	}
+
+	public void addSig_insideOf(AbstractSignature next) {
+		if(insideOfSig == null){
+			insideOfSig = new ArrayList<AbstractSignature>();
+		}
+		insideOfSig.add(next);
+	}
 	
+	
+	public List<AbstractSignature> getInsideOfSig() {
+		return insideOfSig;
+	}
+
+	public void addSig_included(AbstractSignature next) {
+		if(includedSig == null){
+			includedSig = new ArrayList<AbstractSignature>();
+		}
+		includedSig.add(next);
+	}
+
+	public List<AbstractSignature> getIncludedSig() {
+		if(includedSig == null){
+			return new ArrayList<>();
+		}
+		return includedSig;
+	}
+	
+	public RoleElement<?>[] getRoleElementChildren() {
+		RoleElement<?>[] elements = new RoleElement<?>[roleChildren.size()];
+		
+		for(int i=0; i < roleChildren.size();i++){
+			elements[i] = roleChildren.get(i);
+		}
+		return elements;
+	}
+	
+	public void addChild(RoleElement<?> child) {
+		child.setParent(this);
+		roleChildren.add(child);
+	}
 }

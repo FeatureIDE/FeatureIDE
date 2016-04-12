@@ -42,6 +42,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ConstraintEditPar
  * 
  * @author David Broneske
  * @author Fabian Benduhn
+ * @author Marcus Pinnecke
  */
 public class ConstraintMoveEditPolicy extends NonResizableEditPolicy {
 

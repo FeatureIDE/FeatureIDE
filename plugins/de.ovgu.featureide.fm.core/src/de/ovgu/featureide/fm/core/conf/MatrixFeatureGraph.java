@@ -20,19 +20,33 @@
  */
 package de.ovgu.featureide.fm.core.conf;
 
+import java.util.Arrays;
 import java.util.Collection;
 
-import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 public class MatrixFeatureGraph extends AFeatureGraph {
 
 	private static final long serialVersionUID = 3919685766908834399L;
 
-	private final byte[] adjMatrix;
+	private byte[] adjMatrix;
 
-	public MatrixFeatureGraph(Collection<Feature> variantfeatures, Collection<Feature> coreFeatures, Collection<Feature> deadFeatures) {
-		super(variantfeatures, coreFeatures, deadFeatures);
+	public MatrixFeatureGraph(IFeatureModel featureModel, Collection<IFeature> variantfeatures, Collection<IFeature> coreFeatures, Collection<IFeature> deadFeatures) {
+		super(featureModel, variantfeatures, coreFeatures, deadFeatures);
 		adjMatrix = new byte[size * size];
+	}
+	
+	public MatrixFeatureGraph(IFeatureModel featureModel) {
+		super(featureModel);
+		adjMatrix = new byte[size * size];
+	}
+
+	@Override
+	public void copyValues(IFeatureGraph otherGraph) {
+		super.copyValues(otherGraph);
+		final MatrixFeatureGraph matrixGraph = (MatrixFeatureGraph) otherGraph;
+		adjMatrix = Arrays.copyOf(matrixGraph.adjMatrix, matrixGraph.adjMatrix.length);
 	}
 
 	@Override

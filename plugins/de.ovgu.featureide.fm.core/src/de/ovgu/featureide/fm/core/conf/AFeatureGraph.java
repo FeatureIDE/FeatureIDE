@@ -26,7 +26,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.conf.nodes.Expression;
 
 public abstract class AFeatureGraph implements IFeatureGraph {
@@ -48,19 +49,22 @@ public abstract class AFeatureGraph implements IFeatureGraph {
 	public static final byte MASK_0_CLEAR = (byte) 0b11110000, //0xf3,
 			MASK_1_CLEAR = (byte) 0b00001111; //0xf3,
 
-	protected final String[] featureArray;
-	protected final String[] coreFeatures;
-	protected final String[] deadFeatures;
+	protected String[] featureArray;
+	protected String[] coreFeatures;
+	protected String[] deadFeatures;
 
-	protected final int size;
-	protected final HashMap<String, Integer> featureMap;
-	protected final ArrayList<LinkedList<Expression>> expListAr;
+	protected int size;
+	protected HashMap<String, Integer> featureMap;
+	protected ArrayList<LinkedList<Expression>> expListAr;
+	
+	protected final transient IFeatureModel featureModel;
 
 	public static boolean isEdge(byte edge, byte q) {
 		return (edge & q) != EDGE_NONE;
 	}
 
-	public AFeatureGraph(Collection<Feature> variantfeatures, Collection<Feature> coreFeatures, Collection<Feature> deadFeatures) {
+	public AFeatureGraph(IFeatureModel featureModel, Collection<IFeature> variantfeatures, Collection<IFeature> coreFeatures, Collection<IFeature> deadFeatures) {
+		this.featureModel = featureModel;
 		size = variantfeatures.size();
 		featureMap = new HashMap<>(size << 1);
 		featureArray = new String[size];
@@ -73,17 +77,17 @@ public abstract class AFeatureGraph implements IFeatureGraph {
 		}
 
 		int i = 0;
-		for (Feature feature : coreFeatures) {
+		for (IFeature feature : coreFeatures) {
 			this.coreFeatures[i++] = feature.getName();
 		}
 
 		i = 0;
-		for (Feature feature : deadFeatures) {
+		for (IFeature feature : deadFeatures) {
 			this.deadFeatures[i++] = feature.getName();
 		}
 
 		i = 0;
-		for (Feature feature : variantfeatures) {
+		for (IFeature feature : variantfeatures) {
 			featureArray[i++] = feature.getName();
 		}
 
@@ -93,6 +97,20 @@ public abstract class AFeatureGraph implements IFeatureGraph {
 		for (int j = 0; j < featureArray.length; j++) {
 			featureMap.put(featureArray[j], j);
 		}
+	}
+	
+	public AFeatureGraph(IFeatureModel featureModel) {
+		this.featureModel = featureModel;
+	}
+	
+	public void copyValues(IFeatureGraph otherGraph) {
+		final AFeatureGraph anotherAGraph = (AFeatureGraph) otherGraph;
+		this.size = anotherAGraph.size;
+		this.coreFeatures = Arrays.copyOf(anotherAGraph.coreFeatures, anotherAGraph.coreFeatures.length);
+		this.deadFeatures = Arrays.copyOf(anotherAGraph.deadFeatures, anotherAGraph.deadFeatures.length);
+		this.featureArray = Arrays.copyOf(anotherAGraph.featureArray, anotherAGraph.featureArray.length);
+		this.expListAr = new ArrayList<>(anotherAGraph.expListAr);
+		this.featureMap = new HashMap<>(anotherAGraph.featureMap);
 	}
 
 	public void implies(String implyFeature, String impliedFeature) {

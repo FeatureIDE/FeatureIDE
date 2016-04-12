@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.resources.IContainer;
@@ -42,11 +41,17 @@ import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.sat4j.specs.TimeoutException;
 
-import de.ovgu.featureide.fm.core.ExtendedFeatureModel.UsedModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
+import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel.UsedModel;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.cnf.UnkownLiteralException;
-import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
-import de.ovgu.featureide.fm.core.io.ModelIOFactory;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.FileManagerMap;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.IProjectJob;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
@@ -60,19 +65,19 @@ import de.ovgu.featureide.fm.core.job.util.JobSequence;
 public class FMCorePlugin extends AbstractCorePlugin {
 
 	public static final String PLUGIN_ID = "de.ovgu.featureide.fm.core";
-	
+
 	private static FMCorePlugin plugin;
-	
+
 	@Override
 	public String getID() {
 		return PLUGIN_ID;
 	}
-	
+
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
 	}
-	
+
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
 		super.stop(context);
@@ -81,7 +86,7 @@ public class FMCorePlugin extends AbstractCorePlugin {
 	public static FMCorePlugin getDefault() {
 		return plugin;
 	}
-	
+
 	/**
 	 * Creates a {@link IProjectJob} for every project with the given arguments.
 	 * 
@@ -89,7 +94,7 @@ public class FMCorePlugin extends AbstractCorePlugin {
 	 * @param arguments the arguments for the job
 	 * @param autostart if {@code true} the jobs is started automatically.
 	 * @return the created job or a {@link JobSequence} if more than one project is given.
-	 * 	Returns {@code null} if {@code projects} is empty.
+	 *         Returns {@code null} if {@code projects} is empty.
 	 */
 	public IJob startJobs(List<IProject> projects, JobArguments arguments, boolean autostart) {
 		IJob ret;
@@ -124,89 +129,92 @@ public class FMCorePlugin extends AbstractCorePlugin {
 			return;
 		}
 
-		final int modelType = ModelIOFactory.getTypeByFileName(file.getName());
-		if (modelType == ModelIOFactory.TYPE_UNKNOWN) {
+		final IPersistentFormat<IFeatureModel> format = FeatureModelManager.getFormat(file.getName());
+		if (format == null) {
 			return;
 		}
-		final FeatureModel fm = ModelIOFactory.getNewFeatureModel(modelType);
-		final AbstractFeatureModelReader reader = ModelIOFactory.getModelReader(fm, modelType);
 
-		try {
-			reader.readFromFile(file.getLocation().toFile());
-			FeatureModelAnalyzer fma = new FeatureModelAnalyzer(fm);
-			fma.analyzeFeatureModel(null);
+		final String path = file.getLocation().toString();
+		if (FileManagerMap.hasInstance(path)) {
+			final FeatureModelManager instance = FileManagerMap.<IFeatureModel, FeatureModelManager> getInstance(path);
+			final IFeatureModel fm = instance.getObject();
 
-			final StringBuilder sb = new StringBuilder();
-			sb.append("Number Features: ");
-			sb.append(fm.getNumberOfFeatures());
-			sb.append(" (");
-			sb.append(fma.countConcreteFeatures());
-			sb.append(")\n");
+			try {
+				FeatureModelAnalyzer fma = new FeatureModelAnalyzer(fm);
+				fma.analyzeFeatureModel(null);
 
-			if (fm instanceof ExtendedFeatureModel) {
-				ExtendedFeatureModel extFeatureModel = (ExtendedFeatureModel) fm;
-				int countInherited = 0;
-				int countInstances = 0;
-				for (UsedModel usedModel : extFeatureModel.getExternalModels().values()) {
-					switch (usedModel.getType()) {
-					case ExtendedFeature.TYPE_INHERITED:
-						countInherited++;
-						break;
-					case ExtendedFeature.TYPE_INSTANCE:
-						countInstances++;
-						break;
+				final StringBuilder sb = new StringBuilder();
+				sb.append("Number Features: ");
+				sb.append(fm.getNumberOfFeatures());
+				sb.append(" (");
+				sb.append(fma.countConcreteFeatures());
+				sb.append(")\n");
+
+				if (fm instanceof ExtendedFeatureModel) {
+					ExtendedFeatureModel extFeatureModel = (ExtendedFeatureModel) fm;
+					int countInherited = 0;
+					int countInstances = 0;
+					for (UsedModel usedModel : extFeatureModel.getExternalModels().values()) {
+						switch (usedModel.getType()) {
+						case ExtendedFeature.TYPE_INHERITED:
+							countInherited++;
+							break;
+						case ExtendedFeature.TYPE_INSTANCE:
+							countInstances++;
+							break;
+						}
 					}
+					sb.append("Number Instances: ");
+					sb.append(countInstances);
+					sb.append("\n");
+					sb.append("Number Inherited: ");
+					sb.append(countInherited);
+					sb.append("\n");
 				}
-				sb.append("Number Instances: ");
-				sb.append(countInstances);
+
+				final List<List<IFeature>> unnomralFeature = fma.analyzeFeatures();
+
+				Collection<IFeature> analyzedFeatures = unnomralFeature.get(0);
+				sb.append("Core Features (");
+				sb.append(analyzedFeatures.size());
+				sb.append("): ");
+				for (IFeature coreFeature : analyzedFeatures) {
+					sb.append(coreFeature.getName());
+					sb.append(", ");
+				}
+				analyzedFeatures = unnomralFeature.get(1);
+				sb.append("\nDead Features (");
+				sb.append(analyzedFeatures.size());
+				sb.append("): ");
+				for (IFeature deadFeature : analyzedFeatures) {
+					sb.append(deadFeature.getName());
+					sb.append(", ");
+				}
+				analyzedFeatures = fma.getFalseOptionalFeatures();
+				sb.append("\nFO Features (");
+				sb.append(analyzedFeatures.size());
+				sb.append("): ");
+				for (IFeature foFeature : analyzedFeatures) {
+					sb.append(foFeature.getName());
+					sb.append(", ");
+				}
 				sb.append("\n");
-				sb.append("Number Inherited: ");
-				sb.append(countInherited);
-				sb.append("\n");
-			}
 
-			final List<List<Feature>> unnomralFeature = fma.analyzeFeatures();
-
-			Collection<Feature> analyzedFeatures = unnomralFeature.get(0);
-			sb.append("Core Features (");
-			sb.append(analyzedFeatures.size());
-			sb.append("): ");
-			for (Feature coreFeature : analyzedFeatures) {
-				sb.append(coreFeature.getName());
-				sb.append(", ");
+				final IFile outputFile = ((IFolder) outputDir).getFile(file.getName() + "_output.txt");
+				final InputStream inputStream = new ByteArrayInputStream(sb.toString().getBytes(Charset.defaultCharset()));
+				if (outputFile.isAccessible()) {
+					outputFile.setContents(inputStream, false, true, null);
+				} else {
+					outputFile.create(inputStream, true, null);
+				}
+				logInfo(PRINTED_OUTPUT_FILE_);
+			} catch (Exception e) {
+				logError(e);
 			}
-			analyzedFeatures = unnomralFeature.get(1);
-			sb.append("\nDead Features (");
-			sb.append(analyzedFeatures.size());
-			sb.append("): ");
-			for (Feature deadFeature : analyzedFeatures) {
-				sb.append(deadFeature.getName());
-				sb.append(", ");
-			}
-			analyzedFeatures = fma.getFalseOptionalFeatures();
-			sb.append("\nFO Features (");
-			sb.append(analyzedFeatures.size());
-			sb.append("): ");
-			for (Feature foFeature : analyzedFeatures) {
-				sb.append(foFeature.getName());
-				sb.append(", ");
-			}
-			sb.append("\n");
-
-			final IFile outputFile = ((IFolder) outputDir).getFile(file.getName() + "_output.txt");
-			final InputStream inputStream = new ByteArrayInputStream(sb.toString().getBytes(Charset.defaultCharset()));
-			if (outputFile.isAccessible()) {
-				outputFile.setContents(inputStream, false, true, null);
-			} else {
-				outputFile.create(inputStream, true, null);
-			}
-			logInfo(PRINTED_OUTPUT_FILE_);
-		} catch (Exception e) {
-			logError(e);
 		}
 	}
 	
-	public void removeFeatures(IProject project, FeatureModel data, Collection<String> features) {
+	public void removeFeatures(IProject project, IFeatureModel data, Collection<String> features) {
 		try {
 			removeFeatures(data, features);
 		} catch (TimeoutException | UnkownLiteralException e) {
@@ -214,43 +222,43 @@ public class FMCorePlugin extends AbstractCorePlugin {
 		}
 	}
 
-	public static Node removeFeatures(FeatureModel featureModel, Collection<String> removeFeatures) throws TimeoutException, UnkownLiteralException {
+	public static Node removeFeatures(IFeatureModel featureModel, Collection<String> removeFeatures) throws TimeoutException, UnkownLiteralException {
 		final AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(featureModel, removeFeatures);
 		nodeCreator.setCnfType(AdvancedNodeCreator.CNFType.Regular);
 		return nodeCreator.createNodes();
 	}
 
-	public static List<String> splitFeatureModel(FeatureModel featureModel, int level, int limit) {
+	public static List<String> splitFeatureModel(IFeatureModel featureModel, int level, int limit) {
 		final ArrayList<String> rootNames = new ArrayList<>();
-		final Feature root = featureModel.getRoot();
+		final IFeatureStructure root = featureModel.getStructure().getRoot();
 		if (root != null) {
 			split_rec(root, rootNames, 0, level, limit);
 		}
 		return rootNames;
 	}
 
-	private static void split_rec(Feature root, ArrayList<String> rootNames, int level, int x, int y) {
+	private static void split_rec(IFeatureStructure root, ArrayList<String> rootNames, int level, int x, int y) {
 		final int featureLimit = y;
 		final int levelLimit = x;
-		final LinkedList<Feature> children = root.getChildren();
-		for (Feature feature : children) {
+		final List<IFeatureStructure> children = root.getChildren();
+		for (IFeatureStructure feature : children) {
 			final int c = countChildren(feature);
 			if (c > 0) {
 				if (c > featureLimit && level < levelLimit) {
 					split_rec(feature, rootNames, level + 1, x, y);
 				} else {
-					rootNames.add(feature.getName());
+					rootNames.add(feature.getFeature().getName());
 				}
 			} else {
-				rootNames.add(feature.getName());
+				rootNames.add(feature.getFeature().getName());
 			}
 		}
 	}
 
-	private static int countChildren(Feature root) {
-		final LinkedList<Feature> children = root.getChildren();
+	private static int countChildren(IFeatureStructure root) {
+		final List<IFeatureStructure> children = root.getChildren();
 		int count = children.size();
-		for (Feature feature : children) {
+		for (IFeatureStructure feature : children) {
 			count += countChildren(feature);
 		}
 		return count;

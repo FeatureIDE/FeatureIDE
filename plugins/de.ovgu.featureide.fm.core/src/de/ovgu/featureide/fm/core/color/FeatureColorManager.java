@@ -43,13 +43,14 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
  * Manages colors assigned to features.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class FeatureColorManager {
 	
@@ -58,7 +59,7 @@ public class FeatureColorManager {
 	/**
 	 * Returns the current color of the given feature.
 	 */
-	public static FeatureColor getColor(Feature feature) {
+	public static FeatureColor getColor(IFeature feature) {
 		return getCurrentColorScheme(feature).getColor(feature);
 	}
 
@@ -66,14 +67,14 @@ public class FeatureColorManager {
 	/**
 	 * Sets the feature color to the given index.
 	 */
-	public static void setColor(Feature feature, int index) {
+	public static void setColor(IFeature feature, int index) {
 		setColor(feature, FeatureColor.getColor(index));	
 	}
 	
 	/**
 	 * Sets the feature color to the given color.
 	 */
-	public static void setColor(Feature feature, FeatureColor color) {
+	public static void setColor(IFeature feature, FeatureColor color) {
 		getCurrentColorScheme(feature).setColor(feature, color);
 		writeColors(getProject(feature), getCurrentColorScheme(feature));
 	}
@@ -81,14 +82,14 @@ public class FeatureColorManager {
 	/**
 	 * Checks whether the current scheme is the default scheme without colors.
 	 */
-	public static boolean isDefault(FeatureModel featureModel) {
+	public static boolean isDefault(IFeatureModel featureModel) {
 		return getCurrentColorScheme(featureModel).isDefault();
 	}
 
 	/**
 	 * Deletes the profile with the given name.
 	 */
-	public static void removeCurrentColorScheme(final FeatureModel featureModel) {
+	public static void removeCurrentColorScheme(final IFeatureModel featureModel) {
 		final IProject project = getProject(featureModel);
 		final IFolder profileFolder = project.getFolder(".profiles");
 		if (!profileFolder.exists()) {
@@ -117,7 +118,7 @@ public class FeatureColorManager {
 	 * @param newProfileColorSchemeName
 	 * @return
 	 */
-	public static boolean isCurrentColorScheme(FeatureModel featureModel, String schmeName) {
+	public static boolean isCurrentColorScheme(IFeatureModel featureModel, String schmeName) {
 		IProject project = getProject(featureModel);
 		Map<String, ColorScheme> currentSchemes = colorSchemes.get(project);
 		return currentSchemes.get(schmeName).isCurrent();
@@ -126,7 +127,7 @@ public class FeatureColorManager {
 	/**
 	 * Returns the current color scheme.
 	 */
-	public static ColorScheme getCurrentColorScheme(Feature feature) {
+	public static ColorScheme getCurrentColorScheme(IFeature feature) {
 		if (feature == null) {
 			return new DefaultColorScheme();
 		}
@@ -136,7 +137,7 @@ public class FeatureColorManager {
 	/**
 	 * Returns the current color scheme.
 	 */
-	public static ColorScheme getCurrentColorScheme(FeatureModel featureModel) {
+	public static ColorScheme getCurrentColorScheme(IFeatureModel featureModel) {
 		IProject project = getProject(featureModel);
 		if (project == null) {
 			// bad workaround 
@@ -163,7 +164,7 @@ public class FeatureColorManager {
 	/**
 	 * Returns the default color scheme.
 	 */
-	public static ColorScheme getDefaultColorScheme(FeatureModel model) {
+	public static ColorScheme getDefaultColorScheme(IFeatureModel model) {
 		for (ColorScheme cs : getColorSchemes(model)) {
 			if (cs.isDefault()) {
 				return cs;
@@ -186,7 +187,11 @@ public class FeatureColorManager {
 		}
 		try {
 			for (IResource res : profileFolder.members()) {
-				if (res instanceof IFile && res.getFileExtension().equals("profile")) {
+				final String ext = res.getFileExtension();
+				if (ext == null)
+					throw new RuntimeException("Unexpected null reference");
+				
+				if (res instanceof IFile && ext.equals("profile")) {
 					readColors(newEntry, res);
 				}
 			}
@@ -204,6 +209,8 @@ public class FeatureColorManager {
 			ColorScheme newCs = new ColorScheme(name);
 			newEntry.put(newCs.getName(), newCs);
 			String line = in.readLine();
+			if (line == null)
+				throw new RuntimeException("Unexpected null reference");
 			if (line.equals("true")) {
 				setActive(res.getProject(), name, false);
 			}
@@ -265,7 +272,7 @@ public class FeatureColorManager {
 	/**
 	 * Returns all profiles for the given model.
 	 */
-	public static Collection<ColorScheme> getColorSchemes(FeatureModel featureModel) {
+	public static Collection<ColorScheme> getColorSchemes(IFeatureModel featureModel) {
 		IProject project = getProject(featureModel);
 		if (!colorSchemes.containsKey(project)) {
 			initColorSchemes(project);
@@ -276,12 +283,12 @@ public class FeatureColorManager {
 	/**
 	 * Gets the associated project for the given feature.
 	 */
-	private static IProject getProject(Feature feature) {
+	private static IProject getProject(IFeature feature) {
 		return getProject(feature.getFeatureModel());
 	}
 	
-	private static IProject getProject(FeatureModel featureModel) {
-		File file = featureModel.xxxGetSourceFile();
+	private static IProject getProject(IFeatureModel featureModel) {
+		File file = featureModel.getSourceFile();
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		IPath location = Path.fromOSString(file.getAbsolutePath());
 		IFile iFile = workspace.getRoot().getFileForLocation(location);
@@ -296,7 +303,7 @@ public class FeatureColorManager {
 	/**
 	 * Creates a new color scheme for with the given name.
 	 */
-	public static void newColorScheme(FeatureModel featureModel, String csName) {
+	public static void newColorScheme(IFeatureModel featureModel, String csName) {
 		IProject project = getProject(featureModel);
 		ColorScheme newColorScheme = new ColorScheme(csName);
 		Map<String, ColorScheme> currentSchemes = colorSchemes.get(project);
@@ -309,7 +316,7 @@ public class FeatureColorManager {
 	/**
 	 * Checks whether there is a color scheme with the given name.
 	 */
-	public static boolean hasColorScheme(FeatureModel featureModel, String csName) {
+	public static boolean hasColorScheme(IFeatureModel featureModel, String csName) {
 		IProject project = getProject(featureModel);
 		return colorSchemes.get(project).containsKey(csName);
 	}
@@ -317,7 +324,7 @@ public class FeatureColorManager {
 	/**
 	 * Changes the name of the color scheme.
 	 */
-	public static void renameColorScheme(FeatureModel featureModel, String newName) {
+	public static void renameColorScheme(IFeatureModel featureModel, String newName) {
 		IProject project = getProject(featureModel);
 		Map<String, ColorScheme> currentColorSchemes = colorSchemes.get(project);
 		String oldName = getCurrentColorScheme(featureModel).getName();
@@ -331,7 +338,7 @@ public class FeatureColorManager {
 	/**
 	 * Activates the color scheme with the given name.
 	 */
-	public static void setActive(FeatureModel fm, String collName) {
+	public static void setActive(IFeatureModel fm, String collName) {
 		IProject project = getProject(fm);
 		setActive(project, collName, true);
 		fm.handleModelDataChanged();
@@ -369,7 +376,7 @@ public class FeatureColorManager {
 	/**
 	 * Performs the feature renaming.
 	 */
-	public static void renameFeature(FeatureModel model, String oldName, String newName) {
+	public static void renameFeature(IFeatureModel model, String oldName, String newName) {
 		Collection<ColorScheme> currentColorSchemes = getColorSchemes(model);
 		for (ColorScheme colorScheme : currentColorSchemes) {
 			colorScheme.renameFeature(oldName, newName);

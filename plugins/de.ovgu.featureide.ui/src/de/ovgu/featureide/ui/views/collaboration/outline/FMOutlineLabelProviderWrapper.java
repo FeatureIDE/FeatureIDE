@@ -27,14 +27,16 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.TreeItem;
 
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.ui.views.outline.FmLabelProvider;
 
 /**
  * Wrapper for the feature-model label provider
- * 
- * @author Reimar Schröter
+ *
+ * @author Reimar Schroeter
  */
-public class FMOutlineLabelProviderWrapper extends OutlineLabelProvider implements IColorProvider{
+public class FMOutlineLabelProviderWrapper extends OutlineLabelProvider implements IColorProvider {
 
 	private final FmLabelProvider prov = new FmLabelProvider();
 
@@ -45,7 +47,11 @@ public class FMOutlineLabelProviderWrapper extends OutlineLabelProvider implemen
 
 	@Override
 	public String getText(Object element) {
-		return prov.getText(element);
+		if (element instanceof IFeature) {
+			return prov.getText(((IFeature)element).getName());
+		} else if (element instanceof IConstraint) {
+			return prov.getText(((IConstraint)element).getDisplayName());
+		} else return prov.getText(element);
 	}
 
 	@Override
@@ -70,7 +76,7 @@ public class FMOutlineLabelProviderWrapper extends OutlineLabelProvider implemen
 
 	@Override
 	public void colorizeItems(TreeItem[] treeItems, IFile file) {
-	//	prov.colorizeItems(treeItems, file);
+		//	prov.colorizeItems(treeItems, file);
 	}
 
 	@Override
@@ -87,46 +93,22 @@ public class FMOutlineLabelProviderWrapper extends OutlineLabelProvider implemen
 		return OutlineLabelProvider.OUTLINE_FEATURE_MODEL;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.ovgu.featureide.ui.views.collaboration.outline.OutlineLabelProvider
-	 * #refreshContent(org.eclipse.core.resources.IFile,
-	 * org.eclipse.core.resources.IFile)
-	 */
 	@Override
 	public boolean refreshContent(IFile oldFile, IFile currentFile) {
 		return false;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * de.ovgu.featureide.ui.views.collaboration.outline.OutlineLabelProvider
-	 * #init()
-	 */
 	@Override
 	public void init() {
 	}
 
-
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.IColorProvider#getForeground(java.lang.Object)
-	 */
 	@Override
 	public Color getForeground(Object element) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.jface.viewers.IColorProvider#getBackground(java.lang.Object)
-	 */
 	@Override
 	public Color getBackground(Object element) {
-		
 		return prov.getBackground(element);
 	}
 

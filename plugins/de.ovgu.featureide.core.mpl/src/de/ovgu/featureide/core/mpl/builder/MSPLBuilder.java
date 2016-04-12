@@ -22,9 +22,11 @@ package de.ovgu.featureide.core.mpl.builder;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.NO_PROJECT_GOT;
 
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
@@ -37,7 +39,8 @@ import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.core.mpl.job.MPLBuildProjectJob;
 import de.ovgu.featureide.core.mpl.job.MPLRenameExternalJob;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.ConfigurationReader;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
+import de.ovgu.featureide.fm.core.io.manager.FileReader;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 import de.ovgu.featureide.fm.core.job.util.JobSequence;
@@ -106,7 +109,12 @@ public class MSPLBuilder extends IncrementalProjectBuilder {
 			
 			try {
 				final Configuration config = new Configuration(featureProject.getFeatureModel());
-				new ConfigurationReader(config).readFromFile(featureProject.getCurrentConfiguration());
+				
+				final IFile configFile = featureProject.getCurrentConfiguration();
+				final FileReader<Configuration> reader = new FileReader<>();
+				reader.setObject(config);
+				reader.setPath(Paths.get(configFile.getLocationURI()));
+				reader.setFormat(ConfigurationManager.getFormat(configFile.getName()));
 				
 				// build
 				final IFolder buildFolder = featureProject.getBuildFolder();

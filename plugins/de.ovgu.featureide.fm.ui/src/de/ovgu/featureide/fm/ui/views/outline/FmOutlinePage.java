@@ -26,7 +26,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 
 /**
@@ -35,13 +35,14 @@ import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
  * 
  * @author Jan Wedding
  * @author Melanie Pflaume
+ * @author Marcus Pinnecke
  */
 /*
  * TODO #404 fix bug: tree minimizes after selecting the editor page
  */
 public class FmOutlinePage extends ContentOutlinePage {
 
-	protected FeatureModel fInput;
+	protected IFeatureModel fInput;
 
 	protected IDocumentProvider fDocumentProvider;
 
@@ -64,7 +65,7 @@ public class FmOutlinePage extends ContentOutlinePage {
 	 * @param input
 	 *            the input of this outline page
 	 */
-	public void setInput(FeatureModel input) {
+	public void setInput(IFeatureModel input) {
 		fInput = input;
 		update();
 	}
@@ -73,7 +74,7 @@ public class FmOutlinePage extends ContentOutlinePage {
 	 * Updates the outline page.
 	 */
 	public void update() {
-		if (fInput == null || fInput.getRoot() == null)
+		if (fInput == null || fInput.getStructure().getRoot() == null)
 			return;
 		if (viewer != null) {
 			Control control = viewer.getControl();
@@ -95,7 +96,7 @@ public class FmOutlinePage extends ContentOutlinePage {
 			viewer.setLabelProvider(new FmLabelProvider());
 		}
 
-		if (fInput != null && fInput.getRoot() != null) {
+		if (fInput != null && fInput.getStructure().getRoot() != null) {
 			viewer.setInput(fInput);
 		}
 

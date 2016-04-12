@@ -39,7 +39,8 @@ import org.eclipse.ui.internal.util.BundleUtility;
 import org.osgi.framework.Bundle;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslWriter;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
@@ -50,6 +51,7 @@ import de.ovgu.featureide.fm.ui.handlers.base.AFileHandler;
  * Opens the currently selected feature model with GUIDSL.
  * 
  * @author Thomas Thuem
+ * @author Marcus Pinnecke
  */
 @SuppressWarnings(RESTRICTION)
 public class OpenWithGUIDSLHandler extends AFileHandler {
@@ -62,7 +64,7 @@ public class OpenWithGUIDSLHandler extends AFileHandler {
 			String command = "java -cp \"" + jakarta + "\"";
 			command += " -jar \"" + guidsl + "\"";
 
-			FeatureModel fm = new FeatureModel();
+			IFeatureModel fm = FMFactoryManager.getFactory().createFeatureModel();
 			FeatureModelReaderIFileWrapper fmReader = new FeatureModelReaderIFileWrapper(new XmlFeatureModelReader(fm));
 
 			fmReader.readFromFile(modelfile);

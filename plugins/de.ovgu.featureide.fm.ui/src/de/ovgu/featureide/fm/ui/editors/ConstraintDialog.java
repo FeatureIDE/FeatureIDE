@@ -53,7 +53,6 @@ import java.util.Locale;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.AbstractOperation;
-import org.eclipse.core.commands.operations.IUndoContext;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.bindings.keys.ParseException;
 import org.eclipse.jface.fieldassist.ContentProposalAdapter;
@@ -101,18 +100,21 @@ import org.eclipse.ui.PlatformUI;
 import org.prop4j.Node;
 import org.prop4j.NodeReader;
 
-import de.ovgu.featureide.fm.core.Constraint;
 import de.ovgu.featureide.fm.core.Constraints;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
-import de.ovgu.featureide.fm.core.FunctionalInterfaces.IConsumer;
 import de.ovgu.featureide.fm.core.Operator;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.Constraint;
+import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.ConstraintTextValidator.ValidationMessage;
 import de.ovgu.featureide.fm.ui.editors.ConstraintTextValidator.ValidationResult;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ConstraintCreateOperation;
-import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.ConstraintEditOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.CreateConstraintOperation;
+import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.EditConstraintOperation;
 
 /**
  * A simple editor for propositional constraints written below the feature
@@ -411,10 +413,10 @@ public class ConstraintDialog implements GUIDefaults {
 	private Group buttonGroup;
 	private Composite constraintTextComposite;
 	private SimpleSyntaxHighlightEditor constraintText;
-	private FeatureModel featureModel;
+	private IFeatureModel featureModel;
 	private Button okButton;
 
-	private Constraint constraint;
+	private IConstraint constraint;
 	private String defaultDetailsText;
 
 	private String defaultHeaderText;
@@ -537,7 +539,7 @@ public class ConstraintDialog implements GUIDefaults {
 	 * @param featuremodel
 	 * @param constraint
 	 */
-	public ConstraintDialog(final FeatureModel featuremodel, final Constraint constraint) {
+	public ConstraintDialog(final IFeatureModel featuremodel, final IConstraint constraint) {
 		this.constraint = constraint;
 		this.featureModel = featuremodel;
 
@@ -599,23 +601,20 @@ public class ConstraintDialog implements GUIDefaults {
 	private void closeShell() {
 		final NodeReader nodeReader = new NodeReader();
 		final String input = constraintText.getText().trim();
-		final Node propNode = nodeReader.stringToNode(input, featureModel.getFeatureNames());
+		final Node propNode = nodeReader.stringToNode(input, Functional.toList(FeatureUtils.extractFeatureNames(featureModel.getFeatures())));
 
 		AbstractOperation op = null;
 		if (constraint != null && featureModel.getConstraints().contains(constraint)) {
-			int index = 0;
-			for (Constraint c : featureModel.getConstraints()) {
+			for (IConstraint c : featureModel.getConstraints()) {
 				if (c == constraint) {
-					op = new ConstraintEditOperation(propNode, featureModel, index);
+					op = new EditConstraintOperation(constraint, propNode);
 					break;
 				}
-				index++;
 			}
 		}
 		if (op == null) {
-			op = new ConstraintCreateOperation(propNode, featureModel);
+			op = new CreateConstraintOperation(propNode, featureModel);
 		}
-		op.addContext((IUndoContext) featureModel.getUndoContext());
 		try {
 			PlatformUI.getWorkbench().getOperationSupport().getOperationHistory().execute(op, null, null);
 		} catch (ExecutionException e) {
@@ -637,25 +636,25 @@ public class ConstraintDialog implements GUIDefaults {
 	 * @return List of all dead Features, empty if no feature is caused to be
 	 *         dead
 	 */
-	public List<Feature> getDeadFeatures(String input, FeatureModel model) {
-		Collection<Feature> deadFeaturesBefore = null;
-		FeatureModel clonedModel = model.clone();
+	public List<IFeature> getDeadFeatures(String input, IFeatureModel model) {
+		Collection<IFeature> deadFeaturesBefore = null;
+		IFeatureModel clonedModel = model.clone(null);
 
 		NodeReader nodeReader = new NodeReader();
 
-		Node propNode = nodeReader.stringToNode(input, clonedModel.getFeatureNames());
+		Node propNode = nodeReader.stringToNode(input, Functional.toList(FeatureUtils.extractFeatureNames(clonedModel.getFeatures())));
 
 		if (propNode != null) {
 			if (constraint != null) {
 				clonedModel.removeConstraint(constraint);
 			}
 			deadFeaturesBefore = clonedModel.getAnalyser().getDeadFeatures();
-			clonedModel.addPropositionalNode(propNode);
+			clonedModel.addConstraint(new Constraint(clonedModel, (propNode)));
 			clonedModel.handleModelDataChanged();
 		}
 
-		List<Feature> deadFeaturesAfter = new ArrayList<Feature>();
-		for (Feature l : clonedModel.getAnalyser().getDeadFeatures()) {
+		List<IFeature> deadFeaturesAfter = new ArrayList<IFeature>();
+		for (IFeature l : clonedModel.getAnalyser().getDeadFeatures()) {
 			if (!deadFeaturesBefore.contains(l)) {
 				deadFeaturesAfter.add(l);
 
@@ -670,7 +669,7 @@ public class ConstraintDialog implements GUIDefaults {
 	 * @param featuremodel
 	 * @param constraint
 	 */
-	private void initBottom(final FeatureModel featuremodel, final Constraint constraint) {
+	private void initBottom(final IFeatureModel featuremodel, final IConstraint constraint) {
 		GridData gridData = new GridData(GridData.FILL_HORIZONTAL);
 
 		Composite lastComposite = new Composite(shell, SWT.NONE);
@@ -780,7 +779,7 @@ public class ConstraintDialog implements GUIDefaults {
 		constraintText.setLayoutData(formDataConstraintText);
 		constraintText.setText(initialConstraint);
 		constraintText.setMargins(10, 5, 3, 5);
-		constraintText.setPossibleWords(featureModel.getFeatureNames());
+		constraintText.setPossibleWords(Functional.toSet(FeatureUtils.extractFeatureNames(featureModel.getFeatures())));
 
 		constraintText.addModifyListener(new ModifyListener() {
 
@@ -802,7 +801,7 @@ public class ConstraintDialog implements GUIDefaults {
 	 * 
 	 * @param featuremodel
 	 */
-	private void initFeatureGroup(final FeatureModel featuremodel) {
+	private void initFeatureGroup(final IFeatureModel featuremodel) {
 
 		featureGroup = new Group(shell, SWT.NONE);
 		featureGroup.setText("Features");
@@ -840,7 +839,7 @@ public class ConstraintDialog implements GUIDefaults {
 			@Override
 			public int compare(Viewer viewer, Object feature1, Object feature2) {
 
-				return ((Feature) feature1).getName().compareToIgnoreCase(((Feature) feature2).getName());
+				return ((IFeature) feature1).getName().compareToIgnoreCase(((IFeature) feature2).getName());
 			}
 
 		});
@@ -848,7 +847,7 @@ public class ConstraintDialog implements GUIDefaults {
 		viewerNameColumn.setLabelProvider(new CellLabelProvider() {
 			@Override
 			public void update(ViewerCell cell) {
-				cell.setText(((Feature) cell.getElement()).getName());
+				cell.setText(((IFeature) cell.getElement()).getName());
 				cell.setImage(FEATURE_SYMBOL);
 			}
 		});
@@ -862,7 +861,7 @@ public class ConstraintDialog implements GUIDefaults {
 
 						@Override
 						public boolean select(Viewer viewer, Object parentElement, Object element) {
-							return ((Feature) element).getName().toLowerCase(Locale.ENGLISH).contains(searchFeatureText.getText().toLowerCase(Locale.ENGLISH));
+							return ((IFeature) element).getName().toLowerCase(Locale.ENGLISH).contains(searchFeatureText.getText().toLowerCase(Locale.ENGLISH));
 						}
 
 					};
@@ -993,7 +992,7 @@ public class ConstraintDialog implements GUIDefaults {
 				autoActivationCharacters[c] = c;
 
 			adapter = new ContentProposalAdapter(constraintText, new SimpleSyntaxHighlighterConstraintContentAdapter(), new ConstraintContentProposalProvider(
-					featureModel.getFeatureNames()), keyStroke, autoActivationCharacters);
+					Functional.toSet(FeatureUtils.extractFeatureNames(featureModel.getFeatures()))), keyStroke, autoActivationCharacters);
 
 			adapter.setAutoActivationDelay(PROPOSAL_AUTO_ACTIVATION_DELAY);
 			adapter.setPopupSize(new Point(250, 85));

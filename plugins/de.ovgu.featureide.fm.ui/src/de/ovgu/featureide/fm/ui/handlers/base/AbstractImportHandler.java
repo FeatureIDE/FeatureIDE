@@ -43,7 +43,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.FileEditorInput;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
 import de.ovgu.featureide.fm.core.io.IFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
@@ -56,6 +57,7 @@ import de.ovgu.featureide.fm.ui.FMUIPlugin;
  * 
  * @author Fabian Benduhn
  * @author Sebastian Krieter
+ * @author Marcus Pinnecke
  */
 public abstract class AbstractImportHandler extends AFileHandler {
 	private IFeatureModelReader modelReader;
@@ -63,33 +65,31 @@ public abstract class AbstractImportHandler extends AFileHandler {
 	@Override
 	protected final void singleAction(IFile outputFile) {
 		try {
-			if (MessageDialog.openQuestion(new Shell(), "Warning!", "This will override the current model irrepealable! Proceed?")) {
-				final FileDialog fileDialog = new FileDialog(new Shell(), SWT.OPEN);
-				fileDialog.setOverwrite(false);
-				setFilter(fileDialog);
+			final FileDialog fileDialog = new FileDialog(new Shell(), SWT.OPEN);
+			fileDialog.setOverwrite(false);
+			setFilter(fileDialog);
 
-				File inputFile;
-				while (true) {
-					final String filepath = fileDialog.open();
-					if (filepath == null) {
-						return;
-					}
-					inputFile = new File(filepath);
-					if (inputFile.exists()) {
-						break;
-					}
-					MessageDialog.openInformation(new Shell(), FILE + NOT_FOUND, SPECIFIED_FILE_WASNT_FOUND);
+			File inputFile;
+			while (true) {
+				final String filepath = fileDialog.open();
+				if (filepath == null) {
+					return;
 				}
-
-				final FeatureModel fm = createFeatureModel();
-				modelReader = setModelReader(fm);
-				modelReader.readFromFile(inputFile);
-
-				final FeatureModelWriterIFileWrapper fmWriter = new FeatureModelWriterIFileWrapper(new XmlFeatureModelWriter(fm));
-				fmWriter.writeToFile(outputFile);
-				outputFile.refreshLocal(IResource.DEPTH_ZERO, null);
-				openFileInEditor(outputFile);
+				inputFile = new File(filepath);
+				if (inputFile.exists()) {
+					break;
+				}
+				MessageDialog.openInformation(new Shell(), FILE + NOT_FOUND, SPECIFIED_FILE_WASNT_FOUND);
 			}
+
+			final IFeatureModel fm = createFeatureModel();
+			modelReader = setModelReader(fm);
+			modelReader.readFromFile(inputFile);
+
+			final FeatureModelWriterIFileWrapper fmWriter = new FeatureModelWriterIFileWrapper(new XmlFeatureModelWriter(fm));
+			fmWriter.writeToFile(outputFile);
+			outputFile.refreshLocal(IResource.DEPTH_ZERO, null);
+			openFileInEditor(outputFile);
 		} catch (FileNotFoundException | CoreException e) {
 			FMUIPlugin.getDefault().logError(e);
 		} catch (UnsupportedModelException e) {
@@ -103,8 +103,8 @@ public abstract class AbstractImportHandler extends AFileHandler {
 		fileDialog.setFilterNames(new String[] { XML });
 	}
 
-	protected FeatureModel createFeatureModel() {
-		return new FeatureModel();
+	protected IFeatureModel createFeatureModel() {
+		return FMFactoryManager.getFactory().createFeatureModel();
 	}
 
 	/**
@@ -133,5 +133,5 @@ public abstract class AbstractImportHandler extends AFileHandler {
 	 * @param fm
 	 *            the feature model to initialize the IFeatureModelReader
 	 */
-	protected abstract IFeatureModelReader setModelReader(FeatureModel fm);
+	protected abstract IFeatureModelReader setModelReader(IFeatureModel fm);
 }

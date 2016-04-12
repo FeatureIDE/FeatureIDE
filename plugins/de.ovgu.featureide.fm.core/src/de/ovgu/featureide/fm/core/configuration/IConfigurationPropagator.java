@@ -23,12 +23,13 @@ package de.ovgu.featureide.fm.core.configuration;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.prop4j.Node;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 
 /**
- * TODO description
+ * Interface for a configuration propagator.
  * 
  * @author Sebastian Krieter
  */
@@ -43,6 +44,10 @@ public interface IConfigurationPropagator {
 	 * @return {@code true} if the current selection is a valid configuration
 	 */
 	LongRunningMethod<Boolean> isValid();
+	
+	boolean isLoaded();
+	
+	LongRunningMethod<Void> resolve();
 
 	/**
 	 * Ignores hidden features.
@@ -67,5 +72,7 @@ public interface IConfigurationPropagator {
 	LongRunningMethod<Long> number(long timeout);
 
 	LongRunningMethod<List<String>> update(boolean redundantManual, String startFeatureName);
+	
+	LongRunningMethod<List<Node>> findOpenClauses(List<SelectableFeature> featureList);
 
 }

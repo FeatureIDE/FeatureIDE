@@ -20,19 +20,14 @@
  */
 package de.ovgu.featureide.fm.core.conf;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.CoreException;
 import org.prop4j.And;
 import org.prop4j.Implies;
 import org.prop4j.Literal;
@@ -40,10 +35,10 @@ import org.prop4j.Node;
 import org.prop4j.Not;
 import org.prop4j.Or;
 
-import de.ovgu.featureide.fm.core.Constraint;
-import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.conf.nodes.Expression;
 import de.ovgu.featureide.fm.core.conf.nodes.Not2;
 import de.ovgu.featureide.fm.core.conf.nodes.Or2;
@@ -53,6 +48,10 @@ import de.ovgu.featureide.fm.core.conf.nodes.Xor;
 import de.ovgu.featureide.fm.core.conf.worker.CalcFixedThread;
 import de.ovgu.featureide.fm.core.conf.worker.DFSThread;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
+import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.core.io.FeatureGraphFormat;
+import de.ovgu.featureide.fm.core.io.manager.FileReader;
+import de.ovgu.featureide.fm.core.io.manager.FileWriter;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.WorkMonitor;
@@ -61,43 +60,23 @@ import de.ovgu.featureide.fm.core.job.util.JobArguments;
 public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arguments> implements LongRunningMethod<IFeatureGraph> {
 
 	public static class Arguments extends JobArguments {
-		private final FeatureModel featureModel;
+		private final IFeatureModel featureModel;
 
-		public Arguments(FeatureModel featureModel) {
+		public Arguments(IFeatureModel featureModel) {
 			super(Arguments.class);
 			this.featureModel = featureModel;
 		}
 	}
 
-	private final Collection<Feature> fixedFeatures = new HashSet<>();
-	private final Collection<Feature> coreFeatures = new HashSet<>();
-	private final Collection<Feature> deadFeatures = new HashSet<>();
+	private final Collection<IFeature> fixedFeatures = new HashSet<>();
+	private final Collection<IFeature> coreFeatures = new HashSet<>();
+	private final Collection<IFeature> deadFeatures = new HashSet<>();
 	private IFeatureGraph featureGraph = null;
 
-	private final HashSet<Feature> processedParents = new HashSet<>();
+	private final HashSet<IFeature> processedParents = new HashSet<>();
 
 	protected CreateFeatureGraphJob(Arguments arguments) {
 		super("Spliting Feature Model", arguments);
-	}
-
-	private boolean loadFeatureGraph() {
-		try (final ObjectInputStream in = new ObjectInputStream(new FileInputStream(project.getFile("model.fg").getLocation().toFile()))) {
-			this.featureGraph = (IFeatureGraph) in.readObject();
-			return true;
-		} catch (IOException | ClassNotFoundException e) {
-			FMCorePlugin.getDefault().logError(e);
-			return false;
-		}
-	}
-
-	public void writeFeatureGraph() {
-		final IFile file = project.getFile("model.fg");
-		try (final ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file.getLocation().toFile()))) {
-			out.writeObject(featureGraph);
-			file.refreshLocal(IFile.DEPTH_ZERO, null);
-		} catch (IOException | CoreException e) {
-			FMCorePlugin.getDefault().logError(e);
-		}
 	}
 
 	@Override
@@ -106,14 +85,14 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 	}
 
 	private IFeatureGraph createFeatureGraph() {
-		workMonitor.setMaxAbsoluteWork((2 * arguments.featureModel.getFeatureNames().size()) + 1);
+		workMonitor.setMaxAbsoluteWork((2 * arguments.featureModel.getNumberOfFeatures()) + 1);
 
 		final CalcFixedThread calcThread = new CalcFixedThread(AdvancedNodeCreator.createCNF(arguments.featureModel), workMonitor);
-		calcThread.addObjects(arguments.featureModel.getFeatureNames());
+		calcThread.addObjects(arguments.featureModel.getFeatureTable().keySet());
 		calcThread.start();
 
 		for (Literal literal : calcThread.getFixedLiterals()) {
-			final Feature feature = arguments.featureModel.getFeature((String) literal.var);
+			final IFeature feature = arguments.featureModel.getFeature((String) literal.var);
 			if (literal.positive) {
 				coreFeatures.add(feature);
 			} else {
@@ -123,29 +102,30 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 
 		fixedFeatures.addAll(coreFeatures);
 		fixedFeatures.addAll(deadFeatures);
-		final List<Constraint> constraints = arguments.featureModel.getConstraints();
-		final Collection<Feature> features = new ArrayList<Feature>(arguments.featureModel.getFeatures());
+		final List<IConstraint> constraints = arguments.featureModel.getConstraints();
+		
+		final Collection<IFeature> features = Functional.toList(arguments.featureModel.getFeatures());
 		features.removeAll(fixedFeatures);
 
 		processedParents.clear();
 
-		workMonitor.setMaxAbsoluteWork(arguments.featureModel.getFeatureNames().size() + features.size() + 1);
+		workMonitor.setMaxAbsoluteWork(arguments.featureModel.getNumberOfFeatures() + features.size() + 1);
 
-		featureGraph = new MatrixFeatureGraph(features, coreFeatures, deadFeatures);
+		featureGraph = new MatrixFeatureGraph(arguments.featureModel, features, coreFeatures, deadFeatures);
 
 		workMonitor.worked();
 
 		VariableConfiguration conf = new VariableConfiguration(features.size());
 
-		for (Feature feature : features) {
-			final Feature parent = feature.getParent();
+		for (IFeature feature : features) {
+			final IFeatureStructure parent = feature.getStructure().getParent();
 			final String featureName = feature.getName();
-			final String parentName = parent.getName();
+			final String parentName = parent.getFeature().getName();
 
 			// count non dead siblings of the current features
 			int nonDeadSibilingCount = 0;
-			for (Feature sibiling : parent.getChildren()) {
-				if (!deadFeatures.contains(sibiling)) {
+			for (IFeatureStructure sibiling : parent.getChildren()) {
+				if (!deadFeatures.contains(sibiling.getFeature())) {
 					nonDeadSibilingCount++;
 				}
 			}
@@ -154,7 +134,7 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 			if (!coreFeatures.contains(parent)) {
 				featureGraph.implies(featureName, parentName);
 				if (parent.isAnd()) {
-					if (feature.isMandatory()) {
+					if (feature.getStructure().isMandatory()) {
 						featureGraph.implies(parentName, featureName);
 					}
 				} else {
@@ -172,29 +152,29 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 				if (parent.isAlternative()) {
 					// XOR between two children
 					if (coreFeatures.contains(parent) && nonDeadSibilingCount == 2) {
-						for (Feature sibiling : parent.getChildren()) {
+						for (IFeatureStructure sibiling : parent.getChildren()) {
 							if (!deadFeatures.contains(sibiling)) {
-								featureGraph.setEdge(featureName, sibiling.getName(), MatrixFeatureGraph.EDGE_10);
-								featureGraph.setEdge(featureName, sibiling.getName(), MatrixFeatureGraph.EDGE_01);
+								featureGraph.setEdge(featureName, sibiling.getFeature().getName(), MatrixFeatureGraph.EDGE_10);
+								featureGraph.setEdge(featureName, sibiling.getFeature().getName(), MatrixFeatureGraph.EDGE_01);
 							}
 						}
 					} else {
-						for (Feature sibiling : parent.getChildren()) {
+						for (IFeatureStructure sibiling : parent.getChildren()) {
 							if (!deadFeatures.contains(sibiling)) {
-								featureGraph.setEdge(featureName, sibiling.getName(), MatrixFeatureGraph.EDGE_10);
-								featureGraph.setEdge(featureName, sibiling.getName(), MatrixFeatureGraph.EDGE_01Q);
+								featureGraph.setEdge(featureName, sibiling.getFeature().getName(), MatrixFeatureGraph.EDGE_10);
+								featureGraph.setEdge(featureName, sibiling.getFeature().getName(), MatrixFeatureGraph.EDGE_01Q);
 							}
 						}
 
-						if (processedParents.add(parent)) {
+						if (processedParents.add(parent.getFeature())) {
 							final ArrayList<Variable> list = new ArrayList<>(nonDeadSibilingCount + 1);
-							for (Feature sibiling : parent.getChildren()) {
+							for (IFeatureStructure sibiling : parent.getChildren()) {
 								if (!deadFeatures.contains(sibiling)) {
-									list.add(conf.getVariable(featureGraph.getFeatureIndex(sibiling.getName())));
+									list.add(conf.getVariable(featureGraph.getFeatureIndex(sibiling.getFeature().getName())));
 								}
 							}
 							if (!coreFeatures.contains(parent)) {
-								list.add(new Not2(conf.getVariable(featureGraph.getFeatureIndex(parent.getName()))));
+								list.add(new Not2(conf.getVariable(featureGraph.getFeatureIndex(parent.getFeature().getName()))));
 							}
 							expList.add(new Xor(list.toArray(new Variable[0])));
 						}
@@ -202,31 +182,31 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 				} else if (parent.isOr()) {
 					// TODO atomic set would be better than core feature
 					boolean optionalFeature = false;
-					for (Feature sibiling : parent.getChildren()) {
+					for (IFeatureStructure sibiling : parent.getChildren()) {
 						if (coreFeatures.contains(sibiling)) {
 							optionalFeature = true;
 							break;
 						}
 					}
 					if (!optionalFeature) {
-						for (Feature sibiling : parent.getChildren()) {
+						for (IFeatureStructure sibiling : parent.getChildren()) {
 							if (!deadFeatures.contains(sibiling)) {
-								featureGraph.setEdge(featureName, sibiling.getName(), MatrixFeatureGraph.EDGE_01Q);
+								featureGraph.setEdge(featureName, sibiling.getFeature().getName(), MatrixFeatureGraph.EDGE_01Q);
 							}
 						}
 
-						if (processedParents.add(parent)) {
+						if (processedParents.add(parent.getFeature())) {
 							final ArrayList<Variable> list = new ArrayList<>(nonDeadSibilingCount);
-							for (Feature sibiling : parent.getChildren()) {
+							for (IFeatureStructure sibiling : parent.getChildren()) {
 								if (!deadFeatures.contains(sibiling)) {
-									list.add(conf.getVariable(featureGraph.getFeatureIndex(sibiling.getName())));
+									list.add(conf.getVariable(featureGraph.getFeatureIndex(sibiling.getFeature().getName())));
 								}
 							}
 							final Or2 or2 = new Or2(list.toArray(new Variable[0]));
 							if (coreFeatures.contains(parent)) {
 								expList.add(or2);
 							} else {
-								expList.add(new Xor(new Variable[] { or2, new Not2(conf.getVariable(featureGraph.getFeatureIndex(parent.getName()))) }));
+								expList.add(new Xor(new Variable[] { or2, new Not2(conf.getVariable(featureGraph.getFeatureIndex(parent.getFeature().getName()))) }));
 							}
 						}
 					}
@@ -234,15 +214,9 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 			}
 		}
 
-		c1 = 0;
-		c2 = 0;
-		for (Constraint constraint : constraints) {
+		for (IConstraint constraint : constraints) {
 			connect(constraint.getNode(), conf);
 		}
-
-//		System.out.println(c1);
-//		System.out.println(c2);
-//		System.out.println();
 
 		final ArrayList<LinkedList<Expression>> expListAr = featureGraph.getExpListAr();
 		for (Expression exp : expList) {
@@ -257,16 +231,14 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 		}
 
 		final ArrayList<String> featureNames = new ArrayList<>();
-		for (Feature feature : features) {
+		for (IFeature feature : features) {
 			featureNames.add(feature.getName());
 		}
 
 		if (featureGraph instanceof MatrixFeatureGraph) {
-//			final long stsart = System.nanoTime();
 			final DFSThread dfsThread = new DFSThread((MatrixFeatureGraph) featureGraph, workMonitor);
 			dfsThread.addObjects(featureNames);
 			dfsThread.start();
-//			System.out.println("DFS Time: " + Math.floor((System.nanoTime() - start) / 1000000.0) / 1000.0 + "s");
 		}
 
 		return featureGraph;
@@ -274,25 +246,14 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 
 	@Override
 	protected boolean work() throws Exception {
-		if (!loadFeatureGraph()) {
+		final FeatureGraphFormat format = new FeatureGraphFormat();
+		Path path = Paths.get("model." + format.getSuffix());
+		if (!new FileReader<IFeatureGraph>().read(path, featureGraph, format)) {
 			createFeatureGraph();
-			writeFeatureGraph();
+			new FileWriter<IFeatureGraph>(path, featureGraph, format);
 		}
-
-		arguments.featureModel.setFeatureGraph(featureGraph);
-
 		return true;
 	}
-
-	//	private void collectContainedFeatures(Node node, Set<String> featureNames) {
-	//		if (node instanceof Literal) {
-	//			featureNames.add((String) ((Literal) node).var);
-	//		} else {
-	//			for (Node child : node.getChildren()) {
-	//				collectContainedFeatures(child, featureNames);
-	//			}
-	//		}
-	//	}
 
 	private void buildClique(Node... nodes) {
 		final Node cnfNode = new And(nodes).toCNF();
@@ -491,14 +452,9 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 				} else if (cnfNode instanceof Or) {
 					convertNode(conf, cnfNode);
 				}
-				c1++;
-			} else {
-				c2++;
 			}
 		}
 	}
-
-	private int c1, c2;
 
 	private final List<Expression> expList = new ArrayList<>();
 
@@ -506,7 +462,7 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 		final ArrayList<Variable> list = new ArrayList<>(andChild.getChildren().length);
 		for (Node orChild : andChild.getChildren()) {
 			final String featureName = ((Literal) orChild).var.toString();
-			final Feature feature = arguments.featureModel.getFeature(featureName);
+			final IFeature feature = arguments.featureModel.getFeature(featureName);
 			if (feature == null || coreFeatures.contains(feature)) {
 				return;
 			}

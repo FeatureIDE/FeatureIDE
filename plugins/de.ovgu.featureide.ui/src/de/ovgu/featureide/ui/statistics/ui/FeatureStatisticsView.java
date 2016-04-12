@@ -23,9 +23,7 @@ package de.ovgu.featureide.ui.statistics.ui;
 import static de.ovgu.featureide.fm.core.localization.StringTable.REFRESH_VIEW;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATING_FEATURESTATISTICSVIEW;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -38,13 +36,16 @@ import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.ide.ResourceUtil;
+import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.ViewPart;
 
-import de.ovgu.featureide.fm.core.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -150,10 +151,11 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 	/**
 	 * Listener that refreshes the view every time the model has been edited.
 	 */
-	private PropertyChangeListener modelListener = new PropertyChangeListener() {
-		public void propertyChange(PropertyChangeEvent evt) {
-			if (!PropertyConstants.MODEL_LAYOUT_CHANGED.equals(evt.getPropertyName()))
+	private IEventListener modelListener = new IEventListener() {
+		public void propertyChange(FeatureIDEEvent evt) {
+			if (!FeatureIDEEvent.MODEL_LAYOUT_CHANGED.equals(evt.getPropertyName())){
 				refresh(false);
+			}
 		}
 
 	};
@@ -163,7 +165,7 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 	/**
 	 * Refresh the view.
 	 */
-	private void refresh(final boolean button) {
+	private void refresh(final boolean force) {
 		if (contentProvider.isCanceled()) {
 			return;
 		}
@@ -197,7 +199,7 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 							IResource anyFile = ResourceUtil.getResource(((IEditorPart) currentEditor).getEditorInput());
 							//TODO is refresh really necessary? -> true?
 
-							if (button || currentInput == null || !anyFile.getProject().equals(currentInput.getProject())) {
+							if (force || currentInput == null || !anyFile.getProject().equals(currentInput.getProject())) {
 								contentProvider.calculateContent(anyFile, true);
 								currentInput = anyFile;
 							} else {
@@ -232,9 +234,9 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 	 * Watches changes in the feature model if the selected editor is an
 	 * instance of @{link FeatureModelEditor}
 	 */
-	private void setEditor(IEditorPart activeEditor) {
+	private void setEditor(IEditorPart newEditor) {
 		if (currentEditor != null) {
-			if (currentEditor == activeEditor) {
+			if (currentEditor == newEditor) {
 				return;
 			}
 
@@ -242,11 +244,24 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 				((FeatureModelEditor) currentEditor).getFeatureModel().removeListener(modelListener);
 			}
 		}
-
-		currentEditor = activeEditor;
-		if (activeEditor instanceof FeatureModelEditor) {
+		boolean force = true;
+		if (newEditor != null && currentEditor != null) {
+			IEditorInput newInput = newEditor.getEditorInput();
+			if (newInput instanceof FileEditorInput) {
+				IEditorInput oldInput = currentEditor.getEditorInput();
+				if (oldInput instanceof FileEditorInput) {
+					IProject newProject = ((FileEditorInput) newInput).getFile().getProject();
+					IProject oldProject = ((FileEditorInput) oldInput).getFile().getProject();
+					if (newProject.equals(oldProject)) {
+						force = false;
+					}
+				}
+			}
+		}
+		currentEditor = newEditor;
+		if (newEditor instanceof FeatureModelEditor) {
 			((FeatureModelEditor) currentEditor).getFeatureModel().addListener(modelListener);
 		}
-		refresh(false);
+		refresh(force);
 	}
 }

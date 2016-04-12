@@ -25,18 +25,20 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.CALCULATE_REDU
 import org.eclipse.gef.ui.parts.GraphicalViewerImpl;
 import org.eclipse.jface.action.Action;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
- * TODO description
+ * Action to specify feature model analysis.<br>
+ * Enables / disables checks for redundant constraints.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke
  */
 public class RedundantConstrainsCalculationsAction extends Action {
 
-	private final FeatureModel featureModel;
+	private final IFeatureModel featureModel;
 
-	public RedundantConstrainsCalculationsAction(GraphicalViewerImpl viewer, FeatureModel featureModel) {
+	public RedundantConstrainsCalculationsAction(GraphicalViewerImpl viewer, IFeatureModel featureModel) {
 		super(CALCULATE_REDUNDANT_CONSTRAINTS);
 		this.featureModel = featureModel;
 		setChecked(featureModel.getAnalyser().calculateRedundantConstraints);

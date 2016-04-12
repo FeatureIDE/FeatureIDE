@@ -29,10 +29,13 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.TAUTOLOGY;
  * @author Jens Meinicke
  */
 public interface XMLFeatureModelTags {
+	static final String PROPERTIES = "properties";
 	static final String FEATURE_MODEL = "featureModel";
 	static final String STRUCT = "struct";
 	static final String FEATURE_ORDER = "featureOrder";
 	static final String CONSTRAINTS = "constraints";
+	static final String CONSTRAINT = "constraint";
+	static final String FEATURES = "features";
 	static final String CHOSEN_LAYOUT_ALGORITHM = "chosenLayoutAlgorithm";
 	static final String C = "c";
 	static final String TRUE = "true";

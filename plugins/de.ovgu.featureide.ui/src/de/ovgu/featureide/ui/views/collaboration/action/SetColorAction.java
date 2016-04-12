@@ -26,8 +26,8 @@ import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.RGB;
 
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
@@ -121,8 +121,8 @@ public class SetColorAction extends AbstractColorAction {
 	}
 
 	@Override
-	protected boolean action(FeatureModel fm, String collName) {
-		Feature feature = fm.getFeature(collName);
+	protected boolean action(IFeatureModel fm, String collName) {
+		IFeature feature = fm.getFeature(collName);
 		if (feature != null) {
 			FeatureColorManager.setColor(feature, FeatureColor.getColor(index));
 			return true;

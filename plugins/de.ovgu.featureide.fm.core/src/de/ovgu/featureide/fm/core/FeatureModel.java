@@ -20,20 +20,16 @@
  */
 package de.ovgu.featureide.fm.core;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.EMPTY_FEATURE_MODEL;
+import static de.ovgu.featureide.fm.core.base.FeatureUtils.convert;
 
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.File;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -41,7 +37,12 @@ import javax.annotation.Nonnull;
 import org.eclipse.core.resources.IProject;
 import org.prop4j.Node;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.core.conf.IFeatureGraph;
+import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
  * The model representation of the feature tree that notifies listeners of
@@ -52,184 +53,65 @@ import de.ovgu.featureide.fm.core.conf.IFeatureGraph;
  * @author Stefan Krueger
  * 
  */
-public class FeatureModel extends DeprecatedFeatureModel implements PropertyConstants, IGraphicItem {
-	
-	private Feature rootFeature;
+public class FeatureModel extends DeprecatedFeatureModel implements PropertyConstants, IGraphicItem, Cloneable {
 
-	/**
-	 * A {@link Map} containing all features.
-	 */
-	private final Map<String, Feature> featureTable = new ConcurrentHashMap<String, Feature>();
-
-	protected final List<Constraint> constraints = new LinkedList<Constraint>();
-
-	private final List<PropertyChangeListener> listenerList = new LinkedList<PropertyChangeListener>();
-
-	private final FeatureModelAnalyzer analyser = createAnalyser();
-
-	private final RenamingsManager renamingsManager = new RenamingsManager(this);
-
-	/**
-	 * All comment lines from the model file without line number at which they
-	 * occur
-	 */
-	private final List<String> comments;
-
-	/**
-	 * Saves the annotations from the model file as they were read,
-	 * because they were not yet used.
-	 */
-	private final List<String> annotations;
-
-	/**
-	 * A list containing the feature names in their specified order will be
-	 * initialized in XmlFeatureModelReader.
-	 */
-	private final List<String> featureOrderList;
-
-	private final FeatureModelLayout layout;
-
-	private boolean featureOrderUserDefined;
-
-	private boolean featureOrderInXML;
-
-	private Object undoContext;
-
-	private FMComposerManager fmComposerManager;
+	public IFeatureModel model;
 
 	public FeatureModel() {
-		super();
+		throw new RuntimeException("Do not use this construction any longer. Use direct assigment to member 'model' instead");
+	}
 
-		this.featureOrderList = new LinkedList<String>();
-		this.featureOrderUserDefined = false;
-		this.featureOrderInXML = false;
-
-		this.comments = new LinkedList<>();
-		this.annotations = new LinkedList<>();
-
-		this.layout = new FeatureModelLayout();
+	public FeatureModel(IFeatureModel model) {
+		this.model = model;
 	}
 
 	protected FeatureModel(FeatureModel oldFeatureModel, boolean complete) {
-		this(oldFeatureModel, null, complete);
-	}
-
-	public FeatureModel(FeatureModel oldFeatureModel, Feature newRoot, boolean complete) {
-		super();
-
-		if (newRoot == null) {
-			this.featureOrderList = new LinkedList<String>(oldFeatureModel.featureOrderList);
-
-			if (oldFeatureModel.rootFeature != null) {
-				this.rootFeature = oldFeatureModel.rootFeature.clone(this, complete);
-
-				for (final Constraint constraint : oldFeatureModel.constraints) {
-					this.addConstraint(new Constraint(this, constraint.getNode().clone()));
-				}
-			}
-		} else {
-			final HashSet<Feature> featuresToInclude = new HashSet<>();
-			Features.getAllFeatures(featuresToInclude, newRoot);
-
-			this.featureOrderList = new LinkedList<>();
-			for (String featureName : oldFeatureModel.featureOrderList) {
-				final Feature feature = this.getFeature(featureName);
-				if (feature != null && featuresToInclude.contains(feature)) {
-					this.featureOrderList.add(feature.getName());
-				}
-			}
-
-			this.rootFeature = newRoot.clone(this, complete);
-
-			for (final Constraint constraint : oldFeatureModel.constraints) {
-				if (featuresToInclude.containsAll(constraint.getContainedFeatures())) {
-					this.addConstraint(new Constraint(this, constraint.getNode().clone()));
-				}
-			}
-		}
-
-		this.featureOrderUserDefined = oldFeatureModel.featureOrderUserDefined;
-		this.featureOrderInXML = oldFeatureModel.featureOrderInXML;
-
-		if (complete) {
-			this.annotations = new LinkedList<String>(oldFeatureModel.annotations);
-			this.comments = new LinkedList<String>(oldFeatureModel.comments);
-			this.layout = oldFeatureModel.layout.clone();
-		} else {
-			this.comments = Collections.emptyList();
-			this.annotations = Collections.emptyList();
-			this.layout = new FeatureModelLayout();
-		}
+		this.model = oldFeatureModel.model.clone();
 	}
 
 	protected FeatureModelAnalyzer createAnalyser() {
-		return new FeatureModelAnalyzer(this);
+		return model.getAnalyser();
 	}
 
 	/**
 	 * Returns the {@link FeatureModelAnalyzer} which should be used for all calculation
 	 * on the {@link FeatureModel}.
 	 */
-	@Override
 	public FeatureModelAnalyzer getAnalyser() {
-		return analyser;
+		return model.getAnalyser();
 	}
 
 	@Override
-	public FeatureModelLayout getLayout() {
-		return layout;
-    }
-	
+	public IFeatureModelLayout getLayout() {
+		//		return model.getLayout();
+		return null;
+	}
+
+	public ColorschemeTable getColorschemeTable() {
+		//		return model.getGraphicRepresenation().getColorschemeTable();
+		return null;
+	}
+
 	@Override
 	public FMComposerManager getFMComposerManager(final IProject project) {
-		if (fmComposerManager == null) {
-			fmComposerManager = new FMComposerManager(project);
-		}
-		return fmComposerManager;
+		return model.getFMComposerManager(project);
 	}
 
 	public IFMComposerExtension initFMComposerExtension(final IProject project) {
-		return getFMComposerManager(project);
+		return model.initFMComposerExtension(project);
 	}
 
 	public IFMComposerExtension getFMComposerExtension() {
-		return getFMComposerManager(null).getFMComposerExtension();
+		return model.getFMComposerExtension();
 	}
 
 	@Override
 	public RenamingsManager getRenamingsManager() {
-		return renamingsManager;
+		return model.getRenamingsManager();
 	}
 
 	public void reset() {
-		if (rootFeature != null) {
-			while (rootFeature.hasChildren()) {
-				Feature child = rootFeature.getLastChild();
-				deleteChildFeatures(child);
-				rootFeature.removeChild(child);
-				featureTable.remove(child.getName());
-			}
-			rootFeature = null;
-		}
-		featureTable.clear();
-		renamingsManager.clear();
-		constraints.clear();
-		if (comments != null) {
-			comments.clear();
-		}
-		if (annotations != null) {
-			annotations.clear();
-		}
-		featureOrderList.clear();
-	}
-
-	private void deleteChildFeatures(Feature feature) {
-		while (feature.hasChildren()) {
-			Feature child = feature.getLastChild();
-			deleteChildFeatures(child);
-			feature.removeChild(child);
-			featureTable.remove(child.getName());
-		}
+		FeatureUtils.reset(model);
 	}
 
 	/**
@@ -239,74 +121,30 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	 * @param projectName The name of the project
 	 */
 	public void createDefaultValues(String projectName) {
-		String rootName = getValidJavaIdentifier(projectName);
-		if (rootName.isEmpty()) {
-			rootName = "Root";
-		}
-		if (featureTable.isEmpty()) {
-			rootFeature = new Feature(this, rootName);
-			addFeature(rootFeature);
-		}
-		Feature feature = new Feature(this, "Base");
-		addFeature(feature);
-
-		rootFeature.addChild(feature);
-		rootFeature.setAbstract(true);
+		FeatureUtils.createDefaultValues(model, projectName);
 	}
 
-	/**
-	 * Removes all invalid java identifiers form a given string.
-	 */
-	private String getValidJavaIdentifier(String s) {
-		StringBuilder stringBuilder = new StringBuilder();
-		int i = 0;
-		for (; i < s.length(); i++) {
-			if (Character.isJavaIdentifierStart(s.charAt(i))) {
-				stringBuilder.append(s.charAt(i));
-				i++;
-				break;
-			}
-		}
-		for (; i < s.length(); i++) {
-			if (Character.isJavaIdentifierPart(s.charAt(i))) {
-				stringBuilder.append(s.charAt(i));
-			}
-		}
-		return stringBuilder.toString();
-	}
-
-	/* *****************************************************************
-	 * 
-	 * Feature handling
-	 * 
-	 *******************************************************************/
 	public void setRoot(Feature root) {
-		this.rootFeature = root;
+		FeatureUtils.setRoot(model, convert(root));
 	}
 
 	public Feature getRoot() {
-		return rootFeature;
+		return convert(FeatureUtils.getRoot(model));
 	}
 
-	/**
-	 * @param featureTable
-	 *            the featureTable to set
-	 */
 	public void setFeatureTable(final Hashtable<String, Feature> featureTable) {
-		this.featureTable.clear();
-		this.featureTable.putAll(featureTable);
+		Hashtable<String, IFeature> iFeatureTable = new Hashtable<>();
+		for (String key : Functional.toIterator(featureTable.keys()))
+			iFeatureTable.put(key, convert(featureTable.get(key)));
+		FeatureUtils.setFeatureTable(model, iFeatureTable);
 	}
 
 	public boolean addFeature(Feature feature) {
-		String name = feature.getName();
-		if (featureTable.containsKey(name))
-			return false;
-		featureTable.put(name, feature);
-		return true;
+		return FeatureUtils.addFeature(model, convert(feature));
 	}
 
 	public Collection<Feature> getFeatures() {
-		return Collections.unmodifiableCollection(featureTable.values());
+		return Functional.toList(Functional.map(FeatureUtils.getFeatures(model), FeatureUtils.IFEATURE_TO_FEATURE));
 	}
 
 	/**
@@ -314,7 +152,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	 */
 	@CheckForNull
 	public Feature getFeature(String name) {
-		return featureTable.get(name);
+		return convert(FeatureUtils.getFeature(model, name));
 	}
 
 	/**
@@ -323,20 +161,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	 */
 	@Nonnull
 	public Collection<Feature> getConcreteFeatures() {
-		List<Feature> concreteFeatures = new LinkedList<Feature>();
-		if (rootFeature != null) {
-			getConcreteFeatures(rootFeature, concreteFeatures);
-		}
-		return Collections.unmodifiableCollection(concreteFeatures);
-	}
-
-	private void getConcreteFeatures(Feature feature, List<Feature> concreteFeatures) {
-		if (feature.isConcrete()) {
-			concreteFeatures.add(feature);
-		}
-		for (Feature child : feature.getChildren()) {
-			getConcreteFeatures(child, concreteFeatures);
-		}
+		return Functional.toList(Functional.map(FeatureUtils.getConcreteFeatures(model), FeatureUtils.IFEATURE_TO_FEATURE));
 	}
 
 	/**
@@ -345,35 +170,15 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	 */
 	@Nonnull
 	public List<String> getConcreteFeatureNames() {
-		List<String> concreteFeatureNames = new LinkedList<String>();
-		for (Feature f : getConcreteFeatures()) {
-			concreteFeatureNames.add(f.getName());
-		}
-		return concreteFeatureNames;
+		return Functional.toList(FeatureUtils.getConcreteFeatureNames(model));
 	}
 
 	public Collection<Feature> getFeaturesPreorder() {
-		List<Feature> preorderFeatures = new LinkedList<Feature>();
-		if (rootFeature != null) {
-			getFeaturesPreorder(rootFeature, preorderFeatures);
-		}
-		return Collections.unmodifiableCollection(preorderFeatures);
-	}
-
-	private void getFeaturesPreorder(Feature feature, List<Feature> preorderFeatures) {
-
-		preorderFeatures.add(feature);
-		for (Feature child : feature.getChildren()) {
-			getFeaturesPreorder(child, preorderFeatures);
-		}
+		return Functional.toList(Functional.map(FeatureUtils.getFeaturesPreorder(model), FeatureUtils.IFEATURE_TO_FEATURE));
 	}
 
 	public List<String> getFeatureNamesPreorder() {
-		List<String> preorderFeaturesNames = new LinkedList<String>();
-		for (Feature f : getFeaturesPreorder()) {
-			preorderFeaturesNames.add(f.getName());
-		}
-		return preorderFeaturesNames;
+		return FeatureUtils.getFeatureNamesPreorder(model);
 	}
 
 	/**
@@ -382,238 +187,150 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	 */
 	@Deprecated
 	public boolean isConcrete(String featureName) {
-		Feature feature = featureTable.get(featureName);
-		return feature != null && feature.isConcrete();
+		return FeatureUtils.isConcrete(model, featureName);
 	}
 
 	/**
 	 * @return the featureTable
 	 */
 	protected Map<String, Feature> getFeatureTable() {
-		return featureTable;
+		Map<String, Feature> result = new HashMap<>();
+		final Map<String, IFeature> map = FeatureUtils.getFeatureTable(model);
+		for (String key : map.keySet())
+			result.put(key, convert(map.get(key)));
+		return result;
 	}
 
 	public Set<String> getFeatureNames() {
-		return Collections.unmodifiableSet(featureTable.keySet());
+		return FeatureUtils.getFeatureNames(model);
 	}
 
 	public int getNumberOfFeatures() {
-		return featureTable.size();
+		return FeatureUtils.getNumberOfFeatures(model);
 	}
 
 	public void deleteFeatureFromTable(Feature feature) {
-		featureTable.remove(feature.getName());
+		FeatureUtils.deleteFeatureFromTable(model, convert(feature));
 	}
 
 	public boolean deleteFeature(Feature feature) {
-		// the root can not be deleted
-		if (feature == rootFeature) {
-			return false;
-		}
-
-		// check if it exists
-		String name = feature.getName();
-		if (!featureTable.containsKey(name)) {
-			return false;
-		}
-
-		// use the group type of the feature to delete
-		Feature parent = feature.getParent();
-
-		if (parent.getChildrenCount() == 1) {
-			if (feature.isAnd()) {
-				parent.setAnd();
-			} else if (feature.isAlternative()) {
-				parent.setAlternative();
-			} else {
-				parent.setOr();
-			}
-		}
-
-		// add children to parent
-		int index = parent.getChildIndex(feature);
-		while (feature.hasChildren()) {
-			parent.addChildAtPosition(index, feature.removeLastChild());
-		}
-
-		// delete feature
-		parent.removeChild(feature);
-		featureTable.remove(name);
-		featureOrderList.remove(name);
-		return true;
+		return FeatureUtils.deleteFeature(model, convert(feature));
 	}
 
 	public void replaceRoot(Feature feature) {
-		featureTable.remove(rootFeature.getName());
-		rootFeature = feature;
+		FeatureUtils.replaceRoot(model, convert(feature));
 	}
 
-	/* *****************************************************************
-	 * 
-	 * Constraint handling
-	 * 
-	 *#*****************************************************************/
 	public void setConstraints(final LinkedList<Constraint> constraints) {
-		this.constraints.clear();
-		this.constraints.addAll(constraints);
+		FeatureUtils.setConstraints(model, Functional.map(Functional.toIterator(constraints), FeatureUtils.CONSTRAINT_TO_ICONSTRANT));
 	}
 
 	public void addPropositionalNode(Node node) {
-		addConstraint(new Constraint(this, node));
+		FeatureUtils.addPropositionalNode(model, node);
 	}
 
 	public void addConstraint(Constraint constraint) {
-		constraints.add(constraint);
+		FeatureUtils.addConstraint(model, FeatureUtils.convert(constraint));
 	}
 
 	public void addPropositionalNode(Node node, int index) {
-		addConstraint(new Constraint(this, node), index);
+		FeatureUtils.addPropositionalNode(model, node, index);
 	}
-
+	
 	public void addConstraint(Constraint constraint, int index) {
-		constraints.add(index, constraint);
+		FeatureUtils.addConstraint(model, FeatureUtils.convert(constraint), index);
 	}
 
 	public List<Node> getPropositionalNodes() {
-		LinkedList<Node> nodes = new LinkedList<Node>();
-		for (Constraint c : constraints) {
-			nodes.add(c.getNode());
-		}
-		return Collections.unmodifiableList(nodes);
+		return Functional.toList(FeatureUtils.getPropositionalNodes(model));
 	}
 
 	public Node getConstraint(int index) {
-		return constraints.get(index).getNode();
+		return FeatureUtils.getConstraint(model, index);
 	}
 
 	public List<Constraint> getConstraints() {
-		return Collections.unmodifiableList(constraints);
+		return Functional.toList(Functional.map(FeatureUtils.getConstraints(model), FeatureUtils.ICONSTRAINT_TO_CONSTRANT));
 	}
 
-	/**
-	 * 
-	 * @param constraint
-	 * @return The position of the given {@link Constraint} or
-	 *         -1 if it does not exist.
-	 */
 	public int getConstraintIndex(Constraint constraint) {
-		int j = 0;
-		for (Constraint c : constraints) {
-			if (constraint == c) {
-				return j;
-			}
-			j++;
-		}
-		return -1;
+		return FeatureUtils.getConstraintIndex(model, FeatureUtils.convert(constraint));
 	}
 
 	public void removePropositionalNode(Node node) {
-		for (Constraint c : constraints) {
-			if (c.getNode().equals(node)) {
-				removeConstraint(c);
-				break;
-			}
-		}
+		FeatureUtils.removePropositionalNode(model, node);
 	}
 
 	public void removeConstraint(Constraint constraint) {
-		constraints.remove(constraint);
+		FeatureUtils.removeConstraint(model, FeatureUtils.convert(constraint));
 	}
 
 	public void removeConstraint(int index) {
-		constraints.remove(index);
+		FeatureUtils.removeConstraint(model, index);
 	}
 
 	public void replacePropNode(int index, Node node) {
-		assert (index < constraints.size());
-		constraints.set(index, new Constraint(this, node));
+		FeatureUtils.replacePropNode(model, index, node);
 	}
 
 	public int getConstraintCount() {
-		return constraints.size();
+		return FeatureUtils.getConstraintCount(model);
 	}
 
 	public List<String> getAnnotations() {
-		return Collections.unmodifiableList(annotations);
+		return FeatureUtils.getAnnotations(model);
 	}
 
 	public void addAnnotation(String annotation) {
-		annotations.add(annotation);
+		FeatureUtils.addAnnotation(model, annotation);
 	}
 
 	public List<String> getComments() {
-		return Collections.unmodifiableList(comments);
+		return FeatureUtils.getComments(model);
 	}
 
 	public void addComment(String comment) {
-		comments.add(comment);
+		FeatureUtils.addComment(model, comment);
 	}
 
 	public void addListener(PropertyChangeListener listener) {
-		if (!listenerList.contains(listener)) {
-			listenerList.add(listener);
-		}
+		FeatureUtils.addListener(model, listener);
 	}
 
 	public void removeListener(PropertyChangeListener listener) {
-		listenerList.remove(listener);
+		FeatureUtils.removeListener(model, listener);
 	}
 
 	public void handleModelDataLoaded() {
-		fireEvent(MODEL_DATA_LOADED);
+		FeatureUtils.handleModelDataLoaded(model);
 	}
 
 	public void handleModelDataChanged() {
-		fireEvent(MODEL_DATA_CHANGED);
+		FeatureUtils.handleModelDataChanged(model);
 	}
 
 	public void handleModelLayoutChanged() {
-		fireEvent(MODEL_LAYOUT_CHANGED);
+		FeatureUtils.handleModelLayoutChanged(model);
 	}
 
 	public void handleLegendLayoutChanged() {
-		fireEvent(LEGEND_LAYOUT_CHANGED);
+		FeatureUtils.handleLegendLayoutChanged(model);
 	}
 
 	public void refreshContextMenu() {
-		fireEvent(REFRESH_ACTIONS);
+		FeatureUtils.refreshContextMenu(model);
 	}
 
 	/**
 	 * Refreshes the diagram colors.
 	 */
 	public void redrawDiagram() {
-		fireEvent(REDRAW_DIAGRAM);
+		FeatureUtils.redrawDiagram(model);
 	}
 
-	private final void fireEvent(final String action) {
-		final PropertyChangeEvent event = new PropertyChangeEvent(this, action, Boolean.FALSE, Boolean.TRUE);
-		for (PropertyChangeListener listener : listenerList) {
-			listener.propertyChange(event);
-		}
-	}
-	
-	public final void fireEvent(PropertyChangeEvent event) {
-		for (PropertyChangeListener listener : listenerList) {
-			listener.propertyChange(event);
-		}
-	}
-	
 	@Override
 	public FeatureModel clone() {
-		final FeatureModel clone = new FeatureModel();
-		clone.featureTable.putAll(featureTable);
-		if (rootFeature == null) {
-			// TODO this should never happen
-			clone.rootFeature = new Feature(clone, "Root");
-			clone.featureTable.put("root", clone.rootFeature);
-		} else {
-			clone.rootFeature = clone.getFeature(rootFeature.getName());
-		}
-		clone.constraints.addAll(constraints);
-		clone.annotations.addAll(annotations);
-		clone.comments.addAll(comments);
-		return clone;
+		return new FeatureModel(model.clone());
 	}
 
 	/**
@@ -624,7 +341,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	 * @see #clone(boolean)
 	 */
 	public FeatureModel deepClone() {
-		return deepClone(true);
+		return (FeatureModel) model.clone();
 	}
 
 	/**
@@ -639,102 +356,49 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	 * @see #clone()
 	 */
 	public FeatureModel deepClone(boolean complete) {
-		return new FeatureModel(this, complete);
+		return (FeatureModel) model.clone();
 	}
 
-	/**
-	 * @return true if feature model contains mandatory features otherwise false
-	 */
 	public boolean hasMandatoryFeatures() {
-		for (Feature f : featureTable.values()) {
-			Feature parent = f.getParent();
-			if (parent != null && parent.isAnd() && f.isMandatory())
-				return true;
-		}
-		return false;
+		return FeatureUtils.hasMandatoryFeatures(model);
 	}
 
-	/**
-	 * @return <code>true</code> if feature model contains optional features otherwise false
-	 */
 	public boolean hasOptionalFeatures() {
-		for (Feature f : featureTable.values()) {
-			if (!f.equals(rootFeature) && f.getParent().isAnd() && !f.isMandatory())
-				return true;
-		}
-		return false;
+		return FeatureUtils.hasOptionalFeatures(model);
 	}
 
-	/**
-	 * @return true if feature model contains and group otherwise false
-	 */
 	public boolean hasAndGroup() {
-		for (Feature f : featureTable.values()) {
-			if (f.getChildrenCount() > 1 && f.isAnd())
-				return true;
-		}
-		return false;
+		return FeatureUtils.hasAndGroup(model);
 	}
 
-	/**
-	 * @return true if feature model contains alternative group otherwise false
-	 */
 	public boolean hasAlternativeGroup() {
-		for (Feature f : featureTable.values()) {
-			if (f.getChildrenCount() > 1 && f.isAlternative())
-				return true;
-		}
-		return false;
+		return FeatureUtils.hasAlternativeGroup(model);
 	}
 
 	/**
 	 * @return true if feature model contains or group otherwise false
 	 */
 	public boolean hasOrGroup() {
-		for (Feature f : featureTable.values()) {
-			if (f.getChildrenCount() > 1 && f.isOr())
-				return true;
-		}
-		return false;
+		return FeatureUtils.hasOrGroup(model);
 	}
 
 	public boolean hasAbstract() {
-		for (Feature f : featureTable.values()) {
-			if (f.isAbstract())
-				return true;
-		}
-		return false;
+		return FeatureUtils.hasAbstract(model);
 	}
 
 	public boolean hasConcrete() {
-		for (Feature f : featureTable.values()) {
-			if (f.isConcrete())
-				return true;
-		}
-		return false;
+		return FeatureUtils.hasConcrete(model);
 	}
 
 	/**
 	 * @return number of or groups contained in the feature model
 	 */
 	public int numOrGroup() {
-		int count = 0;
-		for (Feature f : featureTable.values()) {
-			if (f.getChildrenCount() > 1 && f.isOr()) {
-				count++;
-			}
-		}
-		return count;
+		return FeatureUtils.numOrGroup(model);
 	}
 
 	public int numAlternativeGroup() {
-		int count = 0;
-		for (Feature f : featureTable.values()) {
-			if (f.getChildrenCount() > 1 && f.isAlternative()) {
-				count++;
-			}
-		}
-		return count;
+		return FeatureUtils.numAlternativeGroup(model);
 	}
 
 	/**
@@ -742,208 +406,89 @@ public class FeatureModel extends DeprecatedFeatureModel implements PropertyCons
 	 * @return <code>true</code> if the feature model contains a hidden feature
 	 */
 	public boolean hasHidden() {
-		for (Feature f : featureTable.values()) {
-			if (f.isHidden()) {
-				return true;
-			}
-		}
-		return false;
+		return FeatureUtils.hasHidden(model);
 	}
 
 	public boolean hasIndetHidden() {
-		for (Feature f : featureTable.values()) {
-			if (f.getFeatureStatus() == FeatureStatus.INDETERMINATE_HIDDEN) {
-				return true;
-			}
-		}
-		return false;
+		return FeatureUtils.hasIndetHidden(model);
 	}
 
 	public boolean hasUnsatisfiableConst() {
-		for (Constraint c : constraints) {
-			if (c.getConstraintAttribute() == ConstraintAttribute.UNSATISFIABLE) {
-				return true;
-			}
-		}
-		return false;
+		return FeatureUtils.hasUnsatisfiableConst(model);
 	}
 
 	public boolean hasTautologyConst() {
-		for (Constraint c : constraints) {
-			if (c.getConstraintAttribute() == ConstraintAttribute.TAUTOLOGY) {
-				return true;
-			}
-		}
-		return false;
+		return FeatureUtils.hasTautologyConst(model);
 	}
 
 	public boolean hasDeadConst() {
-		for (Constraint c : constraints) {
-			if (c.getConstraintAttribute() == ConstraintAttribute.DEAD || !c.getDeadFeatures().isEmpty()) {
-				return true;
-			}
-		}
-		return false;
+		return FeatureUtils.hasDeadConst(model);
 	}
 
 	public boolean hasVoidModelConst() {
-		for (Constraint c : constraints) {
-			if (c.getConstraintAttribute() == ConstraintAttribute.VOID_MODEL)
-				return true;
-		}
-		return false;
+		return FeatureUtils.hasVoidModelConst(model);
 	}
 
 	public boolean hasRedundantConst() {
-		for (Constraint c : constraints) {
-			if (c.getConstraintAttribute() == ConstraintAttribute.REDUNDANT) {
-				return true;
-			}
-		}
-		return false;
+		return FeatureUtils.hasRedundantConst(model);
 	}
 
 	public boolean hasFalseOptionalFeatures() {
-		for (Feature f : featureTable.values()) {
-			if (f.getFeatureStatus() == FeatureStatus.FALSE_OPTIONAL) {
-				return true;
-			}
-		}
-		return false;
+		return FeatureUtils.hasFalseOptionalFeatures(model);
 	}
 
 	public void setUndoContext(Object undoContext) {
-		this.undoContext = undoContext;
+		//		FeatureUtils.setUndoContext(model, undoContext);
 	}
 
 	public Object getUndoContext() {
-		return undoContext;
+		//		return FeatureUtils.getUndoContext(model);
+		return null;
 	}
 
 	public List<String> getFeatureOrderList() {
-		if (featureOrderList.isEmpty()) {
-			return getConcreteFeatureNames();
-		}
-		return featureOrderList;
+		return Functional.toList(FeatureUtils.getFeatureOrderList(model));
 	}
 
 	public void setFeatureOrderList(final List<String> featureOrderList) {
-		this.featureOrderList.clear();
-		this.featureOrderList.addAll(featureOrderList);
+		FeatureUtils.setFeatureOrderList(model, featureOrderList);
 	}
 
 	public boolean isFeatureOrderUserDefined() {
-		return featureOrderUserDefined;
+		return FeatureUtils.isFeatureOrderUserDefined(model);
 	}
 
 	public void setFeatureOrderUserDefined(boolean featureOrderUserDefined) {
-		this.featureOrderUserDefined = featureOrderUserDefined;
+		FeatureUtils.setFeatureOrderUserDefined(model, featureOrderUserDefined);
 	}
 
 	public boolean isFeatureOrderInXML() {
-		return featureOrderInXML;
+		//		return FeatureUtils.isFeatureOrderInXML(model);
+		return false;
 	}
 
 	public void setFeatureOrderInXML(boolean featureOrderInXML) {
-		this.featureOrderInXML = featureOrderInXML;
+		//		FeatureUtils.setFeatureOrderInXML(model, featureOrderInXML);
 	}
 
 	@Override
 	public String toString() {
-		String x = "";
-		try {
-			x = toString(getRoot());
-			for (Constraint c : getConstraints()) {
-				x += c.toString() + " ";
-			}
-		} catch (Exception e) {
-			return EMPTY_FEATURE_MODEL;
-		}
-		return x;
-	}
-
-	private String toString(Feature feature) {
-		String x = feature.getName();
-		if (!feature.hasChildren()) {
-			return x;
-		}
-		if (feature.isOr()) {
-			x += " or [";
-		} else if (feature.isAlternative()) {
-			x += " alt [";
-		} else {
-			x += " and [";
-		}
-
-		for (Feature child : feature.getChildren()) {
-			x += " ";
-			if (feature.isAnd()) {
-				if (child.isMandatory()) {
-					x += "M ";
-				} else {
-					x += "O ";
-				}
-			}
-
-			if (child.hasChildren()) {
-				x += toString(child);
-			} else {
-				x += child.getName();
-			}
-		}
-		return x + " ] ";
+		return FeatureUtils.toString(model);
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		return obj == this;// TODO equals should be implemented
+		return FeatureUtils.equals(model, obj);
 	}
 
 	@Override
 	public int hashCode() {
-		int hash = featureOrderList.hashCode();
-		//		for (String f : featureOrderList) {
-		//			hash = hash * 7 + f.hashCode();
-		//		}
-		for (Constraint c : constraints) {
-			hash = hash * 7 + c.toString().hashCode();
-		}
-		return hash;
-	}
-	
-	private IFeatureGraph featureGraph = null;
-	
-	public IFeatureGraph getFeatureGraph() {
-		return featureGraph;
-	}
-
-	public void setFeatureGraph(IFeatureGraph featureGraph) {
-		this.featureGraph = featureGraph;
+		return FeatureUtils.hashCode(model);
 	}
 
 	@Override
 	public GraphicItem getItemType() {
-		return GraphicItem.Model;
-	}
-	
-	/**
-	 * TODO: REMOVE THIS, THIS IS A HACK
-	 */
-	File sourceFile;
-
-	/**
-	 * TODO: REMOVE THIS, THIS IS A HACK
-	 */
-	public void xxxSetSourceFile(File file) {
-		sourceFile = file;
+		return FeatureUtils.getItemType(model);
 	}
 
-	
-	/**
-	 * TODO: REMOVE THIS, THIS IS A HACK
-	 */
-	public File xxxGetSourceFile() {
-		return sourceFile;
-	}
-	
 }

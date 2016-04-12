@@ -23,12 +23,13 @@ package de.ovgu.featureide.fm.core.color;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
  * Saves colors for features.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class ColorScheme {
 	
@@ -81,7 +82,7 @@ public class ColorScheme {
 	/**
 	 * Sets the color of the given feature.
 	 */
-	public void setColor(Feature feature, FeatureColor color) {
+	public void setColor(IFeature feature, FeatureColor color) {
 		setColor(feature.getName(), color);
 	}
 	
@@ -95,7 +96,7 @@ public class ColorScheme {
 	/**
 	 * Returns the color of the given feature.
 	 */
-	public FeatureColor getColor(Feature feature) {
+	public FeatureColor getColor(IFeature feature) {
 		if (colors.containsKey(feature.getName())) {
 			return colors.get(feature.getName());
 		}

@@ -33,11 +33,13 @@ import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.swt.graphics.Color;
 
-import de.ovgu.featureide.fm.core.ExtendedFeatureModel;
-import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer.Attribute;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
+import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 import de.ovgu.featureide.fm.ui.properties.language.ILanguage;
@@ -48,6 +50,7 @@ import de.ovgu.featureide.fm.ui.properties.language.ILanguage;
  * @author Fabian Benduhn
  * @author Florian Proksch
  * @author Stefan Krueger
+ * @author Marcus Pinnecke
  */
 public class LegendFigure extends Figure implements GUIDefaults {
 
@@ -139,26 +142,27 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		return true;
 	}
 
-	public LegendFigure(FeatureModel featureModel, Point pos) {
+	public LegendFigure(IGraphicalFeatureModel graphicalFeatureModel, Point pos) {
+		final IFeatureModel featureModel = graphicalFeatureModel.getFeatureModel();
 		final FeatureModelAnalyzer analyser = featureModel.getAnalyser();
 
-		mandatory = featureModel.hasMandatoryFeatures();
-		optional = featureModel.hasOptionalFeatures();
-		alternative = featureModel.hasAlternativeGroup();
-		or = featureModel.hasOrGroup();
-		_abstract = featureModel.hasAbstract();
-		concrete = featureModel.hasConcrete();
-		hidden = featureModel.hasHidden();
+		mandatory = featureModel.getStructure().hasMandatoryFeatures();
+		optional = featureModel.getStructure().hasOptionalFeatures();
+		alternative = featureModel.getStructure().hasAlternativeGroup();
+		or = featureModel.getStructure().hasOrGroup();
+		_abstract = featureModel.getStructure().hasAbstract();
+		concrete = featureModel.getStructure().hasConcrete();
+		hidden = featureModel.getStructure().hasHidden();
 		dead = analyser.getAttributeFlag(Attribute.Dead);
 		
-		showHidden = featureModel.getLayout().showHiddenFeatures();
-		falseoptional = featureModel.hasFalseOptionalFeatures();
-		indetHidden = featureModel.hasIndetHidden();
+		showHidden = graphicalFeatureModel.getLayout().showHiddenFeatures();
+		falseoptional = featureModel.getStructure().hasFalseOptionalFeatures();
+		indetHidden = featureModel.getStructure().hasIndetHidden();
 
-		unsatisfiableConst = analyser.calculateConstraints && featureModel.hasUnsatisfiableConst();
-		tautologyConst = analyser.calculateTautologyConstraints && featureModel.hasTautologyConst();
-		voidModelConst = analyser.calculateConstraints && featureModel.hasVoidModelConst();
-		redundantConst = analyser.calculateRedundantConstraints && featureModel.hasRedundantConst();
+		unsatisfiableConst = analyser.calculateConstraints && FeatureUtils.hasUnsatisfiableConst(featureModel);
+		tautologyConst = analyser.calculateTautologyConstraints && FeatureUtils.hasTautologyConst(featureModel);
+		voidModelConst = analyser.calculateConstraints && FeatureUtils.hasVoidModelConst(featureModel);
+		redundantConst = analyser.calculateRedundantConstraints && FeatureUtils.hasRedundantConst(featureModel);
 
 		if (featureModel instanceof ExtendedFeatureModel) {
 			ExtendedFeatureModel extendedFeatureModel = (ExtendedFeatureModel) featureModel;
@@ -173,8 +177,8 @@ public class LegendFigure extends Figure implements GUIDefaults {
 		setLayoutManager(layout);
 		setBorder(FMPropertyManager.getLegendBorder());
 		setLegendSize();
-		FeatureUIHelper.setLegendSize(featureModel, this.getSize());
-		FeatureUIHelper.setLegendFigure(featureModel, this);
+		FeatureUIHelper.setLegendSize(graphicalFeatureModel, this.getSize());
+		FeatureUIHelper.setLegendFigure(graphicalFeatureModel, this);
 		createRows();
 		setForegroundColor(FMPropertyManager.getLegendForgroundColor());
 		setBackgroundColor(FMPropertyManager.getLegendBackgroundColor());

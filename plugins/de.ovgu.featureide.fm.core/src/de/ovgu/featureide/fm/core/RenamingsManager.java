@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.core;
 
-import java.beans.PropertyChangeEvent;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,20 +30,28 @@ import org.eclipse.core.resources.IFile;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 
+import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
-import de.ovgu.featureide.fm.core.io.FeatureModelFile2;
+import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.FileManagerMap;
 
 /**
  * Handles feature renamings.
  * 
  * @author Jens Meinicke
+ * @author Marcus Pinnecke (Feature Interface)
  */
 public class RenamingsManager {
 	/**
 	 * a list containing all renamings since the last save
 	 */
 	private final List<Renaming> renamings = new LinkedList<Renaming>();
-	private final FeatureModel model;
+	private final IFeatureModel model;
 	
 	/* *****************************************************************
 	 * 
@@ -52,30 +59,30 @@ public class RenamingsManager {
 	 * 
 	 *#*****************************************************************/
 	
-	public RenamingsManager(FeatureModel model) {
+	public RenamingsManager(IFeatureModel model) {
 		 this.model = model;
 	}
 	
 	public boolean renameFeature(final String oldName, final String newName) {
-		final Map<String, Feature> featureTable = model.getFeatureTable();
+		final Map<String, IFeature> featureTable = model.getFeatureTable();
 		if (!featureTable.containsKey(oldName)
 				|| featureTable.containsKey(newName)) {
 			return false;
 		}
-		final List<Constraint> constraints = model.getConstraints();
-		final List<String> featureOrderList = model.getFeatureOrderList();
-		Feature feature = featureTable.remove(oldName);
+		final List<IConstraint> constraints = model.getConstraints();
+		final List<String> featureOrderList = Functional.toList(model.getFeatureOrderList());
+		IFeature feature = featureTable.remove(oldName);
 		feature.setName(newName);
 		featureTable.put(newName, feature);
 		renamings.add(new Renaming(oldName, newName));
-		for (Constraint c : constraints) {
+		for (IConstraint c : constraints) {
 			renameVariables(c.getNode(), oldName, newName);
 		}
 		
 		// update the feature order list
 		for (int i = 0;i < featureOrderList.size();i++) {
 			if (featureOrderList.get(i).equals(oldName)) {
-				featureOrderList.set(i, newName);
+				model.setFeatureOrderListItem(i, newName);
 				break;
 			}
 		}
@@ -88,9 +95,9 @@ public class RenamingsManager {
 	}
 
 	public void performRenamings() {
-		final List<Constraint> constraints = model.getConstraints();
+		final List<IConstraint> constraints = model.getConstraints();
 		for (Renaming renaming : renamings) {
-			for (Constraint c : constraints) {
+			for (IConstraint c : constraints) {
 				renameVariables(c.getNode(), renaming.oldName, renaming.newName);
 			}
 		}
@@ -98,9 +105,14 @@ public class RenamingsManager {
 	};
 
 	public void performRenamings(IFile file) {
-		final FeatureModel projectModel = FeatureModelFile2.getInstance(file).getFeatureModel();
+		final FeatureModelManager instance = FileManagerMap.<IFeatureModel, FeatureModelManager>getInstance(file.getLocation().toString());
+		if (instance == null) {
+			return;
+		}
+		instance.read();
+		final IFeatureModel projectModel = instance.getObject();
 		for (Renaming renaming : renamings) {
-			final PropertyChangeEvent event = new PropertyChangeEvent(model, PropertyConstants.FEATURE_NAME_CHANGED, renaming.oldName, renaming.newName);
+			final FeatureIDEEvent event = new FeatureIDEEvent(model, PropertyConstants.FEATURE_NAME_CHANGED, renaming.oldName, renaming.newName);
 			projectModel.fireEvent(event);
 			model.fireEvent(event);
 		}

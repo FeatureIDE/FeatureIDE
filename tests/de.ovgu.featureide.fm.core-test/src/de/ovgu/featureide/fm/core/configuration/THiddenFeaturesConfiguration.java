@@ -27,8 +27,8 @@ import java.util.List;
 
 import org.junit.Test;
 
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
  * Tests about handling of hidden features during configuration
@@ -41,17 +41,17 @@ public class THiddenFeaturesConfiguration extends AbstractConfigurationTest {
 	 * @see de.ovgu.featureide.fm.core.configuration.AbstractConfigurationTest#loadModel()
 	 */
 	@Override
-	FeatureModel loadModel() {
+	IFeatureModel loadModel() {
 		return null;
 	}
 	
 	
 	@Test
 	public void testMandatoryHidden() {
-		FeatureModel fm = loadXML("<and mandatory=\"true\" name=\"S\"><feature hidden=\"true\" mandatory=\"true\" name=\"B\"/></and>");
+		IFeatureModel fm = loadXML("<and mandatory=\"true\" name=\"S\"><feature hidden=\"true\" mandatory=\"true\" name=\"B\"/></and>");
 		Configuration c = new Configuration(fm);
 		assertEquals(1, c.number());
-		List<Feature> list = new ArrayList<Feature>();
+		List<IFeature> list = new ArrayList<IFeature>();
 		list.add(fm.getFeature("S"));
 		list.add(fm.getFeature("B"));
 		assertEquals(c.getSelectedFeatures(), list);
@@ -59,21 +59,21 @@ public class THiddenFeaturesConfiguration extends AbstractConfigurationTest {
 
 	@Test
 	public void testOptionalHidden() {
-		FeatureModel fm = loadXML("<and mandatory=\"true\" name=\"S\"><feature hidden=\"true\" mandatory=\"false\" name=\"B\"/></and>");
+		IFeatureModel fm = loadXML("<and mandatory=\"true\" name=\"S\"><feature hidden=\"true\" mandatory=\"false\" name=\"B\"/></and>");
 		Configuration c = new Configuration(fm);
 		assertEquals(1, c.number());
-		List<Feature> list = new ArrayList<Feature>();
+		List<IFeature> list = new ArrayList<IFeature>();
 		list.add(fm.getFeature("S"));
 		assertEquals(list, c.getSelectedFeatures());
 	}
 	
 	@Test
 	public void testAlternativeHidden() {
-		FeatureModel fm = loadXML("<alt mandatory=\"true\" name=\"S\"><feature mandatory=\"true\" name=\"A\"/><feature hidden=\"true\" mandatory=\"true\" name=\"B\"/></alt>");
+		IFeatureModel fm = loadXML("<alt mandatory=\"true\" name=\"S\"><feature mandatory=\"true\" name=\"A\"/><feature hidden=\"true\" mandatory=\"true\" name=\"B\"/></alt>");
 		Configuration c = new Configuration(fm);
 		assertEquals(2, c.number());
 		c.setManual("A", Selection.UNSELECTED);
-		List<Feature> list = new ArrayList<Feature>();
+		List<IFeature> list = new ArrayList<IFeature>();
 		list.add(fm.getFeature("S"));
 		list.add(fm.getFeature("B"));
 		//set={S,B}
@@ -88,10 +88,10 @@ public class THiddenFeaturesConfiguration extends AbstractConfigurationTest {
 	
 	@Test
 	public void testHidden() {
-		FeatureModel fm = loadXML("<and mandatory=\"true\" name=\"S\"><feature hidden=\"true\" mandatory=\"false\" name=\"B\"/></and>");
+		IFeatureModel fm = loadXML("<and mandatory=\"true\" name=\"S\"><feature hidden=\"true\" mandatory=\"false\" name=\"B\"/></and>");
 		Configuration c = new Configuration(fm);
 		assertEquals(1, c.number());
-		List<Feature> list = new ArrayList<Feature>();
+		List<IFeature> list = new ArrayList<IFeature>();
 		list.add(fm.getFeature("S"));
 		assertEquals(list, c.getSelectedFeatures());
 	}

@@ -49,6 +49,7 @@ import org.sat4j.tools.ModelIterator;
 import org.sat4j.tools.SolutionCounter;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
+import de.ovgu.featureide.fm.core.job.WorkMonitor;
 
 /**
  * A solver that computes if a given propositional node is satisfiable and
@@ -682,7 +683,45 @@ public class SatSolver {
 	}
 
 	public void reset() {
-		solver.reset();		
+		solver.reset();
+	}
+
+	/**
+	 * Creates one solutions to cover the given features.
+	 * 
+	 * @param features The features that should be covered. 
+	 * @param selection true is the features should be selected, false otherwise.
+	 */
+	public List<String> coverFeatures(Collection<String> features, boolean selection, WorkMonitor monitor) throws TimeoutException {
+		final VecInt vector = new VecInt();
+		List<String> coveredFeatures = new LinkedList<>();
+		for (final String feature : features) {
+			Integer integer = (selection ? 1 : -1) * varToInt.get(feature);
+			vector.push(integer);
+			if (solver.isSatisfiable(vector)) {
+				monitor.worked();
+				coveredFeatures.add(feature);
+			} else {
+				vector.pop().push(-integer);
+			}
+		}
+		features.removeAll(coveredFeatures);
+		if (coveredFeatures.isEmpty()) {
+			throw new RuntimeException("Something went wrong! No features are covered.");
+		}
+		if (!solver.isSatisfiable(vector)) {
+			throw new RuntimeException("Unexpected solver exception");
+		}
+
+		int[] model = solver.model();
+		List<String> featureList = new ArrayList<String>(model.length);
+		for (int var : model) {
+			if (var > 0) {
+				featureList.add(intToVar.get(var).toString().intern());
+			}
+		}
+
+		return featureList;
 	}
 
 }
