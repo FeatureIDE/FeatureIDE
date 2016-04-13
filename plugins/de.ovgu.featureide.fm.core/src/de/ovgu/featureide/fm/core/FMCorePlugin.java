@@ -26,10 +26,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.READING_MODEL_
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 import org.eclipse.core.resources.IContainer;
@@ -37,13 +34,11 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.osgi.framework.BundleContext;
-import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel.UsedModel;
@@ -228,66 +223,4 @@ public class FMCorePlugin extends AbstractCorePlugin {
 		return nodeCreator.createNodes();
 	}
 
-	public static List<String> splitFeatureModel(IFeatureModel featureModel, int level, int limit) {
-		final ArrayList<String> rootNames = new ArrayList<>();
-		final IFeatureStructure root = featureModel.getStructure().getRoot();
-		if (root != null) {
-			split_rec(root, rootNames, 0, level, limit);
-		}
-		return rootNames;
-	}
-
-	private static void split_rec(IFeatureStructure root, ArrayList<String> rootNames, int level, int x, int y) {
-		final int featureLimit = y;
-		final int levelLimit = x;
-		final List<IFeatureStructure> children = root.getChildren();
-		for (IFeatureStructure feature : children) {
-			final int c = countChildren(feature);
-			if (c > 0) {
-				if (c > featureLimit && level < levelLimit) {
-					split_rec(feature, rootNames, level + 1, x, y);
-				} else {
-					rootNames.add(feature.getFeature().getName());
-				}
-			} else {
-				rootNames.add(feature.getFeature().getName());
-			}
-		}
-	}
-
-	private static int countChildren(IFeatureStructure root) {
-		final List<IFeatureStructure> children = root.getChildren();
-		int count = children.size();
-		for (IFeatureStructure feature : children) {
-			count += countChildren(feature);
-		}
-		return count;
-	}
-
-	public static List<List<String>> mergeAtomicSets(List<List<List<Literal>>> atomicSetLists) {
-		final HashMap<String, Collection<String>> atomicSetMap = new HashMap<>();
-		for (List<List<Literal>> atomicSetList : atomicSetLists) {
-			for (List<Literal> atomicSet : atomicSetList) {
-				final HashSet<String> newSet = new HashSet<>();
-				for (Literal literal : atomicSet) {
-					newSet.add(literal.var.toString());
-				}
-				for (Literal literal : atomicSet) {
-					final Collection<String> oldSet = atomicSetMap.get(literal.var.toString());
-					if (oldSet != null) {
-						newSet.addAll(oldSet);
-					}
-				}
-				for (String featureName : newSet) {
-					atomicSetMap.put(featureName, newSet);
-				}
-			}
-		}
-		final HashSet<Collection<String>> mergedAtomicSetsSet = new HashSet<>(atomicSetMap.values());
-		final List<List<String>> mergedAtomicSets = new ArrayList<>(mergedAtomicSetsSet.size() + 1);
-		for (Collection<String> atomicSet : mergedAtomicSetsSet) {
-			mergedAtomicSets.add(new ArrayList<>(atomicSet));
-		}
-		return mergedAtomicSets;
-	}
 }

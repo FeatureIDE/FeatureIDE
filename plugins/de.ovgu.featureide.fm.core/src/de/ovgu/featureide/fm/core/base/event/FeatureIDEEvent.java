@@ -77,15 +77,10 @@ public class FeatureIDEEvent {
 	}
 	
 	public FeatureIDEEvent(Object source, EventType eventType) {
-		this(source, null, false, eventType, null, null);
+		this(source, eventType, null, null);
 	}
 
 	public FeatureIDEEvent(Object source, EventType eventType, Object oldValue, Object newValue) {
-		this(source, null, false, eventType, oldValue, newValue);
-	}
-
-	@Deprecated
-	public FeatureIDEEvent(Object source, Object editor, boolean persistent, EventType eventType, Object oldValue, Object newValue) {
 		this.source = source;
 		this.eventType = eventType;
 		this.oldValue = oldValue;
@@ -94,16 +89,6 @@ public class FeatureIDEEvent {
 
 	public Object getSource() {
 		return source;
-	}
-
-	@Deprecated
-	public Object getEditor() {
-		return null;
-	}
-
-	@Deprecated
-	public boolean isPersistent() {
-		return false;
 	}
 
 	public EventType getEventType() {
@@ -123,6 +108,5 @@ public class FeatureIDEEvent {
 		return "FeatureIDEEvent [source=" + source + ", eventType=" + eventType + ", oldValue=" + oldValue
 				+ ", newValue=" + newValue + "]";
 	}
-
 	
 }

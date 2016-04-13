@@ -43,15 +43,8 @@ public class DefaultEventManager implements IEventManager, IEventListener {
 
 	@Override
 	public void fireEvent(FeatureIDEEvent event) {
-		if (event.isPersistent() || event.getEditor() == null) {
-			for (final IEventListener listener : listenerList) {
-				callListener(event, listener);
-			}
-		} else {
-			final int listenerIndex = listenerList.indexOf(event.getEditor());
-			if (listenerIndex >= 0) {
-				callListener(event, listenerList.get(listenerIndex));
-			}
+		for (final IEventListener listener : listenerList) {
+			callListener(event, listener);
 		}
 	}
 

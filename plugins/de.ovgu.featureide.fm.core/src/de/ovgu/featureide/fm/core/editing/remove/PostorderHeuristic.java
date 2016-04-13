@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,8 +20,8 @@
  */
 package de.ovgu.featureide.fm.core.editing.remove;
 
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 
 /**
  * Implementation of {@link AFeatureOrderHeuristic}.
@@ -31,19 +31,19 @@ import de.ovgu.featureide.fm.core.FeatureModel;
  */
 public class PostorderHeuristic extends ATreeHeuristic {
 
-	public PostorderHeuristic(DeprecatedFeature[] map, int length, FeatureModel featureModel) {
+	public PostorderHeuristic(DeprecatedFeature[] map, int length, IFeatureModel featureModel) {
 		super(map, length, featureModel);
 	}
 
 	@Override
-	protected void order(Feature root) {
+	protected void order(IFeatureStructure root) {
 		if (root.hasChildren()) {
-			for (Feature child : root.getChildren()) {
+			for (IFeatureStructure child : root.getChildren()) {
 				order(child);
 			}
-			find(root);
+			find(root.getFeature());
 		} else {
-			find(root);
+			find(root.getFeature());
 		}
 	}
 

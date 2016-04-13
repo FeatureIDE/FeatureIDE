@@ -251,22 +251,11 @@ public class FeatureModel implements IFeatureModel {
 
 	@Override
 	public void fireEvent(FeatureIDEEvent event) {
-		if (event.isPersistent() || event.getEditor() == null) {
-			for (final IEventListener listener : listenerList) {
-				try {
-					listener.propertyChange(event);
-				} catch (Exception e) {
-					FMCorePlugin.getDefault().logError(e);
-				}
-			}
-		} else {
-			final int listenerIndex = listenerList.indexOf(event.getEditor());
-			if (listenerIndex >= 0) {
-				try {
-					listenerList.get(listenerIndex).propertyChange(event);
-				} catch (Exception e) {
-					FMCorePlugin.getDefault().logError(e);
-				}
+		for (final IEventListener listener : listenerList) {
+			try {
+				listener.propertyChange(event);
+			} catch (Exception e) {
+				FMCorePlugin.getDefault().logError(e);
 			}
 		}
 	}

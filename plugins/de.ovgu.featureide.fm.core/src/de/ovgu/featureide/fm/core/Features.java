@@ -29,15 +29,16 @@ import java.util.Set;
 
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 
 public final class Features {
 
 	public static final String FEATURE_SUFFIX = "(Feature)";
 
-	public static void getAllFeatures(final Collection<Feature> features, final Feature startingPointFeature) {
+	public static void getAllFeatures(final Collection<IFeatureStructure> features, final IFeatureStructure startingPointFeature) {
 		features.add(startingPointFeature);
-		final List<Feature> list = startingPointFeature.getChildren();
-		for (final Feature feature : list) {
+		final List<IFeatureStructure> list = startingPointFeature.getChildren();
+		for (final IFeatureStructure feature : list) {
 			getAllFeatures(features, feature);
 		}
 	}

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -37,7 +37,7 @@ import org.sat4j.minisat.orders.VarOrderHeap;
 import org.sat4j.specs.IVecInt;
 import org.sat4j.specs.TimeoutException;
 
-import de.ovgu.featureide.fm.core.Feature;
+import de.ovgu.featureide.fm.core.base.IFeature;
 
 /**
  * Finds certain solutions of propositional formulas.
@@ -88,10 +88,10 @@ public class BasicSolver implements Cloneable {
 	protected final IOrder orgSolverOrder;
 	protected final int[] order;
 	protected final VecInt assignment;
-	
+
 	protected boolean keepHot = false;
 
-	public BasicSolver(Node cnf, List<Feature> featureList) {
+	public BasicSolver(Node cnf, List<IFeature> featureList) {
 		this(new SatInstance(cnf, featureList));
 	}
 
@@ -102,7 +102,7 @@ public class BasicSolver implements Cloneable {
 		solver = initSolver();
 		orgSolverOrder = solver.getOrder();
 	}
-	
+
 	public BasicSolver(BasicSolver oldSolver) {
 		this.satInstance = oldSolver.satInstance;
 		this.order = new int[satInstance.intToVar.length - 1];
@@ -111,7 +111,7 @@ public class BasicSolver implements Cloneable {
 		solver = initSolver();
 		orgSolverOrder = solver.getOrder();
 	}
-	
+
 	private Solver<?> initSolver() {
 		fixOrder();
 		Solver<?> solver = (Solver<?>) SolverFactory.newDefault();
@@ -164,9 +164,9 @@ public class BasicSolver implements Cloneable {
 		solver.setKeepSolverHot(keepHot);
 	}
 
-	public void setOrder(List<Feature> orderList) {
+	public void setOrder(List<IFeature> orderList) {
 		int i = -1;
-		for (Feature feature : orderList) {
+		for (IFeature feature : orderList) {
 			order[++i] = satInstance.varToInt.get(feature.getName());
 		}
 	}

@@ -88,7 +88,6 @@ import de.ovgu.featureide.featurehouse.meta.featuremodel.FeatureModelClassGenera
 import de.ovgu.featureide.featurehouse.model.FeatureHouseModelBuilder;
 import de.ovgu.featureide.featurehouse.signature.documentation.DocumentationCommentParser;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -713,7 +712,8 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			IFeatureModel fm = featureProject.getFeatureModel();
 			fm.getAnalyser().setDependencies();
 
-			Main fuji = new Main(fujiOptions, new FeatureModel(fm), FeatureUtils.extractConcreteFeaturesAsStringList(featureProject.getFeatureModel()));
+			@SuppressWarnings("deprecation")
+			Main fuji = new Main(fujiOptions, new de.ovgu.featureide.fm.core.FeatureModel(fm), FeatureUtils.extractConcreteFeaturesAsStringList(featureProject.getFeatureModel()));
 			
 			Composition composition = fuji.getComposition(fuji);
 			ast = composition.composeAST();

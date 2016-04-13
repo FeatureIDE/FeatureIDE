@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -22,8 +22,8 @@ package de.ovgu.featureide.fm.core.editing.remove;
 
 import java.util.LinkedList;
 
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 
 /**
  * Implementation of {@link AFeatureOrderHeuristic}.
@@ -33,18 +33,18 @@ import de.ovgu.featureide.fm.core.FeatureModel;
  */
 public class PreorderHeuristic extends ATreeHeuristic {
 
-	public PreorderHeuristic(DeprecatedFeature[] map, int length, FeatureModel featureModel) {
+	public PreorderHeuristic(DeprecatedFeature[] map, int length, IFeatureModel featureModel) {
 		super(map, length, featureModel);
 	}
 
 	@Override
-	protected void order(Feature root) {
-		LinkedList<Feature> list = new LinkedList<>();
+	protected void order(IFeatureStructure root) {
+		LinkedList<IFeatureStructure> list = new LinkedList<>();
 		list.add(root);
 		while (!list.isEmpty()) {
-			final Feature nextFeature = list.removeFirst();
+			final IFeatureStructure nextFeature = list.removeFirst();
 			list.addAll(0, nextFeature.getChildren());
-			find(nextFeature);
+			find(nextFeature.getFeature());
 		}
 	}
 

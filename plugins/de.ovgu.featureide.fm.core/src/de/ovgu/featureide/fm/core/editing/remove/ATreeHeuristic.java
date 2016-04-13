@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,8 +20,9 @@
  */
 package de.ovgu.featureide.fm.core.editing.remove;
 
-import de.ovgu.featureide.fm.core.Feature;
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 
 /**
  * Abstract extension of {@link AFeatureOrderHeuristic} for heuristic that work on a feature tree.
@@ -33,10 +34,10 @@ public abstract class ATreeHeuristic extends AFeatureOrderHeuristic {
 	protected final int[] indexArray;
 	protected int indexArrayIndex = 0;
 
-	public ATreeHeuristic(DeprecatedFeature[] map, int length, FeatureModel featureModel) {
+	public ATreeHeuristic(DeprecatedFeature[] map, int length, IFeatureModel featureModel) {
 		super(map, length);
 		indexArray = new int[length];
-		order(featureModel.getRoot());
+		order(featureModel.getStructure().getRoot());
 	}
 
 	@Override
@@ -44,13 +45,13 @@ public abstract class ATreeHeuristic extends AFeatureOrderHeuristic {
 		return indexArray[curIndex];
 	}
 
-	protected abstract void order(Feature root);
+	protected abstract void order(IFeatureStructure root);
 
 	protected void nextIndex() {
 		indexArrayIndex++;
 	}
 
-	protected final void find(Feature feature) {
+	protected final void find(IFeature feature) {
 		for (int i = 0; i < map.length; i++) {
 			final DeprecatedFeature deprecatedFeature = map[i];
 			if (deprecatedFeature != null && deprecatedFeature.getFeature().equals(feature.getName())) {

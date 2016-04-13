@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -36,7 +36,7 @@ import org.prop4j.Node;
 import org.prop4j.Or;
 import org.sat4j.specs.TimeoutException;
 
-import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.editing.cnf.CNFSolver;
 import de.ovgu.featureide.fm.core.editing.cnf.CNFSolver2;
@@ -64,7 +64,7 @@ public class FeatureRemover implements LongRunningMethod<Node> {
 	
 	public static int PARAM_REDUNDANCY_REMOVAL = 3;
 	public static int PARAM_FEATURE_ORDER = 1;
-	public static FeatureModel featureModel = null;
+	public static IFeatureModel featureModel = null;
 
 	private final Node fmNode;
 

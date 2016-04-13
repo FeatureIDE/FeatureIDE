@@ -63,7 +63,7 @@ public class SetFeatureToMandatoryOperation extends AbstractFeatureModelOperatio
 	protected FeatureIDEEvent operation() {
 		final boolean isMandatory = feature.getStructure().isMandatory();
 		feature.getStructure().setMandatory(!isMandatory);
-		return new FeatureIDEEvent(feature, null, false, EventType.MANDATORY_CHANGED, isMandatory, !isMandatory);
+		return new FeatureIDEEvent(feature, EventType.MANDATORY_CHANGED, isMandatory, !isMandatory);
 	}
 
 	@Override

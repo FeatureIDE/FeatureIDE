@@ -110,7 +110,7 @@ public abstract class AbstractFeatureModelOperation extends AbstractOperation {
 	final protected void fireEvent(@Nonnull FeatureIDEEvent event) {
 		if (event == null) {
 			System.out.println(getClass() + " operation() must retuan a FeatureIDEEvent");
-			event = new FeatureIDEEvent(featureModel, editor, false, null, null, null);
+			event = new FeatureIDEEvent(featureModel, null, null, null);
 		}
 		featureModel.fireEvent(event);
 	}
