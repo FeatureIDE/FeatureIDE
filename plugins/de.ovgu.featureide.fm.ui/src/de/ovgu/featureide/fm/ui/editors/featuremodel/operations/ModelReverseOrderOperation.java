@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -22,11 +22,13 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.REVERSE_LAYOUT_ORDER;
 
+import java.util.Collections;
+
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.util.tree.TreeOperations;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -44,26 +46,25 @@ public class ModelReverseOrderOperation extends AbstractGraphicalFeatureModelOpe
 
 	public ModelReverseOrderOperation(IGraphicalFeatureModel featureModel) {
 		super(featureModel, LABEL);
-		setEventId(FeatureIDEEvent.MODEL_DATA_LOADED);
 	}
 
 	@Override
 	protected FeatureIDEEvent operation() {
-		final IGraphicalFeature root = graphicalFeatureModel.getFeatures().getObject();
-		TreeOperations.reverse(root.getTree());
+		final IGraphicalFeature root = FeatureUIHelper.getGraphicalRootFeature(graphicalFeatureModel);
+		Collections.reverse(FeatureUIHelper.getGraphicalChildren(root));
 		if (!graphicalFeatureModel.getLayout().hasFeaturesAutoLayout()) {
-			Point mid = FeatureUIHelper.getLocation(root).getCopy();
-			mid.x += FeatureUIHelper.getSize(root).width / 2;
-			mid.y += FeatureUIHelper.getSize(root).height / 2;
+			Point mid = root.getLocation().getCopy();
+			mid.x += root.getSize().width / 2;
+			mid.y += root.getSize().height / 2;
 			mirrorFeaturePositions(root, mid, FeatureUIHelper.hasVerticalLayout(graphicalFeatureModel));
 		}
-		return null;
+		return new FeatureIDEEvent(null, EventType.LOCATION_CHANGED);
 	}
 
 	private void mirrorFeaturePositions(IGraphicalFeature feature, Point mid, boolean vertical) {
-		if (!feature.getTree().isRoot()) {
-			Point featureMid = FeatureUIHelper.getLocation(feature).getCopy();
-			Dimension size = FeatureUIHelper.getSize(feature).getCopy();
+		if (!feature.getObject().getStructure().isRoot()) {
+			Point featureMid = feature.getLocation().getCopy();
+			Dimension size = feature.getSize().getCopy();
 
 			if (vertical) {
 				featureMid.y += size.height / 2;
@@ -75,10 +76,10 @@ public class ModelReverseOrderOperation extends AbstractGraphicalFeatureModelOpe
 				featureMid.x -= size.width / 2;
 			}
 
-			FeatureUIHelper.setLocation(feature, featureMid);
+			feature.setLocation(featureMid);
 		}
-		if (feature.getTree().hasChildren()) {
-			for (IGraphicalFeature child : feature.getTree().getChildrenObjects()) {
+		if (feature.getObject().getStructure().hasChildren()) {
+			for (IGraphicalFeature child : FeatureUIHelper.getGraphicalChildren(feature)) {
 				mirrorFeaturePositions(child, mid, vertical);
 			}
 		}

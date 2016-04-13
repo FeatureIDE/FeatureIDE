@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -40,8 +40,6 @@ import org.prop4j.Node;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
-import de.ovgu.featureide.fm.core.conf.IFeatureGraph;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
@@ -53,7 +51,8 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  * @author Stefan Krueger
  * 
  */
-public class FeatureModel extends DeprecatedFeatureModel implements PropertyConstants, IGraphicItem, Cloneable {
+@Deprecated
+public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem, Cloneable {
 
 	public IFeatureModel model;
 

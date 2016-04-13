@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -29,6 +29,7 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
@@ -82,7 +83,7 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 		}
 
 		oldChildren = oldChildrenCopy;
-		if (feature == featureModel.getStructure().getRoot()) {
+		if (feature.getStructure().isRoot()) {
 			featureModel.getStructure().replaceRoot(featureModel.getStructure().getRoot().removeLastChild());
 			deleted = true;
 		} else {
@@ -97,7 +98,7 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 				}
 			}
 		}
-		return null;
+		return new FeatureIDEEvent(feature, EventType.FEATURE_DELETE, oldParent, null);
 	}
 
 	@Override
@@ -132,7 +133,7 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 			}
 			featureModel.addFeature(feature);
 
-			//Replace Featurename in Constraints
+			//Replace feature name in Constraints
 			if (replacement != null) {
 				for (IConstraint c : featureModel.getConstraints()) {
 					if (c.getContainedFeatures().contains(replacement)) {
@@ -143,7 +144,7 @@ public class DeleteFeatureOperation extends AbstractFeatureModelOperation {
 		} catch (Exception e) {
 			FMUIPlugin.getDefault().logError(e);
 		}
-		return null;
+		return new FeatureIDEEvent(featureModel, EventType.FEATURE_ADD, null, feature);
 	}
 
 	@Override

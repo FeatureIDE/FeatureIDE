@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -41,7 +41,6 @@ import org.prop4j.NodeWriter;
 import de.ovgu.featureide.fm.core.ConstraintAttribute;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIBasics;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -90,18 +89,19 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 
 		setText(getConstraintText(constraint.getObject()));
 
-		FeatureUIHelper.setSize(constraint, getSize());
+		constraint.setSize(getSize());
 
 		add(label);
 		setOpaque(true);
 
-		if (FeatureUIHelper.getLocation(constraint) != null)
-			setLocation(FeatureUIHelper.getLocation(constraint));
+		if (constraint.getLocation() != null)
+			setLocation(constraint.getLocation());
 
 		init();
 	}
 
 	private void init() {
+		setText(getConstraintText(constraint.getObject()));
 		setBorder(FMPropertyManager.getConstraintBorder(constraint.isFeatureSelected()));
 		setBackgroundColor(FMPropertyManager.getConstraintBackgroundColor());
 	}
@@ -111,7 +111,7 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 	 */
 	public void setConstraintProperties() {
 		init();
-		
+
 		IConstraint constraint = this.constraint.getObject();
 
 		ConstraintAttribute constraintAttribute = constraint.getConstraintAttribute();

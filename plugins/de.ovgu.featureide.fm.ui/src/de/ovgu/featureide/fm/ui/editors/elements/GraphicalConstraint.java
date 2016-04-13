@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -24,9 +24,10 @@ import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
-import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
+import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
-import de.ovgu.featureide.fm.ui.editors.IGraphicalElement;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 
 /**
@@ -36,13 +37,23 @@ import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
  * @author Marcus Pinnecke
  * 
  */
-public class GraphicalConstraint implements IGraphicalConstraint, PropertyConstants {
+public class GraphicalConstraint implements IGraphicalConstraint {
 
 	protected final IConstraint correspondingConstraint;
 	protected final IGraphicalFeatureModel graphicalFeatureModel;
-
+	protected boolean featureSelected = false;
+	
 	protected Point location = new Point(0, 0);
 	protected Dimension dimension = new Dimension(10, 10);
+	private IEventListener uiObject;
+
+	public GraphicalConstraint(GraphicalConstraint constraint) {
+		featureSelected = constraint.featureSelected;
+		correspondingConstraint = constraint.correspondingConstraint;
+		graphicalFeatureModel = constraint.graphicalFeatureModel;
+		location = constraint.location;
+		dimension = constraint.dimension;
+	}
 
 	public GraphicalConstraint(IConstraint correspondingConstraint, IGraphicalFeatureModel graphicalFeatureModel) {
 		this.correspondingConstraint = correspondingConstraint;
@@ -66,17 +77,23 @@ public class GraphicalConstraint implements IGraphicalConstraint, PropertyConsta
 
 	@Override
 	public boolean isFeatureSelected() {
-		return correspondingConstraint.isFeatureSelected();
+		return featureSelected;
 	}
 
 	@Override
 	public void setFeatureSelected(boolean selected) {
-		correspondingConstraint.setFeatureSelected(selected);
+		if (featureSelected != selected) {
+			featureSelected = selected;
+			update(FeatureIDEEvent.getDefault(EventType.ATTRIBUTE_CHANGED));
+		}
 	}
 
 	@Override
 	public void setLocation(Point newLocation) {
-		location = newLocation;
+		if (!newLocation.equals(location)) {
+			location = newLocation;
+			update(FeatureIDEEvent.getDefault(EventType.CONSTRAINT_MOVE));
+		}
 	}
 
 	@Override
@@ -95,18 +112,24 @@ public class GraphicalConstraint implements IGraphicalConstraint, PropertyConsta
 	}
 
 	@Override
-	public void copyValues(IGraphicalElement element) {
-		if (element instanceof GraphicalConstraint) {
-			final GraphicalConstraint oldFeature = (GraphicalConstraint) element;
-
-			location = oldFeature.location;
-			dimension = oldFeature.dimension;
-		}
-	}
-
-	@Override
 	public String getGraphicType() {
 		return null;
 	}
 
+	@Override
+	public GraphicalConstraint clone() {
+		return new GraphicalConstraint(this);
+	}
+
+	@Override
+	public void update(FeatureIDEEvent event) {
+		if (uiObject != null) {
+			uiObject.propertyChange(event);
+		}
+	}
+
+	@Override
+	public void registerUIObject(IEventListener listener) {
+		this.uiObject = listener;
+	}
 }

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -37,7 +37,7 @@ import de.ovgu.featureide.core.fstmodel.RoleElement;
  * Filter to sort the entries in the collaboration outline by their orrurence in the file.
  * 
  * @author Dominic Labsch
- * @author Daniel Püsche
+ * @author Daniel Pï¿½sche
  */
 public class SortByOccurrenceInFeature implements ICollaborationOutlineFilter {
 	private IFile file;

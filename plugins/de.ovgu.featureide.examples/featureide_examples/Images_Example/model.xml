@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+	<featureModel>
+		<properties/>
+		<struct>
+			<and abstract="true" mandatory="true" name="Images_Example">
+				<description>
+					
+				</description>
+				<and mandatory="true" name="Character">
+					<description>
+						
+					</description>
+					<alt abstract="true" mandatory="true" name="Clothes">
+						<description>
+							
+						</description>
+						<and abstract="true" mandatory="true" name="NormalOutfit">
+							<description>
+								
+							</description>
+							<alt abstract="true" mandatory="true" name="TopClothing">
+								<description>
+									
+								</description>
+								<feature mandatory="true" name="RedSweater">
+									<description>
+										
+									</description>
+								</feature>
+								<feature mandatory="true" name="YellowSweater">
+									<description>
+										
+									</description>
+								</feature>
+							</alt>
+							<alt abstract="true" mandatory="true" name="BottomClothing">
+								<description>
+									
+								</description>
+								<feature mandatory="true" name="Jeans">
+									<description>
+										
+									</description>
+								</feature>
+								<feature mandatory="true" name="BrownPant">
+									<description>
+										
+									</description>
+								</feature>
+							</alt>
+						</and>
+						<alt abstract="true" mandatory="true" name="Costume">
+							<description>
+								
+							</description>
+							<feature mandatory="true" name="Koala">
+								<description>
+									
+								</description>
+							</feature>
+							<feature mandatory="true" name="Frog">
+								<description>
+									
+								</description>
+							</feature>
+						</alt>
+					</alt>
+					<or abstract="true" name="Objects">
+						<description>
+							
+						</description>
+						<feature mandatory="true" name="Ball">
+							<description>
+								
+							</description>
+						</feature>
+						<feature mandatory="true" name="Balloon">
+							<description>
+								
+							</description>
+						</feature>
+					</or>
+				</and>
+			</and>
+		</struct>
+		<constraints/>
+		<calculations Auto="true" Constraints="true" Features="true" Redundant="true" Tautology="true"/>
+		<comments/>
+		<featureOrder userDefined="true">
+			<feature name="Balloon"/>
+			<feature name="Ball"/>
+			<feature name="Character"/>
+			<feature name="Jeans"/>
+			<feature name="BrownPant"/>
+			<feature name="RedSweater"/>
+			<feature name="YellowSweater"/>
+			<feature name="Koala"/>
+			<feature name="Frog"/>
+		</featureOrder>
+	</featureModel>

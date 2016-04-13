@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -565,6 +565,7 @@ public class XmlFeatureModelFormat extends AXMLFormat<IFeatureModel> {
 	}
 
 	// TODO implement
+	@SuppressWarnings("unused")
 	private void throwWarning(String message, org.w3c.dom.Node node) throws UnsupportedModelException {
 		throw new UnsupportedModelException(message, Integer.parseInt(node.getUserData(PositionalXMLReader.LINE_NUMBER_KEY_NAME).toString()));
 	}

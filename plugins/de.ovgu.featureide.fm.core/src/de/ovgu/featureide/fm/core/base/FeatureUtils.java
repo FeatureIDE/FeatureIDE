@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -279,7 +279,7 @@ public final class FeatureUtils {
 		for (IConstraint constraint : bone.getFeatureModel().getConstraints()) {
 			for (IFeature f : constraint.getContainedFeatures()) {
 				if (f.getName().equals(bone.getName())) {
-					constraintList.add(new Constraint(bone.getFeatureModel(), constraint.getNode()));
+					constraintList.add((Constraint) constraint.clone(bone.getFeatureModel()));
 					break;
 				}
 			}
@@ -768,12 +768,13 @@ public final class FeatureUtils {
 	public static final void removePropositionalNode(IFeatureModel featureModel, Node node) {
 		List<IConstraint> constraints = featureModel.getConstraints();
 		int index = -1;
-		for (int i = 0; i < constraints.size(); i++)
+		for (int i = 0; i < constraints.size(); i++) {
 			if (constraints.get(i).getNode().equals(node)) {
 				index = i;
 				break;
 			}
-		tryRemoveConstraint(featureModel, constraints, index);
+		}
+		tryRemoveConstraint(featureModel, new LinkedList<>(constraints), index);
 	}
 
 	public static final void removeConstraint(IFeatureModel featureModel, IConstraint constraint) {
@@ -1020,14 +1021,6 @@ public final class FeatureUtils {
 
 	public static final ConstraintAttribute getConstraintAttribute(IConstraint constraint) {
 		return constraint.getConstraintAttribute();
-	}
-
-	public static final void setFeatureSelected(IConstraint constraint, boolean selected) {
-		constraint.setFeatureSelected(selected);
-	}
-
-	public static final boolean isFeatureSelected(IConstraint constraint) {
-		return constraint.isFeatureSelected();
 	}
 
 	public static final Node getNode(IConstraint constraint) {

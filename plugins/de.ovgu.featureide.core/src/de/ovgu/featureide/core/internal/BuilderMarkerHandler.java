@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -122,7 +122,7 @@ public class BuilderMarkerHandler implements IBuilderMarkerHandler {
 		try {
 			IMarker marker = resource.createMarker(CONFIGURATION_MARKER);
 			MarkerInfo info = ((Workspace)resource.getWorkspace()).getMarkerManager().findMarkerInfo(resource, marker.getId());
-			if (marker.exists()&& info == null) {
+			if (marker.exists() && info != null) {
 				marker.setAttribute(IMarker.MESSAGE, message);
 				marker.setAttribute(IMarker.SEVERITY, severity);
 				marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);

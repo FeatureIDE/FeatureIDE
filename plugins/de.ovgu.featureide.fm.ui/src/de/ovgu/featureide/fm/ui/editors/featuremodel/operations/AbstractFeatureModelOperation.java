@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -19,6 +19,8 @@
  * See http://featureide.cs.ovgu.de/ for further information.
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
+
+import javax.annotation.Nonnull;
 
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.operations.AbstractOperation;
@@ -46,8 +48,6 @@ public abstract class AbstractFeatureModelOperation extends AbstractOperation {
 	protected Object editor = null;
 
 	protected boolean executed = false;
-
-	private String eventId = FeatureIDEEvent.MODEL_DATA_CHANGED;
 
 	public AbstractFeatureModelOperation(IFeatureModel featureModel, String label) {
 		super(label);
@@ -81,6 +81,7 @@ public abstract class AbstractFeatureModelOperation extends AbstractOperation {
 		return Status.OK_STATUS;
 	}
 
+	@Nonnull
 	protected abstract FeatureIDEEvent operation();
 
 	public void redo() {
@@ -106,19 +107,12 @@ public abstract class AbstractFeatureModelOperation extends AbstractOperation {
 		executed = false;
 	}
 
-	final protected void fireEvent(FeatureIDEEvent event) {
+	final protected void fireEvent(@Nonnull FeatureIDEEvent event) {
 		if (event == null) {
-			event = new FeatureIDEEvent(featureModel, editor, false, eventId, null, null);
+			System.out.println(getClass() + " operation() must retuan a FeatureIDEEvent");
+			event = new FeatureIDEEvent(featureModel, editor, false, null, null, null);
 		}
 		featureModel.fireEvent(event);
-	}
-
-	protected final String getEventId() {
-		return eventId;
-	}
-
-	protected final void setEventId(String eventId) {
-		this.eventId = eventId;
 	}
 
 	public Object getEditor() {

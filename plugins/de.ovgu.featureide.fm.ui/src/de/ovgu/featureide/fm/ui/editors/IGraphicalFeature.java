@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -22,8 +22,10 @@ package de.ovgu.featureide.fm.ui.editors;
 
 import java.util.List;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.core.base.util.tree.Tree;
 
 /**
  * Graphical representation of a feature.
@@ -33,8 +35,6 @@ import de.ovgu.featureide.fm.core.base.util.tree.Tree;
 public interface IGraphicalFeature extends IGraphicalElement {
 
 	IFeature getObject();
-	
-	Tree<IGraphicalFeature> getTree();
 
 	boolean isConstraintSelected();
 
@@ -42,10 +42,13 @@ public interface IGraphicalFeature extends IGraphicalElement {
 	
 	void addTargetConnection(FeatureConnection connection);
 	
-	List<FeatureConnection> getSourceConnections();
+	@CheckForNull
+	FeatureConnection getSourceConnection();
+	@Nonnull
+	List<FeatureConnection> getSourceConnectionAsList();
 
 	List<FeatureConnection> getTargetConnections();
-	
-	boolean removeTargetConnection(FeatureConnection connection);
+
+	IGraphicalFeature clone();
 
 }

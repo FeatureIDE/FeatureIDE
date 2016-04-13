@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -222,6 +222,20 @@ public class SatSolver {
 			return convertToNodes(backbone);
 		}
 		return Collections.emptyList();
+	}
+
+	public boolean impliedValue(Literal leftNode, Literal rightNode) {
+		if (!contradiction) {
+			final IVecInt backbone = new VecInt();
+			backbone.push(varToInt.get(leftNode.var));
+			backbone.push(-varToInt.get(rightNode.var));
+			try {
+				return !solver.isSatisfiable(backbone);
+			} catch (TimeoutException e) {
+				FMCorePlugin.getDefault().logError(e);
+			}
+		}
+		return false;
 	}
 
 	public List<List<Literal>> atomicSets() {

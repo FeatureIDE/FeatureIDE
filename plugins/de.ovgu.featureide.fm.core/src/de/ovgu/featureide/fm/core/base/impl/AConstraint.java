@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -34,6 +34,7 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
@@ -53,8 +54,6 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 
 	protected final Collection<IFeature> falseOptionalFeatures = new LinkedList<>();
 
-//	protected IGraphicalConstraint graphicalRepresentation;
-
 	protected Node propNode;
 	boolean featureSelected;
 
@@ -62,14 +61,12 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 		super(oldConstraint, featureModel);
 		this.propNode = oldConstraint.propNode;
 		this.featureSelected = oldConstraint.featureSelected;
-//		this.graphicalRepresentation = GraphicMap.getInstance().getGraphicRepresentation(this);
 	}
 
 	public AConstraint(IFeatureModel featureModel, Node propNode) {
 		super(featureModel);
 		this.propNode = propNode;
 		this.featureSelected = false;
-//		this.graphicalRepresentation = GraphicMap.getInstance().getGraphicRepresentation(this);
 	}
 
 	@Override
@@ -148,7 +145,7 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 	public void setConstraintAttribute(ConstraintAttribute attri, boolean fire) {
 		attribute = attri;
 		if (fire) {
-			fireEvent(new FeatureIDEEvent(this, ATTRIBUTE_CHANGED, Boolean.FALSE, Boolean.TRUE));
+			fireEvent(new FeatureIDEEvent(this, EventType.ATTRIBUTE_CHANGED, Boolean.FALSE, Boolean.TRUE));
 		}
 	}
 
@@ -176,23 +173,7 @@ public abstract class AConstraint extends AFeatureModelElement implements IConst
 		fmFalseOptionals.removeAll(falseOptionalFeatures);
 		return !falseOptionalFeatures.isEmpty();
 	}
-
-//	@Override
-//	public IGraphicalConstraint getGraphicRepresenation() {
-//		return graphicalRepresentation;
-//	}
-
-	@Override
-	public boolean isFeatureSelected() {
-		return featureSelected;
-	}
-
-	@Override
-	public void setFeatureSelected(boolean b) {
-		featureSelected = b;
-		fireEvent(new FeatureIDEEvent(this, CONSTRAINT_SELECTED, Boolean.FALSE, Boolean.TRUE));
-	}
-
+	
 	public void setNode(Node node) {
 		this.propNode = node;
 	}

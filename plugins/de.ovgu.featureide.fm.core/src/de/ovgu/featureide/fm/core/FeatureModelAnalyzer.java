@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -542,6 +542,7 @@ public class FeatureModelAnalyzer {
 	 * So LinkedLists are much faster because the number of feature in the set is usually small (e.g. dead features)
 	 */
 	public HashMap<Object, Object> analyzeFeatureModel(IProgressMonitor monitor) {
+		resetAttributeFlags();
 		this.monitor = monitor;
 		if (calculateConstraints) {
 			beginTask(fm.getConstraintCount() + 2);
@@ -552,7 +553,7 @@ public class FeatureModelAnalyzer {
 		HashMap<Object, Object> changedAttributes = new HashMap<Object, Object>();
 
 		// put root always in so it will be refreshed (void/non-void)
-		changedAttributes.put(fm.getStructure().getRoot(), FeatureStatus.NORMAL);
+		changedAttributes.put(fm.getStructure().getRoot().getFeature(), FeatureStatus.NORMAL);
 		if (calculateFeatures) {
 			updateFeatures(oldAttributes, changedAttributes);
 		}
@@ -560,7 +561,6 @@ public class FeatureModelAnalyzer {
 			updateConstraints(oldAttributes, changedAttributes);
 		}
 		// put root always in so it will be refreshed (void/non-void)
-//		changedAttributes.put(fm.getRoot(), ConstraintAttribute.VOID_MODEL);
 		return changedAttributes;
 	}
 
@@ -909,24 +909,21 @@ public class FeatureModelAnalyzer {
 		}
 	}
 
-	
-	public Collection<IFeature> getFalseOptionalFeatures() {
+	public List<IFeature> getFalseOptionalFeatures() {
 		return getFalseOptionalFeatures(fm.getFeatures());
 	}
 	
-	public Collection<IFeature> getFalseOptionalFeatures(Iterable<IFeature> fmFalseOptionals) {
-		final SatSolver solver = new SatSolver(AdvancedNodeCreator.createCNF(fm), 1000, false);
-		Collection<IFeature> falseOptionalFeatures = new LinkedList<>();
+	public List<IFeature> getFalseOptionalFeatures(Iterable<IFeature> fmFalseOptionals) {
+		final List<IFeature> falseOptionalFeatures = new ArrayList<>();
+
+		final SatSolver solver = new SatSolver(AdvancedNodeCreator.createCNF(fm), 1000);
 		for (IFeature feature : fmFalseOptionals) {
 			final IFeatureStructure structure = feature.getStructure();
-			if (!structure.isMandatory() && !structure.isRoot()) {
-				try {
-					if (!solver.isSatisfiable(new Literal[] { new Literal(structure.getParent().getFeature().getName()), new Literal(feature.getName(), false) })) {
-						falseOptionalFeatures.add(feature);
-					}
-				} catch (TimeoutException e) {
-					FMCorePlugin.getDefault().logError(e);
-				}
+			final IFeature parent = FeatureUtils.getParent(feature);
+			if (!structure.isMandatory() && parent != null && solver.impliedValue(
+					new Literal(parent.getName()),
+					new Literal(feature.getName()))) {
+				falseOptionalFeatures.add(feature);
 			}
 		}
 		return falseOptionalFeatures;

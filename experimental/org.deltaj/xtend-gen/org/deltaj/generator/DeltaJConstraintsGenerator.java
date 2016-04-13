@@ -31,6 +31,7 @@ public class DeltaJConstraintsGenerator implements IGenerator {
   @Inject
   private DeltaJStatementConstraintGenerator statementConstraintGenerator;
   
+  @Override
   public void doGenerate(final Resource resource, final IFileSystemAccess fsa) {
     TreeIterator<EObject> _allContents = resource.getAllContents();
     Iterable<EObject> _iterable = IteratorExtensions.<EObject>toIterable(_allContents);

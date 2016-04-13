@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -30,7 +30,6 @@ import org.prop4j.SatSolver;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.event.PropertyConstants;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
@@ -40,9 +39,13 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  * @author Florian Proksch
  * @author Stefan Krueger
  */
-public class Constraint implements PropertyConstants, IGraphicItem {
+public class Constraint implements IGraphicItem {
 
 	public Constraint(IFeatureModel featureModel, Node propNode) {
+		throw new UnsupportedOperationException("No longer supported");
+	}
+
+	public Constraint(FeatureModel featureModel, Node propNode) {
 		throw new UnsupportedOperationException("No longer supported");
 	}
 
@@ -65,15 +68,13 @@ public class Constraint implements PropertyConstants, IGraphicItem {
 	}
 
 	public Collection<Feature> getDeadFeatures(SatSolver solver, FeatureModel fm, Collection<Feature> fmDeadFeatures) {
-		return Functional.toList(Functional.map(
-				FeatureUtils.getDeadFeatures(constraint, solver, FeatureUtils.convert(fm),
-						Functional.toList(Functional.map(fmDeadFeatures, FeatureUtils.FEATURE_TO_IFEATURE))), FeatureUtils.IFEATURE_TO_FEATURE));
+		return Functional.toList(Functional.map(FeatureUtils.getDeadFeatures(constraint, solver, FeatureUtils.convert(fm),
+				Functional.toList(Functional.map(fmDeadFeatures, FeatureUtils.FEATURE_TO_IFEATURE))), FeatureUtils.IFEATURE_TO_FEATURE));
 	}
 
 	public Collection<Feature> getDeadFeatures(FeatureModel fm, Collection<Feature> fmDeadFeatures) {
-		return Functional.toList(Functional.map(
-				FeatureUtils.getDeadFeatures(constraint, FeatureUtils.convert(fm),
-						Functional.toList(Functional.map(fmDeadFeatures, FeatureUtils.FEATURE_TO_IFEATURE))), FeatureUtils.IFEATURE_TO_FEATURE));
+		return Functional.toList(Functional.map(FeatureUtils.getDeadFeatures(constraint, FeatureUtils.convert(fm),
+				Functional.toList(Functional.map(fmDeadFeatures, FeatureUtils.FEATURE_TO_IFEATURE))), FeatureUtils.IFEATURE_TO_FEATURE));
 	}
 
 	public void setConstraintAttribute(ConstraintAttribute attri, boolean fire) {
@@ -82,14 +83,6 @@ public class Constraint implements PropertyConstants, IGraphicItem {
 
 	public ConstraintAttribute getConstraintAttribute() {
 		return FeatureUtils.getConstraintAttribute(constraint);
-	}
-
-	public void setFeatureSelected(boolean selected) {
-		FeatureUtils.setFeatureSelected(constraint, selected);
-	}
-
-	public boolean isFeatureSelected() {
-		return FeatureUtils.isFeatureSelected(constraint);
 	}
 
 	public Node getNode() {
@@ -128,12 +121,12 @@ public class Constraint implements PropertyConstants, IGraphicItem {
 	public void fire(PropertyChangeEvent event) {
 		FeatureUtils.fire(constraint, event);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return FeatureUtils.hashCode(constraint);
 	};
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		return FeatureUtils.equals(constraint, obj);

@@ -738,7 +738,7 @@ public class StringTable {
 	public static final String STATISTICS_OF_PRODUCT_LINE_IMPLEMENTATION = "Statistics of product-line implementation";
 	public static final String STATISTICS_OF_PRODUCT_LINE_SPECIFICATION = "Statistics of product-line specification";
 	public static final String VALID_CONFIGURATIONS_OF_THE_FEATURE_MODEL = "Valid configurations of the feature model";
-	public static final String ATOMIC_SETS_OF_THE_FEATURE_MODEL = "Atomic sets of the feature model";
+	public static final String ATOMIC_SETS_OF_THE_FEATURE_MODEL = "Number of atomic sets";
 	public static final String FEATURE_STATISTICS = "Feature statistics";
 	public static final String STATISTICS_OF_THE_FEATURE_MODEL = "Statistics of the feature model";
 	public static final String NUMBER_OF_FEATURES = "Number of features";

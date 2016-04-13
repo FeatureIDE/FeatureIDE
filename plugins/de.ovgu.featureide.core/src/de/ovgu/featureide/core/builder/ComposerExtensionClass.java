@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -327,7 +327,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	public void buildConfiguration(IFolder folder, Configuration configuration, String configurationName) {
 		try {
 			if (!folder.exists()) {
-				folder.create(true, false, null);
+				folder.create(true, true, null);
 			}
 			final IPersistentFormat<Configuration> format = ConfigurationManager.getFormat(ConfigurationManager.FormatType.CONFIG);
 			IFile configurationFile = folder.getFile(configurationName + "." + format.getSuffix());
@@ -373,8 +373,8 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 		return false;
 	}
 
-	public boolean hasCompositionMechanisms() {
-		return false;
+	public String[] getCompositionMechanisms() {
+		return new String[0];
 	}
 
 	public boolean createFolderForFeatures() {
@@ -413,6 +413,11 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	
 	@Override
 	public <T extends IComposerObject> T getComposerObjectInstance(Class<T> c)  {
+		return null;
+	}
+	
+	@Override
+	public Mechanism getGenerationMechanism() {
 		return null;
 	}
 }

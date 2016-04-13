@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.ui.editors.keyhandler;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import org.eclipse.gef.KeyHandler;
 import org.eclipse.gef.KeyStroke;
@@ -55,7 +56,7 @@ import de.ovgu.featureide.fm.ui.editors.featuremodel.editparts.ModelEditPart;
  */
 public class FeatureDiagramEditorKeyHandler extends KeyHandler implements IEventListener {
 
-	private static final long timeoutThreshold = 1000;
+	private static final long timeoutThreshold = 750;
 	private final IGraphicalFeatureModel featureModel;
 	private final GraphicalViewerKeyHandler gvKeyHandler;
 	private final KeyHandler alternativeKeyHandler;
@@ -125,9 +126,12 @@ public class FeatureDiagramEditorKeyHandler extends KeyHandler implements IEvent
 			// select the new feature
 			final IFeature curFeature = featureModel.getFeatureModel().getFeature(featureList.get(foundIndex));
 			if (curFeature != null) {
-				FeatureEditPart part = (FeatureEditPart) viewer.getEditPartRegistry().get(curFeature);
-				viewer.setSelection(new StructuredSelection(part));
-				viewer.reveal(part);
+				final Map<?, ?> editPartRegistry = viewer.getEditPartRegistry();
+				FeatureEditPart part = (FeatureEditPart) editPartRegistry.get(featureModel.getGraphicalFeature(curFeature));
+				if (part != null) {
+					viewer.setSelection(new StructuredSelection(part));
+					viewer.reveal(part);
+				}
 				curIndex = foundIndex;
 			}
 		}

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -23,16 +23,11 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_LAYER;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DEFAULT_FEATURE_LAYER_CAPTION;
 
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.impl.Feature;
 
 /**
@@ -50,13 +45,6 @@ public class CreateFeatureBelowOperation extends AbstractFeatureModelOperation {
 	public CreateFeatureBelowOperation(IFeature feature, IFeatureModel featureModel) {
 		super(featureModel, CREATE_LAYER);
 		this.feature = feature;
-		setEventId(FeatureIDEEvent.FEATURE_ADD);
-	}
-
-	@Override
-	public IStatus redo(IProgressMonitor monitor, IAdaptable info) throws ExecutionException {
-		fireEvent(operation());
-		return Status.OK_STATUS;
 	}
 
 	@Override
@@ -72,15 +60,13 @@ public class CreateFeatureBelowOperation extends AbstractFeatureModelOperation {
 		feature = featureModel.getFeature(feature.getName());
 		feature.getStructure().addChild(newFeature.getStructure());
 
-		//TODO _interfaces Removed Code
-		//		FeatureDiagramLayoutHelper.initializeLayerFeaturePosition(((FeatureDiagramEditor) diagramEditor).getGraphicalFeatureModel(), newFeature, feature);
-		return new FeatureIDEEvent(featureModel, FeatureIDEEvent.FEATURE_ADD, null, newFeature);
+		return new FeatureIDEEvent(featureModel, EventType.FEATURE_ADD, null, newFeature);
 	}
 
 	@Override
 	protected FeatureIDEEvent inverseOperation() {
 		newFeature = featureModel.getFeature(newFeature.getName());
 		featureModel.deleteFeature(newFeature);
-		return new FeatureIDEEvent(featureModel, FeatureIDEEvent.FEATURE_DELETE, newFeature, null);
+		return new FeatureIDEEvent(featureModel, EventType.FEATURE_DELETE, newFeature, null);
 	}
 }

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,13 +20,8 @@
  */
 package de.ovgu.featureide.fm.ui.editors.featuremodel.policies;
 
-import org.eclipse.draw2d.ColorConstants;
-import org.eclipse.draw2d.FigureUtilities;
 import org.eclipse.draw2d.FreeformLayer;
-import org.eclipse.draw2d.Graphics;
 import org.eclipse.draw2d.IFigure;
-import org.eclipse.draw2d.PolylineConnection;
-import org.eclipse.draw2d.RectangleFigure;
 import org.eclipse.draw2d.geometry.PrecisionRectangle;
 import org.eclipse.gef.editpolicies.NonResizableEditPolicy;
 import org.eclipse.gef.requests.ChangeBoundsRequest;
@@ -38,19 +33,7 @@ public class LegendMoveEditPolicy extends NonResizableEditPolicy {
 
 	@Override
 	protected IFigure createDragSourceFeedbackFigure() {
-		final RectangleFigure r = new RectangleFigure();
-		FigureUtilities.makeGhostShape(r);
-		r.setLineStyle(Graphics.LINE_DOT);
-		r.setForegroundColor(ColorConstants.white);
-		r.setBounds(getInitialFeedbackBounds());
-
-		final PolylineConnection c = new PolylineConnection();
-		c.setForegroundColor(ColorConstants.white);
-		c.setLineWidth(3);
-		FreeformLayer l = new FreeformLayer();
-
-		l.add(c);
-
+		final FreeformLayer l = new FreeformLayer();
 		addFeedback(l);
 		return l;
 	}
@@ -59,7 +42,6 @@ public class LegendMoveEditPolicy extends NonResizableEditPolicy {
 	protected void showChangeBoundsFeedback(ChangeBoundsRequest request) {
 		// call createDragSourceFeedbackFigure on start of the move
 		getDragSourceFeedbackFigure();
-
 		PrecisionRectangle rect = new PrecisionRectangle(getInitialFeedbackBounds().getCopy());
 		getHostFigure().translateToAbsolute(rect);
 		rect.translate(request.getMoveDelta());

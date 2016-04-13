@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.IStatus;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 
 public abstract class MultiFeatureModelOperation extends AbstractFeatureModelOperation {
 
@@ -56,7 +57,7 @@ public abstract class MultiFeatureModelOperation extends AbstractFeatureModelOpe
 				operation.redo();
 			}
 		}
-		return null;
+		return new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED);
 	}
 
 	@Override
@@ -67,7 +68,7 @@ public abstract class MultiFeatureModelOperation extends AbstractFeatureModelOpe
 				operation.undo();
 			}
 		}
-		return null;
+		return new FeatureIDEEvent(null, EventType.STRUCTURE_CHANGED);
 	}
 
 	public void addOperation(AbstractFeatureModelOperation operation) {

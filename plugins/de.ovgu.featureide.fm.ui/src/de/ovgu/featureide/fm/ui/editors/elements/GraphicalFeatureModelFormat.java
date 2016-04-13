@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -79,7 +79,7 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 	private void parseFeatures(NodeList nodeList) {
 		Iterator<IGraphicalFeature> iterator = object.getFeatures().iterator();
 		for (Element e : getElements(nodeList)) {
-			String nodeName = e.getNodeName();
+//			String nodeName = e.getNodeName();
 			if (!iterator.hasNext()) {
 				break;
 			}
@@ -123,7 +123,7 @@ public class GraphicalFeatureModelFormat extends AXMLFormat<IGraphicalFeatureMod
 	private void parseConstraint(NodeList nodeList) {
 		Iterator<IGraphicalConstraint> iterator = object.getConstraints().iterator();
 		for (Element e : getElements(nodeList)) {
-			String nodeName = e.getNodeName();
+//			String nodeName = e.getNodeName();
 			if (!iterator.hasNext()) {
 				break;
 			}

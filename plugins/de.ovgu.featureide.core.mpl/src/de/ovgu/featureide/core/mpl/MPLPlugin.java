@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -54,6 +54,7 @@ import de.ovgu.featureide.core.mpl.job.statistics.PrintStatisticsJob;
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.io.IOConstants;
 
@@ -193,9 +194,9 @@ public class MPLPlugin extends AbstractCorePlugin {
 		interfaceProject.getFeatureModel().addListener(new IEventListener() {
 			@Override
 			public void propertyChange(FeatureIDEEvent evt) {
-				if (FeatureIDEEvent.MODEL_DATA_CHANGED.equals(evt.getPropertyName())) {
+				if (EventType.MODEL_DATA_CHANGED == evt.getEventType()) {
 //					interfaceProject.loadSignatures(true);
-				} else if (FeatureIDEEvent.MODEL_LAYOUT_CHANGED.equals(evt.getPropertyName())) {
+				} else if (EventType.MODEL_LAYOUT_CHANGED == evt.getEventType()) {
 //					interfaceProject.loadSignatures(true);
 				}
 			}

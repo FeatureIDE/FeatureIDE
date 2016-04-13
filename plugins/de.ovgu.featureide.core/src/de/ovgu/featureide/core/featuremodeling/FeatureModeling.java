@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -83,7 +83,7 @@ public class FeatureModeling extends ComposerExtensionClass {
 		try {
 			IContainer parent = folder.getParent();
 			if (!parent.exists()) {
-				folder.create(true, false, null);
+				folder.create(true, true, null);
 			}
 			final IPersistentFormat<Configuration> format = ConfigurationManager.getFormat(ConfigurationManager.FormatType.CONFIG);
 			IFile configurationFile = parent.getFile(new Path(congurationName + "." + format.getSuffix()));
