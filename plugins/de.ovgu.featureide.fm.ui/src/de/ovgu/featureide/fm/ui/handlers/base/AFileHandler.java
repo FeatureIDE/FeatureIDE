@@ -38,9 +38,9 @@ public abstract class AFileHandler extends ASelectionHandler {
 
 	@Override
 	protected void singleAction(Object element) {
-		final IFile project = (IFile) SelectionWrapper.checkClass(element, IFile.class);
-		if (project != null) {
-			singleAction(project);
+		final IFile file = (IFile) SelectionWrapper.checkClass(element, IFile.class);
+		if (file != null) {
+			singleAction(file);
 		}
 	}
 }

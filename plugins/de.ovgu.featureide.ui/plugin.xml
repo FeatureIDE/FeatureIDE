@@ -1099,19 +1099,6 @@
 				allPopups="false"
 				locationURI="popup:de.ovgu.featureide.fm.ui.menus.popupMenu?after=de.ovgu.featureide.fm.ui.menus.popupMenu.submenus">
 			<command
-         			commandId="de.ovgu.featureide.ui.commands.newInterface"
-         			icon="icons/featuretree.ico"
-         			id="de.ovgu.featureide.ui.actions.newInterface"
-         			label="Create New Interface Model"
-         			style="push">
-				<visibleWhen
-						checkEnabled="false">
-					<reference
-							definitionId="de.ovgu.featureide.ui.expressions.onlyProjects">
-					</reference>
-				</visibleWhen>
-			</command>
-			<command
 					commandId="de.ovgu.featureide.ui.commands.productGenerator"
 					icon="icons/FeatureIconSmall.ico"
 					id="de.ovgu.featureide.fm.ui.actions.productGenerator"
@@ -1221,10 +1208,6 @@
 				name="Add FeatureIDE Nature">
 		</command>
 		<command
-				id="de.ovgu.featureide.ui.commands.newInterface"
-				name="Create new interface model">
-		</command>
-		<command
 				id="de.ovgu.featureide.ui.commands.setConfiguration"
 				name="Set as current configuration">
 		</command>
@@ -1303,10 +1286,6 @@
 	        class="de.ovgu.featureide.ui.handlers.FeatureDocumentationHandler"
 	        commandId="de.ovgu.featureide.ui.mpl.commands.javadoc.feature">
 	  </handler>
-   <handler
-         class="de.ovgu.featureide.ui.handlers.NewInterfaceHandler"
-         commandId="de.ovgu.featureide.ui.commands.newInterface">
-   </handler>
 	</extension>
 	<extension
 			point="org.eclipse.core.expressions.definitions">

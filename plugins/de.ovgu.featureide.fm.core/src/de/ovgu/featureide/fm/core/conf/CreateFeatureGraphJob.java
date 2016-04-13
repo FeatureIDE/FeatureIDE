@@ -50,8 +50,8 @@ import de.ovgu.featureide.fm.core.conf.worker.DFSThread;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.FeatureGraphFormat;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.manager.FileReader;
-import de.ovgu.featureide.fm.core.io.manager.FileWriter;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.WorkMonitor;
@@ -131,7 +131,7 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 			}
 
 			// connect current feature to parent
-			if (!coreFeatures.contains(parent)) {
+			if (!coreFeatures.contains(parent.getFeature())) {
 				featureGraph.implies(featureName, parentName);
 				if (parent.isAnd()) {
 					if (feature.getStructure().isMandatory()) {
@@ -151,16 +151,16 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 			if (nonDeadSibilingCount > 1) {
 				if (parent.isAlternative()) {
 					// XOR between two children
-					if (coreFeatures.contains(parent) && nonDeadSibilingCount == 2) {
+					if (coreFeatures.contains(parent.getFeature()) && nonDeadSibilingCount == 2) {
 						for (IFeatureStructure sibiling : parent.getChildren()) {
-							if (!deadFeatures.contains(sibiling)) {
+							if (!deadFeatures.contains(sibiling.getFeature())) {
 								featureGraph.setEdge(featureName, sibiling.getFeature().getName(), MatrixFeatureGraph.EDGE_10);
 								featureGraph.setEdge(featureName, sibiling.getFeature().getName(), MatrixFeatureGraph.EDGE_01);
 							}
 						}
 					} else {
 						for (IFeatureStructure sibiling : parent.getChildren()) {
-							if (!deadFeatures.contains(sibiling)) {
+							if (!deadFeatures.contains(sibiling.getFeature())) {
 								featureGraph.setEdge(featureName, sibiling.getFeature().getName(), MatrixFeatureGraph.EDGE_10);
 								featureGraph.setEdge(featureName, sibiling.getFeature().getName(), MatrixFeatureGraph.EDGE_01Q);
 							}
@@ -169,11 +169,11 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 						if (processedParents.add(parent.getFeature())) {
 							final ArrayList<Variable> list = new ArrayList<>(nonDeadSibilingCount + 1);
 							for (IFeatureStructure sibiling : parent.getChildren()) {
-								if (!deadFeatures.contains(sibiling)) {
+								if (!deadFeatures.contains(sibiling.getFeature())) {
 									list.add(conf.getVariable(featureGraph.getFeatureIndex(sibiling.getFeature().getName())));
 								}
 							}
-							if (!coreFeatures.contains(parent)) {
+							if (!coreFeatures.contains(parent.getFeature())) {
 								list.add(new Not2(conf.getVariable(featureGraph.getFeatureIndex(parent.getFeature().getName()))));
 							}
 							expList.add(new Xor(list.toArray(new Variable[0])));
@@ -183,14 +183,14 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 					// TODO atomic set would be better than core feature
 					boolean optionalFeature = false;
 					for (IFeatureStructure sibiling : parent.getChildren()) {
-						if (coreFeatures.contains(sibiling)) {
+						if (coreFeatures.contains(sibiling.getFeature())) {
 							optionalFeature = true;
 							break;
 						}
 					}
 					if (!optionalFeature) {
 						for (IFeatureStructure sibiling : parent.getChildren()) {
-							if (!deadFeatures.contains(sibiling)) {
+							if (!deadFeatures.contains(sibiling.getFeature())) {
 								featureGraph.setEdge(featureName, sibiling.getFeature().getName(), MatrixFeatureGraph.EDGE_01Q);
 							}
 						}
@@ -198,12 +198,12 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 						if (processedParents.add(parent.getFeature())) {
 							final ArrayList<Variable> list = new ArrayList<>(nonDeadSibilingCount);
 							for (IFeatureStructure sibiling : parent.getChildren()) {
-								if (!deadFeatures.contains(sibiling)) {
+								if (!deadFeatures.contains(sibiling.getFeature())) {
 									list.add(conf.getVariable(featureGraph.getFeatureIndex(sibiling.getFeature().getName())));
 								}
 							}
 							final Or2 or2 = new Or2(list.toArray(new Variable[0]));
-							if (coreFeatures.contains(parent)) {
+							if (coreFeatures.contains(parent.getFeature())) {
 								expList.add(or2);
 							} else {
 								expList.add(new Xor(new Variable[] { or2, new Not2(conf.getVariable(featureGraph.getFeatureIndex(parent.getFeature().getName()))) }));
@@ -247,10 +247,10 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 	@Override
 	protected boolean work() throws Exception {
 		final FeatureGraphFormat format = new FeatureGraphFormat();
-		Path path = Paths.get("model." + format.getSuffix());
+		final Path path = Paths.get(project.getFile("model." + format.getSuffix()).getLocationURI());
 		if (!new FileReader<IFeatureGraph>().read(path, featureGraph, format)) {
 			createFeatureGraph();
-			new FileWriter<IFeatureGraph>(path, featureGraph, format);
+			FileHandler.save(path, featureGraph, format);
 		}
 		return true;
 	}

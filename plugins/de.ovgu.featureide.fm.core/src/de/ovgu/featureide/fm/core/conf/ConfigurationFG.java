@@ -88,7 +88,7 @@ public class ConfigurationFG extends Configuration {
 		this.featureGraph = featureGraph;
 
 		this.variableConfiguration = new VariableConfiguration(featureGraph.getSize());
-		this.propagator = new ConfigurationChanger(featureModel, variableConfiguration, this);
+		this.propagator = new ConfigurationChanger(featureGraph, featureModel, variableConfiguration, this);
 
 		this.root = initRoot();
 

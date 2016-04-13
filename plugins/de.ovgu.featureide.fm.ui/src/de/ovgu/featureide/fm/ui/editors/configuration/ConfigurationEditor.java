@@ -42,6 +42,7 @@ import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.QualifiedName;
@@ -237,7 +238,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		
 		final Configuration c;
 
-		final IFeatureGraph fg = loadFeatureGraph(res);
+		final IFeatureGraph fg = loadFeatureGraph(res.getLocation().removeLastSegments(1).append("model.fg"));
 		if (fg == null) {
 			c = new Configuration(featureModelManager.getObject(), Configuration.PARAM_IGNOREABSTRACT | Configuration.PARAM_LAZY);
 			configurationManager = FileManagerMap.<Configuration, ConfigurationManager>getInstance(file.getLocation().toOSString()); 
@@ -285,10 +286,10 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		}
 	}
 	
-	private IFeatureGraph loadFeatureGraph(IResource file) {
+	private IFeatureGraph loadFeatureGraph(IPath file) {
 		final IFeatureGraph featureGraph = new MatrixFeatureGraph(featureModelManager.getObject());
 		final FeatureGraphFormat format = new FeatureGraphFormat();
-		Path path = Paths.get(file.getLocationURI());
+		Path path = Paths.get(file.toFile().toURI());
 		if (new FileReader<IFeatureGraph>().read(path, featureGraph, format)) {
 			return featureGraph;
 		} else {

@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.conf;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -44,8 +42,6 @@ import de.ovgu.featureide.fm.core.configuration.IConfigurationPropagator;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
-import de.ovgu.featureide.fm.core.io.FeatureGraphFormat;
-import de.ovgu.featureide.fm.core.io.manager.FileReader;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.WorkMonitor;
@@ -562,12 +558,9 @@ public class ConfigurationChanger implements IConfigurationChanger, IConfigurati
 
 	private final VariableConfiguration variableConfiguration;
 
-	public ConfigurationChanger(IFeatureModel featureModel, VariableConfiguration variableConfiguration, ConfigurationFG c) {
+	public ConfigurationChanger(IFeatureGraph featureGraph, IFeatureModel featureModel, VariableConfiguration variableConfiguration, ConfigurationFG c) {
 		this.featureModel = featureModel;
-		this.featureGraph = new MatrixFeatureGraph(featureModel);
-		final FeatureGraphFormat format = new FeatureGraphFormat();
-		final Path path = Paths.get("model." + format.getSuffix());
-		new FileReader<IFeatureGraph>().read(path, this.featureGraph, format);
+		this.featureGraph = featureGraph;
 		this.variableConfiguration = variableConfiguration;
 		this.c = c;
 		LongRunningWrapper.runMethod(load());

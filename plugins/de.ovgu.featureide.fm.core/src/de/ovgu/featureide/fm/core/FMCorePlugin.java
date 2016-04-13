@@ -34,16 +34,12 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.osgi.framework.BundleContext;
-import org.prop4j.Node;
-import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeature;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel.UsedModel;
-import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
-import de.ovgu.featureide.fm.core.editing.cnf.UnkownLiteralException;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.FileManagerMap;
@@ -207,20 +203,6 @@ public class FMCorePlugin extends AbstractCorePlugin {
 				logError(e);
 			}
 		}
-	}
-	
-	public void removeFeatures(IProject project, IFeatureModel data, Collection<String> features) {
-		try {
-			removeFeatures(data, features);
-		} catch (TimeoutException | UnkownLiteralException e) {
-			FMCorePlugin.getDefault().logError(e);
-		}
-	}
-
-	public static Node removeFeatures(IFeatureModel featureModel, Collection<String> removeFeatures) throws TimeoutException, UnkownLiteralException {
-		final AdvancedNodeCreator nodeCreator = new AdvancedNodeCreator(featureModel, removeFeatures);
-		nodeCreator.setCnfType(AdvancedNodeCreator.CNFType.Regular);
-		return nodeCreator.createNodes();
 	}
 
 }

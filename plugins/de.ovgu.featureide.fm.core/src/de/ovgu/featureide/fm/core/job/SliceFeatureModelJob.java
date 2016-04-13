@@ -18,14 +18,9 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.core.mpl.job;
+package de.ovgu.featureide.fm.core.job;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.CREATED_INTERFACE_;
-import static de.ovgu.featureide.fm.core.localization.StringTable.CREATE_INTERFACE;
-import static de.ovgu.featureide.fm.core.localization.StringTable.INTERFACES;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
@@ -33,8 +28,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.runtime.CoreException;
 import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
@@ -42,22 +35,18 @@ import org.prop4j.Or;
 import org.prop4j.SatSolver;
 import org.sat4j.specs.TimeoutException;
 
-import de.ovgu.featureide.core.CorePlugin;
-import de.ovgu.featureide.core.mpl.MPLPlugin;
+import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
-import de.ovgu.featureide.fm.core.editing.cnf.UnkownLiteralException;
-import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
-import de.ovgu.featureide.fm.core.job.AProjectJob;
-import de.ovgu.featureide.fm.core.job.LongRunningMethod;
-import de.ovgu.featureide.fm.core.job.WorkMonitor;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.CNFType;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.ModelType;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
+import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
-
-import org.eclipse.core.resources.IFile;
 
 /**
  * Create mpl interfaces.
@@ -65,16 +54,16 @@ import org.eclipse.core.resources.IFile;
  * @author Sebastian Krieter
  * @author Marcus Pinnecke (Feature Interface)
  */
-public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments> implements LongRunningMethod<IFeatureModel> {
+public class SliceFeatureModelJob extends AProjectJob<SliceFeatureModelJob.Arguments> implements LongRunningMethod<IFeatureModel> {
 
 	public static class Arguments extends JobArguments {
 		private final IFeatureModel featuremodel;
 		private final Collection<String> featureNames;
-		private final String projectName;
+		private final Path modelFile;
 
-		public Arguments(String projectName, IFeatureModel featuremodel, Collection<String> featureNames) {
+		public Arguments(Path modelFile, IFeatureModel featuremodel, Collection<String> featureNames) {
 			super(Arguments.class);
-			this.projectName = projectName;
+			this.modelFile = modelFile;
 			this.featuremodel = featuremodel;
 			this.featureNames = featureNames;
 		}
@@ -82,8 +71,8 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 
 	private IFeatureModel newInterfaceModel = null;
 
-	protected CreateInterfaceJob(Arguments arguments) {
-		super(CREATE_INTERFACE, arguments);
+	protected SliceFeatureModelJob(Arguments arguments) {
+		super("Slice Feature Model", arguments);
 	}
 
 	public IFeatureModel getInterfaceModel() {
@@ -99,40 +88,18 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 	protected boolean work() {
 		newInterfaceModel = createInterface(arguments.featuremodel, arguments.featureNames);
 
-		if (project == null) {
-			return true;
+		String fileName = arguments.modelFile.getFileName().toString();
+		final int extIndex = fileName.lastIndexOf('.');
+		if (extIndex > 0) {
+			fileName = fileName.substring(0, extIndex) + "_sliced_" + System.currentTimeMillis() + ".xml";
+		} else {
+			fileName = fileName + "_sliced_" + System.currentTimeMillis() + ".xml";
 		}
+		final Path outputPathRoot = arguments.modelFile.getRoot();
+		final Path outputPath = arguments.modelFile.subpath(0, arguments.modelFile.getNameCount() - 1);
 
-		String projectName = arguments.projectName;
-		String interfaceName = "I" + projectName;
-		newInterfaceModel.getStructure().getRoot().getFeature().setName(interfaceName);
+		FileHandler.save(outputPathRoot.resolve(outputPath).resolve(fileName), newInterfaceModel, new XmlFeatureModelFormat());
 
-		XmlFeatureModelWriter modelWriter = new XmlFeatureModelWriter(newInterfaceModel);
-		String interfaceContent = modelWriter.writeToString();
-
-		try {
-			// create interface
-			IFolder mplFolder = project.getFolder(INTERFACES);
-			if (!mplFolder.exists()) {
-				mplFolder.create(true, true, null);
-			}
-
-			IFile interfaceFile = mplFolder.getFile(interfaceName + ".xml");
-
-			// TODO: warning for existing interface file
-			if (!interfaceFile.exists()) {
-				ByteArrayInputStream interfaceContentStream = new ByteArrayInputStream(interfaceContent.getBytes());
-				interfaceFile.create(interfaceContentStream, true, null);
-				interfaceContentStream.close();
-			} else {
-				ByteArrayInputStream interfaceContentStream = new ByteArrayInputStream(interfaceContent.getBytes());
-				interfaceFile.setContents(interfaceContentStream, true, false, null);
-				interfaceContentStream.close();
-			}
-		} catch (CoreException | IOException e) {
-			e.printStackTrace();
-		}
-		MPLPlugin.getDefault().logInfo(CREATED_INTERFACE_);
 		return true;
 	}
 
@@ -145,18 +112,9 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 		workMonitor.setMaxAbsoluteWork(3);
 		ArrayList<String> removeFeatures = new ArrayList<>(FeatureUtils.getFeatureNames(m));
 		removeFeatures.removeAll(selectedFeatureNames);
-		Node cnf = null;
-		try {
-			cnf = (selectedFeatureNames.size() > 1) ? CorePlugin.removeFeatures(m, removeFeatures) : new Literal(m.getStructure().getRoot().getFeature()
-					.getName());
-		} catch (java.util.concurrent.TimeoutException e1) {
-			e1.printStackTrace();
-		} catch (UnkownLiteralException e1) {
-			e1.printStackTrace();
-		}
+		final AdvancedNodeCreator nc = new AdvancedNodeCreator(m, removeFeatures, CNFType.Regular, ModelType.All, false);
+		final Node cnf = nc.createNodes();
 		workMonitor.worked();
-
-		//		m = orgFeatureModel.clone();
 
 		// mark features
 		for (IFeature feat : m.getFeatures()) {
@@ -171,7 +129,7 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 		m.reset();
 
 		// set new abstract root
-		IFeature nroot = FMFactoryManager.getFactory().createFeature(m, "nroot");
+		IFeature nroot = FMFactoryManager.getFactory().createFeature(m, "__root__");
 		nroot.getStructure().setAbstract(true);
 		nroot.getStructure().setAnd();
 		nroot.getStructure().addChild(root.getStructure());
@@ -216,7 +174,7 @@ public class CreateInterfaceJob extends AProjectJob<CreateInterfaceJob.Arguments
 						m.addConstraint(FMFactoryManager.getFactory().createConstraint(m, child));
 					}
 				} catch (TimeoutException e) {
-					MPLPlugin.getDefault().logError(e);
+					FMCorePlugin.getDefault().logError(e);
 				} finally {
 					workMonitor.worked();
 				}

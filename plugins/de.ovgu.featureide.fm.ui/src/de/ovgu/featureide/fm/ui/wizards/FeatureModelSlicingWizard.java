@@ -20,22 +20,26 @@
  */
 package de.ovgu.featureide.fm.ui.wizards;
 
-/**
- * Keys for wizard arguments.
- * 
- * @author Sebastian Krieter
- */
-public abstract class WizardConstants {
-	public static final String KEY_OUT_FOLDER = "out_folder",
-			KEY_OUT_FEATURE = "out_feature",
-			KEY_OUT_DOCOPTIONS = "out_options",
-			KEY_OUT_CONFIGLIMIT = "out_configlimit",
-			KEY_OUT_VIEWLEVEL = "out_viewlevel",
-			KEY_OUT_VIEWNAME = "out_viewname",
-			KEY_OUT_PROJECT = "out_project",
-			KEY_OUT_FEATURES = "out_features",
-			KEY_IN_FOLDER = "in_folder",
-			KEY_OUT_INPUTFORMAT = "out_informat",
-			KEY_OUT_OUTPUTFORMAT = "out_outformat",
-			KEY_IN_FEATUREMODEL = "in_featuremodel";
+import de.ovgu.featureide.fm.ui.FMUIPlugin;
+
+public class FeatureModelSlicingWizard extends AbstractWizard {
+
+	public static final String ID = FMUIPlugin.PLUGIN_ID + ".wizards.FeatureModelSlicingWizard";
+
+	public FeatureModelSlicingWizard(String title) {
+		super(title);
+	}
+
+	@Override
+	public void addPages() {
+		addPage(new SelectFeaturesWizardPage());
+	}
+
+	protected SelectFeaturesWizardPage selectFeatures;
+
+	@Override
+	public boolean performFinish() {
+		return true;
+	}
+
 }
