@@ -101,9 +101,11 @@ public class SatInstance implements ISolverProvider {
 	}
 
 	public List<String> convertToString(int[] model) {
-		final List<String> resultList = new ArrayList<>(model.length);
+		final List<String> resultList = new ArrayList<>();
 		for (int var : model) {
-			resultList.add(intToVar[Math.abs(var)].toString());
+			if (var > 0) {
+				resultList.add(intToVar[Math.abs(var)].toString());
+			}
 		}
 		return resultList;
 	}
@@ -140,6 +142,10 @@ public class SatInstance implements ISolverProvider {
 
 	public int getVariable(Literal l) {
 		return varToInt.get(l.var);
+	}
+
+	public int getVariable(Object var) {
+		return varToInt.get(var);
 	}
 
 	public Object getVariableObject(final int x) {

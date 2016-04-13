@@ -32,6 +32,7 @@ import org.sat4j.minisat.core.IPhaseSelectionStrategy;
 import org.sat4j.minisat.core.Solver;
 import org.sat4j.minisat.orders.NegativeLiteralSelectionStrategy;
 import org.sat4j.minisat.orders.PositiveLiteralSelectionStrategy;
+import org.sat4j.minisat.orders.RandomLiteralSelectionStrategy;
 import org.sat4j.minisat.orders.VarOrderHeap;
 import org.sat4j.specs.IVecInt;
 import org.sat4j.specs.TimeoutException;
@@ -50,7 +51,7 @@ public class BasicSolver implements Cloneable {
 	}
 
 	public static enum SelectionStrategy {
-		ORG, POSITIVE, NEGATIVE
+		ORG, POSITIVE, NEGATIVE, RANDOM
 	}
 
 	private class VarOrderHeap2 extends VarOrderHeap {
@@ -190,6 +191,13 @@ public class BasicSolver implements Cloneable {
 			solver.setOrder(positiveHeap);
 			if (keepHot) {
 				positiveHeap.init();
+			}
+			break;
+		case RANDOM:
+			final VarOrderHeap2 randomHeap = new VarOrderHeap2(new RandomLiteralSelectionStrategy());
+			solver.setOrder(randomHeap);
+			if (keepHot) {
+				randomHeap.init();
 			}
 			break;
 		default:
