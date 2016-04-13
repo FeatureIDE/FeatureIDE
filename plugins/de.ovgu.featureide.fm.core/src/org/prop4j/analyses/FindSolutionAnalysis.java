@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -18,23 +18,38 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.ui.wizards;
+package org.prop4j.analyses;
+
+import org.prop4j.solver.ISolverProvider;
+import org.sat4j.specs.IProblem;
+import org.sat4j.tools.ModelIterator;
+
+import de.ovgu.featureide.fm.core.job.WorkMonitor;
 
 /**
- * Keys for wizard arguments.
+ * Finds a solution.
  * 
  * @author Sebastian Krieter
  */
-public abstract class WizardConstants {
-	public static final String KEY_OUT_FOLDER = "out_folder",
-			KEY_OUT_FEATURE = "out_feature",
-			KEY_OUT_DOCOPTIONS = "out_options",
-			KEY_OUT_CONFIGLIMIT = "out_configlimit",
-			KEY_OUT_VIEWLEVEL = "out_viewlevel",
-			KEY_OUT_VIEWNAME = "out_viewname",
-			KEY_OUT_PROJECT = "out_project",
-			KEY_OUT_FEATURES = "out_features",
-			KEY_IN_FOLDER = "in_folder",
-			KEY_OUT_INPUTFORMAT = "out_informat",
-			KEY_OUT_OUTPUTFORMAT = "out_outformat";
+public class FindSolutionAnalysis extends SingleThreadAnalysis<String> {
+
+	public FindSolutionAnalysis(ISolverProvider solver) {
+		super(solver);
+	}
+
+	public String execute(WorkMonitor monitor) throws Exception {
+		StringBuilder out = new StringBuilder();
+		IProblem problem = new ModelIterator(solver.getSolver());
+		if (!problem.isSatisfiable())
+			return null;
+		final int[] model = problem.model();
+
+		for (int var : model) {
+			if (var > 0) {
+				out.append(solver.getSatInstance().getVariableObject(var) + "\n");
+			}
+		}
+		return out.toString();
+	}
+
 }

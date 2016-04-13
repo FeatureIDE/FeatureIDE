@@ -365,10 +365,26 @@
 					</reference>
 				</visibleWhen>
 			</command>
+   <command
+         commandId="de.ovgu.featureide.fm.ui.commands.Convert"
+         id="de.ovgu.featureide.fm.ui.actions.Convert"
+         label="Convert Feature Models"
+         style="push">
+      <visibleWhen
+            checkEnabled="false">
+         <reference
+               definitionId="de.ovgu.featureide.fm.ui.expressions.isFolder">
+         </reference>
+      </visibleWhen>
+   </command>
 		</menuContribution>
 	</extension>
 	<extension
 			point="org.eclipse.ui.commands">
+		<command
+				id="de.ovgu.featureide.fm.ui.commands.Convert"
+				name="Convert Feature Models">
+		</command>
 		<command
 				id="de.ovgu.featureide.fm.ui.commands.AnalyzeVelvet"
 				name="Analyze Velvet Model">
@@ -424,6 +440,10 @@
 	</extension>
 	<extension
 			point="org.eclipse.ui.handlers">
+		<handler
+				class="de.ovgu.featureide.fm.ui.handlers.FeatureModelConversionHandler"
+				commandId="de.ovgu.featureide.fm.ui.commands.Convert">
+		</handler>
 		<handler
 				class="de.ovgu.featureide.fm.ui.handlers.AnalyzeVelvetHandler"
 				commandId="de.ovgu.featureide.fm.ui.commands.AnalyzeVelvet">
@@ -490,6 +510,20 @@
 							args=".xml"
 							property="de.ovgu.featureide.fm.ui.properties.file">
 					</test>
+				</iterate>
+			</with>
+		</definition>
+		<definition
+				id="de.ovgu.featureide.fm.ui.expressions.isFolder">
+			<with
+					variable="activeMenuSelection">
+				<iterate
+						ifEmpty="false"
+						operator="and">
+     <test
+           property="de.ovgu.featureide.fm.ui.properties.class"
+           value="org.eclipse.core.resources.IContainer">
+     </test>
 				</iterate>
 			</with>
 		</definition>
