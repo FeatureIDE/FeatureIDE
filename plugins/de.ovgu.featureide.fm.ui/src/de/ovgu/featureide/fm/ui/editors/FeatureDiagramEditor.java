@@ -74,10 +74,12 @@ import org.eclipse.ui.progress.UIJob;
 import de.ovgu.featureide.fm.core.ConstraintAttribute;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.FeatureStatus;
+import de.ovgu.featureide.fm.core.Features;
 import de.ovgu.featureide.fm.core.Preferences;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
@@ -863,7 +865,11 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			legendLayoutAction.refresh();
 			break;
 		case HIDDEN_CHANGED:
-			FeatureUIHelper.getGraphicalFeature((IFeature)event.getSource(), graphicalFeatureModel).update(event);
+			final List<IFeatureStructure> children = new ArrayList<>(); 
+			Features.getAllFeatures(children, ((IFeature)event.getSource()).getStructure());
+			for (final IFeatureStructure child : children) {
+				FeatureUIHelper.getGraphicalFeature(child.getFeature(), graphicalFeatureModel).update(event);
+			}
 			internRefresh(true);
 			analyzeFeatureModel();
 			featureModelEditor.setPageModified(true);
