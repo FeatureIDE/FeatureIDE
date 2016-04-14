@@ -22,9 +22,6 @@ package de.ovgu.featureide.fm.ui.editors.configuration;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.SOURCE;
 
-import java.util.List;
-
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.texteditor.IDocumentProvider;
@@ -32,7 +29,7 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
-import de.ovgu.featureide.fm.core.io.Problem;
+import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 
 /**
@@ -117,9 +114,9 @@ public class TextEditorPage extends TextEditor implements IConfigurationEditorPa
 	public boolean allowPageChange(int newPageIndex) {
 		final String text = getDocumentProvider().getDocument(getEditorInput()).get();
 		final IPersistentFormat<Configuration> confFormat = configurationEditor.configurationManager.getFormat();
-		final List<Problem> problems = confFormat.getInstance().read(configurationEditor.getConfiguration(), text);
+		final ProblemList problems = confFormat.getInstance().read(configurationEditor.getConfiguration(), text);
 		configurationEditor.createModelFileMarkers(problems);
-		return !Problem.checkSeverity(problems, IMarker.SEVERITY_WARNING);
+		return !problems.containsWarning();
 	}
 
 }

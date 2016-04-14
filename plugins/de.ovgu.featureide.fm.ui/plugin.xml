@@ -34,7 +34,28 @@
 				id="de.ovgu.featureide.contenttype.expression"
 				name="Expression (for non-FeatureIDE projects)"
 				priority="low">
-		</content-type>               
+		</content-type>
+  <content-type
+        base-type="org.eclipse.core.runtime.xml"
+        file-extensions="xml"
+        id="de.ovgu.featureide.fm.ui.featureModel"
+        name="Feature Model"
+        priority="high">
+     <describer
+           class="org.eclipse.core.runtime.content.XMLRootElementContentDescriber2">
+        <parameter
+              name="element"
+              value="featureModel">
+        </parameter>
+     </describer>
+  </content-type>
+  <content-type
+        base-type="org.eclipse.core.runtime.text"
+        file-extensions="velvet"
+        id="de.ovgu.featureide.fm.ui.extendedfeatureModel"
+        name="Extended Feature Model"
+        priority="high">
+  </content-type>               
 	</extension>
 
 	<extension
@@ -64,13 +85,13 @@
 	<extension
 			point="org.eclipse.ui.editors">
 		<editor
-				class="de.ovgu.featureide.fm.ui.editors.FeatureModelEditor"
-				contributorClass="de.ovgu.featureide.fm.ui.editors.featuremodel.FeatureModelEditorContributor"
-				default="true"
-
-				icon="icons/featuretree.ico"
-				id="de.ovgu.featureide.fm.ui.editors.FeatureModelEditor"
-				name="Feature Model Editor">
+        class="de.ovgu.featureide.fm.ui.editors.FeatureModelEditor"
+        contributorClass="de.ovgu.featureide.fm.ui.editors.featuremodel.FeatureModelEditorContributor"
+        default="true"
+        extensions="xml,velvet"
+        icon="icons/featuretree.ico"
+        id="de.ovgu.featureide.fm.ui.editors.FeatureModelEditor"
+        name="Feature Model Editor">
 			<contentTypeBinding
 					contentTypeId="de.ovgu.featureide.fm.ui.featureModel">
 			</contentTypeBinding>
@@ -79,35 +100,18 @@
 			</contentTypeBinding>
 		</editor>
 		<editor
-				class="de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor"
-				default="true"
-				icon="icons/ConfigurationIcon.png"
-				id="de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor"
-				name="Configuration Editor">
+        class="de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor"
+        default="true"
+        extensions="conf,config,equation,expression"
+        icon="icons/ConfigurationIcon.png"
+        id="de.ovgu.featureide.fm.ui.editors.configuration.ConfigurationEditor"
+        name="Configuration Editor">
 			<contentTypeBinding
 					contentTypeId="de.ovgu.featureide.contenttype.conf">
 			</contentTypeBinding>
 		</editor>
 	</extension>
 
-	<extension point="org.eclipse.core.contenttype.contentTypes">
-		<content-type base-type="org.eclipse.core.runtime.xml"
-				file-extensions="xml"
-				id="de.ovgu.featureide.fm.ui.featureModel"
-				name="Feature Model"
-				priority="high">
-			<describer class="org.eclipse.core.runtime.content.XMLRootElementContentDescriber">
-				<parameter name="element"
-						value="featureModel">
-				</parameter>
-			</describer>
-		</content-type>
-		<content-type file-extensions="velvet"
-				id="de.ovgu.featureide.fm.ui.extendedfeatureModel"
-				name="Extended Feature Model"
-				priority="high">
-		</content-type>
-	</extension>  
 	<extension
 			point="org.eclipse.ui.views">
 		<category

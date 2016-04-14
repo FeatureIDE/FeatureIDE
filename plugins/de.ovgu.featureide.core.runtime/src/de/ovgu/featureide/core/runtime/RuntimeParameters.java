@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -41,7 +43,6 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMember;
@@ -72,7 +73,7 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
-import de.ovgu.featureide.fm.core.io.manager.FileReader;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
  * 
@@ -350,7 +351,7 @@ public class RuntimeParameters extends ComposerExtensionClass {
 					InputStream inputStream = null;
 					try {
 						inputStream = FileLocator.openStream(RuntimeCorePlugin.getDefault().getBundle(),
-								new Path("Resources" + FileSystems.getDefault().getSeparator() + PROPERTY_MANAGER_CLASS + ".java"), false);
+								new org.eclipse.core.runtime.Path("Resources" + FileSystems.getDefault().getSeparator() + PROPERTY_MANAGER_CLASS + ".java"), false);
 					} catch (final IOException e) {
 						RuntimeCorePlugin.getDefault().logError(e);
 					}
@@ -433,14 +434,11 @@ public class RuntimeParameters extends ComposerExtensionClass {
 	 * @return
 	 */
 	private Configuration readConfig() {
-
 		final Configuration featureProjectConfig = new Configuration(featureProject.getFeatureModel());
-		final String configPath = featureProject.getCurrentConfiguration().getRawLocation().toOSString();
-		final FileReader<Configuration> reader = new FileReader<>(configPath, featureProjectConfig, ConfigurationManager.getFormat(configPath));
-		reader.read();
+		final Path configPath = Paths.get(featureProject.getCurrentConfiguration().getLocationURI());
+		FileHandler.load(configPath, featureProjectConfig, ConfigurationManager.getFormat(configPath.getFileName().toString()));
 
 		return featureProjectConfig;
-
 	}
 
 	/**

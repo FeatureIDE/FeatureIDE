@@ -24,6 +24,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -39,7 +41,6 @@ import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
@@ -51,7 +52,7 @@ import de.ovgu.featureide.core.framework.activator.FrameworkCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
-import de.ovgu.featureide.fm.core.io.manager.FileReader;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
  * Framework composer updating .classpath file of eclipse
@@ -141,12 +142,10 @@ public class FrameworkComposer extends ComposerExtensionClass {
 
 	@Override
 	public void performFullBuild(IFile config) {
-
-		final String configPath = config.getRawLocation().toOSString();
+		final Path configPath = Paths.get(config.getLocationURI());
 		final Configuration configuration = new Configuration(featureProject.getFeatureModel());
 
-		final FileReader<Configuration> reader = new FileReader<>(configPath, configuration, ConfigurationManager.getFormat(configPath));
-		reader.read();
+		FileHandler.load(configPath, configuration, ConfigurationManager.getFormat(configPath.getFileName().toString()));
 
 		selectedFeatures = new LinkedList<String>();
 		for (final IFeature feature : configuration.getSelectedFeatures()) {
@@ -326,7 +325,7 @@ public class FrameworkComposer extends ComposerExtensionClass {
 		/** Copy plugin loader **/
 		InputStream inputStream = null;
 		try {
-			inputStream = FileLocator.openStream(FrameworkCorePlugin.getDefault().getBundle(), new Path("resources" + FileSystems.getDefault().getSeparator()
+			inputStream = FileLocator.openStream(FrameworkCorePlugin.getDefault().getBundle(), new org.eclipse.core.runtime.Path("resources" + FileSystems.getDefault().getSeparator()
 					+ "PluginLoader.java"), false);
 		} catch (final IOException e) {
 			FrameworkCorePlugin.getDefault().logError(e);

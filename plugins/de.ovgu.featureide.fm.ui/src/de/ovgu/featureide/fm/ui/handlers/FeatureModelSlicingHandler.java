@@ -22,17 +22,15 @@ package de.ovgu.featureide.fm.ui.handlers;
 
 import java.nio.file.Paths;
 import java.util.Collection;
-import java.util.List;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Display;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.io.Problem;
+import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 import de.ovgu.featureide.fm.core.job.SliceFeatureModelJob;
@@ -48,8 +46,8 @@ public class FeatureModelSlicingHandler extends AFileHandler {
 	@Override
 	protected void singleAction(IFile file) {
 		final IFeatureModel featureModel = FMFactoryManager.getFactory().createFeatureModel();
-		final List<Problem> problems = FileHandler.load(Paths.get(file.getLocationURI()), featureModel, new XmlFeatureModelFormat());
-		if (!Problem.checkSeverity(problems, IMarker.SEVERITY_ERROR)) {
+		final ProblemList problems = FileHandler.load(Paths.get(file.getLocationURI()), featureModel, new XmlFeatureModelFormat());
+		if (!problems.containsError()) {
 			final AbstractWizard wizard = new FeatureModelSlicingWizard("Feature-Model Slicing");
 			wizard.putData(WizardConstants.KEY_IN_FEATUREMODEL, featureModel);
 			if (Dialog.OK == new WizardDialog(Display.getCurrent().getActiveShell(), wizard).open()) {

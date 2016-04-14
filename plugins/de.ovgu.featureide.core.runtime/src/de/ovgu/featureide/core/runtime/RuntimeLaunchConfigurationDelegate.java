@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.core.runtime;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.debug.core.ILaunch;
@@ -34,7 +37,7 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
-import de.ovgu.featureide.fm.core.io.manager.FileReader;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 public class RuntimeLaunchConfigurationDelegate implements
 		ILaunchConfigurationDelegate {
@@ -66,12 +69,8 @@ public class RuntimeLaunchConfigurationDelegate implements
 					IJavaLaunchConfigurationConstants.ATTR_PROGRAM_ARGUMENTS,
 					"");
 
-			final String configPath = featureProject.getCurrentConfiguration()
-					.getRawLocation().toOSString();
-			final FileReader<Configuration> reader = new FileReader<>(
-					configPath, featureProjectConfig,
-					ConfigurationManager.getFormat(configPath));
-			reader.read();
+			final Path configPath = Paths.get(featureProject.getCurrentConfiguration().getLocationURI());
+			FileHandler.load(configPath, featureProjectConfig, ConfigurationManager.getFormat(configPath.getFileName().toString()));
 
 			String args = userDefinedArgs;
 			for (final SelectableFeature f : featureProjectConfig.getFeatures()) {

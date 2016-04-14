@@ -28,12 +28,11 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.WRONG_CONFIGUR
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.LinkedList;
-import java.util.List;
 
 import de.ovgu.featureide.fm.core.RenamingsManager;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
+import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
@@ -49,9 +48,9 @@ public class FeatureIDEFormat implements IPersistentFormat<Configuration> {
 	private static final String NEWLINE = System.lineSeparator();
 
 	@Override
-	public List<Problem> read(Configuration configuration, CharSequence source) {
+	public ProblemList read(Configuration configuration, CharSequence source) {
 		final RenamingsManager renamingsManager = configuration.getFeatureModel().getRenamingsManager();
-		final List<Problem> warnings = new LinkedList<>();
+		final ProblemList warnings = new ProblemList();
 
 		final boolean orgPropagate = configuration.isPropagate();
 		configuration.setPropagate(false);

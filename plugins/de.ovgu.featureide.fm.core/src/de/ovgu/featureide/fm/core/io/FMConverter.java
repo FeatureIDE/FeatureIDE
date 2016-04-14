@@ -30,7 +30,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.io.manager.FileWriter;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.sxfm.SXFMReader;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelFormat;
 
@@ -87,11 +87,7 @@ public class FMConverter {
 						final Path outputFile = outputPath.resolve(inputPath.relativize(arg0));
 						Files.createDirectories(outputFile.getRoot().resolve(outputFile.subpath(0, outputFile.getNameCount() - 1)));
 						Files.deleteIfExists(outputFile);
-						final FileWriter<IFeatureModel> fileWriter = new FileWriter<IFeatureModel>();
-						fileWriter.setFormat(writer);
-						fileWriter.setObject(featureModel);
-						fileWriter.setPath(outputPath);
-						fileWriter.save();
+						FileHandler.save(outputPath, featureModel, writer);
 					}
 					return FileVisitResult.CONTINUE;
 				}

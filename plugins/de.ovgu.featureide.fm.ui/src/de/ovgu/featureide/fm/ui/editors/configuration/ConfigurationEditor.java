@@ -32,7 +32,6 @@ import java.util.List;
 import javax.annotation.CheckForNull;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
@@ -71,10 +70,11 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.ConfigurationMatrix;
 import de.ovgu.featureide.fm.core.io.FeatureGraphFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
+import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.manager.FileManagerMap;
-import de.ovgu.featureide.fm.core.io.manager.FileReader;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.LongRunningJob;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
@@ -225,7 +225,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		}
 
 		featureModelManager = FeatureModelManager.getInstance(res);
-		invalidFeatureModel = Problem.checkSeverity(featureModelManager.getLastProblems(), IMarker.SEVERITY_ERROR);
+		invalidFeatureModel = featureModelManager.getLastProblems().containsError();
 		if (invalidFeatureModel) {
 			return;
 		}
@@ -252,17 +252,17 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 			c = new ConfigurationFG(featureModelManager.getObject(), fg, ConfigurationFG.PARAM_IGNOREABSTRACT | ConfigurationFG.PARAM_LAZY);
 		}
 
-		final List<Problem> lastProblems = configurationManager.getLastProblems();
+		final ProblemList lastProblems = configurationManager.getLastProblems();
 		createModelFileMarkers(lastProblems);
 		
 		featureModelManager.addListener(this);
 		firePropertyChange(IEditorPart.PROP_DIRTY);
 		getExtensions();
 		
-		if (!Problem.checkSeverity(lastProblems, IMarker.SEVERITY_ERROR)) {
-			loadPropagator();
-		} else {
+		if (lastProblems.containsError()) {
 			setActivePage(2);
+		} else {
+			loadPropagator();
 		}
 	}
 	
@@ -290,10 +290,10 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 		final IFeatureGraph featureGraph = new MatrixFeatureGraph(featureModelManager.getObject());
 		final FeatureGraphFormat format = new FeatureGraphFormat();
 		Path path = Paths.get(file.toFile().toURI());
-		if (new FileReader<IFeatureGraph>().read(path, featureGraph, format)) {
-			return featureGraph;
-		} else {
+		if (FileHandler.load(path, featureGraph, format).containsError()) {
 			return null;
+		} else {
+			return featureGraph;
 		}
 	}
 
@@ -596,7 +596,7 @@ public class ConfigurationEditor extends MultiPageEditorPart implements GUIDefau
 	void createModelFileMarkers(List<Problem> warnings) {
 		markerHandler.deleteAllModelMarkers();
 		for (Problem warning : warnings) {
-			markerHandler.createModelMarker(warning.message, warning.severity, warning.line);
+			markerHandler.createModelMarker(warning.message, warning.severity.getLevel(), warning.line);
 		}
 	}
 

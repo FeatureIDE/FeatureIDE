@@ -20,16 +20,17 @@
  */
 package de.ovgu.featureide.fm.core.io.manager;
 
+import java.io.FileNotFoundException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.LinkedList;
 import java.util.List;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
+import de.ovgu.featureide.fm.core.io.ProblemList;
 
 /**
  * Capable of reading and writing a file in a certain format.
@@ -44,19 +45,19 @@ public class SimpleFileHandler<T> {
 
 	private IPersistentFormat<T> format;
 
-	private final List<Problem> lastProblems = new LinkedList<>();
+	private final ProblemList lastProblems = new ProblemList();
 
 	private T object;
 
 	private Path path;
 
-	public static <T> List<Problem> load(Path path, T object, IPersistentFormat<T> format) {
+	public static <T> ProblemList load(Path path, T object, IPersistentFormat<T> format) {
 		final SimpleFileHandler<T> fileHandler = new SimpleFileHandler<>(path, object, format);
 		fileHandler.read();
 		return fileHandler.getLastProblems();
 	}
 
-	public static <T> List<Problem> save(Path path, T object, IPersistentFormat<T> format) {
+	public static <T> ProblemList save(Path path, T object, IPersistentFormat<T> format) {
 		final SimpleFileHandler<T> fileHandler = new SimpleFileHandler<>(path, object, format);
 		fileHandler.write();
 		return fileHandler.getLastProblems();
@@ -72,7 +73,7 @@ public class SimpleFileHandler<T> {
 		return format;
 	}
 
-	public List<Problem> getLastProblems() {
+	public ProblemList getLastProblems() {
 		return lastProblems;
 	}
 
@@ -97,10 +98,11 @@ public class SimpleFileHandler<T> {
 	}
 
 	public boolean read() {
+		lastProblems.clear();
 		if (!Files.exists(path)) {
+			lastProblems.add(new Problem(new FileNotFoundException(path.toString())));
 			return false;
 		}
-		lastProblems.clear();
 		try {
 			final T newObject = object;
 
@@ -112,7 +114,7 @@ public class SimpleFileHandler<T> {
 		} catch (final Exception e) {
 			handleException(e);
 		}
-		return lastProblems.isEmpty();
+		return lastProblems.containsError();
 	}
 
 	public boolean write() {
@@ -123,7 +125,7 @@ public class SimpleFileHandler<T> {
 		} catch (final Exception e) {
 			handleException(e);
 		}
-		return lastProblems.isEmpty();
+		return lastProblems.containsError();
 	}
 
 	private void handleException(Exception e) {

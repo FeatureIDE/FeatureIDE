@@ -26,8 +26,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.conf.IFeatureGraph;
@@ -40,8 +38,8 @@ import de.ovgu.featureide.fm.core.conf.IFeatureGraph;
 public class FeatureGraphFormat implements IPersistentFormat<IFeatureGraph> {
 
 	@Override
-	public List<Problem> read(IFeatureGraph object, CharSequence source) {
-		ArrayList<Problem> problems = new ArrayList<>();
+	public ProblemList read(IFeatureGraph object, CharSequence source) {
+		ProblemList problems = new ProblemList();
 		try (final ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(source.toString().getBytes(Charset.forName("UTF-8"))))) {
 			final IFeatureGraph featureGraph = (IFeatureGraph) in.readObject();
 			object.copyValues(featureGraph);

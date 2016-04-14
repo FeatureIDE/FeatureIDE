@@ -76,7 +76,7 @@ import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
-import de.ovgu.featureide.fm.core.io.manager.FileReader;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.job.AStoppableJob;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.ui.UIPlugin;
@@ -105,7 +105,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 * read configuration.
 	 */
 	private Configuration configuration;
-	private FileReader<Configuration> reader;
+	private FileHandler<Configuration> reader;
 
 	/**
 	 * The count of found configurations.
@@ -445,7 +445,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		confs = 1;
 
 		configuration = new Configuration(featureModel, false, false);
-		reader = new FileReader<>(configuration);
+		reader = new FileHandler<>(configuration);
 
 		// method is called to initialize composer extension if not yet
 		// initialized; so only delete if sure
@@ -639,7 +639,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 */
 	protected void buildTWiseConfigurations(IFeatureProject featureProject, IProgressMonitor monitor) {
 		configuration = new Configuration(featureModel, false);
-		reader = new FileReader<>(configuration);
+		reader = new FileHandler<>(configuration);
 		monitor.beginTask(SAMPLING, 1);
 		runSPLCATool();
 		configurationNumber = sorter.sortConfigurations(monitor);

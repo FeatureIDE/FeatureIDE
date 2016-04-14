@@ -51,7 +51,6 @@ import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.io.FeatureGraphFormat;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
-import de.ovgu.featureide.fm.core.io.manager.FileReader;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
 import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 import de.ovgu.featureide.fm.core.job.WorkMonitor;
@@ -248,7 +247,7 @@ public class CreateFeatureGraphJob extends AProjectJob<CreateFeatureGraphJob.Arg
 	protected boolean work() throws Exception {
 		final FeatureGraphFormat format = new FeatureGraphFormat();
 		final Path path = Paths.get(project.getFile("model." + format.getSuffix()).getLocationURI());
-		if (!new FileReader<IFeatureGraph>().read(path, featureGraph, format)) {
+		if (!FileHandler.load(path, featureGraph, format).containsError()) {
 			createFeatureGraph();
 			FileHandler.save(path, featureGraph, format);
 		}

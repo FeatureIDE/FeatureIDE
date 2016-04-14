@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.io;
 
-import java.util.List;
-
 /**
  * Interface for saving and loading data.
  * 
@@ -29,7 +27,7 @@ import java.util.List;
  */
 public interface IPersistentFormat<T> {
 
-	List<Problem> read(T object, CharSequence source);
+	ProblemList read(T object, CharSequence source);
 
 	String write(T object);
 

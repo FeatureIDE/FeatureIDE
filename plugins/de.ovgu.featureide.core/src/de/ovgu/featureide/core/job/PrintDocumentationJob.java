@@ -56,7 +56,7 @@ import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.filter.base.IFilter;
 import de.ovgu.featureide.fm.core.io.IOConstants;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
-import de.ovgu.featureide.fm.core.io.manager.FileReader;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
@@ -113,11 +113,7 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 					Configuration.PARAM_LAZY | Configuration.PARAM_IGNOREABSTRACT);
 			try {
 				final IFile file = featureProject.getCurrentConfiguration();
-				final FileReader<Configuration> reader = new FileReader<>();
-				reader.setPath(Paths.get(file.getLocationURI()));
-				reader.setFormat(ConfigurationManager.getFormat(file.getName()));
-				reader.setObject(conf);
-				reader.read();
+				FileHandler.load(Paths.get(file.getLocationURI()), conf, ConfigurationManager.getFormat(file.getName()));
 			} catch (Exception e) {
 				CorePlugin.getDefault().logError(e);
 				return false;
