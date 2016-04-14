@@ -163,7 +163,7 @@ public class Configuration implements Cloneable {
 	
 	public void loadPropagator() {
 		LongRunningWrapper.runMethod(this.propagator.load());
-		update(false, null);
+		update(true, null);
 	}
 
 	public IConfigurationPropagator getPropagator() {
@@ -341,7 +341,7 @@ public class Configuration implements Cloneable {
 
 	public void setManual(SelectableFeature feature, Selection selection) {
 		feature.setManual(selection);
-		update(false, null);
+		update(true, null);
 	}
 
 	public void setManual(String name, Selection selection) {
@@ -369,7 +369,7 @@ public class Configuration implements Cloneable {
 	}
 
 	public void update() {
-		update(false, null);
+		update(true, null);
 	}
 
 	public void update(boolean redundantManual, String startFeatureName) {

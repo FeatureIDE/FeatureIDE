@@ -641,7 +641,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 				setDirty();
 			}
 			if (configurationEditor.isAutoSelectFeatures()) {
-				computeTree(false);
+				computeTree(true);
 			} else {
 				item.setForeground(null);
 				item.setFont(treeItemStandardFont);
@@ -676,7 +676,7 @@ public abstract class ConfigurationTreeEditorPage extends EditorPart implements 
 				@Override
 				public Void invoke(Void t) {
 					//					updateInfoLabel();
-					computeTree(false);
+					computeTree(true);
 					return null;
 				}
 			});
