@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core.filter.base;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -69,8 +70,8 @@ public abstract class Filter {
 		return source;
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" }) 
-	public static <T> Collection<T> filter(Collection<T> collection, Iterable<IFilter<?>> filterList) {
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private static <T> Collection<T> internalFilter(Collection<T> collection, Iterable<IFilter<?>> filterList) {
 		if (collection != null && filterList != null) {
 			for (IFilter filter : filterList) {
 				for (Iterator<T> iterator = collection.iterator(); iterator.hasNext();) {
@@ -82,9 +83,13 @@ public abstract class Filter {
 		}
 		return collection;
 	}
-	
+
 	public static <T> Collection<T> filter(Collection<T> collection, IFilter<?>... filterList) {
-		return filter(collection, filterList);
+		return internalFilter(collection, Arrays.asList(filterList));
+	}
+
+	public static <T> Collection<T> filter(Collection<T> collection, Iterable<IFilter<?>> filterList) {
+		return internalFilter(collection, filterList);
 	}
 
 	public static Collection<String> toString(Collection<?> collection) {
