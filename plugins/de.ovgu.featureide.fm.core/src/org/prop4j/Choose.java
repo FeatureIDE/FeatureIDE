@@ -43,6 +43,11 @@ public class Choose extends Node {
 	}
 
 	@Override
+	protected Node eliminateNonCNFOperators(Node[] newChildren) {
+		return new And(new AtMost(n, newChildren).eliminateNonCNFOperators(), new AtLeast(n, newChildren).eliminateNonCNFOperators());
+	}
+
+	@Override
 	protected Node eliminate(List<Class<? extends Node>> list) {
 		super.eliminate(list);
 		if (!list.contains(getClass()))

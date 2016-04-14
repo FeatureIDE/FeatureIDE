@@ -90,17 +90,15 @@ public class ConfigurationPage extends ConfigurationTreeEditorPage {
 		return PAGE_TEXT;
 	}
 
-	// TODO
-//	@Override
-//	public void pageChangeTo(int index) {
-//		if (configurationEditor.hasValidFeatureModel()) {
-//			final Configuration configuration = configurationEditor.getConfiguration();
-//			for (SelectableFeature feature : configuration.getFeatures()) {
-//				if (feature.getAutomatic() == Selection.UNDEFINED && feature.getManual() == Selection.UNSELECTED) {
-//					configuration.setManual(feature, Selection.UNDEFINED);
-//				}
+	@Override
+	public void pageChangeTo(int index) {
+//		final IConfiguration configuration = configurationEditor.getConfiguration();
+//		for (SelectableFeature feature : configuration.getFeatures()) {
+//			if (feature.getAutomatic() == Selection.UNDEFINED && feature.getManual() == Selection.UNSELECTED) {
+//				configuration.setManual(feature, Selection.UNDEFINED);
 //			}
 //		}
-//		super.pageChangeTo(index);
-//	}
+		super.pageChangeTo(index);
+	}
+
 }

@@ -43,6 +43,11 @@ public class AtLeast extends Node {
 	}
 
 	@Override
+	protected Node eliminateNonCNFOperators(Node[] newChildren) {
+		return new And(chooseKofN(newChildren, newChildren.length - min + 1, false));
+	}
+
+	@Override
 	protected Node eliminate(List<Class<? extends Node>> list) {
 		super.eliminate(list);
 		if (!list.contains(getClass()))

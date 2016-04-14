@@ -23,12 +23,10 @@ package de.ovgu.featureide.ui.actions.generator;
 import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD_CONFIGURATIONS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CASA;
 import static de.ovgu.featureide.fm.core.localization.StringTable.COUNTING___;
-import static de.ovgu.featureide.fm.core.localization.StringTable.FOR;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NOT_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.OF;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SAMPLING;
-import static de.ovgu.featureide.fm.core.localization.StringTable.SATSOLVER_COMPUTATION_TIMEOUT;
 
 import java.io.IOException;
 import java.net.URL;
@@ -70,17 +68,17 @@ import org.prop4j.SatSolver;
 import splar.core.fm.FeatureModelException;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
-import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FileReader;
 import de.ovgu.featureide.fm.core.job.AStoppableJob;
+import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.ui.UIPlugin;
 
 /**
@@ -285,12 +283,11 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			break;
 		case ALL_VALID:
 			Job number = new AStoppableJob(JOB_TITLE_COUNT_CONFIGURATIONS) {
-
 				@Override
 				protected boolean work() {
 					configurationNumber = new Configuration(featureModel, false, false).number(1000000);
 					if (configurationNumber < 0) {
-						LOGGER.logWarning(SATSOLVER_COMPUTATION_TIMEOUT);
+						LOGGER.logWarning(StringTable.SATSOLVER_COMPUTATION_TIMEOUT);
 						configurationNumber = Integer.MAX_VALUE;
 					}
 
@@ -325,7 +322,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		default:
 			break;
 		}
-		jobName += FOR + featureProject.getProjectName();
+		jobName += StringTable.FOR + featureProject.getProjectName();
 		Job job = new Job(jobName) {
 			public IStatus run(IProgressMonitor monitor) {
 				try {
@@ -649,6 +646,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		monitor.beginTask(BUILD_CONFIGURATIONS, (int)configurationNumber);		
 	}
 
+	@SuppressWarnings("deprecation")
 	private void runSPLCATool() {
 		CoveringArray ca = null;
 		try {
@@ -663,7 +661,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 				CoveringArrayCASA.CASA_PATH = path.toOSString();
 			}
 
-			ca = new GUIDSL(new FeatureModel(featureModel)).getSXFM().getCNF().getCoveringArrayGenerator(algorithm, t);
+			ca = new GUIDSL(new de.ovgu.featureide.fm.core.FeatureModel(featureModel)).getSXFM().getCNF().getCoveringArrayGenerator(algorithm, t);
 			if (ca == null) {
 				return;
 			}
@@ -794,7 +792,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	private void buildAll(IFeature root, IProgressMonitor monitor) {
 		LinkedList<IFeature> selectedFeatures2 = new LinkedList<IFeature>();
 		selectedFeatures2.add(root);
-		rootNode = NodeCreator.createNodes(featureModel, false).toCNF();
+		rootNode = AdvancedNodeCreator.createCNFWithoutAbstract(featureModel);
 		children = new LinkedList<Node>();
 		build(root, "", selectedFeatures2, monitor);
 		sorter.sortConfigurations(monitor);

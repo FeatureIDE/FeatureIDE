@@ -21,6 +21,7 @@
 package org.prop4j;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * A variable or negated variable.
@@ -29,16 +30,16 @@ import java.util.List;
  * @author Marcus Pinnecke (Feature Interface)
  */
 public class Literal extends Node implements Cloneable {
-	
+
 	public Object var;
-	
+
 	public boolean positive;
 
 	public Literal(Object var, boolean positive) {
 		this.var = var;
 		this.positive = positive;
 	}
-	
+
 	public Literal(Object var) {
 		this.var = var;
 		positive = true;
@@ -47,21 +48,26 @@ public class Literal extends Node implements Cloneable {
 	public void flip() {
 		positive = !positive;
 	}
-	
+
+	@Override
+	protected Node eliminateNonCNFOperators(Node[] newChildren) {
+		return clone();
+	}
+
 	@Override
 	protected Node eliminate(List<Class<? extends Node>> list) {
 		//nothing to do with children
 		return this;
 	}
-	
+
 	@Override
 	protected Node clausify() {
 		//nothing to do
 		return this;
 	}
-	
+
 	@Override
-	public void simplify() { 
+	public void simplify() {
 		//nothing to do (recursive calls reached lowest node)
 	}
 
@@ -69,19 +75,27 @@ public class Literal extends Node implements Cloneable {
 	public Literal clone() {
 		return new Literal(var, positive);
 	}
-	
+
 	@Override
 	public int hashCode() {
-		// TODO: This is equivalent not to implement hashCode() at all, and was added for legacy code reasons. 
-		// Please note: implementing "equals" without custom hashCode should be avoided
-		return super.hashCode();	
+		return var.hashCode() * (positive ? 31 : 37);
 	}
 
 	@Override
 	public boolean equals(Object node) {
-		if (!(node instanceof Literal))
+		if (this == node) {
+			return true;
+		}
+		if (!(node instanceof Literal)) {
 			return false;
-		return (var.equals(((Literal) node).var)) && (positive == ((Literal) node).positive);
+		}
+		final Literal other = (Literal) node;
+		return (positive == other.positive) && (var.equals(other.var));
 	}
-	
+
+	@Override
+	public boolean getValue(Map<Object, Boolean> map) {
+		return this.positive == map.get(this.var);
+	}
+
 }

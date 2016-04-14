@@ -29,7 +29,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
+import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 
 /**
@@ -64,7 +64,7 @@ abstract class AbstractJob extends Job implements IJob {
 	}
 	
 	@Override
-	public final void setIntermediateFunction(IFunction<Object, Void> intermediateFunction) {
+	public final void setIntermediateFunction(IConsumer<Object> intermediateFunction) {
 		workMonitor.setIntermediateFunction(intermediateFunction);
 	}
 

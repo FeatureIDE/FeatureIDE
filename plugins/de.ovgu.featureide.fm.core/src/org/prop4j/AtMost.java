@@ -43,6 +43,11 @@ public class AtMost extends Node {
 	}
 
 	@Override
+	protected Node eliminateNonCNFOperators(Node[] newChildren) {
+		return new And(chooseKofN(newChildren, max + 1, true));
+	}
+
+	@Override
 	protected Node eliminate(List<Class<? extends Node>> list) {
 		super.eliminate(list);
 		if (!list.contains(getClass()))

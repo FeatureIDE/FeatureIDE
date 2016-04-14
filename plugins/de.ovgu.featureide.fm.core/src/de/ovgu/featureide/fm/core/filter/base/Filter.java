@@ -20,6 +20,9 @@
  */
 package de.ovgu.featureide.fm.core.filter.base;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 
 /**
@@ -31,6 +34,23 @@ import java.util.Iterator;
  * @see InverseFilter
  */
 public abstract class Filter {
+
+	/**
+	 * Removes all elements from the collection that pass the filter.
+	 * 
+	 * @param source the collection
+	 * @param predicate the filter
+	 */
+	public static <U, T extends U, V extends Iterable<T>> V remove(V source, IFilter<U> predicate) {
+		if (source != null && predicate != null) {
+			for (Iterator<T> iterator = source.iterator(); iterator.hasNext();) {
+				if (predicate.isValid(iterator.next())) {
+					iterator.remove();
+				}
+			}
+		}
+		return source;
+	}
 
 	/**
 	 * Removes all elements from the collection that do <b>not</b> pass the filter.
@@ -49,21 +69,33 @@ public abstract class Filter {
 		return source;
 	}
 
-	/**
-	 * Removes all elements from the collection that pass the filter.
-	 * 
-	 * @param source the collection
-	 * @param predicate the filter
-	 */
-	public static <U, T extends U, V extends Iterable<T>> V remove(V source, IFilter<U> predicate) {
-		if (source != null && predicate != null) {
-			for (Iterator<T> iterator = source.iterator(); iterator.hasNext();) {
-				if (predicate.isValid(iterator.next())) {
-					iterator.remove();
+	@SuppressWarnings({ "rawtypes", "unchecked" }) 
+	public static <T> Collection<T> filter(Collection<T> collection, Iterable<IFilter<?>> filterList) {
+		if (collection != null && filterList != null) {
+			for (IFilter filter : filterList) {
+				for (Iterator<T> iterator = collection.iterator(); iterator.hasNext();) {
+					if (!filter.isValid(iterator.next())) {
+						iterator.remove();
+					}
 				}
 			}
 		}
-		return source;
+		return collection;
+	}
+	
+	public static <T> Collection<T> filter(Collection<T> collection, IFilter<?>... filterList) {
+		return filter(collection, filterList);
+	}
+
+	public static Collection<String> toString(Collection<?> collection) {
+		if (collection != null) {
+			final ArrayList<String> result = new ArrayList<>(collection.size());
+			for (Iterator<?> iterator = collection.iterator(); iterator.hasNext();) {
+				result.add(iterator.next().toString());
+			}
+			return result;
+		}
+		return Collections.emptyList();
 	}
 
 }

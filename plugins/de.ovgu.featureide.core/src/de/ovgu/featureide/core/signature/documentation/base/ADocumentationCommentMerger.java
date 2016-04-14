@@ -30,8 +30,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
-import de.ovgu.featureide.core.signature.filter.Filter;
-import de.ovgu.featureide.core.signature.filter.IFilter;
+import de.ovgu.featureide.fm.core.filter.base.Filter;
+import de.ovgu.featureide.fm.core.filter.base.IFilter;
 
 /**
  * Abstract merger for modul-comment.

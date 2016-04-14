@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2013  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -47,12 +47,12 @@ import de.ovgu.featureide.fm.core.localization.StringTable;
  * user-defined order (if specified).
  * 
  * @author Sebastian Krieter
- * @author Marcus Pinnecke (Feature Interface)
  */
 public class DefaultFormat implements IPersistentFormat<Configuration> {
 
 	private static final String NEWLINE = System.lineSeparator();
 
+	@Override
 	public List<Problem> read(Configuration configuration, CharSequence source) {
 		final RenamingsManager renamingsManager = configuration.getFeatureModel().getRenamingsManager();
 		final List<Problem> warnings = new LinkedList<>();

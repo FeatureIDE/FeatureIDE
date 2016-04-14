@@ -18,34 +18,23 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.core.signature.filter;
+package de.ovgu.featureide.fm.core.conf;
 
-import java.util.Collection;
-import java.util.Iterator;
+import java.util.List;
 
-public abstract class Filter {
+import de.ovgu.featureide.fm.core.job.LongRunningMethod;
 
-	public static <U, T extends U> void filter(Collection<T> collection, IFilter<U> filter) {
-		if (collection != null && filter != null) {
-			for (Iterator<T> iterator = collection.iterator(); iterator.hasNext();) {
-				if (!filter.isValid(iterator.next())) {
-					iterator.remove();
-				}
-			}
-		}
-	}
+/**
+ * TODO description
+ * 
+ * @author Sebastian Krieter
+ */
+public interface IConfigurationChanger {
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public static <T> void filter(Collection<T> collection, Collection<IFilter<?>> filterList) {
-		if (collection != null && filterList != null) {
-			for (IFilter filter : filterList) {
-				for (Iterator<T> iterator = collection.iterator(); iterator.hasNext();) {
-					if (!filter.isValid(iterator.next())) {
-						iterator.remove();
-					}
-				}
-			}
-		}
-	}
+	LongRunningMethod<List<String>> update(boolean redundantManual, String startFeatureName);
+
+	void setNewValue(int index, int value, boolean manual);
+
+	void reset();
 
 }

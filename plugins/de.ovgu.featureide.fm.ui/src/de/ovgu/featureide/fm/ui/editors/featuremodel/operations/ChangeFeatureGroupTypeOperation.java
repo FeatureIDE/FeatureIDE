@@ -64,7 +64,7 @@ public class ChangeFeatureGroupTypeOperation extends AbstractFeatureModelOperati
 		} else {
 			feature.getStructure().changeToAnd();
 		}
-		return new FeatureIDEEvent(feature, null, true, EventType.GROUP_TYPE_CHANGED, null, null);
+		return new FeatureIDEEvent(feature, EventType.GROUP_TYPE_CHANGED, null, null);
 	}
 
 	@Override
@@ -76,7 +76,7 @@ public class ChangeFeatureGroupTypeOperation extends AbstractFeatureModelOperati
 		} else {
 			feature.getStructure().changeToOr();
 		}
-		return new FeatureIDEEvent(feature, null, true, EventType.GROUP_TYPE_CHANGED, null, null);
+		return new FeatureIDEEvent(feature, EventType.GROUP_TYPE_CHANGED, null, null);
 	}
 
 	private static int getGroupType(IFeature feature) {

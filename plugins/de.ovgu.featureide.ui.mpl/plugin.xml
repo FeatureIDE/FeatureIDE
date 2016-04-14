@@ -346,6 +346,7 @@
 			<command
 					commandId="de.ovgu.featureide.ui.mpl.commands.newInterface"
 					icon="icons/featuretree.ico"
+					id="de.ovgu.featureide.ui.mpl.actions.newInterface"
 					label="Create New Interface Model"
 					style="push">
 				<visibleWhen
@@ -403,10 +404,6 @@
 				name="Convert to MPL Project">
 		</command>
 		<command
-				id="de.ovgu.featureide.ui.mpl.commands.newInterface"
-				name="Create new interface model">
-		</command>
-		<command
 				id="de.ovgu.featureide.ui.mpl.commands.mapping"
 				name="Set current project mapping">
 		</command>
@@ -414,16 +411,16 @@
 				id="de.ovgu.featureide.ui.mpl.commands.statistics"
 				name="Print MPL Statistics">
 		</command>
+  <command
+        id="de.ovgu.featureide.ui.mpl.commands.newInterface"
+        name="New Interface">
+  </command>
 	</extension>
 	<extension
 			point="org.eclipse.ui.handlers">
 		<handler
 				class="de.ovgu.featureide.ui.mpl.handlers.AddMSPLNatureHandler"
 				commandId="de.ovgu.featureide.ui.mpl.commands.conversion">
-		</handler>
-		<handler
-				class="de.ovgu.featureide.ui.mpl.handlers.NewInterfaceHandler"
-				commandId="de.ovgu.featureide.ui.mpl.commands.newInterface">
 		</handler>
 		<handler
 				class="de.ovgu.featureide.ui.mpl.handlers.SetMappingHandler"
@@ -433,5 +430,9 @@
 				class="de.ovgu.featureide.ui.mpl.handlers.statistics.PrintAllStatisticsHandler"
 				commandId="de.ovgu.featureide.ui.mpl.commands.statistics">
 		</handler>
+  <handler
+        class="de.ovgu.featureide.ui.mpl.handlers.NewInterfaceHandler"
+        commandId="de.ovgu.featureide.ui.mpl.commands.newInterface">
+  </handler>
 	</extension>
 </plugin>
