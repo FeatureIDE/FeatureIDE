@@ -36,6 +36,7 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.job.WorkMonitor;
 
 /**
@@ -52,7 +53,7 @@ public class Configuration implements Cloneable {
 
 	final boolean ignoreAbstractFeatures;
 
-	private final IFeatureModel featureModel;
+	protected final IFeatureModel featureModel;
 	private final SelectableFeature root;
 	private final ConfigurationPropagator propagator;
 	private boolean propagate = true;
@@ -97,15 +98,15 @@ public class Configuration implements Cloneable {
 			}
 		}
 	}
-	
+
 	public Configuration(IFeatureModel featureModel) {
 		this(featureModel, PARAM_PROPAGATE | PARAM_IGNOREABSTRACT);
 	}
-	
+
 	public Configuration(IFeatureModel featureModel, boolean propagate) {
 		this(featureModel, (propagate ? PARAM_PROPAGATE : 0) | PARAM_IGNOREABSTRACT);
 	}
-	
+
 	public Configuration(IFeatureModel featureModel, boolean propagate, boolean ignoreAbstractFeatures) {
 		this(featureModel, (propagate ? PARAM_PROPAGATE : 0) | (ignoreAbstractFeatures ? PARAM_IGNOREABSTRACT : 0));
 	}
@@ -131,12 +132,13 @@ public class Configuration implements Cloneable {
 		}
 	}
 
-    private void initFeatures(SelectableFeature sFeature, IFeature feature) {
-        if (sFeature != null && sFeature.getName() != null) {
+	private void initFeatures(SelectableFeature sFeature, IFeature feature) {
+		if (sFeature != null && sFeature.getName() != null) {
 			features.add(sFeature);
 			table.put(sFeature.getName(), sFeature);
+
 			for (IFeatureStructure child : feature.getStructure().getChildren()) {
-				SelectableFeature sChild = new SelectableFeature(this, child.getFeature());
+				SelectableFeature sChild = new SelectableFeature(child.getFeature());
 				sFeature.addChild(sChild);
 				initFeatures(sChild, child.getFeature());
 			}
@@ -144,8 +146,9 @@ public class Configuration implements Cloneable {
 	}
 
 	private SelectableFeature initRoot() {
+
 		final IFeature featureRoot = FeatureUtils.getRoot(featureModel);
-		final SelectableFeature root = new SelectableFeature(this, featureRoot);
+		final SelectableFeature root = new SelectableFeature(featureRoot);
 
 		if (featureRoot != null) {
 			initFeatures(root, featureRoot);
@@ -157,12 +160,13 @@ public class Configuration implements Cloneable {
 		return root;
 	}
 
+	
 	public void loadPropagator() {
-		propagator.load(new WorkMonitor());
-		update(false, null);
+		LongRunningWrapper.runMethod(this.propagator.load());
+		update(true, null);
 	}
 
-	public ConfigurationPropagator getPropagator() {
+	public IConfigurationPropagator getPropagator() {
 		return propagator;
 	}
 
@@ -172,11 +176,11 @@ public class Configuration implements Cloneable {
 		}
 	}
 
-	void setAutomatic(SelectableFeature feature, Selection selection) {
+	public void setAutomatic(SelectableFeature feature, Selection selection) {
 		feature.setAutomatic(selection);
 	}
 
-	void setAutomatic(String name, Selection selection) {
+	public void setAutomatic(String name, Selection selection) {
 		SelectableFeature feature = table.get(name);
 		if (feature == null) {
 			throw new FeatureNotFoundException();
@@ -185,7 +189,7 @@ public class Configuration implements Cloneable {
 	}
 
 	public boolean canBeValid() {
-		return propagator.canBeValid(new WorkMonitor());
+		return LongRunningWrapper.runMethod(propagator.canBeValid());
 	}
 
 	public IFeatureModel getFeatureModel() {
@@ -224,7 +228,7 @@ public class Configuration implements Cloneable {
 		return result;
 	}
 
-    public List<IFeature> getSelectedFeatures() {
+	public List<IFeature> getSelectedFeatures() {
 		final List<IFeature> result = new ArrayList<IFeature>();
 		for (SelectableFeature feature : features) {
 			if (feature.getSelection() == Selection.SELECTED) {
@@ -235,9 +239,9 @@ public class Configuration implements Cloneable {
 	}
 
 	public LinkedList<List<String>> getSolutions(int max) throws TimeoutException {
-		return propagator.getSolutions(max, new WorkMonitor());
+		return LongRunningWrapper.runMethod(propagator.getSolutions(max));
 	}
-	
+
 	public List<IFeature> getUnSelectedFeatures() {
 		final List<IFeature> result = new ArrayList<IFeature>();
 		for (SelectableFeature feature : features) {
@@ -248,7 +252,7 @@ public class Configuration implements Cloneable {
 
 		return result;
 	}
-	
+
 	public List<IFeature> getUndefinedSelectedFeatures() {
 		final List<IFeature> result = new ArrayList<IFeature>();
 		for (SelectableFeature feature : features) {
@@ -271,7 +275,7 @@ public class Configuration implements Cloneable {
 	 * @return {@code true} if the current selection is a valid configuration
 	 */
 	public boolean isValid() {
-		return propagator.isValid(new WorkMonitor());
+		return LongRunningWrapper.runMethod(propagator.isValid());
 	}
 
 	/**
@@ -279,15 +283,15 @@ public class Configuration implements Cloneable {
 	 * Use this, when propgate is disabled (hidden features are not updated).
 	 */
 	public boolean isValidNoHidden() {
-		return propagator.isValidNoHidden(new WorkMonitor());
+		return LongRunningWrapper.runMethod(propagator.isValidNoHidden());
 	}
 
 	public void leadToValidConfiguration(List<SelectableFeature> featureList, WorkMonitor workMonitor) {
-		propagator.leadToValidConfiguration(featureList, new WorkMonitor());
+		LongRunningWrapper.runMethod(propagator.leadToValidConfiguration(featureList));
 	}
 
 	public void leadToValidConfiguration(List<SelectableFeature> featureList, int mode, WorkMonitor workMonitor) {
-		propagator.leadToValidConfiguration(featureList, mode, new WorkMonitor());
+		LongRunningWrapper.runMethod(propagator.leadToValidConfiguration(featureList, mode));
 	}
 
 	/**
@@ -314,7 +318,7 @@ public class Configuration implements Cloneable {
 	 * @see #number(long)
 	 */
 	public long number() {
-		return propagator.number(250, new WorkMonitor());
+		return LongRunningWrapper.runMethod(propagator.number(250));
 	}
 
 	/**
@@ -324,7 +328,7 @@ public class Configuration implements Cloneable {
 	 *         or a negative value (if a timeout occured) that indicates that there are more solutions than the absolute value
 	 */
 	public long number(long timeout) {
-		return propagator.number(timeout, new WorkMonitor());
+		return LongRunningWrapper.runMethod(propagator.number(timeout));
 	}
 
 	public void resetValues() {
@@ -337,7 +341,7 @@ public class Configuration implements Cloneable {
 
 	public void setManual(SelectableFeature feature, Selection selection) {
 		feature.setManual(selection);
-		update(false, null);
+		update(true, null);
 	}
 
 	public void setManual(String name, Selection selection) {
@@ -365,12 +369,12 @@ public class Configuration implements Cloneable {
 	}
 
 	public void update() {
-		update(false, null);
+		update(true, null);
 	}
 
 	public void update(boolean redundantManual, String startFeatureName) {
 		if (propagate) {
-			propagator.update(redundantManual, startFeatureName, new WorkMonitor());
+			LongRunningWrapper.runMethod(propagator.update(redundantManual, startFeatureName));
 		}
 	}
 

@@ -218,11 +218,10 @@ public class SXFMReader extends AbstractFeatureModelReader {
     		line++;
     		FeatureIndent feat;
 			String featId = "";   
-    		while (lineText != null) {				
+    		while ((lineText = reader.readLine()) != null) {				
 	    		int countIndent = 0;
 				 						
-				if (lineText.trim().equals("")) {
-					lineText = reader.readLine();
+				if (lineText.trim().isEmpty()) {
 					line++;
 					continue;
 				}	
@@ -306,8 +305,8 @@ public class SXFMReader extends AbstractFeatureModelReader {
 							DETERMINE_GROUP_CARDINALITY, line);
 					//lastFeat = feat;
 					//featId = featId + "_ ";
-					lineText = reader.readLine();
 					line++;
+					addFeatureToModel(feat);
 					continue;
 				} else if (lineText.startsWith(":")) {
 					feat = new FeatureIndent(featureModel, countIndent);
@@ -336,7 +335,6 @@ public class SXFMReader extends AbstractFeatureModelReader {
 				idTable.put(featId, feat);
 				
 				lastFeat = feat;
-				lineText = reader.readLine();
 				line++;
     		}
     		
@@ -362,6 +360,7 @@ public class SXFMReader extends AbstractFeatureModelReader {
 					feature.getStructure().changeToAlternative();
 				child.setParent(null);
 				feature.getStructure().removeChild(child);
+				featureModel.deleteFeatureFromTable(child.getFeature());
 			}
 		}
 		for (IFeatureStructure child : feature.getStructure().getChildren())

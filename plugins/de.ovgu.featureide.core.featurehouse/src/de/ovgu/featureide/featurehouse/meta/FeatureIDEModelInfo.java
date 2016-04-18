@@ -38,7 +38,7 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.configuration.SelectionNotPossibleException;
-import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 
 /**
  * Representation of the feature model. 
@@ -73,7 +73,7 @@ public class FeatureIDEModelInfo implements FeatureModelInfo {
 	}
 	
 	private String createdValidClause() {
-		final Node nodes = NodeCreator.createNodes(featureModel.clone(null)).eliminateNotSupportedSymbols(NodeWriter.javaSymbols);
+		final Node nodes = AdvancedNodeCreator.createNodes(featureModel).eliminateNotSupportedSymbols(NodeWriter.javaSymbols);
 		String formula = " " + nodes.toString(NodeWriter.javaSymbols).toLowerCase(Locale.ENGLISH);
 		
 		final String truefalse = "  &&  true  &&  ! false";

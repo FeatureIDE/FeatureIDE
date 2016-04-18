@@ -30,6 +30,7 @@ import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.signature.base.IConstrainedObject;
+import de.ovgu.featureide.fm.core.filter.base.IFilter;
 
 public class ConstraintFilter implements IFilter<IConstrainedObject> {
 	

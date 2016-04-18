@@ -37,7 +37,7 @@ import org.prop4j.Or;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
@@ -135,7 +135,7 @@ public class FeatureModelJPFCore implements IFeatureModelClass {
 	private LinkedList<String> addedFeatures = new LinkedList<String>();
 
 	private Node getFormulaJPF(IFeatureModel model) {
-		return NodeCreator.createNodes(model.clone(null)).toCNF();
+		return AdvancedNodeCreator.createCNF(model);
 	}
 	
 	/**

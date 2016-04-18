@@ -110,8 +110,7 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslReader;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
-import de.ovgu.featureide.fm.core.io.manager.FileReader;
-import de.ovgu.featureide.fm.core.io.manager.FileWriter;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 import de.ovgu.featureide.fm.core.job.AJob;
 import de.ovgu.featureide.fm.core.job.AStoppableJob;
@@ -570,8 +569,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 					configFolder.accept(new IResourceVisitor() {
 						private final String suffix = "." + composer.getConfigurationExtension();
 						private final Configuration config = new Configuration(model, Configuration.PARAM_LAZY);
-						final FileReader<Configuration> r = new FileReader<>(config);
-						final FileWriter<Configuration> w = new FileWriter<>(config);
+						private final FileHandler<Configuration> handler = new FileHandler<>(config);
 
 						@Override
 						public boolean visit(IResource resource) throws CoreException {
@@ -579,12 +577,10 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 							if (resource instanceof IFile && name.endsWith(suffix)) {
 								final IPersistentFormat<Configuration> format = ConfigurationManager.getFormat(resource.getName());
 								final java.nio.file.Path path = Paths.get(resource.getLocationURI());
-								r.setFormat(format);
-								w.setFormat(format);
-								r.setPath(path);
-								w.setPath(path);
-								r.read();
-								w.save();
+								handler.setFormat(format);
+								handler.setPath(path);
+								handler.read();
+								handler.write();
 							}
 							return true;
 						}
@@ -1061,8 +1057,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			protected boolean work() throws Exception {
 				workMonitor.setMaxAbsoluteWork(2 * files.size());
 				final Configuration config = new Configuration(featureModelManager.getObject(), false, false);
-				final FileReader<Configuration> reader = new FileReader<>();
-				reader.setObject(config);
+				final FileHandler<Configuration> reader = new FileHandler<>(config);
 				try {
 					workMonitor.getMonitor().subTask(DELETE_CONFIGURATION_MARKERS);
 					for (IFile file : files) {
@@ -1156,7 +1151,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 		final boolean[][] selections = new boolean[configurations.size()][concreteFeatures.size()];
 		final Configuration configuration = new Configuration(featureModelManager.getObject(), Configuration.PARAM_IGNOREABSTRACT);
-		final FileReader<Configuration> reader = new FileReader<>(configuration);
+		final FileHandler<Configuration> reader = new FileHandler<>(configuration);
 
 		int row = 0;
 		for (IFile file : configurations) {

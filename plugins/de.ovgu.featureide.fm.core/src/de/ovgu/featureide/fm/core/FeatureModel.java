@@ -51,6 +51,7 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  * @author Stefan Krueger
  * 
  */
+@Deprecated
 public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem, Cloneable {
 
 	public IFeatureModel model;
@@ -71,19 +72,22 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 		return model.getAnalyser();
 	}
 
-	@Override
+	/**
+	 * Returns the {@link FeatureModelAnalyzer} which should be used for all calculation
+	 * on the {@link FeatureModel}.
+	 */
 	public FeatureModelAnalyzer getAnalyser() {
 		return model.getAnalyser();
 	}
 
 	@Override
 	public IFeatureModelLayout getLayout() {
-//		return model.getLayout();
+		//		return model.getLayout();
 		return null;
 	}
 
 	public ColorschemeTable getColorschemeTable() {
-//		return model.getGraphicRepresenation().getColorschemeTable();
+		//		return model.getGraphicRepresenation().getColorschemeTable();
 		return null;
 	}
 
@@ -109,6 +113,12 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 		FeatureUtils.reset(model);
 	}
 
+	/**
+	 * Creates a default {@link FeatureModel} with a root feature named as the project and a
+	 * child feature named base.
+	 * 
+	 * @param projectName The name of the project
+	 */
 	public void createDefaultValues(String projectName) {
 		FeatureUtils.createDefaultValues(model, projectName);
 	}
@@ -136,16 +146,27 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 		return Functional.toList(Functional.map(FeatureUtils.getFeatures(model), FeatureUtils.IFEATURE_TO_FEATURE));
 	}
 
+	/**
+	 * @return The {@link Feature} with the given name or {@code null} if there is no feature with this name.
+	 */
 	@CheckForNull
 	public Feature getFeature(String name) {
 		return convert(FeatureUtils.getFeature(model, name));
 	}
 
+	/**
+	 * 
+	 * @return A list of all concrete features. This list is in preorder of the tree.
+	 */
 	@Nonnull
 	public Collection<Feature> getConcreteFeatures() {
 		return Functional.toList(Functional.map(FeatureUtils.getConcreteFeatures(model), FeatureUtils.IFEATURE_TO_FEATURE));
 	}
 
+	/**
+	 * 
+	 * @return A list of all concrete feature names. This list is in preorder of the tree.
+	 */
 	@Nonnull
 	public List<String> getConcreteFeatureNames() {
 		return Functional.toList(FeatureUtils.getConcreteFeatureNames(model));
@@ -159,16 +180,23 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 		return FeatureUtils.getFeatureNamesPreorder(model);
 	}
 
+	/**
+	 * @return <code>true</code> if a feature with the given name exists and is concrete.
+	 * @deprecated Will be removed in a future release. Use {@link #getFeature(String)}.isConcrete() instead.
+	 */
 	@Deprecated
 	public boolean isConcrete(String featureName) {
 		return FeatureUtils.isConcrete(model, featureName);
 	}
 
+	/**
+	 * @return the featureTable
+	 */
 	protected Map<String, Feature> getFeatureTable() {
 		Map<String, Feature> result = new HashMap<>();
 		final Map<String, IFeature> map = FeatureUtils.getFeatureTable(model);
 		for (String key : map.keySet())
-			result.put (key, convert(map.get(key)));				
+			result.put(key, convert(map.get(key)));
 		return result;
 	}
 
@@ -207,7 +235,7 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 	public void addPropositionalNode(Node node, int index) {
 		FeatureUtils.addPropositionalNode(model, node, index);
 	}
-
+	
 	public void addConstraint(Constraint constraint, int index) {
 		FeatureUtils.addConstraint(model, FeatureUtils.convert(constraint), index);
 	}
@@ -292,6 +320,9 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 		FeatureUtils.refreshContextMenu(model);
 	}
 
+	/**
+	 * Refreshes the diagram colors.
+	 */
 	public void redrawDiagram() {
 		FeatureUtils.redrawDiagram(model);
 	}
@@ -301,10 +332,28 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 		return new FeatureModel(model.clone());
 	}
 
+	/**
+	 * Will return the value of clone(true).
+	 * 
+	 * @return a deep copy from the feature model
+	 * 
+	 * @see #clone(boolean)
+	 */
 	public FeatureModel deepClone() {
 		return (FeatureModel) model.clone();
 	}
 
+	/**
+	 * Clones the feature model.
+	 * Makes a deep copy from all fields in the model.</br>
+	 * Note that: {@code fm == fm.clone(false)} and {@code fm == fm.clone(true)} are {@code false} in every case.
+	 * 
+	 * @param complete If {@code false} the fields annotations, comments, colorschemeTable and layout
+	 *            are set to {@code null} for a faster cloning process.
+	 * @return a deep copy from the feature model
+	 * 
+	 * @see #clone()
+	 */
 	public FeatureModel deepClone(boolean complete) {
 		return (FeatureModel) model.clone();
 	}
@@ -325,6 +374,9 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 		return FeatureUtils.hasAlternativeGroup(model);
 	}
 
+	/**
+	 * @return true if feature model contains or group otherwise false
+	 */
 	public boolean hasOrGroup() {
 		return FeatureUtils.hasOrGroup(model);
 	}
@@ -337,6 +389,9 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 		return FeatureUtils.hasConcrete(model);
 	}
 
+	/**
+	 * @return number of or groups contained in the feature model
+	 */
 	public int numOrGroup() {
 		return FeatureUtils.numOrGroup(model);
 	}
@@ -345,6 +400,10 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 		return FeatureUtils.numAlternativeGroup(model);
 	}
 
+	/**
+	 * 
+	 * @return <code>true</code> if the feature model contains a hidden feature
+	 */
 	public boolean hasHidden() {
 		return FeatureUtils.hasHidden(model);
 	}
@@ -378,11 +437,11 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 	}
 
 	public void setUndoContext(Object undoContext) {
-//		FeatureUtils.setUndoContext(model, undoContext);
+		//		FeatureUtils.setUndoContext(model, undoContext);
 	}
 
 	public Object getUndoContext() {
-//		return FeatureUtils.getUndoContext(model);
+		//		return FeatureUtils.getUndoContext(model);
 		return null;
 	}
 
@@ -403,12 +462,12 @@ public class FeatureModel extends DeprecatedFeatureModel implements IGraphicItem
 	}
 
 	public boolean isFeatureOrderInXML() {
-//		return FeatureUtils.isFeatureOrderInXML(model);
+		//		return FeatureUtils.isFeatureOrderInXML(model);
 		return false;
 	}
 
 	public void setFeatureOrderInXML(boolean featureOrderInXML) {
-//		FeatureUtils.setFeatureOrderInXML(model, featureOrderInXML);
+		//		FeatureUtils.setFeatureOrderInXML(model, featureOrderInXML);
 	}
 
 	@Override

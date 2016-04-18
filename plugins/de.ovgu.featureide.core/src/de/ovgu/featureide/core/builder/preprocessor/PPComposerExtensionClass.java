@@ -53,7 +53,7 @@ import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
@@ -186,7 +186,7 @@ public abstract class PPComposerExtensionClass extends ComposerExtensionClass {
 			patternIsConcreteFeature = Pattern.compile(concreteFeatures.substring(0, concreteFeatures.length() - 1));
 
 		// create expression of feature model
-		featureModel = NodeCreator.createNodes(fm);
+		featureModel = AdvancedNodeCreator.createNodes(fm);
 
 		featureList = Functional.toList(FeatureUtils.extractFeatureNames(fm.getFeatures()));
 

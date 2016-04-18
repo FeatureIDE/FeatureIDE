@@ -195,6 +195,7 @@ public class FeatureUIHelper {
 				editPartList.add((ConnectionEditPart) connectionEditPart);
 			}
 		}
+		
 		return editPartList;
 	}
 

@@ -39,6 +39,7 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  * @author Florian Proksch
  * @author Stefan Krueger
  */
+@Deprecated
 public class Constraint implements IGraphicItem {
 
 	public Constraint(IFeatureModel featureModel, Node propNode) {

@@ -18,12 +18,7 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.ui.mpl.wizards.page;
-
-import static de.ovgu.featureide.fm.core.localization.StringTable.HERE_YOU_SELECT_THE_FEATURES_FOR_THE_NEW_INTERFACE_;
-import static de.ovgu.featureide.fm.core.localization.StringTable.PLEASE_SELECT_A_PROJECT_IN_THE_PREVIOUS_PAGE_;
-import static de.ovgu.featureide.fm.core.localization.StringTable.SELECT_AT_LEAST_ONE_FEATURE_;
-import static de.ovgu.featureide.fm.core.localization.StringTable.SELECT_FEATURES;
+package de.ovgu.featureide.fm.ui.wizards;
 
 import java.util.HashSet;
 
@@ -37,29 +32,25 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
-import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
-import de.ovgu.featureide.fm.ui.wizards.AbstractWizardPage;
-import de.ovgu.featureide.fm.ui.wizards.WizardConstants;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 
 /**
- * A Wizard Page to select the features from the other project to create the
- * interface.
+ * A Wizard Page to select the features from a feature model.
  * 
  * @author Christoph Giesel
  * @author Sebastian Krieter
- * @author Marcus Pinnecke
  */
 public class SelectFeaturesWizardPage extends AbstractWizardPage {
-	
+
 	private Tree featuresTree;
 	private HashSet<String> featureNames = new HashSet<String>();
-	
+
 	public SelectFeaturesWizardPage() {
-		super(SELECT_FEATURES);
-		setTitle(SELECT_FEATURES);
-		setDescription(HERE_YOU_SELECT_THE_FEATURES_FOR_THE_NEW_INTERFACE_);
+		super("Select Features");
+		setTitle("Select Features");
+		setDescription("Here you select the features for the sliced feature model.");
 	}
 
 	@Override
@@ -69,11 +60,11 @@ public class SelectFeaturesWizardPage extends AbstractWizardPage {
 		GridLayout layout = new GridLayout();
 		container.setLayout(layout);
 		setControl(container);
-		
+
 		featuresTree = new Tree(container, SWT.MULTI | SWT.CHECK);
-	    featuresTree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		featuresTree.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 		featuresTree.addSelectionListener(new SelectionListener() {
-			
+
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				if (e.detail == SWT.CHECK) {
@@ -86,56 +77,56 @@ public class SelectFeaturesWizardPage extends AbstractWizardPage {
 					updatePage();
 				}
 			}
-			
+
 			@Override
 			public void widgetDefaultSelected(SelectionEvent e) {
 				updatePage();
 			}
 		});
-		
+
 		Composite buttonGroup = new Composite(container, 0);
 		buttonGroup.setLayoutData(new GridData(SWT.FILL, SWT.BOTTOM, true, false));
 		GridLayout gridLayout = new GridLayout();
 		gridLayout.numColumns = 2;
 		buttonGroup.setLayout(gridLayout);
-		
+
 		Button selectAllButton = new Button(buttonGroup, SWT.PUSH);
 		selectAllButton.setText("Select All");
 		selectAllButton.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				checkItems(true);			
+				checkItems(true);
 			}
-			
+
 			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {}
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
 		});
-		
+
 		Button deselectAllButton = new Button(buttonGroup, SWT.PUSH);
 		deselectAllButton.setText("Deselect All");
 		deselectAllButton.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				checkItems(false);		
+				checkItems(false);
 			}
-			
+
 			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {}
+			public void widgetDefaultSelected(SelectionEvent e) {
+			}
 		});
-		
-//		buttonGroup.pack();
-//		container.pack();
-		setPageComplete(false);		
+
+		setPageComplete(false);
 	}
-	
+
 	private void checkItems(boolean checkStatus) {
 		TreeItem[] items = featuresTree.getItems();
 		for (int i = 0; i < items.length; i++) {
 			check(items[i], checkStatus);
 		}
-		updatePage();				
+		updatePage();
 	}
-	
+
 	private void check(TreeItem parent, boolean checkStatus) {
 		parent.setChecked(checkStatus);
 		if (checkStatus) {
@@ -148,17 +139,17 @@ public class SelectFeaturesWizardPage extends AbstractWizardPage {
 			check(items[i], checkStatus);
 		}
 	}
-	
+
 	@Override
 	public void setVisible(boolean visible) {
 		if (visible) {
 			featuresTree.setItemCount(0);
 			featureNames.clear();
-			Object featureProject = abstractWizard.getData(WizardConstants.KEY_OUT_PROJECT);
-			if (featureProject != null) {
-				addFeaturesToTree(((IFeatureProject)featureProject).getFeatureModel().getStructure().getRoot().getFeature());
+			Object featureModel = abstractWizard.getData(WizardConstants.KEY_IN_FEATUREMODEL);
+			if (featureModel != null) {
+				addFeaturesToTree(((IFeatureModel) featureModel).getStructure().getRoot().getFeature());
 			} else {
-				setErrorMessage(PLEASE_SELECT_A_PROJECT_IN_THE_PREVIOUS_PAGE_);
+				setErrorMessage("Please select a Project in the previous page.");
 				setPageComplete(false);
 			}
 		}
@@ -175,9 +166,9 @@ public class SelectFeaturesWizardPage extends AbstractWizardPage {
 		TreeItem item = new TreeItem(featuresTree, SWT.NORMAL);
 		item.setText(root.getName());
 		item.setData(root);
-		
-		for (IFeature feature : FeatureUtils.convertToFeatureList(root.getStructure().getChildren())) {
-			addFeaturesToTree(feature, item);
+
+		for (IFeatureStructure feature : root.getStructure().getChildren()) {
+			addFeaturesToTree(feature.getFeature(), item);
 		}
 		item.setExpanded(true);
 	}
@@ -196,21 +187,21 @@ public class SelectFeaturesWizardPage extends AbstractWizardPage {
 		item.setData(root);
 		item.setExpanded(true);
 
-		for (IFeature feature : FeatureUtils.convertToFeatureList(root.getStructure().getChildren()))
-			addFeaturesToTree(feature, item);
+		for (IFeatureStructure feature : root.getStructure().getChildren())
+			addFeaturesToTree(feature.getFeature(), item);
 
 		item.setExpanded(true);
 	}
-	
+
 	@Override
 	protected void putData() {
 		abstractWizard.putData(WizardConstants.KEY_OUT_FEATURES, featureNames);
 	}
-	
+
 	@Override
 	protected String checkPage() {
 		if (featureNames.isEmpty()) {
-			return SELECT_AT_LEAST_ONE_FEATURE_;
+			return "Select at least one feature.";
 		}
 		return null;
 	}

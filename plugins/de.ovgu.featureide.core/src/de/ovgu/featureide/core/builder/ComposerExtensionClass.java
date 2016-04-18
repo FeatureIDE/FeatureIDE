@@ -58,7 +58,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
-import de.ovgu.featureide.fm.core.io.manager.FileWriter;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
  * Abstract class for FeatureIDE composer extensions with default values.
@@ -331,10 +331,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 			}
 			final IPersistentFormat<Configuration> format = ConfigurationManager.getFormat(ConfigurationManager.FormatType.CONFIG);
 			IFile configurationFile = folder.getFile(configurationName + "." + format.getSuffix());
-			final FileWriter<Configuration> writer = new FileWriter<>(format);
-			writer.setPath(Paths.get(configurationFile.getLocationURI()));
-			writer.setObject(configuration);
-			writer.save();
+			FileHandler.save(Paths.get(configurationFile.getLocationURI()), configuration, format);
 			copyNotComposedFiles(configuration, folder);
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);

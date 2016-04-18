@@ -89,7 +89,7 @@ public class DirectivesNode extends LazyParent {
 		// 1.1.2.1 Maximum number of directives:
 		directivesPerClass.addChild(new Parent(MAXIMUM_NUMBER_OF_DIRECTIVES + maximumSum.getValue() + IN_CLASS + maximumSum.getKey()));
 		// 1.1.2.2 Minimum number of directives:
-		directivesPerClass.addChild(new Parent(MINIMUM_NUMBER_OF_DIRECTIVES + minimumSum.getValue() + IN_CLASS + minimumSum.getKey())); // TODO: String extrahieren?
+		directivesPerClass.addChild(new Parent(MINIMUM_NUMBER_OF_DIRECTIVES + minimumSum.getValue() + IN_CLASS + minimumSum.getKey()));
 		// 1.1.2.3 Average number of directives per class:
 		directivesPerClass.addChild(new Parent(AVERAGE_NUMBER_OF_DIRECTIVES_PER_CLASS, averageSum));
 		project.addChild(directivesPerClass);

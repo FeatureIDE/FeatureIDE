@@ -34,7 +34,7 @@ public interface IConfigurationEditor {
 
 	File getModelFile();
 
-	ConfigJobManager getConfigJobManager();
+	JobSynchronizer getConfigJobManager();
 
 	boolean isAutoSelectFeatures();
 

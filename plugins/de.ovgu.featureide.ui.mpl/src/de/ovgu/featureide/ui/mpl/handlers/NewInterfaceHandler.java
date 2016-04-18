@@ -32,7 +32,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.core.mpl.MPLPlugin;
 import de.ovgu.featureide.fm.ui.wizards.WizardConstants;
 import de.ovgu.featureide.ui.handlers.base.AFeatureProjectHandler;
-import de.ovgu.featureide.ui.mpl.wizards.NewInterfaceWizard;
+import de.ovgu.featureide.ui.wizards.NewInterfaceWizard;
 
 public class NewInterfaceHandler extends AFeatureProjectHandler {
 
@@ -42,11 +42,9 @@ public class NewInterfaceHandler extends AFeatureProjectHandler {
 		NewInterfaceWizard wizard = new NewInterfaceWizard(NEW_INTERFACES);
 		WizardDialog dialog = new WizardDialog(Display.getCurrent().getActiveShell(), wizard);
 		if (dialog.open() == Dialog.OK) {
-			MPLPlugin.getDefault().createInterface(
-					project.getProject(), 
-					(IFeatureProject) wizard.getData(WizardConstants.KEY_OUT_PROJECT), 
+			MPLPlugin.getDefault().createInterface(project.getProject(), (IFeatureProject) wizard.getData(WizardConstants.KEY_OUT_PROJECT),
 					(Collection<String>) wizard.getData(WizardConstants.KEY_OUT_FEATURES));
 		}
-
 	}
+
 }

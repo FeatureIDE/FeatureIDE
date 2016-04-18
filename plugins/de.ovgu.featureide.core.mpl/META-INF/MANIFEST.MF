@@ -22,7 +22,6 @@ Import-Package: org.eclipse.core.expressions,
  org.eclipse.jdt.internal.corext.refactoring.rename
 Export-Package: de.ovgu.featureide.core.mpl,
  de.ovgu.featureide.core.mpl.builder,
- de.ovgu.featureide.core.mpl.io,
  de.ovgu.featureide.core.mpl.io.reader,
  de.ovgu.featureide.core.mpl.io.writer,
  de.ovgu.featureide.core.mpl.job,

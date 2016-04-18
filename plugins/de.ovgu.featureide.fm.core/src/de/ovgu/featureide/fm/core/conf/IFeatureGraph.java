@@ -18,8 +18,42 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.core.signature.filter;
+package de.ovgu.featureide.fm.core.conf;
 
-public interface IFilter<T> {
-	boolean isValid(T object);
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.LinkedList;
+
+import de.ovgu.featureide.fm.core.conf.nodes.Expression;
+
+public interface IFeatureGraph extends Serializable {
+
+	void implies(String implyFeature, String impliedFeature);
+
+	void implies(String implyFeature, String impliedFeature, int negation);
+
+	void setEdge(String from, String to, byte edgeType);
+
+	boolean setEdge(int from, int to, byte edgeType);
+
+	byte getEdge(int fromIndex, int toIndex);
+
+	byte getValue(int fromIndex, int toIndex, boolean fromSelected);
+
+	int getFeatureIndex(String featureName);
+
+	int getSize();
+
+	ArrayList<LinkedList<Expression>> getExpListAr();
+
+	int countNeighbors(String from, boolean selected, boolean subtractReal);
+
+	String[] getFeatureArray();
+
+	String[] getCoreFeatures();
+
+	String[] getDeadFeatures();
+	
+	void copyValues(IFeatureGraph otherGraph);
+
 }

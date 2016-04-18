@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2013  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -90,6 +90,12 @@ public abstract class Functional {
 	public static interface IProvider<T> {
 		T invoke();
 	}
+
+	public static class NullConsumer<T> implements IConsumer<T> {
+		@Override
+		public void invoke(T t) {
+		}
+	};
 
 	public static class NullFunction<T, U> implements IFunction<T, U> {
 		@Override

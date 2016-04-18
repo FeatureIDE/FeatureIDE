@@ -52,7 +52,7 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
-import de.ovgu.featureide.fm.core.io.manager.FileReader;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
 import de.ovgu.featureide.fm.core.job.IJob;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
@@ -75,16 +75,11 @@ public class MPLBuildProjectJob extends AProjectJob<MPLBuildProjectJob.Arguments
 		public Arguments(IFeatureProject rootFeatureProject, IFeatureProject externalFeatureProject, IFolder buildFolder, Configuration configuration,
 				String varName) {
 			super(Arguments.class);
-			this.rootFeatureProject =
-				rootFeatureProject;
-			this.externalFeatureProject =
-				externalFeatureProject;
-			this.buildF =
-				buildFolder;
-			this.configuration =
-				configuration;
-			this.varName =
-				varName;
+			this.rootFeatureProject = rootFeatureProject;
+			this.externalFeatureProject = externalFeatureProject;
+			this.buildF = buildFolder;
+			this.configuration = configuration;
+			this.varName = varName;
 		}
 	}
 
@@ -93,10 +88,8 @@ public class MPLBuildProjectJob extends AProjectJob<MPLBuildProjectJob.Arguments
 		setPriority(BUILD);
 	}
 
-	IFolder internTempBuildFolder =
-		null;
-	IFolder rootBuildFolder =
-		null;
+	IFolder internTempBuildFolder = null;
+	IFolder rootBuildFolder = null;
 
 	@Override
 	protected boolean work() {
@@ -119,29 +112,23 @@ public class MPLBuildProjectJob extends AProjectJob<MPLBuildProjectJob.Arguments
 	}
 
 	private void buildExternalProject(String projectName, Configuration config, String configName) {
-		final JobSequence curJobSequence =
-			JobSequence.getSequenceForJob(this);
+		final JobSequence curJobSequence = JobSequence.getSequenceForJob(this);
 		if (curJobSequence != null) {
-			final IProject externalProject =
-				ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-			final IFeatureProject externalFeatureProject =
-				CorePlugin.getFeatureProject(externalProject);
+			final IProject externalProject = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+			final IFeatureProject externalFeatureProject = CorePlugin.getFeatureProject(externalProject);
 
-			final ArrayList<IJob> jobList =
-				new ArrayList<IJob>(3);
+			final ArrayList<IJob> jobList = new ArrayList<IJob>(3);
 
 			// build
-			jobList.add(createJob(new MPLBuildProjectJob.Arguments(arguments.rootFeatureProject,
-					externalFeatureProject, internTempBuildFolder, config, configName)));
+			jobList.add(createJob(new MPLBuildProjectJob.Arguments(arguments.rootFeatureProject, externalFeatureProject, internTempBuildFolder, config,
+					configName)));
 
 			// rename
-			jobList.add(createJob(new MPLRenameExternalJob.Arguments(
-					arguments.externalFeatureProject.getProject(), configName,
-					internTempBuildFolder.getFullPath())));
+			jobList.add(createJob(new MPLRenameExternalJob.Arguments(arguments.externalFeatureProject.getProject(), configName, internTempBuildFolder
+					.getFullPath())));
 
 			// copy
-			jobList.add(createJob(new MPLCopyExternalJob.Arguments(
-					internTempBuildFolder, rootBuildFolder)));
+			jobList.add(createJob(new MPLCopyExternalJob.Arguments(internTempBuildFolder, rootBuildFolder)));
 
 			curJobSequence.insertJobs(this, jobList);
 		}
@@ -149,37 +136,28 @@ public class MPLBuildProjectJob extends AProjectJob<MPLBuildProjectJob.Arguments
 	}
 
 	private IJob createJob(JobArguments arg) {
-		IJob curJob =
-			arg.createJob();
+		IJob curJob = arg.createJob();
 		return curJob;
 	}
 
 	private boolean buildMPLProject() {
-		final IFeatureModel featureModel =
-			arguments.externalFeatureProject.getFeatureModel();
+		final IFeatureModel featureModel = arguments.externalFeatureProject.getFeatureModel();
 		if (!(featureModel instanceof ExtendedFeatureModel)) {
 			return false;
 		}
 
 		if (arguments.varName == null) {
-			String varName =
-				arguments.externalFeatureProject.getCurrentConfiguration().getName();
-			final int splitIndex =
-				varName.lastIndexOf('.');
+			String varName = arguments.externalFeatureProject.getCurrentConfiguration().getName();
+			final int splitIndex = varName.lastIndexOf('.');
 			if (splitIndex > -1) {
-				varName =
-					varName.substring(0, splitIndex);
+				varName = varName.substring(0, splitIndex);
 			}
-			rootBuildFolder =
-				arguments.buildF.getFolder(varName);
-			internTempBuildFolder =
-				arguments.buildF.getFolder(EMPTY___
-					+ varName);
+			rootBuildFolder = arguments.buildF.getFolder(varName);
+			internTempBuildFolder = arguments.buildF.getFolder(EMPTY___
+				+ varName);
 		} else {
-			rootBuildFolder =
-				arguments.buildF;
-			internTempBuildFolder =
-				arguments.externalFeatureProject.getBuildFolder();
+			rootBuildFolder = arguments.buildF;
+			internTempBuildFolder = arguments.externalFeatureProject.getBuildFolder();
 		}
 
 		try {
@@ -208,34 +186,24 @@ public class MPLBuildProjectJob extends AProjectJob<MPLBuildProjectJob.Arguments
 		}
 
 		// get mapping of other projects
-		final ExtendedFeatureModel extFeatureModel =
-			(ExtendedFeatureModel) featureModel;
-		final Configuration mappedProjects =
-			new Configuration(extFeatureModel.getMappingModel());
+		final ExtendedFeatureModel extFeatureModel = (ExtendedFeatureModel) featureModel;
+		final Configuration mappedProjects = new Configuration(extFeatureModel.getMappingModel());
 		try {
-			String mappingFileName =
-				arguments.externalFeatureProject.getProject().getPersistentProperty(MPLPlugin.mappingConfigID);
+			String mappingFileName = arguments.externalFeatureProject.getProject().getPersistentProperty(MPLPlugin.mappingConfigID);
 			// XXX MPL save information in builder not as persistent property
 			if (mappingFileName == null) {
-				mappingFileName =
-					"default.config";
+				mappingFileName = "default.config";
 				arguments.externalFeatureProject.getProject().setPersistentProperty(MPLPlugin.mappingConfigID, mappingFileName);
 			}
-			IFile mappingFile =
-				arguments.externalFeatureProject.getProject().getFile("InterfaceMapping/"
-					+ mappingFileName);
+			IFile mappingFile = arguments.externalFeatureProject.getProject().getFile("InterfaceMapping/"
+				+ mappingFileName);
 			if (mappingFile == null) {
 				MPLPlugin.getDefault().logInfo(NO_MAPPING_FILE_SPECIFIED_);
 				return false;
 			}
-			final IFile configFile =
-				arguments.externalFeatureProject.getProject().getFile("InterfaceMapping/"
-					+ mappingFileName);
-			final FileReader<Configuration> reader =
-				new FileReader<>();
-			reader.setObject(mappedProjects);
-			reader.setPath(Paths.get(configFile.getLocationURI()));
-			reader.setFormat(ConfigurationManager.getFormat(configFile.getName()));
+			final IFile configFile = arguments.externalFeatureProject.getProject().getFile("InterfaceMapping/"
+				+ mappingFileName);
+			FileHandler.load(Paths.get(configFile.getLocationURI()), mappedProjects, ConfigurationManager.getFormat(configFile.getName()));
 		} catch (Exception e) {
 			MPLPlugin.getDefault().logError(e);
 			return false;
@@ -245,17 +213,13 @@ public class MPLBuildProjectJob extends AProjectJob<MPLBuildProjectJob.Arguments
 		// build interfaces
 		for (final IFeature mappedProject : mappedProjects.getSelectedFeatures()) {
 			if (mappedProject.getStructure().isConcrete()) {
-				final int splittIndex =
-					mappedProject.getName().lastIndexOf('.');
+				final int splittIndex = mappedProject.getName().lastIndexOf('.');
 				if (splittIndex == -1) {
 					// can this happen???
 					continue;
 				}
-				final String projectName =
-					mappedProject.getName().substring(splittIndex
-						+ 1);
-				final String configName =
-					mappedProject.getName().substring(0, splittIndex);
+				final String projectName = mappedProject.getName().substring(splittIndex + 1);
+				final String configName = mappedProject.getName().substring(0, splittIndex);
 
 				buildExternalProject(projectName, arguments.configuration, configName);
 			}
@@ -264,10 +228,8 @@ public class MPLBuildProjectJob extends AProjectJob<MPLBuildProjectJob.Arguments
 		// build instances
 		for (UsedModel usedModel : extFeatureModel.getExternalModels().values()) {
 			if (usedModel.getType() == ExtendedFeature.TYPE_INSTANCE) {
-				final String projectName =
-					usedModel.getModelName();
-				final String configName =
-					usedModel.getVarName();
+				final String projectName = usedModel.getModelName();
+				final String configName = usedModel.getVarName();
 
 				buildExternalProject(projectName, arguments.configuration, configName);
 			}
@@ -277,8 +239,7 @@ public class MPLBuildProjectJob extends AProjectJob<MPLBuildProjectJob.Arguments
 	}
 
 	private boolean buildFeatureProject(String varName, IFolder buildFolder) {
-		final IComposerExtensionClass composerExtension =
-			arguments.externalFeatureProject.getComposer();
+		final IComposerExtensionClass composerExtension = arguments.externalFeatureProject.getComposer();
 		if (composerExtension == null) {
 			return false;
 		}
@@ -299,24 +260,18 @@ public class MPLBuildProjectJob extends AProjectJob<MPLBuildProjectJob.Arguments
 		if (varName != null) {
 			// Get partial configs
 			// TODO MPL: config for other MPL projects may not working
-			IFeatureModel fm =
-				arguments.rootFeatureProject.getFeatureModel();
+			IFeatureModel fm = arguments.rootFeatureProject.getFeatureModel();
 			if (fm instanceof ExtendedFeatureModel) {
-				ExtendedFeatureModel efm =
-					(ExtendedFeatureModel) fm;
-				UsedModel usedModel =
-					efm.getExternalModel(varName);
-				String prefix =
-					usedModel.getPrefix()
-						+ ".";
+				ExtendedFeatureModel efm = (ExtendedFeatureModel) fm;
+				UsedModel usedModel = efm.getExternalModel(varName);
+				String prefix = usedModel.getPrefix()
+					+ ".";
 
-				final Configuration newConfiguration =
-					new Configuration(arguments.externalFeatureProject.getFeatureModel());
+				final Configuration newConfiguration = new Configuration(arguments.externalFeatureProject.getFeatureModel());
 
 				for (SelectableFeature feature : arguments.configuration.getFeatures()) {
 					if (feature.getName().startsWith(prefix)) {
-						String featureName =
-							feature.getName().substring(prefix.length());
+						String featureName = feature.getName().substring(prefix.length());
 						try {
 							newConfiguration.setManual(featureName, feature.getSelection());
 						} catch (Exception e) {}
@@ -325,12 +280,10 @@ public class MPLBuildProjectJob extends AProjectJob<MPLBuildProjectJob.Arguments
 
 				// Find Random Solution
 				try {
-					LinkedList<List<String>> solutions =
-						newConfiguration.getSolutions(1);
+					LinkedList<List<String>> solutions = newConfiguration.getSolutions(1);
 					if (!solutions.isEmpty()) {
 						newConfiguration.resetValues();
-						List<String> solution =
-							solutions.getFirst();
+						List<String> solution = solutions.getFirst();
 						for (String solutionFeatureName : solution) {
 							try {
 								newConfiguration.setManual(solutionFeatureName, Selection.SELECTED);
@@ -347,13 +300,10 @@ public class MPLBuildProjectJob extends AProjectJob<MPLBuildProjectJob.Arguments
 			}
 		} else {
 			// Build project
-			String configName =
-				arguments.externalFeatureProject.getCurrentConfiguration().getName();
-			final int splitIndex =
-				configName.lastIndexOf('.');
+			String configName = arguments.externalFeatureProject.getCurrentConfiguration().getName();
+			final int splitIndex = configName.lastIndexOf('.');
 			if (splitIndex > -1) {
-				configName =
-					configName.substring(0, splitIndex);
+				configName = configName.substring(0, splitIndex);
 			}
 
 			composerExtension.buildConfiguration(buildFolder, arguments.configuration, configName);

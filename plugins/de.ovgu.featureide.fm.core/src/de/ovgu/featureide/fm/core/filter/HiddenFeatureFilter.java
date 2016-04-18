@@ -29,7 +29,7 @@ import de.ovgu.featureide.fm.core.filter.base.IFilter;
  * @author Sebastian Krieter
  */
 public class HiddenFeatureFilter implements IFilter<IFeature> {
-	
+
 	@Override
 	public boolean isValid(IFeature object) {
 		return object.getStructure().hasHiddenParent();

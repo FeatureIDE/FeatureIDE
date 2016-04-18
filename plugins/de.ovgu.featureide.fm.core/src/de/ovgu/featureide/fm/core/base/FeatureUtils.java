@@ -46,7 +46,6 @@ import de.ovgu.featureide.fm.core.ColorschemeTable;
 import de.ovgu.featureide.fm.core.ConstraintAttribute;
 import de.ovgu.featureide.fm.core.FMComposerManager;
 import de.ovgu.featureide.fm.core.FMPoint;
-import de.ovgu.featureide.fm.core.Feature;
 import de.ovgu.featureide.fm.core.FeatureConnection;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.FeatureStatus;
@@ -63,9 +62,11 @@ import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
 /**
  * @author Marcus Pinnecke
  */
+//@SuppressWarnings("deprecation")
 public final class FeatureUtils {
-	
-	private FeatureUtils() {}
+
+	private FeatureUtils() {
+	}
 
 	public static final ConcreteFeatureFilter CONCRETE_FEATURE_FILTER = new ConcreteFeatureFilter();
 
@@ -76,27 +77,32 @@ public final class FeatureUtils {
 		}
 	};
 
+	@Deprecated
 	public static final de.ovgu.featureide.fm.core.Constraint convert(IConstraint c) {
 		return new de.ovgu.featureide.fm.core.Constraint(c);
 	}
 
+	@Deprecated
 	public static final IConstraint convert(de.ovgu.featureide.fm.core.Constraint c) {
 		return c.constraint;
 	}
 
+	@Deprecated
 	public static final de.ovgu.featureide.fm.core.FeatureModel convert(IFeatureModel fm) {
 		return new de.ovgu.featureide.fm.core.FeatureModel(fm);
 	}
 
-	@SuppressWarnings("deprecation")
+	@Deprecated
 	public static final de.ovgu.featureide.fm.core.Feature convert(IFeature f) {
 		return new de.ovgu.featureide.fm.core.Feature(f);
 	}
 
+	@Deprecated
 	public static final IFeature convert(de.ovgu.featureide.fm.core.Feature f) {
 		return f.feature;
 	}
 
+	@Deprecated
 	public static final IFeatureModel convert(de.ovgu.featureide.fm.core.FeatureModel fm) {
 		return fm.model;
 	}
@@ -135,14 +141,16 @@ public final class FeatureUtils {
 
 	};
 
-	public static final IFunction<IFeature, Feature> IFEATURE_TO_FEATURE = new IFunction<IFeature, Feature>() {
+	@Deprecated
+	public static final IFunction<IFeature, de.ovgu.featureide.fm.core.Feature> IFEATURE_TO_FEATURE = new IFunction<IFeature, de.ovgu.featureide.fm.core.Feature>() {
 
 		@Override
-		public Feature invoke(IFeature t) {
+		public de.ovgu.featureide.fm.core.Feature invoke(IFeature t) {
 			return convert(t);
 		};
 	};
 
+	@Deprecated
 	public static final IFunction<de.ovgu.featureide.fm.core.Constraint, IConstraint> CONSTRAINT_TO_ICONSTRANT = new IFunction<de.ovgu.featureide.fm.core.Constraint, IConstraint>() {
 
 		@Override
@@ -151,14 +159,16 @@ public final class FeatureUtils {
 		};
 	};
 
-	public static final IFunction<Feature, IFeature> FEATURE_TO_IFEATURE = new IFunction<Feature, IFeature>() {
+	@Deprecated
+	public static final IFunction<de.ovgu.featureide.fm.core.Feature, IFeature> FEATURE_TO_IFEATURE = new IFunction<de.ovgu.featureide.fm.core.Feature, IFeature>() {
 
 		@Override
-		public IFeature invoke(Feature t) {
+		public IFeature invoke(de.ovgu.featureide.fm.core.Feature t) {
 			return convert(t);
 		};
 	};
 
+	@Deprecated
 	public static final IFunction<IConstraint, de.ovgu.featureide.fm.core.Constraint> ICONSTRAINT_TO_CONSTRANT = new IFunction<IConstraint, de.ovgu.featureide.fm.core.Constraint>() {
 
 		@Override
@@ -166,22 +176,6 @@ public final class FeatureUtils {
 			return convert(t);
 		};
 	};
-
-//	private static final IFunction<IFeature, IGraphicalFeature> FEATURE_TO_IGRAPHICALFEATURE = new IFunction<IFeature, IGraphicalFeature>() {
-//
-//		@Override
-//		public IGraphicalFeature invoke(IFeature t) {
-//			return t.getGraphicRepresenation();
-//		};
-//	};
-//
-//	private static final IFunction<IConstraint, IGraphicalConstraint> CONSTRAINT_TO_IGRAPHICALCONSTRAINT = new IFunction<IConstraint, IGraphicalConstraint>() {
-//
-//		@Override
-//		public IGraphicalConstraint invoke(IConstraint t) {
-//			return t.getGraphicRepresenation();
-//		};
-//	};
 
 	/**
 	 * Extracts all concrete features from an object that yields features. Basically, an invocation of this method on <b>features</b> will return an iterable
@@ -256,7 +250,7 @@ public final class FeatureUtils {
 	public static final String getRelevantConstraintsString(IFeature feature) {
 		return FeatureUtils.getRelevantConstraintsString(feature, feature.getFeatureModel().getConstraints());
 	}
-	
+
 	public static String getRelevantConstraintsString(IFeature feature, Collection<IConstraint> constraints) {
 		StringBuilder relevant = new StringBuilder();
 		for (IConstraint constraint : constraints) {
@@ -321,11 +315,11 @@ public final class FeatureUtils {
 	}
 
 	public static final void setNewLocation(IFeature feature, FMPoint newLocation) {
-//		feature.getGraphicRepresenation().setLocation(newLocation);
+		//		feature.getGraphicRepresenation().setLocation(newLocation);
 	}
 
 	public static final FMPoint getLocation(IFeature feature) {
-//		return feature.getGraphicRepresenation().getLocation();
+		//		return feature.getGraphicRepresenation().getLocation();
 		return null;
 	}
 
@@ -433,7 +427,7 @@ public final class FeatureUtils {
 	public static final IFeature getParent(IFeature feature) {
 		if (feature != null) {
 			IFeatureStructure parent = feature.getStructure().getParent();
-			if (parent != null) { 
+			if (parent != null) {
 				return parent.getFeature();
 			}
 		}
@@ -477,30 +471,30 @@ public final class FeatureUtils {
 	}
 
 	public static final Iterable<FeatureConnection> getSourceConnections(IFeature feature) {
-//		return feature.getStructure().getSourceConnections();
+		//		return feature.getStructure().getSourceConnections();
 		return null;
 	}
 
 	public static final Iterable<FeatureConnection> getTargetConnections(IFeature feature) {
-//		return feature.getStructure().getTargetConnections();
+		//		return feature.getStructure().getTargetConnections();
 		return null;
 	}
 
 	public static final void addTargetConnection(IFeature feature, FeatureConnection connection) {
-//		feature.getStructure().addTargetConnection(connection);
+		//		feature.getStructure().addTargetConnection(connection);
 	}
 
 	public static final boolean removeTargetConnection(IFeature feature, FeatureConnection connection) {
-//		return feature.getStructure().removeTargetConnection(connection);
+		//		return feature.getStructure().removeTargetConnection(connection);
 		return false;
 	}
 
 	public static final void addListener(IFeature feature, PropertyChangeListener listener) {
-//		feature.addListener(listener);
+		//		feature.addListener(listener);
 	}
 
 	public static final void removeListener(IFeature feature, PropertyChangeListener listener) {
-//		feature.removeListener(listener);
+		//		feature.removeListener(listener);
 	}
 
 	public static final boolean isAncestorOf(IFeature feature, IFeature next) {
@@ -536,7 +530,7 @@ public final class FeatureUtils {
 	}
 
 	public static final void fire(IFeature feature, PropertyChangeEvent event) {
-//		feature.fireEvent(event);
+		//		feature.fireEvent(event);
 	}
 
 	public static final IFeature clone(IFeature feature) {
@@ -588,10 +582,10 @@ public final class FeatureUtils {
 	}
 
 	public static final ColorList getColorList(IFeature feature) {
-//		return feature.getGraphicRepresenation().getColorList();
+		//		return feature.getGraphicRepresenation().getColorList();
 		return null;
 	}
-	
+
 	public static final int hashCode(IFeature feature) {
 		return feature.hashCode();
 	}
@@ -601,7 +595,7 @@ public final class FeatureUtils {
 	}
 
 	public static final GraphicItem getItemType(IFeature feature) {
-//		return feature.getGraphicRepresenation().getItemType();
+		//		return feature.getGraphicRepresenation().getItemType();
 		return null;
 	}
 
@@ -614,12 +608,12 @@ public final class FeatureUtils {
 	}
 
 	public static final IFeatureModelLayout getLayout(IFeatureModel featureModel) {
-//		return featureModel.getLayout();
+		//		return featureModel.getLayout();
 		return null;
 	}
 
 	public static final ColorschemeTable getColorschemeTable(IFeatureModel featureModel) {
-//		return featureModel.getGraphicRepresenation().getColorschemeTable();
+		//		return featureModel.getGraphicRepresenation().getColorschemeTable();
 		return null;
 	}
 
@@ -817,11 +811,11 @@ public final class FeatureUtils {
 	}
 
 	public static final void addListener(IFeatureModel featureModel, PropertyChangeListener listener) {
-//		featureModel.addListener(listener);
+		//		featureModel.addListener(listener);
 	}
 
 	public static final void removeListener(IFeatureModel featureModel, PropertyChangeListener listener) {
-//		featureModel.removeListener(listener);
+		//		featureModel.removeListener(listener);
 	}
 
 	public static final void handleModelDataLoaded(IFeatureModel featureModel) {
@@ -833,32 +827,33 @@ public final class FeatureUtils {
 	}
 
 	public static final void handleModelLayoutChanged(IFeatureModel featureModel) {
-//		featureModel.getGraphicRepresenation().handleModelLayoutChanged();
+		//		featureModel.getGraphicRepresenation().handleModelLayoutChanged();
 	}
 
 	public static final void handleLegendLayoutChanged(IFeatureModel featureModel) {
-//		featureModel.getGraphicRepresenation().handleLegendLayoutChanged();
+		//		featureModel.getGraphicRepresenation().handleLegendLayoutChanged();
 	}
 
 	public static final void refreshContextMenu(IFeatureModel featureModel) {
-//		featureModel.getGraphicRepresenation().refreshContextMenu();
+		//		featureModel.getGraphicRepresenation().refreshContextMenu();
 	}
 
 	public static final void redrawDiagram(IFeatureModel featureModel) {
-//		featureModel.getGraphicRepresenation().redrawDiagram();
+		//		featureModel.getGraphicRepresenation().redrawDiagram();
 	}
 
 	public static final IFeatureModel clone(IFeatureModel featureModel) {
 		return featureModel.clone();
 	}
-//
-//	public static final IFeatureModel deepClone(IFeatureModel featureModel) {
-//		return featureModel.deepClone();
-//	}
-//
-//	public static final IFeatureModel deepClone(IFeatureModel featureModel, boolean complete) {
-//		return featureModel.deepClone(complete);
-//	}
+
+	//
+	//	public static final IFeatureModel deepClone(IFeatureModel featureModel) {
+	//		return featureModel.deepClone();
+	//	}
+	//
+	//	public static final IFeatureModel deepClone(IFeatureModel featureModel, boolean complete) {
+	//		return featureModel.deepClone(complete);
+	//	}
 
 	public static final boolean hasMandatoryFeatures(IFeatureModel featureModel) {
 		return featureModel.getStructure().hasMandatoryFeatures();
@@ -928,13 +923,13 @@ public final class FeatureUtils {
 		return featureModel.getStructure().hasFalseOptionalFeatures();
 	}
 
-//	public static final void setUndoContext(IFeatureModel featureModel, Object undoContext) {
-//		featureModel.getUndoContext(undoContext);
-//	}
-//
-//	public static final Object getUndoContext(IFeatureModel featureModel) {
-//		return featureModel.getUndoContext();
-//	}
+	//	public static final void setUndoContext(IFeatureModel featureModel, Object undoContext) {
+	//		featureModel.getUndoContext(undoContext);
+	//	}
+	//
+	//	public static final Object getUndoContext(IFeatureModel featureModel) {
+	//		return featureModel.getUndoContext();
+	//	}
 
 	public static final Collection<String> getFeatureOrderList(IFeatureModel featureModel) {
 		return featureModel.getFeatureOrderList();
@@ -952,13 +947,13 @@ public final class FeatureUtils {
 		featureModel.setFeatureOrderUserDefined(featureOrderUserDefined);
 	}
 
-//	public static final boolean isFeatureOrderInXML(IFeatureModel featureModel) {
-//		return featureModel.isFeatureOrderInXML();
-//	}
-//
-//	public static final void setFeatureOrderInXML(IFeatureModel featureModel, boolean featureOrderInXML) {
-//		featureModel.setFeatureOrderInXML(featureModel, featureOrderInXML);
-//	}
+	//	public static final boolean isFeatureOrderInXML(IFeatureModel featureModel) {
+	//		return featureModel.isFeatureOrderInXML();
+	//	}
+	//
+	//	public static final void setFeatureOrderInXML(IFeatureModel featureModel, boolean featureOrderInXML) {
+	//		featureModel.setFeatureOrderInXML(featureModel, featureOrderInXML);
+	//	}
 
 	public static final String toString(IFeatureModel featureModel) {
 		return featureModel.toString();
@@ -973,16 +968,16 @@ public final class FeatureUtils {
 	}
 
 	public static final GraphicItem getItemType(IFeatureModel featureModel) {
-//		return featureModel.getGraphicRepresenation().getItemType();
+		//		return featureModel.getGraphicRepresenation().getItemType();
 		return null;
 	}
 
 	public static final void setLocation(IConstraint constraint, FMPoint newLocation) {
-//		constraint.getGraphicRepresenation().setLocation(newLocation);
+		//		constraint.getGraphicRepresenation().setLocation(newLocation);
 	}
 
 	public static final FMPoint getLocation(IConstraint constraint) {
-//		return constraint.getGraphicRepresenation().getLocation();
+		//		return constraint.getGraphicRepresenation().getLocation();
 		return null;
 	}
 
@@ -1061,15 +1056,15 @@ public final class FeatureUtils {
 	}
 
 	public static final void addListener(IConstraint constraint, PropertyChangeListener listener) {
-//		constraint.addListener(listener);
+		//		constraint.addListener(listener);
 	}
 
 	public static final void removeListener(IConstraint constraint, PropertyChangeListener listener) {
-//		constraint.removeListener(listener);
+		//		constraint.removeListener(listener);
 	}
 
 	public static final void fire(IConstraint constraint, PropertyChangeEvent event) {
-//		constraint.fireEvent(event);
+		//		constraint.fireEvent(event);
 	}
 
 	public static final boolean equals(IConstraint constraint, Object obj) {
@@ -1093,7 +1088,7 @@ public final class FeatureUtils {
 	}
 
 	public static final GraphicItem getItemType(IConstraint constraint) {
-//		return constraint.getGraphicRepresenation().getItemType();
+		//		return constraint.getGraphicRepresenation().getItemType();
 		return null;
 	}
 
@@ -1127,11 +1122,11 @@ public final class FeatureUtils {
 		}
 	}
 
-//	public static Iterable<IGraphicalFeature> getGraphicalRepresentationsOfFeatures(Iterable<IFeature> features) {
-//		return Functional.map(features, FEATURE_TO_IGRAPHICALFEATURE);
-//	}
-//	
-//	public static Iterable<IGraphicalConstraint> getGraphicalRepresentationsOfConstraints(Iterable<IConstraint> constraints) {
-//		return Functional.map(constraints, CONSTRAINT_TO_IGRAPHICALCONSTRAINT);
-//	}
+	//	public static Iterable<IGraphicalFeature> getGraphicalRepresentationsOfFeatures(Iterable<IFeature> features) {
+	//		return Functional.map(features, FEATURE_TO_IGRAPHICALFEATURE);
+	//	}
+	//	
+	//	public static Iterable<IGraphicalConstraint> getGraphicalRepresentationsOfConstraints(Iterable<IConstraint> constraints) {
+	//		return Functional.map(constraints, CONSTRAINT_TO_IGRAPHICALCONSTRAINT);
+	//	}
 }

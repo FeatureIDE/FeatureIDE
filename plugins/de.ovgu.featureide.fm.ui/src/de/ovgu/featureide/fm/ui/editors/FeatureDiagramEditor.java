@@ -30,6 +30,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.SET_LAYOUT;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SET_NAME_TYPE;
 import static de.ovgu.featureide.fm.core.localization.StringTable.UPDATING_FEATURE_MODEL_ATTRIBUTES;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -74,19 +75,20 @@ import org.eclipse.ui.progress.UIJob;
 import de.ovgu.featureide.fm.core.ConstraintAttribute;
 import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.FeatureStatus;
+import de.ovgu.featureide.fm.core.Features;
 import de.ovgu.featureide.fm.core.Preferences;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.ExtendedFeatureModel;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.manager.FileManagerMap;
-import de.ovgu.featureide.fm.core.io.manager.FileReader;
-import de.ovgu.featureide.fm.core.io.manager.FileWriter;
 import de.ovgu.featureide.fm.core.job.AStoppableJob;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.elements.GraphicalFeatureModel;
@@ -213,8 +215,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 		graphicalFeatureModel = new GraphicalFeatureModel(featureModelEditor.fmManager.editObject());
 		graphicalFeatureModel.init();
 		extraPath = FileManagerMap.constructExtraPath(featureModelEditor.fmManager.getAbsolutePath(), format);
-		final FileReader<IGraphicalFeatureModel> fr = new FileReader<>(extraPath, graphicalFeatureModel, format);
-		fr.read();
+		FileHandler.load(Paths.get(extraPath), graphicalFeatureModel, format);
 		featureModelEditor.fmManager.addListener(this);
 
 		createControl(container);
@@ -842,8 +843,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			analyzeFeatureModel();
 			break;
 		case MODEL_DATA_SAVED:
-			final FileWriter<IGraphicalFeatureModel> fr = new FileWriter<>(extraPath, graphicalFeatureModel, format);
-			fr.save();
+			FileHandler.load(Paths.get(extraPath), graphicalFeatureModel, format);
 			break;
 		case MODEL_LAYOUT_CHANGED:
 			reload();
@@ -863,7 +863,11 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			legendLayoutAction.refresh();
 			break;
 		case HIDDEN_CHANGED:
-			FeatureUIHelper.getGraphicalFeature((IFeature)event.getSource(), graphicalFeatureModel).update(event);
+			final List<IFeatureStructure> children = new ArrayList<>(); 
+			Features.getAllFeatures(children, ((IFeature)event.getSource()).getStructure());
+			for (final IFeatureStructure child : children) {
+				FeatureUIHelper.getGraphicalFeature(child.getFeature(), graphicalFeatureModel).update(event);
+			}
 			internRefresh(true);
 			analyzeFeatureModel();
 			featureModelEditor.setPageModified(true);
