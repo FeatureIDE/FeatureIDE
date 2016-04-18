@@ -413,4 +413,12 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	public Mechanism getGenerationMechanism() {
 		return null;
 	}
+	
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#showContextFieldsAndMethods()
+	 */
+	@Override
+	public boolean showContextFieldsAndMethods() {
+		return true;
+	}
 }

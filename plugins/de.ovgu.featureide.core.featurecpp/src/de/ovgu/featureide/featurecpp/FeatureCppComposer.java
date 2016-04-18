@@ -316,12 +316,4 @@ public class FeatureCppComposer extends ComposerExtensionClass {
 		return false;
 	}
 
-
-	/* (non-Javadoc)
-	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#showContextFieldsAndMethods()
-	 */
-	@Override
-	public boolean showContextFieldsAndMethods() {
-		return true;
-	}
 }
