@@ -636,6 +636,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	}
 
 	public void setCurrentConfiguration(IFile file) {
+		final boolean performBuild = currentConfiguration != null;
 		currentConfiguration = file;
 
 		int offset = getConfigFolder().getProjectRelativePath().toString().length();
@@ -651,20 +652,22 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		// there are possibly no resource build yet or they are not up-to-date.
 		// Eclipse calls builders, if a resource as changed, but in this case
 		// actually no resource in the file system changes.
-		Job job = new AStoppableJob(PERFORMING_FULL_BUILD) {
-			@Override
-			protected boolean work() throws Exception {
-				buildRelevantChanges = true;
-				try {
-					project.build(IncrementalProjectBuilder.FULL_BUILD, null);
-				} catch (CoreException e) {
-					LOGGER.logError(e);
+		if (performBuild) {
+			Job job = new AStoppableJob(PERFORMING_FULL_BUILD) {
+				@Override
+				protected boolean work() throws Exception {
+					buildRelevantChanges = true;
+					try {
+						project.build(IncrementalProjectBuilder.FULL_BUILD, null);
+					} catch (CoreException e) {
+						LOGGER.logError(e);
+					}
+					return true;
 				}
-				return true;
-			}
-		};
-		job.setPriority(Job.BUILD);
-		job.schedule();
+			};
+			job.setPriority(Job.BUILD);
+			job.schedule();
+		}
 	}
 
 	@CheckForNull
