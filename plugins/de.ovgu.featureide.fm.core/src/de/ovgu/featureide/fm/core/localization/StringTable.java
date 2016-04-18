@@ -469,7 +469,7 @@ public class StringTable {
 	public static final String SET_FEATURE_ABSTRACT = "Set Feature Abstract";
 	public static final String SET_FEATURE_CONCRETE = "Set Feature Concrete";
 	public static final String DEFAULT_FEATURE_LAYER_CAPTION = "NewFeature";
-	public static final String SET_FEATURE_NOT_HIDDEN = "Set Feature Not-Hidden";
+    public static final String SET_FEATURE_NOT_HIDDEN = "Set Feature Not-Hidden";
 	public static final String SET_FEATURE_HIDDEN = "Set Feature Hidden";
 	public static final String SET_FEATURE_MANDATORY = "Set Feature Mandatory";
 	public static final String SET_FEATURE_OPTIONAL = "Set Feature Optional";
@@ -503,7 +503,6 @@ public class StringTable {
 	public static final String EXPORT_TO_DIMACS = "Export to DIMACS";
 	public static final String CALCULATING_FEATURE_DEPENDENCIES = "Calculating Feature Dependencies";
 	public static final String VELVET = "Velvet";
-	public static final String DIMACS = "Dimacs";
 	public static final String UNABLE_TO_START_GUIDSL = "Unable to start GUIDSL";
 	public static final String CONFIGURATION_COLORING = "Configuration Coloring";
 	public static final String THE_CONFIGURATION_EDITOR_PROVIDES_FEATURE_HIGHLIGHTING_FOR_INVALID_CONFIGURATIONS_IN_ODER_TO_FIND_VALID_CONFIGURATIONS_ = "The configuration editor provides feature highlighting for invalid configurations in oder to find valid configurations.";
@@ -693,7 +692,6 @@ public class StringTable {
 	public static final String CANT_CONNECT_TO_DIFFERENT_DOCUMENT_ = "Can't connect to different document.";
 	public static final String CANT_DISCONNECT_FROM_DIFFERENT_DOCUMENT_ = "Can't disconnect from different document.";
 	public static final String OPENED = "opened ";
-	public static final String ACTIVATED = "activated ";
 	public static final String TOTOP = "toTop ";
 	public static final String VISIBLE = "visible ";
 	public static final String DOCUMENTATION_WIZARD = "Documentation Wizard";
@@ -1000,4 +998,5 @@ public class StringTable {
 	public static final String CHOOSE_ACTION_ = "Choose Action:";
 	public static final String FEATURES_ = "Features:";
 	public static final String FIDECONF = "fideconf";
+	public static final String PARAMETER_IS_EXPECTED_TO_BE_NON_NULL = "The method parameter is expected to be non-null";
 }

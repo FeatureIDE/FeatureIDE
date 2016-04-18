@@ -679,7 +679,7 @@ public class FeatureModelAnalyzer {
 				
 				constraint.setContainedFeatures();
 				if (fmFalseOptionals.isEmpty() && fmDeadFeatures.isEmpty()) {
-					constraint.getDeadFeatures().clear();
+					constraint.setDeadFeatures(Functional.getEmptyIterable(IFeature.class));
 					constraint.getFalseOptional().clear();
 					continue;
 				}

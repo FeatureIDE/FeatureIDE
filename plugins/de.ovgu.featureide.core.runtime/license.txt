@@ -1,38 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<feature
-      id="de.ovgu.featureide.exampleprojects"
-      label="FeatureIDE example projects (optional)"
-      version="3.0.0.qualifier"
-      provider-name="University of Magdeburg">
-
-   <description url="http://www.fosd.de/featureide/">
-      Software program lines (SPL) have a long tradition and will gain
-momentum in the future. Today&apos;s research tries to move software
-development to a new quality of industrial production. Several
-solutions concerning different phases of the software development
-process have been proposed in order to cope with different problems
-of program family development. A major problem of program family
-engineering is still the missing tool support. The vision is
-an IDE that brings all phases of the development process together
-consistently and in a user-friendly manner. Our first version
-focuses on AHEAD, a prominent design methodology and architectural
-model for feature-based program families. 
-FeatureIDE is an Eclipse-based IDE that supports building program
-families following the AHEAD architecture model. It provides
-tools for the feature oriented design process and the implementation
-of software product lines. It integrates AHEAD tools like composition
-tools, compilers and more.
-   </description>
-
-   <copyright>
-      Copyrights reserved.
-   </copyright>
-
-   <license url="http://www.gnu.org/licenses/lgpl.html">
-      GNU LESSER GENERAL PUBLIC LICENSE
+                   GNU LESSER GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007
 
- Copyright (C) 2007 Free Software Foundation, Inc. &lt;http://fsf.org/&gt;
+ Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>
  Everyone is permitted to copy and distribute verbatim copies
  of this license document, but changing it is not allowed.
 
@@ -43,29 +12,29 @@ License, supplemented by the additional permissions listed below.
 
   0. Additional Definitions.
 
-  As used herein, &quot;this License&quot; refers to version 3 of the GNU Lesser
-General Public License, and the &quot;GNU GPL&quot; refers to version 3 of the GNU
+  As used herein, "this License" refers to version 3 of the GNU Lesser
+General Public License, and the "GNU GPL" refers to version 3 of the GNU
 General Public License.
 
-  &quot;The Library&quot; refers to a covered work governed by this License,
+  "The Library" refers to a covered work governed by this License,
 other than an Application or a Combined Work as defined below.
 
-  An &quot;Application&quot; is any work that makes use of an interface provided
+  An "Application" is any work that makes use of an interface provided
 by the Library, but which is not otherwise based on the Library.
 Defining a subclass of a class defined by the Library is deemed a mode
 of using an interface provided by the Library.
 
-  A &quot;Combined Work&quot; is a work produced by combining or linking an
+  A "Combined Work" is a work produced by combining or linking an
 Application with the Library.  The particular version of the Library
-with which the Combined Work was made is also called the &quot;Linked
-Version&quot;.
+with which the Combined Work was made is also called the "Linked
+Version".
 
-  The &quot;Minimal Corresponding Source&quot; for a Combined Work means the
+  The "Minimal Corresponding Source" for a Combined Work means the
 Corresponding Source for the Combined Work, excluding any source code
 for portions of the Combined Work that, considered in isolation, are
 based on the Application, and not on the Linked Version.
 
-  The &quot;Corresponding Application Code&quot; for a Combined Work means the
+  The "Corresponding Application Code" for a Combined Work means the
 object code and/or source code for the Application, including any data
 and utility programs needed for reproducing the Combined Work from the
 Application, but excluding the System Libraries of the Combined Work.
@@ -139,7 +108,7 @@ the following:
 
        1) Use a suitable shared library mechanism for linking with the
        Library.  A suitable mechanism is one that (a) uses at run time
-       a copy of the Library already present on the user&apos;s computer
+       a copy of the Library already present on the user's computer
        system, and (b) will operate properly with a modified version
        of the Library that is interface-compatible with the Linked
        Version.
@@ -181,7 +150,7 @@ differ in detail to address new problems or concerns.
 
   Each version is given a distinguishing version number. If the
 Library as you received it specifies that a certain numbered version
-of the GNU Lesser General Public License &quot;or any later version&quot;
+of the GNU Lesser General Public License "or any later version"
 applies to it, you have the option of following the terms and
 conditions either of that published version or of any later version
 published by the Free Software Foundation. If the Library as you
@@ -191,27 +160,6 @@ General Public License ever published by the Free Software Foundation.
 
   If the Library as you received it specifies that a proxy can decide
 whether future versions of the GNU Lesser General Public License shall
-apply, that proxy&apos;s public statement of acceptance of any version is
+apply, that proxy's public statement of acceptance of any version is
 permanent authorization for you to choose that version for the
 Library.
-   </license>
-
-   <url>
-      <update label="FeatureIDE Update Site" url="http://wwwiti.cs.uni-magdeburg.de/iti_db/research/featureide/deploy"/>
-   </url>
-
-   <requires>
-      <import plugin="de.ovgu.featureide.core"/>
-      <import plugin="de.ovgu.featureide.ui"/>
-      <import plugin="de.ovgu.featureide.fm.core"/>
-      <import plugin="de.ovgu.featureide.fm.ui"/>
-   </requires>
-
-   <plugin
-         id="de.ovgu.featureide.examples"
-         download-size="0"
-         install-size="0"
-         version="3.0.0.qualifier"
-         unpack="false"/>
-
-</feature>
