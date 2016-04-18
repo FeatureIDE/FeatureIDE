@@ -350,10 +350,6 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 		return true;
 	}
 
-	public boolean showContextFieldsAndMethods() {
-		return true;
-	}
-
 	public LinkedList<FSTDirective> buildModelDirectivesForFile(Vector<String> lines) {
 		return null;
 	}

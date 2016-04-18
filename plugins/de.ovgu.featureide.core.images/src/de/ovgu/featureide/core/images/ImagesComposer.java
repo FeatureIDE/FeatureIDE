@@ -219,4 +219,9 @@ public class ImagesComposer extends ComposerExtensionClass {
 		return files;
 	}
 
+	@Override
+	public boolean showContextFieldsAndMethods() {
+		return true;
+	}
+
 }

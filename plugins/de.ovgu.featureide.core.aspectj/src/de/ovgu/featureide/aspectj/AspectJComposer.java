@@ -535,4 +535,12 @@ public class AspectJComposer extends ComposerExtensionClass {
 		return super.isComposable();
 	}
 
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#showContextFieldsAndMethods()
+	 */
+	@Override
+	public boolean showContextFieldsAndMethods() {
+		return true;
+	}
+
 }

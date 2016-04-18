@@ -108,4 +108,12 @@ public class FeatureModeling extends ComposerExtensionClass {
 	public void postCompile(IResourceDelta delta, IFile buildFile) {
 
 	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#showContextFieldsAndMethods()
+	 */
+	@Override
+	public boolean showContextFieldsAndMethods() {
+		return false;
+	}
 }

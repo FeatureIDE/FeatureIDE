@@ -1267,4 +1267,12 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		return true;
 	}
 
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#showContextFieldsAndMethods()
+	 */
+	@Override
+	public boolean showContextFieldsAndMethods() {
+		return true;
+	}
+
 }
