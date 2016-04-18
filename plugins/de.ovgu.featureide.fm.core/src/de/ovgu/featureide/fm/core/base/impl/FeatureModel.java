@@ -123,7 +123,7 @@ public class FeatureModel implements IFeatureModel {
 		property = oldFeatureModel.getProperty().clone(this);
 		structure = createStructure();
 
-		this.sourceFile = new File(oldFeatureModel.sourceFile.toURI());
+		this.sourceFile = oldFeatureModel.sourceFile;
 
 		if (newRoot == null) {
 			final IFeatureStructure root = oldFeatureModel.getStructure().getRoot();
@@ -298,7 +298,7 @@ public class FeatureModel implements IFeatureModel {
 	}
 
 	@Override
-	public Iterable<IFeature> getFeatures() {
+	public Collection<IFeature> getFeatures() {
 		return Collections.unmodifiableCollection(featureTable.values());
 	}
 
