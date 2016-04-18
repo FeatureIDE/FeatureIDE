@@ -28,7 +28,7 @@ import de.ovgu.featureide.fm.core.io.dimacs.DIMACSReader;
 import de.ovgu.featureide.fm.ui.handlers.base.AbstractImportHandler;
 
 /**
- * Reads a velvet feature model.
+ * Reads a feature model given in DIMACS format.
  * 
  * @author Sebastian Krieter
  */
