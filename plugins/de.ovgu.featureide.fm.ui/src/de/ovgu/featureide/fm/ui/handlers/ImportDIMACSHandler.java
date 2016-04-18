@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.ui.handlers;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.DIMACS;
-
 import org.eclipse.swt.widgets.FileDialog;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -43,6 +41,6 @@ public class ImportDIMACSHandler extends AbstractImportHandler {
 	@Override
 	protected void setFilter(FileDialog fileDialog) {
 		fileDialog.setFilterExtensions(new String[] { "*.dimacs" });
-		fileDialog.setFilterNames(new String[] { DIMACS });
+		fileDialog.setFilterNames(new String[] { "DIMACS" });
 	}
 }
