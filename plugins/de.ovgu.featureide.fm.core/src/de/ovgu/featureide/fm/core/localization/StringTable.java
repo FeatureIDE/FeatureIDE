@@ -504,6 +504,7 @@ public class StringTable {
 	public static final String CALCULATING_FEATURE_DEPENDENCIES = "Calculating Feature Dependencies";
 	public static final String VELVET = "Velvet";
 	public static final String UNABLE_TO_START_GUIDSL = "Unable to start GUIDSL";
+	public static final String DIMACS = "Dimacs";
 	public static final String CONFIGURATION_COLORING = "Configuration Coloring";
 	public static final String THE_CONFIGURATION_EDITOR_PROVIDES_FEATURE_HIGHLIGHTING_FOR_INVALID_CONFIGURATIONS_IN_ODER_TO_FIND_VALID_CONFIGURATIONS_ = "The configuration editor provides feature highlighting for invalid configurations in oder to find valid configurations.";
 	public static final String LOOKS_FOR_OPEN_CLAUSES_IN_THE_CNF_REPRESENTATION_OF_THE_FEATURE_MODEL_AND_HIGHLIGHTS_THE_CORRESPONDING_FEATURES_ = "The configuration editor searches for open clauses in the CNF representation of the feature model and highlights the corresponding features.";
