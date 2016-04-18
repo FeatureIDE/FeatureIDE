@@ -123,7 +123,7 @@ public class FeatureModel implements IFeatureModel {
 		property = oldFeatureModel.getProperty().clone(this);
 		structure = createStructure();
 
-		this.sourceFile = oldFeatureModel.sourceFile;
+		this.sourceFile = new File(oldFeatureModel.sourceFile.toURI());
 
 		if (newRoot == null) {
 			final IFeatureStructure root = oldFeatureModel.getStructure().getRoot();
@@ -298,7 +298,7 @@ public class FeatureModel implements IFeatureModel {
 	}
 
 	@Override
-	public Collection<IFeature> getFeatures() {
+	public Iterable<IFeature> getFeatures() {
 		return Collections.unmodifiableCollection(featureTable.values());
 	}
 
@@ -403,6 +403,8 @@ public class FeatureModel implements IFeatureModel {
 
 	@Override
 	public void replaceConstraint(IConstraint constraint, int index) {
+		if (constraint == null)
+			throw new NullPointerException();
 		constraints.set(index, constraint);
 	}
 
@@ -450,57 +452,12 @@ public class FeatureModel implements IFeatureModel {
 
 	@Override
 	public Map<String, IFeature> getFeatureTable() {
-		return featureTable;
+		return Collections.unmodifiableMap(featureTable);
 	}
 
-//	@Override
-//	public IFeatureModel clone(IFeatureModel oldFeatureModel, boolean complete) {
-//		throw new UnsupportedOperationException("Not implemented yet");
-//	}
-//
-//	@Override
-//	public IFeatureModel clone() {
-//		throw new UnsupportedOperationException("Not implemented yet");
-//	}
-//
-//	@Override
-//	public IFeatureModel deepClone() {
-//		throw new UnsupportedOperationException("Not implemented yet");
-//	}
-//
-//	@Override
-//	public IFeatureModel deepClone(boolean complete) {
-//		throw new UnsupportedOperationException("Not implemented yet");
-//	}
-//
-//	@Override
-//	public Object getUndoContext(Object undoContext) {
-//		throw new UnsupportedOperationException("Not implemented yet");
-//	}
-//
-//	@Override
-//	public boolean isFeatureOrderInXML() {
-//		throw new UnsupportedOperationException("Not implemented yet");
-//	}
-//
-//	@Override
-//	public Object setFeatureOrderInXML(IFeatureModel featureModel, boolean featureOrderInXML) {
-//		throw new UnsupportedOperationException("Not implemented yet");
-//	}
-//
-//	@Override
-//	public void refreshContextMenu() {
-//		throw new UnsupportedOperationException("Not implemented yet");
-//	}
-//
-//	@Override
-//	public void setConstraintSelected(boolean b) {
-//		throw new UnsupportedOperationException("Not implemented yet");
-//	}
-//
 	@Override
 	public void setFeatureOrderListItem(int i, String newName) {
-//		this.featureOrderList.set(i, newName);
+		this.featureOrderList.set(i, newName);
 	}
 
 	@Override

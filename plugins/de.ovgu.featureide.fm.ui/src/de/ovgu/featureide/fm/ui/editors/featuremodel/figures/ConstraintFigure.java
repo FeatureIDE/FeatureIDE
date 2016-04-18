@@ -41,6 +41,8 @@ import org.prop4j.NodeWriter;
 import de.ovgu.featureide.fm.core.ConstraintAttribute;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.functional.Functional;
+import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIBasics;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -153,14 +155,14 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 			setToolTip(new Label(toolTip.toString()));
 		}
 
-		if (!constraint.getFalseOptional().isEmpty()) {
+		if (!Functional.isEmpty(constraint.getFalseOptional())) {
 			if (constraint.getDeadFeatures().isEmpty()) {
 				setBackgroundColor(FMPropertyManager.getWarningColor());
 			} else {
 				toolTip.append("\n\n");
 			}
 
-			ArrayList<String> falseOptionalFeatures = new ArrayList<String>(constraint.getFalseOptional().size());
+			ArrayList<String> falseOptionalFeatures = new ArrayList<String>();
 			for (IFeature feature : constraint.getFalseOptional()) {
 				falseOptionalFeatures.add(feature.toString());
 			}
