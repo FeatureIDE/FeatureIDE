@@ -32,22 +32,15 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.PROJECTS_WITH_
 import static de.ovgu.featureide.fm.core.localization.StringTable.QUESTION;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SEARCHING_FOR_PROJECTS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SELECTED_ONLY_FULLY_COMPATIBLE_PROJECTS_;
-import static de.ovgu.featureide.fm.core.localization.StringTable.SELECT_A_DIRECTORY_TO_SEARCH_FOR_EXISTING_ECLIPSE_PROJECTS_;
-import static de.ovgu.featureide.fm.core.localization.StringTable.SOURCE_FILE_COULD_NOT_BE_READ_;
-import static de.ovgu.featureide.fm.core.localization.StringTable.SOURCE_FILE_IS_NOT_A_VALID_ZIP_FILE_;
-import static de.ovgu.featureide.fm.core.localization.StringTable.THIS_EXAMPLE_ALREADY_EXISTS_IN_THE_WORKSPACE_DIRECTORY_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.TYPE_FILTER_TEXT;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URI;
-import java.nio.file.FileSystems;
-import java.util.ArrayList;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -55,9 +48,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipException;
-import java.util.zip.ZipFile;
 
 import org.eclipse.core.resources.ICommand;
 import org.eclipse.core.resources.IProject;
@@ -69,11 +59,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jface.dialogs.Dialog;
@@ -107,7 +95,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Widget;
@@ -115,20 +102,20 @@ import org.eclipse.ui.actions.WorkspaceModifyOperation;
 import org.eclipse.ui.dialogs.IOverwriteQuery;
 import org.eclipse.ui.wizards.datatransfer.ImportOperation;
 
-import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.builder.ComposerExtensionManager;
 import de.ovgu.featureide.core.builder.IComposerExtensionBase;
 import de.ovgu.featureide.examples.ExamplePlugin;
-import de.ovgu.featureide.examples.utils.CommentParser;
-import de.ovgu.featureide.examples.utils.ExampleStructureProvider;
-import de.ovgu.featureide.examples.utils.ZipStructureProvider;
+import de.ovgu.featureide.examples.utils.ProjectRecord;
+import de.ovgu.featureide.examples.utils.SimpleStructureProvider;
 
 /**
  * This class represents one page of the Example Wizard.
  * 
  * @author Christian Becker
+ * @author Reimar Schroeter
  */
 public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery {
+	Collection<ProjectRecord> projects = null;
 
 	private static final class ExampleLabelProvider extends LabelProvider {
 		public String getText(Object element) {
@@ -234,23 +221,11 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 	protected static final Color red = new Color(null, 240, 0, 0);
 	protected static final Color black = new Color(null, 0, 0, 0);
 
-	/**
-	 * The name of the folder containing metadata information for the workspace.
-	 */
-	public static final String METADATA_FOLDER = ".metadata"; //$NON-NLS-1$
-
-	/**
-	 * The import structure provider.
-	 * 
-	 * @since 3.4
-	 */
-	private ZipStructureProvider structureProvider;
-
 	private ItemAccessCheckboxTreeViewer projectsList;
 	private Text descBox;
 
 	private Hashtable<String, List<ProjectRecord>> compTable;
-	private String samplePath;
+	//	private String samplePath;
 
 	private static final String[] response = new String[] { YES, ALL, NO, NO_ALL, CANCEL };
 	private static final String FILTERTEXT = TYPE_FILTER_TEXT;
@@ -267,10 +242,9 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 	 * 
 	 * @param pageName
 	 */
-	public ExampleNewWizardPage(String samplePath) {
+	public ExampleNewWizardPage() {
 		super("Select FeatureIDE Example(s)");
 		setTitle("Select FeatureIDE example(s) which you would like to explore");
-		this.samplePath = samplePath;
 	}
 
 	public void createControl(Composite parent) {
@@ -372,7 +346,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 				if (inputElement == null) {
 					return new String[] { "Loading..." };
 				} else if (inputElement == exampleNewWizardPage) {
-					updateProjectsList(samplePath);
+					updateProjectsList();
 					if (updateProjects != null) {
 						try {
 							updateProjects.join();
@@ -518,7 +492,6 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 		GridData dbDG = new GridData(GridData.FILL_BOTH);
 		dbDG.minimumHeight = 75;
 		descBox.setLayoutData(dbDG);
-
 	}
 
 	private void determineAndSetPageComplete() {
@@ -576,74 +549,38 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 	 * 
 	 * @param path
 	 */
-	public void updateProjectsList(final String path) {
-		if (path == null || path.length() == 0) {
-			setMessage(SELECT_A_DIRECTORY_TO_SEARCH_FOR_EXISTING_ECLIPSE_PROJECTS_);
-			projectsList.refresh(true);
-			setPageComplete(projectsList.getCheckedElements().length > 0);
-			return;
-		}
-
-		final File directory = new File(path);
-
+	public void updateProjectsList() {
 		updateProjects = new Thread(new Runnable() {
 			public void run() {
-
 				NullProgressMonitor monitor = new NullProgressMonitor();
 				monitor.beginTask(SEARCHING_FOR_PROJECTS, 100);
-				Collection<ProjectRecord> files = new ArrayList<ProjectRecord>();
+				Iterator<ProjectRecord> filesIterator = null;
+
 				monitor.worked(10);
 
-				if (isZipFile(path)) {
-					ZipFile sourceFile = getSpecifiedZipSourceFile(path);
-					if (sourceFile == null) {
-						return;
-					}
-					structureProvider = new ZipStructureProvider(sourceFile);
-					Object child = structureProvider.getRoot();
+				URL url = null;
+				InputStream inputStream = null;
+				try {
+					url = new URL("platform:/plugin/de.ovgu.featureide.examples/projects.s");
+					inputStream = url.openConnection().getInputStream();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 
-					if (!collectProjectFilesFromProvider(files, child, 0, monitor)) {
-						return;
-					}
-					Iterator<ProjectRecord> filesIterator = files.iterator();
-					monitor.worked(50);
+				if (!getProjects(inputStream)) {
+					return;
+				}
+				filesIterator = projects.iterator();
+
+				monitor.worked(50);
+				if (filesIterator != null) {
 					monitor.subTask(PROCESSING_RESULTS);
 					compTable = new Hashtable<String, List<ProjectRecord>>();
-					// FH, DeltaJ, AHEAD, Antenna, AspectJ, Colligens, FC++,
-					// Munge
-
 					while (filesIterator.hasNext()) {
 						ProjectRecord pr = filesIterator.next();
 						String compID = "", composer = "";
 
-						for (ICommand command : pr.projectDescription.getBuildSpec()) {
-							if (command.getArguments().containsKey("composer")) {
-								compID = command.getArguments().get("composer");
-								composer = compID.substring(compID.lastIndexOf(".") + 1);
-								if (!compTable.containsKey(composer)) {
-									compTable.put(composer, new ArrayList<ProjectRecord>());
-								}
-								compTable.get(composer).add(pr);
-								break;
-							}
-						}
-					}
-				} else if (directory.isDirectory()) {
-					if (!collectProjectFilesFromDirectory(files, directory, null, monitor)) {
-						return;
-					}
-					Iterator<ProjectRecord> filesIterator = files.iterator();
-					monitor.worked(50);
-					monitor.subTask(PROCESSING_RESULTS);
-					compTable = new Hashtable<String, List<ProjectRecord>>();
-					// FH, DeltaJ, AHEAD, Antenna, AspectJ, Colligens, FC++,
-					// Munge
-
-					while (filesIterator.hasNext()) {
-						ProjectRecord pr = filesIterator.next();
-						String compID = "", composer = "";
-
-						for (ICommand command : pr.projectDescription.getBuildSpec()) {
+						for (ICommand command : pr.getProjectDescription().getBuildSpec()) {
 							if (command.getArguments().containsKey("composer")) {
 								compID = command.getArguments().get("composer");
 								composer = compID.substring(compID.lastIndexOf(".") + 1);
@@ -655,12 +592,27 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 							}
 						}
 					}
-				} else {
-					monitor.worked(60);
 				}
 				monitor.done();
 			}
 
+			@SuppressWarnings("unchecked")
+			private boolean getProjects(InputStream inputStream) {
+				if (projects == null) {
+					try (ObjectInputStream stream = new ObjectInputStream(inputStream)) {
+						Object res = stream.readObject();
+						projects = ((Collection<ProjectRecord>) res);
+					} catch (IOException | ClassNotFoundException | ClassCastException e) {
+						ExamplePlugin.getDefault().logError(e);
+						return false;
+					}
+
+					for (ProjectRecord projectRecord : projects) {
+						projectRecord.init();
+					}
+				}
+				return true;
+			}
 		});
 		updateProjects.start();
 	}
@@ -695,139 +647,6 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 	}
 
 	/**
-	 * Answer a handle to the zip file currently specified as being the source.
-	 * Return null if this file does not exist or is not of valid format.
-	 */
-	private ZipFile getSpecifiedZipSourceFile(String fileName) {
-		if (fileName.length() == 0) {
-			return null;
-		}
-
-		try {
-			return new ZipFile(fileName);
-		} catch (ZipException e) {
-			ExamplePlugin.getDefault().logError(SOURCE_FILE_IS_NOT_A_VALID_ZIP_FILE_, e);
-
-		} catch (IOException e) {
-			ExamplePlugin.getDefault().logError(SOURCE_FILE_COULD_NOT_BE_READ_, e);
-		}
-
-		return null;
-	}
-
-	/**
-	 * Collect the list of .project files that are under directory into files.
-	 * 
-	 * @param files
-	 * @param monitor
-	 *            The monitor to report to
-	 * @return boolean <code>true</code> if the operation was completed.
-	 */
-	private boolean collectProjectFilesFromProvider(Collection<ProjectRecord> files, Object entry, int level, IProgressMonitor monitor) {
-
-		if (monitor.isCanceled()) {
-			return false;
-		}
-		monitor.subTask("Checking: " + structureProvider.getLabel(entry));
-		List<ZipEntry> children = structureProvider.getChildren(entry);
-		if (children == null) {
-			children = new ArrayList<ZipEntry>(1);
-		}
-		Iterator<ZipEntry> childrenEnum = children.iterator();
-		while (childrenEnum.hasNext()) {
-			Object child = childrenEnum.next();
-			if (structureProvider.isFolder(child)) {
-				collectProjectFilesFromProvider(files, child, level + 1, monitor);
-			}
-			String elementLabel = structureProvider.getLabel(child);
-			if (elementLabel.equals(IProjectDescription.DESCRIPTION_FILE_NAME)) {
-				files.add(new ProjectRecord(child, entry, level));
-			}
-		}
-		return true;
-	}
-
-	/**
-	 * Collect the list of .project files that are under directory into files.
-	 * 
-	 * @param projects
-	 * @param directory
-	 * @param directoriesVisited
-	 *            Set of canonical paths of directories, used as recursion guard
-	 * @param monitor
-	 *            The monitor to report to
-	 * @return boolean <code>true</code> if the operation was completed.
-	 */
-	private boolean collectProjectFilesFromDirectory(Collection<ProjectRecord> projects, File directory, Set<String> directoriesVisited,
-			IProgressMonitor monitor) {
-		if (monitor.isCanceled()) {
-			return false;
-		}
-		monitor.subTask("Checking: " + directory.getPath());
-		File[] contents = directory.listFiles();
-		if (contents == null)
-			return false;
-
-		// Initialize recursion guard for recursive symbolic links
-		if (directoriesVisited == null) {
-			directoriesVisited = new HashSet<String>();
-			try {
-				directoriesVisited.add(directory.getCanonicalPath());
-			} catch (IOException exception) {
-				exception.printStackTrace();
-			}
-		}
-
-		// first look for project description files
-		ProjectRecord newProject = null;
-		for (int i = 0; i < contents.length; i++) {
-			final File file = contents[i];
-			if (file.isFile() && IProjectDescription.DESCRIPTION_FILE_NAME.equals(file.getName())) {
-				newProject = new ProjectRecord(file);
-				projects.add(newProject);
-			}
-		}
-
-		//look for subprojects
-		if (newProject != null) {
-			Collection<ProjectRecord> subProjects = new ArrayList<>();
-			for (int i = 0; i < contents.length; i++) {
-				if (contents[i].isDirectory() && newProject.SUB_PROJECTS_FOLDER.contains(contents[i].getName())) {
-					collectProjectFilesFromDirectory(subProjects, contents[i], directoriesVisited, monitor);
-				}
-			}
-			newProject.setSubProjects(subProjects);
-			return true;
-		}
-
-		// no project description found, so recurse into sub-directories
-		for (int i = 0; i < contents.length; i++) {
-			final File file = contents[i];
-			if (file.isDirectory() && !METADATA_FOLDER.equals(file.getName())) {
-				try {
-					if (!directoriesVisited.add(file.getCanonicalPath())) {
-						// already been here --> do not recurse
-						continue;
-					}
-				} catch (IOException exception) {
-					exception.printStackTrace();
-				}
-				collectProjectFilesFromDirectory(projects, contents[i], directoriesVisited, monitor);
-			}
-		}
-		return true;
-	}
-
-	/**
-	 * Retrieve all the projects in the current workspace.
-	 * 
-	 * @return IProject[] array of IProject in the current workspace
-	 */
-	private static IProject[] getProjectsInWorkspace() {
-		return ResourcesPlugin.getWorkspace().getRoot().getProjects();
-	}
-
-	/**
 	 * Create the selected projects
 	 * 
 	 * @return boolean <code>true</code> if all project creations were
@@ -847,15 +666,7 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 						final Object selectedObject = selected[i];
 						if (selectedObject instanceof ProjectRecord) {
 							ProjectRecord projectRecord = (ProjectRecord) selectedObject;
-							if (projectRecord.hasSubProjects()) {
-								Collection<ProjectRecord> subProj = projectRecord.getSubProjects();
-								for (ProjectRecord subPprojectRecord : subProj) {
-//									if (!subPprojectRecord.hasWarnings())
-										createExistingProject(subPprojectRecord, new SubProgressMonitor(monitor, 1));
-								}
-							}
 							createExistingProject(projectRecord, new SubProgressMonitor(monitor, 1));
-
 						} else if (selectedObject instanceof String) {
 							// do nothing
 						}
@@ -884,99 +695,87 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 			ExamplePlugin.getDefault().logError(e);
 			return false;
 		}
-		closeZipStructureProvider(structureProvider, getShell());
 		return true;
 	}
 
 	/**
+	 *
 	 * Create the project described in record. If it is successful return true.
 	 * 
 	 * @param record
 	 * @return boolean <code>true</code> if successful
+	 * @throws InvocationTargetException
 	 * @throws InterruptedException
+	 * @throws IOException
 	 */
+	@SuppressWarnings("unchecked")
 	private boolean createExistingProject(final ProjectRecord record, IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 		String projectName = record.getProjectName();
 		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		final IProject project = workspace.getRoot().getProject(projectName);
-		if (record.projectDescription == null) {
-			// error case
-			record.projectDescription = workspace.newProjectDescription(projectName);
-			IPath locationPath = new Path(record.projectDescriptionFile.getAbsolutePath());
 
-			// If it is under the root use the default location
-			if (Platform.getLocation().isPrefixOf(locationPath)) {
-				record.projectDescription.setLocation(null);
-			} else {
-				record.projectDescription.setLocation(locationPath);
-			}
-		} else {
-			record.projectDescription.setName(projectName);
+		URL url = null;
+		InputStream inputStream = null;
+		try {
+			url = new URL("platform:/plugin/de.ovgu.featureide.examples/" + record.getIndexPath());
+			inputStream = url.openConnection().getInputStream();
+		} catch (IOException e) {
+			ExamplePlugin.getDefault().logError(e);
+			return false;
 		}
-		if (record.projectArchiveFile != null) {
-			// import from archive
-			List<ZipEntry> fileSystemObjects = structureProvider.getChildren(record.parent);
-			structureProvider.setStrip(record.level);
-			ImportOperation operation = new ImportOperation(project.getFullPath(), structureProvider.getRoot(), structureProvider, this, fileSystemObjects);
-			operation.setContext(getShell());
+
+		try (ObjectInputStream instr = new ObjectInputStream(inputStream);) {
+			Object in = instr.readObject();
+			List<String> res = (List<String>) in;
+
+			ImportOperation operation = new ImportOperation(project.getFullPath(), res.get(0), new SimpleStructureProvider(record.getProjectName()), this, res);
 			operation.run(monitor);
-			return true;
-		}
-
-		// import from file system
-		File importSource = null;
-		// import project from location copying files - use default project
-		// location for this workspace
-		URI locationURI = record.projectDescription.getLocationURI();
-		// if location is null, project already exists in this location or
-		// some error condition occurred.
-		if (locationURI != null) {
-			importSource = new File(locationURI);
-			IProjectDescription desc = workspace.newProjectDescription(projectName);
-			desc.setBuildSpec(record.projectDescription.getBuildSpec());
-			desc.setComment(record.projectDescription.getComment());
-			desc.setDynamicReferences(record.projectDescription.getDynamicReferences());
-			desc.setNatureIds(record.projectDescription.getNatureIds());
-			desc.setReferencedProjects(record.projectDescription.getReferencedProjects());
-			final String projectPath = record.getLocation();
-			if (!projectPath.substring(1).equals(projectName)) {
-				desc.setLocation(new Path(workspace.getRoot().getLocation() + projectPath));
+			if (record.hasSubProjects()) {
+				for (ProjectRecord sub : record.getSubProjects()) {
+					importSubProjects(sub, monitor);
+				}
 			}
-			record.projectDescription = desc;
+		} catch (IOException | ClassNotFoundException | ClassCastException e) {
+			ExamplePlugin.getDefault().logError(e);
+			return false;
 		}
+		return true;
+	}
+
+	/**
+	 * @param record
+	 * @param monitor
+	 * @param projectName
+	 * @param workspace
+	 * @param project
+	 * @throws InvocationTargetException
+	 */
+	private void importSubProjects(final ProjectRecord record, IProgressMonitor monitor) throws InvocationTargetException {
+		String projectName = record.getProjectName();
+		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		final IProject project = workspace.getRoot().getProject(projectName);
+
+		IProjectDescription desc = workspace.newProjectDescription(projectName);
+		desc.setBuildSpec(record.getProjectDescription().getBuildSpec());
+		desc.setComment(record.getProjectDescription().getComment());
+		desc.setDynamicReferences(record.getProjectDescription().getDynamicReferences());
+		desc.setNatureIds(record.getProjectDescription().getNatureIds());
+		desc.setReferencedProjects(record.getProjectDescription().getReferencedProjects());
+
+		final String projectPath = record.getRelativeLocation();
+		IPath location = workspace.getRoot().getLocation();
+		location = location.append(projectPath);
+		desc.setLocation(location);
 
 		try {
 			monitor.beginTask(CREATING_PROJECTS, 100);
-			project.create(record.projectDescription, new SubProgressMonitor(monitor, 30));
+			project.create(desc, new SubProgressMonitor(monitor, 30));
 			project.open(IResource.BACKGROUND_REFRESH, new SubProgressMonitor(monitor, 70));
 		} catch (CoreException e) {
 			throw new InvocationTargetException(e);
 		} finally {
 			monitor.done();
 		}
-
-		// import operation to import project files if copy checkbox is selected
-		if (importSource != null) {
-			List<File> filesToImport = ExampleStructureProvider.INSTANCE.getChildren(importSource);
-
-//			if (record.hasSubProjects()) {
-//				for (Iterator<File> it = filesToImport.iterator(); it.hasNext();) {
-////					if (ProjectRecord.SUB_PROJECTS_FOLDER.equals(it.next().getName())) {
-////						it.remove();
-////						break;
-////					}
-//				}
-//			}
-
-			ImportOperation operation = new ImportOperation(project.getFullPath(), importSource, ExampleStructureProvider.INSTANCE, this, filesToImport);
-			operation.setContext(getShell());
-			operation.setOverwriteResources(true); // need to overwrite
-			// .project, .classpath
-			// files
-			operation.setCreateContainerStructure(false);
-			operation.run(monitor);
-		}
-		return true;
 	}
 
 	/**
@@ -998,9 +797,10 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 			messageString = OVERWRITE + path.lastSegment() + IN_FOLDER + path.removeLastSegments(1).toOSString() + " ?";
 		}
 
-		final MessageDialog dialog = new MessageDialog(getContainer().getShell(), QUESTION, null, messageString, MessageDialog.QUESTION, new String[] {
-				IDialogConstants.YES_LABEL, IDialogConstants.YES_TO_ALL_LABEL, IDialogConstants.NO_LABEL, IDialogConstants.NO_TO_ALL_LABEL,
-				IDialogConstants.CANCEL_LABEL }, 0);
+		final MessageDialog dialog = new MessageDialog(getContainer().getShell(), QUESTION, null, messageString, MessageDialog.QUESTION,
+				new String[] { IDialogConstants.YES_LABEL, IDialogConstants.YES_TO_ALL_LABEL, IDialogConstants.NO_LABEL, IDialogConstants.NO_TO_ALL_LABEL,
+						IDialogConstants.CANCEL_LABEL },
+				0);
 
 		// run in syncExec because callback is from an operation,
 		// which is probably not running in the UI thread.
@@ -1011,335 +811,4 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 		});
 		return dialog.getReturnCode() < 0 ? CANCEL : response[dialog.getReturnCode()];
 	}
-
-	/**
-	 * Performs clean-up if the user cancels the wizard without doing anything
-	 */
-	public void performCancel() {
-		if (structureProvider != null)
-			closeZipStructureProvider(structureProvider, getShell());
-	}
-
-	/* ****************************************************************
-	 * HANDLE ZIP FILES
-	 * ***************************************************************
-	 */
-
-	/**
-	 * Determine whether the file with the given filename is in .zip or .jar
-	 * format.
-	 * 
-	 * @param fileName
-	 *            file to test
-	 * @return true if the file is in tar format
-	 */
-	public static boolean isZipFile(String fileName) {
-		if (fileName.length() == 0) {
-			return false;
-		}
-
-		ZipFile zipFile = null;
-		try {
-			zipFile = new ZipFile(fileName);
-		} catch (IOException ioException) {
-			return false;
-		} finally {
-			if (zipFile != null) {
-				try {
-					zipFile.close();
-				} catch (IOException e) {
-					ExamplePlugin.getDefault().logError(e);
-				}
-			}
-		}
-
-		return true;
-	}
-
-	/**
-	 * Closes the given structure provider. Attempts to close the passed zip
-	 * file.
-	 * 
-	 * @param structureProvider
-	 *            The structure provider to be closed, can be <code>null</code>
-	 * @param shell
-	 *            The shell to display any possible Dialogs in
-	 */
-	public static void closeZipStructureProvider(ZipStructureProvider structureProvider, Shell shell) {
-		if (structureProvider == null)
-			return;
-
-		try {
-			structureProvider.getZipFile().close();
-		} catch (IOException e) {
-			ExamplePlugin.getDefault().logError(e);
-		}
-	}
-
-	/* ****************************************************************
-	 * PROJECT RECORD
-	 * ***************************************************************
-	 */
-
-	/**
-	 * Determine if the project with the given name is in the current workspace.
-	 * 
-	 * @param projectName
-	 *            String the project name to check
-	 * @return boolean true if the project with the given name is in this
-	 *         workspace
-	 */
-	protected static boolean isProjectInWorkspace(String projectName) {
-		if (projectName == null) {
-			return false;
-		}
-		IProject[] workspaceProjects = getProjectsInWorkspace();
-		for (int i = 0; i < workspaceProjects.length; i++) {
-			if (projectName.equals(workspaceProjects[i].getName())) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	/**
-	 * Class declared public only for test suite.
-	 * 
-	 */
-	private class ProjectRecord {
-		public final Set<String> SUB_PROJECTS_FOLDER = new HashSet<String>(Arrays.asList("projects", "features"));
-		private File projectDescriptionFile;
-
-		private ProjectRecord parentProject;
-		private Collection<ProjectRecord> subProjects;
-
-		private Object projectArchiveFile;
-
-		private String projectName;
-		private CommentParser comment;
-		private String warning = "";
-		private String error = "";
-		private boolean hasWarnings = false;
-		private boolean hasErrors = false;
-
-		private Object parent;
-
-		private int level;
-
-		private IProjectDescription projectDescription;
-
-		/**
-		 * Create a record for a project based on the info in the file.
-		 * 
-		 * @param file
-		 */
-		private ProjectRecord(File file) {
-			projectDescriptionFile = file;
-			setProjectName();
-			performAlreadyExistsCheck();
-			performRequirementCheck();
-		}
-
-		/**
-		 * @param subProjects
-		 */
-		public void setSubProjects(Collection<ProjectRecord> subProjects) {
-			for (ProjectRecord projectRecord : subProjects) {
-				projectRecord.parentProject = this;
-			}
-			this.subProjects = subProjects;
-		}
-
-		/**
-		 * @return
-		 */
-		public String getLocation() {
-			if (parentProject == null) {
-				return FileSystems.getDefault().getSeparator() + this.getProjectName();
-			} else {
-				java.nio.file.Path grandfather = parentProject.projectDescriptionFile.getParentFile().getParentFile().toPath();
-				java.nio.file.Path child = this.projectDescriptionFile.getParentFile().toPath();
-				java.nio.file.Path res = grandfather.relativize(child);
-
-				return FileSystems.getDefault().getSeparator() + res.toString();
-			}
-		}
-
-		/**
-		 * @param file
-		 *            The Object representing the .project file
-		 * @param parent
-		 *            The parent folder of the .project file
-		 * @param level
-		 *            The number of levels deep in the provider the file is
-		 */
-		private ProjectRecord(Object file, Object parent, int level) {
-			this.projectArchiveFile = file;
-			this.parent = parent;
-			this.level = level;
-			setProjectName();
-			performAlreadyExistsCheck();
-			performRequirementCheck();
-		}
-
-		public boolean hasSubProjects() {
-			return !(subProjects == null || subProjects.isEmpty());
-		}
-
-		@SuppressWarnings("unchecked")
-		public Collection<ProjectRecord> getSubProjects() {
-			return (subProjects != null) ? subProjects : Collections.EMPTY_LIST;
-		}
-
-		/**
-		 * Set the name of the project based on the projectFile.
-		 */
-		private void setProjectName() {
-			try {
-				if (projectArchiveFile != null) {
-					InputStream stream = structureProvider.getContents(projectArchiveFile);
-
-					// If we can get a description pull the name from there
-					if (stream == null) {
-						if (projectArchiveFile instanceof ZipEntry) {
-							IPath path = new Path(((ZipEntry) projectArchiveFile).getName());
-							projectName = path.segment(path.segmentCount() - 2);
-						}
-						comment = null;
-					} else {
-						projectDescription = ResourcesPlugin.getWorkspace().loadProjectDescription(stream);
-						stream.close();
-						projectName = projectDescription.getName();
-						comment = new CommentParser(projectDescription.getComment());
-					}
-
-				}
-
-				// If we don't have the project name try again
-				if (projectName == null) {
-					IPath path = new Path(projectDescriptionFile.getPath());
-					// if the file is in the default location, use the directory
-					// name as the project name
-					if (isDefaultLocation(path)) {
-						projectName = path.segment(path.segmentCount() - 2);
-						projectDescription = ResourcesPlugin.getWorkspace().newProjectDescription(projectName);
-						comment = new CommentParser(projectDescription.getComment());
-					} else {
-						projectDescription = ResourcesPlugin.getWorkspace().loadProjectDescription(path);
-						projectName = projectDescription.getName();
-						comment = new CommentParser(projectDescription.getComment());
-					}
-
-				}
-			} catch (CoreException e) {
-				// no good couldn't get the name
-				ExamplePlugin.getDefault().logError(e);
-			} catch (IOException e) {
-				// no good couldn't get the name
-				ExamplePlugin.getDefault().logError(e);
-			}
-		}
-
-		/**
-		 * Returns whether the given project description file path is in the
-		 * default location for a project
-		 * 
-		 * @param path
-		 *            The path to examine
-		 * @return Whether the given path is the default location for a project
-		 */
-		private boolean isDefaultLocation(IPath path) {
-			// The project description file must at least be within the project,
-			// which is within the workspace location
-			if (path.segmentCount() < 2)
-				return false;
-			return path.removeLastSegments(2).toFile().equals(Platform.getLocation().toFile());
-		}
-
-		/**
-		 * Get the name of the project
-		 * 
-		 * @return String
-		 */
-		public String getProjectName() {
-			return projectName;
-		}
-
-		/**
-		 * Get the description of the project
-		 * 
-		 * @return String
-		 */
-		public String getDescription() {
-			return comment == null ? "" : comment.getDescription();
-		}
-
-		public boolean hasWarnings() {
-			return hasWarnings;
-		}
-
-		public String getWarningText() {
-			return warning;
-		}
-
-		public boolean hasErrors() {
-			return hasErrors;
-		}
-
-		public String getErrorText() {
-			return error;
-		}
-
-		private void performAlreadyExistsCheck() {
-			if (isProjectInWorkspace(getProjectName())) {
-				error += THIS_EXAMPLE_ALREADY_EXISTS_IN_THE_WORKSPACE_DIRECTORY_;
-				hasErrors = true;
-			}
-		}
-
-		private void performRequirementCheck() {
-			IStatus status = ResourcesPlugin.getWorkspace().validateNatureSet(projectDescription.getNatureIds());
-
-			if (status.isOK()) {
-				status = CorePlugin.getDefault().isComposable(projectDescription);
-			}
-
-			if (!status.isOK()) {
-				warning = status.getMessage();
-				if (status instanceof MultiStatus) {
-					MultiStatus multi = (MultiStatus) status;
-					if (multi.getChildren().length > 0) {
-						warning += " (";
-						for (int j = 0; j < multi.getChildren().length - 1; j++) {
-							warning += multi.getChildren()[j].getMessage() + " ;";
-						}
-						warning += multi.getChildren()[multi.getChildren().length - 1].getMessage() + ")";
-					}
-				}
-				hasWarnings = true;
-			}
-		}
-
-		/**
-		 * Gets the label to be used when rendering this project record in the
-		 * UI.
-		 * 
-		 * @return String the label
-		 * @since 3.4
-		 */
-		public String getProjectLabel() {
-			return projectName;
-		}
-
-		@Override
-		public int hashCode() {
-			return projectName.hashCode();
-		}
-
-		@Override
-		public boolean equals(Object arg) {
-			return (arg instanceof ProjectRecord) && ((ProjectRecord) arg).projectName.equals(this.projectName);
-		}
-	}
-
 }
