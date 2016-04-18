@@ -727,8 +727,8 @@ public class ExampleNewWizardPage extends WizardPage implements IOverwriteQuery 
 		try (ObjectInputStream instr = new ObjectInputStream(inputStream);) {
 			Object in = instr.readObject();
 			List<String> res = (List<String>) in;
-
-			ImportOperation operation = new ImportOperation(project.getFullPath(), res.get(0), new SimpleStructureProvider(record.getProjectName()), this, res);
+			
+			ImportOperation operation = new ImportOperation(project.getFullPath(), res.get(0), new SimpleStructureProvider(record.getRelativeLocation()), this, res);
 			operation.run(monitor);
 			if (record.hasSubProjects()) {
 				for (ProjectRecord sub : record.getSubProjects()) {

@@ -27,6 +27,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -49,17 +50,36 @@ public class CreateMetaInformation {
 	/**
 	 * The filter to not return specific files...
 	 */
-	private final static FilenameFilter filter = new FilenameFilter() {
+	private static class NameFilter implements FilenameFilter {
+		final static Set<String> names = new HashSet<String>(Arrays.asList( ".svn", ".git", ".gitignore", ".metadata", "index.s", "bin"));
+
 		public boolean accept(File dir, String name) {
-			return !(".svn".equals(name) || ".git".equals(name) || ".gitignore".equals(name) || ".metadata".equals(name) || "index.s".equals(name)
-					|| "bin".equals(name));
+			return !names.contains(name);
 		}
 	};
+	
+	private final static FilenameFilter filter = new NameFilter();
+	
+	/**
+	 * The filter to not return specific files...
+	 */
+	private static class ProjectFilter implements FilenameFilter {
+		final static Set<String> names = new HashSet<String>(Arrays.asList("originalProject", ".svn", ".git", ".gitignore", ".metadata", "bin"));
+
+		public boolean accept(File dir, String name) {
+			return !names.contains(name);
+		}
+	};
+	
+	private final static FilenameFilter projectfilter = new ProjectFilter();
 
 	public static void main(String[] args) {
 		final File directory = new File("./" + ExamplePlugin.FeatureIDE_EXAMPLE_DIR);
 		Collection<ProjectRecord> files = new ArrayList<ProjectRecord>();
 		collectProjects(files, directory, null);
+		for (ProjectRecord projectRecord : files) {
+			System.out.println(projectRecord.getProjectName());
+		}
 		try (ObjectOutputStream obj = new ObjectOutputStream(new FileOutputStream(new File("./projects.s")))) {
 			obj.writeObject(files);
 		} catch (FileNotFoundException e) {
@@ -79,7 +99,7 @@ public class CreateMetaInformation {
 	 * @return boolean <code>true</code> if the operation was completed.
 	 */
 	private static boolean collectProjects(Collection<ProjectRecord> projects, File directory, Set<String> directoriesVisited) {
-		File[] contents = directory.listFiles(filter);
+		File[] contents = directory.listFiles(projectfilter);
 		if (contents == null)
 			return false;
 
@@ -136,16 +156,16 @@ public class CreateMetaInformation {
 		return true;
 	}
 
-	private static void createIndex(File dir, List<String> list) {
+	private static void createIndex(File dir, List<String> list, int segmentsToRemove) {
 		File[] listFiles = dir.listFiles(filter);
 
 		if (listFiles != null) {
 			for (File file : listFiles) {
 				if (file.isDirectory()) {
-					createIndex(file, list);
+					createIndex(file, list, segmentsToRemove);
 				} else {
 					IPath path = new Path(file.getPath());
-					path = path.removeFirstSegments(2);
+					path = path.removeFirstSegments(segmentsToRemove);
 					list.add(path.toString());
 				}
 			}
@@ -155,7 +175,7 @@ public class CreateMetaInformation {
 	private static void createIndex(File projectFile) {
 		File projectDir = projectFile.getParentFile();
 		List<String> listOfFiles = new ArrayList<>();
-		createIndex(projectDir, listOfFiles);
+		createIndex(projectDir, listOfFiles, new Path(projectDir.getPath()).segmentCount());
 		try (ObjectOutputStream obj = new ObjectOutputStream(new FileOutputStream(new File(projectDir, "index.s")))) {
 			obj.writeObject(listOfFiles);
 		} catch (FileNotFoundException e) {

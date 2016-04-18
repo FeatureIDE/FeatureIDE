@@ -70,7 +70,6 @@ public class ProjectRecord implements Serializable {
 	 */
 	public ProjectRecord(File file) {
 		IPath p = new Path(file.getPath());
-		System.out.println(file.getPath().toString());
 		projectDescriptionPath = p.toString();
 		projectName = file.getParentFile().getName();
 	}
@@ -81,13 +80,16 @@ public class ProjectRecord implements Serializable {
 		} catch (IOException | CoreException e) {
 			e.printStackTrace();
 		}
+		
+		projectName = projectDescription.getName();
+
 
 		comment = new CommentParser(projectDescription.getComment());
 
 		performAlreadyExistsCheck();
 		performRequirementCheck();
 
-		for (ProjectRecord projectRecord : subProjects) {
+		for (ProjectRecord projectRecord : getSubProjects()) {
 			projectRecord.init();
 		}
 	}
