@@ -10,9 +10,11 @@ Here, is a list of high-level enhancements.
 Release 3.0.0 (April 2016)
 * Three new generators added for black-box frameworks, runtime parameters, and images
 * New interfaces for feature model, features, and constraints to improve extensibility (new extension points are planned for 3.1.0)
-* Improved performance for feature-model analyses
+* Improved performance for feature-model analyses and example wizard
 * Statistics on feature models added in statistics view
-* Example wizard improved
+* Usability improvements in feature-model editor
+* Usability improvements in configuration editor (e.g., search, folding, revised highlighting)
+* Feature-model slicing available
 
 Release 2.7.5 (December 2015)
 * Support for coloring features in project explorer, feature diagram, configuration, outline, collaboration diagram, and for generated files
