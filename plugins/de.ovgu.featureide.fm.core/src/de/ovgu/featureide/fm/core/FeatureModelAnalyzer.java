@@ -679,6 +679,10 @@ public class FeatureModelAnalyzer {
 				
 				constraint.setContainedFeatures();
 				if (fmFalseOptionals.isEmpty() && fmDeadFeatures.isEmpty()) {
+					if (constraint.getConstraintAttribute() != ConstraintAttribute.NORMAL) {
+						constraint.setConstraintAttribute(ConstraintAttribute.NORMAL, false);
+						changedAttributes.put(constraint, ConstraintAttribute.NORMAL);
+					}
 					constraint.setDeadFeatures(Functional.getEmptyIterable(IFeature.class));
 					constraint.getFalseOptional().clear();
 					continue;
@@ -708,7 +712,7 @@ public class FeatureModelAnalyzer {
 						changedAttributes.put(constraint, ConstraintAttribute.DEAD);
 					}
 				} else {
-					constraint.getDeadFeatures().clear();
+					constraint.setDeadFeatures(Collections.<IFeature>emptyList());
 				}
 				if (!changedAttributes.containsKey(constraint)) {
 					constraint.setConstraintAttribute(ConstraintAttribute.NORMAL, false);

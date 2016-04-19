@@ -831,6 +831,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			IGraphicalFeature deletedFeature = graphicalFeatureModel.getGraphicalFeature((IFeature) event.getSource());
 			deletedFeature.update(event);
 			oldParent = (IFeature) event.getOldValue();
+			internRefresh(true);
 			if (oldParent == null) {
 				FeatureUIHelper.getGraphicalRootFeature(graphicalFeatureModel).update(FeatureIDEEvent.getDefault(EventType.PARENT_CHANGED));
 			} else {
@@ -863,9 +864,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			legendLayoutAction.refresh();
 			break;
 		case HIDDEN_CHANGED:
-			final List<IFeatureStructure> children = new ArrayList<>(); 
-			Features.getAllFeatures(children, ((IFeature)event.getSource()).getStructure());
-			for (final IFeatureStructure child : children) {
+			for (final IFeatureStructure child : Features.getAllFeatures(new ArrayList<IFeatureStructure>(), ((IFeature)event.getSource()).getStructure())) {
 				FeatureUIHelper.getGraphicalFeature(child.getFeature(), graphicalFeatureModel).update(event);
 			}
 			internRefresh(true);
