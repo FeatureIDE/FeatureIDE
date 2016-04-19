@@ -31,15 +31,54 @@ import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 
+/**
+ * Convenience methods for traversing the feature tree structure.
+ * 
+ * @author Sebastian Krieter
+ */
 public final class Features {
 
 	public static final String FEATURE_SUFFIX = "(Feature)";
 
-	public static Collection<IFeatureStructure> getAllFeatures(final Collection<IFeatureStructure> features, final IFeatureStructure startingPointFeature) {
-		features.add(startingPointFeature);
-		final List<IFeatureStructure> list = startingPointFeature.getChildren();
-		for (final IFeatureStructure feature : list) {
-			getAllFeatures(features, feature);
+	public static Collection<IFeatureStructure> getAllFeatures(final Collection<IFeatureStructure> features, final IFeatureStructure root) {
+		return getAllFeatures(features, root, true);
+	}
+
+	public static Collection<IFeatureStructure> getLeafFeatures(final Collection<IFeatureStructure> features, final IFeatureStructure root) {
+		return getLeafFeatures(features, root, true);
+	}
+
+	public static Collection<IFeatureStructure> getCompoundFeatures(final Collection<IFeatureStructure> features, final IFeatureStructure root) {
+		return getCompoundFeatures(features, root, true);
+	}
+
+	public static Collection<IFeatureStructure> getAllFeatures(final Collection<IFeatureStructure> features, final IFeatureStructure root, boolean includeRoot) {
+		if (includeRoot) {
+			features.add(root);
+		}
+		for (final IFeatureStructure feature : root.getChildren()) {
+			getAllFeatures(features, feature, true);
+		}
+		return features;
+	}
+
+	public static Collection<IFeatureStructure> getLeafFeatures(final Collection<IFeatureStructure> features, final IFeatureStructure root, boolean includeRoot) {
+		if (includeRoot && !root.hasChildren()) {
+			features.add(root);
+		}
+		for (final IFeatureStructure feature : root.getChildren()) {
+			getLeafFeatures(features, feature, true);
+		}
+		return features;
+	}
+
+	public static Collection<IFeatureStructure> getCompoundFeatures(final Collection<IFeatureStructure> features, final IFeatureStructure root,
+			boolean includeRoot) {
+		if (includeRoot && root.hasChildren()) {
+			features.add(root);
+		}
+		for (final IFeatureStructure feature : root.getChildren()) {
+			getCompoundFeatures(features, feature, true);
 		}
 		return features;
 	}

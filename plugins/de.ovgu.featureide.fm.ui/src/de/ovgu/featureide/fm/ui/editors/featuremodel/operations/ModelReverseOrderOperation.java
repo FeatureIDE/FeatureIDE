@@ -51,7 +51,7 @@ public class ModelReverseOrderOperation extends AbstractGraphicalFeatureModelOpe
 	protected FeatureIDEEvent operation() {
 		final IGraphicalFeature root = FeatureUIHelper.getGraphicalRootFeature(graphicalFeatureModel);
 		final IFeatureStructure rootStructure = root.getObject().getStructure();
-		for (final IFeatureStructure feature : Features.getAllFeatures(new ArrayList<IFeatureStructure>(), rootStructure)) {
+		for (final IFeatureStructure feature : Features.getCompoundFeatures(new ArrayList<IFeatureStructure>(), rootStructure)) {
 			Collections.reverse(feature.getChildren());
 		}
 		return FeatureIDEEvent.getDefault(FeatureIDEEvent.EventType.LOCATION_CHANGED);
