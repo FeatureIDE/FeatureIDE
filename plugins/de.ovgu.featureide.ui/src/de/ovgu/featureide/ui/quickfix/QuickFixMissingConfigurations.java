@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -40,7 +40,7 @@ import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
-import de.ovgu.featureide.fm.core.io.manager.FileWriter;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
  * Default implementation for quick fix of missing configurations.
@@ -89,14 +89,12 @@ public abstract class QuickFixMissingConfigurations implements IMarkerResolution
 	}
 	
 	protected void writeConfigurations(final Collection<Configuration> confs) {
-		final FileWriter<Configuration> writer = new FileWriter<>(ConfigurationManager.getDefaultFormat());
+		final FileHandler<Configuration> writer = new FileHandler<>(ConfigurationManager.getDefaultFormat());
 		try {
 			configurationNr = 0;
 			for (final Configuration c : confs) {				
 				final IFile configurationFile = getConfigurationFile(project.getConfigFolder());
-				writer.setObject(c);
-				writer.setPath(Paths.get(configurationFile.getLocationURI()));
-				writer.save();
+				writer.write(Paths.get(configurationFile.getLocationURI()), c);
 			}
 			project.getConfigFolder().refreshLocal(IResource.DEPTH_ONE, null);
 		} catch (CoreException e) {

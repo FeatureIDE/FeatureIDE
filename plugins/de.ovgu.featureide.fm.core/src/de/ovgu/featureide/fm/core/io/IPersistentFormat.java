@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2013  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,8 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.io;
 
-import java.util.List;
-
 /**
  * Interface for saving and loading data.
  * 
@@ -29,7 +27,7 @@ import java.util.List;
  */
 public interface IPersistentFormat<T> {
 
-	List<Problem> read(T object, CharSequence source);
+	ProblemList read(T object, CharSequence source);
 
 	String write(T object);
 

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -25,7 +25,6 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.annotation.CheckForNull;
@@ -47,6 +46,7 @@ import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.event.IEventManager;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
+import de.ovgu.featureide.fm.core.io.ProblemList;
 
 /**
  * Responsible to load and save all information from / to a file.</br>
@@ -76,7 +76,7 @@ public abstract class AFileManager<T> implements IFileManager, IEventManager, IR
 
 	private final IEventManager eventManager = new DefaultEventManager();
 
-	private final List<Problem> lastProblems = new LinkedList<>();
+	private final ProblemList lastProblems = new ProblemList();
 
 	private final Object syncObject = new Object();
 
@@ -116,7 +116,7 @@ public abstract class AFileManager<T> implements IFileManager, IEventManager, IR
 		return variableObject;
 	}
 
-	public List<Problem> getLastProblems() {
+	public ProblemList getLastProblems() {
 		return lastProblems;
 	}
 

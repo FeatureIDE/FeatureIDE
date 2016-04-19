@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -44,7 +44,7 @@ import org.prop4j.NodeWriter;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
@@ -91,8 +91,10 @@ public class ExportCNFHandler extends AFileHandler {
 			 * @param model
 			 * @return
 			 */
+
 			private String getCNF(IFeatureModel model) {
-				Node nodes = NodeCreator.createNodes(model.clone(null)).toCNF();
+				Node nodes = AdvancedNodeCreator.createCNF(model);
+
 				StringBuilder cnf = new StringBuilder();
 				cnf.append("Logical Symbols:\r\n");
 				cnf.append(nodes.toString(NodeWriter.logicalSymbols));

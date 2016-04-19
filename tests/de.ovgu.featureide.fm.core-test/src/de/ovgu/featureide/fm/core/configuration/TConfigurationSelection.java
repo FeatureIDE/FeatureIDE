@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -25,6 +25,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import de.ovgu.featureide.common.Commons;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
@@ -90,6 +91,21 @@ public class TConfigurationSelection extends AbstractConfigurationTest{
 			exception = true;
 		}
 		assertTrue(exception);
+	}
+
+	@Test
+	public void testPropagation() 
+	{
+		Configuration c = new Configuration(getModel(), true);
+//		c.setManual("A", Selection.SELECTED);
+		c.setManual("B", Selection.SELECTED);
+		System.out.println(c.getSelectablefeature("A").getAutomatic());
+		System.out.println(c);
+	}
+
+	
+	private IFeatureModel getModel() {
+		return Commons.loadFeatureModelFromFile("model.xml", Commons.FEATURE_MODEL_BENCHMARK_PATH_REMOTE, Commons.FEATURE_MODEL_BENCHMARK_PATH_LOCAL_CLASS_PATH);
 	}
 
 

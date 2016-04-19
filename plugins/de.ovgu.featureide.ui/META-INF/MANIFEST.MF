@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: FeatureIDE UI Plug-In
 Bundle-SymbolicName: de.ovgu.featureide.ui;singleton:=true
-Bundle-Version: 2.7.5.qualifier
+Bundle-Version: 3.0.0.qualifier
 Bundle-Activator: de.ovgu.featureide.ui.UIPlugin
 Bundle-Localization: 
 Require-Bundle: org.eclipse.ui,
@@ -89,6 +89,7 @@ Export-Package:
    org.eclipse.swt.layout,
    de.ovgu.featureide.core.builder,
    de.ovgu.featureide.fm.core",
+ no.sintef.ict.splcatool,
  org.apache.commons.math;uses:="org.apache.commons.math.exception.util,org.apache.commons.math.exception"
 Import-Package: de.ovgu.featureide.fm.core,
  org.eclipse.jdt.core,

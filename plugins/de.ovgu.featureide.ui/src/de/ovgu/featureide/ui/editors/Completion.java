@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -47,7 +47,7 @@ import de.ovgu.featureide.core.IFeatureProject;
 /**
  * Context Completion
  * 
- * @author Reimar Schröter
+ * @author Reimar Schrï¿½ter
  */
 @SuppressWarnings("restriction")
 public class Completion implements IJavaCompletionProposalComputer {

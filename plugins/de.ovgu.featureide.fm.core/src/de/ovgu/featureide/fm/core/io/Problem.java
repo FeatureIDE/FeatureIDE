@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,17 +20,31 @@
  */
 package de.ovgu.featureide.fm.core.io;
 
-import org.eclipse.core.resources.IMarker;
-
 /**
  * Saves a warning with a line number where it occurred.
+ * 
+ * @see ProblemList
  * 
  * @author Thomas Thuem
  * @author Sebastian Krieter
  */
 public class Problem {
 
-	public final int severity;
+	public static enum Severity {
+		INFO(0), WARNING(1), ERROR(2);
+		
+		private final int level;
+
+		private Severity(int level) {
+			this.level = level;
+		}
+
+		public int getLevel() {
+			return level;
+		}
+	}
+
+	public final Severity severity;
 
 	public final String message;
 
@@ -39,16 +53,16 @@ public class Problem {
 	public Problem(Throwable throwable) {
 		this.message = throwable.getMessage();
 		this.line = 0;
-		this.severity = IMarker.SEVERITY_ERROR;
+		this.severity = Severity.ERROR;
 	}
 
 	public Problem(String message, int line) {
 		this.message = message;
 		this.line = line;
-		this.severity = IMarker.SEVERITY_WARNING;
+		this.severity = Severity.WARNING;
 	}
 
-	public Problem(String message, int line, int severity) {
+	public Problem(String message, int line, Severity severity) {
 		this.message = message;
 		this.line = line;
 		this.severity = severity;
@@ -58,26 +72,8 @@ public class Problem {
 	public String toString() {
 		return "Problem(" + severity + ") " + message;
 	}
-	
-	/**
-	 * Checks whether a given list of problems contains at least one problem with the specified or a greater severity level.
-	 * 
-	 * @param problems The problem list.
-	 * @param minimumLevel The minimum severity level
-	 * 		(one of {@link IMarker#SEVERITY_INFO}, {@link IMarker#SEVERITY_WARNING}, or {@link IMarker#SEVERITY_ERROR}).
-	 * 
-	 * @return {@code true} if the list contains a problem with severity at the given minimum level or above, {@code false} otherwise.
-	 */
-	public static boolean checkSeverity(Iterable<Problem> problems, int minimumLevel) {
-		for (Problem modelWarning : problems) {
-			if (modelWarning.severity >= minimumLevel) {
-				return true;
-			}
-		}
-		return false;
-	}
 
-	public int getSeverity() {
+	public Severity getSeverity() {
 		return severity;
 	}
 

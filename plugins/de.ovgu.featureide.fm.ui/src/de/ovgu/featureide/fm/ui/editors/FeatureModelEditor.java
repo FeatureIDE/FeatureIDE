@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -83,6 +83,7 @@ import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.io.Problem;
+import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
 import de.ovgu.featureide.fm.core.io.manager.FileManagerMap;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
@@ -129,10 +130,10 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 	public boolean checkModel(String source) {
 		markerHandler.deleteAllModelMarkers();
 		final IFeatureModel model = FMFactoryManager.getFactory(fmManager.getFormat().getFactoryID()).createFeatureModel();
-		final List<Problem> warnings = fmManager.getFormat().getInstance().read(model, source);
+		final ProblemList warnings = fmManager.getFormat().getInstance().read(model, source);
 		createModelFileMarkers(warnings);
 
-		return !Problem.checkSeverity(warnings, IMarker.SEVERITY_ERROR);
+		return !warnings.containsError();
 	}
 
 	@Override
@@ -153,8 +154,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 		}
 
 		featureOrderEditor.doSave(monitor);
-		//TODO
-//		featureModel.getRenamingsManager().performRenamings(markerHandler.getModelFile());
+		featureModel.getRenamingsManager().performRenamings(featureModel.getSourceFile());
 		for (IFeatureModelEditorPage page : extensionPages) {
 			page.doSave(monitor);
 		}
@@ -177,7 +177,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 		GraphicsExporter.exportAs(featureModel, diagramEditor);
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "rawtypes" })
 	@Override
 	public Object getAdapter(Class adapter) {
 		if (IContentOutlinePage.class.equals(adapter)) {
@@ -541,7 +541,7 @@ public class FeatureModelEditor extends MultiPageEditorPart implements IEventLis
 
 	private void createModelFileMarkers(List<Problem> warnings) {
 		for (Problem warning : warnings) {
-			markerHandler.createModelMarker(warning.message, warning.severity, warning.line);
+			markerHandler.createModelMarker(warning.message, warning.severity.getLevel(), warning.line);
 		}
 		try {
 			if (!featureModel.getAnalyser().isValid()) {

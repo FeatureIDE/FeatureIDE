@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -38,10 +38,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.ListIterator;
 import java.util.Map.Entry;
 
@@ -87,7 +85,7 @@ import de.ovgu.featureide.fm.core.constraint.WeightedTerm;
 import de.ovgu.featureide.fm.core.io.AbstractFeatureModelReader;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.ModelIOFactory;
-import de.ovgu.featureide.fm.core.io.Problem;
+import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
 /**
@@ -313,7 +311,7 @@ public class VelvetFeatureModelFormat implements IPersistentFormat<IFeatureModel
 	}
 
 	@Override
-	public List<Problem> read(IFeatureModel object, CharSequence source) {
+	public ProblemList read(IFeatureModel object, CharSequence source) {
 		extFeatureModel = (ExtendedFeatureModel) object;
 		if (extFeatureModel != null) {
 			featureModelFile = extFeatureModel.getSourceFile();
@@ -325,7 +323,7 @@ public class VelvetFeatureModelFormat implements IPersistentFormat<IFeatureModel
 		} catch (UnsupportedModelException e) {
 			e.printStackTrace();
 		}
-		return Collections.emptyList();
+		return new ProblemList();
 	}
 
 	private static class ConstraintNode {

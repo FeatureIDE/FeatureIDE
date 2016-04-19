@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -22,11 +22,11 @@ package de.ovgu.featureide.fm.core.base;
 
 import javax.annotation.Nonnull;
 
-import de.ovgu.featureide.fm.core.base.impl.AFeature;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 
 /**
- * The feature interface represents any class that acts in the sense of a <i>feature</i> in FeatureIDE. A feature contains both
+ * The feature interface represents any class that acts in the sense of a <i>feature</i> in FeatureIDE. 
+ * A feature contains both
  * <ul>
  * <li>certain fixed properties (e.g., its name) which are available by the features implementation of {@link de.ovgu.featureide.fm.core.base.IFeatureProperty
  * IFeatureProperty}, and</li>

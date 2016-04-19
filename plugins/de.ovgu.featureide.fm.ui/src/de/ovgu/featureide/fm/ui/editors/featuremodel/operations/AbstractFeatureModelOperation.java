@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -110,7 +110,7 @@ public abstract class AbstractFeatureModelOperation extends AbstractOperation {
 	final protected void fireEvent(@Nonnull FeatureIDEEvent event) {
 		if (event == null) {
 			System.out.println(getClass() + " operation() must retuan a FeatureIDEEvent");
-			event = new FeatureIDEEvent(featureModel, editor, false, null, null, null);
+			event = new FeatureIDEEvent(featureModel, null, null, null);
 		}
 		featureModel.fireEvent(event);
 	}

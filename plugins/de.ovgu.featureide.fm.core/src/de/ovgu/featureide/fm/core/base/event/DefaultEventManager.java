@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -43,15 +43,8 @@ public class DefaultEventManager implements IEventManager, IEventListener {
 
 	@Override
 	public void fireEvent(FeatureIDEEvent event) {
-		if (event.isPersistent() || event.getEditor() == null) {
-			for (final IEventListener listener : listenerList) {
-				callListener(event, listener);
-			}
-		} else {
-			final int listenerIndex = listenerList.indexOf(event.getEditor());
-			if (listenerIndex >= 0) {
-				callListener(event, listenerList.get(listenerIndex));
-			}
+		for (final IEventListener listener : listenerList) {
+			callListener(event, listener);
 		}
 	}
 

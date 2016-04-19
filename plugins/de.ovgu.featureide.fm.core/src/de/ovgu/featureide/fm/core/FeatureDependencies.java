@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -36,7 +36,7 @@ import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 
 /**
  * Calculates dependencies of features
@@ -162,7 +162,7 @@ public class FeatureDependencies {
      * @return Node representing the featureModel
      */
     private  Node createRootNode(IFeatureModel fm) {
-		return NodeCreator.createNodes(fm, true).toCNF();
+		return AdvancedNodeCreator.createCNF(fm);
     }
 
     /**

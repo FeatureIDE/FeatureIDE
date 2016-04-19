@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -441,7 +441,7 @@ public class ModelEditPart extends AbstractGraphicalEditPart implements GUIDefau
 		FSTFeature feature = editPart.getRoleModel().getFeature();
 		List<UnderlayerFigure> ulFigures = new LinkedList<UnderlayerFigure>();
 		for (CollaborationEditPart part : collaborationEditPartList) {
-			if (feature.getName().contains(part.getModel().toString()) && feature.getRoles().equals(part.getCollaborationModel().getRoles())) {// TODO TEST: Hello, Hello1
+			if (feature.getName().contains(part.getModel().toString()) && feature.getRoles().equals(part.getCollaborationModel().getRoles())) {
 				 ulFigures.add((UnderlayerFigure) part.getFigure());
 			}
 		}

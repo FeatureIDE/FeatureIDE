@@ -1,0 +1,8 @@
+<plugin>
+	<interface id="interfaces.Print">
+		<class>World</class>
+	</interface>
+	<interface id="interfaces.Announce">
+		<class>World</class>
+	</interface>
+</plugin>

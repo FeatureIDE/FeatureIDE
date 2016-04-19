@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -27,7 +27,6 @@ import org.eclipse.gef.commands.Command;
 import org.eclipse.ui.PlatformUI;
 
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
-import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.operations.MoveConstraintOperation;
@@ -119,11 +118,11 @@ public class ConstraintDragAndDropCommand extends Command {
 				maxUp = c.getLocation().y;
 
 			}
-			if (c.getLocation().x + FeatureUIHelper.getSize(c).width > maxRight) {
-				maxRight = c.getLocation().x + FeatureUIHelper.getSize(c).width;
+			if (c.getLocation().x + c.getSize().width > maxRight) {
+				maxRight = c.getLocation().x + c.getSize().width;
 			}
-			if ((c.getLocation().y + FeatureUIHelper.getSize(c).height) > maxDown) {
-				maxDown = c.getLocation().y + FeatureUIHelper.getSize(c).height;
+			if ((c.getLocation().y + c.getSize().height) > maxDown) {
+				maxDown = c.getLocation().y + c.getSize().height;
 			}
 
 		}
@@ -147,7 +146,7 @@ public class ConstraintDragAndDropCommand extends Command {
 
 	public Point getRightPoint() {
 
-		Point p = new Point(constraint.getLocation().x + FeatureUIHelper.getSize(constraint).width + 5, featureModel
+		Point p = new Point(constraint.getLocation().x + constraint.getSize().width + 5, featureModel
 				.getConstraints().get(calculateNewIndex()).getLocation().y);
 		if (isLastPos) {
 			p.y = p.y + 17;

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -58,7 +58,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
-import de.ovgu.featureide.fm.core.io.manager.FileWriter;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
  * Abstract class for FeatureIDE composer extensions with default values.
@@ -331,10 +331,7 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 			}
 			final IPersistentFormat<Configuration> format = ConfigurationManager.getFormat(ConfigurationManager.FormatType.CONFIG);
 			IFile configurationFile = folder.getFile(configurationName + "." + format.getSuffix());
-			final FileWriter<Configuration> writer = new FileWriter<>(format);
-			writer.setPath(Paths.get(configurationFile.getLocationURI()));
-			writer.setObject(configuration);
-			writer.save();
+			FileHandler.save(Paths.get(configurationFile.getLocationURI()), configuration, format);
 			copyNotComposedFiles(configuration, folder);
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
@@ -350,10 +347,6 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	}
 
 	public boolean canGeneratInParallelJobs() {
-		return true;
-	}
-
-	public boolean showContextFieldsAndMethods() {
 		return true;
 	}
 
@@ -373,8 +366,8 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 		return false;
 	}
 
-	public boolean hasCompositionMechanisms() {
-		return false;
+	public String[] getCompositionMechanisms() {
+		return new String[0];
 	}
 
 	public boolean createFolderForFeatures() {
@@ -419,5 +412,13 @@ public abstract class ComposerExtensionClass implements IComposerExtensionClass 
 	@Override
 	public Mechanism getGenerationMechanism() {
 		return null;
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#showContextFieldsAndMethods()
+	 */
+	@Override
+	public boolean showContextFieldsAndMethods() {
+		return true;
 	}
 }

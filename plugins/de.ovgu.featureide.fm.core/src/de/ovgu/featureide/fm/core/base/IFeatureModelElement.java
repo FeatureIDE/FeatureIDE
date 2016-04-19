@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -23,8 +23,6 @@ package de.ovgu.featureide.fm.core.base;
 import de.ovgu.featureide.fm.core.base.event.IEventManager;
 
 /**
- * Interface for a class that represents a feature model element.
- * 
  * @author Sebastian Krieter
  */
 public interface IFeatureModelElement extends IEventManager {

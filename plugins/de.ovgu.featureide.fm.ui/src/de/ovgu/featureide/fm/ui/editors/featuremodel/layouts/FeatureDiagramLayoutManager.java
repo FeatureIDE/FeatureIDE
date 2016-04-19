@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -62,7 +62,7 @@ abstract public class FeatureDiagramLayoutManager {
 		layoutFeatureModel(featureModel);
 		layoutHidden(featureModel);
 		for (Entry<IGraphicalFeature, Point> entry: newLocations.entrySet()) {
-			FeatureUIHelper.setLocation(entry.getKey(), entry.getValue());
+			entry.getKey().setLocation(entry.getValue());
 		}
 		if (!FMPropertyManager.isLegendHidden() && featureModel.getLayout().hasLegendAutoLayout()) {
 			layoutLegend(featureModel, showHidden);
@@ -89,7 +89,8 @@ abstract public class FeatureDiagramLayoutManager {
 	void layoutHidden(IGraphicalFeatureModel featureModel) {
 		for (IGraphicalFeature feature : featureModel.getFeatures()) {
 			if (isHidden(feature) && !feature.getObject().getStructure().isRoot()) {
-				FeatureUIHelper.setTemporaryLocation(feature, new Point(0, 0));
+				// TODO does nothing
+//				FeatureUIHelper.setTemporaryLocation(feature, new Point(0, 0));
 			}
 		}
 	}
@@ -108,8 +109,8 @@ abstract public class FeatureDiagramLayoutManager {
 		int mostRightFeatureX = Integer.MIN_VALUE;
 		int mostLeftFeatureX = Integer.MAX_VALUE;
 		for (IGraphicalFeature feature : featureModel.getFeatures()) {
-			int tempX = FeatureUIHelper.getLocation(feature).x;
-			int tempXOffset = FeatureUIHelper.getSize(feature).width;
+			int tempX = feature.getLocation().x;
+			int tempXOffset = feature.getSize().width;
 			if (mostRightFeatureX < tempX + tempXOffset)
 				mostRightFeatureX = tempX + tempXOffset;
 			if (mostLeftFeatureX > tempX)
@@ -118,8 +119,7 @@ abstract public class FeatureDiagramLayoutManager {
 		int width = mostRightFeatureX - mostLeftFeatureX;
 		int offset = mostRightFeatureX - ((controlWidth - width) / 2);
 		for (IGraphicalFeature feature : featureModel.getFeatures()) {
-			FeatureUIHelper.setLocation(feature,
-					new Point(FeatureUIHelper.getLocation(feature).getCopy().x + offset, FeatureUIHelper.getLocation(feature).getCopy().y));
+			feature.setLocation(new Point(feature.getLocation().getCopy().x + offset, feature.getLocation().getCopy().y));
 		}
 	}
 
@@ -188,9 +188,9 @@ abstract public class FeatureDiagramLayoutManager {
 		 * check if features would intersect with the legend on the edges
 		 */
 		for (IGraphicalFeature feature : nonHidden) {
-			final Point tempLocation = FeatureUIHelper.getLocation(feature);
+			final Point tempLocation = feature.getLocation();
 			if (null != tempLocation) {
-				final Dimension tempSize = FeatureUIHelper.getSize(feature);
+				final Dimension tempSize = feature.getSize();
 				if (tempSize != null) {
 					if ((tempLocation.x + tempSize.width) > (max.x - legendSize.width - FMPropertyManager.getFeatureSpaceX())
 							&& (tempLocation.y) < (min.y + legendSize.height + FMPropertyManager.getFeatureSpaceY() / 2))
@@ -215,7 +215,7 @@ abstract public class FeatureDiagramLayoutManager {
 				Point tempLocation = constraint.getLocation();
 				if (null == tempLocation)
 					continue;
-				Dimension tempSize = FeatureUIHelper.getSize(constraint);
+				Dimension tempSize = constraint.getSize();
 				if ((tempLocation.x + tempSize.width) > (max.x - legendSize.width - FMPropertyManager.getFeatureSpaceX())
 						&& (tempLocation.y) < (min.y + legendSize.height + FMPropertyManager.getFeatureSpaceY() / 2))
 					topRight = false;
@@ -265,10 +265,10 @@ abstract public class FeatureDiagramLayoutManager {
 	}
 	
 	protected Rectangle getBounds(IGraphicalFeature feature) {
-		if (getLocation(feature) == null || FeatureUIHelper.getSize(feature) == null) {
+		if (getLocation(feature) == null || feature.getSize() == null) {
 			// UIHelper not set up correctly, refresh the feature model
 			feature.getObject().getFeatureModel().handleModelDataChanged();
 		}
-		return new Rectangle(getLocation(feature), FeatureUIHelper.getSize(feature));
+		return new Rectangle(getLocation(feature), feature.getSize());
 	}
 }
