@@ -35,12 +35,13 @@ public final class Features {
 
 	public static final String FEATURE_SUFFIX = "(Feature)";
 
-	public static void getAllFeatures(final Collection<IFeatureStructure> features, final IFeatureStructure startingPointFeature) {
+	public static Collection<IFeatureStructure> getAllFeatures(final Collection<IFeatureStructure> features, final IFeatureStructure startingPointFeature) {
 		features.add(startingPointFeature);
 		final List<IFeatureStructure> list = startingPointFeature.getChildren();
 		for (final IFeatureStructure feature : list) {
 			getAllFeatures(features, feature);
 		}
+		return features;
 	}
 
 	public static final Collection<String> extractOperatorNamesFromFeatuers(final Set<String> features) {

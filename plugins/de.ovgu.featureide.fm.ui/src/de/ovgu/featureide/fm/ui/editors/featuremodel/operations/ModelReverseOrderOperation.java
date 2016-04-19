@@ -22,13 +22,12 @@ package de.ovgu.featureide.fm.ui.editors.featuremodel.operations;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.REVERSE_LAYOUT_ORDER;
 
+import java.util.ArrayList;
 import java.util.Collections;
 
-import org.eclipse.draw2d.geometry.Dimension;
-import org.eclipse.draw2d.geometry.Point;
-
+import de.ovgu.featureide.fm.core.Features;
+import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
-import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
@@ -51,38 +50,11 @@ public class ModelReverseOrderOperation extends AbstractGraphicalFeatureModelOpe
 	@Override
 	protected FeatureIDEEvent operation() {
 		final IGraphicalFeature root = FeatureUIHelper.getGraphicalRootFeature(graphicalFeatureModel);
-		Collections.reverse(FeatureUIHelper.getGraphicalChildren(root));
-		if (!graphicalFeatureModel.getLayout().hasFeaturesAutoLayout()) {
-			Point mid = root.getLocation().getCopy();
-			mid.x += root.getSize().width / 2;
-			mid.y += root.getSize().height / 2;
-			mirrorFeaturePositions(root, mid, FeatureUIHelper.hasVerticalLayout(graphicalFeatureModel));
+		final IFeatureStructure rootStructure = root.getObject().getStructure();
+		for (final IFeatureStructure feature : Features.getAllFeatures(new ArrayList<IFeatureStructure>(), rootStructure)) {
+			Collections.reverse(feature.getChildren());
 		}
-		return new FeatureIDEEvent(null, EventType.LOCATION_CHANGED);
-	}
-
-	private void mirrorFeaturePositions(IGraphicalFeature feature, Point mid, boolean vertical) {
-		if (!feature.getObject().getStructure().isRoot()) {
-			Point featureMid = feature.getLocation().getCopy();
-			Dimension size = feature.getSize().getCopy();
-
-			if (vertical) {
-				featureMid.y += size.height / 2;
-				featureMid.y = 2 * mid.y - featureMid.y;
-				featureMid.y -= size.height / 2;
-			} else {
-				featureMid.x += size.width / 2;
-				featureMid.x = 2 * mid.x - featureMid.x;
-				featureMid.x -= size.width / 2;
-			}
-
-			feature.setLocation(featureMid);
-		}
-		if (feature.getObject().getStructure().hasChildren()) {
-			for (IGraphicalFeature child : FeatureUIHelper.getGraphicalChildren(feature)) {
-				mirrorFeaturePositions(child, mid, vertical);
-			}
-		}
+		return FeatureIDEEvent.getDefault(FeatureIDEEvent.EventType.LOCATION_CHANGED);
 	}
 
 	@Override
