@@ -19,8 +19,7 @@ Bundle-ClassPath: lib/FeatureHouse.jar,
  .
 Bundle-Vendor: University of Magdeburg
 Import-Package: org.eclipse.core.expressions,
- org.eclipse.jdt.internal.core,
- org.eclipse.jdt.internal.ui.packageview
+ org.eclipse.jdt.internal.core
 Export-Package: cide.features,
  de.ovgu.featureide.featurehouse,
  de.ovgu.featureide.featurehouse.errorpropagation,
