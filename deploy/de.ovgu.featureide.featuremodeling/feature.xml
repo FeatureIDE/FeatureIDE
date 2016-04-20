@@ -193,12 +193,12 @@ Library.
       <import plugin="org.eclipse.ui.editors"/>
       <import plugin="org.eclipse.ui.workbench.texteditor"/>
       <import plugin="org.eclipse.ui.ide"/>
-      <import plugin="org.eclipse.jdt.ui"/>
       <import plugin="org.eclipse.debug.ui"/>
-      <import plugin="org.eclipse.jdt.debug.ui"/>
       <import plugin="org.eclipse.ui.views"/>
       <import plugin="org.eclipse.gef"/>
       <import plugin="de.ovgu.featureide.fm.core"/>
+      <import plugin="org.eclipse.swt"/>
+      <import plugin="org.eclipse.core.expressions"/>
    </requires>
 
    <plugin

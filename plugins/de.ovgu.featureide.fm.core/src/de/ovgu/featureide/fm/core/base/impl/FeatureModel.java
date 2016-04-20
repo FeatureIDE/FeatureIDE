@@ -457,7 +457,9 @@ public class FeatureModel implements IFeatureModel {
 
 	@Override
 	public void setFeatureOrderListItem(int i, String newName) {
-		this.featureOrderList.set(i, newName);
+		if (!this.featureOrderList.isEmpty()) {
+			this.featureOrderList.set(i, newName);
+		}
 	}
 
 	@Override

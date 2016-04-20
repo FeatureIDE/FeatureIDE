@@ -59,9 +59,10 @@ import de.ovgu.featureide.fm.core.base.impl.Constraint;
 import de.ovgu.featureide.fm.core.filter.ConcreteFeatureFilter;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
-import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
+ * TODO descriptions Marcus
+ * 
  * @author Marcus Pinnecke
  */
 public final class FeatureUtils {
@@ -78,7 +79,9 @@ public final class FeatureUtils {
 	};
 	
 	public static final void requireNonNull(Object object) {
-		java.util.Objects.requireNonNull(object, StringTable.PARAMETER_IS_EXPECTED_TO_BE_NON_NULL);
+		// TODO check unnecessary null checks, may cuase defect itself
+		// or move to constructors
+//		java.util.Objects.requireNonNull(object, StringTable.PARAMETER_IS_EXPECTED_TO_BE_NON_NULL);
 	}
 
 	public static final de.ovgu.featureide.fm.core.Constraint convert(IConstraint c) {

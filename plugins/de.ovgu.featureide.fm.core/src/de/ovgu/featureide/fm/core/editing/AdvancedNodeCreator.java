@@ -30,6 +30,7 @@ import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Or;
 
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
@@ -246,7 +247,7 @@ public class AdvancedNodeCreator implements LongRunningMethod<Node> {
 	}
 
 	private And createStructuralNodes() {
-		final IFeature root = featureModel.getStructure().getRoot().getFeature();
+		final IFeature root = FeatureUtils.getRoot(featureModel);
 		if (root != null) {
 			final List<Node> clauses = new ArrayList<>(featureModel.getNumberOfFeatures());
 

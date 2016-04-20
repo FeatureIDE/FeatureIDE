@@ -25,7 +25,6 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import de.ovgu.featureide.common.Commons;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
@@ -46,7 +45,6 @@ public class TConfigurationSelection extends AbstractConfigurationTest{
 	public void testSelection1() 
 	{
 		Configuration c = new Configuration(fm, true);
-//		Configuration c = new Configuration(fm, false);
 		c.setManual("C", Selection.SELECTED);
 		assertTrue(c.isValid());
 		assertEquals(2, c.number());
@@ -64,7 +62,6 @@ public class TConfigurationSelection extends AbstractConfigurationTest{
 	public void testSelection3() 
 	{
 		Configuration c = new Configuration(fm, true);
-//		Configuration c = new Configuration(fm, false);
 		c.setManual("A", Selection.SELECTED);
 		c.setManual("C", Selection.SELECTED);
 		assertTrue(c.isValid());
@@ -81,8 +78,7 @@ public class TConfigurationSelection extends AbstractConfigurationTest{
 	}
 
 	@Test
-	public void testSelection5() 
-	{
+	public void testSelection5() {
 		Configuration c = new Configuration(fm, true);
 		boolean exception = false;
 		try {
@@ -92,21 +88,5 @@ public class TConfigurationSelection extends AbstractConfigurationTest{
 		}
 		assertTrue(exception);
 	}
-
-	@Test
-	public void testPropagation() 
-	{
-		Configuration c = new Configuration(getModel(), true);
-//		c.setManual("A", Selection.SELECTED);
-		c.setManual("B", Selection.SELECTED);
-		System.out.println(c.getSelectablefeature("A").getAutomatic());
-		System.out.println(c);
-	}
-
-	
-	private IFeatureModel getModel() {
-		return Commons.loadFeatureModelFromFile("model.xml", Commons.FEATURE_MODEL_BENCHMARK_PATH_REMOTE, Commons.FEATURE_MODEL_BENCHMARK_PATH_LOCAL_CLASS_PATH);
-	}
-
 
 }

@@ -82,11 +82,5 @@ Bundle-ClassPath: .,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Activator: de.ovgu.featureide.fm.core.FMCorePlugin
 Bundle-Vendor: University of Magdeburg
-Import-Package: org.eclipse.jdt.internal.core.util,
- org.eclipse.jface.resource,
- org.eclipse.jface.text,
- org.eclipse.jface.text.source,
- org.eclipse.jface.viewers,
- org.eclipse.swt.graphics,
- org.eclipse.ui.texteditor
+Import-Package: org.eclipse.swt.graphics
 
