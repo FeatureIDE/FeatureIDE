@@ -346,8 +346,8 @@ public class RuntimeParameters extends ComposerExtensionClass {
 				} catch (final CoreException e) {
 					RuntimeCorePlugin.getDefault().logError(e);
 				}
-				final IFile filePropMan = propFolder.getFile(PROPERTY_MANAGER_CLASS + ".java");
-				if (!filePropMan.exists()) {
+				final IFile propFile = propFolder.getFile(PROPERTY_MANAGER_CLASS + ".java");
+				if (!propFile.exists()) {
 					InputStream inputStream = null;
 					try {
 						inputStream = FileLocator.openStream(RuntimeCorePlugin.getDefault().getBundle(),
@@ -355,9 +355,9 @@ public class RuntimeParameters extends ComposerExtensionClass {
 					} catch (final IOException e) {
 						RuntimeCorePlugin.getDefault().logError(e);
 					}
-					createFile(filePropMan, inputStream);
+					createFile(propFile, inputStream);
 					try {
-						filePropMan.setDerived(true, null);
+						propFile.setDerived(true, null);
 					} catch (final CoreException e) {
 						RuntimeCorePlugin.getDefault().logError(e);
 					}
