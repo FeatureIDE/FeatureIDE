@@ -79,6 +79,7 @@ public abstract class AFileManager<T> implements IFileManager, IEventManager, IR
 	private final ProblemList lastProblems = new ProblemList();
 
 	private final Object syncObject = new Object();
+	private final Object saveSyncObject = new Object();
 
 	protected final IPersistentFormat<T> format;
 
@@ -109,7 +110,9 @@ public abstract class AFileManager<T> implements IFileManager, IEventManager, IR
 	}
 
 	public T getObject() {
-		return persistentObject;
+		synchronized (saveSyncObject) {
+			return persistentObject;
+		}
 	}
 
 	public T editObject() {
@@ -127,13 +130,13 @@ public abstract class AFileManager<T> implements IFileManager, IEventManager, IR
 		lastProblems.clear();
 		try {
 			final String content = new String(Files.readAllBytes(path), Charset.availableCharsets().get("UTF-8"));
-			List<Problem> problemList = format.getInstance().read(variableObject, content);
-			if (problemList != null) {
-				lastProblems.addAll(problemList);
+			synchronized (saveSyncObject) {
+				List<Problem> problemList = format.getInstance().read(variableObject, content);
+				if (problemList != null) {
+					lastProblems.addAll(problemList);
+				}
+				persist();
 			}
-
-			persist();
-
 			fireEvent(new FeatureIDEEvent(persistentObject, EventType.MODEL_DATA_LOADED));
 		} catch (Exception e) {
 			handleException(e);
@@ -160,13 +163,14 @@ public abstract class AFileManager<T> implements IFileManager, IEventManager, IR
 			}
 			final byte[] content = format.getInstance().write(variableObject).getBytes(Charset.availableCharsets().get("UTF-8"));
 			final IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(eclipseFile);
-			if (!file.exists()) {
-				file.create(new ByteArrayInputStream(content), true, null);
-			} else {
-				file.setContents(new ByteArrayInputStream(content), true, true, null);
+			synchronized (saveSyncObject) {
+				if (!file.exists()) {
+					file.create(new ByteArrayInputStream(content), true, null);
+				} else {
+					file.setContents(new ByteArrayInputStream(content), true, true, null);
+				}
+				persist();
 			}
-			persist();
-
 			fireEvent(new FeatureIDEEvent(variableObject, EventType.MODEL_DATA_SAVED));
 		} catch (Exception e) {
 			handleException(e);
