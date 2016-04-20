@@ -71,16 +71,18 @@ public class RenamingsManager {
 			return false;
 		}
 		final List<IConstraint> constraints = model.getConstraints();
-		final List<String> featureOrderList = Functional.toList(model.getFeatureOrderList());
-		IFeature feature = featureTable.remove(oldName);
+		final IFeature feature = model.getFeature(oldName);
+		model.deleteFeatureFromTable(feature);
 		feature.setName(newName);
-		featureTable.put(newName, feature);
+		model.addFeature(feature);
 		renamings.add(new Renaming(oldName, newName));
 		for (IConstraint c : constraints) {
 			renameVariables(c.getNode(), oldName, newName);
 		}
 		
 		// update the feature order list
+		
+		final List<String> featureOrderList = Functional.toList(model.getFeatureOrderList());
 		for (int i = 0;i < featureOrderList.size();i++) {
 			if (featureOrderList.get(i).equals(oldName)) {
 				model.setFeatureOrderListItem(i, newName);
