@@ -101,6 +101,7 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.FeatureIDEFormat;
 import de.ovgu.featureide.fm.core.configuration.FeatureOrderReader;
+import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
@@ -1167,7 +1168,11 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 			int column = 0;
 			for (String feature : concreteFeatures) {
-				currentRow[column++] = configuration.getSelectablefeature(feature).getSelection() == Selection.SELECTED;
+				final SelectableFeature selectablefeature = configuration.getSelectablefeature(feature);
+				if (selectablefeature != null) {
+					currentRow[column] = selectablefeature.getSelection() == Selection.SELECTED;
+				}
+				column++;
 			}
 		}
 		return selections;
