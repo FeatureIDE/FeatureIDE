@@ -315,10 +315,6 @@ public class MPLPlugin extends AbstractCorePlugin {
 		FMCorePlugin.getDefault().startJobs(projects, new PrintFeatureInterfacesJob.Arguments(folder), true);
 	}
 	
-//	public void buildDocumentationStatistics(LinkedList<IProject> projects, String folder) {
-//		startJobs(projects, new PrintDocumentationStatisticsJob.Arguments(folder));
-//	}
-	
 	public void buildConfigurationInterfaces(LinkedList<IProject> projects, String viewName, int viewLevel, int configLimit) {
 		FMCorePlugin.getDefault().startJobs(projects, new PrintComparedInterfacesJob.Arguments(), true);
 	}
@@ -335,25 +331,9 @@ public class MPLPlugin extends AbstractCorePlugin {
 		FMCorePlugin.getDefault().startJobs(projects, new PrintStatisticsJob.Arguments(folder), true);
 	}
 	
-//	public void startJobs(LinkedList<IProject> projects, AJobArguments arguments) {
-//		final Object idObject = new Object();
-//		for (IProject p : projects) {
-//			InterfaceProject interfaceProject = getInterfaceProject(p);
-//			if (interfaceProject != null && interfaceProject.getProjectSignatures() == null) {
-//				IChainJob job = new CreateFujiSignaturesJob();
-//				job.setProject(p);
-//				JobManager.addJob(idObject, job);
-//			}
-//			IChainJob job = arguments.createJob();
-//			job.setProject(p);
-//			JobManager.addJob(idObject, job);
-//			
-//		}
-//	}
-	
 	public void createInterface(IProject mplProject, IFeatureProject featureProject, Collection<String> featureNames) {
-		LinkedList<IProject> projectList = new LinkedList<IProject>();
+		final LinkedList<IProject> projectList = new LinkedList<>();
 		projectList.add(mplProject);
-		FMCorePlugin.getDefault().startJobs(projectList, new CreateInterfaceJob.Arguments(featureProject, featureNames), true);
+		FMCorePlugin.getDefault().startJobs(projectList, new CreateInterfaceJob.Arguments(featureProject.getProjectName(), featureProject.getFeatureModel(), featureNames), true);
 	}
 }

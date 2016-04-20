@@ -791,7 +791,7 @@ public class CollaborationView extends ViewPart implements GUIDefaults, ICurrent
 		return false;
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "rawtypes" })
 	@Override
 	public Object getAdapter(Class adapter) {
 		if (GraphicalViewer.class.equals(adapter) || ViewPart.class.equals(adapter))

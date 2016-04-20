@@ -62,6 +62,7 @@ import AST.Problem;
 import AST.Program;
 import cide.gparser.ParseException;
 import cide.gparser.TokenMgrError;
+
 import composer.CmdLineInterpreter;
 import composer.CompositionException;
 import composer.FSTGenComposer;
@@ -69,6 +70,7 @@ import composer.FSTGenComposerExtension;
 import composer.ICompositionErrorListener;
 import composer.IParseErrorListener;
 import composer.rules.meta.FeatureModelInfo;
+
 import de.ovgu.cide.fstgen.ast.FSTNode;
 import de.ovgu.cide.fstgen.ast.FSTTerminal;
 import de.ovgu.featureide.core.IFeatureProject;
@@ -86,13 +88,12 @@ import de.ovgu.featureide.featurehouse.meta.featuremodel.FeatureModelClassGenera
 import de.ovgu.featureide.featurehouse.model.FeatureHouseModelBuilder;
 import de.ovgu.featureide.featurehouse.signature.documentation.DocumentationCommentParser;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.FeatureModel;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.job.AStoppableJob;
 import fuji.CompilerWarningException;
@@ -610,7 +611,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		composer.addCompositionErrorListener(compositionErrorListener);
 		try {
 			IFile cnfFile = featureProject.getSourceFolder().getFile("model.cnf");
-			Node nodes = NodeCreator.createNodes(featureProject.getFeatureModel().clone(null)).toCNF();
+			Node nodes = AdvancedNodeCreator.createCNF(featureProject.getFeatureModel());
 			String input = nodes.toString(NodeWriter.javaSymbols);
 			input = input.replaceAll("!", "! ");
 			InputStream cnfSource = new ByteArrayInputStream(input.getBytes(Charset.availableCharsets().get("UTF-8")));
@@ -680,7 +681,7 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 		}
 		fuji = new AStoppableJob("Type checking " + featureProject.getProjectName() + " with fuji") {
 			@Override
-			protected boolean work() {
+			protected boolean work() throws Exception {
 				try {
 					final Program ast = runFuji(featureProject);
 					signatureSetter.setFujiParameters(featureProject, ast);
@@ -711,7 +712,8 @@ public class FeatureHouseComposer extends ComposerExtensionClass {
 			IFeatureModel fm = featureProject.getFeatureModel();
 			fm.getAnalyser().setDependencies();
 
-			Main fuji = new Main(fujiOptions, new FeatureModel(fm), FeatureUtils.extractConcreteFeaturesAsStringList(featureProject.getFeatureModel()));
+			@SuppressWarnings("deprecation")
+			Main fuji = new Main(fujiOptions, new de.ovgu.featureide.fm.core.FeatureModel(fm), FeatureUtils.extractConcreteFeaturesAsStringList(featureProject.getFeatureModel()));
 			
 			Composition composition = fuji.getComposition(fuji);
 			ast = composition.composeAST();

@@ -42,7 +42,7 @@ public class SelectableFeature extends TreeElement {
 	private Selection manual = Selection.UNDEFINED;
 
 	private Selection automatic = Selection.UNDEFINED;
-	
+
 	private Selection recommended = Selection.UNDEFINED;
 
 	private final IFeature feature;
@@ -50,12 +50,9 @@ public class SelectableFeature extends TreeElement {
 	private int recommendationValue = -1;
 	private Map<Integer, Node> openClauses = null;
 
-	private final Configuration configuration;
-
 	private String name;
 
-	public SelectableFeature(Configuration configuration, IFeature feature) {
-		this.configuration = configuration;
+	public SelectableFeature(IFeature feature) {
 		this.feature = feature;
 	}
 
@@ -67,7 +64,7 @@ public class SelectableFeature extends TreeElement {
 		return manual;
 	}
 
-	protected void setManual(Selection manual) {
+	public void setManual(Selection manual) {
 		if (manual == Selection.UNDEFINED || automatic == Selection.UNDEFINED) {
 			this.manual = manual;
 		} else if (manual != automatic) {
@@ -79,7 +76,7 @@ public class SelectableFeature extends TreeElement {
 		return automatic;
 	}
 
-	protected void setAutomatic(Selection automatic) {
+	public void setAutomatic(Selection automatic) {
 		if (automatic == Selection.UNDEFINED || manual == Selection.UNDEFINED || manual == automatic) {
 			this.automatic = automatic;
 		} else {
@@ -97,10 +94,6 @@ public class SelectableFeature extends TreeElement {
 	public IFeature getFeature() {
 		return feature;
 	}
-	
-	public Configuration getConfiguration() {
-		return configuration;
-	}
 
 	public String toString() {
 		return getName();
@@ -109,11 +102,11 @@ public class SelectableFeature extends TreeElement {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	public Selection getRecommended() {
 		return recommended;
 	}
-	
+
 	public void setRecommended(Selection recommended) {
 		this.recommended = recommended;
 	}
@@ -140,7 +133,7 @@ public class SelectableFeature extends TreeElement {
 		}
 		openClauses.put(index, openClause);
 	}
-	
+
 	public void clearOpenClauses() {
 		openClauses = null;
 	}
@@ -152,4 +145,5 @@ public class SelectableFeature extends TreeElement {
 		}
 		return Collections.emptySet();
 	}
+
 }

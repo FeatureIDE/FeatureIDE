@@ -452,5 +452,4 @@ public class AheadComposer extends ComposerExtensionClass {
 		return false;
 	}
 
-
 }

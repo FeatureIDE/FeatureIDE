@@ -21,13 +21,14 @@
 package de.ovgu.featureide.core.runtime.activator;
 
 import org.osgi.framework.BundleContext;
+
 import de.ovgu.featureide.fm.core.AbstractCorePlugin;
 
 /**
- * Images plugin
+ * CorePlugin for the Runtime Parameters Extension.
  * 
- * @author Jabier Martinez
- *
+ * @author Kai Wolf
+ * @author Matthias Quaas
  */
 public class RuntimeCorePlugin extends AbstractCorePlugin {
 
@@ -60,7 +61,7 @@ public class RuntimeCorePlugin extends AbstractCorePlugin {
 
 	/**
 	 * Returns the shared instance
-	 *
+	 * 
 	 * @return the shared instance
 	 */
 	public static RuntimeCorePlugin getDefault() {

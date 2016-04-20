@@ -4,7 +4,9 @@ import properties.PropertyManager;
 public class Main {
 	public static void main(String[] args) throws IOException {
 
-		
+		// TODO change the "Composition Mechanism" to "Properties"
+		//      in the project's "Properties" > "FeatureIDE" > "Feature Project"
+
 		if (PropertyManager.getProperty("Hello")) {
 			System.out.print("Hello");
 		}
@@ -22,6 +24,5 @@ public class Main {
 		}
 
 	}
-
 
 }

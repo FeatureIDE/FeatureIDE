@@ -75,6 +75,9 @@ import de.ovgu.featureide.core.fstmodel.FSTRole;
  * @author Daniel Hohmann
  */
 public class FrameworkModelBuilder {
+
+	@SuppressWarnings("deprecation")
+	private static final int AST_Type = AST.JLS4;
 	private FSTModel model;
 	private IFeatureProject featureProject;
 
@@ -153,7 +156,7 @@ public class FrameworkModelBuilder {
 		MyASTVisitor interfaceVisitor = null;
 		try {
 			interfaceContent = fileToString(interfaceFile);
-			final ASTParser intefaceParser = ASTParser.newParser(AST.JLS4);
+			final ASTParser intefaceParser = ASTParser.newParser(AST_Type);
 			intefaceParser.setSource(interfaceContent.toCharArray());
 			intefaceParser.setKind(ASTParser.K_COMPILATION_UNIT);
 
@@ -171,7 +174,7 @@ public class FrameworkModelBuilder {
 			final IType classType = project.findType(implementingClass);
 			/** ASTNodes **/
 			final String fileContent = fileToString(classFile);
-			final ASTParser parser = ASTParser.newParser(AST.JLS4);
+			final ASTParser parser = ASTParser.newParser(AST_Type);
 			parser.setSource(fileContent.toCharArray());
 			parser.setKind(ASTParser.K_COMPILATION_UNIT);
 

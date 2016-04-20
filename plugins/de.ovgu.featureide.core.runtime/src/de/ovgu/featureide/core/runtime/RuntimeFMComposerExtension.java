@@ -75,13 +75,12 @@ public class RuntimeFMComposerExtension extends FMComposerExtension {
 	 * Actual handling of renaming.
 	 */
 	@Override
-	public boolean performRenaming(final String oldName, final String newName,
-			final IProject project) {
+	public boolean performRenaming(final String oldName, final String newName, final IProject project) {
 
 		final ArrayList<FeatureLocation> locations = new ArrayList<FeatureLocation>();
 
 		// get FeatureLocation objects with the given oldName as feature name
-		for (final FeatureLocation loc : RuntimeComposer.featureLocs) {
+		for (final FeatureLocation loc : RuntimeParameters.featureLocs) {
 			if (loc.getFeatureName().equals(oldName)) {
 				locations.add(loc);
 			}
@@ -104,8 +103,7 @@ public class RuntimeFMComposerExtension extends FMComposerExtension {
 					final StringBuilder inputStringBuilder = new StringBuilder();
 					BufferedReader bufferedReader = null;
 
-					bufferedReader = new BufferedReader(new InputStreamReader(
-							oldClassStream, "UTF-8"));
+					bufferedReader = new BufferedReader(new InputStreamReader(oldClassStream, "UTF-8"));
 
 					String line = bufferedReader.readLine();
 					while (line != null) {
@@ -113,8 +111,7 @@ public class RuntimeFMComposerExtension extends FMComposerExtension {
 						inputStringBuilder.append('\n');
 						line = bufferedReader.readLine();
 					}
-					oldClassStringArray = inputStringBuilder.toString().split(
-							"\\n");
+					oldClassStringArray = inputStringBuilder.toString().split("\\n");
 					processedClassFiles.put(classPath, oldClassStringArray);
 
 				} catch (final UnsupportedEncodingException e) {
@@ -128,11 +125,9 @@ public class RuntimeFMComposerExtension extends FMComposerExtension {
 			} else {
 				oldClassStringArray = processedClassFiles.get(classPath);
 			}
-			oldClassStringArray[lineNumber - 1] = oldClassStringArray[lineNumber - 1]
-					.replace(RuntimeComposer.GET_PROPERTY_METHOD + "(\""
-							+ oldName + "\")",
-							RuntimeComposer.GET_PROPERTY_METHOD + "(\""
-									+ newName + "\")");
+			oldClassStringArray[lineNumber - 1] = oldClassStringArray[lineNumber - 1].replace(RuntimeParameters.GET_PROPERTY_METHOD
+				+ "(\"" + oldName + "\")", RuntimeParameters.GET_PROPERTY_METHOD
+				+ "(\"" + newName + "\")");
 
 			final StringBuilder newClassString = new StringBuilder();
 			for (int i = 0; i < oldClassStringArray.length; i++) {
@@ -142,11 +137,9 @@ public class RuntimeFMComposerExtension extends FMComposerExtension {
 				newClassString.append(oldClassStringArray[i]);
 			}
 
-			final InputStream newClassStream = new ByteArrayInputStream(
-					newClassString.toString().getBytes(StandardCharsets.UTF_8));
+			final InputStream newClassStream = new ByteArrayInputStream(newClassString.toString().getBytes(StandardCharsets.UTF_8));
 			try {
-				loc.getClassFile().setContents(newClassStream, IResource.FORCE,
-						null);
+				loc.getClassFile().setContents(newClassStream, IResource.FORCE, null);
 			} catch (final CoreException e) {
 				RuntimeCorePlugin.getDefault().logError(e);
 			}

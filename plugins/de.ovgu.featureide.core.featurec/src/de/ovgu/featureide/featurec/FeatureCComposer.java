@@ -43,7 +43,7 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
-import de.ovgu.featureide.fm.core.io.manager.FileReader;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 public class FeatureCComposer extends ComposerExtensionClass {
 
@@ -68,10 +68,7 @@ public class FeatureCComposer extends ComposerExtensionClass {
 		final IFeatureModel model = CorePlugin.getFeatureProject(config)
 				.getFeatureModel();
 		final Configuration cfg = new Configuration(model);
-		final FileReader<Configuration> reader = new FileReader<>(
-				Paths.get(config.getLocationURI()), cfg,
-				ConfigurationManager.getFormat(config.getName()));
-		reader.read();
+		FileHandler.load(Paths.get(config.getLocationURI()), cfg, ConfigurationManager.getFormat(config.getName()));
 
 		final IResource mappings = config.getProject().findMember(
 				MAPPINGS_FILENAME);

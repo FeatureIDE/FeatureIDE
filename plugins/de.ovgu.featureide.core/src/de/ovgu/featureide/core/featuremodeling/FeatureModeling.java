@@ -35,7 +35,7 @@ import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
-import de.ovgu.featureide.fm.core.io.manager.FileWriter;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
  * 
@@ -87,10 +87,7 @@ public class FeatureModeling extends ComposerExtensionClass {
 			}
 			final IPersistentFormat<Configuration> format = ConfigurationManager.getFormat(ConfigurationManager.FormatType.CONFIG);
 			IFile configurationFile = parent.getFile(new Path(congurationName + "." + format.getSuffix()));
-			final FileWriter<Configuration> writer = new FileWriter<>(format);
-			writer.setPath(Paths.get(configurationFile.getLocationURI()));
-			writer.setObject(configuration);
-			writer.save();
+			FileHandler.save(Paths.get(configurationFile.getLocationURI()), configuration, format);
 			copyNotComposedFiles(configuration, folder);
 		} catch (CoreException e) {
 			CorePlugin.getDefault().logError(e);
@@ -110,5 +107,13 @@ public class FeatureModeling extends ComposerExtensionClass {
 	@Override
 	public void postCompile(IResourceDelta delta, IFile buildFile) {
 
+	}
+
+	/* (non-Javadoc)
+	 * @see de.ovgu.featureide.core.builder.IComposerExtensionClass#showContextFieldsAndMethods()
+	 */
+	@Override
+	public boolean showContextFieldsAndMethods() {
+		return false;
 	}
 }

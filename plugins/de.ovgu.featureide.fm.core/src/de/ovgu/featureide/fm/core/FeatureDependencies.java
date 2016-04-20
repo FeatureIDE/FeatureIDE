@@ -36,7 +36,7 @@ import org.sat4j.specs.TimeoutException;
 
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 
 /**
  * Calculates dependencies of features
@@ -162,7 +162,7 @@ public class FeatureDependencies {
      * @return Node representing the featureModel
      */
     private  Node createRootNode(IFeatureModel fm) {
-		return NodeCreator.createNodes(fm, true).toCNF();
+		return AdvancedNodeCreator.createCNF(fm);
     }
 
     /**

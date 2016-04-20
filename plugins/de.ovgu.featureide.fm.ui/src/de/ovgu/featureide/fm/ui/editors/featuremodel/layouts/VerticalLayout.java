@@ -49,7 +49,7 @@ public class VerticalLayout extends FeatureDiagramLayoutManager {
 	private int height;
 
 	public void layoutFeatureModel(IGraphicalFeatureModel featureModel) {
-		heightStep = FeatureUIHelper.getSize(FeatureUIHelper.getGraphicalRootFeature(featureModel)).height + featureSpaceY;
+		heightStep = FeatureUIHelper.getGraphicalRootFeature(featureModel).getSize().height + featureSpaceY;
 		height = FMPropertyManager.getLayoutMarginX() - heightStep;
 
 		calculateLevelWidth(FeatureUIHelper.getGraphicalRootFeature(featureModel));
@@ -93,7 +93,7 @@ public class VerticalLayout extends FeatureDiagramLayoutManager {
 	}
 
 	private void calculateLevelWidth(IGraphicalFeature parent, int level) {
-		final int parentWidth = FeatureUIHelper.getSize(parent).width;
+		final int parentWidth = parent.getSize().width;
 		if (level >= levelWidth.size()) {
 			levelWidth.add(parentWidth);
 		} else if (levelWidth.get(level) < parentWidth) {

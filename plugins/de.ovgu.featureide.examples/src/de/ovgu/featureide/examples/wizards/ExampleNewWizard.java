@@ -22,16 +22,10 @@ package de.ovgu.featureide.examples.wizards;
 
 import static de.ovgu.featureide.fm.core.localization.StringTable.FEATUREIDE_EXAMPLE_IMPORT;
 
-import java.io.IOException;
-import java.net.URL;
-
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
-import org.osgi.framework.Bundle;
 
 import de.ovgu.featureide.examples.ExamplePlugin;
 
@@ -43,10 +37,8 @@ import de.ovgu.featureide.examples.ExamplePlugin;
 public class ExampleNewWizard extends Wizard implements INewWizard {
 
 	public static final String ID = ExamplePlugin.PLUGIN_ID;//"de.ovgu.featureide.examples";
-	private static final String FeatureIDE_EXAMPLE_DIR = "featureide_examples";//$NON-NLS-1$
 
-	private ExampleNewWizardPage mainPage;
-	private String samplePath = "";
+	private ExampleNewWizardPage mainPage = null;
 
 	/**
 	 * Constructor for SampleNewWizard.
@@ -60,38 +52,18 @@ public class ExampleNewWizard extends Wizard implements INewWizard {
 	 * Adding the page to the wizard.
 	 */
 	public void addPages() {
-		mainPage = new ExampleNewWizardPage(samplePath);
+		mainPage = new ExampleNewWizardPage();
 		addPage(mainPage);
 	}
-	
+
 	public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
 		setWindowTitle(FEATUREIDE_EXAMPLE_IMPORT);
-
-		// get the path for the examples - it can be a jar-file or folder
-		// structure
-		try {
-			Bundle bundle = Platform.getBundle(ID);
-			URL realURL = FileLocator.resolve(bundle.getEntry("/"));
-			samplePath = realURL.getPath();
-
-			// check if is jar file
-			if (samplePath.startsWith("file")) {
-				samplePath = samplePath.substring(5, samplePath.length() - 2);
-			} else {
-				// is folder
-				samplePath += FeatureIDE_EXAMPLE_DIR;
-			}
-
-		} catch (IOException e) {
-			ExamplePlugin.getDefault().logError(e);
-		}
 	}
-	
+
 	public boolean performCancel() {
-		mainPage.performCancel();
 		return true;
 	}
-	
+
 	public boolean performFinish() {
 		return mainPage.createProjects();
 	}

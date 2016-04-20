@@ -22,7 +22,7 @@ package de.ovgu.featureide.core.signature.documentation;
 
 import de.ovgu.featureide.core.signature.documentation.base.ADocumentationCommentMerger;
 import de.ovgu.featureide.core.signature.documentation.base.BlockTag;
-import de.ovgu.featureide.core.signature.filter.IFilter;
+import de.ovgu.featureide.fm.core.filter.base.IFilter;
 
 /**
  * Modul-Comment merger for context interfaces.

@@ -28,6 +28,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.THE_REQUIRED_B
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -65,7 +66,7 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
-import de.ovgu.featureide.fm.core.io.manager.FileReader;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 
 /**
@@ -120,15 +121,14 @@ public class AspectJComposer extends ComposerExtensionClass {
 			featureProject.createBuilderMarker(featureProject.getProject(), stat.getMessage(), -1, IMarker.SEVERITY_ERROR);
 		}
 
-		final String configPath = config.getRawLocation().toOSString();
 		final String outputPath = featureProject.getBuildPath();
 
-		if (configPath == null || outputPath == null)
+		if (outputPath == null) {
 			return;
+		}
 
-		Configuration configuration = new Configuration(featureProject.getFeatureModel());
-		FileReader<Configuration> reader = new FileReader<>(configPath, configuration, ConfigurationManager.getFormat(configPath));
-		reader.read();
+		final Configuration configuration = new Configuration(featureProject.getFeatureModel());
+		FileHandler.load(Paths.get(config.getLocationURI()), configuration, ConfigurationManager.getFormat(config.getName()));
 
 		LinkedList<String> selectedFeatures = new LinkedList<String>();
 		unSelectedFeatures = new LinkedList<String>();

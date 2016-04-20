@@ -39,9 +39,14 @@ import de.ovgu.featureide.fm.core.functional.Functional;
  * @author Florian Proksch
  * @author Stefan Krueger
  */
+@Deprecated
 public class Constraint implements IGraphicItem {
 
 	public Constraint(IFeatureModel featureModel, Node propNode) {
+		throw new UnsupportedOperationException("No longer supported");
+	}
+
+	public Constraint(FeatureModel featureModel, Node propNode) {
 		throw new UnsupportedOperationException("No longer supported");
 	}
 
@@ -64,15 +69,13 @@ public class Constraint implements IGraphicItem {
 	}
 
 	public Collection<Feature> getDeadFeatures(SatSolver solver, FeatureModel fm, Collection<Feature> fmDeadFeatures) {
-		return Functional.toList(Functional.map(
-				FeatureUtils.getDeadFeatures(constraint, solver, FeatureUtils.convert(fm),
-						Functional.toList(Functional.map(fmDeadFeatures, FeatureUtils.FEATURE_TO_IFEATURE))), FeatureUtils.IFEATURE_TO_FEATURE));
+		return Functional.toList(Functional.map(FeatureUtils.getDeadFeatures(constraint, solver, FeatureUtils.convert(fm),
+				Functional.toList(Functional.map(fmDeadFeatures, FeatureUtils.FEATURE_TO_IFEATURE))), FeatureUtils.IFEATURE_TO_FEATURE));
 	}
 
 	public Collection<Feature> getDeadFeatures(FeatureModel fm, Collection<Feature> fmDeadFeatures) {
-		return Functional.toList(Functional.map(
-				FeatureUtils.getDeadFeatures(constraint, FeatureUtils.convert(fm),
-						Functional.toList(Functional.map(fmDeadFeatures, FeatureUtils.FEATURE_TO_IFEATURE))), FeatureUtils.IFEATURE_TO_FEATURE));
+		return Functional.toList(Functional.map(FeatureUtils.getDeadFeatures(constraint, FeatureUtils.convert(fm),
+				Functional.toList(Functional.map(fmDeadFeatures, FeatureUtils.FEATURE_TO_IFEATURE))), FeatureUtils.IFEATURE_TO_FEATURE));
 	}
 
 	public void setConstraintAttribute(ConstraintAttribute attri, boolean fire) {
@@ -119,12 +122,12 @@ public class Constraint implements IGraphicItem {
 	public void fire(PropertyChangeEvent event) {
 		FeatureUtils.fire(constraint, event);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return FeatureUtils.hashCode(constraint);
 	};
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		return FeatureUtils.equals(constraint, obj);

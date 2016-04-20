@@ -4,10 +4,10 @@
 	<extension
          point="de.ovgu.featureide.core.composers">
 		<composer
-            class="de.ovgu.featureide.core.runtime.RuntimeComposer"
-            description="Composer for Runtime Variability"
+            class="de.ovgu.featureide.core.runtime.RuntimeParameters"
+            description="Generator for Runtime Variability"
             id="de.ovgu.featureide.core.composer.runtime"
-            name="Runtime Composer"
+            name="Runtime Parameters"
             nature="de.ovgu.featureide.core.composer.runtime">
 		</composer>
 	</extension>
