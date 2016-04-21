@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2013  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -35,6 +35,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Shell;
 
+import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.ui.FMUIPlugin;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramEditor;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
@@ -111,9 +112,9 @@ public class SetFeatureColorAction extends Action {
 
 		SetFeatureColorDialog dialog = new SetFeatureColorDialog(shell, this.featureList);
 		int returnstat = dialog.open();
-
+		
 		if (!featureList.isEmpty() && Window.OK == returnstat) {
-			featureList.get(0).getGraphicalModel().getFeatureModel().handleModelDataChanged();
+			featureList.get(0).getGraphicalModel().getFeatureModel().fireEvent(new FeatureIDEEvent(dialog.featureListBuffer, FeatureIDEEvent.EventType.COLOR_CHANGED));
 		}
 	}
 	

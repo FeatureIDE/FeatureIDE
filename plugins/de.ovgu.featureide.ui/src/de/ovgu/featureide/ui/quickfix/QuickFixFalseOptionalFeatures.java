@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -37,7 +37,7 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
-import de.ovgu.featureide.fm.core.io.manager.FileWriter;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.job.WorkMonitor;
 
 /**
@@ -75,7 +75,7 @@ public class QuickFixFalseOptionalFeatures extends QuickFixMissingConfigurations
 
 	private List<Configuration> createConfigurations(final Collection<String> unusedFeatures, final WorkMonitor monitor, boolean collect) {
 		final List<Configuration> confs = new LinkedList<Configuration>();
-		final FileWriter<Configuration> writer = new FileWriter<>(ConfigurationManager.getDefaultFormat());
+		final FileHandler<Configuration> writer = new FileHandler<>(ConfigurationManager.getDefaultFormat());
 		Configuration configuration = new Configuration(featureModel, false);
 		try {
 			List<List<String>> solutions = configuration.coverFeatures(unusedFeatures, monitor, false);
@@ -90,9 +90,7 @@ public class QuickFixFalseOptionalFeatures extends QuickFixMissingConfigurations
 					confs.add(configuration);
 				} else {
 					final IFile configurationFile = getConfigurationFile(project.getConfigFolder());
-					writer.setObject(configuration);
-					writer.setPath(Paths.get(configurationFile.getLocationURI()));
-					writer.save();
+					writer.write(Paths.get(configurationFile.getLocationURI()), configuration);
 				}
 			}
 		} catch (TimeoutException e1) {

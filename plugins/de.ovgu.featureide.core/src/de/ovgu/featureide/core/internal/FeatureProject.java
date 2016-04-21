@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -101,6 +101,7 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.FeatureIDEFormat;
 import de.ovgu.featureide.fm.core.configuration.FeatureOrderReader;
+import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.FeatureModelWriterIFileWrapper;
@@ -110,8 +111,7 @@ import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.guidsl.GuidslReader;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
-import de.ovgu.featureide.fm.core.io.manager.FileReader;
-import de.ovgu.featureide.fm.core.io.manager.FileWriter;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelWriter;
 import de.ovgu.featureide.fm.core.job.AJob;
 import de.ovgu.featureide.fm.core.job.AStoppableJob;
@@ -140,9 +140,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			if (EventType.FEATURE_NAME_CHANGED == evt.getEventType()) {
 				String oldName = (String) evt.getOldValue();
 				String newName = (String) evt.getNewValue();
-
 				FeatureProject.this.renameFeature((IFeatureModel) evt.getSource(), oldName, newName);
-//				LOGGER.fireFeatureFolderChanged(FeatureProject.this.getSourceFolder());
 			}
 		}
 	}
@@ -572,24 +570,23 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 					configFolder.accept(new IResourceVisitor() {
 						private final String suffix = "." + composer.getConfigurationExtension();
 						private final Configuration config = new Configuration(model, Configuration.PARAM_LAZY);
-						final FileReader<Configuration> r = new FileReader<>(config);
-						final FileWriter<Configuration> w = new FileWriter<>(config);
+						private final FileHandler<Configuration> handler = new FileHandler<>(config);
 
 						@Override
 						public boolean visit(IResource resource) throws CoreException {
 							final String name = resource.getName();
 							if (resource instanceof IFile && name.endsWith(suffix)) {
-								//TODO _test renaming
 								final IPersistentFormat<Configuration> format = ConfigurationManager.getFormat(resource.getName());
 								final java.nio.file.Path path = Paths.get(resource.getLocationURI());
-								r.setFormat(format);
-								w.setFormat(format);
-								r.setPath(path);
-								w.setPath(path);
+								handler.setFormat(format);
+								handler.setPath(path);
+								handler.read();
+								handler.write();
 							}
 							return true;
 						}
 					}, IResource.DEPTH_ONE, IResource.NONE);
+					configFolder.refreshLocal(IResource.DEPTH_ONE, null);
 				} catch (CoreException e) {
 					LOGGER.logError(e);
 				} finally {
@@ -640,6 +637,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 	}
 
 	public void setCurrentConfiguration(IFile file) {
+		final boolean performBuild = currentConfiguration != null;
 		currentConfiguration = file;
 
 		int offset = getConfigFolder().getProjectRelativePath().toString().length();
@@ -655,20 +653,22 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 		// there are possibly no resource build yet or they are not up-to-date.
 		// Eclipse calls builders, if a resource as changed, but in this case
 		// actually no resource in the file system changes.
-		Job job = new AStoppableJob(PERFORMING_FULL_BUILD) {
-			@Override
-			protected boolean work() throws Exception {
-				buildRelevantChanges = true;
-				try {
-					project.build(IncrementalProjectBuilder.FULL_BUILD, null);
-				} catch (CoreException e) {
-					LOGGER.logError(e);
+		if (performBuild) {
+			Job job = new AStoppableJob(PERFORMING_FULL_BUILD) {
+				@Override
+				protected boolean work() throws Exception {
+					buildRelevantChanges = true;
+					try {
+						project.build(IncrementalProjectBuilder.FULL_BUILD, null);
+					} catch (CoreException e) {
+						LOGGER.logError(e);
+					}
+					return true;
 				}
-				return true;
-			}
-		};
-		job.setPriority(Job.BUILD);
-		job.schedule();
+			};
+			job.setPriority(Job.BUILD);
+			job.schedule();
+		}
 	}
 
 	@CheckForNull
@@ -1061,8 +1061,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			protected boolean work() throws Exception {
 				workMonitor.setMaxAbsoluteWork(2 * files.size());
 				final Configuration config = new Configuration(featureModelManager.getObject(), false, false);
-				final FileReader<Configuration> reader = new FileReader<>();
-				reader.setObject(config);
+				final FileHandler<Configuration> reader = new FileHandler<>(config);
 				try {
 					workMonitor.getMonitor().subTask(DELETE_CONFIGURATION_MARKERS);
 					for (IFile file : files) {
@@ -1156,7 +1155,7 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 		final boolean[][] selections = new boolean[configurations.size()][concreteFeatures.size()];
 		final Configuration configuration = new Configuration(featureModelManager.getObject(), Configuration.PARAM_IGNOREABSTRACT);
-		final FileReader<Configuration> reader = new FileReader<>(configuration);
+		final FileHandler<Configuration> reader = new FileHandler<>(configuration);
 
 		int row = 0;
 		for (IFile file : configurations) {
@@ -1169,7 +1168,11 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 
 			int column = 0;
 			for (String feature : concreteFeatures) {
-				currentRow[column++] = configuration.getSelectablefeature(feature).getSelection() == Selection.SELECTED;
+				final SelectableFeature selectablefeature = configuration.getSelectablefeature(feature);
+				if (selectablefeature != null) {
+					currentRow[column] = selectablefeature.getSelection() == Selection.SELECTED;
+				}
+				column++;
 			}
 		}
 		return selections;
@@ -1457,7 +1460,11 @@ public class FeatureProject extends BuilderMarkerHandler implements IFeatureProj
 			LOGGER.logError(e);
 		}
 		if (compositionMechanism == null) {
-			return DEFAULT_COMPOSITION_MECHANISM;
+			if (getComposer().getCompositionMechanisms().length != 0) {
+				compositionMechanism = getComposer().getCompositionMechanisms()[0];
+			} else {
+				compositionMechanism = "";
+			}
 		}
 		return compositionMechanism;
 	}

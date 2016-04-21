@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -69,7 +69,7 @@ public class BreadthFirstLayout extends FeatureDiagramLayoutManager {
 			//center the features of the level
 			int width = 2 * FMPropertyManager.getLayoutMarginX() - FMPropertyManager.getFeatureSpaceX();
 			for (IGraphicalFeature feature : list) {
-				width += FeatureUIHelper.getSize(feature).width + FMPropertyManager.getFeatureSpaceX();
+				width += feature.getSize().width + FMPropertyManager.getFeatureSpaceX();
 			}
 
 			int xoffset = controlWidth / 2 - width / 2;
@@ -79,7 +79,7 @@ public class BreadthFirstLayout extends FeatureDiagramLayoutManager {
 			for (int i = 0; i < levelSize; i++) {
 				IGraphicalFeature feature = list.removeFirst();
 				setLocation(feature, new Point(xoffset, yoffset));
-				xoffset += FeatureUIHelper.getSize(feature).width + FMPropertyManager.getFeatureSpaceX();
+				xoffset += feature.getSize().width + FMPropertyManager.getFeatureSpaceX();
 				//add the features children
 				if (showHidden) {
 					list.addAll(FeatureUIHelper.getGraphicalChildren(feature));

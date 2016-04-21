@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,7 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.job;
 
-import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
+import de.ovgu.featureide.fm.core.functional.Functional.IConsumer;
 import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 
 /**
@@ -30,7 +30,7 @@ import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
  * @author Marcus Pinnecke (Feature Interface)
  */
 public interface IJob {
-	
+
 	public enum JobStatus {
 		/**
 		 * Job is not yet started.
@@ -42,26 +42,27 @@ public interface IJob {
 		RUNNING(0x01),
 		/**
 		 * Job has finished successfully .
+		 * @see #FAILED
 		 */
 		OK(0x02),
 		/**
 		 * Job is finished, <b>without</b> success.
+		 * 
 		 * @see #OK
 		 */
 		FAILED(0x04);
-		
+
 		private int value;
-		
-		private JobStatus(int value){
+
+		private JobStatus(int value) {
 			this.value = value;
 		}
-		
-		public int getValue(){
+
+		public int getValue() {
 			return value;
 		}
 	}
-	
-	
+
 	/**
 	 * Indicates the current status of the job.
 	 * 
@@ -70,32 +71,35 @@ public interface IJob {
 	 * @see JobStatus
 	 */
 	JobStatus getStatus();
-	
+
 	/**
 	 * Adds a {@link JobFinishListener} to this job.
+	 * 
 	 * @param listener the listener to add
 	 * @see #removeJobFinishedListener
 	 */
 	void addJobFinishedListener(JobFinishListener listener);
-	
+
 	/**
 	 * Removes a certain {@link JobFinishListener} from this job.
+	 * 
 	 * @param listener the listener to remove
 	 * @see #addJobFinishedListener
 	 */
 	void removeJobFinishedListener(JobFinishListener listener);
-	
+
 	/**
 	 * {@link org.eclipse.core.runtime.jobs.Job#cancel()}
 	 */
 	boolean cancel();
-	
+
 	void join() throws InterruptedException;
-	
+
 	/**
 	 * {@link org.eclipse.core.runtime.jobs.Job#schedule()}
 	 */
 	void schedule();
-	
-	void setIntermediateFunction(IFunction<Object, Void> intermediateFunction);
+
+	void setIntermediateFunction(IConsumer<Object> intermediateFunction);
+
 }

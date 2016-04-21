@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -22,8 +22,6 @@ package de.ovgu.featureide.fm.core.job;
 
 import org.eclipse.core.runtime.jobs.Job;
 
-import de.ovgu.featureide.fm.core.FMCorePlugin;
-
 /**
  * Job that wraps the functionality of a {@link LongRunningMethod}.
  * 
@@ -33,34 +31,6 @@ public class LongRunningJob<T> extends AStoppableJob implements IStoppableJob {
 
 	private final LongRunningMethod<T> method;
 	private T methodResult = null;
-
-	public static <T> LongRunningJob<T> createJob(String name, LongRunningMethod<T> method) {
-		return new LongRunningJob<T>(name, method);
-	}
-
-	public static <T> LongRunningJob<T> startJob(String name, LongRunningMethod<T> method) {
-		final LongRunningJob<T> job = new LongRunningJob<T>(name, method);
-		job.schedule();
-		return job;
-	}
-
-	public static <T> T runMethod(LongRunningMethod<T> method) {
-		try {
-			return method.execute(new WorkMonitor());
-		} catch (Exception e) {
-			FMCorePlugin.getDefault().logError(e);
-			return null;
-		}
-	}
-
-	public static <T> T runMethod(LongRunningMethod<T> method, WorkMonitor monitor) {
-		try {
-			return method.execute(monitor != null ? monitor : new WorkMonitor());
-		} catch (Exception e) {
-			FMCorePlugin.getDefault().logError(e);
-			return null;
-		}
-	}
 
 	public LongRunningJob(String name, LongRunningMethod<T> method) {
 		super(name, Job.LONG);

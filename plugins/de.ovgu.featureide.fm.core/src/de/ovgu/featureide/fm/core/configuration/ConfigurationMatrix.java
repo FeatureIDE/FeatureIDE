@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -33,7 +33,7 @@ import java.util.List;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
-import de.ovgu.featureide.fm.core.io.manager.FileReader;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
  * Reads all configuration file from a certain folder and saves their content in form of a selection matrix.
@@ -93,7 +93,7 @@ public class ConfigurationMatrix {
 
 	private void readConfigurations(Filter<? super Path> filter) {
 		final Configuration c = new Configuration(featureModel);
-		final FileReader<Configuration> r = new FileReader<>(c);
+		final FileHandler<Configuration> r = new FileHandler<>(c);
 
 		read = false;
 		configurationMatrix.clear();

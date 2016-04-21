@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -313,17 +313,19 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 		label.setText(COMPOSITION_MECHANISM);
 		mechanismCombo = new Combo(group, SWT.READ_ONLY | SWT.DROP_DOWN);
 		mechanismCombo.setLayoutData(gd);
-		mechanismCombo.add(IFeatureProject.DEFAULT_COMPOSITION_MECHANISM);
-		mechanismCombo.add("Jampack");
+
+		for (String mechanism : this.composer.getCompositionMechanisms()) {
+			mechanismCombo.add(mechanism);
+		}
 		String composer = featureProject.getCompositionMechanism();
 		refreshCompositionMechanismCombo(composer);
 		mechanismCombo.addModifyListener(listener);
 	}
 
 	private void refreshCompositionMechanismCombo(String compositionMechanism) {
-		if (!this.composer.hasCompositionMechanisms()) {
+		mechanismCombo.select(0);
+		if (this.composer.getCompositionMechanisms().length == 0) {
 			mechanismCombo.setEnabled(false);
-			mechanismCombo.select(0);
 		} else {
 			int i = 0;
 			for (String item : mechanismCombo.getItems()) {
@@ -436,6 +438,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 		if (!compositionMechanismChanged()) {
 			return;
 		}
+		
 		featureProject.setCompositionMechanism(mechanismCombo.getItem(mechanismCombo.getSelectionIndex()));
 	}
 
@@ -464,12 +467,12 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 		if (noPathChanged()) {
 			return;
 		}
-		
+
 		final IProject iProject = featureProject.getProject();
 		createFolder(iProject.getFolder(featurePath.getText()));
 		createFolder(iProject.getFolder(sourcePath.getText()));
 		createFolder(iProject.getFolder(configPath.getText()));
-		
+
 		try {
 			iProject.refreshLocal(IResource.DEPTH_INFINITE, null);
 		} catch (CoreException e) {
@@ -516,12 +519,12 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 	 * @return
 	 */
 	private boolean noPathChanged() {
-		return ((featureProject.getSourceFolder() != null) ? featureProject.getSourceFolder().getProjectRelativePath().toOSString()
-				.equals(featurePath.getText()) : true)
-				&& ((featureProject.getBuildFolder() != null) ? featureProject.getBuildFolder().getProjectRelativePath().toOSString()
-						.equals(sourcePath.getText()) : true)
-				&& ((featureProject.getConfigFolder() != null) ? featureProject.getConfigFolder().getProjectRelativePath().toOSString()
-						.equals(configPath.getText()) : true);
+		return ((featureProject.getSourceFolder() != null)
+				? featureProject.getSourceFolder().getProjectRelativePath().toOSString().equals(featurePath.getText()) : true)
+				&& ((featureProject.getBuildFolder() != null)
+						? featureProject.getBuildFolder().getProjectRelativePath().toOSString().equals(sourcePath.getText()) : true)
+				&& ((featureProject.getConfigFolder() != null)
+						? featureProject.getConfigFolder().getProjectRelativePath().toOSString().equals(configPath.getText()) : true);
 	}
 
 	@Override
@@ -582,7 +585,7 @@ public class FeatureProjectPropertyPage extends PropertyPage {
 				} else {
 					contractCombo.setEnabled(true);
 				}
-				
+
 				if (c.hasFeatureFolder()) {
 					featurePath.setEnabled(true);
 					if (featurePath.getText().equals("")) {

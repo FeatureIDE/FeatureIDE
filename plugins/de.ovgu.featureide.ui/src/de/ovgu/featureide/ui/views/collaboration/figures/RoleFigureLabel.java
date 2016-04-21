@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -23,6 +23,8 @@ package de.ovgu.featureide.ui.views.collaboration.figures;
 import org.eclipse.draw2d.Label;
 import org.eclipse.swt.graphics.Image;
 
+import de.ovgu.featureide.core.fstmodel.RoleElement;
+
 /**
  * Label for RoleFigures
  *  
@@ -32,6 +34,12 @@ import org.eclipse.swt.graphics.Image;
 public class RoleFigureLabel extends Label{
 	
 	private final String elementName;
+	private RoleElement<?> roleElement;
+	
+	public RoleFigureLabel(String text, Image image, String elementName, RoleElement<?> element) {
+		this(text, image, elementName);
+		roleElement = element;
+	}
 	
 	public RoleFigureLabel(String text, Image image, String elementName) {
 		super(text, image);
@@ -49,5 +57,9 @@ public class RoleFigureLabel extends Label{
 	
 	public String toString() {
 		return elementName;
+	}
+	
+	public RoleElement<?> getRoleElement() {
+		return roleElement;
 	}
 }

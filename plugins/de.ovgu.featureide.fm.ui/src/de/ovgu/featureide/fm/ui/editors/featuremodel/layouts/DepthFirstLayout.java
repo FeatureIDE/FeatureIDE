@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -57,14 +57,14 @@ public class DepthFirstLayout extends FeatureDiagramLayoutManager {
 		if (isHidden(feature)) {
 			return 0;
 		}
-		FeatureUIHelper.setLocation(feature, new Point(x, FMPropertyManager.getLayoutMarginY() + level * FMPropertyManager.getFeatureSpaceY()));
+		feature.setLocation(new Point(x, FMPropertyManager.getLayoutMarginY() + level * FMPropertyManager.getFeatureSpaceY()));
 		int newX = x;
 		if (yoffset < FMPropertyManager.getLayoutMarginY() + level * FMPropertyManager.getFeatureSpaceY())
 			yoffset = FMPropertyManager.getLayoutMarginY() + level * FMPropertyManager.getFeatureSpaceY();
 		for (IGraphicalFeature child : FeatureUIHelper.getGraphicalChildren(feature)) {
 			newX = depthFirstLayout(child, level + 1, newX);
 		}
-		return Math.max(newX, x + FeatureUIHelper.getSize(feature).width + FMPropertyManager.getFeatureSpaceX());
+		return Math.max(newX, x + feature.getSize().width + FMPropertyManager.getFeatureSpaceX());
 	}
 
 }

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -30,8 +30,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
-import de.ovgu.featureide.core.signature.filter.Filter;
-import de.ovgu.featureide.core.signature.filter.IFilter;
+import de.ovgu.featureide.fm.core.filter.base.Filter;
+import de.ovgu.featureide.fm.core.filter.base.IFilter;
 
 /**
  * Abstract merger for modul-comment.

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -27,7 +27,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.prop4j.And;
 import org.prop4j.AtMost;
@@ -64,7 +63,7 @@ public class NodeCreator {
 		return createNodes(featureModel, ignoreAbstractFeatures ? EMPTY_MAP : calculateReplacingMap(featureModel));
 	}
 
-	public static Node createNodes(IFeatureModel featureModel, Set<String> removeFeatures) {
+	public static Node createNodes(IFeatureModel featureModel, Collection<String> removeFeatures) {
 		return createNodes(featureModel, calculateReplacingMap(featureModel, removeFeatures), removeFeatures);
 	}
 
@@ -85,7 +84,7 @@ public class NodeCreator {
 		return replaceNames(and, featureModel);
 	}
 
-	public static Node createNodes(IFeatureModel featureModel, Map<Object, Node> replacingMap, Set<String> removeFeatures) {
+	public static Node createNodes(IFeatureModel featureModel, Map<Object, Node> replacingMap, Collection<String> removeFeatures) {
 		IFeature root = FeatureUtils.getRoot(featureModel);
 		LinkedList<Node> nodes = new LinkedList<Node>();
 		if (root != null) {
@@ -198,7 +197,7 @@ public class NodeCreator {
 		return new And(and, varTrue, new Not(varFalse), new Or(concreteFeatures));
 	}
 
-	public static And eliminateAbstractVariables(And and, Map<Object, Node> map, IFeatureModel featureModel, Set<String> removeFeatures) {
+	public static And eliminateAbstractVariables(And and, Map<Object, Node> map, IFeatureModel featureModel, Collection<String> removeFeatures) {
 		for (Entry<Object, Node> entry : map.entrySet())
 			if (entry.getValue() == null) {
 				String name = entry.getKey().toString();
@@ -452,7 +451,7 @@ public class NodeCreator {
 		return map;
 	}
 
-	public static HashMap<Object, Node> calculateReplacingMap(IFeatureModel featureModel, Set<String> featureNames) {
+	public static HashMap<Object, Node> calculateReplacingMap(IFeatureModel featureModel, Collection<String> featureNames) {
 		HashMap<Object, Node> map = new HashMap<Object, Node>();
 		for (String featureName : featureNames) {
 			String var = getVariable(featureName, featureModel);
@@ -509,7 +508,7 @@ public class NodeCreator {
 		return new Or(children);
 	}
 
-	private static Node calculateReplacing(IFeatureModel featureModel, IFeatureStructure feature, Set<String> featureNames) {
+	private static Node calculateReplacing(IFeatureModel featureModel, IFeatureStructure feature, Collection<String> featureNames) {
 		if (!feature.hasChildren()) {
 			IFeatureStructure parent = feature.getParent();
 			if (parent == null || featureNames.contains(parent.getFeature().getName()))

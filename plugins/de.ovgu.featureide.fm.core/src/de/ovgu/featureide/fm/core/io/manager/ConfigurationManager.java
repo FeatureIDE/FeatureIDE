@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -36,7 +36,8 @@ import de.ovgu.featureide.fm.core.localization.StringTable;
 public class ConfigurationManager extends AFileManager<Configuration> {
 
 	public static enum FormatType implements IFormatType<Configuration> {
-		XML_FIDE(StringTable.CONF, DefaultFormat.class), CONFIG(StringTable.CONFIG, DefaultFormat.class), FIDECONF(StringTable.FIDECONF, FeatureIDEFormat.class);
+		XML_FIDE(StringTable.CONF, DefaultFormat.class), CONFIG(StringTable.CONFIG, DefaultFormat.class),
+		EQUATION(StringTable.EQUATION, DefaultFormat.class), FIDECONF(StringTable.FIDECONF, FeatureIDEFormat.class);
 
 		private final String suffix;
 		private final Class<? extends IPersistentFormat<Configuration>> format;

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -53,7 +53,6 @@ import de.ovgu.featureide.fm.core.color.ColorPalette;
 import de.ovgu.featureide.fm.core.color.FeatureColor;
 import de.ovgu.featureide.fm.core.color.FeatureColorManager;
 import de.ovgu.featureide.fm.ui.editors.FeatureDiagramExtension;
-import de.ovgu.featureide.fm.ui.editors.FeatureUIHelper;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeature;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalFeatureModel;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -92,7 +91,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 	public FeatureFigure(IGraphicalFeature feature, IGraphicalFeatureModel featureModel) {
 		super();
 		this.feature = feature;
-	
+
 		sourceAnchor = new SourceAnchor(this, feature);
 		targetAnchor = new TargetAnchor(this, feature);
 
@@ -107,13 +106,13 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 
 		setProperties();
 
-		FeatureUIHelper.setSize(feature, getSize());
+		feature.setSize(getSize());
 
 		add(label, label.getBounds());
 		setOpaque(true);
 
-		if (FeatureUIHelper.getLocation(feature) != null) {
-			setLocation(FeatureUIHelper.getLocation(feature));
+		if (feature.getLocation() != null) {
+			setLocation(feature.getLocation());
 		}
 
 		if (!featureModel.getLayout().showHiddenFeatures() && feature.getObject().getStructure().hasHiddenParent()) {
@@ -127,7 +126,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		label.setForegroundColor(FMPropertyManager.getFeatureForgroundColor());
 		setBackgroundColor(FMPropertyManager.getConcreteFeatureBackgroundColor());
 		setBorder(FMPropertyManager.getFeatureBorder(feature.isConstraintSelected()));
-		
+
 		IFeature feature = this.feature.getObject();
 
 		final FeatureModelAnalyzer analyser = feature.getFeatureModel().getAnalyser();
@@ -239,7 +238,7 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 		for (FeatureDiagramExtension extension : FeatureDiagramExtension.getExtensions()) {
 			toolTipContent = extension.extendFeatureFigureToolTip(toolTipContent, this);
 		}
-		
+
 		setToolTip(toolTipContent);
 	}
 
@@ -253,8 +252,8 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 			int maxKeyLength = 0;
 			for (int i = 0; i < size; i++)
 				maxKeyLength = Math.max(maxKeyLength, keys.get(i).length());
-			
-			for(int i = 0; i < size; i++) {
+
+			for (int i = 0; i < size; i++) {
 				final String key = keys.get(i);
 				sb.append(String.format("  %1$-" + maxKeyLength + "s", key));
 				sb.append("\t=\t");
@@ -262,13 +261,12 @@ public class FeatureFigure extends Figure implements GUIDefaults {
 				if (i + 1 < size)
 					sb.append("\n");
 			}
-			
+
 			Label propertiesInfo = new Label("\nCustom Properties");
 			propertiesInfo.setFont(DEFAULT_FONT_BOLD);
 			Label properties = new Label(sb.toString());
 			properties.setFont(DEFAULT_FONT);
-			
-			
+
 			toolTipContent.add(propertiesInfo);
 			toolTipContent.add(properties);
 		}

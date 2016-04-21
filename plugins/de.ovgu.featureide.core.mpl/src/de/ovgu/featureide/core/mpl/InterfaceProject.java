@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,12 +20,14 @@
  */
 package de.ovgu.featureide.core.mpl;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.core.mpl.io.FileLoader;
 import de.ovgu.featureide.core.mpl.signature.ViewTag;
 import de.ovgu.featureide.core.signature.ProjectSignatures;
 import de.ovgu.featureide.fm.core.base.IFeature;
@@ -33,7 +35,12 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent;
 import de.ovgu.featureide.fm.core.base.event.FeatureIDEEvent.EventType;
 import de.ovgu.featureide.fm.core.base.event.IEventListener;
+import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.io.IOConstants;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
+import de.ovgu.featureide.fm.core.io.manager.FeatureModelManager;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
  * Holds all relevant information about the interface project.
@@ -101,23 +108,13 @@ public class InterfaceProject {
 		this.featureProject = featureProject;
 		
 		if (projectReference != null) {
-			featureModel = FileLoader.loadFeatureModel(projectReference);
+			final Path featureModelPath = Paths.get(projectReference.getFile(IOConstants.FILENAME_MODEL).getLocationURI());
+			featureModel = FMFactoryManager.getFactory().createFeatureModel();
+			FileHandler.load(featureModelPath, featureModel, FeatureModelManager.getFormat(featureModelPath.getFileName().toString()));
 		} else {
 			featureModel = null;
 		}
 		initFeatureNames();
-//		if (featureModel != null) {
-//			featureNames = new String[featureModel.getNumberOfFeatures()];
-//			int i = 0;
-//			Collection<Entry<String, Feature>> x = featureModel.getFeatureTable().entrySet();
-//			for (Entry<String, Feature> entry : x) {
-//				entry.getValue().addListener(new FeaturePropertyChangeListener(i));
-//				featureNames[i++] = entry.getKey();
-//			}
-////			Arrays.sort(featureNames);
-//		} else {
-//			featureNames = null;
-//		}
 	}
 	
 	private void initFeatureNames() {
@@ -201,8 +198,9 @@ public class InterfaceProject {
 	
 	public Configuration getConfiguration() {
 		if (configuration == null) {
+			final IFile configFile = featureProject.getCurrentConfiguration();
 			configuration = new Configuration(featureModel);
-			FileLoader.loadConfiguration(this);
+			FileHandler.load(Paths.get(configFile.getLocationURI()), configuration, ConfigurationManager.getFormat(configFile.getName()));
 		}
 		return configuration;
 	}

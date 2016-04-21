@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  *
@@ -43,7 +43,6 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.eclipse.core.resources.IMarker;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -57,6 +56,8 @@ import org.xml.sax.helpers.DefaultHandler;
 import de.ovgu.featureide.fm.core.FMCorePlugin;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
+import de.ovgu.featureide.fm.core.io.Problem.Severity;
+import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 
 /**
@@ -195,9 +196,9 @@ public abstract class AXMLFormat<T> implements IPersistentFormat<T>, XMLFeatureM
 	}
 
 	@Override
-	public List<Problem> read(T object, CharSequence source) {
+	public ProblemList read(T object, CharSequence source) {
 		this.object = object;
-		final List<Problem> lastWarnings = new LinkedList<>();
+		final ProblemList lastWarnings = new ProblemList();
 		try {
 			final Document doc = readXML(source);
 			doc.getDocumentElement().normalize();
@@ -205,16 +206,16 @@ public abstract class AXMLFormat<T> implements IPersistentFormat<T>, XMLFeatureM
 		} catch (SAXException e) {
 			FMCorePlugin.getDefault().logError(e);
 			//TODO add line information, if any
-			lastWarnings.add(new Problem(e.getMessage(), 0, IMarker.SEVERITY_ERROR));
+			lastWarnings.add(new Problem(e.getMessage(), 0, Severity.ERROR));
 		} catch (UnsupportedModelException e) {
 			FMCorePlugin.getDefault().logError(e);
-			lastWarnings.add(new Problem(e.getMessage(), e.lineNumber, IMarker.SEVERITY_ERROR));
+			lastWarnings.add(new Problem(e.getMessage(), e.lineNumber, Severity.ERROR));
 		} catch (IOException | ParserConfigurationException e) {
 			FMCorePlugin.getDefault().logError(e);
-			lastWarnings.add(new Problem(e.getMessage(), 0, IMarker.SEVERITY_ERROR));
+			lastWarnings.add(new Problem(e.getMessage(), 0, Severity.ERROR));
 		} catch (Exception e) {
 			FMCorePlugin.getDefault().logError(e);
-			lastWarnings.add(new Problem(e.getMessage(), 0, IMarker.SEVERITY_ERROR));
+			lastWarnings.add(new Problem(e.getMessage(), 0, Severity.ERROR));
 		}
 
 		return lastWarnings;

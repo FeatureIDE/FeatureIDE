@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -33,8 +33,10 @@ import de.ovgu.featureide.fm.ui.AbstractUIPlugin;
 public class ExamplePlugin extends AbstractUIPlugin {
 
 	public static final String PLUGIN_ID = "de.ovgu.featureide.examples";
-	
+
 	private static ExamplePlugin plugin;
+
+	public static final String FeatureIDE_EXAMPLE_DIR = "featureide_examples";//$NON-NLS-1$
 
 	/* (non-Javadoc)
 	 * @see de.ovgu.featureide.ui.plugin.AbstractUIPlugin#getID()
@@ -43,7 +45,7 @@ public class ExamplePlugin extends AbstractUIPlugin {
 	public String getID() {
 		return PLUGIN_ID;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)

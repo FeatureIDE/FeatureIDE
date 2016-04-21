@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -172,6 +172,7 @@ public class FSTDirective extends RoleElement<FSTDirective> {
 			case ELSE_NOT: return "else";
 			case CONDITION: return "condition";
 			case DEFINE: return "define";
+			case CALL: return "call";
 			case UNDEFINE: return "undefine";
 			default: return "";
 			
@@ -249,13 +250,26 @@ public class FSTDirective extends RoleElement<FSTDirective> {
 	 **/
 	@Override
 	public int compareTo(FSTDirective element) {
-
 		if (this == element) {
 			return 0;
 		} else {
 			// TODO Is the linenumber check enough?
 			return this.getStartLine() > element.getStartLine() ? 1 : -1;
 		}
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == this) {
+			return true;
+		}
+		if (obj instanceof FSTDirective) {
+			if (((FSTDirective) obj).getStartLine() == getStartLine() && 
+				((FSTDirective) obj).getEndLine() == getEndLine()) {
+				return super.equals(obj);
+			}
+		}
+		return false;
 	}
 
 	public void addSig_insideOf(AbstractSignature next) {
