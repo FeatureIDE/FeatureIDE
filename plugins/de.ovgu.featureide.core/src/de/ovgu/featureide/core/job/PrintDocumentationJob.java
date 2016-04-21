@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -49,14 +49,14 @@ import de.ovgu.featureide.core.signature.documentation.base.BlockTag;
 import de.ovgu.featureide.core.signature.documentation.base.DocumentationBuilder;
 import de.ovgu.featureide.core.signature.filter.ConstraintFilter;
 import de.ovgu.featureide.core.signature.filter.FeatureFilter;
-import de.ovgu.featureide.core.signature.filter.IFilter;
 import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
-import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
+import de.ovgu.featureide.fm.core.filter.base.IFilter;
 import de.ovgu.featureide.fm.core.io.IOConstants;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
-import de.ovgu.featureide.fm.core.io.manager.FileReader;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.job.AProjectJob;
 import de.ovgu.featureide.fm.core.job.util.JobArguments;
 
@@ -113,11 +113,7 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 					Configuration.PARAM_LAZY | Configuration.PARAM_IGNOREABSTRACT);
 			try {
 				final IFile file = featureProject.getCurrentConfiguration();
-				final FileReader<Configuration> reader = new FileReader<>();
-				reader.setPath(Paths.get(file.getLocationURI()));
-				reader.setFormat(ConfigurationManager.getFormat(file.getName()));
-				reader.setObject(conf);
-				reader.read();
+				FileHandler.load(Paths.get(file.getLocationURI()), conf, ConfigurationManager.getFormat(file.getName()));
 			} catch (Exception e) {
 				CorePlugin.getDefault().logError(e);
 				return false;
@@ -146,9 +142,8 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 				}
 			}
 
-//			filters.add(new FeatureFilter(validFeatureIDs));
 			final Node[] nodes = new Node[conf.getFeatures().size() + 1];
-			nodes[0] = NodeCreator.createNodes(conf.getFeatureModel());
+			nodes[0] = AdvancedNodeCreator.createCNF(conf.getFeatureModel());
 			int i = 1;
 			for (SelectableFeature feature : conf.getFeatures()) {
 				Selection selection = feature.getSelection();
@@ -159,10 +154,8 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 			
 			arguments.merger.setValidFeatureIDs(featureIDs.length, validFeatureIDs);
 		} else if (arguments.merger instanceof ContextMerger) {
-			
-//			filters.add(new ContextFilter(arguments.featureName, projectSignatures));
 			final Node[] nodes = new Node[2];
-			nodes[0] = NodeCreator.createNodes(projectSignatures.getFeatureModel());
+			nodes[0] = AdvancedNodeCreator.createCNF(projectSignatures.getFeatureModel());
 			nodes[1] = new Literal(arguments.featureName, true);
 			signatureFilters.add(new ConstraintFilter(nodes));
 			commentFilters.add(new ConstraintFilter(nodes));
@@ -174,7 +167,7 @@ public class PrintDocumentationJob extends AProjectJob<PrintDocumentationJob.Arg
 			
 			if (featureProject.getComposer().getGenerationMechanism() == Mechanism.PREPROCESSOR) {
 				final Node[] nodes = new Node[2];
-				nodes[0] = NodeCreator.createNodes(projectSignatures.getFeatureModel());
+				nodes[0] = AdvancedNodeCreator.createCNF(projectSignatures.getFeatureModel());
 				nodes[1] = new Literal(arguments.featureName, true);
 				signatureFilters.add(new ConstraintFilter(nodes));
 				commentFilters.add(new ConstraintFilter(nodes));

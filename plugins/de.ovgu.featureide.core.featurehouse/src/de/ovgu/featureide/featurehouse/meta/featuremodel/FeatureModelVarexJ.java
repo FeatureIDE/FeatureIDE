@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -31,7 +31,7 @@ import org.prop4j.NodeWriter;
 import de.ovgu.featureide.fm.core.FeatureComparator;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.functional.Functional;
 
 /**
@@ -90,7 +90,7 @@ public class FeatureModelVarexJ implements IFeatureModelClass {
 
 	@Override
 	public String getFormula() {
-		final Node nodes = NodeCreator.createNodes(featureModel.clone(null)).toCNF();
+		final Node nodes = AdvancedNodeCreator.createCNF(featureModel);
 		String formula = nodes.toString(NodeWriter.javaSymbols);
 		if (formula.contains(TRUE_FALSE)) {
 			formula = formula.substring(0, formula.indexOf(TRUE_FALSE));

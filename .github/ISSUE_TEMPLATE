@@ -1,7 +1,11 @@
-- Eclipse Version [required]
-- FeatureIDE-Version [required]
-- FeatureIDE Composer you are using [optional]
-- Git branch [required if not on master branch, optional otherwise]
-- OS information [required]
-- Java runtime used to run eclipse [required]
-- Java compiler used to build the FeatureIDE plugin [required if custom build, optional otherwise]
+#### Prerequisitives
+* **Eclipse Version:**  `Add text here (needed for best issue handling)`
+* **FeatureIDE-Version:**  `Add text here (needed for best issue handling)`
+* **Operating system:** `Add text here (needed for best issue handling)`
+* **Java runtime used to run eclipse:** `Add text here (needed for best issue handling)`
+* **FeatureIDE Composer:** `Add text here (optional, leave blank if not needed)`
+* **Git branch/Commit-ID:**  `Add text here (optional, leave blank if not needed)`
+* **Java compiler used to build the FeatureIDE plugin:** `Add text here (optional, leave blank if not needed)`
+
+### Issue description
+Add text here

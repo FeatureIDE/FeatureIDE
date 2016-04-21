@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -44,10 +44,10 @@ import org.eclipse.ui.PlatformUI;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
-import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.io.FeatureModelReaderIFileWrapper;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
 import de.ovgu.featureide.fm.core.io.xml.XmlFeatureModelReader;
@@ -95,7 +95,8 @@ public class ExportDIMACSHandler extends AFileHandler {
 			 * @return
 			 */
 			private String getCNF(IFeatureModel model) {
-				Node nodes = NodeCreator.createNodes(model.clone(null)).toCNF();
+				Node nodes = AdvancedNodeCreator.createCNF(model);
+
 				StringBuilder string = new StringBuilder();
 				Map<String, Integer> featureMap = new HashMap<String, Integer>();
 				int i = 1;

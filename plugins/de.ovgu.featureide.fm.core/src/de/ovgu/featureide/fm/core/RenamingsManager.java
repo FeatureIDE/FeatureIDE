@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.core;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -70,16 +71,18 @@ public class RenamingsManager {
 			return false;
 		}
 		final List<IConstraint> constraints = model.getConstraints();
-		final List<String> featureOrderList = Functional.toList(model.getFeatureOrderList());
-		IFeature feature = featureTable.remove(oldName);
+		final IFeature feature = model.getFeature(oldName);
+		model.deleteFeatureFromTable(feature);
 		feature.setName(newName);
-		featureTable.put(newName, feature);
+		model.addFeature(feature);
 		renamings.add(new Renaming(oldName, newName));
 		for (IConstraint c : constraints) {
 			renameVariables(c.getNode(), oldName, newName);
 		}
 		
 		// update the feature order list
+		
+		final List<String> featureOrderList = Functional.toList(model.getFeatureOrderList());
 		for (int i = 0;i < featureOrderList.size();i++) {
 			if (featureOrderList.get(i).equals(oldName)) {
 				model.setFeatureOrderListItem(i, newName);
@@ -105,16 +108,28 @@ public class RenamingsManager {
 	};
 
 	public void performRenamings(IFile file) {
-		final FeatureModelManager instance = FileManagerMap.<IFeatureModel, FeatureModelManager>getInstance(file.getLocation().toString());
+		final String location = file.getLocation().toString();
+		performRenamings(location);
+	}
+	
+	public void performRenamings(File file) {
+		final String location = file.getPath();
+		performRenamings(location);
+	}
+		
+	private void performRenamings(final String location) {
+		final FeatureModelManager instance = FileManagerMap.<IFeatureModel, FeatureModelManager>getInstance(location);
 		if (instance == null) {
 			return;
 		}
-		instance.read();
 		final IFeatureModel projectModel = instance.getObject();
 		for (Renaming renaming : renamings) {
+			// TODO check weather all these events are necessary 
 			final FeatureIDEEvent event = new FeatureIDEEvent(model, EventType.FEATURE_NAME_CHANGED, renaming.oldName, renaming.newName);
 			projectModel.fireEvent(event);
 			model.fireEvent(event);
+			// call to FMComposerExtension
+			instance.fireEvent(event);
 		}
 		renamings.clear();
 	}

@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -67,6 +67,6 @@ public class CreateFeatureBelowOperation extends AbstractFeatureModelOperation {
 	protected FeatureIDEEvent inverseOperation() {
 		newFeature = featureModel.getFeature(newFeature.getName());
 		featureModel.deleteFeature(newFeature);
-		return new FeatureIDEEvent(featureModel, EventType.FEATURE_DELETE, newFeature, null);
+		return new FeatureIDEEvent(newFeature, EventType.FEATURE_DELETE, feature, null);
 	}
 }

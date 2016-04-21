@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -32,33 +32,6 @@ import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
  */
 public final class FMFactoryManager {
 
-	// TODO implement extension point
-//	private static ArrayList<IFeatureModelFactory> cachedProviders = null;
-//	
-//	private void loadProviders(String pluginID, String extensionPointID) {
-//		ArrayList<?> cachedProviders = new ArrayList<>();
-//		IExtension[] extensions = Platform.getExtensionRegistry().getExtensionPoint(pluginID, extensionPointID).getExtensions();
-//		for (IExtension extension : extensions) {
-//			IConfigurationElement[] configurationElements = extension.getConfigurationElements();
-//			for (IConfigurationElement configurationElement : configurationElements) {
-//				IFeatureModelFactory proxy = parseExtension(configurationElement);
-//				if (proxy != null) {
-//					cachedProviders.add(proxy);
-//				}
-//			}
-//		}
-//	}
-//	
-//	protected IFeatureModelFactory parseExtension(IConfigurationElement configurationElement) {
-//		try {
-//			return (IFeatureModelFactory) configurationElement.createExecutableExtension("class");
-//		} catch (CoreException e) {
-//			FMCorePlugin.getDefault().logError(e);
-//		} catch (ClassCastException e) {
-//			FMCorePlugin.getDefault().logError(e);
-//		}
-//	}
-
 	private FMFactoryManager() {
 	}
 
@@ -69,10 +42,24 @@ public final class FMFactoryManager {
 		factoryArray[1] = ExtendedFeatureModelFactory.getInstance();
 	}
 
+	/**
+	 * @return Returns the default instance of the built-in {@link DefaultFeatureModelFactory} which provides access to the default {@link IFeatureModel} and
+	 *         {@link IFeature} implementations of FeatureIDE
+	 */
 	public static IFeatureModelFactory getFactory() {
 		return DefaultFeatureModelFactory.getInstance();
 	}
 
+	/**
+	 * Returns a specific factory associated with the string <b>id</b>. By default, the following
+	 * factories are available:
+	 * <ul>
+	 * <li><b>de.ovgu.featureide.fm.core.DefaultFeatureModelFactory</b>: An instance of {@link DefaultFeatureModelFactory}</li>
+	 * <li><b>de.ovgu.featureide.fm.core.ExtendedFeatureModelFactory</b>: An instance of {@link ExtendedFeatureModelFactory}</li>
+	 * </ul>
+	 * @param id the (unique) identifier for an instance of {@link IFeatureModelFactory} to be returned
+	 * @return Returns Instance of feature model factory associated with <b>id</b>, or throws <b<>RuntimeException</b> in case <b>id</b> is not known
+	 */
 	public static IFeatureModelFactory getFactory(String id) {
 		for (IFeatureModelFactory factory : factoryArray) {
 			if (factory.getId().equals(id)) {

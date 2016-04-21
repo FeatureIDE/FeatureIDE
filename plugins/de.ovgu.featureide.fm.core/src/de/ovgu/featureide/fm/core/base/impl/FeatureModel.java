@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -251,22 +251,11 @@ public class FeatureModel implements IFeatureModel {
 
 	@Override
 	public void fireEvent(FeatureIDEEvent event) {
-		if (event.isPersistent() || event.getEditor() == null) {
-			for (final IEventListener listener : listenerList) {
-				try {
-					listener.propertyChange(event);
-				} catch (Exception e) {
-					FMCorePlugin.getDefault().logError(e);
-				}
-			}
-		} else {
-			final int listenerIndex = listenerList.indexOf(event.getEditor());
-			if (listenerIndex >= 0) {
-				try {
-					listenerList.get(listenerIndex).propertyChange(event);
-				} catch (Exception e) {
-					FMCorePlugin.getDefault().logError(e);
-				}
+		for (final IEventListener listener : listenerList) {
+			try {
+				listener.propertyChange(event);
+			} catch (Exception e) {
+				FMCorePlugin.getDefault().logError(e);
 			}
 		}
 	}
@@ -414,6 +403,8 @@ public class FeatureModel implements IFeatureModel {
 
 	@Override
 	public void replaceConstraint(IConstraint constraint, int index) {
+		if (constraint == null)
+			throw new NullPointerException();
 		constraints.set(index, constraint);
 	}
 
@@ -461,57 +452,14 @@ public class FeatureModel implements IFeatureModel {
 
 	@Override
 	public Map<String, IFeature> getFeatureTable() {
-		return featureTable;
+		return Collections.unmodifiableMap(featureTable);
 	}
 
-//	@Override
-//	public IFeatureModel clone(IFeatureModel oldFeatureModel, boolean complete) {
-//		throw new UnsupportedOperationException("Not implemented yet");
-//	}
-//
-//	@Override
-//	public IFeatureModel clone() {
-//		throw new UnsupportedOperationException("Not implemented yet");
-//	}
-//
-//	@Override
-//	public IFeatureModel deepClone() {
-//		throw new UnsupportedOperationException("Not implemented yet");
-//	}
-//
-//	@Override
-//	public IFeatureModel deepClone(boolean complete) {
-//		throw new UnsupportedOperationException("Not implemented yet");
-//	}
-//
-//	@Override
-//	public Object getUndoContext(Object undoContext) {
-//		throw new UnsupportedOperationException("Not implemented yet");
-//	}
-//
-//	@Override
-//	public boolean isFeatureOrderInXML() {
-//		throw new UnsupportedOperationException("Not implemented yet");
-//	}
-//
-//	@Override
-//	public Object setFeatureOrderInXML(IFeatureModel featureModel, boolean featureOrderInXML) {
-//		throw new UnsupportedOperationException("Not implemented yet");
-//	}
-//
-//	@Override
-//	public void refreshContextMenu() {
-//		throw new UnsupportedOperationException("Not implemented yet");
-//	}
-//
-//	@Override
-//	public void setConstraintSelected(boolean b) {
-//		throw new UnsupportedOperationException("Not implemented yet");
-//	}
-//
 	@Override
 	public void setFeatureOrderListItem(int i, String newName) {
-//		this.featureOrderList.set(i, newName);
+		if (!this.featureOrderList.isEmpty()) {
+			this.featureOrderList.set(i, newName);
+		}
 	}
 
 	@Override

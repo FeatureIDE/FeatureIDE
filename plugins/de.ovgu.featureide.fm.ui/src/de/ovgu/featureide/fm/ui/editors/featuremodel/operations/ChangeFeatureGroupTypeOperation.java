@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -64,7 +64,7 @@ public class ChangeFeatureGroupTypeOperation extends AbstractFeatureModelOperati
 		} else {
 			feature.getStructure().changeToAnd();
 		}
-		return new FeatureIDEEvent(feature, null, true, EventType.GROUP_TYPE_CHANGED, null, null);
+		return new FeatureIDEEvent(feature, EventType.GROUP_TYPE_CHANGED, null, null);
 	}
 
 	@Override
@@ -76,7 +76,7 @@ public class ChangeFeatureGroupTypeOperation extends AbstractFeatureModelOperati
 		} else {
 			feature.getStructure().changeToOr();
 		}
-		return null;
+		return new FeatureIDEEvent(feature, EventType.GROUP_TYPE_CHANGED, null, null);
 	}
 
 	private static int getGroupType(IFeature feature) {

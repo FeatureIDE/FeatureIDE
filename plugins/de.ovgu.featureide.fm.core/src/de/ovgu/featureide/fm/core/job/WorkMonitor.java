@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2013  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,12 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.job;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
-
-import de.ovgu.featureide.fm.core.functional.Functional;
-import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
-
 /**
  * Control object for {@link IJob}s.
  * Can be used to check for cancel request, display job progress, and calling intermediate functions.
@@ -33,68 +27,23 @@ import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
  * @author Sebastian Krieter
  * @author Marcus Pinnecke (Feature Interface)
  */
-public final class WorkMonitor {
-	private static final int maxRelativeWork = 100;
-
-	private IProgressMonitor monitor;
-	private IFunction<Object, Void> intermediateFunction;
-	private int relativeWorkDone = 0, absoluteWorkDone = 0, maxAbsoluteWork = 1;
-
-	public WorkMonitor() {
-		setIntermediateFunction(null);
-		setMonitor(null);
-	}
-
-	/**
-	 * @return {@code true}, if the job received a canceling request.
-	 */
-	public boolean checkCancel() {
-		return monitor.isCanceled();
-	}
-
-	/**
-	 * Sets how many times {@link #worked()} has to be called within {@link #work()}.
-	 * 
-	 * @param maxAbsoluteWork the absolute amount of work this job has to do
-	 */
-	public void setMaxAbsoluteWork(int maxAbsoluteWork) {
-		this.maxAbsoluteWork = maxAbsoluteWork;
-	}
+public final class WorkMonitor extends AWorkMonitor {
 
 	/**
 	 * Increases the monitor's progress.
 	 */
 	public void worked() {
-		final int nworked = (maxRelativeWork * ++absoluteWorkDone) / maxAbsoluteWork;
-		monitor.worked(nworked - relativeWorkDone);
-		relativeWorkDone = nworked;
+		internalWorked();
 	}
 
-	public void begin(String taskName) {
-		monitor.beginTask(taskName, maxRelativeWork);
+	@Override
+	public boolean checkCancel() {
+		return internalCheckCancel();
 	}
 
-	public void done() {
-		monitor.done();
-	}
-
-	public void createSubTask(String name) {
-		this.monitor.subTask(name);
-	}
-
-	public IProgressMonitor getMonitor() {
-		return monitor;
-	}
-
-	public void setMonitor(IProgressMonitor monitor) {
-		this.monitor = (monitor != null) ? monitor : new NullProgressMonitor();
-	}
-
-	public void setIntermediateFunction(IFunction<Object, Void> intermediateFunction) {
-		this.intermediateFunction = (intermediateFunction != null) ? intermediateFunction : new Functional.NullFunction<Object, Void>();
-	}
-
+	@Override
 	public void invoke(Object t) {
-		intermediateFunction.invoke(t);
+		internalInvoke(t);
 	}
+
 }

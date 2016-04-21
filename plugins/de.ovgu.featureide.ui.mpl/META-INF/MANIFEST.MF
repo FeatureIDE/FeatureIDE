@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: FeatureIDE UI Plug-In for Multi Product Lines
 Bundle-SymbolicName: de.ovgu.featureide.ui.mpl;singleton:=true
-Bundle-Version: 2.7.5.qualifier
+Bundle-Version: 3.0.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Require-Bundle: de.ovgu.featureide.core,
  de.ovgu.featureide.core.mpl,
@@ -12,12 +12,7 @@ Require-Bundle: de.ovgu.featureide.core,
  org.eclipse.core.runtime,
  org.eclipse.core.resources,
  org.eclipse.ui,
- org.eclipse.ui.ide,
- org.eclipse.jdt.core,
- org.eclipse.jdt.ui,
- org.eclipse.jface.text,
- org.eclipse.draw2d,
- org.eclipse.ui.editors
+ org.eclipse.draw2d
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: University of Magdeburg
 Bundle-Activator: de.ovgu.featureide.ui.mpl.MPLUIPlugin

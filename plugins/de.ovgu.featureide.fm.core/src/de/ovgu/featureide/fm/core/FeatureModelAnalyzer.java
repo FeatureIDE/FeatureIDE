@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -60,6 +60,7 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.Comparison;
 import de.ovgu.featureide.fm.core.editing.ModelComparator;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
@@ -171,8 +172,7 @@ public class FeatureModelAnalyzer {
 	}
 
 	public boolean isValid() throws TimeoutException {
-		Node root = NodeCreator.createNodes(fm);
-		return new SatSolver(root, 1000).isSatisfiable();
+		return new SatSolver(AdvancedNodeCreator.createCNF(fm), 1000, false).isSatisfiable();
 	}
 
 	/**
@@ -231,8 +231,7 @@ public class FeatureModelAnalyzer {
 	 * @throws TimeoutException
 	 */
 	public boolean checkCondition(Node condition) {
-
-		Node featureModel = NodeCreator.createNodes(fm);
+		Node featureModel = AdvancedNodeCreator.createNodes(fm);
 		// FM => (condition)
 		Implies finalFormula = new Implies(featureModel, condition.clone());
 		try {
@@ -275,7 +274,7 @@ public class FeatureModelAnalyzer {
 		if ((featureSets == null) || (featureSets.size() < 2))
 			return true;
 
-		Node featureModel = NodeCreator.createNodes(fm);
+		Node featureModel = AdvancedNodeCreator.createNodes(fm);
 
 		ArrayList<Node> conjunctions = new ArrayList<Node>(featureSets.size());
 		for (Collection<IFeature> features : featureSets) {
@@ -475,11 +474,13 @@ public class FeatureModelAnalyzer {
 		final ArrayList<IFeature> coreFeatures = new ArrayList<>();
 		final ArrayList<IFeature> deadFeatures = new ArrayList<>();
 		
-		Node formula = NodeCreator.createNodes(fm);
+		Node formula = AdvancedNodeCreator.createCNF(fm);
 		if (selectedFeatures.length > 0) {
-			formula = new And(formula, new Or(selectedFeatures));
+			final Node[] extendedChildren = Arrays.copyOf(formula.getChildren(), formula.getChildren().length + 1);
+			extendedChildren[formula.getChildren().length] = new Or(selectedFeatures);
+			formula.setChildren(extendedChildren);
 		}
-		final SatSolver solver = new SatSolver(formula, timeout);
+		final SatSolver solver = new SatSolver(formula, timeout, false);
 
 		for (Literal literal : solver.knownValues(vt)) {
 			final String var = literal.var.toString();
@@ -508,7 +509,7 @@ public class FeatureModelAnalyzer {
 	public List<List<IFeature>> getAtomicSets() {
 		final ArrayList<List<IFeature>> result = new ArrayList<>();
 		
-		final SatSolver solver = new SatSolver(NodeCreator.createNodes(fm), 1000);
+		final SatSolver solver = new SatSolver(AdvancedNodeCreator.createCNF(fm), 1000, false);
 		
 		for (List<Literal> literalList : solver.atomicSets()) {
 			final List<IFeature> setList = new ArrayList<>();
@@ -678,7 +679,11 @@ public class FeatureModelAnalyzer {
 				
 				constraint.setContainedFeatures();
 				if (fmFalseOptionals.isEmpty() && fmDeadFeatures.isEmpty()) {
-					constraint.getDeadFeatures().clear();
+					if (constraint.getConstraintAttribute() != ConstraintAttribute.NORMAL) {
+						constraint.setConstraintAttribute(ConstraintAttribute.NORMAL, false);
+						changedAttributes.put(constraint, ConstraintAttribute.NORMAL);
+					}
+					constraint.setDeadFeatures(Functional.getEmptyIterable(IFeature.class));
 					constraint.getFalseOptional().clear();
 					continue;
 				}
@@ -707,7 +712,7 @@ public class FeatureModelAnalyzer {
 						changedAttributes.put(constraint, ConstraintAttribute.DEAD);
 					}
 				} else {
-					constraint.getDeadFeatures().clear();
+					constraint.setDeadFeatures(Collections.<IFeature>emptyList());
 				}
 				if (!changedAttributes.containsKey(constraint)) {
 					constraint.setConstraintAttribute(ConstraintAttribute.NORMAL, false);
@@ -907,15 +912,15 @@ public class FeatureModelAnalyzer {
 			chachedFalseOptionalFeatures.add(f);
 		}
 	}
-	
+
 	public List<IFeature> getFalseOptionalFeatures() {
 		return getFalseOptionalFeatures(fm.getFeatures());
 	}
-
+	
 	public List<IFeature> getFalseOptionalFeatures(Iterable<IFeature> fmFalseOptionals) {
 		final List<IFeature> falseOptionalFeatures = new ArrayList<>();
 
-		final SatSolver solver = new SatSolver(NodeCreator.createNodes(fm), 1000);
+		final SatSolver solver = new SatSolver(AdvancedNodeCreator.createCNF(fm), 1000);
 		for (IFeature feature : fmFalseOptionals) {
 			final IFeatureStructure structure = feature.getStructure();
 			final IFeature parent = FeatureUtils.getParent(feature);

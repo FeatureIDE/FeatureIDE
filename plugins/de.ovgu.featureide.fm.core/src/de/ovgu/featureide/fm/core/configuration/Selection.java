@@ -1,5 +1,5 @@
 /* FeatureIDE - A Framework for Feature-Oriented Software Development
- * Copyright (C) 2005-2015  FeatureIDE team, University of Magdeburg, Germany
+ * Copyright (C) 2005-2016  FeatureIDE team, University of Magdeburg, Germany
  *
  * This file is part of FeatureIDE.
  * 
@@ -20,9 +20,25 @@
  */
 package de.ovgu.featureide.fm.core.configuration;
 
+import de.ovgu.featureide.fm.core.conf.nodes.Variable;
+
 /**
  * Defines Selection types Selected, Unselected, Undefined. These are needed for the configuration process.
+ * 
+ * @author Sebastian Krieter
  */
 public enum Selection {
-	SELECTED, UNSELECTED, UNDEFINED
+
+	SELECTED(Variable.TRUE), UNSELECTED(Variable.FALSE), UNDEFINED(Variable.UNDEFINED);
+
+	private final int value;
+
+	private Selection(int value) {
+		this.value = value;
+	}
+
+	public int getValue() {
+		return value;
+	}
+
 }

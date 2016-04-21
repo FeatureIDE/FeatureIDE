@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="de.ovgu.featureide.core.composers">
+      <composer
+            class="de.ovgu.featureide.core.framework.FrameworkComposer"
+            description="Use jars for plugin functionality"
+            id="de.ovgu.featureide.core.composer.framework"
+            name="Framework"
+            nature="de.ovgu.featureide.core.composer.framework">
+      </composer>
+   </extension>
+   <extension
+         point="de.ovgu.featureide.core.wizard">
+      <newProjectWizard
+            class="de.ovgu.featureide.core.wizardextension.DefaultNewFeatureProjectWizardExtension"
+            composerid="de.ovgu.featureide.core.composer.framework"
+            id="de.ovgu.featureide.core.framework.newProjectWizard"
+            name="Default">
+      </newProjectWizard>
+   </extension>
+
+</plugin>
