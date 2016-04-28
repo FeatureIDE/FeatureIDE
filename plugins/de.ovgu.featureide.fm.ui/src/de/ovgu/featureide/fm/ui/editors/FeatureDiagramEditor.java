@@ -844,7 +844,7 @@ public class FeatureDiagramEditor extends ScrollingGraphicalViewer implements GU
 			analyzeFeatureModel();
 			break;
 		case MODEL_DATA_SAVED:
-			FileHandler.load(Paths.get(extraPath), graphicalFeatureModel, format);
+			FileHandler.save(Paths.get(extraPath), graphicalFeatureModel, format);
 			break;
 		case MODEL_LAYOUT_CHANGED:
 			reload();
