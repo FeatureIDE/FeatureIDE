@@ -93,6 +93,8 @@ public interface IJob {
 	 */
 	boolean cancel();
 
+	Class<?> getImplementationClass();
+
 	void join() throws InterruptedException;
 
 	/**

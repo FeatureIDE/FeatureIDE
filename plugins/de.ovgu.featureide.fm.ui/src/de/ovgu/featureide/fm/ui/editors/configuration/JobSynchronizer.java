@@ -42,12 +42,12 @@ public class JobSynchronizer {
 
 		@Override
 		public boolean equals(Object obj) {
-			return (obj instanceof JobEntry) && ((JobEntry) obj).currentJob.getClass().equals(this.currentJob.getClass());
+			return (obj instanceof JobEntry) && ((JobEntry) obj).currentJob.getImplementationClass().equals(this.currentJob.getImplementationClass());
 		}
 
 		@Override
 		public int hashCode() {
-			return this.currentJob.getClass().hashCode();
+			return this.currentJob.getImplementationClass().hashCode();
 		}
 	}
 
