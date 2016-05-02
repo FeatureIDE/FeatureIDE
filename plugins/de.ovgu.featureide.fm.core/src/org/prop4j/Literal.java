@@ -35,6 +35,14 @@ public class Literal extends Node implements Cloneable {
 
 	public boolean positive;
 
+	//annotate each literal of a formula with an attribute for explanation. If "Up", explain child relationship
+	// to parent from feature-tree. If "Constraint", explain using cross-tree constraint.
+	public enum FeatureAttribute {
+		Undef, Up, Down, Root, Constraint
+	};
+
+	public int origin; // combined member of sourceIndex for cross-tree constraint and of enum type, used for explanations
+
 	public Literal(Object var, boolean positive) {
 		this.var = var;
 		this.positive = positive;
@@ -43,6 +51,49 @@ public class Literal extends Node implements Cloneable {
 	public Literal(Object var) {
 		this.var = var;
 		positive = true;
+	}
+
+	public Literal(Object var, FeatureAttribute a) {
+		this(var);
+		this.origin = -1 * FeatureAttribute.values().length + a.ordinal(); // encodes an enumeration type with an int member for explanations  
+	}																	   // example with root as feature attribute: origin = -1 * 5 + 3 = -2 
+
+	public Literal(Object var, int constraintIndex) {
+		this(var);
+		setOriginConstraint(constraintIndex); //encodes a constraint index with the same int member as for an enumeration type 
+	}										  
+
+	/**
+	 * Decodes a constraint index.    
+	 * Example with origin = 4: origin = 4 / 5 = 0. Returns a constraint with index 0.
+	 * 
+	 * @return the index of a constraint
+	 */
+	public int getSourceIndex() {
+		return origin / FeatureAttribute.values().length;
+	}
+
+	/**
+	 * Decodes a feature attribute. 
+	 * Example with feature attribute root and origin = -2: -2 % 5 + 5 = 3. Returns a feature attribute at position 3.   
+	 * 
+	 * @return an enumeration type of a feature attribute
+	 */
+	public FeatureAttribute getSourceAttribute() {
+		int index = origin % FeatureAttribute.values().length;
+		if (index < 0) {
+			index += FeatureAttribute.values().length; // add number of enum types to get positive index
+		}
+		return FeatureAttribute.values()[index];
+	}
+
+	/**
+	 * Encodes a constraint index with an combined integer for explaining feature attributes and cross-tree constraints.  
+	 * Example with constraintIndex = 0: origin = 0 * 5 + 4 = 4
+	 * @param constrIndex
+	 */
+	public void setOriginConstraint(int constrIndex) {
+		this.origin = constrIndex * FeatureAttribute.values().length + FeatureAttribute.Constraint.ordinal();
 	}
 
 	public void flip() {
@@ -71,9 +122,19 @@ public class Literal extends Node implements Cloneable {
 		//nothing to do (recursive calls reached lowest node)
 	}
 
+	/*	@Override
+		public Literal clone() { 
+			Literal copy = new Literal (var,positive);
+			copy.setSourceIndex(this.srcIndex);
+			copy.setFeatureAttribute(this.srcAttribute);
+			return copy;
+		}*/
+
 	@Override
 	public Literal clone() {
-		return new Literal(var, positive);
+		Literal copy = new Literal(var, positive);
+		copy.origin = this.origin;
+		return copy;
 	}
 
 	@Override

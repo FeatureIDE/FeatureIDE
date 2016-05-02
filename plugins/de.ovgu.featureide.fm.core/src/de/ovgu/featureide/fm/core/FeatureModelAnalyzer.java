@@ -64,6 +64,8 @@ import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
 import de.ovgu.featureide.fm.core.editing.Comparison;
 import de.ovgu.featureide.fm.core.editing.ModelComparator;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
+import de.ovgu.featureide.fm.core.explanations.DeadFeatures;
+import de.ovgu.featureide.fm.core.explanations.Redundancy;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
 /**
@@ -99,6 +101,12 @@ public class FeatureModelAnalyzer {
 	private boolean cachedValidity = true;
 	
 	private IFeatureModel fm;
+	
+	//for tooltip: remember explanation for redundant constraint. Key = constraintIndex, Value = explanation
+	public static HashMap<Integer, String> redExpl = new HashMap<Integer, String>(); 
+	
+	//for tooltip: remember explanation for constraint which leads to dead feature. Key = constraintIndex, Value = explanation
+	public static HashMap<Integer, String> deadFExpl = new HashMap<Integer, String>(); 
 	
 	/**
 	 * Defines whether features should be included into calculations.
@@ -705,6 +713,12 @@ public class FeatureModelAnalyzer {
 				
 				if (!fmDeadFeatures.isEmpty()) {
 					Collection<IFeature> deadFeatures = Functional.toList(constraint.getDeadFeatures(solver, clone, fmDeadFeatures));
+					
+					DeadFeatures deadF = new DeadFeatures();
+					int constrInd = FeatureUtils.getConstraintIndex(clone, constraint);
+					String expl = deadF.explainDeadFeature(clone, deadFeatures, constraint);
+					deadFExpl.put(constrInd, expl);
+					
 					if (!deadFeatures.isEmpty()) {
 						fmDeadFeatures.removeAll(deadFeatures);
 						constraint.setDeadFeatures(deadFeatures);
@@ -747,6 +761,11 @@ public class FeatureModelAnalyzer {
 		ModelComparator comparator = new ModelComparator(500);
 		Comparison comparison = comparator.compare(clone, oldModel);
 		if (comparison == Comparison.REFACTORING) {
+			
+			Redundancy redundancy = new Redundancy(); 
+			String expl = redundancy.explainRedundancy(oldModel, clone, constraint); //store explanation for redundant constraint
+			redExpl.put(FeatureUtils.getConstraintIndex(clone, constraint), expl);
+
 			if (oldAttributes.get(constraint) != ConstraintAttribute.REDUNDANT) {
 				changedAttributes.put(constraint, ConstraintAttribute.REDUNDANT);
 			}
