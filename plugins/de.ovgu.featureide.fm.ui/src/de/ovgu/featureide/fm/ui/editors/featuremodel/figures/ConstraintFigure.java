@@ -39,8 +39,13 @@ import org.eclipse.draw2d.geometry.Rectangle;
 import org.prop4j.NodeWriter;
 
 import de.ovgu.featureide.fm.core.ConstraintAttribute;
+import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.explanations.DeadFeatures;
+import de.ovgu.featureide.fm.core.explanations.Redundancy;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIBasics;
@@ -137,6 +142,18 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 			return;
 		}
 
+		if (constraintAttribute == ConstraintAttribute.REDUNDANT) {
+
+			setBackgroundColor(FMPropertyManager.getWarningColor());
+			IFeatureModel model = Redundancy.getNewModel();
+			int constraintIndex = FeatureUtils.getConstraintIndex(model, constraint);
+			// set tooltip with explanation for redundant constraint
+			StringBuilder toolTip = new StringBuilder(FeatureModelAnalyzer.redExpl.get(constraintIndex).toString());
+			setToolTip(new Label(toolTip.toString()));
+			//		setToolTip(new Label(REDUNDANCE));
+			return;
+		}
+
 		StringBuilder toolTip = new StringBuilder();
 		if (!constraint.getDeadFeatures().isEmpty()) {
 			setBackgroundColor(FMPropertyManager.getDeadFeatureBackgroundColor());
@@ -151,6 +168,10 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 				toolTip.append("\n   ");
 				toolTip.append(dead);
 			}
+			// set tooltip with explanation for dead feature
+			IFeatureModel model = DeadFeatures.getNewModel();
+			int constraintIndex = FeatureUtils.getConstraintIndex(model, constraint);
+			toolTip.append("\n\n" + FeatureModelAnalyzer.deadFExpl.get(constraintIndex));
 			setToolTip(new Label(toolTip.toString()));
 		}
 
@@ -176,11 +197,6 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 			return;
 		}
 
-		if (constraintAttribute == ConstraintAttribute.REDUNDANT) {
-			setBackgroundColor(FMPropertyManager.getWarningColor());
-			setToolTip(new Label(REDUNDANCE));
-			return;
-		}
 	}
 
 	private String getConstraintText(IConstraint constraint) {
