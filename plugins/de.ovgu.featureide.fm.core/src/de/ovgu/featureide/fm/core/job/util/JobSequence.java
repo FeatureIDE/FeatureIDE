@@ -214,4 +214,9 @@ public final class JobSequence implements IJob {
 		return sb.toString();
 	}
 
+	@Override
+	public Class<?> getImplementationClass() {
+		return getClass();
+	}
+
 }

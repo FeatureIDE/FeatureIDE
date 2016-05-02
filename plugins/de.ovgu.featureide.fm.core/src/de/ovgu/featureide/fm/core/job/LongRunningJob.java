@@ -46,4 +46,8 @@ public class LongRunningJob<T> extends AStoppableJob implements IStoppableJob {
 		return methodResult;
 	}
 
+	public Class<?> getImplementationClass() {
+		return method.getClass();
+	}
+
 }
