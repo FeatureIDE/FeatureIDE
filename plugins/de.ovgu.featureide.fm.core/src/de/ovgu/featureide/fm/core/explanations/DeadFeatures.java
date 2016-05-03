@@ -63,20 +63,16 @@ public class DeadFeatures {
 		Node[] clauses = node.getChildren();
 
 		for (IFeature deadFeature : deadFeatures) { 
-			setTruthValToUnknown(clauses); //(re)set all literal values to -1
 			Literal deadF = getLiteralFromNode(constr, deadFeature);
 			
 			if (deadF == null) { // possible that constraint does not contain the dead feature. Instantiate the dead literal
 				deadF = new Literal(deadFeature.getName());
 			}	
-			valueMap.get(deadF.var).premise = true;
 			LTMS ltms = new LTMS(model, valueMap);
-			String tmpReason = ltms.explain(clauses, deadF, false);
+			String tmpReason = ltms.explain(clauses, deadF, false, prevDeadFeatures);
 			
 			if (tmpReason.isEmpty()) { // if reason for dead feature is empty after first run, feature is conditionally dead
-				setTruthValToUnknown(clauses);
-	//			setTruthValPrevDead(prevDeadFeatures); //set truth values of previous dead features to false
-				tmpReason = ltms.explain(clauses, deadF, true);
+				tmpReason = ltms.explain(clauses, deadF, true, prevDeadFeatures);
 				reason += "Feature " + deadF + " is conditionally dead, because: ";
 			}
 			else {
@@ -118,38 +114,6 @@ public class DeadFeatures {
 			}
 		}
 		return res;
-	}
-
-	/**
-	 * Sets the truth value of every literal in the conjunctive normal form to -1 (unknown)
-	 * 
-	 * @param clausesFromCNF clauses of the conjunctive normal form
-	 */
-	private void setTruthValToUnknown(Node[] clausesFromCNF) {
-		for (int j = 0; j < clausesFromCNF.length; j++) { // for all clauses of the cnf 
-			Node clause = clausesFromCNF[j];
-
-			Node[] features = clause.getChildren();
-
-			if (features == null) {
-				final Literal literal = (Literal) clause;
-				Bookkeeping expl = new Bookkeeping(literal.var, -1, null, null, false);
-				valueMap.put(literal.var, expl);
-				continue;
-			}
-
-			for (Node feature : features) {
-				final Literal literal = (Literal) feature;
-				Bookkeeping expl = new Bookkeeping(literal.var, -1, null, null, false);
-				valueMap.put(literal.var, expl);
-			}
-		}
-	}
-	
-	private void setTruthValPrevDead(ArrayList<Literal> literals) {
-		for (Literal l : literals) {
-			valueMap.get(l.var).value = 0;
-		}
 	}
 	
 	/**

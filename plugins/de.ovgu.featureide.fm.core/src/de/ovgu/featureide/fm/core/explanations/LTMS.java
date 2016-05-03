@@ -48,7 +48,12 @@ public class LTMS {
 	private ArrayList<Literal> featFromRedConstr = null;
 	private boolean explRed = false;
 	private Node openclause = null;
+	private Literal deadFeature; // the dead feature to explain
+	private Literal condDead; //antecedent which appears in list with different signs, needed to detect cond. dead features 
+	private Node[] cnfclauses; 
 	private boolean conditional;
+	ArrayList<Literal> preDead = new ArrayList<Literal>(); // previously dead features, needed to detect cond. dead features
+
 
 	/**
 	 * Constructor is used if redundant constraints are explained.
@@ -110,12 +115,20 @@ public class LTMS {
 	 * @param clauses the clauses of the conjunctive normal form of the feature model
 	 * @param deadF the dead feature
 	 * @param cond true if feature might be conditionally dead, else false
+	 * @param previous Dead a list of previously dead features
 	 * @return String an explanation why the feature is dead
 	 */
-	public String explain(Node[] clauses, Literal deadF, boolean cond) {
+	public String explain(Node[] clauses, Literal deadF, boolean cond, ArrayList<Literal> previousDead) {
 		conditional = cond;
+		deadFeature = deadF;
+		cnfclauses = clauses;
+		preDead = previousDead;
 		reason = "";
-		// if we are here, propagated values via BCP lead to a false clause
+
+		setTruthValToUnknown(clauses);
+		if (condDead != null) {
+		valueMap.get(condDead.var).value = 0;
+		}
 		if (!set(deadF, false, clauses) || !BCP(clauses)) {
 			return reason;
 		}
@@ -251,7 +264,7 @@ public class LTMS {
 					continue;
 				}
 			} else {
-				if (!hasNegTerm2(!negated, literal, cnfclause)) { //if true is returned, unit-open is checked and then violation
+				if (!hasNegTermDeadF(!negated, literal, cnfclause)) { //if true is returned, unit-open is checked and then violation
 					continue; 
 				}
 			}
@@ -338,7 +351,7 @@ public class LTMS {
 		ArrayList<Literal> literals = getLiterals(node);
 		for (Literal lit : literals) {
 
-			if (neg && !lit.positive && lit.var.toString().equals(l.var.toString())) { //guidsl compares id's of literals, not working for featureIDE
+			if (neg && !lit.positive && lit.var.toString().equals(l.var.toString())) { //guidsl compares id's of literals with same name, not working for featureIDE
 				return true;
 			}
 
@@ -351,15 +364,14 @@ public class LTMS {
 	}
 
 	/**
-	 * Checks if a clause contains a not-literal while it's not contained in the stack for unit open clauses
-	 * for explaining dead features.
+	 * Checks if a clause contains a not-literal for explaining dead features. 
 	 * 
 	 * @param neg representation of the opposite sign of a literal
 	 * @param l the literal
 	 * @param node a clause which may contain a not-literal
 	 * @return true, if a clause contains not-literal. Else, return false
 	 */
-	private boolean hasNegTerm2(boolean neg, Literal l, Node node) {
+	private boolean hasNegTermDeadF(boolean neg, Literal l, Node node) {
 		ArrayList<Literal> literals = getLiterals(node);
 		for (Literal lit : literals) {
 
@@ -367,13 +379,18 @@ public class LTMS {
 				return true;
 			}
 
-			if (conditional == false) {
+			/*
+			 * Dead features can either be unconditionally or conditionally dead. In the first case, the 
+			 * BCP will always lead to a contradiction of the root, even if other clause are violated before.  
+			 * In the second case, BCP doesn't lead to a contradiction of the root but of other clauses.
+			 */
+			if (conditional == false) { //first case: unconditionally dead, ignore violated clauses before root 
 				if (neg || !lit.positive || !lit.var.toString().equals(l.var.toString()) || unitOpenClause.contains(node)) { //!!guidsl compares id's of literals, not working for featureIDE!!
 					continue;  
 				}
 			} 
 			
-			else { // if we are here, first try to generate explanation failed (no explanation) and we are dealing with a conditionally dead feature
+			else { // second case: conditionally dead, consider all violated clauses
 				if (neg || !lit.positive || !lit.var.toString().equals(l.var.toString())) {
 					continue;
 				}
@@ -381,7 +398,7 @@ public class LTMS {
 
 			IFeature f = FeatureUtils.getFeatureTable(model).get(l.var);
 			if (f.getStructure().isRoot()) {
-				return true; // if feature is root, return true for further analysis to check if clause [root] is violated
+				return true; // if feature is root, do further analysis to check if clause [root] is violated
 			}
 			return true;
 		}
@@ -523,6 +540,10 @@ public class LTMS {
 				tmpReason = explainValue(lit);
 				if (!reason.contains(tmpReason)) {
 					reason = reason + tmpReason;
+					// explain conditionally dead features because of previous dead features
+					if (condDead != null && preDead.contains(condDead)) {  
+						reason = reason + "and because " + condDead.var.toString() + " is dead, ";
+					}
 				}
 				return false; // inconsistency
 			}
@@ -542,17 +563,22 @@ public class LTMS {
 		allAntencedents.add(l);
 		collectAntecedents(l, allAntencedents); //collect all variables together that contribute to this variable's value
 		String result = "";
+		
+		//check if feature is conditionally dead because of a previously dead feature
+		if (conditional == true && condDead == null) { 
+			condDead = getCondDead(allAntencedents); // might be a previously dead feature
+			if (condDead != null && preDead.contains(condDead)) { 
+				String tmp = explain(cnfclauses, deadFeature, true, preDead);
+				return tmp;
+			}
+		}
 		for (Literal v : allAntencedents) { // explain every collected antecedent
-
 			if (explRed == true) {
-
-				//_______Special case to explain redundant transitive constraints up__________
 
 				/*
 				 * To explain transitive constraints in up direction, the very first antecedent-literal has an incorrect 
 				 * feature attribute (DOWN), because it is explained from the last unit-open clause. In its respective "reason" stored in valueMap,
 				 * the feature attribute is correctly UP. Therefore, the antecedent-literal is replaced by the literal from valueMap. 
-				 * This workaround shall only add missing up-relationships if explaining transitive constraints.
 				 */
 				Node reason = valueMap.get(v.var).reason;
 				if (reason != null) {
@@ -563,7 +589,6 @@ public class LTMS {
 					}
 				}
 			}
-			//_________________________________________________________________			
 			String tmp = explainVariable(v);
 			if (!result.contains(tmp) && !reason.contains(tmp)) {
 				result += tmp;
@@ -638,5 +663,54 @@ public class LTMS {
 			s = "Constraint " + (FeatureUtils.getConstraint(model, l.getSourceIndex())).toString() + ", ";
 		}
 		return s;
+	}
+	
+	/**
+	 * Returns a literal from the list of antecedents which appears multiple times but with different signs. 
+	 * If such a literal exist, this is used as a hint to check if the dead feature in focus is 
+	 * conditionally dead because of a previously dead feature.
+	 * 
+	 * @param antecedents the list with antecedents to explain for a certain literal
+	 * @return the literal which contradicts itself by appearing multiple times but with different signs
+	 */
+	private Literal getCondDead(ArrayList<Literal> antecedents) {
+		Literal l = null;
+		for (Literal prev : antecedents) {
+			for (Literal tmp : antecedents) {
+				if (prev.var.equals(tmp.var)) {
+					if (prev.positive != tmp.positive) {
+						l = prev;
+						break;
+					}
+				}
+			}
+		}
+		return l;
+	}
+	
+	/**
+	 * Sets the truth value of every literal in the conjunctive normal form to -1 (unknown)
+	 * 
+	 * @param clausesFromCNF clauses of the conjunctive normal form
+	 */
+	private void setTruthValToUnknown(Node[] clausesFromCNF) {
+		for (int j = 0; j < clausesFromCNF.length; j++) { // for all clauses of the cnf 
+			Node clause = clausesFromCNF[j];
+
+			Node[] features = clause.getChildren();
+
+			if (features == null) {
+				final Literal literal = (Literal) clause;
+				Bookkeeping expl = new Bookkeeping(literal.var, -1, null, null, false);
+				valueMap.put(literal.var, expl);
+				continue;
+			}
+
+			for (Node feature : features) {
+				final Literal literal = (Literal) feature;
+				Bookkeeping expl = new Bookkeeping(literal.var, -1, null, null, false);
+				valueMap.put(literal.var, expl);
+			}
+		}
 	}
 }
