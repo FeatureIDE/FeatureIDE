@@ -75,7 +75,7 @@ import de.ovgu.featureide.core.fstmodel.FSTRole;
  * @author Daniel Hohmann
  */
 public class FrameworkModelBuilder {
-	
+
 	@SuppressWarnings("deprecation")
 	private static final int AST_Type = AST.JLS4;
 	private FSTModel model;

@@ -325,8 +325,8 @@ public class FrameworkComposer extends ComposerExtensionClass {
 		/** Copy plugin loader **/
 		InputStream inputStream = null;
 		try {
-			inputStream = FileLocator.openStream(FrameworkCorePlugin.getDefault().getBundle(), new org.eclipse.core.runtime.Path("resources" + FileSystems.getDefault().getSeparator()
-					+ "PluginLoader.java"), false);
+			inputStream = FileLocator.openStream(FrameworkCorePlugin.getDefault().getBundle(), new org.eclipse.core.runtime.Path("resources"
+					+ FileSystems.getDefault().getSeparator() + "PluginLoader.java"), false);
 		} catch (final IOException e) {
 			FrameworkCorePlugin.getDefault().logError(e);
 		}

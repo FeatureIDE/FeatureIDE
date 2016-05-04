@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
+
 /**
  * Auto-generated class
  * 
@@ -12,7 +13,7 @@ import java.util.Properties;
  * 
  * @author Matthias Quaas
  * @author Kai Wolf
- *
+ * 
  */
 
 public class PropertyManager {
@@ -20,8 +21,7 @@ public class PropertyManager {
 	private static final String RUNTIME_PROPERTIES = "runtime.properties";
 	private static Properties property = new Properties();
 
-	private PropertyManager() {
-	}
+	private PropertyManager() {}
 
 	static {
 		try {
@@ -36,15 +36,18 @@ public class PropertyManager {
 			e.printStackTrace();
 		}
 	}
+
 	/**
 	 * Gets value for queried property. Throws error message if it does not exists.
+	 * 
 	 * @param propertyName
-	 * @return Value of property. 
+	 * @return Value of property.
 	 */
 	public static boolean getProperty(String propertyName) {
 
 		if (property.getProperty(propertyName) == null) {
-			System.err.println("Queried Property '"+propertyName+"' does not exist!");
+			System.err.println("Queried Property '"
+				+ propertyName + "' does not exist!");
 		}
 
 		return Boolean.valueOf(property.getProperty(propertyName));

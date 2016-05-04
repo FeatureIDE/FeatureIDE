@@ -97,6 +97,10 @@ abstract class AbstractJob extends Job implements IJob {
 		return success ? Status.OK_STATUS : Status.CANCEL_STATUS;
 	}
 	
+	public Class<?> getImplementationClass() {
+		return getClass();
+	}
+	
 	/**
 	 * This method is called after {@link #work()} is finished regardless whether it succeeded or not.
 	 * The default method is empty.

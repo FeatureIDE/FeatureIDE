@@ -61,7 +61,7 @@ public class RuntimeCorePlugin extends AbstractCorePlugin {
 
 	/**
 	 * Returns the shared instance
-	 *
+	 * 
 	 * @return the shared instance
 	 */
 	public static RuntimeCorePlugin getDefault() {

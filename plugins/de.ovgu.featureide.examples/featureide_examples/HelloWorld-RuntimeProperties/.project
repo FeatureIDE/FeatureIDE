@@ -2,9 +2,10 @@
 <projectDescription>
 	<name>HelloWorld-Properties</name>
 	<comment>
-	[description]
-	Simple HelloWorld-example for Runtime variability using the .properties-file.
-	[/description]
+		[description]
+		Simple HelloWorld-example for Runtime variability using the
+		.properties-file.
+		[/description]
 	</comment>
 	<projects>
 	</projects>
