@@ -123,6 +123,7 @@ public class NewFeatureProjectWizard extends BasicNewProjectResourceWizard {
 			return false;
 		}
 		
+//		this.wizardExtension = null;
 		IConfigurationElement[] conf = Platform.getExtensionRegistry().getConfigurationElementsFor("de.ovgu.featureide.core.wizard");
 		for (IConfigurationElement c : conf) {
 			try {
@@ -135,10 +136,8 @@ public class NewFeatureProjectWizard extends BasicNewProjectResourceWizard {
 			}
 		}
 		
-		// Use default if not found
 		if (wizardExtension == null) {
-			wizardExtension = new DefaultNewFeatureProjectWizardExtension();
-			wizardExtension.setWizard(this);
+			return false;
 		} 
 		
 		if (wizardExtension.performOwnFinish()) {
