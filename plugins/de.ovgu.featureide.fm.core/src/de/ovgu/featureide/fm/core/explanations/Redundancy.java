@@ -159,7 +159,7 @@ public class Redundancy {
 	 * @return a list which contains a mapping between a variable and its value assignment
 	 */
 	private ArrayList<HashMap<Object, Integer>> getInitialValues(int n, Node cnf, ArrayList<Literal> literals) {
-		HashMap<Object, Integer> valueMap = new HashMap<Object, Integer>();
+		HashMap<Object, Integer> map = new HashMap<Object, Integer>();
 		ArrayList<HashMap<Object, Integer>> res = new ArrayList<HashMap<Object, Integer>>();
 
 		for (int i = 0; i != (1 << n); i++) {
@@ -171,7 +171,7 @@ public class Redundancy {
 			for (int k = 0; k < n; k++) { // literals
 				int val = Character.getNumericValue(binaryRep.charAt(k));
 				Literal lit = literals.get(k);
-				valueMap.put(lit.var, val);
+				map.put(lit.var, val);
 				continue;
 			} // here, all literals have their value according to a row in a truth table
 
@@ -179,14 +179,14 @@ public class Redundancy {
 			if (clauses != null) {
 				for (int l = 0; l < clauses.length; l++) {
 					Node clause = clauses[l];
-					if (isFalseClause(clause, valueMap)) { // check if every literal in clause is false
-						res.add(valueMap);
-						valueMap = new HashMap<Object, Integer>();
+					if (isFalseClause(clause, map)) { // check if every literal in clause is false
+						res.add(map);
+						map = new HashMap<Object, Integer>();
 						break; // if one clause is false, cnf is false
 					}
 				}
 			} else if (n == 1) { // special case: explain constraint redundant which contains only one literal
-				res.add(valueMap);
+				res.add(map);
 				break;
 			}
 		}

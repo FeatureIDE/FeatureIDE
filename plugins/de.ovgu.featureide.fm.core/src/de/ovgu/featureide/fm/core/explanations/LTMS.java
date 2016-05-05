@@ -378,27 +378,20 @@ public class LTMS {
 			if (neg && !lit.positive && lit.var.toString().equals(l.var.toString())) { //!!guidsl compares id's of literals, not working for featureIDE!!
 				return true;
 			}
-
 			/*
 			 * Dead features can either be unconditionally or conditionally dead. In the first case, the 
-			 * BCP will always lead to a contradiction of the root, even if other clause are violated before.  
-			 * In the second case, BCP doesn't lead to a contradiction of the root but of other clauses.
+			 * BCP will always lead to a violation of the root, even if former unit-open clauses inside the stack are violated.  
+			 * In the second case, BCP doesn't lead to a violation of the root but of former unit-open clauses.
 			 */
-			if (conditional == false) { //first case: unconditionally dead, ignore violated clauses before root 
+			if (conditional == false) { //first case: unconditionally dead, ignore clauses in stack so only root gets violated 
 				if (neg || !lit.positive || !lit.var.toString().equals(l.var.toString()) || unitOpenClause.contains(node)) { //!!guidsl compares id's of literals, not working for featureIDE!!
 					continue;  
 				}
 			} 
-			
 			else { // second case: conditionally dead, consider all violated clauses
 				if (neg || !lit.positive || !lit.var.toString().equals(l.var.toString())) {
 					continue;
 				}
-			}
-
-			IFeature f = FeatureUtils.getFeatureTable(model).get(l.var);
-			if (f.getStructure().isRoot()) {
-				return true; // if feature is root, do further analysis to check if clause [root] is violated
 			}
 			return true;
 		}
