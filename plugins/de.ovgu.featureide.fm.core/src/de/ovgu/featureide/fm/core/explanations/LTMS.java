@@ -50,10 +50,9 @@ public class LTMS {
 	private Node openclause = null;
 	private Literal deadFeature; // the dead feature to explain
 	private Literal condDead; //antecedent which appears in list with different signs, needed to detect cond. dead features 
-	private Node[] cnfclauses; 
+	private Node[] cnfclauses;
 	private boolean conditional;
 	ArrayList<Literal> preDead = new ArrayList<Literal>(); // previously dead features, needed to detect cond. dead features
-
 
 	/**
 	 * Constructor is used if redundant constraints are explained.
@@ -127,7 +126,7 @@ public class LTMS {
 
 		setTruthValToUnknown(clauses);
 		if (condDead != null) {
-		valueMap.get(condDead.var).value = 0;
+			valueMap.get(condDead.var).value = 0;
 		}
 		if (!set(deadF, false, clauses) || !BCP(clauses)) {
 			return reason;
@@ -247,27 +246,22 @@ public class LTMS {
 			valueMap.get(literal.var).value = 0;
 		}
 
-	/*	if (conditional == true) {
-			IFeature f = FeatureUtils.getFeatureTable(model).get(literal.var);
-			// if mandatory feature is set to "false" while antecedents from same clause are dead except for the dead feature to explain, the feature is cond.dead 
-			if (valueMap.get(literal.var).value == 0 && FeatureUtils.isMandatory(f)) {
-				setViolatedClause(openclause);
-				reason = "conditionally dead by ";
-				return false;
-			}
-		}*/
+		/*	if (conditional == true) {
+				IFeature f = FeatureUtils.getFeatureTable(model).get(literal.var);
+				// if mandatory feature is set to "false" while antecedents from same clause are dead except for the dead feature to explain, the feature is cond.dead 
+				if (valueMap.get(literal.var).value == 0 && FeatureUtils.isMandatory(f)) {
+					setViolatedClause(openclause);
+					reason = "conditionally dead by ";
+					return false;
+				}
+			}*/
 
 		// for each clause in all clauses of the cnf that contains not this-literal
 		for (Node cnfclause : allClauses) {
-			if (explRed == true) {
 				if (!hasNegTerm(!negated, literal, cnfclause)) { //if true is returned, unit-open is checked and then violation
 					continue;
 				}
-			} else {
-				if (!hasNegTermDeadF(!negated, literal, cnfclause)) { //if true is returned, unit-open is checked and then violation
-					continue; 
-				}
-			}
+
 			// if we are here, we may have found a unit open clause
 			if (isUnitOpen(cnfclause) != null) {
 				unitOpenClause.push(cnfclause);
@@ -354,38 +348,14 @@ public class LTMS {
 			if (neg && !lit.positive && lit.var.toString().equals(l.var.toString())) { //guidsl compares id's of literals with same name, not working for featureIDE
 				return true;
 			}
-
-			if (neg || !lit.positive || !lit.var.toString().equals(l.var.toString())) {
-				continue;
-			}
-			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * Checks if a clause contains a not-literal for explaining dead features. 
-	 * 
-	 * @param neg representation of the opposite sign of a literal
-	 * @param l the literal
-	 * @param node a clause which may contain a not-literal
-	 * @return true, if a clause contains not-literal. Else, return false
-	 */
-	private boolean hasNegTermDeadF(boolean neg, Literal l, Node node) {
-		ArrayList<Literal> literals = getLiterals(node);
-		for (Literal lit : literals) {
-
-			if (neg && !lit.positive && lit.var.toString().equals(l.var.toString())) { //!!guidsl compares id's of literals, not working for featureIDE!!
-				return true;
-			}
 			/*
 			 * Dead features can either be unconditionally or conditionally dead. In the first case, the 
 			 * BCP will always lead to a violation of the root, even if former unit-open clauses inside the stack are violated.  
 			 * In the second case, BCP doesn't lead to a violation of the root but of former unit-open clauses.
 			 */
-			if (conditional == false) { //first case: unconditionally dead, ignore clauses in stack so only root gets violated 
+			if (conditional == false && explRed == false) { //first case: unconditionally dead, ignore violated clauses in stack so only root gets violated 
 				if (neg || !lit.positive || !lit.var.toString().equals(l.var.toString()) || unitOpenClause.contains(node)) { //!!guidsl compares id's of literals, not working for featureIDE!!
-					continue;  
+					continue;
 				}
 			} 
 			else { // second case: conditionally dead, consider all violated clauses
@@ -498,7 +468,7 @@ public class LTMS {
 		String tmpReason = "";
 		while (!unitOpenClause.empty()) {
 			openclause = unitOpenClause.pop();
-			Literal l = isUnitOpen(openclause); 
+			Literal l = isUnitOpen(openclause);
 			if (l == null) {
 				continue;
 			}
@@ -534,7 +504,7 @@ public class LTMS {
 				if (!reason.contains(tmpReason)) {
 					reason = reason + tmpReason;
 					// explain conditionally dead features because of previous dead features
-					if (condDead != null && preDead.contains(condDead)) {  
+					if (condDead != null && preDead.contains(condDead)) {
 						reason = reason + "and because " + condDead.var.toString() + " is dead, ";
 					}
 				}
@@ -556,11 +526,11 @@ public class LTMS {
 		allAntencedents.add(l);
 		collectAntecedents(l, allAntencedents); //collect all variables together that contribute to this variable's value
 		String result = "";
-		
+
 		//check if feature is conditionally dead because of a previously dead feature
-		if (conditional == true && condDead == null) { 
+		if (conditional == true && condDead == null) {
 			condDead = getCondDead(allAntencedents); // might be a previously dead feature
-			if (condDead != null && preDead.contains(condDead)) { 
+			if (condDead != null && preDead.contains(condDead)) {
 				String tmp = explain(cnfclauses, deadFeature, true, preDead);
 				return tmp;
 			}
@@ -657,10 +627,10 @@ public class LTMS {
 		}
 		return s;
 	}
-	
+
 	/**
-	 * Returns a literal from the list of antecedents which appears multiple times but with different signs. 
-	 * If such a literal exist, this is used as a hint to check if the dead feature in focus is 
+	 * Returns a literal from the list of antecedents which appears multiple times but with different signs.
+	 * If such a literal exist, this is used as a hint to check if the dead feature in focus is
 	 * conditionally dead because of a previously dead feature.
 	 * 
 	 * @param antecedents the list with antecedents to explain for a certain literal
@@ -680,7 +650,7 @@ public class LTMS {
 		}
 		return l;
 	}
-	
+
 	/**
 	 * Sets the truth value of every literal in the conjunctive normal form to -1 (unknown)
 	 * 
