@@ -60,7 +60,7 @@ public class Redundancy {
 		setNewModel(newModel);
 		featRedundantConstr = getLiterals(redundantConstraint.getNode());
 		featRedundantConstr = new ArrayList<Literal>(new LinkedHashSet<Literal>(featRedundantConstr)); // remove duplicates from list
-		reason = "Constraint is redundant, because: ";
+		reason = "Constraint is redundant, because: \n\n";
 		Node node = NodeCreator.createNodes(oldModel, true).toCNF(); // if createNodes(..,true), don't ignore abstract features
 		Node redundantConstr = redundantConstraint.getNode().toCNF();
 		ArrayList<HashMap<Object, Integer>> values = getInitialValues(featRedundantConstr.size(), redundantConstr, featRedundantConstr); // arraylist of hashmaps with values for false cnf
@@ -80,7 +80,12 @@ public class Redundancy {
 				reason += tmpReason;
 			}
 		}
-		reason = reason.substring(0, reason.length() - 2);
+		int length = reason.length();
+		int lenght3 = reason.lastIndexOf(",");
+		System.out.println(lenght3);
+		System.out.println(length);
+		
+		reason = reason.substring(0, reason.length() - 4);
 		return reason;
 	}
 

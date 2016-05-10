@@ -94,7 +94,7 @@ public class LTMS {
 			for (Literal l : literalList) {
 				String tmpReason = explainVariable(l);
 				if (!reason.contains(tmpReason)) {
-					reason = reason + tmpReason;
+					reason = reason + tmpReason + "\n";
 				}
 			}
 			return reason;
@@ -486,7 +486,7 @@ public class LTMS {
 				for (Literal lit : explLitViolatedClause) {
 					tmpReason = explainVariable(lit);
 					if (!reason.contains(tmpReason)) {
-						reason = reason + tmpReason;
+						reason = reason + tmpReason + "\n";
 					}
 				}
 			}
@@ -495,14 +495,14 @@ public class LTMS {
 				if (explLitReason.size() == 1) {//if only 1 element in list
 					tmpReason = explainValue(lit);
 					if (!reason.contains(tmpReason)) {
-						reason = reason + tmpReason;
+						reason = reason + tmpReason + "\n";
 					}
 					return false; // inconsistency
 				}
 
 				tmpReason = explainValue(lit);
 				if (!reason.contains(tmpReason)) {
-					reason = reason + tmpReason;
+					reason = reason + tmpReason + "\n";
 					// explain conditionally dead features because of previous dead features
 					if (condDead != null && preDead.contains(condDead)) {
 						reason = reason + "and because " + condDead.var.toString() + " is dead, ";
@@ -548,13 +548,13 @@ public class LTMS {
 					Literal litFromMap = getLiteralFromMap(reason, v);
 					String tmp = explainVariable(litFromMap);
 					if (!result.contains(tmp)) {
-						result += tmp;
+						result += tmp + "\n";
 					}
 				}
 			}
 			String tmp = explainVariable(v);
 			if (!result.contains(tmp) && !reason.contains(tmp)) {
-				result += tmp;
+				result += tmp + "\n";
 			}
 		}
 		return result;
