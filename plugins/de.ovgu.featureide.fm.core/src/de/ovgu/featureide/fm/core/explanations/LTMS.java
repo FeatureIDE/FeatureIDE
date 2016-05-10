@@ -49,9 +49,9 @@ public class LTMS {
 	private boolean explRed = false;
 	private Node openclause = null;
 	private Literal deadFeature; // the dead feature to explain
-	private Literal condDead; //antecedent which appears in list with different signs, needed to detect cond. dead features 
+	//	private Literal condDead; //antecedent which appears in list with different signs, needed to detect cond. dead features 
 	private Node[] cnfclauses;
-	private boolean conditional;
+	private boolean considerUsedClauses;
 	ArrayList<Literal> preDead = new ArrayList<Literal>(); // previously dead features, needed to detect cond. dead features
 
 	/**
@@ -117,17 +117,13 @@ public class LTMS {
 	 * @param previous Dead a list of previously dead features
 	 * @return String an explanation why the feature is dead
 	 */
-	public String explain(Node[] clauses, Literal deadF, boolean cond, ArrayList<Literal> previousDead) {
-		conditional = cond;
+	public String explain(Node[] clauses, Literal deadF, boolean considerUsedClauses) {
+		considerUsedClauses = considerUsedClauses;
 		deadFeature = deadF;
 		cnfclauses = clauses;
-		preDead = previousDead;
 		reason = "";
 
 		setTruthValToUnknown(clauses);
-		if (condDead != null) {
-			valueMap.get(condDead.var).value = 0;
-		}
 		if (!set(deadF, false, clauses) || !BCP(clauses)) {
 			return reason;
 		}
@@ -246,21 +242,11 @@ public class LTMS {
 			valueMap.get(literal.var).value = 0;
 		}
 
-		/*	if (conditional == true) {
-				IFeature f = FeatureUtils.getFeatureTable(model).get(literal.var);
-				// if mandatory feature is set to "false" while antecedents from same clause are dead except for the dead feature to explain, the feature is cond.dead 
-				if (valueMap.get(literal.var).value == 0 && FeatureUtils.isMandatory(f)) {
-					setViolatedClause(openclause);
-					reason = "conditionally dead by ";
-					return false;
-				}
-			}*/
-
 		// for each clause in all clauses of the cnf that contains not this-literal
 		for (Node cnfclause : allClauses) {
-				if (!hasNegTerm(!negated, literal, cnfclause)) { //if true is returned, unit-open is checked and then violation
-					continue;
-				}
+			if (!hasNegTerm(!negated, literal, cnfclause)) { //if true is returned, unit-open is checked and then violation
+				continue;
+			}
 
 			// if we are here, we may have found a unit open clause
 			if (isUnitOpen(cnfclause) != null) {
@@ -348,17 +334,14 @@ public class LTMS {
 			if (neg && !lit.positive && lit.var.toString().equals(l.var.toString())) { //guidsl compares id's of literals with same name, not working for featureIDE
 				return true;
 			}
-			/*
-			 * Dead features can either be unconditionally or conditionally dead. In the first case, the 
-			 * BCP will always lead to a violation of the root, even if former unit-open clauses inside the stack are violated.  
-			 * In the second case, BCP doesn't lead to a violation of the root but of former unit-open clauses.
-			 */
-			if (conditional == false && explRed == false) { //first case: unconditionally dead, ignore violated clauses in stack so only root gets violated 
+			
+			// By ignoring violations of clauses inside the stack ("used clauses"), we try to find shorter explanations 
+			// explanations are generated the first time without considering used clauses for violation, the second time with considering used clauses.
+			if (considerUsedClauses == false && explRed == false) { 
 				if (neg || !lit.positive || !lit.var.toString().equals(l.var.toString()) || unitOpenClause.contains(node)) { //!!guidsl compares id's of literals, not working for featureIDE!!
 					continue;
 				}
-			} 
-			else { // second case: conditionally dead, consider all violated clauses
+			} else { 
 				if (neg || !lit.positive || !lit.var.toString().equals(l.var.toString())) {
 					continue;
 				}
@@ -503,10 +486,6 @@ public class LTMS {
 				tmpReason = explainValue(lit);
 				if (!reason.contains(tmpReason)) {
 					reason = reason + tmpReason + "\n";
-					// explain conditionally dead features because of previous dead features
-					if (condDead != null && preDead.contains(condDead)) {
-						reason = reason + "and because " + condDead.var.toString() + " is dead, ";
-					}
 				}
 				return false; // inconsistency
 			}
@@ -527,22 +506,10 @@ public class LTMS {
 		collectAntecedents(l, allAntencedents); //collect all variables together that contribute to this variable's value
 		String result = "";
 
-		//check if feature is conditionally dead because of a previously dead feature
-		if (conditional == true && condDead == null) {
-			condDead = getCondDead(allAntencedents); // might be a previously dead feature
-			if (condDead != null && preDead.contains(condDead)) {
-				String tmp = explain(cnfclauses, deadFeature, true, preDead);
-				return tmp;
-			}
-		}
 		for (Literal v : allAntencedents) { // explain every collected antecedent
 			if (explRed == true) {
-
-				/*
-				 * To explain transitive constraints in up direction, the very first antecedent-literal has an incorrect 
-				 * feature attribute (DOWN), because it is explained from the last unit-open clause. In its respective "reason" stored in valueMap,
-				 * the feature attribute is correctly UP. Therefore, the antecedent-literal is replaced by the literal from valueMap. 
-				 */
+				
+				// explain every antecedent from its unit open clause while setting its value
 				Node reason = valueMap.get(v.var).reason;
 				if (reason != null) {
 					Literal litFromMap = getLiteralFromMap(reason, v);
@@ -628,28 +595,6 @@ public class LTMS {
 		return s;
 	}
 
-	/**
-	 * Returns a literal from the list of antecedents which appears multiple times but with different signs.
-	 * If such a literal exist, this is used as a hint to check if the dead feature in focus is
-	 * conditionally dead because of a previously dead feature.
-	 * 
-	 * @param antecedents the list with antecedents to explain for a certain literal
-	 * @return the literal which contradicts itself by appearing multiple times but with different signs
-	 */
-	private Literal getCondDead(ArrayList<Literal> antecedents) {
-		Literal l = null;
-		for (Literal prev : antecedents) {
-			for (Literal tmp : antecedents) {
-				if (prev.var.equals(tmp.var)) {
-					if (prev.positive != tmp.positive) {
-						l = prev;
-						break;
-					}
-				}
-			}
-		}
-		return l;
-	}
 
 	/**
 	 * Sets the truth value of every literal in the conjunctive normal form to -1 (unknown)

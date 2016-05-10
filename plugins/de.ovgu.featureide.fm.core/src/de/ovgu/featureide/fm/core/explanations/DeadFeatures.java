@@ -42,6 +42,8 @@ public class DeadFeatures {
 
 	private HashMap<Object, Bookkeeping> valueMap = new HashMap<Object, Bookkeeping>(); //hashmap for bookkeeping of reasons and antecedents for literals 
 	private String reason = "";
+	private String tmpReason = "";
+	private String tmpReason2 = "";
 	private static IFeatureModel model; // the model with constraint which makes a feature dead
 	private Node constr; // constraint node which makes a feature dead
 
@@ -58,33 +60,46 @@ public class DeadFeatures {
 		setNewModel(newModel);
 		constr = c.getNode();
 		
-		ArrayList<Literal> prevDeadFeatures = new ArrayList<Literal>(); 
 		Node node = NodeCreator.createNodes(model, true).toCNF();
 		Node[] clauses = node.getChildren();
 
 		for (IFeature deadFeature : deadFeatures) { 
+			tmpReason = "";
+			tmpReason2 = "";
 			Literal deadF = getLiteralFromNode(constr, deadFeature);
-			
 			if (deadF == null) { // possible that constraint does not contain the dead feature. Instantiate the dead literal
 				deadF = new Literal(deadFeature.getName());
 			}	
 			LTMS ltms = new LTMS(model, valueMap);
-			String tmpReason = ltms.explain(clauses, deadF, false, prevDeadFeatures);
 			
-			if (tmpReason.isEmpty()) { // if reason for dead feature is empty after first run, feature is conditionally dead
-				tmpReason = ltms.explain(clauses, deadF, true, prevDeadFeatures);
-				reason += "Feature " + deadF + " is conditionally dead, because: ";
+			// generate explanation which stops after first violation with "used" clauses in stack
+			String withoutUsedClauses = ltms.explain(clauses, deadF, false);
+			if (withoutUsedClauses.isEmpty()) {
+			tmpReason += "";
 			}
-			else {
-			reason += "Feature " + deadF + " is dead, because: ";
+			else if (!tmpReason.contains(withoutUsedClauses)) {
+				tmpReason = "Feature " + deadF + " is dead, because: \n";
+				tmpReason += withoutUsedClauses;
+				tmpReason = tmpReason.substring(0, tmpReason.length() - 4);
 			}
-			if (!reason.contains(tmpReason)) {
-				reason += tmpReason;
+			
+			// generate explanation which searches for violations with new clauses not in stack
+			String withUsedClauses = ltms.explain(clauses, deadF, true);
+			tmpReason2 = "Feature " + deadF + " is dead, because: \n";
+			if (!tmpReason2.contains(withUsedClauses)) {
+				tmpReason2 += withUsedClauses;
 			}
-			reason = reason.substring(0, reason.length() - 2) + "\n";
-			prevDeadFeatures.add(deadF);
+			tmpReason2 = tmpReason2.substring(0, tmpReason2.length() - 4);
+			
+			// return shortest explanation
+			if (tmpReason.length() < tmpReason2.length() && !tmpReason.isEmpty()) {
+				reason += tmpReason +"\n\n";
+			} else {
+				reason += tmpReason2 +"\n\n";
+			}
 		}
 		return reason;
+
 	}
 
 	/**
