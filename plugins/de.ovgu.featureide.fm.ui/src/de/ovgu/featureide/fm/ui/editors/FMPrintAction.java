@@ -28,6 +28,7 @@ import org.eclipse.gef.ui.actions.PrintAction;
 import org.eclipse.ui.IWorkbenchPart;
 
 import de.ovgu.featureide.fm.ui.editors.featuremodel.layouts.FeatureModelLayout;
+import de.ovgu.featureide.fm.ui.properties.FMPropertyManager;
 
 /**
  * A PrintAction for the FeatureModelEditor that temporarily moves the
@@ -94,7 +95,10 @@ public class FMPrintAction extends PrintAction {
 	private void moveLegend(IGraphicalFeatureModel featureModel, FeatureModelLayout layout, Point minP) {
 		Point legendPos = layout.getLegendPos();
 		Point newLegendPos = new Point(legendPos.x - minP.x, legendPos.y - minP.y);
-		FeatureUIHelper.getLegendFigure(featureModel).setLocation(newLegendPos);
+		
+		if (!FMPropertyManager.isLegendHidden()) {
+			FeatureUIHelper.getLegendFigure(featureModel).setLocation(newLegendPos);
+		}
 		layout.setLegendPos(newLegendPos.x, newLegendPos.y);
 	}
 
