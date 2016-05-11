@@ -45,6 +45,7 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.explanations.DeadFeatures;
+import de.ovgu.featureide.fm.core.explanations.FalseOptional;
 import de.ovgu.featureide.fm.core.explanations.Redundancy;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
@@ -175,7 +176,9 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 			setToolTip(new Label(toolTip.toString()));
 		}
 
-		if (!Functional.isEmpty(constraint.getFalseOptional())) {
+	//	if (!Functional.isEmpty(constraint.getFalseOptional())) {
+		if (!constraint.getFalseOptional().isEmpty()) {
+
 			if (constraint.getDeadFeatures().isEmpty()) {
 				setBackgroundColor(FMPropertyManager.getWarningColor());
 			} else {
@@ -193,6 +196,10 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 				toolTip.append("\n   ");
 				toolTip.append(feature);
 			}
+			// set tooltip with explanation for false optional features
+			IFeatureModel model = FalseOptional.getNewModel();
+			int constraintIndex = FeatureUtils.getConstraintIndex(model, constraint);
+			toolTip.append("\n\n" + FeatureModelAnalyzer.falseOptExpl.get(constraintIndex));
 			setToolTip(new Label(toolTip.toString()));
 			return;
 		}

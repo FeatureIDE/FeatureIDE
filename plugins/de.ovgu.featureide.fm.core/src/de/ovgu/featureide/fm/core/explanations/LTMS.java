@@ -51,7 +51,6 @@ public class LTMS {
 	private Literal deadFeature; // the dead feature to explain
 	//	private Literal condDead; //antecedent which appears in list with different signs, needed to detect cond. dead features 
 	private Node[] cnfclauses;
-	private boolean considerUsedClauses;
 	ArrayList<Literal> preDead = new ArrayList<Literal>(); // previously dead features, needed to detect cond. dead features
 
 	/**
@@ -85,7 +84,7 @@ public class LTMS {
 	 * @param clauses the clauses of the conjunctive normal form of the feature model
 	 * @return String an explanation for the redundant constraint
 	 */
-	public String explain(Node[] clauses) {
+	public String explainRedundant(Node[] clauses) {
 		explRed = true;
 		reason = "";
 		if (isViolated(clauses)) { // true, if initial truth values lead to a false clause -> explain immediately
@@ -94,7 +93,7 @@ public class LTMS {
 			for (Literal l : literalList) {
 				String tmpReason = explainVariable(l);
 				if (!reason.contains(tmpReason)) {
-					reason = reason + tmpReason + "\n";
+					reason = reason + tmpReason + "\n\n";
 				}
 			}
 			return reason;
@@ -109,16 +108,14 @@ public class LTMS {
 	}
 
 	/**
-	 * Explains why a feature is dead. As soon as ROOT is set to false, an explanation is generated.
+	 * Explains why a feature is dead. As soon as a violation in any clause occurs, an explanation is generated.
 	 * 
 	 * @param clauses the clauses of the conjunctive normal form of the feature model
 	 * @param deadF the dead feature
 	 * @param cond true if feature might be conditionally dead, else false
-	 * @param previous Dead a list of previously dead features
 	 * @return String an explanation why the feature is dead
 	 */
-	public String explain(Node[] clauses, Literal deadF, boolean considerUsedClauses) {
-		considerUsedClauses = considerUsedClauses;
+	public String explainDead(Node[] clauses, Literal deadF) {
 		deadFeature = deadF;
 		cnfclauses = clauses;
 		reason = "";
@@ -129,24 +126,30 @@ public class LTMS {
 		}
 		return reason;
 	}
-
+	
 	/**
-	 * Removes clauses which are added in Node Creator while eliminateAbstractVariables().
-	 * Such clauses are of the form True & -False & (A|B|C|True) and can be removed because
-	 * they are true and don't change the semantic of a formula.
+	 * Explains why a feature if false optional. Sets value assignment of false-optional feature to false and propagate this value
+	 * until a violation in any occurs. 
 	 * 
-	 * @param node the formula node to remove true clauses from
-	 * @return formula node without true clauses
-	 * 
-	 *         private Node eliminateTrueClauses(Node node) {
-	 * 
-	 *         LinkedList<Node> updatedNodes = new LinkedList<Node>();
-	 *         for (Node child : node.getChildren())
-	 *         if (!child.toString().contains("True") && !child.toString().contains("False"))
-	 *         updatedNodes.add(child);
-	 *         return updatedNodes.isEmpty() ? null : new And(updatedNodes);
-	 *         }
+	 * @param clauses the clauses of the conjunctive normal form of the feature model
+	 * @param falseoptional the literal-feature which is false-optional
+	 * @return String an explanation why the feature is false-optional
 	 */
+	public String explainFalseOps(Node[] clauses, Literal falseoptional) {
+		ArrayList<Literal> falsopts = new ArrayList<Literal>();
+		falsopts.add(falseoptional);
+		cnfclauses = clauses;
+		reason = "";
+
+		setTruthValToUnknown(clauses);
+		valueMap.get(falseoptional.var).value = 0;
+		setFirstOpenClauses(falsopts, clauses);
+		if (!BCP(clauses)) { // true, if violation occured during BCP
+			return reason;
+		}
+		return reason;
+	}
+
 
 	/**
 	 * Returns a list which contains the literals of a given node.
@@ -335,17 +338,9 @@ public class LTMS {
 				return true;
 			}
 			
-			// By ignoring violations of clauses inside the stack ("used clauses"), we try to find shorter explanations 
-			// explanations are generated the first time without considering used clauses for violation, the second time with considering used clauses.
-			if (considerUsedClauses == false && explRed == false) { 
-				if (neg || !lit.positive || !lit.var.toString().equals(l.var.toString()) || unitOpenClause.contains(node)) { //!!guidsl compares id's of literals, not working for featureIDE!!
+				if (neg || !lit.positive || !lit.var.toString().equals(l.var.toString())){ //!!guidsl compares id's of literals, not working for featureIDE!!
 					continue;
 				}
-			} else { 
-				if (neg || !lit.positive || !lit.var.toString().equals(l.var.toString())) {
-					continue;
-				}
-			}
 			return true;
 		}
 		return false;
@@ -585,7 +580,7 @@ public class LTMS {
 		}
 		//if attribute is root, print "ROOT" as explanation only
 		if (l.getSourceAttribute() == Literal.FeatureAttribute.Root) {
-			s = "ROOT " + l.var.toString() + " = TRUE, ";
+			s = "ROOT " + l.var.toString();
 		}
 
 		// if attribute is CONSTRAINT, print origin constraint as explanation only

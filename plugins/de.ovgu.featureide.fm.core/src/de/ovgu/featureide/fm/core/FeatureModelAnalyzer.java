@@ -65,6 +65,7 @@ import de.ovgu.featureide.fm.core.editing.Comparison;
 import de.ovgu.featureide.fm.core.editing.ModelComparator;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 import de.ovgu.featureide.fm.core.explanations.DeadFeatures;
+import de.ovgu.featureide.fm.core.explanations.FalseOptional;
 import de.ovgu.featureide.fm.core.explanations.Redundancy;
 import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.core.functional.Functional.IFunction;
@@ -107,6 +108,10 @@ public class FeatureModelAnalyzer {
 	
 	//for tooltip: remember explanation for constraint which leads to dead feature. Key = constraintIndex, Value = explanation
 	public static HashMap<Integer, String> deadFExpl = new HashMap<Integer, String>(); 
+	
+	//for tooltip: remember explanation for constraint which leads to false optional feature. Key = constraintIndex, Value = explanation
+	// TODO: try to use one hashmap for explanations
+	public static HashMap<Integer, String> falseOptExpl = new HashMap<Integer, String>(); 
 	
 	/**
 	 * Defines whether features should be included into calculations.
@@ -586,6 +591,7 @@ public class FeatureModelAnalyzer {
 	
 		Collection<IFeature> fmDeadFeatures = new ArrayList<>(getCachedDeadFeatures());
 		Collection<IFeature> fmFalseOptionals = getCachedFalseOptionalFeatures();
+		
 		try {
 			if (!cachedValidity) { 
 				// case: invalid model
@@ -706,9 +712,18 @@ public class FeatureModelAnalyzer {
 				// changedAttributes in order to refresh graphics later
 				if (fmFalseOptionals.isEmpty()) {
 					constraint.getFalseOptional().clear();
-				} else if (constraint.setFalseOptionalFeatures(clone, fmFalseOptionals)) {
+				} else { 
+					
+					FalseOptional falseOptionalF = new FalseOptional();
+					int constrInd = FeatureUtils.getConstraintIndex(clone, constraint);
+					String expl = falseOptionalF.explainFalseOptionalFeature(clone, fmFalseOptionals);
+					falseOptExpl.put(constrInd, expl);
+					
+					if (constraint.setFalseOptionalFeatures(clone, fmFalseOptionals)) {
+					
 					constraint.setConstraintAttribute(ConstraintAttribute.FALSE_OPTIONAL, false);
 					changedAttributes.put(constraint, ConstraintAttribute.FALSE_OPTIONAL);
+					}
 				}
 				
 				if (!fmDeadFeatures.isEmpty()) {

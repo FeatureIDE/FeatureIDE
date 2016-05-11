@@ -22,91 +22,73 @@ package de.ovgu.featureide.fm.core.explanations;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 
+import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 
-import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
+
 /**
- * Generating explanations for dead features. Using logic truth maintenance system (LTMS) and
- * boolean constraint propagation (BCP). 
+ * TODO description
  * 
  * @author "Ananieva Sofia"
  */
-public class DeadFeatures {
+public class FalseOptional {
 
 	private HashMap<Object, Bookkeeping> valueMap = new HashMap<Object, Bookkeeping>(); //hashmap for bookkeeping of reasons and antecedents for literals 
 	private String reason = "";
 	private static IFeatureModel model; // the model with constraint which makes a feature dead
-	private Node constr; // constraint node which makes a feature dead
 
 	/**
-	 * Explain dead features using boolean constraint propagation. Set initial truth value assumptions of dead features to true
-	 * and propagate them until a violation in any clause occurs.
+	 * Explain false optional features using boolean constraint propagation. Set initial truth value assumptions of false optional 
+	 * features to false and propagate them until a violation in any clause occurs. 
 	 * 
-	 * @param newModel the model with the new constraint which leads to a dead feature
-	 * @param deadFeatures a list of dead features
-	 * @param c the constraint which leads to a dead feature
-	 * @return String an explanation why the feature(s) is dead
+	 * @param newModel the model with the new constraint which leads to a false optional feature
+	 * @param falsOptionals a list of false optional features
+	 * @return String an explanation why the feature(s) is false optional
 	 */
-	public String explainDeadFeature(IFeatureModel newModel, Collection<IFeature> deadFeatures, IConstraint c) {
-		setNewModel(newModel);
-		constr = c.getNode();
-		
+	public String explainFalseOptionalFeature(IFeatureModel newModel, Collection<IFeature> falseOptionals) {
+		setNewModel(newModel);		
 		Node node = NodeCreator.createNodes(model, true).toCNF();
-		Node[] clauses = node.getChildren();
+		Node withoutTrueClauses = eliminateTrueClauses(node);
+		Node[] clauses = withoutTrueClauses.getChildren();
 
-		for (IFeature deadFeature : deadFeatures) { 
-			Literal deadF = getLiteralFromNode(constr, deadFeature);
-			if (deadF == null) { // possible that constraint does not contain the dead feature. Instantiate the dead literal
-				deadF = new Literal(deadFeature.getName());
-			}	
+		for (IFeature falsopt : falseOptionals) { 
+
+			Literal falseOptional = new Literal(falsopt.getName());
 			LTMS ltms = new LTMS(model, valueMap);
 			
-			// generate explanation which stops after first violation with "used" clauses in stack
-			String tmpReason = "Feature " + deadF + " is dead, because: \n";
-			tmpReason += ltms.explainDead(clauses, deadF);
-		
+			String tmpReason = "Feature " + falseOptional + " is false-optional, because: \n";
+
+			tmpReason += ltms.explainFalseOps(clauses, falseOptional);			
 			if (!reason.contains(tmpReason)) {
 				reason += tmpReason;
 			}
 			reason = reason.substring(0, reason.length() - 4) + "\n\n";			
 		}
 		return reason;
-
 	}
-
+	
 	/**
-	 * Returns a literal from a node (the constraint which leads to dead feature(s)) with the same name 
-	 * as the specified feature as BCP only works with literals and not with features.
+	 * Removes clauses which are added in Node Creator while eliminateAbstractVariables().
+	 * Such clauses are of the form True & -False & (A|B|C|True) and can be removed because
+	 * they are true and don't change the semantic of a formula.
 	 * 
-	 * @param node the constraint which leads to dead feature(s)
-	 * @param l the dead feature
-	 * @return the respective literal from the constraint node which leads to the dead feature
-	 */
-	private Literal getLiteralFromNode(Node node, IFeature l) {
-		Literal res = null;
-		if (node instanceof Literal) {
-			Literal lit = (Literal) node;
-			if (lit.var.toString().equals(l.getName().toString())) {
-				res = lit;
-			}
-			return res;
-		}
-		Node[] childs = node.getChildren();
-		if (childs != null) {
-			for (Node child : childs) {
-				res = getLiteralFromNode((child), l);
-				if (res != null) {
-					return res;
-				}
-			}
-		}
-		return res;
+	 * @param node the formula node to remove true clauses from
+	 * @return formula node without true clauses
+	 */ 
+	private Node eliminateTrueClauses(Node node) {
+
+		LinkedList<Node> updatedNodes = new LinkedList<Node>();
+		for (Node child : node.getChildren())
+			if (!child.toString().contains("True") && !child.toString().contains("False"))
+				updatedNodes.add(child);
+		return updatedNodes.isEmpty() ? null : new And(updatedNodes);
 	}
 	
 	/**
@@ -128,3 +110,6 @@ public class DeadFeatures {
 	}
 
 }
+
+
+
