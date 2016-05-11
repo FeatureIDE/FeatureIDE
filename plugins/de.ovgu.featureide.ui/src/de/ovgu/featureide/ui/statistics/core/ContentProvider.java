@@ -73,6 +73,10 @@ public class ContentProvider implements ITreeContentProvider, StatisticsIds {
 		this.canceled = canceled;
 	}
 
+	public IFeatureProject getProject() {
+		return this.project;
+	}
+	
 	@Override
 	public void dispose() {
 		this.godfather = null;

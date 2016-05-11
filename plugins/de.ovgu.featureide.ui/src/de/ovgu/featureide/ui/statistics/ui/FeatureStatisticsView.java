@@ -52,6 +52,7 @@ import de.ovgu.featureide.fm.ui.editors.FeatureModelEditor;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
 import de.ovgu.featureide.ui.UIPlugin;
 import de.ovgu.featureide.ui.statistics.core.ContentProvider;
+import de.ovgu.featureide.ui.statistics.core.SnapshotExporter;
 import de.ovgu.featureide.ui.statistics.ui.helper.JobDoneListener;
 import de.ovgu.featureide.ui.statistics.ui.helper.TreeClickListener;
 import de.ovgu.featureide.ui.statistics.ui.helper.TreeLabelProvider;
@@ -107,6 +108,14 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 				FeatureStatisticsView.this.refresh(true);
 			}
 		};
+		
+		Action snapshot = new Action() {
+			public void run() {
+				SnapshotExporter snapshotExporter = new SnapshotExporter(contentProvider.godfather, 
+						contentProvider.getProject().getProject().getLocation());
+				snapshotExporter.export();
+			}
+		};
 
 		toolBarManager.add(refresher);
 		refresher.setImageDescriptor(ImageDescriptor.createFromImage(REFRESH_IMG));
@@ -115,6 +124,10 @@ public class FeatureStatisticsView extends ViewPart implements GUIDefaults {
 		toolBarManager.add(checkBoxer);
 		checkBoxer.setImageDescriptor(ImageDescriptor.createFromImage(EXPORT_IMG));
 		checkBoxer.setToolTipText("Export to *.csv");
+		
+		toolBarManager.add(snapshot);
+		snapshot.setImageDescriptor(ImageDescriptor.createFromImage(EXPORT_IMG));
+		snapshot.setToolTipText("Export to *.csv");
 	}
 
 	private IPartListener editorListener = new IPartListener() {
