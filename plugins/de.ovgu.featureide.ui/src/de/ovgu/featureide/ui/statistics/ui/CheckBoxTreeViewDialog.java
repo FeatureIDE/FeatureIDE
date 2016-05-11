@@ -94,6 +94,9 @@ public class CheckBoxTreeViewDialog extends Dialog {
 
 			@Override
 			public Object[] getElements(Object inputElement) {
+				
+				System.out.println(inputElement.toString());
+				
 				if (!(inputElement instanceof Parent)) {
 					return getChildren(godfather);
 				}

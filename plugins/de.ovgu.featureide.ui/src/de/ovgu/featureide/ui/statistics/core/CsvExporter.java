@@ -40,12 +40,14 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
@@ -82,9 +84,25 @@ public class CsvExporter {
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				visibleExpandedElements = export;				
-				FileDialog dialog = new FileDialog(shell);
-				dialog.setFilterExtensions(new String[] { "*.csv" });
+				FileDialog dialog = new FileDialog(shell, SWT.SAVE);
+				
+				String filterPath = "/";
+				String [] filterNames = new String[]{"CSV files", "All files (*)"};
+				String [] filterExtensions = new String[] {"*.csv", "*"};
+				
+				String platform = SWT.getPlatform();
+				if(platform.equals("win32")) {
+					platform = "c:\\";
+					filterNames[1] = "All Files (*.*)";
+					filterExtensions[1] = "*.*";
+				}
+				
+				dialog.setFilterNames(filterNames);
+				dialog.setFilterExtensions(filterExtensions);
+				dialog.setFilterPath(filterPath);
 				dialog.setText(CHOOSE_WISELY);
+				dialog.setFileName("newfile.csv");
+				
 				returnVal = dialog.open();
 				if (returnVal == null) {
 					return Status.CANCEL_STATUS;
