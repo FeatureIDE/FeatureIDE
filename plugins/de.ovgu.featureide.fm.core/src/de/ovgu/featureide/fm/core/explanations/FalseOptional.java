@@ -21,7 +21,6 @@
 package de.ovgu.featureide.fm.core.explanations;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedList;
 
 import org.prop4j.And;
@@ -34,13 +33,13 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
 
 /**
- * TODO description
+ * Generating explanations for false optional features. Using logic truth maintenance system (LTMS) and
+ * boolean constraint propagation (BCP).
  * 
  * @author "Ananieva Sofia"
  */
 public class FalseOptional {
 
-	private HashMap<Object, Bookkeeping> valueMap = new HashMap<Object, Bookkeeping>(); //hashmap for bookkeeping of reasons and antecedents for literals 
 	private String reason = "";
 	private static IFeatureModel model; // the model with constraint which makes a feature dead
 
@@ -61,7 +60,7 @@ public class FalseOptional {
 		for (IFeature falsopt : falseOptionals) { 
 
 			Literal falseOptional = new Literal(falsopt.getName());
-			LTMS ltms = new LTMS(model, valueMap);
+			LTMS ltms = new LTMS(model);
 			
 			String tmpReason = "Feature " + falseOptional + " is false-optional, because: \n";
 

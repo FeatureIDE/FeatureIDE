@@ -110,7 +110,6 @@ public class FeatureModelAnalyzer {
 	public static HashMap<Integer, String> deadFExpl = new HashMap<Integer, String>(); 
 	
 	//for tooltip: remember explanation for constraint which leads to false optional feature. Key = constraintIndex, Value = explanation
-	// TODO: try to use one hashmap for explanations
 	public static HashMap<Integer, String> falseOptExpl = new HashMap<Integer, String>(); 
 	
 	/**

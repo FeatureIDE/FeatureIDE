@@ -21,7 +21,6 @@
 package de.ovgu.featureide.fm.core.explanations;
 
 import java.util.Collection;
-import java.util.HashMap;
 
 import org.prop4j.Literal;
 import org.prop4j.Node;
@@ -39,7 +38,6 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
  */
 public class DeadFeatures {
 
-	private HashMap<Object, Bookkeeping> valueMap = new HashMap<Object, Bookkeeping>(); //hashmap for bookkeeping of reasons and antecedents for literals 
 	private String reason = "";
 	private static IFeatureModel model; // the model with constraint which makes a feature dead
 	private Node constr; // constraint node which makes a feature dead
@@ -65,7 +63,7 @@ public class DeadFeatures {
 			if (deadF == null) { // possible that constraint does not contain the dead feature. Instantiate the dead literal
 				deadF = new Literal(deadFeature.getName());
 			}	
-			LTMS ltms = new LTMS(model, valueMap);
+			LTMS ltms = new LTMS(model);
 			
 			// generate explanation which stops after first violation with "used" clauses in stack
 			String tmpReason = "Feature " + deadF + " is dead, because: \n";

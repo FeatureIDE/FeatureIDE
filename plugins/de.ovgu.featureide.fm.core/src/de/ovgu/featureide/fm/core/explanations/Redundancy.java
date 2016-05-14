@@ -75,12 +75,12 @@ public class Redundancy {
 			}
 
 			LTMS ltms = new LTMS(model, valueMap, featRedundantConstr);
-			String tmpReason = ltms.explainRedundant(clauses);
+			String tmpReason = ltms.explainRedundant(clauses, map);
 			if (!reason.contains(tmpReason)) {
 				reason += tmpReason;
 			}
 		}
-		reason = reason.substring(0, reason.length() - 4); // sometimes -2 needed
+		reason = reason.substring(0, reason.length() - 4); 
 		return reason;
 	}
 
