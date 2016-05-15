@@ -72,9 +72,13 @@ public class DeadFeatures {
 			if (!reason.contains(tmpReason)) {
 				reason += tmpReason;
 			}
-			reason = reason.substring(0, reason.length() - 4) + "\n\n";			
+			int lastChar = reason.lastIndexOf(",");
+			reason = reason.substring(0, lastChar) + "\n\n";	
 		}
-		return reason;
+		if (reason.isEmpty()) {
+			return "No explanation possible";
+		}
+		return reason.trim();
 
 	}
 

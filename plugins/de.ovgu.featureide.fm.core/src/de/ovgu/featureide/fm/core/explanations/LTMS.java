@@ -131,7 +131,7 @@ public class LTMS {
 			for (Literal l : literalList) {
 				String tmpReason = explainVariable(l);
 				if (!reason.contains(tmpReason)) {
-					reason = reason + tmpReason + "\n\n";
+					reason = reason + tmpReason;
 				}
 			}
 			return reason;
@@ -157,8 +157,6 @@ public class LTMS {
 		deadFeature = deadF;
 		reason = "";
 		setTruthValToUnknown(clauses);
-		//		HashMap<Object, Integer> map = new HashMap<Object, Integer>();
-		//		map.put(deadF, 1);
 		if (!set(deadF, false, clauses) || !BCP(clauses)) {
 			return shortestExplanation(reason, clauses, null, deadF);
 		}
@@ -628,14 +626,14 @@ public class LTMS {
 				if (parent.getStructure().isAlternative()) {
 					Iterable<IFeature> children = FeatureUtils.getChildren(parent);
 					for (IFeature child : children) {
-						s += child + " alternative child of " + parentName + ", ";
+						s += child + " alternative child of " + parentName + ", \n";
 					}
 				}
 				// if parent is or, explain or relationship between all children
 				else if (parent.getStructure().isOr()) {
 					Iterable<IFeature> children = FeatureUtils.getChildren(parent);
 					for (IFeature child : children) {
-						s += child + " or child of " + parentName + ", ";
+						s += child + " or child of " + parentName + ", \n";
 					}
 				}
 

@@ -80,7 +80,11 @@ public class Redundancy {
 				reason += tmpReason;
 			}
 		}
-		reason = reason.substring(0, reason.length() - 4); 
+		if (reason.isEmpty()) {
+			return "No explanation possible";
+		}
+		int lastChar = reason.lastIndexOf(",");
+		reason = reason.substring(0, lastChar); 
 		return reason;
 	}
 

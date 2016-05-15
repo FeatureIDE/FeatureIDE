@@ -711,19 +711,15 @@ public class FeatureModelAnalyzer {
 				// changedAttributes in order to refresh graphics later
 				if (fmFalseOptionals.isEmpty()) {
 					constraint.getFalseOptional().clear();
-				} else { 
-					
-					FalseOptional falseOptionalF = new FalseOptional();
-					int constrInd = FeatureUtils.getConstraintIndex(clone, constraint);
-					String expl = falseOptionalF.explainFalseOptionalFeature(clone, fmFalseOptionals);
-					falseOptExpl.put(constrInd, expl);
-					
-					if (constraint.setFalseOptionalFeatures(clone, fmFalseOptionals)) {
-					
+				} else if (constraint.setFalseOptionalFeatures(clone, fmFalseOptionals)) {
 					constraint.setConstraintAttribute(ConstraintAttribute.FALSE_OPTIONAL, false);
 					changedAttributes.put(constraint, ConstraintAttribute.FALSE_OPTIONAL);
-					}
-				}
+					
+					FalseOptional falseOpts = new FalseOptional();
+					int constrInd = FeatureUtils.getConstraintIndex(clone, constraint);
+					String expl = falseOpts.explainFalseOptionalFeature(clone, constraint);
+					falseOptExpl.put(constrInd, expl);
+				}	
 				
 				if (!fmDeadFeatures.isEmpty()) {
 					Collection<IFeature> deadFeatures = Functional.toList(constraint.getDeadFeatures(solver, clone, fmDeadFeatures));
