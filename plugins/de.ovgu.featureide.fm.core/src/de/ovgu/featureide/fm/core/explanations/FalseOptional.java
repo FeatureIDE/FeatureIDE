@@ -33,7 +33,6 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
-
 /**
  * Generating explanations for false optional features. Using logic truth maintenance system (LTMS) and
  * boolean constraint propagation (BCP).
@@ -46,38 +45,39 @@ public class FalseOptional {
 	private static IFeatureModel model; // the model with constraint which makes a feature dead
 
 	/**
-	 * Explain false optional features using boolean constraint propagation. Set initial truth value assumptions of false optional 
-	 * features to false and propagate them until a violation in any clause occurs. 
+	 * Explain false optional features using boolean constraint propagation. Set initial truth value assumptions of false optional
+	 * features to false and propagate them until a violation in any clause occurs.
 	 * 
 	 * @param newModel the model with the new constraint which leads to a false optional feature
 	 * @param falsOptionals a list of false optional features
 	 * @return String an explanation why the feature(s) is false optional
 	 */
 	public String explainFalseOptionalFeature(IFeatureModel newModel, IConstraint constr) {
-		setNewModel(newModel);		
+		setNewModel(newModel);
 		Node node = NodeCreator.createNodes(model, true).toCNF();
 		Node withoutTrueClauses = eliminateTrueClauses(node);
 		Node[] clauses = withoutTrueClauses.getChildren();
 		Collection<IFeature> falseOptionals = new ArrayList<>(constr.getFalseOptional());
-		
-		for (IFeature falsopt : falseOptionals) { 
+
+		for (IFeature falsopt : falseOptionals) {
 			Literal falseOptional = new Literal(falsopt.getName());
 			LTMS ltms = new LTMS(model);
 			String tmpReason = "Feature " + falseOptional + " is false-optional, because: \n";
-			
-			tmpReason += ltms.explainFalseOps(clauses, falseOptional);	
+
+			tmpReason += ltms.explainFalseOps(clauses, falseOptional);
 			if (!reason.contains(tmpReason)) {
 				reason += tmpReason;
 			}
 			int lastChar = reason.lastIndexOf(",");
-			reason = reason.substring(0, lastChar) + "\n\n"; 		
+			reason = reason.substring(0, lastChar) + "\n\n";
 		}
 		if (reason.isEmpty()) {
 			return "No explanation possible";
+		} else {
+			return reason.trim();
 		}
-		return reason.trim();
 	}
-	
+
 	/**
 	 * Removes clauses which are added in Node Creator while eliminateAbstractVariables().
 	 * Such clauses are of the form True & -False & (A|B|C|True) and can be removed because
@@ -85,7 +85,7 @@ public class FalseOptional {
 	 * 
 	 * @param node the formula node to remove true clauses from
 	 * @return formula node without true clauses
-	 */ 
+	 */
 	private Node eliminateTrueClauses(Node node) {
 
 		LinkedList<Node> updatedNodes = new LinkedList<Node>();
@@ -94,7 +94,7 @@ public class FalseOptional {
 				updatedNodes.add(child);
 		return updatedNodes.isEmpty() ? null : new And(updatedNodes);
 	}
-	
+
 	/**
 	 * Sets the model with the new constraint which lead to a dead feature.
 	 * 
@@ -114,6 +114,3 @@ public class FalseOptional {
 	}
 
 }
-
-
-

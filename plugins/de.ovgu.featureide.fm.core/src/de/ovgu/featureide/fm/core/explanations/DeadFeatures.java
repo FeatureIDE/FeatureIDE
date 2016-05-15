@@ -32,7 +32,7 @@ import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
 /**
  * Generating explanations for dead features. Using logic truth maintenance system (LTMS) and
- * boolean constraint propagation (BCP). 
+ * boolean constraint propagation (BCP).
  * 
  * @author "Ananieva Sofia"
  */
@@ -54,36 +54,36 @@ public class DeadFeatures {
 	public String explainDeadFeature(IFeatureModel newModel, Collection<IFeature> deadFeatures, IConstraint c) {
 		setNewModel(newModel);
 		constr = c.getNode();
-		
+
 		Node node = NodeCreator.createNodes(model, true).toCNF();
 		Node[] clauses = node.getChildren();
 
-		for (IFeature deadFeature : deadFeatures) { 
+		for (IFeature deadFeature : deadFeatures) {
 			Literal deadF = getLiteralFromNode(constr, deadFeature);
 			if (deadF == null) { // possible that constraint does not contain the dead feature. Instantiate the dead literal
 				deadF = new Literal(deadFeature.getName());
-			}	
+			}
 			LTMS ltms = new LTMS(model);
-			
+
 			// generate explanation which stops after first violation with "used" clauses in stack
 			String tmpReason = "Feature " + deadF + " is dead, because: \n";
 			tmpReason += ltms.explainDead(clauses, deadF);
-		
+
 			if (!reason.contains(tmpReason)) {
 				reason += tmpReason;
 			}
 			int lastChar = reason.lastIndexOf(",");
-			reason = reason.substring(0, lastChar) + "\n\n";	
+			reason = reason.substring(0, lastChar) + "\n\n";
 		}
 		if (reason.isEmpty()) {
 			return "No explanation possible";
+		} else {
+			return reason.trim();
 		}
-		return reason.trim();
-
 	}
 
 	/**
-	 * Returns a literal from a node (the constraint which leads to dead feature(s)) with the same name 
+	 * Returns a literal from a node (the constraint which leads to dead feature(s)) with the same name
 	 * as the specified feature as BCP only works with literals and not with features.
 	 * 
 	 * @param node the constraint which leads to dead feature(s)
@@ -110,7 +110,7 @@ public class DeadFeatures {
 		}
 		return res;
 	}
-	
+
 	/**
 	 * Sets the model with the new constraint which lead to a dead feature.
 	 * 

@@ -648,7 +648,7 @@ public class LTMS {
 		//if attribute is root, print "ROOT" as explanation only
 		if (l.getSourceAttribute() == Literal.FeatureAttribute.Root) {
 			cntLength++;
-			s = "ROOT " + l.var.toString();
+			s = "ROOT " + l.var.toString() + ", ";
 		}
 
 		// if attribute is CONSTRAINT, print origin constraint as explanation only
