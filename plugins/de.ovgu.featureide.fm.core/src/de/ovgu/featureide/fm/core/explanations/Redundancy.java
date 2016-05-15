@@ -67,6 +67,7 @@ public class Redundancy {
 		Node[] clauses = node.getChildren();
 
 		for (HashMap<Object, Integer> map : values) {
+			reason = reason.trim() + "\n";
 			setTruthValueToUnknown(clauses); //(re)set all literal values to -1
 
 			for (Literal l : featRedundantConstr) {
@@ -75,7 +76,7 @@ public class Redundancy {
 			}
 
 			LTMS ltms = new LTMS(model, valueMap, featRedundantConstr);
-			String tmpReason = ltms.explainRedundant(clauses, map);
+			String tmpReason = ltms.explainRedundant(clauses, map).trim();
 			if (!reason.contains(tmpReason)) {
 				reason += tmpReason;
 			}

@@ -95,7 +95,7 @@ public class LTMS {
 			for (Literal l : literalList) {
 				String tmpReason = explainVariable(l);
 				if (!reason.contains(tmpReason)) {
-					reason = reason + tmpReason + "\n\n";
+					reason = reason + tmpReason + "\n";
 				}
 			}
 			return reason;
@@ -624,17 +624,20 @@ public class LTMS {
 
 				// if parent is alternative, explain alternative relationship between all children
 				if (parent.getStructure().isAlternative()) {
-					Iterable<IFeature> children = FeatureUtils.getChildren(parent);
-					for (IFeature child : children) {
-						s += child + " alternative child of " + parentName + ", \n";
-					}
+				//	Iterable<IFeature> children = FeatureUtils.getChildren(parent);
+				//	for (IFeature child : children) {
+				//		s += child + " alternative child of " + parentName + ", \n";
+						s += f.getName() + " alternative child of " + parentName + ", ";
+
+				//	}
 				}
 				// if parent is or, explain or relationship between all children
 				else if (parent.getStructure().isOr()) {
-					Iterable<IFeature> children = FeatureUtils.getChildren(parent);
-					for (IFeature child : children) {
-						s += child + " or child of " + parentName + ", \n";
-					}
+				//	Iterable<IFeature> children = FeatureUtils.getChildren(parent);
+				//	for (IFeature child : children) {
+				//		s += child + " or child of " + parentName + ", \n";
+					s += f.getName() + " or child of " + parentName + ", ";
+				//	}
 				}
 
 				else { // if parent is not "alt" or "or", then feature is mandatory or optional child
