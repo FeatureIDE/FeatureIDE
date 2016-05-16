@@ -123,6 +123,7 @@ public class LTMS {
 		reason = "";
 		setTruthValToUnknown(clauses);
 		valueMap.get(falseoptional.var).value = 0;
+		valueMap.get(falseoptional.var).premise = true;
 
 		// if initial truth values lead to a false clause, explain immediately
 		if (isViolated(clauses)) {
@@ -157,6 +158,8 @@ public class LTMS {
 		deadFeature = deadF;
 		reason = "";
 		setTruthValToUnknown(clauses);
+		valueMap.get(deadF.var).premise = true;
+
 		if (!set(deadF, false, clauses) || !BCP(clauses)) {
 			return shortestExplanation(reason, clauses, null, deadF);
 		}
@@ -566,7 +569,7 @@ public class LTMS {
 			if (!result.contains(tmp) && !reason.contains(tmp)) {
 				result += tmp + "\n";
 			} else if (!tmp.equals("")) {
-				cntLength--;
+				cntLength--; // if the same explanation has been generated again and length has been incremented, reduce length
 			}
 
 			// explain every antecedent from its unit open clause 
@@ -578,7 +581,7 @@ public class LTMS {
 					// result contains an explanation for the BCP stack, reason contains an explanation for the violated clause 
 					result += explFromMap + "\n";
 				} else if (!tmp.equals("") && tmp.equals(explFromMap)) {
-					cntLength--;
+					cntLength--; // if the same explanation has been generated again and length has been incremented, reduce length
 				}
 			}
 		}
@@ -616,7 +619,7 @@ public class LTMS {
 
 		// if attribute is UP, explain relationship to parent
 		if (l.getSourceAttribute() == Literal.FeatureAttribute.Up) {
-			cntLength++;
+			cntLength++; // increase length of explanation
 			if (FeatureUtils.getParent(f) != null) {
 				IFeature parent = FeatureUtils.getParent(f);
 				String parentName = parent.getName();
@@ -647,13 +650,13 @@ public class LTMS {
 		}
 		//if attribute is root, print "ROOT" as explanation only
 		if (l.getSourceAttribute() == Literal.FeatureAttribute.Root) {
-			cntLength++;
+			cntLength++; // increase length of explanation
 			s = "ROOT " + l.var.toString() + ", ";
 		}
 
 		// if attribute is CONSTRAINT, print origin constraint as explanation only
 		if (l.getSourceAttribute() == Literal.FeatureAttribute.Constraint) {
-			cntLength++;
+			cntLength++; // increase length of explanation
 			s = "Constraint " + (FeatureUtils.getConstraint(model, l.getSourceIndex())).toString() + ", ";
 		}
 		return s;
