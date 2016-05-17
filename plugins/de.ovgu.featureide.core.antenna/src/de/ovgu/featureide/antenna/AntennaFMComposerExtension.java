@@ -55,7 +55,7 @@ public class AntennaFMComposerExtension extends FMComposerExtension {
 			"FeatureIDE projects based on preprocessors such as Antenna do not\n" +
 			NEED_AN_ORDER_COMMA__AS_THE_ORDER_IS_GIVEN_DIRECTLY_AT_THE_SOURCE_CODE_;
 	
-	public static final String FEATURE_NAME_PATTERN = "^[a-zA-Z]\\w*$";
+	public static final String FEATURE_NAME_PATTERN = "^[a-zA-Z][\\w\\.\\-]*$";
 	
 	@Override
 	protected boolean isValidFeatureNameComposerSpecific(String s) {

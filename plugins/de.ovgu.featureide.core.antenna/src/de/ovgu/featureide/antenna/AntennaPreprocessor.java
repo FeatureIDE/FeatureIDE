@@ -343,7 +343,7 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 							Node lastElement = new Not(expressionStack.pop().clone());
 							expressionStack.push(lastElement);
 						}
-					} else if (line.contains("//#if ") || line.contains("//#ifdef ") || line.contains("//#ifndef ")) {
+					} else if (line.contains("//#if ") || line.contains("//#ifdef ") || line.contains("//#ifndef ") || line.contains("//#condition ")) {
 						ifelseCountStack.push(0);
 					}
 
@@ -420,17 +420,17 @@ public class AntennaPreprocessor extends PPComposerExtensionClass {
 		Node ppExpression = nodereader.stringToNode(line, featureList);
 
 		if (ppExpression != null) {
-			if (negative)
+			if (negative) {
 				ppExpression = new Not(ppExpression.clone());
-
-			if (!conditionIsSet)
-				expressionStack.push(ppExpression);
+			}
+			expressionStack.push(ppExpression);
 
 			checkExpressions(ppExpression, lineNumber, res);
 		} else {
 			// if generating of expression failed, generate expression "true"
-			if (!conditionIsSet)
+			if (!conditionIsSet) {
 				expressionStack.push(new Literal(NodeCreator.varTrue));
+			}
 		}
 
 	}

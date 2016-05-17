@@ -137,14 +137,17 @@ public class AntennaModelBuilder extends PPModelBuilder {
 					directive.setExpression(line);
 					directive.setStartLine(i, 0);
 					directive.setId(id++);
-
+					if (command == FSTDirectiveCommand.CONDITION) {
+						directive.setEndLine(lines.size());
+						directive.setEndLine(lines.size(), 0);
+					}
 					if (directivesStack.isEmpty()) {
 						directivesList.add(directive);
 					} else {
 						directivesStack.peek().addChild(directive);
 					}
 
-					if (command != FSTDirectiveCommand.DEFINE && command != FSTDirectiveCommand.UNDEFINE && command != FSTDirectiveCommand.CONDITION)
+					if (command != FSTDirectiveCommand.DEFINE && command != FSTDirectiveCommand.UNDEFINE)
 						directivesStack.push(directive);
 				}
 			}
