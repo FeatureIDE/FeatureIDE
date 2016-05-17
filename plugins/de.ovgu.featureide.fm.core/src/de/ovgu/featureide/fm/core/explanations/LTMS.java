@@ -176,6 +176,9 @@ public class LTMS {
 	 * @return String the shortest explanation
 	 */
 	private String shortestExplanation(String expl, Node[] clauses, HashMap<Object, Integer> map, Literal explLit) {
+		final long meanEnd = System.currentTimeMillis();
+		System.out.println("Erste Erklärung: " + meanEnd + " Millisek.");
+
 		String shortestExpl = "";
 		allExplanations.put(cntLength, expl); // remember first explanation
 		while (!stackOpenClause.isEmpty()) {
