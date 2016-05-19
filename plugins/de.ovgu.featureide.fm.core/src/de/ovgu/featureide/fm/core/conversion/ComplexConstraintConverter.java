@@ -27,6 +27,7 @@ import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.Or;
 
+import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
@@ -86,12 +87,59 @@ public class ComplexConstraintConverter {
 		
 		//Work with a clone
 		fm = model.clone();
+				
+		//Basic cleaning
+		prepare();
 		
-		List<Node> nodes = new LinkedList<Node>();
+		//Get list of complex clauses and remove them from the model
+		List<IConstraint> complexConstraints = pruneComplexConstraints();
 		
-		//TODO logic and preprocessing
+		//Minimize constraints
+		List<Node> minComplexNodes = new LinkedList<Node>();
+		for(IConstraint c : complexConstraints) {			
+			List<Node> nodes = converter.preprocess(c);
+			
+			for(Node node : nodes) {
+				Node minNode = minimize(node);
+				if(ComplexConstraintConverter.isSimple(minNode)) {
+					fm.addConstraint(factory.createConstraint(fm, minNode));
+				} else {
+					minComplexNodes.add(minNode);	
+				}
+			}
+		}
 		
-		return converter.convert(fm, nodes, true);
+		if(minComplexNodes.isEmpty()) {
+			return fm;
+		}
+		
+		return converter.convert(fm, minComplexNodes, true);
 	}
 	
+	protected Node minimize(Node clause) {
+		//TODO minimize complex clauses
+		return clause;
+	}
+	
+	protected void prepare() {
+		//TODO remove redundant constraints or tautologies (method: prepare)
+		//TODO split up clauses from complex constraints that model a simple constraint (method: prepare)
+		//TODO replace requires and excludes constraint with "implication"-syntax (method: prepare)
+	}
+	
+	protected List<IConstraint> pruneComplexConstraints() {
+		List<IConstraint> complexConstraints = new LinkedList<IConstraint>();
+		
+		for(IConstraint c : fm.getConstraints()) {
+			if(ComplexConstraintConverter.isComplex(c.getNode())) {
+				complexConstraints.add(c);
+			}
+		}
+		
+		for(IConstraint c : complexConstraints) {
+			fm.removeConstraint(c);
+		}
+		
+		return complexConstraints;
+	}
 }
