@@ -23,7 +23,9 @@ package de.ovgu.featureide.fm.core.conversion;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.prop4j.Literal;
 import org.prop4j.Node;
+import org.prop4j.Or;
 
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
@@ -40,6 +42,35 @@ public class ComplexConstraintConverter {
 	protected IFeatureModel fm;
 	
 	/**
+	 * Checks whether given node is either a requires- or an excludes-constraint
+	 * @param node
+	 * @return true if node is a simple constraint. False otherwise.
+	 */
+	public static boolean isSimple(Node node) {
+		Node cnf = node.toCNF();
+		if(cnf.getChildren().length == 1 && cnf.getContainedFeatures().size() == 2) {
+			Node clause = cnf.getChildren()[0];
+			if(clause instanceof Or) {
+				Node f1 = clause.getChildren()[0];
+				Node f2 = clause.getChildren()[1];
+
+				return (f1 instanceof Literal && !((Literal)f1).positive) || (f2 instanceof Literal && !((Literal)f2).positive);
+			}
+		}
+		return false;
+	}	
+	
+	/**
+	 * Checks whether given node is neither a requires- nor an excludes-constraint
+	 * @param node
+	 * @return true if node is a complex constraint. False otherwise.
+	 */
+	public static boolean isComplex(Node node) {
+		return !ComplexConstraintConverter.isSimple(node);
+	}
+	
+	/**
+	 * Eliminates complex constraints according to given strategy
 	 * @param fm
 	 * @return
 	 */

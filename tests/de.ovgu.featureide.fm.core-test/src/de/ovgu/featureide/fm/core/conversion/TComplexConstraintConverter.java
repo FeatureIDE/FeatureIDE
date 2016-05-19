@@ -23,7 +23,11 @@ package de.ovgu.featureide.fm.core.conversion;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
+import org.prop4j.And;
+import org.prop4j.Implies;
+import org.prop4j.Literal;
 import org.prop4j.Node;
+import org.prop4j.Not;
 import org.prop4j.Or;
 
 import de.ovgu.featureide.fm.core.base.IConstraint;
@@ -76,6 +80,60 @@ public class TComplexConstraintConverter {
 		
 	    fm.addConstraint(c1);
 		fm.addConstraint(c2);
+	}
+	
+	/*
+	 * Check whether our converter recognizes simple constraints.
+	 */
+	@Test
+	public void testIsSimpleConstraint() throws UnsupportedModelException {
+		Node[] simpleNodes = new Node[] {
+				 				new Implies("f", "g"),
+				 				new Or("f",new Not("g")), 
+				 				new Or(new Not("f"),"g"), 
+				 				new Or(new Not("f"),new Not("g")), 
+				 				new Implies("f", new Not(new Not("g"))),
+				 				new Implies("f", new Not("g")),
+				 				new Implies("f", new Literal("g")),
+				 				new Implies("f", new Not(new Literal("g"))),
+				 				new Implies(new Literal("f"), new Not("g")),
+				 				new Implies(new Literal("f"), new Literal("g")),
+				 				new Implies(new Literal("f"), new Not(new Literal("g")))};
+
+		boolean result = true;
+		for (Node node : simpleNodes) {
+			result &= ComplexConstraintConverter.isSimple(node);
+ 		}	
+
+		assertTrue(result);
+	}
+	
+	/**
+	 * @param result
+	 */
+	private void assertTrue(boolean result) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/*
+	 * Check whether our converter recognizes simple constraints.
+	 */
+	@Test
+	public void testIsComplexConstraint() throws UnsupportedModelException {
+		Node[] complexNodes = new Node[] {
+ 				new Implies(new Not("f"), "g"),
+ 				new Implies("f", new And("g", "h")),
+ 				new Implies("f", new Or("g", "h")),
+ 				new Or("f", "g"),
+ 				new And("f", "g")};
+
+		boolean result = true;
+		for (Node node : complexNodes) {
+			result &= ComplexConstraintConverter.isComplex(node);
+ 		}	
+
+		assertTrue(result);
 	}
 	
 	/*
