@@ -34,25 +34,28 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
 /**
- * Generating explanations for false optional features. Using logic truth maintenance system (LTMS) and
- * boolean constraint propagation (BCP).
+ * The class FalseOptional generates explanations for false optional features. It uses a logic truth maintenance system (LTMS)
+ * and its boolean constraint propagation (BCP).
  * 
  * @author "Ananieva Sofia"
  */
 public class FalseOptional {
 
-	private String reason = "";
-	private static IFeatureModel model; // the model with constraint which makes a feature dead
+	/**
+	 * The model after a change (with a constraint that makes a feature false optional).
+	 */
+	private static IFeatureModel model;
 
 	/**
-	 * Explain false optional features using boolean constraint propagation. Set initial truth value assumptions of false optional
+	 * Explains false optional features using boolean constraint propagation. Sets initial truth value assumptions of false optional
 	 * features to false and propagate them until a violation in any clause occurs.
 	 * 
 	 * @param newModel the model with the new constraint which leads to a false optional feature
 	 * @param falsOptionals a list of false optional features
 	 * @return String an explanation why the feature(s) is false optional
 	 */
-	public String explainFalseOptionalFeature(IFeatureModel newModel, IConstraint constr) {
+	public String explain(IFeatureModel newModel, IConstraint constr) {
+		String reason = "";
 		setNewModel(newModel);
 		Node node = NodeCreator.createNodes(model, true).toCNF();
 		Node withoutTrueClauses = eliminateTrueClauses(node);
@@ -87,7 +90,6 @@ public class FalseOptional {
 	 * @return formula node without true clauses
 	 */
 	private Node eliminateTrueClauses(Node node) {
-
 		LinkedList<Node> updatedNodes = new LinkedList<Node>();
 		for (Node child : node.getChildren())
 			if (!child.toString().contains("True") && !child.toString().contains("False"))
@@ -112,5 +114,4 @@ public class FalseOptional {
 	public static IFeatureModel getNewModel() {
 		return model;
 	}
-
 }

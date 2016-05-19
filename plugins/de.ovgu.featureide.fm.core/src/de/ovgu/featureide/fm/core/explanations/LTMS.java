@@ -35,24 +35,48 @@ import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
- * A logic truth maintenance system (LTMS) is used for managing logical implications. By recording proofs
- * for the implications, explanations can be constructed.
+ * The class LTMS (logic truth maintenance system) uses BCP for managing logical implications. By recording proofs
+ * for implications, explanations can be constructed.
  * 
  * @author "Ananieva Sofia"
  */
 public class LTMS {
-
-	private boolean explRed = false; // true, if a redundant constraint shall be explained
-	private int cntLength = 0; // count the parts of an explanation in order to select the shortest explanation
+	
+	/**
+	 * Differentiates between different modes to explain. A mode can either belong to Redundancy, Dead Features 
+	 * or False-optional Features.
+	 */
+	public static enum ExplanationMode {
+		Redundancy, DeadFeature, FalseOptionalFeature
+	};
+	/**
+	 * The length of an explanation in order to select the shortest one. 
+	 */
+	private int cntLength = 0; 
+	/**
+	 * The model to explain the defect from. Used to retrieve a feature from a respective literal. 
+	 */
 	private IFeatureModel model;
+	/**
+	 * The explanation of a defect.
+	 */
 	private String reason = "";
-	private Stack<Node> stackOpenClause = new Stack<Node>(); // stack for unit open clauses
-	private HashMap<Object, Bookkeeping> valueMap = new HashMap<Object, Bookkeeping>(); // bookkeeping of reasons and antecedents for literals 
-	private HashMap<Integer, String> allExplanations = new HashMap<Integer, String>(); // storing all explanations. key = length, value = explanation
-	private Node violatedClause; // the clause whose terms are all false
-	private ArrayList<Literal> featFromRedConstr = null; // the feature from the redundant constraint
-	private Node openclause = null;
-	private Literal deadFeature;
+	/**
+	 * The stack to collect unit-open clauses. 
+	 */
+	private Stack<Node> stackOpenClause = new Stack<Node>(); 
+	/**
+	 * The hashMap for bookkeeping of reasons and antecedents for literals. Key = literal.var, value = class Bookkeeping
+	 */
+	private HashMap<Object, Bookkeeping> valueMap = new HashMap<Object, Bookkeeping>(); 
+	/**
+	 * The clause which is violated (all terms are bound to false).
+	 */
+	private Node violatedClause; 
+	/**
+	 * The list which contains a literal of a respective feature from the redundant constraint.
+	 */
+	private ArrayList<Literal> featuresRedundantConstr = null; // the feature from the redundant constraint
 
 	/**
 	 * Constructor is used if redundant constraints are explained.
@@ -63,9 +87,9 @@ public class LTMS {
 	 * @param features the features from the redundant constraint
 	 */
 	public LTMS(IFeatureModel oldModel, HashMap<Object, Bookkeeping> map, ArrayList<Literal> features) {
-		model = oldModel;
+		this(oldModel);
 		valueMap = map;
-		featFromRedConstr = features;
+		featuresRedundantConstr = features;
 	}
 
 	/**
@@ -85,13 +109,12 @@ public class LTMS {
 	 * @return String an explanation for the redundant constraint
 	 */
 	public String explainRedundant(Node[] clauses, HashMap<Object, Integer> map) {
-		explRed = true;
+	//	explRedundancy = true;
 		reason = "";
 
 		// if initial truth values lead to a false clause, explain immediately
 		if (isViolated(clauses)) {
-			ArrayList<Literal> literalList = getLiterals(getViolatedClause());
-
+			ArrayList<Literal> literalList = getLiterals(violatedClause);
 			for (Literal l : literalList) {
 				String tmpReason = explainVariable(l);
 				if (!reason.contains(tmpReason)) {
@@ -100,13 +123,18 @@ public class LTMS {
 			}
 			return reason;
 		}
-
 		// if we are here, propagated values via BCP lead to a false clause
-		setInitialOpenClauses(featFromRedConstr, clauses); // find first open clauses with initial truth value assumptions
+		set(featuresRedundantConstr, clauses); // find first open clauses with initial truth value assumptions
 		if (!BCP(clauses)) { // true, if violation occured during BCP
-			return shortestExplanation(reason, clauses, map, null);
+			final long meanEnd = System.currentTimeMillis();
+			System.out.println("Erste Erklärung: " + meanEnd + " Millisek.");
+		//return reason;
+			return shortestExplanation(reason, clauses, map, null, ExplanationMode.Redundancy);
 		}
-		return shortestExplanation(reason, clauses, map, null);
+		final long meanEnd = System.currentTimeMillis();
+		System.out.println("Erste Erklärung: " + meanEnd + " Millisek.");
+	// return reason;
+		return shortestExplanation(reason, clauses, map, null, ExplanationMode.Redundancy);
 	}
 
 	/**
@@ -127,8 +155,7 @@ public class LTMS {
 
 		// if initial truth values lead to a false clause, explain immediately
 		if (isViolated(clauses)) {
-			ArrayList<Literal> literalList = getLiterals(getViolatedClause());
-
+			ArrayList<Literal> literalList = getLiterals(violatedClause);
 			for (Literal l : literalList) {
 				String tmpReason = explainVariable(l);
 				if (!reason.contains(tmpReason)) {
@@ -137,13 +164,12 @@ public class LTMS {
 			}
 			return reason;
 		}
-
 		// if we are here, propagated values via BCP lead to a false clause
-		setInitialOpenClauses(falsopts, clauses);
+		set(falsopts, clauses);
 		if (!BCP(clauses)) {
-			return shortestExplanation(reason, clauses, null, falseoptional);
+			return shortestExplanation(reason, clauses, null, falseoptional, ExplanationMode.FalseOptionalFeature);	
 		}
-		return shortestExplanation(reason, clauses, null, falseoptional);
+		return shortestExplanation(reason, clauses, null, falseoptional, ExplanationMode.FalseOptionalFeature);
 	}
 
 	/**
@@ -154,16 +180,15 @@ public class LTMS {
 	 * @param cond true if feature might be conditionally dead, else false
 	 * @return String an explanation why the feature is dead
 	 */
-	public String explainDead(Node[] clauses, Literal deadF) {
-		deadFeature = deadF;
+	public String explainDeadF(Node[] clauses, Literal deadF) {
+	//	deadFeature = deadF;
 		reason = "";
 		setTruthValToUnknown(clauses);
 		valueMap.get(deadF.var).premise = true;
-
 		if (!set(deadF, false, clauses) || !BCP(clauses)) {
-			return shortestExplanation(reason, clauses, null, deadF);
+			return shortestExplanation(reason, clauses, null, deadF, ExplanationMode.DeadFeature);
 		}
-		return shortestExplanation(reason, clauses, null, deadF);
+		return shortestExplanation(reason, clauses, null, deadF, ExplanationMode.DeadFeature);
 	}
 
 	/**
@@ -172,32 +197,38 @@ public class LTMS {
 	 * 
 	 * @param expl the first generated explanation
 	 * @param clauses the clauses of the conjunctive normal form
-	 * @param map the map which stores the intial values for features from the redundant constraint
+	 * @param map the map which stores the initial values for features from the redundant constraint
 	 * @return String the shortest explanation
 	 */
-	private String shortestExplanation(String expl, Node[] clauses, HashMap<Object, Integer> map, Literal explLit) {
-		final long meanEnd = System.currentTimeMillis();
-		System.out.println("Erste Erklärung: " + meanEnd + " Millisek.");
-
+	private String shortestExplanation(String expl, Node[] clauses, HashMap<Object, Integer> map, Literal explLit, ExplanationMode mode) {
 		String shortestExpl = "";
+		HashMap<Integer, String> allExplanations = new HashMap<Integer, String>();
 		allExplanations.put(cntLength, expl); // remember first explanation
 		while (!stackOpenClause.isEmpty()) {
 			reason = "";
 			cntLength = 0;
 			setTruthValToUnknown(clauses);
 
-			if (explRed == true) { // explain redundant features, set their initial values according to invalid formula of redundant constraint
-				for (Literal l : featFromRedConstr) {
+			switch(mode) {
+			case Redundancy: // parameter map is expected not to be null
+				for (Literal l : featuresRedundantConstr) {
 					valueMap.get(l.var).value = map.get(l.var);// get literal from origin map and set its value according to false cnf
 					valueMap.get(l.var).premise = true;
 				}
-			} else {
-				if (deadFeature != null) { // explain dead feature, set its initial value to true
-					valueMap.get(explLit.var).value = 1;
-				} else { // explain false-optional feature, set its initial value to false
-					valueMap.get(explLit.var).value = 0;
-				}
+				break;
+			
+			case DeadFeature: // explain dead feature, set its initial value to true
+				valueMap.get(explLit.var).value = 1;
 				valueMap.get(explLit.var).premise = true;
+				break;
+			
+			case FalseOptionalFeature:// explain false-optional feature, set its initial value to false
+				valueMap.get(explLit.var).value = 0;
+				valueMap.get(explLit.var).premise = true;
+				break;
+ 
+			default: 
+				return "unknown mode";
 			}
 			BCP(clauses); // generate new explanation with remaining clauses in stack 
 			if (cntLength == 0) { // don't take empty reason as explanation 
@@ -211,59 +242,10 @@ public class LTMS {
 		// if we are here, all explanations have been generated and stored in a hashmap (key = length, value = explanation)
 		Set<Integer> keySet = allExplanations.keySet();
 		ArrayList<Integer> list = new ArrayList<Integer>(keySet);
-		Collections.sort(list);
+		Collections.sort(list); // sort list to get the explanation with minimal key
 		int minLength = list.get(0);
 		shortestExpl = allExplanations.get(minLength);
 		return shortestExpl;
-	}
-
-	/**
-	 * Returns a list which contains the literals of a given node.
-	 * 
-	 * @param node the node which contains the literals
-	 * @return a list which contains the literals
-	 */
-	private ArrayList<Literal> getLiterals(Node node) {
-		ArrayList<Literal> res = new ArrayList<Literal>();
-		if (node instanceof Literal) {
-			res.add((Literal) node);
-			return res;
-		}
-		Node[] childs = node.getChildren();
-		if (childs != null) {
-			for (Node child : childs) {
-				res.addAll(getLiterals(child));
-			}
-		}
-		return res;
-	}
-
-	/**
-	 * Returns a specified literal from (another) node
-	 * 
-	 * @param node the node which contains the literal
-	 * @param l the literal with the same name as the literal to return
-	 * @return the specified literal
-	 */
-	private Literal getLiteralFromMap(Node node, Literal l) {
-		Literal res = null;
-		if (node instanceof Literal) {
-			Literal lit = (Literal) node;
-			if (lit.var.toString().equals(l.var.toString()))
-				res = lit;
-			return res;
-		}
-
-		Node[] childs = node.getChildren();
-		if (childs != null) {
-			for (Node child : childs) {
-				res = getLiteralFromMap((child), l);
-				if (res != null) {
-					return res;
-				}
-			}
-		}
-		return res;
 	}
 
 	/**
@@ -273,14 +255,10 @@ public class LTMS {
 	 * @param literal the literal from the redundant constraint whose value is initially set
 	 * @param allClauses clauses of the conjunctive normal form
 	 */
-	private void setInitialOpenClauses(ArrayList<Literal> literal, Node[] allClauses) {
-		boolean negated = false;
-		for (Literal l : literal) {
-			if (valueMap.get(l.var).value == 0) {
-				negated = true;
-			}
+	private void set(ArrayList<Literal> literals, Node[] allClauses) {
+		for (Literal l : literals) {
+			boolean negated = (valueMap.get(l.var).value == 0);
 			for (Node cnfclause : allClauses) {
-
 				// check for every assumed value if there are unit open clauses
 				if (!hasNegTerm(!negated, l, cnfclause)) {
 					continue;
@@ -304,18 +282,13 @@ public class LTMS {
 	private boolean set(Literal literal, boolean negated, Node[] allClauses) {
 
 		// propagate value of variable to be true or false
-		if (literal.positive == true) {
-			valueMap.get(literal.var).value = 1;
-		} else {
-			valueMap.get(literal.var).value = 0;
-		}
-
+		valueMap.get(literal.var).value = literal.positive? 1 : 0;
+		
 		// for each clause in all clauses of the cnf that contains not this-literal
 		for (Node cnfclause : allClauses) {
 			if (!hasNegTerm(!negated, literal, cnfclause)) { //if true is returned, unit-open is checked and then violation
 				continue;
 			}
-
 			// if we are here, we may have found a unit open clause
 			if (isUnitOpen(cnfclause) != null) {
 				stackOpenClause.push(cnfclause);
@@ -336,12 +309,10 @@ public class LTMS {
 	 * @return true, if the clause is violated. Else, return false
 	 */
 	private boolean isViolated(Node clause) {
-
 		// truth values of all terms must be false
 		ArrayList<Literal> literals = getLiterals(clause);
 		for (Literal lit : literals) {
 			if (eval3(lit) == 0) {
-
 				if (valueMap.get(lit.var).reason == null && valueMap.get(lit.var).premise == false) { // features from red. constraint can't have antecedents
 					justify(lit, clause);// set reason and antecedent
 				}
@@ -349,7 +320,7 @@ public class LTMS {
 			}
 			return false;
 		}
-		setViolatedClause(clause); // remember violated clause for explanation
+		violatedClause = clause; // remember violated clause for explanation
 		return true;
 	}
 
@@ -370,24 +341,6 @@ public class LTMS {
 	}
 
 	/**
-	 * Sets the violated clause.
-	 * 
-	 * @param clause the violated clause
-	 */
-	private void setViolatedClause(Node clause) {
-		violatedClause = clause;
-	}
-
-	/**
-	 * Returns the violated clause.
-	 * 
-	 * @return the violated clause.
-	 */
-	private Node getViolatedClause() {
-		return violatedClause;
-	}
-
-	/**
 	 * Checks if a clause contains a not-literal for explaining redundant constraints.
 	 * 
 	 * @param neg representation of the opposite sign of a literal
@@ -398,11 +351,9 @@ public class LTMS {
 	private boolean hasNegTerm(boolean neg, Literal l, Node node) {
 		ArrayList<Literal> literals = getLiterals(node);
 		for (Literal lit : literals) {
-
 			if (neg && !lit.positive && lit.var.toString().equals(l.var.toString())) { //guidsl compares id's of literals with same name, not working for featureIDE
 				return true;
 			}
-
 			if (neg || !lit.positive || !lit.var.toString().equals(l.var.toString())) { //!!guidsl compares id's of literals, not working for featureIDE!!
 				continue;
 			}
@@ -510,7 +461,7 @@ public class LTMS {
 	private boolean BCP(Node[] cnfclauses) {
 		String tmpReason = "";
 		while (!stackOpenClause.empty()) {
-			openclause = stackOpenClause.pop();
+			Node openclause = stackOpenClause.pop();
 			Literal l = isUnitOpen(openclause);
 			if (l == null) {
 				continue;
@@ -521,7 +472,7 @@ public class LTMS {
 			}
 
 			// BCP is finished, all clauses are checked or a clause is violated
-			ArrayList<Literal> explLitViolatedClause = getLiterals(getViolatedClause());
+			ArrayList<Literal> explLitViolatedClause = getLiterals(violatedClause);
 			ArrayList<Literal> explLitReason = getLiterals(valueMap.get(l.var).reason);
 
 			// first, explain the violated clause and then start explaining from the current reason-clause
@@ -574,14 +525,13 @@ public class LTMS {
 			} else if (!tmp.equals("")) {
 				cntLength--; // if the same explanation has been generated again and length has been incremented, reduce length
 			}
-
 			// explain every antecedent from its unit open clause 
 			Node reasonFromMap = valueMap.get(v.var).reason;
 			if (reasonFromMap != null) {
 				Literal litFromMap = getLiteralFromMap(reasonFromMap, v);
 				String explFromMap = explainVariable(litFromMap);
 				if (!result.contains(explFromMap) && !reason.contains(explFromMap)) {
-					// result contains an explanation for the BCP stack, reason contains an explanation for the violated clause 
+					// "result" contains an explanation for the BCP stack, "reason" contains an explanation for the violated clause 
 					result += explFromMap + "\n";
 				} else if (!tmp.equals("") && tmp.equals(explFromMap)) {
 					cntLength--; // if the same explanation has been generated again and length has been incremented, reduce length
@@ -619,7 +569,7 @@ public class LTMS {
 	private String explainVariable(Literal l) {
 		String s = "";
 		IFeature f = FeatureUtils.getFeatureTable(model).get(l.var);
-
+		
 		// if attribute is UP, explain relationship to parent
 		if (l.getSourceAttribute() == Literal.FeatureAttribute.Up) {
 			cntLength++; // increase length of explanation
@@ -630,20 +580,11 @@ public class LTMS {
 
 				// if parent is alternative, explain alternative relationship between all children
 				if (parent.getStructure().isAlternative()) {
-				//	Iterable<IFeature> children = FeatureUtils.getChildren(parent);
-				//	for (IFeature child : children) {
-				//		s += child + " alternative child of " + parentName + ", \n";
 						s += f.getName() + " alternative child of " + parentName + ", ";
-
-				//	}
 				}
 				// if parent is or, explain or relationship between all children
 				else if (parent.getStructure().isOr()) {
-				//	Iterable<IFeature> children = FeatureUtils.getChildren(parent);
-				//	for (IFeature child : children) {
-				//		s += child + " or child of " + parentName + ", \n";
 					s += f.getName() + " or child of " + parentName + ", ";
-				//	}
 				}
 
 				else { // if parent is not "alt" or "or", then feature is mandatory or optional child
@@ -656,7 +597,6 @@ public class LTMS {
 			cntLength++; // increase length of explanation
 			s = "ROOT " + l.var.toString() + ", ";
 		}
-
 		// if attribute is CONSTRAINT, print origin constraint as explanation only
 		if (l.getSourceAttribute() == Literal.FeatureAttribute.Constraint) {
 			cntLength++; // increase length of explanation
@@ -673,7 +613,6 @@ public class LTMS {
 	private void setTruthValToUnknown(Node[] clausesFromCNF) {
 		for (int j = 0; j < clausesFromCNF.length; j++) { // for all clauses of the cnf 
 			Node clause = clausesFromCNF[j];
-
 			Node[] features = clause.getChildren();
 
 			if (features == null) {
@@ -682,12 +621,59 @@ public class LTMS {
 				valueMap.put(literal.var, expl);
 				continue;
 			}
-
 			for (Node feature : features) {
 				final Literal literal = (Literal) feature;
 				Bookkeeping expl = new Bookkeeping(literal.var, -1, null, null, false);
 				valueMap.put(literal.var, expl);
 			}
 		}
+	}
+	
+	/**
+	 * Returns a list which contains the literals of a given node.
+	 * 
+	 * @param node the node which contains the literals
+	 * @return a list which contains the literals
+	 */
+	private ArrayList<Literal> getLiterals(Node node) {
+		ArrayList<Literal> res = new ArrayList<Literal>();
+		if (node instanceof Literal) {
+			res.add((Literal) node);
+			return res;
+		}
+		Node[] childs = node.getChildren();
+		if (childs != null) {
+			for (Node child : childs) {
+				res.addAll(getLiterals(child));
+			}
+		}
+		return res;
+	}
+
+	/**
+	 * Returns a specified literal from (another) node
+	 * 
+	 * @param node the node which contains the literal
+	 * @param l the literal with the same name as the literal to return
+	 * @return the specified literal
+	 */
+	private Literal getLiteralFromMap(Node node, Literal l) {
+		Literal res = null;
+		if (node instanceof Literal) {
+			Literal lit = (Literal) node;
+			if (lit.var.toString().equals(l.var.toString()))
+				res = lit;
+			return res;
+		}
+		Node[] childs = node.getChildren();
+		if (childs != null) {
+			for (Node child : childs) {
+				res = getLiteralFromMap((child), l);
+				if (res != null) {
+					return res;
+				}
+			}
+		}
+		return res;
 	}
 }

@@ -31,30 +31,31 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
 
 /**
- * Generating explanations for dead features. Using logic truth maintenance system (LTMS) and
- * boolean constraint propagation (BCP).
+ * The class deadFeatures generates explanations for dead features. It uses a logic truth maintenance system (LTMS)
+ * and its boolean constraint propagation (BCP).
  * 
  * @author "Ananieva Sofia"
  */
 public class DeadFeatures {
 
-	private String reason = "";
-	private static IFeatureModel model; // the model with constraint which makes a feature dead
-	private Node constr; // constraint node which makes a feature dead
+	/**
+	 * The model after a change (with a constraint that makes a feature dead).
+	 */
+	private static IFeatureModel model; 
 
 	/**
-	 * Explain dead features using boolean constraint propagation. Set initial truth value assumptions of dead features to true
-	 * and propagate them until a violation in any clause occurs.
+	 * Explains dead features using boolean constraint propagation. Sets initial truth value assumptions of dead features to true
+	 * and propagates them until a violation in a clause occurs.
 	 * 
 	 * @param newModel the model with the new constraint which leads to a dead feature
 	 * @param deadFeatures a list of dead features
 	 * @param c the constraint which leads to a dead feature
 	 * @return String an explanation why the feature(s) is dead
 	 */
-	public String explainDeadFeature(IFeatureModel newModel, Collection<IFeature> deadFeatures, IConstraint c) {
+	public String explain(IFeatureModel newModel, Collection<IFeature> deadFeatures, IConstraint c) {
+		String reason = "";
 		setNewModel(newModel);
-		constr = c.getNode();
-
+		Node constr = c.getNode(); // constraint node which makes a feature dead
 		Node node = NodeCreator.createNodes(model, true).toCNF();
 		Node[] clauses = node.getChildren();
 
@@ -67,8 +68,7 @@ public class DeadFeatures {
 
 			// generate explanation which stops after first violation with "used" clauses in stack
 			String tmpReason = "Feature " + deadF + " is dead, because: \n";
-			tmpReason += ltms.explainDead(clauses, deadF);
-
+			tmpReason += ltms.explainDeadF(clauses, deadF);
 			if (!reason.contains(tmpReason)) {
 				reason += tmpReason;
 			}
@@ -128,5 +128,4 @@ public class DeadFeatures {
 	public static IFeatureModel getNewModel() {
 		return model;
 	}
-
 }

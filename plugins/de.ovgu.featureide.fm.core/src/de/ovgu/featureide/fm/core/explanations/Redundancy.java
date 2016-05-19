@@ -35,36 +35,47 @@ import org.prop4j.Literal;
 import org.prop4j.Node;
 
 /**
- * Generating explanations for redundant constraints. Using logic truth maintenance system (LTMS) and
- * boolean constraint propagation (BCP).
+ * The class Redundancy generates explanations for redundant constraints. It uses a logic truth maintenance system (LTMS)
+ * and its boolean constraint propagation (BCP).
  * 
  * @author "Ananieva Sofia"
  */
 public class Redundancy {
-
-	private HashMap<Object, Bookkeeping> valueMap = new HashMap<Object, Bookkeeping>(); //hashmap for bookkeeping of reasons and antecedents for literals 
-	private String reason = "";
-	private IFeatureModel model; // feature model without redundant constraint
-	private static IFeatureModel newModel; //feature model with redundant constraint
+	
+	/**
+	 * The hashMap for bookkeeping of reasons and antecedents for literals. Key = literal.var, value = class Bookkeeping
+	 */
+	private HashMap<Object, Bookkeeping> valueMap = new HashMap<Object, Bookkeeping>(); 
+	/**
+	 * The model before changes (usually without redundant constraints).
+	 */
+	private IFeatureModel model; 
+	/**
+	 * The model after changes (with redundant constraint).
+	 */
+	private static IFeatureModel newModel; 
+	/**
+	 * The list which contains a literal of a respective feature from the redundant constraint.
+	 */
 	private ArrayList<Literal> featRedundantConstr = null;
 
 	/**
 	 * Explains why a constraint is redundant. Assumes values for features of the redundant constraint
-	 * which lead to a false formula of the redundant constraint and propagates this values until an inconsistency
-	 * occurs.
+	 * which lead to a false formula of the redundant constraint and propagates this values until a violation
+	 * in a clause occurs.
 	 * 
 	 * @param oldModel the feature model without the redundant constraint
 	 * @param redundantConstraint the redundant constraint
 	 */
-	public String explainRedundancy(IFeatureModel oldModel, IFeatureModel newModel, IConstraint redundantConstraint) {
+	public String explain(IFeatureModel oldModel, IFeatureModel newModel, IConstraint redundantConstraint) {
 		model = oldModel; // the model without the redundant constraint
 		setNewModel(newModel);
 		featRedundantConstr = getLiterals(redundantConstraint.getNode());
 		featRedundantConstr = new ArrayList<Literal>(new LinkedHashSet<Literal>(featRedundantConstr)); // remove duplicates from list
-		reason = "Constraint is redundant, because: \n,"; // last comma is used as delimiter in order to remove duplicates 
+		String reason = "Constraint is redundant, because: \n,"; // last comma is used as delimiter in order to remove duplicates 
 		Node node = NodeCreator.createNodes(oldModel, true).toCNF(); 
 		Node redundantConstr = redundantConstraint.getNode().toCNF();
-		ArrayList<HashMap<Object, Integer>> values = getInitialValues(featRedundantConstr.size(), redundantConstr, featRedundantConstr); // arraylist of hashmaps with values for false cnf
+		ArrayList<HashMap<Object, Integer>> values = getFeatureValues(featRedundantConstr.size(), redundantConstr, featRedundantConstr); // arraylist of hashmaps with values for false cnf
 		Node[] clauses = node.getChildren();
 
 		for (HashMap<Object, Integer> map : values) {
@@ -76,10 +87,7 @@ public class Redundancy {
 				valueMap.get(l.var).premise = true;
 			}
 			LTMS ltms = new LTMS(model, valueMap, featRedundantConstr);
-			String tmpReason = ltms.explainRedundant(clauses, map).trim() + "\n";
-			if (!reason.contains(tmpReason)) {
-				reason += tmpReason;
-			}
+			reason += ltms.explainRedundant(clauses, map).trim() + "\n";
 		}
 		if (reason.isEmpty()) {
 			return "No explanation possible";
@@ -96,7 +104,7 @@ public class Redundancy {
 	 * @return String the string with the explanation for a redundant constraint
 	 */
 	private String prepare(String s) {	
-		s = removeDup(reason); // remove duplicates
+		s = removeDup(s); // remove duplicates
 		int lastChar = s.lastIndexOf(",");
 		s = s.substring(0, lastChar); // remove last comma from explanation
 		s = s.substring(1, 35) + s.substring(39); // remove comma which was only used as delimiter to remove duplicates
@@ -143,7 +151,6 @@ public class Redundancy {
 			res.add((Literal) node);
 			return res;
 		}
-
 		Node[] childs = node.getChildren();
 		if (childs != null) {
 			for (Node child : childs) {
@@ -161,16 +168,13 @@ public class Redundancy {
 	private void setTruthValueToUnknown(Node[] clausesFromCNF) {
 		for (int j = 0; j < clausesFromCNF.length; j++) { // for all clauses of the cnf 
 			Node clause = clausesFromCNF[j];
-
 			Node[] features = clause.getChildren();
-
 			if (features == null) {
 				final Literal literal = (Literal) clause;
 				Bookkeeping expl = new Bookkeeping(literal.var, -1, null, null, false);
 				valueMap.put(literal.var, expl);
 				continue;
 			}
-
 			for (Node feature : features) {
 				final Literal literal = (Literal) feature;
 				Bookkeeping expl = new Bookkeeping(literal.var, -1, null, null, false);
@@ -187,7 +191,7 @@ public class Redundancy {
 	 * @param literals the literals from the redundant constraint
 	 * @return a list which contains a mapping between a variable and its value assignment
 	 */
-	private ArrayList<HashMap<Object, Integer>> getInitialValues(int n, Node cnf, ArrayList<Literal> literals) {
+	private ArrayList<HashMap<Object, Integer>> getFeatureValues(int n, Node cnf, ArrayList<Literal> literals) {
 		HashMap<Object, Integer> map = new HashMap<Object, Integer>();
 		ArrayList<HashMap<Object, Integer>> res = new ArrayList<HashMap<Object, Integer>>();
 
@@ -196,14 +200,12 @@ public class Redundancy {
 			while (binaryRep.length() != n) {
 				binaryRep = '0' + binaryRep;
 			}
-
 			for (int k = 0; k < n; k++) { // literals
 				int val = Character.getNumericValue(binaryRep.charAt(k));
 				Literal lit = literals.get(k);
 				map.put(lit.var, val);
 				continue;
 			} // here, all literals have their value according to a row in a truth table
-
 			Node[] clauses = cnf.getChildren();
 			if (clauses != null) {
 				for (int l = 0; l < clauses.length; l++) {
