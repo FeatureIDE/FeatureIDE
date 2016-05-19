@@ -108,7 +108,10 @@ public class ClassEditPart extends AbstractGraphicalEditPart {
 			if (fileName.contains("*"))
 				return;
 
-			IFolder buildFolder = CorePlugin.getFeatureProject(classModel.getRoles().getFirst().getFile()).getBuildFolder();
+			final LinkedList<FSTRole> roles = classModel.getRoles();
+			
+			IFile roleFile = roles.getFirst().getFile();
+			IFolder buildFolder = CorePlugin.getFeatureProject(roleFile).getBuildFolder();
 			IFile file = buildFolder.getFile(fileName);
 			try {
 				if (!file.exists())

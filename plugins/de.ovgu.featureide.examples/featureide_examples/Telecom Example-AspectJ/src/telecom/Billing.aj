@@ -70,4 +70,13 @@ public aspect Billing {
     public void Customer.addCharge(long charge){
         totalCharge += charge;
     }
+    
+    before(Customer c): execution(* BasicSimulation.report(Customer)) && args(c)  {
+        Timing t = Timing.aspectOf();
+        Billing b = Billing.aspectOf();
+        System.out.println(c + " has been connected for "
+  			   + t.getTotalConnectTime(c)
+  			   + " seconds and has a bill of "
+  			   + b.getTotalCharge(c));
+     }
 }
