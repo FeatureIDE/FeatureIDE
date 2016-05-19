@@ -22,6 +22,7 @@ package de.ovgu.featureide.fm.core.conversion;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -52,8 +53,8 @@ public class NNFConverter implements IConverterStrategy {
 	/*
 	 * Factory 
 	 */
-	private static final IFeatureModelFactory factory = FMFactoryManager.getFactory();
-	
+	protected static final IFeatureModelFactory factory = FMFactoryManager.getFactory();
+	private static int number = 0;
 	/**
 	 * Restructures root if needed
 	 * @param fm Feature model
@@ -84,8 +85,45 @@ public class NNFConverter implements IConverterStrategy {
 		return top;
 	}	
 	
-	protected void createStructureAndConstraints(IFeatureModel fm, List<Node> nodes, boolean preserve) {	
+	protected void createStructureAndConstraints(IFeatureModel fm, IFeature top, List<Node> nodes, boolean preserve) {	
 		//TODO create structure and constraints
+		for(Node node : nodes) {
+			if(node instanceof Literal || node instanceof Not) {
+				String name = node.getContainedFeatures().get(0) + (number++);
+				IFeature feature = factory.createFeature(top.getFeatureModel(), name);
+				feature.getStructure().setAbstract(true);
+				feature.getStructure().setMandatory(true);
+				top.getStructure().addChild(feature.getStructure());
+				if(((Literal)node).positive) {
+					Node requires = new Implies(name, node.getContainedFeatures().get(0));
+					fm.addConstraint(factory.createConstraint(fm, requires));
+					if(preserve) {
+						requires = new Implies(node.getContainedFeatures().get(0), name);
+						fm.addConstraint(factory.createConstraint(fm, requires));
+					}
+				} else {
+					Node excludes = new Implies(name, new Not(node.getContainedFeatures().get(0)));
+					fm.addConstraint(factory.createConstraint(fm, excludes));
+				}
+				return;
+			}
+		
+			//Either And or Or
+			IFeature feature = factory.createFeature(top.getFeatureModel(), "f" + (number++));
+			feature.getStructure().setAbstract(true);
+			feature.getStructure().setMandatory(true);
+			if(node instanceof And) {
+				feature.getStructure().setAnd();
+			} else {
+				feature.getStructure().setOr();
+			}
+			
+			createStructureAndConstraints(fm, feature, Arrays.asList(node.getChildren()), preserve);
+			
+			top.getStructure().addChild(feature.getStructure());
+		}
+		
+		
 	}
 	
 	@Override
@@ -96,7 +134,7 @@ public class NNFConverter implements IConverterStrategy {
 		
 		IFeature top = prepareTopElement(result, "top");
 		
-		createStructureAndConstraints(fm, nodes, preserve);
+		createStructureAndConstraints(fm, top, nodes, preserve);
 		
 		return result;
 	}
