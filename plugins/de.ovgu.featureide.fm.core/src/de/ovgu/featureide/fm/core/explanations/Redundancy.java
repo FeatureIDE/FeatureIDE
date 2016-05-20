@@ -21,7 +21,7 @@
 package de.ovgu.featureide.fm.core.explanations;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 
@@ -72,12 +72,14 @@ public class Redundancy {
 		setNewModel(newModel);
 		featRedundantConstr = getLiterals(redundantConstraint.getNode());
 		featRedundantConstr = new ArrayList<Literal>(new LinkedHashSet<Literal>(featRedundantConstr)); // remove duplicates from list
-		String reason = "Constraint is redundant, because: \n,"; // last comma is used as delimiter in order to remove duplicates 
+		String reason = "Constraint is redundant, because: \n";  
 		Node node = NodeCreator.createNodes(oldModel, true).toCNF(); 
 		Node redundantConstr = redundantConstraint.getNode().toCNF();
 		ArrayList<HashMap<Object, Integer>> values = getFeatureValues(featRedundantConstr.size(), redundantConstr, featRedundantConstr); // arraylist of hashmaps with values for false cnf
 		Node[] clauses = node.getChildren();
 
+		List<String> reasons = new ArrayList<String>(); // collect all explanations into array without duplicates
+		
 		for (HashMap<Object, Integer> map : values) {
 			reason = reason.trim() + "\n";
 			setTruthValueToUnknown(clauses); //(re)set all literal values to -1
@@ -87,38 +89,24 @@ public class Redundancy {
 				valueMap.get(l.var).premise = true;
 			}
 			LTMS ltms = new LTMS(model, valueMap, featRedundantConstr);
-			reason += ltms.explainRedundant(clauses, map).trim() + "\n";
+			List<String> explanationList = ltms.explainRedundant(clauses, map);
+
+			for (String tmp: explanationList) {
+				if (!reasons.contains(tmp)) { 
+					reasons.add(tmp);
+				}
+			}
 		}
-		if (reason.isEmpty()) {
+		if (reasons.isEmpty()) {
 			return "No explanation possible";
 		} else {		
-			reason = prepare(reason);
+			reason=reasons.get(0); // initialize reason with first explanation
+			reasons.remove(0); // start with second explanation
+			for (String tmp : reasons) {
+				reason += ",\n" + tmp;
+			}
 			return reason;
 		}
-	}
-	
-	/**
-	 * Prepare string for tool tip. Remove duplicates and unnecessary characters.
-	 * 
-	 * @param The string to prepare
-	 * @return String the string with the explanation for a redundant constraint
-	 */
-	private String prepare(String s) {	
-		s = removeDup(s); // remove duplicates
-		int lastChar = s.lastIndexOf(",");
-		s = s.substring(0, lastChar); // remove last comma from explanation
-		s = s.substring(1, 35) + s.substring(39); // remove comma which was only used as delimiter to remove duplicates
-		return s; 
-	}
-	
-	/**
-	 * Remove duplicate explanation parts which are separated by ","
-	 * 
-	 * @param The string to remove the duplicates from
-	 * @return String the string without duplicates
-	 */
-	private String removeDup(String s) {
-	    return new LinkedHashSet<String>(Arrays.asList(s.split(","))).toString();
 	}
 
 	/**

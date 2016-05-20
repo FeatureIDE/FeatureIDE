@@ -706,7 +706,7 @@ public class FeatureModelAnalyzer {
 
 					FalseOptional falseOpts = new FalseOptional();
 					int constrInd = FeatureUtils.getConstraintIndex(clone, constraint);
-					String expl = falseOpts.explainFalseOptionalFeature(clone, constraint);
+					String expl = falseOpts.explain(clone, constraint);
 					falseOptExpl.put(constrInd, expl);
 				}
 
@@ -715,7 +715,7 @@ public class FeatureModelAnalyzer {
 
 					DeadFeatures deadF = new DeadFeatures();
 					int constrInd = FeatureUtils.getConstraintIndex(clone, constraint);
-					String expl = deadF.explainDeadFeature(clone, deadFeatures, constraint);
+					String expl = deadF.explain(clone, deadFeatures, constraint);
 					deadFExpl.put(constrInd, expl);
 
 					if (!deadFeatures.isEmpty()) {
@@ -764,7 +764,7 @@ public class FeatureModelAnalyzer {
 			System.out.println("Start: " + timeStart + " Millisek.");
 
 			Redundancy redundancy = new Redundancy();
-			String expl = redundancy.explainRedundancy(oldModel, clone, constraint); //store explanation for redundant constraint
+			String expl = redundancy.explain(oldModel, clone, constraint); //store explanation for redundant constraint
 			redExpl.put(FeatureUtils.getConstraintIndex(clone, constraint), expl);
 			final long timeEnd = System.currentTimeMillis();
 			System.out.println("Ende: " + timeEnd + " Millisek.");

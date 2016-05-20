@@ -23,6 +23,7 @@ package de.ovgu.featureide.fm.core.explanations;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.prop4j.And;
 import org.prop4j.Literal;
@@ -67,18 +68,20 @@ public class FalseOptional {
 			LTMS ltms = new LTMS(model);
 			String tmpReason = "Feature " + falseOptional + " is false-optional, because: \n";
 
-			tmpReason += ltms.explainFalseOps(clauses, falseOptional);
-			if (!reason.contains(tmpReason)) {
-				reason += tmpReason;
+			List<String> explList = ltms.explainFalseOps(clauses, falseOptional);
+			if (explList.isEmpty()){
+				tmpReason += "No explanation possible";
 			}
-			int lastChar = reason.lastIndexOf(",");
-			reason = reason.substring(0, lastChar) + "\n\n";
+			else{	
+				for (String tmp : explList) {
+					tmpReason += tmp + ",\n";
+				}
+				int lastChar = tmpReason.lastIndexOf(",");
+				tmpReason = tmpReason.substring(0, lastChar);
+			}
+			reason += tmpReason + "\n\n";
 		}
-		if (reason.isEmpty()) {
-			return "No explanation possible";
-		} else {
-			return reason.trim();
-		}
+		return reason;
 	}
 
 	/**

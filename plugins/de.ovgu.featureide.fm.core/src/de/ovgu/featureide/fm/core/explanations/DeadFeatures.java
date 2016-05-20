@@ -21,6 +21,7 @@
 package de.ovgu.featureide.fm.core.explanations;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.prop4j.Literal;
 import org.prop4j.Node;
@@ -68,18 +69,20 @@ public class DeadFeatures {
 
 			// generate explanation which stops after first violation with "used" clauses in stack
 			String tmpReason = "Feature " + deadF + " is dead, because: \n";
-			tmpReason += ltms.explainDeadF(clauses, deadF);
-			if (!reason.contains(tmpReason)) {
-				reason += tmpReason;
+			List<String> explList = ltms.explainDeadF(clauses, deadF);
+			if (explList.isEmpty()){
+				tmpReason += "No explanation possible";
 			}
-			int lastChar = reason.lastIndexOf(",");
-			reason = reason.substring(0, lastChar) + "\n\n";
+			else{	
+				for (String tmp : explList) {
+					tmpReason += tmp + ",\n";
+				}
+				int lastChar = tmpReason.lastIndexOf(",");
+				tmpReason = tmpReason.substring(0, lastChar);
+			}
+			reason += tmpReason + "\n\n";
 		}
-		if (reason.isEmpty()) {
-			return "No explanation possible";
-		} else {
-			return reason.trim();
-		}
+		return reason;
 	}
 
 	/**
