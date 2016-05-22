@@ -69,7 +69,7 @@ public class DeadFeatures {
 
 			// generate explanation which stops after first violation with "used" clauses in stack
 			String tmpReason = "Feature " + deadF + " is dead, because: \n";
-			List<String> explList = ltms.explainDeadF(clauses, deadF);
+			List<String> explList = ltms.explainDeadFeature(clauses, deadF);
 			if (explList.isEmpty()){
 				tmpReason += "No explanation possible";
 			}
@@ -82,7 +82,7 @@ public class DeadFeatures {
 			}
 			reason += tmpReason + "\n\n";
 		}
-		return reason;
+		return reason.trim();
 	}
 
 	/**

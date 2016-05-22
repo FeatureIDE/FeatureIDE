@@ -68,7 +68,7 @@ public class FalseOptional {
 			LTMS ltms = new LTMS(model);
 			String tmpReason = "Feature " + falseOptional + " is false-optional, because: \n";
 
-			List<String> explList = ltms.explainFalseOps(clauses, falseOptional);
+			List<String> explList = ltms.explainFalseOpsFeature(clauses, falseOptional);
 			if (explList.isEmpty()){
 				tmpReason += "No explanation possible";
 			}
@@ -81,7 +81,7 @@ public class FalseOptional {
 			}
 			reason += tmpReason + "\n\n";
 		}
-		return reason;
+		return reason.trim();
 	}
 
 	/**

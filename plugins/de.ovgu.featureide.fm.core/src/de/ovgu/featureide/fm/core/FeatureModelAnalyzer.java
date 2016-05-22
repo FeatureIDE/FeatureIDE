@@ -768,7 +768,7 @@ public class FeatureModelAnalyzer {
 			redExpl.put(FeatureUtils.getConstraintIndex(clone, constraint), expl);
 			final long timeEnd = System.currentTimeMillis();
 			System.out.println("Ende: " + timeEnd + " Millisek.");
-			System.out.println("Gesamte Verlaufszeit: " + (timeEnd - timeStart) + " Millisek.\n\n");
+			System.out.println("Verlaufszeit pro Constr: " + (timeEnd - timeStart) + " Millisek.\n\n");
 			if (oldAttributes.get(constraint) != ConstraintAttribute.REDUNDANT) {
 				changedAttributes.put(constraint, ConstraintAttribute.REDUNDANT);
 			}

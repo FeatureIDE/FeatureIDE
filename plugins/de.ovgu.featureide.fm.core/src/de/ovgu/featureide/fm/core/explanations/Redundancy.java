@@ -89,7 +89,7 @@ public class Redundancy {
 				valueMap.get(l.var).premise = true;
 			}
 			LTMS ltms = new LTMS(model, valueMap, featRedundantConstr);
-			List<String> explanationList = ltms.explainRedundant(clauses, map);
+			List<String> explanationList = ltms.explainRedundantConstraint(clauses, map);
 
 			for (String tmp: explanationList) {
 				if (!reasons.contains(tmp)) { 
@@ -100,7 +100,7 @@ public class Redundancy {
 		if (reasons.isEmpty()) {
 			return "No explanation possible";
 		} else {		
-			reason=reasons.get(0); // initialize reason with first explanation
+			reason+=reasons.get(0); // initialize reason with first explanation
 			reasons.remove(0); // start with second explanation
 			for (String tmp : reasons) {
 				reason += ",\n" + tmp;
