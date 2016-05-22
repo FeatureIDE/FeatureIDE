@@ -130,9 +130,6 @@ public class LTMS {
 		// if we are here, propagated values via BCP lead to a false clause
 		findUnitOpenClauses(featuresRedundantConstr, clauses); // find first open clauses with initial truth value assumptions
 		BCP(clauses);// true, if violation occured during BCP
-
-		final long firstExpl = System.currentTimeMillis(); // performance
-		System.out.println("Erste Erklärung: " + firstExpl + " Millisek."); // performance
 		return shortestExplanation(clauses, map, null, ExplanationMode.Redundancy);
 	}
 

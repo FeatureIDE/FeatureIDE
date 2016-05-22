@@ -760,15 +760,10 @@ public class FeatureModelAnalyzer {
 		ModelComparator comparator = new ModelComparator(500);
 		Comparison comparison = comparator.compare(clone, oldModel);
 		if (comparison == Comparison.REFACTORING) {
-			final long timeStart = System.currentTimeMillis();
-			System.out.println("Start: " + timeStart + " Millisek.");
 
 			Redundancy redundancy = new Redundancy();
 			String expl = redundancy.explain(oldModel, clone, constraint); //store explanation for redundant constraint
 			redExpl.put(FeatureUtils.getConstraintIndex(clone, constraint), expl);
-			final long timeEnd = System.currentTimeMillis();
-			System.out.println("Ende: " + timeEnd + " Millisek.");
-			System.out.println("Verlaufszeit pro Constr: " + (timeEnd - timeStart) + " Millisek.\n\n");
 			if (oldAttributes.get(constraint) != ConstraintAttribute.REDUNDANT) {
 				changedAttributes.put(constraint, ConstraintAttribute.REDUNDANT);
 			}
