@@ -53,7 +53,7 @@ public class DeadFeatures {
 	 * @param c the constraint which leads to a dead feature
 	 * @return String an explanation why the feature(s) is dead
 	 */
-	public String explain(IFeatureModel newModel, Collection<IFeature> deadFeatures, IConstraint c) {
+	public String explain(IFeatureModel newModel, IConstraint c, Collection<IFeature> deadFeatures) {
 		String reason = "";
 		setNewModel(newModel);
 		Node constr = c.getNode(); // constraint node which makes a feature dead

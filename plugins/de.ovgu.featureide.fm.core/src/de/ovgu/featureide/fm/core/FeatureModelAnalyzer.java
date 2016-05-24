@@ -706,23 +706,24 @@ public class FeatureModelAnalyzer {
 
 					FalseOptional falseOpts = new FalseOptional();
 					int constrInd = FeatureUtils.getConstraintIndex(clone, constraint);
-					String expl = falseOpts.explain(clone, constraint);
+					String expl = falseOpts.explain(clone, constraint.getFalseOptional());
 					falseOptExpl.put(constrInd, expl);
 				}
 
 				if (!fmDeadFeatures.isEmpty()) {
 					Collection<IFeature> deadFeatures = Functional.toList(constraint.getDeadFeatures(solver, clone, fmDeadFeatures));
 
-					DeadFeatures deadF = new DeadFeatures();
-					int constrInd = FeatureUtils.getConstraintIndex(clone, constraint);
-					String expl = deadF.explain(clone, deadFeatures, constraint);
-					deadFExpl.put(constrInd, expl);
-
 					if (!deadFeatures.isEmpty()) {
 						fmDeadFeatures.removeAll(deadFeatures);
 						constraint.setDeadFeatures(deadFeatures);
 						constraint.setConstraintAttribute(ConstraintAttribute.DEAD, false);
 						changedAttributes.put(constraint, ConstraintAttribute.DEAD);
+
+						// generate explanation for the dead feature
+						DeadFeatures deadF = new DeadFeatures();
+						int constrInd = FeatureUtils.getConstraintIndex(clone, constraint);
+						String expl = deadF.explain(clone, constraint, constraint.getDeadFeatures());
+						deadFExpl.put(constrInd, expl);
 					}
 				} else {
 					constraint.setDeadFeatures(Collections.<IFeature> emptyList());

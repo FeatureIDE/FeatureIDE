@@ -130,7 +130,8 @@ public class LTMS {
 		// if we are here, propagated values via BCP lead to a false clause
 		findUnitOpenClauses(featuresRedundantConstr, clauses); // find first open clauses with initial truth value assumptions
 		BCP(clauses);// true, if violation occured during BCP
-		return shortestExplanation(clauses, map, null, ExplanationMode.Redundancy);
+		return reason;
+		//return shortestExplanation(clauses, map, null, ExplanationMode.Redundancy);
 	}
 
 	/**

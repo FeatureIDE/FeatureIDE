@@ -20,7 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.explanations;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -29,7 +28,6 @@ import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 
-import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.editing.NodeCreator;
@@ -55,13 +53,12 @@ public class FalseOptional {
 	 * @param falsOptionals a list of false optional features
 	 * @return String an explanation why the feature(s) is false optional
 	 */
-	public String explain(IFeatureModel newModel, IConstraint constr) {
+	public String explain(IFeatureModel newModel, Collection<IFeature> falseOptionals) {
 		String reason = "";
 		setNewModel(newModel);
 		Node node = NodeCreator.createNodes(model, true).toCNF();
 		Node withoutTrueClauses = eliminateTrueClauses(node);
 		Node[] clauses = withoutTrueClauses.getChildren();
-		Collection<IFeature> falseOptionals = new ArrayList<>(constr.getFalseOptional());
 
 		for (IFeature falsopt : falseOptionals) {
 			Literal falseOptional = new Literal(falsopt.getName());
