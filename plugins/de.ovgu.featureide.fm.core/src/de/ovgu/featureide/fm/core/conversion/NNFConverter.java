@@ -94,18 +94,18 @@ public class NNFConverter implements IConverterStrategy {
 				feature.getStructure().setAbstract(true);
 				feature.getStructure().setMandatory(true);
 				top.getStructure().addChild(feature.getStructure());
-				if(((Literal)node).positive) {
+				if(!(node instanceof Not) && ((Literal)node).positive) {
 					Node requires = new Implies(name, node.getContainedFeatures().get(0));
-					fm.addConstraint(factory.createConstraint(fm, requires));
+					top.getFeatureModel().addConstraint(factory.createConstraint(fm, requires));
 					if(preserve) {
 						requires = new Implies(node.getContainedFeatures().get(0), name);
-						fm.addConstraint(factory.createConstraint(fm, requires));
+						top.getFeatureModel().addConstraint(factory.createConstraint(fm, requires));
 					}
 				} else {
 					Node excludes = new Implies(name, new Not(node.getContainedFeatures().get(0)));
-					fm.addConstraint(factory.createConstraint(fm, excludes));
+					top.getFeatureModel().addConstraint(factory.createConstraint(fm, excludes));
 				}
-				return;
+				continue;
 			}
 		
 			//Either And or Or
@@ -122,8 +122,6 @@ public class NNFConverter implements IConverterStrategy {
 			
 			top.getStructure().addChild(feature.getStructure());
 		}
-		
-		
 	}
 	
 	@Override
