@@ -130,8 +130,7 @@ public class LTMS {
 		// if we are here, propagated values via BCP lead to a false clause
 		findUnitOpenClauses(featuresRedundantConstr, clauses); // find first open clauses with initial truth value assumptions
 		BCP(clauses);// true, if violation occured during BCP
-		return reason;
-		//return shortestExplanation(clauses, map, null, ExplanationMode.Redundancy);
+		return shortestExplanation(clauses, map, null, ExplanationMode.Redundancy);
 	}
 
 	/**
@@ -174,13 +173,24 @@ public class LTMS {
 	 * @return String an explanation why the feature is dead
 	 */
 	public List<String> explainDeadFeature(Node[] clauses, Literal deadF) {
+		ArrayList<Literal> deads = new ArrayList<Literal>();
+		deads.add(deadF);
 		reason.clear();
 		setTruthValToUnknown(clauses);
+		valueMap.get(deadF.var).value = 1;
 		valueMap.get(deadF.var).premise = true;
 
-		if (setValueAndFindUnitOpenClauses(deadF, false, clauses)) {
-			BCP(clauses);
+		// if initial truth values lead to a false clause, explain immediately
+		if (isViolated(clauses)) {
+			ArrayList<Literal> literalList = getLiterals(violatedClause);
+			for (Literal l : literalList) {
+				String tmpReason = explainVariable(l);
+				addToReasonListOptionally(tmpReason);
+			}
+			return reason;
 		}
+		findUnitOpenClauses(deads, clauses); 
+		BCP(clauses);
 		return shortestExplanation(clauses, null, deadF, ExplanationMode.DeadFeature);
 	}
 
@@ -266,7 +276,12 @@ public class LTMS {
 	private boolean setValueAndFindUnitOpenClauses(Literal literal, boolean negated, Node[] allClauses) {
 
 		// propagate value of variable to be true or false
-		valueMap.get(literal.var).value = literal.positive ? 1 : 0;
+		if (literal.positive == true) {
+			valueMap.get(literal.var).value = 1;
+		} else {
+			valueMap.get(literal.var).value = 0;
+		}
+		//valueMap.get(literal.var).value = literal.positive ? 1 : 0;
 
 		// for each clause in all clauses of the cnf that contains not this-literal
 		for (Node cnfclause : allClauses) {

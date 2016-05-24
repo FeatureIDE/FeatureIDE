@@ -67,7 +67,7 @@ public class FalseOptional {
 
 			List<String> explList = ltms.explainFalseOpsFeature(clauses, falseOptional);
 			if (explList.isEmpty()){
-				tmpReason += "No explanation possible";
+				tmpReason += "No explanation possible, some parent might be dead";
 			}
 			else{	
 				for (String tmp : explList) {

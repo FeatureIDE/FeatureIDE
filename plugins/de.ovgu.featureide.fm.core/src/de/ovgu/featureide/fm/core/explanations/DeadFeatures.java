@@ -56,22 +56,18 @@ public class DeadFeatures {
 	public String explain(IFeatureModel newModel, IConstraint c, Collection<IFeature> deadFeatures) {
 		String reason = "";
 		setNewModel(newModel);
-		Node constr = c.getNode(); // constraint node which makes a feature dead
 		Node node = NodeCreator.createNodes(model, true).toCNF();
 		Node[] clauses = node.getChildren();
 
 		for (IFeature deadFeature : deadFeatures) {
-			Literal deadF = getLiteralFromNode(constr, deadFeature);
-			if (deadF == null) { // possible that constraint does not contain the dead feature. Instantiate the dead literal
-				deadF = new Literal(deadFeature.getName());
-			}
+			Literal	deadF = new Literal(deadFeature.getName());
 			LTMS ltms = new LTMS(model);
 
 			// generate explanation which stops after first violation with "used" clauses in stack
 			String tmpReason = "Feature " + deadF + " is dead, because: \n";
 			List<String> explList = ltms.explainDeadFeature(clauses, deadF);
 			if (explList.isEmpty()){
-				tmpReason += "No explanation possible";
+				tmpReason += "No explanation possible, some parent might be dead";
 			}
 			else{	
 				for (String tmp : explList) {
@@ -84,36 +80,7 @@ public class DeadFeatures {
 		}
 		return reason.trim();
 	}
-
-	/**
-	 * Returns a literal from a node (the constraint which leads to dead feature(s)) with the same name
-	 * as the specified feature as BCP only works with literals and not with features.
-	 * 
-	 * @param node the constraint which leads to dead feature(s)
-	 * @param l the dead feature
-	 * @return the respective literal from the constraint node which leads to the dead feature
-	 */
-	private Literal getLiteralFromNode(Node node, IFeature l) {
-		Literal res = null;
-		if (node instanceof Literal) {
-			Literal lit = (Literal) node;
-			if (lit.var.toString().equals(l.getName().toString())) {
-				res = lit;
-			}
-			return res;
-		}
-		Node[] childs = node.getChildren();
-		if (childs != null) {
-			for (Node child : childs) {
-				res = getLiteralFromNode((child), l);
-				if (res != null) {
-					return res;
-				}
-			}
-		}
-		return res;
-	}
-
+	
 	/**
 	 * Sets the model with the new constraint which lead to a dead feature.
 	 * 
