@@ -145,22 +145,87 @@ public class ComplexConstraintConverter {
 		return converter.convert(fm, minComplexNodes, true);
 	}
 	
+	/**
+	 * 
+	 * @param clause
+	 * @return
+	 */
 	protected Node minimize(Node clause) {
 		//TODO minimize complex clauses
 		return clause;
 	}
 	
+	/**
+	 * Removes tautologies and redundant constraints.
+	 * If the feature model is a void model or unsatisfiable then a simple contradicting feature model will be created.
+	 */
 	protected void prepare() {
-		//TODO remove redundant constraints or tautologies (method: prepare)
-		//TODO split up clauses from complex constraints that model a simple constraint (method: prepare)
-		//TODO replace requires and excludes constraint with "implication"-syntax (method: prepare)
+		FeatureModelAnalyzer analyzer = fm.getAnalyser();
+		
+		analyzer.calculateFeatures = true;
+		analyzer.calculateConstraints = true;
+		analyzer.calculateRedundantConstraints = true;
+		analyzer.calculateTautologyConstraints = true;
+		
+		analyzer.analyzeFeatureModel(null);
+		List<IConstraint> toRemove = new LinkedList<IConstraint>();
+		
+		for (IConstraint c : fm.getConstraints()) {
+			ConstraintAttribute attribute = c.getConstraintAttribute();
+			
+			if (attribute == ConstraintAttribute.REDUNDANT || attribute == ConstraintAttribute.TAUTOLOGY) {
+				toRemove.add(c);
+			} else if (attribute == ConstraintAttribute.VOID_MODEL || attribute == ConstraintAttribute.UNSATISFIABLE ) {
+				IFeatureModel voidModel = factory.createFeatureModel();
+				IFeature root = factory.createFeature(fm, "root");
+				root.getStructure().setAbstract(true);
+				voidModel.getStructure().setRoot(root.getStructure());
+				voidModel.addConstraint(factory.createConstraint(fm, new Implies(root, new Not(root))));
+				fm = voidModel;
+				toRemove.clear();
+				return;
+			}
+		}
+	
+		for (IConstraint c : toRemove) {
+			fm.removeConstraint(c);
+		}
 	}
 	
+	/**
+	 * Splits up a complex constraint completely into simple constraints if possible.
+	 */
+	protected void refactorPseudocomplexConstraints() {
+		List<IConstraint> pseudocomplexConstraints = new LinkedList<IConstraint>();
+		for(IConstraint c : fm.getConstraints()) {
+			if(ComplexConstraintConverter.isPseudocomplex(c.getNode().clone())) {
+				pseudocomplexConstraints.add(c);
+			}
+		}
+		
+		for(IConstraint c : pseudocomplexConstraints) {
+			Node cnf = c.getNode().toCNF();
+			if(cnf instanceof And) {
+				for(Node clause : cnf.getChildren()) {
+					fm.addConstraint(factory.createConstraint(fm, clause));
+				}
+			} else {
+				fm.addConstraint(factory.createConstraint(fm, cnf));
+			}
+			fm.removeConstraint(c);
+		}
+	}
+	
+	/**
+	 * Collects and removes all complex constraints from the feature model.
+	 * @return List of complex constraints
+	 */
 	protected List<IConstraint> pruneComplexConstraints() {
 		List<IConstraint> complexConstraints = new LinkedList<IConstraint>();
 		
 		for(IConstraint c : fm.getConstraints()) {
 			if(ComplexConstraintConverter.isComplex(c.getNode())) {
+				System.out.println("Prune: " + c.getNode());
 				complexConstraints.add(c);
 			}
 		}
