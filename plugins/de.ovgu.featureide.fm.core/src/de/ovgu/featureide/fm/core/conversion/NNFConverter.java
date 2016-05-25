@@ -50,17 +50,21 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
  * @author Alexander Knüppel
  */
 public class NNFConverter implements IConverterStrategy {
-	/*
-	 * Factory 
-	 */
+	/* Feature model factory */
 	protected static final IFeatureModelFactory factory = FMFactoryManager.getFactory();
+	/* Working feature model */
+	protected IFeatureModel fm;
+	/* Preserving configuration semantics */
+	protected boolean preserve = false;
+	/* Running number for naming */
 	private static int number = 0;
+	
 	/**
 	 * Restructures root if needed
 	 * @param fm Feature model
 	 * @param name Name of new root
 	 */
-	protected void restructureRoot(IFeatureModel fm, String name) {
+	protected void restructureRoot(String name) {
 		if(!fm.getStructure().getRoot().isAnd()) {
 			IFeature newRoot = factory.createFeature(fm, name);
 			newRoot.getStructure().addChild(fm.getStructure().getRoot());
@@ -75,7 +79,7 @@ public class NNFConverter implements IConverterStrategy {
 	 * @param name Name of element
 	 * @return The top element for further actions
 	 */
-	protected IFeature prepareTopElement(IFeatureModel fm, String name) {		
+	protected IFeature prepareTopElement(String name) {
 		IFeature top = factory.createFeature(fm, name);
 		fm.getStructure().getRoot().addChild(top.getStructure());
 		top.getStructure().changeToAnd();
@@ -85,30 +89,40 @@ public class NNFConverter implements IConverterStrategy {
 		return top;
 	}	
 	
-	protected void createStructureAndConstraints(IFeatureModel fm, IFeature top, List<Node> nodes, boolean preserve) {	
-		//TODO create structure and constraints
+	protected void addRequires(String f1, String f2) {
+		Node requires = new Implies(new Literal(f1), new Literal(f2));
+		fm.addConstraint(factory.createConstraint(fm, requires));
+	}
+	
+	protected void addExcludes(String f1, String f2) {
+		Node excludes = new Implies(new Literal(f1), new Not(new Literal(f2)));
+		fm.addConstraint(factory.createConstraint(fm, excludes));
+	}
+	
+	private void createStructureAndConstraints(IFeature top, List<Node> nodes, int level) {	
 		for(Node node : nodes) {
-			if(node instanceof Literal || node instanceof Not) {
+			// Terminal feature
+			if(node.getContainedFeatures().size() == 1) {
 				String name = node.getContainedFeatures().get(0) + (number++);
+				
 				IFeature feature = factory.createFeature(top.getFeatureModel(), name);
 				feature.getStructure().setAbstract(true);
-				feature.getStructure().setMandatory(true);
+				feature.getStructure().setMandatory(false);
 				top.getStructure().addChild(feature.getStructure());
+				
 				if(!(node instanceof Not) && ((Literal)node).positive) {
-					Node requires = new Implies(name, node.getContainedFeatures().get(0));
-					top.getFeatureModel().addConstraint(factory.createConstraint(fm, requires));
+					addRequires(name, node.getContainedFeatures().get(0));
 					if(preserve) {
-						requires = new Implies(node.getContainedFeatures().get(0), name);
-						top.getFeatureModel().addConstraint(factory.createConstraint(fm, requires));
+						addRequires(node.getContainedFeatures().get(0), name);
 					}
 				} else {
-					Node excludes = new Implies(name, new Not(node.getContainedFeatures().get(0)));
-					top.getFeatureModel().addConstraint(factory.createConstraint(fm, excludes));
+					addExcludes(name, node.getContainedFeatures().get(0));
 				}
+				
 				continue;
 			}
 		
-			//Either And or Or
+			// Non-Terminal feature: either And or Or
 			IFeature feature = factory.createFeature(top.getFeatureModel(), "f" + (number++));
 			feature.getStructure().setAbstract(true);
 			feature.getStructure().setMandatory(true);
@@ -118,23 +132,23 @@ public class NNFConverter implements IConverterStrategy {
 				feature.getStructure().setOr();
 			}
 			
-			createStructureAndConstraints(fm, feature, Arrays.asList(node.getChildren()), preserve);
-			
+			createStructureAndConstraints(feature, Arrays.asList(node.getChildren()), level+1);
 			top.getStructure().addChild(feature.getStructure());
 		}
 	}
 	
+	protected void createStructureAndConstraints(IFeature top, List<Node> nodes) {	
+		this.createStructureAndConstraints(top, nodes, 0);
+	}
+	
 	@Override
 	public IFeatureModel convert(IFeatureModel fm, List<Node> nodes, boolean preserve) {
-		IFeatureModel result = fm.clone();
-
-		restructureRoot(result, "new_root");
-		
-		IFeature top = prepareTopElement(result, "top");
-		
-		createStructureAndConstraints(fm, top, nodes, preserve);
-		
-		return result;
+		this.fm = fm.clone();
+		this.preserve = preserve;
+		restructureRoot("NewRoot");
+		IFeature top = prepareTopElement("top");
+		createStructureAndConstraints(top, nodes);
+		return this.fm;
 	}
 
 	@Override
