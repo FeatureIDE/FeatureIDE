@@ -83,7 +83,7 @@ public class ComplexConstraintConverter {
 	 * @param node
 	 * @return true if node consists of a number of simple constraints. False otherwise.
 	 */
-	public static boolean isPseudocomplex(Node node) {
+	public static boolean isPseudoComplex(Node node) {
 		Node cnf = node.toCNF();
 		
 		if(cnf instanceof Or)
@@ -118,7 +118,7 @@ public class ComplexConstraintConverter {
 		//Basic cleaning
 		prepare();
 		
-		refactorPseudocomplexConstraints();
+		refactorPseudoComplexConstraints();
 		
 		//Get list of complex clauses and remove them from the model
 		List<IConstraint> complexConstraints = pruneComplexConstraints();
@@ -195,15 +195,15 @@ public class ComplexConstraintConverter {
 	/**
 	 * Splits up a complex constraint completely into simple constraints if possible.
 	 */
-	protected void refactorPseudocomplexConstraints() {
-		List<IConstraint> pseudocomplexConstraints = new LinkedList<IConstraint>();
+	protected void refactorPseudoComplexConstraints() {
+		List<IConstraint> pseudoComplexConstraints = new LinkedList<IConstraint>();
 		for(IConstraint c : fm.getConstraints()) {
-			if(ComplexConstraintConverter.isPseudocomplex(c.getNode().clone())) {
-				pseudocomplexConstraints.add(c);
+			if(ComplexConstraintConverter.isPseudoComplex(c.getNode().clone())) {
+				pseudoComplexConstraints.add(c);
 			}
 		}
 		
-		for(IConstraint c : pseudocomplexConstraints) {
+		for(IConstraint c : pseudoComplexConstraints) {
 			Node cnf = c.getNode().toCNF();
 			if(cnf instanceof And) {
 				for(Node clause : cnf.getChildren()) {
