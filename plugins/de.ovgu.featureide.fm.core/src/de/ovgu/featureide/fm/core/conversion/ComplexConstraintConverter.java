@@ -23,11 +23,18 @@ package de.ovgu.featureide.fm.core.conversion;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.prop4j.And;
+import org.prop4j.Implies;
 import org.prop4j.Literal;
 import org.prop4j.Node;
+import org.prop4j.Not;
 import org.prop4j.Or;
 
+import de.ovgu.featureide.fm.core.ConstraintAttribute;
+import de.ovgu.featureide.fm.core.FeatureModel;
+import de.ovgu.featureide.fm.core.FeatureModelAnalyzer;
 import de.ovgu.featureide.fm.core.base.IConstraint;
+import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureModelFactory;
 import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
@@ -38,12 +45,13 @@ import de.ovgu.featureide.fm.core.base.impl.FMFactoryManager;
  * @author Alexander
  */
 public class ComplexConstraintConverter {
+	/* Feature model factory */
 	private static final IFeatureModelFactory factory = FMFactoryManager.getFactory();
-	
+	/* Working feature model */
 	protected IFeatureModel fm;
 	
 	/**
-	 * Checks whether given node is either a requires- or an excludes-constraint
+	 * Checks whether a given node is either a requires- or an excludes-constraint
 	 * @param node
 	 * @return true if node is a simple constraint. False otherwise.
 	 */
@@ -62,7 +70,7 @@ public class ComplexConstraintConverter {
 	}	
 	
 	/**
-	 * Checks whether given node is neither a requires- nor an excludes-constraint
+	 * Checks whether a given node is neither a requires- nor an excludes-constraint
 	 * @param node
 	 * @return true if node is a complex constraint. False otherwise.
 	 */
@@ -71,7 +79,26 @@ public class ComplexConstraintConverter {
 	}
 	
 	/**
-	 * Eliminates complex constraints according to given strategy
+	 * Checks whether a given node is a (hidden) composition of requires- and excludes-constraints
+	 * @param node
+	 * @return true if node consists of a number of simple constraints. False otherwise.
+	 */
+	public static boolean isPseudocomplex(Node node) {
+		Node cnf = node.toCNF();
+		
+		if(cnf instanceof Or)
+			return isSimple(node);
+		
+		boolean result = true;
+		for(Node child : cnf.getChildren()) {
+			result &= isSimple(child);
+		}
+		
+		return result;
+	}
+	
+	/**
+	 * Eliminates complex constraints according to a given strategy.
 	 * @param fm
 	 * @return
 	 */
@@ -90,6 +117,8 @@ public class ComplexConstraintConverter {
 				
 		//Basic cleaning
 		prepare();
+		
+		refactorPseudocomplexConstraints();
 		
 		//Get list of complex clauses and remove them from the model
 		List<IConstraint> complexConstraints = pruneComplexConstraints();
