@@ -166,7 +166,7 @@ public class PairWiseConfigurationGenerator extends SingleThreadAnalysis<List<Li
 	protected byte[] recArray = new byte[0];
 	protected final List<int[]> solutions = new ArrayList<>();
 
-	private final Deque<Configuration> tempConfigurationList = new LinkedList<>();
+	protected final Deque<Configuration> tempConfigurationList = new LinkedList<>();
 	public final BlockingQueue<Configuration> q = new LinkedBlockingQueue<>();
 
 	protected long time = 0;
