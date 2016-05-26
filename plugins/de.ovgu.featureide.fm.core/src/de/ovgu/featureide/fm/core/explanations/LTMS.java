@@ -117,7 +117,6 @@ public class LTMS {
 	 */
 	public List<String> explainRedundantConstraint(Node[] clauses, HashMap<Object, Integer> map) {
 		reason.clear();
-
 		// if initial truth values lead to a false clause, explain immediately
 		if (isViolated(clauses)) {
 			ArrayList<Literal> literalList = getLiterals(violatedClause);
@@ -276,12 +275,7 @@ public class LTMS {
 	private boolean setValueAndFindUnitOpenClauses(Literal literal, boolean negated, Node[] allClauses) {
 
 		// propagate value of variable to be true or false
-		if (literal.positive == true) {
-			valueMap.get(literal.var).value = 1;
-		} else {
-			valueMap.get(literal.var).value = 0;
-		}
-		//valueMap.get(literal.var).value = literal.positive ? 1 : 0;
+		valueMap.get(literal.var).value = literal.positive ? 1 : 0;
 
 		// for each clause in all clauses of the cnf that contains not this-literal
 		for (Node cnfclause : allClauses) {

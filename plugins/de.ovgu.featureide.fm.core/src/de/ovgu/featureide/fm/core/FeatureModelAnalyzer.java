@@ -712,7 +712,6 @@ public class FeatureModelAnalyzer {
 
 				if (!fmDeadFeatures.isEmpty()) {
 					Collection<IFeature> deadFeatures = Functional.toList(constraint.getDeadFeatures(solver, clone, fmDeadFeatures));
-
 					if (!deadFeatures.isEmpty()) {
 						fmDeadFeatures.removeAll(deadFeatures);
 						constraint.setDeadFeatures(deadFeatures);
