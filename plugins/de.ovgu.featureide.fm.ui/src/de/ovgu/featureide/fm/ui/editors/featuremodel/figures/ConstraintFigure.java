@@ -150,7 +150,7 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 			int constraintIndex = FeatureUtils.getConstraintIndex(model, constraint);
 			// set tooltip with explanation for redundant constraint
 			StringBuilder toolTip = new StringBuilder(FeatureModelAnalyzer.redExpl.get(constraintIndex).toString());
-			setToolTip(new Label(toolTip.toString()));
+			setToolTip(new Label(REDUNDANCE + "\n\n" + toolTip.toString()));
 			//		setToolTip(new Label(REDUNDANCE));
 			return;
 		}
