@@ -42,7 +42,7 @@ public class DeadFeatures {
 	/**
 	 * The model after a change (with a constraint that makes a feature dead).
 	 */
-	private IFeatureModel model; 
+	private static IFeatureModel model; 
 
 	/**
 	 * Explains dead features using boolean constraint propagation. Sets initial truth value assumptions of dead features to true
@@ -95,7 +95,7 @@ public class DeadFeatures {
 	 * 
 	 * @return the model with the new constraint
 	 */
-	public IFeatureModel getNewModel() {
+	public static IFeatureModel getNewModel() {
 		return model;
 	}
 }

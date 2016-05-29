@@ -20,10 +20,6 @@
  */
 package de.ovgu.featureide.fm.core.explanations;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
@@ -57,7 +53,7 @@ public class Redundancy {
 	/**
 	 * The model after changes (with redundant constraint).
 	 */
-	private IFeatureModel newModel; 
+	private static IFeatureModel newModel; 
 	/**
 	 * The list which contains a literal of a respective feature from the redundant constraint.
 	 */
@@ -72,10 +68,6 @@ public class Redundancy {
 	 * @param redundantConstraint the redundant constraint
 	 */
 	public String explain(IFeatureModel oldModel, IFeatureModel newModel, IConstraint redundantConstraint) {
-		
-		final long start = System.currentTimeMillis();
-
-		
 		model = oldModel; // the model without the redundant constraint
 		setNewModel(newModel);
 		featRedundantConstr = getLiterals(redundantConstraint.getNode());
@@ -99,18 +91,6 @@ public class Redundancy {
 			LTMS ltms = new LTMS(model, valueMap, featRedundantConstr);
 			List<String> explanationList = ltms.explainRedundantConstraint(clauses, map);
 			
-			final long end = System.currentTimeMillis();
-			final long duration = end - start;
-			
-			try {
-			String output = duration + " Millisek.\n";
-			File file = new File("/Users/sonja/Desktop/performance.txt");
-			FileWriter fw = new FileWriter (file, true);
-			BufferedWriter bw = new BufferedWriter (fw);
-			bw.write(output);
-			bw.close();
-			} catch (IOException ex) {		}
-
 			for (String tmp: explanationList) {
 				if (!reasons.contains(tmp)) { 
 					reasons.add(tmp);
@@ -143,7 +123,7 @@ public class Redundancy {
 	 * 
 	 * @return the model with the new constraint
 	 */
-	public IFeatureModel getNewModel() {
+	public static IFeatureModel getNewModel() {
 		return newModel;
 	}
 

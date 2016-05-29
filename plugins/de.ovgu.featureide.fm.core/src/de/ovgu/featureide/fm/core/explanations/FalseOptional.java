@@ -43,7 +43,7 @@ public class FalseOptional {
 	/**
 	 * The model after a change (with a constraint that makes a feature false optional).
 	 */
-	private IFeatureModel model;
+	private static IFeatureModel model;
 
 	/**
 	 * Explains false optional features using boolean constraint propagation. Sets initial truth value assumptions of false optional
@@ -111,7 +111,7 @@ public class FalseOptional {
 	 * 
 	 * @return the model with the new constraint
 	 */
-	public IFeatureModel getNewModel() {
+	public static IFeatureModel getNewModel() {
 		return model;
 	}
 }
