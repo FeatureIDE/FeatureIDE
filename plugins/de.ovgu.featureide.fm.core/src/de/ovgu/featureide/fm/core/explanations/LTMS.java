@@ -20,6 +20,10 @@
  */
 package de.ovgu.featureide.fm.core.explanations;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -114,6 +118,7 @@ public class LTMS {
 	 * 
 	 * @param clauses the clauses of the conjunctive normal form of the feature model
 	 * @return String an explanation for the redundant constraint
+	 * @throws IOException 
 	 */
 	public List<String> explainRedundantConstraint(Node[] clauses, HashMap<Object, Integer> map) {
 		reason.clear();
@@ -127,9 +132,9 @@ public class LTMS {
 			return reason;
 		}
 		// if we are here, propagated values via BCP lead to a false clause
-		findUnitOpenClauses(featuresRedundantConstr, clauses); // find first open clauses with initial truth value assumptions
-		BCP(clauses);// true, if violation occured during BCP
-		return shortestExplanation(clauses, map, null, ExplanationMode.Redundancy);
+		findOpenClauses(featuresRedundantConstr, clauses); // find first open clauses with initial truth value assumptions
+		BCP(clauses);// true, if violation occured during BCP		
+		return shortestExpl(clauses, map, null, ExplanationMode.Redundancy);
 	}
 
 	/**
@@ -158,9 +163,9 @@ public class LTMS {
 			return reason;
 		}
 		// if we are here, propagated values via BCP lead to a false clause
-		findUnitOpenClauses(falsopts, clauses); // find unit open clauses depending on initial truth values 
+		findOpenClauses(falsopts, clauses); // find unit open clauses depending on initial truth values 
 		BCP(clauses); // propagate values and find further unit open clauses
-		return shortestExplanation(clauses, null, falseoptional, ExplanationMode.FalseOptionalFeature);
+		return shortestExpl(clauses, null, falseoptional, ExplanationMode.FalseOptionalFeature);
 	}
 
 	/**
@@ -188,9 +193,9 @@ public class LTMS {
 			}
 			return reason;
 		}
-		findUnitOpenClauses(deads, clauses); 
+		findOpenClauses(deads, clauses); 
 		BCP(clauses);
-		return shortestExplanation(clauses, null, deadF, ExplanationMode.DeadFeature);
+		return shortestExpl(clauses, null, deadF, ExplanationMode.DeadFeature);
 	}
 
 	/**
@@ -202,7 +207,7 @@ public class LTMS {
 	 * @param map the map which stores the initial values for features from the redundant constraint
 	 * @return String the shortest explanation
 	 */
-	private List<String> shortestExplanation(Node[] clauses, HashMap<Object, Integer> map, Literal explLit, ExplanationMode mode) {
+	private List<String> shortestExpl(Node[] clauses, HashMap<Object, Integer> map, Literal explLit, ExplanationMode mode) {
 		List<String> shortestExpl = (List<String>) ((ArrayList<String>) reason).clone(); // remember first explanation
 		while (!stackOpenClause.isEmpty()) { // generate explanations until stack with unit open clauses is empty
 			
@@ -249,7 +254,7 @@ public class LTMS {
 	 * @param literal the literal from the redundant constraint whose value is initially set
 	 * @param allClauses clauses of the conjunctive normal form
 	 */
-	private void findUnitOpenClauses(ArrayList<Literal> literals, Node[] allClauses) {
+	private void findOpenClauses(ArrayList<Literal> literals, Node[] allClauses) {
 		for (Literal l : literals) {
 			boolean negated = (valueMap.get(l.var).value == 0);
 			for (Node cnfclause : allClauses) {
@@ -272,7 +277,7 @@ public class LTMS {
 	 * @param negated true, if the literal is negated in the open clause. Else, false
 	 * @return true, if the value of a literal is set without violating a clause. Else, return false
 	 */
-	private boolean setValueAndFindUnitOpenClauses(Literal literal, boolean negated, Node[] allClauses) {
+	private boolean setValue(Literal literal, boolean negated, Node[] allClauses) {
 
 		// propagate value of variable to be true or false
 		valueMap.get(literal.var).value = literal.positive ? 1 : 0;
@@ -460,7 +465,7 @@ public class LTMS {
 				continue;
 			}
 			justify(l, openclause); //set reason and antecedents explanation
-			if (setValueAndFindUnitOpenClauses(l, !l.positive, cnfclauses)) { // set propagated value and push unit open clauses to stack
+			if (setValue(l, !l.positive, cnfclauses)) { // set propagated value and push unit open clauses to stack
 				continue;
 			}
 
