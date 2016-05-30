@@ -64,10 +64,13 @@ import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.SatSolver;
+import org.prop4j.analyses.RandomConfigurationGenerator;
+import org.prop4j.solver.SatInstance;
 
 import splar.core.fm.FeatureModelException;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
+import de.ovgu.featureide.fm.core.base.FeatureUtils;
 import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.base.IFeatureStructure;
@@ -75,9 +78,11 @@ import de.ovgu.featureide.fm.core.configuration.Configuration;
 import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
 import de.ovgu.featureide.fm.core.configuration.Selection;
 import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
+import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.CNFType;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.job.AStoppableJob;
+import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.ui.UIPlugin;
 
@@ -194,6 +199,8 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	
 	final TestResults testResults;
 
+	private final int maxConfigs;
+
 	/**
 	 * Gets the first entry of configurations or <code>null</code> if there is
 	 * none.
@@ -229,18 +236,21 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 *            <code>true</code> if the configurations should be built into
 	 *            separate projects
 	 * @param runTests 
+	 * @param max Maximal number of configurations to generate.
 	 * @see BuildAllCurrentConfigurationsAction
 	 * @see BuildAllValidConfigurationsAction
 	 */
-	public ConfigurationBuilder(final IFeatureProject featureProject, final BuildType buildType, final boolean createNewProjects, final String algorithm, final int t, final BuildOrder buildOrder, boolean runTests) {
-		this(featureProject, buildType, createNewProjects, algorithm, t, buildOrder, runTests, null);
+	public ConfigurationBuilder(final IFeatureProject featureProject, final BuildType buildType, final boolean createNewProjects, final String algorithm, final int t, final BuildOrder buildOrder, boolean runTests, int max) {
+		this(featureProject, buildType, createNewProjects, algorithm, t, buildOrder, runTests, null, max);
 	}
 	
 	public ConfigurationBuilder(final IFeatureProject featureProject, final BuildType buildType, final String featureName) {
-		this(featureProject, BuildType.INTEGRATION, false, "", 0, BuildOrder.DEFAULT, true, featureName);
+		this(featureProject, BuildType.INTEGRATION, false, "", 0, BuildOrder.DEFAULT, true, featureName, Integer.MAX_VALUE);
 	}
 		
-	public ConfigurationBuilder(final IFeatureProject featureProject, final BuildType buildType, final boolean createNewProjects, final String algorithm, final int t, final BuildOrder buildOrder, boolean runTests, final String featureName) {
+	public ConfigurationBuilder(final IFeatureProject featureProject, final BuildType buildType, final boolean createNewProjects, 
+			final String algorithm, final int t, final BuildOrder buildOrder, boolean runTests, final String featureName, int maxConfigs) {
+		this.maxConfigs = maxConfigs;
 		this.runTests = runTests;
 		if (runTests) {
 			testResults = new TestResults(featureProject.getProjectName(), "FeatureIDE test: " + featureProject.getProjectName());
@@ -299,6 +309,9 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			break;
 		case T_WISE:
 			break;
+		case RANDOM:
+			configurationNumber = maxConfigs;
+			break;
 		case INTEGRATION:
 			configurationNumber = 2;
 			break;
@@ -316,6 +329,9 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			break;
 		case T_WISE:
 			jobName = JOB_TITLE_T_WISE;
+			break;
+		case RANDOM:
+			jobName = JOB_TITLE_RANDOM;
 			break;
 		case INTEGRATION:
 			break;
@@ -363,6 +379,9 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 						break;
 					case INTEGRATION:
 						buildModule(featureProject, monitor, featureName);
+						break;
+					case RANDOM:
+						buildRandomConfigurations(featureProject, monitor);
 						break;
 					default:
 						break;
@@ -517,6 +536,12 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 								res.delete(true, null);
 							}
 							break;
+						case RANDOM:
+							if (projectName.startsWith(featureProject.getProjectName() + SEPARATOR_RANDOM)) {
+								monitor.setTaskName("Remove old products : " + projectName);
+								res.delete(true, null);
+							}
+							break;
 						default:
 							break;
 						}
@@ -629,6 +654,31 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		return configuration.isValid();
 	}
 	
+	protected void buildRandomConfigurations(IFeatureProject featureProject, IProgressMonitor monitor) {
+		List<List<String>> solutions = genRandomConfigurations(featureModel, maxConfigs);
+		for (final List<String> solution : solutions) {
+			System.out.println(solution);
+			configuration.resetValues();
+			for (final String selection : solution) {
+				configuration.setManual(selection, Selection.SELECTED);
+			}
+			addConfiguration(new BuilderConfiguration(configuration, confs++));
+		}
+	}
+	
+	private List<List<String>> genRandomConfigurations(IFeatureModel fm, int solutionCount) {
+        final AdvancedNodeCreator advancedNodeCreator = new AdvancedNodeCreator(fm);
+        advancedNodeCreator.setCnfType(CNFType.Regular);
+        advancedNodeCreator.setIncludeBooleanValues(false);
+
+        Node createNodes = advancedNodeCreator.createNodes();
+        System.out.println(createNodes);
+		SatInstance solver = new SatInstance(createNodes, FeatureUtils.getFeatureNamesPreorder(fm));
+        RandomConfigurationGenerator gen = new RandomConfigurationGenerator(solver, solutionCount);
+        return LongRunningWrapper.runMethod(gen);
+  }
+	
+	
 	/**
 	 * Builds all current configurations for the given feature project into the
 	 * folder for current configurations.
@@ -665,7 +715,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			if (ca == null) {
 				return;
 			}
-			ca.generate();
+			ca.generate(100, maxConfigs);
 		} catch (FeatureModelException e) {
 			LOGGER.logError(e);
 		} catch (TimeoutException e) {
@@ -720,6 +770,9 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		monitor.beginTask("", (int) configurationNumber);
 		try {
 			for (IResource configuration : featureProject.getConfigFolder().members()) {
+				if (confs > maxConfigs) {
+					break;
+				}
 				if (monitor.isCanceled()) {
 					finish();
 					return;
@@ -727,6 +780,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 				if (isConfiguration(configuration)) {
 					build(configuration, monitor);
 				}
+				confs++;
 			}
 			sorter.sortConfigurations(monitor);
 		} catch (CoreException e) {
@@ -803,8 +857,11 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			cancelGenerationJobs();
 			return;
 		}
-
-		if ((configurationNumber != 0 && confs > configurationNumber)) {
+		if (confs > maxConfigs) {
+			return;
+		}
+		
+		if (configurationNumber != 0 && confs > configurationNumber) {
 			return;
 		}
 

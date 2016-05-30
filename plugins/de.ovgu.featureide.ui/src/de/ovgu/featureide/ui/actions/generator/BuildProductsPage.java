@@ -36,6 +36,7 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.ERROR_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.INTERACTIONS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SEARCHES_FOR_TEST_CASED_IN_THE_GENERATED_PRODUCTS_AND_EXECUTES_THEM_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.T_WISE_CONFIGURATIONS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RANDOM_CONFIGURATIONS;
 
 import javax.annotation.CheckForNull;
 
@@ -45,6 +46,7 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -104,8 +106,11 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 	private final String generate;
 	private final String order;
 	private boolean test;
+	private Text textField;
+	private Label labelMax;
+	private String maxConfs;
 
-	public BuildProductsPage(String project, IFeatureProject featureProject, String generate, boolean buildProjects, String algorithm, int t, String order, boolean test) {
+	public BuildProductsPage(String project, IFeatureProject featureProject, String generate, boolean buildProjects, String algorithm, int t, String order, boolean test, String maxConfs) {
 		super(project);
 		this.project = featureProject;
 		this.buildProjects = buildProjects;
@@ -114,6 +119,7 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		this.t = t;
 		this.order = order;
 		this.test = test;
+		this.maxConfs = maxConfs;
 		setDescription(BUILD_PRODUCTS_FOR_PROJECT + featureProject.getProjectName() + ".");
 	}
 
@@ -170,6 +176,17 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		scale.setSelection(t);
 		setScale();
 
+		labelMax = new Label(composite, SWT.NULL);
+		labelMax.setText("Max Configurations:");
+		final String maxToolTip = "Set the maximal number of configs to generate, or empty to create all.";
+		labelMax.setToolTipText(maxToolTip);
+		textField = new Text(composite, SWT.BORDER);
+		final Rectangle textBounds = textField.getBounds();
+		textBounds.width += 13;
+		textField.setBounds(textBounds);
+		textField.setText(maxConfs);
+		textField.setToolTipText(maxToolTip);
+		
 		final Label labelTest = new Label(composite, SWT.NULL);
 		labelTest.setText(LABEL_TEST);
 		labelTest.setToolTipText(TOOL_TIP_TEST);
@@ -231,6 +248,8 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 			return ALL_VALID_CONFIGURATIONS;
 		case T_WISE:
 			return T_WISE_CONFIGURATIONS;
+		case RANDOM:
+			return RANDOM_CONFIGURATIONS;
 		default:
 			UIPlugin.getDefault().logWarning("Unimplemented switch statement for BuildType: " + type);
 			break;
@@ -355,6 +374,9 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		if (comboGenerate.getText().equals(T_WISE_CONFIGURATIONS)) {
 			return BuildType.T_WISE;
 		}
+		if (comboGenerate.getText().equals(RANDOM_CONFIGURATIONS)) {
+			return BuildType.RANDOM;
+		}
 		return null;
 	}
 
@@ -374,5 +396,13 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 	
 	public boolean getTest() {
 		return buttonTest.getSelection();
+	}
+	
+	public int getMax() {
+		try {
+			return Integer.parseInt(textField.getText());
+		} catch (NumberFormatException e) {
+			return Integer.MAX_VALUE;
+		}
 	}
 }

@@ -652,6 +652,7 @@ public class StringTable {
 	public static final String REDUNDANT_CAST_TO = "redundant cast to";
 	public static final String HAS_BEEN_DEPRECATED = "has been deprecated";
 	public static final String T_WISE_CONFIGURATIONS = "T-wise configurations";
+	public static final String RANDOM_CONFIGURATIONS = "Random configurations";
 	public static final String ALL_CURRENT_CONFIGURATIONS = "All current configurations";
 	public static final String ALL_VALID_CONFIGURATIONS = "All valid configurations";
 	public static final String INTERACTIONS = "Interactions";

@@ -144,12 +144,10 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 					}
 				}
 				monitor.subTask("(Build)");
-				System.out.println("Generator.run()" + builder.getClass());
 				configuration = builder.getConfiguration();
 				if (configuration == null) {
 					continue;
 				}
-				System.out.println("Generator.run()2");
 				String name = configuration.getName();
 				switch (builder.buildType) {
 				case ALL_CURRENT:
@@ -179,6 +177,15 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 					} else {
 						builder.featureProject.getComposer().buildConfiguration(builder.folder.getFolder(name), configuration, name);
 					}
+					break;
+				case RANDOM:
+					if (builder.createNewProjects) {
+						buildConfiguration(builder.featureProject.getProjectName() + SEPARATOR_RANDOM + name, configuration);
+					} else {
+						builder.featureProject.getComposer().buildConfiguration(builder.folder.getFolder(name), configuration, name);
+					}
+					break;
+				default:
 					break;
 				}
 				if (compiler != null) {
