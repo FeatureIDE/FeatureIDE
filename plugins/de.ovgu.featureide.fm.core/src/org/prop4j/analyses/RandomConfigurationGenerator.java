@@ -51,6 +51,9 @@ public class RandomConfigurationGenerator extends PairWiseConfigurationGenerator
 		solver.setSelectionStrategy(SelectionStrategy.RANDOM);
 		
 		for (int i = 0; i < maxValue; i++) {
+			if (monitor.checkCancel()) {
+				break;
+			}
 			if (handleNewConfig(solver.findModel(), satInstance)) {
 				break;
 			}

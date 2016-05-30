@@ -31,12 +31,14 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.DEFINES_THE_AL
 import static de.ovgu.featureide.fm.core.localization.StringTable.DEFINES_THE_PRODUKT_BASED_STRATEGY_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DEFINE_THE_T_FOR_T_WISE_SAMPLING_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DEFNIES_WHETHER_THE_PRODUKTS_ARE_GENERATED_INTO_SEPARATE_PROJECTS_OR_INTO_A_FOLDER_IN_THIS_PROJECT_;
-import static de.ovgu.featureide.fm.core.localization.StringTable.DIFFERENCE;
+import static de.ovgu.featureide.fm.core.localization.StringTable.DISSIMILARITY;
 import static de.ovgu.featureide.fm.core.localization.StringTable.ERROR_;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ICPL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.INTERACTIONS;
+import static de.ovgu.featureide.fm.core.localization.StringTable.MASK;
+import static de.ovgu.featureide.fm.core.localization.StringTable.RANDOM_CONFIGURATIONS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.SEARCHES_FOR_TEST_CASED_IN_THE_GENERATED_PRODUCTS_AND_EXECUTES_THEM_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.T_WISE_CONFIGURATIONS;
-import static de.ovgu.featureide.fm.core.localization.StringTable.RANDOM_CONFIGURATIONS;
 
 import javax.annotation.CheckForNull;
 
@@ -46,7 +48,6 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -119,6 +120,9 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		this.t = t;
 		this.order = order;
 		this.test = test;
+		if (maxConfs.equals(Integer.MAX_VALUE + "")) {
+			maxConfs = "";
+		}	
 		this.maxConfs = maxConfs;
 		setDescription(BUILD_PRODUCTS_FOR_PROJECT + featureProject.getProjectName() + ".");
 	}
@@ -181,11 +185,12 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		final String maxToolTip = "Set the maximal number of configs to generate, or empty to create all.";
 		labelMax.setToolTipText(maxToolTip);
 		textField = new Text(composite, SWT.BORDER);
-		final Rectangle textBounds = textField.getBounds();
-		textBounds.width += 13;
-		textField.setBounds(textBounds);
-		textField.setText(maxConfs);
 		textField.setToolTipText(maxToolTip);
+		final GridData gridData = new GridData();
+		gridData.widthHint = 100;
+		textField.setLayoutData(gridData);
+		textField.setText(maxConfs);
+		
 		
 		final Label labelTest = new Label(composite, SWT.NULL);
 		labelTest.setText(LABEL_TEST);
@@ -212,8 +217,8 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		switch (order) {
 		case DEFAULT:
 			return DEFAULT;
-		case DIFFERENCE:
-			return DIFFERENCE;
+		case DISSIMILARITY:
+			return DISSIMILARITY;
 		case INTERACTION:
 			return INTERACTIONS;
 		default:
@@ -232,6 +237,8 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 			return CHVATAL;
 		case ICPL:
 			return ICPL;
+		case MASK: 
+			return MASK;
 		default:
 			UIPlugin.getDefault().logWarning("Unimplemented switch statement for TWise: " + tWise);
 			break;
@@ -281,7 +288,11 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 			scale.setMaximum(ICPL_MAX);
 		} else if (selection.equals(CASA)) {
 			scale.setMaximum(CASA_MAX);
-		}
+		} else if (selection.equals(MASK)) {
+			scale.setMaximum(MASK_MAX);
+			scale.setSelection(MASK_MAX);
+			scale.setEnabled(false);
+		}		
 
 		if (lastSelection > scale.getMaximum()) {
 			scale.setSelection(scale.getMaximum());
@@ -296,7 +307,6 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 		labelT.setText(LABEL_INTERACTIONS + perspectiveValue + "   ");
 
 		setPageComplete(true);
-
 	}
 
 	private void addListeners() {
@@ -381,8 +391,8 @@ public class BuildProductsPage extends WizardPage implements IConfigurationBuild
 	}
 
 	public BuildOrder getOrder() {
-		if (comboOrder.getText().equals(DIFFERENCE)) {
-			return BuildOrder.DIFFERENCE;
+		if (comboOrder.getText().equals(DISSIMILARITY)) {
+			return BuildOrder.DISSIMILARITY;
 		}
 		if (comboOrder.getText().equals(INTERACTIONS)) {
 			return BuildOrder.INTERACTION;

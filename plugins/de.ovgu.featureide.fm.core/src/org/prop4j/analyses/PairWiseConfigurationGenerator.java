@@ -224,6 +224,9 @@ public class PairWiseConfigurationGenerator extends SingleThreadAnalysis<List<Li
 		final int[] varStatus = new int[2];
 
 		while (count <= maxNumber) {
+			if (monitor.checkCancel()) {
+				break;
+			}
 			final boolean[] featuresUsed = Arrays.copyOf(featuresUsedOrg, featuresUsedOrg.length);
 
 			countLoops = featureIndexArray.length;

@@ -130,7 +130,7 @@ public class Generator extends Job implements IConfigurationBuilderBasics {
 						while (builder.sorter.getBufferSize() == 0 || !builder.sorter.sorted) {
 							/** the job waits for a new configuration to build **/
 							try {
-								wait(1000);
+								Thread.sleep(1000);
 								if ((builder.sorter.getBufferSize() == 0 && builder.finish) || builder.cancelGeneratorJobs) {
 									return Status.OK_STATUS;
 								}

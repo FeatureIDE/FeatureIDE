@@ -23,6 +23,7 @@ package de.ovgu.featureide.ui.actions.generator;
 import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD_CONFIGURATIONS;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CASA;
 import static de.ovgu.featureide.fm.core.localization.StringTable.COUNTING___;
+import static de.ovgu.featureide.fm.core.localization.StringTable.MASK;
 import static de.ovgu.featureide.fm.core.localization.StringTable.NOT_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.OF;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
@@ -39,11 +40,6 @@ import java.util.concurrent.TimeoutException;
 
 import javax.annotation.CheckForNull;
 
-import no.sintef.ict.splcatool.CoveringArray;
-import no.sintef.ict.splcatool.CoveringArrayCASA;
-import no.sintef.ict.splcatool.CoveringArrayGenerationException;
-import no.sintef.ict.splcatool.GUIDSL;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -55,6 +51,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.JavaModelException;
@@ -64,10 +61,10 @@ import org.prop4j.And;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 import org.prop4j.SatSolver;
+import org.prop4j.analyses.PairWiseConfigurationGenerator;
 import org.prop4j.analyses.RandomConfigurationGenerator;
 import org.prop4j.solver.SatInstance;
 
-import splar.core.fm.FeatureModelException;
 import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
 import de.ovgu.featureide.fm.core.base.FeatureUtils;
@@ -82,9 +79,17 @@ import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.CNFType;
 import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
 import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 import de.ovgu.featureide.fm.core.job.AStoppableJob;
+import de.ovgu.featureide.fm.core.job.IJob;
+import de.ovgu.featureide.fm.core.job.LongRunningJob;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
+import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.ui.UIPlugin;
+import no.sintef.ict.splcatool.CoveringArray;
+import no.sintef.ict.splcatool.CoveringArrayCASA;
+import no.sintef.ict.splcatool.CoveringArrayGenerationException;
+import no.sintef.ict.splcatool.GUIDSL;
+import splar.core.fm.FeatureModelException;
 
 /**
  * Builds all valid or current configurations for a selected feature project.
@@ -249,7 +254,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	}
 		
 	public ConfigurationBuilder(final IFeatureProject featureProject, final BuildType buildType, final boolean createNewProjects, 
-			final String algorithm, final int t, final BuildOrder buildOrder, boolean runTests, final String featureName, int maxConfigs) {
+			final String algorithm, final int t, final BuildOrder buildOrder, boolean runTests, final String featureName, final int maxConfigs) {
 		this.maxConfigs = maxConfigs;
 		this.runTests = runTests;
 		if (runTests) {
@@ -272,7 +277,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		case DEFAULT:
 			sorter = new AbstractConfigurationSorter(featureModel);
 			break;
-		case DIFFERENCE:
+		case DISSIMILARITY:
 			sorter = new PriorizationSorter(featureModel);
 			maxSize = Integer.MAX_VALUE;
 			break;
@@ -342,15 +347,12 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		Job job = new Job(jobName) {
 			public IStatus run(IProgressMonitor monitor) {
 				try {
-					monitor.beginTask("", 1);
-
+					monitor = SubMonitor.convert(monitor, getTaskName(), maxConfigs);
 					if (!init(monitor, buildType)) {
 						return Status.OK_STATUS;
 					}
 
 					time = System.currentTimeMillis();
-
-					monitor.setTaskName(getTaskName());
 
 					if (featureProject.getComposer().canGeneratInParallelJobs()) {
 						if (buildType != BuildType.ALL_CURRENT) {
@@ -381,7 +383,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 						buildModule(featureProject, monitor, featureName);
 						break;
 					case RANDOM:
-						buildRandomConfigurations(featureProject, monitor);
+						callConfigurationGenerator(featureModel, (int)configurationNumber, monitor);
 						break;
 					default:
 						break;
@@ -480,17 +482,8 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 				}
 			} else {
 				try {
-					IResource[] members = folder.members();
-					int countProducts = members.length;
-					int current = 1;
-					for (IResource res : members) {
-						if (monitor.isCanceled()) {
-							return false;
-						}
-						monitor.setTaskName("Remove old products : " + current + "/" + countProducts);
-						current++;
-						res.delete(true, null);
-					}
+					folder.delete(true, null);
+					folder.create(true, true, null);
 				} catch (CoreException e) {
 					LOGGER.logError(e);
 				}
@@ -654,30 +647,72 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		return configuration.isValid();
 	}
 	
-	protected void buildRandomConfigurations(IFeatureProject featureProject, IProgressMonitor monitor) {
-		List<List<String>> solutions = genRandomConfigurations(featureModel, maxConfigs);
-		for (final List<String> solution : solutions) {
-			System.out.println(solution);
-			configuration.resetValues();
-			for (final String selection : solution) {
-				configuration.setManual(selection, Selection.SELECTED);
-			}
-			addConfiguration(new BuilderConfiguration(configuration, confs++));
+	private void callConfigurationGenerator(IFeatureModel fm, int solutionCount, IProgressMonitor monitor) {
+		final AdvancedNodeCreator advancedNodeCreator = new AdvancedNodeCreator(fm);
+		advancedNodeCreator.setCnfType(CNFType.Regular);
+		advancedNodeCreator.setIncludeBooleanValues(false);
+
+		Node createNodes = advancedNodeCreator.createNodes();
+		SatInstance solver = new SatInstance(createNodes, FeatureUtils.getFeatureNamesPreorder(fm));
+		PairWiseConfigurationGenerator gen;
+		switch (buildType) {
+		case RANDOM:
+			gen = new RandomConfigurationGenerator(solver, solutionCount);
+			break;
+		case T_WISE:
+			gen = new PairWiseConfigurationGenerator(solver, solutionCount);
+			break;
+		default:
+			LOGGER.logWarning(buildType + " not supported.");
+			return;
 		}
+		exec(solver, gen, monitor);
 	}
 	
-	private List<List<String>> genRandomConfigurations(IFeatureModel fm, int solutionCount) {
-        final AdvancedNodeCreator advancedNodeCreator = new AdvancedNodeCreator(fm);
-        advancedNodeCreator.setCnfType(CNFType.Regular);
-        advancedNodeCreator.setIncludeBooleanValues(false);
+	protected void exec(final SatInstance satInstance, final PairWiseConfigurationGenerator as, IProgressMonitor monitor) {
+		final Thread consumer = new Thread() {
+			@Override
+			public void run() {
+				while (true) {
+					try {
+						generateConfiguration(satInstance.convertToString(as.q.take().getModel()));
+					} catch (InterruptedException e) {
+						break;
+					}
+				}
+				for (org.prop4j.analyses.PairWiseConfigurationGenerator.Configuration c : as.q) {
+					generateConfiguration(satInstance.convertToString(c.getModel()));
+				}
+			}
 
-        Node createNodes = advancedNodeCreator.createNodes();
-        System.out.println(createNodes);
-		SatInstance solver = new SatInstance(createNodes, FeatureUtils.getFeatureNamesPreorder(fm));
-        RandomConfigurationGenerator gen = new RandomConfigurationGenerator(solver, solutionCount);
-        return LongRunningWrapper.runMethod(gen);
-  }
-	
+			private void generateConfiguration(List<String> solution) {
+				configuration.resetValues();
+				for (final String selection : solution) {
+					configuration.setManual(selection, Selection.SELECTED);
+				}
+				addConfiguration(new BuilderConfiguration(configuration, confs++));
+			}
+		};
+		LongRunningJob<List<List<String>>> job = LongRunningWrapper.createJob("Create configurations", as);
+		job.addJobFinishedListener(new JobFinishListener() {
+			
+			@Override
+			public void jobFinished(IJob finishedJob, boolean success) {
+				consumer.interrupt();
+			}
+		});
+		consumer.start();
+		job.schedule();
+		
+		if (sorter instanceof AbstractConfigurationSorter) {
+			try {
+				job.join();
+				sorter.sortConfigurations(monitor);
+			} catch (InterruptedException e) {
+				LOGGER.logError(e);
+			}
+		}
+	}
 	
 	/**
 	 * Builds all current configurations for the given feature project into the
@@ -691,7 +726,11 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		configuration = new Configuration(featureModel, false);
 		reader = new FileHandler<>(configuration);
 		monitor.beginTask(SAMPLING, 1);
-		runSPLCATool();
+		if (algorithm.equals(MASK)) {
+			callConfigurationGenerator(featureModel, (int)configurationNumber, monitor);
+		} else {
+			runSPLCATool();
+		}
 		configurationNumber = sorter.sortConfigurations(monitor);
 		monitor.beginTask(BUILD_CONFIGURATIONS, (int)configurationNumber);		
 	}
@@ -978,7 +1017,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			long h = duration / (60 * 60 * 1000);
 			t = " " + h + "h " + (min < 10 ? "0" + min : min) + "min " + (s < 10 ? "0" + s : s) + "s.";
 		}
-		long buffer = buildType == BuildType.ALL_VALID ? sorter.getBufferSize() : configurationNumber - built;
+		long buffer = sorter.getBufferSize();
 		return "Built configurations: " + built + "/" + (configurationNumber == 0 ? COUNTING___ : configurationNumber) + "(" + buffer + " buffered)" + " Expected time: " + t;
 	}
 

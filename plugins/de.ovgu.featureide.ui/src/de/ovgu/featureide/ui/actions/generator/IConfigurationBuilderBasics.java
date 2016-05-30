@@ -49,8 +49,8 @@ import de.ovgu.featureide.core.CorePlugin;
 public interface IConfigurationBuilderBasics {
 	
 	enum BuildType {ALL_VALID, ALL_CURRENT, T_WISE, INTEGRATION, RANDOM};
-	enum BuildOrder {DEFAULT, DIFFERENCE, INTERACTION};
-	enum TWise {ICPL, CHVATAL, CASA}
+	enum BuildOrder {DEFAULT, DISSIMILARITY, INTERACTION};
+	enum TWise {ICPL, CHVATAL, CASA, MASK}
 	
 	/** Saves the toggle state whether new projects should be generated for each configuration. **/
 	QualifiedName TOGGLE_STATE = new QualifiedName(IConfigurationBuilderBasics.class.getName() + "#CreateNewProject", 
@@ -107,5 +107,5 @@ public interface IConfigurationBuilderBasics {
 	int CHVATAL_MAX = 4;
 	int ICPL_MAX = 3;
 	int CASA_MAX = 6;
-	String ICPL = "ICPL (fastest)";
+	int MASK_MAX = 2;
 }

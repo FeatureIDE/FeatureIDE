@@ -25,6 +25,8 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD_PRODUCTS
 import static de.ovgu.featureide.fm.core.localization.StringTable.CASA;
 import static de.ovgu.featureide.fm.core.localization.StringTable.CHVATAL;
 import static de.ovgu.featureide.fm.core.localization.StringTable.DEFAULT;
+import static de.ovgu.featureide.fm.core.localization.StringTable.MASK;
+import static de.ovgu.featureide.fm.core.localization.StringTable.ICPL;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -89,6 +91,7 @@ public class BuildProductsWizard extends Wizard implements INewWizard, IConfigur
 		String algorithm = tWise.split("[|]")[0];
 		if (!(algorithm.equals(ICPL) ||
 			  algorithm.equals(CASA) ||
+			  algorithm.equals(MASK) ||
 			  algorithm.equals(CHVATAL))) {
 			// return the default algorithm if the algorithm was saved wrong
 			return ICPL;
