@@ -74,7 +74,7 @@ public class Literal extends Node implements Cloneable {
 	}
 
 	/**
-	 * Decodes a feature attribute. 
+	 * Decodes a feature attribute from the feature tree topology. 
 	 * Example with feature attribute root and origin = -2: -2 % 5 + 5 = 3. Returns a feature attribute at position 3.   
 	 * 
 	 * @return an enumeration type of a feature attribute

@@ -29,6 +29,10 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.FIND_REDUNDANT
 import static de.ovgu.featureide.fm.core.localization.StringTable.GET_DEAD_FEATURES_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.GET_FALSE_OPTIONAL_FEATURES_;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;

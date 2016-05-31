@@ -133,7 +133,7 @@ public class LTMS {
 		}
 		// if we are here, propagated values via BCP lead to a false clause
 		findOpenClauses(featuresRedundantConstr, clauses); // find first open clauses with initial truth value assumptions
-		BCP(clauses);// true, if violation occured during BCP		
+		BCP(clauses);// true, if violation occured during BCP	
 		return shortestExpl(clauses, map, null, ExplanationMode.Redundancy);
 	}
 
@@ -490,7 +490,7 @@ public class LTMS {
 	 * Returns an explanation why a variable has its truth value by iterating its antecedents
 	 * and collecting their reasons. Only called to explain the BCP stack, not the violated clause.
 	 * 
-	 * @param l the literal to explain from the violated clause
+	 * @param l the literal to explain   
 	 * @return a string to explain a variables truth value
 	 */
 	private void explainValue(Literal l) {
@@ -503,7 +503,7 @@ public class LTMS {
 			String tmp = explainVariable(v);
 			addToReasonListOptionally(tmp);
 
-			// explain every antecedent from its reason in map (is usually the case)
+			// explain every antecedent from its reason in map 
 			Node reasonFromMap = valueMap.get(v.var).reason;
 			if (reasonFromMap != null) {
 				Literal litFromMap = getLiteralFromMap(reasonFromMap, v);
