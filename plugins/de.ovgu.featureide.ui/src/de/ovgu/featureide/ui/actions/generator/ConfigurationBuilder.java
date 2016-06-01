@@ -20,76 +20,49 @@
  */
 package de.ovgu.featureide.ui.actions.generator;
 
-import static de.ovgu.featureide.fm.core.localization.StringTable.BUILD_CONFIGURATIONS;
-import static de.ovgu.featureide.fm.core.localization.StringTable.CASA;
 import static de.ovgu.featureide.fm.core.localization.StringTable.COUNTING___;
 import static de.ovgu.featureide.fm.core.localization.StringTable.MASK;
-import static de.ovgu.featureide.fm.core.localization.StringTable.NOT_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.OF;
 import static de.ovgu.featureide.fm.core.localization.StringTable.RESTRICTION;
-import static de.ovgu.featureide.fm.core.localization.StringTable.SAMPLING;
 
-import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Paths;
 import java.security.KeyStore.Builder;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.TimeoutException;
 
 import javax.annotation.CheckForNull;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.core.JavaProject;
-import org.eclipse.ui.internal.util.BundleUtility;
-import org.prop4j.And;
-import org.prop4j.Literal;
-import org.prop4j.Node;
-import org.prop4j.SatSolver;
-import org.prop4j.analyses.PairWiseConfigurationGenerator;
-import org.prop4j.analyses.RandomConfigurationGenerator;
-import org.prop4j.solver.SatInstance;
 
-import de.ovgu.featureide.core.CorePlugin;
 import de.ovgu.featureide.core.IFeatureProject;
-import de.ovgu.featureide.fm.core.base.FeatureUtils;
-import de.ovgu.featureide.fm.core.base.IFeature;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
-import de.ovgu.featureide.fm.core.base.IFeatureStructure;
-import de.ovgu.featureide.fm.core.configuration.Configuration;
-import de.ovgu.featureide.fm.core.configuration.SelectableFeature;
-import de.ovgu.featureide.fm.core.configuration.Selection;
-import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator;
-import de.ovgu.featureide.fm.core.editing.AdvancedNodeCreator.CNFType;
-import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
-import de.ovgu.featureide.fm.core.io.manager.FileHandler;
-import de.ovgu.featureide.fm.core.job.AStoppableJob;
-import de.ovgu.featureide.fm.core.job.IJob;
+import de.ovgu.featureide.fm.core.job.IJob.JobStatus;
 import de.ovgu.featureide.fm.core.job.LongRunningJob;
 import de.ovgu.featureide.fm.core.job.LongRunningWrapper;
-import de.ovgu.featureide.fm.core.job.util.JobFinishListener;
+import de.ovgu.featureide.fm.core.job.WorkMonitor;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 import de.ovgu.featureide.ui.UIPlugin;
-import no.sintef.ict.splcatool.CoveringArray;
-import no.sintef.ict.splcatool.CoveringArrayCASA;
-import no.sintef.ict.splcatool.CoveringArrayGenerationException;
-import no.sintef.ict.splcatool.GUIDSL;
-import splar.core.fm.FeatureModelException;
+import de.ovgu.featureide.ui.actions.generator.configuration.AConfigurationGenerator;
+import de.ovgu.featureide.ui.actions.generator.configuration.AllConfigrationsGenerator;
+import de.ovgu.featureide.ui.actions.generator.configuration.CurrentConfigurationsGenerator;
+import de.ovgu.featureide.ui.actions.generator.configuration.MASKConfigurationGenerator;
+import de.ovgu.featureide.ui.actions.generator.configuration.ModuleConfigurationGenerator;
+import de.ovgu.featureide.ui.actions.generator.configuration.RandConfigurationGenerator;
+import de.ovgu.featureide.ui.actions.generator.configuration.SPLCAToolConfigurationGenerator;
+import de.ovgu.featureide.ui.actions.generator.sorter.AbstractConfigurationSorter;
+import de.ovgu.featureide.ui.actions.generator.sorter.InteractionSorter;
+import de.ovgu.featureide.ui.actions.generator.sorter.PriorizationSorter;
 
 /**
  * Builds all valid or current configurations for a selected feature project.
@@ -101,7 +74,7 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 
 	private static final UIPlugin LOGGER = UIPlugin.getDefault();
 
-	IFeatureProject featureProject;
+	public IFeatureProject featureProject;
 	private IFeatureModel featureModel;
 
 	/**
@@ -111,28 +84,16 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	IFolder folder;
 
 	/**
-	 * This is the configuration where the {@link ConfigurationReader} saves the
-	 * read configuration.
-	 */
-	private Configuration configuration;
-	private FileHandler<Configuration> reader;
-
-	/**
-	 * The count of found configurations.
-	 */
-	private long confs;
-
-	/**
 	 * The count of valid configurations.<br>
 	 * This is generated by the sat-solver or the amount current configurations
 	 * at the configurations folder.
 	 */
-	private long configurationNumber = 0;
+	public long configurationNumber = 0;
 
 	/**
 	 * A flag that indicates that the counting Job is running or has finished.
 	 */
-	private boolean counting = true;
+	public boolean counting = true;
 
 	/**
 	 * Saves the classpath entry for compilation.
@@ -155,15 +116,6 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 */
 	private int built;
 
-	/**
-	 * The count of how many configurations where built since the last update.
-	 */
-	int builtConfigurations = 0;
-
-	/**
-	 * The max size of <code>>configurations</code>
-	 */
-	private int maxSize = 500;
 
 	/**
 	 * This flag indicates that all jobs should be aborted.
@@ -191,20 +143,15 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	/**
 	 * This list contains all {@link Generator} jobs.
 	 */
-	ArrayList<Generator> generatorJobs = new ArrayList<Generator>();
-
-	private String algorithm;
-	private int t = 1;
-	private Node rootNode;
-	private LinkedList<Node> children;
-
-	AbstractConfigurationSorter sorter;
+	List<Generator> generatorJobs = new ArrayList<>();
+	
+	public AbstractConfigurationSorter sorter;
 	
 	public final boolean runTests;
 	
-	final TestResults testResults;
+	TestResults testResults;
 
-	private final int maxConfigs;
+	private AConfigurationGenerator configurationBuilder;
 
 	/**
 	 * Gets the first entry of configurations or <code>null</code> if there is
@@ -252,11 +199,16 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	public ConfigurationBuilder(final IFeatureProject featureProject, final BuildType buildType, final String featureName) {
 		this(featureProject, BuildType.INTEGRATION, false, "", 0, BuildOrder.DEFAULT, true, featureName, Integer.MAX_VALUE);
 	}
+	static int id = 0;
+	IProgressMonitor globalMonitor;
 		
 	public ConfigurationBuilder(final IFeatureProject featureProject, final BuildType buildType, final boolean createNewProjects, 
 			final String algorithm, final int t, final BuildOrder buildOrder, boolean runTests, final String featureName, final int maxConfigs) {
-		this.maxConfigs = maxConfigs;
 		this.runTests = runTests;
+		if (maxConfigs <= 0) {
+			return;
+		}
+		configurationNumber = maxConfigs;
 		if (runTests) {
 			testResults = new TestResults(featureProject.getProjectName(), "FeatureIDE test: " + featureProject.getProjectName());
 		} else {
@@ -265,8 +217,6 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 		if (!featureProject.getComposer().preBuildConfiguration()) {
 			return;
 		}
-		this.algorithm = algorithm;
-		this.t = t;
 		this.featureProject = featureProject;
 		this.createNewProjects = createNewProjects;
 		this.buildType = buildType;
@@ -279,11 +229,9 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			break;
 		case DISSIMILARITY:
 			sorter = new PriorizationSorter(featureModel);
-			maxSize = Integer.MAX_VALUE;
 			break;
 		case INTERACTION:
 			sorter = new InteractionSorter(t, featureModel, buildType == BuildType.T_WISE);
-			maxSize = Integer.MAX_VALUE;
 			break;
 		default:
 			LOGGER.logWarning("Case statement missing for: " + buildOrder);
@@ -291,63 +239,45 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			break;
 		}
 
-		/** set number of configurations to build **/
-		switch (buildType) {
-		case ALL_CURRENT:
-			configurationNumber = countConfigurations(this.featureProject.getConfigFolder());
-			break;
-		case ALL_VALID:
-			Job number = new AStoppableJob(JOB_TITLE_COUNT_CONFIGURATIONS) {
-				@Override
-				protected boolean work() {
-					configurationNumber = new Configuration(featureModel, false, false).number(1000000);
-					if (configurationNumber < 0) {
-						LOGGER.logWarning(StringTable.SATSOLVER_COMPUTATION_TIMEOUT);
-						configurationNumber = Integer.MAX_VALUE;
-					}
-
-					return true;
-				}
-			};
-			number.setPriority(Job.LONG);
-			number.schedule();
-			break;
-		case T_WISE:
-			break;
-		case RANDOM:
-			configurationNumber = maxConfigs;
-			break;
-		case INTEGRATION:
-			configurationNumber = 2;
-			break;
-		default:
-			break;
-		}
-
 		String jobName = "";
 		switch (buildType) {
 		case ALL_CURRENT:
+			configurationBuilder = new CurrentConfigurationsGenerator(this, featureModel, featureProject);
 			jobName = JOB_TITLE_CURRENT;
 			break;
 		case ALL_VALID:
+			configurationBuilder = new AllConfigrationsGenerator(this, featureModel, featureProject);
 			jobName = JOB_TITLE;
 			break;
 		case T_WISE:
+			if (algorithm.equals(MASK)) {
+				configurationBuilder = new MASKConfigurationGenerator(this, featureModel, featureProject);
+			} else {
+				configurationBuilder = new SPLCAToolConfigurationGenerator(this, featureModel, featureProject, algorithm, t);
+			}
 			jobName = JOB_TITLE_T_WISE;
 			break;
 		case RANDOM:
+			configurationBuilder = new RandConfigurationGenerator(this, featureModel, featureProject);
 			jobName = JOB_TITLE_RANDOM;
 			break;
 		case INTEGRATION:
+			configurationNumber = 2;
+			configurationBuilder = new ModuleConfigurationGenerator(this, featureModel, featureProject, featureName);
 			break;
 		default:
-			break;
+			throw new RuntimeException(buildType + " not supported");
 		}
 		jobName += StringTable.FOR + featureProject.getProjectName();
 		Job job = new Job(jobName) {
+			
+			
+			private LongRunningJob<Void> configurationBuilderJob;
+
 			public IStatus run(IProgressMonitor monitor) {
 				try {
 					monitor = SubMonitor.convert(monitor, getTaskName(), maxConfigs);
+					globalMonitor = monitor;
 					if (!init(monitor, buildType)) {
 						return Status.OK_STATUS;
 					}
@@ -367,29 +297,9 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 					} else {
 						newgeneratorJobs(1);
 					}
+					configurationBuilderJob = LongRunningWrapper.startJob("Create Configurations " + id++, configurationBuilder);
 
-					switch (buildType) {
-					case ALL_VALID:
-						buildAll(featureModel.getStructure().getRoot().getFeature(), monitor);
-						break;
-					case ALL_CURRENT:
-						buildCurrentConfigurations(featureProject, monitor);
-						break;
-					case T_WISE:
-						buildTWiseConfigurations(featureProject, monitor);
-						time = System.currentTimeMillis();
-						break;
-					case INTEGRATION:
-						buildModule(featureProject, monitor, featureName);
-						break;
-					case RANDOM:
-						callConfigurationGenerator(featureModel, (int)configurationNumber, monitor);
-						break;
-					default:
-						break;
-					}
-					finish();
-
+					showStatistics(monitor);
 					if (!createNewProjects) {
 						try {
 							folder.refreshLocal(IResource.DEPTH_INFINITE, null);
@@ -397,8 +307,12 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 							LOGGER.logError(e);
 						}
 					}
-					showStatistics(monitor);
 				} finally {
+					configurationBuilderJob.cancel();
+					cancelGenerationJobs();
+					for (Thread g : generatorJobs) {
+						g.interrupt();
+					}
 					monitor.done();
 				}
 				return Status.OK_STATUS;
@@ -407,21 +321,52 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			private void showStatistics(IProgressMonitor monitor) {
 				try {
 					synchronized (this) {
+						while (configurationBuilderJob.getStatus() == JobStatus.NOT_STARTED) {
+							try {
+								Thread.sleep(150);
+							} catch (InterruptedException e) {
+								LOGGER.logError(e);
+							}
+						}
+						while (configurationBuilderJob.getStatus() == JobStatus.RUNNING) {
+							monitor.setTaskName(getTaskName());
+							if (monitor.isCanceled()) {
+								cancelGenerationJobs();
+								configurationBuilderJob.cancel();
+								return;
+							}
+							try {
+								Thread.sleep(150);
+							} catch (InterruptedException e) {
+								LOGGER.logError(e);
+							}
+						}
+						System.err.println(configurationBuilderJob.getStatus());
+						
+						if (!sorter.isSorted()) {
+							monitor.setTaskName(getTaskName());
+							final WorkMonitor workMonitor = new WorkMonitor();
+							workMonitor.setMonitor(monitor);
+							configurationNumber = Math.min(configurationNumber, sorter.sortConfigurations(workMonitor));
+						}
+						finish();
+						
+						((SubMonitor)monitor).setWorkRemaining((int)configurationNumber - built);
 						while (!generatorJobs.isEmpty()) {
 							try {
 								if (monitor.isCanceled()) {
 									cancelGenerationJobs();
 									break;
 								}
-								Generator job = generatorJobs.get(0);
-								if (job.getState() != Job.RUNNING) {
-									job.schedule();
+								Generator generator = generatorJobs.get(0);
+								if (generator.getState() == Thread.State.TERMINATED) {
+									generatorJobs.remove(generator);
+									if (sorter.getBufferSize() != 0) {
+										createNewGenerator(generator.nr);
+									}
 								}
-								monitor.setTaskName(getTaskName() + " (waiting for Generators to finish)");
-								monitor.worked(builtConfigurations);
-								built += builtConfigurations;
-								builtConfigurations = 0;
-								wait(100);
+								monitor.setTaskName(getTaskName());
+								Thread.sleep(150);
 							} catch (InterruptedException e) {
 								LOGGER.logError(e);
 							} catch (IndexOutOfBoundsException e) {
@@ -431,7 +376,6 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 					}
 	
 					long duration = System.currentTimeMillis() - time;
-	
 					long s = (duration / 1000) % 60;
 					long min = (duration / (60 * 1000)) % 60;
 					long h = duration / (60 * 60 * 1000);
@@ -463,17 +407,11 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 *            build
 	 */
 	private boolean init(IProgressMonitor monitor, BuildType buildType) {
-		confs = 1;
-
-		configuration = new Configuration(featureModel, false, false);
-		reader = new FileHandler<>(configuration);
-
 		// method is called to initialize composer extension if not yet
 		// initialized; so only delete if sure
 		featureProject.getComposer();
-
 		if (!createNewProjects) {
-			folder = featureProject.getProject().getFolder(buildType != BuildType.ALL_CURRENT ? FOLDER_NAME : FOLDER_NAME_CURRENT);
+			folder = featureProject.getProject().getFolder(FOLDER_NAME);
 			if (!folder.exists()) {
 				try {
 					folder.create(true, true, null);
@@ -500,43 +438,33 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 			}
 		} else {
 			try {
-				for (IResource res : ResourcesPlugin.getWorkspace().getRoot().members()) {
+				String identifier;
+				switch (buildType) {
+				case ALL_CURRENT:
+					identifier = SEPARATOR_CONFIGURATION;
+					break;
+				case ALL_VALID:
+					identifier = SEPARATOR_VARIANT;
+					break;
+				case T_WISE:
+					identifier = SEPARATOR_T_WISE;
+					break;
+				case INTEGRATION:
+					identifier = SEPARATOR_INTEGRATION;
+					break;
+				case RANDOM:
+					identifier = SEPARATOR_RANDOM;
+					break;
+				default:
+					return false;
+				}
+				for (final IResource res : ResourcesPlugin.getWorkspace().getRoot().members()) {
 					if (res instanceof IProject) {
 						IProject p = (IProject) res;
 						String projectName = p.getName();
-						switch (buildType) {
-						case ALL_CURRENT:
-							if (projectName.startsWith(featureProject.getProjectName() + SEPARATOR_CONFIGURATION)) {
-								monitor.setTaskName("Remove old products : " + projectName);
-								res.delete(true, null);
-							}
-							break;
-						case ALL_VALID:
-							if (projectName.startsWith(featureProject.getProjectName() + SEPARATOR_VARIANT)) {
-								monitor.setTaskName("Remove old products : " + projectName);
-								res.delete(true, null);
-							}
-							break;
-						case T_WISE:
-							if (projectName.startsWith(featureProject.getProjectName() + SEPARATOR_T_WISE)) {
-								monitor.setTaskName("Remove old products : " + projectName);
-								res.delete(true, null);
-							}
-							break;
-						case INTEGRATION:
-							if (projectName.startsWith(featureProject.getProjectName() + SEPARATOR_INTEGRATION)) {
-								monitor.setTaskName("Remove old products : " + projectName);
-								res.delete(true, null);
-							}
-							break;
-						case RANDOM:
-							if (projectName.startsWith(featureProject.getProjectName() + SEPARATOR_RANDOM)) {
-								monitor.setTaskName("Remove old products : " + projectName);
-								res.delete(true, null);
-							}
-							break;
-						default:
-							break;
+						if (projectName.startsWith(featureProject.getProjectName() + identifier)) {
+							monitor.setTaskName("Remove old products : " + projectName);
+							res.delete(true, null);
 						}
 					}
 				}
@@ -573,606 +501,6 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	}
 
 	/**
-	 * Creates a configuration containing the given feature.
-	 * @param featureProject The feature project
-	 * @param featureName The feature to build
-	 */
-	private void buildModule(IFeatureProject featureProject, IProgressMonitor monitor, String featureName) {
-		// create a configuration where the feature is selected
-		Configuration configuration = new Configuration(featureModel, true);
-		boolean success = createValidConfiguration(configuration, featureName, Selection.SELECTED);
-		if (success) {
-			addConfiguration(new BuilderConfiguration(configuration, featureName));
-		}
-		
-
-		for (IFeature coreFeature : featureModel.getAnalyser().getCoreFeatures()) {
-			if (coreFeature.getName().equals(featureName)) {
-				configurationNumber = 1;
-				return;
-			}
-		}
-		// create a configuration without the feature
-		configuration = new Configuration(featureModel, true);
-		if (configuration.getSelectablefeature(featureName).getAutomatic() != Selection.UNDEFINED) {
-			return;
-		}
-		createValidConfiguration(configuration, featureName, Selection.UNSELECTED);
-		if (success) {
-			addConfiguration(new BuilderConfiguration(configuration, NOT_ + featureName));
-		}
-	}
-	
-	/**
-	 * Selects features to create a valid configuration.
-	 * @param featureName 
-	 * @param selection 
-	 */
-	private boolean createValidConfiguration(Configuration configuration, String featureName, Selection selection) {
-		configuration.setManual(featureName, selection);
-		for (SelectableFeature feature : configuration.getFeatures()) {
-			if (feature.getName().equals(featureName)) {
-				continue;
-			}
-			if (configuration.isValid()) {
-				break;
-			}
-			SelectableFeature selectableFeature = configuration.getSelectablefeature(feature.getName());
-			if (selectableFeature.getSelection() == Selection.UNDEFINED) {
-				configuration.setManual(selectableFeature, Selection.SELECTED);
-			}
-		}
-		boolean canDeselect = true;
-		while (canDeselect) {
-			canDeselect = false;
-			for (IFeature feature : configuration.getSelectedFeatures()) {
-				if (feature.getName().equals(featureName)) {
-					continue;
-				}
-				SelectableFeature selectableFeature = configuration.getSelectablefeature(feature.getName());
-				try {
-					if (selectableFeature.getAutomatic() == Selection.UNDEFINED && selectableFeature.getManual() == Selection.SELECTED) {
-						configuration.setManual(selectableFeature, Selection.UNDEFINED);
-						if (!configuration.isValid()) {
-							configuration.setManual(selectableFeature, Selection.SELECTED);
-						} else {
-							canDeselect = true;
-						}
-					}
-				} catch (Exception e) {
-					LOGGER.logError(e);
-				}
-			}
-		}
-		return configuration.isValid();
-	}
-	
-	private void callConfigurationGenerator(IFeatureModel fm, int solutionCount, IProgressMonitor monitor) {
-		final AdvancedNodeCreator advancedNodeCreator = new AdvancedNodeCreator(fm);
-		advancedNodeCreator.setCnfType(CNFType.Regular);
-		advancedNodeCreator.setIncludeBooleanValues(false);
-
-		Node createNodes = advancedNodeCreator.createNodes();
-		SatInstance solver = new SatInstance(createNodes, FeatureUtils.getFeatureNamesPreorder(fm));
-		PairWiseConfigurationGenerator gen;
-		switch (buildType) {
-		case RANDOM:
-			gen = new RandomConfigurationGenerator(solver, solutionCount);
-			break;
-		case T_WISE:
-			gen = new PairWiseConfigurationGenerator(solver, solutionCount);
-			break;
-		default:
-			LOGGER.logWarning(buildType + " not supported.");
-			return;
-		}
-		exec(solver, gen, monitor);
-	}
-	
-	protected void exec(final SatInstance satInstance, final PairWiseConfigurationGenerator as, IProgressMonitor monitor) {
-		final Thread consumer = new Thread() {
-			@Override
-			public void run() {
-				while (true) {
-					try {
-						generateConfiguration(satInstance.convertToString(as.q.take().getModel()));
-					} catch (InterruptedException e) {
-						break;
-					}
-				}
-				for (org.prop4j.analyses.PairWiseConfigurationGenerator.Configuration c : as.q) {
-					generateConfiguration(satInstance.convertToString(c.getModel()));
-				}
-			}
-
-			private void generateConfiguration(List<String> solution) {
-				configuration.resetValues();
-				for (final String selection : solution) {
-					configuration.setManual(selection, Selection.SELECTED);
-				}
-				addConfiguration(new BuilderConfiguration(configuration, confs++));
-			}
-		};
-		LongRunningJob<List<List<String>>> job = LongRunningWrapper.createJob("Create configurations", as);
-		job.addJobFinishedListener(new JobFinishListener() {
-			
-			@Override
-			public void jobFinished(IJob finishedJob, boolean success) {
-				consumer.interrupt();
-			}
-		});
-		consumer.start();
-		job.schedule();
-		
-		if (sorter instanceof AbstractConfigurationSorter) {
-			try {
-				job.join();
-				sorter.sortConfigurations(monitor);
-			} catch (InterruptedException e) {
-				LOGGER.logError(e);
-			}
-		}
-	}
-	
-	/**
-	 * Builds all current configurations for the given feature project into the
-	 * folder for current configurations.
-	 * 
-	 * @param featureProject
-	 *            The feature project
-	 * @param monitor
-	 */
-	protected void buildTWiseConfigurations(IFeatureProject featureProject, IProgressMonitor monitor) {
-		configuration = new Configuration(featureModel, false);
-		reader = new FileHandler<>(configuration);
-		monitor.beginTask(SAMPLING, 1);
-		if (algorithm.equals(MASK)) {
-			callConfigurationGenerator(featureModel, (int)configurationNumber, monitor);
-		} else {
-			runSPLCATool();
-		}
-		configurationNumber = sorter.sortConfigurations(monitor);
-		monitor.beginTask(BUILD_CONFIGURATIONS, (int)configurationNumber);		
-	}
-
-	@SuppressWarnings("deprecation")
-	private void runSPLCATool() {
-		CoveringArray ca = null;
-		try {
-			if (algorithm.equals(CASA)) {
-				URL url = BundleUtility.find(LOGGER.getBundle(), "lib/cover.exe");
-				try {
-					url = FileLocator.toFileURL(url);
-				} catch (IOException e) {
-					LOGGER.logError(e);
-				}
-				Path path = new Path(url.getFile());
-				CoveringArrayCASA.CASA_PATH = path.toOSString();
-			}
-
-			ca = new GUIDSL(new de.ovgu.featureide.fm.core.FeatureModel(featureModel)).getSXFM().getCNF().getCoveringArrayGenerator(algorithm, t);
-			if (ca == null) {
-				return;
-			}
-			ca.generate(100, maxConfigs);
-		} catch (FeatureModelException e) {
-			LOGGER.logError(e);
-		} catch (TimeoutException e) {
-			LOGGER.logError(e);
-		} catch (CoveringArrayGenerationException e) {
-			LOGGER.logError(e);
-		}
-		final List<List<String>> solutions = removeDuplicates(ca);
-		configurationNumber = solutions.size();
-		for (final List<String> solution : solutions) {
-			configuration.resetValues();
-			for (final String selection : solution) {
-				configuration.setManual(selection, Selection.SELECTED);
-			}
-			addConfiguration(new BuilderConfiguration(configuration, confs++));
-		}
-	}
-
-	/**
-	 * The result of the generator can:<br>
-	 * a) contain duplicate solutions<br>
-	 * b) duplicate solutions that differ only by the selection of abstract
-	 * features
-	 * 
-	 * @return Duplicate free solutions
-	 */
-	private List<List<String>> removeDuplicates(final CoveringArray ca) {
-		final List<List<Integer>> solutions = ca.getSolutionsAsList();
-		final List<List<String>> duplicateFreeSolutions = new LinkedList<List<String>>();
-		for (final List<Integer> solution : solutions) {
-			final List<String> convertedSolution = new LinkedList<String>();
-			for (final Integer i : solution) {
-				if (i > 0) {
-					String id = ca.getId(i);
-					final IFeature feature = featureModel.getFeature(id);
-					if (feature != null && feature.getStructure().isConcrete()) {
-						convertedSolution.add(feature.getName());
-					}
-				}
-			}
-			if (!duplicateFreeSolutions.contains(convertedSolution)) {
-				duplicateFreeSolutions.add(convertedSolution);
-			}
-		}
-		if (solutions.size() - duplicateFreeSolutions.size() > 0) {
-			LOGGER.logInfo((solutions.size() - duplicateFreeSolutions.size()) + " duplicate solutions skipped!");
-		}
-		return duplicateFreeSolutions;
-	}
-
-	protected void buildCurrentConfigurations(IFeatureProject featureProject, IProgressMonitor monitor) {
-		monitor.beginTask("", (int) configurationNumber);
-		try {
-			for (IResource configuration : featureProject.getConfigFolder().members()) {
-				if (confs > maxConfigs) {
-					break;
-				}
-				if (monitor.isCanceled()) {
-					finish();
-					return;
-				}
-				if (isConfiguration(configuration)) {
-					build(configuration, monitor);
-				}
-				confs++;
-			}
-			sorter.sortConfigurations(monitor);
-		} catch (CoreException e) {
-			LOGGER.logError(e);
-		}
-	}
-
-	/**
-	 * Builds the given configuration file into the folder for current
-	 * configurations.
-	 * 
-	 * @param configuration
-	 *            The configuration file
-	 * @param monitor
-	 */
-	private void build(IResource configuration, IProgressMonitor monitor) {
-		reader.read(Paths.get(configuration.getLocationURI()), ConfigurationManager.getFormat(configuration.getName()));
-		addConfiguration(new BuilderConfiguration(this.configuration, configuration.getName().split("[.]")[0]));
-	}
-
-	/**
-	 * Counts the configurations at the given folder.
-	 * 
-	 * @param configFolder
-	 *            The folder
-	 * @return Number of configuration files
-	 */
-	private int countConfigurations(IFolder configFolder) {
-		int i = 0;
-		try {
-			for (IResource res : configFolder.members()) {
-				if (isConfiguration(res)) {
-					i++;
-				}
-			}
-		} catch (CoreException e) {
-			LOGGER.logError(e);
-		}
-		return i;
-	}
-
-	/**
-	 * @param res
-	 *            A file.
-	 * @return <code>true</code> if the given file is a configuration file
-	 */
-	private boolean isConfiguration(IResource res) {
-		return res instanceof IFile && CorePlugin.getDefault().getConfigurationExtensions().contains(res.getFileExtension());
-	}
-
-	/**
-	 * Builds all possible valid configurations for the feature project.<br>
-	 * Iterates through the structure of the feature model and ignores
-	 * constraints, to get a linear expenditure.<br>
-	 * After collecting a configurations the satsolver tests its validity.<br>
-	 * Then the found configuration will be build into the folder for all valid
-	 * products.
-	 * 
-	 * @param root
-	 *            The root feature of the feature model
-	 * @param monitor
-	 */
-	private void buildAll(IFeature root, IProgressMonitor monitor) {
-		LinkedList<IFeature> selectedFeatures2 = new LinkedList<IFeature>();
-		selectedFeatures2.add(root);
-		rootNode = AdvancedNodeCreator.createCNFWithoutAbstract(featureModel);
-		children = new LinkedList<Node>();
-		build(root, "", selectedFeatures2, monitor);
-		sorter.sortConfigurations(monitor);
-	}
-
-	private void build(IFeature currentFeature, String selected, LinkedList<IFeature> selectedFeatures2, IProgressMonitor monitor) {
-		if (monitor.isCanceled()) {
-			cancelGenerationJobs();
-			return;
-		}
-		if (confs > maxConfigs) {
-			return;
-		}
-		
-		if (configurationNumber != 0 && confs > configurationNumber) {
-			return;
-		}
-
-		if (!counting && configurationNumber != 0) {
-			monitor.worked(builtConfigurations);
-			built += builtConfigurations;
-			builtConfigurations = 0;
-		} else if (counting) {
-			built = builtConfigurations;
-		}
-
-		monitor.setTaskName(getTaskName());
-
-		if (featureModel.getConstraintCount() > 0) {
-			children.clear();
-			for (String feature : selected.split("\\s+")) {
-				children.add(new Literal(feature, true));
-			}
-			try {
-				if (!(new SatSolver(new And(rootNode.clone(), new And(children)), 1000)).isSatisfiable()) {
-					return;
-				}
-			} catch (org.sat4j.specs.TimeoutException e) {
-				LOGGER.logError(e);
-			}
-		}
-
-		if (selectedFeatures2.isEmpty()) {
-			configuration.resetValues();
-
-			if (!selected.isEmpty()) {
-				for (final String feature : selected.split("\\s+")) {
-					configuration.setManual((feature), Selection.SELECTED);
-				}
-
-			}
-			if (configuration.isValid()) {
-				LinkedList<String> selectedFeatures3 = new LinkedList<String>();
-				for (String f : selected.split("\\s+")) {
-					if (!"".equals(f)) {
-						selectedFeatures3.add(f);
-					}
-				}
-				for (IFeature f : configuration.getSelectedFeatures()) {
-					if (f.getStructure().isConcrete()) {
-						if (!selectedFeatures3.contains(f.getName())) {
-							return;
-						}
-					}
-				}
-				for (String f : selectedFeatures3) {
-					if (configuration.getSelectablefeature(f).getSelection() != Selection.SELECTED) {
-						return;
-					}
-				}
-
-				monitor.setTaskName(getTaskName());
-				addConfiguration(new BuilderConfiguration(configuration, confs));
-
-				if (sorter.getBufferSize() >= maxSize) {
-					monitor.setTaskName(getTaskName() + " (waiting, buffer full)");
-					synchronized (this) {
-						while (sorter.getBufferSize() >= maxSize) {
-							if (monitor.isCanceled()) {
-								return;
-							}
-							try {
-								wait(1000);
-							} catch (InterruptedException e) {
-								LOGGER.logError(e);
-							}
-						}
-					}
-				}
-				confs++;
-				monitor.setTaskName(getTaskName());
-				if (counting && configurationNumber == 0) {
-					built = builtConfigurations;
-				}
-				if (counting && configurationNumber != 0) {
-					counting = false;
-					monitor.beginTask("", (int) configurationNumber);
-					monitor.worked(builtConfigurations);
-					built = builtConfigurations;
-					builtConfigurations = 0;
-				} else if (configurationNumber != 0) {
-					monitor.worked(builtConfigurations);
-					built += builtConfigurations;
-					builtConfigurations = 0;
-				}
-			}
-			return;
-		}
-
-		if (currentFeature.getStructure().isAnd()) {
-			buildAnd(selected, selectedFeatures2, monitor);
-		} else if (currentFeature.getStructure().isOr()) {
-			buildOr(selected, selectedFeatures2, monitor);
-		} else if (currentFeature.getStructure().isAlternative()) {
-			buildAlternative(selected, selectedFeatures2, monitor);
-		}
-	}
-
-	/**
-	 * @return a description of the state.
-	 */
-	private String getTaskName() {
-		String t = "";
-		if (configurationNumber != 0 && built != 0) {
-			long duration = System.currentTimeMillis() - time;
-			duration = (duration / built) * (configurationNumber - built);
-			long s = (duration / 1000) % 60;
-			long min = (duration / (60 * 1000)) % 60;
-			long h = duration / (60 * 60 * 1000);
-			t = " " + h + "h " + (min < 10 ? "0" + min : min) + "min " + (s < 10 ? "0" + s : s) + "s.";
-		}
-		long buffer = sorter.getBufferSize();
-		return "Built configurations: " + built + "/" + (configurationNumber == 0 ? COUNTING___ : configurationNumber) + "(" + buffer + " buffered)" + " Expected time: " + t;
-	}
-
-	private void buildAlternative(String selected, LinkedList<IFeature> selectedFeatures2, IProgressMonitor monitor) {
-		IFeature currentFeature = selectedFeatures2.getFirst();
-		selectedFeatures2.removeFirst();
-		LinkedList<IFeature> selectedFeatures3 = new LinkedList<IFeature>();
-		if (currentFeature.getStructure().isConcrete()) {
-			if ("".equals(selected)) {
-				selected = currentFeature.getName();
-			} else {
-				selected += " " + currentFeature.getName();
-			}
-		}
-		if (!currentFeature.getStructure().hasChildren()) {
-			if (selectedFeatures2.isEmpty()) {
-				currentFeature = null;
-			} else {
-				currentFeature = selectedFeatures2.getFirst();
-			}
-			selectedFeatures3.addAll(selectedFeatures2);
-			build(currentFeature, selected, selectedFeatures3, monitor);
-			return;
-		}
-		for (int i2 = 0; i2 < getChildren(currentFeature).size(); i2++) {
-			selectedFeatures3 = new LinkedList<IFeature>();
-			selectedFeatures3.add(getChildren(currentFeature).get(i2));
-			selectedFeatures3.addAll(selectedFeatures2);
-			build(selectedFeatures3.isEmpty() ? null : selectedFeatures3.getFirst(), selected, selectedFeatures3, monitor);
-		}
-	}
-
-	private void buildOr(String selected, LinkedList<IFeature> selectedFeatures2, IProgressMonitor monitor) {
-		IFeature currentFeature = selectedFeatures2.getFirst();
-		selectedFeatures2.removeFirst();
-		LinkedList<IFeature> selectedFeatures3 = new LinkedList<IFeature>();
-		if (currentFeature.getStructure().isConcrete()) {
-			if ("".equals(selected)) {
-				selected = currentFeature.getName();
-			} else {
-				selected += " " + currentFeature.getName();
-			}
-		}
-		if (!currentFeature.getStructure().hasChildren()) {
-			if (selectedFeatures2.isEmpty()) {
-				currentFeature = null;
-			} else {
-				currentFeature = selectedFeatures2.getFirst();
-			}
-			selectedFeatures3.addAll(selectedFeatures2);
-			build(currentFeature, selected, selectedFeatures3, monitor);
-			return;
-		}
-		int k2;
-		int i2 = 1;
-		if (getChildren(currentFeature).size() < currentFeature.getStructure().getChildren().size()) {
-			i2 = 0;
-		}
-		for (; i2 < (int) java.lang.Math.pow(2, getChildren(currentFeature).size()); i2++) {
-			k2 = i2;
-			selectedFeatures3 = new LinkedList<IFeature>();
-			for (int j = 0; j < getChildren(currentFeature).size(); j++) {
-				if (k2 % 2 != 0) {
-					selectedFeatures3.add(getChildren(currentFeature).get(j));
-				}
-				k2 = k2 / 2;
-			}
-			selectedFeatures3.addAll(selectedFeatures2);
-			build(selectedFeatures3.isEmpty() ? null : selectedFeatures3.getFirst(), selected, selectedFeatures3, monitor);
-		}
-	}
-
-	private void buildAnd(String selected, LinkedList<IFeature> selectedFeatures2, IProgressMonitor monitor) {
-		IFeature currentFeature = selectedFeatures2.removeFirst();
-		LinkedList<IFeature> selectedFeatures3 = new LinkedList<IFeature>();
-		if (currentFeature.getStructure().isConcrete()) {
-			if ("".equals(selected)) {
-				selected = currentFeature.getName();
-			} else {
-				selected += " " + currentFeature.getName();
-			}
-		}
-		if (!currentFeature.getStructure().hasChildren()) {
-			if (selectedFeatures2.isEmpty()) {
-				currentFeature = null;
-			} else {
-				currentFeature = selectedFeatures2.getFirst();
-			}
-			selectedFeatures3.addAll(selectedFeatures2);
-			build(currentFeature, selected, selectedFeatures3, monitor);
-			return;
-		}
-		int k2;
-		LinkedList<IFeature> optionalFeatures = new LinkedList<IFeature>();
-		for (IFeature f : getChildren(currentFeature)) {
-			if (f.getStructure().isMandatory()) {
-				selectedFeatures2.add(f);
-			} else {
-				optionalFeatures.add(f);
-			}
-		}
-
-		for (int i2 = 0; i2 < (int) java.lang.Math.pow(2, optionalFeatures.size()); i2++) {
-			k2 = i2;
-			selectedFeatures3 = new LinkedList<IFeature>();
-			for (int j = 0; j < optionalFeatures.size(); j++) {
-				if (k2 % 2 != 0) {
-					selectedFeatures3.add(optionalFeatures.get(j));
-				}
-				k2 = k2 / 2;
-			}
-			selectedFeatures3.addAll(selectedFeatures2);
-			build(selectedFeatures3.isEmpty() ? null : selectedFeatures3.getFirst(), selected, selectedFeatures3, monitor);
-		}
-
-	}
-
-	/**
-	 * Returns all children of a feature if it is a layer or if it has a child
-	 * that is a layer.
-	 * 
-	 * @param currentFeature
-	 *            The feature
-	 * @return The children
-	 */
-	private LinkedList<IFeature> getChildren(IFeature currentFeature) {
-		LinkedList<IFeature> children = new LinkedList<IFeature>();
-		for (IFeatureStructure childStructure : currentFeature.getStructure().getChildren()) {
-			IFeature child = childStructure.getFeature();
-			if (child.getStructure().isConcrete() || hasLayerChild(child)) {
-				children.add(child);
-			}
-		}
-		return children;
-	}
-
-	/**
-	 * @param feature
-	 *            The feature
-	 * @return <code>true</code> if the feature is a layer or if it has a child
-	 *         that is a layer
-	 */
-	private boolean hasLayerChild(IFeature feature) {
-		if (feature.getStructure().hasChildren()) {
-			for (IFeatureStructure childStructure : feature.getStructure().getChildren()) {
-				IFeature child = childStructure.getFeature();
-				if (child.getStructure().isConcrete() || hasLayerChild(child)) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	/**
 	 * Creates new {@link Generator}s
 	 * 
 	 * @param count
@@ -1201,15 +529,14 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	void createNewGenerator(int nr) {
 		Generator g = new Generator(nr, this);
 		generatorJobs.add(g);
-		g.setPriority(Job.LONG);
-		g.schedule();
+		g.start();
 	}
 
 	/**
 	 * This is called if the main job is canceled and all {@link Builder} and
 	 * {@link JavaCompiler} should finish.
 	 */
-	private void cancelGenerationJobs() {
+	public void cancelGenerationJobs() {
 		cancelGeneratorJobs = true;
 	}
 
@@ -1217,8 +544,35 @@ public class ConfigurationBuilder implements IConfigurationBuilderBasics {
 	 * This is called if the main job has finished and no more configurations
 	 * will be added.
 	 */
-	private void finish() {
+	public void finish() {
 		finish = true;
 	}
 
+	/**
+	 * @return a description of the state.
+	 */
+	public String getTaskName() {
+		String t = "";
+		if (configurationNumber != 0 && built != 0) {
+			long duration = System.currentTimeMillis() - time;
+			duration = (duration / built) * (configurationNumber - built);
+			long s = (duration / 1000) % 60;
+			long min = (duration / (60 * 1000)) % 60;
+			long h = duration / (60 * 60 * 1000);
+			t = " " + h + "h " + (min < 10 ? "0" + min : min) + "min " + (s < 10 ? "0" + s : s) + "s.";
+		}
+		long buffer = sorter.getBufferSize();
+		return "Built configurations: " + built + "/" + (configurationNumber == Integer.MAX_VALUE ? COUNTING___ : configurationNumber) + "(" + buffer + " buffered)" + " Expected time: " + t;
+	}
+
+	/**
+	 * Notification that one configuration has been built.
+	 */
+	public synchronized void builtConfiguration() {
+		built++;
+		((SubMonitor)globalMonitor).setWorkRemaining((int)configurationNumber - built);
+		globalMonitor.setTaskName(getTaskName());
+		globalMonitor.worked(1);
+	}
+	
 }

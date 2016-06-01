@@ -13,7 +13,9 @@ import de.ovgu.featureide.ui.actions.generator.IConfigurationBuilderBasics.Build
 
 /**
  * Launch shortcut for integration tests<br>
- * See: Run As > Run as JUnit Integration Test
+ * See: Run As > Run as JUnit Integration Test.
+ * 
+ * @author Jens Meinicke
  */
 public class IntegrationTestLaunchShortcut implements ILaunchShortcut {
 
