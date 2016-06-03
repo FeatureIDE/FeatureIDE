@@ -18,15 +18,15 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.core;
+package de.ovgu.featureide.fm.core;
 
 /**
- * A FeatureIDE extension with its ID.
+ * Loads extensions and registers them to the given {@link ExtensionManager extension manager}.
  * 
- * @author Tom Brosch
+ * @author Sebastian Krieter
  */
-public interface IExtension {
-	
-	public abstract String getId();
-	
+public interface IExtensionLoader<T extends de.ovgu.featureide.fm.core.IExtension> {
+
+	void loadProviders(ExtensionManager<T> extensionManager);
+
 }

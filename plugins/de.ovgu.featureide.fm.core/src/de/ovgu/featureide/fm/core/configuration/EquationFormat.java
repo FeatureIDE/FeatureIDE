@@ -20,51 +20,24 @@
  */
 package de.ovgu.featureide.fm.core.configuration;
 
-import java.util.List;
-
-import org.w3c.dom.Document;
-
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
-import de.ovgu.featureide.fm.core.io.IPersistentFormat;
-import de.ovgu.featureide.fm.core.io.Problem;
-import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.io.xml.AXMLFormat;
 import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
- * Extended configuration format for FeatureIDE projects in XML structure.
+ * Simple configuration format.</br>
+ * Lists all selected features in the user-defined order (if specified).
  * 
  * @author Sebastian Krieter
+ * 
+ * @see DefaultFormat
  */
-public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigurationFormat {
+public class EquationFormat extends DefaultFormat {
 
-	public static final String ID = FMCorePlugin.PLUGIN_ID + ".format.config." + XMLConfFormat.class.getSimpleName();
-	public static final String EXTENSION = StringTable.CONF;
-
-	@Override
-	public IPersistentFormat<Configuration> getInstance() {
-		return null;
-	}
+	public static final String ID = FMCorePlugin.PLUGIN_ID + ".format.config." + EquationFormat.class.getSimpleName();
 
 	@Override
-	public boolean supportsRead() {
-		return false;
-	}
-
-	@Override
-	public boolean supportsWrite() {
-		return false;
-	}
-
-	@Override
-	protected void readDocument(Document doc, List<Problem> warnings) throws UnsupportedModelException {
-
-	}
-
-	@Override
-	protected void writeDocument(Document doc) {
-
+	public String getSuffix() {
+		return StringTable.EQUATION;
 	}
 
 	@Override

@@ -18,28 +18,39 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.ui.handlers;
+package de.ovgu.featureide.fm.core.base.impl;
 
-import org.eclipse.swt.widgets.FileDialog;
+import javax.annotation.CheckForNull;
 
-import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
-import de.ovgu.featureide.fm.core.io.dimacs.DIMACSFormat;
-import de.ovgu.featureide.fm.ui.handlers.base.AbstractImportHandler;
+import de.ovgu.featureide.fm.core.ExtensionManager;
+import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 
 /**
- * Reads a feature model given in DIMACS format.
+ * Manages additional formats for a certain object (e.g., a feature model or configuration).
  * 
  * @author Sebastian Krieter
  */
-public class ImportDIMACSHandler extends AbstractImportHandler {
-	@Override
-	protected IFeatureModelFormat setModelReader() {
-		return new DIMACSFormat();
+public abstract class FormatManager<T extends IPersistentFormat<?>> extends ExtensionManager<T> {
+
+	public T getFormatById(String id) throws NoSuchExtensionException {
+		return getExtension(id);
 	}
 
-	@Override
-	protected void setFilter(FileDialog fileDialog) {
-		fileDialog.setFilterExtensions(new String[] { "*.dimacs" });
-		fileDialog.setFilterNames(new String[] { "DIMACS" });
+	@CheckForNull
+	public T getFormatByExtension(String extension) {
+		if (extension != null) {
+			for (T format : getExtensions()) {
+				if (extension.equals(format.getSuffix())) {
+					return format;
+				}
+			}
+		}
+		return null;
 	}
+
+	@CheckForNull
+	public T getFormatByFileName(String fileName) {
+		return getFormatByExtension(fileName.substring(fileName.lastIndexOf('.') + 1));
+	}
+
 }

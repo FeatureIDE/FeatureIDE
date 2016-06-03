@@ -26,9 +26,9 @@ import java.util.ListIterator;
 import java.util.NoSuchElementException;
 
 /**
- * Iterates through a tree.
+ * Abstract implementation of the {@link TreeIterator} interface.
  * 
- * @author skrieter
+ * @author Sebastian Krieter
  */
 public abstract class AbstractTreeIterator<M, E> implements TreeIterator<E> {
 

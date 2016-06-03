@@ -18,28 +18,28 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.ui.handlers;
-
-import org.eclipse.swt.widgets.FileDialog;
-
-import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
-import de.ovgu.featureide.fm.core.io.dimacs.DIMACSFormat;
-import de.ovgu.featureide.fm.ui.handlers.base.AbstractImportHandler;
+package de.ovgu.featureide.fm.core.base.impl;
 
 /**
- * Reads a feature model given in DIMACS format.
+ * This {@link IFactoryWorkspaceProvider provider} only uses native Java methods.
  * 
  * @author Sebastian Krieter
  */
-public class ImportDIMACSHandler extends AbstractImportHandler {
-	@Override
-	protected IFeatureModelFormat setModelReader() {
-		return new DIMACSFormat();
+public final class CoreFactoryWorkspaceProvider implements IFactoryWorkspaceProvider {
+
+	private final FactoryWorkspace defaultWorkspace = new FactoryWorkspace();
+
+	public FactoryWorkspace getFactoryWorkspace(String path) {
+		return defaultWorkspace;
 	}
 
-	@Override
-	protected void setFilter(FileDialog fileDialog) {
-		fileDialog.setFilterExtensions(new String[] { "*.dimacs" });
-		fileDialog.setFilterNames(new String[] { "DIMACS" });
+	public FactoryWorkspace getFactoryWorkspace() {
+		return defaultWorkspace;
 	}
+
+	//TODO Implement map for core factory workspace provider
+	@Override
+	public void addFactoryWorkspace(String path, FactoryWorkspace workspace) {
+	}
+
 }

@@ -18,19 +18,15 @@
  *
  * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.io.manager;
-
-import de.ovgu.featureide.fm.core.io.IPersistentFormat;
+package de.ovgu.featureide.fm.core;
 
 /**
- * TODO description
+ * A FeatureIDE extension with its ID.
  * 
- * @author Sebastian Krieter
+ * @author Tom Brosch
  */
-public interface IFormatType<T> {
-
-	String getSuffix();
-
-	Class<? extends IPersistentFormat<T>> getFormat();
-
+public interface IExtension {
+	
+	public abstract String getId();
+	
 }

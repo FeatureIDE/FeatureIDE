@@ -16,55 +16,63 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with FeatureIDE.  If not, see <http://www.gnu.org/licenses/>.
  *
- * See http://www.fosd.de/featureide/ for further information.
+ * See http://featureide.cs.ovgu.de/ for further information.
  */
-package de.ovgu.featureide.fm.core.configuration;
-
-import java.util.List;
-
-import org.w3c.dom.Document;
+package de.ovgu.featureide.fm.core.io.sxfm;
 
 import de.ovgu.featureide.fm.core.FMCorePlugin;
-import de.ovgu.featureide.fm.core.io.IConfigurationFormat;
+import de.ovgu.featureide.fm.core.base.IFeatureModel;
+import de.ovgu.featureide.fm.core.io.IFeatureModelFormat;
 import de.ovgu.featureide.fm.core.io.IPersistentFormat;
 import de.ovgu.featureide.fm.core.io.Problem;
+import de.ovgu.featureide.fm.core.io.ProblemList;
 import de.ovgu.featureide.fm.core.io.UnsupportedModelException;
-import de.ovgu.featureide.fm.core.io.xml.AXMLFormat;
-import de.ovgu.featureide.fm.core.localization.StringTable;
 
 /**
- * Extended configuration format for FeatureIDE projects in XML structure.
+ * Reads / Writes feature models in the SXFM format.
  * 
  * @author Sebastian Krieter
  */
-public class XMLConfFormat extends AXMLFormat<Configuration> implements IConfigurationFormat {
+public class SXFMFormat implements IFeatureModelFormat {
 
-	public static final String ID = FMCorePlugin.PLUGIN_ID + ".format.config." + XMLConfFormat.class.getSimpleName();
-	public static final String EXTENSION = StringTable.CONF;
+	public static final String ID = FMCorePlugin.PLUGIN_ID + ".format.fm." + SXFMFormat.class.getSimpleName();
 
 	@Override
-	public IPersistentFormat<Configuration> getInstance() {
-		return null;
+	public ProblemList read(IFeatureModel featureModel, CharSequence source) {
+		final ProblemList problemList = new ProblemList();
+		final SXFMReader guidslReader = new SXFMReader(featureModel);
+		try {
+			guidslReader.parseInputStream(source.toString());
+		} catch (UnsupportedModelException e) {
+			problemList.add(new Problem(e, e.lineNumber));
+		}
+		problemList.addAll(guidslReader.getWarnings());
+		return problemList;
+	}
+
+	@Override
+	public String write(IFeatureModel featureModel) {
+		return new SXFMWriter(featureModel).writeToString();
+	}
+
+	@Override
+	public String getSuffix() {
+		return "model";
+	}
+
+	@Override
+	public IPersistentFormat<IFeatureModel> getInstance() {
+		return this;
 	}
 
 	@Override
 	public boolean supportsRead() {
-		return false;
+		return true;
 	}
 
 	@Override
 	public boolean supportsWrite() {
-		return false;
-	}
-
-	@Override
-	protected void readDocument(Document doc, List<Problem> warnings) throws UnsupportedModelException {
-
-	}
-
-	@Override
-	protected void writeDocument(Document doc) {
-
+		return true;
 	}
 
 	@Override

@@ -20,12 +20,14 @@
  */
 package de.ovgu.featureide.fm.core.io;
 
+import de.ovgu.featureide.fm.core.IExtension;
+
 /**
  * Interface for saving and loading data.
  * 
  * @author Sebastian Krieter
  */
-public interface IPersistentFormat<T> {
+public interface IPersistentFormat<T> extends IExtension {
 
 	ProblemList read(T object, CharSequence source);
 
@@ -35,6 +37,8 @@ public interface IPersistentFormat<T> {
 
 	IPersistentFormat<T> getInstance();
 
-	String getFactoryID();
+	boolean supportsRead();
+
+	boolean supportsWrite();
 
 }
