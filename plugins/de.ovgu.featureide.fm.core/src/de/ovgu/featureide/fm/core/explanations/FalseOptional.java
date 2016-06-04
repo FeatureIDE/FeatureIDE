@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.explanations;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -53,8 +54,8 @@ public class FalseOptional {
 	 * @param falsOptionals a list of false optional features
 	 * @return String an explanation why the feature(s) is false optional
 	 */
-	public String explain(IFeatureModel newModel, Collection<IFeature> falseOptionals) {
-		String reason = "";
+	public List<String> explain(IFeatureModel newModel, Collection<IFeature> falseOptionals) {
+		List<String> explList = new ArrayList<>();
 		setNewModel(newModel);
 		Node node = NodeCreator.createNodes(model, true).toCNF();
 		Node withoutTrueClauses = eliminateTrueClauses(node);
@@ -62,23 +63,20 @@ public class FalseOptional {
 
 		for (IFeature falsopt : falseOptionals) {
 			Literal falseOptional = new Literal(falsopt.getName());
+			explList.add("\nFeature " + falseOptional + " is false-optional, because:");
 			LTMS ltms = new LTMS(model);
-			String tmpReason = "Feature " + falseOptional + " is false-optional, because: \n";
 
-			List<String> explList = ltms.explainFalseOpsFeature(clauses, falseOptional);
-			if (explList.isEmpty()){
-				tmpReason += "No explanation possible, some parent might be dead";
+			List<String> tmpExplList  = ltms.explainFalseOpsFeature(clauses, falseOptional);
+			if (tmpExplList.isEmpty()){
+				explList.add("No explanation possible");
 			}
 			else{	
-				for (String tmp : explList) {
-					tmpReason += tmp + ",\n";
+				for (String tmp : tmpExplList) {
+					explList.add(tmp);
 				}
-				int lastChar = tmpReason.lastIndexOf(",");
-				tmpReason = tmpReason.substring(0, lastChar);
 			}
-			reason += tmpReason + "\n\n";
 		}
-		return reason.trim();
+		return explList;
 	}
 
 	/**

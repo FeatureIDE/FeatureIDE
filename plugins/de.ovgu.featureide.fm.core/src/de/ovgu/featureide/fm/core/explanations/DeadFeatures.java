@@ -20,6 +20,7 @@
  */
 package de.ovgu.featureide.fm.core.explanations;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -53,32 +54,30 @@ public class DeadFeatures {
 	 * @param c the constraint which leads to a dead feature
 	 * @return String an explanation why the feature(s) is dead
 	 */
-	public String explain(IFeatureModel newModel, IConstraint c, Collection<IFeature> deadFeatures) {
-		String reason = "";
+	public List<String> explain(IFeatureModel newModel, IConstraint c, Collection<IFeature> deadFeatures) {
+		List<String> explList = new ArrayList<>();
 		setNewModel(newModel);
 		Node node = NodeCreator.createNodes(model, true).toCNF();
 		Node[] clauses = node.getChildren();
-
+		
 		for (IFeature deadFeature : deadFeatures) {
 			Literal	deadF = new Literal(deadFeature.getName());
+			explList.add("\nFeature " + deadF + " is dead, because:");
 			LTMS ltms = new LTMS(model);
 
 			// generate explanation which stops after first violation with "used" clauses in stack
-			String tmpReason = "Feature " + deadF + " is dead, because: \n";
-			List<String> explList = ltms.explainDeadFeature(clauses, deadF);
-			if (explList.isEmpty()){
-				tmpReason += "No explanation possible, some parent might be dead";
+			List<String> tmpExplList = ltms.explainDeadFeature(clauses, deadF);
+
+			if (tmpExplList.isEmpty()){
+				explList.add("No explanation possible");
 			}
 			else{	
-				for (String tmp : explList) {
-					tmpReason += tmp + ",\n";
+				for (String tmp : tmpExplList) {
+					explList.add(tmp);
 				}
-				int lastChar = tmpReason.lastIndexOf(",");
-				tmpReason = tmpReason.substring(0, lastChar);
 			}
-			reason += tmpReason + "\n\n";
 		}
-		return reason.trim();
+		return explList;
 	}
 	
 	/**

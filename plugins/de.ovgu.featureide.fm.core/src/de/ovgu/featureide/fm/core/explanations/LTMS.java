@@ -20,15 +20,16 @@
  */
 package de.ovgu.featureide.fm.core.explanations;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Stack;
 
+//import org.eclipse.swt.graphics.Color;
 import org.prop4j.Literal;
 import org.prop4j.Node;
 
@@ -118,7 +119,7 @@ public class LTMS {
 	 * 
 	 * @param clauses the clauses of the conjunctive normal form of the feature model
 	 * @return String an explanation for the redundant constraint
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public List<String> explainRedundantConstraint(Node[] clauses, HashMap<Object, Integer> map) {
 		reason.clear();
@@ -193,14 +194,15 @@ public class LTMS {
 			}
 			return reason;
 		}
-		findOpenClauses(deads, clauses); 
+		findOpenClauses(deads, clauses);
 		BCP(clauses);
 		return shortestExpl(clauses, null, deadF, ExplanationMode.DeadFeature);
 	}
 
 	/**
 	 * Generate all possible explanations and choose the shortest one. The length of an explanation
-	 * is measured by the amount of parts (is child, is root, is constraint) it consists of.
+	 * is measured by the amount of lines it consists of. Every line represents a relationship within the
+	 * feature model tree topology or a cross-tree constraint.
 	 * 
 	 * @param expl the first generated explanation
 	 * @param clauses the clauses of the conjunctive normal form
@@ -208,10 +210,20 @@ public class LTMS {
 	 * @return String the shortest explanation
 	 */
 	private List<String> shortestExpl(Node[] clauses, HashMap<Object, Integer> map, Literal explLit, ExplanationMode mode) {
+
+		//Weight strings which occur in every generated explanation for a defect while searching for the shortest explanation.
+		HashMap<String, Integer> weightedExplanations = new HashMap<String, Integer>();
 		List<String> shortestExpl = (List<String>) ((ArrayList<String>) reason).clone(); // remember first explanation
+		int cnt = 1; // remember number of explanations
+
+		// remember first explanation strings in order to weight them later according their occurrences 
+		for (String tmp : shortestExpl) {
+			weightedExplanations.put(tmp, 1);
+		}
 		while (!stackOpenClause.isEmpty()) { // generate explanations until stack with unit open clauses is empty
-			
+
 			// restore preconditions to start BCP algorithm again
+			cnt++;
 			reason.clear();
 			setTruthValToUnknown(clauses);
 
@@ -237,14 +249,94 @@ public class LTMS {
 				shortestExpl.add("unknown explanation mode");
 				return shortestExpl;
 			}
-
 			BCP(clauses); // generate new explanation with remaining clauses in stack 
 
+			// remember how often a certain string occurred in several explanations for the same defect
+			for (String tmp : reason) {
+				if (weightedExplanations.containsKey(tmp)) {
+					weightedExplanations.put(tmp, weightedExplanations.get(tmp) + 1);
+				} else {
+					weightedExplanations.put(tmp, 1);
+				}
+			}
 			if (!reason.isEmpty() && reason.size() < shortestExpl.size()) { //remember only shortest explanation
 				shortestExpl = (List<String>) ((ArrayList<String>) reason).clone();
 			}
 		}
+		// if we are here, shortest explanation is found
+		weightExpl(shortestExpl, weightedExplanations, cnt); // mark explanations parts within final explanation
 		return shortestExpl;
+	}
+	
+
+	/**
+	 * Processes the shortest explanation and marks parts of an explanation which occur in every
+	 * explanation (intersection) or are most common ones. Such explanation parts possess a high probability 
+	 * to trigger the defect to explain. 
+	 * 
+	 * @param shortest the shortest explanation
+	 * @param weighted the explanation parts to mark  
+	 * @param cnt the number of explanations
+	 * @return the shortest explanation with marked explanation parts that occur most often
+	 */
+	public List<String> weightExpl(List<String> shortest, HashMap<String, Integer> weighted, int cnt) {
+		// remove all explanation parts which are not part of the shortest explanation
+		Iterator<String> it = weighted.keySet().iterator();
+		while (it.hasNext()) {
+			String expl = it.next();
+			if (!shortest.contains(expl)) {
+				it.remove();
+			}
+		}
+		// extract list of values
+		ArrayList<Integer> list = new ArrayList<Integer>();
+		for (String key : weighted.keySet()) {
+			list.add(weighted.get(key));
+		}
+		if (!list.isEmpty()) {
+			Integer max = Collections.max(list);
+		//	if (max > 1) { // only mark explanation parts that occurred more than once 
+			List<String> listCnt = getKeysFromValue(weighted, max); // remember explanation parts which occur in every explanation
+			selectWeighted(listCnt, shortest, cnt, max);
+		//	}
+		}
+		return shortest;
+	}
+
+	/**
+	 * Returns explanation parts which occur most often in all explanations.
+	 * 
+	 * @param map the hash map which contains explanation parts as keys and their number of occurrence as value
+	 * @param value the max value of occurred explanation parts
+	 * @return explanation parts which occur most often in all explanations
+	 */
+	private static List<String> getKeysFromValue(HashMap<String, Integer> map, Object value) {
+		List<String> res = new ArrayList<String>();
+		for (String s : map.keySet()) {
+			if (map.get(s).equals(value)) {
+				res.add(s);
+			}
+		}
+		return res;
+	}
+
+	/**
+	 * Marks explanation parts in final explanation which occur most often. Adds the number of occurences to
+	 * those parts. 
+	 * 
+	 * @param weighted list of explanation parts that shall be marked
+	 * @param shortest the shortest explanation
+	 */
+	private static void selectWeighted(List<String> weighted, List<String> shortest, int allExpl, int maxExpl) {
+			for (ListIterator<String> itr = shortest.listIterator(); itr.hasNext();) {
+				String tmp = (String) itr.next();
+				for (String s : weighted) {
+					if (tmp.equals(s)) {
+						itr.set(s + "$" + ((allExpl == maxExpl)? allExpl : -allExpl)); // intersection if +, most common if -
+						break;
+					}
+				}
+			}
 	}
 
 	/**
@@ -258,7 +350,7 @@ public class LTMS {
 		for (Literal l : literals) {
 			boolean negated = (valueMap.get(l.var).value == 0);
 			for (Node cnfclause : allClauses) {
-				if (!hasNegTerm(!negated, l, cnfclause)) { 
+				if (!hasNegTerm(!negated, l, cnfclause)) {
 					continue;
 				}
 				if (isUnitOpen(cnfclause) != null && !stackOpenClause.contains(cnfclause)) {
@@ -349,10 +441,10 @@ public class LTMS {
 	private boolean hasNegTerm(boolean neg, Literal l, Node node) {
 		ArrayList<Literal> literals = getLiterals(node);
 		for (Literal lit : literals) {
-			if (neg && !lit.positive && lit.var.toString().equals(l.var.toString())) { 
+			if (neg && !lit.positive && lit.var.toString().equals(l.var.toString())) {
 				return true;
 			}
-			if (neg || !lit.positive || !lit.var.toString().equals(l.var.toString())) { 
+			if (neg || !lit.positive || !lit.var.toString().equals(l.var.toString())) {
 				continue;
 			}
 			return true;
@@ -457,7 +549,6 @@ public class LTMS {
 	 * @return true, if all unit open clauses have been processed and no violated clause have been encountered
 	 */
 	private boolean BCP(Node[] cnfclauses) {
-		//		List<String> tmpReason = new ArrayList<String>();
 		while (!stackOpenClause.empty()) {
 			Node openclause = stackOpenClause.pop();
 			Literal l = isUnitOpen(openclause);
@@ -490,7 +581,7 @@ public class LTMS {
 	 * Returns an explanation why a variable has its truth value by iterating its antecedents
 	 * and collecting their reasons. Only called to explain the BCP stack, not the violated clause.
 	 * 
-	 * @param l the literal to explain   
+	 * @param l the literal to explain
 	 * @return a string to explain a variables truth value
 	 */
 	private void explainValue(Literal l) {

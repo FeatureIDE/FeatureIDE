@@ -28,11 +28,14 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.CONSTRAINT_MAK
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import org.eclipse.draw2d.Figure;
 import org.eclipse.draw2d.FreeformLayout;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.Label;
+import org.eclipse.draw2d.Panel;
+import org.eclipse.draw2d.ToolbarLayout;
 import org.eclipse.draw2d.geometry.Dimension;
 import org.eclipse.draw2d.geometry.Point;
 import org.eclipse.draw2d.geometry.Rectangle;
@@ -47,7 +50,6 @@ import de.ovgu.featureide.fm.core.base.IFeatureModel;
 import de.ovgu.featureide.fm.core.explanations.DeadFeatures;
 import de.ovgu.featureide.fm.core.explanations.FalseOptional;
 import de.ovgu.featureide.fm.core.explanations.Redundancy;
-import de.ovgu.featureide.fm.core.functional.Functional;
 import de.ovgu.featureide.fm.ui.editors.IGraphicalConstraint;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIBasics;
 import de.ovgu.featureide.fm.ui.editors.featuremodel.GUIDefaults;
@@ -149,9 +151,11 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 			IFeatureModel model = Redundancy.getNewModel();
 			int constraintIndex = FeatureUtils.getConstraintIndex(model, constraint);
 			// set tooltip with explanation for redundant constraint
-			StringBuilder toolTip = new StringBuilder(FeatureModelAnalyzer.redExpl.get(constraintIndex).toString());
-			setToolTip(new Label(REDUNDANCE + "\n\n" + toolTip.toString()));
-			//		setToolTip(new Label(REDUNDANCE));
+			List<String> explanation = FeatureModelAnalyzer.redundantExpl.get(constraintIndex);
+			Panel panel = new Panel();
+			panel.setLayoutManager(new ToolbarLayout(false));
+			panel.add(new Label(REDUNDANCE));
+			setToolTip(panel, explanation); 
 			return;
 		}
 
@@ -172,11 +176,16 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 			// set tooltip with explanation for dead feature
 			IFeatureModel model = DeadFeatures.getNewModel();
 			int constraintIndex = FeatureUtils.getConstraintIndex(model, constraint);
-			toolTip.append("\n\n" + FeatureModelAnalyzer.deadFExpl.get(constraintIndex));
-			setToolTip(new Label(toolTip.toString()));
+			List<String> explanation = FeatureModelAnalyzer.deadFExpl.get(constraintIndex);
+
+			Panel panel = new Panel();
+			panel.setLayoutManager(new ToolbarLayout(false));
+			panel.add(new Label(toolTip.toString()));
+			setToolTip(panel, explanation); 
+			return;
 		}
 
-	//	if (!Functional.isEmpty(constraint.getFalseOptional())) {
+		//	if (!Functional.isEmpty(constraint.getFalseOptional())) {
 		if (!constraint.getFalseOptional().isEmpty()) {
 
 			if (constraint.getDeadFeatures().isEmpty()) {
@@ -199,12 +208,52 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 			// set tooltip with explanation for false optional features
 			IFeatureModel model = FalseOptional.getNewModel();
 			int constraintIndex = FeatureUtils.getConstraintIndex(model, constraint);
-			toolTip.append("\n\n" + FeatureModelAnalyzer.falseOptExpl.get(constraintIndex));
-			setToolTip(new Label(toolTip.toString()));
+			List<String> explanation = FeatureModelAnalyzer.falseOptExpl.get(constraintIndex); 
+			
+			Panel panel = new Panel();
+			panel.setLayoutManager(new ToolbarLayout(false));
+			panel.add(new Label(toolTip.toString()));
+			setToolTip(panel, explanation); 
 			return;
 		}
-
 	}
+	
+	/**
+	 * Colors explanation parts which occur most often in all explanations which were generated for a 
+	 * certain defect. Explanation parts which represent an intersection of all explanations are colored
+	 * light red. If no intersection exists, explanation which occur most often are colored dark red.
+	 * 
+	 * @param panel the panel to pass for a tool tip
+	 * @param expl the explanation within a tool tip
+	 */
+	private void setToolTip(Panel panel, List<String> expl) {
+		for (String s : expl) {
+			if (s.contains("$")) {
+				int lastChar = s.lastIndexOf("$");
+				String text = s.substring(0, lastChar); // pure explanation without delimiter and count of explanation part
+				int count = 0; //if non-negative, intersection
+				if (lastChar < s.length()-1)
+				{
+					String suffix = s.substring(lastChar+1, s.length());
+					try{
+					    count = Integer.parseInt(suffix);
+					}
+					catch(NumberFormatException e){
+					}
+				}
+				Label tmp = new Label(text+"("+Math.abs(count)+")");
+				if (count>0) tmp.setForegroundColor(GUIBasics.createColor(255,99,71));
+				else tmp.setForegroundColor(GUIBasics.createColor(139,0,0));
+				panel.add(tmp);
+			}
+			else {
+				Label tmp = new Label(s);
+				panel.add(tmp);
+			}
+		}
+		setToolTip(panel);
+	}
+
 
 	private String getConstraintText(IConstraint constraint) {
 		return constraint.getNode().toString(symbols);

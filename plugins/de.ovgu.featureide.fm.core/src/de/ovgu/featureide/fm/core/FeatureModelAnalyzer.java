@@ -105,13 +105,13 @@ public class FeatureModelAnalyzer {
 	private IFeatureModel fm;
 
 	//for tooltip: remember explanation for redundant constraint. Key = constraintIndex, Value = explanation
-	public static HashMap<Integer, String> redExpl = new HashMap<Integer, String>();
+	public static HashMap<Integer, List<String>> redundantExpl = new HashMap<Integer, List<String>>();
 
 	//for tooltip: remember explanation for constraint which leads to dead feature. Key = constraintIndex, Value = explanation
-	public static HashMap<Integer, String> deadFExpl = new HashMap<Integer, String>();
+	public static HashMap<Integer, List<String>> deadFExpl = new HashMap<Integer, List<String>>();
 
 	//for tooltip: remember explanation for constraint which leads to false optional feature. Key = constraintIndex, Value = explanation
-	public static HashMap<Integer, String> falseOptExpl = new HashMap<Integer, String>();
+	public static HashMap<Integer, List<String>> falseOptExpl = new HashMap<Integer, List<String>>();
 
 	/**
 	 * Defines whether features should be included into calculations.
@@ -710,7 +710,7 @@ public class FeatureModelAnalyzer {
 
 					FalseOptional falseOpts = new FalseOptional();
 					int constrInd = FeatureUtils.getConstraintIndex(clone, constraint);
-					String expl = falseOpts.explain(clone, constraint.getFalseOptional());
+					List<String> expl = falseOpts.explain(clone, constraint.getFalseOptional());
 					falseOptExpl.put(constrInd, expl);
 				}
 
@@ -725,7 +725,7 @@ public class FeatureModelAnalyzer {
 						// generate explanation for the dead feature
 						DeadFeatures deadF = new DeadFeatures();
 						int constrInd = FeatureUtils.getConstraintIndex(clone, constraint);
-						String expl = deadF.explain(clone, constraint, constraint.getDeadFeatures());
+						List<String> expl = deadF.explain(clone, constraint, constraint.getDeadFeatures());
 						deadFExpl.put(constrInd, expl);
 					}
 				} else {
@@ -766,8 +766,8 @@ public class FeatureModelAnalyzer {
 		if (comparison == Comparison.REFACTORING) {
 
 			Redundancy redundancy = new Redundancy();
-			String expl = redundancy.explain(oldModel, clone, constraint); //store explanation for redundant constraint
-			redExpl.put(FeatureUtils.getConstraintIndex(clone, constraint), expl);
+			List<String> expl = redundancy.explain(oldModel, clone, constraint); //store explanation for redundant constraint
+			redundantExpl.put(FeatureUtils.getConstraintIndex(clone, constraint), expl);
 			if (oldAttributes.get(constraint) != ConstraintAttribute.REDUNDANT) {
 				changedAttributes.put(constraint, ConstraintAttribute.REDUNDANT);
 			}

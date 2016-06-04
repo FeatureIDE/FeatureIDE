@@ -41,24 +41,44 @@ import org.prop4j.Node;
  * @author "Ananieva Sofia"
  */
 public class Redundancy {
-	
+
 	/**
 	 * The hashMap for bookkeeping of reasons and antecedents for literals. Key = literal.var, value = class Bookkeeping
 	 */
-	private HashMap<Object, Bookkeeping> valueMap = new HashMap<Object, Bookkeeping>(); 
+	private HashMap<Object, Bookkeeping> valueMap = new HashMap<Object, Bookkeeping>();
 	/**
 	 * The model before changes (usually without redundant constraints).
 	 */
-	private IFeatureModel model; 
+	private IFeatureModel model;
 	/**
 	 * The model after changes (with redundant constraint).
 	 */
-	private static IFeatureModel newModel; 
+	private static IFeatureModel newModel;
 	/**
 	 * The list which contains a literal of a respective feature from the redundant constraint.
 	 */
 	private ArrayList<Literal> featRedundantConstr = null;
 
+	/**
+	 * Checks whether a string is contained in a list of strings.
+	 * @param list the list with all strings
+	 * @param str String to check its occurrence in the list
+	 * @param del delimiter  
+	 * @return
+	 */
+	static boolean containsIgnoreSuffix(List<String> list, String str, String del) {
+		for (String s : list) {
+			int index1 = s.lastIndexOf(del);
+			if (index1 >= 0) s = s.substring(0, index1);
+			int index2 = str.lastIndexOf(del);  
+			if (index2 >= 0) str = str.substring(0, index2);
+			if (s.equals(str))	{
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	/**
 	 * Explains why a constraint is redundant. Assumes values for features of the redundant constraint
 	 * which lead to a false formula of the redundant constraint and propagates this values until a violation
@@ -67,21 +87,21 @@ public class Redundancy {
 	 * @param oldModel the feature model without the redundant constraint
 	 * @param redundantConstraint the redundant constraint
 	 */
-	public String explain(IFeatureModel oldModel, IFeatureModel newModel, IConstraint redundantConstraint) {
+	public List<String> explain(IFeatureModel oldModel, IFeatureModel newModel, IConstraint redundantConstraint) {
 		model = oldModel; // the model without the redundant constraint
 		setNewModel(newModel);
 		featRedundantConstr = getLiterals(redundantConstraint.getNode());
 		featRedundantConstr = new ArrayList<Literal>(new LinkedHashSet<Literal>(featRedundantConstr)); // remove duplicates from list
-		String reason = "Constraint is redundant, because: \n";  
-		Node node = NodeCreator.createNodes(oldModel, true).toCNF(); 
+		List<String> explList = new ArrayList<>();
+		explList.add("\nConstraint is redundant, because:");
+		Node node = NodeCreator.createNodes(oldModel, true).toCNF();
 		Node redundantConstr = redundantConstraint.getNode().toCNF();
 		ArrayList<HashMap<Object, Integer>> values = getFeatureValues(featRedundantConstr.size(), redundantConstr, featRedundantConstr); // arraylist of hashmaps with values for false cnf
 		Node[] clauses = node.getChildren();
 
 		List<String> reasons = new ArrayList<String>(); // collect all explanations into array without duplicates
-		
+
 		for (HashMap<Object, Integer> map : values) {
-			reason = reason.trim() + "\n";
 			setTruthValueToUnknown(clauses); //(re)set all literal values to -1
 
 			for (Literal l : featRedundantConstr) {
@@ -89,24 +109,22 @@ public class Redundancy {
 				valueMap.get(l.var).premise = true;
 			}
 			LTMS ltms = new LTMS(model, valueMap, featRedundantConstr);
-			List<String> explanationList = ltms.explainRedundantConstraint(clauses, map);
-			
-			for (String tmp: explanationList) {
-				if (!reasons.contains(tmp)) { 
-					reasons.add(tmp);
+			List<String> tmpExplList = ltms.explainRedundantConstraint(clauses, map);
+
+			for (String s : tmpExplList) {
+				if (!containsIgnoreSuffix(reasons, s, "$")) {	
+					reasons.add(s);
 				}
 			}
 		}
 		if (reasons.isEmpty()) {
-			return "No explanation possible";
-		} else {		
-			reason+=reasons.get(0); // initialize reason with first explanation
-			reasons.remove(0); // start with second explanation
-			for (String tmp : reasons) {
-				reason += ",\n" + tmp;
+			explList.add("No explanation possible");
+		} else {
+			for (String s : reasons) {
+				explList.add(s);
 			}
-			return reason;
 		}
+		return explList;
 	}
 
 	/**
