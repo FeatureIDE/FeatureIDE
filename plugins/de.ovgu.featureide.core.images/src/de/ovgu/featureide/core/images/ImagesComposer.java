@@ -1,14 +1,7 @@
 package de.ovgu.featureide.core.images;
 
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -16,12 +9,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.imageio.ImageIO;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 
 import de.ovgu.featureide.core.builder.ComposerExtensionClass;
+import de.ovgu.featureide.fm.core.base.IFeature;
+import de.ovgu.featureide.fm.core.configuration.Configuration;
+import de.ovgu.featureide.fm.core.io.manager.ConfigurationManager;
+import de.ovgu.featureide.fm.core.io.manager.FileHandler;
 
 /**
  * Images composer through images overlapping.
@@ -33,100 +28,60 @@ import de.ovgu.featureide.core.builder.ComposerExtensionClass;
 public class ImagesComposer extends ComposerExtensionClass {
 
 	@Override
-	public Mechanism getGenerationMechanism() {
-		return null;
-	}
-
-	@Override
 	public void performFullBuild(IFile config) {
-		try {
-			// Get the selected features and order them
-			List<IFolder> selectedFeatures = getSelectedFeatures(config);
-			List<IFolder> orderedFeatures = orderSelectedFeatures(selectedFeatures);
 
-			// Create imagesMap, the key is the relative path from the feature
-			// folder to the image file
-			Map<String, List<File>> imagesMap = new LinkedHashMap<String, List<File>>();
-			for (int i = 0; i < orderedFeatures.size(); i++) {
-				IFolder f = orderedFeatures.get(i);
-				File folder = f.getRawLocation().makeAbsolute().toFile();
-				List<File> files = getAllFiles(folder);
-				for (File file : files) {
-					if (getImageFormat(file.getName()) != null) {
-						String relative = folder.toURI().relativize(file.toURI()).getPath();
-						List<File> currentList = imagesMap.get(relative);
-						if (currentList == null) {
-							currentList = new ArrayList<File>();
-						}
-						currentList.add(file);
-						imagesMap.put(relative, currentList);
+		// Get the selected features and order them
+		List<String> selectedFeatures = getSelectedNonAbstractFeatures(config);
+		List<String> orderedFeatures = orderSelectedFeatures(selectedFeatures);
+
+		// Create imagesMap, the key is the relative path from the feature
+		// folder to the image file
+		Map<String, List<File>> imagesMap = new LinkedHashMap<String, List<File>>();
+		for (int i = 0; i < orderedFeatures.size(); i++) {
+			IFolder f = featureProject.getSourceFolder().getFolder(orderedFeatures.get(i));
+			File folder = f.getRawLocation().makeAbsolute().toFile();
+			List<File> files = ImagesComposerUtils.getAllFiles(folder);
+			for (File file : files) {
+				if (ImagesComposerUtils.getImageFormat(file.getName()) != null) {
+					String relative = folder.toURI().relativize(file.toURI()).getPath();
+					List<File> currentList = imagesMap.get(relative);
+					if (currentList == null) {
+						currentList = new ArrayList<File>();
 					}
+					currentList.add(file);
+					imagesMap.put(relative, currentList);
 				}
 			}
+		}
 
-			// For each image, combine the related image files
-			for (Entry<String, List<File>> entry : imagesMap.entrySet()) {
-
-				// Get the images and calculate final size
-				List<BufferedImage> images = new ArrayList<BufferedImage>();
-				int maxWidth = 0;
-				int maxHeight = 0;
-				for (File imageFile : entry.getValue()) {
-					BufferedImage image = ImageIO.read(imageFile);
-					if (image.getWidth() > maxWidth) {
-						maxWidth = image.getWidth();
-					}
-					if (image.getHeight() > maxHeight) {
-						maxHeight = image.getHeight();
-					}
-					images.add(image);
-				}
-
-				// Overlap the images
-				if (!images.isEmpty()) {
-					BufferedImage combined = new BufferedImage(maxWidth, maxHeight, BufferedImage.TYPE_INT_ARGB);
-					Graphics g = combined.getGraphics();
-					for (BufferedImage i : images) {
-						g.drawImage(i, 0, 0, null);
-					}
-					g.dispose();
-					File output = featureProject.getBuildFolder().getRawLocation().makeAbsolute().toFile();
-					File outputImageFile = new File(output, entry.getKey());
-					outputImageFile.getParentFile().mkdirs();
-					ImageIO.write(combined, getImageFormat(entry.getKey()), outputImageFile);
-				}
+		// For each image, combine the related image files
+		for (Entry<String, List<File>> entry : imagesMap.entrySet()) {
+			File output = featureProject.getBuildFolder().getRawLocation().makeAbsolute().toFile();
+			File outputImageFile = new File(output, entry.getKey());
+			try {
+				ImagesComposerUtils.overlapImages(entry.getValue(), outputImageFile);
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 	}
 
 	/**
-	 * The main file formats supported by javax.imageio
+	 * Get selected non abstract features
 	 * 
-	 * @param name
-	 * @return null if it is not an image file or the file format
+	 * @param config
+	 * @return features
 	 */
-	private String getImageFormat(String name) {
-		int i = name.lastIndexOf('.');
-		if (i > 0) {
-			name = name.substring(i + 1);
-		} else {
-			return null;
+	protected List<String> getSelectedNonAbstractFeatures(IFile config) {
+		List<String> selectedFeatures = new ArrayList<String>();
+		final Configuration configuration = new Configuration(featureProject.getFeatureModel());
+		FileHandler.load(Paths.get(config.getLocationURI()), configuration, ConfigurationManager.getFormat(config.getName()));
+		for (IFeature f : configuration.getSelectedFeatures()) {
+			if (!f.getStructure().isAbstract()) {
+				selectedFeatures.add(f.getName());
+			}
 		}
-		if (name.equalsIgnoreCase("gif")) {
-			return "GIF";
-		} else if (name.equalsIgnoreCase("png")) {
-			return "PNG";
-		} else if (name.equalsIgnoreCase("jpg")) {
-			return "JPEG";
-		} else if (name.equalsIgnoreCase("jpeg")) {
-			return "JPEG";
-		} else if (name.equalsIgnoreCase("bmp")) {
-			return "BMP";
-		}
-		return null;
+		return selectedFeatures;
 	}
 
 	/**
@@ -135,88 +90,19 @@ public class ImagesComposer extends ComposerExtensionClass {
 	 * @param selectedFeatures
 	 * @return ordered features
 	 */
-	private List<IFolder> orderSelectedFeatures(List<IFolder> selectedFeatures) {
+	protected List<String> orderSelectedFeatures(List<String> selectedFeatures) {
 		// Order them if needed
 		Collection<String> featureOrderList = featureProject.getFeatureModel().getFeatureOrderList();
 		if (featureOrderList != null && !featureOrderList.isEmpty()) {
-			List<IFolder> orderedFeatures = new ArrayList<IFolder>();
+			List<String> orderedFeatures = new ArrayList<String>();
 			for (String feature : featureOrderList) {
-				IFolder folder = featureProject.getSourceFolder().getFolder(feature);
-				if (selectedFeatures.contains(folder)) {
-					orderedFeatures.add(folder);
+				if (selectedFeatures.contains(feature)) {
+					orderedFeatures.add(feature);
 				}
 			}
 			return orderedFeatures;
 		}
 		return selectedFeatures;
-	}
-
-	/**
-	 * Get selected features
-	 * 
-	 * @param config
-	 * @return list of IFolders of the features
-	 * @throws FileNotFoundException
-	 * @throws IOException
-	 */
-	private List<IFolder> getSelectedFeatures(IFile config) throws FileNotFoundException, IOException {
-		List<IFolder> selectedFeatures = new ArrayList<IFolder>();
-		BufferedReader reader = null;
-		if (config != null) {
-			try {
-				reader = new BufferedReader(
-						new InputStreamReader(new FileInputStream(config.getRawLocation().toFile()), Charset.availableCharsets().get("UTF-8")));
-				String line = null;
-				while ((line = reader.readLine()) != null) {
-					if (line.startsWith("#"))
-						continue;
-					IFolder f = featureProject.getSourceFolder().getFolder(line);
-					if (f != null) {
-						if (!selectedFeatures.contains(f)) {
-							selectedFeatures.add(f);
-						}
-					}
-				}
-			} finally {
-				if (reader != null) {
-					reader.close();
-				}
-			}
-		}
-		return selectedFeatures;
-	}
-
-	/**
-	 * Get all files recursively
-	 * 
-	 * @param dir
-	 * @return files
-	 */
-	public static List<File> getAllFiles(File dir) {
-		return getAllFiles(null, dir);
-	}
-
-	/**
-	 * getAllFiles recursively, initialize files with null
-	 * 
-	 * @param files
-	 * @param dir
-	 * @return
-	 */
-	private static List<File> getAllFiles(List<File> files, File dir) {
-		if (files == null) {
-			files = new ArrayList<File>();
-		}
-
-		if (!dir.isDirectory()) {
-			files.add(dir);
-			return files;
-		}
-
-		for (File file : dir.listFiles()) {
-			getAllFiles(files, file);
-		}
-		return files;
 	}
 
 }
