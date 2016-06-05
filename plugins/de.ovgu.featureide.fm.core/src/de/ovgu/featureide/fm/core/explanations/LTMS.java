@@ -267,19 +267,19 @@ public class LTMS {
 		weightExpl(shortestExpl, weightedExplanations, cnt); // mark explanations parts within final explanation
 		return shortestExpl;
 	}
-	
 
 	/**
 	 * Processes the shortest explanation and marks parts of an explanation which occur in every
-	 * explanation (intersection) or are most common ones. Such explanation parts possess a high probability 
-	 * to trigger the defect to explain. 
+	 * explanation (intersection) or are most common ones. Such explanation parts possess a high probability
+	 * to trigger the defect to explain.
 	 * 
 	 * @param shortest the shortest explanation
-	 * @param weighted the explanation parts to mark  
+	 * @param weighted the explanation parts to mark
 	 * @param cnt the number of explanations
 	 * @return the shortest explanation with marked explanation parts that occur most often
 	 */
-	public List<String> weightExpl(List<String> shortest, HashMap<String, Integer> weighted, int cnt) {
+	public List<String> weightExpl(List<String> shortest, HashMap<String, Integer> weighted, int cntExpl) {
+
 		// remove all explanation parts which are not part of the shortest explanation
 		Iterator<String> it = weighted.keySet().iterator();
 		while (it.hasNext()) {
@@ -288,55 +288,24 @@ public class LTMS {
 				it.remove();
 			}
 		}
-		// extract list of values
+		// get max number of occurences
 		ArrayList<Integer> list = new ArrayList<Integer>();
 		for (String key : weighted.keySet()) {
 			list.add(weighted.get(key));
 		}
-		if (!list.isEmpty()) {
-			Integer max = Collections.max(list);
-		//	if (max > 1) { // only mark explanation parts that occurred more than once 
-			List<String> listCnt = getKeysFromValue(weighted, max); // remember explanation parts which occur in every explanation
-			selectWeighted(listCnt, shortest, cnt, max);
-		//	}
-		}
-		return shortest;
-	}
-
-	/**
-	 * Returns explanation parts which occur most often in all explanations.
-	 * 
-	 * @param map the hash map which contains explanation parts as keys and their number of occurrence as value
-	 * @param value the max value of occurred explanation parts
-	 * @return explanation parts which occur most often in all explanations
-	 */
-	private static List<String> getKeysFromValue(HashMap<String, Integer> map, Object value) {
-		List<String> res = new ArrayList<String>();
-		for (String s : map.keySet()) {
-			if (map.get(s).equals(value)) {
-				res.add(s);
-			}
-		}
-		return res;
-	}
-
-	/**
-	 * Marks explanation parts in final explanation which occur most often. Adds the number of occurences to
-	 * those parts. 
-	 * 
-	 * @param weighted list of explanation parts that shall be marked
-	 * @param shortest the shortest explanation
-	 */
-	private static void selectWeighted(List<String> weighted, List<String> shortest, int allExpl, int maxExpl) {
+		Iterator<String> it2 = weighted.keySet().iterator();
+		while (it2.hasNext()) {
+			String explMap = it2.next();
 			for (ListIterator<String> itr = shortest.listIterator(); itr.hasNext();) {
-				String tmp = (String) itr.next();
-				for (String s : weighted) {
-					if (tmp.equals(s)) {
-						itr.set(s + "$" + ((allExpl == maxExpl)? allExpl : -allExpl)); // intersection if +, most common if -
-						break;
-					}
+				String explShortest = (String) itr.next(); // A => B
+				if (explMap.equals(explShortest)) {	
+					int cntOccur = weighted.get(explMap);
+					itr.set(explShortest + "$" + cntOccur+"/"+cntExpl);
+					break;
 				}
 			}
+		}
+		return shortest;
 	}
 
 	/**

@@ -155,7 +155,7 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 			Panel panel = new Panel();
 			panel.setLayoutManager(new ToolbarLayout(false));
 			panel.add(new Label(REDUNDANCE));
-			setToolTip(panel, explanation); 
+			setToolTip(panel, explanation);
 			return;
 		}
 
@@ -181,7 +181,7 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 			Panel panel = new Panel();
 			panel.setLayoutManager(new ToolbarLayout(false));
 			panel.add(new Label(toolTip.toString()));
-			setToolTip(panel, explanation); 
+			setToolTip(panel, explanation);
 			return;
 		}
 
@@ -208,20 +208,20 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 			// set tooltip with explanation for false optional features
 			IFeatureModel model = FalseOptional.getNewModel();
 			int constraintIndex = FeatureUtils.getConstraintIndex(model, constraint);
-			List<String> explanation = FeatureModelAnalyzer.falseOptExpl.get(constraintIndex); 
-			
+			List<String> explanation = FeatureModelAnalyzer.falseOptExpl.get(constraintIndex);
+
 			Panel panel = new Panel();
 			panel.setLayoutManager(new ToolbarLayout(false));
 			panel.add(new Label(toolTip.toString()));
-			setToolTip(panel, explanation); 
+			setToolTip(panel, explanation);
 			return;
 		}
 	}
-	
+
 	/**
-	 * Colors explanation parts which occur most often in all explanations which were generated for a 
-	 * certain defect. Explanation parts which represent an intersection of all explanations are colored
-	 * light red. If no intersection exists, explanation which occur most often are colored dark red.
+	 * Color explanation parts according to their occurrences in all explanations for a defect constraint. 
+	 * If expl. part occured once, it is colored black. If it occurred in every explanation, it is colored red. 
+	 * For all other cases, a color gradient is used.
 	 * 
 	 * @param panel the panel to pass for a tool tip
 	 * @param expl the explanation within a tool tip
@@ -231,29 +231,51 @@ public class ConstraintFigure extends Figure implements GUIDefaults {
 			if (s.contains("$")) {
 				int lastChar = s.lastIndexOf("$");
 				String text = s.substring(0, lastChar); // pure explanation without delimiter and count of explanation part
-				int count = 0; //if non-negative, intersection
-				if (lastChar < s.length()-1)
-				{
-					String suffix = s.substring(lastChar+1, s.length());
-					try{
-					    count = Integer.parseInt(suffix);
-					}
-					catch(NumberFormatException e){
+				int occur = 1; //if non-negative, intersection, number of all occurences of expl. part
+				int allExpl = 1; // number of all explanations
+				if (lastChar < s.length() - 1) {
+					String suffix = s.substring(lastChar + 1, s.length()); // 2 (occur) /3 (allExpl)
+					String[] l = suffix.split("/");
+					if (l.length == 2) {
+						try {
+							occur = Integer.parseInt(l[0]);
+							allExpl = Integer.parseInt(l[1]);
+
+						} catch (NumberFormatException e) {
+							System.out.println(e);
+						}
 					}
 				}
-				Label tmp = new Label(text+"("+Math.abs(count)+")");
-				if (count>0) tmp.setForegroundColor(GUIBasics.createColor(255,99,71));
-				else tmp.setForegroundColor(GUIBasics.createColor(139,0,0));
+				//check validity
+				if (allExpl<1 || occur<1 || occur > allExpl)
+				{
+					System.out.println("inconsistent suffix: "+occur +"/"+allExpl+", use defaults 1/1");
+					occur = 1;
+					allExpl = 1;
+				}
+				//if we are here, occur and allExpl are both >=1 and occur <= allExpl - consistent!
+				Label tmp = new Label(text + " (" + occur + "/" + allExpl +")");
+				if (allExpl == 1) { 
+					tmp.setForegroundColor(GUIBasics.createColor(255, 0, 0));
+				}
+				else{ //allExp > 1, can divide through allExpl - 1 
+					if (occur == 1)
+					tmp.setForegroundColor(GUIBasics.createColor(0, 0, 0)); // black for explanation part which occurs once
+
+				// color gradient for remaining explanations
+					else {
+						int confidence = (int)(255.0 * (occur-1.0) / (allExpl- 1.0) +0.5);
+						tmp.setForegroundColor(GUIBasics.createColor(confidence, 0, 0));
+					}
+				}
 				panel.add(tmp);
-			}
-			else {
+			} else {
 				Label tmp = new Label(s);
 				panel.add(tmp);
 			}
 		}
 		setToolTip(panel);
 	}
-
 
 	private String getConstraintText(IConstraint constraint) {
 		return constraint.getNode().toString(symbols);
