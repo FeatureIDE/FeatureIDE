@@ -29,10 +29,6 @@ import static de.ovgu.featureide.fm.core.localization.StringTable.FIND_REDUNDANT
 import static de.ovgu.featureide.fm.core.localization.StringTable.GET_DEAD_FEATURES_;
 import static de.ovgu.featureide.fm.core.localization.StringTable.GET_FALSE_OPTIONAL_FEATURES_;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -711,21 +707,6 @@ public class FeatureModelAnalyzer {
 					FalseOptional falseOpts = new FalseOptional();
 					int constrInd = FeatureUtils.getConstraintIndex(clone, constraint);
 					List<String> expl = falseOpts.explain(clone, constraint.getFalseOptional());
-
-					try {
-						int cnt = 0;
-						for (String s : expl) {
-						cnt++;
-						}
-					
-						String output ="";
-						output += cnt-1 + "\n";
-						File file = new File("/Users/sonja/Desktop/length.txt");
-						FileWriter fw = new FileWriter(file, true);
-						BufferedWriter bw = new BufferedWriter(fw);
-						bw.write(output);
-						bw.close();
-					} catch (IOException ex) {} 
 					
 					falseOptExpl.put(constrInd, expl);
 				}
@@ -743,22 +724,6 @@ public class FeatureModelAnalyzer {
 						int constrInd = FeatureUtils.getConstraintIndex(clone, constraint);
 						List<String> expl = deadF.explain(clone, constraint, constraint.getDeadFeatures());
 						
-						try {
-							int cnt = 0;
-							for (String s : expl) {
-							cnt++;
-							}
-						
-							String output ="";
-							output += cnt-1 + "\n";
-							File file = new File("/Users/sonja/Desktop/length.txt");
-							FileWriter fw = new FileWriter(file, true);
-							BufferedWriter bw = new BufferedWriter(fw);
-							bw.write(output);
-							bw.close();
-						} catch (IOException ex) {
-							
-						}
 						deadFExpl.put(constrInd, expl);
 					}
 				} else {
@@ -800,22 +765,6 @@ public class FeatureModelAnalyzer {
 
 			Redundancy redundancy = new Redundancy();
 			List<String> expl = redundancy.explain(oldModel, clone, constraint); //store explanation for redundant constraint
-
-			try {
-				int cnt = 0;
-				for (String s : expl) {
-				cnt++;
-				}
-			
-				String output ="";
-				output += cnt-1 + "\n";
-				File file = new File("/Users/sonja/Desktop/length.txt");
-				FileWriter fw = new FileWriter(file, true);
-				BufferedWriter bw = new BufferedWriter(fw);
-				bw.write(output);
-				bw.close();
-			} catch (IOException ex) {
-			}
 
 			redundantExpl.put(FeatureUtils.getConstraintIndex(clone, constraint), expl);
 			if (oldAttributes.get(constraint) != ConstraintAttribute.REDUNDANT) {

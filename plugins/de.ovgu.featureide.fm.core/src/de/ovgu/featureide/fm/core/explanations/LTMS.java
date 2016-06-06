@@ -22,7 +22,6 @@ package de.ovgu.featureide.fm.core.explanations;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -214,7 +213,7 @@ public class LTMS {
 		//Weight strings which occur in every generated explanation for a defect while searching for the shortest explanation.
 		HashMap<String, Integer> weightedExplanations = new HashMap<String, Integer>();
 		List<String> shortestExpl = (List<String>) ((ArrayList<String>) reason).clone(); // remember first explanation
-		int cnt = 1; // remember number of explanations
+		int allExpl = 1; // remember number of explanations
 
 		// remember first explanation strings in order to weight them later according their occurrences 
 		for (String tmp : shortestExpl) {
@@ -223,7 +222,7 @@ public class LTMS {
 		while (!stackOpenClause.isEmpty()) { // generate explanations until stack with unit open clauses is empty
 
 			// restore preconditions to start BCP algorithm again
-			cnt++;
+			allExpl++;
 			reason.clear();
 			setTruthValToUnknown(clauses);
 
@@ -264,7 +263,7 @@ public class LTMS {
 			}
 		}
 		// if we are here, shortest explanation is found
-		weightExpl(shortestExpl, weightedExplanations, cnt); // mark explanations parts within final explanation
+		weightExpl(shortestExpl, weightedExplanations, allExpl); // mark explanations parts within final explanation
 		return shortestExpl;
 	}
 
@@ -278,7 +277,7 @@ public class LTMS {
 	 * @param cnt the number of explanations
 	 * @return the shortest explanation with marked explanation parts that occur most often
 	 */
-	public List<String> weightExpl(List<String> shortest, HashMap<String, Integer> weighted, int cntExpl) {
+	public List<String> weightExpl(List<String> shortest, HashMap<String, Integer> weighted, int cntAllExpl) {
 
 		// remove all explanation parts which are not part of the shortest explanation
 		Iterator<String> it = weighted.keySet().iterator();
@@ -300,7 +299,7 @@ public class LTMS {
 				String explShortest = (String) itr.next(); // A => B
 				if (explMap.equals(explShortest)) {	
 					int cntOccur = weighted.get(explMap);
-					itr.set(explShortest + "$" + cntOccur+"/"+cntExpl);
+					itr.set(explShortest + "$" + cntOccur+"/"+cntAllExpl);
 					break;
 				}
 			}
