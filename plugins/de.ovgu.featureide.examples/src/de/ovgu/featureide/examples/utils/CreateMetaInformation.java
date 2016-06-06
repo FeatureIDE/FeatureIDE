@@ -74,7 +74,7 @@ public class CreateMetaInformation {
 	private final static FilenameFilter projectfilter = new ProjectFilter();
 
 	public static void main(String[] args) {
-		final File directory = new File("./" + ExamplePlugin.FeatureIDE_EXAMPLE_DIR);
+		final File directory = new File(args[0]+ "/" + ExamplePlugin.FeatureIDE_EXAMPLE_DIR);
 		Collection<ProjectRecord> files = new ArrayList<ProjectRecord>();
 		collectProjects(files, directory, null);
 		for (ProjectRecord projectRecord : files) {
