@@ -28,13 +28,13 @@ import de.ovgu.featureide.fm.core.base.IConstraint;
 import de.ovgu.featureide.fm.core.base.IFeatureModel;
 
 /**
- * Interface for a conversion strategy
+ * Interface for a conversion strategy.
  * 
  * @author Alexander Knueppel
  */
 public interface IConverterStrategy {
 	/**
-	 * Converts a feature model with complex constraints to a feature model with only requires- and excludes-constraints
+	 * Converts a feature model with complex constraints to a feature model with only requires- and excludes-constraints.
 	 * @param fm Original feature model
 	 * @param nodes List of (complex) formulas
 	 * @param preserve States whether configuration semantics should be preserved (same number of configurations in original and converted model)
@@ -43,9 +43,9 @@ public interface IConverterStrategy {
 	public IFeatureModel convert(IFeatureModel fm, List<Node> nodes, boolean preserve);
 	
 	/**
-	 * Should strive to simplify a complex constraint
+	 * Should strive to simplify a complex constraint.
 	 * @param constraint
-	 * @return A list of nodes, some of them might be simple constraints
+	 * @return A list of nodes; some of them might be simple constraints
 	 */
 	public List<Node> preprocess(IConstraint constraint);
 }
