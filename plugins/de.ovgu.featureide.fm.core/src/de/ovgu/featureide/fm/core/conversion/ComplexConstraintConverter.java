@@ -49,9 +49,11 @@ public class ComplexConstraintConverter {
 	private static final IFeatureModelFactory factory = FMFactoryManager.getFactory();
 	/* Working feature model */
 	protected IFeatureModel fm;
+	/* Preserve number of configurations */
+	protected boolean preserveConfigurations;
 	
 	/**
-	 * Checks whether a given node is either a requires- or an excludes-constraint
+	 * Checks whether a given node is either a requires- or an excludes-constraint.
 	 * @param node
 	 * @return true if node is a simple constraint. False otherwise.
 	 */
@@ -70,7 +72,7 @@ public class ComplexConstraintConverter {
 	}	
 	
 	/**
-	 * Checks whether a given node is neither a requires- nor an excludes-constraint
+	 * Checks whether a given node is neither a requires- nor an excludes-constraint.
 	 * @param node
 	 * @return true if node is a complex constraint. False otherwise.
 	 */
@@ -79,7 +81,7 @@ public class ComplexConstraintConverter {
 	}
 	
 	/**
-	 * Checks whether a given node is a (hidden) composition of requires- and excludes-constraints
+	 * Checks whether a given node is a (hidden) composition of requires- and excludes-constraints.
 	 * @param node
 	 * @return true if node consists of a number of simple constraints. False otherwise.
 	 */
@@ -95,6 +97,36 @@ public class ComplexConstraintConverter {
 		}
 		
 		return result;
+	}
+	
+	/**
+	 * Checks whether there exist only constraints that can be refactored trivially.
+	 * @param node
+	 * @return true if no construction of an abstract subtree is necessary. False otherwise.
+	 */
+	public static boolean trivialRefactoring(List<Node> nodes) {
+		for(Node node : nodes) {
+			if(!isPseudoComplex(node))
+				return false;
+		}
+		return true;
+	}
+	
+	/**
+	 * Checks whether there exist only constraints that can be refactored trivially.
+	 * @param fm
+	 * @return true if no construction of an abstract subtree is necessary. False otherwise.
+	 */
+	public static boolean trivialRefactoring(final IFeatureModel fm) {
+		List<Node> nodes = new LinkedList<Node>();
+		for(IConstraint c : fm.getConstraints()) {
+			nodes.add(c.getNode());
+		}
+		return ComplexConstraintConverter.trivialRefactoring(nodes);
+	}
+	
+	public void enablePreserveConfigurations(boolean enable) {
+		preserveConfigurations = enable;
 	}
 	
 	/**
@@ -118,6 +150,7 @@ public class ComplexConstraintConverter {
 		//Basic cleaning
 		prepare();
 		
+		//Identify trivial refactorings
 		refactorPseudoComplexConstraints();
 		
 		//Get list of complex clauses and remove them from the model
@@ -142,7 +175,7 @@ public class ComplexConstraintConverter {
 			return fm;
 		}
 		
-		return converter.convert(fm, minComplexNodes, true);
+		return converter.convert(fm, minComplexNodes, preserveConfigurations);
 	}
 	
 	/**
@@ -193,7 +226,7 @@ public class ComplexConstraintConverter {
 	}
 	
 	/**
-	 * Splits up a complex constraint completely into simple constraints if possible.
+	 * Splits up a complex constraint into simple constraints if possible.
 	 */
 	protected void refactorPseudoComplexConstraints() {
 		List<IConstraint> pseudoComplexConstraints = new LinkedList<IConstraint>();
@@ -225,7 +258,6 @@ public class ComplexConstraintConverter {
 		
 		for(IConstraint c : fm.getConstraints()) {
 			if(ComplexConstraintConverter.isComplex(c.getNode())) {
-				System.out.println("Prune: " + c.getNode());
 				complexConstraints.add(c);
 			}
 		}
